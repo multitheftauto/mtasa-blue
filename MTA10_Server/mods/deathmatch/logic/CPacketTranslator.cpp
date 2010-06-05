@@ -121,7 +121,7 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
             pTemp = new CCameraSyncPacket;
             break;
 
-        default: break;
+		default: break;
     }
 
     // Could we create the packet?
@@ -137,13 +137,6 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
         // Set the source player
         pTemp->SetSourceElement ( pSourcePlayer );
 
-        // Check we have a source player if the packet type needs it
-        if ( !pSourcePlayer && pTemp->RequiresSourcePlayer () )
-        {
-            delete pTemp;
-            pTemp = NULL;
-        }
-        else
         // Attempt to read the content, if we fail, delete the packet again
         if ( !pTemp->Read ( BitStream ) )
         {

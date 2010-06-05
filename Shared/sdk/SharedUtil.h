@@ -13,16 +13,6 @@
 
 #pragma once
 #include "SString.h"
-#include <list>
-#include <vector>
-#include <map>
-#include <deque>
-#include <algorithm>
-
-//
-// System wide defines
-//
-#define WITH_VEHICLE_HANDLING 0
 
 //
 // _vsnprintf with buffer full check
@@ -34,18 +24,8 @@
             (buffer)[(count)-1] = 0; \
     }
 
-//
-// strncpy with null termination
-//
-#define STRNCPY( dest, source, count ) \
-    { \
-        strncpy( dest, source, (count)-1 ); \
-        (dest)[(count)-1] = 0; \
-    }
-
 #ifndef WIN32
     #define _vsnprintf vsnprintf
-    #define _isnan isnan
 #endif
 
 //
@@ -57,9 +37,6 @@
 
 namespace SharedUtil
 {
-
-#ifdef WIN32
-
     //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only
@@ -71,13 +48,6 @@ namespace SharedUtil
     // into an absolute MTASA path i.e. "C:\Program Files\MTA San Andreas\MTA\file.dat"
     //
     SString CalcMTASAPath ( const SString& strPath );
-
-    //
-    // Run ShellExecute with these parameters after exit
-    //
-    void SetOnQuitCommand ( const SString& strOperation, const SString& strFile = "", const SString& strParameters = "", const SString& strDirectory = "", const SString& strShowCmd = "" );
-
-#endif
 
     //
     // Retrieves the number of milliseconds that have elapsed since the system was started.
@@ -93,26 +63,6 @@ namespace SharedUtil
     //
     double GetSecondCount ( void );
 
-    //
-    // Get the local time in a string.
-    // Set bDate to include the date, bMs to include milliseconds
-    //
-    SString GetLocalTimeString ( bool bDate = false, bool bMilliseconds = false );
-
-    //
-    // Output timestamped line into the debugger
-    //
-    void OutputDebugLine ( const char* szMessage );
-
-    //
-    // Load binary data from a file into an array
-    //
-    bool FileLoad ( const SString& strFilename, std::vector < char >& buffer );
-
-    //
-    // Return true if supplied string adheres to the new version format
-    //
-    bool IsValidVersionString ( const SString& strVersion );
 
     //
     // Some templates
@@ -138,7 +88,7 @@ namespace SharedUtil
 
     // Lerps between two values depending on the weight
     template< class T >
-    T Lerp ( const T& from, float fAlpha, const T& to )
+    T Lerp ( T& from, float fAlpha, T& to )
     {
         return ( to - from ) * fAlpha + from;
     }
@@ -163,106 +113,6 @@ namespace SharedUtil
     {
         return static_cast < int > ( floor ( value + 0.5f ) );
     }
-
-
-
-    //
-    // Container helpers for std::list/vector/map
-    //
-
-    //
-    // std::list helpers
-    //
-
-    // Returns true if the item is in the itemList
-    template < class T >
-    bool ListContains ( const std::list < T >& itemList, const T& item )
-    {
-        typename std::list < T > ::const_iterator it = itemList.begin ();
-        for ( ; it != itemList.end () ; ++it )
-            if ( item == *it )
-                return true;
-        return false;
-    }
-
-
-    //
-    // std::vector helpers
-    //
-
-    // Returns true if the item is in the itemList
-    template < class T >
-    bool ListContains ( const std::vector < T >& itemList, const T& item )
-    {
-        typename std::vector < T > ::const_iterator it = itemList.begin ();
-        for ( ; it != itemList.end () ; ++it )
-            if ( item == *it )
-                return true;
-        return false;
-    }
-
-    // Remove first occurrence of item from itemList
-    template < class T >
-    void ListRemove ( std::vector < T >& itemList, const T& item )
-    {
-        typename std::vector < T > ::iterator it = itemList.begin ();
-        for ( ; it != itemList.end () ; ++it )
-            if ( item == *it )
-            {
-                itemList.erase ( it );
-                break;
-            }
-    }
-
-
-    //
-    // std::map helpers
-    //
-
-    // Update or add a value for a key
-    template < class T, class V, class TR, class T2 >
-    void MapSet ( std::map < T, V, TR >& collection, const T2& key, const V& value )
-    {
-        collection[ key ] = value;
-    }
-
-    // Returns true if the item is in the collection
-    template < class T, class V, class TR, class T2 >
-    bool MapContains ( const std::map < T, V, TR >& collection, const T2& key )
-    {
-        return collection.find ( key ) != collection.end ();
-    }
-
-    // Remove key from collection
-    template < class T, class V, class TR, class T2 >
-    void MapRemove ( std::map < T, V, TR >& collection, const T2& key )
-    {
-        typename std::map < T, V, TR > ::iterator it = collection.find ( key );
-        if ( it != collection.end () )
-            collection.erase ( it );
-    }
-
-    // Find value in collection
-    template < class T, class V, class TR, class T2 >
-    V* MapFind ( std::map < T, V, TR >& collection, const T2& key )
-    {
-        typename std::map < T, V, TR > ::iterator it = collection.find ( key );
-        if ( it == collection.end () )
-            return NULL;
-        return &it->second;
-    }
-
-    // Find value in const collection
-    template < class T, class V, class TR, class T2 >
-    const V* MapFind ( const std::map < T, V, TR >& collection, const T2& key )
-    {
-        typename std::map < T, V, TR > ::const_iterator it = collection.find ( key );
-        if ( it == collection.end () )
-            return NULL;
-        return &it->second;
-    }
-
-
 
 
     //
@@ -372,101 +222,6 @@ namespace SharedUtil
     // string stuff
     //
     std::string RemoveColorCode ( const char* szString );
-
-
-    //
-    // ID 'stack'
-    //
-    // Note: IDs run from 1 to Capacity
-    //
-    template < typename T, unsigned long INITIAL_MAX_STACK_SIZE, T INVALID_STACK_ID >
-    class CStack
-    {
-    public:
-        CStack ( void )
-        {
-            m_ulCapacity = 0;
-            ExpandBy ( INITIAL_MAX_STACK_SIZE - 1 );
-        }
-
-        unsigned long GetCapacity ( void ) const
-        {
-            return m_ulCapacity;
-        }
-
-        unsigned long GetUnusedAmount ( void ) const
-        {
-            return m_Queue.size ();
-        }
-
-        void ExpandBy ( unsigned long ulAmount )
-        {
-            const unsigned long ulOldSize = m_ulCapacity;
-            const unsigned long ulNewSize = m_ulCapacity + ulAmount;
-
-            // Add ID's for new items
-            for ( T ID = ulOldSize + 1; ID <= ulNewSize; ++ID )
-            {
-                m_Queue.push_front( ID );
-            }
-            m_ulCapacity = ulNewSize;
-        }
-
-        T Pop ( void )
-        {
-            // Got any items? Pop from the back
-            if ( m_Queue.size () > 0 )
-            {
-                T ID = m_Queue.back();
-                m_Queue.pop_back ();
-                return ID;
-            }
-
-            // No IDs left
-            return INVALID_STACK_ID;
-        }
-
-        void Push ( T ID )
-        {
-            assert ( m_Queue.size () < m_ulCapacity );
-            assert ( ID != INVALID_STACK_ID );
-            // Push to the front
-            return m_Queue.push_front ( ID );
-        }
-
-    private:
-        unsigned long       m_ulCapacity;
-        std::deque < T >    m_Queue;
-    };
-
-
-    //
-    // Fixed sized string buffer
-    //
-    template < int MAX_LENGTH >
-    class CStaticString
-    {
-        char szData [ MAX_LENGTH + 1 ];
-    public:
-        CStaticString ( void )
-        {
-            szData[0] = 0;
-        }
-
-        // In  
-        CStaticString& operator= ( const char* szOther )
-        {
-            STRNCPY( szData, szOther, MAX_LENGTH + 1 );
-            return *this;
-        }
-
-        // Out  
-        operator const char*() const
-        {
-            return szData;
-        }
-    };
-
 
 };
 

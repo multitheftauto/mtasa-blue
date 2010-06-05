@@ -7,7 +7,6 @@
 *  PURPOSE:     Sound entity class
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
 *               arc_
-*               Florian Busse <flobu@gmx.net>
 *
 *****************************************************************************/
 
@@ -28,9 +27,7 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : CClientE
     RelateDimension ( pManager->GetSoundManager ()->GetDimension () );
 
     m_fVolume = 1.0f;
-    m_fSpeed = 1.0f;
     m_fMinDistance = 2.0f;
-    m_fMaxDistance = 10.0f;
     m_usDimension = 0;
     m_b3D = false;
 }
@@ -62,7 +59,7 @@ bool CClientSound::Play3D ( const char* szPath, CVector vecPosition, bool bLoop 
 {
     m_vecPosition = vecPosition;
     vec3df pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
-    m_pSound = m_pSoundManager->GetEngine()->play3D ( szPath, pos, bLoop, false, true );
+	m_pSound = m_pSoundManager->GetEngine()->play3D ( szPath, pos, bLoop, false, true );
     if ( m_pSound )
     {
         m_b3D = true;
@@ -149,20 +146,6 @@ void CClientSound::SetVolume ( float fVolume )
     }
 }
 
-float CClientSound::GetPlaybackSpeed ( void )
-{
-    return m_fSpeed;
-}
-
-void CClientSound::SetPlaybackSpeed ( float fSpeed )
-{
-    m_fSpeed = fSpeed;
-    if ( m_pSound )
-    {
-        m_pSound->setPlaybackSpeed ( fSpeed );
-    }
-}
-
 void CClientSound::SetPosition ( const CVector& vecPosition )
 {
     m_vecPosition = vecPosition;
@@ -212,7 +195,6 @@ float CClientSound::GetMinDistance ( void )
 
 void CClientSound::SetMaxDistance ( float fDistance )
 {
-    m_fMaxDistance = fDistance;
     if ( m_pSound )
     {
         m_pSound->setMaxDistance ( fDistance );
@@ -257,19 +239,20 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecLookAt )
 
         // Volume
         float fDistance = DistanceBetweenPoints3D ( vecPosition, m_vecPosition );
+        float fSilenceDistance = m_fMinDistance * 20.0f;
         float fVolume = 1.0;
 
         if ( fDistance <= m_fMinDistance )
         {
             fVolume = 1.0f;
         }
-        else if ( fDistance >= m_fMaxDistance )
+        else if ( fDistance >= fSilenceDistance )
         {
             fVolume = 0.0f;
         }
         else
         {
-            float fLinear = (m_fMaxDistance - fDistance) / m_fMaxDistance;
+            float fLinear = (fSilenceDistance - fDistance) / fSilenceDistance;
             fVolume = sqrt ( fLinear ) * fLinear;
         }
 

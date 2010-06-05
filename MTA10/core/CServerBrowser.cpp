@@ -8,7 +8,6 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Florian Busse <flobu@gmx.net>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -22,7 +21,7 @@ extern CCore* g_pCore;
 
 template<> CServerBrowser * CSingleton < CServerBrowser >::m_pSingleton = NULL;
 
-#define BROWSER_DEFAULTWIDTH    720.0f
+#define BROWSER_DEFAULTWIDTH	720.0f
 #define BROWSER_DEFAULTHEIGHT    495.0f
 
 CServerBrowser::CServerBrowser ( void )
@@ -31,8 +30,6 @@ CServerBrowser::CServerBrowser ( void )
 
     // Initialize
     m_ulLastUpdateTime = 0;
-    m_firstTimeBrowseServer = true;
-    m_bOptionsLoaded = false;
     m_PrevServerBrowserType = INTERNET;
 
     // Create serverbrowser window
@@ -46,10 +43,10 @@ CServerBrowser::CServerBrowser ( void )
     m_pWindow->SetAlwaysOnTop ( true );
     m_pWindow->SetMinimumSize ( CVector2D ( BROWSER_DEFAULTWIDTH, BROWSER_DEFAULTHEIGHT ) );
 
-    // Create the serverlist tab panel and some tabs
-    m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
-    m_pTabs->SetPosition ( CVector2D ( 0.0f, 25.0f ) );
-    m_pTabs->SetSize ( CVector2D ( BROWSER_DEFAULTWIDTH, BROWSER_DEFAULTHEIGHT - 60.0f ) );
+	// Create the serverlist tab panel and some tabs
+	m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
+	m_pTabs->SetPosition ( CVector2D ( 0.0f, 25.0f ) );
+	m_pTabs->SetSize ( CVector2D ( BROWSER_DEFAULTWIDTH, BROWSER_DEFAULTHEIGHT - 60.0f ) );
     
     // Back button
     m_pButtonBack = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Back" ) );
@@ -59,21 +56,21 @@ CServerBrowser::CServerBrowser ( void )
     // Create the serverlist status label
     m_pServerListStatus = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Loading..." ) );
     m_pServerListStatus->SetPosition ( CVector2D ( 14.0f, BROWSER_DEFAULTHEIGHT - 30.0f ) );
-    m_pServerListStatus->SetSize ( CVector2D ( 0.40f, 0.40f ), true );
+	m_pServerListStatus->SetSize ( CVector2D ( 0.40f, 0.40f ), true );
     //m_pServerListStatus->SetMinimumSize ( CVector2D ( 1.0f, 1.0f ) );
     //m_pServerListStatus->SetMaximumSize ( CVector2D ( 1.0f, 1.0f ) );
 
-    // Create locked icon
-    m_pLockedIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pWindow ) );
-    m_pLockedIcon->SetVisible ( false );
-    m_pLockedIcon->SetFrameEnabled ( false );
-    m_pLockedIcon->LoadFromFile ( "cgui\\images\\locked.png" );
+	// Create locked icon
+	m_pLockedIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pWindow ) );
+	m_pLockedIcon->SetVisible ( false );
+	m_pLockedIcon->SetFrameEnabled ( false );
+	m_pLockedIcon->LoadFromFile ( "cgui\\images\\locked.png" );
 
     // Serial verification icon
-    m_pSerialIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pWindow ) );
-    m_pSerialIcon->SetVisible ( false );
-    m_pSerialIcon->SetFrameEnabled ( false );
-    m_pSerialIcon->LoadFromFile ( "cgui\\images\\shield.png" );
+	m_pSerialIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pWindow ) );
+	m_pSerialIcon->SetVisible ( false );
+	m_pSerialIcon->SetFrameEnabled ( false );
+	m_pSerialIcon->LoadFromFile ( "cgui\\images\\shield.png" );
 
     //Set necessary handlers
     m_pButtonBack->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnBackClick, this ) );
@@ -81,7 +78,7 @@ CServerBrowser::CServerBrowser ( void )
 
     // Create the tabs
     CreateTab ( ServerBrowserType::INTERNET, "Internet" );
-    CreateTab ( ServerBrowserType::LAN, "Lan" );
+	CreateTab ( ServerBrowserType::LAN, "Lan" );
     CreateTab ( ServerBrowserType::FAVOURITES, "Favourites" );
     CreateTab ( ServerBrowserType::RECENTLY_PLAYED, "Recently Played" );
     
@@ -97,12 +94,6 @@ CServerBrowser::CServerBrowser ( void )
     // Login dialog
     m_pCommunityLogin.SetVisible ( false );
     m_pCommunityLogin.SetCallback ( &CServerBrowser::CompleteConnect );
-
-    // Load options
-    LoadOptions ( CCore::GetSingletonPtr ()->GetConfig ( )->FindSubNode ( CONFIG_NODE_SERVER_OPTIONS ) );
-
-    // Save the active tab, needs to be done after at least one tab exists
-    m_pTabs->SetSelectionHandler ( GUI_CALLBACK( &CServerBrowser::OnTabChanged, this ) );
 }
 
 
@@ -110,7 +101,7 @@ CServerBrowser::~CServerBrowser ( void )
 {
     // Delete the Tabs
     DeleteTab ( ServerBrowserType::INTERNET );
-    DeleteTab ( ServerBrowserType::LAN );
+	DeleteTab ( ServerBrowserType::LAN );
     DeleteTab ( ServerBrowserType::FAVOURITES );
     DeleteTab ( ServerBrowserType::RECENTLY_PLAYED );
 
@@ -153,10 +144,10 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pEditServerSearch [ type ]->SetTextChangedHandler( GUI_CALLBACK( &CServerBrowser::OnFilterChanged, this ) );
 
     // Server search icon
-    m_pServerSearchIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditServerSearch [ type ] ) );
-    m_pServerSearchIcon [ type ]->SetPosition ( CVector2D ( 0.85f, 0.15f ), true );
-    m_pServerSearchIcon [ type ]->SetSize ( CVector2D ( 16, 14 ), false );
-    m_pServerSearchIcon [ type ]->LoadFromFile ( "cgui\\images\\magnfglasssmall.png" );
+	m_pServerSearchIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditServerSearch [ type ] ) );
+	m_pServerSearchIcon [ type ]->SetPosition ( CVector2D ( 0.85f, 0.15f ), true );
+	m_pServerSearchIcon [ type ]->SetSize ( CVector2D ( 16, 14 ), false );
+	m_pServerSearchIcon [ type ]->LoadFromFile ( "cgui\\images\\magnfglasssmall.png" );
 
     // Player search edit
     m_pEditPlayerSearch [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
@@ -165,10 +156,10 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pEditPlayerSearch [ type ]->SetTextChangedHandler( GUI_CALLBACK( &CServerBrowser::OnFilterChanged, this ) );
 
     // Player search icon
-    m_pPlayerSearchIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditPlayerSearch [ type ] ) );
-    m_pPlayerSearchIcon [ type ]->SetPosition ( CVector2D ( 0.8f, 0.15f ), true );
-    m_pPlayerSearchIcon [ type ]->SetSize ( CVector2D ( 16, 14 ), false );
-    m_pPlayerSearchIcon [ type ]->LoadFromFile ( "cgui\\images\\magnfglasssmall.png" );
+	m_pPlayerSearchIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditPlayerSearch [ type ] ) );
+	m_pPlayerSearchIcon [ type ]->SetPosition ( CVector2D ( 0.8f, 0.15f ), true );
+	m_pPlayerSearchIcon [ type ]->SetSize ( CVector2D ( 16, 14 ), false );
+	m_pPlayerSearchIcon [ type ]->LoadFromFile ( "cgui\\images\\magnfglasssmall.png" );
 
     // Include checkboxes
     m_pIncludeEmpty [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Empty", true ) );
@@ -241,7 +232,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 
     // Server List Columns
     m_hSerial [ type ] = m_pServerList [ type ]->AddColumn ( "", 0.03f );
-    m_hLocked [ type ] = m_pServerList [ type ]->AddColumn ( "", 0.03f );
+	m_hLocked [ type ] = m_pServerList [ type ]->AddColumn ( "", 0.03f );
     m_hName [ type ] = m_pServerList [ type ]->AddColumn ( "Name", 0.50f );
     m_hPlayers [ type ] = m_pServerList [ type ]->AddColumn ( "Players", 0.14f );
     m_hPing [ type ] = m_pServerList [ type ]->AddColumn ( "Ping", 0.10f );
@@ -300,10 +291,10 @@ CServerBrowser::ServerBrowserType CServerBrowser::GetCurrentServerBrowserType ( 
     {
         currentServerBrowserType = ServerBrowserType::RECENTLY_PLAYED;
     }
-    else if ( m_pTabs->IsTabSelected ( m_pTab [ ServerBrowserType::LAN ] ) )
-    {
-        currentServerBrowserType = ServerBrowserType::LAN;
-    }
+	else if ( m_pTabs->IsTabSelected ( m_pTab [ ServerBrowserType::LAN ] ) )
+	{
+		currentServerBrowserType = ServerBrowserType::LAN;
+	}
     else
     {
         currentServerBrowserType = ServerBrowserType::INTERNET;
@@ -314,17 +305,16 @@ CServerBrowser::ServerBrowserType CServerBrowser::GetCurrentServerBrowserType ( 
 
 void CServerBrowser::Update ( void )
 {
-    ServerBrowserType Type = GetCurrentServerBrowserType ();
-    CServerList *pList = GetServerList ( Type );
+    CServerList *pList = GetServerList ( GetCurrentServerBrowserType () );
 
     // Update the current server list class
     pList->Pulse ();
 
     // If an update is needed, the serverbrowser is visible and it has gone some time since last update
-    if ( ( pList->IsUpdated () || m_PrevServerBrowserType != Type ) && m_ulLastUpdateTime < CClientTime::GetTime () - SERVER_BROWSER_UPDATE_INTERVAL )
+    if ( ( pList->IsUpdated () || m_PrevServerBrowserType != GetCurrentServerBrowserType () ) && m_ulLastUpdateTime < CClientTime::GetTime () - SERVER_BROWSER_UPDATE_INTERVAL )
     {
         // Update the GUI
-        UpdateServerList ( Type , Type == RECENTLY_PLAYED );
+        UpdateServerList ( GetCurrentServerBrowserType () );
 
         // Set the status string
         m_pServerListStatus->SetText ( pList->GetStatus ().c_str () );
@@ -333,7 +323,7 @@ void CServerBrowser::Update ( void )
         m_ulLastUpdateTime = CClientTime::GetTime ();
 
         // Update last viewed tab
-        m_PrevServerBrowserType = Type;
+        m_PrevServerBrowserType = GetCurrentServerBrowserType ();
     }
 }
 
@@ -363,8 +353,8 @@ bool CServerBrowser::OnWindowSize ( CGUIElement* pElement )
 {
     CVector2D WindowSize = m_pWindow->GetSize ();
 
-    // Update the Tab panel size
-    m_pTabs->SetSize ( CVector2D ( WindowSize.fX, WindowSize.fY - 60.0f ) );
+	// Update the Tab panel size
+	m_pTabs->SetSize ( CVector2D ( WindowSize.fX, WindowSize.fY - 60.0f ) );
     
     // Back button position
     m_pButtonBack->SetPosition ( CVector2D ( WindowSize.fX - 123.0f, WindowSize.fY - 32.0f ) );
@@ -387,20 +377,15 @@ void CServerBrowser::SetVisible ( bool bVisible )
 {
     m_pWindow->SetVisible ( bVisible );
     m_pWindow->BringToFront ();
-
     // Are we making this window visible?
     if ( bVisible )
     {
-        if ( m_firstTimeBrowseServer )
+        // Start refreshing all servers
+        for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
         {
-            // Start loading all servers
-            for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
-            {
-                m_pEditPassword [ i ]->SetText( "" );
-                m_iSelectedServer [ i ] = -1;
-                GetServerList ( (ServerBrowserType)i )->Refresh ();
-            }
-            m_firstTimeBrowseServer = false;
+            m_pEditPassword [ i ]->SetText( "" );
+            m_iSelectedServer [ i ] = -1;
+            GetServerList ( (ServerBrowserType)i )->Refresh ();
         }
     }
     else
@@ -507,8 +492,8 @@ void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserT
                 if ( strPlayerNameLower.find(strPlayerSearchText) != string::npos )
                 {
                     bPlayerSearchFound = true;
-                    int k = m_pServerPlayerList [ Type ]->AddRow ( true );
-                    m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], strPlayerName.c_str (), false, false, true );
+                    int k = m_pServerPlayerList [ Type ]->AddRow ();
+                    m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], strPlayerName.c_str () );
                 }
             }
         }
@@ -533,14 +518,14 @@ void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserT
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hName [ Type ],     pServer->strName.c_str (), false, false, true );
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hGame [ Type ],     pServer->strType.c_str (), false, false, true );
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hMap [ Type ],      pServer->strMap.c_str (), false, false, true );
-        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hHost [ Type ],     strEndpoint.c_str (), false, false, true );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hHost [ Type ],     strEndpoint.c_str (), true, false, true );
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPlayers [ Type ],  ssPlayers.str ().c_str (), true, false, true );
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPing [ Type ],     itoa ( pServer->nPing, buf, 10 ), true, false, true );
 
-        // Locked icon
-        if ( pServer->bPassworded )
+		// Locked icon
+		if ( pServer->bPassworded )
         {
-            m_pServerList [ Type ]->SetItemImage ( iIndex, m_hLocked [ Type ], m_pLockedIcon );
+			m_pServerList [ Type ]->SetItemImage ( iIndex, m_hLocked [ Type ], m_pLockedIcon );
         }
         if ( pServer->bSerials )
         {
@@ -570,68 +555,13 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
 {
     ServerBrowserType Type = GetCurrentServerBrowserType ();
 
+    m_pServerPlayerList [ Type ]->Clear ();
+
     char buf[32];
-
-    if ( pElement == m_pServerPlayerList [ Type ] && m_pServerPlayerList [ Type ]->GetSelectedCount () >= 1 )
-    {
-        // Get the selected row of the player gridlist
-        int iSelectedIndex = m_pServerPlayerList [ Type ]->GetSelectedItemRow ();
-        std::string strSelectedPlayerName = m_pServerPlayerList [ Type ]->GetItemText ( iSelectedIndex, m_hPlayerName [ Type ] );
-
-        // Walk the server list looking for the player on a server 
-        CServerList * pList = GetServerList ( Type );
-        CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
-        for ( i = i_b; i != i_e; i++ ) 
-        {
-            CServerListItem * pServer = *i;
-
-            for ( unsigned int j = 0; j < pServer->vecPlayers.size (); j++ )
-            {
-                std::string strPlayerName = pServer->vecPlayers[j].c_str ();
-                if ( strPlayerName.compare ( strSelectedPlayerName ) == 0 )
-                {
-                    // We found the server on which the player is
-                    // Walk the server gridlist looking for the server host to get the row index
-                    std::string strEndpoint = pServer->strHost + ":" + itoa ( pServer->usGamePort, buf, 10 );
-                    for ( int k = 0; k < m_pServerList [ Type ]->GetRowCount (); k++ )
-                    {
-                        if ( strEndpoint.compare ( m_pServerList [ Type ]->GetItemText ( k, m_hHost [ Type ] ) ) == 0 )
-                        {
-                            // We found the index, select it
-                            m_pServerList [ Type ]->SetSelectedItem ( k, m_hHost [ Type ], true );
-
-                            // It's not the same server as was selected before, so we update the password
-                            if ( k != m_iSelectedServer[ Type ] )
-                            {
-                                bool bSavedPasswords;
-                                CVARS_GET ( "save_server_passwords", bSavedPasswords );
-                                if ( pServer->bPassworded && bSavedPasswords )
-                                {
-                                    m_pEditPassword [ Type ]->SetText ( GetServerPassword(strEndpoint).c_str() );
-                                }
-                                else
-                                {
-                                    m_pEditPassword [ Type ]->SetText ( "" );
-                                }
-                            }
-
-                            // save the selected server
-                            m_iSelectedServer [ Type ] = iSelectedIndex;
-
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-    }
  
     // If there is one item selected
     if ( m_pServerList [ Type ]->GetSelectedCount () >= 1 )
     {
-        // Clear the player list
-        m_pServerPlayerList [ Type ]->Clear ();
-
         // Get the selected row
         int iSelectedIndex = m_pServerList [ Type ]->GetSelectedItemRow ();
 
@@ -805,7 +735,6 @@ bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
             if ( currentServerBrowserType == ServerBrowserType::FAVOURITES )
             {
                 m_ServersFavourites.Remove ( pServer );
-                SaveFavouritesList();
             }
             else
             {
@@ -813,7 +742,6 @@ bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
                 if ( !m_ServersFavourites.Exists ( pServer ) )
                 {
                     m_ServersFavourites.Add ( pServer );
-                    SaveFavouritesList();
                 }
             }
             UpdateServerList ( ServerBrowserType::FAVOURITES, true );
@@ -837,8 +765,6 @@ bool CServerBrowser::OnBackClick ( CGUIElement* pElement )
 
 bool CServerBrowser::OnMouseClick ( CGUIMouseEventArgs Args )
 {
-    ServerBrowserType Type = GetCurrentServerBrowserType ();
-
     if ( Args.pWindow == m_pServerList [ ServerBrowserType::INTERNET ] )
     {
         OnClick ( m_pServerList [ ServerBrowserType::INTERNET ] );
@@ -859,13 +785,8 @@ bool CServerBrowser::OnMouseClick ( CGUIMouseEventArgs Args )
         OnClick ( m_pServerList [ ServerBrowserType::RECENTLY_PLAYED ] );
         return true;
     }
-    else if ( Args.pWindow == m_pServerPlayerList [ Type ] && !m_pEditPlayerSearch [ Type ]->GetText ().empty() )
-    {
-        OnClick ( m_pServerPlayerList [ Type ] );
-        return true;
-    }
 
-    return false;
+	return false;
 }
 
 
@@ -892,20 +813,12 @@ bool CServerBrowser::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
         return true;
     }
 
-    return false;
+	return false;
 }
 
 bool CServerBrowser::OnFilterChanged ( CGUIElement* pElement )
 {
     UpdateServerList ( GetCurrentServerBrowserType (), true );
-    SaveOptions ( );
-
-    return true;
-}
-
-bool CServerBrowser::OnTabChanged ( CGUIElement* pElement )
-{
-    SaveOptions ( );
 
     return true;
 }
@@ -938,13 +851,12 @@ bool CServerBrowser::OnFavouritesByIPAddClick ( CGUIElement* pElement )
     }
 
     // Construct list item
-    CServerListItem Item ( Address, iPort, strHost );
+    CServerListItem Item ( Address, iPort );
 
     // Add the item if it doesn't already exist
     if ( !m_ServersFavourites.Exists ( Item ) )
     {
         m_ServersFavourites.Add ( Item );
-        SaveFavouritesList();
         UpdateServerList ( ServerBrowserType::FAVOURITES );
     }
 
@@ -954,7 +866,7 @@ bool CServerBrowser::OnFavouritesByIPAddClick ( CGUIElement* pElement )
     return true;
 }
 
-bool CServerBrowser::LoadServerList ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList )
+bool CServerBrowser::LoadServerList ( CXMLNode* pNode, std::string strTagName, CServerList *pList )
 {
     CXMLNode* pSubNode = NULL;
     in_addr Address;
@@ -988,45 +900,7 @@ bool CServerBrowser::LoadServerList ( CXMLNode* pNode, const std::string& strTag
 }
 
 
-void CServerBrowser::LoadInternetList()
-{
-    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ),
-            CONFIG_INTERNET_LIST_TAG, GetInternetList () );
-}
-
-
-void CServerBrowser::SaveInternetList()
-{
-    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    CXMLNode* pRecent = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT );
-    if ( !pRecent )
-        pRecent = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_INT );
-    SaveServerList ( pRecent, CONFIG_INTERNET_LIST_TAG, GetInternetList () );
-}
-
-
-void CServerBrowser::SaveRecentlyPlayedList()
-{
-    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    CXMLNode* pRecent = pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC );
-    if ( !pRecent )
-        pRecent = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_REC );
-    SaveServerList ( pRecent, CONFIG_RECENT_LIST_TAG, GetRecentList () );
-}
-
-
-void CServerBrowser::SaveFavouritesList()
-{
-    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    CXMLNode* pFavourites = pConfig->FindSubNode ( CONFIG_NODE_SERVER_FAV );
-    if ( !pFavourites )
-        pFavourites = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_FAV );
-    SaveServerList ( pFavourites, CONFIG_FAVOURITE_LIST_TAG, GetFavouritesList () );
-}
-
-
-bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList )
+bool CServerBrowser::SaveServerList ( CXMLNode* pNode, std::string strTagName, CServerList *pList )
 {
     if ( !pNode )
         return false;
@@ -1049,13 +923,10 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
             if ( pSubNode )
             {
                 CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Create ( "host" );
-                std::string strHost = pServer->strHost;
-                if ( !pServer->strHostName.empty () )
-                    strHost = pServer->strHostName;
-                pHostAttribute->SetValue ( strHost.c_str () );
+				pHostAttribute->SetValue ( pServer->strHost.c_str () );
                 
                 CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Create ( "port" );
-                pPortAttribute->SetValue ( pServer->usGamePort );
+				pPortAttribute->SetValue ( pServer->usGamePort );
             }
             j++;
         }
@@ -1063,131 +934,7 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
     return true;
 }
 
-void CServerBrowser::LoadOptions ( CXMLNode* pNode )
-{
-    if ( !pNode ) {
-        //Node does not exist so allow saving
-        m_bOptionsLoaded = true;
-        return;
-    }
-
-    // loop through all subnodes
-    unsigned int uiCount = pNode->GetSubNodeCount ( ); 
-    for ( unsigned int ui = 0; ui < uiCount; ui ++ )
-    {
-        CXMLNode * pSubNode = pNode->GetSubNode ( ui );
-        if ( pSubNode && pSubNode->GetTagName ( ).compare ( "list" ) == 0 )
-        {
-            CXMLAttribute* pListID = pSubNode->GetAttributes ( ).Find ( "id" );
-            if ( pListID )
-            {
-                // Check for a valid list ID
-                int i = atoi ( pListID->GetValue ().c_str () );
-                if ( i >= 0 && i < SERVER_BROWSER_TYPE_COUNT )
-                {
-                    // load all checkbox options
-                    CXMLAttribute* pIncludeEmpty = pSubNode->GetAttributes ( ).Find ( "include_empty" );
-                    if ( pIncludeEmpty )
-                        m_pIncludeEmpty[ i ]->SetSelected ( pIncludeEmpty->GetValue ( ).compare ( "1" ) == 0 );
-
-                    CXMLAttribute* pIncludeFull = pSubNode->GetAttributes ( ).Find ( "include_full" );
-                    if ( pIncludeFull )
-                        m_pIncludeFull[ i ]->SetSelected ( pIncludeFull->GetValue ( ).compare ( "1" ) == 0 );
-
-                    CXMLAttribute* pIncludeLocked = pSubNode->GetAttributes ( ).Find ( "include_locked" );
-                    if ( pIncludeLocked )
-                        m_pIncludeLocked[ i ]->SetSelected ( pIncludeLocked->GetValue ( ).compare ( "1" ) == 0 );
-
-                    // load 'include offline' if the checkbox exists
-                    if ( m_pIncludeOffline[ i ] )
-                    {
-                        CXMLAttribute* pIncludeOffline = pSubNode->GetAttributes ( ).Find ( "include_offline" );
-                        if ( pIncludeOffline )
-                            m_pIncludeOffline[ i ]->SetSelected ( pIncludeOffline->GetValue ( ).compare ( "1" ) == 0 );
-                    }
-
-                    // restore the active tab
-                    CXMLAttribute* pActiveTab = pSubNode->GetAttributes ( ).Find ( "active" );
-                    if ( pActiveTab && pActiveTab->GetValue ( ).compare ( "1" ) == 0 )
-                        m_pTabs->SetSelectedTab ( m_pTab [ i ] );
-
-                    // restore the search field contents
-                    std::string strSearch = pSubNode->GetTagContent ( );
-                    if ( strSearch.length ( ) > 0 )
-                        m_pEditServerSearch [ i ]->SetText ( strSearch.c_str ( ) );
-                }
-            }
-        }
-    }
-    m_bOptionsLoaded = true;
-}
-
-void CServerBrowser::SaveOptions ( )
-{
-    // Check to make sure if the options were loaded yet, if not the 'changed' events might screw up
-    if ( !m_bOptionsLoaded )
-        return;
-
-    CXMLNode* pConfig = CCore::GetSingletonPtr ( )->GetConfig ( );
-    CXMLNode* pOptions = pConfig->FindSubNode ( CONFIG_NODE_SERVER_OPTIONS );
-    if ( !pOptions )
-    {
-        pOptions = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_OPTIONS );
-    }
-    else
-    {
-        // start with a clean node
-        pOptions->DeleteAllSubNodes ( );
-    }
-
-    int iCurrentType = GetCurrentServerBrowserType ( );
-
-    // Save the options for all four lists
-    for ( unsigned int ui = 0; ui < SERVER_BROWSER_TYPE_COUNT; ui++ )
-    {
-        CXMLNode * pSubNode = pOptions->CreateSubNode ( "list" );
-        if ( pSubNode ) 
-        {
-            // ID of the list to save
-            CXMLAttribute* pListID = pSubNode->GetAttributes ( ).Create ( "id" );
-            pListID->SetValue ( ui );
-
-            // Checkboxes
-            CXMLAttribute* pIncludeEmpty = pSubNode->GetAttributes ( ).Create ( "include_empty" );
-            pIncludeEmpty->SetValue ( m_pIncludeEmpty [ ui ]->GetSelected ( ) );
-
-            CXMLAttribute* pIncludeFull = pSubNode->GetAttributes ( ).Create ( "include_full" );
-            pIncludeFull->SetValue ( m_pIncludeFull [ ui ]->GetSelected ( ) );
-
-            CXMLAttribute* pIncludeLocked = pSubNode->GetAttributes ( ).Create ( "include_locked" );
-            pIncludeLocked->SetValue ( m_pIncludeLocked [ ui ]->GetSelected ( ) );
-
-            // Only recently played & favorites have 'Include offline'
-            if ( m_pIncludeOffline [ ui ] )
-            {
-                CXMLAttribute* pIncludeOffline = pSubNode->GetAttributes ( ).Create ( "include_offline" );
-                pIncludeOffline->SetValue ( m_pIncludeOffline [ ui ]->GetSelected ( ) );
-            }
-
-            // Save the active Tab
-            if ( iCurrentType == ui )
-            {
-                CXMLAttribute* pActive = pSubNode->GetAttributes ( ).Create ( "active" );
-                pActive->SetValue ( 1 );
-            }
-
-            // save the search box content
-            std::string strSearch = m_pEditServerSearch [ ui ]->GetText ( );
-            if ( strSearch.length ( ) > 0 )
-            {
-                pSubNode->SetTagContent ( strSearch.c_str ( ) );
-            }
-        }
-    }
-    g_pCore->SaveConfig ( );
-}
-
-void CServerBrowser::SetServerPassword ( const std::string& strHost, const std::string& strPassword )
+void CServerBrowser::SetServerPassword ( std::string strHost, std::string strPassword )
 {
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
     CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
@@ -1203,7 +950,7 @@ void CServerBrowser::SetServerPassword ( const std::string& strHost, const std::
         {
             if ( CXMLAttribute* pHost = pAttributes->Find ( "host" ) )
             {
-                const std::string& strXMLHost = pHost->GetValue();
+                std::string strXMLHost = pHost->GetValue();
                 if ( strXMLHost == strHost )
                 {
                     CXMLAttribute* pPassword = pAttributes->Create( "password" );
@@ -1224,7 +971,7 @@ void CServerBrowser::SetServerPassword ( const std::string& strHost, const std::
 }
 
 
-std::string CServerBrowser::GetServerPassword ( const std::string& strHost )
+std::string CServerBrowser::GetServerPassword ( std::string strHost )
 {
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
     CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
@@ -1240,11 +987,11 @@ std::string CServerBrowser::GetServerPassword ( const std::string& strHost )
         {
             if ( CXMLAttribute* pHost = pAttributes->Find ( "host" ) )
             {
-                const std::string& strXMLHost = pHost->GetValue();
-                if ( pHost->GetValue() == strHost )
+                std::string strXMLHost = pHost->GetValue();
+                if ( strXMLHost == strHost )
                 {
                     CXMLAttribute* pPassword = pAttributes->Create( "password" );
-                    const std::string& strPassword = pPassword->GetValue();
+                    std::string strPassword = pPassword->GetValue();
                     return strPassword;
                 }
             }

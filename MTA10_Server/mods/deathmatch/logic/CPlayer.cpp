@@ -41,7 +41,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_fRotation = 0.0f;
     m_fAimDirection = 0.0f;
     m_ucDriveByDirection = 0;
-    m_bAkimboArmUp = false;    
+	m_bAkimboArmUp = false;    
     
     m_uiScriptDebugLevel = 0;
 
@@ -51,7 +51,10 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_ucLoginAttempts = 0;
 
-    m_pPlayerTextManager = new CPlayerTextManager ( this ); 
+    m_pPlayerTextManager = new CPlayerTextManager ( this );	
+
+    m_bCamFadedIn = false;
+    SetCamFadeColor ( 0, 0, 0 );
 
     m_PlayerAttackerID = INVALID_ELEMENT_ID;
     m_ucAttackWeapon = 0xFF;
@@ -159,16 +162,8 @@ void CPlayer::Unlink ( void )
 
 void CPlayer::SetNick ( const char* szNick )
 {
-    if ( strlen ( m_szNick ) > 0 && strcmp ( m_szNick, szNick ) != 0 )
-    {
-        // If changing, add the new name to the whowas list
-        char szIP [22];
-        g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP( szIP ) ), GetSerial (), GetPlayerVersion () );
-    }
-
-    assert ( sizeof ( m_szNick ) == MAX_NICK_LENGTH + 1 );
     // Copy the nick to us
-    STRNCPY ( m_szNick, szNick, MAX_NICK_LENGTH + 1 );
+    strncpy ( m_szNick, szNick, MAX_NICK_LENGTH );
 }
 
 
@@ -346,6 +341,19 @@ bool CPlayer::SetScriptDebugLevel ( unsigned int uiLevel )
 }
 
 
+void CPlayer::SetCamFadeColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
+{
+    #define COLOR_ARGB(a,r,g,b) \
+        (((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
+    #define COLOR_RGBA(r,g,b,a) COLOR_ARGB(a,r,g,b)
+
+    m_ulCamFadeColor = COLOR_ARGB ( 255, ucRed, ucGreen, ucBlue );
+
+	#undef COLOR_ARGB
+	#undef COLOR_RGBA
+}
+
+
 void CPlayer::SetDamageInfo ( ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart )
 {
     m_PlayerAttackerID = ElementID;
@@ -414,6 +422,8 @@ void CPlayer::Reset ( void )
     m_bForcedMap = false;
     m_ucInterior = 0;
     m_usDimension = 0;
+    m_bCamFadedIn = true;
+    SetCamFadeColor ( 0, 0, 0 );
     //m_pKeyBinds->Clear ();
     m_bCursorShowing = false;
 
@@ -588,21 +598,4 @@ void CPlayer::ClearSyncTimes ( void )
 
     // Clear the list so we won't try accessing bad data later
     m_SyncTimes.clear ();
-}
-
-
-// Note: The return value must be consumed before m_AnnounceValues is next modified
-const std::string& CPlayer::GetAnnounceValue ( const string& strKey ) const
-{
-    std::map < string, string > ::const_iterator it = m_AnnounceValues.find ( strKey );
-    if ( it != m_AnnounceValues.end () )
-        return it->second;
-    static std::string strDefault;
-    return strDefault;
-}
-
-
-void CPlayer::SetAnnounceValue ( const string& strKey, const string& strValue )
-{
-    m_AnnounceValues [ strKey ] = strValue;
 }

@@ -10,6 +10,27 @@
 *
 *****************************************************************************/
 
+//////////////////////////////////////////////////////////
+//
+// NOTE:
+//
+//    GetBindableFromKey in
+//    MTA10\mods\deathmatch\logic\CScriptKeyBinds.cpp and
+//    MTA10_Server\mods\deathmatch\logic\CKeyBinds.cpp
+//    does not know about the joystick buttons. The implications of which
+//    I'm not sure of. If it just means the script can't bind the joystick
+//    buttons, then that maybe a good thing, or not
+//
+//   TO DO.
+//          1. Axis config              - Done
+//          2. Them thar script binds
+//          3. POV hat as buttons       - Done
+//          4. Axis switch off
+//          5. Axis as buttons
+//
+//
+//////////////////////////////////////////////////////////
+
 #include "StdInc.h"
 #include <game/CPad.h>
 
@@ -152,8 +173,8 @@ public:
     virtual void        SetDeadZone                 ( int iDeadZone );
     virtual void        SetSaturation               ( int iSaturation );
     virtual int         GetSettingsRevision         ( void );
-    virtual void        SetDefaults                 ( void );
-    virtual bool        SaveToXML                   ( void );
+    virtual void        LoadDefaultConfig           ( void );
+    virtual bool        SaveConfig                  ( void );
 
     // Binding
     virtual int         GetOutputCount              ( void );
@@ -171,7 +192,7 @@ private:
     void                EnumAxes                    ( void );
     void                ReadCurrentState            ( void );
     CXMLNode*           GetConfigNode               ( bool bCreateIfRequired );
-    bool                LoadFromXML                 ( void );
+    bool                LoadConfig                  ( void );
 
     int                     m_SettingsRevision;
     SInputDeviceInfo        m_DevInfo;
@@ -213,7 +234,7 @@ CJoystickManagerInterface* GetJoystickManager ( void )
 ///////////////////////////////////////////////////////////////
 CJoystickManager::CJoystickManager ( void )
 {
-    SetDefaults();
+    LoadDefaultConfig();
 }
 
 
@@ -377,9 +398,9 @@ void CJoystickManager::EnumAxes ( void )
         m_DevInfo.guidProduct = didi.guidProduct;
         m_DevInfo.strProductName = didi.tszProductName;
         m_DevInfo.strGuid = GUIDToString ( m_DevInfo.guidProduct );
-        if ( !LoadFromXML () )
+        if ( !LoadConfig () )
         {
-            SetDefaults();
+            LoadDefaultConfig();
         }
     }
 
@@ -829,9 +850,9 @@ CXMLNode* CJoystickManager::GetConfigNode ( bool bCreateIfRequired )
         {
             CXMLAttributes* pAttributes = &pItemNode->GetAttributes ();
 
-            CXMLAttribute* pA = NULL;
+	        CXMLAttribute* pA = NULL;
             pA = pAttributes->Create ( "guid" );
-            pA->SetValue ( m_DevInfo.strGuid.c_str () );
+			pA->SetValue ( m_DevInfo.strGuid.c_str () );
         }
 
     }
@@ -842,12 +863,12 @@ CXMLNode* CJoystickManager::GetConfigNode ( bool bCreateIfRequired )
 
 ///////////////////////////////////////////////////////////////
 //
-// CJoystickManager::SetDefaults
+// CJoystickManager::LoadDefaultConfig
 //
 // Set the default axes mapping for the current joypad.
 //
 ///////////////////////////////////////////////////////////////
-void CJoystickManager::SetDefaults ( void )
+void CJoystickManager::LoadDefaultConfig ( void )
 {
     m_SettingsRevision++;
 
@@ -905,12 +926,12 @@ void CJoystickManager::SetDefaults ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CJoystickManager::LoadFromXML
+// CJoystickManager::LoadConfig
 //
 // Load axes mapping for the current joypad.
 //
 ///////////////////////////////////////////////////////////////
-bool CJoystickManager::LoadFromXML ( void )
+bool CJoystickManager::LoadConfig ( void )
 {
     m_SettingsRevision++;
 
@@ -931,14 +952,14 @@ bool CJoystickManager::LoadFromXML ( void )
         {
             CXMLAttributes* pAttributes = &pNode->GetAttributes ();
 
-            CXMLAttribute* pA = NULL;
+	        CXMLAttribute* pA = NULL;
             if ( pA = pAttributes->Find( "deadzone" ) )
-                m_DevInfo.iDeadZone = Clamp ( 0, atoi ( pA->GetValue ().c_str () ), 49 );
+			    m_DevInfo.iDeadZone = Clamp ( 0, atoi ( pA->GetValue ().c_str () ), 49 );
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "saturation" ) )
-                m_DevInfo.iSaturation = Clamp ( 51, atoi ( pA->GetValue ().c_str () ), 100 );
+			    m_DevInfo.iSaturation = Clamp ( 51, atoi ( pA->GetValue ().c_str () ), 100 );
             else
                 iErrors++;
         }
@@ -960,34 +981,34 @@ bool CJoystickManager::LoadFromXML ( void )
         {
             CXMLAttributes* pAttributes = &pNode->GetAttributes ();
 
-            CXMLAttribute* pA = NULL;
+	        CXMLAttribute* pA = NULL;
             if ( pA = pAttributes->Find( "source_index" ) )
-                line.SourceAxisIndex = (eJoy)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eJoyMax );
+			    line.SourceAxisIndex = (eJoy)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eJoyMax );
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "source_dir" ) )
-                line.SourceAxisDir = (eDir)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eDirMax );
+			    line.SourceAxisDir = (eDir)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eDirMax );
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "output_index" ) )
-                line.OutputAxisIndex = (eStick)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eStickMax );
+			    line.OutputAxisIndex = (eStick)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eStickMax );
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "output_dir" ) )
-                line.OutputAxisDir = (eDir)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eDirMax );
+			    line.OutputAxisDir = (eDir)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eDirMax );
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "enabled" ) )
-                line.bEnabled = atoi ( pA->GetValue ().c_str () ) ? true : false;
+			    line.bEnabled = atoi ( pA->GetValue ().c_str () ) ? true : false;
             else
                 iErrors++;
 
             if ( pA = pAttributes->Find( "max_value" ) )
-                line.MaxValue = atoi ( pA->GetValue ().c_str () );
+			    line.MaxValue = atoi ( pA->GetValue ().c_str () );
             else
                 iErrors++;
 
@@ -1007,12 +1028,12 @@ bool CJoystickManager::LoadFromXML ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CJoystickManager::SaveToXML
+// CJoystickManager::SaveConfig
 //
 // Save axes mapping for the current joypad.
 //
 ///////////////////////////////////////////////////////////////
-bool CJoystickManager::SaveToXML ( void )
+bool CJoystickManager::SaveConfig ( void )
 {
     if ( !IsJoypadValid () )
         return false;
@@ -1036,15 +1057,15 @@ bool CJoystickManager::SaveToXML ( void )
             {
                 CXMLAttributes* pAttributes = &pNode->GetAttributes ();
 
-                CXMLAttribute* pA = NULL;
+	            CXMLAttribute* pA = NULL;
                 pA = pAttributes->Create ( "deadzone" );
-                pA->SetValue ( m_DevInfo.iDeadZone );
+			    pA->SetValue ( m_DevInfo.iDeadZone );
 
                 pA = pAttributes->Create ( "saturation" );
-                pA->SetValue ( m_DevInfo.iSaturation );
+			    pA->SetValue ( m_DevInfo.iSaturation );
 
                 pA = pAttributes->Create ( "product_name" );
-                pA->SetValue ( m_DevInfo.strProductName.c_str () );
+			    pA->SetValue ( m_DevInfo.strProductName.c_str () );
             }
         }
 
@@ -1061,24 +1082,24 @@ bool CJoystickManager::SaveToXML ( void )
             {
                 CXMLAttributes* pAttributes = &pNode->GetAttributes ();
 
-                CXMLAttribute* pA = NULL;
+	            CXMLAttribute* pA = NULL;
                 pA = pAttributes->Create ( "source_index" );
-                pA->SetValue ( line.SourceAxisIndex );
+				pA->SetValue ( line.SourceAxisIndex );
 
                 pA = pAttributes->Create ( "source_dir" );
-                pA->SetValue ( line.SourceAxisDir );
+				pA->SetValue ( line.SourceAxisDir );
 
                 pA = pAttributes->Create ( "output_index" );
-                pA->SetValue ( line.OutputAxisIndex );
+				pA->SetValue ( line.OutputAxisIndex );
 
                 pA = pAttributes->Create ( "output_dir" );
-                pA->SetValue ( line.OutputAxisDir );
+				pA->SetValue ( line.OutputAxisDir );
 
                 pA = pAttributes->Create ( "enabled" );
-                pA->SetValue ( line.bEnabled );
+				pA->SetValue ( line.bEnabled );
 
                 pA = pAttributes->Create ( "max_value" );
-                pA->SetValue ( line.MaxValue );
+				pA->SetValue ( line.MaxValue );
 
             }
         }

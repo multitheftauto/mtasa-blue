@@ -36,7 +36,6 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_usDimension = 0;
     m_ucSyncTimeContext = 1;
     m_ucInterior = 0;
-    m_bDoubleSided = false;
     m_bMapCreated = false;
 
     // Store the line
@@ -118,9 +117,6 @@ CElement::~CElement ( void )
             pPed->m_pContactElement = NULL;
     }
 
-    // Remove from spatial database
-    GetSpatialDatabase ()->RemoveEntity ( this );
-
     // Deallocate our unique ID
     CElementIDs::PushUniqueID ( this );
 
@@ -139,7 +135,7 @@ const CVector & CElement::GetPosition ( void )
 }
 
 
-void CElement::SetTypeName ( const std::string& strTypeName )
+void CElement::SetTypeName ( std::string strTypeName )
 {
     CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
     m_uiTypeHash = HashString ( strTypeName.c_str () );
@@ -235,8 +231,8 @@ void CElement::GetChildren ( lua_State* pLua )
 
 bool CElement::IsMyChild ( CElement* pElement, bool bRecursive )
 {
-    // Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
-    if ( pElement == NULL ) return false;
+	// Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
+	if ( pElement == NULL ) return false;
 
     // Is he us?
     if ( pElement == this )
@@ -268,7 +264,7 @@ void CElement::ClearChildren ( void )
     assert ( m_pParent != this );
 
     // Process our children - Move up to our parent
-    list < CElement* > cloneList = m_Children;
+	list < CElement* > cloneList = m_Children;
     list < CElement* > ::const_iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end () ; ++iter )
         (*iter)->SetParentObject ( m_pParent );
@@ -642,7 +638,7 @@ bool CElement::GetCustomDataBool ( const char* szName, bool& bOut, bool bInherit
 }
 
 
-void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient )
+void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized )
 {
     assert ( szName );
 
@@ -660,9 +656,8 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
     // Trigger the onElementDataChange event on us
     CLuaArguments Arguments;
     Arguments.PushString ( szName );
-    Arguments.PushArgument ( oldVariable );
-    Arguments.PushArgument ( Variable );
-    CallEvent ( "onElementDataChange", Arguments, pClient );
+    Arguments.PushArgument ( oldVariable  );
+    CallEvent ( "onElementDataChange", Arguments );
 }
 
 
@@ -1086,7 +1081,7 @@ bool CElement::IsAttachable ( void )
         }
         default: break;
     }
-    return false;
+	return false;
 }
 
 
@@ -1108,7 +1103,7 @@ bool CElement::IsAttachToable ( void )
         }
         default: break;
     }
-    return false;
+	return false;
 }
 
 
@@ -1356,24 +1351,3 @@ void CElement::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < CEleme
 
 
 #endif
-
-
-void CElement::SetPosition ( const CVector& vecPosition )
-{
-    m_vecLastPosition = m_vecPosition;
-    m_vecPosition = vecPosition;
-    UpdateSpatialData ();
-};
-
-
-CSphere CElement::GetWorldBoundingSphere ( void )
-{
-    // Default to a point around the entity's position
-    return CSphere ( GetPosition (), 0.f );
-}
-
-
-void CElement::UpdateSpatialData ( void )
-{
-    GetSpatialDatabase ()->UpdateEntity ( this );
-}

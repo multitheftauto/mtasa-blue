@@ -59,9 +59,9 @@ public:
     void                Packet_TextItem                 ( NetBitStreamInterface& bitStream );
     void                Packet_MarkerHit                ( NetBitStreamInterface& bitStream );
     void                Packet_ExplosionSync            ( NetBitStreamInterface& bitStream );
-    void                Packet_FireSync                 ( NetBitStreamInterface& bitStream );
-    void                Packet_ProjectileSync           ( NetBitStreamInterface& bitStream );
-    void                Packet_PlayerStats              ( NetBitStreamInterface& bitStream );
+	void				Packet_FireSync					( NetBitStreamInterface& bitStream );
+	void                Packet_ProjectileSync           ( NetBitStreamInterface& bitStream );
+    void			    Packet_PlayerStats				( NetBitStreamInterface& bitStream );
     void                Packet_PlayerClothes            ( NetBitStreamInterface& bitStream );
     void                Packet_LuaEvent                 ( NetBitStreamInterface& bitStream );
     void                Packet_ScriptControl            ( NetBitStreamInterface& bitStream );
@@ -69,7 +69,6 @@ public:
     void                Packet_ResourceStop             ( NetBitStreamInterface& bitStream );
     void                Packet_DetonateSatchels         ( NetBitStreamInterface& bitStream );
     void                Packet_VoiceData                ( NetBitStreamInterface& bitStream );
-    void                Packet_UpdateInfo               ( NetBitStreamInterface& bitStream );
 };
 
 #endif

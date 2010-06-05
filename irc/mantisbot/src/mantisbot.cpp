@@ -299,7 +299,6 @@ bool MantisBot::Run()
   time_t nextWebCheck;
   time_t currentTime;
   pthread_t mantisThread;
-  bool bThreadInitialized = false;
 
   m_client.Connect();
   if (!m_client.Ok())
@@ -349,17 +348,8 @@ bool MantisBot::Run()
     {
       m_client.Send(IRCMessagePing("."));
       nextWebCheck = currentTime + updatedelay;
-
-      if ( bThreadInitialized )
-      {
-        pthread_detach(mantisThread);
-        pthread_cancel(mantisThread);
-      }
-      else
-	  {
-        bThreadInitialized = true;
-      }
-
+      pthread_detach(mantisThread);
+      pthread_cancel(mantisThread);
       pthread_create(&mantisThread, 0, CheckForChanges_thread, this);
       m_selector.SetTimeout(updatedelay * 1000);
     }

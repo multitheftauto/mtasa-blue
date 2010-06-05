@@ -15,7 +15,7 @@
 using namespace std;
 
 CClientEntity* CElementIDs::m_Elements [MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS];
-CStack < ElementID, MAX_CLIENT_ELEMENTS, INVALID_ELEMENT_ID > CElementIDs::m_ClientStack;
+CStack < unsigned long > CElementIDs::m_ClientStack;
 
 void CElementIDs::Initialize ( void )
 {

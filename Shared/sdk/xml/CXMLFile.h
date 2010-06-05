@@ -38,8 +38,6 @@ public:
 
     virtual CXMLErrorCodes::Code    GetLastError        ( std::string& strOut ) = 0;
     virtual void                    ResetLastError      ( void ) = 0;
-
-    virtual bool                    IsValid             ( void ) = 0;
 };
 
 #endif

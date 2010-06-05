@@ -32,20 +32,21 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
 
     m_usServerPort = 0;
     m_uiMaxPlayers = 0;
-    m_bHTTPEnabled = true;
+	m_bHTTPEnabled = true;
     m_bAseEnabled = false;
-    m_usHTTPPort = 0;
+	m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_iHTTPConnectionsPerClient = 32;
     m_iEnableClientChecks = -1;
+    m_bLogFileEnabled = false;
     m_bAutoUpdateAntiCheatEnabled = true;
     m_bJoinFloodProtectionEnabled = true;
     m_bScriptDebugLogEnabled = false;
     m_uiScriptDebugLogLevel = 0;
-    m_bAutoUpdateIncludedResources = false;
-    m_bDontBroadcastLan = false;
-    m_uiMTUSize = MTU_SIZE_DEFAULT;
-    m_usFPSLimit = 36;
+	m_bAutoUpdateIncludedResources = false;
+	m_bDontBroadcastLan = false;
+	m_uiMTUSize = MTU_SIZE_DEFAULT;
+	m_usFPSLimit = 36;
 }
 
 
@@ -65,7 +66,7 @@ bool CMainConfig::Load ( const char* szFilename )
     if ( !m_pFile )
     {
         CLogger::ErrorPrintf ( "Error loading config file\n" );
-        return false;
+		return false;
     }
 
     // Parse it
@@ -96,7 +97,7 @@ bool CMainConfig::Load ( const char* szFilename )
         return false;
     }
 
-    // Grab the script debuglog
+	// Grab the script debuglog
     GetString ( m_pRootNode, "serverip", m_strServerIP, 1 );
 
     // Grab the port
@@ -116,7 +117,7 @@ bool CMainConfig::Load ( const char* szFilename )
         return false;
     }
 
-    // Grab the MTU size
+	// Grab the MTU size
     iResult = GetInteger ( m_pRootNode, "mtusize", iTemp, 1, 65535 );
     if ( iResult == IS_SUCCESS )
     {
@@ -195,32 +196,6 @@ bool CMainConfig::Load ( const char* szFilename )
     // verifyclientsettings
     GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );
 
-    {
-        SString strDisbaleAC;
-        GetString ( m_pRootNode, "disableac", strDisbaleAC );
-        std::vector < SString > tagACList;
-        strDisbaleAC.Split ( ",", tagACList );
-        for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
-            if ( (*it).length () )
-                MapSet ( m_DisableACMap, *it, 1 );
-    }
-
-    // minclientversion - Minimum client version or kick
-    GetString ( m_pRootNode, "minclientversion", m_strMinClientVersion );
-    if ( m_strMinClientVersion != "" && !IsValidVersionString ( m_strMinClientVersion ) )
-    {
-        CLogger::LogPrint ( "WARNING: Invalid value specified in \"minclientversion\"\n" );
-        m_strMinClientVersion = "";
-    }
-
-    // recommendedclientversion - Minimum client version or spam
-    GetString ( m_pRootNode, "recommendedclientversion", m_strRecommendedClientVersion );
-    if ( m_strRecommendedClientVersion != "" && !IsValidVersionString ( m_strRecommendedClientVersion ) )
-    {
-        CLogger::LogPrint ( "WARNING: Invalid value specified in \"recommendedclientversion\"\n" );
-        m_strRecommendedClientVersion = "";
-    }
-
     // ASE
     iResult = GetBoolean ( m_pRootNode, "ase", m_bAseEnabled );
     if ( iResult == INVALID_VALUE )
@@ -240,16 +215,16 @@ bool CMainConfig::Load ( const char* szFilename )
     {
         g_pGame->GetResourceDownloader()->AddUpdateSite ( updateURL->GetTagContent ().c_str () );
     }
-    
-    // Auto update included resources
-    iResult = GetBoolean ( m_pRootNode, "autoupdateincludedresources", m_bAutoUpdateIncludedResources );
-    if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
-        m_bAutoUpdateIncludedResources = false;
+	
+	// Auto update included resources
+	iResult = GetBoolean ( m_pRootNode, "autoupdateincludedresources", m_bAutoUpdateIncludedResources );
+	if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
+		m_bAutoUpdateIncludedResources = false;
 
-    // Lan server broadcast
-    iResult = GetBoolean ( m_pRootNode, "donotbroadcastlan", m_bDontBroadcastLan );
-    if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
-        m_bDontBroadcastLan = false;
+	// Lan server broadcast
+	iResult = GetBoolean ( m_pRootNode, "donotbroadcastlan", m_bDontBroadcastLan );
+	if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
+		m_bDontBroadcastLan = false;
 
     // Grab the server password
     iResult = GetString ( m_pRootNode, "password", m_strPassword, 1, 32 );
@@ -266,29 +241,33 @@ bool CMainConfig::Load ( const char* szFilename )
         }
     }
 
-    // Grab the serial verification
-    /** ACHTUNG: Unsupported for release 1.0 (#4090)
-    iResult = GetBoolean ( m_pRootNode, "verifyserials", m_bVerifySerials );
+	// Grab the serial verification
+	/** ACHTUNG: Unsupported for release 1.0 (#4090)
+	iResult = GetBoolean ( m_pRootNode, "verifyserials", m_bVerifySerials );
     if ( iResult == INVALID_VALUE )
     {
         m_bVerifySerials = true;
     }
     else if ( iResult == DOESNT_EXIST )
-    */
+	*/
     {
         m_bVerifySerials = false;
     }
 
-    // Grab the server logfiles
+    // Grab the server logfile
     std::string strBuffer;
     if ( GetString ( m_pRootNode, "logfile", strBuffer, 1 ) == IS_SUCCESS )
+    {
         m_strLogFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
-
-    if ( GetString ( m_pRootNode, "authfile", strBuffer, 1 ) == IS_SUCCESS )
-        m_strAuthFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
+        m_bLogFileEnabled = true;
+    }
+    else
+    {
+        m_bLogFileEnabled = false;
+    }
 
     // Grab the server access control list
-    if ( GetString ( m_pRootNode, "acl", strBuffer, 1, 255 ) == IS_SUCCESS )
+    if ( GetString ( m_pRootNode, "acl", strBuffer, 255, 1 ) == IS_SUCCESS )
     {
         m_strAccessControlListFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
     }
@@ -297,7 +276,7 @@ bool CMainConfig::Load ( const char* szFilename )
         m_strAccessControlListFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "acl.xml" );
     }
 
-    return true;
+	return true;
 }
 
 
@@ -306,8 +285,8 @@ bool CMainConfig::LoadExtended ( void )
     std::string strBuffer;
     int iTemp = 0, iResult = 0;
 
-    // Grab the script debuglog
-    if ( GetString ( m_pRootNode, "scriptdebuglogfile", strBuffer, 1, 255 ) == IS_SUCCESS )
+	// Grab the script debuglog
+    if ( GetString ( m_pRootNode, "scriptdebuglogfile", strBuffer, 255, 1 ) == IS_SUCCESS )
     {
         m_strScriptDebugLogFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strBuffer.c_str () );
         m_bScriptDebugLogEnabled = true;
@@ -348,7 +327,7 @@ bool CMainConfig::LoadExtended ( void )
         g_pGame->GetScriptDebugging()->SetHTMLLogLevel ( 0 );
     }
 
-    // Handle the <module> nodes
+	// Handle the <module> nodes
     CXMLNode* pNode = NULL;
     unsigned int uiCurrentIndex = 0;
     do
@@ -369,7 +348,7 @@ bool CMainConfig::LoadExtended ( void )
             }
         }
     }
-    while ( pNode );
+	while ( pNode );
     
     // Handle the <resource> nodes
     pNode = NULL;
@@ -434,7 +413,7 @@ bool CMainConfig::LoadExtended ( void )
                         }
                     }
 
-                    pAttribute = pNode->GetAttributes ().Find ( "protected" );
+					pAttribute = pNode->GetAttributes ().Find ( "protected" );
                     if ( pAttribute )
                     {
                         std::string strProtected = pAttribute->GetValue ();
@@ -483,7 +462,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "update", CConsoleCommands::Update, false );
     RegisterCommand ( "start", CConsoleCommands::StartResource, false );
     RegisterCommand ( "stop", CConsoleCommands::StopResource, false );
-    RegisterCommand ( "stopall", CConsoleCommands::StopAllResources, false );
+	RegisterCommand ( "stopall", CConsoleCommands::StopAllResources, false );
     RegisterCommand ( "restart", CConsoleCommands::RestartResource, false );
     RegisterCommand ( "refresh", CConsoleCommands::RefreshResources, false );
     RegisterCommand ( "refreshall", CConsoleCommands::RefreshAllResources, false );
@@ -516,19 +495,18 @@ bool CMainConfig::LoadExtended ( void )
 
     RegisterCommand ( "debugscript", CConsoleCommands::DebugScript, false );
 
-    RegisterCommand ( "sudo", CConsoleCommands::Sudo, false );
+	RegisterCommand ( "sudo", CConsoleCommands::Sudo, false );
 
     RegisterCommand ( "help", CConsoleCommands::Help, false );
 
-    RegisterCommand ( "loadmodule", CConsoleCommands::LoadModule, false );
-    //RegisterCommand ( "unloadmodule", CConsoleCommands::UnloadModule, false );
-    //RegisterCommand ( "reloadmodule", CConsoleCommands::ReloadModule, false );
+	RegisterCommand ( "loadmodule", CConsoleCommands::LoadModule, false );
+	//RegisterCommand ( "unloadmodule", CConsoleCommands::UnloadModule, false );
+	//RegisterCommand ( "reloadmodule", CConsoleCommands::ReloadModule, false );
 
     RegisterCommand ( "ver", CConsoleCommands::Ver, false );
     RegisterCommand ( "sver", CConsoleCommands::Ver, false );
-    RegisterCommand ( "ase", CConsoleCommands::Ase, false );
 
-    return true;
+	return true;
 }
 
 

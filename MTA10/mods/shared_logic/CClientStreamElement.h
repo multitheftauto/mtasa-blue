@@ -44,10 +44,8 @@ public:
     void                        StreamOutForABit            ( void );
     void                        SetDimension                ( unsigned short usDimension );
     float                       GetExpDistance              ( void )                            { return m_fExpDistance; }
-    virtual CSphere             GetWorldBoundingSphere      ( void );
-    float                       GetDistanceToBoundingBoxSquared ( const CVector& vecPosition );
-
-    bool                        IsStreamingCompatibleClass  ( void )                            { return true; };
+    
+	bool						IsStreamingCompatibleClass  ( void )							{ return true; };
 
 private:
     void                        SetStreamRow                ( CClientStreamSectorRow * pRow )   { m_pStreamRow = pRow; }

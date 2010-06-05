@@ -27,7 +27,7 @@ class CResourceConfigItem :
     public CDownloadableResource
 {
 public:
-                                        CResourceConfigItem       ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CChecksum serverChecksum );
+                                        CResourceConfigItem       ( class CResource * resource, const char * szShortName, const char * szResourceFileName, unsigned long ulServerCRC );
                                         ~CResourceConfigItem      ( void );
 
     bool                                Start                           ( void );

@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CSettings.h
-*  PURPOSE:     Game settings interface
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		sdk/game/CSettings.h
+*  PURPOSE:		Game settings interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -88,16 +88,7 @@ public:
     virtual void            SetRadioVolume          ( unsigned char ucVolume ) = 0;
     virtual unsigned char   GetSFXVolume            ( void ) = 0;
     virtual void            SetSFXVolume            ( unsigned char ucVolume ) = 0;
-
     virtual float           GetDrawDistance         ( void ) = 0;
-    virtual void            SetDrawDistance         ( float fDrawDistance ) = 0;
-
-    virtual unsigned int    GetBrightness           ( void ) = 0;
-    virtual void            SetBrightness           ( unsigned int uiBrightness ) = 0;
-
-    virtual unsigned int    GetFXQuality            ( void ) = 0;
-    virtual void            SetFXQuality            ( unsigned int fxQualityId ) = 0;
-
     virtual void            Save                    ( void ) = 0;
 };
 

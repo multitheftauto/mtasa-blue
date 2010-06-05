@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/core/CKeyBindsInterface.h
-*  PURPOSE:     Keybind manager interface
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		sdk/core/CKeyBindsInterface.h
+*  PURPOSE:		Keybind manager interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -38,7 +38,6 @@ struct SBindableKey
     int iGTARelative;
     eKeyData data;
     unsigned char ucNumpadRelative;
-    bool bIgnoredByGUI;
 };
 
 enum eControlType
@@ -71,11 +70,11 @@ class CKeyBind
 {
 public:
     inline                  CKeyBind ( void ) : boundKey ( NULL ), beingDeleted ( false ) { bActive = true; }
-    const SBindableKey*     boundKey;
+    const SBindableKey*		boundKey;
     bool                    beingDeleted;
     bool                    bActive;
     inline bool             IsBeingDeleted ( void ) { return beingDeleted; }
-    virtual eKeyBindType    GetType    ( void ) = 0;
+    virtual eKeyBindType	GetType    ( void ) = 0;
 };
 
 class CKeyBindWithState: public CKeyBind
@@ -144,7 +143,7 @@ public:
     virtual bool                    RemoveCommand               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szResource = NULL ) = 0;
     virtual bool                    RemoveAllCommands           ( const char* szKey, bool bCheckState = false, bool bState = true ) = 0;
     virtual bool                    RemoveAllCommands           ( void ) = 0;
-    virtual bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL, const char* szResource = NULL ) = 0;
+    virtual bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL ) = 0;
     virtual bool                    SetCommandActive            ( const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive, bool checkHitState ) = 0;
     virtual void                    SetAllCommandsActive        ( const char* szResource, bool bActive ) = 0;
     virtual CCommandBind*           GetBindFromCommand          ( const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true, const char* szKey = NULL, bool bCheckHitState = false, bool bState = NULL ) = 0;
@@ -155,7 +154,7 @@ public:
     virtual bool                    AddGTAControl               ( const char* szKey, eControllerAction action ) = 0;
     virtual bool                    AddGTAControl               ( const SBindableKey* pKey, SBindableGTAControl* pControl ) = 0;
     virtual bool                    RemoveGTAControl            ( const char* szKey, const char* szControl ) = 0;
-    virtual void                    RemoveGTAControls           ( const char* szControl, bool bDestroy = true ) = 0;
+	virtual void					RemoveGTAControls		    ( const char* szControl, bool bDestroy = true ) = 0;
     virtual bool                    RemoveAllGTAControls        ( const char* szKey ) = 0;
     virtual bool                    RemoveAllGTAControls        ( void ) = 0;
     virtual bool                    GTAControlExists            ( const char* szKey, const char* szControl ) = 0;
@@ -219,7 +218,7 @@ public:
     virtual bool                    SaveToXML                   ( class CXMLNode* pMainNode ) = 0;
     virtual void                    LoadDefaultBinds            ( void ) = 0;
     virtual void                    LoadDefaultControls         ( void ) = 0;
-    virtual void                    LoadDefaultCommands         ( bool bForce ) = 0;
+    virtual void                    LoadDefaultCommands         ( void ) = 0;
     virtual void                    LoadControlsFromGTA         ( void ) = 0;
 
     virtual void                    BindCommand                 ( const char* szCmdLine ) = 0;

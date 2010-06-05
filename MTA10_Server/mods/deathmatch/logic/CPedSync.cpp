@@ -26,7 +26,7 @@ CPedSync::CPedSync ( CPlayerManager* pPlayerManager, CPedManager* pPedManager )
 
 void CPedSync::DoPulse ( void )
 {
-    // Time to check for players that should no longer be syncing a ped or peds that should be synced?
+    // Time to check for players that should no longer be syncing a vehicle or vehicles that should be synced?
     unsigned long ulCurrentTime = GetTime ();
     if ( ulCurrentTime >= m_ulLastSweepTime + 500 )
     {
@@ -71,7 +71,7 @@ void CPedSync::Update ( unsigned long ulCurrentTime )
     for ( ; iter != m_pPedManager->IterEnd (); iter++ )
     {
         // It is a ped, yet not a player
-        if ( IS_PED ( *iter ) && !IS_PLAYER ( *iter ) )
+        if ( IS_PED ( *iter ) && !IS_PLAYER ( *iter ) && ( *iter )->IsSyncable() )
             UpdatePed ( *iter );
     }
 }
@@ -81,22 +81,10 @@ void CPedSync::UpdatePed ( CPed* pPed )
 {
     CPlayer* pSyncer = pPed->GetSyncer ();
 
-    // Handle no syncing
-    if ( !pPed->IsSyncable () )
-    {
-        // This ped got a syncer?
-        if ( pSyncer )
-        {
-            // Tell the syncer to stop syncing
-            StopSync ( pPed );
-        }
-        return;
-    }
-
-    // This ped got a syncer?
+    // This vehicle got a syncer?
     if ( pSyncer )
     {
-        // He isn't close enough to the ped and in the right dimension?
+        // He isn't close enough to the vehicle and in the right dimension?
         if ( ( !IsPointNearPoint3D ( pSyncer->GetPosition (), pPed->GetPosition (), MAX_PLAYER_SYNC_DISTANCE ) ) ||
                 ( pPed->GetDimension () != pSyncer->GetDimension () ) )
         {
@@ -117,8 +105,6 @@ void CPedSync::UpdatePed ( CPed* pPed )
 
 void CPedSync::FindSyncer ( CPed* pPed )
 {
-    assert ( pPed->IsSyncable () );
-
     // Find a player close enough to him
     CPlayer* pPlayer = FindPlayerCloseToPed ( pPed, MAX_PLAYER_SYNC_DISTANCE - 20.0f );
     if ( pPlayer )
@@ -131,35 +117,21 @@ void CPedSync::FindSyncer ( CPed* pPed )
 
 void CPedSync::StartSync ( CPlayer* pPlayer, CPed* pPed )
 {
-    if ( !pPed->IsSyncable () )
-        return;
-
     // Tell the player
     pPlayer->Send ( CPedStartSyncPacket ( pPed ) );
 
     // Mark him as the syncing player
     pPed->SetSyncer ( pPlayer );
-
-    // Call the onElementStartSync event
-    CLuaArguments Arguments;
-    Arguments.PushElement ( pPlayer );  // New syncer
-    pPed->CallEvent ( "onElementStartSync", Arguments );
 }
 
 
 void CPedSync::StopSync ( CPed* pPed )
 {
     // Tell the player that used to sync it
-    CPlayer* pSyncer = pPed->GetSyncer ();
-    pSyncer->Send ( CPedStopSyncPacket ( pPed->GetID () ) );
+    pPed->GetSyncer ()->Send ( CPedStopSyncPacket ( pPed->GetID () ) );
 
     // Unmark him as the syncing player
     pPed->SetSyncer ( NULL );
-
-    // Call the onElementStopSync event
-    CLuaArguments Arguments;
-    Arguments.PushElement ( pSyncer );  // Old syncer
-    pPed->CallEvent ( "onElementStopSync", Arguments );
 }
 
 
@@ -243,13 +215,13 @@ void CPedSync::Packet_PedSync ( CPedSyncPacket& Packet )
                             // Grab the delta health
                             float fDeltaHealth = fPreviousHealth - pData->fHealth;
 
-                            if ( fDeltaHealth > 0.0f )
-                            {
-                                // Call the onPedDamage event
-                                CLuaArguments Arguments;
-                                Arguments.PushNumber ( fDeltaHealth );
-                                pPed->CallEvent ( "onPedDamage", Arguments );
-                            }
+					        if ( fDeltaHealth > 0.0f )
+					        {
+						        // Call the onPedDamage event
+						        CLuaArguments Arguments;
+						        Arguments.PushNumber ( fDeltaHealth );
+						        pPed->CallEvent ( "onPedDamage", Arguments );
+					        }
                         }
                     }
 

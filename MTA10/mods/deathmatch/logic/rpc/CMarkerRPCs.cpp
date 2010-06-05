@@ -46,19 +46,16 @@ void CMarkerRPCs::SetMarkerColor ( NetBitStreamInterface& bitStream )
 {
     // Read out the ID and the color
     ElementID ID;
-    SColor color;
+    unsigned long ulColor;
     if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( color.B ) &&
-         bitStream.Read ( color.G ) &&
-         bitStream.Read ( color.R ) &&
-         bitStream.Read ( color.A ) )
+         bitStream.Read ( ulColor ) )
     {
         // Grab the marker
         CClientMarker* pMarker = m_pMarkerManager->Get ( ID );
         if ( pMarker )
         {
             // Set the new position
-            pMarker->SetColor ( color );
+            pMarker->SetColor ( ulColor );
         }
     }
 }

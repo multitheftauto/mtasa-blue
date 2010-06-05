@@ -23,7 +23,7 @@ CClientColShape::CClientColShape ( CClientManager* pManager, ElementID ID ) : CC
     m_bAutoCallEvent = true;
     m_pCallback = NULL;
     m_pOwningMarker = NULL;
-    m_pOwningPickup = NULL;
+	m_pOwningPickup = NULL;
 
     SetTypeName ( "colshape" );
 
@@ -52,30 +52,10 @@ void CClientColShape::Unlink ( void )
 }
 
 
-void CClientColShape::SizeChanged ( void )
-{
-    UpdateSpatialData ();
-    // Maybe queue RefreshColliders for v1.1
-}
-
 void CClientColShape::DoPulse ( void )
 {
     // Update our position/rotation if we're attached
     DoAttaching ();
-    #ifdef SPATIAL_DATABASE_TESTS
-        if ( !GetClientSpatialDatabase ()->IsEntityPresent ( this ) )
-        {
-            CSphere sphere = GetWorldBoundingSphere ();
-            CLogger::ErrorPrintf ( "Spatial problem - ColShape %08x Type %d not in new  sphere: %2.2f,%2.2f,%2.2f   %2.2f"
-                                                ,this
-                                                ,this->GetShapeType ()
-                                                ,sphere.vecPosition.fX
-                                                ,sphere.vecPosition.fY
-                                                ,sphere.vecPosition.fZ
-                                                ,sphere.fRadius
-                                                );
-        }
-    #endif
 }
 
 
@@ -88,7 +68,6 @@ bool CClientColShape::IsAttachable ( void )
 void CClientColShape::SetPosition ( const CVector& vecPosition )
 {
     m_vecPosition = vecPosition;
-    UpdateSpatialData ();
     CStaticFunctionDefinitions::RefreshColShapeColliders ( this );
 };
 

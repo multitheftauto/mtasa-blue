@@ -35,8 +35,14 @@ public:
     inline bool                     IsVisible                           ( void ) const                      { return m_bVisible; };
     inline void                     SetVisible                          ( bool bVisible )                   { m_bVisible = bVisible; };
 
-    inline SColor                   GetColor                            ( void ) const                      { return m_Color; }
-    inline void                     SetColor                            ( const SColor color )              { m_Color = color; }
+    inline unsigned long            GetColor                            ( void )                            { return m_rgbaColor; };
+    void                            GetColor                            ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const;
+    inline unsigned char            GetColorRed                         ( void ) const                      { return m_rgbaColor.R; };
+    inline unsigned char            GetColorGreen                       ( void ) const                      { return m_rgbaColor.G; };
+    inline unsigned char            GetColorBlue                        ( void ) const                      { return m_rgbaColor.B; };
+    inline unsigned char            GetColorAlpha                       ( void ) const                      { return m_rgbaColor.A; };
+    void                            SetColor                            ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha );
+    void                            SetColor                            ( unsigned long ulColor );
 
     inline float                    GetSize                             ( void ) const                      { return m_fSize; };
     inline void                     SetSize                             ( float fSize )                     { m_fSize = fSize; };
@@ -55,7 +61,7 @@ private:
     CMatrix                         m_Matrix;
     bool                            m_bVisible;
     float                           m_fSize;
-    SColor                          m_Color;
+    RGBA                            m_rgbaColor;
     CCoronas *                      m_pCoronas;
 };
 

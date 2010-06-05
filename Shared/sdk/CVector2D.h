@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/CVector2D.h
-*  PURPOSE:     2D vector class
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		sdk/CVector2D.h
+*  PURPOSE:		2D vector class
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -46,12 +46,12 @@ public:
         return *this;
     }
 
-    float DotProduct ( CVector2D& other ) const
+    float DotProduct ( CVector2D& other )
     {
         return fX*other.fX + fY*other.fY;
     }
 
-    float Length () const
+    float Length ()
     {
         return sqrt ( fX * fX + fY * fY );
     }

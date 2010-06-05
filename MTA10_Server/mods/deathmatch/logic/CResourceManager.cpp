@@ -74,8 +74,7 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
             // Add each file
             do
             {
-                // Skip dotted entries
-                if ( FindData.cFileName[0] != '.' )
+                if ( strcmp ( FindData.cFileName, ".." ) != 0 && strcmp ( FindData.cFileName, "." ) != 0 )
                 {
                     char * extn = NULL;
                     if ( ( FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) != FILE_ATTRIBUTE_DIRECTORY )
@@ -87,7 +86,6 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                     CResource* pResource = GetResource ( FindData.cFileName );
 
                     if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-                         !strchr ( FindData.cFileName, '.' ) &&
                          ( bRefreshAll ||
                            !pResource ||
                            !pResource->CheckIfStartable()
@@ -127,54 +125,54 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
         }
     #else
         DIR *Dir;
-        struct dirent *DirEntry;
-        char szPath[MAX_PATH] = {0};
+		struct dirent *DirEntry;
+		char szPath[MAX_PATH] = {0};
 
-        SString strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/" );
+		SString strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/" );
 
-        if ( ( Dir = opendir ( strBuffer ) ) )
-        {
-            while ( ( DirEntry = readdir ( Dir ) ) != NULL )
-            {
-                // Skip dotted entries
-                if ( DirEntry->d_name[0] != '.' )
+		if ( ( Dir = opendir ( strBuffer ) ) )
+		{
+			while ( ( DirEntry = readdir ( Dir ) ) != NULL )
+			{
+                // Skip . and .. entry
+                if ( strcmp ( DirEntry->d_name, "." ) != 0 &&
+                     strcmp ( DirEntry->d_name, ".." ) != 0 )
                 {
-                    struct stat Info;
-                    bool bDir = false;
+				    struct stat Info;
+				    bool bDir = false;
 
-                    // Get the path
-                    if ( strlen(strBuffer) + strlen(DirEntry->d_name) < MAX_PATH )
+				    // Get the path
+				    if ( strlen(strBuffer) + strlen(DirEntry->d_name) < MAX_PATH )
                     {
-                        strcpy ( szPath, strBuffer );
-                        unsigned long ulPathLength = strlen ( szPath );
+					    strcpy ( szPath, strBuffer );
+					    unsigned long ulPathLength = strlen ( szPath );
 
-                        if ( szPath [ ulPathLength-1 ] != '/') strcat ( szPath, "/" );
+					    if ( szPath [ ulPathLength-1 ] != '/') strcat ( szPath, "/" );
 
-                        strcat ( szPath, DirEntry->d_name );
+					    strcat ( szPath, DirEntry->d_name );
 
-                        // Determine the file stats
-                        if ( lstat ( szPath, &Info ) != -1 )
-                            bDir = S_ISDIR ( Info.st_mode );
-                        else
-                            CLogger::ErrorPrintf ( "Unable to stat %s\n", szPath );
+					    // Determine the file stats
+					    if ( lstat ( szPath, &Info ) != -1 )
+						    bDir = S_ISDIR ( Info.st_mode );
+					    else
+						    CLogger::ErrorPrintf ( "Unable to stat %s\n", szPath );
 
-                        // Chop off the extension if it's not a dir
-                        char * extn = NULL;
-                        if ( !bDir )
+				        // Chop off the extension if it's not a dir
+				        char * extn = NULL;
+				        if ( !bDir )
                         {
-                            extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
-                            DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
-                        }
+					        extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
+					        DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
+				        }
 
-                        CResource* pResource = GetResource ( DirEntry->d_name );
+				        CResource* pResource = GetResource ( DirEntry->d_name );
 
-                        if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-                             !strchr ( DirEntry->d_name, '.' ) &&
-                             ( bRefreshAll ||
-                               !pResource ||
-                               !pResource->CheckIfStartable()
-                              )
-                            )
+						if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
+							 ( bRefreshAll ||
+							   !pResource ||
+							   !pResource->CheckIfStartable()
+							  )
+							)
                         {
                             // Add the resource
                             Load ( DirEntry->d_name );
@@ -183,11 +181,11 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                             uiCount++;
                         }
 
-                    }
+				    }
                 }
 
 
-            }
+			}
 
             CheckResourceDependencies();
 
@@ -206,11 +204,11 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 
             s_bNotFirstTime = true;
 
-            // Close the directory handle
-            closedir ( Dir );
-
             return true;
-        }
+
+			// Close the directory handle
+			closedir ( Dir );
+		}
     #endif
 
     // The list hasn't changed
@@ -485,21 +483,20 @@ bool CResourceManager::Exists ( CResource* pResource )
 
 unsigned short CResourceManager::GenerateID ( void )
 {
-    // Create a map of all used IDs
-    map < unsigned short, bool > idMap;
-    list < CResource* > ::iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
-    {
-        idMap[ ( *iter )->GetID () ] = true;
-    }
+	bool bMatch = false;
+	for ( unsigned short i = 0 ; i < 0xFFFE ; i++ )
+	{
+		list < CResource* > ::iterator iter = m_resources.begin ();
+		for ( ; iter != m_resources.end (); iter++ )
+		{
+			if ( ( *iter )->GetID () == i )
+                bMatch = true;
 
-    // Find an unused ID
-    for ( unsigned short i = 0 ; i < 0xFFFE ; i++ )
-    {
-        if ( idMap.find ( i ) == idMap.end () )
-            return i;
-    }
-    return 0xFFFF;
+		}
+		if ( !bMatch ) return i;
+		else bMatch = false;
+	}
+	return 0xFFFF;
 }
 
 
@@ -571,25 +568,25 @@ bool CResourceManager::StartResource ( CResource* pResource, list < CResource* >
         if ( Reload ( pResource ) )
         {
             // Start the resource
-            return pResource->Start( NULL, bStartedManually, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles );
+		    return pResource->Start( NULL, bStartedManually, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles );
         }
         else
             return false;
     }
-    else
-    {
-        // If it's not running yet
-        if ( !pResource->IsActive() )
-        {
-            // Start it
-            return pResource->Start ( dependents, bStartedManually, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles );
-        }
-        return false;
-    }
+	else
+	{
+		// If it's not running yet
+		if ( !pResource->IsActive() )
+		{
+			// Start it
+			return pResource->Start ( dependents, bStartedManually, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts, bClientFiles );
+		}
+		return false;
+	}
 
     // Stop it again if it failed starting
-    pResource->Stop ();
-    return false;
+	pResource->Stop ();
+	return false;
 }
 
 
@@ -605,8 +602,8 @@ bool CResourceManager::Reload ( CResource* pResource )
     pResource->Reload ();
 
     // Was it loaded successfully?
-    if ( pResource->IsLoaded () )
-    {
+	if ( pResource->IsLoaded () )
+	{
         // Add the resource back to the list
         m_bResourceListChanged = true;
 
@@ -616,7 +613,7 @@ bool CResourceManager::Reload ( CResource* pResource )
     else
     {
         CLogger::LogPrintf ( "Loading of resource '%s' failed\n", strResourceName.c_str () );
-        return false;
+		return false;
     }
 
     // Success
@@ -636,10 +633,10 @@ bool CResourceManager::StopAllResources ( void )
         {
             CLogger::SetOutputEnabled ( false );
 
-            if ( pResource->IsPersistent () )
-                pResource->SetPersistent ( false );
+			if ( pResource->IsPersistent () )
+				pResource->SetPersistent ( false );
 
-            pResource->Stop ( true );
+			pResource->Stop ( true );
 
             CLogger::SetOutputEnabled ( true );
             CLogger::LogPrintNoStamp ( "." );
@@ -740,7 +737,7 @@ void CResourceManager::ProcessQueue ( void )
                 if ( sItem.pResource->Stop ( true ) )
                 {
                     // Start it again
-                    if ( !StartResource ( sItem.pResource, &resourceListCopy, true,
+				    if ( !StartResource ( sItem.pResource, &resourceListCopy, true,
                                          sItem.Flags.bConfigs, sItem.Flags.bMaps,
                                          sItem.Flags.bScripts, sItem.Flags.bHTML,
                                          sItem.Flags.bClientConfigs, sItem.Flags.bClientScripts,
@@ -749,8 +746,8 @@ void CResourceManager::ProcessQueue ( void )
                         // Failed
                         CLogger::ErrorPrintf ( "Unable to restart resource %s\n", sItem.pResource->GetName ().c_str () );
                     }
-                    else
-                        CLogger::LogPrintf ( "%s restarted successfully\n", sItem.pResource->GetName ().c_str () );
+					else
+						CLogger::LogPrintf ( "%s restarted successfully\n", sItem.pResource->GetName ().c_str () );
 
                 }
                 else
@@ -846,15 +843,15 @@ CResource* CResourceManager::CreateResource ( char* szResourceName )
     }
 
     // Add the resource and load it
-    CResource* pResource = new CResource ( this, szResourceName, true );
-    if ( pResource )
-    {
-        m_resources.push_back ( pResource );
-        return pResource;
-    }
+	CResource* pResource = new CResource ( this, szResourceName, true );
+	if ( pResource )
+	{
+		m_resources.push_back ( pResource );
+		return pResource;
+	}
 
     // We failed
-    return NULL;
+	return NULL;
 }
 
 

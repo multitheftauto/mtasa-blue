@@ -24,16 +24,17 @@ public:
     static void                 PushUniqueID        ( CXMLCommon* pEntry );
 
     static CXMLCommon*          GetEntry            ( unsigned long ulID );
-    static unsigned long        GetCapacity         ( void );
-    static unsigned long        GetUnusedAmount     ( void );
 
 private:
-    static void                 ExpandBy            ( unsigned long ulAmount );
     static void                 PushUniqueID        ( unsigned long ulID );
 
-    static CStack < unsigned long, 1, INVALID_XML_ID >  m_IDStack;
-    static std::vector < CXMLCommon* >                  m_Elements;
-    static unsigned long                                m_ulCapacity;
+    static unsigned long        PopStack            ( void );
+    static void                 PushStack           ( unsigned long ulID );
+
+    static unsigned long        m_ulIDStack [MAX_XML];
+    static unsigned long        m_ulStackPosition;
+
+    static CXMLCommon*          m_Elements [MAX_XML];
 };
 
 

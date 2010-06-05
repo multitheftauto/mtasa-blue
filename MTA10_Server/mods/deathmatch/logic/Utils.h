@@ -30,7 +30,7 @@
 #define SAFE_DELETE(p) { if(p) { delete (p); (p)=NULL; } }
 
 #ifndef WIN32
-unsigned long   GetTickCount                ( void );
+unsigned long	GetTickCount				( void );
 #endif
 
 bool            CheckNickProvided           ( const char* szNick );
@@ -58,31 +58,30 @@ void            InitializeTime              ( void );
 void            DisconnectPlayer            ( class CGame* pGame, class CPlayer& Player, const char* szMessage );
 void            DisconnectConnectionDesync  ( class CGame* pGame, class CPlayer& Player, unsigned int uiCode );
 
-bool            InitializeSockets           ( void );
-bool            CleanupSockets              ( void );
+bool			InitializeSockets			( void );
+bool			CleanupSockets				( void );
 
 float           GetRandomFloat              ( void );
 double          GetRandomDouble             ( void );
 int             GetRandom                   ( int iLow, int iHigh );
 
-bool            IsValidFilePath             ( const char* szPath );
+bool            IsValidFilePath 			( const char* szPath );
 
 unsigned int    HexToInt                    ( const char* szHex );
 bool            XMLColorToInt               ( const char* szColor, unsigned long& ulColor );
 bool            XMLColorToInt               ( const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha );
 
 const char* GetFilenameFromPath ( const char* szPath );
-std::string ConformResourcePath ( const char* szRes );
 
 inline unsigned long GetTime ( void )
 {
     #if WIN32
-        extern LONGLONG g_lTimeCounts;
+		extern LONGLONG	g_lTimeCounts;
         LARGE_INTEGER lPerf;
         QueryPerformanceCounter ( &lPerf );
         return static_cast < unsigned long > ( lPerf.QuadPart / g_lTimeCounts );
     #else
-        extern timeval  g_tvInitialTime;
+	    extern timeval	g_tvInitialTime;
         timeval tvNow;
         gettimeofday ( &tvNow, 0 );
         return static_cast < unsigned long > ( ( tvNow.tv_sec - g_tvInitialTime.tv_sec ) * 1000 + ( tvNow.tv_usec - g_tvInitialTime.tv_usec ) / 1000 );
@@ -195,17 +194,4 @@ inline bool IsVisibleCharacter ( unsigned char c )
 void            MakeSureDirExists           ( const char* szPath );
 bool            FileCopy                    ( const char* szPathNameSrc, const char* szPathDst );
 
-inline SString SQLEscape ( const SString& strEscapeString )
-{
-    SString strParsedQuery = "";
-    for ( unsigned int k = 0; k < strEscapeString.length (); k++ ) {
-        if ( strEscapeString[k] == '\'' )
-            strParsedQuery += '\'';
-        if ( strEscapeString[k] == '\"' )
-            strParsedQuery += '\"';
-
-        strParsedQuery += strEscapeString[k];
-    }
-    return strParsedQuery;
-}
 #endif

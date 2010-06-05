@@ -47,7 +47,7 @@ Zac Hansen ( xaxxon@slackworks.com )
 #ifndef _WIN32
 #include <assert.h>
 #include <stdio.h>
-#include <fcntl.h>
+#include <sys/ioctl.h>
 #endif
 
 #ifndef MSG_NOSIGNAL
@@ -145,7 +145,10 @@ Socket::Init (  int iIP,   ///< ip address to bind to
 	ioctlsocket ( nAcceptSocket, FIONBIO, &MyTrueVar );
 	
 #else
-    fcntl ( nAcceptSocket, F_SETFL, fcntl( nAcceptSocket, F_GETFL ) | O_NONBLOCK ); 
+	int MyTrueVar = 1;
+	ioctl ( nAcceptSocket, FIONBIO, &MyTrueVar );
+	MyTrueVar = 1; // not sure if it was changed in ioctl, so re-set it
+	setsockopt ( nAcceptSocket, SOL_SOCKET, SO_REUSEADDR, (const void *) &MyTrueVar, sizeof ( int ) );
 #endif
 
 	// bind the socket to the appropriate port

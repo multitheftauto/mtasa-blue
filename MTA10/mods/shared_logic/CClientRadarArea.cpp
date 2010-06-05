@@ -22,7 +22,7 @@ CClientRadarArea::CClientRadarArea ( class CClientManager* pManager, ElementID I
     // Init
     m_pManager = pManager;
     m_pRadarAreaManager = pManager->GetRadarAreaManager ();
-    m_Color = SColorRGBA ( 255, 255, 255, 255 );
+    SetColor ( 0xFFFFFFFF );
     m_bFlashing = false;
     m_ulFlashCycleStart = 0;
     m_bStreamedIn = true;
@@ -52,7 +52,7 @@ void CClientRadarArea::Unlink ( void )
 
 void CClientRadarArea::DoPulse ( void )
 {
-    DoPulse ( true );
+	DoPulse ( true );
 }
 
 
@@ -64,7 +64,7 @@ void CClientRadarArea::DoPulse ( bool bRender )
     if ( m_bStreamedIn )
     {
         // If it's flashing, calculate a new alpha
-        SColor color = m_Color;
+        unsigned long ulColor = m_ulColor;
      
         if ( m_bFlashing )
         {
@@ -96,18 +96,32 @@ void CClientRadarArea::DoPulse ( bool bRender )
             }
 
             // Multiply the alpha-factor with the alpha we're supposed to have to find what alpha to use and set it
-            color.A = static_cast < unsigned char > ( fAlphaFactor * static_cast < float > ( color.A ) );
+            unsigned char ucAlpha = static_cast < unsigned char > ( fAlphaFactor * static_cast < float > ( ( ulColor & 0xFF000000 ) >> 24 ) );
+            ulColor &= 0x00FFFFFF;
+            ulColor |= ucAlpha << 24;
         }
 
-        // Only render the radar area if we are told to
-        if ( bRender )
-        {
-            // Draw it
-            g_pGame->GetRadar ()->DrawAreaOnRadar ( m_vecPosition.fX + m_vecSize.fX, m_vecPosition.fY,
+	    // Only render the radar area if we are told to
+	    if ( bRender )
+	    {
+		    // Draw it
+		    g_pGame->GetRadar ()->DrawAreaOnRadar ( m_vecPosition.fX + m_vecSize.fX, m_vecPosition.fY,
                                                     m_vecPosition.fX, m_vecPosition.fY + m_vecSize.fY,
-                                                    color );
-        }
+												    ulColor );
+	    }
     }
+}
+
+
+void CClientRadarArea::SetColor ( unsigned long ulColor )
+{
+    m_ulColor = ulColor;
+}
+
+
+void CClientRadarArea::SetColor ( unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA )
+{
+	m_ulColor = (((((ucA)&0xff)<<24)|(((ucB)&0xff)<<16)|(((ucG)&0xff)<<8)|((ucR)&0xff)));
 }
 
 

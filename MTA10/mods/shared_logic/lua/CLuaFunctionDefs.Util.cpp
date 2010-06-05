@@ -169,28 +169,6 @@ int CLuaFunctionDefs::KillTimer ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::ResetTimer ( lua_State* luaVM )
-{
-    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( luaMain )
-    {
-        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
-        if ( pLuaTimer )
-        {
-            luaMain->GetTimerManager ()->ResetTimer ( pLuaTimer );
-
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "resetTimer" );
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaFunctionDefs::GetTimers ( lua_State* luaVM )
 {
     // Find our VM
@@ -227,27 +205,6 @@ int CLuaFunctionDefs::IsTimer ( lua_State* luaVM )
             lua_pushboolean ( luaVM, pLuaMain->GetTimerManager ()->Exists ( pLuaTimer ) );
             return 1;
         }
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetTimerDetails ( lua_State* luaVM )
-{
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
-        if ( pLuaTimer )
-        {
-            lua_pushnumber( luaVM, pLuaTimer->GetTimeLeft () );
-            lua_pushnumber( luaVM, pLuaTimer->GetRepeats () );
-            lua_pushnumber( luaVM, pLuaTimer->GetDelay () );
-            return 3;
-        }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "getTimerDetails" );
     }
 
     lua_pushboolean ( luaVM, false );
@@ -392,25 +349,6 @@ int CLuaFunctionDefs::GetColorFromString ( lua_State* luaVM )
     return 1;
 }
 
-
-int CLuaFunctionDefs::GetValidPedModels ( lua_State* luaVM )
-{
-    int iIndex = 0;
-    lua_newtable ( luaVM );
-    for( int i = 0; i < 289; i++)
-    {
-        if ( CClientPlayerManager::IsValidModel(i) )
-        {
-            lua_pushnumber ( luaVM , ++iIndex);
-            lua_pushnumber ( luaVM , i);
-            lua_settable ( luaVM , -3);
-        }
-    }
-
-    return 1;
-}
-
-
 int CLuaFunctionDefs::GetDistanceBetweenPoints2D ( lua_State* luaVM )
 {
     // We got 6 valid float arguments?
@@ -547,10 +485,6 @@ int CLuaFunctionDefs::GetVersion ( lua_State* luaVM )
 
     lua_pushstring ( luaVM, "tag" );
     lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionBuildTag () );
-    lua_settable   ( luaVM, -3 );
-
-    lua_pushstring ( luaVM, "sortable" );
-    lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionSortable () );
     lua_settable   ( luaVM, -3 );
 
     return 1;

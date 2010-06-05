@@ -59,8 +59,6 @@ public:
     list < CElement* > ::iterator  CollidersEnd     ( void )                            { return m_Colliders.end (); }
 
     inline bool                 IsPartnered         ( void )                            { return m_bPartnered; }
-
-    void                        SizeChanged         ( void );
 protected:
     CVector                     m_vecPosition;
 

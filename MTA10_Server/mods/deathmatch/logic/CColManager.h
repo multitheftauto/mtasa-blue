@@ -37,11 +37,6 @@ private:
     inline void                                 AddToList           ( CColShape* pShape )       { m_List.push_back ( pShape ); };
     void                                        RemoveFromList      ( CColShape* pShape );
     void                                        TakeOutTheTrash     ( void );
-    void                                        DoHitDetectionOld           ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius, CElement* pElement, CColShape * pJustThis = NULL, bool bChildren = false );
-    void                                        DoHitDetectionNew           ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius, CElement* pElement, CColShape * pJustThis = NULL, bool bChildren = false );
-    void                                        DoHitDetectionForColShape   ( CColShape* pShape );
-    void                                        DoHitDetectionForEntity     ( const CVector& vecNowPosition, float fRadius, CElement* pEntity );
-    void                                        HandleHitDetectionResult    ( bool bHit, CColShape* pShape, CElement* pEntity );
 
     std::vector < CColShape* >                  m_List;
     bool                                        m_bCanRemoveFromList;

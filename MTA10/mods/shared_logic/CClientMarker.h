@@ -65,8 +65,14 @@ public:
     bool                        IsVisible               ( void ) const;
     void                        SetVisible              ( bool bVisible );
 
-    SColor                      GetColor                ( void ) const;
-    void                        SetColor                ( const SColor color );
+    unsigned long               GetColor                ( void );
+    void                        GetColor                ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const;
+    unsigned char               GetColorRed             ( void ) const;
+    unsigned char               GetColorGreen           ( void ) const;
+    unsigned char               GetColorBlue            ( void ) const;
+    unsigned char               GetColorAlpha           ( void ) const;
+    void                        SetColor                ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha );
+    void                        SetColor                ( unsigned long ulColor );
 
     float                       GetSize                 ( void ) const;
     void                        SetSize                 ( float fSize );
@@ -78,10 +84,8 @@ public:
 
     inline CClientColShape *    GetColShape             ( void ) { return m_pCollision; }
 
-    void                        Callback_OnCollision    ( CClientColShape& Shape, CClientEntity& Entity );
-    void                        Callback_OnLeave        ( CClientColShape& Shape, CClientEntity& Entity );
-
-    virtual CSphere             GetWorldBoundingSphere  ( void );
+	void						Callback_OnCollision	( CClientColShape& Shape, CClientEntity& Entity );
+	void						Callback_OnLeave		( CClientColShape& Shape, CClientEntity& Entity );
 
 protected:
     void                        StreamIn                ( bool bInstantly );

@@ -21,7 +21,7 @@ CClientCheckpoint::CClientCheckpoint ( CClientMarker * pThis )
     m_bStreamedIn = false;
     m_bVisible = true;
     m_uiIcon = CClientCheckpoint::ICON_NONE;
-    m_Color = SColorRGBA ( 255, 0, 0, 255 );
+    m_rgbaColor = COLOR_RGBA ( 255, 0, 0, 255 );
     m_fSize = 4.0f;
     m_dwType = CHECKPOINT_EMPTYTUBE;
     m_vecDirection.fX = 1.0f;
@@ -252,13 +252,28 @@ void CClientCheckpoint::SetIcon ( unsigned int uiIcon )
 }
 
 
-void CClientCheckpoint::SetColor ( const SColor color )
+void CClientCheckpoint::GetColor ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const
+{
+    Red   = m_rgbaColor.R;
+    Green = m_rgbaColor.G;
+    Blue  = m_rgbaColor.B;
+    Alpha = m_rgbaColor.A;
+}
+
+
+void CClientCheckpoint::SetColor ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha )
+{
+    SetColor ( SColorARGB ( Alpha, Red, Green, Blue ) );
+}
+
+
+void CClientCheckpoint::SetColor ( unsigned long ulColor )
 {
     // Different from our current color?
-    if ( m_Color != color )
+    if ( m_rgbaColor != ulColor )
     {
         // Set it and recreate
-        m_Color = color;
+        m_rgbaColor = ulColor;
         ReCreate ();
     }
 }
@@ -361,7 +376,7 @@ void CClientCheckpoint::Create ( unsigned long ulIdentifier )
         }
 
         // Create it
-        m_pCheckpoint = g_pGame->GetCheckpoints()->CreateCheckpoint ( m_dwIdentifier, static_cast < WORD > ( m_dwType ), &m_Matrix.vPos, &m_vecDirection, m_fSize, 0.2f, m_Color );
+        m_pCheckpoint = g_pGame->GetCheckpoints()->CreateCheckpoint ( m_dwIdentifier, static_cast < WORD > ( m_dwType ), &m_Matrix.vPos, &m_vecDirection, m_fSize, 0.2f, m_rgbaColor );
         if ( m_pCheckpoint )
         {
             // Set properties

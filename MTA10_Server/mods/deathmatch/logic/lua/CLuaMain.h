@@ -94,7 +94,7 @@ public:
 
     CTextDisplay *                  CreateDisplay           ( void );
     void                            DestroyDisplay          ( CTextDisplay * pDisplay );
-    CTextItem *                     CreateTextItem          ( const char* szText, float fX, float fY, eTextPriority priority = PRIORITY_LOW, const SColor color = -1, float fScale = 1.0f, unsigned char format = 0, unsigned char ucShadowAlpha = 0 );
+    CTextItem *                     CreateTextItem          ( const char* szText, float fX, float fY, eTextPriority priority = PRIORITY_LOW, unsigned char red = 255, unsigned char green = 255, unsigned char blue = 255, unsigned char alpha = 255, float fScale = 1.0f, unsigned char format = 0, unsigned char ucShadowAlpha = 0 );
     void                            DestroyTextItem         ( CTextItem * pTextItem );
 
     bool                            TextDisplayExists       ( CTextDisplay* pDisplay );
@@ -114,7 +114,7 @@ public:
 
 private:
     void                            InitVM                  ( void );
-    void                            InitSecurity            ( void );
+	void							InitSecurity			( void );
 
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );
 

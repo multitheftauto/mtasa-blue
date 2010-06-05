@@ -833,10 +833,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientSpatialDatabase.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientStreamElement.cpp"
 					>
 				</File>
@@ -866,6 +862,22 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientTextDisplay.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayBackgroundEffect.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayEffect.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayFadeEffect.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayGlowEffect.cpp"
 					>
 				</File>
 				<File
@@ -1711,10 +1723,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientSpatialDatabase.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientStreamElement.h"
 					>
 				</File>
@@ -1744,6 +1752,22 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientTextDisplay.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayBackgroundEffect.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayEffect.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayFadeEffect.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayGlowEffect.h"
 					>
 				</File>
 				<File
@@ -1812,6 +1836,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CScriptFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CStack.h"
 					>
 				</File>
 				<File

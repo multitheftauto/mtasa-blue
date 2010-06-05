@@ -13,7 +13,7 @@
 
 #include <StdInc.h>
 
-CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const char* szName, const char* szNameShort, CChecksum serverChecksum, bool bGenerateClientChecksum )
+CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const char* szName, const char* szNameShort, unsigned long ulServerCRC, bool bGenerateClientCRC, CRCGenerator* pCRCGen )
 {
     // Store the resource type
     m_resourceType = resourceType;
@@ -30,18 +30,26 @@ CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const
     strcpy ( m_szNameShort, szNameShort );
     m_szNameShort[sizeNameShort] = '\0';
 
-    // Store the server checksum
-    m_ServerChecksum = serverChecksum;
+    // Store the server CRC
+    m_ulServerCRC = ulServerCRC;
 
-    // Check to see if the client checksum should be generated now
-    if ( bGenerateClientChecksum )
+    // Check to see if the client CRC should be generated now
+    if ( bGenerateClientCRC )
     {
-        GenerateClientChecksum ();
+        // Was a CRC Generator passed in?
+        if ( pCRCGen )
+        {
+            this->GenerateClientCRC ( pCRCGen );
+        }
+        else
+        {
+            this->GenerateClientCRC ();
+        }
     }
     else
     {
-        // Default the last client checksum
-        m_LastClientChecksum = CChecksum ();
+        // Default the last client CRC
+        m_ulLastClientCRC = 0;
     }
 }
 
@@ -60,38 +68,45 @@ CDownloadableResource::~CDownloadableResource ( void )
     }
 }
 
-bool CDownloadableResource::DoesClientAndServerChecksumMatch ( void )
+bool CDownloadableResource::DoesClientAndServerCRCMatch ( void )
 {
-    return ( m_LastClientChecksum.CompareWithLegacy ( m_ServerChecksum ) );
+    return ( m_ulLastClientCRC == m_ulServerCRC );
 }
 
-CChecksum CDownloadableResource::GenerateClientChecksum ( void )
+unsigned long CDownloadableResource::GenerateClientCRC ( void )
+{
+    CRCGenerator* pCRCGen = CRCGenerator::GetInstance();
+
+    return GenerateClientCRC ( pCRCGen );
+}
+
+unsigned long CDownloadableResource::GenerateClientCRC ( CRCGenerator* pCRCGen )
 {
     WIN32_FIND_DATA fdInfo;
     if ( INVALID_HANDLE_VALUE != FindFirstFile( m_szName, &fdInfo ) )
     {
-        m_LastClientChecksum = CChecksum::GenerateChecksumFromFile ( m_szName );
+        m_ulLastClientCRC = pCRCGen->GetCRC ( m_szName );
     }
     else
     {
-        // Reset the last client checksum, as the  does not exist
-        m_LastClientChecksum = CChecksum ();
+        // Reset the last client CRC, as the  does not exist
+        m_ulLastClientCRC = 0;
     }
 
-    return m_LastClientChecksum;
+    return m_ulLastClientCRC;
 }
 
-CChecksum CDownloadableResource::GetLastClientChecksum ( void )
+unsigned long CDownloadableResource::GetLastClientCRC ( void )
 {
-    return m_LastClientChecksum;
+    return m_ulLastClientCRC;
 }
 
-CChecksum CDownloadableResource::GetServerChecksum ( void )
+unsigned long CDownloadableResource::GetServerCRC ( void )
 {
-    return m_ServerChecksum;
+    return m_ulServerCRC;
 }
 
-void CDownloadableResource::SetServerChecksum ( CChecksum serverChecksum )
+void CDownloadableResource::SetServerCRC ( unsigned long ulServerCRC )
 {
-    m_ServerChecksum = serverChecksum;
+    m_ulServerCRC = ulServerCRC;
 }

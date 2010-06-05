@@ -86,6 +86,7 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
         default:
             return false;
     }
+
     return true;
 }
 

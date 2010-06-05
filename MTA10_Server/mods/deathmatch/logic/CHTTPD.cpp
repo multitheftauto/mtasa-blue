@@ -17,7 +17,6 @@
 extern CGame * g_pGame;
 
 CHTTPD::CHTTPD ( void )
-    : m_BruteForceProtect( 4, 30000, 60000 * 5 )     // Max of 4 attempts per 30 seconds, then 5 minute ignore
 {
     m_resource = NULL;
     m_server = NULL;
@@ -50,11 +49,11 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
     // Server not already started?
     if ( !m_bStartedServer )
     {
-        EHSServerParameters parameters;
+	    EHSServerParameters parameters;
 
-        char szPort[10];
+	    char szPort[10];
         itoa ( port, szPort, 10 );
-        parameters[ "port" ] = szPort;
+	    parameters[ "port" ] = szPort;
 
         if ( szIP && szIP[0] )
         {
@@ -68,8 +67,8 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
             parameters[ "bindip" ] = (long) INADDR_ANY;
         }
 
-        parameters[ "mode" ] = "threadpool";        // or "singlethreaded"/"threadpool"
-        parameters[ "threadcount" ] = 5;                // unnecessary because 1 is the default
+	    parameters[ "mode" ] = "threadpool";		// or "singlethreaded"/"threadpool"
+	    parameters[ "threadcount" ] = 5;				// unnecessary because 1 is the default
 
         bResult = ( StartServer ( parameters ) == STARTSERVER_SUCCESS );
         m_bStartedServer = true;
@@ -82,7 +81,7 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
 // creates a page based on user input -- either displays data from
 //   form or presents a form for users to submit data.
 ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
-                                         HttpResponse * ipoHttpResponse )
+										 HttpResponse * ipoHttpResponse )
 {
     CAccount * account = CheckAuthentication ( ipoHttpRequest );
 
@@ -100,24 +99,24 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
             char * szAccountName = account->GetName();
 
             if ( pACLManager->CanObjectUseRight ( szAccountName,
-                                                  CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                  m_szDefaultResourceName,
-                                                  CAccessControlListRight::RIGHT_TYPE_RESOURCE,
-                                                  true ) &&
+												  CAccessControlListGroupObject::OBJECT_TYPE_USER,
+												  m_szDefaultResourceName,
+												  CAccessControlListRight::RIGHT_TYPE_RESOURCE,
+												  true ) &&
                 pACLManager->CanObjectUseRight ( szAccountName,
-                                                 CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                 "http",
-                                                 CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                                 true ) )
+												 CAccessControlListGroupObject::OBJECT_TYPE_USER,
+												 "http",
+												 CAccessControlListRight::RIGHT_TYPE_GENERAL,
+												 true ) )
             {
                 CResource * resource = g_pGame->GetResourceManager()->GetResource ( m_szDefaultResourceName );
                 if ( resource )
                 {
-                    ResponseCode ret = resource->HandleRequest ( ipoHttpRequest, ipoHttpResponse );
+					ResponseCode ret = resource->HandleRequest ( ipoHttpRequest, ipoHttpResponse );
 
-                    // Log if this request was not a 200 OK response
-                    if ( ret != HTTPRESPONSECODE_200_OK )
-                        CLogger::LogPrintf ( "HTTPD: Request from %s (%d: %s)\n", ipoHttpRequest->GetAddress ().c_str (), ret, ipoHttpRequest->sUri.c_str () );
+					// Log if this request was not a 200 OK response
+					if ( ret != HTTPRESPONSECODE_200_OK )
+						CLogger::LogPrintf ( "HTTPD: Request from %s (%d: %s)\n", ipoHttpRequest->GetAddress ().c_str (), ret, ipoHttpRequest->sUri.c_str () );
 
                     return ret;
                 }
@@ -166,59 +165,22 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                 }
             }
 
-            if ( m_BruteForceProtect.IsFlooding ( ipoHttpRequest->GetAddress ().c_str () ) )
-            {
-                CLogger::AuthPrintf ( "HTTP: Ignoring login attempt for user '%s' from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
-                return m_pGuestAccount;
-            }
-
             CAccount * account = g_pGame->GetAccountManager()->Get ( (char *)authName.c_str());
             if ( account )
             {
                 // Check that the password is right
-                if ( account->IsPassword ( authPassword.c_str () ) )
+				if ( account->IsPassword ( authPassword.c_str () ) )
                 {
                     // Check that it isn't the Console account
                     std::string strAccountName = account->GetName ();
                     if ( strAccountName.compare ( "Console" ) != 0 )
                     {
-                        // Handle initial login logging
-                        if ( m_LoggedInMap.find ( authName ) == m_LoggedInMap.end () )
-                            CLogger::AuthPrintf ( "HTTP: '%s' entered correct password from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
-                        m_LoggedInMap[authName] = GetTickCount64_ ();
                         // @@@@@ Check they can access HTTP
                         return account;
                     }
                 }
             }
-            if ( authName.length () > 0 )
-            {
-                m_BruteForceProtect.AddConnect ( ipoHttpRequest->GetAddress ().c_str () );
-                CLogger::AuthPrintf ( "HTTP: Failed login attempt for user '%s' from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
-            }
         }
     }
     return m_pGuestAccount;
-}
-
-void CHTTPD::HttpPulse ( void )
-{
-
-    long long llExpireTime = GetTickCount64_ () - 1000 * 60 * 5;    // 5 minute timeout
-
-    map < string, long long > :: iterator iter = m_LoggedInMap.begin ();
-    while ( iter != m_LoggedInMap.end () )
-    {
-        // Remove if too long since last request
-        if ( iter->second < llExpireTime )
-        {
-            g_pGame->Lock(); // get the mutex (blocking)
-            CLogger::AuthPrintf ( "HTTP: '%s' no longer connected\n", iter->first.c_str () );
-            m_LoggedInMap.erase ( iter++ );
-            g_pGame->Unlock();
-        }
-        else
-            iter++;
-    }
-
 }

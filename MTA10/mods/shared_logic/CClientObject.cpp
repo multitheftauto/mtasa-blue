@@ -53,7 +53,7 @@ CClientObject::~CClientObject ( void )
     m_pModelRequester->Cancel ( this, false );  
 
     // Detach us from anything
-    AttachTo ( NULL );
+	AttachTo ( NULL );
 
     // Destroy the object
     Destroy ();
@@ -245,7 +245,6 @@ void CClientObject::SetModel ( unsigned short usModel )
         // Set the new model ID and recreate the model
         m_usModel = usModel;
         m_pModelInfo = g_pGame->GetModelInfo ( usModel );
-        UpdateSpatialData ();
 
         // Request the new model so we can recreate when it's done
         if ( m_pModelRequester->Request ( usModel, this ) )
@@ -404,7 +403,7 @@ void CClientObject::Create ( void )
 
                 // Done
                 return;
-            }
+	        }
             else
             {
                 // Remove our reference to the object again
@@ -472,7 +471,7 @@ void CClientObject::StreamedInPulse ( void )
 
 void CClientObject::AttachTo ( CClientEntity* pEntity )
 {
-    // Add/remove us to/from our managers attached list
+	// Add/remove us to/from our managers attached list
     if ( m_pAttachedToEntity && !pEntity ) m_pObjectManager->m_Attached.remove ( this );
     else if ( !m_pAttachedToEntity && pEntity ) m_pObjectManager->m_Attached.push_back ( this );
 
@@ -500,22 +499,4 @@ void CClientObject::SetMoveSpeed ( const CVector& vecMoveSpeed )
         m_pObject->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
     }
     m_vecMoveSpeed = vecMoveSpeed;
-}
-
-
-CSphere CClientObject::GetWorldBoundingSphere ( void )
-{
-    CSphere sphere;
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( GetModel () );
-    if ( pModelInfo )
-    {
-        CBoundingBox* pBoundingBox = pModelInfo->GetBoundingBox ();
-        if ( pBoundingBox )
-        {
-            sphere.vecPosition = pBoundingBox->vecBoundOffset;
-            sphere.fRadius = pBoundingBox->fRadius;
-        }
-    }
-    sphere.vecPosition += GetStreamPosition ();
-    return sphere;
 }

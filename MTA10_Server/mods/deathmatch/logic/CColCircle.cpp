@@ -15,11 +15,18 @@
 
 using namespace std;
 
+CColCircle::CColCircle ( CColManager* pManager, CElement* pParent, CXMLNode* pNode ) : CColShape ( pManager, pParent, pNode )
+{
+    m_fRadius = 1.0f;
+
+    SetTypeName ( "colcircle" );
+}
+
+
 CColCircle::CColCircle ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, CXMLNode* pNode, bool bIsPartnered ) : CColShape ( pManager, pParent, pNode, bIsPartnered )
 {
     m_vecPosition = vecPosition;
     m_fRadius = fRadius;
-    UpdateSpatialData ();
 }
 
 
@@ -32,22 +39,11 @@ bool CColCircle::DoHitDetection ( const CVector& vecLastPosition, const CVector&
 
 bool CColCircle::ReadSpecialData ( void )
 {
-    int iTemp;
-    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+	int iTemp;
+	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     GetCustomDataFloat ( "radius", m_fRadius, true );
 
     return true;
-}
-
-
-CSphere CColCircle::GetWorldBoundingSphere ( void )
-{
-    CSphere sphere;
-    sphere.vecPosition.fX = m_vecPosition.fX;
-    sphere.vecPosition.fY = m_vecPosition.fY;
-    sphere.vecPosition.fZ = SPATIAL_2D_Z;
-    sphere.fRadius        = m_fRadius;
-    return sphere;
 }

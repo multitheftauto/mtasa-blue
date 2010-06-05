@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CStreaming.h
-*  PURPOSE:     Game streaming interface
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		sdk/game/CStreaming.h
+*  PURPOSE:		Game streaming interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -15,8 +15,7 @@
 class CStreaming
 {
 public:
-    virtual void            RequestAnimations               ( int i, int j ) = 0;
-    virtual bool            HasVehicleUpgradeLoaded         ( int model ) = 0;
+    virtual void            RequestAnimations   ( int i, int j ) = 0;
 };
 
 #endif

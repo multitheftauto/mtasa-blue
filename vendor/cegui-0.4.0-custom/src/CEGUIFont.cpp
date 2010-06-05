@@ -144,7 +144,7 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
 	Constructs a new Font object (via FreeType & a true-type font file)
 	The font file will provide support for 7-bit ASCII characters only
 *************************************************************************/
-Font::Font(const String& name, const String& fontname, const String& resourceGroup, uint size, uint flags, FontImplData* dat, bool bAutoScale, float fNativeResX, float fNativeResY) :
+Font::Font(const String& name, const String& fontname, const String& resourceGroup, uint size, uint flags, FontImplData* dat) :
     d_glyph_images(0),
     d_freetype(false),
     d_lineHeight(0),
@@ -153,11 +153,11 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
     d_maxGlyphHeight(0),
     d_impldat(dat),
     d_ptSize(0),
-    d_autoScale(bAutoScale),
+    d_autoScale(false),
     d_horzScaling(1.0f),
     d_vertScaling(1.0f),
-    d_nativeHorzRes(fNativeResX),
-    d_nativeVertRes(fNativeResY),
+    d_nativeHorzRes(DefaultNativeHorzRes),
+    d_nativeVertRes(DefaultNativeVertRes),
     d_antiAliased(false)
 {
 	String tmp;
@@ -166,10 +166,6 @@ Font::Font(const String& name, const String& fontname, const String& resourceGro
 	{
 		tmp += cp;
 	}
-
-	Size screensize = System::getSingleton().getRenderer()->getSize();
-	d_horzScaling = screensize.d_width / d_nativeHorzRes;
-	d_vertScaling = screensize.d_height / d_nativeVertRes;
 
 	constructor_impl(name, fontname, resourceGroup, size, flags, tmp);
 }

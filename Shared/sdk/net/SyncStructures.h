@@ -1077,7 +1077,7 @@ struct SWeaponAimSync : public ISyncStructure
     {
         // Write arm direction (We only sync one arm, Y axis for on foot sync and X axis for driveby)
         short sArm = static_cast < short > ( data.fArm * 90.0f * 180.0f / 3.14159265f );
-        bitStream.Write ( sArm );
+	    bitStream.Write ( sArm );
 
         if ( m_bFull )
         {
@@ -1577,22 +1577,6 @@ struct SColorSync : public ISyncStructure
     void Write ( NetBitStreamInterface& bitStream ) const
     {
         bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), 32 );
-    }
-
-    // From SColor
-    SColorSync( void ) {}
-    SColorSync( SColor color )
-    {
-        data.ucR = color.R;
-        data.ucG = color.G;
-        data.ucB = color.B;
-        data.ucA = color.A;
-    }
-
-    // To SColor
-    operator SColor( void ) const
-    {
-        return SColorRGBA ( data.ucR, data.ucG, data.ucB, data.ucA );
     }
 
     struct

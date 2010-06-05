@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CClientVariables.cpp
-*  PURPOSE:     Managed storage of client variables (cvars)
-*  DEVELOPERS:  Derek Abdine <>
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		core/CClientVariables.cpp
+*  PURPOSE:		Managed storage of client variables (cvars)
+*  DEVELOPERS:	Derek Abdine <>
 *               Cecill Etheredge <ijsf@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -50,7 +50,7 @@ bool CClientVariables::Load ( void )
 }
 
 
-bool CClientVariables::Get ( const std::string& strVariable, CVector &val )
+bool CClientVariables::Get ( const std::string strVariable, CVector &val )
 {
     std::stringstream ss;
     std::string strVal;
@@ -69,7 +69,7 @@ bool CClientVariables::Get ( const std::string& strVariable, CVector &val )
 }
 
 
-bool CClientVariables::Get ( const std::string& strVariable, CVector2D &val )
+bool CClientVariables::Get ( const std::string strVariable, CVector2D &val )
 {
     std::stringstream ss;
     std::string strVal;
@@ -88,7 +88,7 @@ bool CClientVariables::Get ( const std::string& strVariable, CVector2D &val )
 }
 
 
-bool CClientVariables::Get ( const std::string& strVariable, CColor &val )
+bool CClientVariables::Get ( const std::string strVariable, CColor &val )
 {
     std::stringstream ss;
     std::string strVal;
@@ -112,7 +112,7 @@ bool CClientVariables::Get ( const std::string& strVariable, CColor &val )
 }
 
 
-void CClientVariables::Set ( const std::string& strVariable, CVector val )
+void CClientVariables::Set ( const std::string strVariable, CVector val )
 {
     std::stringstream ss;
     if ( !m_pStorage ) return;
@@ -126,7 +126,7 @@ void CClientVariables::Set ( const std::string& strVariable, CVector val )
 }
 
 
-void CClientVariables::Set ( const std::string& strVariable, CVector2D val )
+void CClientVariables::Set ( const std::string strVariable, CVector2D val )
 {
     std::stringstream ss;
     if ( !m_pStorage ) return;
@@ -140,7 +140,7 @@ void CClientVariables::Set ( const std::string& strVariable, CVector2D val )
 }
 
 
-void CClientVariables::Set ( const std::string& strVariable, CColor val )
+void CClientVariables::Set ( const std::string strVariable, CColor val )
 {
     std::stringstream ss;
     if ( !m_pStorage ) return;
@@ -154,7 +154,7 @@ void CClientVariables::Set ( const std::string& strVariable, CColor val )
 }
 
 
-CXMLNode* CClientVariables::Node ( const std::string& strVariable )
+CXMLNode* CClientVariables::Node ( const std::string strVariable )
 {
     CXMLNode *pNode;
     if ( !m_pStorage ) return NULL;
@@ -169,7 +169,7 @@ CXMLNode* CClientVariables::Node ( const std::string& strVariable )
 }
 
 
-bool CClientVariables::Exists ( const std::string& strVariable )
+bool CClientVariables::Exists ( const std::string strVariable )
 {
     // Check whether this node exists, thus if it is a valid cvar
     if ( !m_pStorage ) return false;
@@ -191,9 +191,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "qc_port",                    22003 );                        // quick connect port
     DEFAULT ( "qc_password",                _S("") );                       // quick connect password
     DEFAULT ( "debugfile",                  _S("") );                       // debug filename
-    DEFAULT ( "console_pos",                CVector2D ( 0, 0 ) );           // console position
-    DEFAULT ( "console_size",               CVector2D ( 200, 200 ) );       // console size
-    DEFAULT ( "serverbrowser_size",         CVector2D ( 720.0f, 495.0f ) ); // serverbrowser size
+    DEFAULT ( "console_pos",                CVector2D ( 0.20f, 0.20f ) );   // console position
     DEFAULT ( "fps_limit",                  100 );                          // frame limiter
     DEFAULT ( "chat_font",                  0 );                            // chatbox font type
     DEFAULT ( "chat_lines",                 7 );                            // chatbox lines
@@ -214,5 +212,4 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "steer_with_mouse",           false );                        // steering with mouse controls
     DEFAULT ( "classic_controls",           false );                        // classic/standard controls
     DEFAULT ( "mtavolume",                  1.0f );                         // custom sound's volume
-    DEFAULT ( "async_loading",              1 );                            // loading while crashing
 }

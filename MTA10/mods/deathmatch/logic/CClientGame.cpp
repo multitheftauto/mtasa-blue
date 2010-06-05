@@ -15,8 +15,6 @@
 *               Derek Abdine <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
-*               Cazomino05 <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -115,10 +113,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
 
-    // Remove Night & Thermal vision view (if enabled).
-    g_pMultiplayer->SetNightVisionEnabled ( false );
-    g_pMultiplayer->SetThermalVisionEnabled ( false );
-
     m_bCloudsEnabled = true;
 
     #ifdef MTA_VOICE
@@ -141,18 +135,17 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_strModRoot = g_pCore->GetModInstallRoot ( "deathmatch" );
 
     // Override CGUI's global events
-    g_pCore->GetGUI ()->SetKeyDownHandler           ( INPUT_MOD, GUI_CALLBACK_KEY ( &CClientGame::OnKeyDown, this ) );
-    g_pCore->GetGUI ()->SetMouseClickHandler        ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseClick, this ) );
-    g_pCore->GetGUI ()->SetMouseDoubleClickHandler  ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseDoubleClick, this ) );
-    g_pCore->GetGUI ()->SetMouseButtonDownHandler   ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseButtonDown, this ) );
-    g_pCore->GetGUI ()->SetMouseButtonUpHandler     ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseButtonUp, this ) );
-    g_pCore->GetGUI ()->SetMouseMoveHandler         ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseMove, this ) );
-    g_pCore->GetGUI ()->SetMouseEnterHandler        ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseEnter, this ) );
-    g_pCore->GetGUI ()->SetMouseLeaveHandler        ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseLeave, this ) );
-    g_pCore->GetGUI ()->SetMouseWheelHandler        ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseWheel, this ) );
-    g_pCore->GetGUI ()->SetMovedHandler             ( INPUT_MOD, GUI_CALLBACK ( &CClientGame::OnMove, this ) );
-    g_pCore->GetGUI ()->SetSizedHandler             ( INPUT_MOD, GUI_CALLBACK ( &CClientGame::OnSize, this ) );
-    g_pCore->GetGUI ()->SelectInputHandlers         ( INPUT_MOD );
+    g_pCore->GetGUI ()->SetKeyDownHandler           ( GUI_CALLBACK_KEY ( &CClientGame::OnKeyDown, this ) );
+    g_pCore->GetGUI ()->SetMouseClickHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseClick, this ) );
+    g_pCore->GetGUI ()->SetMouseDoubleClickHandler  ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseDoubleClick, this ) );
+    g_pCore->GetGUI ()->SetMouseButtonDownHandler   ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseButtonDown, this ) );
+    g_pCore->GetGUI ()->SetMouseButtonUpHandler     ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseButtonUp, this ) );
+    g_pCore->GetGUI ()->SetMouseMoveHandler         ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseMove, this ) );
+    g_pCore->GetGUI ()->SetMouseEnterHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseEnter, this ) );
+    g_pCore->GetGUI ()->SetMouseLeaveHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseLeave, this ) );
+    g_pCore->GetGUI ()->SetMouseWheelHandler        ( GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseWheel, this ) );
+    g_pCore->GetGUI ()->SetMovedHandler             ( GUI_CALLBACK ( &CClientGame::OnMove, this ) );
+    g_pCore->GetGUI ()->SetSizedHandler             ( GUI_CALLBACK ( &CClientGame::OnSize, this ) );
 
     // Startup "entities from root" optimization for getElementsByType
     CClientEntity::StartupEntitiesFromRoot ();
@@ -204,10 +197,10 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pRadarMap = new CRadarMap ( m_pManager );
 
     // Set the screenshot path
-    /* This is now done in CCore, to maintain a global screenshot path
+	/* This is now done in CCore, to maintain a global screenshot path
     SString strScreenShotPath = SString::Printf ( "%s\\screenshots", m_szModRoot );
     g_pCore->SetScreenShotPath ( strScreenShotPath );
-    */
+	*/
 
     // Create the transfer boxes (GUI)
     m_pTransferBox = new CTransferBox ();
@@ -225,7 +218,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pMultiplayer->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
-    g_pMultiplayer->SetBulletImpactHandler ( CClientGame::BulletImpact );
     g_pMultiplayer->SetExplosionHandler ( CClientExplosionManager::Hook_StaticExplosionCreation );
     g_pMultiplayer->SetBreakTowLinkHandler ( CClientGame::StaticBreakTowLinkHandler );
     g_pMultiplayer->SetDrawRadarAreasHandler ( CClientGame::StaticDrawRadarAreasHandler );
@@ -292,9 +284,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     float fScale;
     g_pCore->GetCVars ()->Get ( "text_scale", fScale );
     CClientTextDisplay::SetGlobalScale ( fScale );
-
-    // Reset async loading script settings to default
-    g_pGame->SetAsyncLoadingFromScript ( false, false );
 }
 
 
@@ -313,11 +302,19 @@ CClientGame::~CClientGame ( void )
         g_pGame->GetAudio ()->PlayFrontEndSound ( 48 );
     }
 
-    // Reset the GUI input mode
-    g_pCore->GetGUI ()->SetGUIInputEnabled ( false );
+	// Reset the GUI input mode
+	g_pCore->GetGUI ()->SetGUIInputEnabled ( false );
 
     // Reset CGUI's global events
-    g_pCore->GetGUI ()->ClearInputHandlers ( INPUT_MOD );
+    g_pCore->GetGUI ()->SetKeyDownHandler           ( );
+    g_pCore->GetGUI ()->SetMouseClickHandler        ( );
+    g_pCore->GetGUI ()->SetMouseDoubleClickHandler  ( );
+    g_pCore->GetGUI ()->SetMouseMoveHandler         ( );
+    g_pCore->GetGUI ()->SetMouseEnterHandler        ( );
+    g_pCore->GetGUI ()->SetMouseLeaveHandler        ( );
+    g_pCore->GetGUI ()->SetMouseWheelHandler        ( );
+    g_pCore->GetGUI ()->SetMovedHandler             ( );
+    g_pCore->GetGUI ()->SetSizedHandler             ( );
 
     // Destroy mimics
     #ifdef MTA_DEBUG
@@ -354,7 +351,6 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPostContextSwitchHandler ( NULL );
     g_pMultiplayer->SetPreWeaponFireHandler ( NULL );
     g_pMultiplayer->SetPostWeaponFireHandler ( NULL );
-    g_pMultiplayer->SetBulletImpactHandler ( NULL );
     g_pMultiplayer->SetExplosionHandler ( NULL );
     g_pMultiplayer->SetBreakTowLinkHandler ( NULL );
     g_pMultiplayer->SetDrawRadarAreasHandler ( NULL );
@@ -459,7 +455,7 @@ void CClientGame::StartPlayback ( void )
 
     if ( !m_pManager->IsGameLoaded () )
     {
-        g_pGame->StartGame ();
+		g_pGame->StartGame ();
     }
 }
 
@@ -493,10 +489,6 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
     // Are we connected?
     if ( g_pNet->IsConnected () || m_bIsPlayingBack )
     {
-        // Hide the console when connecting..
-        if ( g_pCore->GetConsole ()->IsVisible () )
-           g_pCore->GetConsole ()->SetVisible ( false );
-
         // Display the status box
         g_pCore->ShowMessageBox ( "CONNECTING", "Entering the game ...", MB_ICON_INFO );
 
@@ -524,28 +516,6 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
             pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_VERSION ) );
             if ( pBitStream->Version () >= 0x02 )
                 pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_BITSTREAM_VERSION ) );
-
-            if ( pBitStream->Version () >= 0x0b )
-            {
-                SString strPlayerVersion ( "%d.%d.%d-%d.%05d.%d"
-                                            ,MTASA_VERSION_MAJOR
-                                            ,MTASA_VERSION_MINOR
-                                            ,MTASA_VERSION_MAINTENANCE
-                                            ,MTASA_VERSION_TYPE
-                                            ,MTASA_VERSION_BUILD
-                                            ,g_pNet->GetNetRev ()
-                                            );
-
-                pBitStream->WriteCompressed ( (unsigned int)strPlayerVersion.length () );
-                pBitStream->Write ( strPlayerVersion.c_str (), strPlayerVersion.length () );
-            }
-
-            if ( pBitStream->Version () >= 0x0e )
-            {
-                // Should the server send us recommended update info?
-                pBitStream->WriteBit ( g_pCore->IsOptionalUpdateInfoRequired ( g_pNet->GetConnectedServer() ) );
-            }
-
             pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGameVersion () ) );
             
             // Append user details
@@ -833,7 +803,7 @@ void CClientGame::DoPulses ( void )
 
     if ( m_bIsPlayingBack && m_bFirstPlaybackFrame && m_pManager->IsGameLoaded () )
     {
-        g_pCore->GetConsole()->Printf("First playback frame, starting");
+		g_pCore->GetConsole()->Printf("First playback frame, starting");
         m_pManager->GetPacketRecorder ()->StartPlayback ( "log.rec", false );
         m_bFirstPlaybackFrame = false;
     }
@@ -850,7 +820,7 @@ void CClientGame::DoPulses ( void )
         if ( !m_pManager->GetAntiCheat ().PerformChecks () )
         {
             // TODO: Tell the server, also encrypt this
-            g_pCore->ShowMessageBox ( "Error", "AC #1: You were kicked from the game", MB_BUTTON_OK | MB_ICON_ERROR );
+            g_pCore->ShowMessageBox ( "Error", "AC: You were kicked from the game", MB_BUTTON_OK | MB_ICON_ERROR );
             g_pCore->GetModManager ()->RequestUnload ();
             return;
         }
@@ -990,7 +960,7 @@ void CClientGame::DoPulses ( void )
     if ( !m_bWaitingForLocalConnect )
     {
         // Trigger the ingame and connected event
-        if ( !m_bTriggeredIngameAndConnected && m_pManager->IsGameLoaded () && g_pCore->IsConnected() )
+		if ( !m_bTriggeredIngameAndConnected && m_pManager->IsGameLoaded () && g_pCore->IsConnected() )
         {
             m_bTriggeredIngameAndConnected = true;
             Event_OnIngameAndConnected ();
@@ -1609,18 +1579,18 @@ void CClientGame::UpdatePlayerTarget ( void )
 
         // Store the last targeted player's id
         if ( m_pTargetedEntity && m_pTargetedEntity->GetType () == CCLIENTPLAYER )
-        {
+		{
             m_TargetedPlayerID = m_pTargetedEntity->GetID ();
-        }
+		}
         else
             m_TargetedPlayerID = INVALID_ELEMENT_ID;
 
         // Send the target
         ElementID TargetID = INVALID_ELEMENT_ID;
         if ( m_pTargetedEntity )
-        {
+		{
             TargetID = m_pTargetedEntity->GetID ();
-        }
+		}
 
         CBitStream bitStream;
         bitStream.pBitStream->WriteCompressed ( TargetID );
@@ -1818,19 +1788,11 @@ void CClientGame::UpdateFireKey ( void )
                             {
                                 // Change the state back to false so this press doesn't do anything else
                                 pControl->bState = false;
-                                CLuaArguments Arguments;
-                                Arguments.PushElement ( pTargetPed );
-                                if ( m_pLocalPlayer->CallEvent ( "onClientPlayerStealthKill", Arguments, false ) ) 
-                                {
-                                    // Lets request a stealth kill
-                                    CBitStream bitStream;
-                                    bitStream.pBitStream->WriteCompressed ( pTargetPed->GetID () );
-                                    m_pNetAPI->RPC ( REQUEST_STEALTH_KILL, bitStream.pBitStream );
-                                }
-                                else
-                                {
-                                    return;
-                                }
+
+                                // Lets request a stealth kill
+                                CBitStream bitStream;
+                                bitStream.pBitStream->WriteCompressed ( pTargetPed->GetID () );
+                                m_pNetAPI->RPC ( REQUEST_STEALTH_KILL, bitStream.pBitStream );
                             }
                         }
                     }
@@ -2323,7 +2285,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientElementDataChange", "name", NULL, false );
     m_Events.AddEvent ( "onClientElementStreamIn", "", NULL, false );
     m_Events.AddEvent ( "onClientElementStreamOut", "", NULL, false );
-    m_Events.AddEvent ( "onClientElementDestroy", "", NULL, false );
+	m_Events.AddEvent ( "onClientElementDestroy", "", NULL, false );
 
     // Player events
     m_Events.AddEvent ( "onClientPlayerJoin", "", NULL, false );
@@ -2342,7 +2304,6 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false );
     m_Events.AddEvent ( "onClientPlayerWasted", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerChoke", "", NULL, false );
-    m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onClientPedDamage", "attacker, weapon, bodypart", NULL, false );
@@ -2382,8 +2343,8 @@ void CClientGame::AddBuiltInEvents ( void )
     // Console events
     m_Events.AddEvent ( "onClientConsole", "text", NULL, false );
 
-    // Chat events
-    m_Events.AddEvent ( "onClientChatMessage", "test, r, g, b", NULL, false );
+	// Chat events
+	m_Events.AddEvent ( "onClientChatMessage", "test, r, g, b", NULL, false );
 
     // Game events
     m_Events.AddEvent ( "onClientPreRender", "", NULL, false );
@@ -2393,11 +2354,11 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false );
     m_Events.AddEvent ( "onClientCursorMove", "relativeX, relativeX, absoluteX, absoluteY, worldX, worldY, worldZ", NULL, false );
 
-    // Marker events
+	// Marker events
     m_Events.AddEvent ( "onClientMarkerHit", "entity, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onClientMarkerLeave", "entity, matchingDimension", NULL, false );
 
-    // Marker events
+	// Marker events
     m_Events.AddEvent ( "onClientPickupHit", "entity, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onClientPickupLeave", "entity, matchingDimension", NULL, false );
 
@@ -2453,11 +2414,11 @@ void CClientGame::DrawTasks ( CClientPlayer* pPlayer )
     if ( pPlayer )
     {
         CTaskManager *man = pPlayer->GetTaskManager ();
-        if(man == NULL) return;
-        if((unsigned long)man == 0xDDDDDDDD) {
-            m_pDisplayManager->DrawText2D ( "HELP! MANAGER FUCKED", CVector ( 0.05f, 0.5f,0 ), 1.0f );
-            return;
-        }
+		if(man == NULL) return;
+		if((unsigned long)man == 0xDDDDDDDD) {
+			m_pDisplayManager->DrawText2D ( "HELP! MANAGER FUCKED", CVector ( 0.05f, 0.5f,0 ), 1.0f );
+			return;
+		}
 
         // Grab the current task
         SString strOutput;
@@ -2664,12 +2625,12 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
             yoffset = 0;
             _snprintf ( str, sizeof( str ), "Ammo in clip: %d", pWeapon->GetAmmoInClip () );
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+			g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
 
             yoffset = 15;
             _snprintf ( str, sizeof( str ), "State: %d", pWeapon->GetState() );
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+			g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
         }
     }
 }
@@ -2848,7 +2809,7 @@ void CClientGame::UpdateMimics ( void )
                     uiModel = pVehicle->GetModel ();
                     pVehicle->GetPosition ( vecPosition );
                     pVehicle->GetRotationDegrees ( vecRotationDegrees );
-                    pVehicle->GetMoveSpeed ( vecMoveSpeed );
+					pVehicle->GetMoveSpeed ( vecMoveSpeed );
                     pVehicle->GetTurnSpeed ( vecTurnSpeed );
                     fHealth = pVehicle->GetHealth ();
 
@@ -2971,12 +2932,12 @@ void CClientGame::DoPaintballs ( void )
         if ( bCollision && pCollision )
         {
             pCorona->SetPosition ( *pCollision->GetPosition () );
-            pCorona->SetColor ( SColorRGBA ( 255, 0, 0, 255 ) );
+            pCorona->SetColor ( 255, 0, 0, 255 );
         }
         else
         {
             pCorona->SetPosition ( vecTarget );
-            pCorona->SetColor ( SColorRGBA ( 255, 255, 0, 255 ) );
+            pCorona->SetColor ( 255, 255, 0, 255 );
         }
 
         // Destroy the colpoint
@@ -3241,12 +3202,12 @@ void CClientGame::ProjectileInitiateHandler ( CClientProjectile * pProjectile )
         SendProjectileSync ( pProjectile );
     }
 
-    // Renew the interior and dimension
-    if ( pProjectile->GetCreator() )
-    {
-        pProjectile->SetInterior ( pProjectile->GetCreator()->GetInterior() );
-        pProjectile->SetDimension ( pProjectile->GetCreator()->GetDimension() );
-    }
+	// Renew the interior and dimension
+	if ( pProjectile->GetCreator() )
+	{
+		pProjectile->SetInterior ( pProjectile->GetCreator()->GetInterior() );
+		pProjectile->SetDimension ( pProjectile->GetCreator()->GetDimension() );
+	}
 
     // Validate the projectile for our element tree
     pProjectile->SetParent ( m_pRootEntity );
@@ -3922,20 +3883,20 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
         // Move both players to where they should be for shot compensation
         if ( pPlayer && !pPlayer->IsLocalPlayer ())
         {                   
-            if ( bShotCompensation )
-            {
+			if ( bShotCompensation )
+			{
                 if ( !pVehicle || pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
                 {
-                    // Warp back in time to where we were when this player shot (their latency)
-                    
+				    // Warp back in time to where we were when this player shot (their latency)
+				    
                     // We don't account for interpolation here, +250ms seems to work better
                     // ** Changed ajustment to +125ms as the position of this clients player on the firers screen
                     // has been changed. See CClientPed::UpdateTargetPosition() **
                     CVector vecPosition;
-                    unsigned short usLatency = ( pPlayer->GetLatency () + 125 );
-                    g_pClientGame->m_pNetAPI->GetInterpolation ( vecPosition, usLatency );
-            
-                    // Move the entity back
+				    unsigned short usLatency = ( pPlayer->GetLatency () + 125 );
+				    g_pClientGame->m_pNetAPI->GetInterpolation ( vecPosition, usLatency );
+			
+				    // Move the entity back
                     if ( pVehicle )
                     {
                         pVehicle->GetPosition ( vecWeaponFirePosition );
@@ -3943,11 +3904,11 @@ void CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed )
                     }
                     else
                     {
-                        pLocalPlayer->GetPosition ( vecWeaponFirePosition );
-                        pLocalPlayer->SetPosition ( vecPosition );
+				        pLocalPlayer->GetPosition ( vecWeaponFirePosition );
+				        pLocalPlayer->SetPosition ( vecPosition );
                     }
                 }
-            }
+			}
         }
     }
 }
@@ -3964,57 +3925,48 @@ void CClientGame::PostWeaponFire ( void )
         {
             if ( pPed->GetType () == CCLIENTPLAYER )
             {
-                if ( bShotCompensation )
-                {
-                    // Restore compensated positions            
-                    if ( !pPed->IsLocalPlayer () )
-                    {
-                        CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
-                        if ( !pVehicle )
-                        {
-                            pLocalPlayer->SetPosition ( vecWeaponFirePosition );
-                        }
+			    if ( bShotCompensation )
+			    {
+				    // Restore compensated positions            
+				    if ( !pPed->IsLocalPlayer () )
+				    {
+					    CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
+					    if ( !pVehicle )
+					    {
+						    pLocalPlayer->SetPosition ( vecWeaponFirePosition );
+					    }
                         else if ( pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
                         {
                             pVehicle->SetPosition ( vecWeaponFirePosition );
                         }
-                    }
-                }
+				    }
+			    }
             }
 
             // Call some events
             CWeapon* pWeapon = pPed->GetWeapon ();
             if ( pWeapon )
             {
-                CVector vecCollision;
+                CShotSyncData* pShotsyncData = pPed->m_shotSyncData;
+                CVector vecOrigin, vecTarget;
+                pPed->GetShotData ( &vecOrigin, &vecTarget );
+
+                CColPoint* pCollision = NULL;
+                CEntity* pCollisionGameEntity = NULL;
+                CVector vecCollision = vecTarget;
+                bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
+                if ( bCollision && pCollision )
+                    vecCollision = *pCollision->GetPosition ();
+
+                // Destroy the colpoint
+                if ( pCollision )
+                {
+                    pCollision->Destroy ();
+                }
+
                 CClientEntity* pCollisionEntity = NULL;
-
-                if ( pPed->GetBulletImpactData ( &pCollisionEntity, &vecCollision ) == false )
-                {
-                    CShotSyncData* pShotsyncData = pPed->m_shotSyncData;
-                    CVector vecOrigin, vecTarget;
-                    pPed->GetShotData ( &vecOrigin, &vecTarget );
-
-                    CColPoint* pCollision = NULL;
-                    CEntity* pCollisionGameEntity = NULL;
-                    vecCollision = vecTarget;
-                    bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pCollision, &pCollisionGameEntity );
-                    if ( bCollision && pCollision )
-                        vecCollision = *pCollision->GetPosition ();
-
-                    // Destroy the colpoint
-                    if ( pCollision )
-                    {
-                        pCollision->Destroy ();
-                    }
-
-                    if ( pCollisionGameEntity )
-                        pCollisionEntity = g_pClientGame->m_pManager->FindEntity ( pCollisionGameEntity );
-                }
-                else
-                {
-                    pPed->ClearBulletImpactData ();
-                }
+                if ( pCollisionGameEntity )
+                    pCollisionEntity = g_pClientGame->m_pManager->FindEntity ( pCollisionGameEntity );
 
                 // Call our lua event
                 CLuaArguments Arguments;
@@ -4043,50 +3995,6 @@ void CClientGame::PostWeaponFire ( void )
         }        
     }
     pWeaponFirePed = NULL;
-}
-
-void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition )
-{
-    // Got a local player model?
-    CClientPed* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
-    if ( pLocalPlayer && pInitiator )
-    {
-        // Find the client ped that initiated the bullet impact
-        CClientPed * pInitiatorPed = g_pClientGame->GetPedManager ()->Get ( dynamic_cast < CPlayerPed* > ( pInitiator ), true, true );
-
-        if ( pInitiatorPed )
-        {
-            // Calculate the collision of the bullet
-            CVector vecCollision;
-            CColPoint* pCollision = NULL;
-            bool bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( pStartPosition, pEndPosition, &pCollision, NULL );
-            if ( bCollision && pCollision )
-            {
-                vecCollision = *pCollision->GetPosition ();
-            }
-            else
-            {
-                // If we don't have a collision, use the end of the ray that the bullet is tracing.
-                vecCollision = *pEndPosition;
-            }
-
-            // Destroy the colpoint
-            if ( pCollision )
-            {
-                pCollision->Destroy ();
-            }
-
-            // Find the client entity for the victim.
-            CClientEntity* pClientVictim = NULL;
-            if ( pVictim )
-            {   
-                pClientVictim = g_pClientGame->m_pManager->FindEntity ( pVictim );
-            }
-
-            // Store the data in the bullet fire initiator.
-            pInitiatorPed->SetBulletImpactData ( pClientVictim, vecCollision );
-        }
-    }
 }
 
 
@@ -4265,6 +4173,7 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
             case WEAPONTYPE_FREEFALL_BOMB:
                 break;
         }
+
         g_pNet->SendPacket ( PACKET_ID_PROJECTILE, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
 
         // Destroy it
@@ -4306,8 +4215,8 @@ void CClientGame::ResetMapInfo ( void )
     // Gamespeed
     SetGameSpeed ( DEFAULT_GAME_SPEED );
 
-    // Game minute duration
-    SetMinuteDuration ( DEFAULT_MINUTE_DURATION );
+	// Game minute duration
+	SetMinuteDuration ( DEFAULT_MINUTE_DURATION );
 
     // Wanted-level
     g_pGame->GetPlayerInfo()->GetWanted()->SetWantedLevel ( 0 ); 
@@ -4374,7 +4283,6 @@ void CClientGame::ResetMapInfo ( void )
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
     }
 }
-
 void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID )
 {
     if ( Ped && Ped->GetHealth () == 0.0f )
@@ -4898,8 +4806,7 @@ bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
         "data/vehicles.ide",    "\xbd\xc3\xa0\xfc\xed\x24\x02\xc5\xbc\x61\x58\x57\x14\x45\x7d\x4b",
         "data/water.dat",       "\x69\x04\x00\xec\xc9\x21\x69\xd9\xea\xdd\xaa\xa9\x48\x90\x3e\xfb",
         "data/water1.dat",      "\x16\xfe\x5a\x3e\x8c\x57\xd0\x2e\xb6\x2a\x44\xa9\x6d\x8b\x9d\x39",
-        "data/weapon.dat",      "\x0a\x9b\xb4\x90\x03\x68\x03\x64\xf9\xf9\x76\x8e\x9b\xce\xa9\x82",
-        "anim/ped.ifp",         "\x47\x36\xB2\xC9\x0B\x00\x98\x12\x55\xF9\x50\x73\x08\xEE\x91\x74"
+        "data/weapon.dat",      "\x0a\x9b\xb4\x90\x03\x68\x03\x64\xf9\xf9\x76\x8e\x9b\xce\xa9\x82"
     };
 
     CMD5Hasher hasher;
