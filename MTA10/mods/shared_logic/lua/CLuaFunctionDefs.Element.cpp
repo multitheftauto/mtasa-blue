@@ -298,7 +298,7 @@ int CLuaFunctionDefs::GetElementRotation ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            // Grab the rotation
+            // Grab the position
             CVector vecRotation;
             if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation ) )
             {            
@@ -1128,52 +1128,6 @@ int CLuaFunctionDefs::IsElementSyncer ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::IsElementCollidableWith ( lua_State* luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-         lua_istype ( luaVM, 2, LUA_TLIGHTUSERDATA ) )
-    {
-        // Grab the entity and verify it.
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        CClientEntity* pWithEntity = lua_toelement ( luaVM, 2 );
-        if ( pEntity && pWithEntity )
-        {
-            bool bCanCollide;
-            if ( CStaticFunctionDefinitions::IsElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
-            {
-                lua_pushboolean ( luaVM, bCanCollide );
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "isElementCollidableWith" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::IsElementDoubleSided ( lua_State* luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-    {
-        // Grab the entity and verify it.
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
-        {
-            lua_pushboolean ( luaVM, pEntity->IsDoubleSided () );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "isElementDoubleSided" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 
 int CLuaFunctionDefs::IsElementStreamedIn ( lua_State* luaVM )
 {
@@ -1897,61 +1851,6 @@ int CLuaFunctionDefs::SetElementCollisionsEnabled ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
-int CLuaFunctionDefs::SetElementCollidableWith ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
-    {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        CClientEntity* pWithEntity = lua_toelement ( luaVM, 2 );
-        if ( pEntity && pWithEntity )
-        {
-            bool bCanCollide = ( lua_toboolean ( luaVM, 3 ) ) ? true:false;
-            if ( CStaticFunctionDefinitions::SetElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
-            {
-                lua_pushboolean ( luaVM, true );    
-                return 1;
-            }        
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementCollidableWith", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setElementCollidableWith" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::SetElementDoubleSided ( lua_State* luaVM )
-{
-    // Valid args?
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-        lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
-    {
-        // Grab the element to change
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
-        {
-            // Grab the chosen value and set it
-            pEntity->SetDoubleSided ( lua_toboolean ( luaVM, 2 ) ? true : false );
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementDoubleSided", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setElementDoubleSided" );
-
-    // Failure
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 
 int CLuaFunctionDefs::SetElementAlpha ( lua_State* luaVM )
 {

@@ -53,10 +53,6 @@ CTask * CTaskManagementSystemSA::AddTask ( CTaskSA * pTask )
 
 void CTaskManagementSystemSA::RemoveTask ( CTaskSAInterface * pTaskInterface )
 {
-    // Stops crash on exit
-    if ( m_TaskList.size () == 0 )
-        return;
-
     // Find it in our list
     STaskListItem* pItem;
     list < STaskListItem* > ::iterator iter = m_TaskList.begin ();
@@ -71,7 +67,7 @@ void CTaskManagementSystemSA::RemoveTask ( CTaskSAInterface * pTaskInterface )
             // Delete the object
             delete pItem;
 
-            // Remove from list
+			// Remove from list
             m_TaskList.erase ( iter );
 
             // Eventually destroy the task
@@ -97,7 +93,7 @@ CTask * CTaskManagementSystemSA::GetTask ( CTaskSAInterface * pTaskInterface )
     {
         // Matches?
         pListItem = *iter;
-        if ( pListItem->taskInterface == pTaskInterface && pListItem->pTaskSA )
+		if ( pListItem->taskInterface == pTaskInterface && pListItem->pTaskSA )
         {
             // Yes it has existed before, return it
             return pListItem->pTaskSA;
@@ -120,13 +116,13 @@ CTask * CTaskManagementSystemSA::GetTask ( CTaskSAInterface * pTaskInterface )
 
     // Create it and add it to our list
     CTaskSA * pTask = dynamic_cast < CTaskSA* > ( CreateAppropriateTask ( pTaskInterface, iTaskType ) );
-    if ( pTask )
-    {
-        pListItem = new STaskListItem;
-        pListItem->pTaskSA = pTask;
-        pListItem->taskInterface = pTaskInterface;
-        m_TaskList.push_back ( pListItem );
-    }
+	if ( pTask )
+	{
+		pListItem = new STaskListItem;
+		pListItem->pTaskSA = pTask;
+		pListItem->taskInterface = pTaskInterface;
+		m_TaskList.push_back ( pListItem );
+	}
 
     return pTask;
 }

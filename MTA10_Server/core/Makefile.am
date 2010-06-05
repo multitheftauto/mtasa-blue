@@ -15,11 +15,10 @@ clean-local:
 	-rm -f StdInc.h.gch
 endif
 
-libdir = $(outputdir)
-lib_LTLIBRARIES = core.la
-core_la_LIBTOOLFLAGS = --tag=disable-static
-core_la_LDFLAGS = -lcurses -module -avoid-version
-core_la_SOURCES = \
+lib_LTLIBRARIES = \
+	libcore.la
+
+libcore_la_SOURCES = \
 	StdInc.cpp \
 	CCrashHandlerAPI.cpp \
 	CCrashHandlerAPI.h \
@@ -44,3 +43,5 @@ core_la_SOURCES = \
 	sockets/CTCPServerSocketImpl.h \
 	sockets/CTCPServerSocketImplManager.cpp \
 	sockets/CTCPServerSocketImplManager.h
+
+libcore_la_LDFLAGS = -lcurses -lrt

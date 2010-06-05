@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CChat.h
-*  PURPOSE:     Header file for the chatbox class
-*  DEVELOPERS:  Jax <>
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		core/CChat.h
+*  PURPOSE:		Header file for the chatbox class
+*  DEVELOPERS:	Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -60,13 +60,6 @@ public:
         G = (ulColor >>  8) & 0xFF;
         B = (ulColor      ) & 0xFF;
         return *this;
-    }
-    bool                        operator ==         ( const CColor& other ) const
-    {
-        return R == other.R
-            && G == other.G
-            && B == other.B
-            && A == other.A;
     }
 
     unsigned char               R, G, B, A;
@@ -170,13 +163,10 @@ public:
     void                        SetInputColor           ( CColor& Color );
     void                        SetTextColor            ( CColor& Color )   { m_TextColor = Color; };
     void                        SetNumLines             ( unsigned int uiNumLines );
-
-    void                        Scroll                  ( int iState )  { m_iScrollState = iState; };
     void                        ScrollUp                ( void );
     void                        ScrollDown              ( void );
 
     void                        SetChatFont             ( eChatFont Font );
-    void                        OnModLoad               ( void );
 
 private:
     void                        LoadCVars               ( void );
@@ -186,14 +176,12 @@ protected:
     void                        UpdateSmoothScroll      ( float* pfPixelScroll, int *piLineScroll );
 
     CChatLine                   m_Lines [ CHAT_MAX_LINES ];     // Circular buffer
-    int                         m_iScrollState;                 // 1 up, 0 stop, -1 down 
     unsigned int                m_uiMostRecentLine;
     unsigned int                m_uiScrollOffset;
     float                       m_fSmoothScroll;
     float                       m_fSmoothLastTimeSeconds;
     float                       m_fSmoothAllowAfter;
     float                       m_fSmoothScrollResetTime;
-    float                       m_fSmoothRepeatTimer;
     CChatInputLine              m_InputLine;
 
     CGUI*                       m_pManager;
@@ -215,10 +203,6 @@ protected:
 
     bool                        m_bVisible;
     bool                        m_bInputVisible;
-    int                         m_iScrollingBack;           // Non zero if currently scrolling back
-    float                       m_fCssStyleOverrideAlpha;   // For fading out 'CssStyle' effect. (When entering text or scrolling back)
-    float                       m_fBackgroundAlpha;
-    float                       m_fInputBackgroundAlpha;
     
     unsigned int                m_uiNumLines;
     CColor                      m_Color;

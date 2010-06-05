@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/multiplayer/CMultiplayer.h
-*  PURPOSE:     Multiplayer subsystem interface
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		sdk/multiplayer/CMultiplayer.h
+*  PURPOSE:		Multiplayer subsystem interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -28,7 +28,6 @@ typedef void ( PreContextSwitchHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostContextSwitchHandler ) ( void );
 typedef void ( PreWeaponFireHandler ) ( class CPlayerPed* pPlayer );
 typedef void ( PostWeaponFireHandler ) ( void );
-typedef void ( BulletImpactHandler ) ( class CPed* pInitiator, class CEntity* pVictim, const CVector* pvecStartPosition, const CVector* pvecEndPosition );
 typedef bool ( DamageHandler ) ( class CPed* pDamagePed, class CEventDamage * pEvent );
 typedef void ( FireHandler ) ( class CFire* pFire );
 typedef bool ( ProjectileStopHandler ) ( class CEntity * owner, enum eWeaponType weaponType, class CVector * origin, float fForce, class CVector * target, class CEntity * targetEntity );
@@ -42,7 +41,7 @@ typedef void ( PostWorldProcessHandler ) ( void );
 typedef void ( IdleHandler ) ( void );
 typedef void ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
-typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
+
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -99,12 +98,12 @@ public:
 
     virtual class CPed *                GetContextSwitchedPed       ( void ) = 0;
 
-    virtual class CPopulationMP         * GetPopulationMP           () = 0;
-    virtual void                        PreventLeavingVehicles      () = 0;
-    virtual void                        HideRadar                   ( bool bHide ) = 0;
-    virtual void                        SetCenterOfWorld            ( class CEntity * entity, class CVector * vecPosition, FLOAT fHeading ) = 0;
-    virtual void                        DisablePadHandler           ( bool bDisabled ) = 0;
-    virtual void                        DisableHeatHazeEffect       ( bool bDisable ) = 0;
+	virtual class CPopulationMP         * GetPopulationMP           () = 0;
+	virtual void						PreventLeavingVehicles      () = 0;
+	virtual void						HideRadar                   ( bool bHide ) = 0;
+	virtual void						SetCenterOfWorld            ( class CEntity * entity, class CVector * vecPosition, FLOAT fHeading ) = 0;
+	virtual void						DisablePadHandler           ( bool bDisabled ) = 0;
+	virtual void						DisableHeatHazeEffect       ( bool bDisable ) = 0;
     virtual void                        DisableAllVehicleWeapons    ( bool bDisable ) = 0;
     virtual void                        DisableZoneNames            ( bool bDisabled ) = 0; // move to CHud
     virtual void                        DisableBirds                ( bool bDisabled ) = 0;
@@ -112,19 +111,18 @@ public:
 
     virtual bool                        GetExplosionsDisabled       () = 0;
     virtual void                        DisableExplosions           ( bool bDisabled ) = 0;
-    virtual void                        SetExplosionHandler         ( ExplosionHandler * pExplosionHandler ) = 0;
+	virtual void						SetExplosionHandler         ( ExplosionHandler * pExplosionHandler ) = 0;
     virtual void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler ) = 0;
     virtual void                        SetDamageHandler            ( DamageHandler * pDamageHandler ) = 0;
     virtual void                        SetFireHandler              ( FireHandler * pFireHandler ) = 0;
     virtual void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler ) = 0;
-    virtual void                        SetChokingHandler           ( ChokingHandler* pChokingHandler ) = 0;
+	virtual void                        SetChokingHandler           ( ChokingHandler* pChokingHandler ) = 0;
     virtual void                        SetProjectileHandler        ( ProjectileHandler * pProjectileHandler ) = 0;
     virtual void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler ) = 0;
     virtual void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler ) = 0;
     virtual void                        SetIdleHandler              ( IdleHandler * pHandler ) = 0;
     virtual void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler ) = 0;
     virtual void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler ) = 0;
-    virtual void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler ) = 0;
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;
@@ -134,9 +132,6 @@ public:
     virtual void                        ResetWater                  ( void ) = 0;
     virtual void                        SetCloudsEnabled            ( bool bDisabled ) = 0;
     virtual void                        DisableEnterExitVehicleKey  ( bool bDisabled ) = 0;
-
-    virtual void                        SetNightVisionEnabled       ( bool bEnabled ) = 0;
-    virtual void                        SetThermalVisionEnabled     ( bool bEnabled ) = 0;
 
     virtual void                        RebuildMultiplayerPlayer    ( class CPed * player ) = 0;
 
@@ -148,7 +143,6 @@ public:
     virtual void                        SetPostContextSwitchHandler ( PostContextSwitchHandler* pHandler ) = 0;
     virtual void                        SetPreWeaponFireHandler     ( PreWeaponFireHandler* pHandler ) = 0;
     virtual void                        SetPostWeaponFireHandler    ( PostWeaponFireHandler* pHandler ) = 0;
-    virtual void                        SetBulletImpactHandler      ( BulletImpactHandler* pHandler ) = 0;
     virtual void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler ) = 0;
     virtual void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler ) = 0;
 

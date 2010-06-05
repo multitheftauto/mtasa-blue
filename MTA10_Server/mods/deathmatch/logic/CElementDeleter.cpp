@@ -18,40 +18,43 @@ extern CGame * g_pGame;
 
 void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink )
 {
-    if ( pElement && !IsBeingDeleted ( pElement ) )
+	if ( pElement && !IsBeingDeleted ( pElement ) )
     {
-        // Before we do anything, fire the on-destroy event
+		// Before we do anything, fire the on-destroy event
         CLuaArguments Arguments;
         pElement->CallEvent ( "onElementDestroy", Arguments );
 
-        // Add it to our list
-        if ( !pElement->IsBeingDeleted () )
-        {
-            m_List.push_back ( pElement );
-        }
+		// Add it to our list
+		if ( !pElement->IsBeingDeleted () )
+		{
+			m_List.push_back ( pElement );
+		}
 
-        // Flag it as being deleted and unlink it from the tree/managers
-        pElement->SetIsBeingDeleted ( true );
+		// Flag it as being deleted and unlink it from the tree/managers
+		pElement->SetIsBeingDeleted ( true );
         pElement->ClearChildren ();
         pElement->SetParentObject ( NULL );
 
         if ( bUnlink )
-            pElement->Unlink ();
-    }
+		    pElement->Unlink ();
+	}
 }
 
 
 void CElementDeleter::DoDeleteAll ( void )
 {
-    // This depends on CElementDeleter::Unreference() being called in ~CElement() 
-    while ( !m_List.empty () )
-        delete *m_List.begin ();
+    // Delete all the elements
+    list < CElement* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
+    {
+        CElement* pElement = *iter;
+        delete pElement;
+    }
+
+    // Clear the list
+    m_List.clear ();
 }
 
-void CElementDeleter::Unreference ( CElement* pElement )
-{
-    m_List.remove ( pElement );
-}
 
 bool CElementDeleter::IsBeingDeleted ( CElement* pElement )
 {

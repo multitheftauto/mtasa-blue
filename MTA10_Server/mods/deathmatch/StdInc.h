@@ -8,7 +8,6 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 #include <pthread.h>
 
@@ -31,15 +30,10 @@
 #include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
 #include "CVector.h"
-#include "CSphere.h"
-#include "CBox.h"
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
 #include "SString.h"
-#include "utils/zip/crc32.h"
-#include "CMD5Hasher.h"
-#include "CChecksum.h"
 
 // Packet includes
 #include "net/Packets.h"
@@ -84,7 +78,6 @@
 #include "packets/CResourceStopPacket.h"
 #include "packets/CReturnSyncPacket.h"
 #include "packets/CServerTextItemPacket.h"
-#include "packets/CUpdateInfoPacket.h"
 #include "packets/CUnoccupiedVehicleStartSyncPacket.h"
 #include "packets/CUnoccupiedVehicleStopSyncPacket.h"
 #include "packets/CUnoccupiedVehicleSyncPacket.h"
@@ -171,6 +164,7 @@
 #include "CKeyBinds.h"
 #include "CLanBroadcast.h"
 #include "CLogger.h"
+#include "CMD5Hasher.h"
 #include "CMainConfig.h"
 #include "CMapEvent.h"
 #include "CMapEventManager.h"
@@ -216,7 +210,7 @@
 #include "CScriptFile.h"
 #include "CSerialManager.h"
 #include "CSettings.h"
-#include "CSpatialDatabase.h"
+#include "CStack.h"
 #include "CTeam.h"
 #include "CTeamManager.h"
 #include "CTextDisplay.h"
@@ -253,6 +247,7 @@
 #include "utils/CTCPSocket.h"
 #include "utils/CTCPSocketImpl.h"
 #include "utils/base64.h"
+#include "utils/zip/crc32.h"
 
 // Module includes
 #include "CServer.h"

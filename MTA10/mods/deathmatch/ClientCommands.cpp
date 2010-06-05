@@ -15,7 +15,6 @@
 #include "StdInc.h"
 
 using std::list;
-using std::vector;
 
 #ifdef MTA_DEBUG
 #include <Tlhelp32.h>
@@ -85,11 +84,11 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
         // Call the onClientConsole event
         Arguments.PushString ( szBuffer );
 
-        // Call the event on the local player's onClientConsole first
-        if ( g_pClientGame->GetLocalPlayer () )
-            g_pClientGame->GetLocalPlayer ()->CallEvent ( "onClientConsole", Arguments, true );
+	    // Call the event on the local player's onClientConsole first
+	    if ( g_pClientGame->GetLocalPlayer () )
+		    g_pClientGame->GetLocalPlayer ()->CallEvent ( "onClientConsole", Arguments, true );
 
-        // Write the chatlength and the content
+	    // Write the chatlength and the content
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
         if ( !pBitStream ) 
             return false;
@@ -167,9 +166,9 @@ void COMMAND_ShowChat ( const char* szCmdLine )
 void COMMAND_ShowNetstat ( const char* szCmdLine )
 {
     if ( szCmdLine && szCmdLine [ 0 ] )
-    {
-        g_pClientGame->ShowNetstat ( atoi ( szCmdLine ) == 1 );
-    }
+	{
+		g_pClientGame->ShowNetstat ( atoi ( szCmdLine ) == 1 );
+	}
 }
 
 void COMMAND_Eaeg ( const char* szCmdLine )
@@ -253,12 +252,12 @@ void COMMAND_RadarMoveNorth ( const char* szCmdLine )
 
     if ( pRadarMap->IsRadarShowing () )
     {
-        // Toggle on/off
-        if ( pRadarMap->IsMovingNorth () )
-            pRadarMap->SetMovingNorth ( false );
+		// Toggle on/off
+		if ( pRadarMap->IsMovingNorth () )
+			pRadarMap->SetMovingNorth ( false );
         else if ( pRadarMap->IsMovingSouth () )
             pRadarMap->SetMovingSouth ( false );
-        else
+		else
         {
             pRadarMap->SetMovingNorth ( true );
             pRadarMap->SetMovingSouth ( false );
@@ -274,12 +273,12 @@ void COMMAND_RadarMoveSouth ( const char* szCmdLine )
 
     if ( pRadarMap->IsRadarShowing () )
     {
-        // Toggle on/off
-        if ( pRadarMap->IsMovingSouth () )
-            pRadarMap->SetMovingSouth ( false );
+		// Toggle on/off
+		if ( pRadarMap->IsMovingSouth () )
+			pRadarMap->SetMovingSouth ( false );
         else if ( pRadarMap->IsMovingNorth () )
             pRadarMap->SetMovingNorth ( false );
-        else
+		else
         {
             pRadarMap->SetMovingNorth ( false );
             pRadarMap->SetMovingSouth ( true );
@@ -295,12 +294,12 @@ void COMMAND_RadarMoveEast ( const char* szCmdLine )
 
     if ( pRadarMap->IsRadarShowing () )
     {
-        // Toggle on/off
-        if ( pRadarMap->IsMovingEast () )
-            pRadarMap->SetMovingEast ( false );
+		// Toggle on/off
+		if ( pRadarMap->IsMovingEast () )
+			pRadarMap->SetMovingEast ( false );
         else if ( pRadarMap->IsMovingWest () )
             pRadarMap->SetMovingWest ( false );
-        else
+		else
         {
             pRadarMap->SetMovingNorth ( false );
             pRadarMap->SetMovingSouth ( false );
@@ -316,12 +315,12 @@ void COMMAND_RadarMoveWest ( const char* szCmdLine )
 
     if ( pRadarMap->IsRadarShowing () )
     {
-        // Toggle on/off
-        if ( pRadarMap->IsMovingWest () )
-            pRadarMap->SetMovingWest ( false );
+		// Toggle on/off
+		if ( pRadarMap->IsMovingWest () )
+			pRadarMap->SetMovingWest ( false );
         else if ( pRadarMap->IsMovingEast () )
             pRadarMap->SetMovingEast ( false );
-        else
+		else
         {
             pRadarMap->SetMovingNorth ( false );
             pRadarMap->SetMovingSouth ( false );
@@ -685,7 +684,7 @@ void COMMAND_DumpPlayers ( const char* szCmdLine )
         fprintf ( pFile, "Used point single link pool: %u\n\n\n", g_pGame->GetPools ()->GetNumberOfUsedSpaces ( POINTER_SINGLE_LINK_POOL ) );
 
         // Loop through all players
-        vector < CClientPlayer* > ::const_iterator iter = g_pClientGame->GetPlayerManager ()->IterBegin ();
+        list < CClientPlayer* > ::const_iterator iter = g_pClientGame->GetPlayerManager ()->IterBegin ();
         for ( ; iter != g_pClientGame->GetPlayerManager ()->IterEnd (); iter++ )
         {
             // Write the player dump
@@ -1107,8 +1106,8 @@ CObject *o;
 
 void COMMAND_Debug4 ( const char* szCmdLine )
 {
-    g_pCore->GetConsole ()->Printf ( "debug4" );
-    g_pClientGame->StartPlayback ();
-    return;
+	g_pCore->GetConsole ()->Printf ( "debug4" );
+	g_pClientGame->StartPlayback ();
+	return;
 }
 #endif

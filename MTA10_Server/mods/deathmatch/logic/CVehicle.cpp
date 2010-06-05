@@ -20,7 +20,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     // Init
     m_pVehicleManager = pVehicleManager;
     m_usModel = usModel;
-    m_pUpgrades = new CVehicleUpgrades ( this );
+	m_pUpgrades = new CVehicleUpgrades ( this );
 
     m_iType = CElement::VEHICLE;
     SetTypeName ( "vehicle" );
@@ -35,7 +35,6 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bLandingGearDown = true;
     m_usAdjustableProperty = 0;
     m_bIsFrozen = false;
-    m_bUnoccupiedSyncable = true;
     m_pSyncer = NULL;
     GetInitialDoorStates ( m_ucDoorStates );
     memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
@@ -45,7 +44,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_pTowedVehicle = NULL;
     m_pTowedByVehicle = NULL;
     m_ucPaintjob = 3;
-    m_ucMaxPassengersOverride = VEHICLE_PASSENGERS_UNDEFINED;
+	m_ucMaxPassengersOverride = VEHICLE_PASSENGERS_UNDEFINED;
 
     m_bRespawnInfoChanged = false;
     m_fRespawnHealth = DEFAULT_VEHICLE_HEALTH;
@@ -68,7 +67,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bIsDerailable = true;
     m_bTaxiLightState = false;
     m_bTrainDirection = true;
-    m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
+    m_HeadLightColor = COLOR_RGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
 
     // Initialize the occupied Players
@@ -118,7 +117,7 @@ CVehicle::~CVehicle ( void )
             m_pOccupants [i]->SetVehicleAction ( CPed::VEHICLEACTION_NONE );
         }
     }
-    delete m_pUpgrades;
+	delete m_pUpgrades;
 
     // Remove us from the vehicle manager
     Unlink ();
@@ -127,8 +126,8 @@ CVehicle::~CVehicle ( void )
 
 void CVehicle::Unlink ( void )
 {
-    // Remove us from the vehicle manager
-    m_pVehicleManager->RemoveFromList ( this );
+	// Remove us from the vehicle manager
+	m_pVehicleManager->RemoveFromList ( this );
 }
 
 
@@ -291,10 +290,10 @@ bool CVehicle::ReadSpecialData ( void )
         SetRegPlate ( szTemp );
     }
 
-    if ( GetCustomDataInt ( "interior", iTemp, true ) )
+	if ( GetCustomDataInt ( "interior", iTemp, true ) )
         m_ucInterior = static_cast < unsigned char > ( iTemp );
 
-    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     return true;
@@ -304,7 +303,11 @@ bool CVehicle::ReadSpecialData ( void )
 const CVector & CVehicle::GetPosition ( void )
 {
     // Are we attached to something?
-    if ( m_pAttachedTo ) GetAttachedPosition ( m_vecPosition );
+    if ( m_pAttachedTo )
+    {
+        // Update our stored position to where we should be, before returning
+        m_vecPosition = m_pAttachedTo->GetPosition () + m_vecAttachedPosition;
+    }
     return m_vecPosition;
 }
 
@@ -320,33 +323,7 @@ void CVehicle::SetPosition ( const CVector & vecPosition )
         // Update our stored vectors
         m_vecLastPosition = m_vecPosition;
         m_vecPosition = vecPosition;
-        UpdateSpatialData ();
     }
-}
-
-
-void CVehicle::GetRotation ( CVector & vecRotation )
-{
-    if ( m_pAttachedTo ) GetAttachedRotation ( vecRotation );
-    else
-    {
-        GetRotationDegrees ( vecRotation );
-        ConvertDegreesToRadians ( vecRotation );
-    }
-}
-
-
-void CVehicle::GetRotationDegrees ( CVector & vecRotation )
-{
-    if ( m_pAttachedTo ) GetAttachedRotation ( vecRotation );
-    else vecRotation = m_vecRotationDegrees;
-}
-
-
-void CVehicle::SetRotationDegrees ( const CVector & vecRotation )
-{
-    if ( m_pAttachedTo ) return;
-    m_vecRotationDegrees = vecRotation;
 }
 
 
@@ -492,7 +469,7 @@ void CVehicle::SetSyncer ( CPlayer* pPlayer )
 
 unsigned char CVehicle::GetMaxPassengers ( void )
 {
-    return ( ( m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED ) ? CVehicleManager::GetMaxPassengers ( m_usModel ) : m_ucMaxPassengersOverride );
+	return ( ( m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED ) ? CVehicleManager::GetMaxPassengers ( m_usModel ) : m_ucMaxPassengersOverride );
 }
 
 
@@ -589,14 +566,9 @@ void CVehicle::SpawnAt ( const CVector& vecPosition, const CVector& vecRotation 
     memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
     SetLandingGearDown ( true );
     SetAdjustableProperty ( 0 );
-    
-    CVector vecNull;
 
-    m_vecTurnSpeed = vecNull;
-    m_vecVelocity = vecNull;
     m_vecPosition = vecPosition;
     m_vecRotationDegrees = vecRotation;
-    UpdateSpatialData ();
 }
 
 
@@ -664,7 +636,7 @@ void CVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
         case VT_RCCAM:
         case VT_RCGOBLIN:
         case VT_RCRAIDER:
-        case VT_RCTIGER:
+        case VT_TIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
             memset ( pucDoorStates, DT_DOOR_MISSING, 6 );

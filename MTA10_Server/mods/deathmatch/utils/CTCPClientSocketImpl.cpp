@@ -14,10 +14,10 @@
 
 CTCPClientSocketImpl::CTCPClientSocketImpl ( void )
 {
-    // Init
-    m_bIsConnected = false;
-    m_Socket = 0;
-    m_szLastError [0] = 0;
+	// Init
+	m_bIsConnected = false;
+	m_Socket = 0;
+	m_szLastError [0] = 0;
 }
 
 
@@ -32,7 +32,7 @@ CTCPClientSocketImpl::~CTCPClientSocketImpl ( void )
 }
 
 
-bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort, const char* szLocalIP )
+bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort )
 {
     // If we're already connected, disconnect
     if ( m_bIsConnected )
@@ -54,22 +54,6 @@ bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort, 
     {
         strcpy ( m_szLastError, "Unable to resolve" );
         return false;
-    }
-
-    // If a local IP has been specified, ensure it is used for sending
-    if ( szLocalIP && szLocalIP[0] )
-    {
-        sockaddr_in m_SockAddr;
-        m_SockAddr.sin_family = AF_INET;
-        m_SockAddr.sin_addr.s_addr = inet_addr( szLocalIP );
-        m_SockAddr.sin_port = 0;   
-
-        // Bind the socket
-        if ( bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) == -1 )
-        {
-            strcpy ( m_szLastError, "Unable to bind socket" );
-            return false;
-        }
     }
 
     // Create a sockaddr_in structure and set the data
@@ -138,39 +122,39 @@ const char* CTCPClientSocketImpl::GetLastError ( void )
 
 int CTCPClientSocketImpl::ReadBuffer ( void* pOutput, int iSize )
 {
-    // Try to read something
-    int iReturn = recv ( m_Socket, (char*)pOutput, iSize, 0 );
-    if ( !iReturn )
-    {
-        // TODO: Store somewhere
+	// Try to read something
+	int iReturn = recv ( m_Socket, (char*)pOutput, iSize, 0 );
+	if ( !iReturn )
+	{
+		// TODO: Store somewhere
 #ifdef WIN32
-        WSAGetLastError ();
+		WSAGetLastError ();
 #endif
-        return -1;
-    }
+		return -1;
+	}
 
-    // Return number of bytes actually read
-    m_szLastError [0] = 0;
-    return iReturn;
+	// Return number of bytes actually read
+	m_szLastError [0] = 0;
+	return iReturn;
 }
 
 
 int CTCPClientSocketImpl::WriteBuffer ( const void* pInput, int iSize )
 {
-    // Try to write the stuff
-    int iReturn = send ( m_Socket, (const char*)pInput, iSize, 0 );
-    if ( !iReturn )
-    {
-        // TODO: Store somewhere
+	// Try to write the stuff
+	int iReturn = send ( m_Socket, (const char*)pInput, iSize, 0 );
+	if ( !iReturn )
+	{
+		// TODO: Store somewhere
 #ifdef WIN32
-        WSAGetLastError ();
+		WSAGetLastError ();
 #endif
-        return -1;
-    }
+		return -1;
+	}
 
-    // Return number of bytes actually written
-    m_szLastError [0] = 0;
-    return iReturn;
+	// Return number of bytes actually written
+	m_szLastError [0] = 0;
+	return iReturn;
 }
 
 

@@ -40,9 +40,9 @@ CLuaArguments::CLuaArguments ( const CLuaArguments& Arguments, std::map < CLuaAr
 
 CLuaArgument* CLuaArguments::operator [] ( const unsigned int uiPosition ) const
 {
-    if ( uiPosition < m_Arguments.size () )
-        return m_Arguments.at ( uiPosition );
-    return NULL;
+	if ( uiPosition < m_Arguments.size () )
+		return m_Arguments.at ( uiPosition );
+	return NULL;
 }
 
 
@@ -110,7 +110,6 @@ void CLuaArguments::ReadTable ( lua_State* luaVM, int iIndexBegin, std::map < co
     // Delete the previous arguments if any
     DeleteArguments ();
 
-    LUA_CHECKSTACK ( luaVM, 1 );
     lua_pushnil(luaVM);  /* first key */
     if ( iIndexBegin < 0 )
         iIndexBegin--;
@@ -189,9 +188,8 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments *
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
     assert ( luaVM );
-    LUA_CHECKSTACK ( luaVM, 1 );
     int luaStackPointer = lua_gettop ( luaVM );
-    lua_getref ( luaVM, iLuaFunction );
+	lua_getref ( luaVM, iLuaFunction );
 
     // Push our arguments onto the stack
     PushArguments ( luaVM );
@@ -202,30 +200,23 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments *
     int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
-        std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
-        g_pClientGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
-
-        // cleanup the stack
-        while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
-            lua_pop ( luaVM, 1 );
+        const char* szRes = lua_tostring( luaVM, -1 );		
+		g_pClientGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
 
         return false; // the function call failed
     }
-    else
+    else if ( returnValues != NULL )
     {
         int iReturns = lua_gettop ( luaVM ) - luaStackPointer;
-
-        if ( returnValues != NULL )
+        for ( int i = - iReturns; i <= -1; i++ )
         {
-            for ( int i = - iReturns; i <= -1; i++ )
-            {
-                returnValues->ReadArgument ( luaVM, i );
-            }
+            returnValues->ReadArgument ( luaVM, i );
         }
 
-        // cleanup the stack
-        while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
+        for ( int h = 0; h < iReturns; h++)
+		{
             lua_pop ( luaVM, 1 );
+		}
     }
         
     return true;
@@ -240,7 +231,6 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
     assert ( luaVM );
-    LUA_CHECKSTACK ( luaVM, 1 );
     int luaStackPointer = lua_gettop ( luaVM );
     lua_pushstring ( luaVM, szFunction );
     lua_gettable ( luaVM, LUA_GLOBALSINDEX );
@@ -254,30 +244,23 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
     int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
-        std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
-        g_pClientGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
-
-        // cleanup the stack
-        while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
-            lua_pop ( luaVM, 1 );
+        const char* szRes = lua_tostring( luaVM, -1 );
+        g_pClientGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
 
         return false; // the function call failed
     }
-    else
+    else if ( returnValues != NULL )
     {
         int iReturns = lua_gettop ( luaVM ) - luaStackPointer;
-
-        if ( returnValues != NULL )
+        for ( int i = - iReturns; i <= -1; i++ )
         {
-            for ( int i = - iReturns; i <= -1; i++ )
-            {
-                returnValues->ReadArgument ( luaVM, i );
-            }
+            returnValues->ReadArgument ( luaVM, i );
         }
 
-        // cleanup the stack
-        while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
+        for ( int h = 0; h < iReturns; h++)
+		{
             lua_pop ( luaVM, 1 );
+		}
     }
         
     return true;
@@ -332,7 +315,7 @@ CLuaArgument* CLuaArguments::PushElement ( CClientEntity* pElement )
 }
 
 
-CLuaArgument* CLuaArguments::PushArgument ( const CLuaArgument& Argument )
+CLuaArgument* CLuaArguments::PushArgument ( CLuaArgument& Argument )
 {
     CLuaArgument* pArgument = new CLuaArgument ( Argument );
     m_Arguments.push_back ( pArgument );
@@ -363,42 +346,6 @@ void CLuaArguments::DeleteArguments ( void )
 }
 
 
-void CLuaArguments::ValidateTableKeys ( void )
-{
-    // Iterate over m_Arguments as pairs
-    // If first is LUA_TNIL, then remove pair
-    vector < CLuaArgument* > ::iterator iter = m_Arguments.begin ();
-    for ( ; iter != m_Arguments.end () ; )
-    {
-        // Check first in pair
-        if ( (*iter)->GetType () == LUA_TNIL )
-        {
-            // Remove pair
-            delete *iter;
-            iter = m_Arguments.erase ( iter );
-            if ( iter != m_Arguments.end () )
-            {
-                delete *iter;
-                iter = m_Arguments.erase ( iter );
-            }
-            // Check if end
-            if ( iter == m_Arguments.end () )
-                break;
-        }
-        else
-        {
-            // Skip second in pair
-            iter++;
-            // Check if end
-            if ( iter == m_Arguments.end () )
-                break;
-
-            iter++;
-        }
-    }
-}
-
-
 bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
 {
     bool bKnownTablesCreated = false;
@@ -414,10 +361,10 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
         pKnownTables->push_back ( this );
         for ( unsigned short us = 0 ; us < usNumArgs ; us++ )
         {
-            CLuaArgument* pArgument = new CLuaArgument ( bitStream, pKnownTables );
+		    CLuaArgument* pArgument = new CLuaArgument ( bitStream, pKnownTables );
             m_Arguments.push_back ( pArgument );
         }
-    }
+	}
 
     if ( bKnownTablesCreated )
         delete pKnownTables;
@@ -451,5 +398,5 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, std::ma
     if ( bKnownTablesCreated )
         delete pKnownTables;
 
-    return bSuccess;
+	return bSuccess;
 }

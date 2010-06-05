@@ -12,115 +12,97 @@
 
 #include "StdInc.h"
 
-CConnectHistory::CConnectHistory ( unsigned long ulMaxConnections, unsigned long ulSamplePeriod, unsigned long ulBanLength )
+CConnectHistory::CConnectHistory ( void )
 {
-    m_ulMaxConnections = ulMaxConnections;
-    m_ulSamplePeriod = ulSamplePeriod;
-    m_ulBanLength = ulBanLength;
+
 }
 
-// Add flood candidate connection attempt and return true if flooding is occurring
-bool CConnectHistory::AddConnect ( const string& strIP )
+
+CConnectHistory::~CConnectHistory ( void )
 {
-    // See if banned first
-    if ( IsFlooding ( strIP ) )
-        return true;
-
-    // Get history for this IP
-    CConnectHistoryItem& historyItem = GetHistoryItem ( strIP );
-
-    // Add time of this allowed connection
-    historyItem.joinTimes.push_back ( GetTickCount64_ () );
-    return false;
+    // Clear our list
+    Reset ();
 }
 
-// Check if IP is currently flooding
-bool CConnectHistory::IsFlooding ( const string& strIP )
+
+bool CConnectHistory::IsFlooding ( unsigned long ulIP )
 {
     // Delete the expired entries
     RemoveExpired ();
 
-    // Get history for this IP
-    CConnectHistoryItem& historyItem = GetHistoryItem ( strIP );
-
-    // Check if inside ban time
-    if ( GetTickCount64_ () < historyItem.llBanEndTime )
-        return true;
-
-    // Check if too many connections
-    if ( historyItem.joinTimes.size () > m_ulMaxConnections )
+    // Does it exist?
+    CConnectHistoryItem* pItem = Find ( ulIP );
+    if ( pItem )
     {
-        // Begin timed ban
-        historyItem.llBanEndTime = GetTickCount64_ () + m_ulBanLength;
-        return true;
-    }
+        // Update the time and increment the counter
+        ++pItem->ucCounter;
+        pItem->ulTime = GetTime ();
 
-    return false;
+        // Counter passed 2 = join flood
+        return pItem->ucCounter > 2;
+    }
+    else
+    {
+        // Create a new entry for this IP
+        pItem = new CConnectHistoryItem;
+        pItem->ucCounter = 1;
+        pItem->ulIP = ulIP;
+        pItem->ulTime = GetTime ();
+
+        // Add it to the list
+        m_List.push_back ( pItem );
+        return false;
+    }
 }
 
 
-CConnectHistoryItem& CConnectHistory::GetHistoryItem ( const string& strIP )
+CConnectHistoryItem* CConnectHistory::Find ( unsigned long ulIP )
 {
-    // Find existing
-    map < string, CConnectHistoryItem >::iterator iter = m_HistoryItemMap.find ( strIP );
-
-    if ( iter == m_HistoryItemMap.end () )
+    // Find the IP in our list
+    list < CConnectHistoryItem* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        // Add if not found
-        m_HistoryItemMap[strIP] = CConnectHistoryItem();
-        iter = m_HistoryItemMap.find ( strIP );
+        if ( (*iter)->ulIP == ulIP )
+        {
+            return *iter;
+        }
     }
 
-#if MTA_DEBUG
-    // Dump info
-    CConnectHistoryItem& historyItem = iter->second;
-    SString strInfo ( "IP:%s  ", strIP.c_str () );
-    for ( unsigned int i = 0 ; i < historyItem.joinTimes.size () ; i++ )
-    {
-        strInfo += SString ( "%u  ", GetTickCount64_ () - historyItem.joinTimes[i] );
-    }
-    strInfo += "\n";
-    OutputDebugString ( strInfo );
-#endif
+    // Couldn't find it
+    return NULL;
+}
 
-    return iter->second;
+
+void CConnectHistory::Reset ( void )
+{
+    // Delete every item
+    list < CConnectHistoryItem* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
+    {
+        delete *iter;
+    }
+
+    // Clear the list
+    m_List.clear ();
 }
 
 
 void CConnectHistory::RemoveExpired ( void )
 {
-    long long llCurrentTime = GetTickCount64_ ();
-
-    // Step through each IP's connect history
-    HistoryItemMap ::iterator mapIt = m_HistoryItemMap.begin ();
-    while ( mapIt != m_HistoryItemMap.end () )
+    // Check if any items are too old (2 min)
+    unsigned long ulCurrentTime = GetTime ();
+    list < CConnectHistoryItem* > ::iterator iter = m_List.begin ();
+    while ( iter != m_List.end () )
     {
-        CConnectHistoryItem& historyItem = mapIt->second;
-
-        // Find point in the joinTimes list where the time is too old
-        JoinTimesMap ::iterator timesIt = historyItem.joinTimes.begin ();
-        for ( ; timesIt < historyItem.joinTimes.end () ; ++timesIt )
+        if ( ulCurrentTime > (*iter)->ulTime + 40000 )
         {
-            if ( *timesIt > llCurrentTime - m_ulSamplePeriod )
-                break;
-        }
+			// Delete the object
+            delete *iter;
 
-        if ( timesIt == historyItem.joinTimes.end () )
-        {
-            // All times are too old
-            historyItem.joinTimes.clear ();
+			// Remove from list
+			iter = m_List.erase ( iter );
         }
-        else
-        if ( timesIt != historyItem.joinTimes.begin () )
-        {
-            // Some times are too old
-            historyItem.joinTimes.erase ( historyItem.joinTimes.begin (), timesIt );
-        }
-
-        // Remove history item for this IP if there are no join times left (postfix ++ here ensures that a copy of the current pointer is used to call erase, hence causing no invalidation)
-        if ( historyItem.joinTimes.empty () )
-            m_HistoryItemMap.erase ( mapIt++ );
-        else
-            ++mapIt;
+		else
+			++iter;
     }
 }

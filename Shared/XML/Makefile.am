@@ -15,13 +15,10 @@ clean-local:
 	-rm -f StdInc.h.gch
 endif
 
-libdir = $(outputdir)
-lib_LTLIBRARIES = xmll.la
-xmll_la_LIBTOOLFLAGS = --tag=disable-static
-xmll_la_LDFLAGS = \
-	-module -avoid-version \
-	-L../../vendor/tinyxml -ltinyxml
-xmll_la_SOURCES = \
+lib_LTLIBRARIES = \
+	libxml.la
+
+libxml_la_SOURCES = \
 	CXMLArray.cpp \
 	CXMLArray.h \
 	CXMLAttributeImpl.cpp \
@@ -37,3 +34,5 @@ xmll_la_SOURCES = \
 	StdInc.cpp \
 	StdInc.h \
 	XML.cpp
+
+libxml_la_LDFLAGS = -L../../vendor/tinyxml -ltinyxml

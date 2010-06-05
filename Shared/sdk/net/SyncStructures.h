@@ -15,6 +15,7 @@
 
 #include <CVector.h>
 #include <net/bitstream.h>
+#include <ieee754.h>
 
 // Used to make sure that any position values we receive are at least half sane
 #define SYNC_POSITION_LIMIT 100000.0f
@@ -45,20 +46,23 @@ struct SFloatSync : public ISyncStructure
 
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        double limitsMax = ( 1 << ( integerBits - 1 ) ) - 1;
-        double limitsMin = 0 - ( 1 << ( integerBits - 1 ) );
-        double scale     = 1 << fractionalBits;
+        struct
+        {
+            int iMin : integerBits;
+            int iMax : integerBits;
+        } limits;
+        limits.iMax = ( 1 << ( integerBits - 1 ) ) - 1;
+        limits.iMin = limits.iMax + 1;
 
-        double dValue = data.fValue;
-#ifdef WIN32
-#ifdef MTA_DEBUG
-        assert ( !_isnan ( dValue ) );
-#endif
-#endif
-        dValue = Clamp < double > ( limitsMin, dValue, limitsMax );
+        IEEE754_DP dValue ( data.fValue );
+        assert ( !dValue.isnan () );
+
+        if ( dValue > limits.iMax ) dValue = (double)limits.iMax;
+        else if ( dValue < limits.iMin ) dValue = (double)limits.iMin;
 
         SFixedPointNumber num;
-        num.iValue = static_cast < int > ( dValue * scale );
+        num.iValue = (int)( dValue * (double)( 1 << fractionalBits ));
+
         bitStream.WriteBits ( (const char* )&num, integerBits + fractionalBits );
     }
 
@@ -188,9 +192,9 @@ struct SPositionSync : public ISyncStructure
     {
         if ( m_bUseFloats )
         {
-            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fX, SYNC_POSITION_LIMIT - 1 ) );
-            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fY, SYNC_POSITION_LIMIT - 1 ) );
-            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fZ, SYNC_POSITION_LIMIT - 1 ) );
+            bitStream.Write ( data.vecPosition.fX );
+            bitStream.Write ( data.vecPosition.fY );
+            bitStream.Write ( data.vecPosition.fZ );
         }
         else
         {
@@ -200,7 +204,7 @@ struct SPositionSync : public ISyncStructure
 
             bitStream.Write ( &x );
             bitStream.Write ( &y );
-            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fZ, SYNC_POSITION_LIMIT - 1 ) );
+            bitStream.Write ( data.vecPosition.fZ );
         }
     }
 
@@ -244,8 +248,8 @@ struct SPosition2DSync : public ISyncStructure
     {
         if ( m_bUseFloats )
         {
-            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fX, SYNC_POSITION_LIMIT - 1 ) );
-            bitStream.Write ( Clamp ( -SYNC_POSITION_LIMIT + 1, data.vecPosition.fY, SYNC_POSITION_LIMIT - 1 ) );
+            bitStream.Write ( data.vecPosition.fX );
+            bitStream.Write ( data.vecPosition.fY );
         }
         else
         {
@@ -1077,7 +1081,7 @@ struct SWeaponAimSync : public ISyncStructure
     {
         // Write arm direction (We only sync one arm, Y axis for on foot sync and X axis for driveby)
         short sArm = static_cast < short > ( data.fArm * 90.0f * 180.0f / 3.14159265f );
-        bitStream.Write ( sArm );
+	    bitStream.Write ( sArm );
 
         if ( m_bFull )
         {
@@ -1577,22 +1581,6 @@ struct SColorSync : public ISyncStructure
     void Write ( NetBitStreamInterface& bitStream ) const
     {
         bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), 32 );
-    }
-
-    // From SColor
-    SColorSync( void ) {}
-    SColorSync( SColor color )
-    {
-        data.ucR = color.R;
-        data.ucG = color.G;
-        data.ucB = color.B;
-        data.ucA = color.A;
-    }
-
-    // To SColor
-    operator SColor( void ) const
-    {
-        return SColorRGBA ( data.ucR, data.ucG, data.ucB, data.ucA );
     }
 
     struct

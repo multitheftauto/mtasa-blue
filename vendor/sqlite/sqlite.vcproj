@@ -87,7 +87,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\sqlite3d.dll &quot;C:\Program Files\MTA San Andreas\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\sqlite3d.dll &quot;..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -138,10 +138,6 @@
 				OutputFile="../sqlite3.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
-				MapExports="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -168,13 +164,13 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\sqlite3.dll &quot;C:\Program Files\MTA San Andreas\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\sqlite3.dll &quot;..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="..\..\obj\vendor\sqlite"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -201,6 +197,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_EXPORTS;FORCE_BUILD=3"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -218,10 +215,6 @@
 				OutputFile="../sqlite3.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
-				MapExports="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -248,7 +241,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\sqlite3.dll &quot;..\..\output\MTA San Andreas\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\sqlite3.dll &quot;..\..\output\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 	</Configurations>

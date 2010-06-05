@@ -38,8 +38,6 @@ CClientEntity::CClientEntity ( ElementID ID )
     m_bSystemEntity = false;
     m_ucSyncTimeContext = 0;
     m_ucInterior = 0;
-    m_bDoubleSided = false;
-    m_bDoubleSidedInit = false;
 
     // Need to generate a clientside ID?
     if ( ID == INVALID_ELEMENT_ID )
@@ -59,8 +57,7 @@ CClientEntity::CClientEntity ( ElementID ID )
     strncpy ( m_szTypeName, "unknown", MAX_TYPENAME_LENGTH );
     m_szTypeName [MAX_TYPENAME_LENGTH] = 0;
     m_uiTypeHash = HashString ( m_szTypeName );
-    if ( IsFromRoot ( m_pParent ) )
-        CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
+    CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
 
     m_szName [0] = 0;
     m_szName [MAX_ELEMENT_NAME_LENGTH] = 0;
@@ -84,9 +81,31 @@ CClientEntity::~CClientEntity ( void )
         g_pClientGame->GetElementDeleter ()->Unreference ( this );
     }
 
-    // Remove from parent
-    ClearChildren ();
-    SetParent ( NULL );
+    // If our managers being deleted, theres no point in pissing about with element trees IF WE LIKE CRASH
+    if ( m_pManager /*&& !m_pManager->IsBeingDeleted ()*/ )
+    {
+        // Unreference us from our eventual parent
+        if ( m_pParent && !m_pParent->m_Children.empty () )
+        {
+            for ( list < CClientEntity* >::iterator iter = m_pParent->m_Children.begin () ; iter != m_pParent->m_Children.end () ; )
+            {
+                // Did we find a matching entity?
+                CClientEntity* pChild = *iter;
+                if ( pChild == this )
+                {
+                    // Delete it
+                    iter = m_pParent->m_Children.erase ( iter );
+                }
+                else
+                {
+                    // Get the next object in the list
+                    ++iter;
+                }
+            }
+        }
+
+        ClearChildren ();
+    }
 
     // Reset our index in the element array
     if ( m_ID != INVALID_ELEMENT_ID )
@@ -139,10 +158,9 @@ CClientEntity::~CClientEntity ( void )
         for ( ; iterUsers != m_OriginSourceUsers.end () ; iterUsers++ )
         {
             CClientPed* pModel = *iterUsers;
-            if ( pModel->m_interp.pTargetOriginSource == this )
+            if ( pModel->m_pTargetOriginSource == this )
             {
-                pModel->m_interp.pTargetOriginSource = NULL;
-                pModel->m_interp.bHadOriginSource = true;
+                pModel->m_pTargetOriginSource = NULL;
             }
         }
         m_OriginSourceUsers.clear ();
@@ -160,21 +178,7 @@ CClientEntity::~CClientEntity ( void )
     }
     m_Contacts.clear ();
 
-    // Unlink disabled-collisions
-    while ( !m_DisabledCollisions.empty () )
-    {
-        CClientEntity * pEntity = m_DisabledCollisions.begin ()->first;
-        SetCollidableWith ( pEntity, true );
-    }
-
-    // Remove from spatial database
-    GetClientSpatialDatabase ()->RemoveEntity ( this );
-
-    // Ensure not referenced in the disabled collisions list
-    assert ( !MapContains ( g_pClientGame->m_AllDisabledCollisions, this ) );
-
-    // Ensure nothing has inadvertently set a parent
-    assert ( m_pParent == NULL );
+    CClientEntity::RemoveEntityFromRoot ( m_uiTypeHash, this );
 }
 
 
@@ -183,8 +187,7 @@ void CClientEntity::SetTypeName ( const char* szName )
     CClientEntity::RemoveEntityFromRoot ( m_uiTypeHash, this );
     strncpy ( m_szTypeName, szName, MAX_TYPENAME_LENGTH );
     m_uiTypeHash = HashString ( szName );
-    if ( IsFromRoot ( m_pParent ) )
-        CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
+    CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
 }
 
 
@@ -200,10 +203,6 @@ bool CClientEntity::CanUpdateSync ( unsigned char ucRemote )
 
 CClientEntity* CClientEntity::SetParent ( CClientEntity* pParent )
 {
-    // Get into/out-of FromRoot info
-    bool bOldFromRoot = CClientEntity::IsFromRoot ( m_pParent );
-    bool bNewFromRoot = CClientEntity::IsFromRoot ( pParent );
-
     // Remove us from previous parent's children list
     if ( m_pParent )
     {
@@ -218,14 +217,6 @@ CClientEntity* CClientEntity::SetParent ( CClientEntity* pParent )
     {
         pParent->m_Children.push_back ( this );
     }
-
-    // Moving out of FromRoot?
-    if ( bOldFromRoot && !bNewFromRoot )
-        CClientEntity::RemoveEntityFromRoot ( m_uiTypeHash, this );
-
-    // Moving into FromRoot?
-    if ( !bOldFromRoot && bNewFromRoot )
-            CClientEntity::AddEntityFromRoot ( m_uiTypeHash, this );
 
     // Return the new parent
     return pParent;
@@ -246,8 +237,8 @@ CClientEntity* CClientEntity::AddChild ( CClientEntity* pChild )
 
 bool CClientEntity::IsMyChild ( CClientEntity* pEntity, bool bRecursive )
 {
-    // Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
-    if ( pEntity == NULL ) return false;
+	// Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
+	if ( pEntity == NULL ) return false;
 
     // Is he us?
     if ( pEntity == this )
@@ -275,17 +266,24 @@ bool CClientEntity::IsMyChild ( CClientEntity* pEntity, bool bRecursive )
 
 void CClientEntity::ClearChildren ( void )
 {
-    // Sanity check
-    assert ( m_pParent != this );
+    // Move our children's parents up to our parent
+	if ( !m_Children.empty () )
+	{
+		for ( list < CClientEntity* >::iterator iterChildren = m_Children.begin () ; iterChildren != m_Children.end (); ++iterChildren )
+		{
+            CClientEntity* pEntity = *iterChildren;
+            if ( pEntity )
+            {
+			    pEntity->m_pParent = m_pParent;
+                if ( m_pParent )
+                {
+                    m_pParent->m_Children.push_back ( pEntity );
+                }
+            }
+		}
 
-    // Process our children - Move up to our parent
-    list < CClientEntity* > cloneList = m_Children;
-    list < CClientEntity* > ::const_iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ; ++iter )
-        (*iter)->SetParent ( m_pParent );
-
-    // This list should now be empty
-    assert ( m_Children.size () == 0 );
+        m_Children.clear ();
+	}
 }
 
 
@@ -510,8 +508,7 @@ void CClientEntity::SetCustomData ( const char* szName, const CLuaArgument& Vari
     // Trigger the onClientElementDataChange event on us
     CLuaArguments Arguments;
     Arguments.PushString ( szName );
-    Arguments.PushArgument ( oldVariable );
-    Arguments.PushArgument ( Variable );
+    Arguments.PushArgument ( oldVariable  );
     CallEvent ( "onClientElementDataChange", Arguments, true );
 }
 
@@ -607,13 +604,13 @@ bool CClientEntity::IsOutOfBounds ( void )
 
 void CClientEntity::AttachTo ( CClientEntity* pEntity )
 {
-    if ( m_pAttachedToEntity )
-        m_pAttachedToEntity->RemoveAttachedEntity ( this );
+	if ( m_pAttachedToEntity )
+		m_pAttachedToEntity->RemoveAttachedEntity ( this );
 
-    m_pAttachedToEntity = pEntity;
+	m_pAttachedToEntity = pEntity;
 
-    if ( m_pAttachedToEntity )
-        m_pAttachedToEntity->AddAttachedEntity ( this );
+	if ( m_pAttachedToEntity )
+		m_pAttachedToEntity->AddAttachedEntity ( this );
 
     InternalAttachTo ( pEntity );
 }
@@ -740,8 +737,6 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
         for ( ; iter != m_Children.end (); iter++ )
         {
             (*iter)->CallEventNoParent ( szName, Arguments, pSource );
-            if ( m_bBeingDeleted )
-                break;
         }
     }
 }
@@ -1144,8 +1139,8 @@ unsigned int CClientEntity::GetTypeID ( const char* szTypeName )
         return CCLIENTPICKUP;
     else if ( strcmp ( szTypeName, "radararea" ) == 0 )
         return CCLIENTRADARAREA;
-    else if ( strcmp ( szTypeName, "sound" ) == 0 )
-        return CCLIENTSOUND;
+ 	else if ( strcmp ( szTypeName, "sound" ) == 0 )
+ 	    return CCLIENTSOUND;
     else
         return CCLIENTUNKNOWN;
 }
@@ -1153,30 +1148,30 @@ unsigned int CClientEntity::GetTypeID ( const char* szTypeName )
 
 void CClientEntity::DeleteClientChildren ( void )
 {
-    // Gather a list over children (we can't use the list as it changes)
-    list < CClientEntity* > Children;
+	// Gather a list over children (we can't use the list as it changes)
+	list < CClientEntity* > Children;
     list < CClientEntity* > ::const_iterator iterCopy = m_Children.begin ();
-    for ( ; iterCopy != m_Children.end (); iterCopy++ )
-    {
-        Children.push_back ( *iterCopy );
-    }
+	for ( ; iterCopy != m_Children.end (); iterCopy++ )
+	{
+		Children.push_back ( *iterCopy );
+	}
 
-    // Call ourselves on each child of this to go as deep as possible and start deleting there
-    list < CClientEntity* > ::const_iterator iter = Children.begin ();
-    for ( ; iter != Children.end (); iter++ )
-    {
-        (*iter)->DeleteClientChildren ();
-    }
+	// Call ourselves on each child of this to go as deep as possible and start deleting there
+	list < CClientEntity* > ::const_iterator iter = Children.begin ();
+	for ( ; iter != Children.end (); iter++ )
+	{
+		(*iter)->DeleteClientChildren ();
+	}
 
-    // We have no children at this point if we're locally created. Client elements can only be children
-    // of server elements, not vice versa.
-    
-    // Are we a client element?
-    if ( IsLocalEntity () && !IsSystemEntity () )
-    {
-        // Delete us
-        g_pClientGame->GetElementDeleter ()->Delete ( this );
-    }
+	// We have no children at this point if we're locally created. Client elements can only be children
+	// of server elements, not vice versa.
+	
+	// Are we a client element?
+	if ( IsLocalEntity () && !IsSystemEntity () )
+	{
+		// Delete us
+		g_pClientGame->GetElementDeleter ()->Delete ( this );
+	}
 }
 
 
@@ -1198,30 +1193,6 @@ void CClientEntity::SetStatic ( bool bStatic )
     {
         pEntity->SetStatic ( bStatic );
     }
-}
-
-
-bool CClientEntity::IsDoubleSided ( void )
-{
-    CEntity* pEntity = GetGameEntity ();
-    if ( pEntity )
-    {
-        m_bDoubleSidedInit = true;
-        m_bDoubleSided = !pEntity->IsBackfaceCulled ();
-    }
-    return m_bDoubleSided;
-}
-
-
-void CClientEntity::SetDoubleSided ( bool bDoubleSided )
-{
-    CEntity* pEntity = GetGameEntity ();
-    if ( pEntity )
-    {
-        pEntity->SetBackfaceCulled ( !bDoubleSided );
-    }
-    m_bDoubleSidedInit = true;
-    m_bDoubleSided = bDoubleSided;
 }
 
 
@@ -1283,40 +1254,14 @@ void CClientEntity::StartupEntitiesFromRoot ()
     }
 }
 
-// Returns true if top parent is root
-bool CClientEntity::IsFromRoot ( CClientEntity* pEntity )
+void CClientEntity::AddEntityFromRoot ( unsigned int uiTypeHash, CClientEntity* pEntity )
 {
-    if ( !pEntity )
-        return false;
-    if ( pEntity == g_pClientGame->GetRootEntity() )
-        return true;
-    return CClientEntity::IsFromRoot ( pEntity->GetParent () );
-}
-
-void CClientEntity::AddEntityFromRoot ( unsigned int uiTypeHash, CClientEntity* pEntity, bool bDebugCheck )
-{
-    // Check
-    assert ( CClientEntity::IsFromRoot ( pEntity ) );
-
-    // Insert into list
     std::list < CClientEntity* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
-    listEntities.remove ( pEntity );
     listEntities.push_front ( pEntity );
-
-    // Apply to child elements as well
-    list < CClientEntity* > ::const_iterator iter = pEntity->IterBegin ();
-    for ( ; iter != pEntity->IterEnd (); iter++ )
-        CClientEntity::AddEntityFromRoot ( (*iter)->GetTypeHash (), *iter, false );
-
-#if CHECK_ENTITIES_FROM_ROOT
-    if ( bDebugCheck )
-        _CheckEntitiesFromRoot ( uiTypeHash );
-#endif
 }
 
 void CClientEntity::RemoveEntityFromRoot ( unsigned int uiTypeHash, CClientEntity* pEntity )
 {
-    // Remove from list
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
@@ -1325,19 +1270,10 @@ void CClientEntity::RemoveEntityFromRoot ( unsigned int uiTypeHash, CClientEntit
         if ( listEntities.size () == 0 )
             ms_mapEntitiesFromRoot.erase ( find );
     }
-
-    // Apply to child elements as well
-    list < CClientEntity* > ::const_iterator iter = pEntity->IterBegin ();
-    for ( ; iter != pEntity->IterEnd (); iter++ )
-        CClientEntity::RemoveEntityFromRoot ( (*iter)->GetTypeHash (), *iter );
 }
 
 void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, CLuaMain* pLuaMain, bool bStreamedIn )
 {
-#if CHECK_ENTITIES_FROM_ROOT
-    _CheckEntitiesFromRoot ( uiTypeHash );
-#endif
-
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
@@ -1363,153 +1299,4 @@ void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, CLuaMain* pLu
             }
         }
     }    
-}
-
-
-#if CHECK_ENTITIES_FROM_ROOT
-
-//
-// Check that GetEntitiesFromRoot produces the same results as FindAllChildrenByTypeIndex on the root element
-//
-void CClientEntity::_CheckEntitiesFromRoot ( unsigned int uiTypeHash )
-{
-    std::map < CClientEntity*, int > mapResults1;
-    g_pClientGame->GetRootEntity()->_FindAllChildrenByTypeIndex ( uiTypeHash, mapResults1 );
-
-    std::map < CClientEntity*, int > mapResults2;
-    _GetEntitiesFromRoot ( uiTypeHash, mapResults2 );
-
-    std::map < CClientEntity*, int > :: const_iterator iter1 = mapResults1.begin ();
-    std::map < CClientEntity*, int > :: const_iterator iter2 = mapResults2.begin ();
-
-    for ( ; iter1 != mapResults1.end (); ++iter1 )
-    {
-        CClientEntity* pElement1 = iter1->first;
-
-        if ( mapResults2.find ( pElement1 ) == mapResults2.end () )
-        {
-            OutputDebugString ( SString ( "Client: 0x%08x  %s is missing from GetEntitiesFromRoot list\n", pElement1, pElement1->GetTypeName () ) );
-        }
-    }
-
-    for ( ; iter2 != mapResults2.end (); ++iter2 )
-    {
-        CClientEntity* pElement2 = iter2->first;
-
-        if ( mapResults1.find ( pElement2 ) == mapResults1.end () )
-        {
-            OutputDebugString ( SString ( "Client: 0x%08x  %s is missing from FindAllChildrenByTypeIndex list\n", pElement2, pElement2->GetTypeName () ) );
-        }
-    }
-
-    assert ( mapResults1 == mapResults2 );
-}
-
-
-void CClientEntity::_FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map < CClientEntity*, int >& mapResults )
-{
-    // Our type matches?
-    if ( uiTypeHash == m_uiTypeHash )
-    {
-        // Add it to the table
-        assert ( mapResults.find ( this ) == mapResults.end () );
-        mapResults [ this ] = 1;
-
-        assert ( this );
-        ElementID ID = this->GetID ();
-        assert ( ID != INVALID_ELEMENT_ID );
-        assert ( this == CElementIDs::GetElement ( ID ) );
-        if ( this->IsBeingDeleted () )
-            OutputDebugString ( SString ( "Client: 0x%08x  %s is flagged as IsBeingDeleted() but is still in FindAllChildrenByTypeIndex\n", this, this->GetTypeName () ) );
-    }
-
-    // Call us on the children
-    list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
-    for ( ; iter != m_Children.end (); iter++ )
-    {
-        (*iter)->_FindAllChildrenByTypeIndex ( uiTypeHash, mapResults );
-    }
-}
-
-
-void CClientEntity::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < CClientEntity*, int >& mapResults )
-{
-    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
-    if ( find != ms_mapEntitiesFromRoot.end () )
-    {
-        const std::list < CClientEntity* >& listEntities = find->second;
-        CClientEntity* pEntity;
-        unsigned int uiIndex = 0;
-
-        for ( std::list < CClientEntity* >::const_reverse_iterator i = listEntities.rbegin ();
-              i != listEntities.rend ();
-              ++i )
-        {
-            pEntity = *i;
-
-            assert ( pEntity );
-            ElementID ID = pEntity->GetID ();
-            assert ( ID != INVALID_ELEMENT_ID );
-            assert ( pEntity == CElementIDs::GetElement ( ID ) );
-            if ( pEntity->IsBeingDeleted () )
-                OutputDebugString ( SString ( "Client: 0x%08x  %s is flagged as IsBeingDeleted() but is still in GetEntitiesFromRoot\n", pEntity, pEntity->GetTypeName () ) );
-
-            assert ( mapResults.find ( pEntity ) == mapResults.end () );
-            mapResults [ pEntity ] = 1;
-        }
-    }    
-}
-
-#endif
-
-
-bool CClientEntity::IsCollidableWith ( CClientEntity * pEntity )
-{
-    return !MapContains ( m_DisabledCollisions, pEntity );
-}
-
-
-void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollide )
-{
-    // quit if no change
-    if ( MapContains( m_DisabledCollisions, pEntity ) != bCanCollide )
-        return;
-
-    if ( bCanCollide )
-    {
-        MapRemove ( m_DisabledCollisions, pEntity );
-        if ( m_DisabledCollisions.empty () )
-            MapRemove ( g_pClientGame->m_AllDisabledCollisions, this );
-    }
-    else
-    {
-        MapSet ( m_DisabledCollisions, pEntity, true );
-        MapSet ( g_pClientGame->m_AllDisabledCollisions, this, true );
-    }
-    // Set in the other entity as well
-    pEntity->SetCollidableWith ( this, bCanCollide );
-}
-
-
-CSphere CClientEntity::GetWorldBoundingSphere ( void )
-{
-    // Default to a point around the entity's position
-    CVector vecPosition;
-    GetPosition ( vecPosition );
-    return CSphere ( vecPosition, 0.f );
-}
-
-
-void CClientEntity::UpdateSpatialData ( void )
-{
-    GetClientSpatialDatabase ()->UpdateEntity ( this );
-}
-
-// Return the distance to the other entity.
-// A negative value indicates overlapping bounding spheres
-float CClientEntity::GetDistanceBetweenBoundingSpheres ( CClientEntity* pOther )
-{
-    CSphere sphere = GetWorldBoundingSphere ();
-    CSphere otherSphere = pOther->GetWorldBoundingSphere ();
-    return ( sphere.vecPosition - otherSphere.vecPosition ).Length () - sphere.fRadius - otherSphere.fRadius;
 }

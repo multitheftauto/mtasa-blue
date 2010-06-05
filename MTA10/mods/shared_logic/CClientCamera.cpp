@@ -153,7 +153,7 @@ void CClientCamera::SetPosition ( const CVector& vecPosition )
     CMatrix matTemp;
     GetMatrix ( matTemp );
     g_pMultiplayer->ConvertMatrixToEulerAngles ( matTemp, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
-    CVector * v = & ( const_cast < CVector& > ( vecPosition ) );
+	CVector * v = & ( const_cast < CVector& > ( vecPosition ) );
     g_pMultiplayer->SetCenterOfWorld ( NULL, v, 3.1415926535897932384626433832795f - vecRotation.fZ );
 
     // Store the position so it can be updated from our hook
@@ -412,30 +412,24 @@ bool CClientCamera::SetCameraMode ( eCamMode eMode )
 }
 
 
-void CClientCamera::SetCameraClip ( bool bObjects, bool bVehicles )
-{
-    m_pCamera->SetCameraClip ( bObjects, bVehicles );
-}
-
-
 void CClientCamera::ToggleCameraFixedMode ( bool bEnabled )
 {    
     if ( bEnabled )
     {
         CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer ();
-        CClientVehicle* pLocalVehicle = NULL;
+		CClientVehicle* pLocalVehicle = NULL;
 
-        // Get the local vehicle, if any
-        if ( pLocalPlayer )
-            pLocalVehicle = pLocalPlayer->GetOccupiedVehicle ();
+		// Get the local vehicle, if any
+		if ( pLocalPlayer )
+			pLocalVehicle = pLocalPlayer->GetOccupiedVehicle ();
 
-        // Use the local vehicle, otherwise use the local player
-        if ( pLocalVehicle )
-            SetFocus ( pLocalVehicle, MODE_FIXED, false );
-        else
-            SetFocus ( pLocalPlayer, MODE_FIXED, false );
+		// Use the local vehicle, otherwise use the local player
+		if ( pLocalVehicle )
+			SetFocus ( pLocalVehicle, MODE_FIXED, false );
+		else
+			SetFocus ( pLocalPlayer, MODE_FIXED, false );
 
-        // Set the target position
+		// Set the target position
         SetFocus ( &m_vecFixedPosition, false );
     }
     else

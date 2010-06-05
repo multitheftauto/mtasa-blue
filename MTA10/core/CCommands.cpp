@@ -1,11 +1,11 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CCommands.cpp
-*  PURPOSE:     Management for dynamically added commands
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Derek Abdine <>
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		core/CCommands.cpp
+*  PURPOSE:		Management for dynamically added commands
+*  DEVELOPERS:	Christian Myhre Lundheim <>
+*				Derek Abdine <>
 *               Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -51,8 +51,8 @@ void CCommands::Add ( const char* szCommand, const char* szDescription, PFNCOMMA
     strncpy ( pCommand->szCommandName, szCommand,
               GET_LENGTH_BOUND ( MAX_COMMAND_NAME_LENGTH, strlen ( szCommand ) + 1 ) );
 
-    strncpy ( pCommand->szDescription, szDescription,
-              GET_LENGTH_BOUND ( MAX_COMMAND_DESCRIPTION_LENGTH, strlen ( szDescription ) + 1 ) );
+	strncpy ( pCommand->szDescription, szDescription,
+			  GET_LENGTH_BOUND ( MAX_COMMAND_DESCRIPTION_LENGTH, strlen ( szDescription ) + 1 ) );
 
     // Set the command.
     pCommand->pfnCmdFunc = pfnHandler;
@@ -91,17 +91,8 @@ bool CCommands::Execute ( const char* szCommandLine )
 }
 
 
-bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, bool bHandleRemotely )
+bool CCommands::Execute ( const char* szCommand, const char* szParameters, bool bHandleRemotely )
 {
-    // Copy szParametersIn so the contents can be changed
-    char* szParameters = NULL;
-    if ( szParametersIn )
-    {
-        size_t sizeParameters = strlen ( szParametersIn ) + 1;
-        szParameters = static_cast < char* > ( alloca ( sizeParameters ) );
-        memcpy ( szParameters, szParametersIn, sizeParameters );
-    }
-
     // HACK: if its a 'chatboxsay' command, use the next parameter
     // Is the command "say" and the arguments start with /? (command comes from the chatbox)
     if ( !stricmp ( szCommand, "chatboxsay" ) )
@@ -168,23 +159,6 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
         return true;
     }
 
-    // HACK: if its a 'nick' command, save it here
-    if ( !stricmp ( szCommand, "nick" ) && szParameters )
-    {
-        if ( CCore::GetSingleton ().IsValidNick ( szParameters ) )
-        {
-            CVARS_SET ( "nick", std::string ( szParameters ) );
-        }
-
-        if ( strlen ( szParameters ) >= MAX_PLAYER_NICK_LENGTH &&
-             CCore::GetSingleton ().GetNetwork () &&
-             CCore::GetSingleton ().GetNetwork ()->GetServerBitStreamVersion () < 0x06 )
-        {
-            // Limit the nick length for servers that have a problem with max length nicks
-            szParameters [ MAX_PLAYER_NICK_LENGTH - 1 ] = 0;             
-        }
-    }
-
     // Try to execute the handler
     if ( m_pfnExecuteHandler )
     {
@@ -212,9 +186,9 @@ void CCommands::Delete ( const char* szCommand )
             delete *iter;
             iter = m_CommandList.erase ( iter );
         }
-        else
-            ++iter;
-    }
+		else
+			++iter;
+	}
 }
 
 
@@ -247,7 +221,7 @@ tagCOMMANDENTRY* CCommands::Get ( const char* szCommand, bool bCheckIfMod, bool 
                 return *iter;
             }
         }    
-    }
+	}
 
     // Couldn't find it
     return NULL;

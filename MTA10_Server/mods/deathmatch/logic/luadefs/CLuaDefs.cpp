@@ -83,11 +83,11 @@ bool CLuaDefs::CanUseFunction ( const char* szFunction, lua_State* luaVM, bool b
     {
         // Can we use the function? Return true so LUA can execute it
         if ( m_pACLManager->CanObjectUseRight ( pResource->GetName().c_str (),
-                                                CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                                szFunction,
-                                                CAccessControlListRight::RIGHT_TYPE_FUNCTION,
-                                                !bRestricted ) )
-        {
+			                                    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+												szFunction,
+												CAccessControlListRight::RIGHT_TYPE_FUNCTION,
+												!bRestricted ) )
+		{
             return true;
         }
         else
@@ -110,7 +110,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
     CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( f );
     if ( pFunction )
     {
-        return static_cast < bool > ( CLuaDefs::CanUseFunction (
+        return static_cast < BOOL > ( CLuaDefs::CanUseFunction (
             pFunction->GetName ().c_str (), luaVM, pFunction->IsRestricted () ) );
     }
 

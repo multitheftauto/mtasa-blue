@@ -18,7 +18,7 @@
 		<Configuration
 			Name="Nightly|Win32"
 			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\obj\vendor\libcurl"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -55,9 +55,12 @@
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
+				PrecompiledHeaderFile=".\DLL-Release/libcurl.pch"
+				AssemblerListingLocation=".\DLL-Release/"
+				ObjectFile=".\DLL-Release/"
+				ProgramDataBaseFileName=".\DLL-Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="3"
 				DisableSpecificWarnings="4996"
 			/>
 			<Tool
@@ -77,11 +80,6 @@
 				OutputFile="../../libcurl.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
-				MapExports="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary="../lib/libcurl2008_imp.lib"
@@ -109,7 +107,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\..\libcurl.dll &quot;..\..\..\output\MTA San Andreas\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurl.dll &quot;..\..\..\output\MTA San Andreas\server\&quot;"
+				CommandLine="xcopy /y ..\..\libcurl.dll &quot;..\..\..\output\MTA San Andreas\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurl.dll &quot;..\..\..\output\server\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -158,7 +156,6 @@
 				ProgramDataBaseFileName=".\DLL-Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="3"
 				DisableSpecificWarnings="4996"
 			/>
 			<Tool
@@ -178,11 +175,6 @@
 				OutputFile="../../libcurl.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
-				MapExports="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary="../lib/libcurl2008_imp.lib"
@@ -210,7 +202,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\..\libcurl.dll &quot;C:\Program Files\MTA San Andreas\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurl.dll &quot;C:\Program Files\MTA San Andreas\server\&quot;"
+				CommandLine="xcopy /y ..\..\libcurl.dll &quot;C:\Program Files\MTA San Andreas\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurl.dll &quot;..\..\..\MTA10_Server\output\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -309,7 +301,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\..\libcurld.dll &quot;C:\Program Files\MTA San Andreas\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurld.dll &quot;C:\Program Files\MTA San Andreas\server\&quot;"
+				CommandLine="xcopy /y ..\..\libcurld.dll &quot;C:\Program Files\MTA San Andreas\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurld.dll &quot;..\..\..\MTA10_Server\output\&quot;"
 			/>
 		</Configuration>
 	</Configurations>

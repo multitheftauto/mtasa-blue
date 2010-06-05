@@ -14,6 +14,7 @@
 #define __CELEMENTIDS_H
 
 #include "CElement.h"
+#include "CStack.h"
 
 class CElementIDs
 {
@@ -27,7 +28,7 @@ public:
     static CElement*            GetElement          ( ElementID ID );
 
 private:
-    static CStack < ElementID, MAX_SERVER_ELEMENTS, INVALID_ELEMENT_ID > m_UniqueIDs;
+    static CStack < ElementID > m_UniqueIDs;
     static CElement*            m_Elements [MAX_SERVER_ELEMENTS];
 };
 

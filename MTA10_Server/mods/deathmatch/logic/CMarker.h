@@ -57,20 +57,27 @@ public:
     inline const CVector&   GetTarget               ( void )                                        { return m_vecTarget; };
     inline unsigned char    GetMarkerType           ( void )                                        { return m_ucType; };
     inline float            GetSize                 ( void )                                        { return m_fSize; };
-    inline SColor           GetColor                ( void ) const                                  { return m_Color; };
+    void                    GetColor                ( unsigned char & R, unsigned char & G, unsigned char & B, unsigned char & A );
+    inline unsigned long    GetColor                ( void )                                        { return m_ulColor; };
+    inline unsigned char    GetColorRed             ( void )                                        { return static_cast < unsigned char > ( m_ulColor >> 16 ); };
+    inline unsigned char    GetColorGreen           ( void )                                        { return static_cast < unsigned char > ( m_ulColor >> 8 ); };
+    inline unsigned char    GetColorBlue            ( void )                                        { return static_cast < unsigned char > ( m_ulColor ); };
+    inline unsigned char    GetColorAlpha           ( void )                                        { return static_cast < unsigned char > ( m_ulColor >> 24 ); };
     inline unsigned char    GetIcon                 ( void )                                        { return m_ucIcon; }
     
     void                    SetPosition             ( const CVector& vecPosition );
     void                    SetTarget               ( const CVector* pTargetVector );
     void                    SetMarkerType           ( unsigned char ucType );
     void                    SetSize                 ( float fSize );
-    void                    SetColor                ( const SColor color );
+    void                    SetColor                ( unsigned long ulColor );
+    void                    SetColor                ( unsigned char ucRed,
+                                                      unsigned char ucGreen,
+                                                      unsigned char ucBlue,
+                                                      unsigned char ucAlpha );
 
     void                    SetIcon                 ( unsigned char ucIcon );
 
     inline CColShape*       GetColShape             ( void )    { return m_pCollision; }
-
-    virtual CSphere         GetWorldBoundingSphere  ( void );
 
 private:
     void                    Callback_OnCollision    ( CColShape& Shape, CElement& Element );
@@ -85,7 +92,7 @@ private:
     CVector                 m_vecTarget;
     unsigned char           m_ucType;
     float                   m_fSize;
-    SColor                  m_Color;
+    unsigned long           m_ulColor;
     unsigned char           m_ucIcon;
 
     CColShape*              m_pCollision;

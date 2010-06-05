@@ -3,7 +3,6 @@
 
 AC_PREREQ(2.61)
 AC_INIT(mta, 1.0-trunk, nospam@mtanet)
-AC_CONFIG_AUX_DIR([.])
 AM_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -11,10 +10,6 @@ if test x$prefix = xNONE; then
         prefix=/usr/local
 fi
 
-# Output directory
-outputdir=`pwd`/MTA10_Server/output
-
-AC_SUBST(outputdir)
 AC_SUBST(prefix)
 
 AC_SUBST(INCLUDES)
@@ -38,6 +33,7 @@ AH_TEMPLATE([USING_BIG_ENDIAN], Define this if you are on a big-endian system.)
 AH_TEMPLATE([USING_LITTLE_ENDIAN], Define this if you are on a non-big-endian system.)
 AH_TEMPLATE([X64], Define this if you are under an X64-based operating system.)
 AH_TEMPLATE([X86], Define this if you are under an X86-based 32bit operating system.)
+AH_TEMPLATE([MTA_REVISION], The revision of the latest checkout)
 
 # Flags 
 
@@ -63,7 +59,7 @@ AX_LIB_SQLITE3()
 # curl
 AC_CHECK_CURL(7)
 
-# Checking for a 64-bit system
+# Checking for a 64bit system
 AC_MSG_CHECKING([uname -m for detecting host operating system architecture])
 ARCH=`uname -m`
 case "$ARCH" in
@@ -76,7 +72,7 @@ case "$ARCH" in
 	x86_64*)
 		dnl yay 21st century hardware
 		AC_MSG_RESULT(x64 feel teh power)
-		AC_DEFINE(X64)
+    AC_DEFINE(X64)
 		AC_SUBST(ARCH,x64)
 	;;
 	*)
@@ -86,35 +82,17 @@ case "$ARCH" in
 	;;
 esac
 
-# Platform specific rules
-AC_MSG_CHECKING([operating system])
-case $host in
-	*-linux*)
-		AC_MSG_RESULT(linux)
-		AC_CHECK_LIB(rt, clock_gettime)
-	;;
-	*-darwin*)
-		AC_MSG_RESULT(darwin)
-	;;
-	*-bsd*)
-		AC_MSG_RESULT(bsd)
-	;;
-	*)
-		AC_MSG_ERROR(unsupported)
-	;;
-esac
-
 # Check for BigEndian
 AC_C_BIGENDIAN([AC_DEFINE(USING_BIG_ENDIAN)],[AC_DEFINE(USING_LITTLE_ENDIAN)],[])
 
 # Check for zlib
-AX_CHECK_ZLIB()
+AC_CHECK_LIB(z, deflate,, AC_MSG_ERROR([can't find zlib]))
 
 # Check for curses
 AC_CHECK_LIB(curses, stdscr,, AC_MSG_ERROR([can't find curses]))
 
 # Define compile/library flags.
-AC_SUBST(AM_CXXFLAGS, "$AM_CXXFLAGS $INCLUDES $PCRE_CFLAGS -Wall -DTIXML_USE_STL")
+AC_SUBST(AM_CXXFLAGS, "$AM_CXXFLAGS $INCLUDES -DLINUX $PCRE_CFLAGS -Wall -DTIXML_USE_STL")
 AC_SUBST(AM_LDFLAGS, "$AM_LDFLAGS -lstdc++")
 
 # Checks for header files.
@@ -135,19 +113,26 @@ AC_CHECK_HEADERS([google/sparse_hash_map],,AC_MSG_ERROR([can't find google spars
 
 # Checks for library functions.
 
-# Configure subdirectories where necessary
-#   NOTE: Put these on separate single lines due to a bug in autoconf
-#   http://readlist.com/lists/lists.sourceforge.net/mingw-users/2/12488.html
-AC_CONFIG_SUBDIRS([vendor/lua])
-AC_CONFIG_SUBDIRS([vendor/json-c])
+# Extract the latest SVN revision
+AC_CHECK_PROG([SVNVERSION], [svnversion], yes)
+if test -z "$SVNVERSION"; then
+	AC_MSG_ERROR(Subversion 'svnversion' not found)
+else
+	MTA_REVISION=`/usr/bin/env svnversion -n`
+	if test -z "$MTA_REVISION"; then MTA_REVISION="n/a"; fi
 
-# Generate makefiles
+	AC_MSG_NOTICE(Extracted SVN version: $MTA_REVISION)
+	AC_DEFINE_UNQUOTED(MTA_REVISION,["\$Rev: $MTA_REVISION \$"])
+	AC_SUBST(MTA_REVISION)
+fi
+
 AC_CONFIG_FILES([
 	Makefile
 	vendor/Makefile
 	vendor/tinyxml/Makefile
 	vendor/pme/Makefile
 	vendor/ehs/Makefile
+	vendor/json-c/Makefile
 	Shared/Makefile
 	Shared/XML/Makefile
 	MTA10_Server/Makefile

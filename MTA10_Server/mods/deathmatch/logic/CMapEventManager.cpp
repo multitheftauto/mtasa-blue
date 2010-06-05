@@ -38,15 +38,15 @@ CMapEventManager::~CMapEventManager ( void )
 
 bool CMapEventManager::Add ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction, bool bPropagated )
 {
-    // Check for max name length
-    if ( strlen ( szName ) <= MAPEVENT_MAX_LENGTH_NAME )
-    {
-        // Make a new event
-        CMapEvent* pEvent = new CMapEvent ( pLuaMain, szName, iLuaFunction, bPropagated );
-        m_Events.push_back ( pEvent );
-        return true;
-    }
-    return false;
+	// Check for max name length
+	if ( strlen ( szName ) <= MAPEVENT_MAX_LENGTH_NAME )
+	{
+		// Make a new event
+		CMapEvent* pEvent = new CMapEvent ( pLuaMain, szName, iLuaFunction, bPropagated );
+		m_Events.push_back ( pEvent );
+		return true;
+	}
+	return false;
 }
 
 
@@ -64,7 +64,7 @@ bool CMapEventManager::Delete ( CLuaMain* pLuaMain, const char* szName, int iLua
         if ( pLuaMain == pMapEvent->GetVM () &&
              strcmp ( pMapEvent->GetName (), szName ) == 0 )
         {
-            // Same lua function?
+			// Same lua function?
             if ( pMapEvent->GetLuaFunction () == iLuaFunction )
             {
                 // Not alredy being destroyed?
@@ -85,8 +85,8 @@ bool CMapEventManager::Delete ( CLuaMain* pLuaMain, const char* szName, int iLua
                         // Delete the object
                         delete pMapEvent;
 
-                        // Remove from list and remember that we deleted something
-                        iter = m_Events.erase ( iter );
+					    // Remove from list and remember that we deleted something
+					    iter = m_Events.erase ( iter );
                         bRemovedSomeone = true;
                         continue;
                     }
@@ -151,7 +151,7 @@ void CMapEventManager::Delete ( CLuaMain* pLuaMain )
                 {
                     // Delete the event and continue from where we left.
                     delete pMapEvent;
-                    iter = m_Events.erase ( iter );
+				    iter = m_Events.erase ( iter );
                     continue;
                 }
             }
@@ -175,8 +175,8 @@ void CMapEventManager::DeleteAll ( void )
             delete *iter;
             iter = m_Events.erase ( iter );
         }
-        else
-            ++iter;
+		else
+	        ++iter;
     }
 }
 
@@ -245,35 +245,26 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                 {
                     // Grab the current VM
                     lua_State* pState = pMapEvent->GetVM ()->GetVM ();
-                    #if MTA_DEBUG
-                        int luaStackPointer = lua_gettop ( pState );
-                    #endif
 
                     // Store the current values of the globals
                     lua_getglobal ( pState, "source" );
                     CLuaArgument OldSource ( pState, -1 );
-                    lua_pop( pState, 1 );
 
                     lua_getglobal ( pState, "this" );
                     CLuaArgument OldThis ( pState, -1 );
-                    lua_pop( pState, 1 );
 
                     lua_getglobal ( pState, "sourceResource" );
                     CLuaArgument OldResource ( pState, -1 );
-                    lua_pop( pState, 1 );
 
                     lua_getglobal ( pState, "sourceResourceRoot" );
                     CLuaArgument OldResourceRoot ( pState, -1 );
-                    lua_pop( pState, 1 );
-
+                    
                     lua_getglobal ( pState, "eventName" );
                     CLuaArgument OldEventName ( pState, -1 );
-                    lua_pop( pState, 1 );
 
                     lua_getglobal ( pState, "client" );
                     CLuaArgument OldClient ( pState, -1 );
-                    lua_pop( pState, 1 );
-
+                    
                     // Set the "source", "this", "sourceResource" and "sourceResourceRoot" globals on that VM
                     lua_pushelement ( pState, pSource );
                     lua_setglobal ( pState, "source" );
@@ -281,25 +272,25 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     lua_pushelement ( pState, pThis );
                     lua_setglobal ( pState, "this" );
 
-                    lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );
-                    lua_setglobal ( pState, "sourceResource" );
+				    lua_pushresource ( pState, pMapEvent->GetVM()->GetResource() );
+				    lua_setglobal ( pState, "sourceResource" );
 
-                    lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceRootElement() );
-                    lua_setglobal ( pState, "sourceResourceRoot" );
+				    lua_pushelement ( pState, pMapEvent->GetVM()->GetResource()->GetResourceRootElement() );
+				    lua_setglobal ( pState, "sourceResourceRoot" );
 
                     lua_pushstring ( pState, szName );
                     lua_setglobal ( pState, "eventName" );
 
-                    if ( pCaller )
-                    {
-                        lua_pushelement ( pState, pCaller );
-                        lua_setglobal ( pState, "client" );
-                    }
-                    else
-                    {
-                        lua_pushnil ( pState );
-                        lua_setglobal ( pState, "client" );
-                    }
+				    if ( pCaller )
+				    {
+					    lua_pushelement ( pState, pCaller );
+					    lua_setglobal ( pState, "client" );
+				    }
+				    else
+				    {
+					    lua_pushnil ( pState );
+					    lua_setglobal ( pState, "client" );
+				    }
 
                     // Call it
                     pMapEvent->Call ( Arguments );
@@ -312,8 +303,8 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     OldThis.Push ( pState );
                     lua_setglobal ( pState, "this" );                
 
-                    OldResource.Push ( pState );
-                    lua_setglobal ( pState, "sourceResource" );
+				    OldResource.Push ( pState );
+				    lua_setglobal ( pState, "sourceResource" );
 
                     OldResourceRoot.Push ( pState );
                     lua_setglobal ( pState, "sourceResourceRoot" );
@@ -323,10 +314,6 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
                     OldClient.Push ( pState );
                     lua_setglobal ( pState, "client" );
-
-                    #if MTA_DEBUG
-                        assert ( lua_gettop ( pState ) == luaStackPointer );
-                    #endif
                 }
             }
         }
@@ -382,7 +369,7 @@ bool CMapEventManager::HandleExists ( CLuaMain* pLuaMain, const char* szName, in
                 // Same name?
                 if ( strcmp ( pMapEvent->GetName (), szName ) == 0 )
                 {
-                    // Same lua function?
+					// Same lua function?
                     if ( pMapEvent->GetLuaFunction () == iLuaFunction )
                     {
                         // It exists

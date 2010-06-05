@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Client - Deathmatch"
 	ProjectGUID="{F661CA1A-A296-4505-9583-3BEC58FB79C5}"
 	RootNamespace="Client - Deathmatch"
@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/irrklang;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -139,7 +139,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/irrklang;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -170,9 +170,9 @@
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				ProgramDatabaseFile="C:/Symbols/Release_Deathmatch.pdb"
 				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapFileName="C:/Symbols/Release_Deathmatch.map"
 				MapExports="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -236,7 +236,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/irrklang;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -267,9 +267,9 @@
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				ProgramDatabaseFile="C:/Symbols/Release_Deathmatch.pdb"
 				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapFileName="C:/Symbols/Release_Deathmatch.map"
 				MapExports="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -833,10 +833,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientSpatialDatabase.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientStreamElement.cpp"
 					>
 				</File>
@@ -866,6 +862,22 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientTextDisplay.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayBackgroundEffect.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayEffect.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayFadeEffect.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayGlowEffect.cpp"
 					>
 				</File>
 				<File
@@ -1711,10 +1723,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientSpatialDatabase.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientStreamElement.h"
 					>
 				</File>
@@ -1744,6 +1752,22 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientTextDisplay.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayBackgroundEffect.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayEffect.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayFadeEffect.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTextDisplayGlowEffect.h"
 					>
 				</File>
 				<File
@@ -1812,6 +1836,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CScriptFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CStack.h"
 					>
 				</File>
 				<File

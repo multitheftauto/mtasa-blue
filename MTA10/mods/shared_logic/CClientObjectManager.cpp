@@ -16,7 +16,6 @@
 #include "StdInc.h"
 
 using std::list;
-using std::vector;
 
 static unsigned int g_uiValidObjectModels[] = {
     2, 0, 0, 0, 0, 0, 0, 0, 0, -4096, -1053185, 4194303, 16127, 0, 0, 0, 0, 0, 0, -128,
@@ -116,7 +115,7 @@ void CClientObjectManager::DoPulse ( void )
 
     CClientObject * pObject = NULL;
     // Loop through all our streamed-in objects
-    vector < CClientObject * > ::iterator iter = m_StreamedIn.begin ();
+    list < CClientObject * > ::iterator iter = m_StreamedIn.begin ();
     for ( ; iter != m_StreamedIn.end () ; ++iter )
     {
         pObject = *iter;
@@ -162,7 +161,7 @@ CClientObject* CClientObjectManager::Get ( CObject* pObject, bool bValidatePoint
 
     if ( bValidatePointer )
     {
-        vector < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
+        list < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
         for ( ; iter != m_StreamedIn.end (); iter++ )
         {
             if ( (*iter)->GetGameObject () == pObject )
@@ -184,7 +183,7 @@ CClientObject* CClientObjectManager::GetSafe ( CEntity * pEntity )
     if ( !pEntity ) return NULL;
 
 
-    vector < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
+    list < CClientObject* > ::const_iterator iter = m_StreamedIn.begin ();
     for ( ; iter != m_StreamedIn.end (); iter++ )
     {
         if ( dynamic_cast < CEntity * > ( (*iter)->GetGameObject () ) == pEntity )
@@ -268,49 +267,50 @@ void CClientObjectManager::LoadObjectsAroundPoint ( const CVector& vecPosition, 
 */
 
 
-bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition, float fRadius, unsigned short usDimension, SString* pstrStatus )
+bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition, float fRadius, unsigned short usDimension )
 {
-    // Get list of objects that may be intersecting the sphere
-    CClientEntityResult result;
-    GetClientSpatialDatabase()->SphereQuery ( result, CSphere ( vecPosition, fRadius ) );
+    // TODO: mix in with the streamer, cause this is way too slow
+    return true;
 
-    bool bResult = true;
-    // Extract relevant types
-    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
+    CVector vecObject;
+    float fDistanceX, fDistanceY, fDistanceZ, fDistanceExp;
+
+    // Radius exp 2
+    float fRadius2 = fRadius * fRadius;
+
+    // Loop through our objects
+    CClientObject* pObject;
+    list < CClientObject* > ::const_iterator iter = m_Objects.begin ();
+    for ( ; iter != m_Objects.end (); iter++ )
     {
-        CClientEntity* pEntity = *it;
-        if  ( pEntity->GetType () == CCLIENTOBJECT )
-        {
-            CClientObject* pObject = static_cast < CClientObject* > ( pEntity );
-            if ( !pObject->GetGameObject () || !pObject->GetModelInfo ()->IsLoaded () || !pObject->IsStreamedIn () )
-            {
-                if ( pObject->GetDimension () == usDimension )
-                {
-                    // Final distance check
-                    float fDistSquared = pObject->GetDistanceToBoundingBoxSquared ( vecPosition );
-                    if ( fDistSquared < fRadius * fRadius )
-                        bResult = false;
+        pObject = *iter;
 
-                    if ( pstrStatus )
-                    {
-                        // Debugging information
-                        *pstrStatus += SString ( "ID:%05d  Dist:%4.1f  GetGameObject:%d  IsLoaded:%d  IsStreamedIn:%d\n"
-                                                ,pObject->GetModel ()
-                                                ,sqrtf ( fDistSquared )
-                                                ,pObject->GetGameObject () ? 1 : 0
-                                                ,pObject->GetModelInfo ()->IsLoaded () ? 1 : 0
-                                                ,pObject->IsStreamedIn () ? 1 : 0
-                                              );
-                    }
-                    else
-                    if ( !bResult )
-                        break;
+        // Is it not loaded?
+        if ( !pObject->GetGameObject () )
+        {
+            if ( pObject->GetDimension () == usDimension )
+            {
+                // Grab its position
+                pObject->GetPosition ( vecObject );
+
+                // Grab the distance ^ 2
+	            fDistanceX = vecObject.fX - vecPosition.fX;
+	            fDistanceY = vecObject.fY - vecPosition.fY;
+	            fDistanceZ = vecObject.fZ - vecPosition.fZ;
+	            fDistanceExp = fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ;
+
+                // Closer than the radius ^ 2?
+                if ( fDistanceExp < fRadius2 )
+                {
+                    // We haven't loaded all the objects nearby that location
+                    return false;
                 }
             }
         }
     }
 
-    return bResult;
+    // We have
+    return true;
 }
 
 
@@ -323,7 +323,7 @@ void CClientObjectManager::OnCreation ( CClientObject * pObject )
 
 void CClientObjectManager::OnDestruction ( CClientObject * pObject )
 {
-    ListRemove ( m_StreamedIn, pObject );
+    m_StreamedIn.remove ( pObject );
     UpdateLimitInfo ();
 }
 
@@ -369,7 +369,7 @@ void CClientObjectManager::RestreamObjects ( unsigned short usModel )
         pObject = *iter;
 
         // Streamed in and same vehicle ID?
-        if ( pObject->IsStreamedIn () && pObject->GetModel () == usModel )
+		if ( pObject->IsStreamedIn () && pObject->GetModel () == usModel )
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually

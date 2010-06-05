@@ -17,8 +17,8 @@
 CLuaTimer::CLuaTimer ( void )
 {
     m_ulStartTime = 0;
-    m_ulDelay = 0;
-    m_uiRepeats = 1;
+	m_ulDelay = 0;
+	m_uiRepeats = 1;
     m_iLuaFunction = LUA_REFNIL;
     m_bBeingDeleted = false;
 }
@@ -26,7 +26,7 @@ CLuaTimer::CLuaTimer ( void )
 
 CLuaTimer::CLuaTimer ( int iLuaFunction, const CLuaArguments& Arguments )
 {
-    m_iLuaFunction = iLuaFunction;
+	m_iLuaFunction = iLuaFunction;
     m_Arguments = Arguments;
     m_bBeingDeleted = false;
 }
@@ -43,12 +43,4 @@ void CLuaTimer::ExecuteTimer ( CLuaMain* pLuaMain )
     {
         m_Arguments.Call ( pLuaMain, m_iLuaFunction );
     }
-}
-
-
-unsigned long CLuaTimer::GetTimeLeft ( void )
-{
-    unsigned long ulCurrentTime = GetTime ();
-    unsigned long ulTimeLeft = m_ulStartTime + m_ulDelay - ulCurrentTime;
-    return ulTimeLeft;
 }

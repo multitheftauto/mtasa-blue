@@ -158,8 +158,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleStartSync ( NetBitStreamInt
             BitStream.Read ( fHealth );
 
             // Set data for interpolation
-            pVehicle->SetTargetPosition ( vecPosition, UNOCCUPIED_VEHICLE_SYNC_RATE );
-            pVehicle->SetTargetRotation ( vecRotationDegrees, UNOCCUPIED_VEHICLE_SYNC_RATE );
+            pVehicle->SetTargetPosition ( vecPosition );
+            pVehicle->SetTargetRotation ( vecRotationDegrees );
             pVehicle->SetMoveSpeed ( vecMoveSpeed );
             pVehicle->SetTurnSpeed ( vecTurnSpeed );
 
@@ -207,8 +207,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
             CClientVehicle* pVehicle = m_pVehicleManager->Get ( vehicle.data.vehicleID );
             if ( pVehicle && pVehicle->CanUpdateSync ( vehicle.data.ucTimeContext ) )
             {
-                if ( vehicle.data.bSyncPosition )       pVehicle->SetTargetPosition ( vehicle.data.vecPosition, UNOCCUPIED_VEHICLE_SYNC_RATE );
-                if ( vehicle.data.bSyncRotation )       pVehicle->SetTargetRotation ( vehicle.data.vecRotation, UNOCCUPIED_VEHICLE_SYNC_RATE );
+                if ( vehicle.data.bSyncPosition )       pVehicle->SetTargetPosition ( vehicle.data.vecPosition );
+                if ( vehicle.data.bSyncRotation )       pVehicle->SetTargetRotation ( vehicle.data.vecRotation );
                 if ( vehicle.data.bSyncVelocity )       pVehicle->SetMoveSpeed ( vehicle.data.vecVelocity );
                 if ( vehicle.data.bSyncTurnVelocity )   pVehicle->SetTurnSpeed ( vehicle.data.vecTurnVelocity );
                 if ( vehicle.data.bSyncHealth )         pVehicle->SetHealth ( vehicle.data.fHealth );
@@ -216,9 +216,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
                 if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
                                                         pVehicle->SetDerailed ( vehicle.data.bDerailed );
 #ifdef MTA_DEBUG
-                pVehicle->m_pLastSyncer = NULL;
-                pVehicle->m_ulLastSyncTime = GetTickCount ();
-                pVehicle->m_szLastSyncType = "unoccupied";
+				pVehicle->m_pLastSyncer = NULL;
+				pVehicle->m_ulLastSyncTime = GetTickCount ();
+				pVehicle->m_szLastSyncType = "unoccupied";
 #endif
             }
         }

@@ -57,11 +57,11 @@ public:
     void                            RemoveNametagOverrideColor  ( void );
     inline bool                     IsNametagColorOverridden( void )                                { return m_bNametagColorOverridden; }
 
-    inline const char*              GetNametagText          ( void )                                { return m_strNametag.c_str (); }
-    inline void                     SetNametagText          ( const char* szText );
-    inline bool                     IsNametagShowing        ( void )                                { return m_bNametagShowing; }
-    inline void                     SetNametagShowing       ( bool bShowing )                       { m_bNametagShowing = bShowing; }
-    inline CGUIStaticImage*         GetStatusIcon           ( void )                                { return m_pStatusIcon; }
+    inline const char*              GetNametagText          ( void )								{ return m_strNametag.c_str (); }
+	inline void                     SetNametagText          ( const char* szText );
+    inline bool                     IsNametagShowing        ( void )								{ return m_bNametagShowing; }
+    inline void                     SetNametagShowing       ( bool bShowing )						{ m_bNametagShowing = bShowing; }
+	inline CGUIStaticImage*			GetStatusIcon			( void )								{ return m_pStatusIcon; }
     inline unsigned long            GetLastNametagShow      ( void )                                { return m_ulLastNametagShow; }
     inline void                     SetLastNametagShow      ( unsigned long ulTime )                { m_ulLastNametagShow = ulTime; }
 
@@ -101,6 +101,10 @@ public:
 
     inline CClientManager*          GetManager              ( void )                                { return m_pManager; }
 
+    void                            AddPretendDamage        ( float fDamage, unsigned long ulLatency );
+    void                            GetPretendHealthAndArmor ( float* pfHealth, float* pfArmor );
+    float                           GetTotalPretendDamage   ( void );
+
 private:
     bool                            m_bIsLocalPlayer;
     char                            m_szNick [ MAX_PLAYER_NICK_LENGTH + 1 ];
@@ -132,8 +136,8 @@ private:
 
     CClientTeam*                    m_pTeam;
 
-    CGUIStaticImage*                m_pStatusIcon;
-    bool                            m_bNametagShowing;
+	CGUIStaticImage*				m_pStatusIcon;
+	bool							m_bNametagShowing;
     unsigned long                   m_ulLastNametagShow;
     unsigned char                   m_ucNametagColorR, m_ucNametagColorG, m_ucNametagColorB;
     bool                            m_bNametagColorOverridden;
@@ -154,6 +158,18 @@ public:
     inline void                     SetShowingWepdata       ( bool bState ) { m_bShowingWepdata = bState; }
     inline bool                     IsShowingWepdata        ( ) const       { return m_bShowingWepdata; }
 #endif
+
+    // For instant feedback on damage caused to remote players
+    struct SPretendDamage
+    {
+        SPretendDamage ( float fInDamage, unsigned long ulInExpireTime ) : fDamage ( fInDamage ), ulExpireTime ( ulInExpireTime ) {}
+        float           fDamage;
+        unsigned long   ulExpireTime;
+    };
+
+    std::vector < SPretendDamage >  m_PretendDamageList;
+    float                           m_fPretendHealthSmoothed;
+    float                           m_fPretendArmorSmoothed;
 
 };
 

@@ -23,6 +23,16 @@ class CClientStreamSectorRow;
 class CClientStreamElement;
 typedef bool ( StreamerLimitReachedFunction ) ( void );
 
+// Returns true if the item is in the itemList
+template < class T >
+bool ListContains ( std::list < T >& itemList, const T& item )
+{
+    std::list < T > ::iterator it = itemList.begin ();
+    for ( ; it != itemList.end () ; it++ )
+        if ( item == *it )
+            return true;
+    return false;
+}
 
 class CClientStreamer
 {
@@ -77,8 +87,6 @@ private:
     unsigned short                          m_usDimension;
     std::list < CClientStreamElement * >    m_ActiveElements;
     std::list < CClientStreamElement * >    m_ToStreamOut;
-
-    static void*                            pAddingElement;
 };
 
 #endif

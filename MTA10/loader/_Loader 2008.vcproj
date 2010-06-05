@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Client - Loader"
 	ProjectGUID="{AF2AF376-1ACD-4F3B-B399-2A30D8BE950E}"
 	TargetFrameworkVersion="131072"
@@ -179,9 +179,9 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				ProgramDatabaseFile="C:/Symbols/Release_Loader.pdb"
 				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapFileName="C:/Symbols/Release_Loader.map"
 				MapExports="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -283,9 +283,9 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				ProgramDatabaseFile="C:/Symbols/Release_Loader.pdb"
 				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapFileName="C:/Symbols/Release_Loader.map"
 				MapExports="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -352,19 +352,23 @@
 		</Filter>
 		<Filter
 			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
 			<File
-				RelativePath=".\GDFImp.rc"
+				RelativePath="loader.rc"
 				>
 			</File>
 			<File
-				RelativePath="loader.rc">
+				RelativePath=".\resource\mtaicon.ico"
+				>
 			</File>
 			<File
-				RelativePath=".\resource\mtaicon.ico">
+				RelativePath=".\resource\splash.bmp"
+				>
 			</File>
 			<File
-				RelativePath=".\resource\splash.bmp">
+				RelativePath=".\resource\vistaicon.ico"
+				>
 			</File>
 		</Filter>
 	</Files>

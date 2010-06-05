@@ -13,14 +13,6 @@
 
 #include "StdInc.h"
 
-// Helper function
-static const char* GetResourceName ( lua_State* luaVM )
-{
-    CLuaMain * luaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-    return luaMain ? luaMain->GetScriptNamePointer () : "";
-}
-
-
 void CLuaACLDefs::LoadFunctions ( void )
 {
     CLuaCFunctions::AddFunction ( "aclReload", CLuaACLDefs::aclReload );
@@ -35,9 +27,9 @@ void CLuaACLDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "aclGetName", CLuaACLDefs::aclGetName );
 
     CLuaCFunctions::AddFunction ( "aclGetRight", CLuaACLDefs::aclGetRight );
-    CLuaCFunctions::AddFunction ( "aclSetRight", CLuaACLDefs::aclSetRight );
+	CLuaCFunctions::AddFunction ( "aclSetRight", CLuaACLDefs::aclSetRight );
     CLuaCFunctions::AddFunction ( "aclListRights", CLuaACLDefs::aclListRights );
-    CLuaCFunctions::AddFunction ( "aclRemoveRight", CLuaACLDefs::aclRemoveRight );
+	CLuaCFunctions::AddFunction ( "aclRemoveRight", CLuaACLDefs::aclRemoveRight );
 
     CLuaCFunctions::AddFunction ( "aclCreateGroup", CLuaACLDefs::aclCreateGroup );
     CLuaCFunctions::AddFunction ( "aclDestroyGroup", CLuaACLDefs::aclDestroyGroup );
@@ -64,8 +56,8 @@ int CLuaACLDefs::aclReload ( lua_State* luaVM )
     bool bSuccess = m_pACLManager->Load ( m_pMainConfig->GetAccessControlListFile ().c_str () );
 
     // Return whether we succeeded or not
-    lua_pushboolean ( luaVM, bSuccess );
-    return 1;
+	lua_pushboolean ( luaVM, bSuccess );
+	return 1;
 }
 
 
@@ -75,51 +67,49 @@ int CLuaACLDefs::aclSave ( lua_State* luaVM )
     bool bSuccess = m_pACLManager->Save ( m_pMainConfig->GetAccessControlListFile ().c_str () );
 
     // Return whether we succeeded or not
-    lua_pushboolean ( luaVM, bSuccess );
-    return 1;
+	lua_pushboolean ( luaVM, bSuccess );
+	return 1;
 }
 
 
 int CLuaACLDefs::aclCreate ( lua_State* luaVM )
 {
     // Verify the argument types
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+	{
         // Grab the arguments
-        const char* szACLName = lua_tostring ( luaVM, 1 );
+		const char* szACLName = lua_tostring ( luaVM, 1 );
 
         // See that the name doesn't exist already
-        CAccessControlList* pACL = m_pACLManager->GetACL ( szACLName );
-        if ( !pACL )
-        {
+	    CAccessControlList* pACL = m_pACLManager->GetACL ( szACLName );
+	    if ( !pACL )
+	    {
             // Create a new ACL with that name
             pACL = m_pACLManager->AddACL ( szACLName );
-            CLogger::LogPrintf ( "ACL: %s: ACL '%s' created\n", GetResourceName ( luaVM ), pACL->GetName () );
 
             // Return the created ACL
             lua_pushacl ( luaVM, pACL );
             return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclCreate" );
+		}
+	}
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclCreate" );
 
-    lua_pushboolean ( luaVM, false );
-    return 1;
+	lua_pushboolean ( luaVM, false );
+	return 1;
 }
 
 
 int CLuaACLDefs::aclDestroy ( lua_State* luaVM )
 {
     // Verify the argument types
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+	{
         // Grab the arguments
         CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
         if ( pACL )
         {
             // Delete it
-            CLogger::LogPrintf ( "ACL: %s: ACL '%s' deleted\n", GetResourceName ( luaVM ), pACL->GetName () );
             m_pACLManager->DeleteACL ( pACL );
 
             // Return true
@@ -127,36 +117,36 @@ int CLuaACLDefs::aclDestroy ( lua_State* luaVM )
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclDestroy" );
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclDestroy" );
 
-    lua_pushboolean ( luaVM, false );
-    return 1;
+	lua_pushboolean ( luaVM, false );
+	return 1;
 }
 
 
 int CLuaACLDefs::aclGet ( lua_State* luaVM )
 {
     // Verify the argument types
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+	{
         // Grab the arguments
-        const char* szACLName = lua_tostring ( luaVM, 1 );
+		const char* szACLName = lua_tostring ( luaVM, 1 );
 
         // See that the name doesn't exist already
-        CAccessControlList* pACL = m_pACLManager->GetACL ( szACLName );
-        if ( pACL )
-        {
+	    CAccessControlList* pACL = m_pACLManager->GetACL ( szACLName );
+	    if ( pACL )
+	    {
             // Return the created ACL
             lua_pushacl ( luaVM, pACL );
             return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclGet" );
+		}
+	}
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclGet" );
 
-    lua_pushboolean ( luaVM, false );
-    return 1;
+	lua_pushboolean ( luaVM, false );
+	return 1;
 }
 
 
@@ -184,7 +174,7 @@ int CLuaACLDefs::aclList ( lua_State* luaVM )
 int CLuaACLDefs::aclGetName ( lua_State* luaVM )
 {
     // Verify the argument types
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
         // Grab and verify the ACL pointer
         CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
@@ -196,150 +186,147 @@ int CLuaACLDefs::aclGetName ( lua_State* luaVM )
         }
     }
 
-    lua_pushboolean ( luaVM, false );
-    return 1;
+	lua_pushboolean ( luaVM, false );
+	return 1;
 }
 
 
 int CLuaACLDefs::aclGetRight ( lua_State* luaVM )
 {
     // Verify the argument types
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TSTRING )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+		 lua_type ( luaVM, 2 ) == LUA_TSTRING )
+	{
         // Grab the arguments
         CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
-        char* szRight = (char*) lua_tostring ( luaVM, 2 );
+	    char* szRight = (char*) lua_tostring ( luaVM, 2 );
 
         // Verify the ACL pointer
         if ( pACL )
         {
             // Grab the type from the name passed
             char* szRightAftedDot = szRight;
-            CAccessControlListRight::ERightType eType;
-            if ( StringBeginsWith ( szRight, "command." ) )
+			CAccessControlListRight::ERightType eType;
+			if ( StringBeginsWith ( szRight, "command." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_COMMAND;
+				eType = CAccessControlListRight::RIGHT_TYPE_COMMAND;
                 szRightAftedDot += 8;
             }
-            else if ( StringBeginsWith ( szRight, "function." ) )
+			else if ( StringBeginsWith ( szRight, "function." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_FUNCTION;
+				eType = CAccessControlListRight::RIGHT_TYPE_FUNCTION;
                 szRightAftedDot += 9;
             }
-            else if ( StringBeginsWith ( szRight, "resource." ) )
+			else if ( StringBeginsWith ( szRight, "resource." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_RESOURCE;
+				eType = CAccessControlListRight::RIGHT_TYPE_RESOURCE;
                 szRightAftedDot += 9;
             }
-            else if ( StringBeginsWith ( szRight, "general." ) )
+			else if ( StringBeginsWith ( szRight, "general." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_GENERAL;
+				eType = CAccessControlListRight::RIGHT_TYPE_GENERAL;
                 szRightAftedDot += 8;
             }
-            else
-            {
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
+			else
+			{
+				lua_pushboolean ( luaVM, false );
+				return 1;
+			}
 
             // Grab the right from the name and type
-            CAccessControlListRight* pACLRight = pACL->GetRight ( szRightAftedDot, eType );
-            if ( pACLRight )
-            {
+			CAccessControlListRight* pACLRight = pACL->GetRight ( szRightAftedDot, eType );
+			if ( pACLRight )
+			{
                 lua_pushboolean ( luaVM, pACLRight->GetRightAccess () );
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclGetRight" );
+			    return 1;
+			}
+		}
+	}
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclGetRight" );
 
-    lua_pushboolean ( luaVM, false );
-    return 1;
+	lua_pushboolean ( luaVM, false );
+	return 1;
 }
 
 
 int CLuaACLDefs::aclSetRight ( lua_State* luaVM )
 {
     // Verify the argument types
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TSTRING &&
-         lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+		 lua_type ( luaVM, 2 ) == LUA_TSTRING &&
+	     lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+	{
         // Grab the arguments
-        CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
-        char* szRight = (char*) lua_tostring ( luaVM, 2 );
-        bool bAccess = lua_toboolean ( luaVM, 3 ) ?true:false;
+		CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
+	    char* szRight = (char*) lua_tostring ( luaVM, 2 );
+		bool bAccess = lua_toboolean ( luaVM, 3 ) ?true:false;
 
         // Verify the ACL pointer
         if ( pACL )
         {
             // Grab the type from the name passed
             char* szRightAftedDot = szRight;
-            CAccessControlListRight::ERightType eType;
-            if ( StringBeginsWith ( szRight, "command." ) )
+			CAccessControlListRight::ERightType eType;
+			if ( StringBeginsWith ( szRight, "command." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_COMMAND;
+				eType = CAccessControlListRight::RIGHT_TYPE_COMMAND;
                 szRightAftedDot += 8;
             }
-            else if ( StringBeginsWith ( szRight, "function." ) )
+			else if ( StringBeginsWith ( szRight, "function." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_FUNCTION;
+				eType = CAccessControlListRight::RIGHT_TYPE_FUNCTION;
                 szRightAftedDot += 9;
             }
-            else if ( StringBeginsWith ( szRight, "resource." ) )
+			else if ( StringBeginsWith ( szRight, "resource." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_RESOURCE;
+				eType = CAccessControlListRight::RIGHT_TYPE_RESOURCE;
                 szRightAftedDot += 9;
             }
-            else if ( StringBeginsWith ( szRight, "general." ) )
+			else if ( StringBeginsWith ( szRight, "general." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_GENERAL;
+				eType = CAccessControlListRight::RIGHT_TYPE_GENERAL;
                 szRightAftedDot += 8;
             }
-            else
-            {
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
+			else
+			{
+				lua_pushboolean ( luaVM, false );
+				return 1;
+			}
 
             // Grab the right from the name and type
-            CAccessControlListRight* pACLRight = pACL->GetRight ( szRightAftedDot, eType );
-            if ( pACLRight )
-            {
+			CAccessControlListRight* pACLRight = pACL->GetRight ( szRightAftedDot, eType );
+			if ( pACLRight )
+			{
                 // Set the new access right
-                if ( pACLRight->GetRightAccess () != bAccess )
-                    CLogger::LogPrintf ( "ACL: %s: Right '%s' changed to %s in ACL '%s'\n", GetResourceName ( luaVM ), szRight, bAccess ? "ALLOW" : "DISALLOW", pACL->GetName () );
                 pACLRight->SetRightAccess ( bAccess );
                 lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+			    return 1;
+			}
 
             // Try to add it
-            pACLRight = pACL->AddRight ( szRightAftedDot, eType, bAccess );
-            if ( pACLRight )
-            {
+			pACLRight = pACL->AddRight ( szRightAftedDot, eType, bAccess );
+			if ( pACLRight )
+			{
                 // Return success
-                CLogger::LogPrintf ( "ACL: %s: Right '%s' %s added in ACL '%s'\n", GetResourceName ( luaVM ), szRight, bAccess ? "ALLOW" : "DISALLOW", pACL->GetName () );
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclSetRight" );
+				lua_pushboolean ( luaVM, true );
+				return 1;
+			}
+		}
+	}
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclSetRight" );
 
-    lua_pushboolean ( luaVM, false );
-    return 1;
+	lua_pushboolean ( luaVM, false );
+	return 1;
 }
 
 
 int CLuaACLDefs::aclListRights ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+	{
         // Grab and verify the ACL
         CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
         if ( pACL )
@@ -402,88 +389,84 @@ int CLuaACLDefs::aclListRights ( lua_State* luaVM )
 int CLuaACLDefs::aclRemoveRight ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TSTRING )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+		 lua_type ( luaVM, 2 ) == LUA_TSTRING )
+	{
         // Grab the argument strings
-        CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
-        char* szRight = (char*) lua_tostring ( luaVM, 2 );
+		CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
+		char* szRight = (char*) lua_tostring ( luaVM, 2 );
 
         // Verify the ACL pointer
         if ( pACL )
         {
             // Grab the type from the name passed
             char* szRightAftedDot = szRight;
-            CAccessControlListRight::ERightType eType;
-            if ( StringBeginsWith ( szRight, "command." ) )
+			CAccessControlListRight::ERightType eType;
+			if ( StringBeginsWith ( szRight, "command." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_COMMAND;
+				eType = CAccessControlListRight::RIGHT_TYPE_COMMAND;
                 szRightAftedDot += 8;
             }
-            else if ( StringBeginsWith ( szRight, "function." ) )
+			else if ( StringBeginsWith ( szRight, "function." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_FUNCTION;
+				eType = CAccessControlListRight::RIGHT_TYPE_FUNCTION;
                 szRightAftedDot += 9;
             }
-            else if ( StringBeginsWith ( szRight, "resource." ) )
+			else if ( StringBeginsWith ( szRight, "resource." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_RESOURCE;
+				eType = CAccessControlListRight::RIGHT_TYPE_RESOURCE;
                 szRightAftedDot += 9;
             }
-            else if ( StringBeginsWith ( szRight, "general." ) )
+			else if ( StringBeginsWith ( szRight, "general." ) )
             {
-                eType = CAccessControlListRight::RIGHT_TYPE_GENERAL;
+				eType = CAccessControlListRight::RIGHT_TYPE_GENERAL;
                 szRightAftedDot += 8;
             }
-            else
-            {
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
+			else
+			{
+				lua_pushboolean ( luaVM, false );
+				return 1;
+			}
 
             // Try removing the right
-            CAccessControlListRight* pACLRight = pACL->GetRight ( szRightAftedDot, eType );
-            bool bAccess = pACLRight && pACLRight->GetRightAccess ();
-            if ( pACL->RemoveRight ( szRightAftedDot, eType ) )
-            {
-                CLogger::LogPrintf ( "ACL: %s: Right '%s' %s removed from ACL '%s'\n", GetResourceName ( luaVM ), szRight, bAccess ? "ALLOW" : "DISALLOW", pACL->GetName () );
+			if ( pACL->RemoveRight ( szRightAftedDot, eType ) )
+			{
                 // Return success
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclRemoveRight" );
+				lua_pushboolean ( luaVM, true );
+				return 1;
+			}
+		}
+	}
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclRemoveRight" );
 
-    lua_pushboolean ( luaVM, false );
-    return 1;
+	lua_pushboolean ( luaVM, false );
+	return 1;
 }
 
 
 int CLuaACLDefs::aclCreateGroup ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+	{
         // Grab the argument strings
-        char* szGroup = (char*) lua_tostring ( luaVM, 1 );
+		char* szGroup = (char*) lua_tostring ( luaVM, 1 );
 
         // Find the ACL specified
-        CAccessControlListGroup* pGroup = m_pACLManager->GetGroup ( szGroup );
-        if ( !pGroup )
-        {
+		CAccessControlListGroup* pGroup = m_pACLManager->GetGroup ( szGroup );
+		if ( !pGroup )
+		{
             // Create the group
             pGroup = m_pACLManager->AddGroup ( szGroup );
-            CLogger::LogPrintf ( "ACL: %s: Group '%s' created\n", GetResourceName ( luaVM ), pGroup->GetGroupName () );
 
             // And return it
             lua_pushaclgroup ( luaVM, pGroup );
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclCreateGroup" );
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclCreateGroup" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -493,8 +476,8 @@ int CLuaACLDefs::aclCreateGroup ( lua_State* luaVM )
 int CLuaACLDefs::aclDestroyGroup ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+	{
          // Grab the arguments
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 1 );
 
@@ -502,7 +485,6 @@ int CLuaACLDefs::aclDestroyGroup ( lua_State* luaVM )
         if ( pGroup )
         {
             // Delete it
-            CLogger::LogPrintf ( "ACL: %s: Group '%s' deleted\n", GetResourceName ( luaVM ), pGroup->GetGroupName () );
             m_pACLManager->DeleteGroup ( pGroup );
 
             // Return success
@@ -510,8 +492,8 @@ int CLuaACLDefs::aclDestroyGroup ( lua_State* luaVM )
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclDestroyGroup" );
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclDestroyGroup" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -521,22 +503,22 @@ int CLuaACLDefs::aclDestroyGroup ( lua_State* luaVM )
 int CLuaACLDefs::aclGetGroup ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+	{
         // Grab the argument strings
-        char* szGroup = (char*) lua_tostring ( luaVM, 1 );
+		char* szGroup = (char*) lua_tostring ( luaVM, 1 );
 
         // Find the ACL specified
-        CAccessControlListGroup* pGroup = m_pACLManager->GetGroup ( szGroup );
-        if ( pGroup )
-        {
+		CAccessControlListGroup* pGroup = m_pACLManager->GetGroup ( szGroup );
+		if ( pGroup )
+		{
             // Return the group
             lua_pushaclgroup ( luaVM, pGroup );
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclGetGroup" );
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclGetGroup" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -566,8 +548,8 @@ int CLuaACLDefs::aclGroupList ( lua_State* luaVM )
 int CLuaACLDefs::aclGroupGetName ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+	{
         // Grab the arguments
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 1 );
 
@@ -579,8 +561,8 @@ int CLuaACLDefs::aclGroupGetName ( lua_State* luaVM )
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclGroupGetName" );
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclGroupGetName" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -590,9 +572,9 @@ int CLuaACLDefs::aclGroupGetName ( lua_State* luaVM )
 int CLuaACLDefs::aclGroupAddACL ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
-    {
+	{
         // Grab the arguments
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 1 );
         CAccessControlList* pACL = lua_toacl ( luaVM, 2 );
@@ -602,15 +584,14 @@ int CLuaACLDefs::aclGroupAddACL ( lua_State* luaVM )
         {
             // Add the ACL to the group
             pGroup->AddACL ( pACL );
-            CLogger::LogPrintf ( "ACL: %s: ACL '%s' added to group '%s'\n", GetResourceName ( luaVM ), pACL->GetName (), pGroup->GetGroupName () );
 
             // Return success
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclGroupAddACL" );
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclGroupAddACL" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -620,8 +601,8 @@ int CLuaACLDefs::aclGroupAddACL ( lua_State* luaVM )
 int CLuaACLDefs::aclGroupListACL ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+	{
         // Grab and verify the group
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 1 );
         if ( pGroup )
@@ -654,9 +635,9 @@ int CLuaACLDefs::aclGroupListACL ( lua_State* luaVM )
 int CLuaACLDefs::aclGroupRemoveACL ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
-    {
+	{
         // Grab the arguments
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 1 );
         CAccessControlList* pACL = lua_toacl ( luaVM, 2 );
@@ -666,15 +647,14 @@ int CLuaACLDefs::aclGroupRemoveACL ( lua_State* luaVM )
         {
             // Add the ACL to the group
             pGroup->RemoveACL ( pACL );
-            CLogger::LogPrintf ( "ACL: %s: ACL '%s' removed from group '%s'\n", GetResourceName ( luaVM ), pACL->GetName (), pGroup->GetGroupName () );
 
             // Return success
             lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclGroupRemoveACL" );
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclGroupRemoveACL" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -684,9 +664,9 @@ int CLuaACLDefs::aclGroupRemoveACL ( lua_State* luaVM )
 int CLuaACLDefs::aclGroupAddObject ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TSTRING )
-    {
+	{
         // Grab the arguments
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 1 );
         const char* szObject = lua_tostring ( luaVM, 2 );
@@ -697,28 +677,27 @@ int CLuaACLDefs::aclGroupAddObject ( lua_State* luaVM )
             // Figure out what type of object this is
             const char* szObjectAfterDot = szObject;
             CAccessControlListGroupObject::EObjectType eType;
-            if ( StringBeginsWith ( szObject, "resource." ) )
+			if ( StringBeginsWith ( szObject, "resource." ) )
             {
                 eType = CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE;
                 szObjectAfterDot += 9;
             }
-            else if ( StringBeginsWith ( szObject, "user." ) )
+			else if ( StringBeginsWith ( szObject, "user." ) )
             {
-                eType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
+				eType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
                 szObjectAfterDot += 5;
             }
-            else
-            {
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
+			else
+			{
+				lua_pushboolean ( luaVM, false );
+				return 1;
+			}
 
             // Make sure it doesn't already exist
             if ( !pGroup->FindObjectMatch ( szObjectAfterDot, eType ) )
             {
                 // Set it
                 pGroup->AddObject ( szObjectAfterDot, eType );
-                CLogger::LogPrintf ( "ACL: %s: Object '%s' added to group '%s'\n", GetResourceName ( luaVM ), szObject, pGroup->GetGroupName () );
 
                 // Return success
                 lua_pushboolean ( luaVM, true );
@@ -726,8 +705,8 @@ int CLuaACLDefs::aclGroupAddObject ( lua_State* luaVM )
             }
         }
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclGroupAddObject" );
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclGroupAddObject" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -737,8 +716,8 @@ int CLuaACLDefs::aclGroupAddObject ( lua_State* luaVM )
 int CLuaACLDefs::aclGroupListObjects ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+	{
         // Grab and verify the group
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 1 );
         if ( pGroup )
@@ -787,9 +766,9 @@ int CLuaACLDefs::aclGroupListObjects ( lua_State* luaVM )
 int CLuaACLDefs::aclGroupRemoveObject ( lua_State* luaVM )
 {
     // Verify the arguents
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+	if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TSTRING )
-    {
+	{
         // Grab the arguments
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 1 );
         const char* szObject = lua_tostring ( luaVM, 2 );
@@ -800,34 +779,33 @@ int CLuaACLDefs::aclGroupRemoveObject ( lua_State* luaVM )
             // Figure out what type of object this is
             const char* szObjectAfterDot = szObject;
             CAccessControlListGroupObject::EObjectType eType;
-            if ( StringBeginsWith ( szObject, "resource." ) )
+			if ( StringBeginsWith ( szObject, "resource." ) )
             {
                 eType = CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE;
                 szObjectAfterDot += 9;
             }
-            else if ( StringBeginsWith ( szObject, "user." ) )
+			else if ( StringBeginsWith ( szObject, "user." ) )
             {
-                eType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
+				eType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
                 szObjectAfterDot += 5;
             }
-            else
-            {
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
+			else
+			{
+				lua_pushboolean ( luaVM, false );
+				return 1;
+			}
 
             // Remove it
             if ( pGroup->RemoveObject ( szObjectAfterDot, eType ) )
             {
                 // Return success
-                CLogger::LogPrintf ( "ACL: %s: Object '%s' removed from group '%s'\n", GetResourceName ( luaVM ), szObject, pGroup->GetGroupName () );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
         }
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "aclGroupRemoveObject" );
+	else
+		m_pScriptDebugging->LogBadType ( luaVM, "aclGroupRemoveObject" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -937,7 +915,7 @@ int CLuaACLDefs::hasObjectPermissionTo ( lua_State* luaVM )
 int CLuaACLDefs::isObjectInACLGroup ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
-    {
+	{
         const char* szObject = lua_tostring ( luaVM, 1 );
         CAccessControlListGroup* pGroup = lua_toaclgroup ( luaVM, 2 );
         CAccessControlListGroupObject::EObjectType GroupObjectType;

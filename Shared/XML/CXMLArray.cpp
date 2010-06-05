@@ -14,59 +14,49 @@
 
 using namespace std;
 
-CStack < unsigned long, 1, INVALID_XML_ID > CXMLArray::m_IDStack;
-std::vector < CXMLCommon* >                 CXMLArray::m_Elements;
-unsigned long                               CXMLArray::m_ulCapacity = 0;
+unsigned long CXMLArray::m_ulStackPosition;
+unsigned long CXMLArray::m_ulIDStack [MAX_XML];
+CXMLCommon* CXMLArray::m_Elements [MAX_XML];
 
 void CXMLArray::Initialize ( void )
 {
-    m_ulCapacity = 0;
-#ifndef MTA_DEBUG
-    ExpandBy ( 10000 );
-#endif
+    // Initialize entry array
+    memset ( m_Elements, 0, sizeof ( m_Elements ) );
+
+    // Initialize the stack with unique ids
+    m_ulStackPosition = MAX_XML;
+    for ( unsigned long i = 0; i < MAX_XML; i++ )
+    {
+        m_ulIDStack [i] = i;
+    }
 }
+
 
 unsigned long CXMLArray::PopUniqueID ( CXMLCommon* pEntry )
 {
-    // Add more ID's if required
-    if ( m_IDStack.GetUnusedAmount () < 1 )
+    // Grab the ID and check that we had more left
+    unsigned long ulID = PopStack ();
+    if ( ulID != INVALID_XML_ID &&
+         ulID < MAX_XML )
     {
-#ifdef MTA_DEBUG
-        ExpandBy ( 5 );
-#else
-        ExpandBy ( 10000 );
-#endif
+        m_Elements [ulID] = pEntry;
     }
 
-    // Grab the next unused ID
-    unsigned long ulPhysicalIndex = m_IDStack.Pop ();
-
-    // Checks
-    assert ( ulPhysicalIndex != INVALID_XML_ID );
-    assert ( ulPhysicalIndex <= m_ulCapacity );
-    assert ( m_Elements.size () > ulPhysicalIndex );
-    assert ( m_Elements [ ulPhysicalIndex ] == NULL );
-
-    m_Elements [ ulPhysicalIndex ] = pEntry;
-
-    // Map to ID
-    unsigned long ulLogicalID = ( ulPhysicalIndex + MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS ) ;
-    return ulLogicalID;
+    return MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS + ulID;
 }
 
 
-void CXMLArray::PushUniqueID ( unsigned long ulLogicalID )
+void CXMLArray::PushUniqueID ( unsigned long ulID )
 {
-    // Map to index
-    unsigned long ulPhysicalIndex = ulLogicalID - (MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS);
-
-    // Checks
-    assert ( ulLogicalID != INVALID_XML_ID );
-    assert ( ulPhysicalIndex <= m_ulCapacity );
-    assert ( m_Elements [ ulPhysicalIndex ] );
-
-    m_IDStack.Push ( ulPhysicalIndex );
-    m_Elements [ ulPhysicalIndex ] = NULL;
+    // Push the ID back and NULL the entity there
+    if ( ulID != INVALID_XML_ID &&
+         ulID >= MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS &&
+         ulID < MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS + MAX_XML )
+    {
+        ulID -= MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS;
+        PushStack ( ulID );
+        m_Elements [ulID] = NULL;
+    }
 }
 
 
@@ -76,37 +66,37 @@ void CXMLArray::PushUniqueID ( CXMLCommon* pEntry )
 }
 
 
-CXMLCommon* CXMLArray::GetEntry ( unsigned long ulLogicalID )
+CXMLCommon* CXMLArray::GetEntry ( unsigned long ulID )
 {
     // Return the element with the given ID
+    if ( ulID != INVALID_XML_ID &&
+         ulID >= MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS &&
+         ulID < MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS + MAX_XML )
+        return m_Elements [ulID - (MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS)];
 
-    // Map to index
-    unsigned long ulPhysicalIndex = ulLogicalID - (MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS);
-
-    if ( ulLogicalID != INVALID_XML_ID && ulPhysicalIndex <= m_ulCapacity )
-    {
-        return m_Elements [ ulPhysicalIndex ];
-    }
     return NULL;
 }
 
 
-void CXMLArray::ExpandBy ( unsigned long ulAmount )
+unsigned long CXMLArray::PopStack ( void )
 {
-    m_IDStack.ExpandBy ( ulAmount );
-    m_Elements.resize ( m_ulCapacity + ulAmount + 1, NULL );
-    m_ulCapacity += ulAmount;
-    assert ( m_IDStack.GetCapacity () == m_ulCapacity );
+    // Got any items? Pop off and return the first item
+    if ( m_ulStackPosition > 0 )
+    {
+        --m_ulStackPosition;
+        return m_ulIDStack [m_ulStackPosition];
+    }
+
+    // No IDs left
+    return INVALID_XML_ID;
 }
 
 
-unsigned long CXMLArray::GetCapacity ( void )
+void CXMLArray::PushStack ( unsigned long ulID )
 {
-    return m_ulCapacity;
-}
-
-
-unsigned long CXMLArray::GetUnusedAmount ( void )
-{
-    return m_IDStack.GetUnusedAmount ();
+    if ( m_ulStackPosition < MAX_XML )
+    {
+        m_ulIDStack [m_ulStackPosition] = ulID;
+        ++m_ulStackPosition;
+    }
 }

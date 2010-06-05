@@ -42,7 +42,7 @@ CXMLFileImpl::~CXMLFileImpl ( void )
     ClearWrapperTree ();
 
     // Delete the document and the builder
-    delete m_pDocument;
+	delete m_pDocument;
 }
 
 
@@ -68,22 +68,15 @@ bool CXMLFileImpl::Parse ( void )
     if ( m_strFilename != "" )
     {
         // Reset previous file
-        Reset ();
+		Reset ();
 
         // Parse from the current file
         if ( m_pDocument->LoadFile ( m_strFilename.c_str () ) )
         {
             // Build our wrapper
-            if ( BuildWrapperTree () )
-            {
-                ResetLastError ();
-                return true;
-            }
-            else
-            {
-                SetLastError ( CXMLErrorCodes::OtherError, "Out of Elements" );
-                return false;
-            }
+		    BuildWrapperTree ();
+		    ResetLastError ();
+		    return true;
         }
 
         // Bad XML file
@@ -102,11 +95,7 @@ bool CXMLFileImpl::Write ( void )
     // We have a filename?
     if ( m_strFilename != "" )
     {
-        // Try a safe method of saving first
-        if ( WriteSafer () )
-        {
-            return true;
-        }
+        // Save it
         if ( m_pDocument->SaveFile ( m_strFilename.c_str () ) )
         {
             return true;
@@ -115,46 +104,6 @@ bool CXMLFileImpl::Write ( void )
 
     return false;
 }
-
-
-bool CXMLFileImpl::WriteSafer ( void )
-{
-    // We have a filename?
-    if ( m_strFilename != "" )
-    {
-        SString strFilename = m_strFilename;
-        SString strTemp     = strFilename + "_new_";
-        SString strBackup   = strFilename + "_old_";
-
-        // Save to temp
-        if ( !m_pDocument->SaveFile ( strTemp ) )
-        {
-            SetLastError ( CXMLErrorCodes::OtherError, "Could not save temporary file" );
-            return false;
-        }
-
-        // Delete any leftover backup
-        unlink ( strBackup );
-
-        // Rename current to backup
-        rename ( strFilename, strBackup );
-
-        // Rename temp to current
-        if ( rename ( strTemp, strFilename ) )
-        {
-            SetLastError ( CXMLErrorCodes::OtherError, "Could not rename temporary to current" );
-            return false;
-        }
-
-        // Delete backup
-        unlink ( strBackup );
-
-        return true;
-    }
-
-    return false;
-}
-
 
 
 void CXMLFileImpl::Clear ( void )
@@ -237,31 +186,25 @@ TiXmlDocument* CXMLFileImpl::GetDocument ( void )
 }
 
 
-bool CXMLFileImpl::BuildWrapperTree ( void )
+void CXMLFileImpl::BuildWrapperTree ( void )
 {
     // Clear the previous tree
     ClearWrapperTree ();
 
     // Grab the root element
-    TiXmlElement* pRootNode = m_pDocument->RootElement ();
-    if ( pRootNode )
+	TiXmlElement* pRootNode = m_pDocument->RootElement ();
+	if ( pRootNode )
     {
         // Create an XML node for it
         m_pRootNode = new CXMLNodeImpl ( this, NULL, *pRootNode );
 
         // And build all sub-nodes
-        if ( !BuildSubElements ( m_pRootNode ) )
-        {
-            Reset ( );
-            return false;
-        }
-        return true;
+        BuildSubElements ( m_pRootNode );
     }
-    return false;
 }
 
 
-bool CXMLFileImpl::BuildSubElements ( CXMLNodeImpl* pNode )
+void CXMLFileImpl::BuildSubElements ( CXMLNodeImpl* pNode )
 {
     // Grab the node
     TiXmlElement* pRawNode = pNode->GetNode ();
@@ -277,24 +220,11 @@ bool CXMLFileImpl::BuildSubElements ( CXMLNodeImpl* pNode )
             if ( pElement = pChild->ToElement () )
             {
                 // Create the child and build its subnodes again
-                CXMLNodeImpl* pTempNode = new CXMLNodeImpl ( this, pNode, *pElement );
-                if ( pTempNode->IsValid ( ) )
-                {
-                    if ( !BuildSubElements ( pTempNode ) )
-                    {
-                        delete pTempNode;
-                        return false;
-                    }
-                }
-                else
-                {
-                    delete pTempNode;
-                    return false;
-                }
+			    CXMLNodeImpl* pTempNode = new CXMLNodeImpl ( this, pNode, *pElement );
+			    BuildSubElements ( pTempNode );
             }
-        }
-    }
-    return true;
+		}
+	}
 }
 
 

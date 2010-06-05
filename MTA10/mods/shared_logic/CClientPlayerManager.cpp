@@ -13,10 +13,7 @@
 
 #include "StdInc.h"
 
-#define REMOTE_PLAYER_CONNECTION_TROUBLE_TIME 6000
-
 using std::list;
-using std::vector;
 
 CClientPlayerManager::CClientPlayerManager ( CClientManager* pManager )
 {
@@ -33,20 +30,21 @@ CClientPlayerManager::~CClientPlayerManager ( void )
     DeleteAll ();
 }
 
+
 void CClientPlayerManager::DoPulse ( void )
 {
     unsigned long ulCurrentTime = CClientTime::GetTime ();
     CClientPlayer * pPlayer = NULL;
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); ++iter )
     {
         pPlayer = *iter;
         if ( !pPlayer->IsLocalPlayer () )
         {
-            // Flag him with connection error if its been too long since last puresync and force his position
+            // Flag him with connection error if its been more than 6000 ms since last puresync and force his position
             unsigned long ulLastPuresyncTime = pPlayer->GetLastPuresyncTime ();
-            bool bHasConnectionTrouble = ( ulLastPuresyncTime != 0 && ulCurrentTime >= ulLastPuresyncTime + REMOTE_PLAYER_CONNECTION_TROUBLE_TIME );
-            if ( bHasConnectionTrouble && !g_pClientGame->IsDownloadingBigPacket () && !pPlayer->IsDeadOnNetwork () )
+            bool bHasConnectionTrouble = ( ulLastPuresyncTime != 0 && ulCurrentTime >= ulLastPuresyncTime + 6000 && pPlayer->GetOccupiedVehicleSeat () == 0 );
+            if ( bHasConnectionTrouble && !g_pClientGame->IsDownloadingBigPacket () )
             {
                 pPlayer->SetHasConnectionTrouble ( true );
 
@@ -66,7 +64,7 @@ void CClientPlayerManager::DoPulse ( void )
                         pVehicle->SetPosition ( pPlayer->GetLastPuresyncPosition () );
                         pVehicle->SetMoveSpeed ( CVector ( 0, 0, 0 ) );
                         pVehicle->SetTurnSpeed ( CVector ( 0, 0, 0 ) );
-                        pPlayer->ResetInterpolation ();
+			            pPlayer->ResetInterpolation ();
                     }
                 }
                 else
@@ -75,7 +73,7 @@ void CClientPlayerManager::DoPulse ( void )
                     pPlayer->SetPosition ( pPlayer->GetLastPuresyncPosition () );
                     pPlayer->ResetInterpolation ();
                     pPlayer->SetMoveSpeed ( CVector ( 0, 0, 0 ) );
-                    pPlayer->ResetInterpolation ();
+			        pPlayer->ResetInterpolation ();
                 }
             }
             else
@@ -91,7 +89,7 @@ void CClientPlayerManager::DeleteAll ( void )
 {
     // Delete all the players
     m_bCanRemoveFromList = false;
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         delete *iter;
@@ -121,7 +119,7 @@ CClientPlayer* CClientPlayerManager::Get ( const char* szNick, bool bCaseSensiti
     assert ( szNick );
 
     // Find a player with a matching nick in the list
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         const char* szPtr = (*iter)->GetNick ();
@@ -145,7 +143,7 @@ CClientPlayer* CClientPlayerManager::Get ( CPlayerPed* pPlayer, bool bValidatePo
 
     if ( bValidatePointer )
     {
-        vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+        list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
         for ( ; iter != m_Players.end () ; iter++ )
         {
             if ( (*iter)->GetGamePlayer () == pPlayer )
@@ -169,7 +167,7 @@ CClientPlayer* CClientPlayerManager::Get ( CPlayerPed* pPlayer, bool bValidatePo
 
 bool CClientPlayerManager::Exists ( CClientPlayer* pPlayer )
 {
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end () ; iter++ )
     {
         if ( *iter == pPlayer )
@@ -210,7 +208,7 @@ bool CClientPlayerManager::IsValidModel ( unsigned long ulModel )
 
 void CClientPlayerManager::ResetAll ( void )
 {
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         CClientPlayer * pPlayer = *iter;
@@ -222,10 +220,10 @@ void CClientPlayerManager::ResetAll ( void )
 }
 
 
-vector < CClientPlayer* > ::const_iterator CClientPlayerManager::IterGet ( CClientPlayer* pPlayer )
+list < CClientPlayer* > ::const_iterator CClientPlayerManager::IterGet ( CClientPlayer* pPlayer )
 {
     // Find it in our list
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    list < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         if ( *iter == pPlayer )
@@ -239,10 +237,10 @@ vector < CClientPlayer* > ::const_iterator CClientPlayerManager::IterGet ( CClie
 }
 
 
-vector < CClientPlayer* > ::const_reverse_iterator CClientPlayerManager::IterGetReverse ( CClientPlayer* pPlayer )
+list < CClientPlayer* > ::const_reverse_iterator CClientPlayerManager::IterGetReverse ( CClientPlayer* pPlayer )
 {
     // Find it in our list
-    vector < CClientPlayer* > ::reverse_iterator iter = m_Players.rbegin ();
+    list < CClientPlayer* > ::reverse_iterator iter = m_Players.rbegin ();
     for ( ; iter != m_Players.rend (); iter++ )
     {
         if ( *iter == pPlayer )
@@ -260,6 +258,6 @@ void CClientPlayerManager::RemoveFromList ( CClientPlayer* pPlayer )
 {
     if ( m_bCanRemoveFromList )
     {
-        ListRemove ( m_Players, pPlayer );
+        if ( !m_Players.empty() ) m_Players.remove ( pPlayer );
     }
 }

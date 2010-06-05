@@ -44,7 +44,6 @@ const char szPreloadedScript [] = ""\
     "                outputDebugString(\"exports: Call to non-existing resource (\" .. k .. \")\", 1)\n" \
     "        end\n" \
     "end\n" \
-    "addEventHandler(\"onResourceStop\", root, function(res) exports[getResourceFromName(res)] = nil end)\n" \
     "exports = setmetatable({}, exportsMT)\n";
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
@@ -80,8 +79,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     // Add all our events and functions
     InitVM();
 
-    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
-    InitSecurity();
+	// Initialize security restrictions. Very important to prevent lua trojans and viruses!
+	InitSecurity();
 }
 
 
@@ -133,10 +132,10 @@ void CLuaMain::ResetInstructionCount ( void )
 
 void CLuaMain::InitSecurity ( void )
 {
-    lua_register ( m_luaVM, "dofile", CLuaFunctionDefinitions::DisabledFunction );
-    lua_register ( m_luaVM, "loadfile", CLuaFunctionDefinitions::DisabledFunction );
-    lua_register ( m_luaVM, "require", CLuaFunctionDefinitions::DisabledFunction );
-    lua_register ( m_luaVM, "loadlib", CLuaFunctionDefinitions::DisabledFunction );
+	lua_register ( m_luaVM, "dofile", CLuaFunctionDefinitions::DisabledFunction );
+	lua_register ( m_luaVM, "loadfile", CLuaFunctionDefinitions::DisabledFunction );
+	lua_register ( m_luaVM, "require", CLuaFunctionDefinitions::DisabledFunction );
+	lua_register ( m_luaVM, "loadlib", CLuaFunctionDefinitions::DisabledFunction );
     lua_register ( m_luaVM, "getfenv", CLuaFunctionDefinitions::DisabledFunction );
     lua_register ( m_luaVM, "newproxy", CLuaFunctionDefinitions::DisabledFunction );
 }
@@ -157,7 +156,7 @@ void CLuaMain::InitVM ( void )
     luaopen_table ( m_luaVM );
     luaopen_debug ( m_luaVM );
 
-    // Create the callback table (at location 1 in the registry)
+	// Create the callback table (at location 1 in the registry)
     lua_pushnumber ( m_luaVM, 1 );
     lua_newtable ( m_luaVM );
     lua_settable ( m_luaVM, LUA_REGISTRYINDEX );
@@ -167,15 +166,15 @@ void CLuaMain::InitVM ( void )
 
     // Oli: Don't forget to add new ones to CLuaManager::LoadCFunctions. Thanks!
 
-    // create global vars
-    lua_pushelement ( m_luaVM, g_pGame->GetMapManager()->GetRootElement() );
-    lua_setglobal ( m_luaVM, "root" );
+	// create global vars
+	lua_pushelement ( m_luaVM, g_pGame->GetMapManager()->GetRootElement() );
+	lua_setglobal ( m_luaVM, "root" );
 
-    lua_pushresource ( m_luaVM, m_pResource );
-    lua_setglobal ( m_luaVM, "resource" );
+	lua_pushresource ( m_luaVM, m_pResource );
+	lua_setglobal ( m_luaVM, "resource" );
 
-    lua_pushelement ( m_luaVM, m_pResource->GetResourceRootElement () );
-    lua_setglobal ( m_luaVM, "resourceRoot" );
+	lua_pushelement ( m_luaVM, m_pResource->GetResourceRootElement () );
+	lua_setglobal ( m_luaVM, "resourceRoot" );
 
     // Load pre-loaded lua code
     LoadScript ( szPreloadedScript );
@@ -197,7 +196,7 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
         if ( GetTime () >= pLuaMain->m_ulFunctionEnterTime + HOOK_MAXIMUM_TIME )
         {
             // Print it in the console
-            CLogger::ErrorPrintf ( "Infinite/too long execution (%s)\n", pLuaMain->GetScriptNamePointer () );
+            CLogger::ErrorPrintf ( "ERROR: Infinite/too long execution (%s)\n", pLuaMain->GetScriptNamePointer () );
 
             // Error out
             lua_pushstring ( luaVM, "Aborting; infinite running script" );
@@ -209,17 +208,18 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
 
 bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
 {
+    const char* szRes = NULL;
     if ( m_luaVM )
     {
         // Load the script
         if ( luaL_loadfile ( m_luaVM, szLUAScript ) )
         {
             // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-            if ( strRes.length () )
+            szRes = lua_tostring(m_luaVM, -1);
+            if ( szRes )
             {
-                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
+                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", szRes );
+                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", szRes );
             }
             else
             {
@@ -233,8 +233,8 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
+                szRes = lua_tostring(m_luaVM, -1);
+                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", szRes );
             }
             return true;
         }
@@ -254,14 +254,14 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Executing in-line script failed: %s", strRes.c_str () );
+                const char* szRes = lua_tostring(m_luaVM, -1);
+                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Executing in-line script failed: %s", szRes );
             }
         }
         else
         {
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-            g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading in-line script failed: %s", strRes.c_str () );
+            const char* szRes = lua_tostring(m_luaVM, -1);
+            g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading in-line script failed: %s", szRes );
         }
     }
     else
@@ -288,13 +288,13 @@ void CLuaMain::UnloadScript ( void )
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers ();
 
-    // Delete all keybinds
+	// Delete all keybinds
     list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
     for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
     {
         if ( (*iter)->IsJoined () )
-            (*iter)->GetKeyBinds ()->RemoveAllKeys ( this );
-    }
+			(*iter)->GetKeyBinds ()->RemoveAllKeys ( this );
+	}
 }
 
 
@@ -400,9 +400,9 @@ void CLuaMain::DestroyDisplay ( CTextDisplay * pDisplay )
 }
 
 
-CTextItem * CLuaMain::CreateTextItem ( const char* szText, float fX, float fY, eTextPriority priority, const SColor color, float fScale, unsigned char format, unsigned char ucShadowAlpha )
+CTextItem * CLuaMain::CreateTextItem ( const char* szText, float fX, float fY, eTextPriority priority, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha, float fScale, unsigned char format )
 {
-    CTextItem * pTextItem = new CTextItem( szText, CVector2D ( fX, fY ), priority, color, fScale, format, ucShadowAlpha );
+    CTextItem * pTextItem = new CTextItem( szText, CVector2D ( fX, fY ), priority, red, green, blue, alpha, fScale, format );
     m_TextItems.push_back ( pTextItem );
     return pTextItem;
 }

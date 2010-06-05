@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Client - Core"
 	ProjectGUID="{4C71249E-EA08-4A3D-9AEF-28707ACC6531}"
 	RootNamespace="Client - Core"
@@ -46,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;COMPILE_FOR_SA;MTA_WINDOWED;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_DEBUG;COMPILE_FOR_SA;MTA_WINDOWED;_CRT_SECURE_NO_WARNINGS;INITGUID"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -154,7 +154,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);_WIN32_WINNT=0x502;WIN32;MTA_RELEASE;COMPILE_FOR_SA;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_RELEASE;COMPILE_FOR_SA;_CRT_SECURE_NO_WARNINGS;INITGUID"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -190,9 +190,9 @@
 				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				ProgramDatabaseFile="C:/Symbols/Release_Core.pdb"
 				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapFileName="C:/Symbols/Release_Core.map"
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -259,7 +259,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);_WIN32_WINNT=0x502;WIN32;MTA_RELEASE;COMPILE_FOR_SA;_CRT_SECURE_NO_WARNINGS;INITGUID"
+				PreprocessorDefinitions="_WIN32_WINNT=0x501;WIN32;MTA_RELEASE;COMPILE_FOR_SA;_CRT_SECURE_NO_WARNINGS;INITGUID"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -295,9 +295,9 @@
 				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				ProgramDatabaseFile="C:/Symbols/Release_Core.pdb"
 				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapFileName="C:/Symbols/Release_Core.map"
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -545,10 +545,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CQuestionBox.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CQuickConnect.cpp"
 				>
 			</File>
@@ -582,10 +578,6 @@
 			</File>
 			<File
 				RelativePath=".\CText.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CVersionUpdater.cpp"
 				>
 			</File>
 			<File
@@ -882,6 +874,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\game_sa\CProjectileSA.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CProxyDirect3D8.h"
 				>
 			</File>
@@ -903,10 +899,6 @@
 			</File>
 			<File
 				RelativePath=".\CProxyDirectInputDevice8.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CQuestionBox.h"
 				>
 			</File>
 			<File
@@ -942,10 +934,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CVersionUpdater.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CVideoModeManager.h"
 				>
 			</File>
@@ -970,18 +958,6 @@
 				</File>
 				<File
 					RelativePath=".\tracking\CHTTPResponse.h"
-					>
-				</File>
-				<File
-					RelativePath=".\tracking\CTCPClientSocket.h"
-					>
-				</File>
-				<File
-					RelativePath=".\tracking\CTCPClientSocketImpl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\tracking\CTCPManager.h"
 					>
 				</File>
 				<File
@@ -1549,14 +1525,6 @@
 				Name="shared"
 				>
 				<File
-					RelativePath="..\..\Shared\sdk\CBox.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Shared\sdk\CChecksum.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\Shared\sdk\CMatrix.h"
 					>
 				</File>
@@ -1581,19 +1549,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\Shared\sdk\CSphere.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\Shared\sdk\CVector.h"
 					>
 				</File>
 				<File
 					RelativePath="..\..\Shared\sdk\CVector2D.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Shared\sdk\RTree.h"
 					>
 				</File>
 				<File

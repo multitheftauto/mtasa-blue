@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Server - Launcher"
 	ProjectGUID="{0EAA9107-413A-47C4-B6E7-41B10208FBA1}"
 	Keyword="Win32Proj"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas\server/MTA Server_d.exe"
+				OutputFile="../output/MTA Server_d.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -143,13 +143,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas\server/MTA Server.exe"
+				OutputFile="../output/MTA Server.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				ProgramDatabaseFile="C:/Symbols/Release_ServerLauncher.pdb"
 				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapFileName="C:/Symbols/Release_ServerLauncher.map"
 				MapExports="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -230,13 +230,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\..\output\MTA San Andreas\server\MTA Server.exe"
+				OutputFile="..\..\output\server\MTA Server.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
-				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				ProgramDatabaseFile="$(OutDir)/launcher.pdb"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

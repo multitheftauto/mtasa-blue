@@ -26,39 +26,32 @@ struct CRegistryResult;
 class CRegistry
 {
 public:
-                                CRegistry               ( const std::string& strFileName );
+                                CRegistry               ( std::string strFileName );
                                 ~CRegistry              ( void );
 
-    void                        Load                    ( const std::string& strFileName );
+    void						Load					( std::string strFileName );
 
-    void                        CreateTable             ( const std::string& strTable, const std::string& strDefinition, bool bSilent = false );
-    void                        DropTable               ( const std::string& strTable );
+    void						CreateTable				( std::string strTable, std::string strDefinition );
+	void						DropTable				( std::string strTable );
 
-    bool                        Delete                  ( const std::string& strTable, const std::string& strWhere );
-    bool                        Insert                  ( const std::string& strTable, const std::string& strValues, const std::string& strColumns );
-    bool                        Select                  ( const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult );
-    bool                        Update                  ( const std::string& strTable, const std::string& strSet, const std::string& strWhere );
+    bool						Delete					( std::string strTable, std::string strWhere );
+	bool						Insert					( std::string strTable, std::string strValues, std::string strColumns );
+	bool						Select					( std::string strColumns, std::string strTable, std::string strWhere, unsigned int uiLimit, CRegistryResult* pResult );
+	bool						Update					( std::string strTable, std::string strSet, std::string strWhere );
 
-    bool                        Query                   ( const std::string& strQuery, CLuaArguments *pArgs, CRegistryResult* pResult );
-    bool                        Query                   ( const char* szQuery, ... );
-    bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, ... );
+	bool						Query					( std::string strQuery, CLuaArguments *pArgs, CRegistryResult* pResult );
 
-    const std::string&          GetLastError            ( void ) { return m_strLastError; }
-
-    void                        BeginTransaction        ( void );
-    void                        EndTransaction          ( bool bEndAllOutstanding = false );
+    std::string&                GetLastError            ( void ) { return m_strLastError; }
 
 protected:
 
-    bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, va_list vl );
     bool                        QueryInternal           ( const char* szQuery, CRegistryResult* pResult );
 
-    sqlite3                     *m_db;
-    bool                        m_bOpened;
-    int                         m_iTransactionCount;
+	sqlite3						*m_db;
+	bool						m_bOpened;
+	bool						m_bMutexLocked;
 
 private:
-    bool                        Query                   ( const char* szQuery, CRegistryResult* pResult );  // Not defined to catch incorrect usage
     std::string                 m_strLastError;
 
 };
@@ -87,7 +80,7 @@ struct CRegistryResultCell
                                 ~CRegistryResultCell ( void )
                                 {
                                     if ( pVal )
-                                        delete [] pVal;
+                                        delete pVal;
                                 }
 
     int                         nType;      // Type identifier, SQLITE_*
@@ -106,9 +99,9 @@ struct CRegistryResult
                                                 nColumns = 0;
                                              }
     vector < string >                        ColNames;
-    vector < vector<CRegistryResultCell> >   Data;
-    int                                      nRows;
-    int                                      nColumns;
+	vector < vector<CRegistryResultCell> >   Data;
+	int							             nRows;
+	int							             nColumns;
 };
 
 #endif

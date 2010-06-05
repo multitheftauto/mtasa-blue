@@ -19,17 +19,16 @@
 class CColTube : public CColShape
 {
 public:
+                            CColTube        ( CColManager* pManager, CElement* pParent, CXMLNode* pNode = NULL );
                             CColTube        ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, float fHeight, CXMLNode* pNode = NULL );
-
-    virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType           GetShapeType    ( void )            { return COLSHAPE_TUBE; }
     bool                    DoHitDetection  ( const CVector& vecLastPosition, const CVector& vecNowPosition, float fRadius );
 
     inline float            GetRadius       ( void )            { return m_fRadius; };
-    inline void             SetRadius       ( float fRadius )   { m_fRadius = fRadius; SizeChanged (); };
+    inline void             SetRadius       ( float fRadius )   { m_fRadius = fRadius; };
     inline float            GetHeight       ( void )            { return m_fHeight; };
-    inline void             SetHeight       ( float fHeight )   { m_fHeight = fHeight; SizeChanged (); };
+    inline void             SetHeight       ( float fHeight )   { m_fHeight = fHeight; };
 
 protected:
     bool                    ReadSpecialData ( void );

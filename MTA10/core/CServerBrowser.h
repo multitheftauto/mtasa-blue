@@ -11,7 +11,6 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Florian Busse <flobu@gmx.net>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -44,7 +43,7 @@ public:
     typedef enum ServerBrowserType
     {
         INTERNET = 0,
-        LAN,
+		LAN,
         FAVOURITES,
         RECENTLY_PLAYED
     };
@@ -65,38 +64,29 @@ public:
 
     static void         CompleteConnect         ( void );
 
-    CServerList*        GetInternetList         ( void ) { return &m_ServersInternet; };
     CServerList*        GetFavouritesList       ( void ) { return &m_ServersFavourites; };
     CServerList*        GetRecentList           ( void ) { return &m_ServersRecent; };
 
-    void                LoadInternetList        ( );
-    void                SaveInternetList        ( );
-    void                SaveRecentlyPlayedList  ( );
-    void                SaveFavouritesList      ( );
+    bool                LoadServerList          ( CXMLNode* pNode, std::string strTagName, CServerList *pList );
+    bool                SaveServerList          ( CXMLNode* pNode, std::string strTagName, CServerList *pList );
 
-    void                LoadOptions             ( CXMLNode* pNode );
-    void                SaveOptions             ( );
-
-    bool                LoadServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList );
-    bool                SaveServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList );
-
-    void                SetServerPassword       ( const std::string& strHost, const std::string& strPassword );
-    std::string         GetServerPassword       ( const std::string& strHost );
+    void                SetServerPassword       ( std::string strHost, std::string strPassword );
+    std::string         GetServerPassword       ( std::string strHost );
     void                ClearServerPasswords    ( void );
 
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
-    bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
+	bool				OnMouseDoubleClick		( CGUIMouseEventArgs Args );
 
     int                 m_iSelectedServer[ SERVER_BROWSER_TYPE_COUNT ];
 
     // Window widgets
     CGUIWindow*         m_pWindow;
-    CGUITabPanel*       m_pTabs;
+	CGUITabPanel*		m_pTabs;
     CGUIButton*         m_pButtonBack;
     CGUILabel*          m_pServerListStatus;
-    CGUIStaticImage*    m_pLockedIcon;
-    CGUIStaticImage*    m_pSerialIcon;
+    CGUIStaticImage*	m_pLockedIcon;
+    CGUIStaticImage*	m_pSerialIcon;
     CGUIButton*         m_pButtonFavouritesByIP;
 
     // Classes
@@ -112,9 +102,6 @@ protected:
     CGUILabel*          m_pServerPlayerListLabel [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIGridList*       m_pServerPlayerList [ SERVER_BROWSER_TYPE_COUNT ];
 
-    CGUIEdit*           m_pEditServerSearch [ SERVER_BROWSER_TYPE_COUNT ];
-    CGUIStaticImage*    m_pServerSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
-
     CGUICheckBox*       m_pIncludeEmpty [ SERVER_BROWSER_TYPE_COUNT ];
     CGUICheckBox*       m_pIncludeFull [ SERVER_BROWSER_TYPE_COUNT ];
     CGUICheckBox*       m_pIncludeLocked [ SERVER_BROWSER_TYPE_COUNT ];
@@ -127,12 +114,12 @@ protected:
     CGUILabel*          m_pLabelPassword [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIEdit*           m_pEditPassword [ SERVER_BROWSER_TYPE_COUNT ];
 
-    CGUIEdit*           m_pEditPlayerSearch [ SERVER_BROWSER_TYPE_COUNT ];
-    CGUIStaticImage*    m_pPlayerSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIEdit*           m_pEditSearch [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIStaticImage*    m_pSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
 
     // Server list columns
-    CGUIHandle          m_hSerial [ SERVER_BROWSER_TYPE_COUNT ];
-    CGUIHandle          m_hLocked [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIHandle			m_hSerial [ SERVER_BROWSER_TYPE_COUNT ];
+	CGUIHandle			m_hLocked [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hName [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hPing [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hPlayers [ SERVER_BROWSER_TYPE_COUNT ];
@@ -158,7 +145,6 @@ private:
     bool                    OnFavouritesClick               ( CGUIElement* pElement );
     bool                    OnBackClick                     ( CGUIElement* pElement );
     bool                    OnFilterChanged                 ( CGUIElement* pElement );
-    bool                    OnTabChanged                    ( CGUIElement* pElement );
     bool                    OnFavouritesByIPClick           ( CGUIElement* pElement );
     bool                    OnFavouritesByIPAddClick        ( CGUIElement* pElement );
     bool                    OnWindowSize                    ( CGUIElement* pElement );
@@ -171,9 +157,6 @@ private:
     CServerList             m_ServersRecent;
 
     unsigned long           m_ulLastUpdateTime;
-    bool                    m_firstTimeBrowseServer;
-    bool                    m_bOptionsLoaded;
-    ServerBrowserType       m_PrevServerBrowserType;
 };
 
 #endif

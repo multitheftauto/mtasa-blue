@@ -60,7 +60,6 @@ public:
     void                        SetFocusToLocalPlayer       ( void );
 
     bool                        SetCameraMode               ( eCamMode eMode );               
-    void                        SetCameraClip               ( bool bObjects, bool bVehicles );
 
     inline bool                 IsInFixedMode               ( void )                        { return m_bFixed; }
 

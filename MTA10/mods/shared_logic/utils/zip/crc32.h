@@ -6,14 +6,21 @@
 #ifndef _CRC_32_H
 #define _CRC_32_H
 
-class CRCGenerator
-{
+class CRCGenerator {
+    
+protected:
+    static class CRCGenerator *        instance;
+                                CRCGenerator();
+private:
+    unsigned long               crc32_table[256];
+    unsigned long               Reflect ( unsigned long ref, unsigned char ch );
 public:
-    static unsigned long    GetCRCFromBuffer    ( const char* pBuf, size_t sizeBuffer );
-    static unsigned long    GetCRCFromBuffer    ( const char* pBuf, size_t sizeBuffer, unsigned long ulOldCRC );
+    static CRCGenerator *       GetInstance() { if ( !instance ) instance = new CRCGenerator(); return instance; }
+    void                        Init(void);
+    unsigned long               GetCRC ( unsigned long * buf, unsigned long buflen);
+    unsigned long               GetCRC ( char * szFilename );
+    unsigned long               GetCRC ( char * szFilename, unsigned long ucOldCRC );
 
-    static unsigned long    GetCRCFromFile      ( const char* szFilename );
-    static unsigned long    GetCRCFromFile      ( const char* szFilename, unsigned long ucOldCRC );
 };
 
 #endif 

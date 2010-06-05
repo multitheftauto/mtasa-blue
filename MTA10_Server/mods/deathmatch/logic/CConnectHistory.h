@@ -13,33 +13,30 @@
 #ifndef __CCONNECTHISTORY_H
 #define __CCONNECTHISTORY_H
 
-typedef std::map < std::string, struct CConnectHistoryItem > HistoryItemMap;
-typedef std::vector < long long > JoinTimesMap;
+#include <list>
 
 struct CConnectHistoryItem
 {
-    CConnectHistoryItem ( void ) : llBanEndTime ( 0 ) {} 
-    long long llBanEndTime;
-    JoinTimesMap joinTimes;
+    unsigned long   ulIP;
+    unsigned long   ulTime;
+    unsigned char   ucCounter;
 };
 
 class CConnectHistory
 {
 public:
-                                        CConnectHistory         ( unsigned long ulMaxConnections, unsigned long ulSamplePeriod, unsigned long ulBanLength );
+                                        CConnectHistory         ( void );
+                                        ~CConnectHistory        ( void );
 
-                                                                // Note strIP, can be any string that uniquely identifies the connection
-    bool                                AddConnect              ( const std::string& strIP );
-    bool                                IsFlooding              ( const std::string& strIP );
-    CConnectHistoryItem&                GetHistoryItem          ( const std::string& strIP );
+    bool                                IsFlooding              ( unsigned long ulIP );
+
+    CConnectHistoryItem*                Find                    ( unsigned long ulIP );
+    void                                Reset                   ( void );
 
 private:
     void                                RemoveExpired           ( void );
 
-    unsigned long                       m_ulSamplePeriod;
-    unsigned long                       m_ulMaxConnections;
-    unsigned long                       m_ulBanLength;
-    HistoryItemMap                      m_HistoryItemMap;
+    std::list < CConnectHistoryItem* >  m_List;
 };
 
 #endif

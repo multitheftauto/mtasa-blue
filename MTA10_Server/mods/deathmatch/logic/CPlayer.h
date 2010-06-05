@@ -71,10 +71,6 @@ public:
     inline void                                 SetGameVersion              ( int iGameVersion )                    { m_iGameVersion = iGameVersion; };
     inline unsigned short                       GetMTAVersion               ( void )                                { return m_usMTAVersion; };
     inline void                                 SetMTAVersion               ( unsigned short usMTAVersion )         { m_usMTAVersion = usMTAVersion; };
-    inline unsigned short                       GetBitStreamVersion         ( void )                                { return m_usBitStreamVersion; };
-    inline void                                 SetBitStreamVersion         ( unsigned short usBitStreamVersion )   { m_usBitStreamVersion = usBitStreamVersion; };
-    void                                        SetPlayerVersion            ( const SString& strPlayerVersion )     { m_strPlayerVersion = strPlayerVersion; };
-    const SString&                              GetPlayerVersion            ( void )                                { return m_strPlayerVersion; };
 
     inline bool                                 IsMuted                     ( void )                                { return m_bIsMuted; };
     inline void                                 SetMuted                    ( bool bSetMuted )                      { m_bIsMuted = bSetMuted; };
@@ -99,8 +95,8 @@ public:
     inline void                                 SetAimDirection             ( float fDirection )            { m_fAimDirection = fDirection; };
     inline unsigned char                        GetDriveByDirection         ( void )                        { return m_ucDriveByDirection; };
     inline void                                 SetDriveByDirection         ( unsigned char ucDirection )   { m_ucDriveByDirection = ucDirection; };
-    inline bool                                 IsAkimboArmUp               ( void )                        { return m_bAkimboArmUp; };
-    inline void                                 SetAkimboArmUp              ( bool bUp )                    { m_bAkimboArmUp = bUp; };
+	inline bool									IsAkimboArmUp				( void )						{ return m_bAkimboArmUp; };
+	inline void									SetAkimboArmUp				( bool bUp )					{ m_bAkimboArmUp = bUp; };
 
     inline NetServerPlayerID&                   GetSocket                   ( void )                        { return m_PlayerSocket; };
     char*                                       GetSourceIP                 ( char* pBuffer );
@@ -139,11 +135,16 @@ public:
     inline unsigned int                         GetScriptDebugLevel         ( void )                        { return m_uiScriptDebugLevel; };
     bool                                        SetScriptDebugLevel         ( unsigned int uiLevel );
 
-    void                                        SetDamageInfo               ( ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart );
-    void                                        ValidateDamageInfo          ( void );
-    ElementID                                   GetPlayerAttacker           ( void );
-    unsigned char                               GetAttackWeapon             ( void );
-    unsigned char                               GetAttackBodyPart           ( void );
+    inline unsigned long                        GetCamFadeColor             ( void )                        { return m_ulCamFadeColor; };
+    void                                        SetCamFadeColor             ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
+
+    inline bool                                 IsCamFadedIn                ( void )                        { return m_bCamFadedIn; };
+    inline void                                 SetCamFadedIn               ( bool bCamFadedIn )            { m_bCamFadedIn = bCamFadedIn; };
+
+    inline void                                 SetDamageInfo               ( CElement* pElement, unsigned char ucWeapon, unsigned char ucBodyPart )     { m_pPlayerAttacker = pElement, m_ucAttackWeapon = ucWeapon, m_ucAttackBodyPart = ucBodyPart; }
+    inline CElement*                            GetPlayerAttacker           ( void )                        { return m_pPlayerAttacker; }
+    inline unsigned char                        GetAttackWeapon             ( void )                        { return m_ucAttackWeapon; }
+    inline unsigned char                        GetAttackBodyPart           ( void )                        { return m_ucAttackBodyPart; }
 
     inline CTeam*                               GetTeam                     ( void )                        { return m_pTeam; }
     void                                        SetTeam                     ( CTeam* pTeam, bool bChangeTeam = false );
@@ -187,8 +188,8 @@ public:
     inline const std::string&                   GetSerialUser               ( void )                        { return m_strSerialUser; };
     inline void                                 SetSerialUser               ( const std::string& strUser )  { m_strSerialUser = strUser; };
 
-    inline const std::string&                   GetCommunityID              ( void )                        { return m_strCommunityID; };
-    inline void                                 SetCommunityID              ( const std::string& strID )    { m_strCommunityID = strID; };
+	inline const std::string&                   GetCommunityID              ( void )                        { return m_strCommunityID; };
+    inline void                                 SetCommunityID              ( const std::string& strID )	{ m_strCommunityID = strID; };
 
     inline unsigned char                        GetBlurLevel                ( void )                        { return m_ucBlurLevel; }
     inline void                                 SetBlurLevel                ( unsigned char ucBlurLevel )   { m_ucBlurLevel = ucBlurLevel; }
@@ -203,12 +204,6 @@ public:
     inline void                                 IncrementPuresync           ( void )                        { m_uiPuresyncPackets++; }
     inline unsigned int                         GetPuresyncCount            ( void ) const                  { return m_uiPuresyncPackets; }
 
-    void                                        NotifyReceivedSync        ( void )                        { m_ulLastReceivedSyncTime = GetTickCount (); }
-    unsigned long                               GetTicksSinceLastReceivedSync ( void ) const              { return GetTickCount () - m_ulLastReceivedSyncTime; }
-
-    const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
-    void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );
-
 private:
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
@@ -222,8 +217,6 @@ private:
     bool                                        m_bDoNotSendEntities;
     int                                         m_iGameVersion;
     unsigned short                              m_usMTAVersion;
-    unsigned short                              m_usBitStreamVersion;
-    SString                                     m_strPlayerVersion;
     bool                                        m_bIsMuted;
     int                                         m_iStatus;
     
@@ -236,7 +229,7 @@ private:
     float                                       m_fAimDirection;
     unsigned char                               m_ucDriveByDirection;   
     
-    bool                                        m_bAkimboArmUp;
+	bool										m_bAkimboArmUp;
 
     unsigned long                               m_ulTimeConnected;
 
@@ -249,12 +242,14 @@ private:
     std::list < CVehicle* >                     m_SyncingVehicles;
     std::list < CPed* >                         m_SyncingPeds;
 
-    unsigned int                                m_uiScriptDebugLevel;   
+    unsigned int                                m_uiScriptDebugLevel;	
 
-    ElementID                                   m_PlayerAttackerID;
+    unsigned long                               m_ulCamFadeColor;
+    bool                                        m_bCamFadedIn;
+
+    CElement*                                   m_pPlayerAttacker;
     unsigned char                               m_ucAttackWeapon;
     unsigned char                               m_ucAttackBodyPart;
-    long long                                   m_llSetDamageInfoTime;
 
     CTeam*                                      m_pTeam;
     CPad*                                       m_pPad;
@@ -280,7 +275,7 @@ private:
 
     std::string                                 m_strSerial;
     std::string                                 m_strSerialUser;
-    std::string                                 m_strCommunityID;
+	std::string									m_strCommunityID;
 
     unsigned char                               m_ucBlurLevel;
 
@@ -289,10 +284,6 @@ private:
     // Sync stuff
     bool                                        m_bSyncingVelocity;
     unsigned int                                m_uiPuresyncPackets;
-
-    unsigned long                               m_ulLastReceivedSyncTime;
-
-    std::map < std::string, std::string >       m_AnnounceValues;
 };
 
 #endif

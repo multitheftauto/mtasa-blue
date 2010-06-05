@@ -217,10 +217,10 @@ bool CNetAPI::GetInterpolation ( CVector& vecPosition, unsigned short usLatency 
 
 bool CNetAPI::IsWeaponIDAkimbo ( unsigned char ucWeaponID )
 {
-    return ( ucWeaponID == 22 ||
-             ucWeaponID == 26 ||
-             ucWeaponID == 28 ||
-             ucWeaponID == 32 );
+	return ( ucWeaponID == 22 ||
+		     ucWeaponID == 26 ||
+			 ucWeaponID == 28 ||
+			 ucWeaponID == 32 );
 }
 
 
@@ -244,8 +244,8 @@ void CNetAPI::DoPulse ( void )
             // Grab the player vehicle
             CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
-            // Record local data in the packet recorder
-            m_pManager->GetPacketRecorder ()->RecordLocalData ( pPlayer );
+			// Record local data in the packet recorder
+			m_pManager->GetPacketRecorder ()->RecordLocalData ( pPlayer );
 
             // We should do a puresync?
             if ( IsPureSyncNeeded () && !g_pClientGame->IsDownloadingBigPacket () )
@@ -542,11 +542,11 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
                 }
             }
 
-            // Make sure that if he doesn't have an akimbo weapon his hands up state is false
-            if ( !IsWeaponIDAkimbo ( ucCurrentWeaponType ) )
-            {
+			// Make sure that if he doesn't have an akimbo weapon his hands up state is false
+			if ( !IsWeaponIDAkimbo ( ucCurrentWeaponType ) )
+			{
                 flags.data.bAkimboTargetUp = false;
-            }
+			}
 
             // Read the weapon aim data
             SWeaponAimSync aim ( fWeaponRange );
@@ -830,11 +830,11 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
                 pPlayer->AddChangeWeapon ( TICK_RATE, WEAPONSLOT_TYPE_UNARMED, 0 );
             }
 
-            // Make sure that if he doesn't have an akimbo weapon his hands up state is false
-            if ( !IsWeaponIDAkimbo ( ucCurrentWeapon ) )
-            {
+    		// Make sure that if he doesn't have an akimbo weapon his hands up state is false
+	    	if ( !IsWeaponIDAkimbo ( ucCurrentWeapon ) )
+		    {
                 flags.data.bAkimboTargetUp = false;
-            }
+		    }
 
             // Read out the aim directions
             SWeaponAimSync aim ( fWeaponRange, ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle ) );
@@ -877,8 +877,8 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
          pPlayer->GetVehicleInOutState () == VEHICLE_INOUT_GETTING_IN ||
          pPlayer->GetVehicleInOutState () == VEHICLE_INOUT_JACKING )
     {
-        pPlayer->SetTargetPosition ( position.data.vecPosition, TICK_RATE, pContactEntity );
-        pPlayer->SetCurrentRotation ( rotation.data.fRotation );
+        pPlayer->SetTargetPosition ( position.data.vecPosition, pContactEntity );
+        pPlayer->SetTargetRotation ( rotation.data.fRotation );
     }
 
     // Set move speed, controller state and camera rotation + duck state
@@ -981,12 +981,6 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
 
     if ( flags.data.bHasAWeapon )
     {
-        if ( BitStream.Version () >= 0x0d )
-        {
-            unsigned char ucWeaponType = pPlayerWeapon->GetType ();
-            BitStream.Write ( ucWeaponType );
-        }
-
         // Write the weapon slot
         unsigned int uiSlot = pPlayerWeapon->GetSlot ();
         SWeaponSlotSync slot;
@@ -1113,8 +1107,8 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         pVehicle->SetHealth ( health.data.fValue );
 
         // Set the target position and rotation
-        pVehicle->SetTargetPosition ( position.data.vecPosition, TICK_RATE );
-        pVehicle->SetTargetRotation ( rotation.data.vecRotation, TICK_RATE );
+        pVehicle->SetTargetPosition ( position.data.vecPosition );
+        pVehicle->SetTargetRotation ( rotation.data.vecRotation );
 
         // Apply the correct move and turnspeed
         pVehicle->SetMoveSpeed ( velocity.data.vecVelocity );

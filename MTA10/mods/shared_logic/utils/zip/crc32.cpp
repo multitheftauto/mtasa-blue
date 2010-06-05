@@ -8,53 +8,74 @@
 #include "crc32.h"
 #include "zlib.h"
 
-
-unsigned long CRCGenerator::GetCRCFromBuffer ( const char* pBuf, size_t sizeBuffer )
-{
-    return crc32 ( 0, (Bytef*) pBuf, sizeBuffer );
+CRCGenerator* CRCGenerator::instance = 0;
+CRCGenerator::CRCGenerator() {
+	Init();
 }
 
+void CRCGenerator::Init ( void ) {
+    unsigned long POLYNOMIAL = 0x04c11db7;
+    int i;
 
-unsigned long CRCGenerator::GetCRCFromBuffer ( const char* pBuf, size_t sizeBuffer, unsigned long ulOldCRC )
-{
-    return crc32 ( ulOldCRC, (Bytef*) pBuf, sizeBuffer );
+    for(i = 0; i<0xFF; i++) {
+        int j;
+        crc32_table[i]=Reflect(i,8) << 24;
+
+        for(j=0; j<8; j++)
+            crc32_table[i] = (crc32_table[i]<<1)^(crc32_table[i] & (1<<31) ? POLYNOMIAL : 0);
+
+        crc32_table[i] = Reflect(crc32_table[i], 32);
+    }
 }
 
+unsigned long CRCGenerator::Reflect ( unsigned long ref, unsigned char ch ) {
+    unsigned long value(0);
+    int i;
 
-unsigned long CRCGenerator::GetCRCFromFile ( const char* szFilename )
-{
-    // Generate the CRC without the last CRC
-    return GetCRCFromFile ( szFilename, 0 );
-}
-
-
-unsigned long CRCGenerator::GetCRCFromFile ( const char* szFilename, unsigned long ucOldCRC )
-{
-    // Open the file
-    FILE* pFile = fopen ( szFilename, "rb" );
-    if ( pFile )
-    {
-        // Start at the old CRC
-        unsigned long ulCRC = ucOldCRC;
-
-        // While we're not at the end
-        char pBuffer [4096];
-        do
-        {
-            // Try to read 4096 bytes. It returns number of bytes actually read.
-            // Then CRC that using the CRC from last loop as beginning. This should
-            // be faster/more compatible than allocating a huge buffer for the entire
-            // file.
-            size_t sizeRead = fread ( pBuffer, 1, 4096, pFile );
-            ulCRC = crc32 ( ulCRC, (Bytef*) pBuffer, sizeRead );
-        }
-        while ( !feof ( pFile ) );
-
-        // Close it and return the CRC
-        fclose ( pFile );
-        return ulCRC;
+    for(i=1; i<(ch+1); i++) {
+        if(ref & 1)
+            value |= 1 << (ch-i);
+        ref >>= 1;
     }
 
-    // Not exist
-    return 0;
+    return value;
+}
+
+unsigned long CRCGenerator::GetCRC ( unsigned long * buf, unsigned long buflen ) {
+    unsigned long ulCRC = 0xFFFFFFFF;
+    unsigned long len = buflen;
+    unsigned char * buffer = (unsigned char *)buf;
+
+    while(len--)
+        ulCRC=(ulCRC>>8)^crc32_table[(ulCRC & 0xFF)^*buffer++];
+
+    return ulCRC ^ 0xFFFFFFFF;
+}
+
+unsigned long CRCGenerator::GetCRC ( char * szFilename )
+{
+    return GetCRC ( szFilename, 0 );
+}
+
+unsigned long CRCGenerator::GetCRC ( char * szFilename, unsigned long ucOldCRC )
+{
+    FILE * file = fopen ( szFilename, "rb" );
+    if ( file )
+    {
+        fseek ( file, 0, SEEK_END );
+        unsigned long ulLength = ftell ( file );
+
+        rewind ( file );
+
+        char * buffer = new char [ ulLength + 1 ];
+        memset(buffer, 0, ulLength + 1);
+        fread ( buffer, 1, ulLength, file );
+     
+        fclose ( file );
+        // I assume the zlib version is faster, uncomment the second part if not
+        unsigned long ulCRC = crc32 ( ucOldCRC, (Bytef *)buffer, ulLength);// GetCRC ( (unsigned long *)buffer, strlen(buffer) + 1 );
+        delete[] buffer;
+        return ulCRC;
+    }
+    return NULL;
 }

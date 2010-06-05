@@ -29,7 +29,7 @@ CLogger::~CLogger ( )
     File.close ( );
 }
 
-void CLogger::WriteDebugEventInt ( const string& EventDescription ) 
+void CLogger::WriteDebugEventInt ( string EventDescription ) 
 {
     SYSTEMTIME      SystemTime;
     stringstream    s ( stringstream::in | stringstream::out );
@@ -63,7 +63,7 @@ void CLogger::WriteDebugEventInt ( const string& EventDescription )
     File.flush ( );
 }
 
-void CLogger::WriteEvent ( const string& EventDescription )
+void CLogger::WriteEvent ( string EventDescription )
 {
     SYSTEMTIME SystemTime;
 
@@ -86,7 +86,7 @@ void CLogger::WriteEvent ( const string& EventDescription )
                        << EventDescription     << endl;
 }
 
-void CLogger::OutputDebugMessage ( const string& DebugMessage )
+void CLogger::OutputDebugMessage ( string DebugMessage )
 {
     #ifdef MTA_DEBUG
         WriteEvent ( DebugMessage );
@@ -94,7 +94,7 @@ void CLogger::OutputDebugMessage ( const string& DebugMessage )
     #endif
 }
 
-void CLogger::WriteErrorEventInt ( const string& ErrorMessage )
+void CLogger::WriteErrorEventInt ( string ErrorMessage )
 {
     // Show user an error message box.
     MessageBox ( 0, ErrorMessage.c_str ( ), "[ERROR EVENT]", MB_ICONEXCLAMATION );

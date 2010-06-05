@@ -32,20 +32,20 @@ class CTextItem
     friend class CPlayerTextManager;
 
 public:
-                            CTextItem               ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority = PRIORITY_LOW, const SColor color = -1, float fScale = 1.0f, unsigned char ucFormat = 0, unsigned char ucShadowAlpha = 0 );
+                            CTextItem               ( const char* szText, const CVector2D& vecPosition, eTextPriority Priority = PRIORITY_LOW, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255, unsigned char ucAlpha = 255, float fScale = 1.0f, unsigned char ucFormat = 0 );
                             CTextItem               ( const CTextItem& TextItem );
                             ~CTextItem              ( void );
 
     bool                    operator=               ( const CTextItem& TextItem );
 
     void                    SetText                 ( const char* szText );
-    const SString&          GetText                 ( void )                            { return m_strText; };
+    char*                   GetText                 ( char* pBuffer, size_t bufferSize );
 
     inline const CVector2D& GetPosition             ( void )                            { return m_vecPosition; };
     void                    SetPosition             ( const CVector2D& vecPosition );
 
-    void                    SetColor                ( const SColor color );
-    SColor                  GetColor                ( void ) const                      { return m_Color; }
+    void                    SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    void                    GetColor                ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha );
 
     inline float            GetScale                ( void )                            { return m_fScale; };
     void                    SetScale                ( float fScale );
@@ -60,12 +60,14 @@ public:
     inline bool             IsBeingDeleted          ( void )                            { return m_bDeletable; };
 
 private:
-    SString                     m_strText;
+    char *                      m_szText;
     CVector2D                   m_vecPosition;
-    SColor                      m_Color;
+    unsigned char               m_ucRed;
+    unsigned char               m_ucGreen;
+    unsigned char               m_ucBlue;
+    unsigned char               m_ucAlpha;
     float                       m_fScale;
     unsigned char               m_ucFormat;
-    unsigned char               m_ucShadowAlpha;
     unsigned long               m_ulUniqueId;
     eTextPriority               m_Priority;
     bool                        m_bDeletable;

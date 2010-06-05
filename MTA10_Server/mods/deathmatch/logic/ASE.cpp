@@ -33,16 +33,6 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     m_pMainConfig = pMainConfig;
     m_pPlayerManager = pPlayerManager;
 
-    m_uiFullLastPlayerCount = 0;
-    m_llFullLastTime = 0;
-    m_lFullMinInterval = 10 * 1000;     // Update full query cache after 10 seconds
-
-    m_uiLightLastPlayerCount = 0;
-    m_llLightLastTime = 0;
-    m_lLightMinInterval = 10 * 1000;     // Update light query cache after 10 seconds
-
-    m_ulMasterServerQueryCount = 0;
-
     m_strGameType = "MTA:SA";
     m_strMapName = "None";
     if ( szServerIP )
@@ -54,11 +44,8 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     // Set the sock addr
     m_SockAddr.sin_family = AF_INET;         
     m_SockAddr.sin_port = htons ( m_usPort );
-    // If a local IP has been specified, ensure it is used for sending
-    if ( m_strIP.length () )
-        m_SockAddr.sin_addr.s_addr = inet_addr( m_strIP.c_str () );
-    else
-        m_SockAddr.sin_addr.s_addr = INADDR_ANY;
+    // If we are in lan broadcasting mode, only let local ips query us
+    m_SockAddr.sin_addr.s_addr = INADDR_ANY;
 
     // Initialize socket
     m_Socket = socket ( AF_INET, SOCK_DGRAM, 0 );
@@ -66,15 +53,14 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     // If we are in lan only mode, reuse addr to avoid possible conflicts
     if ( m_bLan )
     {
-        const int Flags = 1;
-        setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&Flags, sizeof ( Flags ) );
+        setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, "1", sizeof ( "1" ) );
     }
 
     // Bind the socket
     if ( bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) != 0 )
     {
         sockclose ( m_Socket );
-        m_Socket = 0;
+        m_Socket = NULL;
         return;
     }
 
@@ -83,7 +69,7 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     unsigned long ulNonBlock = 1;
     ioctlsocket ( m_Socket, FIONBIO, &ulNonBlock );
     #else
-    fcntl ( m_Socket, F_SETFL, fcntl( m_Socket, F_GETFL ) | O_NONBLOCK ); 
+    fcntl(m_Socket, F_SETFL, O_NONBLOCK); 
     #endif
 }
 
@@ -99,7 +85,7 @@ void ASE::DoPulse ( void )
 {
     sockaddr_in SockAddr;
 #ifndef WIN32
-    socklen_t nLen = sizeof ( sockaddr );
+	socklen_t nLen = sizeof ( sockaddr );
 #else
     int nLen = sizeof ( sockaddr );
 #endif
@@ -117,18 +103,17 @@ void ASE::DoPulse ( void )
         {
             case 's':
             { // ASE protocol query
-                m_ulMasterServerQueryCount++;
-                strReply = QueryFullCached ();
+                strReply = QueryFull ();
                 break;
             }
             case 'b':
             { // Our own lighter query for ingame browser
-                strReply = QueryLightCached ();
+                strReply = QueryLight ();
                 break;
             }
             case 'r':
             { // Our own lighter query for ingame browser - Release version only
-                strReply = QueryLightCached ();
+                strReply = QueryLight ();
                 break;
             }
             case 'v':
@@ -146,27 +131,11 @@ void ASE::DoPulse ( void )
             /*int sent =*/ sendto ( m_Socket,
                                 strReply.c_str(),
                                 strReply.length(),
-                                0,
-                                (sockaddr*)&SockAddr,
-                                nLen );
+						        0,
+						        (sockaddr*)&SockAddr,
+						        nLen );
         }
     }
-}
-
-
-// Protect against a flood of server queries.
-// Send cached version unless player count has changed, or last re-cache is older than m_lFullMinInterval
-const std::string& ASE::QueryFullCached ( void )
-{
-    long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->CountJoined ();
-    if ( uiPlayerCount != m_uiFullLastPlayerCount || llTime - m_llFullLastTime > m_lFullMinInterval || m_strFullCached == "" )
-    {
-        m_strFullCached = QueryFull ();
-        m_llFullLastTime = llTime;
-        m_uiFullLastPlayerCount = uiPlayerCount;
-    }
-    return m_strFullCached;
 }
 
 
@@ -243,45 +212,25 @@ std::string ASE::QueryFull ( void )
         {
             reply << ucFlags;
             // nick
-            std::string strPlayerName = RemoveColorCode ( pPlayer->GetNick () );
-            if ( strPlayerName.length () == 0 )
-                strPlayerName = pPlayer->GetNick ();
-            reply << ( unsigned char ) ( strPlayerName.length () + 1 );
-            reply << strPlayerName.c_str ();
+            _snprintf ( szTemp, 255, "%s", pPlayer->GetNick () );
+            reply << ( unsigned char ) ( strlen ( szTemp ) + 1 );
+            reply << szTemp;
             // team (skip)
             reply << ( unsigned char ) 1;
             // skin (skip)
             reply << ( unsigned char ) 1;
-            // score
-            const std::string& strScore = pPlayer->GetAnnounceValue ( "score" );
-            reply << ( unsigned char ) ( strScore.length () + 1 );
-            reply << strScore.c_str ();
+            // score (skip)
+            reply << ( unsigned char ) 1;
             // ping
             _snprintf ( szTemp, 255, "%u", pPlayer->GetPing () );
             reply << ( unsigned char ) ( strlen ( szTemp ) + 1 );
             reply << szTemp;
             // time (skip)
             reply << ( unsigned char ) 1;
-        }
+	    }
     }
 
     return reply.str();
-}
-
-
-// Protect against a flood of server queries.
-// Send cached version unless player count has changed, or last re-cache is older than m_lLightMinInterval
-const std::string& ASE::QueryLightCached ( void )
-{
-    long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->CountJoined ();
-    if ( uiPlayerCount != m_uiLightLastPlayerCount || llTime - m_llLightLastTime > m_lLightMinInterval || m_strLightCached == "" )
-    {
-        m_strLightCached = QueryLight ();
-        m_llLightLastTime = llTime;
-        m_uiLightLastPlayerCount = uiPlayerCount;
-    }
-    return m_strLightCached;
 }
 
 
@@ -319,6 +268,7 @@ std::string ASE::QueryLight ( void )
     reply << ( unsigned char ) m_pMainConfig->GetMaxPlayers ();
 
     // players
+    char szTemp[256] = { '\0' };
     CPlayer* pPlayer = NULL;
 
     list < CPlayer* > ::const_iterator pIter = m_pPlayerManager->IterBegin ();
@@ -328,12 +278,10 @@ std::string ASE::QueryLight ( void )
         if ( pPlayer->IsJoined () )
         {
             // nick
-            std::string strPlayerName = RemoveColorCode ( pPlayer->GetNick () );
-            if ( strPlayerName.length () == 0 )
-                strPlayerName = pPlayer->GetNick ();
-            reply << ( unsigned char ) ( strPlayerName.length () + 1 );
-            reply << strPlayerName.c_str ();
-        }
+            _snprintf ( szTemp, 255, "%s", pPlayer->GetNick () );
+            reply << ( unsigned char ) ( strlen ( szTemp ) + 1 );
+            reply << szTemp;
+	    }
     }
 
     return reply.str();
@@ -388,11 +336,11 @@ void ASE::SetRuleValue ( const char* szKey, const char* szValue )
                 }
                 else
                 {
-                    // Remove from the list
+					// Remove from the list
                     delete pRule;
                     m_Rules.erase ( iter );
                 }
-                // And return
+				// And return
                 return;
             }
         }

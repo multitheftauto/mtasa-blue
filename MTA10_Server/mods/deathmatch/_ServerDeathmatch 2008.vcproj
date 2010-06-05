@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Server - Deathmatch"
 	ProjectGUID="{DC99F9D4-7C17-4A36-9F21-CEE075E42292}"
 	RootNamespace="Server - Deathmatch"
@@ -55,7 +55,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;../../../vendor/sqlite;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -83,14 +83,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
-				OutputFile="C:\Program Files\MTA San Andreas\server/mods/deathmatch/deathmatch.dll"
+				OutputFile="../../output/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;../../../vendor/json-c/lib;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				ProgramDatabaseFile="C:\Symbols\Release_ServerDM.pdb"
 				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapFileName="C:\Symbols\Release_ServerDM.map"
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -157,7 +157,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;../../../vendor/sqlite;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
@@ -186,7 +186,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib"
-				OutputFile="C:\Program Files\MTA San Andreas\server/mods/deathmatch/deathmatch_d.dll"
+				OutputFile="../../output/mods/deathmatch/deathmatch_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;../../../vendor/json-c/lib;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
@@ -260,7 +260,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;../../../vendor/sqlite;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
-				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -288,14 +288,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
-				OutputFile="../../../output/MTA San Andreas/server/mods/deathmatch/deathmatch.dll"
+				OutputFile="../../../output/server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;../../../vendor/json-c/lib;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:/Symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				ProgramDatabaseFile="C:/Symbols/Release_ServerDeathmatch.pdb"
 				GenerateMapFile="true"
-				MapFileName="C:/Symbols/$(ConfigurationName)_$(SafeParentName).map"
+				MapFileName="C:/Symbols/Release_ServerDeathmatch.map"
 				MapExports="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -741,10 +741,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CSpatialDatabase.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CStaticFunctionDefinitions.cpp"
 					>
 				</File>
@@ -997,10 +993,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CUnoccupiedVehicleSyncPacket.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CUpdateInfoPacket.cpp"
 						>
 					</File>
 					<File
@@ -1746,15 +1738,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CSpatialDatabase.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CSpawnpoint.h"
 					>
 				</File>
 				<File
 					RelativePath=".\logic\CSpawnpoints.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CStack.h"
 					>
 				</File>
 				<File
@@ -2030,10 +2022,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CUnoccupiedVehicleSyncPacket.h"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CUpdateInfoPacket.h"
 						>
 					</File>
 					<File

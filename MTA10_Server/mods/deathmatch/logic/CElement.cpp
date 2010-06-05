@@ -36,7 +36,6 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_usDimension = 0;
     m_ucSyncTimeContext = 1;
     m_ucInterior = 0;
-    m_bDoubleSided = false;
     m_bMapCreated = false;
 
     // Store the line
@@ -56,8 +55,7 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     }
 
     m_uiTypeHash = HashString ( m_strTypeName.c_str () );
-    if ( m_pParent )
-        CElement::AddEntityFromRoot ( m_uiTypeHash, this );
+    CElement::AddEntityFromRoot ( m_uiTypeHash, this );
 
     // Make an event manager for us
     m_pEventManager = new CMapEventManager;
@@ -72,7 +70,6 @@ CElement::~CElement ( void )
 {
     // Get rid of the children elements
     ClearChildren ();
-    SetParentObject ( NULL );
 
     // Remove ourselves from our element group
     if ( m_pElementGroup )
@@ -118,34 +115,19 @@ CElement::~CElement ( void )
             pPed->m_pContactElement = NULL;
     }
 
-    // Remove from spatial database
-    GetSpatialDatabase ()->RemoveEntity ( this );
-
     // Deallocate our unique ID
     CElementIDs::PushUniqueID ( this );
 
-    // Remove our reference from the element deleter
-    g_pGame->GetElementDeleter ()->Unreference ( this );
-
-    // Ensure nothing has inadvertently set a parent
-    assert ( m_pParent == NULL );
+    CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
 }
 
 
-const CVector & CElement::GetPosition ( void )
-{
-    if ( m_pAttachedTo ) GetAttachedPosition ( m_vecPosition );
-    return m_vecPosition;
-}
-
-
-void CElement::SetTypeName ( const std::string& strTypeName )
+void CElement::SetTypeName ( std::string strTypeName )
 {
     CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
     m_uiTypeHash = HashString ( strTypeName.c_str () );
     m_strTypeName = strTypeName;
-    if ( m_pParent )
-        CElement::AddEntityFromRoot ( m_uiTypeHash, this );
+    CElement::AddEntityFromRoot ( m_uiTypeHash, this );
 }
 
 
@@ -235,8 +217,8 @@ void CElement::GetChildren ( lua_State* pLua )
 
 bool CElement::IsMyChild ( CElement* pElement, bool bRecursive )
 {
-    // Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
-    if ( pElement == NULL ) return false;
+	// Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
+	if ( pElement == NULL ) return false;
 
     // Is he us?
     if ( pElement == this )
@@ -264,17 +246,34 @@ bool CElement::IsMyChild ( CElement* pElement, bool bRecursive )
 
 void CElement::ClearChildren ( void )
 {
-    // Sanity check
-    assert ( m_pParent != this );
+    // Got a parent?
+    if ( m_pParent )
+    {
+        // Remove us from parent's list
+        if ( !m_pParent->m_Children.empty() ) m_pParent->m_Children.remove ( this );
 
-    // Process our children - Move up to our parent
-    list < CElement* > cloneList = m_Children;
-    list < CElement* > ::const_iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ; ++iter )
-        (*iter)->SetParentObject ( m_pParent );
-
-    // This list should now be empty
-    assert ( m_Children.size () == 0 );
+        // Process our children
+        list < CElement* > ::const_iterator iter = m_Children.begin ();
+        for ( ; iter != m_Children.end (); iter++ )
+        {
+            // Set it to our parent and add it to our parent's list
+            (*iter)->m_pParent = m_pParent;
+            m_pParent->m_Children.push_back ( *iter );
+        }
+    }
+    else
+    {
+        // Set all our children's parents to NULL
+		if ( !m_Children.empty() ) {
+			list < CElement* > ::const_iterator iter = m_Children.begin ();
+			for ( ; iter != m_Children.end (); iter++ )
+			{
+				// Set it to our parent and add it to our parent's list
+				(*iter)->m_pParent = NULL;
+			}
+		}
+    }
+    m_Children.clear ();
 }
 
 
@@ -290,16 +289,8 @@ CElement* CElement::SetParentObject ( CElement* pParent )
             m_pParent->OnSubtreeRemove ( this );
 
             // Eventually unreference us from the previous parent entity
-            m_pParent->m_Children.remove ( this );
+            if ( !m_pParent->m_Children.empty() ) m_pParent->m_Children.remove ( this );
         }
-
-        // Get into/out-of FromRoot info
-        bool bOldFromRoot = CElement::IsFromRoot ( m_pParent );
-        bool bNewFromRoot = CElement::IsFromRoot ( pParent );
-
-        // Moving out of FromRoot?
-        if ( bOldFromRoot && !bNewFromRoot )
-            CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
 
         // Grab the root element now
         CElement* pRoot;
@@ -321,10 +312,6 @@ CElement* CElement::SetParentObject ( CElement* pParent )
         {
             // Add us to the new parent's child list
             pParent->m_Children.push_back ( this );
-
-            // Moving into FromRoot?
-            if ( !bOldFromRoot && bNewFromRoot )
-                CElement::AddEntityFromRoot ( m_uiTypeHash, this );
 
             // Call the on children add event on the new parent
             pParent->OnSubtreeAdd ( this );
@@ -642,7 +629,7 @@ bool CElement::GetCustomDataBool ( const char* szName, bool& bOut, bool bInherit
 }
 
 
-void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient )
+void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized )
 {
     assert ( szName );
 
@@ -660,9 +647,8 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
     // Trigger the onElementDataChange event on us
     CLuaArguments Arguments;
     Arguments.PushString ( szName );
-    Arguments.PushArgument ( oldVariable );
-    Arguments.PushArgument ( Variable );
-    CallEvent ( "onElementDataChange", Arguments, pClient );
+    Arguments.PushArgument ( oldVariable  );
+    CallEvent ( "onElementDataChange", Arguments );
 }
 
 
@@ -960,8 +946,6 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
     for ( ; iter != m_Children.end (); iter++ )
     {
         (*iter)->CallEventNoParent ( szName, Arguments, pSource, pCaller );
-        if ( m_bIsBeingDeleted )
-            break;
     }
 }
 
@@ -1079,14 +1063,13 @@ bool CElement::IsAttachable ( void )
         case CElement::OBJECT:
         case CElement::MARKER:
         case CElement::PICKUP:
-        case CElement::COLSHAPE:
         {
             return true;
             break;
         }
         default: break;
     }
-    return false;
+	return false;
 }
 
 
@@ -1101,39 +1084,13 @@ bool CElement::IsAttachToable ( void )
         case CElement::OBJECT:
         case CElement::MARKER:
         case CElement::PICKUP:
-        case CElement::COLSHAPE:
         {
             return true;
             break;
         }
         default: break;
     }
-    return false;
-}
-
-
-void CElement::GetAttachedPosition ( CVector & vecPosition )
-{
-    if ( m_pAttachedTo )
-    {
-        CVector vecRotation;
-        vecPosition = m_pAttachedTo->GetPosition ();
-        m_pAttachedTo->GetRotation ( vecRotation );
-        
-        CVector vecPositionOffset = m_vecAttachedPosition;
-        RotateVector ( vecPositionOffset, vecRotation );
-        vecPosition += vecPositionOffset;
-    }
-}
-
-
-void CElement::GetAttachedRotation ( CVector & vecRotation )
-{
-    if ( m_pAttachedTo )
-    {
-        m_pAttachedTo->GetRotation ( vecRotation );
-        vecRotation += m_vecAttachedRotation;
-    }
+	return false;
 }
 
 
@@ -1175,48 +1132,14 @@ void CElement::StartupEntitiesFromRoot ()
     }
 }
 
-// Returns true if top parent is root
-bool CElement::IsFromRoot ( CElement* pEntity )
+void CElement::AddEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity )
 {
-    if ( !pEntity )
-        return false;
-    if ( g_pGame && g_pGame->GetMapManager () )
-    {
-        if ( pEntity == g_pGame->GetMapManager ()->GetRootElement () )
-            return true;
-    }
-    else
-    {
-        if ( pEntity->GetTypeName () == "root" )
-            return true;
-    }
-    return CElement::IsFromRoot ( pEntity->GetParentEntity () );
-}
-
-void CElement::AddEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity, bool bDebugCheck )
-{
-    // Check
-    assert ( CElement::IsFromRoot ( pEntity ) );
-
-    // Insert into list
     std::list < CElement* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
-    listEntities.remove ( pEntity );
     listEntities.push_front ( pEntity );
-
-    // Apply to child elements as well
-    list < CElement* > ::const_iterator iter = pEntity->IterBegin ();
-    for ( ; iter != pEntity->IterEnd (); iter++ )
-        CElement::AddEntityFromRoot ( (*iter)->GetTypeHash (), *iter, false );
-
-#if CHECK_ENTITIES_FROM_ROOT
-    if ( bDebugCheck )
-        _CheckEntitiesFromRoot ( uiTypeHash );
-#endif
 }
 
 void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity )
 {
-    // Remove from list
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
@@ -1225,23 +1148,14 @@ void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity
         if ( listEntities.size () == 0 )
             ms_mapEntitiesFromRoot.erase ( find );
     }
-
-    // Apply to child elements as well
-    list < CElement* > ::const_iterator iter = pEntity->IterBegin ();
-    for ( ; iter != pEntity->IterEnd (); iter++ )
-        CElement::RemoveEntityFromRoot ( (*iter)->GetTypeHash (), *iter );
 }
 
 void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
 {
-#if CHECK_ENTITIES_FROM_ROOT
-    _CheckEntitiesFromRoot ( uiTypeHash );
-#endif
-
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        const std::list < CElement* >& listEntities = find->second;
+        std::list < CElement* >& listEntities = find->second;
         CElement* pEntity;
         unsigned int uiIndex = 0;
 
@@ -1257,123 +1171,4 @@ void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
             lua_settable ( pLua, -3 );
         }
     }    
-}
-
-
-
-#if CHECK_ENTITIES_FROM_ROOT
-
-//
-// Check that GetEntitiesFromRoot produces the same results as FindAllChildrenByTypeIndex on the root element
-//
-void CElement::_CheckEntitiesFromRoot ( unsigned int uiTypeHash )
-{
-    std::map < CElement*, int > mapResults1;
-    g_pGame->GetMapManager ()->GetRootElement ()->_FindAllChildrenByTypeIndex ( uiTypeHash, mapResults1 );
-
-    std::map < CElement*, int > mapResults2;
-    _GetEntitiesFromRoot ( uiTypeHash, mapResults2 );
-
-    std::map < CElement*, int > :: const_iterator iter1 = mapResults1.begin ();
-    std::map < CElement*, int > :: const_iterator iter2 = mapResults2.begin ();
-
-    for ( ; iter1 != mapResults1.end (); ++iter1 )
-    {
-        CElement* pElement1 = iter1->first;
-
-        if ( mapResults2.find ( pElement1 ) == mapResults2.end () )
-        {
-            OutputDebugString ( SString ( "Server: 0x%08x  %s is missing from GetEntitiesFromRoot list\n", pElement1, pElement1->GetTypeName ().c_str () ) );
-        }
-    }
-
-    for ( ; iter2 != mapResults2.end (); ++iter2 )
-    {
-        CElement* pElement2 = iter2->first;
-
-        if ( mapResults1.find ( pElement2 ) == mapResults1.end () )
-        {
-            OutputDebugString ( SString ( "Server: 0x%08x  %s is missing from FindAllChildrenByTypeIndex list\n", pElement2, pElement2->GetTypeName ().c_str () ) );
-        }
-    }
-
-    assert ( mapResults1 == mapResults2 );
-}
-
-
-void CElement::_FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults )
-{
-    // Our type matches?
-    if ( uiTypeHash == m_uiTypeHash )
-    {
-        // Add it to the table
-        assert ( mapResults.find ( this ) == mapResults.end () );
-        mapResults [ this ] = 1;
-
-        ElementID ID = this->GetID ();
-        assert ( ID != INVALID_ELEMENT_ID );
-        assert ( this == CElementIDs::GetElement ( ID ) );
-        if ( this->IsBeingDeleted () )
-            OutputDebugString ( SString ( "Server: 0x%08x  %s is flagged as IsBeingDeleted() but is still in FindAllChildrenByTypeIndex\n", this, this->GetTypeName ().c_str () ) );
-    }
-
-    // Call us on the children
-    list < CElement* > ::const_iterator iter = m_Children.begin ();
-    for ( ; iter != m_Children.end (); iter++ )
-    {
-        (*iter)->_FindAllChildrenByTypeIndex ( uiTypeHash, mapResults );
-    }
-}
-
-
-void CElement::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults )
-{
-    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
-    if ( find != ms_mapEntitiesFromRoot.end () )
-    {
-        const std::list < CElement* >& listEntities = find->second;
-        CElement* pEntity;
-        unsigned int uiIndex = 0;
-
-        for ( std::list < CElement* >::const_reverse_iterator i = listEntities.rbegin ();
-              i != listEntities.rend ();
-              ++i )
-        {
-            pEntity = *i;
-
-            assert ( pEntity );
-            ElementID ID = pEntity->GetID ();
-            assert ( ID != INVALID_ELEMENT_ID );
-            assert ( pEntity == CElementIDs::GetElement ( ID ) );
-            if ( pEntity->IsBeingDeleted () )
-                OutputDebugString ( SString ( "Server: 0x%08x  %s is flagged as IsBeingDeleted() but is still in GetEntitiesFromRoot\n", pEntity, pEntity->GetTypeName ().c_str () ) );
-
-            assert ( mapResults.find ( pEntity ) == mapResults.end () );
-            mapResults [ pEntity ] = 1;
-        }
-    }    
-}
-
-
-#endif
-
-
-void CElement::SetPosition ( const CVector& vecPosition )
-{
-    m_vecLastPosition = m_vecPosition;
-    m_vecPosition = vecPosition;
-    UpdateSpatialData ();
-};
-
-
-CSphere CElement::GetWorldBoundingSphere ( void )
-{
-    // Default to a point around the entity's position
-    return CSphere ( GetPosition (), 0.f );
-}
-
-
-void CElement::UpdateSpatialData ( void )
-{
-    GetSpatialDatabase ()->UpdateEntity ( this );
 }

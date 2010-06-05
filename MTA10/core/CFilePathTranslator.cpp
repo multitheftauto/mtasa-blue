@@ -23,7 +23,7 @@ CFilePathTranslator::~CFilePathTranslator ( )
 {
 }
 
-bool CFilePathTranslator::GetFileFromModPath ( const string& FileToGet, string & TranslatedFilePathOut )
+bool CFilePathTranslator::GetFileFromModPath ( string FileToGet, string & TranslatedFilePathOut )
 {
     // Translate the path to this file.
     TranslatedFilePathOut =  m_ModPath;
@@ -33,7 +33,7 @@ bool CFilePathTranslator::GetFileFromModPath ( const string& FileToGet, string &
     return true;
 }
 
-bool CFilePathTranslator::GetFileFromWorkingDirectory ( const string& FileToGet, string & TranslatedFilePathOut )
+bool CFilePathTranslator::GetFileFromWorkingDirectory ( string FileToGet, string & TranslatedFilePathOut )
 {
     // Translate the path to this file.
     TranslatedFilePathOut =  m_WorkingDirectory;
@@ -48,14 +48,14 @@ void CFilePathTranslator::GetModPath ( string & ModPathOut )
     ModPathOut = m_ModPath;
 }
 
-void CFilePathTranslator::SetModPath ( const string& PathBasedOffWorkingDirectory )
+void CFilePathTranslator::SetModPath ( string PathBasedOffWorkingDirectory )
 {
     m_ModPath =  m_WorkingDirectory;
     m_ModPath += '\\';
     m_ModPath += PathBasedOffWorkingDirectory;
 }
 
-void CFilePathTranslator::SetCurrentWorkingDirectory ( const string& PathBasedOffModuleRoot )
+void CFilePathTranslator::SetCurrentWorkingDirectory ( string PathBasedOffModuleRoot )
 {
     string RootDirectory;
 
@@ -98,9 +98,9 @@ void CFilePathTranslator::GetGTARootDirectory ( string & ModuleRootDirOut )
 
 void CFilePathTranslator::GetMTASARootDirectory ( string & InstallRootDirOut )
 {
-    static char szInstallRoot[MAX_PATH] = "";
-    if( !szInstallRoot[0] )
-    {
+	static char szInstallRoot[MAX_PATH] = "";
+	if( !szInstallRoot[0] )
+	{
         memset ( szInstallRoot, 0, MAX_PATH );
 
         HKEY hkey = NULL;
@@ -116,10 +116,10 @@ void CFilePathTranslator::GetMTASARootDirectory ( string & InstallRootDirOut )
                 RegCloseKey ( hkey );
                 TerminateProcess ( GetCurrentProcess (), 9 );
             }
-            RegCloseKey ( hkey );
+			RegCloseKey ( hkey );
         }
-    }
-    InstallRootDirOut = szInstallRoot;
+	}
+	InstallRootDirOut = szInstallRoot;
 }
 
 

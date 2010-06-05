@@ -139,17 +139,6 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         if ( flags.data.bHasAWeapon )
         {
-            if ( BitStream.Version () >= 0x0d )
-            {
-                // Check client has the weapon we think he has
-                unsigned char ucWeaponType;
-                if ( !BitStream.Read ( ucWeaponType ) )
-                    return false;
-
-                if ( pSourcePlayer->GetWeaponType () != ucWeaponType )
-                    return false;
-            }
-
             // Current weapon slot
             SWeaponSlotSync slot;
             if ( !BitStream.Read ( &slot ) )
@@ -202,6 +191,8 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             if ( !BitStream.ReadCompressed ( DamagerID ) )
                 return false;
 
+            CElement* pElement = CElementIDs::GetElement ( DamagerID );
+
             SWeaponTypeSync weaponType;
             if ( !BitStream.Read ( &weaponType ) )
                 return false;
@@ -210,7 +201,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             if ( !BitStream.Read ( &bodyPart ) )
                 return false;
 
-            pSourcePlayer->SetDamageInfo ( DamagerID, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart );
+            pSourcePlayer->SetDamageInfo ( pElement, weaponType.data.ucWeaponType, bodyPart.data.uiBodypart );
         }
 
         // If we know the player's dead, make sure the health we send on is 0
@@ -218,7 +209,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             fHealth = 0.0f;
 
         float fOldHealth = pSourcePlayer->GetHealth ();
-        float fHealthLoss = fOldHealth - fHealth;
+		float fHealthLoss = fOldHealth - fHealth;
         pSourcePlayer->SetHealth ( fHealth );
 
         // Less than last packet's frame?
@@ -230,7 +221,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
             // Call the onPlayerDamage event
             CLuaArguments Arguments;
-            CElement* pKillerElement = CElementIDs::GetElement ( pSourcePlayer->GetPlayerAttacker () );
+            CElement* pKillerElement = pSourcePlayer->GetPlayerAttacker ();
             if ( pKillerElement ) Arguments.PushElement ( pKillerElement );
             else Arguments.PushNil ();
             Arguments.PushNumber ( pSourcePlayer->GetAttackWeapon () );
@@ -378,13 +369,12 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( usWeaponAmmoInClip );
 
             if ( sent.bAimDirectionX )
-                BitStream.Write ( fAimDirectionX );
+			    BitStream.Write ( fAimDirectionX );
             if ( sent.bAimDirectionY )
-                BitStream.Write ( fAimDirectionY );
+			    BitStream.Write ( fAimDirectionY );
 
             etc...
 */
-
                 SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
                 ammo.data.usAmmoInClip = usWeaponAmmoInClip;
                 BitStream.Write ( &ammo );

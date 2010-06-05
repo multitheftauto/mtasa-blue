@@ -44,7 +44,7 @@ public:
     static bool                             IsValidModel                ( unsigned long ulObjectModel );
     static bool                             IsBreakableModel            ( unsigned long ulObjectModel );
     bool                                    Exists                      ( CClientObject* pObject );
-    bool                                    ObjectsAroundPointLoaded    ( const CVector& vecPosition, float fRadius, unsigned short usDimension, SString* pstrStatus = NULL );
+    bool                                    ObjectsAroundPointLoaded    ( const CVector& vecPosition, float fRadius, unsigned short usDimension );
 
     static bool                             IsObjectLimitReached        ( void );
 
@@ -76,7 +76,7 @@ private:
     class CClientManager*                   m_pManager;
     bool                                    m_bCanRemoveFromList;
     std::list < CClientObject* >            m_Objects;
-    std::vector < CClientObject* >          m_StreamedIn;
+    std::list < CClientObject* >            m_StreamedIn;
     std::list < CClientObject* >            m_Attached;
 };
 

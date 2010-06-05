@@ -31,7 +31,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_szNick [0] = 0;
     m_iGameVersion = 0;
     m_usMTAVersion = 0;
-    m_usBitStreamVersion = 0;
     m_bIsMuted = false;
     m_lMoney = 0;
     m_bNametagColorOverridden = false;
@@ -41,7 +40,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_fRotation = 0.0f;
     m_fAimDirection = 0.0f;
     m_ucDriveByDirection = 0;
-    m_bAkimboArmUp = false;    
+	m_bAkimboArmUp = false;    
     
     m_uiScriptDebugLevel = 0;
 
@@ -51,12 +50,14 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_ucLoginAttempts = 0;
 
-    m_pPlayerTextManager = new CPlayerTextManager ( this ); 
+    m_pPlayerTextManager = new CPlayerTextManager ( this );	
 
-    m_PlayerAttackerID = INVALID_ELEMENT_ID;
+    m_bCamFadedIn = false;
+    SetCamFadeColor ( 0, 0, 0 );
+
+    m_pPlayerAttacker = NULL;
     m_ucAttackWeapon = 0xFF;
     m_ucAttackBodyPart = 0xFF;
-    m_llSetDamageInfoTime = 0;
 
     m_pTeam = NULL;
 
@@ -86,8 +87,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     // Sync stuff
     m_bSyncingVelocity = false;
     m_uiPuresyncPackets = 0;
-
-    m_ulLastReceivedSyncTime = 0;
 
     // Add us to the manager
     pPlayerManager->AddToList ( this );
@@ -159,16 +158,8 @@ void CPlayer::Unlink ( void )
 
 void CPlayer::SetNick ( const char* szNick )
 {
-    if ( strlen ( m_szNick ) > 0 && strcmp ( m_szNick, szNick ) != 0 )
-    {
-        // If changing, add the new name to the whowas list
-        char szIP [22];
-        g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP( szIP ) ), GetSerial (), GetPlayerVersion () );
-    }
-
-    assert ( sizeof ( m_szNick ) == MAX_NICK_LENGTH + 1 );
     // Copy the nick to us
-    STRNCPY ( m_szNick, szNick, MAX_NICK_LENGTH + 1 );
+    strncpy ( m_szNick, szNick, MAX_NICK_LENGTH );
 }
 
 
@@ -223,7 +214,7 @@ void CPlayer::Send ( const CPacket& Packet, NetServerPacketOrdering packetOrderi
     }
 
     // Allocate a bitstream for it
-    NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ( GetBitStreamVersion () );
+    NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ();
     if ( pBitStream )
     {
         // Write the content to it and send it
@@ -346,45 +337,16 @@ bool CPlayer::SetScriptDebugLevel ( unsigned int uiLevel )
 }
 
 
-void CPlayer::SetDamageInfo ( ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart )
+void CPlayer::SetCamFadeColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
 {
-    m_PlayerAttackerID = ElementID;
-    m_ucAttackWeapon = ucWeapon;
-    m_ucAttackBodyPart = ucBodyPart;
-    m_llSetDamageInfoTime = GetTickCount64_ ();
-}
+    #define COLOR_ARGB(a,r,g,b) \
+        (((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
+    #define COLOR_RGBA(r,g,b,a) COLOR_ARGB(a,r,g,b)
 
+    m_ulCamFadeColor = COLOR_ARGB ( 255, ucRed, ucGreen, ucBlue );
 
-void CPlayer::ValidateDamageInfo ( void )
-{
-    if ( m_llSetDamageInfoTime + 100 < GetTickCount64_ () )
-    {
-        // Reset if data is too old
-        m_PlayerAttackerID = INVALID_ELEMENT_ID;
-        m_ucAttackWeapon = 0xFF;
-        m_ucAttackBodyPart = 0xFF;
-    }
-}
-
-
-ElementID CPlayer::GetPlayerAttacker ( void )
-{
-    ValidateDamageInfo ();
-    return m_PlayerAttackerID;
-}
-
-
-unsigned char CPlayer::GetAttackWeapon ( void )
-{
-    ValidateDamageInfo ();
-    return m_ucAttackWeapon;
-}
-
-
-unsigned char CPlayer::GetAttackBodyPart ( void )
-{
-    ValidateDamageInfo ();
-    return m_ucAttackBodyPart;
+	#undef COLOR_ARGB
+	#undef COLOR_RGBA
 }
 
 
@@ -414,6 +376,8 @@ void CPlayer::Reset ( void )
     m_bForcedMap = false;
     m_ucInterior = 0;
     m_usDimension = 0;
+    m_bCamFadedIn = true;
+    SetCamFadeColor ( 0, 0, 0 );
     //m_pKeyBinds->Clear ();
     m_bCursorShowing = false;
 
@@ -588,21 +552,4 @@ void CPlayer::ClearSyncTimes ( void )
 
     // Clear the list so we won't try accessing bad data later
     m_SyncTimes.clear ();
-}
-
-
-// Note: The return value must be consumed before m_AnnounceValues is next modified
-const std::string& CPlayer::GetAnnounceValue ( const string& strKey ) const
-{
-    std::map < string, string > ::const_iterator it = m_AnnounceValues.find ( strKey );
-    if ( it != m_AnnounceValues.end () )
-        return it->second;
-    static std::string strDefault;
-    return strDefault;
-}
-
-
-void CPlayer::SetAnnounceValue ( const string& strKey, const string& strValue )
-{
-    m_AnnounceValues [ strKey ] = strValue;
 }

@@ -1,12 +1,11 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CConnectManager.cpp
-*  PURPOSE:     Manager for connecting to servers
-*  DEVELOPERS:  Christian Myhre Lundheim <>
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		core/CConnectManager.cpp
+*  PURPOSE:		Manager for connecting to servers
+*  DEVELOPERS:	Christian Myhre Lundheim <>
 *               Jax <>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -30,8 +29,8 @@ CConnectManager::CConnectManager ( void )
 
     m_pOnCancelClick = new GUI_CALLBACK ( &CConnectManager::Event_OnCancelClick, this );
 
-    // Set default MTU size
-    m_usMTUSize = NET_MTU_DSL;
+	// Set default MTU size
+	m_usMTUSize = NET_MTU_DSL;
 }
 
 
@@ -60,20 +59,19 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
         CModManager::GetSingleton ().Unload ();
     }    
 
-    // Is the nick valid?
-    if ( !CheckNickProvided ( (char*) szNick ) )
-    {
+	// Is the nick valid?
+	if ( !CheckNickProvided ( (char*) szNick ) )
+	{
         SString strBuffer = "Connecting failed. Invalid nick provided!";
         CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
-        return false;
-    }
+		return false;
+	}
 
     // Save the nick too
     CVARS_SET ( "nick", std::string ( szNick ) );
 
     // Reset the network
     pNet->Reset ();
-    assert ( pNet->GetServerBitStreamVersion () == 0 );
 
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket, true );
@@ -100,7 +98,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     // Display the status box
     SString strBuffer ( "Connecting to %s:%u ...", m_strHost.c_str(), usPort );
-    CCore::GetSingleton ().ShowMessageBox ( "CONNECTING", strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
+    CCore::GetSingleton ().ShowMessageBox ( "Connecting", strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
 
     return true;
 }
@@ -131,12 +129,12 @@ bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, con
 
 bool CConnectManager::Event_OnCancelClick ( CGUIElement * pElement )
 {
-    // The user clicked cancel, so abort connecting
-    Abort ();
+	// The user clicked cancel, so abort connecting
+	Abort ();
     // Remove the message box next frame
     g_pCore->RemoveMessageBox ( true );
 
-    return true;
+	return true;
 }
 
 
@@ -182,39 +180,39 @@ void CConnectManager::DoPulse ( void )
                 SString strError;
                 switch ( ucError )
                 {
-                    case ID_RSA_PUBLIC_KEY_MISMATCH:
+		            case ID_RSA_PUBLIC_KEY_MISMATCH:
                         strError = "Disconnected: unknown protocol error";  // encryption key mismatch
-                        break;
-                    case ID_REMOTE_DISCONNECTION_NOTIFICATION:
-                        strError = "Disconnected: disconnected remotely";
-                        break;
-                    case ID_REMOTE_CONNECTION_LOST:
-                        strError = "Disconnected: connection lost remotely";
-                        break;
-                    case ID_CONNECTION_BANNED:
-                        strError = "Disconnected: you are banned from this server";
-                        break;
-                    case ID_NO_FREE_INCOMING_CONNECTIONS:
-                        strError = "Disconnected: server is full";
-                        break;
-                    case ID_DISCONNECTION_NOTIFICATION:
-                        strError = "Disconnected: disconnected";
-                        break;
-                    case ID_CONNECTION_LOST:
-                        strError = "Disconnected: connection lost";
-                        break;
-                    case ID_INVALID_PASSWORD:
-                        strError = "Disconnected: invalid password";
-                        break;
+			            break;
+		            case ID_REMOTE_DISCONNECTION_NOTIFICATION:
+			            strError = "Disconnected: disconnected remotely";
+			            break;
+		            case ID_REMOTE_CONNECTION_LOST:
+			            strError = "Disconnected: connection lost remotely";
+			            break;
+		            case ID_CONNECTION_BANNED:
+			            strError = "Disconnected: you are banned from this server";
+			            break;
+		            case ID_NO_FREE_INCOMING_CONNECTIONS:
+			            strError = "Disconnected: server is full";
+			            break;
+		            case ID_DISCONNECTION_NOTIFICATION:
+			            strError = "Disconnected: disconnected";
+			            break;
+		            case ID_CONNECTION_LOST:
+			            strError = "Disconnected: connection lost";
+			            break;
+		            case ID_INVALID_PASSWORD:
+			            strError = "Disconnected: invalid password";
+			            break;
                     default:
-                        strError = "Disconnected: connection refused";
-                        break;
+			            strError = "Disconnected: connection refused";
+			            break;
                 }
 
                 // Display an error, reset the error status and exit
                 CCore::GetSingleton ().ShowMessageBox ( "Error", strError, MB_BUTTON_OK | MB_ICON_ERROR );
                 CCore::GetSingleton ().GetNetwork ()->SetConnectionError ( 0 );
-                CCore::GetSingleton ().GetNetwork ()->SetImmediateError ( 0 );
+				CCore::GetSingleton ().GetNetwork ()->SetImmediateError ( 0 );
                 Abort ();
             }
         }
@@ -245,19 +243,6 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             memset ( szModName, 0, BitStream.GetNumberOfBytesUsed () + 1 );
             if ( BitStream.Read ( szModName, BitStream.GetNumberOfBytesUsed () ) )
             {
-                // Backward compatibly examine the bytes following the mod name
-                BitStream.ResetReadPointer ();
-                BitStream.Read ( szModName, strlen ( szModName ) );
-                char cPad;
-                BitStream.Read ( cPad );
-                unsigned short usServerBitStreamVersion = 0x01;
-                BitStream.Read ( usServerBitStreamVersion );    // This will silently fail for < 1.0.2 and leave the bitstream version at 0x01
-                CCore::GetSingleton ().GetNetwork ()->SetServerBitStreamVersion ( usServerBitStreamVersion );
-
-                // Limit the nick length for servers that have a problem with max length nicks
-                if ( usServerBitStreamVersion < 0x06 )
-                    g_pConnectManager->m_strNick = g_pConnectManager->m_strNick.substr ( 0, MAX_PLAYER_NICK_LENGTH - 1 );
-
                 // Populate the arguments to pass it (-c host port nick)
                 SString strArguments ( "%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str() );
 
@@ -274,6 +259,32 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 CVARS_SET ( "port",     g_pConnectManager->m_usPort );
                 CVARS_SET ( "password", g_pConnectManager->m_strPassword );
 
+
+                // Save the connection details into the recently played servers list
+                in_addr Address;
+                if ( CServerListItem::Parse ( g_pConnectManager->m_strHost.c_str (), Address ) )
+                {
+                    CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
+                    CServerList* pRecentList = pServerBrowser->GetRecentList ();
+                    CServerListItem RecentServer ( Address, g_pConnectManager->m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+                    if ( !pRecentList->Exists ( RecentServer ) )
+                    {
+                        pRecentList->Add ( RecentServer );
+                    }
+
+                    // Set as our current server for xfire
+                    if ( XfireIsLoaded () )
+                    {
+                        const char *szKey[2], *szValue[2];
+                        szKey[0] = "Gamemode";
+                        szValue[0] = RecentServer.strType.c_str();
+
+                        szKey[1] = "Map";
+                        szValue[1] = RecentServer.strMap.c_str();
+
+                        XfireSetCustomGameData ( 2, szKey, szValue ); 
+                    }
+                }
 
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
                 CCore::GetSingleton ().SaveConfig ();
@@ -293,7 +304,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                     // Failed loading the mod
                     strArguments.Format ( "No such mod installed (%s)", szModName );
                     CCore::GetSingleton ().ShowMessageBox ( "Error", strArguments, MB_BUTTON_OK | MB_ICON_ERROR );
-                    g_pConnectManager->Abort ();
+					g_pConnectManager->Abort ();
                 }
             }
             else

@@ -5,7 +5,6 @@
 *  FILE:        core/CKeyBinds.h
 *  PURPOSE:     Header file for core keybind manager class
 *  DEVELOPERS:  Jax <>
-*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -22,14 +21,6 @@ class CKeyBinds;
 
 #include <core/CCoreInterface.h>
 #include <core/CCommandsInterface.h>
-
-struct SDefaultCommandBind
-{
-    char szKey [20];
-    bool bState;
-    char szCommand [20];
-    char szArguments [20];
-};
 
 class CKeyBinds: public CKeyBindsInterface
 {
@@ -60,8 +51,8 @@ public:
     bool                    RemoveCommand               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szResource = NULL );
     bool                    RemoveAllCommands           ( const char* szKey, bool bCheckState = false, bool bState = true );
     bool                    RemoveAllCommands           ( void );
-    bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL, const char* szResource = NULL );
-    bool                    SetCommandActive            ( const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive, bool checkHitState );
+    bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL );
+    bool                    SetCommandActive            ( const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive, bool checkHitState );
     void                    SetAllCommandsActive        ( const char* szResource, bool bActive );
     CCommandBind*           GetBindFromCommand          ( const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true, const char* szKey = NULL, bool bCheckHitState = false, bool bState = NULL );
     bool                    GetBoundCommands            ( const char* szCommand, std::list < CCommandBind * > & commandsList );
@@ -71,7 +62,7 @@ public:
     bool                    AddGTAControl               ( const char* szKey, eControllerAction action );
     bool                    AddGTAControl               ( const SBindableKey* pKey, SBindableGTAControl* pControl );
     bool                    RemoveGTAControl            ( const char* szKey, const char* szControl );
-    void                    RemoveGTAControls           ( const char* szControl, bool bDestroy = true );
+	void					RemoveGTAControls		    ( const char* szControl, bool bDestroy = true );
     bool                    RemoveAllGTAControls        ( const char* szKey );
     bool                    RemoveAllGTAControls        ( void );
     bool                    GTAControlExists            ( const char* szKey, const char* szControl );
@@ -110,8 +101,8 @@ public:
     bool                    ControlFunctionExists       ( SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bCheckState = false, bool bState = true );
 
     // Key/code funcs
-    char*                   GetKeyFromCode              ( unsigned long ulCode );
-    bool                    GetCodeFromKey              ( const char* szKey, unsigned long& ucCode );
+    char*					GetKeyFromCode              ( unsigned long ulCode );
+    bool					GetCodeFromKey              ( const char* szKey, unsigned long& ucCode );
     const SBindableKey*     GetBindableFromKey          ( const char* szKey );
     const SBindableKey*     GetBindableFromGTARelative  ( int iGTAKey );
     bool                    IsKey                       ( const char* szKey );
@@ -139,7 +130,7 @@ public:
     bool                    SaveToXML                   ( CXMLNode* pMainNode );
     void                    LoadDefaultBinds            ( void );
     void                    LoadDefaultControls         ( void );
-    void                    LoadDefaultCommands         ( bool bForce );
+    void                    LoadDefaultCommands         ( void );
     void                    LoadControlsFromGTA         ( void );
 
     void                    BindCommand                 ( const char* szCmdLine );

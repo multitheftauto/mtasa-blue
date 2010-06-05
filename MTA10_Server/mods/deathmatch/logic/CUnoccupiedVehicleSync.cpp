@@ -85,18 +85,6 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
     CPlayer* pSyncer = pVehicle->GetSyncer ();
     CPed* pController = pVehicle->GetController ();
 
-    // Handle no syncing when not occupied
-    if ( !pVehicle->IsUnoccupiedSyncable () )
-    {
-        // This vehicle got a syncer?
-        if ( pSyncer )
-        {
-            // Tell the syncer to stop syncing
-            StopSync ( pVehicle );
-        }
-        return;
-    }
-
     // If someones driving it, or its being towed by someone driving (and not just entering/exiting)
     if ( pController && IS_PLAYER ( pController ) && pController->GetVehicleAction () == CPlayer::VEHICLEACTION_NONE )
     {
@@ -134,8 +122,6 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
 
 void CUnoccupiedVehicleSync::FindSyncer ( CVehicle* pVehicle )
 {
-    assert ( pVehicle->IsUnoccupiedSyncable () );
-
     // This vehicle got any passengers?
     CPed* pPassenger = pVehicle->GetFirstOccupant ();
     if ( pPassenger && IS_PLAYER ( pPassenger ) && !pPassenger->IsBeingDeleted() )
@@ -158,35 +144,21 @@ void CUnoccupiedVehicleSync::FindSyncer ( CVehicle* pVehicle )
 
 void CUnoccupiedVehicleSync::StartSync ( CPlayer* pPlayer, CVehicle* pVehicle )
 {
-    if ( !pVehicle->IsUnoccupiedSyncable () )
-        return;
-
     // Tell the player
     pPlayer->Send ( CUnoccupiedVehicleStartSyncPacket ( pVehicle ) );
 
     // Mark him as the syncing player
     pVehicle->SetSyncer ( pPlayer );
-
-    // Call the onElementStartSync event
-    CLuaArguments Arguments;
-    Arguments.PushElement ( pPlayer );  // New syncer
-    pVehicle->CallEvent ( "onElementStartSync", Arguments );
 }
 
 
 void CUnoccupiedVehicleSync::StopSync ( CVehicle* pVehicle )
 {
     // Tell the player that used to sync it
-    CPlayer* pSyncer = pVehicle->GetSyncer ();
-    pSyncer->Send ( CUnoccupiedVehicleStopSyncPacket ( pVehicle->GetID () ) );
+    pVehicle->GetSyncer ()->Send ( CUnoccupiedVehicleStopSyncPacket ( pVehicle->GetID () ) );
 
     // Unmark him as the syncing player
     pVehicle->SetSyncer ( NULL );
-
-    // Call the onElementStopSync event
-    CLuaArguments Arguments;
-    Arguments.PushElement ( pSyncer );  // Old syncer
-    pVehicle->CallEvent ( "onElementStopSync", Arguments );
 }
 
 
@@ -272,13 +244,13 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                                 // Grab the delta health
                                 float fDeltaHealth = fPreviousHealth - vehicle.data.fHealth;
 
-                                if ( fDeltaHealth > FLOAT_EPSILON )
-                                {
-                                    // Call the onVehicleDamage event
-                                    CLuaArguments Arguments;
-                                    Arguments.PushNumber ( fDeltaHealth );
-                                    pVehicle->CallEvent ( "onVehicleDamage", Arguments );
-                                }
+						        if ( fDeltaHealth > FLOAT_EPSILON )
+						        {
+							        // Call the onVehicleDamage event
+							        CLuaArguments Arguments;
+							        Arguments.PushNumber ( fDeltaHealth );
+							        pVehicle->CallEvent ( "onVehicleDamage", Arguments );
+						        }
                             }
                         }
 
@@ -384,7 +356,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         pVehicle->SetDerailed ( vehicle.data.bDerailed );
 
                         // Run colpoint checks on vehicle
-                        g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
+					    g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
 
                         // Send this sync
                         data.bSend = true;

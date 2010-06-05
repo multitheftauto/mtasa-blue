@@ -24,8 +24,8 @@ void CLuaTextDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "textDisplayRemoveText", CLuaTextDefs::textDisplayRemoveText );
     CLuaCFunctions::AddFunction ( "textDisplayAddObserver", CLuaTextDefs::textDisplayAddObserver );
     CLuaCFunctions::AddFunction ( "textDisplayRemoveObserver", CLuaTextDefs::textDisplayRemoveObserver );
-    CLuaCFunctions::AddFunction ( "textDisplayIsObserver", CLuaTextDefs::textDisplayIsObserver );
-    CLuaCFunctions::AddFunction ( "textDisplayGetObservers", CLuaTextDefs::textDisplayGetObservers );
+	CLuaCFunctions::AddFunction ( "textDisplayIsObserver", CLuaTextDefs::textDisplayIsObserver );
+	CLuaCFunctions::AddFunction ( "textDisplayGetObservers", CLuaTextDefs::textDisplayGetObservers );
 
     CLuaCFunctions::AddFunction ( "textItemSetText", CLuaTextDefs::textItemSetText );
     CLuaCFunctions::AddFunction ( "textItemGetText", CLuaTextDefs::textItemGetText );
@@ -91,10 +91,12 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
     float fX = 0.5f;
     float fY = 0.5f;
     int priority = PRIORITY_LOW;
-    SColorRGBA color ( 255, 255, 255, 255 );
+    unsigned char red = 255;
+    unsigned char green = 255;
+    unsigned char blue = 255;
+    unsigned char alpha = 255;
     float scale = 1.0f;
     unsigned char format = 0;
-    unsigned char ucShadowAlpha = 0;
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
         szText = lua_tostring ( luaVM, 1 );
 
@@ -118,16 +120,16 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
     }
         
     if ( lua_type ( luaVM, 5 ) == LUA_TNUMBER )
-        color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+        red = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
 
     if ( lua_type ( luaVM, 6 ) == LUA_TNUMBER )
-        color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
+        green = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
 
     if ( lua_type ( luaVM, 7 ) == LUA_TNUMBER )
-        color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
+        blue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 7 ) );
 
     if ( lua_type ( luaVM, 8 ) == LUA_TNUMBER )
-        color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 8 ) );
+        alpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 8 ) );
 
     if ( lua_type ( luaVM, 9 ) == LUA_TNUMBER )
         scale = static_cast < float > ( lua_tonumber ( luaVM, 9 ) );
@@ -148,14 +150,12 @@ int CLuaTextDefs::textCreateTextItem ( lua_State* luaVM )
         else if ( !stricmp ( szTemp, "bottom" ) )
             format |= 0x00000008; // DT_BOTTOM
     }
-    if ( lua_type ( luaVM, 12 ) == LUA_TNUMBER )
-        ucShadowAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 12 ) );
 
     // Grab our virtual machine
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
     if ( luaMain )
     {
-        CTextItem* pTextItem = luaMain->CreateTextItem ( szText, fX, fY, (eTextPriority)priority, color, scale, format, ucShadowAlpha );
+        CTextItem* pTextItem = luaMain->CreateTextItem ( szText, fX, fY, (eTextPriority)priority, red, green, blue, alpha, scale, format );
         lua_pushtextitem ( luaVM, pTextItem );
         return 1;
     }
@@ -234,7 +234,7 @@ int CLuaTextDefs::textDisplayRemoveText ( lua_State* luaVM )
             {
                 if ( pTextItem )
                 {
-                    pTextDisplay->Remove ( pTextItem );
+				    pTextDisplay->Remove ( pTextItem );
 
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -299,7 +299,7 @@ int CLuaTextDefs::textDisplayRemoveObserver ( lua_State* luaVM )
             {
                 if ( pPlayer )
                 {
-                    pTextDisplay->RemoveObserver ( pPlayer );
+				    pTextDisplay->RemoveObserver ( pPlayer );
 
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -334,10 +334,10 @@ int CLuaTextDefs::textDisplayIsObserver ( lua_State* luaVM )
             {
                 if ( pPlayer )
                 {
-                    if ( pTextDisplay -> IsObserver ( pPlayer ) )
-                        lua_pushboolean ( luaVM, true );
-                    else
-                        lua_pushboolean ( luaVM, false );
+				    if ( pTextDisplay -> IsObserver ( pPlayer ) )
+						lua_pushboolean ( luaVM, true );
+					else
+						lua_pushboolean ( luaVM, false );
 
                     return 1;
                 }
@@ -367,12 +367,12 @@ int CLuaTextDefs::textDisplayGetObservers ( lua_State* luaVM )
             CTextDisplay* pTextDisplay = lua_totextdisplay ( luaVM, 1 );
             if ( pTextDisplay )
             {
-                // We want a table obviously
-                lua_newtable ( luaVM );
+				// We want a table obviously
+				lua_newtable ( luaVM );
 
-                // And make the text-display list all the observers
-                pTextDisplay -> GetObservers ( luaVM );
-                return 1;
+				// And make the text-display list all the observers
+				pTextDisplay -> GetObservers ( luaVM );
+				return 1;
             }
             else
                 m_pScriptDebugging->LogBadPointer ( luaVM, "textDisplayGetObservers", "textDisplay", 1 );
@@ -421,7 +421,9 @@ int CLuaTextDefs::textItemGetText ( lua_State* luaVM )
             CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
             if ( pTextItem )
             {
-                lua_pushstring ( luaVM, pTextItem->GetText() );
+                char szBuffer[1024];
+                pTextItem->GetText ( szBuffer, 1024 );
+                lua_pushstring ( luaVM, szBuffer );
                 return 1;
             }
         }
@@ -550,12 +552,7 @@ int CLuaTextDefs::textItemSetColor ( lua_State* luaVM )
             CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
             if ( pTextItem )
             {
-                SColor color;
-                color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-                color.G = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-                color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-                color.A = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
-                pTextItem->SetColor ( color );
+                pTextItem->SetColor ( static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) ), static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) ), static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) ), static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) ) );
 
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -580,11 +577,13 @@ int CLuaTextDefs::textItemGetColor ( lua_State* luaVM )
             CTextItem* pTextItem = lua_totextitem ( luaVM, 1 );
             if ( pTextItem )
             {
-                SColor color = pTextItem->GetColor ();
-                lua_pushnumber ( luaVM, color.R );
-                lua_pushnumber ( luaVM, color.G );
-                lua_pushnumber ( luaVM, color.B );
-                lua_pushnumber ( luaVM, color.A );
+                unsigned char ucRed, ucGreen, ucBlue, ucAlpha;
+                pTextItem->GetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+
+                lua_pushnumber ( luaVM, ucRed );
+                lua_pushnumber ( luaVM, ucGreen );
+                lua_pushnumber ( luaVM, ucBlue );
+                lua_pushnumber ( luaVM, ucAlpha );
                 return 4;
             }
         }

@@ -43,12 +43,12 @@ public:
 
     static bool                 IsPlayerLimitReached            ( void );
 
-    std::vector < CClientPlayer* > ::const_iterator                IterGet             ( CClientPlayer* pPlayer );
-    std::vector < CClientPlayer* > ::const_reverse_iterator        IterGetReverse      ( CClientPlayer* pPlayer );
-    inline std::vector < CClientPlayer* > ::const_iterator         IterBegin           ( void )                                    { return m_Players.begin (); };
-    inline std::vector < CClientPlayer* > ::const_iterator         IterEnd             ( void )                                    { return m_Players.end (); };
-    inline std::vector < CClientPlayer* > ::const_reverse_iterator IterReverseBegin    ( void )                                    { return m_Players.rbegin (); };
-    inline std::vector < CClientPlayer* > ::const_reverse_iterator IterReverseEnd      ( void )                                    { return m_Players.rend (); };
+    std::list < CClientPlayer* > ::const_iterator                IterGet             ( CClientPlayer* pPlayer );
+    std::list < CClientPlayer* > ::const_reverse_iterator        IterGetReverse      ( CClientPlayer* pPlayer );
+    inline std::list < CClientPlayer* > ::const_iterator         IterBegin           ( void )                                    { return m_Players.begin (); };
+    inline std::list < CClientPlayer* > ::const_iterator         IterEnd             ( void )                                    { return m_Players.end (); };
+    inline std::list < CClientPlayer* > ::const_reverse_iterator IterReverseBegin    ( void )                                    { return m_Players.rbegin (); };
+    inline std::list < CClientPlayer* > ::const_reverse_iterator IterReverseEnd      ( void )                                    { return m_Players.rend (); };
 
     static bool                 IsValidModel                    ( unsigned long ulModel );
 
@@ -63,7 +63,7 @@ private:
 
     CClientManager*                 m_pManager;
     bool                            m_bCanRemoveFromList;
-    std::vector < CClientPlayer* >  m_Players;
+    std::list < CClientPlayer* >    m_Players;
     CClientPlayer*                  m_pLocalPlayer;
 };
 

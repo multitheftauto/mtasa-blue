@@ -1,11 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CHandlingEntrySA.h
-*  PURPOSE:     Header file for vehicle handling data entry class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               The_GTA <>
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		game_sa/CHandlingEntrySA.h
+*  PURPOSE:		Header file for vehicle handling data entry class
+*  DEVELOPERS:	Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -38,7 +37,7 @@ public:
 
 struct tHandlingDataSA
 {
-    int             iVehicleID;                     // +0
+    int             iUnknown7;                      // +0
 
     float           fMass;                          // +4
 
@@ -98,15 +97,8 @@ public:
 
     virtual         ~CHandlingEntrySA               ( void );
 
-    bool            IsVehicleAdded                  ( CVehicle* pVeh );
-    // We add a vehicle to this entry
-    void            AddVehicle                      ( CVehicle* pVeh );
-
     // Use this to copy data from an another handling class to this
     void            ApplyHandlingData               ( CHandlingEntry* pData );
-
-    // Remove a vehicle from list
-    void            RemoveVehicle                   ( CVehicle* pVeh );
 
     // Get functions
     float           GetMass                         ( void ) const    { return m_Handling.fMass; };
@@ -119,7 +111,7 @@ public:
 
     eDriveType      GetCarDriveType                 ( void ) const    { return static_cast < eDriveType > ( m_Handling.Transmission.ucDriveType ); };
     eEngineType     GetCarEngineType                ( void ) const    { return static_cast < eEngineType > ( m_Handling.Transmission.ucEngineType ); };
-    unsigned char   GetNumberOfGears                ( void ) const    { return m_Handling.Transmission.ucNumberOfGears; };
+    unsigned char   GetNUmberOfGears                ( void ) const    { return m_Handling.Transmission.ucNumberOfGears; };
 
     float           GetEngineAccelleration          ( void ) const    { return m_Handling.Transmission.fEngineAccelleration; };
     float           GetEngineInertia                ( void ) const    { return m_Handling.Transmission.fEngineInertia; };
@@ -210,7 +202,6 @@ private:
     tHandlingDataSA         m_Handling;
 
     tHandlingDataSA*        m_pOriginalData;
-    std::list < CVehicleSA* > m_VehicleList;    // Single vehicles to apply data to
 };
 
 #endif

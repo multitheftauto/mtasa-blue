@@ -16,7 +16,6 @@
 #include "StdInc.h"
 
 using std::list;
-using std::vector;
 
 // List over all vehicles with their passenger max counts
 unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,              // 400->415
@@ -32,7 +31,7 @@ unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3,
                                        1, 1, 3, 3, 1, 1, 0, 1, 3, 3, 0, 255, 255, 0, 0,             // 558->572
                                        1, 0, 1, 1, 1, 1, 3, 3, 1, 3, 0, 255, 3, 1, 1, 1,            // 573->588
                                        1, 255, 255, 1, 1, 1, 0, 3, 3, 3, 1, 1, 1, 1, 1,             // 589->604
-                                       3, 1, 255, 255, 255, 3, 255, 255 };                          // 605->611
+                                       3, 1, 255, 255, 255, 3, 255 };                               // 605->611
 
 // List over all vehicles with their special attributes
 #define VEHICLE_HAS_TURRENT             0x001UL //1
@@ -51,13 +50,11 @@ unsigned long g_ulVehicleAttributes [] = {
   8, 0, 0, 2, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,    // 525-549
   0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 550-574
   0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 2, 2, 2, 2,   // 575-599
-  0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 CClientVehicleManager::CClientVehicleManager ( CClientManager* pManager )
 {
-    assert ( NUMELMS ( g_ucMaxPassengers ) == 212 );
-    assert ( NUMELMS ( g_ulVehicleAttributes ) == 212 );
     // Initialize members
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
@@ -75,7 +72,7 @@ void CClientVehicleManager::DeleteAll ( void )
 {
     // Delete all the vehicles
     m_bCanRemoveFromList = false;
-    vector < CClientVehicle* > ::const_iterator iter = m_List.begin ();
+    list < CClientVehicle* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
         delete *iter;
@@ -92,8 +89,8 @@ void CClientVehicleManager::DoPulse ( void )
 {
     CClientVehicle * pVehicle = NULL;
     // Loop through our streamed-in vehicles
-    vector < CClientVehicle * > cloneList = m_StreamedIn;
-    vector < CClientVehicle* > ::iterator iter = cloneList.begin ();
+    list < CClientVehicle * > cloneList = m_StreamedIn;
+    list < CClientVehicle* > ::iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end (); ++iter )
     {
         pVehicle = *iter;
@@ -123,7 +120,7 @@ CClientVehicle* CClientVehicleManager::Get ( CVehicle* pVehicle, bool bValidateP
 
     if ( bValidatePointer )
     {
-        vector < CClientVehicle* > ::const_iterator iter = m_StreamedIn.begin ();
+        list < CClientVehicle* > ::const_iterator iter = m_StreamedIn.begin ();
         for ( ; iter != m_StreamedIn.end (); iter++ )
         {
             if ( (*iter)->GetGameVehicle () == pVehicle )
@@ -145,7 +142,7 @@ CClientVehicle* CClientVehicleManager::GetSafe ( CEntity * pEntity )
     if ( !pEntity ) return NULL;
 
 
-    vector < CClientVehicle* > ::const_iterator iter = m_StreamedIn.begin ();
+    list < CClientVehicle* > ::const_iterator iter = m_StreamedIn.begin ();
     for ( ; iter != m_StreamedIn.end (); iter++ )
     {
         if ( dynamic_cast < CEntity * > ( (*iter)->GetGameVehicle () ) == pEntity )
@@ -163,7 +160,7 @@ CClientVehicle* CClientVehicleManager::GetClosest ( CVector& vecPosition, float 
     float fClosestDistance = 0.0f;
     CVector vecVehiclePosition;
     CClientVehicle* pClosest = NULL;
-    vector < CClientVehicle* > ::const_iterator iter = m_List.begin ();
+    list < CClientVehicle* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
         (*iter)->GetPosition ( vecVehiclePosition );
@@ -387,10 +384,10 @@ bool CClientVehicleManager::HasDamageModel ( eClientVehicleType Type )
 }
 
 
-vector < CClientVehicle* > ::iterator CClientVehicleManager::IterGet ( CClientVehicle* pVehicle )
+list < CClientVehicle* > ::iterator CClientVehicleManager::IterGet ( CClientVehicle* pVehicle )
 {
     // Find it in our list
-    vector < CClientVehicle* > ::iterator iter = m_List.begin ();
+    list < CClientVehicle* > ::iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
         if ( *iter == pVehicle )
@@ -404,10 +401,10 @@ vector < CClientVehicle* > ::iterator CClientVehicleManager::IterGet ( CClientVe
 }
 
 
-vector < CClientVehicle* > ::reverse_iterator CClientVehicleManager::IterGetReverse ( CClientVehicle* pVehicle )
+list < CClientVehicle* > ::reverse_iterator CClientVehicleManager::IterGetReverse ( CClientVehicle* pVehicle )
 {
     // Find it in our list
-    vector < CClientVehicle* > ::reverse_iterator iter = m_List.rbegin ();
+    list < CClientVehicle* > ::reverse_iterator iter = m_List.rbegin ();
     for ( ; iter != m_List.rend (); iter++ )
     {
         if ( *iter == pVehicle )
@@ -425,14 +422,14 @@ void CClientVehicleManager::RemoveFromList ( CClientVehicle* pVehicle )
 {
     if ( m_bCanRemoveFromList )
     {
-        ListRemove ( m_List, pVehicle );
+        if ( !m_List.empty() ) m_List.remove ( pVehicle );
     }
 }
 
 
 bool CClientVehicleManager::Exists ( CClientVehicle* pVehicle )
 {
-    vector < CClientVehicle* > ::const_iterator iter = m_List.begin ();
+    list < CClientVehicle* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
     {
         if ( *iter == pVehicle )
@@ -461,20 +458,20 @@ void CClientVehicleManager::OnCreation ( CClientVehicle * pVehicle )
 
 void CClientVehicleManager::OnDestruction ( CClientVehicle * pVehicle )
 {
-    ListRemove( m_StreamedIn, pVehicle );
+    m_StreamedIn.remove ( pVehicle );
 }
 
 void CClientVehicleManager::RestreamVehicles ( unsigned short usModel )
 {
     // Store the affected vehicles
     CClientVehicle* pVehicle;
-    std::vector < CClientVehicle* > ::iterator iter = IterBegin ();
+    std::list < CClientVehicle* > ::iterator iter = IterBegin ();
     for ( ; iter != IterEnd (); iter++ )
     {
         pVehicle = *iter;
 
         // Streamed in and same vehicle ID?
-        if ( pVehicle->IsStreamedIn () && pVehicle->GetModel () == usModel )
+		if ( pVehicle->IsStreamedIn () && pVehicle->GetModel () == usModel )
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually
