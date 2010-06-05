@@ -41,7 +41,6 @@ public:
     static int      getAllElementData                   ( lua_State* luaVM );
     static int      getElementParent                    ( lua_State* luaVM );
     static int      getElementPosition                  ( lua_State* luaVM );
-    static int      getElementRotation                  ( lua_State* luaVM );
     static int      getElementVelocity                  ( lua_State* luaVM );
     static int      getElementType                      ( lua_State* luaVM );
     static int      getElementsByType                   ( lua_State* luaVM );
@@ -51,7 +50,6 @@ public:
     static int      getElementZoneName                  ( lua_State* luaVM );
     static int      getElementColShape                  ( lua_State* luaVM );
     static int      getElementAlpha                     ( lua_State* luaVM );
-    static int      isElementDoubleSided                ( lua_State* luaVM );
     static int      getElementHealth                    ( lua_State* luaVM );
     static int      getElementModel                     ( lua_State* luaVM );
     static int      isElementInWater                    ( lua_State* luaVM );
@@ -79,15 +77,12 @@ public:
     static int      setElementID                        ( lua_State* luaVM );
     static int      setElementParent                    ( lua_State* luaVM );
     static int      setElementPosition                  ( lua_State* luaVM );
-    static int      setElementRotation                  ( lua_State* luaVM );
     static int      setElementVelocity                  ( lua_State* luaVM );
     static int      setElementInterior                  ( lua_State* luaVM );
     static int      setElementDimension                 ( lua_State* luaVM );
     static int      setElementAlpha                     ( lua_State* luaVM );
-    static int      setElementDoubleSided               ( lua_State* luaVM );
     static int      setElementHealth                    ( lua_State* luaVM );
     static int      setElementModel                     ( lua_State* luaVM );
-    static int      setElementSyncer                    ( lua_State* luaVM );
 };
 
 #endif

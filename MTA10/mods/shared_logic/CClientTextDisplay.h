@@ -18,6 +18,7 @@ class CClientTextDisplay;
 
 #include "CClientDisplay.h"
 #include "CClientDisplayManager.h"
+#include "CClientTextDisplayEffect.h"
 #include "CClientTime.h"
 #include <gui/CGUI.h>
 
@@ -31,17 +32,22 @@ public:
 
     inline eDisplayType         GetType                 ( void )                                { return DISPLAY_TEXT; }
 
+    void                        ApplyEffect             ( CClientTextDisplayEffect* pTextDisplayEffect );
+    void                        RemoveEffect            ( CClientTextDisplayEffect* pTextDisplayEffect );
+    void                        RemoveAllEffects        ( void );
+
     inline const char*          GetCaptionPointer       ( void )                                { return m_szCaption; };
     char*                       GetCaption              ( char* szBuffer, size_t sizeBuffer );
     void                        SetCaption              ( const char* szCaption );
 
-    void                        SetPosition             ( const CVector& vecPosition );
+	void						SetPosition             ( const CVector& vecPosition );
 
-    void                        SetColor                ( const SColor color );
+    void						SetColor                ( RGBA rgbaColor );
+    void						SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )     { SetColor ( COLOR_RGBA ( ucRed, ucGreen, ucBlue, ucAlpha ) ); };
     void                        SetColorAlpha           ( unsigned char ucAlpha );
     void                        SetShadowAlpha          ( unsigned char ucShadowAlpha );
 
-    inline float                GetScale                ( void )                                { return m_fScale; };
+	inline float                GetScale                ( void )                                { return m_fScale; };
     void                        SetScale                ( float fScale );
 
     inline unsigned long        GetFormat               ( void )                                { return m_ulFormat; };
@@ -49,7 +55,7 @@ public:
 
     void                        SetVisible              ( bool bVisible );
 
-    void                        Render                  ( void );
+    void                        Render                  ( bool bPulseEffects );
 
     static void                 SetGlobalScale          ( float fScale )                        { m_fGlobalScale = fScale; }
 private:
@@ -60,6 +66,7 @@ private:
     unsigned long               m_ulFormat;
     unsigned char               m_ucShadowAlpha;
 
+    std::list < CClientTextDisplayEffect* > m_EffectList;
     static float                m_fGlobalScale;
 };
 

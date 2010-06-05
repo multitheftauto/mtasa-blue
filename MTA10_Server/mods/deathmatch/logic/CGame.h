@@ -158,8 +158,8 @@ public:
                                 CGame                       ( void );
                                 ~CGame                      ( void );
 
-    void                        GetTag                      ( char* szInfoTag, int iInfoTag );
-    void                        HandleInput                 ( char* szCommand );
+	void						GetTag						( char* szInfoTag, int iInfoTag );
+	void						HandleInput					( char* szCommand );
 
     void                        DoPulse                     ( void );
 
@@ -196,15 +196,19 @@ public:
     inline CGroups*                 GetGroups                   ( void )        { return m_pGroups; }
     inline CElementDeleter*         GetElementDeleter           ( void )        { return &m_ElementDeleter; }
     inline CHTTPD*                  GetHTTPD                    ( void )        { return m_pHTTPD; }
-    inline CSettings*               GetSettings                 ( void )        { return m_pSettings; }
+	inline CSettings*			    GetSettings					( void )		{ return m_pSettings; }
     inline CAccessControlListManager* GetACLManager             ( void )        { return m_pACLManager; }
-    inline CBanManager*             GetBanManager               ( void )        { return m_pBanManager; }
+	inline CBanManager*			    GetBanManager				( void )		{ return m_pBanManager; }
     inline CRemoteCalls*            GetRemoteCalls              ( void )        { return m_pRemoteCalls; }
     inline CResourceDownloader*     GetResourceDownloader       ( void )        { return m_pResourceDownloader; }
     inline CZoneNames*              GetZoneNames                ( void )        { return m_pZoneNames; }
     inline CClock*                  GetClock                    ( void )        { return m_pClock; }
     inline CSerialManager*          GetSerialManager            ( void )        { return &m_SerialManager; }
     inline CWaterManager*           GetWaterManager             ( void )        { return m_pWaterManager; }
+
+#ifdef WIN32
+    inline CRITICAL_SECTION *   GetCriticalSection          ( void )        { return &m_cs; }
+#endif
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -232,11 +236,11 @@ public:
     inline bool                 IsBeingDeleted              ( void )        { return m_bBeingDeleted; }
     void                        ResetMapInfo                ( void );
 
-    void                        SetGlitchEnabled            ( const std::string& strGlitch, bool bEnabled );
-    bool                        IsGlitchEnabled             ( const std::string& strGlitch );
+    void                        SetGlitchEnabled            ( std::string strGlitch, bool bEnabled );
+    bool                        IsGlitchEnabled             ( std::string strGlitch );
     bool                        IsGlitchEnabled             ( eGlitchType cGlitch );
-    eGlitchType                 GetGlitchIndex              ( const std::string& strGlitch )    { return m_GlitchNames[strGlitch]; }
-    bool                        IsGlitch                    ( const std::string& strGlitch )    { return m_GlitchNames.count(strGlitch) > 0; }
+    eGlitchType                 GetGlitchIndex              ( std::string strGlitch )    { return m_GlitchNames[strGlitch]; }
+    bool                        IsGlitch                    ( std::string strGlitch )    { return m_GlitchNames.count(strGlitch) > 0; }
 
     void                        SetCloudsEnabled            ( bool bEnabled );
     bool                        GetCloudsEnabled            ( void );
@@ -265,7 +269,7 @@ private:
     void                        Packet_Voice_Data           ( class CVoiceDataPacket& Packet );
     void                        Packet_CameraSync           ( class CCameraSyncPacket& Packet );
 
-    static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
+	static void					PlayerCompleteConnect		( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
     // Technically, this could be put somewhere else.  It's a callback function
     // which the voice server library will call to send out data.
@@ -286,7 +290,7 @@ private:
     CPacketTranslator*              m_pPacketTranslator;
     CMapManager*                    m_pMapManager;
     CElementDeleter                 m_ElementDeleter;
-    CConnectHistory                 m_FloodProtect;
+    CConnectHistory                 m_ConnectHistory;
     CLuaManager*                    m_pLuaManager;
     CScriptDebugging*               m_pScriptDebugging;
     CConsole*                       m_pConsole;
@@ -304,21 +308,25 @@ private:
     CPedManager*                    m_pPedManager;
     CResourceManager*               m_pResourceManager;
     CAccessControlListManager*      m_pACLManager;
-    CSettings*                      m_pSettings;
+    CSettings*					    m_pSettings;
     CZoneNames*                     m_pZoneNames;
     ASE*                            m_pASE;
     CHandlingManager*               m_pHandlingManager;
     CRPCFunctions*                  m_pRPCFunctions;
-    CLanBroadcast*                  m_pLanBroadcast;
+	CLanBroadcast*                  m_pLanBroadcast;
     CWaterManager*                  m_pWaterManager;
 
     CSerialManager                  m_SerialManager;
+
+#ifdef WIN32
+    CRITICAL_SECTION            m_cs; // to prevent odd things happening with the http server, I hope
+#endif
 
 #ifdef MTA_VOICE
     CVoiceServer*               m_pVoiceServer;
 #endif
 
-    char*                       m_szCurrentFileName;
+	char*						m_szCurrentFileName;
 
     // This client represents the console input
     CConsoleClient*             m_pConsoleClient;
@@ -332,10 +340,10 @@ private:
 
     bool                        m_bGarageStates[MAX_GARAGES];
 
-    // FPS statistics
-    unsigned long               m_ulLastFPSTime;
-    unsigned short              m_usFrames;
-    unsigned short              m_usFPS;
+	// FPS statistics
+	unsigned long				m_ulLastFPSTime;
+	unsigned short				m_usFrames;
+	unsigned short				m_usFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
     bool                        m_Glitches[3];
 

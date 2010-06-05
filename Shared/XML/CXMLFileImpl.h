@@ -43,24 +43,22 @@ public:
     // Private functions
     void                            SetLastError        ( CXMLErrorCodes::Code errCode, const std::string& strDescription );
 
-    TiXmlDocument*                  GetDocument         ( void );
+	TiXmlDocument*                  GetDocument         ( void );
 
     eXMLClass                       GetClassType        ( void )    { return CXML_FILE; };
     unsigned long                   GetID               ( void )    { return m_ulID; };
-    bool                            IsValid             ( void )    { return m_ulID != INVALID_XML_ID; };
 
 private:
-    bool                            BuildWrapperTree    ( void );
-    bool                            BuildSubElements    ( class CXMLNodeImpl* pNode );
+    void                            BuildWrapperTree    ( void );
+    void                            BuildSubElements    ( class CXMLNodeImpl* pNode );
     void                            ClearWrapperTree    ( void );
-    bool                            WriteSafer          ( void );
 
     std::string                     m_strFilename;
 
     CXMLErrorCodes::Code            m_errLastError;
     std::string                     m_strLastError;
 
-    TiXmlDocument*                  m_pDocument;
+	TiXmlDocument*                  m_pDocument;
 
     class CXMLNodeImpl*             m_pRootNode;
     unsigned long                   m_ulID;

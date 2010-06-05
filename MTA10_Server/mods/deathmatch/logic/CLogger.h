@@ -27,18 +27,13 @@ public:
 
     static void         ErrorPrintf         ( const char* szFormat, ... );
     static void         DebugPrintf         ( const char* szFormat, ... );
-    static void         AuthPrintf          ( const char* szFormat, ... );
 
     static bool         SetLogFile          ( const char* szLogFile );
-    static bool         SetAuthFile         ( const char* szAuthFile );
 
     static void         SetOutputEnabled    ( bool bEnabled );
 
 private:
-    static void         HandleLogPrint     ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile, bool bToAuthFile );
-
     static FILE*        m_pLogFile;
-    static FILE*        m_pAuthFile;
     static bool         m_bOutputEnabled;
 };
 

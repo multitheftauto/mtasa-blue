@@ -24,6 +24,10 @@ CModManagerImpl::CModManagerImpl ( CServerImpl* pServer )
     // Init
     m_pServer = pServer;
     m_pBase = NULL;
+    m_szModPath [0] = 0;
+    m_szModPath [MAX_PATH - 1] = 0;
+    m_szServerPath [0] = 0;
+    m_szServerPath [MAX_PATH - 1] = 0;
 }
 
 
@@ -43,7 +47,7 @@ bool CModManagerImpl::RequestLoad ( const char* szModName )
 
 SString CModManagerImpl::GetAbsolutePath ( const char* szRelative )
 {
-    return SString ( "%s/%s", m_strModPath.c_str (), szRelative );
+    return SString ( "%s/%s", m_szModPath, szRelative );
 }
 
 bool CModManagerImpl::IsModLoaded ( void )
@@ -61,37 +65,46 @@ CServerBase* CModManagerImpl::GetCurrentMod ( void )
 bool CModManagerImpl::Load ( const char* szModName, int iArgumentCount, char* szArguments [] )
 {
     // Fail if no server path is specified
-    if ( m_strServerPath == "" )
+    if ( m_szServerPath [0] == 0 )
         return false;
 
     // Make the string path to the mod library
-    m_strModPath = SString ( "%s/mods/%s", m_strServerPath.c_str (), szModName );
+    char szFilename [MAX_PATH];
+    szFilename [MAX_PATH - 1] = 0;
 
-    #if defined( WIN32 ) && defined( _DEBUG )
-        SString strFilename ( "%s/%s_d%s", m_strModPath.c_str (), szModName, MTA_LIB_EXTENSION );
+    #ifdef WIN32
+        _snprintf ( m_szModPath, MAX_PATH - 1, "%s/mods/%s", m_szServerPath, szModName );
+
+        #ifdef _DEBUG       // hack to make it use the debug version of the mod if we run the debug core
+            _snprintf ( szFilename, MAX_PATH - 1, "%s/%s_d.dll", m_szModPath, szModName );
+        #else
+            _snprintf ( szFilename, MAX_PATH - 1, "%s/%s.dll", m_szModPath, szModName );
+        #endif
     #else
-        SString strFilename ( "%s/%s%s", m_strModPath.c_str (), szModName, MTA_LIB_EXTENSION );
+
+		snprintf ( m_szModPath, MAX_PATH - 1, "%s/mods/%s", m_szServerPath, szModName );
+		snprintf ( szFilename, MAX_PATH - 1, "%s/%s.so", m_szModPath, szModName );
     #endif
 
     // Attempt to load it
-    if ( !m_Library.Load ( strFilename ) )
+    if ( !m_Library.Load ( szFilename ) )
     {
         // Failed
-        Print ( "\nERROR: Loading mod (%s) failed!\n", strFilename.c_str () );
+        Print ( "\nERROR: Loading mod (%s) failed!\n", szFilename );
         return false;
     }
 
     // Grab the initialization procedure
     InitServer* pfnInitServer = (InitServer*) ( m_Library.GetProcedureAddress ( "InitServer" ) );
     if ( !pfnInitServer )
-    {
+	{
         // Unload the library
         m_Library.Unload ();
 
         // Report the error
-        Print ( "\nERROR: Bad file: %s!\n", strFilename.c_str () );
-        return false;
-    }
+        Print ( "\nERROR: Bad file: %s!\n", szFilename );
+		return false;
+	}
 
     // Call the InitServer procedure to get the interface
     m_pBase = pfnInitServer ();
@@ -101,8 +114,8 @@ bool CModManagerImpl::Load ( const char* szModName, int iArgumentCount, char* sz
         m_Library.Unload ();
 
         // Report the error
-        Print ( "\nERROR: Failed initializing '%s'!\n", strFilename.c_str () );
-        return false;
+        Print ( "\nERROR: Failed initializing '%s'!\n", szFilename );
+		return false;
     }
 
     // Call the initialization procedure in the interface
@@ -160,17 +173,17 @@ bool CModManagerImpl::IsFinished ( void )
 
 void CModManagerImpl::GetTag ( char *szInfoTag, int iInfoTag )
 {
-    if ( m_pBase )
-    {
-        m_pBase->GetTag ( szInfoTag, iInfoTag );
-    }
+	if ( m_pBase )
+	{
+		m_pBase->GetTag ( szInfoTag, iInfoTag );
+	}
 }
 
 
 void CModManagerImpl::HandleInput ( const char* szCommand )
 {
-    if ( m_pBase )
-    {
-        m_pBase->HandleInput ( (char*)szCommand );
-    }
+	if ( m_pBase )
+	{
+		m_pBase->HandleInput ( (char*)szCommand );
+	}
 }

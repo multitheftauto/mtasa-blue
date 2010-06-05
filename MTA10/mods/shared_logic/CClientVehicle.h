@@ -128,19 +128,18 @@ public:
     void                        SetRotationRadians      ( const CVector& vecRotation )      { SetRotationRadians ( vecRotation, true ); }
     void                        SetRotationRadians      ( const CVector& vecRotation, bool bResetInterpolation );
     
-    void                        AttachTo                ( CClientEntity * pEntity );
+	void                        AttachTo                ( CClientEntity * pEntity );
 
     float                       GetDistanceFromCentreOfMassToBaseOfModel ( void );
 
     bool                        GetMatrix               ( CMatrix& Matrix ) const;
     bool                        SetMatrix               ( const CMatrix& Matrix );
-    virtual CSphere             GetWorldBoundingSphere  ( void );
 
-    void                        GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
-    void                        GetMoveSpeedMeters      ( CVector& vecMoveSpeed ) const;
+   	void                        GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
+	void						GetMoveSpeedMeters		( CVector& vecMoveSpeed ) const;
     void                        SetMoveSpeed            ( const CVector& vecMoveSpeed );
-    void                        GetTurnSpeed            ( CVector& vecTurnSpeed ) const;
-    void                        SetTurnSpeed            ( const CVector& vecTurnSpeed );
+	void                        GetTurnSpeed            ( CVector& vecTurnSpeed ) const;
+	void                        SetTurnSpeed            ( const CVector& vecTurnSpeed );
 
     bool                        IsVisible               ( void );
     void                        SetVisible              ( bool bVisible );
@@ -158,9 +157,9 @@ public:
     inline bool                 IsVehicleBlown          ( void ) { return m_bBlown; };
 
     void                        GetColor                ( unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 );
-    void                        SetColor                ( unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4 );
+	void						SetColor				( unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4 );
 
-    void                        GetTurretRotation       ( float& fHorizontal, float& fVertical );
+	void						GetTurretRotation		( float& fHorizontal, float& fVertical );
     void                        SetTurretRotation       ( float fHorizontal, float fVertical );
 
     inline unsigned short       GetModel                ( void )                            { return m_usModel; };
@@ -176,7 +175,6 @@ public:
     void                        CalcAndUpdateCanBeDamagedFlag     ( void );
     void                        SetScriptCanBeDamaged   ( bool bCanBeDamaged );
     void                        SetSyncUnoccupiedDamage ( bool bCanBeDamaged );
-    bool                        GetScriptCanBeDamaged   ( void )                            { return m_bScriptCanBeDamaged; };
 
     bool                        GetTyresCanBurst        ( void );
     void                        CalcAndUpdateTyresCanBurstFlag    ( void );
@@ -214,8 +212,8 @@ public:
 
     void                        SetDoorStatus           ( unsigned char ucDoor, unsigned char ucStatus );
     void                        SetWheelStatus          ( unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true );
-    void                        SetPanelStatus          ( unsigned char ucPanel, unsigned char ucStatus );
-    void                        SetLightStatus          ( unsigned char ucLight, unsigned char ucStatus );
+	void						SetPanelStatus			( unsigned char ucPanel, unsigned char ucStatus );
+	void						SetLightStatus			( unsigned char ucLight, unsigned char ucStatus );
 
     // TODO: Make the class remember on virtualization
     float                       GetHeliRotorSpeed       ( void );
@@ -224,10 +222,10 @@ public:
     bool                        IsHeliSearchLightVisible    ( void );
     void                        SetHeliSearchLightVisible   ( bool bVisible );
 
-    void                        ReportMissionAudioEvent ( unsigned short usSound );
+	void						ReportMissionAudioEvent ( unsigned short usSound );
 
     inline bool                 IsCollisionEnabled      ( void )                            { return m_bIsCollisionEnabled; };
-    void                        SetCollisionEnabled     ( bool bCollisionEnabled );
+	void						SetCollisionEnabled     ( bool bCollisionEnabled );
 
     bool                        GetCanShootPetrolTank   ( void );
     void                        SetCanShootPetrolTank   ( bool bCanShoot );
@@ -236,13 +234,13 @@ public:
     void                        SetCanBeTargettedByHeatSeekingMissiles      ( bool bEnabled );
 
     inline unsigned char        GetAlpha                ( void )                            { return m_ucAlpha; }
-    void                        SetAlpha                ( unsigned char ucAlpha );
+	void						SetAlpha			    ( unsigned char ucAlpha );
 
     CClientPed*                 GetOccupant             ( int iSeat = 0 ) const;
     CClientPed*                 GetControllingPlayer    ( void );
     void                        ClearForOccupants       ( void );
 
-    void                        PlaceProperlyOnGround   ( void );
+	void						PlaceProperlyOnGround   ( void );
 
     void                        FuckCarCompletely       ( bool bKeepWheels );
 
@@ -258,8 +256,6 @@ public:
     inline bool                 IsFrozen                ( void )                            { return m_bIsFrozen; };
     void                        SetFrozen               ( bool bFrozen );
     void                        SetScriptFrozen         ( bool bFrozen )                    { m_bScriptFrozen = bFrozen; };
-    bool                        IsFrozenWaitingForGroundToLoad      ( void ) const;
-    void                        SetFrozenWaitingForGroundToLoad     ( bool bFrozen );
 
     CClientVehicle*             GetPreviousTrainCarriage( void );
     CClientVehicle*             GetNextTrainCarriage    ( void );
@@ -285,7 +281,7 @@ public:
     inline CEntity*             GetGameEntity           ( void )                            { return m_pVehicle; }
     inline const CEntity*       GetGameEntity           ( void ) const                      { return m_pVehicle; }
     inline CVehicleUpgrades*    GetUpgrades             ( void )                            { return m_pUpgrades; }
-    inline CModelInfo*          GetModelInfo            ( void )                            { return m_pModelInfo; }
+	inline CModelInfo*          GetModelInfo            ( void )                            { return m_pModelInfo; }
 
     CClientVehicle*             GetTowedVehicle         ( void );
     CClientVehicle*             GetRealTowedVehicle     ( void );
@@ -308,13 +304,11 @@ public:
     float                       GetDirtLevel            ( void );
     void                        SetDirtLevel            ( float fDirtLevel );
 
-    float                       GetDistanceFromGround   ( void );
-
     void                        SetInWater              ( bool bState )                     { m_bIsInWater = bState; }
     bool                        IsInWater               ( void );
     bool                        IsOnGround              ( void );
     bool                        IsOnWater               ( void );
-    void                        LockSteering            ( bool bLock );
+	void						LockSteering			( bool bLock );
 
     bool                        IsSmokeTrailEnabled     ( void );
     void                        SetSmokeTrailEnabled    ( bool bEnabled );
@@ -326,8 +320,8 @@ public:
 
     void                        GetInitialDoorStates    ( unsigned char * pucDoorStates );
 
-    void                        AddMatrix               ( CMatrix& Matrix, double dTime, unsigned short usTickRate );
-    void                        AddVelocity             ( CVector& vecVelocity );
+	void						AddMatrix				( CMatrix& Matrix, double dTime, unsigned short usTickRate );
+	void						AddVelocity				( CVector& vecVelocity );
 
 
     // Time dependent interpolation
@@ -341,8 +335,8 @@ public:
     void                        RemoveTargetRotation    ( void );
     inline bool                 HasTargetRotation       ( void )                            { return ( m_interp.rot.ulFinishTime != 0 ); }
 
-    void                        UpdateTargetPosition    ( void );
-    void                        UpdateTargetRotation    ( void );
+	void						UpdateTargetPosition	( void );
+    void						UpdateTargetRotation	( void );
 
 
     inline unsigned long        GetIllegalTowBreakTime  ( void )                            { return m_ulIllegalTowBreakTime; }
@@ -351,10 +345,8 @@ public:
     void                        GetGravity              ( CVector& vecGravity ) const       { vecGravity = m_vecGravity; }
     void                        SetGravity              ( const CVector& vecGravity );
 
-    SColor                      GetHeadLightColor       ( void );
-    void                        SetHeadLightColor       ( const SColor color );
-
-    int                         GetCurrentGear          ( void );
+    RGBA                        GetHeadLightColor       ( void );
+    void                        SetHeadLightColor       ( RGBA color );
 
     bool                        IsEnterable             ( void );
     bool                        HasRadio                ( void );
@@ -384,12 +376,6 @@ public:
     static void                 ValidatePedAndVehiclePair ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed );
-    
-#if WITH_VEHICLE_HANDLING
-    void                        ApplyHandling           ( void );
-    CHandlingEntry*             GetHandlingData         ( void );
-    const CHandlingEntry*       GetOriginalHandlingData ( void )    { return m_pOriginalHandlingEntry; }
-#endif
 
 protected:
     void                        StreamIn                ( bool bInstantly );
@@ -399,7 +385,6 @@ protected:
     void                        NotifyDestroy           ( void );
 
     bool                        DoCheckHasLandingGear   ( void );
-    void                        HandleWaitingForGroundToLoad ( void );
 
     void                        StreamedInPulse         ( void );
     void                        Dump                    ( FILE* pFile, bool bDumpDetails, unsigned int uiIndex );
@@ -417,17 +402,17 @@ protected:
     CClientPed*                 m_pPassengers [8];
     CClientPed*                 m_pOccupyingDriver;
     CClientPed*                 m_pOccupyingPassengers [8];
-    RpClump*                    m_pClump;
-    short                       m_usRemoveTimer;
+	RpClump*					m_pClump;
+	short						m_usRemoveTimer;
 
     CClientVehicle*             m_pPreviousLink;
     CClientVehicle*             m_pNextLink;
     CMatrix                     m_Matrix;
-    CMatrix                     m_MatrixLast;
-    CMatrix                     m_MatrixPure;   
-    CVector                     m_vecMoveSpeedInterpolate;
-    CVector                     m_vecMoveSpeedMeters;
-    CVector                     m_vecMoveSpeed;
+	CMatrix						m_MatrixLast;
+	CMatrix						m_MatrixPure;	
+	CVector						m_vecMoveSpeedInterpolate;
+	CVector						m_vecMoveSpeedMeters;
+	CVector                     m_vecMoveSpeed;
     CVector                     m_vecTurnSpeed;
     float                       m_fHealth;
     float                       m_fTurretHorizontal;
@@ -453,8 +438,8 @@ protected:
     unsigned char               m_ucWheelStates [MAX_WHEELS];
     unsigned char               m_ucPanelStates [MAX_PANELS];
     unsigned char               m_ucLightStates [MAX_LIGHTS];
-    bool                        m_bJustBlewUp;
-    eEntityStatus               m_NormalStatus;
+	bool						m_bJustBlewUp;
+    eEntityStatus				m_NormalStatus;
     bool                        m_bColorSaved;
     unsigned char               m_ucColor1;
     unsigned char               m_ucColor2;
@@ -462,11 +447,8 @@ protected:
     unsigned char               m_ucColor4;
     bool                        m_bIsFrozen;
     bool                        m_bScriptFrozen;
-    bool                        m_bFrozenWaitingForGroundToLoad;
-    float                       m_fGroundCheckTolerance;
-    float                       m_fObjectsAroundTolerance;
     CMatrix                     m_matFrozen;
-    CVehicleUpgrades*           m_pUpgrades;
+	CVehicleUpgrades*			m_pUpgrades;
     unsigned char               m_ucOverrideLights;
     CClientVehicle*             m_pTowedVehicle;
     CClientVehicle*             m_pTowedByVehicle;
@@ -478,15 +460,11 @@ protected:
     bool                        m_bSmokeTrail;
     unsigned char               m_ucAlpha;
     bool                        m_bAlphaChanged;
-    double                      m_dLastRotationTime;
+	double						m_dLastRotationTime;
     bool                        m_bBlowNextFrame;
     bool                        m_bIsOnGround;
     bool                        m_bHeliSearchLightVisible;
     float                       m_fHeliRotorSpeed;
-#if WITH_VEHICLE_HANDLING
-    const CHandlingEntry*       m_pOriginalHandlingEntry;
-    CHandlingEntry*             m_pHandlingEntry;
-#endif
 
     bool                        m_bIsDerailed;
     bool                        m_bIsDerailable;
@@ -532,7 +510,7 @@ protected:
     bool                        m_bIsInWater;
 
     CVector                     m_vecGravity;
-    SColor                      m_HeadLightColor;
+    RGBA                        m_HeadLightColor;
 
 public:
     CClientPlayer *             m_pLastSyncer;

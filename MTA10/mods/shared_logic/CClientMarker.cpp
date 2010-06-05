@@ -28,7 +28,7 @@ CClientMarker::CClientMarker ( CClientManager* pManager, ElementID ID, int iMark
     m_pManager = pManager;
     m_pMarkerManager = pManager->GetMarkerManager ();
     m_pCollision = NULL;
-    m_pMarker = NULL;
+	m_pMarker = NULL;
 
     // Typename
     SetTypeName ( "marker" );
@@ -38,7 +38,6 @@ CClientMarker::CClientMarker ( CClientManager* pManager, ElementID ID, int iMark
 
     // Add us to marker manager list
     m_pMarkerManager->AddToList ( this );
-    UpdateSpatialData ();
 }
 
 
@@ -191,7 +190,7 @@ void CClientMarker::SetMarkerType ( CClientMarker::eMarkerType eType )
         m_pMarker->GetPosition ( vecPosition );
         bool bVisible = m_pMarker->IsVisible ();
         float fSize = m_pMarker->GetSize ();
-        SColor color = m_pMarker->GetColor ();
+        unsigned long ulColor = m_pMarker->GetColor ();
         bool bStreamedIn = IsStreamedIn ();
 
         // Destroy the old.
@@ -204,7 +203,7 @@ void CClientMarker::SetMarkerType ( CClientMarker::eMarkerType eType )
         // Set the properties back
         SetPosition ( vecPosition );
         SetSize ( fSize );
-        SetColor ( color );
+        SetColor ( ulColor );
         SetVisible ( bVisible );
 
         // Stream it in if it was streamed in
@@ -267,15 +266,51 @@ void CClientMarker::SetVisible ( bool bVisible )
 }
 
 
-SColor CClientMarker::GetColor ( void ) const
+unsigned long CClientMarker::GetColor ( void )
 {
     return m_pMarker->GetColor ();
 }
 
 
-void CClientMarker::SetColor ( const SColor color )
+void CClientMarker::GetColor ( unsigned char& Red, unsigned char& Green, unsigned char& Blue, unsigned char& Alpha ) const
 {
-    m_pMarker->SetColor ( color );
+    m_pMarker->GetColor ( Red, Green, Blue, Alpha );
+}
+
+
+unsigned char CClientMarker::GetColorRed ( void ) const
+{
+    return m_pMarker->GetColorRed ();
+}
+
+
+unsigned char CClientMarker::GetColorGreen ( void ) const
+{
+    return m_pMarker->GetColorGreen ();
+}
+
+
+unsigned char CClientMarker::GetColorBlue ( void ) const
+{
+    return m_pMarker->GetColorBlue ();
+}
+
+
+unsigned char CClientMarker::GetColorAlpha ( void ) const
+{
+    return m_pMarker->GetColorAlpha ();
+}
+
+
+void CClientMarker::SetColor ( unsigned char Red, unsigned char Green, unsigned char Blue, unsigned char Alpha )
+{
+    m_pMarker->SetColor ( Red, Green, Blue, Alpha );
+}
+
+
+void CClientMarker::SetColor ( unsigned long ulColor )
+{
+    m_pMarker->SetColor ( ulColor );
 }
 
 
@@ -287,21 +322,21 @@ float CClientMarker::GetSize ( void ) const
 
 void CClientMarker::SetSize ( float fSize )
 {
-    switch ( m_pCollision->GetShapeType() )
-    {
-        case COLSHAPE_CIRCLE:
-        {
-            CClientColCircle* pShape = static_cast < CClientColCircle* > ( m_pCollision );
-            pShape->SetRadius ( fSize );
-            break;
-        }
-        case COLSHAPE_SPHERE:
-        {
-            CClientColSphere* pShape = static_cast < CClientColSphere* > ( m_pCollision );
-            pShape->SetRadius ( fSize );
-            break;
-        }
-    }
+	switch ( m_pCollision->GetShapeType() )
+	{
+		case COLSHAPE_CIRCLE:
+		{
+			CClientColCircle* pShape = static_cast < CClientColCircle* > ( m_pCollision );
+			pShape->SetRadius ( fSize );
+			break;
+		}
+		case COLSHAPE_SPHERE:
+		{
+			CClientColSphere* pShape = static_cast < CClientColSphere* > ( m_pCollision );
+			pShape->SetRadius ( fSize );
+			break;
+		}
+	}
     m_pMarker->SetSize ( fSize );
 }
 
@@ -431,7 +466,7 @@ void CClientMarker::Callback_OnLeave ( CClientColShape& Shape, CClientEntity& En
 
 void CClientMarker::CreateOfType ( int iType )
 {
-    SAFE_DELETE ( m_pCollision )
+    if ( m_pCollision ) delete m_pCollision;
 
     CVector vecOrigin;
     GetPosition ( vecOrigin );    
@@ -444,7 +479,7 @@ void CClientMarker::CreateOfType ( int iType )
             m_pMarker = pCheckpoint;
             m_pCollision = new CClientColCircle ( g_pClientGame->GetManager(), NULL, vecOrigin, GetSize() );
             m_pCollision->m_pOwningMarker = this;
-            m_pCollision->SetHitCallback ( this );
+			m_pCollision->SetHitCallback ( this );
             break;
         }
 
@@ -455,7 +490,7 @@ void CClientMarker::CreateOfType ( int iType )
             m_pMarker = pCheckpoint;
             m_pCollision = new CClientColSphere ( g_pClientGame->GetManager(), NULL, vecOrigin, GetSize() );
             m_pCollision->m_pOwningMarker = this;
-            m_pCollision->SetHitCallback ( this );
+			m_pCollision->SetHitCallback ( this );
             break;
         }
 
@@ -466,7 +501,7 @@ void CClientMarker::CreateOfType ( int iType )
             m_pMarker = p3DMarker;
             m_pCollision = new CClientColCircle ( g_pClientGame->GetManager(), NULL, vecOrigin, GetSize() );
             m_pCollision->m_pOwningMarker = this;
-            m_pCollision->SetHitCallback ( this );
+			m_pCollision->SetHitCallback ( this );
             break;
         }
 
@@ -477,7 +512,7 @@ void CClientMarker::CreateOfType ( int iType )
             m_pMarker = p3DMarker;
             m_pCollision = new CClientColSphere ( g_pClientGame->GetManager(), NULL, vecOrigin, GetSize() );
             m_pCollision->m_pOwningMarker = this;
-            m_pCollision->SetHitCallback ( this );
+			m_pCollision->SetHitCallback ( this );
             break;
         }
 
@@ -486,21 +521,11 @@ void CClientMarker::CreateOfType ( int iType )
             m_pMarker = new CClientCorona ( this );
             m_pCollision = new CClientColSphere ( g_pClientGame->GetManager(), NULL, vecOrigin, GetSize() );
             m_pCollision->m_pOwningMarker = this;
-            m_pCollision->SetHitCallback ( this );
+			m_pCollision->SetHitCallback ( this );
             break;
         }
-        
-        default:
-            break;
+		
+		default:
+			break;
     }
-}
-
-
-CSphere CClientMarker::GetWorldBoundingSphere ( void )
-{
-    CSphere sphere;
-    GetPosition ( sphere.vecPosition );
-    //sphere.vecPosition = GetStreamPosition ();
-    sphere.fRadius = GetSize ();
-    return sphere;
 }

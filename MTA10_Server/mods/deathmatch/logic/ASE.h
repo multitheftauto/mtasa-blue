@@ -19,14 +19,14 @@ class ASE;
 #define __ASE_H__
 
 #ifdef WIN32
-    #include <conio.h>
-    #include <winsock.h>
+	#include <conio.h>
+	#include <winsock.h>
     #define sockclose closesocket
 #else
-    #include <sys/socket.h>
-    #include <sys/stat.h>
-    #include <netinet/in.h>
-    #define sockclose close
+	#include <sys/socket.h>
+	#include <sys/stat.h>
+	#include <netinet/in.h>
+	#define sockclose close
 #endif
 
 #include <string.h>
@@ -43,18 +43,15 @@ class CASERule;
 class ASE
 {
 public:
-                            ASE                 ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL, bool bLan = false );
-                            ~ASE                ( void );
+	                        ASE                 ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL, bool bLan = false );
+	                        ~ASE                ( void );
 
-    void                    DoPulse             ( void );
+	void                    DoPulse             ( void );
 
     static ASE*             GetInstance         ( void )                { return _instance; }
 
-    const std::string&      QueryFullCached     ( void );
     std::string             QueryFull           ( void );
-    const std::string&      QueryLightCached    ( void );
     std::string             QueryLight          ( void );
-    unsigned long           GetMasterServerQueryCount ( void )          { return m_ulMasterServerQueryCount; }
 
     CLanBroadcast*          InitLan             ( void );
 
@@ -88,27 +85,14 @@ private:
 
     list < CASERule* >      m_Rules;
 
-    unsigned int            m_Socket;
+    unsigned int			m_Socket;
     sockaddr_in             m_SockAddr;
 
     bool                    m_bLan;
     unsigned short          m_usPort;
 
-    // Full query cache
-    unsigned int            m_uiFullLastPlayerCount;
-    long long               m_llFullLastTime;
-    long                    m_lFullMinInterval;
-    std::string             m_strFullCached;
-
-    // Light query cache
-    unsigned int            m_uiLightLastPlayerCount;
-    long long               m_llLightLastTime;
-    long                    m_lLightMinInterval;
-    std::string             m_strLightCached;
-
-    unsigned long           m_ulMasterServerQueryCount;
 protected:
-    void                    GetStatusVals();
+	void                    GetStatusVals();
 
 };
 

@@ -61,10 +61,10 @@ public:
 
     inline bool             GetBoolean          ( void ) const      { return m_bBoolean; };
     inline lua_Number       GetNumber           ( void ) const      { return m_Number; };
-    inline const std::string& GetString         ( void )            { return m_strString; };
+    inline std::string&     GetString           ( void )            { return m_strString; };
     inline void*            GetLightUserData    ( void ) const      { return m_pLightUserData; };
     CElement*               GetElement          ( void ) const;
-    bool                    GetAsString         ( SString& strBuffer );
+    bool                    GetAsString         ( char * szBuffer, unsigned int uiLength );
 
     bool                    ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
     bool                    WriteToBitStream    ( NetBitStreamInterface& bitStream, std::map < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;

@@ -35,22 +35,6 @@ bool CPlayerJoinDataPacket::Read ( NetBitStreamInterface& BitStream )
             return false;
     }
 
-    if ( m_usBitStreamVersion >= 0x0b )
-    {
-        unsigned int uiLength;
-        BitStream.ReadCompressed ( uiLength );
-        if ( uiLength < 1 || uiLength > 100 )
-            return false;
-
-        m_strPlayerVersion.assign ( uiLength, 32 );
-        BitStream.Read ( &m_strPlayerVersion.at ( 0 ), uiLength );
-    }
-
-    if ( m_usBitStreamVersion >= 0x0e )
-        m_bOptionalUpdateInfoRequired = BitStream.ReadBit ();
-    else
-        m_bOptionalUpdateInfoRequired = false;
-
     return ( BitStream.Read ( m_ucGameVersion ) &&
              BitStream.Read ( m_szNick, MAX_NICK_LENGTH ) &&
              BitStream.Read ( reinterpret_cast < char* > ( &m_Password ), 16 ) &&

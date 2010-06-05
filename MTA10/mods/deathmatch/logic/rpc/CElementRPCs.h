@@ -30,11 +30,10 @@ public:
     DECLARE_RPC ( AttachElements );
     DECLARE_RPC ( DetachElements );
     DECLARE_RPC ( SetElementAlpha );
-    DECLARE_RPC ( SetElementName );
+	DECLARE_RPC ( SetElementName );
     DECLARE_RPC ( SetElementHealth );
     DECLARE_RPC ( SetElementModel );
     DECLARE_RPC ( SetElementAttachedOffsets );
-    DECLARE_RPC ( SetElementDoubleSided );
 };
 
 #endif

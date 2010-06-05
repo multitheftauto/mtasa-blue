@@ -17,6 +17,8 @@ CClientColPolygon::CClientColPolygon ( CClientManager* pManager, ElementID ID, c
     m_pManager = pManager;
     m_vecPosition = vecPosition;
 
+    SetTypeName ( "colpolygon" );
+
     // That's only to speed up things by not checking the polygon collision,
     // if the point is not even in the bounds
     m_fRadius = 0.0f;
@@ -57,8 +59,8 @@ bool CClientColPolygon::DoHitDetection  ( const CVector& vecNowPosition, float f
 
 bool CClientColPolygon::ReadSpecialData ( void )
 {
-    int iTemp;
-    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+	int iTemp;
+	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     return true;
@@ -76,43 +78,28 @@ void CClientColPolygon::SetPosition ( const CVector& vecPosition )
     }
 
     m_vecPosition = vecPosition;
-    UpdateSpatialData ();
-    // Add queued collider refresh for v1.1
 }
+
 
 void CClientColPolygon::AddPoint ( CVector2D vecPoint )
 {
-    float fDistanceX = vecPoint.fX - m_vecPosition.fX;
-    float fDistanceY = vecPoint.fY - m_vecPosition.fY;
+	float fDistanceX = vecPoint.fX - m_vecPosition.fX;
+	float fDistanceY = vecPoint.fY - m_vecPosition.fY;
 
-    float fDist = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
+	float fDist = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
 
     if ( fDist > m_fRadius )
-    {
         m_fRadius = fDist;
-        SizeChanged ();
-    }
 
     m_Points.push_back ( vecPoint );
 }
 
 bool CClientColPolygon::IsInBounds ( CVector vecPoint )
 {
-    float fDistanceX = vecPoint.fX - m_vecPosition.fX;
-    float fDistanceY = vecPoint.fY - m_vecPosition.fY;
+	float fDistanceX = vecPoint.fX - m_vecPosition.fX;
+	float fDistanceY = vecPoint.fY - m_vecPosition.fY;
 
-    float fDist = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
+	float fDist = sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
 
     return fDist <= m_fRadius;
-}
-
-
-CSphere CClientColPolygon::GetWorldBoundingSphere ( void )
-{
-    CSphere sphere;
-    sphere.vecPosition.fX = m_vecPosition.fX;
-    sphere.vecPosition.fY = m_vecPosition.fY;
-    sphere.vecPosition.fZ = SPATIAL_2D_Z;
-    sphere.fRadius        = m_fRadius;
-    return sphere;
 }

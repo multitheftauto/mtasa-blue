@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CWaterManagerSA.h
-*  PURPOSE:     Control the lakes and seas
-*  DEVELOPERS:  arc_
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		game_sa/CWaterManagerSA.h
+*  PURPOSE:		Control the lakes and seas
+*  DEVELOPERS:	arc_
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -15,7 +15,7 @@
 
 #include "CWaterSA.h"
 
-#define DEFAULT_WAVE_LEVEL                 0.0f
+#define DEFAULT_WAVE_LEVEL                 1.0f
 
 #define FUNC_ReadWaterConfiguration        0x6EAE80         // ()
 #define FUNC_CreateWaterVertex             0x6E5A40         // (word x, word y, float z, float unknown, float height, word flow)

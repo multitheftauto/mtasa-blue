@@ -1,9 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CHandlingEntry.h
-*  PURPOSE:     Vehicle handling entry interface
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		sdk/game/CHandlingEntry.h
+*  PURPOSE:		Vehicle handling entry interface
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -107,7 +107,7 @@ public:
 
     virtual eDriveType      GetCarDriveType                 ( void ) const = 0;
     virtual eEngineType     GetCarEngineType                ( void ) const = 0;
-    virtual unsigned char   GetNumberOfGears                ( void ) const = 0;
+    virtual unsigned char   GetNUmberOfGears                ( void ) const = 0;
 
     virtual float           GetEngineAccelleration          ( void ) const = 0;
     virtual float           GetEngineInertia                ( void ) const = 0;

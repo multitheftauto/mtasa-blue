@@ -75,19 +75,22 @@ void CBlipRPCs::SetBlipColor ( NetBitStreamInterface& bitStream )
 {
     // Read out the blip ID and the color
     ElementID ID;
-    SColor color;
+    unsigned char ucRed;
+    unsigned char ucGreen;
+    unsigned char ucBlue;
+    unsigned char ucAlpha;
     if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( color.R ) &&
-         bitStream.Read ( color.G ) &&
-         bitStream.Read ( color.B ) &&
-         bitStream.Read ( color.A ) )
+         bitStream.Read ( ucRed ) &&
+         bitStream.Read ( ucGreen ) &&
+         bitStream.Read ( ucBlue ) &&
+         bitStream.Read ( ucAlpha ) )
     {
         // Grab the blip
         CClientRadarMarker* pMarker = m_pRadarMarkerManager->Get ( ID );
         if ( pMarker )
         {
             // Set the new color
-            pMarker->SetColor ( color );
+            pMarker->SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
         }
     }
 }

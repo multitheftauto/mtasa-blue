@@ -3,7 +3,6 @@
 
 AC_PREREQ(2.61)
 AC_INIT(mta, 1.0-trunk, nospam@mtanet)
-AC_CONFIG_AUX_DIR([.])
 AM_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -38,6 +37,7 @@ AH_TEMPLATE([USING_BIG_ENDIAN], Define this if you are on a big-endian system.)
 AH_TEMPLATE([USING_LITTLE_ENDIAN], Define this if you are on a non-big-endian system.)
 AH_TEMPLATE([X64], Define this if you are under an X64-based operating system.)
 AH_TEMPLATE([X86], Define this if you are under an X86-based 32bit operating system.)
+AH_TEMPLATE([MTA_REVISION], The revision of the latest checkout)
 
 # Flags 
 
@@ -135,11 +135,24 @@ AC_CHECK_HEADERS([google/sparse_hash_map],,AC_MSG_ERROR([can't find google spars
 
 # Checks for library functions.
 
+# Extract the latest SVN revision
+AC_CHECK_PROG([SVNVERSION], [svnversion], yes)
+if test -z "$SVNVERSION"; then
+	AC_MSG_ERROR(Subversion 'svnversion' not found)
+else
+	MTA_REVISION=`/usr/bin/env svnversion -n`
+	if test -z "$MTA_REVISION"; then MTA_REVISION="n/a"; fi
+
+	AC_MSG_NOTICE(Extracted SVN version: $MTA_REVISION)
+	AC_DEFINE_UNQUOTED(MTA_REVISION,["\$Rev: $MTA_REVISION \$"])
+	AC_SUBST(MTA_REVISION)
+fi
+
 # Configure subdirectories where necessary
-#   NOTE: Put these on separate single lines due to a bug in autoconf
-#   http://readlist.com/lists/lists.sourceforge.net/mingw-users/2/12488.html
-AC_CONFIG_SUBDIRS([vendor/lua])
-AC_CONFIG_SUBDIRS([vendor/json-c])
+AC_CONFIG_SUBDIRS([
+	vendor/lua
+	vendor/json-c
+	])
 
 # Generate makefiles
 AC_CONFIG_FILES([

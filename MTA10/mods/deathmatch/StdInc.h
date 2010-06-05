@@ -15,7 +15,6 @@
 #include <map>
 #include <set>
 #include <string>
-#include <sstream>
 #include <vector>
 #include <cstdio>
 #include <cstring>
@@ -36,8 +35,6 @@
 #include <CVector.h>
 #include <CMatrix4.h>
 #include <CQuat.h>
-#include <CSphere.h>
-#include <CBox.h>
 #include <ijsify.h>
 #include <Common.h>
 
@@ -60,7 +57,6 @@
 #include <CClientDisplayGroup.h>
 #include <CClientDummy.h>
 #include <CClientEntity.h>
-#include <CClientSpatialDatabase.h>
 #include <CClientExplosionManager.h>
 #include <CClientHandling.h>
 #include <CClientPed.h>
@@ -69,6 +65,9 @@
 #include <CClientStreamSector.h>
 #include <CClientStreamSectorRow.h>
 #include <CClientTask.h>
+#include <CClientTextDisplayBackgroundEffect.h>
+#include <CClientTextDisplayFadeEffect.h>
+#include <CClientTextDisplayGlowEffect.h>
 #include <CClientTXD.h>
 #include <CClientWater.h>
 #include <CCustomData.h>

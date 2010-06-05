@@ -1,10 +1,10 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CChat.cpp
-*  PURPOSE:     In-game chat box user interface implementation
-*  DEVELOPERS:  Jax <>
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		core/CChat.cpp
+*  PURPOSE:		In-game chat box user interface implementation
+*  DEVELOPERS:	Jax <>
 *               arc_
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -31,14 +31,12 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     m_vecBackgroundPosition = vecPosition;
 
     // Initialize variables
-    m_iScrollState = 0;
     m_uiMostRecentLine = 0;
     m_uiScrollOffset = 0;
     m_fSmoothScroll = 0;
     m_fSmoothLastTimeSeconds = 0;
     m_fSmoothAllowAfter = 0;
     m_fSmoothScrollResetTime = 0;
-    m_fSmoothRepeatTimer = 0;
     m_TextColor = CHAT_TEXT_COLOR;
     m_bUseCEGUI = false;
     m_iCVarsRevision = -1;
@@ -74,6 +72,9 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     m_pInput->SetVisible ( false );
     SetInputPrefix ( "Say: " );
 
+    // Set handlers
+    m_pManager->SetCharacterKeyHandler ( GUI_CALLBACK_KEY ( &CChat::CharacterKeyHandler, this ) );
+
     // Load cvars and position the GUI
     LoadCVars ();
     UpdateGUI ();
@@ -94,11 +95,6 @@ CChat::~CChat ( void )
         g_pChat = NULL;
 }
 
-void CChat::OnModLoad ( void )
-{
-    // Set handlers
-    m_pManager->SetCharacterKeyHandler ( INPUT_MOD, GUI_CALLBACK_KEY ( &CChat::CharacterKeyHandler, this ) );
-}
 
 void CChat::LoadCVars ( void )
 {
@@ -118,35 +114,6 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_line_life",               (unsigned int &)m_ulChatLineLife );
     CVARS_GET ( "chat_line_fade_out",           (unsigned int &)m_ulChatLineFadeOut );
     CVARS_GET ( "chat_font",                    (unsigned int &)Font ); SetChatFont ( (eChatFont)Font );
-
-    // Modify default chat box to be like 'Transparent' preset
-    bool bVal = false;
-    CVARS_GET ( "chat_done_default_upgrade", bVal );
-    if ( !bVal )
-    {
-        CVARS_SET ( "chat_done_default_upgrade", true );
-
-        if ( Font                       == 0                            // chat_font
-             && m_uiNumLines            == 7                            // chat_lines
-             && m_Color                 == CColor (0,0,128,100)         // chat_color
-             && m_InputColor            == CColor (0,0,191,110)         // chat_input_color
-             && m_InputTextColor        == CColor (172,213,254,255)     // chat_input_text_color
-             && m_vecScale              == CVector2D ( 1.0f, 1.0f )     // chat_scale
-             && fWidth                  == 1.0f                         // chat_width
-             && m_bCssStyleText         == false                        // chat_css_style_text
-             && m_bCssStyleBackground   == false                        // chat_css_style_background
-             && m_ulChatLineLife        == 12000                        // chat_line_life
-             && m_ulChatLineFadeOut     == 3000                         // chat_line_fade_out
-            )
-        {
-            CVARS_SET ( "chat_font",                    (unsigned int)2 );
-            CVARS_SET ( "chat_color",                   CColor (0,0,0,0) );
-            CVARS_SET ( "chat_input_color",             CColor (0,0,0,0) );
-            CVARS_SET ( "chat_lines",                   10 );
-            CVARS_SET ( "chat_width",                   1.5f );
-            LoadCVars ();
-        }
-    }
 }
 
 
@@ -248,33 +215,6 @@ void CChat::Draw ( void )
 //
 void CChat::UpdateSmoothScroll ( float* pfPixelScroll, int *piLineScroll )
 {
-    // Calc frame time
-    float fTimeSeconds = GetSecondCount ();
-    float fDeltaSeconds = fTimeSeconds - m_fSmoothLastTimeSeconds;
-    m_fSmoothLastTimeSeconds = fTimeSeconds;
-
-    // Handle auto repeat
-    if ( m_iScrollState == 0 )
-    {
-        m_fSmoothRepeatTimer = -100;
-    }
-    else
-    {
-        if ( m_fSmoothRepeatTimer < 0.0f )
-        {
-            if ( m_fSmoothRepeatTimer < -50 )
-                m_fSmoothRepeatTimer = 0.250f;
-            else
-                m_fSmoothRepeatTimer += 1/22.f;
-
-            if ( m_iScrollState == 1 )
-                ScrollUp ();
-            else if ( m_iScrollState == -1 )
-                ScrollDown ();
-        }
-        m_fSmoothRepeatTimer -= fDeltaSeconds;
-    }
-
     // Time to reset?
     if ( m_fSmoothScrollResetTime && m_fSmoothScrollResetTime < GetSecondCount () )
     {
@@ -283,10 +223,14 @@ void CChat::UpdateSmoothScroll ( float* pfPixelScroll, int *piLineScroll )
         m_uiScrollOffset -= m_uiScrollOffset;
     }
 
+    // Calc frame time
+    float fTimeSeconds = GetSecondCount ();
+    float fDeltaSeconds = fTimeSeconds - m_fSmoothLastTimeSeconds;
+    m_fSmoothLastTimeSeconds = fTimeSeconds;
 
     // Calc smooth scroll deceleration
     float fFixedChange = ( m_fSmoothScroll < 0 ? -1 : 1 ) * -Min ( fDeltaSeconds / 0.2f, 1.0f );
-    float fLerpChange = m_fSmoothScroll * ( 1 - Min ( fDeltaSeconds / 0.3f, 1.0f ) ) - m_fSmoothScroll;
+    float fLerpChange = m_fSmoothScroll * ( 1 - Min ( fDeltaSeconds / 0.2f, 1.0f ) ) - m_fSmoothScroll;
     float fChange = fLerpChange * 0.7f + fFixedChange * 0.4f;
     fChange = Clamp ( -fabsf ( m_fSmoothScroll ), fChange, fabsf ( m_fSmoothScroll ) );
 
@@ -362,10 +306,10 @@ void CChat::Outputf ( bool bColorCoded, const char* szFormat, ... )
 {
     SString str;
     
-    va_list ap;
-    va_start ( ap, szFormat );
+	va_list ap;
+	va_start ( ap, szFormat );
     str.vFormat ( szFormat, ap );
-    va_end ( ap );
+	va_end ( ap );
 
     Output ( str.c_str (), bColorCoded );
 }
@@ -391,6 +335,7 @@ void CChat::ClearInput ( void )
         m_pInput->SetSize ( m_vecInputSize );
 }
 
+// Not yet integrated/tested
 void CChat::ScrollUp ()
 {
     if ( m_Lines [ (m_uiMostRecentLine + m_uiScrollOffset + m_uiNumLines) % CHAT_MAX_LINES ].IsActive ()
@@ -406,6 +351,7 @@ void CChat::ScrollUp ()
     }
 }
 
+// Not yet integrated/tested
 void CChat::ScrollDown ()
 {
     if ( m_uiScrollOffset <= 0 )
@@ -447,9 +393,9 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 // If theres a command to call, call it
                 if ( !m_strCommand.empty () && !m_strInputText.empty () )
                     CCommands::GetSingleton().Execute ( m_strCommand.c_str (), m_strInputText.c_str () );
-            
-                // Deactivate the VisibleWindows counter
-                CLocalGUI::GetSingleton ().SetVisibleWindows ( false );
+    		
+				// Deactivate the VisibleWindows counter
+				CLocalGUI::GetSingleton ().SetVisibleWindows ( false );
                 SetInputVisible ( false );
 
                 m_fSmoothScrollResetTime = GetSecondCount ();
@@ -472,7 +418,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
         }
     }
 
-    return true;
+	return true;
 }
 
 
@@ -514,18 +460,18 @@ void CChat::SetChatFont ( eChatFont Font )
     {
         case CHAT_FONT_DEFAULT:
             pFont = g_pCore->GetGUI ()->GetDefaultFont ();
-            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT );
+			pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT );
             break;
         case CHAT_FONT_CLEAR:
             pFont = g_pCore->GetGUI ()->GetClearFont ();
-            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_CLEAR );
+			pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_CLEAR );
             break;
         case CHAT_FONT_BOLD:
             pFont = g_pCore->GetGUI ()->GetBoldFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT_BOLD );
             break;
         case CHAT_FONT_ARIAL:
-            pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_ARIAL );
+			pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_ARIAL );
             break;                
     }
 

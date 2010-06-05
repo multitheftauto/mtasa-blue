@@ -5,7 +5,6 @@
 *  FILE:        core/CKeyBinds.cpp
 *  PURPOSE:     Core keybind manager
 *  DEVELOPERS:  Jax <>
-*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -31,21 +30,21 @@ SBindableKey g_bkKeys[] =
     { "rshift",  0x10,          GTA_KEY_RSHIFT,         DATA_EXTENDED,          0 }, // 10
     { "lctrl",   0x11,          GTA_KEY_LCONTROL,       DATA_NOT_EXTENDED,      0 }, 
     { "rctrl",   0x11,          GTA_KEY_RCONTROL,       DATA_EXTENDED,          0 },
-    { "lalt",    0x12,          GTA_KEY_LMENU,          DATA_NOT_EXTENDED,      0,      true },
-    { "ralt",    0x12,          GTA_KEY_RMENU,          DATA_EXTENDED,          0,      true },
-    { "pause",   0x13,          GTA_KEY_PAUSE,          DATA_NONE,              0,      true },
+    { "lalt",    0x12,          GTA_KEY_LMENU,          DATA_NOT_EXTENDED,      0 },
+    { "ralt",    0x12,          GTA_KEY_RMENU,          DATA_EXTENDED,          0 },
+    { "pause",   0x13,          GTA_KEY_PAUSE,          DATA_NONE,              0 },
     { "capslock",0x14,          GTA_KEY_CAPSLOCK,       DATA_NONE,              0 },
     { "enter",   0x0D,          GTA_KEY_RETURN,         DATA_NOT_EXTENDED,      0 },
     { "space",   0x20,          GTA_KEY_SPACE,          DATA_NONE,              0 },
-    { "pgup",    0x21,          GTA_KEY_PGUP,           DATA_NUMPAD,            74,     true },
-    { "pgdn",    0x22,          GTA_KEY_PGDN,           DATA_NUMPAD,            68,     true }, // 20
+    { "pgup",    0x21,          GTA_KEY_PGUP,           DATA_NUMPAD,            74 },
+    { "pgdn",    0x22,          GTA_KEY_PGDN,           DATA_NUMPAD,            68 }, // 20
     { "end",     0x23,          GTA_KEY_END,            DATA_NUMPAD,            66 },
     { "home",    0x24,          GTA_KEY_HOME,           DATA_NUMPAD,            72 },
     { "arrow_l", 0x25,          GTA_KEY_LEFT,           DATA_NUMPAD,            69 },
     { "arrow_u", 0x26,          GTA_KEY_UP,             DATA_NUMPAD,            73 },
     { "arrow_r", 0x27,          GTA_KEY_RIGHT,          DATA_NUMPAD,            71 }, 
     { "arrow_d", 0x28,          GTA_KEY_DOWN,           DATA_NUMPAD,            67 },
-    { "insert",  0x2D,          GTA_KEY_INSERT,         DATA_NUMPAD,            65,     true }, 
+    { "insert",  0x2D,          GTA_KEY_INSERT,         DATA_NUMPAD,            65 }, 
     { "delete",  0x2E,          GTA_KEY_DELETE,         DATA_NUMPAD,            79 },
     { "0",       0x30,          GTA_KEY_0,              DATA_NONE,              0 }, 
     { "1",       0x31,          GTA_KEY_1,              DATA_NONE,              0 }, // 30
@@ -92,26 +91,26 @@ SBindableKey g_bkKeys[] =
     { "num_6",   0x66,          GTA_KEY_NUMPAD6,        DATA_NONE,              0 },
     { "num_7",   0x67,          GTA_KEY_NUMPAD7,        DATA_NONE,              0 },
     { "num_8",   0x68,          GTA_KEY_NUMPAD8,        DATA_NONE,              0 }, 
-    { "num_9",   0x69,          GTA_KEY_NUMPAD9,        DATA_NONE,              0 },    
+    { "num_9",   0x69,          GTA_KEY_NUMPAD9,        DATA_NONE,              0 },	
     { "num_mul", 0x6A,          GTA_KEY_MULTIPLY,       DATA_NONE,              0 },
     { "num_add", 0x6B,          GTA_KEY_ADD,            DATA_NONE,              0 },
     { "num_sep", 0x6C,          NO_KEY_DEFINED,         DATA_NONE,              0 },
     { "num_sub", 0x6D,          GTA_KEY_SUBTRACT,       DATA_NONE,              0 },
     { "num_dec", 0x6E,          GTA_KEY_DECIMAL,        DATA_NONE,              0 },
     { "num_div", 0x6F,          GTA_KEY_DIVIDE,         DATA_NONE,              0 }, // 80
-    { "F1",      0x70,          GTA_KEY_F1,             DATA_NONE,              0,     true }, 
-    { "F2",      0x71,          GTA_KEY_F2,             DATA_NONE,              0,     true }, 
-    { "F3",      0x72,          GTA_KEY_F3,             DATA_NONE,              0,     true }, 
-    { "F4",      0x73,          GTA_KEY_F4,             DATA_NONE,              0,     true }, 
-    { "F5",      0x74,          GTA_KEY_F5,             DATA_NONE,              0,     true },
-    { "F6",      0x75,          GTA_KEY_F6,             DATA_NONE,              0,     true }, 
-    { "F7",      0x76,          GTA_KEY_F7,             DATA_NONE,              0,     true }, 
+    { "F1",      0x70,          GTA_KEY_F1,             DATA_NONE,              0 }, 
+    { "F2",      0x71,          GTA_KEY_F2,             DATA_NONE,              0 }, 
+    { "F3",      0x72,          GTA_KEY_F3,             DATA_NONE,              0 }, 
+    { "F4",      0x73,          GTA_KEY_F4,             DATA_NONE,              0 }, 
+    { "F5",      0x74,          GTA_KEY_F5,             DATA_NONE,              0 },
+    { "F6",      0x75,          GTA_KEY_F6,             DATA_NONE,              0 }, 
+    { "F7",      0x76,          GTA_KEY_F7,             DATA_NONE,              0 }, 
     //{ "F8",    0x77,          GTA_KEY_F8,             DATA_NONE },  * Used for console
-    { "F9",      0x78,          GTA_KEY_F9,             DATA_NONE,              0,     true },
-    { "F10",     0x79,          GTA_KEY_F10,            DATA_NONE,              0,     true },
-    { "F11",     0x7A,          GTA_KEY_F11,            DATA_NONE,              0,     true }, // 90
-    { "F12",     0x7B,          GTA_KEY_F12,            DATA_NONE,              0,     true },
-    { "scroll",  0x91,          GTA_KEY_SCROLL,         DATA_NONE,              0,     true },
+    { "F9",      0x78,          GTA_KEY_F9,             DATA_NONE,              0 },
+    { "F10",     0x79,          GTA_KEY_F10,            DATA_NONE,              0 },
+    { "F11",     0x7A,          GTA_KEY_F11,            DATA_NONE,              0 }, // 90
+    { "F12",     0x7B,          GTA_KEY_F12,            DATA_NONE,              0 },
+    { "scroll",  0x91,          GTA_KEY_SCROLL,         DATA_NONE,              0 },
     { ";",       0xBA,          GTA_KEY_SEMICOLON,      DATA_NONE,              0 },
     { "=",       0xBB,          GTA_KEY_EQUALS,         DATA_NONE,              0 },
     { ",",       0xBC,          GTA_KEY_COMMA,          DATA_NONE,              0 },
@@ -217,31 +216,6 @@ SBindableGTAControl g_bcControls[] =
     { "", (eControllerAction)0, (eControlType)0, false, false }
 };
 
-SDefaultCommandBind g_dcbDefaultCommands[] = 
-{ 
-    { "g",       true,  "enter_passenger",  NULL },
-    { "F12",     true,  "screenshot",       NULL },
-    { "t",       true,  "chatbox",          "chatboxsay" },
-    { "y",       true,  "chatbox",          "teamsay 255 0 0" },
-    { "F11",     true,  "radar",            "-1" },
-    { "num_add", true,  "radar_zoom_in",    NULL },
-    { "num_sub", true,  "radar_zoom_out",   NULL },
-    { "num_8",   true,  "radar_move_north", NULL },
-    { "num_2",   true,  "radar_move_south", NULL },
-    { "num_6",   true,  "radar_move_east",  NULL },
-    { "num_4",   true,  "radar_move_west",  NULL },
-    { "num_0",   true,  "radar_attach",     NULL },
-    
-    { "pgup",    true,  "chatscrollup",     "1" },
-    { "pgup",    false, "chatscrollup",     "0" },
-    { "pgdn",    true,  "chatscrolldown",   "-1" },
-    { "pgdn",    false, "chatscrolldown",   "0" },
-    { "pgup",    true,  "debugscrollup",    "1" },
-    { "pgup",    false, "debugscrollup",    "0" },
-    { "pgdn",    true,  "debugscrolldown",  "-1" },
-    { "pgdn",    false, "debugscrolldown",  "0" }
-};
-
 // HACK: our current shift key states
 bool bPreLeftShift = false, bPreRightShift = false;
 
@@ -286,9 +260,9 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     static bool bInputGoesToGUI = false;
     static bool bIsCursorForced = false;
     if ( m_pCore->IsMenuVisible () ||
-         ( m_pCore->GetConsole ()->IsVisible () ||
+         m_pCore->GetConsole ()->IsVisible () ||
          m_pCore->IsChatInputEnabled () ||
-         m_pCore->GetGUI ()->GetGUIInputEnabled () ) && !pKey->bIgnoredByGUI )
+		 m_pCore->GetGUI ()->GetGUIInputEnabled () )
     {
         if ( !bInputGoesToGUI )
         {
@@ -320,13 +294,12 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
     // Search through binds
     bool bFound = false;
     CKeyBind* pBind = NULL;
-    list < CCommandBind* > *processedList = new list < CCommandBind* >;
     list < CKeyBind* > cloneList = *m_pList;
     list < CKeyBind* > ::const_iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end (); ++iter )
     {
         pBind = *iter;
-        if ( pBind->IsBeingDeleted () || !pBind->bActive || !pBind->boundKey ) continue;
+        if ( pBind->IsBeingDeleted () || !pBind->boundKey ) continue;
 
         // Does this bind's key match?
         if ( pBind->boundKey == pKey )
@@ -371,30 +344,8 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
                                             m_pChatBoxBind = pCommandBind;
                                         }                                                                            
                                         else
-                                        {
-                                            bool bAlreadyProcessed = false;
-                                            list < CCommandBind* > ::iterator iter = processedList->begin ();
-                                            for ( ; iter != processedList->end (); iter++ )
-                                            {
-                                                if ( strcmp ( ( *iter )->szCommand, pCommandBind->szCommand ) == 0 )
-                                                {
-                                                    if ( ( *iter )->bHitState == pCommandBind->bHitState )
-                                                    {
-                                                        if ( !pCommandBind->szArguments || ( ( *iter )->szArguments && strcmp ( ( *iter )->szArguments, pCommandBind->szArguments ) == 0 ) )
-                                                        {
-                                                            bAlreadyProcessed = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            //don't fire if its already fired
-                                            if ( !bAlreadyProcessed )
-                                            {
-                                                Call ( pCommandBind );
-                                                processedList->push_back ( pCommandBind );
-                                            }
+                                        {                                    
+                                            Call ( pCommandBind );
                                         }
                                     }
                                     break;
@@ -466,8 +417,8 @@ void CKeyBinds::RemoveDeletedBinds ( void )
             delete *iter;
             iter = m_pList->erase ( iter );
         }
-        else
-            ++iter;
+		else
+			++iter;
     }
 }
 
@@ -672,15 +623,15 @@ bool CKeyBinds::RemoveAllCommands ( void )
             iter = m_pList->erase ( iter );
             bFound = true;
         }
-        else
-            ++iter;
+		else
+			++iter;
     }
 
     return bFound;
 }
 
 
-bool CKeyBinds::CommandExists ( const char* szKey, const char* szCommand, bool bCheckState, bool bState, const char* szArguments, const char* szResource )
+bool CKeyBinds::CommandExists ( const char* szKey, const char* szCommand, bool bCheckState, bool bState, const char* szArguments )
 {
     list < CKeyBind* > ::const_iterator iter = m_pList->begin ();
     for ( ; iter != m_pList->end (); iter++ )
@@ -694,12 +645,9 @@ bool CKeyBinds::CommandExists ( const char* szKey, const char* szCommand, bool b
                 {
                     if ( !bCheckState || pBind->bHitState == bState )
                     {
-                        if ( !szArguments || ( pBind->szArguments && strcmp ( pBind->szArguments, szArguments ) == 0 ) )
+                        if ( !szArguments || ( szArguments && strcmp ( pBind->szArguments, szArguments ) == 0 ) )
                         {
-                            if ( !szResource || ( pBind->szResource && strcmp ( pBind->szResource, szResource ) == 0 ) )
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }
@@ -710,27 +658,24 @@ bool CKeyBinds::CommandExists ( const char* szKey, const char* szCommand, bool b
     return false;
 }
 
-bool CKeyBinds::SetCommandActive ( const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive, bool checkHitState )
+bool CKeyBinds::SetCommandActive ( const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive, bool checkHitState )
 {
     list < CKeyBind* > ::const_iterator iter = m_pList->begin ();
     for ( ; iter != m_pList->end (); iter++ )
     {
         if ( (*iter)->GetType () == KEY_BIND_COMMAND )
         {
-            if ( !szKey || ( strcmp ( (*iter)->boundKey->szKey, szKey ) == 0 ) )
+            CCommandBind* pBind = static_cast < CCommandBind* > ( *iter );
+            if ( pBind->szResource && ( strcmp ( pBind->szResource, szResource ) == 0 ) )
             {
-                CCommandBind* pBind = static_cast < CCommandBind* > ( *iter );
-                if ( pBind->szResource && ( strcmp ( pBind->szResource, szResource ) == 0 ) )
+                if ( !szCommand || ( strcmp ( pBind->szCommand, szCommand ) == 0 ) )
                 {
-                    if ( !szCommand || ( strcmp ( pBind->szCommand, szCommand ) == 0 ) )
+                    if ( !checkHitState || ( pBind->bHitState == bState ) )
                     {
-                        if ( !checkHitState || ( pBind->bHitState == bState ) )
+                        if ( !szArguments || ( strcmp ( pBind->szArguments, szArguments ) == 0 ) )
                         {
-                            if ( !szArguments || ( pBind->szArguments && strcmp ( pBind->szArguments, szArguments ) == 0 ) )
-                            {
-                                pBind->bActive = bActive;
-                                return true;
-                            }
+                            pBind->bActive = bActive;
+                            return true;
                         }
                     }
                 }
@@ -888,9 +833,9 @@ void CKeyBinds::RemoveGTAControls ( const char* szControl, bool bDestroy )
             CGTAControlBind* pBind = static_cast < CGTAControlBind* > ( *iter );
             if ( strcmp ( szControl, pBind->control->szControl ) == 0 )
             {
-                // Only destroy if we have to
-                if ( bDestroy )
-                    delete *iter;
+				// Only destroy if we have to
+				if ( bDestroy )
+					delete *iter;
 
                 iter = m_pList->erase ( iter );
                 continue;
@@ -966,8 +911,8 @@ bool CKeyBinds::RemoveAllGTAControls ( void )
             iter = m_pList->erase ( iter );
             bFound = true;
         }
-        else
-            ++iter;
+		else
+			++iter;
     }
 
     return bFound;
@@ -2061,8 +2006,8 @@ void CKeyBinds::DoPostFramePulse ( void )
     if ( pPed->GetCurrentWeaponSlot () == 12 /*Detonator*/ )
         bHasDetonator = true;
 
-    CTaskManager * pTaskManager = pPed->GetPedIntelligence ()->GetTaskManager ();
-    CTask * pTask = pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
+	CTaskManager * pTaskManager = pPed->GetPedIntelligence ()->GetTaskManager ();
+	CTask * pTask = pTaskManager->GetTask ( TASK_PRIORITY_PRIMARY );
     if ( pTask )
     {
         if ( pTask->GetTaskType () == TASK_COMPLEX_ENTER_CAR_AS_DRIVER ||
@@ -2070,7 +2015,7 @@ void CKeyBinds::DoPostFramePulse ( void )
         {
             bEnteringVehicle = true;
         }
-    }
+	}
     pTask = pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
     if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DEAD )
         bIsDead = true;
@@ -2258,7 +2203,7 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
                                 {
                                     strResource = pAttribute->GetValue ();
                                     AddCommand ( strKey.c_str (), strCommand.c_str (), strArguments.c_str (), bState, strResource.c_str() );
-                                    SetCommandActive ( strKey.c_str (), strCommand.c_str(), bState, strArguments.c_str(), strResource.c_str(), false, true );
+                                    SetCommandActive ( strCommand.c_str(), bState, strArguments.c_str(), strResource.c_str(), false, true );
                                 }
                                 else if ( !CommandExists ( strKey.c_str (), strCommand.c_str (), true, bState ) )
                                     AddCommand ( strKey.c_str (), strCommand.c_str (), strArguments.c_str (), bState );
@@ -2300,7 +2245,7 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
 
 bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
 {
-    CXMLAttribute * pA = NULL;
+	CXMLAttribute * pA = NULL;
     if ( pMainNode )
     {
         // Clear our current bind nodes
@@ -2331,40 +2276,40 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                     if ( szKey )
                     {
                         pA = pAttributes->Create ( "key" );
-                        pA->SetValue ( szKey );
+						pA->SetValue ( szKey );
                     }
 
                     CCommandBind* pBind = static_cast < CCommandBind* > ( *iter );
                     char* szState = ( pBind->bHitState ) ? "down" : "up";
 
 
-                    pA = pAttributes->Create ( "state" );
-                    pA->SetValue ( szState );
+					pA = pAttributes->Create ( "state" );
+					pA->SetValue ( szState );
 
                     char* szCommand = pBind->szCommand;
                     if ( szCommand )
                     {
-                        pA = pAttributes->Create ( "command" );                     
-                        pA->SetValue ( szCommand );
+						pA = pAttributes->Create ( "command" );						
+						pA->SetValue ( szCommand );
                     }
 
                     char* szArguments = pBind->szArguments;
                     if ( szArguments )
                     {
-                        pA = pAttributes->Create ( "arguments" );                       
-                        pA->SetValue ( szArguments );
+						pA = pAttributes->Create ( "arguments" );						
+						pA->SetValue ( szArguments );
                     }
 
                     char* szResource = pBind->szResource;
                     if ( szResource )
                     {
-                        pA = pAttributes->Create ( "resource" );                        
-                        pA->SetValue ( szResource );
+						pA = pAttributes->Create ( "resource" );						
+						pA->SetValue ( szResource );
 
                         //If its still the default key dont bother saving it
                         if ( strcmp ( pBind->szDefaultKey, szKey ) == 0 )
                         {
-                            pNode->GetParent()->DeleteSubNode(pNode);
+                             pNode->GetParent()->DeleteSubNode(pNode);
                         }
                     }
                 }
@@ -2374,16 +2319,16 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                     const char* szKey = (*iter)->boundKey->szKey;
                     if ( szKey )
                     {
-                        pA = pAttributes->Create ( "key" );
-                        pA->SetValue ( szKey );
+						pA = pAttributes->Create ( "key" );
+						pA->SetValue ( szKey );
                     }
 
                     CGTAControlBind* pBind = static_cast < CGTAControlBind* > ( *iter );
                     char* szControl = pBind->control->szControl;
                     if ( szControl )
                     {
-                        pA = pAttributes->Create ( "control" );
-                        pA->SetValue ( szControl );
+						pA = pAttributes->Create ( "control" );
+						pA->SetValue ( szControl );
                     }
                 }
             }
@@ -2399,8 +2344,8 @@ void CKeyBinds::LoadDefaultBinds ( void )
 {
     Clear ();
     
-    LoadControlsFromGTA ();
-    LoadDefaultCommands ( true );
+	LoadControlsFromGTA ();
+    LoadDefaultCommands ();
 }
 
 
@@ -2424,7 +2369,7 @@ void CKeyBinds::LoadDefaultControls ( void )
     AddGTAControl ( "arrow_l", "left" );
     AddGTAControl ( "a", "left" );
     AddGTAControl ( "arrow_r", "right" );
-    AddGTAControl ( "d", "right" );
+	AddGTAControl ( "d", "right" );
     AddGTAControl ( "x", "zoom_in" );
     AddGTAControl ( "pgup", "zoom_in" );
     AddGTAControl ( "mouse_wheel_up", "zoom_in" );
@@ -2469,7 +2414,7 @@ void CKeyBinds::LoadDefaultControls ( void )
     AddGTAControl ( "h", "horn" );
     AddGTAControl ( "2", "sub_mission" );
     AddGTAControl ( "num_add", "sub_mission" );
-    AddGTAControl ( "space", "handbrake" );
+	AddGTAControl ( "space", "handbrake" );
     AddGTAControl ( "rctrl", "handbrake" );
     AddGTAControl ( "mouse3", "vehicle_look_behind" );
     AddGTAControl ( "mouse2", "vehicle_mouse_look" );
@@ -2484,14 +2429,20 @@ void CKeyBinds::LoadDefaultControls ( void )
 }
 
 
-void CKeyBinds::LoadDefaultCommands ( bool bForce )
+void CKeyBinds::LoadDefaultCommands ( void )
 {
-    for ( int i = 0 ; *g_dcbDefaultCommands [ i ].szKey != NULL ; i++ )
-    {
-        SDefaultCommandBind* temp = &g_dcbDefaultCommands [ i ];
-        if ( bForce || !CommandExists ( temp->szKey, temp->szCommand, true, temp->bState ) )
-            AddCommand ( temp->szKey, temp->szCommand, temp->szArguments, temp->bState );
-    }
+    AddCommand ( "g", "enter_passenger", NULL, true );
+    AddCommand ( "F12", "screenshot", NULL, true );
+    AddCommand ( "t", "chatbox", "chatboxsay", true );
+    AddCommand ( "y", "chatbox", "teamsay 255 0 0", true );
+    AddCommand ( "F11", "radar", "-1", true );
+    AddCommand ( "num_add", "radar_zoom_in", NULL, true );
+    AddCommand ( "num_sub", "radar_zoom_out", NULL, true );
+    AddCommand ( "num_8", "radar_move_north", NULL, true );
+    AddCommand ( "num_2", "radar_move_south", NULL, true );
+    AddCommand ( "num_6", "radar_move_east", NULL, true );
+    AddCommand ( "num_4", "radar_move_west", NULL, true );
+    AddCommand ( "num_0", "radar_attach", NULL, true );
 }
 
 
@@ -2803,13 +2754,13 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
         * NOTE: This usually happens when TweakUI is enabled.
         */
         if ( !bReturn )
-        {
-            /* Voodoo to make sure that the Alt_R message has posted */
-            Sleep ( 0 );
+	    {
+	        /* Voodoo to make sure that the Alt_R message has posted */
+	        Sleep ( 0 );
 
-            /* Look for fake Ctrl_L preceeding an Alt_R press. */
-            bReturn = PeekMessage ( &msgNext, NULL, WM_KEYDOWN, WM_SYSKEYDOWN, PM_NOREMOVE );
-        }
+	        /* Look for fake Ctrl_L preceeding an Alt_R press. */
+	        bReturn = PeekMessage ( &msgNext, NULL, WM_KEYDOWN, WM_SYSKEYDOWN, PM_NOREMOVE );
+	    }
 
         if ( msgNext.message != WM_KEYDOWN && msgNext.message != WM_SYSKEYDOWN )
             bReturn = 0;
@@ -2817,14 +2768,14 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
         /* Is next press an Alt_R with the same timestamp? */
         if ( bReturn && msgNext.wParam == VK_MENU && msgNext.time == lTime && 
             ( HIWORD ( msgNext.lParam ) & KF_EXTENDED ) )
-        {
-            /* 
-            * Next key press is Alt_R with same timestamp as current
-            * Ctrl_L message.  Therefore, this Ctrl_L press is a fake
-            * event, so discard it.
-            */
-            return TRUE;
-        }
+	    {
+	        /* 
+	        * Next key press is Alt_R with same timestamp as current
+	        * Ctrl_L message.  Therefore, this Ctrl_L press is a fake
+	        * event, so discard it.
+	        */
+	        return TRUE;
+	    }
     }
 
     /* 
@@ -2847,13 +2798,13 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
         * NOTE: This usually happens when TweakUI is enabled.
         */
         if ( !bReturn )
-        {
-            /* Voodoo to make sure that the Alt_R message has posted */
-            Sleep ( 0 );
+	    {
+	        /* Voodoo to make sure that the Alt_R message has posted */
+	        Sleep ( 0 );
 
-            /* Look for fake Ctrl_L release preceeding an Alt_R release. */
-            bReturn = PeekMessage ( &msgNext, NULL, WM_KEYUP, WM_SYSKEYUP, PM_NOREMOVE );
-        }
+	        /* Look for fake Ctrl_L release preceeding an Alt_R release. */
+	        bReturn = PeekMessage ( &msgNext, NULL, WM_KEYUP, WM_SYSKEYUP, PM_NOREMOVE );
+	    }
 
         if ( msgNext.message != WM_KEYUP && msgNext.message != WM_SYSKEYUP )
             bReturn = 0;
@@ -2862,14 +2813,14 @@ bool CKeyBinds::IsFakeCtrl_L ( UINT message, WPARAM wParam, LPARAM lParam )
         if ( bReturn && ( msgNext.message == WM_KEYUP || msgNext.message == WM_SYSKEYUP ) &&
             msgNext.wParam == VK_MENU && msgNext.time == lTime &&
             ( HIWORD ( msgNext.lParam) & KF_EXTENDED ) )
-        {
-            /*
-            * Next key release is Alt_R with same timestamp as current
-            * Ctrl_L message. Therefore, this Ctrl_L release is a fake
-            * event, so discard it.
-            */
-            return TRUE;    
-        }
+	    {
+	        /*
+	        * Next key release is Alt_R with same timestamp as current
+	        * Ctrl_L message. Therefore, this Ctrl_L release is a fake
+	        * event, so discard it.
+	        */
+	        return TRUE;    
+	    }
     }
   
     /* Not a fake control left press/release */

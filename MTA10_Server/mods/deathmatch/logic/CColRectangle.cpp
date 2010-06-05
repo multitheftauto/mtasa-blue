@@ -18,7 +18,7 @@ CColRectangle::CColRectangle ( CColManager* pManager, CElement* pParent, const C
     m_vecPosition = vecPosition;
     m_vecSize = vecSize;
 
-    UpdateSpatialData ();
+    SetTypeName ( "colrectangle" );
 }
 
 
@@ -36,8 +36,8 @@ bool CColRectangle::DoHitDetection ( const CVector& vecLastPosition, const CVect
 
 bool CColRectangle::ReadSpecialData ( void )
 {
-    int iTemp;
-    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+	int iTemp;
+	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     float fWidth = 1.0f, fDepth = 1.0f;
@@ -48,15 +48,4 @@ bool CColRectangle::ReadSpecialData ( void )
     m_vecSize.fY = fDepth;
 
     return true;
-}
-
-
-CSphere CColRectangle::GetWorldBoundingSphere ( void )
-{
-    CSphere sphere;
-    sphere.vecPosition.fX = m_vecPosition.fX + m_vecSize.fX * 0.5f;
-    sphere.vecPosition.fY = m_vecPosition.fY + m_vecSize.fY * 0.5f;
-    sphere.vecPosition.fZ = SPATIAL_2D_Z;
-    sphere.fRadius        = Max ( m_vecSize.fX, m_vecSize.fY ) * 0.5f;
-    return sphere;
 }

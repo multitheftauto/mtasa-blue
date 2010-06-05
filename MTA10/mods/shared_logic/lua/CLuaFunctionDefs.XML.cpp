@@ -418,7 +418,7 @@ int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
 
                     // Destroy the XML
                     luaMain->DestroyXML ( xmlFile );
-                }   
+                }	
             }
         }
     }
@@ -554,11 +554,8 @@ int CLuaFunctionDefs::XMLCreateChild ( lua_State* luaVM )
         {
             SString strSubNodeName ( "%s", lua_tostring ( luaVM, 2 ) );
             CXMLNode* pXMLSubNode = pXMLNode->CreateSubNode ( strSubNodeName );
-            if ( pXMLSubNode )
-            {
-                lua_pushxmlnode ( luaVM, pXMLSubNode );
-                return 1;
-            }
+            lua_pushxmlnode ( luaVM, pXMLSubNode );
+            return 1;
         }
     }
 

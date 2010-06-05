@@ -23,7 +23,7 @@
 class CXMLNodeImpl : public CXMLNode
 {
 public:
-                            CXMLNodeImpl        ( class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node );
+							CXMLNodeImpl        ( class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node );
                             ~CXMLNodeImpl       ( void );
 
     CXMLNode*               CreateSubNode       ( const char* szTagName );
@@ -63,25 +63,23 @@ public:
     eXMLClass               GetClassType        ( void )    { return CXML_NODE; };
     unsigned long           GetID               ( void )    { return m_ulID; };
 
-    CXMLNode*               CopyNode            ( CXMLNode* pParent = NULL );
+	CXMLNode*				CopyNode			( CXMLNode* pParent = NULL );
     bool                    CopyChildrenInto    ( CXMLNode* pDestination, bool bRecursive );
 
-    TiXmlElement*           GetNode             ( void );
+	TiXmlElement*           GetNode				( void );
     void                    DeleteWrapper       ( void );
 
     void                    AddToList           ( CXMLNode* pNode );
     void                    RemoveFromList      ( CXMLNode* pNode );
     void                    RemoveAllFromList   ( void );
 
-    bool                    IsValid             ( void ) { return m_ulID != INVALID_XML_ID; };
-
 private:
     bool                    StringToLong        ( const char* szString, long& lValue );
 
     class CXMLFileImpl*         m_pFile;
     CXMLNodeImpl*               m_pParent;
-    TiXmlElement*               m_pNode;
-    TiXmlDocument*              m_pDocument;
+	TiXmlElement*               m_pNode;
+	TiXmlDocument*              m_pDocument;
 
     std::list < CXMLNode* >     m_Children;
     bool                        m_bCanRemoveFromList;

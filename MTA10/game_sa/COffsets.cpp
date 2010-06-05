@@ -1,12 +1,11 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/COffsets.cpp
-*  PURPOSE:     EXE-dependant game variable offsets
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		game_sa/COffsets.cpp
+*  PURPOSE:		EXE-dependant game variable offsets
+*  DEVELOPERS:	Ed Lyons <eai@opencoding.net>
 *               Christian Myhre Lundheim <>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -21,7 +20,6 @@ void COffsets::Initialize10EU ( void )
     CSettingsSA::FUNC_GetCurrentVideoMode = 0x7F2D60;
     CSettingsSA::FUNC_GetNumVideoModes = 0x7F2D00;
     CSettingsSA::FUNC_GetVideoModeInfo = 0x7F2D30;
-    CSettingsSA::FUNC_SetDrawDistance = 0x572ea0;
 
     CEntitySA::FUNC_RwFrameGetLTM = 0x7F09D0;
     CCameraSA::FUNC_RwFrameGetLTM = 0x7F09D0;
@@ -35,7 +33,6 @@ void COffsets::Initialize10US ( void )
     CSettingsSA::FUNC_GetCurrentVideoMode = 0x7F2D20;
     CSettingsSA::FUNC_GetNumVideoModes = 0x7F2CC0;
     CSettingsSA::FUNC_GetVideoModeInfo = 0x7F2CF0;
-    CSettingsSA::FUNC_SetDrawDistance = 0x572ea0;
 
     CEntitySA::FUNC_RwFrameGetLTM = 0x7F0990;
     CCameraSA::FUNC_RwFrameGetLTM = 0x7F0990;

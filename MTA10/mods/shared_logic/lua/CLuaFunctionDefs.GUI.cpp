@@ -14,7 +14,6 @@
 *               Christian Myhre Lundheim <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
-*               Florian Busse <flobu@gmx.net>
 *
 *****************************************************************************/
 
@@ -34,7 +33,7 @@ int CLuaFunctionDefs::GUISetInputEnabled ( lua_State* luaVM )
     if ( lua_istype ( luaVM, 1, LUA_TBOOLEAN ) ) {
         CStaticFunctionDefinitions::GUISetInputEnabled ( lua_toboolean ( luaVM, 1 ) ? true : false );
         bRet = true;
-    }   // else: error, bad arguments
+    }	// else: error, bad arguments
 
     lua_pushboolean ( luaVM, bRet );
     return 1;
@@ -208,7 +207,7 @@ int CLuaFunctionDefs::GUICreateButton ( lua_State* luaVM )
     {
         if ( lua_istype ( luaVM, 1, LUA_TNUMBER ) && lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
             lua_istype ( luaVM, 3, LUA_TNUMBER ) && lua_istype ( luaVM, 4, LUA_TNUMBER ) &&
-            lua_istype ( luaVM, 5, LUA_TSTRING ) && lua_istype ( luaVM, 6, LUA_TBOOLEAN ) ) // ACHTUNG: EVENTS!
+            lua_istype ( luaVM, 5, LUA_TSTRING ) && lua_istype ( luaVM, 6, LUA_TBOOLEAN ) )	// ACHTUNG: EVENTS!
         {
             const char *szCaption = lua_tostring ( luaVM, 5 );
             //const char *szOnClick = lua_istype ( luaVM, 8, LUA_TSTRING ) ? lua_tostring ( luaVM, 8 ) : NULL;
@@ -769,11 +768,10 @@ int CLuaFunctionDefs::GUIBringToFront ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::GUIBringToFront ( *pEntity ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            CStaticFunctionDefinitions::GUIBringToFront ( *pEntity );
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "guiBringToFront", "gui-element", 1 );
@@ -994,7 +992,7 @@ int CLuaFunctionDefs::GUIProgressBarGetProgress ( lua_State* luaVM )
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_PROGRESSBAR ( pGUIElement ) )
         {
-            int iProgress = ( int ) ( static_cast < CGUIProgressBar* > ( pGUIElement->GetCGUIElement () ) -> GetProgress () * 100.0f + 0.5f );
+            int iProgress = ( int ) ( static_cast < CGUIProgressBar* > ( pGUIElement->GetCGUIElement () ) -> GetProgress () * 100.0f );
             lua_pushnumber ( luaVM, iProgress );
             return 1;
         }
@@ -1547,9 +1545,8 @@ int CLuaFunctionDefs::GUIGridListAddRow ( lua_State* luaVM )
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
         {
-            iRet = CStaticFunctionDefinitions::GUIGridListAddRow ( *pGUIElement, true );
+            iRet = CStaticFunctionDefinitions::GUIGridListAddRow ( *pGUIElement );
             if ( iRet >= 0 ) {
-                m_pGUIManager->QueueGridListUpdate ( pGUIElement );
                 lua_pushnumber ( luaVM, iRet );
                 return 1;
             }
@@ -1859,32 +1856,6 @@ int CLuaFunctionDefs::GUIGridListGetItemData ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::GUIGridListGetItemColor ( lua_State* luaVM )
-{
-    if ( lua_isuserdata ( luaVM, 1 ) && lua_isnumber ( luaVM, 2 ) && lua_isnumber ( luaVM, 3 ) )
-    {
-        CClientGUIElement* pGUIElement = lua_toguielement ( luaVM, 1 );
-        if ( pGUIElement )
-        {
-            unsigned char ucRed = 255, ucGreen = 255, ucBlue = 255, ucAlpha = 255;
-            if ( reinterpret_cast < const char* > ( static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () ) -> GetItemColor ( lua_tointeger ( luaVM, 2 ), lua_tointeger ( luaVM, 3 ), ucRed, ucGreen, ucBlue, ucAlpha ) ) )
-            {
-                lua_pushnumber ( luaVM, ucRed );
-                lua_pushnumber ( luaVM, ucGreen );
-                lua_pushnumber ( luaVM, ucBlue );
-                lua_pushnumber ( luaVM, ucAlpha );
-                return 4;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "guiGridListGetItemColor", "gui-element", 1 );
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaFunctionDefs::GUIGridListSetItemText ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
@@ -1903,10 +1874,9 @@ int CLuaFunctionDefs::GUIGridListSetItemText ( lua_State* luaVM )
                 static_cast < int > ( lua_tonumber ( luaVM, 3 ) ),
                 lua_tostring ( luaVM, 4 ),
                 lua_toboolean ( luaVM, 5 ) ? true : false,
-                lua_toboolean ( luaVM, 6 ) ? true : false,
-                true
+                lua_toboolean ( luaVM, 6 ) ? true : false
             );
-            m_pGUIManager->QueueGridListUpdate ( pGUIElement );
+
             lua_pushboolean ( luaVM, true );
             return 1;
         }
@@ -1945,33 +1915,6 @@ int CLuaFunctionDefs::GUIGridListSetItemData ( lua_State* luaVM )
     }
 
     // error: bad arguments
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::GUIGridListSetItemColor ( lua_State* luaVM )
-{
-    if ( lua_isuserdata ( luaVM, 1 ) && lua_isnumber ( luaVM, 2 ) && lua_isnumber ( luaVM, 3 ) && lua_isnumber ( luaVM, 4 ) && lua_isnumber ( luaVM, 5 ) && lua_isnumber ( luaVM, 6 ) )
-    {
-        CClientGUIElement* pGUIElement = lua_toguielement ( luaVM, 1 );
-        if ( pGUIElement )
-        {
-            int iAlpha = 255;
-            if ( lua_isnumber ( luaVM, 7 ) )
-            {
-                iAlpha = lua_tointeger ( luaVM, 7 );
-            }
-            CStaticFunctionDefinitions::GUIGridListSetItemColor( *pGUIElement, lua_tointeger ( luaVM, 2 ), lua_tointeger ( luaVM, 3 ), lua_tointeger ( luaVM, 4 ), lua_tointeger ( luaVM, 5 ), lua_tointeger ( luaVM, 6 ), iAlpha );
-
-            m_pGUIManager->QueueGridListUpdate ( pGUIElement );
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "guiGridListSetItemColor", "gui-element", 1 );
-    }
-
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -2024,7 +1967,7 @@ int CLuaFunctionDefs::GUIScrollPaneSetScrollBars ( lua_State* luaVM )
 int CLuaFunctionDefs::GUIGridListGetRowCount ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-    {       
+    {		
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
         {
@@ -2312,7 +2255,7 @@ int CLuaFunctionDefs::GUILabelSetColor ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            CStaticFunctionDefinitions::GUILabelSetColor (  *pEntity,
+            CStaticFunctionDefinitions::GUILabelSetColor (	*pEntity,
                 static_cast < int > ( lua_tonumber ( luaVM, 2 ) ),
                 static_cast < int > ( lua_tonumber ( luaVM, 3 ) ),
                 static_cast < int > ( lua_tonumber ( luaVM, 4 ) ) );
@@ -2356,7 +2299,7 @@ int CLuaFunctionDefs::GUILabelSetVerticalAlign ( lua_State* luaVM )
         else
         {
             // Bad align string
-            CLogger::ErrorPrintf ( "%s", "No such align for guiLabelSetVerticalAlign" );
+            CLogger::ErrorPrintf ( "%s", "ERROR: No such align for guiLabelSetVerticalAlign" );
             lua_pushboolean ( luaVM, false );
             return 0;
         }
@@ -2422,7 +2365,7 @@ int CLuaFunctionDefs::GUILabelSetHorizontalAlign ( lua_State* luaVM )
         else
         {
             // Bad align string
-            CLogger::ErrorPrintf ( "%s", "No such align for guiLabelSetHorizontalAlign" );
+            CLogger::ErrorPrintf ( "%s", "ERROR: No such align for guiLabelSetHorizontalAlign" );
             lua_pushboolean ( luaVM, false );
             return 0;
         }
@@ -2446,177 +2389,3 @@ int CLuaFunctionDefs::GUILabelSetHorizontalAlign ( lua_State* luaVM )
     return 1;
 }
 
-
-int CLuaFunctionDefs::GUIGetChatboxLayout ( lua_State* luaVM )
-{
-    //* chat_font - Returns the chatbox font
-    //* chat_lines - Returns how many lines the chatbox has
-    //* chat_color - Returns the background color of the chatbox
-    //* chat_text_color - Returns the chatbox text color
-    //* chat_input_color - Returns the background color of the chatbox input
-    //* chat_input_prefix_color - Returns the color of the input prefix text
-    //* chat_input_text_color - Returns the color of the text in the chatbox input
-    //* chat_scale - Returns the scale of the text in the chatbox
-    //* chat_width - Returns the scale of the background width
-    //* chat_css_style_text - Returns whether text fades out over time
-    //* chat_css_style_background - Returns whether the background fades out over time
-    //* chat_line_life - Returns how long it takes for text to start fading out
-    //* chat_line_fade_out - Returns how long takes for text to fade out
-    //* chat_use_cegui - Returns whether CEGUI is used to render the chatbox
-    //* text_scale - Returns text scale
-
-    CCVarsInterface* pCVars = g_pCore->GetCVars ();
-    float fNumber;
-    pCVars->Get("chat_font", fNumber);
-    lua_newtable ( luaVM );
-    lua_pushnumber ( luaVM, fNumber );
-    lua_setfield ( luaVM, -2, "chat_font" );
-    pCVars->Get("chat_lines", fNumber);
-    lua_pushnumber ( luaVM, fNumber );
-    lua_setfield ( luaVM, -2, "chat_lines" );
-    pCVars->Get("chat_width", fNumber);
-    lua_pushnumber ( luaVM, fNumber );
-    lua_setfield ( luaVM, -2, "chat_width" );
-    pCVars->Get("chat_css_style_text", fNumber);
-    lua_pushnumber ( luaVM, fNumber );
-    lua_setfield ( luaVM, -2, "chat_css_style_text" );
-    pCVars->Get("chat_css_style_background", fNumber);
-    lua_pushnumber ( luaVM, fNumber );
-    lua_setfield ( luaVM, -2, "chat_css_style_background" );
-    pCVars->Get("chat_line_life", fNumber);
-    lua_pushnumber ( luaVM, fNumber );
-    lua_setfield ( luaVM, -2, "chat_line_life" );
-    pCVars->Get("chat_line_fade_out", fNumber);
-    lua_pushnumber ( luaVM, fNumber );
-    lua_setfield ( luaVM, -2, "chat_line_fade_out" );
-    pCVars->Get("text_scale", fNumber);
-    lua_pushnumber ( luaVM, fNumber );
-    lua_setfield ( luaVM, -2, "text_scale" );
-    pCVars->Get("chat_use_cegui", fNumber);
-    lua_pushboolean ( luaVM, fNumber ? true : false );
-    lua_setfield ( luaVM, -2, "chat_use_cegui" );
-    std::string strCVar;
-    std::stringstream ss;
-    int iR, iG, iB, iA;
-    pCVars->Get("chat_color", strCVar);
-    if ( !strCVar.empty() )
-    {
-        ss.str ( strCVar );
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable ( luaVM );
-        lua_pushnumber ( luaVM, 1 );
-        lua_pushnumber ( luaVM, iR );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 2 );
-        lua_pushnumber ( luaVM, iG );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 3 );
-        lua_pushnumber ( luaVM, iB );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 4 );
-        lua_pushnumber ( luaVM, iA );
-        lua_settable( luaVM, -3 );
-        lua_setfield ( luaVM, -2, "chat_color" );
-    }
-    pCVars->Get("chat_text_color", strCVar);
-    if ( !strCVar.empty() )
-    {
-        ss.clear();
-        ss.str ( strCVar );
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable ( luaVM );
-        lua_pushnumber ( luaVM, 1 );
-        lua_pushnumber ( luaVM, iR );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 2 );
-        lua_pushnumber ( luaVM, iG );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 3 );
-        lua_pushnumber ( luaVM, iB );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 4 );
-        lua_pushnumber ( luaVM, iA );
-        lua_settable( luaVM, -3 );
-        lua_setfield ( luaVM, -2, "chat_text_color" );
-    }
-    pCVars->Get("chat_input_color", strCVar);
-    if ( !strCVar.empty() )
-    {
-        ss.clear();
-        ss.str ( strCVar );
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable ( luaVM );
-        lua_pushnumber ( luaVM, 1 );
-        lua_pushnumber ( luaVM, iR );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 2 );
-        lua_pushnumber ( luaVM, iG );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 3 );
-        lua_pushnumber ( luaVM, iB );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 4 );
-        lua_pushnumber ( luaVM, iA );
-        lua_settable( luaVM, -3 );
-        lua_setfield ( luaVM, -2, "chat_input_color" );
-    }
-    pCVars->Get("chat_input_prefix_color", strCVar);
-    if ( !strCVar.empty() )
-    {
-        ss.clear();
-        ss.str ( strCVar );
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable ( luaVM );
-        lua_pushnumber ( luaVM, 1 );
-        lua_pushnumber ( luaVM, iR );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 2 );
-        lua_pushnumber ( luaVM, iG );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 3 );
-        lua_pushnumber ( luaVM, iB );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 4 );
-        lua_pushnumber ( luaVM, iA );
-        lua_settable( luaVM, -3 );
-        lua_setfield ( luaVM, -2, "chat_input_prefix_color" );
-    }
-    pCVars->Get("chat_input_text_color", strCVar);
-    if ( !strCVar.empty() )
-    {
-        ss.clear();
-        ss.str ( strCVar );
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable ( luaVM );
-        lua_pushnumber ( luaVM, 1 );
-        lua_pushnumber ( luaVM, iR );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 2 );
-        lua_pushnumber ( luaVM, iG );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 3 );
-        lua_pushnumber ( luaVM, iB );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 4 );
-        lua_pushnumber ( luaVM, iA );
-        lua_settable( luaVM, -3 );
-        lua_setfield ( luaVM, -2, "chat_input_text_color" );
-    }
-    int iX, iY;
-    pCVars->Get("chat_scale", strCVar);
-    if ( !strCVar.empty() )
-    {
-        ss.clear();
-        ss.str ( strCVar );
-        ss >> iX >> iY;
-        lua_newtable ( luaVM );
-        lua_pushnumber ( luaVM, 1 );
-        lua_pushnumber ( luaVM, iX );
-        lua_settable( luaVM, -3 );
-        lua_pushnumber ( luaVM, 2 );
-        lua_pushnumber ( luaVM, iY );
-        lua_settable( luaVM, -3 );
-        lua_setfield ( luaVM, -2, "chat_scale" );
-    }
-    return 1;
-}

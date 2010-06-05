@@ -39,9 +39,9 @@ CLuaManager::CLuaManager ( CObjectManager* pObjectManager,
     m_pMapManager = pMapManager;
     m_pEvents = pEvents;
 
-    // Create our lua dynamic module manager
-    m_pLuaModuleManager = new CLuaModuleManager ( this );
-    m_pLuaModuleManager->_SetScriptDebugging ( g_pGame->GetScriptDebugging() );
+	// Create our lua dynamic module manager
+	m_pLuaModuleManager = new CLuaModuleManager ( this );
+	m_pLuaModuleManager->_SetScriptDebugging ( g_pGame->GetScriptDebugging() );
 
     // Load our C Functions into LUA and hook callback
     CLuaCFunctions::InitializeHashMaps ();
@@ -58,8 +58,8 @@ CLuaManager::~CLuaManager ( void )
         delete (*iter);
     }
 
-    // Destroy the module manager
-    delete m_pLuaModuleManager;
+	// Destroy the module manager
+	delete m_pLuaModuleManager;
 }
 
 void CLuaManager::StopScriptsOwnedBy ( int iOwner )
@@ -72,14 +72,14 @@ void CLuaManager::StopScriptsOwnedBy ( int iOwner )
         pLuaMain = *iter;
         if ( pLuaMain->GetOwner () == iOwner )
         {
-            // Delete the object
+			// Delete the object
             delete pLuaMain;
 
-            // Remove from list
-            m_virtualMachines.erase ( iter );
+			// Remove from list
+			m_virtualMachines.erase ( iter );
 
-            // Continue from the beginning, unless the list is empty
-            if ( m_virtualMachines.empty () ) break;
+			// Continue from the beginning, unless the list is empty
+			if ( m_virtualMachines.empty () ) break;
             iter = m_virtualMachines.begin ();
         }
     }
@@ -91,7 +91,7 @@ CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
     CLuaMain * vm = new CLuaMain ( this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager, pResourceOwner );
     m_virtualMachines.push_back ( vm );
 
-    m_pLuaModuleManager->_RegisterFunctions ( vm->GetVirtualMachine() );
+	m_pLuaModuleManager->_RegisterFunctions ( vm->GetVirtualMachine() );
 
     return vm;
 }
@@ -107,7 +107,7 @@ bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
         // Remove it from our list
         if ( !m_virtualMachines.empty() ) m_virtualMachines.remove ( vm );
 
-        // Delete it unless it is already
+	    // Delete it unless it is already
         if ( !vm->BeingDeleted () )
         {
             delete vm;
@@ -127,7 +127,7 @@ void CLuaManager::DoPulse ( void )
     {
         (*iter)->DoPulse();
     }
-    m_pLuaModuleManager->_DoPulse ();
+	m_pLuaModuleManager->_DoPulse ();
 }
 
 CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
@@ -223,9 +223,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getClientIP", CLuaFunctionDefinitions::GetPlayerIP );
     CLuaCFunctions::AddFunction ( "getClientAccount", CLuaFunctionDefinitions::GetPlayerAccount );
     CLuaCFunctions::AddFunction ( "setClientName", CLuaFunctionDefinitions::SetPlayerName );
-    CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaFunctionDefinitions::GetPedWeapon );
-    CLuaCFunctions::AddFunction ( "getPlayerTotalAmmo", CLuaFunctionDefinitions::GetPedTotalAmmo );
-    CLuaCFunctions::AddFunction ( "getPlayerAmmoInClip", CLuaFunctionDefinitions::GetPedAmmoInClip );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
     CLuaCFunctions::AddFunction ( "addEvent", CLuaFunctionDefinitions::AddEvent );
@@ -235,15 +232,18 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "triggerClientEvent", CLuaFunctionDefinitions::TriggerClientEvent );
     CLuaCFunctions::AddFunction ( "cancelEvent", CLuaFunctionDefinitions::CancelEvent );
     CLuaCFunctions::AddFunction ( "wasEventCancelled", CLuaFunctionDefinitions::WasEventCancelled );
-    CLuaCFunctions::AddFunction ( "getCancelReason", CLuaFunctionDefinitions::GetCancelReason );
+	CLuaCFunctions::AddFunction ( "getCancelReason", CLuaFunctionDefinitions::GetCancelReason );
 
     // Ped funcs
     CLuaCFunctions::AddFunction ( "createPed", CLuaFunctionDefinitions::CreatePed );
 
     // Player get funcs
     CLuaCFunctions::AddFunction ( "getPlayerCount", CLuaFunctionDefinitions::GetPlayerCount );
+    CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaFunctionDefinitions::GetPlayerWeapon );
+    CLuaCFunctions::AddFunction ( "getPlayerAmmoInClip", CLuaFunctionDefinitions::GetPlayerAmmoInClip );
+    CLuaCFunctions::AddFunction ( "getPlayerTotalAmmo", CLuaFunctionDefinitions::GetPlayerTotalAmmo );
     CLuaCFunctions::AddFunction ( "getPlayerFromNick", CLuaFunctionDefinitions::GetPlayerFromName );
-    CLuaCFunctions::AddFunction ( "getPlayerFromName", CLuaFunctionDefinitions::GetPlayerFromName );
+	CLuaCFunctions::AddFunction ( "getPlayerFromName", CLuaFunctionDefinitions::GetPlayerFromName );
     CLuaCFunctions::AddFunction ( "getPlayerMoney", CLuaFunctionDefinitions::GetPlayerMoney );
     CLuaCFunctions::AddFunction ( "getPlayerPing", CLuaFunctionDefinitions::GetPlayerPing );
     CLuaCFunctions::AddFunction ( "getRandomPlayer", CLuaFunctionDefinitions::GetRandomPlayer );
@@ -259,12 +259,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isPlayerNametagShowing", CLuaFunctionDefinitions::IsPlayerNametagShowing );
     CLuaCFunctions::AddFunction ( "getPlayerSerial", CLuaFunctionDefinitions::GetPlayerSerial );
     CLuaCFunctions::AddFunction ( "getPlayerUserName", CLuaFunctionDefinitions::GetPlayerUserName );
-    CLuaCFunctions::AddFunction ( "getPlayerCommunityID", CLuaFunctionDefinitions::GetPlayerCommunityID );
+	CLuaCFunctions::AddFunction ( "getPlayerCommunityID", CLuaFunctionDefinitions::GetPlayerCommunityID );
     CLuaCFunctions::AddFunction ( "getPlayerBlurLevel", CLuaFunctionDefinitions::GetPlayerBlurLevel );
     CLuaCFunctions::AddFunction ( "getPlayerName", CLuaFunctionDefinitions::GetPlayerName );
     CLuaCFunctions::AddFunction ( "getPlayerIP", CLuaFunctionDefinitions::GetPlayerIP );
     CLuaCFunctions::AddFunction ( "getPlayerAccount", CLuaFunctionDefinitions::GetPlayerAccount );
-    CLuaCFunctions::AddFunction ( "getPlayerVersion", CLuaFunctionDefinitions::GetPlayerVersion );
 
     // Player set funcs
     CLuaCFunctions::AddFunction ( "setPlayerMoney", CLuaFunctionDefinitions::SetPlayerMoney );
@@ -290,11 +289,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isPedChoking", CLuaFunctionDefinitions::IsPedChoking );
     CLuaCFunctions::AddFunction ( "isPedDead", CLuaFunctionDefinitions::IsPedDead );
     CLuaCFunctions::AddFunction ( "isPedDucked", CLuaFunctionDefinitions::IsPedDucked );
-    CLuaCFunctions::AddFunction ( "getPedAmmoInClip", CLuaFunctionDefinitions::GetPedAmmoInClip );
     CLuaCFunctions::AddFunction ( "getPedStat", CLuaFunctionDefinitions::GetPedStat );
     CLuaCFunctions::AddFunction ( "getPedTarget", CLuaFunctionDefinitions::GetPedTarget );
-    CLuaCFunctions::AddFunction ( "getPedTotalAmmo", CLuaFunctionDefinitions::GetPedTotalAmmo );
-    CLuaCFunctions::AddFunction ( "getPedWeapon", CLuaFunctionDefinitions::GetPedWeapon );
     CLuaCFunctions::AddFunction ( "getPedClothes", CLuaFunctionDefinitions::GetPedClothes );
     CLuaCFunctions::AddFunction ( "doesPedHaveJetPack", CLuaFunctionDefinitions::DoesPedHaveJetPack );
     CLuaCFunctions::AddFunction ( "isPedOnGround", CLuaFunctionDefinitions::IsPedOnGround );
@@ -345,14 +341,13 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSlotFromWeapon", CLuaFunctionDefinitions::GetSlotFromWeapon );
 
     // Vehicle get funcs
-    CLuaCFunctions::AddFunction ( "getVehicleType", CLuaFunctionDefinitions::GetVehicleType );
+	CLuaCFunctions::AddFunction ( "getVehicleType", CLuaFunctionDefinitions::GetVehicleType );
     CLuaCFunctions::AddFunction ( "getVehicleColor", CLuaFunctionDefinitions::GetVehicleColor );
     CLuaCFunctions::AddFunction ( "getVehicleModelFromName", CLuaFunctionDefinitions::GetVehicleModelFromName );
     CLuaCFunctions::AddFunction ( "getVehicleLandingGearDown", CLuaFunctionDefinitions::GetVehicleLandingGearDown );
     CLuaCFunctions::AddFunction ( "getVehicleName", CLuaFunctionDefinitions::GetVehicleName );
     CLuaCFunctions::AddFunction ( "getVehicleNameFromModel", CLuaFunctionDefinitions::GetVehicleNameFromModel );
     CLuaCFunctions::AddFunction ( "getVehicleOccupant", CLuaFunctionDefinitions::GetVehicleOccupant );
-    CLuaCFunctions::AddFunction ( "getVehicleOccupants", CLuaFunctionDefinitions::GetVehicleOccupants );
     CLuaCFunctions::AddFunction ( "getVehicleController", CLuaFunctionDefinitions::GetVehicleController );
     CLuaCFunctions::AddFunction ( "getVehicleRotation", CLuaFunctionDefinitions::GetVehicleRotation );
     CLuaCFunctions::AddFunction ( "getVehicleSirensOn", CLuaFunctionDefinitions::GetVehicleSirensOn );
@@ -374,7 +369,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getVehicleTowingVehicle", CLuaFunctionDefinitions::GetVehicleTowingVehicle );
     CLuaCFunctions::AddFunction ( "getVehiclePaintjob", CLuaFunctionDefinitions::GetVehiclePaintjob );
     CLuaCFunctions::AddFunction ( "getVehiclePlateText", CLuaFunctionDefinitions::GetVehiclePlateText );
-    CLuaCFunctions::AddFunction ( "isVehicleDamageProof", CLuaFunctionDefinitions::IsVehicleDamageProof );
     CLuaCFunctions::AddFunction ( "isVehicleFuelTankExplodable", CLuaFunctionDefinitions::IsVehicleFuelTankExplodable );
     CLuaCFunctions::AddFunction ( "isVehicleFrozen", CLuaFunctionDefinitions::IsVehicleFrozen );
     CLuaCFunctions::AddFunction ( "isVehicleOnGround", CLuaFunctionDefinitions::IsVehicleOnGround );
@@ -571,7 +565,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "outputDebugString", CLuaFunctionDefinitions::OutputDebugString );
     CLuaCFunctions::AddFunction ( "outputServerLog", CLuaFunctionDefinitions::OutputServerLog );
     CLuaCFunctions::AddFunction ( "getServerName", CLuaFunctionDefinitions::GetServerName );
-    CLuaCFunctions::AddFunction ( "getServerHttpPort", CLuaFunctionDefinitions::GetServerHttpPort );
+	CLuaCFunctions::AddFunction ( "getServerHttpPort", CLuaFunctionDefinitions::GetServerHttpPort );
     CLuaCFunctions::AddFunction ( "getServerPassword", CLuaFunctionDefinitions::GetServerPassword );
     CLuaCFunctions::AddFunction ( "setServerPassword", CLuaFunctionDefinitions::SetServerPassword );
     
@@ -588,14 +582,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "gettok", CLuaFunctionDefinitions::GetTok );
     CLuaCFunctions::AddFunction ( "setTimer", CLuaFunctionDefinitions::SetTimer );
     CLuaCFunctions::AddFunction ( "killTimer", CLuaFunctionDefinitions::KillTimer );
-    CLuaCFunctions::AddFunction ( "resetTimer", CLuaFunctionDefinitions::ResetTimer );
     CLuaCFunctions::AddFunction ( "getTimers", CLuaFunctionDefinitions::GetTimers );
     CLuaCFunctions::AddFunction ( "isTimer", CLuaFunctionDefinitions::IsTimer );
-    CLuaCFunctions::AddFunction ( "getTimerDetails", CLuaFunctionDefinitions::GetTimerDetails );
     CLuaCFunctions::AddFunction ( "getColorFromString", CLuaFunctionDefinitions::GetColorFromString );
     CLuaCFunctions::AddFunction ( "ref", CLuaFunctionDefinitions::Reference );
     CLuaCFunctions::AddFunction ( "deref", CLuaFunctionDefinitions::Dereference );
-    CLuaCFunctions::AddFunction ( "getValidPedModels", CLuaFunctionDefinitions::GetValidPedModels );
 
     // Loaded map funcs
     CLuaCFunctions::AddFunction ( "getRootElement", CLuaFunctionDefinitions::GetRootElement );
@@ -622,8 +613,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getRuleValue", CLuaFunctionDefinitions::GetRuleValue );
     CLuaCFunctions::AddFunction ( "setRuleValue", CLuaFunctionDefinitions::SetRuleValue );
     CLuaCFunctions::AddFunction ( "removeRuleValue", CLuaFunctionDefinitions::RemoveRuleValue );
-    CLuaCFunctions::AddFunction ( "getPlayerAnnounceValue", CLuaFunctionDefinitions::GetPlayerAnnounceValue );
-    CLuaCFunctions::AddFunction ( "setPlayerAnnounceValue", CLuaFunctionDefinitions::SetPlayerAnnounceValue );
 
     // Registry functions
     CLuaCFunctions::AddFunction ( "executeSQLCreateTable", CLuaFunctionDefinitions::ExecuteSQLCreateTable );
@@ -631,7 +620,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "executeSQLDelete", CLuaFunctionDefinitions::ExecuteSQLDelete );
     CLuaCFunctions::AddFunction ( "executeSQLSelect", CLuaFunctionDefinitions::ExecuteSQLSelect );
     CLuaCFunctions::AddFunction ( "executeSQLUpdate", CLuaFunctionDefinitions::ExecuteSQLUpdate );
-    CLuaCFunctions::AddFunction ( "executeSQLInsert", CLuaFunctionDefinitions::ExecuteSQLInsert );
+	CLuaCFunctions::AddFunction ( "executeSQLInsert", CLuaFunctionDefinitions::ExecuteSQLInsert );
     CLuaCFunctions::AddFunction ( "executeSQLQuery", CLuaFunctionDefinitions::ExecuteSQLQuery );
 
     // Account get functions
@@ -693,8 +682,8 @@ void CLuaManager::LoadCFunctions ( void )
     // Cursor set funcs
     CLuaCFunctions::AddFunction ( "showCursor", CLuaFunctionDefinitions::ShowCursor );
 
-    // Chat funcs
-    CLuaCFunctions::AddFunction ( "showChat", CLuaFunctionDefinitions::ShowChat );
+	// Chat funcs
+	CLuaCFunctions::AddFunction ( "showChat", CLuaFunctionDefinitions::ShowChat );
 
     // Misc funcs
     CLuaCFunctions::AddFunction ( "resetMapInfo", CLuaFunctionDefinitions::ResetMapInfo );

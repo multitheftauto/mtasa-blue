@@ -52,7 +52,7 @@ private:
     CCriticalSection            m_CriticalSection;
     char                        m_szServerRoot [MAX_PATH];
     SString                     m_strDLLFile;
-    SString                     m_strConfig;
+    char*                       m_szConfig;
 
     int                         m_iLastError;
 

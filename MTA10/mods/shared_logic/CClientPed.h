@@ -54,19 +54,19 @@ enum eVehicleInOutState
 
 enum eBodyPart
 {
-    BODYPART_TORSO = 3,
-    BODYPART_ASS = 4,
-    BODYPART_LEFT_ARM = 5,
-    BODYPART_RIGHT_ARM = 6,
-    BODYPART_LEFT_LEG = 7,
-    BODYPART_RIGHT_LEG = 8,
-    BODYPART_HEAD = 9,
+	BODYPART_TORSO = 3,
+	BODYPART_ASS = 4,
+	BODYPART_LEFT_ARM = 5,
+	BODYPART_RIGHT_ARM = 6,
+	BODYPART_LEFT_LEG = 7,
+	BODYPART_RIGHT_LEG = 8,
+	BODYPART_HEAD = 9,
 };
 
 enum eDeathAnims
 {
-    DEATH_ANIM_HEAD = 19,
-    DEATH_ANIM_TORSO = 20,
+	DEATH_ANIM_HEAD = 19,
+	DEATH_ANIM_TORSO = 20,
 };
 
 struct SDelayedSyncData
@@ -111,8 +111,8 @@ public:
     inline void                 Unlink                      ( void ) {};
 
     virtual eClientEntityType   GetType                     ( void ) const                              { return CCLIENTPED; }
-    
-    inline CPlayerPed*          GetGamePlayer               ( void )                                    { return m_pPlayerPed; }
+	
+	inline CPlayerPed*			GetGamePlayer				( void )									{ return m_pPlayerPed; }
     inline CEntity*             GetGameEntity               ( void )                                    { return m_pPlayerPed; }
     inline const CEntity*       GetGameEntity               ( void ) const                              { return m_pPlayerPed; }
 
@@ -120,7 +120,6 @@ public:
 
     bool                        GetMatrix                   ( CMatrix& Matrix ) const;
     bool                        SetMatrix                   ( const CMatrix& Matrix );
-    virtual CSphere             GetWorldBoundingSphere      ( void );
 
     void                        GetPosition                 ( CVector& vecPosition ) const;
     void                        SetPosition                 ( const CVector& vecPosition )              { SetPosition ( vecPosition, true ); }
@@ -335,7 +334,7 @@ public:
     void                        GetTargetPosition       ( CVector & vecPosition );
     void                        SetTargetPosition       ( const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource = NULL );
     void                        RemoveTargetPosition    ( void );
-    void                        UpdateTargetPosition    ( void );
+	void						UpdateTargetPosition	( void );
 
     CClientEntity*              GetTargetedEntity       ( void );    
     CClientPed*                 GetTargetedPed          ( void );
@@ -346,11 +345,11 @@ public:
     bool                        IsSunbathing            ( void );
     void                        SetSunbathing           ( bool bSunbathing, bool bStartStanding = true );
 
-    bool                        LookAt                  ( CVector vecOffset, int iTime = 1000, int iBlend = 1000, CClientEntity * pEntity = NULL );
+    bool                        LookAt                  ( CVector vecOffset, int iTime = 1000, CClientEntity * pEntity = NULL );
     bool                        UseGun                  ( CVector vecTarget, CClientEntity * pEntity );
 
     bool                        IsAttachToable            ( void );
-    static char*                GetBodyPartName         ( unsigned char ucID );
+	static char*				GetBodyPartName			( unsigned char ucID );
 
     bool                        IsDoingGangDriveby      ( void );
     void                        SetDoingGangDriveby     ( bool bDriveby );
@@ -369,11 +368,6 @@ public:
 
     inline bool                 IsFrozen                ( void ) const                                  { return m_bFrozen; }
     void                        SetFrozen               ( bool bFrozen );
-    bool                        IsFrozenWaitingForGroundToLoad      ( void ) const;
-    void                        SetFrozenWaitingForGroundToLoad     ( bool bFrozen );
-
-    bool                        IsFootBloodEnabled      ( void );
-    void                        SetFootBloodEnabled     ( bool bHasFootBlood );
 
     inline bool                 IsOnFire                ( void )                                        { return m_bIsOnFire; }
     void                        SetOnFire               ( bool bOnFire );
@@ -387,9 +381,6 @@ public:
     void                        SetSpeechEnabled        ( bool bEnabled );
 
     void                        PostWeaponFire          ( void );
-    void                        SetBulletImpactData     ( CClientEntity* pVictim, const CVector& vecHitPosition );
-    bool                        GetBulletImpactData     ( CClientEntity** ppVictim = 0, CVector* pvecHitPosition = 0 );
-    void                        ClearBulletImpactData   ( void ) { m_bBulletImpactData = false; }
 
     bool                        CanReloadWeapon         ( void );
     bool                        ReloadWeapon            ( void );
@@ -430,7 +421,6 @@ protected:
     void                        InternalRemoveFromVehicle   ( CVehicle* pGameVehicle );
 
     bool                        PerformChecks               ( void );
-    void                        HandleWaitingForGroundToLoad ( void );
 
     // Used to start and stop radio for local player
     void                        StartRadio                  ( void );
@@ -451,7 +441,7 @@ public:
     CPad*                       m_pPad;
     bool                        m_bIsLocalPlayer;
     int                         m_pRespawnState;
-    unsigned long               m_ulModel;  
+    unsigned long               m_ulModel;	
     CMatrix                     m_matFrozen;
     bool                        m_bRadioOn;
     unsigned char               m_ucRadioChannel;
@@ -482,7 +472,7 @@ public:
     float                       m_fTargetAimY;
     unsigned long               m_ulBeginAimTime;
     unsigned long               m_ulTargetAimTime;
-    bool                        m_bTargetAkimboUp;
+	bool						m_bTargetAkimboUp;
     unsigned long               m_ulBeginRotationTime;
     unsigned long               m_ulEndRotationTime;
     float                       m_fBeginRotation;
@@ -526,6 +516,7 @@ public:
     float                       m_fTargetRotation;
     int                         m_iVehicleInOutState;
     bool                        m_bRecreatingModel;
+    bool                        m_bPerformSpawnLoadingChecks;
     CClientEntity *             m_pCurrentContactEntity;
     bool                        m_bSunbathing;
     CClientPad                  m_Pad;
@@ -538,19 +529,11 @@ public:
     bool                        m_bUpdatePositionAnimation;
     bool                        m_bHeadless;
     bool                        m_bFrozen;
-    bool                        m_bFrozenWaitingForGroundToLoad;
-    float                       m_fGroundCheckTolerance;
-    float                       m_fObjectsAroundTolerance;
-    int                         m_iLoadAllModelsCounter;
     bool                        m_bIsOnFire;
     SLastSyncedPedData*         m_LastSyncedData;
     bool                        m_bSpeechEnabled;
     bool                        m_bStealthAiming;
     float                       m_fLighting;
-
-    bool                        m_bBulletImpactData;
-    CClientEntity*              m_pBulletImpactEntity;
-    CVector                     m_vecBulletImpactHit;
 
     // Time dependent interpolation
     struct

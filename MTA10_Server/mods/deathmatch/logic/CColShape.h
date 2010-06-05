@@ -42,7 +42,7 @@ public:
     inline void                 SetEnabled          ( bool bEnabled )                   { m_bIsEnabled = bEnabled; };
 
     const CVector&              GetPosition         ( void );
-    virtual void                SetPosition         ( const CVector& vecPosition );
+    virtual void                SetPosition         ( const CVector& vecPosition )      { m_vecPosition = vecPosition; };
 
     void                        CallHitCallback     ( CElement& Element );
     void                        CallLeaveCallback   ( CElement& Element );
@@ -59,8 +59,6 @@ public:
     list < CElement* > ::iterator  CollidersEnd     ( void )                            { return m_Colliders.end (); }
 
     inline bool                 IsPartnered         ( void )                            { return m_bPartnered; }
-
-    void                        SizeChanged         ( void );
 protected:
     CVector                     m_vecPosition;
 

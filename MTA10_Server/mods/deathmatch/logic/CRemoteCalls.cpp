@@ -148,9 +148,8 @@ void CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownlo
             arguments.PushString("ERROR");
             arguments.PushNumber(error);
             arguments.Call ( call->m_VM, call->m_iFunction);   
-
-            g_pGame->GetRemoteCalls()->Remove(call); // delete ourselves
         }
+        g_pGame->GetRemoteCalls()->Remove(call); // delete ourselves
     }
 }
 

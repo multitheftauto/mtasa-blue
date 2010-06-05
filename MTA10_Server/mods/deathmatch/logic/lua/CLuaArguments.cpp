@@ -37,9 +37,9 @@ CLuaArguments::CLuaArguments ( const CLuaArguments& Arguments, std::map < CLuaAr
 
 CLuaArgument* CLuaArguments::operator [] ( const unsigned int uiPosition ) const
 {
-    if ( uiPosition < m_Arguments.size () )
-        return m_Arguments.at ( uiPosition );
-    return NULL;
+	if ( uiPosition < m_Arguments.size () )
+		return m_Arguments.at ( uiPosition );
+	return NULL;
 }
 
 
@@ -203,8 +203,8 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments *
     int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
-        std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
-        g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
+        const char* szRes = lua_tostring( luaVM, -1 );		
+		g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
 
         // cleanup the stack
         while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
@@ -261,8 +261,8 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
     }
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
-        std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
-        g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
+        const char* szRes = lua_tostring( luaVM, -1 );
+        g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
 
         // cleanup the stack
         while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
@@ -327,14 +327,14 @@ vector < char * > * CLuaArguments::WriteToCharVector ( vector < char * > * value
                 char * szValue = new char [10];
                 memset(szValue,0,10);
                 CElement* pElement = (*iter)->GetElement ();
-                if ( VERIFY_ELEMENT(pElement) )
-                {
+			    if ( VERIFY_ELEMENT(pElement) )
+			    {
                     _snprintf ( szValue, 9, "E#%d", (int)pElement->GetID() );
-                }
-                else
-                {
-                    g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't serialize argument list, invalid element specified. Passing empty string instead." );
-                }
+			    }
+			    else
+			    {
+				    g_pGame->GetScriptDebugging()->LogError ( NULL, "Couldn't serialize argument list, invalid element specified. Passing empty string instead." );
+			    }
                 values->push_back ( szValue );
             }        
         default:
@@ -490,42 +490,6 @@ void CLuaArguments::DeleteArguments ( void )
 }
 
 
-void CLuaArguments::ValidateTableKeys ( void )
-{
-    // Iterate over m_Arguments as pairs
-    // If first is LUA_TNIL, then remove pair
-    vector < CLuaArgument* > ::iterator iter = m_Arguments.begin ();
-    for ( ; iter != m_Arguments.end () ; )
-    {
-        // Check first in pair
-        if ( (*iter)->GetType () == LUA_TNIL )
-        {
-            // Remove pair
-            delete *iter;
-            iter = m_Arguments.erase ( iter );
-            if ( iter != m_Arguments.end () )
-            {
-                delete *iter;
-                iter = m_Arguments.erase ( iter );
-            }
-            // Check if end
-            if ( iter == m_Arguments.end () )
-                break;
-        }
-        else
-        {
-            // Skip second in pair
-            iter++;
-            // Check if end
-            if ( iter == m_Arguments.end () )
-                break;
-
-            iter++;
-        }
-    }
-}
-
-
 bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
 {
     bool bKnownTablesCreated = false;
@@ -541,10 +505,10 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
         pKnownTables->push_back ( this );
         for ( unsigned short us = 0 ; us < usNumArgs ; us++ )
         {
-            CLuaArgument* pArgument = new CLuaArgument ( bitStream, pKnownTables );
+		    CLuaArgument* pArgument = new CLuaArgument ( bitStream, pKnownTables );
             m_Arguments.push_back ( pArgument );
         }
-    }
+	}
 
     if ( bKnownTablesCreated )
         delete pKnownTables;
@@ -578,7 +542,7 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, std::ma
     if ( bKnownTablesCreated )
         delete pKnownTables;
 
-    return bSuccess;
+	return bSuccess;
 }
 
 bool CLuaArguments::WriteToJSONString ( std::string& strJSON, bool bSerialize )
@@ -587,7 +551,7 @@ bool CLuaArguments::WriteToJSONString ( std::string& strJSON, bool bSerialize )
     if ( my_array )
     {
         strJSON = json_object_get_string ( my_array );
-        json_object_put ( my_array ); // dereference - causes a crash, is actually commented out in the example too
+        // json_object_put ( my_array ); // dereference - causes a crash, is actually commented out in the example too
         return true;
     }
     return false;
@@ -610,7 +574,7 @@ json_object * CLuaArguments::WriteToJSONArray ( bool bSerialize )
             break;
         }
     }
-    return my_array;
+	return my_array;
 }
 
 json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map < CLuaArguments*, unsigned long > * pKnownTables )
@@ -708,7 +672,6 @@ json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map 
     }
 }
 
-
 bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
 {
     json_object* object = json_tokener_parse ( const_cast < char* > ( szJSON ) );
@@ -723,16 +686,14 @@ bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
             for(int i=0; i < json_object_array_length(object); i++) 
             {
                 json_object *arrayObject = json_object_array_get_idx(object, i);
-                CLuaArgument * pArgument = new CLuaArgument();
+		        CLuaArgument * pArgument = new CLuaArgument();
                 bSuccess = pArgument->ReadFromJSONObject ( arrayObject, &knownTables );
                 m_Arguments.push_back ( pArgument ); // then the value
                 if ( !bSuccess )
                     break;
             }
-            json_object_put ( object ); // dereference
             return bSuccess;
         }
-        json_object_put ( object ); // dereference
     }
 //    else
 //        g_pGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
@@ -797,10 +758,10 @@ bool CLuaArguments::ReadFromJSONArray ( json_object * object, std::vector < CLua
             for(int i=0; i < json_object_array_length(object); i++) 
             {
                 json_object *arrayObject = json_object_array_get_idx(object, i);
-                CLuaArgument* pArgument = new CLuaArgument ((double)i+1); // push the key
+		        CLuaArgument* pArgument = new CLuaArgument ((double)i+1); // push the key
                 m_Arguments.push_back ( pArgument );
 
-                pArgument = new CLuaArgument();
+		        pArgument = new CLuaArgument();
                 bSuccess = pArgument->ReadFromJSONObject ( arrayObject, pKnownTables );
                 m_Arguments.push_back ( pArgument ); // then the valoue
                 if ( !bSuccess )

@@ -65,6 +65,8 @@ private:
     bool                            m_bCanRemoveFromList;
     std::vector < CClientPlayer* >  m_Players;
     CClientPlayer*                  m_pLocalPlayer;
+    long long                       m_llSyncTroubleCheckTime;
+    long long                       m_llSyncTroubleStartTime;
 };
 
 #endif
