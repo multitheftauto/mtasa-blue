@@ -356,7 +356,7 @@ int CLuaFunctionDefs::EngineSetAsynchronousLoading ( lua_State* luaVM )
     if ( ( iArgument1 == LUA_TBOOLEAN ) &&
         ( iArgument2 == LUA_TBOOLEAN || iArgument2 == LUA_TNONE ) )
     {
-        bool bEnabled = lua_toboolean ( luaVM, 1 );
+        bool bEnabled = lua_toboolean ( luaVM, 1 ) ? true : false;
         bool bForced = iArgument2 == LUA_TBOOLEAN && lua_toboolean ( luaVM, 2 );
         g_pGame->SetAsyncLoadingFromScript ( bEnabled, bForced );
         lua_pushboolean ( luaVM, true );

@@ -166,16 +166,27 @@ void CUnoccupiedVehicleSync::StartSync ( CPlayer* pPlayer, CVehicle* pVehicle )
 
     // Mark him as the syncing player
     pVehicle->SetSyncer ( pPlayer );
+
+    // Call the onElementStartSync event
+    CLuaArguments Arguments;
+    Arguments.PushElement ( pPlayer );  // New syncer
+    pVehicle->CallEvent ( "onElementStartSync", Arguments );
 }
 
 
 void CUnoccupiedVehicleSync::StopSync ( CVehicle* pVehicle )
 {
     // Tell the player that used to sync it
-    pVehicle->GetSyncer ()->Send ( CUnoccupiedVehicleStopSyncPacket ( pVehicle->GetID () ) );
+    CPlayer* pSyncer = pVehicle->GetSyncer ();
+    pSyncer->Send ( CUnoccupiedVehicleStopSyncPacket ( pVehicle->GetID () ) );
 
     // Unmark him as the syncing player
     pVehicle->SetSyncer ( NULL );
+
+    // Call the onElementStopSync event
+    CLuaArguments Arguments;
+    Arguments.PushElement ( pSyncer );  // Old syncer
+    pVehicle->CallEvent ( "onElementStopSync", Arguments );
 }
 
 
