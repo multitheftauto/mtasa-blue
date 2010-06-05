@@ -1182,6 +1182,8 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false );
     m_Events.AddEvent ( "onElementDataChange", "key, oldValue", NULL, false );
     m_Events.AddEvent ( "onElementDestroy", "", NULL, false );
+    m_Events.AddEvent ( "onElementStartSync", "newSyncer", NULL, false );
+    m_Events.AddEvent ( "onElementStopSync", "oldSyncer", NULL, false );
 
     // Radar area events
 

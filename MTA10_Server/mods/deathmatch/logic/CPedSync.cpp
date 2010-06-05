@@ -139,16 +139,27 @@ void CPedSync::StartSync ( CPlayer* pPlayer, CPed* pPed )
 
     // Mark him as the syncing player
     pPed->SetSyncer ( pPlayer );
+
+    // Call the onElementStartSync event
+    CLuaArguments Arguments;
+    Arguments.PushElement ( pPlayer );  // New syncer
+    pPed->CallEvent ( "onElementStartSync", Arguments );
 }
 
 
 void CPedSync::StopSync ( CPed* pPed )
 {
     // Tell the player that used to sync it
-    pPed->GetSyncer ()->Send ( CPedStopSyncPacket ( pPed->GetID () ) );
+    CPlayer* pSyncer = pPed->GetSyncer ();
+    pSyncer->Send ( CPedStopSyncPacket ( pPed->GetID () ) );
 
     // Unmark him as the syncing player
     pPed->SetSyncer ( NULL );
+
+    // Call the onElementStopSync event
+    CLuaArguments Arguments;
+    Arguments.PushElement ( pSyncer );  // Old syncer
+    pPed->CallEvent ( "onElementStopSync", Arguments );
 }
 
 
