@@ -49,8 +49,8 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
         //Set our settings and clear the accounts/userdata tables just in case
         m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "autologin", SQLITE_INTEGER, 0 );
         m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "XMLParsed", SQLITE_INTEGER, 0 );
-        //Clear the SQL database
-        ClearSQLDatabase ();
+        //Tell the Server to load the xml file rather than the SQL
+        m_bLoadXML = true;
     }
     else
     {
@@ -69,8 +69,8 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
                 //Is XMLParsed zero
                 if ( result.Data[i][1].nVal == 0 ) 
                 {
-                    //Clear the SQL database
-                    ClearSQLDatabase ();
+                    //Tell the Server to load the xml file rather than the SQL
+                    m_bLoadXML = true;
                 }
                 bLoadXMLMissing = false;
             }
@@ -80,8 +80,8 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
         {
             //Insert it
             m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "XMLParsed", SQLITE_INTEGER, 0 );
-            //Clear the SQL database
-            ClearSQLDatabase ();
+            //Tell the Server to load the xml file rather than the SQL
+            m_bLoadXML = true;
         }
         else if (result.nRows == 1) 
         {
@@ -96,8 +96,6 @@ void CAccountManager::ClearSQLDatabase ( void )
     //Clear the accounts and userdata tables
     m_pSaveFile->Query ( "DELETE from accounts" );
     m_pSaveFile->Query ( "DELETE from userdata");
-    //Tell the Server to load the xml file rather than the SQL
-    m_bLoadXML = true;
 }
 
 CAccountManager::~CAccountManager ( void )
@@ -146,8 +144,18 @@ bool CAccountManager::ConvertXMLToSQL ( const char* szFileName )
                 CXMLNode* pRootNode = m_pFile->GetRootNode ();
                 if ( pRootNode )
                 {
+                    ClearSQLDatabase();
                     return LoadXML ( pRootNode );
                 }
+            }
+            else
+            {
+                //Save the settings to SQL
+                SaveSettings();
+                CLogger::LogPrint ( "Conversion Failed: Accounts.xml failed to load.\n" );
+                //Add Console to the SQL Database (You don't need to create an account since the server takes care of that (Have to do this here or Console may be created after other accounts if the owner uses addaccount too early)
+                m_pSaveFile->Query ( "INSERT INTO accounts (name, password) VALUES(?,?)", "Console", "" );
+                ++m_iAccounts;
             }
         }
     }
