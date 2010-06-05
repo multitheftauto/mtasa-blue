@@ -1028,6 +1028,14 @@ void CMultiplayerSA::InitHooks()
 
     // Force the MrWhoopee music to load even if we are not the driver.
     *(BYTE *)(0x4F9CCE) = 0xCE;
+
+	// Disable re-initialization of DirectInput mouse device by the game
+	*(BYTE *)0x576CCC = 0xEB;
+	*(BYTE *)0x576EBA = 0xEB;
+	*(BYTE *)0x576F8A = 0xEB;
+
+	// Make sure DirectInput mouse device is set non-exclusive (may not be needed?)
+	*(DWORD *)0x7469A0 = 0x909000B0;
 }
 
 
