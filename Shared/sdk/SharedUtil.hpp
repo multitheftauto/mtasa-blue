@@ -13,7 +13,6 @@
 *
 *****************************************************************************/
 
-#include <assert.h>
 
 #ifdef WIN32
 //
@@ -58,31 +57,14 @@ SString SharedUtil::CalcMTASAPath ( const SString& strPath )
     return strNewPath;
 }
 
+#else
 
-//
-// Write a registry string value
-//
-static void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, const SString& strBuffer )
+SString SharedUtil::CalcMTASAPath ( const SString& strPath )
 {
-    HKEY hkTemp;
-    RegCreateKeyEx ( hkRoot, szSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkTemp, NULL );
-    if ( hkTemp )
-    {
-        RegSetValueEx ( hkTemp, szValue, NULL, REG_SZ, (LPBYTE)strBuffer.c_str (), strBuffer.length () + 1 );
-        RegCloseKey ( hkTemp );
-    }
+    SString strNewPath = "./";
+    strNewPath += strPath;
+    return strNewPath;
 }
-
-//
-// Run ShellExecute with these parameters after exit
-//
-void SharedUtil::SetOnQuitCommand ( const SString& strOperation, const SString& strFile, const SString& strParameters, const SString& strDirectory, const SString& strShowCmd )
-{
-    // Encode into a string and set a registry key
-    SString strValue ( "%s\t%s\t%s\t%s\t%s", strOperation.c_str (), strFile.c_str (), strParameters.c_str (), strDirectory.c_str (), strShowCmd.c_str () );
-    WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnQuitCommand", strValue );
-}
-
 
 #endif
 
@@ -182,113 +164,8 @@ double SharedUtil::GetSecondCount ( void )
 #endif
 
 
-//
-// Format a string
-//
-SString& SString::vFormat ( const char* szFormat, va_list vl )
-{
-#ifdef WIN32
-
-    va_list vlLocal;
-
-    // Calc size
-    va_copy ( vlLocal, vl );
-    int iRequiredCapacity = _vscprintf ( szFormat, vlLocal );
-
-    if ( iRequiredCapacity < 1 )
-    {
-        // Error or empty string
-        clear ();
-        return *this;
-    }
-
-    // Allocate buffer
-    char* szDest = static_cast < char* > ( malloc ( iRequiredCapacity + 1 ) );
-
-    // Try to format the string into the buffer.
-    va_copy ( vlLocal, vl );
-    int iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
-
-    if ( iSize < 1 )
-    {
-        // Error
-        clear ();
-    }
-    else
-    {
-        // Copy from buffer
-        szDest [ iSize ] = '\0';
-        std::string::assign ( szDest );
-    }
-
-    // Delete buffer
-    free ( szDest );
-
-    // Done
-    return *this;
-
-#else
-
-    va_list vlLocal;
-
-    // Guess size
-    int iRequiredCapacity = 220;
-
-    // Allocate buffer
-    char* szDest = static_cast < char* > ( malloc ( iRequiredCapacity + 1 ) );
-
-    // Try to format the string into the buffer. If we will need
-    // more capacity it will return -1 in glibc 2.0 and a greater capacity than
-    // current in glibc 2.1, so we will resize. Else we've finished.
-    va_copy ( vlLocal, vl );
-    int iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
-    if ( iSize == -1 )
-    {
-        // glibc 2.0 - Returns -1 when it hasn't got enough capacity.
-        // Duplicate the buffer size until we get enough capacity
-        do
-        {
-            iRequiredCapacity *= 2;
-            szDest = static_cast < char* > ( realloc ( szDest, iRequiredCapacity + 1 ) );
-            va_copy ( vlLocal, vl );
-            iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
-        } while ( iSize == -1 );
-    }
-    else if ( iSize > iRequiredCapacity )
-    {
-        // glibc 2.1 - Returns the required capacity.
-        iRequiredCapacity = iSize + 1;
-        szDest = static_cast < char* > ( realloc ( szDest, iRequiredCapacity + 1 ) );
-
-        va_copy ( vlLocal, vl );
-        iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
-    }
-
-    if ( iSize < 1 )
-    {
-        // Error or empty string
-        clear ();
-    }
-    else
-    {
-        // Copy from buffer
-        szDest [ iSize ] = '\0';
-        std::string::assign ( szDest );
-    }
-
-    // Delete buffer
-    free ( szDest );
-
-    // Done
-    return *this;
-#endif
-}
-
-
-//
 // Split into parts
-//
-void SString::Split ( const SString& strDelim, std::vector < SString >& outResult, unsigned int uiMaxAmount ) const
+void SString::Split ( const SString& strDelim, std::vector < SString >& outResult ) const
 {
     outResult.clear ();
     unsigned long ulStartPoint = 0;
@@ -297,9 +174,9 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
     {
         unsigned long ulPos = find ( strDelim, ulStartPoint );
 
-        if ( ulPos == npos || ( uiMaxAmount > 0 && uiMaxAmount <= outResult.size () + 1 ) )
+        if ( ulPos == npos )
         {
-            if ( ulStartPoint <= length () )
+            if ( ulStartPoint < length () )
                 outResult.push_back ( substr ( ulStartPoint ) );
             return;
         }
@@ -310,92 +187,6 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
     }
 }
 
-//
-// Replace any char in szOld with szNew
-//
-SString SString::Replace ( const char* szOld, const char* szNew ) const
-{
-    // Bad things will happen if szNew exists in szOld
-    if( strlen ( szNew ) == 1 && std::string ( szOld ).find ( szNew ) != std::string::npos )
-        return *this;
-
-    int iOldLength = strlen ( szOld );
-    SString strResult = *this;
-    int idx = 0;
-    while( ( idx = strResult.find_first_of ( szOld, idx ) ) >= 0 )
-        strResult.replace ( idx, iOldLength, szNew );
-    return strResult;
-}
-
-
-//
-// Replace all szOlds with szNews
-//
-SString SString::ReplaceSubString ( const char* szOld, const char* szNew ) const
-{
-    int iOldLength = strlen ( szOld );
-    SString strResult = *this;
-    int idx = 0;
-    while( ( idx = strResult.find ( szOld, idx ) ) >= 0 )
-        strResult.replace ( idx, iOldLength, szNew );
-    return strResult;
-}
-
-//
-// Remove szOlds from the start of the string.
-//
-SString SString::TrimStart ( const char* szOld ) const
-{
-    int iOldLength = strlen ( szOld );
-    SString strResult = *this;
-    while ( strResult.substr ( 0, iOldLength ) == szOld )
-        strResult = strResult.substr ( iOldLength );
-    return strResult;
-}
-
-//
-// Remove szOlds from the end of the string.
-//
-SString SString::TrimEnd ( const char* szOld ) const
-{
-    int iOldLength = strlen ( szOld );
-    SString strResult = *this;
-    while ( strResult.substr ( strResult.length () - iOldLength ) == szOld )
-        strResult = strResult.substr ( 0, strResult.length () - iOldLength );
-    return strResult;
-}
-
-//
-// Change to all lower case characters.
-//
-SString SString::ToLower ( void ) const
-{
-    SString strResult = *this;
-    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::tolower );
-    return strResult;
-}
-
-//
-// Change to all upper case characters.
-//
-SString SString::ToUpper ( void ) const
-{
-    SString strResult = *this;
-    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), ::toupper );
-    return strResult;
-}
-
-//
-// Change '0x0a' or '0x0d' or '0x0d 0x0a' to '\n'.
-//
-SString SString::ConformLineEndings ( void ) const
-{
-    assert ( '\n' == '\x0A' );
-    if ( std::count( begin(), end(), '\n' ) )
-        return Replace ( "\x0D", "" );
-    else
-        return Replace ( "\x0D", "\n" );
-}
 
 //
 // Cross-platform GetTickCount() implementations
@@ -462,173 +253,3 @@ unsigned long GetTickCount ( void )
 }
 #endif
 
-
-//
-// Expiry stuff
-//
-#ifdef WIN32
-#if defined(MTA_DM_EXPIRE_DAYS)
-    #include <time.h>
-
-    #define YEAR ((((__DATE__ [7]-'0')*10+(__DATE__ [8]-'0'))*10+(__DATE__ [9]-'0'))*10+(__DATE__ [10]-'0'))
-
-    /* Month: 0 - 11 */
-    #define MONTH (__DATE__ [2] == 'n' ? (__DATE__ [1] == 'a' ? 0 : 5) \
-                  : __DATE__ [2] == 'b' ? 1 \
-                  : __DATE__ [2] == 'r' ? (__DATE__ [0] == 'M'? 2 : 3) \
-                  : __DATE__ [2] == 'y' ? 4 \
-                  : __DATE__ [2] == 'l' ? 6 \
-                  : __DATE__ [2] == 'g' ? 7 \
-                  : __DATE__ [2] == 'p' ? 8 \
-                  : __DATE__ [2] == 't' ? 9 \
-                  : __DATE__ [2] == 'v' ? 10 : 11)
-
-    #define DAY ((__DATE__ [4]==' ' ? 0 : __DATE__[4]-'0')*10+(__DATE__[5]-'0'))
-
-    int SharedUtil::GetDaysUntilExpire ( void )
-    {
-        tm when;
-        memset ( &when, 0, sizeof ( when ) );
-        when.tm_year = YEAR - 1900;
-        when.tm_mon = MONTH;
-        when.tm_mday = DAY + MTA_DM_EXPIRE_DAYS;
-        return ( int )( mktime( &when ) - time ( NULL ) ) / ( 60 * 60 * 24 );
-    }
-
-#endif
-#endif
-
-
-// Copied from CChatLine::RemoveColorCode()
-std::string SharedUtil::RemoveColorCode ( const char* szString )
-{
-    std::string strOut;
-    const char* szStart = szString;
-    const char* szEnd = szString;
-
-    while ( true )
-    {
-        if ( *szEnd == '\0' )
-        {
-            strOut.append ( szStart, szEnd - szStart );
-            break;
-        }
-        else
-        {
-            bool bIsColorCode = false;
-            if ( *szEnd == '#' )
-            {
-                bIsColorCode = true;
-                for ( int i = 0; i < 6; i++ )
-                {
-                    char c = szEnd [ 1 + i ];
-                    if ( !isdigit ( (unsigned char)c ) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f') )
-                    {
-                        bIsColorCode = false;
-                        break;
-                    }
-                }
-            }
-
-            if ( bIsColorCode )
-            {
-                strOut.append ( szStart, szEnd - szStart );
-                szStart = szEnd + 7;
-                szEnd = szStart;
-            }
-            else
-            {
-                szEnd++;
-            }
-        }
-    }
-
-    return strOut;
-}
-
-
-//
-// Get the local time in a string.
-// Set bDate to include the date, bMs to include milliseconds
-//
-SString SharedUtil::GetLocalTimeString ( bool bDate, bool bMilliseconds )
-{
-#ifdef _WIN32
-    SYSTEMTIME s;
-    GetLocalTime( &s );
-
-    SString strResult = SString ( "%02d:%02d:%02d", s.wHour, s.wMinute, s.wSecond );
-    if ( bMilliseconds )
-        strResult += SString ( ":%04d", s.wMilliseconds );
-    if ( bDate )
-        strResult = SString ( "%02d-%02d-%02d ", s.wYear, s.wMonth, s.wDay  ) + strResult;
-    return strResult;
-#else
-    // Other platforms here
-    return "HH:MM:SS";
-#endif
-}
-
-
-//
-// Output timestamped line into the debugger
-//
-void SharedUtil::OutputDebugLine ( const char* szMessage )
-{
-    SString strMessage = GetLocalTimeString ( false, true ) + " - " + szMessage;
-    if ( strMessage.length () > 0 && strMessage[ strMessage.length () - 1 ] != '\n' )
-        strMessage += "\n";
-#ifdef _WIN32
-    OutputDebugString ( strMessage );
-#else
-    // Other platforms here
-#endif
-}
-
-
-//
-// Load binary data from a file into an array
-//
-bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& buffer )
-{
-    buffer.clear ();
-    // Open
-    FILE* fh = fopen ( strFilename, "rb" );
-    if ( !fh )
-        return false;
-    // Get size
-    fseek ( fh, 0, SEEK_END );
-    int size = ftell ( fh );
-    rewind ( fh );
-
-    int bytesRead = 0;
-    if ( size > 0 && size < 1e9 )
-    {
-        // Allocate space
-        buffer.assign ( size, 0 );
-        // Read into buffer
-        bytesRead = fread ( &buffer.at ( 0 ), 1, size, fh );
-    }
-    // Close
-    fclose ( fh );
-    return bytesRead == size;
-}
-
-
-//
-// Return true if supplied string adheres to the new version format
-//
-bool SharedUtil::IsValidVersionString ( const SString& strVersion )
-{
-    SString strCheck = "0.0.0-0-00000.0";
-    if ( strCheck.length () != strVersion.length () )
-        return false;
-    for ( unsigned int i = 0 ; i < strVersion.length () ; i++ )
-    {
-        char c = strVersion[i];
-        char d = strCheck[i];
-        if ( c != d && isdigit( c ) != isdigit( d ) )
-            return false;
-    }
-    return true;
-}

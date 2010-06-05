@@ -17,26 +17,26 @@
 #include <string>
 
 typedef struct _section_info_t {
-    DWORD Address;
-    DWORD  Size;
+	DWORD Address;
+	DWORD  Size;
 } SECTIONINFO, *PSECTIONINFO;
 
 class CPEHookUtils
 {
     public:
 
-    DWORD               GetIATAddress   ( const std::string& ModuleName,
-                                          const std::string& FunctionName, 
+    DWORD               GetIATAddress   ( std::string ModuleName,
+                                          std::string FunctionName, 
                                           HANDLE hImgBase );
-    DWORD               WriteIATAddress ( const std::string& ModuleName,
-                                          const std::string& FunctionName,
+    DWORD               WriteIATAddress ( std::string ModuleName,
+                                          std::string FunctionName,
                                           HANDLE hImgBase,
                                           PVOID  pvNewProc );
     PVOID               HookVTableFunc  ( PVOID  pvInterface,
                                           int    nOffset,
                                           PVOID  pvHookFunc,
                                           int    nVtableSlot );
-    void                GetSectionHeader( const std::string& SectName,
+    void                GetSectionHeader( std::string SectName,
                                           const HANDLE hImgBase,
                                           PSECTIONINFO pSectionInfo );
 

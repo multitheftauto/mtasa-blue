@@ -24,7 +24,7 @@ CMarker::CMarker ( CMarkerManager* pMarkerManager, CColManager* pColManager, CEl
     SetTypeName ( "marker" );
     m_ucType = TYPE_CHECKPOINT;
     m_fSize = 4.0f;
-    m_Color = SColorRGBA ( 255, 255, 255, 255 );
+    m_ulColor = 0xFFFFFFFF;
     m_bHasTarget = false;
     m_ucIcon = ICON_NONE;
 
@@ -35,8 +35,7 @@ CMarker::CMarker ( CMarkerManager* pMarkerManager, CColManager* pColManager, CEl
 
     // Add us to the marker manager
     pMarkerManager->AddToList ( this );
-    UpdateSpatialData ();
-}
+};
 
 
 CMarker::~CMarker ( void )
@@ -105,7 +104,7 @@ bool CMarker::ReadSpecialData ( void )
     if ( GetCustomDataString ( "color", szBuffer, 128, true ) )
     {
         // Convert the HTML-style color to RGB
-        if ( !XMLColorToInt ( szBuffer, m_Color.R, m_Color.G, m_Color.B, m_Color.A ) )
+        if ( !XMLColorToInt ( szBuffer, m_ulColor ) )
         {
             CLogger::ErrorPrintf ( "Bad 'color' specified in <marker> (line %u)\n", m_uiLine );
             return false;
@@ -113,15 +112,15 @@ bool CMarker::ReadSpecialData ( void )
     }
     else
     {
-        SetColor ( SColorRGBA( 255, 0, 0, 255 ) );
+        SetColor ( 255, 0, 0, 255 );
     }
 
     float fSize;
     if ( GetCustomDataFloat ( "size", fSize, true ) )
         m_fSize = fSize;
 
-    int iTemp;
-    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
+	int iTemp;
+	if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
     if ( GetCustomDataInt ( "interior", iTemp, true ) )
@@ -144,7 +143,6 @@ void CMarker::SetPosition ( const CVector& vecPosition )
         m_vecPosition = vecPosition;
         if ( m_pCollision )
             m_pCollision->SetPosition ( vecPosition );
-        UpdateSpatialData ();
 
         // We need to make sure the time context is replaced 
         // before that so old packets don't arrive after this.
@@ -215,6 +213,15 @@ void CMarker::SetTarget ( const CVector* pTargetVector )
 }
 
 
+void CMarker::GetColor ( unsigned char & R, unsigned char & G, unsigned char & B, unsigned char & A )
+{
+    R = static_cast < unsigned char > ( m_ulColor );
+    G = static_cast < unsigned char > ( m_ulColor >> 8 );
+    B = static_cast < unsigned char > ( m_ulColor >> 16 );
+    A = static_cast < unsigned char > ( m_ulColor >> 24 );
+}
+
+
 void CMarker::SetMarkerType ( unsigned char ucType )
 {
     // Different from our current type?
@@ -258,23 +265,27 @@ void CMarker::SetSize ( float fSize )
 }
 
 
-void CMarker::SetColor ( const SColor color )
+void CMarker::SetColor ( unsigned long ulColor )
 {
     // Different from our current color?
-    if ( color != m_Color )
+    if ( ulColor != m_ulColor )
     {
         // Set the new color
-        m_Color = color;
+        m_ulColor = ulColor;
 
         // Tell all the players
         CBitStream BitStream;
         BitStream.pBitStream->Write ( m_ID );
-        BitStream.pBitStream->Write ( color.B  );
-        BitStream.pBitStream->Write ( color.G );
-        BitStream.pBitStream->Write ( color.R );
-        BitStream.pBitStream->Write ( color.A );
+        BitStream.pBitStream->Write ( ulColor );
         BroadcastOnlyVisible ( CLuaPacket ( SET_MARKER_COLOR, *BitStream.pBitStream ) );
     }
+}
+
+
+void CMarker::SetColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+{
+    // Set the new color
+    SetColor ( COLOR_ARGB ( ucAlpha, ucRed, ucGreen, ucBlue ) );
 }
 
 
@@ -378,10 +389,4 @@ void CMarker::UpdateCollisionObject ( unsigned char ucOldType )
     {
         static_cast < CColSphere* > ( m_pCollision )->SetRadius ( m_fSize );
     }
-}
-
-
-CSphere CMarker::GetWorldBoundingSphere ( void )
-{
-    return CSphere ( GetPosition (), GetSize () );
 }

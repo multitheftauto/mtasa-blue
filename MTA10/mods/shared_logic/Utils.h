@@ -24,15 +24,14 @@
 
 
 const char* GetFilenameFromPath ( const char* szPath );
-std::string ConformResourcePath ( const char* szRes );
 
 // Vector math
 inline float DistanceBetweenPoints2D ( const CVector& vecPosition1, const CVector& vecPosition2 )
 {
-    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+	float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+	float fDistanceY = vecPosition2.fY - vecPosition1.fY;
 
-    return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
+	return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
 }
 inline float HorizontalAngleBetweenPoints3D ( const CVector &vecPosition1, const CVector &vecPosition2 )
 {
@@ -48,28 +47,28 @@ inline float HorizontalAngleBetweenPoints3D ( const CVector &vecPosition1, const
 }
 inline float DistanceBetweenPoints3D ( const CVector& vecPosition1, const CVector& vecPosition2 )
 {
-    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
-    float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
+	float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+	float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+	float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
 
-    return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
+	return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
 }
 
 inline bool IsPointNearPoint2D ( const CVector& vecPosition1, const CVector& vecPosition2, float fDistance )
 {
-    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+	float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+	float fDistanceY = vecPosition2.fY - vecPosition1.fY;
 
-    return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY <= fDistance * fDistance );
+	return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY <= fDistance * fDistance );
 }
 
 inline bool IsPointNearPoint3D ( const CVector& vecPosition1, const CVector& vecPosition2, float fDistance )
 {
-    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
-    float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
+	float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+	float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+	float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
 
-    return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ <= fDistance * fDistance );
+	return ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ <= fDistance * fDistance );
 }
 
 inline float WrapAround ( float fValue, float fHigh )
@@ -177,6 +176,62 @@ inline float GetOffsetDegrees ( float a, float b )
 }
 
 
+// std::list wrappers
+// Returns true if the item is in the itemList
+template < class T >
+bool ListContains ( std::list < T >& itemList, const T& item )
+{
+    std::list < T > ::iterator it = itemList.begin ();
+    for ( ; it != itemList.end () ; it++ )
+        if ( item == *it )
+            return true;
+    return false;
+}
+
+// std::vector wrappers
+template < class T >
+bool VectorContains ( std::vector < T >& itemList, const T& item )
+{
+    std::vector < T > ::iterator it = itemList.begin ();
+    for ( ; it != itemList.end () ; it++ )
+        if ( item == *it )
+            return true;
+    return false;
+}
+template < class T >
+void VectorRemove ( std::vector < T >& itemList, const T& item )
+{
+    std::vector < T > ::iterator it = itemList.begin ();
+    for ( ; it != itemList.end () ; it++ )
+        if ( item == *it )
+        {
+            itemList.erase ( it );
+            break;
+        }
+}
+
+// std::map wrappers
+template < class T, class V >
+void MapSet ( std::map < T, V >& collection, const T& key, const V& value )
+{
+    collection[ key ] = value;
+}
+
+template < class T, class V >
+bool MapContains ( std::map < T, V >& collection, const T& key )
+{
+    return collection.find ( key ) != collection.end ();
+}
+
+template < class T, class V >
+void MapRemove ( std::map < T, V >& collection, const T& key )
+{
+    std::map < T, V > ::iterator it = collection.find ( key );
+    if ( it != collection.end () )
+        collection.erase ( it );
+}
+
+
 bool            DoesFileExist               ( const char* szFilename );
 
 // Misc utility functions
@@ -185,8 +240,8 @@ unsigned int    StripUnwantedCharacters     ( char* szText, unsigned char cRepla
 unsigned int    StripControlCodes           ( char* szText, unsigned char cReplace = ' ' );
 bool            IsWantedCharacter           ( unsigned char c );
 bool            IsControlCode               ( unsigned char c );
-bool            IsValidFilePath             ( const char* szDir );
-void            ReplaceOccurrencesInString  ( std::string &s, const char *a, const char *b );
+bool            IsValidFilePath	            ( const char* szDir );
+void			ReplaceOccurrencesInString  ( std::string &s, const char *a, const char *b );
 
 void            RaiseFatalError             ( unsigned int uiCode );
 void            RaiseProtocolError          ( unsigned int uiCode );

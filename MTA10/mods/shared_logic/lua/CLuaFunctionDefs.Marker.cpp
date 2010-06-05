@@ -38,7 +38,10 @@ int CLuaFunctionDefs::CreateMarker ( lua_State* luaVM )
         // Other defaulted arguments
         unsigned char ucType = 0;
         float fSize = 4.0f;
-        SColorRGBA color ( 0, 0, 255, 255 );
+        unsigned char ucRed = 0;
+        unsigned char ucGreen = 0;
+        unsigned char ucBlue = 255;
+        unsigned char ucAlpha = 255;
 
         // Optional type argument
         char szDefaultType [] = "default";
@@ -67,7 +70,7 @@ int CLuaFunctionDefs::CreateMarker ( lua_State* luaVM )
             lua_Number nRed = lua_tonumber ( luaVM, 6 );
             if ( nRed >= 0 && nRed <= 255 )
             {
-                color.R = static_cast < unsigned char > ( nRed );
+                ucRed = static_cast < unsigned char > ( nRed );
             }
         }
 
@@ -78,7 +81,7 @@ int CLuaFunctionDefs::CreateMarker ( lua_State* luaVM )
             lua_Number nGreen = lua_tonumber ( luaVM, 7 );
             if ( nGreen >= 0 && nGreen <= 255 )
             {
-                color.G = static_cast < unsigned char > ( nGreen );
+                ucGreen = static_cast < unsigned char > ( nGreen );
             }
         }
 
@@ -89,7 +92,7 @@ int CLuaFunctionDefs::CreateMarker ( lua_State* luaVM )
             lua_Number nBlue = lua_tonumber ( luaVM, 8 );
             if ( nBlue >= 0 && nBlue <= 255 )
             {
-                color.B = static_cast < unsigned char > ( nBlue );
+                ucBlue = static_cast < unsigned char > ( nBlue );
             }
         }
 
@@ -100,7 +103,7 @@ int CLuaFunctionDefs::CreateMarker ( lua_State* luaVM )
             lua_Number nAlpha = lua_tonumber ( luaVM, 9 );
             if ( nAlpha >= 0 && nAlpha <= 255 )
             {
-                color.A = static_cast < unsigned char > ( nAlpha );
+                ucAlpha = static_cast < unsigned char > ( nAlpha );
             }
         }
 
@@ -110,7 +113,7 @@ int CLuaFunctionDefs::CreateMarker ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource();
             {
                 // Create it
-                CClientMarker* pMarker = CStaticFunctionDefinitions::CreateMarker ( *pResource, vecPosition, szType, fSize, color );
+                CClientMarker* pMarker = CStaticFunctionDefinitions::CreateMarker ( *pResource, vecPosition, szType, fSize, ucRed, ucGreen, ucBlue, ucAlpha );
                 if ( pMarker )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -195,11 +198,16 @@ int CLuaFunctionDefs::GetMarkerColor ( lua_State* luaVM )
         CClientMarker* pMarker = lua_tomarker ( luaVM, 1 );
         if ( pMarker )
         {
-            SColor color = pMarker->GetColor ();
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.R ) );
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.G ) );
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.B ) );
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.A ) );
+            unsigned char ucRed;
+            unsigned char ucGreen;
+            unsigned char ucBlue;
+            unsigned char ucAlpha;
+            pMarker->GetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucRed ) );
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucGreen ) );
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucBlue ) );
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucAlpha ) );
             return 4;
         }
         else
@@ -349,14 +357,13 @@ int CLuaFunctionDefs::SetMarkerColor ( lua_State* luaVM )
                 dBlue >= 0 && dBlue <= 255 &&
                 dAlpha >= 0 && dAlpha <= 255 )
             {
-                SColor color;
-                color.R = static_cast < unsigned char > ( dRed );
-                color.G = static_cast < unsigned char > ( dGreen );
-                color.B = static_cast < unsigned char > ( dBlue );
-                color.A = static_cast < unsigned char > ( dAlpha );
+                unsigned char ucRed = static_cast < unsigned char > ( dRed );
+                unsigned char ucGreen = static_cast < unsigned char > ( dGreen );
+                unsigned char ucBlue = static_cast < unsigned char > ( dBlue );
+                unsigned char ucAlpha = static_cast < unsigned char > ( dAlpha );
 
                 // Set the new color
-                if ( CStaticFunctionDefinitions::SetMarkerColor ( *pEntity, color ) )
+                if ( CStaticFunctionDefinitions::SetMarkerColor ( *pEntity, ucRed, ucGreen, ucBlue, ucAlpha ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;

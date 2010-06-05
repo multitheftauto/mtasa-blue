@@ -44,13 +44,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_eVehicleType = CClientVehicleManager::GetVehicleType ( usModel );
     m_bHasDamageModel = CClientVehicleManager::HasDamageModel ( m_eVehicleType );
     m_pVehicle = NULL;
-    m_pUpgrades = new CVehicleUpgrades ( this );
-    m_pClump = NULL;
-#if WITH_VEHICLE_HANDLING
-    m_pOriginalHandlingEntry = g_pGame->GetHandlingManager ()->GetOriginalHandlingData ( static_cast < eVehicleTypes > ( usModel ) );
-    m_pHandlingEntry = g_pGame->GetHandlingManager ()->CreateHandlingData ();
-    m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
-#endif
+	m_pUpgrades = new CVehicleUpgrades ( this );
+	m_pClump = NULL;
 
     SetTypeName ( "vehicle" );
 
@@ -68,8 +63,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_Matrix.vFront.fY = 1.0f;
     m_Matrix.vUp.fZ = 1.0f;
     m_Matrix.vRight.fX = 1.0f;
-    m_MatrixLast = m_Matrix;
-    m_dLastRotationTime = 0;
+	m_MatrixLast = m_Matrix;
+	m_dLastRotationTime = 0;
     m_fHealth = DEFAULT_VEHICLE_HEALTH;
     m_fTurretHorizontal = 0.0f;
     m_fTurretVertical = 0.0f;
@@ -88,9 +83,6 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bColorSaved = false;
     m_bIsFrozen = false;
     m_bScriptFrozen = false;
-    m_bFrozenWaitingForGroundToLoad = false;
-    m_fGroundCheckTolerance = 0.f;
-    m_fObjectsAroundTolerance = 0.f;
     GetInitialDoorStates ( m_ucDoorStates );
     memset ( m_ucWheelStates, 0, sizeof ( m_ucWheelStates ) );
     memset ( m_ucPanelStates, 0, sizeof ( m_ucPanelStates ) );
@@ -107,7 +99,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_ucPaintjob = 3;
     m_fDirtLevel = 0.0f;
     m_bSmokeTrail = false;
-    m_bJustBlewUp = false;
+	m_bJustBlewUp = false;
     m_ucAlpha = 255;
     m_bAlphaChanged = false;
     m_bBlowNextFrame = false;
@@ -121,7 +113,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_fTrainSpeed = 0.0f;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
-    m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
+    m_HeadLightColor = COLOR_RGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
     m_fHeliRotorSpeed = 0.0f;
 
@@ -133,7 +125,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     m_interp.rot.ulFinishTime = 0;
     m_interp.pos.ulFinishTime = 0;
-    ResetInterpolation ();
+	ResetInterpolation ();
 
     // Check if we have landing gears
     m_bHasLandingGear = DoCheckHasLandingGear ();
@@ -155,7 +147,7 @@ CClientVehicle::~CClientVehicle ( void )
     if ( m_pTowedByVehicle )
         m_pTowedByVehicle->m_pTowedVehicle = NULL;
 
-    AttachTo ( NULL );
+	AttachTo ( NULL );
 
     // Remove all our projectiles
     RemoveAllProjectiles ();
@@ -207,10 +199,7 @@ CClientVehicle::~CClientVehicle ( void )
     // Remove us from the vehicle list
     Unlink ();
 
-    delete m_pUpgrades;
-#if WITH_VEHICLE_HANDLING
-    delete m_pHandlingEntry;
-#endif
+	delete m_pUpgrades;
 }
 
 
@@ -218,7 +207,7 @@ void CClientVehicle::Unlink ( void )
 {
     m_pVehicleManager->RemoveFromList ( this );
     m_pVehicleManager->m_Attached.remove ( this );
-    ListRemove( m_pVehicleManager->m_StreamedIn, this );
+    m_pVehicleManager->m_StreamedIn.remove ( this );
 }
 
 
@@ -315,15 +304,6 @@ void CClientVehicle::SetWas ( const CVector &vecWas )
 
 void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
 {
-    // Is the local player in the vehicle
-    if ( g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == this )
-    {
-        // If move is big enough, do ground checks
-        float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ();
-        if ( DistanceMoved > 50 && !IsFrozen () )
-            SetFrozenWaitingForGroundToLoad ( true );
-    }
-
     if ( m_pVehicle )
     {
         m_pVehicle->SetPosition ( const_cast < CVector* > ( &vecPosition ) );
@@ -352,9 +332,14 @@ void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterp
     }
 
     // If we have any occupants, update their positions
-    for ( int i = 0; i <= NUMELMS ( m_pPassengers ) ; i++ )
-        if ( CClientPed* pOccupant = GetOccupant ( i ) )
-            pOccupant->SetPosition ( vecPosition );
+    if ( m_pDriver ) m_pDriver->SetPosition ( vecPosition );
+    for ( int i = 0; i < ( sizeof ( m_pPassengers ) / sizeof ( CClientPed * ) ) ; i++ )
+    {
+        if ( m_pPassengers [ i ] )
+        {
+            m_pPassengers [ i ]->SetPosition ( vecPosition );
+        }
+    }
 
     // Reset interpolation
     if ( bResetInterpolation )
@@ -416,9 +401,9 @@ void CClientVehicle::SetRotationRadians ( const CVector& vecRotation, bool bRese
 
 void CClientVehicle::ReportMissionAudioEvent ( unsigned short usSound )
 {
-    if ( m_pVehicle )
+	if ( m_pVehicle )
     {
-//      g_pGame->GetAudio ()->ReportMissionAudioEvent ( m_pVehicle, usSound );
+//		g_pGame->GetAudio ()->ReportMissionAudioEvent ( m_pVehicle, usSound );
     }
 }
 
@@ -486,7 +471,7 @@ bool CClientVehicle::SetMatrix ( const CMatrix& Matrix )
 
     m_Matrix = Matrix;
     m_matFrozen = Matrix;
-    m_MatrixPure = Matrix;
+	m_MatrixPure = Matrix;
 
     // If we have any occupants, update their positions
     if ( m_pDriver ) m_pDriver->SetPosition ( m_Matrix.vPos );
@@ -526,7 +511,7 @@ void CClientVehicle::GetMoveSpeedMeters ( CVector& vecMoveSpeed ) const
 {
     if ( m_bIsFrozen )
     {
-        vecMoveSpeed = CVector ( 0, 0, 0 );     
+        vecMoveSpeed = CVector ( 0, 0, 0 );		
     }
     else
     {
@@ -699,7 +684,7 @@ void CClientVehicle::Blow ( bool bAllowMovement )
     if ( m_pVehicle )
     {
         // Make sure it can be damaged
-        m_pVehicle->SetCanBeDamaged ( true );       
+        m_pVehicle->SetCanBeDamaged ( true );		
 
         // Grab our current speeds
         CVector vecMoveSpeed, vecTurnSpeed;
@@ -707,18 +692,18 @@ void CClientVehicle::Blow ( bool bAllowMovement )
         GetTurnSpeed ( vecTurnSpeed );
 
         // Set the health to 0
-        m_pVehicle->SetHealth ( 0.0f );     
+        m_pVehicle->SetHealth ( 0.0f );		
 
-        // "Fuck" the car completely, so we don't have weird client-side jumpyness because of differently synced wheel states on clients
-        FuckCarCompletely ( true );     
+		// "Fuck" the car completely, so we don't have weird client-side jumpyness because of differently synced wheel states on clients
+		FuckCarCompletely ( true );		
 
         m_pVehicle->BlowUp ( NULL, 0 );
 
         // And force the wheel states to "burst"
-        SetWheelStatus ( FRONT_LEFT_WHEEL, DT_WHEEL_BURST );
-        SetWheelStatus ( FRONT_RIGHT_WHEEL, DT_WHEEL_BURST );
-        SetWheelStatus ( REAR_LEFT_WHEEL, DT_WHEEL_BURST );
-        SetWheelStatus ( REAR_RIGHT_WHEEL, DT_WHEEL_BURST );
+		SetWheelStatus ( FRONT_LEFT_WHEEL, DT_WHEEL_BURST );
+		SetWheelStatus ( FRONT_RIGHT_WHEEL, DT_WHEEL_BURST );
+		SetWheelStatus ( REAR_LEFT_WHEEL, DT_WHEEL_BURST );
+		SetWheelStatus ( REAR_RIGHT_WHEEL, DT_WHEEL_BURST );
 
         if ( !bAllowMovement )
         {
@@ -755,7 +740,7 @@ void CClientVehicle::SetColor ( unsigned char ucColor1, unsigned char ucColor2, 
 {
     if ( m_pVehicle )
     {
-        m_pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
+	    m_pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
     }
     m_ucColor1 = ucColor1;
     m_ucColor2 = ucColor2;
@@ -770,17 +755,17 @@ void CClientVehicle::GetTurretRotation ( float& fHorizontal, float& fVertical )
     if ( m_pVehicle )
     {
         // Car, plane or quad?
-        if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
+	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
             m_eVehicleType == CLIENTVEHICLE_QUADBIKE )
         {
-            m_pVehicle->GetTurretRotation ( &fHorizontal, &fVertical );
+		    m_pVehicle->GetTurretRotation ( &fHorizontal, &fVertical );
         }
-        else
-        {
-            fHorizontal = 0;
-            fVertical = 0;
-        }
+	    else
+	    {
+		    fHorizontal = 0;
+		    fVertical = 0;
+	    }
     }
     else
     {
@@ -795,11 +780,11 @@ void CClientVehicle::SetTurretRotation ( float fHorizontal, float fVertical )
     if ( m_pVehicle )
     {
         // Car, plane or quad?
-        if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
+	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
             m_eVehicleType == CLIENTVEHICLE_QUADBIKE )
         {
-            m_pVehicle->SetTurretRotation ( fHorizontal, fVertical );
+		    m_pVehicle->SetTurretRotation ( fHorizontal, fVertical );
         }
     }
     m_fTurretHorizontal = fHorizontal;
@@ -845,23 +830,9 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         m_pModelInfo = g_pGame->GetModelInfo ( usModel );
         m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( usModel );
 
-#if WITH_VEHICLE_HANDLING
-        // Reset handling to fit the vehicle
-        m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData ( (eVehicleTypes)usModel );
-        m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
-        m_pHandlingEntry->Recalculate ();
-#endif
-
         // Create the vehicle if we're streamed in
         if ( IsStreamedIn () )
         {
-            // Preload the model
-            if( !m_pModelInfo->IsLoaded () )
-            {
-                m_pModelInfo->Request ( true, true );
-                m_pModelInfo->MakeCustomModel ();
-            }
-
             // Create the vehicle now. Don't prerequest the model ID for this func.
             Create ();
         }
@@ -1451,7 +1422,7 @@ void CClientVehicle::SetAlpha ( unsigned char ucAlpha )
     {
         if ( m_pVehicle )
         {
-            m_pVehicle->SetAlpha ( ucAlpha );
+	        m_pVehicle->SetAlpha ( ucAlpha );
         }
         m_ucAlpha = ucAlpha;
         m_bAlphaChanged = true;
@@ -1640,49 +1611,6 @@ void CClientVehicle::SetFrozen ( bool bFrozen )
 }
 
 
-bool CClientVehicle::IsFrozenWaitingForGroundToLoad ( void ) const
-{
-    return m_bFrozenWaitingForGroundToLoad;
-}
-
-
-void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
-{
-    if ( !g_pGame->IsASyncLoadingEnabled ( true ) )
-        return;
-
-    if ( m_bFrozenWaitingForGroundToLoad != bFrozen )
-    {
-        m_bFrozenWaitingForGroundToLoad = bFrozen;
-
-        if ( bFrozen )
-        {
-            g_pGame->SuspendASyncLoading ( true );
-            m_fGroundCheckTolerance = 0.f;
-            m_fObjectsAroundTolerance = -1.f;
-
-            CVector vecTemp;
-            if ( m_pVehicle )
-            {
-                m_pVehicle->GetMatrix ( &m_matFrozen );
-                m_pVehicle->SetMoveSpeed ( &vecTemp );
-                m_pVehicle->SetTurnSpeed ( &vecTemp );
-            }
-            else
-            {
-                m_matFrozen = m_Matrix;
-                m_vecMoveSpeed = vecTemp;
-                m_vecTurnSpeed = vecTemp;
-            }
-        }
-        else
-        {
-            g_pGame->SuspendASyncLoading ( false );
-        }
-    }
-}
-
-
 CClientVehicle* CClientVehicle::GetPreviousTrainCarriage ( void )
 {
     return NULL;
@@ -1830,7 +1758,7 @@ void CClientVehicle::StreamedInPulse ( void )
     // Make sure the vehicle doesn't go too far down
     if ( m_pVehicle )
     {
-        if ( m_bBlowNextFrame )
+		if ( m_bBlowNextFrame )
         {
             Blow ( false );
             m_bBlowNextFrame = false;
@@ -1848,10 +1776,6 @@ void CClientVehicle::StreamedInPulse ( void )
             m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
         }
 
-        // Handle waiting for the ground to load
-        if ( IsFrozenWaitingForGroundToLoad () )
-            HandleWaitingForGroundToLoad ();
-
         // If we are frozen, make sure we freeze our matrix and keep move/turn speed at 0,0,0
         if ( m_bIsFrozen )
         {
@@ -1864,8 +1788,8 @@ void CClientVehicle::StreamedInPulse ( void )
         {
             // Cols been loaded for where the vehicle is? Only check this if it has no drivers.
             if ( m_pDriver ||
-                 ( g_pGame->GetWorld ()->HasCollisionBeenLoaded ( &m_matFrozen.vPos ) /*&&
-                   m_pObjectManager->ObjectsAroundPointLoaded ( m_matFrozen.vPos, 200.0f, m_usDimension )*/ ) )
+                 ( g_pGame->GetWorld ()->HasCollisionBeenLoaded ( &m_matFrozen.vPos ) &&
+                   m_pObjectManager->ObjectsAroundPointLoaded ( m_matFrozen.vPos, 200.0f, m_usDimension ) ) )
             {
                 // Remember the matrix
                 m_pVehicle->GetMatrix ( &m_matFrozen );
@@ -1879,14 +1803,14 @@ void CClientVehicle::StreamedInPulse ( void )
                 // Added by ChrML 27. Nov: Shouldn't cause any problems
                 m_pVehicle->SetUsesCollision ( false );
             }
-        }
+		}
 
-        // Calculate the velocity
-        CMatrix MatrixCurrent;
-        m_pVehicle->GetMatrix ( &MatrixCurrent );
-        m_vecMoveSpeedMeters = ( MatrixCurrent.vPos - m_MatrixLast.vPos ) * g_pGame->GetFPS ();
-        // Store the current matrix
-        m_MatrixLast = MatrixCurrent;        
+		// Calculate the velocity
+		CMatrix MatrixCurrent;
+		m_pVehicle->GetMatrix ( &MatrixCurrent );
+		m_vecMoveSpeedMeters = ( MatrixCurrent.vPos - m_MatrixLast.vPos ) * g_pGame->GetFPS ();
+		// Store the current matrix
+		m_MatrixLast = MatrixCurrent;        
 
         // We dont interpolate attached trailers
         if ( m_pTowedByVehicle )
@@ -1923,9 +1847,9 @@ void CClientVehicle::StreamedInPulse ( void )
         // Have we moved?
         if ( vecPosition != m_Matrix.vPos )
         {
-            // If we're setting the position, check whether we're under-water.
-            // If so, we need to set the Underwater flag so the render draw order is changed.
-            m_pVehicle->SetUnderwater ( IsBelowWater () );
+		    // If we're setting the position, check whether we're under-water.
+		    // If so, we need to set the Underwater flag so the render draw order is changed.
+		    m_pVehicle->SetUnderwater ( IsBelowWater () );
 
             // Store our new position
             m_Matrix.vPos = vecPosition;
@@ -2049,7 +1973,7 @@ void CClientVehicle::Create ( void )
             return;
         }
 
-        // Put our pointer in its custom data
+		// Put our pointer in its custom data
         m_pVehicle->SetStoredPointer ( this );
         
         // Jump straight to the target position if we have one
@@ -2110,6 +2034,18 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetHeliSearchLightVisible ( m_bHeliSearchLightVisible );
         }
 
+        // Check the paintjob hasn't reset our colors
+        if ( m_bColorSaved )
+        {
+            unsigned char ucColor1, ucColor2, ucColor3, ucColor4;
+            m_pVehicle->GetColor ( &ucColor1, &ucColor2, &ucColor3, &ucColor4 );
+            if ( ucColor1 != m_ucColor1 || ucColor2 != m_ucColor2 ||
+                 ucColor3 != m_ucColor3 || ucColor4 != m_ucColor4 )
+            {
+                m_pVehicle->SetColor ( m_ucColor1, m_ucColor2, m_ucColor3, m_ucColor4 );
+            }
+        }
+
         m_pVehicle->SetUnderwater ( IsBelowWater () );
 
         // HACK: temp fix until windows are fixed using setAlpha
@@ -2140,7 +2076,7 @@ void CClientVehicle::Create ( void )
         }
 
         // Restore turret rotation
-        if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
+	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
             m_eVehicleType == CLIENTVEHICLE_QUADBIKE )
         {
@@ -2217,16 +2153,9 @@ void CClientVehicle::Create ( void )
         // Set the frozen matrix to our position
         m_matFrozen = m_Matrix;
 
-        // Reset the interpolation
-        ResetInterpolation ();
+		// Reset the interpolation
+		ResetInterpolation ();
 
-#if WITH_VEHICLE_HANDLING
-        // Re-apply handling entry
-        if ( m_pHandlingEntry )
-        {
-            m_pVehicle->SetHandlingData ( m_pHandlingEntry );
-        }
-#endif
         // Tell the streamer we've created this object
         NotifyCreate ();
     }
@@ -2258,10 +2187,8 @@ void CClientVehicle::Destroy ( void )
         m_bIsDerailed = IsDerailed ();
         m_fHeliRotorSpeed = GetHeliRotorSpeed ();
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible ();
-#if WITH_VEHICLE_HANDLING
-        m_pHandlingEntry = m_pVehicle->GetHandlingData();
-#endif
-        if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
+
+	    if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
             m_eVehicleType == CLIENTVEHICLE_QUADBIKE )
         {
@@ -2689,20 +2616,6 @@ bool CClientVehicle::IsInWater ( void )
 }
 
 
-float CClientVehicle::GetDistanceFromGround ( void )
-{
-    CVector vecPosition;
-    GetPosition ( vecPosition );
-    float fGroundLevel = static_cast < float > ( g_pGame->GetWorld ()->FindGroundZFor3DPosition ( &vecPosition ) );
-
-    CBoundingBox* pBoundingBox = m_pModelInfo->GetBoundingBox ();
-    if ( pBoundingBox )
-        fGroundLevel -= pBoundingBox->vecBoundMin.fZ + pBoundingBox->vecBoundOffset.fZ;
-
-    return ( vecPosition.fZ - fGroundLevel );
-}
-
-
 bool CClientVehicle::IsOnGround ( void )
 {
     if ( m_pModelInfo )
@@ -2729,18 +2642,18 @@ bool CClientVehicle::IsOnGround ( void )
 
 void CClientVehicle::LockSteering ( bool bLock )
 {
-    // STATUS_TRAIN_MOVING or STATUS_PLAYER_DISABLED will do. STATUS_TRAIN_NOT_MOVING is neater but will screw up planes (turns off the engine).
+	// STATUS_TRAIN_MOVING or STATUS_PLAYER_DISABLED will do. STATUS_TRAIN_NOT_MOVING is neater but will screw up planes (turns off the engine).
 
-    eEntityStatus Status = m_pVehicle->GetEntityStatus ();
-    
-    if ( bLock && Status != STATUS_TRAIN_MOVING ) {
-        m_NormalStatus = Status;
-        m_pVehicle->SetEntityStatus ( STATUS_TRAIN_MOVING );
-    } else if ( !bLock && Status == STATUS_TRAIN_MOVING ) {
-        m_pVehicle->SetEntityStatus ( m_NormalStatus );
-    }
+	eEntityStatus Status = m_pVehicle->GetEntityStatus ();
+	
+	if ( bLock && Status != STATUS_TRAIN_MOVING ) {
+		m_NormalStatus = Status;
+		m_pVehicle->SetEntityStatus ( STATUS_TRAIN_MOVING );
+	} else if ( !bLock && Status == STATUS_TRAIN_MOVING ) {
+		m_pVehicle->SetEntityStatus ( m_NormalStatus );
+	}
 
-    return;
+	return;
 }
 
 
@@ -2778,40 +2691,40 @@ void CClientVehicle::ResetInterpolation ( void )
 void CClientVehicle::AddMatrix ( CMatrix& Matrix, double dTime, unsigned short usTickRate )
 {
     /*
-    // See if we need an update yet (since the rotation could have a lower tick rate)
-    if ( ( ( dTime - m_dLastRotationTime ) * 1000 ) >= usTickRate ) {
-        m_fLERP = LERP_FACTOR;
+	// See if we need an update yet (since the rotation could have a lower tick rate)
+	if ( ( ( dTime - m_dLastRotationTime ) * 1000 ) >= usTickRate ) {
+		m_fLERP = LERP_FACTOR;
 
-        // Set the source quaternion to whatever we have right now
-        m_QuatA = m_QuatLERP;
+		// Set the source quaternion to whatever we have right now
+		m_QuatA = m_QuatLERP;
 
-        // Set the destination quaternion to whatever we just received
-        m_QuatB = CQuat ( &Matrix );
+		// Set the destination quaternion to whatever we just received
+		m_QuatB = CQuat ( &Matrix );
 
-        // Store the matrix into the pure matrix
-        m_MatrixPure = Matrix;
+		// Store the matrix into the pure matrix
+		m_MatrixPure = Matrix;
 
-        // Debug stuff
-        #ifdef MTA_DEBUG_INTERPOLATION
-        g_pCore->GetGraphics()->DrawTextTTF(232,200,300,216,0xDDDDDDDD, "RENEW", 1.0f, 0);
-        #endif
+		// Debug stuff
+		#ifdef MTA_DEBUG_INTERPOLATION
+		g_pCore->GetGraphics()->DrawTextTTF(232,200,300,216,0xDDDDDDDD, "RENEW", 1.0f, 0);
+		#endif
 
-        // Store the time for this rotation
-        m_dLastRotationTime = dTime;
-    }
+		// Store the time for this rotation
+		m_dLastRotationTime = dTime;
+	}
     */
 }
 
 
 void CClientVehicle::AddVelocity ( CVector& vecVelocity )
 {
-    m_vecMoveSpeedInterpolate = vecVelocity;
+	m_vecMoveSpeedInterpolate = vecVelocity;
 }
 
 
 void CClientVehicle::Interpolate ( void )
 {
-    // Interpolate it if: It has a driver and it's not local and we're not syncing it or
+	// Interpolate it if: It has a driver and it's not local and we're not syncing it or
     //                    It has no driver and we're not syncing it.
     if ( ( m_pDriver && !m_pDriver->IsLocalPlayer () && !static_cast < CDeathmatchVehicle* > ( this ) ->IsSyncing () ) ||
          ( !m_pDriver && !static_cast < CDeathmatchVehicle* > ( this ) ->IsSyncing () ) )
@@ -2845,7 +2758,7 @@ void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
         case VT_RCCAM:
         case VT_RCGOBLIN:
         case VT_RCRAIDER:
-        case VT_RCTIGER:
+        case VT_TIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
             memset ( pucDoorStates, DT_DOOR_MISSING, 6 );
@@ -3145,7 +3058,7 @@ void CClientVehicle::SetGravity ( const CVector& vecGravity )
 }
 
 
-SColor CClientVehicle::GetHeadLightColor ( void )
+RGBA CClientVehicle::GetHeadLightColor ( void )
 {
     if ( m_pVehicle )
     {
@@ -3155,17 +3068,7 @@ SColor CClientVehicle::GetHeadLightColor ( void )
 }
 
 
-int CClientVehicle::GetCurrentGear ( void )
-{
-    if ( m_pVehicle )
-    {
-        return m_pVehicle->GetCurrentGear ();
-    }
-    return 0;
-}
-
-
-void CClientVehicle::SetHeadLightColor ( const SColor color )
+void CClientVehicle::SetHeadLightColor ( RGBA color )
 {
     if ( m_pVehicle )
     {
@@ -3180,7 +3083,7 @@ void CClientVehicle::SetHeadLightColor ( const SColor color )
 // But there you go.
 //
 
-#if OCCUPY_DEBUG_INFO
+#if MTA_DEBUG
     #define INFO(x)    g_pCore->GetConsole ()->Printf x
     #define WARN(x)    g_pCore->GetConsole ()->Printf x
 #else
@@ -3445,151 +3348,4 @@ void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed )
         WARN (( "*** Unexpected m_pOccupyingVehicle:0x%08x for %s\n", pClientPed->m_pOccupyingVehicle, GetPlayerName( pClientPed ).c_str () ));
         pClientPed->m_pOccupyingVehicle = NULL;
     }
-}
-
-#if WITH_VEHICLE_HANDLING
-void CClientVehicle::ApplyHandling( void )
-{
-    if ( m_pVehicle )
-    {
-        m_pVehicle->GetHandlingData()->Recalculate();
-        // Update vehicle settings
-        m_pVehicle->UpdateHandlingStatus ();
-    }
-}
-
-
-CHandlingEntry* CClientVehicle::GetHandlingData( void )
-{
-    if ( m_pVehicle )
-    {
-        return m_pVehicle->GetHandlingData();
-    }
-    else if ( m_pHandlingEntry )
-    {
-        return m_pHandlingEntry;
-    }
-    return NULL;
-}
-#endif
-
-
-CSphere CClientVehicle::GetWorldBoundingSphere ( void )
-{
-    CSphere sphere;
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo ( GetModel () );
-    if ( pModelInfo )
-    {
-        CBoundingBox* pBoundingBox = pModelInfo->GetBoundingBox ();
-        if ( pBoundingBox )
-        {
-            sphere.vecPosition = pBoundingBox->vecBoundOffset;
-            sphere.fRadius = pBoundingBox->fRadius;
-        }
-    }
-    sphere.vecPosition += GetStreamPosition ();
-    return sphere;
-}
-
-
-// Currently, this should only be called if the local player is, or was just in the vehicle
-void CClientVehicle::HandleWaitingForGroundToLoad ( void )
-{
-    // Check if near any MTA objects
-    bool bNearObject = false;
-    CVector vecPosition;
-    GetPosition ( vecPosition );
-    CClientEntityResult result;
-    GetClientSpatialDatabase ()->SphereQuery ( result, CSphere ( vecPosition + CVector ( 0, 0, -3 ), 5 ) );
-    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
-    {
-        if  ( (*it)->GetType () == CCLIENTOBJECT )
-        {
-            bNearObject = true;
-            break;
-        }
-    }
-
-    if ( !bNearObject )
-    {
-        // If not near any MTA objects, then don't bother waiting
-        SetFrozenWaitingForGroundToLoad ( false );
-        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-            OutputDebugLine ( "  FreezeUntilCollisionLoaded - Early stop" );
-        #endif 
-        return;
-    }
-
-    // Reset position
-    CVector vecTemp;
-    m_pVehicle->SetMatrix ( &m_matFrozen );
-    m_pVehicle->SetMoveSpeed ( &vecTemp );
-    m_pVehicle->SetTurnSpeed ( &vecTemp );
-    m_vecMoveSpeedMeters = vecTemp;
-    m_vecMoveSpeed = vecTemp;
-    m_vecTurnSpeed = vecTemp;
-
-    // Load load load
-    if ( GetModelInfo () )
-        GetModelInfo ()-> LoadAllRequestedModels ();
-
-    // Start out with a fairly big radius to check, and shrink it down over time
-    float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );
-
-    // Gather up some flags
-    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ();
-    bool bASync         = g_pGame->IsASyncLoadingEnabled ();
-    bool bMTAObjLimit   = pObjectManager->IsObjectLimitReached ();
-    bool bHasModel      = GetModelInfo () != NULL;
-    #ifndef ASYNC_LOADING_DEBUG_OUTPUTA
-        bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, fUseRadius, m_usDimension );
-    #else
-        SString strAround;
-        bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded ( vecPosition, fUseRadius, m_usDimension, &strAround );
-    #endif
-
-    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-        SString status = SString ( "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f   m_fObjectsAroundTolerance:%2.2f  fUseRadius:%2.1f"
-                                       ,vecPosition.fX, vecPosition.fY, vecPosition.fZ
-                                       ,bASync, bHasModel, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance, m_fObjectsAroundTolerance, fUseRadius );
-    #endif
-
-    // See if ground is ready
-    if ( ( !bHasModel || !bMTALoaded ) && m_fObjectsAroundTolerance < 1.f )
-    {
-        m_fGroundCheckTolerance = 0.f;
-        m_fObjectsAroundTolerance = Min ( 1.f, m_fObjectsAroundTolerance + 0.01f );
-        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-            status += ( "  FreezeUntilCollisionLoaded - wait" );
-        #endif
-    }
-    else
-    {
-        // Models should be loaded, but sometimes the collision is still not ready
-        // Do a ground distance check to make sure.
-        // Make the check tolerance larger with each passing frame
-        m_fGroundCheckTolerance = Min ( 1.f, m_fGroundCheckTolerance + 0.01f );
-        float fDist = GetDistanceFromGround ();
-        float fUseDist = fDist * ( 1.f - m_fGroundCheckTolerance );
-        if ( fUseDist > -0.2f && fUseDist < 1.5f )
-            SetFrozenWaitingForGroundToLoad ( false );
-
-        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-            status += ( SString ( "  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist ) );
-        #endif
-
-        // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here) 
-        if ( m_fGroundCheckTolerance > 0.03f && !bMTAObjLimit && !bASync )
-            SetFrozenWaitingForGroundToLoad ( false );
-    }
-
-    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
-        OutputDebugLine ( status );
-        g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
-
-        std::vector < SString > lineList;
-        strAround.Split ( "\n", lineList );
-        for ( unsigned int i = 0 ; i < lineList.size () ; i++ )
-            g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
-    #endif
 }

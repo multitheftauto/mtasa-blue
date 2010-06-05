@@ -28,74 +28,74 @@ class CVehicle;
 #define MAX_VEHICLE_HEALTH 10000
 
 enum eWheelStatus {
-    DT_WHEEL_INTACT=0,
-    DT_WHEEL_BURST,
-    DT_WHEEL_MISSING,
+	DT_WHEEL_INTACT=0,
+	DT_WHEEL_BURST,
+	DT_WHEEL_MISSING,
     DT_WHEEL_INTACT_COLLISIONLESS,
 };
 
 enum eDoorStatus
 {
-    DT_DOOR_INTACT = 0,
-    DT_DOOR_SWINGING_FREE,
-    DT_DOOR_BASHED,
-    DT_DOOR_BASHED_AND_SWINGING_FREE,
-    DT_DOOR_MISSING
+	DT_DOOR_INTACT = 0,
+	DT_DOOR_SWINGING_FREE,
+	DT_DOOR_BASHED,
+	DT_DOOR_BASHED_AND_SWINGING_FREE,
+	DT_DOOR_MISSING
 };
 
 enum eComponentStatus 
 {
-    DT_PANEL_INTACT = 0,
-    DT_PANEL_BASHED,
-    DT_PANEL_BASHED2,
-    DT_PANEL_MISSING
+	DT_PANEL_INTACT = 0,
+	DT_PANEL_BASHED,
+	DT_PANEL_BASHED2,
+	DT_PANEL_MISSING
 };
 
 enum eLightStatus 
 {
-    DT_LIGHT_OK=0,
-    DT_LIGHT_SMASHED
+	DT_LIGHT_OK=0,
+	DT_LIGHT_SMASHED
 };
 
 enum eDoors
 {
-    BONNET = 0,
-    BOOT,
-    FRONT_LEFT_DOOR,
-    FRONT_RIGHT_DOOR,
-    REAR_LEFT_DOOR,
-    REAR_RIGHT_DOOR,
-    MAX_DOORS
+	BONNET = 0,
+	BOOT,
+	FRONT_LEFT_DOOR,
+	FRONT_RIGHT_DOOR,
+	REAR_LEFT_DOOR,
+	REAR_RIGHT_DOOR,
+	MAX_DOORS
 };
 
 enum eWheels
 {
-    FRONT_LEFT_WHEEL = 0,
-    REAR_LEFT_WHEEL,
-    FRONT_RIGHT_WHEEL,
-    REAR_RIGHT_WHEEL,
-    MAX_WHEELS
+	FRONT_LEFT_WHEEL = 0,
+	REAR_LEFT_WHEEL,
+	FRONT_RIGHT_WHEEL,
+	REAR_RIGHT_WHEEL,
+	MAX_WHEELS
 };
 
 enum ePanels
 {
-    FRONT_LEFT_PANEL = 0,
-    FRONT_RIGHT_PANEL,
-    REAR_LEFT_PANEL,
-    REAR_RIGHT_PANEL,
-    WINDSCREEN_PANEL,
-    FRONT_BUMPER,
-    REAR_BUMPER,
-    MAX_PANELS
+	FRONT_LEFT_PANEL = 0,
+	FRONT_RIGHT_PANEL,
+	REAR_LEFT_PANEL,
+	REAR_RIGHT_PANEL,
+	WINDSCREEN_PANEL,
+	FRONT_BUMPER,
+	REAR_BUMPER,
+	MAX_PANELS
 };
 
 enum eLights
 {
-    LEFT_HEADLIGHT = 0,
-    RIGHT_HEADLIGHT,
-    LEFT_TAIL_LIGHT,
-    RIGHT_TAIL_LIGHT,
-    MAX_LIGHTS
+	LEFT_HEADLIGHT = 0,
+	RIGHT_HEADLIGHT,
+	LEFT_TAIL_LIGHT,
+	RIGHT_TAIL_LIGHT,
+	MAX_LIGHTS
 };
 
 enum eVehicleType
@@ -142,9 +142,8 @@ public:
 
     const CVector&                  GetPosition             ( void );
     void                            SetPosition             ( const CVector& vecPosition );
-    inline void                     GetRotation             ( CVector& vecRotation );
-    void                            GetRotationDegrees      ( CVector& vecRotation );
-    void                            SetRotationDegrees      ( const CVector& vecRotation );
+    inline void                     GetRotationDegrees      ( CVector& vecRotation )        { vecRotation = m_vecRotationDegrees; };
+    inline void                     SetRotationDegrees      ( const CVector& vecRotation )  { m_vecRotationDegrees = vecRotation; };
 
     inline const CVector&           GetVelocity             ( void )                        { return m_vecVelocity; };
     inline void                     SetVelocity             ( const CVector& vecVelocity )  { m_vecVelocity = vecVelocity; };
@@ -196,15 +195,12 @@ public:
     inline class CPlayer*           GetSyncer               ( void )                        { return m_pSyncer; };
     void                            SetSyncer               ( class CPlayer* pPlayer );
 
-    bool                            IsUnoccupiedSyncable    ( void )                        { return m_bUnoccupiedSyncable; };
-    void                            SetUnoccupiedSyncable   ( bool bUnoccupiedSynced )      { m_bUnoccupiedSyncable = bUnoccupiedSynced; };
-
     unsigned char                   GetMaxPassengers        ( void );
     unsigned char                   GetFreePassengerSeat    ( void );
 
-    inline void                     SetMaxPassengers        ( unsigned char ucPassengers )  { m_ucMaxPassengersOverride = ucPassengers; };
+	inline void						SetMaxPassengers		( unsigned char ucPassengers )	{ m_ucMaxPassengersOverride = ucPassengers; };
 
-    inline CVehicleUpgrades*        GetUpgrades             ( void )                        { return m_pUpgrades; }
+	inline CVehicleUpgrades*		GetUpgrades				( void )						{ return m_pUpgrades; }
     void                            SetUpgrades             ( CVehicleUpgrades* pUpgrades );
 
     inline unsigned char            GetOverrideLights       ( void )                        { return m_ucOverrideLights; }
@@ -257,8 +253,8 @@ public:
     inline bool                     GetTrainDirection       ( void )                        { return m_bTrainDirection; }
     inline void                     SetTrainDirection       ( bool bDirection )             { m_bTrainDirection = bDirection; }
 
-    inline SColor                   GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
-    inline void                     SetHeadLightColor       ( const SColor color )          { m_HeadLightColor = color; }
+    inline RGBA                     GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
+    inline void                     SetHeadLightColor       ( RGBA color )                  { m_HeadLightColor = color; }
 
     inline bool                     IsHeliSearchLightVisible ( void )                       { return m_bHeliSearchLightVisible; }
     inline void                     SetHeliSearchLightVisible ( bool bVisible )             { m_bHeliSearchLightVisible = bVisible; }
@@ -299,14 +295,13 @@ private:
     unsigned long                   m_ulBlowTime;
     unsigned long                   m_ulIdleTime;
 
-    unsigned char                   m_ucMaxPassengersOverride;
+	unsigned char					m_ucMaxPassengersOverride;
 
     CVehicleColor                   m_Color;
 
     bool                            m_bIsFrozen;    
-    bool                            m_bUnoccupiedSyncable;
 
-    CVehicleUpgrades*               m_pUpgrades;
+	CVehicleUpgrades*				m_pUpgrades;
 
     unsigned char                   m_ucOverrideLights;
 
@@ -329,7 +324,7 @@ private:
     bool                            m_bIsDerailable;
     bool                            m_bTrainDirection;
     CPlayer *                       m_pJackingPlayer;
-    SColor                          m_HeadLightColor;
+    RGBA                            m_HeadLightColor;
     bool                            m_bHeliSearchLightVisible;
 
     // Used to remember where this vehicle spawns

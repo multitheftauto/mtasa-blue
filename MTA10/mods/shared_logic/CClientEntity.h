@@ -26,9 +26,6 @@ class CClientEntity;
 #include <list>
 #include <google/dense_hash_map>
 
-// Used to check fast version of getElementsByType
-//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
-
 class CClientManager;
 
 #define IS_PED(entity) ((entity)->GetType()==CCLIENTPLAYER||(entity)->GetType()==CCLIENTPED)
@@ -53,7 +50,7 @@ enum eClientEntityType
     CCLIENTVEHICLE,
     CCLIENTRADARMARKER,
     CCLIENTOBJECT,
-    CCLIENTCIVILIAN,
+	CCLIENTCIVILIAN,
     CCLIENTPICKUP,
     CCLIENTRADARAREA,
     CCLIENTMARKER,
@@ -62,7 +59,7 @@ enum eClientEntityType
     CCLIENTTEAM,
     CCLIENTPED,
     CCLIENTPROJECTILE,
-    CCLIENTGUI,
+	CCLIENTGUI,
     CCLIENTSPAWNPOINT_DEPRECATED,
     CCLIENTCOLSHAPE,
     CCLIENTDUMMY, // anything user-defined
@@ -96,7 +93,7 @@ public:
     static inline int                           GetInstanceCount        ( void )                    { return iCount; };
 
     virtual eClientEntityType                   GetType                 ( void ) const = 0;
-    inline bool                                 IsLocalEntity           ( void )                    { return m_ID >= MAX_SERVER_ELEMENTS; };
+	inline bool									IsLocalEntity    		( void )					{ return m_ID >= MAX_SERVER_ELEMENTS; };
 
     // System entity? A system entity means it can't be removed by the server
     // or the client scripts.
@@ -116,7 +113,7 @@ public:
     bool                                        CanUpdateSync           ( unsigned char ucRemote );
 
     inline char*                                GetName                 ( void )                    { return m_szName; };
-    inline void                                 SetName                 ( const char* szName )      { assert ( szName ); strncpy ( m_szName, szName, MAX_ELEMENT_NAME_LENGTH ); };
+	inline void                                 SetName                 ( const char* szName )      { assert ( szName ); strncpy ( m_szName, szName, MAX_ELEMENT_NAME_LENGTH ); };
 
     inline const char*                          GetTypeName             ( void )                    { return m_szTypeName; };
     inline unsigned int                         GetTypeHash             ( void )                    { return m_uiTypeHash; };
@@ -153,7 +150,7 @@ public:
     void                                        GetPositionRelative     ( CClientEntity * pOrigin, CVector& vecPosition ) const;
     virtual void                                SetPosition             ( const CVector& vecPosition ) = 0;
     void                                        SetPositionRelative     ( CClientEntity * pOrigin, const CVector& vecPosition );
-    virtual void                                Teleport                ( const CVector& vecPosition ) { SetPosition(vecPosition); }
+	virtual void                                Teleport                ( const CVector& vecPosition ) { SetPosition(vecPosition); }
 
     virtual inline unsigned short               GetDimension            ( void )                        { return m_usDimension; }
     virtual void                                SetDimension            ( unsigned short usDimension ) { m_usDimension = usDimension; }
@@ -164,7 +161,7 @@ public:
     inline CModelInfo*                          GetModelInfo            ( void )                        { return m_pModelInfo; };
     
     inline CClientEntity*                       GetAttachedTo           ( void )                        { return m_pAttachedToEntity; }
-    virtual void                                AttachTo                ( CClientEntity * pEntity );
+    virtual void								AttachTo                ( CClientEntity * pEntity );
     virtual void                                GetAttachedOffsets      ( CVector & vecPosition, CVector & vecRotation );
     virtual void                                SetAttachedOffsets      ( CVector & vecPosition, CVector & vecRotation );
     inline void                                 AddAttachedEntity       ( CClientEntity* pEntity )      { m_AttachedEntities.push_back ( pEntity ); }
@@ -230,9 +227,6 @@ public:
     bool                                        IsCollidableWith            ( CClientEntity * pEntity );
     void                                        SetCollidableWith           ( CClientEntity * pEntity, bool bCanCollide );
 
-    bool                                        IsDoubleSided               ( void );
-    void                                        SetDoubleSided              ( bool bEnable );
-
     // Game layer functions for CEntity/CPhysical
     virtual void                                InternalAttachTo            ( CClientEntity * pEntity );
     bool                                        IsStatic                    ( void );
@@ -241,12 +235,6 @@ public:
     virtual void                                SetInterior                 ( unsigned char ucInterior );
     bool                                        IsOnScreen                  ( void );
     virtual RpClump *                           GetClump                    ( void );
-
-    // Spatial database
-    virtual CSphere                             GetWorldBoundingSphere      ( void );
-    virtual void                                UpdateSpatialData           ( void );
-
-    float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
 protected:
     CClientManager*                             m_pManager;
@@ -284,8 +272,6 @@ protected:
     std::list < CClientPed * >                  m_Contacts;
     unsigned char                               m_ucInterior;
     std::map < CClientEntity *, bool >          m_DisabledCollisions;
-    bool                                        m_bDoubleSided;
-    bool                                        m_bDoubleSidedInit;
 
 private:
     static int                                  iCount;
@@ -299,7 +285,7 @@ private:
     static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CClientEntity* pEntity );
     static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, CLuaMain* pLuaMain, bool bStreamedIn );
 
-#if CHECK_ENTITIES_FROM_ROOT
+#if MTA_DEBUG
     static void                     _CheckEntitiesFromRoot      ( unsigned int uiTypeHash );
     void                            _FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map < CClientEntity*, int >& mapResults );
     static void                     _GetEntitiesFromRoot        ( unsigned int uiTypeHash, std::map < CClientEntity*, int >& mapResults );

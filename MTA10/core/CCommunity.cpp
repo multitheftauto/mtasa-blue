@@ -1,8 +1,8 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CCommunity.cpp
+*  PROJECT:		Multi Theft Auto v1.0
+*  LICENSE:		See LICENSE in the top level directory
+*  FILE:		core/CCommunity.cpp
 *  PURPOSE:     Community connector class
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
@@ -18,15 +18,15 @@ extern CCore* g_pCore;
 template<> CCommunity * CSingleton< CCommunity >::m_pSingleton = NULL;
 
 char *szVerificationMessages[] = {
-    "Unexpected error",
-    "Success",
+	"Unexpected error",
+	"Success",
     "Your account does not seem to exist",
-    "Computer already in use",
-    "You have reached your serials quota",
-    "Invalid username/password",
-    "Account provided is already in use",
-    "Version error",
-    "Account is banned",
+	"Computer already in use",
+	"You have reached your serials quota",
+	"Invalid username/password",
+	"Account provided is already in use",
+	"Version error",
+	"Account is banned",
     "Serial is banned",
     "Could not connect to master server"
 };
@@ -89,7 +89,8 @@ void CCommunity::Login ( VERIFICATIONCALLBACK pCallBack, void* pObject )
                      szSerial );
 
     // Perform the HTTP request
-    m_HTTP.Get ( strURL );
+    memset ( m_szBuffer, 0, VERIFICATION_DATA_BUFFER_SIZE );
+    m_HTTP.Get ( strURL, m_szBuffer, VERIFICATION_DATA_BUFFER_SIZE - 1 );
 
     // Store the start time
     m_ulStartTime = CClientTime::GetTime ();
@@ -100,14 +101,12 @@ void CCommunity::DoPulse ( void )
 {
     if ( m_ulStartTime )
     {
+        char *szBuffer;
         eVerificationResult Status;
+        unsigned int nDataLength;
 
         // Poll the HTTP client
-        CHTTPBuffer buffer;
-        if ( m_HTTP.GetData ( buffer ) ) {
-
-            char *szBuffer = buffer.GetData ();
-            
+        if ( m_HTTP.GetData ( &szBuffer, nDataLength ) ) {
             // Get the returned status
             Status = (eVerificationResult)(szBuffer[0] - 48);
             m_bLoggedIn = Status == VERIFY_ERROR_SUCCESS;

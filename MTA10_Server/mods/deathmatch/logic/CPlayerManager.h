@@ -53,8 +53,8 @@ public:
     inline std::list < CPlayer* > ::const_iterator  IterGet                     ( ElementID PlayerID );
 
     void                                        Broadcast                       ( const CPacket& Packet, CPlayer* pSkip = NULL );
-    void                                        Broadcast                       ( const CPacket& Packet, std::list < CPlayer * > & playersList );
-    void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME, unsigned short usMinBitstreamVersion = 0 );
+	void                                        Broadcast                       ( const CPacket& Packet, std::list < CPlayer * > & playersList );
+    void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME );
 
     static bool                                 IsValidPlayerModel              ( unsigned short usPlayerModel );
 

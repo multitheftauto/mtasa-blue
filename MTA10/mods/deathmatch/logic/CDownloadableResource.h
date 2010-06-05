@@ -26,7 +26,6 @@
 #endif
 
 #include "../../shared_logic/utils/zip/crc32.h"
-#include "CChecksum.h"
 
 class CDownloadableResource
 {
@@ -43,30 +42,31 @@ public:
     };
 
 public:
-    CDownloadableResource           ( eResourceType resourceType, const char* szName, const char* szNameShort, CChecksum checksum = CChecksum (), bool bGenerateClientChecksum = false );
+    CDownloadableResource           ( eResourceType resourceType, const char* szName, const char* szNameShort, unsigned long ulServerCRC = 0, bool bGenerateClientCRC = false, CRCGenerator* pCRCGen = NULL );
     virtual ~CDownloadableResource  ( void );
 
-    bool DoesClientAndServerChecksumMatch ( void );
+    bool DoesClientAndServerCRCMatch( void );
 
     eResourceType GetResourceType   ( void ) { return m_resourceType; };
     const char* GetName             ( void ) { return m_szName; };
     const char* GetShortName        ( void ) { return m_szNameShort; };
 
     // CRC-based methods
-    CChecksum GenerateClientChecksum ( void );
+    unsigned long GenerateClientCRC ( void );
+    unsigned long GenerateClientCRC ( CRCGenerator* pCRCGen );
 
-    CChecksum GetLastClientChecksum  ( void );
+    unsigned long GetLastClientCRC  ( void );
 
-    CChecksum GetServerChecksum      ( void );
-    void SetServerChecksum           ( CChecksum serverChecksum );
+    unsigned long GetServerCRC      ( void );
+    void SetServerCRC               ( unsigned long ulServerCRC );
 protected:
     eResourceType       m_resourceType;
 
     char*               m_szName;
     char*               m_szNameShort;
 
-    CChecksum           m_LastClientChecksum;
-    CChecksum           m_ServerChecksum;
+    unsigned long       m_ulLastClientCRC;
+    unsigned long       m_ulServerCRC;
 };
 
 #endif

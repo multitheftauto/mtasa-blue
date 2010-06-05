@@ -36,10 +36,10 @@ public:
                                     CMainConfig                     ( CConsole* pConsole, class CLuaManager* pLuaMain );
 
     bool                            Load                            ( const char* szFileName = NULL );
-    bool                            LoadExtended                    ( void );
+	bool							LoadExtended					( void );
     bool                            Save                            ( const char* szFileName = NULL );
 
-    inline unsigned int             GetMTUSize                      ( void )        { return m_uiMTUSize; };
+	inline unsigned int				GetMTUSize						( void )		{ return m_uiMTUSize; };
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
     std::string                     GetServerIP                     ( void );
     unsigned short                  GetServerPort                   ( void );
@@ -55,28 +55,20 @@ public:
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
-    inline bool                     GetHTTPAutoClientFiles          ( void )        { return m_bHTTPAutoClientFiles; };
-    inline int                      GetHTTPConnectionsPerClient     ( void )        { return m_iHTTPConnectionsPerClient; };
-    inline int                      GetEnableClientChecks           ( void )        { return m_iEnableClientChecks; };
+    inline bool                     GetLogFileEnabled               ( void )        { return m_bLogFileEnabled; };
     inline const std::string&       GetLogFile                      ( void )        { return m_strLogFile; };
-    inline const std::string&       GetAuthFile                     ( void )        { return m_strAuthFile; };
     inline bool                     GetAutoUpdateAntiCheatEnabled   ( void )        { return m_bAutoUpdateAntiCheatEnabled; };
     inline bool                     GetJoinFloodProtectionEnabled   ( void )        { return m_bJoinFloodProtectionEnabled; };
     inline bool                     GetScriptDebugLogEnabled        ( void )        { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty (); };
     inline const std::string&       GetScriptDebugLogFile           ( void )        { return m_strScriptDebugLogFile; };
     inline unsigned int             GetScriptDebugLogLevel          ( void )        { return m_uiScriptDebugLogLevel; };
     inline const std::string&       GetAccessControlListFile        ( void )        { return m_strAccessControlListFile; };
-    inline bool                     GetAutoUpdateIncludedResourcesEnabled   ( void )        { return m_bAutoUpdateIncludedResources; };
-    inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan; };
-    inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
-    bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableACMap, szTagAC ); };
-    bool                            IsBelowMinimumClient            ( const char* szVersion )   { return m_strMinClientVersion.length () && m_strMinClientVersion > szVersion; }
-    bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
-    const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersion; }
-    const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
+	inline bool                     GetAutoUpdateIncludedResourcesEnabled   ( void )        { return m_bAutoUpdateIncludedResources; };
+	inline bool						GetDontBroadcastLan				( void )		{ return m_bDontBroadcastLan; };
+	inline bool						GetSerialVerificationEnabled	( void )		{ return m_bVerifySerials; };
 
-    inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
-    void                            SetFPSLimit                     ( unsigned short usFPS );
+	inline unsigned short			GetFPSLimit						( void )		{ return m_usFPSLimit; };
+	void							SetFPSLimit						( unsigned short usFPS );
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
 
@@ -88,7 +80,7 @@ private:
     CXMLNode*                       m_pRootNode;
     CCommandLineParser*             m_pCommandLineParser;
 
-    unsigned int                    m_uiMTUSize;
+	unsigned int					m_uiMTUSize;
     std::string                     m_strServerIP;
     std::string                     m_strServerName;
     unsigned short                  m_usServerPort;
@@ -96,27 +88,21 @@ private:
     bool                            m_bHTTPEnabled;
     std::string                     m_strPassword;
     bool                            m_bAseEnabled;
-    unsigned short                  m_usHTTPPort;
+	unsigned short					m_usHTTPPort;
     eHTTPDownloadType               m_ucHTTPDownloadType;
     std::string                     m_strHTTPDownloadURL;
-    bool                            m_bHTTPAutoClientFiles;
-    int                             m_iHTTPConnectionsPerClient;
-    int                             m_iEnableClientChecks;
+    bool                            m_bLogFileEnabled;
     std::string                     m_strLogFile;
-    std::string                     m_strAuthFile;
     bool                            m_bAutoUpdateAntiCheatEnabled;
     bool                            m_bJoinFloodProtectionEnabled;
     bool                            m_bScriptDebugLogEnabled;
     std::string                     m_strScriptDebugLogFile;
     unsigned int                    m_uiScriptDebugLogLevel;
     std::string                     m_strAccessControlListFile;
-    bool                            m_bAutoUpdateIncludedResources;
-    bool                            m_bVerifySerials;
-    unsigned short                  m_usFPSLimit;
-    bool                            m_bDontBroadcastLan;
-    std::map < SString, int >       m_DisableACMap;
-    SString                         m_strMinClientVersion;
-    SString                         m_strRecommendedClientVersion;
+	bool							m_bAutoUpdateIncludedResources;
+	bool							m_bVerifySerials;
+	unsigned short					m_usFPSLimit;
+	bool							m_bDontBroadcastLan;
 };
 
 #endif

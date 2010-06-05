@@ -17,10 +17,10 @@
 using SharedUtil::CalcMTASAPath;
 
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
-                                    CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-                                    CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-                                    CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam
-                                    );
+									CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
+									CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+									CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam
+									);
 
 template<> CModManager * CSingleton < CModManager > ::m_pSingleton = NULL;
 
@@ -83,7 +83,8 @@ void CModManager::RequestLoadDefault ( const char* szArguments )
 void CModManager::RequestUnload ( void )
 {
     RequestLoad ( NULL, NULL );
-    CCore::GetSingletonPtr () -> OnModUnload ();
+	CCore::GetSingletonPtr () -> OnModUnload ();
+    CLocalGUI::GetSingleton ().OnModUnload ();
 }
 
 
@@ -108,6 +109,9 @@ bool CModManager::IsLoaded ( void )
 
 CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
 {
+    char szOriginalDirectory[255] = {'\0'};
+    SString strMTADirectory;
+
     // Make sure we haven't already loaded a mod
     Unload ();
 
@@ -119,13 +123,23 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
         return NULL;
     }
 
-    // Ensure DllDirectory has not been changed
-    char szDllDirectory[ MAX_PATH + 1 ] = {'\0'};
-    GetDllDirectory( sizeof ( szDllDirectory ), szDllDirectory );
-    assert ( stricmp( CalcMTASAPath ( "mta" ), szDllDirectory ) == 0 );
+    // Change the search path and current directory
+    char szOrigPath [ 1024 ];
+    DWORD dwGetPathResult = GetEnvironmentVariable ( "Path", szOrigPath, sizeof(szOrigPath) );
+    if ( dwGetPathResult == 0 || dwGetPathResult >= sizeof(szOrigPath) )
+    {
+        CCore::GetSingleton ().GetConsole ()->Print ( "Error getting Path environment variable" );
+        return NULL;
+    }
+    SString strPath ( "%s\\%s;%s", CalcMTASAPath("mods").c_str (), szName, szOrigPath );
+    SetEnvironmentVariable ( "Path", strPath );
 
-    // Load the library and use the supplied path as an extra place to search for dependencies
-    m_hClientDLL = LoadLibraryEx ( itMod->second.c_str (), NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
+    GetCurrentDirectory ( sizeof(szOriginalDirectory), szOriginalDirectory );
+    strMTADirectory = CalcMTASAPath ( "mta" );
+    SetCurrentDirectory ( strMTADirectory );
+    
+    // Load the library
+    m_hClientDLL = LoadLibrary ( itMod->second.c_str () );
     if ( !m_hClientDLL )
     {
         DWORD dwError = GetLastError ();
@@ -144,6 +158,10 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
         }
 
         CCore::GetSingleton ().GetConsole ()->Printf ( "Unable to load %s's DLL (reason: %s)", szName, szError );
+
+        // Return the search path and current directory to its normal
+        SetEnvironmentVariable ( "Path", szOrigPath );
+        SetCurrentDirectory ( szOriginalDirectory );
         return NULL;
     }
 
@@ -155,8 +173,15 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     {
         CCore::GetSingleton ().GetConsole ()->Printf ( "Unable to load %s's DLL (unknown mod)", szName, GetLastError () );
         FreeLibrary ( m_hClientDLL );
+
+        // Return the current directory to its normal
+        SetCurrentDirectory ( szOriginalDirectory );
         return NULL;
     }
+
+    // Return the search path and current directory to its normal
+    SetEnvironmentVariable ( "Path", szOrigPath );
+    SetCurrentDirectory ( szOriginalDirectory );
 
     // Call InitClient and store the Client interface in m_pClientBase
     m_pClientBase = pClientInitializer ();
@@ -173,9 +198,6 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     // HACK: make the console input active if its visible
     if ( CLocalGUI::GetSingleton ().IsConsoleVisible () )
         CLocalGUI::GetSingleton ().GetConsole ()->ActivateInput ();
-
-    // Tell chat to start handling input
-    CLocalGUI::GetSingleton ().GetChat ()->OnModLoad ();
  
     // Return the interface
     return m_pClientBase;
@@ -203,6 +225,7 @@ void CModManager::Unload ( void )
 
         // Call the on mod unload func
         CCore::GetSingletonPtr () -> OnModUnload ();
+        CLocalGUI::GetSingleton ().OnModUnload ();
 
         // Reset chatbox status (so it won't prevent further input), and clear it
         /*CLocalGUI::GetSingleton ().GetChatBox ()->SetInputEnabled ( false );
@@ -224,7 +247,6 @@ void CModManager::Unload ( void )
         CCore::GetSingleton ().GetGame ()->Reset ();
         CCore::GetSingleton ().GetMultiplayer ()->Reset ();
         CCore::GetSingleton ().GetNetwork ()->Reset ();
-        assert ( CCore::GetSingleton ().GetNetwork ()->GetServerBitStreamVersion () == 0 );
 
         // Enable the console again
         CCore::GetSingleton ().GetConsole ()->SetEnabled ( true );
@@ -427,34 +449,34 @@ void CModManager::DumpCoreLog ( CExceptionInformation* pExceptionInformation )
 
 void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
 {
-    // Try to load the DLL in our directory
-    HMODULE hDll = NULL;
-    char szDbgHelpPath [MAX_PATH];
-    if ( GetModuleFileName ( NULL, szDbgHelpPath, MAX_PATH ) )
-    {
-        char* pSlash = _tcsrchr ( szDbgHelpPath, '\\' );
-        if ( pSlash )
-        {
-            _tcscpy ( pSlash + 1, "DBGHELP.DLL" );
-            hDll = LoadLibrary ( szDbgHelpPath );
-        }
-    }
+	// Try to load the DLL in our directory
+	HMODULE hDll = NULL;
+	char szDbgHelpPath [MAX_PATH];
+	if ( GetModuleFileName ( NULL, szDbgHelpPath, MAX_PATH ) )
+	{
+		char* pSlash = _tcsrchr ( szDbgHelpPath, '\\' );
+		if ( pSlash )
+		{
+			_tcscpy ( pSlash + 1, "DBGHELP.DLL" );
+			hDll = LoadLibrary ( szDbgHelpPath );
+		}
+	}
 
     // If we couldn't load the one in our dir, load any version available
-    if ( !hDll )
-    {
-        hDll = LoadLibrary( "DBGHELP.DLL" );
-    }
+	if ( !hDll )
+	{
+		hDll = LoadLibrary( "DBGHELP.DLL" );
+	}
 
     // We could load a dll?
-    if ( hDll )
-    {
+	if ( hDll )
+	{
         // Grab the MiniDumpWriteDump proc address
-        MINIDUMPWRITEDUMP pDump = reinterpret_cast < MINIDUMPWRITEDUMP > ( GetProcAddress( hDll, "MiniDumpWriteDump" ) );
-        if ( pDump )
-        {
-            // Create the file
-            HANDLE hFile = CreateFile ( CalcMTASAPath ( "mta\\core.dmp" ), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+		MINIDUMPWRITEDUMP pDump = reinterpret_cast < MINIDUMPWRITEDUMP > ( GetProcAddress( hDll, "MiniDumpWriteDump" ) );
+		if ( pDump )
+		{
+			// Create the file
+			HANDLE hFile = CreateFile ( CalcMTASAPath ( "mta\\core.dmp" ), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
             if ( hFile != INVALID_HANDLE_VALUE )
             {
                 // Create an exception information struct
@@ -478,7 +500,7 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
                 CreateDirectory ( CalcMTASAPath ( "mta\\dumps" ), 0 );
 
                 // Add a log entry.
-                SString strFilename ( "mta\\dumps\\client_%s_%02d%02d%04d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG,
+                SString strFilename ( "mta\\dumps\\client_%s_%02d%02d%04d_%02d%02d.dmp", MTA_DM_BUILDTYPE,
                                                                                          SystemTime.wMonth,
                                                                                          SystemTime.wDay,
                                                                                          SystemTime.wYear,
@@ -487,12 +509,12 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
 
                 // Copy the file
                 CopyFile ( CalcMTASAPath ( "mta\\core.dmp" ), CalcMTASAPath ( strFilename ), false );
-            }
-        }
+			}
+		}
 
         // Free the DLL again
         FreeLibrary ( hDll );
-    }
+	}
 }
 
 void CModManager::RunErrorTool ( CExceptionInformation* pExceptionInformation )
@@ -620,4 +642,3 @@ void CModManager::VerifyAndAddEntry ( const char* szModFolderPath, const char* s
         }
     }
 }
-

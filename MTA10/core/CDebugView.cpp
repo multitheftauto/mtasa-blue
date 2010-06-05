@@ -42,7 +42,6 @@ CDebugView::CDebugView ( CGUI * pManager, CVector2D & vecPosition ) : CChat ()
     m_fSmoothLastTimeSeconds = 0;
     m_fSmoothAllowAfter = 0;
     m_fSmoothScrollResetTime = 0;
-    m_fSmoothRepeatTimer = 0;
     m_pFont = m_pManager->GetBoldFont ();
     m_pDXFont = g_pCore->GetGraphics ()->GetFont ();
     m_fNativeWidth = DEBUGVIEW_WIDTH;
@@ -108,10 +107,10 @@ void CDebugView::Output ( char* szText, bool bColorCoded )
 void CDebugView::Outputf ( bool bColorCoded, char* szText, ... )
 {
     char szBuffer [ 1024 ];
-    va_list ap;
-    va_start ( ap, szText );
-    _VSNPRINTF ( szBuffer, 1024, szText, ap );
-    va_end ( ap );
+	va_list ap;
+	va_start ( ap, szText );
+	_VSNPRINTF ( szBuffer, 1024, szText, ap );
+	va_end ( ap );
 
     CChat * pChat = g_pChat;
     g_pChat = this;

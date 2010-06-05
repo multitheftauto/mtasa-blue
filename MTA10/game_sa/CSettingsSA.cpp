@@ -5,7 +5,6 @@
 *  FILE:        game_sa/CSettingsSA.cpp
 *  PURPOSE:     Game settings
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -17,7 +16,6 @@ unsigned long CSettingsSA::FUNC_GetNumVideoModes;
 unsigned long CSettingsSA::FUNC_GetVideoModeInfo;
 unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetCurrentVideoMode;
-unsigned long CSettingsSA::FUNC_SetDrawDistance;
 
 CSettingsSA::CSettingsSA ( void )
 {
@@ -101,8 +99,15 @@ unsigned char CSettingsSA::GetRadioVolume ( void )
 
 void CSettingsSA::SetRadioVolume ( unsigned char ucVolume )
 {
+    DWORD dwRadioVolume = ucVolume;
+    _asm
+    {
+        mov ecx, CLASS_CAudioEngine
+        mov eax, FUNC_CAudioEngine_SetMusicMasterVolume
+        push dwRadioVolume
+        call eax
+    }
     m_pInterface->ucRadioVolume = ucVolume;
-    pGame->GetAudio ()->SetMusicMasterVolume ( ucVolume );
 }
 
 unsigned char CSettingsSA::GetSFXVolume ( void )
@@ -112,47 +117,21 @@ unsigned char CSettingsSA::GetSFXVolume ( void )
 
 void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
 {
+    DWORD dwSFXVolume = ucVolume;
+    _asm
+    {
+        mov ecx, CLASS_CAudioEngine
+        mov eax, FUNC_CAudioEngine_SetEffectsMasterVolume
+        push dwSFXVolume
+        call eax
+    }
     m_pInterface->ucSfxVolume = ucVolume;
-    pGame->GetAudio ()->SetEffectsMasterVolume ( ucVolume );
 }
 
 // Minimum is 0.925 and maximum is 1.8
 float CSettingsSA::GetDrawDistance ( void )
 {
     return m_pInterface->fDrawDistance;
-}
-
-void CSettingsSA::SetDrawDistance ( float fDistance )
-{
-    _asm
-    {
-        push    fDistance
-        call    FUNC_SetDrawDistance
-        add     esp, 4
-    }
-    m_pInterface->fDrawDistance = fDistance;
-}
-
-unsigned int CSettingsSA::GetBrightness ( )
-{
-    // up to 384
-    return m_pInterface->dwBrightness;
-}
-
-void CSettingsSA::SetBrightness ( unsigned int uiBrightness )
-{
-    m_pInterface->dwBrightness = uiBrightness;
-}
-
-unsigned int CSettingsSA::GetFXQuality ( )
-{
-    // 0 = low, 1 = medium, 2 = high, 3 = very high
-    return *(BYTE*)VAR_fFxQuality;
-}
-
-void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
-{
-    *(BYTE *)VAR_fFxQuality = fxQualityId;
 }
 
 void CSettingsSA::Save ()

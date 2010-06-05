@@ -29,11 +29,11 @@ public:
     CBan*               AddBan                  ( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
     CBan*               AddBan                  ( const char* szIP, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
-    CBan*               AddSerialBan            ( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
-    CBan*               AddSerialBan            ( const char* szSerial, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+    CBan*				AddSerialBan			( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+	CBan*				AddSerialBan			( const char* szSerial, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
-    CBan*               AddAccountBan           ( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
-    CBan*               AddAccountBan           ( const char* szAccount, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+    CBan*				AddAccountBan			( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+	CBan*				AddAccountBan			( const char* szAccount, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
     CBan*               AddBan                  ( CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
@@ -41,8 +41,8 @@ public:
 
     bool                IsBanned                ( const char* szIP );
     bool                IsSpecificallyBanned    ( const char* szIP );
-    bool                IsSerialBanned          ( const char* szSerial );
-    bool                IsAccountBanned         ( const char* szAccount );
+	bool				IsSerialBanned			( const char* szSerial );
+    bool				IsAccountBanned			( const char* szAccount );
     void                RemoveBan               ( CBan* pBan );
     void                RemoveAllBans           ( bool bPermanentDelete = false );
 
@@ -54,7 +54,7 @@ public:
 
     bool                LoadBanList             ( void );
     void                SaveBanList             ( void );
-    void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, const std::string& strValue );
+    void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, std::string strValue );
     void                SafeSetValue            ( CXMLNode* pNode, const char* szKey, unsigned int );
     std::string         SafeGetValue            ( CXMLNode* pNode, const char* szKey );
     bool                IsValidIP               ( const char* szIP );
@@ -68,8 +68,6 @@ private:
     list < CBan* >      m_BanManager;
 
     time_t              m_tUpdate;
-
-    bool                IsValidIPPart               ( const char* szIP );
 
 };
 

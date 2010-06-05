@@ -36,7 +36,6 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_usDimension = 0;
     m_ucSyncTimeContext = 1;
     m_ucInterior = 0;
-    m_bDoubleSided = false;
     m_bMapCreated = false;
 
     // Store the line
@@ -118,9 +117,6 @@ CElement::~CElement ( void )
             pPed->m_pContactElement = NULL;
     }
 
-    // Remove from spatial database
-    GetSpatialDatabase ()->RemoveEntity ( this );
-
     // Deallocate our unique ID
     CElementIDs::PushUniqueID ( this );
 
@@ -132,14 +128,7 @@ CElement::~CElement ( void )
 }
 
 
-const CVector & CElement::GetPosition ( void )
-{
-    if ( m_pAttachedTo ) GetAttachedPosition ( m_vecPosition );
-    return m_vecPosition;
-}
-
-
-void CElement::SetTypeName ( const std::string& strTypeName )
+void CElement::SetTypeName ( std::string strTypeName )
 {
     CElement::RemoveEntityFromRoot ( m_uiTypeHash, this );
     m_uiTypeHash = HashString ( strTypeName.c_str () );
@@ -235,8 +224,8 @@ void CElement::GetChildren ( lua_State* pLua )
 
 bool CElement::IsMyChild ( CElement* pElement, bool bRecursive )
 {
-    // Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
-    if ( pElement == NULL ) return false;
+	// Since VERIFY_ELEMENT is calling us, the pEntity argument could be NULL
+	if ( pElement == NULL ) return false;
 
     // Is he us?
     if ( pElement == this )
@@ -268,7 +257,7 @@ void CElement::ClearChildren ( void )
     assert ( m_pParent != this );
 
     // Process our children - Move up to our parent
-    list < CElement* > cloneList = m_Children;
+	list < CElement* > cloneList = m_Children;
     list < CElement* > ::const_iterator iter = cloneList.begin ();
     for ( ; iter != cloneList.end () ; ++iter )
         (*iter)->SetParentObject ( m_pParent );
@@ -642,7 +631,7 @@ bool CElement::GetCustomDataBool ( const char* szName, bool& bOut, bool bInherit
 }
 
 
-void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient )
+void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized )
 {
     assert ( szName );
 
@@ -660,9 +649,8 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
     // Trigger the onElementDataChange event on us
     CLuaArguments Arguments;
     Arguments.PushString ( szName );
-    Arguments.PushArgument ( oldVariable );
-    Arguments.PushArgument ( Variable );
-    CallEvent ( "onElementDataChange", Arguments, pClient );
+    Arguments.PushArgument ( oldVariable  );
+    CallEvent ( "onElementDataChange", Arguments );
 }
 
 
@@ -960,8 +948,6 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
     for ( ; iter != m_Children.end (); iter++ )
     {
         (*iter)->CallEventNoParent ( szName, Arguments, pSource, pCaller );
-        if ( m_bIsBeingDeleted )
-            break;
     }
 }
 
@@ -1079,14 +1065,13 @@ bool CElement::IsAttachable ( void )
         case CElement::OBJECT:
         case CElement::MARKER:
         case CElement::PICKUP:
-        case CElement::COLSHAPE:
         {
             return true;
             break;
         }
         default: break;
     }
-    return false;
+	return false;
 }
 
 
@@ -1101,39 +1086,13 @@ bool CElement::IsAttachToable ( void )
         case CElement::OBJECT:
         case CElement::MARKER:
         case CElement::PICKUP:
-        case CElement::COLSHAPE:
         {
             return true;
             break;
         }
         default: break;
     }
-    return false;
-}
-
-
-void CElement::GetAttachedPosition ( CVector & vecPosition )
-{
-    if ( m_pAttachedTo )
-    {
-        CVector vecRotation;
-        vecPosition = m_pAttachedTo->GetPosition ();
-        m_pAttachedTo->GetRotation ( vecRotation );
-        
-        CVector vecPositionOffset = m_vecAttachedPosition;
-        RotateVector ( vecPositionOffset, vecRotation );
-        vecPosition += vecPositionOffset;
-    }
-}
-
-
-void CElement::GetAttachedRotation ( CVector & vecRotation )
-{
-    if ( m_pAttachedTo )
-    {
-        m_pAttachedTo->GetRotation ( vecRotation );
-        vecRotation += m_vecAttachedRotation;
-    }
+	return false;
 }
 
 
@@ -1208,7 +1167,7 @@ void CElement::AddEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity, b
     for ( ; iter != pEntity->IterEnd (); iter++ )
         CElement::AddEntityFromRoot ( (*iter)->GetTypeHash (), *iter, false );
 
-#if CHECK_ENTITIES_FROM_ROOT
+#if MTA_DEBUG
     if ( bDebugCheck )
         _CheckEntitiesFromRoot ( uiTypeHash );
 #endif
@@ -1234,7 +1193,7 @@ void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity
 
 void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
 {
-#if CHECK_ENTITIES_FROM_ROOT
+#if MTA_DEBUG
     _CheckEntitiesFromRoot ( uiTypeHash );
 #endif
 
@@ -1261,7 +1220,7 @@ void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
 
 
 
-#if CHECK_ENTITIES_FROM_ROOT
+#if MTA_DEBUG
 
 //
 // Check that GetEntitiesFromRoot produces the same results as FindAllChildrenByTypeIndex on the root element
@@ -1356,24 +1315,3 @@ void CElement::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < CEleme
 
 
 #endif
-
-
-void CElement::SetPosition ( const CVector& vecPosition )
-{
-    m_vecLastPosition = m_vecPosition;
-    m_vecPosition = vecPosition;
-    UpdateSpatialData ();
-};
-
-
-CSphere CElement::GetWorldBoundingSphere ( void )
-{
-    // Default to a point around the entity's position
-    return CSphere ( GetPosition (), 0.f );
-}
-
-
-void CElement::UpdateSpatialData ( void )
-{
-    GetSpatialDatabase ()->UpdateEntity ( this );
-}

@@ -99,7 +99,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\..\lua5.1d.dll &quot;C:\Program Files\MTA San Andreas\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1d.dll &quot;C:\Program Files\MTA San Andreas\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\..\lua5.1d.dll &quot;C:\Program Files\MTA San Andreas\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1d.dll &quot;..\..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -188,20 +188,19 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\..\lua5.1.dll &quot;C:\Program Files\MTA San Andreas\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1.dll &quot;C:\Program Files\MTA San Andreas\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\..\lua5.1.dll &quot;C:\Program Files\MTA San Andreas\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1.dll &quot;..\..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
 			OutputDirectory="../../"
-			IntermediateDirectory="..\..\..\obj\vendor\lua51_dll"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="if exist &quot;..\obj&quot; (rmdir /s/q &quot;..\obj&quot;)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -223,6 +222,7 @@
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="1"
@@ -277,7 +277,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\..\lua5.1.dll &quot;..\..\..\output\MTA San Andreas\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1.dll &quot;..\..\..\output\MTA San Andreas\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\..\lua5.1.dll &quot;..\..\..\output\MTA San Andreas\mods\deathmatch\&quot; &amp;&amp; xcopy /y ..\..\lua5.1.dll &quot;..\..\..\output\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 	</Configurations>

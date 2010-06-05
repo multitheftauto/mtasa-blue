@@ -17,16 +17,17 @@
 #define NET_DISCONNECT_REASON_SIZE  256
 
 // Element IDs
-#define RESERVED_ELEMENT_ID 0xFFFFFFFE
+#define RESERVED_ELEMENT_ID	0xFFFFFFFE
 #define INVALID_ELEMENT_ID 0xFFFFFFFF
 
 // Element name characteristics
 #define MAX_TYPENAME_LENGTH 32
 #define MAX_ELEMENT_NAME_LENGTH 64
 
-// Allow 100k server elements and 100k client elements
+// Allow 100k server elements, 100k client elements and 100k xml nodes
 #define MAX_SERVER_ELEMENTS 100000
 #define MAX_CLIENT_ELEMENTS 100000
+#define MAX_XML             100000
 typedef unsigned long ElementID;
 
 // Event name characteristics
@@ -42,10 +43,6 @@ typedef unsigned long ElementID;
 // LAN packet broadcasting string
 #define SERVER_LIST_CLIENT_BROADCAST_STR    "MTA-CLIENT"
 #define SERVER_LIST_SERVER_BROADCAST_STR    "MTA-SERVER"
-
-// Defines the min/max size for the player nick for use in the core module
-#define MIN_PLAYER_NICK_LENGTH          1
-#define MAX_PLAYER_NICK_LENGTH          22
 
 // Windows Specific stuff
 #ifdef WIN32

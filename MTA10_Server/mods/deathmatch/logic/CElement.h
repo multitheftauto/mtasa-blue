@@ -28,9 +28,6 @@
 #include <cstring>
 #include "CElementGroup.h"
 
-// Used to check fast version of getElementsByType
-//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
-
 #define IS_BLIP(element)     ((element)->GetType()==CElement::BLIP)
 #define IS_COLSHAPE(element) ((element)->GetType()==CElement::COLSHAPE)
 #define IS_DUMMY(element)    ((element)->GetType()==CElement::DUMMY)
@@ -91,11 +88,9 @@ public:
 
     inline ElementID                            GetID                       ( void )                        { return m_ID; };
 
-    virtual const CVector&                      GetPosition                 ( void );
+    virtual const CVector&                      GetPosition                 ( void )                        { return m_vecPosition; };
     virtual const CVector&                      GetLastPosition             ( void )                        { return m_vecLastPosition; };
-    virtual void                                SetPosition                 ( const CVector& vecPosition );
-
-    virtual void                                GetRotation                 ( CVector & vecRotation )       { vecRotation = CVector (); }
+    virtual void                                SetPosition                 ( const CVector& vecPosition )  { m_vecLastPosition = m_vecPosition; m_vecPosition = vecPosition; };
 
     virtual bool                                IsPerPlayerEntity           ( void )                        { return false; };
 
@@ -128,7 +123,7 @@ public:
     bool                                        GetCustomDataInt            ( const char* szName, int& iOut, bool bInheritData );
     bool                                        GetCustomDataFloat          ( const char* szName, float& fOut, bool bInheritData );
     bool                                        GetCustomDataBool           ( const char* szName, bool& bOut, bool bInheritData );
-    void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized = true, CPlayer* pClient = NULL );
+    void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized = true );
     bool                                        DeleteCustomData            ( const char* szName, bool bRecursive );
     void                                        DeleteAllCustomData         ( CLuaMain* pLuaMain, bool bRecursive );
 
@@ -146,10 +141,10 @@ public:
     virtual bool                                IsEntity                    ( void )                        { return false; };
     inline unsigned int                         GetTypeHash                 ( void )                        { return m_uiTypeHash; };
     inline const std::string&                   GetTypeName                 ( void )                        { return m_strTypeName; };
-    void                                        SetTypeName                 ( const std::string& strTypeName );
+    void                                        SetTypeName                 ( std::string strTypeName );
 
     inline const std::string&                   GetName                     ( void )                        { return m_strName; };
-    inline void                                 SetName                     ( const std::string& strName )  { m_strName = strName; };
+    inline void                                 SetName                     ( std::string strName )         { m_strName = strName; };
 
     bool                                        LoadFromCustomData          ( CLuaMain* pLuaMain, CEvents* pEvents );
 
@@ -185,8 +180,6 @@ public:
     bool                                        IsElementAttached           ( CElement* pElement );
     virtual bool                                IsAttachable                ( void );
     virtual bool                                IsAttachToable              ( void );
-    void                                        GetAttachedPosition         ( CVector & vecPosition );
-    void                                        GetAttachedRotation         ( CVector & vecRotation );
 
     inline CElementGroup*                       GetElementGroup             ( void )                        { return m_pElementGroup; }
     inline void                                 SetElementGroup             ( CElementGroup * elementGroup ){ m_pElementGroup = elementGroup; }
@@ -207,14 +200,7 @@ public:
     inline unsigned char                        GetInterior                 ( void )                        { return m_ucInterior; }
     inline void                                 SetInterior                 ( unsigned char ucInterior )    { m_ucInterior = ucInterior; }
 
-    bool                                        IsDoubleSided               ( void )                        { return m_bDoubleSided; }
-    void                                        SetDoubleSided              ( bool bDoubleSided )           { m_bDoubleSided = bDoubleSided; }
-
     inline bool                                 IsMapCreated                ( void )                        { return m_bMapCreated; }
-
-    // Spatial database
-    virtual CSphere                             GetWorldBoundingSphere      ( void );
-    virtual void                                UpdateSpatialData           ( void );
 
 protected:
     CElement*                                   GetRootElement              ( void );
@@ -262,7 +248,6 @@ protected:
 
     std::list < class CPed * >                  m_OriginSourceUsers;
     unsigned char                               m_ucInterior;
-    bool                                        m_bDoubleSided;
     bool                                        m_bMapCreated;
 
     // Optimization for getElementsByType starting at root
@@ -274,7 +259,7 @@ private:
     static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CElement* pEntity );
     static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, lua_State* pLua );
 
-#if CHECK_ENTITIES_FROM_ROOT
+#if MTA_DEBUG
     static void                     _CheckEntitiesFromRoot      ( unsigned int uiTypeHash );
     void                            _FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults );
     static void                     _GetEntitiesFromRoot        ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults );

@@ -4,11 +4,11 @@
 
 
 
-const char * DaysOfWeek [] = { 
+char * DaysOfWeek [] = { 
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 };
 
-const char * Months [] = {
+char * Months [] = {
 
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 

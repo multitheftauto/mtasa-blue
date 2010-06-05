@@ -5,7 +5,7 @@
 *  FILE:        mods/deathmatch/logic/CResourceConfigItem.cpp
 *  PURPOSE:     Resource configuration item class
 *  DEVELOPERS:  Kevin Whiteside <kevuwk@gmail.com>
-*               Christian Myhre Lundheim <>
+*				Christian Myhre Lundheim <>
 *               Chris McArthur <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -19,8 +19,8 @@
 
 #include <StdInc.h>
 
-CResourceConfigItem::CResourceConfigItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, CChecksum serverChecksum ) :
-    CDownloadableResource ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG, szResourceFileName, szShortName, serverChecksum, true )
+CResourceConfigItem::CResourceConfigItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, unsigned long ulServerCRC ) :
+    CDownloadableResource ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG, szResourceFileName, szShortName, ulServerCRC, true )
 {
     m_pXMLFile = NULL;
     m_pXMLRootNode = NULL;

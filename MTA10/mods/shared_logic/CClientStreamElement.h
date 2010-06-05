@@ -44,10 +44,8 @@ public:
     void                        StreamOutForABit            ( void );
     void                        SetDimension                ( unsigned short usDimension );
     float                       GetExpDistance              ( void )                            { return m_fExpDistance; }
-    virtual CSphere             GetWorldBoundingSphere      ( void );
-    float                       GetDistanceToBoundingBoxSquared ( const CVector& vecPosition );
-
-    bool                        IsStreamingCompatibleClass  ( void )                            { return true; };
+    
+	bool						IsStreamingCompatibleClass  ( void )							{ return true; };
 
 private:
     void                        SetStreamRow                ( CClientStreamSectorRow * pRow )   { m_pStreamRow = pRow; }
@@ -62,11 +60,6 @@ private:
     bool                        m_bAttemptingToStreamIn;
     bool                        m_bStreamedIn;
     unsigned short              m_usStreamReferences, m_usStreamReferencesScript;
-public:
-    float                       m_fCachedRadius;
-    int                         m_iCachedRadiusCounter;
-    CVector                     m_vecCachedBoundingBox[2];
-    int                         m_iCachedBoundingBoxCounter;
 };
 
 #endif

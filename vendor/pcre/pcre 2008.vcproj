@@ -85,7 +85,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\pcre3d.dll &quot;C:\Program Files\MTA San Andreas\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\pcre3d.dll &quot;..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -163,13 +163,13 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\pcre3.dll &quot;C:\Program Files\MTA San Andreas\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\pcre3.dll &quot;..\..\MTA10_Server\output\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="..\..\obj\vendor\pcre"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -197,6 +197,7 @@
 				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4996"
@@ -240,7 +241,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\pcre3.dll &quot;..\..\output\MTA San Andreas\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\pcre3.dll &quot;..\..\output\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 	</Configurations>

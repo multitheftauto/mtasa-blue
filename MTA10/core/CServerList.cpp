@@ -87,7 +87,7 @@ void CServerList::Pulse ( void )
     }
 
     // Update our status message
-    m_strStatus = ss.str () + m_strStatus2;
+    m_strStatus = ss.str ();
 }
 
 
@@ -99,13 +99,6 @@ bool CServerList::Exists ( CServerListItem Server )
     return false;
 }
 
-void CServerList::Add ( CServerListItem Server, bool addAtFront )
-{
-    if ( addAtFront )
-        m_Servers.push_front ( new CServerListItem ( Server ) );
-    else
-        m_Servers.push_back ( new CServerListItem ( Server ) );
-}
 
 void CServerList::Remove ( CServerListItem Server )
 {
@@ -141,7 +134,8 @@ void CServerList::Refresh ( void )
 void CServerListInternet::Refresh ( void )
 {   // Gets the server list from the master server and refreshes
     m_ulStartTime = CClientTime::GetTime ();
-    m_HTTP.Get ( SERVER_LIST_MASTER_URL );
+    memset ( m_szBuffer, 0, SERVER_LIST_DATA_BUFFER );
+    m_HTTP.Get ( SERVER_LIST_MASTER_URL, m_szBuffer, SERVER_LIST_DATA_BUFFER - 1 );
     m_iPass = 1;
     m_bUpdated = true;
 
@@ -152,6 +146,8 @@ void CServerListInternet::Refresh ( void )
 
 void CServerListInternet::Pulse ( void )
 {   // We also need to take care of the master server list here
+    char *szBuffer;
+    unsigned int nDataLength;
     unsigned long ulTime = CClientTime::GetTime () - m_ulStartTime;
 
     if ( m_iPass == 1 ) {
@@ -159,14 +155,12 @@ void CServerListInternet::Pulse ( void )
         stringstream ss;
         ss << "Requesting master server list (" << ulTime << "ms elapsed)";
         m_strStatus = ss.str ();
-        m_strStatus2 = "";
         m_bUpdated = true;
         
         // Attempt to get the HTTP data
-        CHTTPBuffer buffer;
-        if ( m_HTTP.GetData ( buffer ) ) {
+        if ( m_HTTP.GetData ( &szBuffer, nDataLength ) ) {
             // We got the data, parse it and switch pass
-            if ( ParseList ( buffer.GetData (), buffer.GetSize () ) ) {
+            if ( ParseList ( szBuffer, nDataLength ) ) {
                 m_iPass++;
             } else {
                 // Abort
@@ -180,19 +174,6 @@ void CServerListInternet::Pulse ( void )
                 m_strStatus = "Master server list could not be retrieved.";
                 m_iPass = 0;
             }
-        }
-        if ( m_iPass == 0 )
-        {
-            // If query failed, load from backup
-            CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->LoadInternetList();
-            m_strStatus2 = string ( "  (Backup server list)" );
-            m_iPass = 2;
-        }
-        else
-        if ( m_iPass == 2 )
-        {
-            // If query succeeded, save to backup
-            CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->SaveInternetList();
         }
     } else if ( m_iPass == 2 ) {
         // We are scanning our known servers (second pass)
@@ -212,20 +193,19 @@ bool CServerListInternet::ParseList ( const char *szBuffer, unsigned int nLength
 
     // Add all servers until we hit the count or nLength
     while ( i < ( nLength - 6 ) && uiCount-- ) {
+        CServerListItem item;
 
         // Read the IPv4-address
-        in_addr _Address;
-        _Address.S_un.S_un_b.s_b1 = szBuffer[i];
-        _Address.S_un.S_un_b.s_b2 = szBuffer[i+1];
-        _Address.S_un.S_un_b.s_b3 = szBuffer[i+2];
-        _Address.S_un.S_un_b.s_b4 = szBuffer[i+3];
+        item.Address.S_un.S_un_b.s_b1 = szBuffer[i];
+        item.Address.S_un.S_un_b.s_b2 = szBuffer[i+1];
+        item.Address.S_un.S_un_b.s_b3 = szBuffer[i+2];
+        item.Address.S_un.S_un_b.s_b4 = szBuffer[i+3];
 
         // Read the query port
-        unsigned short _usQueryPort = ntohs ( *((unsigned short*)(&szBuffer[i+4])) );
-        CServerListItem& item = *new CServerListItem ( _Address, _usQueryPort );
+        item.usQueryPort = ntohs ( *((unsigned short*)(&szBuffer[i+4])) );
 
         // Add the server
-        m_Servers.push_back ( &item );
+        Add ( item );
         i += 6;
     }
     return true;
@@ -279,9 +259,9 @@ void CServerListLAN::Refresh ( void )
 
     // Prepare the structures
     memset ( &m_Remote, 0, sizeof (m_Remote) );
-    m_Remote.sin_family         = AF_INET;
-    m_Remote.sin_port           = htons ( SERVER_LIST_BROADCAST_PORT ); 
-    m_Remote.sin_addr.s_addr    = INADDR_BROADCAST;
+	m_Remote.sin_family			= AF_INET;
+	m_Remote.sin_port			= htons ( SERVER_LIST_BROADCAST_PORT ); 
+	m_Remote.sin_addr.s_addr	= INADDR_BROADCAST;
 
     // Clear the previous server list
     Clear ();
@@ -297,7 +277,7 @@ void CServerListLAN::Discover ( void )
 
     // Send out the broadcast packet
     std::string strQuery = std::string ( SERVER_LIST_CLIENT_BROADCAST_STR ) + " " + std::string ( MTA_DM_ASE_VERSION );
-    sendto ( m_Socket, strQuery.c_str (), strQuery.length () + 1, 0, (sockaddr *)&m_Remote, sizeof (m_Remote) );
+	sendto ( m_Socket, strQuery.c_str (), strQuery.length () + 1, 0, (sockaddr *)&m_Remote, sizeof (m_Remote) );
     
     // Keep the time
     m_ulStartTime = CClientTime::GetTime ();
@@ -326,7 +306,7 @@ std::string CServerListItem::Pulse ( void )
             return "ParsedQuery";
         }
 
-        if ( CClientTime::GetTime () - m_ulQueryStart > SERVER_LIST_ITEM_TIMEOUT )
+        if ( CClientTime::GetTime () - m_ulQueryStart > 2000 )
         {
             bSkipped = true;
             return "NoReply";
@@ -342,11 +322,11 @@ void CServerListItem::Query ( void )
     sockaddr_in addr;
     memset ( &addr, 0, sizeof(addr) );
     addr.sin_family = AF_INET;
-    addr.sin_addr = Address;
-    addr.sin_port = htons ( usQueryPort );
+	addr.sin_addr = Address;
+	addr.sin_port = htons ( usQueryPort );
 
     int ret = sendto ( m_Socket, "r", 1, 0, (sockaddr *) &addr, sizeof(addr) );
-    if ( ret == 1 )
+	if ( ret == 1 )
         m_ulQueryStart = CClientTime::GetTime ();
 }
 
@@ -439,11 +419,7 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
 
         if ( ReadString ( strPlayer, szBuffer, i, nLength ) )
         {
-            // Remove color code, unless that results in an empty string
-            std::string strResult = RemoveColorCode ( strPlayer.c_str () );
-            if ( strResult.length () == 0 )
-                strResult = strPlayer;
-            vecPlayers.push_back ( strResult );
+            vecPlayers.push_back ( strPlayer );
         }
     }
 

@@ -7,7 +7,6 @@
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               lil_Toady <>
 *               Cecill Etheredge <>
-*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -24,7 +23,6 @@ public:
     static void     LoadFunctions                       ( void );
 
     static int      fileCreate                          ( lua_State* luaVM );
-    static int      fileExists                          ( lua_State* luaVM );
     static int      fileOpen                            ( lua_State* luaVM );
     static int      fileIsEOF                           ( lua_State* luaVM );
     static int      fileGetPos                          ( lua_State* luaVM );
@@ -34,7 +32,7 @@ public:
     static int      fileWrite                           ( lua_State* luaVM );
     static int      fileFlush                           ( lua_State* luaVM );
     static int      fileClose                           ( lua_State* luaVM );
-    static int      fileDelete                          ( lua_State* luaVM );
+	static int      fileDelete                          ( lua_State* luaVM );
 };
 
 #endif

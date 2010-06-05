@@ -40,14 +40,24 @@ public:
     virtual const CVector&      GetPosition             ( void )                                { return m_vecPosition; };
     virtual void                SetPosition             ( const CVector& vecPosition )          { m_vecPosition = vecPosition; };
 
-    virtual SColor              GetColor                ( void ) const                          { return m_Color; }
-    virtual void                SetColor                ( const SColor color )                  { m_Color = color; }
+    virtual RGBA                GetColor                ( void )                                { return m_rgbaColor; };
+	virtual void                GetColor                ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha )
+    {
+		ucBlue  = m_rgbaColor.B;
+		ucGreen = m_rgbaColor.G;
+		ucRed   = m_rgbaColor.R;
+		ucAlpha = m_rgbaColor.A;
+	};
+    inline unsigned char        GetColorAlpha           ( void )                                { return m_rgbaColor.A; };
+
+    virtual void                SetColor                ( RGBA rgbaColor )                      { m_rgbaColor = rgbaColor; };
+    virtual void                SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )     { m_rgbaColor = COLOR_RGBA ( ucRed, ucGreen, ucBlue, ucAlpha ); };
     virtual void                SetColorAlpha           ( unsigned char ucAlpha );
 
     virtual bool                IsVisible               ( void )                                { return m_bVisible; };
     virtual void                SetVisible              ( bool bVisible )                       { m_bVisible = bVisible; };
 
-    virtual void                Render                  ( void ) = 0;
+    virtual void                Render                  ( bool bPulseEffects ) = 0;
 
 protected:
     inline bool                 IsExpired               ( void )                                { return ( m_ulExpirationTime != 0 && ( CClientTime::GetTime () > m_ulExpirationTime ) ); };
@@ -58,7 +68,7 @@ protected:
     unsigned long               m_ulExpirationTime;
     bool                        m_bVisible;
     CVector                     m_vecPosition;
-    SColor                      m_Color;
+    RGBA                        m_rgbaColor;
 };
 
 #endif

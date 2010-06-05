@@ -40,9 +40,9 @@ CLuaArguments::CLuaArguments ( const CLuaArguments& Arguments, std::map < CLuaAr
 
 CLuaArgument* CLuaArguments::operator [] ( const unsigned int uiPosition ) const
 {
-    if ( uiPosition < m_Arguments.size () )
-        return m_Arguments.at ( uiPosition );
-    return NULL;
+	if ( uiPosition < m_Arguments.size () )
+		return m_Arguments.at ( uiPosition );
+	return NULL;
 }
 
 
@@ -202,8 +202,8 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments *
     int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
-        std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
-        g_pClientGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
+        const char* szRes = lua_tostring( luaVM, -1 );		
+		g_pClientGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
 
         // cleanup the stack
         while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
@@ -254,8 +254,8 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
     int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
-        std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
-        g_pClientGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
+        const char* szRes = lua_tostring( luaVM, -1 );
+        g_pClientGame->GetScriptDebugging()->LogError ( luaVM, "%s", szRes );
 
         // cleanup the stack
         while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
@@ -332,7 +332,7 @@ CLuaArgument* CLuaArguments::PushElement ( CClientEntity* pElement )
 }
 
 
-CLuaArgument* CLuaArguments::PushArgument ( const CLuaArgument& Argument )
+CLuaArgument* CLuaArguments::PushArgument ( CLuaArgument& Argument )
 {
     CLuaArgument* pArgument = new CLuaArgument ( Argument );
     m_Arguments.push_back ( pArgument );
@@ -363,42 +363,6 @@ void CLuaArguments::DeleteArguments ( void )
 }
 
 
-void CLuaArguments::ValidateTableKeys ( void )
-{
-    // Iterate over m_Arguments as pairs
-    // If first is LUA_TNIL, then remove pair
-    vector < CLuaArgument* > ::iterator iter = m_Arguments.begin ();
-    for ( ; iter != m_Arguments.end () ; )
-    {
-        // Check first in pair
-        if ( (*iter)->GetType () == LUA_TNIL )
-        {
-            // Remove pair
-            delete *iter;
-            iter = m_Arguments.erase ( iter );
-            if ( iter != m_Arguments.end () )
-            {
-                delete *iter;
-                iter = m_Arguments.erase ( iter );
-            }
-            // Check if end
-            if ( iter == m_Arguments.end () )
-                break;
-        }
-        else
-        {
-            // Skip second in pair
-            iter++;
-            // Check if end
-            if ( iter == m_Arguments.end () )
-                break;
-
-            iter++;
-        }
-    }
-}
-
-
 bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables )
 {
     bool bKnownTablesCreated = false;
@@ -414,10 +378,10 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
         pKnownTables->push_back ( this );
         for ( unsigned short us = 0 ; us < usNumArgs ; us++ )
         {
-            CLuaArgument* pArgument = new CLuaArgument ( bitStream, pKnownTables );
+		    CLuaArgument* pArgument = new CLuaArgument ( bitStream, pKnownTables );
             m_Arguments.push_back ( pArgument );
         }
-    }
+	}
 
     if ( bKnownTablesCreated )
         delete pKnownTables;
@@ -451,5 +415,5 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, std::ma
     if ( bKnownTablesCreated )
         delete pKnownTables;
 
-    return bSuccess;
+	return bSuccess;
 }

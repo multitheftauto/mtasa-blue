@@ -45,7 +45,6 @@ const char szPreloadedScript [] = ""\
     "                outputDebugString(\"exports: Call to non-existing resource (\" .. k .. \")\", 1)\n" \
     "        end\n" \
     "end\n" \
-    "addEventHandler(\"onClientResourceStop\", root, function(res) exports[getResourceFromName(res)] = nil end)\n" \
     "exports = setmetatable({}, exportsMT)\n";
 
 
@@ -68,8 +67,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
     // Add all our events and functions
     InitVM();
 
-    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
-    InitSecurity();
+	// Initialize security restrictions. Very important to prevent lua trojans and viruses!
+	InitSecurity();
 }
 
 
@@ -97,10 +96,10 @@ void CLuaMain::ResetInstructionCount ( void )
 
 void CLuaMain::InitSecurity ( void )
 {
-    lua_register ( m_luaVM, "dofile", CLuaFunctionDefs::DisabledFunction );
-    lua_register ( m_luaVM, "loadfile", CLuaFunctionDefs::DisabledFunction );
-    lua_register ( m_luaVM, "require", CLuaFunctionDefs::DisabledFunction );
-    lua_register ( m_luaVM, "loadlib", CLuaFunctionDefs::DisabledFunction );
+	lua_register ( m_luaVM, "dofile", CLuaFunctionDefs::DisabledFunction );
+	lua_register ( m_luaVM, "loadfile", CLuaFunctionDefs::DisabledFunction );
+	lua_register ( m_luaVM, "require", CLuaFunctionDefs::DisabledFunction );
+	lua_register ( m_luaVM, "loadlib", CLuaFunctionDefs::DisabledFunction );
     lua_register ( m_luaVM, "getfenv", CLuaFunctionDefs::DisabledFunction );
     lua_register ( m_luaVM, "newproxy", CLuaFunctionDefs::DisabledFunction );
 }
@@ -121,23 +120,23 @@ void CLuaMain::InitVM ( void )
     luaopen_table ( m_luaVM );
     luaopen_debug ( m_luaVM );
 
-    // Create the callback table (at location 1 in the registry)
+	// Create the callback table (at location 1 in the registry)
     lua_pushnumber ( m_luaVM, 1 );
     lua_newtable ( m_luaVM );
     lua_settable ( m_luaVM, LUA_REGISTRYINDEX );
 
-    // Register module functions
+	// Register module functions
     CLuaCFunctions::RegisterFunctionsWithVM ( m_luaVM );
 
     // Update global variables
     lua_pushelement ( m_luaVM, g_pClientGame->GetRootEntity () );
-    lua_setglobal ( m_luaVM, "root" );
+	lua_setglobal ( m_luaVM, "root" );
 
     lua_pushresource ( m_luaVM, m_pResource );
-    lua_setglobal ( m_luaVM, "resource" );
+	lua_setglobal ( m_luaVM, "resource" );
 
-    lua_pushelement ( m_luaVM, m_pResource->GetResourceEntity () );
-    lua_setglobal ( m_luaVM, "resourceRoot" );
+	lua_pushelement ( m_luaVM, m_pResource->GetResourceEntity () );
+	lua_setglobal ( m_luaVM, "resourceRoot" );
 
     lua_pushelement ( m_luaVM, m_pResource->GetResourceGUIEntity () );
     lua_setglobal ( m_luaVM, "guiRoot" );
@@ -157,7 +156,7 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
         if ( timeGetTime () >= pLuaMain->m_ulFunctionEnterTime + HOOK_MAXIMUM_TIME )
         {
             // Print it in the console
-            CLogger::ErrorPrintf ( "Infinite/too long execution (%s)", pLuaMain->GetScriptNamePointer () );
+            CLogger::ErrorPrintf ( "ERROR: Infinite/too long execution (%s)", pLuaMain->GetScriptNamePointer () );
 
             // Error out
             lua_pushstring ( luaVM, "Aborting; infinite running script" );
@@ -169,17 +168,18 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
 
 bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
 {
+    const char* szRes = NULL;
     if ( m_luaVM )
     {
         // Load the script
         if ( luaL_loadfile ( m_luaVM, szLUAScript ) )
         {
             // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-            if ( strRes.length () )
+            szRes = lua_tostring(m_luaVM, -1);
+            if ( szRes )
             {
-                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
-                g_pClientGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
+                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", szRes );
+                g_pClientGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", szRes );
             }
             else
             {
@@ -193,8 +193,8 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-                g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
+                szRes = lua_tostring(m_luaVM, -1);
+                g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", szRes );
             }
             return true;
         }
@@ -202,45 +202,6 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
 
     return false;
 }
-
-
-bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName )
-{
-    if ( m_luaVM )
-    {
-        // Run the script
-        std::string strRes = ConformResourcePath ( szFileName );
-        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, strRes.c_str () ) )
-        {
-            // Print the error
-            strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-            if ( strRes.length () )
-            {
-                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
-                g_pClientGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
-            }
-            else
-            {
-                CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
-                g_pClientGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
-            }
-        }
-        else
-        {
-            ResetInstructionCount ();
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
-            if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
-            {
-                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-                g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
-            }
-            return true;
-        }
-    }
-
-    return false;
-}
-
 
 bool CLuaMain::LoadScript ( const char* szLUAScript )
 {
@@ -253,14 +214,14 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-                g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "Executing in-line script failed: %s", strRes.c_str () );
+                const char* szRes = lua_tostring(m_luaVM, -1);
+                g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "Executing in-line script failed: %s", szRes );
             }
         }
         else
         {
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-            g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading in-line script failed: %s", strRes.c_str () );
+            const char* szRes = lua_tostring(m_luaVM, -1);
+            g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading in-line script failed: %s", szRes );
         }
     }
     else
@@ -277,7 +238,7 @@ void CLuaMain::Start ( void )
 
 void CLuaMain::UnloadScript ( void )
 {
-    // ACHTUNG: UNLOAD MODULES!
+	// ACHTUNG: UNLOAD MODULES!
 
     // End the lua vm
     if ( m_luaVM )
@@ -289,8 +250,8 @@ void CLuaMain::UnloadScript ( void )
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers ();
 
-    // Delete all GUI elements
-    //m_pLuaManager->m_pGUIManager->DeleteAll ( this );
+	// Delete all GUI elements
+	//m_pLuaManager->m_pGUIManager->DeleteAll ( this );
 }
 
 

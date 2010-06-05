@@ -22,7 +22,6 @@
 class CPlayerJoinDataPacket : public CPacket
 {
 public:
-    virtual bool            RequiresSourcePlayer        ( void ) const                      { return false; }
     inline ePacketID        GetPacketID                 ( void ) const                      { return static_cast < ePacketID > ( PACKET_ID_PLAYER_JOINDATA ); };
     inline unsigned long    GetFlags                    ( void ) const                      { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
@@ -35,8 +34,7 @@ public:
     inline void             SetGameVersion              ( unsigned char ucGameVersion )     { m_ucGameVersion = ucGameVersion; };
 
     inline unsigned short   GetMTAVersion               ( void )                            { return m_usMTAVersion; };
-    inline unsigned short   GetBitStreamVersion         ( void )                            { return m_usBitStreamVersion; };
-    inline const SString&   GetPlayerVersion            ( void )                            { return m_strPlayerVersion; };
+    inline void             SetMTAVersion               ( unsigned short usMTAVersion )     { m_usMTAVersion = usMTAVersion; };
 
     inline const char*      GetNick                     ( void )                            { return m_szNick; };
     inline void             SetNick                     ( const char* szNick )              { strncpy ( m_szNick, szNick, MAX_NICK_LENGTH ); };
@@ -47,18 +45,13 @@ public:
     inline char*            GetSerialUser               ( void )                            { return m_szSerialUser; };
     inline void             SetSerialUser               ( const char* szSerialUser )        { strncpy ( m_szSerialUser, szSerialUser, MAX_SERIAL_LENGTH ); };
 
-    inline bool             IsOptionalUpdateInfoRequired ( void )                           { return m_bOptionalUpdateInfoRequired; }
-
 private:
     unsigned short          m_usNetVersion;
     unsigned short          m_usMTAVersion;
-    unsigned short          m_usBitStreamVersion;
     unsigned char           m_ucGameVersion;
-    bool                    m_bOptionalUpdateInfoRequired;
     char                    m_szNick [MAX_NICK_LENGTH + 1];
     MD5                     m_Password;
     char                    m_szSerialUser[MAX_SERIAL_LENGTH + 1];
-    SString                 m_strPlayerVersion;
 };
 
 #endif

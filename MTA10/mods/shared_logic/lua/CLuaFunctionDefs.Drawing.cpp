@@ -361,7 +361,7 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
             // Get the correct directory
             SString strPath;
             if ( CResourceManager::ParseResourcePathInput( szFile, pResource, strPath ) &&
-                 g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, 0, 0, 1, 1, true, strPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
+                 g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, strPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
             {
                 // Success
                 lua_pushboolean ( luaVM, true );
@@ -379,105 +379,6 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
     return 1;
 }
 
-
-int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
-{
-    // dxDrawImageSection ( float x,float y,float width,float height,float u, float v, float usize, float vsize, filename,[float rotation=0,
-    //            float rotCenOffX=0, float rotCenOffY=0, int color=0xffffffff, bool postgui=false] )
-
-
-    // Grab all argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    int iArgument7 = lua_type ( luaVM, 7 );
-    int iArgument8 = lua_type ( luaVM, 8 );
-    int iArgument9 = lua_type ( luaVM, 9 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) && 
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) && 
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) && 
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-        ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) &&
-        ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) &&
-        ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING ) &&
-        ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING ) &&
-        (                              iArgument9 == LUA_TSTRING ) )
-    {
-        float fX = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
-        float fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-        float fWidth = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-        float fHeight = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-        float fU = static_cast < float > ( lua_tonumber ( luaVM, 5 ) );
-        float fV = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
-        float fSizeU = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
-        float fSizeV = static_cast < float > ( lua_tonumber ( luaVM, 8 ) );
-        const char * szFile = lua_tostring ( luaVM, 9 );
-        float fRotation = 0;
-        float fRotCenOffX = 0;
-        float fRotCenOffY = 0;
-        unsigned long ulColor = 0xFFFFFFFF;
-
-        int iArgument10 = lua_type ( luaVM, 10 );
-        if ( ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING ) )
-        {
-            fRotation = static_cast < float > ( lua_tonumber ( luaVM, 10 ) );
-        }
-
-        int iArgument11 = lua_type ( luaVM, 11 );
-        if ( ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING ) )
-        {
-            fRotCenOffX = static_cast < float > ( lua_tonumber ( luaVM, 11 ) );
-        }
-
-        int iArgument12 = lua_type ( luaVM, 12 );
-        if ( ( iArgument12 == LUA_TNUMBER || iArgument12 == LUA_TSTRING ) )
-        {
-            fRotCenOffY = static_cast < float > ( lua_tonumber ( luaVM, 12 ) );
-        }
-
-        int iArgument13 = lua_type ( luaVM, 13 );
-        if ( ( iArgument13 == LUA_TNUMBER || iArgument13 == LUA_TSTRING ) )
-        {
-            ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 13 ) );
-        }
-
-        // Got a post gui specifier?
-        bool bPostGUI = false;
-        int iArgument14 = lua_type ( luaVM, 14 );
-        if ( iArgument14 == LUA_TBOOLEAN )
-        {
-            bPostGUI = ( lua_toboolean ( luaVM, 14 ) ) ? true:false;
-        }
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-
-        // Check for a valid (and sane) file path
-        if ( pResource && szFile )
-        {
-            // Get the correct directory
-            SString strPath;
-            if ( CResourceManager::ParseResourcePathInput( szFile, pResource, strPath ) &&
-                 g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, fU, fV, fSizeU, fSizeV, false, strPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
-            {
-                // Success
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-
-            m_pScriptDebugging->LogError ( luaVM, "dxDrawImageSection can't load %s", szFile );
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawImageSection" );
-
-    // Failed
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
 
 
 int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
@@ -503,18 +404,8 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
         }
 
         ID3DXFont * pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
+        float fWidth = g_pCore->GetGraphics ()->GetDXTextExtent ( szText, fScale, pFont );
 
-        // Retrieve the longest line's extent
-        std::stringstream ssText ( szText );
-        std::string sLineText;
-        float fWidth = 0.0f, fLineExtent = 0.0f;
-
-        while( std::getline ( ssText, sLineText ) )
-        {
-            fLineExtent = g_pCore->GetGraphics ()->GetDXTextExtent ( sLineText.c_str ( ), fScale, pFont );
-            if ( fLineExtent > fWidth )
-                fWidth = fLineExtent;
-        }
         // Success
         lua_pushnumber ( luaVM, fWidth );
         return 1;

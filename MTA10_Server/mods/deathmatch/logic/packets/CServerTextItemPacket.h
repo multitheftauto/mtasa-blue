@@ -19,20 +19,24 @@
 class CServerTextItemPacket : public CPacket
 {
 public:
-                            CServerTextItemPacket       ( unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color, unsigned char format, unsigned char ucShadowAlpha, const char* szText );
+                            CServerTextItemPacket       ( void );
+                            CServerTextItemPacket       ( unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha, unsigned char format, char* szText );
+                            ~CServerTextItemPacket      ( void );
 
     inline ePacketID        GetPacketID                 ( void ) const              { return PACKET_ID_TEXT_ITEM; };
     inline unsigned long    GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 private:
-    SString                 m_strText;
+    char *                  m_szText;
     float                   m_fX;
     float                   m_fY;
-    SColor                  m_Color;
+    unsigned char           m_red;
+    unsigned char           m_green;
+    unsigned char           m_blue;
+    unsigned char           m_alpha;
     float                   m_fScale;
     unsigned char           m_ucFormat;
-    unsigned char           m_ucShadowAlpha;
     unsigned long           m_ulUniqueId;
     bool                    m_bDeletable;
 };

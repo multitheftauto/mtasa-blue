@@ -43,7 +43,6 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementID", CLuaElementDefs::getElementID );
     CLuaCFunctions::AddFunction ( "getElementParent", CLuaElementDefs::getElementParent );
     CLuaCFunctions::AddFunction ( "getElementPosition", CLuaElementDefs::getElementPosition );
-    CLuaCFunctions::AddFunction ( "getElementRotation", CLuaElementDefs::getElementRotation );
     CLuaCFunctions::AddFunction ( "getElementVelocity", CLuaElementDefs::getElementVelocity );
     CLuaCFunctions::AddFunction ( "getElementsByType", CLuaElementDefs::getElementsByType );
     CLuaCFunctions::AddFunction ( "getElementType", CLuaElementDefs::getElementType );
@@ -53,7 +52,6 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementZoneName", CLuaElementDefs::getElementZoneName );
     CLuaCFunctions::AddFunction ( "getElementColShape", CLuaElementDefs::getElementColShape );
     CLuaCFunctions::AddFunction ( "getElementAlpha", CLuaElementDefs::getElementAlpha );
-    CLuaCFunctions::AddFunction ( "isElementDoubleSided", CLuaElementDefs::isElementDoubleSided );
     CLuaCFunctions::AddFunction ( "getElementHealth", CLuaElementDefs::getElementHealth );
     CLuaCFunctions::AddFunction ( "getElementModel", CLuaElementDefs::getElementModel );
     CLuaCFunctions::AddFunction ( "getElementSyncer", CLuaElementDefs::getElementSyncer );
@@ -64,7 +62,6 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isElementAttached", CLuaElementDefs::isElementAttached );
     CLuaCFunctions::AddFunction ( "getAttachedElements", CLuaElementDefs::getAttachedElements );
     CLuaCFunctions::AddFunction ( "getElementAttachedTo", CLuaElementDefs::getElementAttachedTo );
-    CLuaCFunctions::AddFunction ( "setElementAttachedOffsets", CLuaElementDefs::setElementAttachedOffsets );
 
     // Element data
     CLuaCFunctions::AddFunction ( "getElementData", CLuaElementDefs::getElementData );
@@ -75,7 +72,6 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementID", CLuaElementDefs::setElementID );
     CLuaCFunctions::AddFunction ( "setElementParent", CLuaElementDefs::setElementParent );
     CLuaCFunctions::AddFunction ( "setElementPosition", CLuaElementDefs::setElementPosition );
-    CLuaCFunctions::AddFunction ( "setElementRotation", CLuaElementDefs::setElementRotation );
     CLuaCFunctions::AddFunction ( "setElementVelocity", CLuaElementDefs::setElementVelocity );
     CLuaCFunctions::AddFunction ( "setElementVisibleTo", CLuaElementDefs::setElementVisibleTo );
     CLuaCFunctions::AddFunction ( "clearElementVisibleTo", CLuaElementDefs::clearElementVisibleTo );
@@ -83,10 +79,8 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementInterior", CLuaElementDefs::setElementInterior );
     CLuaCFunctions::AddFunction ( "setElementDimension", CLuaElementDefs::setElementDimension );
     CLuaCFunctions::AddFunction ( "setElementAlpha", CLuaElementDefs::setElementAlpha );
-    CLuaCFunctions::AddFunction ( "setElementDoubleSided", CLuaElementDefs::setElementDoubleSided );
     CLuaCFunctions::AddFunction ( "setElementHealth", CLuaElementDefs::setElementHealth );
     CLuaCFunctions::AddFunction ( "setElementModel", CLuaElementDefs::setElementModel );
-    CLuaCFunctions::AddFunction ( "setElementSyncer", CLuaElementDefs::setElementSyncer );
 }
 
 
@@ -114,28 +108,28 @@ int CLuaElementDefs::createElement ( lua_State* luaVM )
         // Grab the string
         const char* szTypeName = lua_tostring ( luaVM, 1 );
 
-        // Get the virtual machine
-        CLuaMain * pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+		// Get the virtual machine
+		CLuaMain * pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            // Get the resource
-            CResource* pResource = pLuaMain->GetResource();
-            if ( pResource )
-            {
-                // Try to create
-                CDummy* pDummy = CStaticFunctionDefinitions::CreateElement ( pResource, szTypeName, szID );
-                if ( pDummy )
-                {
-                    // Get the group
-                    CElementGroup * pGroup = pResource->GetElementGroup();
-                    if ( pGroup )
-                    {
-                        pGroup->Add ( pDummy );
-                    }
-                    lua_pushelement ( luaVM, pDummy );
-                    return 1;
-                }
-            }
+			// Get the resource
+			CResource* pResource = pLuaMain->GetResource();
+			if ( pResource )
+			{
+				// Try to create
+				CDummy* pDummy = CStaticFunctionDefinitions::CreateElement ( pResource, szTypeName, szID );
+				if ( pDummy )
+				{
+					// Get the group
+					CElementGroup * pGroup = pResource->GetElementGroup();
+					if ( pGroup )
+					{
+						pGroup->Add ( pDummy );
+					}
+					lua_pushelement ( luaVM, pDummy );
+					return 1;
+				}
+			}
         }
     }
     else
@@ -201,18 +195,18 @@ int CLuaElementDefs::cloneElement ( lua_State* luaVM )
             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( pLuaMain )
             {
-                CResource * pResource = pLuaMain->GetResource();
+				CResource * pResource = pLuaMain->GetResource();
                 if ( pResource )
                 {
-                    CElement* pNewElement = CStaticFunctionDefinitions::CloneElement ( pResource, pElement, vecPosition, bCloneChildren );
+					CElement* pNewElement = CStaticFunctionDefinitions::CloneElement ( pResource, pElement, vecPosition, bCloneChildren );
 
-                    if ( pNewElement )
-                    {
-                        lua_pushelement ( luaVM, pNewElement );
-                        return 1;
-                    }
-                }
-            }
+					if ( pNewElement )
+					{
+						lua_pushelement ( luaVM, pNewElement );
+						return 1;
+					}
+				}
+			}
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "cloneElement", "element", 1 );
@@ -443,7 +437,7 @@ int CLuaElementDefs::getAllElementData ( lua_State* luaVM )
         {
 //          _asm int 3
 //          CLuaArguments * pTable = new CLuaArguments();
-            CLuaArguments Args;
+			CLuaArguments Args;
             if ( CStaticFunctionDefinitions::GetAllElementData ( pElement, &Args ) )
             {
                 Args.PushAsTable ( luaVM );
@@ -515,38 +509,6 @@ int CLuaElementDefs::getElementPosition ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
-
-int CLuaElementDefs::getElementRotation ( lua_State* luaVM )
-{
-    // Verify the argument
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        // Grab the element, verify it
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
-        {
-            // Grab the rotation
-            CVector vecRotation;
-            if ( CStaticFunctionDefinitions::GetElementRotation ( pElement, vecRotation ) )
-            {
-                // Return it
-                lua_pushnumber ( luaVM, vecRotation.fX );
-                lua_pushnumber ( luaVM, vecRotation.fY );
-                lua_pushnumber ( luaVM, vecRotation.fZ );
-                return 3;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementRotation", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getElementRotation" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 
 
 int CLuaElementDefs::getElementVelocity ( lua_State* luaVM )
@@ -753,8 +715,8 @@ int CLuaElementDefs::getElementsWithinColShape ( lua_State* luaVM )
             CColShape* pColShape = lua_tocolshape ( luaVM, 1 );
             if ( pColShape )
             {
-                // Create a new table
-                lua_newtable ( luaVM );
+		        // Create a new table
+		        lua_newtable ( luaVM );
 
                 // Add all the elements within the shape to it
                 unsigned int uiIndex = 0;
@@ -764,8 +726,8 @@ int CLuaElementDefs::getElementsWithinColShape ( lua_State* luaVM )
                     if ( szType == NULL || strcmp ( (*iter)->GetTypeName ().c_str (), szType ) == 0 )
                     {
                         lua_pushnumber ( luaVM, ++uiIndex );
-                        lua_pushelement ( luaVM, *iter );
-                        lua_settable ( luaVM, -3 );
+			            lua_pushelement ( luaVM, *iter );
+			            lua_settable ( luaVM, -3 );
                     }
                 }
                 return 1;
@@ -901,8 +863,8 @@ int CLuaElementDefs::getAttachedElements ( lua_State* luaVM )
             CElement* pElement = lua_toelement ( luaVM, 1 );
             if ( pElement )
             {
-                // Create a new table
-                lua_newtable ( luaVM );
+		        // Create a new table
+		        lua_newtable ( luaVM );
 
                 // Add All Attached Elements
                 unsigned int uiIndex = 0;
@@ -912,8 +874,8 @@ int CLuaElementDefs::getAttachedElements ( lua_State* luaVM )
                     if ( ( *iter )->GetAttachedToElement() == pElement )
                     {
                         lua_pushnumber ( luaVM, ++uiIndex );
-                        lua_pushelement ( luaVM, *iter );
-                        lua_settable ( luaVM, -3 );
+			            lua_pushelement ( luaVM, *iter );
+			            lua_settable ( luaVM, -3 );
                     }
                 }
                 return 1;
@@ -1039,31 +1001,6 @@ int CLuaElementDefs::getElementAlpha ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getElementAlpha" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaElementDefs::isElementDoubleSided ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
-        {
-            bool bDoubleSided;
-            if ( CStaticFunctionDefinitions::IsElementDoubleSided ( pElement, bDoubleSided ) )
-            {
-                lua_pushboolean ( luaVM, bDoubleSided );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementDoubleSided", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "isElementDoubleSided" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1408,47 +1345,6 @@ int CLuaElementDefs::setElementPosition ( lua_State* luaVM )
 }
 
 
-int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
-{
-    // Verify the first argument
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        // Grab the element and verify it
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
-        {
-            int iArgument2 = lua_type ( luaVM, 2 );
-            int iArgument3 = lua_type ( luaVM, 3 );
-            int iArgument4 = lua_type ( luaVM, 4 );
-            if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-                 ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-                 ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
-            {
-                // Grab the rotation
-                CVector vecRotation = CVector ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
-                                                static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
-                                                static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
-                // Set the rotation
-                if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-            }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM, "setElementRotation" );
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementRotation", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setElementRotation" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaElementDefs::setElementVelocity ( lua_State* luaVM )
 {
     // Verify the first argument
@@ -1494,7 +1390,7 @@ int CLuaElementDefs::setElementVisibleTo ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
          lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+		 lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
@@ -1502,11 +1398,11 @@ int CLuaElementDefs::setElementVisibleTo ( lua_State* luaVM )
             CElement* pReference = lua_toelement ( luaVM, 2 );
             if ( pReference )
             {
-                if ( CStaticFunctionDefinitions::SetElementVisibleTo ( pElement, pReference, lua_toboolean ( luaVM, 3 ) ? true:false ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+				if ( CStaticFunctionDefinitions::SetElementVisibleTo ( pElement, pReference, lua_toboolean ( luaVM, 3 ) ? true:false ) )
+				{
+					lua_pushboolean ( luaVM, true );
+					return 1;
+				}
             }
             else
                 m_pScriptDebugging->LogBadPointer ( luaVM, "setElementVisibleTo", "element", 2 );
@@ -1720,33 +1616,6 @@ int CLuaElementDefs::setElementAlpha ( lua_State* luaVM )
 }
 
 
-int CLuaElementDefs::setElementDoubleSided ( lua_State* luaVM )
-{
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         iArgument2 == LUA_TBOOLEAN )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
-        {
-            bool bDoubleSided = lua_toboolean ( luaVM, 2 ) ? true : false;
-            if ( CStaticFunctionDefinitions::SetElementDoubleSided ( pElement, bDoubleSided ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementDoubleSided", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setElementDoubleSided" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaElementDefs::setElementHealth ( lua_State* luaVM )
 {
     int iArgument2 = lua_type ( luaVM, 2 );
@@ -1795,40 +1664,6 @@ int CLuaElementDefs::setElementModel ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementModel" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaElementDefs::setElementSyncer ( lua_State* luaVM )
-{
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && ( iArgument2 == LUA_TLIGHTUSERDATA || iArgument2 == LUA_TBOOLEAN ) )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        CPlayer* pPlayer = NULL;
-        bool bEnable = true;
-
-        if ( iArgument2 == LUA_TLIGHTUSERDATA )
-            pPlayer = lua_toplayer ( luaVM, 2 );
-        if ( iArgument2 == LUA_TBOOLEAN )
-            bEnable = lua_toboolean ( luaVM, 2 ) ? true : false;
-
-        if ( pElement )
-        {
-            if ( pPlayer || iArgument2 == LUA_TBOOLEAN )
-            {
-                lua_pushboolean ( luaVM, CStaticFunctionDefinitions::SetElementSyncer ( pElement, pPlayer, bEnable ) );
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "setElementSyncer", "player", 2 );
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementSyncer", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setElementSyncer" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

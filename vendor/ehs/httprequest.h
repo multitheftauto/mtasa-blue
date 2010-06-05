@@ -31,7 +31,7 @@ enum RequestMethod { REQUESTMETHOD_OPTIONS, /* not implemented */
 };
 
 /// this holds a list of strings corresponding to the order of the RequestMethod enumeration
-extern const char * RequestMethodStrings [];
+extern char * RequestMethodStrings [];
 
 /// This is what the client sent in a more organized form
 /**

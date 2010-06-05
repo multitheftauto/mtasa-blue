@@ -44,6 +44,7 @@ char* szServerErrors[4] =
 CServer::CServer ( void )
 {
     assert ( !g_bIsStarted );
+    m_szConfig = NULL;
 
     // Initialize
     m_bIsReady = false;
@@ -132,7 +133,8 @@ bool CServer::Start ( const char* szConfig )
     // Not already started?
     if ( !g_bIsStarted )
     {
-        m_strConfig = szConfig;
+        m_szConfig = new char [ strlen ( szConfig ) + 1 ];
+	    strcpy ( m_szConfig, szConfig );
 
         // Check that the DLL exists
         if ( !DoesFileExist ( m_strDLLFile ) )
@@ -300,7 +302,7 @@ unsigned long CServer::Thread_Run ( void )
             strcpy ( szArgument3, "--config" );
 
             char szArgument4 [64];
-            strcpy ( szArgument4, m_strConfig );
+            strcpy ( szArgument4, m_szConfig );
 
             char szArgument5 [8];
             strcpy ( szArgument5, "-s" );

@@ -33,7 +33,7 @@ enum eColShapeType
 class CClientColShape : public CClientEntity
 {
     friend CClientMarker;
-    friend CClientPickup;
+	friend CClientPickup;
 public:
                                         CClientColShape                 ( class CClientManager* pManager, ElementID ID );
                                         ~CClientColShape                ( void );
@@ -48,7 +48,7 @@ public:
     inline eClientEntityType            GetType                         ( void ) const                          { return CCLIENTCOLSHAPE; }
 
     virtual void                        GetPosition                     ( CVector& vecPosition ) const          { vecPosition = m_vecPosition; };
-    virtual void                        SetPosition                     ( const CVector& vecPosition );
+    virtual void                        SetPosition                     ( const CVector& vecPosition )          { m_vecPosition = vecPosition; };
 
     virtual bool                        DoHitDetection                  ( const CVector& vecNowPosition, float fRadius ) = 0;
 
@@ -56,7 +56,7 @@ public:
     inline void                         SetEnabled                      ( bool bEnabled )                                   { m_bIsEnabled = bEnabled; };
 
     void                                CallHitCallback                 ( CClientEntity& Entity );
-    void                                CallLeaveCallback               ( CClientEntity& Entity );
+	void                                CallLeaveCallback               ( CClientEntity& Entity );
     inline CClientColCallback*          SetHitCallback                  ( CClientColCallback* pCallback )                   { return ( m_pCallback = pCallback ); };
 
     inline bool                         GetAutoCallEvent                ( void )                                            { return m_bAutoCallEvent; };
@@ -69,11 +69,10 @@ public:
     std::list < CClientEntity* > ::iterator  CollidersBegin             ( void )                                            { return m_Colliders.begin (); }
     std::list < CClientEntity* > ::iterator  CollidersEnd               ( void )                                            { return m_Colliders.end (); }
 
-    void                                SizeChanged                     ( void );
 protected:
     CVector                             m_vecPosition;
     CClientMarker *                     m_pOwningMarker;
-    CClientPickup *                     m_pOwningPickup;
+	CClientPickup *                     m_pOwningPickup;
 
 private:
     bool                                m_bIsEnabled;

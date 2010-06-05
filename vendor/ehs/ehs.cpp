@@ -564,12 +564,6 @@ EHSServer::EHSServer ( EHS * ipoTopLevelEHS ///< pointer to top-level EHS for re
 
 EHSServer::~EHSServer ( )
 {
-    if ( m_poNetworkAbstraction )
-    {
-        m_poNetworkAbstraction->Close ();
-        delete m_poNetworkAbstraction;
-        m_poNetworkAbstraction = NULL;
-    }
 
 #ifdef EHS_MEMORY
 	fprintf ( stderr, "[EHS_MEMORY] Deallocated: EHSServer\n" );
@@ -671,9 +665,6 @@ int EHSServer::RemoveEHSConnection ( EHSConnection * ipoEHSConnection )
 			NetworkAbstraction * poNetworkAbstraction = poEHSConnection->GetNetworkAbstraction ( );
 			
 			poNetworkAbstraction->Close ( );
-#if STOP_MEMORY_LEAKS   // Needs testing
-            delete poEHSConnection;
-#endif
 
 			// start back over at the beginning of the list
 			m_oEHSConnectionList.erase ( i );
@@ -906,8 +897,6 @@ void EHSServer::HandleData ( int inTimeoutMilliseconds, ///< milliseconds for ti
 			m_nAccepting = 0;
 			MUTEX_UNLOCK ( m_oMutex );
 
-            // Occasional pulse for updating of things
-            m_poTopLevelEHS->HttpPulse ();
 
 		} // END ACCEPTING
 		

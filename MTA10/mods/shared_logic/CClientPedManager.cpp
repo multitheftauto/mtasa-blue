@@ -13,7 +13,6 @@
 #include "StdInc.h"
 
 using std::list;
-using std::vector;
 
 CClientPedManager::CClientPedManager ( CClientManager* pManager )
 {
@@ -31,7 +30,7 @@ CClientPedManager::~CClientPedManager ( void )
 void CClientPedManager::DeleteAll ( void )
 {
     m_bRemoveFromList = false;
-    vector < CClientPed* > ::iterator iter = m_List.begin ();
+    list < CClientPed* > ::iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
         delete *iter;
@@ -45,8 +44,8 @@ void CClientPedManager::DoPulse ( void )
 {   
     CClientPed * pPed = NULL;
     // Loop through our streamed-in peds
-    vector < CClientPed * > List = m_StreamedIn;
-    vector < CClientPed* > ::iterator iter = List.begin ();
+    list < CClientPed * > List = m_StreamedIn;
+    list < CClientPed* > ::iterator iter = List.begin ();
     for ( ; iter != List.end (); ++iter )
     {
         pPed = *iter;
@@ -76,7 +75,7 @@ CClientPed* CClientPedManager::Get ( CPlayerPed* pPlayer, bool bValidatePointer,
 
     if ( bValidatePointer )
     {
-        vector < CClientPed* > ::const_iterator iter = m_StreamedIn.begin ();
+        list < CClientPed* > ::const_iterator iter = m_StreamedIn.begin ();
         for ( ; iter != m_StreamedIn.end (); iter++ )
         {
             if ( (*iter)->GetGamePlayer () == pPlayer )
@@ -102,7 +101,7 @@ CClientPed* CClientPedManager::Get ( RpClump * pClump, bool bCheckPlayers )
     if ( !pClump ) return NULL;
 
     CClientPed * pPed = NULL;
-    vector < CClientPed* > ::const_iterator iter = m_StreamedIn.begin ();
+    list < CClientPed* > ::const_iterator iter = m_StreamedIn.begin ();
     for ( ; iter != m_StreamedIn.end (); iter++ )
     {
         pPed = *iter;
@@ -119,7 +118,7 @@ CClientPed* CClientPedManager::GetSafe ( CEntity * pEntity, bool bCheckPlayers )
 {
     if ( !pEntity ) return NULL;
 
-    vector < CClientPed* > ::const_iterator iter = m_StreamedIn.begin ();
+    list < CClientPed* > ::const_iterator iter = m_StreamedIn.begin ();
     for ( ; iter != m_StreamedIn.end (); iter++ )
     {
         if ( dynamic_cast < CEntity * > ( (*iter)->GetGamePlayer () ) == pEntity )
@@ -134,7 +133,7 @@ CClientPed* CClientPedManager::GetSafe ( CEntity * pEntity, bool bCheckPlayers )
 bool CClientPedManager::Exists ( CClientPed* pPed )
 {
     // Is it in our list?
-    vector < CClientPed* > ::iterator iter = m_List.begin ();
+    list < CClientPed* > ::iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
         if ( *iter == pPed )
@@ -150,7 +149,7 @@ void CClientPedManager::RemoveFromList ( CClientPed* pPed )
 {
     if ( m_bRemoveFromList )
     {
-        ListRemove ( m_List, pPed );
+        if ( !m_List.empty() ) m_List.remove ( pPed );
     }
 }
 
@@ -165,5 +164,5 @@ void CClientPedManager::OnCreation ( CClientPed * pPed )
 
 void CClientPedManager::OnDestruction ( CClientPed * pPed )
 {
-    ListRemove ( m_StreamedIn, pPed );
+    m_StreamedIn.remove ( pPed );
 }

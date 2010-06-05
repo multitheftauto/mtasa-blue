@@ -26,7 +26,7 @@ public:
                                     ~CClientColManager          ( void );
 
     void                            DoPulse                     ( void );
-    void                            DoHitDetection              ( const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape * pJustThis = NULL, bool bChildren = false );
+    void                            DoHitDetection              ( const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity );
 
     bool                            Exists                      ( CClientColShape* pShape );
     void                            DeleteAll                   ( void );
@@ -36,13 +36,8 @@ public:
 protected:
     inline void                     AddToList                   ( CClientColShape* pShape )         { m_List.push_back ( pShape ); };
     void                            RemoveFromList              ( CClientColShape* pShape );
-    void                            DoHitDetectionOld           ( const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape * pJustThis = NULL, bool bChildren = false );
-    void                            DoHitDetectionNew           ( const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape * pJustThis = NULL, bool bChildren = false );
-    void                            DoHitDetectionForColShape   ( CClientColShape* pShape );
-    void                            DoHitDetectionForEntity     ( const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity );
-    void                            HandleHitDetectionResult    ( bool bHit, CClientColShape* pShape, CClientEntity* pEntity );
 
-    std::vector < CClientColShape* >  m_List;
+    std::list < CClientColShape* >  m_List;
 };
 
 #endif
