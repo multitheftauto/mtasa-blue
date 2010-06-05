@@ -1,0 +1,38 @@
+******************************************************************************
+*                                                                            *
+* DirectX Video-to-texture renderer                                          *
+*                                                                            *
+* (C) Cecill "IJs" Etheredge / Multi Theft Auto, 2008                        *
+*               <ijsf@gmx.net, http://ijs.mtasa.com/>                        *
+*                                                                            *
+******************************************************************************
+
+==============================================================================
+- DESCRIPTION                                                                -
+==============================================================================
+  This project contains a DirectShow video renderer interface that is
+  capable of rendering directly to a Direct3D 9 texture that is heavily based
+  on the Texture3D9 sample in the WIndows Server 2003 R2 Platform SDK. This
+  code fixes some compatibility problems with more common graph setups, such
+  as XviD videos. Thus, a DirectShow video graph can be set up that plays back
+  a video file and outputs this to an in-game texture of some sort, allowing
+  easy in-game video playback.
+
+  An example of usage of this filter involves manually creating the DirectShow
+  graph by adding the video renderer renderer as a filter (among other
+  filters) and connecting the appropriate pins. The texture renderer should be
+  connected to a video output pin.
+
+  Experimenting with DirectShow graphs, and debugging your graph creation code
+  can be done easily with the graphedt.exe tool in the Windows Server 2003 R2
+  Platform SDK (or higher).
+
+  In order for this project to compile and to be used, you will need the
+  Windows Server 2003 R2 Platform SDK, which contains all the necessary
+  DirectShow libraries and headers. This project contains code and is based on
+  code from the SDK.
+  Please copy the /Samples/Multimedia/DirectShow/BaseClasses directory to
+  the /directshow directory in this project's root. Any compilation errors can
+  be fixed by applying the patch files that are included in the directory.
+  
+  The precompiled libraries were compiled in Microsoft Visual Studio 2003.
