@@ -22,19 +22,23 @@ Var RedistInstalled
 
 ; ###########################################################################################################
 !ifndef FILES_ROOT
+	!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
 	!define FILES_ROOT "C:\Build\output"
 	!define SERVER_FILES_ROOT "C:\Build\mta10_server\output"
 	!define FILES_MODULE_SDK "C:\Build\Shared\publicsdk"
-	#!define INCLUDE_DEVELOPMENT
 	!define CLIENT_SETUP
 	!define INCLUDE_SERVER
-	#!define INCLUDE_EDITOR
 	!define INSTALL_OUTPUT "mtasa-1.0.exe"
-	!define LIGHTBUILD
+!endif
+!ifndef LIGHTBUILD
+	!define INCLUDE_DEVELOPMENT
+	!define INCLUDE_EDITOR
 !endif
 !ifndef PRODUCT_VERSION
 	!define PRODUCT_VERSION "v1.0"
 !endif
+!define EXPAND_DIALOG_X 134
+!define EXPAND_DIALOG_Y 60
 ; ###########################################################################################################
 
 ;ReserveFile "${NSISDIR}\Plugins\InstallOptions.dll"
@@ -73,12 +77,15 @@ Var RedistInstalled
 !insertmacro MUI_PAGE_WELCOME
 
 ; License page
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW "LicenseShowProc"
 !insertmacro MUI_PAGE_LICENSE					"eula.txt"
 
 ; Components page
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW "ComponetsShowProc"
 !insertmacro MUI_PAGE_COMPONENTS
 
 ; Game directory page
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW "DirectoryShowProc"
 !define MUI_DIRECTORYPAGE_VARIABLE				$INSTDIR
 !insertmacro MUI_PAGE_DIRECTORY
 
@@ -594,9 +601,10 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 
 			!ifndef LIGHTBUILD
-				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_41.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\vorbis.ax"
-				File "${FILES_ROOT}\MTA San Andreas\mta\xv.ax"
+				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\ikpMP3.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\irrKlang.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 
 				SetOutPath "$INSTDIR\MTA\cgui"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.is.xml"
@@ -625,15 +633,6 @@ DontInstallRedist:
 				SetOutPath "$INSTDIR\MTA\cgui\images\transferset"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\transferset\*.png"
 
-				SetOutPath "$INSTDIR\MTA\data"
-				File "${FILES_ROOT}\MTA San Andreas\mta\data\*.png"
-				;  File "${FILES_ROOT}\MTA San Andreas\mta\data\menu.mkv"
-				File "${FILES_ROOT}\MTA San Andreas\mta\data\pixel.psh"
-				File "${FILES_ROOT}\MTA San Andreas\mta\data\scene.x"
-				File "${FILES_ROOT}\MTA San Andreas\mta\data\vertex.vsh"
-
-				SetOutPath "$INSTDIR\MTA\data\textures"
-				File "${FILES_ROOT}\MTA San Andreas\mta\data\textures\*.png"
 			!endif
 
 			SetOutPath "$INSTDIR"
@@ -694,7 +693,6 @@ DontInstallRedist:
 		!insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "711185d8f4ebb355542053ce408b82b3"
 
 		SetOverwrite off
-		;File "${SERVER_FILES_ROOT}\mods\deathmatch\accounts.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\acl.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\banlist.xml"
@@ -709,7 +707,7 @@ DontInstallRedist:
 			!endif
 			
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
-			SetOutPath "$INSTDIR\server\mods\deathmatch\resourcecache"
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resource-cache"
 			SetOutPath "$INSTDIR\server\mods\deathmatch\logs"
 		!endif
 	SectionEnd
@@ -720,28 +718,221 @@ DontInstallRedist:
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
 			SetOverwrite ifnewer
 			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\required\*.zip"
-			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\edf"
-			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\freecam"
-			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\msgbox"
-			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\move_*"
-			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\tooltip"
 		SectionEnd
 	!endif
 
 	!ifndef LIGHTBUILD
-		Section "Resource and maps pack" SEC07
+		SectionGroup "Optional Resources" SEC07
+			Section "AMX Emulation package"
 		SectionIn 1 2
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
 			SetOverwrite ifnewer
-			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\*.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\amx"
 		SectionEnd
+			Section "Assault Gamemode"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\assault.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-area51.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-cliff.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-dam.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-docks.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-heist.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-sharks.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-ship.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\as-supermarket.zip"
+			SectionEnd
+			Section "Briefcase Race Gamemode"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\briefcaserace.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\briefcase.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\easytext.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\br-sf.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\br-sf-autoteams.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\br-sf-teams.zip"
+			SectionEnd
+			Section "Classic Deathmatch Gamemode"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\cdm.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\cdm-ls.zip"
+			SectionEnd
+			Section "Capture the Flag Gamemode"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-bombsite.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-canals.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-csitaly.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-goldcove.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-hideout_z.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-hydrastrike.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-sewer.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctf-tbd.zip"
+			SectionEnd
+			Section "Capture the Vehicle Gamemode"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctv.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctv-ls.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\ctv-smalltownrumble.zip"
+			SectionEnd
+			Section "Deathmatch Gamemode"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\deathmatch.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdm.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-canals.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-arena1.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-smallville.zip"
+			SectionEnd
+			Section "Element browser Utility"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\elementbrowser.zip"
+			SectionEnd
+			Section "Fallout Gamemode"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\fallout.zip"
+			SectionEnd
+			Section "Hay Gamemode"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\hay.zip"
+			SectionEnd
+			Section "Race Gamemode"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-10laphotring.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-3lapdirtring.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-5lap8track.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-airportdogfight.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-airportspeedway.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-apacheassault.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-awalkinthepark.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-badlandsblastaround.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-bandito.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-bayareacircuit.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-bloodring.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-blowthedam.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-boatingblastaround.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-bobcatblastaround.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-break.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-chiliadclimb.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-chrmleasy.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-chrmlhard.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-degenerationofx.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-desertdogfight.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-destructionderby.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-dockbikes.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-docksideblastaround.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-drift.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-driftcity.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-dunebuggy.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-errand.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-farewellmylove.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-farm2city.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-findthecock.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-freeroam.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-highnoon.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-homeinthehills.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-hotroute.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-hydrarace.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-island.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-justanotherbikerace.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-longwayround.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-lsairport.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-lstrenches.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-lvsprint.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-midairmayhem.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-miniputt.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-monsterblastaround.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-mx_sky.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-offroadblastaround.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-predatorzone.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-quarryrun.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-rcairwar.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-rcwarz.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-runway69.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-rustlerrampage.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-sandking.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-santosdrive.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-seadragon.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-seahunter.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-searustler.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-sewers.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-sfbynight.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-smugglersrun.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-sparrowstorm.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-specialdelivery.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-speedforweed.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-squalorace.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-stunt.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-suburbanspeedway.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-superhydrarace.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-technicalitch.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-thepanopticon.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-vinewoodblastaround.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-wuzimu.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\mapratings.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_nos.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_racewar.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_toptimes.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_traffic_sensor.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_voicepack.zip"
+			SectionEnd
+			Section "Stealth Gamemode"
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\stealth.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-carrier.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-chinatown.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-church.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-coookiepirates.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-dra-park.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-factory.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-junkyard.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-ritzy.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-sewers.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-shopping.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-terminal.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\sth-thebunker.zip"
+			SectionEnd
+			Section "Team Deathmatch Arena Gamemode"
+		SectionIn 1 2
+			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+			SetOverwrite ifnewer
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-damwars.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-gridlock.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-medieval.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-nomansland.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-tbd.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\tdma-vinewood.zip"
+		SectionEnd
+		SectionGroupEnd
 	!endif
 
 	!ifdef INCLUDE_EDITOR
-		Section /o "Editor (Developer version *still unzipped*)" SEC08
+		Section "Editor" SEC08
+			SectionIn 1 2
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
 			SetOverwrite ifnewer
-			File /r /x ".svn" "${SERVER_FILES_ROOT}\mods\deathmatch\resources\editor*"
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\editor\*.zip"
 		SectionEnd
 	!endif
 
@@ -755,7 +946,7 @@ DontInstallRedist:
 		Section /o "Module SDK" SEC09
 			SetOutPath "$INSTDIR\development\module SDK"
 			SetOverwrite ifnewer
-			File /r /x ".svn" "${FILES_MODULE_SDK}"
+			File /r "${FILES_MODULE_SDK}\"
 		SectionEnd
 	SectionGroupEnd
 !endif
@@ -874,6 +1065,7 @@ Section Uninstall
 		!endif
 
 		Delete "$INSTDIR\Multi Theft Auto.exe"
+		Delete "$INSTDIR\Multi Theft Auto.exe.dat"
 		Delete "$INSTDIR\Uninstall.exe"
 
 		Delete "$INSTDIR\mods\deathmatch\Client.dll"
@@ -993,4 +1185,359 @@ FunctionEnd
 
 Function un.DoRightsElevation
     !insertmacro RightsElevation "un"
+FunctionEnd
+
+
+;****************************************************************
+;
+; Functions relating to the resizing of the 'Components' dialog.
+;
+;****************************************************************
+
+Var HWND
+Var RECT_X
+Var RECT_Y
+Var RECT_W
+Var RECT_H
+
+; In: $HWND $RECT_X $RECT_Y
+; Out: $RECT_X $RECT_Y
+Function ScreenToClient
+	;Save existing register values to the stack
+	Push $1
+	Push $2
+	Push $3
+
+	; Allocate a 2 int struct in $1
+	System::Call "*(i $RECT_X, i $RECT_Y) i.r1"
+	${If} $1 == 0
+		DetailPrint "Memory problem"
+	${Else}
+		; Call ScreenToClient
+		System::Call "User32::ScreenToClient(i, i) i ($HWND, r1r1) .r5"
+		System::Call "*$1(i .r2, i .r3)"
+
+		; Set return values
+		StrCpy $RECT_X $2
+		StrCpy $RECT_Y $3
+
+		; Free 2 int struct
+		System::Free $1
+	${EndIf}
+	
+	;Restore register values from the stack
+	Pop $3
+	Pop $2
+	Pop $1
+	
+FunctionEnd
+
+
+; In: $HWND
+; Out: $RECT_X $RECT_Y $RECT_W $RECT_D
+Function GetWindowRect
+	;Save existing register values to the stack
+	Push $1
+	Push $2
+	Push $3
+	Push $4
+	Push $5
+
+	; Allocate a 4 int struct in $1
+	System::Call "*(i 0, i 0, i 0, i 0) i.r1"
+	${If} $1 == 0
+		DetailPrint "Memory problem"
+	${Else}
+		; Call GetWindowRect
+		System::Call "User32::GetWindowRect(i, i) i ($HWND, r1) .r5"
+		System::Call "*$1(i .r2, i .r3, i .r4, i .r5)"
+
+		; Set return values
+		StrCpy $RECT_X $2
+		StrCpy $RECT_Y $3
+		IntOp $RECT_W $4 - $2
+		IntOp $RECT_H $5 - $3
+
+		; Free 4 int struct
+		System::Free $1
+	${EndIf}
+	
+	;Restore register values from the stack
+	Pop $5
+	Pop $4
+	Pop $3
+	Pop $2
+	Pop $1
+	
+FunctionEnd
+
+
+; In: $HWND
+; Out: $RECT_X $RECT_Y $RECT_W $RECT_D
+Function GetChildRect
+	;Save existing register values to the stack
+	Push $1
+
+	Call GetWindowRect
+
+	System::Call "User32::GetParent(i) i ($HWND) .r1"
+	StrCpy $HWND $1
+
+	Call ScreenToClient
+
+	;Restore register values from the stack
+	Pop $1
+FunctionEnd
+
+
+Var ITEM_HWND
+Var ITEM_PARENT
+Var ITEM_ID
+Var X
+Var Y
+Var CX
+Var CY
+
+; Input:
+; 	$ITEM_PARENT - Parent window
+; 	$ITEM_ID 	 - Dialog ID
+; 	$X $Y 		 - Position change
+; 	$CX $CY 	 - Size change
+Function MoveDialogItem
+	;Save existing register values to the stack
+	Push $1
+	Push $2
+	Push $3
+	Push $4
+
+	; Get item handle
+	GetDlgItem $ITEM_HWND $ITEM_PARENT $ITEM_ID
+
+	StrCpy $HWND $ITEM_HWND
+	Call GetChildRect
+	
+	; Calculate new dims
+	IntOp $1 $RECT_X + $X
+	IntOp $2 $RECT_Y + $Y
+	IntOp $3 $RECT_W + $CX
+	IntOp $4 $RECT_H + $CY 
+	
+	; Set new dims
+	System::Call "User32::MoveWindow(i, i, i, i, i, b) b ($ITEM_HWND, $1, $2, $3, $4, true)"
+
+	;Restore register values from the stack
+	Pop $4
+	Pop $3
+	Pop $2
+	Pop $1
+	
+FunctionEnd
+
+
+Var HWND_DIALOG
+Var RESIZE_X
+Var RESIZE_Y
+
+; Input:
+; 	$RESIZE_X $RESIZE_X		- Resize amount
+Function ResizeComponentsDialogContents
+
+ 	FindWindow $HWND_DIALOG "#32770" "" $HWNDPARENT
+
+	;Move description right and stretch down
+	StrCpy $X $RESIZE_X
+	StrCpy $Y 0
+	StrCpy $CX 0
+	StrCpy $CY $RESIZE_Y
+
+ 	StrCpy $ITEM_PARENT $HWND_DIALOG
+ 	StrCpy $ITEM_ID 1043	; Static - "Position your mouse over a component to see its description."
+	Call MoveDialogItem
+	
+ 	StrCpy $ITEM_PARENT $HWND_DIALOG
+	StrCpy $ITEM_ID 1042	; Button - Description
+	Call MoveDialogItem
+
+	;Middle zone bigger
+	StrCpy $X 0
+	StrCpy $Y 0
+	StrCpy $CX $RESIZE_X
+	StrCpy $CY $RESIZE_Y
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 0		; Sub dialog
+	Call MoveDialogItem
+
+	;Make tree view bigger
+	StrCpy $X 0
+	StrCpy $Y 0
+	StrCpy $CX $RESIZE_X
+	StrCpy $CY $RESIZE_Y
+	StrCpy $ITEM_PARENT $HWND_DIALOG
+	StrCpy $ITEM_ID 1032	; Tree view
+	Call MoveDialogItem
+	
+	;Stretch combo box to the right
+	StrCpy $X 0
+	StrCpy $Y 0
+	StrCpy $CX $RESIZE_X
+	StrCpy $CY 0
+	
+	StrCpy $ITEM_PARENT $HWND_DIALOG
+	StrCpy $ITEM_ID 1017	; Combo box
+	Call MoveDialogItem
+	
+	;Move space required text down
+	StrCpy $X 0
+	StrCpy $Y $RESIZE_Y
+	StrCpy $CX 0
+	StrCpy $CY 0
+	
+	StrCpy $ITEM_PARENT $HWND_DIALOG
+	StrCpy $ITEM_ID 1023	; Static
+	Call MoveDialogItem
+
+FunctionEnd
+
+
+; Input:
+; 	$RESIZE_X $RESIZE_X		- Resize amount
+Function ResizeSharedDialogContents
+
+	;Move buttons down and right
+	StrCpy $X $RESIZE_X
+	StrCpy $Y $RESIZE_Y
+	StrCpy $CX 0
+	StrCpy $CY 0
+
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 1	; Button - Back
+	Call MoveDialogItem
+
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 2	; Button - Cancel
+	Call MoveDialogItem
+
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 3 ; Button - Next
+	Call MoveDialogItem
+	
+	;Move branding text down
+	StrCpy $X 0
+	StrCpy $Y $RESIZE_Y
+	StrCpy $CX 0
+	StrCpy $CY 0
+	
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 1256	; Static - "Nullsoft Install System..."
+	Call MoveDialogItem
+
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 1028	; Static - "Nullsoft Install System..."
+	Call MoveDialogItem
+
+	;Move lower horizontal line down and stretch to the right
+	StrCpy $X 0
+	StrCpy $Y $RESIZE_Y
+	StrCpy $CX $RESIZE_X
+	StrCpy $CY 0
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 1035	; Static - Line
+	Call MoveDialogItem
+
+	;Stretch header to the right
+	StrCpy $X 0
+	StrCpy $Y 0
+	StrCpy $CX $RESIZE_X
+	StrCpy $CY 0
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 1034	; Static - White bar
+	Call MoveDialogItem
+
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 1036	; Static - Line
+	Call MoveDialogItem
+	
+	;Move header text to the right
+	StrCpy $X $RESIZE_X
+	StrCpy $Y 0
+	StrCpy $CX 0
+	StrCpy $CY 0
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 1037	; Static - "Choose Components"
+	Call MoveDialogItem
+
+	StrCpy $ITEM_PARENT $HWNDPARENT
+	StrCpy $ITEM_ID 1038	; Static - "Choose which features of MTA:SA v1.0 you want to install."
+	Call MoveDialogItem
+	
+FunctionEnd
+
+
+; Input:
+; 	$RESIZE_X $RESIZE_X		- Resize amount
+Function ResizeMainWindow
+	;Save existing register values to the stack
+	Push $0
+	Push $1
+	Push $2
+	Push $3
+	Push $4
+ 
+	StrCpy $HWND $HWNDPARENT
+	Call GetWindowRect
+
+	IntOp $0 $RESIZE_X / 2
+	IntOp $1 $RECT_X - $0
+	
+	IntOp $0 $RESIZE_Y / 2
+	IntOp $2 $RECT_Y - $0
+	
+	IntOp $3 $RECT_W + $RESIZE_X
+	IntOp $4 $RECT_H + $RESIZE_Y
+
+	System::Call "User32::SetWindowPos(i, i, i, i, i, i, i) b ($HWNDPARENT, 0, $1, $2, $3, $4, ${SWP_NOOWNERZORDER}|${SWP_NOSIZE})"
+
+	;Restore register values from the stack
+	Pop $4
+	Pop $3
+	Pop $2
+	Pop $1
+	Pop $0
+
+FunctionEnd
+
+
+Var COMPONENTS_EXPAND_STATUS
+
+Function "LicenseShowProc"
+	${If} $COMPONENTS_EXPAND_STATUS == 1
+		StrCpy $COMPONENTS_EXPAND_STATUS 0
+		IntOp $RESIZE_X 0 - ${EXPAND_DIALOG_X}
+		IntOp $RESIZE_Y 0 - ${EXPAND_DIALOG_Y}
+		Call ResizeSharedDialogContents
+		Call ResizeMainWindow
+	${Endif}
+FunctionEnd
+
+
+Function "ComponetsShowProc"
+	${If} $COMPONENTS_EXPAND_STATUS != 1
+		StrCpy $COMPONENTS_EXPAND_STATUS 1
+		IntOp $RESIZE_X 0 + ${EXPAND_DIALOG_X}
+		IntOp $RESIZE_Y 0 + ${EXPAND_DIALOG_Y}
+		Call ResizeComponentsDialogContents
+		Call ResizeSharedDialogContents
+		Call ResizeMainWindow
+	${Endif}
+FunctionEnd
+
+
+Function "DirectoryShowProc"
+	${If} $COMPONENTS_EXPAND_STATUS == 1
+		StrCpy $COMPONENTS_EXPAND_STATUS 0
+		IntOp $RESIZE_X 0 - ${EXPAND_DIALOG_X}
+		IntOp $RESIZE_Y 0 - ${EXPAND_DIALOG_Y}
+		Call ResizeSharedDialogContents
+		Call ResizeMainWindow
+	${Endif}
 FunctionEnd
