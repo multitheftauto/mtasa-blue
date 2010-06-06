@@ -430,7 +430,7 @@ bool CAccountManager::SaveSettings ()
 {
     //Update our autologin and XML Load SQL entries
     m_pSaveFile->Query ( "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, m_bAutoLogin ? 1 : 0, "autologin" );
-    m_pSaveFile->Query ( "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, m_bLoadXML ? 1 : 0, "XMLParsed" );
+    m_pSaveFile->Query ( "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, 1, "XMLParsed" );
 
     return true;
 }
