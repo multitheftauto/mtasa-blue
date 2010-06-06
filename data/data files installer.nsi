@@ -1,6 +1,7 @@
 !include nsDialogs.nsh
 !include LogicLib.nsh
 !include Sections.nsh
+!include UAC.nsh
 
 XPStyle on
 RequestExecutionLevel user
@@ -17,9 +18,9 @@ Var Install_Dir
 ; Don't forget to update the BUILD_NUMBER
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "1630"
+!define BUILD_NUMBER "1746"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
-!define INSTALL_OUTPUT "multitheftauto_data-r${BUILD_NUMBER}.exe"
+!define INSTALL_OUTPUT "mtasa-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
 
 
@@ -63,35 +64,11 @@ LangString DESC_Section1 ${LANG_ENGLISH}			"The data files required to run Multi
 
 
 Function .OnInstFailed
-	UAC::Unload ;Must call unload!
+	;UAC::Unload ;Must call unload!
 FunctionEnd
 
 Function .onInit
-
-; FOR VISTA
-
-UAC_Elevate:
-	UAC::RunElevated
-	StrCmp 1223 $0 UAC_ElevationAborted ; UAC dialog aborted by user?
-	StrCmp 0 $0 0 UAC_Err ; Error?
-	StrCmp 1 $1 0 UAC_Success ;Are we the real deal or just the wrapper?
-	Quit
-
-UAC_Err:
-	MessageBox mb_iconstop "Unable to elevate, error $0"
-	Abort
-
-UAC_ElevationAborted:
-	; elevation was aborted, run as normal?
-	MessageBox mb_iconstop "This installer requires admin access, aborting!"
-	Abort
-
-UAC_Success:
-	StrCmp 1 $3 +4 ; Admin?
-	StrCmp 3 $1 0 UAC_ElevationAborted ; Try again?
-	MessageBox mb_iconstop "This installer requires admin access, try again"
-	goto UAC_Elevate
-
+	Call DoRightsElevation
 
 	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" ; start of fix for #3743
 	${If} $Install_Dir == '' 
@@ -108,7 +85,7 @@ FunctionEnd
 Function .onInstSuccess
 	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" $INSTDIR
 
-	UAC::Unload ;Must call unload!
+	;UAC::Unload ;Must call unload!
 FunctionEnd
 
 
@@ -131,7 +108,7 @@ Section "Data files" SEC01
 	SetOverwrite on
 
 	SetOutPath "$INSTDIR\MTA"
-	File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_41.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\ikpMP3.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\irrKlang.dll"
 	;File "${FILES_ROOT}\MTA San Andreas\mta\matroska.ax"
@@ -188,3 +165,38 @@ SectionEnd
 
 
 
+;====================================================================================
+; UAC related functions
+;====================================================================================
+
+!macro RightsElevation un
+    uac_tryagain:
+    !insertmacro UAC_RunElevated
+    #MessageBox mb_TopMost "0=$0 1=$1 2=$2 3=$3"
+    ${Switch} $0
+    ${Case} 0
+        ${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
+        ${IfThen} $3 <> 0 ${|} ${Break} ${|} ;we are admin, let the show go on
+        ${If} $1 = 3 ;RunAs completed successfully, but with a non-admin user
+            MessageBox mb_IconExclamation|mb_TopMost|mb_SetForeground "This ${un}installer requires admin access, try again" /SD IDNO IDOK uac_tryagain IDNO 0
+        ${EndIf}
+        ;fall-through and die
+    ${Case} 1223
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "This ${un}installer requires admin privileges, aborting!"
+        Quit
+    ${Case} 1062
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "Logon service not running, aborting!"
+        Quit
+    ${Default}
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "Unable to elevate , error $0"
+        Quit
+    ${EndSwitch}
+!macroend
+
+Function DoRightsElevation
+    !insertmacro RightsElevation ""
+FunctionEnd
+
+Function un.DoRightsElevation
+    !insertmacro RightsElevation "un"
+FunctionEnd

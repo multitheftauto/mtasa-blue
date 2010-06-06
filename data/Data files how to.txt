@@ -12,3 +12,6 @@ Making installer:
 3. Run the script (with NSIS 2)
 4. Commit back to the svn
 5. Upload data_files.exe to somewhere
+
+
+Note: Uses the same NSIS plugins as the main installer.
