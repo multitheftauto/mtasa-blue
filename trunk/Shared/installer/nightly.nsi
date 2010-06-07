@@ -588,9 +588,24 @@ DontInstallRedist:
 			SetOutPath "$INSTDIR\MTA"
 			SetOverwrite on
 
+			#############################################################
 			# Make the directory "$INSTDIR" read write accessible by all users
-			DetailPrint "Updating permissions. This could take a few minutes..."
-			AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
+			StrCpy $3 "update"
+			!ifdef LIGHTBUILD
+				# For lightbuilds, if the install directory already exists, and there is no virtual store version,
+				# then skip updating permissions
+				IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
+					StrCpy $2 $INSTDIR "" 3
+					IfFileExists "$LOCALAPPDATA\VirtualStore\$2" skip1 0
+						StrCpy $3 "noupdate"
+				skip1:
+			!endif
+
+			${If} $3 == "update"
+				DetailPrint "Updating permissions. This could take a few minutes..."
+				AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
+			${EndIf}
+			#############################################################
 
 			File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
