@@ -13,7 +13,7 @@
 #include "RTree.h"
 
 // Define our tree type
-typedef RTree < CElement*, float, 3 > CElementTree;
+typedef RTree < CElement*, float, 2 > CElementTree;
 
 //
 // SEntityInfo used by CSpatialDatabaseImpl

@@ -13,7 +13,7 @@
 #include "RTree.h"
 
 // Define our tree type
-typedef RTree < CClientEntity*, float, 3 > CClientEntityTree;
+typedef RTree < CClientEntity*, float, 2 > CClientEntityTree;
 
 //
 // SEntityInfo used by CClientSpatialDatabaseImpl
