@@ -23,9 +23,6 @@
 #endif
 
 
-const char* GetFilenameFromPath ( const char* szPath );
-std::string ConformResourcePath ( const char* szRes );
-
 // Vector math
 inline float DistanceBetweenPoints2D ( const CVector& vecPosition1, const CVector& vecPosition2 )
 {
