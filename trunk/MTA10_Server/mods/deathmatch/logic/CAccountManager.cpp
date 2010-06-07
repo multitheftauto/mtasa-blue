@@ -152,7 +152,8 @@ bool CAccountManager::ConvertXMLToSQL ( const char* szFileName )
             {
                 //Save the settings to SQL
                 SaveSettings();
-                CLogger::LogPrint ( "Conversion Failed: Accounts.xml failed to load.\n" );
+                if ( FileExists ( szFileName ) )
+                    CLogger::LogPrint ( "Conversion Failed: 'accounts.xml' failed to load.\n" );
                 //Add Console to the SQL Database (You don't need to create an account since the server takes care of that (Have to do this here or Console may be created after other accounts if the owner uses addaccount too early)
                 m_pSaveFile->Query ( "INSERT INTO accounts (name, password) VALUES(?,?)", "Console", "" );
                 ++m_iAccounts;
