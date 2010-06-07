@@ -632,3 +632,51 @@ bool SharedUtil::IsValidVersionString ( const SString& strVersion )
     }
     return true;
 }
+
+
+//
+// Try to make a path relative to the 'resources/' directory
+//
+SString SharedUtil::ConformResourcePath ( const char* szRes )
+{
+    // Remove up to first '/resources/'
+    // else
+    // remove up to first '/resource-cache/unzipped/'
+    // else
+    // remove up to first '/deathmatch/'
+    // else
+    // if starts with '...'
+    //  remove up to first '/'
+
+    SString strDelimList[] = { "/resources/", "/resource-cache/unzipped/", "/deathmatch/" };
+    SString strText = szRes ? szRes : "";
+#ifdef WIN32
+    char cPathSep = '\\';
+    for ( int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+        strDelimList[i] = strDelimList[i].Replace ( "/", "\\" );
+    strText = strText.Replace ( "/", "\\" );
+#else
+    char cPathSep = '/';
+    for ( int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+        strDelimList[i] = strDelimList[i].Replace ( "\\", "/" );
+    strText = strText.Replace ( "\\", "/" );
+#endif
+
+    for ( int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+    {
+        // Remove up to first occurrence
+        int iPos = strText.find ( strDelimList[i] );
+        if ( iPos >= 0 )
+            return strText.substr ( iPos + strDelimList[i].length () );
+    }
+
+    if ( strText.substr ( 0, 3 ) == "..." )
+    {
+        // Remove up to first '/'
+        int iPos = strText.find ( cPathSep );
+        if ( iPos >= 0 )
+            return strText.substr ( iPos + 1 );
+    }
+
+    return strText;
+}

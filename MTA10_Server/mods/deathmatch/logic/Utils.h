@@ -71,8 +71,6 @@ unsigned int    HexToInt                    ( const char* szHex );
 bool            XMLColorToInt               ( const char* szColor, unsigned long& ulColor );
 bool            XMLColorToInt               ( const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha );
 
-const char* GetFilenameFromPath ( const char* szPath );
-std::string ConformResourcePath ( const char* szRes );
 
 inline unsigned long GetTime ( void )
 {

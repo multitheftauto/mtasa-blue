@@ -115,6 +115,11 @@ namespace SharedUtil
     bool IsValidVersionString ( const SString& strVersion );
 
     //
+    // Try to make a path relative to the 'resources/' directory
+    //
+    SString ConformResourcePath ( const char* szRes );
+
+    //
     // Some templates
     //
     template < class T >
