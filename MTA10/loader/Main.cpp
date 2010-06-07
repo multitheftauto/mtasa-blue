@@ -77,19 +77,6 @@ bool TerminateGTAIfRunning ( void )
 
 
 //
-// Returns true if the file exists
-//
-bool FileExists ( const SString& strFilename )
-{
-    WIN32_FIND_DATA fdFileInfo;
-    HANDLE hHandle = FindFirstFile ( strFilename, &fdFileInfo );
-    if ( hHandle == INVALID_HANDLE_VALUE )
-        return false;
-    FindClose ( hHandle );
-    return true;
-}
-
-//
 // General error message box
 //
 long DisplayErrorMessageBox ( HWND& hwndSplash, const SString& strMessage )

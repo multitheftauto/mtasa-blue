@@ -587,6 +587,19 @@ void SharedUtil::OutputDebugLine ( const char* szMessage )
 
 
 //
+// Returns true if the file exists
+//
+bool SharedUtil::FileExists ( const SString& strFilename )
+{
+    FILE* fh = fopen ( strFilename, "rb" );
+    if ( !fh )
+        return false;
+    fclose ( fh );
+    return true;
+}
+
+
+//
 // Load binary data from a file into an array
 //
 bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& buffer )

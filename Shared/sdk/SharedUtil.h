@@ -105,6 +105,11 @@ namespace SharedUtil
     void OutputDebugLine ( const char* szMessage );
 
     //
+    // Returns true if the file exists
+    //
+    bool FileExists ( const SString& strFilename );
+
+    //
     // Load binary data from a file into an array
     //
     bool FileLoad ( const SString& strFilename, std::vector < char >& buffer );

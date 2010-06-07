@@ -368,7 +368,8 @@ bool CBanManager::LoadBanList ( void )
     if ( !pFile->Parse () )
     {
         delete pFile;
-        CLogger::ErrorPrintf ( "Error parsing banlist\n" );
+        if ( FileExists ( m_strPath ) )
+            CLogger::ErrorPrintf ( "Error parsing banlist\n" );
         return false;
     }
 
