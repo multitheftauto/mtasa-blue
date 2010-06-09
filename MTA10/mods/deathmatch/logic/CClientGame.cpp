@@ -2412,6 +2412,10 @@ void CClientGame::AddBuiltInEvents ( void )
 
     // Projectile events
     m_Events.AddEvent ( "onClientProjectileCreation", "creator", NULL, false );
+
+    // Sound events
+    m_Events.AddEvent ( "onClientSoundStream", "success, length", NULL, false );
+    m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
 }
 
 
