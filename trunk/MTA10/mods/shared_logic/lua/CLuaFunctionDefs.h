@@ -77,6 +77,9 @@ public:
     LUA_DECLARE ( GetSoundMinDistance );
     LUA_DECLARE ( SetSoundMaxDistance );
     LUA_DECLARE ( GetSoundMaxDistance );
+    LUA_DECLARE ( GetSoundMetaTags );
+    LUA_DECLARE ( SetSoundEffectEnabled );
+    LUA_DECLARE ( GetSoundEffects );
 
     // Output functions
     LUA_DECLARE ( OutputConsole );

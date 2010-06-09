@@ -471,8 +471,8 @@ public:
     static bool                         FxAddFootSplash                     ( CVector & vecPosition );
 
     // Sound funcs
-    static CClientSound*                PlaySound                           ( CResource* pResource, const char* szSound, bool bLoop );
-    static CClientSound*                PlaySound3D                         ( CResource* pResource, const char* szSound, CVector vecPosition, bool bLoop );
+    static CClientSound*                PlaySound                           ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop );
+    static CClientSound*                PlaySound3D                         ( CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop );
     static bool                         StopSound                           ( CClientSound& Sound );
     static bool                         SetSoundPosition                    ( CClientSound& Sound, unsigned int uiPosition );
     static bool                         GetSoundPosition                    ( CClientSound& Sound, unsigned int& uiPosition );
@@ -487,6 +487,8 @@ public:
     static bool                         GetSoundMinDistance                 ( CClientSound& Sound, float& fDistance );
     static bool                         SetSoundMaxDistance                 ( CClientSound& Sound, float fDistance );
     static bool                         GetSoundMaxDistance                 ( CClientSound& Sound, float& fDistance );
+    static bool                         GetSoundMetaTags                    ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags );
+    static bool                         SetSoundEffectEnabled               ( CClientSound& Sound, const SString& strEffectName, bool bEnable );
 
 #ifdef MTA_VOICE
     // Voice funcs
