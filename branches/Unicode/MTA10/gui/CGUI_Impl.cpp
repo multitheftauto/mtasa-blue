@@ -67,21 +67,22 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     char szWinDir[64], szFont[128];
     GetWindowsDirectory ( szWinDir, 64 );
 
+    // 32..1105 glyths range uses only for testing
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT );
-    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9, 0, 32, 65532 ); // allowed code points range is 0..65532
-    m_pSmallFont   = (CGUIFont_Impl*) CreateFnt ( "default-small",  szFont, 7, 0, 32, 65532 ); // allowed code points range is 0..65532
+    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9, 0, 32, 1105 ); // allowed code points range is 0..65532
+    m_pSmallFont   = (CGUIFont_Impl*) CreateFnt ( "default-small",  szFont, 7, 0, 32, 1105 ); // allowed code points range is 0..65532
 
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT_BOLD );
-    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8, 0, 32, 65532 ); // allowed code points range is 0..65532
+    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8, 0, 32, 1105 ); // allowed code points range is 0..65532
 
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_CLEAR_FONT );
-    m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9, 0, 32, 64258 ); // allowed code points range is 0..64258
+    m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9, 0, 32, 1105 ); // allowed code points range is 0..64258
 
-    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 32, 8729, true ); // allowed code points range is 0..61442
+    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 32, 127, true ); // allowed code points range is 0..61442
 
-    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 32, 8221, true ); // allowed code points range is 0..8221
+    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 32, 127, true ); // allowed code points range is 0..8221
 
-    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 32, 64258, false ); // allowed code points range is 0..64258
+    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 32, 127, false ); // allowed code points range is 0..64258
     // ACHTUNG: These font creations can throw exceptions!
     // ACHTUNG: Client don't even started if any font has wrong start/end code points.
  
@@ -250,7 +251,29 @@ bool CGUI_Impl::GetGUIInputEnabled ( void )
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
 {
-    m_pSystem->injectChar ( ulCharacter );
+    if ( ulCharacter < 128 ) // we have any char from ASCII 
+    {
+        // injecting as is
+        m_pSystem->injectChar( ulCharacter );
+    }
+    else // we have any char from Extended ASCII, any ANSI code page or UNICODE range
+    {
+        // we need temp input string of unsigned char
+        unsigned char ucANSI[2] = { (unsigned char) ulCharacter, 0 };
+
+        // also we need temp output string of wchar_t
+        WCHAR *wUNICODE;
+        wUNICODE = new WCHAR[1];
+
+        // converting ANSI temp string to UNICODE temp string
+        MultiByteToWideChar( CP_THREAD_ACP, 0, (LPCSTR) ucANSI, -1, wUNICODE, 1 ); // can be CP_ACP too
+
+        // injecting unicode char
+        m_pSystem->injectChar( (unsigned long) wUNICODE[0] );
+
+        // temp UNICODE string no needs more
+        delete wUNICODE;
+    }
 }
 
 
