@@ -3,11 +3,10 @@
 *  PROJECT:     Multi Theft Auto v1.0
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientSoundManager.cpp
-*  PURPOSE:     Sound manager class
+*  FILE:        mods/shared_logic/CClientSound.h
+*  PURPOSE:     Sound entity class
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
 *               Marcus Bauer <mabako@gmail.com>
-*               Florian Busse <flobu@gmx.net>
 *
 *****************************************************************************/
 
@@ -22,77 +21,65 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
 {
     m_pClientManager = pClientManager;
 
-    // Initialize BASS audio library
-    if (!BASS_Init ( -1,44100,BASS_DEVICE_3D,NULL,NULL ))
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in Init", BASS_ErrorGetCode() );
+    m_bUse3DBuffers = false;
 
-    // Load the Plugins
-    if (!BASS_PluginLoad ( "basswma.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad WMA", BASS_ErrorGetCode() );
-    if (!BASS_PluginLoad ( "bassflac.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad FLAC", BASS_ErrorGetCode() );
-    if (!BASS_PluginLoad ( "bassmidi.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad MIDI", BASS_ErrorGetCode() );
-    if (!BASS_PluginLoad ( "bass_aac.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad AAC", BASS_ErrorGetCode() );
-    if (!BASS_PluginLoad ( "bass_ac3.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad AC3", BASS_ErrorGetCode() );
+    if ( m_bUse3DBuffers )
+    {
+        m_pSoundEngine = createIrrKlangDevice ();
+    }
+    else
+    {
+        // ESEO_USE_3D_BUFFERS in the default options set fucks up gta sounds
+        // on some PCs, so we set the options ourselves.
+        // ESEO_MULTI_THREADED is not used as OnSoundStopped() is not thread safe
+        m_pSoundEngine = createIrrKlangDevice ( ESOD_AUTO_DETECT, 0 );
+    }
 
-    BASS_SetConfig ( BASS_CONFIG_NET_PREBUF, 0 );
-    // Allow playlists
-    BASS_SetConfig ( BASS_CONFIG_NET_PLAYLIST, 1 );
+    // Load plugins (mp3 in our case)
+    m_pSoundEngine->loadPlugins ( CalcMTASAPath("\\MTA\\") );
 
     UpdateVolume ();
-
-    m_FxEffectNames["chorus"] =         BASS_FX_DX8_CHORUS;
-    m_FxEffectNames["compressor"] =     BASS_FX_DX8_COMPRESSOR;
-    m_FxEffectNames["distortion"] =     BASS_FX_DX8_DISTORTION;
-    m_FxEffectNames["echo"] =           BASS_FX_DX8_ECHO;
-    m_FxEffectNames["flanger"] =        BASS_FX_DX8_FLANGER;
-    m_FxEffectNames["gargle"] =         BASS_FX_DX8_GARGLE;
-    m_FxEffectNames["i3dl2reverb"] =    BASS_FX_DX8_I3DL2REVERB;
-    m_FxEffectNames["parameq"] =        BASS_FX_DX8_PARAMEQ;
-    m_FxEffectNames["reverb"] =         BASS_FX_DX8_REVERB;
 }
 
 CClientSoundManager::~CClientSoundManager ( void )
 {
-    BASS_Stop();
-    BASS_Free();
+    list < CClientSound* > ::iterator iter = m_Sounds.begin ();
+    for ( ; iter != m_Sounds.end () ; iter++ )
+    {
+        (*iter)->GetSound()->setSoundStopEventReceiver ( NULL );
+    }
+    m_Sounds.clear();
+    m_pSoundEngine->drop ();
 }
 
 void CClientSoundManager::DoPulse ( void )
 {
+    // Update needs to be called in single threaded mode
+    m_pSoundEngine->update();
+
     UpdateVolume ();
 
     CClientCamera* pCamera = m_pClientManager->GetCamera();
 
-    CVector vecPosition, vecLookAt, vecFront, vecVelocity;
+    CVector vecPosition, vecLookAt;
     pCamera->GetPosition ( vecPosition );
     pCamera->GetTarget ( vecLookAt );
-    vecFront = vecLookAt - vecPosition;
 
-    CClientPlayer* p_LocalPlayer = m_pClientManager->GetPlayerManager()->GetLocalPlayer();
-    if ( p_LocalPlayer )
-        p_LocalPlayer->GetMoveSpeed( vecVelocity );
-
-    BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
-    BASS_3DVECTOR vel ( vecVelocity.fX, vecVelocity.fY, vecVelocity.fZ );
-    BASS_3DVECTOR front ( vecFront.fX, vecFront.fY, vecFront.fZ );
-    BASS_3DVECTOR top ( 0, 0, -1 );
-
-    // Update the listener position
-    BASS_Set3DPosition ( &pos, &vel, &front, &top );
-
-    // Update volume position and velocity from all sounds
-    list < CClientSound* > ::iterator iter = m_Sounds.begin ();
-    for ( ; iter != m_Sounds.end () ; ++iter )
+    if ( m_bUse3DBuffers )
     {
-        (*iter)->Process3D ( vecPosition );
+        m_pSoundEngine->setListenerPosition ( vec3df ( vecPosition.fX, vecPosition.fY, vecPosition.fZ ),
+                                              vec3df ( vecLookAt.fX, vecLookAt.fY, vecLookAt.fZ ),
+                                              vec3df ( 0, 0, 0 ),
+                                              vec3df ( 0, 0, 1 ) );
     }
-
-    // Apply the 3D changes
-    BASS_Apply3D ();
+    else
+    {
+        list < CClientSound* > ::iterator iter = m_Sounds.begin ();
+        for ( ; iter != m_Sounds.end () ; ++iter )
+        {
+            (*iter)->Process3D ( vecPosition, vecLookAt );
+        }
+    }
 }
 
 void CClientSoundManager::SetDimension ( unsigned short usDimension )
@@ -105,34 +92,36 @@ void CClientSoundManager::SetDimension ( unsigned short usDimension )
     }
 }
 
-CClientSound* CClientSoundManager::PlaySound2D ( const SString& strSound, bool bIsURL, bool bLoop )
+CClientSound* CClientSoundManager::PlaySound2D ( const char* szFile, bool bLoop )
 {
     CClientSound* pSound = new CClientSound ( m_pClientManager, INVALID_ELEMENT_ID );
-    if ( bIsURL )
+    if ( pSound->Play ( szFile, bLoop ) )
     {
-        pSound->PlayStream ( strSound, bLoop );
         return pSound;
     }
-    else
-        if ( pSound->Play ( strSound, bLoop ) )
-            return pSound;
-
     delete pSound;
     return NULL;
 }
 
-CClientSound* CClientSoundManager::PlaySound3D ( const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop )
+CClientSound* CClientSoundManager::PlaySound3D ( const char* szFile, CVector vecPosition, bool bLoop )
 {
     CClientSound* pSound = new CClientSound ( m_pClientManager, INVALID_ELEMENT_ID );
-
-    if ( bIsURL )
+    if ( m_bUse3DBuffers )
     {
-        pSound->PlayStream ( strSound, bLoop, true, vecPosition );
-        return pSound;
+        if ( pSound->Play3D ( szFile, vecPosition, bLoop ) )
+        {
+            return pSound;
+        }
     }
     else
-        if ( pSound->Play3D ( strSound, vecPosition, bLoop ) )
+    {
+        if ( pSound->Play ( szFile, bLoop ) )
+        {
+            pSound->SetPosition ( vecPosition );
+            pSound->Set3D ( true );
             return pSound;
+        }
+    }
 
     delete pSound;
     return NULL;
@@ -151,7 +140,7 @@ bool CClientSoundManager::Exists ( CClientSound* pSound )
     return false;
 }
 
-CClientSound* CClientSoundManager::Get ( DWORD pSound )
+CClientSound* CClientSoundManager::Get ( ISound* pSound )
 {
     list < CClientSound* > ::iterator iter = m_Sounds.begin ();
     for ( ; iter != m_Sounds.end () ; iter++ )
@@ -164,25 +153,23 @@ CClientSound* CClientSoundManager::Get ( DWORD pSound )
     return NULL;
 }
 
-int CClientSoundManager::GetFxEffectFromName ( const std::string& strEffectName )
+void CClientSoundManager::OnSoundStopped ( ISound* sound, E_STOP_EVENT_CAUSE reason, void* pObj )
 {
-    std::map < std::string, int >::iterator it;
-    it = m_FxEffectNames.find ( strEffectName );
-
-    if ( it != m_FxEffectNames.end () )
+    CClientSound* pSound = Get ( sound );
+    if ( pSound )
     {
-        return it->second;
+        g_pClientGame->GetElementDeleter()->Delete ( pSound );
+        RemoveFromList ( pSound );
     }
-    return -1;
 }
 
-void CClientSoundManager::UpdateVolume ()
+void CClientSoundManager::UpdateVolume ( )
 {
     // set our master sound volume if the cvar changed
     float fValue = 0.0f;
     if( g_pCore->GetCVars ()->Get ( "mtavolume", fValue ) )
     {
-        if ( fValue*10000 == BASS_GetConfig ( BASS_CONFIG_GVOL_STREAM ) )
+        if ( fValue == m_pSoundEngine->getSoundVolume () )
             return;
 
         fValue = max( 0.0f, min( 1.0f, fValue ) );
@@ -192,6 +179,5 @@ void CClientSoundManager::UpdateVolume ()
         fValue = 1.0f;
     }
 
-    BASS_SetConfig( BASS_CONFIG_GVOL_STREAM, static_cast <DWORD> ( fValue * 10000 ) );
-    BASS_SetConfig( BASS_CONFIG_GVOL_MUSIC, static_cast <DWORD> ( fValue * 10000 ) );
+    m_pSoundEngine->setSoundVolume( fValue );
 }

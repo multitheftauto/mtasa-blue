@@ -31,23 +31,19 @@ int CLuaFunctionDefs::PlaySound ( lua_State* luaVM )
             if ( pResource )
             {
                 SString strFilename;
-                bool bIsURL = false;
                 if ( CResourceManager::ParseResourcePathInput( strSound, pResource, strFilename ) )
-                    strSound = strFilename;
-                else
-                    bIsURL = true;
-
-                bool bLoop = false;
-                if ( lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
                 {
-                    bLoop = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
-                }
-
-                CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, strSound, bIsURL, bLoop );
-                if ( pSound )
-                {
-                    lua_pushelement ( luaVM, pSound );
-                    return 1;
+                    bool bLoop = false;
+                    if ( lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
+                    {
+                        bLoop = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
+                    }
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, strFilename, bLoop );
+                    if ( pSound )
+                    {
+                        lua_pushelement ( luaVM, pSound );
+                        return 1;
+                    }
                 }
             }
         }
@@ -80,23 +76,19 @@ int CLuaFunctionDefs::PlaySound3D ( lua_State* luaVM )
             if ( pResource )
             {
                 SString strFilename;
-                bool bIsURL = false;
                 if ( CResourceManager::ParseResourcePathInput( strSound, pResource, strFilename ) )
-                    strSound = strFilename;
-                else
-                    bIsURL = true;
-
-                bool bLoop = false;
-                if ( lua_istype ( luaVM, 5, LUA_TBOOLEAN ) )
                 {
-                    bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true : false;
-                }
-
-                CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, strSound, bIsURL, vecPosition, bLoop );
-                if ( pSound )
-                {
-                    lua_pushelement ( luaVM, pSound );
-                    return 1;
+                    bool bLoop = false;
+                    if ( lua_istype ( luaVM, 5, LUA_TBOOLEAN ) )
+                    {
+                        bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true : false;
+                    }
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, strFilename, vecPosition, bLoop );
+                    if ( pSound )
+                    {
+                        lua_pushelement ( luaVM, pSound );
+                        return 1;
+                    }
                 }
             }
         }
@@ -384,153 +376,6 @@ int CLuaFunctionDefs::GetSoundMaxDistance ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, fDistance );
                 return 1;
             }
-        }
-    }
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::GetSoundMetaTags ( lua_State* luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-    {
-        CClientSound* pSound = lua_tosound ( luaVM, 1 );
-        if ( pSound )
-        {
-            //pSound->ShowShoutcastMetaTags ();
-            SString strMetaTags = "";
-            if ( lua_istype ( luaVM, 2, LUA_TSTRING ) )
-            {
-                SString strFormat = lua_tostring ( luaVM, 2 );
-                if ( CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, strFormat, strMetaTags ) )
-                {
-                    if ( !strMetaTags.empty() )
-                    {
-                        lua_pushstring ( luaVM, strMetaTags );
-                        return 1;
-                    }
-                }
-            }
-            else
-            {
-                lua_newtable ( luaVM );
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%TITL", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "title" );
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%ARTI", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "artist" );
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%ALBM", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "album" );
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%GNRE", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "genre" );
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%YEAR", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "year" );
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%CMNT", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "comment" );
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%TRCK", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "track" );
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%COMP", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "composer" );
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%COPY", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "copyright" );
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%SUBT", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "subtitle" );
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "%AART", strMetaTags );
-                if ( !strMetaTags.empty() )
-                {
-                    lua_pushstring ( luaVM, strMetaTags );
-                    lua_setfield ( luaVM, -2, "album_artist" );
-                }
-                return 1;
-            }
-        }
-    }
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::SetSoundEffectEnabled ( lua_State* luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-        lua_istype ( luaVM, 2, LUA_TSTRING ) )
-    {
-        CClientSound* pSound = lua_tosound ( luaVM, 1 );
-        if ( pSound )
-        {
-            SString strEffectName = lua_tostring ( luaVM, 2 );
-            bool bEnable = false;
-            if ( lua_istype ( luaVM, 3, LUA_TBOOLEAN ) )
-            {
-                bEnable = ( lua_toboolean ( luaVM, 3 ) ) ? true : false;
-            }
-            if ( CStaticFunctionDefinitions::SetSoundEffectEnabled ( *pSound, strEffectName, bEnable ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-    }
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::GetSoundEffects ( lua_State* luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-    {
-        CClientSound* pSound = lua_tosound ( luaVM, 1 );
-        if ( pSound )
-        {
-            std::map < std::string, int > iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
-            lua_newtable ( luaVM );
-            for ( std::map < std::string, int >::const_iterator iter = iFxEffects.begin(); iter != iFxEffects.end(); ++iter )
-            {
-                lua_pushboolean ( luaVM, pSound->IsFxEffectEnabled ( (*iter).second ) );
-                lua_setfield ( luaVM, -2, (*iter).first.c_str () );
-            }
-            return 1;
         }
     }
     lua_pushboolean ( luaVM, false );
