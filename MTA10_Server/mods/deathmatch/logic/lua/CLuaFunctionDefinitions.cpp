@@ -10141,11 +10141,14 @@ int CLuaFunctionDefinitions::ExecuteSQLUpdate ( lua_State* luaVM )
 {
     std::string strError;
 
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING && lua_type ( luaVM, 3 ) == LUA_TSTRING )
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )
     {
         std::string strTable    = std::string ( lua_tostring ( luaVM, 1 ) );
         std::string strSet      = std::string ( lua_tostring ( luaVM, 2 ) );
-        std::string strWhere    = std::string ( lua_tostring ( luaVM, 3 ) );
+
+        std::string strWhere    = "";
+        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            strWhere = std::string ( lua_tostring ( luaVM, 3 ) );
 
         if ( CStaticFunctionDefinitions::ExecuteSQLUpdate ( strTable, strSet, strWhere ) )
         {
