@@ -1905,8 +1905,8 @@ void CClientPed::RemoveAllWeapons ( void )
     if ( m_bIsLocalPlayer )
     {
         g_pClientGame->ResetAmmoInClip();
-		g_pMultiplayer->SetNightVisionEnabled( false );
-		g_pMultiplayer->SetThermalVisionEnabled( false );
+        g_pMultiplayer->SetNightVisionEnabled( false );
+        g_pMultiplayer->SetThermalVisionEnabled( false );
     }
     if ( m_pPlayerPed )
     {
