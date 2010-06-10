@@ -617,8 +617,13 @@ DontInstallRedist:
 
 			!ifndef LIGHTBUILD
 				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\ikpMP3.dll"
-				File "${FILES_ROOT}\MTA San Andreas\mta\irrKlang.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bass.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\basswma.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bassmidi.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bassflac.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 
 				SetOutPath "$INSTDIR\MTA\cgui"
