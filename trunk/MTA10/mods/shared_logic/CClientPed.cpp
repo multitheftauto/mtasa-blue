@@ -1905,14 +1905,13 @@ void CClientPed::RemoveAllWeapons ( void )
     if ( m_bIsLocalPlayer )
     {
         g_pClientGame->ResetAmmoInClip();
+		g_pMultiplayer->SetNightVisionEnabled( false );
+		g_pMultiplayer->SetThermalVisionEnabled( false );
     }
     if ( m_pPlayerPed )
     {
         m_pPlayerPed->ClearWeapons ();
     }
-
-    g_pMultiplayer->SetNightVisionEnabled( false );
-    g_pMultiplayer->SetThermalVisionEnabled( false );
 
     for ( int i = 0 ; i < (int)WEAPONSLOT_MAX ; i++ )
         m_WeaponTypes [ i ] = WEAPONTYPE_UNARMED;
