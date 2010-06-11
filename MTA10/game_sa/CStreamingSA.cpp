@@ -5,6 +5,7 @@
 *  FILE:        game_sa/CStreamingSA.cpp
 *  PURPOSE:     Data streamer
 *  DEVELOPERS:  Jax <>
+*               jenksta <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -12,22 +13,63 @@
 
 #include "StdInc.h"
 
-void CStreamingSA::RequestAnimations ( int i, int j )
+void CStreamingSA::RequestModel( DWORD dwModelID, DWORD dwFlags )
 {
-    DWORD dwFunc = FUNC_CStreaming_RequestAnimations;
+    DWORD dwFunction = FUNC_CStreaming__RequestModel;
     _asm
     {
-        push    j
-        push    i
-        call    dwFunc
-        add     esp, 0x8
+        push    dwFlags
+        push    dwModelID
+        call    dwFunction
+        add     esp, 8
     }
+}
+
+void CStreamingSA::LoadAllRequestedModels ( BOOL bOnlyPriorityModels )
+{
+    DWORD dwFunction = FUNC_LoadAllRequestedModels;
+    DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
+    _asm
+    {
+        push    dwOnlyPriorityModels
+        call    dwFunction
+        add     esp, 4
+    }
+}
+
+BOOL CStreamingSA::HasModelLoaded ( DWORD dwModelID )
+{
+    DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
+
+    BOOL bReturn = 0;
+    _asm
+    {
+        push    dwModelID
+        call    dwFunc
+        movzx   eax, al
+        mov     bReturn, eax
+        pop     eax
+    }
+
+    return bReturn;
+}
+
+void CStreamingSA::RequestAnimations ( int iAnimationLibraryBlock, DWORD dwFlags )
+{
+    iAnimationLibraryBlock += 25575;
+    RequestModel( iAnimationLibraryBlock, dwFlags );
+}
+
+BOOL CStreamingSA::HaveAnimationsLoaded ( int iAnimationLibraryBlock )
+{
+    iAnimationLibraryBlock += 25575;
+    return HasModelLoaded( iAnimationLibraryBlock );
 }
 
 bool CStreamingSA::HasVehicleUpgradeLoaded ( int model )
 {
     bool bReturn;
-    DWORD dwFunc = FUNC_CStreaming_HasVehicleUpgradeLoaded;
+    DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
     _asm
     {
         push    model

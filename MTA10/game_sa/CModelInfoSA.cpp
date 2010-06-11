@@ -294,27 +294,18 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority
         pGame->GetModelInfo ( 7 )->Request ( bAndLoad, false );
     }
 
-    DWORD dwFunction = FUNC_RequestModel;
-    DWORD ModelID = m_dwModelID;
-    //DWORD dwChannel = ( m_dwModelID < 400 ) ? 0 : 6;
     DWORD dwFlags;
     if ( bHighPriority )
         dwFlags = 0x16;
     else
         dwFlags = 6;
-    _asm
-    {
-        push    dwFlags
-        push    ModelID
-        call    dwFunction
-        add     esp, 8
-    }
+    pGame->GetStreaming()->RequestModel(m_dwModelID, dwFlags);
 
     int iTimeToWait = 50;
 
     if(bAndLoad)
     {
-        LoadAllRequestedModels();
+        pGame->GetStreaming()->LoadAllRequestedModels();
         
         if(bWaitForLoad)
         {
@@ -367,22 +358,6 @@ VOID CModelInfoSA::Remove ( )
     }
 }
 
-VOID CModelInfoSA::LoadAllRequestedModels ( )
-{
-    DEBUG_TRACE("VOID CModelInfoSA::LoadAllRequestedModels ( )");
-
-    DWORD dwFunction = FUNC_LoadAllRequestedModels;
-    DWORD dwOnlyPriorityModels = 0;
-    //if ( m_dwModelID >= 400 && m_dwModelID < 615 )
-        //dwSlot = 1;
-    _asm
-    {
-        push    dwOnlyPriorityModels
-        call    dwFunction
-        add     esp, 4
-    }
-}
-
 BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )
 {
     DEBUG_TRACE("BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )");
@@ -405,21 +380,9 @@ BOOL CModelInfoSA::IsLoaded ( )
         return pGame->GetStreaming ()->HasVehicleUpgradeLoaded ( m_dwModelID );
 
     //return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
-    DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
-    DWORD ModelID = m_dwModelID;
-
-    BOOL bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunc
-        movzx   eax, al
-        mov     bReturn, eax
-        pop     eax
-    }
-
+    BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
     m_pInterface = ppModelInfo [ m_dwModelID ];
-    return bReturn;
+    return bLoaded;
 }
 
 BYTE CModelInfoSA::GetFlags ( )
