@@ -53,9 +53,7 @@ class CPedModelInfoSAInterface;
 #define     FUNC_IsTrailerModel             0x4c5c50
 #define     FUNC_IsVehicleModelType         0x4c5c80
 
-#define     FUNC_RequestModel               0x4087e0
 #define     FUNC_RemoveModel                0x4089a0
-#define     FUNC_LoadAllRequestedModels     0x40ea10
 #define     FUNC_FlushRequestList           0x40E4E0
 
 #define     FUNC_HasVehicleUpgradeLoaded    0x407820
@@ -258,7 +256,6 @@ public:
 
     VOID                            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false, bool bHighPriority = false );
     VOID                            Remove                  ( void );
-    VOID                            LoadAllRequestedModels  ( void );
     BYTE                            GetLevelFromPosition    ( CVector * vecPosition );
     BOOL                            IsLoaded                ( void );
     BYTE                            GetFlags                ( void );
