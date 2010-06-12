@@ -313,6 +313,7 @@ bool CAccountManager::Load( const char* szFileName )
     SString strName, strPassword, strSerial, strIP;
     int iUserID = 0;
     m_iAccounts = 0;
+    bool bNeedsVacuum = false;
     CAccount* pAccount = NULL;
     for ( int i = 0 ; i < iResults ; i++ )
     {
@@ -336,6 +337,7 @@ bool CAccountManager::Load( const char* szFileName )
             {
                 m_pSaveFile->Query ( "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
                 m_pSaveFile->Query ( "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+                bNeedsVacuum = true;
                 CLogger::LogPrintf ( "Removed duplicate or damaged account for %s\n", strName.substr ( 0, 64 ).c_str() );
                 continue;
             }
@@ -368,6 +370,8 @@ bool CAccountManager::Load( const char* szFileName )
         pAccount->SetChanged ( bChanged );
         m_iAccounts = Max ( m_iAccounts, iUserID );
     }
+    if ( bNeedsVacuum )
+        m_pSaveFile->Query ( "VACUUM" );
     return true;
 }
 
