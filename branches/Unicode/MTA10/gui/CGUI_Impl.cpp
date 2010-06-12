@@ -27,6 +27,7 @@ using std::list;
 #define CGUI_SA_GOTHIC_SIZE         47
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
+
 CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 {
     // Init
@@ -63,29 +64,41 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
 #endif
     CEGUI::Logger::getSingleton().setLogFilename ( "CEGUI.log" );
 
-    // Load our fonts
+    // + Load our fonts
     char szWinDir[64], szFont[128];
     GetWindowsDirectory ( szWinDir, 64 );
 
-    // 32..1105 glyths range uses only for testing
+    // (?) extra glyphs (ascii + some of unicode)
+    // (!) no dubls here! it will throw an exception while creating fonts
+    // (!) every glyph image takes some of RAM, do not use too many glyph codes here
+    unsigned int uiGlyphs[] =
+    {
+        // (?) ascii
+        32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,
+        // (?) cyrillic
+        1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,0x0401,0x0451,
+        // (?) arabic
+        0x067E,0x0679,0x0686,0x0698,0x0688,0x06AF,0x06A9,0x0691,0x06BA,0x060C,0x06BE,0x061B,0x061F,0x06C1,0x0621,0x0622,0x0623,0x0624,0x0625,0x0626,0x0627,0x0628,0x0629,0x062A,0x062B,0x062C,0x062D,0x062E,0x062F,0x0630,0x0631,0x0632,0x0633,0x0634,0x0635,0x0636,0x0637,0x0638,0x0639,0x063A,0x0640,0x0641,0x0642,0x0643,0x0644,0x0645,0x0646,0x0647,0x0648,0x0649,0x064A,0x064B,0x064C,0x064D,0x064E,0x064F,0x0650,0x0651,0x0652,0x06D2,
+        // (!) it's `end of array` indicator
+        0
+    };
+
+    // (?) for most used fonts we need to define some of unicode glyphs too
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT );
-    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9, 0, 32, 1105 ); // allowed code points range is 0..65532
-    m_pSmallFont   = (CGUIFont_Impl*) CreateFnt ( "default-small",  szFont, 7, 0, 32, 1105 ); // allowed code points range is 0..65532
+    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, uiGlyphs, 9, 0 ); // (!) allowed code points range is 0..65532
+    m_pSmallFont   = (CGUIFont_Impl*) CreateFnt ( "default-small",  szFont, uiGlyphs, 7, 0 ); // (!) allowed code points range is 0..65532
 
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT_BOLD );
-    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8, 0, 32, 1105 ); // allowed code points range is 0..65532
+    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, uiGlyphs, 8, 0 ); // (!) allowed code points range is 0..65532
 
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_CLEAR_FONT );
-    m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9, 0, 32, 1105 ); // allowed code points range is 0..64258
+    m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, uiGlyphs, 9, 0 ); // (!) allowed code points range is 0..64258
 
-    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 32, 127, true ); // allowed code points range is 0..61442
-
-    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 32, 127, true ); // allowed code points range is 0..8221
-
-    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 32, 127, false ); // allowed code points range is 0..64258
-    // ACHTUNG: These font creations can throw exceptions!
-    // ACHTUNG: Client don't even started if any font has wrong start/end code points.
- 
+    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, uiGlyphs, CGUI_SA_HEADER_SIZE, 0, true ); // (!) allowed code points range is 0..61442
+    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, uiGlyphs, CGUI_SA_GOTHIC_SIZE, 0, true ); // (!) allowed code points range is 0..8221
+    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, uiGlyphs, CGUI_MTA_SANS_FONT_SIZE, 0, false ); // (!) allowed code points range is 0..64258
+    // (!) ACHTUNG: These font creations can throw exceptions!
+    // - Load our fonts
 
     // Load bluescheme
     CEGUI::SchemeManager::getSingleton().loadScheme("cgui/CGUI.xml");
@@ -251,7 +264,7 @@ bool CGUI_Impl::GetGUIInputEnabled ( void )
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
 {
-    if ( ulCharacter < 128 ) // we have any char from ASCII 
+    if ( ulCharacter < 127 ) // we have any char from ASCII 
     {
         // injecting as is
         m_pSystem->injectChar( ulCharacter );
@@ -307,9 +320,9 @@ CGUIEdit* CGUI_Impl::_CreateEdit ( CGUIElement_Impl* pParent, const char* szText
 }
 
 
-CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int uFirstCodePoint, unsigned int uLastCodePoint, bool bAutoScale )
+CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int* uiGlyphs, unsigned int uSize, unsigned int uFlags, bool bAutoScale )
 {
-    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, uFirstCodePoint, uLastCodePoint, bAutoScale );
+    return new CGUIFont_Impl ( this, szFontName, szFontFile, uiGlyphs, uSize, uFlags, bAutoScale );
 }
 
 

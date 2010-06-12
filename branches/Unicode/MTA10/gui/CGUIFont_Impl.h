@@ -20,7 +20,7 @@
 class CGUIFont_Impl : public CGUIFont
 {
 public:
-                            CGUIFont_Impl           ( class CGUI_Impl* pManager, const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uFirstCodePoint = 32, unsigned int uLastCodePoint = 127, bool bAutoScale = false );
+                            CGUIFont_Impl           ( class CGUI_Impl* pManager, const char* szFontName, const char* szFontFile, unsigned int* uiGlyphs, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false );
                             ~CGUIFont_Impl          ( void );
 
     void                    SetAntiAliasingEnabled  ( bool bAntialiased );
