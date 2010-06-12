@@ -380,7 +380,7 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
                 {
                     const char* szValue = va_arg( vl, const char* );
                     assert ( szValue );
-                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue ).c_str () );
+                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue, true, false ).c_str () );
                 }
                 break;
 
@@ -401,7 +401,7 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
                     // If can't match type, assume it's a string
                     const char* szValue = (const char*)ptype;
                     assert ( szValue );
-                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue ).c_str () );
+                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue, true, false ).c_str () );
                 }
                 break;
             }

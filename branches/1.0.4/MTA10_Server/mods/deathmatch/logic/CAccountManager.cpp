@@ -312,12 +312,35 @@ bool CAccountManager::Load( const char* szFileName )
     //Initialize all our variables
     SString strName, strPassword, strSerial, strIP;
     int iUserID = 0;
+    m_iAccounts = 0;
     CAccount* pAccount = NULL;
     for ( int i = 0 ; i < iResults ; i++ )
     {
         //Fill User ID, Name & Password (Required data)
         iUserID = result.Data[i][0].nVal;
         strName = (char *)result.Data[i][1].pVal;
+
+        // Check for overlong names and incorrect escapement
+        bool bChanged = false;
+        if ( strName.length () > 64 )
+        {
+            // Try to repair name
+            if ( strName.length () <= 256 )
+            {
+                strName = strName.ReplaceSubString ( "\"\"", "\"" ).substr ( 0, 64 );
+                bChanged = true;
+            }
+
+            // If name gone doolally or account with this name already exists, remove account
+            if ( strName.length () > 256 || Get ( strName, true ) )
+            {
+                m_pSaveFile->Query ( "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
+                m_pSaveFile->Query ( "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+                CLogger::LogPrintf ( "Removed duplicate or damaged account for %s\n", strName.substr ( 0, 64 ).c_str() );
+                continue;
+            }
+        }
+
         strPassword = "";
         // If we have an password
         if ( result.Data[i][2].pVal )
@@ -342,8 +365,9 @@ bool CAccountManager::Load( const char* szFileName )
             //Create a new account with the specified information
             pAccount = new CAccount ( this, true, strName, strPassword, "", iUserID );
         }
+        pAccount->SetChanged ( bChanged );
+        m_iAccounts = Max ( m_iAccounts, iUserID );
     }
-    m_iAccounts = iUserID;
     return true;
 }
 
