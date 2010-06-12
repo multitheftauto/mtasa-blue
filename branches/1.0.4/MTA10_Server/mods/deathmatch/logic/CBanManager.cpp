@@ -20,6 +20,7 @@ CBanManager::CBanManager ( void )
 {
     m_strPath = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "banlist.xml" );
     m_tUpdate = 0;
+    m_bAllowSave = false;
 }
 
 
@@ -357,6 +358,8 @@ unsigned int CBanManager::GetBansWithBanner ( const char* szBanner )
 
 bool CBanManager::LoadBanList ( void )
 {
+    m_bAllowSave = true;
+
     // Create the XML
     CXMLFile* pFile = g_pServerInterface->GetXML ()->CreateXML ( m_strPath );
     if ( !pFile )
@@ -434,6 +437,10 @@ bool CBanManager::LoadBanList ( void )
 
 void CBanManager::SaveBanList ( void )
 {
+    // Only allow save after a load was attempted
+    if ( !m_bAllowSave )
+        return;
+
     // Create the XML file
     CXMLFile* pFile = g_pServerInterface->GetXML ()->CreateXML ( m_strPath );
     if ( pFile )
