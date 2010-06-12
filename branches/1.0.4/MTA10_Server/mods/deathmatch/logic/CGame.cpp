@@ -231,9 +231,6 @@ void CGame::HandleInput ( char* szCommand )
 
 void CGame::DoPulse ( void )
 {
-    if ( m_pHTTPD )
-        m_pHTTPD->DoPulse ();
-
     // Lock the critical section so http server won't interrupt in the middle of our pulse
     Lock ();
     // Calculate FPS
