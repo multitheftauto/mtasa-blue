@@ -33,6 +33,7 @@ public:
                                  HttpResponse * ipoHttpResponse );
     void         HttpPulse     ( void );
     
+    void                        DoPulse    ( void );
     bool                        StartHTTPD ( const char* szIP, unsigned int port );
     inline void                 SetResource ( CResource * resource ) { m_resource = resource; }
     inline CResource *          GetResource ( void ) { return m_resource; }

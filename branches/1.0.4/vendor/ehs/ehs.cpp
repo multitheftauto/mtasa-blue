@@ -26,6 +26,14 @@ This can be found in the 'COPYING' file.
 #include "ehs.h"
 #include <fstream>
 
+#ifndef WITH_EHS_THREADING
+    // Remove all locks if no threading going on
+    #undef MUTEX_LOCK
+    #undef MUTEX_UNLOCK
+    #define MUTEX_LOCK(a)
+    #define MUTEX_UNLOCK(a)
+#endif
+
 int EHSServer::CreateFdSet ( )
 {
 
@@ -475,6 +483,9 @@ EHSServer::EHSServer ( EHS * ipoTopLevelEHS ///< pointer to top-level EHS for re
 		return;
 	}
 
+#ifndef WITH_EHS_THREADING
+	assert ( roEHSServerParameters [ "mode" ] == "singlethreaded" );
+#endif
 
 	if ( roEHSServerParameters [ "mode" ] == "threadpool" ) {
 
@@ -976,7 +987,7 @@ void EHSServer::CheckClientSockets ( )
 			if ( nBytesReceived <= 0 ) {
 
 				// we're done reading and we received a disconnect
-				(*i)->DoneReading ( true );
+                (*i)->DoneReading ( true );
 
 			}
 			// otherwise we got data

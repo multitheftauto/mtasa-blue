@@ -68,7 +68,7 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
             parameters[ "bindip" ] = (long) INADDR_ANY;
         }
 
-        parameters[ "mode" ] = "threadpool";        // or "singlethreaded"/"threadpool"
+        parameters[ "mode" ] = "singlethreaded";        // or "singlethreaded"/"threadpool"
         parameters[ "threadcount" ] = 5;                // unnecessary because 1 is the default
 
         bResult = ( StartServer ( parameters ) == STARTSERVER_SUCCESS );
@@ -201,9 +201,13 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
     return m_pGuestAccount;
 }
 
+void CHTTPD::DoPulse ( void )
+{
+    EHS::HandleData ( 0 );
+}
+
 void CHTTPD::HttpPulse ( void )
 {
-
     long long llExpireTime = GetTickCount64_ () - 1000 * 60 * 5;    // 5 minute timeout
 
     map < string, long long > :: iterator iter = m_LoggedInMap.begin ();
