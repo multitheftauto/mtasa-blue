@@ -120,11 +120,11 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_font",                    (unsigned int &)Font ); SetChatFont ( (eChatFont)Font );
 
     // Modify default chat box to be like 'Transparent' preset
-    bool bVal = false;
-    CVARS_GET ( "chat_done_default_upgrade", bVal );
-    if ( !bVal )
+    SString strFlags;
+    CVARS_GET ( "fixup_flags", strFlags );
+    if ( strFlags.find ( "-cb" ) == std::string::npos )
     {
-        CVARS_SET ( "chat_done_default_upgrade", true );
+        CVARS_SET ( "fixup_flags", strFlags + "-cb" );
 
         if ( Font                       == 0                            // chat_font
              && m_uiNumLines            == 7                            // chat_lines
@@ -145,6 +145,21 @@ void CChat::LoadCVars ( void )
             CVARS_SET ( "chat_lines",                   10 );
             CVARS_SET ( "chat_width",                   1.5f );
             LoadCVars ();
+        }
+    }
+
+    // Fix mapalpha being set incorrectly in 1.0.4-9.1752.1
+    CVARS_GET ( "fixup_flags", strFlags );
+    if ( strFlags.find ( "-ma" ) == std::string::npos )
+    {
+        CVARS_SET ( "fixup_flags", strFlags + "-ma" );
+
+        int iVar = -1;
+        CVARS_GET ( "mapalpha", iVar );
+        if ( iVar < 3 )
+        {
+            iVar = 155;
+            CVARS_SET ( "mapalpha", iVar );
         }
     }
 }
