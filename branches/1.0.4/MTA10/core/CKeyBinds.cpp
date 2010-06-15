@@ -239,7 +239,9 @@ SDefaultCommandBind g_dcbDefaultCommands[] =
     { "pgup",    true,  "debugscrollup",    "1" },
     { "pgup",    false, "debugscrollup",    "0" },
     { "pgdn",    true,  "debugscrolldown",  "-1" },
-    { "pgdn",    false, "debugscrolldown",  "0" }
+    { "pgdn",    false, "debugscrolldown",  "0" },
+
+    { "", false, NULL, NULL }
 };
 
 // HACK: our current shift key states
@@ -2489,7 +2491,7 @@ void CKeyBinds::LoadDefaultCommands ( bool bForce )
     for ( int i = 0 ; *g_dcbDefaultCommands [ i ].szKey != NULL ; i++ )
     {
         SDefaultCommandBind* temp = &g_dcbDefaultCommands [ i ];
-        if ( bForce || !CommandExists ( temp->szKey, temp->szCommand, true, temp->bState ) )
+        if ( bForce || !CommandExists ( NULL, temp->szCommand, true, temp->bState, temp->szArguments ) )
             AddCommand ( temp->szKey, temp->szCommand, temp->szArguments, temp->bState );
     }
 }
