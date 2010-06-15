@@ -898,11 +898,13 @@ void CSettings::ProcessKeyBinds ( void )
 {
     CKeyBindsInterface *pKeyBinds = CCore::GetSingleton ().GetKeyBinds ();
 
+    SString strResource;
+
     // Loop through every row in the binds list
     for ( int i = 0; i < m_pBindsList->GetRowCount (); i++ )
     {
         // Get the type and keys
-        unsigned char ucType = reinterpret_cast < unsigned char > ( m_pBindsList->GetItemData ( i, m_hBind ) );        
+        unsigned char ucType = reinterpret_cast < unsigned char > ( m_pBindsList->GetItemData ( i, m_hBind ) );
         char* szPri = m_pBindsList->GetItemText ( i, m_hPriKey );
         const SBindableKey* pPriKey = szPri ? pKeyBinds->GetBindableFromKey ( szPri ) : NULL;
         const SBindableKey* pSecKeys[SecKeyNum];
@@ -911,9 +913,13 @@ void CSettings::ProcessKeyBinds ( void )
             char* szSec = m_pBindsList->GetItemText ( i, m_hSecKeys[k] );
             pSecKeys[k] = szSec ? pKeyBinds->GetBindableFromKey ( szSec ) : NULL;
         }
-        
+        // If it is a resource name
+        if ( ucType == 255 )
+        {
+            strResource = m_pBindsList->GetItemText ( i, m_hBind );
+        }
         // If the type is control
-        if ( ucType == KEY_BIND_GTA_CONTROL )
+        else if ( ucType == KEY_BIND_GTA_CONTROL )
         {            
             // Get the previous bind
             CGTAControlBind* pBind = reinterpret_cast < CGTAControlBind* > ( m_pBindsList->GetItemData ( i, m_hPriKey ) );
@@ -1019,7 +1025,10 @@ void CSettings::ProcessKeyBinds ( void )
             // If there was no keybind for this command, create it
             else if ( pPriKey )
             {
-                pKeyBinds->AddCommand ( pPriKey, szCommand, szArguments );
+                if ( strResource.empty() )
+                    pKeyBinds->AddCommand ( pPriKey, szCommand, szArguments );
+                else
+                    pKeyBinds->AddCommand ( pPriKey->szKey, szCommand, szArguments, true, strResource.c_str () );
             }
 
             /** Secondary keybinds **/
@@ -1058,12 +1067,16 @@ void CSettings::ProcessKeyBinds ( void )
                 // If this key bind didn't exist, create it
                 else if ( pSecKeys[k] )
                 {
-                    pKeyBinds->AddCommand ( pSecKeys[k], szCommand, szArguments );
+                    if ( strResource.empty() )
+                        pKeyBinds->AddCommand ( pSecKeys[k], szCommand, szArguments );
+                    else
+                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, szArguments, true, strResource.c_str (), true );
+
                     // Also add a matching "up" state if applicable
                     CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pPriKey->szKey, true, false );
                     if ( pUpBind )
                     {
-                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, pUpBind->szArguments, false, pUpBind->szResource );
+                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, pUpBind->szArguments, false, pUpBind->szResource, true );
                     }
                 }
             }
@@ -1345,7 +1358,7 @@ void CSettings::Initialize ( void )
     struct SListedCommand
     {
         int iIndex;
-        CKeyBind* pBind;
+        CCommandBind* pBind;
         unsigned int uiMatchCount;
     };
 
@@ -1356,37 +1369,33 @@ void CSettings::Initialize ( void )
     list < CKeyBind* > ::const_iterator iter = pKeyBinds->IterBegin ();
     for ( unsigned int uiIndex = 0 ; iter != pKeyBinds->IterEnd (); iter++, uiIndex++ )
     {
-        eKeyBindType bindType = (*iter)->GetType ();
         // keys bound to a console command or a function (we don't show keys bound 
         // from gta controls by scripts as these are clearly not user editable)
-        if ( bindType == KEY_BIND_COMMAND || bindType == KEY_BIND_FUNCTION )
+        if ( (*iter)->GetType () == KEY_BIND_COMMAND )
         {
-            CKeyBindWithState * pBind = reinterpret_cast < CKeyBindWithState* > ( *iter );
-            if ( pBind->bHitState )
+            CCommandBind* pCommandBind = reinterpret_cast < CCommandBind* > ( *iter );
+            if ( pCommandBind->bHitState )
             {
                 bool bFoundMatches = false;
                 // Loop through the already listed array of commands for matches
                 for ( unsigned int i = 0 ; i < uiNumListedCommands ; i++ )
                 {
                     SListedCommand* pListedCommand = &listedCommands [ i ];
-                    CKeyBind* pListedBind = pListedCommand->pBind;
-                    bool bMatched = false;
-                    if ( pListedBind->GetType() == pBind->GetType() )
+                    CCommandBind* pListedBind = pListedCommand->pBind;
+                    if ( !strcmp ( pListedBind->szCommand, pCommandBind->szCommand ) )
                     {
-                        // Jax: TODO: rewrite? :S
-                    }
-
-                    // If we found a 1st match, add it to the secondary section
-                    if ( bMatched )
-                    {
-                        bFoundMatches = true;
-                        for ( int k = 0 ; k < SecKeyNum ; k++ )
-                            if ( pListedCommand->uiMatchCount == k )
-                            {
-                                m_pBindsList->SetItemText ( pListedCommand->iIndex, m_hSecKeys[k], pBind->boundKey->szKey );
-                                m_pBindsList->SetItemData ( pListedCommand->iIndex, m_hSecKeys[k], pBind );
-                            }
-                        pListedCommand->uiMatchCount++;
+                        if ( !pListedBind->szArguments || ( pCommandBind->szArguments && !strcmp ( pListedBind->szArguments, pCommandBind->szArguments ) ) )
+                        {
+                            // If we found a 1st match, add it to the secondary section
+                            bFoundMatches = true;
+                            for ( int k = 0 ; k < SecKeyNum ; k++ )
+                                if ( pListedCommand->uiMatchCount == k )
+                                {
+                                    m_pBindsList->SetItemText ( pListedCommand->iIndex, m_hSecKeys[k], pCommandBind->boundKey->szKey );
+                                    m_pBindsList->SetItemData ( pListedCommand->iIndex, m_hSecKeys[k], pCommandBind );
+                                }
+                            pListedCommand->uiMatchCount++;
+                        }
                     }
                 }
 
@@ -1396,61 +1405,55 @@ void CSettings::Initialize ( void )
                     unsigned int row = iGameRowCount + 1;
                     // Combine command and arguments
                     SString strDescription;
-                    bool bSkip = true;
-                    if ( bindType == KEY_BIND_COMMAND )
+                    bool bSkip = false;
+                    if ( pCommandBind->szResource )
                     {
-                        CCommandBind* pCommandBind = reinterpret_cast < CCommandBind* > ( *iter );
-                        bSkip = false;
-                        if ( pCommandBind->szResource )
+                        if ( pCommandBind->bActive )
                         {
-                            if ( pCommandBind->bActive )
+                            const char* szResource = pCommandBind->szResource;
+                            std::string strResource = szResource;
+                            if ( iResourceItems.count(strResource) == 0 )
                             {
-                                const char* szResource = pCommandBind->szResource;
-                                std::string strResource = szResource;
-                                if ( iResourceItems.count(strResource) == 0 )
-                                {
-                                    iBind = m_pBindsList->InsertRowAfter ( m_pBindsList->GetRowCount() );
-                                    m_pBindsList->SetItemText ( iBind, m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true );
-                                    
-                                    iBind = m_pBindsList->InsertRowAfter ( iBind );
-                                    m_pBindsList->SetItemText ( iBind, m_hBind, szResource, false, true );
-                                    iResourceItems.insert( make_pair(strResource, iBind ) );
-                                }
-                                row = iResourceItems[strResource];
-                                iMultiplayerRowCount++;
+                                iBind = m_pBindsList->AddRow ( true );
+                                m_pBindsList->SetItemText ( iBind, m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true );
+
+                                iBind = m_pBindsList->AddRow ( true );
+                                m_pBindsList->SetItemText ( iBind, m_hBind, szResource, false, true );
+                                m_pBindsList->SetItemData ( iBind, m_hBind, (void*) 255 );
+                                iResourceItems.insert( make_pair(strResource, iBind ) );
                             }
-                            else
-                            {
-                                bSkip = true;
-                            }
-                        }
-                        if ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' )
-                        {
-                            strDescription.Format ( "%s: %s", pCommandBind->szCommand, pCommandBind->szArguments );
+                            row = iResourceItems[strResource];
                             iMultiplayerRowCount++;
                         }
                         else
-                        {
-                            strDescription = pCommandBind->szCommand;
-                            iMultiplayerRowCount++;
-                        }
-                    }                    
+                            continue;
+                    }
+                    if ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' )
+                    {
+                        strDescription.Format ( "%s: %s", pCommandBind->szCommand, pCommandBind->szArguments );
+                        iMultiplayerRowCount++;
+                    }
+                    else
+                    {
+                        strDescription = pCommandBind->szCommand;
+                        iMultiplayerRowCount++;
+                    }
 
                     if ( !bSkip )
                     {
                         // Add the bind to the list
-                        iBind = m_pBindsList->InsertRowAfter ( row );
+                        iBind = m_pBindsList->AddRow ( true );
                         m_pBindsList->SetItemText ( iBind, m_hBind, strDescription );
-                        m_pBindsList->SetItemText ( iBind, m_hPriKey, pBind->boundKey->szKey );
+                        m_pBindsList->SetItemText ( iBind, m_hPriKey, pCommandBind->boundKey->szKey );
                         for ( int k = 0 ; k < SecKeyNum ; k++ )
                             m_pBindsList->SetItemText ( iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY );
-                        m_pBindsList->SetItemData ( iBind, m_hBind, (void*) bindType );
-                        m_pBindsList->SetItemData ( iBind, m_hPriKey, pBind );
+                        m_pBindsList->SetItemData ( iBind, m_hBind, (void*) KEY_BIND_COMMAND );
+                        m_pBindsList->SetItemData ( iBind, m_hPriKey, pCommandBind );
 
                         // Add it to the already-listed array
                         SListedCommand* pListedCommand = &listedCommands [ uiNumListedCommands ];
                         pListedCommand->iIndex = iBind;
-                        pListedCommand->pBind = pBind;
+                        pListedCommand->pBind = pCommandBind;
                         pListedCommand->uiMatchCount = 0;
                         uiNumListedCommands++;
                     }
