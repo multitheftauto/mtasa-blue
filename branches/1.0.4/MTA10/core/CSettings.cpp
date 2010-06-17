@@ -902,7 +902,7 @@ void CSettings::ProcessKeyBinds ( void )
     for ( int i = 0; i < m_pBindsList->GetRowCount (); i++ )
     {
         // Get the type and keys
-        unsigned char ucType = reinterpret_cast < unsigned char > ( m_pBindsList->GetItemData ( i, m_hBind ) );        
+        unsigned char ucType = reinterpret_cast < unsigned char > ( m_pBindsList->GetItemData ( i, m_hBind ) );
         char* szPri = m_pBindsList->GetItemText ( i, m_hPriKey );
         const SBindableKey* pPriKey = szPri ? pKeyBinds->GetBindableFromKey ( szPri ) : NULL;
         const SBindableKey* pSecKeys[SecKeyNum];
@@ -1019,7 +1019,7 @@ void CSettings::ProcessKeyBinds ( void )
             // If there was no keybind for this command, create it
             else if ( pPriKey )
             {
-                pKeyBinds->AddCommand ( pPriKey, szCommand, szArguments );
+                    pKeyBinds->AddCommand ( pPriKey, szCommand, szArguments );
             }
 
             /** Secondary keybinds **/
@@ -1058,7 +1058,7 @@ void CSettings::ProcessKeyBinds ( void )
                 // If this key bind didn't exist, create it
                 else if ( pSecKeys[k] )
                 {
-                    pKeyBinds->AddCommand ( pSecKeys[k], szCommand, szArguments );
+                        pKeyBinds->AddCommand ( pSecKeys[k], szCommand, szArguments );
                     // Also add a matching "up" state if applicable
                     CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pPriKey->szKey, true, false );
                     if ( pUpBind )
@@ -1378,17 +1378,17 @@ void CSettings::Initialize ( void )
 
                     // If we found a 1st match, add it to the secondary section
                     if ( bMatched )
-                    {
-                        bFoundMatches = true;
-                        for ( int k = 0 ; k < SecKeyNum ; k++ )
-                            if ( pListedCommand->uiMatchCount == k )
-                            {
+                        {
+                            bFoundMatches = true;
+                            for ( int k = 0 ; k < SecKeyNum ; k++ )
+                                if ( pListedCommand->uiMatchCount == k )
+                                {
                                 m_pBindsList->SetItemText ( pListedCommand->iIndex, m_hSecKeys[k], pBind->boundKey->szKey );
                                 m_pBindsList->SetItemData ( pListedCommand->iIndex, m_hSecKeys[k], pBind );
-                            }
-                        pListedCommand->uiMatchCount++;
+                                }
+                            pListedCommand->uiMatchCount++;
+                        }
                     }
-                }
 
                 // If there weren't any matches
                 if ( !bFoundMatches )
@@ -1401,39 +1401,39 @@ void CSettings::Initialize ( void )
                     {
                         CCommandBind* pCommandBind = reinterpret_cast < CCommandBind* > ( *iter );
                         bSkip = false;
-                        if ( pCommandBind->szResource )
+                    if ( pCommandBind->szResource )
+                    {
+                        if ( pCommandBind->bActive )
                         {
-                            if ( pCommandBind->bActive )
+                            const char* szResource = pCommandBind->szResource;
+                            std::string strResource = szResource;
+                            if ( iResourceItems.count(strResource) == 0 )
                             {
-                                const char* szResource = pCommandBind->szResource;
-                                std::string strResource = szResource;
-                                if ( iResourceItems.count(strResource) == 0 )
-                                {
                                     iBind = m_pBindsList->InsertRowAfter ( m_pBindsList->GetRowCount() );
-                                    m_pBindsList->SetItemText ( iBind, m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true );
-                                    
+                                m_pBindsList->SetItemText ( iBind, m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true );
+
                                     iBind = m_pBindsList->InsertRowAfter ( iBind );
-                                    m_pBindsList->SetItemText ( iBind, m_hBind, szResource, false, true );
-                                    iResourceItems.insert( make_pair(strResource, iBind ) );
-                                }
-                                row = iResourceItems[strResource];
-                                iMultiplayerRowCount++;
+                                m_pBindsList->SetItemText ( iBind, m_hBind, szResource, false, true );
+                                iResourceItems.insert( make_pair(strResource, iBind ) );
                             }
-                            else
-                            {
-                                bSkip = true;
-                            }
-                        }
-                        if ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' )
-                        {
-                            strDescription.Format ( "%s: %s", pCommandBind->szCommand, pCommandBind->szArguments );
+                            row = iResourceItems[strResource];
                             iMultiplayerRowCount++;
                         }
                         else
-                        {
-                            strDescription = pCommandBind->szCommand;
-                            iMultiplayerRowCount++;
-                        }
+                            {
+                                bSkip = true;
+                            }
+                    }
+                    if ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' )
+                    {
+                        strDescription.Format ( "%s: %s", pCommandBind->szCommand, pCommandBind->szArguments );
+                        iMultiplayerRowCount++;
+                    }
+                    else
+                    {
+                        strDescription = pCommandBind->szCommand;
+                        iMultiplayerRowCount++;
+                    }
                     }                    
 
                     if ( !bSkip )
@@ -1759,20 +1759,10 @@ void CSettings::LoadData ( void )
 
     // Map alpha
     CVARS_GET ( "mapalpha", iVar);
-    
-    if (iVar >= 0 && iVar<= 255)
-    {
-        int iAlphaPercent = ceil( ( (float)iVar / 255 ) * 100 );
-        m_pMapAlphaValueLabel->SetText ( SString("%i%%", iAlphaPercent).c_str() );
-        float sbPos = (float)iAlphaPercent / 100.0f;
-        m_pMapAlpha->SetScrollPosition ( sbPos );
-    }
-    else
-    {
-        CVARS_SET ( "mapalpha", 155 );
-        m_pMapAlphaValueLabel->SetText ( "60%" ); // ~155 Alpha
-        m_pMapAlpha->SetScrollPosition ( 0.6f );
-    }
+    int iAlphaPercent = ceil( ( (float)Clamp ( 0, iVar, 255 ) / 255 ) * 100 );
+    m_pMapAlphaValueLabel->SetText ( SString("%i%%", iAlphaPercent).c_str() );
+    float sbPos = (float)iAlphaPercent / 100.0f;
+    m_pMapAlpha->SetScrollPosition ( sbPos );
 
     // Chat
     LoadChatColorFromCVar ( ChatColorType::CHAT_COLOR_BG, "chat_color" );
