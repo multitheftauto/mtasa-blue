@@ -706,6 +706,7 @@ DontInstallRedist:
 		
 		;Only overwrite the following files if previous versions were bugged and explicitly need replacing
 		!insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "711185d8f4ebb355542053ce408b82b3"
+		!insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "706869E53F508919F987A2F7F2653AD2"
 
 		SetOverwrite off
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\acl.xml"
@@ -807,6 +808,7 @@ DontInstallRedist:
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-canals.zip"
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-arena1.zip"
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-smallville.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\dm-port69.zip"
 			SectionEnd
 			Section "Element browser Utility"
 			SectionIn 1 2
@@ -903,6 +905,7 @@ DontInstallRedist:
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-vinewoodblastaround.zip"
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race-wuzimu.zip"
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\mapratings.zip"
+				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_delay_indicator.zip"
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_nos.zip"
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_racewar.zip"
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\race_toptimes.zip"
