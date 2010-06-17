@@ -2788,8 +2788,8 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
             pCamera->SetMode ( CAMERAMODE_PLAYER );
             if ( pTarget )
                 pCamera->SetTarget ( pTarget );
-            else
-               CLogger::LogPrintf ( "INTERNAL ERROR: Camera sync packet with invalid target\n" );
+            //else
+            //   CLogger::LogPrintf ( "INTERNAL ERROR: Camera sync packet with invalid target\n" );
         }
     }
 }
