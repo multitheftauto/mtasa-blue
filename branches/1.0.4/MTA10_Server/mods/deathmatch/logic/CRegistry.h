@@ -25,7 +25,7 @@ struct CRegistryResult;
 
 class CRegistry
 {
-    friend CRegistryManager;
+    friend class CRegistryManager;
                                 CRegistry               ( const std::string& strFileName );
                                 ~CRegistry              ( void );
 public:
