@@ -25,9 +25,10 @@ struct CRegistryResult;
 
 class CRegistry
 {
-public:
+    friend CRegistryManager;
                                 CRegistry               ( const std::string& strFileName );
                                 ~CRegistry              ( void );
+public:
 
     void                        Load                    ( const std::string& strFileName );
 
@@ -45,17 +46,16 @@ public:
 
     const std::string&          GetLastError            ( void ) { return m_strLastError; }
 
-    void                        BeginTransaction        ( void );
-    void                        EndTransaction          ( bool bEndAllOutstanding = false );
-
 protected:
 
     bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, va_list vl );
     bool                        QueryInternal           ( const char* szQuery, CRegistryResult* pResult );
+    void                        BeginAutomaticTransaction ( void );
+    void                        EndAutomaticTransaction ( void );
 
     sqlite3                     *m_db;
     bool                        m_bOpened;
-    int                         m_iTransactionCount;
+    bool                        m_bInAutomaticTransaction;
 
 private:
     bool                        Query                   ( const char* szQuery, CRegistryResult* pResult );  // Not defined to catch incorrect usage
