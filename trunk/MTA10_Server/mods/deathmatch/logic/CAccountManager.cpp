@@ -27,7 +27,7 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     m_iAccounts = 1;
 
     //Create our database
-    m_pSaveFile = new CRegistry ( "" );
+    m_pSaveFile = g_pGame->GetRegistryManager ()->OpenRegistry ( "" );
 
     //Load internal.db
     m_pSaveFile->Load ( strBuffer );
@@ -103,15 +103,13 @@ CAccountManager::~CAccountManager ( void )
     //Save everything
     Save ();
     //Delete our save file
-    delete m_pSaveFile;
+    g_pGame->GetRegistryManager ()->CloseRegistry ( m_pSaveFile );
     RemoveAll ();
 }
 
 
 void CAccountManager::DoPulse ( void )
 {
-    m_pSaveFile->EndTransaction ( true );   // Flush any SetAccountData() calls
-
     // Save it only once in a while whenever something has changed
     if ( m_bChangedSinceSaved &&
          GetTickCount64_ () > m_llLastTimeSaved + 15000 )
@@ -175,8 +173,6 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
 
     if ( pParent )
     {
-        m_pSaveFile->BeginTransaction ();
-
         CXMLNode* pAccountNode = NULL;
         unsigned int uiAccountNodesCount = pParent->GetSubNodeCount ();
         for ( unsigned int i = 0 ; i < uiAccountNodesCount ; i++ )
@@ -292,7 +288,6 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
         SaveSettings();
         CLogger::LogPrint ( "Conversion Complete.\n" );
         m_bChangedSinceSaved = false;
-        m_pSaveFile->EndTransaction ();
         return true;
     }
 
@@ -312,12 +307,37 @@ bool CAccountManager::Load( const char* szFileName )
     //Initialize all our variables
     SString strName, strPassword, strSerial, strIP;
     int iUserID = 0;
+    m_iAccounts = 0;
+    bool bNeedsVacuum = false;
     CAccount* pAccount = NULL;
     for ( int i = 0 ; i < iResults ; i++ )
     {
         //Fill User ID, Name & Password (Required data)
         iUserID = result.Data[i][0].nVal;
         strName = (char *)result.Data[i][1].pVal;
+
+        // Check for overlong names and incorrect escapement
+        bool bChanged = false;
+        if ( strName.length () > 64 )
+        {
+            // Try to repair name
+            if ( strName.length () <= 256 )
+            {
+                strName = strName.ReplaceSubString ( "\"\"", "\"" ).substr ( 0, 64 );
+                bChanged = true;
+            }
+
+            // If name gone doolally or account with this name already exists, remove account
+            if ( strName.length () > 256 || Get ( strName, true ) )
+            {
+                m_pSaveFile->Query ( "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
+                m_pSaveFile->Query ( "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+                bNeedsVacuum = true;
+                CLogger::LogPrintf ( "Removed duplicate or damaged account for %s\n", strName.substr ( 0, 64 ).c_str() );
+                continue;
+            }
+        }
+
         strPassword = "";
         // If we have an password
         if ( result.Data[i][2].pVal )
@@ -342,8 +362,11 @@ bool CAccountManager::Load( const char* szFileName )
             //Create a new account with the specified information
             pAccount = new CAccount ( this, true, strName, strPassword, "", iUserID );
         }
+        pAccount->SetChanged ( bChanged );
+        m_iAccounts = Max ( m_iAccounts, iUserID );
     }
-    m_iAccounts = iUserID;
+    if ( bNeedsVacuum )
+        m_pSaveFile->Query ( "VACUUM" );
     return true;
 }
 
@@ -395,13 +418,9 @@ void CAccountManager::Save ( CAccount* pAccount )
 
 bool CAccountManager::Save ( const char* szFileName )
 {
-    m_pSaveFile->EndTransaction ( true );   // Flush any SetAccountData() calls
-
     // Attempted save now
     m_bChangedSinceSaved = false;
     m_llLastTimeSaved = GetTickCount64_ ();
-
-    m_pSaveFile->BeginTransaction ();
 
     list < CAccount* > ::iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
@@ -413,8 +432,6 @@ bool CAccountManager::Save ( const char* szFileName )
         }
     }
 
-    m_pSaveFile->EndTransaction ();
-    
     //Get the time took to save
     long long llDeltaTime = GetTickCount64_ () - m_llLastTimeSaved;
     //Greater than five seconds?
@@ -723,8 +740,6 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
 
 CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, char* szKey )
 {
-    m_pSaveFile->EndTransaction ( true );   // Flush any SetAccountData() calls
-
     //Get the user ID
     int iUserID = pAccount->GetID();
     //create a new registry result for the query return
@@ -762,8 +777,6 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString s
     if ( iType != LUA_TSTRING && iType != LUA_TNUMBER && iType != LUA_TBOOLEAN && iType != LUA_TNIL )
         return false;
 
-    m_pSaveFile->BeginTransaction ();   // Batch successive SetAccountData() calls
-
     //Get the user ID
     int iUserID = pAccount->GetID();
     SString strKey = szKey;
@@ -793,8 +806,6 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString s
 
 bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAccount )
 {
-    m_pSaveFile->EndTransaction ( true );   // Flush any SetAccountData() calls
-
     //Get the user ID of the from account
     int iUserID = pFromAccount->GetID();
     //create a new registry result for the from account query return value

@@ -198,6 +198,7 @@
 #include "CRadarArea.h"
 #include "CRadarAreaManager.h"
 #include "CRegisteredCommands.h"
+#include "CRegistryManager.h"
 #include "CRegistry.h"
 #include "CRemoteCalls.h"
 #include "CResource.h"

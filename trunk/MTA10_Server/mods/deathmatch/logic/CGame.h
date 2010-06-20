@@ -85,6 +85,7 @@ class CPlayer;
 class CPlayerManager;
 class CRadarAreaManager;
 class CRegisteredCommands;
+class CRegistryManager;
 class CRegistry;
 class CRemoteCalls;
 class CResourceDownloader;
@@ -182,6 +183,7 @@ public:
     inline CUnoccupiedVehicleSync*  GetUnoccupiedVehicleSync    ( void )        { return m_pUnoccupiedVehicleSync; }
     inline CPedSync*                GetPedSync                  ( void )        { return m_pPedSync; }
     inline CConsole*                GetConsole                  ( void )        { return m_pConsole; }
+    inline CRegistryManager*        GetRegistryManager          ( void )        { return m_pRegistryManager; }
     inline CRegistry*               GetRegistry                 ( void )        { return m_pRegistry; }
     inline CAccountManager*         GetAccountManager           ( void )        { return m_pAccountManager; }
     inline CScriptDebugging*        GetScriptDebugging          ( void )        { return m_pScriptDebugging; }
@@ -299,6 +301,7 @@ private:
     CWhoWas                         m_WhoWas;
     CCommandLineParser              m_CommandLineParser;
     CRegisteredCommands*            m_pRegisteredCommands;
+    CRegistryManager*               m_pRegistryManager;
     CRegistry*                      m_pRegistry;
     CAccountManager*                m_pAccountManager;
     CPedManager*                    m_pPedManager;

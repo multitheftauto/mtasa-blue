@@ -18,7 +18,7 @@ CRegistry::CRegistry ( const std::string& strFileName )
     m_strLastError = "";
     m_db = NULL;
     m_bOpened = false;
-    m_iTransactionCount = 0;
+    m_bInAutomaticTransaction = false;
 
     Load ( strFileName );
 }
@@ -26,6 +26,7 @@ CRegistry::CRegistry ( const std::string& strFileName )
 
 CRegistry::~CRegistry ( void )
 {
+    EndAutomaticTransaction ();
     CLogger::LogPrint ( "Closing SQLite3 database\n" );
     if ( m_bOpened )
         sqlite3_close ( m_db );
@@ -67,6 +68,7 @@ bool CRegistry::Update ( const std::string& strTable, const std::string& strSet,
         strQuery += " WHERE " + strWhere;
 
     // Execute SQL
+    BeginAutomaticTransaction ();
     if ( sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, &szErrorMsg ) != SQLITE_OK )
     {
         m_strLastError = std::string ( szErrorMsg );
@@ -88,6 +90,7 @@ void CRegistry::CreateTable ( const std::string& strTable, const std::string& st
     if ( !bSilent )
         CLogger::LogPrintf ( "Creating new DB table %s\n", strTable.c_str () );
 
+    BeginAutomaticTransaction ();
     sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, NULL );
 }
 
@@ -102,6 +105,7 @@ void CRegistry::DropTable ( const std::string& strTable )
     std::string strQuery = "DROP TABLE " + strTable;
 
     CLogger::LogPrintf ( "Dropping DB table %s\n", strTable.c_str () );
+    BeginAutomaticTransaction ();
     sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, NULL );
 }
 
@@ -122,6 +126,7 @@ bool CRegistry::Insert ( const std::string& strTable, const std::string& strValu
         strQuery = "INSERT INTO " + strTable + " ( " + strColumns + " ) VALUES ( " + strValues + " )";
     }
 
+    BeginAutomaticTransaction ();
     if ( sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, &szErrorMsg ) != SQLITE_OK ) {
         m_strLastError = std::string ( szErrorMsg );
         sqlite3_free ( szErrorMsg );
@@ -142,6 +147,7 @@ bool CRegistry::Delete ( const std::string& strTable, const std::string& strWher
 
     std::string strQuery = "DELETE FROM " + strTable + " WHERE " + strWhere;
 
+    BeginAutomaticTransaction ();
     if ( sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, &szErrorMsg ) != SQLITE_OK ) {
         m_strLastError = std::string ( szErrorMsg );
         sqlite3_free ( szErrorMsg );
@@ -281,6 +287,18 @@ bool CRegistry::Query ( const std::string& strQuery, CLuaArguments *pArgs, CRegi
         }
     }
 
+    // Catch BEGIN/END/COMMIT TRANSACTION and ignore
+    SString strTest = SString ( strParsedQuery ).ToUpper ();
+    if ( strTest.find ( "TRANSACTION" ) != std::string::npos )
+    {
+        strTest = strTest.Replace ( "\t", " " ).ReplaceSubString ( "  ", " " ).TrimStart ( " " ).TrimEnd ( " " );
+        if ( strTest.find ( "BEGIN" ) == 0 || strTest.find ( "END" ) == 0 || strTest.find ( "COMMIT" ) == 0 )
+        {
+            return true;
+        }
+    }
+
+    BeginAutomaticTransaction ();
     return QueryInternal ( strParsedQuery.c_str (), pResult );
 }
 
@@ -304,26 +322,23 @@ bool CRegistry::Select ( const std::string& strColumns, const std::string& strTa
     return QueryInternal ( strQuery.c_str (), pResult );
 }
 
-void CRegistry::BeginTransaction ( void )
+void CRegistry::BeginAutomaticTransaction ( void )
 {
-    if ( m_iTransactionCount++ == 0 )
+    if ( !m_bInAutomaticTransaction )
     {
-        Query ( "BEGIN TRANSACTION" );
+        m_bInAutomaticTransaction = true;
+        CRegistryResult dummy;
+        QueryInternal ( "BEGIN TRANSACTION", &dummy );
     }
 }
 
-
-void CRegistry::EndTransaction ( bool bEndAllOutstanding )
+void CRegistry::EndAutomaticTransaction ( void )
 {
-    if ( m_iTransactionCount )
+    if ( m_bInAutomaticTransaction )
     {
-        if ( bEndAllOutstanding )
-            m_iTransactionCount = 1;
-
-        if ( --m_iTransactionCount == 0 )
-        {
-            Query ( "END TRANSACTION" );
-        }
+        m_bInAutomaticTransaction = false;
+        CRegistryResult dummy;
+        QueryInternal ( "END TRANSACTION", &dummy );
     }
 }
 
@@ -371,7 +386,7 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
 
                 case SQLITE_FLOAT:
                 {
-                    float fValue = va_arg( vl, float );
+                    double fValue = va_arg( vl, double );
                     strParsedQuery += SString ( "%f", fValue );
                 }
                 break;
@@ -380,7 +395,7 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
                 {
                     const char* szValue = va_arg( vl, const char* );
                     assert ( szValue );
-                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue ).c_str () );
+                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue, true, false ).c_str () );
                 }
                 break;
 
@@ -401,13 +416,14 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
                     // If can't match type, assume it's a string
                     const char* szValue = (const char*)ptype;
                     assert ( szValue );
-                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue ).c_str () );
+                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue, true, false ).c_str () );
                 }
                 break;
             }
         }
     }
     va_end ( vl );
+    BeginAutomaticTransaction ();
     return QueryInternal ( strParsedQuery.c_str (), pResult );
 }
 
