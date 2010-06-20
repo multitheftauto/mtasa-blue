@@ -84,7 +84,7 @@ public:
 
     ~CServerListItem ( void )
     {
-        closesocket ( m_Socket );
+        CloseSocket ();
     }
 
     static bool         Parse           ( const char* szAddress, in_addr& Address )
@@ -131,6 +131,15 @@ public:
         m_Socket = socket ( PF_INET, SOCK_DGRAM, IPPROTO_UDP );
         u_long flag = 1;
         ioctlsocket ( m_Socket, FIONBIO, &flag );
+    }
+
+    void                CloseSocket     ( void )
+    {
+        if ( m_Socket != INVALID_SOCKET )
+        {
+            closesocket ( m_Socket );
+            m_Socket = INVALID_SOCKET;
+        }
     }
 
     bool                ParseQuery      ( const char * szBuffer, unsigned int nLength );
@@ -200,6 +209,7 @@ protected:
     std::list < CServerListItem* >          m_Servers;
     std::string                             m_strStatus;
     std::string                             m_strStatus2;
+    long long                               m_llLastTickCount;
 };
 
 // Internet list (grabs the master server list on refresh)

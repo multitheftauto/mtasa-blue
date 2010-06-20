@@ -318,7 +318,8 @@ void CServerBrowser::Update ( void )
     CServerList *pList = GetServerList ( Type );
 
     // Update the current server list class
-    pList->Pulse ();
+    if ( IsVisible () )
+        pList->Pulse ();
 
     // If an update is needed, the serverbrowser is visible and it has gone some time since last update
     if ( ( pList->IsUpdated () || m_PrevServerBrowserType != Type ) && m_ulLastUpdateTime < CClientTime::GetTime () - SERVER_BROWSER_UPDATE_INTERVAL )

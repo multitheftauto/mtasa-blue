@@ -43,18 +43,45 @@ void CServerList::Clear ( void )
     m_nScanned = 0;
     m_nSkipped = 0;
     m_iRevision++;
+    m_llLastTickCount = 0;
 }
 
 
 void CServerList::Pulse ( void )
 {
+    // Get QueriesPerSecond setting
+    int iQueriesPerSecond = 100;
+    int iVar;
+    CVARS_GET ( "browser_speed", iVar );
+    if ( iVar == 0 ) iQueriesPerSecond = 4;
+    else if ( iVar == 1 ) iQueriesPerSecond = 10;
+    else if ( iVar == 2 ) iQueriesPerSecond = 100;
+
+    long long llTickCount = GetTickCount64_ ();
+    // Ensure m_llLastTickCount is initialized
+    m_llLastTickCount = m_llLastTickCount ? m_llLastTickCount : llTickCount;
+    // Ensure m_llLastTickCount is in range
+    m_llLastTickCount = Clamp ( llTickCount - 1000, m_llLastTickCount, llTickCount );
+
+    // Calc number of queries this pulse
+    int iTicksPerQuery = 1000 / Max ( 1, iQueriesPerSecond );
+    int iDeltaTicks = llTickCount - m_llLastTickCount;
+    int iNumQueries = iDeltaTicks / Max ( 1, iTicksPerQuery );
+    iNumQueries = Clamp ( 0, iNumQueries, SERVER_LIST_QUERIES_PER_PULSE );
+    int iNumTicksUsed = iNumQueries * iTicksPerQuery;
+    m_llLastTickCount += iNumTicksUsed;
+#if MTA_DEBUG
+    OutputDebugLine ( SString ( "%08x  Size: %d  iNumQueries: %d", this, m_Servers.size(), iNumQueries ) );
+#endif
+
     unsigned int n = m_Servers.size ();
     unsigned int uiQueriesSent = 0;
     unsigned int uiRepliesParsed = 0;
     unsigned int uiNoReplies = 0;
 
     // Scan all servers in our list, and keep the value of scanned servers
-    for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ ) {
+    for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end () && (int)uiQueriesSent < iNumQueries ; i++ )
+    {
         CServerListItem * pServer = *i;
         std::string strResult = pServer->Pulse ();
         if ( strResult == "SentQuery" )
@@ -65,8 +92,6 @@ void CServerList::Pulse ( void )
         else
         if ( strResult == "NoReply" )
             uiNoReplies++;
-           
-        if ( uiQueriesSent >= SERVER_LIST_QUERIES_PER_PULSE ) break;
     }
 
     // If we queried any new servers, we should toggle the GUI update flag
@@ -323,12 +348,14 @@ std::string CServerListItem::Pulse ( void )
         if ( len >= 0 ) {
             // Parse data
             ParseQuery ( szBuffer, len );
+            CloseSocket ();
             return "ParsedQuery";
         }
 
         if ( CClientTime::GetTime () - m_ulQueryStart > SERVER_LIST_ITEM_TIMEOUT )
         {
             bSkipped = true;
+            CloseSocket ();
             return "NoReply";
         }
 

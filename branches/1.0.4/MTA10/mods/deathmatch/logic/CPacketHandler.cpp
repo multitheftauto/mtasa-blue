@@ -385,10 +385,13 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     }
 
     // Allow forcing of SingleDownloadOption with core config option <single_download>1</single_download>
-    bool bForceSingleDownload;
-    if ( g_pCore->GetCVars ()->Get ( "single_download", bForceSingleDownload ) && bForceSingleDownload )
+    int iSingleDownload;
+    if ( g_pCore->GetCVars ()->Get ( "single_download", iSingleDownload ) && iSingleDownload == 1 )
         g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( true );
-        
+
+    // Force SingleDownloadOption if server doesn't want many connections
+    if ( iHTTPConnectionsPerClient < 3 )
+        g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( true );
 
     // Make the camera black until we spawn
     // Anyone want to document wtf these values are?  Why are we putting seemingly "random"

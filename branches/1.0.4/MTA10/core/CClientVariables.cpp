@@ -216,4 +216,6 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "mtavolume",                  1.0f );                         // custom sound's volume
     DEFAULT ( "async_loading",              1 );                            // loading while crashing
     DEFAULT ( "mapalpha",                   155 );                          // map alpha
+    DEFAULT ( "browser_speed",              2 );                            // Browser speed
+    DEFAULT ( "single_download",            0 );                            // Single connection for downloads
 }

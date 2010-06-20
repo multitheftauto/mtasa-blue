@@ -646,6 +646,7 @@ CSettings::CSettings ( void )
      **/
     vecTemp = CVector2D ( 15.f, 27.f );
 
+    // Asynchronous Loading
     m_pAsyncLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Asynchronous Loading:" ) );
     m_pAsyncLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pAsyncLabel->GetPosition ( vecTemp, false );
@@ -659,10 +660,49 @@ CSettings::CSettings ( void )
     m_pAsyncCombo->AddItem ( "Auto" )->SetData ( (void*)1 );
     m_pAsyncCombo->SetReadOnly ( true );
 
-    m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "(Experimental feature which\n may improve performance)" ) );
+    m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental feature which\nmay improve performance." ) );
     m_pAsyncLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 332.f, vecTemp.fY - 4.f ) );
     m_pAsyncLabelInfo->SetFont ( "default-bold-small" );
     m_pAsyncLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+
+    // Browser scan speed
+    vecTemp.fY += 40;
+    m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Browser speed:" ) );
+    m_pBrowserSpeedLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pBrowserSpeedLabel->GetPosition ( vecTemp, false );
+    m_pBrowserSpeedLabel->AutoSize ( m_pBrowserSpeedLabel->GetText ().c_str () );
+
+    m_pBrowserSpeedCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pBrowserSpeedCombo->SetPosition ( CVector2D ( vecTemp.fX + 141.0f, vecTemp.fY - 1.0f ) );
+    m_pBrowserSpeedCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pBrowserSpeedCombo->AddItem ( "Very slow" )->SetData ( (void*)0 );
+    m_pBrowserSpeedCombo->AddItem ( "Slow" )->SetData ( (void*)1 );
+    m_pBrowserSpeedCombo->AddItem ( "Fast" )->SetData ( (void*)2 );
+    m_pBrowserSpeedCombo->SetReadOnly ( true );
+
+    m_pBrowserSpeedLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Older routers may require\na slower scan speed." ) );
+    m_pBrowserSpeedLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 332.f, vecTemp.fY - 4.f ) );
+    m_pBrowserSpeedLabelInfo->SetFont ( "default-bold-small" );
+    m_pBrowserSpeedLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+
+    // Single download
+    vecTemp.fY += 40;
+    m_pSingleDownloadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Single connection:" ) );
+    m_pSingleDownloadLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pSingleDownloadLabel->GetPosition ( vecTemp, false );
+    m_pSingleDownloadLabel->AutoSize ( m_pSingleDownloadLabel->GetText ().c_str () );
+
+    m_pSingleDownloadCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pSingleDownloadCombo->SetPosition ( CVector2D ( vecTemp.fX + 141.0f, vecTemp.fY - 1.0f ) );
+    m_pSingleDownloadCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pSingleDownloadCombo->AddItem ( "Default" )->SetData ( (void*)0 );
+    m_pSingleDownloadCombo->AddItem ( "On" )->SetData ( (void*)1 );
+    m_pSingleDownloadCombo->SetReadOnly ( true );
+
+    m_pSingleDownloadLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Switch on to use only one\nconnection when downloading." ) );
+    m_pSingleDownloadLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 332.f, vecTemp.fY - 4.f ) );
+    m_pSingleDownloadLabelInfo->SetFont ( "default-bold-small" );
+    m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
@@ -1754,8 +1794,19 @@ void CSettings::LoadData ( void )
     int iVar;
     CVARS_GET ( "async_loading", iVar );
     if ( iVar == 0 ) m_pAsyncCombo->SetText ( "Off" );
-    else if ( iVar == 2 ) m_pAsyncCombo->SetText ( "On" );
     else if ( iVar == 1 ) m_pAsyncCombo->SetText ( "Auto" );
+    else if ( iVar == 2 ) m_pAsyncCombo->SetText ( "On" );
+
+    // Browser speed
+    CVARS_GET ( "browser_speed", iVar );
+    if ( iVar == 0 ) m_pBrowserSpeedCombo->SetText ( "Very slow" );
+    else if ( iVar == 1 ) m_pBrowserSpeedCombo->SetText ( "Slow" );
+    else if ( iVar == 2 ) m_pBrowserSpeedCombo->SetText ( "Fast" );
+
+    // Single download
+    CVARS_GET ( "single_download", iVar );
+    if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( "Default" );
+    else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( "On" );
 
     // Map alpha
     CVARS_GET ( "mapalpha", iVar);
@@ -1901,6 +1952,20 @@ void CSettings::SaveData ( void )
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "async_loading", iSelected );
         g_pCore->GetGame ()->SetAsyncLoadingFromSettings ( iSelected == 1, iSelected == 2 );
+    }
+
+    // Browser speed
+    if ( CGUIListItem* pSelected = m_pBrowserSpeedCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "browser_speed", iSelected );
+    }
+
+    // Single download
+    if ( CGUIListItem* pSelected = m_pSingleDownloadCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "single_download", iSelected );
     }
 
     // Map alpha

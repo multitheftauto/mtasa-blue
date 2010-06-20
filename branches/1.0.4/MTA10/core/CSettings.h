@@ -149,7 +149,12 @@ protected:
     CGUILabel*          m_pAsyncLabelInfo;
     CGUILabel*          m_pAsyncLabel;
     CGUIComboBox*       m_pAsyncCombo;
-
+    CGUILabel*          m_pSingleDownloadLabelInfo;
+    CGUILabel*          m_pSingleDownloadLabel;
+    CGUIComboBox*       m_pSingleDownloadCombo;
+    CGUILabel*          m_pBrowserSpeedLabelInfo;
+    CGUILabel*          m_pBrowserSpeedLabel;
+    CGUIComboBox*       m_pBrowserSpeedCombo;
     
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
