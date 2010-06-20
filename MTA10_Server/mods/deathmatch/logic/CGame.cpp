@@ -79,6 +79,7 @@ CGame::CGame ( void )
     m_pBanManager = NULL;
     m_pTeamManager = NULL;
     m_pMainConfig = NULL;
+    m_pRegistryManager = NULL;
     m_pRegistry = NULL;
     m_pAccountManager = NULL;
     m_pPedManager = NULL;
@@ -184,8 +185,10 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pBanManager );
     SAFE_DELETE ( m_pTeamManager );
     SAFE_DELETE ( m_pMainConfig );
-    SAFE_DELETE ( m_pRegistry );
+    m_pRegistryManager->CloseRegistry ( m_pRegistry );
+    m_pRegistry = NULL;
     SAFE_DELETE ( m_pAccountManager );
+    SAFE_DELETE ( m_pRegistryManager );
     SAFE_DELETE ( m_pRegisteredCommands );
     SAFE_DELETE ( m_pPedManager );
     SAFE_DELETE ( m_pHTTPD );
@@ -315,6 +318,7 @@ void CGame::DoPulse ( void )
     m_pPedSync->DoPulse ();
     m_pBanManager->DoPulse ();
     m_pAccountManager->DoPulse ();
+    m_pRegistryManager->DoPulse ();
 
     // Pulse ASE
     if ( m_pASE )
@@ -414,6 +418,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Create the account manager
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "internal.db" );
+    m_pRegistryManager = new CRegistryManager ();
     m_pAccountManager = new CAccountManager ( NULL, strBuffer );
 
     // Create and start the HTTP server
@@ -520,7 +525,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
     m_pRemoteCalls = new CRemoteCalls();
-    m_pRegistry = new CRegistry ("");
+    m_pRegistry = m_pRegistryManager->OpenRegistry ( "" );
 
     m_pResourceManager = new CResourceManager;
     m_pSettings = new CSettings ( m_pResourceManager );
@@ -2788,8 +2793,8 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
             pCamera->SetMode ( CAMERAMODE_PLAYER );
             if ( pTarget )
                 pCamera->SetTarget ( pTarget );
-            else
-               CLogger::LogPrintf ( "INTERNAL ERROR: Camera sync packet with invalid target\n" );
+            //else
+            //   CLogger::LogPrintf ( "INTERNAL ERROR: Camera sync packet with invalid target\n" );
         }
     }
 }

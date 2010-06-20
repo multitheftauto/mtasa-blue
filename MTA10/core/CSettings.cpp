@@ -1762,20 +1762,10 @@ void CSettings::LoadData ( void )
 
     // Map alpha
     CVARS_GET ( "mapalpha", iVar);
-    
-    if (iVar >= 0 && iVar<= 255)
-    {
-        int iAlphaPercent = ceil( ( (float)iVar / 255 ) * 100 );
-        m_pMapAlphaValueLabel->SetText ( SString("%i%%", iAlphaPercent).c_str() );
-        float sbPos = (float)iAlphaPercent / 100.0f;
-        m_pMapAlpha->SetScrollPosition ( sbPos );
-    }
-    else
-    {
-        CVARS_SET ( "mapalpha", 155 );
-        m_pMapAlphaValueLabel->SetText ( "60%" ); // ~155 Alpha
-        m_pMapAlpha->SetScrollPosition ( 0.6f );
-    }
+    int iAlphaPercent = ceil( ( (float)Clamp ( 0, iVar, 255 ) / 255 ) * 100 );
+    m_pMapAlphaValueLabel->SetText ( SString("%i%%", iAlphaPercent).c_str() );
+    float sbPos = (float)iAlphaPercent / 100.0f;
+    m_pMapAlpha->SetScrollPosition ( sbPos );
 
     // Chat
     LoadChatColorFromCVar ( ChatColorType::CHAT_COLOR_BG, "chat_color" );

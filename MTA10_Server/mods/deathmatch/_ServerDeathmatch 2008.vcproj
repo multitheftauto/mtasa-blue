@@ -669,6 +669,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CRegistryManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CRemoteCalls.cpp"
 					>
 				</File>
@@ -1675,6 +1679,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CRegistry.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CRegistryManager.h"
 					>
 				</File>
 				<File

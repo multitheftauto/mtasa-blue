@@ -215,4 +215,5 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "classic_controls",           false );                        // classic/standard controls
     DEFAULT ( "mtavolume",                  1.0f );                         // custom sound's volume
     DEFAULT ( "async_loading",              1 );                            // loading while crashing
+    DEFAULT ( "mapalpha",                   155 );                          // map alpha
 }

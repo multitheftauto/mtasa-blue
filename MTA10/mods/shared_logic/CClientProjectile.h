@@ -110,6 +110,7 @@ protected:
     CVector *                           m_pvecTarget;
     float                               m_fForce;
     bool                                m_bLocal;
+    long long                           m_llCreationTime;
 
     bool                                m_bInitiate;
     CProjectileInitiateData *           m_pInitiateData;
