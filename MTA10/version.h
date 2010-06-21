@@ -12,14 +12,18 @@
 
 // New version info
 #define MTASA_VERSION_MAJOR         1
-#define MTASA_VERSION_MINOR         0
-#define MTASA_VERSION_MAINTENANCE   4
+#define MTASA_VERSION_MINOR         1
+#define MTASA_VERSION_MAINTENANCE   0
 #define MTASA_VERSION_TYPE          VERSION_TYPE_CUSTOM
 #define MTASA_VERSION_BUILD         0
 
 // Old version info
 #define MTA_DM_VERSION              ( ( ( MTASA_VERSION_MAJOR ) << 8 ) | ( ( MTASA_VERSION_MINOR ) << 4 ) | ( ( MTASA_VERSION_MAINTENANCE ) << 0 ) )
-#define MTA_DM_VERSIONSTRING        QUOTE_DEFINE ( MTASA_VERSION_MAJOR ) "." QUOTE_DEFINE ( MTASA_VERSION_MINOR ) "." QUOTE_DEFINE ( MTASA_VERSION_MAINTENANCE )
+#if MTASA_VERSION_MAINTENANCE == 0
+    #define MTA_DM_VERSIONSTRING        QUOTE_DEFINE ( MTASA_VERSION_MAJOR ) "." QUOTE_DEFINE ( MTASA_VERSION_MINOR )
+#else
+    #define MTA_DM_VERSIONSTRING        QUOTE_DEFINE ( MTASA_VERSION_MAJOR ) "." QUOTE_DEFINE ( MTASA_VERSION_MINOR ) "." QUOTE_DEFINE ( MTASA_VERSION_MAINTENANCE )
+#endif
 #define MTA_DM_FULL_STRING          "MTA:SA Client"
 #define MTA_DM_BITSTREAM_VERSION    0x0e
 
@@ -68,14 +72,17 @@
 #endif
 
 
+#define _ASE_VERSION                    "1.1"
+#define _NETCODE_VERSION                0x0180
+#define _CLIENT_NET_MODULE_VERSION      0x0020
+
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
 #if defined(MTA_DM_CONNECT_TO_PUBLIC)
-    #define MTA_DM_ASE_VERSION      "1.0"
-    #define MTA_DM_NETCODE_VERSION  0x164
-    #define MTA_DM_CLIENT_NET_MODULE_VERSION   0x1014
+    #define MTA_DM_ASE_VERSION                  _ASE_VERSION
+    #define MTA_DM_NETCODE_VERSION              _NETCODE_VERSION
+    #define MTA_DM_CLIENT_NET_MODULE_VERSION   _CLIENT_NET_MODULE_VERSION
 #else
-    #define MTA_DM_ASE_VERSION      "1.0n"
-    #define MTA_DM_NETCODE_VERSION  0x165
-    #define MTA_DM_CLIENT_NET_MODULE_VERSION   0x1414
+    #define MTA_DM_ASE_VERSION                  _ASE_VERSION "n"
+    #define MTA_DM_NETCODE_VERSION              ( _NETCODE_VERSION + 0x4000 )
+    #define MTA_DM_CLIENT_NET_MODULE_VERSION    ( _CLIENT_NET_MODULE_VERSION + 0x4000 )
 #endif
-
