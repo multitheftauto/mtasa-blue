@@ -248,7 +248,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         // Network module compatibility check
         typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
     PFNCHECKCOMPATIBILITY pfnCheckCompatibility = reinterpret_cast< PFNCHECKCOMPATIBILITY > ( m_NetworkLibrary.GetProcedureAddress ( "CheckCompatibility" ) );
-        if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_NET_MODULE_VERSION ) )
+        if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_SERVER_NET_MODULE_VERSION ) )
         {
             // net.dll doesn't like our version number
             Print ( "Network module not compatible!\n" );
