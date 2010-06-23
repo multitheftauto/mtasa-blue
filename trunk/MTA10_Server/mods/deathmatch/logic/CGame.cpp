@@ -509,16 +509,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             fprintf ( fh, "(It will get recreated when the server is next started)\n" );
             fprintf ( fh, "---------------------------------------------------------------------------\n\n" );
             fprintf ( fh, "The 'http-client-files' directory always contains the correct client files\n" );
-            fprintf ( fh, "for hosting on a web server, (if that option is enabled in mtaserver.conf).\n" );
+            fprintf ( fh, "for hosting on a web server.\n" );
             fprintf ( fh, "* If the web server is on the same machine, you can simply link the appropriate\n" );
             fprintf ( fh, "  web server directory to 'http-client-files'.\n" );
             fprintf ( fh, "* If the web server is on a separate machine, ensure it has access to\n" );
             fprintf ( fh, "  'http-client-files' via a network path, or maintain a remote copy using\n" );
             fprintf ( fh, "  synchronization software.\n" );
-            fprintf ( fh, "---------------------------------------------------------------------------\n" );
-            fprintf ( fh, "Note: 'http-client-files' will only be updated if:\n" );
-            fprintf ( fh, "       'httpdownloadurl' in mtaserver.conf is not blank\n" );
-            fprintf ( fh, "   and 'httpautoclientfiles' in mtaserver.conf is not set to 0\n" );
             fprintf ( fh, "---------------------------------------------------------------------------\n\n" );
             fclose ( fh );
         }
