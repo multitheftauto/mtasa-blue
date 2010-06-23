@@ -60,14 +60,13 @@ public:
     virtual bool                Stop ( void ) = 0;
 
     inline eResourceType        GetType() { return m_type; }
-    inline const char *         GetPath() { return m_strResourceFileName.c_str (); }
     inline const char *         GetName() { return m_strShortName.c_str (); }
     inline const char *         GetWindowsName() { return m_strWindowsName.c_str (); }
 
     inline CChecksum            GetLastChecksum ( void ) { return m_checksum; }
     void                        SetLastChecksum ( CChecksum checksum ) { m_checksum = checksum; }
 
-    double                      GetSize ( void );
+    double                      GetApproxSize ( void );    // Only used by download counters
     string                      GetMetaFileAttribute ( const string& key ) { return m_attributeMap[key]; }
 };
 

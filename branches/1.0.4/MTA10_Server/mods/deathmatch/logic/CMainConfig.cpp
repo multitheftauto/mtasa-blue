@@ -176,17 +176,13 @@ bool CMainConfig::Load ( const char* szFilename )
     if ( GetString ( m_pRootNode, "httpdownloadurl", m_strHTTPDownloadURL, 5 ) == IS_SUCCESS )
     {
         m_ucHTTPDownloadType = HTTP_DOWNLOAD_ENABLED_URL;
+        m_strHTTPDownloadURL = SString ( m_strHTTPDownloadURL ).TrimEnd ( "/" );
     }
     else
     {
         m_ucHTTPDownloadType = HTTP_DOWNLOAD_ENABLED_PORT;
         m_strHTTPDownloadURL = "";
     }
-
-    // httpautoclientfiles
-    iResult = GetBoolean ( m_pRootNode, "httpautoclientfiles", m_bHTTPAutoClientFiles );
-    if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
-        m_bHTTPAutoClientFiles = true;
 
     // httpconnectionsperclient
     GetInteger ( m_pRootNode, "httpconnectionsperclient", m_iHTTPConnectionsPerClient, 2, 32 );
