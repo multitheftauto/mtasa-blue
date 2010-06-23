@@ -58,7 +58,7 @@ CResourceFile::~CResourceFile ( void )
 }
 
 
-double CResourceFile::GetSize ( void )
+double CResourceFile::GetApproxSize ( void )
 {
     double dSize = 0.0;
 
@@ -76,8 +76,14 @@ double CResourceFile::GetSize ( void )
 
 ResponseCode CResourceFile::Request ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
+    // HACK - Use http-client-files if possible as the resources directory may have been changed since the resource was loaded.
+    SString strDstFilePath = string ( g_pServerInterface->GetServerModPath () ) + "/resource-cache/http-client-files/" + m_resource->GetName() + "/" + this->GetName();
+
+    FILE * file = fopen ( strDstFilePath.c_str (), "rb" );
+    if ( !file )
+        file = fopen ( m_strResourceFileName.c_str (), "rb" );
+
     // its a raw page
-    FILE * file = fopen ( m_strResourceFileName.c_str (), "rb" );
     if ( file )
     {
         // Grab the filesize. Don't use the above method because it doesn't account for a changing
