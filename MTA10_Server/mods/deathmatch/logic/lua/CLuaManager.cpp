@@ -90,6 +90,7 @@ CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
     // Create it and add it to the list over VM's
     CLuaMain * vm = new CLuaMain ( this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager, pResourceOwner );
     m_virtualMachines.push_back ( vm );
+    vm->InitVM ();
 
     m_pLuaModuleManager->_RegisterFunctions ( vm->GetVirtualMachine() );
 

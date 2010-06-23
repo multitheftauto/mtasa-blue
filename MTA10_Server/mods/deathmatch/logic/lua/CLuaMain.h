@@ -112,8 +112,8 @@ public:
 
     void                            RegisterHTMLDFunctions  ( void );
 
-private:
     void                            InitVM                  ( void );
+private:
     void                            InitSecurity            ( void );
 
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );
