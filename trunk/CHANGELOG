@@ -8,6 +8,13 @@ Targets:
 * Fixes for issues and crashes that are present in 1.0.3 and are degrading the stability of the software
 * High priority gameplay and UI fixes
 
+- 0005394: [Server] Many accounts delays server to be ready (ccw) - resolved.
+- 0005392: [Server] Banlist gets reset after "ERROR: Could not start HTTP server on interface" message (ccw) - resolved.
+- 0005388: [Scripting] projectiles can exist forever (ccw) - resolved.
+- 0005389: [Server] Download Resources not allocatable (ccw) - resolved.
+- 0005084: [Client] Connecting to server using the server browser doesn't work. (ccw) - resolved.
+- 0005026: [Client] Improve serial algorithm to reduce duplicates (ccw) - resolved.
+- 0005396: [Client] F11 Map has no texture (ccw) - resolved.
 - 0005372: [Client] MTA Nightlys stopped working with Wine (ccw) - resolved.
 - 0005371: [Client] guiGridListSetItemText doesn't remove the section row type (Flobu) - resolved.
 - 0005368: [General] Opening a local server after disconnection causes a net.dll VS Runtime Error (ccw) - resolved.
