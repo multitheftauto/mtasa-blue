@@ -24,7 +24,7 @@ CRegistryManager::~CRegistryManager ( void )
 void CRegistryManager::DoPulse ( void )
 {
     // End automatic transactions started in the previous pulse
-    for ( int i = 0 ; i < m_RegistryList.size () ; i++ )
+    for ( unsigned int i = 0 ; i < m_RegistryList.size () ; i++ )
         m_RegistryList[i]->EndAutomaticTransaction ();
 }
 
