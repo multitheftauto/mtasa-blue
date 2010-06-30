@@ -26,6 +26,7 @@
 #define VAR_bMouseSteering      0xC1CC02
 #define VAR_bMouseFlying        0xC1CC03
 #define VAR_fFxQuality          0xA9AE54
+#define VAR_fMouseSensivity     0xB6EC1C
 
 #define CLASS_CAudioEngine 0xB6BC90
 #define FUNC_CAudioEngine_SetEffectsMasterVolume 0x506E10
@@ -97,6 +98,9 @@ public:
 
     unsigned int            GetFXQuality                ( void );
     void                    SetFXQuality                ( unsigned int fxQualityId );
+
+    float                   GetMouseSensivity           ( void );
+    void                    SetMouseSensivity           ( float fSensivity );
 
     void                    Save                        ( void );
 
