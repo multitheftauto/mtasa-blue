@@ -33,7 +33,7 @@ class CRadarAreaManager;
 class CVehicleManager;
 class CMapManager;
 
-class CLuaMain : public CClient
+class CLuaMain //: public CClient
 {
 public:
     enum
