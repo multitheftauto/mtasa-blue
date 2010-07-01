@@ -43,17 +43,19 @@ class CASERule;
 class ASE
 {
 public:
-                            ASE                 ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL, bool bLan = false );
-                            ~ASE                ( void );
+                            ASE                      ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL, bool bLan = false );
+                            ~ASE                     ( void );
 
-    void                    DoPulse             ( void );
+    void                    DoPulse                  ( void );
 
-    static ASE*             GetInstance         ( void )                { return _instance; }
+    static ASE*             GetInstance              ( void )                { return _instance; }
 
-    const std::string&      QueryFullCached     ( void );
-    std::string             QueryFull           ( void );
-    const std::string&      QueryLightCached    ( void );
-    std::string             QueryLight          ( void );
+    const std::string&      QueryFullCached          ( void );
+    std::string             QueryFull                ( void );
+    const std::string&      QueryLightCached         ( void );
+    std::string             QueryLight               ( void );
+    const std::string&      QueryXfireLightCached    ( void );
+    std::string             QueryXfireLight          ( void );
     unsigned long           GetMasterServerQueryCount ( void )          { return m_ulMasterServerQueryCount; }
 
     CLanBroadcast*          InitLan             ( void );
@@ -105,6 +107,12 @@ private:
     long long               m_llLightLastTime;
     long                    m_lLightMinInterval;
     std::string             m_strLightCached;
+
+    // XFire Light query cache
+    unsigned int            m_uiXfireLightLastPlayerCount;
+    long long               m_llXfireLightLastTime;
+    long                    m_lXfireLightMinInterval;
+    std::string             m_strXfireLightCached;
 
     unsigned long           m_ulMasterServerQueryCount;
 protected:

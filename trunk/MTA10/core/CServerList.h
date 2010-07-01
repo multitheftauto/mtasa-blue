@@ -160,7 +160,7 @@ public:
     std::vector < std::string >
                         vecPlayers;
 
-private:
+protected:
     int                 m_Socket;
     unsigned long       m_ulQueryStart;
 };
