@@ -593,6 +593,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CXfireQuery.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\StdInc.cpp"
 				>
 				<FileConfiguration
@@ -947,6 +951,10 @@
 			</File>
 			<File
 				RelativePath=".\CVideoModeManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CXfireQuery.h"
 				>
 			</File>
 			<File

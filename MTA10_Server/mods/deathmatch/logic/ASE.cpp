@@ -41,6 +41,10 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     m_llLightLastTime = 0;
     m_lLightMinInterval = 10 * 1000;     // Update light query cache after 10 seconds
 
+    m_uiXfireLightLastPlayerCount = 0;
+    m_llXfireLightLastTime = 0;
+    m_lXfireLightMinInterval = 10 * 1000;     // Update XFire light query cache after 10 seconds
+
     m_ulMasterServerQueryCount = 0;
 
     m_strGameType = "MTA:SA";
@@ -129,6 +133,11 @@ void ASE::DoPulse ( void )
             case 'r':
             { // Our own lighter query for ingame browser - Release version only
                 strReply = QueryLightCached ();
+                break;
+            }
+            case 'x':
+            { // Our own lighter query for xfire updates
+                strReply = QueryXfireLightCached ();
                 break;
             }
             case 'v':
@@ -264,6 +273,54 @@ std::string ASE::QueryFull ( void )
             reply << ( unsigned char ) 1;
         }
     }
+
+    return reply.str();
+}
+
+
+// Protect against a flood of server queries.
+// Send cached version unless player count has changed, or last re-cache is older than m_lLightMinInterval
+const std::string& ASE::QueryXfireLightCached ( void )
+{
+    long long llTime = GetTickCount64_ ();
+    unsigned int uiPlayerCount = m_pPlayerManager->CountJoined ();
+    if ( uiPlayerCount != m_uiXfireLightLastPlayerCount || llTime - m_llXfireLightLastTime > m_lLightMinInterval || m_strXfireLightCached == "" )
+    {
+        m_strXfireLightCached = QueryXfireLight ();
+        m_llXfireLightLastTime = llTime;
+        m_uiXfireLightLastPlayerCount = uiPlayerCount;
+    }
+    return m_strXfireLightCached;
+}
+
+
+std::string ASE::QueryXfireLight ( void )
+{
+    std::stringstream reply;
+
+    reply << "EYE3";
+    // game
+    reply << ( unsigned char ) 4;
+    reply << "mta";
+    // server name
+    reply << ( unsigned char ) ( m_pMainConfig->GetServerName ().length() + 1 );
+    reply << m_pMainConfig->GetServerName ();
+    // game type
+    reply << ( unsigned char ) ( m_strGameType.length() + 1 );
+    reply << m_strGameType;
+    // map name
+    reply << ( unsigned char ) ( m_strMapName.length() + 1 );
+    reply << m_strMapName;
+    // version
+    std::string temp = MTA_DM_ASE_VERSION;
+    reply << ( unsigned char ) ( temp.length() + 1 );
+    reply << temp;
+    // passworded
+    reply << ( unsigned char ) ( ( m_pMainConfig->HasPassword () ) ? 1 : 0 );
+    // players count
+    reply << ( unsigned char ) m_pPlayerManager->CountJoined ();
+    // players max
+    reply << ( unsigned char ) m_pMainConfig->GetMaxPlayers ();
 
     return reply.str();
 }

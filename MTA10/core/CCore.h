@@ -48,6 +48,7 @@ class CCore;
 #include "CCommunity.h"
 #include <xml/CXML.h>
 #include <ijsify.h>
+#include "CXfireQuery.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -206,6 +207,11 @@ public:
     const char *            GetCommandLineOption            ( const char* szOption );
     const char *            GetCommandLineArgs              ( void ) { return m_szCommandLineArgs; }
 
+    //XFire
+    SString                 UpdateXfire                     ( void );
+    void                    SetCurrentServer                ( in_addr Addr, unsigned short usQueryPort );
+    void                    SetXfireData                    ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount );
+
 private:
     // Core devices.
     CXML*                       m_pXML;
@@ -265,6 +271,10 @@ private:
 
     // screen res
     DEVMODE                     m_Current;
+
+    //Xfire Update
+    CXfireServerInfo*           m_pCurrentServer;
+    time_t                      m_tXfireUpdate;
 
     char                        m_szInstallRoot[MAX_PATH];
     char                        m_szGTAInstallRoot[MAX_PATH];
