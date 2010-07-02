@@ -181,6 +181,7 @@ CCore::CCore ( void )
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bFocused = true;
+    m_bLastFocused = true;
 
     // Initialize time
     CClientTime::InitializeTime ();
@@ -1229,6 +1230,16 @@ void CCore::DoPostFramePulse ( )
         {
             WaitForMenu++;
         }
+    }
+
+    if ( !IsFocused() && m_bLastFocused )
+    {
+        m_pKeyBinds->CallAllGTAControlBinds( CONTROL_BOTH, false );
+        m_bLastFocused = false;
+    }
+    else if ( IsFocused() && !m_bLastFocused )
+    {
+        m_bLastFocused = true;
     }
 
     GetJoystickManager ()->DoPulse ();      // Note: This may indirectly call CMessageLoopHook::ProcessMessage

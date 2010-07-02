@@ -236,6 +236,7 @@ private:
     CTCPManager *               m_pTCPManager;
 
     bool                        m_bFocused;
+    bool                        m_bLastFocused;
 
     // Module loader objects.
     CModuleLoader               m_GameModule;
