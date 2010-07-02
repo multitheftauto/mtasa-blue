@@ -87,7 +87,7 @@
 #endif
 
 
-#define _ASE_VERSION                    "1.1"
+#define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
 #define _NETCODE_VERSION                0x0181
 #define _SERVER_NET_MODULE_VERSION      0x0020
 
