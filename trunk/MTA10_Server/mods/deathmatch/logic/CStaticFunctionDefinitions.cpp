@@ -7407,6 +7407,15 @@ bool CStaticFunctionDefinitions::SetPlayerAnnounceValue ( CElement* pElement, co
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetServerName( const std::string strServerName )
+{
+    if ( strServerName != "" )
+    {
+        g_pGame->GetConfig()->SetServerName ( strServerName );
+        return true;
+    }
+    return false;
+}
 
 void CStaticFunctionDefinitions::ExecuteSQLCreateTable ( const std::string& strTable, const std::string& strDefinition )
 {
@@ -8260,4 +8269,3 @@ SString CStaticFunctionDefinitions::GetVersionSortable ()
                             ,0
                             );
 }
-

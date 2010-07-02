@@ -623,3 +623,8 @@ unsigned short CMainConfig::GetHTTPPort ( void )
         return usHTTPPort;
     return m_usHTTPPort;
 }
+void CMainConfig::SetServerName ( std::string strServerName )
+{
+    m_strServerName = strServerName;
+    CLogger::LogPrintf ( "The Server Name has now been set to: %s\n", strServerName.c_str () );
+}
