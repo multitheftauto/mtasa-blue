@@ -7407,7 +7407,7 @@ bool CStaticFunctionDefinitions::SetPlayerAnnounceValue ( CElement* pElement, co
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetServerName( const std::string strServerName )
+bool CStaticFunctionDefinitions::SetServerName( std::string strServerName )
 {
     if ( strServerName != "" )
     {
