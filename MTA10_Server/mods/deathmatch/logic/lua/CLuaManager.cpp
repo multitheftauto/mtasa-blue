@@ -625,6 +625,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "removeRuleValue", CLuaFunctionDefinitions::RemoveRuleValue );
     CLuaCFunctions::AddFunction ( "getPlayerAnnounceValue", CLuaFunctionDefinitions::GetPlayerAnnounceValue );
     CLuaCFunctions::AddFunction ( "setPlayerAnnounceValue", CLuaFunctionDefinitions::SetPlayerAnnounceValue );
+    CLuaCFunctions::AddFunction ( "setServerName", CLuaFunctionDefinitions::SetServerName );
 
     // Registry functions
     CLuaCFunctions::AddFunction ( "executeSQLCreateTable", CLuaFunctionDefinitions::ExecuteSQLCreateTable );

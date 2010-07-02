@@ -41,6 +41,7 @@ public:
 
     inline unsigned int             GetMTUSize                      ( void )        { return m_uiMTUSize; };
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
+    inline void                     SetServerName                   ( std::string strServerName );
     std::string                     GetServerIP                     ( void );
     unsigned short                  GetServerPort                   ( void );
     unsigned int                    GetMaxPlayers                   ( void );
