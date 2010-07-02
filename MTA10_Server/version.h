@@ -88,7 +88,7 @@
 
 
 #define _ASE_VERSION                    "1.1"
-#define _NETCODE_VERSION                0x0180
+#define _NETCODE_VERSION                0x0181
 #define _SERVER_NET_MODULE_VERSION      0x0020
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
