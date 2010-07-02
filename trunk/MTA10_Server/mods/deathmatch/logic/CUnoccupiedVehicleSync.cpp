@@ -383,6 +383,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
                         // Derailed state
                         pVehicle->SetDerailed ( vehicle.data.bDerailed );
 
+                        // Set our In Water State
+                        pVehicle->SetInWater ( vehicle.data.bIsInWater );
+
                         // Run colpoint checks on vehicle
                         g_pGame->GetColManager()->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
 
