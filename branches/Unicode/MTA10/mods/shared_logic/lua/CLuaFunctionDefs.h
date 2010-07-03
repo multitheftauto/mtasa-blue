@@ -77,6 +77,9 @@ public:
     LUA_DECLARE ( GetSoundMinDistance );
     LUA_DECLARE ( SetSoundMaxDistance );
     LUA_DECLARE ( GetSoundMaxDistance );
+    LUA_DECLARE ( GetSoundMetaTags );
+    LUA_DECLARE ( SetSoundEffectEnabled );
+    LUA_DECLARE ( GetSoundEffects );
 
     // Output functions
     LUA_DECLARE ( OutputConsole );
@@ -450,6 +453,7 @@ public:
     LUA_DECLARE ( EngineAddAllAtomics );
     LUA_DECLARE ( EngineReplaceVehiclePart );
     LUA_DECLARE ( EngineSetModelLODDistance );
+    LUA_DECLARE ( EngineSetAsynchronousLoading );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
@@ -477,6 +481,7 @@ public:
     LUA_DECLARE ( Reference );
     LUA_DECLARE ( Dereference );
     LUA_DECLARE ( GetColorFromString );
+    LUA_DECLARE ( GetValidPedModels );
     
     // GUI funcs
     LUA_DECLARE ( GUIGetInputEnabled );

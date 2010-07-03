@@ -331,8 +331,7 @@ bool CResource::Load ( void )
         // Generate a CRC for this resource
         m_checksum = GenerateChecksum();
 
-        // copy client files to http holding directory if external web server is being used
-        if ( g_pGame->GetConfig ()->GetHTTPDownloadType () == HTTP_DOWNLOAD_ENABLED_URL && g_pGame->GetConfig ()->GetHTTPAutoClientFiles () )
+        // copy client files to http holding directory
         {
             list < CResourceFile* > ::const_iterator iter = this->IterBegin ();
             for ( ; iter != this->IterEnd () ; iter++ )
@@ -349,10 +348,16 @@ bool CResource::Load ( void )
                         string strSrcFilePath;
                         if ( GetFilePath ( clientFileShortPath.c_str (), strSrcFilePath ) )
                         {
-                            MakeSureDirExists( strDstFilePath.c_str () );
-                            if ( !FileCopy ( strSrcFilePath.c_str (), strDstFilePath.c_str () ) )
+                            unsigned long ulSrcFileCRC = CRCGenerator::GetCRCFromFile ( strSrcFilePath.c_str () );
+                            unsigned long ulDstFileCRC = CRCGenerator::GetCRCFromFile ( strDstFilePath.c_str () );
+                            if ( ulSrcFileCRC != ulDstFileCRC )
                             {
-                                CLogger::LogPrintf ( "Could not copy Copy '%s' to '%s'\n", strSrcFilePath.c_str (), strDstFilePath.c_str () );
+                                MakeSureDirExists( strDstFilePath.c_str () );
+
+                                if ( !FileCopy ( strSrcFilePath.c_str (), strDstFilePath.c_str () ) )
+                                {
+                                    CLogger::LogPrintf ( "Could not copy Copy '%s' to '%s'\n", strSrcFilePath.c_str (), strDstFilePath.c_str () );
+                                }
                             }
                         }
                     }
@@ -1870,13 +1875,12 @@ bool CResource::IncludedFileExists ( const char* szName, int iType )
     std::list <CResourceFile*> ::iterator iter = m_resourceFiles.begin ();
     for ( ; iter != m_resourceFiles.end (); iter++ )
     {
-        // Is it a config?
+        // Is it the required type?
         if ( ( iType == CResourceFile::RESOURCE_FILE_TYPE_NONE ) ||
              ( (*iter)->GetType () == iType ) )
         {
             // Check if the name compares equal (case independant)
-            CResourceMapItem* pMapItem = static_cast < CResourceMapItem* > ( *iter );
-            if ( stricmp ( pMapItem->GetName (), szName ) == 0 )
+            if ( stricmp ( (*iter)->GetName (), szName ) == 0 )
             {
                 return true;
             }

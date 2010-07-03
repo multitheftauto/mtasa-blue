@@ -963,6 +963,7 @@ int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
             bool bLoop = true;
             bool bUpdatePosition = true;
             bool bInterruptable = true;
+            bool bFreezeLastFrame = true;
             if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szBlockName = lua_tostring ( luaVM, 2 );
             if ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 3 );
             int iArgument4 = lua_type ( luaVM, 4 );
@@ -972,10 +973,12 @@ int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
                 bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
             if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
                 bUpdatePosition = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
-            if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
+            if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )
                 bInterruptable = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
+            if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )
+                bFreezeLastFrame = ( lua_toboolean ( luaVM, 8 ) ) ? true:false;
 
-            if ( CStaticFunctionDefinitions::SetPedAnimation ( pElement, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable ) )
+            if ( CStaticFunctionDefinitions::SetPedAnimation ( pElement, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -9611,6 +9614,24 @@ int CLuaFunctionDefinitions::Dereference ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetValidPedModels ( lua_State* luaVM )
+{
+    int iIndex = 0;
+    lua_newtable ( luaVM );
+    for( int i = 0; i < 289; i++)
+    {
+        if ( CPlayerManager::IsValidPlayerModel(i) )
+        {
+            lua_pushnumber ( luaVM , ++iIndex);
+            lua_pushnumber ( luaVM , i);
+            lua_settable ( luaVM , -3);
+        }
+    }
+
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::GetRootElement ( lua_State* luaVM )
 {
     CElement* pRoot = CStaticFunctionDefinitions::GetRootElement ();
@@ -9898,6 +9919,23 @@ int CLuaFunctionDefinitions::SetPlayerAnnounceValue ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetServerName ( lua_State* luaVM )
+{
+	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        std::string strServerName = lua_tostring ( luaVM, 1 );
+        if ( CStaticFunctionDefinitions::SetServerName ( strServerName ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setServerName" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::ExecuteSQLCreateTable ( lua_State* luaVM )
 {
@@ -10123,11 +10161,14 @@ int CLuaFunctionDefinitions::ExecuteSQLUpdate ( lua_State* luaVM )
 {
     std::string strError;
 
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING && lua_type ( luaVM, 3 ) == LUA_TSTRING )
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )
     {
         std::string strTable    = std::string ( lua_tostring ( luaVM, 1 ) );
         std::string strSet      = std::string ( lua_tostring ( luaVM, 2 ) );
-        std::string strWhere    = std::string ( lua_tostring ( luaVM, 3 ) );
+
+        std::string strWhere    = "";
+        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            strWhere = std::string ( lua_tostring ( luaVM, 3 ) );
 
         if ( CStaticFunctionDefinitions::ExecuteSQLUpdate ( strTable, strSet, strWhere ) )
         {

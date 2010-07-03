@@ -45,7 +45,7 @@ const char szPreloadedScript [] = ""\
     "                outputDebugString(\"exports: Call to non-existing resource (\" .. k .. \")\", 1)\n" \
     "        end\n" \
     "end\n" \
-    "addEventHandler(\"onClientResourceStop\", root, function(res) exports[getResourceFromName(res)] = nil end)\n" \
+    "addEventHandler(\"onClientResourceStop\", root, function(res) exports[res] = nil end)\n" \
     "exports = setmetatable({}, exportsMT)\n";
 
 
@@ -64,12 +64,6 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
     m_szScriptName [MAX_SCRIPTNAME_LENGTH] = 0;
     
     m_pResource = pResourceOwner;
-
-    // Add all our events and functions
-    InitVM();
-
-    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
-    InitSecurity();
 }
 
 
@@ -110,6 +104,9 @@ void CLuaMain::InitVM ( void )
 {
     // Create a new VM
     m_luaVM = lua_open ();
+
+    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
+    InitSecurity();
 
     // Set the instruction count hook
     lua_sethook ( m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT );
@@ -204,15 +201,16 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
 }
 
 
-bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize )
+bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName )
 {
     if ( m_luaVM )
     {
         // Run the script
-        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, NULL ) )
+        std::string strRes = ConformResourcePath ( szFileName );
+        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, strRes.c_str () ) )
         {
             // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
             if ( strRes.length () )
             {
                 CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );

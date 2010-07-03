@@ -38,7 +38,10 @@ unsigned long* CGameSA::VAR_Framelimiter;
  */
 CGameSA::CGameSA()
 {
-    m_bASyncLoading = false;
+    m_bAsyncSettingsDontUse = false;
+    m_bAsyncSettingsEnabled = false;
+    m_bAsyncScriptEnabled = false;
+    m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
 
     // Unprotect all of the GTASA code at once and leave it that way
@@ -582,9 +585,16 @@ bool CGameSA::VerifySADataFileNames ()
            !strcmp ( *(char **)0x5BE686, "DATA\\WEAPON.DAT" );
 }
 
-void CGameSA::SetASyncLoadingEnabled ( bool bEnabled )
+void CGameSA::SetAsyncLoadingFromSettings ( bool bSettingsDontUse, bool bSettingsEnabled )
 {
-    m_bASyncLoading = bEnabled;
+    m_bAsyncSettingsDontUse = bSettingsDontUse;
+    m_bAsyncSettingsEnabled = bSettingsEnabled;
+}
+
+void CGameSA::SetAsyncLoadingFromScript ( bool bScriptEnabled, bool bScriptForced )
+{
+    m_bAsyncScriptEnabled = bScriptEnabled;
+    m_bAsyncScriptForced = bScriptForced;
 }
 
 void CGameSA::SuspendASyncLoading ( bool bSuspend )
@@ -596,5 +606,8 @@ bool CGameSA::IsASyncLoadingEnabled ( bool bIgnoreSuspend )
 {
     if ( m_bASyncLoadingSuspended && !bIgnoreSuspend )
         return false;
-    return true;
+
+    if ( m_bAsyncScriptForced || m_bAsyncSettingsDontUse )
+        return m_bAsyncScriptEnabled;
+    return m_bAsyncSettingsEnabled;
 }

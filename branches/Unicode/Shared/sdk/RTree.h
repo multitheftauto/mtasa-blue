@@ -1402,6 +1402,7 @@ void RTREE_QUAL::PickSeeds(PartitionVars* a_parVars)
     area[index] = CalcRectVolume(&a_parVars->m_branchBuf[index].m_rect);
   }
 
+  bool bDoneFirst = false;
   worst = -a_parVars->m_coverSplitArea - 1;
   for(int indexA=0; indexA < a_parVars->m_total-1; ++indexA)
   {
@@ -1409,8 +1410,9 @@ void RTREE_QUAL::PickSeeds(PartitionVars* a_parVars)
     {
       Rect oneRect = CombineRect(&a_parVars->m_branchBuf[indexA].m_rect, &a_parVars->m_branchBuf[indexB].m_rect);
       waste = CalcRectVolume(&oneRect) - area[indexA] - area[indexB];
-      if(waste > worst)
+      if(waste > worst || !bDoneFirst)
       {
+        bDoneFirst = true;
         worst = waste;
         seed0 = indexA;
         seed1 = indexB;

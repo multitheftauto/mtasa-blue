@@ -44,7 +44,7 @@ const char szPreloadedScript [] = ""\
     "                outputDebugString(\"exports: Call to non-existing resource (\" .. k .. \")\", 1)\n" \
     "        end\n" \
     "end\n" \
-    "addEventHandler(\"onResourceStop\", root, function(res) exports[getResourceFromName(res)] = nil end)\n" \
+    "addEventHandler(\"onResourceStop\", root, function(res) exports[res] = nil end)\n" \
     "exports = setmetatable({}, exportsMT)\n";
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
@@ -76,12 +76,6 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     m_pVehicleManager = pVehicleManager;
     m_pBlipManager = pBlipManager;
     m_pMapManager = pMapManager;
-
-    // Add all our events and functions
-    InitVM();
-
-    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
-    InitSecurity();
 }
 
 
@@ -146,6 +140,9 @@ void CLuaMain::InitVM ( void )
 {
     // Create a new VM
     m_luaVM = lua_open ();
+
+    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
+    InitSecurity ();
 
     // Set the instruction count hook
     lua_sethook ( m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT );

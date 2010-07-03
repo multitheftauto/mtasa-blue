@@ -18,6 +18,7 @@
 class CPlayerJoinPacket : public CPacket
 {
 public:
+    virtual bool            RequiresSourcePlayer    ( void ) const                              { return false; }
     inline ePacketID        GetPacketID             ( void ) const                              { return static_cast < ePacketID > ( PACKET_ID_PLAYER_JOIN ); };
     inline unsigned long    GetFlags                ( void ) const                              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 

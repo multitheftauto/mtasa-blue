@@ -669,6 +669,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CRegistryManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CRemoteCalls.cpp"
 					>
 				</File>
@@ -997,6 +1001,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CUnoccupiedVehicleSyncPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CUpdateInfoPacket.cpp"
 						>
 					</File>
 					<File
@@ -1674,6 +1682,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CRegistryManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CRemoteCalls.h"
 					>
 				</File>
@@ -2026,6 +2038,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CUnoccupiedVehicleSyncPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CUpdateInfoPacket.h"
 						>
 					</File>
 					<File

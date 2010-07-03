@@ -306,7 +306,12 @@ void CResourceHTMLItem::GetMimeType ( const char * szFilename )
 bool CResourceHTMLItem::Stop ( void )
 {
     if ( m_pVM )
+    {
+        // Delete the events on this VM
+        g_pGame->GetMapManager ()->GetRootElement()->DeleteEvents ( m_pVM, true );
+
         g_pGame->GetLuaManager()->RemoveVirtualMachine ( m_pVM );
+    }
 
     m_pVM = NULL;
     return true;

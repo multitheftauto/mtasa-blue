@@ -3531,7 +3531,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
 
     // Load load load
     if ( GetModelInfo () )
-        GetModelInfo ()-> LoadAllRequestedModels ();
+        g_pGame->GetStreaming()->LoadAllRequestedModels ();
 
     // Start out with a fairly big radius to check, and shrink it down over time
     float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );

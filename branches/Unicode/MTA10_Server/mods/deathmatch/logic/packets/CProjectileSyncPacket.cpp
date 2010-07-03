@@ -19,10 +19,6 @@ CProjectileSyncPacket::CProjectileSyncPacket ( void )
 
 bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
-    //Projectile sync packets are sent fast so check our player is still connected
-    if ( !GetSourcePlayer() )
-        return false;
-
     bool bHasOrigin;
     if ( !BitStream.ReadBit ( bHasOrigin ) )
         return false;
@@ -89,38 +85,6 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         default:
             return false;
-    }
-    if ( BitStream.Version() >= 0x07 ) {
-        bool bGTACreated;
-        if ( !BitStream.ReadBit ( bGTACreated ) )
-            return false;
-        unsigned char ucWeaponID = m_ucWeaponType;
-        if ( m_ucWeaponType == 19 || m_ucWeaponType == 20 )
-        {
-            ucWeaponID += 16;
-        }
-        CPlayer* pSourcePlayer = GetSourcePlayer();
-        if ( m_ucWeaponType != 58 && m_ucWeaponType != 21
-            && bGTACreated && pSourcePlayer->GetWeaponType( 7 ) != ucWeaponID
-            && pSourcePlayer->GetWeaponType( 8 ) != ucWeaponID )
-        {
-            if ( pSourcePlayer->GetWeaponType( 7 ) == 36 
-                && ( m_ucWeaponType == 19 || m_ucWeaponType == 20 ) )
-            {
-                return true;
-            }
-            else
-            {
-                CVehicle* pVehicle = pSourcePlayer->GetOccupiedVehicle();
-                if ( !pVehicle || ( pVehicle->GetModel() != 520 
-                    && pVehicle->GetModel() != 432 
-                    && pVehicle->GetModel() != 425 ) )
-                {
-                    pSourcePlayer->Kick ( NULL, "AC #3: You were kicked from the game" );
-                    return false;
-                }
-            }
-        }
     }
     return true;
 }

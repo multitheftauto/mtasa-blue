@@ -292,6 +292,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     float fScale;
     g_pCore->GetCVars ()->Get ( "text_scale", fScale );
     CClientTextDisplay::SetGlobalScale ( fScale );
+
+    // Reset async loading script settings to default
+    g_pGame->SetAsyncLoadingFromScript ( false, false );
 }
 
 
@@ -535,6 +538,12 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
 
                 pBitStream->WriteCompressed ( (unsigned int)strPlayerVersion.length () );
                 pBitStream->Write ( strPlayerVersion.c_str (), strPlayerVersion.length () );
+            }
+
+            if ( pBitStream->Version () >= 0x0e )
+            {
+                // Should the server send us recommended update info?
+                pBitStream->WriteBit ( g_pCore->IsOptionalUpdateInfoRequired ( g_pNet->GetConnectedServer() ) );
             }
 
             pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGameVersion () ) );
@@ -2403,6 +2412,10 @@ void CClientGame::AddBuiltInEvents ( void )
 
     // Projectile events
     m_Events.AddEvent ( "onClientProjectileCreation", "creator", NULL, false );
+
+    // Sound events
+    m_Events.AddEvent ( "onClientSoundStream", "success, length", NULL, false );
+    m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
 }
 
 
@@ -4255,14 +4268,6 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
             case WEAPONTYPE_FLARE:
             case WEAPONTYPE_FREEFALL_BOMB:
                 break;
-        }
-        if ( pBitStream->Version() >= 0x07 ) 
-        {
-            //if we created it it'l have a parent
-            if ( pProjectile->GetParent() )
-                pBitStream->WriteBit ( false );
-            else
-                pBitStream->WriteBit ( true );
         }
         g_pNet->SendPacket ( PACKET_ID_PROJECTILE, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
 

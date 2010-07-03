@@ -3,7 +3,7 @@
 *  PROJECT:     Multi Theft Auto v1.0
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientSound.h
+*  FILE:        mods/shared_logic/CClientSound.cpp
 *  PURPOSE:     Sound entity class
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
 *               arc_
@@ -12,6 +12,8 @@
 *****************************************************************************/
 
 #include <StdInc.h>
+#include <process.h>
+#include <tags.h>
 
 extern CClientGame* g_pClientGame;
 
@@ -27,67 +29,162 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : CClientE
 
     RelateDimension ( pManager->GetSoundManager ()->GetDimension () );
 
+    m_strPath = "";
     m_fVolume = 1.0f;
-    m_fSpeed = 1.0f;
-    m_fMinDistance = 2.0f;
-    m_fMaxDistance = 10.0f;
+    m_fDefaultFrequency = 44100.0f;
+    m_fMinDistance = 5.0f;
+    m_fMaxDistance = 200.0f;
     m_usDimension = 0;
     m_b3D = false;
+    m_pThread = 0;
+
+    for ( int i=0; i<9; i++ )
+        m_FxEffects[i] = 0;
 }
 
 CClientSound::~CClientSound ( void )
 {
-    m_pSoundManager->RemoveFromList ( this );
     if ( m_pSound )
-    {
-        m_pSound->setSoundStopEventReceiver ( NULL );
-        m_pSound->stop ();
-        m_pSound->drop ();
-    }
+        BASS_ChannelStop ( m_pSound );
+
+    m_pSoundManager->RemoveFromList ( this );
+    TerminateThread ( m_pThread, 0 );
 }
 
-bool CClientSound::Play ( const char* szPath, bool bLoop )
+bool CClientSound::Play ( const SString& strPath, bool bLoop )
 {
-    m_pSound = m_pSoundManager->GetEngine()->play2D ( szPath, bLoop, false, true );
-    if ( m_pSound )
+    long lFlags = BASS_STREAM_AUTOFREE;
+    if ( bLoop )
+        lFlags = BASS_SAMPLE_LOOP;
+
+    // Try to load the sound file
+    if (
+        ( m_pSound = BASS_StreamCreateFile ( false, strPath, 0, 0, lFlags ) )
+     || ( m_pSound = BASS_MusicLoad ( false, strPath, 0, 0, lFlags, 0) )
+        )
     {
-        m_b3D = false;
-        m_pSound->setSoundStopEventReceiver ( m_pSoundManager );
+        m_strPath = strPath;
+        BASS_ChannelPlay ( m_pSound, false );
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
         return true;
     }
+    g_pCore->GetConsole()->Printf ( "BASS ERROR %d in Play  path = %s", BASS_ErrorGetCode(), strPath.c_str() );
     return false;
 }
 
-bool CClientSound::Play3D ( const char* szPath, CVector vecPosition, bool bLoop )
+bool CClientSound::Play3D ( const SString& strPath, const CVector& vecPosition, bool bLoop )
 {
-    m_vecPosition = vecPosition;
-    vec3df pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
-    m_pSound = m_pSoundManager->GetEngine()->play3D ( szPath, pos, bLoop, false, true );
-    if ( m_pSound )
+    long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
+    if ( bLoop )
+        lFlags |= BASS_SAMPLE_LOOP;
+
+    // Try to load the sound file
+    if (
+        ( m_pSound = BASS_StreamCreateFile ( false, strPath, 0, 0, lFlags ) )
+     || ( m_pSound = BASS_MusicLoad ( false, strPath, 0, 0, lFlags, 0) )
+        )
     {
         m_b3D = true;
-        m_pSound->setSoundStopEventReceiver ( m_pSoundManager );
-        m_pSound->setMinDistance ( m_fMinDistance );
+        m_strPath = strPath;
+        m_vecPosition = vecPosition;
+        BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
+        BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, NULL );
+        BASS_ChannelSet3DAttributes ( m_pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
+        BASS_ChannelPlay ( m_pSound, false );
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
         return true;
     }
+    g_pCore->GetConsole()->Printf ( "BASS ERROR %d in Play3D  path = %s", BASS_ErrorGetCode(), strPath.c_str() );
     return false;
+}
+
+void CClientSound::PlayStream ( const SString& strURL, bool bLoop, bool b3D, const CVector& vecPosition )
+{
+    m_strPath = strURL;
+    m_b3D = b3D;
+    m_vecPosition = vecPosition;
+
+    long lFlags = BASS_STREAM_AUTOFREE;
+    if ( b3D )
+    {
+        m_b3D = true;
+        m_vecPosition = vecPosition;
+        lFlags |= BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
+    }
+    if ( bLoop )
+        lFlags |= BASS_SAMPLE_LOOP;
+
+    thestruct* pArguments = new thestruct;
+    pArguments->pClientSound = this;
+    pArguments->strURL = strURL;
+    pArguments->lFlags = lFlags;
+
+    // Stream the file in a seperate thread to don't interupt the game
+    m_pThread = CreateThread ( NULL, 0, reinterpret_cast <LPTHREAD_START_ROUTINE> ( &CClientSound::PlayStreamIntern ), pArguments, 0, NULL );
+}
+
+void CClientSound::PlayStreamIntern ( void* arguments )
+{
+    thestruct* pArgs = static_cast <thestruct*> ( arguments );
+
+    // Try to load the sound file
+    HSTREAM pSound = BASS_StreamCreateURL ( pArgs->strURL, 0, pArgs->lFlags, NULL, NULL );
+    pArgs->pClientSound->ThreadCallback( pSound );
+    delete arguments;
+}
+
+void CALLBACK DownloadSync ( HSYNC handle, DWORD channel, DWORD data, void* user )
+{
+    CClientSound* pClientSound = static_cast <CClientSound*> ( user );
+
+    // Call onClientSoundFinishedDownload LUA event
+    CLuaArguments Arguments;
+    Arguments.PushNumber ( pClientSound->GetLength () );
+    pClientSound->CallEvent ( "onClientSoundFinishedDownload", Arguments, true );
+}
+
+void CClientSound::ThreadCallback ( HSTREAM pSound )
+{
+    if ( pSound )
+    {
+        m_pSound = pSound;
+        if ( m_b3D )
+        {
+            BASS_3DVECTOR pos ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
+            BASS_ChannelSet3DPosition ( pSound, &pos, NULL, NULL );
+            BASS_ChannelSet3DAttributes ( pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
+        }
+        // Set a Callback function for download finished
+        BASS_ChannelSetSync ( pSound, BASS_SYNC_DOWNLOAD, 0, &DownloadSync, this );
+        BASS_ChannelGetAttribute ( pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
+        BASS_ChannelPlay ( pSound, false );
+    }
+    else
+        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PlayStream  b3D = %s  path = %s", BASS_ErrorGetCode(), m_b3D ? "true" : "false", m_strPath.c_str() );
+    
+    // Call onClientSoundStream LUA event
+    CLuaArguments Arguments;
+    Arguments.PushBoolean ( pSound ? true : false );
+    Arguments.PushNumber ( GetLength () );
+    this->CallEvent ( "onClientSoundStream", Arguments, true );
 }
 
 void CClientSound::Stop ( void )
 {
     if ( m_pSound )
-    {
-        m_pSound->stop ();
-    }
+        BASS_ChannelStop ( m_pSound );
+
     g_pClientGame->GetElementDeleter()->Delete ( this );
-    m_pSoundManager->RemoveFromList ( this );
 }
 
 void CClientSound::SetPaused ( bool bPaused )
 {
     if ( m_pSound )
     {
-        return m_pSound->setIsPaused ( bPaused );
+        if ( bPaused )
+            BASS_ChannelPause ( m_pSound );
+        else
+            BASS_ChannelPlay ( m_pSound, false );
     }
 }
 
@@ -95,7 +192,7 @@ bool CClientSound::IsPaused ( void )
 {
     if ( m_pSound )
     {
-        return m_pSound->getIsPaused ();
+        return BASS_ChannelIsActive( m_pSound ) == BASS_ACTIVE_PAUSED;
     }
     return false;
 }
@@ -104,7 +201,7 @@ bool CClientSound::IsFinished ( void )
 {
     if ( m_pSound )
     {
-        return m_pSound->isFinished ();
+        return BASS_ChannelIsActive( m_pSound ) == BASS_ACTIVE_STOPPED;
     }
     return false;
 }
@@ -113,7 +210,7 @@ void CClientSound::SetPlayPosition ( unsigned int uiPosition )
 {
     if ( m_pSound )
     {
-        m_pSound->setPlayPosition ( uiPosition );
+        BASS_ChannelSetPosition( m_pSound, BASS_ChannelSeconds2Bytes( m_pSound, uiPosition/1000 ), BASS_POS_BYTE );
     }
 }
 
@@ -121,7 +218,9 @@ unsigned int CClientSound::GetPlayPosition ( void )
 {
     if ( m_pSound )
     {
-        return m_pSound->getPlayPosition ();
+        QWORD pos = BASS_ChannelGetPosition( m_pSound, BASS_POS_BYTE );
+        if ( pos != -1 )
+            return static_cast <unsigned int> ( BASS_ChannelBytes2Seconds( m_pSound, pos ) * 1000 );
     }
     return 0;
 }
@@ -130,7 +229,9 @@ unsigned int CClientSound::GetLength ( void )
 {
     if ( m_pSound )
     {
-        return m_pSound->getPlayLength ();
+        QWORD length = BASS_ChannelGetLength( m_pSound, BASS_POS_BYTE );
+        if ( length != -1 )
+            return static_cast <unsigned int> ( BASS_ChannelBytes2Seconds( m_pSound, length ) * 1000 );
     }
     return 0;
 }
@@ -144,37 +245,51 @@ void CClientSound::SetVolume ( float fVolume )
 {
     m_fVolume = fVolume;
     if ( m_pSound && !m_b3D && m_usDimension == m_pManager->GetSoundManager ()->GetDimension () )
-    {
-        m_pSound->setVolume ( fVolume );
-    }
+        BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_VOL, fVolume );
 }
 
 float CClientSound::GetPlaybackSpeed ( void )
 {
-    return m_fSpeed;
+    float fSpeed = 1;
+    if ( m_pSound )
+        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &fSpeed );
+    return ( fSpeed / m_fDefaultFrequency );
 }
 
 void CClientSound::SetPlaybackSpeed ( float fSpeed )
 {
-    m_fSpeed = fSpeed;
     if ( m_pSound )
-    {
-        m_pSound->setPlaybackSpeed ( fSpeed );
-    }
+        BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_FREQ, fSpeed * m_fDefaultFrequency );
 }
 
 void CClientSound::SetPosition ( const CVector& vecPosition )
 {
-    m_vecPosition = vecPosition;
     if ( m_pSound )
     {
-        m_pSound->setPosition ( vec3df ( vecPosition.fX, vecPosition.fY, vecPosition.fZ ) );
+        m_vecPosition = vecPosition;
+        BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
+        BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, NULL);
     }
 }
 
 void CClientSound::GetPosition ( CVector& vecPosition ) const
 {
     vecPosition = m_vecPosition;
+}
+
+void CClientSound::SetVelocity ( const CVector& vecVelocity )
+{
+    if ( m_pSound )
+    {
+        m_vecVelocity = vecVelocity;
+        BASS_3DVECTOR vel ( vecVelocity.fX, vecVelocity.fY, vecVelocity.fZ );
+        BASS_ChannelSet3DPosition ( m_pSound, NULL, NULL, &vel);
+    }
+}
+
+void CClientSound::GetVelocity ( CVector& vecVelocity )
+{
+    vecVelocity = m_vecVelocity;
 }
 
 void CClientSound::SetDimension ( unsigned short usDimension )
@@ -199,10 +314,6 @@ void CClientSound::RelateDimension ( unsigned short usDimension )
 void CClientSound::SetMinDistance ( float fDistance )
 {
     m_fMinDistance = fDistance;
-    if ( m_pSound )
-    {
-        m_pSound->setMinDistance ( fDistance );
-    }
 }
 
 float CClientSound::GetMinDistance ( void )
@@ -213,66 +324,89 @@ float CClientSound::GetMinDistance ( void )
 void CClientSound::SetMaxDistance ( float fDistance )
 {
     m_fMaxDistance = fDistance;
-    if ( m_pSound )
-    {
-        m_pSound->setMaxDistance ( fDistance );
-    }
 }
 
 float CClientSound::GetMaxDistance ( void )
 {
-    if ( m_pSound )
-    {
-        return m_pSound->getMaxDistance ();
-    }
-    return 0.0f;
+    return m_fMaxDistance;
 }
 
-void CClientSound::Process3D ( CVector vecPosition, CVector vecLookAt )
+void CClientSound::ShowShoutcastMetaTags( void )
 {
-    if ( !m_b3D ) return;
-
-    // Update our position/rotation if we're attached
-    DoAttaching ();
-
     if ( m_pSound )
     {
-        // Pan
-        CVector vecLook = vecLookAt - vecPosition;
-        CVector vecSound = m_vecPosition - vecPosition;
-        vecLook.fZ = vecSound.fZ = 0.0f;
-        vecLook.Normalize ();
-        vecSound.Normalize ();
-
-        vecLook.CrossProduct ( &vecSound );
-        // The length of the cross product (which is simply fZ in this case)
-        // is equal to the sine of the angle between the vectors
-        float fPan = vecLook.fZ;
-        if ( fPan < -1.0f + SOUND_PAN_THRESHOLD )
-            fPan = -1.0f + SOUND_PAN_THRESHOLD;
-        else if ( fPan > 1.0f - SOUND_PAN_THRESHOLD )
-            fPan = 1.0f - SOUND_PAN_THRESHOLD;
-
-        m_pSound->setPan ( fPan );
-
-        // Volume
-        float fDistance = DistanceBetweenPoints3D ( vecPosition, m_vecPosition );
-        float fVolume = 1.0;
-
-        if ( fDistance <= m_fMinDistance )
-        {
-            fVolume = 1.0f;
-        }
-        else if ( fDistance >= m_fMaxDistance )
-        {
-            fVolume = 0.0f;
-        }
-        else
-        {
-            float fLinear = (m_fMaxDistance - fDistance) / m_fMaxDistance;
-            fVolume = sqrt ( fLinear ) * fLinear;
-        }
-
-        m_pSound->setVolume ( m_fVolume * fVolume );
+        const char* szMeta = BASS_ChannelGetTags( m_pSound, BASS_TAG_META );
+        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in ShowShoutcastMetaTags  MetaTags = %s", BASS_ErrorGetCode(), szMeta );
     }
+}
+
+SString CClientSound::GetMetaTags( const SString& strFormat )
+{
+    SString strMetaTags = "";
+    strMetaTags = TAGS_Read( m_pSound, strFormat.c_str() );
+    return strMetaTags;
+}
+
+bool CClientSound::SetFxEffect ( int iFxEffect, bool bEnable )
+{
+    if ( m_pSound )
+    {
+        if ( iFxEffect >= 0 )
+        {
+            if ( bEnable )
+            {
+                if ( !m_FxEffects[iFxEffect] )
+                {
+                    m_FxEffects[iFxEffect] = BASS_ChannelSetFX ( m_pSound, iFxEffect, 0 );
+                    if ( m_FxEffects[iFxEffect] )
+                        return true;
+                }
+            }
+            else
+            {
+                if ( BASS_ChannelRemoveFX ( m_pSound, m_FxEffects[iFxEffect] ) )
+                {
+                    m_FxEffects[iFxEffect] = 0;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool CClientSound::IsFxEffectEnabled ( int iFxEffect )
+{
+    return m_FxEffects[iFxEffect] ? true : false;
+}
+
+void CClientSound::Process3D ( CVector vecPosition )
+{
+    if ( !m_pSound || !m_b3D )
+        return;
+
+    // Update our position and velocity if we're attached
+    CClientEntity* pAttachedToEntity = GetAttachedTo ();
+    if ( pAttachedToEntity )
+    {
+        DoAttaching ();
+        CVector vecVelocity;
+        if ( CStaticFunctionDefinitions::GetElementVelocity ( *pAttachedToEntity, vecVelocity ) )
+            SetVelocity ( vecVelocity );
+    }
+
+    // Volume
+    float fDistance = DistanceBetweenPoints3D ( vecPosition, m_vecPosition );
+    float fDistDiff = m_fMaxDistance - m_fMinDistance;
+    float fVolume = 1.0;
+
+    //Transform e^-x to suit our sound
+    if ( fDistance <= m_fMinDistance )
+        fVolume = 1.0f;
+    else if ( fDistance >= m_fMaxDistance )
+        fVolume = 0.0f;
+    else
+        fVolume = exp ( - ( fDistance - m_fMinDistance ) * ( CUT_OFF / fDistDiff ) );
+
+    BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_VOL, fVolume * m_fVolume );
 }

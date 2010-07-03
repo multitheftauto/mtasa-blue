@@ -75,6 +75,7 @@ CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner )
     // Create it and add it to the list over VM's
     CLuaMain * vm = new CLuaMain ( this, pResourceOwner );
     m_virtualMachines.push_back ( vm );
+    vm->InitVM ();
     return vm;
 }
 
@@ -342,6 +343,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSoundMinDistance", CLuaFunctionDefs::GetSoundMinDistance );
     CLuaCFunctions::AddFunction ( "setSoundMaxDistance", CLuaFunctionDefs::SetSoundMaxDistance );
     CLuaCFunctions::AddFunction ( "getSoundMaxDistance", CLuaFunctionDefs::GetSoundMaxDistance );
+    CLuaCFunctions::AddFunction ( "getSoundMetaTags", CLuaFunctionDefs::GetSoundMetaTags );
+    CLuaCFunctions::AddFunction ( "setSoundEffectEnabled", CLuaFunctionDefs::SetSoundEffectEnabled );
+    CLuaCFunctions::AddFunction ( "getSoundEffects", CLuaFunctionDefs::GetSoundEffects );
 
     // Radio funcs
     CLuaCFunctions::AddFunction ( "setRadioChannel", CLuaFunctionDefs::SetRadioChannel );
@@ -545,6 +549,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineReplaceModel", CLuaFunctionDefs::EngineReplaceModel );
     CLuaCFunctions::AddFunction ( "engineRestoreModel", CLuaFunctionDefs::EngineRestoreModel );
     CLuaCFunctions::AddFunction ( "engineSetModelLODDistance", CLuaFunctionDefs::EngineSetModelLODDistance );
+    CLuaCFunctions::AddFunction ( "engineSetAsynchronousLoading", CLuaFunctionDefs::EngineSetAsynchronousLoading );
 
     //CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", CLuaFunctionDefs::EngineReplaceMatchingAtomics );
     //CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", CLuaFunctionDefs::EngineReplaceWheelAtomics );
@@ -774,6 +779,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "ref", CLuaFunctionDefs::Reference );
     CLuaCFunctions::AddFunction ( "deref", CLuaFunctionDefs::Dereference );
     CLuaCFunctions::AddFunction ( "getColorFromString", CLuaFunctionDefs::GetColorFromString );
+    CLuaCFunctions::AddFunction ( "getValidPedModels", CLuaFunctionDefs::GetValidPedModels );
 
     // World get functions
     CLuaCFunctions::AddFunction ( "getTime", CLuaFunctionDefs::GetTime_ );    

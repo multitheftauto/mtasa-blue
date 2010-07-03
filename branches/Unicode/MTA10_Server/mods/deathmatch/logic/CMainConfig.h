@@ -41,6 +41,7 @@ public:
 
     inline unsigned int             GetMTUSize                      ( void )        { return m_uiMTUSize; };
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
+    void                            SetServerName                   ( std::string strServerName );
     std::string                     GetServerIP                     ( void );
     unsigned short                  GetServerPort                   ( void );
     unsigned int                    GetMaxPlayers                   ( void );
@@ -55,7 +56,6 @@ public:
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
-    inline bool                     GetHTTPAutoClientFiles          ( void )        { return m_bHTTPAutoClientFiles; };
     inline int                      GetHTTPConnectionsPerClient     ( void )        { return m_iHTTPConnectionsPerClient; };
     inline int                      GetEnableClientChecks           ( void )        { return m_iEnableClientChecks; };
     inline const std::string&       GetLogFile                      ( void )        { return m_strLogFile; };
@@ -69,6 +69,11 @@ public:
     inline bool                     GetAutoUpdateIncludedResourcesEnabled   ( void )        { return m_bAutoUpdateIncludedResources; };
     inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
+    bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableACMap, szTagAC ); };
+    bool                            IsBelowMinimumClient            ( const char* szVersion )   { return m_strMinClientVersion.length () && m_strMinClientVersion > szVersion; }
+    bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
+    const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersion; }
+    const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     void                            SetFPSLimit                     ( unsigned short usFPS );
@@ -94,7 +99,6 @@ private:
     unsigned short                  m_usHTTPPort;
     eHTTPDownloadType               m_ucHTTPDownloadType;
     std::string                     m_strHTTPDownloadURL;
-    bool                            m_bHTTPAutoClientFiles;
     int                             m_iHTTPConnectionsPerClient;
     int                             m_iEnableClientChecks;
     std::string                     m_strLogFile;
@@ -109,6 +113,9 @@ private:
     bool                            m_bVerifySerials;
     unsigned short                  m_usFPSLimit;
     bool                            m_bDontBroadcastLan;
+    std::map < SString, int >       m_DisableACMap;
+    SString                         m_strMinClientVersion;
+    SString                         m_strRecommendedClientVersion;
 };
 
 #endif

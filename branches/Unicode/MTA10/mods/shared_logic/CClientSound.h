@@ -18,10 +18,15 @@ class CClientSound;
 #include "CClientSoundManager.h"
 #include "CClientEntity.h"
 
-using namespace irrklang;
-
 //#define MAX_SOUND_DISTANCE 100
-#define SOUND_PAN_THRESHOLD 0.85f
+#define CUT_OFF 5.0f //Cut off point at which volume is regarded as 0 in the function e^-x
+
+typedef struct
+{
+    CClientSound* pClientSound;
+    SString strURL;
+    long lFlags;
+} thestruct;
 
 class CClientSound : public CClientEntity
 {
@@ -34,8 +39,14 @@ public:
 
     eClientEntityType       GetType                 ( void ) const                      { return CCLIENTSOUND; }
 
-    bool                    Play                    ( const char* szPath, bool bLoop );
-    bool                    Play3D                  ( const char* szPath, CVector vecPosition, bool bLoop );
+    bool                    Play                    ( const SString& strPath, bool bLoop );
+    bool                    Play3D                  ( const SString& strPath, const CVector& vecPosition, bool bLoop );
+    void                    PlayStream              ( const SString& strURL, bool bLoop, bool b3D = false, const CVector& vecPosition = CVector () );
+
+    static void             PlayStreamIntern        ( void* arguments );
+
+    void                    ThreadCallback          ( HSTREAM pSound );
+
     void                    Stop                    ( void );
 
     void                    SetPaused               ( bool bPaused );
@@ -54,39 +65,53 @@ public:
     void                    SetPlaybackSpeed        ( float fSpeed );
     float                   GetPlaybackSpeed        ( void );
 
+    void                    GetPosition             ( CVector& vecPosition ) const;
+    void                    SetPosition             ( const CVector& vecPosition );
+
+    void                    GetVelocity             ( CVector& vecVelocity );
+    void                    SetVelocity             ( const CVector& vecVelocity );
+
+    void                    SetDimension            ( unsigned short usDimension );
+    void                    RelateDimension         ( unsigned short usDimension );
+
     void                    SetMinDistance          ( float fDistance );
     float                   GetMinDistance          ( void );
 
     void                    SetMaxDistance          ( float fDistance );
     float                   GetMaxDistance          ( void );
 
+    void                    ShowShoutcastMetaTags   ( void );
+    SString                 GetMetaTags             ( const SString& strFormat );
+
+    bool                    SetFxEffect             ( int iFxEffect, bool bEnable );
+    bool                    IsFxEffectEnabled       ( int iFxEffect );
+
     void                    Unlink                  ( void ) {};
-    void                    GetPosition             ( CVector& vecPosition ) const;
-    void                    SetPosition             ( const CVector& vecPosition );
-
-    void                    SetDimension            ( unsigned short usDimension );
-    void                    RelateDimension         ( unsigned short usDimension );
-
 
 protected:
 
-    ISound*                 GetSound                ( void )                            { return m_pSound; };
-    void                    Process3D               ( CVector vecPosition, CVector vecLookAt );
-    void                    Set3D                   ( bool b3D )                        { m_b3D = b3D; };
+    DWORD                   GetSound                ( void )                            { return m_pSound; };
+    void                    Process3D               ( CVector vecPosition );
 
 private:
 
-    float                   m_fVolume;
-    float                   m_fSpeed;
-    float                   m_fMinDistance;
-    float                   m_fMaxDistance;
-
-    CVector                 m_vecPosition;
-
     CClientSoundManager*    m_pSoundManager;
-    ISound*                 m_pSound;
+
+    DWORD                   m_pSound;
 
     bool                    m_b3D;
+    float                   m_fDefaultFrequency;
+    float                   m_fVolume;
+    float                   m_fMinDistance;
+    float                   m_fMaxDistance;
+    CVector                 m_vecPosition;
+    CVector                 m_vecVelocity;
+
+    HFX                     m_FxEffects[9];
+
+    HANDLE                  m_pThread;
+
+    SString                 m_strPath;
 };
 
 #endif

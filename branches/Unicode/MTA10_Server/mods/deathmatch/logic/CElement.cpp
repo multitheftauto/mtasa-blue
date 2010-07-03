@@ -1376,4 +1376,15 @@ CSphere CElement::GetWorldBoundingSphere ( void )
 void CElement::UpdateSpatialData ( void )
 {
     GetSpatialDatabase ()->UpdateEntity ( this );
+    // Also make sure attached entites get updated
+    for ( list < CElement * > ::iterator iter = m_AttachedElements.begin (); iter != m_AttachedElements.end () ; iter++ )
+    {
+        CElement* pElement = *iter;
+        if ( pElement->GetAttachedToElement () )
+        {
+            CVector vecPosition;
+            pElement->GetAttachedPosition ( vecPosition );
+            pElement->SetPosition ( vecPosition );
+        }
+    }
 }

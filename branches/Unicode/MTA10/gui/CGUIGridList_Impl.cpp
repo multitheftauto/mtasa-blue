@@ -319,6 +319,9 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
             }
             else
             {
+                pItem->SetFont ( "default-normal" );
+                pItem->SetDisabled ( false );
+
                 if ( hColumn == 1 )
                 {
                     // Enable some spacing on regular items, if this is the first item

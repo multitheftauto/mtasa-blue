@@ -29,8 +29,8 @@ SBindableKey g_bkKeys[] =
     { "tab",     0x09,          GTA_KEY_TAB,            DATA_NONE,              0 }, 
     { "lshift",  0x10,          GTA_KEY_LSHIFT,         DATA_NOT_EXTENDED,      0 },
     { "rshift",  0x10,          GTA_KEY_RSHIFT,         DATA_EXTENDED,          0 }, // 10
-    { "lctrl",   0x11,          GTA_KEY_LCONTROL,       DATA_NOT_EXTENDED,      0,      true }, 
-    { "rctrl",   0x11,          GTA_KEY_RCONTROL,       DATA_EXTENDED,          0,      true },
+    { "lctrl",   0x11,          GTA_KEY_LCONTROL,       DATA_NOT_EXTENDED,      0 }, 
+    { "rctrl",   0x11,          GTA_KEY_RCONTROL,       DATA_EXTENDED,          0 },
     { "lalt",    0x12,          GTA_KEY_LMENU,          DATA_NOT_EXTENDED,      0,      true },
     { "ralt",    0x12,          GTA_KEY_RMENU,          DATA_EXTENDED,          0,      true },
     { "pause",   0x13,          GTA_KEY_PAUSE,          DATA_NONE,              0,      true },
@@ -239,7 +239,9 @@ SDefaultCommandBind g_dcbDefaultCommands[] =
     { "pgup",    true,  "debugscrollup",    "1" },
     { "pgup",    false, "debugscrollup",    "0" },
     { "pgdn",    true,  "debugscrolldown",  "-1" },
-    { "pgdn",    false, "debugscrolldown",  "0" }
+    { "pgdn",    false, "debugscrolldown",  "0" },
+
+    { "", false, NULL, NULL }
 };
 
 // HACK: our current shift key states
@@ -527,7 +529,7 @@ bool CKeyBinds::Call ( CKeyBind* pKeyBind )
 }
 
 
-bool CKeyBinds::AddCommand ( const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource )
+bool CKeyBinds::AddCommand ( const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource, bool bAltKey )
 {
     if ( szKey == NULL || szCommand == NULL ) return false;
 
@@ -549,8 +551,13 @@ bool CKeyBinds::AddCommand ( const char* szKey, const char* szCommand, const cha
             bind->szResource = new char [ strlen ( szResource ) + 1 ];
             strcpy ( bind->szResource, szResource );
 
-            bind->szDefaultKey = new char [ strlen ( szKey ) + 1 ];
-            strcpy ( bind->szDefaultKey, szKey );
+            if ( bAltKey )
+                bind->szDefaultKey = "";
+            else
+            {
+                bind->szDefaultKey = new char [ strlen ( szKey ) + 1 ];
+                strcpy ( bind->szDefaultKey, szKey );
+            }
         }
         bind->bHitState = bState;
         bind->bState = false;
@@ -740,7 +747,7 @@ bool CKeyBinds::SetCommandActive ( const char* szKey, const char* szCommand, boo
     return false;
 }
 
-void CKeyBinds::SetAllCommandsActive ( const char* szResource, bool bActive )
+void CKeyBinds::SetAllCommandsActive ( const char* szResource, bool bActive, const char* szCommand, bool bState, const char* szArguments, bool checkHitState )
 {
     list < CKeyBind* > ::const_iterator iter = m_pList->begin ();
     for ( ; iter != m_pList->end (); iter++ )
@@ -750,7 +757,16 @@ void CKeyBinds::SetAllCommandsActive ( const char* szResource, bool bActive )
             CCommandBind* pBind = static_cast < CCommandBind* > ( *iter );
             if ( pBind->szResource && ( strcmp ( pBind->szResource, szResource ) == 0 ) )
             {
-                pBind->bActive = bActive;
+                if ( !szCommand || ( strcmp ( pBind->szCommand, szCommand ) == 0 ) )
+                {
+                    if ( !checkHitState || ( pBind->bHitState == bState ) )
+                    {
+                        if ( !szArguments || ( pBind->szArguments && strcmp ( pBind->szArguments, szArguments ) == 0 ) )
+                        {
+                            pBind->bActive = bActive;
+                        }
+                    }
+                }
             }
         }
     }  
@@ -2362,10 +2378,8 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
                         pA->SetValue ( szResource );
 
                         //If its still the default key dont bother saving it
-                        if ( strcmp ( pBind->szDefaultKey, szKey ) == 0 )
-                        {
+                        if ( !strcmp ( pBind->szDefaultKey, szKey ) )
                             pNode->GetParent()->DeleteSubNode(pNode);
-                        }
                     }
                 }
                 else if ( type == KEY_BIND_GTA_CONTROL )
@@ -2489,7 +2503,7 @@ void CKeyBinds::LoadDefaultCommands ( bool bForce )
     for ( int i = 0 ; *g_dcbDefaultCommands [ i ].szKey != NULL ; i++ )
     {
         SDefaultCommandBind* temp = &g_dcbDefaultCommands [ i ];
-        if ( bForce || !CommandExists ( temp->szKey, temp->szCommand, true, temp->bState ) )
+        if ( bForce || !CommandExists ( NULL, temp->szCommand, true, temp->bState, temp->szArguments ) )
             AddCommand ( temp->szKey, temp->szCommand, temp->szArguments, temp->bState );
     }
 }

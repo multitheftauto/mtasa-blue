@@ -57,7 +57,7 @@ public:
     inline void                     SetOwner                ( int iOwner )                  { m_iOwner = iOwner; };
 
     bool                            LoadScriptFromFile      ( const char* szLUAScript );
-    bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize );
+    bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName );
     bool                            LoadScript              ( const char* szLUAScript );
     void                            UnloadScript            ( void );
 
@@ -87,8 +87,8 @@ public:
     void                            SaveXML                 ( CXMLNode * pRootNode );
     bool                            XMLExists               ( CXMLFile* pFile );
 
-private:
     void                            InitVM                  ( void );
+private:
     void                            InitSecurity            ( void );
 
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );

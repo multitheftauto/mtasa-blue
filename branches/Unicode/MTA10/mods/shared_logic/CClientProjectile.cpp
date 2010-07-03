@@ -12,6 +12,8 @@
 
 #include <StdInc.h>
 
+#define AIRBOMB_MAX_LIFETIME 60000
+
 /* An instance of this class is created when GTA creates a projectile, it automatically
    destroys itself when GTA is finished with the projectile, this could/should eventually be
    used as a server created element and streamed.
@@ -34,6 +36,7 @@ CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjecti
     else m_pvecTarget = NULL;
     m_fForce = fForce;
     m_bLocal = bLocal;
+    m_llCreationTime = GetTickCount64_ ();
 
     m_pInitiateData = NULL;
     m_bInitiate = true;
@@ -152,6 +155,9 @@ void CClientProjectile::Destroy ( void )
 
 bool CClientProjectile::IsActive ( void )
 {
+    // Ensure airbomb is cleaned up
+    if ( m_weaponType == WEAPONTYPE_FREEFALL_BOMB && GetTickCount64_ () - m_llCreationTime > AIRBOMB_MAX_LIFETIME )
+        return false;
     return ( m_pProjectile && m_pProjectileInfo->IsActive () );
 }
 

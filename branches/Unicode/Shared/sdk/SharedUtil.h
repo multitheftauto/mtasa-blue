@@ -45,6 +45,7 @@
 
 #ifndef WIN32
     #define _vsnprintf vsnprintf
+    #define _isnan isnan
 #endif
 
 //
@@ -104,10 +105,24 @@ namespace SharedUtil
     void OutputDebugLine ( const char* szMessage );
 
     //
+    // Returns true if the file exists
+    //
+    bool FileExists ( const SString& strFilename );
+
+    //
     // Load binary data from a file into an array
     //
     bool FileLoad ( const SString& strFilename, std::vector < char >& buffer );
 
+    //
+    // Return true if supplied string adheres to the new version format
+    //
+    bool IsValidVersionString ( const SString& strVersion );
+
+    //
+    // Try to make a path relative to the 'resources/' directory
+    //
+    SString ConformResourcePath ( const char* szRes );
 
     //
     // Some templates

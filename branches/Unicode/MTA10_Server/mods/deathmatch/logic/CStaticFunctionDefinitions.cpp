@@ -3102,10 +3102,10 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby ( CElement * pElement, b
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame )
 {
     assert ( pElement );
-    RUN_CHILDREN SetPedAnimation ( *iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
+    RUN_CHILDREN SetPedAnimation ( *iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
 
     if ( IS_PED ( pElement ) )
     {
@@ -3130,6 +3130,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const ch
                 BitStream.pBitStream->WriteBit ( bLoop );
                 BitStream.pBitStream->WriteBit ( bUpdatePosition );
                 BitStream.pBitStream->WriteBit ( bInterruptable );
+                BitStream.pBitStream->WriteBit ( bFreezeLastFrame );
             }
             else
             {
@@ -7406,6 +7407,15 @@ bool CStaticFunctionDefinitions::SetPlayerAnnounceValue ( CElement* pElement, co
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetServerName( std::string strServerName )
+{
+    if ( strServerName != "" )
+    {
+        g_pGame->GetConfig()->SetServerName ( strServerName );
+        return true;
+    }
+    return false;
+}
 
 void CStaticFunctionDefinitions::ExecuteSQLCreateTable ( const std::string& strTable, const std::string& strDefinition )
 {
@@ -8259,4 +8269,3 @@ SString CStaticFunctionDefinitions::GetVersionSortable ()
                             ,0
                             );
 }
-

@@ -179,6 +179,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             return true;
         #endif
 
+        case PACKET_ID_UPDATE_INFO:
+            Packet_UpdateInfo ( bitStream );
+            return true;
+
         default:             break;
     }
 
@@ -442,6 +446,7 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
     g_pClientGame->m_bGracefulDisconnect = true;
     g_pNet->StopNetwork ();
     g_pCore->GetModManager ()->RequestUnload ();
+    g_pClientGame->GetManager ()->SetGameUnloadedFlag ();
 }
 
 
@@ -4314,3 +4319,15 @@ void CPacketHandler::Packet_VoiceData ( NetBitStreamInterface& bitStream )
     }
 }
 #endif
+
+
+void CPacketHandler::Packet_UpdateInfo ( NetBitStreamInterface& bitStream )
+{
+    SString strType;
+    SString strData;
+    if ( BitStreamReadUsString( bitStream, strType ) &&
+         BitStreamReadUsString( bitStream, strData ) )
+    {
+        g_pCore->InitiateUpdate ( strType, g_pNet->GetConnectedServer () );
+    }
+}

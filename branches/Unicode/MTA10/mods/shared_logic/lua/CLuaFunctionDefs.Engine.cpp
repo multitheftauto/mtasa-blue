@@ -136,6 +136,11 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
         CResource* pResource = pLuaMain->GetResource ();
         if ( pResource )
         {
+            bool bFilteringEnabled = true;
+
+            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+                bFilteringEnabled = ( lua_toboolean ( luaVM, 2 ) ) ? true:false;
+
             // Grab the filename
             SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : "" );
             
@@ -150,7 +155,7 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
                 CClientTXD* pTXD = new CClientTXD ( m_pManager, INVALID_ELEMENT_ID );
 
                 // Try to load the TXD file
-                if ( pTXD->LoadTXD ( strPath ) )
+                if ( pTXD->LoadTXD ( strPath, bFilteringEnabled ) )
                 {
                     // Success loading the file. Set parent to TXD root
                     pTXD->SetParent ( pRoot );
@@ -342,6 +347,26 @@ int CLuaFunctionDefs::EngineSetModelLODDistance ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::EngineSetAsynchronousLoading ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( ( iArgument1 == LUA_TBOOLEAN ) &&
+        ( iArgument2 == LUA_TBOOLEAN || iArgument2 == LUA_TNONE ) )
+    {
+        bool bEnabled = lua_toboolean ( luaVM, 1 ) ? true : false;
+        bool bForced = iArgument2 == LUA_TBOOLEAN && lua_toboolean ( luaVM, 2 );
+        g_pGame->SetAsyncLoadingFromScript ( bEnabled, bForced );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 // TODO: int CLuaFunctionDefs::EngineReplaceMatchingAtomics ( lua_State* luaVM )
 int CLuaFunctionDefs::EngineReplaceMatchingAtomics ( lua_State* luaVM )

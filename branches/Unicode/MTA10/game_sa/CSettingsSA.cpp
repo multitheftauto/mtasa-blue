@@ -147,12 +147,23 @@ void CSettingsSA::SetBrightness ( unsigned int uiBrightness )
 unsigned int CSettingsSA::GetFXQuality ( )
 {
     // 0 = low, 1 = medium, 2 = high, 3 = very high
-    return *(BYTE*)VAR_fFxQuality;
+    return *(BYTE *)VAR_fFxQuality;
 }
 
 void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 {
     *(BYTE *)VAR_fFxQuality = fxQualityId;
+}
+
+float CSettingsSA::GetMouseSensivity ( )
+{
+    // 0.000312 (min) - 0.005000 (max)
+    return *(FLOAT *)VAR_fMouseSensivity;
+}
+
+void CSettingsSA::SetMouseSensivity ( float fSensivity )
+{
+    *(FLOAT *)VAR_fMouseSensivity = fSensivity;
 }
 
 void CSettingsSA::Save ()

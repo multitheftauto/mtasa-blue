@@ -274,6 +274,15 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 CVARS_SET ( "port",     g_pConnectManager->m_usPort );
                 CVARS_SET ( "password", g_pConnectManager->m_strPassword );
 
+                //Conver the Address to an unsigned long
+                unsigned long ulAddr = inet_addr( g_pConnectManager->m_strHost.c_str() );
+
+                //Create an instance of the in_addr structure to store the address
+                in_addr Address;
+                //Set the address to the unsigned long we just created
+                Address.S_un.S_addr = ulAddr;
+                //Set the current server info and Add the ASE Offset to the Query port)
+                CCore::GetSingleton().SetCurrentServer ( Address, g_pConnectManager->m_usPort + 123 );
 
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
                 CCore::GetSingleton ().SaveConfig ();

@@ -392,6 +392,25 @@ int CLuaFunctionDefs::GetColorFromString ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::GetValidPedModels ( lua_State* luaVM )
+{
+    int iIndex = 0;
+    lua_newtable ( luaVM );
+    for( int i = 0; i < 289; i++)
+    {
+        if ( CClientPlayerManager::IsValidModel(i) )
+        {
+            lua_pushnumber ( luaVM , ++iIndex);
+            lua_pushnumber ( luaVM , i);
+            lua_settable ( luaVM , -3);
+        }
+    }
+
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetDistanceBetweenPoints2D ( lua_State* luaVM )
 {
     // We got 6 valid float arguments?
