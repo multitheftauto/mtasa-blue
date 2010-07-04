@@ -46,6 +46,7 @@ bool g_bBoundsChecker = true;
 #define DEFAULT_GAME_SPEED 1.0f
 #define DEFAULT_BLUR_LEVEL 36
 #define DEFAULT_MINUTE_DURATION 1000
+#define DOUBLECLICK_TIMEOUT 330
 
 CClientGame::CClientGame ( bool bLocalPlay )
 {
@@ -2224,6 +2225,28 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
 
                         m_pNetAPI->RPC ( CURSOR_EVENT, bitStream.pBitStream );
 
+                        if ( strcmp(szState, "down") == 0 )
+                        {
+                            if ( ( GetTickCount() - m_ulLastClickTick ) < DOUBLECLICK_TIMEOUT )
+                            {
+                                // Call the event for the client
+                                CLuaArguments DoubleClickArguments;
+                                DoubleClickArguments.PushString ( szButton );
+                                DoubleClickArguments.PushNumber ( vecCursorPosition.fX );
+                                DoubleClickArguments.PushNumber ( vecCursorPosition.fY );
+                                DoubleClickArguments.PushNumber ( vecCollision.fX );
+                                DoubleClickArguments.PushNumber ( vecCollision.fY );
+                                DoubleClickArguments.PushNumber ( vecCollision.fZ );
+                                if ( pCollisionEntity )
+                                    DoubleClickArguments.PushElement ( pCollisionEntity );
+                                else
+                                    DoubleClickArguments.PushBoolean ( false );
+                                m_pRootEntity->CallEvent ( "onClientDoubleClick", DoubleClickArguments, false );
+                            }
+
+                            m_ulLastClickTick = GetTickCount();
+                        }
+
                         return true;
                     }
                 }
@@ -2371,7 +2394,7 @@ void CClientGame::AddBuiltInEvents ( void )
     //m_Events.AddEvent ( "onClientGUIKeyDown", "element", NULL, false );
     m_Events.AddEvent ( "onClientGUITabSwitched", "element", NULL, false );
 
-    m_Events.AddEvent ( "onClientDoubleClick", "button, state, screenX, screenY, worldX, worldY, worldZ, element", NULL, false );
+    m_Events.AddEvent ( "onClientDoubleClick", "button, screenX, screenY, worldX, worldY, worldZ, element", NULL, false );
     m_Events.AddEvent ( "onClientMouseMove", "screenX, screenY", NULL, false );
     m_Events.AddEvent ( "onClientMouseEnter", "screenX, screenY", NULL, false );
     m_Events.AddEvent ( "onClientMouseLeave", "screenX, screenY", NULL, false );
