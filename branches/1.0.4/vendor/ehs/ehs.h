@@ -162,8 +162,10 @@ class EHSConnection {
 	/// destructor
 	~EHSConnection ( );
 
-	MUTEX_TYPE m_oMutex; ///< mutex protecting entire object
-	
+	MUTEX_TYPE m_oConnectionMutex; ///< mutex protecting entire object
+
+    long long m_UnusedSyncId;       // Value of SyncId when the connection was first unused
+
 	/// updates the last activity to the current time
 	void UpdateLastActivity ( ) { m_nLastActivity = time ( NULL ); }
 
@@ -215,6 +217,9 @@ class EHSConnection {
 	/// returns underlying network abstraction
 	NetworkAbstraction * GetNetworkAbstraction ( );
 	
+    // Send with retries
+    int TrySend ( const char * ipMessage, size_t inLength, int inFlags = 0 );
+
 };
 
 
@@ -330,7 +335,39 @@ class EHS {
 };
 
 
+class CThreadsSyncPoint
+{
+    int                 m_iHighestThreadIndex;
+    long long           m_SyncId;
+    std::map<int,int>   m_SyncList;
+public:
 
+    CThreadsSyncPoint ()
+    {
+        m_iHighestThreadIndex = -1;
+        m_SyncId = 0;
+    }
+
+    long long GetSyncId () const
+    {
+        return m_SyncId;
+    }
+
+    int GetNewThreadIndex ()
+    {
+        return ++m_iHighestThreadIndex;
+    }
+
+    void SyncThreadIndex( int iThreadIndex )
+    {
+        m_SyncList[ iThreadIndex ] = 1;
+        if ( (int)m_SyncList.size() == m_iHighestThreadIndex )
+        {
+            m_SyncId++;
+            m_SyncList.clear ();
+        }
+    }
+};
 
 /// EHSServer contains all the network functionality for EHS
 /**
@@ -407,6 +444,12 @@ class EHSServer {
 	/// condition for when a thread is done accepting and there may be more jobs to process
 	pthread_cond_t m_oDoneAccepting;
 
+    // Used to ensure all threads are past a certain point
+    CThreadsSyncPoint m_ThreadsSyncPoint;
+
+    // Count of active threads
+    int m_iActiveThreadCount;
+
 	/// static method for starting threaded mode -- pthreads can't start a thread on a normal member function, only static
 	static void * PthreadHandleData_ThreadedStub ( void * ipData );
 
@@ -432,6 +475,9 @@ class EHSServer {
 
 	/// List of all connections currently attached to the server
 	EHSConnectionList m_oEHSConnectionList;
+
+    // List of all connections that are no longer used
+	EHSConnectionList m_oEHSConnectionUnusedList;
 
 	/// the network abstraction this server is listening on
 	NetworkAbstraction * m_poNetworkAbstraction;
