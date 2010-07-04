@@ -78,6 +78,11 @@ class NetworkAbstraction {
 	/// returns whether the child class connection is considered secure
 	virtual int IsSecure ( ) = 0;
 
+    // Check status
+    virtual bool IsReadable( int inTimeoutMilliseconds ) = 0;
+    virtual bool IsWritable( int inTimeoutMilliseconds ) = 0;
+    virtual bool IsAtError( int inTimeoutMilliseconds ) = 0;
+
 };
 
 
