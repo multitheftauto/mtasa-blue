@@ -67,6 +67,19 @@ Zac Hansen ( xaxxon@slackworks.com )
 
 #include "networkabstraction.h"
 
+#ifdef _WIN32
+    #define E_WOULDBLOCK WSAEWOULDBLOCK
+    #define GetLastSocketError() WSAGetLastError()
+#else
+    #define E_WOULDBLOCK EWOULDBLOCK
+    #define GetLastSocketError() errno
+    #define SOCKET_ERROR (-1)
+    #define INVALID_SOCKET (0)
+    #ifndef Sleep
+        #define Sleep(x) usleep((x)*1000)
+    #endif
+#endif
+
 /// plain socket implementation of NetworkAbstraction
 class Socket : public NetworkAbstraction {
 
@@ -76,7 +89,7 @@ class Socket : public NetworkAbstraction {
 	virtual InitResult Init ( int iIP, int inPort );
 
 	/// default constructor
-	Socket ( ) : nAcceptSocket ( 0 ) { }
+	Socket ( ) : nAcceptSocket ( INVALID_SOCKET ) { }
 
 	/// client socket constructor
 	Socket ( int inAcceptSocket, sockaddr_in * );
@@ -102,6 +115,10 @@ class Socket : public NetworkAbstraction {
 	/// Returns false, plain sockets are not secure
 	virtual int IsSecure ( ) { return 0; }
 
+    // Check status
+    virtual bool IsReadable( int inTimeoutMilliseconds );
+    virtual bool IsWritable( int inTimeoutMilliseconds );
+    virtual bool IsAtError( int inTimeoutMilliseconds );
   protected:
 
 	/// Socket on which this connection came in
@@ -117,6 +134,11 @@ class Socket : public NetworkAbstraction {
 	/// returns the port of the incoming connection
 	int GetPort ( );
 
+    // Set non blocking mode
+    void SetNonBlocking( bool bOn );
+
+    // Set re-use address option
+    void SetReuseAddress( bool bOn );
 };
 
 #endif // SOCKET_H
