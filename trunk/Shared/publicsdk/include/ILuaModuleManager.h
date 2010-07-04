@@ -34,8 +34,8 @@ public:
 
     virtual bool                RegisterFunction        ( lua_State * luaVM, const char *szFunctionName, lua_CFunction Func ) = 0;
     virtual bool                GetResourceName         ( lua_State * luaVM, std::string &strName ) = 0;
-    virtual CChecksum           GetResourceMetaChecksum ( lua_State * luaVM ) = 0;
-    virtual CChecksum           GetResourceFileChecksum ( lua_State * luaVM, const char* szFile ) = 0;
+    virtual unsigned long       GetResourceMetaCRC      ( lua_State * luaVM ) = 0;
+    virtual unsigned long       GetResourceMetaCRC      ( lua_State * luaVM, const char* szFile ) = 0;
 };
 
 /* Interface for modules until 1.0 */
