@@ -451,6 +451,7 @@ private:
     unsigned long                       m_ulTimeStart;
     unsigned long                       m_ulVerifyTimeStart;
     unsigned long                       m_ulLastClickTick;
+    CVector2D                           m_vecLastCursorPosition;
     bool                                m_bWaitingForLocalConnect;
     bool                                m_bErrorStartingLocal;
     int                                 m_iLocalConnectAttempts;

@@ -47,6 +47,7 @@ bool g_bBoundsChecker = true;
 #define DEFAULT_BLUR_LEVEL 36
 #define DEFAULT_MINUTE_DURATION 1000
 #define DOUBLECLICK_TIMEOUT 330
+#define DOUBLECLICK_MOVE_THRESHOLD 10.0f
 
 CClientGame::CClientGame ( bool bLocalPlay )
 {
@@ -2227,7 +2228,10 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
 
                         if ( strcmp(szState, "down") == 0 )
                         {
-                            if ( ( GetTickCount() - m_ulLastClickTick ) < DOUBLECLICK_TIMEOUT )
+                            CVector2D vecDelta = m_vecLastCursorPosition - vecCursorPosition;
+
+                            if (    ( GetTickCount() - m_ulLastClickTick ) < DOUBLECLICK_TIMEOUT &&
+                                    vecDelta.Length() <= DOUBLECLICK_MOVE_THRESHOLD )
                             {
                                 // Call the event for the client
                                 CLuaArguments DoubleClickArguments;
@@ -2245,6 +2249,7 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                             }
 
                             m_ulLastClickTick = GetTickCount();
+                            m_vecLastCursorPosition = vecCursorPosition;
                         }
 
                         return true;
