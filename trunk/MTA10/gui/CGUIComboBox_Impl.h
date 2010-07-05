@@ -27,10 +27,18 @@ public:
     eCGUIType                   GetType                     ( void ) { return CGUI_COMBOBOX; };
 
     CGUIListItem*               AddItem                     ( const char* szText );
+    bool                        RemoveItem                  ( int index );
     CGUIListItem*               GetSelectedItem             ( void );
+    int                         GetSelectedItemIndex        ( void );
+    int                         GetItemIndex                ( CGUIListItem* pItem );
+    const char*                 GetItemText                 ( int index );
+    bool                        SetItemText                 ( int index, const char* szText );
+    bool                        SetSelectedItemByIndex      ( int index );
     void                        Clear                       ( void );
 
     void                        SetReadOnly                 ( bool bReadonly );
+
+    //void                        SetSelectionHandler         ( GUI_CALLBACK Callback );
 
     #include "CGUIElement_Inc.h"
 
@@ -39,6 +47,8 @@ protected:
     google::dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* > m_Items;
 
     CGUIListItem_Impl*          GetListItem                 ( CEGUI::ListboxItem* pItem );
+    std::string storedCaption;
+    //GUI_CALLBACK                        m_OnSelectChange;
 };
 
 #endif

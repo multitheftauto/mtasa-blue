@@ -125,7 +125,7 @@ public:
     CGUIComboBox*                   CreateComboBox              ( CGUIElement* pParent = NULL, const char* szCaption = "" );
     CGUIComboBox*                   CreateComboBox              ( CGUIComboBox* pParent = NULL, const char* szCaption = "" );
 
-    CGUIWindow*                     CreateWnd                   ( CGUIElement* pParent = NULL, const char* szCaption = "" );
+	CGUIWindow*                     CreateWnd                   ( CGUIElement* pParent = NULL, const char* szCaption = "" );
     //
 
     CGUITexture*                    CreateTexture               ( void );
@@ -210,7 +210,7 @@ private:
     CGUIScrollPane*                 _CreateScrollPane           ( CGUIElement_Impl* pParent = NULL );
     CGUIScrollBar*                  _CreateScrollBar            ( bool bHorizontal, CGUIElement_Impl* pParent = NULL );
     CGUIComboBox*                   _CreateComboBox             ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
-
+	
     IDirect3DDevice9*               m_pDevice;
 
     CEGUI::Renderer*                m_pRenderer;

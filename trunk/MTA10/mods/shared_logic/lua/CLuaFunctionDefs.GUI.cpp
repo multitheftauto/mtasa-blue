@@ -2620,3 +2620,207 @@ int CLuaFunctionDefs::GUIGetChatboxLayout ( lua_State* luaVM )
     }
     return 1;
 }
+
+int CLuaFunctionDefs::GUICreateComboBox ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        if ( lua_istype ( luaVM, 1, LUA_TNUMBER ) && lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
+            lua_istype ( luaVM, 3, LUA_TNUMBER ) && lua_istype ( luaVM, 4, LUA_TNUMBER ) &&
+            lua_istype ( luaVM, 5, LUA_TSTRING ) && lua_istype ( luaVM, 6, LUA_TBOOLEAN ) )
+        {
+            CClientGUIElement* pParent = lua_toguielement ( luaVM, 7 );
+
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateComboBox (
+                *pLuaMain,
+                static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
+                static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
+                static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
+                static_cast < float > ( lua_tonumber ( luaVM, 4 ) ),
+                lua_tostring ( luaVM, 5 ),
+                lua_toboolean ( luaVM, 6 ) ? true : false,
+                pParent
+                );
+
+            if ( pGUIElement ) {
+                lua_pushelement ( luaVM, pGUIElement );
+                return 1;
+            }
+        }
+    }
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GUIComboBoxAddItem ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TSTRING )
+        )
+    {
+        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
+        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
+        {
+            int newId = CStaticFunctionDefinitions::GUIComboBoxAddItem (
+                *pEntity,
+                lua_tostring ( luaVM, 2 )
+                );
+            if( newId > 0 )
+            {
+                lua_pushnumber( luaVM, newId );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxAddItem", "gui-element", 1 );
+    }
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GUIComboBoxRemoveItem ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TNUMBER )
+        )
+    {
+        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
+        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
+        {
+            bool ret = CStaticFunctionDefinitions::GUIComboBoxRemoveItem (
+                *pEntity,
+                lua_tonumber ( luaVM, 2 )
+                );
+            lua_pushboolean( luaVM, ret );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxRemoveItem", "gui-element", 1 );
+    }
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GUIComboBoxClear ( lua_State* luaVM )
+{
+    bool returnVal = false;
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
+        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
+        {
+            returnVal = CStaticFunctionDefinitions::GUIComboBoxClear (
+                *pEntity
+                );
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxClear", "gui-element", 1 );
+    }
+    lua_pushboolean ( luaVM, returnVal );
+    return 1;
+}
+
+int CLuaFunctionDefs::GUIComboBoxGetSelected ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {
+        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
+        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
+        {
+            int selected = CStaticFunctionDefinitions::GUIComboBoxGetSelected( *pEntity );
+            if ( selected > 0 )
+            {
+                lua_pushnumber ( luaVM, selected );
+                return 1;
+            }
+            else
+            {
+                lua_pushnil ( luaVM );
+                return 1;
+            }
+        }
+        else m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxGetSelected", "gui-element", 1 );
+    }
+    lua_pushnil ( luaVM );
+    return 1;
+}
+
+int CLuaFunctionDefs::GUIComboBoxSetSelected ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER )
+        )
+    {
+        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
+        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
+        {
+            bool ret = CStaticFunctionDefinitions::GUIComboBoxSetSelected( 
+                *pEntity,
+                lua_tonumber ( luaVM, 2 ) 
+                );
+            lua_pushboolean ( luaVM, ret );
+            return 1;
+        }
+        else m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxSetSelected", "gui-element", 1 );
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GUIComboBoxGetItemText ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER )
+        )
+    {
+        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
+        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
+        {
+            std::string ret = CStaticFunctionDefinitions::GUIComboBoxGetItemText( 
+                *pEntity,
+                lua_tonumber ( luaVM, 2 ) 
+                );
+            if( !ret.empty( ) )
+            {
+                lua_pushstring ( luaVM, ret.c_str( ) );
+                return 1;
+            }
+        }
+        else m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxGetItemText", "gui-element", 1 );
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GUIComboBoxSetItemText ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
+         lua_istype ( luaVM, 3, LUA_TSTRING )
+        )
+    {
+        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
+        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
+        {
+            bool ret = CStaticFunctionDefinitions::GUIComboBoxSetItemText( 
+                *pEntity,
+                lua_tonumber ( luaVM, 2 ),
+                lua_tostring ( luaVM, 3 )
+                );
+            lua_pushboolean ( luaVM, ret );
+            return 1;
+        }
+        else m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxSetItemText", "gui-element", 1 );
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
