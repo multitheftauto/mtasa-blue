@@ -64,6 +64,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_fMarkerBounce = 0.0f;
     m_Status = CClientGame::STATUS_CONNECTING;
     m_ulVerifyTimeStart = 0;
+    m_ulLastClickTick = 0;
     m_pLocalPlayer = NULL;
     m_LocalID = INVALID_ELEMENT_ID;
     m_szLocalNick [0] = 0;
