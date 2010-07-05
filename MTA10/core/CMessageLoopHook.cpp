@@ -98,6 +98,17 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
         g_pCore->Quit ();
     }
 
+    if ( uMsg == WM_COPYDATA )
+    {
+        PCOPYDATASTRUCT pCDS = (PCOPYDATASTRUCT) lParam;
+
+        if ( pCDS->dwData == URI_CONNECT )
+        {
+            LPSTR szConnectInfo      = (LPSTR) pCDS->lpData;
+            CCommandFuncs::Connect ( szConnectInfo );
+        }
+    }
+
     if ( hwnd != pThis->GetHookedWindowHandle () ) return NULL;
 
     // Make sure our pointers are valid.
