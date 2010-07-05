@@ -32,6 +32,8 @@ using SharedUtil::CalcMTASAPath;
 #include <shlobj.h>
 #include <Psapi.h>
 
+HANDLE g_hMutex = CreateMutex(NULL, FALSE, TEXT(MTA_GUID));
+
 bool TerminateGTAIfRunning ( void )
 {
     DWORD dwProcessIDs[250];
@@ -225,6 +227,37 @@ int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+    if ( GetLastError() == ERROR_ALREADY_EXISTS )
+    {
+        if ( strcmp ( lpCmdLine, "" ) != 0 )
+        {
+            COPYDATASTRUCT cdStruct;
+
+            cdStruct.cbData = strlen(lpCmdLine)+1;
+            cdStruct.lpData = const_cast<char *>((lpCmdLine));
+            cdStruct.dwData = URI_CONNECT;
+
+            HWND hwMTAWindow = FindWindow( NULL, "MTA: San Andreas" );
+            if( hwMTAWindow != NULL )
+            {
+                SendMessage( hwMTAWindow,
+                            WM_COPYDATA,
+                            NULL,
+                            (LPARAM)&cdStruct );
+            }
+            else
+            {
+                MessageBox( 0, "Can't send WM_COPYDATA", "Error", MB_ICONERROR );
+                return 0;
+            }
+        }
+        else
+        {
+            MessageBox ( 0, "Another instance of MTA is already running.", "Error", MB_ICONERROR );
+            return 0;
+        }
+    }
+
     if ( !TerminateGTAIfRunning () )
     {
         MessageBox ( 0, "MTA: SA couldn't start because an another instance of GTA is running.", "Error", MB_ICONERROR );
@@ -381,6 +414,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // Cleanup and exit.
     CloseHandle ( piLoadee.hProcess );
     CloseHandle ( piLoadee.hThread );
+    CloseHandle ( g_hMutex );
 
 
     // Maybe spawn an exe

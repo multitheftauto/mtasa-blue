@@ -18,6 +18,8 @@
 #include <windows.h>
 #include "CSingleton.h"
 
+#define URI_CONNECT 1
+
 class CMessageLoopHook : public CSingleton < CMessageLoopHook >
 {
     public:
