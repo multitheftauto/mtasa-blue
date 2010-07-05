@@ -3931,7 +3931,7 @@ int CStaticFunctionDefinitions::GUIComboBoxAddItem ( CClientEntity& Entity, cons
             // Add a new item.
             CGUIListItem* item = static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> AddItem ( szText );
             // Return it's id + 1 so indexes start at 1.
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> GetItemIndex ( item ) + 1;
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> GetItemIndex ( item );
         }
     }    
 
@@ -3951,7 +3951,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxRemoveItem ( CClientEntity& Entity, 
         if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
         {
             // Call RemoveItem with index - 1 so indexes are compatible internally ...
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> RemoveItem( index - 1 );
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> RemoveItem( index  );
         }
     }    
 
@@ -3992,7 +3992,7 @@ int CStaticFunctionDefinitions::GUIComboBoxGetSelected ( CClientEntity& Entity )
         if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
         {
             // return the selected + 1 so indexes start at 1...
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) ->GetSelectedItemIndex ( ) + 1;
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) ->GetSelectedItemIndex ( );
         }
     }    
 
@@ -4012,7 +4012,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetSelected ( CClientEntity& Entity,
         if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
         {
             // Call SetSelectedItem with index - 1 so indexes are compatible internally ...
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItemByIndex( index - 1 );
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItemByIndex( index );
         }
     }    
 
@@ -4032,7 +4032,7 @@ std::string CStaticFunctionDefinitions::GUIComboBoxGetItemText ( CClientEntity& 
         if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
         {
             // Call GetItemText with index - 1 so indexes are compatible internally ...
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> GetItemText( index - 1 );
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> GetItemText( index );
         }
     }    
 
@@ -4052,7 +4052,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetItemText ( CClientEntity& Entity,
         if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
         {
             // Call SetItemText with index - 1 so indexes are compatible internally ...
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> SetItemText( index - 1, szText );
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> SetItemText( index, szText );
         }
     }    
 

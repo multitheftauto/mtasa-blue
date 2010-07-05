@@ -2669,11 +2669,8 @@ int CLuaFunctionDefs::GUIComboBoxAddItem ( lua_State* luaVM )
                 *pEntity,
                 lua_tostring ( luaVM, 2 )
                 );
-            if( newId > 0 )
-            {
-                lua_pushnumber( luaVM, newId );
-                return 1;
-            }
+            lua_pushnumber( luaVM, newId );
+            return 1;
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxAddItem", "gui-element", 1 );
@@ -2737,16 +2734,8 @@ int CLuaFunctionDefs::GUIComboBoxGetSelected ( lua_State* luaVM )
         if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
         {
             int selected = CStaticFunctionDefinitions::GUIComboBoxGetSelected( *pEntity );
-            if ( selected > 0 )
-            {
-                lua_pushnumber ( luaVM, selected );
-                return 1;
-            }
-            else
-            {
-                lua_pushnil ( luaVM );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, selected );
+            return 1;
         }
         else m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxGetSelected", "gui-element", 1 );
     }
@@ -2789,11 +2778,8 @@ int CLuaFunctionDefs::GUIComboBoxGetItemText ( lua_State* luaVM )
                 *pEntity,
                 lua_tonumber ( luaVM, 2 ) 
                 );
-            if( !ret.empty( ) )
-            {
-                lua_pushstring ( luaVM, ret.c_str( ) );
-                return 1;
-            }
+            lua_pushstring ( luaVM, ret.c_str( ) );
+            return 1;
         }
         else m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxGetItemText", "gui-element", 1 );
     }
