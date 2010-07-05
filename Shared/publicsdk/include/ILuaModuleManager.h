@@ -24,12 +24,14 @@ extern "C"
 }
 #include <string>
 
+#ifndef __CChecksum_H
 class CChecksum
 {
 public:
     unsigned long ulCRC;
     unsigned char mD5 [16];
 };
+#endif
 
 /* Interface for modules until DP2.3 */
 class ILuaModuleManager
