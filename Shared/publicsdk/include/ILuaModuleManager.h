@@ -24,6 +24,13 @@ extern "C"
 }
 #include <string>
 
+class CChecksum
+{
+public:
+    unsigned long ulCRC;
+    unsigned char mD5 [16];
+};
+
 /* Interface for modules until DP2.3 */
 class ILuaModuleManager
 {
