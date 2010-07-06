@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_dll", "lua5.1_dll.vcproj", "{8EEECEE6-A6EC-BC48-8E76-22B87825444B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_lib", "lua5.1_lib.vcproj", "{E2629417-52DF-854E-B510-C15A87AB4BE3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Nightly|Win32 = Nightly|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8EEECEE6-A6EC-BC48-8E76-22B87825444B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8EEECEE6-A6EC-BC48-8E76-22B87825444B}.Debug|Win32.Build.0 = Debug|Win32
+		{8EEECEE6-A6EC-BC48-8E76-22B87825444B}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{8EEECEE6-A6EC-BC48-8E76-22B87825444B}.Nightly|Win32.Build.0 = Nightly|Win32
+		{8EEECEE6-A6EC-BC48-8E76-22B87825444B}.Release|Win32.ActiveCfg = Release|Win32
+		{8EEECEE6-A6EC-BC48-8E76-22B87825444B}.Release|Win32.Build.0 = Release|Win32
+		{E2629417-52DF-854E-B510-C15A87AB4BE3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E2629417-52DF-854E-B510-C15A87AB4BE3}.Debug|Win32.Build.0 = Debug|Win32
+		{E2629417-52DF-854E-B510-C15A87AB4BE3}.Nightly|Win32.ActiveCfg = Nightly|Win32
+		{E2629417-52DF-854E-B510-C15A87AB4BE3}.Nightly|Win32.Build.0 = Nightly|Win32
+		{E2629417-52DF-854E-B510-C15A87AB4BE3}.Release|Win32.ActiveCfg = Release|Win32
+		{E2629417-52DF-854E-B510-C15A87AB4BE3}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
