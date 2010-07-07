@@ -2991,7 +2991,7 @@ void CClientPed::_CreateModel ( void )
 
         // Set the voice that corresponds to our model
         short sVoiceType, sVoiceID;
-        static_cast < CPedModelInfo * > ( m_pModelInfo )->GetVoice ( &sVoiceType, &sVoiceID );
+        m_pModelInfo->GetVoice ( &sVoiceType, &sVoiceID );
         SetVoice ( sVoiceType, sVoiceID );
 
         // Tell the streamer we created the player

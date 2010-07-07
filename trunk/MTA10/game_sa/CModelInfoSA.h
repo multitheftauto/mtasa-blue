@@ -62,6 +62,8 @@ class CPedModelInfoSAInterface;
 #define     FUNC_CVehicleModelInfo__GetNumRemaps        0x4C86B0
 
 #define     FUNC_SetColModel                0x4C4BC0
+#define     FUNC_AddPedModel                0x4c67a0
+#define     VAR_CTempColModels_ModelPed1    0x968DF0
 /**
  * \todo Fill this class with info from R*
  */
@@ -233,7 +235,7 @@ public:
                                     CModelInfoSA            ( void );
                                     CModelInfoSA            ( DWORD dwModelID );
 
-    CBaseModelInfoSAInterface *     GetInterface             ( void )              { return m_pInterface; }
+    CBaseModelInfoSAInterface *     GetInterface             ( void );
     CPedModelInfoSAInterface *      GetPedModelInfoInterface ( void )              { return reinterpret_cast < CPedModelInfoSAInterface * > ( GetInterface () ); }
 
     DWORD                           GetModel                ( void )               { return m_dwModelID; }
@@ -263,6 +265,7 @@ public:
     bool                            IsValid                 ( void );
     float                           GetDistanceFromCentreOfMassToBaseOfModel ( void );
     unsigned short                  GetTextureDictionaryID  ( void );
+    void                            SetTextureDictionaryID  ( unsigned short usID );
     float                           GetLODDistance          ( void );
     void                            SetLODDistance          ( float fDistance );
     void                            RestreamIPL             ( void );
@@ -296,6 +299,8 @@ public:
     inline void                     SetModelID              ( DWORD dwModelID ) { m_dwModelID = dwModelID; }
 
     inline RwObject*                GetRwObject             ( void ) { return m_pInterface ? m_pInterface->pRwObject : NULL; }
+
+    void                            MakePedModel            ( char * szTexture );
 };
 
 #endif

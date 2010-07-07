@@ -431,6 +431,7 @@ void CGameSA::Initialize ( void )
 {
     // Initialize garages
     m_pGarages->Initialize();
+    SetupSpecialCharacters ();
 
     // *Sebas* Hide the GTA:SA Main menu.
     *(BYTE *)(CLASS_CMenuManager+0x5C) = 0;
@@ -610,4 +611,54 @@ bool CGameSA::IsASyncLoadingEnabled ( bool bIgnoreSuspend )
     if ( m_bAsyncScriptForced || m_bAsyncSettingsDontUse )
         return m_bAsyncScriptEnabled;
     return m_bAsyncSettingsEnabled;
+}
+
+void CGameSA::SetupSpecialCharacters ( void )
+{
+    ModelInfo[1].MakePedModel ( "TRUTH" );
+    ModelInfo[2].MakePedModel ( "MACCER" );
+    //ModelInfo[190].MakePedModel ( "BARBARA" );
+    //ModelInfo[191].MakePedModel ( "HELENA" );
+    //ModelInfo[192].MakePedModel ( "MICHELLE" );
+    //ModelInfo[193].MakePedModel ( "KATIE" );
+    //ModelInfo[194].MakePedModel ( "MILLIE" );
+    //ModelInfo[195].MakePedModel ( "DENISE" );
+    ModelInfo[265].MakePedModel ( "TENPEN" );   
+    ModelInfo[266].MakePedModel ( "PULASKI" );
+    ModelInfo[267].MakePedModel ( "HERN" );
+    ModelInfo[268].MakePedModel ( "DWAYNE" );
+    ModelInfo[269].MakePedModel ( "SMOKE" );
+    ModelInfo[270].MakePedModel ( "SWEET" );
+    ModelInfo[271].MakePedModel ( "RYDER" );
+    ModelInfo[272].MakePedModel ( "FORELLI" );
+    ModelInfo[290].MakePedModel ( "ROSE" );
+    ModelInfo[291].MakePedModel ( "PAUL" );
+    ModelInfo[292].MakePedModel ( "CESAR" );
+    ModelInfo[293].MakePedModel ( "OGLOC" );
+    ModelInfo[294].MakePedModel ( "WUZIMU" );
+    ModelInfo[295].MakePedModel ( "TORINO" );
+    ModelInfo[296].MakePedModel ( "JIZZY" );
+    ModelInfo[297].MakePedModel ( "MADDOGG" );
+    ModelInfo[298].MakePedModel ( "CAT" );
+    ModelInfo[299].MakePedModel ( "CLAUDE" );
+    ModelInfo[300].MakePedModel ( "RYDER2" );
+    ModelInfo[301].MakePedModel ( "RYDER3" );
+    ModelInfo[302].MakePedModel ( "EMMET" );
+    ModelInfo[303].MakePedModel ( "ANDRE" );
+    ModelInfo[304].MakePedModel ( "KENDL" );
+    ModelInfo[305].MakePedModel ( "JETHRO" );
+    ModelInfo[306].MakePedModel ( "ZERO" );
+    ModelInfo[307].MakePedModel ( "TBONE" );
+    ModelInfo[308].MakePedModel ( "SINDACO" );
+    ModelInfo[309].MakePedModel ( "JANITOR" );
+    ModelInfo[310].MakePedModel ( "BBTHIN" );
+    ModelInfo[311].MakePedModel ( "SMOKEV" );
+    ModelInfo[312].MakePedModel ( "PSYCHO" );
+    /* Hot-coffee only models
+    ModelInfo[313].MakePedModel ( "GANGRL2" );
+    ModelInfo[314].MakePedModel ( "MECGRL2" );
+    ModelInfo[315].MakePedModel ( "GUNGRL2" );
+    ModelInfo[316].MakePedModel ( "COPGRL2" );
+    ModelInfo[317].MakePedModel ( "NURGRL2" );
+    */
 }
