@@ -223,10 +223,10 @@ void CWorldRPCs::SetCloudsEnabled ( NetBitStreamInterface& bitStream )
 
 void CWorldRPCs::SetTrafficLightState ( NetBitStreamInterface& bitStream )
 {
-    unsigned char ucTrafficLightState;
+    char ucTrafficLightState;
 
-    if ( bitStream.Read ( ucTrafficLightState ) )
+    if ( bitStream.ReadBits ( &ucTrafficLightState, 3 ) )
     {
-        g_pMultiplayer->SetTrafficLightState ( ucTrafficLightState );
+        g_pMultiplayer->SetTrafficLightState ( (unsigned char)* &ucTrafficLightState );
     }
 }
