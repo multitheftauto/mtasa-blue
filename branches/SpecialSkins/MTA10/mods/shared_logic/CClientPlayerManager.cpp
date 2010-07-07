@@ -208,8 +208,7 @@ bool CClientPlayerManager::IsValidModel ( unsigned long ulModel )
              ulModel >= 274 &&
              ulModel <= 288 ||
              ulModel >= 290 &&
-             ulModel <= 312 &&
-             ulModel != 299 );
+             ulModel <= 312 );
 }
 
 void CClientPlayerManager::ResetAll ( void )
