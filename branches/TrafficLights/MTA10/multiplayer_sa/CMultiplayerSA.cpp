@@ -3108,28 +3108,16 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
 {
     _asm pushad
 
-    switch (ucTrafficLightState)
+    if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 )
     {
-        case 0:
-        case 5:
-        case 8:
-        {
-            ucDesignatedLightState = 0;
-            break;
-        }
-        case 1:
-        case 6:
-        case 7:
-        {
-            ucDesignatedLightState = 1;
-            break;
-        }
-        default:
-        {
-            ucDesignatedLightState = 2;
-            break;
-        }
+        ucDesignatedLightState = 0;
     }
+    else if ( ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7 )
+    {
+        ucDesignatedLightState = 1;
+    }
+    else
+        ucDesignatedLightState = 2;
 
     _asm
     {
@@ -3143,28 +3131,16 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
 {
     _asm pushad
 
-    switch (ucTrafficLightState)
+    if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 )
     {
-        case 3:
-        case 5:
-        case 7:
-        {
-            ucDesignatedLightState = 0;
-            break;
-        }
-        case 4:
-        case 6:
-        case 8:
-        {
-            ucDesignatedLightState = 1;
-            break;
-        }
-        default:
-        {
-            ucDesignatedLightState = 2;
-            break;
-        }
+        ucDesignatedLightState = 0;
     }
+    else if ( ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8 )
+    {
+        ucDesignatedLightState = 1;
+    }
+    else
+        ucDesignatedLightState = 2;
 
     _asm
     {
