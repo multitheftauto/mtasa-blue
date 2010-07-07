@@ -27,12 +27,6 @@ CPedModelInfoSA::CPedModelInfoSA ( void ) : CModelInfoSA ()
     m_pPedModelInterface = new CPedModelInfoSAInterface;
 }
 
-CPedModelInfoSA::~CPedModelInfoSA ( void )
-{
-    delete m_pPedModelInterface;
-}
-
-
 void CPedModelInfoSA::SetMotionAnimGroup ( AssocGroupId animGroup )
 {
     DWORD dwThis = (DWORD)m_pInterface;

@@ -67,7 +67,6 @@ class CPedModelInfoSA : public CModelInfoSA, public CPedModelInfo
 {
 public:
                                     CPedModelInfoSA             ( void );
-                                    ~CPedModelInfoSA            ( void );
     CPedModelInfoSAInterface *      GetPedModelInfoInterface    ( void )        { return m_pPedModelInterface; }
     void                            SetMotionAnimGroup          ( AssocGroupId animGroup );
 
