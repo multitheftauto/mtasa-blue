@@ -255,6 +255,10 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 			<File
+				RelativePath=".\GDFImp.rc"
+				>
+			</File>
+			<File
 				RelativePath="loader.rc">
 			</File>
 			<File
@@ -262,9 +266,6 @@
 			</File>
 			<File
 				RelativePath=".\resource\splash.bmp">
-			</File>
-			<File
-				RelativePath=".\resource\vistaicon.ico">
 			</File>
 		</Filter>
 	</Files>

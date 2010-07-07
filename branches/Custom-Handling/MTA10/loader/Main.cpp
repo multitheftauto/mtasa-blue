@@ -32,6 +32,8 @@ using SharedUtil::CalcMTASAPath;
 #include <shlobj.h>
 #include <Psapi.h>
 
+HANDLE g_hMutex = CreateMutex(NULL, FALSE, TEXT(MTA_GUID));
+
 bool TerminateGTAIfRunning ( void )
 {
     DWORD dwProcessIDs[250];
@@ -75,19 +77,6 @@ bool TerminateGTAIfRunning ( void )
     return true;
 }
 
-
-//
-// Returns true if the file exists
-//
-bool FileExists ( const SString& strFilename )
-{
-    WIN32_FIND_DATA fdFileInfo;
-    HANDLE hHandle = FindFirstFile ( strFilename, &fdFileInfo );
-    if ( hHandle == INVALID_HANDLE_VALUE )
-        return false;
-    FindClose ( hHandle );
-    return true;
-}
 
 //
 // General error message box
@@ -238,6 +227,37 @@ int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+    if ( GetLastError() == ERROR_ALREADY_EXISTS )
+    {
+        if ( strcmp ( lpCmdLine, "" ) != 0 )
+        {
+            COPYDATASTRUCT cdStruct;
+
+            cdStruct.cbData = strlen(lpCmdLine)+1;
+            cdStruct.lpData = const_cast<char *>((lpCmdLine));
+            cdStruct.dwData = URI_CONNECT;
+
+            HWND hwMTAWindow = FindWindow( NULL, "MTA: San Andreas" );
+            if( hwMTAWindow != NULL )
+            {
+                SendMessage( hwMTAWindow,
+                            WM_COPYDATA,
+                            NULL,
+                            (LPARAM)&cdStruct );
+            }
+            else
+            {
+                MessageBox( 0, "Can't send WM_COPYDATA", "Error", MB_ICONERROR );
+                return 0;
+            }
+        }
+        else
+        {
+            MessageBox ( 0, "Another instance of MTA is already running.", "Error", MB_ICONERROR );
+            return 0;
+        }
+    }
+
     if ( !TerminateGTAIfRunning () )
     {
         MessageBox ( 0, "MTA: SA couldn't start because an another instance of GTA is running.", "Error", MB_ICONERROR );
@@ -259,7 +279,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
     else if ( iResult == -2 ) {
         MessageBox ( 0, "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue.", "Error", MB_OK|MB_ICONEXCLAMATION );
-        ShellExecute ( NULL, "open", "http://wiki.multitheftauto.com/wiki/Known_Issues_-_FAQ#I_have_the_Steam_version_of_GTA_San_Andreas.__How_can_I_play_MTASA.3F", NULL, NULL, SW_SHOWNORMAL );
+        ShellExecute ( NULL, "open", "http://multitheftauto.com/downgrade/steam", NULL, NULL, SW_SHOWNORMAL );
         return 5;
     }
 
@@ -394,6 +414,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // Cleanup and exit.
     CloseHandle ( piLoadee.hProcess );
     CloseHandle ( piLoadee.hThread );
+    CloseHandle ( g_hMutex );
 
 
     // Maybe spawn an exe

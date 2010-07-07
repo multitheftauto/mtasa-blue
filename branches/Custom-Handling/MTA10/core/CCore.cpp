@@ -181,6 +181,7 @@ CCore::CCore ( void )
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bFocused = true;
+    m_bLastFocused = true;
 
     // Initialize time
     CClientTime::InitializeTime ();
@@ -208,6 +209,10 @@ CCore::CCore ( void )
 
     // Reset the screenshot flag
     bScreenShot = false;
+
+    //Create our current server and set the update time to zero
+    m_pCurrentServer = new CXfireServerInfo();
+    m_tXfireUpdate = 0;
 }
 
 CCore::~CCore ( void )
@@ -260,6 +265,9 @@ CCore::~CCore ( void )
 
     // Delete the logger
     delete m_pLogger;
+
+    //Delete the Current Server
+    delete m_pCurrentServer;
 }
 
 
@@ -623,12 +631,13 @@ void CCore::ApplyServerBrowserSettings ( void )
 void CCore::ApplyGameSettings ( void )
 {
     bool bval;
+    int iVal;
     CControllerConfigManager * pController = m_pGame->GetControllerConfigManager ();
 
     CVARS_GET ( "invert_mouse",     bval ); pController->SetMouseInverted ( bval );
     CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
     CVARS_GET ( "classic_controls", bval ); bval ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
-    CVARS_GET ( "async_loading",    bval ); m_pGame->SetASyncLoadingEnabled ( bval );
+    CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
 }
 
 void CCore::ApplyMenuSettings ( void )
@@ -805,7 +814,7 @@ void CCore::CreateGame ( )
         if ( m_pGame->GetGameVersion () >= VERSION_11 )
         {
             MessageBox ( 0, "Only GTA:SA version 1.0 is supported!  You are now being redirected to a page where you can patch your version.", "Error", MB_OK|MB_ICONEXCLAMATION );
-            ShellExecute ( NULL, _T("open"), "http://forum.multitheftauto.com/viewtopic.php?f=104&t=15151#p213686", NULL, NULL, SW_SHOWNORMAL );
+            ShellExecute ( NULL, _T("open"), "http://multitheftauto.com/downgrade", NULL, NULL, SW_SHOWNORMAL );
             TerminateProcess ( GetCurrentProcess (), 0 );
         }
     }
@@ -1223,6 +1232,16 @@ void CCore::DoPostFramePulse ( )
         }
     }
 
+    if ( !IsFocused() && m_bLastFocused )
+    {
+        m_pKeyBinds->CallAllGTAControlBinds( CONTROL_BOTH, false );
+        m_bLastFocused = false;
+    }
+    else if ( IsFocused() && !m_bLastFocused )
+    {
+        m_bLastFocused = true;
+    }
+
     GetJoystickManager ()->DoPulse ();      // Note: This may indirectly call CMessageLoopHook::ProcessMessage
     m_pKeyBinds->DoPostFramePulse ();
 
@@ -1231,6 +1250,37 @@ void CCore::DoPostFramePulse ( )
     m_pConnectManager->DoPulse ();
 
     m_Community.DoPulse ();
+
+    //XFire polling
+    if ( IsConnected() )
+    {
+        time_t ttime;
+        ttime = time ( NULL );
+        if ( ttime >= m_tXfireUpdate + XFIRE_UPDATE_RATE )
+        {
+            if ( m_pCurrentServer->IsSocketClosed() )
+            {
+                //Init our socket
+                m_pCurrentServer->Init();
+            }
+            //Get our xfire query reply
+            SString strReply = UpdateXfire( );
+            //If we Parsed or if the reply failed wait another XFIRE_UPDATE_RATE until trying again
+            if ( strReply == "ParsedQuery" || strReply == "NoReply" ) 
+            {
+                m_tXfireUpdate = time ( NULL );
+                //Close the socket
+                m_pCurrentServer->SocketClose();
+            }
+        }
+    }
+    //Set our update time to zero to ensure that the first xfire update happens instantly when joining
+    else
+    {
+        XfireSetCustomGameData ( 0, NULL, NULL );
+        if ( m_tXfireUpdate != 0 )
+            m_tXfireUpdate = 0;
+    }
 }
 
 
@@ -1256,9 +1306,10 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "hud",               "shows the hud",                    CCommandFuncs::HUD );
     m_pCommands->Add ( "binds",             "shows all the binds",              CCommandFuncs::Binds );
 
+#if 0
     m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
-
     m_pCommands->Add ( "window",            "enter/leave windowed mode",        CCommandFuncs::Window );
+#endif
 
     m_pCommands->Add ( "load",              "loads a mod (name args)",          CCommandFuncs::Load );
     m_pCommands->Add ( "unload",            "unloads a mod (name)",             CCommandFuncs::Unload );
@@ -1648,19 +1699,68 @@ void CCore::UpdateRecentlyPlayed()
         pRecentList->Add ( RecentServer, true );
         pServerBrowser->SaveRecentlyPlayedList();
 
-        // Set as our current server for xfire
-        if ( XfireIsLoaded () )
-        {
-            const char *szKey[2], *szValue[2];
-            szKey[0] = "Gamemode";
-            szValue[0] = RecentServer.strType.c_str();
-
-            szKey[1] = "Map";
-            szValue[1] = RecentServer.strMap.c_str();
-
-            XfireSetCustomGameData ( 2, szKey, szValue ); 
-        }
     }
     //Save our configuration file
     CCore::GetSingleton ().SaveConfig ();
+}
+void CCore::SetCurrentServer( in_addr Addr, unsigned short usQueryPort )
+{
+    //Set the current server info so we can query it with ASE for xfire
+    m_pCurrentServer->Address = Addr;
+    m_pCurrentServer->usQueryPort = usQueryPort;
+
+}
+SString CCore::UpdateXfire( void )
+{
+    //Check if a current server exists
+    if ( m_pCurrentServer ) 
+    {
+        //Get the result from the Pulse method
+        std::string strResult = m_pCurrentServer->Pulse();
+        //Have we parsed the query this function call?
+        if ( strResult == "ParsedQuery" )
+        {
+            //Get our Nick from CVARS
+            std::string strNick;
+            CVARS_GET ( "nick", strNick );
+            //Format a player count
+            SString strPlayerCount("%i / %i", m_pCurrentServer->nPlayers, m_pCurrentServer->nMaxPlayers);
+            // Set as our custom date
+            SetXfireData( m_pCurrentServer->strName, m_pCurrentServer->strVersion, m_pCurrentServer->bPassworded, m_pCurrentServer->strType, m_pCurrentServer->strMap, strNick, strPlayerCount );
+        }
+        //Return the result
+        return strResult;
+    }
+    return "";
+}
+
+void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount )
+{
+    if ( XfireIsLoaded () )
+    {
+        //Set our "custom data"
+        const char *szKey[7], *szValue[7];
+        szKey[0] = "Server Name";
+        szValue[0] = strServerName.c_str();
+
+        szKey[1] = "Server Version";
+        szValue[1] = strVersion.c_str();
+
+        szKey[2] = "Passworded";
+        szValue[2] = bPassworded ? "Yes" : "No";
+
+        szKey[3] = "Gamemode";
+        szValue[3] = strGamemode.c_str();
+
+        szKey[4] = "Map";
+        szValue[4] = strMap.c_str();
+
+        szKey[5] = "Player Name";
+        szValue[5] = strPlayerName.c_str();
+
+        szKey[6] = "Player Count";
+        szValue[6] = strPlayerCount.c_str();
+        
+        XfireSetCustomGameData ( 7, szKey, szValue );
+    }
 }

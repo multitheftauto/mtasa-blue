@@ -169,6 +169,10 @@ DWORD RETURN_CPhysical_ProcessCollisionSectorList =         0x54BB9A;
 #define HOOKPOS_CrashFix_Misc1                              0x5D9A6E
 DWORD RETURN_CrashFix_Misc1 =                               0x5D9A74;
 
+#define HOOKPOS_CrashFix_Misc2                              0x6B18B0
+DWORD RETURN_CrashFix_Misc2a =                              0x6B18B9;
+DWORD RETURN_CrashFix_Misc2b =                              0x6B1F6C;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -284,6 +288,7 @@ void HOOK_CPed_GetWeaponSkill ();
 void HOOK_CPed_AddGogglesModel ();
 void HOOK_CPhysical_ProcessCollisionSectorList ();
 void HOOK_CrashFix_Misc1 ();
+void HOOK_CrashFix_Misc2 ();
 
 void vehicle_lights_init ();
 
@@ -398,6 +403,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7 );
     HookInstall(HOOKPOS_CrashFix_Misc1, (DWORD)HOOK_CrashFix_Misc1, 6 );
+    HookInstall(HOOKPOS_CrashFix_Misc2, (DWORD)HOOK_CrashFix_Misc2, 9 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -1024,10 +1030,18 @@ void CMultiplayerSA::InitHooks()
     // We are hiding the menu in "void CGameSA::Initialize ( void )".
     // 
     // - Sebas
-	*(BYTE *)((0xBA6748)+0x5C) = 1;
+    *(BYTE *)((0xBA6748)+0x5C) = 1;
 
     // Force the MrWhoopee music to load even if we are not the driver.
     *(BYTE *)(0x4F9CCE) = 0xCE;
+
+    // Disable re-initialization of DirectInput mouse device by the game
+    *(BYTE *)0x576CCC = 0xEB;
+    *(BYTE *)0x576EBA = 0xEB;
+    *(BYTE *)0x576F8A = 0xEB;
+
+    // Make sure DirectInput mouse device is set non-exclusive (may not be needed?)
+    *(DWORD *)0x7469A0 = 0x909000B0;
 }
 
 
@@ -4336,5 +4350,22 @@ void _declspec(naked) HOOK_CrashFix_Misc1 ()
         test    ecx,ecx
     cont:
         jmp     RETURN_CrashFix_Misc1
+    }
+}
+
+
+void _declspec(naked) HOOK_CrashFix_Misc2 ()
+{
+    _asm
+    {
+        // Hooked from 006B18B0
+        test    eax,eax 
+        je      cont        // Skip much code if eax is zero (vehicle has no colmodel)
+
+        mov     eax,dword ptr [eax+2Ch] 
+        mov     cl,byte ptr [esi+429h]
+        jmp     RETURN_CrashFix_Misc2a
+    cont:
+        jmp     RETURN_CrashFix_Misc2b
     }
 }

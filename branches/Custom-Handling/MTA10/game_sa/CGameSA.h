@@ -206,9 +206,10 @@ public:
     bool                    VerifySADataFileNames   ();
     bool                    PerformChecks           ();
 
-    void                    SetASyncLoadingEnabled  ( bool bEnabled );
-    void                    SuspendASyncLoading     ( bool bSuspend );
-    bool                    IsASyncLoadingEnabled   ( bool bIgnoreSuspend = false );
+    void                    SetAsyncLoadingFromSettings     ( bool bSettingsDontUse, bool bSettingsEnabled );
+    void                    SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced );
+    void                    SuspendASyncLoading             ( bool bSuspend );
+    bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );
 
 private:
     CPools                  * m_pPools;
@@ -259,7 +260,10 @@ private:
     CControllerConfigManager    * m_pControllerConfigManager;
 
     eGameVersion            m_eGameVersion;
-    bool                    m_bASyncLoading;
+    bool                    m_bAsyncSettingsDontUse;
+    bool                    m_bAsyncSettingsEnabled;
+    bool                    m_bAsyncScriptEnabled;
+    bool                    m_bAsyncScriptForced;
     bool                    m_bASyncLoadingSuspended;
 
     static unsigned long*   VAR_SystemTime;

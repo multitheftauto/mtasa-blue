@@ -46,6 +46,8 @@ bool g_bBoundsChecker = true;
 #define DEFAULT_GAME_SPEED 1.0f
 #define DEFAULT_BLUR_LEVEL 36
 #define DEFAULT_MINUTE_DURATION 1000
+#define DOUBLECLICK_TIMEOUT 330
+#define DOUBLECLICK_MOVE_THRESHOLD 10.0f
 
 CClientGame::CClientGame ( bool bLocalPlay )
 {
@@ -62,6 +64,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_fMarkerBounce = 0.0f;
     m_Status = CClientGame::STATUS_CONNECTING;
     m_ulVerifyTimeStart = 0;
+    m_ulLastClickTick = 0;
     m_pLocalPlayer = NULL;
     m_LocalID = INVALID_ELEMENT_ID;
     m_szLocalNick [0] = 0;
@@ -292,6 +295,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     float fScale;
     g_pCore->GetCVars ()->Get ( "text_scale", fScale );
     CClientTextDisplay::SetGlobalScale ( fScale );
+
+    // Reset async loading script settings to default
+    g_pGame->SetAsyncLoadingFromScript ( false, false );
 }
 
 
@@ -535,6 +541,12 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
 
                 pBitStream->WriteCompressed ( (unsigned int)strPlayerVersion.length () );
                 pBitStream->Write ( strPlayerVersion.c_str (), strPlayerVersion.length () );
+            }
+
+            if ( pBitStream->Version () >= 0x0e )
+            {
+                // Should the server send us recommended update info?
+                pBitStream->WriteBit ( g_pCore->IsOptionalUpdateInfoRequired ( g_pNet->GetConnectedServer() ) );
             }
 
             pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGameVersion () ) );
@@ -2215,6 +2227,32 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
 
                         m_pNetAPI->RPC ( CURSOR_EVENT, bitStream.pBitStream );
 
+                        if ( strcmp(szState, "down") == 0 )
+                        {
+                            CVector2D vecDelta = m_vecLastCursorPosition - vecCursorPosition;
+
+                            if (    ( GetTickCount() - m_ulLastClickTick ) < DOUBLECLICK_TIMEOUT &&
+                                    vecDelta.Length() <= DOUBLECLICK_MOVE_THRESHOLD )
+                            {
+                                // Call the event for the client
+                                CLuaArguments DoubleClickArguments;
+                                DoubleClickArguments.PushString ( szButton );
+                                DoubleClickArguments.PushNumber ( vecCursorPosition.fX );
+                                DoubleClickArguments.PushNumber ( vecCursorPosition.fY );
+                                DoubleClickArguments.PushNumber ( vecCollision.fX );
+                                DoubleClickArguments.PushNumber ( vecCollision.fY );
+                                DoubleClickArguments.PushNumber ( vecCollision.fZ );
+                                if ( pCollisionEntity )
+                                    DoubleClickArguments.PushElement ( pCollisionEntity );
+                                else
+                                    DoubleClickArguments.PushBoolean ( false );
+                                m_pRootEntity->CallEvent ( "onClientDoubleClick", DoubleClickArguments, false );
+                            }
+
+                            m_ulLastClickTick = GetTickCount();
+                            m_vecLastCursorPosition = vecCursorPosition;
+                        }
+
                         return true;
                     }
                 }
@@ -2362,7 +2400,7 @@ void CClientGame::AddBuiltInEvents ( void )
     //m_Events.AddEvent ( "onClientGUIKeyDown", "element", NULL, false );
     m_Events.AddEvent ( "onClientGUITabSwitched", "element", NULL, false );
 
-    m_Events.AddEvent ( "onClientDoubleClick", "button, state, screenX, screenY, worldX, worldY, worldZ, element", NULL, false );
+    m_Events.AddEvent ( "onClientDoubleClick", "button, screenX, screenY, worldX, worldY, worldZ, element", NULL, false );
     m_Events.AddEvent ( "onClientMouseMove", "screenX, screenY", NULL, false );
     m_Events.AddEvent ( "onClientMouseEnter", "screenX, screenY", NULL, false );
     m_Events.AddEvent ( "onClientMouseLeave", "screenX, screenY", NULL, false );
@@ -2403,6 +2441,10 @@ void CClientGame::AddBuiltInEvents ( void )
 
     // Projectile events
     m_Events.AddEvent ( "onClientProjectileCreation", "creator", NULL, false );
+
+    // Sound events
+    m_Events.AddEvent ( "onClientSoundStream", "success, length", NULL, false );
+    m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
 }
 
 
@@ -4255,14 +4297,6 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
             case WEAPONTYPE_FLARE:
             case WEAPONTYPE_FREEFALL_BOMB:
                 break;
-        }
-        if ( pBitStream->Version() >= 0x07 ) 
-        {
-            //if we created it it'l have a parent
-            if ( pProjectile->GetParent() )
-                pBitStream->WriteBit ( false );
-            else
-                pBitStream->WriteBit ( true );
         }
         g_pNet->SendPacket ( PACKET_ID_PROJECTILE, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
 

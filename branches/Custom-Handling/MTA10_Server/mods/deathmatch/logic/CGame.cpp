@@ -79,6 +79,7 @@ CGame::CGame ( void )
     m_pBanManager = NULL;
     m_pTeamManager = NULL;
     m_pMainConfig = NULL;
+    m_pRegistryManager = NULL;
     m_pRegistry = NULL;
     m_pAccountManager = NULL;
     m_pPedManager = NULL;
@@ -184,8 +185,10 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pBanManager );
     SAFE_DELETE ( m_pTeamManager );
     SAFE_DELETE ( m_pMainConfig );
-    SAFE_DELETE ( m_pRegistry );
+    m_pRegistryManager->CloseRegistry ( m_pRegistry );
+    m_pRegistry = NULL;
     SAFE_DELETE ( m_pAccountManager );
+    SAFE_DELETE ( m_pRegistryManager );
     SAFE_DELETE ( m_pRegisteredCommands );
     SAFE_DELETE ( m_pPedManager );
     SAFE_DELETE ( m_pHTTPD );
@@ -315,6 +318,7 @@ void CGame::DoPulse ( void )
     m_pPedSync->DoPulse ();
     m_pBanManager->DoPulse ();
     m_pAccountManager->DoPulse ();
+    m_pRegistryManager->DoPulse ();
 
     // Pulse ASE
     if ( m_pASE )
@@ -414,6 +418,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Create the account manager
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "internal.db" );
+    m_pRegistryManager = new CRegistryManager ();
     m_pAccountManager = new CAccountManager ( NULL, strBuffer );
 
     // Create and start the HTTP server
@@ -504,23 +509,19 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             fprintf ( fh, "(It will get recreated when the server is next started)\n" );
             fprintf ( fh, "---------------------------------------------------------------------------\n\n" );
             fprintf ( fh, "The 'http-client-files' directory always contains the correct client files\n" );
-            fprintf ( fh, "for hosting on a web server, (if that option is enabled in mtaserver.conf).\n" );
+            fprintf ( fh, "for hosting on a web server.\n" );
             fprintf ( fh, "* If the web server is on the same machine, you can simply link the appropriate\n" );
             fprintf ( fh, "  web server directory to 'http-client-files'.\n" );
             fprintf ( fh, "* If the web server is on a separate machine, ensure it has access to\n" );
             fprintf ( fh, "  'http-client-files' via a network path, or maintain a remote copy using\n" );
             fprintf ( fh, "  synchronization software.\n" );
-            fprintf ( fh, "---------------------------------------------------------------------------\n" );
-            fprintf ( fh, "Note: 'http-client-files' will only be updated if:\n" );
-            fprintf ( fh, "       'httpdownloadurl' in mtaserver.conf is not blank\n" );
-            fprintf ( fh, "   and 'httpautoclientfiles' in mtaserver.conf is not set to 0\n" );
             fprintf ( fh, "---------------------------------------------------------------------------\n\n" );
             fclose ( fh );
         }
     }
 
     m_pRemoteCalls = new CRemoteCalls();
-    m_pRegistry = new CRegistry ("");
+    m_pRegistry = m_pRegistryManager->OpenRegistry ( "" );
 
     m_pResourceManager = new CResourceManager;
     m_pSettings = new CSettings ( m_pResourceManager );
@@ -1182,6 +1183,8 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false );
     m_Events.AddEvent ( "onElementDataChange", "key, oldValue", NULL, false );
     m_Events.AddEvent ( "onElementDestroy", "", NULL, false );
+    m_Events.AddEvent ( "onElementStartSync", "newSyncer", NULL, false );
+    m_Events.AddEvent ( "onElementStopSync", "oldSyncer", NULL, false );
 
     // Radar area events
 
@@ -1320,6 +1323,41 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 
                                 // Set the bitstream version number for this connection
                                 g_pNetServer->SetClientBitStreamVersion ( Packet.GetSourceSocket (), Packet.GetBitStreamVersion () );
+
+                                // Check if client must update
+                                if ( GetConfig ()->IsBelowMinimumClient ( pPlayer->GetPlayerVersion () ) )
+                                {
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick, strIPAndSerial.c_str () );
+
+                                    // Tell the player
+                                    if ( Packet.GetBitStreamVersion () >= 0x0e )
+                                    {
+                                        pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", GetConfig ()->GetMinimumClientVersion () ) );
+                                        DisconnectPlayer ( this, *pPlayer, "" );
+                                    }
+                                    else
+                                    {
+                                        SString strMessage = "Disconnected: You need to update MTA to connect to this server.";
+                                        for ( int i = 0 ; i < 55 ; i++ )
+                                            strMessage += " ";
+                                        strMessage += "*         Update at www.mtasa.com";
+                                        DisconnectPlayer ( this, *pPlayer, strMessage );
+                                    }
+                                    return;
+                                }
+
+                                // Check if client should optionally update
+                                if ( Packet.IsOptionalUpdateInfoRequired () && GetConfig ()->IsBelowRecommendedClient ( pPlayer->GetPlayerVersion () ) )
+                                {
+                                    // Tell the console
+                                    CLogger::LogPrintf ( "CONNECT: %s advised to update (Client version is below recommended) (%s)\n", szNick, strIPAndSerial.c_str () );
+
+                                    // Tell the player
+                                    pPlayer->Send ( CUpdateInfoPacket ( "Optional", GetConfig ()->GetRecommendedClientVersion () ) );
+                                    DisconnectPlayer ( this, *pPlayer, "" );
+                                    return;
+                                }
 
                                 // Check the serial for validity
                                 if ( !pPlayer->GetSerial ().empty() &&
@@ -2751,8 +2789,8 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
             pCamera->SetMode ( CAMERAMODE_PLAYER );
             if ( pTarget )
                 pCamera->SetTarget ( pTarget );
-            else
-               CLogger::LogPrintf ( "INTERNAL ERROR: Camera sync packet with invalid target\n" );
+            //else
+            //   CLogger::LogPrintf ( "INTERNAL ERROR: Camera sync packet with invalid target\n" );
         }
     }
 }

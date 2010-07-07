@@ -33,7 +33,7 @@ class CRadarAreaManager;
 class CVehicleManager;
 class CMapManager;
 
-class CLuaMain : public CClient
+class CLuaMain //: public CClient
 {
 public:
     enum
@@ -112,8 +112,8 @@ public:
 
     void                            RegisterHTMLDFunctions  ( void );
 
-private:
     void                            InitVM                  ( void );
+private:
     void                            InitSecurity            ( void );
 
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );

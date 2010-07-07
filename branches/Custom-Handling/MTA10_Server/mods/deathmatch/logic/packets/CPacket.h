@@ -38,6 +38,7 @@ public:
                                         CPacket             ( void );
     virtual                             ~CPacket            ( void ) {};
 
+    virtual bool                        RequiresSourcePlayer ( void ) const                                     { return true; }
     virtual ePacketID                   GetPacketID         ( void ) const = 0;
     virtual unsigned long               GetFlags            ( void ) const = 0;
 

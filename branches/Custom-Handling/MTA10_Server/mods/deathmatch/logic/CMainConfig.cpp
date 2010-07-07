@@ -176,6 +176,7 @@ bool CMainConfig::Load ( const char* szFilename )
     if ( GetString ( m_pRootNode, "httpdownloadurl", m_strHTTPDownloadURL, 5 ) == IS_SUCCESS )
     {
         m_ucHTTPDownloadType = HTTP_DOWNLOAD_ENABLED_URL;
+        m_strHTTPDownloadURL = SString ( m_strHTTPDownloadURL ).TrimEnd ( "/" );
     }
     else
     {
@@ -183,17 +184,38 @@ bool CMainConfig::Load ( const char* szFilename )
         m_strHTTPDownloadURL = "";
     }
 
-    // httpautoclientfiles
-    iResult = GetBoolean ( m_pRootNode, "httpautoclientfiles", m_bHTTPAutoClientFiles );
-    if ( iResult == INVALID_VALUE  || iResult == DOESNT_EXIST )
-        m_bHTTPAutoClientFiles = true;
-
     // httpconnectionsperclient
     GetInteger ( m_pRootNode, "httpconnectionsperclient", m_iHTTPConnectionsPerClient, 2, 32 );
     m_iHTTPConnectionsPerClient = Clamp ( 0, m_iHTTPConnectionsPerClient, 32 );
 
     // verifyclientsettings
     GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );
+
+    {
+        SString strDisbaleAC;
+        GetString ( m_pRootNode, "disableac", strDisbaleAC );
+        std::vector < SString > tagACList;
+        strDisbaleAC.Split ( ",", tagACList );
+        for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
+            if ( (*it).length () )
+                MapSet ( m_DisableACMap, *it, 1 );
+    }
+
+    // minclientversion - Minimum client version or kick
+    GetString ( m_pRootNode, "minclientversion", m_strMinClientVersion );
+    if ( m_strMinClientVersion != "" && !IsValidVersionString ( m_strMinClientVersion ) )
+    {
+        CLogger::LogPrint ( "WARNING: Invalid value specified in \"minclientversion\"\n" );
+        m_strMinClientVersion = "";
+    }
+
+    // recommendedclientversion - Minimum client version or spam
+    GetString ( m_pRootNode, "recommendedclientversion", m_strRecommendedClientVersion );
+    if ( m_strRecommendedClientVersion != "" && !IsValidVersionString ( m_strRecommendedClientVersion ) )
+    {
+        CLogger::LogPrint ( "WARNING: Invalid value specified in \"recommendedclientversion\"\n" );
+        m_strRecommendedClientVersion = "";
+    }
 
     // ASE
     iResult = GetBoolean ( m_pRootNode, "ase", m_bAseEnabled );
@@ -500,6 +522,7 @@ bool CMainConfig::LoadExtended ( void )
 
     RegisterCommand ( "ver", CConsoleCommands::Ver, false );
     RegisterCommand ( "sver", CConsoleCommands::Ver, false );
+    RegisterCommand ( "ase", CConsoleCommands::Ase, false );
 
     return true;
 }
@@ -599,4 +622,9 @@ unsigned short CMainConfig::GetHTTPPort ( void )
     if ( m_pCommandLineParser && m_pCommandLineParser->GetHTTPPort ( usHTTPPort ) )
         return usHTTPPort;
     return m_usHTTPPort;
+}
+void CMainConfig::SetServerName ( std::string strServerName )
+{
+    m_strServerName = strServerName;
+    CLogger::LogPrintf ( "The Server Name has now been set to: %s\n", strServerName.c_str () );
 }

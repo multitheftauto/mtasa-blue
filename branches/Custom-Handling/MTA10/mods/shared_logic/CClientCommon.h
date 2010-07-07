@@ -15,7 +15,7 @@
 #define MAX_MIMICS                      50
 
 // Defines the maximum amount of real players
-#define MAX_NET_PLAYERS_REAL            128
+#define MAX_NET_PLAYERS_REAL            250
 
 // Defines the maximum amount of players inside the game (includes mimics)
 #define MAX_NET_PLAYERS                 (MAX_NET_PLAYERS_REAL + MAX_MIMICS)

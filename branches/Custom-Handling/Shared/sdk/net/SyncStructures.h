@@ -585,7 +585,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
     {
         if ( bitStream.ReadCompressed ( data.vehicleID ) &&
              bitStream.Read ( data.ucTimeContext ) &&
-             bitStream.ReadBits ( (char *)&data, 8 ) )
+             bitStream.ReadBits ( (char *)&data, 9 ) )
         {
             if ( data.bSyncPosition )
             {
@@ -636,7 +636,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
     {
         bitStream.WriteCompressed ( data.vehicleID );
         bitStream.Write ( data.ucTimeContext );
-        bitStream.WriteBits ( (const char* )&data, 8 );
+        bitStream.WriteBits ( (const char* )&data, 9 );
 
         if ( data.bSyncPosition )
         {
@@ -689,6 +689,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
         bool bSyncTrailer : 1;
         bool bEngineOn : 1;
         bool bDerailed : 1;
+        bool bIsInWater : 1;
         CVector vecPosition;
         CVector vecRotation;
         CVector vecVelocity;

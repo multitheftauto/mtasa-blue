@@ -71,8 +71,6 @@ unsigned int    HexToInt                    ( const char* szHex );
 bool            XMLColorToInt               ( const char* szColor, unsigned long& ulColor );
 bool            XMLColorToInt               ( const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha );
 
-const char* GetFilenameFromPath ( const char* szPath );
-std::string ConformResourcePath ( const char* szRes );
 
 inline unsigned long GetTime ( void )
 {
@@ -195,13 +193,13 @@ inline bool IsVisibleCharacter ( unsigned char c )
 void            MakeSureDirExists           ( const char* szPath );
 bool            FileCopy                    ( const char* szPathNameSrc, const char* szPathDst );
 
-inline SString SQLEscape ( const SString& strEscapeString )
+inline SString SQLEscape ( const SString& strEscapeString, bool bSingleQuotes, bool bDoubleQuotes )
 {
     SString strParsedQuery = "";
     for ( unsigned int k = 0; k < strEscapeString.length (); k++ ) {
-        if ( strEscapeString[k] == '\'' )
+        if ( bSingleQuotes && strEscapeString[k] == '\'' )
             strParsedQuery += '\'';
-        if ( strEscapeString[k] == '\"' )
+        if ( bDoubleQuotes && strEscapeString[k] == '\"' )
             strParsedQuery += '\"';
 
         strParsedQuery += strEscapeString[k];

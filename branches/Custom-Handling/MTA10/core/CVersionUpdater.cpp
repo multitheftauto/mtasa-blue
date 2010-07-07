@@ -53,7 +53,7 @@ end=ok
 CVersionUpdater::CVersionUpdater ( void )
     : m_llTimeStart ( 0 )
 {
-    m_strStage = "Start";
+    m_strStage = "SeeIfTimeForCheck";
 }
 
 
@@ -62,7 +62,7 @@ void CVersionUpdater::DoPulse ( void )
     if ( m_strStage.length () == 0 )
         return;
 
-    if ( m_strStage == "Start" )
+    if ( m_strStage == "SeeIfTimeForCheck" )
     {
         unsigned int uiTimeNow = static_cast < unsigned int > ( time ( NULL ) );
         unsigned int uiLastCheckTime = 0;
@@ -71,16 +71,22 @@ void CVersionUpdater::DoPulse ( void )
         // Only check once a day
         if ( uiTimeNow - uiLastCheckTime > 60 * 60 * 24 )
         {
-            // Prime check server list
-            m_CheckInfo = CCheckInfo ();
-            m_CheckInfo.serverList.push_back ( VERSION_CHECKER_URL1 );
-            m_CheckInfo.serverList.push_back ( VERSION_CHECKER_URL2 );
-            m_strStage = "NextCheck";
+            m_strStage = "StartCheck";
+            m_strContext = "Periodic";
+
         }
         else
             m_strStage = "End";
     }
 
+    if ( m_strStage == "StartCheck" )
+    {
+        // Prime check server list
+        m_CheckInfo = CCheckInfo ();
+        m_CheckInfo.serverList.push_back ( VERSION_CHECKER_URL1 );
+        m_CheckInfo.serverList.push_back ( VERSION_CHECKER_URL2 );
+        m_strStage = "NextCheck";
+    }
 
     if ( m_strStage == "NextCheck" )
     {
@@ -92,6 +98,16 @@ void CVersionUpdater::DoPulse ( void )
         PollVersionCheck ();
     }
 
+    if ( m_strStage == "StartNoUpdateQuestion" )
+    {
+        StartNoUpdateQuestion ();
+    }
+
+    if ( m_strStage == "PollNoUpdateQuestion" )
+    {
+        PollNoUpdateQuestion ();
+    }
+
     if ( m_strStage == "StartUpdateQuestion" )
     {
         StartUpdateQuestion ();
@@ -100,6 +116,14 @@ void CVersionUpdater::DoPulse ( void )
     if ( m_strStage == "PollUpdateQuestion" )
     {
         PollUpdateQuestion ();
+    }
+
+    if ( m_strStage == "FirstMirror" )
+    {
+        // Start first download attempt at a random mirror
+        m_DownloadInfo.iCurrent = ( rand () / 11 ) % 100;
+        m_DownloadInfo.iRetryCount = 0;
+        m_strStage = "NextMirror";
     }
 
     if ( m_strStage == "NextMirror" )
@@ -122,10 +146,44 @@ void CVersionUpdater::DoPulse ( void )
         PollPostDownloadOk ();
     }
 
+    if ( m_strStage == "ServerSaysOptionalUpdate" )
+        ServerSaysOptionalUpdate ();
+
+    if ( m_strStage == "ServerSaysMandatoryUpdate" )
+        ServerSaysMandatoryUpdate ();
+
+    if ( m_strStage == "PollServerUpdateQuestion" )
+        PollServerUpdateQuestion ();
+
     if ( m_strStage == "End" )
     {
         m_strStage = "";
     }
+}
+
+
+// Server says update
+void CVersionUpdater::InitiateUpdate ( const SString& strType, const SString& strHost )
+{
+    if ( strType == "Optional" )
+    {
+        MapSet ( m_DoneOptionalMap, strHost, 1 );
+        m_strStage = "ServerSaysOptionalUpdate";
+        CCore::GetSingleton ().RemoveMessageBox ();
+    }
+
+    if ( strType == "Mandatory" )
+    {
+        m_strStage = "ServerSaysMandatoryUpdate";
+        CCore::GetSingleton ().RemoveMessageBox ();
+    }
+}
+
+
+// Should this server tell us about recommended updates?
+bool CVersionUpdater::IsOptionalUpdateInfoRequired ( const SString& strHost )
+{
+    return true || !MapContains ( m_DoneOptionalMap, strHost );
 }
 
 
@@ -140,7 +198,7 @@ void CVersionUpdater::ResetCheckTimer ( void )
 
 bool CVersionUpdater::IsDownloadMandatory ( void )
 {
-    return m_DownloadInfo.strPriority == "mandatory";
+    return m_DownloadInfo.strPriority == "mandatory" || m_strContext == "Mandatory";
 }
 
 CQuestionBox& CVersionUpdater::GetQuestionBox ( void )
@@ -148,6 +206,10 @@ CQuestionBox& CVersionUpdater::GetQuestionBox ( void )
     return *CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
 }
 
+bool CVersionUpdater::IsPeriodicCheck ( void )
+{
+    return m_strContext == "Periodic";
+}
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -163,7 +225,7 @@ void CVersionUpdater::StartVersionCheck ( void )
 {
     if ( ++m_CheckInfo.iRetryCount > MAX_UPDATER_CHECK_ATTEMPTS || m_CheckInfo.serverList.size () == 0 )
     {
-        m_strStage = "End";
+        m_strStage = "StartNoUpdateQuestion";
         return;
     }
 
@@ -269,7 +331,7 @@ void CVersionUpdater::PollVersionCheck ( void )
             // Finish here if there is no update available
             if ( m_DownloadInfo.strStatus != "update" )
             {
-                m_strStage = "End";
+                m_strStage = "StartNoUpdateQuestion";
                 return;
             }
 
@@ -283,17 +345,53 @@ void CVersionUpdater::PollVersionCheck ( void )
     return;
 }
 
+void CVersionUpdater::StartNoUpdateQuestion ( void )
+{
+    if ( IsPeriodicCheck () )
+    {
+        m_strStage = "End";     // No message if no update
+    }
+    else
+    {
+        // Display dialog
+        GetQuestionBox ().Reset ();
+        GetQuestionBox ().SetTitle ( "UPDATE CHECK" );
+        GetQuestionBox ().SetMessage ( "Update not currently avalable.\n\nPlease check www.mtasa.com" );
+        GetQuestionBox ().SetButton ( 0, "OK" );
+        GetQuestionBox ().Show ();
+        m_strStage = "PollNoUpdateQuestion";
+    }
+}
+
+void CVersionUpdater::PollNoUpdateQuestion ( void )
+{
+    if ( GetQuestionBox ().PollButtons () != -1 )
+    {
+        GetQuestionBox ().Reset ();
+        if ( !IsDownloadMandatory () )
+            CCommandFuncs::Reconnect ( NULL );  // Reconnect if no update after optional update check
+        m_strStage = "End";
+    }
+}
+
 
 void CVersionUpdater::StartUpdateQuestion ( void )
 {
-    // Display message
-    GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( m_DownloadInfo.strTitle );
-    GetQuestionBox ().SetMessage ( m_DownloadInfo.strMsg );
-    GetQuestionBox ().SetButton ( 0, m_DownloadInfo.strNo );
-    GetQuestionBox ().SetButton ( 1, m_DownloadInfo.strYes );
-    GetQuestionBox ().Show ();
-    m_strStage = "PollUpdateQuestion";
+    if ( !IsPeriodicCheck () )
+    {
+        m_strStage = "FirstMirror"; // No user confirmation for server initiated update
+    }
+    else
+    {
+        // Display message
+        GetQuestionBox ().Reset ();
+        GetQuestionBox ().SetTitle ( m_DownloadInfo.strTitle );
+        GetQuestionBox ().SetMessage ( m_DownloadInfo.strMsg );
+        GetQuestionBox ().SetButton ( 0, m_DownloadInfo.strNo );
+        GetQuestionBox ().SetButton ( 1, m_DownloadInfo.strYes );
+        GetQuestionBox ().Show ();
+        m_strStage = "PollUpdateQuestion";
+    }
 }
 
 
@@ -323,10 +421,7 @@ void CVersionUpdater::PollUpdateQuestion ( void )
     else
     {
         // Yes
-        m_strStage = "NextMirror";
-        // Start first download attempt at a random mirror
-        m_DownloadInfo.iCurrent = ( rand () / 11 ) % 100;
-        m_DownloadInfo.iRetryCount = 0;
+        m_strStage = "FirstMirror";
     }
 }
 
@@ -376,7 +471,10 @@ void CVersionUpdater::PollDownload ( void )
     {
         m_HTTP.Get ("");
         GetQuestionBox ().Reset ();
-        m_strStage = "StartUpdateQuestion";
+        if ( IsPeriodicCheck () )
+            m_strStage = "StartUpdateQuestion";
+        else
+            m_strStage = "End";
         return;
     }
 
@@ -509,5 +607,56 @@ void CVersionUpdater::PollPostDownloadOk ( void )
         // Exit game
         m_strStage = "End";
         CCore::GetSingleton ().Quit ();
+    }
+}
+
+void CVersionUpdater::ServerSaysOptionalUpdate ( void )
+{
+    // Exit game after button press
+    GetQuestionBox ().Reset ();
+    GetQuestionBox ().SetTitle ( "OPTIONAL UPDATE" );
+    GetQuestionBox ().SetMessage ( "Server says an update is recommended, but not essential.\n\n Do you want to update now ?" );
+    GetQuestionBox ().SetButton ( 0, "No" );
+    GetQuestionBox ().SetButton ( 1, "Yes" );
+    GetQuestionBox ().Show ();
+    m_strContext = "Optional";
+    m_strStage = "PollServerUpdateQuestion";
+}
+
+void CVersionUpdater::ServerSaysMandatoryUpdate ( void )
+{
+    // Exit game after button press
+    GetQuestionBox ().Reset ();
+    GetQuestionBox ().SetTitle ( "MANDATORY UPDATE" );
+    GetQuestionBox ().SetMessage ( "To join this server, you must update MTA.\n\n Do you want to update now ?" );
+    GetQuestionBox ().SetButton ( 0, "No" );
+    GetQuestionBox ().SetButton ( 1, "Yes" );
+    GetQuestionBox ().Show ();
+    m_strContext = "Mandatory";
+    m_strStage = "PollServerUpdateQuestion";
+}
+
+
+void CVersionUpdater::PollServerUpdateQuestion ( void )
+{
+    // Wait for answer before continuing
+    switch ( GetQuestionBox ().PollButtons () )
+    {
+        case 1:
+            GetQuestionBox ().Reset ();
+            GetQuestionBox ().SetTitle ( "CHECKING FOR UPDATE" );
+            GetQuestionBox ().SetMessage ( "Please wait..." );
+            GetQuestionBox ().SetButton ( 0, "Cancel" );
+            GetQuestionBox ().Show ();
+            m_strStage = "StartCheck";
+            break;
+
+        case 0:
+            GetQuestionBox ().Reset ();
+            m_strStage = "End";
+
+            if ( !IsDownloadMandatory () )
+                CCommandFuncs::Reconnect ( NULL );  // Reconnect if user says no to optional update
+            break;
     }
 }

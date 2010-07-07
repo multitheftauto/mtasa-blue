@@ -300,7 +300,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
             if ( buffer.size () > 0 && CChecksum::GenerateChecksumFromBuffer ( &buffer.at ( 0 ), buffer.size () ).CompareWithLegacy ( pResourceFile->GetServerChecksum () ) )
             {
                 // Load the resource text
-                m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), buffer.size () );
+                m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), buffer.size (), pResourceFile->GetName () );
             }
             else
             {

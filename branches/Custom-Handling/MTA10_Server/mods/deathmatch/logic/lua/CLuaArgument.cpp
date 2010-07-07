@@ -974,7 +974,8 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                             }
                             else 
                             {
-                                g_pGame->GetScriptDebugging()->LogError ( NULL, SString ( "Invalid element specified in JSON string '%s'.", szString ) );
+                                // Appears sometimes when a player quits
+                                //g_pGame->GetScriptDebugging()->LogError ( NULL, SString ( "Invalid element specified in JSON string '%s'.", szString ) );
                                 m_iType = LUA_TNIL;
                             }
                             break;

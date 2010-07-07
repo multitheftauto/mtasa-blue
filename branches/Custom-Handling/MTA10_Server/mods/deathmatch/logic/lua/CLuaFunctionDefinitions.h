@@ -424,6 +424,7 @@ public:
     static int      GetColorFromString                  ( lua_State* luaVM );
     static int      Reference                           ( lua_State* luaVM );
     static int      Dereference                         ( lua_State* luaVM );
+    static int      GetValidPedModels                   ( lua_State* luaVM );
 
     // Loaded Map Functions
     static int      GetRootElement                      ( lua_State* luaVM );
@@ -443,6 +444,7 @@ public:
     static int      RemoveRuleValue                     ( lua_State* luaVM );
     static int      GetPlayerAnnounceValue              ( lua_State* luaVM );
     static int      SetPlayerAnnounceValue              ( lua_State* luaVM );
+    static int      SetServerName                       ( lua_State* luaVM );
 
     // Registry funcs
     static int      ExecuteSQLCreateTable               ( lua_State* luaVM );

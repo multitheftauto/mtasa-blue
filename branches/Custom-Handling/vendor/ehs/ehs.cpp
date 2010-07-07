@@ -26,6 +26,12 @@ This can be found in the 'COPYING' file.
 #include "ehs.h"
 #include <fstream>
 
+// Returns true if lock succeeded
+static bool MUTEX_TRY_LOCK( MUTEX_TYPE& x )
+{
+    return ( pthread_mutex_trylock( &x ) != EBUSY );
+}
+
 int EHSServer::CreateFdSet ( )
 {
 
@@ -84,7 +90,8 @@ int EHSServer::ClearIdleConnections ( )
 		  i != m_oEHSConnectionList.end ( );
 		  i++ ) {
 
-		MUTEX_LOCK ( (*i)->m_oMutex );
+        if ( MUTEX_TRY_LOCK ( (*i)->m_oConnectionMutex ) == false )
+            continue;
 
 		// if it's been more than N seconds since a response has been
 		//   sent and there are no pending requests
@@ -101,7 +108,7 @@ int EHSServer::ClearIdleConnections ( )
 
 		}
 		
-		MUTEX_UNLOCK ( (*i)->m_oMutex );
+		MUTEX_UNLOCK ( (*i)->m_oConnectionMutex );
 
 	}
 
@@ -154,11 +161,11 @@ EHSConnection::EHSConnection ( NetworkAbstraction * ipoNetworkAbstraction,
 	m_poCurrentHttpRequest ( NULL ),
 	m_poEHSServer ( ipoEHSServer )
 {
-
+    m_UnusedSyncId = 0;
 	UpdateLastActivity ( );
 
 	// initialize mutex for this object
-	MUTEX_SETUP ( m_oMutex );
+	MUTEX_SETUP ( m_oConnectionMutex );
 
 	// get the address and port of the new connection
 	m_sAddress = ipoNetworkAbstraction->GetAddress ( );
@@ -179,7 +186,9 @@ EHSConnection::~EHSConnection ( )
 #ifdef EHS_MEMORY
 	fprintf ( stderr, "[EHS_MEMORY] Deallocated: EHSConnection\n" );
 #endif
-
+    MUTEX_CLEANUP ( m_oConnectionMutex );
+    if ( m_poCurrentHttpRequest )
+        delete m_poCurrentHttpRequest;
 	delete m_poNetworkAbstraction;
 
 }
@@ -199,12 +208,10 @@ EHSConnection::AddBuffer ( char * ipsData, ///< new data to be added
 						   int inSize ///< size of new data
 	)
 {
-
-	MUTEX_LOCK ( m_oMutex );
+    // Mutex is locked
 
 	// make sure we actually got some data
 	if ( inSize <= 0 ) {
-		MUTEX_UNLOCK ( m_oMutex );
 		return ADDBUFFER_INVALID;
 	}
 
@@ -213,7 +220,6 @@ EHSConnection::AddBuffer ( char * ipsData, ///< new data to be added
 
 	// make sure the buffer hasn't grown too big
 	if ( m_sBuffer.length ( ) > MAX_BUFFER_SIZE_BEFORE_BOOT ) {
-		MUTEX_UNLOCK ( m_oMutex );
 		return ADDBUFFER_TOOBIG;
 	}
 
@@ -242,13 +248,13 @@ EHSConnection::AddBuffer ( char * ipsData, ///< new data to be added
 					// create a thread if necessary
 					pthread_t oThread;
 
-					MUTEX_UNLOCK ( m_oMutex );
+					MUTEX_UNLOCK ( m_oConnectionMutex );
 					pthread_create ( & oThread,
 									 NULL,
 									 EHSServer::PthreadHandleData_ThreadedStub,
 									 (void *) m_poEHSServer );
 					pthread_detach ( oThread );
-					MUTEX_LOCK ( m_oMutex );
+					MUTEX_LOCK ( m_oConnectionMutex );
 
 
 //					fprintf ( stderr, "##### Created new thread %d - %d\n", ++nThreadsCreated, oThread );
@@ -289,8 +295,6 @@ EHSConnection::AddBuffer ( char * ipsData, ///< new data to be added
 
 	}
 
-	MUTEX_UNLOCK ( m_oMutex );
-
 	return nReturnValue;
 
 }
@@ -298,15 +302,9 @@ EHSConnection::AddBuffer ( char * ipsData, ///< new data to be added
 /// call when no more reads will be performed on this object.  inDisconnected is true when client has disconnected
 void EHSConnection::DoneReading ( int inDisconnected )
 {
-    // REMOVE LOCKS (eAi), already locked when this function is called (at least sometimes it is)
-    // May need real fix
-//	MUTEX_LOCK ( m_oMutex );
-
+    // Mutex is locked
 	m_nDoneReading = 1;
 	m_nDisconnected = inDisconnected;
-
-	//MUTEX_UNLOCK ( m_oMutex );
-
 }
 
 
@@ -315,7 +313,8 @@ HttpRequest * EHSConnection::GetNextRequest ( )
 
 	HttpRequest * poHttpRequest = NULL;
 
-	MUTEX_LOCK ( m_oMutex );
+    if ( MUTEX_TRY_LOCK ( m_oConnectionMutex ) == false )
+        return NULL;
 
 	if ( m_oHttpRequestList.empty ( ) ) {
 
@@ -329,7 +328,7 @@ HttpRequest * EHSConnection::GetNextRequest ( )
 		
 	}
 
-	MUTEX_UNLOCK ( m_oMutex );
+	MUTEX_UNLOCK ( m_oConnectionMutex );
 
 	return poHttpRequest;
 
@@ -383,6 +382,7 @@ EHSServer::EHSServer ( EHS * ipoTopLevelEHS ///< pointer to top-level EHS for re
 	pthread_cond_init ( & m_oDoneAccepting, NULL );
 
 	m_nAccepting = 0;
+    m_iActiveThreadCount = 0;
 
 	// grab out the parameters for less typing later on
 	EHSServerParameters & roEHSServerParameters = 
@@ -570,6 +570,7 @@ EHSServer::~EHSServer ( )
         delete m_poNetworkAbstraction;
         m_poNetworkAbstraction = NULL;
     }
+    MUTEX_CLEANUP ( m_oMutex );
 
 #ifdef EHS_MEMORY
 	fprintf ( stderr, "[EHS_MEMORY] Deallocated: EHSServer\n" );
@@ -679,6 +680,9 @@ int EHSServer::RemoveEHSConnection ( EHSConnection * ipoEHSConnection )
 			m_oEHSConnectionList.erase ( i );
 			i = m_oEHSConnectionList.begin ( );
 
+            // Mark as unused
+            poEHSConnection->m_UnusedSyncId = m_ThreadsSyncPoint.GetSyncId ();
+            m_oEHSConnectionUnusedList.push_back ( poEHSConnection );
 		} else {
 			i++;
 		}
@@ -755,6 +759,13 @@ void EHS::StopServer ( )
 		poParent->StopServer ( );
 	} else {
 		poEHSServer->m_nServerRunningStatus = EHSServer::SERVERRUNNING_NOTRUNNING;
+
+        // Allow 10 seconds for threads to stop
+        for( int i = 0; i < 100 && poEHSServer->m_iActiveThreadCount; i++ )
+        {
+            pthread_cond_broadcast ( & poEHSServer->m_oDoneAccepting );
+            Sleep(100);
+        }
 	}
 
 }
@@ -770,17 +781,29 @@ void EHSServer::HandleData_Threaded ( )
 
 	pthread_t nMyThreadId = pthread_self ( );
 
+	MUTEX_LOCK ( m_oMutex );
+    int ThreadIndex = m_ThreadsSyncPoint.GetNewThreadIndex ();
+    m_iActiveThreadCount++;
+	MUTEX_UNLOCK ( m_oMutex );
+
 	do {
 
         //fprintf ( stderr, "##### [%d] Thread HandleData\n", nMyThreadId );
 		HandleData ( HANDLEDATA_THREADEDSELECTTIMEOUTMILLISECONDS,
 					 nMyThreadId );
 
+	    MUTEX_LOCK ( m_oMutex );
+        m_ThreadsSyncPoint.SyncThreadIndex ( ThreadIndex );
+	    MUTEX_UNLOCK ( m_oMutex );
 
-	} while ( m_nServerRunningStatus == SERVERRUNNING_THREADPOOL ||
-			  pthread_equal(nMyThreadId,m_nAcceptThreadId) );
+	} while ( m_nServerRunningStatus != SERVERRUNNING_NOTRUNNING &&
+              ( m_nServerRunningStatus == SERVERRUNNING_THREADPOOL ||
+			    pthread_equal(nMyThreadId,m_nAcceptThreadId) ) );
 
 	//fprintf ( stderr, "##### [%d] Thread exiting\n", nMyThreadId );
+	MUTEX_LOCK ( m_oMutex );
+    m_iActiveThreadCount--;
+	MUTEX_UNLOCK ( m_oMutex );
 
 
 }
@@ -913,6 +936,26 @@ void EHSServer::HandleData ( int inTimeoutMilliseconds, ///< milliseconds for ti
 		
 	} // END NO REQUESTS PENDING
 
+
+    MUTEX_LOCK ( m_oMutex );
+
+    // Delete unused connections after all threads have been synced
+    EHSConnectionList :: iterator iter = m_oEHSConnectionUnusedList.begin ();
+    while ( iter != m_oEHSConnectionUnusedList.end () )
+    {
+        EHSConnection* pConnection = *iter;
+        // Delete it after all threads are past syncing point
+        if ( pConnection->m_UnusedSyncId < m_ThreadsSyncPoint.GetSyncId () - 1 )
+        {
+            iter = m_oEHSConnectionUnusedList.erase ( iter );
+            delete pConnection;
+        }
+        else
+            iter++;
+    }
+
+    MUTEX_UNLOCK ( m_oMutex );
+
 }
 
 void EHSServer::CheckAcceptSocket ( )
@@ -958,6 +1001,8 @@ void EHSServer::CheckClientSockets ( )
 
 		if ( FD_ISSET ( (*i)->GetNetworkAbstraction ( )->GetFd ( ), &m_oReadFds ) ) {
 
+            if ( MUTEX_TRY_LOCK ( (*i)->m_oConnectionMutex ) == false )
+                continue;
 
 			EHS_TRACE ( "$$$$$ Got data on client connection\n" );
 
@@ -972,6 +1017,15 @@ void EHSServer::CheckClientSockets ( )
 				(*i)->GetNetworkAbstraction ( )->Read ( psReadBuffer,
 														BYTES_TO_READ_AT_A_TIME );
 
+            if ( nBytesReceived == SOCKET_ERROR )
+            {
+                int err = GetLastSocketError ();
+                if ( err == E_WOULDBLOCK )
+                {
+                    MUTEX_UNLOCK ( (*i)->m_oConnectionMutex );
+                    continue;
+                }
+            }
 			// if we received a disconnect
 			if ( nBytesReceived <= 0 ) {
 
@@ -998,6 +1052,7 @@ void EHSServer::CheckClientSockets ( )
 
 			} // end nBytesReceived
 
+            MUTEX_UNLOCK ( (*i)->m_oConnectionMutex );
 		} // FD_ISSET
 		
 	} // for loop through connections
@@ -1058,7 +1113,7 @@ const char * GetResponsePhrase ( int inResponseCode ///< HTTP response code to g
 void EHSConnection::AddResponse ( HttpResponse * ipoHttpResponse )
 {
 
-	MUTEX_LOCK ( m_oMutex );
+	MUTEX_LOCK ( m_oConnectionMutex );
 
 	// push the object on to the list
 	m_oHttpResponseMap [ ipoHttpResponse->m_nResponseId ] = ipoHttpResponse;
@@ -1089,13 +1144,13 @@ void EHSConnection::AddResponse ( HttpResponse * ipoHttpResponse )
 			// if we're done with this connection, get rid of it
 			if ( CheckDone ( ) ) {
 				EHS_TRACE( "add response found something to delete\n" );
-				
+
 				// careful with mutexes around here.. Don't want to hold both
-				MUTEX_UNLOCK ( m_oMutex );
+				MUTEX_UNLOCK ( m_oConnectionMutex );
 				MUTEX_LOCK ( m_poEHSServer->m_oMutex );
 				m_poEHSServer->RemoveEHSConnection ( this );
 				MUTEX_UNLOCK ( m_poEHSServer->m_oMutex );
-				MUTEX_LOCK ( m_oMutex );
+                return;
 
 			}
 
@@ -1107,7 +1162,7 @@ void EHSConnection::AddResponse ( HttpResponse * ipoHttpResponse )
 
 	} while ( nFoundNextResponse == 1 );
 
-	MUTEX_UNLOCK ( m_oMutex );
+	MUTEX_UNLOCK ( m_oConnectionMutex );
 
 }
 
@@ -1160,18 +1215,59 @@ void EHSConnection::SendHttpResponse ( HttpResponse * ipoHttpResponse )
 	// extra line break signalling end of headers
 	sOutput += "\r\n";
 
-	const char * psBuffer = sOutput.c_str ( );
-#ifdef _WIN32
-	m_poNetworkAbstraction->Send ( (const char*) psBuffer, sOutput.length() );
-#else
-	m_poNetworkAbstraction->Send ( (void *) psBuffer, sOutput.length() );
-#endif
+	int ret = TrySend ( sOutput.c_str (), sOutput.length() );
 
+    if ( ret == -1 )
+        return;
 
 	// now send the body
-	m_poNetworkAbstraction->Send ( ipoHttpResponse->GetBody ( ), 
+	TrySend ( ipoHttpResponse->GetBody ( ), 
 								   atoi ( ipoHttpResponse->oResponseHeaders [ "content-length" ].c_str ( ) ) );
 
+}
+
+int EHSConnection::TrySend ( const char * ipMessage, size_t inLength, int inFlags )
+{
+
+    int iWouldBlockCount = 0;
+lp1:
+    {
+        int iCount = 0;
+        UpdateLastActivity ( );
+        while( !m_poNetworkAbstraction->IsWritable(1000) && !m_poNetworkAbstraction->IsAtError(0) )
+        {
+            iCount++;
+            if ( iCount == 10 )
+            {
+                break;
+            }
+        } 
+    }
+
+	int ret = m_poNetworkAbstraction->Send ( ipMessage, inLength, inFlags );
+
+    if ( ret == SOCKET_ERROR )
+    {
+        int err = GetLastSocketError ();
+        if ( err == E_WOULDBLOCK )
+        {
+            Sleep(20);
+            iWouldBlockCount++;
+            if ( iWouldBlockCount < 2 )
+                goto lp1;
+            m_poNetworkAbstraction->Close();
+        }
+    }
+    else
+    if ( ret != inLength )
+    {
+        ipMessage += ret;
+        inLength -= ret;
+        Sleep(1);
+        goto lp1;
+    }
+
+    return ret;
 }
 
 

@@ -34,12 +34,6 @@ CHTTPD::~CHTTPD ()
     {
         // Stop the server
         StopServer ();
-
-        // Wait for the server threads to stop. To prevent a crash a while after ending.
-        // StopServer should really have waited for this itself or provide a method to
-        // tell whether it's done or not, but it doesn't so this seems like the only way.
-        // :(
-        Sleep ( 1000 );
     }
 }
 

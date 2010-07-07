@@ -80,7 +80,7 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( checksum.ulCRC );
                 if ( BitStream.Version () >= 0x08 )
                     BitStream.Write ( (const char*)checksum.mD5, sizeof ( checksum.mD5 ) );
-                BitStream.Write ( ( *iter )->GetSize () );
+                BitStream.Write ( ( *iter )->GetApproxSize () );
             }
         }
 

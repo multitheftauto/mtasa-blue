@@ -48,6 +48,7 @@ class CCore;
 #include "CCommunity.h"
 #include <xml/CXML.h>
 #include <ijsify.h>
+#include "CXfireQuery.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -197,11 +198,19 @@ public:
     void                    RegisterCommands                ( void );
     bool                    IsValidNick                     ( const char* szNick );     // Move somewhere else
     void                    Quit                            ( bool bInstantly = true );
+    void                    InitiateUpdate                  ( const char* szType, const char* szHost )      { m_pLocalGUI->InitiateUpdate ( szType, szHost ); }
+    bool                    IsOptionalUpdateInfoRequired    ( const char* szHost )                          { return m_pLocalGUI->IsOptionalUpdateInfoRequired ( szHost ); }
+
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
     bool                    bScreenShot;
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
     const char *            GetCommandLineOption            ( const char* szOption );
     const char *            GetCommandLineArgs              ( void ) { return m_szCommandLineArgs; }
+
+    //XFire
+    SString                 UpdateXfire                     ( void );
+    void                    SetCurrentServer                ( in_addr Addr, unsigned short usQueryPort );
+    void                    SetXfireData                    ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount );
 
 private:
     // Core devices.
@@ -227,6 +236,7 @@ private:
     CTCPManager *               m_pTCPManager;
 
     bool                        m_bFocused;
+    bool                        m_bLastFocused;
 
     // Module loader objects.
     CModuleLoader               m_GameModule;
@@ -262,6 +272,10 @@ private:
 
     // screen res
     DEVMODE                     m_Current;
+
+    //Xfire Update
+    CXfireServerInfo*           m_pCurrentServer;
+    time_t                      m_tXfireUpdate;
 
     char                        m_szInstallRoot[MAX_PATH];
     char                        m_szGTAInstallRoot[MAX_PATH];

@@ -347,7 +347,7 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CClientEntity& Entity, CVe
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.GetMoveSpeed ( vecVelocity );            
+            Vehicle.GetMoveSpeed ( vecVelocity );
             break;
         }
         case CCLIENTOBJECT:
@@ -360,6 +360,12 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CClientEntity& Entity, CVe
         {
             CClientProjectile& Projectile = static_cast < CClientProjectile& > ( Entity );
             Projectile.GetVelocity ( vecVelocity );
+            break;
+        }
+        case CCLIENTSOUND:
+        {
+            CClientSound& Sound = static_cast < CClientSound& > ( Entity );
+            Sound.GetVelocity ( vecVelocity );
             break;
         }
         default: return false;
@@ -848,7 +854,7 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CClientEntity& Entity, con
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.SetMoveSpeed ( vecVelocity );            
+            Vehicle.SetMoveSpeed ( vecVelocity );
             break;
         }
         case CCLIENTOBJECT:
@@ -861,6 +867,12 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CClientEntity& Entity, con
         {
             CClientProjectile& Projectile = static_cast < CClientProjectile& > ( Entity );
             Projectile.SetVelocity ( const_cast < CVector& > ( vecVelocity ) );
+            break;
+        }
+        case CCLIENTSOUND:
+        {
+            CClientSound& Sound = static_cast < CClientSound& > ( Entity );
+            Sound.SetVelocity ( const_cast < CVector& > ( vecVelocity ) );
             break;
         }
 
@@ -1640,9 +1652,9 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike ( CClientEntity& Enti
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame )
 {    
-    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
+    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
 
     if ( IS_PED ( &Entity ) )
     {
@@ -1652,7 +1664,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const 
             CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
             if ( pBlock )
             {
-                Ped.RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
+                Ped.RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
                 return true;
             }
         }
@@ -1746,13 +1758,13 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby ( CClientEntity & Entity
 }
 
 
-bool CStaticFunctionDefinitions::SetPedLookAt ( CClientEntity & Entity, CVector & vecPosition, int iTime, CClientEntity * pTarget )
+bool CStaticFunctionDefinitions::SetPedLookAt ( CClientEntity & Entity, CVector & vecPosition, int iTime, int iBlend, CClientEntity * pTarget )
 {
-    RUN_CHILDREN SetPedLookAt ( **iter, vecPosition, iTime, pTarget );
+    RUN_CHILDREN SetPedLookAt ( **iter, vecPosition, iTime, iBlend, pTarget );
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        Ped.LookAt ( vecPosition, iTime, pTarget );
+        Ped.LookAt ( vecPosition, iTime, iBlend, pTarget );
         return true;
     }
     return false;
@@ -3887,6 +3899,165 @@ bool CStaticFunctionDefinitions::GUIDeleteTab ( CLuaMain& LuaMain, CClientGUIEle
     return true;
 }
 
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
+{
+    CGUIElement *pElement = m_pGUI->CreateComboBox ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    
+    // Disable editing of the box...
+    //CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( pElement );
+    static_cast < CGUIComboBox* > ( pElement ) -> SetReadOnly ( true );
+
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+
+    return pGUIElement;
+}
+
+int CStaticFunctionDefinitions::GUIComboBoxAddItem ( CClientEntity& Entity, const char* szText )
+{
+    RUN_CHILDREN GUIComboBoxAddItem ( **iter, szText );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Add a new item.
+            CGUIListItem* item = static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> AddItem ( szText );
+            // Return it's id + 1 so indexes start at 1.
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> GetItemIndex ( item );
+        }
+    }    
+
+    return 0;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxRemoveItem ( CClientEntity& Entity, int index )
+{
+    RUN_CHILDREN GUIComboBoxRemoveItem ( **iter, index );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Call RemoveItem with index - 1 so indexes are compatible internally ...
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> RemoveItem( index  );
+        }
+    }    
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxClear ( CClientEntity& Entity  )
+{
+    RUN_CHILDREN GUIComboBoxClear ( **iter );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Clear the combobox
+            static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) ->Clear ( );
+            return true;
+        }
+    }    
+
+    return false;
+}
+
+int CStaticFunctionDefinitions::GUIComboBoxGetSelected ( CClientEntity& Entity )
+{
+    RUN_CHILDREN GUIComboBoxGetSelected ( **iter );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // return the selected + 1 so indexes start at 1...
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) ->GetSelectedItemIndex ( );
+        }
+    }    
+
+    return 0;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxSetSelected ( CClientEntity& Entity, int index )
+{
+    RUN_CHILDREN GUIComboBoxSetSelected ( **iter, index );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Call SetSelectedItem with index - 1 so indexes are compatible internally ...
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItemByIndex( index );
+        }
+    }    
+
+    return false;
+}
+
+std::string CStaticFunctionDefinitions::GUIComboBoxGetItemText ( CClientEntity& Entity, int index )
+{
+    RUN_CHILDREN GUIComboBoxGetItemText ( **iter, index );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Call GetItemText with index - 1 so indexes are compatible internally ...
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> GetItemText( index );
+        }
+    }    
+
+    return NULL;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxSetItemText ( CClientEntity& Entity, int index, const char* szText )
+{
+    RUN_CHILDREN GUIComboBoxSetItemText ( **iter, index, szText );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Call SetItemText with index - 1 so indexes are compatible internally ...
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> SetItemText( index, szText );
+        }
+    }    
+
+    return false;
+}
 
 void CStaticFunctionDefinitions::GUISetText ( CClientEntity& Entity, const char* szText )
 {
@@ -4981,24 +5152,24 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
     if ( bKey )
     {
         bool bHitState = true;
+        //Activate all keys for this command
+        pKeyBinds->SetAllCommandsActive ( szResource, true, szCommandName, bHitState, szArguments, true );
         //Check if its binded already (dont rebind)
-        if  ( pKeyBinds->CommandExists ( NULL, szCommandName, true, bHitState, szArguments, szResource ) )
-        {
-            pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, szArguments, szResource, true, true );
+        if ( pKeyBinds->CommandExists ( szKey, szCommandName, true, bHitState, szArguments, szResource ) )
             return true;
-        }
+
         if ( ( !stricmp ( szHitState, "down" ) || !stricmp ( szHitState, "both" ) ) &&
              pKeyBinds->AddCommand ( szKey, szCommandName, szArguments, bHitState, szResource ) )
         {
             pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, szArguments, szResource, true, true );
             bSuccess = true;
         }
+
         bHitState = false;
-        if  ( pKeyBinds->CommandExists ( NULL, szCommandName, true, bHitState, szArguments, szResource ) )
-        {
-            pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, szArguments, szResource, true, true );
+        pKeyBinds->SetAllCommandsActive ( szResource, true, szCommandName, bHitState, szArguments, true );
+        if ( pKeyBinds->CommandExists ( szKey, szCommandName, true, bHitState, szArguments, szResource ) )
             return true;
-        }
+
         if ( ( !stricmp ( szHitState, "up" ) || !stricmp ( szHitState, "both" ) ) &&
              pKeyBinds->AddCommand ( szKey, szCommandName, szArguments, bHitState, szResource ) )
         {
@@ -5083,12 +5254,14 @@ bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, const char* szHi
         if ( ( !stricmp ( szHitState, "down" ) || !stricmp ( szHitState, "both" ) ) &&
              pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, NULL, szResource, false, true  ) )
         {
+            pKeyBinds->SetAllCommandsActive ( szResource, false, szCommandName, bHitState, NULL, true );
             bSuccess = true;
         }
         bHitState = false;
         if ( ( !stricmp ( szHitState, "up" ) || !stricmp ( szHitState, "both" ) ) &&
              pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, NULL, szResource, false, true  ) )
         {
+            pKeyBinds->SetAllCommandsActive ( szResource, false, szCommandName, bHitState, NULL, true );
             bSuccess = true;
         }
     }
@@ -5489,17 +5662,17 @@ bool CStaticFunctionDefinitions::FxAddFootSplash ( CVector & vecPosition )
 }
 
 
-CClientSound* CStaticFunctionDefinitions::PlaySound ( CResource* pResource, const char* szSound, bool bLoop )
+CClientSound* CStaticFunctionDefinitions::PlaySound ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop )
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound2D ( szSound, bLoop );
+    CClientSound* pSound = m_pSoundManager->PlaySound2D ( strSound, bIsURL, bLoop );
     if ( pSound ) pSound->SetParent ( pResource->GetResourceDynamicEntity() );
     return pSound;
 }
 
 
-CClientSound* CStaticFunctionDefinitions::PlaySound3D ( CResource* pResource, const char* szSound, CVector vecPosition, bool bLoop )
+CClientSound* CStaticFunctionDefinitions::PlaySound3D ( CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop )
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound3D ( szSound, vecPosition, bLoop );
+    CClientSound* pSound = m_pSoundManager->PlaySound3D ( strSound, bIsURL, vecPosition, bLoop );
     if ( pSound ) pSound->SetParent ( pResource->GetResourceDynamicEntity() );
     return pSound;
 }
@@ -5600,6 +5773,23 @@ bool CStaticFunctionDefinitions::GetSoundMaxDistance ( CClientSound& Sound, floa
 {
     fDistance = Sound.GetMaxDistance ();
     return true;
+}
+
+bool CStaticFunctionDefinitions::GetSoundMetaTags ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags )
+{
+    strMetaTags = Sound.GetMetaTags ( strFormat );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetSoundEffectEnabled ( CClientSound& Sound, const SString& strEffectName, bool bEnable )
+{
+    int iFxEffect = m_pSoundManager->GetFxEffectFromName ( strEffectName );
+
+    if ( iFxEffect >= 0 )
+        if ( Sound.SetFxEffect ( iFxEffect, bEnable ) )
+            return true;
+
+    return false;
 }
 
 #ifdef MTA_VOICE

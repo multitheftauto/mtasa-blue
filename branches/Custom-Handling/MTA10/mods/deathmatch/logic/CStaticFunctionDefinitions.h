@@ -137,13 +137,13 @@ public:
     static bool                         SetPedWeaponSlot                    ( CClientEntity& Entity, int iSlot );
     static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedCanBeKnockedOffBike           ( CClientEntity& Entity, bool bCanBeKnockedOffBike );
-    static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable );
+    static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame );
     static bool                         SetPedMoveAnim                      ( CClientEntity& Entity, unsigned int iMoveAnim );
     static bool                         AddPedClothes                       ( CClientEntity& Entity, char* szTexture, char* szModel, unsigned char ucType );
     static bool                         RemovePedClothes                    ( CClientEntity& Entity, unsigned char ucType );
     static bool                         SetPedControlState                  ( CClientEntity& Entity, const char* szControl, bool bState );
     static bool                         SetPedDoingGangDriveby              ( CClientEntity& Entity, bool bGangDriveby );
-    static bool                         SetPedLookAt                        ( CClientEntity& Entity, CVector & vecPosition, int iTime, CClientEntity * pTarget );
+    static bool                         SetPedLookAt                        ( CClientEntity& Entity, CVector & vecPosition, int iTime, int iBlend, CClientEntity * pTarget );
     static bool                         SetPedHeadless                      ( CClientEntity& Entity, bool bHeadless );
     static bool                         SetPedFrozen                        ( CClientEntity& Entity, bool bFrozen );
     static bool                         SetPedFootBloodEnabled              ( CClientEntity& Entity, bool bHasFootBlood );
@@ -305,6 +305,8 @@ public:
     static CClientGUIElement*           GUICreateCheckBox                   ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bChecked, bool bRelative, CClientGUIElement* pParent );
     static CClientGUIElement*           GUICreateRadioButton                ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
     static CClientGUIElement*           GUICreateStaticImage                ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const SString& strFile, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateComboBox                   ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    
     
     static bool                         GUIStaticImageLoadImage             ( CClientEntity& Element, const SString& strDir );
 
@@ -370,6 +372,15 @@ public:
     static void                         GUILabelSetColor                    ( CClientEntity& Element, int iR, int iG, int iB );
     static void                         GUILabelSetVerticalAlign            ( CClientEntity& Element, CGUIVerticalAlign eAlign );
     static void                         GUILabelSetHorizontalAlign          ( CClientEntity& Element, CGUIHorizontalAlign eAlign );
+
+    static int                          GUIComboBoxAddItem                  ( CClientEntity& Entity, const char* szText );
+    static bool                         GUIComboBoxRemoveItem               ( CClientEntity& Entity, int index );
+    static bool                         GUIComboBoxClear                    ( CClientEntity& Entity );
+
+    static int                          GUIComboBoxGetSelected              ( CClientEntity& Entity );
+    static bool                         GUIComboBoxSetSelected              ( CClientEntity& Entity, int index );
+    static std::string                  GUIComboBoxGetItemText              ( CClientEntity& Entity, int index );
+    static bool                         GUIComboBoxSetItemText              ( CClientEntity& Entity, int index, const char* szText );
 
     // World functions
     static bool                         GetTime                             ( unsigned char &ucHour, unsigned char &ucMin );
@@ -471,8 +482,8 @@ public:
     static bool                         FxAddFootSplash                     ( CVector & vecPosition );
 
     // Sound funcs
-    static CClientSound*                PlaySound                           ( CResource* pResource, const char* szSound, bool bLoop );
-    static CClientSound*                PlaySound3D                         ( CResource* pResource, const char* szSound, CVector vecPosition, bool bLoop );
+    static CClientSound*                PlaySound                           ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop );
+    static CClientSound*                PlaySound3D                         ( CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop );
     static bool                         StopSound                           ( CClientSound& Sound );
     static bool                         SetSoundPosition                    ( CClientSound& Sound, unsigned int uiPosition );
     static bool                         GetSoundPosition                    ( CClientSound& Sound, unsigned int& uiPosition );
@@ -487,6 +498,8 @@ public:
     static bool                         GetSoundMinDistance                 ( CClientSound& Sound, float& fDistance );
     static bool                         SetSoundMaxDistance                 ( CClientSound& Sound, float fDistance );
     static bool                         GetSoundMaxDistance                 ( CClientSound& Sound, float& fDistance );
+    static bool                         GetSoundMetaTags                    ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags );
+    static bool                         SetSoundEffectEnabled               ( CClientSound& Sound, const SString& strEffectName, bool bEnable );
 
 #ifdef MTA_VOICE
     // Voice funcs

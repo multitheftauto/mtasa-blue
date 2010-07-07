@@ -70,7 +70,7 @@ private:
     time_t              m_tUpdate;
 
     bool                IsValidIPPart               ( const char* szIP );
-
+    bool                m_bAllowSave;
 };
 
 #endif

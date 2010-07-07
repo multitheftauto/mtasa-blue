@@ -314,7 +314,7 @@ void CPedRPCs::SetPedAnimation ( NetBitStreamInterface& bitStream )
     char szBlockName [ 64 ], szAnimName [ 64 ];
     unsigned char ucBlockSize, ucAnimSize;
     int iTime;
-    bool bLoop, bUpdatePosition, bInterruptable;
+    bool bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
 
     if ( bitStream.ReadCompressed ( PedID ) &&
          bitStream.Read ( ucBlockSize ) )
@@ -333,14 +333,15 @@ void CPedRPCs::SetPedAnimation ( NetBitStreamInterface& bitStream )
                          bitStream.Read ( iTime ) &&
                          bitStream.ReadBit ( bLoop ) &&
                          bitStream.ReadBit ( bUpdatePosition ) &&
-                         bitStream.ReadBit ( bInterruptable ) )
+                         bitStream.ReadBit ( bInterruptable ) &&
+                         bitStream.ReadBit ( bFreezeLastFrame ) )
                     {
                         szAnimName [ ucAnimSize ] = 0;
 
                         CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
                         if ( pBlock )
                         {
-                            pPed->RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
+                            pPed->RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
                         }
                     }
                 }
