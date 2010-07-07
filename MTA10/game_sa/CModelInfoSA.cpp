@@ -41,6 +41,12 @@ CModelInfoSA::CModelInfoSA ( DWORD dwModelID )
 }
 
 
+CBaseModelInfoSAInterface * CModelInfoSA::GetInterface ( void )
+{
+    return m_pInterface = ppModelInfo [ m_dwModelID ];
+}
+
+
 BOOL CModelInfoSA::IsBoat ( )
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsBoat ( )");
@@ -448,6 +454,13 @@ unsigned short CModelInfoSA::GetTextureDictionaryID ()
         return m_pInterface->usTextureDictionary;
 
     return 0;
+}
+
+void CModelInfoSA::SetTextureDictionaryID ( unsigned short usID )
+{
+    m_pInterface = ppModelInfo [ m_dwModelID ];
+    if ( m_pInterface )
+        m_pInterface->usTextureDictionary = usID;
 }
 
 float CModelInfoSA::GetLODDistance ()
@@ -874,4 +887,14 @@ void CModelInfoSA::SetVoice ( const char* szVoiceType, const char* szVoice )
     if ( sVoiceID < 0 )
         return;
     SetVoice ( sVoiceType, sVoiceID );
+}
+
+void CModelInfoSA::MakePedModel ( char * szTexture )
+{
+    // Create a new CPedModelInfo
+    CPedModelInfoSA pedModelInfo;
+    ppModelInfo [ m_dwModelID ] = ( CBaseModelInfoSAInterface * ) pedModelInfo.GetPedModelInfoInterface ();
+
+    // Load our texture
+    pGame->GetStreaming ()->RequestSpecialModel ( m_dwModelID, szTexture, 0 );
 }
