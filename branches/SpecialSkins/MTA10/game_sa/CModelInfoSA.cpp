@@ -887,6 +887,7 @@ void CModelInfoSA::SetVoice ( const char* szVoiceType, const char* szVoice )
     if ( sVoiceID < 0 )
         return;
     SetVoice ( sVoiceType, sVoiceID );
+}
 
 void CModelInfoSA::MakePedModel ( char * szTexture )
 {

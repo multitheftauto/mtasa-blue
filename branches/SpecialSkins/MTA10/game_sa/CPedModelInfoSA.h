@@ -21,9 +21,9 @@
 class ePedStats;
 typedef long AssocGroupID;
 
+#define     FUNC_SetMotionAnimGroup                         0x5b3580
 #define     FUNC_CPedModelInfo_Constructor                  0x4c57a0
 #define     VAR_CPedModelInfo_VTBL                          0x85bdc0
-#define		FUNC_SetMotionAnimGroup				            0x5b3580
 
 // CPedModelInfo:
 // +36 = Motion anim group (AssocGroupID, long)

@@ -91,3 +91,4 @@ void CStreamingSA::RequestSpecialModel ( DWORD model, const char * szTexture, DW
         call    dwFunc
         add     esp, 0xC
     }
+}

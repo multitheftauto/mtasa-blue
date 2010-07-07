@@ -653,11 +653,12 @@ void CGameSA::SetupSpecialCharacters ( void )
     ModelInfo[309].MakePedModel ( "JANITOR" );
     ModelInfo[310].MakePedModel ( "BBTHIN" );
     ModelInfo[311].MakePedModel ( "SMOKEV" );
+    ModelInfo[312].MakePedModel ( "PSYCHO" );
     /* Hot-coffee only models
-    ModelInfo[312].MakePedModel ( "GANGRL2" );
-    ModelInfo[313].MakePedModel ( "MECGRL2" );
-    ModelInfo[314].MakePedModel ( "GUNGRL2" );
-    ModelInfo[315].MakePedModel ( "COPGRL2" );
-    ModelInfo[316].MakePedModel ( "NURGRL2" );
+    ModelInfo[313].MakePedModel ( "GANGRL2" );
+    ModelInfo[314].MakePedModel ( "MECGRL2" );
+    ModelInfo[315].MakePedModel ( "GUNGRL2" );
+    ModelInfo[316].MakePedModel ( "COPGRL2" );
+    ModelInfo[317].MakePedModel ( "NURGRL2" );
     */
 }

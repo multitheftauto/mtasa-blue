@@ -304,7 +304,7 @@ bool CPlayerManager::IsValidPlayerModel ( unsigned short usPlayerModel )
              (usPlayerModel >= 274 &&
              usPlayerModel <= 288) ||
              (usPlayerModel >= 290 &&
-             usPlayerModel <= 311 &&
+             usPlayerModel <= 312 &&
              usPlayerModel != 299) );
 }
 
