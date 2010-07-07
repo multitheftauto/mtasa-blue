@@ -573,6 +573,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CServerQueue.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CSetCursorPosHook.cpp"
 				>
 			</File>
@@ -935,6 +939,10 @@
 			</File>
 			<File
 				RelativePath=".\CSetCursorPosHook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerQueue.h"
 				>
 			</File>
 			<File
