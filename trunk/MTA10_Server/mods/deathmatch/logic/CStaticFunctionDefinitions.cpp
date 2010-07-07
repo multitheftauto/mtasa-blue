@@ -6999,6 +6999,18 @@ bool CStaticFunctionDefinitions::IsGarageOpen ( unsigned char ucGarageID, bool& 
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetTrafficLightState ( unsigned char& ucState )
+{
+    ucState = g_pGame->GetTrafficLightState ();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetTrafficLightsLocked ( bool& bLocked )
+{
+    bLocked = g_pGame->GetTrafficLightsLocked ();
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char ucMinute )
 {
@@ -7018,6 +7030,27 @@ bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char u
     }
 
     return false;
+}
+bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
+{
+    if ( ucState >= 0 && ucState < 9 )
+    {
+        g_pGame->SetTrafficLightState ( ucState );
+ 
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( ucState );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAFFIC_LIGHT_STATE, *BitStream.pBitStream ) );
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetTrafficLightsLocked ( bool bLocked )
+{
+    g_pGame->SetTrafficLightsLocked ( bLocked );
+    return true;
 }
 
 

@@ -618,6 +618,8 @@ public:
     LUA_DECLARE ( GetGarageBoundingBox );
     LUA_DECLARE ( IsWorldSpecialPropertyEnabled );
     LUA_DECLARE ( GetBlurLevel );
+    LUA_DECLARE ( GetTrafficLightState );
+    LUA_DECLARE ( AreTrafficLightsLocked );
 
     LUA_DECLARE ( SetTime );
     LUA_DECLARE ( SetSkyGradient );
@@ -638,6 +640,8 @@ public:
     LUA_DECLARE ( SetJetpackMaxHeight );
     LUA_DECLARE ( SetCloudsEnabled );
     LUA_DECLARE ( GetCloudsEnabled );
+    LUA_DECLARE ( SetTrafficLightState );
+    LUA_DECLARE ( SetTrafficLightsLocked );
 
     // Input functions
     LUA_DECLARE ( BindKey );

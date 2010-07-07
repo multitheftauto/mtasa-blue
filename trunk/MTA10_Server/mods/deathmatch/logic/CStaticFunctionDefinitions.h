@@ -444,6 +444,8 @@ public:
     static bool                 GetFPSLimit                         ( unsigned short& usLimit );
     static bool                 GetMinuteDuration                   ( unsigned long& ulDuration );
     static bool                 IsGarageOpen                        ( unsigned char ucGarageID, bool& bIsOpen );
+    static bool                 GetTrafficLightState                ( unsigned char& ucState );
+    static bool                 GetTrafficLightsLocked              ( bool& bLocked );
 
     // General world set funcs
     static bool                 SetTime                             ( unsigned char ucHour, unsigned char ucMinute );
@@ -461,6 +463,8 @@ public:
     static bool                 IsGlitchEnabled                     ( const std::string& strGlitchName, bool& bEnabled );
     static bool                 SetCloudsEnabled                    ( bool bEnabled );
     static bool                 GetCloudsEnabled                    ( void );
+    static bool                 SetTrafficLightState                ( unsigned char ucState );
+    static bool                 SetTrafficLightsLocked              ( bool bLocked );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );

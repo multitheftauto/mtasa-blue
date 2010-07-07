@@ -7,6 +7,7 @@
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Christian Myhre Lundheim <>
 *               Jax <>
+*               Peter Beverloo <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -106,6 +107,12 @@ public:
 
     float                       GetLocalPlayerGravity       ();
     void                        SetLocalPlayerGravity       ( float fGravity );
+
+    unsigned char               GetTrafficLightState        ();
+    void                        SetTrafficLightState        ( unsigned char ucState );
+
+    bool                        GetTrafficLightsLocked      ();
+    void                        SetTrafficLightsLocked      ( bool bLocked );
 
     void                        SetLocalStatValue           ( unsigned short usStat, float fValue );
     void                        SetLocalStatsStatic         ( bool bStatic );

@@ -179,5 +179,6 @@ enum eRPCFunctions
     // bitstream version 0x0c
     SET_ELEMENT_DOUBLESIDED,
 
+    SET_TRAFFIC_LIGHT_STATE,
     NUM_RPC_FUNCS
 };
