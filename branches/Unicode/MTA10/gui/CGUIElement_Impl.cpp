@@ -234,7 +234,7 @@ void CGUIElement_Impl::SetText ( const char *szText )
 {
     CEGUI::String strText;
 
-    if ( szText ) strText.assign ( szText );
+    if ( *szText > 0 ) strText.assign( (CEGUI::utf8*) szText ); // (!) assign as UTF8 string
     m_pWindow->setText ( strText );
 }
 

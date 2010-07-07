@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const char* szFontFile, unsigned int* uiGlyphs, unsigned int uSize, unsigned int uFlags, bool bAutoScale )
+CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int uExtraGlyphs[], bool bAutoScale )
 {
     // Store the fontmanager and create a font with the given attributes
     m_pFontManager = pGUI->GetFontManager ();
@@ -32,16 +32,22 @@ CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const ch
         }
     }
 
-    // + Define our glyphs
-    CEGUI::String glyphSet; // (?) we needs temporary (CEGUI::String) string to define our glyphs correctly
-    
-    for ( ; *uiGlyphs >= 32; ++uiGlyphs ) // (?) adding extra glyphs codes to temp string
-	{
-        glyphSet += (CEGUI::utf32) *uiGlyphs;
-	}
-    
-    m_pFont->defineFontGlyphs( glyphSet ); // (?) defining font's glyphs
-    // - Define our glyphs
+    // Define our glyphs
+    if ( uExtraGlyphs ) 
+    {
+        CEGUI::String glyphSet; // (?) we needs temporary (CEGUI::String) string to define our glyphs correctly
+        
+        for ( unsigned int g = 0; uExtraGlyphs[g] >= 32; ++g ) // (?) adding extra glyphs codes to temp string
+	    {
+            glyphSet += (CEGUI::utf32) uExtraGlyphs[g];
+	    }
+        
+        m_pFont->defineFontGlyphs( glyphSet ); // (?) defining font's glyphs
+    } 
+    else
+    {
+        m_pFont->defineFontGlyphs( (CEGUI::utf8*)" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" );
+    }
 
     // Set default attributes
     SetNativeResolution ( 1024, 768 );
