@@ -914,6 +914,19 @@ int CLuaFunctionDefs::GetGarageBoundingBox ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetTrafficLightState ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pMultiplayer->GetTrafficLightState () );
+    return 1;
+}
+
+int CLuaFunctionDefs::AreTrafficLightsLocked ( lua_State* luaVM )
+{
+    lua_pushboolean ( luaVM, g_pMultiplayer->GetTrafficLightsLocked () );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetBlurLevel ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pGame->GetBlurLevel () );
