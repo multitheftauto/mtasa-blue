@@ -129,6 +129,7 @@ public:
     bool                    IsCursorForcedVisible           ( void );
     bool                    IsCursorControlsToggled         ( void ) { return m_bCursorToggleControls; }
     void                    HideMainMenu                    ( void );
+    void                    HideQuickConnect                ( void );
     void                    SetCenterCursor                 ( bool bEnabled );
 
     // Configuration
