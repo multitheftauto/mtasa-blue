@@ -122,6 +122,10 @@ CGame::CGame ( void )
 
     m_bCloudsEnabled = true;
 
+    m_bTrafficLightsLocked = false;
+    m_ucTrafficLightState = 0;
+    m_ulLastTrafficUpdate = 0;
+
     memset( m_bGarageStates, 0, sizeof(bool) * MAX_GARAGES );
 
     // init our mutex
@@ -142,6 +146,10 @@ void CGame::ResetMapInfo ( void )
     m_ucSkyGradientBR = 0, m_ucSkyGradientBG = 0, m_ucSkyGradientBB = 0;
     m_bHasSkyGradient = false;
     m_bCloudsEnabled = true;
+
+    m_bTrafficLightsLocked = false;
+    m_ucTrafficLightState = 0;
+    m_ulLastTrafficUpdate = 0;
 }
 
 CGame::~CGame ( void )
@@ -319,6 +327,13 @@ void CGame::DoPulse ( void )
     m_pBanManager->DoPulse ();
     m_pAccountManager->DoPulse ();
     m_pRegistryManager->DoPulse ();
+
+	
+    // Handle the traffic light sync
+    if (m_bTrafficLightsLocked == false)
+    {
+        ProcessTrafficLights (ulCurrentTime);
+    }
 
     // Pulse ASE
     if ( m_pASE )
@@ -1209,6 +1224,34 @@ void CGame::AddBuiltInEvents ( void )
     // Ban events
     m_Events.AddEvent ( "onBan", "ip", NULL, false );
     m_Events.AddEvent ( "onUnban", "ip", NULL, false );
+}
+
+void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
+{
+    unsigned long ulDiff = ulCurrentTime - m_ulLastTrafficUpdate;
+    unsigned char ucNewState = 0xFF;
+
+    if ( ulDiff >= 1000 )
+    {
+        if ( ( m_ucTrafficLightState == 0 || m_ucTrafficLightState == 3 ) && ulDiff >= 8000 ) // green
+        {
+            ucNewState = m_ucTrafficLightState + 1;
+        }
+        else if ( ( m_ucTrafficLightState == 1 || m_ucTrafficLightState == 4 ) && ulDiff >= 3000 ) // orange
+        {
+            ucNewState = ( m_ucTrafficLightState == 4 ) ? 0 : 2;
+        }
+        else if ( m_ucTrafficLightState == 2 && ulDiff >= 2000 ) // red
+        {
+            ucNewState = 3;
+        }
+
+        if ( ucNewState != 0xFF )
+        {
+            CStaticFunctionDefinitions::SetTrafficLightState (ucNewState);
+            m_ulLastTrafficUpdate = GetTickCount ();
+        }
+    }
 }
 
 

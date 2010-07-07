@@ -409,11 +409,13 @@ public:
     static bool                         IsWorldSpecialPropertyEnabled       ( const char* szPropName );
     static bool                         SetCloudsEnabled                    ( bool bEnabled );
     static bool                         GetCloudsEnabled                    ( void );
+    static bool                         GetTrafficLightState                ( unsigned char& ucState );
+    static bool                         AreTrafficLightsLocked              ( bool& bLocked );
 
     static bool                         SetTime                             ( unsigned char ucHour, unsigned char ucMin );
     static bool                         SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );
     static bool                         ResetSkyGradient                    ( void );
-     static bool                         SetWaterColor                       ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
+    static bool                         SetWaterColor                       ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
     static bool                         ResetWaterColor                     ( void );
     static bool                         SetWeather                          ( unsigned char ucWeather );
     static bool                         SetWeatherBlended                   ( unsigned char ucWeather );
@@ -425,6 +427,8 @@ public:
     static bool                         SetWorldSpecialPropertyEnabled      ( const char* szPropName, bool bEnabled );
     static bool                         SetBlurLevel                        ( unsigned char ucLevel );
     static bool                         SetJetpackMaxHeight                 ( float fHeight );
+    static bool                         SetTrafficLightState                ( unsigned char ucState );
+    static bool                         SetTrafficLightsLocked              ( bool bLocked );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );

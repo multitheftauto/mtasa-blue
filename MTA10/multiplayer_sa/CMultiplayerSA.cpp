@@ -84,6 +84,9 @@ DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
 
 #define CALL_CBike_ProcessRiderAnims                        0x6BF425   // @ CBike::ProcessDrivingAnims
 
+#define CALL_CTrafficLights_GetPrimaryLightState 			0x49DB5F
+#define CALL_CTrafficLights_GetSecondaryLightState 			0x49DB6D
+
 #define HOOKPOS_CGame_Process                               0x53C095
 DWORD RETURN_CGame_Process =                                0x53C09F;
 
@@ -189,6 +192,8 @@ float fGlobalGravity = 0.008f;
 float fLocalPlayerGravity = 0.008f;
 float fLocalPlayerCameraRotation = 0.0f;
 bool bCustomCameraRotation = false;
+unsigned char ucTrafficLightState = 0;
+bool bTrafficLightsBlocked = false;
 
 bool bUsingCustomSkyGradient = false;
 BYTE ucSkyGradientTopR = 0;
@@ -289,6 +294,9 @@ void HOOK_CPed_AddGogglesModel ();
 void HOOK_CPhysical_ProcessCollisionSectorList ();
 void HOOK_CrashFix_Misc1 ();
 void HOOK_CrashFix_Misc2 ();
+
+void HOOK_CTrafficLights_GetPrimaryLightState ();
+void HOOK_CTrafficLights_GetSecondaryLightState ();
 
 void vehicle_lights_init ();
 
@@ -411,6 +419,9 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( CALL_VehicleLookBehindUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_VehicleLookAsideUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_RenderScene_Plants, (DWORD)HOOK_RenderScene_Plants );
+
+    HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
+    HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     memset ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -3090,6 +3101,77 @@ void _declspec(naked) HOOK_CollisionStreamRead ()
             ret
         }
     }
+}
+
+unsigned char ucDesignatedLightState = 0;
+void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
+{
+    _asm pushad
+
+    if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 )
+    {
+        ucDesignatedLightState = 0;
+    }
+    else if ( ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7 )
+    {
+        ucDesignatedLightState = 1;
+    }
+    else
+        ucDesignatedLightState = 2;
+
+    _asm
+    {
+        popad
+        mov al, ucDesignatedLightState
+        retn
+    }
+}
+
+void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
+{
+    _asm pushad
+
+    if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 )
+    {
+        ucDesignatedLightState = 0;
+    }
+    else if ( ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8 )
+    {
+        ucDesignatedLightState = 1;
+    }
+    else
+        ucDesignatedLightState = 2;
+
+    _asm
+    {
+        popad
+        mov al, ucDesignatedLightState
+        retn
+    }
+}
+
+
+unsigned char CMultiplayerSA::GetTrafficLightState ()
+{
+    return ucTrafficLightState;
+}
+
+void CMultiplayerSA::SetTrafficLightState ( unsigned char ucState )
+{
+    if ( bTrafficLightsBlocked == false )
+    {
+        ucTrafficLightState = ucState;
+    }
+}
+
+bool CMultiplayerSA::GetTrafficLightsLocked ()
+{
+    return bTrafficLightsBlocked;
+}
+
+void CMultiplayerSA::SetTrafficLightsLocked ( bool bLocked )
+{
+    bTrafficLightsBlocked = bLocked;
 }
 
 // Allowing a created object into the vertical line test makes getGroundPosition, jetpacks and molotovs to work.

@@ -33,6 +33,9 @@ public:
     static int      getMinuteDuration                   ( lua_State* luaVM );
     static int      isGarageOpen                        ( lua_State* luaVM );
     static int      isGlitchEnabled                     ( lua_State* luaVM );
+    static int      getCloudsEnabled                    ( lua_State* luaVM );
+    static int      getTrafficLightState                ( lua_State* luaVM );
+    static int      areTrafficLightsLocked              ( lua_State* luaVM );
 
     // Set
     static int      setTime                             ( lua_State* luaVM );
@@ -48,7 +51,8 @@ public:
     static int      setGarageOpen                       ( lua_State* luaVM );
     static int      setGlitchEnabled                    ( lua_State* luaVM );
     static int      setCloudsEnabled                    ( lua_State* luaVM );
-    static int      getCloudsEnabled                    ( lua_State* luaVM );
+    static int      setTrafficLightState                ( lua_State* luaVM );
+    static int      setTrafficLightsLocked              ( lua_State* luaVM );
 };
 
 #endif

@@ -12,6 +12,7 @@
 *               Kevin Whiteside <kevuwk@gmail.com>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Peter Beverloo <>
 *               
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -4939,11 +4940,41 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
     g_pGame->GetWorld ()->SetJetpackMaxHeight ( fHeight );
     return true;
 }
+bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
+{
+    if ( ucState >= 0 && ucState < 9 )
+    {
+        g_pMultiplayer->SetTrafficLightState ( ucState );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetTrafficLightsLocked ( bool bLocked )
+{
+    g_pMultiplayer->SetTrafficLightsLocked ( bLocked );
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled ( const char* szPropName )
 {
     return g_pGame->IsCheatEnabled ( szPropName );
 }
+
+bool CStaticFunctionDefinitions::GetTrafficLightState ( unsigned char& ucState )
+{
+    ucState = g_pMultiplayer->GetTrafficLightState ();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::AreTrafficLightsLocked ( bool& bLocked )
+{
+    bLocked = g_pMultiplayer->GetTrafficLightsLocked ();
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::SetSkyGradient ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue )
 {

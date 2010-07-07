@@ -26,6 +26,8 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getFPSLimit", CLuaWorldDefs::getFPSLimit );
     CLuaCFunctions::AddFunction ( "getMinuteDuration", CLuaWorldDefs::getMinuteDuration );
     CLuaCFunctions::AddFunction ( "isGarageOpen", CLuaWorldDefs::isGarageOpen );
+    CLuaCFunctions::AddFunction ( "getTrafficLightState", CLuaWorldDefs::getTrafficLightState );
+    CLuaCFunctions::AddFunction ( "areTrafficLightsLocked", CLuaWorldDefs::areTrafficLightsLocked );
 
     // Set
     CLuaCFunctions::AddFunction ( "setTime", CLuaWorldDefs::setTime );
@@ -43,6 +45,9 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isGlitchEnabled", CLuaWorldDefs::isGlitchEnabled );
     CLuaCFunctions::AddFunction ( "setCloudsEnabled", CLuaWorldDefs::setCloudsEnabled );
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaWorldDefs::getCloudsEnabled );
+    CLuaCFunctions::AddFunction ( "setTrafficLightState", CLuaWorldDefs::setTrafficLightState );
+    CLuaCFunctions::AddFunction ( "setTrafficLightsLocked", CLuaWorldDefs::setTrafficLightsLocked );
+
 }
 
 
@@ -207,6 +212,31 @@ int CLuaWorldDefs::isGarageOpen ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaWorldDefs::getTrafficLightState ( lua_State* luaVM )
+{
+    unsigned char ucTrafficLightState;
+    if ( CStaticFunctionDefinitions::GetTrafficLightState ( ucTrafficLightState ) )
+    {
+        lua_pushnumber ( luaVM, ucTrafficLightState );
+        return 1;
+    }
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::areTrafficLightsLocked ( lua_State* luaVM )
+{
+    bool bTrafficLightsLocked;
+    if ( CStaticFunctionDefinitions::GetTrafficLightsLocked ( bTrafficLightsLocked ) )
+    {
+        lua_pushboolean ( luaVM, bTrafficLightsLocked );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaWorldDefs::setTime ( lua_State* luaVM )
 {
@@ -230,6 +260,44 @@ int CLuaWorldDefs::setTime ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaWorldDefs::setTrafficLightState ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        unsigned char ucTrafficLightState = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+
+        if ( CStaticFunctionDefinitions::SetTrafficLightState ( ucTrafficLightState ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setTrafficLightsLocked ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
+    {
+        bool bTrafficLightsLocked = ( ( lua_toboolean( luaVM, 1 ) == 0 ) ? false : true );
+        if ( CStaticFunctionDefinitions::SetTrafficLightsLocked ( bTrafficLightsLocked ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightsLocked" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaWorldDefs::setWeather ( lua_State* luaVM )
 {

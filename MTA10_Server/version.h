@@ -23,7 +23,7 @@
 #define MTASA_VERSION_MAJOR         1
 #define MTASA_VERSION_MINOR         1
 #define MTASA_VERSION_MAINTENANCE   0
-#define MTASA_VERSION_TYPE          VERSION_TYPE_RELEASE
+#define MTASA_VERSION_TYPE          VERSION_TYPE_CUSTOM
 #define MTASA_VERSION_BUILD         0
 
 // Old version info
@@ -88,7 +88,7 @@
 
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
-#define _NETCODE_VERSION                0x0181
+#define _NETCODE_VERSION                0x0182
 #define _SERVER_NET_MODULE_VERSION      0x0020
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
