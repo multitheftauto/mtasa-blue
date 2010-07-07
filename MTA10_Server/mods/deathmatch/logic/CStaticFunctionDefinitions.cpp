@@ -7038,7 +7038,7 @@ bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
         g_pGame->SetTrafficLightState ( ucState );
  
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( ucState );
+        BitStream.pBitStream->WriteBits ( &ucState, 3 );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAFFIC_LIGHT_STATE, *BitStream.pBitStream ) );
 
         return true;
