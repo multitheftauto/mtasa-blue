@@ -1313,6 +1313,13 @@ bool CStaticFunctionDefinitions::GetPedMoveAnim ( CClientPed & Ped, unsigned int
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetPedMoveState ( CClientPed & Ped, std::string& strMoveState )
+{
+    if ( Ped.GetMovementState(strMoveState) )
+        return true;
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::IsPedHeadless ( CClientPed & Ped, bool & bHeadless )
 {

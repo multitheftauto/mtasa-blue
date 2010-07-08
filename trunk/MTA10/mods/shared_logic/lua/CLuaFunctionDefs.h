@@ -213,6 +213,7 @@ public:
     LUA_DECLARE ( IsPedSunbathing );
     LUA_DECLARE ( IsPedDoingGangDriveby );
     LUA_DECLARE ( GetPedAnimation );
+    LUA_DECLARE ( GetPedMoveState );
     LUA_DECLARE ( GetPedMoveAnim );
     LUA_DECLARE ( IsPedHeadless );
     LUA_DECLARE ( IsPedFrozen );
