@@ -156,7 +156,8 @@ CObjectSA::CObjectSA( DWORD dwModel )
 
     m_ucAlpha = 255;
 
-    CheckForGangTag ();
+    if ( m_pInterface )
+        CheckForGangTag ();
 }
 
 CObjectSA::~CObjectSA( )
