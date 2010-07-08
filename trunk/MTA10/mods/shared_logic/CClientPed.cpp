@@ -5032,27 +5032,33 @@ bool CClientPed::ShouldBeStealthAiming ( void )
         if ( GetCurrentWeaponType () == WEAPONTYPE_KNIFE )
         {
             // Do we have the aim key pressed?
-            SBindableGTAControl* pAimControl = g_pCore->GetKeyBinds ()->GetBindableFromControl ( "aim_weapon" );
+            CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
+            SBindableGTAControl* pAimControl = pKeyBinds->GetBindableFromControl ( "aim_weapon" );
             if ( pAimControl && pAimControl->bState )
             {
-                // Do we have a target ped?
-                CClientPed * pTargetPed = GetTargetedPed ();
-                if ( pTargetPed && pTargetPed->GetGamePlayer () )
+                //We need to be either crouched, walking or standing
+                SBindableGTAControl* pWalkControl = pKeyBinds->GetBindableFromControl ( "walk" );
+                if ( m_pPlayerPed->GetRunState() == 1 || m_pPlayerPed->GetRunState() == 4 || pWalkControl && pWalkControl->bState )
                 {
-                    // Are we close enough to the target?
-                    CVector vecPos, vecPos_2;
-                    GetPosition ( vecPos );
-                    pTargetPed->GetPosition ( vecPos_2 );
-                    if ( DistanceBetweenPoints3D ( vecPos, vecPos_2 ) <= STEALTH_KILL_RANGE )
+                    // Do we have a target ped?
+                    CClientPed * pTargetPed = GetTargetedPed ();
+                    if ( pTargetPed && pTargetPed->GetGamePlayer () )
                     {
-                        // Grab our current anim
-                        CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
-                        if ( pAssoc )
+                        // Are we close enough to the target?
+                        CVector vecPos, vecPos_2;
+                        GetPosition ( vecPos );
+                        pTargetPed->GetPosition ( vecPos_2 );
+                        if ( DistanceBetweenPoints3D ( vecPos, vecPos_2 ) <= STEALTH_KILL_RANGE )
                         {
-                            // Our game checks for stealth killing
-                            if ( m_pPlayerPed->GetPedIntelligence ()->TestForStealthKill ( pTargetPed->GetGamePlayer (), false ) )
+                            // Grab our current anim
+                            CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
+                            if ( pAssoc )
                             {
-                                return true;
+                                // Our game checks for stealth killing
+                                if ( m_pPlayerPed->GetPedIntelligence ()->TestForStealthKill ( pTargetPed->GetGamePlayer (), false ) )
+                                {
+                                    return true;
+                                }
                             }
                         }
                     }
