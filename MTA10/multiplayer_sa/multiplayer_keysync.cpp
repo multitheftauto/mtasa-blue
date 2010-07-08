@@ -501,11 +501,30 @@ void SwitchContext ( CVehicleSAInterface* pVehicleInterface )
 
 /************************** ACTUAL HOOK FUNCTIONS BELOW THIS LINE *******************************/
 
+
+struct CSavedRegs
+{
+    DWORD eax, ecx, edx, ebx, esp, ebp, esi, edi;
+};
+static CSavedRegs PlayerPed__ProcessControl_Saved;
+
+
 VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 {
+    // Assumes no reentrancy
     _asm
     {
         mov     dwCurrentPlayerPed, ecx
+
+        // Save incase of abort
+        mov     PlayerPed__ProcessControl_Saved.eax, eax
+        mov     PlayerPed__ProcessControl_Saved.ecx, ecx
+        mov     PlayerPed__ProcessControl_Saved.edx, edx
+        mov     PlayerPed__ProcessControl_Saved.ebx, ebx
+        mov     PlayerPed__ProcessControl_Saved.esp, esp
+        mov     PlayerPed__ProcessControl_Saved.ebp, ebp
+        mov     PlayerPed__ProcessControl_Saved.esi, esi
+        mov     PlayerPed__ProcessControl_Saved.edi, edi
         pushad
     }
 
@@ -527,6 +546,33 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
         retn
     }
 }
+
+
+void CPlayerPed__ProcessControl_Abort()
+{
+    _asm
+    {
+        // restore stuff
+        mov     eax, PlayerPed__ProcessControl_Saved.eax
+        mov     ecx, PlayerPed__ProcessControl_Saved.ecx
+        mov     edx, PlayerPed__ProcessControl_Saved.edx
+        mov     ebx, PlayerPed__ProcessControl_Saved.ebx
+        mov     esp, PlayerPed__ProcessControl_Saved.esp
+        mov     ebp, PlayerPed__ProcessControl_Saved.ebp
+        mov     esi, PlayerPed__ProcessControl_Saved.esi
+        mov     edi, PlayerPed__ProcessControl_Saved.edi
+        pushad
+    }
+
+    ReturnContextToLocalPlayer();
+
+    _asm
+    {
+        popad
+        retn
+    }
+}
+
 
 //--------------------------------------------------------------------------------------------
 
