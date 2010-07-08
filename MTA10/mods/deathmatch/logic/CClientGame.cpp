@@ -1819,6 +1819,18 @@ void CClientGame::UpdateFireKey ( void )
                             // Would GTA let us stealth kill now?
                             if ( m_pLocalPlayer->GetGamePlayer ()->GetPedIntelligence ()->TestForStealthKill ( pGameTarget, false ) )
                             {
+                                //Grab our local position
+                                CVector vecLocalPosition;
+                                m_pLocalPlayer->GetPosition(vecLocalPosition);
+                                
+                                //Grab the target's position
+                                CVector vecTargetPosition;
+                                pTargetPed->GetPosition(vecTargetPosition);
+
+                                //Work out an angle between the players, and set this as we initiate our knife kill
+                                float fAngle = AngleBetweenPoints2D ( vecLocalPosition, vecTargetPosition );
+                                m_pLocalPlayer->SetCurrentRotation(fAngle);
+
                                 // Change the state back to false so this press doesn't do anything else
                                 pControl->bState = false;
                                 CLuaArguments Arguments;
