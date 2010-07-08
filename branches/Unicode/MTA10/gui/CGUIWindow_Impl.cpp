@@ -41,7 +41,7 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
     
     // Give the window a caption
     CEGUI::String strText;
-    if ( *szCaption > 0 ) strText.assign( (CEGUI::utf8*) szCaption ); // (!) assign as UTF8 string
+    strText.assign( (CEGUI::utf8*) szCaption ); // assign as UTF8 string
     m_pWindow->setText ( strText );
 
     // Register our events
