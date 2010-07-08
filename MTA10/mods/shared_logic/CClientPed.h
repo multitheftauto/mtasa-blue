@@ -63,6 +63,20 @@ enum eBodyPart
     BODYPART_HEAD = 9,
 };
 
+enum eMovementState
+{
+    MOVEMENTSTATE_UNKNOWN,
+    MOVEMENTSTATE_STAND, //Standing still
+    MOVEMENTSTATE_WALK, //Walking
+    MOVEMENTSTATE_POWERWALK, //Walking quickly
+    MOVEMENTSTATE_JOG, //Jogging
+    MOVEMENTSTATE_SPRINT, //Sprinting
+    MOVEMENTSTATE_CROUCH, //Crouching still
+    // Duds for now.  We should add methods to detect these
+    MOVEMENTSTATE_CRAWL, //Crouch-moving
+    MOVEMENTSTATE_ROLL, //Crouch-rolling
+};
+
 enum eDeathAnims
 {
     DEATH_ANIM_HEAD = 19,
@@ -230,6 +244,10 @@ public:
     bool                        HasWeapon                   ( eWeaponType weaponType );
     void                        RemoveWeapon                ( eWeaponType weaponType );
     void                        RemoveAllWeapons            ( void );
+
+    std::map<eMovementState,std::string> m_MovementStateNames;
+    eMovementState              GetMovementState            ( void );
+    bool                        GetMovementState            ( std::string& strStateName );
 
     CTask*                      GetCurrentPrimaryTask       ( void );
     bool                        IsSimplestTask              ( int iTaskType );

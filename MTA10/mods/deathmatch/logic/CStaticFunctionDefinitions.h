@@ -126,6 +126,7 @@ public:
     static bool                         IsPedDoingGangDriveby               ( CClientPed& Ped, bool & bDoingGangDriveby );
     static bool                         GetPedAnimation                     ( CClientPed& Ped, char * szBlockName, char * szAnimName, unsigned int uiLength );
     static bool                         GetPedMoveAnim                      ( CClientPed& Ped, unsigned int& iMoveAnim );
+    static bool                         GetPedMoveState                     ( CClientPed & Ped, std::string& strMoveState );
     static bool                         IsPedHeadless                       ( CClientPed& Ped, bool & bHeadless );
     static bool                         IsPedFrozen                         ( CClientPed& Ped, bool & bFrozen );
     static bool                         IsPedFootBloodEnabled               ( CClientPed& Ped, bool & bHasFootBlood );

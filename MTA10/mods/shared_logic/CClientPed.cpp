@@ -178,6 +178,17 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     // Our default clothes
     m_pClothes->DefaultClothes ( false );
 
+    // Movement state names for Lua
+    m_MovementStateNames[MOVEMENTSTATE_STAND]       =    "stand";
+    m_MovementStateNames[MOVEMENTSTATE_WALK]        =    "walk";
+    m_MovementStateNames[MOVEMENTSTATE_POWERWALK]   =    "powerwalk";
+    m_MovementStateNames[MOVEMENTSTATE_JOG]         =    "jog";
+    m_MovementStateNames[MOVEMENTSTATE_SPRINT]      =    "sprint";
+    m_MovementStateNames[MOVEMENTSTATE_CROUCH]      =    "crouch";
+    //These two are inactive for now
+    m_MovementStateNames[MOVEMENTSTATE_CRAWL]       =    "crawl";
+    m_MovementStateNames[MOVEMENTSTATE_ROLL]        =    "roll";
+
     // Create the player model
     if ( m_bIsLocalPlayer )
     {
@@ -1968,6 +1979,59 @@ bool CClientPed::HasWeapon ( eWeaponType weaponType )
     return false;
 }
 
+eMovementState CClientPed::GetMovementState ( void )
+{
+    // Do we have a player, and are we on foot? (streamed in)
+    if ( m_pPlayerPed && !GetRealOccupiedVehicle () )
+    {
+        CControllerState cs;
+        GetControllerState ( cs );
+
+        // Grab his controller state
+        bool bWalkKey = false;
+        if ( GetType () == CCLIENTPLAYER )
+            bWalkKey = CClientPad::GetControlState ( "walk", cs, true );
+        else
+            m_Pad.GetControlState("walk",bWalkKey);
+        
+        // Is he standing up?
+        if ( !IsDucked() )
+        {
+            unsigned int iRunState = m_pPlayerPed->GetRunState();
+
+            // Is he moving the contoller at all?
+            if ( iRunState == 1 && cs.LeftStickX == 0 && cs.LeftStickY == 0 )
+                return MOVEMENTSTATE_STAND;
+
+            //Is he either pressing the walk key, or has run state 1?
+            if ( iRunState == 1 || bWalkKey && iRunState == 6 )
+                return MOVEMENTSTATE_WALK;
+            else if ( iRunState == 4 )
+                return MOVEMENTSTATE_POWERWALK;
+            else if ( iRunState == 6 )
+                return MOVEMENTSTATE_JOG;
+            else if ( iRunState == 7 )
+                return MOVEMENTSTATE_SPRINT;
+        }
+        else
+        {
+            // Is he moving the contoller at all?
+            if ( cs.LeftStickX == 0 && cs.LeftStickY == 0 )
+                return MOVEMENTSTATE_CROUCH;
+        }
+    }
+    return MOVEMENTSTATE_UNKNOWN;
+}
+
+bool CClientPed::GetMovementState ( std::string& strStateName )
+{
+    eMovementState eCurrentMoveState = GetMovementState();
+    if ( eCurrentMoveState == MOVEMENTSTATE_UNKNOWN )
+        return false;
+
+    strStateName = m_MovementStateNames[eCurrentMoveState];
+    return true;
+}
 
 CTask* CClientPed::GetCurrentPrimaryTask ( void )
 {
