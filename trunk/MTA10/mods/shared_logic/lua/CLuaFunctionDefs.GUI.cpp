@@ -2693,7 +2693,7 @@ int CLuaFunctionDefs::GUIComboBoxRemoveItem ( lua_State* luaVM )
         {
             bool ret = CStaticFunctionDefinitions::GUIComboBoxRemoveItem (
                 *pEntity,
-                lua_tonumber ( luaVM, 2 )
+                static_cast < int > ( lua_tonumber ( luaVM, 2 ) )
                 );
             lua_pushboolean( luaVM, ret );
             return 1;
@@ -2754,7 +2754,7 @@ int CLuaFunctionDefs::GUIComboBoxSetSelected ( lua_State* luaVM )
         {
             bool ret = CStaticFunctionDefinitions::GUIComboBoxSetSelected( 
                 *pEntity,
-                lua_tonumber ( luaVM, 2 ) 
+                static_cast < int > ( lua_tonumber ( luaVM, 2 ) )
                 );
             lua_pushboolean ( luaVM, ret );
             return 1;
@@ -2776,7 +2776,7 @@ int CLuaFunctionDefs::GUIComboBoxGetItemText ( lua_State* luaVM )
         {
             std::string ret = CStaticFunctionDefinitions::GUIComboBoxGetItemText( 
                 *pEntity,
-                lua_tonumber ( luaVM, 2 ) 
+                static_cast < int > ( lua_tonumber ( luaVM, 2 ) )
                 );
             lua_pushstring ( luaVM, ret.c_str( ) );
             return 1;
@@ -2799,7 +2799,7 @@ int CLuaFunctionDefs::GUIComboBoxSetItemText ( lua_State* luaVM )
         {
             bool ret = CStaticFunctionDefinitions::GUIComboBoxSetItemText( 
                 *pEntity,
-                lua_tonumber ( luaVM, 2 ),
+                static_cast < int > ( lua_tonumber ( luaVM, 2 ) ),
                 lua_tostring ( luaVM, 3 )
                 );
             lua_pushboolean ( luaVM, ret );

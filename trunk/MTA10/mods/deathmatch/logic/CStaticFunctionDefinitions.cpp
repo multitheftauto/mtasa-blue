@@ -3921,6 +3921,10 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox ( CLuaMain& Lua
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
     pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
 
+    // set events
+    pGUIElement->SetEvents ( "onClientGUIComboBoxAccepted" );
+    static_cast < CGUIComboBox* > ( pElement ) -> SetSelectionHandler ( pGUIElement->GetCallback1 () );
+
     return pGUIElement;
 }
 

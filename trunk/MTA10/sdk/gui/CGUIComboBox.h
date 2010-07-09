@@ -33,7 +33,7 @@ public:
     virtual bool                SetSelectedItemByIndex       ( int index ) = 0;
     virtual int                 GetItemIndex                 ( CGUIListItem* pItem ) = 0;
     virtual void                Clear                        ( void ) = 0;
-    //virtual void                SetSelectionHandler          ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetSelectionHandler          ( GUI_CALLBACK Callback ) = 0;
 };
 
 #endif
