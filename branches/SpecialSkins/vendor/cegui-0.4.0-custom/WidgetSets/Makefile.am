@@ -1,1 +1,0 @@
-SUBDIRS = TaharezLook WindowsLook Falagard
