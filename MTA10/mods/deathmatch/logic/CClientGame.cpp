@@ -2411,6 +2411,7 @@ void CClientGame::AddBuiltInEvents ( void )
     //m_Events.AddEvent ( "onClientGUIClose", "element", NULL, false );
     //m_Events.AddEvent ( "onClientGUIKeyDown", "element", NULL, false );
     m_Events.AddEvent ( "onClientGUITabSwitched", "element", NULL, false );
+    m_Events.AddEvent ( "onClientGUIComboBoxAccepted", "element", NULL, false );
 
     m_Events.AddEvent ( "onClientDoubleClick", "button, screenX, screenY, worldX, worldY, worldZ, element", NULL, false );
     m_Events.AddEvent ( "onClientMouseMove", "screenX, screenY", NULL, false );
