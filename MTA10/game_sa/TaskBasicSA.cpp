@@ -72,7 +72,7 @@ CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA (  const char* pAnimName,
     DEBUG_TRACE("CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA (  const char* pAnimName, const char* pAnimGroupName, const int flags, const float fBlendDelta, const int iTime = -1, const bool bDontInterrupt = false, const bool bRunInSequence = false, const bool bOffsetPed = false, const bool bHoldLastFrame = false )");
 
     // TODO: Find out the real size
-    this->CreateTaskInterface ( sizeof ( CTaskSimpleRunNamedAnimSA ) );
+    this->CreateTaskInterface ( sizeof ( CTaskSimpleRunNamedAnimSAInterface ) );
     DWORD dwFunc = FUNC_CTaskSimpleRunNamedAnim__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
 
