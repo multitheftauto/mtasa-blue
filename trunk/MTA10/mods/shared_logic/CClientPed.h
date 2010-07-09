@@ -552,8 +552,11 @@ public:
     CAnimBlock *                m_pAnimationBlock;
     char *                      m_szAnimationName;
     bool                        m_bRequestedAnimation;
+    int                         m_iTimeAnimation;
     bool                        m_bLoopAnimation;
     bool                        m_bUpdatePositionAnimation;
+    bool                        m_bInterruptableAnimation;
+    bool                        m_bFreezeLastFrameAnimation;
     bool                        m_bHeadless;
     bool                        m_bFrozen;
     bool                        m_bFrozenWaitingForGroundToLoad;

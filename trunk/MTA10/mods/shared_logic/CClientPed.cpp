@@ -153,8 +153,11 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_pAnimationBlock = NULL;
     m_szAnimationName = NULL;
     m_bRequestedAnimation = false;
+    m_iTimeAnimation = -1;
     m_bLoopAnimation = false;    
     m_bUpdatePositionAnimation = false;
+    m_bInterruptableAnimation = false;
+    m_bFreezeLastFrameAnimation = true;
     m_bHeadless = false;
     m_bFrozen = false;
     m_bFrozenWaitingForGroundToLoad = false;
@@ -2643,7 +2646,7 @@ void CClientPed::StreamedInPulse ( void )
                 char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
                 strcpy ( szAnimName, m_szAnimationName );
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
                 delete [] szAnimName;                
             }            
         }
@@ -3059,7 +3062,7 @@ void CClientPed::_CreateModel ( void )
             char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
             strcpy ( szAnimName, m_szAnimationName );
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             delete [] szAnimName;
         }
 
@@ -3292,7 +3295,7 @@ void CClientPed::_ChangeModel ( void )
                 char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
                 strcpy ( szAnimName, m_szAnimationName );
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
                 delete [] szAnimName;
             }
 
@@ -4897,8 +4900,11 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     m_pAnimationBlock = pBlock;
     m_szAnimationName = new char [ strlen ( szAnimName ) + 1 ];
     strcpy ( m_szAnimationName, szAnimName ); 
+    m_iTimeAnimation = iTime;
     m_bLoopAnimation = bLoop;
     m_bUpdatePositionAnimation = bUpdatePosition;
+    m_bInterruptableAnimation = bInterruptable;
+    m_bFreezeLastFrameAnimation = bFreezeLastFrame;
 }
 
 
