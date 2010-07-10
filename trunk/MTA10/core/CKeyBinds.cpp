@@ -610,6 +610,13 @@ bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool b
                 {
                     if ( !bCheckState || pBind->bHitState == bState )
                     {
+#if 1   // crash fix
+                        // szResource is always NULL here
+                        assert ( szResource == NULL );
+
+                        Remove ( *iter );
+                        return true;
+#else
                         if ( !pBind->szResource )
                         {
                             if ( m_bProcessingKeyStroke )
@@ -627,6 +634,7 @@ bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool b
                         {
                             pBind->bActive = false;
                         }
+#endif
                     }
                 }
             }
@@ -643,8 +651,9 @@ bool CKeyBinds::RemoveAllCommands ( const char* szKey, bool bCheckState, bool bS
     if ( szKey == NULL ) return false;
 
     bool bFound = false;
-    list < CKeyBind* > ::iterator iter = m_pList->begin ();
-    while ( iter != m_pList->end () )
+    list < CKeyBind* > cloneList = *m_pList;
+    list < CKeyBind* > ::iterator iter = cloneList.begin ();
+    while ( iter != cloneList.end () )
     {
         if ( (*iter)->GetType () == KEY_BIND_COMMAND )
         {
@@ -653,10 +662,8 @@ bool CKeyBinds::RemoveAllCommands ( const char* szKey, bool bCheckState, bool bS
             {
                 if ( !bCheckState || pBind->bHitState == bState )
                 {
-                    delete *iter;
-                    iter = m_pList->erase ( iter );
+                    Remove ( *iter );
                     bFound = true;
-                    continue;
                 }
             }
         }
@@ -670,17 +677,16 @@ bool CKeyBinds::RemoveAllCommands ( const char* szKey, bool bCheckState, bool bS
 bool CKeyBinds::RemoveAllCommands ( void )
 {
     bool bFound = false;
-    list < CKeyBind* > ::iterator iter = m_pList->begin ();
-    while ( iter != m_pList->end () )
+    list < CKeyBind* > cloneList = *m_pList;
+    list < CKeyBind* > ::iterator iter = cloneList.begin ();
+    while ( iter != cloneList.end () )
     {
         if ( (*iter)->GetType () == KEY_BIND_COMMAND )
         {
-            delete *iter;
-            iter = m_pList->erase ( iter );
+            Remove ( *iter );
             bFound = true;
         }
-        else
-            ++iter;
+        ++iter;
     }
 
     return bFound;
