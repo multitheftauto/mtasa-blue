@@ -64,14 +64,12 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 
     #ifdef WIN32
 
-        // Find all .map files in the maps folder
+        // Find all the resources
         WIN32_FIND_DATA FindData;
         HANDLE hFind = FindFirstFile ( g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/*" ), &FindData );
         if ( hFind != INVALID_HANDLE_VALUE )
         {
-            // Remove the extension and store the time
-            FindData.cFileName [ strlen ( FindData.cFileName ) - 4 ] = 0;
-            // Add each file
+            // Add each resource
             do
             {
                 // Skip dotted entries
@@ -80,25 +78,34 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                     char * extn = NULL;
                     if ( ( FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) != FILE_ATTRIBUTE_DIRECTORY )
                     {
-                        extn = &FindData.cFileName [ strlen ( FindData.cFileName ) - 3 ];
-                        FindData.cFileName [ strlen ( FindData.cFileName ) - 4 ] = 0;
+                        if ( strlen ( FindData.cFileName ) > 3 )
+                        {
+                            extn = &FindData.cFileName [ strlen ( FindData.cFileName ) - 3 ];
+                            FindData.cFileName [ strlen ( FindData.cFileName ) - 4 ] = 0;
+                        }
                     }
 
                     CResource* pResource = GetResource ( FindData.cFileName );
 
                     if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-                         !strchr ( FindData.cFileName, '.' ) &&
                          ( bRefreshAll ||
                            !pResource ||
                            !pResource->CheckIfStartable()
                           )
                         )
                     {
-                        // Add the resource
-                        Load ( FindData.cFileName );
+                        if ( !strchr ( FindData.cFileName, '.' ) )
+                        {
+                            // Add the resource
+                            Load ( FindData.cFileName );
 
-                        // Increment the counter
-                        uiCount++;
+                            // Increment the counter
+                            uiCount++;
+                        }
+                        else
+                        {
+                            CLogger::LogPrintf ( "WARNING: Not loading resource %s as it has dots in the name\n", FindData.cFileName );
+                        }
                     }
                 }
             } while ( FindNextFile ( hFind, &FindData ) );
@@ -162,25 +169,34 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                         char * extn = NULL;
                         if ( !bDir )
                         {
-                            extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
-                            DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
+                            if ( strlen ( DirEntry->d_name ) > 3 )
+                            {
+                                extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
+                                DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
+                            }
                         }
 
                         CResource* pResource = GetResource ( DirEntry->d_name );
 
                         if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-                             !strchr ( DirEntry->d_name, '.' ) &&
                              ( bRefreshAll ||
                                !pResource ||
                                !pResource->CheckIfStartable()
                               )
                             )
                         {
-                            // Add the resource
-                            Load ( DirEntry->d_name );
+                            if ( !strchr ( DirEntry->d_name, '.' ) )
+                            {
+                                // Add the resource
+                                Load ( DirEntry->d_name );
 
-                            // Increment the counter
-                            uiCount++;
+                                // Increment the counter
+                                uiCount++;
+                            }
+                            else
+                            {
+                                CLogger::LogPrintf ( "WARNING: Not loading resource %s as it has dots in the name\n", DirEntry->d_name );
+                            }
                         }
 
                     }
@@ -389,10 +405,10 @@ CResource * CResourceManager::Load ( const char * szResourceName )
             m_resourcesToStartAfterRefresh.push_back ( loadedResource );
         if ( s_bNotFirstTime )
             CLogger::LogPrintf("New resource '%s' loaded\n", loadedResource->GetName().c_str () );
-        m_resources.push_back ( loadedResource );
-        m_bResourceListChanged = true;
         unsigned short usID = GenerateID ();
         loadedResource->SetID ( usID );
+        m_resources.push_back ( loadedResource );
+        m_bResourceListChanged = true;
     }
 
     return loadedResource;
