@@ -104,7 +104,7 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                         }
                         else
                         {
-                            CLogger::LogPrintf ( "WARNING: Not loading resource %s as it has dots in the name.", FindData.cFileName );
+                            CLogger::LogPrintf ( "WARNING: Not loading resource %s as it has dots in the name\n", FindData.cFileName );
                         }
                     }
                 }
@@ -195,7 +195,7 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
                             }
                             else
                             {
-                                CLogger::LogPrintf ( "WARNING: Not loading resource %s as it has dots in the name.", DirEntry->d_name );
+                                CLogger::LogPrintf ( "WARNING: Not loading resource %s as it has dots in the name\n", DirEntry->d_name );
                             }
                         }
 
