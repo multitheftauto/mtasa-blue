@@ -2108,7 +2108,7 @@ bool CCam_ProcessFixed ( class CCamSAInterface* pCamInterface )
 {
     CCam* pCam = static_cast < CCameraSA* > ( pGameInterface->GetCamera () )->GetCam ( pCamInterface );
 
-    if ( m_pProcessCamHandler )
+    if ( m_pProcessCamHandler && pCam )
     {
         return m_pProcessCamHandler ( pCam );
     }

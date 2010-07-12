@@ -21,10 +21,10 @@
 
 int CLuaFunctionDefs::GetCameraMode ( lua_State* luaVM )
 {
-    char szMode [ 256 ];
-    if ( CStaticFunctionDefinitions::GetCameraMode ( szMode, 256 ) )
+    unsigned char ucMode;
+    if ( CStaticFunctionDefinitions::GetCameraMode ( ucMode ) )
     {
-        lua_pushstring ( luaVM, szMode );
+        lua_pushnumber ( luaVM, ucMode );
         return 1;
     }
 
@@ -249,5 +249,19 @@ int CLuaFunctionDefs::SetCameraClip ( lua_State* luaVM )
     m_pManager->GetCamera ()->SetCameraClip ( bObjects, bVehicles );
 
     lua_pushboolean ( luaVM, true );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetCameraMode ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        CStaticFunctionDefinitions::SetCameraMode ( static_cast <unsigned char> ( lua_tonumber ( luaVM, 1 ) ) );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
