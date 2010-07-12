@@ -469,6 +469,16 @@ float CCameraSA::GetCameraRotation ( void )
     return *(float *)VAR_CameraRotation;
 }
 
+DWORD CCameraSA::GetCameraMode ( void )
+{
+    return *(DWORD *)VAR_CameraMode;
+}
+
+VOID CCameraSA::SetCameraMode ( DWORD dwCamMode )
+{
+    *(DWORD*)VAR_CameraMode = dwCamMode;
+}
+
 RwMatrix * CCameraSA::GetLTM ( void )
 {
     DWORD frame = *(DWORD *)(((DWORD)this->GetInterface()->m_pRwCamera) + 4);

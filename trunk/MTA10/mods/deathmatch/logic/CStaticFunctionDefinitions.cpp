@@ -3415,20 +3415,6 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CClientEntity& Entity, const ch
 }
 
 
-bool CStaticFunctionDefinitions::GetCameraMode ( char * szBuffer, size_t sizeBuffer )
-{
-    assert ( szBuffer );
-    assert ( sizeBuffer );
-
-    if ( m_pCamera->IsInFixedMode () )
-        strncpy ( szBuffer, "fixed", sizeBuffer );
-    else
-        strncpy ( szBuffer, "player", sizeBuffer );
-
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::GetCameraMatrix ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV )
 {
     m_pCamera->GetPosition ( vecPosition );
@@ -3531,6 +3517,17 @@ bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, uns
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetCameraMode ( unsigned char ucMode )
+{
+    m_pCamera->SetCameraMode ( (eVehicleCamMode) ucMode );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetCameraMode ( unsigned char& ucMode )
+{
+    ucMode = m_pCamera->GetCameraMode();
+    return true;
+}
 
 bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVector& vecWorld )
 {

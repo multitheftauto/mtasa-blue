@@ -42,6 +42,7 @@
     
 #define VAR_ActiveCam                       0x7E46FE
 #define VAR_CameraRotation                  0xB6F178 // used for controling where the player faces
+#define VAR_CameraMode                      0xB6F0DC
 
 
 #define MAX_CAMS                            3 
@@ -428,6 +429,8 @@ public:
     RwMatrix *                  GetLTM ( void );
     CEntity *                   GetTargetEntity ( void );
     void                        SetCameraClip ( bool bObjects, bool bVehicles );
+    DWORD                       GetCameraMode ( void );
+    VOID                        SetCameraMode ( DWORD dwCamMode );
 
 private:
     static unsigned long        FUNC_RwFrameGetLTM;
