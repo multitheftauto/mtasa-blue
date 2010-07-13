@@ -133,8 +133,8 @@ public:
     virtual RwMatrix *                  GetLTM ( void )=0;
     virtual CEntity *                   GetTargetEntity ( void )=0;
     virtual void                        SetCameraClip ( bool bObjects, bool bVehicles )=0;
-    virtual void                        SetCameraMode ( DWORD dwCamMode )=0;
-    virtual DWORD                       GetCameraMode ( void )=0;
+    virtual VOID                        SetCameraView ( BYTE dwCamMode )=0;
+    virtual BYTE                        GetCameraView ( void )=0;
 };
 
 

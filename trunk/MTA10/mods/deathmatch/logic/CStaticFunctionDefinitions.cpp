@@ -3517,15 +3517,15 @@ bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, uns
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetCameraMode ( unsigned char ucMode )
+bool CStaticFunctionDefinitions::SetCameraView ( unsigned short ucMode )
 {
-    m_pCamera->SetCameraMode ( (eVehicleCamMode) ucMode );
+    m_pCamera->SetCameraView ( (eVehicleCamMode) ucMode );
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetCameraMode ( unsigned char& ucMode )
+bool CStaticFunctionDefinitions::GetCameraView ( unsigned short& ucMode )
 {
-    ucMode = m_pCamera->GetCameraMode();
+    ucMode = m_pCamera->GetCameraView();
     return true;
 }
 

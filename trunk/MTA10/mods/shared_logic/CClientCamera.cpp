@@ -406,14 +406,14 @@ void CClientCamera::RestoreEntity ( CClientEntity* pEntity )
 }
 
 
-void CClientCamera::SetCameraMode ( eVehicleCamMode eMode )
+void CClientCamera::SetCameraView ( eVehicleCamMode eMode )
 {
-    m_pCamera->SetCameraMode ( eMode );
+    m_pCamera->SetCameraView ( eMode );
 }
 
-eVehicleCamMode CClientCamera::GetCameraMode ()
+eVehicleCamMode CClientCamera::GetCameraView ()
 {
-    return (eVehicleCamMode)m_pCamera->GetCameraMode();
+    return (eVehicleCamMode)m_pCamera->GetCameraView();
 }
 
 

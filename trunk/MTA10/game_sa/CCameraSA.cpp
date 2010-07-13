@@ -8,6 +8,7 @@
 *               Christian Myhre Lundheim <>
 *               Jax <>
 *               Cecill Etheredge <ijsf@gmx.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -469,16 +470,6 @@ float CCameraSA::GetCameraRotation ( void )
     return *(float *)VAR_CameraRotation;
 }
 
-DWORD CCameraSA::GetCameraMode ( void )
-{
-    return *(DWORD *)VAR_CameraMode;
-}
-
-VOID CCameraSA::SetCameraMode ( DWORD dwCamMode )
-{
-    *(DWORD*)VAR_CameraMode = dwCamMode;
-}
-
 RwMatrix * CCameraSA::GetLTM ( void )
 {
     DWORD frame = *(DWORD *)(((DWORD)this->GetInterface()->m_pRwCamera) + 4);
@@ -553,3 +544,13 @@ void _declspec(naked) HOOK_Camera_CollisionDetection ()
     }
 }
 
+BYTE CCameraSA::GetCameraView ( void )
+{
+    // TODO: Add support for ped camera view, this will only work on vehicles for now.
+    return *(BYTE *)VAR_VehicleCameraView;
+}
+
+VOID CCameraSA::SetCameraView ( BYTE dwCamMode )
+{
+    *(BYTE *)VAR_VehicleCameraView = dwCamMode;
+}
