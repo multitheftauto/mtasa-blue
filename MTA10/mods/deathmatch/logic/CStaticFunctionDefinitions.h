@@ -273,7 +273,7 @@ public:
     static bool                         SetMarkerIcon                       ( CClientEntity& Entity, const char* szIcon );
 
     // Camera get funcs
-    static bool                         GetCameraMode                       ( unsigned char& ucMode );
+    static bool                         GetCameraView                       ( unsigned short& ucMode );
     static bool                         GetCameraMatrix                     ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV );
     static CClientEntity *              GetCameraTarget                     ( void );
     static bool                         GetCameraInterior                   ( unsigned char & ucInterior );
@@ -283,7 +283,7 @@ public:
     static bool                         SetCameraTarget                     ( CClientEntity * pEntity);
     static bool                         SetCameraInterior                   ( unsigned char ucInterior );
     static bool                         FadeCamera                          ( bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
-    static bool                         SetCameraMode                       ( unsigned char ucMode );
+    static bool                         SetCameraView                       ( unsigned short ucMode );
 
     // Cursor funcs
     static bool                         GetCursorPosition                   ( CVector2D& vecCursor, CVector& vecWorld );
