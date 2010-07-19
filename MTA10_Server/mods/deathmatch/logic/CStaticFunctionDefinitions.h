@@ -36,8 +36,8 @@ public:
 
     // Event funcs
     static bool                 AddEvent                            ( CLuaMain* pLuaMain, const char* szName, const char* szArguments, bool bAllowRemoteTrigger );
-    static bool                 AddEventHandler                     ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, int iLuaFunction, bool bPropagated );
-    static bool                 RemoveEventHandler                  ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, int iLuaFunction );
+    static bool                 AddEventHandler                     ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    static bool                 RemoveEventHandler                  ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction );
     static bool                 TriggerEvent                        ( const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool & bWasCancelled );
     static bool                 TriggerClientEvent                  ( CElement* pElement, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments );
 
@@ -396,11 +396,11 @@ public:
     static bool                 GetClothesTypeName                  ( unsigned char ucType, char* szNameReturn );
 
     // Input funcs
-    static bool                 BindKey                             ( CPlayer* pPlayer, const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );
+    static bool                 BindKey                             ( CPlayer* pPlayer, const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
     static bool                 BindKey                             ( CPlayer* pPlayer, const char* szKey, const char* szHitState, const char* szCommandName, const char* szArguments, const char* szResource );
-    static bool                 UnbindKey                           ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState = NULL, int iLuaFunction = -1 );
+    static bool                 UnbindKey                           ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState = NULL, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     static bool                 UnbindKey                           ( CPlayer* pPlayer, const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource );
-    static bool                 IsKeyBound                          ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState, int iLuaFunction, bool& bBound );
+    static bool                 IsKeyBound                          ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState, const CLuaFunctionRef& iLuaFunction, bool& bBound );
     static bool                 GetControlState                     ( CPlayer* pPlayer, char* szControl, bool& bState );
     static bool                 IsControlEnabled                    ( CPlayer* pPlayer, char* szControl, bool& bEnabled );
 

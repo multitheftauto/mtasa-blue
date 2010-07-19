@@ -25,6 +25,7 @@ extern "C"
 #include <vector>
 #include "../common/CBitStream.h"
 #include "json.h"
+#include "CLuaFunctionRef.h"
 
 #if MTA_DEBUG
     // Tight allocation in debug to find trouble.
@@ -62,7 +63,7 @@ public:
     void                                                ReadArguments       ( lua_State* luaVM, signed int uiIndexBegin = 1 );
     void                                                PushArguments       ( lua_State* luaVM ) const;
     void                                                PushArguments       ( CLuaArguments& Arguments );
-    bool                                                Call                ( class CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments * returnValues = NULL ) const;
+    bool                                                Call                ( class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments * returnValues = NULL ) const;
     bool                                                CallGlobal          ( class CLuaMain* pLuaMain, const char* szFunction, CLuaArguments * returnValues = NULL ) const;
 
     void                                                ReadTable           ( lua_State* luaVM, int iIndexBegin, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );

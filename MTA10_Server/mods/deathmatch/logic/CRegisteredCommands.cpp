@@ -30,7 +30,7 @@ CRegisteredCommands::~CRegisteredCommands ( void )
 }
 
 
-bool CRegisteredCommands::AddCommand ( CLuaMain* pLuaMain, const char* szKey, int iLuaFunction, bool bRestricted, bool bCaseSensitive )
+bool CRegisteredCommands::AddCommand ( CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bRestricted, bool bCaseSensitive )
 {
     assert ( pLuaMain );
     assert ( szKey );
@@ -58,7 +58,7 @@ bool CRegisteredCommands::AddCommand ( CLuaMain* pLuaMain, const char* szKey, in
 }
 
 
-bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey, int iLuaFunction )
+bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction )
 {
     assert ( pLuaMain );
     assert ( szKey );
@@ -78,7 +78,7 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey,
         // Matching vm's and names?
         if ( (*iter)->pLuaMain == pLuaMain && iCompareResult == 0 )
         {
-            if ( iLuaFunction && (*iter)->iLuaFunction != iLuaFunction )
+            if ( iLuaFunction != LUA_REFNIL && (*iter)->iLuaFunction != iLuaFunction )
             {
                 iter++;
                 continue;
@@ -217,7 +217,7 @@ CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand ( const char* szK
 }
 
 
-void CRegisteredCommands::CallCommandHandler ( CLuaMain* pLuaMain, int iLuaFunction, const char* szKey, const char* szArguments, CClient* pClient )
+void CRegisteredCommands::CallCommandHandler ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments, CClient* pClient )
 {
     assert ( pLuaMain );
     assert ( szKey );

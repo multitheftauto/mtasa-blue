@@ -31,12 +31,12 @@ CRemoteCalls::~CRemoteCalls()
 }
 
 
-void CRemoteCalls::Call ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, int iFunction )
+void CRemoteCalls::Call ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
 {
     m_calls.push_back ( new CRemoteCall ( szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction ) );
 }
 
-void CRemoteCalls::Call ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, int iFunction )
+void CRemoteCalls::Call ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
 {
     m_calls.push_back ( new CRemoteCall ( szURL, arguments, luaMain, iFunction ) );
 }
@@ -80,7 +80,7 @@ bool CRemoteCalls::CallExists ( CRemoteCall * call )
 
 ////////////////////////////////////////////////////////////////////////////////
 
-CRemoteCall::CRemoteCall ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, int iFunction )
+CRemoteCall::CRemoteCall ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
 {
     m_szServerHost = szServerHost;
     m_szResourceName = szResourceName;
@@ -97,7 +97,7 @@ CRemoteCall::CRemoteCall ( char * szServerHost, char * szResourceName, char * sz
 }
 
 //arbitary URL version
-CRemoteCall::CRemoteCall ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, int iFunction )
+CRemoteCall::CRemoteCall ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction )
 {
     m_VM = luaMain;
     m_iFunction = iFunction;

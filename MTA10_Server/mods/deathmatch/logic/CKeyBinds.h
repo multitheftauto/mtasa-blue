@@ -41,6 +41,7 @@ class CKeyBind
 {
 public:
     inline                  CKeyBind        ( void )    { boundKey = NULL; luaMain = NULL; beingDeleted = false; }
+    virtual                 ~CKeyBind       ( void )    {}
     inline bool             IsBeingDeleted ( void ) { return beingDeleted; }
     
     SBindableKey*           boundKey;
@@ -60,9 +61,9 @@ public:
 class CFunctionBind
 {
 public:
-    inline                  CFunctionBind       ( void )    { m_iLuaFunction = -1; }
+    inline                  CFunctionBind       ( void )    {}
     inline                  ~CFunctionBind      ( void )    {}
-    int                     m_iLuaFunction;
+    CLuaFunctionRef         m_iLuaFunction;
     CLuaArguments           m_Arguments;
 };
 
@@ -99,16 +100,16 @@ public:
     std::list < CKeyBind* > ::iterator IterEnd          ( void )            { return m_List.end (); }
 
     // Key-function bind funcs
-    bool                        AddKeyFunction          ( const char* szKey, bool bHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );
-    bool                        AddKeyFunction          ( SBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );
-    bool                        RemoveKeyFunction       ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, int iLuaFunction = NULL );
-    bool                        KeyFunctionExists       ( const char* szKey, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, int iLuaFunction = LUA_REFNIL );
+    bool                        AddKeyFunction          ( const char* szKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
+    bool                        AddKeyFunction          ( SBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
+    bool                        RemoveKeyFunction       ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
+    bool                        KeyFunctionExists       ( const char* szKey, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
 
     // Control-function bind funcs
-    bool                        AddControlFunction      ( const char* szControl, bool bHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );
-    bool                        AddControlFunction      ( SBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );
-    bool                        RemoveControlFunction   ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, int iLuaFunction = LUA_REFNIL );
-    bool                        ControlFunctionExists   ( const char* szControl, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, int iLuaFunction = LUA_REFNIL );
+    bool                        AddControlFunction      ( const char* szControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
+    bool                        AddControlFunction      ( SBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
+    bool                        RemoveControlFunction   ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
+    bool                        ControlFunctionExists   ( const char* szControl, CLuaMain* pLuaMain = NULL, bool bCheckHitState = false, bool bHitState = true, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
 
     void                        RemoveAllKeys           ( CLuaMain* pLuaMain );
 
