@@ -28,12 +28,8 @@ class CLuaTimer
 {
 public:
 
-                            CLuaTimer                   ( void );
-                            CLuaTimer                   ( int iLuaFunction, const CLuaArguments& Arguments );
+                            CLuaTimer                   ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments& Arguments );
                             ~CLuaTimer                  ( void );
-
-    inline int              GetLuaFunction              ( void )                        { return m_iLuaFunction; };
-    inline void             SetLuaFunction              ( int iLuaFunction )            { m_iLuaFunction = iLuaFunction; };
 
     inline unsigned long    GetStartTime                ( void ) const                  { return m_ulStartTime; };
     inline void             SetStartTime                ( unsigned long ulStartTime )   { m_ulStartTime = ulStartTime; };
@@ -51,7 +47,7 @@ public:
     inline bool             IsBeingDeleted              ( void )                        { return m_bBeingDeleted; }
     inline void             SetBeingDeleted             ( bool bBeingDeleted )          { m_bBeingDeleted = bBeingDeleted; }
 private:
-    int                     m_iLuaFunction;
+    CLuaFunctionRef         m_iLuaFunction;
     CLuaArguments           m_Arguments;
     unsigned long           m_ulStartTime;
     unsigned long           m_ulDelay;

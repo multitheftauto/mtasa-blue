@@ -895,9 +895,6 @@ bool CResource::Stop ( bool bStopManually )
         // Tell the module manager we have stopped
         g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_ResourceStopped ( m_pVM->GetVirtualMachine () );
 
-        // Destroy the virtual machine for this resource
-        DestroyVM ();
-
         // Remove the temporary XML storage node
         if ( m_pNodeStorage )
         {
@@ -913,6 +910,9 @@ bool CResource::Stop ( bool bStopManually )
         }
         m_elementGroups.clear();
         m_pDefaultElementGroup = NULL;
+
+        // Destroy the virtual machine for this resource
+        DestroyVM ();
 
         // We're no longer active
         m_bActive = false;
