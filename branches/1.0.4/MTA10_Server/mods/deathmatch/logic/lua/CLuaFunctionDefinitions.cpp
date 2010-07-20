@@ -23,42 +23,6 @@
 
 extern CGame* g_pGame;
 
-#define MAX_STRING_LENGTH 2048
-
-// Custom Lua stack argument->reference function
-// This function should always be called last! (Since it pops the lua stack)
-LUALIB_API int luaM_toref (lua_State *L, int i) {
-    int ref = -1;
-
-    // convert the function pointer to a string so we can use it as index
-    char buf[10] = {0};
-    char * index = itoa ( (int)lua_topointer ( L, i ), buf, 16 );
-
-    // get the callback table we made in CLuaMain::InitVM (at location 1)
-    lua_getref ( L, 1 );
-        lua_getfield ( L, -1, index );
-        ref = (int)lua_tonumber ( L, -1 );
-        lua_pop ( L, 1 );
-    lua_pop ( L, 1 );
-
-    // if it wasn't added yet, add it to the callback table and the registry
-    // else, get the reference from the table
-    if ( !ref ) {
-        // add a new reference (and get the id)
-        lua_settop ( L, i );
-        ref = lua_ref ( L, 1 );
-
-        // and add it to the callback table
-        lua_getref ( L, 1 );
-            lua_pushstring ( L, index );
-            lua_pushnumber ( L, ref );
-            lua_settable ( L, -3 );
-        lua_pop ( L, 1 );
-    }
-    return ref;
-}
-
-
 static CBlipManager*                                    m_pBlipManager = NULL;
 static CLuaManager*                                     m_pLuaManager = NULL;
 static CMarkerManager*                                  m_pMarkerManager = NULL;
@@ -203,7 +167,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 
             CLuaArguments args;
             args.ReadArguments ( luaVM, 5 );
-            int iLuaFunction = luaM_toref ( luaVM, 4 ); // you have to read this last or ReadArguments (above) fails
+            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 4 ); // you have to read this last or ReadArguments (above) fails
 
             g_pGame->GetRemoteCalls()->Call ( szHost, szResourceName, szFunctionName, &args, luaMain, iLuaFunction );
             lua_pushboolean ( luaVM, true );
@@ -216,7 +180,7 @@ int CLuaFunctionDefinitions::CallRemote ( lua_State* luaVM )
 
             CLuaArguments args;
             args.ReadArguments ( luaVM, 3 );
-            int iLuaFunction = luaM_toref ( luaVM, 2 ); // you have to read this last or ReadArguments (above) fails
+            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 2 ); // you have to read this last or ReadArguments (above) fails
 
             g_pGame->GetRemoteCalls()->Call ( szURL, &args, luaMain, iLuaFunction );
             lua_pushboolean ( luaVM, true );
@@ -409,7 +373,7 @@ int CLuaFunctionDefinitions::AddEventHandler ( lua_State* luaVM )
                 // Grab the arguments
                 const char* szName = lua_tostring ( luaVM, 1 );
                 CElement* pElement = lua_toelement ( luaVM, 2 );
-                int iLuaFunction = luaM_toref ( luaVM, 3 );
+                CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 3 );
 
                 // Verify the element
                 if ( !pElement )
@@ -461,7 +425,7 @@ int CLuaFunctionDefinitions::RemoveEventHandler ( lua_State* luaVM )
             // Grab the arguments
             const char* szName = lua_tostring ( luaVM, 1 );
             CElement* pElement = lua_toelement ( luaVM, 2 );
-            int iLuaFunction = luaM_toref ( luaVM, 3 );
+            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 3 );
 
             // Verify the element
             if ( !pElement )
@@ -7428,7 +7392,7 @@ int CLuaFunctionDefinitions::BindKey ( lua_State* luaVM )
                     CLuaArguments Arguments;
                     Arguments.ReadArguments ( luaVM, 5 );
 
-                    int iLuaFunction = luaM_toref ( luaVM, 4 );
+                    CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 4 );
 
                     if ( VERIFY_FUNCTION ( iLuaFunction ) )
                     {
@@ -7465,7 +7429,7 @@ int CLuaFunctionDefinitions::UnbindKey ( lua_State* luaVM )
             CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
             const char* szKey = lua_tostring ( luaVM, 2 );
             const char* szHitState = NULL;
-            int iLuaFunction = LUA_REFNIL;
+            CLuaFunctionRef iLuaFunction;
 
             if ( lua_type ( luaVM, 3 ) != LUA_TNONE )
                 szHitState = lua_tostring ( luaVM, 3 );
@@ -7516,7 +7480,7 @@ int CLuaFunctionDefinitions::IsKeyBound ( lua_State* luaVM )
             CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
             const char* szKey = lua_tostring ( luaVM, 2 );
             const char* szHitState = NULL;
-            int iLuaFunction = LUA_REFNIL;
+            CLuaFunctionRef iLuaFunction;
 
             if ( lua_type ( luaVM, 3 ) )
                 szHitState = lua_tostring ( luaVM, 3 );
@@ -7639,7 +7603,7 @@ int CLuaFunctionDefinitions::GetKeyBoundToFunction ( lua_State* luaVM )
             lua_type ( luaVM, 2 ) == LUA_TFUNCTION )
         {
             CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-            int iLuaFunction = luaM_toref ( luaVM, 2 );
+            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 2 );
 
             if ( pPlayer )
             {
@@ -7655,7 +7619,6 @@ int CLuaFunctionDefinitions::GetKeyBoundToFunction ( lua_State* luaVM )
                             case KEY_BIND_FUNCTION:
                             {
                                 CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( pKeyBind );
-                                // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
                                 if ( iLuaFunction == pBind->m_iLuaFunction )
                                 {
                                     lua_pushstring ( luaVM, pBind->boundKey->szKey );
@@ -7666,7 +7629,6 @@ int CLuaFunctionDefinitions::GetKeyBoundToFunction ( lua_State* luaVM )
                             case KEY_BIND_CONTROL_FUNCTION:
                             {
                                 CControlFunctionBind* pBind = static_cast < CControlFunctionBind* > ( pKeyBind );
-                                // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
                                 if ( iLuaFunction == pBind->m_iLuaFunction )
                                 {
                                     lua_pushstring ( luaVM, pBind->boundKey->szKey );
@@ -8831,7 +8793,7 @@ int CLuaFunctionDefinitions::AddCommandHandler ( lua_State* luaVM )
 
             // Grab the strings. Valid?
             const char* szKey = lua_tostring ( luaVM, 1 );
-            int iLuaFunction = luaM_toref ( luaVM, 2 );
+            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 2 );
 
             if ( szKey [0] != 0 && VERIFY_FUNCTION ( iLuaFunction ) )
             {
@@ -8868,7 +8830,7 @@ int CLuaFunctionDefinitions::RemoveCommandHandler ( lua_State* luaVM )
             const char* szKey = lua_tostring ( luaVM, 1 );
             if ( szKey [0] )
             {
-                int iLuaFunction = 0;
+                CLuaFunctionRef iLuaFunction;
                 if ( lua_type ( luaVM, 2 ) == LUA_TFUNCTION )
                     iLuaFunction = luaM_toref ( luaVM, 2 );
 

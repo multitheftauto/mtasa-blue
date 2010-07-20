@@ -355,7 +355,7 @@ void CElement::SetXMLNode ( CXMLNode* pNode )
 };
 
 
-bool CElement::AddEvent ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction, bool bPropagated )
+bool CElement::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
 {
     return m_pEventManager->Add ( pLuaMain, szName, iLuaFunction, bPropagated );
 }
@@ -382,7 +382,7 @@ bool CElement::CallEvent ( const char* szName, const CLuaArguments& Arguments, C
 }
 
 
-bool CElement::DeleteEvent ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction )
+bool CElement::DeleteEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction )
 {
     return m_pEventManager->Delete ( pLuaMain, szName, iLuaFunction );
 }

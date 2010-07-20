@@ -114,9 +114,9 @@ public:
     CElement*                                   SetParentObject             ( CElement* pParent );
     void                                        SetXMLNode                  ( CXMLNode* pNode );
 
-    bool                                        AddEvent                    ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction, bool bPropagated );
+    bool                                        AddEvent                    ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
     bool                                        CallEvent                   ( const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller = NULL );
-    bool                                        DeleteEvent                 ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction = -1 );
+    bool                                        DeleteEvent                 ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     void                                        DeleteEvents                ( CLuaMain* pLuaMain, bool bRecursive );
     void                                        DeleteAllEvents             ( void );
 

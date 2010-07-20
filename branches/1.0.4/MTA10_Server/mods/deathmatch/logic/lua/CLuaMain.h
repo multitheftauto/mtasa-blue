@@ -33,6 +33,12 @@ class CRadarAreaManager;
 class CVehicleManager;
 class CMapManager;
 
+struct CRefInfo
+{
+    unsigned long int ulUseCount;
+    int iFunction;
+};
+
 class CLuaMain : public CClient
 {
 public:
@@ -140,6 +146,8 @@ private:
     bool                            m_bBeingDeleted; // prevent it being deleted twice
 
     unsigned long                   m_ulFunctionEnterTime;
+public:
+    std::map < const void*, CRefInfo >      m_CallbackTable;
 };
 
 #endif

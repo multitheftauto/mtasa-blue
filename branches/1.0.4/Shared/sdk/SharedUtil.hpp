@@ -665,17 +665,17 @@ SString SharedUtil::ConformResourcePath ( const char* szRes )
     SString strText = szRes ? szRes : "";
 #ifdef WIN32
     char cPathSep = '\\';
-    for ( int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+    for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
         strDelimList[i] = strDelimList[i].Replace ( "/", "\\" );
     strText = strText.Replace ( "/", "\\" );
 #else
     char cPathSep = '/';
-    for ( int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+    for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
         strDelimList[i] = strDelimList[i].Replace ( "\\", "/" );
     strText = strText.Replace ( "\\", "/" );
 #endif
 
-    for ( int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+    for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
     {
         // Remove up to first occurrence
         int iPos = strText.find ( strDelimList[i] );
