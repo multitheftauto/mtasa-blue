@@ -30,6 +30,7 @@
 #include "lvm.h"
 #include "lzio.h"
 
+// MTA Specific
 lua_PreCallHook pPreCallHook = NULL;
 void lua_registerPreCallHook ( lua_PreCallHook f )
 {
@@ -308,6 +309,7 @@ int luaD_precall (lua_State *L, StkId func, int nresults) {
   }
   else {  /* if is a C function, call it */
     CallInfo *ci;
+    // MTA Specific
     int allowed = 1;
     int n = 0;
     luaD_checkstack(L, LUA_MINSTACK);  /* ensure minimum stack size */
@@ -320,6 +322,7 @@ int luaD_precall (lua_State *L, StkId func, int nresults) {
     if (L->hookmask & LUA_MASKCALL)
       luaD_callhook(L, LUA_HOOKCALL, -1);
     lua_unlock(L);
+    // MTA Specific
     if ( pPreCallHook )
         allowed = pPreCallHook ( *curr_func(L)->c.f, L );
     if ( allowed )
