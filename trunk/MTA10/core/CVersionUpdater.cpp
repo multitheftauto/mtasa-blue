@@ -183,7 +183,7 @@ void CVersionUpdater::InitiateUpdate ( const SString& strType, const SString& st
 // Should this server tell us about recommended updates?
 bool CVersionUpdater::IsOptionalUpdateInfoRequired ( const SString& strHost )
 {
-    return true || !MapContains ( m_DoneOptionalMap, strHost );
+    return !MapContains ( m_DoneOptionalMap, strHost );
 }
 
 
