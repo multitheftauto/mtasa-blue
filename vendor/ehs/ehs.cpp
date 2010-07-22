@@ -908,7 +908,8 @@ void EHSServer::HandleData ( int inTimeoutMilliseconds, ///< milliseconds for ti
 
 				EHS_TRACE ( "[%d] Critical Error: select() failed.  Aborting\n", inThreadId );
 
-				exit ( 0 );
+				// Idea! Remove stupid idea
+				//exit ( 0 );
 			}
 			
 			
