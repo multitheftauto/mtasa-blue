@@ -1701,6 +1701,28 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                                     // Warp him in
                                     pInsidePlayer->WarpIntoVehicle ( pVehicle, ucSeat );
                                 }
+
+                                // Call the onClientVehicleStartEnter event
+                                CLuaArguments Arguments;
+                                Arguments.PushElement ( pInsidePlayer ); // player
+                                Arguments.PushNumber ( ucSeat );         // seat
+                                pVehicle->CallEvent ( "onClientVehicleEnter", Arguments, true );
+
+                                CLuaArguments Arguments2;
+                                Arguments2.PushElement ( pOutsidePlayer );   // player
+                                Arguments2.PushNumber ( ucSeat );            // seat
+                                pVehicle->CallEvent ( "onClientVehicleExit", Arguments2, true );
+
+                                CLuaArguments Arguments3;
+                                Arguments3.PushElement ( pVehicle );        // vehicle
+                                Arguments3.PushNumber ( ucSeat );           // seat
+                                Arguments3.PushElement ( pInsidePlayer );   // jacker
+                                pOutsidePlayer->CallEvent ( "onClientPlayerVehicleExit", Arguments3, true );
+
+                                CLuaArguments Arguments4;
+                                Arguments4.PushElement ( pVehicle );        // vehicle
+                                Arguments4.PushNumber ( ucSeat );            // seat
+                                pInsidePlayer->CallEvent ( "onClientPlayerVehicleEnter", Arguments, true );
                             }
                         }
 
