@@ -1722,7 +1722,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                                 CLuaArguments Arguments4;
                                 Arguments4.PushElement ( pVehicle );        // vehicle
                                 Arguments4.PushNumber ( ucSeat );            // seat
-                                pInsidePlayer->CallEvent ( "onClientPlayerVehicleEnter", Arguments, true );
+                                pInsidePlayer->CallEvent ( "onClientPlayerVehicleEnter", Arguments4, true );
                             }
                         }
 
