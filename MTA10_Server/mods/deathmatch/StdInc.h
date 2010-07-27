@@ -258,4 +258,5 @@
 // Module includes
 #include "CServer.h"
 #include "Config.h"
+#define SHOW_LINUX_RELEASE_WARNING
 #include "../../version.h"
