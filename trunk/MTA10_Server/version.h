@@ -5,18 +5,13 @@
 //
 
 //
-// To compile a Linux public server:
+// To compile a public server:
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE
-//      2. Use net.so from the latest Linux build (nightly.mtasa.com)
+//      2. Use net.dll/net.so from the latest 1.1 untested/rc/release (nightly.mtasa.com)
 //
-// To compile a Windows public server:
-//      1. set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE
-//      2. Use net.dll from the latest untested (nightly.mtasa.com)
-//
-// To compile a Windows custom server:
+// To compile a custom server:
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
-//      2. Use net.dll from the latest unstable (nightly.mtasa.com)
-//
+//      2. Use net.dll/net.so from the latest 1.1 unstable (nightly.mtasa.com)
 
 
 // New version info
@@ -48,15 +43,7 @@
 #define QUOTE_DEFINE(x) QUOTE_DEFINE2(x)
 
 // Implement compile types
-#if !defined(WIN32)
-
-    // Only one type of build for non-windows servers
-    #define MTA_DM_BUILDTYPE        ""
-    #define MTA_DM_BUILDTAG_SHORT   MTA_DM_VERSIONSTRING
-    #define MTA_DM_BUILDTAG_LONG    MTA_DM_VERSIONSTRING "-" QUOTE_DEFINE ( MTASA_VERSION_BUILD )
-    #define MTA_DM_CONNECT_FROM_PUBLIC
-
-#elif MTASA_VERSION_TYPE == VERSION_TYPE_CUSTOM
+#if MTASA_VERSION_TYPE == VERSION_TYPE_CUSTOM
 
     #define MTA_DM_BUILDTYPE        "custom"
     #define MTA_DM_BUILDTAG_SHORT   MTA_DM_VERSIONSTRING "-" MTA_DM_BUILDTYPE
@@ -100,4 +87,19 @@
     #define MTA_DM_ASE_VERSION                  _ASE_VERSION "n"
     #define MTA_DM_NETCODE_VERSION              ( _NETCODE_VERSION + 0x4000 )
     #define MTA_DM_SERVER_NET_MODULE_VERSION    ( _SERVER_NET_MODULE_VERSION + 0x4000 )
+#endif
+
+// Handy Linux message
+#if !defined(WIN32)
+    #if MTASA_VERSION_TYPE != VERSION_TYPE_RELEASE
+        #ifdef SHOW_LINUX_RELEASE_WARNING
+            #warning "-------------------------------------------------------------------------"
+            #warning "MTASA_VERSION_TYPE is not set to VERSION_TYPE_RELEASE"
+            #warning "Server will not work with release clients"
+            #warning "-------------------------------------------------------------------------"
+            #warning "If you want the server to work with release clients,"
+            #warning "set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE in MTA10_Server/version.h"
+            #warning "-------------------------------------------------------------------------"
+        #endif
+    #endif
 #endif
