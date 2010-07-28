@@ -89,10 +89,18 @@
     #define MTA_DM_SERVER_NET_MODULE_VERSION    ( _SERVER_NET_MODULE_VERSION + 0x4000 )
 #endif
 
-// Handy Linux message
-#if !defined(WIN32)
-    #if MTASA_VERSION_TYPE != VERSION_TYPE_RELEASE
-        #ifdef SHOW_LINUX_RELEASE_WARNING
+// Handy self compile message
+#ifndef MTA_DM_CONNECT_FROM_PUBLIC
+    #ifdef SHOW_SELF_COMPILE_WARNING
+        #ifdef WIN32
+            #pragma message("-------------------------------------------------------------------------")
+            #pragma message("MTASA_VERSION_TYPE is not set to VERSION_TYPE_RELEASE")
+            #pragma message("Server will not work with release clients")
+            #pragma message("-------------------------------------------------------------------------")
+            #pragma message("If you want the server to work with release clients,")
+            #pragma message("set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE in MTA10_Server/version.h")
+            #pragma message("-------------------------------------------------------------------------")
+        #else
             #warning "-------------------------------------------------------------------------"
             #warning "MTASA_VERSION_TYPE is not set to VERSION_TYPE_RELEASE"
             #warning "Server will not work with release clients"
