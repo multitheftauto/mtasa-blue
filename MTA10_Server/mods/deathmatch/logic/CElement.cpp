@@ -38,6 +38,7 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     m_ucInterior = 0;
     m_bDoubleSided = false;
     m_bMapCreated = false;
+    m_bUpdatingSpatialData = false;
 
     // Store the line
     if ( m_pXMLNode )
@@ -1375,16 +1376,22 @@ CSphere CElement::GetWorldBoundingSphere ( void )
 
 void CElement::UpdateSpatialData ( void )
 {
-    GetSpatialDatabase ()->UpdateEntity ( this );
-    // Also make sure attached entites get updated
-    for ( list < CElement * > ::iterator iter = m_AttachedElements.begin (); iter != m_AttachedElements.end () ; iter++ )
+    // Avoid recursion
+    if ( !m_bUpdatingSpatialData )
     {
-        CElement* pElement = *iter;
-        if ( pElement->GetAttachedToElement () )
+        m_bUpdatingSpatialData = true;
+        GetSpatialDatabase ()->UpdateEntity ( this );
+        // Also make sure attached entites get updated
+        for ( list < CElement * > ::iterator iter = m_AttachedElements.begin (); iter != m_AttachedElements.end () ; iter++ )
         {
-            CVector vecPosition;
-            pElement->GetAttachedPosition ( vecPosition );
-            pElement->SetPosition ( vecPosition );
+            CElement* pElement = *iter;
+            if ( pElement->GetAttachedToElement () )
+            {
+                CVector vecPosition;
+                pElement->GetAttachedPosition ( vecPosition );
+                pElement->SetPosition ( vecPosition );
+            }
         }
+        m_bUpdatingSpatialData = false;
     }
 }
