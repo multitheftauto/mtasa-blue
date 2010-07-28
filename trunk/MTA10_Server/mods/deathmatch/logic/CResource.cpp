@@ -3109,4 +3109,6 @@ void CResource::InvalidateIncludedResourceReference ( CResource * resource )
     }
 
     m_temporaryIncludes.remove ( resource );
+    assert ( this != resource );
+    m_dependents.remove ( resource );
 }
