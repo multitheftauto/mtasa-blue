@@ -1083,7 +1083,7 @@ void CGraphics::ExpireCachedTextures ( bool bExpireAll )
     // 50 cached textures   = 8 seconds till expire
     // 100 cached textures  = 1 second till expire
     long ulNumTextures              = m_CachedTextureInfoMap.size ();
-    unsigned long ulMaxAgeSeconds   = max( 1, 15 - (ulNumTextures * 15 / 100) );
+    unsigned long ulMaxAgeSeconds   = Max < long > ( 1, 15 - (ulNumTextures * 15 / 100) );
 
     map < string, SCachedTextureInfo > ::iterator iter = m_CachedTextureInfoMap.begin ();
     while ( iter != m_CachedTextureInfoMap.end () )

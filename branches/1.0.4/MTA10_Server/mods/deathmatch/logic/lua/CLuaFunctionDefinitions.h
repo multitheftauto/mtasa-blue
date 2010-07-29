@@ -453,6 +453,7 @@ public:
     static int      ExecuteSQLSelect                    ( lua_State* luaVM );
     static int      ExecuteSQLUpdate                    ( lua_State* luaVM );
     static int      ExecuteSQLQuery                     ( lua_State* luaVM );
+    static int      GetPerformanceStats                 ( lua_State* luaVM );
 
     // Account get funcs
     static int      GetAccount                          ( lua_State* luaVM );

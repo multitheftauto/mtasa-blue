@@ -11,6 +11,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define ALLOC_STATS_MODULE_NAME "xml"
+#include "SharedUtil.hpp"
 
 CXMLImpl::CXMLImpl ( void )
 {

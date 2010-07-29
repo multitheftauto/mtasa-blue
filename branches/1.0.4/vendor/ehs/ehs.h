@@ -74,6 +74,7 @@
 #endif // end platform headers   //
 ///////////////////////////////////
 
+#include "SharedUtil.h"
 
 // STL headers
 #include <algorithm>

@@ -509,6 +509,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CDynamicLibrary.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CElement.cpp"
 					>
 				</File>
@@ -614,6 +618,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPedSync.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStatManager.cpp"
 					>
 				</File>
 				<File
@@ -1522,6 +1530,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CDynamicLibrary.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CElement.h"
 					>
 				</File>
@@ -1631,6 +1643,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPedSync.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStatManager.h"
 					>
 				</File>
 				<File

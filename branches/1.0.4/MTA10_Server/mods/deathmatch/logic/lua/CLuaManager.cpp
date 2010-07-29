@@ -634,6 +634,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "executeSQLUpdate", CLuaFunctionDefinitions::ExecuteSQLUpdate );
     CLuaCFunctions::AddFunction ( "executeSQLInsert", CLuaFunctionDefinitions::ExecuteSQLInsert );
     CLuaCFunctions::AddFunction ( "executeSQLQuery", CLuaFunctionDefinitions::ExecuteSQLQuery );
+    CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefinitions::GetPerformanceStats );
 
     // Account get functions
     CLuaCFunctions::AddFunction ( "getAccountName", CLuaFunctionDefinitions::GetAccountName );

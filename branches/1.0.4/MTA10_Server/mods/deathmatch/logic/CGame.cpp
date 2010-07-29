@@ -19,6 +19,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
 
 #define MAX_KEYSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
@@ -337,6 +338,8 @@ void CGame::DoPulse ( void )
 
     // Delete all items requested
     m_ElementDeleter.DoDeleteAll ();
+
+    GetPerfStatManager ()->DoPulse ();
 
     // Unlock the critical section again
     Unlock();

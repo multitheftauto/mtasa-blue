@@ -77,6 +77,7 @@ void luaM_dec_use ( lua_State *luaVM, int iFunction, const void* pFuncPtr )
         // Remove on last unuse
         lua_unref ( luaVM, iFunction );
         MapRemove ( pLuaMain->m_CallbackTable, pFuncPtr );
+        MapRemove ( pLuaMain->m_FunctionTagMap, iFunction );
     }
 }
 
