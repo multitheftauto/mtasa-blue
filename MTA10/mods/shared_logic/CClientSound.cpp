@@ -14,6 +14,7 @@
 #include <StdInc.h>
 #include <process.h>
 #include <tags.h>
+#include <bassmix.h>
 
 extern CClientGame* g_pClientGame;
 
@@ -72,18 +73,43 @@ bool CClientSound::Play ( const SString& strPath, bool bLoop )
     return false;
 }
 
+HSTREAM CClientSound::ConvertFileToMono(const SString& strPath)
+{
+    HSTREAM decoder = BASS_StreamCreateFile ( false, strPath, 0, 0, BASS_STREAM_DECODE | BASS_SAMPLE_MONO ); // open file for decoding
+    if ( !decoder )
+        return 0; // failed
+    DWORD length = static_cast <DWORD> ( BASS_ChannelGetLength ( decoder, BASS_POS_BYTE ) ); // get the length
+    void *data = malloc ( length ); // allocate buffer for decoded data
+    BASS_CHANNELINFO ci;
+    BASS_ChannelGetInfo ( decoder, &ci ); // get sample format
+    if ( ci.chans > 1 ) // not mono, downmix...
+    {
+        HSTREAM mixer = BASS_Mixer_StreamCreate ( ci.freq, 1, BASS_STREAM_DECODE | BASS_MIXER_END ); // create mono mixer
+        BASS_Mixer_StreamAddChannel ( mixer, decoder, BASS_MIXER_DOWNMIX | BASS_MIXER_NORAMPIN | BASS_STREAM_AUTOFREE ); // plug-in the decoder (auto-free with the mixer)
+        decoder = mixer; // decode from the mixer
+    }
+    length = BASS_ChannelGetData ( decoder, data, length ); // decode data
+    BASS_StreamFree ( decoder ); // free the decoder/mixer
+    HSTREAM stream = BASS_StreamCreate ( ci.freq, 1, BASS_STREAM_AUTOFREE | BASS_SAMPLE_3D, STREAMPROC_PUSH, NULL ); // create stream
+    BASS_StreamPutData ( stream, data, length ); // set the stream data
+    free ( data ); // free the buffer
+    return stream;
+}
+
 bool CClientSound::Play3D ( const SString& strPath, const CVector& vecPosition, bool bLoop )
 {
     long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
-    if ( bLoop )
-        lFlags |= BASS_SAMPLE_LOOP;
 
     // Try to load the sound file
     if (
         ( m_pSound = BASS_StreamCreateFile ( false, strPath, 0, 0, lFlags ) )
      || ( m_pSound = BASS_MusicLoad ( false, strPath, 0, 0, lFlags, 0) )
+     || ( m_pSound = ConvertFileToMono ( strPath ) ) //this interrupts the game, depends on the file size and length
         )
     {
+        if ( bLoop && BASS_ChannelFlags ( m_pSound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP ) == -1 )
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in Play3D ChannelFlags LOOP  path = %s", BASS_ErrorGetCode(), strPath.c_str() );
+
         m_b3D = true;
         m_strPath = strPath;
         m_vecPosition = vecPosition;
