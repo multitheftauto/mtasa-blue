@@ -41,6 +41,9 @@ public:
 
     bool                    Play                    ( const SString& strPath, bool bLoop );
     bool                    Play3D                  ( const SString& strPath, const CVector& vecPosition, bool bLoop );
+
+    HSTREAM                 ConvertFileToMono       ( const SString& strPath );
+
     void                    PlayStream              ( const SString& strURL, bool bLoop, bool b3D = false, const CVector& vecPosition = CVector () );
 
     static void             PlayStreamIntern        ( void* arguments );
