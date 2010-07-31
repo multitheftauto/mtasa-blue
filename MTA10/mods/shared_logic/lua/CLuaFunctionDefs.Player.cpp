@@ -239,7 +239,7 @@ int CLuaFunctionDefs::IsPlayerDead ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "isPlayerDead" );
 
     // Failed
-    lua_pushnil ( luaVM );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
