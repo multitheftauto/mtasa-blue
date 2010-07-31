@@ -616,7 +616,7 @@ int CLuaFunctionDefs::IsElementWithinColShape ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "isElementWithinColShape" );
 
     // Failed
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -652,7 +652,7 @@ int CLuaFunctionDefs::IsElementWithinMarker( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "isElementWithinMarker" );
 
     // Failed
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -827,7 +827,7 @@ int CLuaFunctionDefs::IsElementAttached ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "isElementAttached" );
 
     // Failed
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -864,7 +864,7 @@ int CLuaFunctionDefs::GetElementAttachedTo ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "getElementAttachedTo" );
 
     // Failed
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -963,7 +963,7 @@ int CLuaFunctionDefs::IsElementLocal ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "isElementLocal" );
 
     // Failed
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -1203,7 +1203,7 @@ int CLuaFunctionDefs::IsElementStreamedIn ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "isElementStreamedIn" );
 
     // We failed
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -1241,7 +1241,7 @@ int CLuaFunctionDefs::IsElementStreamable ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "isElementStreamable" );
 
     // We failed
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -1269,7 +1269,7 @@ int CLuaFunctionDefs::IsElementOnScreen ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogBadType ( luaVM, "isElementOnScreen" );
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 

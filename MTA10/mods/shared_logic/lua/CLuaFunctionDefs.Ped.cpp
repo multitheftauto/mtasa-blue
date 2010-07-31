@@ -630,7 +630,7 @@ int CLuaFunctionDefs::IsPedChoking ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "isPedChoking" );
 
     // Failed
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -656,7 +656,7 @@ int CLuaFunctionDefs::IsPedDucked ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "isPedDucked" );
 
     // Failed
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -686,7 +686,7 @@ int CLuaFunctionDefs::IsPedInVehicle ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "isPedInVehicle" );
 
     // Failed
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 

@@ -164,7 +164,7 @@ int CLuaFunctionDefs::GetVehicleLandingGearDown ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getVehicleLandingGearDown" );
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -330,7 +330,7 @@ int CLuaFunctionDefs::GetVehicleSirensOn ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getVehicleSirensOn" );
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
@@ -403,7 +403,7 @@ int CLuaFunctionDefs::IsVehicleLocked ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogBadType ( luaVM, "isVehicleLocked" );
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
