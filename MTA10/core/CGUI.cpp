@@ -38,6 +38,8 @@ CLocalGUI::CLocalGUI ( void )
 
     m_bVisibleWindows = false;
     m_iVisibleWindows = 0;
+
+    m_pVersionUpdater = GetVersionUpdater ();
 }
 
 
@@ -45,6 +47,7 @@ CLocalGUI::~CLocalGUI ( void )
 {
     // Destroy all GUI elements
     DestroyObjects ();
+    delete m_pVersionUpdater;
 }
 
 
@@ -174,7 +177,7 @@ CD3DMGEng* CLocalGUI::GetRenderingLibrary ( void )
 void CLocalGUI::DoPulse ( void )
 {
     m_CommunityRegistration.DoPulse ();
-    m_VersionUpdater.DoPulse ();
+    m_pVersionUpdater->DoPulse ();
 }
 
 

@@ -4962,7 +4962,7 @@ bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
 
     if ( iCheckStatus & iEnableClientChecks )
     {
-        g_pCore->ShowMessageBox ( "Error", "San Andreas data files have been modified", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->InitiateDataFilesFix ();
         g_pCore->GetModManager ()->RequestUnload ();
         return false;
     }

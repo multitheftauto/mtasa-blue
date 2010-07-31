@@ -35,6 +35,7 @@ public:
     void                SetButton                   ( unsigned int uiButton, const SString& strText );
     void                SetCallback                 ( pfnQuestionCallback callback, void* ptr = NULL );
     unsigned int        PollButtons                 ( void );
+    bool                IsVisible                   ( void );
 
 private:
     bool                OnButtonClick               ( CGUIElement* pElement );
