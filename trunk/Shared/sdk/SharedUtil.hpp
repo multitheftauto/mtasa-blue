@@ -311,6 +311,32 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
 }
 
 //
+// Split in two
+//
+bool SString::Split ( const SString& strDelim, SString* pstrLeft, SString* pstrRight, bool bFromRight ) const
+{
+    unsigned long ulPos = bFromRight ? rfind ( strDelim ) : find ( strDelim );
+
+    if ( ulPos == npos )
+    {
+        if ( pstrLeft )
+            *pstrLeft = bFromRight ? "" : c_str ();
+        if ( pstrRight )
+            *pstrRight = bFromRight ? c_str () : "";
+        return false;
+    }
+
+    if ( pstrLeft )
+        *pstrLeft = substr ( 0, ulPos );
+
+    if ( pstrRight )
+        *pstrRight = substr ( ulPos + 1, length () - ( ulPos + 1 ) );
+ 
+    return true;
+}
+
+
+//
 // Replace any char in szOld with szNew
 //
 SString SString::Replace ( const char* szOld, const char* szNew ) const
