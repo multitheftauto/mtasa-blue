@@ -85,7 +85,7 @@ void CCommunityLogin::SetVisible ( bool bVisible )
     m_pWindow->SetVisible ( bVisible );
     if ( bVisible )
     {
-        SetLoginFrozen ( false );
+        SetFrozen ( false );
         m_pWindow->BringToFront ();
     }
 }
@@ -95,7 +95,7 @@ bool CCommunityLogin::IsVisible ( void )
     return m_pWindow->IsVisible ();
 }
 
-void CCommunityLogin::SetLoginFrozen ( bool bFrozen )
+void CCommunityLogin::SetFrozen ( bool bFrozen )
 {
     m_pEditUsername->SetEnabled ( !bFrozen );
     m_pEditPassword->SetEnabled ( !bFrozen );
@@ -111,7 +111,7 @@ bool CCommunityLogin::OnButtonLoginClick ( CGUIElement* pElement )
         g_pCore->ShowMessageBox ( "Login Error", "Invalid username/password", MB_BUTTON_OK | MB_ICON_ERROR );
         return true;
     }
-    SetLoginFrozen ( true );
+    SetFrozen ( true );
 
     // Hash password
     char szPassword[33];
@@ -145,7 +145,7 @@ void CCommunityLogin::OnLoginCallback ( bool bResult, char* szError, void *obj )
     CCommunityLogin* pLogin = reinterpret_cast < CCommunityLogin* > ( obj );
     if ( !bResult )
     {
-        pLogin->SetLoginFrozen ( false );
+        pLogin->SetFrozen ( false );
         g_pCore->ShowMessageBox ( "Login Error", szError, MB_BUTTON_OK | MB_ICON_ERROR );
     }
     else

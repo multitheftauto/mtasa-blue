@@ -134,10 +134,10 @@ void CCommunityRegistration::Open ( void )
 void CCommunityRegistration::SetVisible ( bool bVisible )
 {
     m_pWindow->SetVisible ( bVisible );
-    SetRegisterFrozen ( false );
+    SetFrozen ( false );
 }
 
-void CCommunityRegistration::SetRegisterFrozen ( bool bFrozen )
+void CCommunityRegistration::SetFrozen ( bool bFrozen )
 {
     m_pEditUsername->SetEnabled ( !bFrozen );
     m_pEditEmail->SetEnabled ( !bFrozen );
@@ -201,7 +201,7 @@ void CCommunityRegistration::DoPulse ( void )
                 g_pCore->ShowMessageBox ( "Success", "Successfully registered!", MB_BUTTON_OK | MB_ICON_INFO );
 
                 m_pWindow->SetVisible ( false );
-                SetRegisterFrozen ( false );
+                SetFrozen ( false );
                 m_strCommunityHash.clear ();
                 m_pImageCode->Clear ();
             }
@@ -212,18 +212,18 @@ void CCommunityRegistration::DoPulse ( void )
                 else
                     g_pCore->ShowMessageBox ( "Error", "Unexpected error", MB_BUTTON_OK | MB_ICON_ERROR );
 
-                SetRegisterFrozen ( false );
+                SetFrozen ( false );
             }
             else
             {
                 g_pCore->ShowMessageBox ( "Error", "Services currently unavaliable", MB_BUTTON_OK | MB_ICON_ERROR );
-                SetRegisterFrozen ( false );
+                SetFrozen ( false );
             }
         }
         else if ( ( CClientTime::GetTime () - m_ulStartTime ) > REGISTRATION_DELAY )
         {
             g_pCore->ShowMessageBox ( "Error", "Services currently unavaliable", MB_BUTTON_OK | MB_ICON_ERROR );
-            SetRegisterFrozen ( false );
+            SetFrozen ( false );
             // Timed out
             m_ulStartTime = 0;
         }
@@ -235,7 +235,7 @@ bool CCommunityRegistration::OnButtonCancelClick ( CGUIElement* pElement )
 {
     m_pWindow->SetVisible ( false );
 
-    SetRegisterFrozen ( false );
+    SetFrozen ( false );
     m_strCommunityHash.clear ();
     m_pImageCode->Clear ();
     m_pEditUsername->SetText("");
@@ -263,7 +263,7 @@ bool CCommunityRegistration::OnButtonRegisterClick ( CGUIElement* pElement )
     {
         if ( m_ulStartTime == 0 )
         {
-            SetRegisterFrozen ( true );
+            SetFrozen ( true );
             std::string strPassword;
             HashString ( m_pEditPassword->GetText().c_str(), strPassword );
 

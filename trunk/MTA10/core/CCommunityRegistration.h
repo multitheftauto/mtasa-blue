@@ -41,7 +41,7 @@ public:
     void                    SetVisible          ( bool bVisible );
     bool                    IsVisible           ( void )                        { return m_pWindow->IsVisible(); };
 
-    void                    SetRegisterFrozen   ( bool bFrozen );
+    void                    SetFrozen           ( bool bFrozen );
 
     void                    DoPulse             ( void );
 

@@ -118,8 +118,6 @@ void CCommunity::DoPulse ( void )
             CLocalGUI::GetSingleton ().GetMainMenu()->ChangeCommunityState ( m_bLoggedIn, m_strUsername );
             CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->OnLoginStateChange ( m_bLoggedIn );
 
-            g_pCore->ShowMessageBox ( "Welcome", SString("Welcome, %s", m_strUsername.c_str()), MB_BUTTON_OK | MB_ICON_INFO );
-
             // Perform callback
             if ( m_pCallback ) {
                 m_pCallback ( m_bLoggedIn, szVerificationMessages[Status], m_pVerificationObject );
