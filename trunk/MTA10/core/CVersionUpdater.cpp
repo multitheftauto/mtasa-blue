@@ -52,6 +52,15 @@ md5=12977BDDCCCE7171898F999773823CD5=
 end=ok
 */
 
+//
+// Note: Due to a bug, pre 1.0.4 1891 clients cannot download from http servers that send no data with the http header
+//
+// To help get round this:
+//  * Use 'mirror2' for http servers that send no data with the http header (e.g. Apache/2.2.9)
+//  * Use 'mirror' for http servers that send data with the http header (e.g. lighttpd, Apache/2)
+//  * Always use 'mirror' at least once to prevent locking out older clients
+//
+
 class CVersionUpdater;
 
 namespace
@@ -1222,6 +1231,7 @@ int CVersionUpdater::DoPollQueryResponse ( void )
                 if ( strPartList[0] == "filename" )     m_DownloadInfo.strFilename = strPartList[1];
                 if ( strPartList[0] == "filesize" )     m_DownloadInfo.uiFilesize = atoi ( strPartList[1] );
                 if ( strPartList[0] == "mirror" )       m_DownloadInfo.serverList.push_back ( strPartList[1] );
+                if ( strPartList[0] == "mirror2" )      m_DownloadInfo.serverList.push_back ( strPartList[1] );
                 if ( strPartList[0] == "md5" )          m_DownloadInfo.strMD5 = strPartList[1];
                 if ( strPartList[0] == "end" )          m_DownloadInfo.strEnd = strPartList[1];
             }
