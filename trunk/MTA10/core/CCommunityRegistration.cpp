@@ -5,6 +5,7 @@
 *  FILE:        core/CCommunityRegistration.cpp
 *  PURPOSE:     Community registration dialog class
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -95,8 +96,8 @@ void CCommunityRegistration::CreateWindows ( void )
     m_pButtonCancel->SetPosition ( CVector2D ( 200.0f, 270.0f ), false );
     m_pButtonCancel->SetSize ( CVector2D ( 70.0f, 20.0f ), false );
 
-    m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonClick, this ) );
-    m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonClick, this ) );
+    m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonRegisterClick, this ) );
+    m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonCancelClick, this ) );
 
     m_pWindow->SetAlpha ( 0.9f );
 }
@@ -130,11 +131,28 @@ void CCommunityRegistration::Open ( void )
 }
 
 
+void CCommunityRegistration::SetVisible ( bool bVisible )
+{
+    m_pWindow->SetVisible ( bVisible );
+    SetRegisterFrozen ( false );
+}
+
+void CCommunityRegistration::SetRegisterFrozen ( bool bFrozen )
+{
+    m_pEditUsername->SetEnabled ( !bFrozen );
+    m_pEditEmail->SetEnabled ( !bFrozen );
+    m_pEditPassword->SetEnabled ( !bFrozen );
+    m_pEditConfirm->SetEnabled ( !bFrozen );
+    m_pEditCode->SetEnabled ( !bFrozen );
+    m_pButtonRegister->SetEnabled ( !bFrozen );
+    m_pButtonRegister->SetText ( ( bFrozen ) ? "Registering..." : "Register" );
+}
+
+
 void CCommunityRegistration::DoPulse ( void )
 {
     if ( m_ulStartTime > 0 )
     {
-
         CHTTPBuffer buffer;
         if ( m_HTTP.GetData ( buffer ) )
         {
@@ -183,6 +201,7 @@ void CCommunityRegistration::DoPulse ( void )
                 g_pCore->ShowMessageBox ( "Success", "Successfully registered!", MB_BUTTON_OK | MB_ICON_INFO );
 
                 m_pWindow->SetVisible ( false );
+                SetRegisterFrozen ( false );
                 m_strCommunityHash.clear ();
                 m_pImageCode->Clear ();
             }
@@ -192,15 +211,19 @@ void CCommunityRegistration::DoPulse ( void )
                     g_pCore->ShowMessageBox ( "Error", &szBuffer[1], MB_BUTTON_OK | MB_ICON_ERROR );
                 else
                     g_pCore->ShowMessageBox ( "Error", "Unexpected error", MB_BUTTON_OK | MB_ICON_ERROR );
+
+                SetRegisterFrozen ( false );
             }
             else
             {
                 g_pCore->ShowMessageBox ( "Error", "Services currently unavaliable", MB_BUTTON_OK | MB_ICON_ERROR );
+                SetRegisterFrozen ( false );
             }
         }
         else if ( ( CClientTime::GetTime () - m_ulStartTime ) > REGISTRATION_DELAY )
         {
             g_pCore->ShowMessageBox ( "Error", "Services currently unavaliable", MB_BUTTON_OK | MB_ICON_ERROR );
+            SetRegisterFrozen ( false );
             // Timed out
             m_ulStartTime = 0;
         }
@@ -208,60 +231,57 @@ void CCommunityRegistration::DoPulse ( void )
 }
 
 
-bool CCommunityRegistration::OnButtonClick ( CGUIElement* pElement )
+bool CCommunityRegistration::OnButtonCancelClick ( CGUIElement* pElement )
 {
-    if ( pElement == m_pButtonCancel )
+    m_pWindow->SetVisible ( false );
+
+    SetRegisterFrozen ( false );
+    m_strCommunityHash.clear ();
+    m_pImageCode->Clear ();
+    m_pEditUsername->SetText("");
+    m_pEditEmail->SetText("");
+    m_pEditPassword->SetText("");
+    m_pEditConfirm->SetText("");
+    m_pEditCode->SetText("");
+    return true;
+}
+
+
+bool CCommunityRegistration::OnButtonRegisterClick ( CGUIElement* pElement )
+{
+    if ( m_pEditUsername->GetText().empty() )
+        g_pCore->ShowMessageBox ( "Error", "Username missing", MB_BUTTON_OK | MB_ICON_INFO );
+    else if ( m_pEditEmail->GetText().empty() )
+        g_pCore->ShowMessageBox ( "Error", "Email missing", MB_BUTTON_OK | MB_ICON_INFO );
+    else if ( m_pEditPassword->GetText().empty() || m_pEditConfirm->GetText().empty() )
+        g_pCore->ShowMessageBox ( "Error", "Password missing", MB_BUTTON_OK | MB_ICON_INFO );
+    else if ( m_pEditPassword->GetText() != m_pEditConfirm->GetText() )
+        g_pCore->ShowMessageBox ( "Error", "Passwords do not match", MB_BUTTON_OK | MB_ICON_INFO );
+    else if ( m_pEditCode->GetText().empty() )
+        g_pCore->ShowMessageBox ( "Error", "Validation code missing", MB_BUTTON_OK | MB_ICON_INFO );
+    else
     {
-        m_pWindow->SetVisible ( false );
-        m_strCommunityHash.clear ();
-        m_pImageCode->Clear ();
-    }
-    else if ( pElement == m_pButtonRegister )
-    {
-        if ( m_pEditUsername->GetText().empty() )
-            g_pCore->ShowMessageBox ( "Error", "Username missing", MB_BUTTON_OK | MB_ICON_INFO );
-        else if ( m_pEditEmail->GetText().empty() )
-            g_pCore->ShowMessageBox ( "Error", "Email missing", MB_BUTTON_OK | MB_ICON_INFO );
-        else if ( m_pEditPassword->GetText().empty() || m_pEditConfirm->GetText().empty() )
-            g_pCore->ShowMessageBox ( "Error", "Password missing", MB_BUTTON_OK | MB_ICON_INFO );
-        else if ( m_pEditPassword->GetText() != m_pEditConfirm->GetText() )
-            g_pCore->ShowMessageBox ( "Error", "Passwords do not match", MB_BUTTON_OK | MB_ICON_INFO );
-        else if ( m_pEditCode->GetText().empty() )
-            g_pCore->ShowMessageBox ( "Error", "Validation code missing", MB_BUTTON_OK | MB_ICON_INFO );
-        else
+        if ( m_ulStartTime == 0 )
         {
-            /*
-            // Compare entered code to the hash we recieved
-            std::string strCode;
-            HashString ( m_pEditCode->GetText().c_str(), strCode );
-            // case insesitive
-            if ( stricmp ( strCode.c_str(), m_strCommunityHash.c_str() ) != 0 )
-            {
-                g_pCore->ShowMessageBox ( "Error", "Invalid validation code", MB_BUTTON_OK | MB_ICON_INFO );
-                return true;
-            }
-            */
-            if ( m_ulStartTime == 0 )
-            {
-                std::string strPassword;
-                HashString ( m_pEditPassword->GetText().c_str(), strPassword );
+            SetRegisterFrozen ( true );
+            std::string strPassword;
+            HashString ( m_pEditPassword->GetText().c_str(), strPassword );
 
-                // Create the URL
-                std::string strURL =
-                    std::string ( REGISTRATION_URL ) +
-                    "?action=register" +
-                    "&username=" + m_pEditUsername->GetText() + 
-                    "&password=" + strPassword +
-                    "&email=" + m_pEditEmail->GetText() +
-                    "&code=" + m_pEditCode->GetText() +
-                    "&hash=" + m_strCommunityHash;
+            // Create the URL
+            std::string strURL =
+                std::string ( REGISTRATION_URL ) +
+                "?action=register" +
+                "&username=" + m_pEditUsername->GetText() + 
+                "&password=" + strPassword +
+                "&email=" + m_pEditEmail->GetText() +
+                "&code=" + m_pEditCode->GetText() +
+                "&hash=" + m_strCommunityHash;
 
-                // Perform the HTTP request
-                m_HTTP.Get ( strURL );
+            // Perform the HTTP request
+            m_HTTP.Get ( strURL );
 
-                // Store the start time
-                m_ulStartTime = CClientTime::GetTime ();
-            }
+            // Store the start time
+            m_ulStartTime = CClientTime::GetTime ();
         }
     }
     return true;

@@ -5,6 +5,7 @@
 *  FILE:        core/CCommunityRegistration.h
 *  PURPOSE:     Header file for community registration dialog
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -15,8 +16,8 @@ class CCommunityRegistration;
 #ifndef __CCOMMUNITYREGISTRATION_H
 #define __CCOMMUNITYREGISTRATION_H
 
-#define REGISTRATION_DELAY              3000
-#define REGISTRATION_URL                "http://dp3.community.mtasa.com/core/1.0/register.php"
+#define REGISTRATION_DELAY              9000
+#define REGISTRATION_URL                "http://dp3.community.mtasa.com/core/1.1/register.php"
 #define REGISTRATION_TEMP_FILE          "MTA\\temp.png"
 
 enum eRegistrationResult
@@ -37,8 +38,10 @@ public:
 
     void                    Open                ( void );
 
-    void                    SetVisible          ( bool bVisible )               { return m_pWindow->SetVisible ( bVisible ); };
+    void                    SetVisible          ( bool bVisible );
     bool                    IsVisible           ( void )                        { return m_pWindow->IsVisible(); };
+
+    void                    SetRegisterFrozen   ( bool bFrozen );
 
     void                    DoPulse             ( void );
 
@@ -50,7 +53,8 @@ protected:
 private:
 
     // GUI elements
-    bool                    OnButtonClick       ( CGUIElement* pElement );
+    bool                    OnButtonRegisterClick       ( CGUIElement* pElement );
+    bool                    OnButtonCancelClick         ( CGUIElement* pElement );
 
     CGUIWindow*             m_pWindow;
 

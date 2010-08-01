@@ -263,8 +263,6 @@ CSettings::CSettings ( void )
     /**
      *  Community tab
      **/
-    // Hide
-    m_pTabs->DeleteTab ( pTabCommunity );
 
     m_pLabelCommunity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, CORE_SETTINGS_COMMUNITY_TEXT ) );
     m_pLabelCommunity->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
@@ -1583,9 +1581,19 @@ bool CSettings::OnLoginButtonClick ( CGUIElement* pElement )
 {
     if ( strcmp ( m_pButtonLogin->GetText().c_str(), "Login" ) == 0 )
     {
-        if ( !m_pEditUser->GetText().empty() &&
-            !m_pEditPass->GetText().empty() )
+        if ( m_pEditUser->GetText().empty() ||
+            m_pEditPass->GetText().empty() )
         {
+            g_pCore->ShowMessageBox ( "Login Error", "Invalid username/password", MB_BUTTON_OK | MB_ICON_ERROR );
+            return true;
+        }
+        else
+        {
+            m_pEditUser->SetEnabled ( false );
+            m_pEditPass->SetEnabled ( false );
+            m_pButtonLogin->SetEnabled ( false );
+            m_pButtonLogin->SetText ( "Logging in..." );
+
             // Hash password
             char szPassword[33];
             std::string strPassword;
@@ -1631,7 +1639,7 @@ void CSettings::OnLoginCallback ( bool bResult, char* szError, void* obj )
 {   // This callback function is called by CCommunity whenever an error has occurred
     if ( !bResult )
     {
-        g_pCore->ShowMessageBox ( "Serial Error", szError, MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( "Login Error", szError, MB_BUTTON_OK | MB_ICON_ERROR );
     }
 }
 
@@ -1641,6 +1649,7 @@ void CSettings::OnLoginStateChange ( bool bResult )
     m_pEditUser->SetEnabled ( !bResult );
     m_pEditPass->SetEnabled ( !bResult );
     m_pButtonLogin->SetText ( ( bResult ) ? "Logout" : "Login" );
+    m_pButtonLogin->SetEnabled ( true );
     m_pButtonRegister->SetVisible ( !bResult );
 }
 
