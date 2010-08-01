@@ -5,6 +5,7 @@
 *  FILE:        core/CCommunityLogin.cpp
 *  PURPOSE:     Header file for community login dialog
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -25,6 +26,8 @@ public:
 
     void                    SetVisible          ( bool bVisible );
     bool                    IsVisible           ( void );
+
+    void                    SetLoginFrozen      ( bool bFrozen );
 
     void                    SetCallback         ( BROWSERLOGINCALLBACK );
     BROWSERLOGINCALLBACK    GetCallback         ( void );
