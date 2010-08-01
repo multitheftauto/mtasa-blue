@@ -27,7 +27,7 @@ public:
     void                    SetVisible          ( bool bVisible );
     bool                    IsVisible           ( void );
 
-    void                    SetLoginFrozen      ( bool bFrozen );
+    void                    SetFrozen           ( bool bFrozen );
 
     void                    SetCallback         ( BROWSERLOGINCALLBACK );
     BROWSERLOGINCALLBACK    GetCallback         ( void );
