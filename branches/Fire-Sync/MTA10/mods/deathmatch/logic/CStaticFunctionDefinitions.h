@@ -243,7 +243,7 @@ public:
     static bool                         CreateExplosion                     ( CVector& vecPosition, unsigned char ucType, bool bMakeSound, float fCamShake, bool bDamaging );
 
     // Fire funcs
-    static bool                         CreateFire                          ( CVector& vecPosition, float fSize );
+    static CClientFire*                 CreateFire                          ( CResource& Resource, CVector& vecPosition, float fSize );
 
     // Audio funcs
     static bool                         PlayMissionAudio                    ( const CVector& vecPosition, unsigned short usSound );

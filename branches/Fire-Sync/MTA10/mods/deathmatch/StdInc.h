@@ -88,6 +88,7 @@
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
+#include <CClientFire.h>
 
 // Deathmatch includes
 #include "Client.h"

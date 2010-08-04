@@ -23,6 +23,7 @@ class CClientManager;
 #include "CClientColModelManager.h"
 #include "CClientDFFManager.h"
 #include "CClientEntity.h"
+#include "CClientFireManager.h"
 #include "CClientGUIManager.h"
 #include "CClientHandlingManager.h"
 #include "CClientMarkerManager.h"
@@ -90,6 +91,7 @@ public:
     inline CClientExplosionManager*     GetExplosionManager         ( void )        { return m_pExplosionManager; }
     inline CClientPacketRecorder*       GetPacketRecorder           ( void )        { return m_pPacketRecorder; }
     inline CClientWaterManager*         GetWaterManager             ( void )        { return m_pWaterManager; }
+    inline CClientFireManager*          GetFireManager              ( void )        { return m_pFireManager; }
 
     inline CGUITexture*                 GetConnectionTroubleTexture ( void )        { return m_pConnectionTroubleTexture; }
 
@@ -111,6 +113,7 @@ private:
     CClientCivilianManager*             m_pCivilianManager;
     CClientColModelManager*             m_pColModelManager;
     CClientDFFManager*                  m_pDFFManager;
+    CClientFireManager*                 m_pFireManager;
     CClientGUIManager*                  m_pGUIManager;
     CClientMarkerManager*               m_pMarkerManager;
     CClientStreamer*                    m_pMarkerStreamer;

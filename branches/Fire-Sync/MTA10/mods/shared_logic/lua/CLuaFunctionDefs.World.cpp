@@ -69,6 +69,8 @@ int CLuaFunctionDefs::CreateExplosion ( lua_State* luaVM )
 int CLuaFunctionDefs::CreateFire ( lua_State* luaVM )
 {
     // Grab the argument types
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    CResource* pResource = pLuaMain->GetResource ();
     int iArgument1 = lua_type ( luaVM, 1 );
     int iArgument2 = lua_type ( luaVM, 2 );
     int iArgument3 = lua_type ( luaVM, 3 );
@@ -84,12 +86,8 @@ int CLuaFunctionDefs::CreateFire ( lua_State* luaVM )
         float fSize = 1.8f;
         if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
             fSize = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-
-        if ( CStaticFunctionDefinitions::CreateFire ( vecPosition, fSize ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
+        lua_pushelement ( luaVM, CStaticFunctionDefinitions::CreateFire ( *pResource, vecPosition, fSize ) );
+        return 1;
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "createFire" );

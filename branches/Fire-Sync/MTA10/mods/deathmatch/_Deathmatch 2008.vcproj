@@ -709,6 +709,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientFire.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFireManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientGroups.cpp"
 					>
 				</File>
@@ -1208,6 +1216,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\shared_logic\CClientFireManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Client.h"
 				>
 			</File>
@@ -1580,6 +1592,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientExplosionManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFire.h"
 					>
 				</File>
 				<File
