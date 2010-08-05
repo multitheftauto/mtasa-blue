@@ -465,7 +465,7 @@ public:
     static bool                 IsGlitchEnabled                     ( const std::string& strGlitchName, bool& bEnabled );
     static bool                 SetCloudsEnabled                    ( bool bEnabled );
     static bool                 GetCloudsEnabled                    ( void );
-    static bool                 SetTrafficLightState                ( unsigned char ucState );
+    static bool                 SetTrafficLightState                ( unsigned char ucState, bool bForced = false );
     static bool                 SetTrafficLightsLocked              ( bool bLocked );
 
     // Loaded Map Functions

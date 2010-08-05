@@ -7038,14 +7038,16 @@ bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char u
 
     return false;
 }
-bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
+bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState, bool bForced )
 {
-    if ( ucState >= 0 && ucState < 9 )
+    if ( ucState >= 0 && ucState < 13 )
     {
         g_pGame->SetTrafficLightState ( ucState );
  
         CBitStream BitStream;
-        BitStream.pBitStream->WriteBits ( &ucState, 3 );
+        BitStream.pBitStream->WriteBits ( &ucState, 4 );
+        BitStream.pBitStream->WriteBit  ( bForced );
+
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAFFIC_LIGHT_STATE, *BitStream.pBitStream ) );
 
         return true;
