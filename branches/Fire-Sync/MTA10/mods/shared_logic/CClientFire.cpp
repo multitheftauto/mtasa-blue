@@ -18,6 +18,7 @@ CClientFire::CClientFire ( CClientManager* pManager, ElementID ID, CVector& vecP
     // TODO: Add a server-side fire manager
     m_pManager = pManager->GetFireManager ( ); // needs verification
     m_pFire = g_pGame->GetFireManager ( )->StartFire ( vecPosition, fSize );
+    SetSilent ( bSilent );
     SetTypeName ( "fire" );
     m_pManager->AddToList ( this ); 
 }
@@ -26,20 +27,10 @@ CClientFire::~CClientFire ( )
 {
     Unlink ( );
     if ( m_pFire )
-        m_pFire->Extinguish ( );
+        Extinguish ( );
 }
 
-void CClientFire::GetPosition ( CVector& vecPosition ) const
-{
-    vecPosition = *m_pFire->GetPosition ( );
-}
-
-void CClientFire::SetPosition ( const CVector& vecPosition )
-{
-    //m_pFire->SetPosition ( vecPosition );
-}
-
-void CClientFire::Unlink ( ) // apparently necessary.
+void CClientFire::Unlink ( )
 {
     m_pManager->RemoveFromList ( this );
 }

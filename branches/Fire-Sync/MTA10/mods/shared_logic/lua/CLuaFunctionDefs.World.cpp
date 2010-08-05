@@ -84,9 +84,11 @@ int CLuaFunctionDefs::CreateFire ( lua_State* luaVM )
             static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
             static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
         float fSize = 1.8f;
+        bool bSilent = false;
         if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
             fSize = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-        lua_pushelement ( luaVM, CStaticFunctionDefinitions::CreateFire ( *pResource, vecPosition, fSize ) );
+        bSilent = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
+        lua_pushelement ( luaVM, CStaticFunctionDefinitions::CreateFire ( *pResource, vecPosition, fSize, bSilent ) );
         return 1;
     }
     else
@@ -95,6 +97,7 @@ int CLuaFunctionDefs::CreateFire ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 
 int CLuaFunctionDefs::GetTime_ ( lua_State* luaVM )

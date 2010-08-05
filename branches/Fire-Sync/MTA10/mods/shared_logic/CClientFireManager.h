@@ -29,12 +29,6 @@ class CClientFireManager
     void                                            DeleteAll                   ( void );
     bool                                            Exists                      ( CClientFire* pFire );
 
-    /*bool                                            GetWaterLevel               ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
-    bool                                            SetWaterLevel               ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL );
-    bool                                            SetWaterLevel               ( CClientFire* pWater, float fLevel, void* pChangeSource = NULL );
-    float                                           GetWaveLevel                ( );
-    void                                            SetWaveLevel                ( float fWaveLevel );*/
-
     inline std::list < CClientFire* > ::const_iterator   IterBegin              ( void )                        { return m_List.begin ( ); };
     inline std::list < CClientFire* > ::const_iterator   IterEnd                ( void )                        { return m_List.end ( ); };
 
