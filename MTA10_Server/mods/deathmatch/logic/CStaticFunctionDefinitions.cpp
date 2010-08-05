@@ -774,6 +774,13 @@ bool CStaticFunctionDefinitions::GetElementModel ( CElement* pElement, unsigned 
 }
 
 
+bool CStaticFunctionDefinitions::GetElementAttachedOffsets ( CElement* pElement, CVector & vecPosition, CVector & vecRotation )
+{
+    pElement->GetAttachedOffsets ( vecPosition, vecRotation );
+    return true;
+}
+
+
 CElement* CStaticFunctionDefinitions::GetElementSyncer ( CElement* pElement )
 {
     assert ( pElement );
