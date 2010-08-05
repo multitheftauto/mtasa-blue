@@ -267,7 +267,7 @@ int CLuaWorldDefs::setTrafficLightState ( lua_State* luaVM )
     {
         unsigned char ucTrafficLightState = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
 
-        if ( CStaticFunctionDefinitions::SetTrafficLightState ( ucTrafficLightState ) )
+        if ( CStaticFunctionDefinitions::SetTrafficLightState ( ucTrafficLightState, true ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

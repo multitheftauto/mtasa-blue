@@ -225,8 +225,11 @@ void CWorldRPCs::SetTrafficLightState ( NetBitStreamInterface& bitStream )
 {
     char ucTrafficLightState;
 
-    if ( bitStream.ReadBits ( &ucTrafficLightState, 3 ) )
+    if ( bitStream.ReadBits ( &ucTrafficLightState, 4 ) )
     {
-        g_pMultiplayer->SetTrafficLightState ( (unsigned char)* &ucTrafficLightState );
+       bool bForced = bitStream.ReadBit();
+       // We ignore updating the serverside traffic light state if it's blocked, unless script forced it
+        if ( bForced || !g_pMultiplayer->GetTrafficLightsLocked() )
+            g_pMultiplayer->SetTrafficLightState ( (unsigned char)* &ucTrafficLightState );
     }
 }

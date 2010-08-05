@@ -3156,16 +3156,20 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
 {
     _asm pushad
 
-    if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 )
+    if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 || ucTrafficLightState == 9 )
     {
-        ucDesignatedLightState = 0;
+        ucDesignatedLightState = 0; //Green
     }
-    else if ( ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7 )
+    else if ( ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7 || ucTrafficLightState == 10 )
     {
-        ucDesignatedLightState = 1;
+        ucDesignatedLightState = 1; //Amber
+    }
+    else if ( ucTrafficLightState == 12 )
+    {
+        ucDesignatedLightState = 4;  //Off
     }
     else
-        ucDesignatedLightState = 2;
+        ucDesignatedLightState = 2;  //Red
 
     _asm
     {
@@ -3179,16 +3183,20 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
 {
     _asm pushad
 
-    if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 )
+    if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 || ucTrafficLightState == 9 )
     {
-        ucDesignatedLightState = 0;
+        ucDesignatedLightState = 0; //Green
     }
-    else if ( ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8 )
+    else if ( ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8 || ucTrafficLightState == 10 )
     {
-        ucDesignatedLightState = 1;
+        ucDesignatedLightState = 1; //Amber
+    }
+    else if ( ucTrafficLightState == 12 )
+    {
+        ucDesignatedLightState = 4; //Off
     }
     else
-        ucDesignatedLightState = 2;
+        ucDesignatedLightState = 2; //Red
 
     _asm
     {
@@ -3206,10 +3214,7 @@ unsigned char CMultiplayerSA::GetTrafficLightState ()
 
 void CMultiplayerSA::SetTrafficLightState ( unsigned char ucState )
 {
-    if ( bTrafficLightsBlocked == false )
-    {
-        ucTrafficLightState = ucState;
-    }
+    ucTrafficLightState = ucState;
 }
 
 bool CMultiplayerSA::GetTrafficLightsLocked ()
