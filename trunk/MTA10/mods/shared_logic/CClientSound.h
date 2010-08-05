@@ -48,6 +48,8 @@ public:
 
     static void             PlayStreamIntern        ( void* arguments );
 
+    void                    GetMeta                  ( void );
+
     void                    ThreadCallback          ( HSTREAM pSound );
 
     void                    Stop                    ( void );
@@ -115,6 +117,9 @@ private:
     HANDLE                  m_pThread;
 
     SString                 m_strPath;
+
+    SString                 m_strStreamName;
+    SString                 m_strStreamTitle;
 };
 
 #endif
