@@ -74,7 +74,9 @@ public:
     static bool                 GetElementHealth                    ( CElement* pElement, float& fHealth );
     static bool                 GetElementModel                     ( CElement* pElement, unsigned short & usModel );
     static bool                 IsElementInWater                    ( CElement* pElement, bool& bInWater );
+    static bool                 GetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation );
     static CElement*            GetElementSyncer                    ( CElement* pElement );
+
     // Element set funcs
     static bool                 ClearElementVisibleTo               ( CElement* pElement );
     static bool                 SetElementID                        ( CElement* pElement, const char* szID );

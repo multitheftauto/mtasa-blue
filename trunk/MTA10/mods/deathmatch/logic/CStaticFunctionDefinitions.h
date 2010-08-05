@@ -64,6 +64,7 @@ public:
     static bool                         GetElementRadius                    ( CClientEntity& Entity, float &fRadius );
     static CClientEntity*               GetElementAttachedTo                ( CClientEntity& Entity );
     static bool                         GetElementDistanceFromCentreOfMassToBaseOfModel ( CClientEntity& Entity, float& fDistance );
+    static bool                         GetElementAttachedOffsets           ( CClientEntity& Entity, CVector & vecPosition, CVector & vecRotation );
     static bool                         GetElementAlpha                     ( CClientEntity& Entity, unsigned char& ucAlpha );
     static bool                         IsElementOnScreen                   ( CClientEntity& Entity, bool& bOnScreen );
     static bool                         GetElementHealth                    ( CClientEntity& Entity, float& fHealth );
