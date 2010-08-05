@@ -4128,9 +4128,9 @@ bool CStaticFunctionDefinitions::DetonateSatchels(void)
     return false;
 }
 
-CClientFire* CStaticFunctionDefinitions::CreateFire(CResource& Resource, CVector& vecPosition, float fSize)
+CClientFire* CStaticFunctionDefinitions::CreateFire(CResource& Resource, CVector& vecPosition, float fSize, bool bSilent)
 {
-    CClientFire* pFire = new CClientFire(m_pManager, INVALID_ELEMENT_ID, vecPosition, fSize);
+    CClientFire* pFire = new CClientFire(m_pManager, INVALID_ELEMENT_ID, vecPosition, fSize, bSilent);
     if (pFire) {
         pFire->SetParent(Resource.GetResourceDynamicEntity());
         return pFire;

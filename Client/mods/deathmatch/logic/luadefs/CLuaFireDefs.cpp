@@ -18,20 +18,22 @@ void CLuaFireDefs::LoadFunctions(void)
 
 int CLuaFireDefs::CreateFire(lua_State* luaVM)
 {
-    // bool createFire ( float x, float y, float z [, float size = 1.8 ] )
+    // bool createFire ( float x, float y, float z [, float size = 1.8, bool bSilent = false ] )
     CVector vecPosition;
     float   fSize;
+    bool    bSilent;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecPosition);
     argStream.ReadNumber(fSize, 1.8f);
+    argStream.ReadBool(bSilent, false);
 
     if (!argStream.HasErrors())
     {
         CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         CResource* pResource = pLuaMain->GetResource();
     
-        lua_pushelement(luaVM, CStaticFunctionDefinitions::CreateFire(*pResource, vecPosition, fSize));
+        lua_pushelement(luaVM, CStaticFunctionDefinitions::CreateFire(*pResource, vecPosition, fSize, bSilent));
         return 1;
     }
     else
