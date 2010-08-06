@@ -117,6 +117,7 @@ public:
     LUA_DECLARE ( GetAttachedElements );
     LUA_DECLARE ( GetElementDistanceFromCentreOfMassToBaseOfModel );
     LUA_DECLARE ( IsElementLocal );
+    LUA_DECLARE ( GetElementAttachedOffsets );
     LUA_DECLARE ( GetElementAlpha );
     LUA_DECLARE ( IsElementOnScreen );
     LUA_DECLARE ( GetElementHealth );
@@ -419,7 +420,7 @@ public:
     LUA_DECLARE ( SetPickupType );
 
     // Cam get funcs
-    LUA_DECLARE ( GetCameraMode );
+    LUA_DECLARE ( GetCameraView );
     LUA_DECLARE ( GetCameraMatrix );
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
@@ -430,6 +431,7 @@ public:
     LUA_DECLARE ( SetCameraInterior );
     LUA_DECLARE ( FadeCamera );
     LUA_DECLARE ( SetCameraClip );
+    LUA_DECLARE ( SetCameraView );
 
     // Cursor funcs
     LUA_DECLARE ( GetCursorPosition );

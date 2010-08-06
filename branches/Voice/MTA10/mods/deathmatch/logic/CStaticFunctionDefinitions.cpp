@@ -512,6 +512,13 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
 }
 
 
+bool CStaticFunctionDefinitions::GetElementAttachedOffsets ( CClientEntity & Entity, CVector & vecPosition, CVector & vecRotation )
+{
+    Entity.GetAttachedOffsets ( vecPosition, vecRotation );
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetElementAlpha ( CClientEntity& Entity, unsigned char& ucAlpha )
 {
     switch ( Entity.GetType () )
@@ -1026,7 +1033,7 @@ bool CStaticFunctionDefinitions::DetachElements ( CClientEntity& Entity, CClient
     {
         if ( pAttachedToEntity == NULL || pActualAttachedToEntity == pAttachedToEntity )
         {
-            Entity.AttachTo ( NULL );            
+            Entity.AttachTo ( NULL );
             return true;
         }
     }
@@ -3415,20 +3422,6 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CClientEntity& Entity, const ch
 }
 
 
-bool CStaticFunctionDefinitions::GetCameraMode ( char * szBuffer, size_t sizeBuffer )
-{
-    assert ( szBuffer );
-    assert ( sizeBuffer );
-
-    if ( m_pCamera->IsInFixedMode () )
-        strncpy ( szBuffer, "fixed", sizeBuffer );
-    else
-        strncpy ( szBuffer, "player", sizeBuffer );
-
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::GetCameraMatrix ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV )
 {
     m_pCamera->GetPosition ( vecPosition );
@@ -3531,6 +3524,17 @@ bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, uns
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetCameraView ( unsigned short ucMode )
+{
+    m_pCamera->SetCameraView ( (eVehicleCamMode) ucMode );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetCameraView ( unsigned short& ucMode )
+{
+    ucMode = m_pCamera->GetCameraView();
+    return true;
+}
 
 bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVector& vecWorld )
 {
@@ -4953,7 +4957,7 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
 }
 bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
 {
-    if ( ucState >= 0 && ucState < 9 )
+    if ( ucState >= 0 && ucState < 13 )
     {
         g_pMultiplayer->SetTrafficLightState ( ucState );
         return true;

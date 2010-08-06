@@ -14,7 +14,7 @@
 
 #include "StdInc.h"
 
-CMapEvent::CMapEvent ( CLuaMain* pMain, const char* szName, int iLuaFunction, bool bPropagated )
+CMapEvent::CMapEvent ( CLuaMain* pMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
 {
     // Init
     m_pMain = pMain;

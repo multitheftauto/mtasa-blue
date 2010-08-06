@@ -109,8 +109,9 @@ public:
     int                 GetVisibleWindows           ( );
     void                SetVisibleWindows           ( bool bEnable );
 
-    void                InitiateUpdate              ( const char* szType, const char* szHost )      { m_VersionUpdater.InitiateUpdate ( szType, szHost ); }
-    bool                IsOptionalUpdateInfoRequired( const char* szHost )                          { return m_VersionUpdater.IsOptionalUpdateInfoRequired ( szHost ); }
+    void                InitiateUpdate              ( const char* szType, const char* szHost )      { m_pVersionUpdater->InitiateUpdate ( szType, szHost ); }
+    bool                IsOptionalUpdateInfoRequired( const char* szHost )                          { return m_pVersionUpdater->IsOptionalUpdateInfoRequired ( szHost ); }
+    void                InitiateDataFilesFix        ( void )                                        { m_pVersionUpdater->InitiateDataFilesFix (); }
 
 private:
     void                    UpdateCursor                ( void );
@@ -125,7 +126,7 @@ private:
     CD3DMGEng*              m_pRendererLibrary;
 
     CCommunityRegistration  m_CommunityRegistration;
-    CVersionUpdater         m_VersionUpdater;
+    CVersionUpdaterInterface* m_pVersionUpdater;
 
 
     CGUILabel*              m_pLabelVersionTag;

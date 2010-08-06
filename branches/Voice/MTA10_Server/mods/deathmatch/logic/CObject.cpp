@@ -162,7 +162,7 @@ const CVector& CObject::GetPosition ( void )
         m_vecPosition = m_moveData.vecStartPosition + vecJourney;
     }
 
-    UpdateSpatialData ();
+    UpdateSpatialData ();     // Not sure this is necessary
     // Finally, return it
     return m_vecPosition;
 }

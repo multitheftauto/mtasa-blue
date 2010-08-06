@@ -39,8 +39,7 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
         g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad AC3", BASS_ErrorGetCode() );
 
     BASS_SetConfig ( BASS_CONFIG_NET_PREBUF, 0 );
-    // Allow playlists
-    BASS_SetConfig ( BASS_CONFIG_NET_PLAYLIST, 1 );
+    BASS_SetConfig ( BASS_CONFIG_NET_PLAYLIST, 1 ); // Allow playlists
 
     UpdateVolume ();
 

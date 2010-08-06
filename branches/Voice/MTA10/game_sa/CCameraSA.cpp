@@ -8,6 +8,7 @@
 *               Christian Myhre Lundheim <>
 *               Jax <>
 *               Cecill Etheredge <ijsf@gmx.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -543,3 +544,13 @@ void _declspec(naked) HOOK_Camera_CollisionDetection ()
     }
 }
 
+BYTE CCameraSA::GetCameraView ( void )
+{
+    // TODO: Add support for ped camera view, this will only work on vehicles for now.
+    return *(BYTE *)VAR_VehicleCameraView;
+}
+
+VOID CCameraSA::SetCameraView ( BYTE dwCamMode )
+{
+    *(BYTE *)VAR_VehicleCameraView = dwCamMode;
+}

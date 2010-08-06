@@ -76,16 +76,21 @@ void CGUITabPanel_Impl::DeleteTab ( CGUITab* pTab )
 CGUITab* CGUITabPanel_Impl::GetSelectedTab ( void )
 {
     CEGUI::TabControl* pControl = reinterpret_cast < CEGUI::TabControl* > ( m_pWindow );
-    CEGUI::Window* pTab = pControl->getTabContentsAtIndex ( pControl->getSelectedTabIndex() );
 
-    try
+    if ( pControl->getTabCount() > 0 )
     {
-        return reinterpret_cast < CGUITab* > ( pTab->getUserData() );
+        CEGUI::Window* pTab = pControl->getTabContentsAtIndex ( pControl->getSelectedTabIndex() );
+
+        try
+        {
+            return reinterpret_cast < CGUITab* > ( pTab->getUserData() );
+        }
+        catch ( CEGUI::Exception )
+        {
+            return NULL;
+        }
     }
-    catch ( CEGUI::Exception )
-    {
-        return NULL;
-    }
+    return NULL;
 }
 
 

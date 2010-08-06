@@ -635,7 +635,7 @@ int CLuaFunctionDefs::GUIGetSelectedTab ( lua_State* luaVM )
             }
             else
             {
-                lua_pushnil ( luaVM );
+                lua_pushboolean ( luaVM, false );
                 return 1;
             }
         }

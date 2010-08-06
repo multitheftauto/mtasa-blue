@@ -180,6 +180,34 @@ DWORD RETURN_CrashFix_Misc2b =                              0x6B1F6C;
 DWORD RETURN_CrashFix_Misc3 =                               0x645FDF;
 void CPlayerPed__ProcessControl_Abort();
 
+#define HOOKPOS_CrashFix_Misc4                              0x4F02D2
+DWORD RETURN_CrashFix_Misc4a =                              0x4F02D7;
+DWORD RETURN_CrashFix_Misc4b =                              0x4F0B07;
+
+#define HOOKPOS_CrashFix_Misc5                              0x5DF949
+DWORD RETURN_CrashFix_Misc5a =                              0x5DF950;
+DWORD RETURN_CrashFix_Misc5b =                              0x5DFCC4;
+
+#define HOOKPOS_CrashFix_Misc6                              0x4D1750
+DWORD RETURN_CrashFix_Misc6a =                              0x4D1755;
+DWORD RETURN_CrashFix_Misc6b =                              0x4D1A44;
+
+#define HOOKPOS_CrashFix_Misc7                              0x417BF8
+DWORD RETURN_CrashFix_Misc7a =                              0x417BFD;
+DWORD RETURN_CrashFix_Misc7b =                              0x417BFF;
+
+#define HOOKPOS_CrashFix_Misc8                              0x73485D
+DWORD RETURN_CrashFix_Misc8a =                              0x734862;
+DWORD RETURN_CrashFix_Misc8b =                              0x734871;
+
+#define HOOKPOS_CrashFix_Misc9                              0x738B64
+DWORD RETURN_CrashFix_Misc9a =                              0x738B6A;
+DWORD RETURN_CrashFix_Misc9b =                              0x73983A;
+
+#define HOOKPOS_CrashFix_Misc10                              0x5334FE
+DWORD RETURN_CrashFix_Misc10a =                              0x533504;
+
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -299,6 +327,13 @@ void HOOK_CPhysical_ProcessCollisionSectorList ();
 void HOOK_CrashFix_Misc1 ();
 void HOOK_CrashFix_Misc2 ();
 void HOOK_CrashFix_Misc3 ();
+void HOOK_CrashFix_Misc4 ();
+void HOOK_CrashFix_Misc5 ();
+void HOOK_CrashFix_Misc6 ();
+void HOOK_CrashFix_Misc7 ();
+void HOOK_CrashFix_Misc8 ();
+void HOOK_CrashFix_Misc9 ();
+void HOOK_CrashFix_Misc10 ();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
@@ -418,6 +453,13 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc1, (DWORD)HOOK_CrashFix_Misc1, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc2, (DWORD)HOOK_CrashFix_Misc2, 9 );
     HookInstall(HOOKPOS_CrashFix_Misc3, (DWORD)HOOK_CrashFix_Misc3, 6 );
+    HookInstall(HOOKPOS_CrashFix_Misc4, (DWORD)HOOK_CrashFix_Misc4, 5 );
+    HookInstall(HOOKPOS_CrashFix_Misc5, (DWORD)HOOK_CrashFix_Misc5, 7 );
+    HookInstall(HOOKPOS_CrashFix_Misc6, (DWORD)HOOK_CrashFix_Misc6, 5 );
+    HookInstall(HOOKPOS_CrashFix_Misc7, (DWORD)HOOK_CrashFix_Misc7, 5 );
+    HookInstall(HOOKPOS_CrashFix_Misc8, (DWORD)HOOK_CrashFix_Misc8, 5 );
+    HookInstall(HOOKPOS_CrashFix_Misc9, (DWORD)HOOK_CrashFix_Misc9, 6 );
+    HookInstall(HOOKPOS_CrashFix_Misc10, (DWORD)HOOK_CrashFix_Misc10, 6 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -2096,7 +2138,7 @@ bool CCam_ProcessFixed ( class CCamSAInterface* pCamInterface )
 {
     CCam* pCam = static_cast < CCameraSA* > ( pGameInterface->GetCamera () )->GetCam ( pCamInterface );
 
-    if ( m_pProcessCamHandler )
+    if ( m_pProcessCamHandler && pCam )
     {
         return m_pProcessCamHandler ( pCam );
     }
@@ -3114,16 +3156,20 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
 {
     _asm pushad
 
-    if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 )
+    if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 || ucTrafficLightState == 9 )
     {
-        ucDesignatedLightState = 0;
+        ucDesignatedLightState = 0; //Green
     }
-    else if ( ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7 )
+    else if ( ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7 || ucTrafficLightState == 10 )
     {
-        ucDesignatedLightState = 1;
+        ucDesignatedLightState = 1; //Amber
+    }
+    else if ( ucTrafficLightState == 12 )
+    {
+        ucDesignatedLightState = 4;  //Off
     }
     else
-        ucDesignatedLightState = 2;
+        ucDesignatedLightState = 2;  //Red
 
     _asm
     {
@@ -3137,16 +3183,20 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
 {
     _asm pushad
 
-    if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 )
+    if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 || ucTrafficLightState == 9 )
     {
-        ucDesignatedLightState = 0;
+        ucDesignatedLightState = 0; //Green
     }
-    else if ( ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8 )
+    else if ( ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8 || ucTrafficLightState == 10 )
     {
-        ucDesignatedLightState = 1;
+        ucDesignatedLightState = 1; //Amber
+    }
+    else if ( ucTrafficLightState == 12 )
+    {
+        ucDesignatedLightState = 4; //Off
     }
     else
-        ucDesignatedLightState = 2;
+        ucDesignatedLightState = 2; //Red
 
     _asm
     {
@@ -3164,10 +3214,7 @@ unsigned char CMultiplayerSA::GetTrafficLightState ()
 
 void CMultiplayerSA::SetTrafficLightState ( unsigned char ucState )
 {
-    if ( bTrafficLightsBlocked == false )
-    {
-        ucTrafficLightState = ucState;
-    }
+    ucTrafficLightState = ucState;
 }
 
 bool CMultiplayerSA::GetTrafficLightsLocked ()
@@ -4473,4 +4520,136 @@ void _declspec(naked) HOOK_CrashFix_Misc3 ()
     }
 
     CPlayerPed__ProcessControl_Abort();
+}
+
+
+void _declspec(naked) HOOK_CrashFix_Misc4 ()
+{
+    _asm
+    {
+        // Hooked from 004F02D2
+        test    ecx,ecx 
+        je      cont        // Skip much code if ecx is zero (avoid divide by zero in soundmanager::service)
+
+        cdq  
+        idiv    ecx  
+        add     edx, ebp  
+        jmp     RETURN_CrashFix_Misc4a
+    cont:
+        jmp     RETURN_CrashFix_Misc4b
+    }
+}
+
+
+void _declspec(naked) HOOK_CrashFix_Misc5 ()
+{
+    _asm
+    {
+        // Hooked from 005DF949
+        mov     edi, dword ptr [ecx*4+0A9B0C8h]
+        mov     edi, dword ptr [edi+5Ch]     
+        test    edi, edi 
+        je      cont        // Skip much code if edi is zero (ped has no model)
+
+        mov     edi, dword ptr [ecx*4+0A9B0C8h]
+        jmp     RETURN_CrashFix_Misc5a  // 005DF950
+    cont:
+        pop edi
+        jmp     RETURN_CrashFix_Misc5b  // 005DFCC4
+    }
+}
+
+
+// #5465 2/2
+void _declspec(naked) HOOK_CrashFix_Misc6 ()
+{
+    _asm
+    {
+        // Hooked from 4D1750  5 bytes
+        test    ecx, ecx 
+        je      cont        // Skip much code if ecx is zero (ped has no anim something)
+
+        mov     eax, dword ptr [ecx+10h]
+        test    eax, eax
+        jmp     RETURN_CrashFix_Misc6a  // 004D1755
+    cont:
+        jmp     RETURN_CrashFix_Misc6b  // 004D1A44
+    }
+}
+
+
+// #5466
+void _declspec(naked) HOOK_CrashFix_Misc7 ()
+{
+    _asm
+    {
+        // Hooked from 417BF8  5 bytes
+        test    ecx, ecx 
+        je      cont        // Skip much code if ecx is zero (no colmodel)
+
+        mov     esi, dword ptr [ecx+2Ch] 
+        test    esi, esi
+        jmp     RETURN_CrashFix_Misc7a  // 417BFD
+    cont:
+        jmp     RETURN_CrashFix_Misc7b  // 417BFF
+    }
+}
+
+
+// #5468  1/3
+void _declspec(naked) HOOK_CrashFix_Misc8 ()
+{
+    _asm
+    {
+        // Hooked from 73485D  5 bytes
+        test    ecx, ecx 
+        je      cont        // Skip much code if ecx is zero (no 2d effect plugin)
+
+        mov     ecx, dword ptr [edx+ecx] 
+        test    ecx, ecx 
+        jmp     RETURN_CrashFix_Misc8a  // 734862
+    cont:
+        jmp     RETURN_CrashFix_Misc8b  // 734871
+    }
+}
+
+
+// #5468  2/3
+void _declspec(naked) HOOK_CrashFix_Misc9 ()
+{
+    _asm
+    {
+        // Hooked from 738B64  6 bytes
+        test    esi, esi 
+        je      cont        // Skip much code if esi is zero (invalid projectile)
+
+        mov     eax, dword ptr [esi+40h] 
+        test    ah, 1
+        jmp     RETURN_CrashFix_Misc9a  // 738B6A
+    cont:
+        jmp     RETURN_CrashFix_Misc9b  // 73983A
+    }
+}
+
+
+// #5468  3/3
+void _declspec(naked) HOOK_CrashFix_Misc10 ()
+{
+    _asm
+    {
+        // Hooked from 5334FE  6 bytes
+        cmp     ecx, 0x80
+        jb      cont  // Skip much code if ecx is small (invalid vector pointer)
+
+        mov     edx, dword ptr [ecx] 
+        mov     dword ptr [esp], edx
+        jmp     RETURN_CrashFix_Misc10a  // 533504
+    cont:
+        mov     ecx, dword ptr [esp+1Ch] 
+        mov     dword ptr [ecx],0 
+        mov     dword ptr [ecx+4],0 
+        mov     dword ptr [ecx+8],0 
+        add     esp, 18h 
+        ret     8  
+    }
 }

@@ -154,11 +154,6 @@ void CLuaMain::InitVM ( void )
     luaopen_table ( m_luaVM );
     luaopen_debug ( m_luaVM );
 
-    // Create the callback table (at location 1 in the registry)
-    lua_pushnumber ( m_luaVM, 1 );
-    lua_newtable ( m_luaVM );
-    lua_settable ( m_luaVM, LUA_REGISTRYINDEX );
-
     // Registering C functions
     CLuaCFunctions::RegisterFunctionsWithVM ( m_luaVM );
 
@@ -275,13 +270,6 @@ void CLuaMain::Start ( void )
 
 void CLuaMain::UnloadScript ( void )
 {
-    // End the lua vm
-    if ( m_luaVM )
-    {
-        lua_close( m_luaVM );
-        m_luaVM = NULL;
-    }
-
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers ();
 
@@ -291,6 +279,13 @@ void CLuaMain::UnloadScript ( void )
     {
         if ( (*iter)->IsJoined () )
             (*iter)->GetKeyBinds ()->RemoveAllKeys ( this );
+    }
+
+    // End the lua vm
+    if ( m_luaVM )
+    {
+        lua_close( m_luaVM );
+        m_luaVM = NULL;
     }
 }
 

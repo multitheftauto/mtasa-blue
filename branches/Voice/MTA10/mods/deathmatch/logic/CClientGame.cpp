@@ -2456,8 +2456,9 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientProjectileCreation", "creator", NULL, false );
 
     // Sound events
-    m_Events.AddEvent ( "onClientSoundStream", "success, length", NULL, false );
+    m_Events.AddEvent ( "onClientSoundStream", "success, length, streamName", NULL, false );
     m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
+    m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
 }
 
 
@@ -4361,6 +4362,10 @@ void CClientGame::ResetMapInfo ( void )
     // Money
     SetMoney ( 0 );
 
+    // Water
+    g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, 0.0f, NULL, true );
+    g_pGame->GetWaterManager ()->SetWaveLevel ( 0.0f );
+
     // Weather
     m_pBlendedWeather->SetWeather ( 0 );
 
@@ -4369,9 +4374,6 @@ void CClientGame::ResetMapInfo ( void )
 
     // Water-colour
     g_pMultiplayer->ResetWater ();
-
-    // Water
-    g_pGame->GetWaterManager ()->Reset ();
 
      // Sky-gradient
     g_pMultiplayer->SetCloudsEnabled ( true );
@@ -4961,7 +4963,7 @@ bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
 
     if ( iCheckStatus & iEnableClientChecks )
     {
-        g_pCore->ShowMessageBox ( "Error", "San Andreas data files have been modified", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->InitiateDataFilesFix ();
         g_pCore->GetModManager ()->RequestUnload ();
         return false;
     }

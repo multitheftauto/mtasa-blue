@@ -27,20 +27,20 @@ class CMapEvent
 public:
     inline class CLuaMain*  GetVM               ( void )                                { return m_pMain; };
     inline const char*      GetName             ( void )                                { return m_szName; };
-    inline int              GetLuaFunction      ( void )                                { return m_iLuaFunction; };
+    const CLuaFunctionRef&  GetLuaFunction      ( void )                                { return m_iLuaFunction; };
     inline bool             IsPropagated        ( void )                                { return m_bPropagated; }
     inline bool             IsBeingDestroyed    ( void )                                { return m_bBeingDestroyed; }
 
     void                    Call                ( const class CLuaArguments& Arguments );
 
 private:
-                            CMapEvent           ( class CLuaMain* pMain, const char* szName, int iLuaFunction, bool bPropagated );
+                            CMapEvent           ( class CLuaMain* pMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
                             ~CMapEvent          ( void );
 
     inline void             SetBeingDestroyed   ( bool bBeingDestroyed )                { m_bBeingDestroyed = bBeingDestroyed; }
 
     class CLuaMain*         m_pMain;
-    int                     m_iLuaFunction;
+    CLuaFunctionRef         m_iLuaFunction;
     char                    m_szName [MAPEVENT_MAX_LENGTH_NAME + 1];
     bool                    m_bPropagated;
     bool                    m_bDestroyFunction;
