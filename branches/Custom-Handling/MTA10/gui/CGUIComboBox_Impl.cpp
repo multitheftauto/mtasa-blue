@@ -41,7 +41,9 @@ CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
     // Store the pointer to this CGUI element in the CEGUI element
     m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
 
-    //m_pWindow->subscribeEvent ( CEGUI::Combobox::EventListSelectionChanged, CEGUI::Event::Subscriber ( &CGUIComboBox_Impl::Event_OnSelectionChanged, this ) );
+    //Add out changed event
+    m_pWindow->subscribeEvent ( CEGUI::Combobox::EventListSelectionAccepted, CEGUI::Event::Subscriber ( &CGUIComboBox_Impl::Event_OnSelectionAccepted, this ) );
+    
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager
@@ -234,18 +236,18 @@ CGUIListItem_Impl* CGUIComboBox_Impl::GetListItem ( CEGUI::ListboxItem* pItem )
 
     return it->second;
 }
-/*
-I dunno how to make the event...
-void CGUIComboBox_Impl::SetSelectionHandler ( GUI_CALLBACK Callback )
+
+
+void CGUIComboBox_Impl::SetSelectionHandler ( GUI_CALLBACK Callback  )
 {
     m_OnSelectChange = Callback;
 }
 
 
-bool CGUIComboBox_Impl::Event_OnSelectionChanged ( const CEGUI::EventArgs& e )
+bool CGUIComboBox_Impl::Event_OnSelectionAccepted ( const CEGUI::EventArgs& e )
 {
     if ( m_OnSelectChange )
         m_OnSelectChange ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
-*/
+

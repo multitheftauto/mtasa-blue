@@ -20,6 +20,7 @@ class CMainMenu;
 #include "CQuickConnect.h"
 #include "CQuestionBox.h"
 #include "CServerBrowser.h"
+#include "CServerQueue.h"
 #include "CSettings.h"
 #include "CCredits.h"
 #include "CGraphics.h"
@@ -98,6 +99,9 @@ private:
     bool                OnItemEnter                     ( CGUIElement* pElement );
     bool                OnItemLeave                     ( CGUIElement* pElement );
 
+	void				ShowServerQueue					( void );
+    void                HideServerQueue                 ( void );
+
     CGUI*               m_pManager;
 
     // Images
@@ -115,6 +119,7 @@ private:
     CSettings           m_Settings;
     CCredits            m_Credits;
     CServerBrowser      m_ServerBrowser;
+	CServerQueue		m_ServerQueue;
 
     // Properties
     bool                m_bIsIngame;

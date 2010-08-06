@@ -38,6 +38,7 @@ public:
     DECLARE_RPC ( SetGarageOpen );
     DECLARE_RPC ( SetGlitchEnabled );
     DECLARE_RPC ( SetCloudsEnabled );
+    DECLARE_RPC ( SetTrafficLightState );
 };
 
 #endif

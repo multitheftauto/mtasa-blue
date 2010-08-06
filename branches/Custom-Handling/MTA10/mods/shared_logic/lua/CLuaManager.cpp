@@ -292,6 +292,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getAttachedElements", CLuaFunctionDefs::GetAttachedElements );
     CLuaCFunctions::AddFunction ( "getElementDistanceFromCentreOfMassToBaseOfModel", CLuaFunctionDefs::GetElementDistanceFromCentreOfMassToBaseOfModel );
     CLuaCFunctions::AddFunction ( "isElementLocal", CLuaFunctionDefs::IsElementLocal );
+    CLuaCFunctions::AddFunction ( "getElementAttachedOffsets", CLuaFunctionDefs::GetElementAttachedOffsets );
     CLuaCFunctions::AddFunction ( "getElementAlpha", CLuaFunctionDefs::GetElementAlpha );
     CLuaCFunctions::AddFunction ( "isElementOnScreen", CLuaFunctionDefs::IsElementOnScreen );
     CLuaCFunctions::AddFunction ( "getElementHealth", CLuaFunctionDefs::GetElementHealth );
@@ -409,6 +410,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPedControlState", CLuaFunctionDefs::GetPedControlState );
     CLuaCFunctions::AddFunction ( "isPedDoingGangDriveby", CLuaFunctionDefs::IsPedDoingGangDriveby );
     CLuaCFunctions::AddFunction ( "getPedAnimation", CLuaFunctionDefs::GetPedAnimation );
+    CLuaCFunctions::AddFunction ( "getPedMoveState", CLuaFunctionDefs::GetPedMoveState );
     //CLuaCFunctions::AddFunction ( "getPedWalkingStyle", CLuaFunctionDefs::GetPedMoveAnim );
     CLuaCFunctions::AddFunction ( "isPedHeadless", CLuaFunctionDefs::IsPedHeadless );
     CLuaCFunctions::AddFunction ( "isPedFrozen", CLuaFunctionDefs::IsPedFrozen );
@@ -627,7 +629,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPickupType", CLuaFunctionDefs::SetPickupType );
 
     // Cam get funcs
-    CLuaCFunctions::AddFunction ( "getCameraMode", CLuaFunctionDefs::GetCameraMode );
+    CLuaCFunctions::AddFunction ( "getCameraView", CLuaFunctionDefs::GetCameraView );
     CLuaCFunctions::AddFunction ( "getCameraMatrix", CLuaFunctionDefs::GetCameraMatrix );
     CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaFunctionDefs::GetCameraTarget );
     CLuaCFunctions::AddFunction ( "getCameraInterior", CLuaFunctionDefs::GetCameraInterior );
@@ -638,6 +640,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setCameraInterior", CLuaFunctionDefs::SetCameraInterior );
     CLuaCFunctions::AddFunction ( "fadeCamera", CLuaFunctionDefs::FadeCamera );
     CLuaCFunctions::AddFunction ( "setCameraClip", CLuaFunctionDefs::SetCameraClip );
+    CLuaCFunctions::AddFunction ( "setCameraView", CLuaFunctionDefs::SetCameraView );
 
     // Cursor funcs
     CLuaCFunctions::AddFunction ( "getCursorPosition", CLuaFunctionDefs::GetCursorPosition );
@@ -780,6 +783,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "split", CLuaFunctionDefs::Split );
     CLuaCFunctions::AddFunction ( "setTimer", CLuaFunctionDefs::SetTimer );
     CLuaCFunctions::AddFunction ( "killTimer", CLuaFunctionDefs::KillTimer );
+    CLuaCFunctions::AddFunction ( "resetTimer", CLuaFunctionDefs::ResetTimer );
     CLuaCFunctions::AddFunction ( "getTimers", CLuaFunctionDefs::GetTimers );
     CLuaCFunctions::AddFunction ( "isTimer", CLuaFunctionDefs::IsTimer );
     CLuaCFunctions::AddFunction ( "getTimerDetails", CLuaFunctionDefs::GetTimerDetails );
@@ -813,6 +817,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getGarageBoundingBox", CLuaFunctionDefs::GetGarageBoundingBox );
     CLuaCFunctions::AddFunction ( "isWorldSpecialPropertyEnabled", CLuaFunctionDefs::IsWorldSpecialPropertyEnabled );
     CLuaCFunctions::AddFunction ( "getBlurLevel", CLuaFunctionDefs::GetBlurLevel );
+    CLuaCFunctions::AddFunction ( "getTrafficLightState", CLuaFunctionDefs::GetTrafficLightState );
+    CLuaCFunctions::AddFunction ( "areTrafficLightsLocked", CLuaFunctionDefs::AreTrafficLightsLocked );
 
     // World set funcs
     CLuaCFunctions::AddFunction ( "setTime", CLuaFunctionDefs::SetTime );
@@ -835,6 +841,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setJetpackMaxHeight", CLuaFunctionDefs::SetJetpackMaxHeight );
     CLuaCFunctions::AddFunction ( "setCloudsEnabled", CLuaFunctionDefs::SetCloudsEnabled );
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled );
+    CLuaCFunctions::AddFunction ( "setTrafficLightState", CLuaFunctionDefs::SetTrafficLightState );
+    CLuaCFunctions::AddFunction ( "setTrafficLightsLocked", CLuaFunctionDefs::SetTrafficLightsLocked );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );

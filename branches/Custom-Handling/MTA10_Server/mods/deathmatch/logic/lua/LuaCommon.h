@@ -19,15 +19,9 @@ extern "C"
     #include "lua.h"
     #include "lualib.h"
     #include "lauxlib.h"
-    
-    LUALIB_API int luaM_toref (lua_State *L, int i);
 }
 
-#define abs_index(L, i) \
-    ((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
-    lua_gettop(L) + (i) + 1)
-#define FREELIST_REF    0
-#define RESERVED_REFS   2
+CLuaFunctionRef         luaM_toref              ( lua_State *luaVM, int iArgument );
 
 // Lua pop macros for our datatypes
 class CElement*         lua_toelement           ( lua_State* luaVM, int iArgument );

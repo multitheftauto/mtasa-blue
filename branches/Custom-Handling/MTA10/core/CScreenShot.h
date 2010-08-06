@@ -26,6 +26,10 @@ public:
     static SString                  GetScreenShotPath           ( int iNumber );
     static SString                  GetValidScreenshotFilename  ( void );
     static int                      GetScreenShots              ( void );
+
+    static void                     BeginSave                   ( const char *szFileName, void* pBits, unsigned long ulPitch, RECT ScreenSize );
+    static bool                     IsSaving                    ( void );
+    static DWORD                    ThreadProc                  ( LPVOID lpdwThreadParam );
 };
 
 #endif

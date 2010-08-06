@@ -991,6 +991,29 @@ int CLuaFunctionDefs::GetPedAnimation ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetPedMoveState ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
+    {
+        CClientPed * pPed = lua_toped ( luaVM, 1 );
+        if ( pPed )
+        {
+            std::string strMoveState;
+            if ( CStaticFunctionDefinitions::GetPedMoveState ( *pPed, strMoveState ) )
+            {
+                lua_pushstring ( luaVM, strMoveState.c_str() );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "GetPedMoveState", "ped", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "GetPedMoveState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::GetPedMoveAnim ( lua_State* luaVM )
 {

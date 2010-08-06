@@ -129,6 +129,7 @@ public:
     bool                    IsCursorForcedVisible           ( void );
     bool                    IsCursorControlsToggled         ( void ) { return m_bCursorToggleControls; }
     void                    HideMainMenu                    ( void );
+    void                    HideQuickConnect                ( void );
     void                    SetCenterCursor                 ( bool bEnabled );
 
     // Configuration
@@ -200,6 +201,7 @@ public:
     void                    Quit                            ( bool bInstantly = true );
     void                    InitiateUpdate                  ( const char* szType, const char* szHost )      { m_pLocalGUI->InitiateUpdate ( szType, szHost ); }
     bool                    IsOptionalUpdateInfoRequired    ( const char* szHost )                          { return m_pLocalGUI->IsOptionalUpdateInfoRequired ( szHost ); }
+    void                    InitiateDataFilesFix            ( void )                                        { m_pLocalGUI->InitiateDataFilesFix (); }
 
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
     bool                    bScreenShot;

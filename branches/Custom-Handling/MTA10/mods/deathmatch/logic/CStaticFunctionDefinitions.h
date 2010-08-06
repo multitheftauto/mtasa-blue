@@ -64,6 +64,7 @@ public:
     static bool                         GetElementRadius                    ( CClientEntity& Entity, float &fRadius );
     static CClientEntity*               GetElementAttachedTo                ( CClientEntity& Entity );
     static bool                         GetElementDistanceFromCentreOfMassToBaseOfModel ( CClientEntity& Entity, float& fDistance );
+    static bool                         GetElementAttachedOffsets           ( CClientEntity& Entity, CVector & vecPosition, CVector & vecRotation );
     static bool                         GetElementAlpha                     ( CClientEntity& Entity, unsigned char& ucAlpha );
     static bool                         IsElementOnScreen                   ( CClientEntity& Entity, bool& bOnScreen );
     static bool                         GetElementHealth                    ( CClientEntity& Entity, float& fHealth );
@@ -126,6 +127,7 @@ public:
     static bool                         IsPedDoingGangDriveby               ( CClientPed& Ped, bool & bDoingGangDriveby );
     static bool                         GetPedAnimation                     ( CClientPed& Ped, char * szBlockName, char * szAnimName, unsigned int uiLength );
     static bool                         GetPedMoveAnim                      ( CClientPed& Ped, unsigned int& iMoveAnim );
+    static bool                         GetPedMoveState                     ( CClientPed & Ped, std::string& strMoveState );
     static bool                         IsPedHeadless                       ( CClientPed& Ped, bool & bHeadless );
     static bool                         IsPedFrozen                         ( CClientPed& Ped, bool & bFrozen );
     static bool                         IsPedFootBloodEnabled               ( CClientPed& Ped, bool & bHasFootBlood );
@@ -272,7 +274,7 @@ public:
     static bool                         SetMarkerIcon                       ( CClientEntity& Entity, const char* szIcon );
 
     // Camera get funcs
-    static bool                         GetCameraMode                       ( char * szBuffer, size_t sizeBuffer );
+    static bool                         GetCameraView                       ( unsigned short& ucMode );
     static bool                         GetCameraMatrix                     ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV );
     static CClientEntity *              GetCameraTarget                     ( void );
     static bool                         GetCameraInterior                   ( unsigned char & ucInterior );
@@ -282,6 +284,7 @@ public:
     static bool                         SetCameraTarget                     ( CClientEntity * pEntity);
     static bool                         SetCameraInterior                   ( unsigned char ucInterior );
     static bool                         FadeCamera                          ( bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
+    static bool                         SetCameraView                       ( unsigned short ucMode );
 
     // Cursor funcs
     static bool                         GetCursorPosition                   ( CVector2D& vecCursor, CVector& vecWorld );
@@ -409,11 +412,13 @@ public:
     static bool                         IsWorldSpecialPropertyEnabled       ( const char* szPropName );
     static bool                         SetCloudsEnabled                    ( bool bEnabled );
     static bool                         GetCloudsEnabled                    ( void );
+    static bool                         GetTrafficLightState                ( unsigned char& ucState );
+    static bool                         AreTrafficLightsLocked              ( bool& bLocked );
 
     static bool                         SetTime                             ( unsigned char ucHour, unsigned char ucMin );
     static bool                         SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );
     static bool                         ResetSkyGradient                    ( void );
-     static bool                         SetWaterColor                       ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
+    static bool                         SetWaterColor                       ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
     static bool                         ResetWaterColor                     ( void );
     static bool                         SetWeather                          ( unsigned char ucWeather );
     static bool                         SetWeatherBlended                   ( unsigned char ucWeather );
@@ -425,6 +430,8 @@ public:
     static bool                         SetWorldSpecialPropertyEnabled      ( const char* szPropName, bool bEnabled );
     static bool                         SetBlurLevel                        ( unsigned char ucLevel );
     static bool                         SetJetpackMaxHeight                 ( float fHeight );
+    static bool                         SetTrafficLightState                ( unsigned char ucState );
+    static bool                         SetTrafficLightsLocked              ( bool bLocked );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );

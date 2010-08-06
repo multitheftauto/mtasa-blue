@@ -33,6 +33,7 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_GARAGE_OPEN, SetGarageOpen, "SetGarageOpen" );
     AddHandler ( SET_GLITCH_ENABLED, SetGlitchEnabled, "SetGlitchEnabled" );
     AddHandler ( SET_CLOUDS_ENABLED, SetCloudsEnabled, "SetCloudsEnabled" );
+    AddHandler ( SET_TRAFFIC_LIGHT_STATE, SetTrafficLightState, "SetTrafficLightState" );
 }
 
 
@@ -218,4 +219,17 @@ void CWorldRPCs::SetCloudsEnabled ( NetBitStreamInterface& bitStream )
     bool bEnabled = (ucIsEnabled == 1);
     g_pMultiplayer->SetCloudsEnabled ( bEnabled );
     g_pClientGame->SetCloudsEnabled( bEnabled );
+}
+
+void CWorldRPCs::SetTrafficLightState ( NetBitStreamInterface& bitStream )
+{
+    char ucTrafficLightState;
+
+    if ( bitStream.ReadBits ( &ucTrafficLightState, 4 ) )
+    {
+       bool bForced = bitStream.ReadBit();
+       // We ignore updating the serverside traffic light state if it's blocked, unless script forced it
+        if ( bForced || !g_pMultiplayer->GetTrafficLightsLocked() )
+            g_pMultiplayer->SetTrafficLightState ( (unsigned char)* &ucTrafficLightState );
+    }
 }

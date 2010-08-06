@@ -117,6 +117,7 @@ public:
     LUA_DECLARE ( GetAttachedElements );
     LUA_DECLARE ( GetElementDistanceFromCentreOfMassToBaseOfModel );
     LUA_DECLARE ( IsElementLocal );
+    LUA_DECLARE ( GetElementAttachedOffsets );
     LUA_DECLARE ( GetElementAlpha );
     LUA_DECLARE ( IsElementOnScreen );
     LUA_DECLARE ( GetElementHealth );
@@ -213,6 +214,7 @@ public:
     LUA_DECLARE ( IsPedSunbathing );
     LUA_DECLARE ( IsPedDoingGangDriveby );
     LUA_DECLARE ( GetPedAnimation );
+    LUA_DECLARE ( GetPedMoveState );
     LUA_DECLARE ( GetPedMoveAnim );
     LUA_DECLARE ( IsPedHeadless );
     LUA_DECLARE ( IsPedFrozen );
@@ -418,7 +420,7 @@ public:
     LUA_DECLARE ( SetPickupType );
 
     // Cam get funcs
-    LUA_DECLARE ( GetCameraMode );
+    LUA_DECLARE ( GetCameraView );
     LUA_DECLARE ( GetCameraMatrix );
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
@@ -429,6 +431,7 @@ public:
     LUA_DECLARE ( SetCameraInterior );
     LUA_DECLARE ( FadeCamera );
     LUA_DECLARE ( SetCameraClip );
+    LUA_DECLARE ( SetCameraView );
 
     // Cursor funcs
     LUA_DECLARE ( GetCursorPosition );
@@ -618,6 +621,8 @@ public:
     LUA_DECLARE ( GetGarageBoundingBox );
     LUA_DECLARE ( IsWorldSpecialPropertyEnabled );
     LUA_DECLARE ( GetBlurLevel );
+    LUA_DECLARE ( GetTrafficLightState );
+    LUA_DECLARE ( AreTrafficLightsLocked );
 
     LUA_DECLARE ( SetTime );
     LUA_DECLARE ( SetSkyGradient );
@@ -638,6 +643,8 @@ public:
     LUA_DECLARE ( SetJetpackMaxHeight );
     LUA_DECLARE ( SetCloudsEnabled );
     LUA_DECLARE ( GetCloudsEnabled );
+    LUA_DECLARE ( SetTrafficLightState );
+    LUA_DECLARE ( SetTrafficLightsLocked );
 
     // Input functions
     LUA_DECLARE ( BindKey );

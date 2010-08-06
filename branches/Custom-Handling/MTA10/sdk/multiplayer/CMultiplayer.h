@@ -166,6 +166,12 @@ public:
     virtual float                       GetLocalPlayerGravity       () = 0;
     virtual void                        SetLocalPlayerGravity       ( float fGravity ) = 0;
 
+    virtual unsigned char               GetTrafficLightState        () = 0;
+    virtual void                        SetTrafficLightState        ( unsigned char ucState ) = 0;
+
+    virtual bool                        GetTrafficLightsLocked      () = 0;
+    virtual void                        SetTrafficLightsLocked      ( bool bLocked ) = 0;
+
     virtual void                        SetLocalStatValue           ( unsigned short usStat, float fValue ) = 0;
     virtual void                        SetLocalStatsStatic         ( bool bStatic ) = 0;
 

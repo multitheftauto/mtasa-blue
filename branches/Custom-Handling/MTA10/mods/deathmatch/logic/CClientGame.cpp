@@ -1819,6 +1819,18 @@ void CClientGame::UpdateFireKey ( void )
                             // Would GTA let us stealth kill now?
                             if ( m_pLocalPlayer->GetGamePlayer ()->GetPedIntelligence ()->TestForStealthKill ( pGameTarget, false ) )
                             {
+                                //Grab our local position
+                                CVector vecLocalPosition;
+                                m_pLocalPlayer->GetPosition(vecLocalPosition);
+                                
+                                //Grab the target's position
+                                CVector vecTargetPosition;
+                                pTargetPed->GetPosition(vecTargetPosition);
+
+                                //Work out an angle between the players, and set this as we initiate our knife kill
+                                float fAngle = AngleBetweenPoints2D ( vecLocalPosition, vecTargetPosition );
+                                m_pLocalPlayer->SetCurrentRotation(fAngle);
+
                                 // Change the state back to false so this press doesn't do anything else
                                 pControl->bState = false;
                                 CLuaArguments Arguments;
@@ -2399,6 +2411,7 @@ void CClientGame::AddBuiltInEvents ( void )
     //m_Events.AddEvent ( "onClientGUIClose", "element", NULL, false );
     //m_Events.AddEvent ( "onClientGUIKeyDown", "element", NULL, false );
     m_Events.AddEvent ( "onClientGUITabSwitched", "element", NULL, false );
+    m_Events.AddEvent ( "onClientGUIComboBoxAccepted", "element", NULL, false );
 
     m_Events.AddEvent ( "onClientDoubleClick", "button, screenX, screenY, worldX, worldY, worldZ, element", NULL, false );
     m_Events.AddEvent ( "onClientMouseMove", "screenX, screenY", NULL, false );
@@ -2443,8 +2456,9 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientProjectileCreation", "creator", NULL, false );
 
     // Sound events
-    m_Events.AddEvent ( "onClientSoundStream", "success, length", NULL, false );
+    m_Events.AddEvent ( "onClientSoundStream", "success, length, streamName", NULL, false );
     m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
+    m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
 }
 
 
@@ -4348,6 +4362,10 @@ void CClientGame::ResetMapInfo ( void )
     // Money
     SetMoney ( 0 );
 
+    // Water
+    g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, 0.0f, NULL, true );
+    g_pGame->GetWaterManager ()->SetWaveLevel ( 0.0f );
+
     // Weather
     m_pBlendedWeather->SetWeather ( 0 );
 
@@ -4356,9 +4374,6 @@ void CClientGame::ResetMapInfo ( void )
 
     // Water-colour
     g_pMultiplayer->ResetWater ();
-
-    // Water
-    g_pGame->GetWaterManager ()->Reset ();
 
      // Sky-gradient
     g_pMultiplayer->SetCloudsEnabled ( true );
@@ -4948,7 +4963,7 @@ bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
 
     if ( iCheckStatus & iEnableClientChecks )
     {
-        g_pCore->ShowMessageBox ( "Error", "San Andreas data files have been modified", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->InitiateDataFilesFix ();
         g_pCore->GetModManager ()->RequestUnload ();
         return false;
     }

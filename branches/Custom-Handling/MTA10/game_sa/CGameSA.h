@@ -211,6 +211,8 @@ public:
     void                    SuspendASyncLoading             ( bool bSuspend );
     bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );
 
+    void                    SetupSpecialCharacters  ( void );
+
 private:
     CPools                  * m_pPools;
     CPlayerInfo             * m_pPlayerInfo;

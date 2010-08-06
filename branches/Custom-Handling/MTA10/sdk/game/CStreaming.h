@@ -21,6 +21,7 @@ public:
     virtual void            RequestAnimations               ( int iAnimationLibraryBlock, DWORD dwFlags ) = 0;
     virtual BOOL            HaveAnimationsLoaded            ( int iAnimationLibraryBlock ) = 0;
     virtual bool            HasVehicleUpgradeLoaded         ( int model ) = 0;
+    virtual void            RequestSpecialModel ( DWORD model, const char * szTexture, DWORD channel ) = 0;
 };
 
 #endif

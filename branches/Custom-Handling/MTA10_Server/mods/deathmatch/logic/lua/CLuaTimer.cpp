@@ -14,17 +14,7 @@
 
 #include "StdInc.h"
 
-CLuaTimer::CLuaTimer ( void )
-{
-    m_ulStartTime = 0;
-    m_ulDelay = 0;
-    m_uiRepeats = 1;
-    m_iLuaFunction = LUA_REFNIL;
-    m_bBeingDeleted = false;
-}
-
-
-CLuaTimer::CLuaTimer ( int iLuaFunction, const CLuaArguments& Arguments )
+CLuaTimer::CLuaTimer ( const CLuaFunctionRef& iLuaFunction, const CLuaArguments& Arguments )
 {
     m_iLuaFunction = iLuaFunction;
     m_Arguments = Arguments;

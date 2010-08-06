@@ -914,6 +914,19 @@ int CLuaFunctionDefs::GetGarageBoundingBox ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetTrafficLightState ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pMultiplayer->GetTrafficLightState () );
+    return 1;
+}
+
+int CLuaFunctionDefs::AreTrafficLightsLocked ( lua_State* luaVM )
+{
+    lua_pushboolean ( luaVM, g_pMultiplayer->GetTrafficLightsLocked () );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetBlurLevel ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pGame->GetBlurLevel () );
@@ -1272,5 +1285,41 @@ int CLuaFunctionDefs::GetCloudsEnabled ( lua_State* luaVM )
 {
       lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetCloudsEnabled () );
       return 1;
+}
+
+int CLuaFunctionDefs::SetTrafficLightState ( lua_State *luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        unsigned char ucState = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+        if ( CStaticFunctionDefinitions::SetTrafficLightState ( ucState ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetTrafficLightsLocked ( lua_State *luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
+    {
+        bool bLocked = lua_toboolean ( luaVM, 1 ) ? true : false;
+        if ( CStaticFunctionDefinitions::SetTrafficLightsLocked ( bLocked ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1 ;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightsLocked" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 

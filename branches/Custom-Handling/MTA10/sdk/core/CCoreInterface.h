@@ -112,6 +112,7 @@ public:
     virtual void                    Quit                            ( bool bInstantly = true) = 0;
     virtual void                    InitiateUpdate                  ( const char* szType, const char* szHost ) = 0;
     virtual bool                    IsOptionalUpdateInfoRequired    ( const char* szHost ) = 0;
+    virtual void                    InitiateDataFilesFix            ( void ) = 0;
 };
 
 #endif

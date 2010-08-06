@@ -12,6 +12,7 @@
 *               Kevin Whiteside <kevuwk@gmail.com>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Peter Beverloo <>
 *               
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -508,6 +509,13 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
     }
 
     return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetElementAttachedOffsets ( CClientEntity & Entity, CVector & vecPosition, CVector & vecRotation )
+{
+    Entity.GetAttachedOffsets ( vecPosition, vecRotation );
+    return true;
 }
 
 
@@ -1025,7 +1033,7 @@ bool CStaticFunctionDefinitions::DetachElements ( CClientEntity& Entity, CClient
     {
         if ( pAttachedToEntity == NULL || pActualAttachedToEntity == pAttachedToEntity )
         {
-            Entity.AttachTo ( NULL );            
+            Entity.AttachTo ( NULL );
             return true;
         }
     }
@@ -1310,6 +1318,13 @@ bool CStaticFunctionDefinitions::GetPedMoveAnim ( CClientPed & Ped, unsigned int
 {
     iMoveAnim = (unsigned int)Ped.GetMoveAnim();
     return true;
+}
+
+bool CStaticFunctionDefinitions::GetPedMoveState ( CClientPed & Ped, std::string& strMoveState )
+{
+    if ( Ped.GetMovementState(strMoveState) )
+        return true;
+    return false;
 }
 
 
@@ -3407,20 +3422,6 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CClientEntity& Entity, const ch
 }
 
 
-bool CStaticFunctionDefinitions::GetCameraMode ( char * szBuffer, size_t sizeBuffer )
-{
-    assert ( szBuffer );
-    assert ( sizeBuffer );
-
-    if ( m_pCamera->IsInFixedMode () )
-        strncpy ( szBuffer, "fixed", sizeBuffer );
-    else
-        strncpy ( szBuffer, "player", sizeBuffer );
-
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::GetCameraMatrix ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV )
 {
     m_pCamera->GetPosition ( vecPosition );
@@ -3523,6 +3524,17 @@ bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, uns
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetCameraView ( unsigned short ucMode )
+{
+    m_pCamera->SetCameraView ( (eVehicleCamMode) ucMode );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetCameraView ( unsigned short& ucMode )
+{
+    ucMode = m_pCamera->GetCameraView();
+    return true;
+}
 
 bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVector& vecWorld )
 {
@@ -3912,6 +3924,10 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox ( CLuaMain& Lua
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
     pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+
+    // set events
+    pGUIElement->SetEvents ( "onClientGUIComboBoxAccepted" );
+    static_cast < CGUIComboBox* > ( pElement ) -> SetSelectionHandler ( pGUIElement->GetCallback1 () );
 
     return pGUIElement;
 }
@@ -4939,11 +4955,41 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
     g_pGame->GetWorld ()->SetJetpackMaxHeight ( fHeight );
     return true;
 }
+bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
+{
+    if ( ucState >= 0 && ucState < 13 )
+    {
+        g_pMultiplayer->SetTrafficLightState ( ucState );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetTrafficLightsLocked ( bool bLocked )
+{
+    g_pMultiplayer->SetTrafficLightsLocked ( bLocked );
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled ( const char* szPropName )
 {
     return g_pGame->IsCheatEnabled ( szPropName );
 }
+
+bool CStaticFunctionDefinitions::GetTrafficLightState ( unsigned char& ucState )
+{
+    ucState = g_pMultiplayer->GetTrafficLightState ();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::AreTrafficLightsLocked ( bool& bLocked )
+{
+    bLocked = g_pMultiplayer->GetTrafficLightsLocked ();
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::SetSkyGradient ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue )
 {

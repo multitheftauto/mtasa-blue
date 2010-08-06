@@ -43,6 +43,26 @@ inline float HorizontalAngleBetweenPoints3D ( const CVector &vecPosition1, const
     return fRad;
     //return (fRad*180/PI);
 }
+inline float AngleBetweenPoints2D ( const CVector &vecPosition1, const CVector &vecPosition2 )
+{
+	float fRad = (PI*2) - atan2( ( vecPosition2.fX - vecPosition1.fX ), ( vecPosition2.fY - vecPosition1.fY ) );
+    // Clamp it to -PI .. PI
+    if ( fRad < -PI )
+    {
+        do
+        {
+            fRad += PI * 2.0f;
+        } while ( fRad < -PI );
+    }
+    else if ( fRad > PI )
+    {
+        do
+        {
+            fRad -= PI * 2.0f;
+        } while ( fRad > PI );
+    }
+ 	return fRad;
+}
 inline float DistanceBetweenPoints3D ( const CVector& vecPosition1, const CVector& vecPosition2 )
 {
     float fDistanceX = vecPosition2.fX - vecPosition1.fX;

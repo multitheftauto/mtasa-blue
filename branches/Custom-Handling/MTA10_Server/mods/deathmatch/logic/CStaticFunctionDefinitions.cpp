@@ -95,7 +95,7 @@ bool CStaticFunctionDefinitions::AddEvent ( CLuaMain* pLuaMain, const char* szNa
 }
 
 
-bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, int iLuaFunction, bool bPropagated )
+bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
 {
     assert ( pLuaMain );
     assert ( szName );
@@ -113,7 +113,7 @@ bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain* pLuaMain, const cha
 }
 
 
-bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, int iLuaFunction )
+bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction )
 {
     assert ( pLuaMain );
     assert ( szName );
@@ -770,6 +770,13 @@ bool CStaticFunctionDefinitions::GetElementModel ( CElement* pElement, unsigned 
         default: return false;
     }
 
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetElementAttachedOffsets ( CElement* pElement, CVector & vecPosition, CVector & vecRotation )
+{
+    pElement->GetAttachedOffsets ( vecPosition, vecRotation );
     return true;
 }
 
@@ -6595,7 +6602,7 @@ bool CStaticFunctionDefinitions::PreloadMissionAudio ( CElement* pElement, unsig
 }
 
 
-bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments )
+bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
     assert ( pPlayer );
     assert ( szKey );
@@ -6693,7 +6700,7 @@ bool CStaticFunctionDefinitions::BindKey ( CPlayer* pPlayer, const char* szKey, 
 }
 
 
-bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState, int iLuaFunction )
+bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState, const CLuaFunctionRef& iLuaFunction )
 {
     assert ( pPlayer );
     assert ( szKey );
@@ -6780,7 +6787,7 @@ bool CStaticFunctionDefinitions::UnbindKey ( CPlayer* pPlayer, const char* szKey
     return false;
 }
 
-bool CStaticFunctionDefinitions::IsKeyBound ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState, int iLuaFunction, bool& bBound )
+bool CStaticFunctionDefinitions::IsKeyBound ( CPlayer* pPlayer, const char* szKey, CLuaMain* pLuaMain, const char* szHitState, const CLuaFunctionRef& iLuaFunction, bool& bBound )
 {
     assert ( pPlayer );
     assert ( szKey );
@@ -7550,6 +7557,18 @@ bool CStaticFunctionDefinitions::IsGarageOpen ( unsigned char ucGarageID, bool& 
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetTrafficLightState ( unsigned char& ucState )
+{
+    ucState = g_pGame->GetTrafficLightState ();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetTrafficLightsLocked ( bool& bLocked )
+{
+    bLocked = g_pGame->GetTrafficLightsLocked ();
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char ucMinute )
 {
@@ -7569,6 +7588,29 @@ bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char u
     }
 
     return false;
+}
+bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState, bool bForced )
+{
+    if ( ucState >= 0 && ucState < 13 )
+    {
+        g_pGame->SetTrafficLightState ( ucState );
+ 
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteBits ( &ucState, 4 );
+        BitStream.pBitStream->WriteBit  ( bForced );
+
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_TRAFFIC_LIGHT_STATE, *BitStream.pBitStream ) );
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetTrafficLightsLocked ( bool bLocked )
+{
+    g_pGame->SetTrafficLightsLocked ( bLocked );
+    return true;
 }
 
 

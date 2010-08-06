@@ -47,7 +47,7 @@ struct SVersion
     unsigned int m_uiMajor;
     unsigned int m_uiMinor;
     unsigned int m_uiRevision;
-    unsigned int m_uiState;
+    //unsigned int m_uiState;
 };
 
 class CExportedFunction

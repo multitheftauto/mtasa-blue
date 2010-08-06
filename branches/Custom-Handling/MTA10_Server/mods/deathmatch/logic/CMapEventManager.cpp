@@ -36,7 +36,7 @@ CMapEventManager::~CMapEventManager ( void )
 }
 
 
-bool CMapEventManager::Add ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction, bool bPropagated )
+bool CMapEventManager::Add ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
 {
     // Check for max name length
     if ( strlen ( szName ) <= MAPEVENT_MAX_LENGTH_NAME )
@@ -50,7 +50,7 @@ bool CMapEventManager::Add ( CLuaMain* pLuaMain, const char* szName, int iLuaFun
 }
 
 
-bool CMapEventManager::Delete ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction )
+bool CMapEventManager::Delete ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction )
 {
     // Delete all the events with matching names
     bool bRemovedSomeone = false;
@@ -365,7 +365,7 @@ void CMapEventManager::TakeOutTheTrash ( void )
 }
 
 
-bool CMapEventManager::HandleExists ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction )
+bool CMapEventManager::HandleExists ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction )
 {
     // Return true if we find an event which matches the handle
     list < CMapEvent* > ::const_iterator iter = m_Events.begin ();

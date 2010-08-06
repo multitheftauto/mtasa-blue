@@ -334,6 +334,7 @@ LUA_API lua_Integer lua_tointeger (lua_State *L, int idx) {
 }
 
 
+// MTA Specific
 LUA_API lua_Integer lua_tointegerW (lua_State *L, int idx) {
   TValue n;
   const TValue *o = index2adr(L, idx);

@@ -8,6 +8,17 @@ Targets:
 * Fixes for issues and crashes that are present in 1.0.3 and are degrading the stability of the software
 * High priority gameplay and UI fixes
 
+- 0005466: [Client] MTA Crash (ccw) - resolved.
+- 0005468: [Client] Crash dumps (ccw) - resolved.
+- 0005465: [Client] Crashes - the next one part (ccw) - resolved.
+- 0005487: [Server] Server sometimes quits without warning (ccw) - resolved.
+- 0005476: [Server] Server consumes memory over time (ccw) - resolved.
+- 0005435: [Server] Download Error still occurs (ccw) - resolved.
+- 0005197: [Server] Dots in resource file names can cause issues (ccw) - resolved.
+- 0005455: [Client] MTA crash dumps (ccw) - resolved.
+- 0005162: [Server] Download timeouts caused by temporary internal web server failure (ccw) - resolved.
+- 0005445: [Client] MTA is crashing every 30-60 minutes (ccw) - resolved.
+- 0005372: [Client] MTA Nightlys stopped working with Wine (ccw) - resolved.
 - 0005394: [Server] Many accounts delays server to be ready (ccw) - resolved.
 - 0005392: [Server] Banlist gets reset after "ERROR: Could not start HTTP server on interface" message (ccw) - resolved.
 - 0005388: [Scripting] projectiles can exist forever (ccw) - resolved.

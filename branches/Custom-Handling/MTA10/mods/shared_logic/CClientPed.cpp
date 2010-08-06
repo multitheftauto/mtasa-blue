@@ -153,8 +153,11 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_pAnimationBlock = NULL;
     m_szAnimationName = NULL;
     m_bRequestedAnimation = false;
+    m_iTimeAnimation = -1;
     m_bLoopAnimation = false;    
     m_bUpdatePositionAnimation = false;
+    m_bInterruptableAnimation = false;
+    m_bFreezeLastFrameAnimation = true;
     m_bHeadless = false;
     m_bFrozen = false;
     m_bFrozenWaitingForGroundToLoad = false;
@@ -177,6 +180,17 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
 
     // Our default clothes
     m_pClothes->DefaultClothes ( false );
+
+    // Movement state names for Lua
+    m_MovementStateNames[MOVEMENTSTATE_STAND]       =    "stand";
+    m_MovementStateNames[MOVEMENTSTATE_WALK]        =    "walk";
+    m_MovementStateNames[MOVEMENTSTATE_POWERWALK]   =    "powerwalk";
+    m_MovementStateNames[MOVEMENTSTATE_JOG]         =    "jog";
+    m_MovementStateNames[MOVEMENTSTATE_SPRINT]      =    "sprint";
+    m_MovementStateNames[MOVEMENTSTATE_CROUCH]      =    "crouch";
+    //These two are inactive for now
+    m_MovementStateNames[MOVEMENTSTATE_CRAWL]       =    "crawl";
+    m_MovementStateNames[MOVEMENTSTATE_ROLL]        =    "roll";
 
     // Create the player model
     if ( m_bIsLocalPlayer )
@@ -1968,6 +1982,59 @@ bool CClientPed::HasWeapon ( eWeaponType weaponType )
     return false;
 }
 
+eMovementState CClientPed::GetMovementState ( void )
+{
+    // Do we have a player, and are we on foot? (streamed in)
+    if ( m_pPlayerPed && !GetRealOccupiedVehicle () )
+    {
+        CControllerState cs;
+        GetControllerState ( cs );
+
+        // Grab his controller state
+        bool bWalkKey = false;
+        if ( GetType () == CCLIENTPLAYER )
+            bWalkKey = CClientPad::GetControlState ( "walk", cs, true );
+        else
+            m_Pad.GetControlState("walk",bWalkKey);
+        
+        // Is he standing up?
+        if ( !IsDucked() )
+        {
+            unsigned int iRunState = m_pPlayerPed->GetRunState();
+
+            // Is he moving the contoller at all?
+            if ( iRunState == 1 && cs.LeftStickX == 0 && cs.LeftStickY == 0 )
+                return MOVEMENTSTATE_STAND;
+
+            //Is he either pressing the walk key, or has run state 1?
+            if ( iRunState == 1 || bWalkKey && iRunState == 6 )
+                return MOVEMENTSTATE_WALK;
+            else if ( iRunState == 4 )
+                return MOVEMENTSTATE_POWERWALK;
+            else if ( iRunState == 6 )
+                return MOVEMENTSTATE_JOG;
+            else if ( iRunState == 7 )
+                return MOVEMENTSTATE_SPRINT;
+        }
+        else
+        {
+            // Is he moving the contoller at all?
+            if ( cs.LeftStickX == 0 && cs.LeftStickY == 0 )
+                return MOVEMENTSTATE_CROUCH;
+        }
+    }
+    return MOVEMENTSTATE_UNKNOWN;
+}
+
+bool CClientPed::GetMovementState ( std::string& strStateName )
+{
+    eMovementState eCurrentMoveState = GetMovementState();
+    if ( eCurrentMoveState == MOVEMENTSTATE_UNKNOWN )
+        return false;
+
+    strStateName = m_MovementStateNames[eCurrentMoveState];
+    return true;
+}
 
 CTask* CClientPed::GetCurrentPrimaryTask ( void )
 {
@@ -2287,6 +2354,16 @@ void CClientPed::StreamedInPulse ( void )
                     Current.LeftStickY = 0;
                 }
             }
+
+            // Fix to disable the quick cutting of the post deagle shooting animation
+            // If we're USE_GUN, but aren't pressing the fire or aim keys we must be
+            // in a post-fire state where the player is preparing to move back to 
+            // a normal stance.  This can normally be cut using the crouch key, so block it
+            if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTMOVE ) )
+            {
+                if ( Current.RightShoulder1 == 0 && Current.LeftShoulder1 == 0 && Current.ButtonCircle == 0 )
+                    Current.ShockButtonL = 0;
+            }
         }
         else
         {
@@ -2569,7 +2646,7 @@ void CClientPed::StreamedInPulse ( void )
                 char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
                 strcpy ( szAnimName, m_szAnimationName );
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
                 delete [] szAnimName;                
             }            
         }
@@ -2985,13 +3062,13 @@ void CClientPed::_CreateModel ( void )
             char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
             strcpy ( szAnimName, m_szAnimationName );
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             delete [] szAnimName;
         }
 
         // Set the voice that corresponds to our model
         short sVoiceType, sVoiceID;
-        static_cast < CPedModelInfo * > ( m_pModelInfo )->GetVoice ( &sVoiceType, &sVoiceID );
+        m_pModelInfo->GetVoice ( &sVoiceType, &sVoiceID );
         SetVoice ( sVoiceType, sVoiceID );
 
         // Tell the streamer we created the player
@@ -3218,7 +3295,7 @@ void CClientPed::_ChangeModel ( void )
                 char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
                 strcpy ( szAnimName, m_szAnimationName );
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
                 delete [] szAnimName;
             }
 
@@ -4823,8 +4900,11 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     m_pAnimationBlock = pBlock;
     m_szAnimationName = new char [ strlen ( szAnimName ) + 1 ];
     strcpy ( m_szAnimationName, szAnimName ); 
+    m_iTimeAnimation = iTime;
     m_bLoopAnimation = bLoop;
     m_bUpdatePositionAnimation = bUpdatePosition;
+    m_bInterruptableAnimation = bInterruptable;
+    m_bFreezeLastFrameAnimation = bFreezeLastFrame;
 }
 
 
@@ -5032,27 +5112,36 @@ bool CClientPed::ShouldBeStealthAiming ( void )
         if ( GetCurrentWeaponType () == WEAPONTYPE_KNIFE )
         {
             // Do we have the aim key pressed?
-            SBindableGTAControl* pAimControl = g_pCore->GetKeyBinds ()->GetBindableFromControl ( "aim_weapon" );
-            if ( pAimControl && pAimControl->bState )
+            CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
+            if ( pKeyBinds )
             {
-                // Do we have a target ped?
-                CClientPed * pTargetPed = GetTargetedPed ();
-                if ( pTargetPed && pTargetPed->GetGamePlayer () )
+                SBindableGTAControl* pAimControl = pKeyBinds->GetBindableFromControl ( "aim_weapon" );
+                if ( pAimControl && pAimControl->bState )
                 {
-                    // Are we close enough to the target?
-                    CVector vecPos, vecPos_2;
-                    GetPosition ( vecPos );
-                    pTargetPed->GetPosition ( vecPos_2 );
-                    if ( DistanceBetweenPoints3D ( vecPos, vecPos_2 ) <= STEALTH_KILL_RANGE )
+                    //We need to be either crouched, walking or standing
+                    SBindableGTAControl* pWalkControl = pKeyBinds->GetBindableFromControl ( "walk" );
+                    if ( m_pPlayerPed->GetRunState() == 1 || m_pPlayerPed->GetRunState() == 4 || pWalkControl && pWalkControl->bState )
                     {
-                        // Grab our current anim
-                        CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
-                        if ( pAssoc )
+                        // Do we have a target ped?
+                        CClientPed * pTargetPed = GetTargetedPed ();
+                        if ( pTargetPed && pTargetPed->GetGamePlayer () )
                         {
-                            // Our game checks for stealth killing
-                            if ( m_pPlayerPed->GetPedIntelligence ()->TestForStealthKill ( pTargetPed->GetGamePlayer (), false ) )
+                            // Are we close enough to the target?
+                            CVector vecPos, vecPos_2;
+                            GetPosition ( vecPos );
+                            pTargetPed->GetPosition ( vecPos_2 );
+                            if ( DistanceBetweenPoints3D ( vecPos, vecPos_2 ) <= STEALTH_KILL_RANGE )
                             {
-                                return true;
+                                // Grab our current anim
+                                CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
+                                if ( pAssoc )
+                                {
+                                    // Our game checks for stealth killing
+                                    if ( m_pPlayerPed->GetPedIntelligence ()->TestForStealthKill ( pTargetPed->GetGamePlayer (), false ) )
+                                    {
+                                        return true;
+                                    }
+                                }
                             }
                         }
                     }
