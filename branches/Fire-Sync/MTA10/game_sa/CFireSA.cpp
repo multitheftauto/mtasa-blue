@@ -162,7 +162,7 @@ BOOL CFireSA::IsBeingExtinguished (  )
 VOID CFireSA::Ignite( )
 {
     DEBUG_TRACE("VOID CFireSA::Ignite( )");
-    this->internalInterface->bActive = TRUE;
+    this->internalInterface->bActive = FALSE;
 
     CVector * vecPosition = this->GetPosition();
     DWORD dwFunc = FUNC_CreateFxSysForStrength;

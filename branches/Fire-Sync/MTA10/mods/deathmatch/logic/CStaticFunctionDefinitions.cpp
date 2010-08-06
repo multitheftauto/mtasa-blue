@@ -512,6 +512,13 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
 }
 
 
+bool CStaticFunctionDefinitions::GetElementAttachedOffsets ( CClientEntity & Entity, CVector & vecPosition, CVector & vecRotation )
+{
+    Entity.GetAttachedOffsets ( vecPosition, vecRotation );
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetElementAlpha ( CClientEntity& Entity, unsigned char& ucAlpha )
 {
     switch ( Entity.GetType () )
@@ -1026,7 +1033,7 @@ bool CStaticFunctionDefinitions::DetachElements ( CClientEntity& Entity, CClient
     {
         if ( pAttachedToEntity == NULL || pActualAttachedToEntity == pAttachedToEntity )
         {
-            Entity.AttachTo ( NULL );            
+            Entity.AttachTo ( NULL );
             return true;
         }
     }
@@ -4956,7 +4963,7 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
 }
 bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
 {
-    if ( ucState >= 0 && ucState < 9 )
+    if ( ucState >= 0 && ucState < 13 )
     {
         g_pMultiplayer->SetTrafficLightState ( ucState );
         return true;

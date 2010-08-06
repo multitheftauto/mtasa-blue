@@ -968,6 +968,40 @@ int CLuaFunctionDefs::IsElementLocal ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetElementAttachedOffsets ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        // Grab the attached element
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        CVector vecPosition, vecRotation;
+
+        // Valid element?
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::GetElementAttachedOffsets ( *pEntity, vecPosition, vecRotation ) )
+            {
+                lua_pushnumber( luaVM, vecPosition.fX );
+                lua_pushnumber( luaVM, vecPosition.fY );
+                lua_pushnumber( luaVM, vecPosition.fZ );
+                lua_pushnumber( luaVM, vecRotation.fX );
+                lua_pushnumber( luaVM, vecRotation.fY );
+                lua_pushnumber( luaVM, vecRotation.fZ );
+                return 6;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementAttachedOffsets", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementAttachedOffsets" );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetElementAlpha ( lua_State* luaVM )
 {
     // Valid type?

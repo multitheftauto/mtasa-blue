@@ -481,6 +481,18 @@ int CLuaFunctionDefs::GetSoundMetaTags ( lua_State* luaVM )
                     lua_pushstring ( luaVM, strMetaTags );
                     lua_setfield ( luaVM, -2, "album_artist" );
                 }
+                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "streamName", strMetaTags );
+                if ( !strMetaTags.empty() )
+                {
+                    lua_pushstring ( luaVM, strMetaTags );
+                    lua_setfield ( luaVM, -2, "stream_name" );
+                }
+                CStaticFunctionDefinitions::GetSoundMetaTags ( *pSound, "streamTitle", strMetaTags );
+                if ( !strMetaTags.empty() )
+                {
+                    lua_pushstring ( luaVM, strMetaTags );
+                    lua_setfield ( luaVM, -2, "stream_title" );
+                }
                 return 1;
             }
         }

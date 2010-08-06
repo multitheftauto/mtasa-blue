@@ -48,6 +48,7 @@ class CClientFire : public CClientEntity
     private:
     CFire*                          m_pFire;
     CClientFireManager*             m_pManager;
+    void*                           m_pFireInterface;
 
     friend CClientFireManager;
 };
