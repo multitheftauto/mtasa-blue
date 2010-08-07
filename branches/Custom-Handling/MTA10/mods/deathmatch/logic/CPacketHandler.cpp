@@ -2610,10 +2610,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pEntry->SetCarDriveType ( (CHandlingEntry::eDriveType)handling.data.ucDriveType );
                     pEntry->SetCarEngineType ( (CHandlingEntry::eEngineType)handling.data.ucEngineType );
                     pEntry->SetNumberOfGears ( handling.data.ucNumberOfGears );
-                    pEntry->SetEngineAccelleration ( handling.data.fEngineAccelleration );
+                    pEntry->SetEngineAcceleration ( handling.data.fEngineAcceleration );
                     pEntry->SetEngineInertia ( handling.data.fEngineInertia );
                     pEntry->SetMaxVelocity ( handling.data.fMaxVelocity );
-                    pEntry->SetBrakeDecelleration ( handling.data.fBrakeDecelleration );
+                    pEntry->SetBrakeDeceleration ( handling.data.fBrakeDeceleration );
                     pEntry->SetBrakeBias ( handling.data.fBrakeBias );
                     pEntry->SetABS ( handling.data.ucABS ? true : false );
                     pEntry->SetSteeringLock ( handling.data.fSteeringLock );

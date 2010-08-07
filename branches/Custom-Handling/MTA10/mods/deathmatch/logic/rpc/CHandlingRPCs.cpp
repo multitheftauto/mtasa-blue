@@ -35,10 +35,10 @@ enum eHandlingProperty
     HANDLING_DRIVETYPE,
     HANDLING_ENGINETYPE,
     HANDLING_NUMOFGEARS,
-    HANDLING_ENGINEACCELLERATION,
+    HANDLING_ENGINEACCELERATION,
     HANDLING_ENGINEINERTIA,
     HANDLING_MAXVELOCITY,
-    HANDLING_BRAKEDECELLERATION,
+    HANDLING_BRAKEDECELERATION,
     HANDLING_BRAKEBIAS,
     HANDLING_ABS,
     HANDLING_STEERINGLOCK,
@@ -157,9 +157,9 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( NetBitStreamInterface& bitStrea
                     pHandlingEntry->SetNumberOfGears ( ucChar );
                     break;
 
-                case HANDLING_ENGINEACCELLERATION:
+                case HANDLING_ENGINEACCELERATION:
                     bitStream.Read ( fFloat );
-                    pHandlingEntry->SetEngineAccelleration ( fFloat );
+                    pHandlingEntry->SetEngineAcceleration ( fFloat );
                     break;
 
                 case HANDLING_ENGINEINERTIA:
@@ -172,9 +172,9 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( NetBitStreamInterface& bitStrea
                     pHandlingEntry->SetMaxVelocity ( fFloat );
                     break;
 
-                case HANDLING_BRAKEDECELLERATION:
+                case HANDLING_BRAKEDECELERATION:
                     bitStream.Read ( fFloat );
-                    pHandlingEntry->SetBrakeDecelleration ( fFloat );
+                    pHandlingEntry->SetBrakeDeceleration ( fFloat );
                     break;
 
                 case HANDLING_BRAKEBIAS:
@@ -346,8 +346,8 @@ void CHandlingRPCs::RestoreVehicleHandlingProperty ( NetBitStreamInterface& bitS
                     pHandlingEntry->SetNumberOfGears ( pOriginalEntry->GetNumberOfGears () );
                     break;
 
-                case HANDLING_ENGINEACCELLERATION:
-                    pHandlingEntry->SetEngineAccelleration ( pOriginalEntry->GetEngineAccelleration () );
+                case HANDLING_ENGINEACCELERATION:
+                    pHandlingEntry->SetEngineAcceleration ( pOriginalEntry->GetEngineAcceleration () );
                     break;
 
                 case HANDLING_ENGINEINERTIA:
@@ -358,8 +358,8 @@ void CHandlingRPCs::RestoreVehicleHandlingProperty ( NetBitStreamInterface& bitS
                     pHandlingEntry->SetMaxVelocity ( pOriginalEntry->GetMaxVelocity () );
                     break;
 
-                case HANDLING_BRAKEDECELLERATION:
-                    pHandlingEntry->SetBrakeDecelleration ( pOriginalEntry->GetBrakeDecelleration () );
+                case HANDLING_BRAKEDECELERATION:
+                    pHandlingEntry->SetBrakeDeceleration ( pOriginalEntry->GetBrakeDeceleration () );
                     break;
 
                 case HANDLING_BRAKEBIAS:

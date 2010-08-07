@@ -378,10 +378,10 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     handling.data.ucDriveType                   = pEntry->GetCarDriveType ();
                     handling.data.ucEngineType                  = pEntry->GetCarEngineType ();
                     handling.data.ucNumberOfGears               = pEntry->GetNumberOfGears ();
-                    handling.data.fEngineAccelleration          = pEntry->GetEngineAccelleration ();
+                    handling.data.fEngineAcceleration          = pEntry->GetEngineAcceleration ();
                     handling.data.fEngineInertia                = pEntry->GetEngineInertia ();
                     handling.data.fMaxVelocity                  = pEntry->GetMaxVelocity ();
-                    handling.data.fBrakeDecelleration           = pEntry->GetBrakeDecelleration ();
+                    handling.data.fBrakeDeceleration           = pEntry->GetBrakeDeceleration ();
                     handling.data.fBrakeBias                    = pEntry->GetBrakeBias ();
                     handling.data.ucABS                         = pEntry->GetABS () ? 1 : 0;
                     handling.data.fSteeringLock                 = pEntry->GetSteeringLock ();

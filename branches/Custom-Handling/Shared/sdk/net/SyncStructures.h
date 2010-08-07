@@ -1368,10 +1368,10 @@ struct SVehicleHandlingSync : public ISyncStructure
             bitStream.Read ( data.ucDriveType ) &&
             bitStream.Read ( data.ucEngineType ) &&
             bitStream.Read ( data.ucNumberOfGears ) &&
-            bitStream.Read ( data.fEngineAccelleration ) &&
+            bitStream.Read ( data.fEngineAcceleration ) &&
             bitStream.Read ( data.fEngineInertia ) &&
             bitStream.Read ( data.fMaxVelocity ) &&
-            bitStream.Read ( data.fBrakeDecelleration ) &&
+            bitStream.Read ( data.fBrakeDeceleration ) &&
             bitStream.Read ( data.fBrakeBias ) &&
             bitStream.Read ( data.ucABS ) &&
             bitStream.Read ( data.fSteeringLock ) &&
@@ -1411,10 +1411,10 @@ struct SVehicleHandlingSync : public ISyncStructure
         bitStream.Write ( data.ucDriveType );
         bitStream.Write ( data.ucEngineType );
         bitStream.Write ( data.ucNumberOfGears );
-        bitStream.Write ( data.fEngineAccelleration );
+        bitStream.Write ( data.fEngineAcceleration );
         bitStream.Write ( data.fEngineInertia );
         bitStream.Write ( data.fMaxVelocity );
-        bitStream.Write ( data.fBrakeDecelleration );
+        bitStream.Write ( data.fBrakeDeceleration );
         bitStream.Write ( data.fBrakeBias );
         bitStream.Write ( data.ucABS );
         bitStream.Write ( data.fSteeringLock );
@@ -1452,11 +1452,11 @@ struct SVehicleHandlingSync : public ISyncStructure
         unsigned char   ucEngineType;                   // +113
         unsigned char   ucNumberOfGears;                // +114
 
-        float           fEngineAccelleration;           // +120     (value in handling.cfg * 0x86A950)
+        float           fEngineAcceleration;           // +120     (value in handling.cfg * 0x86A950)
         float           fEngineInertia;                 // +124
         float           fMaxVelocity;                   // +128
 
-        float           fBrakeDecelleration;            // +148
+        float           fBrakeDeceleration;            // +148
         float           fBrakeBias;                     // +152
         unsigned char   ucABS;                           // +156
 

@@ -44,11 +44,11 @@ void CLuaHandlingDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "handlingGetEngineType", CLuaHandlingDefs::handlingGetEngineType );
     CLuaCFunctions::AddFunction ( "handlingGetNumberOfGears", CLuaHandlingDefs::handlingGetNumberOfGears );
 
-    CLuaCFunctions::AddFunction ( "handlingGetEngineAcceleration", CLuaHandlingDefs::handlingGetEngineAccelleration );
+    CLuaCFunctions::AddFunction ( "handlingGetEngineAcceleration", CLuaHandlingDefs::handlingGetEngineAcceleration );
     CLuaCFunctions::AddFunction ( "handlingGetEngineInertia", CLuaHandlingDefs::handlingGetEngineInertia );
     CLuaCFunctions::AddFunction ( "handlingGetMaxVelocity", CLuaHandlingDefs::handlingGetMaxVelocity );
 
-    CLuaCFunctions::AddFunction ( "handlingGetBrakeDeceleration", CLuaHandlingDefs::handlingGetBrakeDecelleration );
+    CLuaCFunctions::AddFunction ( "handlingGetBrakeDeceleration", CLuaHandlingDefs::handlingGetBrakeDeceleration );
     CLuaCFunctions::AddFunction ( "handlingGetBrakeBias", CLuaHandlingDefs::handlingGetBrakeBias );
     CLuaCFunctions::AddFunction ( "handlingGetABS", CLuaHandlingDefs::handlingGetABS );
 
@@ -87,11 +87,11 @@ void CLuaHandlingDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "handlingSetEngineType", CLuaHandlingDefs::handlingSetEngineType );
     CLuaCFunctions::AddFunction ( "handlingSetNumberOfGears", CLuaHandlingDefs::handlingSetNumberOfGears );
 
-    CLuaCFunctions::AddFunction ( "handlingSetEngineAcceleration", CLuaHandlingDefs::handlingSetEngineAccelleration );
+    CLuaCFunctions::AddFunction ( "handlingSetEngineAcceleration", CLuaHandlingDefs::handlingSetEngineAcceleration );
     CLuaCFunctions::AddFunction ( "handlingSetEngineInertia", CLuaHandlingDefs::handlingSetEngineInertia );
     CLuaCFunctions::AddFunction ( "handlingSetMaxVelocity", CLuaHandlingDefs::handlingSetMaxVelocity );
 
-    CLuaCFunctions::AddFunction ( "handlingSetBrakeDeceleration", CLuaHandlingDefs::handlingSetBrakeDecelleration );
+    CLuaCFunctions::AddFunction ( "handlingSetBrakeDeceleration", CLuaHandlingDefs::handlingSetBrakeDeceleration );
     CLuaCFunctions::AddFunction ( "handlingSetBrakeBias", CLuaHandlingDefs::handlingSetBrakeBias );
     CLuaCFunctions::AddFunction ( "handlingSetABS", CLuaHandlingDefs::handlingSetABS );
 
@@ -645,7 +645,7 @@ int CLuaHandlingDefs::handlingGetNumberOfGears ( lua_State* luaVM )
 }
 
 
-int CLuaHandlingDefs::handlingGetEngineAccelleration ( lua_State* luaVM )
+int CLuaHandlingDefs::handlingGetEngineAcceleration ( lua_State* luaVM )
 {
     // Got argument?
     CHandling* pHandling = lua_tohandling ( luaVM, 1 );
@@ -653,7 +653,7 @@ int CLuaHandlingDefs::handlingGetEngineAccelleration ( lua_State* luaVM )
     {
         // Return the value if it's changed
         bool bChanged;
-        float fFloat = pHandling->GetEngineAccelleration ( bChanged );
+        float fFloat = pHandling->GetEngineAcceleration ( bChanged );
         if ( bChanged )
         {
             lua_pushnumber ( luaVM, fFloat );
@@ -677,7 +677,7 @@ int CLuaHandlingDefs::handlingGetEngineAccelleration ( lua_State* luaVM )
             m_pHandlingManager->GetDefaultHandlings ( usID, List );
 
             // Return the one that actually set that property. Eventually this is the original.
-            lua_pushnumber ( luaVM, m_pHandlingManager->GetEngineAccelleration ( List ) );
+            lua_pushnumber ( luaVM, m_pHandlingManager->GetEngineAcceleration ( List ) );
             return 1;
         }
     }
@@ -774,7 +774,7 @@ int CLuaHandlingDefs::handlingGetMaxVelocity ( lua_State* luaVM )
 }
 
 
-int CLuaHandlingDefs::handlingGetBrakeDecelleration ( lua_State* luaVM )
+int CLuaHandlingDefs::handlingGetBrakeDeceleration ( lua_State* luaVM )
 {
     // Got argument?
     CHandling* pHandling = lua_tohandling ( luaVM, 1 );
@@ -782,7 +782,7 @@ int CLuaHandlingDefs::handlingGetBrakeDecelleration ( lua_State* luaVM )
     {
         // Return the value if it's changed
         bool bChanged;
-        float fFloat = pHandling->GetBrakeDecelleration ( bChanged );
+        float fFloat = pHandling->GetBrakeDeceleration ( bChanged );
         if ( bChanged )
         {
             lua_pushnumber ( luaVM, fFloat );
@@ -806,7 +806,7 @@ int CLuaHandlingDefs::handlingGetBrakeDecelleration ( lua_State* luaVM )
             m_pHandlingManager->GetDefaultHandlings ( usID, List );
 
             // Return the one that actually set that property. Eventually this is the original.
-            lua_pushnumber ( luaVM, m_pHandlingManager->GetBrakeDecelleration ( List ) );
+            lua_pushnumber ( luaVM, m_pHandlingManager->GetBrakeDeceleration ( List ) );
             return 1;
         }
     }
@@ -1448,10 +1448,10 @@ enum eHandlingProperty
     HANDLING_DRIVETYPE,
     HANDLING_ENGINETYPE,
     HANDLING_NUMOFGEARS,
-    HANDLING_ENGINEACCELLERATION,
+    HANDLING_ENGINEACCELERATION,
     HANDLING_ENGINEINERTIA,
     HANDLING_MAXVELOCITY,
-    HANDLING_BRAKEDECELLERATION,
+    HANDLING_BRAKEDECELERATION,
     HANDLING_BRAKEBIAS,
     HANDLING_ABS,
     HANDLING_STEERINGLOCK,
@@ -1481,10 +1481,10 @@ enum eHandlingProperty
     HANDLING_DRIVETYPE_RESTORE,
     HANDLING_ENGINETYPE_RESTORE,
     HANDLING_NUMOFGEARS_RESTORE,
-    HANDLING_ENGINEACCELLERATION_RESTORE,
+    HANDLING_ENGINEACCELERATION_RESTORE,
     HANDLING_ENGINEINERTIA_RESTORE,
     HANDLING_MAXVELOCITY_RESTORE,
-    HANDLING_BRAKEDECELLERATION_RESTORE,
+    HANDLING_BRAKEDECELERATION_RESTORE,
     HANDLING_BRAKEBIAS_RESTORE,
     HANDLING_ABS_RESTORE,
     HANDLING_STEERINGLOCK_RESTORE,
@@ -1940,7 +1940,7 @@ int CLuaHandlingDefs::handlingSetNumberOfGears ( lua_State* luaVM )
 }
 
 
-int CLuaHandlingDefs::handlingSetEngineAccelleration ( lua_State* luaVM )
+int CLuaHandlingDefs::handlingSetEngineAcceleration ( lua_State* luaVM )
 {
     // Got argument?
     CHandling* pHandling = lua_tohandling ( luaVM, 1 );
@@ -1951,24 +1951,24 @@ int CLuaHandlingDefs::handlingSetEngineAccelleration ( lua_State* luaVM )
         {
             // Grab the value from parameters and set it
             float fValue = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-            pHandling->SetEngineAccelleration ( fValue );
+            pHandling->SetEngineAcceleration ( fValue );
 
             // Tell the players
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pHandling->GetID () );
-            BitStream.pBitStream->Write ( static_cast < unsigned char > ( HANDLING_ENGINEACCELLERATION ) );
+            BitStream.pBitStream->Write ( static_cast < unsigned char > ( HANDLING_ENGINEACCELERATION ) );
             BitStream.pBitStream->Write ( fValue );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( HANDLING_SET_PROPERTY, *BitStream.pBitStream ) );
         }
         else
         {
             // Restore it
-            pHandling->RestoreEngineAccelleration ();
+            pHandling->RestoreEngineAcceleration ();
 
             // Tell the players
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pHandling->GetID () );
-            BitStream.pBitStream->Write ( static_cast < unsigned char > ( HANDLING_ENGINEACCELLERATION_RESTORE ) );
+            BitStream.pBitStream->Write ( static_cast < unsigned char > ( HANDLING_ENGINEACCELERATION_RESTORE ) );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( HANDLING_SET_PROPERTY, *BitStream.pBitStream ) );
         }
 
@@ -2069,7 +2069,7 @@ int CLuaHandlingDefs::handlingSetMaxVelocity ( lua_State* luaVM )
 }
 
 
-int CLuaHandlingDefs::handlingSetBrakeDecelleration ( lua_State* luaVM )
+int CLuaHandlingDefs::handlingSetBrakeDeceleration ( lua_State* luaVM )
 {
     // Got argument?
     CHandling* pHandling = lua_tohandling ( luaVM, 1 );
@@ -2080,24 +2080,24 @@ int CLuaHandlingDefs::handlingSetBrakeDecelleration ( lua_State* luaVM )
         {
             // Grab the value from parameters and set it
             float fValue = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-            pHandling->SetBrakeDecelleration ( fValue );
+            pHandling->SetBrakeDeceleration ( fValue );
 
             // Tell the players
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pHandling->GetID () );
-            BitStream.pBitStream->Write ( static_cast < unsigned char > ( HANDLING_BRAKEDECELLERATION ) );
+            BitStream.pBitStream->Write ( static_cast < unsigned char > ( HANDLING_BRAKEDECELERATION ) );
             BitStream.pBitStream->Write ( fValue );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( HANDLING_SET_PROPERTY, *BitStream.pBitStream ) );
         }
         else
         {
             // Restore it
-            pHandling->RestoreBrakeDecelleration ();
+            pHandling->RestoreBrakeDeceleration ();
 
             // Tell the players
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pHandling->GetID () );
-            BitStream.pBitStream->Write ( static_cast < unsigned char > ( HANDLING_BRAKEDECELLERATION_RESTORE ) );
+            BitStream.pBitStream->Write ( static_cast < unsigned char > ( HANDLING_BRAKEDECELERATION_RESTORE ) );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( HANDLING_SET_PROPERTY, *BitStream.pBitStream ) );
         }
 
@@ -2745,10 +2745,10 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                         case HANDLING_TURNMASS:
                         case HANDLING_DRAGCOEFF:
                         case HANDLING_TRACTIONMULTIPLIER:
-                        case HANDLING_ENGINEACCELLERATION:
+                        case HANDLING_ENGINEACCELERATION:
                         case HANDLING_ENGINEINERTIA:
                         case HANDLING_MAXVELOCITY:
-                        case HANDLING_BRAKEDECELLERATION:
+                        case HANDLING_BRAKEDECELERATION:
                         case HANDLING_BRAKEBIAS:
                         case HANDLING_STEERINGLOCK:
                         case HANDLING_TRACTIONLOSS:
@@ -2878,10 +2878,10 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                         case HANDLING_TURNMASS:
                         case HANDLING_DRAGCOEFF:
                         case HANDLING_TRACTIONMULTIPLIER:
-                        case HANDLING_ENGINEACCELLERATION:
+                        case HANDLING_ENGINEACCELERATION:
                         case HANDLING_ENGINEINERTIA:
                         case HANDLING_MAXVELOCITY:
-                        case HANDLING_BRAKEDECELLERATION:
+                        case HANDLING_BRAKEDECELERATION:
                         case HANDLING_BRAKEBIAS:
                         case HANDLING_STEERINGLOCK:
                         case HANDLING_TRACTIONLOSS:
@@ -3002,10 +3002,10 @@ int CLuaHandlingDefs::GetVehicleHandling ( lua_State* luaVM )
                         case HANDLING_TURNMASS:
                         case HANDLING_DRAGCOEFF:
                         case HANDLING_TRACTIONMULTIPLIER:
-                        case HANDLING_ENGINEACCELLERATION:
+                        case HANDLING_ENGINEACCELERATION:
                         case HANDLING_ENGINEINERTIA:
                         case HANDLING_MAXVELOCITY:
-                        case HANDLING_BRAKEDECELLERATION:
+                        case HANDLING_BRAKEDECELERATION:
                         case HANDLING_BRAKEBIAS:
                         case HANDLING_STEERINGLOCK:
                         case HANDLING_TRACTIONLOSS:
@@ -3120,13 +3120,13 @@ int CLuaHandlingDefs::GetVehicleHandling ( lua_State* luaVM )
                 lua_setfield ( luaVM, -2, "engineType" );
                 lua_pushnumber ( luaVM, pEntry->GetNumberOfGears() );
                 lua_setfield ( luaVM, -2, "numberOfGears" );
-                lua_pushnumber ( luaVM, pEntry->GetEngineAccelleration() );
+                lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration() );
                 lua_setfield ( luaVM, -2, "engineAcceleration" );
                 lua_pushnumber ( luaVM, pEntry->GetEngineInertia() );
                 lua_setfield ( luaVM, -2, "engineInertia" );
                 lua_pushnumber ( luaVM, pEntry->GetMaxVelocity() );
                 lua_setfield ( luaVM, -2, "maxVelocity" );
-                lua_pushnumber ( luaVM, pEntry->GetBrakeDecelleration() );
+                lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration() );
                 lua_setfield ( luaVM, -2, "brakeDeceleration" );
                 lua_pushnumber ( luaVM, pEntry->GetBrakeBias() );
                 lua_setfield ( luaVM, -2, "brakeBias" );
@@ -3218,10 +3218,10 @@ int CLuaHandlingDefs::GetModelHandling ( lua_State* luaVM )
                         case HANDLING_TURNMASS:
                         case HANDLING_DRAGCOEFF:
                         case HANDLING_TRACTIONMULTIPLIER:
-                        case HANDLING_ENGINEACCELLERATION:
+                        case HANDLING_ENGINEACCELERATION:
                         case HANDLING_ENGINEINERTIA:
                         case HANDLING_MAXVELOCITY:
-                        case HANDLING_BRAKEDECELLERATION:
+                        case HANDLING_BRAKEDECELERATION:
                         case HANDLING_BRAKEBIAS:
                         case HANDLING_STEERINGLOCK:
                         case HANDLING_TRACTIONLOSS:
@@ -3343,13 +3343,13 @@ int CLuaHandlingDefs::GetModelHandling ( lua_State* luaVM )
                 lua_setfield ( luaVM, -2, "engineType" );
                 lua_pushnumber ( luaVM, pEntry->GetNumberOfGears() );
                 lua_setfield ( luaVM, -2, "numberOfGears" );
-                lua_pushnumber ( luaVM, pEntry->GetEngineAccelleration() );
+                lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration() );
                 lua_setfield ( luaVM, -2, "engineAcceleration" );
                 lua_pushnumber ( luaVM, pEntry->GetEngineInertia() );
                 lua_setfield ( luaVM, -2, "engineInertia" );
                 lua_pushnumber ( luaVM, pEntry->GetMaxVelocity() );
                 lua_setfield ( luaVM, -2, "maxVelocity" );
-                lua_pushnumber ( luaVM, pEntry->GetBrakeDecelleration() );
+                lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration() );
                 lua_setfield ( luaVM, -2, "brakeDeceleration" );
                 lua_pushnumber ( luaVM, pEntry->GetBrakeBias() );
                 lua_setfield ( luaVM, -2, "brakeBias" );
@@ -3441,10 +3441,10 @@ int CLuaHandlingDefs::GetOriginalHandling ( lua_State* luaVM )
                         case HANDLING_TURNMASS:
                         case HANDLING_DRAGCOEFF:
                         case HANDLING_TRACTIONMULTIPLIER:
-                        case HANDLING_ENGINEACCELLERATION:
+                        case HANDLING_ENGINEACCELERATION:
                         case HANDLING_ENGINEINERTIA:
                         case HANDLING_MAXVELOCITY:
-                        case HANDLING_BRAKEDECELLERATION:
+                        case HANDLING_BRAKEDECELERATION:
                         case HANDLING_BRAKEBIAS:
                         case HANDLING_STEERINGLOCK:
                         case HANDLING_TRACTIONLOSS:
@@ -3566,13 +3566,13 @@ int CLuaHandlingDefs::GetOriginalHandling ( lua_State* luaVM )
                 lua_setfield ( luaVM, -2, "engineType" );
                 lua_pushnumber ( luaVM, pEntry->GetNumberOfGears() );
                 lua_setfield ( luaVM, -2, "numberOfGears" );
-                lua_pushnumber ( luaVM, pEntry->GetEngineAccelleration() );
+                lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration() );
                 lua_setfield ( luaVM, -2, "engineAcceleration" );
                 lua_pushnumber ( luaVM, pEntry->GetEngineInertia() );
                 lua_setfield ( luaVM, -2, "engineInertia" );
                 lua_pushnumber ( luaVM, pEntry->GetMaxVelocity() );
                 lua_setfield ( luaVM, -2, "maxVelocity" );
-                lua_pushnumber ( luaVM, pEntry->GetBrakeDecelleration() );
+                lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration() );
                 lua_setfield ( luaVM, -2, "brakeDeceleration" );
                 lua_pushnumber ( luaVM, pEntry->GetBrakeBias() );
                 lua_setfield ( luaVM, -2, "brakeBias" );

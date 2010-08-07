@@ -4228,8 +4228,8 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_TRACTIONMULTIPLIER:
                 fValue = pEntry->GetTractionMultiplier ();
                 break;
-            case HANDLING_ENGINEACCELLERATION:
-                fValue = pEntry->GetEngineAccelleration ();
+            case HANDLING_ENGINEACCELERATION:
+                fValue = pEntry->GetEngineAcceleration ();
                 break;
             case HANDLING_ENGINEINERTIA:
                 fValue = pEntry->GetEngineInertia ();
@@ -4237,8 +4237,8 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_MAXVELOCITY:
                 fValue = pEntry->GetMaxVelocity ();
                 break;
-            case HANDLING_BRAKEDECELLERATION:
-                fValue = pEntry->GetBrakeDecelleration ();
+            case HANDLING_BRAKEDECELERATION:
+                fValue = pEntry->GetBrakeDeceleration ();
                 break;
             case HANDLING_BRAKEBIAS:
                 fValue = pEntry->GetBrakeBias ();
@@ -4399,8 +4399,8 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_TRACTIONMULTIPLIER:
                 pEntry->SetTractionMultiplier ( fValue );
                 break;
-            case HANDLING_ENGINEACCELLERATION:
-                pEntry->SetEngineAccelleration ( fValue );
+            case HANDLING_ENGINEACCELERATION:
+                pEntry->SetEngineAcceleration ( fValue );
                 break;
             case HANDLING_ENGINEINERTIA:
                 pEntry->SetEngineInertia ( fValue );
@@ -4408,8 +4408,8 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_MAXVELOCITY:
                 pEntry->SetMaxVelocity ( fValue );
                 break;
-            case HANDLING_BRAKEDECELLERATION:
-                pEntry->SetBrakeDecelleration ( fValue );
+            case HANDLING_BRAKEDECELERATION:
+                pEntry->SetBrakeDeceleration ( fValue );
                 break;
             case HANDLING_BRAKEBIAS:
                 pEntry->SetBrakeBias ( fValue );

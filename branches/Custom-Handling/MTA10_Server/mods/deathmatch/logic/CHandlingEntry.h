@@ -28,7 +28,7 @@ public:
 
     unsigned int    uiHandlingFlags;                // +116
 
-    float           fEngineAccelleration;           // +120     (value in handling.cfg * 0x86A950)
+    float           fEngineAcceleration;           // +120     (value in handling.cfg * 0x86A950)
     float           fEngineInertia;                 // +124
     float           fMaxVelocity;                   // +128
 
@@ -49,7 +49,7 @@ struct tHandlingData
     float           fTractionMultiplier;            // +40
 
     CTransmissionSAInterface Transmission;          // +44
-    float           fBrakeDecelleration;            // +148
+    float           fBrakeDeceleration;            // +148
     float           fBrakeBias;                     // +152
     bool            bABS;                           // +156
 
@@ -127,11 +127,11 @@ public:
     eEngineType     GetCarEngineType                ( void ) const    { return static_cast < eEngineType > ( m_Handling.Transmission.ucEngineType ); };
     unsigned char   GetNumberOfGears                ( void ) const    { return m_Handling.Transmission.ucNumberOfGears; };
 
-    float           GetEngineAccelleration          ( void ) const    { return m_Handling.Transmission.fEngineAccelleration; };
+    float           GetEngineAcceleration          ( void ) const    { return m_Handling.Transmission.fEngineAcceleration; };
     float           GetEngineInertia                ( void ) const    { return m_Handling.Transmission.fEngineInertia; };
     float           GetMaxVelocity                  ( void ) const    { return m_Handling.Transmission.fMaxVelocity; };
 
-    float           GetBrakeDecelleration           ( void ) const    { return m_Handling.fBrakeDecelleration; };
+    float           GetBrakeDeceleration           ( void ) const    { return m_Handling.fBrakeDeceleration; };
     float           GetBrakeBias                    ( void ) const    { return m_Handling.fBrakeBias; };
     bool            GetABS                          ( void ) const    { return m_Handling.bABS; };
 
@@ -172,11 +172,11 @@ public:
     void            SetCarEngineType                ( eEngineType Type )            { m_Handling.Transmission.ucEngineType = Type; };
     void            SetNumberOfGears                ( unsigned char ucNumber )      { m_Handling.Transmission.ucNumberOfGears = ucNumber; };
 
-    void            SetEngineAccelleration          ( float fAccelleration )        { m_Handling.Transmission.fEngineAccelleration = fAccelleration; };
+    void            SetEngineAcceleration          ( float fAcceleration )        { m_Handling.Transmission.fEngineAcceleration = fAcceleration; };
     void            SetEngineInertia                ( float fInertia )              { m_Handling.Transmission.fEngineInertia = fInertia; };
     void            SetMaxVelocity                  ( float fVelocity )             { m_Handling.Transmission.fMaxVelocity = fVelocity; };
     
-    void            SetBrakeDecelleration           ( float fDecelleration )        { m_Handling.fBrakeDecelleration = fDecelleration; };
+    void            SetBrakeDeceleration           ( float fDeceleration )        { m_Handling.fBrakeDeceleration = fDeceleration; };
     void            SetBrakeBias                    ( float fBias )                 { m_Handling.fBrakeBias = fBias; };
     void            SetABS                          ( bool bABS )                   { m_Handling.bABS = bABS; };
 

@@ -2486,12 +2486,12 @@ _etf:
                         {
                             if ( iArgument3 == LUA_TNUMBER )
                             {
-                                pEntry->SetEngineAccelleration ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                pEntry->SetEngineAcceleration ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
                                 bSuccess = true;
                             }
                             else if ( iArgument3 == LUA_TNIL )
                             {
-                                pEntry->SetEngineAccelleration ( pOriginalEntry->GetEngineAccelleration () );
+                                pEntry->SetEngineAcceleration ( pOriginalEntry->GetEngineAcceleration () );
                                 bSuccess = true;
                             }
                         }
@@ -2525,12 +2525,12 @@ _etf:
                         {
                             if ( iArgument3 == LUA_TNUMBER )
                             {
-                                pEntry->SetBrakeDecelleration ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                pEntry->SetBrakeDeceleration ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
                                 bSuccess = true;
                             }
                             else if ( iArgument3 == LUA_TNIL )
                             {
-                                pEntry->SetBrakeDecelleration ( pOriginalEntry->GetBrakeDecelleration () ); 
+                                pEntry->SetBrakeDeceleration ( pOriginalEntry->GetBrakeDeceleration () ); 
                                 bSuccess = true;
                             }
                         }
@@ -2916,7 +2916,7 @@ _ttf:
                                 {
                                     if ( iArgument3 == LUA_TNUMBER )
                                     {
-                                        pEntry->SetEngineAccelleration ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                        pEntry->SetEngineAcceleration ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
                                     }
                                 }
                                 else if (strcmp(szHandlingData,"engineInertia")==0)
@@ -2937,7 +2937,7 @@ _ttf:
                                 {
                                     if ( iArgument3 == LUA_TNUMBER )
                                     {
-                                        pEntry->SetBrakeDecelleration ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                        pEntry->SetBrakeDeceleration ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
                                     }
                                 }
                                 else if (strcmp(szHandlingData,"brakeBias")==0)
@@ -3210,7 +3210,7 @@ int CLuaFunctionDefs::GetVehicleHandlingData ( lua_State* luaVM )
                 }
                 else if (strcmp(szHandlingData,"engineAcceleration")==0)
                 {
-                    lua_pushnumber ( luaVM, pEntry->GetEngineAccelleration () );
+                    lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration () );
                     return 1;
                 }
                 else if (strcmp(szHandlingData,"engineInertia")==0)
@@ -3225,7 +3225,7 @@ int CLuaFunctionDefs::GetVehicleHandlingData ( lua_State* luaVM )
                 }
                 else if (strcmp(szHandlingData,"brakeDeceleration")==0)
                 {
-                    lua_pushnumber ( luaVM, pEntry->GetBrakeDecelleration () );
+                    lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration () );
                     return 1;
                 }
                 else if (strcmp(szHandlingData,"brakeBias")==0)
@@ -3403,13 +3403,13 @@ int CLuaFunctionDefs::GetVehicleHandlingData ( lua_State* luaVM )
                 lua_setfield ( luaVM, -2, "engineType" );
                 lua_pushnumber ( luaVM, pEntry->GetNumberOfGears() );
                 lua_setfield ( luaVM, -2, "numberOfGears" );
-                lua_pushnumber ( luaVM, pEntry->GetEngineAccelleration() );
+                lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration() );
                 lua_setfield ( luaVM, -2, "engineAcceleration" );
                 lua_pushnumber ( luaVM, pEntry->GetEngineInertia() );
                 lua_setfield ( luaVM, -2, "engineInertia" );
                 lua_pushnumber ( luaVM, pEntry->GetMaxVelocity() );
                 lua_setfield ( luaVM, -2, "maxVelocity" );
-                lua_pushnumber ( luaVM, pEntry->GetBrakeDecelleration() );
+                lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration() );
                 lua_setfield ( luaVM, -2, "brakeDeceleration" );
                 lua_pushnumber ( luaVM, pEntry->GetBrakeBias() );
                 lua_setfield ( luaVM, -2, "brakeBias" );

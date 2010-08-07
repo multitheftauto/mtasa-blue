@@ -48,11 +48,11 @@ public:
     static int      handlingGetEngineType                   ( lua_State* luaVM );
     static int      handlingGetNumberOfGears                ( lua_State* luaVM );
 
-    static int      handlingGetEngineAccelleration          ( lua_State* luaVM );
+    static int      handlingGetEngineAcceleration          ( lua_State* luaVM );
     static int      handlingGetEngineInertia                ( lua_State* luaVM );
     static int      handlingGetMaxVelocity                  ( lua_State* luaVM );
 
-    static int      handlingGetBrakeDecelleration           ( lua_State* luaVM );
+    static int      handlingGetBrakeDeceleration           ( lua_State* luaVM );
     static int      handlingGetBrakeBias                    ( lua_State* luaVM );
     static int      handlingGetABS                          ( lua_State* luaVM );
 
@@ -91,11 +91,11 @@ public:
     static int      handlingSetEngineType                   ( lua_State* luaVM );
     static int      handlingSetNumberOfGears                ( lua_State* luaVM );
 
-    static int      handlingSetEngineAccelleration          ( lua_State* luaVM );
+    static int      handlingSetEngineAcceleration          ( lua_State* luaVM );
     static int      handlingSetEngineInertia                ( lua_State* luaVM );
     static int      handlingSetMaxVelocity                  ( lua_State* luaVM );
 
-    static int      handlingSetBrakeDecelleration           ( lua_State* luaVM );
+    static int      handlingSetBrakeDeceleration           ( lua_State* luaVM );
     static int      handlingSetBrakeBias                    ( lua_State* luaVM );
     static int      handlingSetABS                          ( lua_State* luaVM );
 
