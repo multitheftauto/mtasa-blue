@@ -173,11 +173,9 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_DetonateSatchels ( bitStream );
             return true;
 
-        #ifdef MTA_VOICE
         case PACKET_ID_VOICE_DATA:
             Packet_VoiceData ( bitStream );
             return true;
-        #endif
 
         case PACKET_ID_UPDATE_INFO:
             Packet_UpdateInfo ( bitStream );
@@ -342,6 +340,16 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     if ( bitStream.Version () >= 0x05 )
         bitStream.Read ( iEnableClientChecks );
 
+    // Get whether or not voice is enabled, as determined by the server
+    bool bVoiceEnabled = true;
+    bitStream.ReadBit ( bVoiceEnabled );
+
+    // Get the current sample rate for the voice module
+    unsigned int uiSampleRate = 1;
+    bitStream.Read ( uiSampleRate );
+
+    g_pClientGame->InitVoice ( bVoiceEnabled, uiSampleRate );
+
     // Limit number of http request if required by the server
     int iHTTPConnectionsPerClient = 32;
     if ( bitStream.Version () >= 0x04 )
@@ -413,6 +421,9 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     g_pCore->UpdateRecentlyPlayed();
     // Make sure that the SA data files weren't tampered with
     g_pClientGame->VerifySADataFiles ( iEnableClientChecks );
+
+    // Initialize the voice module
+    //g_pClientGame->InitVoice ( );
 }
 
 
@@ -4314,34 +4325,24 @@ void CPacketHandler::Packet_DetonateSatchels ( NetBitStreamInterface& bitStream 
     }
 }
 
-#ifdef MTA_VOICE
-/**
- * Decodes the data from an incoming voice packet and queues it on
- * the voice module, if it is loaded.
- *
- * @param bitStream The bitStream (packet) containing the data.
- */
-
 void CPacketHandler::Packet_VoiceData ( NetBitStreamInterface& bitStream )
 {
     unsigned short usPacketSize;
     if ( bitStream.Read ( usPacketSize ) )
     {
-        // This should be secure enough.  We won't ever be newing 65K...
         char * pBuf = new char[usPacketSize];
         if ( bitStream.Read ( pBuf, usPacketSize ) )
         {
-            // Voice may not be loaded...
-            if (m_pVoice)
+            if ( g_pClientGame->GetVoice() )
             {
-                // Decode the sound data and queue it to be played.
-                m_pVoice->DecodeAndQueueData((unsigned char *)pBuf, usPacketSize);
+                if ( g_pClientGame->GetVoice()->IsEnabled() )
+                {
+                    g_pClientGame->GetVoice()->DecodeAndBuffer(pBuf, usPacketSize );
+                }
             }
         }
     }
 }
-#endif
-
 
 void CPacketHandler::Packet_UpdateInfo ( NetBitStreamInterface& bitStream )
 {

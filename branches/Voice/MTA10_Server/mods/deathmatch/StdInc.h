@@ -94,6 +94,7 @@
 #include "packets/CVehicleSpawnPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
+#include "packets/CVoiceEndPacket.h"
 #include "packets/PacketIODeclarators.h"
 
 // Lua function definition includes

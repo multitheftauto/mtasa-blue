@@ -101,6 +101,10 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
             pTemp = new CVoiceDataPacket;
             break;
 
+        case PACKET_ID_VOICE_END:
+            pTemp = new CVoiceEndPacket;
+            break;
+
         case PACKET_ID_UNOCCUPIED_VEHICLE_SYNC:
             pTemp = new CUnoccupiedVehicleSyncPacket;
             break;

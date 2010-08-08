@@ -54,10 +54,7 @@
 #include "../../shared_logic/CClientGUIElement.h"
 #include "CVariableBuffer.h"
 #include "CLocalServer.h"
-
-#ifdef MTA_VOICE
-    #include "CVoice.h"
-#endif
+#include "CVoice.h"
 
 #ifdef MTA_DEBUG
     struct AddressInfo 
@@ -213,11 +210,11 @@ public:
     void                                StartPlayback                   ( void );
     void                                EnablePacketRecorder            ( const char* szFilename );
 
-    // Accessors
-#ifdef MTA_VOICE
-    inline CVoice*                      GetVoice                        ( void )        { return m_pVoice; };
-#endif
+    void                                InitVoice                       ( bool bEnabled, unsigned int uiServerSampleRate );
 
+    // Accessors
+
+    inline CVoice*                      GetVoice                        ( void )        { return m_pVoice; };
     inline CClientManager*              GetManager                      ( void )        { return m_pManager; };
     inline CClientObjectManager*        GetObjectManager                ( void )        { return m_pObjectManager; };
     inline CClientPickupManager*        GetPickupManager                ( void )        { return m_pPickupManager; };
@@ -350,10 +347,6 @@ public:
     bool                                IsDownloadingBigPacket          ( ) const                       { return m_bReceivingBigPacket; }
 
 private:
-    #ifdef MTA_VOICE
-    // Voice callbacks
-    static void                         SendVoiceData                   ( const unsigned char * pData, int len );
-    #endif
 
     // CGUI Callbacks
     bool                                OnKeyDown                       ( CGUIKeyEventArgs Args );
@@ -496,12 +489,7 @@ private:
 
     // Revised facilities
     CServer                             m_Server;
-
-#ifdef MTA_VOICE
     CVoice*                             m_pVoice;
-    static CRITICAL_SECTION             m_crVoice;
-    static CVariableBuffer*             m_pVoiceBuffer;
-#endif
 
     CClientPlayer*                      m_pLocalPlayer;
     ElementID                           m_LocalID;

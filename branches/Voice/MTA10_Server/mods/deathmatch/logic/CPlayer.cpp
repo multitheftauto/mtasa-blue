@@ -42,6 +42,9 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_fAimDirection = 0.0f;
     m_ucDriveByDirection = 0;
     m_bAkimboArmUp = false;    
+
+    m_VoiceState = VOICESTATE_IDLE;
+    m_pBroadcastElement = g_pGame->GetMapManager()->GetRootElement();
     
     m_uiScriptDebugLevel = 0;
 
@@ -52,6 +55,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_ucLoginAttempts = 0;
 
     m_pPlayerTextManager = new CPlayerTextManager ( this ); 
+    m_pIgnoredElement = NULL;
 
     m_PlayerAttackerID = INVALID_ELEMENT_ID;
     m_ucAttackWeapon = 0xFF;
@@ -605,4 +609,63 @@ const std::string& CPlayer::GetAnnounceValue ( const string& strKey ) const
 void CPlayer::SetAnnounceValue ( const string& strKey, const string& strValue )
 {
     m_AnnounceValues [ strKey ] = strValue;
+}
+
+void CPlayer::setVoiceBroadcastTo( CElement* pElement )
+{
+    m_lstIgnoredList.clear();
+    m_pBroadcastElement = pElement;
+}
+
+void CPlayer::setVoiceBroadcastTo( std::list < CElement* > lstElements )
+{
+    m_pBroadcastElement = NULL;
+    m_lstBroadcastList = lstElements;
+}
+
+void CPlayer::setVoiceIgnoredElement( CElement* pElement )
+{
+    m_lstIgnoredList.clear();
+    m_pIgnoredElement = pElement;
+}
+
+void CPlayer::setVoiceIgnoredList( std::list < CElement* > lstElements )
+{
+    m_pBroadcastElement = NULL;
+    m_lstIgnoredList = lstElements;
+}
+
+bool CPlayer::IsPlayerIgnoringElement( CElement* pElement )
+{
+    if ( IsUsingIgnoredList() )
+    {
+        list < CElement* > ::const_iterator iter = IterIgnoredListBegin();
+        for ( ; iter != IterIgnoredListEnd(); iter++ )
+        {
+            if ( *iter == pElement )
+                return true;
+        }
+        return false;
+    }
+    else if ( m_pIgnoredElement ) 
+    {
+        if ( IS_TEAM(m_pIgnoredElement) ) //if a team is  being ignored
+        {
+            CTeam* pTeam = static_cast < CTeam* > ( m_pIgnoredElement );
+            // If the broadcast-to player is in the ignored team
+            list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
+            for ( ; iter != pTeam->PlayersEnd (); iter++ )
+            {
+                if ( *iter == pElement )
+                    return true;
+            }
+            return false;
+        }
+        else
+        {
+            // See if the broadcast-to player is a descendent of the ignored element
+            return ( m_pIgnoredElement == pElement ) || ( m_pIgnoredElement->IsMyChild(pElement,true) );
+        }
+    }
+    return false;
 }

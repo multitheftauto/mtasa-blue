@@ -18,34 +18,3 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
-#ifdef MTA_VOICE
-
-int CLuaFunctionDefs::SetVoiceInputEnabled ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
-    {
-        bool bEnabled = lua_toboolean ( luaVM, 1 ) ? true : false;
-        bool bResult = CStaticFunctionDefinitions::SetVoiceInputEnabled(bEnabled); 
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetVoiceMuteAllEnabled ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
-    {
-        bool bEnabled = lua_toboolean ( luaVM, 1 ) ? true : false;
-        bool bResult = CStaticFunctionDefinitions::SetVoiceMuteAllEnabled ( bEnabled );
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-#endif
-

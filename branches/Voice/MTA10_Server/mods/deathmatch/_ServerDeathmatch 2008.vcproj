@@ -1031,6 +1031,10 @@
 						RelativePath=".\logic\packets\CVoiceDataPacket.cpp"
 						>
 					</File>
+					<File
+						RelativePath=".\logic\packets\CVoiceEndPacket.cpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="lua"
@@ -2070,6 +2074,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CVoiceDataPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CVoiceEndPacket.h"
 						>
 					</File>
 					<File

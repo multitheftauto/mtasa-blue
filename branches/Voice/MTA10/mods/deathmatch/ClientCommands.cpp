@@ -715,6 +715,11 @@ void COMMAND_ShowSyncData ( const char* szCmdLine )
     }
 }
 
+void COMMAND_VoicePushToTalk ( const char* szCmdLine)
+{
+    g_pClientGame->GetVoice()-> UpdatePTTState ( atoi(szCmdLine) );
+}
+
 #if defined (MTA_DEBUG) || defined (MTA_BETA)
 
 void COMMAND_ShowSyncing ( const char *szCmdLine )
@@ -1001,7 +1006,6 @@ void COMMAND_HashArray ( const char *szCmdLine )
         g_pCore->GetConsole ()->Printf ( "Hashing array at 0x%08X [length: %u, size: %u, pad: %u]: failed!", ulOffset, uiArrayLength, uiSize, uiArrayPad );
     }
 }
-
 
 void COMMAND_Modules ( const char *szCmdLine )
 {

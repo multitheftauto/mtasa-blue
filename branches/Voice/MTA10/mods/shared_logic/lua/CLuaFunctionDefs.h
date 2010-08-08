@@ -731,12 +731,6 @@ public:
     LUA_DECLARE ( Md5 );
     LUA_DECLARE ( GetPacketInfo );
 
-#ifdef MTA_VOICE
-    // Voice funcs
-    LUA_DECLARE ( SetVoiceInputEnabled );
-    LUA_DECLARE ( SetVoiceMuteAllEnabled );
-#endif
-
     LUA_DECLARE ( GetVersion );
 
 private:
