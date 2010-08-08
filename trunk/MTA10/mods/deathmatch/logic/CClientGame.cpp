@@ -2399,6 +2399,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientVehicleStartExit", "player, seat", NULL, false );
     m_Events.AddEvent ( "onClientTrailerAttach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onClientTrailerDetach", "towedBy", NULL, false );
+    m_Events.AddEvent ( "onClientVehicleExplode", "", NULL, false );
 
     // GUI events
     m_Events.AddEvent ( "onClientGUIClick", "button, state, absoluteX, absoluteY", NULL, false );
