@@ -3156,15 +3156,15 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
 {
     _asm pushad
 
-    if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 || ucTrafficLightState == 9 )
+    if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 )
     {
         ucDesignatedLightState = 0; //Green
     }
-    else if ( ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7 || ucTrafficLightState == 10 )
+    else if ( ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7 )
     {
         ucDesignatedLightState = 1; //Amber
     }
-    else if ( ucTrafficLightState == 12 )
+    else if ( ucTrafficLightState == 9 )
     {
         ucDesignatedLightState = 4;  //Off
     }
@@ -3183,15 +3183,15 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
 {
     _asm pushad
 
-    if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 || ucTrafficLightState == 9 )
+    if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 )
     {
         ucDesignatedLightState = 0; //Green
     }
-    else if ( ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8 || ucTrafficLightState == 10 )
+    else if ( ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8 )
     {
         ucDesignatedLightState = 1; //Amber
     }
-    else if ( ucTrafficLightState == 12 )
+    else if ( ucTrafficLightState == 9 )
     {
         ucDesignatedLightState = 4; //Off
     }
