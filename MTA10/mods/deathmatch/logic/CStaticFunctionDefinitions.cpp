@@ -4957,7 +4957,7 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
 }
 bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
 {
-    if ( ucState >= 0 && ucState < 13 )
+    if ( ucState >= 0 && ucState < 10 )
     {
         g_pMultiplayer->SetTrafficLightState ( ucState );
         return true;

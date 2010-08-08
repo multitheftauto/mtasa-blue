@@ -7040,7 +7040,7 @@ bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char u
 }
 bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState, bool bForced )
 {
-    if ( ucState >= 0 && ucState < 13 )
+    if ( ucState >= 0 && ucState < 10 )
     {
         g_pGame->SetTrafficLightState ( ucState );
  
