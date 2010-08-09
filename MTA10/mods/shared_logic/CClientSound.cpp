@@ -403,10 +403,12 @@ float CClientSound::GetVolume ( void )
     return m_fVolume;
 }
 
-void CClientSound::SetVolume ( float fVolume )
+void CClientSound::SetVolume ( float fVolume, bool bStore )
 {
-    m_fVolume = fVolume;
-    if ( m_pSound && !m_b3D && m_usDimension == m_pManager->GetSoundManager ()->GetDimension () )
+    if ( bStore )
+        m_fVolume = fVolume;
+
+    if ( m_pSound && !m_b3D && m_bInSameDimension )
         BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_VOL, fVolume );
 }
 
@@ -464,12 +466,13 @@ void CClientSound::RelateDimension ( unsigned short usDimension )
 {
     if ( usDimension == m_usDimension )
     {
-        SetVolume ( m_fVolume );
+        m_bInSameDimension = true;
+        SetVolume ( m_fVolume, false );
     }
     else
     {
-        m_fVolume = GetVolume ();
-        SetVolume ( 0.0f );
+        SetVolume ( 0.0f, false );
+        m_bInSameDimension = false;
     }
 }
 
@@ -554,18 +557,26 @@ void CClientSound::Process3D ( CVector vecPosition )
             SetVelocity ( vecVelocity );
     }
 
-    // Volume
-    float fDistance = DistanceBetweenPoints3D ( vecPosition, m_vecPosition );
-    float fDistDiff = m_fMaxDistance - m_fMinDistance;
+    // Initialize fVolume
     float fVolume = 1.0;
 
-    //Transform e^-x to suit our sound
-    if ( fDistance <= m_fMinDistance )
-        fVolume = 1.0f;
-    else if ( fDistance >= m_fMaxDistance )
+    if ( !m_bInSameDimension )
+        // We don't need any fancy calculations if the sound is not in our dimension - just mute it already
         fVolume = 0.0f;
     else
-        fVolume = exp ( - ( fDistance - m_fMinDistance ) * ( CUT_OFF / fDistDiff ) );
+    {
+        // Volume
+        float fDistance = DistanceBetweenPoints3D ( vecPosition, m_vecPosition );
+        float fDistDiff = m_fMaxDistance - m_fMinDistance;
+
+        //Transform e^-x to suit our sound
+        if ( fDistance <= m_fMinDistance )
+            fVolume = 1.0f;
+        else if ( fDistance >= m_fMaxDistance )
+            fVolume = 0.0f;
+        else
+            fVolume = exp ( - ( fDistance - m_fMinDistance ) * ( CUT_OFF / fDistDiff ) );
+    }
 
     BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_VOL, fVolume * m_fVolume );
 }
