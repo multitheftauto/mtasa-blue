@@ -974,6 +974,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, un
         case CCLIENTPICKUP:
         case CCLIENTRADARAREA:
         case CCLIENTWORLDMESH:
+        case CCLIENTSOUND:
         {
             Entity.SetDimension ( usDimension );
 
