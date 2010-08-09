@@ -64,7 +64,7 @@ public:
 
     unsigned int            GetLength               ( void );
 
-    void                    SetVolume               ( float fVolume );
+    void                    SetVolume               ( float fVolume, bool bStore = true );
     float                   GetVolume               ( void );
 
     void                    SetPlaybackSpeed        ( float fSpeed );
@@ -105,6 +105,7 @@ private:
     DWORD                   m_pSound;
 
     bool                    m_b3D;
+    bool                    m_bInSameDimension;
     float                   m_fDefaultFrequency;
     float                   m_fVolume;
     float                   m_fMinDistance;
