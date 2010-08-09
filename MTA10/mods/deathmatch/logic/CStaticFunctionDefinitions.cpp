@@ -1508,7 +1508,7 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
 bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucComponent, bool bShow )
 {
     enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK };
+                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_ALL };
     switch ( ucComponent )
     {
         case HUD_AMMO:
@@ -1541,6 +1541,9 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucCompon
             return true;
         case HUD_CLOCK:
             g_pGame->GetHud ()->DisableClock ( !bShow );
+            return true;
+        case HUD_ALL:
+            g_pGame->GetHud ()->DisableAll ( !bShow );
             return true;
     }
     return false;
