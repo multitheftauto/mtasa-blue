@@ -2555,7 +2555,7 @@ int CLuaFunctionDefinitions::ShowPlayerHudComponent ( lua_State* luaVM )
             SHudComponent hudComponents [] = { { "ammo" }, { "weapon" }, { "health" },
                                                { "breath" }, { "armour" }, { "money" },
                                                { "vehicle_name" }, { "area_name" }, { "radar" },
-                                               { "clock" }, { "\0" } };
+                                               { "clock" }, { "all" }, { "\0" } };
 
             if ( szComponent && szComponent [ 0 ] )
             {

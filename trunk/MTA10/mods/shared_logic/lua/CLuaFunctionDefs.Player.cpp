@@ -280,7 +280,7 @@ int CLuaFunctionDefs::ShowPlayerHudComponent ( lua_State* luaVM )
         static SHudComponent hudComponents [] = { { "ammo" }, { "weapon" }, { "health" },
         { "breath" }, { "armour" }, { "money" },
         { "vehicle_name" }, { "area_name" }, { "radar" },
-        { "clock" }, { NULL } };
+        { "clock" }, { "all" }, { NULL } };
 
         // Grab the component name and the bool deciding whether to show it or not
         const char* szComponent = lua_tostring ( luaVM, 1 );
