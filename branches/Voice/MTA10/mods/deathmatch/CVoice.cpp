@@ -65,6 +65,7 @@ void CVoice::Init( bool bEnabled, unsigned int uiServerSampleRate )
     m_SampleRate = convertServerSampleRate( uiServerSampleRate );
 
     // State is awaiting input
+    m_VoiceState = VOICESTATE_AWAITING_INPUT;
  
     // Calculate how many frames we are storing and then the buffer size in bytes
     unsigned int iFramesPerBuffer = ( 2048 / ( 32000 / m_SampleRate ));
@@ -386,7 +387,7 @@ void CVoice::DoPulse( void )
 
 void CVoice::SendFrame( const void* inputBuffer )
 {
-    if ( m_VoiceState != VOICESTATE_AWAITING_INPUT && m_bEnabled )
+    if ( m_VoiceState != VOICESTATE_AWAITING_INPUT && m_bEnabled && inputBuffer )
     {
         unsigned int remainingBufferSize = 0;
         unsigned int uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
