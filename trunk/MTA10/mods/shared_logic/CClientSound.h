@@ -106,10 +106,12 @@ private:
 
     bool                    m_b3D;
     bool                    m_bInSameDimension;
+    bool                    m_bPaused;
     float                   m_fDefaultFrequency;
     float                   m_fVolume;
     float                   m_fMinDistance;
     float                   m_fMaxDistance;
+    float                   m_fPlaybackSpeed;
     CVector                 m_vecPosition;
     CVector                 m_vecVelocity;
 
