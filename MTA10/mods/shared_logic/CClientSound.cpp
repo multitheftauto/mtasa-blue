@@ -36,8 +36,10 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : CClientE
     m_fDefaultFrequency = 44100.0f;
     m_fMinDistance = 5.0f;
     m_fMaxDistance = 200.0f;
+    m_fPlaybackSpeed = 1.0f;
     m_usDimension = 0;
     m_b3D = false;
+    m_bPaused = false;
     m_pThread = 0;
 
     m_strStreamName = "";
@@ -117,8 +119,11 @@ bool CClientSound::Play3D ( const SString& strPath, const CVector& vecPosition, 
         m_b3D = true;
         m_strPath = strPath;
         m_vecPosition = vecPosition;
-        BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
-        BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, NULL );
+        m_vecVelocity = CVector( 0, 0, 0 );
+
+        BASS_3DVECTOR pos ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
+        BASS_3DVECTOR vel ( m_vecVelocity.fX, m_vecVelocity.fY, m_vecVelocity.fZ );
+        BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, &vel );
         BASS_ChannelSet3DAttributes ( m_pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
         BASS_ChannelPlay ( m_pSound, false );
         BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
@@ -245,12 +250,20 @@ void CClientSound::ThreadCallback ( HSTREAM pSound )
     if ( pSound )
     {
         m_pSound = pSound;
+
+        BASS_ChannelGetAttribute ( pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
+
         if ( m_b3D )
         {
             BASS_3DVECTOR pos ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
-            BASS_ChannelSet3DPosition ( pSound, &pos, NULL, NULL );
+            BASS_3DVECTOR vel ( m_vecVelocity.fX, m_vecVelocity.fY, m_vecVelocity.fZ );
+            BASS_ChannelSet3DPosition ( pSound, &pos, NULL, &vel );
             BASS_ChannelSet3DAttributes ( pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
         }
+        
+        BASS_ChannelSetAttribute( pSound, BASS_ATTRIB_VOL, m_fVolume );
+        BASS_ChannelSetAttribute ( pSound, BASS_ATTRIB_FREQ, m_fPlaybackSpeed * m_fDefaultFrequency );
+
         // Set a Callback function for download finished
         BASS_ChannelSetSync ( pSound, BASS_SYNC_DOWNLOAD, 0, &DownloadSync, this );
 
@@ -316,8 +329,9 @@ void CClientSound::ThreadCallback ( HSTREAM pSound )
         //g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_WMA_META", BASS_ErrorGetCode() );
         //BASS_ChannelSetSync(pSound,BASS_SYNC_WMA_CHANGE,0,&WMAChangeSync,this); // server-side playlist changes
         //g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_WMA_CHANGE", BASS_ErrorGetCode() );
-        BASS_ChannelGetAttribute ( pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
-        BASS_ChannelPlay ( pSound, false );
+
+        if ( !m_bPaused )
+            BASS_ChannelPlay ( pSound, false );
     }
     else
         g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PlayStream  b3D = %s  path = %s", BASS_ErrorGetCode(), m_b3D ? "true" : "false", m_strPath.c_str() );
@@ -341,6 +355,8 @@ void CClientSound::Stop ( void )
 
 void CClientSound::SetPaused ( bool bPaused )
 {
+    m_bPaused = bPaused;
+
     if ( m_pSound )
     {
         if ( bPaused )
@@ -414,23 +430,23 @@ void CClientSound::SetVolume ( float fVolume, bool bStore )
 
 float CClientSound::GetPlaybackSpeed ( void )
 {
-    float fSpeed = 1;
-    if ( m_pSound )
-        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &fSpeed );
-    return ( fSpeed / m_fDefaultFrequency );
+    return m_fPlaybackSpeed;
 }
 
 void CClientSound::SetPlaybackSpeed ( float fSpeed )
 {
+    m_fPlaybackSpeed = fSpeed;
+
     if ( m_pSound )
         BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_FREQ, fSpeed * m_fDefaultFrequency );
 }
 
 void CClientSound::SetPosition ( const CVector& vecPosition )
 {
+    m_vecPosition = vecPosition;
+
     if ( m_pSound )
     {
-        m_vecPosition = vecPosition;
         BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
         BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, NULL);
     }
@@ -443,9 +459,10 @@ void CClientSound::GetPosition ( CVector& vecPosition ) const
 
 void CClientSound::SetVelocity ( const CVector& vecVelocity )
 {
+    m_vecVelocity = vecVelocity;
+
     if ( m_pSound )
     {
-        m_vecVelocity = vecVelocity;
         BASS_3DVECTOR vel ( vecVelocity.fX, vecVelocity.fY, vecVelocity.fZ );
         BASS_ChannelSet3DPosition ( m_pSound, NULL, NULL, &vel);
     }
@@ -544,7 +561,8 @@ bool CClientSound::IsFxEffectEnabled ( int iFxEffect )
 
 void CClientSound::Process3D ( CVector vecPosition )
 {
-    if ( !m_pSound || !m_b3D )
+    // If the sound isn't 3D, we don't need to process it
+    if ( !m_b3D )
         return;
 
     // Update our position and velocity if we're attached
@@ -556,6 +574,10 @@ void CClientSound::Process3D ( CVector vecPosition )
         if ( CStaticFunctionDefinitions::GetElementVelocity ( *pAttachedToEntity, vecVelocity ) )
             SetVelocity ( vecVelocity );
     }
+
+    // If the sound isn't playing, just having attaching handled is all that's needed here
+    if ( !m_pSound )
+        return;
 
     // Initialize fVolume
     float fVolume = 1.0;
