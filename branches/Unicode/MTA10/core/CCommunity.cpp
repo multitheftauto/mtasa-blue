@@ -6,6 +6,7 @@
 *  PURPOSE:     Community connector class
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -61,10 +62,10 @@ void CCommunity::Logout ( void )
 
     CVARS_SET ( "community_username", std::string () );
     CVARS_SET ( "community_password", std::string () );
+
     // Change GUI
     CLocalGUI::GetSingleton ().GetMainMenu()->ChangeCommunityState ( false, "" );
     CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->OnLoginStateChange ( false );
-
 }
 
 

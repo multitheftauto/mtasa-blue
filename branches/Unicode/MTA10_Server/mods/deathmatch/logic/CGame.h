@@ -13,6 +13,7 @@
 *               Chris McArthur <>
 *               Kevin Whiteside <>
 *               lil_Toady <>
+*               Peter Beverloo <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -217,6 +218,13 @@ public:
     inline float                GetGravity                  ( void )        { return m_fGravity; }
     inline void                 SetGravity                  ( float fGravity )  { m_fGravity = fGravity; }
 
+    inline unsigned char        GetTrafficLightState        ( void )        { return m_ucTrafficLightState; }
+    inline void                 SetTrafficLightState        ( unsigned char ucState ) { m_ucTrafficLightState = ucState; }
+
+    inline bool                 GetTrafficLightsLocked      ( void )        { return m_bTrafficLightsLocked; }
+    inline void                 SetTrafficLightsLocked      ( bool bLocked ) { m_bTrafficLightsLocked = bLocked; }
+
+
     inline float                GetGameSpeed                ( void )        { return m_fGameSpeed; }
     inline void                 SetGameSpeed                ( float fGameSpeed )  { m_fGameSpeed = fGameSpeed; }
 
@@ -245,6 +253,8 @@ public:
 
 private:
     void                        AddBuiltInEvents            ( void );
+
+    void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
 
     void                        Packet_PlayerJoin           ( NetServerPlayerID& Source );
     void                        Packet_PlayerJoinData       ( class CPlayerJoinDataPacket& Packet );
@@ -328,6 +338,10 @@ private:
 
     float                       m_fGravity;
     float                       m_fGameSpeed;
+
+    unsigned char               m_ucTrafficLightState;
+    bool                        m_bTrafficLightsLocked;
+    unsigned long               m_ulLastTrafficUpdate;
 
     unsigned char               m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char               m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;

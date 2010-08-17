@@ -12,6 +12,7 @@
 *               Kevin Whiteside <kevuwk@gmail.com>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Peter Beverloo <>
 *               
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -511,6 +512,13 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
 }
 
 
+bool CStaticFunctionDefinitions::GetElementAttachedOffsets ( CClientEntity & Entity, CVector & vecPosition, CVector & vecRotation )
+{
+    Entity.GetAttachedOffsets ( vecPosition, vecRotation );
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetElementAlpha ( CClientEntity& Entity, unsigned char& ucAlpha )
 {
     switch ( Entity.GetType () )
@@ -966,6 +974,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, un
         case CCLIENTPICKUP:
         case CCLIENTRADARAREA:
         case CCLIENTWORLDMESH:
+        case CCLIENTSOUND:
         {
             Entity.SetDimension ( usDimension );
 
@@ -1025,7 +1034,7 @@ bool CStaticFunctionDefinitions::DetachElements ( CClientEntity& Entity, CClient
     {
         if ( pAttachedToEntity == NULL || pActualAttachedToEntity == pAttachedToEntity )
         {
-            Entity.AttachTo ( NULL );            
+            Entity.AttachTo ( NULL );
             return true;
         }
     }
@@ -1312,6 +1321,13 @@ bool CStaticFunctionDefinitions::GetPedMoveAnim ( CClientPed & Ped, unsigned int
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetPedMoveState ( CClientPed & Ped, std::string& strMoveState )
+{
+    if ( Ped.GetMovementState(strMoveState) )
+        return true;
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::IsPedHeadless ( CClientPed & Ped, bool & bHeadless )
 {
@@ -1493,7 +1509,7 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
 bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucComponent, bool bShow )
 {
     enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK };
+                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_ALL };
     switch ( ucComponent )
     {
         case HUD_AMMO:
@@ -1526,6 +1542,9 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucCompon
             return true;
         case HUD_CLOCK:
             g_pGame->GetHud ()->DisableClock ( !bShow );
+            return true;
+        case HUD_ALL:
+            g_pGame->GetHud ()->DisableAll ( !bShow );
             return true;
     }
     return false;
@@ -3407,20 +3426,6 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CClientEntity& Entity, const ch
 }
 
 
-bool CStaticFunctionDefinitions::GetCameraMode ( char * szBuffer, size_t sizeBuffer )
-{
-    assert ( szBuffer );
-    assert ( sizeBuffer );
-
-    if ( m_pCamera->IsInFixedMode () )
-        strncpy ( szBuffer, "fixed", sizeBuffer );
-    else
-        strncpy ( szBuffer, "player", sizeBuffer );
-
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::GetCameraMatrix ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV )
 {
     m_pCamera->GetPosition ( vecPosition );
@@ -3523,6 +3528,17 @@ bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, uns
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetCameraView ( unsigned short ucMode )
+{
+    m_pCamera->SetCameraView ( (eVehicleCamMode) ucMode );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetCameraView ( unsigned short& ucMode )
+{
+    ucMode = m_pCamera->GetCameraView();
+    return true;
+}
 
 bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVector& vecWorld )
 {
@@ -3899,6 +3915,169 @@ bool CStaticFunctionDefinitions::GUIDeleteTab ( CLuaMain& LuaMain, CClientGUIEle
     return true;
 }
 
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
+{
+    CGUIElement *pElement = m_pGUI->CreateComboBox ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    
+    // Disable editing of the box...
+    //CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( pElement );
+    static_cast < CGUIComboBox* > ( pElement ) -> SetReadOnly ( true );
+
+    // register to the gui manager
+    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
+
+    // set events
+    pGUIElement->SetEvents ( "onClientGUIComboBoxAccepted" );
+    static_cast < CGUIComboBox* > ( pElement ) -> SetSelectionHandler ( pGUIElement->GetCallback1 () );
+
+    return pGUIElement;
+}
+
+int CStaticFunctionDefinitions::GUIComboBoxAddItem ( CClientEntity& Entity, const char* szText )
+{
+    RUN_CHILDREN GUIComboBoxAddItem ( **iter, szText );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Add a new item.
+            CGUIListItem* item = static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> AddItem ( szText );
+            // Return it's id + 1 so indexes start at 1.
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> GetItemIndex ( item );
+        }
+    }    
+
+    return 0;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxRemoveItem ( CClientEntity& Entity, int index )
+{
+    RUN_CHILDREN GUIComboBoxRemoveItem ( **iter, index );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Call RemoveItem with index - 1 so indexes are compatible internally ...
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> RemoveItem( index  );
+        }
+    }    
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxClear ( CClientEntity& Entity  )
+{
+    RUN_CHILDREN GUIComboBoxClear ( **iter );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Clear the combobox
+            static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) ->Clear ( );
+            return true;
+        }
+    }    
+
+    return false;
+}
+
+int CStaticFunctionDefinitions::GUIComboBoxGetSelected ( CClientEntity& Entity )
+{
+    RUN_CHILDREN GUIComboBoxGetSelected ( **iter );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // return the selected + 1 so indexes start at 1...
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) ->GetSelectedItemIndex ( );
+        }
+    }    
+
+    return 0;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxSetSelected ( CClientEntity& Entity, int index )
+{
+    RUN_CHILDREN GUIComboBoxSetSelected ( **iter, index );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Call SetSelectedItem with index - 1 so indexes are compatible internally ...
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItemByIndex( index );
+        }
+    }    
+
+    return false;
+}
+
+std::string CStaticFunctionDefinitions::GUIComboBoxGetItemText ( CClientEntity& Entity, int index )
+{
+    RUN_CHILDREN GUIComboBoxGetItemText ( **iter, index );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Call GetItemText with index - 1 so indexes are compatible internally ...
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> GetItemText( index );
+        }
+    }    
+
+    return NULL;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxSetItemText ( CClientEntity& Entity, int index, const char* szText )
+{
+    RUN_CHILDREN GUIComboBoxSetItemText ( **iter, index, szText );
+
+    // Are we a CGUI element?
+    if ( IS_GUI ( &Entity ) )
+    {
+        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
+
+        // Are we a combobox?
+        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
+        {
+            // Call SetItemText with index - 1 so indexes are compatible internally ...
+            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> SetItemText( index, szText );
+        }
+    }    
+
+    return false;
+}
 
 void CStaticFunctionDefinitions::GUISetText ( CClientEntity& Entity, const char* szText )
 {
@@ -4780,11 +4959,41 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
     g_pGame->GetWorld ()->SetJetpackMaxHeight ( fHeight );
     return true;
 }
+bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
+{
+    if ( ucState >= 0 && ucState < 10 )
+    {
+        g_pMultiplayer->SetTrafficLightState ( ucState );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetTrafficLightsLocked ( bool bLocked )
+{
+    g_pMultiplayer->SetTrafficLightsLocked ( bLocked );
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled ( const char* szPropName )
 {
     return g_pGame->IsCheatEnabled ( szPropName );
 }
+
+bool CStaticFunctionDefinitions::GetTrafficLightState ( unsigned char& ucState )
+{
+    ucState = g_pMultiplayer->GetTrafficLightState ();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::AreTrafficLightsLocked ( bool& bLocked )
+{
+    bLocked = g_pMultiplayer->GetTrafficLightsLocked ();
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::SetSkyGradient ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue )
 {

@@ -8,6 +8,7 @@
 *               Christian Myhre Lundheim <>
 *               Jax <>
 *               Cecill Etheredge <ijsf@gmx.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -42,6 +43,7 @@
     
 #define VAR_ActiveCam                       0x7E46FE
 #define VAR_CameraRotation                  0xB6F178 // used for controling where the player faces
+#define VAR_VehicleCameraView               0xB6F0DC
 
 
 #define MAX_CAMS                            3 
@@ -428,6 +430,8 @@ public:
     RwMatrix *                  GetLTM ( void );
     CEntity *                   GetTargetEntity ( void );
     void                        SetCameraClip ( bool bObjects, bool bVehicles );
+    BYTE                        GetCameraView ( void );
+    VOID                        SetCameraView ( BYTE dwCamMode );
 
 private:
     static unsigned long        FUNC_RwFrameGetLTM;

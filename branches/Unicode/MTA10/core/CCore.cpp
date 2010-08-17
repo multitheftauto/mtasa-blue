@@ -764,6 +764,10 @@ void CCore::HideMainMenu ( void )
     m_pLocalGUI->GetMainMenu ()->SetServerBrowserVisible ( false );
 }
 
+void CCore::HideQuickConnect ( void )
+{
+    m_pLocalGUI->GetMainMenu ()->GetQuickConnectWindow()->SetVisible( false );
+}
 
 void CCore::ApplyHooks ( )
 { 

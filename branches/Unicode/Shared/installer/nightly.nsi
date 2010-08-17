@@ -502,7 +502,8 @@ Function .onInstSuccess
 		!ifdef CLIENT_SETUP
 			IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
 			SetOutPath "$INSTDIR"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas\Play MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
+			Delete "$SMPROGRAMS\\MTA San Andreas\Play MTA San Andreas.lnk"
+			CreateShortCut "$SMPROGRAMS\\MTA San Andreas\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
 				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
 				"" "Play Multi Theft Auto: San Andreas"
 			skip1:
@@ -535,7 +536,8 @@ Function .onInstSuccess
 		!ifdef CLIENT_SETUP
 			IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip4
 			SetOutPath "$INSTDIR"
-			CreateShortCut "$DESKTOP\Play MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
+			Delete "$DESKTOP\Play MTA San Andreas.lnk"
+			CreateShortCut "$DESKTOP\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
 				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
 				"" "Play Multi Theft Auto: San Andreas"
 			skip4:
@@ -610,7 +612,7 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\net.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
 
 			!ifndef LIGHTBUILD
@@ -621,6 +623,7 @@ DontInstallRedist:
 				File "${FILES_ROOT}\MTA San Andreas\mta\bassflac.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
+				File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 
@@ -712,7 +715,6 @@ DontInstallRedist:
 		!insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "706869E53F508919F987A2F7F2653AD2"
 
 		SetOverwrite off
-		File "${SERVER_FILES_ROOT}\mods\deathmatch\accounts.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\acl.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml"
 		File "${SERVER_FILES_ROOT}\mods\deathmatch\banlist.xml"
@@ -1106,7 +1108,7 @@ Section Uninstall
 		${GameExplorer_RemoveGame} ${GUID}
 		
 		; Delete shortcuts
-		Delete "$SMPROGRAMS\\MTA San Andreas\Play MTA San Andreas.lnk"
+		Delete "$SMPROGRAMS\\MTA San Andreas\MTA San Andreas.lnk"
 		Delete "$SMPROGRAMS\\MTA San Andreas\Uninstall MTA San Andreas.lnk"
 	!else
 		RmDir /r "$INSTDIR\server" ; for server only install

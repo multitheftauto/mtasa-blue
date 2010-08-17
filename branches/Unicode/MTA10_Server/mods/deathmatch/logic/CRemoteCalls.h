@@ -26,12 +26,12 @@ private:
     char *              m_szServerHost;
     std::string         m_strData;
     class CLuaMain *    m_VM;
-    int                 m_iFunction;
+    CLuaFunctionRef     m_iFunction;
     char                m_szURL[512];
 
 public:
-                        CRemoteCall ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, int iFunction );
-                        CRemoteCall ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, int iFunction );
+                        CRemoteCall ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+                        CRemoteCall ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
                         ~CRemoteCall ();
     void                MakeCall();
     static void         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
@@ -51,8 +51,8 @@ public:
                         CRemoteCalls();
                         ~CRemoteCalls();
 
-    void                Call ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, int iFunction );
-    void                Call ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, int iFunction );
+    void                Call ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+    void                Call ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
     void                Remove ( CLuaMain * luaMain );
     void                Remove ( CRemoteCall * call );
     bool                CallExists ( CRemoteCall * call );

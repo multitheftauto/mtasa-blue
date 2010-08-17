@@ -65,6 +65,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getAttachedElements", CLuaElementDefs::getAttachedElements );
     CLuaCFunctions::AddFunction ( "getElementAttachedTo", CLuaElementDefs::getElementAttachedTo );
     CLuaCFunctions::AddFunction ( "setElementAttachedOffsets", CLuaElementDefs::setElementAttachedOffsets );
+    CLuaCFunctions::AddFunction ( "getElementAttachedOffsets", CLuaElementDefs::getElementAttachedOffsets );
 
     // Element data
     CLuaCFunctions::AddFunction ( "getElementData", CLuaElementDefs::getElementData );
@@ -988,6 +989,40 @@ int CLuaElementDefs::setElementAttachedOffsets ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementAttachedOffsets" );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaElementDefs::getElementAttachedOffsets ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        // Grab the attached element
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        CVector vecPosition, vecRotation;
+
+        // Valid element?
+        if ( pElement )
+        {
+            if ( CStaticFunctionDefinitions::GetElementAttachedOffsets ( pElement, vecPosition, vecRotation ) )
+            {
+                lua_pushnumber( luaVM, vecPosition.fX );
+                lua_pushnumber( luaVM, vecPosition.fY );
+                lua_pushnumber( luaVM, vecPosition.fZ );
+                lua_pushnumber( luaVM, vecRotation.fX );
+                lua_pushnumber( luaVM, vecRotation.fY );
+                lua_pushnumber( luaVM, vecRotation.fZ );
+                return 6;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementAttachedOffsets", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementAttachedOffsets" );
 
     // Failed
     lua_pushboolean ( luaVM, false );

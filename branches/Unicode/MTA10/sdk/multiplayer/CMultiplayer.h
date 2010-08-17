@@ -135,6 +135,9 @@ public:
     virtual void                        SetCloudsEnabled            ( bool bDisabled ) = 0;
     virtual void                        DisableEnterExitVehicleKey  ( bool bDisabled ) = 0;
 
+    virtual void                        SetNightVisionEnabled       ( bool bEnabled ) = 0;
+    virtual void                        SetThermalVisionEnabled     ( bool bEnabled ) = 0;
+
     virtual void                        RebuildMultiplayerPlayer    ( class CPed * player ) = 0;
 
     virtual void                        AllowWindowsCursorShowing   ( bool bAllow ) = 0;
@@ -162,6 +165,12 @@ public:
 
     virtual float                       GetLocalPlayerGravity       () = 0;
     virtual void                        SetLocalPlayerGravity       ( float fGravity ) = 0;
+
+    virtual unsigned char               GetTrafficLightState        () = 0;
+    virtual void                        SetTrafficLightState        ( unsigned char ucState ) = 0;
+
+    virtual bool                        GetTrafficLightsLocked      () = 0;
+    virtual void                        SetTrafficLightsLocked      ( bool bLocked ) = 0;
 
     virtual void                        SetLocalStatValue           ( unsigned short usStat, float fValue ) = 0;
     virtual void                        SetLocalStatsStatic         ( bool bStatic ) = 0;

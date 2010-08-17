@@ -10,6 +10,7 @@
 *               Jax <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Fedor Sinev <fedorsinev@gmail.com>
 *
 *****************************************************************************/
 
@@ -152,13 +153,17 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_pAnimationBlock = NULL;
     m_szAnimationName = NULL;
     m_bRequestedAnimation = false;
+    m_iTimeAnimation = -1;
     m_bLoopAnimation = false;    
     m_bUpdatePositionAnimation = false;
+    m_bInterruptableAnimation = false;
+    m_bFreezeLastFrameAnimation = true;
     m_bHeadless = false;
     m_bFrozen = false;
     m_bFrozenWaitingForGroundToLoad = false;
     m_fGroundCheckTolerance = 0.f;
     m_fObjectsAroundTolerance = 0.f;
+    m_iLoadAllModelsCounter = 0;
     m_bIsOnFire = false;
     m_LastSyncedData = new SLastSyncedPedData;
     m_bSpeechEnabled = true;
@@ -175,6 +180,17 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
 
     // Our default clothes
     m_pClothes->DefaultClothes ( false );
+
+    // Movement state names for Lua
+    m_MovementStateNames[MOVEMENTSTATE_STAND]       =    "stand";
+    m_MovementStateNames[MOVEMENTSTATE_WALK]        =    "walk";
+    m_MovementStateNames[MOVEMENTSTATE_POWERWALK]   =    "powerwalk";
+    m_MovementStateNames[MOVEMENTSTATE_JOG]         =    "jog";
+    m_MovementStateNames[MOVEMENTSTATE_SPRINT]      =    "sprint";
+    m_MovementStateNames[MOVEMENTSTATE_CROUCH]      =    "crouch";
+    //These two are inactive for now
+    m_MovementStateNames[MOVEMENTSTATE_CRAWL]       =    "crawl";
+    m_MovementStateNames[MOVEMENTSTATE_ROLL]        =    "roll";
 
     // Create the player model
     if ( m_bIsLocalPlayer )
@@ -586,7 +602,10 @@ void CClientPed::Spawn ( const CVector& vecPosition,
 
     // Wait for ground
     if ( m_bIsLocalPlayer )
+    {
         SetFrozenWaitingForGroundToLoad ( true );
+        m_iLoadAllModelsCounter = 10;
+    }
 
     // Remove any animation
     KillAnimation ();
@@ -1209,7 +1228,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     {
         if ( pVehicle->IsStreamedIn () )
         {
-            pModelInfo->LoadAllRequestedModels ();
+            g_pGame->GetStreaming()->LoadAllRequestedModels ();
         }
     }
 
@@ -1901,12 +1920,14 @@ void CClientPed::RemoveAllWeapons ( void )
     if ( m_bIsLocalPlayer )
     {
         g_pClientGame->ResetAmmoInClip();
+        g_pMultiplayer->SetNightVisionEnabled( false );
+        g_pMultiplayer->SetThermalVisionEnabled( false );
     }
     if ( m_pPlayerPed )
     {
         m_pPlayerPed->ClearWeapons ();
     }
-    
+
     for ( int i = 0 ; i < (int)WEAPONSLOT_MAX ; i++ )
         m_WeaponTypes [ i ] = WEAPONTYPE_UNARMED;
     m_CurrentWeaponSlot = WEAPONSLOT_TYPE_UNARMED;
@@ -1961,6 +1982,59 @@ bool CClientPed::HasWeapon ( eWeaponType weaponType )
     return false;
 }
 
+eMovementState CClientPed::GetMovementState ( void )
+{
+    // Do we have a player, and are we on foot? (streamed in)
+    if ( m_pPlayerPed && !GetRealOccupiedVehicle () )
+    {
+        CControllerState cs;
+        GetControllerState ( cs );
+
+        // Grab his controller state
+        bool bWalkKey = false;
+        if ( GetType () == CCLIENTPLAYER )
+            bWalkKey = CClientPad::GetControlState ( "walk", cs, true );
+        else
+            m_Pad.GetControlState("walk",bWalkKey);
+        
+        // Is he standing up?
+        if ( !IsDucked() )
+        {
+            unsigned int iRunState = m_pPlayerPed->GetRunState();
+
+            // Is he moving the contoller at all?
+            if ( iRunState == 1 && cs.LeftStickX == 0 && cs.LeftStickY == 0 )
+                return MOVEMENTSTATE_STAND;
+
+            //Is he either pressing the walk key, or has run state 1?
+            if ( iRunState == 1 || bWalkKey && iRunState == 6 )
+                return MOVEMENTSTATE_WALK;
+            else if ( iRunState == 4 )
+                return MOVEMENTSTATE_POWERWALK;
+            else if ( iRunState == 6 )
+                return MOVEMENTSTATE_JOG;
+            else if ( iRunState == 7 )
+                return MOVEMENTSTATE_SPRINT;
+        }
+        else
+        {
+            // Is he moving the contoller at all?
+            if ( cs.LeftStickX == 0 && cs.LeftStickY == 0 )
+                return MOVEMENTSTATE_CROUCH;
+        }
+    }
+    return MOVEMENTSTATE_UNKNOWN;
+}
+
+bool CClientPed::GetMovementState ( std::string& strStateName )
+{
+    eMovementState eCurrentMoveState = GetMovementState();
+    if ( eCurrentMoveState == MOVEMENTSTATE_UNKNOWN )
+        return false;
+
+    strStateName = m_MovementStateNames[eCurrentMoveState];
+    return true;
+}
 
 CTask* CClientPed::GetCurrentPrimaryTask ( void )
 {
@@ -2184,18 +2258,27 @@ void CClientPed::StreamedInPulse ( void )
         if ( IsFrozenWaitingForGroundToLoad () )
             HandleWaitingForGroundToLoad ();
 
-        // Draw a little star in the corner if async is on
-        if ( g_pGame->IsASyncLoadingEnabled ( true ) )
+        // Bodge to get things loaded quicker on spawn
+        if ( m_iLoadAllModelsCounter )
         {
-            CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
-            unsigned int uiHeight = pGraphics->GetViewportHeight ();
-            unsigned int uiWidth = pGraphics->GetViewportWidth ();
-            unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled () ? uiHeight - 7 : uiHeight - 12;
-            pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
+            m_iLoadAllModelsCounter--;
+            if ( GetModelInfo () )
+                g_pGame->GetStreaming()->LoadAllRequestedModels();
         }
+
 
         if ( m_bIsLocalPlayer )
         {
+            // Draw a little star in the corner if async is on
+            if ( g_pGame->IsASyncLoadingEnabled ( true ) )
+            {
+                CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+                unsigned int uiHeight = pGraphics->GetViewportHeight ();
+                unsigned int uiWidth = pGraphics->GetViewportWidth ();
+                unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled () ? uiHeight - 7 : uiHeight - 12;
+                pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
+            }
+
             // Check if the ped got in fire without the script control
             m_bIsOnFire = m_pPlayerPed->IsOnFire();
 
@@ -2270,6 +2353,16 @@ void CClientPed::StreamedInPulse ( void )
                     Current.LeftStickX = 0;
                     Current.LeftStickY = 0;
                 }
+            }
+
+            // Fix to disable the quick cutting of the post deagle shooting animation
+            // If we're USE_GUN, but aren't pressing the fire or aim keys we must be
+            // in a post-fire state where the player is preparing to move back to 
+            // a normal stance.  This can normally be cut using the crouch key, so block it
+            if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTMOVE ) )
+            {
+                if ( Current.RightShoulder1 == 0 && Current.LeftShoulder1 == 0 && Current.ButtonCircle == 0 )
+                    Current.ShockButtonL = 0;
             }
         }
         else
@@ -2553,7 +2646,7 @@ void CClientPed::StreamedInPulse ( void )
                 char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
                 strcpy ( szAnimName, m_szAnimationName );
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
                 delete [] szAnimName;                
             }            
         }
@@ -2969,13 +3062,13 @@ void CClientPed::_CreateModel ( void )
             char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
             strcpy ( szAnimName, m_szAnimationName );
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             delete [] szAnimName;
         }
 
         // Set the voice that corresponds to our model
         short sVoiceType, sVoiceID;
-        static_cast < CPedModelInfo * > ( m_pModelInfo )->GetVoice ( &sVoiceType, &sVoiceID );
+        m_pModelInfo->GetVoice ( &sVoiceType, &sVoiceID );
         SetVoice ( sVoiceType, sVoiceID );
 
         // Tell the streamer we created the player
@@ -3202,7 +3295,7 @@ void CClientPed::_ChangeModel ( void )
                 char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
                 strcpy ( szAnimName, m_szAnimationName );
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
                 delete [] szAnimName;
             }
 
@@ -4626,13 +4719,13 @@ void CClientPed::SetSunbathing ( bool bSunbathing, bool bStartStanding )
 }
 
 
-bool CClientPed::LookAt ( CVector vecOffset, int iTime, CClientEntity * pEntity )
+bool CClientPed::LookAt ( CVector vecOffset, int iTime, int iBlend, CClientEntity * pEntity )
 {   
     if ( m_pPlayerPed )
     {          
         CEntity * pGameEntity = NULL;
         if ( pEntity ) pGameEntity = pEntity->GetGameEntity ();
-        CTaskSimpleTriggerLookAt * pTask = g_pGame->GetTasks ()->CreateTaskSimpleTriggerLookAt ( pGameEntity, iTime, 0, vecOffset );
+        CTaskSimpleTriggerLookAt * pTask = g_pGame->GetTasks ()->CreateTaskSimpleTriggerLookAt ( pGameEntity, iTime, 0, vecOffset, false, 0.250000, iBlend );
         if ( pTask )
         {
             pTask->SetAsSecondaryPedTask ( m_pPlayerPed, TASK_SECONDARY_PARTIAL_ANIM );
@@ -4742,7 +4835,7 @@ void CClientPed::RunAnimation ( AssocGroupId animGroup, AnimationId animID )
 }
 
 
-void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bOffsetPed, bool bHoldLastFrame )
+void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame )
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -4752,8 +4845,36 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     // Are we streamed in?
     if ( m_pPlayerPed )
     {  
-        if ( pBlock->IsLoaded () )
+        bool bLoaded = true;
+        
+        if( !pBlock->IsLoaded() )
         {
+            int iTimeToWait = 50;
+
+            g_pGame->GetStreaming()->RequestAnimations( pBlock->GetIndex(), 4 );
+            g_pGame->GetStreaming()->LoadAllRequestedModels( );
+
+            while( !pBlock->IsLoaded() && iTimeToWait != 0 )
+            {
+                iTimeToWait--;
+                Sleep(10);
+            }
+
+            if( iTimeToWait == 0 )
+                bLoaded = false;
+        }
+
+        if ( bLoaded )
+        {
+            int flags = 0x10; // // Stops jaw fucking up, some speaking flag maybe   
+            if ( bLoop ) flags |= 0x2; // flag that triggers the loop (Maccer)
+            if ( bUpdatePosition ) 
+            {
+                // 0x40 enables position updating on Y-coord, 0x80 on X. (Maccer)
+                flags |= 0x40; 
+                flags |= 0x80;
+            }
+            
             // Kill any higher priority tasks if we dont want this anim interuptable
             if ( !bInterruptable )
             {
@@ -4761,12 +4882,9 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
                 KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
                 KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
             }
-
-            int flags = 0;            
-            if ( bLoop ) flags |= 0x2;
-            flags |= 0x10;      // Stops jaw fucking up, some speaking flag maybe
-            if ( bUpdatePosition ) flags |= 0x40;
-            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bOffsetPed, bHoldLastFrame );
+            
+            if ( !bFreezeLastFrame ) flags |= 0x08; // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
+            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
@@ -4782,8 +4900,11 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     m_pAnimationBlock = pBlock;
     m_szAnimationName = new char [ strlen ( szAnimName ) + 1 ];
     strcpy ( m_szAnimationName, szAnimName ); 
+    m_iTimeAnimation = iTime;
     m_bLoopAnimation = bLoop;
     m_bUpdatePositionAnimation = bUpdatePosition;
+    m_bInterruptableAnimation = bInterruptable;
+    m_bFreezeLastFrameAnimation = bFreezeLastFrame;
 }
 
 
@@ -4991,27 +5112,36 @@ bool CClientPed::ShouldBeStealthAiming ( void )
         if ( GetCurrentWeaponType () == WEAPONTYPE_KNIFE )
         {
             // Do we have the aim key pressed?
-            SBindableGTAControl* pAimControl = g_pCore->GetKeyBinds ()->GetBindableFromControl ( "aim_weapon" );
-            if ( pAimControl && pAimControl->bState )
+            CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
+            if ( pKeyBinds )
             {
-                // Do we have a target ped?
-                CClientPed * pTargetPed = GetTargetedPed ();
-                if ( pTargetPed && pTargetPed->GetGamePlayer () )
+                SBindableGTAControl* pAimControl = pKeyBinds->GetBindableFromControl ( "aim_weapon" );
+                if ( pAimControl && pAimControl->bState )
                 {
-                    // Are we close enough to the target?
-                    CVector vecPos, vecPos_2;
-                    GetPosition ( vecPos );
-                    pTargetPed->GetPosition ( vecPos_2 );
-                    if ( DistanceBetweenPoints3D ( vecPos, vecPos_2 ) <= STEALTH_KILL_RANGE )
+                    //We need to be either crouched, walking or standing
+                    SBindableGTAControl* pWalkControl = pKeyBinds->GetBindableFromControl ( "walk" );
+                    if ( m_pPlayerPed->GetRunState() == 1 || m_pPlayerPed->GetRunState() == 4 || pWalkControl && pWalkControl->bState )
                     {
-                        // Grab our current anim
-                        CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
-                        if ( pAssoc )
+                        // Do we have a target ped?
+                        CClientPed * pTargetPed = GetTargetedPed ();
+                        if ( pTargetPed && pTargetPed->GetGamePlayer () )
                         {
-                            // Our game checks for stealth killing
-                            if ( m_pPlayerPed->GetPedIntelligence ()->TestForStealthKill ( pTargetPed->GetGamePlayer (), false ) )
+                            // Are we close enough to the target?
+                            CVector vecPos, vecPos_2;
+                            GetPosition ( vecPos );
+                            pTargetPed->GetPosition ( vecPos_2 );
+                            if ( DistanceBetweenPoints3D ( vecPos, vecPos_2 ) <= STEALTH_KILL_RANGE )
                             {
-                                return true;
+                                // Grab our current anim
+                                CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
+                                if ( pAssoc )
+                                {
+                                    // Our game checks for stealth killing
+                                    if ( m_pPlayerPed->GetPedIntelligence ()->TestForStealthKill ( pTargetPed->GetGamePlayer (), false ) )
+                                    {
+                                        return true;
+                                    }
+                                }
                             }
                         }
                     }
@@ -5136,7 +5266,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
 
     // Load load load
     if ( GetModelInfo () )
-        GetModelInfo ()-> LoadAllRequestedModels ();
+        g_pGame->GetStreaming()->LoadAllRequestedModels ();
 
     // Start out with a fairly big radius to check, and shrink it down over time
     float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );

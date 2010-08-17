@@ -46,6 +46,8 @@ bool g_bBoundsChecker = true;
 #define DEFAULT_GAME_SPEED 1.0f
 #define DEFAULT_BLUR_LEVEL 36
 #define DEFAULT_MINUTE_DURATION 1000
+#define DOUBLECLICK_TIMEOUT 330
+#define DOUBLECLICK_MOVE_THRESHOLD 10.0f
 
 CClientGame::CClientGame ( bool bLocalPlay )
 {
@@ -62,6 +64,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_fMarkerBounce = 0.0f;
     m_Status = CClientGame::STATUS_CONNECTING;
     m_ulVerifyTimeStart = 0;
+    m_ulLastClickTick = 0;
     m_pLocalPlayer = NULL;
     m_LocalID = INVALID_ELEMENT_ID;
     m_szLocalNick [0] = 0;
@@ -114,6 +117,10 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->DisableQuickReload ( true );
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
+
+    // Remove Night & Thermal vision view (if enabled).
+    g_pMultiplayer->SetNightVisionEnabled ( false );
+    g_pMultiplayer->SetThermalVisionEnabled ( false );
 
     m_bCloudsEnabled = true;
 
@@ -1812,6 +1819,18 @@ void CClientGame::UpdateFireKey ( void )
                             // Would GTA let us stealth kill now?
                             if ( m_pLocalPlayer->GetGamePlayer ()->GetPedIntelligence ()->TestForStealthKill ( pGameTarget, false ) )
                             {
+                                //Grab our local position
+                                CVector vecLocalPosition;
+                                m_pLocalPlayer->GetPosition(vecLocalPosition);
+                                
+                                //Grab the target's position
+                                CVector vecTargetPosition;
+                                pTargetPed->GetPosition(vecTargetPosition);
+
+                                //Work out an angle between the players, and set this as we initiate our knife kill
+                                float fAngle = AngleBetweenPoints2D ( vecLocalPosition, vecTargetPosition );
+                                m_pLocalPlayer->SetCurrentRotation(fAngle);
+
                                 // Change the state back to false so this press doesn't do anything else
                                 pControl->bState = false;
                                 CLuaArguments Arguments;
@@ -2220,6 +2239,32 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
 
                         m_pNetAPI->RPC ( CURSOR_EVENT, bitStream.pBitStream );
 
+                        if ( strcmp(szState, "down") == 0 )
+                        {
+                            CVector2D vecDelta = m_vecLastCursorPosition - vecCursorPosition;
+
+                            if (    ( GetTickCount() - m_ulLastClickTick ) < DOUBLECLICK_TIMEOUT &&
+                                    vecDelta.Length() <= DOUBLECLICK_MOVE_THRESHOLD )
+                            {
+                                // Call the event for the client
+                                CLuaArguments DoubleClickArguments;
+                                DoubleClickArguments.PushString ( szButton );
+                                DoubleClickArguments.PushNumber ( vecCursorPosition.fX );
+                                DoubleClickArguments.PushNumber ( vecCursorPosition.fY );
+                                DoubleClickArguments.PushNumber ( vecCollision.fX );
+                                DoubleClickArguments.PushNumber ( vecCollision.fY );
+                                DoubleClickArguments.PushNumber ( vecCollision.fZ );
+                                if ( pCollisionEntity )
+                                    DoubleClickArguments.PushElement ( pCollisionEntity );
+                                else
+                                    DoubleClickArguments.PushBoolean ( false );
+                                m_pRootEntity->CallEvent ( "onClientDoubleClick", DoubleClickArguments, false );
+                            }
+
+                            m_ulLastClickTick = GetTickCount();
+                            m_vecLastCursorPosition = vecCursorPosition;
+                        }
+
                         return true;
                     }
                 }
@@ -2354,6 +2399,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientVehicleStartExit", "player, seat", NULL, false );
     m_Events.AddEvent ( "onClientTrailerAttach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onClientTrailerDetach", "towedBy", NULL, false );
+    m_Events.AddEvent ( "onClientVehicleExplode", "", NULL, false );
 
     // GUI events
     m_Events.AddEvent ( "onClientGUIClick", "button, state, absoluteX, absoluteY", NULL, false );
@@ -2366,8 +2412,9 @@ void CClientGame::AddBuiltInEvents ( void )
     //m_Events.AddEvent ( "onClientGUIClose", "element", NULL, false );
     //m_Events.AddEvent ( "onClientGUIKeyDown", "element", NULL, false );
     m_Events.AddEvent ( "onClientGUITabSwitched", "element", NULL, false );
+    m_Events.AddEvent ( "onClientGUIComboBoxAccepted", "element", NULL, false );
 
-    m_Events.AddEvent ( "onClientDoubleClick", "button, state, screenX, screenY, worldX, worldY, worldZ, element", NULL, false );
+    m_Events.AddEvent ( "onClientDoubleClick", "button, screenX, screenY, worldX, worldY, worldZ, element", NULL, false );
     m_Events.AddEvent ( "onClientMouseMove", "screenX, screenY", NULL, false );
     m_Events.AddEvent ( "onClientMouseEnter", "screenX, screenY", NULL, false );
     m_Events.AddEvent ( "onClientMouseLeave", "screenX, screenY", NULL, false );
@@ -2410,8 +2457,9 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientProjectileCreation", "creator", NULL, false );
 
     // Sound events
-    m_Events.AddEvent ( "onClientSoundStream", "success, length", NULL, false );
+    m_Events.AddEvent ( "onClientSoundStream", "success, length, streamName", NULL, false );
     m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
+    m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
 }
 
 
@@ -4315,6 +4363,10 @@ void CClientGame::ResetMapInfo ( void )
     // Money
     SetMoney ( 0 );
 
+    // Water
+    g_pGame->GetWaterManager ()->SetWaterLevel ( (CVector *)NULL, 0.0f, NULL, true );
+    g_pGame->GetWaterManager ()->SetWaveLevel ( 0.0f );
+
     // Weather
     m_pBlendedWeather->SetWeather ( 0 );
 
@@ -4323,9 +4375,6 @@ void CClientGame::ResetMapInfo ( void )
 
     // Water-colour
     g_pMultiplayer->ResetWater ();
-
-    // Water
-    g_pGame->GetWaterManager ()->Reset ();
 
      // Sky-gradient
     g_pMultiplayer->SetCloudsEnabled ( true );
@@ -4915,7 +4964,7 @@ bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
 
     if ( iCheckStatus & iEnableClientChecks )
     {
-        g_pCore->ShowMessageBox ( "Error", "San Andreas data files have been modified", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->InitiateDataFilesFix ();
         g_pCore->GetModManager ()->RequestUnload ();
         return false;
     }

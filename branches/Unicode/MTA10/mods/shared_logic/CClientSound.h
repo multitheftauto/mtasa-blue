@@ -41,9 +41,14 @@ public:
 
     bool                    Play                    ( const SString& strPath, bool bLoop );
     bool                    Play3D                  ( const SString& strPath, const CVector& vecPosition, bool bLoop );
+
+    HSTREAM                 ConvertFileToMono       ( const SString& strPath );
+
     void                    PlayStream              ( const SString& strURL, bool bLoop, bool b3D = false, const CVector& vecPosition = CVector () );
 
     static void             PlayStreamIntern        ( void* arguments );
+
+    void                    GetMeta                  ( void );
 
     void                    ThreadCallback          ( HSTREAM pSound );
 
@@ -59,7 +64,7 @@ public:
 
     unsigned int            GetLength               ( void );
 
-    void                    SetVolume               ( float fVolume );
+    void                    SetVolume               ( float fVolume, bool bStore = true );
     float                   GetVolume               ( void );
 
     void                    SetPlaybackSpeed        ( float fSpeed );
@@ -100,10 +105,13 @@ private:
     DWORD                   m_pSound;
 
     bool                    m_b3D;
+    bool                    m_bInSameDimension;
+    bool                    m_bPaused;
     float                   m_fDefaultFrequency;
     float                   m_fVolume;
     float                   m_fMinDistance;
     float                   m_fMaxDistance;
+    float                   m_fPlaybackSpeed;
     CVector                 m_vecPosition;
     CVector                 m_vecVelocity;
 
@@ -112,6 +120,9 @@ private:
     HANDLE                  m_pThread;
 
     SString                 m_strPath;
+
+    SString                 m_strStreamName;
+    SString                 m_strStreamTitle;
 };
 
 #endif

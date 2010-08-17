@@ -69,8 +69,7 @@ Socket::Socket ( int inAcceptSocket,
 
 Socket::~Socket ( )
 {
-
-
+    Close();
 }
 
 
@@ -139,17 +138,8 @@ Socket::Init (  int iIP,   ///< ip address to bind to
 		return INITSOCKET_SOCKETFAILED;
 	}
 
-#ifdef _WIN32
-
-	u_long MyTrueVar = 1; 
-	ioctlsocket ( nAcceptSocket, FIONBIO, &MyTrueVar );
-	
-#else
-	int MyTrueVar = 1;
-	ioctl ( nAcceptSocket, FIONBIO, &MyTrueVar );
-	MyTrueVar = 1; // not sure if it was changed in ioctl, so re-set it
-	setsockopt ( nAcceptSocket, SOL_SOCKET, SO_REUSEADDR, (const void *) &MyTrueVar, sizeof ( int ) );
-#endif
+    SetNonBlocking( true );
+    SetReuseAddress( true );
 
 	// bind the socket to the appropriate port
 	struct sockaddr_in oSocketInfo;
@@ -199,7 +189,6 @@ Socket::Init (  int iIP,   ///< ip address to bind to
 int Socket::Read ( void * ipBuffer, int ipBufferLength )
 {
 
-	//return read ( nAcceptSocket, ipBuffer, ipBufferLength );
 	return recv ( nAcceptSocket, 
 #ifdef _WIN32
 				  (char *) ipBuffer,
@@ -225,14 +214,16 @@ int Socket::Send ( const void * ipMessage, size_t inLength, int inFlags )
 
 void Socket::Close ( )
 {
+    if ( nAcceptSocket == INVALID_SOCKET )
+        return;
+
 #ifdef _WIN32
 	closesocket ( nAcceptSocket );
 #else
 	close ( nAcceptSocket );
 #endif
 
-//    if ( poSocket )
-//        delete poSocket;
+    nAcceptSocket = INVALID_SOCKET;
 }
 
 NetworkAbstraction * Socket::Accept ( )
@@ -272,6 +263,8 @@ NetworkAbstraction * Socket::Accept ( )
 	
 	Socket * poSocket = new Socket ( nNewFd, &oInternetSocketAddress );
 
+    poSocket->SetNonBlocking( true );
+
 #ifdef EHS_DEBUG
 	fprintf ( stderr, "[EHS_DEBUG] Allocated new socket object with fd='%d' and socket addr='%x'\n",
 			  nNewFd,
@@ -306,4 +299,76 @@ int Socket::GetPort ( )
 
 	return ntohs ( oInternetSocketAddress.sin_port );
 
+}
+
+
+void Socket::SetNonBlocking( bool bOn )
+{
+#ifdef _WIN32
+    u_long MyTrueVar = bOn ? 1 : 0; 
+    ioctlsocket ( nAcceptSocket, FIONBIO, &MyTrueVar );
+#else
+	int MyTrueVar =  bOn ? 1 : 0; ;
+	ioctl ( nAcceptSocket, FIONBIO, &MyTrueVar );
+#endif
+}
+
+void Socket::SetReuseAddress( bool bOn )
+{
+	int MyTrueVar = bOn ? 1 : 0;
+	setsockopt ( nAcceptSocket, SOL_SOCKET, SO_REUSEADDR, (const char *) &MyTrueVar, sizeof ( int ) );
+}
+
+bool Socket::IsReadable( int inTimeoutMilliseconds )
+{
+	timeval tv = { 0, inTimeoutMilliseconds * 1000 }; 
+	tv.tv_sec = tv.tv_usec / 1000000;
+	tv.tv_usec %= 1000000;
+    fd_set rfds;
+    FD_ZERO(&rfds);
+    FD_SET(nAcceptSocket, &rfds);
+    // See if socket it writable
+    int ret = select(nAcceptSocket+1, &rfds, NULL, NULL, &tv);
+    if (ret == 0)
+        return false;     // Not readable yet
+    if (ret == -1)
+        return false;    // select error
+
+    return true;
+}
+
+bool Socket::IsWritable( int inTimeoutMilliseconds )
+{
+	timeval tv = { 0, inTimeoutMilliseconds * 1000 }; 
+	tv.tv_sec = tv.tv_usec / 1000000;
+	tv.tv_usec %= 1000000;
+    fd_set wfds;
+    FD_ZERO(&wfds);
+    FD_SET(nAcceptSocket, &wfds);
+    // See if socket it writable
+    int ret = select(nAcceptSocket+1, NULL, &wfds, NULL, &tv);
+    if (ret == 0)
+        return false;     // Not writable yet
+    if (ret == -1)
+        return false;    // select error
+
+    return true;
+}
+
+bool Socket::IsAtError( int inTimeoutMilliseconds )
+{
+	timeval tv = { 0, inTimeoutMilliseconds * 1000 }; 
+	tv.tv_sec = tv.tv_usec / 1000000;
+	tv.tv_usec %= 1000000;
+    fd_set efds;
+    FD_ZERO(&efds);
+    FD_SET(nAcceptSocket, &efds);
+    // See if socket it writable
+    int ret = select(nAcceptSocket+1, NULL, NULL, &efds, &tv);
+    if (ret == 0)
+        return false;     // Not error
+    if (ret == -1)
+        return true;    // select error
+
+    return true;
 }

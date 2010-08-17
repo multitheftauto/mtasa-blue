@@ -183,7 +183,7 @@ void CLuaArguments::PushArguments ( CLuaArguments& Arguments )
 }
 
 
-bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments * returnValues ) const
+bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments * returnValues ) const
 {
     assert ( pLuaMain );
 

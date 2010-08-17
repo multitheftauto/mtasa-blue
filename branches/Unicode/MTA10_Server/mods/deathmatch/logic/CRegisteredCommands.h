@@ -29,7 +29,7 @@ class CRegisteredCommands
     {
         class CLuaMain* pLuaMain;
         char szKey [MAX_REGISTERED_COMMAND_LENGTH + 1];
-        int iLuaFunction;
+        CLuaFunctionRef iLuaFunction;
         bool bRestricted;
         bool bCaseSensitive;
     };
@@ -38,8 +38,8 @@ public:
                                         CRegisteredCommands             ( class CAccessControlListManager* pACLManager );
                                         ~CRegisteredCommands            ( void );
 
-    bool                                AddCommand                      ( class CLuaMain* pLuaMain, const char* szKey, int iLuaFunction, bool bRestricted, bool bCaseSensitive );
-    bool                                RemoveCommand                   ( class CLuaMain* pLuaMain, const char* szKey, int iLuaFunction = NULL );
+    bool                                AddCommand                      ( class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bRestricted, bool bCaseSensitive );
+    bool                                RemoveCommand                   ( class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     void                                ClearCommands                   ( void );
     void                                CleanUpForVM                    ( class CLuaMain* pLuaMain );
 
@@ -49,7 +49,7 @@ public:
 
 private:
     SCommand*                           GetCommand                      ( const char* szKey, class CLuaMain* pLuaMain = NULL );
-    void                                CallCommandHandler              ( class CLuaMain* pLuaMain, int iLuaFunction, const char* szKey, const char* szArguments, class CClient* pClient );
+    void                                CallCommandHandler              ( class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments, class CClient* pClient );
 
     void                                TakeOutTheTrash                 ( void );
 

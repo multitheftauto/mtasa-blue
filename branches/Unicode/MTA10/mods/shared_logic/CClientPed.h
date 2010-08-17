@@ -63,6 +63,20 @@ enum eBodyPart
     BODYPART_HEAD = 9,
 };
 
+enum eMovementState
+{
+    MOVEMENTSTATE_UNKNOWN,
+    MOVEMENTSTATE_STAND, //Standing still
+    MOVEMENTSTATE_WALK, //Walking
+    MOVEMENTSTATE_POWERWALK, //Walking quickly
+    MOVEMENTSTATE_JOG, //Jogging
+    MOVEMENTSTATE_SPRINT, //Sprinting
+    MOVEMENTSTATE_CROUCH, //Crouching still
+    // Duds for now.  We should add methods to detect these
+    MOVEMENTSTATE_CRAWL, //Crouch-moving
+    MOVEMENTSTATE_ROLL, //Crouch-rolling
+};
+
 enum eDeathAnims
 {
     DEATH_ANIM_HEAD = 19,
@@ -231,6 +245,10 @@ public:
     void                        RemoveWeapon                ( eWeaponType weaponType );
     void                        RemoveAllWeapons            ( void );
 
+    std::map<eMovementState,std::string> m_MovementStateNames;
+    eMovementState              GetMovementState            ( void );
+    bool                        GetMovementState            ( std::string& strStateName );
+
     CTask*                      GetCurrentPrimaryTask       ( void );
     bool                        IsSimplestTask              ( int iTaskType );
     bool                        HasTask                     ( int iTaskType, int iTaskPriority = -1, bool bPrimary = true );
@@ -346,7 +364,7 @@ public:
     bool                        IsSunbathing            ( void );
     void                        SetSunbathing           ( bool bSunbathing, bool bStartStanding = true );
 
-    bool                        LookAt                  ( CVector vecOffset, int iTime = 1000, CClientEntity * pEntity = NULL );
+    bool                        LookAt                  ( CVector vecOffset, int iTime = 1000, int iBlend = 1000, CClientEntity * pEntity = NULL );
     bool                        UseGun                  ( CVector vecTarget, CClientEntity * pEntity );
 
     bool                        IsAttachToable            ( void );
@@ -357,7 +375,7 @@ public:
 
     bool                        IsRunningAnimation      ( void );
     void                        RunAnimation            ( AssocGroupId animGroup, AnimationId animID );
-    void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
+    void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
     void                        KillAnimation           ( void );
     inline CAnimBlock *         GetAnimationBlock       ( void )                                        { return m_pAnimationBlock; }
     inline char *               GetAnimationName        ( void )                                        { return m_szAnimationName; }
@@ -534,13 +552,17 @@ public:
     CAnimBlock *                m_pAnimationBlock;
     char *                      m_szAnimationName;
     bool                        m_bRequestedAnimation;
+    int                         m_iTimeAnimation;
     bool                        m_bLoopAnimation;
     bool                        m_bUpdatePositionAnimation;
+    bool                        m_bInterruptableAnimation;
+    bool                        m_bFreezeLastFrameAnimation;
     bool                        m_bHeadless;
     bool                        m_bFrozen;
     bool                        m_bFrozenWaitingForGroundToLoad;
     float                       m_fGroundCheckTolerance;
     float                       m_fObjectsAroundTolerance;
+    int                         m_iLoadAllModelsCounter;
     bool                        m_bIsOnFire;
     SLastSyncedPedData*         m_LastSyncedData;
     bool                        m_bSpeechEnabled;

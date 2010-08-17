@@ -33,6 +33,8 @@ public:
 
     virtual void                    SetAlpha            ( unsigned char ucAlpha ) = 0;
     virtual unsigned char           GetAlpha            ( ) = 0;
+
+    virtual bool                    IsAGangTag          ( ) const = 0;
 };
 
 #endif

@@ -14,6 +14,8 @@
 #include <StdInc.h>
 #include <process.h>
 #include <tags.h>
+#include <bassmix.h>
+#include <basswma.h>
 
 extern CClientGame* g_pClientGame;
 
@@ -34,9 +36,14 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : CClientE
     m_fDefaultFrequency = 44100.0f;
     m_fMinDistance = 5.0f;
     m_fMaxDistance = 200.0f;
+    m_fPlaybackSpeed = 1.0f;
     m_usDimension = 0;
     m_b3D = false;
+    m_bPaused = false;
     m_pThread = 0;
+
+    m_strStreamName = "";
+    m_strStreamTitle = "";
 
     for ( int i=0; i<9; i++ )
         m_FxEffects[i] = 0;
@@ -72,23 +79,51 @@ bool CClientSound::Play ( const SString& strPath, bool bLoop )
     return false;
 }
 
+HSTREAM CClientSound::ConvertFileToMono(const SString& strPath)
+{
+    HSTREAM decoder = BASS_StreamCreateFile ( false, strPath, 0, 0, BASS_STREAM_DECODE | BASS_SAMPLE_MONO ); // open file for decoding
+    if ( !decoder )
+        return 0; // failed
+    DWORD length = static_cast <DWORD> ( BASS_ChannelGetLength ( decoder, BASS_POS_BYTE ) ); // get the length
+    void *data = malloc ( length ); // allocate buffer for decoded data
+    BASS_CHANNELINFO ci;
+    BASS_ChannelGetInfo ( decoder, &ci ); // get sample format
+    if ( ci.chans > 1 ) // not mono, downmix...
+    {
+        HSTREAM mixer = BASS_Mixer_StreamCreate ( ci.freq, 1, BASS_STREAM_DECODE | BASS_MIXER_END ); // create mono mixer
+        BASS_Mixer_StreamAddChannel ( mixer, decoder, BASS_MIXER_DOWNMIX | BASS_MIXER_NORAMPIN | BASS_STREAM_AUTOFREE ); // plug-in the decoder (auto-free with the mixer)
+        decoder = mixer; // decode from the mixer
+    }
+    length = BASS_ChannelGetData ( decoder, data, length ); // decode data
+    BASS_StreamFree ( decoder ); // free the decoder/mixer
+    HSTREAM stream = BASS_StreamCreate ( ci.freq, 1, BASS_STREAM_AUTOFREE | BASS_SAMPLE_3D, STREAMPROC_PUSH, NULL ); // create stream
+    BASS_StreamPutData ( stream, data, length ); // set the stream data
+    free ( data ); // free the buffer
+    return stream;
+}
+
 bool CClientSound::Play3D ( const SString& strPath, const CVector& vecPosition, bool bLoop )
 {
     long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
-    if ( bLoop )
-        lFlags |= BASS_SAMPLE_LOOP;
 
     // Try to load the sound file
     if (
         ( m_pSound = BASS_StreamCreateFile ( false, strPath, 0, 0, lFlags ) )
      || ( m_pSound = BASS_MusicLoad ( false, strPath, 0, 0, lFlags, 0) )
+     || ( m_pSound = ConvertFileToMono ( strPath ) ) //this interrupts the game, depends on the file size and length
         )
     {
+        if ( bLoop && BASS_ChannelFlags ( m_pSound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP ) == -1 )
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in Play3D ChannelFlags LOOP  path = %s", BASS_ErrorGetCode(), strPath.c_str() );
+
         m_b3D = true;
         m_strPath = strPath;
         m_vecPosition = vecPosition;
-        BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
-        BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, NULL );
+        m_vecVelocity = CVector( 0, 0, 0 );
+
+        BASS_3DVECTOR pos ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
+        BASS_3DVECTOR vel ( m_vecVelocity.fX, m_vecVelocity.fY, m_vecVelocity.fZ );
+        BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, &vel );
         BASS_ChannelSet3DAttributes ( m_pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
         BASS_ChannelPlay ( m_pSound, false );
         BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
@@ -143,29 +178,170 @@ void CALLBACK DownloadSync ( HSYNC handle, DWORD channel, DWORD data, void* user
     pClientSound->CallEvent ( "onClientSoundFinishedDownload", Arguments, true );
 }
 
+// get stream title from metadata and send it as event
+void CClientSound::GetMeta( void )
+{
+    //g_pCore->GetConsole()->Printf ( "BASS STREAM META" );
+
+    const char* szMeta = BASS_ChannelGetTags( m_pSound, BASS_TAG_META );
+    if ( szMeta )// got Shoutcast metadata
+    {
+        char* szMem = new char [ strlen ( szMeta ) + 1 ];
+        strcpy( szMem, szMeta );
+        strtok( szMem, "'" );
+        char* szStreamTitle = strtok ( NULL, "'" );
+        if ( strcmp ( szStreamTitle, ";" ) && strcmp ( szStreamTitle, ";StreamUrl=" ) )
+            m_strStreamTitle = szStreamTitle;
+
+        //g_pCore->GetConsole()->Printf ( "BASS_TAG_META  %s", szMeta );
+    }
+    //else
+    //    g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_TAG_META", BASS_ErrorGetCode() );
+
+    /* TESTING ( Found no stream which have those tags )
+    szMeta=BASS_ChannelGetTags(m_pSound,BASS_TAG_OGG);
+    if (szMeta)// got Icecast/OGG tags
+    {
+        for (;*szMeta;szMeta+=strlen(szMeta)+1) {
+            g_pCore->GetConsole()->Printf ( "BASS_TAG_OGG  %s", szMeta );
+        }
+    }
+    else
+        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_TAG_OGG", BASS_ErrorGetCode() );
+
+    szMeta=BASS_ChannelGetTags(m_pSound,BASS_TAG_WMA_META);
+    if (szMeta) // got a script/mid-stream tag, display it
+        g_pCore->GetConsole()->Printf ( "BASS_TAG_WMA_META  %s", szMeta );
+    else
+        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_TAG_WMA_META", BASS_ErrorGetCode() );
+    //*/
+    //g_pCore->GetConsole()->Printf ( "BASS STREAM META END count = %u", Arguments.Count () );
+
+    if ( !m_strStreamTitle.empty () )
+    {
+        // Call onClientSoundChangedMeta LUA event
+        CLuaArguments Arguments;
+        Arguments.PushString ( m_strStreamTitle );
+        this->CallEvent ( "onClientSoundChangedMeta", Arguments, true );
+    }
+}
+
+void CALLBACK MetaSync( HSYNC handle, DWORD channel, DWORD data, void *user )
+{
+    static_cast <CClientSound*> ( user )->GetMeta ();
+}
+
+/* TESTING ( Found no stream which has the real title and author in it )
+void CALLBACK WMAChangeSync(HSYNC handle, DWORD channel, DWORD data, void *user)
+{
+    const char* szIcy = BASS_ChannelGetTags ( channel, BASS_TAG_WMA );
+    if (szIcy)
+        for (;*szIcy;szIcy+=strlen(szIcy)+1)
+        {
+            g_pCore->GetConsole()->Printf ( "BASS_TAG_WMA CHANGE  %s", szIcy );
+        }
+    else
+        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_TAG_WMA CHANGE", BASS_ErrorGetCode() );
+}
+//*/
+
 void CClientSound::ThreadCallback ( HSTREAM pSound )
 {
     if ( pSound )
     {
         m_pSound = pSound;
+
+        BASS_ChannelGetAttribute ( pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
+
         if ( m_b3D )
         {
             BASS_3DVECTOR pos ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
-            BASS_ChannelSet3DPosition ( pSound, &pos, NULL, NULL );
+            BASS_3DVECTOR vel ( m_vecVelocity.fX, m_vecVelocity.fY, m_vecVelocity.fZ );
+            BASS_ChannelSet3DPosition ( pSound, &pos, NULL, &vel );
             BASS_ChannelSet3DAttributes ( pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
         }
+        
+        BASS_ChannelSetAttribute( pSound, BASS_ATTRIB_VOL, m_fVolume );
+        BASS_ChannelSetAttribute ( pSound, BASS_ATTRIB_FREQ, m_fPlaybackSpeed * m_fDefaultFrequency );
+
         // Set a Callback function for download finished
         BASS_ChannelSetSync ( pSound, BASS_SYNC_DOWNLOAD, 0, &DownloadSync, this );
-        BASS_ChannelGetAttribute ( pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
-        BASS_ChannelPlay ( pSound, false );
+
+        /* TESTING
+        const char* szIcy = BASS_ChannelGetTags ( m_pSound, BASS_TAG_ICY );
+        if (szIcy)
+            for (;*szIcy;szIcy+=strlen(szIcy)+1)
+            {
+                g_pCore->GetConsole()->Printf ( "BASS_TAG_ICY  %s", szIcy );
+            }
+        else
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_TAG_ICY", BASS_ErrorGetCode() );
+
+
+        szIcy = BASS_ChannelGetTags ( m_pSound, BASS_TAG_HTTP );
+        if (szIcy)
+            for (;*szIcy;szIcy+=strlen(szIcy)+1)
+            {
+                g_pCore->GetConsole()->Printf ( "BASS_TAG_HTTP  %s", szIcy );
+            }
+        else
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_TAG_HTTP", BASS_ErrorGetCode() );
+
+        szIcy = BASS_ChannelGetTags ( m_pSound, BASS_TAG_WMA );
+        if (szIcy)
+            for (;*szIcy;szIcy+=strlen(szIcy)+1)
+            {
+                g_pCore->GetConsole()->Printf ( "BASS_TAG_WMA  %s", szIcy );
+            }
+        else
+            g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_TAG_WMA", BASS_ErrorGetCode() );
+        //*/
+
+        // get the broadcast name
+        const char* szIcy;
+        if ( 
+            ( szIcy = BASS_ChannelGetTags ( m_pSound, BASS_TAG_ICY ) )
+         || ( szIcy = BASS_ChannelGetTags ( m_pSound, BASS_TAG_WMA ) )
+         || ( szIcy = BASS_ChannelGetTags ( m_pSound, BASS_TAG_HTTP ) )
+            )
+        {
+            for ( ; *szIcy; szIcy += strlen ( szIcy ) + 1 )
+            {
+                if ( !strnicmp ( szIcy, "icy-name:", 9 ) ) // ICY / HTTP
+                {
+                    m_strStreamName = szIcy + 9;
+                    break;
+                }
+                else if ( !strnicmp ( szIcy, "title=", 6 ) ) // WMA
+                {
+                    m_strStreamName = szIcy + 6;
+                    break;
+                }
+                //g_pCore->GetConsole()->Printf ( "BASS STREAM INFO  %s", szIcy );
+            }
+        }
+        // set sync for stream titles
+        BASS_ChannelSetSync( pSound, BASS_SYNC_META, 0, &MetaSync, this); // Shoutcast
+        //g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_META", BASS_ErrorGetCode() );
+        //BASS_ChannelSetSync(pSound,BASS_SYNC_OGG_CHANGE,0,&MetaSync,this); // Icecast/OGG
+        //g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_OGG_CHANGE", BASS_ErrorGetCode() );
+        //BASS_ChannelSetSync(pSound,BASS_SYNC_WMA_META,0,&MetaSync,this); // script/mid-stream tags
+        //g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_WMA_META", BASS_ErrorGetCode() );
+        //BASS_ChannelSetSync(pSound,BASS_SYNC_WMA_CHANGE,0,&WMAChangeSync,this); // server-side playlist changes
+        //g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_WMA_CHANGE", BASS_ErrorGetCode() );
+
+        if ( !m_bPaused )
+            BASS_ChannelPlay ( pSound, false );
     }
     else
         g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PlayStream  b3D = %s  path = %s", BASS_ErrorGetCode(), m_b3D ? "true" : "false", m_strPath.c_str() );
-    
+
     // Call onClientSoundStream LUA event
     CLuaArguments Arguments;
     Arguments.PushBoolean ( pSound ? true : false );
     Arguments.PushNumber ( GetLength () );
+    if ( !m_strStreamName.empty () )
+        Arguments.PushString ( m_strStreamName );
     this->CallEvent ( "onClientSoundStream", Arguments, true );
 }
 
@@ -179,6 +355,8 @@ void CClientSound::Stop ( void )
 
 void CClientSound::SetPaused ( bool bPaused )
 {
+    m_bPaused = bPaused;
+
     if ( m_pSound )
     {
         if ( bPaused )
@@ -241,32 +419,33 @@ float CClientSound::GetVolume ( void )
     return m_fVolume;
 }
 
-void CClientSound::SetVolume ( float fVolume )
+void CClientSound::SetVolume ( float fVolume, bool bStore )
 {
-    m_fVolume = fVolume;
-    if ( m_pSound && !m_b3D && m_usDimension == m_pManager->GetSoundManager ()->GetDimension () )
+    if ( bStore )
+        m_fVolume = fVolume;
+
+    if ( m_pSound && !m_b3D && m_bInSameDimension )
         BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_VOL, fVolume );
 }
 
 float CClientSound::GetPlaybackSpeed ( void )
 {
-    float fSpeed = 1;
-    if ( m_pSound )
-        BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &fSpeed );
-    return ( fSpeed / m_fDefaultFrequency );
+    return m_fPlaybackSpeed;
 }
 
 void CClientSound::SetPlaybackSpeed ( float fSpeed )
 {
+    m_fPlaybackSpeed = fSpeed;
+
     if ( m_pSound )
         BASS_ChannelSetAttribute ( m_pSound, BASS_ATTRIB_FREQ, fSpeed * m_fDefaultFrequency );
 }
 
 void CClientSound::SetPosition ( const CVector& vecPosition )
 {
+
     if ( m_pSound )
     {
-        m_vecPosition = vecPosition;
         BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
         BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, NULL);
     }
@@ -279,9 +458,10 @@ void CClientSound::GetPosition ( CVector& vecPosition ) const
 
 void CClientSound::SetVelocity ( const CVector& vecVelocity )
 {
+    m_vecVelocity = vecVelocity;
+
     if ( m_pSound )
     {
-        m_vecVelocity = vecVelocity;
         BASS_3DVECTOR vel ( vecVelocity.fX, vecVelocity.fY, vecVelocity.fZ );
         BASS_ChannelSet3DPosition ( m_pSound, NULL, NULL, &vel);
     }
@@ -302,12 +482,13 @@ void CClientSound::RelateDimension ( unsigned short usDimension )
 {
     if ( usDimension == m_usDimension )
     {
-        SetVolume ( m_fVolume );
+        m_bInSameDimension = true;
+        SetVolume ( m_fVolume, false );
     }
     else
     {
-        m_fVolume = GetVolume ();
-        SetVolume ( 0.0f );
+        SetVolume ( 0.0f, false );
+        m_bInSameDimension = false;
     }
 }
 
@@ -326,24 +507,21 @@ void CClientSound::SetMaxDistance ( float fDistance )
     m_fMaxDistance = fDistance;
 }
 
-float CClientSound::GetMaxDistance ( void )
+SString CClientSound::GetMetaTags( const SString& strFormat )
 {
     return m_fMaxDistance;
-}
-
-void CClientSound::ShowShoutcastMetaTags( void )
-{
-    if ( m_pSound )
-    {
-        const char* szMeta = BASS_ChannelGetTags( m_pSound, BASS_TAG_META );
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in ShowShoutcastMetaTags  MetaTags = %s", BASS_ErrorGetCode(), szMeta );
-    }
 }
 
 SString CClientSound::GetMetaTags( const SString& strFormat )
 {
     SString strMetaTags = "";
-    strMetaTags = TAGS_Read( m_pSound, strFormat.c_str() );
+    if ( strFormat == "streamName" )
+        strMetaTags = m_strStreamName;
+    else if ( strFormat == "streamTitle" )
+        strMetaTags = m_strStreamTitle;
+    else
+        strMetaTags = TAGS_Read( m_pSound, strFormat.c_str() );
+
     return strMetaTags;
 }
 
@@ -382,7 +560,8 @@ bool CClientSound::IsFxEffectEnabled ( int iFxEffect )
 
 void CClientSound::Process3D ( CVector vecPosition )
 {
-    if ( !m_pSound || !m_b3D )
+    // If the sound isn't 3D, we don't need to process it
+    if ( !m_b3D )
         return;
 
     // Update our position and velocity if we're attached
@@ -395,18 +574,30 @@ void CClientSound::Process3D ( CVector vecPosition )
             SetVelocity ( vecVelocity );
     }
 
-    // Volume
-    float fDistance = DistanceBetweenPoints3D ( vecPosition, m_vecPosition );
-    float fDistDiff = m_fMaxDistance - m_fMinDistance;
+    // If the sound isn't playing, just having attaching handled is all that's needed here
+    if ( !m_pSound )
+        return;
+
+    // Initialize fVolume
     float fVolume = 1.0;
 
-    //Transform e^-x to suit our sound
-    if ( fDistance <= m_fMinDistance )
-        fVolume = 1.0f;
-    else if ( fDistance >= m_fMaxDistance )
+    if ( !m_bInSameDimension )
+        // We don't need any fancy calculations if the sound is not in our dimension - just mute it already
         fVolume = 0.0f;
     else
-        fVolume = exp ( - ( fDistance - m_fMinDistance ) * ( CUT_OFF / fDistDiff ) );
+    {
+        // Volume
+        float fDistance = DistanceBetweenPoints3D ( vecPosition, m_vecPosition );
+        float fDistDiff = m_fMaxDistance - m_fMinDistance;
+
+        //Transform e^-x to suit our sound
+        if ( fDistance <= m_fMinDistance )
+            fVolume = 1.0f;
+        else if ( fDistance >= m_fMaxDistance )
+            fVolume = 0.0f;
+        else
+            fVolume = exp ( - ( fDistance - m_fMinDistance ) * ( CUT_OFF / fDistDiff ) );
+    }
 
     BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_VOL, fVolume * m_fVolume );
 }

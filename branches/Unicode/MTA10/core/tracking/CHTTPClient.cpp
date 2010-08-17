@@ -34,6 +34,7 @@ CHTTPClient::~CHTTPClient ( void )
 void CHTTPClient::Reset ( void )
 {
     m_Status = 0;
+    m_strStatus = "";
     m_Buffer.Clear ();
     m_bCompleted = false;
 
@@ -248,7 +249,7 @@ void CHTTPClient::OnRead ( void* pSocketPtr, void* pClassPtr )
             if ( iRead <= 0 ) break;
 
             // Is this our first chunk of data?
-            if ( pClass->m_Buffer.GetSize () == 0 ) {
+            if ( pClass->m_Buffer.GetSize () == 0 && pClass->m_Status == 0 ) {
                 // Parse the header
                 unsigned int nHeaderSize, uiResponseCode;
                 const char * szData = CHTTPResponse::Parse ( szBuffer, HTTP_BUFFER_LENGTH, nHeaderSize, uiResponseCode );

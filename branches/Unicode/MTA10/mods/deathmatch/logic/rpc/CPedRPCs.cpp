@@ -270,6 +270,10 @@ void CPedRPCs::RemovePedFromVehicle ( NetBitStreamInterface& bitStream )
         CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
+            // Get the ped / player's occupied vehicle data before pulling it out
+            CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
+            unsigned int    uiSeat   = pPed->GetOccupiedVehicleSeat();
+
             pPed->SetSyncTimeContext ( ucTimeContext );
 
             // Remove the player from his vehicle
@@ -280,6 +284,19 @@ void CPedRPCs::RemovePedFromVehicle ( NetBitStreamInterface& bitStream )
                 // Reset expectation of vehicle enter completion, in case we were removed while entering
                 g_pClientGame->ResetVehicleInOut ();
             }
+
+            // Call onClientPlayerVehicleExit
+            CLuaArguments Arguments;
+            Arguments.PushElement ( pVehicle ); // vehicle
+            Arguments.PushNumber ( uiSeat );    // seat
+            Arguments.PushBoolean ( false );    // jacker
+            pPed->CallEvent ( "onClientPlayerVehicleExit", Arguments, true );
+
+            // Call onClientVehicleExit
+            CLuaArguments Arguments2;
+            Arguments2.PushElement ( pPed );   // player
+            Arguments2.PushNumber ( uiSeat );  // seat
+            pVehicle->CallEvent ( "onClientVehicleExit", Arguments2, true );
         }
     }
 }

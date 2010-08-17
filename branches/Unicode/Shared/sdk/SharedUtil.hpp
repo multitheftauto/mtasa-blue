@@ -311,6 +311,32 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
 }
 
 //
+// Split in two
+//
+bool SString::Split ( const SString& strDelim, SString* pstrLeft, SString* pstrRight, bool bFromRight ) const
+{
+    unsigned long ulPos = bFromRight ? rfind ( strDelim ) : find ( strDelim );
+
+    if ( ulPos == npos )
+    {
+        if ( pstrLeft )
+            *pstrLeft = bFromRight ? "" : c_str ();
+        if ( pstrRight )
+            *pstrRight = bFromRight ? c_str () : "";
+        return false;
+    }
+
+    if ( pstrLeft )
+        *pstrLeft = substr ( 0, ulPos );
+
+    if ( pstrRight )
+        *pstrRight = substr ( ulPos + 1, length () - ( ulPos + 1 ) );
+ 
+    return true;
+}
+
+
+//
 // Replace any char in szOld with szNew
 //
 SString SString::Replace ( const char* szOld, const char* szNew ) const
@@ -600,6 +626,19 @@ bool SharedUtil::FileExists ( const SString& strFilename )
 
 
 //
+// Returns true if the file exists
+//
+bool SharedUtil::FileExists ( const SString& strFilename )
+{
+    FILE* fh = fopen ( strFilename, "rb" );
+    if ( !fh )
+        return false;
+    fclose ( fh );
+    return true;
+}
+
+
+//
 // Load binary data from a file into an array
 //
 bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& buffer )
@@ -665,17 +704,17 @@ SString SharedUtil::ConformResourcePath ( const char* szRes )
     SString strText = szRes ? szRes : "";
 #ifdef WIN32
     char cPathSep = '\\';
-    for ( int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+    for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
         strDelimList[i] = strDelimList[i].Replace ( "/", "\\" );
     strText = strText.Replace ( "/", "\\" );
 #else
     char cPathSep = '/';
-    for ( int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+    for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
         strDelimList[i] = strDelimList[i].Replace ( "\\", "/" );
     strText = strText.Replace ( "\\", "/" );
 #endif
 
-    for ( int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+    for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
     {
         // Remove up to first occurrence
         int iPos = strText.find ( strDelimList[i] );

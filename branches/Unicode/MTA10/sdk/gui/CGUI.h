@@ -128,6 +128,7 @@ public:
 
     virtual CGUIComboBox*       CreateComboBox          ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
     virtual CGUIComboBox*       CreateComboBox          ( CGUIComboBox* pParent = NULL, const char* szCaption = "" ) = 0;
+
     //
 
     virtual CGUIWindow*         CreateWnd               ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;

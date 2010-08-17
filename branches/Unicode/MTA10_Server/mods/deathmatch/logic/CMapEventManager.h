@@ -25,15 +25,15 @@ public:
                             CMapEventManager                ( void );
                             ~CMapEventManager               ( void );
 
-    bool                    Add                             ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction, bool bPropagated );
-    bool                    Delete                          ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction = -1 );
+    bool                    Add                             ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    bool                    Delete                          ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     void                    Delete                          ( CMapEvent* pEvent );
     void                    Delete                          ( CLuaMain* pLuaMain );
     void                    DeleteAll                       ( void );
 
     inline bool             Exists                          ( const char* szName )  { return Get ( szName ) != NULL; };
     bool                    Exists                          ( CMapEvent* pEvent );
-    bool                    HandleExists                    ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction );
+    bool                    HandleExists                    ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction );
     CMapEvent*              Get                             ( const char* szName );
     CMapEvent*              GetFromXML                      ( const char* szName );
 

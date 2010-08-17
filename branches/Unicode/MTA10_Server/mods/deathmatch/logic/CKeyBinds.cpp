@@ -246,9 +246,9 @@ bool CKeyBinds::ProcessKey ( const char* szKey, bool bHitState, eKeyBindType bin
 }
 
 
-bool CKeyBinds::AddKeyFunction ( const char* szKey, bool bHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments )
+bool CKeyBinds::AddKeyFunction ( const char* szKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
-    if ( szKey == NULL || iLuaFunction == 0 )
+    if ( szKey == NULL || iLuaFunction == LUA_REFNIL )
         return false;
 
     SBindableKey* pKey = GetBindableFromKey ( szKey );
@@ -269,7 +269,7 @@ bool CKeyBinds::AddKeyFunction ( const char* szKey, bool bHitState, CLuaMain* pL
 }
 
 
-bool CKeyBinds::AddKeyFunction ( SBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments )
+bool CKeyBinds::AddKeyFunction ( SBindableKey* pKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
     if ( pKey )
     {
@@ -288,7 +288,7 @@ bool CKeyBinds::AddKeyFunction ( SBindableKey* pKey, bool bHitState, CLuaMain* p
 }
 
 
-bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
+bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, const CLuaFunctionRef& iLuaFunction )
 {
     bool bFound = false;
     CKeyFunctionBind* pBind = NULL;
@@ -305,7 +305,6 @@ bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool 
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {
-                        // ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
                         if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
@@ -329,7 +328,7 @@ bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool 
 }
 
 
-bool CKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
+bool CKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, const CLuaFunctionRef& iLuaFunction )
 {
     bool bFound = false;
     list < CKeyBind* > cloneList = m_List;
@@ -345,7 +344,6 @@ bool CKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain, bool 
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {
-                        // ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
                         if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
@@ -386,7 +384,7 @@ void CKeyBinds::RemoveAllKeys ( CLuaMain* pLuaMain )
 }
 
 
-bool CKeyBinds::AddControlFunction ( const char* szControl, bool bHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments )
+bool CKeyBinds::AddControlFunction ( const char* szControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
     if ( szControl == NULL )
         return false;
@@ -410,7 +408,7 @@ bool CKeyBinds::AddControlFunction ( const char* szControl, bool bHitState, CLua
 }
 
 
-bool CKeyBinds::AddControlFunction ( SBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments )
+bool CKeyBinds::AddControlFunction ( SBindableGTAControl* pControl, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
     if ( pControl )
     {
@@ -430,7 +428,7 @@ bool CKeyBinds::AddControlFunction ( SBindableGTAControl* pControl, bool bHitSta
 }
 
 
-bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
+bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, const CLuaFunctionRef& iLuaFunction )
 {
     bool bFound = false;
     CControlFunctionBind* pBind = NULL;
@@ -447,7 +445,6 @@ bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMai
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {                    
-                        // ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
                         if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
@@ -470,7 +467,7 @@ bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMai
 }
 
 
-bool CKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, int iLuaFunction )
+bool CKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, const CLuaFunctionRef& iLuaFunction )
 {
     bool bFound = false;
     list < CKeyBind* > cloneList = m_List;
@@ -486,7 +483,6 @@ bool CKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* pLuaMai
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {                    
-                        // ACHTUNG: CHECK WHETHER THE REF TO THE LUA FUNCTION IS CORRECT
                         if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;

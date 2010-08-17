@@ -42,6 +42,7 @@ class CClientGUIElement;
 #define IS_CGUIELEMENT_STATICIMAGE(entity)      ((entity)->GetCGUIType()==CGUI_STATICIMAGE)
 #define IS_CGUIELEMENT_TAB(entity)              ((entity)->GetCGUIType()==CGUI_TAB)
 #define IS_CGUIELEMENT_TABPANEL(entity)         ((entity)->GetCGUIType()==CGUI_TABPANEL)
+#define IS_CGUIELEMENT_COMBOBOX(entity)         ((entity)->GetCGUIType()==CGUI_COMBOBOX)
 #define IS_CGUIELEMENT_WINDOW(entity)           ((entity)->GetCGUIType()==CGUI_WINDOW)
 
 #define IS_CGUIELEMENT_VALID_PARENT(entity)     (IS_CGUIELEMENT_SCROLLPANE(entity) || IS_CGUIELEMENT_WINDOW(entity) || IS_CGUIELEMENT_TAB(entity) )
