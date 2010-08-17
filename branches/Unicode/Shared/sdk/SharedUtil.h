@@ -383,6 +383,8 @@ namespace SharedUtil
     //
     std::string RemoveColorCode ( const char* szString );
 
+    std::wstring ConvertToUTF8 (const std::string& s);
+
 
     //
     // ID 'stack'

@@ -144,8 +144,12 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
 
         m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
-            m_pDXSprite->SetTransform ( &matrix );        
-            pDXFont->DrawText ( m_pDXSprite, szText, -1, &rect, ulFormat, ulColor );
+            m_pDXSprite->SetTransform ( &matrix );  
+            
+            // Convert to UTF8
+            std::wstring strText = SharedUtil::ConvertToUTF8(szText);
+
+            pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ulColor );
         m_pDXSprite->End ();
     }        
 }
@@ -450,7 +454,10 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
     {
         HDC dc = pDXFont->GetDC ();
         SIZE size;
-        GetTextExtentPoint32 ( dc, szText, strlen ( szText ), &size );
+
+        std::wstring strText = SharedUtil::ConvertToUTF8(szText);
+
+        GetTextExtentPoint32W ( dc, strText.c_str(), strText.length(), &size );
 
         return ( ( float ) size.cx * fScale );
     }
@@ -667,7 +674,8 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
         Item.Text.ulFormat = ulFormat;
         Item.Text.pDXFont = pDXFont;
 
-        Item.strText = szText;
+        // Convert to wstring        
+        Item.strText = SharedUtil::ConvertToUTF8(szText);
 
         // Add it to the queue
         AddQueueItem ( Item, bPostGUI );
@@ -997,7 +1005,7 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             D3DXVECTOR2 scaling ( Item.Text.fScaleX, Item.Text.fScaleY );
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
             m_pDXSprite->SetTransform ( &matrix );        
-            Item.Text.pDXFont->DrawText ( m_pDXSprite, Item.strText.c_str (), -1, &rect, Item.Text.ulFormat, Item.Text.ulColor );
+            Item.Text.pDXFont->DrawTextW ( m_pDXSprite, Item.strText.c_str (), -1, &rect, Item.Text.ulFormat, Item.Text.ulColor );
             break;
         }
         case QUEUE_TEXTURE:

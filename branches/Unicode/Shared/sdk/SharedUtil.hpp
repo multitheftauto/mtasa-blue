@@ -572,6 +572,19 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
     return strOut;
 }
 
+// Convert a standard std::string into a UTF-8 std::wstring
+std::wstring SharedUtil::ConvertToUTF8 (const std::string& s)
+{
+    int len;
+    int slength = (int)s.length() + 1;
+    len = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), slength, 0, 0);
+    wchar_t* buf = new wchar_t[len];
+    MultiByteToWideChar(CP_UTF8, 0, s.c_str(), slength, buf, len);
+    std::wstring r(buf);
+    delete[] buf;
+    return r;
+}
+
 
 //
 // Get the local time in a string.
