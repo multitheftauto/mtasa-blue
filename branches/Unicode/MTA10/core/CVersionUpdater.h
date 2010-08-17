@@ -26,8 +26,5 @@ public:
 
 CVersionUpdaterInterface* GetVersionUpdater ();
 
-    void                    ServerSaysOptionalUpdate        ( void );
-    void                    ServerSaysMandatoryUpdate       ( void );
-    void                    PollServerUpdateQuestion        ( void );
 
 #endif

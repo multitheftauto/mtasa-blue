@@ -1101,10 +1101,6 @@ void CVersionUpdater::_PollFileDownload ( void )
     }
 }
 
-bool CVersionUpdater::IsPeriodicCheck ( void )
-{
-    return m_strContext == "Periodic";
-}
 
 
 
@@ -1252,23 +1248,6 @@ int CVersionUpdater::DoPollQueryResponse ( void )
     return RES_FAIL;
 }
 
-void CVersionUpdater::StartNoUpdateQuestion ( void )
-{
-    if ( IsPeriodicCheck () )
-    {
-        m_strStage = "End";     // No message if no update
-    }
-    else
-    {
-        // Display dialog
-        GetQuestionBox ().Reset ();
-        GetQuestionBox ().SetTitle ( "UPDATE CHECK" );
-        GetQuestionBox ().SetMessage ( "Update not currently avalable.\n\nPlease check www.mtasa.com" );
-        GetQuestionBox ().SetButton ( 0, "OK" );
-        GetQuestionBox ().Show ();
-        m_strStage = "PollNoUpdateQuestion";
-    }
-}
 
 ///////////////////////////////////////////////////////////////
 //

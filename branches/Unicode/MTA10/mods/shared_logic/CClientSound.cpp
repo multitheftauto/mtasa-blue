@@ -443,6 +443,7 @@ void CClientSound::SetPlaybackSpeed ( float fSpeed )
 
 void CClientSound::SetPosition ( const CVector& vecPosition )
 {
+    m_vecPosition = vecPosition;
 
     if ( m_pSound )
     {
@@ -507,7 +508,7 @@ void CClientSound::SetMaxDistance ( float fDistance )
     m_fMaxDistance = fDistance;
 }
 
-SString CClientSound::GetMetaTags( const SString& strFormat )
+float CClientSound::GetMaxDistance ( void )
 {
     return m_fMaxDistance;
 }
