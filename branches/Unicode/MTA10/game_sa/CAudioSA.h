@@ -40,7 +40,6 @@
 class CAudioSA : public CAudio
 {
 public:
-    CAudioSA ();
     VOID PlayFrontEndSound(DWORD dwSound);
     VOID PlayBeatTrack ( short iTrack );
     VOID SetEffectsMasterVolume ( BYTE bVolume );
@@ -55,10 +54,6 @@ public:
     VOID PauseAllSound ( bool bPaused );
     VOID StopRadio();
     VOID StartRadio( unsigned int station );
-
-    bool            m_bRadioOn;
-    bool            m_bRadioMuted;
-    unsigned char   m_ucRadioChannel;
 };
 
 #endif

@@ -135,9 +135,6 @@ public:
     virtual void                        SetCloudsEnabled            ( bool bDisabled ) = 0;
     virtual void                        DisableEnterExitVehicleKey  ( bool bDisabled ) = 0;
 
-    virtual void                        SetNightVisionEnabled       ( bool bEnabled ) = 0;
-    virtual void                        SetThermalVisionEnabled     ( bool bEnabled ) = 0;
-
     virtual void                        RebuildMultiplayerPlayer    ( class CPed * player ) = 0;
 
     virtual void                        AllowWindowsCursorShowing   ( bool bAllow ) = 0;

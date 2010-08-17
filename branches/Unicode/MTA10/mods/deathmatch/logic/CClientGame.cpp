@@ -115,10 +115,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
 
-    // Remove Night & Thermal vision view (if enabled).
-    g_pMultiplayer->SetNightVisionEnabled ( false );
-    g_pMultiplayer->SetThermalVisionEnabled ( false );
-
     m_bCloudsEnabled = true;
 
     #ifdef MTA_VOICE

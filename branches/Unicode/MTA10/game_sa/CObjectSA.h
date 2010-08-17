@@ -34,7 +34,6 @@ class CObjectSA : public virtual CObject, public virtual CPhysicalSA
 {
 private:
     unsigned char               m_ucAlpha;
-    bool                        m_bIsAGangTag;
 
 public:
                                 CObjectSA           ( CObjectSAInterface * objectInterface );
@@ -51,10 +50,6 @@ public:
 
     inline void                 SetAlpha            ( unsigned char ucAlpha ) { m_ucAlpha = ucAlpha; }
     inline unsigned char        GetAlpha            ( ) { return m_ucAlpha; }
-
-    bool                        IsAGangTag          ( ) const { return m_bIsAGangTag; }
-private:
-    void                        CheckForGangTag     ( );
 };
 
 /*
