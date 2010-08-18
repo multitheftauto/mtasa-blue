@@ -478,8 +478,35 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 {                    
                     if ( KeyboardArgs.codepoint >= 32 )
                     {
-                        m_strInputText += static_cast < char > ( KeyboardArgs.codepoint );
-                        SetInputText ( m_strInputText.c_str () );
+                        unsigned int uiCharacter = KeyboardArgs.codepoint;
+                        if ( uiCharacter < 127 ) // we have any char from ASCII 
+                        {
+                            // injecting as is
+                            m_strInputText += static_cast < char > ( KeyboardArgs.codepoint );
+                            SetInputText ( m_strInputText.c_str () );
+                        }
+                        else // we have any char from Extended ASCII, any ANSI code page or UNICODE range
+                        {
+                            // we need temp input string of unsigned char
+                            unsigned char ucANSI[2] = { (unsigned char) uiCharacter, 0 };
+
+                            // also we need temp output string of wchar_t
+                            WCHAR *wUNICODE;
+                            wUNICODE = new WCHAR[1];
+
+                            // converting ANSI temp string to UNICODE temp string
+                            MultiByteToWideChar( CP_THREAD_ACP, 0, (LPCSTR) ucANSI, -1, wUNICODE, 1 ); // can be CP_ACP too
+
+                            // injecting unicode char
+                            unsigned int uiLength = WideCharToMultiByte ( CP_UTF8, 0, wUNICODE, -1, 0, 0, NULL, NULL );
+                            const char* buf = new char[uiLength];
+                            WideCharToMultiByte ( CP_UTF8, 0, wUNICODE, -1, (LPSTR)buf, uiLength, NULL, NULL );
+                            m_strInputText += buf;
+                            SetInputText ( m_strInputText.c_str () );
+
+                            // temp UNICODE string no needs more
+                            delete [] wUNICODE;
+                        }
                     }
                 }
                 break;
