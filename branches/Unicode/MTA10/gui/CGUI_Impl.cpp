@@ -588,18 +588,21 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                 // If we got something to copy
                 if ( strTemp.length () > 0 )
                 {
+                    // Convert it to Unicode
+                    std::wstring strUTF = SharedUtil::ConvertToUTF8(strTemp.c_str());
+
                     // Open and empty the clipboard
                     OpenClipboard ( NULL );
                     EmptyClipboard ();
 
                     // Allocate the clipboard buffer and copy the data
-                    HGLOBAL hBuf = GlobalAlloc ( GMEM_DDESHARE, strTemp.length () + 1 );
-                    char* buf = reinterpret_cast < char* > ( GlobalLock ( hBuf ) );
-                    strcpy ( buf , strTemp.c_str () );
+                    HGLOBAL hBuf = GlobalAlloc ( GMEM_DDESHARE, strlen(strTemp.c_str()) );
+                    wchar_t* buf = reinterpret_cast < wchar_t* > ( GlobalLock ( hBuf ) );
+                    wcscpy ( buf , strUTF.c_str () );
                     GlobalUnlock ( hBuf );
 
                     // Copy the data into the clipboard
-                    SetClipboardData ( CF_TEXT , hBuf );
+                    SetClipboardData ( CF_UNICODETEXT , hBuf );
 
                     // Close the clipboard
                     CloseClipboard( );
@@ -624,12 +627,12 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                     CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
 
                     // Get the clipboard's data and put it into a char array
-                    const char * ClipboardBuffer = reinterpret_cast < const char* > ( GetClipboardData ( CF_TEXT ) );
+                    const wchar_t * ClipboardBuffer = reinterpret_cast < const wchar_t* > ( GetClipboardData ( CF_UNICODETEXT ) );
 
                     // Check to make sure we have valid data.
                     if ( ClipboardBuffer )
                     {
-                        SString strClipboardText ( "%s", ClipboardBuffer );
+                        std::wstring strClipboardText = ClipboardBuffer;
                         size_t iNewlineIndex;
 
                         // Remove the newlines inserting spaces instead
@@ -643,7 +646,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                                     // \r\n
                                     strClipboardText [ iNewlineIndex - 1 ] = ' ';
                                     strClipboardText.replace ( iNewlineIndex, strClipboardText.length () - iNewlineIndex,
-                                                              (const std::string&)strClipboardText, iNewlineIndex + 1,
+                                                              strClipboardText.c_str(), iNewlineIndex + 1,
                                                               strClipboardText.length () - iNewlineIndex - 1 );
                                 }
                                 else
@@ -654,7 +657,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                         } while ( iNewlineIndex != SString::npos );
 
                         // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
-                        CEGUI::String tmp = WndEdit->getText ();
+                        std::wstring tmp = SharedUtil::ConvertToUTF8(WndEdit->getText ().c_str());
                         if ( ( strClipboardText.length () + tmp.length () ) < WndEdit->getMaxTextLength( ) )
                         {
                             // Are there characters selected?
@@ -663,18 +666,19 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             {
                                 // Replace what's selected with the pasted buffer and set the new carat index
                                 tmp.replace ( WndEdit->getSelectionStartIndex (), WndEdit->getSelectionLength (),
-                                              strClipboardText.c_str (), strClipboardText.length () );
+                                              strClipboardText.c_str(), strClipboardText.length () );
                                 sizeCaratIndex = WndEdit->getSelectionStartIndex () + strClipboardText.length ();
                             }
                             else
                             {
                                 // If not, insert the clipboard buffer where we were and set the new carat index
-                                tmp.insert ( WndEdit->getSelectionStartIndex (), strClipboardText.c_str (), strClipboardText.length () );
+                                tmp.insert ( WndEdit->getSelectionStartIndex (), strClipboardText.c_str(), strClipboardText.length () );
                                 sizeCaratIndex = WndEdit->getCaratIndex () + strClipboardText.length ();
                             }
 
                             // Set the new text and move the carat at the end of what we pasted
-                            WndEdit->setText ( tmp );
+                            CEGUI::String strText((CEGUI::utf8*)SharedUtil::ConvertToANSI(tmp).c_str());
+                            WndEdit->setText ( strText );
                             WndEdit->setCaratIndex ( sizeCaratIndex );
                         }
                         else
