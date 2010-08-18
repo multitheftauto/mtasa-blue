@@ -29,6 +29,7 @@ bool CCommandPacket::Read ( NetBitStreamInterface& BitStream )
             delete[] szBuffer;
             return true;
         }
+        delete[] szBuffer;
     }
 
     return false;
