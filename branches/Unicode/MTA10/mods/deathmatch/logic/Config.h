@@ -120,6 +120,10 @@ public:
 #define MIN_CHAT_LENGTH 1
 #define MAX_CHAT_LENGTH 96
 
+// Min and max number of characters in a console command
+#define MIN_COMMAND_LENGTH 1
+#define MAX_COMMAND_LENGTH 255
+
 // Min and max number of characters in chat echos
 #define MIN_CHATECHO_LENGTH 1
 #define MAX_CHATECHO_LENGTH 128

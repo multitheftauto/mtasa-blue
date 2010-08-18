@@ -440,9 +440,6 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
                         case CClient::CLIENT_PLAYER:
                         {
                             strEcho.Format("%s: #EBDDB2%s", szNick, szArguments);
-                            // Populate a chat message
-                            _snprintf ( szEcho, MAX_CHATECHO_LENGTH, "%s: #EBDDB2%s", szNick, szArguments );
-                            szEcho [MAX_CHATECHO_LENGTH-1] = '\0';
 
                             // Send the chat message and player pointer to the script
                             CLuaArguments Arguments;
@@ -565,12 +562,10 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
 
                         if ( szNick )
                         {
-                            char szEcho [MAX_CHATECHO_LENGTH];
-                            szEcho[0] = '\0';
+                            SString strEcho;
 
                             // Populate a chat message
-                            _snprintf ( szEcho, MAX_CHATECHO_LENGTH, "(TEAM) %s: #EBDDB2%s", szNick, szArguments );
-                            szEcho[MAX_CHATECHO_LENGTH-1] = '\0';
+                            strEcho.Format("(TEAM) %s: #EBDDB2%s", szNick, szArguments);
 
                             // Send the chat message and player pointer to the script
                             CLuaArguments Arguments;
@@ -588,7 +583,7 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
                                 list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
                                 for ( ; iter != pTeam->PlayersEnd (); iter++ )
                                 {
-                                    (*iter)->Send ( CChatEchoPacket ( szEcho, ucRed, ucGreen, ucBlue, true ) );
+                                    (*iter)->Send ( CChatEchoPacket ( strEcho, ucRed, ucGreen, ucBlue, true ) );
                                 }
                             }
 
@@ -744,11 +739,7 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
                             if ( szNick )
                             {
                                 // Populate the message to the player
-                                char szMsg[256];
-                                szMsg[0] = '\0';
-
-                                _snprintf ( szMsg, 256, "* PM from %s: %s", szNick, szMessage );
-                                szMsg[255] = '\0';
+                                SString strMessage("* PM from %s: %s", szNick, szMessage);
 
                                 switch ( pClient->GetClientType () )
                                 {
@@ -773,10 +764,10 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
                                         if ( bContinue )
                                         {
                                             // Send it to the player
-                                            pPlayer->Send ( CChatEchoPacket ( szMsg, CHATCOLOR_INFO ) );
+                                            pPlayer->Send ( CChatEchoPacket ( strMessage, CHATCOLOR_INFO ) );
 
                                             // Send a reponse to the player who sent it
-                                            pEchoClient->SendEcho ( SString ( "-> %s: %s", pPlayer->GetNick (), szMessage ) );
+                                            pEchoClient->SendEcho ( SString ( "-> %s: %s", pPlayer->GetNick (), strMessage ) );
                                         }
                                         break;
                                     }
@@ -786,7 +777,7 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
                                         CLogger::LogPrintf ( "CONSOLEMSG: %s to %s: %s\n", szNick, pPlayer->GetNick (), szMessage );
 
                                         // Send it to the player
-                                        pPlayer->Send ( CChatEchoPacket ( szMsg, CHATCOLOR_INFO ) );
+                                        pPlayer->Send ( CChatEchoPacket ( strMessage, CHATCOLOR_INFO ) );
                                     }
                                     case CClient::CLIENT_SCRIPT:
                                     {
@@ -794,7 +785,7 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
                                         CLogger::LogPrintf ( "SCRIPTMSG: %s to %s: %s\n", szNick, pPlayer->GetNick (), szMessage );
 
                                         // Send it to the player
-                                        pPlayer->Send ( CChatEchoPacket ( szMsg, CHATCOLOR_INFO ) );
+                                        pPlayer->Send ( CChatEchoPacket ( strMessage, CHATCOLOR_INFO ) );
                                         break;
                                     }
                                     default: break;
@@ -977,11 +968,7 @@ bool CConsoleCommands::Me ( CConsole* pConsole, const char* szArguments, CClient
                 if ( szNick )
                 {
                     // Populate a chat message depending on if it starts on /me or not
-                    char szEcho [MAX_CHATECHO_LENGTH];
-                    szEcho[0] = '\0';
-
-                    _snprintf ( szEcho, MAX_CHATECHO_LENGTH, "* %s %s", szNick, szArguments );
-                    szEcho[MAX_CHATECHO_LENGTH-1] = '\0';
+                    SString strEcho("* %s %s", szNick, szArguments);
 
                     // Send the chat message and player pointer to the script IF the client is a player
                     if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
@@ -993,10 +980,10 @@ bool CConsoleCommands::Me ( CConsole* pConsole, const char* szArguments, CClient
                         if ( bContinue )
                         {
                             // Log it in the console
-                            CLogger::LogPrintf ( "CHAT: %s\n", szEcho );
+                            CLogger::LogPrintf ( "CHAT: %s\n", strEcho );
 
                             // Broadcast the message to all clients
-                            pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( szEcho, CHATCOLOR_ME ) );
+                            pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( strEcho, CHATCOLOR_ME ) );
                         }
                     }
 

@@ -39,11 +39,13 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
         CLuaArguments Arguments;
 
         const char* szCommandBufferPointer = szCommand;
+
         if ( !bHandleRemotely )
         {
             // Is the command "say" and the arguments start with '/' ? (command comes from the chatbox)
             if ( stricmp ( szCommand, "chatboxsay" ) == 0 )
             {
+                /* This code seems redundant, the chatbox now properly simulates commands.
                 // His line starts with '/'?
                 if ( *szArguments == '/' )
                 {
@@ -69,21 +71,27 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
                         return true;
                     }
                 }
+                */
                 szCommandBufferPointer = "say";
             }
         }
 
         // Toss them together so we can send it to the server
+        SString strClumpedCommand;
         if ( szArguments && szArguments [ 0 ] )
-            _snprintf ( szBuffer, 256, "%s %s", szCommandBufferPointer, szArguments );
+            strClumpedCommand.Format ( "%s %s", szCommandBufferPointer, szArguments );
         else
-            strncpy ( szBuffer, szCommandBufferPointer, 256 );
+            strClumpedCommand = szCommandBufferPointer;
 
-        szBuffer [255] = 0;
+        // Convert to Unicode, and clamp it to a maximum command length
+        std::wstring strClumpedCommandUTF = SharedUtil::ConvertToUTF8(strClumpedCommand.c_str());
+        strClumpedCommandUTF.substr(0,MAX_COMMAND_LENGTH);
+        strClumpedCommand = SharedUtil::ConvertToANSI(strClumpedCommandUTF);
+
         g_pClientGame->GetRegisteredCommands ()->ProcessCommand ( szCommandBufferPointer, szArguments );
 
         // Call the onClientConsole event
-        Arguments.PushString ( szBuffer );
+        Arguments.PushString ( strClumpedCommand );
 
         // Call the event on the local player's onClientConsole first
         if ( g_pClientGame->GetLocalPlayer () )
@@ -95,7 +103,7 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
             return false;
 
         // Write it to the bitstream
-        pBitStream->Write ( szBuffer, static_cast < int > ( strlen ( szBuffer ) ) );
+        pBitStream->Write ( strClumpedCommand.c_str(), static_cast < int > ( strlen ( strClumpedCommand.c_str() ) ) );
 
         // Send the packet to the server and free it
         g_pNet->SendPacket ( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE, PACKET_ORDERING_CHAT );
