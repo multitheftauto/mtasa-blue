@@ -385,6 +385,8 @@ namespace SharedUtil
 
     std::wstring ConvertToUTF8 (const std::string& s);
 
+    std::string  ConvertToANSI (const std::wstring& ws);
+
 
     //
     // ID 'stack'

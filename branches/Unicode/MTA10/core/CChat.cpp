@@ -450,8 +450,10 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
             {
                 if ( m_strInputText.size () > 0 )
                 {
-                    m_strInputText.resize ( m_strInputText.size () - 1 );
-                    SetInputText ( m_strInputText.c_str () );
+                    // Convert our string to UTF8 before resizing, then back to ANSI.
+                    std::wstring strText = SharedUtil::ConvertToUTF8(m_strInputText);
+                    strText.resize ( strText.size () - 1 );
+                    SetInputText ( SharedUtil::ConvertToANSI(strText).c_str() );
                 }
                 break;
             }
@@ -487,25 +489,15 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                         }
                         else // we have any char from Extended ASCII, any ANSI code page or UNICODE range
                         {
-                            // we need temp input string of unsigned char
-                            unsigned char ucANSI[2] = { (unsigned char) uiCharacter, 0 };
+                            // Generate a null-terminating string for our character
+                            wchar_t wUNICODE[2] = { uiCharacter, '\0' };
 
-                            // also we need temp output string of wchar_t
-                            WCHAR *wUNICODE;
-                            wUNICODE = new WCHAR[1];
+                            // Convert our UTF character into an ANSI string
+                            std::string strANSI = SharedUtil::ConvertToANSI(wUNICODE);
 
-                            // converting ANSI temp string to UNICODE temp string
-                            MultiByteToWideChar( CP_THREAD_ACP, 0, (LPCSTR) ucANSI, -1, wUNICODE, 1 ); // can be CP_ACP too
-
-                            // injecting unicode char
-                            unsigned int uiLength = WideCharToMultiByte ( CP_UTF8, 0, wUNICODE, -1, 0, 0, NULL, NULL );
-                            const char* buf = new char[uiLength];
-                            WideCharToMultiByte ( CP_UTF8, 0, wUNICODE, -1, (LPSTR)buf, uiLength, NULL, NULL );
-                            m_strInputText += buf;
+                            // Append the ANSI string, and update
+                            m_strInputText.append(strANSI);
                             SetInputText ( m_strInputText.c_str () );
-
-                            // temp UNICODE string no needs more
-                            delete [] wUNICODE;
                         }
                     }
                 }

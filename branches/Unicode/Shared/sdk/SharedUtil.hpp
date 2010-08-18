@@ -585,6 +585,17 @@ std::wstring SharedUtil::ConvertToUTF8 (const std::string& s)
     return r;
 }
 
+// Convert a std::wstring into an ANSI encoded string
+std::string SharedUtil::ConvertToANSI (const std::wstring& ws)
+{
+    int len = WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), -1, 0, 0, NULL, NULL);
+    const char* buf = new char[len];
+    WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), -1, LPSTR(buf), len, NULL, NULL);
+    std::string r(buf);
+    delete[] buf;
+    return r;
+}
+
 
 //
 // Get the local time in a string.
