@@ -781,11 +781,13 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
 
         szSectionStart = szSectionEnd;
         szLastWrapPoint = szSectionStart;
+        unsigned int uiSeekPos = 1;
 
         while ( true )      // find end of this section
         {
-            float fCharWidth = CChat::GetCharacterWidth ( *szSectionEnd, g_pChat->m_vecScale.fX );
-            if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || fCurrentWidth + fCharWidth > fWidth )
+            unsigned int uiCharWidth = CChat::GetTextExtent ( std::string(szString).substr(0,uiSeekPos).c_str(), g_pChat->m_vecScale.fX );
+
+            if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || uiCharWidth > fWidth )
             {
                 bLastSection = true;
                 break;
@@ -801,8 +803,8 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
             {
                 szLastWrapPoint = szSectionEnd;
             }
-            fCurrentWidth += fCharWidth;
             szSectionEnd++;
+            uiSeekPos++;
         }
         section.m_strText.assign ( szSectionStart, szSectionEnd - szSectionStart );
     }
