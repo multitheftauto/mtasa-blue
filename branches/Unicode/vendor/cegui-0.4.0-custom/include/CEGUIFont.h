@@ -664,6 +664,18 @@ public:
 	*/
 	const String& getAvailableGlyphs(void) const;
 
+	/*!
+	\brief
+		returns whether the image is being used (i.e. if 0 images of the glyph are drawn).
+	*/
+	bool	isGlyphBeingUsed (unsigned long ulGlyph) const;
+
+	/*!
+	\brief
+		hacked callback for when a Glyph has been rendered
+	*/
+    void	OnGlyphDrawn ( CEGUI::String strGlyph ) const;
+
 
 	/*!
 	\brief
@@ -1022,7 +1034,6 @@ private:
 		returns extent of widest line of wrapped text.
 	*/
 	float	getWrappedTextExtent(const String& text, float wrapWidth, float x_scale = 1.0f) const;
-
 
     /*!
     \brief

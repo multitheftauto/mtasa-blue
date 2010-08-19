@@ -111,7 +111,7 @@ void Image::draw(const Rect& dest_rect, float z, const Rect& clip_rect, const Co
 	dest.offset(d_scaledOffset);
 
 	// draw
-	d_owner->draw(d_area, dest, z, clip_rect, colours, quad_split_mode);
+	d_owner->draw(d_area, dest, z, clip_rect, colours, quad_split_mode, this );
 }
 
 

@@ -35,18 +35,11 @@ CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const ch
     // Define our glyphs
     if ( uExtraGlyphs ) 
     {
-        CEGUI::String glyphSet; // (?) we needs temporary (CEGUI::String) string to define our glyphs correctly
-        
-        for ( unsigned int g = 0; uExtraGlyphs[g] >= 32; ++g ) // (?) adding extra glyphs codes to temp string
-	    {
-            glyphSet += (CEGUI::utf32) uExtraGlyphs[g];
-	    }
-        
-        m_pFont->defineFontGlyphs( glyphSet ); // (?) defining font's glyphs
+        defineFontGlyphs ( uExtraGlyphs );
     } 
     else
     {
-        m_pFont->defineFontGlyphs( (CEGUI::utf8*)" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" );
+        defineFontGlyphs( " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" );
     }
 
     // Set default attributes
@@ -136,4 +129,26 @@ float CGUIFont_Impl::GetTextExtent ( const char* szText, float fScale )
 CEGUI::Font* CGUIFont_Impl::GetFont ( void )
 {
     return m_pFont;
+}
+
+void CGUIFont_Impl::defineFontGlyphs (unsigned int uExtraGlyphs[])
+{
+        CEGUI::String glyphSet; // (?) we needs temporary (CEGUI::String) string to define our glyphs correctly
+        
+        for ( unsigned int g = 0; uExtraGlyphs[g] >= 32; ++g ) // (?) adding extra glyphs codes to temp string
+	    {
+            glyphSet += (CEGUI::utf32) uExtraGlyphs[g];
+	    }
+        
+        m_pFont->defineFontGlyphs( glyphSet ); // (?) defining font's glyphs
+}
+
+void CGUIFont_Impl::defineFontGlyphs (const char *szExtraGlyphs)
+{
+    m_pFont->defineFontGlyphs( (CEGUI::utf8*)szExtraGlyphs );
+}
+
+bool CGUIFont_Impl::isGlyphBeingUsed (unsigned long ulGlyph)
+{
+    return m_pFont->isGlyphBeingUsed ( ulGlyph );
 }

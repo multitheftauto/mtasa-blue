@@ -385,7 +385,7 @@ public:
 	\return
 		Nothing
 	*/
-	void	draw(const Rect& source_rect, const Rect& dest_rect, float z, const Rect& clip_rect,const ColourRect& colours, QuadSplitMode quad_split_mode) const;
+	void	draw(const Rect& source_rect, const Rect& dest_rect, float z, const Rect& clip_rect,const ColourRect& colours, QuadSplitMode quad_split_mode, const Image* image = NULL) const;
 
 
 	/*!

@@ -128,7 +128,7 @@ DirectX9Renderer::~DirectX9Renderer(void)
 /*************************************************************************
 	add's a quad to the list to be rendered
 *************************************************************************/
-void DirectX9Renderer::addQuad(const Rect& dest_rect, float z, const Texture* tex, const Rect& texture_rect, const ColourRect& colours, QuadSplitMode quad_split_mode)
+void DirectX9Renderer::addQuad(const Rect& dest_rect, float z, const Texture* tex, const Rect& texture_rect, const ColourRect& colours, QuadSplitMode quad_split_mode, const Image* image)
 {
 	// if not queueing, render directly (as in, right now!)
 	if (!d_queueing)
@@ -142,6 +142,7 @@ void DirectX9Renderer::addQuad(const Rect& dest_rect, float z, const Texture* te
 		quad.position		= dest_rect;
 		quad.z				= z;
 		quad.texture		= ((DirectX9Texture*)tex)->getD3DTexture();
+        quad.image          = image;
 		quad.texPosition	= texture_rect;
 		quad.topLeftCol		= colours.d_top_left.getARGB();
 		quad.topRightCol	= colours.d_top_right.getARGB();
@@ -203,6 +204,25 @@ void DirectX9Renderer::doRender(void)
 
 			locked = true;
 		}
+
+        // Hack: Inform the Font class that this glyph has been used recently, if it's a glyph being drawn
+        if ( quad.image )
+        {
+            CEGUI::String strImgName = quad.image->getName();
+            // Is it a glyph?
+            if ( strImgName.substr(0,6) == "glyph_" )
+            {
+                // Grab the font this belongs to, and the glyph id from the name
+                CEGUI::String::size_type pos = strImgName.find_last_of(95);
+                CEGUI::String strFontName = strImgName.substr(6,pos-6);
+                CEGUI::String strGlyph = strImgName.substr(pos+1);
+
+                char buffs[1024];
+                sprintf(buffs,"Pos: %i",(int)pos);
+                CEGUI::Font* pFont = System::getSingleton().getFontManager()->getFont(strFontName);
+                pFont->OnGlyphDrawn(strGlyph);
+            }
+        }
 
 		// setup Vertex 1...
 		buffmem->x = quad.position.d_left;

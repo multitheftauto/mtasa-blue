@@ -196,7 +196,7 @@ void Imageset::defineImage(const String& name, const Rect& image_rect, const Poi
 	Queues an area of the associated Texture the be drawn on the screen.
 	Low-level routine not normally used!
 *************************************************************************/
-void Imageset::draw(const Rect& source_rect, const Rect& dest_rect, float z, const Rect& clip_rect,const ColourRect& colours, QuadSplitMode quad_split_mode) const
+void Imageset::draw(const Rect& source_rect, const Rect& dest_rect, float z, const Rect& clip_rect,const ColourRect& colours, QuadSplitMode quad_split_mode, const Image* image ) const
 {
 	// get the rect area that we will actually draw to (i.e. perform clipping)
 	Rect final_rect(dest_rect.getIntersection(clip_rect));
@@ -222,7 +222,7 @@ void Imageset::draw(const Rect& source_rect, const Rect& dest_rect, float z, con
 		final_rect.d_bottom	= PixelAligned(final_rect.d_bottom);
 
 		// queue a quad to be rendered
-		d_texture->getRenderer()->addQuad(final_rect, z, d_texture, tex_rect, colours, quad_split_mode);
+		d_texture->getRenderer()->addQuad(final_rect, z, d_texture, tex_rect, colours, quad_split_mode,image);
 	}
 
 }

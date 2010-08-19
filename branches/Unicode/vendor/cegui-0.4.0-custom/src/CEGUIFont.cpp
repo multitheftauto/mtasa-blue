@@ -465,7 +465,7 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 		drawGlyphToBuffer(dest_buff, size);
 
 		// define Image on Imageset for this glyph to save re-rendering glyph later
-		imageName		= glyph_set[i];
+        imageName		= "glyph_" + d_name + "_" + glyph_set[i];
 		rect.d_left		= (float)cur_x;
 		rect.d_top		= (float)cur_y;
 		rect.d_right	= (float)(cur_x + width - InterGlyphPadSpace);
@@ -1262,6 +1262,27 @@ float Font::getWrappedTextExtent(const String& text, float wrapWidth, float x_sc
 const String& Font::getAvailableGlyphs(void) const
 {
 	return d_glyphset;
+}
+
+/*************************************************************************
+!Talidan!: Return whether a certain glyph in the font is being used or not
+*************************************************************************/
+bool Font::isGlyphBeingUsed (unsigned long ulGlyph) const
+{
+    /* stuff */
+    return false;
+}
+
+/*************************************************************************
+!Talidan!: Callback for when a glyph has just been used from this font
+*************************************************************************/
+void Font::OnGlyphDrawn (CEGUI::String ulGlyph) const
+{
+    unsigned long glyph = (unsigned long)ulGlyph[0];
+    if ( glyph == 1090 )
+    {
+        Logger::getSingleton().logEvent("REVOLVER OCELOT");
+    }
 }
 
 
