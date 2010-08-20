@@ -575,11 +575,9 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
 // Convert a standard std::string into a UTF-8 std::wstring
 std::wstring SharedUtil::ConvertToUTF8 (const std::string& s)
 {
-    int len;
-    int slength = (int)s.length() + 1;
-    len = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), slength, 0, 0);
+    int len = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, 0, 0);
     wchar_t* buf = new wchar_t[len];
-    MultiByteToWideChar(CP_UTF8, 0, s.c_str(), slength, buf, len);
+    MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, buf, len);
     std::wstring r(buf);
     delete[] buf;
     return r;
@@ -595,6 +593,15 @@ std::string SharedUtil::ConvertToANSI (const std::wstring& ws)
     delete[] buf;
     return r;
 }
+
+// CEGUI does a poor job of ensuring ANSI strings are safe to convert to CEGUI::utf8.
+// If they are insane, CEGUI causes a crash.
+const char* SharedUtil::SafeANSI (const char* s)
+{
+    return s;
+}
+
+
 
 
 //
