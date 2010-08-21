@@ -43,6 +43,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include "time.h"
 
 // Start of CEGUI namespace section
 namespace CEGUI
@@ -437,6 +438,12 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 
 	for (uint i = 0; i < glyph_set_length; ++i)
 	{
+        //Check for repetitions
+	    CodepointMap::const_iterator	pos, end = d_cp_map.end();
+        pos = d_cp_map.find(glyph_set[i]);
+        if (pos != end)
+            continue;
+
 		// load-up required glyph
 		if (FT_Load_Char(d_impldat->fontFace, glyph_set[i], FT_LOAD_RENDER | (d_antiAliased ? FT_LOAD_TARGET_NORMAL : FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO)))
 		{
@@ -465,7 +472,9 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 		drawGlyphToBuffer(dest_buff, size);
 
 		// define Image on Imageset for this glyph to save re-rendering glyph later
-        imageName		= "glyph_" + d_name + "_" + glyph_set[i];
+        char* b    =  new char[];
+        sprintf(b,"%u",i);
+        imageName		= ("glyph_" + d_name + "_" + String(b));
 		rect.d_left		= (float)cur_x;
 		rect.d_top		= (float)cur_y;
 		rect.d_right	= (float)(cur_x + width - InterGlyphPadSpace);
@@ -474,7 +483,7 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 		offset.d_x		= (float)(glyph->metrics.horiBearingX >> 6);
 		offset.d_y		= -(float)(glyph->metrics.horiBearingY >> 6);
 
-		d_glyph_images->defineImage(imageName, rect, offset);
+		d_glyph_images->defineImage(imageName, rect, offset,glyph_set[i]);
 
 		cur_x += width;
 
@@ -487,6 +496,7 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 		// create entry in code-point to Image map
 		glyphDat	dat;
 		dat.d_image = &d_glyph_images->getImage(imageName);
+        const Image* image = dat.d_image;
 		dat.d_horz_advance = glyph->advance.x >> 6;
 		d_cp_map[glyph_set[i]] = dat;
 	}
@@ -659,6 +669,7 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
 
 	for (size_t c = 0; c < char_count; ++c)
 	{
+        OnGlyphDrawn(text[c]);
 		pos = d_cp_map.find(text[c]);
 
 		if (pos != end)
@@ -702,6 +713,7 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
 
 	for (c = 0; c < char_count; ++c)
 	{
+        OnGlyphDrawn(text[c]);
 		pos = d_cp_map.find(text[c]);
 
 		if (pos != end)
@@ -727,7 +739,9 @@ void Font::constructor_impl(const String& name, const String& fontname, const St
 {
 	ImagesetManager& ismgr	= ImagesetManager::getSingleton();
 
-	// pull a-a setting from flags
+    m_pGlyphCache = &m_GlyphCache;
+
+    // pull a-a setting from flags
 	d_antiAliased = (flags == NoAntiAlias) ? false : true;
 
 	// create an blank Imageset
@@ -1276,12 +1290,56 @@ bool Font::isGlyphBeingUsed (unsigned long ulGlyph) const
 /*************************************************************************
 !Talidan!: Callback for when a glyph has just been used from this font
 *************************************************************************/
-void Font::OnGlyphDrawn (CEGUI::String ulGlyph) const
+void Font::OnGlyphDrawn ( unsigned long ulGlyph ) const
 {
-    unsigned long glyph = (unsigned long)ulGlyph[0];
-    if ( glyph == 1090 )
+    //std::map< unsigned long, unsigned long >* m_pGlyphCache = &m_GlyphCache;
+    // Are we an ASCII character (always loaded), or out of range character?
+    if ( ulGlyph < 128 )
+        return;
+
+    unsigned int iRange = 128;
+    std::map< unsigned long, unsigned long >::const_iterator itToErase;
+    bool bErase = false;
+    // Let's check our cache to see if this glyph is already loaded
+    for ( std::map< unsigned long, unsigned long >::const_iterator it = m_pGlyphCache->begin(); it != m_pGlyphCache->end(); ++it )
     {
-        Logger::getSingleton().logEvent("REVOLVER OCELOT");
+        // Is our glyph within range of another cache?
+        if ( ulGlyph == it->first )
+            return;
+
+        if ( (unsigned int)abs(it->first - ulGlyph) <= iRange )
+        {
+            itToErase = it;
+            bErase = true;
+            break;
+        }
+    }
+
+    if ( bErase )
+    {
+        unsigned long ulGlyphToUpdate = itToErase->first;
+        m_pGlyphCache->erase(itToErase);
+        m_pGlyphCache->insert ( std::pair<unsigned long,unsigned long>(ulGlyphToUpdate,clock()/CLOCKS_PER_SEC) );
+        return;
+    }
+
+    // Not in any other cache, let's create a new cache
+    CEGUI::String strNewCache = d_glyphset.c_str();
+    //m_GlyphCache.insert ( std::map::pair<ulong,ulong>(100,100) );
+    m_pGlyphCache->insert ( std::pair<unsigned long,unsigned long>(ulGlyph,clock()/CLOCKS_PER_SEC) );
+    unsigned long i;
+    for(i=(ulGlyph-iRange); i <= (ulGlyph+iRange); i++)
+    {
+        strNewCache += i;
+    }
+
+    const CEGUI::String strNewCache2 = strNewCache;
+
+    System::getSingleton().getFontManager()->getFont(d_name)->defineFontGlyphs(strNewCache);
+
+    if ( ulGlyph == 1090 )
+    {
+        //Logger::getSingleton().logEvent("REVOLVER OCELOT");
     }
 }
 

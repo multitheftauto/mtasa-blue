@@ -208,19 +208,26 @@ void DirectX9Renderer::doRender(void)
         // Hack: Inform the Font class that this glyph has been used recently, if it's a glyph being drawn
         if ( quad.image )
         {
-            CEGUI::String strImgName = quad.image->getName();
+            unsigned long ulCodepoint = quad.image->getCodepoint();
             // Is it a glyph?
-            if ( strImgName.substr(0,6) == "glyph_" )
+            if ( ulCodepoint != 0 )
             {
-                // Grab the font this belongs to, and the glyph id from the name
-                CEGUI::String::size_type pos = strImgName.find_last_of(95);
-                CEGUI::String strFontName = strImgName.substr(6,pos-6);
-                CEGUI::String strGlyph = strImgName.substr(pos+1);
+                String strImgName = quad.image->getName();
+                if ( strImgName.substr(0,6) == "glyph_" )
+                {
+                    CEGUI::String::size_type pos = strImgName.find_last_of(95);
+                    // Is the last character a '_'? Account for this specially as it ruins the algorithm
+                    CEGUI::String::size_type size = strImgName.length();
+                    if ( strImgName.substr(size-1) == "_" )
+                        pos = size-2;
 
-                char buffs[1024];
-                sprintf(buffs,"Pos: %i",(int)pos);
-                CEGUI::Font* pFont = System::getSingleton().getFontManager()->getFont(strFontName);
-                pFont->OnGlyphDrawn(strGlyph);
+
+                    // Grab the font this belongs to from the name
+                    CEGUI::String strFontName = strImgName.substr(6,pos-6);
+
+                    CEGUI::Font* pFont = System::getSingleton().getFontManager()->getFont(strFontName);
+                    pFont->OnGlyphDrawn(ulCodepoint);
+                }
             }
         }
 

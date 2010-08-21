@@ -674,7 +674,8 @@ public:
 	\brief
 		hacked callback for when a Glyph has been rendered
 	*/
-    void	OnGlyphDrawn ( CEGUI::String strGlyph ) const;
+    void	OnGlyphDrawn ( CEGUI::String strGlyph ) const { OnGlyphDrawn ((unsigned long)strGlyph[0]); }
+    void	OnGlyphDrawn ( unsigned long ulGlyph ) const;
 
 
 	/*!
@@ -1090,6 +1091,9 @@ private:
 	float	d_nativeVertRes;		//!< native vertical resolution for this Imageset.
 
 	bool	d_antiAliased;			//!< True if the font should be rendered as anti-alaised by freeType.
+
+    std::map < unsigned long, unsigned long >   m_GlyphCache;
+    std::map< unsigned long, unsigned long >* m_pGlyphCache;
 };
 
 } // End of  CEGUI namespace section
