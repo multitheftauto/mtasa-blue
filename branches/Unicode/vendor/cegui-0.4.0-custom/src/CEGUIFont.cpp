@@ -1298,6 +1298,9 @@ void Font::OnGlyphDrawn ( unsigned long ulGlyph ) const
         return;
 
     unsigned int iRange = 128;
+    // To prevent overlapping, we set limits 
+    unsigned int iLowerBound = 127;
+    unsigned int iUpperBound = 65534;
     std::map< unsigned long, unsigned long >::const_iterator itToErase;
     bool bErase = false;
     // Let's check our cache to see if this glyph is already loaded
@@ -1307,12 +1310,24 @@ void Font::OnGlyphDrawn ( unsigned long ulGlyph ) const
         if ( ulGlyph == it->first )
             return;
 
+        // If we're in range of another cache, we only update that cache
         if ( (unsigned int)abs(it->first - ulGlyph) <= iRange )
         {
             itToErase = it;
             bErase = true;
             break;
         }
+
+        // Following code assumes we're adding a new glyph, we need to find boundaries to avoid overwriting glyphs
+        unsigned int iterLowerBound = it->first - iRange;
+        unsigned int iterUpperBound = it->first + iRange;
+        // Is this upper bound closer than the previous lower bound?
+        if ( ( iterUpperBound < ulGlyph ) && ((ulGlyph - iLowerBound) < (ulGlyph - iterUpperBound)) )
+            iLowerBound = iterUpperBound;
+
+        // Is this lower bound closer than the previous upper bound?
+        if ( ( iterLowerBound > ulGlyph ) && ((iUpperBound - ulGlyph) > (iterLowerBound - ulGlyph)) )
+            iUpperBound = iterLowerBound;
     }
 
     if ( bErase )
@@ -1324,16 +1339,25 @@ void Font::OnGlyphDrawn ( unsigned long ulGlyph ) const
     }
 
     // Not in any other cache, let's create a new cache
-    CEGUI::String strNewCache = d_glyphset.c_str();
-    //m_GlyphCache.insert ( std::map::pair<ulong,ulong>(100,100) );
+    //CEGUI::String strNewCache = d_glyphset.c_str();
     m_pGlyphCache->insert ( std::pair<unsigned long,unsigned long>(ulGlyph,clock()/CLOCKS_PER_SEC) );
-    unsigned long i;
+    /*unsigned long i;
     for(i=(ulGlyph-iRange); i <= (ulGlyph+iRange); i++)
     {
-        strNewCache += i;
+        if ( ( i > iterLowerBound ) && ( i < iterUpperBound ) )
+            strNewCache += i;
     }
 
-    const CEGUI::String strNewCache2 = strNewCache;
+    const CEGUI::String strNewCache2 = strNewCache;*/
+    unsigned int uiGlyphs[] =
+    {
+        1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,0x0401,0x0451,
+    };
+    CEGUI::String strNewCache = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+    for ( unsigned int g = 0; uiGlyphs[g] >= 32; ++g ) // (?) adding extra glyphs codes to temp string
+	{
+        strNewCache += (CEGUI::utf32) uiGlyphs[g];
+	}
 
     System::getSingleton().getFontManager()->getFont(d_name)->defineFontGlyphs(strNewCache);
 

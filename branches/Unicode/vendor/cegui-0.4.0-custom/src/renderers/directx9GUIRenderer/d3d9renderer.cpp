@@ -210,7 +210,7 @@ void DirectX9Renderer::doRender(void)
         {
             unsigned long ulCodepoint = quad.image->getCodepoint();
             // Is it a glyph?
-            if ( ulCodepoint != 0 )
+            if ( ulCodepoint != 0 && ulCodepoint < 65534 && ulCodepoint > 127 )
             {
                 String strImgName = quad.image->getName();
                 if ( strImgName.substr(0,6) == "glyph_" )
