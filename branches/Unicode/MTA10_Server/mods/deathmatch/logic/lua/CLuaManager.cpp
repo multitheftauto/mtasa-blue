@@ -596,6 +596,13 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getColorFromString", CLuaFunctionDefinitions::GetColorFromString );
     CLuaCFunctions::AddFunction ( "ref", CLuaFunctionDefinitions::Reference );
     CLuaCFunctions::AddFunction ( "deref", CLuaFunctionDefinitions::Dereference );
+    // UTF functions
+    CLuaCFunctions::AddFunction ( "utfLen", CLuaFunctionDefinitions::UtfLen );
+    CLuaCFunctions::AddFunction ( "utfSeek", CLuaFunctionDefinitions::UtfSeek );
+    CLuaCFunctions::AddFunction ( "utfSub", CLuaFunctionDefinitions::UtfSub );
+    CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefinitions::UtfChar );
+    CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefinitions::UtfCode );
+
     CLuaCFunctions::AddFunction ( "getValidPedModels", CLuaFunctionDefinitions::GetValidPedModels );
 
     // Loaded map funcs
