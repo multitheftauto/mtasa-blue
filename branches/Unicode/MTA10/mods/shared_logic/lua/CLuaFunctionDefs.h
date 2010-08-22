@@ -745,6 +745,8 @@ public:
     LUA_DECLARE ( UtfSub );
     LUA_DECLARE ( UtfChar );
     LUA_DECLARE ( UtfCode );
+    LUA_DECLARE ( UtfUpper );
+    LUA_DECLARE ( UtfLower );
 
 private:
     // Static references to objects

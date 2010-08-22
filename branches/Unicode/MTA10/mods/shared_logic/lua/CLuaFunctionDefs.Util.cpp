@@ -597,102 +597,42 @@ int CLuaFunctionDefs::UtfSeek ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::UtfSub ( lua_State* luaVM )
+int CLuaFunctionDefs::UtfSub ( lua_State* L )
 {
         // Grab argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument1 = lua_type ( L, 1 );
+    int iArgument2 = lua_type ( L, 2 );
 
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) )
+    if ( ( lua_type ( L, 1 ) != LUA_TSTRING ) || ( lua_type ( L, 2 ) != LUA_TNUMBER ) )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfSub" );
-        lua_pushnil ( luaVM );
+        m_pScriptDebugging->LogBadType ( L, "utfSub" );
+        lua_pushnil ( L );
         return 1;
     }
-    std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
-    int iUTFLen = static_cast < int > ( strUTF.size() );
-    int iStart = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
+    //Ripped and modded Lua source.  It's pretty disgusting, i know.
 
-    //Do we only have one argument?
-    if ( ( iArgument3 != LUA_TNUMBER ) )
+    const char *s = lua_tostring(L, 1);
+    std::wstring strUTF = SharedUtil::ConvertToUTF8(s);
+    size_t l = static_cast < int > ( strUTF.size() );
+
+    ptrdiff_t start = luaL_checkinteger(L, 2);
+    ptrdiff_t end = luaL_optinteger(L, 3, -1);
+
+    //posrelat them both
+    if (start < 0) start += (ptrdiff_t)l + 1;
+        start = (start >= 0) ? start : 0;
+
+    if (end < 0) end += (ptrdiff_t)l + 1;
+        end = (end >= 0) ? end : 0;
+
+    if (start < 1) start = 1;
+    if (end > (ptrdiff_t)l) end = (ptrdiff_t)l;
+    if (start <= end)
     {
-        // If the number is too big, return an empty string (as with string.sub)
-        if ( abs(iStart) > static_cast < int >(strUTF.size()) )
-        {
-            lua_pushstring ( luaVM, "" );
-            return 1;
-        }
-        // If the number is negative, do a start->end+number sub
-        if ( iStart <= 0 )
-        {
-            std::wstring strSubbed = strUTF.substr(iUTFLen+iStart);
-            lua_pushstring ( luaVM, SharedUtil::ConvertToANSI(strSubbed).c_str() );
-            return 1;
-        }
-        // If the number is positive, we do a start-1 -> end sub (strange string.sub behaviour, but meh)
-        std::wstring strSubbed = strUTF.substr(iStart-1,iUTFLen-iStart+1);
-        lua_pushstring ( luaVM, SharedUtil::ConvertToANSI(strSubbed).c_str() );
-        return 1;
-
+        strUTF = strUTF.substr(start-1, end-start+1);
+        lua_pushstring(L, SharedUtil::ConvertToANSI(strUTF).c_str());
     }
-
-    int iEnd = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
-
-    // Two arguments
-    // If the end is smaller than the start return an empty string,
-
-    if ( ( ( iEnd >= 0 ) && ( iStart > iEnd ) )  )
-    {
-        lua_pushstring ( luaVM, "" );
-        return 1;
-    }
-
-    // If negative, we start from the end unless iEnd is smaller
-    if ( ( iStart < 0 ) )
-    {
-        if ( static_cast < int >(strUTF.size())+iStart > iEnd )
-        {
-            lua_pushstring ( luaVM, "" );
-            return 1;
-        }
-        iStart = strUTF.size()+iStart;
-    }
-    else
-    {
-        //Conform our iStart to Lua's warped logic if it's positive
-        iStart = iStart - 1;
-        iStart = iStart < 0 ? 0 : iStart;
-    }
-
-    //Only employ warped logic to the end if it's negative
-    if ( iEnd < 0 )
-    {
-        // If it's bigger than the string, return an empty one
-        if ( abs(iEnd) > iUTFLen )
-        {
-            lua_pushstring ( luaVM, "" );
-            return 1;
-        }
-        iEnd = iEnd + 1;
-        iEnd = iEnd > 0 ? 0 : iEnd;
-        // Make it relative to the end
-        iEnd = iUTFLen + iEnd;
-    }
-    // Sub from the start point first
-    std::wstring strSubbed = strUTF.substr(iStart);
-
-    // If the sub length was too big, just return the rest of the string
-    if ( iEnd-iStart > static_cast < int >(strSubbed.size()) )
-    {
-        lua_pushstring ( luaVM, SharedUtil::ConvertToANSI(strSubbed).c_str() );
-        return 1;
-    }
-
-    strSubbed = strSubbed.substr(0,iEnd-iStart);
-
-    lua_pushstring ( luaVM, SharedUtil::ConvertToANSI(strSubbed).c_str() );
+    else lua_pushliteral(L, "");
     return 1;
 }
 
@@ -700,7 +640,6 @@ int CLuaFunctionDefs::UtfChar ( lua_State* luaVM )
 {
         // Grab argument types
     int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
 
     if ( ( lua_type ( luaVM, 1 ) != LUA_TNUMBER ) )
     {
@@ -730,8 +669,6 @@ int CLuaFunctionDefs::UtfCode ( lua_State* luaVM )
 {
         // Grab argument types
     int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-
     if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "utfCode" );
@@ -743,5 +680,51 @@ int CLuaFunctionDefs::UtfCode ( lua_State* luaVM )
     unsigned long ulCode = strUTF.c_str()[0];
 
     lua_pushnumber ( luaVM, ulCode );
+    return 1;
+}
+
+int CLuaFunctionDefs::UtfUpper ( lua_State* luaVM )
+{
+        // Grab argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "UtfUpper" );
+        lua_pushnil ( luaVM );
+        return 1;
+    }
+    std::string strInput = lua_tostring ( luaVM, 1 );
+    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
+    unsigned int lenUTF = static_cast < int >(strUTF.size());
+    std::wstring strUpper;
+    unsigned int i;
+    for (i=0; i<lenUTF; i++)
+        strUpper += towupper(strUTF[i]);
+
+    lua_pushstring ( luaVM, SharedUtil::ConvertToANSI(strUpper).c_str() );
+    return 1;
+}
+
+int CLuaFunctionDefs::UtfLower ( lua_State* luaVM )
+{
+        // Grab argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "UtfLower" );
+        lua_pushnil ( luaVM );
+        return 1;
+    }
+    std::string strInput = lua_tostring ( luaVM, 1 );
+    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
+    unsigned int lenUTF = static_cast < int >(strUTF.size());
+    std::wstring strUpper;
+    unsigned int i;
+    for (i=0; i<lenUTF; i++)
+        strUpper += towlower(strUTF[i]);
+
+    lua_pushstring ( luaVM, SharedUtil::ConvertToANSI(strUpper).c_str() );
     return 1;
 }
