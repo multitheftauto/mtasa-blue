@@ -167,7 +167,7 @@ void DirectX9Texture::freeD3DTexture(void)
 {
 	if (d_d3dtexture != NULL)
 	{
-		d_d3dtexture->Release();
+		((DirectX9Renderer*)getRenderer())->releaseD3DTexture( d_d3dtexture );
 		d_d3dtexture = NULL;
 	}
 

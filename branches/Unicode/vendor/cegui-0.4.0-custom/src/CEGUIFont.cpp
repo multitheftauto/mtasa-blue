@@ -739,8 +739,6 @@ void Font::constructor_impl(const String& name, const String& fontname, const St
 {
 	ImagesetManager& ismgr	= ImagesetManager::getSingleton();
 
-    m_pGlyphCache = &m_GlyphCache;
-
     // pull a-a setting from flags
 	d_antiAliased = (flags == NoAntiAlias) ? false : true;
 
@@ -1303,6 +1301,9 @@ void Font::OnGlyphDrawn ( unsigned long ulGlyph ) const
     unsigned int iUpperBound = 65534;
     std::map< unsigned long, unsigned long >::const_iterator itToErase;
     bool bErase = false;
+
+    std::map< unsigned long, unsigned long >* m_pGlyphCache = const_cast< std::map< unsigned long, unsigned long >* >( &m_GlyphCache );
+
     // Let's check our cache to see if this glyph is already loaded
     for ( std::map< unsigned long, unsigned long >::const_iterator it = m_pGlyphCache->begin(); it != m_pGlyphCache->end(); ++it )
     {
@@ -1359,7 +1360,9 @@ void Font::OnGlyphDrawn ( unsigned long ulGlyph ) const
         strNewCache += (CEGUI::utf32) uiGlyphs[g];
 	}
 
-    System::getSingleton().getFontManager()->getFont(d_name)->defineFontGlyphs(strNewCache);
+    System::getSingleton().getRenderer()->setDelayTextureRelease(true);
+    const_cast<Font*>( this )->defineFontGlyphs(strNewCache);
+    System::getSingleton().getRenderer()->setDelayTextureRelease(false);
 
     if ( ulGlyph == 1090 )
     {

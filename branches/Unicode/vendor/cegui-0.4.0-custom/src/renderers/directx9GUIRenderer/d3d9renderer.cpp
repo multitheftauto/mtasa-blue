@@ -67,6 +67,7 @@ void DirectX9Renderer::constructor_impl(LPDIRECT3DDEVICE9 device, const Size& di
 	d_currTexture   = NULL;
 	d_buffer        = NULL;
 	d_bufferPos     = 0;
+    d_bDelayTextureRelease = false;
 
 	// initialise renderer display area
 	d_display_area.d_left	= 0;
@@ -347,6 +348,8 @@ void DirectX9Renderer::doRender(void)
 	}
 
 	renderVBuffer();
+
+    processReleaseQueue();
 }
 
 
@@ -696,6 +699,38 @@ void DirectX9Renderer::setDisplaySize(const Size& sz)
 		fireEvent(EventDisplaySizeChanged, args, EventNamespace);
 	}
 
+}
+
+
+/************************************************************************
+
+*************************************************************************/
+void DirectX9Renderer::releaseD3DTexture(LPDIRECT3DTEXTURE9 d_d3dtexture)
+{
+    if ( d_bDelayTextureRelease )
+        d_releaseQueue.push_back( d_d3dtexture );
+    else
+        d_d3dtexture->Release();
+}
+
+
+/************************************************************************
+
+*************************************************************************/
+void DirectX9Renderer::setDelayTextureRelease( bool bOn )
+{
+    d_bDelayTextureRelease = bOn;
+}
+
+
+/************************************************************************
+
+*************************************************************************/
+void DirectX9Renderer::processReleaseQueue(void)
+{
+    for ( unsigned int i = 0 ; i < d_releaseQueue.size() ; i++ )
+        d_releaseQueue[i]->Release();
+    d_releaseQueue.clear();
 }
 
 

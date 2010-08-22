@@ -37,6 +37,7 @@
 #include "CEGUIImage.h"
 #include <d3d9.h>
 #include <list>
+#include <vector>
 #include <set>
 
 #ifdef DIRECTX9_GUIRENDERER_EXPORTS
@@ -253,6 +254,8 @@ public:
 	*/
 	void	setDisplaySize(const Size& sz);
 
+    virtual void    setDelayTextureRelease(bool bOn);
+    void            releaseD3DTexture(LPDIRECT3DTEXTURE9 d3dtexture);
 
 private:
 	/************************************************************************
@@ -323,6 +326,7 @@ private:
 	// method to do work of constructor
 	void	constructor_impl(LPDIRECT3DDEVICE9 device, const Size& display_size);
 
+    void    processReleaseQueue(void);
 
 	/*************************************************************************
 	    Implementation Data
@@ -341,6 +345,10 @@ private:
 	std::list<DirectX9Texture*>	d_texturelist;		//!< List used to track textures.
 
 	uint	d_maxTextureSize;		//!< Holds maximum supported texture size (in pixels).
+
+    bool    d_bDelayTextureRelease;
+    std::vector< LPDIRECT3DTEXTURE9 > d_releaseQueue;
+
 };
 
 } // End of  CEGUI namespace section

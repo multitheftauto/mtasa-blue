@@ -367,6 +367,8 @@ public:
 
     virtual ResourceProvider* createResourceProvider(void);
 
+    virtual void setDelayTextureRelease(bool bOn) {}
+
 protected:
 	/*************************************************************************
 		Construction and Destruction

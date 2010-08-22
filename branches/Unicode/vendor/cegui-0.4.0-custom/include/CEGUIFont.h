@@ -1093,7 +1093,6 @@ private:
 	bool	d_antiAliased;			//!< True if the font should be rendered as anti-alaised by freeType.
 
     std::map < unsigned long, unsigned long >   m_GlyphCache;
-    std::map< unsigned long, unsigned long >* m_pGlyphCache;
 };
 
 } // End of  CEGUI namespace section
