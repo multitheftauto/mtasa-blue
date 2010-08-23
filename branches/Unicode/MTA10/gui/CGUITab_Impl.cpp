@@ -26,7 +26,7 @@ CGUITab_Impl::CGUITab_Impl ( CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const c
     m_pWindow->setDestroyedByParent ( false );
 
     CEGUI::String strText;
-    strText.assign( (CEGUI::utf8*) SharedUtil::SafeANSI(szCaption) ); // assign as UTF8 string
+    strText.assign( (CEGUI::utf8*) szCaption ); // assign as UTF8 string
     m_pWindow->setText ( strText );
 
 
@@ -61,6 +61,6 @@ void CGUITab_Impl::SetCaption ( const char* szCaption )
 {
     CEGUI::String strCaption;
 
-    if ( szCaption ) strCaption.assign ( (CEGUI::utf8*)SharedUtil::SafeANSI(szCaption) );
+    if ( szCaption ) strCaption.assign ( (CEGUI::utf8*)szCaption );
     m_pWindow->setText ( strCaption );
 }

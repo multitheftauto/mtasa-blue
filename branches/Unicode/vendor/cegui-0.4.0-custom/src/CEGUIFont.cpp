@@ -684,8 +684,7 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
 	size_t char_count = text.length();
 	CodepointMap::const_iterator	pos, end = d_cp_map.end();
 
-    //String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
-    String strNewGlyphs = d_glyphset;
+    String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
 	for (size_t c = 0; c < char_count; ++c)
 	{
         strNewGlyphs += OnGlyphDrawn(text[c],true);
@@ -740,8 +739,7 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
 	if (space_count > 0) shared_lost_space = lost_space / (float)space_count;
 
     //First ensure our glyphs are loaded
-    //String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
-    String strNewGlyphs = d_glyphset;
+    String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
 	for (size_t c = 0; c < char_count; ++c)
 	{
         strNewGlyphs += OnGlyphDrawn(text[c],true);

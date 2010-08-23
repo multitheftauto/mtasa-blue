@@ -99,7 +99,7 @@ unsigned int CGUIGridList_Impl::AddColumn ( const char* szTitle, float fWidth )
 {
     // Create a new column with an unique handle
     int hUniqueHandle = GetUniqueHandle ();
-    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addColumn ( ((CEGUI::utf8*)SharedUtil::SafeANSI(szTitle)), hUniqueHandle, fWidth );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addColumn ( ((CEGUI::utf8*)szTitle), hUniqueHandle, fWidth );
 
     int iColumnIndex = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getColumnWithID ( hUniqueHandle );
 
@@ -351,7 +351,7 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
             
 
             // If it doesn't, create it and set it in the gridlist
-            pItem = new CGUIListItem_Impl ( SharedUtil::SafeANSI(szText), bNumber );
+            pItem = new CGUIListItem_Impl ( szText, bNumber );
 
             CEGUI::ListboxItem* pListboxItem = pItem->GetListItem ();
             win->setItem ( pListboxItem, hColumn, iRow, bFast );

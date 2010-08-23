@@ -594,16 +594,6 @@ std::string SharedUtil::ConvertToANSI (const std::wstring& ws)
     return r;
 }
 
-// CEGUI does a poor job of ensuring ANSI strings are safe to convert to CEGUI::utf8.
-// If they are insane, CEGUI causes a crash.
-const char* SharedUtil::SafeANSI (const char* s)
-{
-    return s;
-}
-
-
-
-
 //
 // Get the local time in a string.
 // Set bDate to include the date, bMs to include milliseconds

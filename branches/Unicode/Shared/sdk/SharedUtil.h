@@ -387,8 +387,6 @@ namespace SharedUtil
 
     std::string  ConvertToANSI (const std::wstring& ws);
 
-    const char*  SafeANSI (const char* s);
-
 
     //
     // ID 'stack'

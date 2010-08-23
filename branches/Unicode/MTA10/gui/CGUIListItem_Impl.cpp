@@ -65,7 +65,7 @@ void CGUIListItem_Impl::SetFont ( const char *szFontName )
 void CGUIListItem_Impl::SetText ( const char *pszText )
 {
     CEGUI::String strText;
-    strText.assign ( (CEGUI::utf8*) SharedUtil::SafeANSI(pszText) );
+    strText.assign ( (CEGUI::utf8*) pszText );
     m_pListItem->setText( strText );
 }
 
