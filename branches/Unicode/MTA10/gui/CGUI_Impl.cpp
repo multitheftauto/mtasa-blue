@@ -78,22 +78,25 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
         1040,1041,1042,1043,1044,1045,1046,1047,1048,1049,1050,1051,1052,1053,1054,1055,1056,1057,1058,1059,1060,1061,1062,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1099,1100,1101,1102,1103,0x0401,0x0451,
         // (?) arabic
         0x067E,0x0679,0x0686,0x0698,0x0688,0x06AF,0x06A9,0x0691,0x06BA,0x060C,0x06BE,0x061B,0x061F,0x06C1,0x0621,0x0622,0x0623,0x0624,0x0625,0x0626,0x0627,0x0628,0x0629,0x062A,0x062B,0x062C,0x062D,0x062E,0x062F,0x0630,0x0631,0x0632,0x0633,0x0634,0x0635,0x0636,0x0637,0x0638,0x0639,0x063A,0x0640,0x0641,0x0642,0x0643,0x0644,0x0645,0x0646,0x0647,0x0648,0x0649,0x064A,0x064B,0x064C,0x064D,0x064E,0x064F,0x0650,0x0651,0x0652,0x06D2,
+        // test
+        20001, 35199, 0xFE9D,
         // (!) it's `end of array` indicator
         0
     };
 
+    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", "cgui/ARIALUNI.TTF", 9, 0, NULL );
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT );
-    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9, 0, uiGlyphs );
-    m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7, 0, uiGlyphs );
+    m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7, 0, NULL );
 
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT_BOLD );
-    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8, 0, uiGlyphs );
+    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8, 0, NULL );
 
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_CLEAR_FONT );
     m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9 );
-    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, uiGlyphs, true );
-    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, uiGlyphs, true );
-    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, uiGlyphs, false );
+    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, NULL, true );
+    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, NULL, true );
+    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, NULL, false );
     // ACHTUNG: These font creations can throw exceptions!
 
     // Load bluescheme

@@ -674,9 +674,9 @@ public:
 	\brief
 		hacked callback for when a Glyph has been rendered
 	*/
-    void	OnGlyphDrawn ( CEGUI::String strGlyph ) const { OnGlyphDrawn ((unsigned long)strGlyph[0]); }
-    void	OnGlyphDrawn ( unsigned long ulGlyph ) const;
+    String	OnGlyphDrawn ( unsigned long ulGlyph, bool bLoadNewGlyphs ) const;
 
+    String	cleanGlyphCache ( String strCache ) const;
 
 	/*!
 	\brief
