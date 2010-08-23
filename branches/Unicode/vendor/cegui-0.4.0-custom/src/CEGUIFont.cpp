@@ -375,23 +375,32 @@ uint Font::getRequiredTextureSize(const String& glyph_set)
 
 	uint	glyph_set_length = static_cast<uint>(glyph_set.length());
 
+    FT_GlyphSlot thisGlyph = d_impldat->fontFace->glyph;
+
 	for (uint i = 0; i < glyph_set_length; ++i)
 	{
+        FT_GlyphSlot glyph = thisGlyph;
+
 		// load-up required glyph
-		if (FT_Load_Char(d_impldat->fontFace, glyph_set[i], FT_LOAD_RENDER | (d_antiAliased ? FT_LOAD_TARGET_NORMAL : FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO)))
+        if (!FT_Get_Char_Index( d_impldat->fontFace, glyph_set[i] ) )
+        {
+			//We couldnt find a glyph for this font.  Load it from the substitute font.
+            glyph = (FT_GlyphSlot)FontManager::getSingleton().getSubstituteGlyph ( glyph_set[i] );
+        }
+		else if (FT_Load_Char(d_impldat->fontFace, glyph_set[i], FT_LOAD_RENDER | (d_antiAliased ? FT_LOAD_TARGET_NORMAL : FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO)))
 		{
 			// skip errors
 			continue;
 		}
 
 		// if this glyph is taller than all others so far, update height and re-calculate cur_y
-		if ((uint)d_impldat->fontFace->glyph->bitmap.rows + InterGlyphPadSpace > d_maxGlyphHeight)
+		if ((uint)glyph->bitmap.rows + InterGlyphPadSpace > d_maxGlyphHeight)
 		{
-			d_maxGlyphHeight = d_impldat->fontFace->glyph->bitmap.rows + InterGlyphPadSpace;
+			d_maxGlyphHeight = glyph->bitmap.rows + InterGlyphPadSpace;
 			cur_y = (i + 1) * d_maxGlyphHeight;
 		}
 
-		width = d_impldat->fontFace->glyph->bitmap.width + InterGlyphPadSpace;
+		width = glyph->bitmap.width + InterGlyphPadSpace;
 		cur_x += width;
 
 		// check for fit
@@ -427,7 +436,7 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 	Rect	rect;
 	Point	offset;
 
-	FT_GlyphSlot glyph = d_impldat->fontFace->glyph;
+	FT_GlyphSlot thisGlyph = d_impldat->fontFace->glyph;
 
 	d_max_bearingY = 0;
 
@@ -438,14 +447,21 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 
 	for (uint i = 0; i < glyph_set_length; ++i)
 	{
+        FT_GlyphSlot glyph = thisGlyph;
+
         //Check for repetitions
 	    CodepointMap::const_iterator	pos, end = d_cp_map.end();
         pos = d_cp_map.find(glyph_set[i]);
         if (pos != end)
             continue;
 
-		// load-up required glyph
-		if (FT_Load_Char(d_impldat->fontFace, glyph_set[i], FT_LOAD_RENDER | (d_antiAliased ? FT_LOAD_TARGET_NORMAL : FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO)))
+        // Check if the glyph exists in this font
+        if (!FT_Get_Char_Index( d_impldat->fontFace, glyph_set[i] ) )
+        {
+			//We couldnt find a glyph for this font.  Load it from the substitute font.
+            glyph = (FT_GlyphSlot)FontManager::getSingleton().getSubstituteGlyph ( glyph_set[i] );
+        }
+        else if (FT_Load_Char(d_impldat->fontFace, glyph_set[i], FT_LOAD_RENDER | (d_antiAliased ? FT_LOAD_TARGET_NORMAL : FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO)))
 		{
 			// skip errors (but now we log them!)
 			std::stringstream err;
@@ -469,7 +485,7 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 		argb_t* dest_buff = buffer + (cur_y * size) + cur_x;
 
 		// draw glyph into buffer
-		drawGlyphToBuffer(dest_buff, size);
+		drawGlyphToBuffer((void*)glyph,dest_buff, size);
 
 		// define Image on Imageset for this glyph to save re-rendering glyph later
         char* b    =  new char[];
@@ -558,9 +574,10 @@ void Font::defineFontGlyphs(utf32 first_code_point, utf32 last_code_point)
 /*************************************************************************
 	Copy the FreeType glyph bitmap into the given memory buffer
 *************************************************************************/
-void Font::drawGlyphToBuffer(argb_t* buffer, uint buf_width)
+void Font::drawGlyphToBuffer(void* glyph, argb_t* buffer, uint buf_width)
 {
-	FT_Bitmap* glyph_bitmap = &d_impldat->fontFace->glyph->bitmap;
+    FT_GlyphSlot thisGlyph = (FT_GlyphSlot)glyph;
+	FT_Bitmap* glyph_bitmap = &thisGlyph->bitmap;
 
 	for (int i = 0; i < glyph_bitmap->rows; ++i)
 	{
@@ -667,8 +684,8 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
 	size_t char_count = text.length();
 	CodepointMap::const_iterator	pos, end = d_cp_map.end();
 
-    //First ensure our glyphs are loaded
-    String strNewGlyphs = cleanGlyphCache(d_glyphset);
+    //String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
+    String strNewGlyphs = d_glyphset;
 	for (size_t c = 0; c < char_count; ++c)
 	{
         strNewGlyphs += OnGlyphDrawn(text[c],true);
@@ -723,7 +740,8 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
 	if (space_count > 0) shared_lost_space = lost_space / (float)space_count;
 
     //First ensure our glyphs are loaded
-    String strNewGlyphs = cleanGlyphCache(d_glyphset);
+    //String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
+    String strNewGlyphs = d_glyphset;
 	for (size_t c = 0; c < char_count; ++c)
 	{
         strNewGlyphs += OnGlyphDrawn(text[c],true);

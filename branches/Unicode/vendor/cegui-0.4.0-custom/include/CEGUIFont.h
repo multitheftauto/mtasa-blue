@@ -954,7 +954,7 @@ private:
 	\return
 		Nothing.
 	*/
-	void	drawGlyphToBuffer(argb_t* buffer, uint buf_width);
+	void	drawGlyphToBuffer(void* glyph, argb_t* buffer, uint buf_width);
 
 
 	/*!
