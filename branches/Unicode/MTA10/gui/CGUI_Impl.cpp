@@ -84,9 +84,8 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
         0
     };
 
-    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", "cgui/ARIALUNI.TTF", 9, 0, NULL );
-
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT );
+    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9, 0, NULL );
     m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7, 0, NULL );
 
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT_BOLD );

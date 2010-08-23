@@ -724,7 +724,6 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
 
     //First ensure our glyphs are loaded
     String strNewGlyphs = cleanGlyphCache(d_glyphset);
-    //String strNewGlyphs = d_glyphset;
 	for (size_t c = 0; c < char_count; ++c)
 	{
         strNewGlyphs += OnGlyphDrawn(text[c],true);
@@ -1380,6 +1379,8 @@ String Font::OnGlyphDrawn ( unsigned long ulGlyph, bool bCreateNewCache ) const
 String Font::cleanGlyphCache ( String strCache ) const
 {
     unsigned int iRange = 128;
+    unsigned int iLowerBound = 127;
+    unsigned int iUpperBound = 65534;
     bool bPurged = false; //Have we purged any outdated caches?
 
     std::map< unsigned long, unsigned long >* m_pGlyphCache = const_cast< std::map< unsigned long, unsigned long >* >( &m_GlyphCache );
@@ -1399,29 +1400,26 @@ String Font::cleanGlyphCache ( String strCache ) const
         return strCache;
 
     String strNewCache = strCache;
-    const char* b = strNewCache.c_str();
     std::vector<unsigned long>::iterator iter;
     for (iter=l_Outdated.begin(); iter!=l_Outdated.end(); iter++)
     {
-        size_t char_count = strNewCache.length();
-        for (size_t c = 0; c < char_count; ++c)
+        String::iterator c;
+        for (c = strNewCache.begin(); c != strNewCache.end(); c++)
 	    {
-            unsigned long ulGlyph = (unsigned long)strNewCache[c];
-            if ( ( (*iter-iRange) <= ulGlyph ) && ( (ulGlyph <= (*iter+iRange) ) ) )
+            unsigned long ulGlyph = (unsigned long)*c;
+            if ( ( ulGlyph > iLowerBound) && ( ulGlyph < iUpperBound ) )
             {
-                strNewCache.erase(c,1);
-                b = strNewCache.c_str();
+                if ( ( (*iter-iRange) <= ulGlyph ) && ( (ulGlyph <= (*iter+iRange) ) ) )
+                {
+                    strNewCache.erase(c);
+                    c--;
+                }
             }
         }
-        char* szGlyphCode = new char[];
-        sprintf(szGlyphCode,"Purged Glyph Cache: %u", *iter);
         m_pGlyphCache->erase(*iter);
-        CEGUI::Logger::getSingleton().logEvent(szGlyphCode);
     }
 
-    //return strNewCache;
-    //return " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-    return strCache;
+    return strNewCache;
 }
 
 
