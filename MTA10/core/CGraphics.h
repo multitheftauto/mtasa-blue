@@ -271,7 +271,7 @@ private:
     struct sDrawQueueItem
     {
         eDrawQueueType      eType;
-        std::string         strText;
+        std::wstring        strText;
 
         // Queue item data based on the eType.
         union

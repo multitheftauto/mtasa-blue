@@ -40,17 +40,17 @@ namespace CEGUI
 /*************************************************************************
 	Constructor
 *************************************************************************/
-Image::Image(const Imageset* owner, const String& name, const Rect& area, const Point& render_offset, float horzScaling, float vertScaling) :
+Image::Image(const Imageset* owner, const String& name, const Rect& area, const Point& render_offset, float horzScaling, float vertScaling, unsigned long ulCodepoint) :
 	d_owner(owner),
 	d_area(area),
 	d_offset(render_offset),
-	d_name(name)
+	d_name(name),
+    d_codepoint(ulCodepoint)
 {
 	if (d_owner == NULL)
 	{
 		throw NullObjectException((utf8*)"Image::Image - Imageset pointer passed to Image constructor must not be null.");
 	}
-
 	// setup initial image scaling
 	setHorzScaling(horzScaling);
 	setVertScaling(vertScaling);
@@ -68,7 +68,8 @@ Image::Image(const Image& image) :
 	d_scaledWidth(image.d_scaledWidth),
 	d_scaledHeight(image.d_scaledHeight),
 	d_scaledOffset(image.d_scaledOffset),
-	d_name(image.d_name)
+	d_name(image.d_name),
+    d_codepoint(image.d_codepoint)
 {
 }
 
@@ -111,7 +112,7 @@ void Image::draw(const Rect& dest_rect, float z, const Rect& clip_rect, const Co
 	dest.offset(d_scaledOffset);
 
 	// draw
-	d_owner->draw(d_area, dest, z, clip_rect, colours, quad_split_mode);
+	d_owner->draw(d_area, dest, z, clip_rect, colours, quad_split_mode, this );
 }
 
 

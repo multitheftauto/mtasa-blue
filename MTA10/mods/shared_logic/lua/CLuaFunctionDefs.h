@@ -739,6 +739,13 @@ public:
 
     LUA_DECLARE ( GetVersion );
 
+    // UTF functions
+    LUA_DECLARE ( UtfLen );
+    LUA_DECLARE ( UtfSeek );
+    LUA_DECLARE ( UtfSub );
+    LUA_DECLARE ( UtfChar );
+    LUA_DECLARE ( UtfCode );
+
 private:
     // Static references to objects
     static CLuaManager*                 m_pLuaManager;

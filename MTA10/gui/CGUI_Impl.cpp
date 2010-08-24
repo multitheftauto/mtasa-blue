@@ -20,6 +20,7 @@ using std::list;
 #define CGUI_MTA_DEFAULT_FONT       "tahoma.ttf"        // %WINDIR%/font/<...>
 #define CGUI_MTA_DEFAULT_FONT_BOLD  "tahomabd.ttf"      // %WINDIR%/font/<...>
 #define CGUI_MTA_CLEAR_FONT         "verdana.ttf"       // %WINDIR%/font/<...>
+#define CGUI_MTA_SUBSTITUTE_FONT    "cgui/unifont-5.1.20080907.ttf"  // GTA/MTA/<...>
 #define CGUI_MTA_SANS_FONT          "cgui/sans.ttf"     // GTA/MTA/<...>
 #define CGUI_SA_HEADER_FONT         "cgui/saheader.ttf" // GTA/MTA/<...>
 #define CGUI_SA_GOTHIC_FONT         "cgui/sagothic.ttf" // GTA/MTA/<...>
@@ -66,16 +67,21 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     // Load our fonts
     char szWinDir[64], szFont[128];
     GetWindowsDirectory ( szWinDir, 64 );
+
+    m_pFontManager->setSubstituteFont ( CGUI_MTA_SUBSTITUTE_FONT, 9 );
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT );
-    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9 );
-    m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7 );
+    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9, 0 );
+    m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7, 0 );
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT_BOLD );
-    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8 );
+    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8, 0 );
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_CLEAR_FONT );
     m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9 );
-    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 0, true );
-    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 0, true );
-    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 0, false );
+    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, true );
+    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, true );
+    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, false );
     // ACHTUNG: These font creations can throw exceptions!
 
     // Load bluescheme
@@ -242,7 +248,29 @@ bool CGUI_Impl::GetGUIInputEnabled ( void )
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
 {
-    m_pSystem->injectChar ( ulCharacter );
+    if ( ulCharacter < 127 ) // we have any char from ASCII 
+    {
+        // injecting as is
+        m_pSystem->injectChar( ulCharacter );
+    }
+    else // we have any char from Extended ASCII, any ANSI code page or UNICODE range
+    {
+        // we need temp input string of unsigned char
+        unsigned char ucANSI[2] = { (unsigned char) ulCharacter, 0 };
+
+        // also we need temp output string of wchar_t
+        WCHAR *wUNICODE;
+        wUNICODE = new WCHAR[1];
+
+        // converting ANSI temp string to UNICODE temp string
+        MultiByteToWideChar( CP_THREAD_ACP, 0, (LPCSTR) ucANSI, -1, wUNICODE, 1 ); // can be CP_ACP too
+
+        // injecting unicode char
+        m_pSystem->injectChar( (unsigned long) wUNICODE[0] );
+
+        // temp UNICODE string no needs more
+        delete [] wUNICODE;
+    }
 }
 
 
@@ -276,9 +304,9 @@ CGUIEdit* CGUI_Impl::_CreateEdit ( CGUIElement_Impl* pParent, const char* szText
 }
 
 
-CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int uExtraGlyphs[], bool bAutoScale )
+CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale )
 {
-    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, uExtraGlyphs, bAutoScale );
+    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, bAutoScale );
 }
 
 
@@ -548,18 +576,21 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                 // If we got something to copy
                 if ( strTemp.length () > 0 )
                 {
+                    // Convert it to Unicode
+                    std::wstring strUTF = SharedUtil::ConvertToUTF8(strTemp.c_str());
+
                     // Open and empty the clipboard
                     OpenClipboard ( NULL );
                     EmptyClipboard ();
 
                     // Allocate the clipboard buffer and copy the data
-                    HGLOBAL hBuf = GlobalAlloc ( GMEM_DDESHARE, strTemp.length () + 1 );
-                    char* buf = reinterpret_cast < char* > ( GlobalLock ( hBuf ) );
-                    strcpy ( buf , strTemp.c_str () );
+                    HGLOBAL hBuf = GlobalAlloc ( GMEM_DDESHARE, strlen(strTemp.c_str()) );
+                    wchar_t* buf = reinterpret_cast < wchar_t* > ( GlobalLock ( hBuf ) );
+                    wcscpy ( buf , strUTF.c_str () );
                     GlobalUnlock ( hBuf );
 
                     // Copy the data into the clipboard
-                    SetClipboardData ( CF_TEXT , hBuf );
+                    SetClipboardData ( CF_UNICODETEXT , hBuf );
 
                     // Close the clipboard
                     CloseClipboard( );
@@ -584,12 +615,12 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                     CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
 
                     // Get the clipboard's data and put it into a char array
-                    const char * ClipboardBuffer = reinterpret_cast < const char* > ( GetClipboardData ( CF_TEXT ) );
+                    const wchar_t * ClipboardBuffer = reinterpret_cast < const wchar_t* > ( GetClipboardData ( CF_UNICODETEXT ) );
 
                     // Check to make sure we have valid data.
                     if ( ClipboardBuffer )
                     {
-                        SString strClipboardText ( "%s", ClipboardBuffer );
+                        std::wstring strClipboardText = ClipboardBuffer;
                         size_t iNewlineIndex;
 
                         // Remove the newlines inserting spaces instead
@@ -603,7 +634,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                                     // \r\n
                                     strClipboardText [ iNewlineIndex - 1 ] = ' ';
                                     strClipboardText.replace ( iNewlineIndex, strClipboardText.length () - iNewlineIndex,
-                                                              (const std::string&)strClipboardText, iNewlineIndex + 1,
+                                                              strClipboardText.c_str(), iNewlineIndex + 1,
                                                               strClipboardText.length () - iNewlineIndex - 1 );
                                 }
                                 else
@@ -614,7 +645,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                         } while ( iNewlineIndex != SString::npos );
 
                         // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
-                        CEGUI::String tmp = WndEdit->getText ();
+                        std::wstring tmp = SharedUtil::ConvertToUTF8(WndEdit->getText ().c_str());
                         if ( ( strClipboardText.length () + tmp.length () ) < WndEdit->getMaxTextLength( ) )
                         {
                             // Are there characters selected?
@@ -623,18 +654,19 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             {
                                 // Replace what's selected with the pasted buffer and set the new carat index
                                 tmp.replace ( WndEdit->getSelectionStartIndex (), WndEdit->getSelectionLength (),
-                                              strClipboardText.c_str (), strClipboardText.length () );
+                                              strClipboardText.c_str(), strClipboardText.length () );
                                 sizeCaratIndex = WndEdit->getSelectionStartIndex () + strClipboardText.length ();
                             }
                             else
                             {
                                 // If not, insert the clipboard buffer where we were and set the new carat index
-                                tmp.insert ( WndEdit->getSelectionStartIndex (), strClipboardText.c_str (), strClipboardText.length () );
+                                tmp.insert ( WndEdit->getSelectionStartIndex (), strClipboardText.c_str(), strClipboardText.length () );
                                 sizeCaratIndex = WndEdit->getCaratIndex () + strClipboardText.length ();
                             }
 
                             // Set the new text and move the carat at the end of what we pasted
-                            WndEdit->setText ( tmp );
+                            CEGUI::String strText((CEGUI::utf8*)SharedUtil::ConvertToANSI(tmp).c_str());
+                            WndEdit->setText ( strText );
                             WndEdit->setCaratIndex ( sizeCaratIndex );
                         }
                         else

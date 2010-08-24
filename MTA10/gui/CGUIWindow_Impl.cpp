@@ -40,7 +40,9 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
     reinterpret_cast < CEGUI::FrameWindow* > ( m_pWindow ) -> setTitlebarFont ( "default-bold-small" );
     
     // Give the window a caption
-    m_pWindow->setText ( szCaption );
+    CEGUI::String strText;
+    strText.assign( (CEGUI::utf8*)szCaption ); // assign as UTF8 string
+    m_pWindow->setText ( strText );
 
     // Register our events
     m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber ( &CGUIWindow_Impl::Event_OnCloseClick, this ) );

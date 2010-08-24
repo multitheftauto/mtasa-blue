@@ -99,7 +99,7 @@ unsigned int CGUIGridList_Impl::AddColumn ( const char* szTitle, float fWidth )
 {
     // Create a new column with an unique handle
     int hUniqueHandle = GetUniqueHandle ();
-    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addColumn ( szTitle, hUniqueHandle, fWidth );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addColumn ( ((CEGUI::utf8*)szTitle), hUniqueHandle, fWidth );
 
     int iColumnIndex = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getColumnWithID ( hUniqueHandle );
 

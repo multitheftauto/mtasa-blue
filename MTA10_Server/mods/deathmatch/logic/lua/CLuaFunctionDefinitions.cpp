@@ -9575,6 +9575,136 @@ int CLuaFunctionDefinitions::Dereference ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::UtfLen ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "utfLen" );
+
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+    std::string strInput = lua_tostring ( luaVM, 1 );
+    lua_pushnumber ( luaVM, SharedUtil::ConvertToUTF8(strInput).size() );
+
+    return 1;
+}
+
+int CLuaFunctionDefinitions::UtfSeek ( lua_State* luaVM )
+{
+        // Grab argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "utfSeek" );
+        lua_pushnil ( luaVM );
+        return 1;
+    }
+    int iPos = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
+    std::string strInput = lua_tostring ( luaVM, 1 );
+    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
+    if ( iPos <= static_cast < int >(strUTF.size()) && iPos >= 0 )
+    {
+        strUTF = strUTF.substr(0,iPos);
+        lua_pushnumber ( luaVM, SharedUtil::ConvertToANSI(strUTF).size() );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::UtfSub ( lua_State* L )
+{
+        // Grab argument types
+    int iArgument1 = lua_type ( L, 1 );
+    int iArgument2 = lua_type ( L, 2 );
+
+    if ( ( lua_type ( L, 1 ) != LUA_TSTRING ) || ( lua_type ( L, 2 ) != LUA_TNUMBER ) )
+    {
+        m_pScriptDebugging->LogBadType ( L, "utfSub" );
+        lua_pushnil ( L );
+        return 1;
+    }
+    //Ripped and modded Lua source.  It's pretty disgusting, i know.
+
+    const char *s = lua_tostring(L, 1);
+    std::wstring strUTF = SharedUtil::ConvertToUTF8(s);
+    size_t l = static_cast < int > ( strUTF.size() );
+
+    ptrdiff_t start = luaL_checkinteger(L, 2);
+    ptrdiff_t end = luaL_optinteger(L, 3, -1);
+
+    //posrelat them both
+    if (start < 0) start += (ptrdiff_t)l + 1;
+        start = (start >= 0) ? start : 0;
+
+    if (end < 0) end += (ptrdiff_t)l + 1;
+        end = (end >= 0) ? end : 0;
+
+    if (start < 1) start = 1;
+    if (end > (ptrdiff_t)l) end = (ptrdiff_t)l;
+    if (start <= end)
+    {
+        strUTF = strUTF.substr(start-1, end-start+1);
+        lua_pushstring(L, SharedUtil::ConvertToANSI(strUTF).c_str());
+    }
+    else lua_pushliteral(L, "");
+    return 1;
+}
+
+int CLuaFunctionDefinitions::UtfChar ( lua_State* luaVM )
+{
+        // Grab argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TNUMBER ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "utfChar" );
+        lua_pushnil ( luaVM );
+        return 1;
+    }
+    int iChar = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
+    if ( iChar > 65534 || iChar < 32 )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "utfChar" );
+        lua_pushnil ( luaVM );
+        return 1;
+    }
+
+    // Generate a null-terminating string for our character
+    wchar_t wUNICODE[2] = { iChar, '\0' };
+
+    // Convert our UTF character into an ANSI string
+    std::string strANSI = SharedUtil::ConvertToANSI(wUNICODE);
+
+    lua_pushstring ( luaVM, strANSI.c_str() );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::UtfCode ( lua_State* luaVM )
+{
+        // Grab argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "utfCode" );
+        lua_pushnil ( luaVM );
+        return 1;
+    }
+    std::string strInput = lua_tostring ( luaVM, 1 );
+    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
+    unsigned long ulCode = strUTF.c_str()[0];
+
+    lua_pushnumber ( luaVM, ulCode );
+    return 1;
+}
+
 
 int CLuaFunctionDefinitions::GetValidPedModels ( lua_State* luaVM )
 {

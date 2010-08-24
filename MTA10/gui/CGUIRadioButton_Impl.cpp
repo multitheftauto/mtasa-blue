@@ -25,7 +25,11 @@ CGUIRadioButton_Impl::CGUIRadioButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pPare
     // Create the window and set default settings
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIRADIOBUTTON_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
-    m_pWindow->setText ( szCaption );
+
+    CEGUI::String strText;
+    strText.assign( (CEGUI::utf8*) szCaption ); // assign as UTF8 string
+    m_pWindow->setText ( strText );
+
     m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( 128.0f, 16.0f ) );
     m_pWindow->setVisible ( true );
 
