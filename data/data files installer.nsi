@@ -141,6 +141,7 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.dat"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.tga"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
+	;File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
 
 	SetOutPath "$INSTDIR\MTA\cgui\images"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.png"
