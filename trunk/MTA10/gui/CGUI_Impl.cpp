@@ -606,13 +606,10 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
             if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {
                 CEGUI::Window* Wnd = reinterpret_cast < CEGUI::Window* > ( KeyboardArgs.window );
-                if ( Wnd->getType ( ) == "CGUI/Editbox" )
+                if ( Wnd->getType ( ) == "CGUI/Editbox" || Wnd->getType () == "CGUI/MultiLineEditbox" )
                 {
                     // Open the clipboard
                     OpenClipboard( NULL );
-
-                    // Turn our event window into an editbox
-                    CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
 
                     // Get the clipboard's data and put it into a char array
                     const wchar_t * ClipboardBuffer = reinterpret_cast < const wchar_t* > ( GetClipboardData ( CF_UNICODETEXT ) );
@@ -620,62 +617,121 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                     // Check to make sure we have valid data.
                     if ( ClipboardBuffer )
                     {
+                        size_t iSelectionStart, iSelectionLength, iMaxLength, iCaratIndex;
+                        CEGUI::String strEditText;
+                        bool bReplaceNewLines = true;
+                        bool bIsBoxFull = false;
+
+                        if ( Wnd->getType ( ) == "CGUI/Editbox" )
+                        {
+                            // Turn our event window into an editbox
+                            CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );      
+                            strEditText = WndEdit->getText ();
+                            iSelectionStart = WndEdit->getSelectionStartIndex ();
+                            iSelectionLength = WndEdit->getSelectionLength();
+                            iMaxLength = WndEdit->getMaxTextLength();
+                            iCaratIndex = WndEdit->getCaratIndex();
+                            strEditText = WndEdit->getText();
+                        }
+                        else
+                        {
+                            CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );      
+                            strEditText = WndEdit->getText ();
+                            iSelectionStart = WndEdit->getSelectionStartIndex ();
+                            iSelectionLength = WndEdit->getSelectionLength();
+                            iMaxLength = WndEdit->getMaxTextLength();
+                            iCaratIndex = WndEdit->getCaratIndex();
+                            strEditText = WndEdit->getText();
+                            bReplaceNewLines = false;
+                        }
+
                         std::wstring strClipboardText = ClipboardBuffer;
                         size_t iNewlineIndex;
 
                         // Remove the newlines inserting spaces instead
-                        do
+                        if ( bReplaceNewLines )
                         {
-                            iNewlineIndex = strClipboardText.find ( '\n' );
-                            if ( iNewlineIndex != SString::npos )
+                            do
                             {
-                                if ( iNewlineIndex > 0 && strClipboardText[ iNewlineIndex - 1 ] == '\r' )
+                                iNewlineIndex = strClipboardText.find ( '\n' );
+                                if ( iNewlineIndex != SString::npos )
                                 {
-                                    // \r\n
-                                    strClipboardText [ iNewlineIndex - 1 ] = ' ';
-                                    strClipboardText.replace ( iNewlineIndex, strClipboardText.length () - iNewlineIndex,
-                                                              strClipboardText.c_str(), iNewlineIndex + 1,
-                                                              strClipboardText.length () - iNewlineIndex - 1 );
+                                    if ( iNewlineIndex > 0 && strClipboardText[ iNewlineIndex - 1 ] == '\r' )
+                                    {
+                                        // \r\n
+                                        strClipboardText [ iNewlineIndex - 1 ] = ' ';
+                                        strClipboardText.replace ( iNewlineIndex, strClipboardText.length () - iNewlineIndex,
+                                                                  strClipboardText.c_str(), iNewlineIndex + 1,
+                                                                  strClipboardText.length () - iNewlineIndex - 1 );
+                                    }
+                                    else
+                                    {
+                                        strClipboardText [ iNewlineIndex ] = ' ';
+                                    }
                                 }
-                                else
-                                {
-                                    strClipboardText [ iNewlineIndex ] = ' ';
-                                }
-                            }
-                        } while ( iNewlineIndex != SString::npos );
+                            } while ( iNewlineIndex != SString::npos );
+                        }
 
                         // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
-                        std::wstring tmp = SharedUtil::ConvertToUTF8(WndEdit->getText ().c_str());
-                        if ( ( strClipboardText.length () + tmp.length () ) < WndEdit->getMaxTextLength( ) )
+                        std::wstring tmp = SharedUtil::ConvertToUTF8(strEditText.c_str());
+                        if ( ( strClipboardText.length () + tmp.length () ) < iMaxLength )
                         {
                             // Are there characters selected?
                             size_t sizeCaratIndex = 0;
-                            if ( WndEdit->getSelectionLength () > 0 )
+                            if ( iSelectionLength > 0 )
                             {
                                 // Replace what's selected with the pasted buffer and set the new carat index
-                                tmp.replace ( WndEdit->getSelectionStartIndex (), WndEdit->getSelectionLength (),
+                                tmp.replace ( iSelectionStart, iSelectionLength,
                                               strClipboardText.c_str(), strClipboardText.length () );
-                                sizeCaratIndex = WndEdit->getSelectionStartIndex () + strClipboardText.length ();
+                                sizeCaratIndex = iSelectionStart + strClipboardText.length ();
                             }
                             else
                             {
                                 // If not, insert the clipboard buffer where we were and set the new carat index
-                                tmp.insert ( WndEdit->getSelectionStartIndex (), strClipboardText.c_str(), strClipboardText.length () );
-                                sizeCaratIndex = WndEdit->getCaratIndex () + strClipboardText.length ();
+                                tmp.insert ( iSelectionStart, strClipboardText.c_str(), strClipboardText.length () );
+                                sizeCaratIndex = iCaratIndex + strClipboardText.length ();
                             }
 
                             // Set the new text and move the carat at the end of what we pasted
                             CEGUI::String strText((CEGUI::utf8*)SharedUtil::ConvertToANSI(tmp).c_str());
-                            WndEdit->setText ( strText );
-                            WndEdit->setCaratIndex ( sizeCaratIndex );
+                            strEditText = strText;
+                            iCaratIndex = sizeCaratIndex;
                         }
                         else
                         {
+                            bIsBoxFull = true;
+                        }
+                        if ( bIsBoxFull )
+                        {
                             // Fire an event if the editbox is full
-                            WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                            if ( Wnd->getType ( ) == "CGUI/Editbox" )
+                            {
+                                CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );  
+                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                            }
+                            else
+                            {
+                                CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );  
+                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                            }
+                        }
+                        else
+                        {
+                            if ( Wnd->getType ( ) == "CGUI/Editbox" )
+                            {
+                                CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );  
+                                WndEdit->setText ( strEditText );
+                                WndEdit->setCaratIndex ( iCaratIndex );
+                            }
+                            else
+                            {
+                                CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );  
+                                WndEdit->setText ( strEditText );
+                                WndEdit->setCaratIndex ( iCaratIndex );
+                            }
                         }
                     }
-
+                    
                     // Close the clipboard
                     CloseClipboard( );
                 }
