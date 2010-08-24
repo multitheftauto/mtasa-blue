@@ -708,7 +708,8 @@ bool CGraphics::LoadFonts ( void )
         { "pricedown",            30, FW_NORMAL },
         { "bankgothic md bt",     30, FW_NORMAL },
         { "diploma",              30, FW_NORMAL },
-        { "beckett",              30, FW_NORMAL }
+        { "beckett",              30, FW_NORMAL },
+        { "unifont",              14, FW_NORMAL }
     };
 
     bool bSuccess = true;
@@ -822,8 +823,8 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     m_pDevice = pDevice;
 
     if ( !LoadFonts () )
-        // Some of the above objects could not be created
-        CCore::GetSingleton ().GetConsole ()->Printf ( "WARNING: Some fonts could not be loaded! Your game will not be able to display any text." );
+        // Some of the above objects could not be created, but how do we print without a console!? Doh.
+        //CCore::GetSingleton ().GetConsole ()->Printf ( "WARNING: Some fonts could not be loaded! Your game will not be able to display any text." );
 
     // Get the original render target
     assert ( !m_pOriginalTarget );
