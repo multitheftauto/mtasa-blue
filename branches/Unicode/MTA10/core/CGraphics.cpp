@@ -696,6 +696,7 @@ bool CGraphics::LoadFonts ( void )
     iLoaded += AddFontResourceEx ( std::string ( strFontPath + "sabankgothic.ttf" ).c_str (), FR_PRIVATE, 0 );
     iLoaded += AddFontResourceEx ( std::string ( strFontPath + "saheader.ttf" ).c_str (), FR_PRIVATE, 0 );
     iLoaded += AddFontResourceEx ( std::string ( strFontPath + "sagothic.ttf" ).c_str (), FR_PRIVATE, 0 );
+    iLoaded += AddFontResourceEx ( std::string ( strFontPath + "unifont-5.1.20080907.ttf" ).c_str (), FR_PRIVATE, 0 );
 
     // Create DirectX font and sprite objects
     static const sFontInfo fontInfos[] = {
@@ -750,6 +751,7 @@ bool CGraphics::DestroyFonts ( void )
     RemoveFontResourceEx ( std::string ( strFontPath + "sabankgothic.ttf" ).c_str (), FR_PRIVATE, 0 );
     RemoveFontResourceEx ( std::string ( strFontPath + "saheader.ttf" ).c_str (), FR_PRIVATE, 0 );
     RemoveFontResourceEx ( std::string ( strFontPath + "sagothic.ttf" ).c_str (), FR_PRIVATE, 0 );
+    RemoveFontResourceEx ( std::string ( strFontPath + "unifont-5.1.20080907.ttf" ).c_str (), FR_PRIVATE, 0 );
 
     return true;
 }
