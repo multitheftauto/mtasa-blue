@@ -67,7 +67,6 @@ void DirectX9Renderer::constructor_impl(LPDIRECT3DDEVICE9 device, const Size& di
 	d_currTexture   = NULL;
 	d_buffer        = NULL;
 	d_bufferPos     = 0;
-    d_bDelayTextureRelease = false;
 
 	// initialise renderer display area
 	d_display_area.d_left	= 0;
@@ -142,7 +141,7 @@ void DirectX9Renderer::addQuad(const Rect& dest_rect, float z, const Texture* te
 
 		quad.position		= dest_rect;
 		quad.z				= z;
-		quad.texture		= ((DirectX9Texture*)tex)->getD3DTexture();
+		quad.texture		= ((DirectX9Texture*)tex);
         quad.image          = image;
 		quad.texPosition	= texture_rect;
 		quad.topLeftCol		= colours.d_top_left.getARGB();
@@ -179,8 +178,9 @@ void DirectX9Renderer::doRender(void)
 	{
 		const QuadInfo& quad = (*i);
 
+		LPDIRECT3DTEXTURE9 d3dTexture = quad.texture->getD3DTexture();
 		// flush & set texture if needed
-		if (d_currTexture != quad.texture)
+		if (d_currTexture != d3dTexture)
 		{
 			if (locked)
 			{
@@ -192,8 +192,8 @@ void DirectX9Renderer::doRender(void)
 			renderVBuffer();
 
 			// set new texture
-			d_device->SetTexture(0, quad.texture);
-			d_currTexture = quad.texture;
+			d_device->SetTexture(0, d3dTexture);
+			d_currTexture = d3dTexture;
 		}
 
 		if (!locked)
@@ -348,8 +348,6 @@ void DirectX9Renderer::doRender(void)
 	}
 
 	renderVBuffer();
-
-    processReleaseQueue();
 }
 
 
@@ -699,38 +697,6 @@ void DirectX9Renderer::setDisplaySize(const Size& sz)
 		fireEvent(EventDisplaySizeChanged, args, EventNamespace);
 	}
 
-}
-
-
-/************************************************************************
-
-*************************************************************************/
-void DirectX9Renderer::releaseD3DTexture(LPDIRECT3DTEXTURE9 d_d3dtexture)
-{
-    if ( d_bDelayTextureRelease )
-        d_releaseQueue.push_back( d_d3dtexture );
-    else
-        d_d3dtexture->Release();
-}
-
-
-/************************************************************************
-
-*************************************************************************/
-void DirectX9Renderer::setDelayTextureRelease( bool bOn )
-{
-    d_bDelayTextureRelease = bOn;
-}
-
-
-/************************************************************************
-
-*************************************************************************/
-void DirectX9Renderer::processReleaseQueue(void)
-{
-    for ( unsigned int i = 0 ; i < d_releaseQueue.size() ; i++ )
-        d_releaseQueue[i]->Release();
-    d_releaseQueue.clear();
 }
 
 

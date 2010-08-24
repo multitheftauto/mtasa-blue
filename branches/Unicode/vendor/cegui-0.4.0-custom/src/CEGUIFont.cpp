@@ -691,9 +691,7 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
     }
     if ( strNewGlyphs != d_glyphset )
     {
-        System::getSingleton().getRenderer()->setDelayTextureRelease(true);
         const_cast<Font*>( this )->defineFontGlyphs(strNewGlyphs);
-        System::getSingleton().getRenderer()->setDelayTextureRelease(false);
     }
 
 	for (size_t c = 0; c < char_count; ++c)
@@ -746,9 +744,7 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
     }
     if ( strNewGlyphs != d_glyphset )
     {
-        System::getSingleton().getRenderer()->setDelayTextureRelease(true);
         const_cast<Font*>( this )->defineFontGlyphs(strNewGlyphs);
-        System::getSingleton().getRenderer()->setDelayTextureRelease(false);
     }
     
     for (c = 0; c < char_count; ++c)
