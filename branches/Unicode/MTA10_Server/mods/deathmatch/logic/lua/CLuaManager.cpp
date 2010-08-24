@@ -602,8 +602,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "utfSub", CLuaFunctionDefinitions::UtfSub );
     CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefinitions::UtfChar );
     CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefinitions::UtfCode );
-    CLuaCFunctions::AddFunction ( "utfUpper", CLuaFunctionDefinitions::UtfUpper );
-    CLuaCFunctions::AddFunction ( "utfLower", CLuaFunctionDefinitions::UtfLower );
 
     CLuaCFunctions::AddFunction ( "getValidPedModels", CLuaFunctionDefinitions::GetValidPedModels );
 

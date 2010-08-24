@@ -946,8 +946,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "utfSub", CLuaFunctionDefs::UtfSub );
     CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefs::UtfChar );
     CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefs::UtfCode );
-    CLuaCFunctions::AddFunction ( "utfUpper", CLuaFunctionDefs::UtfUpper );
-    CLuaCFunctions::AddFunction ( "utfLower", CLuaFunctionDefs::UtfLower );
 
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();

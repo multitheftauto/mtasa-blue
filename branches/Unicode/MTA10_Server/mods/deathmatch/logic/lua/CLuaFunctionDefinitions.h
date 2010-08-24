@@ -429,8 +429,6 @@ public:
     static int      UtfSub                              ( lua_State* luaVM );
     static int      UtfChar                             ( lua_State* luaVM );
     static int      UtfCode                             ( lua_State* luaVM );
-    static int      UtfUpper                            ( lua_State* luaVM );
-    static int      UtfLower                            ( lua_State* luaVM );
     static int      GetValidPedModels                   ( lua_State* luaVM );
 
     // Loaded Map Functions
