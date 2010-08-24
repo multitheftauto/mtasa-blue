@@ -940,6 +940,13 @@ void CLuaManager::LoadCFunctions ( void )
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );
 
+    // UTF functions
+    CLuaCFunctions::AddFunction ( "utfLen", CLuaFunctionDefs::UtfLen );
+    CLuaCFunctions::AddFunction ( "utfSeek", CLuaFunctionDefs::UtfSeek );
+    CLuaCFunctions::AddFunction ( "utfSub", CLuaFunctionDefs::UtfSub );
+    CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefs::UtfChar );
+    CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefs::UtfCode );
+
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();

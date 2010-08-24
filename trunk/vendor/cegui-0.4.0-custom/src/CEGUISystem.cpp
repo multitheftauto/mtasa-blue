@@ -323,7 +323,7 @@ void System::constructor_impl(Renderer* renderer, ResourceProvider* resourceProv
 
 	// cause creation of other singleton objects
 	new ImagesetManager();
-	new FontManager();
+	d_fontManager = new FontManager();
 	new WindowFactoryManager();
 	new WindowManager();
 	new SchemeManager();

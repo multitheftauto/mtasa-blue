@@ -357,7 +357,7 @@ public:
 
 	\exception AlreadyExistsException	thrown if an Image named \a name is already defined for this Imageset
 	*/
-	void	defineImage(const String& name, const Rect& image_rect, const Point& render_offset);
+	void	defineImage(const String& name, const Rect& image_rect, const Point& render_offset, const unsigned long ulCodepoint = 0 );
 
 
 	/*!
@@ -385,7 +385,7 @@ public:
 	\return
 		Nothing
 	*/
-	void	draw(const Rect& source_rect, const Rect& dest_rect, float z, const Rect& clip_rect,const ColourRect& colours, QuadSplitMode quad_split_mode) const;
+	void	draw(const Rect& source_rect, const Rect& dest_rect, float z, const Rect& clip_rect,const ColourRect& colours, QuadSplitMode quad_split_mode, const Image* image = NULL) const;
 
 
 	/*!

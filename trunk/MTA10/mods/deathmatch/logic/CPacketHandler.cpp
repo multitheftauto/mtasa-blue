@@ -1092,34 +1092,38 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
     unsigned char ucRed;
     unsigned char ucGreen;
     unsigned char ucBlue;
-    unsigned char ucColorCoded;
+    bool ucColorCoded;
     if ( bitStream.Read ( ucRed ) &&
          bitStream.Read ( ucGreen ) &&
          bitStream.Read ( ucBlue ) &&
-         bitStream.Read ( ucColorCoded ) )
+         bitStream.ReadBit ( ucColorCoded ) )
     {
         // Valid length?
+
         int iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed () - 4;
-        if ( iNumberOfBytesUsed >= MIN_CHATECHO_LENGTH && iNumberOfBytesUsed <= MAX_CHATECHO_LENGTH )
+        if ( iNumberOfBytesUsed >= MIN_CHATECHO_LENGTH  )
         {
             // Read the message into a buffer
-            char szMessage [MAX_CHATECHO_LENGTH + 1];
+            char* szMessage = new char[iNumberOfBytesUsed + 1];
             bitStream.Read ( szMessage, iNumberOfBytesUsed );
             szMessage [iNumberOfBytesUsed] = 0;
+            if ( SharedUtil::ConvertToUTF8(szMessage).size() <= MAX_CHATECHO_LENGTH )
+            {
+                // Strip it for bad characters
+                StripControlCodes ( szMessage, ' ' );
 
-            // Strip it for bad characters
-            StripControlCodes ( szMessage, ' ' );
+                // Call an event
+                CLuaArguments Arguments;
+                Arguments.PushString ( szMessage );
+                Arguments.PushNumber ( ucRed );
+                Arguments.PushNumber ( ucGreen );
+                Arguments.PushNumber ( ucBlue );
+                g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
 
-            // Call an event
-            CLuaArguments Arguments;
-            Arguments.PushString ( szMessage );
-            Arguments.PushNumber ( ucRed );
-            Arguments.PushNumber ( ucGreen );
-            Arguments.PushNumber ( ucBlue );
-            g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
-
-            // Echo it
-            g_pCore->ChatEchoColor ( szMessage, ucRed, ucGreen, ucBlue, ( ucColorCoded == 1 ) );
+                // Echo it
+                g_pCore->ChatEchoColor ( szMessage, ucRed, ucGreen, ucBlue, ucColorCoded );
+                delete[] szMessage;
+            }
         }
     }
 }

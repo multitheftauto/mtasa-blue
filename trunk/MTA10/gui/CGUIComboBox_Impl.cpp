@@ -31,12 +31,16 @@ CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
     // Create the window and set default settings
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUICOMBOBOX_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
-    m_pWindow->setText ( szCaption );
+
+    CEGUI::String strText;
+    strText.assign( (CEGUI::utf8*) szCaption ); // assign as UTF8 string
+    m_pWindow->setText ( strText );
+
     m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( 128.0f, 24.0f ) );
     m_pWindow->setVisible ( true );
 
     // This needs a better alternative, so changing comboBox will change this - Jyrno42
-    storedCaption = szCaption;
+    storedCaption = strText;
 
     // Store the pointer to this CGUI element in the CEGUI element
     m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
@@ -164,10 +168,13 @@ bool CGUIComboBox_Impl::SetItemText ( int index, const char* szText )
     try
     {
         CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
-        pItem->setText( szText );
+        CEGUI::String strText;
+        strText.assign( (CEGUI::utf8*) szText ); // assign as UTF8 string
+        pItem->setText( strText );
         if( pItem->isSelected( ) ) // if this is currently selected, let's update the editbox.
         {
-            m_pWindow->setText ( szText );
+            strText.assign( (CEGUI::utf8*) szText );
+            m_pWindow->setText ( strText );
         }
         return true;
     }
@@ -186,7 +193,7 @@ bool CGUIComboBox_Impl::SetSelectedItemByIndex ( int index )
 
         if( index == 0 )
         {
-            m_pWindow->setText ( storedCaption.c_str( ) );
+            m_pWindow->setText ( storedCaption );
         }
         else
         {
@@ -194,7 +201,7 @@ bool CGUIComboBox_Impl::SetSelectedItemByIndex ( int index )
             if( pItem != NULL )
             {
                 pItem->setSelected( true );
-                m_pWindow->setText ( pItem->getText( ).c_str( ) );
+                m_pWindow->setText ( pItem->getText( ) );
                 return true;
             }
         }
@@ -218,7 +225,7 @@ void CGUIComboBox_Impl::Clear ( void )
     }
 
     m_Items.clear ();
-    m_pWindow->setText ( storedCaption.c_str( ) );
+    m_pWindow->setText ( storedCaption );
 }
 
 void CGUIComboBox_Impl::SetReadOnly ( bool bReadonly )

@@ -27,19 +27,19 @@
 class CChatEchoPacket : public CPacket
 {
 public:
-    inline                  CChatEchoPacket             ( const char* szMessage,
+    inline                  CChatEchoPacket             ( SString strMessage,
                                                           unsigned char ucRed,
                                                           unsigned char ucGreen,
                                                           unsigned char ucBlue,
-                                                          bool bColorCoded = false )    { strncpy ( m_szMessage, szMessage, MAX_CHATECHO_LENGTH ); m_szMessage [MAX_CHATECHO_LENGTH] = 0; m_ucRed = ucRed; m_ucGreen = ucGreen; m_ucBlue = ucBlue; m_bColorCoded = bColorCoded; };
+                                                          bool bColorCoded = false )    { m_strMessage = strMessage; m_ucRed = ucRed; m_ucGreen = ucGreen; m_ucBlue = ucBlue; m_bColorCoded = bColorCoded; };
 
     inline ePacketID        GetPacketID                 ( void ) const              { return PACKET_ID_CHAT_ECHO; };
     inline unsigned long    GetFlags                    ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
-    inline const char*      GetMessage                  ( void )                    { return m_szMessage; };
-    void                    SetMessage                  ( const char* szMessage )   { strncpy ( m_szMessage, szMessage, MAX_CHATECHO_LENGTH ); };
+    inline SString          GetMessage                  ( void )                    { return m_strMessage; };
+    void                    SetMessage                  ( SString  strMessage )     { m_strMessage = strMessage; };
     inline void             SetColor                    ( unsigned char ucRed,
                                                           unsigned char ucGreen,
                                                           unsigned char ucBlue )    { m_ucRed = ucRed; m_ucGreen = ucGreen; m_ucRed = ucRed; };
@@ -48,7 +48,7 @@ private:
     unsigned char           m_ucRed;
     unsigned char           m_ucGreen;
     unsigned char           m_ucBlue;
-    char                    m_szMessage [MAX_CHATECHO_LENGTH + 1];
+    SString                 m_strMessage;
     bool                    m_bColorCoded;
 };
 

@@ -29,6 +29,7 @@ enum eFontType
     FONT_BANKGOTHIC,
     FONT_DIPLOMA,
     FONT_BECKETT,
+    FONT_UNIFONT,
     NUM_FONTS
 };
 

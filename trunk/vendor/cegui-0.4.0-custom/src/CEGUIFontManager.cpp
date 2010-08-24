@@ -53,6 +53,7 @@ template<> FontManager* Singleton<FontManager>::ms_Singleton	= NULL;
 FontManager::FontManager(void)
 {
 	d_implData = new FontManagerImplData;
+    d_subfntdata = new Font::FontImplData(d_implData->d_ftlib);
 
 	if (FT_Init_FreeType(&d_implData->d_ftlib))
 	{
@@ -70,6 +71,10 @@ FontManager::~FontManager(void)
 {
 	Logger::getSingleton().logEvent((utf8*)"---- Begining cleanup of Font system ----");
 	destroyAllFonts();
+
+    System::getSingleton().getResourceProvider()->unloadRawDataContainer(d_subfntdata->fontData);
+	FT_Done_Face(d_subfntdata->fontFace);
+	delete d_subfntdata;
 
 	FT_Done_FreeType(d_implData->d_ftlib);
 	delete d_implData;
@@ -255,6 +260,65 @@ void FontManager::writeFontToStream(const String& name, OutStream& out_stream) c
 
     // output font data
     font->writeXMLToStream(out_stream);
+}
+
+void FontManager::setSubstituteFont(const String& fontname,  uint size, const String& resourceGroup) const
+{
+    System::getSingleton().getResourceProvider()->loadRawDataContainer(fontname, d_subfntdata->fontData, resourceGroup);
+
+	uint		horzdpi		= System::getSingleton().getRenderer()->getHorzScreenDPI();
+	uint		vertdpi		= System::getSingleton().getRenderer()->getVertScreenDPI();
+    Logger::getSingleton().logEvent("Substitute font set to: " + fontname);
+
+    String errMsg;
+
+    if (FT_New_Memory_Face(d_implData->d_ftlib, d_subfntdata->fontData.getDataPtr(), 
+            (FT_Long)d_subfntdata->fontData.getSize(), 0, &d_subfntdata->fontFace) == 0)
+    {
+		// check that default Unicode character map is available
+		if (d_subfntdata->fontFace->charmap != NULL)	
+		{
+			try
+			{
+				if (FT_Set_Char_Size(d_subfntdata->fontFace, 0, size * 64, horzdpi, vertdpi) == 0)
+				    return;
+			}
+			catch(...)
+			{
+				FT_Done_Face(d_subfntdata->fontFace);
+				// re-throw
+				throw;
+			}
+
+		}
+		// missing Unicode character map
+		else
+		{
+			FT_Done_Face(d_subfntdata->fontFace);
+			errMsg = (utf8*)"setSubstituteFont::setSubstituteFont - The source font '" + fontname +"' does not have a Unicode charmap, and cannot be used.";
+		}
+
+	} // failed to create face (a problem with the font file?)
+	else
+	{
+		errMsg = (utf8*)"setSubstituteFont::setSubstituteFont - An error occurred while trying to create a FreeType face from source font '" + fontname + "'.";
+	}
+
+    Logger::getSingleton().logEvent(errMsg);
+}
+
+void* FontManager::getSubstituteGlyph(unsigned long ulGlyph) const
+{
+    bool bAntiAliased = false;
+    FT_GlyphSlot glyph = d_subfntdata->fontFace->glyph;
+    if (FT_Load_Char(d_subfntdata->fontFace, ulGlyph, FT_LOAD_RENDER | (bAntiAliased ? FT_LOAD_TARGET_NORMAL : FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO ) ))
+    {
+		std::stringstream err;
+		err << "FontManager::getSubstituteGlyph - Failed to load glyph for codepoint: ";
+		err << static_cast<unsigned int>(ulGlyph);
+		Logger::getSingleton().logEvent(err.str(), Errors);
+    }
+    return (void*)glyph;
 }
 
 } // End of  CEGUI namespace section
