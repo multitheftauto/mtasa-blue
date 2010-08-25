@@ -13,6 +13,7 @@
 *
 *****************************************************************************/
 
+#include "UTF8.h"
 #include <assert.h>
 
 #ifdef WIN32
@@ -573,25 +574,57 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
 }
 
 // Convert a standard std::string into a UTF-8 std::wstring
-std::wstring SharedUtil::ConvertToUTF8 (const std::string& s)
+std::wstring SharedUtil::ConvertToUTF8 (const std::string& input)
 {
-    int len = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, 0, 0);
-    wchar_t* buf = new wchar_t[len];
-    MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, buf, len);
-    std::wstring r(buf);
-    delete[] buf;
-    return r;
+    std::wstring strOutput;
+    std::string::const_iterator it;
+    unsigned int uiUTFStart = 0;
+    bool bUTFSeeking = false;
+    unsigned int i = 1;
+    unsigned int uiGlyph;
+    for ( it=input.begin() ; it < input.end(); it++ )
+    {
+        const char mb[] = { (*it),0 };
+        int len = utf8_mbtowc( &uiGlyph, bUTFSeeking ? input.substr(uiUTFStart,i).c_str() : mb, 6 );
+        if ( len < 1 )
+        {
+            if ( !bUTFSeeking )
+            {
+                uiUTFStart = i-1;
+                bUTFSeeking = true;
+            }
+        }
+        else
+        {
+            wchar_t wUNICODE[2] = { uiGlyph, '\0' };
+            strOutput += wUNICODE;
+            bUTFSeeking = false;
+        }
+        i++;
+    }
+    if ( strOutput.empty() )
+    {
+        wchar_t wReplacement[2] = { 0xFFFD, '\0' };
+        strOutput = wReplacement;
+    }
+    return strOutput;
 }
 
 // Convert a std::wstring into an ANSI encoded string
-std::string SharedUtil::ConvertToANSI (const std::wstring& ws)
+std::string SharedUtil::ConvertToANSI (const std::wstring& input)
 {
-    int len = WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), -1, 0, 0, NULL, NULL);
-    const char* buf = new char[len];
-    WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), -1, LPSTR(buf), len, NULL, NULL);
-    std::string r(buf);
-    delete[] buf;
-    return r;
+    std::string strOutput = "";
+    std::wstring::const_iterator it;
+    for ( it=input.begin() ; it < input.end(); it++ )
+    {
+        int len = utf8_wctomb( NULL, (*it) );
+        char* buf = new char[len+1];
+        utf8_wctomb( buf, (*it) );
+        buf[len] = '\0';
+        strOutput += buf;
+        delete[] buf;
+    }
+    return strOutput;
 }
 
 //
