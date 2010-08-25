@@ -18,9 +18,9 @@ Var Install_Dir
 ; Don't forget to update the BUILD_NUMBER
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "1746"
-!define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
-!define INSTALL_OUTPUT "mtasa-data-r${BUILD_NUMBER}.exe"
+!define BUILD_NUMBER "1948"
+!define PRODUCT_VERSION "1.1 Data-r${BUILD_NUMBER}"
+!define INSTALL_OUTPUT "mtasa-1.1-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
 
 
