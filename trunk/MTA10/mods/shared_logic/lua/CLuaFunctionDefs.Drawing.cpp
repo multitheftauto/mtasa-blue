@@ -139,8 +139,9 @@ int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
 int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 {
     // dxDrawText ( string text,int left,int top [,int right=left,int bottom=top,int color=0xffffffff,float scale=1,string font="default",string alignX="left",string alignY="top",bool clip=false,bool wordBreak=false] )
-
     // Grab all argument types
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
     int iArgument2 = lua_type ( luaVM, 2 );
     int iArgument3 = lua_type ( luaVM, 3 );
     if ( ( lua_type ( luaVM, 1 ) == LUA_TSTRING ) &&
@@ -154,10 +155,11 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         int iBottom = iTop;        
         unsigned long ulColor = 0xFFFFFFFF;
         float fScale = 1.0f;
-        eFontType fontType = FONT_DEFAULT;
         unsigned long ulFormat = 0;
         bool bClip = false;
         bool bPostGUI = false;
+        const char * szFontName;
+        CResource* pResource =  pLuaMain->GetResource();
 
         int iArgument4 = lua_type ( luaVM, 4 );
         if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
@@ -182,9 +184,8 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
                         int iArgument8 = lua_type ( luaVM, 8 );
                         if ( iArgument8 == LUA_TSTRING )
                         {
-                            const char * szFontName = lua_tostring ( luaVM, 8 );
-                            fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFontName ) );
-
+                            szFontName = lua_tostring ( luaVM, 8 );
+                            
                             if ( lua_type ( luaVM, 9 ) == LUA_TSTRING )
                             {
                                 const char * szTemp = lua_tostring ( luaVM, 9 );
@@ -224,8 +225,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         }
         if ( !bClip ) ulFormat |= DT_NOCLIP;
 
-        ID3DXFont * pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
-        g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, ulColor, szText, fScale, fScale, ulFormat, pFont, bPostGUI );
+        CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, szText, fScale, fScale, ulFormat, szFontName, bPostGUI, pResource );
 
         // Success
         lua_pushboolean ( luaVM, true );
@@ -489,6 +489,7 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
         const char * szText = lua_tostring ( luaVM, 1 );
         float fScale = 1.0f;
         eFontType fontType = FONT_DEFAULT;
+        ID3DXFont * pFont = NULL;
 
         int iArgument2 = lua_type ( luaVM, 2 );
         if ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING )
@@ -497,12 +498,20 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 
             if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
             {
+                CResource* pResource =  m_pLuaManager->GetVirtualMachine(luaVM)->GetResource();
+                // sanitize the input
                 const char * szFontName = lua_tostring ( luaVM, 3 );
-                fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFontName ) );
+                SString strPath, strMetaPath;
+                if ( CResourceManager::ParseResourcePathInput( szFontName, pResource, strPath, strMetaPath ) && FileExists(strPath) && 
+                     g_pClientGame->GetScriptFontLoader()->GetDXFont(&pFont,strPath,strMetaPath,pResource,fScale,fScale) )
+                {}
+                else
+                {
+                    fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFontName ) );
+                    pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
+                }
             }
         }
-
-        ID3DXFont * pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
 
         // Retrieve the longest line's extent
         std::stringstream ssText ( szText );
@@ -534,6 +543,7 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 
     float fScale = 1.0f;
     eFontType fontType = FONT_DEFAULT;
+    ID3DXFont * pFont = NULL;
 
     int iArgument1 = lua_type ( luaVM, 1 );
     if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
@@ -543,11 +553,19 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
         if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
         {
             const char * szFontName = lua_tostring ( luaVM, 2 );
-            fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFontName ) );
+            CResource* pResource =  m_pLuaManager->GetVirtualMachine(luaVM)->GetResource();
+            // sanitize the input
+            SString strPath, strMetaPath;
+            if ( CResourceManager::ParseResourcePathInput( szFontName, pResource, strPath, strMetaPath ) && FileExists(strPath) && 
+                 g_pClientGame->GetScriptFontLoader()->GetDXFont(&pFont,strPath,strMetaPath,pResource,fScale,fScale) )
+            {}
+            else
+            {
+                fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFontName ) );
+                pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
+            }
         }
     }
-
-    ID3DXFont * pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
     float fHeight = g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, pFont );
 
     // Success
@@ -555,3 +573,77 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::LoadFont ( lua_State* luaVM )
+{
+    bool bResult = false;
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+        {
+            CResource* pResource =  pLuaMain->GetResource();
+            // sanitize the input
+            SString strFile = lua_tostring ( luaVM, 1 );
+            SString strPath, strMetaPath;
+            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath, strMetaPath ) )
+            {
+                if ( FileExists(strPath) )
+                {
+                    bool bBold = false;
+                    unsigned int uiSize = 9;
+                    if ( lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
+                        bBold = lua_toboolean ( luaVM, 2 );
+                    if ( lua_istype ( luaVM, 3, LUA_TNUMBER ) )
+                        uiSize = lua_tonumber ( luaVM, 3 );
+
+                    bResult = CStaticFunctionDefinitions::LoadFont ( strPath, bBold, uiSize, strMetaPath, pResource );
+                }
+                else
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );               
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );
+    }
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, bResult );
+    return 1;
+}
+
+int CLuaFunctionDefs::UnloadFont ( lua_State* luaVM )
+{
+    bool bResult = false;
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+        {
+            CResource* pResource =  pLuaMain->GetResource();
+            // sanitize the input
+            SString strFile = lua_tostring ( luaVM, 1 );
+            SString strPath, strMetaPath;
+            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath, strMetaPath ) )
+            {
+                if ( FileExists(strPath) )
+                {
+                    bResult = CStaticFunctionDefinitions::UnloadFont ( strPath, strMetaPath, pResource );
+                }
+                else
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );               
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );
+    }
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, bResult );
+    return 1;
+}

@@ -467,6 +467,8 @@ public:
     LUA_DECLARE ( dxDrawImageSection );
     LUA_DECLARE ( dxGetTextWidth );
     LUA_DECLARE ( dxGetFontHeight );
+    LUA_DECLARE ( LoadFont );
+    LUA_DECLARE ( UnloadFont );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them

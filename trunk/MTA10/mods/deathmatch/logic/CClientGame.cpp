@@ -188,6 +188,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_pZoneNames = new CZoneNames;
     m_pScriptKeyBinds = new CScriptKeyBinds;
+    m_pScriptFontLoader = new CScriptFontLoader;
 
     // Create our net API
     m_pNetAPI = new CNetAPI ( m_pManager );
@@ -405,6 +406,7 @@ CClientGame::~CClientGame ( void )
 
     delete m_pZoneNames;
     delete m_pScriptKeyBinds;    
+    delete m_pScriptFontLoader;    
 
     // Delete the scriptdebugger
     delete m_pScriptDebugging;

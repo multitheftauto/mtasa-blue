@@ -37,6 +37,7 @@ static CClientTeamManager*                          m_pTeamManager;
 static CGUI*                                        m_pGUI;
 static CClientGUIManager*                           m_pGUIManager;
 static CScriptKeyBinds*                             m_pScriptKeyBinds;
+static CScriptFontLoader*                           m_pScriptFontLoader;
 static CClientMarkerManager*                        m_pMarkerManager;
 static CClientPickupManager*                        m_pPickupManager;
 static CMovingObjectsManager*                       m_pMovingObjectsManager;
@@ -75,6 +76,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     m_pGUI = pCore->GetGUI ();
     m_pGUIManager = pManager->GetGUIManager ();
     m_pScriptKeyBinds = m_pClientGame->GetScriptKeyBinds ();
+    m_pScriptFontLoader = m_pClientGame->GetScriptFontLoader();
     m_pMarkerManager = pManager->GetMarkerManager ();
     m_pPickupManager = pManager->GetPickupManager ();
     m_pMovingObjectsManager = m_pClientGame->GetMovingObjectsManager ();
@@ -3576,6 +3578,44 @@ bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVect
 }
 
 
+void CStaticFunctionDefinitions::DrawText ( int iLeft, int iTop,
+                                 int iRight, int iBottom,
+                                 unsigned long dwColor,
+                                 const char* szText,
+                                 float fScaleX,
+                                 float fScaleY,
+                                 unsigned long ulFormat,
+                                 const char* szFont,
+                                 bool bPostGUI, CResource* pResource )
+{
+    SString strFile = szFont;
+    SString strPath, strMetaPath;
+    ID3DXFont *pFont = NULL;
+    if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath, strMetaPath ) && FileExists(strPath) )
+    {
+        if ( m_pScriptFontLoader->GetDXFont(&pFont, strPath, strMetaPath, pResource, fScaleX, fScaleY) )
+        {
+            g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pFont, bPostGUI );
+            return;
+        }
+    }
+
+               
+    eFontType fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFont ) );
+    pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
+    g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pFont, bPostGUI );
+}
+
+bool CStaticFunctionDefinitions::LoadFont ( std::string strFullFilePath, bool bBold, unsigned int uiSize, std::string strMetaPath, CResource* pResource )
+{
+    return m_pScriptFontLoader->LoadFont(strFullFilePath, bBold, uiSize, strMetaPath, pResource );
+}
+
+bool CStaticFunctionDefinitions::UnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
+{
+    return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
+}
+
 bool CStaticFunctionDefinitions::IsCursorShowing ( bool& bShowing )
 {
     bShowing = m_pClientGame->AreCursorEventsEnabled () || m_pCore->IsCursorForcedVisible();
@@ -4106,6 +4146,12 @@ bool CStaticFunctionDefinitions::GUISetFont ( CClientEntity& Entity, const char*
     }
     return bResult;
 }
+
+bool CStaticFunctionDefinitions::GUIUnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
+{
+    return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
+}
+
 
 
 void CStaticFunctionDefinitions::GUISetSize ( CClientEntity& Entity, const CVector2D& vecSize, bool bRelative )

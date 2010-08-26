@@ -289,7 +289,12 @@ public:
     // Cursor funcs
     static bool                         GetCursorPosition                   ( CVector2D& vecCursor, CVector& vecWorld );
     static bool                         IsCursorShowing                     ( bool& bShowing );
-    
+
+    // Drawing funcs
+    static void                         DrawText                            ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, const char* szFont, bool bPostGUI, CResource* pResource );
+    static bool                         LoadFont                            ( std::string strFullFilePath, bool bBold,  unsigned int uiSize, std::string strMetaPath, CResource* pResource );
+    static bool                         UnloadFont                          ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource );
+
     // GUI funcs
     static bool                         GUIGetInputEnabled                  ( void );
     static void                         GUISetInputEnabled                  ( bool bEnabled );
@@ -321,6 +326,7 @@ public:
     static void                         GUISetProperty                      ( CClientEntity& Element, const char* szProperty, const char* szValue );
     static void                         GUISetText                          ( CClientEntity& Element, const char* szText );
     static bool                         GUISetFont                          ( CClientEntity& Element, const char* szFont );
+    static bool                         GUIUnloadFont                       ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource );
     static void                         GUISetSize                          ( CClientEntity& Element, const CVector2D& vecSize, bool bRelative );
     static void                         GUISetPosition                      ( CClientEntity& Element, const CVector2D& vecPosition, bool bRelative );
     static void                         GUISetVisible                       ( CClientEntity& Element, bool bFlag );

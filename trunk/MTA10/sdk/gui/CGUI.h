@@ -146,6 +146,7 @@ public:
     virtual CGUIFont*           GetBoldFont             ( void ) = 0;
     virtual CGUIFont*           GetClearFont            ( void ) = 0;
     virtual CGUIFont*           GetSansFont             ( void ) = 0;
+    virtual bool                IsFontPresent           ( const char* szFont ) = 0;
 
     virtual void                SetWorkingDirectory     ( const char * szDir ) = 0;
 
