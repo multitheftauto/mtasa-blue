@@ -593,22 +593,6 @@ std::wstring SharedUtil::ConvertToUTF8 (const std::string& input)
                 uiUTFStart = i-1;
                 bUTFSeeking = true;
             }
-            else
-            {
-                unsigned int iSearch = uiUTFStart + 1;
-                for ( iSearch; iSearch != i; iSearch++ )
-                {
-                    int iLen = utf8_mbtowc( &uiGlyph, input.substr(iSearch,i).c_str(), 6 );
-                    if ( iLen > 0 )
-                    {
-                        //Insert a replacement character, then our valid character, and continue
-                        wchar_t wReplacement[3] = { 0xFFFD, uiGlyph, '\0' };
-                        strOutput += wReplacement;
-                        bUTFSeeking = false;
-                        break;
-                    }
-                }
-            }
         }
         else
         {
