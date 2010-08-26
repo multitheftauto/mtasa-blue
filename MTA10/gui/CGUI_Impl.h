@@ -153,6 +153,7 @@ public:
     CGUIFont*                       GetSAHeaderFont             ( void );
     CGUIFont*                       GetSAGothicFont             ( void );
     CGUIFont*                       GetSansFont                 ( void );
+    bool                            IsFontPresent               ( const char* szFont ) { return m_pFontManager->isFontPresent(szFont); }
 
     void                            SetWorkingDirectory         ( const char * szDir );
     inline const char*              GetWorkingDirectory         ( void )    { return const_cast < const char* > ( m_szWorkingDirectory ); }

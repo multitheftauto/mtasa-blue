@@ -767,7 +767,7 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
                                             pPlayer->Send ( CChatEchoPacket ( strMessage, CHATCOLOR_INFO ) );
 
                                             // Send a reponse to the player who sent it
-                                            pEchoClient->SendEcho ( SString ( "-> %s: %s", pPlayer->GetNick (), strMessage ) );
+                                            pEchoClient->SendEcho ( SString ( "-> %s: %s", pPlayer->GetNick (), szMessage ) );
                                         }
                                         break;
                                     }

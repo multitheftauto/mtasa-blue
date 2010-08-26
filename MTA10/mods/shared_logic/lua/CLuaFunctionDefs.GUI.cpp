@@ -746,11 +746,17 @@ int CLuaFunctionDefs::GUISetFont ( lua_State* luaVM )
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
         lua_istype ( luaVM, 2, LUA_TSTRING ) )
     {
-        const char *szFont = lua_tostring ( luaVM, 2 );
+        SString strFont = lua_tostring ( luaVM, 2 );
+        // If our font is a filepath, it's a custom font
+        CResource* pResource =  m_pLuaManager->GetVirtualMachine(luaVM)->GetResource();
+        std::string strPath, strMetaPath;
+        if ( CResourceManager::ParseResourcePathInput( strFont, pResource, strPath, strMetaPath ) && FileExists (strPath) )
+            strFont = SString("%s/%s", pResource->GetName(), strMetaPath.c_str());
+
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            bResult = CStaticFunctionDefinitions::GUISetFont ( *pEntity, szFont );
+            bResult = CStaticFunctionDefinitions::GUISetFont ( *pEntity, strFont );
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "guiSetFont", "gui-element", 1 );
@@ -760,7 +766,6 @@ int CLuaFunctionDefs::GUISetFont ( lua_State* luaVM )
     lua_pushboolean ( luaVM, bResult );
     return 1;
 }
-
 
 int CLuaFunctionDefs::GUIBringToFront ( lua_State* luaVM )
 {

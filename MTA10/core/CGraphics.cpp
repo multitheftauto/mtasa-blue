@@ -736,7 +736,44 @@ bool CGraphics::LoadFonts ( void )
         }
     }
 
-    return bSuccess && SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) && ( iLoaded == 4 );
+    return bSuccess && SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) && ( iLoaded == 5 );
+}
+
+bool CGraphics::LoadFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont )
+{
+    int iLoaded = AddFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 );
+
+    int iWeight = bBold ? FW_BOLD : FW_NORMAL;
+    ID3DXFont *pNewDXSmallFont = NULL;
+    ID3DXFont *pNewDXBigFont = NULL;
+
+    bool bSuccess = true;
+    // Normal size
+    if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight, 0, iWeight, 1,
+        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
+        &pNewDXSmallFont ) ) )
+    {
+        CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D font '%s'", strFontName.c_str() );
+        bSuccess = false;
+    }
+
+    // Big size (4x)
+    if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight*4, 0, iWeight, 1,
+        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
+        &pNewDXBigFont ) ) )
+    {
+        CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D big font '%s'", strFontName.c_str() );
+        bSuccess = false;
+    }
+    *pDXSmallFont = pNewDXSmallFont;
+    *pDXBigFont = pNewDXBigFont;
+
+    return bSuccess && SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) && ( iLoaded == 1 );
+}
+
+bool CGraphics::DestroyFont ( std::string strFontPath )
+{
+    return RemoveFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 ) ? true : false; 
 }
 
 bool CGraphics::DestroyFonts ( void )
