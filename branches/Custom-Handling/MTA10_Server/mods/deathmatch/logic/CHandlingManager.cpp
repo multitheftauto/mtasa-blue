@@ -45,10 +45,10 @@ CHandlingManager::CHandlingManager ( void )
     m_HandlingNames["driveType"] =                      HANDLING_DRIVETYPE;
     m_HandlingNames["engineType"] =                     HANDLING_ENGINETYPE;
     m_HandlingNames["numberOfGears"] =                  HANDLING_NUMOFGEARS;
-    m_HandlingNames["engineAcceleration"] =            HANDLING_ENGINEACCELERATION;
+    m_HandlingNames["engineAcceleration"] =             HANDLING_ENGINEACCELERATION;
     m_HandlingNames["engineInertia"] =                  HANDLING_ENGINEINERTIA;
     m_HandlingNames["maxVelocity"] =                    HANDLING_MAXVELOCITY;
-    m_HandlingNames["brakeDeceleration"] =             HANDLING_BRAKEDECELERATION;
+    m_HandlingNames["brakeDeceleration"] =              HANDLING_BRAKEDECELERATION;
     m_HandlingNames["brakeBias"] =                      HANDLING_BRAKEBIAS;
     m_HandlingNames["ABS"] =                            HANDLING_ABS;
     m_HandlingNames["steeringLock"] =                   HANDLING_STEERINGLOCK;

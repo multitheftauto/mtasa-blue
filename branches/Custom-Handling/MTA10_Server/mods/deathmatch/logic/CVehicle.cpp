@@ -677,7 +677,7 @@ void CVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
 
             // Keep the bonet and boot intact
             pucDoorStates [ 0 ] = pucDoorStates [ 1 ] = DT_DOOR_INTACT;
-            break;        
+            break;
         default:
             memset ( pucDoorStates, DT_DOOR_INTACT, 6 );
     }

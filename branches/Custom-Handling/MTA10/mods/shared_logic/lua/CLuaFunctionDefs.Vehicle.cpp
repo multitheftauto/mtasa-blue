@@ -3451,7 +3451,7 @@ int CLuaFunctionDefs::GetVehicleHandlingData ( lua_State* luaVM )
                 else
                     lua_pushnil( luaVM );
                 lua_setfield ( luaVM, -2, "headLight" );
-                CHandlingEntry::eLightType eTailType=pEntry->GetHeadLight();
+                CHandlingEntry::eLightType eTailType=pEntry->GetTailLight();
                 if (eTailType==CHandlingEntry::eLightType::LONG)
                     lua_pushstring(luaVM,"long");
                 else if (eTailType==CHandlingEntry::eLightType::SMALL)

@@ -189,9 +189,6 @@ public:
     // Call this every time you're done changing something. This will recalculate
     // all transmission/handling values according to the new values.
     virtual void            Recalculate                     ( void ) = 0;
-
-    // This will restore this handling data back to default values.
-    virtual void            Restore                         ( void ) = 0;
 };
 
 #endif

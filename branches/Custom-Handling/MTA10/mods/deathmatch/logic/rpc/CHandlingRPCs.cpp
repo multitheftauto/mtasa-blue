@@ -272,7 +272,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( NetBitStreamInterface& bitStrea
 
                 case HANDLING_TAILLIGHT:
                     bitStream.Read ( ucChar );
-                    if ( ucChar > CHandlingEntry::TALL )
+                    if ( ucChar > CHandlingEntry::TALL ) 
                         ucChar = CHandlingEntry::TALL;
 
                     pHandlingEntry->SetTailLight ( static_cast < CHandlingEntry::eLightType > ( ucChar ) );
@@ -457,7 +457,7 @@ void CHandlingRPCs::RestoreVehicleHandling ( NetBitStreamInterface& bitStream )
         {
             // Grab the vehicle handling entry and restore all data
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pEntity );
-            Vehicle.GetHandlingData()->Restore();
+            Vehicle.GetHandlingData()->ApplyHandlingData( (CHandlingEntry*)Vehicle.GetOriginalHandlingData () );
 
             Vehicle.ApplyHandling();
         }

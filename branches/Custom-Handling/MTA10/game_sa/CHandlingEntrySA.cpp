@@ -71,17 +71,3 @@ void CHandlingEntrySA::Recalculate ( void )
         }
     }
 }
-
-
-void CHandlingEntrySA::Restore ( void )
-{
-    // Real GTA class?
-    if ( m_pOriginalData )
-    {
-        // Copy default stuff over gta's data
-        memcpy ( &m_Handling, m_pOriginalData, sizeof ( tHandlingDataSA ) );
-
-        // Recalculate the fields
-        Recalculate ();
-    }
-}

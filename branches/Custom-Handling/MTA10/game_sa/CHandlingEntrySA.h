@@ -189,8 +189,6 @@ public:
 
     void            Recalculate                     ( void );
 
-    void            Restore                         ( void );
-
     tHandlingDataSA*    GetInterface                ( void )                        { return m_pHandlingSA; };
 
 private:
