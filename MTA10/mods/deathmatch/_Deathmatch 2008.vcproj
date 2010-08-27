@@ -493,6 +493,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CScriptFontLoader.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CScriptKeyBinds.cpp"
 					>
 				</File>
@@ -1327,6 +1331,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CScriptFontLoader.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CScriptKeyBinds.h"
 					>
 				</File>
@@ -1456,6 +1464,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\Shared\sdk\ieee754.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\sdk\utils\XFont.h"
 					>
 				</File>
 			</Filter>
