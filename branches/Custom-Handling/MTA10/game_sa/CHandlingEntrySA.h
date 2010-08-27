@@ -49,7 +49,7 @@ struct tHandlingDataSA
     CVector         vecCenterOfMass;                // +20
     unsigned int    uiPercentSubmerged;             // +32
 
-    float           fMassModded;                    // +36  Automatically calculated
+    float           fBuoyancyConstant;              // +36  Automatically calculated
 
     float           fTractionMultiplier;            // +40
 
