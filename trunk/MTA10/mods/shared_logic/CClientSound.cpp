@@ -183,17 +183,11 @@ void CClientSound::GetMeta( void )
 {
     //g_pCore->GetConsole()->Printf ( "BASS STREAM META" );
 
-    const char* szMeta = BASS_ChannelGetTags( m_pSound, BASS_TAG_META );
-    if ( szMeta )// got Shoutcast metadata
+    SString strMeta = BASS_ChannelGetTags( m_pSound, BASS_TAG_META );
+    if ( !strMeta.empty () )// got Shoutcast metadata
     {
-        char* szMem = new char [ strlen ( szMeta ) + 1 ];
-        strcpy( szMem, szMeta );
-        strtok( szMem, "'" );
-        char* szStreamTitle = strtok ( NULL, "'" );
-        if ( strcmp ( szStreamTitle, ";" ) && strcmp ( szStreamTitle, ";StreamUrl=" ) )
-            m_strStreamTitle = szStreamTitle;
-
-        //g_pCore->GetConsole()->Printf ( "BASS_TAG_META  %s", szMeta );
+        int startPos = strMeta.find("=");
+        m_strStreamTitle = strMeta.substr(startPos + 2,strMeta.find(";") - startPos - 3);
     }
     //else
     //    g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_TAG_META", BASS_ErrorGetCode() );
