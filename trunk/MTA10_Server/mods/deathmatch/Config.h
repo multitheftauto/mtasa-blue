@@ -138,9 +138,6 @@ public:
 // Server FPS limit (in milliseconds)
 #define FPS_LIMIT                   16
 
-// Default MTU size
-#define MTU_SIZE_DEFAULT            1264
-
 // Max garages
 #define MAX_GARAGES                 50
 

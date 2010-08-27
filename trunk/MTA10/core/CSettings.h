@@ -119,8 +119,6 @@ protected:
     CGUIButton*         m_pButtonCancel;
     CGUILabel*          m_pLabelNick;
     CGUIEdit*           m_pEditNick;
-    CGUILabel*          m_pLabelConnection;
-    CGUIComboBox*       m_pComboConnection;
     CGUICheckBox*       m_pSavePasswords;
 
     CGUILabel*          m_pVideoGeneralLabel;

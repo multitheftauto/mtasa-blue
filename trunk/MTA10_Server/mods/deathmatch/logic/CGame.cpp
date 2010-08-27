@@ -475,7 +475,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 "= \n" \
                                 "= Log file         : %s\n" \
                                 "= Maximum players  : %u\n" \
-                                "= MTU packet size  : %u\n" \
                                 "= HTTP port        : %u\n" \
                                 "===========================================================\n",
 
@@ -485,7 +484,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 usServerPort,
                                 pszLogFileName,
                                 uiMaxPlayers,
-                                m_pMainConfig->GetMTUSize (),
                                 m_pMainConfig->IsHTTPEnabled () ? m_pMainConfig->GetHTTPPort () : 0 );
 
     if ( !bLogFile )
@@ -633,11 +631,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket, TRUE );
 
-    // Grab the MTU size
-    unsigned int uiMTUSize = m_pMainConfig->GetMTUSize ();
-
     // Try to start the network
-    if ( !g_pNetServer->StartNetwork ( szServerIP, usServerPort, uiMTUSize, uiMaxPlayers ) )
+    if ( !g_pNetServer->StartNetwork ( szServerIP, usServerPort, uiMaxPlayers ) )
     {
         CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", szServerIP, usServerPort );
         return false;
@@ -713,10 +708,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             CLogger::LogPrint ( "WARNING: Unable to open the given script debug logfile\n" );
         }
     }
-
-    // Set the autopatcher directory
-    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "" );
-    g_pNetServer->SetAutoPatcherDirectory ( (char*)strBuffer.c_str () );
 
 
 #ifdef MTA_VOICE
@@ -1262,9 +1253,8 @@ void CGame::Packet_PlayerJoin ( NetServerPlayerID& Source )
     if ( pBitStream )
     {
         // Write the mod name to the bitstream
-        pBitStream->Write ( const_cast < char* > ( "deathmatch" ), 10 );
-        pBitStream->Write ( static_cast < char > ( 0 ) );
         pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_BITSTREAM_VERSION ) );
+        pBitStream->WriteString ( "deathmatch" );
 
         // Send and destroy the bitstream
         g_pNetServer->SendPacket ( PACKET_ID_MOD_NAME, Source, pBitStream );
@@ -1374,19 +1364,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                                     // Tell the player
-                                    if ( Packet.GetBitStreamVersion () >= 0x0e )
-                                    {
-                                        pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", GetConfig ()->GetMinimumClientVersion () ) );
-                                        DisconnectPlayer ( this, *pPlayer, "" );
-                                    }
-                                    else
-                                    {
-                                        SString strMessage = "Disconnected: You need to update MTA to connect to this server.";
-                                        for ( int i = 0 ; i < 55 ; i++ )
-                                            strMessage += " ";
-                                        strMessage += "*         Update at www.mtasa.com";
-                                        DisconnectPlayer ( this, *pPlayer, strMessage );
-                                    }
+                                    pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", GetConfig ()->GetMinimumClientVersion () ) );
+                                    DisconnectPlayer ( this, *pPlayer, "" );
                                     return;
                                 }
 

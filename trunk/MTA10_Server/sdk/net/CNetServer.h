@@ -21,7 +21,7 @@ class CNetServer
 {
 public:
     // szIP can be NULL if autochoosing is wanted.
-    virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiMTUSize, unsigned int uiAllowedPlayers ) = 0;
+    virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers ) = 0;
     virtual void                            StopNetwork                     ( void ) = 0;
     virtual void                            ResetNetwork                    ( void ) = 0;
 
@@ -48,19 +48,18 @@ public:
 
     virtual void                            Kick                            ( NetServerPlayerID &PlayerID ) = 0;
 
-    virtual void                            SetPassword                     ( char* szPassword ) = 0;
+    virtual void                            SetPassword                     ( const char* szPassword ) = 0;
 
     virtual void                            SetMaximumIncomingConnections   ( unsigned short numberAllowed ) = 0;
-
-    virtual bool                            AutoPatcherAddFile              ( char* szFile ) = 0;
-    virtual void                            SetAutoPatcherDirectory         ( char* szDirectory ) = 0;
-    virtual bool                            AutoPatcherRemoveFile           ( char* szFile ) = 0;
 
     virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager      ( void ) = 0;
 
     virtual void                            SetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID, unsigned short usBitStreamVersion ) = 0;
     virtual void                            ClearClientBitStreamVersion     ( const NetServerPlayerID &PlayerID ) = 0;
     virtual unsigned short                  GetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID ) = 0;
+
+    virtual void                            EnablePortForwarding            ( unsigned short usPort, const char* szProtocol, bool bEnable ) = 0;
+    virtual int                             GetPortForwardingStatus         ( unsigned short usPort, const char* szProtocol ) = 0;  // 0:closed  1:busy  2:open  -1:fail
 };
 
 #endif

@@ -58,19 +58,14 @@ bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.WriteCompressed ( m_RootElementID );
 
     // Transmit server requirement for the client to check settings
-    if ( BitStream.Version () >= 0x05 )
-        BitStream.Write ( m_iEnableClientChecks );
+    BitStream.Write ( m_iEnableClientChecks );
 
-    // Tell aware clients about maybe throttling back http client requests
-    if ( BitStream.Version () >= 0x04 )
-        BitStream.Write ( m_iHTTPConnectionsPerClient );
+    // Tellclient about maybe throttling back http client requests
+    BitStream.Write ( m_iHTTPConnectionsPerClient );
 
-    // Tell unaware clients to use the builtin web server if http flood protection is hinted
-    unsigned char ucHTTPDownloadType = ( m_iHTTPConnectionsPerClient < 32 && BitStream.Version () < 0x04 && m_ucHTTPDownloadType != HTTP_DOWNLOAD_DISABLED ) ? HTTP_DOWNLOAD_ENABLED_PORT : m_ucHTTPDownloadType;
+    BitStream.Write ( static_cast < unsigned char > ( m_ucHTTPDownloadType ) );
 
-    BitStream.Write ( static_cast < unsigned char > ( ucHTTPDownloadType ) );
-
-    switch ( ucHTTPDownloadType )
+    switch ( m_ucHTTPDownloadType )
     {
     case HTTP_DOWNLOAD_ENABLED_PORT:
         {

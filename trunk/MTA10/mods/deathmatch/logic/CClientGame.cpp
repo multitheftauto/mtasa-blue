@@ -527,29 +527,19 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
             // Append version information
             pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_NETCODE_VERSION ) );
             pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_VERSION ) );
-            if ( pBitStream->Version () >= 0x02 )
-                pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_BITSTREAM_VERSION ) );
+            pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_BITSTREAM_VERSION ) );
 
-            if ( pBitStream->Version () >= 0x0b )
-            {
-                SString strPlayerVersion ( "%d.%d.%d-%d.%05d.%d"
-                                            ,MTASA_VERSION_MAJOR
-                                            ,MTASA_VERSION_MINOR
-                                            ,MTASA_VERSION_MAINTENANCE
-                                            ,MTASA_VERSION_TYPE
-                                            ,MTASA_VERSION_BUILD
-                                            ,g_pNet->GetNetRev ()
-                                            );
+            SString strPlayerVersion ( "%d.%d.%d-%d.%05d.%d"
+                                        ,MTASA_VERSION_MAJOR
+                                        ,MTASA_VERSION_MINOR
+                                        ,MTASA_VERSION_MAINTENANCE
+                                        ,MTASA_VERSION_TYPE
+                                        ,MTASA_VERSION_BUILD
+                                        ,g_pNet->GetNetRev ()
+                                        );
+            pBitStream->WriteString ( strPlayerVersion );
 
-                pBitStream->WriteCompressed ( (unsigned int)strPlayerVersion.length () );
-                pBitStream->Write ( strPlayerVersion.c_str (), strPlayerVersion.length () );
-            }
-
-            if ( pBitStream->Version () >= 0x0e )
-            {
-                // Should the server send us recommended update info?
-                pBitStream->WriteBit ( g_pCore->IsOptionalUpdateInfoRequired ( g_pNet->GetConnectedServer() ) );
-            }
+            pBitStream->WriteBit ( g_pCore->IsOptionalUpdateInfoRequired ( g_pNet->GetConnectedServer() ) );
 
             pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGameVersion () ) );
             

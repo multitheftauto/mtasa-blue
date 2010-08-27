@@ -339,13 +339,11 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
 
     // Get amount of checking to do, as determined by the server
     int iEnableClientChecks = -1;
-    if ( bitStream.Version () >= 0x05 )
-        bitStream.Read ( iEnableClientChecks );
+    bitStream.Read ( iEnableClientChecks );
 
     // Limit number of http request if required by the server
     int iHTTPConnectionsPerClient = 32;
-    if ( bitStream.Version () >= 0x04 )
-        bitStream.Read ( iHTTPConnectionsPerClient );
+    bitStream.Read ( iHTTPConnectionsPerClient );
     g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetMaxConnections( iHTTPConnectionsPerClient );
 
     // HTTP Download Type
@@ -2318,11 +2316,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             return;
                         }
 
-                        if ( bitStream.Version () >= 0x0c )
-                        {
-                            if ( bitStream.ReadBit () )
-                                pObject->SetDoubleSided ( true );
-                        }
+                        if ( bitStream.ReadBit () )
+                            pObject->SetDoubleSided ( true );
 
                         bool bIsMoving;
                         if ( bitStream.ReadBit ( bIsMoving ) && bIsMoving )
@@ -2873,9 +2868,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     SEntityAlphaSync alpha;
                     bitStream.Read ( &alpha );
                     pPed->SetAlpha ( alpha.data.ucAlpha );
-
-                    if ( bitStream.Version () < 0x07 )
-                        break;
 
                     // clothes
                     unsigned char ucNumClothes, ucTextureLength, ucModelLength, ucType;
@@ -3594,8 +3586,7 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
             bitStream.Read ( color.B );
             bitStream.Read ( color.A );
             bitStream.Read ( ucFormat );
-            if ( bitStream.Version() >= 0x03 )
-                bitStream.Read ( ucShadowAlpha );
+            bitStream.Read ( ucShadowAlpha );
 
             // Read out the text size
             unsigned short usTextLength = 0;
@@ -4178,8 +4169,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 
                     bitStream.Read ( ucChunkSubType );
                     bitStream.Read ( chunkChecksum.ulCRC );
-                    if ( bitStream.Version () >= 0x08 )
-                        bitStream.Read ( (char*)chunkChecksum.mD5, sizeof ( chunkChecksum.mD5 ) );
+                    bitStream.Read ( (char*)chunkChecksum.mD5, sizeof ( chunkChecksum.mD5 ) );
                     bitStream.Read ( dChunkDataSize );
 
                     // Don't bother with empty files

@@ -59,9 +59,6 @@ public:
     virtual int                         GetPing                     ( void ) = 0;
     virtual unsigned long               GetTime                     ( void ) = 0;
 
-    virtual unsigned int                GetMTUSize                  ( void ) = 0;
-    virtual bool                        SetMTUSize                  ( unsigned int uiSize ) = 0;
-
     virtual const char *                GetLocalIP                  ( void ) = 0;
     virtual void                        GetSerial                   ( char* szSerial, size_t maxLength ) = 0;
 
