@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-#define USE_GTASA_HANDLING          FALSE
+#define USE_GTASA_HANDLING          TRUE
 
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 

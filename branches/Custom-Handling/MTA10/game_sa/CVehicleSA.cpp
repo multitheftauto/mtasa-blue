@@ -1548,7 +1548,7 @@ void CVehicleSA::UpdateHandlingStatus ( void )
     pInt->fMass = m_pHandlingData->GetInterface ()->fMass;
     pInt->fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
     pInt->vecCenterOfMass = &m_pHandlingData->GetInterface()->vecCenterOfMass;
-    pInt->fBuoyancyConstant = m_pHandlingData->GetInterface()->fBuoyancyConstant;
+    pInt->fBuoyancyConstant = m_pHandlingData->GetInterface()->fUnknown2;
     /*if (m_pHandlingData->GetInterface()->fDragCoeff >= pGame->GetHandlingManager()->GetBasicDragCoeff())
         GetVehicleInterface ()->fDragCoeff = pGame->GetHandlingManager()->GetBasicDragCoeff();
     else*/

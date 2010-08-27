@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="Client - Multiplayer SA"
 	ProjectGUID="{916D94E2-FB0B-4992-A52C-3698CCBB0A41}"
+	RootNamespace="Client - Multiplayer SA"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -79,7 +80,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas\mta\multiplayer_SA_d.dll"
+				OutputFile="G:\MTA San Andreas\mta\multiplayer_SA_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -179,7 +180,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas\MTA\multiplayer_sa.dll"
+				OutputFile="G:\MTA San Andreas\MTA\multiplayer_sa.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"

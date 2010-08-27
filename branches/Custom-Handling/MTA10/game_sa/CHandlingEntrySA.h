@@ -20,20 +20,20 @@
 class CTransmissionSAInterface
 {
 public:
-    float           fUnknown  [19];                 // +40
+    float           fUnknown  [18];                 // +40
 
-    unsigned char   ucDriveType         :8;         // +116
-    unsigned char   ucEngineType        :8;         // +117
-    unsigned char   ucNumberOfGears     :8;         // +118
-    unsigned char   ucUnknown           :8;         // +119
+    unsigned char   ucDriveType         :8;         // +112
+    unsigned char   ucEngineType        :8;         // +113
+    unsigned char   ucNumberOfGears     :8;         // +114
+    unsigned char   ucUnknown           :8;         // +115
 
-    unsigned int    uiHandlingFlags;                // +120
+    unsigned int    uiHandlingFlags;                // +116
 
-    float           fEngineAcceleration;            // +124    (value in handling.cfg * 0x86A950)
-    float           fEngineInertia;                 // +128
-    float           fMaxVelocity;                   // +132
+    float           fEngineAcceleration;           // +120     (value in handling.cfg * 0x86A950)
+    float           fEngineInertia;                 // +124
+    float           fMaxVelocity;                   // +128
 
-    float           fUnknown2 [3];                  // +136
+    float           fUnknown2 [3];                  // +132
 };
 
 struct tHandlingDataSA
@@ -42,14 +42,14 @@ struct tHandlingDataSA
 
     float           fMass;                          // +4
 
-    float           fMassReciprical;                // +8    Automatically calculated
+    float           fUnknown1;                      // +8    Automatically calculated
 
     float           fTurnMass;                      // +12
     float           fDragCoeff;                     // +16
     CVector         vecCenterOfMass;                // +20
     unsigned int    uiPercentSubmerged;             // +32
 
-    float           fBuoyancyConstant;              // +36  Automatically calculated
+    float           fUnknown2;                      // +36  Automatically calculated
 
     float           fTractionMultiplier;            // +40
 
@@ -57,6 +57,7 @@ struct tHandlingDataSA
     float           fBrakeDeceleration;            // +148
     float           fBrakeBias;                     // +152
     bool            bABS;                           // +156
+    char            fUnknown[3];                    // +157
 
     float           fSteeringLock;                  // +160
     float           fTractionLoss;                  // +164
@@ -80,7 +81,6 @@ struct tHandlingDataSA
     unsigned char   ucHeadLight     : 8;            // +220
     unsigned char   ucTailLight     : 8;            // +221
     unsigned char   ucAnimGroup     : 8;            // +222
-    unsigned char   ucUnused        : 8;            // +223
 };
 
 
