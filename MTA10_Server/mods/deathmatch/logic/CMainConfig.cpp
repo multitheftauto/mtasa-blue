@@ -44,7 +44,6 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_uiScriptDebugLogLevel = 0;
     m_bAutoUpdateIncludedResources = false;
     m_bDontBroadcastLan = false;
-    m_uiMTUSize = MTU_SIZE_DEFAULT;
     m_usFPSLimit = 36;
 }
 
@@ -114,18 +113,6 @@ bool CMainConfig::Load ( const char* szFilename )
             CLogger::ErrorPrintf ( "Server port must be between 1 and 65535\n" );
 
         return false;
-    }
-
-    // Grab the MTU size
-    iResult = GetInteger ( m_pRootNode, "mtusize", iTemp, 1, 65535 );
-    if ( iResult == IS_SUCCESS )
-    {
-        m_uiMTUSize = iTemp;
-    }
-    else
-    {
-        if ( iResult != DOESNT_EXIST )
-            CLogger::ErrorPrintf ( "MTU packet size must be between 1 and 65535, defaulting to %u\n", m_uiMTUSize );
     }
 
     // Grab the max players

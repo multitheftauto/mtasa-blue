@@ -139,16 +139,13 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         if ( flags.data.bHasAWeapon )
         {
-            if ( BitStream.Version () >= 0x0d )
-            {
-                // Check client has the weapon we think he has
-                unsigned char ucWeaponType;
-                if ( !BitStream.Read ( ucWeaponType ) )
-                    return false;
+            // Check client has the weapon we think he has
+            unsigned char ucWeaponType;
+            if ( !BitStream.Read ( ucWeaponType ) )
+                return false;
 
-                if ( pSourcePlayer->GetWeaponType () != ucWeaponType )
-                    return false;
-            }
+            if ( pSourcePlayer->GetWeaponType () != ucWeaponType )
+                return false;
 
             // Current weapon slot
             SWeaponSlotSync slot;

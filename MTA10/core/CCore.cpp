@@ -1323,7 +1323,6 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "unbind",            "unbinds a key (key)",              CCommandFuncs::Unbind );
     m_pCommands->Add ( "copygtacontrols",   "copies the default gta controls",  CCommandFuncs::CopyGTAControls );
     m_pCommands->Add ( "screenshot",        "outputs a screenshot",             CCommandFuncs::ScreenShot );
-    m_pCommands->Add ( "connectiontype",    "sets the connection type (type)",  CCommandFuncs::ConnectionType );
     m_pCommands->Add ( "saveconfig",        "immediately saves the config",     CCommandFuncs::SaveConfig );
 
     m_pCommands->Add ( "cleardebug",        "clears the debug view",            CCommandFuncs::DebugClear );

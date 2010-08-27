@@ -317,20 +317,6 @@ CSettings::CSettings ( void )
     m_pEditNick->SetMaxLength ( MAX_PLAYER_NICK_LENGTH );
     m_pEditNick->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnOKButtonClick, this ) );
 
-    m_pLabelConnection = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Connection:" ) );
-    m_pLabelConnection->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 26.0f ) );
-    m_pLabelConnection->GetPosition ( vecTemp, false );
-    m_pLabelConnection->AutoSize ( "Connection:" );
-
-    m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabMultiplayer, "" ) );
-    m_pComboConnection->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
-    m_pComboConnection->GetPosition ( vecTemp, false );
-    m_pComboConnection->SetSize ( CVector2D ( 178.0f, 90.0f ) );
-    m_pComboConnection->SetReadOnly ( true );
-    m_pComboConnection->AddItem ( "Lan" );
-    m_pComboConnection->AddItem ( "DSL" );
-    m_pComboConnection->AddItem ( "Modem" );
-
     m_pSavePasswords = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Save server passwords", true ) );
     m_pSavePasswords->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 50.0f ) );
     m_pSavePasswords->GetPosition ( vecTemp, false );
@@ -1671,14 +1657,6 @@ void CSettings::LoadData ( void )
         m_pEditNick->SetText ( "Player" );
     }
 
-    // Connection type
-    unsigned int uiMTUSize = NET_MTU_LAN;
-    CVARS_GET ( "mtu_size", uiMTUSize );
-    if ( uiMTUSize == NET_MTU_LAN ) m_pComboConnection->SetText ( "Lan" );
-    else if ( uiMTUSize == NET_MTU_DSL ) m_pComboConnection->SetText ( "DSL" );
-    else if ( uiMTUSize == NET_MTU_MODEM ) m_pComboConnection->SetText ( "Modem" );
-    else m_pComboConnection->SetText ( "Unknown" );
-
     // Save server password
     CVARS_GET ( "save_server_passwords", bVar ); m_pSavePasswords->SetSelected ( bVar );
 
@@ -1844,9 +1822,6 @@ void CSettings::SaveData ( void )
     {
         CVARS_SET ( "nick", m_pEditNick->GetText () );
     }
-
-    // Connection type
-    CCommandFuncs::ConnectionType ( m_pComboConnection->GetText().c_str() );
 
     // Server pass saving
     bool bServerPasswords = m_pSavePasswords->GetSelected ();

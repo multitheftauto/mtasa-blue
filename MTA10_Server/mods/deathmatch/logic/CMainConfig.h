@@ -39,7 +39,6 @@ public:
     bool                            LoadExtended                    ( void );
     bool                            Save                            ( const char* szFileName = NULL );
 
-    inline unsigned int             GetMTUSize                      ( void )        { return m_uiMTUSize; };
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
     void                            SetServerName                   ( std::string strServerName );
     std::string                     GetServerIP                     ( void );
@@ -88,7 +87,6 @@ private:
     CXMLNode*                       m_pRootNode;
     CCommandLineParser*             m_pCommandLineParser;
 
-    unsigned int                    m_uiMTUSize;
     std::string                     m_strServerIP;
     std::string                     m_strServerName;
     unsigned short                  m_usServerPort;

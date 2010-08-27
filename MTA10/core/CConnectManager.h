@@ -19,10 +19,6 @@
 #include <xfire.h>
 #include "CServerQueue.h"
 
-#define NET_MTU_MODEM       576
-#define NET_MTU_DSL         1400
-#define NET_MTU_LAN         1492
-
 class CConnectManager
 {
 public:
@@ -39,13 +35,9 @@ public:
 
     static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream );
 
-    inline void     SetMTUSize          ( unsigned short usMTUSize )                                            { m_usMTUSize = usMTUSize; };
-
-
 private:
     bool            Event_OnCancelClick ( CGUIElement * pElement );
 
-    unsigned short  m_usMTUSize;
     std::string     m_strHost;
     unsigned short  m_usPort;
     std::string     m_strNick;

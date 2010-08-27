@@ -160,11 +160,8 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     alpha.data.ucAlpha = pObject->GetAlpha ();
                     BitStream.Write ( &alpha );
 
-                    if ( BitStream.Version () >= 0x0c )
-                    {
-                        bool bIsDoubleSided = pObject->IsDoubleSided ();
-                        BitStream.WriteBit ( bIsDoubleSided );
-                    }
+                    bool bIsDoubleSided = pObject->IsDoubleSided ();
+                    BitStream.WriteBit ( bIsDoubleSided );
 
                     bool bIsMoving = pObject->IsMoving ();
                     BitStream.WriteBit ( bIsMoving );
@@ -565,9 +562,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     SEntityAlphaSync alpha;
                     alpha.data.ucAlpha = pPed->GetAlpha ();
                     BitStream.Write ( &alpha );
-
-                    if ( BitStream.Version () < 0x07 )
-                        break;
 
                     // clothes
                     unsigned char ucNumClothes = 0;
