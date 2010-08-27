@@ -4,7 +4,6 @@
 	Version="9.00"
 	Name="Server - Launcher"
 	ProjectGUID="{0EAA9107-413A-47C4-B6E7-41B10208FBA1}"
-	RootNamespace="Server - Launcher"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -62,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="G:\MTA San Andreas\server/MTA Server_d.exe"
+				OutputFile="C:\Program Files\MTA San Andreas\server/MTA Server_d.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -144,7 +143,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="G:\MTA San Andreas\server/MTA Server.exe"
+				OutputFile="C:\Program Files\MTA San Andreas\server/MTA Server.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"

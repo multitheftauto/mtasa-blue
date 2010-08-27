@@ -4,7 +4,6 @@
 	Version="9.00"
 	Name="Client - Game SA"
 	ProjectGUID="{E13D1441-438B-4A03-AB79-5E8EF08EE414}"
-	RootNamespace="Client - Game SA"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -84,7 +83,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="G:\MTA San Andreas\MTA\game_sa.dll"
+				OutputFile="C:\Program Files\MTA San Andreas\MTA\game_sa.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -186,7 +185,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="G:\MTA San Andreas\mta\game_sa_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas\mta\game_sa_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
