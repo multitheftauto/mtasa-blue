@@ -343,10 +343,14 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
         bitStream.Read ( iEnableClientChecks );
 
     // Limit number of http request if required by the server
-    int iHTTPConnectionsPerClient = 32;
+    int old_iHTTPConnectionsPerClient = 32;
     if ( bitStream.Version () >= 0x04 )
-        bitStream.Read ( iHTTPConnectionsPerClient );
-    g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetMaxConnections( iHTTPConnectionsPerClient );
+        bitStream.Read ( old_iHTTPConnectionsPerClient );
+
+    // And again, (this one works!)
+    int iHTTPMaxConnectionsPerClient = 4;
+    if ( bitStream.Version () >= 0x10 )
+        bitStream.Read ( iHTTPMaxConnectionsPerClient );
 
     // HTTP Download Type
     unsigned char ucHTTPDownloadType;
@@ -369,15 +373,12 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
             g_pClientGame->m_strHTTPDownloadURL = SString ( "http://%s:%d", g_pNet->GetConnectedServer(), ulHTTPDownloadPort );
 
             // We are downloading from the internal HTTP Server, therefore disable multiple downloads
-            g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( true );
+            iHTTPMaxConnectionsPerClient = 1;
             break;
         }
         case HTTP_DOWNLOAD_ENABLED_URL:
         {
             BitStreamReadUsString( bitStream, g_pClientGame->m_strHTTPDownloadURL );
-
-            // We are downloading from a URL, therefore allow multiple downloads
-            g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( false );
             break;
         }
     default:
@@ -387,11 +388,9 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     // Allow forcing of SingleDownloadOption with core config option <single_download>1</single_download>
     int iSingleDownload;
     if ( g_pCore->GetCVars ()->Get ( "single_download", iSingleDownload ) && iSingleDownload == 1 )
-        g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( true );
+        iHTTPMaxConnectionsPerClient = 1;
 
-    // Force SingleDownloadOption if server doesn't want many connections
-    if ( iHTTPConnectionsPerClient < 3 )
-        g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( true );
+    g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetMaxConnections( iHTTPMaxConnectionsPerClient );
 
     // Make the camera black until we spawn
     // Anyone want to document wtf these values are?  Why are we putting seemingly "random"
