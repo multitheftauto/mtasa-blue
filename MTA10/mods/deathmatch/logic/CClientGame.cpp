@@ -3424,14 +3424,7 @@ void CClientGame::DownloadFiles ( void )
                 m_bTransferReset = false;
             }
 
-            if ( pHTTP->GetSingleDownloadOption () )
-            {
-                m_pTransferBox->SetInfoSingleDownload ( "", pHTTP->GetDownloadSizeNow () );
-            }
-            else
-            {
-                m_pTransferBox->SetInfoMultipleDownload ( pHTTP->GetDownloadSizeNow (), pHTTP->GetDownloadSizeTotal (), pHTTP->GetNumberOfQueuedFilesRemaining (), pHTTP->GetNumberOfQueuedFiles () );
-            }
+            m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () );
         }
         else
         {
@@ -3451,11 +3444,7 @@ void CClientGame::DownloadFiles ( void )
                 // Throw the error and disconnect
                 g_pCore->GetModManager ()->RequestUnload ();
                 g_pCore->ShowMessageBox ( "Error", szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR );
-                char* szErrorInfo = pHTTP->GetErrorInfo ();
-                if ( szErrorInfo && szErrorInfo [ 0 ] )
-                    g_pCore->GetConsole ()->Printf ( "Download error: %s", szErrorInfo );
-                else
-                    g_pCore->GetConsole ()->Printf ( "Download error: unknown" );
+                g_pCore->GetConsole ()->Printf ( "Download error: %s", szHTTPError );
             }
         }
     }
@@ -4890,7 +4879,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
     }
 
     m_pBigPacketTransferBox->DoPulse ();
-    m_pBigPacketTransferBox->SetInfoSingleDownload ( "", Min ( ulTotalSize, ulBytesReceived ) );
+    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ) );
 }
 
 bool CClientGame::SetGlitchEnabled ( unsigned char ucGlitch, bool bEnabled )

@@ -36,7 +36,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bAseEnabled = false;
     m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
-    m_iHTTPConnectionsPerClient = 32;
+    m_iHTTPMaxConnectionsPerClient = 4;
     m_iEnableClientChecks = -1;
     m_bAutoUpdateAntiCheatEnabled = true;
     m_bJoinFloodProtectionEnabled = true;
@@ -171,9 +171,9 @@ bool CMainConfig::Load ( const char* szFilename )
         m_strHTTPDownloadURL = "";
     }
 
-    // httpconnectionsperclient
-    GetInteger ( m_pRootNode, "httpconnectionsperclient", m_iHTTPConnectionsPerClient, 2, 32 );
-    m_iHTTPConnectionsPerClient = Clamp ( 0, m_iHTTPConnectionsPerClient, 32 );
+    // httpmaxconnectionsperclient
+    GetInteger ( m_pRootNode, "httpmaxconnectionsperclient", m_iHTTPMaxConnectionsPerClient, 1, 8 );
+    m_iHTTPMaxConnectionsPerClient = Clamp ( 1, m_iHTTPMaxConnectionsPerClient, 8 );
 
     // verifyclientsettings
     GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );

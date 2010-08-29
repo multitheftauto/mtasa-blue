@@ -20,18 +20,18 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( void )
     m_RootElementID = INVALID_ELEMENT_ID;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_usHTTPDownloadPort = 0;
-    m_iHTTPConnectionsPerClient = 32;
+    m_iHTTPMaxConnectionsPerClient = 4;
     m_iEnableClientChecks = 0;
 }
 
 
-CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsigned char ucNumberOfPlayers, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType, unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPConnectionsPerClient, int iEnableClientChecks )
+CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsigned char ucNumberOfPlayers, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType, unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient, int iEnableClientChecks )
 {
     m_PlayerID = PlayerID;
     m_ucNumberOfPlayers = ucNumberOfPlayers;
     m_RootElementID = RootElementID;
     m_ucHTTPDownloadType = ucHTTPDownloadType;
-    m_iHTTPConnectionsPerClient = iHTTPConnectionsPerClient;
+    m_iHTTPMaxConnectionsPerClient = iHTTPMaxConnectionsPerClient;
     m_iEnableClientChecks = iEnableClientChecks;
 
     switch ( m_ucHTTPDownloadType )
@@ -61,7 +61,7 @@ bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( m_iEnableClientChecks );
 
     // Tellclient about maybe throttling back http client requests
-    BitStream.Write ( m_iHTTPConnectionsPerClient );
+    BitStream.Write ( m_iHTTPMaxConnectionsPerClient );
 
     BitStream.Write ( static_cast < unsigned char > ( m_ucHTTPDownloadType ) );
 

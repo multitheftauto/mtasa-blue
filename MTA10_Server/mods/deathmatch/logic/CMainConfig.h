@@ -55,7 +55,7 @@ public:
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
-    inline int                      GetHTTPConnectionsPerClient     ( void )        { return m_iHTTPConnectionsPerClient; };
+    inline int                      GetHTTPMaxConnectionsPerClient  ( void )        { return m_iHTTPMaxConnectionsPerClient; };
     inline int                      GetEnableClientChecks           ( void )        { return m_iEnableClientChecks; };
     inline const std::string&       GetLogFile                      ( void )        { return m_strLogFile; };
     inline const std::string&       GetAuthFile                     ( void )        { return m_strAuthFile; };
@@ -97,7 +97,7 @@ private:
     unsigned short                  m_usHTTPPort;
     eHTTPDownloadType               m_ucHTTPDownloadType;
     std::string                     m_strHTTPDownloadURL;
-    int                             m_iHTTPConnectionsPerClient;
+    int                             m_iHTTPMaxConnectionsPerClient;
     int                             m_iEnableClientChecks;
     std::string                     m_strLogFile;
     std::string                     m_strAuthFile;

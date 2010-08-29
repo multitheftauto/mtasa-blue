@@ -33,8 +33,7 @@ public:
     void                                Show                                    ( void );
     void                                Hide                                    ( void );
 
-    void                                SetInfoSingleDownload                   ( const char* szFileName, double dDownloadSizeNow );
-    void                                SetInfoMultipleDownload                 ( double dDownloadSizeNow, double dDownloadSizeTotal, int iDownloadsRemaining, int iDownloadsTotal );
+    void                                SetInfo                                 ( double dDownloadSizeNow );
 
     void                                DoPulse                                 ( void );
 
