@@ -1,133 +1,176 @@
 /*
- * Copyright (C) 2001 Edmund Grimley Evans <edmundo@rano.org>
+ * Smart Common Input Method
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * Copyright (c) 2002-2005 James Su <suzhe@tsinghua.org.cn>
  *
- * This program is distributed in the hope that it will be useful,
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA  02111-1307  USA
+ *
+ * $Id: scim_utility.cpp,v 1.48.2.5 2006/11/02 04:11:51 suzhe Exp $
  */
 
-// Modified to make consistent unsigned to prevent warnings.
-int utf8_mbtowc(unsigned int *pwc, const char *s, int n)
+/* Return code if invalid. (xxx_mbtowc, xxx_wctomb) */
+#define RET_ILSEQ      0
+/* Return code if only a shift sequence of n bytes was read. (xxx_mbtowc) */
+#define RET_TOOFEW(n)  (-1-(n))
+/* Return code if output buffer is too small. (xxx_wctomb, xxx_reset) */
+#define RET_TOOSMALL   -1
+/* Replacement character for invalid multibyte sequence or wide character. */
+#define BAD_WCHAR ((wchar_t) 0xfffd)
+#define BAD_CHAR '?'
+
+int
+utf8_mbtowc (wchar_t *pwc, const unsigned char *src, int src_len)
 {
-  unsigned char c;
-  int wc, i, k;
+    if (!pwc)
+        return 0;
 
-  if (!n || !s)
-    return 0;
+    unsigned char c = src [0];
 
-  c = *s;
-  if (c < 0x80) {
-    if (pwc)
-      *pwc = c;
-    return c ? 1 : 0;
-  }
-  else if (c < 0xc2)
-    return -1;
-  else if (c < 0xe0) {
-    if (n >= 2 && (s[1] & 0xc0) == 0x80) {
-      if (pwc)
-        *pwc = ((c & 0x1f) << 6) | (s[1] & 0x3f);
-      return 2;
-    }
-    else
-      return -1;
-  }
-  else if (c < 0xf0)
-    k = 3;
-  else if (c < 0xf8)
-    k = 4;
-  else if (c < 0xfc)
-    k = 5;
-  else if (c < 0xfe)
-    k = 6;
-  else
-    return -1;
-
-  if (n < k)
-    return -1;
-  wc = *s++ & ((1 << (7 - k)) - 1);
-  for (i = 1; i < k; i++) {
-    if ((*s & 0xc0) != 0x80)
-      return -1;
-    wc = (wc << 6) | (*s++ & 0x3f);
-  }
-  if (wc < (1 << (5 * k - 4)))
-    return -1;
-  if (pwc)
-    *pwc = wc;
-  return k;
+    if (c < 0x80) {
+        *pwc = c;
+        return 1;
+    } else if (c < 0xc2) {
+        return RET_ILSEQ;
+    } else if (c < 0xe0) {
+        if (src_len < 2)
+            return RET_TOOFEW(0);
+        if (!((src [1] ^ 0x80) < 0x40))
+            return RET_ILSEQ;
+        *pwc = ((wchar_t) (c & 0x1f) << 6)
+                 | (wchar_t) (src [1] ^ 0x80);
+        return 2;
+    } else if (c < 0xf0) {
+        if (src_len < 3)
+            return RET_TOOFEW(0);
+        if (!((src [1] ^ 0x80) < 0x40 && (src [2] ^ 0x80) < 0x40
+                && (c >= 0xe1 || src [1] >= 0xa0)))
+            return RET_ILSEQ;
+        *pwc = ((wchar_t) (c & 0x0f) << 12)
+                 | ((wchar_t) (src [1] ^ 0x80) << 6)
+                 | (wchar_t) (src [2] ^ 0x80);
+        return 3;
+    } else if (c < 0xf8) {
+        if (src_len < 4)
+            return RET_TOOFEW(0);
+        if (!((src [1] ^ 0x80) < 0x40 && (src [2] ^ 0x80) < 0x40
+                && (src [3] ^ 0x80) < 0x40
+                && (c >= 0xf1 || src [1] >= 0x90)))
+            return RET_ILSEQ;
+        *pwc = ((wchar_t) (c & 0x07) << 18)
+                 | ((wchar_t) (src [1] ^ 0x80) << 12)
+                 | ((wchar_t) (src [2] ^ 0x80) << 6)
+                 | (wchar_t) (src [3] ^ 0x80);
+        return 4;
+    } else if (c < 0xfc) {
+        if (src_len < 5)
+            return RET_TOOFEW(0);
+        if (!((src [1] ^ 0x80) < 0x40 && (src [2] ^ 0x80) < 0x40
+                && (src [3] ^ 0x80) < 0x40 && (src [4] ^ 0x80) < 0x40
+                && (c >= 0xf9 || src [1] >= 0x88)))
+            return RET_ILSEQ;
+        *pwc = ((wchar_t) (c & 0x03) << 24)
+                 | ((wchar_t) (src [1] ^ 0x80) << 18)
+                 | ((wchar_t) (src [2] ^ 0x80) << 12)
+                 | ((wchar_t) (src [3] ^ 0x80) << 6)
+                 | (wchar_t) (src [4] ^ 0x80);
+        return 5;
+    } else if (c < 0xfe) {
+        if (src_len < 6)
+            return RET_TOOFEW(0);
+        if (!((src [1] ^ 0x80) < 0x40 && (src [2] ^ 0x80) < 0x40
+                && (src [3] ^ 0x80) < 0x40 && (src [4] ^ 0x80) < 0x40
+                && (src [5] ^ 0x80) < 0x40
+                && (c >= 0xfd || src [1] >= 0x84)))
+            return RET_ILSEQ;
+        *pwc = ((wchar_t) (c & 0x01) << 30)
+                 | ((wchar_t) (src [1] ^ 0x80) << 24)
+                 | ((wchar_t) (src [2] ^ 0x80) << 18)
+                 | ((wchar_t) (src [3] ^ 0x80) << 12)
+                 | ((wchar_t) (src [4] ^ 0x80) << 6)
+                 | (wchar_t) (src [5] ^ 0x80);
+        return 6;
+    } else
+        return RET_ILSEQ;
 }
 
-// Modified to accept s as NULL
-int utf8_wctomb(char *s, int wc1)
+int
+utf8_wctomb (unsigned char *dest, wchar_t wc, int dest_size)
 {
-  unsigned int wc = wc1;
+    if (!dest)
+        return 0;
 
-  if (wc < (1 << 7)) {
-    if (s)
-      *s++ = wc;
-    return 1;
-  }
-  else if (wc < (1 << 11)) {
-    if (s)
-    {
-      *s++ = 0xc0 | (wc >> 6);
-      *s++ = 0x80 | (wc & 0x3f);
+    int count;
+    if (wc < 0x80)
+        count = 1;
+    else if (wc < 0x800)
+        count = 2;
+    else if (wc < 0x10000)
+        count = 3;
+    else if (wc < 0x200000)
+        count = 4;
+    else if (wc < 0x4000000)
+        count = 5;
+    else if (wc <= 0x7fffffff)
+        count = 6;
+    else
+        return RET_ILSEQ;
+    if (dest_size < count)
+        return RET_TOOSMALL;
+    switch (count) { /* note: code falls through cases! */
+        case 6: dest [5] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x4000000;
+        case 5: dest [4] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x200000;
+        case 4: dest [3] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x10000;
+        case 3: dest [2] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x800;
+        case 2: dest [1] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0xc0;
+        case 1: dest [0] = (unsigned char)wc;
     }
-    return 2;
-  }
-  else if (wc < (1 << 16)) {
-    if (s)
-    {
-      *s++ = 0xe0 | (wc >> 12);
-      *s++ = 0x80 | ((wc >> 6) & 0x3f);
-      *s++ = 0x80 | (wc & 0x3f);
+    return count;
+}
+
+std::wstring
+utf8_mbstowcs (const std::string & str)
+{
+    std::wstring wstr;
+    wchar_t wc;
+    unsigned int sn = 0;
+    int un = 0;
+
+    const unsigned char *s = (const unsigned char *) str.c_str ();
+
+    while (sn < str.length () && *s != 0 &&
+            (un=utf8_mbtowc (&wc, s, str.length () - sn)) > 0) {
+        wstr.push_back (wc);
+        s += un;
+        sn += un;
     }
-    return 3;
-  }
-  else if (wc < (1 << 21)) {
-    if (s)
-    {
-      *s++ = 0xf0 | (wc >> 18);
-      *s++ = 0x80 | ((wc >> 12) & 0x3f);
-      *s++ = 0x80 | ((wc >> 6) & 0x3f);
-      *s++ = 0x80 | (wc & 0x3f);
+    return wstr;
+}
+
+std::string
+utf8_wcstombs (const std::wstring & wstr)
+{
+    std::string str;
+    char utf8 [6];
+    int un = 0;
+
+    for (unsigned int i = 0; i<wstr.size (); ++i) {
+        un = utf8_wctomb ((unsigned char*)utf8, wstr [i], 6);
+        if (un > 0)
+            str.append (utf8, un);
     }
-    return 4;
-  }
-  else if (wc < (1 << 26)) {
-    if (s)
-    {
-      *s++ = 0xf8 | (wc >> 24);
-      *s++ = 0x80 | ((wc >> 18) & 0x3f);
-      *s++ = 0x80 | ((wc >> 12) & 0x3f);
-      *s++ = 0x80 | ((wc >> 6) & 0x3f);
-      *s++ = 0x80 | (wc & 0x3f);
-    }
-    return 5;
-  }
-  else if (wc < (1 << 31)) {
-    if (s)
-    {
-      *s++ = 0xfc | (wc >> 30);
-      *s++ = 0x80 | ((wc >> 24) & 0x3f);
-      *s++ = 0x80 | ((wc >> 18) & 0x3f);
-      *s++ = 0x80 | ((wc >> 12) & 0x3f);
-      *s++ = 0x80 | ((wc >> 6) & 0x3f);
-      *s++ = 0x80 | (wc & 0x3f);
-    }
-    return 6;
-  }
-  else
-    return -1;
+    return str;
 }

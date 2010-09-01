@@ -158,7 +158,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         unsigned long ulFormat = 0;
         bool bClip = false;
         bool bPostGUI = false;
-        const char * szFontName;
+        const char * szFontName = "";
         CResource* pResource =  pLuaMain->GetResource();
 
         int iArgument4 = lua_type ( luaVM, 4 );
