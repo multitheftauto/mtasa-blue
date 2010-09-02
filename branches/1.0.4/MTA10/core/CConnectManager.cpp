@@ -53,6 +53,9 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     assert ( szNick );
     assert ( szPassword );
 
+    // Hide the server queue
+    CServerQueue::GetSingletonPtr()->SetVisible( false );
+
     // Are we already connecting?
     CNet* pNet = CCore::GetSingleton ().GetNetwork ();
     if ( m_bIsConnecting || pNet->IsConnected () )
@@ -195,7 +198,8 @@ void CConnectManager::DoPulse ( void )
                         strError = "Disconnected: you are banned from this server";
                         break;
                     case ID_NO_FREE_INCOMING_CONNECTIONS:
-                        strError = "Disconnected: server is full";
+                        CServerQueue::GetSingletonPtr()->SetVisible( true );
+                        CServerQueue::GetSingletonPtr()->SetServerInformation(m_strHost.c_str(), m_usPort, m_strPassword.c_str());
                         break;
                     case ID_DISCONNECTION_NOTIFICATION:
                         strError = "Disconnected: disconnected";
@@ -212,7 +216,16 @@ void CConnectManager::DoPulse ( void )
                 }
 
                 // Display an error, reset the error status and exit
-                CCore::GetSingleton ().ShowMessageBox ( "Error", strError, MB_BUTTON_OK | MB_ICON_ERROR );
+
+                // Only display the error if we set one
+                if ( strError.length() > 0 )
+                    CCore::GetSingleton ().ShowMessageBox ( "Error", strError, MB_BUTTON_OK | MB_ICON_ERROR );
+                else // Otherwise, remove the message box and hide quick connect
+                {
+                    CCore::GetSingleton ().RemoveMessageBox( false );
+                    CCore::GetSingleton ().HideQuickConnect ();
+                }
+
                 CCore::GetSingleton ().GetNetwork ()->SetConnectionError ( 0 );
                 CCore::GetSingleton ().GetNetwork ()->SetImmediateError ( 0 );
                 Abort ();

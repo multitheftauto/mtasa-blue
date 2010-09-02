@@ -17,6 +17,7 @@
 #include <ctime>
 #include <gui/CGUI.h>
 #include <xfire.h>
+#include "CServerQueue.h"
 
 #define NET_MTU_MODEM       576
 #define NET_MTU_DSL         1400

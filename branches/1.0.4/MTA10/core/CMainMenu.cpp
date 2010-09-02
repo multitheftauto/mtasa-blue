@@ -131,6 +131,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     // Submenu's
     m_QuickConnect.SetVisible ( false );
     m_ServerBrowser.SetVisible ( false );
+    m_ServerQueue.SetVisible ( false );
     m_Settings.SetVisible ( false );
     m_Credits.SetVisible ( false );
 
@@ -411,6 +412,7 @@ void CMainMenu::Update ( void )
 
     // Call subdialog pulses
     m_ServerBrowser.Update ();
+    m_ServerQueue.DoPulse ();
 }
 
 
@@ -543,6 +545,16 @@ bool CMainMenu::OnBrowseServersButtonClick ( CGUIElement* pElement )
     }
 
     return true;
+}
+
+void CMainMenu::ShowServerQueue ( void )
+{
+    m_ServerQueue.SetVisible ( true );
+}
+
+void CMainMenu::HideServerQueue ( void )
+{
+    m_ServerQueue.SetVisible ( false );
 }
 
 
