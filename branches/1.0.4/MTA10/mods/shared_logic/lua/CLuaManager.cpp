@@ -767,6 +767,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "split", CLuaFunctionDefs::Split );
     CLuaCFunctions::AddFunction ( "setTimer", CLuaFunctionDefs::SetTimer );
     CLuaCFunctions::AddFunction ( "killTimer", CLuaFunctionDefs::KillTimer );
+    CLuaCFunctions::AddFunction ( "resetTimer", CLuaFunctionDefs::ResetTimer );
     CLuaCFunctions::AddFunction ( "getTimers", CLuaFunctionDefs::GetTimers );
     CLuaCFunctions::AddFunction ( "isTimer", CLuaFunctionDefs::IsTimer );
     CLuaCFunctions::AddFunction ( "getTimerDetails", CLuaFunctionDefs::GetTimerDetails );
