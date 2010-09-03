@@ -36,6 +36,7 @@ public:
         QUEUE_STOP,
         QUEUE_STOPALL,
         QUEUE_RESTART,
+        QUEUE_RESTART2,
     };
 
     struct sResourceStartFlags
@@ -55,6 +56,7 @@ private:
         CResource*          pResource;
         eResourceQueue      eQueue;
         sResourceStartFlags Flags;
+        vector < SString >  dependents;
     };
 
 public:
@@ -82,7 +84,7 @@ public:
     bool                        Reload                          ( CResource* pResource );
     bool                        StopAllResources                ( void );
 
-    void                        QueueResource                   ( CResource* pResource, eResourceQueue eQueueTypebConfigs, const sResourceStartFlags* Flags );
+    void                        QueueResource                   ( CResource* pResource, eResourceQueue eQueueType, const sResourceStartFlags* Flags, list < CResource* > * dependents = NULL );
     void                        ProcessQueue                    ( void );
     void                        RemoveFromQueue                 ( CResource* pResource );
 
