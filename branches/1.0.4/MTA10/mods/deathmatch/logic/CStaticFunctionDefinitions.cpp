@@ -4981,24 +4981,24 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
     if ( bKey )
     {
         bool bHitState = true;
+        //Activate all keys for this command
+        pKeyBinds->SetAllCommandsActive ( szResource, true, szCommandName, bHitState, szArguments, true );
         //Check if its binded already (dont rebind)
-        if  ( pKeyBinds->CommandExists ( NULL, szCommandName, true, bHitState, szArguments, szResource ) )
-        {
-            pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, szArguments, szResource, true, true );
+        if ( pKeyBinds->CommandExists ( szKey, szCommandName, true, bHitState, szArguments, szResource ) )
             return true;
-        }
+
         if ( ( !stricmp ( szHitState, "down" ) || !stricmp ( szHitState, "both" ) ) &&
              pKeyBinds->AddCommand ( szKey, szCommandName, szArguments, bHitState, szResource ) )
         {
             pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, szArguments, szResource, true, true );
             bSuccess = true;
         }
+
         bHitState = false;
-        if  ( pKeyBinds->CommandExists ( NULL, szCommandName, true, bHitState, szArguments, szResource ) )
-        {
-            pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, szArguments, szResource, true, true );
+        pKeyBinds->SetAllCommandsActive ( szResource, true, szCommandName, bHitState, szArguments, true );
+        if ( pKeyBinds->CommandExists ( szKey, szCommandName, true, bHitState, szArguments, szResource ) )
             return true;
-        }
+
         if ( ( !stricmp ( szHitState, "up" ) || !stricmp ( szHitState, "both" ) ) &&
              pKeyBinds->AddCommand ( szKey, szCommandName, szArguments, bHitState, szResource ) )
         {
@@ -5083,12 +5083,14 @@ bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, const char* szHi
         if ( ( !stricmp ( szHitState, "down" ) || !stricmp ( szHitState, "both" ) ) &&
              pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, NULL, szResource, false, true  ) )
         {
+            pKeyBinds->SetAllCommandsActive ( szResource, false, szCommandName, bHitState, NULL, true );
             bSuccess = true;
         }
         bHitState = false;
         if ( ( !stricmp ( szHitState, "up" ) || !stricmp ( szHitState, "both" ) ) &&
              pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, NULL, szResource, false, true  ) )
         {
+            pKeyBinds->SetAllCommandsActive ( szResource, false, szCommandName, bHitState, NULL, true );
             bSuccess = true;
         }
     }
