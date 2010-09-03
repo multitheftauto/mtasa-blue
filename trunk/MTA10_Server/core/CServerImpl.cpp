@@ -253,6 +253,8 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             // net.dll doesn't like our version number
             Print ( "Network module not compatible!\n" );
             Print ( "Press Q to shut down the server!\n" );
+            Print ( "\n\n\n(If this is a custom build,\n" );
+            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n" );
             WaitForKey ( 'q' );
             DestroyWindow ( );
             return ERROR_NETWORK_LIBRARY_FAILED;

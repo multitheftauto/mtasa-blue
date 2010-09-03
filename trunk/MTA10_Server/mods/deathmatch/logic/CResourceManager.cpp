@@ -667,12 +667,15 @@ bool CResourceManager::StopAllResources ( void )
 }
 
 
-void CResourceManager::QueueResource ( CResource* pResource, eResourceQueue eQueueType, const sResourceStartFlags* Flags )
+void CResourceManager::QueueResource ( CResource* pResource, eResourceQueue eQueueType, const sResourceStartFlags* Flags, list < CResource* > * dependents )
 {
     // Make the queue item
     sResourceQueue sItem;
     sItem.pResource = pResource;
     sItem.eQueue = eQueueType;
+    if ( dependents )
+        for ( list < CResource* >::iterator it = dependents->begin () ; it != dependents->end () ; ++it )
+           sItem.dependents.push_back ( (*it)->GetName () );
 
     if ( Flags )
     {
@@ -755,25 +758,39 @@ void CResourceManager::ProcessQueue ( void )
                 // Stop it
                 if ( sItem.pResource->Stop ( true ) )
                 {
-                    // Start it again
-                    if ( !StartResource ( sItem.pResource, &resourceListCopy, true,
-                                         sItem.Flags.bConfigs, sItem.Flags.bMaps,
-                                         sItem.Flags.bScripts, sItem.Flags.bHTML,
-                                         sItem.Flags.bClientConfigs, sItem.Flags.bClientScripts,
-                                         sItem.Flags.bClientFiles ) )
-                    {
-                        // Failed
-                        CLogger::ErrorPrintf ( "Unable to restart resource %s\n", sItem.pResource->GetName ().c_str () );
-                    }
-                    else
-                        CLogger::LogPrintf ( "%s restarted successfully\n", sItem.pResource->GetName ().c_str () );
-
+                    // Continue after the rest of the queue is processed
+                    QueueResource ( sItem.pResource, QUEUE_RESTART2, &sItem.Flags, &resourceListCopy );
                 }
                 else
                     CLogger::ErrorPrintf ( "Unable to stop resource %s for restart\n", sItem.pResource->GetName ().c_str () );
             }
         }
+        // Restart part 2
+        else if ( sItem.eQueue == QUEUE_RESTART2 )
+        {
+            list < CResource* > resourceListCopy;
+            for ( vector < SString >::iterator it = sItem.dependents.begin () ; it != sItem.dependents.end () ; ++it )
+            {
+                CResource* pResource = GetResource ( *it );
+                if ( pResource )
+                    resourceListCopy.push_back ( pResource);
+            }
+
+            // Start it again
+            if ( !StartResource ( sItem.pResource, &resourceListCopy, true, true,
+                                 sItem.Flags.bConfigs, sItem.Flags.bMaps,
+                                 sItem.Flags.bScripts, sItem.Flags.bHTML,
+                                 sItem.Flags.bClientConfigs, sItem.Flags.bClientScripts,
+                                 sItem.Flags.bClientFiles ) )
+            {
+                // Failed
+                CLogger::ErrorPrintf ( "Unable to restart resource %s\n", sItem.pResource->GetName ().c_str () );
+            }
+            else
+                CLogger::LogPrintf ( "%s restarted successfully\n", sItem.pResource->GetName ().c_str () );
+        }
     }
+
 }
 
 
