@@ -2286,6 +2286,16 @@ void CClientPed::StreamedInPulse ( void )
                     Current.LeftStickY = 0;
                 }
             }
+
+            // Fix to disable the quick cutting of the post deagle shooting animation
+            // If we're USE_GUN, but aren't pressing the fire or aim keys we must be
+            // in a post-fire state where the player is preparing to move back to 
+            // a normal stance.  This can normally be cut using the crouch key, so block it
+            if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTMOVE ) )
+            {
+                if ( Current.RightShoulder1 == 0 && Current.LeftShoulder1 == 0 && Current.ButtonCircle == 0 )
+                    Current.ShockButtonL = 0;
+            }
         }
         else
         {
