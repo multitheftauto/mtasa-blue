@@ -105,14 +105,14 @@ bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
         m_pEvents->RemoveAllEvents ( vm );
         m_pRegisteredCommands->CleanUpForVM ( vm );
 
-        // Remove it from our list
-        if ( !m_virtualMachines.empty() ) m_virtualMachines.remove ( vm );
-
         // Delete it unless it is already
         if ( !vm->BeingDeleted () )
         {
             delete vm;
         }
+
+        // Remove it from our list
+        if ( !m_virtualMachines.empty() ) m_virtualMachines.remove ( vm );
 
         return true;
     }
