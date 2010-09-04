@@ -36,7 +36,9 @@ CHandlingManager::CHandlingManager ( void )
         m_pModelEntries [i] = new CHandlingEntry ( &m_OriginalHandlingData [GetHandlingID( (eVehicleTypes)i )] );
     }
     
-    m_HandlingNames["mass"] =                           HANDLING_MASS;
+    // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
+    
+    m_HandlingNames["mass"] =                           HANDLING_MASS;                          // works
     m_HandlingNames["turnMass"] =                       HANDLING_TURNMASS;
     m_HandlingNames["dragCoeff"] =                      HANDLING_DRAGCOEFF;
     m_HandlingNames["centerOfMass"] =                   HANDLING_CENTEROFMASS;
@@ -44,15 +46,15 @@ CHandlingManager::CHandlingManager ( void )
     m_HandlingNames["tractionMultiplier"] =             HANDLING_TRACTIONMULTIPLIER;
     m_HandlingNames["driveType"] =                      HANDLING_DRIVETYPE;
     m_HandlingNames["engineType"] =                     HANDLING_ENGINETYPE;
-    m_HandlingNames["numberOfGears"] =                  HANDLING_NUMOFGEARS;
-    m_HandlingNames["engineAcceleration"] =             HANDLING_ENGINEACCELERATION;
+    m_HandlingNames["numberOfGears"] =                  HANDLING_NUMOFGEARS;                    // LSoD Loading Screen of Death
+    m_HandlingNames["engineAcceleration"] =             HANDLING_ENGINEACCELERATION;            // works
     m_HandlingNames["engineInertia"] =                  HANDLING_ENGINEINERTIA;
-    m_HandlingNames["maxVelocity"] =                    HANDLING_MAXVELOCITY;
+    m_HandlingNames["maxVelocity"] =                    HANDLING_MAXVELOCITY;                   // works
     m_HandlingNames["brakeDeceleration"] =              HANDLING_BRAKEDECELERATION;
     m_HandlingNames["brakeBias"] =                      HANDLING_BRAKEBIAS;
     m_HandlingNames["ABS"] =                            HANDLING_ABS;
-    m_HandlingNames["steeringLock"] =                   HANDLING_STEERINGLOCK;
-    m_HandlingNames["tractionLoss"] =                   HANDLING_TRACTIONLOSS;
+    m_HandlingNames["steeringLock"] =                   HANDLING_STEERINGLOCK;                  // works
+    m_HandlingNames["tractionLoss"] =                   HANDLING_TRACTIONLOSS;                  // works
     m_HandlingNames["tractionBias"] =                   HANDLING_TRACTIONBIAS;
     m_HandlingNames["suspensionForceLevel"] =           HANDLING_SUSPENSION_FORCELEVEL;
     m_HandlingNames["suspensionDamping"] =              HANDLING_SUSPENSION_DAMPING;
@@ -61,8 +63,8 @@ CHandlingManager::CHandlingManager ( void )
     m_HandlingNames["suspensionLowerLimit"] =           HANDLING_SUSPENSION_LOWER_LIMIT;
     m_HandlingNames["suspensionFrontRearBias"] =        HANDLING_SUSPENSION_FRONTREARBIAS;
     m_HandlingNames["suspensionAntiDiveMultiplier"] =   HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER;
-    m_HandlingNames["collisionDamageMultiplier"] =      HANDLING_COLLISIONDAMAGEMULTIPLIER;
-    m_HandlingNames["setOffsetDistance"] =              HANDLING_SEATOFFSETDISTANCE;
+    m_HandlingNames["collisionDamageMultiplier"] =      HANDLING_COLLISIONDAMAGEMULTIPLIER;     // works
+    m_HandlingNames["seatOffsetDistance"] =             HANDLING_SEATOFFSETDISTANCE;            // doesn't seem to work
     m_HandlingNames["monetary"] =                       HANDLING_MONETARY;
     m_HandlingNames["handlingFlags"] =                  HANDLING_HANDLINGFLAGS;
     m_HandlingNames["modelFlags"] =                     HANDLING_MODELFLAGS;

@@ -17,6 +17,9 @@
 #include <game/CHandlingEntry.h>
 #include "Common.h"
 
+// http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
+// http://www.gtamodding.com/index.php?title=Memory_Addresses_%28SA%29#Handling
+
 class CTransmissionSAInterface
 {
 public:
