@@ -2276,8 +2276,25 @@ bool CStaticFunctionDefinitions::SetPlayerMuted ( CElement* pElement, bool bMute
     if ( IS_PLAYER ( pElement ) )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
-        pPlayer->SetMuted ( bMuted );
-        return true;
+
+        if ( bMuted != pPlayer->IsMuted ( ) )
+        {
+            bool bEventCancelled = false;
+
+            CLuaArguments arguments;
+
+            if ( bMuted )
+                bEventCancelled = !pPlayer->CallEvent ( "onPlayerMute", arguments );
+            else
+                bEventCancelled = !pPlayer->CallEvent ( "onPlayerUnmute", arguments );
+
+            if ( !bEventCancelled )
+            {
+                pPlayer->SetMuted ( bMuted );
+                
+                return true;
+            }
+        }
     }
     return false;
 }
