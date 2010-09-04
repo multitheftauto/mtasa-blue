@@ -767,9 +767,6 @@ bool CServerBrowser::OnRefreshClick ( CGUIElement* pElement )
 
     GetServerList ( Type )->Refresh ();
 
-    //Clear the search fields
-    m_pEditServerSearch [ Type ]->SetText("");
-    m_pEditPlayerSearch [ Type ]->SetText("");
     return true;
 }
 
