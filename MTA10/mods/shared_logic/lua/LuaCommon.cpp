@@ -57,6 +57,15 @@ CClientColShape* lua_tocolshape ( lua_State* luaVM, int iArgument )
     return NULL;
 }
 
+CScriptFile* lua_tofile ( lua_State* luaVM, int iArgument )
+{
+    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
+    if ( pElement && pElement->GetType () == SCRIPTFILE )
+        return static_cast < CScriptFile* > ( pElement );
+    else
+        return NULL;
+}
+
 CClientDFF* lua_todff ( lua_State* luaVM, int iArgument )
 {
     CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
