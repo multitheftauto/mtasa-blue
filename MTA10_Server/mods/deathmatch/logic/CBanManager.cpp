@@ -61,7 +61,7 @@ void CBanManager::DoPulse ( void )
 }
 
 
-CBan* CBanManager::AddBan ( CPlayer* pPlayer, SString strBanner, SString strReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddBan ( CPlayer* pPlayer, const SString& strBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     if ( pPlayer )
     {
@@ -84,7 +84,7 @@ CBan* CBanManager::AddBan ( CPlayer* pPlayer, SString strBanner, SString strReas
 }
 
 
-CBan* CBanManager::AddBan ( SString strIP, SString strBanner, SString strReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddBan ( const SString& strIP, const SString& strBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     if ( IsValidIP ( strIP.c_str() ) && !IsSpecificallyBanned ( strIP.c_str() ) )
     {
@@ -100,7 +100,7 @@ CBan* CBanManager::AddBan ( SString strIP, SString strBanner, SString strReason,
 }
 
 
-CBan* CBanManager::AddSerialBan ( CPlayer* pPlayer, CClient* pBanner, SString strReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddSerialBan ( CPlayer* pPlayer, CClient* pBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     if ( pPlayer )
     {
@@ -119,7 +119,7 @@ CBan* CBanManager::AddSerialBan ( CPlayer* pPlayer, CClient* pBanner, SString st
 }
 
 
-CBan* CBanManager::AddSerialBan ( SString strSerial, CClient* pBanner, SString strReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddSerialBan ( const SString& strSerial, CClient* pBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     if ( /*IsValidSerial ( szSerial ) &&*/ !IsSerialBanned ( strSerial.c_str() ) )
     {
@@ -134,7 +134,7 @@ CBan* CBanManager::AddSerialBan ( SString strSerial, CClient* pBanner, SString s
 }
 
 
-CBan* CBanManager::AddAccountBan ( CPlayer* pPlayer, CClient* pBanner, SString strReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddAccountBan ( CPlayer* pPlayer, CClient* pBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     if ( pPlayer )
     {
@@ -153,7 +153,7 @@ CBan* CBanManager::AddAccountBan ( CPlayer* pPlayer, CClient* pBanner, SString s
 }
 
 
-CBan* CBanManager::AddAccountBan ( SString strAccount, CClient* pBanner, SString strReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddAccountBan ( const SString& strAccount, CClient* pBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     if ( !IsAccountBanned ( strAccount.c_str() ) )
     {
@@ -168,7 +168,7 @@ CBan* CBanManager::AddAccountBan ( SString strAccount, CClient* pBanner, SString
 }
 
 
-CBan* CBanManager::AddBan ( SString strBanner, SString strReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddBan ( const SString& strBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     // Create the ban and assign its values
     CBan* pBan = new CBan;
