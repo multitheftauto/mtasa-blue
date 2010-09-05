@@ -10707,23 +10707,31 @@ int CLuaFunctionDefinitions::KickPlayer ( lua_State* luaVM )
     {
         if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
         {
-            CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-            CPlayer* pResponsible = NULL;
-            const char* szReason = NULL;
+            CPlayer* pPlayer       = lua_toplayer ( luaVM, 1 );
+            SString strResponsible = "Console";
+            SString strReason      = "";
 
             if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
             {
-                pResponsible = lua_toplayer ( luaVM, 2 );
+                CPlayer* pResponsible = lua_toplayer ( luaVM, 2 );
+
+                if ( pResponsible )
+                    strResponsible = pResponsible->GetNick ( );
 
                 if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
-                    szReason = lua_tostring ( luaVM, 3 );
+                    strReason = lua_tostring ( luaVM, 3 );
+            }
+            else if ( lua_type ( luaVM, 2 ) == LUA_TSTRING && lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            {
+                strResponsible = lua_tostring ( luaVM, 2 );
+                strReason      = lua_tostring ( luaVM, 3 );
             }
             else if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-                szReason = lua_tostring ( luaVM, 2 );
+                strReason      = lua_tostring ( luaVM, 2 );
 
             if ( pPlayer )
             {
-                if ( CStaticFunctionDefinitions::KickPlayer ( pPlayer, pResponsible, szReason ) )
+                if ( CStaticFunctionDefinitions::KickPlayer ( pPlayer, strResponsible, strReason ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
