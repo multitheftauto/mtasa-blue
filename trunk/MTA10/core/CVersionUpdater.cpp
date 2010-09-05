@@ -14,11 +14,13 @@
 #include <utils/CMD5Hasher.h>
 
 // Do a static page check first
-#define VERSION_CHECKER_URL1 "http://vers-m2-kows.yomg.net/mta/%VERSION%/?v=%VERSION%&id=%ID%&st=%STATUS%"
-#define VERSION_CHECKER_URL2 "http://vers-m2-kows.yomg.net/mta/?v=%VERSION%&id=%ID%&st=%STATUS%"
+#define VERSION_CHECKER_URL1 "http://vers-m3-kows.yomg.net/mta/%VERSION%/?v=%VERSION%&id=%ID%&st=%STATUS%&ty=%TYPE%&re=%REFER%"
+#define VERSION_CHECKER_URL2 "http://vers-m3-kows.yomg.net/mta/?v=%VERSION%&id=%ID%&st=%STATUS%&ty=%TYPE%&re=%REFER%"
 
-#define DATA_FILES_URL1 "http://vers-m2-kows.yomg.net/mtadf/%VERSION%/?v=%VERSION%&id=%ID%&st=%STATUS%"
-#define DATA_FILES_URL2 "http://vers-m2-kows.yomg.net/mtadf/?v=%VERSION%&id=%ID%&st=%STATUS%"
+#define DATA_FILES_URL1 "http://vers-m3-kows.yomg.net/mtadf/%VERSION%/?v=%VERSION%&id=%ID%&st=%STATUS%"
+#define DATA_FILES_URL2 "http://vers-m3-kows.yomg.net/mtadf/?v=%VERSION%&id=%ID%&st=%STATUS%"
+
+#define REPORT_LOG_URL1 "http://vers-m3-kows.yomg.net/mtarep/?v=%VERSION%&id=%ID%&st=%STATUS%"
 
 
 #define MAX_UPDATER_CHECK_ATTEMPTS      (3)
@@ -60,6 +62,11 @@ end=ok
 //  * Use 'mirror' for http servers that send data with the http header (e.g. lighttpd, Apache/2)
 //  * Always use 'mirror' at least once to prevent locking out older clients
 //
+
+//
+// Added two new statuses for 1981: 'files' and 'silent'
+//
+
 
 class CVersionUpdater;
 
@@ -125,25 +132,83 @@ namespace
 
     typedef void (CVersionUpdater::*PFNVOIDVOID) ( void );
 
+
+    //
+    // One update instruction
+    //
     struct CInstruction
     {
-        CInstruction ( const SString& strCondition, PFNVOIDVOID pfnCmdFunc )
+        SString strLabel;
+        SString strCondition;
+        SString strGoto;
+        PFNVOIDVOID pfnCmdFunc;
+
+        CInstruction ( PFNVOIDVOID pfnCmdFunc )
         {
-            this->strCondition = strCondition;
             this->pfnCmdFunc = pfnCmdFunc;
         }
-        SString strCondition;
-        PFNVOIDVOID pfnCmdFunc;
+        CInstruction ( const SString& strText )
+        {
+            this->pfnCmdFunc = NULL;
+            std::vector < SString > parts;
+            strText.Split ( " ", parts );
+            if ( parts.size () == 1 )
+                strLabel = parts[0].TrimEnd ( ":" );    // Label
+            else
+            if ( parts.size () == 4 )
+            {
+                strCondition = parts[1];                // Conditional goto
+                strGoto = parts[3];
+            }
+        }
+        bool IsLabel() const            { return strLabel.length () != 0; }
+        bool IsConditionalGoto() const  { return strCondition.length () != 0; }
+        bool IsFunction() const         { return pfnCmdFunc != NULL; }
     };
+
+
+    //
+    // Many update instructions
+    //
+    struct CProgram
+    {
+        unsigned int pc;
+        std::vector < CInstruction >    instructions;
+
+        CProgram() : pc ( 0 ) {}
+        bool IsValid () const
+        {
+            return ( pc >= 0 && pc < instructions.size () );
+        }
+        const CInstruction* GetNextInstruction()
+        {
+            if ( IsValid () )
+                return &instructions[ pc++ ];
+            return NULL;
+        }
+        void GotoLabel ( const SString& strLabel )
+        {
+            pc = FindLabel ( strLabel );
+        }
+        int FindLabel( const SString& strLabel ) const
+        {
+            for ( unsigned int i = 0 ; i < instructions.size () ; i++ )
+                if ( instructions[i].IsLabel () && instructions[i].strLabel == strLabel )
+                    return i;
+            return -1;
+        }
+    };
+
 
     #define Push(F) \
         m_Stack.push_back ( &CVersionUpdater::F )
 
-    #define ADDINSTR( condition, expr ) \
-        m_Instructions.push_back ( CInstruction ( condition, &CVersionUpdater::expr ) );
-
-    #define DUMPFUNC \
-        OutputDebugLine ( SString ( "%s", __FUNCTION__ )  );
+    #define ADDINST( expr ) \
+        program.instructions.push_back ( CInstruction ( &CVersionUpdater::expr ) );
+    #define ADDCOND( condition ) \
+        program.instructions.push_back ( CInstruction ( condition ) );
+    #define ADDLABL( label ) \
+        program.instructions.push_back ( CInstruction ( label ) );
 }
 
 
@@ -168,10 +233,9 @@ public:
     // CVersionUpdater functions
 
     // Command lists
-    void                RunPeriodicCheck                    ( void );
-    void                RunServerSaysUpdate                 ( void );
-    void                RunServerSaysRecommend              ( void );
-    void                RunServerSaysDataFilesWrong         ( void );
+    void                InitPrograms                        ( void );
+    void                CheckPrograms                       ( void );
+    void                RunProgram                          ( const SString& strProgramName );
 
     // Util
     bool                IsBusy                              ( void );
@@ -182,11 +246,14 @@ public:
     // Commands
     void                _UseVersionCheckURLs                ( void );
     void                _UseDataFilesURLs                   ( void );
+    void                _UseReportLogURLs                   ( void );
     void                _ActionReconnect                    ( void );
+    void                _DialogHide                         ( void );
     void                _End                                ( void );
     void                _ExitGame                           ( void );
     void                _PollQuestionNoYes                  ( void );
     void                _PollAnyButton                      ( void );
+    void                _DialogConnectingWait               ( void );
     void                _DialogChecking                     ( void );
     void                _DialogDownloading                  ( void );
     void                _DialogServerSaysUpdateQuestion     ( void );
@@ -194,6 +261,7 @@ public:
     void                _DialogUpdateQuestion               ( void );
     void                _DialogUpdateQueryError             ( void );
     void                _DialogUpdateResult                 ( void );
+    void                _QUpdateResult                      ( void );
     void                _DialogDataFilesQuestion            ( void );
     void                _DialogDataFilesQueryError          ( void );
     void                _DialogDataFilesResult              ( void );
@@ -201,24 +269,30 @@ public:
     void                _PollFileQuery                      ( void );
     void                _StartFileDownload                  ( void );
     void                _PollFileDownload                   ( void );
+    void                _StartSendPost                      ( void );
+    void                _PollSendPost                       ( void );
 
     // Doers
-    int                DoSendQueryToNextServer              ( void );
-    int                DoPollQueryResponse                  ( void );
-    int                DoSendDownloadRequestToNextServer    ( void );
-    int                DoPollDownload                       ( void );
-
+    int                 DoSendQueryToNextServer             ( void );
+    int                 DoPollQueryResponse                 ( void );
+    int                 DoSendDownloadRequestToNextServer   ( void );
+    int                 DoPollDownload                      ( void );
+    int                 DoSendPostToNextServer              ( void );
+    int                 DoPollPost                          ( void );
 
     std::vector < PFNVOIDVOID >         m_Stack;
     CDownloadInfo                       m_DownloadInfo;
-    std::vector < CInstruction >        m_Instructions;
+    std::map < SString, CProgram >      m_ProgramMap;
+    CProgram                            m_CurrentProgram;
     CCheckInfo                          m_QueryInfo;
     CHTTPClient                         m_HTTP;
     long long                           m_llTimeStart;
-    unsigned long                       m_PC;
     std::map < SString, CStringPair >   m_ConditionMap;
+    SString                             m_strServerSaysType;
+    SString                             m_strServerSaysHost;
 
     bool                                m_bCheckedTimeForPeriodicCheck;
+    bool                                m_bSentReportLog;
     std::map < SString, int >           m_DoneOptionalMap;
 };
 
@@ -250,8 +324,10 @@ CVersionUpdaterInterface* GetVersionUpdater ()
 CVersionUpdater::CVersionUpdater ( void )
 {
     m_llTimeStart = 0;
-    m_PC = 0;
-    m_bCheckedTimeForPeriodicCheck = 0;
+    m_bCheckedTimeForPeriodicCheck = false;
+    m_bSentReportLog = false;
+    InitPrograms ();
+    CheckPrograms ();
 }
 
 
@@ -276,7 +352,9 @@ CVersionUpdater::~CVersionUpdater ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::DoPulse ( void )
 {
+    //
     // Check time for periodic check?
+    //
     if ( !m_bCheckedTimeForPeriodicCheck && !IsBusy () )
     {
         m_bCheckedTimeForPeriodicCheck = true;
@@ -288,10 +366,22 @@ void CVersionUpdater::DoPulse ( void )
         // Only check once a day
         if ( uiTimeNow - uiLastCheckTime > 60 * 60 * 24 )
         {
-            RunPeriodicCheck ();
+            RunProgram ( "PeriodicCheck" );
         }
     }
 
+    //
+    // Should send report on how new features are functioning?
+    //
+    if ( !m_bSentReportLog && !IsBusy () )
+    {
+        m_bSentReportLog = true;
+        RunProgram ( "SendReportLog" );
+    }
+
+    //
+    // Step through update sequence
+    //
     if ( m_Stack.size () )
     {
         // Call top function on stack
@@ -301,15 +391,15 @@ void CVersionUpdater::DoPulse ( void )
     }
     else
     {
-        // If no top function on stack, find next true condition in the instruction list
-        while ( m_PC < m_Instructions.size () )
+        // If no top function on stack, process next instruction
+        if ( const CInstruction* pInstruction = m_CurrentProgram.GetNextInstruction () )
         {
-            CInstruction instr = m_Instructions[ m_PC++ ];
-            if ( IsConditionTrue ( instr.strCondition ) )
-            {
-                m_Stack.push_back ( instr.pfnCmdFunc );
-                break;
-            }
+            if ( pInstruction->IsFunction () )
+                m_Stack.push_back ( pInstruction->pfnCmdFunc );
+            else
+            if ( pInstruction->IsConditionalGoto () )
+                if ( IsConditionTrue ( pInstruction->strCondition ) )
+                    m_CurrentProgram.GotoLabel ( pInstruction->strGoto );
         }
     }
 }
@@ -324,18 +414,23 @@ void CVersionUpdater::DoPulse ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::InitiateUpdate ( const SString& strType, const SString& strHost )
 {
-    if ( strType == "Optional" )
-    {
-        CCore::GetSingleton ().RemoveMessageBox ();
-        MapSet ( m_DoneOptionalMap, strHost, 1 );
-        RunServerSaysRecommend ();
-    }
+    if ( IsBusy () )
+        return;
 
     if ( strType == "Mandatory" )
     {
         CCore::GetSingleton ().RemoveMessageBox ();
-        RunServerSaysUpdate ();
+        RunProgram ( "ServerSaysUpdate" );
     }
+    else
+    {
+        CCore::GetSingleton ().RemoveMessageBox ();
+        MapSet ( m_DoneOptionalMap, strHost, 1 );
+        RunProgram ( "ServerSaysRecommend" );
+    }
+
+    m_strServerSaysType = strType;
+    m_strServerSaysHost = strHost;
 }
 
 
@@ -362,7 +457,7 @@ bool CVersionUpdater::IsOptionalUpdateInfoRequired ( const SString& strHost )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::InitiateDataFilesFix ( void )
 {
-    RunServerSaysDataFilesWrong ();
+    RunProgram ( "ServerSaysDataFilesWrong" );
 }
 
 
@@ -377,12 +472,13 @@ void CVersionUpdater::ResetEverything ()
 {
     m_Stack.clear ();
     m_DownloadInfo = CDownloadInfo();
-    m_Instructions.clear ();
+    m_CurrentProgram = CProgram();
     m_QueryInfo = CCheckInfo ();
     m_HTTP.Get ("");
     m_llTimeStart = 0;
-    m_PC = 0;
     m_ConditionMap.clear ();
+    m_strServerSaysType = "";
+    m_strServerSaysHost = "";
 
     GetQuestionBox ().Reset ();
 }
@@ -397,7 +493,7 @@ void CVersionUpdater::ResetEverything ()
 ///////////////////////////////////////////////////////////////
 bool CVersionUpdater::IsBusy ( void )
 {
-    return m_Stack.size () || ( m_PC < m_Instructions.size () );
+    return m_Stack.size () || ( m_CurrentProgram.IsValid () );
 }
 
 
@@ -469,100 +565,204 @@ bool CVersionUpdater::IsConditionTrue ( const SString& strCondition )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::RunPeriodicCheck
+// CVersionUpdater::InitPrograms
 //
-// Periodic check
+//
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::RunPeriodicCheck ()
+void CVersionUpdater::InitPrograms ()
 {
-    ResetEverything ();
-    ADDINSTR ( "",                          _UseVersionCheckURLs );
-    ADDINSTR ( "",                          _StartFileQuery );
-    ADDINSTR ( "QueryResponse.!update",     _End );
-    ADDINSTR ( "",                          _DialogUpdateQuestion );
-    ADDINSTR ( "QuestionResponse.!Yes",     _End );
-    ADDINSTR ( "",                          _DialogDownloading );
-    ADDINSTR ( "",                          _StartFileDownload );
-    ADDINSTR ( "",                          _DialogUpdateResult );
+    //
+    // PeriodicCheck
+    //
+    {
+        SString strProgramName = "PeriodicCheck";
+        MapSet ( m_ProgramMap, strProgramName, CProgram () );
+        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
+
+        ADDINST (   _UseVersionCheckURLs );                     // Use VERSION_CHECKER_URL*
+        ADDINST (   _StartFileQuery );                          // Fetch update info from update server
+        ADDCOND ( "if QueryResponse.update goto dload");        // If update server says 'update' then goto dload:
+        ADDCOND ( "if QueryResponse.files goto dload");         // If update server says 'files' then goto dload:
+        ADDCOND ( "if QueryResponse.silent goto silentdload");  // If update server says 'silent' then goto silentdload:
+        ADDINST (   _End );
+
+        ADDLABL ( "dload:" );
+        ADDINST (   _DialogUpdateQuestion );                    // Show "Update available" dialog
+        ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
+        ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
+        ADDINST (   _StartFileDownload );                       // Fetch update binary from update mirror
+        ADDINST (   _DialogUpdateResult );                      // Show "Update ok/failed" message
+        ADDINST (   _End );
+
+        ADDLABL ( "silentdload:" );
+        ADDINST (   _StartFileDownload );                       // Fetch update binary from update mirror
+        ADDINST (   _QUpdateResult );                           // Maybe set OnRestartCommand
+        ADDINST (   _End );
+
+        ADDLABL ( "end:" );
+        ADDINST (   _End );
+    }
+
+    //
+    // ServerSaysUpdate
+    //
+    {
+        SString strProgramName = "ServerSaysUpdate";
+        MapSet ( m_ProgramMap, strProgramName, CProgram () );
+        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
+
+        ADDINST (   _UseVersionCheckURLs );                     // Use VERSION_CHECKER_URL*
+        ADDINST (   _DialogServerSaysUpdateQuestion );          // Show "Server says update" dialog
+        ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
+        ADDINST (   _DialogChecking );                          // Show "Checking..." message
+        ADDINST (   _StartFileQuery );                          // Fetch update info from update server
+        ADDCOND ( "if QueryResponse.update goto dload");        // If update server says 'update' then goto dload:
+        ADDCOND ( "if QueryResponse.files goto dload");         // If update server says 'files' then goto dload:
+        ADDCOND ( "if QueryResponse.silent goto dload");        // If update server says 'silent' then goto dload:
+        ADDINST (   _DialogUpdateQueryError );
+        ADDINST (   _End );
+
+        ADDLABL ( "dload:" );
+        ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
+        ADDINST (   _StartFileDownload );                       // Fetch update binary from update mirror
+        ADDINST (   _DialogUpdateResult );                      // Show "Update ok/failed" message
+        ADDINST (   _End );
+
+        ADDLABL ( "end:" );
+        ADDINST (   _End );
+    }
+
+    //
+    // ServerSaysRecommend
+    //
+    {
+        SString strProgramName = "ServerSaysRecommend";
+        MapSet ( m_ProgramMap, strProgramName, CProgram () );
+        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
+
+        ADDINST (   _UseVersionCheckURLs );                     // Use VERSION_CHECKER_URL*
+        ADDINST (   _DialogConnectingWait );                    // Show "Please wait..." message
+        ADDINST (   _StartFileQuery );                          // Fetch update info from update server
+        ADDCOND ( "if QueryResponse.update goto dload");        // If update server says 'update' then goto dload:
+        ADDCOND ( "if QueryResponse.files goto dload");         // If update server says 'files' then goto dload:
+        ADDCOND ( "if QueryResponse.silent goto silentdload");  // If update server says 'silent' then goto silentdload:
+        ADDINST (   _ActionReconnect );
+        ADDINST (   _End );
+
+        ADDLABL ( "dload:" );
+        ADDINST (   _DialogServerSaysRecommendQuestion );       // Show "Server says update" dialog
+        ADDCOND ( "if QuestionResponse.!Yes goto reconnect" );  // If user says 'No', then goto reconnect:
+        ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
+        ADDINST (   _StartFileDownload );                       // Fetch update binary from update mirror
+        ADDINST (   _DialogUpdateResult );                      // Show "Update ok/failed" message
+        ADDINST (   _End );
+
+        ADDLABL ( "silentdload:" );
+        ADDINST (   _DialogHide );                              // Don't show downloading progress
+        ADDINST (   _ActionReconnect );                         // Reconnect to game
+        ADDINST (   _StartFileDownload );                       // Fetch update binary from update mirror
+        ADDINST (   _QUpdateResult );                           // Maybe set OnRestartCommand
+        ADDINST (   _End );
+
+        ADDLABL ( "reconnect:" );
+        ADDINST (   _ActionReconnect );
+        ADDINST (   _End );
+
+        ADDLABL ( "end:" );
+        ADDINST (   _End );
+    }
+
+
+    //
+    // ServerSaysDataFilesWrong
+    //
+    {
+        SString strProgramName = "ServerSaysDataFilesWrong";
+        MapSet ( m_ProgramMap, strProgramName, CProgram () );
+        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
+
+        ADDINST (   _UseDataFilesURLs );                        // Use DATA_FILES_URL*
+        ADDINST (   _DialogDataFilesQuestion );                 // Show "Data files wrong" dialog
+        ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
+        ADDINST (   _DialogChecking );                          // Show "Checking..." message
+        ADDINST (   _StartFileQuery );                          // Fetch file info from server
+        ADDCOND ( "if QueryResponse.!datafiles goto error1" );  // If server says 'No files' then goto error1:
+        ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
+        ADDINST (   _StartFileDownload );                       // Fetch file binary from mirror
+        ADDINST (   _DialogDataFilesResult );                   // Show "Update ok/failed" message
+        ADDINST (   _End );
+
+        ADDLABL ( "error1:" );
+        ADDINST (   _DialogUpdateQueryError );
+        ADDINST (   _End );
+
+        ADDLABL ( "end:" );
+        ADDINST (     _End );
+    }
+
+
+    //
+    // SendReportLog
+    //
+    {
+        SString strProgramName = "SendReportLog";
+        MapSet ( m_ProgramMap, strProgramName, CProgram () );
+        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
+
+        ADDINST (   _UseReportLogURLs );                        // Use REPORT_LOG_URL*
+        ADDINST (   _StartSendPost );                           // Send data
+        ADDLABL ( "end:" );
+        ADDINST (     _End );
+    }
+
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::RunServerSaysUpdate
+// CVersionUpdater::CheckPrograms
 //
-// Server says update
+//
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::RunServerSaysUpdate ()
+void CVersionUpdater::CheckPrograms ()
 {
-    ResetEverything ();
-    ADDINSTR ( "",                          _UseVersionCheckURLs );
-    ADDINSTR ( "",                          _DialogServerSaysUpdateQuestion );
-    ADDINSTR ( "QuestionResponse.!Yes",     _End );
-    ADDINSTR ( "",                          _DialogChecking );
-    ADDINSTR ( "",                          _StartFileQuery );
-    ADDINSTR ( "QueryResponse.!update",     _DialogUpdateQueryError );
-    ADDINSTR ( "QueryResponse.!update",     _End );
-    ADDINSTR ( "",                          _DialogDownloading );
-    ADDINSTR ( "",                          _StartFileDownload );
-    ADDINSTR ( "",                          _DialogUpdateResult );
+    // Check each program
+    for ( std::map < SString, CProgram >::iterator it = m_ProgramMap.begin (); it != m_ProgramMap.end (); ++it )
+    {
+        CProgram program = it->second;
+
+        // Check each instruction
+        while ( const CInstruction* pInstruction = program.GetNextInstruction () )
+        {
+            assert ( pInstruction->IsFunction () || pInstruction->IsConditionalGoto () || pInstruction->IsLabel () );
+
+            if ( pInstruction->IsConditionalGoto () )
+                assert ( program.FindLabel ( pInstruction->strGoto ) != -1 );
+        }
+    }
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::RunServerSaysRecommend
+// CVersionUpdater::RunProgram
 //
-// Server says recommend
+//
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::RunServerSaysRecommend ()
+void CVersionUpdater::RunProgram ( const SString& strProgramName )
 {
     ResetEverything ();
-
-    ADDINSTR ( "",                          _UseVersionCheckURLs );
-    ADDINSTR ( "",                          _DialogServerSaysRecommendQuestion );
-    ADDINSTR ( "QuestionResponse.!Yes",     _ActionReconnect );
-    ADDINSTR ( "QuestionResponse.!Yes",     _End );
-    ADDINSTR ( "",                          _DialogChecking );
-    ADDINSTR ( "",                          _StartFileQuery );
-    ADDINSTR ( "QueryResponse.!update",     _DialogUpdateQueryError );
-    ADDINSTR ( "QueryResponse.!update",     _ActionReconnect );
-    ADDINSTR ( "QueryResponse.!update",     _End );
-    ADDINSTR ( "",                          _DialogDownloading );
-    ADDINSTR ( "",                          _StartFileDownload );
-    ADDINSTR ( "",                          _DialogUpdateResult );
+    CProgram* pProgram = MapFind ( m_ProgramMap, strProgramName );
+    if ( pProgram )
+    {
+        m_CurrentProgram = *pProgram;
+    }
 }
-
-
-///////////////////////////////////////////////////////////////
-//
-// CVersionUpdater::RunServerSaysDataFilesWrong
-//
-// Server says data files wrong
-//
-///////////////////////////////////////////////////////////////
-void CVersionUpdater::RunServerSaysDataFilesWrong ()
-{
-    ResetEverything ();
-    ADDINSTR ( "",                          _UseDataFilesURLs );
-    ADDINSTR ( "",                          _DialogDataFilesQuestion );
-    ADDINSTR ( "QuestionResponse.!Yes",     _End );
-    ADDINSTR ( "",                          _DialogChecking );
-    ADDINSTR ( "",                          _StartFileQuery );
-    ADDINSTR ( "QueryResponse.!datafiles",  _DialogDataFilesQueryError );
-    ADDINSTR ( "QueryResponse.!datafiles",  _End );
-    ADDINSTR ( "",                          _DialogDownloading );
-    ADDINSTR ( "",                          _StartFileDownload );
-    ADDINSTR ( "",                          _DialogDataFilesResult );
-}
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -612,6 +812,20 @@ void CVersionUpdater::_UseDataFilesURLs ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CVersionUpdater::_UseReportLogURLs
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseReportLogURLs ( void )
+{
+    m_QueryInfo = CCheckInfo ();
+    m_QueryInfo.serverList.push_back ( REPORT_LOG_URL1 );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CVersionUpdater::_ActionReconnect
 //
 //
@@ -620,6 +834,19 @@ void CVersionUpdater::_UseDataFilesURLs ( void )
 void CVersionUpdater::_ActionReconnect ( void )
 {
     CCommandFuncs::Reconnect ( NULL );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_DialogHide
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_DialogHide()
+{
+    GetQuestionBox ().Reset ();
 }
 
 
@@ -700,6 +927,23 @@ void CVersionUpdater::_PollQuestionNoYes ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CVersionUpdater::_DialogConnectingWait
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_DialogConnectingWait ( void )
+{
+    GetQuestionBox ().Reset ();
+    GetQuestionBox ().SetTitle ( "Connecting" );
+    GetQuestionBox ().SetMessage ( "Please wait..." );
+    GetQuestionBox ().SetButton ( 0, "Cancel" );
+    GetQuestionBox ().Show ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CVersionUpdater::_DialogChecking
 //
 //
@@ -722,7 +966,7 @@ void CVersionUpdater::_DialogChecking ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogDownloading(void)
+void CVersionUpdater::_DialogDownloading ( void )
 {
     // Display dialog
     GetQuestionBox ().Reset ();
@@ -857,17 +1101,64 @@ void CVersionUpdater::_DialogUpdateResult(void)
     if ( IsConditionTrue ( "Download.Ok" ) )
     {
         // Handle success
-        SetOnQuitCommand ( "open", m_DownloadInfo.strSaveLocation );
-
         // Exit game after button press
         GetQuestionBox ().Reset ();
         GetQuestionBox ().SetTitle ( "DOWNLOAD COMPLETE" );
         GetQuestionBox ().SetMessage ( m_DownloadInfo.strMsg2 );
         GetQuestionBox ().SetButton ( 0, "OK" );
         GetQuestionBox ().Show ();
-        Push ( _ExitGame );
+
+        if ( m_DownloadInfo.strStatus == "update" )
+        {
+            // 'update' - Stand alone installer
+            SetOnQuitCommand ( "open", m_DownloadInfo.strSaveLocation );
+            SetOnRestartCommand ( "" );
+            Push ( _ExitGame );
+        }
+        else
+        if ( m_DownloadInfo.strStatus == "files" || m_DownloadInfo.strStatus == "silent" )
+        {
+            // 'files'/'silent' - Self extracting archive 
+            SetOnQuitCommand ( "restart" );
+            SetOnRestartCommand ( "files", m_DownloadInfo.strSaveLocation );
+            Push ( _ExitGame );
+        }
+        else
+        {
+            GetQuestionBox ().SetMessage ( m_DownloadInfo.strStatus + " - Unknown problem in _DialogUpdateResult" );
+        }
+
         Push ( _PollAnyButton );
     }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_QUpdateResult
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_QUpdateResult ( void )
+{
+    if ( IsConditionTrue ( "Download.Ok" ) )
+    {
+        // Handle success
+        if ( m_DownloadInfo.strStatus == "silent" )
+        {
+            // 'silent' - Self extracting archive 
+            SetOnRestartCommand ( "silent", m_DownloadInfo.strSaveLocation );
+        }
+#if MTA_DEBUG
+        else
+            MessageBox ( NULL, "_QUpdateResult m_DownloadInfo.strStatus != 'silent'", m_DownloadInfo.strStatus, MB_OK );
+#endif
+    }
+#if MTA_DEBUG
+    else
+        MessageBox ( NULL, "_QUpdateResult Download.!Ok", "Error", MB_OK );
+#endif
 }
 
 
@@ -917,7 +1208,7 @@ void CVersionUpdater::_DialogDataFilesQueryError ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogDataFilesResult(void)
+void CVersionUpdater::_DialogDataFilesResult ( void )
 {
     // Handle failure
     if ( IsConditionTrue ( "Download.Fail" ) )
@@ -978,7 +1269,7 @@ void CVersionUpdater::_DialogDataFilesResult(void)
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_StartFileQuery(void)
 {
-        switch ( DoSendQueryToNextServer () )
+    switch ( DoSendQueryToNextServer () )
     {
         case RES_FAIL:
             // Can't find any(more) servers to send a query to
@@ -1037,7 +1328,7 @@ void CVersionUpdater::_PollFileQuery ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_StartFileDownload(void)
+void CVersionUpdater::_StartFileDownload ( void )
 {
     switch ( DoSendDownloadRequestToNextServer () )
     {
@@ -1103,6 +1394,68 @@ void CVersionUpdater::_PollFileDownload ( void )
 
 
 
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_StartSendPost
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_StartSendPost ( void )
+{
+    switch ( DoSendPostToNextServer () )
+    {
+        case RES_FAIL:
+            // Can't find any(more) servers to send a query to
+            // Drop back to previous stack level
+            break;
+
+        case RES_OK:
+            // Query sent ok, now wait for response
+            Push ( _PollSendPost );
+            break;
+
+        default:
+            assert ( 0 );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_PollSendPost
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_PollSendPost ( void )
+{
+    switch ( DoPollPost () )
+    {
+        case RES_FAIL:
+            // Connection to current server failed, try next server
+            Push ( _StartSendPost );
+            break;
+
+        case RES_OK:
+            // Got a valid response
+            // Drop back to previous stack level for processing
+            break;
+
+        case RES_POLL:
+
+            // Waiting...
+            Push ( _PollSendPost );
+            break;
+
+        default:
+            assert ( 0 );
+    }
+}
+
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1118,7 +1471,6 @@ void CVersionUpdater::_PollFileDownload ( void )
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -1164,6 +1516,8 @@ int CVersionUpdater::DoSendQueryToNextServer ( void )
     strQueryURL = strQueryURL.ReplaceSubString ( "%VERSION%", strPlayerVersion );
     strQueryURL = strQueryURL.ReplaceSubString ( "%ID%", szSerial );
     strQueryURL = strQueryURL.ReplaceSubString ( "%STATUS%", szStatus );
+    strQueryURL = strQueryURL.ReplaceSubString ( "%TYPE%", m_strServerSaysType );
+    strQueryURL = strQueryURL.ReplaceSubString ( "%REFER%", m_strServerSaysHost );
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
@@ -1312,6 +1666,7 @@ int CVersionUpdater::DoPollDownload ( void )
 
             //m_strStage = "NextMirror";
             SetCondition ( "Download", "Fail" );
+            AddReportLog ( SString ( "DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_DownloadInfo.strFilename.c_str(), status, GetTickCount64_ () - m_llTimeStart ) );
             return RES_FAIL;
         }
         return RES_POLL;
@@ -1338,49 +1693,127 @@ int CVersionUpdater::DoPollDownload ( void )
                 if ( m_DownloadInfo.serverList.size () )
                     ListRemove( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
                 SetCondition ( "Download", "Fail", "Checksum" );
+                AddReportLog ( SString ( "DoPollDownload: Checksum wrong for %s (%s %s)", m_DownloadInfo.strFilename.c_str(), m_DownloadInfo.strMD5.c_str(), szMD5 ) );
                 return RES_FAIL;
             }
         }
 
-        // Save file somewhere
-        // Make a list of possible places to save the file
-        std::vector < SString > saveLocationList;
-        char szTempPath[ MAX_PATH ] = "";
-        GetTempPath( MAX_PATH - 30, szTempPath );
-        saveLocationList.push_back ( std::string( szTempPath ) + m_DownloadInfo.strFilename );
-        saveLocationList.push_back ( CalcMTASAPath ( std::string ( "\\mta\\" ) + m_DownloadInfo.strFilename ) );
-
-        // Try each place
-        SString strPathFilename;
-        for ( std::vector < SString > ::iterator iter = saveLocationList.begin () ; iter != saveLocationList.end () ; ++iter )
-        {
-            bool bSaveOk = false;
-            FILE* fh = fopen ( *iter, "wb" );
-            if ( fh )
-            {
-                bSaveOk = ( fwrite ( pData, 1, uiSize, fh ) == uiSize );
-                fclose ( fh );
-            }
-            if ( bSaveOk )
-            {
-                strPathFilename = *iter;
-                break;
-            }
-        }
-
-        if ( strPathFilename.length () == 0 )
+        // Save file
+        SString strPathFilename = CalcMTASAPath ( std::string ( "\\mta\\upcache\\" ) + m_DownloadInfo.strFilename );
+        MakeSureDirExists ( strPathFilename );
+        if ( !FileSave ( strPathFilename, pData, uiSize ) )
         {
             if ( m_DownloadInfo.serverList.size () )
                 ListRemove( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
             SetCondition ( "Download", "Fail", "Saving" );
+            AddReportLog ( SString ( "DoPollDownload: Unable to save the file %s (size %d)", strPathFilename.c_str(), uiSize ) );
             return RES_FAIL;
         }
 
         m_DownloadInfo.strSaveLocation = strPathFilename;
         SetCondition ( "Download", "Ok" );
+        AddReportLog ( SString ( "DoPollDownload: Downloaded %s", m_DownloadInfo.strFilename.c_str() ) );
         return RES_OK;
     }
 
     SetCondition ( "Download", "Fail" );
+    AddReportLog ( SString ( "DoPollDownload: Fail for %s", m_DownloadInfo.strFilename.c_str() ) );
     return RES_FAIL;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::DoSendPostToNextServer
+//
+// RES_FAIL - Can't find a valid server to query
+// RES_OK   - Query sent
+//
+///////////////////////////////////////////////////////////////
+int CVersionUpdater::DoSendPostToNextServer ( void )
+{
+    if ( ++m_QueryInfo.iRetryCount > 1 || m_QueryInfo.serverList.size () == 0 )
+    {
+        return RES_FAIL;
+    }
+
+    m_llTimeStart = GetTickCount64_ ();
+
+    // Get URL of next server in the list
+    m_QueryInfo.iCurrent++;
+    m_QueryInfo.iCurrent = m_QueryInfo.iCurrent % m_QueryInfo.serverList.size ();
+    SString strServerURL = m_QueryInfo.serverList[ m_QueryInfo.iCurrent ];
+
+    // Get our serial number
+    char szSerial [ 64 ];
+    CCore::GetSingleton ().GetNetwork ()->GetSerial ( szSerial, sizeof ( szSerial ) );
+    char szStatus [ 128 ];
+    CCore::GetSingleton ().GetNetwork ()->GetStatus ( szStatus, sizeof ( szStatus ) );
+
+    // Compose version string
+    unsigned short usNetRev = CCore::GetSingleton ().GetNetwork ()->GetNetRev ();
+    SString strPlayerVersion ( "%d.%d.%d-%s.%05d.%d"
+                                ,MTASA_VERSION_MAJOR
+                                ,MTASA_VERSION_MINOR
+                                ,MTASA_VERSION_MAINTENANCE
+                                ,MTA_DM_BUILDTYPE
+                                ,MTASA_VERSION_BUILD
+                                ,usNetRev
+                                );
+
+    // Make the query URL
+    SString strQueryURL = strServerURL;
+    strQueryURL = strQueryURL.ReplaceSubString ( "%VERSION%", strPlayerVersion );
+    strQueryURL = strQueryURL.ReplaceSubString ( "%ID%", szSerial );
+    strQueryURL = strQueryURL.ReplaceSubString ( "%STATUS%", szStatus );
+
+    //
+    // Get post contents
+    //
+    SString strReportFilename = CalcMTASAPath ( std::string ( "\\mta\\report.log" )  );
+    std::vector < char > buffer;
+    FileLoad ( strReportFilename, buffer );
+
+    //
+    // Send data. Don't bother checking if it was received, as it's not important.
+    //
+    if ( buffer.size () > 10 )
+    {
+        buffer.push_back ( 0 );
+        SString strContent = &buffer[0];
+        if ( strContent.length () > 5000 )
+            strContent = strContent.substr ( strContent.length () - 5000 );
+
+        CNetHTTPDownloadManagerInterface * downloadManager = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ();
+        downloadManager->QueueFile ( strQueryURL, NULL, 0, &strContent.at ( 0 ) );
+        if ( !downloadManager->IsDownloading () )
+            downloadManager->StartDownloadingQueuedFiles ();
+
+        FileSave ( strReportFilename, NULL, 0 );
+    }
+
+    return RES_OK;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::DoPollPost
+//
+// RES_FAIL   - Post failed
+// RES_OK     - Post ok
+// RES_POLL   - Processing
+//
+///////////////////////////////////////////////////////////////
+int CVersionUpdater::DoPollPost ( void )
+{
+    CNetHTTPDownloadManagerInterface* pHTTP = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ();
+    if ( pHTTP )
+    {
+        if ( !pHTTP->ProcessQueuedFiles () )
+        {
+            return RES_POLL;
+        }
+    }
+    return RES_OK;
 }

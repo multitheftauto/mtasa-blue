@@ -310,40 +310,6 @@ SString GetDataUnit ( unsigned int uiInput )
 }
 
 
-
-#include <direct.h>
-void MakeSureDirExists ( const char* szPath )
-{
-    // Copy the path
-    char szCopy [MAX_PATH];
-    strncpy ( szCopy, szPath, MAX_PATH );
-
-    // Begin from the start
-    char cChar = 0;
-    char* szIter = szCopy;
-    while ( *szIter != 0 )
-    {
-        // Met a slash?
-        cChar = *szIter;
-        if ( cChar == '\\' ||
-             cChar == '/' )
-        {
-            // Replace it temprarily with 0
-            *szIter = 0;
-
-            // Call mkdir on this path
-            mkdir ( szCopy );
-
-            // Make it a slash again
-            *szIter = cChar;
-        }
-
-        // Increment iterator
-        ++szIter;
-    }
-}
-
-
 #ifdef MTA_DEBUG
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
