@@ -81,12 +81,12 @@ public:
 // Max kick string length that can be sent
 #define MIN_KICK_REASON_LENGTH      1
 #define MAX_KICK_REASON_LENGTH      64
-#define MAX_KICK_RESPONSIBLE_LENGTH 32
+#define MAX_KICK_RESPONSIBLE_LENGTH 30
 
 // Max ban string length that can be sent
-#define MIN_BAN_REASON_LENGTH 1
-#define MAX_BAN_REASON_LENGTH 64
-
+#define MIN_BAN_REASON_LENGTH      1
+#define MAX_BAN_REASON_LENGTH      64
+#define MAX_BAN_RESPONSIBLE_LENGTH 30
 
 // Couple of defines to ensure proper configuration
 #if MAX_CHAT_LENGTH > 255
