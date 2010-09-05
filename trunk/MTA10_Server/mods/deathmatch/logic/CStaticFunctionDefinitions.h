@@ -512,7 +512,7 @@ public:
     static bool                 LogOut                              ( CPlayer* pPlayer );
 
     // Admin funcs
-    static bool                 KickPlayer                          ( CPlayer* pPlayer, CPlayer* pResponsible = NULL, const char* szReason = NULL );
+    static bool                 KickPlayer                          ( CPlayer* pPlayer, SString strResponsible = "Console", SString strReason = "" );
     static CBan*                BanPlayer                           ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible = NULL, const char* szReason = NULL, time_t tUnban = 0 );
 
     static CBan*                AddBan                              ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason, time_t tUnban );

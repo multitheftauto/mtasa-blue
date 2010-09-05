@@ -7678,58 +7678,47 @@ bool CStaticFunctionDefinitions::LogOut ( CPlayer* pPlayer )
 }
 
 
-bool CStaticFunctionDefinitions::KickPlayer ( CPlayer* pPlayer, CPlayer* pResponsible, const char* szReason )
+bool CStaticFunctionDefinitions::KickPlayer ( CPlayer* pPlayer, SString strResponsible, SString strReason )
 {
+    // Make sure we have a player
     assert ( pPlayer );
 
-    const char* szResponsible = "Console";
-    if ( pResponsible )
-        szResponsible = pResponsible->GetNick ();
+    // If our responsible string is too long, crop it to size and display ... in the end so it's obvious it's cropped
+    if ( strResponsible.length( ) > MAX_KICK_RESPONSIBLE_LENGTH )
+        strResponsible = strResponsible.substr ( 0, MAX_KICK_RESPONSIBLE_LENGTH - 3 ) + "...";
 
-
-    const char* szReasonPointer = NULL;
-    char szMessage [256];
-    szMessage [0] = '\0';
+    // Declare the strings for use later on
+    SString strMessage;
+    SString strInfoMessage;
+    
+    // Get the size of the reason
+    size_t sizeReason = strReason.length ( );
 
     // Got any reason?
-    if ( szReason )
+    if ( sizeReason >= MIN_KICK_REASON_LENGTH )
     {
-        size_t sizeReason = strlen ( szReason );
-        if ( sizeReason >= MIN_KICK_REASON_LENGTH && sizeReason <= MAX_KICK_REASON_LENGTH )
-        {
-            _snprintf ( szMessage, 256, "You were kicked by %s (%s)", szResponsible, szReason );
-            szReasonPointer = szReason;
-        }
-        else
-        {
-            _snprintf ( szMessage, 256, "You were kicked by %s", szResponsible );
-        }
-    }
-    else
-    {
-        _snprintf ( szMessage, 256, "You were kicked by %s", szResponsible );
-    }
-    szMessage[255] = '\0';
+        // If our reaon string is too long, crop it to size and display ... in the end so it's obvious it's cropped
+        if ( sizeReason > MAX_KICK_REASON_LENGTH )
+            strReason = strReason.substr ( 0, MAX_KICK_REASON_LENGTH - 3 ) + "...";
 
-    // Make a message to send to everyone else
-    char szInfoMessage [256];
-    if ( szReasonPointer )
-    {
-        _snprintf ( szInfoMessage, 256, "%s was kicked from the game by %s (%s)", pPlayer->GetNick (), szResponsible, szReasonPointer );
+        // Now create the messages which will be displayed to both the kicked player and the console
+        strMessage.Format ( "You were kicked by %s (%s)", strResponsible.c_str( ), strReason.c_str( ) );
+        strInfoMessage.Format ( "%s was kicked from the game by %s (%s)", pPlayer->GetNick( ), strResponsible.c_str( ), strReason.c_str( ) );
     }
     else
     {
-        _snprintf ( szInfoMessage, 256, "%s was kicked from the game by %s", pPlayer->GetNick (), szResponsible );
+        // Now create the messages which will be displayed to both the kicked player and the console
+        strMessage.Format ( "You were kicked by %s", strResponsible.c_str( ) );
+        strInfoMessage.Format ( "%s was kicked from the game by %s", pPlayer->GetNick( ), strResponsible.c_str( ) );
     }
-    szInfoMessage [255] = 0;
 
     // Tell the player that was kicked why. QuitPlayer will delete the player.
-    pPlayer->Send ( CPlayerDisconnectedPacket ( szMessage ) );
-    g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_KICK, false, szReason, szResponsible );
+    pPlayer->Send ( CPlayerDisconnectedPacket ( strMessage.c_str ( ) ) );
+    g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_KICK, false, strReason.c_str( ), strResponsible.c_str( ) );
 
     // Tell everyone else that he was kicked from the game including console
     // m_pPlayerManager->BroadcastOnlyJoined ( CChatEchoPacket ( szInfoMessage, CHATCOLOR_INFO ) );
-    CLogger::LogPrintf ( "KICK: %s\n", szInfoMessage );
+    CLogger::LogPrintf ( "KICK: %s\n", strInfoMessage.c_str ( ) );
 
     return true;
 }

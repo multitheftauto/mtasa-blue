@@ -79,8 +79,9 @@ public:
 #define MAX_DISCONNECT_REASON_LENGTH 127
 
 // Max kick string length that can be sent
-#define MIN_KICK_REASON_LENGTH 1
-#define MAX_KICK_REASON_LENGTH 64
+#define MIN_KICK_REASON_LENGTH      1
+#define MAX_KICK_REASON_LENGTH      64
+#define MAX_KICK_RESPONSIBLE_LENGTH 32
 
 // Max ban string length that can be sent
 #define MIN_BAN_REASON_LENGTH 1
