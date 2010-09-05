@@ -52,8 +52,8 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;_CRT_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=""
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="StdInc.h"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
@@ -325,11 +325,31 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\AccessControl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Main.cpp"
 				>
 			</File>
 			<File
+				RelativePath=".\StdInc.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ViewACLs.cpp"
 				>
 			</File>
 		</Filter>
@@ -346,25 +366,33 @@
 				>
 			</File>
 			<File
+				RelativePath=".\StdInc.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Utils.h"
 				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
 			<File
 				RelativePath=".\GDFImp.rc"
 				>
 			</File>
 			<File
-				RelativePath="loader.rc">
+				RelativePath="loader.rc"
+				>
 			</File>
 			<File
-				RelativePath=".\resource\mtaicon.ico">
+				RelativePath=".\resource\mtaicon.ico"
+				>
 			</File>
 			<File
-				RelativePath=".\resource\splash.bmp">
+				RelativePath=".\resource\splash.bmp"
+				>
 			</File>
 		</Filter>
 	</Files>

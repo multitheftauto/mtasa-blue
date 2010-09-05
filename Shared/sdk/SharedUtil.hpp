@@ -15,6 +15,9 @@
 
 #include "UTF8.h"
 #include <assert.h>
+#ifdef WIN32
+    #include <direct.h>
+#endif
 
 #ifdef WIN32
 //
@@ -82,6 +85,28 @@ void SharedUtil::SetOnQuitCommand ( const SString& strOperation, const SString& 
     // Encode into a string and set a registry key
     SString strValue ( "%s\t%s\t%s\t%s\t%s", strOperation.c_str (), strFile.c_str (), strParameters.c_str (), strDirectory.c_str (), strShowCmd.c_str () );
     WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnQuitCommand", strValue );
+}
+
+//
+// What to do on next restart
+//
+void SharedUtil::SetOnRestartCommand ( const SString& strOperation, const SString& strFile, const SString& strParameters, const SString& strDirectory, const SString& strShowCmd )
+{
+    // Encode into a string and set a registry key
+    SString strValue ( "%s\t%s\t%s\t%s\t%s", strOperation.c_str (), strFile.c_str (), strParameters.c_str (), strDirectory.c_str (), strShowCmd.c_str () );
+    WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnRestartCommand", strValue );
+}
+
+//
+// For tracking results of new features
+//
+void SharedUtil::AddReportLog ( const SString& strText )
+{
+    SString strPathFilename = CalcMTASAPath ( std::string ( "\\mta\\report.log" )  );
+    MakeSureDirExists ( strPathFilename );
+
+    SString strMessage = GetLocalTimeString ( true, false ) + " - " + strText + "\n";
+    FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
 }
 
 
@@ -663,6 +688,79 @@ bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& bu
     // Close
     fclose ( fh );
     return bytesRead == size;
+}
+
+
+//
+// Save binary data to a file
+//
+bool SharedUtil::FileSave ( const SString& strFilename, void* pBuffer, unsigned long ulSize )
+{
+    FILE* fh = fopen ( strFilename, "wb" );
+    if ( !fh )
+        return false;
+
+    bool bSaveOk = true;
+    if ( ulSize )
+        bSaveOk = ( fwrite ( pBuffer, 1, ulSize, fh ) == ulSize );
+    fclose ( fh );
+    return bSaveOk;
+}
+
+
+//
+// Append binary data to a file
+//
+bool SharedUtil::FileAppend ( const SString& strFilename, void* pBuffer, unsigned long ulSize )
+{
+    FILE* fh = fopen ( strFilename, "ab" );
+    if ( !fh )
+        return false;
+
+    bool bSaveOk = true;
+    if ( ulSize )
+        bSaveOk = ( fwrite ( pBuffer, 1, ulSize, fh ) == ulSize );
+    fclose ( fh );
+    return bSaveOk;
+}
+
+
+//
+// Ensure all directories exist to the file
+//
+void SharedUtil::MakeSureDirExists ( const char* szPath )
+{
+    // Copy the path
+    char szCopy [MAX_PATH];
+    strncpy ( szCopy, szPath, MAX_PATH );
+
+    // Begin from the start
+    char cChar = 0;
+    char* szIter = szCopy;
+    while ( *szIter != 0 )
+    {
+        // Met a slash?
+        cChar = *szIter;
+        if ( cChar == '\\' ||
+             cChar == '/' )
+        {
+            // Replace it temprarily with 0
+            *szIter = 0;
+
+            // Call mkdir on this path
+            #ifdef WIN32
+                mkdir ( szCopy );
+            #else
+                mkdir ( szCopy ,0775 );
+            #endif
+
+            // Make it a slash again
+            *szIter = cChar;
+        }
+
+        // Increment iterator
+        ++szIter;
+    }
 }
 
 
