@@ -513,9 +513,9 @@ public:
 
     // Admin funcs
     static bool                 KickPlayer                          ( CPlayer* pPlayer, SString strResponsible = "Console", SString strReason = "" );
-    static CBan*                BanPlayer                           ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible = NULL, const char* szReason = NULL, time_t tUnban = 0 );
+    static CBan*                BanPlayer                           ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible = NULL, SString strResponsible = "Console", SString strReason = "", time_t tUnban = 0 );
 
-    static CBan*                AddBan                              ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason, time_t tUnban );
+    static CBan*                AddBan                              ( SString strIP, SString strUsername, SString strSerial, CPlayer* pResponsible = NULL, SString strResponsible = "Console", SString strReason = "", time_t tUnban = 0 );
     static bool                 RemoveBan                           ( CBan* pBan, CPlayer* pResponsible = NULL );
 
     static bool                 GetBans                             ( CLuaMain* pLuaMain );

@@ -10751,64 +10751,68 @@ int CLuaFunctionDefinitions::KickPlayer ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
 {
-    // Grab our virtual machine
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+        CPlayer* pPlayer       = lua_toplayer ( luaVM, 1 );
+        CPlayer* pResponsible  = NULL;
+        SString strResponsible = "Console";
+        SString strReason      = "";
+
+        bool bIP       = true;
+        bool bUsername = false;
+        bool bSerial   = false;
+
+        // Check if the player should be banned over IP
+        if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+            bIP = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
+
+        // Check if the player should be banned over username
+        if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+            bUsername = ( lua_toboolean ( luaVM, 3 ) ) ? true : false;
+
+        // Check if the player should be banned over serial
+        if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
+            bSerial = ( lua_toboolean ( luaVM, 4 ) ) ? true : false;
+
+        // Get the responsible element or string
+        if ( lua_type ( luaVM, 5 ) == LUA_TLIGHTUSERDATA )
         {
-            CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-            CPlayer* pResponsible = NULL;
-            const char* szReason = NULL;
+            pResponsible = lua_toplayer ( luaVM, 5 );
 
-            bool bIP = true;
-            bool bUsername = false;
-            bool bSerial = false;
+            // If the responsible element is a player, set the responsible string to his nick
+            if ( pResponsible )
+                strResponsible = pResponsible->GetNick();
+        }
+        else if ( lua_type ( luaVM, 5 ) == LUA_TSTRING )
+            strResponsible = lua_tostring( luaVM, 5 );
 
-            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+        // Get the ban reason
+        if ( lua_type ( luaVM, 6 ) == LUA_TSTRING )
+            strReason = lua_tostring ( luaVM, 6 );
+
+        // Get the unban time
+        time_t tUnban = 0;
+        if ( lua_type ( luaVM, 7 ) == LUA_TNUMBER || lua_type ( luaVM, 7 ) == LUA_TSTRING )
+        {
+            tUnban = ( time_t ) atoi ( lua_tostring ( luaVM, 7 ) );
+            if ( tUnban > 0 ) tUnban += time ( NULL );
+        }
+
+        // If we have a player to be banned
+        if ( pPlayer )
+        {
+            CBan* pBan = NULL;
+            if ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, strResponsible, strReason, tUnban ) )
             {
-                bIP = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
+                lua_pushban ( luaVM, pBan );
+                return 1;
             }
-
-            if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
-            {
-                bUsername = ( lua_toboolean ( luaVM, 3 ) ) ? true : false;
-            }
-
-            if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
-            {
-                bSerial = ( lua_toboolean ( luaVM, 4 ) ) ? true : false;
-            }
-
-            if ( lua_type ( luaVM, 5 ) == LUA_TLIGHTUSERDATA )
-            {
-                pResponsible = lua_toplayer ( luaVM, 5 );
-            }
-            if ( lua_type ( luaVM, 6 ) == LUA_TSTRING )
-                szReason = lua_tostring ( luaVM, 6 );
-
-            time_t tUnban = 0;
-            if ( lua_type ( luaVM, 7 ) == LUA_TNUMBER || lua_type ( luaVM, 7 ) == LUA_TSTRING )
-            {
-                tUnban = ( time_t ) atoi ( lua_tostring ( luaVM, 7 ) );
-                if ( tUnban > 0 ) tUnban += time ( NULL );
-            }
-
-            if ( pPlayer )
-            {
-                CBan* pBan = NULL;
-                if ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, szReason, tUnban ) )
-                {
-                    lua_pushban ( luaVM, pBan );
-                    return 1;
-                }
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "banPlayer", "player", 1 );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "banPlayer" );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "banPlayer", "player", 1 );
     }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "banPlayer" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -10821,37 +10825,47 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
          ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) ||
          ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) )
     {
-        const char* szIP = NULL;
-        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-        {
-            szIP = lua_tostring ( luaVM, 1 );
-        }
-
-        const char* szUsername = NULL;
-        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-        {
-            szUsername = lua_tostring ( luaVM, 2 );
-        }
-
-        const char* szSerial = NULL;
-        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
-        {
-            szSerial = lua_tostring ( luaVM, 3 );
-        }
+        // Initialize the required variables
+        SString strIP          = "";
+        SString strUsername    = "";
+        SString strSerial      = "";
+        SString strResponsible = "Console";
+        SString strReason      = "";
 
         CPlayer* pResponsible = NULL;
-        if ( lua_type ( luaVM, 4 ) == LUA_TLIGHTUSERDATA )
-        {
-            pResponsible = lua_toplayer ( luaVM, 4 );
-        }
-
-        const char* szReason = NULL;
-        if ( lua_type ( luaVM, 5 ) == LUA_TSTRING )
-        {
-            szReason = lua_tostring ( luaVM, 5 );
-        }
 
         time_t tUnban = 0;
+
+        // Get the IP parameter
+        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+            strIP = lua_tostring ( luaVM, 1 );
+
+        // Get the username
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            strUsername = lua_tostring ( luaVM, 2 );
+
+        // Get the serial
+        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            strSerial = lua_tostring ( luaVM, 3 );
+
+        // Get the responsible string, and - if applicable - the responsible player
+        if ( lua_type ( luaVM, 4 ) == LUA_TLIGHTUSERDATA )
+        {
+            // Get the responsible player
+            pResponsible = lua_toplayer ( luaVM, 4 );
+
+            // If it actually is a player, get its nick and set the responsible string to it
+            if ( pResponsible )
+                strResponsible = pResponsible->GetNick ( );
+        }
+        else if ( lua_type ( luaVM, 4 ) == LUA_TSTRING )
+            strResponsible = lua_tostring ( luaVM, 4 );
+
+        // Let's not forget about the reason
+        if ( lua_type ( luaVM, 5 ) == LUA_TSTRING )
+            strReason = lua_tostring ( luaVM, 5 );
+
+        // And the time at which the ban will be removed might be useful as well
         if ( lua_type ( luaVM, 6 ) == LUA_TNUMBER || lua_type ( luaVM, 6 ) == LUA_TSTRING )
         {
             tUnban = ( time_t ) atoi ( lua_tostring ( luaVM, 6 ) );
@@ -10859,7 +10873,7 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
         }
 
         CBan* pBan = NULL;
-        if ( pBan = CStaticFunctionDefinitions::AddBan ( szIP, szUsername, szSerial, pResponsible, szReason, tUnban ) )
+        if ( pBan = CStaticFunctionDefinitions::AddBan ( strIP, strUsername, strSerial, pResponsible, strResponsible, strReason, tUnban ) )
         {
             lua_pushban ( luaVM, pBan );
             return 1;
