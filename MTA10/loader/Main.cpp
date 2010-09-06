@@ -129,7 +129,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     //
     // Check file and directory permissions are ok
     //
-    if ( strcmp ( lpCmdLine, "skip_permissions_check" ) != 0 )
+    if ( strcmp ( lpCmdLine, "skip_permissions_check" ) != 0 && IsVistaOrHigher () )
     {
         if ( !CheckPermissions ( strMTASAPath, 3000 ) )
         {
