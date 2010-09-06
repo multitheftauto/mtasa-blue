@@ -36,5 +36,6 @@ bool    UpdateProgress              ( int iPos, int iMax, const SString& strMsg 
 
 bool    CheckPermissions            ( const std::string& strPath, unsigned int uiMaxTimeMs );
 void    FixPermissions              ( const std::string& strPath );
+bool    IsVistaOrHigher             ( void );
 
 #endif

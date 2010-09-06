@@ -591,3 +591,19 @@ void FixPermissions ( const std::string& strPath )
             DoSetOnFile ( false, strFilePathName, "(BU)","FullAccess" );
     }
 }
+
+
+///////////////////////////////////////////////////////////////
+//
+// IsVistaOrHigher
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool IsVistaOrHigher()
+{
+    SString strVersion = ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "CurrentVersion" );
+    int iMajor = atoi ( strVersion );
+    return iMajor >= 6;
+}
+
