@@ -141,7 +141,15 @@ void CQuestionBox::SetCallback ( pfnQuestionCallback callback, void* ptr )
 
 unsigned int CQuestionBox::PollButtons ( void )
 {
+    if ( !m_pWindow->IsVisible () )
+        return -1;
     return m_uiLastButton;
+}
+
+
+bool CQuestionBox::IsVisible ( void )
+{
+    return m_pWindow->IsVisible ();
 }
 
 

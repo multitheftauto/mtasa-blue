@@ -1357,7 +1357,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     CLogger::LogPrintf ( "CONNECT: %s advised to update (Client version is below recommended) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                                     // Tell the player
-                                    pPlayer->Send ( CUpdateInfoPacket ( "Optional", GetConfig ()->GetRecommendedClientVersion () ) );
+                                    pPlayer->Send ( CUpdateInfoPacket ( "Recommended", GetConfig ()->GetRecommendedClientVersion () ) );
                                     DisconnectPlayer ( this, *pPlayer, "" );
                                     return;
                                 }

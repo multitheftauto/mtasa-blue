@@ -815,42 +815,6 @@ const char* HTMLEscapeString ( const char *szSource )
 }
 
 
-#ifdef WIN32
-#include <direct.h>
-#endif
-
-void MakeSureDirExists ( const char* szPath )
-{
-    // Copy the path
-    char szCopy [MAX_PATH];
-    strncpy ( szCopy, szPath, MAX_PATH );
-
-    // Begin from the start
-    char cChar = 0;
-    char* szIter = szCopy;
-    while ( *szIter != 0 )
-    {
-        // Met a slash?
-        cChar = *szIter;
-        if ( cChar == '\\' ||
-             cChar == '/' )
-        {
-            // Replace it temprarily with 0
-            *szIter = 0;
-
-            // Call mkdir on this path
-            mymkdir ( szCopy );
-
-            // Make it a slash again
-            *szIter = cChar;
-        }
-
-        // Increment iterator
-        ++szIter;
-    }
-}
-
-
 // Copies a single file.
 bool FileCopy ( const char* szPathNameSrc, const char* szPathDst )
 {

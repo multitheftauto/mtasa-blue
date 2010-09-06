@@ -208,8 +208,6 @@ void            LongToDottedIP              ( unsigned long ulIP, char* szDotted
 
 bool            BitStreamReadUsString       ( class NetBitStreamInterface& bitStream, SString& strOut );
 
-void            MakeSureDirExists           ( const char* szPath );
-
 
 // for debug
 #ifdef MTA_DEBUG

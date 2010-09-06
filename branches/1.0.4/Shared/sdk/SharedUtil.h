@@ -258,6 +258,16 @@ namespace SharedUtil
     //
     void SetOnQuitCommand ( const SString& strOperation, const SString& strFile = "", const SString& strParameters = "", const SString& strDirectory = "", const SString& strShowCmd = "" );
 
+    //
+    // What to do on next restart
+    //
+    void SetOnRestartCommand ( const SString& strOperation, const SString& strFile = "", const SString& strParameters = "", const SString& strDirectory = "", const SString& strShowCmd = "" );
+
+    //
+    // For tracking results of new features
+    //
+    void AddReportLog ( const SString& strText );
+
 #endif
 
     //
@@ -294,6 +304,21 @@ namespace SharedUtil
     // Load binary data from a file into an array
     //
     bool FileLoad ( const SString& strFilename, std::vector < char >& buffer );
+
+    //
+    // Save binary data to a file
+    //
+    bool FileSave ( const SString& strFilename, void* pBuffer, unsigned long ulSize );
+
+    //
+    // Append binary data to a file
+    //
+    bool FileAppend ( const SString& strFilename, void* pBuffer, unsigned long ulSize );
+
+    //
+    // Ensure all directories exist to the file
+    //
+    void MakeSureDirExists ( const char* szPath );
 
     //
     // Return true if supplied string adheres to the new version format
