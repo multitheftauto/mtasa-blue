@@ -71,8 +71,14 @@ void CCommandFuncs::Ver ( const char* szParameters )
 {
     ShowCursor(TRUE);
     HCURSOR hc = LoadCursor ( NULL, IDC_ARROW );
-    SetCursor ( hc );  
-    CLocalGUI::GetSingleton ( ).EchoConsole ( BLUE_VERSION_STRING );
+    SetCursor ( hc );
+
+    // Compose version string
+    unsigned short usNetRev = CCore::GetSingleton ().GetNetwork ()->GetNetRev ();
+    SString strVersion = BLUE_VERSION_STRING;
+    if ( usNetRev > 0 )
+        strVersion = strVersion.Replace ( "\n", SString ( ".%d\n", usNetRev ) );
+    CLocalGUI::GetSingleton ( ).EchoConsole ( strVersion );
 }
 
 void CCommandFuncs::ScreenShot ( const char* szParameters )

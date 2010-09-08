@@ -13,6 +13,7 @@
 
 #include "SharedUtil.h"
 #include "Main.h"
+#include "Install.h"
 #include "Utils.h"
 
 int     HasUsersGotFullAccess   ( const char* argv1 );

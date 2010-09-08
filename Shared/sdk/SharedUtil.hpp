@@ -109,6 +109,9 @@ void SharedUtil::AddReportLog ( const SString& strText )
     FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
 }
 
+#else
+    unsigned long   GetTickCount                ( void );
+    #include <sys/time.h>
 
 #endif
 
@@ -172,12 +175,14 @@ double SharedUtil::GetSecondCount ( void )
 
     void SharedUtil::CCriticalSection::Lock ( void )
     {
-        EnterCriticalSection ( ( CRITICAL_SECTION* ) m_pCriticalSection );
+        if ( m_pCriticalSection )
+            EnterCriticalSection ( ( CRITICAL_SECTION* ) m_pCriticalSection );
     }
 
     void SharedUtil::CCriticalSection::Unlock ( void )
     {
-        LeaveCriticalSection ( ( CRITICAL_SECTION* ) m_pCriticalSection );
+        if ( m_pCriticalSection )
+            LeaveCriticalSection ( ( CRITICAL_SECTION* ) m_pCriticalSection );
     }
 
 #else
@@ -363,33 +368,19 @@ bool SString::Split ( const SString& strDelim, SString* pstrLeft, SString* pstrR
 
 
 //
-// Replace any char in szOld with szNew
+// Replace all occurrences of the string szOld with szNew
 //
 SString SString::Replace ( const char* szOld, const char* szNew ) const
 {
-    // Bad things will happen if szNew exists in szOld
-    if( strlen ( szNew ) == 1 && std::string ( szOld ).find ( szNew ) != std::string::npos )
-        return *this;
-
     int iOldLength = strlen ( szOld );
-    SString strResult = *this;
-    int idx = 0;
-    while( ( idx = strResult.find_first_of ( szOld, idx ) ) >= 0 )
-        strResult.replace ( idx, iOldLength, szNew );
-    return strResult;
-}
-
-
-//
-// Replace all szOlds with szNews
-//
-SString SString::ReplaceSubString ( const char* szOld, const char* szNew ) const
-{
-    int iOldLength = strlen ( szOld );
+    int iNewLength = strlen ( szNew );
     SString strResult = *this;
     int idx = 0;
     while( ( idx = strResult.find ( szOld, idx ) ) >= 0 )
+    {
         strResult.replace ( idx, iOldLength, szNew );
+        idx += iNewLength - iOldLength + 1;
+    }
     return strResult;
 }
 
@@ -627,8 +618,22 @@ SString SharedUtil::GetLocalTimeString ( bool bDate, bool bMilliseconds )
         strResult = SString ( "%02d-%02d-%02d ", s.wYear, s.wMonth, s.wDay  ) + strResult;
     return strResult;
 #else
-    // Other platforms here
-    return "HH:MM:SS";
+    timeval now;
+    gettimeofday ( &now, NULL );
+    time_t t = now.tv_sec;
+    tm* tmp = localtime ( &t );
+    assert ( tmp );
+
+    char outstr[200] = { 0 };
+    if ( bDate )
+        strftime ( outstr, sizeof ( outstr ), "%y-%m-%d %H:%M:%S", tmp );
+    else
+        strftime ( outstr, sizeof ( outstr ), "%H:%M:%S", tmp );
+
+    if ( !bMilliseconds )
+        return outstr;
+
+    return SString ( "%s.%03d", outstr, now.tv_usec / 1000 );
 #endif
 }
 

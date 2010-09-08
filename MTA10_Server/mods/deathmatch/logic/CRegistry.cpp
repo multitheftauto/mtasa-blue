@@ -291,7 +291,7 @@ bool CRegistry::Query ( const std::string& strQuery, CLuaArguments *pArgs, CRegi
     SString strTest = SString ( strParsedQuery ).ToUpper ();
     if ( strTest.find ( "TRANSACTION" ) != std::string::npos )
     {
-        strTest = strTest.Replace ( "\t", " " ).ReplaceSubString ( "  ", " " ).TrimStart ( " " ).TrimEnd ( " " );
+        strTest = strTest.Replace ( "\t", " " ).Replace ( "  ", " " ).TrimStart ( " " ).TrimEnd ( " " );
         if ( strTest.find ( "BEGIN" ) == 0 || strTest.find ( "END" ) == 0 || strTest.find ( "COMMIT" ) == 0 )
         {
             return true;

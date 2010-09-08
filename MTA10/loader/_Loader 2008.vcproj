@@ -329,6 +329,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Install.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Main.cpp"
 				>
 			</File>
@@ -357,6 +361,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\Install.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Main.h"
 				>

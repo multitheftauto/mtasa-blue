@@ -81,7 +81,6 @@ public:
     void        Split               ( const SString& strDelim, std::vector < SString >& outResult, unsigned int uiMaxAmount = 0 ) const;
     bool        Split               ( const SString& strDelim, SString* pstrLeft, SString* pstrRight, bool bFromRight = false ) const;
     SString     Replace             ( const char* szOld, const char* szNew ) const;
-    SString     ReplaceSubString    ( const char* szOld, const char* szNew ) const;
     SString     TrimStart           ( const char* szOld ) const;
     SString     TrimEnd             ( const char* szOld ) const;
     SString     ToLower             ( void ) const;

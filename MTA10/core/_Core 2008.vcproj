@@ -938,11 +938,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CSetCursorPosHook.h"
+				RelativePath=".\CServerQueue.h"
 				>
 			</File>
 			<File
-				RelativePath=".\CServerQueue.h"
+				RelativePath=".\CSetCursorPosHook.h"
 				>
 			</File>
 			<File
