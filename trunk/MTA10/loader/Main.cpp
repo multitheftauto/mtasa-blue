@@ -25,11 +25,39 @@ HANDLE g_hMutex = CreateMutex(NULL, FALSE, TEXT(MTA_GUID));
 ///////////////////////////////////////////////////////////////
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+#ifndef MTA_DEBUG
+    ShowSplash ( hInstance );
+#endif
+
+    SString strArg1, strArg2;
+    SString ( std::string ( lpCmdLine ) ).Split ( " ", &strArg1, &strArg2 ); 
+
+    //////////////////////////////////////////////////////////
+    //
+    // Handle install mode
+    //
+    if ( strArg1 == "install" )
+    {
+        if ( strArg2 != "silent" )
+            StartPseudoProgress( hInstance, "MTA: San Andreas", "Installing update...." );
+
+        SetMTASAPathSource( true );
+        // Install new files
+        InstallFiles ();
+        AddReportLog ( SString ( "WinMain: Update completed (%s) %s", "", "" ) );
+        // Start new files
+        StopPseudoProgress();
+        ShellExecuteNonBlocking ( "open", PathJoin ( GetMTASAPath (), "Multi Theft Auto.exe" ) );
+        return 0;
+    }
+
+    SetMTASAPathSource( false );
+
     //////////////////////////////////////////////////////////
     //
     // Handle relaunching to fix up permissions
     //
-    if ( strcmp ( lpCmdLine, "fixpermissions" ) == 0 )
+    if ( strArg1 == "fixpermissions" )
     {
         // Should be administrator here
         ShowProgressDialog ( hInstance, "Fixing MTA permissions...", true );
@@ -79,7 +107,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     //
     if ( !TerminateGTAIfRunning () )
     {
-        MessageBox ( 0, "MTA: SA couldn't start because an another instance of GTA is running.", "Error", MB_ICONERROR );
+        DisplayErrorMessageBox ( "MTA: SA couldn't start because an another instance of GTA is running." );
         return 0;
     }
 
@@ -90,15 +118,15 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     SString strGTAPath;
     int iResult = GetGamePath ( strGTAPath );
     if ( iResult == 0 ) {
-        MessageBox ( 0, "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas.", "Error!", MB_ICONEXCLAMATION | MB_OK );
+        DisplayErrorMessageBox ( "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas." );
         return 5;
     }
     else if ( iResult == -1 ) {
-        MessageBox ( 0, "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas.", "Error!", MB_ICONEXCLAMATION | MB_OK );
+        DisplayErrorMessageBox ( "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas." );
         return 5;
     }
     else if ( iResult == -2 ) {
-        MessageBox ( 0, "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue.", "Error", MB_OK|MB_ICONEXCLAMATION );
+        DisplayErrorMessageBox ( "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue." );
         ShellExecute ( NULL, "open", "http://multitheftauto.com/downgrade/steam", NULL, NULL, SW_SHOWNORMAL );
         return 5;
     }
@@ -129,7 +157,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     //
     // Check file and directory permissions are ok
     //
-    if ( strcmp ( lpCmdLine, "skip_permissions_check" ) != 0 && IsVistaOrHigher () )
+    if ( strArg1 != "skip_permissions_check" && IsVistaOrHigher () )
     {
         if ( !CheckPermissions ( strMTASAPath, 3000 ) )
         {
@@ -138,6 +166,8 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             int hr = MessageBox ( 0, "MTA has detected that some of its files or directories do not have the correct permissions.\n\n"
                                  "Do you want to automatically fix this?", "Question", MB_YESNO | MB_ICONQUESTION );
 
+            AddReportLog ( SString ( "WinMain: Fix permissions %s", ( hr == IDYES ) ? "yes" : "no" ) );
+
             if ( hr == IDYES )
             {
                 // Permissions are not correct, so elevate and fix them
@@ -145,21 +175,8 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 SetDllDirectory( strMTASAPath );
                 SString strFile = strMTASAPath + "\\" + MTA_EXE_NAME;
 
-                SHELLEXECUTEINFO info;
-                memset( &info, 0, sizeof ( info ) );
-                info.cbSize = sizeof ( info );
-                info.fMask = SEE_MASK_NOCLOSEPROCESS;
-                info.lpVerb = "runas";
-                info.lpFile = strFile;
-                info.lpParameters = "fixpermissions";
-                info.lpDirectory = "";
-                info.nShow = SW_SHOWNORMAL;
-                ShellExecuteEx( &info );
-                if ( info.hProcess)
-                    WaitForSingleObject ( info.hProcess, INFINITE );
+                ShellExecuteBlocking ( "runas", strFile, "fixpermissions" );
             }
-
-            AddReportLog ( SString ( "WinMain: Fix permissions %s", ( hr == IDYES ) ? "yes" : "no" ) );
         }
     }
 
@@ -187,39 +204,42 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
             if ( strOperation == "files" || strOperation == "silent" )
             {
-                bool bShowProgress = ( strOperation == "files" );
-                if ( bShowProgress )
-                {
-                    ShowProgressDialog ( hInstance, "MTA: San Andreas" );
-                    UpdateProgress( 10, 100, "Installing update..." );
-                    Sleep ( 500 );
-                    UpdateProgress( 30, 100 );
-                }
+                //
+                // Update
+                //
 
-                // Run self extracting archive
-                SHELLEXECUTEINFO info;
-                memset( &info, 0, sizeof ( info ) );
-                info.cbSize = sizeof ( info );
-                info.fMask = SEE_MASK_NOCLOSEPROCESS;
-                info.lpVerb = "open";
-                info.lpFile = strFile;
-                info.lpParameters = "-s";
-                info.lpDirectory = strMTASAPath;
-                info.nShow = SW_SHOWNORMAL;
-                ShellExecuteEx( &info );
-                if ( info.hProcess)
-                    WaitForSingleObject ( info.hProcess, INFINITE );
+                // Start progress bar
+                if ( strOperation != "silent" )
+                    StartPseudoProgress( hInstance, "MTA: San Andreas", "Installing update..." );
 
-                if ( bShowProgress )
-                {
-                    UpdateProgress( 60, 100 );
-                    Sleep ( 500 );
-                    UpdateProgress( 90, 100 );
-                    Sleep ( 100 );
-                    HideProgressDialog ();
-                }
+                // Make temp path name and go there
+                SString strArchivePath, strArchiveName;
+                strFile.Split ( "\\", &strArchivePath, &strArchiveName, true );
 
-                AddReportLog ( SString ( "WinMain: Update complete (%s) %s", strOperation.c_str (), strFile.c_str () ) );
+                SString strTempPath = strArchivePath + "\\_" + strArchiveName + "_tmp_";
+                DelTree ( strTempPath, strMTASAPath );
+                MkDir ( strTempPath );
+                SetCurrentDirectory ( strTempPath );
+
+                // Run self extracting archive to extract files into the temp directory
+                ShellExecuteBlocking ( "open", strFile, "-s" );
+
+                // Stop progress bar
+                StopPseudoProgress();
+
+                // If a new "Multi Theft Auto.exe" exists, let that complete the install
+                SString strInstallProg = PathJoin ( strTempPath, "Multi Theft Auto.exe" );
+                if ( FileExists ( strInstallProg ) )
+                    if ( ShellExecuteNonBlocking ( "open", strInstallProg, std::string ( "install " ) + strOperation ) )
+                        return 0;
+
+                // Otherwise, do it here
+                if ( strOperation != "silent" )
+                    StartPseudoProgress( hInstance, "MTA: San Andreas", "Installing update....." );
+                InstallFiles();
+                StopPseudoProgress();
+
+                AddReportLog ( SString ( "WinMain: Update completed (%s) %s", strOperation.c_str (), strFile.c_str () ) );
             }
             else
             {

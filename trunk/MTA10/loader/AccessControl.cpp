@@ -110,8 +110,10 @@ int DoSetOnFile ( bool bYesInherit, const std::string& strFilename, const std::s
     if ( !bYesInherit )
         pushstring ( "/noinherit" );
     SetOnFile ( NULL, 1024, NULL, NULL );
-    DumpResult ();
-    return 0;
+
+    int NumErrors = stringStack.size ();
+    stringStack.clear ();
+    return NumErrors;
 }
 
 ////////////////////////////////////////////////////////////////////

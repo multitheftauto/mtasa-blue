@@ -70,6 +70,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="libv2.lib lua5.1d.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlibd_2008.lib Iphlpapi.lib"
 				ShowProgress="0"
 				OutputFile="C:\Program Files\MTA San Andreas\mods\deathmatch\Client_d.dll"
@@ -161,6 +162,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
+				LinkLibraryDependencies="false"
 				AdditionalOptions="/FIXED:NO"
 				AdditionalDependencies="libv2.lib lua5.1.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib_2008.lib"
 				OutputFile="C:\Program Files\MTA San Andreas\mods\deathmatch\Client.dll"
@@ -258,6 +260,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
+				LinkLibraryDependencies="false"
 				AdditionalOptions="/FIXED:NO"
 				AdditionalDependencies="libv2.lib lua5.1.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib_2008.lib"
 				OutputFile="..\..\..\output\MTA San Andreas\mods\deathmatch\client.dll"

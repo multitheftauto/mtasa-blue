@@ -11,11 +11,15 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <assert.h>
 
 static bool bCancelPressed = false;
 static HWND hwndSplash = NULL;
 static unsigned long ulSplashStartTime = 0;
 static HWND hwndProgressDialog = NULL;
+static unsigned long ulProgressStartTime = 0;
+static SString g_strMTASAPath;
+
 
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
@@ -162,6 +166,8 @@ void ShowSplash ( HINSTANCE hInstance )
         hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
         ulSplashStartTime = GetTickCount ();
     }
+    SetForegroundWindow ( hwndSplash );
+    SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
 }
 
 
@@ -243,18 +249,33 @@ void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, co
 }
 
 
+void SetMTASAPathSource ( bool bReadFromRegistry )
+{
+    if ( bReadFromRegistry )
+    {
+        g_strMTASAPath = GetMTASABaseDir();
+    }
+    else
+    {
+        // Get current module full path
+        char szBuffer[64000];
+        GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+
+        // Strip the module name out of the path.
+        PathRemoveFileSpec ( szBuffer );
+
+        // Save to a temp registry key
+        WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "Last Run Location", szBuffer );
+        g_strMTASAPath = szBuffer;
+    }
+}
+
+
 SString GetMTASAPath ( void )
 {
-    // Get current module full path
-    char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
-
-    // Strip the module name out of the path.
-    PathRemoveFileSpec ( szBuffer );
-
-    // Save to a temp registry key
-    WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "Last Run Location", szBuffer );
-    return szBuffer;
+    if ( g_strMTASAPath == "" )
+        SetMTASAPathSource ( true );
+    return g_strMTASAPath;
 }
 
 
@@ -339,18 +360,30 @@ void ShowProgressDialog( HINSTANCE hInstance, const SString& strTitle, bool bAll
 {
     if ( !hwndProgressDialog )
     {
+        HideSplash ();
         bCancelPressed = false;
         hwndProgressDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_PROGRESS_DIALOG), 0, DialogProc );
         SetWindowText ( hwndProgressDialog, strTitle );
         HWND hwndButton = GetDlgItem( hwndProgressDialog, IDCANCEL );
         ShowWindow( hwndButton, bAllowCancel ? SW_SHOW : SW_HIDE );
+        ulProgressStartTime = GetTickCount ();
     }
+    SetForegroundWindow ( hwndProgressDialog );
+    SetWindowPos ( hwndProgressDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
 }
 
 void HideProgressDialog ( void )
 {
     if ( hwndProgressDialog )
     {
+        // Show progress for at least two seconds
+        unsigned long ulTimeElapsed = GetTickCount () - ulProgressStartTime;
+        if ( ulTimeElapsed < 2000 )
+        {
+            UpdateProgress( 100, 100 );
+            Sleep ( 2000 - ulTimeElapsed );
+        }
+
         DestroyWindow ( hwndProgressDialog );
         hwndProgressDialog = NULL;
     }
@@ -386,6 +419,31 @@ bool UpdateProgress( int iPos, int iMax, const SString& strMsg )
 
 ///////////////////////////////////////////////////////////////
 //
+// Progress
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void StartPseudoProgress( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg )
+{
+    ShowProgressDialog ( hInstance, strTitle );
+    UpdateProgress( 10, 100, strMsg );
+    Sleep ( 100 );
+    UpdateProgress( 30, 100 );
+}
+
+void StopPseudoProgress( void )
+{
+    UpdateProgress( 60, 100 );
+    Sleep ( 100 );
+    UpdateProgress( 90, 100 );
+    Sleep ( 100 );
+    HideProgressDialog ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // FindFiles
 //
 // Find all files or directories at a path
@@ -409,6 +467,39 @@ std::vector < SString > FindFiles ( const SString& strMatch, bool bFiles, bool b
         FindClose( hFind );
     }
     return result;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// FindFilesRecursive
+//
+// Return a list of files inside strPath
+//
+///////////////////////////////////////////////////////////////
+void FindFilesRecursive ( const SString& strPath, std::vector < SString >& outFileList )
+{
+    std::list < SString > toDoList;
+    toDoList.push_back ( strPath );
+    while ( toDoList.size () )
+    {
+        SString strPathHere = toDoList.front ();
+        toDoList.pop_front ();
+
+        std::vector < SString > fileListHere = FindFiles ( strPathHere + "\\*", true, false );
+        std::vector < SString > dirListHere = FindFiles ( strPathHere + "\\*", false, true );
+
+        for ( unsigned int i = 0 ; i < fileListHere.size (); i++ )
+        {
+            SString filePathName = strPathHere + "\\" + fileListHere[i];
+            outFileList.push_back ( filePathName );
+        }
+        for ( unsigned int i = 0 ; i < dirListHere.size (); i++ )
+        {
+            SString dirPathName = strPathHere + "\\" + dirListHere[i];
+            toDoList.push_back ( dirPathName );
+        }
+    }
 }
 
 
@@ -569,15 +660,27 @@ void FixPermissions ( const std::string& strPath )
 
     int Total = dirPathList.size () + filePathList.size ();
 
+    int iFilesChecked = 0;
+    int iFilesFixed = 0;
+    int iFilesNotFixed = 0;
+
+    int iDirsChecked = 0;
+    int iDirsFixed = 0;
+    int iDirsNotFixed = 0;
+
     for ( unsigned int i = 0 ; i < dirPathList.size (); i++ )
     {
         const SString& strDirPathName = dirPathList[i];
         if ( ( i % 10 ) == 0 )
             if ( UpdateProgress ( i + Total, Total * 2, SString ( "%s", strDirPathName.substr ( strPath.length () ).c_str () ) ) )
-                return;
+                goto cancel;
 
+        iDirsChecked++;
         if ( !HasUsersGotFullAccess( strDirPathName ) )
-            DoSetOnFile ( false, strDirPathName, "(BU)","FullAccess" );
+            if ( !DoSetOnFile ( false, strDirPathName, "(BU)","FullAccess" ) )
+                iDirsFixed++;
+            else
+                iDirsNotFixed++;
     }
 
     for ( unsigned int i = 0 ; i < filePathList.size (); i++ )
@@ -585,11 +688,21 @@ void FixPermissions ( const std::string& strPath )
         const SString& strFilePathName = filePathList[i];
         if ( ( i % 10 ) == 0 )
             if ( UpdateProgress ( i + dirPathList.size () + Total, Total * 2, SString ( "%s", strFilePathName.substr ( strPath.length () ).c_str () ) ) )
-                return;
+                goto cancel;
 
+        iFilesChecked++;
         if ( !HasUsersGotFullAccess( strFilePathName ) )
-            DoSetOnFile ( false, strFilePathName, "(BU)","FullAccess" );
+            if ( !DoSetOnFile ( false, strFilePathName, "(BU)","FullAccess" ) )
+                iFilesFixed++;
+            else
+                iFilesNotFixed++;
     }
+
+cancel:
+    AddReportLog ( SString ( "WinMain: Fix permissions end - Dirs: %d/%d/%d/%d  Files: %d/%d/%d/%d"
+                , dirPathList.size (), iDirsChecked, iDirsFixed, iDirsNotFixed
+                , filePathList.size (), iFilesChecked, iFilesFixed, iFilesNotFixed
+                 ) );
 }
 
 
@@ -607,3 +720,190 @@ bool IsVistaOrHigher()
     return iMajor >= 6;
 }
 
+
+///////////////////////////////////////////////////////////////
+//
+// MyShellExecute
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" )
+{
+    SHELLEXECUTEINFO info;
+    memset( &info, 0, sizeof ( info ) );
+    info.cbSize = sizeof ( info );
+    info.fMask = SEE_MASK_NOCLOSEPROCESS;
+    info.lpVerb = strAction;
+    info.lpFile = strFile;
+    info.lpParameters = strParameters;
+    info.lpDirectory = strDirectory;
+    info.nShow = SW_SHOWNORMAL;
+    bool bResult = ShellExecuteExA( &info ) != FALSE;
+    if ( bBlocking && info.hProcess )
+        WaitForSingleObject ( info.hProcess, INFINITE );
+    return bResult;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// ShellExecuteBlocking
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory )
+{
+    return MyShellExecute ( true, strAction, strFile, strParameters, strDirectory );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// ShellExecuteNonBlocking
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory )
+{
+    return MyShellExecute ( false, strAction, strFile, strParameters, strDirectory );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// ConformPath
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString ConformPath ( const SString& strInPath )
+{
+    SString strPath = strInPath;
+    // '/' to '\'
+    strPath = strPath.Replace ( "/", "\\" );
+    // no '\\'
+    strPath = strPath.Replace ( "\\\\", "\\" );
+    // no trailing '\'
+    strPath = strPath.TrimEnd ( "\\" );
+    return strPath;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// PathJoin
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString PathJoin ( const SString& A, const SString& B )
+{
+    return ConformPath ( A + "\\" + B );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// DelTree
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool DelTree ( const SString& strPath, const SString& strInsideHere )
+{
+    // Safety: Make sure strPath is inside strInsideHere
+    if ( strPath.ToLower ().substr ( 0, strInsideHere.length () ) != strInsideHere.ToLower () )
+    {
+        assert ( 0 );
+        return false;
+    }
+
+    const SString strMTASAPath = ConformPath ( GetMTASAPath () );
+
+    DWORD dwBufferSize = strPath.length () + 3;
+    char *szBuffer = static_cast < char* > ( alloca ( dwBufferSize ) );
+    memset ( szBuffer, 0, dwBufferSize );
+    strncpy ( szBuffer, strPath, strPath.length () );
+    SHFILEOPSTRUCT sfos;
+
+    sfos.hwnd = NULL;
+    sfos.wFunc = FO_DELETE;
+    sfos.pFrom = szBuffer;
+    sfos.pTo = NULL;
+    sfos.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT | FOF_ALLOWUNDO;
+
+    int status = SHFileOperation(&sfos);
+    return status == 0;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// MkDir
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool MkDir ( const SString& strInPath )
+{
+    SString strPath = ConformPath ( strInPath ) + "\\";
+    MakeSureDirExists ( strPath );
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// FileCopy
+//
+// Copies a single file.
+//
+///////////////////////////////////////////////////////////////
+bool FileCopy ( const SString& strSrc, const SString& strDest )
+{
+    MakeSureDirExists ( strDest );
+
+    FILE* fhSrc = fopen ( strSrc, "rb" );
+    if ( !fhSrc )
+    {
+        return false;
+    }
+
+    FILE* fhDst = fopen ( strDest, "wb" );
+    if ( !fhDst )
+    {
+        fclose ( fhSrc );
+        return false;
+    }
+
+    char cBuffer[16384];
+    while ( true )
+    {
+        size_t dataLength = fread ( cBuffer, 1, 16384, fhSrc );
+        if ( dataLength == 0 )
+            break;
+        fwrite ( cBuffer, 1, dataLength, fhDst );
+    }
+
+    fclose ( fhSrc );
+    fclose ( fhDst );
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// GetCurrentDir
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString GetCurrentDir ( void )
+{
+    char szCurDir [ 1024 ] = "";
+    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
+    return szCurDir;
+}

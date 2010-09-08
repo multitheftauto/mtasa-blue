@@ -55,7 +55,7 @@ end=ok
 */
 
 //
-// Note: Due to a bug, pre 1.0.4 1891 clients cannot download from http servers that send no data with the http header
+// Note: Due to a bug, pre 1.0.4 1983 clients cannot download from http servers that send no data with the http header
 //
 // To help get round this:
 //  * Use 'mirror2' for http servers that send no data with the http header (e.g. Apache/2.2.9)
@@ -251,6 +251,7 @@ public:
     void                _DialogHide                         ( void );
     void                _End                                ( void );
     void                _ExitGame                           ( void );
+    void                _ResetCheckTimer                    ( void );
     void                _PollQuestionNoYes                  ( void );
     void                _PollAnyButton                      ( void );
     void                _DialogConnectingWait               ( void );
@@ -364,7 +365,7 @@ void CVersionUpdater::DoPulse ( void )
         CVARS_GET ( "last_version_check", uiLastCheckTime );
 
         // Only check once a day
-        if ( uiTimeNow - uiLastCheckTime > 60 * 60 * 24 )
+        if ( uiTimeNow - uiLastCheckTime > 60 * 60 * 24 || uiTimeNow < uiLastCheckTime )
         {
             RunProgram ( "PeriodicCheck" );
         }
@@ -414,15 +415,13 @@ void CVersionUpdater::DoPulse ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::InitiateUpdate ( const SString& strType, const SString& strHost )
 {
-    if ( IsBusy () )
-        return;
-
     if ( strType == "Mandatory" )
     {
         CCore::GetSingleton ().RemoveMessageBox ();
         RunProgram ( "ServerSaysUpdate" );
     }
     else
+    if ( strType == "Optional" || strType == "Recommended" )
     {
         CCore::GetSingleton ().RemoveMessageBox ();
         MapSet ( m_DoneOptionalMap, strHost, 1 );
@@ -587,6 +586,7 @@ void CVersionUpdater::InitPrograms ()
         ADDCOND ( "if QueryResponse.update goto dload");        // If update server says 'update' then goto dload:
         ADDCOND ( "if QueryResponse.files goto dload");         // If update server says 'files' then goto dload:
         ADDCOND ( "if QueryResponse.silent goto silentdload");  // If update server says 'silent' then goto silentdload:
+        ADDCOND ( "if QueryResponse.noupdate goto noupdate");   // If update server says 'noupdate' then goto noupdate:
         ADDINST (   _End );
 
         ADDLABL ( "dload:" );
@@ -600,6 +600,10 @@ void CVersionUpdater::InitPrograms ()
         ADDLABL ( "silentdload:" );
         ADDINST (   _StartFileDownload );                       // Fetch update binary from update mirror
         ADDINST (   _QUpdateResult );                           // Maybe set OnRestartCommand
+        ADDINST (   _End );
+
+        ADDLABL ( "noupdate:" );
+        ADDINST (   _ResetCheckTimer );                         // Wait 24hrs before checking again
         ADDINST (   _End );
 
         ADDLABL ( "end:" );
@@ -874,6 +878,20 @@ void CVersionUpdater::_ExitGame ( void )
 {
     // Exit game
     CCore::GetSingleton ().Quit ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_ResetCheckTimer
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_ResetCheckTimer ( void )
+{
+    unsigned int uiTimeNow = static_cast < unsigned int > ( time ( NULL ) );
+    CVARS_SET ( "last_version_check", uiTimeNow );
 }
 
 
@@ -1513,11 +1531,11 @@ int CVersionUpdater::DoSendQueryToNextServer ( void )
 
     // Make the query URL
     SString strQueryURL = strServerURL;
-    strQueryURL = strQueryURL.ReplaceSubString ( "%VERSION%", strPlayerVersion );
-    strQueryURL = strQueryURL.ReplaceSubString ( "%ID%", szSerial );
-    strQueryURL = strQueryURL.ReplaceSubString ( "%STATUS%", szStatus );
-    strQueryURL = strQueryURL.ReplaceSubString ( "%TYPE%", m_strServerSaysType );
-    strQueryURL = strQueryURL.ReplaceSubString ( "%REFER%", m_strServerSaysHost );
+    strQueryURL = strQueryURL.Replace ( "%VERSION%", strPlayerVersion );
+    strQueryURL = strQueryURL.Replace ( "%ID%", szSerial );
+    strQueryURL = strQueryURL.Replace ( "%STATUS%", szStatus );
+    strQueryURL = strQueryURL.Replace ( "%TYPE%", m_strServerSaysType );
+    strQueryURL = strQueryURL.Replace ( "%REFER%", m_strServerSaysHost );
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
@@ -1664,7 +1682,6 @@ int CVersionUpdater::DoPollDownload ( void )
             if ( status == 404 && m_DownloadInfo.serverList.size () )
                 ListRemove( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
 
-            //m_strStage = "NextMirror";
             SetCondition ( "Download", "Fail" );
             AddReportLog ( SString ( "DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_DownloadInfo.strFilename.c_str(), status, GetTickCount64_ () - m_llTimeStart ) );
             return RES_FAIL;
@@ -1763,9 +1780,9 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
 
     // Make the query URL
     SString strQueryURL = strServerURL;
-    strQueryURL = strQueryURL.ReplaceSubString ( "%VERSION%", strPlayerVersion );
-    strQueryURL = strQueryURL.ReplaceSubString ( "%ID%", szSerial );
-    strQueryURL = strQueryURL.ReplaceSubString ( "%STATUS%", szStatus );
+    strQueryURL = strQueryURL.Replace ( "%VERSION%", strPlayerVersion );
+    strQueryURL = strQueryURL.Replace ( "%ID%", szSerial );
+    strQueryURL = strQueryURL.Replace ( "%STATUS%", szStatus );
 
     //
     // Get post contents
