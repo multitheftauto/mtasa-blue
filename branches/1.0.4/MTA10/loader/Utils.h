@@ -27,6 +27,7 @@ long    DisplayErrorMessageBox      ( const SString& strMessage );
 SString ReadRegistryStringValue     ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, int* iResult = NULL );
 void    WriteRegistryStringValue    ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, const char* szBuffer );
 
+void    SetMTASAPathSource          ( bool bReadFromRegistry );
 SString GetMTASAPath                ( void );
 int     GetGamePath                 ( SString& strOutResult );
 
@@ -34,8 +35,23 @@ void    ShowProgressDialog          ( HINSTANCE hInstance, const SString& strTit
 void    HideProgressDialog          ( void );
 bool    UpdateProgress              ( int iPos, int iMax, const SString& strMsg = "" );
 
+void    FindFilesRecursive          ( const SString& strPath, std::vector < SString >& outFileList );
 bool    CheckPermissions            ( const std::string& strPath, unsigned int uiMaxTimeMs );
 void    FixPermissions              ( const std::string& strPath );
 bool    IsVistaOrHigher             ( void );
+
+bool    ShellExecuteBlocking        ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" );
+bool    ShellExecuteNonBlocking     ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" );
+
+SString ConformPath                 ( const SString& strPath );
+SString PathJoin                    ( const SString& A, const SString& B );
+bool    DelTree                     ( const SString& strPath, const SString& strInsideHere );
+bool    MkDir                       ( const SString& strPath );
+
+bool    FileCopy                    ( const SString& strSrc, const SString& strDest );
+SString GetCurrentDir               ( void );
+
+void    StartPseudoProgress           ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
+void    StopPseudoProgress            ( void );
 
 #endif

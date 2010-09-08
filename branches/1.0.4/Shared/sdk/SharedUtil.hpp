@@ -367,33 +367,19 @@ bool SString::Split ( const SString& strDelim, SString* pstrLeft, SString* pstrR
 
 
 //
-// Replace any char in szOld with szNew
+// Replace all occurrences of the string szOld with szNew
 //
 SString SString::Replace ( const char* szOld, const char* szNew ) const
 {
-    // Bad things will happen if szNew exists in szOld
-    if( strlen ( szNew ) == 1 && std::string ( szOld ).find ( szNew ) != std::string::npos )
-        return *this;
-
     int iOldLength = strlen ( szOld );
-    SString strResult = *this;
-    int idx = 0;
-    while( ( idx = strResult.find_first_of ( szOld, idx ) ) >= 0 )
-        strResult.replace ( idx, iOldLength, szNew );
-    return strResult;
-}
-
-
-//
-// Replace all szOlds with szNews
-//
-SString SString::ReplaceSubString ( const char* szOld, const char* szNew ) const
-{
-    int iOldLength = strlen ( szOld );
+    int iNewLength = strlen ( szNew );
     SString strResult = *this;
     int idx = 0;
     while( ( idx = strResult.find ( szOld, idx ) ) >= 0 )
+    {
         strResult.replace ( idx, iOldLength, szNew );
+        idx += iNewLength - iOldLength + 1;
+    }
     return strResult;
 }
 

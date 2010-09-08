@@ -47,7 +47,7 @@ bool CPlayerJoinDataPacket::Read ( NetBitStreamInterface& BitStream )
     }
 
     if ( m_usBitStreamVersion >= 0x0e )
-        m_bOptionalUpdateInfoRequired = BitStream.ReadBit ();
+        m_bOptionalUpdateInfoRequired = BitStream.ReadBit () && ( m_usBitStreamVersion >= 0x10 );
     else
         m_bOptionalUpdateInfoRequired = false;
 
