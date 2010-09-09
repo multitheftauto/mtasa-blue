@@ -186,7 +186,8 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pBanManager );
     SAFE_DELETE ( m_pTeamManager );
     SAFE_DELETE ( m_pMainConfig );
-    m_pRegistryManager->CloseRegistry ( m_pRegistry );
+    if ( m_pRegistryManager )
+        m_pRegistryManager->CloseRegistry ( m_pRegistry );
     m_pRegistry = NULL;
     SAFE_DELETE ( m_pAccountManager );
     SAFE_DELETE ( m_pRegistryManager );
