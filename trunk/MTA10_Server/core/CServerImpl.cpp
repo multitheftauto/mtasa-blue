@@ -20,6 +20,7 @@
 #include "MTAPlatform.h"
 #include "ErrorCodes.h"
 #include <cstdio>
+#include <signal.h>
 
 // Define libraries
 char szNetworkLibName[] = "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
@@ -667,6 +668,14 @@ void CServerImpl::HandleInput ( void )
 
 bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
 {
+#ifndef WIN32
+    // Default to a simple console if running under 'nohup'
+    struct sigaction sa;
+    sigaction ( SIGHUP, NULL, &sa );
+    if ( sa.sa_handler == SIG_IGN )
+        g_bNoTopBar = true;
+#endif
+
     // Iterate our arguments
     unsigned char ucNext = 0;
     for ( int i = 0; i < iArgumentCount; i++ )
@@ -707,6 +716,10 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                 else if ( strcmp ( szArguments [i], "-t" ) == 0 )
                 {
                     g_bNoTopBar = true;
+                }
+                else if ( strcmp ( szArguments [i], "-f" ) == 0 )
+                {
+                    g_bNoTopBar = false;
                 }
 
                 #ifdef WIN32
