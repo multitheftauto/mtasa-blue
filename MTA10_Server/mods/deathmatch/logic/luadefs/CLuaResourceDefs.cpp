@@ -56,6 +56,7 @@ void CLuaResourceDefs::LoadFunctions ( void )
 
     // Misc
     CLuaCFunctions::AddFunction ( "call", CLuaResourceDefs::call );
+    CLuaCFunctions::AddFunction ( "refreshResources", CLuaResourceDefs::refreshResources );
 }
 
 
@@ -1087,5 +1088,18 @@ int CLuaResourceDefs::call ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "call" );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaResourceDefs::refreshResources ( lua_State* luaVM )
+{
+    bool bRefreshAll = false;
+    
+    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
+        bRefreshAll = lua_toboolean ( luaVM, 1 ) ? true : false;
+
+    m_pResourceManager->Refresh ( bRefreshAll );
+
+    lua_pushboolean ( luaVM, true );
     return 1;
 }
