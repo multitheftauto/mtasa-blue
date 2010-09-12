@@ -5039,6 +5039,22 @@ bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CVehicle* pVehicle, 
 }
 
 
+bool CStaticFunctionDefinitions::SetVehicleTurretPosition ( CVehicle* pVehicle, float fHorizontal, float fVertical )
+{
+    assert ( pVehicle );
+
+    pVehicle->SetTurretPosition ( fHorizontal, fVertical );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( fHorizontal );
+    BitStream.pBitStream->Write ( fVertical );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_TURRET_POSITION, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
 CMarker* CStaticFunctionDefinitions::CreateMarker ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo )
 {
     assert ( szType );

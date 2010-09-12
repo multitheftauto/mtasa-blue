@@ -2315,6 +2315,29 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetVehicleTurretPosition ( lua_State *luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA
+        && lua_type( luaVM, 2 ) == LUA_TNUMBER
+        && lua_type( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            float fHorizontal = ( float ) lua_tonumber ( luaVM, 2 );
+            float fVertical   = ( float ) lua_tonumber ( luaVM, 3 );
+
+            pVehicle->SetTurretRotation ( fHorizontal, fVertical );
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 #if WITH_VEHICLE_HANDLING
 int CLuaFunctionDefs::SetVehicleHandlingData ( lua_State* luaVM )
 {

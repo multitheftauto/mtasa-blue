@@ -340,6 +340,7 @@ public:
     LUA_DECLARE ( SetTrainSpeed );
     LUA_DECLARE ( SetVehicleGravity );
     LUA_DECLARE ( SetVehicleHeadLightColor );
+    LUA_DECLARE ( SetVehicleTurretPosition );
 #if WITH_VEHICLE_HANDLING
     LUA_DECLARE ( SetVehicleHandlingData );
 #endif

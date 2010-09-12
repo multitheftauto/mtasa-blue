@@ -5743,6 +5743,29 @@ int CLuaFunctionDefinitions::SetVehicleHeadLightColor ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetVehicleTurretPosition ( lua_State *luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA
+        && lua_type( luaVM, 2 ) == LUA_TNUMBER
+        && lua_type( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            float fHorizontal = ( float ) lua_tonumber ( luaVM, 2 );
+            float fVertical   = ( float ) lua_tonumber ( luaVM, 3 );
+
+            if ( CStaticFunctionDefinitions::SetVehicleTurretPosition ( pVehicle, fHorizontal, fVertical ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
 {
