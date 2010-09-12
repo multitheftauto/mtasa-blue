@@ -430,6 +430,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setTrainDirection", CLuaFunctionDefinitions::SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", CLuaFunctionDefinitions::SetTrainSpeed );
     CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", CLuaFunctionDefinitions::SetVehicleHeadLightColor );
+    CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", CLuaFunctionDefinitions::SetVehicleTurretPosition );
 
     // Marker functions
     CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefinitions::CreateMarker );

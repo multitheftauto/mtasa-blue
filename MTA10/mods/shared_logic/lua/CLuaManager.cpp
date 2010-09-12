@@ -521,6 +521,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleTaxiLightOn", CLuaFunctionDefs::SetVehicleTaxiLightOn );
     CLuaCFunctions::AddFunction ( "setVehicleGravity", CLuaFunctionDefs::SetVehicleGravity );
     CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", CLuaFunctionDefs::SetVehicleHeadLightColor );
+    CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", CLuaFunctionDefs::SetVehicleTurretPosition );
 #if WITH_VEHICLE_HANDLING
     CLuaCFunctions::AddFunction ( "setVehicleHandling", CLuaFunctionDefs::SetVehicleHandlingData );
 #endif
