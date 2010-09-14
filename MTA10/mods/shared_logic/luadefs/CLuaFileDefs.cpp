@@ -2,8 +2,8 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/luadefs/CLuaFileDefs.cpp
-*  PURPOSE:     Lua file handling definitions class
+*  FILE:        mods/shared_logic/luadefs/CLuaFileDefs.cpp
+*  PURPOSE:     Lua file definitions class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               lil_Toady <>
 *               Cecill Etheredge <>
