@@ -247,6 +247,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getResourceRootElement", CLuaFunctionDefs::GetResourceRootElement );
     CLuaCFunctions::AddFunction ( "getResourceGUIElement", CLuaFunctionDefs::GetResourceGUIElement );
     CLuaCFunctions::AddFunction ( "getResourceDynamicElementRoot", CLuaFunctionDefs::GetResourceDynamicElementRoot );
+    CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", CLuaFunctionDefs::GetResourceExportedFunctions );
 
     // Event funcs
     CLuaCFunctions::AddFunction ( "addEvent", CLuaFunctionDefs::AddEvent );

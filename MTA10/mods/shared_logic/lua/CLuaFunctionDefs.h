@@ -50,6 +50,7 @@ public:
     LUA_DECLARE ( GetResourceRootElement );
     LUA_DECLARE ( GetResourceGUIElement );
     LUA_DECLARE ( GetResourceDynamicElementRoot );
+    LUA_DECLARE ( GetResourceExportedFunctions );
 
     // Event functions
     LUA_DECLARE ( AddEvent );

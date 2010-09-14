@@ -965,20 +965,15 @@ int CLuaResourceDefs::getResourceMapRootElement ( lua_State* luaVM )
 int CLuaResourceDefs::getResourceExportedFunctions ( lua_State* luaVM )
 {
     CResource* resource = NULL;
-    char * szConfigName = NULL;
+    
     // resource
     if ( argtype ( 1, LUA_TLIGHTUSERDATA ) )
-    {
         resource = lua_toresource ( luaVM, 1 );
-        szConfigName = (char *)lua_tostring ( luaVM, 2 );
-    }
     else if ( argtype ( 1, LUA_TNONE ) )
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
-        {
             resource = pLuaMain->GetResource ();
-        }
     }
 
     if ( resource )

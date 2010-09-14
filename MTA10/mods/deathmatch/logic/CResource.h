@@ -86,6 +86,9 @@ public:
     // Use this for cursor showing/hiding
     void                    ShowCursor                  ( bool bShow, bool bToggleControls = true );
 
+    inline std::list < CExportedFunction* >::iterator    IterBeginExportedFunctions   ( void )        { return m_exportedFunctions.begin(); }
+    inline std::list < CExportedFunction* >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }
+
 private:
     unsigned short          m_usID;
     char                    m_szResourceName [ MAX_RESOURCE_NAME_LENGTH ];
