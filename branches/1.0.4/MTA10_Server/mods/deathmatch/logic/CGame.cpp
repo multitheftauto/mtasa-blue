@@ -412,10 +412,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Let the main config handle selecting settings from the command line where appropriate
     m_pMainConfig->SetCommandLineParser ( &m_CommandLineParser );
 
-    const char* szServerIP = m_pMainConfig->GetServerIP ().c_str ();
-
-    if ( szServerIP && szServerIP [0] == '\0' )
-        szServerIP = NULL;
+    const SString strServerIP = m_pMainConfig->GetServerIP ();
 
     unsigned short usServerPort = m_pMainConfig->GetServerPort ();
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
@@ -431,9 +428,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Enable it if required
     if ( m_pMainConfig->IsHTTPEnabled () )
     {
-        if ( !m_pHTTPD->StartHTTPD ( szServerIP, m_pMainConfig->GetHTTPPort () ) )
+        if ( !m_pHTTPD->StartHTTPD ( strServerIP, m_pMainConfig->GetHTTPPort () ) )
         {
-            CLogger::ErrorPrintf ( "Could not start HTTP server on interface '%s' and port '%u'!\n", szServerIP, m_pMainConfig->GetHTTPPort () );
+            CLogger::ErrorPrintf ( "Could not start HTTP server on interface '%s' and port '%u'!\n", strServerIP.c_str (), m_pMainConfig->GetHTTPPort () );
             return false;
         }
     }
@@ -470,7 +467,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
                                 MTA_DM_BUILDTAG_SHORT,
                                 m_pMainConfig->GetServerName ().c_str (),
-                                szServerIP ? szServerIP : "",
+                                strServerIP.c_str (),
                                 usServerPort,
                                 pszLogFileName,
                                 uiMaxPlayers,
@@ -626,9 +623,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     unsigned int uiMTUSize = m_pMainConfig->GetMTUSize ();
 
     // Try to start the network
-    if ( !g_pNetServer->StartNetwork ( szServerIP, usServerPort, uiMTUSize, uiMaxPlayers ) )
+    if ( !g_pNetServer->StartNetwork ( strServerIP, usServerPort, uiMTUSize, uiMaxPlayers ) )
     {
-        CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", szServerIP, usServerPort );
+        CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", strServerIP.c_str (), usServerPort );
         return false;
     }
 
@@ -655,7 +652,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // If ASE is enabled
     if ( m_pMainConfig->GetASEEnabled () || !m_pMainConfig->GetDontBroadcastLan() )
     {
-        m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), szServerIP, !m_pMainConfig->GetDontBroadcastLan() && !m_pMainConfig->GetASEEnabled () );
+        m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), strServerIP, !m_pMainConfig->GetDontBroadcastLan() && !m_pMainConfig->GetASEEnabled () );
 
         if ( m_pMainConfig->GetSerialVerificationEnabled () )
             m_pASE->SetRuleValue ( "SerialVerification", "yes" );
@@ -671,7 +668,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             _snprintf ( szURL, sizeof(szURL) - 1, QUERY_URL_GAME_MONITOR, usServerPort + 123);
 
             CHTTPRequest * request = new CHTTPRequest ( szURL );
-            request->SetLocalIP ( szServerIP );
+            request->SetLocalIP ( strServerIP );
             CHTTPResponse * response = request->Send ( pTCP );
             if ( !response )
                 CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
