@@ -256,8 +256,18 @@ int CLuaFunctionDefs::GetVehicleOccupants ( lua_State* luaVM )
             // Create a new table
             lua_newtable ( luaVM );
 
+            // Get the maximum amount of passengers
+            unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( pVehicle->GetModel ( ) );
+
+            // Make sure that if the vehicle doesn't have any seats, the function returns false
+            if ( ucMaxPassengers == 255 )
+            {
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+
             // Add All Occupants
-            for ( unsigned char ucSeat = 0; ucSeat <= CClientVehicleManager::GetMaxPassengerCount ( pVehicle->GetModel () ); ++ ucSeat )
+            for ( unsigned char ucSeat = 0; ucSeat <= ucMaxPassengers; ++ ucSeat )
             {
                 CClientPed* pPed = pVehicle->GetOccupant ( ucSeat );
                 if ( pPed )
