@@ -230,9 +230,9 @@ namespace SharedUtil
     template < class T, class V, class TR, class T2 >
     void MultiFind ( const std::multimap < T, V, TR >& collection, T2& key, std::vector < V >* pResult )
     {
-        typedef const std::multimap < T, V, TR > iimap;
-        std::pair<iimap::const_iterator, iimap::const_iterator> itp = collection.equal_range ( key );
-        for (iimap::const_iterator it = itp.first; it != itp.second; ++it)
+        typedef typename std::multimap < T, V, TR > ::const_iterator const_iter_t;
+        std::pair < const_iter_t, const_iter_t > itp = collection.equal_range ( key );
+        for ( const_iter_t it = itp.first ; it != itp.second ; ++it )
             pResult->push_back ( it->second );
     }
 

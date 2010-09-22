@@ -10,6 +10,10 @@
 *
 *****************************************************************************/
 
+#ifndef WIN32
+    unsigned long GetTickCount ( void );
+    #include "sys/time.h"
+#endif
 
 //
 // Retrieves the number of milliseconds that have elapsed since some arbitrary point in time.

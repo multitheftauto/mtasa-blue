@@ -48,7 +48,6 @@ namespace SharedUtil
     SString GetCurrentWorkingDirectory ( void );
     std::vector < SString > FindFiles ( const SString& strMatch, bool bFiles, bool bDirectories );
     SString MakeUniquePath ( const SString& strPathFilename );
-    void MoveFileOrDirOutOfTheWay ( const SString& strPath );
 
     SString GetMTAAppDataPath ( void );
     SString GetMTATempPath ( void );

@@ -10,8 +10,10 @@
 *
 *****************************************************************************/
 
-#include "shellapi.h"
-#include "shlobj.h"
+#ifdef WIN32
+    #include "shellapi.h"
+    #include "shlobj.h"
+#endif
 
 //
 // Returns true if the file exists
@@ -194,7 +196,7 @@ SString SharedUtil::GetMTATempPath ( void )
 
 
 
-
+#ifdef WIN32
 ///////////////////////////////////////////////////////////////
 //
 // DelTree
@@ -226,8 +228,9 @@ bool SharedUtil::DelTree ( const SString& strPath, const SString& strInsideHere 
     int status = SHFileOperation(&sfos);
     return status == 0;
 }
+#endif
 
-
+#ifdef WIN32
 ///////////////////////////////////////////////////////////////
 //
 // MkDir
@@ -242,7 +245,7 @@ bool SharedUtil::MkDir ( const SString& strInPath, bool bTree )
     MakeSureDirExists ( strPath + "\\" );
     return FindFiles ( strPath, false, true ).size () > 0;
 }
-
+#endif
 
 ///////////////////////////////////////////////////////////////
 //
@@ -283,6 +286,7 @@ bool SharedUtil::FileCopy ( const SString& strSrc, const SString& strDest )
 }
 
 
+#ifdef WIN32
 ///////////////////////////////////////////////////////////////
 //
 // GetCurrentWorkingDirectory
@@ -296,9 +300,10 @@ SString SharedUtil::GetCurrentWorkingDirectory ( void )
     GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
     return szCurDir;
 }
+#endif
 
 
-
+#ifdef WIN32
 ///////////////////////////////////////////////////////////////
 //
 // FindFiles
@@ -325,7 +330,7 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
     }
     return strResult;
 }
-
+#endif
 
 bool ExtractFilename ( const SString& strPathFilename, SString* strPath, SString* strFilename )
 {
@@ -339,6 +344,7 @@ bool ExtractExt ( const SString& strFilename, SString* strMain, SString* strExt 
 }
 
 
+#ifdef WIN32
 SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
 {
     SString strBeforeUniqueChar, strAfterUniqueChar;
@@ -366,23 +372,5 @@ SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
     }
     return strTest;
 }
+#endif
 
-
-void SharedUtil::MoveFileOrDirOutOfTheWay ( const SString& strPath )
-{
-    // Must be fully qualified path, at least two levels deep
-
-    std::vector < SString > parts;
-    strPath.Split ( "\\", parts );
-
-    if ( parts.size () < 2 )
-        return;
-
-/*
-    // Remove any existing dir/file
-    DelTree ( strPath, strInsideHere );
-    rmdir ( strPath );
-    remove ( strPath );
-*/
-    rename( strPath, MakeUniquePath ( strPath ) );
-}

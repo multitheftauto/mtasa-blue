@@ -273,7 +273,7 @@ SString SharedUtil::GetReportLogContents ( void )
         memset ( &when, 0, sizeof ( when ) );
         when.tm_year = YEAR - 1900;
         when.tm_mon = MONTH;
-        when.tm_mday = DAY - 5;
+        when.tm_mday = DAY;
         return ( int )( time ( NULL ) - mktime( &when ) ) / ( 60 * 60 * 24 );
     }
 
