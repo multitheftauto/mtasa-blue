@@ -13,6 +13,31 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "direct.h"
+
+
+// Command line as map
+class CUPL : public CArgMap
+{
+public:
+    CUPL ( void )
+        :  CArgMap ( "=", "&" )
+    {}
+};
+
+// Command line keys
+#define INSTALL_STAGE  "install_stage"
+#define INSTALL_LOC    "install_loc"
+#define ADMIN_STATE    "admin_state"
+#define SILENT_OPT     "silent_opt"
+
+int     DoInstallStage              ( const CUPL& UPL );
+SString CheckOnRestartCommand       ( void );
+int     LaunchGame                  ( LPSTR lpCmdLine );
+
+HINSTANCE g_hInstance = NULL;
+LPSTR g_lpCmdLine = NULL;
+
 
 ///////////////////////////////////////////////////////////////
 //
@@ -23,47 +48,252 @@
 ///////////////////////////////////////////////////////////////
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+    g_hInstance = hInstance;
+    g_lpCmdLine = lpCmdLine;
 #ifndef MTA_DEBUG
     ShowSplash ( hInstance );
 #endif
 
-    SString strArg1, strArg2;
-    SString ( std::string ( lpCmdLine ) ).Split ( " ", &strArg1, &strArg2 ); 
-
     //////////////////////////////////////////////////////////
     //
-    // Handle install mode
+    // Parse command line
     //
-    if ( strArg1 == "install" )
-    {
-        if ( strArg2 != "silent" )
-            StartPseudoProgress( hInstance, "MTA: San Andreas", "Installing update...." );
 
-        SetMTASAPathSource( true );
+    CUPL UPL;
+    UPL.SetFromString ( lpCmdLine );
+
+    // No stage parameter means it's been run by the user
+    if ( !UPL.Contains ( INSTALL_STAGE ) )
+    {
+        AddReportLog ( 1040, SString ( "*", 0 ) );
+        UPL.Set ( INSTALL_STAGE, "initial" );
+        UPL.Set ( INSTALL_LOC, "near" );
+        UPL.Set ( ADMIN_STATE, "no" );   // Could be yes, but assuming 'no' works best
+    }
+
+    // If not running from the launch directory, get the launch directory location from the registry
+    if ( UPL.Get ( INSTALL_LOC ) == "far" )
+        SetMTASAPathSource ( true );
+    else
+        SetMTASAPathSource ( false );
+
+
+    BOOL bIsAdmin = IsUserAdmin ();
+    SString RealOSVersion = GetRealOSVersion ();
+
+    DWORD pid = GetCurrentProcessId();
+    SString GotPathFrom = ( UPL.Get( INSTALL_LOC ) == "far" ) ? "registry" : "module location";
+    AddReportLog ( 1041, SString ( "* Launch * pid:%d '%s' RealOSVersion:%s IsUserAdmin:%d MTASAPath set from %s '%s'", pid, GetMTASAModuleFileName ().c_str (), RealOSVersion.c_str (), bIsAdmin, GotPathFrom.c_str (), GetMTASAPath ().c_str () ) );
+
+
+    SString OSVersion = GetOSVersion ();
+    if  ( OSVersion != RealOSVersion )
+        AddReportLog ( 1043, SString ( "RealOSVersion:%s  OSVersion:%s", RealOSVersion.c_str (), OSVersion.c_str () ) );
+
+    // Do next stage
+    int iReturnCode = DoInstallStage ( UPL );
+
+    AddReportLog ( 1044, SString ( "* End (%d)* pid:%d",  iReturnCode, pid ) );
+    return iReturnCode;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// ChangeInstallUPL
+//
+//
+//
+//////////////////////////////////////////////////////////
+int _ChangeInstallUPL ( const CUPL& UPLOld, const CUPL& UPLNew, bool bBlocking )
+{
+    AddReportLog ( 1045, SString ( "ChangeInstallUPL: '%s' -> '%s'", UPLOld.ToString ().c_str (), UPLNew.ToString ().c_str () ) );
+
+    const SString strLocOld     = UPLOld.Get ( INSTALL_LOC );
+    const SString strAdminOld   = UPLOld.Get ( ADMIN_STATE );
+
+    const SString strLocNew     = UPLNew.Get ( INSTALL_LOC );
+    const SString strAdminNew   = UPLNew.Get ( ADMIN_STATE );
+
+
+    // If loc or admin state is changing, relaunch
+    if ( strLocOld != strLocNew || strAdminOld != strAdminNew )
+    {
+        if ( strAdminOld == "yes" && strAdminNew == "no" )
+            return 0;   // admin is always an inner process. Exit to drop rights.
+
+        SString strAction = strAdminNew == "yes" ? "runas" : "open";
+        SString strFile;
+        if ( strLocNew == "far" )
+            strFile = PathJoin ( GetCurrentWorkingDirectory (), "Multi Theft Auto.exe" );
+        else
+            strFile = PathJoin ( GetMTASAPath (), "Multi Theft Auto.exe" );
+
+        if ( bBlocking )
+        {
+            if ( ShellExecuteBlocking ( strAction, strFile, UPLNew.ToString () ) )
+                return 0;
+        }
+        else
+        {
+            if ( ShellExecuteNonBlocking ( strAction, strFile, UPLNew.ToString () ) )
+                return 0;
+        }
+    }
+
+    return DoInstallStage ( UPLNew );
+}
+
+
+int ChangeInstallUPL ( const CUPL& UPLOld, const SString& strStageNew, const SString& strLocNew, const SString& strAdminNew, const CUPL& UPLOptions = CUPL() )
+{
+    CUPL UPLNew = UPLOld;
+    if ( strStageNew != "*" )   UPLNew.Set ( INSTALL_STAGE, strStageNew );
+    if ( strLocNew   != "*" )   UPLNew.Set ( INSTALL_LOC,   strLocNew );
+    if ( strAdminNew != "*" )   UPLNew.Set ( ADMIN_STATE,   strAdminNew );
+    UPLNew.Merge ( UPLOptions );
+    return _ChangeInstallUPL ( UPLOld, UPLNew, false );
+}
+
+int ChangeInstallUPLBlocking ( const CUPL& UPLOld, const SString& strStageNew, const SString& strLocNew, const SString& strAdminNew, const CUPL& UPLOptions = CUPL() )
+{
+    CUPL UPLNew = UPLOld;
+    if ( strStageNew != "*" )   UPLNew.Set ( INSTALL_STAGE, strStageNew );
+    if ( strLocNew   != "*" )   UPLNew.Set ( INSTALL_LOC,   strLocNew );
+    if ( strAdminNew != "*" )   UPLNew.Set ( ADMIN_STATE,   strAdminNew );
+    UPLNew.Merge ( UPLOptions );
+    return _ChangeInstallUPL ( UPLOld, UPLNew, true );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// DoInstallStage
+//
+//
+//
+//////////////////////////////////////////////////////////
+int DoInstallStage ( const CUPL& UPL ) 
+{
+    AddReportLog ( 1046, SString ( "DoInstallStage: '%s'", UPL.ToString ().c_str () ) );
+
+    if ( UPL.Get( INSTALL_STAGE ) == "initial" )
+    {
+        const SString strResult = CheckOnRestartCommand ();
+        if ( strResult.Contains ( "install" ) )
+        {
+            SString strLoc = strResult.Contains ( "far" ) ? "far" : "near";
+            CUPL UPLOptions;
+            UPLOptions.Set ( SILENT_OPT, strResult.Contains ( "silent" ) ? "yes" : "no" );
+            // This may launch new .exe in temp dir if required
+            return ChangeInstallUPL ( UPL, "copy_files", strLoc, "no", UPLOptions );
+        }
+        else
+        if ( !strResult.Contains ( "no update" ) )
+        {
+            AddReportLog ( 4047, SString ( "DoInstallStage: CheckOnRestartCommand returned %s", strResult.c_str () ) );
+        }
+    }
+    else
+    if ( UPL.Get( INSTALL_STAGE ) == "copy_files" )
+    {
         // Install new files
-        InstallFiles ();
-        AddReportLog ( SString ( "WinMain: Update completed (%s) %s", "", "" ) );
-        // Start new files
-        StopPseudoProgress();
-        ShellExecuteNonBlocking ( "open", PathJoin ( GetMTASAPath (), "Multi Theft Auto.exe" ) );
-        return 0;
+        if ( !InstallFiles ( UPL.Get( SILENT_OPT ) != "no" ) )
+        {
+            if ( UPL.Get( ADMIN_STATE ) != "yes" )
+            {
+                AddReportLog ( 3048, SString ( "DoInstallStage: Install - trying as admin %s", "" ) );
+                // The only place the admin process is launched.
+                // Wait for it to finish before continuing here.
+                ChangeInstallUPLBlocking ( UPL, "*", "*", "yes" );
+            }
+            else
+            {
+                AddReportLog ( 5049, SString ( "DoInstallStage: Couldn't install files %s", "" ) );
+                //return 1;   // failure
+            }
+        }
+        else
+            AddReportLog ( 2050, SString ( "DoInstallStage: Install ok %s", "" ) );
+
+        return ChangeInstallUPL ( UPL, "launch", "near", "no" );
     }
 
-    SetMTASAPathSource( false );
+    // Default to launching MTA
+    AddReportLog ( 1051, SString ( "DoInstallStage: LaunchGame cwd:%s", GetCurrentWorkingDirectory ().c_str () ) );
+    return LaunchGame ( g_lpCmdLine );
+}
 
-    //////////////////////////////////////////////////////////
-    //
-    // Handle relaunching to fix up permissions
-    //
-    if ( strArg1 == "fixpermissions" )
+
+//////////////////////////////////////////////////////////
+//
+// CheckOnRestartCommand
+//
+//
+//
+//////////////////////////////////////////////////////////
+SString CheckOnRestartCommand ( void )
+{
+    const SString strMTASAPath = GetMTASAPath ();
+
+    SetCurrentDirectory ( strMTASAPath );
+    SetDllDirectory( strMTASAPath );
+
+    SString strOperation, strFile, strParameters, strDirectory, strShowCmd;
+    if ( GetOnRestartCommand ( strOperation, strFile, strParameters, strDirectory, strShowCmd ) )
     {
-        // Should be administrator here
-        ShowProgressDialog ( hInstance, "Fixing MTA permissions...", true );
-        FixPermissions ( GetMTASAPath () );
-        HideProgressDialog ();
-        return 0;
-    }
+        if ( strOperation == "files" || strOperation == "silent" )
+        {
+            //
+            // Update
+            //
 
+            // Make temp path name and go there
+            SString strArchivePath, strArchiveName;
+            strFile.Split ( "\\", &strArchivePath, &strArchiveName, true );
+
+            SString strTempPath = MakeUniquePath ( strArchivePath + "\\_" + strArchiveName + "_tmp_" );
+
+            if ( !MkDir ( strTempPath ) )
+                return "FileError1";
+
+            if ( !SetCurrentDirectory ( strTempPath ) )
+                return "FileError2";
+
+            // Start progress bar
+            if ( strOperation != "silent" )
+               StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Installing update..." );
+
+            // Run self extracting archive to extract files into the temp directory
+            ShellExecuteBlocking ( "open", strFile, "-s" );
+
+            // Stop progress bar
+            StopPseudoProgress();
+
+            // If a new "Multi Theft Auto.exe" exists, let that complete the install
+            if ( FileExists ( "Multi Theft Auto.exe" ) )
+                return "install from far " + strOperation;
+
+            return "install from near " + strOperation;
+        }
+        else
+        {
+            AddReportLog ( 5052, SString ( "CheckOnRestartCommand: Unknown restart command %s", strOperation.c_str () ) );
+        }
+    }
+    return "no update";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// LaunchGame
+//
+//
+//
+//////////////////////////////////////////////////////////
+int LaunchGame ( LPSTR lpCmdLine )
+{
     //////////////////////////////////////////////////////////
     //
     // Handle GTA already running
@@ -96,6 +326,9 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     const SString strMTASAPath = GetMTASAPath ();
 
+    SetCurrentDirectory ( strMTASAPath );
+    SetDllDirectory( strMTASAPath );
+
     //////////////////////////////////////////////////////////
     //
     // Show splash screen
@@ -111,106 +344,9 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
 
         // Show the splash and wait 2 seconds
-        ShowSplash ( hInstance );
+        ShowSplash ( g_hInstance );
     #endif
     #endif
-
-
-    //////////////////////////////////////////////////////////
-    //
-    // Check file and directory permissions are ok
-    //
-    if ( strArg1 != "skip_permissions_check" && IsVistaOrHigher () )
-    {
-        if ( !CheckPermissions ( strMTASAPath, 3000 ) )
-        {
-            HideSplash ();
-
-            int hr = MessageBox ( 0, "MTA has detected that some of its files or directories do not have the correct permissions.\n\n"
-                                 "Do you want to automatically fix this?", "Question", MB_YESNO | MB_ICONQUESTION );
-
-            AddReportLog ( SString ( "WinMain: Fix permissions %s", ( hr == IDYES ) ? "yes" : "no" ) );
-
-            if ( hr == IDYES )
-            {
-                // Permissions are not correct, so elevate and fix them
-                SetCurrentDirectory ( strMTASAPath );
-                SetDllDirectory( strMTASAPath );
-                SString strFile = strMTASAPath + "\\" + MTA_EXE_NAME;
-
-                ShellExecuteBlocking ( "runas", strFile, "fixpermissions" );
-            }
-        }
-    }
-
-
-    //////////////////////////////////////////////////////////
-    //
-    // Handle OnRestartCommand
-    //
-    {
-        SetCurrentDirectory ( strMTASAPath );
-        SetDllDirectory( strMTASAPath );
-
-        SString strOnRestartCommand = ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnRestartCommand" );
-        SetOnRestartCommand ( "" );
-
-        std::vector < SString > vecParts;
-        strOnRestartCommand.Split ( "\t", vecParts );
-        if ( vecParts.size () > 4 && vecParts[0].length () )
-        {
-            SString strOperation = vecParts[0];
-            SString strFile = vecParts[1];
-            SString strParameters = vecParts[2];
-            SString strDirectory = vecParts[3];
-            SString strShowCmd = vecParts[4];
-
-            if ( strOperation == "files" || strOperation == "silent" )
-            {
-                //
-                // Update
-                //
-
-                // Start progress bar
-                if ( strOperation != "silent" )
-                    StartPseudoProgress( hInstance, "MTA: San Andreas", "Installing update..." );
-
-                // Make temp path name and go there
-                SString strArchivePath, strArchiveName;
-                strFile.Split ( "\\", &strArchivePath, &strArchiveName, true );
-
-                SString strTempPath = strArchivePath + "\\_" + strArchiveName + "_tmp_";
-                DelTree ( strTempPath, strMTASAPath );
-                MkDir ( strTempPath );
-                SetCurrentDirectory ( strTempPath );
-
-                // Run self extracting archive to extract files into the temp directory
-                ShellExecuteBlocking ( "open", strFile, "-s" );
-
-                // Stop progress bar
-                StopPseudoProgress();
-
-                // If a new "Multi Theft Auto.exe" exists, let that complete the install
-                SString strInstallProg = PathJoin ( strTempPath, "Multi Theft Auto.exe" );
-                if ( FileExists ( strInstallProg ) )
-                    if ( ShellExecuteNonBlocking ( "open", strInstallProg, std::string ( "install " ) + strOperation ) )
-                        return 0;
-
-                // Otherwise, do it here
-                if ( strOperation != "silent" )
-                    StartPseudoProgress( hInstance, "MTA: San Andreas", "Installing update....." );
-                InstallFiles();
-                StopPseudoProgress();
-
-                AddReportLog ( SString ( "WinMain: Update completed (%s) %s", strOperation.c_str (), strFile.c_str () ) );
-            }
-            else
-            {
-                AddReportLog ( SString ( "WinMain: Unknown restart command %s", strOperation.c_str () ) );
-            }
-        }
-    }
-
 
     //////////////////////////////////////////////////////////
     //

@@ -36,7 +36,6 @@
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
-#include "SString.h"
 #include "utils/zip/crc32.h"
 #include "CMD5Hasher.h"
 #include "CChecksum.h"

@@ -6,6 +6,7 @@
 
 //#define WIN32_LEAN_AND_MEAN
 
+#include <sys/stat.h>
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <direct.h>
@@ -41,7 +42,6 @@
 
 // Core-level includes
 #include "SharedUtil.h"
-#include "SString.h"
 #include "CrashHandler.h"
 #include "CCore.h"
 #include "CDebugView.h"

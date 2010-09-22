@@ -12,6 +12,10 @@
 #pragma once
 
 #include "Common.h"
+#include <string>
+#ifndef WIN32
+    #include <alloca.h>
+#endif
 
 struct ISyncStructure;
 
@@ -141,6 +145,39 @@ public:
             return true;
         }
         return false;
+    }
+
+    // Write a string
+    void WriteString(const std::string& value)
+    {
+        // Send the length
+        unsigned short usLength = value.length ();
+        Write ( usLength );
+        // Send the data
+        if ( usLength )
+            Write ( &value.at ( 0 ), usLength );
+    }
+
+    // Read a string
+    bool ReadString(std::string& result)
+    {
+        result = "";
+
+        // Get the length
+        unsigned short usLength = 0;
+        if ( !Read ( usLength ) )
+            return false;
+
+        if ( usLength )
+            {
+            // Read the data
+            char* buffer = static_cast < char* > ( alloca ( usLength ) );
+            if ( !Read ( buffer, usLength ) )
+                return false;
+
+            result = std::string ( buffer, usLength );
+        }
+        return true;
     }
 
     virtual unsigned short Version                  ( void ) const = 0;

@@ -16,7 +16,6 @@
 #include <renderers/directx9GUIRenderer/d3d9texture.h>
 
 #include "SharedUtil.h"
-#include "SString.h"
 #include "CGUITabListItem.h"
 #include "CGUITabList.h"
 #include "CGUI_Impl.h"

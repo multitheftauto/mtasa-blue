@@ -221,6 +221,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_dwFrameTimeSlice = 0;
     m_dwLastFrameTick = 0;
+    m_llLastTransgressionTime = 0;
 
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
@@ -844,15 +845,45 @@ void CClientGame::DoPulses ( void )
     // Output stuff from our internal server eventually
     m_Server.DoPulse ();
 
-    if ( m_pManager->IsGameLoaded () )
+    if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED && GetTickCount64_ () - m_llLastTransgressionTime > 60000 )
     {
+        uint uiLevel = 0;
+        SString strMessage;
+
         // Is the player a cheater?
         if ( !m_pManager->GetAntiCheat ().PerformChecks () )
         {
-            // TODO: Tell the server, also encrypt this
-            g_pCore->ShowMessageBox ( "Error", "AC #1: You were kicked from the game", MB_BUTTON_OK | MB_ICON_ERROR );
-            g_pCore->GetModManager ()->RequestUnload ();
-            return;
+            uiLevel = 1;
+        }
+        else
+        {
+            strMessage = g_pNet->GetNextBuffer ();
+            if ( strMessage.length () )
+                uiLevel = 4;
+        }
+
+        // Send message to the server
+        if ( uiLevel )
+        {
+            SString strMessageCombo  = SString( "AC #%d %s", uiLevel, strMessage.c_str () ).TrimEnd ( " " );
+            m_llLastTransgressionTime = GetTickCount64_ ();
+            AddReportLog ( 3100, strMessageCombo );
+            if ( g_pNet->GetServerBitStreamVersion () >= 0x12 )
+            {
+                // Inform the server if we can
+                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                pBitStream->Write ( uiLevel );
+                pBitStream->WriteString ( strMessage );
+                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
+                g_pNet->DeallocateNetBitStream ( pBitStream );
+            }
+            else
+            {
+                // Otherwise, disconnect here
+                g_pCore->ShowMessageBox ( "Error", SString ( strMessageCombo + ": You were kicked from the game" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->GetModManager ()->RequestUnload ();
+                return;
+            }
         }
     }
 

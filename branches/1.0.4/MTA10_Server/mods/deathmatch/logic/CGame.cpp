@@ -907,6 +907,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_TRANSGRESSION:
+        {
+            Packet_PlayerTransgression ( static_cast < CPlayerTransgressionPacket& > ( Packet ) );
+            return true;
+        }
+
         default:
             break;
     }
@@ -2792,6 +2798,21 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
                 pCamera->SetTarget ( pTarget );
             //else
             //   CLogger::LogPrintf ( "INTERNAL ERROR: Camera sync packet with invalid target\n" );
+        }
+    }
+}
+
+
+void CGame::Packet_PlayerTransgression ( CPlayerTransgressionPacket & Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // If ac# not disabled on this server, do a kick
+        if ( !g_pGame->GetConfig ()->IsDisableAC ( SString ( "%d", Packet.m_uiLevel ) ) )
+        {
+            SString strMessageCombo ( "AC #%d %s", Packet.m_uiLevel, Packet.m_strMessage.c_str () );
+            CStaticFunctionDefinitions::KickPlayer ( pPlayer, NULL, strMessageCombo );
         }
     }
 }

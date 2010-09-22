@@ -314,7 +314,8 @@ void CMainMenu::Update ( void )
         // Initialize our 3D scene once the device is available
         IDirect3DDevice9 * pDevice = m_pGraphics->GetDevice ();
         if ( !m_bInitialized && pDevice )
-        {            
+        {
+            CCore::GetSingleton ().GetNetwork ()->Reset ();
             m_bInitialized = true;
 
             // If the static flag has not already been set

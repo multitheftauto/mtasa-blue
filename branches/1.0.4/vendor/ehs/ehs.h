@@ -49,7 +49,6 @@
 #pragma warning(disable : 4786)
 
 // to use winsock2.h instead of winsock.h
-#define _WIN32_WINNT 0x0400
 #include <windows.h>
 
 #include <time.h>

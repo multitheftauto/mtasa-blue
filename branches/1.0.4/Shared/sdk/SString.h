@@ -18,9 +18,6 @@
 //
 // Adds some functionality to the std::string class
 //
-#include <string>
-#include <vector>
-#include <stdarg.h>
 
 #ifdef WIN32
     #define va_copy(dest, orig) (dest) = (orig)
@@ -87,4 +84,7 @@ public:
     SString     ToLower             ( void ) const;
     SString     ToUpper             ( void ) const;
     SString     ConformLineEndings  ( void ) const;
+    bool        Contains            ( const SString& strOther ) const;
+    bool        ContainsI           ( const SString& strOther ) const;
+    bool        CompareI            ( const SString& strOther ) const;
 };

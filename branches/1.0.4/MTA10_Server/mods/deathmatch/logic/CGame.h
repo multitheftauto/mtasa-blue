@@ -50,6 +50,7 @@ class CGame;
 #include "packets/CDetonateSatchelsPacket.h"
 #include "packets/CCustomDataPacket.h"
 #include "packets/CCameraSyncPacket.h"
+#include "packets/CPlayerTransgressionPacket.h"
 
 #include "CRPCFunctions.h"
 
@@ -266,6 +267,7 @@ private:
     void                        Packet_CustomData           ( class CCustomDataPacket& Packet );
     void                        Packet_Voice_Data           ( class CVoiceDataPacket& Packet );
     void                        Packet_CameraSync           ( class CCameraSyncPacket& Packet );
+    void                        Packet_PlayerTransgression  ( class CPlayerTransgressionPacket& Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 

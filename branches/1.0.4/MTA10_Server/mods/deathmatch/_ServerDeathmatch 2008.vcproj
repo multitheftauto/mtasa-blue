@@ -980,6 +980,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerTransgressionPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CPlayerTransgressionPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerWastedPacket.cpp"
 						>
 					</File>

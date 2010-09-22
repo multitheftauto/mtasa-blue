@@ -1,7 +1,6 @@
 #pragma message("Compiling precompiled header.\n")
 
 #define WIN32_LEAN_AND_MEAN
-#define _WIN32_WINNT 0x500
 
 #include <windows.h>
 #include <string.h>
@@ -22,7 +21,6 @@
 
 // SDK includes
 #include "SharedUtil.h"
-#include "SString.h"
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>

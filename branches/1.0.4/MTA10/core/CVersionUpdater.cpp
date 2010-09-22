@@ -73,6 +73,137 @@ class CVersionUpdater;
 namespace
 {
 
+    ///////////////////////////////////////////////////////////////
+    //
+    // CReportWrap
+    //
+    // gawd knows
+    //
+    ///////////////////////////////////////////////////////////////
+    class CReportWrap
+    {
+        SString strFilter;
+        int iMinSize;
+        int iMaxSize;
+        const static int DEFAULT_MIN_SIZE = 1;
+        const static int DEFAULT_MAX_SIZE = 5000;
+    public:
+
+        CReportWrap ()
+            : iMinSize ( DEFAULT_MIN_SIZE )
+            , iMaxSize ( DEFAULT_MAX_SIZE )
+        {
+            LoadReportSettings ();
+        }
+
+        void SaveReportSettings ( void ) const
+        {
+            CArgMap m_ArgMap ( "@", ";" );
+            m_ArgMap.Set ( "filter", strFilter );
+            m_ArgMap.Set ( "min", iMinSize );
+            m_ArgMap.Set ( "max", iMaxSize );
+            CVARS_SET ( "reportsettings", m_ArgMap.ToString () );
+        }
+
+        void LoadReportSettings ( void )
+        {
+            SString strSettings;
+            CVARS_GET ( "reportsettings", strSettings );
+            SetSettings ( strSettings );
+        }
+
+        void SetSettings ( const SString& strSettings )
+        {
+            CArgMap m_ArgMap ( "@", ";" );
+            m_ArgMap.SetFromString ( strSettings );
+            // If build is 30 days old, default no report logging          
+            m_ArgMap.Get ( "filter", strFilter, GetBuildAge () < 30 ? "1-9999" : "" );
+            m_ArgMap.Get ( "min", iMinSize, DEFAULT_MIN_SIZE );
+            m_ArgMap.Get ( "max", iMaxSize, DEFAULT_MAX_SIZE );
+            SaveReportSettings ();
+        }
+
+        SString GetFilter ( void ) const
+        {
+            return strFilter != "" ? strFilter : "1-9999";
+        }
+
+        int GetMinSize ( void ) const
+        {
+            return iMinSize;
+        }
+
+        int GetMaxSize ( void ) const
+        {
+            return iMaxSize;
+        }
+
+        static void ClearLogContents ( const SString& strIdFilter )
+        {
+            if ( strIdFilter == "" && FileExists ( CalcMTASAPath ( "_keep_report_" ) ) )
+                return;
+            SetReportLogContents ( GetLogContents ( strIdFilter ) );
+        }
+
+        static SString GetLogContents ( const SString& strIdFilter, int iMaxSize = 0 )
+        {
+            // Make id filter map
+            std::map < uint, bool > idMap;
+            {
+                std::vector < SString > parts;
+                strIdFilter.Split ( ",", parts );
+
+                for ( uint i = 0 ; i < parts.size () ; i++ )
+                {
+                    SString strFrom, strTo;
+                    if ( parts[i].Split ( "-", &strFrom, &strTo ) )
+                    {
+                        // Range
+                        const int iTo = atoi ( strTo );
+                        for ( int i = atoi ( strFrom ) ; i < iTo ; i++ )
+                            idMap[i] = true;
+                    }
+                    else
+                    {
+                        // Single
+                        idMap[ atoi ( strFrom ) ] = true;
+                    }
+                }
+            }
+
+            // Load file into a string
+            SString strContent = GetReportLogContents ();
+
+            // Split into lines
+            std::vector < SString > lines;
+            strContent.Split ( "\n", lines );
+
+            // Filter each line
+            int size = 0;
+            std::vector < SString > filteredLines;
+            for ( int i = lines.size () - 1 ; i  >= 0 ; i-- )
+            {
+                SString strLeft, strRight;
+                lines[i].Split ( ",", &strLeft, NULL );
+                if ( MapContains ( idMap, atoi ( strLeft ) ) )
+                {
+                    size += lines[i].length ();
+                    if ( iMaxSize && size > iMaxSize )
+                        break;
+                    filteredLines.push_back ( lines[i] );
+                }
+            }
+
+            // Compose final output
+            SString strResult;
+            for ( int i = filteredLines.size () - 1 ; i  >= 0 ; i-- )
+                if ( filteredLines[i].length () > 0 )
+                    strResult += filteredLines[i] + "\n";
+
+            return strResult;
+        }
+    };
+
     enum
     {
         RES_FAIL,
@@ -105,7 +236,7 @@ namespace
 
     struct CDownloadInfo
     {
-                                CDownloadInfo() : iCurrent ( -1 ), iRetryCount ( 0 ), uiFilesize ( 0 ), uiBytesDownloaded ( 0 ) {}
+                                CDownloadInfo() : iCurrent ( -1 ), iRetryCount ( 0 ), iFilesize ( 0 ), uiBytesDownloaded ( 0 ) {}
         int                     iCurrent;
         int                     iRetryCount;
         SString                 strStatus;
@@ -116,12 +247,13 @@ namespace
         SString                 strNo;
         SString                 strPriority;
         SString                 strFilename;
-        unsigned int            uiFilesize;
+        int                     iFilesize;
         std::vector < SString > serverList;
         SString                 strMD5;
         SString                 strEnd;
         unsigned int            uiBytesDownloaded;
         SString                 strSaveLocation;
+        SString                 strReportSettings;
     };
 
     struct CStringPair
@@ -242,6 +374,7 @@ public:
     void                SetCondition                        ( const SString& strType, const SString& strValue1, const SString& strValue2 = "" );
     bool                IsConditionTrue                     ( const SString& strCondition );
     void                ResetEverything                     ( void );
+    CReportWrap*        GetReportWrap                       ( void );
 
     // Commands
     void                _UseVersionCheckURLs                ( void );
@@ -295,6 +428,8 @@ public:
     bool                                m_bCheckedTimeForPeriodicCheck;
     bool                                m_bSentReportLog;
     std::map < SString, int >           m_DoneOptionalMap;
+
+    CReportWrap*                        m_pReportWrap;
 };
 
 
@@ -324,6 +459,7 @@ CVersionUpdaterInterface* GetVersionUpdater ()
 ///////////////////////////////////////////////////////////////
 CVersionUpdater::CVersionUpdater ( void )
 {
+    m_pReportWrap = NULL;
     m_llTimeStart = 0;
     m_bCheckedTimeForPeriodicCheck = false;
     m_bSentReportLog = false;
@@ -341,6 +477,22 @@ CVersionUpdater::CVersionUpdater ( void )
 ///////////////////////////////////////////////////////////////
 CVersionUpdater::~CVersionUpdater ( void )
 {
+    SAFE_DELETE ( m_pReportWrap );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::DoPulse
+//
+//
+//
+///////////////////////////////////////////////////////////////
+CReportWrap* CVersionUpdater::GetReportWrap()
+{
+    if ( !m_pReportWrap )
+        m_pReportWrap = new CReportWrap();
+    return m_pReportWrap;
 }
 
 
@@ -1399,7 +1551,7 @@ void CVersionUpdater::_PollFileDownload ( void )
                     GetQuestionBox ().Reset ();
                     return;
                 }
-                GetQuestionBox ().SetMessage ( SString ( "%3d %% completed", m_DownloadInfo.uiBytesDownloaded * 100 / Max < unsigned int > ( 1, m_DownloadInfo.uiFilesize ) ) );
+                GetQuestionBox ().SetMessage ( SString ( "%3d %% completed", m_DownloadInfo.uiBytesDownloaded * 100 / Max < unsigned int > ( 1, m_DownloadInfo.iFilesize ) ) );
             }
 
             Push ( _PollFileDownload );
@@ -1421,6 +1573,14 @@ void CVersionUpdater::_PollFileDownload ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_StartSendPost ( void )
 {
+    // Remove unrequired items
+    GetReportWrap ()->ClearLogContents ( GetReportWrap ()->GetFilter () );
+
+    // See if anything left to send
+    SString strContents = GetReportWrap ()->GetLogContents ( GetReportWrap ()->GetFilter () );
+    if ( (int)strContents.length () < GetReportWrap ()->GetMinSize () )
+        return;
+
     switch ( DoSendPostToNextServer () )
     {
         case RES_FAIL:
@@ -1566,6 +1726,7 @@ int CVersionUpdater::DoPollQueryResponse ( void )
             if ( status == 404 && m_QueryInfo.serverList.size () )
                 ListRemove( m_QueryInfo.serverList, m_QueryInfo.serverList[ m_QueryInfo.iCurrent % m_QueryInfo.serverList.size () ] );
 
+            AddReportLog ( 4000, SString ( "QueryResponse: Regular fail for %s (status:%u  time:%u)", m_QueryInfo.serverList[ m_QueryInfo.iCurrent ].c_str (), status, GetTickCount64_ () - m_llTimeStart ) );
             return RES_FAIL;
         }
         return RES_POLL;
@@ -1581,42 +1742,35 @@ int CVersionUpdater::DoPollQueryResponse ( void )
         // Make all line endings '\n'
         SString strInput = SString ( std::string( pData ) ).ConformLineEndings();
 
-        // Break into lines
-        std::vector < SString > strLineList;
-        strInput.Split ( "=\n", strLineList );
- 
-        // Parse each line
-        std::vector < SString > ::iterator iter = strLineList.begin ();
-        for ( ; iter != strLineList.end () ; iter++ )
-        {
-            std::vector < SString > strPartList;
-            (*iter).Split ( "=", strPartList, 2 );
-            if ( strPartList.size () == 2 )
-            {
-                if ( strPartList[0] == "status" )       m_DownloadInfo.strStatus = strPartList[1];
-                if ( strPartList[0] == "title" )        m_DownloadInfo.strTitle = strPartList[1];
-                if ( strPartList[0] == "msg" )          m_DownloadInfo.strMsg = strPartList[1];
-                if ( strPartList[0] == "msg2" )         m_DownloadInfo.strMsg2 = strPartList[1];
-                if ( strPartList[0] == "yes" )          m_DownloadInfo.strYes = strPartList[1];
-                if ( strPartList[0] == "no" )           m_DownloadInfo.strNo = strPartList[1];
-                if ( strPartList[0] == "priority" )     m_DownloadInfo.strPriority = strPartList[1];
-                if ( strPartList[0] == "filename" )     m_DownloadInfo.strFilename = strPartList[1];
-                if ( strPartList[0] == "filesize" )     m_DownloadInfo.uiFilesize = atoi ( strPartList[1] );
-                if ( strPartList[0] == "mirror" )       m_DownloadInfo.serverList.push_back ( strPartList[1] );
-                if ( strPartList[0] == "mirror2" )      m_DownloadInfo.serverList.push_back ( strPartList[1] );
-                if ( strPartList[0] == "md5" )          m_DownloadInfo.strMD5 = strPartList[1];
-                if ( strPartList[0] == "end" )          m_DownloadInfo.strEnd = strPartList[1];
-            }
-        }
+        CArgMap argMap ( "=", "=\n" );
+        argMap.SetFromString ( strInput );
+
+        argMap.Get ( "status",          m_DownloadInfo.strStatus );
+        argMap.Get ( "title",           m_DownloadInfo.strTitle );
+        argMap.Get ( "msg",             m_DownloadInfo.strMsg );
+        argMap.Get ( "msg2",            m_DownloadInfo.strMsg2 );
+        argMap.Get ( "yes",             m_DownloadInfo.strYes );
+        argMap.Get ( "no",              m_DownloadInfo.strNo );
+        argMap.Get ( "priority",        m_DownloadInfo.strPriority );
+        argMap.Get ( "filename",        m_DownloadInfo.strFilename );
+        argMap.Get ( "filesize",        m_DownloadInfo.iFilesize );     // int
+        argMap.Get ( "mirror",          m_DownloadInfo.serverList );    // List append
+        argMap.Get ( "mirror2",         m_DownloadInfo.serverList );    // List append
+        argMap.Get ( "md5",             m_DownloadInfo.strMD5 );
+        argMap.Get ( "reportsettings",  m_DownloadInfo.strReportSettings );
+        argMap.Get ( "end",             m_DownloadInfo.strEnd );
 
         // Check if full message gotten
         if ( m_DownloadInfo.strEnd == "ok" )
         {
+            if ( m_DownloadInfo.strReportSettings.length () )
+                GetReportWrap ()->SetSettings ( m_DownloadInfo.strReportSettings );
             SetCondition ( "QueryResponse", m_DownloadInfo.strStatus );
             return RES_OK;
         }
     }
 
+    AddReportLog ( 5001, SString ( "QueryResponse: Fail for %s", m_QueryInfo.serverList[ m_QueryInfo.iCurrent ].c_str () ) );
     return RES_FAIL;
 }
 
@@ -1683,7 +1837,7 @@ int CVersionUpdater::DoPollDownload ( void )
                 ListRemove( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
 
             SetCondition ( "Download", "Fail" );
-            AddReportLog ( SString ( "DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_DownloadInfo.strFilename.c_str(), status, GetTickCount64_ () - m_llTimeStart ) );
+            AddReportLog ( 4002, SString ( "DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_DownloadInfo.strFilename.c_str(), status, GetTickCount64_ () - m_llTimeStart ) );
             return RES_FAIL;
         }
         return RES_POLL;
@@ -1710,31 +1864,55 @@ int CVersionUpdater::DoPollDownload ( void )
                 if ( m_DownloadInfo.serverList.size () )
                     ListRemove( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
                 SetCondition ( "Download", "Fail", "Checksum" );
-                AddReportLog ( SString ( "DoPollDownload: Checksum wrong for %s (%s %s)", m_DownloadInfo.strFilename.c_str(), m_DownloadInfo.strMD5.c_str(), szMD5 ) );
+                AddReportLog ( 5003, SString ( "DoPollDownload: Checksum wrong for %s (%s %s)", m_DownloadInfo.strFilename.c_str(), m_DownloadInfo.strMD5.c_str(), szMD5 ) );
                 return RES_FAIL;
             }
         }
 
-        // Save file
-        SString strPathFilename = CalcMTASAPath ( std::string ( "\\mta\\upcache\\" ) + m_DownloadInfo.strFilename );
-        MakeSureDirExists ( strPathFilename );
-        if ( !FileSave ( strPathFilename, pData, uiSize ) )
+        ////////////////////////
+        // Save file somewhere
+        // Make a list of possible places to save the file
+        SString strPathFilename;
+        {
+            std::vector < SString > saveLocationList;
+            saveLocationList.push_back ( MakeUniquePath ( PathJoin ( GetMTAAppDataPath (), "upcache", m_DownloadInfo.strFilename ) ) );
+            saveLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache", m_DownloadInfo.strFilename ) );
+            // Mix up list
+            //for ( uint i = 0 ; i < saveLocationList.size (); i++ )
+            //    std::swap ( saveLocationList[ i ], saveLocationList[ rand () % saveLocationList.size () ] );
+
+            // Try each place
+            for ( std::vector < SString > ::iterator iter = saveLocationList.begin () ; iter != saveLocationList.end () ; ++iter )
+            {
+                MakeSureDirExists ( *iter );
+                if ( FileSave ( *iter, pData, uiSize ) )
+                {
+                    strPathFilename = *iter;
+                    break;
+                }
+
+                AddReportLog ( 5004, SString ( "DoPollDownload: Unable to use the path %s", *iter ) );
+            }
+        }
+
+        if ( strPathFilename.length () == 0 )
         {
             if ( m_DownloadInfo.serverList.size () )
-                ListRemove( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
+                ListRemove ( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
             SetCondition ( "Download", "Fail", "Saving" );
-            AddReportLog ( SString ( "DoPollDownload: Unable to save the file %s (size %d)", strPathFilename.c_str(), uiSize ) );
+            AddReportLog ( 5005, SString ( "DoPollDownload: Unable to save the file %s (size %d)", m_DownloadInfo.strFilename.c_str (), uiSize ) );
             return RES_FAIL;
         }
+        ////////////////////////
 
         m_DownloadInfo.strSaveLocation = strPathFilename;
         SetCondition ( "Download", "Ok" );
-        AddReportLog ( SString ( "DoPollDownload: Downloaded %s", m_DownloadInfo.strFilename.c_str() ) );
+        AddReportLog ( 2006, SString ( "DoPollDownload: Downloaded %s", m_DownloadInfo.strSaveLocation.c_str() ) );
         return RES_OK;
     }
 
     SetCondition ( "Download", "Fail" );
-    AddReportLog ( SString ( "DoPollDownload: Fail for %s", m_DownloadInfo.strFilename.c_str() ) );
+    AddReportLog ( 5007, SString ( "DoPollDownload: Fail for %s", m_DownloadInfo.strFilename.c_str() ) );
     return RES_FAIL;
 }
 
@@ -1787,27 +1965,18 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
     //
     // Get post contents
     //
-    SString strReportFilename = CalcMTASAPath ( std::string ( "\\mta\\report.log" )  );
-    std::vector < char > buffer;
-    FileLoad ( strReportFilename, buffer );
+    SString strContent = GetReportWrap ()->GetLogContents ( GetReportWrap ()->GetFilter (), GetReportWrap ()->GetMaxSize () );
 
     //
     // Send data. Don't bother checking if it was received, as it's not important.
     //
-    if ( buffer.size () > 10 )
-    {
-        buffer.push_back ( 0 );
-        SString strContent = &buffer[0];
-        if ( strContent.length () > 5000 )
-            strContent = strContent.substr ( strContent.length () - 5000 );
+    CNetHTTPDownloadManagerInterface * downloadManager = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ();
+    downloadManager->QueueFile ( strQueryURL, NULL, 0, &strContent.at ( 0 ) );
+    if ( !downloadManager->IsDownloading () )
+        downloadManager->StartDownloadingQueuedFiles ();
 
-        CNetHTTPDownloadManagerInterface * downloadManager = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ();
-        downloadManager->QueueFile ( strQueryURL, NULL, 0, &strContent.at ( 0 ) );
-        if ( !downloadManager->IsDownloading () )
-            downloadManager->StartDownloadingQueuedFiles ();
-
-        FileSave ( strReportFilename, NULL, 0 );
-    }
+    // Wipe log here
+    GetReportWrap ()->ClearLogContents ( "" );
 
     return RES_OK;
 }
