@@ -1344,7 +1344,7 @@ String Font::OnGlyphDrawn ( unsigned long ulGlyph, bool bCreateNewCache ) const
     for ( std::map< unsigned long, unsigned long >::const_iterator it = m_pGlyphCache->begin(); it != m_pGlyphCache->end(); ++it )
     {
         // If we're in range of another cache, we only update that cache
-        if ( (unsigned int)abs(it->first - ulGlyph) <= iRange )
+        if ( (unsigned int)abs((int)(it->first - ulGlyph)) <= iRange )
         {
             itToErase = it;
             bErase = true;
