@@ -367,7 +367,8 @@ public:
     static inline void                  GUIGridListAutoSizeColumn           ( CClientGUIElement& GUIElement, unsigned int uiColumn )                                    { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AutoSizeColumn ( uiColumn ); };
     static void                         GUIGridListClear                    ( CClientEntity& Element );
     static inline void                  GUIGridListSetItemText              ( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szText, bool bSection, bool bNumber, bool bFast )   { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemText ( iRow, iColumn, szText, bNumber, bSection, bFast ); };
-    static inline void                  GUIGridListSetItemData              ( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szData )                { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemData ( iRow, iColumn, szData ); };
+    static void                         GUIGridListSetItemData              ( CClientGUIElement& GUIElement, int iRow, int iColumn, CLuaArgument* Variable );
+    static void                         GUIItemDataDestroyCallback          ( void* m_data );
     static void                         GUIGridListSetSelectionMode         ( CClientEntity& Element, unsigned int uiMode );
     static inline void                  GUIGridListSetSelectedItem          ( CClientGUIElement& GUIElement, int iRow, int iColumn, bool bReset )                       { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItem ( iRow, iColumn, bReset ); };
     static inline void                  GUIGridListSetItemColor             ( CClientGUIElement& GUIElement, int iRow, int iColumn, int iRed, int iGreen, int iBlue, int iAlpha )       { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemColor ( iRow, iColumn, iRed, iGreen, iBlue, iAlpha ); };

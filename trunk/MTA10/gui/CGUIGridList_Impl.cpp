@@ -278,13 +278,13 @@ void* CGUIGridList_Impl::GetItemData ( int iRow, int hColumn )
 }
 
 
-void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, void* pData )
+void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, void* pData, CGUICallback<void,void*> deleteDataCallback )
 {
     // Get the current item at that offset and set the text
     CGUIListItem* pItem = GetItem ( iRow, hColumn );
     if ( pItem )
     {
-        pItem->SetData ( pData );
+        pItem->SetData ( pData, deleteDataCallback );
     }
 }
 
