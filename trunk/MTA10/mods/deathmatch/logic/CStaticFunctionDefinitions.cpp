@@ -4577,7 +4577,17 @@ void CStaticFunctionDefinitions::GUIGridListClear ( CClientEntity& Entity )
 }
 
 void CStaticFunctionDefinitions::GUIGridListSetItemData ( CClientGUIElement& GUIElement, int iRow, int iColumn, CLuaArgument* Variable )
-{ 
+{
+    //Delete any old data we might have
+    CLuaArgument* pVariable = reinterpret_cast < CLuaArgument* > (
+        static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> GetItemData (
+            iRow, 
+            iColumn
+        )
+    );
+    if ( pVariable )
+        delete pVariable;
+
     static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemData ( 
         iRow, 
         iColumn, 
