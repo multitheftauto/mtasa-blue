@@ -56,7 +56,7 @@ public:
     virtual CGUIListItem*           GetItem                 ( int iRow, int hColumn ) = 0;
     virtual char*                   GetItemText             ( int iRow, int hColumn ) = 0;
     virtual int                     SetItemText             ( int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bFast = false ) = 0;
-    virtual void                    SetItemData             ( int iRow, int hColumn, void* pData ) = 0;
+    virtual void                    SetItemData             ( int iRow, int hColumn, void* pData, CGUICallback<void,void*> deleteDataCallback = NULL ) = 0;
     virtual void                    SetItemData             ( int iRow, int hColumn, const char* pszData ) = 0;
     virtual void*                   GetItemData             ( int iRow, int hColumn ) = 0;
     virtual void                    SetItemColor            ( int iRow, int hColumn, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha ) = 0;

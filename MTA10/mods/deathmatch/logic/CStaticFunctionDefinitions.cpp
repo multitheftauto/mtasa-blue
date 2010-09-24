@@ -4576,6 +4576,22 @@ void CStaticFunctionDefinitions::GUIGridListClear ( CClientEntity& Entity )
     }
 }
 
+void CStaticFunctionDefinitions::GUIGridListSetItemData ( CClientGUIElement& GUIElement, int iRow, int iColumn, CLuaArgument* Variable )
+{ 
+    static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemData ( 
+        iRow, 
+        iColumn, 
+        (void*)Variable, 
+        CGUICallback<void,void*>( &CStaticFunctionDefinitions::GUIItemDataDestroyCallback )
+    ); 
+}
+
+
+void CStaticFunctionDefinitions::GUIItemDataDestroyCallback ( void* data )
+{
+    delete (CLuaArgument*)(data);
+}
+
 
 void CStaticFunctionDefinitions::GUIGridListSetSelectionMode ( CClientEntity& Entity, unsigned int uiMode )
 {

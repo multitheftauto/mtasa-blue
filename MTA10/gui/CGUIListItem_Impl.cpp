@@ -45,6 +45,8 @@ CGUIListItem_Impl::CGUIListItem_Impl ( const char* szText, unsigned int uiType, 
 
 CGUIListItem_Impl::~CGUIListItem_Impl ( void )
 {
+    if ( m_deleteDataCallback )
+        m_deleteDataCallback(m_pData);
     delete m_pListItem;
 }
 
