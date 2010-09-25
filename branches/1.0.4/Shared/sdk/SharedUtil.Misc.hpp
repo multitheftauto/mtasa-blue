@@ -150,7 +150,7 @@ bool SharedUtil::GetOnRestartCommand ( SString& strOperation, SString& strFile, 
             strShowCmd = vecParts[4];
             return true;
         }
-        AddReportLog( 4000, SString ( "OnRestartCommand disgregarded due to version change %s -> %s", vecParts[5].c_str (), strVersion.c_str () ) );
+        AddReportLog( 4000, SString ( "OnRestartCommand disregarded due to version change %s -> %s", vecParts[5].c_str (), strVersion.c_str () ) );
     }
     return false;
 }
@@ -340,7 +340,7 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
 }
 
 
-
+#ifdef MTA_DEBUG
 //
 // Output timestamped line into the debugger
 //
@@ -355,7 +355,7 @@ void SharedUtil::OutputDebugLine ( const char* szMessage )
     // Other platforms here
 #endif
 }
-
+#endif
 
 
 //

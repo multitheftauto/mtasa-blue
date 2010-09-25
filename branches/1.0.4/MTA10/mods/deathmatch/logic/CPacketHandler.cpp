@@ -1056,7 +1056,7 @@ void CPacketHandler::Packet_PlayerChangeNick ( NetBitStreamInterface& bitStream 
         std::string strNick;
         g_pCore->GetCVars ()->Get ( "nick", strNick );
         if ( strNick == "Player" )
-            g_pCore->GetCVars ()->Set ( "nick", std::string ( szNewNick ) );
+            g_pCore->GetCVars ()->Set ( "nick", SString ( "Player%d", ( rand () % 9000 ) + 1000 ) );
     }
 
     /*
@@ -4330,6 +4330,6 @@ void CPacketHandler::Packet_UpdateInfo ( NetBitStreamInterface& bitStream )
     if ( BitStreamReadUsString( bitStream, strType ) &&
          BitStreamReadUsString( bitStream, strData ) )
     {
-        g_pCore->InitiateUpdate ( strType, g_pNet->GetConnectedServer () );
+        g_pCore->InitiateUpdate ( strType, strData, g_pNet->GetConnectedServer () );
     }
 }

@@ -14,8 +14,8 @@
 #include <utils/CMD5Hasher.h>
 
 // Do a static page check first
-#define VERSION_CHECKER_URL1 "http://vers-m2-kows.yomg.net/mta/%VERSION%/?v=%VERSION%&id=%ID%&st=%STATUS%&ty=%TYPE%&re=%REFER%"
-#define VERSION_CHECKER_URL2 "http://vers-m2-kows.yomg.net/mta/?v=%VERSION%&id=%ID%&st=%STATUS%&ty=%TYPE%&re=%REFER%"
+#define VERSION_CHECKER_URL1 "http://vers-m2-kows.yomg.net/mta/%VERSION%/?v=%VERSION%&id=%ID%&st=%STATUS%&ty=%TYPE%&da=%DATA%&be=%BETA%&re=%REFER%"
+#define VERSION_CHECKER_URL2 "http://vers-m2-kows.yomg.net/mta/?v=%VERSION%&id=%ID%&st=%STATUS%&ty=%TYPE%&da=%DATA%&be=%BETA%&re=%REFER%"
 
 #define DATA_FILES_URL1 "http://vers-m2-kows.yomg.net/mtadf/%VERSION%/?v=%VERSION%&id=%ID%&st=%STATUS%"
 #define DATA_FILES_URL2 "http://vers-m2-kows.yomg.net/mtadf/?v=%VERSION%&id=%ID%&st=%STATUS%"
@@ -116,8 +116,8 @@ namespace
         {
             CArgMap m_ArgMap ( "@", ";" );
             m_ArgMap.SetFromString ( strSettings );
-            // If build is 30 days old, default no report logging          
-            m_ArgMap.Get ( "filter", strFilter, GetBuildAge () < 30 ? "1-9999" : "" );
+            // If build is 30 days old, default no report logging
+            m_ArgMap.Get ( "filter", strFilter, GetBuildAge () < 30 ? "2000-9999" : "0" );
             m_ArgMap.Get ( "min", iMinSize, DEFAULT_MIN_SIZE );
             m_ArgMap.Get ( "max", iMaxSize, DEFAULT_MAX_SIZE );
             SaveReportSettings ();
@@ -358,9 +358,10 @@ public:
                         CVersionUpdater                     ( void );
     virtual             ~CVersionUpdater                    ( void );
     virtual void        DoPulse                             ( void );
-    virtual void        InitiateUpdate                      ( const SString& strType, const SString& strHost );
+    virtual void        InitiateUpdate                      ( const SString& strType, const SString& strData, const SString& strHost );
     virtual bool        IsOptionalUpdateInfoRequired        ( const SString& strHost );
     virtual void        InitiateDataFilesFix                ( void );
+    virtual void        InitiateManualCheck                 ( void );
 
     // CVersionUpdater functions
 
@@ -389,6 +390,7 @@ public:
     void                _PollAnyButton                      ( void );
     void                _DialogConnectingWait               ( void );
     void                _DialogChecking                     ( void );
+    void                _DialogNoUpdate                     ( void );
     void                _DialogDownloading                  ( void );
     void                _DialogServerSaysUpdateQuestion     ( void );
     void                _DialogServerSaysRecommendQuestion  ( void );
@@ -423,11 +425,14 @@ public:
     long long                           m_llTimeStart;
     std::map < SString, CStringPair >   m_ConditionMap;
     SString                             m_strServerSaysType;
+    SString                             m_strServerSaysData;
     SString                             m_strServerSaysHost;
 
     bool                                m_bCheckedTimeForPeriodicCheck;
     bool                                m_bSentReportLog;
     std::map < SString, int >           m_DoneOptionalMap;
+
+    long long                           m_llTimeLastManualCheck;
 
     CReportWrap*                        m_pReportWrap;
 };
@@ -465,12 +470,13 @@ CVersionUpdater::CVersionUpdater ( void )
     m_bSentReportLog = false;
     InitPrograms ();
     CheckPrograms ();
+    m_llTimeLastManualCheck = 0;
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::CVersionUpdater
+// CVersionUpdater::~CVersionUpdater
 //
 //
 //
@@ -565,7 +571,7 @@ void CVersionUpdater::DoPulse ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::InitiateUpdate ( const SString& strType, const SString& strHost )
+void CVersionUpdater::InitiateUpdate ( const SString& strType, const SString& strData, const SString& strHost )
 {
     if ( strType == "Mandatory" )
     {
@@ -581,6 +587,7 @@ void CVersionUpdater::InitiateUpdate ( const SString& strType, const SString& st
     }
 
     m_strServerSaysType = strType;
+    m_strServerSaysData = strData;
     m_strServerSaysHost = strHost;
 }
 
@@ -614,6 +621,41 @@ void CVersionUpdater::InitiateDataFilesFix ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CVersionUpdater::InitiateManualCheck
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::InitiateManualCheck ( void )
+{
+    if ( GetQuestionBox ().IsVisible () )
+    {
+        // Bring to the front
+        GetQuestionBox ().Show ();
+        return;
+    }
+
+    if ( IsBusy () )
+    {
+        CCore::GetSingleton ().ShowMessageBox ( "Busy", "Can't check for updates right now", MB_BUTTON_OK | MB_ICON_ERROR );
+        return;
+    }
+
+    if ( GetTickCount64_ () - m_llTimeLastManualCheck > 60000 )
+    {
+        m_llTimeLastManualCheck = GetTickCount64_ ();
+        RunProgram ( "ManualCheck" );
+    }
+    else
+    {
+        // Pretend to do a check if less than a minute since last check
+        RunProgram ( "ManualCheckSim" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CVersionUpdater::ResetEverything
 //
 //
@@ -629,6 +671,7 @@ void CVersionUpdater::ResetEverything ()
     m_llTimeStart = 0;
     m_ConditionMap.clear ();
     m_strServerSaysType = "";
+    m_strServerSaysData = "";
     m_strServerSaysHost = "";
 
     GetQuestionBox ().Reset ();
@@ -761,6 +804,54 @@ void CVersionUpdater::InitPrograms ()
         ADDLABL ( "end:" );
         ADDINST (   _End );
     }
+
+
+    //
+    // Manual update check
+    //
+    {
+        SString strProgramName = "ManualCheck";
+        MapSet ( m_ProgramMap, strProgramName, CProgram () );
+        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
+
+        ADDINST (   _UseVersionCheckURLs );                     // Use VERSION_CHECKER_URL*
+        ADDINST (   _DialogChecking );                          // Show "Checking..." message
+        ADDINST (   _StartFileQuery );                          // Fetch update info from update server
+        ADDCOND ( "if QueryResponse.update goto dload");        // If update server says 'update' then goto dload:
+        ADDCOND ( "if QueryResponse.files goto dload");         // If update server says 'files' then goto dload:
+        ADDCOND ( "if QueryResponse.silent goto dload");        // If update server says 'silent' then goto dload:
+        ADDCOND ( "if QueryResponse.noupdate goto noupdate");   // If update server says 'noupdate' then goto noupdate:
+        ADDINST (   _End );
+
+        ADDLABL ( "dload:" );
+        ADDINST (   _DialogUpdateQuestion );                    // Show "Update available" dialog
+        ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
+        ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
+        ADDINST (   _StartFileDownload );                       // Fetch update binary from update mirror
+        ADDINST (   _DialogUpdateResult );                      // Show "Update ok/failed" message
+        ADDINST (   _End );
+
+        ADDLABL ( "noupdate:" );
+        ADDINST (   _DialogNoUpdate );                          // Show "No update available" dialog
+        ADDINST (   _End );
+
+        ADDLABL ( "end:" );
+        ADDINST (   _End );
+    }
+
+
+    //
+    // Manual update simulation
+    //
+    {
+        SString strProgramName = "ManualCheckSim";
+        MapSet ( m_ProgramMap, strProgramName, CProgram () );
+        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
+
+        ADDINST (   _DialogNoUpdate );                          // Show "No update available" dialog
+        ADDINST (   _End );
+    }
+
 
     //
     // ServerSaysUpdate
@@ -1126,6 +1217,25 @@ void CVersionUpdater::_DialogChecking ( void )
     GetQuestionBox ().SetMessage ( "Please wait..." );
     GetQuestionBox ().SetButton ( 0, "Cancel" );
     GetQuestionBox ().Show ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_DialogNoUpdate
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_DialogNoUpdate ( void )
+{
+    // Display message
+    GetQuestionBox ().Reset ();
+    GetQuestionBox ().SetTitle ( "UPDATE CHECK" );
+    GetQuestionBox ().SetMessage ( "No update needed" );
+    GetQuestionBox ().SetButton ( 0, "OK" );
+    GetQuestionBox ().Show ();
+    Push ( _PollAnyButton );
 }
 
 
@@ -1689,12 +1799,17 @@ int CVersionUpdater::DoSendQueryToNextServer ( void )
                                 ,usNetRev
                                 );
 
+    SString strUpdateBuildType;
+    CVARS_GET ( "update_build_type", strUpdateBuildType );
+
     // Make the query URL
     SString strQueryURL = strServerURL;
     strQueryURL = strQueryURL.Replace ( "%VERSION%", strPlayerVersion );
     strQueryURL = strQueryURL.Replace ( "%ID%", szSerial );
     strQueryURL = strQueryURL.Replace ( "%STATUS%", szStatus );
+    strQueryURL = strQueryURL.Replace ( "%BETA%", strUpdateBuildType );
     strQueryURL = strQueryURL.Replace ( "%TYPE%", m_strServerSaysType );
+    strQueryURL = strQueryURL.Replace ( "%DATA%", m_strServerSaysData );
     strQueryURL = strQueryURL.Replace ( "%REFER%", m_strServerSaysHost );
 
     // Perform the HTTP request

@@ -119,8 +119,12 @@ bool DoInstallFiles ( void )
     {
         if ( !FileCopy ( itemList[i].strDestPathFilename, itemList[i].strBackupPathFilename ) )
         {
-            AddReportLog ( 5021, SString ( "InstallFiles: Couldn't copy '%s' to '%s'", itemList[i].strDestPathFilename.c_str (), itemList[i].strBackupPathFilename.c_str () ) );
-            return false;
+            if ( FileExists ( itemList[i].strDestPathFilename ) )
+            {
+                AddReportLog ( 5021, SString ( "InstallFiles: Couldn't copy '%s' to '%s'", itemList[i].strDestPathFilename.c_str (), itemList[i].strBackupPathFilename.c_str () ) );
+                return false;
+            }
+            AddReportLog ( 4023, SString ( "InstallFiles: Couldn't copy '%s' as it does not exist", itemList[i].strDestPathFilename.c_str () ) );
         }
     }
 

@@ -155,7 +155,13 @@ protected:
     CGUILabel*          m_pBrowserSpeedLabelInfo;
     CGUILabel*          m_pBrowserSpeedLabel;
     CGUIComboBox*       m_pBrowserSpeedCombo;
-    
+    CGUILabel*          m_pUpdateBuildTypeLabelInfo;
+    CGUILabel*          m_pUpdateBuildTypeLabel;
+    CGUIComboBox*       m_pUpdateBuildTypeCombo;
+    CGUIButton*         m_pButtonUpdate;
+    CGUILabel*          m_pAdvancedMiscLabel;
+    CGUILabel*          m_pAdvancedUpdaterLabel;
+
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
     CGUILabel*          m_pLabelMTAVolume;
@@ -242,6 +248,7 @@ protected:
     bool                OnChatGreenChanged      ( CGUIElement* pElement );
     bool                OnChatBlueChanged       ( CGUIElement* pElement );
     bool                OnChatAlphaChanged      ( CGUIElement* pElement );
+    bool                OnUpdateButtonClick     ( CGUIElement* pElement );
 
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 

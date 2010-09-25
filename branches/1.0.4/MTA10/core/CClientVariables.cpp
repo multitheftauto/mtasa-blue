@@ -218,4 +218,5 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "mapalpha",                   155 );                          // map alpha
     DEFAULT ( "browser_speed",              2 );                            // Browser speed
     DEFAULT ( "single_download",            0 );                            // Single connection for downloads
+    DEFAULT ( "update_build_type",          0 );                            // 0-stable 1-test 2-nightly
 }

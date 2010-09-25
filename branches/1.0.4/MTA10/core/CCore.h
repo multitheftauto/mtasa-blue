@@ -198,7 +198,7 @@ public:
     void                    RegisterCommands                ( void );
     bool                    IsValidNick                     ( const char* szNick );     // Move somewhere else
     void                    Quit                            ( bool bInstantly = true );
-    void                    InitiateUpdate                  ( const char* szType, const char* szHost )      { m_pLocalGUI->InitiateUpdate ( szType, szHost ); }
+    void                    InitiateUpdate                  ( const char* szType, const char* szData, const char* szHost )      { m_pLocalGUI->InitiateUpdate ( szType, szData, szHost ); }
     bool                    IsOptionalUpdateInfoRequired    ( const char* szHost )                          { return m_pLocalGUI->IsOptionalUpdateInfoRequired ( szHost ); }
     void                    InitiateDataFilesFix            ( void )                                        { m_pLocalGUI->InitiateDataFilesFix (); }
 

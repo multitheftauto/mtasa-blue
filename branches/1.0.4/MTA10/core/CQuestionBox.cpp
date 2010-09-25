@@ -87,6 +87,8 @@ void CQuestionBox::Show ( void )
 
     m_pWindow->SetVisible ( true );
     m_pWindow->Activate ();
+    m_pWindow->SetAlwaysOnTop ( true );
+    m_pWindow->BringToFront ();
 }
 
 

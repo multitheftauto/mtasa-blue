@@ -53,7 +53,11 @@ namespace SharedUtil
     //
     // Output timestamped line into the debugger
     //
-    void OutputDebugLine ( const char* szMessage );
+    #ifdef MTA_DEBUG
+        void OutputDebugLine ( const char* szMessage );
+    #else
+        #define OutputDebugLine(x) {}
+    #endif
 
     //
     // Return true if supplied string adheres to the new version format

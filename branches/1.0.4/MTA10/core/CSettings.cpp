@@ -644,16 +644,22 @@ CSettings::CSettings ( void )
     /**
      *  Advanced tab
      **/
-    vecTemp = CVector2D ( 15.f, 27.f );
+    vecTemp = CVector2D ( 12.f, 12.f );
+
+    // Misc section label
+    m_pAdvancedMiscLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Misc" ) );
+    m_pAdvancedMiscLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pAdvancedMiscLabel->SetFont ( "default-bold-small" );
+    m_pAdvancedMiscLabel->AutoSize ( "Misc" );
+    vecTemp.fY += 20;
 
     // Asynchronous Loading
     m_pAsyncLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Asynchronous Loading:" ) );
-    m_pAsyncLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
-    m_pAsyncLabel->GetPosition ( vecTemp, false );
+    m_pAsyncLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pAsyncLabel->AutoSize ( m_pAsyncLabel->GetText ().c_str () );
 
     m_pAsyncCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pAsyncCombo->SetPosition ( CVector2D ( vecTemp.fX + 141.0f, vecTemp.fY - 1.0f ) );
+    m_pAsyncCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pAsyncCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pAsyncCombo->AddItem ( "Off" )->SetData ( (void*)0 );
     m_pAsyncCombo->AddItem ( "On" )->SetData ( (void*)2 );
@@ -661,19 +667,18 @@ CSettings::CSettings ( void )
     m_pAsyncCombo->SetReadOnly ( true );
 
     m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental feature which\nmay improve performance." ) );
-    m_pAsyncLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 332.f, vecTemp.fY - 4.f ) );
+    m_pAsyncLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pAsyncLabelInfo->SetFont ( "default-bold-small" );
     m_pAsyncLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
 
     // Browser scan speed
-    vecTemp.fY += 40;
     m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Browser speed:" ) );
-    m_pBrowserSpeedLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
-    m_pBrowserSpeedLabel->GetPosition ( vecTemp, false );
+    m_pBrowserSpeedLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pBrowserSpeedLabel->AutoSize ( m_pBrowserSpeedLabel->GetText ().c_str () );
 
     m_pBrowserSpeedCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pBrowserSpeedCombo->SetPosition ( CVector2D ( vecTemp.fX + 141.0f, vecTemp.fY - 1.0f ) );
+    m_pBrowserSpeedCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pBrowserSpeedCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pBrowserSpeedCombo->AddItem ( "Very slow" )->SetData ( (void*)0 );
     m_pBrowserSpeedCombo->AddItem ( "Slow" )->SetData ( (void*)1 );
@@ -681,28 +686,61 @@ CSettings::CSettings ( void )
     m_pBrowserSpeedCombo->SetReadOnly ( true );
 
     m_pBrowserSpeedLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Older routers may require\na slower scan speed." ) );
-    m_pBrowserSpeedLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 332.f, vecTemp.fY - 4.f ) );
+    m_pBrowserSpeedLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pBrowserSpeedLabelInfo->SetFont ( "default-bold-small" );
     m_pBrowserSpeedLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
 
     // Single download
-    vecTemp.fY += 40;
     m_pSingleDownloadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Single connection:" ) );
-    m_pSingleDownloadLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
-    m_pSingleDownloadLabel->GetPosition ( vecTemp, false );
+    m_pSingleDownloadLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pSingleDownloadLabel->AutoSize ( m_pSingleDownloadLabel->GetText ().c_str () );
 
     m_pSingleDownloadCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pSingleDownloadCombo->SetPosition ( CVector2D ( vecTemp.fX + 141.0f, vecTemp.fY - 1.0f ) );
+    m_pSingleDownloadCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pSingleDownloadCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pSingleDownloadCombo->AddItem ( "Default" )->SetData ( (void*)0 );
     m_pSingleDownloadCombo->AddItem ( "On" )->SetData ( (void*)1 );
     m_pSingleDownloadCombo->SetReadOnly ( true );
 
     m_pSingleDownloadLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Switch on to use only one\nconnection when downloading." ) );
-    m_pSingleDownloadLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 332.f, vecTemp.fY - 4.f ) );
+    m_pSingleDownloadLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pSingleDownloadLabelInfo->SetFont ( "default-bold-small" );
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40;
+
+    // Auto updater section label
+    m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Auto updater" ) );
+    m_pAdvancedUpdaterLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pAdvancedUpdaterLabel->SetFont ( "default-bold-small" );
+    m_pAdvancedUpdaterLabel->AutoSize ( "Auto updater" );
+    vecTemp.fY += 20;
+
+    // Update build type
+    m_pUpdateBuildTypeLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Update build type:" ) );
+    m_pUpdateBuildTypeLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pUpdateBuildTypeLabel->AutoSize ( m_pUpdateBuildTypeLabel->GetText ().c_str () );
+
+    m_pUpdateBuildTypeCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pUpdateBuildTypeCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pUpdateBuildTypeCombo->AddItem ( "Default" )->SetData ( (void*)0 );
+    m_pUpdateBuildTypeCombo->AddItem ( "Beta" )->SetData ( (void*)1 );
+    m_pUpdateBuildTypeCombo->AddItem ( "Nightly" )->SetData ( (void*)2 );
+    m_pUpdateBuildTypeCombo->SetReadOnly ( true );
+
+    m_pUpdateBuildTypeLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default unless you like\nfilling out bug reports." ) );
+    m_pUpdateBuildTypeLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pUpdateBuildTypeLabelInfo->SetFont ( "default-bold-small" );
+    m_pUpdateBuildTypeLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 35;
+
+    // Check for updates
+    m_pButtonUpdate = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, "Check for updates now" ) );
+    m_pButtonUpdate->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pButtonUpdate->SetSize ( CVector2D ( 168.0f, 24.0f ) );
+    m_pButtonUpdate->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnUpdateButtonClick, this ) );
+    vecTemp.fY += 30;
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
@@ -1811,6 +1849,12 @@ void CSettings::LoadData ( void )
     if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( "Default" );
     else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( "On" );
 
+    // Update build type
+    CVARS_GET ( "update_build_type", iVar );
+    if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( "Default" );
+    else if ( iVar == 1 ) m_pUpdateBuildTypeCombo->SetText ( "Beta" );
+    else if ( iVar == 2 ) m_pUpdateBuildTypeCombo->SetText ( "Nightly" );
+
     // Map alpha
     CVARS_GET ( "mapalpha", iVar);
     int iAlphaPercent = ceil( ( (float)Clamp ( 0, iVar, 255 ) / 255 ) * 100 );
@@ -1969,6 +2013,13 @@ void CSettings::SaveData ( void )
     {
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "single_download", iSelected );
+    }
+
+    // Update build type
+    if ( CGUIListItem* pSelected = m_pUpdateBuildTypeCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "update_build_type", iSelected );
     }
 
     // Map alpha
@@ -2428,5 +2479,18 @@ bool CSettings::OnChatAlphaChanged ( CGUIElement* pElement)
     else if ( pScrollBar == m_pChatAlpha [ ChatColorType::CHAT_COLOR_INPUT_TEXT ] )
         m_pChatAlphaValue [ ChatColorType::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
 
+    return true;
+}
+
+bool CSettings::OnUpdateButtonClick ( CGUIElement* pElement )
+{
+    // Update build type
+    if ( CGUIListItem* pSelected = m_pUpdateBuildTypeCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "update_build_type", iSelected );
+    }
+
+    GetVersionUpdater ()->InitiateManualCheck ();
     return true;
 }
