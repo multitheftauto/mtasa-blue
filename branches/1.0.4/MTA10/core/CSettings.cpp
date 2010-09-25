@@ -736,7 +736,7 @@ CSettings::CSettings ( void )
     vecTemp.fY += 35;
 
     // Check for updates
-    m_pButtonUpdate = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, "Check for updates now" ) );
+    m_pButtonUpdate = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, "Check for update now" ) );
     m_pButtonUpdate->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pButtonUpdate->SetSize ( CVector2D ( 168.0f, 24.0f ) );
     m_pButtonUpdate->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnUpdateButtonClick, this ) );

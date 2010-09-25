@@ -1367,17 +1367,32 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 }
 
                                 // Check the serial for validity
-                                if ( !pPlayer->GetSerial ().empty() &&
-                                     m_pBanManager->IsSerialBanned ( pPlayer->GetSerial ().c_str () ) )
+                                if ( CBan* pBan = m_pBanManager->GetBanFromSerial ( pPlayer->GetSerial ().c_str () ) )
                                 {
+                                    // Make a message including the ban duration
+                                    SString strBanMessage = "Serial is banned";
+                                    SString strDurationDesc = pBan->GetDurationDesc ();
+                                    if ( strDurationDesc.length () )
+                                        strBanMessage += " (" + strDurationDesc + ")";
+
                                     // Tell the console
-                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Serial is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (%s) (%s)\n", szNick, strBanMessage.c_str (), strIPAndSerial.c_str () );
+
+                                    // Make a message for the player
+                                    strBanMessage = std::string ( "Disconnected: " ) + strBanMessage;
+                                    if ( pPlayer->GetMTAVersion () <= 0x102 )
+                                        strBanMessage += " - If this is in error, ensure you have the lastest version of MTA.";
 
                                     // Tell the player he's banned
+                                    DisconnectPlayer ( this, *pPlayer, strBanMessage );
+
+/*
+                                    // Tell the player he's banned
                                     if ( pPlayer->GetMTAVersion () <= 0x102 )
-                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned - If this is in error, ensure you have the lastest version of MTA." );
+                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: %s - If this is in error, ensure you have the lastest version of MTA." );
                                     else
-                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned" );
+                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: %s" );
+*/
                                     return;
                                 }
 

@@ -7749,10 +7749,18 @@ CBan* CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsern
 
     if ( pBan )
     {
-        char szMessage [256];
-        szMessage[0] = '\0';
+        SString strDurationDesc = pBan->GetDurationDesc ();
+        SString strReasonText = pBan->GetReasonText ();
+        SString strEndBit;
+        if ( strReasonText.length () )
+            strEndBit += " (" + strReasonText + ")";
+        if ( strDurationDesc.length () )
+            strEndBit += " (" + strDurationDesc + ")";
 
-        _snprintf ( szMessage, 255, "You were banned by %s", ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+        SString strMessage ( "You were banned by %s%s", ( pResponsible ) ? pResponsible->GetNick () : "Console", strEndBit.c_str () );
+
+        if ( strMessage.length () > 255 )
+            strMessage = strMessage.substr ( 0, 255 );
 
         if ( szUsername ) pBan->SetAccount ( szUsername );
         if ( szSerial ) pBan->SetSerial ( szSerial );
@@ -7769,11 +7777,11 @@ CBan* CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsern
 
         // Log
         if ( szIP )
-            CLogger::LogPrintf ( "BAN: %s was banned by %s\n", szIP, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+            CLogger::LogPrintf ( "BAN: %s was banned by %s%s\n", szIP, ( pResponsible ) ? pResponsible->GetNick () : "Console", strEndBit.c_str () );
         else if ( szUsername )
-            CLogger::LogPrintf ( "BAN: %s was banned by %s\n", szUsername, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+            CLogger::LogPrintf ( "BAN: %s was banned by %s%s\n", szUsername, ( pResponsible ) ? pResponsible->GetNick () : "Console", strEndBit.c_str () );
         else
-            CLogger::LogPrintf ( "BAN: Serial ban was added by %s\n", szIP, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+            CLogger::LogPrintf ( "BAN: Serial ban was added by %s%s\n", ( pResponsible ) ? pResponsible->GetNick () : "Console", strEndBit.c_str () );
 
         // Loop through players to see if we should kick anyone
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
@@ -7810,7 +7818,7 @@ CBan* CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsern
                 (*iter)->CallEvent ( "onPlayerBan", Arguments );
 
                 // Tell the player that was banned why. QuitPlayer will delete the player.
-                (*iter)->Send ( CPlayerDisconnectedPacket ( szMessage ) );
+                (*iter)->Send ( CPlayerDisconnectedPacket ( strMessage ) );
                 g_pGame->QuitPlayer ( **iter, CClient::QUIT_BAN, false, szReason, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
             }
         }

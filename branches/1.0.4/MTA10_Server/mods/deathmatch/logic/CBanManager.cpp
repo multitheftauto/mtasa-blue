@@ -324,6 +324,18 @@ CBan* CBanManager::GetBan ( const char* szNick, unsigned int uiOccurrance )
 }
 
 
+CBan* CBanManager::GetBanFromSerial ( const char* szSerial )
+{
+    list < CBan* >::const_iterator iter = m_BanManager.begin ();
+    for ( ; iter != m_BanManager.end (); iter++ )
+    {
+        if ( (*iter)->GetSerial () == szSerial )
+            return *iter;
+    }
+    return NULL;
+}
+
+
 unsigned int CBanManager::GetBansWithNick ( const char* szNick )
 {
     unsigned int uiOccurrances = 0;

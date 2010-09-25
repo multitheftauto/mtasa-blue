@@ -17,3 +17,37 @@ CBan::CBan ( void )
     m_tTimeOfBan = 0;
     m_tTimeOfUnban = 0;
 }
+
+
+SString CBan::GetDurationDesc( void )
+{
+    time_t Start = GetTimeOfBan ();
+    time_t End = GetTimeOfUnban ();
+    if ( End > Start )
+    {
+        time_t Duration = End - Start;
+        int iDays = static_cast < int > ( Duration / 86400 );
+        Duration = Duration % 86400;
+        int iHours = static_cast < int > ( Duration / 3600 );
+        Duration = Duration % 3600;
+        int iMins = static_cast < int > ( Duration / 60 );
+
+        if ( iDays )
+            return SString ( "%d day%s", iDays, iDays > 1 ? "s" : "" );
+        if ( iHours )
+            return SString ( "%d hour%s", iHours, iHours > 1 ? "s" : "" );
+        if ( iMins )
+            return SString ( "%d min%s", iMins, iMins > 1 ? "s" : "" );
+    }
+    return "";
+}
+
+
+SString CBan::GetReasonText( void ) const
+{
+    // Remove after first '(' because of extra info added by admin panel
+    int iPos = m_strReason.find_first_of ( " (" );
+    if ( iPos != std::string::npos )
+        return m_strReason.substr ( 0, iPos );
+    return m_strReason;
+}
