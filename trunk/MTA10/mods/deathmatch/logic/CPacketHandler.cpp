@@ -1303,6 +1303,10 @@ void CPacketHandler::Packet_VehicleSpawn ( NetBitStreamInterface& bitStream )
         pVehicle->SetTurretRotation ( 0.0f, 0.0f );
         pVehicle->SetSirenOrAlarmActive ( false );
         pVehicle->SetAdjustablePropertyValue ( 0 );
+        CClientVehicle* pTowedBy = pVehicle->GetTowedByVehicle ();
+        if ( pTowedBy )
+            pTowedBy->SetTowedVehicle( NULL );
+        pVehicle->AttachTo ( NULL );
 
         // Call the onClientVehicleRespawn event
         CLuaArguments Arguments;
