@@ -465,7 +465,7 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
         if ( lua_getinfo( m_luaVM, ">nlS", &debugInfo ) )
         {
             // Make sure this function isn't defined in a string
-            if ( debugInfo.linedefined != 0 )
+            if ( debugInfo.source[0] == '@' )
             {
                 //std::string strFilename2 = ConformResourcePath ( debugInfo.source );
                 SString strFilename = debugInfo.source;
@@ -474,11 +474,11 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
                 if ( iPos >= 0 )
                     strFilename = strFilename.substr ( iPos + 1 );
 
-                strText = SString ( "@%s:%d", strFilename.c_str (), debugInfo.linedefined, iLuaFunction );
+                strText = SString ( "@%s:%d", strFilename.c_str (), debugInfo.currentline, iLuaFunction );
             }
             else
             {
-                strText = SString ( "@func_%d (string-defined function)", iLuaFunction );
+                strText = SString ( "@func_%d %s", iLuaFunction, debugInfo.short_src );
             }
         }
         else
