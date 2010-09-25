@@ -589,6 +589,8 @@ void CVehicle::SpawnAt ( const CVector& vecPosition, const CVector& vecRotation 
     memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
     SetLandingGearDown ( true );
     SetAdjustableProperty ( 0 );
+    SetTowedByVehicle ( NULL );
+    AttachTo ( NULL );
     
     CVector vecNull;
 

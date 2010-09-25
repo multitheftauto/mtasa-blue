@@ -530,6 +530,7 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
     Player.SetTeam ( pTeam, true );
     Player.SetInterior ( ucInterior );
     Player.SetDimension ( usDimension );
+    Player.AttachTo ( NULL );
 
     // Call onPlayerSpawn
     CLuaArguments OnPlayerSpawnArguments;
