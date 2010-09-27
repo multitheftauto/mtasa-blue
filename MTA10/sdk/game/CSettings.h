@@ -88,6 +88,14 @@ public:
     virtual void            SetRadioVolume          ( unsigned char ucVolume ) = 0;
     virtual unsigned char   GetSFXVolume            ( void ) = 0;
     virtual void            SetSFXVolume            ( unsigned char ucVolume ) = 0;
+    virtual unsigned int    GetUsertrackMode        ( void ) = 0;
+    virtual void            SetUsertrackMode        ( unsigned int uiMode ) = 0;
+    virtual bool            IsUsertrackAutoScan     ( void ) = 0;
+    virtual void            SetUsertrackAutoScan    ( bool bEnable ) = 0;
+    virtual bool            IsRadioEqualizerEnabled ( void ) = 0;
+    virtual void            SetRadioEqualizerEnabled( bool bEnable ) = 0;
+    virtual bool            IsRadioAutotuneEnabled  ( void ) = 0;
+    virtual void            SetRadioAutotuneEnabled ( bool bEnable ) = 0;
 
     virtual float           GetDrawDistance         ( void ) = 0;
     virtual void            SetDrawDistance         ( float fDrawDistance ) = 0;
