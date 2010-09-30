@@ -174,9 +174,7 @@ public:
     // Hooks
     void                    ApplyHooks                      ( void );
     HWND                    GetHookedWindow                 ( void );
-    void                    SetRenderDevice                 ( IUnknown* pDevice );
     void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput );
-    bool                    GetResetNeeded                  ( void );
     void                    CallSetCursorPos                ( int X, int Y ) { m_pSetCursorPosHook->CallSetCursorPos(X,Y); }
     void                    SetClientMessageProcessor       ( pfnProcessMessage pfnMessageProcessor ) { m_pfnMessageProcessor = pfnMessageProcessor; };
     pfnProcessMessage       GetClientMessageProcessor       ( void ) { return m_pfnMessageProcessor; }
@@ -222,7 +220,6 @@ private:
     CCommands *                 m_pCommands;
     CDirect3DData *             m_pDirect3DData;
     CConnectManager*            m_pConnectManager;
-    IUnknown *                  m_pRenderDevice;
 
     // Instances (put new classes here!)
     CXMLFile*                   m_pConfigFile;
@@ -264,7 +261,6 @@ private:
 
     CKeyBinds*                  m_pKeyBinds;
 
-    bool                        m_bResetNeeded;
     bool                        m_bFirstFrame;
     bool                        m_bIsOfflineMod;
     bool                        m_bCursorToggleControls;
