@@ -174,7 +174,6 @@ CCore::CCore ( void )
     m_pfnMessageProcessor       = NULL;
     m_pMessageBox = NULL;
 
-    m_bResetNeeded = false;
     m_bFirstFrame = true;
     m_bIsOfflineMod = false;
     m_bQuitOnPulse = false;
@@ -1286,18 +1285,6 @@ void CCore::RegisterCommands ( )
 #ifdef MTA_DEBUG
     //m_pCommands->Add ( "pools",               "read out the pool values",         CCommandFuncs::PoolRelocations );
 #endif
-}
-
-
-bool CCore::GetResetNeeded ( )
-{
-    return m_bResetNeeded;
-}
-
-
-void CCore::SetRenderDevice ( IUnknown* pDevice )
-{
-    m_pRenderDevice = pDevice;
 }
 
 
