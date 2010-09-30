@@ -256,7 +256,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 {
                     if ( !GetVideoModeManager ()->IsWindowed () )
                     {
-                        if ( !CLocalGUI::GetSingleton ().GetMainMenu ()->HasStarted () )
+                        if ( !CLocalGUI::GetSingleton ().GetMainMenu () || !CLocalGUI::GetSingleton ().GetMainMenu ()->HasStarted () )
                             return true;    // No auto-minimize
 
                         if ( GetVideoModeManager ()->IsMultiMonitor ()
