@@ -105,8 +105,10 @@ bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& bu
 //
 bool SharedUtil::FileSave ( const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce )
 {
+#ifdef WIN32
     if ( bForce )
         SetFileAttributes ( strFilename, FILE_ATTRIBUTE_NORMAL );
+#endif
 
     FILE* fh = fopen ( strFilename, "wb" );
     if ( !fh )
@@ -125,8 +127,10 @@ bool SharedUtil::FileSave ( const SString& strFilename, const void* pBuffer, uns
 //
 bool SharedUtil::FileAppend ( const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce )
 {
+#ifdef WIN32
     if ( bForce )
         SetFileAttributes ( strFilename, FILE_ATTRIBUTE_NORMAL );
+#endif
 
     FILE* fh = fopen ( strFilename, "ab" );
     if ( !fh )
@@ -307,8 +311,10 @@ bool SharedUtil::FileCopy ( const SString& strSrc, const SString& strDest, bool 
 {
     MakeSureDirExists ( strDest );
 
+#ifdef WIN32
     if ( bForce )
         SetFileAttributes ( strDest, FILE_ATTRIBUTE_NORMAL );
+#endif
 
     FILE* fhSrc = fopen ( strSrc, "rb" );
     if ( !fhSrc )

@@ -56,9 +56,6 @@ namespace SharedUtil
     int             GetApplicationSettingInt        ( const SString& strGroup, const SString& strKey );
     int             GetApplicationSettingInt        ( const SString& strGroupKey );
 
-    SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
-    SString         UnescapeString                  ( const SString& strText, char cSpecialChar = '#' );
-
     void            WatchDogReset                   ( void );
     bool            WatchDogIsSectionOpen           ( const SString& str );
     void            WatchDogIncCounter              ( const SString& str );
@@ -71,6 +68,8 @@ namespace SharedUtil
 
 #endif
 
+    SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
+    SString         UnescapeString                  ( const SString& strText, char cSpecialChar = '#' );
 
     //
     // Output timestamped line into the debugger
@@ -254,7 +253,7 @@ namespace SharedUtil
 
     // Find values in const collection
     template < class T, class V, class TR, class T2 >
-    void MultiFind ( const std::multimap < T, V, TR >& collection, T2& key, std::vector < V >* pResult )
+    void MultiFind ( const std::multimap < T, V, TR >& collection, const T2& key, std::vector < V >* pResult )
     {
         typedef typename std::multimap < T, V, TR > ::const_iterator const_iter_t;
         std::pair < const_iter_t, const_iter_t > itp = collection.equal_range ( key );
@@ -513,9 +512,9 @@ namespace SharedUtil
 
         SString ToString ( void ) const;
 
-        SString CArgMap::Escape ( const SString& strIn ) const;
+        SString Escape ( const SString& strIn ) const;
 
-        SString CArgMap::Unescape ( const SString& strIn ) const;
+        SString Unescape ( const SString& strIn ) const;
 
         // Set a unique key string value
         void Set ( const SString& strInCmd, const SString& strInValue );

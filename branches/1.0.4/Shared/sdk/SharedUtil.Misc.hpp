@@ -157,58 +157,6 @@ bool SharedUtil::GetOnRestartCommand ( SString& strOperation, SString& strFile, 
 #endif
 
 
-
-
-
-static char ToHexChar ( char c )
-{
-    return c > 9 ? c - 10 + 'A' : c + '0';
-}
-
-static char FromHexChar ( char c )
-{
-    return c > '9' ? c - 'A' + 10 : c - '0';
-}
-
-SString SharedUtil::EscapeString ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar )
-{
-    // Replace each disallowed char with #FF
-    SString strResult;
-    for ( uint i = 0 ; i < strText.length () ; i++ )
-    {
-        char c = strText[i];
-        if ( strDisallowedChars.find ( c ) == std::string::npos && c != cSpecialChar )
-            strResult += c;
-        else
-        {
-            strResult += cSpecialChar;
-            strResult += ToHexChar ( c >> 4 );
-            strResult += ToHexChar ( c & 0x0f );
-        }
-    }
-    return strResult;
-}
-
-
-SString SharedUtil::UnescapeString ( const SString& strText, char cSpecialChar )
-{
-    SString strResult;
-    // Replace #FF with char
-    for ( uint i = 0 ; i < strText.length () ; i++ )
-    {
-        char c = strText[i];
-        if ( c == cSpecialChar && i < strText.length () - 2 )
-        {
-            char c0 = FromHexChar ( strText[++i] );
-            char c1 = FromHexChar ( strText[++i] );
-            c = ( c0 << 4 ) | c1;
-        }
-        strResult += c;
-    }
-    return strResult;
-}
-
-
 //
 // An ApplicationSettingGroup is a collection of persistant key/value pairs
 // 
@@ -400,6 +348,55 @@ SString SharedUtil::GetReportLogContents ( void )
     return &buffer[0];
 }
 #endif
+
+
+static char ToHexChar ( char c )
+{
+    return c > 9 ? c - 10 + 'A' : c + '0';
+}
+
+static char FromHexChar ( char c )
+{
+    return c > '9' ? c - 'A' + 10 : c - '0';
+}
+
+SString SharedUtil::EscapeString ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar )
+{
+    // Replace each disallowed char with #FF
+    SString strResult;
+    for ( uint i = 0 ; i < strText.length () ; i++ )
+    {
+        char c = strText[i];
+        if ( strDisallowedChars.find ( c ) == std::string::npos && c != cSpecialChar )
+            strResult += c;
+        else
+        {
+            strResult += cSpecialChar;
+            strResult += ToHexChar ( c >> 4 );
+            strResult += ToHexChar ( c & 0x0f );
+        }
+    }
+    return strResult;
+}
+
+
+SString SharedUtil::UnescapeString ( const SString& strText, char cSpecialChar )
+{
+    SString strResult;
+    // Replace #FF with char
+    for ( uint i = 0 ; i < strText.length () ; i++ )
+    {
+        char c = strText[i];
+        if ( c == cSpecialChar && i < strText.length () - 2 )
+        {
+            char c0 = FromHexChar ( strText[++i] );
+            char c1 = FromHexChar ( strText[++i] );
+            c = ( c0 << 4 ) | c1;
+        }
+        strResult += c;
+    }
+    return strResult;
+}
 
 
 //
@@ -667,7 +664,6 @@ namespace SharedUtil
         {
             SString strCmd, strArg;
             parts[i].Split ( m_strArgSep, &strCmd, &strArg );
-            //Set ( strCmd, strArg );
             m_Map.erase ( strCmd );
             if ( strCmd.length () ) // Key can not be empty
                 MapInsert ( m_Map, strCmd, strArg );
