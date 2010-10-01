@@ -810,14 +810,14 @@ void CCore::CreateGame ( )
         {
             MessageBox ( 0, "Only GTA:SA version 1.0 is supported!  You are now being redirected to a page where you can patch your version.", "Error", MB_OK|MB_ICONEXCLAMATION );
             ShellExecute ( NULL, _T("open"), "http://multitheftauto.com/downgrade", NULL, NULL, SW_SHOWNORMAL );
-            TerminateProcess ( GetCurrentProcess (), 0 );
+            TerminateProcess ( GetCurrentProcess (), 1 );
         }
     }
     else
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "Game module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 }
 
@@ -856,7 +856,7 @@ void CCore::CreateMultiplayer ( )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "Multiplayer module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 }
 
@@ -894,7 +894,7 @@ void CCore::InitGUI ( IUnknown* pDevice )
     } else {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "GUI module could not be initialized!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     // Set the working directory for CGUI
@@ -933,7 +933,7 @@ void CCore::CreateGUI ( void )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "GUI module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
     WriteDebugEvent ( "GUI loaded." );
 
@@ -976,7 +976,7 @@ void CCore::CreateNetwork ( )
     if ( m_NetModule.IsOk () == false )
     {
         MessageBox ( 0, "Network module not found!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     // Network module compatibility check
@@ -986,7 +986,7 @@ void CCore::CreateNetwork ( )
     {
         // net.dll doesn't like our version number
         MessageBox ( 0, "Network module not compatible!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     // Get client initializer function from DLL's routine.
@@ -1003,10 +1003,23 @@ void CCore::CreateNetwork ( )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "Network module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     SetCurrentDirectory ( szCurDir );
+
+    // Set mta version for report log here
+    SetApplicationSetting ( "mta-version", SString ( "%d.%d.%d-%d.%05d.%d"
+                                ,MTASA_VERSION_MAJOR
+                                ,MTASA_VERSION_MINOR
+                                ,MTASA_VERSION_MAINTENANCE
+                                ,MTASA_VERSION_TYPE
+                                ,MTASA_VERSION_BUILD
+                                ,m_pNet->GetNetRev ()
+                                ) );
+    char szSerial [ 64 ];
+    m_pNet->GetSerial ( szSerial, sizeof ( szSerial ) );
+    SetApplicationSetting ( "serial", szSerial );
 }
 
 
@@ -1047,7 +1060,7 @@ void CCore::CreateXML ( )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "XML module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     SetCurrentDirectory ( szCurDir );

@@ -14,12 +14,14 @@
 #include <assert.h>
 
 static bool bCancelPressed = false;
+static bool bOkPressed = false;
 static HWND hwndSplash = NULL;
 static unsigned long ulSplashStartTime = 0;
 static HWND hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
 SString GetWMIOSVersion ( void );
+static HWND hwndCrashedDialog = NULL;
 
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
@@ -149,6 +151,9 @@ int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
             {  
                 case IDCANCEL:
                     bCancelPressed = true;
+                    return TRUE; 
+                case IDOK:
+                    bOkPressed = true;
                     return TRUE; 
             } 
     } 
@@ -458,13 +463,73 @@ void StopPseudoProgress( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// Crashed dialog
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString ShowCrashedDialog( HINSTANCE hInstance, const SString& strMessage )
+{
+    if ( !hwndCrashedDialog )
+    {
+        HideSplash ();
+        bCancelPressed = false;
+        bOkPressed = false;
+        hwndCrashedDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_CRASHED_DIALOG), 0, DialogProc );
+        SetWindowText ( GetDlgItem( hwndCrashedDialog, IDC_CRASH_INFO_EDIT ), strMessage );
+        SendDlgItemMessage( hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK, GetApplicationSetting ( "diagnostics", "send-dumps" ) != "no" ? BST_CHECKED : BST_UNCHECKED, 0 );
+    }
+    SetForegroundWindow ( hwndCrashedDialog );
+    SetWindowPos ( hwndCrashedDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+
+    while ( !bCancelPressed && !bOkPressed )
+    {
+        MSG msg;
+        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        {
+            if( GetMessage( &msg, NULL, 0, 0 ) )
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        Sleep( 10 );
+    }
+
+    LRESULT res = SendMessageA( GetDlgItem( hwndCrashedDialog, IDC_SEND_DUMP_CHECK ), BM_GETCHECK, 0, 0 );
+    SetApplicationSetting ( "diagnostics", "send-dumps", res ? "yes" : "no" );
+
+    if ( bCancelPressed )
+        return "quit";
+    //if ( bOkPressed )
+        return "ok";
+}
+
+
+void HideCrashedDialog ( void )
+{
+    if ( hwndCrashedDialog )
+    {
+        DestroyWindow ( hwndCrashedDialog );
+        hwndCrashedDialog = NULL;
+    }
+}
+
+
+
+
+///////////////////////////////////////////////////////////////
+//
 // FindFilesRecursive
 //
 // Return a list of files inside strPath
 //
 ///////////////////////////////////////////////////////////////
-void FindFilesRecursive ( const SString& strPath, std::vector < SString >& outFileList )
+void FindFilesRecursive ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth )
 {
+    SString strPath, strMatch;
+    strPathMatch.Split ( "\\", &strPath, &strMatch, true );
+
     std::list < SString > toDoList;
     toDoList.push_back ( strPath );
     while ( toDoList.size () )
@@ -472,8 +537,8 @@ void FindFilesRecursive ( const SString& strPath, std::vector < SString >& outFi
         SString strPathHere = toDoList.front ();
         toDoList.pop_front ();
 
-        std::vector < SString > fileListHere = FindFiles ( strPathHere + "\\*", true, false );
-        std::vector < SString > dirListHere = FindFiles ( strPathHere + "\\*", false, true );
+        std::vector < SString > fileListHere = FindFiles ( strPathHere + "\\" + strMatch, true, false );
+        std::vector < SString > dirListHere = FindFiles ( strPathHere + "\\" + strMatch, false, true );
 
         for ( unsigned int i = 0 ; i < fileListHere.size (); i++ )
         {
@@ -949,4 +1014,93 @@ SString GetWMIOSVersion ( void )
 
     const SString& strVersion  = vecResults[0][0];
     return strVersion;
+}
+
+
+static SString HashBuffer ( char* pData, uint uiLength )
+{
+    DWORD dwSum1 = 0;
+    DWORD dwSum2 = 0x1234;
+    for ( uint i = 0 ; i < uiLength ; i++ )
+    {
+        dwSum1 += pData[i];
+        dwSum2 += pData[i];
+        dwSum2 ^= ( dwSum2 << 2 ) + 0x93;
+    }
+    return SString ( "%08x%08x%08x", dwSum1, dwSum2, uiLength );
+}
+
+
+/////////////////////////////////////////////////////////////////////
+//
+// UpdateMTAVersionApplicationSetting
+//
+// Make sure "mta-version" is correct. eg "1.0.4-9.01234.0"
+//
+/////////////////////////////////////////////////////////////////////
+void UpdateMTAVersionApplicationSetting ( void )
+{
+#ifdef MTA_DEBUG
+    SString strFilename = CalcMTASAPath ( "mta\\netc_d.dll" );
+#else
+    SString strFilename = CalcMTASAPath ( "mta\\netc.dll" );
+#endif
+
+    //
+    // Determine NetRev number
+    //
+
+    // Get saved status
+    SString strOldHash = GetApplicationSetting ( "netc-hash" );
+    SString strNetRev;
+    GetApplicationSetting ( "mta-version" ).Split ( ".", NULL, &strNetRev, true );
+
+    // Hash the file
+    std::vector < char > buffer;
+    FileLoad ( strFilename, buffer );
+    SString strNewHash = "none";
+    if ( buffer.size () )
+        strNewHash = HashBuffer ( &buffer.at ( 0 ), buffer.size () );
+
+    // Only loadup the dll if the hash has changed, or we don't have a previous valid netrev value
+    if ( strNewHash != strOldHash || !isdigit ( strNetRev[0] ) )
+    {
+        char cResult = '+';
+
+        SString strPrevCurDir = GetCurrentWorkingDirectory ();
+        SString strTempCurDir = CalcMTASAPath ( "mta" );
+        SetCurrentDirectory ( strTempCurDir );
+        SetDllDirectory( strTempCurDir );
+
+    #ifdef MTA_DEBUG
+        HMODULE hModule = LoadLibrary ( CalcMTASAPath ( "mta\\netc_d.dll" ) );
+    #else
+        HMODULE hModule = LoadLibrary ( CalcMTASAPath ( "mta\\netc.dll" ) );
+    #endif
+
+        if ( hModule )
+        {
+            typedef unsigned short (*PFNGETNETREV) ( void );
+            PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
+            if ( pfnGetNetRev )
+                cResult = pfnGetNetRev () + '0';
+
+            FreeLibrary ( hModule );
+        }
+
+        SetCurrentDirectory ( strPrevCurDir );
+        SetDllDirectory( strPrevCurDir );
+
+        strNetRev = SString ( "%c", cResult );
+        SetApplicationSetting ( "netc-hash", strNewHash );
+    }
+
+    SetApplicationSetting ( "mta-version", SString ( "%d.%d.%d-%d.%05d.%c"
+                                ,MTASA_VERSION_MAJOR
+                                ,MTASA_VERSION_MINOR
+                                ,MTASA_VERSION_MAINTENANCE
+                                ,MTASA_VERSION_TYPE
+                                ,MTASA_VERSION_BUILD
+                                ,strNetRev[0]
+                                ) );
 }

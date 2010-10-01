@@ -3133,6 +3133,9 @@ void CClientGame::Event_OnIngame ( void )
 
     // Make sure we never get tired
     g_pGame->GetPlayerInfo ()->SetDoesNotGetTired ( true );
+
+    // Tell doggy we got the game running
+    WatchDogCompletedSection ( "L1" );
 }
 
 

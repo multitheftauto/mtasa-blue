@@ -29,6 +29,49 @@ bool SharedUtil::FileExists ( const SString& strFilename )
 
 
 //
+// Returns true if the directory exists
+//
+bool SharedUtil::DirectoryExists ( const SString& strPath )
+{
+#ifdef WIN32
+    DWORD dwAtr = GetFileAttributes ( strPath );
+    if ( dwAtr == INVALID_FILE_ATTRIBUTES )
+        return false;
+    return ( ( dwAtr & FILE_ATTRIBUTE_DIRECTORY) != 0 );     
+#else
+    struct stat Info;
+    stat ( strPath, &Info );
+    return ( S_ISDIR ( Info.st_mode ) );
+#endif
+}
+
+
+bool SharedUtil::FileLoad ( const SString& strFilename, SString& strBuffer )
+{
+    strBuffer = "";
+    std::vector < char > buffer;
+    if ( !FileLoad ( strFilename, buffer ) )
+        return false;
+    if ( buffer.size () )
+    {
+        buffer.push_back ( 0 );
+        strBuffer = SString ( &buffer.at ( 0 ), buffer.size () );
+    }
+    return true;
+}
+
+bool SharedUtil::FileSave ( const SString& strFilename, const SString& strBuffer, bool bForce )
+{
+    return FileSave ( strFilename, strBuffer.length () ? &strBuffer.at ( 0 ) : NULL, strBuffer.length (), bForce );
+}
+
+bool SharedUtil::FileAppend ( const SString& strFilename, const SString& strBuffer, bool bForce )
+{
+    return FileAppend ( strFilename, strBuffer.length () ? &strBuffer.at ( 0 ) : NULL, strBuffer.length (), bForce );
+}
+
+
+//
 // Load binary data from a file into an array
 //
 bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& buffer )
@@ -60,8 +103,11 @@ bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& bu
 //
 // Save binary data to a file
 //
-bool SharedUtil::FileSave ( const SString& strFilename, const void* pBuffer, unsigned long ulSize )
+bool SharedUtil::FileSave ( const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce )
 {
+    if ( bForce )
+        SetFileAttributes ( strFilename, FILE_ATTRIBUTE_NORMAL );
+
     FILE* fh = fopen ( strFilename, "wb" );
     if ( !fh )
         return false;
@@ -77,8 +123,11 @@ bool SharedUtil::FileSave ( const SString& strFilename, const void* pBuffer, uns
 //
 // Append binary data to a file
 //
-bool SharedUtil::FileAppend ( const SString& strFilename, const void* pBuffer, unsigned long ulSize )
+bool SharedUtil::FileAppend ( const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce )
 {
+    if ( bForce )
+        SetFileAttributes ( strFilename, FILE_ATTRIBUTE_NORMAL );
+
     FILE* fh = fopen ( strFilename, "ab" );
     if ( !fh )
         return false;
@@ -179,10 +228,10 @@ void SharedUtil::PathExtractLast ( std::vector < SString >& outList, const SStri
 */
 
 #ifdef WIN32
-SString SharedUtil::GetMTAAppDataPath ( void )
+SString SharedUtil::GetMTALocalAppDataPath ( void )
 {
     char szResult[MAX_PATH] = "";
-    SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szResult );
+    SHGetFolderPath( NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szResult );
     return PathJoin ( szResult, "MTA San Andreas" );
 }
 
@@ -254,9 +303,12 @@ bool SharedUtil::MkDir ( const SString& strInPath, bool bTree )
 // Copies a single file.
 //
 ///////////////////////////////////////////////////////////////
-bool SharedUtil::FileCopy ( const SString& strSrc, const SString& strDest )
+bool SharedUtil::FileCopy ( const SString& strSrc, const SString& strDest, bool bForce )
 {
     MakeSureDirExists ( strDest );
+
+    if ( bForce )
+        SetFileAttributes ( strDest, FILE_ATTRIBUTE_NORMAL );
 
     FILE* fhSrc = fopen ( strSrc, "rb" );
     if ( !fhSrc )
@@ -332,13 +384,14 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
 }
 #endif
 
-bool ExtractFilename ( const SString& strPathFilename, SString* strPath, SString* strFilename )
+void SharedUtil::ExtractFilename ( const SString& strPathFilename, SString* strPath, SString* strFilename )
 {
-    return strPathFilename.Split ( PATH_SEPERATOR, strPath, strFilename, true );
+    if ( !strPathFilename.Split ( PATH_SEPERATOR, strPath, strFilename, true ) )
+        if ( strFilename )
+            *strFilename = strPathFilename;
 }
 
-
-bool ExtractExt ( const SString& strFilename, SString* strMain, SString* strExt )
+bool SharedUtil::ExtractExtention ( const SString& strFilename, SString* strMain, SString* strExt )
 {
     return strFilename.Split ( ".", strMain, strExt, true );
 }
@@ -353,7 +406,7 @@ SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
     ExtractFilename ( strPathFilename, &strPath, &strFilename );
 
     SString strMain, strExt;
-    if ( ExtractExt ( strFilename, &strMain, &strExt ) )
+    if ( ExtractExtention ( strFilename, &strMain, &strExt ) )
     {
         strBeforeUniqueChar = PathJoin ( strPath, strMain );
         strAfterUniqueChar = "." + strExt;

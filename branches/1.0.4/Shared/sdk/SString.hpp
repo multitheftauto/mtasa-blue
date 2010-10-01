@@ -160,7 +160,7 @@ bool SString::Split ( const SString& strDelim, SString* pstrLeft, SString* pstrR
         *pstrLeft = substr ( 0, ulPos );
 
     if ( pstrRight )
-        *pstrRight = substr ( ulPos + 1, length () - ( ulPos + 1 ) );
+        *pstrRight = substr ( ulPos + strDelim.length (), length () - ( ulPos + strDelim.length () ) );
  
     return true;
 }
@@ -184,14 +184,32 @@ SString SString::Replace ( const char* szOld, const char* szNew ) const
 }
 
 //
+// Case insensitive version of Replace()
+//
+SString SString::ReplaceI ( const char* szOld, const char* szNew ) const
+{
+    int iOldLength = strlen ( szOld );
+    int iNewLength = strlen ( szNew );
+    SString strResult = *this;
+    int idx = 0;
+    while( ( idx = strResult.ToUpper ().find ( SString ( szOld, 0 ).ToUpper (), idx ) ) >= 0 )
+    {
+        strResult.replace ( idx, iOldLength, szNew );
+        idx += iNewLength - iOldLength + 1;
+    }
+    return strResult;
+}
+
+
+//
 // Remove szOlds from the start of the string.
 //
 SString SString::TrimStart ( const char* szOld ) const
 {
-    int iOldLength = strlen ( szOld );
+    const uint uiOldLength = strlen ( szOld );
     SString strResult = *this;
-    while ( strResult.substr ( 0, iOldLength ) == szOld )
-        strResult = strResult.substr ( iOldLength );
+    while ( strResult.substr ( 0, uiOldLength ) == szOld )
+        strResult = strResult.substr ( uiOldLength );
     return strResult;
 }
 
@@ -200,10 +218,10 @@ SString SString::TrimStart ( const char* szOld ) const
 //
 SString SString::TrimEnd ( const char* szOld ) const
 {
-    int iOldLength = strlen ( szOld );
+    const uint uiOldLength = strlen ( szOld );
     SString strResult = *this;
-    while ( strResult.substr ( strResult.length () - iOldLength ) == szOld )
-        strResult = strResult.substr ( 0, strResult.length () - iOldLength );
+    while ( strResult.length () >= uiOldLength && strResult.substr ( strResult.length () - uiOldLength ) == szOld )
+        strResult = strResult.substr ( 0, strResult.length () - uiOldLength );
     return strResult;
 }
 

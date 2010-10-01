@@ -14,7 +14,7 @@
 
 namespace SharedUtil
 {
-
+    class CArgMap;
 #ifdef WIN32
 
     //
@@ -43,9 +43,31 @@ namespace SharedUtil
     //
     // For tracking results of new features
     //
-    void AddReportLog ( uint uiId, const SString& strText );
-    void SetReportLogContents ( const SString& strText );
-    SString GetReportLogContents ( void );
+    void            AddReportLog                    ( uint uiId, const SString& strText );
+    void            SetReportLogContents            ( const SString& strText );
+    SString         GetReportLogContents            ( void );
+
+    void            SetApplicationSetting           ( const SString& strGroup, const SString& strKey, const SString& strValue );
+    void            SetApplicationSetting           ( const SString& strGroupKey, const SString& strValue );
+    void            SetApplicationSettingInt        ( const SString& strGroup, const SString& strKey, int iValue );
+    void            SetApplicationSettingInt        ( const SString& strGroupKey, int iValue );
+    SString         GetApplicationSetting           ( const SString& strGroup, const SString& strKey );
+    SString         GetApplicationSetting           ( const SString& strGroupKey );
+    int             GetApplicationSettingInt        ( const SString& strGroup, const SString& strKey );
+    int             GetApplicationSettingInt        ( const SString& strGroupKey );
+
+    SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
+    SString         UnescapeString                  ( const SString& strText, char cSpecialChar = '#' );
+
+    void            WatchDogReset                   ( void );
+    bool            WatchDogIsSectionOpen           ( const SString& str );
+    void            WatchDogIncCounter              ( const SString& str );
+    int             WatchDogGetCounter              ( const SString& str );
+    void            WatchDogClearCounter            ( const SString& str );
+    void            WatchDogBeginSection            ( const SString& str );
+    void            WatchDogCompletedSection        ( const SString& str );
+    bool            WatchDogWasUncleanStop          ( void );
+    void            WatchDogSetUncleanStop          ( bool bOn );
 
 #endif
 
@@ -480,123 +502,54 @@ namespace SharedUtil
         std::multimap < SString, SString > m_Map;
         SString m_strArgSep;
         SString m_strPartsSep;
+        SString m_strDisallowedChars;
     public:
-        CArgMap ( const SString& strArgSep, const SString& strPartsSep )
-            : m_strArgSep ( strArgSep )
-            , m_strPartsSep ( strPartsSep )
-        {}
+        CArgMap ( const SString& strArgSep = "=", const SString& strPartsSep = "&", const SString& strExtraDisallowedChars = "" );
 
-        void Merge ( const CArgMap& other )
-        {
-            MergeFromString ( other.ToString () );
-        }
+        void Merge ( const CArgMap& other );
+        void SetFromString ( const SString& strLine );
 
-        void SetFromString ( const SString& strLine )
-        {
-            m_Map.clear ();
-            MergeFromString ( strLine );
-        }
+        void MergeFromString ( const SString& strLine );
 
-        void MergeFromString ( const SString& strLine )
-        {
-            std::vector < SString > parts;
-            strLine.Split( m_strPartsSep, parts );
-            for ( uint i = 0 ; i < parts.size () ; i++ )
-            {
-                SString strCmd, strArg;
-                parts[i].Split ( m_strArgSep, &strCmd, &strArg );
-                Set ( strCmd, strArg );
-            }
-        }
+        SString ToString ( void ) const;
 
-        SString ToString ( void ) const
-        {
-            SString strResult;
-            for ( std::multimap < SString, SString >::const_iterator iter = m_Map.begin () ; iter != m_Map.end () ; ++iter )
-            {
-                if ( strResult.length () )
-                    strResult += m_strPartsSep;
-                strResult += iter->first + m_strArgSep + iter->second;
-            }
-            return strResult;
-        }
+        SString CArgMap::Escape ( const SString& strIn ) const;
+
+        SString CArgMap::Unescape ( const SString& strIn ) const;
 
         // Set a unique key string value
-        void Set ( const SString& strCmd, const SString& strValue )
-        {
-            m_Map.erase ( strCmd );
-            Insert ( strCmd, strValue );
-        }
+        void Set ( const SString& strInCmd, const SString& strInValue );
+
 
         // Set a unique key int value
-        void Set ( const SString& strCmd, int iValue )
-        {
-            m_Map.erase ( strCmd );
-            Insert ( strCmd, iValue );
-        }
+        void Set ( const SString& strInCmd, int iValue );
+
 
         // Insert a key int value
-        void Insert ( const SString& strCmd, int iValue )
-        {
-            Insert ( strCmd, SString ( "%d", iValue ) );
-        }
-
+        void Insert ( const SString& strInCmd, int iValue );
+ 
         // Insert a key string value
-        void Insert ( const SString& strCmd, const SString& strValue )
-        {
-            if ( strCmd.length () ) // Key can not be empty
-                MapInsert ( m_Map, strCmd, strValue );
-        }
+        void Insert ( const SString& strInCmd, const SString& strInValue );
 
 
         // Test if key exists
-        bool Contains ( const SString& strCmd  ) const
-        {
-            return MapFind ( m_Map, strCmd ) != NULL;
-        }
+        bool Contains ( const SString& strInCmd  ) const;
+
 
         // First result as string
-        bool Get ( const SString& strCmd, SString& strOut, const char* szDefault = "" ) const
-        {
-            assert ( szDefault );
-            if ( const SString* pResult = MapFind ( m_Map, strCmd ) )
-            {
-                strOut = *pResult;
-                return true;
-            }
-            strOut = szDefault;
-            return false;
-        }
+        bool Get ( const SString& strInCmd, SString& strOut, const char* szDefault = "" ) const;
 
         // First result as string
-        SString Get ( const SString& strCmd ) const
-        {
-            SString strResult;
-            Get ( strCmd, strResult );
-            return strResult;
-        }
+        SString Get ( const SString& strInCmd ) const;
 
         // All results as strings
-        bool Get ( const SString& strCmd, std::vector < SString >& outList ) const
-        {
-            std::vector < SString > newItems;
-            MultiFind ( m_Map, strCmd, &newItems );
-            ListAppend ( outList, newItems );
-            return newItems.size () > 0;
-        }
+        bool Get ( const SString& strInCmd, std::vector < SString >& outList ) const;
 
         // First result as int
-        bool Get ( const SString& strCmd, int& iValue, int iDefault = 0 ) const
-        {
-            if ( const SString* pResult = MapFind ( m_Map, strCmd ) )
-            {
-                iValue = atoi ( *pResult );
-                return true;
-            }
-            iValue = iDefault;
-            return false;
-        }
+        bool Get ( const SString& strInCmd, int& iValue, int iDefault = 0 ) const;
+
     };
+
 
 };
 

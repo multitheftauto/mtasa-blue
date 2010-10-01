@@ -12,15 +12,17 @@
 
 #include "StdInc.h"
 #include <utils/CMD5Hasher.h>
+#include "Userenv.h"
 
 // Do a static page check first
 #define VERSION_CHECKER_URL1 "http://vers-m2-kows.yomg.net/mta/%VERSION%/?v=%VERSION%&id=%ID%&st=%STATUS%&ty=%TYPE%&da=%DATA%&be=%BETA%&re=%REFER%"
 #define VERSION_CHECKER_URL2 "http://vers-m2-kows.yomg.net/mta/?v=%VERSION%&id=%ID%&st=%STATUS%&ty=%TYPE%&da=%DATA%&be=%BETA%&re=%REFER%"
 
-#define DATA_FILES_URL1 "http://vers-m2-kows.yomg.net/mtadf/%VERSION%/?v=%VERSION%&id=%ID%&st=%STATUS%"
-#define DATA_FILES_URL2 "http://vers-m2-kows.yomg.net/mtadf/?v=%VERSION%&id=%ID%&st=%STATUS%"
+#define DATA_FILES_URL1 "http://vers-m2-kows.yomg.net/mtadf/?v=%VERSION%&id=%ID%&st=%STATUS%"
 
 #define REPORT_LOG_URL1 "http://vers-m2-kows.yomg.net/mtarep/?v=%VERSION%&id=%ID%&st=%STATUS%"
+
+#define CRASH_DUMP_URL1 "http://vers-m2-kows.yomg.net/mtadmp/?v=%VERSION%&id=%ID%&st=%STATUS%&file=%FILE%"
 
 
 #define MAX_UPDATER_CHECK_ATTEMPTS      (3)
@@ -72,6 +74,26 @@ class CVersionUpdater;
 
 namespace
 {
+
+    ///////////////////////////////////////////////////////////////
+    //
+    // ExpandEnvString
+    //
+    // eg "%HOMEDRIVE%" -> "C:"
+    //
+    ///////////////////////////////////////////////////////////////
+    SString ExpandEnvString( const SString& strInput )
+    {
+        HANDLE hProcessToken;
+        if ( !OpenProcessToken ( GetCurrentProcess (), TOKEN_IMPERSONATE | TOKEN_QUERY | TOKEN_DUPLICATE, &hProcessToken ) )
+            return strInput;
+
+        const static int iBufferSize = 32000;
+        char envBuf [ iBufferSize + 2 ];
+        ExpandEnvironmentStringsForUser ( hProcessToken, strInput, envBuf, iBufferSize );
+        return envBuf;
+    }
+
 
     ///////////////////////////////////////////////////////////////
     //
@@ -249,6 +271,7 @@ namespace
         SString                 strFilename;
         int                     iFilesize;
         std::vector < SString > serverList;
+        std::vector < SString > savePathList;
         SString                 strMD5;
         SString                 strEnd;
         unsigned int            uiBytesDownloaded;
@@ -357,6 +380,7 @@ public:
     // CVersionUpdaterInterface interface
                         CVersionUpdater                     ( void );
     virtual             ~CVersionUpdater                    ( void );
+    virtual void        EnableChecking                      ( bool bOn );
     virtual void        DoPulse                             ( void );
     virtual void        InitiateUpdate                      ( const SString& strType, const SString& strData, const SString& strHost );
     virtual bool        IsOptionalUpdateInfoRequired        ( const SString& strHost );
@@ -381,6 +405,9 @@ public:
     void                _UseVersionCheckURLs                ( void );
     void                _UseDataFilesURLs                   ( void );
     void                _UseReportLogURLs                   ( void );
+    void                _UseCrashDumpURLs                   ( void );
+    void                _UseReportLogPostContent            ( void );
+    void                _UseCrashDumpPostContent            ( void );
     void                _ActionReconnect                    ( void );
     void                _DialogHide                         ( void );
     void                _End                                ( void );
@@ -429,12 +456,18 @@ public:
     SString                             m_strServerSaysHost;
 
     bool                                m_bCheckedTimeForPeriodicCheck;
+    bool                                m_bSentCrashDump;
     bool                                m_bSentReportLog;
     std::map < SString, int >           m_DoneOptionalMap;
+    std::vector < char >                m_PostContent;
+    bool                                m_bPostContentBinary;
+    SString                             m_strPostFilename;
 
     long long                           m_llTimeLastManualCheck;
 
     CReportWrap*                        m_pReportWrap;
+    SString                             m_strLastQueryURL;
+    bool                                m_bEnableChecking;
 };
 
 
@@ -467,10 +500,13 @@ CVersionUpdater::CVersionUpdater ( void )
     m_pReportWrap = NULL;
     m_llTimeStart = 0;
     m_bCheckedTimeForPeriodicCheck = false;
+    m_bSentCrashDump = false;
     m_bSentReportLog = false;
     InitPrograms ();
     CheckPrograms ();
     m_llTimeLastManualCheck = 0;
+    m_bPostContentBinary = false;
+    m_bEnableChecking = false;
 }
 
 
@@ -489,7 +525,20 @@ CVersionUpdater::~CVersionUpdater ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::DoPulse
+// CVersionUpdater::EnableChecking
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::EnableChecking( bool bOn )
+{
+    m_bEnableChecking = bOn;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::GetReportWrap
 //
 //
 //
@@ -511,6 +560,9 @@ CReportWrap* CVersionUpdater::GetReportWrap()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::DoPulse ( void )
 {
+    if ( !m_bEnableChecking )
+        return;
+
     //
     // Check time for periodic check?
     //
@@ -522,11 +574,24 @@ void CVersionUpdater::DoPulse ( void )
         unsigned int uiLastCheckTime = 0;
         CVARS_GET ( "last_version_check", uiLastCheckTime );
 
+        // Do update check now if game did not stop cleanly last time
+        if ( WatchDogWasUncleanStop () )
+            uiLastCheckTime = 0;
+
         // Only check once a day
         if ( uiTimeNow - uiLastCheckTime > 60 * 60 * 24 || uiTimeNow < uiLastCheckTime )
         {
             RunProgram ( "PeriodicCheck" );
         }
+    }
+
+    //
+    // Should send previous crash dump?
+    //
+    if ( !m_bSentCrashDump && !IsBusy () )
+    {
+        m_bSentCrashDump = true;
+        RunProgram ( "SendCrashDump" );
     }
 
     //
@@ -673,6 +738,9 @@ void CVersionUpdater::ResetEverything ()
     m_strServerSaysType = "";
     m_strServerSaysData = "";
     m_strServerSaysHost = "";
+    m_bPostContentBinary = false;
+    m_strPostFilename = "";
+    m_PostContent.clear ();
 
     GetQuestionBox ().Reset ();
 }
@@ -952,6 +1020,22 @@ void CVersionUpdater::InitPrograms ()
 
 
     //
+    // SendCrashDump
+    //
+    {
+        SString strProgramName = "SendCrashDump";
+        MapSet ( m_ProgramMap, strProgramName, CProgram () );
+        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
+
+        ADDINST (   _UseCrashDumpURLs );                        // Use CRASH_DUMP_URL*
+        ADDINST (   _UseCrashDumpPostContent );                 // Use crash dump source
+        ADDINST (   _StartSendPost );                           // Send data
+        ADDLABL ( "end:" );
+        ADDINST (     _End );
+    }
+
+
+    //
     // SendReportLog
     //
     {
@@ -960,6 +1044,7 @@ void CVersionUpdater::InitPrograms ()
         CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
 
         ADDINST (   _UseReportLogURLs );                        // Use REPORT_LOG_URL*
+        ADDINST (   _UseReportLogPostContent );                 // Use report log source
         ADDINST (   _StartSendPost );                           // Send data
         ADDLABL ( "end:" );
         ADDINST (     _End );
@@ -1053,7 +1138,6 @@ void CVersionUpdater::_UseDataFilesURLs ( void )
 {
     m_QueryInfo = CCheckInfo ();
     m_QueryInfo.serverList.push_back ( DATA_FILES_URL1 );
-    m_QueryInfo.serverList.push_back ( DATA_FILES_URL2 );
 }
 
 
@@ -1068,6 +1152,20 @@ void CVersionUpdater::_UseReportLogURLs ( void )
 {
     m_QueryInfo = CCheckInfo ();
     m_QueryInfo.serverList.push_back ( REPORT_LOG_URL1 );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_UseCrashDumpURLs
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseCrashDumpURLs ( void )
+{
+    m_QueryInfo = CCheckInfo ();
+    m_QueryInfo.serverList.push_back ( CRASH_DUMP_URL1 );
 }
 
 
@@ -1673,6 +1771,71 @@ void CVersionUpdater::_PollFileDownload ( void )
 }
 
 
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_UseReportLogPostContent
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseReportLogPostContent ( void )
+{
+    m_PostContent.clear ();
+    m_strPostFilename = "";
+
+    // Remove unrequired items
+#ifndef MTA_DEBUG
+    GetReportWrap ()->ClearLogContents ( GetReportWrap ()->GetFilter () );
+#endif
+    // See if anything left to send
+    SString strContents = GetReportWrap ()->GetLogContents ( GetReportWrap ()->GetFilter (), GetReportWrap ()->GetMaxSize () );
+    if ( (int)strContents.length () < GetReportWrap ()->GetMinSize () )
+        return;
+
+    // Copy to post buffer
+    const char* pSrc = &strContents.at ( 0 );
+    uint uiLength = strContents.length () + 1;
+
+    m_PostContent.assign ( uiLength, 0 );
+    char* pDst = &m_PostContent.at ( 0 );
+    memcpy ( pDst, pSrc, uiLength );
+    m_bPostContentBinary = false;
+
+    // Wipe log here
+    GetReportWrap ()->ClearLogContents ( "" );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_UseCrashDumpPostContent
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseCrashDumpPostContent ( void )
+{
+    m_PostContent.clear ();
+    m_strPostFilename = "";
+
+    // Get filename to send
+    SString strPathFilename = GetApplicationSetting ( "diagnostics", "last-dump-save" );
+    if ( !strPathFilename.length () )
+        return;
+    SetApplicationSetting ( "diagnostics", "last-dump-save", "" );
+
+    // Get user pref
+    if ( GetApplicationSetting ( "diagnostics", "send-dumps" ) == "no" )
+        return;
+
+    // Load into post buffer
+    FileLoad ( strPathFilename, m_PostContent );
+
+    // Set post filename without path
+    strPathFilename.Split ( PATH_SEPERATOR, NULL, &m_strPostFilename, true );
+    m_bPostContentBinary = true;
+}
+
 
 ///////////////////////////////////////////////////////////////
 //
@@ -1683,12 +1846,7 @@ void CVersionUpdater::_PollFileDownload ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_StartSendPost ( void )
 {
-    // Remove unrequired items
-    GetReportWrap ()->ClearLogContents ( GetReportWrap ()->GetFilter () );
-
-    // See if anything left to send
-    SString strContents = GetReportWrap ()->GetLogContents ( GetReportWrap ()->GetFilter () );
-    if ( (int)strContents.length () < GetReportWrap ()->GetMinSize () )
+    if ( !m_PostContent.size () )
         return;
 
     switch ( DoSendPostToNextServer () )
@@ -1814,6 +1972,7 @@ int CVersionUpdater::DoSendQueryToNextServer ( void )
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );
+    m_strLastQueryURL = strQueryURL;
     return RES_OK;
 }
 
@@ -1837,11 +1996,12 @@ int CVersionUpdater::DoPollQueryResponse ( void )
         unsigned int status = m_HTTP.GetStatus ();
         if ( ( status !=0 && status != 200 ) || GetTickCount64_ () - m_llTimeStart > UPDATER_CHECK_TIMEOUT )
         {
+            AddReportLog ( 4000, SString ( "QueryResponse: Regular fail for %s (status:%u  time:%u)", m_strLastQueryURL.c_str (), status, GetTickCount64_ () - m_llTimeStart ) );
+
             // If 404 error, remove this server from the list
             if ( status == 404 && m_QueryInfo.serverList.size () )
                 ListRemove( m_QueryInfo.serverList, m_QueryInfo.serverList[ m_QueryInfo.iCurrent % m_QueryInfo.serverList.size () ] );
 
-            AddReportLog ( 4000, SString ( "QueryResponse: Regular fail for %s (status:%u  time:%u)", m_QueryInfo.serverList[ m_QueryInfo.iCurrent ].c_str (), status, GetTickCount64_ () - m_llTimeStart ) );
             return RES_FAIL;
         }
         return RES_POLL;
@@ -1871,6 +2031,7 @@ int CVersionUpdater::DoPollQueryResponse ( void )
         argMap.Get ( "filesize",        m_DownloadInfo.iFilesize );     // int
         argMap.Get ( "mirror",          m_DownloadInfo.serverList );    // List append
         argMap.Get ( "mirror2",         m_DownloadInfo.serverList );    // List append
+        argMap.Get ( "savepath",        m_DownloadInfo.savePathList );  // List append
         argMap.Get ( "md5",             m_DownloadInfo.strMD5 );
         argMap.Get ( "reportsettings",  m_DownloadInfo.strReportSettings );
         argMap.Get ( "end",             m_DownloadInfo.strEnd );
@@ -1885,7 +2046,7 @@ int CVersionUpdater::DoPollQueryResponse ( void )
         }
     }
 
-    AddReportLog ( 5001, SString ( "QueryResponse: Fail for %s", m_QueryInfo.serverList[ m_QueryInfo.iCurrent ].c_str () ) );
+    AddReportLog ( 5001, SString ( "QueryResponse: Fail for %s", m_strLastQueryURL.c_str () ) );
     return RES_FAIL;
 }
 
@@ -1914,6 +2075,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
 
     // Perform the HTTP request
     m_HTTP.Get ( strURL );
+    m_strLastQueryURL = strURL;
     return RES_OK;
 }
 
@@ -1947,12 +2109,13 @@ int CVersionUpdater::DoPollDownload ( void )
         // Give up if error or timeout
         if ( ( status !=0 && status != 200 ) || GetTickCount64_ () - m_llTimeStart > UPDATER_DOWNLOAD_TIMEOUT )
         {
+            AddReportLog ( 4002, SString ( "DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_strLastQueryURL.c_str (), status, GetTickCount64_ () - m_llTimeStart ) );
+
             // If 404 error, remove this server from the list
             if ( status == 404 && m_DownloadInfo.serverList.size () )
                 ListRemove( m_DownloadInfo.serverList, m_DownloadInfo.serverList[ m_DownloadInfo.iCurrent % m_DownloadInfo.serverList.size () ] );
 
             SetCondition ( "Download", "Fail" );
-            AddReportLog ( 4002, SString ( "DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_DownloadInfo.strFilename.c_str(), status, GetTickCount64_ () - m_llTimeStart ) );
             return RES_FAIL;
         }
         return RES_POLL;
@@ -1989,24 +2152,34 @@ int CVersionUpdater::DoPollDownload ( void )
         // Make a list of possible places to save the file
         SString strPathFilename;
         {
-            std::vector < SString > saveLocationList;
-            saveLocationList.push_back ( MakeUniquePath ( PathJoin ( GetMTAAppDataPath (), "upcache", m_DownloadInfo.strFilename ) ) );
+            std::list < SString > saveLocationList;
+            saveLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache", m_DownloadInfo.strFilename ) );
             saveLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache", m_DownloadInfo.strFilename ) );
-            // Mix up list
-            //for ( uint i = 0 ; i < saveLocationList.size (); i++ )
-            //    std::swap ( saveLocationList[ i ], saveLocationList[ rand () % saveLocationList.size () ] );
+            saveLocationList.push_back ( GetMTATempPath () + m_DownloadInfo.strFilename );
+            saveLocationList.push_back ( PathJoin ( "\\temp", m_DownloadInfo.strFilename ) );
+
+            // Add provided custom paths
+            for ( std::vector < SString > ::iterator iter = m_DownloadInfo.savePathList.begin () ; iter != m_DownloadInfo.savePathList.end () ; ++iter )
+            {
+                const SString strSavePath = *iter;
+                if ( strSavePath[0] == '+' )
+                    saveLocationList.push_front ( ExpandEnvString ( strSavePath.substr ( 1 ) ) );
+                else
+                    saveLocationList.push_back ( ExpandEnvString ( strSavePath ) );
+            }
 
             // Try each place
-            for ( std::vector < SString > ::iterator iter = saveLocationList.begin () ; iter != saveLocationList.end () ; ++iter )
+            for ( std::list < SString > ::iterator iter = saveLocationList.begin () ; iter != saveLocationList.end () ; ++iter )
             {
-                MakeSureDirExists ( *iter );
-                if ( FileSave ( *iter, pData, uiSize ) )
+                const SString strSaveLocation = MakeUniquePath ( *iter );
+                MakeSureDirExists ( strSaveLocation );
+                if ( FileSave ( strSaveLocation, pData, uiSize ) )
                 {
-                    strPathFilename = *iter;
+                    strPathFilename = strSaveLocation;
                     break;
                 }
 
-                AddReportLog ( 5004, SString ( "DoPollDownload: Unable to use the path %s", *iter ) );
+                AddReportLog ( 5004, SString ( "DoPollDownload: Unable to use the path %s", strSaveLocation.c_str() ) );
             }
         }
 
@@ -2076,22 +2249,15 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "%VERSION%", strPlayerVersion );
     strQueryURL = strQueryURL.Replace ( "%ID%", szSerial );
     strQueryURL = strQueryURL.Replace ( "%STATUS%", szStatus );
-
-    //
-    // Get post contents
-    //
-    SString strContent = GetReportWrap ()->GetLogContents ( GetReportWrap ()->GetFilter (), GetReportWrap ()->GetMaxSize () );
+    strQueryURL = strQueryURL.Replace ( "%FILE%", m_strPostFilename );
 
     //
     // Send data. Don't bother checking if it was received, as it's not important.
     //
     CNetHTTPDownloadManagerInterface * downloadManager = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ();
-    downloadManager->QueueFile ( strQueryURL, NULL, 0, &strContent.at ( 0 ) );
+    downloadManager->QueueFile ( strQueryURL, NULL, 0, &m_PostContent.at ( 0 ), m_PostContent.size (), m_bPostContentBinary );
     if ( !downloadManager->IsDownloading () )
         downloadManager->StartDownloadingQueuedFiles ();
-
-    // Wipe log here
-    GetReportWrap ()->ClearLogContents ( "" );
 
     return RES_OK;
 }

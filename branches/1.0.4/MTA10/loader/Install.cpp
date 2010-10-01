@@ -94,7 +94,7 @@ bool DoInstallFiles ( void )
     std::vector < SFileItem > itemList;
     {
         std::vector < SString > fileList;
-        FindFilesRecursive ( strCurrentDir, fileList );
+        FindFilesRecursive ( PathJoin ( strCurrentDir, "*" ), fileList );
         for ( unsigned int i = 0 ; i < fileList.size () ; i++ )
         {
             SFileItem item;
@@ -121,10 +121,10 @@ bool DoInstallFiles ( void )
         {
             if ( FileExists ( itemList[i].strDestPathFilename ) )
             {
-                AddReportLog ( 5021, SString ( "InstallFiles: Couldn't copy '%s' to '%s'", itemList[i].strDestPathFilename.c_str (), itemList[i].strBackupPathFilename.c_str () ) );
+                AddReportLog ( 5021, SString ( "InstallFiles: Couldn't backup '%s' to '%s'", itemList[i].strDestPathFilename.c_str (), itemList[i].strBackupPathFilename.c_str () ) );
                 return false;
             }
-            AddReportLog ( 4023, SString ( "InstallFiles: Couldn't copy '%s' as it does not exist", itemList[i].strDestPathFilename.c_str () ) );
+            AddReportLog ( 4023, SString ( "InstallFiles: Couldn't backup '%s' as it does not exist", itemList[i].strDestPathFilename.c_str () ) );
         }
     }
 

@@ -23,6 +23,7 @@ public:
     virtual bool            IsOptionalUpdateInfoRequired    ( const SString& strHost ) = 0;
     virtual void            InitiateDataFilesFix            ( void ) = 0;
     virtual void            InitiateManualCheck             ( void ) = 0;
+    virtual void            EnableChecking                  ( bool bOn ) = 0;
 };
 
 CVersionUpdaterInterface* GetVersionUpdater ();

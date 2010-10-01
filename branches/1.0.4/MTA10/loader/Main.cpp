@@ -16,6 +16,8 @@
 #include "direct.h"
 
 
+#define TROUBLE_URL1 "http://nightly.mtasa.com/trouble/?v=%VERSION%&id=%ID%"
+
 // Command line as map
 class CUPL : public CArgMap
 {
@@ -25,19 +27,19 @@ public:
     {}
 };
 
-// Command line keys
-#define INSTALL_STAGE  "install_stage"
-#define INSTALL_LOC    "install_loc"
-#define ADMIN_STATE    "admin_state"
-#define SILENT_OPT     "silent_opt"
+// Common command line keys
+#define INSTALL_STAGE       "install_stage"
+#define INSTALL_LOCATION    "install_loc"
+#define ADMIN_STATE         "admin_state"
+#define SILENT_OPT          "silent_opt"
 
-int     DoInstallStage              ( const CUPL& UPL );
-SString CheckOnRestartCommand       ( void );
-int     LaunchGame                  ( LPSTR lpCmdLine );
 
 HINSTANCE g_hInstance = NULL;
 LPSTR g_lpCmdLine = NULL;
 
+class CMainHack
+{
+public:
 
 ///////////////////////////////////////////////////////////////
 //
@@ -50,6 +52,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 {
     g_hInstance = hInstance;
     g_lpCmdLine = lpCmdLine;
+
 #ifndef MTA_DEBUG
     ShowSplash ( hInstance );
 #endif
@@ -62,38 +65,32 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     CUPL UPL;
     UPL.SetFromString ( lpCmdLine );
 
-    // No stage parameter means it's been run by the user
-    if ( !UPL.Contains ( INSTALL_STAGE ) )
-    {
-        AddReportLog ( 1040, SString ( "*", 0 ) );
-        UPL.Set ( INSTALL_STAGE, "initial" );
-        UPL.Set ( INSTALL_LOC, "near" );
-        UPL.Set ( ADMIN_STATE, "no" );   // Could be yes, but assuming 'no' works best
-    }
+    // Set command line defaults if required
+    if ( !UPL.Contains ( INSTALL_STAGE ) )      UPL.Set ( INSTALL_STAGE, "initial" );
+    if ( !UPL.Contains ( INSTALL_LOCATION ) )   UPL.Set ( INSTALL_LOCATION, "near" );
+    if ( !UPL.Contains ( ADMIN_STATE ) )        UPL.Set ( ADMIN_STATE, "no" );   // Could be yes, but assuming 'no' works best
 
     // If not running from the launch directory, get the launch directory location from the registry
-    if ( UPL.Get ( INSTALL_LOC ) == "far" )
+    if ( UPL.Get ( INSTALL_LOCATION ) == "far" )
         SetMTASAPathSource ( true );
     else
         SetMTASAPathSource ( false );
 
+    // Update some settings which are used by ReportLog
+    UpdateMTAVersionApplicationSetting ();
+    SetApplicationSetting ( "os-version", GetOSVersion () );
+    SetApplicationSetting ( "real-os-version", GetRealOSVersion () );
+    SetApplicationSetting ( "is-admin", IsUserAdmin () ? "1" : "0" );
 
-    BOOL bIsAdmin = IsUserAdmin ();
-    SString RealOSVersion = GetRealOSVersion ();
-
-    DWORD pid = GetCurrentProcessId();
-    SString GotPathFrom = ( UPL.Get( INSTALL_LOC ) == "far" ) ? "registry" : "module location";
-    AddReportLog ( 1041, SString ( "* Launch * pid:%d '%s' RealOSVersion:%s IsUserAdmin:%d MTASAPath set from %s '%s'", pid, GetMTASAModuleFileName ().c_str (), RealOSVersion.c_str (), bIsAdmin, GotPathFrom.c_str (), GetMTASAPath ().c_str () ) );
-
-
-    SString OSVersion = GetOSVersion ();
-    if  ( OSVersion != RealOSVersion )
-        AddReportLog ( 1043, SString ( "RealOSVersion:%s  OSVersion:%s", RealOSVersion.c_str (), OSVersion.c_str () ) );
+    // Initial report line
+    DWORD dwProcessId = GetCurrentProcessId();
+    SString GotPathFrom = ( UPL.Get( INSTALL_LOCATION ) == "far" ) ? "registry" : "module location";
+    AddReportLog ( 1041, SString ( "* Launch * pid:%d '%s' MTASAPath set from %s '%s'", dwProcessId, GetMTASAModuleFileName ().c_str (), GotPathFrom.c_str (), GetMTASAPath ().c_str () ) );
 
     // Do next stage
     int iReturnCode = DoInstallStage ( UPL );
 
-    AddReportLog ( 1044, SString ( "* End (%d)* pid:%d",  iReturnCode, pid ) );
+    AddReportLog ( 1044, SString ( "* End (%d)* pid:%d",  iReturnCode, dwProcessId ) );
     return iReturnCode;
 }
 
@@ -109,25 +106,25 @@ int _ChangeInstallUPL ( const CUPL& UPLOld, const CUPL& UPLNew, bool bBlocking )
 {
     AddReportLog ( 1045, SString ( "ChangeInstallUPL: '%s' -> '%s'", UPLOld.ToString ().c_str (), UPLNew.ToString ().c_str () ) );
 
-    const SString strLocOld     = UPLOld.Get ( INSTALL_LOC );
-    const SString strAdminOld   = UPLOld.Get ( ADMIN_STATE );
+    const SString strLocationOld    = UPLOld.Get ( INSTALL_LOCATION );
+    const SString strAdminOld       = UPLOld.Get ( ADMIN_STATE );
 
-    const SString strLocNew     = UPLNew.Get ( INSTALL_LOC );
-    const SString strAdminNew   = UPLNew.Get ( ADMIN_STATE );
+    const SString strLocationNew    = UPLNew.Get ( INSTALL_LOCATION );
+    const SString strAdminNew       = UPLNew.Get ( ADMIN_STATE );
 
 
     // If loc or admin state is changing, relaunch
-    if ( strLocOld != strLocNew || strAdminOld != strAdminNew )
+    if ( strLocationOld != strLocationNew || strAdminOld != strAdminNew )
     {
         if ( strAdminOld == "yes" && strAdminNew == "no" )
             return 0;   // admin is always an inner process. Exit to drop rights.
 
         SString strAction = strAdminNew == "yes" ? "runas" : "open";
         SString strFile;
-        if ( strLocNew == "far" )
-            strFile = PathJoin ( GetCurrentWorkingDirectory (), "Multi Theft Auto.exe" );
+        if ( strLocationNew == "far" )
+            strFile = PathJoin ( GetCurrentWorkingDirectory (), MTA_EXE_NAME_RELEASE );
         else
-            strFile = PathJoin ( GetMTASAPath (), "Multi Theft Auto.exe" );
+            strFile = PathJoin ( GetMTASAPath (), MTA_EXE_NAME_RELEASE );
 
         if ( bBlocking )
         {
@@ -145,22 +142,22 @@ int _ChangeInstallUPL ( const CUPL& UPLOld, const CUPL& UPLNew, bool bBlocking )
 }
 
 
-int ChangeInstallUPL ( const CUPL& UPLOld, const SString& strStageNew, const SString& strLocNew, const SString& strAdminNew, const CUPL& UPLOptions = CUPL() )
+int ChangeInstallUPL ( const CUPL& UPLOld, const SString& strStageNew, const SString& strLocationNew, const SString& strAdminNew, const CUPL& UPLOptions = CUPL() )
 {
     CUPL UPLNew = UPLOld;
-    if ( strStageNew != "*" )   UPLNew.Set ( INSTALL_STAGE, strStageNew );
-    if ( strLocNew   != "*" )   UPLNew.Set ( INSTALL_LOC,   strLocNew );
-    if ( strAdminNew != "*" )   UPLNew.Set ( ADMIN_STATE,   strAdminNew );
+    if ( strStageNew    != "*" )   UPLNew.Set ( INSTALL_STAGE, strStageNew );
+    if ( strLocationNew != "*" )   UPLNew.Set ( INSTALL_LOCATION,   strLocationNew );
+    if ( strAdminNew    != "*" )   UPLNew.Set ( ADMIN_STATE,   strAdminNew );
     UPLNew.Merge ( UPLOptions );
     return _ChangeInstallUPL ( UPLOld, UPLNew, false );
 }
 
-int ChangeInstallUPLBlocking ( const CUPL& UPLOld, const SString& strStageNew, const SString& strLocNew, const SString& strAdminNew, const CUPL& UPLOptions = CUPL() )
+int ChangeInstallUPLBlocking ( const CUPL& UPLOld, const SString& strStageNew, const SString& strLocationNew, const SString& strAdminNew, const CUPL& UPLOptions = CUPL() )
 {
     CUPL UPLNew = UPLOld;
-    if ( strStageNew != "*" )   UPLNew.Set ( INSTALL_STAGE, strStageNew );
-    if ( strLocNew   != "*" )   UPLNew.Set ( INSTALL_LOC,   strLocNew );
-    if ( strAdminNew != "*" )   UPLNew.Set ( ADMIN_STATE,   strAdminNew );
+    if ( strStageNew    != "*" )   UPLNew.Set ( INSTALL_STAGE, strStageNew );
+    if ( strLocationNew != "*" )   UPLNew.Set ( INSTALL_LOCATION,   strLocationNew );
+    if ( strAdminNew    != "*" )   UPLNew.Set ( ADMIN_STATE,   strAdminNew );
     UPLNew.Merge ( UPLOptions );
     return _ChangeInstallUPL ( UPLOld, UPLNew, true );
 }
@@ -177,16 +174,28 @@ int DoInstallStage ( const CUPL& UPL )
 {
     AddReportLog ( 1046, SString ( "DoInstallStage: '%s'", UPL.ToString ().c_str () ) );
 
+    if ( UPL.Get( INSTALL_STAGE ) == "crashed" )
+    {
+        // Crashed before gta game started ?
+        if ( WatchDogIsSectionOpen ( "L1" ) )
+            WatchDogIncCounter ( "CR1" );
+
+        const SString strResult = HandlePostCrash ();
+        if ( strResult.Contains ( "quit" ) )
+            return 0;
+        return ChangeInstallUPL ( UPL, "initial", "*", "*" );     
+    }
+    else
     if ( UPL.Get( INSTALL_STAGE ) == "initial" )
     {
         const SString strResult = CheckOnRestartCommand ();
         if ( strResult.Contains ( "install" ) )
         {
-            SString strLoc = strResult.Contains ( "far" ) ? "far" : "near";
+            SString strLocation = strResult.Contains ( "far" ) ? "far" : "near";
             CUPL UPLOptions;
             UPLOptions.Set ( SILENT_OPT, strResult.Contains ( "silent" ) ? "yes" : "no" );
             // This may launch new .exe in temp dir if required
-            return ChangeInstallUPL ( UPL, "copy_files", strLoc, "no", UPLOptions );
+            return ChangeInstallUPL ( UPL, "copy_files", strLocation, "no", UPLOptions );
         }
         else
         if ( !strResult.Contains ( "no update" ) )
@@ -197,6 +206,7 @@ int DoInstallStage ( const CUPL& UPL )
     else
     if ( UPL.Get( INSTALL_STAGE ) == "copy_files" )
     {
+        WatchDogReset ();
         // Install new files
         if ( !InstallFiles ( UPL.Get( SILENT_OPT ) != "no" ) )
         {
@@ -210,6 +220,9 @@ int DoInstallStage ( const CUPL& UPL )
             else
             {
                 AddReportLog ( 5049, SString ( "DoInstallStage: Couldn't install files %s", "" ) );
+                int iResponse = MessageBox ( NULL, "Could not update due to file conflicts. Please close other applications and retry", "Error", MB_RETRYCANCEL | MB_ICONERROR );
+                if ( iResponse == IDRETRY )
+                    return DoInstallStage ( UPL );
                 //return 1;   // failure
             }
         }
@@ -271,9 +284,10 @@ SString CheckOnRestartCommand ( void )
             StopPseudoProgress();
 
             // If a new "Multi Theft Auto.exe" exists, let that complete the install
-            if ( FileExists ( "Multi Theft Auto.exe" ) )
+            if ( FileExists ( MTA_EXE_NAME_RELEASE ) )
                 return "install from far " + strOperation;
 
+            // Otherwise use the current exe to install
             return "install from near " + strOperation;
         }
         else
@@ -287,12 +301,97 @@ SString CheckOnRestartCommand ( void )
 
 //////////////////////////////////////////////////////////
 //
+// HandlePostCrash
+//
+//
+//
+//////////////////////////////////////////////////////////
+SString HandlePostCrash ( void )
+{
+    HideSplash ();
+
+    SString strMessage = GetApplicationSetting ( "diagnostics", "last-crash-info" );
+
+    strMessage = strMessage.Replace ( "\r", "" ).Replace ( "\n", "\r\n" );
+
+    SString strResult = ShowCrashedDialog ( g_hInstance, strMessage );
+    HideCrashedDialog ();
+    return strResult;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// HandleTrouble
+//
+//
+//
+//////////////////////////////////////////////////////////
+void HandleTrouble ( void )
+{
+    int iResponse = MessageBox ( NULL, "There maybe trouble.\n\nDo you want to revert to an earlier version of MTA:SA?", "", MB_YESNO | MB_ICONERROR );
+    if ( iResponse == IDYES )
+    {
+        MessageBox ( NULL, "Your browser will now download an installer which may fix the trouble.\n\nIf the page fails to load, please goto www.mtasa.com", "", MB_OK | MB_ICONINFORMATION );
+
+        SString strQueryURL = TROUBLE_URL1;
+        strQueryURL = strQueryURL.Replace ( "%VERSION%", GetApplicationSetting ( "mta-version" ) );
+        strQueryURL = strQueryURL.Replace ( "%ID%", GetApplicationSetting ( "serial" ) );
+        ShellExecute ( NULL, "open", strQueryURL.c_str (), NULL, NULL, SW_SHOWNORMAL );
+        TerminateProcess ( GetCurrentProcess (), 1 );
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // LaunchGame
 //
 //
 //
 //////////////////////////////////////////////////////////
 int LaunchGame ( LPSTR lpCmdLine )
+{
+    // Check for unclean stop on previous run
+    if ( WatchDogIsSectionOpen ( "L0" ) )
+        WatchDogSetUncleanStop ( true );
+    else
+        WatchDogSetUncleanStop ( false );
+
+    // Reset counter if gta game was run last time
+    if ( !WatchDogIsSectionOpen ( "L1" ) )
+        WatchDogClearCounter ( "CR1" );
+
+    // If crashed 3 times in a row before starting the game, do something
+    if ( WatchDogGetCounter ( "CR1" ) >= 3 )
+    {
+        WatchDogReset ();
+        HandleTrouble ();
+    }
+
+    WatchDogBeginSection ( "L0" );
+    WatchDogBeginSection ( "L1" );
+
+    int iReturnCode = DoLaunchGame ( lpCmdLine );
+
+    if ( iReturnCode == 0 )
+    {
+        WatchDogClearCounter ( "CR1" );
+        WatchDogCompletedSection ( "L0" );
+    }
+
+    return iReturnCode;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// DoLaunchGame
+//
+//
+//
+//////////////////////////////////////////////////////////
+int DoLaunchGame ( LPSTR lpCmdLine )
 {
     //////////////////////////////////////////////////////////
     //
@@ -301,7 +400,7 @@ int LaunchGame ( LPSTR lpCmdLine )
     if ( !TerminateGTAIfRunning () )
     {
         DisplayErrorMessageBox ( "MTA: SA couldn't start because an another instance of GTA is running." );
-        return 0;
+        return 1;
     }
 
     //////////////////////////////////////////////////////////
@@ -468,6 +567,10 @@ int LaunchGame ( LPSTR lpCmdLine )
     if ( piLoadee.hThread)
         WaitForSingleObject ( piLoadee.hProcess, INFINITE );
 
+    // Get its exit code
+    DWORD dwExitCode = -1;
+    GetExitCodeProcess( piLoadee.hProcess, &dwExitCode );
+
     //////////////////////////////////////////////////////////
     //
     // On exit
@@ -517,7 +620,16 @@ int LaunchGame ( LPSTR lpCmdLine )
         }
     }
 
-    // Success
-    return 0;
+    // Success, maybe
+    return dwExitCode;
 }
 
+
+};
+
+// To avoid having to forward declare functions in this file
+int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+{
+    CMainHack MainHack;
+    return MainHack.WinMain ( hInstance, hPrevInstance, lpCmdLine, nCmdShow );
+}

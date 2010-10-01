@@ -38,7 +38,7 @@ void    ShowProgressDialog          ( HINSTANCE hInstance, const SString& strTit
 void    HideProgressDialog          ( void );
 bool    UpdateProgress              ( int iPos, int iMax, const SString& strMsg = "" );
 
-void    FindFilesRecursive          ( const SString& strPath, std::vector < SString >& outFileList );
+void    FindFilesRecursive          ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth = 99 );
 SString GetOSVersion                ( void );
 SString GetRealOSVersion            ( void );
 bool    IsVistaOrHigher             ( void );
@@ -47,7 +47,12 @@ BOOL    IsUserAdmin                 ( void );
 bool    ShellExecuteBlocking        ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" );
 bool    ShellExecuteNonBlocking     ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" );
 
-void    StartPseudoProgress           ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
-void    StopPseudoProgress            ( void );
+void    StartPseudoProgress         ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
+void    StopPseudoProgress          ( void );
+
+SString ShowCrashedDialog           ( HINSTANCE hInstance, const SString& strMessage );
+void    HideCrashedDialog           ( void );
+
+void    UpdateMTAVersionApplicationSetting    ( void );
 
 #endif

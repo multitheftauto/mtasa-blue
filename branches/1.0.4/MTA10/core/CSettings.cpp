@@ -2045,6 +2045,10 @@ void CSettings::SaveData ( void )
     strVar = m_pChatScaleX->GetText () + " " + m_pChatScaleY->GetText ();
     CVARS_SET ( "chat_scale", strVar );
 
+    // Test error reporter
+    if ( m_pChatLines->GetText () == "crashme" )
+        *((int*)NULL) = 0;      
+
     CVARS_SET ( "chat_lines", m_pChatLines->GetText () );
     CVARS_SET ( "chat_width", m_pChatWidth->GetText () );
     CVARS_SET ( "chat_css_style_text", m_pChatCssText->GetSelected () );

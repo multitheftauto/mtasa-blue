@@ -157,28 +157,242 @@ bool SharedUtil::GetOnRestartCommand ( SString& strOperation, SString& strFile, 
 #endif
 
 
+
+
+
+static char ToHexChar ( char c )
+{
+    return c > 9 ? c - 10 + 'A' : c + '0';
+}
+
+static char FromHexChar ( char c )
+{
+    return c > '9' ? c - 'A' + 10 : c - '0';
+}
+
+SString SharedUtil::EscapeString ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar )
+{
+    // Replace each disallowed char with #FF
+    SString strResult;
+    for ( uint i = 0 ; i < strText.length () ; i++ )
+    {
+        char c = strText[i];
+        if ( strDisallowedChars.find ( c ) == std::string::npos && c != cSpecialChar )
+            strResult += c;
+        else
+        {
+            strResult += cSpecialChar;
+            strResult += ToHexChar ( c >> 4 );
+            strResult += ToHexChar ( c & 0x0f );
+        }
+    }
+    return strResult;
+}
+
+
+SString SharedUtil::UnescapeString ( const SString& strText, char cSpecialChar )
+{
+    SString strResult;
+    // Replace #FF with char
+    for ( uint i = 0 ; i < strText.length () ; i++ )
+    {
+        char c = strText[i];
+        if ( c == cSpecialChar && i < strText.length () - 2 )
+        {
+            char c0 = FromHexChar ( strText[++i] );
+            char c1 = FromHexChar ( strText[++i] );
+            c = ( c0 << 4 ) | c1;
+        }
+        strResult += c;
+    }
+    return strResult;
+}
+
+
+//
+// An ApplicationSettingGroup is a collection of persistant key/value pairs
+// 
+static void GetApplicationSettingGroup ( const SString& strGroup, CArgMap& argMap )
+{
+    argMap = CArgMap ( "=", "&" );
+    argMap.SetFromString ( ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas\\Settings", strGroup, NULL ) );
+}
+
+static void SetApplicationSettingGroup( const SString& strGroup, const CArgMap& argMap )
+{
+    WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas\\Settings", strGroup, argMap.ToString () );
+}
+
+
+// Get a key/value pair in a group
+SString SharedUtil::GetApplicationSetting ( const SString& strGroup, const SString& strKey )
+{
+    CArgMap argMap;
+    GetApplicationSettingGroup ( strGroup, argMap );
+    return argMap.Get ( strKey );
+}
+
+// Set a key/value pair in a group
+void SharedUtil::SetApplicationSetting ( const SString& strGroup, const SString& strKey, const SString& strValue )
+{
+    CArgMap argMap;
+    GetApplicationSettingGroup ( strGroup, argMap );
+    argMap.Set ( strKey, strValue );
+    SetApplicationSettingGroup ( strGroup, argMap );
+}
+
+// Get a setting for 'group.key' or just 'key' for general settings
+SString SharedUtil::GetApplicationSetting ( const SString& strGroupKey )
+{
+    {
+        SString strGroup, strKey;
+        if ( strGroupKey.Split ( ".", &strGroup, &strKey ) )
+            return GetApplicationSetting ( strGroup, strKey );
+    }
+    return GetApplicationSetting ( "general", strGroupKey );
+}
+
+// Set a setting for 'group.key' or just 'key' for general settings
+void SharedUtil::SetApplicationSetting ( const SString& strGroupKey, const SString& strValue )
+{
+    {
+        SString strGroup, strKey;
+        if ( strGroupKey.Split ( ".", &strGroup, &strKey ) )
+            SetApplicationSetting ( strGroup, strKey, strValue );
+    }
+    SetApplicationSetting ( "general", strGroupKey, strValue );
+}
+
+
+void SharedUtil::SetApplicationSettingInt ( const SString& strGroup, const SString& strKey, int iValue )
+{
+    SetApplicationSetting ( strGroup, strKey, SString ( "%d", iValue ) );
+}
+
+
+void SharedUtil::SetApplicationSettingInt ( const SString& strGroupKey, int iValue )
+{
+    SetApplicationSetting ( strGroupKey, SString ( "%d", iValue ) );
+}
+
+
+int SharedUtil::GetApplicationSettingInt ( const SString& strGroup, const SString& strKey )
+{
+    return atoi ( GetApplicationSetting ( strGroup, strKey ) );
+}
+
+
+int SharedUtil::GetApplicationSettingInt ( const SString& strGroupKey )
+{
+    return atoi ( GetApplicationSetting ( strGroupKey ) );
+}
+
+
+
+
+//
+// WatchDog
+//
+
+void SharedUtil::WatchDogReset ( void )
+{
+    CArgMap argMap;
+    SetApplicationSettingGroup ( "watchdog", argMap );
+}
+
+// Section
+bool SharedUtil::WatchDogIsSectionOpen ( const SString& str )
+{
+    return GetApplicationSettingInt ( "watchdog", str ) != 0;
+}
+
+void SharedUtil::WatchDogBeginSection ( const SString& str )
+{
+    SetApplicationSettingInt ( "watchdog", str, 1 );
+}
+
+void SharedUtil::WatchDogCompletedSection ( const SString& str )
+{
+    SetApplicationSettingInt ( "watchdog", str, 0 );
+}
+
+// Counter
+void SharedUtil::WatchDogIncCounter ( const SString& str )
+{
+    SetApplicationSettingInt ( "watchdog", str, WatchDogGetCounter ( str ) + 1 );
+}
+
+int SharedUtil::WatchDogGetCounter ( const SString& str )
+{
+    return GetApplicationSettingInt ( "watchdog", str );
+}
+
+void SharedUtil::WatchDogClearCounter ( const SString& str )
+{
+    SetApplicationSettingInt ( "watchdog", str, 0 );
+}
+
+
+bool SharedUtil::WatchDogWasUncleanStop ( void )
+{
+    return GetApplicationSettingInt ( "watchdog", "uncleanstop" ) != 0;
+}
+
+void SharedUtil::WatchDogSetUncleanStop ( bool bOn )
+{
+    SetApplicationSettingInt ( "watchdog", "uncleanstop", bOn );
+}
+
+
 //
 // For tracking results of new features
 //
+static SString GetReportLogHeaderText ( void )
+{
+    CArgMap argMap;
+    GetApplicationSettingGroup ( "general", argMap );
+    SString strMTABuild;
+    argMap.Get ( "mta-version" ).Split ( "-", NULL, &strMTABuild );
+    SString strOSVersion     = argMap.Get ( "os-version" );
+    SString strRealOSVersion = argMap.Get ( "real-os-version" );
+    SString strIsAdmin       = argMap.Get ( "is-admin" );
+
+    SString strResult = "[";
+    if ( strMTABuild.length () )
+        strResult += strMTABuild + " ";
+    if ( strOSVersion.length () )
+    {
+        if ( strOSVersion == strRealOSVersion )
+            strResult += strOSVersion + " ";
+        else
+            strResult += strOSVersion + "(" + strRealOSVersion + ") ";
+    }
+    if ( strIsAdmin == "1" )
+        strResult += "a";
+
+    return strResult.TrimEnd ( " " ) + "]";
+}
+
+
 void SharedUtil::AddReportLog ( uint uiId, const SString& strText )
 {
-    SString strPathFilename = PathJoin ( GetMTAAppDataPath (), "report.log" );
+    SString strPathFilename = PathJoin ( GetMTALocalAppDataPath (), "report.log" );
     MakeSureDirExists ( strPathFilename );
 
-    SString strMessage ( "%u: %s - %s\n", uiId, GetTimeString ( true, false ).c_str (), strText.c_str () );
+    SString strMessage ( "%u: %s %s - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), strText.c_str () );
     FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
 }
 
 void SharedUtil::SetReportLogContents ( const SString& strText )
 {
-    SString strPathFilename = PathJoin ( GetMTAAppDataPath (), "report.log" );
+    SString strPathFilename = PathJoin ( GetMTALocalAppDataPath (), "report.log" );
     MakeSureDirExists ( strPathFilename );
     FileSave ( strPathFilename, strText.length () ? &strText.at ( 0 ) : NULL, strText.length () );
 }
 
 SString SharedUtil::GetReportLogContents ( void )
 {
-    SString strReportFilename = PathJoin ( GetMTAAppDataPath (), "report.log" );
+    SString strReportFilename = PathJoin ( GetMTALocalAppDataPath (), "report.log" );
     // Load file into a string
     std::vector < char > buffer;
     FileLoad ( strReportFilename, buffer );
@@ -422,4 +636,144 @@ SString SharedUtil::ConformResourcePath ( const char* szRes )
     }
 
     return strText;
+}
+
+
+namespace SharedUtil
+{
+    CArgMap::CArgMap ( const SString& strArgSep, const SString& strPartsSep, const SString& strExtraDisallowedChars )
+        : m_strArgSep ( strArgSep )
+        , m_strPartsSep ( strPartsSep )
+    {
+        m_strDisallowedChars = strExtraDisallowedChars + m_strArgSep + m_strPartsSep;
+    }
+
+    void CArgMap::Merge ( const CArgMap& other )
+    {
+        MergeFromString ( other.ToString () );
+    }
+
+    void CArgMap::SetFromString ( const SString& strLine )
+    {
+        m_Map.clear ();
+        MergeFromString ( strLine );
+    }
+
+    void CArgMap::MergeFromString ( const SString& strLine )
+    {
+        std::vector < SString > parts;
+        strLine.Split( m_strPartsSep, parts );
+        for ( uint i = 0 ; i < parts.size () ; i++ )
+        {
+            SString strCmd, strArg;
+            parts[i].Split ( m_strArgSep, &strCmd, &strArg );
+            //Set ( strCmd, strArg );
+            m_Map.erase ( strCmd );
+            if ( strCmd.length () ) // Key can not be empty
+                MapInsert ( m_Map, strCmd, strArg );
+        }
+    }
+
+    SString CArgMap::ToString ( void ) const
+    {
+        SString strResult;
+        for ( std::multimap < SString, SString >::const_iterator iter = m_Map.begin () ; iter != m_Map.end () ; ++iter )
+        {
+            if ( strResult.length () )
+                strResult += m_strPartsSep;
+            strResult += iter->first + m_strArgSep + iter->second;
+        }
+        return strResult;
+    }
+
+
+    SString CArgMap::Escape ( const SString& strIn ) const
+    {
+        return EscapeString ( strIn, m_strDisallowedChars );
+    } 
+
+    SString CArgMap::Unescape ( const SString& strIn ) const
+    {
+        return UnescapeString ( strIn );
+    } 
+
+
+    // Set a unique key string value
+    void CArgMap::Set ( const SString& strCmd, const SString& strValue )
+    {
+        m_Map.erase ( Escape ( strCmd ) );
+        Insert ( strCmd, strValue );
+    }
+
+    // Set a unique key int value
+    void CArgMap::Set ( const SString& strCmd, int iValue )
+    {
+        m_Map.erase ( Escape ( strCmd ) );
+        Insert ( strCmd, iValue );
+    }
+
+    // Insert a key int value
+    void CArgMap::Insert ( const SString& strCmd, int iValue )
+    {
+        Insert ( strCmd, SString ( "%d", iValue ) );
+    }
+
+    // Insert a key string value
+    void CArgMap::Insert ( const SString& strCmd, const SString& strValue )
+    {
+        if ( strCmd.length () ) // Key can not be empty
+            MapInsert ( m_Map, Escape ( strCmd ), Escape ( strValue ) );
+    }
+
+
+    // Test if key exists
+    bool CArgMap::Contains ( const SString& strCmd  ) const
+    {
+        return MapFind ( m_Map, Escape ( strCmd ) ) != NULL;
+    }
+
+    // First result as string
+    bool CArgMap::Get ( const SString& strCmd, SString& strOut, const char* szDefault ) const
+    {
+        assert ( szDefault );
+        if ( const SString* pResult = MapFind ( m_Map, Escape ( strCmd ) ) )
+        {
+            strOut = Unescape ( *pResult );
+            return true;
+        }
+        strOut = szDefault;
+        return false;
+    }
+
+    // First result as string
+    SString CArgMap::Get ( const SString& strCmd ) const
+    {
+        SString strResult;
+        Get ( strCmd, strResult );
+        return strResult;
+    }
+
+    // All results as strings
+    bool CArgMap::Get ( const SString& strCmd, std::vector < SString >& outList ) const
+    {
+        std::vector < SString > newItems;
+        MultiFind ( m_Map, Escape ( strCmd ), &newItems );
+        for ( uint i = 0 ; i < newItems.size () ; i++ )
+            newItems[i] = Unescape ( newItems[i] );
+        ListAppend ( outList, newItems );
+        return newItems.size () > 0;
+    }
+
+    // First result as int
+    bool CArgMap::Get ( const SString& strCmd, int& iValue, int iDefault ) const
+    {
+        SString strResult;
+        if ( Get ( strCmd, strResult ) )
+        {
+            iValue = atoi ( strResult );
+            return true;
+        }
+        iValue = iDefault;
+        return false;
+    }
 }

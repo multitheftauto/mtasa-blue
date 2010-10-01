@@ -316,6 +316,7 @@ void CMainMenu::Update ( void )
         if ( !m_bInitialized && pDevice )
         {
             CCore::GetSingleton ().GetNetwork ()->Reset ();
+            GetVersionUpdater ()->EnableChecking ( true );
             m_bInitialized = true;
 
             // If the static flag has not already been set

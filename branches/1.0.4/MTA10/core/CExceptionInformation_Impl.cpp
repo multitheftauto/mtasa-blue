@@ -13,11 +13,15 @@
 
 #include "StdInc.h"
 
+#define MAX_MODULE_PATH 512
+
 CExceptionInformation_Impl::CExceptionInformation_Impl ( void )
 {
     m_uiCode = 0;
-    m_pOffset = NULL;
-    m_pReferencingOffset = NULL;
+    m_pAddress = NULL;
+    m_szModulePathName = NULL;
+    m_szModuleBaseName = NULL;
+    m_uiAddressModuleOffset = 0;
     m_ulEAX = 0;
     m_ulEBX = 0;
     m_ulECX = 0;
@@ -36,12 +40,17 @@ CExceptionInformation_Impl::CExceptionInformation_Impl ( void )
     m_ulEFlags = 0;
 }
 
+CExceptionInformation_Impl::~CExceptionInformation_Impl ( void )
+{
+    if ( m_szModulePathName )
+        delete m_szModulePathName;
+}
+
 
 void CExceptionInformation_Impl::Set ( unsigned int iCode, _EXCEPTION_POINTERS* pException )
 {
     m_uiCode = iCode;
-    m_pOffset = pException->ExceptionRecord->ExceptionAddress;
-    m_pReferencingOffset = reinterpret_cast < void* > ( pException->ContextRecord->Eax );
+    m_pAddress = pException->ExceptionRecord->ExceptionAddress;
     m_ulEAX = pException->ContextRecord->Eax;
     m_ulEBX = pException->ContextRecord->Ebx;
     m_ulECX = pException->ContextRecord->Ecx;
@@ -58,6 +67,15 @@ void CExceptionInformation_Impl::Set ( unsigned int iCode, _EXCEPTION_POINTERS* 
     m_ulGS = pException->ContextRecord->SegGs;
     m_ulSS = pException->ContextRecord->SegSs;
     m_ulEFlags = pException->ContextRecord->EFlags;
+
+
+    void* pModuleBaseAddress = NULL;
+    m_szModulePathName = new char[MAX_MODULE_PATH];
+    GetModule ( m_szModulePathName, MAX_MODULE_PATH, &pModuleBaseAddress );
+    m_szModuleBaseName = strrchr ( m_szModulePathName , '\\' );
+    m_szModuleBaseName = m_szModuleBaseName ? m_szModuleBaseName + 1 : m_szModulePathName;
+    m_uiAddressModuleOffset = static_cast < BYTE* > ( GetAddress () ) - static_cast < BYTE* > ( pModuleBaseAddress );
+
 }
 
 /**
@@ -66,7 +84,7 @@ void CExceptionInformation_Impl::Set ( unsigned int iCode, _EXCEPTION_POINTERS* 
  *
  * @return <code>true</code> if successful, <code>false</code> otherwise.
  */
-bool CExceptionInformation_Impl::GetModule ( char * szOutputBuffer, int nOutputNameLength )
+bool CExceptionInformation_Impl::GetModule ( char * szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress )
 {
    HMODULE hModule;
 
@@ -111,12 +129,14 @@ bool CExceptionInformation_Impl::GetModule ( char * szOutputBuffer, int nOutputN
    
    if ( 0 == pfnGetModuleHandleExA ( 
                0x00000004 /*GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS*/, 
-               (LPCSTR)m_pOffset,
+               (LPCSTR)m_pAddress,
                &hModule ) )
    {
       return false;
    }
-   
+
+   *ppModuleBaseAddress = hModule;
+
    if ( 0 != GetModuleFileNameA ( 
                 hModule, 
                 szOutputBuffer,
@@ -134,6 +154,8 @@ bool CExceptionInformation_Impl::GetModule ( char * szOutputBuffer, int nOutputN
 
       return true;
    }
+
+   szOutputBuffer[0] = 0;
 
    return false;
 }

@@ -13,43 +13,47 @@
 namespace SharedUtil
 {
     //
-    // Returns true if the file exists
+    // Returns true if the file/directory exists
     //
-    bool FileExists ( const SString& strFilename );
+    bool            FileExists                      ( const SString& strFilename );
+    bool            DirectoryExists                 ( const SString& strPath );
 
     //
-    // Load binary data from a file into an array
+    // Load from a file
     //
-    bool FileLoad ( const SString& strFilename, std::vector < char >& buffer );
+    bool            FileLoad                        ( const SString& strFilename, std::vector < char >& buffer );
+    bool            FileLoad                        ( const SString& strFilename, SString& strBuffer );
 
     //
-    // Save binary data to a file
+    // Save to a file
     //
-    bool FileSave ( const SString& strFilename, const void* pBuffer, unsigned long ulSize );
+    bool            FileSave                        ( const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce = true );
+    bool            FileSave                        ( const SString& strFilename, const SString& strBuffer, bool bForce = true );
 
     //
-    // Append binary data to a file
+    // Append to a file
     //
-    bool FileAppend ( const SString& strFilename, const void* pBuffer, unsigned long ulSize );
+    bool            FileAppend                      ( const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce = true );
+    bool            FileAppend                      ( const SString& strFilename, const SString& strBuffer, bool bForce = true );
 
     //
     // Ensure all directories exist to the file
     //
-    void MakeSureDirExists ( const SString& strPath );
+    void            MakeSureDirExists               ( const SString& strPath );
 
-    SString PathConform ( const SString& strInPath );
-    SString PathJoin ( const SString& str1, const SString& str2, const SString& str3 = "", const SString& str4 = "", const SString& str5 = "" );
+    SString         PathConform                     ( const SString& strInPath );
+    SString         PathJoin                        ( const SString& str1, const SString& str2, const SString& str3 = "", const SString& str4 = "", const SString& str5 = "" );
+    void            ExtractFilename                 ( const SString& strPathFilename, SString* strPath, SString* strFilename );
+    bool            ExtractExtention                ( const SString& strFilename, SString* strRest, SString* strExt );
 
-    SString GetMTAAppDataPath ( void );
+    bool            DelTree                         ( const SString& strPath, const SString& strInsideHere );
+    bool            MkDir                           ( const SString& strInPath, bool bTree = true );
+    bool            FileCopy                        ( const SString& strSrc, const SString& strDest, bool bForce = true );
+    SString         GetCurrentWorkingDirectory      ( void );
+    std::vector < SString > FindFiles               ( const SString& strMatch, bool bFiles, bool bDirectories );
+    SString         MakeUniquePath                  ( const SString& strPathFilename );
 
-    bool DelTree ( const SString& strPath, const SString& strInsideHere );
-    bool MkDir ( const SString& strInPath, bool bTree = true );
-    bool FileCopy ( const SString& strSrc, const SString& strDest );
-    SString GetCurrentWorkingDirectory ( void );
-    std::vector < SString > FindFiles ( const SString& strMatch, bool bFiles, bool bDirectories );
-    SString MakeUniquePath ( const SString& strPathFilename );
-
-    SString GetMTAAppDataPath ( void );
-    SString GetMTATempPath ( void );
+    SString         GetMTALocalAppDataPath          ( void );
+    SString         GetMTATempPath                  ( void );
 
 }
