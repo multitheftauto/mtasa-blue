@@ -34,7 +34,7 @@ static bool MUTEX_TRY_LOCK( MUTEX_TYPE& x )
 
 int EHSServer::CreateFdSet ( )
 {
-
+    MUTEX_LOCK ( m_oMutex );
 	// don't lock mutex, as it is only called from within a locked section
 
 	FD_ZERO( &m_oReadFds );
@@ -72,6 +72,8 @@ int EHSServer::CreateFdSet ( )
 
 		}
 	}
+
+    MUTEX_UNLOCK ( m_oMutex );
 
 	return nHighestFd;
 
@@ -994,6 +996,7 @@ void EHSServer::CheckAcceptSocket ( )
 
 void EHSServer::CheckClientSockets ( )
 {
+    MUTEX_LOCK ( m_oMutex );
 
 	// go through all the sockets from which we're still reading
 	for ( EHSConnectionList::iterator i = m_oEHSConnectionList.begin ( );
@@ -1057,6 +1060,7 @@ void EHSServer::CheckClientSockets ( )
 		} // FD_ISSET
 		
 	} // for loop through connections
+    MUTEX_UNLOCK ( m_oMutex );
 
 } 
 

@@ -53,6 +53,7 @@
 				PrecompiledHeaderThrough=""
 				ProgramDataBaseFileName="vc70.pdb"
 				WarningLevel="3"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4996"
 			/>
@@ -195,6 +196,7 @@
 				EnableFunctionLevelLinking="false"
 				PrecompiledHeaderThrough=""
 				WarningLevel="3"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4996"
 			/>

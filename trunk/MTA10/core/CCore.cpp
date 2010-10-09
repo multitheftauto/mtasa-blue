@@ -168,9 +168,6 @@ CCore::CCore ( void )
     // Create the mod manager
     m_pModManager               = new CModManager;
 
-    // Create a resolution manager (for screen res)
-    m_pResManager               = new CResManager;
-
     m_pfnMessageProcessor       = NULL;
     m_pMessageBox = NULL;
 
