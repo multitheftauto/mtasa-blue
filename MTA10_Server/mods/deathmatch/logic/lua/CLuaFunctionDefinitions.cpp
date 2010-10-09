@@ -14,6 +14,7 @@
 *               Kevin Whiteside <>
 *               lil_Toady <>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -2555,7 +2556,8 @@ int CLuaFunctionDefinitions::ShowPlayerHudComponent ( lua_State* luaVM )
             SHudComponent hudComponents [] = { { "ammo" }, { "weapon" }, { "health" },
                                                { "breath" }, { "armour" }, { "money" },
                                                { "vehicle_name" }, { "area_name" }, { "radar" },
-                                               { "clock" }, { "all" }, { "\0" } };
+                                               { "clock" }, { "radio" } , { "wanted" },
+                                               { "all" }, { "\0" } };
 
             if ( szComponent && szComponent [ 0 ] )
             {
