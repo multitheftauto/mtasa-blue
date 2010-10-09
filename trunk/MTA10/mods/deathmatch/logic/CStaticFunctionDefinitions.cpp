@@ -13,6 +13,7 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Peter Beverloo <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *               
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -1511,7 +1512,7 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
 bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucComponent, bool bShow )
 {
     enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_ALL };
+                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_ALL };
     switch ( ucComponent )
     {
         case HUD_AMMO:
@@ -1544,6 +1545,12 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucCompon
             return true;
         case HUD_CLOCK:
             g_pGame->GetHud ()->DisableClock ( !bShow );
+            return true;
+        case HUD_RADIO:
+            g_pGame->GetHud ()->DisableRadioName ( !bShow );
+            return true;
+        case HUD_WANTED:
+            g_pGame->GetHud ()->DisableWantedLevel ( !bShow );
             return true;
         case HUD_ALL:
             g_pGame->GetHud ()->DisableAll ( !bShow );
