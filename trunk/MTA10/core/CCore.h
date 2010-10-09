@@ -96,10 +96,6 @@ public:
 
     void                    SaveConfig                      ( void );
 
-    #ifndef MTA_DEBUG
-    CResManager *           GetResManager                   ( void );
-    #endif
-
     // Debug
     void                    DebugEcho                       ( const char* szText );
     void                    DebugPrintf                     ( const char* szFormat, ... );

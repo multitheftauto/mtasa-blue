@@ -1385,14 +1385,6 @@ bool CCore::IsValidNick ( const char* szNick )
 }
 
 
-#ifndef MTA_DEBUG
-CResManager * CCore::GetResManager ( void )
-{
-    return m_pResManager;
-}
-#endif
-
-
 void CCore::Quit ( bool bInstantly )
 {
     if ( bInstantly )
