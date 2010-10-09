@@ -40,7 +40,6 @@ class CCore;
 #include <core/CClientBase.h>
 #include <core/CCoreInterface.h>
 #include "CDirect3DData.h"
-#include "CResManager.h"
 #include "tracking/CTCPManager.h"
 #include "CClientVariables.h"
 #include "CKeyBinds.h"
@@ -246,9 +245,6 @@ private:
 
     // Mod manager
     CModManager*                m_pModManager; 
-
-    // Resolution manager
-    CResManager*                m_pResManager;
 
     // Module interfaces.
     CGame *                     m_pGame;
