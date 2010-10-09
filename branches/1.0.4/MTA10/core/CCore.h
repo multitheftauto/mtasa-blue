@@ -40,7 +40,6 @@ class CCore;
 #include <core/CClientBase.h>
 #include <core/CCoreInterface.h>
 #include "CDirect3DData.h"
-#include "CResManager.h"
 #include "tracking/CTCPManager.h"
 #include "CClientVariables.h"
 #include "CKeyBinds.h"
@@ -95,10 +94,6 @@ public:
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
 
     void                    SaveConfig                      ( void );
-
-    #ifndef MTA_DEBUG
-    CResManager *           GetResManager                   ( void );
-    #endif
 
     // Debug
     void                    DebugEcho                       ( const char* szText );
@@ -239,9 +234,6 @@ private:
 
     // Mod manager
     CModManager*                m_pModManager; 
-
-    // Resolution manager
-    CResManager*                m_pResManager;
 
     // Module interfaces.
     CGame *                     m_pGame;

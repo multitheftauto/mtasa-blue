@@ -2160,14 +2160,6 @@
 						RelativePath=".\logic\common\CBitStream.h"
 						>
 					</File>
-					<File
-						RelativePath=".\logic\common\CGeneric.h"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\common\CGenericManager.h"
-						>
-					</File>
 				</Filter>
 				<Filter
 					Name="luadefs"

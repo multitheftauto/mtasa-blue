@@ -557,10 +557,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CResManager.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CScreenShot.cpp"
 				>
 			</File>
@@ -582,10 +578,6 @@
 			</File>
 			<File
 				RelativePath=".\CSettings.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CText.cpp"
 				>
 			</File>
 			<File
@@ -754,19 +746,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CDirect3DEvents8.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CDirect3DEvents9.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CDirect3DHook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CDirect3DHook8.h"
 				>
 			</File>
 			<File
@@ -815,14 +799,6 @@
 			</File>
 			<File
 				RelativePath=".\CFileSystemMemoryHandleManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CGenericManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CGenericManagerItem.h"
 				>
 			</File>
 			<File
@@ -886,10 +862,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CProxyDirect3D8.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CProxyDirect3D9.h"
 				>
 			</File>
@@ -918,10 +890,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CResManager.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CScreenShot.h"
 				>
 			</File>
@@ -943,10 +911,6 @@
 			</File>
 			<File
 				RelativePath=".\CSettings.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CText.h"
 				>
 			</File>
 			<File
@@ -1010,14 +974,6 @@
 				>
 				<File
 					RelativePath=".\CExceptionInformation_Impl.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="utils"
-				>
-				<File
-					RelativePath=".\client\utils\CMD5Hasher.h"
 					>
 				</File>
 			</Filter>

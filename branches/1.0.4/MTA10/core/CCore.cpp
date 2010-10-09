@@ -168,9 +168,6 @@ CCore::CCore ( void )
     // Create the mod manager
     m_pModManager               = new CModManager;
 
-    // Create a resolution manager (for screen res)
-    m_pResManager               = new CResManager;
-
     m_pfnMessageProcessor       = NULL;
     m_pMessageBox = NULL;
 
@@ -1351,14 +1348,6 @@ bool CCore::IsValidNick ( const char* szNick )
 
     return false;
 }
-
-
-#ifndef MTA_DEBUG
-CResManager * CCore::GetResManager ( void )
-{
-    return m_pResManager;
-}
-#endif
 
 
 void CCore::Quit ( bool bInstantly )
