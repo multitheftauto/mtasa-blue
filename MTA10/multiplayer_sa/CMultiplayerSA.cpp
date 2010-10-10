@@ -3079,6 +3079,16 @@ void CMultiplayerSA::SetThermalVisionEnabled ( bool bEnabled )
     }
 }
 
+bool CMultiplayerSA::IsNightVisionEnabled ( )
+{
+    return (*(BYTE *)0xC402B8 == 1 );
+}
+
+bool CMultiplayerSA::IsThermalVisionEnabled ( )
+{
+    return (*(BYTE *)0xC402B9 == 1 );
+}
+
 
 float CMultiplayerSA::GetGlobalGravity ( void )
 {

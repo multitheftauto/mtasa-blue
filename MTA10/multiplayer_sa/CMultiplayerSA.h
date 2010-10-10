@@ -81,6 +81,8 @@ public:
 
     void                        SetNightVisionEnabled       ( bool bEnabled );
     void                        SetThermalVisionEnabled     ( bool bEnabled );
+    bool                        IsNightVisionEnabled        ( );
+    bool                        IsThermalVisionEnabled      ( );
 
     void                        AllowWindowsCursorShowing   ( bool bAllow );
 
