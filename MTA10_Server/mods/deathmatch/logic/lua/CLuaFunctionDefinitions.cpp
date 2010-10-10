@@ -6845,7 +6845,7 @@ int CLuaFunctionDefinitions::SetObjectScale ( lua_State* luaVM )
         CObject* pObject = lua_toobject ( luaVM, 1 );
         if ( pObject && IS_OBJECT ( pObject ) )
         {
-            float fScale = lua_tonumber ( luaVM, 2 );
+            float fScale = (float) lua_tonumber ( luaVM, 2 );
 
             if ( CStaticFunctionDefinitions::SetObjectScale ( pObject, fScale ) )
             {

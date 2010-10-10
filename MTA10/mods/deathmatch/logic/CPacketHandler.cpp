@@ -2037,6 +2037,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // unsigned char        (1)     - entity interior
     // unsigned short       (2)     - entity dimension
     // ElementID            (2)     - attached to entity id
+    // bool                 (1)     - collisions enabled
     // ???                  (?)     - custom data
 
     // Objects:
@@ -2142,6 +2143,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         ElementID ParentID;
         unsigned char ucInterior;
         unsigned short usDimension;
+        bool bCollisonsEnabled;
 
         if ( bitStream.ReadCompressed ( EntityID ) &&
              bitStream.Read ( ucEntityTypeID ) &&
@@ -2150,20 +2152,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
              bitStream.ReadCompressed ( usDimension ) &&
              bitStream.ReadBit ( bIsAttached ) )
         {
-            /*
-#ifdef MTA_DEBUG
-            char* names [ 17 ] = { "dummy", "player", "vehicle", "object", "marker", "blip",
-                                   "pickup", "radar_area", "spawnpoint", "remoteclient", "console",
-                                   "path_node", "world_mesh", "team", "ped", "colshape", "unknown" };
-            g_pCore->GetConsole ()->Printf ( "* Entity-add: %s - %u - parent: %u", names [ ( ucEntityTypeID <= 16 ) ? ucEntityTypeID : 16 ], EntityID, ParentID );
-
-            if ( FILE * file = fopen ( "entity-add.txt", "a" ) )
-            {
-                fprintf ( file, "entity-type: %s - id: %u - parent: %u\n", names [ ( ucEntityTypeID <= 16 ) ? ucEntityTypeID : 16 ], EntityID, ParentID );
-                fclose ( file );
-            }
-#endif
-            */
 
             if ( bIsAttached )
             {
@@ -2171,6 +2159,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 bitStream.Read ( &attachedPosition );
                 bitStream.Read ( &attachedRotation );
             }
+
+            // Check element collisions enabled ( for use later on )
+            bitStream.ReadBit ( bCollisonsEnabled );
 
             // Read custom data
             CCustomData* pCustomData = new CCustomData;
@@ -2338,6 +2329,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         float fScale;
                         if ( bitStream.Read ( fScale ) )
                             pObject->SetScale ( fScale );
+
+                        pObject->SetCollisionEnabled ( bCollisonsEnabled );
                     }
 
                     break;
@@ -2605,6 +2598,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // Set the matrix
                     pVehicle->SetPosition ( position.data.vecPosition );
                     pVehicle->SetRotationDegrees ( rotationDegrees.data.vecRotation );
+
+                    // Set collidable state
+                    pVehicle->SetCollisionEnabled ( bCollisonsEnabled );
 
                     break;
                 }
@@ -2904,6 +2900,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             pPed->RebuildModel ( true );
                         }
                     }
+
+                    // Collisions
+                    pPed->SetUsesCollision ( bCollisonsEnabled );
+                    
                     break;
                 }
 

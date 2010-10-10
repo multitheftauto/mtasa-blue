@@ -130,6 +130,7 @@ public:
     LUA_DECLARE ( IsElementSyncer );
     LUA_DECLARE ( IsElementCollidableWith );
     LUA_DECLARE ( IsElementDoubleSided );
+    LUA_DECLARE ( GetElementCollisionsEnabled );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );

@@ -692,6 +692,32 @@ bool CStaticFunctionDefinitions::IsElementCollidableWith ( CClientEntity& Entity
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetElementCollisionsEnabled ( CClientEntity& Entity )
+{
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTVEHICLE:
+        {
+            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+            return Vehicle.IsCollisionEnabled ( );
+        }
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            return Object.IsCollisionEnabled ( );
+        }
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+        {
+            CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+            return Ped.GetUsesCollision ( );
+        }
+        default: return false;
+    }
+
+    return false;
+}
+
 
 CClientDummy* CStaticFunctionDefinitions::CreateElement ( CResource& Resource, const char* szTypeName, const char* szID )
 {

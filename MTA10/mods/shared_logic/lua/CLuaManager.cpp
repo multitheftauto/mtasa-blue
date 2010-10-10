@@ -305,6 +305,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isElementSyncer", CLuaFunctionDefs::IsElementSyncer );
     CLuaCFunctions::AddFunction ( "isElementCollidableWith", CLuaFunctionDefs::IsElementCollidableWith );
     CLuaCFunctions::AddFunction ( "isElementDoubleSided", CLuaFunctionDefs::IsElementDoubleSided );
+    CLuaCFunctions::AddFunction ( "getElementCollisionsEnabled", CLuaFunctionDefs::GetElementCollisionsEnabled );
 
     // Element set funcs
     CLuaCFunctions::AddFunction ( "createElement", CLuaFunctionDefs::CreateElement );

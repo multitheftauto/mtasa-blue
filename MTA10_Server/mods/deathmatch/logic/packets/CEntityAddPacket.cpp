@@ -97,6 +97,34 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             }
             else
                 BitStream.WriteBit ( false );
+
+            // Entity collisions enabled
+            bool bCollisionsEnabled = true;
+
+            switch ( pElement->GetType() )
+            {
+                case CElement::VEHICLE:
+                {
+                    CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+                    bCollisionsEnabled = pVehicle->GetCollisionEnabled ( );
+                    break;
+                }
+                case CElement::OBJECT:
+                {
+                    CObject* pObject = static_cast < CObject* > ( pElement );
+                    bCollisionsEnabled = pObject->GetCollisionEnabled ( );
+                    break;
+                }
+                case CElement::PED:
+                case CElement::PLAYER:
+                {
+                    CPed* pPed = static_cast < CPed* > ( pElement );
+                    bCollisionsEnabled = pPed->GetCollisionEnabled ( );
+                    break;
+                }
+            }
+
+            BitStream.WriteBit ( bCollisionsEnabled );
             
             // Write custom data
             CCustomData* pCustomData = pElement->GetCustomDataPointer ();

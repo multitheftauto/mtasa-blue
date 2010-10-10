@@ -263,6 +263,9 @@ public:
     inline bool                     IsHeliSearchLightVisible ( void )                       { return m_bHeliSearchLightVisible; }
     inline void                     SetHeliSearchLightVisible ( bool bVisible )             { m_bHeliSearchLightVisible = bVisible; }
 
+    inline bool                     GetCollisionEnabled     ( void )                        { return m_bCollisionsEnabled; }
+    inline void                     SetCollisionEnabled     ( bool bCollisionEnabled )      { m_bCollisionsEnabled = bCollisionEnabled; }
+
     // Functions used to remember where this vehicle spawns
     inline const CVector&           GetRespawnPosition      ( void )                        { return m_vecRespawnPosition; };
     inline void                     SetRespawnPosition      ( const CVector& vecPosition )  { m_vecRespawnPosition = vecPosition; };
@@ -348,6 +351,7 @@ private:
     bool                            m_bTaxiLightState;
     bool                            m_bLandingGearDown;
     unsigned short                  m_usAdjustableProperty;
+    bool                            m_bCollisionsEnabled;
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;

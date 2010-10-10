@@ -31,6 +31,8 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
     m_ucAlpha = 255;
     m_fScale  = 1;
 
+    m_bCollisionsEnabled = true;
+
     // Add us to the manager's list
     pObjectManager->AddToList ( this );
 }
@@ -48,6 +50,8 @@ CObject::CObject ( const CObject& Copy ) : CElement ( Copy.m_pParent, Copy.m_pXM
     m_vecRotation = Copy.m_vecRotation;
     // TODO: copy move data properly
     m_moveData.bActive = false;
+
+    m_bCollisionsEnabled = Copy.m_bCollisionsEnabled;
 
     // Add us to the manager's list
     m_pObjectManager->AddToList ( this );
@@ -133,6 +137,9 @@ bool CObject::ReadSpecialData ( void )
 
     if ( !GetCustomDataFloat ( "scale", m_fScale, true ) )
         m_fScale = 1;
+
+    if ( !GetCustomDataBool ( "collisions", m_bCollisionsEnabled, true ) )
+        m_bCollisionsEnabled = true;
 
     // Success
     return true;

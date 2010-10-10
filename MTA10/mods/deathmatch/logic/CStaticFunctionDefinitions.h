@@ -72,6 +72,7 @@ public:
     static bool                         IsElementInWater                    ( CClientEntity& Entity, bool & bInWater );
     static bool                         IsElementSyncer                     ( CClientEntity& Entity, bool & bIsSyncer );
     static bool                         IsElementCollidableWith             ( CClientEntity& Entity, CClientEntity& ThisEntity, bool & bCanCollide );
+    static bool                         GetElementCollisionsEnabled         ( CClientEntity& Entity );
     // Element set funcs
     static CClientDummy*                CreateElement                       ( CResource& Resource, const char* szTypeName, const char* szID );
     static bool                         DestroyElement                      ( CClientEntity& Entity );

@@ -57,6 +57,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementHealth", CLuaElementDefs::getElementHealth );
     CLuaCFunctions::AddFunction ( "getElementModel", CLuaElementDefs::getElementModel );
     CLuaCFunctions::AddFunction ( "getElementSyncer", CLuaElementDefs::getElementSyncer );
+    CLuaCFunctions::AddFunction ( "getElementCollisionsEnabled", CLuaElementDefs::getElementCollisionsEnabled );
 
     // Attachement
     CLuaCFunctions::AddFunction ( "attachElements", CLuaElementDefs::attachElements );
@@ -88,6 +89,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementHealth", CLuaElementDefs::setElementHealth );
     CLuaCFunctions::AddFunction ( "setElementModel", CLuaElementDefs::setElementModel );
     CLuaCFunctions::AddFunction ( "setElementSyncer", CLuaElementDefs::setElementSyncer );
+    CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", CLuaElementDefs::setElementCollisionsEnabled );
 }
 
 
@@ -1179,6 +1181,27 @@ int CLuaElementDefs::getElementSyncer ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaElementDefs::getElementCollisionsEnabled ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+
+        if ( pElement )
+        {
+            lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetElementCollisionsEnabled ( pElement ) );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementCollisionsEnabled", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementCollisionsEnabled" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaElementDefs::clearElementVisibleTo ( lua_State* luaVM )
 {
@@ -1864,6 +1887,31 @@ int CLuaElementDefs::setElementSyncer ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementSyncer" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaElementDefs::setElementCollisionsEnabled ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        bool bEnable       = lua_toboolean ( luaVM, 2 ) ? true : false;
+
+        if ( pElement )
+        {
+            if ( CStaticFunctionDefinitions::SetElementCollisionsEnabled ( pElement, bEnable ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementCollisionsEnabled", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementCollisionsEnabled" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
