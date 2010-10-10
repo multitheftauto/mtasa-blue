@@ -299,6 +299,9 @@ bool CVehicle::ReadSpecialData ( void )
     if ( !GetCustomDataBool ( "collisions", m_bCollisionsEnabled, true ) )
         m_bCollisionsEnabled = true;
 
+    if ( GetCustomDataInt ( "alpha", iTemp, true ) )
+        m_ucAlpha = static_cast < unsigned char > ( iTemp );
+
     return true;
 }
 
