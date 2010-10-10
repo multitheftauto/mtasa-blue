@@ -348,7 +348,10 @@ public:
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );
+    
+    // Object get funcs
     LUA_DECLARE ( IsObjectStatic );
+    LUA_DECLARE ( GetObjectScale );
 
     // Object set funcs
     LUA_DECLARE ( SetObjectRotation );

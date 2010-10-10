@@ -6780,6 +6780,27 @@ int CLuaFunctionDefinitions::GetObjectRotation ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetObjectScale ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CObject* pObject = lua_toobject ( luaVM, 1 );
+        if ( pObject )
+        {
+            lua_pushnumber ( luaVM, pObject->GetScale ( ) );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getObjectScale", "object", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getObjectScale" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::SetObjectRotation ( lua_State* luaVM )
 {
     int iArgumentType1 = lua_type ( luaVM, 1 );
@@ -6811,6 +6832,32 @@ int CLuaFunctionDefinitions::SetObjectRotation ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setObjectRotation" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetObjectScale ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+    {
+        CObject* pObject = lua_toobject ( luaVM, 1 );
+        if ( pObject && IS_OBJECT ( pObject ) )
+        {
+            float fScale = lua_tonumber ( luaVM, 2 );
+
+            if ( CStaticFunctionDefinitions::SetObjectScale ( pObject, fScale ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setObjectScale", "object", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setObjectScale" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

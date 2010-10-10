@@ -5534,6 +5534,26 @@ bool CStaticFunctionDefinitions::SetObjectRotation ( CElement* pElement, const C
 }
 
 
+bool CStaticFunctionDefinitions::SetObjectScale ( CElement* pElement, float fScale )
+{
+    RUN_CHILDREN SetObjectScale ( *iter, fScale );
+
+    if ( IS_OBJECT ( pElement ) )
+    {
+        CObject* pObject = static_cast < CObject* > ( pElement );
+
+        pObject->SetScale ( fScale );
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( pObject->GetID () );
+        BitStream.pBitStream->Write ( fScale );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_OBJECT_SCALE, *BitStream.pBitStream ) );
+    }
+
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation )
 {
     RUN_CHILDREN MoveObject ( pResource, *iter, ulTime, vecPosition, vecRotation );

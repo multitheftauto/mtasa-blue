@@ -19,6 +19,7 @@ void CObjectRPCs::LoadFunctions ( void )
     AddHandler ( SET_OBJECT_ROTATION, SetObjectRotation, "SetObjectRotation" );
     AddHandler ( MOVE_OBJECT, MoveObject, "MoveObject" );
     AddHandler ( STOP_OBJECT, StopObject, "StopObject" );
+    AddHandler ( SET_OBJECT_SCALE, SetObjectScale, "SetObjectScale" );
 }
 
 
@@ -119,6 +120,23 @@ void CObjectRPCs::StopObject ( NetBitStreamInterface& bitStream )
                 // Set it to the source position and rotation
                 pObject->SetOrientation ( vecSourcePosition, vecSourceRotation );
             }
+        }
+    }
+}
+
+
+void CObjectRPCs::SetObjectScale ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
+    {
+        CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( ID ) );
+        if ( pObject )
+        {
+            float fScale;
+            
+            if ( bitStream.Read ( fScale ) )
+                pObject->SetScale ( fScale );
         }
     }
 }

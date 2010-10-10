@@ -471,9 +471,11 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Object get funcs
     CLuaCFunctions::AddFunction ( "getObjectRotation", CLuaFunctionDefinitions::GetObjectRotation );
+    CLuaCFunctions::AddFunction ( "getObjectScale", CLuaFunctionDefinitions::GetObjectScale );
 
     // Object set funcs
     CLuaCFunctions::AddFunction ( "setObjectRotation", CLuaFunctionDefinitions::SetObjectRotation );
+    CLuaCFunctions::AddFunction ( "setObjectScale", CLuaFunctionDefinitions::SetObjectScale );
     CLuaCFunctions::AddFunction ( "moveObject", CLuaFunctionDefinitions::MoveObject );
     CLuaCFunctions::AddFunction ( "stopObject", CLuaFunctionDefinitions::StopObject );
 

@@ -215,6 +215,7 @@ public:
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );
     static bool                         IsObjectStatic                      ( CClientObject& Object, bool & bStatic );
+    static bool                         GetObjectScale                      ( CClientObject& Object, float& fScale );
 
     // Object set funcs
     static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );

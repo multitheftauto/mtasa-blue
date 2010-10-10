@@ -29,6 +29,7 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
     m_usModel = 0xFFFF;
     m_moveData.bActive = false;
     m_ucAlpha = 255;
+    m_fScale  = 1;
 
     // Add us to the manager's list
     pObjectManager->AddToList ( this );
@@ -129,6 +130,9 @@ bool CObject::ReadSpecialData ( void )
 
     if ( !GetCustomDataBool ( "doublesided", m_bDoubleSided, true ) )
         m_bDoubleSided = false;
+
+    if ( !GetCustomDataFloat ( "scale", m_fScale, true ) )
+        m_fScale = 1;
 
     // Success
     return true;

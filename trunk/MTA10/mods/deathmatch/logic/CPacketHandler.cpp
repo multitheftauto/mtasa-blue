@@ -2044,6 +2044,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // CVector              (12)    - rotation
     // unsigned short       (2)     - object model id
     // unsigned char        (1)     - alpha
+    // float                (4)     - scale
 
     // Pickups:
     // CVector              (12)    - position
@@ -2332,7 +2333,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                                                          rotationRadians.data.vecRotation,
                                                          ulMoveTimeLeft );
                             }
-                        }                                 
+                        }
+
+                        float fScale;
+                        if ( bitStream.Read ( fScale ) )
+                            pObject->SetScale ( fScale );
                     }
 
                     break;
