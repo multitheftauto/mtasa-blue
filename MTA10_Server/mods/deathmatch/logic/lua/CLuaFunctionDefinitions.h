@@ -299,10 +299,12 @@ public:
     // Object get functions
     static int      GetObjectName                       ( lua_State* luaVM );
     static int      GetObjectRotation                   ( lua_State* luaVM );
+    static int      GetObjectScale                      ( lua_State* luaVM );
 
     // Object set functions
     static int      SetObjectName                       ( lua_State* luaVM );
     static int      SetObjectRotation                   ( lua_State* luaVM );
+    static int      SetObjectScale                      ( lua_State* luaVM );
     static int      MoveObject                          ( lua_State* luaVM );
     static int      StopObject                          ( lua_State* luaVM );
 

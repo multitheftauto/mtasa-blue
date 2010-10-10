@@ -2815,6 +2815,13 @@ bool CStaticFunctionDefinitions::IsObjectStatic ( CClientObject & Object, bool &
 }
 
 
+bool CStaticFunctionDefinitions::GetObjectScale ( CClientObject & Object, float& fScale )
+{
+    fScale = Object.GetScale ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, const CVector& vecRotation )
 {
     RUN_CHILDREN SetObjectRotation ( **iter, vecRotation );

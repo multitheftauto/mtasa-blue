@@ -529,7 +529,10 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
+
+    // Object get funcs
     CLuaCFunctions::AddFunction ( "isObjectStatic", CLuaFunctionDefs::IsObjectStatic );
+    CLuaCFunctions::AddFunction ( "getObjectScale", CLuaFunctionDefs::GetObjectScale );
 
     // Object set funcs
     CLuaCFunctions::AddFunction ( "moveObject", CLuaFunctionDefs::MoveObject );

@@ -63,12 +63,16 @@ public:
     inline unsigned short       GetModel                ( void )                        { return m_usModel; }
     inline void                 SetModel                ( unsigned short usModel )      { m_usModel = usModel; }
 
+    inline float                GetScale                ( void )                        { return m_fScale; }
+    inline void                 SetScale                ( float fScale )                { m_fScale = fScale; }
+
 private:
     CObjectManager*             m_pObjectManager;
     char                        m_szName [MAX_ELEMENT_NAME_LENGTH + 1];
     CVector                     m_vecRotation;
     unsigned char               m_ucAlpha;
     unsigned short              m_usModel;
+    float                       m_fScale;
 
 public:
     SObjectMoveData             m_moveData;

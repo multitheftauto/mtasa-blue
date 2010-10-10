@@ -121,6 +121,31 @@ int CLuaFunctionDefs::IsObjectStatic ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetObjectScale ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientObject* pObject = lua_toobject ( luaVM, 1 );
+        if ( pObject )
+        {
+            float fScale;
+            if ( CStaticFunctionDefinitions::GetObjectScale ( *pObject, fScale ) )
+            {
+                lua_pushnumber ( luaVM, fScale );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getObjectScale", "object", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getObjectScale" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::MoveObject ( lua_State* luaVM )
 {
     int iArgument2 = lua_type ( luaVM, 2 );

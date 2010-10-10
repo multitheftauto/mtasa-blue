@@ -160,9 +160,11 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     alpha.data.ucAlpha = pObject->GetAlpha ();
                     BitStream.Write ( &alpha );
 
+                    // Double sided
                     bool bIsDoubleSided = pObject->IsDoubleSided ();
                     BitStream.WriteBit ( bIsDoubleSided );
 
+                    // Moving
                     bool bIsMoving = pObject->IsMoving ();
                     BitStream.WriteBit ( bIsMoving );
 
@@ -177,6 +179,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         BitStream.Write ( &rotationRadians );
                     }
 
+                    // Scale
+                    float fScale = pObject->GetScale ();
+                    BitStream.Write ( fScale );
 
                     break;
                 }

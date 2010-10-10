@@ -183,5 +183,7 @@ enum eRPCFunctions
 
     SET_VEHICLE_TURRET_POSITION,
 
+    SET_OBJECT_SCALE,
+
     NUM_RPC_FUNCS
 };
