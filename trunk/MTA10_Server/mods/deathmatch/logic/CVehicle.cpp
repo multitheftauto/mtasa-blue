@@ -70,6 +70,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bTrainDirection = true;
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
+    m_bCollisionsEnabled = true;
 
     // Initialize the occupied Players
     for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )
@@ -287,15 +288,16 @@ bool CVehicle::ReadSpecialData ( void )
     }
 
     if ( GetCustomDataString ( "plate", szTemp, 9, true ) )
-    {
         SetRegPlate ( szTemp );
-    }
 
     if ( GetCustomDataInt ( "interior", iTemp, true ) )
         m_ucInterior = static_cast < unsigned char > ( iTemp );
 
     if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
+
+    if ( !GetCustomDataBool ( "collisions", m_bCollisionsEnabled, true ) )
+        m_bCollisionsEnabled = true;
 
     return true;
 }

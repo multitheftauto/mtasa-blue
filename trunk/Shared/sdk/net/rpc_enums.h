@@ -185,5 +185,7 @@ enum eRPCFunctions
 
     SET_OBJECT_SCALE,
 
+    SET_ELEMENT_COLLISIONS_ENABLED,
+
     NUM_RPC_FUNCS
 };

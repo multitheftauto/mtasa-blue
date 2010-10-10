@@ -1207,6 +1207,29 @@ int CLuaFunctionDefs::IsElementDoubleSided ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetElementCollisionsEnabled ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::GetElementCollisionsEnabled ( *pEntity ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }        
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementCollisionsEnabled", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementCollisionsEnabled" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 
 int CLuaFunctionDefs::IsElementStreamedIn ( lua_State* luaVM )

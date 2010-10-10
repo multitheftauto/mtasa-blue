@@ -804,6 +804,34 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer ( CElement* pElement )
     return NULL;
 }
 
+bool CStaticFunctionDefinitions::GetElementCollisionsEnabled ( CElement* pElement )
+{
+    assert ( pElement );
+
+    switch ( pElement->GetType () )
+    {
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+            return pVehicle->GetCollisionEnabled ( );
+        }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            return pObject->GetCollisionEnabled ( );
+        }
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            CPed* pPed = static_cast < CPed* > ( pElement );
+            return pPed->GetCollisionEnabled ( );
+        }
+        default: return false;
+    }
+
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::IsElementInWater ( CElement* pElement, bool & bInWater )
 {
@@ -1538,6 +1566,42 @@ bool CStaticFunctionDefinitions::SetElementSyncer ( CElement* pElement, CPlayer*
         default: return false;
     }
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CElement* pElement, bool bEnable )
+{
+    assert ( pElement );
+
+    switch ( pElement->GetType () )
+    {
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+            pVehicle->SetCollisionEnabled ( bEnable );
+            break;
+        }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            pObject->SetCollisionEnabled ( bEnable );
+            break;
+        }
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            CPed* pPed = static_cast < CPed* > ( pElement );
+            pPed->SetCollisionEnabled ( bEnable );
+            break;
+        }
+        default: return false;
+    }
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteBit ( bEnable );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_COLLISIONS_ENABLED, *BitStream.pBitStream ) );
+
+    return true;
 }
 
 

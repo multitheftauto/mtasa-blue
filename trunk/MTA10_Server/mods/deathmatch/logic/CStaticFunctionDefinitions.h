@@ -76,6 +76,7 @@ public:
     static bool                 IsElementInWater                    ( CElement* pElement, bool& bInWater );
     static bool                 GetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation );
     static CElement*            GetElementSyncer                    ( CElement* pElement );
+    static bool                 GetElementCollisionsEnabled         ( CElement* pElement );
 
     // Element set funcs
     static bool                 ClearElementVisibleTo               ( CElement* pElement );
@@ -97,6 +98,7 @@ public:
     static bool                 SetElementModel                     ( CElement* pElement, unsigned short usModel );
     static bool                 SetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation );
     static bool                 SetElementSyncer                    ( CElement* pElement, CPlayer* pPlayer, bool bEnable = true );
+    static bool                 SetElementCollisionsEnabled         ( CElement* pElement, bool bEnable );
 
     // Scoreboard
     static bool                 AddScoreboardColumn                 ( const char* szID, const char* szName, float fWidth );

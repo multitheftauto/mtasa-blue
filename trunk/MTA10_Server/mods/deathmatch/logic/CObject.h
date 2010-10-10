@@ -66,6 +66,9 @@ public:
     inline float                GetScale                ( void )                        { return m_fScale; }
     inline void                 SetScale                ( float fScale )                { m_fScale = fScale; }
 
+    inline bool                 GetCollisionEnabled     ( void )                        { return m_bCollisionsEnabled; }
+    inline void                 SetCollisionEnabled     ( bool bCollisionEnabled )      { m_bCollisionsEnabled = bCollisionEnabled; }
+
 private:
     CObjectManager*             m_pObjectManager;
     char                        m_szName [MAX_ELEMENT_NAME_LENGTH + 1];
@@ -73,6 +76,9 @@ private:
     unsigned char               m_ucAlpha;
     unsigned short              m_usModel;
     float                       m_fScale;
+
+protected:
+    bool                        m_bCollisionsEnabled;
 
 public:
     SObjectMoveData             m_moveData;

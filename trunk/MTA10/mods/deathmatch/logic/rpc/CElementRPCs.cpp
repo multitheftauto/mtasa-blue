@@ -18,21 +18,22 @@ using std::list;
 
 void CElementRPCs::LoadFunctions ( void )
 {
-    AddHandler ( SET_ELEMENT_PARENT,            SetElementParent,           "SetElementParent" );
-    AddHandler ( SET_ELEMENT_DATA,              SetElementData,             "SetElementData" );
-    AddHandler ( REMOVE_ELEMENT_DATA,           RemoveElementData,          "RemoveElementData" );
-    AddHandler ( SET_ELEMENT_POSITION,          SetElementPosition,         "SetElementPosition" );
-    AddHandler ( SET_ELEMENT_VELOCITY,          SetElementVelocity,         "SetElementVelocity" );
-    AddHandler ( SET_ELEMENT_INTERIOR,          SetElementInterior,         "SetElementInterior" );
-    AddHandler ( SET_ELEMENT_DIMENSION,         SetElementDimension,        "SetElementDimension" );
-    AddHandler ( ATTACH_ELEMENTS,               AttachElements,             "AttachElements" );
-    AddHandler ( DETACH_ELEMENTS,               DetachElements,             "DetachElements" );
-    AddHandler ( SET_ELEMENT_ALPHA,             SetElementAlpha,            "SetElementAlpha" );
-    AddHandler ( SET_ELEMENT_NAME,              SetElementName,             "SetElementName" );
-    AddHandler ( SET_ELEMENT_HEALTH,            SetElementHealth,           "SetElementHealth" );
-    AddHandler ( SET_ELEMENT_MODEL,             SetElementModel,            "SetElementModel" );
-    AddHandler ( SET_ELEMENT_ATTACHED_OFFSETS,  SetElementAttachedOffsets,  "SetElementAttachedOffsets" );
-    AddHandler ( SET_ELEMENT_DOUBLESIDED,       SetElementDoubleSided,      "SetElementDoubleSided" );
+    AddHandler ( SET_ELEMENT_PARENT,             SetElementParent,            "SetElementParent" );
+    AddHandler ( SET_ELEMENT_DATA,               SetElementData,              "SetElementData" );
+    AddHandler ( REMOVE_ELEMENT_DATA,            RemoveElementData,           "RemoveElementData" );
+    AddHandler ( SET_ELEMENT_POSITION,           SetElementPosition,          "SetElementPosition" );
+    AddHandler ( SET_ELEMENT_VELOCITY,           SetElementVelocity,          "SetElementVelocity" );
+    AddHandler ( SET_ELEMENT_INTERIOR,           SetElementInterior,          "SetElementInterior" );
+    AddHandler ( SET_ELEMENT_DIMENSION,          SetElementDimension,         "SetElementDimension" );
+    AddHandler ( ATTACH_ELEMENTS,                AttachElements,              "AttachElements" );
+    AddHandler ( DETACH_ELEMENTS,                DetachElements,              "DetachElements" );
+    AddHandler ( SET_ELEMENT_ALPHA,              SetElementAlpha,             "SetElementAlpha" );
+    AddHandler ( SET_ELEMENT_NAME,               SetElementName,              "SetElementName" );
+    AddHandler ( SET_ELEMENT_HEALTH,             SetElementHealth,            "SetElementHealth" );
+    AddHandler ( SET_ELEMENT_MODEL,              SetElementModel,             "SetElementModel" );
+    AddHandler ( SET_ELEMENT_ATTACHED_OFFSETS,   SetElementAttachedOffsets,   "SetElementAttachedOffsets" );
+    AddHandler ( SET_ELEMENT_DOUBLESIDED,        SetElementDoubleSided,       "SetElementDoubleSided" );
+    AddHandler ( SET_ELEMENT_COLLISIONS_ENABLED, SetElementCollisionsEnabled, "SetElementCollisionsEnabled" );
 }
 
 
@@ -502,6 +503,45 @@ void CElementRPCs::SetElementAttachedOffsets ( NetBitStreamInterface& bitStream 
         if ( pEntity )
         {
             pEntity->SetAttachedOffsets ( position.data.vecPosition, rotation.data.vecRotation );
+        }
+    }
+}
+
+void CElementRPCs::SetElementCollisionsEnabled ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    bool bEnable;
+
+    if ( bitStream.Read ( ID ) &&
+         bitStream.ReadBit ( bEnable ) )
+    {
+        CClientEntity * pEntity = CElementIDs::GetElement ( ID );
+        if ( pEntity )
+        {
+            switch ( pEntity->GetType () )
+            {
+                case CCLIENTPED:
+                case CCLIENTPLAYER:
+                {
+                    CClientPed* pPed = static_cast < CClientPed * > ( pEntity );
+                    pPed->SetUsesCollision ( bEnable );
+                    break;
+                }
+
+                case CCLIENTVEHICLE:
+                {
+                    CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pEntity );
+                    pVehicle->SetCollisionEnabled ( bEnable );
+                    break;
+                }
+
+                case CCLIENTOBJECT:
+                {
+                    CClientObject* pObject = static_cast < CClientObject * > ( pEntity );
+                    pObject->SetCollisionEnabled ( bEnable );
+                    break;
+                }
+            }
         }
     }
 }
