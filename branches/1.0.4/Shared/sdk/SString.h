@@ -72,12 +72,28 @@ public:
         return std::string::operator[]( iOffset );
     }
 
+    // Operators  
+    SString operator+( const char* other ) const
+    {
+        return std::string ( *this ) + other;
+    }
+    SString operator+( const std::string& other ) const
+    {
+        return std::string ( *this ) + other;
+    }
+
     // Assignment  
     operator const char*() const    { return c_str (); }        // Auto assign to const char* without using c_str()
+    const char* operator*( void ) const
+    {
+        return c_str ();
+    }
 
     // Functions
     void        Split               ( const SString& strDelim, std::vector < SString >& outResult, unsigned int uiMaxAmount = 0 ) const;
-    bool        Split               ( const SString& strDelim, SString* pstrLeft, SString* pstrRight, bool bFromRight = false ) const;
+    bool        Split               ( const SString& strDelim, SString* pstrLeft, SString* pstrRight, int iIndex = 1 ) const;
+    SString     SplitLeft           ( const SString& strDelim, SString* pstrRight = NULL, int iIndex = 1 ) const;
+    SString     SplitRight          ( const SString& strDelim, SString* pstrLeft = NULL, int iIndex = 1 ) const;
     SString     Replace             ( const char* szOld, const char* szNew ) const;
     SString     ReplaceI            ( const char* szOld, const char* szNew ) const;
     SString     TrimStart           ( const char* szOld ) const;
@@ -88,4 +104,20 @@ public:
     bool        Contains            ( const SString& strOther ) const;
     bool        ContainsI           ( const SString& strOther ) const;
     bool        CompareI            ( const SString& strOther ) const;
+    SString     SubStr              ( int iPos, int iCount ) const;
+    SString     Left                ( int iCount ) const;
+    SString     Right               ( int iCount ) const;
+    bool        EndsWith            ( const SString& strOther ) const;
+    bool        EndsWithI           ( const SString& strOther ) const;
+    bool        BeginsWith          ( const SString& strOther ) const;
+    bool        BeginsWithI         ( const SString& strOther ) const;
+};
+
+
+class SStringX : public SString
+{
+public:
+    SStringX ( const char* szText )
+        : SString ( std::string ( szText ? szText : "" ) )
+    { }
 };

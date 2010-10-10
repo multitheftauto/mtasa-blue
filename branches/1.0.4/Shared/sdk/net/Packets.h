@@ -129,4 +129,7 @@ enum ePacketID
     // Bitstream 0x12
     PACKET_ID_PLAYER_TRANSGRESSION,
 
+    // Bitstream 0x14
+    PACKET_ID_PLAYER_DIAGNOSTIC,
+
 };

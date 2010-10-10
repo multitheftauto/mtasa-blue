@@ -376,9 +376,7 @@ void CModManager::DumpCoreLog ( CExceptionInformation* pExceptionInformation )
         time_t timeTemp;
         time ( &timeTemp );
 
-        SString strNetRev;
-        GetApplicationSetting ( "mta-version" ).Split ( ".", NULL, &strNetRev, true );
-        SString strMTAVersionFull = SString ( "%s.%s", MTA_DM_BUILDTAG_LONG, strNetRev.c_str () );
+        SString strMTAVersionFull = SString ( "%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting ( "mta-version-ext" ).SplitRight ( ".", NULL, -2 ) );
 
         SString strInfo;
         strInfo += SString ( "Version = %s\n", strMTAVersionFull.c_str () );
@@ -480,13 +478,11 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInfo
                 CreateDirectory ( CalcMTASAPath ( "mta\\dumps" ), 0 );
 
                 SString strModuleName = pExceptionInformation->GetModuleBaseName ();
-                strModuleName = strModuleName.ReplaceI ( ".dll", "" ).Replace ( ".exe", "" );
+                strModuleName = strModuleName.ReplaceI ( ".dll", "" ).Replace ( ".exe", "" ).Replace ( "_", "" ).Replace ( ".", "" ).Replace ( "-", "" );
                 if ( strModuleName.length () == 0 )
                     strModuleName = "unknown";
 
-                SString strNetRev;
-                GetApplicationSetting ( "mta-version" ).Split ( ".", NULL, &strNetRev, true );
-                SString strMTAVersionFull = SString ( "%s.%s", MTA_DM_BUILDTAG_LONG, strNetRev.c_str () );
+                SString strMTAVersionFull = SString ( "%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting ( "mta-version-ext" ).SplitRight ( ".", NULL, -2 ) );
                 SString strSerialPart = GetApplicationSetting ( "serial" ).substr ( 0, 8 );
 
                 SString strFilename ( "mta\\dumps\\client_%s_%s_%06x_%x_%s_%04d%02d%02d_%02d%02d.dmp",

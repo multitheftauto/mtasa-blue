@@ -913,6 +913,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_DIAGNOSTIC:
+        {
+            Packet_PlayerDiagnostic ( static_cast < CPlayerDiagnosticPacket& > ( Packet ) );
+            return true;
+        }
+
         default:
             break;
     }
@@ -2828,6 +2834,21 @@ void CGame::Packet_PlayerTransgression ( CPlayerTransgressionPacket & Packet )
         {
             SString strMessageCombo ( "AC #%d %s", Packet.m_uiLevel, Packet.m_strMessage.c_str () );
             CStaticFunctionDefinitions::KickPlayer ( pPlayer, NULL, strMessageCombo );
+        }
+    }
+}
+
+
+void CGame::Packet_PlayerDiagnostic ( CPlayerDiagnosticPacket & Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // If diagnosticis enabled on this server, log it
+        if ( g_pGame->GetConfig ()->IsEnableDiagnostic ( SString ( "%d", Packet.m_uiLevel ) ) )
+        {
+            SString strMessageCombo ( "DIAGNOSTIC: %s #%d %s\n", pPlayer->GetNick (), Packet.m_uiLevel, Packet.m_strMessage.c_str () );
+            CLogger::LogPrint ( strMessageCombo );
         }
     }
 }

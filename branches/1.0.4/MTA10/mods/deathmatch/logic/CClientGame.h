@@ -586,6 +586,7 @@ private:
     DWORD                               m_dwLastFrameTick;      // time at which the previous frame was processed
 
     long long                           m_llLastTransgressionTime;
+    SString                             m_strLastDiagnosticStatus;
 
     // Cache for speeding up collision processing
 public:

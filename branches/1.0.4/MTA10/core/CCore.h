@@ -60,6 +60,7 @@ class CCore;
 #define CONFIG_NODE_CVARS           "settings"                  // cvars node
 #define CONFIG_NODE_KEYBINDS        "binds"                     // keybinds node
 #define CONFIG_NODE_JOYPAD          "joypad"
+#define CONFIG_NODE_UPDATER         "updater"
 #define CONFIG_NODE_SERVER_INT      "internet_servers"          // backup of last successful master server list query
 #define CONFIG_NODE_SERVER_FAV      "favourite_servers"         // favourite servers list node
 #define CONFIG_NODE_SERVER_REC      "recently_played_servers"   // recently played servers list node

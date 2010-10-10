@@ -105,6 +105,16 @@ static SString ReadRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR sz
 
 
 //
+// Write a registry string value
+//
+static bool DeleteRegistryKey ( HKEY hkRoot, LPCSTR szSubKey )
+{
+    return RegDeleteKey ( hkRoot, szSubKey ) == ERROR_SUCCESS;
+}
+
+
+
+//
 // Run ShellExecute with these parameters after exit
 //
 void SharedUtil::SetOnQuitCommand ( const SString& strOperation, const SString& strFile, const SString& strParameters, const SString& strDirectory, const SString& strShowCmd )
@@ -122,7 +132,7 @@ void SharedUtil::SetOnQuitCommand ( const SString& strOperation, const SString& 
 void SharedUtil::SetOnRestartCommand ( const SString& strOperation, const SString& strFile, const SString& strParameters, const SString& strDirectory, const SString& strShowCmd )
 {
     // Encode into a string and set a registry key
-    SString strVersion ( "%d.%d.%d-%s.%05d" ,MTASA_VERSION_MAJOR ,MTASA_VERSION_MINOR ,MTASA_VERSION_MAINTENANCE ,MTA_DM_BUILDTYPE ,MTASA_VERSION_BUILD );
+    SString strVersion ( "%d.%d.%d-%d.%05d" ,MTASA_VERSION_MAJOR ,MTASA_VERSION_MINOR ,MTASA_VERSION_MAINTENANCE ,MTASA_VERSION_TYPE ,MTASA_VERSION_BUILD );
     SString strValue ( "%s\t%s\t%s\t%s\t%s\t%s", strOperation.c_str (), strFile.c_str (), strParameters.c_str (), strDirectory.c_str (), strShowCmd.c_str (), strVersion.c_str () );
     WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnRestartCommand", strValue );
 }
@@ -140,7 +150,7 @@ bool SharedUtil::GetOnRestartCommand ( SString& strOperation, SString& strFile, 
     strOnRestartCommand.Split ( "\t", vecParts );
     if ( vecParts.size () > 5 && vecParts[0].length () )
     {
-        SString strVersion ( "%d.%d.%d-%s.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTA_DM_BUILDTYPE, MTASA_VERSION_BUILD );
+        SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
         if ( vecParts[5] == strVersion )
         {
             strOperation = vecParts[0];
@@ -158,83 +168,77 @@ bool SharedUtil::GetOnRestartCommand ( SString& strOperation, SString& strFile, 
 
 
 //
-// An ApplicationSettingGroup is a collection of persistant key/value pairs
+// Application settings
 // 
-static void GetApplicationSettingGroup ( const SString& strGroup, CArgMap& argMap )
+
+//
+// Get/set string
+//
+void SharedUtil::SetApplicationSetting ( const SString& strPath, const SString& strKey, const SString& strValue )
 {
-    argMap = CArgMap ( "=", "&" );
-    argMap.SetFromString ( ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas\\Settings", strGroup, NULL ) );
+    SString strRegFullPath  = SStringX( "Software\\Multi Theft Auto: San Andreas\\Settings\\" ) + strPath.Replace( ".", "\\" );
+    WriteRegistryStringValue ( HKEY_CURRENT_USER, strRegFullPath, strKey, strValue );
 }
 
-static void SetApplicationSettingGroup( const SString& strGroup, const CArgMap& argMap )
+SString SharedUtil::GetApplicationSetting ( const SString& strPath, const SString& strKey )
 {
-    WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas\\Settings", strGroup, argMap.ToString () );
+    SString strRegFullPath  = SStringX( "Software\\Multi Theft Auto: San Andreas\\Settings\\" ) + strPath.Replace( ".", "\\" );
+    return ReadRegistryStringValue ( HKEY_CURRENT_USER, strRegFullPath, strKey, NULL );
 }
 
-
-// Get a key/value pair in a group
-SString SharedUtil::GetApplicationSetting ( const SString& strGroup, const SString& strKey )
+//
+// Get/set int
+//
+void SharedUtil::SetApplicationSettingInt ( const SString& strPath, const SString& strKey, int iValue )
 {
-    CArgMap argMap;
-    GetApplicationSettingGroup ( strGroup, argMap );
-    return argMap.Get ( strKey );
+    SetApplicationSetting ( strPath, strKey, SString ( "%d", iValue ) );
 }
 
-// Set a key/value pair in a group
-void SharedUtil::SetApplicationSetting ( const SString& strGroup, const SString& strKey, const SString& strValue )
+int SharedUtil::GetApplicationSettingInt ( const SString& strPath, const SString& strKey )
 {
-    CArgMap argMap;
-    GetApplicationSettingGroup ( strGroup, argMap );
-    argMap.Set ( strKey, strValue );
-    SetApplicationSettingGroup ( strGroup, argMap );
+    return atoi ( GetApplicationSetting ( strPath, strKey ) );
 }
 
-// Get a setting for 'group.key' or just 'key' for general settings
-SString SharedUtil::GetApplicationSetting ( const SString& strGroupKey )
+//
+// Get/set string - Combined path and key i.e. "group.key"
+//
+SString SharedUtil::GetApplicationSetting ( const SString& strPathKey )
 {
-    {
-        SString strGroup, strKey;
-        if ( strGroupKey.Split ( ".", &strGroup, &strKey ) )
-            return GetApplicationSetting ( strGroup, strKey );
-    }
-    return GetApplicationSetting ( "general", strGroupKey );
+    SString strPath;
+    SString strKey = strPathKey.SplitRight ( ".", &strPath, -1 );
+    if ( !strPath.length () )
+        strPath = "general";
+    return GetApplicationSetting ( strPath, strKey );
 }
 
-// Set a setting for 'group.key' or just 'key' for general settings
-void SharedUtil::SetApplicationSetting ( const SString& strGroupKey, const SString& strValue )
+void SharedUtil::SetApplicationSetting ( const SString& strPathKey, const SString& strValue )
 {
-    {
-        SString strGroup, strKey;
-        if ( strGroupKey.Split ( ".", &strGroup, &strKey ) )
-            SetApplicationSetting ( strGroup, strKey, strValue );
-    }
-    SetApplicationSetting ( "general", strGroupKey, strValue );
+    SString strPath;
+    SString strKey = strPathKey.SplitRight ( ".", &strPath, -1 );
+    if ( !strPath.length () )
+        strPath = "general";
+    SetApplicationSetting ( strPath, strKey, strValue );
 }
 
-
-void SharedUtil::SetApplicationSettingInt ( const SString& strGroup, const SString& strKey, int iValue )
+//
+// Get/set int - Combined path and key i.e. "group.key"
+//
+void SharedUtil::SetApplicationSettingInt ( const SString& strPathKey, int iValue )
 {
-    SetApplicationSetting ( strGroup, strKey, SString ( "%d", iValue ) );
+    SetApplicationSetting ( strPathKey, SString ( "%d", iValue ) );
 }
 
-
-void SharedUtil::SetApplicationSettingInt ( const SString& strGroupKey, int iValue )
+int SharedUtil::GetApplicationSettingInt ( const SString& strPathKey )
 {
-    SetApplicationSetting ( strGroupKey, SString ( "%d", iValue ) );
+    return atoi ( GetApplicationSetting ( strPathKey ) );
 }
 
-
-int SharedUtil::GetApplicationSettingInt ( const SString& strGroup, const SString& strKey )
+// Delete a setting key
+static bool DeleteApplicationSettingKey ( const SString& strPathKey )
 {
-    return atoi ( GetApplicationSetting ( strGroup, strKey ) );
+    SString strRegFullPath  = SStringX( "Software\\Multi Theft Auto: San Andreas\\Settings\\" ) + strPathKey.Replace( ".", "\\" );
+    return DeleteRegistryKey ( HKEY_CURRENT_USER, strRegFullPath );
 }
-
-
-int SharedUtil::GetApplicationSettingInt ( const SString& strGroupKey )
-{
-    return atoi ( GetApplicationSetting ( strGroupKey ) );
-}
-
 
 
 
@@ -244,8 +248,7 @@ int SharedUtil::GetApplicationSettingInt ( const SString& strGroupKey )
 
 void SharedUtil::WatchDogReset ( void )
 {
-    CArgMap argMap;
-    SetApplicationSettingGroup ( "watchdog", argMap );
+    DeleteApplicationSettingKey ( "watchdog" );
 }
 
 // Section
@@ -297,13 +300,10 @@ void SharedUtil::WatchDogSetUncleanStop ( bool bOn )
 //
 static SString GetReportLogHeaderText ( void )
 {
-    CArgMap argMap;
-    GetApplicationSettingGroup ( "general", argMap );
-    SString strMTABuild;
-    argMap.Get ( "mta-version" ).Split ( "-", NULL, &strMTABuild );
-    SString strOSVersion     = argMap.Get ( "os-version" );
-    SString strRealOSVersion = argMap.Get ( "real-os-version" );
-    SString strIsAdmin       = argMap.Get ( "is-admin" );
+    SString strMTABuild      = GetApplicationSetting ( "mta-version-ext" ).SplitRight ( "-" );
+    SString strOSVersion     = GetApplicationSetting ( "os-version" );
+    SString strRealOSVersion = GetApplicationSetting ( "real-os-version" );
+    SString strIsAdmin       = GetApplicationSetting ( "is-admin" );
 
     SString strResult = "[";
     if ( strMTABuild.length () )
@@ -329,6 +329,9 @@ void SharedUtil::AddReportLog ( uint uiId, const SString& strText )
 
     SString strMessage ( "%u: %s %s - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), strText.c_str () );
     FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
+#if MTA_DEBUG
+    OutputDebugString ( SStringX ( "ReportLog: " ) + strMessage );
+#endif
 }
 
 void SharedUtil::SetReportLogContents ( const SString& strText )
@@ -397,6 +400,23 @@ SString SharedUtil::UnescapeString ( const SString& strText, char cSpecialChar )
     }
     return strResult;
 }
+
+#ifdef ExpandEnvironmentStringsForUser
+//
+// eg "%HOMEDRIVE%" -> "C:"
+//
+SString SharedUtil::ExpandEnvString ( const SString& strInput )
+{
+    HANDLE hProcessToken;
+    if ( !OpenProcessToken ( GetCurrentProcess (), TOKEN_IMPERSONATE | TOKEN_QUERY | TOKEN_DUPLICATE, &hProcessToken ) )
+        return strInput;
+
+    const static int iBufferSize = 32000;
+    char envBuf [ iBufferSize + 2 ];
+    ExpandEnvironmentStringsForUser ( hProcessToken, strInput, envBuf, iBufferSize );
+    return envBuf;
+}
+#endif
 
 
 //
@@ -645,18 +665,18 @@ namespace SharedUtil
         m_strDisallowedChars = strExtraDisallowedChars + m_strArgSep + m_strPartsSep;
     }
 
-    void CArgMap::Merge ( const CArgMap& other )
+    void CArgMap::Merge ( const CArgMap& other, bool bAllowMultiValues )
     {
-        MergeFromString ( other.ToString () );
+        MergeFromString ( other.ToString (), bAllowMultiValues );
     }
 
-    void CArgMap::SetFromString ( const SString& strLine )
+    void CArgMap::SetFromString ( const SString& strLine, bool bAllowMultiValues )
     {
         m_Map.clear ();
-        MergeFromString ( strLine );
+        MergeFromString ( strLine, bAllowMultiValues );
     }
 
-    void CArgMap::MergeFromString ( const SString& strLine )
+    void CArgMap::MergeFromString ( const SString& strLine, bool bAllowMultiValues )
     {
         std::vector < SString > parts;
         strLine.Split( m_strPartsSep, parts );
@@ -664,7 +684,8 @@ namespace SharedUtil
         {
             SString strCmd, strArg;
             parts[i].Split ( m_strArgSep, &strCmd, &strArg );
-            m_Map.erase ( strCmd );
+            if ( !bAllowMultiValues )
+                m_Map.erase ( strCmd );
             if ( strCmd.length () ) // Key can not be empty
                 MapInsert ( m_Map, strCmd, strArg );
         }
@@ -682,6 +703,23 @@ namespace SharedUtil
         return strResult;
     }
 
+    bool CArgMap::HasMultiValues ( void ) const
+    {
+        for ( std::multimap < SString, SString >::const_iterator iter = m_Map.begin () ; iter != m_Map.end () ; ++iter )
+        {
+            std::vector < SString > newItems;
+            MultiFind ( m_Map, iter->first, &newItems );
+            if ( newItems.size () > 1 )
+                return true;
+        }
+        return false;
+    }
+
+    void CArgMap::RemoveMultiValues ( void )
+    {
+        if ( HasMultiValues () )
+            SetFromString ( ToString (), false );
+    }
 
     SString CArgMap::Escape ( const SString& strIn ) const
     {

@@ -918,6 +918,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CVersionUpdater.Util.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CVideoModeManager.h"
 				>
 			</File>

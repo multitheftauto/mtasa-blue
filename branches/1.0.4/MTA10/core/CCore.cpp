@@ -19,6 +19,7 @@
 #include <game/CGame.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
+#include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #include "SharedUtil.hpp"
 
 using SharedUtil::CalcMTASAPath;
@@ -342,6 +343,7 @@ void CCore::SaveConfig ( void )
         if ( !pBindsNode )
             pBindsNode = GetConfig ()->CreateSubNode ( CONFIG_NODE_KEYBINDS );
         m_pKeyBinds->SaveToXML ( pBindsNode );
+        GetVersionUpdater ()->SaveConfigToXML ();
         m_pConfigFile->Write ();
     }
 }
@@ -1006,13 +1008,14 @@ void CCore::CreateNetwork ( )
     SetCurrentDirectory ( szCurDir );
 
     // Set mta version for report log here
-    SetApplicationSetting ( "mta-version", SString ( "%d.%d.%d-%d.%05d.%d"
+    SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%d.%03d"
                                 ,MTASA_VERSION_MAJOR
                                 ,MTASA_VERSION_MINOR
                                 ,MTASA_VERSION_MAINTENANCE
                                 ,MTASA_VERSION_TYPE
                                 ,MTASA_VERSION_BUILD
                                 ,m_pNet->GetNetRev ()
+                                ,m_pNet->GetNetRel ()
                                 ) );
     char szSerial [ 64 ];
     m_pNet->GetSerial ( szSerial, sizeof ( szSerial ) );

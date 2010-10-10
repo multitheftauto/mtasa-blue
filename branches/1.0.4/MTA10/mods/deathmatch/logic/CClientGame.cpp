@@ -887,6 +887,23 @@ void CClientGame::DoPulses ( void )
         }
     }
 
+    // Send diagnostic info
+    if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED && g_pNet->GetServerBitStreamVersion () >= 0x14 )
+    {
+        // Retrieve data
+        SString strMessage = g_pNet->GetDiagnosticStatus ();
+
+        // Send to the server if changed
+        if ( strMessage != m_strLastDiagnosticStatus )
+        {
+            m_strLastDiagnosticStatus = strMessage;
+            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+            pBitStream->WriteString ( strMessage );
+            g_pNet->SendPacket ( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream );
+            g_pNet->DeallocateNetBitStream ( pBitStream );
+        }
+    }
+
     // Pulse the network interface
     g_pNet->DoPulse ();
     m_pManager->DoPulse ();

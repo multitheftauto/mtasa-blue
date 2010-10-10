@@ -16,7 +16,7 @@
 #include "direct.h"
 
 
-#define TROUBLE_URL1 "http://nightly.mtasa.com/trouble/?v=%VERSION%&id=%ID%"
+#define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=%VERSION%&id=%ID%"
 
 // Command line as map
 class CUPL : public CArgMap
@@ -263,7 +263,7 @@ SString CheckOnRestartCommand ( void )
 
             // Make temp path name and go there
             SString strArchivePath, strArchiveName;
-            strFile.Split ( "\\", &strArchivePath, &strArchiveName, true );
+            strFile.Split ( "\\", &strArchivePath, &strArchiveName, -1 );
 
             SString strTempPath = MakeUniquePath ( strArchivePath + "\\_" + strArchiveName + "_tmp_" );
 
@@ -329,13 +329,15 @@ SString HandlePostCrash ( void )
 //////////////////////////////////////////////////////////
 void HandleTrouble ( void )
 {
-    int iResponse = MessageBox ( NULL, "There maybe trouble.\n\nDo you want to revert to an earlier version of MTA:SA?", "", MB_YESNO | MB_ICONERROR );
+    int iResponse = MessageBox ( NULL, "There may be trouble.\n\nDo you want to revert to an earlier version of MTA:SA?", "", MB_YESNO | MB_ICONERROR );
     if ( iResponse == IDYES )
     {
         MessageBox ( NULL, "Your browser will now download an installer which may fix the trouble.\n\nIf the page fails to load, please goto www.mtasa.com", "", MB_OK | MB_ICONINFORMATION );
 
-        SString strQueryURL = TROUBLE_URL1;
-        strQueryURL = strQueryURL.Replace ( "%VERSION%", GetApplicationSetting ( "mta-version" ) );
+        SString strQueryURL = GetApplicationSetting ( "trouble-url" );
+        if ( strQueryURL == "" )
+            strQueryURL = TROUBLE_URL1;
+        strQueryURL = strQueryURL.Replace ( "%VERSION%", GetApplicationSetting ( "mta-version-ext" ) );
         strQueryURL = strQueryURL.Replace ( "%ID%", GetApplicationSetting ( "serial" ) );
         ShellExecute ( NULL, "open", strQueryURL.c_str (), NULL, NULL, SW_SHOWNORMAL );
         TerminateProcess ( GetCurrentProcess (), 1 );

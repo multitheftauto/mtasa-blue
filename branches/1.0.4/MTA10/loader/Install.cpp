@@ -77,7 +77,7 @@ bool DoInstallFiles ( void )
     const SString strMTASAPath = PathConform ( GetMTASAPath () );
 
     SString path1, path2;
-    strCurrentDir.Split ( "\\", &path1, &path2, true );
+    strCurrentDir.Split ( "\\", &path1, &path2, -1 );
 
     SString strDestRoot = strMTASAPath;
     SString strSrcRoot = strCurrentDir;

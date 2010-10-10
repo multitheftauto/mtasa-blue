@@ -47,14 +47,14 @@ namespace SharedUtil
     void            SetReportLogContents            ( const SString& strText );
     SString         GetReportLogContents            ( void );
 
-    void            SetApplicationSetting           ( const SString& strGroup, const SString& strKey, const SString& strValue );
-    void            SetApplicationSetting           ( const SString& strGroupKey, const SString& strValue );
-    void            SetApplicationSettingInt        ( const SString& strGroup, const SString& strKey, int iValue );
-    void            SetApplicationSettingInt        ( const SString& strGroupKey, int iValue );
-    SString         GetApplicationSetting           ( const SString& strGroup, const SString& strKey );
-    SString         GetApplicationSetting           ( const SString& strGroupKey );
-    int             GetApplicationSettingInt        ( const SString& strGroup, const SString& strKey );
-    int             GetApplicationSettingInt        ( const SString& strGroupKey );
+    void            SetApplicationSetting           ( const SString& strPath, const SString& strKey, const SString& strValue );
+    void            SetApplicationSetting           ( const SString& strPathKey, const SString& strValue );
+    void            SetApplicationSettingInt        ( const SString& strPath, const SString& strKey, int iValue );
+    void            SetApplicationSettingInt        ( const SString& strPathKey, int iValue );
+    SString         GetApplicationSetting           ( const SString& strPath, const SString& strKey );
+    SString         GetApplicationSetting           ( const SString& strPathKey );
+    int             GetApplicationSettingInt        ( const SString& strPath, const SString& strKey );
+    int             GetApplicationSettingInt        ( const SString& strPathKey );
 
     void            WatchDogReset                   ( void );
     bool            WatchDogIsSectionOpen           ( const SString& str );
@@ -70,6 +70,8 @@ namespace SharedUtil
 
     SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
     SString         UnescapeString                  ( const SString& strText, char cSpecialChar = '#' );
+
+    SString         ExpandEnvString                 ( const SString& strInput );
 
     //
     // Output timestamped line into the debugger
@@ -190,6 +192,14 @@ namespace SharedUtil
             }
     }
 
+    // Remove item at index from itemList
+    template < class T >
+    void ListRemoveIndex ( std::vector < T >& itemList, uint index )
+    {
+        if ( index >=0 && index < itemList.size () )
+            itemList.erase ( itemList.begin () + index );
+    }
+
     // Append one list onto another
     template < class T >
     void ListAppend ( std::vector < T >& itemList, const std::vector < T >& other )
@@ -275,7 +285,7 @@ namespace SharedUtil
     template < class T, class V, class TR, class T2 >
     void MapInsert ( std::multimap < T, V, TR >& collection, const T2& key, const V& value )
     {
-        collection.insert ( std::pair < T2, T > ( key, value ) );
+        collection.insert ( std::pair < T2, V > ( key, value ) );
     }
 
 
@@ -498,55 +508,29 @@ namespace SharedUtil
     ///////////////////////////////////////////////////////////////
     class CArgMap
     {
-        std::multimap < SString, SString > m_Map;
-        SString m_strArgSep;
-        SString m_strPartsSep;
-        SString m_strDisallowedChars;
+        std::multimap < SString, SString >  m_Map;
+        SString                             m_strArgSep;
+        SString                             m_strPartsSep;
+        SString                             m_strDisallowedChars;
     public:
-        CArgMap ( const SString& strArgSep = "=", const SString& strPartsSep = "&", const SString& strExtraDisallowedChars = "" );
-
-        void Merge ( const CArgMap& other );
-        void SetFromString ( const SString& strLine );
-
-        void MergeFromString ( const SString& strLine );
-
-        SString ToString ( void ) const;
-
-        SString Escape ( const SString& strIn ) const;
-
-        SString Unescape ( const SString& strIn ) const;
-
-        // Set a unique key string value
-        void Set ( const SString& strInCmd, const SString& strInValue );
-
-
-        // Set a unique key int value
-        void Set ( const SString& strInCmd, int iValue );
-
-
-        // Insert a key int value
-        void Insert ( const SString& strInCmd, int iValue );
- 
-        // Insert a key string value
-        void Insert ( const SString& strInCmd, const SString& strInValue );
-
-
-        // Test if key exists
-        bool Contains ( const SString& strInCmd  ) const;
-
-
-        // First result as string
-        bool Get ( const SString& strInCmd, SString& strOut, const char* szDefault = "" ) const;
-
-        // First result as string
-        SString Get ( const SString& strInCmd ) const;
-
-        // All results as strings
-        bool Get ( const SString& strInCmd, std::vector < SString >& outList ) const;
-
-        // First result as int
-        bool Get ( const SString& strInCmd, int& iValue, int iDefault = 0 ) const;
-
+                    CArgMap             ( const SString& strArgSep = "=", const SString& strPartsSep = "&", const SString& strExtraDisallowedChars = "" );
+        void        Merge               ( const CArgMap& other, bool bAllowMultiValues = false );
+        void        SetFromString       ( const SString& strLine, bool bAllowMultiValues = false );
+        void        MergeFromString     ( const SString& strLine, bool bAllowMultiValues = false );
+        SString     ToString            ( void ) const;
+        bool        HasMultiValues      ( void ) const;
+        void        RemoveMultiValues   ( void );
+        SString     Escape              ( const SString& strIn ) const;
+        SString     Unescape            ( const SString& strIn ) const;
+        void        Set                 ( const SString& strInCmd, const SString& strInValue );                             // Set a unique key string value
+        void        Set                 ( const SString& strInCmd, int iValue );                                            // Set a unique key int value
+        void        Insert              ( const SString& strInCmd, int iValue );                                            // Insert a key int value
+        void        Insert              ( const SString& strInCmd, const SString& strInValue );                             // Insert a key string value
+        bool        Contains            ( const SString& strInCmd  ) const;                                                 // Test if key exists
+        bool        Get                 ( const SString& strInCmd, SString& strOut, const char* szDefault = "" ) const;     // First result as string
+        SString     Get                 ( const SString& strInCmd ) const;                                                  // First result as string
+        bool        Get                 ( const SString& strInCmd, std::vector < SString >& outList ) const;                // All results as strings
+        bool        Get                 ( const SString& strInCmd, int& iValue, int iDefault = 0 ) const;                   // First result as int
     };
 
 

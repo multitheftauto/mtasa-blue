@@ -528,7 +528,7 @@ void HideCrashedDialog ( void )
 void FindFilesRecursive ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth )
 {
     SString strPath, strMatch;
-    strPathMatch.Split ( "\\", &strPath, &strMatch, true );
+    strPathMatch.Split ( "\\", &strPath, &strMatch, -1 );
 
     std::list < SString > toDoList;
     toDoList.push_back ( strPath );
@@ -1035,7 +1035,7 @@ static SString HashBuffer ( char* pData, uint uiLength )
 //
 // UpdateMTAVersionApplicationSetting
 //
-// Make sure "mta-version" is correct. eg "1.0.4-9.01234.0"
+// Make sure "mta-version-ext" is correct. eg "1.0.4-9.01234.2.000"
 //
 /////////////////////////////////////////////////////////////////////
 void UpdateMTAVersionApplicationSetting ( void )
@@ -1052,8 +1052,15 @@ void UpdateMTAVersionApplicationSetting ( void )
 
     // Get saved status
     SString strOldHash = GetApplicationSetting ( "netc-hash" );
-    SString strNetRev;
-    GetApplicationSetting ( "mta-version" ).Split ( ".", NULL, &strNetRev, true );
+    unsigned short usNetRev = -1;
+    unsigned short usNetRel = 0;
+    std::vector < SString > parts;
+    GetApplicationSetting ( "mta-version-ext" ).Split ( ".", parts );
+    if ( parts.size () == 6 )
+    {
+        usNetRev = atoi ( parts[4] );
+        usNetRel = atoi ( parts[5] );
+    }
 
     // Hash the file
     std::vector < char > buffer;
@@ -1063,10 +1070,8 @@ void UpdateMTAVersionApplicationSetting ( void )
         strNewHash = HashBuffer ( &buffer.at ( 0 ), buffer.size () );
 
     // Only loadup the dll if the hash has changed, or we don't have a previous valid netrev value
-    if ( strNewHash != strOldHash || !isdigit ( strNetRev[0] ) )
+    if ( strNewHash != strOldHash || usNetRev == -1 )
     {
-        char cResult = '+';
-
         SString strPrevCurDir = GetCurrentWorkingDirectory ();
         SString strTempCurDir = CalcMTASAPath ( "mta" );
         SetCurrentDirectory ( strTempCurDir );
@@ -1083,7 +1088,10 @@ void UpdateMTAVersionApplicationSetting ( void )
             typedef unsigned short (*PFNGETNETREV) ( void );
             PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
             if ( pfnGetNetRev )
-                cResult = pfnGetNetRev () + '0';
+                usNetRev = pfnGetNetRev ();
+            PFNGETNETREV pfnGetNetRel = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRel" ) ) );
+            if ( pfnGetNetRel )
+                usNetRel = pfnGetNetRel ();
 
             FreeLibrary ( hModule );
         }
@@ -1091,16 +1099,16 @@ void UpdateMTAVersionApplicationSetting ( void )
         SetCurrentDirectory ( strPrevCurDir );
         SetDllDirectory( strPrevCurDir );
 
-        strNetRev = SString ( "%c", cResult );
         SetApplicationSetting ( "netc-hash", strNewHash );
     }
 
-    SetApplicationSetting ( "mta-version", SString ( "%d.%d.%d-%d.%05d.%c"
+    SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
                                 ,MTASA_VERSION_MAJOR
                                 ,MTASA_VERSION_MINOR
                                 ,MTASA_VERSION_MAINTENANCE
                                 ,MTASA_VERSION_TYPE
                                 ,MTASA_VERSION_BUILD
-                                ,strNetRev[0]
+                                ,usNetRev == -1 ? '*' : usNetRev + '0'
+                                ,usNetRel
                                 ) );
 }

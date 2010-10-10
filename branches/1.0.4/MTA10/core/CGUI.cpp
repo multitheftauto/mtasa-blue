@@ -47,7 +47,8 @@ CLocalGUI::~CLocalGUI ( void )
 {
     // Destroy all GUI elements
     DestroyObjects ();
-    delete m_pVersionUpdater;
+    // This is needed after the local gui is deleted for config saving
+    //delete m_pVersionUpdater;
 }
 
 

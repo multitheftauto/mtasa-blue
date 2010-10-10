@@ -125,6 +125,10 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
             pTemp = new CPlayerTransgressionPacket;
             break;
 
+        case PACKET_ID_PLAYER_DIAGNOSTIC:
+            pTemp = new CPlayerDiagnosticPacket;
+            break;
+
         default: break;
     }
 

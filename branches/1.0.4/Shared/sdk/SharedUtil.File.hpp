@@ -70,6 +70,14 @@ bool SharedUtil::FileAppend ( const SString& strFilename, const SString& strBuff
     return FileAppend ( strFilename, strBuffer.length () ? &strBuffer.at ( 0 ) : NULL, strBuffer.length (), bForce );
 }
 
+bool SharedUtil::FileDelete ( const SString& strFilename, bool bForce )
+{
+#ifdef WIN32
+    if ( bForce )
+        SetFileAttributes ( strFilename, FILE_ATTRIBUTE_NORMAL );
+#endif
+    return unlink ( strFilename ) == 0;
+}
 
 //
 // Load binary data from a file into an array
@@ -109,6 +117,9 @@ bool SharedUtil::FileSave ( const SString& strFilename, const void* pBuffer, uns
     if ( bForce )
         SetFileAttributes ( strFilename, FILE_ATTRIBUTE_NORMAL );
 #endif
+
+    if ( bForce )
+        MakeSureDirExists ( strFilename );
 
     FILE* fh = fopen ( strFilename, "wb" );
     if ( !fh )
@@ -309,7 +320,8 @@ bool SharedUtil::MkDir ( const SString& strInPath, bool bTree )
 ///////////////////////////////////////////////////////////////
 bool SharedUtil::FileCopy ( const SString& strSrc, const SString& strDest, bool bForce )
 {
-    MakeSureDirExists ( strDest );
+    if ( bForce )
+        MakeSureDirExists ( strDest );
 
 #ifdef WIN32
     if ( bForce )
@@ -392,14 +404,14 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
 
 void SharedUtil::ExtractFilename ( const SString& strPathFilename, SString* strPath, SString* strFilename )
 {
-    if ( !strPathFilename.Split ( PATH_SEPERATOR, strPath, strFilename, true ) )
+    if ( !strPathFilename.Split ( PATH_SEPERATOR, strPath, strFilename, -1 ) )
         if ( strFilename )
             *strFilename = strPathFilename;
 }
 
 bool SharedUtil::ExtractExtention ( const SString& strFilename, SString* strMain, SString* strExt )
 {
-    return strFilename.Split ( ".", strMain, strExt, true );
+    return strFilename.Split ( ".", strMain, strExt, -1 );
 }
 
 

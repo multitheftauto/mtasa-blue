@@ -32,6 +32,7 @@ public:
     void                Reset                       ( void );
     void                SetTitle                    ( const SString& strTitle );
     void                SetMessage                  ( const SString& strMsg );
+    void                AppendMessage               ( const SString& strMsg );
     void                SetButton                   ( unsigned int uiButton, const SString& strText );
     void                SetCallback                 ( pfnQuestionCallback callback, void* ptr = NULL );
     unsigned int        PollButtons                 ( void );
@@ -47,6 +48,7 @@ private:
     unsigned int                m_uiActiveButtons;
     pfnQuestionCallback         m_Callback;
     void*                       m_CallbackParameter;
+    SString                     m_strMsg;
 };
 
 

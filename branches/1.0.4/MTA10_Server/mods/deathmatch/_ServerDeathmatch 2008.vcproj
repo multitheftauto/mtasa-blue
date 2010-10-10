@@ -940,6 +940,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerDiagnosticPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerDisconnectedPacket.cpp"
 						>
 					</File>
@@ -981,10 +985,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPlayerTransgressionPacket.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CPlayerTransgressionPacket.h"
 						>
 					</File>
 					<File
@@ -1993,6 +1993,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerDiagnosticPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerDisconnectedPacket.h"
 						>
 					</File>
@@ -2030,6 +2034,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPlayerTimeoutPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CPlayerTransgressionPacket.h"
 						>
 					</File>
 					<File

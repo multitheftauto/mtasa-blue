@@ -143,16 +143,60 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
 //
 // Split in two
 //
-bool SString::Split ( const SString& strDelim, SString* pstrLeft, SString* pstrRight, bool bFromRight ) const
+// eg  "a.b.c.d.e" with strDelim == "." and iIndex == 1  gives "a" and "b.c.d.e"
+//     "a.b.c.d.e" with strDelim == "." and iIndex == -2 gives "a.b.c" and "d.e"
+//
+bool SString::Split ( const SString& strDelim, SString* pstrLeft, SString* pstrRight, int iIndex ) const
 {
-    unsigned long ulPos = bFromRight ? rfind ( strDelim ) : find ( strDelim );
+    // Check for self-overwrite
+    if ( this == pstrLeft || this == pstrRight )
+        return SString ( *this ).Split ( strDelim, pstrLeft, pstrRight, iIndex );
+
+    assert ( iIndex );
+    bool bFromEnd = iIndex < 0;
+    unsigned long ulPos;
+    if ( !bFromEnd )
+    {
+        ulPos = 0;
+        for ( int i = 0 ; i < iIndex && ulPos != npos ; i++ )
+        {
+            if ( i )
+                ulPos += strDelim.length ();
+            if ( ulPos < length () )
+            {
+                ulPos = find ( strDelim, ulPos );
+            }
+            else
+            {
+                ulPos = npos;
+                break;
+            }
+        }
+    }
+    else
+    {
+        ulPos = length ();
+        for ( int i = 0 ; i < -iIndex && ulPos != npos ; i++ )
+        {
+            if ( ulPos >= strDelim.length () )
+            {
+                ulPos -= strDelim.length ();
+                ulPos = rfind ( strDelim, ulPos );
+            }
+            else
+            {
+                ulPos = npos;
+                break;
+            }
+        }
+    }
 
     if ( ulPos == npos )
     {
         if ( pstrLeft )
-            *pstrLeft = bFromRight ? "" : c_str ();
+            *pstrLeft = bFromEnd ? "" : c_str ();
         if ( pstrRight )
-            *pstrRight = bFromRight ? c_str () : "";
+            *pstrRight = bFromEnd ? c_str () : "";
         return false;
     }
 
@@ -163,6 +207,28 @@ bool SString::Split ( const SString& strDelim, SString* pstrLeft, SString* pstrR
         *pstrRight = substr ( ulPos + strDelim.length (), length () - ( ulPos + strDelim.length () ) );
  
     return true;
+}
+
+
+//
+// Specialization of Split that returns the left side of the split
+//
+SString SString::SplitLeft ( const SString& strDelim, SString* pstrRight, int iIndex ) const
+{
+    SString strLeft;
+    Split ( strDelim, &strLeft, pstrRight, iIndex );
+    return strLeft;
+}
+
+
+//
+// Specialization of Split that returns the right side of the split
+//
+SString SString::SplitRight ( const SString& strDelim, SString* pstrLeft, int iIndex ) const
+{
+    SString strRight;
+    Split ( strDelim, pstrLeft, &strRight, iIndex );
+    return strRight;
 }
 
 
@@ -280,3 +346,55 @@ bool SString::CompareI ( const SString& strOther ) const
 {
     return stricmp ( *this, strOther ) == 0;
 }
+
+// Fault tolerant version of substr
+SString SString::SubStr ( int iPos, int iCount ) const
+{
+    if ( iPos < 0 )
+    {
+        iCount += iPos;
+        iPos = 0;
+    }
+    iCount = Max ( 0, iCount );
+    if ( iPos + iCount > (int)length () )
+    {
+        iCount = length () - iPos;
+    }
+    if ( iCount < 1 )
+        return "";
+    return substr ( iPos, iCount );
+}
+
+// Left most number of characters
+SString SString::Left ( int iCount ) const
+{
+    return SubStr ( 0, iCount );
+}
+
+// Right most number of characters
+SString SString::Right ( int iCount ) const
+{
+    return SubStr ( length () - iCount, iCount );
+}
+
+
+bool SString::EndsWith ( const SString& strOther ) const
+{
+    return Right ( strOther.length () ) == strOther;
+}
+
+bool SString::EndsWithI ( const SString& strOther ) const
+{
+    return stricmp ( Right ( strOther.length () ), strOther ) == 0;
+}
+
+bool SString::BeginsWith ( const SString& strOther ) const
+{
+    return Left ( strOther.length () ) == strOther;
+}
+
+bool SString::BeginsWithI ( const SString& strOther ) const
+{
+    return stricmp ( Left ( strOther.length () ), strOther ) == 0;
+}
+

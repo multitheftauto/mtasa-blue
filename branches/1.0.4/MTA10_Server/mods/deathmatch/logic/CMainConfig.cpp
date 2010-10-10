@@ -201,6 +201,16 @@ bool CMainConfig::Load ( const char* szFilename )
                 MapSet ( m_DisableACMap, *it, 1 );
     }
 
+    {
+        SString strEnable;
+        GetString ( m_pRootNode, "enablediagnostic", strEnable );
+        std::vector < SString > tagList;
+        strEnable.Split ( ",", tagList );
+        for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
+            if ( (*it).length () )
+                MapSet ( m_EnableDiagnosticMap, *it, 1 );
+    }
+
     // minclientversion - Minimum client version or kick
     GetString ( m_pRootNode, "minclientversion", m_strMinClientVersion );
     if ( m_strMinClientVersion != "" && !IsValidVersionString ( m_strMinClientVersion ) )
