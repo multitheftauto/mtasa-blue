@@ -808,7 +808,7 @@ void CCore::CreateGame ( )
         if ( m_pGame->GetGameVersion () >= VERSION_11 )
         {
             MessageBox ( 0, "Only GTA:SA version 1.0 is supported!  You are now being redirected to a page where you can patch your version.", "Error", MB_OK|MB_ICONEXCLAMATION );
-            ShellExecute ( NULL, _T("open"), "http://multitheftauto.com/downgrade", NULL, NULL, SW_SHOWNORMAL );
+            BrowseToSolution ( "downgrade" );
             TerminateProcess ( GetCurrentProcess (), 1 );
         }
     }
@@ -975,6 +975,7 @@ void CCore::CreateNetwork ( )
     if ( m_NetModule.IsOk () == false )
     {
         MessageBox ( 0, "Network module not found!", "Error", MB_OK|MB_ICONEXCLAMATION );
+        BrowseToSolution ( "netc-not-loadable", true );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
@@ -985,6 +986,7 @@ void CCore::CreateNetwork ( )
     {
         // net.dll doesn't like our version number
         MessageBox ( 0, "Network module not compatible!", "Error", MB_OK|MB_ICONEXCLAMATION );
+        BrowseToSolution ( "netc-not-compatible", true );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 

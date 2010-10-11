@@ -1965,6 +1965,8 @@ void CVersionUpdater::_UseCrashDumpPostContent ( void )
             item.strValue = strDateAndTime;
             history.push_back ( item );
         }
+        else
+            return;
 
         // Sort by date
         for ( int i = 0 ; i < (int)history.size () - 1 ; i++ )

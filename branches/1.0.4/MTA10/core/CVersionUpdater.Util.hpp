@@ -47,23 +47,21 @@ class CVersionUpdater;
     <crashdump>
         <serverlist>
             <server priority="3">http://updatesa.mtasa.com/sa/crashdump/?v=%VERSION%&amp;id=%ID%&amp;file=%FILE%</server>
-            <server priority="3">http://updatesa.multitheftauto.com/sa/crashdump/?v=%VERSION%&amp;id=%ID%&amp;file=%FILE%</server>
+            <server priority="4">http://updatesa.multitheftauto.com/sa/crashdump/?v=%VERSION%&amp;id=%ID%&amp;file=%FILE%</server>
         </serverlist>
         <interval>12h</interval>
         <duplicates>0</duplicates>
         <maxhistorylength>100</maxhistorylength>
-        <maxhistoryage>28d</maxhistoryage>
     </crashdump>
     <gtadatafiles>
         <serverlist>
-            <server priority="3">http://updatesa.mtasa.com/sa/gtadatafiles/?v=%VERSION%&amp;id=%ID%</server>
+            <server priority="4">http://updatesa.mtasa.com/sa/gtadatafiles/?v=%VERSION%&amp;id=%ID%</server>
             <server priority="3">http://updatesa.multitheftauto.com/sa/gtadatafiles/?v=%VERSION%&amp;id=%ID%</server>
         </serverlist>
     </gtadatafiles>
     <trouble>
         <serverlist>
-            <server priority="3">http://updatesa.mtasa.com/sa/trouble/?v=%VERSION%&amp;id=%ID%</server>
-            <server priority="3">http://updatesa.multitheftauto.com/sa/trouble/?v=%VERSION%&amp;id=%ID%</server>
+            <server>http://updatesa.mtasa.com/sa/trouble/?v=%VERSION%&amp;id=%ID%&amp;tr=%TROUBLE%</server>
         </serverlist>
     </trouble>
 </masterroot>
@@ -103,7 +101,7 @@ DO YOU WANT TO DOWNLOAD AND INSTALL THE LATEST VERSION ?
         <minsize>10</minsize>
         <maxsize>4000</maxsize>
     </reportsettings>
-    <notifymasterrevision>0</notifymasterrevision>
+    <notifymasterrevision>2010-09-05-b</notifymasterrevision>
 </versioncheckroot>
 
 */

@@ -14,9 +14,13 @@
 
 #ifdef WIN32
     #include <direct.h>
+    #include <shellapi.h>
 #endif
 
 #ifdef WIN32
+
+#define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=%VERSION%&id=%ID%&tr=%TROUBLE%"
+
 //
 // Get startup directory as saved in the registry by the launcher
 // Used in the Win32 Client only
@@ -292,6 +296,29 @@ bool SharedUtil::WatchDogWasUncleanStop ( void )
 void SharedUtil::WatchDogSetUncleanStop ( bool bOn )
 {
     SetApplicationSettingInt ( "watchdog", "uncleanstop", bOn );
+}
+
+
+//
+// Direct players to info about trouble
+//
+void SharedUtil::BrowseToSolution ( const SString& strType, bool bAskQuestion, bool bTerminateProcess )
+{
+    AddReportLog ( 3200, SString ( "Trouble %s", *strType ) );
+
+    if ( !bAskQuestion || IDYES == MessageBox( 0, "Do you want to see some on-line help about this problem ?", "MTA: San Andreas", MB_ICONQUESTION|MB_YESNO ) )
+    {
+        SString strQueryURL = GetApplicationSetting ( "trouble-url" );
+        if ( strQueryURL == "" )
+            strQueryURL = TROUBLE_URL1;
+        strQueryURL = strQueryURL.Replace ( "%VERSION%", GetApplicationSetting ( "mta-version-ext" ) );
+        strQueryURL = strQueryURL.Replace ( "%ID%", GetApplicationSetting ( "serial" ) );
+        strQueryURL = strQueryURL.Replace ( "%TROUBLE%", strType );
+        ShellExecute ( NULL, "open", strQueryURL.c_str (), NULL, NULL, SW_SHOWNORMAL );
+    }
+
+    if ( bTerminateProcess )
+        TerminateProcess ( GetCurrentProcess (), 1 );
 }
 
 

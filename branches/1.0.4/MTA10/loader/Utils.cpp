@@ -200,10 +200,13 @@ void HideSplash ( bool bOnlyDelay  )
 //
 // General error message box
 //
-long DisplayErrorMessageBox ( const SString& strMessage )
+long DisplayErrorMessageBox ( const SString& strMessage, const SString& strTroubleType )
 {
     HideSplash ();
     MessageBox( 0, strMessage, "Error!", MB_ICONEXCLAMATION|MB_OK );
+
+    if ( strTroubleType != "" )
+        BrowseToSolution ( strTroubleType, true );
     return 1;
 }
 
@@ -259,6 +262,19 @@ SString GetMTASAModuleFileName ( void )
     // Get current module full path
     char szBuffer[64000];
     GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+    return szBuffer;
+}
+
+
+SString GetLaunchPath ( void )
+{
+    // Get current module full path
+    char szBuffer[64000];
+    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+
+    // Strip the module name out of the path.
+    PathRemoveFileSpec ( szBuffer );
+
     return szBuffer;
 }
 
@@ -1041,9 +1057,9 @@ static SString HashBuffer ( char* pData, uint uiLength )
 void UpdateMTAVersionApplicationSetting ( void )
 {
 #ifdef MTA_DEBUG
-    SString strFilename = CalcMTASAPath ( "mta\\netc_d.dll" );
+    SString strFilename = "netc_d.dll";
 #else
-    SString strFilename = CalcMTASAPath ( "mta\\netc.dll" );
+    SString strFilename = "netc.dll";
 #endif
 
     //
@@ -1052,7 +1068,7 @@ void UpdateMTAVersionApplicationSetting ( void )
 
     // Get saved status
     SString strOldHash = GetApplicationSetting ( "netc-hash" );
-    unsigned short usNetRev = -1;
+    unsigned short usNetRev = 65535;
     unsigned short usNetRel = 0;
     std::vector < SString > parts;
     GetApplicationSetting ( "mta-version-ext" ).Split ( ".", parts );
@@ -1062,26 +1078,25 @@ void UpdateMTAVersionApplicationSetting ( void )
         usNetRel = atoi ( parts[5] );
     }
 
+    // Get path to the relevant file
+    SString strNetLibPath = PathJoin ( GetLaunchPath (), "mta" );
+    SString strNetLibPathFilename = PathJoin ( strNetLibPath, strFilename );
+
     // Hash the file
     std::vector < char > buffer;
-    FileLoad ( strFilename, buffer );
+    FileLoad ( strNetLibPathFilename, buffer );
     SString strNewHash = "none";
     if ( buffer.size () )
         strNewHash = HashBuffer ( &buffer.at ( 0 ), buffer.size () );
 
     // Only loadup the dll if the hash has changed, or we don't have a previous valid netrev value
-    if ( strNewHash != strOldHash || usNetRev == -1 )
+    if ( strNewHash != strOldHash || usNetRev == 65535 )
     {
         SString strPrevCurDir = GetCurrentWorkingDirectory ();
-        SString strTempCurDir = CalcMTASAPath ( "mta" );
-        SetCurrentDirectory ( strTempCurDir );
-        SetDllDirectory( strTempCurDir );
+        SetCurrentDirectory ( strNetLibPath );
+        SetDllDirectory( strNetLibPath );
 
-    #ifdef MTA_DEBUG
-        HMODULE hModule = LoadLibrary ( CalcMTASAPath ( "mta\\netc_d.dll" ) );
-    #else
-        HMODULE hModule = LoadLibrary ( CalcMTASAPath ( "mta\\netc.dll" ) );
-    #endif
+        HMODULE hModule = LoadLibrary ( strNetLibPathFilename );
 
         if ( hModule )
         {
@@ -1108,7 +1123,7 @@ void UpdateMTAVersionApplicationSetting ( void )
                                 ,MTASA_VERSION_MAINTENANCE
                                 ,MTASA_VERSION_TYPE
                                 ,MTASA_VERSION_BUILD
-                                ,usNetRev == -1 ? '*' : usNetRev + '0'
+                                ,usNetRev == 65535 ? '+' : usNetRev + '0'
                                 ,usNetRel
                                 ) );
 }

@@ -16,8 +16,6 @@
 #include "direct.h"
 
 
-#define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=%VERSION%&id=%ID%"
-
 // Command line as map
 class CUPL : public CArgMap
 {
@@ -333,14 +331,7 @@ void HandleTrouble ( void )
     if ( iResponse == IDYES )
     {
         MessageBox ( NULL, "Your browser will now download an installer which may fix the trouble.\n\nIf the page fails to load, please goto www.mtasa.com", "", MB_OK | MB_ICONINFORMATION );
-
-        SString strQueryURL = GetApplicationSetting ( "trouble-url" );
-        if ( strQueryURL == "" )
-            strQueryURL = TROUBLE_URL1;
-        strQueryURL = strQueryURL.Replace ( "%VERSION%", GetApplicationSetting ( "mta-version-ext" ) );
-        strQueryURL = strQueryURL.Replace ( "%ID%", GetApplicationSetting ( "serial" ) );
-        ShellExecute ( NULL, "open", strQueryURL.c_str (), NULL, NULL, SW_SHOWNORMAL );
-        TerminateProcess ( GetCurrentProcess (), 1 );
+        BrowseToSolution ( "crashing-before-gtagame", false, true );
     }
 }
 
@@ -412,7 +403,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     SString strGTAPath;
     int iResult = GetGamePath ( strGTAPath );
     if ( iResult == 0 ) {
-        DisplayErrorMessageBox ( "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas." );
+        DisplayErrorMessageBox ( "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas.", "reg-entries-missing" );
         return 5;
     }
     else if ( iResult == -1 ) {
@@ -421,7 +412,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     }
     else if ( iResult == -2 ) {
         DisplayErrorMessageBox ( "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue." );
-        ShellExecute ( NULL, "open", "http://multitheftauto.com/downgrade/steam", NULL, NULL, SW_SHOWNORMAL );
+        BrowseToSolution ( "downgrade-steam" );
         return 5;
     }
 
@@ -456,19 +447,19 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     if ( !FileExists ( strMTASAPath + "\\mta\\cgui\\CGUI.png" ) )
     {
         // Check if CGUI.png exists
-        return DisplayErrorMessageBox ( "Load failed. Please ensure that the data files have been installed correctly." );
+        return DisplayErrorMessageBox ( "Load failed. Please ensure that the data files have been installed correctly.", "mta-datafiles-missing" );
     }
 
     // Check for client file
     if ( !FileExists ( strMTASAPath + "\\" +  CHECK_DM_CLIENT_NAME ) )
     {
-        return DisplayErrorMessageBox ( "Load failed. Please ensure that '" CHECK_DM_CLIENT_NAME "' is installed correctly." );
+        return DisplayErrorMessageBox ( "Load failed. Please ensure that '" CHECK_DM_CLIENT_NAME "' is installed correctly.", "client-missing" );
     }
 
     // Check for lua file
     if ( !FileExists ( strMTASAPath + "\\" + CHECK_DM_LUA_NAME ) )
     {
-        return DisplayErrorMessageBox ( "Load failed. Please ensure that '" CHECK_DM_LUA_NAME "' is installed correctly." );
+        return DisplayErrorMessageBox ( "Load failed. Please ensure that '" CHECK_DM_LUA_NAME "' is installed correctly.", "lua-missing" );
     }
 
     // Grab the MTA folder
@@ -479,7 +470,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     SetCurrentDirectory ( strGTAPath );
     if ( !FileExists( strGTAEXEPath ) )
     {
-        return DisplayErrorMessageBox ( SString ( "Load failed. Could not find gta_sa.exe in %s.", strGTAPath.c_str () ) );
+        return DisplayErrorMessageBox ( SString ( "Load failed. Could not find gta_sa.exe in %s.", strGTAPath.c_str () ), "gta_sa-missing" );
     }
 
     // Make sure important dll's do not exist in the wrong place
@@ -488,7 +479,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     {
         if ( FileExists( strGTAPath + "\\" + dllCheckList[i] ) )
         {
-            return DisplayErrorMessageBox ( SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ) );
+            return DisplayErrorMessageBox ( SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ), "file-clash" );
         }    
     }
 
@@ -518,7 +509,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     {
         DisplayErrorMessageBox ( "Could not start Grand Theft Auto: San Andreas.  "
                             "Please try restarting, or if the problem persists,"
-                            "contact MTA at www.multitheftauto.com." );
+                            "contact MTA at www.multitheftauto.com.", "createprocess-fail" );
         return 2;
     }
 
@@ -529,7 +520,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     {
         DisplayErrorMessageBox ( "Load failed.  Please ensure that "
                             "the file core.dll is in the modules "
-                            "directory within the MTA root directory." );
+                            "directory within the MTA root directory.", "core-missing" );
 
         // Kill GTA and return errorcode
         TerminateProcess ( piLoadee.hProcess, 1 );
@@ -544,7 +535,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     {
         DisplayErrorMessageBox ( "Load failed.  Please ensure that \n"
                             "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed." );
+                            "and the latest DirectX is correctly installed.", "vc-redist-missing" );
         // Kill GTA and return errorcode
         TerminateProcess ( piLoadee.hProcess, 1 );
         return 1;
