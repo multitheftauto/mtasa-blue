@@ -115,11 +115,13 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_QUICKRELOAD ] = false;
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
+    m_Glitches [ GLITCH_CROUCHBUG ] = false;
 
     //Glitch names (for Lua interface)
     m_GlitchNames["quickreload"] = GLITCH_QUICKRELOAD;
     m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
     m_GlitchNames["fastmove"] = GLITCH_FASTMOVE;
+    m_GlitchNames["crouchbug"] = GLITCH_CROUCHBUG;
 
     m_bCloudsEnabled = true;
 
@@ -2917,19 +2919,19 @@ void CGame::Unlock ( void )
 void CGame::SetGlitchEnabled ( const std::string& strGlitch, bool bEnabled )
 {
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
-    assert ( cGlitch >= 0 && cGlitch <= 2 );
+    assert ( cGlitch >= 0 && cGlitch <= 3 );
     m_Glitches[cGlitch] = bEnabled;
 }
 
 bool CGame::IsGlitchEnabled ( const std::string& strGlitch )
 {
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
-    assert ( cGlitch >= 0 && cGlitch <= 2 );
+    assert ( cGlitch >= 0 && cGlitch <= 3 );
     return m_Glitches[cGlitch] ? true : false;
 }
 bool CGame::IsGlitchEnabled ( eGlitchType cGlitch )
 {
-    assert ( cGlitch >= 0 && cGlitch <= 2 );
+    assert ( cGlitch >= 0 && cGlitch <= 3 );
     return m_Glitches[cGlitch] || false;
 }
 

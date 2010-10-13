@@ -172,6 +172,7 @@ public:
         GLITCH_QUICKRELOAD,
         GLITCH_FASTFIRE,
         GLITCH_FASTMOVE,
+        GLITCH_CROUCHBUG,
         NUM_GLITCHES
     };
     class CStoredWeaponSlot

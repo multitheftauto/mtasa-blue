@@ -156,6 +156,7 @@ public:
         GLITCH_QUICKRELOAD,
         GLITCH_FASTFIRE,
         GLITCH_FASTMOVE,
+        GLITCH_CROUCHBUG,
     };
 public:
                                 CGame                       ( void );
@@ -344,7 +345,7 @@ private:
     unsigned short              m_usFrames;
     unsigned short              m_usFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
-    bool                        m_Glitches[3];
+    bool                        m_Glitches[4];
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;

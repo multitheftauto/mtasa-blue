@@ -114,6 +114,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->DisableQuickReload ( true );
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
+    m_Glitches [ GLITCH_CROUCHBUG ] = false;
 
     // Remove Night & Thermal vision view (if enabled).
     g_pMultiplayer->SetNightVisionEnabled ( false );
