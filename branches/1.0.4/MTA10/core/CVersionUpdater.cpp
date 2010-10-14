@@ -1762,7 +1762,7 @@ void CVersionUpdater::_ProcessPatchFileDownload ( void )
 
     m_JobInfo.strSaveLocation = strPathFilename;
     m_ConditionMap.SetCondition ( "Download", "Ok" );
-    AddReportLog ( 2006, SString ( "DoPollDownload: Downloaded %s", m_JobInfo.strSaveLocation.c_str() ) );
+    AddReportLog ( 2007, SString ( "DoPollDownload: Downloaded %s", m_JobInfo.strSaveLocation.c_str() ) );
 }
 
 
@@ -2188,7 +2188,7 @@ int CVersionUpdater::DoPollDownload ( void )
         memcpy ( &m_JobInfo.downloadBuffer[0], pData, uiSize );
 
         m_ConditionMap.SetCondition ( "Download", "Ok" );
-        AddReportLog ( 2006, SString ( "DoPollDownload: Downloaded %d bytes from %s", uiSize, m_strLastQueryURL.c_str() ) );
+        AddReportLog ( 2005, SString ( "DoPollDownload: Downloaded %d bytes from %s", uiSize, m_strLastQueryURL.c_str() ) );
         return RES_OK;
     }
 
