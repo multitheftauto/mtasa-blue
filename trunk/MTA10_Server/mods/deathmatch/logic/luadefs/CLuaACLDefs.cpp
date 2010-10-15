@@ -344,6 +344,25 @@ int CLuaACLDefs::aclListRights ( lua_State* luaVM )
         CAccessControlList* pACL = lua_toacl ( luaVM, 1 );
         if ( pACL )
         {
+			// Check if we want all the types
+			bool bAll = true;
+			CAccessControlListRight::ERightType eAllowed;
+			if ( lua_isstring ( luaVM, 2 ) )
+			{
+				bAll = false;
+				const char *szType = lua_tostring ( luaVM, 2 );
+				if ( strncmp ( "command", szType, strlen ( szType ) ) == 0 )
+					eAllowed = CAccessControlListRight::RIGHT_TYPE_COMMAND;
+				else if ( strncmp ( "function", szType, strlen ( szType ) ) == 0 )
+					eAllowed = CAccessControlListRight::RIGHT_TYPE_FUNCTION;
+				else if ( strncmp ( "resource", szType, strlen ( szType ) ) == 0 )
+					eAllowed = CAccessControlListRight::RIGHT_TYPE_RESOURCE;
+				else if ( strncmp ( "general", szType, strlen ( szType ) ) == 0 )
+					eAllowed = CAccessControlListRight::RIGHT_TYPE_GENERAL;
+				else
+					bAll = true;
+			}
+
             // Create a table to return into
             lua_newtable ( luaVM );
 
@@ -356,6 +375,9 @@ int CLuaACLDefs::aclListRights ( lua_State* luaVM )
             {
                 // Type
                 eType = (*iter)->GetRightType ();
+				if ( !bAll && eType != eAllowed )
+					continue;
+
                 switch ( eType )
                 {
                     case CAccessControlListRight::RIGHT_TYPE_COMMAND:
