@@ -74,7 +74,7 @@
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
 #define _NETCODE_VERSION                0x0184
-#define _CLIENT_NET_MODULE_VERSION      0x0022
+#define _CLIENT_NET_MODULE_VERSION      0x0023
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
 #if defined(MTA_DM_CONNECT_TO_PUBLIC)
