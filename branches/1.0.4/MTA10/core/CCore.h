@@ -56,6 +56,7 @@ class CCore;
 
 // Configuration file path (relative to Grand Theft Auto directory)
 #define MTA_CONFIG_PATH             "mta/coreconfig.xml"
+#define MTA_SERVER_CACHE_PATH       "mta/servercache.xml"
 #define CONFIG_ROOT                 "mainconfig"
 #define CONFIG_NODE_CVARS           "settings"                  // cvars node
 #define CONFIG_NODE_KEYBINDS        "binds"                     // keybinds node

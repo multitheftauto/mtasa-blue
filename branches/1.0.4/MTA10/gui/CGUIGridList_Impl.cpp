@@ -467,6 +467,7 @@ void CGUIGridList_Impl::SetItemImage ( int iRow, int hColumn, CGUIStaticImage* p
         pItem->SetImage ( pImage );
     }
     else
+    if ( pImage )
     {
         // If it doesn't, create it and set it in the gridlist
         CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl*) pImage );

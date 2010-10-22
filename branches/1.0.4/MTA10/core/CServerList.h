@@ -120,9 +120,13 @@ public:
         nPlayers = 0;
         nMaxPlayers = 0;
         nPing = 0;
+        uiNoReplyCount = 0;
         m_ulQueryStart = 0;
         for ( int i = 0 ; i < SERVER_BROWSER_TYPE_COUNT ; i++ )
-            bAddedToList[i] = false;
+        {
+            bAddedToListInitial[i] = false;
+            bAddedToListScanned[i] = false;
+        }
 
         strHost = inet_ntoa ( Address );
         strName = SString ( "%s:%d", inet_ntoa ( Address ), usGamePort );
@@ -144,7 +148,7 @@ public:
 
     bool                ParseQuery      ( const char * szBuffer, unsigned int nLength );
     void                Query           ( void );
-    std::string         Pulse           ( void );
+    std::string         Pulse           ( bool bCanSendQuery );
 
     in_addr             Address;        // IP-address
     unsigned short      usQueryPort;    // Query port
@@ -156,7 +160,9 @@ public:
     bool                bSerials;       // Serial verification on
     bool                bScanned;
     bool                bSkipped;
-    bool                bAddedToList[ SERVER_BROWSER_TYPE_COUNT ];
+    bool                bAddedToListInitial[ SERVER_BROWSER_TYPE_COUNT ];
+    bool                bAddedToListScanned[ SERVER_BROWSER_TYPE_COUNT ];
+    uint                uiNoReplyCount;
 
     std::string         strGame;        // Game name
     std::string         strVersion;     // Game version

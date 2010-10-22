@@ -78,12 +78,13 @@ void CServerList::Pulse ( void )
     unsigned int uiQueriesSent = 0;
     unsigned int uiRepliesParsed = 0;
     unsigned int uiNoReplies = 0;
+    unsigned int uiActiveServers = 0;
 
     // Scan all servers in our list, and keep the value of scanned servers
-    for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end () && (int)uiQueriesSent < iNumQueries ; i++ )
+    for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ )
     {
         CServerListItem * pServer = *i;
-        std::string strResult = pServer->Pulse ();
+        std::string strResult = pServer->Pulse ( (int)uiQueriesSent < iNumQueries );
         if ( strResult == "SentQuery" )
             uiQueriesSent++;
         else
@@ -92,6 +93,9 @@ void CServerList::Pulse ( void )
         else
         if ( strResult == "NoReply" )
             uiNoReplies++;
+
+        if ( pServer->nMaxPlayers )
+            uiActiveServers++;
     }
 
     // If we queried any new servers, we should toggle the GUI update flag
@@ -104,11 +108,11 @@ void CServerList::Pulse ( void )
     m_nScanned += uiRepliesParsed;
     m_nSkipped += uiNoReplies;
     if ( m_nScanned + m_nSkipped == n ) {
-        ss << "Found " << m_nScanned << " / " << m_nScanned + m_nSkipped << " servers";
+        ss << "   " << uiActiveServers << " servers";
         // We are no longer refreshing
         m_iPass = 0;
     } else {
-        ss << "Scanned " << m_nScanned << " / " << m_nScanned + m_nSkipped << " servers";
+        ss << "   " << uiActiveServers << " servers...";
     }
 
     // Update our status message
@@ -193,6 +197,7 @@ void CServerListInternet::Pulse ( void )
             // We got the data, parse it and switch pass
             if ( ParseList ( buffer.GetData (), buffer.GetSize () ) ) {
                 m_iPass++;
+                GetServerCache ()->GetServerListCachedInfo ( this );
             } else {
                 // Abort
                 m_strStatus = "Master server list could not be parsed.";
@@ -209,15 +214,10 @@ void CServerListInternet::Pulse ( void )
         if ( m_iPass == 0 )
         {
             // If query failed, load from backup
-            CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->LoadInternetList();
+            GetServerCache ()->GenerateServerList ( this );
+            GetServerCache ()->GetServerListCachedInfo ( this );
             m_strStatus2 = string ( "  (Backup server list)" );
             m_iPass = 2;
-        }
-        else
-        if ( m_iPass == 2 )
-        {
-            // If query succeeded, save to backup
-            CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->SaveInternetList();
         }
     } else if ( m_iPass == 2 ) {
         // We are scanning our known servers (second pass)
@@ -329,7 +329,7 @@ void CServerListLAN::Discover ( void )
 }
 
 
-std::string CServerListItem::Pulse ( void )
+std::string CServerListItem::Pulse ( bool bCanSendQuery )
 {   // Queries the server on it's query port (ASE protocol)
     // and returns whether it is done scanning
     if ( bScanned || bSkipped ) return "Done";
@@ -337,6 +337,8 @@ std::string CServerListItem::Pulse ( void )
     char szBuffer[SERVER_LIST_QUERY_BUFFER] = {0};
 
     if ( m_ulQueryStart == 0 ) {
+        if ( !bCanSendQuery )
+            return "NotSentQuery";
         Query ();
         return "SentQuery";
     } else {
@@ -349,6 +351,8 @@ std::string CServerListItem::Pulse ( void )
             // Parse data
             ParseQuery ( szBuffer, len );
             CloseSocket ();
+            uiNoReplyCount = 0;
+            GetServerCache ()->SetServerCachedInfo ( this );
             return "ParsedQuery";
         }
 
@@ -356,6 +360,8 @@ std::string CServerListItem::Pulse ( void )
         {
             bSkipped = true;
             CloseSocket ();
+            uiNoReplyCount++;
+            GetServerCache ()->SetServerCachedInfo ( this );
             return "NoReply";
         }
 

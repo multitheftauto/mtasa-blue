@@ -344,6 +344,7 @@ void CCore::SaveConfig ( void )
             pBindsNode = GetConfig ()->CreateSubNode ( CONFIG_NODE_KEYBINDS );
         m_pKeyBinds->SaveToXML ( pBindsNode );
         GetVersionUpdater ()->SaveConfigToXML ();
+        GetServerCache ()->SaveServerCache ();
         m_pConfigFile->Write ();
     }
 }
