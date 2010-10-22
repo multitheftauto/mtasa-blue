@@ -41,7 +41,7 @@ void CElementRPCs::SetElementParent ( NetBitStreamInterface& bitStream )
 {
     // Read out the entity id and parent id
     ElementID ID, ParentID;
-    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( ParentID ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( ParentID ) )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         CClientEntity* pParent = CElementIDs::GetElement ( ParentID );
