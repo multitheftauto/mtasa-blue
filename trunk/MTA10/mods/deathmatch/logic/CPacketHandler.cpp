@@ -321,7 +321,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     bitStream.Read ( ucNumberOfPlayers );
 
     // Can't be 0
-    if ( ucNumberOfPlayers == 0 || ucNumberOfPlayers > MAX_PLAYER_COUNT )
+    if ( ucNumberOfPlayers == 0 )
     {
         RaiseProtocolError ( 6 );
         return;
