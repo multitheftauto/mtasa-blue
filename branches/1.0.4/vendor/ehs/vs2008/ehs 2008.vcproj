@@ -124,6 +124,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\pcre;..\..\pme;..\..\pthreads\include;../../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;MTA_DEBUG"
+				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"

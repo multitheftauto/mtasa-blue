@@ -109,7 +109,7 @@ static SString ReadRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR sz
 
 
 //
-// Write a registry string value
+// Delete a registry key and its subkeys
 //
 static bool DeleteRegistryKey ( HKEY hkRoot, LPCSTR szSubKey )
 {

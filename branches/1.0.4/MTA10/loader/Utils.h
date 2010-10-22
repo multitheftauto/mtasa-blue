@@ -54,5 +54,6 @@ SString ShowCrashedDialog           ( HINSTANCE hInstance, const SString& strMes
 void    HideCrashedDialog           ( void );
 
 void    UpdateMTAVersionApplicationSetting    ( void );
+bool    Is32bitProcess              ( DWORD processID );
 
 #endif

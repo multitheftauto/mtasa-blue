@@ -51,6 +51,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="./tinyxml;../sdk"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;TIXML_USE_STL;_CRT_SECURE_NO_WARNINGS;FORCE_BUILD=1"
+				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="true"

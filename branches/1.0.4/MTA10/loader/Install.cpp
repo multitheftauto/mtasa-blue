@@ -26,6 +26,9 @@ bool TerminateProcessFromPathFilename ( const SString& strPathFilename )
             DWORD id2 = dwProcessIDs[i];
             if ( id2 == id1 )
                 continue;
+            // Skip 64 bit processes to avoid errors
+            if ( !Is32bitProcess ( dwProcessIDs[i] ) )
+                continue;
             // Open the process
             HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, dwProcessIDs[i]);
             if ( hProcess )

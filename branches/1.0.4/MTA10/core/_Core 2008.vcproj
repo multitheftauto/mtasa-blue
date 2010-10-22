@@ -565,6 +565,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CServerCache.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerCache.h"
+				>
+			</File>
+			<File
 				RelativePath="CServerList.cpp"
 				>
 			</File>

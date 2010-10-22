@@ -107,6 +107,9 @@ bool TerminateGTAIfRunning ( void )
     {
         for ( unsigned int i = 0; i < pBytesReturned / sizeof ( DWORD ); i++ )
         {
+            // Skip 64 bit processes to avoid errors
+            if ( !Is32bitProcess ( dwProcessIDs[i] ) )
+                continue;
             // Open the process
             HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, dwProcessIDs[i]);
             if ( hProcess )
@@ -1127,3 +1130,79 @@ void UpdateMTAVersionApplicationSetting ( void )
                                 ,usNetRel
                                 ) );
 }
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// Is32bitProcess
+//
+// Determine if processID is a 32 bit process or not.
+// Assumes current process is 32 bit.
+//
+// (Calling GetModuleFileNameEx or EnumProcessModules on a 64bit process from a 32bit process can cause problems)
+//
+///////////////////////////////////////////////////////////////////////////
+bool Is32bitProcess ( DWORD processID )
+{
+    typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+    static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;
+    static bool bDoneGetProcAddress = false;
+    static bool bDoneIs64BitOS = false;
+    static bool bIs64BitOS = false;
+
+    if ( !bDoneGetProcAddress )
+    {
+        // Find 'IsWow64Process'
+        bDoneGetProcAddress = true;
+        HMODULE hModule = GetModuleHandle ( "Kernel32.dll" );
+        fnIsWow64Process = static_cast < LPFN_ISWOW64PROCESS > ( static_cast < PVOID > ( GetProcAddress( hModule, "IsWow64Process" ) ) );
+    }
+
+    // Function not there? Must be 32bit everything
+    if ( !fnIsWow64Process )
+        return true;
+
+
+    // See if this is a 64 bit O/S
+    if ( !bDoneIs64BitOS )
+    {
+        bDoneIs64BitOS = true;
+
+        // We know current process is 32 bit. See if it is running under WOW64
+        BOOL bIsWow64 = FALSE;
+        BOOL bOk = fnIsWow64Process ( GetCurrentProcess (), &bIsWow64 );
+        if ( bOk )
+        {
+            // Must be 64bit O/S if current (32 bit) process is running under WOW64
+            if ( bIsWow64 )
+                bIs64BitOS = true;
+        }
+    }
+
+    // Not 64 bit O/S? Must be 32bit everything
+    if ( !bIs64BitOS )
+        return true;
+
+    // Call 'IsWow64Process' on query process
+    for ( int i = 0 ; i < 2 ; i++ )
+    {
+        HANDLE hProcess = OpenProcess( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
+
+        if ( hProcess )
+        {
+            BOOL bIsWow64 = FALSE;
+            BOOL bOk = fnIsWow64Process ( hProcess, &bIsWow64 );
+            CloseHandle( hProcess );
+
+            if ( bOk )
+            {
+                if ( bIsWow64 == FALSE )
+                    return false;       // 64 bit O/S and process not running under WOW64, so it must be a 64 bit process
+                return true;
+            }
+        }
+    }
+
+    return false;   // Can't determine. Guess it's 64 bit
+}
+
