@@ -299,7 +299,20 @@ void CServerCache::GetServerListCachedInfo ( CServerList *pList )
 {
     // Get cached info for each server
     for ( CServerListIterator it = pList->IteratorBegin (); it != pList->IteratorEnd (); it++ )
-        GetServerCache ()->GetServerCachedInfo ( *it );
+        GetServerCachedInfo ( *it );
+
+    // Remove servers not in serverlist from cache
+    std::map < CCachedKey, CCachedInfo > nextServerCachedMap;
+    for ( CServerListIterator it = pList->IteratorBegin (); it != pList->IteratorEnd (); it++ )
+    {
+        CServerListItem* pItem = *it;
+        CCachedKey key;
+        key.ulIp = pItem->Address.s_addr;
+        key.usGamePort = pItem->usGamePort;
+        if ( CCachedInfo* pInfo = MapFind ( m_ServerCachedMap, key ) )
+            MapSet ( nextServerCachedMap, key, *pInfo );
+    }
+    m_ServerCachedMap = nextServerCachedMap;
 }
 
 

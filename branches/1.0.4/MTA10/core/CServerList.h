@@ -130,11 +130,8 @@ public:
 
         strHost = inet_ntoa ( Address );
         strName = SString ( "%s:%d", inet_ntoa ( Address ), usGamePort );
-        
-        // Initialize sockets
-        m_Socket = socket ( PF_INET, SOCK_DGRAM, IPPROTO_UDP );
-        u_long flag = 1;
-        ioctlsocket ( m_Socket, FIONBIO, &flag );
+
+        m_Socket = INVALID_SOCKET;
     }
 
     void                CloseSocket     ( void )

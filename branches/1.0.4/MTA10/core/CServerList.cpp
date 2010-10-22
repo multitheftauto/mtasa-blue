@@ -378,6 +378,14 @@ void CServerListItem::Query ( void )
     addr.sin_addr = Address;
     addr.sin_port = htons ( usQueryPort );
 
+    // Initialize socket on demand
+    if ( m_Socket == INVALID_SOCKET )
+    {
+        m_Socket = socket ( PF_INET, SOCK_DGRAM, IPPROTO_UDP );
+        u_long flag = 1;
+        ioctlsocket ( m_Socket, FIONBIO, &flag );
+    }
+
     int ret = sendto ( m_Socket, "r", 1, 0, (sockaddr *) &addr, sizeof(addr) );
     if ( ret == 1 )
         m_ulQueryStart = CClientTime::GetTime ();
