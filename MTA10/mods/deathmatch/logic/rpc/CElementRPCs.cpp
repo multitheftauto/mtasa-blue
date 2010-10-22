@@ -41,7 +41,7 @@ void CElementRPCs::SetElementParent ( NetBitStreamInterface& bitStream )
 {
     // Read out the entity id and parent id
     ElementID ID, ParentID;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( ParentID ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( ParentID ) )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         CClientEntity* pParent = CElementIDs::GetElement ( ParentID );
@@ -121,7 +121,7 @@ void CElementRPCs::SetElementPosition ( NetBitStreamInterface& bitStream )
     ElementID ID;
     CVector vecPosition;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( ID ) &&
+    if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( vecPosition.fX ) &&
          bitStream.Read ( vecPosition.fY ) &&
          bitStream.Read ( vecPosition.fZ ) &&
@@ -179,7 +179,7 @@ void CElementRPCs::SetElementVelocity ( NetBitStreamInterface& bitStream )
     // Read out the entity id and the speed
     ElementID ID;
     CVector vecVelocity;
-    if ( bitStream.Read ( ID ) &&
+    if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( vecVelocity.fX ) &&
          bitStream.Read ( vecVelocity.fY ) &&
          bitStream.Read ( vecVelocity.fZ ) )
@@ -229,7 +229,7 @@ void CElementRPCs::SetElementInterior ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     unsigned char ucInterior, ucSetPosition;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( ucInterior ) && bitStream.Read ( ucSetPosition ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( ucInterior ) && bitStream.Read ( ucSetPosition ) )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         if ( pEntity )
@@ -255,7 +255,7 @@ void CElementRPCs::SetElementDimension ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     unsigned short usDimension;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( usDimension ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( usDimension ) )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         if ( pEntity )
@@ -299,7 +299,7 @@ void CElementRPCs::AttachElements ( NetBitStreamInterface& bitStream )
 {
     ElementID ID, usAttachedToID;
     CVector vecPosition, vecRotation;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( usAttachedToID ) &&
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( usAttachedToID ) &&
         bitStream.Read ( vecPosition.fX ) &&
         bitStream.Read ( vecPosition.fY ) &&
         bitStream.Read ( vecPosition.fZ ) &&
@@ -322,7 +322,7 @@ void CElementRPCs::DetachElements ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( ID ) &&
+    if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( ucTimeContext ) )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
@@ -347,7 +347,7 @@ void CElementRPCs::SetElementAlpha ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     unsigned char ucAlpha;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( ucAlpha ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( ucAlpha ) )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         if ( pEntity )
@@ -384,7 +384,7 @@ void CElementRPCs::SetElementDoubleSided ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     bool bDoubleSided;
-    if ( bitStream.Read ( ID ) && bitStream.ReadBit ( bDoubleSided ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadBit ( bDoubleSided ) )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         if ( pEntity )
@@ -399,7 +399,7 @@ void CElementRPCs::SetElementName ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     unsigned short usNameLength;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( usNameLength ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( usNameLength ) )
     {
         char* szName = new char [ usNameLength + 1 ];
         szName [ usNameLength ] = 0;
@@ -422,7 +422,7 @@ void CElementRPCs::SetElementHealth ( NetBitStreamInterface& bitStream )
     ElementID ID;
     float fHealth;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( ID ) &&
+    if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( fHealth ) &&
          bitStream.Read ( ucTimeContext ) )
     {
@@ -457,7 +457,7 @@ void CElementRPCs::SetElementModel ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     unsigned short usModel;
-    if ( bitStream.Read ( ID ) &&
+    if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( usModel ) )
     {
         CClientEntity * pEntity = CElementIDs::GetElement ( ID );
@@ -497,7 +497,7 @@ void CElementRPCs::SetElementAttachedOffsets ( NetBitStreamInterface& bitStream 
     ElementID ID;
     SPositionSync position ( true );
     SRotationDegreesSync rotation ( true );
-    if ( bitStream.Read ( ID ) && position.Read ( bitStream ) && rotation.Read ( bitStream ) )
+    if ( bitStream.ReadCompressed ( ID ) && position.Read ( bitStream ) && rotation.Read ( bitStream ) )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         if ( pEntity )
@@ -512,7 +512,7 @@ void CElementRPCs::SetElementCollisionsEnabled ( NetBitStreamInterface& bitStrea
     ElementID ID;
     bool bEnable;
 
-    if ( bitStream.Read ( ID ) &&
+    if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.ReadBit ( bEnable ) )
     {
         CClientEntity * pEntity = CElementIDs::GetElement ( ID );

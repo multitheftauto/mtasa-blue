@@ -870,7 +870,7 @@ bool CStaticFunctionDefinitions::SetElementID ( CElement* pElement, const char* 
     // Tell the clients of the name change
     unsigned short usIDLength = static_cast < unsigned short > ( strlen ( szID ) );
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( usIDLength );
     BitStream.pBitStream->Write ( szID, usIDLength );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_NAME, *BitStream.pBitStream ) );
@@ -967,7 +967,7 @@ bool CStaticFunctionDefinitions::SetElementParent ( CElement* pElement, CElement
         pElement->SetParentObject ( pParent );
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( pElement->GetID () );
+        BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
         BitStream.pBitStream->Write ( pParent->GetID () );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_PARENT, *BitStream.pBitStream ) );
         return true;
@@ -1068,7 +1068,7 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
 
     // Construct the set position packet
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( vecPosition.fX );
     BitStream.pBitStream->Write ( vecPosition.fY );
     BitStream.pBitStream->Write ( vecPosition.fZ );
@@ -1152,7 +1152,7 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const 
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( vecVelocity.fX );
     BitStream.pBitStream->Write ( vecVelocity.fY );
     BitStream.pBitStream->Write ( vecVelocity.fZ );
@@ -1190,7 +1190,7 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsign
 
         // Tell everyone
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( pElement->GetID () );
+        BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
         BitStream.pBitStream->Write ( ucInterior );
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bSetPosition ) ? 1 : 0 ) );
         if ( bSetPosition )
@@ -1250,7 +1250,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
             pElement->SetDimension ( usDimension );
 
             CBitStream bitStream;
-            bitStream.pBitStream->Write ( pElement->GetID () );
+            bitStream.pBitStream->WriteCompressed ( pElement->GetID () );
             bitStream.pBitStream->Write ( usDimension );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_DIMENSION, *bitStream.pBitStream ) );
 
@@ -1281,7 +1281,7 @@ bool CStaticFunctionDefinitions::AttachElements ( CElement* pElement, CElement* 
                 pElement->AttachTo ( pAttachedToElement );
 
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( pElement->GetID () );
+                BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
                 BitStream.pBitStream->Write ( pAttachedToElement->GetID () );
                 BitStream.pBitStream->Write ( vecPosition.fX );
                 BitStream.pBitStream->Write ( vecPosition.fY );
@@ -1316,7 +1316,7 @@ bool CStaticFunctionDefinitions::DetachElements ( CElement* pElement, CElement* 
             pElement->GenerateSyncTimeContext ();
 
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pElement->GetID () );
+            BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
             BitStream.pBitStream->Write ( pElement->GetSyncTimeContext () );
             BitStream.pBitStream->Write ( vecPosition.fX );
             BitStream.pBitStream->Write ( vecPosition.fY );
@@ -1369,7 +1369,7 @@ bool CStaticFunctionDefinitions::SetElementAlpha ( CElement* pElement, unsigned 
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( ucAlpha );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_ALPHA, *BitStream.pBitStream ) );
 
@@ -1385,7 +1385,7 @@ bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, boo
     pElement->SetDoubleSided ( bDoubleSided );
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->WriteBit ( bDoubleSided );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ), NULL, PACKET_ORDERING_GAME, 0x0c );
 
@@ -1432,7 +1432,7 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( fHealth );
     BitStream.pBitStream->Write ( pElement->GenerateSyncTimeContext () );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_HEALTH, *BitStream.pBitStream ) );
@@ -1494,7 +1494,7 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( usModel );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_MODEL, *BitStream.pBitStream ) );
 
@@ -1519,7 +1519,7 @@ bool CStaticFunctionDefinitions::SetElementAttachedOffsets ( CElement* pElement,
         rotation.data.vecRotation = vecRotation;
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( pElement->GetID () );
+        BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
         position.Write ( *BitStream.pBitStream );
         rotation.Write ( *BitStream.pBitStream );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_ATTACHED_OFFSETS, *BitStream.pBitStream ) );
@@ -1597,7 +1597,7 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CElement* pElemen
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->WriteBit ( bEnable );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_COLLISIONS_ENABLED, *BitStream.pBitStream ) );
 
