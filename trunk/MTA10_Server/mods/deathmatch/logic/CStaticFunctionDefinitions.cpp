@@ -968,7 +968,7 @@ bool CStaticFunctionDefinitions::SetElementParent ( CElement* pElement, CElement
 
         CBitStream BitStream;
         BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
-        BitStream.pBitStream->Write ( pParent->GetID () );
+        BitStream.pBitStream->WriteCompressed ( pParent->GetID () );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_PARENT, *BitStream.pBitStream ) );
         return true;
     }
