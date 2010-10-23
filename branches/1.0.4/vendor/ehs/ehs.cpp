@@ -99,7 +99,7 @@ int EHSServer::ClearIdleConnections ( )
 		//   sent and there are no pending requests
 		if ( (*i)->StillReading ( ) &&
 			 time ( NULL ) - (*i)->LastActivity ( ) > m_nIdleTimeout &&
-			 (*i)->RequestsPending ( )
+			 !(*i)->RequestsPending ( )
 			  ) {
 
 			EHS_TRACE ( "Done reading because of idle timeout\n" );
