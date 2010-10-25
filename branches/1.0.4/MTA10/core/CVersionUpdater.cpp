@@ -1724,6 +1724,14 @@ void CVersionUpdater::_ProcessPatchFileDownload ( void )
         }
     }
 
+    // Check signature
+    if ( !CCore::GetSingleton ().GetNetwork ()->VerifySignature ( pData, uiSize ) )
+    {
+        AddReportLog ( 5006, SString ( "DoPollDownload: Signature wrong for %s (MD5: %s)", m_JobInfo.strFilename.c_str(), m_JobInfo.strMD5.c_str() ) );
+        m_ConditionMap.SetCondition ( "Download", "Fail", "Checksum" );
+        return;
+    }
+    
     ////////////////////////
     // Save file somewhere
     // Make a list of possible places to save the file

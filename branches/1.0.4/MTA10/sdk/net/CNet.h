@@ -84,6 +84,8 @@ public:
 
     virtual const char*                 GetNextBuffer               ( void ) = 0;
     virtual const char*                 GetDiagnosticStatus         ( void ) = 0;
+
+    virtual bool                        VerifySignature             ( const char* pData, unsigned long ulSize ) = 0;
 };
 
 #endif
