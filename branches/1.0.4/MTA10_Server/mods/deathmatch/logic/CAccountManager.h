@@ -19,6 +19,48 @@ class CAccountManager;
 #include "CAccount.h"
 #include "CXMLConfig.h"
 
+//
+// CAccountList
+//
+// Combination list and map - For fast list Contains() method
+//
+class CAccountList
+{
+    list < CAccount* >          m_List;
+    std::map < CAccount*, int > m_Map;
+public:
+
+    // list only
+    list < CAccount* > ::iterator  begin ( void )   { return m_List.begin (); }
+    list < CAccount* > ::iterator  end ( void )     { return m_List.end (); }
+
+    // map only
+    bool Contains ( CAccount* pAccount ) const      { return MapContains ( m_Map, pAccount ); }
+
+    // list and map
+    void push_back ( CAccount* pAccount )
+    {
+        m_List.push_back ( pAccount );
+        MapSet ( m_Map, pAccount, 1 );
+    }
+
+    void remove ( CAccount* pAccount )
+    {
+        m_List.remove ( pAccount );
+        MapRemove ( m_Map, pAccount );
+    }
+
+    void clear ( void )
+    {
+        m_List.clear ();
+        m_Map.clear ();
+    }
+};
+
+
+//
+// CAccountManager
+//
 class CAccountManager: public CXMLConfig
 {
     friend class CAccount;
@@ -68,7 +110,7 @@ public:
     inline list < CAccount* > ::const_iterator  IterEnd     ( void )                    { return m_List.end (); };
 
 protected:
-    list < CAccount* >          m_List;
+    CAccountList                m_List;
     bool                        m_bRemoveFromList;
 
     bool                        m_bAutoLogin;
