@@ -154,6 +154,7 @@ class EHSConnection {
 	int m_nPort;
 
   public:
+    int m_iStopASAP;
 
 	/// Constructor
 	EHSConnection ( NetworkAbstraction * ipoNetworkAbstraction,
@@ -302,6 +303,9 @@ class EHS {
 
 	/// This function should be defined by the subclass
 	virtual void HttpPulse ( void ) {};
+
+	/// This function should be defined by the subclass
+	virtual bool ShouldAllowConnection ( const char * szAddress ) { return true; }
 
 	/// makes this EHS object get its data from another EHS -- useful for having secure and normal connections share same data
 	void SetSourceEHS ( EHS & iroSourceEHS );

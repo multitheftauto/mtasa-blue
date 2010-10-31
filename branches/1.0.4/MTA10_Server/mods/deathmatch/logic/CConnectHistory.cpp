@@ -97,6 +97,13 @@ void CConnectHistory::RemoveExpired ( void )
     {
         CConnectHistoryItem& historyItem = mapIt->second;
 
+        // Don't expire until any ban is finished
+        if ( llCurrentTime < historyItem.llBanEndTime )
+        {
+            ++mapIt;
+            continue;
+        }
+
         // Find point in the joinTimes list where the time is too old
         JoinTimesMap ::iterator timesIt = historyItem.joinTimes.begin ();
         for ( ; timesIt < historyItem.joinTimes.end () ; ++timesIt )
