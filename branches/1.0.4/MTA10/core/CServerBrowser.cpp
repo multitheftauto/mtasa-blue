@@ -439,21 +439,14 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
     {
         CServerListItem * pServer = *it;
 
-        // Add the cached item to the list
-        if ( !pServer->bScanned && pServer->nMaxPlayers &&
-             ( !pServer->bAddedToListInitial[ Type ] || bClearServerList ) )
+        // Add/update the item to the list
+        if ( ( ( pServer->bScanned || pServer->nMaxPlayers ) || (pServer->bMaybeOffline && m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ()) ) &&
+             ( pServer->revisionInList[ Type ] != pServer->uiRevision || bClearServerList ) )
         {
-            pServer->bAddedToListInitial[ Type ] = true;
+            pServer->revisionInList[ Type ] = pServer->uiRevision;
             AddServerToList ( pServer, Type );
         }
 
-        // Add/update the scanned item to the list
-        if ( ( pServer->bScanned || (pServer->bSkipped && m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ()) ) &&
-             ( !pServer->bAddedToListScanned[ Type ] || bClearServerList ) )
-        {
-            pServer->bAddedToListScanned[ Type ] = true;
-            AddServerToList ( pServer, Type );
-        }
     }
 
     m_pServerList [ Type ]->ForceUpdate ();

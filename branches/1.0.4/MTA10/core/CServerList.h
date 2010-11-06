@@ -122,11 +122,11 @@ public:
         nPing = 0;
         uiNoReplyCount = 0;
         m_ulQueryStart = 0;
+        uiQueryRetryCount = 0;
+        uiRevision = 1;
+        bMaybeOffline = false;
         for ( int i = 0 ; i < SERVER_BROWSER_TYPE_COUNT ; i++ )
-        {
-            bAddedToListInitial[i] = false;
-            bAddedToListScanned[i] = false;
-        }
+            revisionInList[i] = -1;
 
         strHost = inet_ntoa ( Address );
         strName = SString ( "%s:%d", inet_ntoa ( Address ), usGamePort );
@@ -157,9 +157,11 @@ public:
     bool                bSerials;       // Serial verification on
     bool                bScanned;
     bool                bSkipped;
-    bool                bAddedToListInitial[ SERVER_BROWSER_TYPE_COUNT ];
-    bool                bAddedToListScanned[ SERVER_BROWSER_TYPE_COUNT ];
+    bool                bMaybeOffline;
+    uint                revisionInList[ SERVER_BROWSER_TYPE_COUNT ];
     uint                uiNoReplyCount;
+    uint                uiQueryRetryCount;
+    uint                uiRevision;
 
     std::string         strGame;        // Game name
     std::string         strVersion;     // Game version

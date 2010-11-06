@@ -76,6 +76,7 @@ void CServerList::Pulse ( void )
 
     unsigned int n = m_Servers.size ();
     unsigned int uiQueriesSent = 0;
+    unsigned int uiQueriesResent = 0;
     unsigned int uiRepliesParsed = 0;
     unsigned int uiNoReplies = 0;
     unsigned int uiActiveServers = 0;
@@ -84,9 +85,15 @@ void CServerList::Pulse ( void )
     for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ )
     {
         CServerListItem * pServer = *i;
-        std::string strResult = pServer->Pulse ( (int)uiQueriesSent < iNumQueries );
+        uint uiPrevRevision = pServer->uiRevision;
+        std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries );
+        if ( uiPrevRevision != pServer->uiRevision )
+            m_bUpdated |= true;         // Flag GUI update
         if ( strResult == "SentQuery" )
             uiQueriesSent++;
+        else
+        if ( strResult == "ResentQuery" )
+            uiQueriesResent++;
         else
         if ( strResult == "ParsedQuery" )
             uiRepliesParsed++;
@@ -97,9 +104,6 @@ void CServerList::Pulse ( void )
         if ( pServer->nMaxPlayers )
             uiActiveServers++;
     }
-
-    // If we queried any new servers, we should toggle the GUI update flag
-    m_bUpdated = m_bUpdated || ( uiRepliesParsed > 0 ) || ( uiNoReplies > 0 );
 
     // Check whether we are done scanning
     std::stringstream ss;
@@ -351,18 +355,37 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
             // Parse data
             ParseQuery ( szBuffer, len );
             CloseSocket ();
+            bMaybeOffline = false;
             uiNoReplyCount = 0;
-            GetServerCache ()->SetServerCachedInfo ( this );
+            uiRevision++;           // To flag browser gui update
+            GetServerCache ()->SetServerCachedInfo ( this );    // Save parsed info in the cache
             return "ParsedQuery";
         }
 
         if ( CClientTime::GetTime () - m_ulQueryStart > SERVER_LIST_ITEM_TIMEOUT )
         {
-            bSkipped = true;
-            CloseSocket ();
-            uiNoReplyCount++;
-            GetServerCache ()->SetServerCachedInfo ( this );
-            return "NoReply";
+            bMaybeOffline = true;       // Flag to help 'Include offline' browser option
+            nPlayers = 0;               // We don't have player names, so zero this now
+            uiRevision++;               // To flag browser gui update
+            if ( uiQueryRetryCount == 0 )
+                uiNoReplyCount++;       // Keep a persistant count of failures. (When uiNoReplyCount gets to 3, the server is removed from the Server Cache)
+
+            if ( uiQueryRetryCount < 3 )
+            {
+                // Try again
+                uiQueryRetryCount++;
+                GetServerCache ()->SetServerCachedInfo ( this );
+                Query ();
+                return "ResentQuery";
+            }
+            else
+            {
+                // Give up
+                bSkipped = true;
+                CloseSocket ();
+                GetServerCache ()->SetServerCachedInfo ( this );
+                return "NoReply";
+            }
         }
 
         return "WaitingReply";
@@ -386,9 +409,8 @@ void CServerListItem::Query ( void )
         ioctlsocket ( m_Socket, FIONBIO, &flag );
     }
 
-    int ret = sendto ( m_Socket, "r", 1, 0, (sockaddr *) &addr, sizeof(addr) );
-    if ( ret == 1 )
-        m_ulQueryStart = CClientTime::GetTime ();
+    sendto ( m_Socket, "r", 1, 0, (sockaddr *) &addr, sizeof(addr) );
+    m_ulQueryStart = CClientTime::GetTime ();
 }
 
 
