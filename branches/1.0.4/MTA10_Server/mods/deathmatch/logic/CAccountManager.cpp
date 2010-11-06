@@ -427,7 +427,7 @@ bool CAccountManager::Save ( const char* szFileName )
     m_bChangedSinceSaved = false;
     m_llLastTimeSaved = GetTickCount64_ ();
 
-    list < CAccount* > ::iterator iter = m_List.begin ();
+    list < CAccount* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
     {
         if ( (*iter)->IsRegistered () && (*iter)->HasChanged() )
@@ -464,7 +464,7 @@ CAccount* CAccountManager::Get ( const char* szName, bool bRegistered )
     if ( szName && szName [ 0 ] )
     {
         unsigned int uiHash = HashString ( szName );
-        list < CAccount* > ::iterator iter = m_List.begin ();
+        list < CAccount* > ::const_iterator iter = m_List.begin ();
         for ( ; iter != m_List.end () ; iter++ )
         {
             CAccount* pAccount = *iter;
@@ -486,7 +486,7 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
     if ( szName && szName [ 0 ] && szIP && szIP [ 0 ] )
     {
         unsigned int uiHash = HashString ( szName );
-        list < CAccount* > ::iterator iter = m_List.begin ();
+        list < CAccount* > ::const_iterator iter = m_List.begin ();
         for ( ; iter != m_List.end () ; iter++ )
         {
             CAccount* pAccount = *iter;
@@ -533,7 +533,7 @@ void CAccountManager::MarkAsChanged ( CAccount* pAccount )
 void CAccountManager::RemoveAll ( void )
 {
     m_bRemoveFromList = false;
-    list < CAccount* > ::iterator iter = m_List.begin ();
+    list < CAccount* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
     {
         delete *iter;

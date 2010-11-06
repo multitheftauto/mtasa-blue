@@ -46,7 +46,7 @@ public:
 
 private:
 
-    std::list < CResource* >    m_resources;
+    CMappedList < CResource* >  m_resources;
 };
 
 #endif

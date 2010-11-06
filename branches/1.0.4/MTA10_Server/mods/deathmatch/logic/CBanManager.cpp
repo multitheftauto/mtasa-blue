@@ -194,16 +194,7 @@ CBan* CBanManager::AddBan ( CClient* pBanner, const char* szReason, time_t tTime
 
 bool CBanManager::Exists ( CBan* pBan )
 {
-    list < CBan* >::const_iterator iter = m_BanManager.begin ();
-    for ( ; iter != m_BanManager.end (); iter++ )
-    {
-        if ( *iter == pBan )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return m_BanManager.Contains ( pBan );
 }
 
 

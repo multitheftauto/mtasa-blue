@@ -29,7 +29,7 @@ CPlayerManager::~CPlayerManager ( void )
 
 void CPlayerManager::DoPulse ( void )
 {
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
+    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         (*iter)->DoPulse ();
@@ -58,7 +58,7 @@ unsigned int CPlayerManager::CountWithStatus ( int iStatus )
 {
     // Count each ingame player
     unsigned int uiCount = 0;
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
+    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         if ( (*iter)->GetStatus () == iStatus )
@@ -74,24 +74,14 @@ unsigned int CPlayerManager::CountWithStatus ( int iStatus )
 
 bool CPlayerManager::Exists ( CPlayer* pPlayer )
 {
-    // Try to find it in our list
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
-    {
-        if ( (*iter) == pPlayer )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return m_Players.Contains ( pPlayer );
 }
 
 
 CPlayer* CPlayerManager::Get ( NetServerPlayerID& PlayerSocket )
 {
     // Try to find it in our list
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
+    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         if ( (*iter)->GetSocket () == PlayerSocket )
@@ -109,7 +99,7 @@ CPlayer* CPlayerManager::Get ( const char* szNick, bool bCaseSensitive )
 {
     // Try to find it in our list
     const char* szTemp;
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
+    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         // Grab the nick pointer
@@ -139,7 +129,7 @@ void CPlayerManager::DeleteAll ( void )
 
     // Delete all the items in the list (without letting them remove themselves)
     m_bCanRemoveFromList = false;
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
+    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         delete *iter;
@@ -174,7 +164,7 @@ CPlayer* CPlayerManager::GetAfter ( ElementID PlayerID )
         // TODO: 31 bit limitation here on element id's
         CPlayer* pPlayer = NULL;
         int iLast = -1;
-        list < CPlayer* > ::iterator iter = m_Players.begin ();
+        list < CPlayer* > ::const_iterator iter = m_Players.begin ();
         for ( ; iter != m_Players.end (); iter++ )
         {
             ElementID ThisID = (*iter)->GetID ();
@@ -214,7 +204,7 @@ CPlayer* CPlayerManager::GetAfter ( ElementID PlayerID )
 list < CPlayer* > ::const_iterator CPlayerManager::IterGet ( CPlayer* pPlayer )
 {
     // Find the player in the list
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
+    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         if ( *iter == pPlayer )
@@ -231,7 +221,7 @@ list < CPlayer* > ::const_iterator CPlayerManager::IterGet ( CPlayer* pPlayer )
 list < CPlayer* > ::const_iterator CPlayerManager::IterGet ( ElementID PlayerID )
 {
     // Find the player in the list
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
+    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         if ( (*iter)->GetID () == PlayerID )
@@ -248,7 +238,7 @@ list < CPlayer* > ::const_iterator CPlayerManager::IterGet ( ElementID PlayerID 
 void CPlayerManager::Broadcast ( const CPacket& Packet, CPlayer* pSkip )
 {
     // Send the packet to each player on the server except the skipped one
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
+    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         if ( *iter != pSkip )
@@ -273,7 +263,7 @@ void CPlayerManager::Broadcast ( const CPacket& Packet, list < CPlayer * > & pla
 void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip, NetServerPacketOrdering packetOrdering, unsigned short usMinBitstreamVersion )
 {
     // Send the packet to each ingame player on the server except the skipped one
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
+    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         CPlayer* pPlayer = *iter;
@@ -306,7 +296,7 @@ bool CPlayerManager::IsValidPlayerModel ( unsigned short usPlayerModel )
 
 void CPlayerManager::ResetAll ( void )
 {
-    list < CPlayer* > ::iterator iter = m_Players.begin ();
+    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         (*iter)->Reset ();
@@ -322,7 +312,7 @@ void CPlayerManager::ClearSyncTime ( CPlayer& Player )
     {
         // Call ClearSyncTime on every player. This makes sure this
         // player no longer references it in its synctime stuff.
-        list < CPlayer* > ::iterator iter = m_Players.begin ();
+        list < CPlayer* > ::const_iterator iter = m_Players.begin ();
         for ( ; iter != m_Players.end (); iter++ )
         {
             (*iter)->ClearSyncTime ( Player );
@@ -339,7 +329,7 @@ void CPlayerManager::ClearSyncTimes ( void )
     {
         // Call ClearSyncTimes on every player. This clears
         // all synctimes on the server.
-        list < CPlayer* > ::iterator iter = m_Players.begin ();
+        list < CPlayer* > ::const_iterator iter = m_Players.begin ();
         for ( ; iter != m_Players.end (); iter++ )
         {
             (*iter)->ClearSyncTimes ();

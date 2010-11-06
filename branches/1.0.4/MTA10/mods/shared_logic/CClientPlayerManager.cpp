@@ -169,16 +169,7 @@ CClientPlayer* CClientPlayerManager::Get ( CPlayerPed* pPlayer, bool bValidatePo
 
 bool CClientPlayerManager::Exists ( CClientPlayer* pPlayer )
 {
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end () ; iter++ )
-    {
-        if ( *iter == pPlayer )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return m_Players.Contains ( pPlayer );
 }
 
 
@@ -222,44 +213,10 @@ void CClientPlayerManager::ResetAll ( void )
 }
 
 
-vector < CClientPlayer* > ::const_iterator CClientPlayerManager::IterGet ( CClientPlayer* pPlayer )
-{
-    // Find it in our list
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
-    {
-        if ( *iter == pPlayer )
-        {
-            return iter;
-        }
-    }
-
-    // We couldn't find it
-    return m_Players.begin ();
-}
-
-
-vector < CClientPlayer* > ::const_reverse_iterator CClientPlayerManager::IterGetReverse ( CClientPlayer* pPlayer )
-{
-    // Find it in our list
-    vector < CClientPlayer* > ::reverse_iterator iter = m_Players.rbegin ();
-    for ( ; iter != m_Players.rend (); iter++ )
-    {
-        if ( *iter == pPlayer )
-        {
-            return iter;
-        }
-    }
-
-    // We couldn't find it
-    return m_Players.rbegin ();
-}
-
-
 void CClientPlayerManager::RemoveFromList ( CClientPlayer* pPlayer )
 {
     if ( m_bCanRemoveFromList )
     {
-        ListRemove ( m_Players, pPlayer );
+        m_Players.remove ( pPlayer );
     }
 }

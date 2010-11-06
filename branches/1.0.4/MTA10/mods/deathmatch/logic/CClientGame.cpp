@@ -1761,7 +1761,7 @@ void CClientGame::UpdateTrailers ( void )
     CClientVehicle * pVehicle = NULL, * pTrailer = NULL;
     CVehicle * pGameVehicle = NULL, * pGameTrailer = NULL;
     unsigned long ulIllegalTowBreakTime;
-    vector < CClientVehicle* > ::iterator iterVehicles = m_pVehicleManager->StreamedBegin ();
+    vector < CClientVehicle* > ::const_iterator iterVehicles = m_pVehicleManager->StreamedBegin ();
     for ( ; iterVehicles != m_pVehicleManager->StreamedEnd (); iterVehicles++ )
     {
         pVehicle = *iterVehicles;
@@ -4796,7 +4796,7 @@ AddressInfo * CClientGame::GetAddressInfo ( unsigned long ulOffset, AddressInfo 
     }
 
     CClientVehicle* pVehicle = NULL;
-    vector < CClientVehicle* > ::iterator iterVehicle = m_pVehicleManager->IterBegin ();
+    vector < CClientVehicle* > ::const_iterator iterVehicle = m_pVehicleManager->IterBegin ();
     for ( ; iterVehicle != m_pVehicleManager->IterEnd (); iterVehicle++ )
     {
         // Grab the game address of the vehicle

@@ -22,7 +22,7 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
 {
     unsigned long ulCurrentTime = timeGetTime ();
     m_bIteratingList = true;
-    list < CLuaTimer* > ::iterator iter = m_TimerList.begin ();
+    list < CLuaTimer* > ::const_iterator iter = m_TimerList.begin ();
     for ( ; iter != m_TimerList.end (); )
     {
         CLuaTimer* pLuaTimer = *iter;
@@ -82,7 +82,7 @@ void CLuaTimerManager::RemoveTimer ( CLuaTimer* pLuaTimer )
 void CLuaTimerManager::RemoveAllTimers ( void )
 {
     // Delete all the timers
-    list < CLuaTimer* > ::iterator iter = m_TimerList.begin ();
+    list < CLuaTimer* > ::const_iterator iter = m_TimerList.begin ();
     for ( ; iter != m_TimerList.end (); iter++ )
     {
         delete *iter;
@@ -104,18 +104,7 @@ void CLuaTimerManager::ResetTimer ( CLuaTimer* pLuaTimer )
 
 bool CLuaTimerManager::Exists ( CLuaTimer* pLuaTimer )
 {
-    // Return true if we find it
-    list < CLuaTimer* > ::iterator iter = m_TimerList.begin ();
-    for ( ; iter != m_TimerList.end (); iter++ )
-    {
-        if ( *iter == pLuaTimer )
-        {
-            return true;
-        }
-    }
-
-    // If not, false
-    return false;
+    return m_TimerList.Contains ( pLuaTimer );
 }
 
 
@@ -163,7 +152,7 @@ void CLuaTimerManager::GetTimers ( unsigned long ulTime, CLuaMain* pLuaMain )
     unsigned long ulCurrentTime = timeGetTime();
     // Add all the timers to the table
     unsigned int uiIndex = 0;
-    list < CLuaTimer* > ::iterator iter = m_TimerList.begin ();
+    list < CLuaTimer* > ::const_iterator iter = m_TimerList.begin ();
     for ( ; iter != m_TimerList.end () ; iter++ )
     {
         // If the time left is less than the time specified, or the time specifed is 0

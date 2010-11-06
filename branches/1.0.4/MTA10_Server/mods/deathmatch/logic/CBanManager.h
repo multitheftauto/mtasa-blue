@@ -66,7 +66,7 @@ public:
 private:
     SString             m_strPath;
 
-    list < CBan* >      m_BanManager;
+    CMappedList < CBan* >   m_BanManager;
 
     time_t              m_tUpdate;
 

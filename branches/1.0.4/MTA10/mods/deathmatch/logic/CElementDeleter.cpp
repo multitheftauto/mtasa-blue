@@ -84,7 +84,7 @@ void CElementDeleter::DoDeleteAll ( void )
     m_bAllowUnreference = false;
 
     // Delete all the elements
-    list < CClientEntity* > ::iterator iter = m_List.begin ();
+    list < CClientEntity* > ::const_iterator iter = m_List.begin ();
     while ( iter != m_List.end () )
     {
         CClientEntity* pEntity = *iter;
@@ -109,17 +109,7 @@ void CElementDeleter::DoDeleteAll ( void )
 
 bool CElementDeleter::IsBeingDeleted ( CClientEntity* pElement )
 {
-    // Return true if the given element is in the list
-    list < CClientEntity* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( pElement == *iter )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return m_List.Contains ( pElement );
 }
 
 
@@ -140,7 +130,7 @@ bool CElementDeleter::CanBeDestroyed ( void )
         return true;
 
     // Check if there are any elements that can't be destroyed ye
-    list < CClientEntity* > ::iterator iter = m_List.begin ();
+    list < CClientEntity* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
         // Can this element be destroyed yet?

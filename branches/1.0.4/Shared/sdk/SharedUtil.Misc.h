@@ -164,6 +164,13 @@ namespace SharedUtil
         return false;
     }
 
+    // Remove first occurrence of item from itemList
+    template < class T >
+    void ListRemove ( std::list < T >& itemList, const T& item )
+    {
+        itemList.remove ( item );
+    }
+
 
     //
     // std::vector helpers
@@ -534,6 +541,91 @@ namespace SharedUtil
         bool        Get                 ( const SString& strInCmd, int& iValue, int iDefault = 0 ) const;                   // First result as int
     };
 
+
+    ///////////////////////////////////////////////////////////////
+    //
+    // CMappedContainer
+    //
+    // Combination list and map - For fast list Contains() method
+    //
+    ///////////////////////////////////////////////////////////////
+    template < class T, class LIST_TYPE >
+    class CMappedContainer
+    {
+        std::map < T, int > m_Map;
+        LIST_TYPE           m_List;
+    public:
+
+        // map only
+        bool Contains ( const T& item ) const { return MapContains ( m_Map, item ); }
+
+        // list only
+        typename LIST_TYPE ::const_iterator         begin ( void ) const    { return m_List.begin (); }
+        typename LIST_TYPE ::const_iterator         end ( void ) const      { return m_List.end (); }
+        uint                                        size ( void ) const     { return m_List.size (); }
+        bool                                        empty ( void ) const    { return m_List.empty (); }
+        const T&                                    back ( void ) const     { return m_List.back (); }
+        const T&                                    front ( void ) const    { return m_List.front (); }
+
+        // list and map
+        void push_back ( const T& item )
+        {
+            MapSet ( m_Map, item, 1 );
+            m_List.push_back ( item );
+        }
+
+        void push_front ( const T& item )
+        {
+            MapSet ( m_Map, item, 1 );
+            m_List.push_front ( item );
+        }
+
+        void pop_back ( void )
+        {
+            MapRemove ( m_Map, m_List.back () );
+            m_List.pop_back ();
+        }
+
+        void pop_front ( void )
+        {
+            MapRemove ( m_Map, m_List.front () );
+            m_List.pop_front ();
+        }
+
+        void remove ( const T& item )
+        {
+            if ( Contains ( item ) )
+            {
+                MapRemove ( m_Map, item );
+                ListRemove ( m_List, item );
+            }
+        }
+
+        void clear ( void )
+        {
+            m_Map.clear ();
+            m_List.clear ();
+        }
+
+        typename LIST_TYPE ::const_iterator erase ( typename LIST_TYPE ::const_iterator iter )
+        {
+            MapRemove ( m_Map, *iter );
+            return m_List.erase ( iter );
+        }
+
+    };
+
+
+    template < class T >
+    class CMappedList : public CMappedContainer < T, std::list < T > >
+    {
+    };
+
+
+    template < class T >
+    class CMappedArray : public CMappedContainer < T, std::vector < T > >
+    {
+    };
 
 };
 

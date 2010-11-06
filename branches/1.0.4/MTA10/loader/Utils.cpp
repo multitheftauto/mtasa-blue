@@ -1092,6 +1092,10 @@ void UpdateMTAVersionApplicationSetting ( void )
     if ( buffer.size () )
         strNewHash = HashBuffer ( &buffer.at ( 0 ), buffer.size () );
 
+#ifdef MTA_DEBUG
+    // Force update
+    strNewHash = "x";
+#endif
     // Only loadup the dll if the hash has changed, or we don't have a previous valid netrev value
     if ( strNewHash != strOldHash || usNetRev == 65535 )
     {
