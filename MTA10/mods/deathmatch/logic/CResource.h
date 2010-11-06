@@ -44,41 +44,42 @@ class CResource
 {  
 
 public:
-                            CResource       ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
-                            ~CResource      ( void );
+                            CResource                   ( unsigned short usID, char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity );
+                            ~CResource                  ( void );
 
-    inline unsigned short   GetID           ( void )                { return m_usID; };
-    inline char*            GetName         ( void )                { return m_szResourceName; };
-    inline CLuaMain*        GetVM           ( void )                { return m_pLuaVM; };
-    inline bool             GetActive       ( void )                { return m_bActive; };
+    inline unsigned short   GetID                       ( void )                            { return m_usID; };
+    inline char*            GetName                     ( void )                            { return m_szResourceName; };
+    inline CLuaMain*        GetVM                       ( void )                            { return m_pLuaVM; };
+    inline bool             GetActive                   ( void )                            { return m_bActive; };
 
-    void                    Load            ( CClientEntity *pRootEntity );
+    void                    Load                        ( CClientEntity *pRootEntity );
 
-    bool                    InDownloadQueue     ( void )            { return m_bInDownloadQueue; };
-    bool                    SetInDownloadQueue  ( bool bIn )        { m_bInDownloadQueue = bIn; };
+    bool                    InDownloadQueue             ( void )                            { return m_bInDownloadQueue; };
+    bool                    SetInDownloadQueue          ( bool bIn )                        { m_bInDownloadQueue = bIn; };
 
-    CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum );
+    CDownloadableResource*  QueueFile                   ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum );
 
-    CDownloadableResource*  AddConfigFile   ( char *szFileName, CChecksum serverChecksum );
+    CDownloadableResource*  AddConfigFile               ( char *szFileName, CChecksum serverChecksum );
 
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterBegin     ( void )        { return m_ConfigFiles.begin(); }
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterEnd       ( void )        { return m_ConfigFiles.end(); }
 
-    CElementGroup *         GetElementGroup ( void )                { return m_pDefaultElementGroup; }
+    CElementGroup *         GetElementGroup             ( void )                            { return m_pDefaultElementGroup; }
 
-    void                    AddExportedFunction (char *szFunctionName );
-    bool                    CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller );
+    void                    AddExportedFunction         ( char *szFunctionName );
+    bool                    CallExportedFunction        ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller );
 
-    class CClientEntity*    GetResourceEntity ( void )              { return m_pResourceEntity; }
-    void                    SetResourceEntity ( CClientEntity* pEntity )    { m_pResourceEntity = pEntity; }
-    class CClientEntity*    GetResourceDynamicEntity ( void )                       { return m_pResourceDynamicEntity; }
-    void                    SetResourceDynamicEntity ( CClientEntity* pEntity )     { m_pResourceDynamicEntity = pEntity; }
-    inline const char *     GetResourceDirectoryPath () { return m_strResourceDirectoryPath.c_str (); };
-    class CClientEntity*    GetResourceGUIEntity ( void )                   { return m_pResourceGUIEntity; }
-    void                    SetResourceGUIEntity      ( CClientEntity* pEntity )    { m_pResourceGUIEntity = pEntity; }
-    inline CClientEntity*   GetResourceCOLModelRoot ( void )                           { return m_pResourceCOLRoot; };
-    inline CClientEntity*   GetResourceDFFRoot ( void )                           { return m_pResourceDFFEntity; };
-    inline CClientEntity*   GetResourceTXDRoot ( void )                           { return m_pResourceTXDRoot; };
+    class CClientEntity*    GetResourceEntity           ( void )                            { return m_pResourceEntity; }
+    void                    SetResourceEntity           ( CClientEntity* pEntity )          { m_pResourceEntity = pEntity; }
+    class CClientEntity*    GetResourceDynamicEntity    ( void )                            { return m_pResourceDynamicEntity; }
+    void                    SetResourceDynamicEntity    ( CClientEntity* pEntity )          { m_pResourceDynamicEntity = pEntity; }
+    inline const char *     GetResourceDirectoryPath    ()                                  { return m_strResourceDirectoryPath.c_str (); };
+    class CClientEntity*    GetResourceGUIEntity        ( void )                            { return m_pResourceGUIEntity; }
+    void                    SetResourceGUIEntity        ( CClientEntity* pEntity )          { m_pResourceGUIEntity = pEntity; }
+    inline CClientEntity*   GetResourceCOLModelRoot     ( void )                            { return m_pResourceCOLRoot; };
+    inline CClientEntity*   GetResourceDFFRoot          ( void )                            { return m_pResourceDFFEntity; };
+    inline CClientEntity*   GetResourceTXDRoot          ( void )                            { return m_pResourceTXDRoot; };
+    inline CClientEntity*   GetResourceIFPRoot          ( void )                            { return m_pResourceIFPRoot; };
 
     // This is to delete all the elements created in this resource that are created locally in this client
     void                    DeleteClientChildren        ( void );
@@ -102,6 +103,7 @@ private:
     class CClientEntity*    m_pResourceDFFEntity;
     class CClientEntity*    m_pResourceGUIEntity;
     class CClientEntity*    m_pResourceTXDRoot;
+    class CClientEntity*    m_pResourceIFPRoot;
     bool                    m_bInDownloadQueue;
 
     // To control cursor show/hide
@@ -110,11 +112,11 @@ private:
 
     SString                 m_strResourceDirectoryPath; // stores the path to /mods/deathmatch/resources/resource_name
 
-    std::list < class CResourceFile* >           m_ResourceFiles;
-    std::list < class CResourceConfigItem* >     m_ConfigFiles;
-    std::list<CElementGroup *>   m_elementGroups; // stores elements created by scripts in this resource
-    std::list<CExportedFunction *>   m_exportedFunctions;
-    CElementGroup *         m_pDefaultElementGroup;
+    std::list < class CResourceFile* >          m_ResourceFiles;
+    std::list < class CResourceConfigItem* >    m_ConfigFiles;
+    std::list<CElementGroup *>                  m_elementGroups; // stores elements created by scripts in this resource
+    std::list<CExportedFunction *>              m_exportedFunctions;
+    CElementGroup *                             m_pDefaultElementGroup;
 };
 
 #endif
