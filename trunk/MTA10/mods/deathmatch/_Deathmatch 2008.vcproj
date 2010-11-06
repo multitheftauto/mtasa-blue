@@ -736,6 +736,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientIFP.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientManager.cpp"
 					>
 				</File>
@@ -1615,6 +1619,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientHandlingManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientIFP.h"
 					>
 				</File>
 				<File

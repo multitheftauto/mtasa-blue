@@ -35,6 +35,9 @@ class CRenderWareSA : public CRenderWare
     // Removes texture from the TXD of a model, eventually destroying each texture
     void                ModelInfoTXDRemoveTextures  ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy = true, bool bKeepRaster = false, bool bRemoveRef = true );
 
+    //Reads and parses an IFP file specified by a path ( szIFP )
+    CAnimBlock *        ReadIFP                     ( const char *szIFP );
+
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary *   ReadTXD                     ( const char *szTXD );
 

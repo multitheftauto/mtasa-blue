@@ -64,6 +64,11 @@ CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity*
     m_pResourceTXDRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "txdroot" );
     m_pResourceTXDRoot->MakeSystemEntity ();
 
+    // Create our IFP root element. We set its parent when we're loaded.
+    // Make it a system entity so nothing but us can delete it.
+    m_pResourceIFPRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "ifproot" );
+    m_pResourceIFPRoot->MakeSystemEntity ();
+
     m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), m_szResourceName );
 
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this );
@@ -90,6 +95,10 @@ CResource::~CResource ( void )
     // Destroy the txd root so all dff elements are deleted except those moved out
     g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceTXDRoot );
     m_pResourceTXDRoot = NULL;
+
+    // Destroy the ifp root so all ifp elements are deleted except those moved out
+    g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceIFPRoot );
+    m_pResourceIFPRoot = NULL;
 
     // Destroy the ddf root so all dff elements are deleted except those moved out
     g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceDFFEntity );
@@ -273,6 +282,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
         m_pResourceDFFEntity->SetParent ( m_pResourceEntity );
         m_pResourceGUIEntity->SetParent ( m_pResourceEntity );
         m_pResourceTXDRoot->SetParent ( m_pResourceEntity );
+        m_pResourceIFPRoot->SetParent ( m_pResourceEntity );
     }
 
     CLogger::LogPrintf ( "> Starting resource '%s'", m_szResourceName );
