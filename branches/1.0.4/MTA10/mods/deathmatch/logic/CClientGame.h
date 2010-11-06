@@ -349,6 +349,7 @@ public:
     void                                ChangeVehicleWeapon             ( bool bNext );
     void                                NotifyBigPacketProgress         ( unsigned long ulBytesReceived, unsigned long ulTotalSize );
     bool                                IsDownloadingBigPacket          ( ) const                       { return m_bReceivingBigPacket; }
+    bool                                IsBeingDeleted                  ( void )                        { return m_bBeingDeleted; }
 
 private:
     #ifdef MTA_VOICE
@@ -588,6 +589,8 @@ private:
 
     long long                           m_llLastTransgressionTime;
     SString                             m_strLastDiagnosticStatus;
+
+    bool                                m_bBeingDeleted;        // To enable speedy disconnect
 
     // Cache for speeding up collision processing
 public:

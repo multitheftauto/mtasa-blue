@@ -272,6 +272,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_ulBigPacketSize               = 0;
     m_ulBigPacketBytesReceivedBase  = 0;
 
+    m_bBeingDeleted = false;
+
     #if defined (MTA_DEBUG) || defined (MTA_BETA)
     m_bShowSyncingInfo = false;
     #endif
@@ -302,6 +304,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
 CClientGame::~CClientGame ( void )
 {
+    m_bBeingDeleted = true;
     // Stop all explosions. Unfortunately this doesn't fix the crash
     // if a vehicle is destroyed while it explodes.
     g_pGame->GetExplosionManager ()->RemoveAllExplosions ();
@@ -422,6 +425,7 @@ CClientGame::~CClientGame ( void )
 
     // NULL the global CClientGame var
     g_pClientGame = NULL;
+    m_bBeingDeleted = false;
 }
 
 /*
