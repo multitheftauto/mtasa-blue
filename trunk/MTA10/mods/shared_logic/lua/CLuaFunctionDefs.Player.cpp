@@ -481,6 +481,22 @@ int CLuaFunctionDefs::GetPlayerUserName ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetPlayerSerial ( lua_State* luaVM )
+{
+    char szSerial [ 64 ];
+    g_pCore->GetNetwork ()->GetSerial ( szSerial, sizeof ( szSerial ) );
+
+    if ( szSerial )
+    {
+        lua_pushstring ( luaVM, szSerial );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 // Player Map
 
 int CLuaFunctionDefs::IsPlayerMapForced ( lua_State* luaVM )

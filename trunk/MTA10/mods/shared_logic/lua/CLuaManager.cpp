@@ -927,6 +927,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Community funcs
     CLuaCFunctions::AddFunction ( "getPlayerUserName", CLuaFunctionDefs::GetPlayerUserName );
+    CLuaCFunctions::AddFunction ( "getPlayerSerial", CLuaFunctionDefs::GetPlayerSerial );
 
     // Utility vector math functions
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints2D", CLuaFunctionDefs::GetDistanceBetweenPoints2D );

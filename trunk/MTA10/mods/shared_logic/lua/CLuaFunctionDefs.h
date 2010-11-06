@@ -727,6 +727,7 @@ public:
 
     // Community funcs
     LUA_DECLARE ( GetPlayerUserName );
+    LUA_DECLARE ( GetPlayerSerial );
 
     // Utility vector math functions
     LUA_DECLARE ( GetDistanceBetweenPoints2D );
