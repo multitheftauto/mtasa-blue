@@ -84,7 +84,7 @@ void CElementDeleter::DoDeleteAll ( void )
     m_bAllowUnreference = false;
 
     // Delete all the elements
-    list < CClientEntity* > ::const_iterator iter = m_List.begin ();
+    list < CClientEntity* > ::iterator iter = m_List.begin ();
     while ( iter != m_List.end () )
     {
         CClientEntity* pEntity = *iter;

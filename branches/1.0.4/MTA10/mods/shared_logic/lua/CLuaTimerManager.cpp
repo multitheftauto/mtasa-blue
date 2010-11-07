@@ -22,7 +22,7 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
 {
     unsigned long ulCurrentTime = timeGetTime ();
     m_bIteratingList = true;
-    list < CLuaTimer* > ::const_iterator iter = m_TimerList.begin ();
+    list < CLuaTimer* > ::iterator iter = m_TimerList.begin ();
     for ( ; iter != m_TimerList.end (); )
     {
         CLuaTimer* pLuaTimer = *iter;
@@ -39,7 +39,7 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
             if ( uiRepeats == 1 )
             {
                 delete pLuaTimer;
-                m_TimerList.erase ( iter++ );
+                iter = m_TimerList.erase ( iter );
             }
             else
             {

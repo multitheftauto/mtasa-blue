@@ -552,16 +552,14 @@ namespace SharedUtil
     template < class T, class LIST_TYPE >
     class CMappedContainer
     {
-        std::map < T, int > m_Map;
-        LIST_TYPE           m_List;
     public:
 
         // map only
         bool Contains ( const T& item ) const { return MapContains ( m_Map, item ); }
 
         // list only
-        typename LIST_TYPE ::const_iterator         begin ( void ) const    { return m_List.begin (); }
-        typename LIST_TYPE ::const_iterator         end ( void ) const      { return m_List.end (); }
+        typename LIST_TYPE ::iterator               begin ( void )          { return m_List.begin (); }
+        typename LIST_TYPE ::iterator               end ( void )            { return m_List.end (); }
         uint                                        size ( void ) const     { return m_List.size (); }
         bool                                        empty ( void ) const    { return m_List.empty (); }
         const T&                                    back ( void ) const     { return m_List.back (); }
@@ -570,25 +568,25 @@ namespace SharedUtil
         // list and map
         void push_back ( const T& item )
         {
-            MapSet ( m_Map, item, 1 );
+            AddMapRef ( item );
             m_List.push_back ( item );
         }
 
         void push_front ( const T& item )
         {
-            MapSet ( m_Map, item, 1 );
+            AddMapRef ( item );
             m_List.push_front ( item );
         }
 
         void pop_back ( void )
         {
-            MapRemove ( m_Map, m_List.back () );
+            RemoveMapRef ( m_List.back () );
             m_List.pop_back ();
         }
 
         void pop_front ( void )
         {
-            MapRemove ( m_Map, m_List.front () );
+            RemoveMapRef ( m_List.front () );
             m_List.pop_front ();
         }
 
@@ -596,6 +594,7 @@ namespace SharedUtil
         {
             if ( Contains ( item ) )
             {
+                // Remove all refs from map and list
                 MapRemove ( m_Map, item );
                 ListRemove ( m_List, item );
             }
@@ -607,12 +606,42 @@ namespace SharedUtil
             m_List.clear ();
         }
 
-        typename LIST_TYPE ::const_iterator erase ( typename LIST_TYPE ::const_iterator iter )
+        typename LIST_TYPE ::iterator erase ( typename LIST_TYPE ::iterator iter )
         {
-            MapRemove ( m_Map, *iter );
+            RemoveMapRef ( *iter );
             return m_List.erase ( iter );
         }
 
+    protected:
+        // Increment reference count for item
+        void AddMapRef ( const T& item )
+        {
+            if ( int* pInt = MapFind ( m_Map, item ) )
+                ( *pInt )++;
+            else
+                MapSet ( m_Map, item, 1 );
+        }
+
+        // Decrement reference count for item
+        void RemoveMapRef ( const T& item )
+        {
+            typename std::map < T, int > ::iterator it = m_Map.find ( item );
+            if ( it != m_Map.end () )
+                if ( !--( it->second ) )
+                    m_Map.erase ( it );
+        }
+
+        // Debug
+        void Validate ( void ) const
+        {
+            int iTotalRefs = 0;
+            for ( typename std::map < T, int > ::const_iterator it = m_Map.begin () ; it != m_Map.end () ; ++it )
+                iTotalRefs += it->second;
+            assert ( iTotalRefs == m_List.size () );
+        }
+
+        std::map < T, int > m_Map;
+        LIST_TYPE           m_List;
     };
 
 
