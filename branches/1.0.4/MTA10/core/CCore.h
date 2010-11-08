@@ -175,6 +175,7 @@ public:
     void                    SetClientMessageProcessor       ( pfnProcessMessage pfnMessageProcessor ) { m_pfnMessageProcessor = pfnMessageProcessor; };
     pfnProcessMessage       GetClientMessageProcessor       ( void ) { return m_pfnMessageProcessor; }
     void                    ChangeResolution                ( long width, long height, long depth );
+    void                    ApplyLoadingCrashPatch          ( void );
 
     void                    SetFocused                      ( bool bFocused )               { m_bFocused = bFocused; };
     bool                    IsFocused                       ( void )                        { return m_bFocused; };

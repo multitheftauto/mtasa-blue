@@ -762,6 +762,8 @@ void CCore::HideQuickConnect ( void )
 
 void CCore::ApplyHooks ( )
 { 
+    ApplyLoadingCrashPatch ();
+
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook ( );
     m_pDirect3DHookManager->ApplyHook ( );
@@ -1664,4 +1666,32 @@ void CCore::UpdateRecentlyPlayed()
     }
     //Save our configuration file
     CCore::GetSingleton ().SaveConfig ();
+}
+
+
+//
+// Patch to fix loading crash.
+// Has to be done before the main window is created.
+//
+void CCore::ApplyLoadingCrashPatch ( void )
+{
+    uchar* pAddress = (uchar*)0x7468F9;
+    uchar ucOldValue = 183;
+    uchar ucNewValue = 57;
+
+    MEMORY_BASIC_INFORMATION info;
+    VirtualQuery( pAddress, &info, sizeof(MEMORY_BASIC_INFORMATION) );
+
+    if ( info.State == MEM_COMMIT && info.Protect & ( PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_READONLY | PAGE_READWRITE ) )
+    {
+        if ( pAddress[0] == ucOldValue )
+        {
+            DWORD dwOldProtect;
+            if ( VirtualProtect( pAddress, 1, PAGE_READWRITE, &dwOldProtect ) )
+            {
+                pAddress[0] = ucNewValue;
+                VirtualProtect( pAddress, 1, dwOldProtect, &dwOldProtect );
+            }
+        }
+    }
 }
