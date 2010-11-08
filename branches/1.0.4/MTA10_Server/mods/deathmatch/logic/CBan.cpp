@@ -46,8 +46,8 @@ SString CBan::GetDurationDesc( void )
 SString CBan::GetReasonText( void ) const
 {
     // Remove after first '(' because of extra info added by admin panel
-    int iPos = m_strReason.find_first_of ( " (" );
-    if ( iPos != std::string::npos )
-        return m_strReason.substr ( 0, iPos );
+    size_t pos = m_strReason.find_first_of ( " (" );
+    if ( pos != std::string::npos )
+        return m_strReason.substr ( 0, pos );
     return m_strReason;
 }

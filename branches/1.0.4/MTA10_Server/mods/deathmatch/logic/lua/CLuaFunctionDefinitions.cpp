@@ -9327,7 +9327,7 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
     lua_settable ( luaVM, -3 );
 
     // strtok until we're out of tokens
-    while ( szToken = strtok ( NULL, szDelimiter ) )
+    while ( ( szToken = strtok ( NULL, szDelimiter ) ) )
     {
         // Add the token to the table
         lua_pushnumber ( luaVM, ++uiCount );
@@ -10298,7 +10298,7 @@ int CLuaFunctionDefinitions::AddAccount ( lua_State* luaVM )
             const char* szPassword = lua_tostring ( luaVM, 2 );
 
             CAccount* pAccount;
-            if ( pAccount = CStaticFunctionDefinitions::AddAccount ( szName, szPassword ) )
+            if ( ( pAccount = CStaticFunctionDefinitions::AddAccount ( szName, szPassword ) ) )
             {
                 lua_pushaccount ( luaVM, pAccount );
                 return 1;
@@ -10647,7 +10647,7 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
             if ( pPlayer )
             {
                 CBan* pBan = NULL;
-                if ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, szReason, tUnban ) )
+                if ( ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, szReason, tUnban ) ) )
                 {
                     lua_pushban ( luaVM, pBan );
                     return 1;
@@ -10709,7 +10709,7 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
         }
 
         CBan* pBan = NULL;
-        if ( pBan = CStaticFunctionDefinitions::AddBan ( szIP, szUsername, szSerial, pResponsible, szReason, tUnban ) )
+        if ( ( pBan = CStaticFunctionDefinitions::AddBan ( szIP, szUsername, szSerial, pResponsible, szReason, tUnban ) ) )
         {
             lua_pushban ( luaVM, pBan );
             return 1;
@@ -11173,7 +11173,7 @@ int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
             } else {
                 // We need to return multiply entries, so push all subnodes
                 char *szDataValue;
-                while ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) {
+                while ( ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) ) {
                     PUSH_SETTING ( pSubNode, szDataValue );
                 }
                 // Push a table and return

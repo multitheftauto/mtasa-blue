@@ -796,10 +796,10 @@ void CPerfStatManagerImpl::GetLibMemoryStats ( CPerfStatResult* pResult, const s
                 bool bModDir;
                 const char* szName;
             } libs [] = {
-                            false,  "core",
-                            true,   "deathmatch",
-                            false,  "net",
-                            false,  "xmll",
+                            { false,  "core", },
+                            { true,   "deathmatch", },
+                            { false,  "net", },
+                            { false,  "xmll", },
                         };
 
             for ( unsigned int i = 0 ; i < NUMELMS ( libs ) ; i++ )
