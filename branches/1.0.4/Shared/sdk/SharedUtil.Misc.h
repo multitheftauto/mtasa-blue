@@ -150,19 +150,32 @@ namespace SharedUtil
     //
 
     //
-    // std::list helpers
+    // std:: container helpers
     //
 
-    // Returns true if the item is in the itemList
-    template < class T >
-    bool ListContains ( const std::list < T >& itemList, const T& item )
+    // Add item if it does not aleady exist in itemList
+    template < class TL, class T >
+    void ListAddUnique ( TL& itemList, const T& item )
     {
-        typename std::list < T > ::const_iterator it = itemList.begin ();
+        if ( !ListContains ( itemList, item ) )
+            itemList.push_back ( item );
+    }
+
+    // Returns true if the item is in the itemList
+    template < class TL, class T >
+    bool ListContains ( const TL& itemList, const T& item )
+    {
+        typename TL ::const_iterator it = itemList.begin ();
         for ( ; it != itemList.end () ; ++it )
             if ( item == *it )
                 return true;
         return false;
     }
+
+
+    //
+    // std::list helpers
+    //
 
     // Remove first occurrence of item from itemList
     template < class T >
@@ -175,17 +188,6 @@ namespace SharedUtil
     //
     // std::vector helpers
     //
-
-    // Returns true if the item is in the itemList
-    template < class T >
-    bool ListContains ( const std::vector < T >& itemList, const T& item )
-    {
-        typename std::vector < T > ::const_iterator it = itemList.begin ();
-        for ( ; it != itemList.end () ; ++it )
-            if ( item == *it )
-                return true;
-        return false;
-    }
 
     // Remove first occurrence of item from itemList
     template < class T >

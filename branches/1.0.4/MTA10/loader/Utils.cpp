@@ -12,6 +12,9 @@
 
 #include "StdInc.h"
 #include <assert.h>
+#include <tchar.h>
+#include <strsafe.h>
+#define BUFSIZE 512
 
 static bool bCancelPressed = false;
 static bool bOkPressed = false;
@@ -98,49 +101,245 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 }
 
 
-bool TerminateGTAIfRunning ( void )
+///////////////////////////////////////////////////////////////////////////
+//
+// devicePathToWin32Path
+//
+// Code from the merky depths of MSDN
+//
+///////////////////////////////////////////////////////////////////////////
+SString devicePathToWin32Path ( const SString& strDevicePath ) 
 {
-    DWORD dwProcessIDs[250];
-    DWORD pBytesReturned = 0;
-    unsigned int uiListSize = 50;
-    if ( EnumProcesses ( dwProcessIDs, 250 * sizeof(DWORD), &pBytesReturned ) )
-    {
-        for ( unsigned int i = 0; i < pBytesReturned / sizeof ( DWORD ); i++ )
-        {
-            // Skip 64 bit processes to avoid errors
-            if ( !Is32bitProcess ( dwProcessIDs[i] ) )
-                continue;
-            // Open the process
-            HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, dwProcessIDs[i]);
-            if ( hProcess )
-            {
-                HMODULE pModule;
-                DWORD cbNeeded;
-                if ( EnumProcessModules ( hProcess, &pModule, sizeof ( HMODULE ), &cbNeeded ) )
-                {
-                    char szModuleName[500];
-                    if ( GetModuleFileNameEx( hProcess, pModule, szModuleName, 500 ) )
-                    {
-                        if ( strcmpi ( szModuleName + strlen ( szModuleName ) - strlen ( "gta_sa.exe" ), "gta_sa.exe" ) == 0 )
-                        {
-                            if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA: SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION ) == IDYES )
-                            {
-                                TerminateProcess ( hProcess, 0 );
-                                CloseHandle ( hProcess );
-                                return true;
-                            }
+    TCHAR pszFilename[MAX_PATH+2];
+    strncpy ( pszFilename, strDevicePath, MAX_PATH );
+    pszFilename[MAX_PATH] = 0;
 
-                            return false;
-                        } 
+    // Translate path with device name to drive letters.
+    TCHAR szTemp[BUFSIZE];
+    szTemp[0] = '\0';
+
+    if (GetLogicalDriveStrings(BUFSIZE-1, szTemp)) 
+    {
+        TCHAR szName[MAX_PATH];
+        TCHAR szDrive[3] = TEXT(" :");
+        BOOL bFound = FALSE;
+        TCHAR* p = szTemp;
+
+        do 
+        {
+            // Copy the drive letter to the template string
+            *szDrive = *p;
+
+            // Look up each device name
+            if (QueryDosDevice(szDrive, szName, MAX_PATH))
+            {
+                UINT uNameLen = _tcslen(szName);
+
+                if (uNameLen < MAX_PATH) 
+                {
+                    bFound = _tcsnicmp(pszFilename, szName, uNameLen) == 0;
+
+                    if (bFound && *(pszFilename + uNameLen) == _T('\\')) 
+                    {
+                        // Reconstruct pszFilename using szTempFile
+                        // Replace device path with DOS path
+                        TCHAR szTempFile[MAX_PATH];
+                        StringCchPrintf(szTempFile,
+                        MAX_PATH,
+                        TEXT("%s%s"),
+                        szDrive,
+                        pszFilename+uNameLen);
+                        StringCchCopyN(pszFilename, MAX_PATH+1, szTempFile, _tcslen(szTempFile));
                     }
                 }
+            }
+            // Go to the next NULL character.
+            while (*p++);
 
-                // Close the process
-                CloseHandle ( hProcess );
+        } while (!bFound && *p); // end of string
+    }
+    return pszFilename;
+}
+
+
+typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameA)(__in HANDLE hProcess, __in DWORD dwFlags, __out_ecount_part(*lpdwSize, *lpdwSize) LPSTR lpExeName, __inout PDWORD lpdwSize);
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetPossibleProcessPathFilenames
+//
+// Get all image names for a processID
+//
+///////////////////////////////////////////////////////////////////////////
+std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
+{
+    static LPFN_QueryFullProcessImageNameA fnQueryFullProcessImageNameA = NULL;
+    static bool bDoneGetProcAddress = false;
+
+    std::vector < SString > result;
+
+    if ( !bDoneGetProcAddress )
+    {
+        // Find 'QueryFullProcessImageNameA'
+        bDoneGetProcAddress = true;
+        HMODULE hModule = GetModuleHandle ( "Kernel32.dll" );
+        fnQueryFullProcessImageNameA = static_cast < LPFN_QueryFullProcessImageNameA > ( static_cast < PVOID > ( GetProcAddress( hModule, "QueryFullProcessImageNameA" ) ) );
+    }
+
+    if ( fnQueryFullProcessImageNameA )
+    {
+        for ( int i = 0 ; i < 2 ; i++ )
+        {
+            HANDLE hProcess = OpenProcess ( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
+
+            if ( hProcess )
+            {
+                TCHAR szProcessName[MAX_PATH] = TEXT("");
+                DWORD dwSize = sizeof(szProcessName)/sizeof(TCHAR);
+                DWORD bOk = fnQueryFullProcessImageNameA ( hProcess, 0, szProcessName, &dwSize );
+                CloseHandle( hProcess );
+
+                if ( bOk && strlen ( szProcessName ) > 0 )
+                    ListAddUnique ( result, SString ( SStringX ( szProcessName ) ) );
             }
         }
     }
 
+    {
+        HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
+
+        if ( hProcess )
+        {
+            TCHAR szProcessName[MAX_PATH] = TEXT("");
+            DWORD bOk = GetModuleFileNameEx ( hProcess, NULL, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+            CloseHandle ( hProcess );
+
+            if ( bOk && strlen ( szProcessName ) > 0 )
+                ListAddUnique ( result, SString ( SStringX ( szProcessName ) ) );
+        }
+    }
+
+    for ( int i = 0 ; i < 2 ; i++ )
+    {
+        HANDLE hProcess = OpenProcess ( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
+
+        if ( hProcess )
+        {
+            TCHAR szProcessName[MAX_PATH] = TEXT("");
+            DWORD bOk = GetProcessImageFileName ( hProcess, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+            CloseHandle( hProcess );
+
+            if ( bOk && strlen ( szProcessName ) > 0 )
+                ListAddUnique ( result, SString ( SStringX ( devicePathToWin32Path ( szProcessName ) ) ) );
+        }
+    }
+
+    return result;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// MyEnumProcesses
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+std::vector < DWORD > MyEnumProcesses ( void )
+{
+    uint uiSize = 200;
+    std::vector < DWORD > processIdList;
+    while ( true )
+    {
+        processIdList.resize ( uiSize );
+        DWORD pBytesReturned = 0;
+        if ( !EnumProcesses ( &processIdList[0], uiSize * sizeof(DWORD), &pBytesReturned ) )
+        {
+            processIdList.clear ();
+            break;
+        }
+        uint uiNumProcessIds = pBytesReturned / sizeof(DWORD);
+
+        if ( uiNumProcessIds != uiSize )
+        {
+            processIdList.resize ( uiNumProcessIds );
+            break;
+        }
+
+        uiSize *= 2;
+    }
+
+    return processIdList;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetGTAProcessList
+//
+// Get list of process id's with the image name ending in "gta_sa.exe"
+//
+///////////////////////////////////////////////////////////////////////////
+std::vector < DWORD > GetGTAProcessList ( void )
+{
+    std::vector < DWORD > result;
+
+    uint uiNumFound = 0;
+    std::vector < DWORD > processIdList = MyEnumProcesses ();
+    for ( uint i = 0; i < processIdList.size (); i++ )
+    {
+        DWORD processId = processIdList[i];
+        // Skip 64 bit processes to avoid errors
+        if ( !Is32bitProcess ( processId ) )
+            continue;
+
+        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
+        for ( uint i = 0; i < filenameList.size (); i++ )
+            if ( filenameList[i].EndsWith ( "gta_sa.exe" ) )
+                result.push_back ( processId );
+    }
+    return result;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// TerminateGTAIfRunning
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+bool TerminateGTAIfRunning ( void )
+{
+    std::vector < DWORD > processIdList = GetGTAProcessList ();
+
+    if ( processIdList.size () )
+    {
+        if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION ) == IDNO )
+            return false;
+
+        // Try to stop all GTA process id's
+        for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
+        {
+            for ( std::vector < DWORD > ::iterator iter = processIdList.begin () ; iter != processIdList.end (); ++iter )
+            {
+                HANDLE hProcess = OpenProcess ( PROCESS_TERMINATE, 0, *iter );
+                if ( hProcess )
+                {
+                    TerminateProcess ( hProcess, 0 );
+                    CloseHandle ( hProcess );
+                }
+            }
+            Sleep ( 1000 );
+            processIdList = GetGTAProcessList ();
+        }
+
+        if ( processIdList.size () )
+        {
+            MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_YESNO | MB_ICONQUESTION );
+            return false;
+        }
+    }
     return true;
 }
 
