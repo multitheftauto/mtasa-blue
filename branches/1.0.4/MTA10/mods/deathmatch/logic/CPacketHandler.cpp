@@ -3692,23 +3692,26 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
         // * Ping compensation *
         // Vehicle or player?
         CClientPlayer * pLocalPlayer = g_pClientGame->GetLocalPlayer ();
-        if ( pLocalPlayer->GetOccupiedVehicleSeat () == 0 )
-            pMovedEntity = pLocalPlayer->GetRealOccupiedVehicle ();
-        if ( !pMovedEntity )
-            pMovedEntity = pLocalPlayer;
-
-        // Warp back in time to where we were when this explosion happened
-        unsigned short usLatency = ( unsigned short ) g_pNet->GetPing ();
-        if ( pCreator && pCreator != g_pClientGame->GetLocalPlayer () )
-            usLatency = pCreator->GetLatency ();
-        CVector vecWarpPosition;
-        if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecWarpPosition, usLatency ) )
+        if ( pLocalPlayer )
         {
-            pMovedEntity->GetPosition ( vecRestorePosition );
-            pMovedEntity->SetPosition ( vecWarpPosition );
+            if ( pLocalPlayer->GetOccupiedVehicleSeat () == 0 )
+                pMovedEntity = pLocalPlayer->GetRealOccupiedVehicle ();
+            if ( !pMovedEntity )
+                pMovedEntity = pLocalPlayer;
+
+            // Warp back in time to where we were when this explosion happened
+            unsigned short usLatency = ( unsigned short ) g_pNet->GetPing ();
+            if ( pCreator && pCreator != g_pClientGame->GetLocalPlayer () )
+                usLatency = pCreator->GetLatency ();
+            CVector vecWarpPosition;
+            if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecWarpPosition, usLatency ) )
+            {
+                pMovedEntity->GetPosition ( vecRestorePosition );
+                pMovedEntity->SetPosition ( vecWarpPosition );
+            }
+            else
+                pMovedEntity = NULL;
         }
-        else
-            pMovedEntity = NULL;
     }
 
     eExplosionType Type = static_cast < eExplosionType > ( explosionType.data.uiType );
