@@ -56,7 +56,7 @@ public:
     static CClientEntity*               GetElementChild                     ( CClientEntity& Entity, unsigned int uiIndex );
     static bool                         GetElementMatrix                    ( CClientEntity& Entity, CMatrix& matrix );
     static bool                         GetElementPosition                  ( CClientEntity& Entity, CVector & vecPosition );
-    static bool                         GetElementRotation                  ( CClientEntity& Entity, CVector & vecRotation );
+    static bool                         GetElementRotation                  ( CClientEntity& Entity, CVector & vecRotation, const char* szRotationOrder );
     static bool                         GetElementVelocity                  ( CClientEntity& Entity, CVector& vecVelocity );
     static bool                         GetElementInterior                  ( CClientEntity& Entity, unsigned char& ucInterior );
     static bool                         GetElementZoneName                  ( CClientEntity& Entity, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly = false );
@@ -79,7 +79,7 @@ public:
     static bool                         SetElementData                      ( CClientEntity& Entity, const char* szName, CLuaArgument& Variable, CLuaMain& LuaMain, bool bSynchronize );
     static bool                         RemoveElementData                   ( CClientEntity& Entity, const char* szName );
     static bool                         SetElementPosition                  ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true );
-    static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation );
+    static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder );
     static bool                         SetElementVelocity                  ( CClientEntity& Element, const CVector& vecVelocity );
     static bool                         SetElementParent                    ( CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain );
     static bool                         SetElementInterior                  ( CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );

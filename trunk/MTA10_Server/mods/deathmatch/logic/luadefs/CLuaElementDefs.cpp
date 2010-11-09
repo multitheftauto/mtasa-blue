@@ -527,11 +527,18 @@ int CLuaElementDefs::getElementRotation ( lua_State* luaVM )
     {
         // Grab the element, verify it
         CElement* pElement = lua_toelement ( luaVM, 1 );
+
+        const char* szRotationOrder = "default";
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) 
+        {
+            szRotationOrder = lua_tostring ( luaVM, 2 );
+        }
+
         if ( pElement )
         {
             // Grab the rotation
             CVector vecRotation;
-            if ( CStaticFunctionDefinitions::GetElementRotation ( pElement, vecRotation ) )
+            if ( CStaticFunctionDefinitions::GetElementRotation ( pElement, vecRotation, szRotationOrder ) )
             {
                 // Return it
                 lua_pushnumber ( luaVM, vecRotation.fX );
@@ -1486,8 +1493,15 @@ int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
                 CVector vecRotation = CVector ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
                                                 static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
                                                 static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
+
+                const char* szRotationOrder = "default";
+                if ( lua_type ( luaVM, 5 ) == LUA_TSTRING ) 
+                {
+                    szRotationOrder = lua_tostring ( luaVM, 5 );
+                }
+
                 // Set the rotation
-                if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation ) )
+                if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, szRotationOrder ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;

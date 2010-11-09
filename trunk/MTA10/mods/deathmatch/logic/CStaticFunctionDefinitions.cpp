@@ -293,8 +293,14 @@ bool CStaticFunctionDefinitions::GetElementPosition ( CClientEntity& Entity, CVe
 }
 
 
-bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVector& vecRotation )
+bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVector& vecRotation, const char* szRotationOrder)
 {
+    eEulerRotationOrder desiredRotOrder = EulerRotationOrderFromString(szRotationOrder);
+    if (desiredRotOrder == EULER_INVALID)
+    {
+        return false;
+    }
+
     int iType = Entity.GetType ();
     switch ( iType )
     {
@@ -309,18 +315,34 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             if ( vecRotation.fZ < 0 )
                 vecRotation.fZ = 360 + vecRotation.fZ;
 
+            if (desiredRotOrder != EULER_DEFAULT)
+            {
+                //In get, ped is Z-Y-X wheras in set it's -Z-Y-Z
+                //It's a bug in ped, but the goal here is not to fix it, so we hack
+                vecRotation.fZ = -vecRotation.fZ;
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_MINUS_ZYX, desiredRotOrder);
+            }
+
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
             Vehicle.GetRotationDegrees ( vecRotation );
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZYX)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZYX, desiredRotOrder);
+            }
             break;
         }
         case CCLIENTOBJECT:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             Object.GetRotationDegrees ( vecRotation );
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            }
             break;
         }
         case CCLIENTPROJECTILE:
@@ -834,9 +856,15 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CClientEntity& Entity, con
 }
 
 
-bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, const CVector& vecRotation )
+bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder )
 {
-    RUN_CHILDREN SetElementRotation ( **iter, vecRotation );
+    RUN_CHILDREN SetElementRotation ( **iter, vecRotation, szRotationOrder);
+
+    eEulerRotationOrder argumentRotOrder = EulerRotationOrderFromString(szRotationOrder);
+    if (argumentRotOrder == EULER_INVALID)
+    {
+        return false;
+    }
 
     int iType = Entity.GetType ();
     switch ( iType )
@@ -845,23 +873,47 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
         case CCLIENTPLAYER:
         {
             CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-            Ped.SetRotationDegrees ( vecRotation );
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_MINUS_ZYX)
+            {
+                Ped.SetRotationDegrees ( vecRotation );
+            }
+            else
+            {
+                Ped.SetRotationDegrees ( ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_MINUS_ZYX ) );
+            }
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.SetRotationDegrees ( vecRotation );            
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZYX)
+            {
+                Vehicle.SetRotationDegrees ( vecRotation );
+            }
+            else
+            {
+                Vehicle.SetRotationDegrees ( ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZYX ) );            
+            }
+			
             break;
         }
         case CCLIENTOBJECT:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            Object.SetRotationDegrees ( vecRotation );
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
+            {
+                Object.SetRotationDegrees ( vecRotation );
+            }
+            else
+            {
+                Object.SetRotationDegrees ( ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY ) );
+            }
+            
             break;
         }
         case CCLIENTPROJECTILE:
         {
+            //Didn't implement anything for projectiles since I couldn't really test (only non crashing element was satchel and its rotation is ugly)
             CClientProjectile& Projectile = static_cast < CClientProjectile& > ( Entity );
             Projectile.SetRotationDegrees ( const_cast < CVector& > ( vecRotation ) );
             break;
