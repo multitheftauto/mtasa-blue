@@ -67,6 +67,9 @@ public:
     void                Printf              ( const char* szText, ... );
 
     int                 Run                 ( int iArgumentCount, char* szArguments [] );
+#ifndef WIN32
+    void                Daemonize           () const;
+#endif
 
 private:
     void                MainLoop            ( void );
