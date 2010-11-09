@@ -232,10 +232,20 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
         {    
             // Got a collision?
             CVector vecColPosition;
+            CVector vecColNormal;
+
+            int iMaterial = -1;
+            int iLighting = -1;
+            int iPiece = -1;
+
             if ( pColPoint )
             {
                 // Get the collision position
                 vecColPosition = *pColPoint->GetPosition ();
+                vecColNormal = *pColPoint->GetNormal();
+                iMaterial = pColPoint->GetSurfaceTypeB(); //From test, only B function return relevant data
+                iLighting = pColPoint->GetLightingB();
+                iPiece = pColPoint->GetPieceTypeB();
 
                 // Delete the colpoint
                 pColPoint->Destroy ();
@@ -247,11 +257,21 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
                 lua_pushnumber ( luaVM, vecColPosition.fX );
                 lua_pushnumber ( luaVM, vecColPosition.fY );
                 lua_pushnumber ( luaVM, vecColPosition.fZ );
+
                 if ( pColEntity )
                     lua_pushelement ( luaVM, pColEntity );
                 else
                     lua_pushnil ( luaVM );
-                return 5;
+
+                lua_pushnumber ( luaVM, vecColNormal.fX );
+                lua_pushnumber ( luaVM, vecColNormal.fY );
+                lua_pushnumber ( luaVM, vecColNormal.fZ );
+
+                lua_pushinteger ( luaVM, iMaterial );
+                lua_pushinteger ( luaVM, iLighting );
+                lua_pushinteger ( luaVM, iPiece );
+
+                return 11;
             }
             return 1;
         }
