@@ -169,7 +169,7 @@ public:
             return false;
 
         if ( usLength )
-        {
+            {
             // Read the data
             char* buffer = static_cast < char* > ( alloca ( usLength ) );
             if ( !Read ( buffer, usLength ) )

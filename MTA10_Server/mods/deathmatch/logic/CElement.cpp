@@ -1122,7 +1122,8 @@ void CElement::GetAttachedPosition ( CVector & vecPosition )
         m_pAttachedTo->GetRotation ( vecRotation );
         
         CVector vecPositionOffset = m_vecAttachedPosition;
-        RotateVector ( vecPositionOffset, vecRotation );
+        // This works when rotating around z axis. Other axes need testing.
+        RotateVector ( vecPositionOffset, CVector ( vecRotation.fX, vecRotation.fY, -vecRotation.fZ ) );
         vecPosition += vecPositionOffset;
     }
 }

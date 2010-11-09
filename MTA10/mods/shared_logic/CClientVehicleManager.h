@@ -63,14 +63,10 @@ public:
 
     void                            RestreamVehicles        ( unsigned short usModel );
 
-    std::vector < CClientVehicle* > ::iterator            IterGet             ( CClientVehicle* pVehicle );
-    std::vector < CClientVehicle* > ::reverse_iterator    IterGetReverse      ( CClientVehicle* pVehicle );
-    std::vector < CClientVehicle* > ::iterator            IterBegin           ( void )    { return m_List.begin (); };
-    std::vector < CClientVehicle* > ::iterator            IterEnd             ( void )    { return m_List.end (); };
-    std::vector < CClientVehicle* > ::reverse_iterator    IterReverseBegin    ( void )    { return m_List.rbegin (); };
-    std::vector < CClientVehicle* > ::reverse_iterator    IterReverseEnd      ( void )    { return m_List.rend (); };
-    std::vector < CClientVehicle* > ::iterator            StreamedBegin       ( void )    { return m_StreamedIn.begin (); };
-    std::vector < CClientVehicle* > ::iterator            StreamedEnd         ( void )    { return m_StreamedIn.end (); };
+    std::vector < CClientVehicle* > ::const_iterator            IterBegin           ( void )    { return m_List.begin (); };
+    std::vector < CClientVehicle* > ::const_iterator            IterEnd             ( void )    { return m_List.end (); };
+    std::vector < CClientVehicle* > ::const_iterator            StreamedBegin       ( void )    { return m_StreamedIn.begin (); };
+    std::vector < CClientVehicle* > ::const_iterator            StreamedEnd         ( void )    { return m_StreamedIn.end (); };
     
 private:
                                     CClientVehicleManager   ( CClientManager* pManager );
@@ -84,7 +80,7 @@ private:
 
     CClientManager*                 m_pManager;
     bool                            m_bCanRemoveFromList;
-    std::vector < CClientVehicle* >   m_List;
+    CMappedArray < CClientVehicle* >  m_List;
     std::vector < CClientVehicle* >   m_StreamedIn;
     std::list < CClientVehicle* >   m_Attached;
 

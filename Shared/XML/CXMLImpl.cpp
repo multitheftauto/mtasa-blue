@@ -11,6 +11,15 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define ALLOC_STATS_MODULE_NAME "xml"
+/*
+From 1.0.4 - maybe needed ?
+#include <sys/stat.h>
+#ifndef MAX_PATH
+#define MAX_PATH 260
+#endif
+*/
+#include "SharedUtil.hpp"
 
 CXMLImpl::CXMLImpl ( void )
 {

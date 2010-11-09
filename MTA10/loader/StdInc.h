@@ -15,7 +15,4 @@
 #include "Main.h"
 #include "Install.h"
 #include "Utils.h"
-
-int     HasUsersGotFullAccess   ( const char* argv1 );
-char*   ParseSid                ( const TCHAR * trustee );
-int     DoSetOnFile             ( bool bYesInherit, const std::string& strFilename, const std::string& strTrustee, const std::string& strPermissions );
+#include "..\version.h"

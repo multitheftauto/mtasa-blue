@@ -49,20 +49,7 @@ void CClientGUIManager::DeleteAll ( void )
 
 bool CClientGUIManager::Exists ( CClientGUIElement* pGUIElement )
 {
-    if ( pGUIElement ) {
-        // Find the object in the list
-        list < CClientGUIElement* > ::const_iterator iter = m_Elements.begin ();
-        for ( ; iter != m_Elements.end (); iter++ )
-        {
-            if ( *iter == pGUIElement )
-            {
-                return true;
-            }
-        }
-    }
-
-    // Doesn't exist
-    return false;
+    return m_Elements.Contains ( pGUIElement );
 }
 
 

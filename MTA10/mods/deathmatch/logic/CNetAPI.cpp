@@ -59,6 +59,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                 }
             }
 
+            m_ulLastSyncReturnTime = CClientTime::GetTime ();   // Network trouble fix test
             return true;
         }
 

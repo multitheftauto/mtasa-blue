@@ -1165,7 +1165,7 @@ int CLuaElementDefs::getElementSyncer ( lua_State* luaVM )
         if ( pElement )
         {
             CElement* pSyncer = NULL;
-            if ( pSyncer = CStaticFunctionDefinitions::GetElementSyncer ( pElement ) )
+            if ( ( pSyncer = CStaticFunctionDefinitions::GetElementSyncer ( pElement ) ) )
             {
                 lua_pushelement ( luaVM, pSyncer );
                 return 1;

@@ -26,6 +26,9 @@ bool TerminateProcessFromPathFilename ( const SString& strPathFilename )
             DWORD id2 = dwProcessIDs[i];
             if ( id2 == id1 )
                 continue;
+            // Skip 64 bit processes to avoid errors
+            if ( !Is32bitProcess ( dwProcessIDs[i] ) )
+                continue;
             // Open the process
             HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, dwProcessIDs[i]);
             if ( hProcess )
@@ -65,39 +68,42 @@ struct SFileItem
 
 ///////////////////////////////////////////////////////////////
 //
-// InstallFiles
+// DoInstallFiles
 //
 // Copy directory tree at current dirctory to GetMTASAPath ()
 //
 ///////////////////////////////////////////////////////////////
-bool InstallFiles ( void )
+bool DoInstallFiles ( void )
 {
-    SString strCurrentDir = ConformPath ( GetCurrentDir () );
+    SString strCurrentDir = PathConform ( GetCurrentWorkingDirectory () );
 
-    const SString strMTASAPath = ConformPath ( GetMTASAPath () );
+    const SString strMTASAPath = PathConform ( GetMTASAPath () );
 
-    // Calc some path stuff
-    SString strTempMid = SString ( strCurrentDir.substr ( strMTASAPath.length () ) ).TrimStart ( "\\" );
-    SString strBakMid = strTempMid + "_bak_";
+    SString path1, path2;
+    strCurrentDir.Split ( "\\", &path1, &path2, -1 );
+
+    SString strDestRoot = strMTASAPath;
+    SString strSrcRoot = strCurrentDir;
+    SString strBakRoot = MakeUniquePath ( strCurrentDir + "_bak_" );
 
     // Clean backup dir
+    if ( !MkDir ( strBakRoot ) )
     {
-        SString strBackupPath = PathJoin ( strMTASAPath, strBakMid );
-        DelTree ( strBackupPath, strMTASAPath );
-        MkDir ( strBackupPath );
+        AddReportLog ( 5020, SString ( "InstallFiles: Couldn't make dir '%s'", strBakRoot.c_str () ) );
+        return false;
     }
 
     // Get list of files to install
     std::vector < SFileItem > itemList;
     {
         std::vector < SString > fileList;
-        FindFilesRecursive ( strCurrentDir, fileList );
+        FindFilesRecursive ( PathJoin ( strCurrentDir, "*" ), fileList );
         for ( unsigned int i = 0 ; i < fileList.size () ; i++ )
         {
             SFileItem item;
-            item.strSrcPathFilename = ConformPath ( fileList[i] );
-            item.strDestPathFilename = ConformPath ( fileList[i].Replace ( strTempMid, "" ) );
-            item.strBackupPathFilename = ConformPath ( fileList[i].Replace ( strTempMid, strBakMid ) );
+            item.strSrcPathFilename = PathConform ( fileList[i] );
+            item.strDestPathFilename = PathConform ( fileList[i].Replace ( strSrcRoot, strDestRoot ) );
+            item.strBackupPathFilename = PathConform ( fileList[i].Replace ( strSrcRoot, strBakRoot ) );
             itemList.push_back ( item );
         }
     }
@@ -115,7 +121,14 @@ bool InstallFiles ( void )
     for ( unsigned int i = 0 ; i < itemList.size () ; i++ )
     {
         if ( !FileCopy ( itemList[i].strDestPathFilename, itemList[i].strBackupPathFilename ) )
-            return false;
+        {
+            if ( FileExists ( itemList[i].strDestPathFilename ) )
+            {
+                AddReportLog ( 5021, SString ( "InstallFiles: Couldn't backup '%s' to '%s'", itemList[i].strDestPathFilename.c_str (), itemList[i].strBackupPathFilename.c_str () ) );
+                return false;
+            }
+            AddReportLog ( 4023, SString ( "InstallFiles: Couldn't backup '%s' as it does not exist", itemList[i].strDestPathFilename.c_str () ) );
+        }
     }
 
     // Try copy new files
@@ -125,6 +138,7 @@ bool InstallFiles ( void )
     {
         if ( !FileCopy ( itemList[i].strSrcPathFilename, itemList[i].strDestPathFilename ) )
         {
+            AddReportLog ( 5022, SString ( "InstallFiles: Couldn't copy '%s' to '%s'", itemList[i].strSrcPathFilename.c_str (), itemList[i].strDestPathFilename.c_str () ) );
             bOk = false;
             break;
         }
@@ -145,19 +159,40 @@ bool InstallFiles ( void )
 
                 if ( !--iRetryCount )
                 {
+                    AddReportLog ( 5023, SString ( "InstallFiles: Possible disaster restoring '%s' to '%s'", itemList[i].strBackupPathFilename.c_str (), itemList[i].strDestPathFilename.c_str () ) );
                     bPossibleDisaster = true;
                     break;
                 }
             }
         }
 
-        if ( bPossibleDisaster )
-            MessageBox ( NULL, "Installation may be corrupt. Please redownload from www.mtasa.com", "Error", MB_OK | MB_ICONERROR );
-        else 
-            MessageBox ( NULL, "Could not update due to file conflicts.", "Error", MB_OK | MB_ICONERROR );
+        //if ( bPossibleDisaster )
+        //    MessageBox ( NULL, "Installation may be corrupt. Please redownload from www.mtasa.com", "Error", MB_OK | MB_ICONERROR );
+        //else 
+        //    MessageBox ( NULL, "Could not update due to file conflicts.", "Error", MB_OK | MB_ICONERROR );
     }
 
     // Launch MTA_EXE_NAME
     return bOk;
 }
 
+
+///////////////////////////////////////////////////////////////
+//
+// InstallFiles
+//
+// Handle progress bar if required
+//
+///////////////////////////////////////////////////////////////
+bool InstallFiles ( bool bSilent )
+{
+    // Start progress bar
+    if ( !bSilent )
+       StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Installing update..." );
+
+    bool bResult = DoInstallFiles ();
+
+    // Stop progress bar
+    StopPseudoProgress();
+    return bResult;
+}

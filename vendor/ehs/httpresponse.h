@@ -7,6 +7,7 @@
 #pragma warning(disable : 4786)
 #endif
 
+#include "SharedUtil.h"
 #include <map>
 #include <list>
 #include <string>

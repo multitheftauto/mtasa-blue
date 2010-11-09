@@ -69,7 +69,7 @@ private:
 
     class CScriptDebugging*                     m_pScriptDebugging;
 
-    std::list < CPlayer* >                      m_Players;
+    CMappedList < CPlayer* >                    m_Players;
     bool                                        m_bCanRemoveFromList;
 };
 

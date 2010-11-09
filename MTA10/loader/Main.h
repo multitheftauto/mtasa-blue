@@ -19,6 +19,7 @@
 #define MTA_GTASTEAMEXE_NAME "gta-sa.exe"
 #define MTA_GUID "Global\\{4962AF5F-5D82-412D-9CCA-AB8BB9DBD353}"
 #define URI_CONNECT 1
+#define MTA_EXE_NAME_RELEASE "Multi Theft Auto.exe"
 
 #ifdef MTA_DEBUG
     #define MTA_EXE_NAME            "Multi Theft Auto_d.exe"

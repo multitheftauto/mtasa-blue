@@ -158,6 +158,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;../../../vendor/sqlite;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
@@ -509,6 +510,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CDynamicLibrary.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CElement.cpp"
 					>
 				</File>
@@ -614,6 +619,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPedSync.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStatManager.cpp"
 					>
 				</File>
 				<File
@@ -932,6 +941,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerDiagnosticPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerDisconnectedPacket.cpp"
 						>
 					</File>
@@ -969,6 +982,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPlayerTimeoutPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CPlayerTransgressionPacket.cpp"
 						>
 					</File>
 					<File
@@ -1522,6 +1539,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CDynamicLibrary.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CElement.h"
 					>
 				</File>
@@ -1631,6 +1652,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPedSync.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStatManager.h"
 					>
 				</File>
 				<File
@@ -1969,6 +1994,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerDiagnosticPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerDisconnectedPacket.h"
 						>
 					</File>
@@ -2006,6 +2035,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPlayerTimeoutPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CPlayerTransgressionPacket.h"
 						>
 					</File>
 					<File

@@ -1,3 +1,3 @@
 
 
-bool InstallFiles ( void );
+bool InstallFiles ( bool bSilent );

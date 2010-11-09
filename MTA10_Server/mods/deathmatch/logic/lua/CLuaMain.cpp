@@ -16,6 +16,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
 
 static CLuaManager* m_pLuaManager;
 
@@ -76,6 +77,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     m_pVehicleManager = pVehicleManager;
     m_pBlipManager = pBlipManager;
     m_pMapManager = pMapManager;
+
+    GetPerfStatManager ()->OnLuaMainCreate ( this );
 }
 
 
@@ -111,6 +114,8 @@ CLuaMain::~CLuaMain ( void )
     {
         delete *iterItems;
     }
+
+    GetPerfStatManager ()->OnLuaMainDestroy ( this );
 }
 
 bool CLuaMain::BeingDeleted ( void )
@@ -434,4 +439,64 @@ bool CLuaMain::TextItemExists ( CTextItem* pTextItem )
     }
 
     return false;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::GetFunctionTag
+//
+// Turn iFunctionNumber into something human readable
+//
+///////////////////////////////////////////////////////////////
+const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
+{
+    // Find existing
+    SString* pTag = MapFind ( m_FunctionTagMap, iLuaFunction );
+#ifndef MTA_DEBUG
+    if ( !pTag )
+#endif
+    {
+        // Create if required
+        SString strText;
+
+        lua_Debug debugInfo;
+        lua_getref ( m_luaVM, iLuaFunction );
+        if ( lua_getinfo( m_luaVM, ">nlS", &debugInfo ) )
+        {
+            // Make sure this function isn't defined in a string
+            if ( debugInfo.source[0] == '@' )
+            {
+                //std::string strFilename2 = ConformResourcePath ( debugInfo.source );
+                SString strFilename = debugInfo.source;
+
+                int iPos = strFilename.find_last_of ( '/' );
+                if ( iPos >= 0 )
+                    strFilename = strFilename.substr ( iPos + 1 );
+
+                strText = SString ( "@%s:%d", strFilename.c_str (), debugInfo.currentline, iLuaFunction );
+            }
+            else
+            {
+                strText = SString ( "@func_%d %s", iLuaFunction, debugInfo.short_src );
+            }
+        }
+        else
+        {
+            strText = SString ( "@func_%d NULL", iLuaFunction );
+        }
+
+    #ifdef MTA_DEBUG
+        if ( pTag )
+        {
+            // Check tag remains unchanged
+            assert ( strText == *pTag );
+            return *pTag;
+        }
+    #endif
+
+        MapSet ( m_FunctionTagMap, iLuaFunction, strText );
+        pTag = MapFind ( m_FunctionTagMap, iLuaFunction );
+    }
+    return *pTag;
 }

@@ -19,6 +19,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
 
 #define MAX_KEYSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
@@ -114,11 +115,13 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_QUICKRELOAD ] = false;
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
+    m_Glitches [ GLITCH_CROUCHBUG ] = false;
 
     //Glitch names (for Lua interface)
     m_GlitchNames["quickreload"] = GLITCH_QUICKRELOAD;
     m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
     m_GlitchNames["fastmove"] = GLITCH_FASTMOVE;
+    m_GlitchNames["crouchbug"] = GLITCH_CROUCHBUG;
 
     m_bCloudsEnabled = true;
 
@@ -353,6 +356,8 @@ void CGame::DoPulse ( void )
 
     // Delete all items requested
     m_ElementDeleter.DoDeleteAll ();
+
+    GetPerfStatManager ()->DoPulse ();
 
     // Unlock the critical section again
     Unlock();
@@ -910,6 +915,18 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_TRANSGRESSION:
+        {
+            Packet_PlayerTransgression ( static_cast < CPlayerTransgressionPacket& > ( Packet ) );
+            return true;
+        }
+
+        case PACKET_ID_PLAYER_DIAGNOSTIC:
+        {
+            Packet_PlayerDiagnostic ( static_cast < CPlayerDiagnosticPacket& > ( Packet ) );
+            return true;
+        }
+
         default:
             break;
     }
@@ -1382,17 +1399,22 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 }
 
                                 // Check the serial for validity
-                                if ( !pPlayer->GetSerial ().empty() &&
-                                     m_pBanManager->IsSerialBanned ( pPlayer->GetSerial ().c_str () ) )
+                                if ( CBan* pBan = m_pBanManager->GetBanFromSerial ( pPlayer->GetSerial ().c_str () ) )
                                 {
+                                    // Make a message including the ban duration
+                                    SString strBanMessage = "Serial is banned";
+                                    SString strDurationDesc = pBan->GetDurationDesc ();
+                                    if ( strDurationDesc.length () )
+                                        strBanMessage += " (" + strDurationDesc + ")";
+
                                     // Tell the console
-                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Serial is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (%s) (%s)\n", szNick, strBanMessage.c_str (), strIPAndSerial.c_str () );
+
+                                    // Make a message for the player
+                                    strBanMessage = std::string ( "Disconnected: " ) + strBanMessage;
 
                                     // Tell the player he's banned
-                                    if ( pPlayer->GetMTAVersion () <= 0x102 )
-                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned - If this is in error, ensure you have the lastest version of MTA." );
-                                    else
-                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned" );
+                                    DisconnectPlayer ( this, *pPlayer, strBanMessage );
                                     return;
                                 }
 
@@ -2818,6 +2840,36 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
 }
 
 
+void CGame::Packet_PlayerTransgression ( CPlayerTransgressionPacket & Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // If ac# not disabled on this server, do a kick
+        if ( !g_pGame->GetConfig ()->IsDisableAC ( SString ( "%d", Packet.m_uiLevel ) ) )
+        {
+            SString strMessageCombo ( "AC #%d %s", Packet.m_uiLevel, Packet.m_strMessage.c_str () );
+            CStaticFunctionDefinitions::KickPlayer ( pPlayer, NULL, strMessageCombo );
+        }
+    }
+}
+
+
+void CGame::Packet_PlayerDiagnostic ( CPlayerDiagnosticPacket & Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // If diagnosticis enabled on this server, log it
+        if ( g_pGame->GetConfig ()->IsEnableDiagnostic ( SString ( "%d", Packet.m_uiLevel ) ) )
+        {
+            SString strMessageCombo ( "DIAGNOSTIC: %s #%d %s\n", pPlayer->GetNick (), Packet.m_uiLevel, Packet.m_strMessage.c_str () );
+            CLogger::LogPrint ( strMessageCombo );
+        }
+    }
+}
+
+
 void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char* szError )
 {
     char szIP [22];
@@ -2881,19 +2933,19 @@ void CGame::Unlock ( void )
 void CGame::SetGlitchEnabled ( const std::string& strGlitch, bool bEnabled )
 {
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
-    assert ( cGlitch >= 0 && cGlitch <= 2 );
+    assert ( cGlitch >= 0 && cGlitch <= 3 );
     m_Glitches[cGlitch] = bEnabled;
 }
 
 bool CGame::IsGlitchEnabled ( const std::string& strGlitch )
 {
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
-    assert ( cGlitch >= 0 && cGlitch <= 2 );
+    assert ( cGlitch >= 0 && cGlitch <= 3 );
     return m_Glitches[cGlitch] ? true : false;
 }
 bool CGame::IsGlitchEnabled ( eGlitchType cGlitch )
 {
-    assert ( cGlitch >= 0 && cGlitch <= 2 );
+    assert ( cGlitch >= 0 && cGlitch <= 3 );
     return m_Glitches[cGlitch] || false;
 }
 

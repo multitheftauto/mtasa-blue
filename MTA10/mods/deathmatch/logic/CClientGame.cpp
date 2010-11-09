@@ -117,6 +117,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->DisableQuickReload ( true );
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
+    m_Glitches [ GLITCH_CROUCHBUG ] = false;
 
     // Remove Night & Thermal vision view (if enabled).
     g_pMultiplayer->SetNightVisionEnabled ( false );
@@ -225,6 +226,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_dwFrameTimeSlice = 0;
     m_dwLastFrameTick = 0;
+    m_llLastTransgressionTime = 0;
 
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
@@ -274,6 +276,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_ulBigPacketSize               = 0;
     m_ulBigPacketBytesReceivedBase  = 0;
 
+    m_bBeingDeleted = false;
+
     #if defined (MTA_DEBUG) || defined (MTA_BETA)
     m_bShowSyncingInfo = false;
     #endif
@@ -304,6 +308,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
 CClientGame::~CClientGame ( void )
 {
+    m_bBeingDeleted = true;
     // Stop all explosions. Unfortunately this doesn't fix the crash
     // if a vehicle is destroyed while it explodes.
     g_pGame->GetExplosionManager ()->RemoveAllExplosions ();
@@ -425,6 +430,7 @@ CClientGame::~CClientGame ( void )
 
     // NULL the global CClientGame var
     g_pClientGame = NULL;
+    m_bBeingDeleted = false;
 }
 
 /*
@@ -839,15 +845,62 @@ void CClientGame::DoPulses ( void )
     // Output stuff from our internal server eventually
     m_Server.DoPulse ();
 
-    if ( m_pManager->IsGameLoaded () )
+    if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED && GetTickCount64_ () - m_llLastTransgressionTime > 60000 )
     {
+        uint uiLevel = 0;
+        SString strMessage;
+
         // Is the player a cheater?
         if ( !m_pManager->GetAntiCheat ().PerformChecks () )
         {
-            // TODO: Tell the server, also encrypt this
-            g_pCore->ShowMessageBox ( "Error", "AC #1: You were kicked from the game", MB_BUTTON_OK | MB_ICON_ERROR );
-            g_pCore->GetModManager ()->RequestUnload ();
-            return;
+            uiLevel = 1;
+        }
+        else
+        {
+            strMessage = g_pNet->GetNextBuffer ();
+            if ( strMessage.length () )
+                uiLevel = 4;
+        }
+
+        // Send message to the server
+        if ( uiLevel )
+        {
+            SString strMessageCombo  = SString( "AC #%d %s", uiLevel, strMessage.c_str () ).TrimEnd ( " " );
+            m_llLastTransgressionTime = GetTickCount64_ ();
+            AddReportLog ( 3100, strMessageCombo );
+            if ( g_pNet->GetServerBitStreamVersion () >= 0x12 )
+            {
+                // Inform the server if we can
+                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                pBitStream->Write ( uiLevel );
+                pBitStream->WriteString ( strMessage );
+                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
+                g_pNet->DeallocateNetBitStream ( pBitStream );
+            }
+            else
+            {
+                // Otherwise, disconnect here
+                g_pCore->ShowMessageBox ( "Error", SString ( strMessageCombo + ": You were kicked from the game" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->GetModManager ()->RequestUnload ();
+                return;
+            }
+        }
+    }
+
+    // Send diagnostic info
+    if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED && g_pNet->GetServerBitStreamVersion () >= 0x14 )
+    {
+        // Retrieve data
+        SString strMessage = g_pNet->GetDiagnosticStatus ();
+
+        // Send to the server if changed
+        if ( strMessage != m_strLastDiagnosticStatus )
+        {
+            m_strLastDiagnosticStatus = strMessage;
+            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+            pBitStream->WriteString ( strMessage );
+            g_pNet->SendPacket ( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream );
+            g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }
 
@@ -1703,7 +1756,7 @@ void CClientGame::UpdateTrailers ( void )
     CClientVehicle * pVehicle = NULL, * pTrailer = NULL;
     CVehicle * pGameVehicle = NULL, * pGameTrailer = NULL;
     unsigned long ulIllegalTowBreakTime;
-    vector < CClientVehicle* > ::iterator iterVehicles = m_pVehicleManager->StreamedBegin ();
+    vector < CClientVehicle* > ::const_iterator iterVehicles = m_pVehicleManager->StreamedBegin ();
     for ( ; iterVehicles != m_pVehicleManager->StreamedEnd (); iterVehicles++ )
     {
         pVehicle = *iterVehicles;
@@ -3142,6 +3195,9 @@ void CClientGame::Event_OnIngame ( void )
 
     // Make sure we never get tired
     g_pGame->GetPlayerInfo ()->SetDoesNotGetTired ( true );
+
+    // Tell doggy we got the game running
+    WatchDogCompletedSection ( "L1" );
 }
 
 
@@ -3268,7 +3324,7 @@ void CClientGame::ProjectileInitiateHandler ( CClientProjectile * pProjectile )
     if ( pProjectile->IsLocal () )
     {
         // Did the local player create this projectile?
-        if ( pProjectile->GetCreator () == m_pLocalPlayer )
+        if ( m_pLocalPlayer && pProjectile->GetCreator () == m_pLocalPlayer )
         {
             // Physics says our projectile should start off at our velocity
             CVector vecVelocity, vecPlayerVelocity;
@@ -3335,6 +3391,8 @@ void CClientGame::IdleHandler ( void )
 
 bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
 {
+    if ( !m_pLocalPlayer )
+        return true;
     CLuaArguments Arguments;
     Arguments.PushNumber ( ucWeaponType );
     return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );
@@ -4781,7 +4839,7 @@ AddressInfo * CClientGame::GetAddressInfo ( unsigned long ulOffset, AddressInfo 
     }
 
     CClientVehicle* pVehicle = NULL;
-    vector < CClientVehicle* > ::iterator iterVehicle = m_pVehicleManager->IterBegin ();
+    vector < CClientVehicle* > ::const_iterator iterVehicle = m_pVehicleManager->IterBegin ();
     for ( ; iterVehicle != m_pVehicleManager->IterEnd (); iterVehicle++ )
     {
         // Grab the game address of the vehicle

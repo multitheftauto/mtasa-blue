@@ -44,7 +44,7 @@ CResourceManager::~CResourceManager ( void )
     StopAllResources ();
 
     // Then start deleting them
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         delete (*iter);
@@ -251,7 +251,7 @@ void CResourceManager::CheckResourceDependencies ( void )
 {
     m_uiResourceLoadedCount = 0;
     m_uiResourceFailedCount = 0;
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         (*iter)->LinkToIncludedResources();
@@ -267,18 +267,13 @@ void CResourceManager::CheckResourceDependencies ( void )
     }
 }
 
-list<class CResource *>* CResourceManager::GetLoadedResources ( void )
-{
-    return &m_resources;
-}
-
 void CResourceManager::ListResourcesLoaded ( void )
 {
     unsigned int uiCount = 0;
     unsigned int uiFailedCount = 0;
     unsigned int uiRunningCount = 0;
     CLogger::LogPrintf ( "== Resource list ==\n" );
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         CResource * res = (*iter);
@@ -306,7 +301,7 @@ void CResourceManager::ListResourcesLoaded ( void )
 void CResourceManager::UnloadRemovedResources ( void )
 {
     list < CResource* > resourcesToDelete;
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     string strPath;
     for ( ; iter != m_resources.end (); iter++ )
     {
@@ -350,7 +345,7 @@ CResource * CResourceManager::Load ( const char * szResourceName )
     // load each resource once
 
     list < CResource* > resourcesToDelete;
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         if ( stricmp ( (*iter)->GetName().c_str (), szResourceName ) == 0 )
@@ -416,7 +411,7 @@ CResource * CResourceManager::Load ( const char * szResourceName )
 
 CResource * CResourceManager::GetResource ( const char * szResourceName )
 {
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         if ( stricmp ( (*iter)->GetName().c_str (), szResourceName ) == 0 )
@@ -429,7 +424,7 @@ CResource * CResourceManager::GetResource ( const char * szResourceName )
 
 CResource * CResourceManager::GetResource ( unsigned short usID )
 {
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         if ( (*iter)->GetID() == usID )
@@ -444,15 +439,7 @@ CResource * CResourceManager::GetResource ( unsigned short usID )
 
 bool CResourceManager::Exists ( CResource* pResource )
 {
-    list < CResource* > ::iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
-    {
-        if ( pResource == *iter )
-        {
-            return true;
-        }
-    }
-    return false;
+    return m_resources.Contains ( pResource );
 }
 
 
@@ -503,7 +490,7 @@ unsigned short CResourceManager::GenerateID ( void )
 {
     // Create a map of all used IDs
     map < unsigned short, bool > idMap;
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         idMap[ ( *iter )->GetID () ] = true;
@@ -533,7 +520,7 @@ void CResourceManager::OnPlayerJoin ( CPlayer& Player )
 CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
 {
     luaVM = lua_getmainstate ( luaVM );
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         if ( (*iter)->GetVirtualMachine () != NULL )
@@ -551,7 +538,7 @@ CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
 
 bool CResourceManager::IsAResourceElement ( CElement* pElement )
 {
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         CResource* pResource = *iter;
@@ -644,7 +631,7 @@ bool CResourceManager::StopAllResources ( void )
 {
     CLogger::LogPrint ( "Stopping resources..." );
 
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         CResource* pResource = *iter;

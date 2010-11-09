@@ -19,6 +19,7 @@
 #include <game/CGame.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
+#include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #include "SharedUtil.hpp"
 
 using SharedUtil::CalcMTASAPath;
@@ -350,6 +351,8 @@ void CCore::SaveConfig ( void )
         if ( !pBindsNode )
             pBindsNode = GetConfig ()->CreateSubNode ( CONFIG_NODE_KEYBINDS );
         m_pKeyBinds->SaveToXML ( pBindsNode );
+        GetVersionUpdater ()->SaveConfigToXML ();
+        GetServerCache ()->SaveServerCache ();
         m_pConfigFile->Write ();
     }
 }
@@ -767,6 +770,8 @@ void CCore::HideQuickConnect ( void )
 
 void CCore::ApplyHooks ( )
 { 
+    ApplyLoadingCrashPatch ();
+
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook ( );
     m_pDirect3DHookManager->ApplyHook ( );
@@ -814,15 +819,15 @@ void CCore::CreateGame ( )
         if ( m_pGame->GetGameVersion () >= VERSION_11 )
         {
             MessageBox ( 0, "Only GTA:SA version 1.0 is supported!  You are now being redirected to a page where you can patch your version.", "Error", MB_OK|MB_ICONEXCLAMATION );
-            ShellExecute ( NULL, _T("open"), "http://multitheftauto.com/downgrade", NULL, NULL, SW_SHOWNORMAL );
-            TerminateProcess ( GetCurrentProcess (), 0 );
+            BrowseToSolution ( "downgrade" );
+            TerminateProcess ( GetCurrentProcess (), 1 );
         }
     }
     else
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "Game module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 }
 
@@ -861,7 +866,7 @@ void CCore::CreateMultiplayer ( )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "Multiplayer module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 }
 
@@ -899,7 +904,7 @@ void CCore::InitGUI ( IUnknown* pDevice )
     } else {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "GUI module could not be initialized!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     // Set the working directory for CGUI
@@ -938,7 +943,7 @@ void CCore::CreateGUI ( void )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "GUI module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
     WriteDebugEvent ( "GUI loaded." );
 
@@ -981,7 +986,8 @@ void CCore::CreateNetwork ( )
     if ( m_NetModule.IsOk () == false )
     {
         MessageBox ( 0, "Network module not found!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        BrowseToSolution ( "netc-not-loadable", true );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     // Network module compatibility check
@@ -991,7 +997,8 @@ void CCore::CreateNetwork ( )
     {
         // net.dll doesn't like our version number
         MessageBox ( 0, "Network module not compatible!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        BrowseToSolution ( "netc-not-compatible", true );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     // Get client initializer function from DLL's routine.
@@ -1008,10 +1015,24 @@ void CCore::CreateNetwork ( )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "Network module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     SetCurrentDirectory ( szCurDir );
+
+    // Set mta version for report log here
+    SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%d.%03d"
+                                ,MTASA_VERSION_MAJOR
+                                ,MTASA_VERSION_MINOR
+                                ,MTASA_VERSION_MAINTENANCE
+                                ,MTASA_VERSION_TYPE
+                                ,MTASA_VERSION_BUILD
+                                ,m_pNet->GetNetRev ()
+                                ,m_pNet->GetNetRel ()
+                                ) );
+    char szSerial [ 64 ];
+    m_pNet->GetSerial ( szSerial, sizeof ( szSerial ) );
+    SetApplicationSetting ( "serial", szSerial );
 }
 
 
@@ -1052,7 +1073,7 @@ void CCore::CreateXML ( )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "XML module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     SetCurrentDirectory ( szCurDir );
@@ -1741,5 +1762,33 @@ void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bo
         szValue[6] = strPlayerCount.c_str();
         
         XfireSetCustomGameData ( 7, szKey, szValue );
+    }
+}
+
+
+//
+// Patch to fix loading crash.
+// Has to be done before the main window is created.
+//
+void CCore::ApplyLoadingCrashPatch ( void )
+{
+    uchar* pAddress = (uchar*)0x7468F9;
+    uchar ucOldValue = 183;
+    uchar ucNewValue = 57;
+
+    MEMORY_BASIC_INFORMATION info;
+    VirtualQuery( pAddress, &info, sizeof(MEMORY_BASIC_INFORMATION) );
+
+    if ( info.State == MEM_COMMIT && info.Protect & ( PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_READONLY | PAGE_READWRITE ) )
+    {
+        if ( pAddress[0] == ucOldValue )
+        {
+            DWORD dwOldProtect;
+            if ( VirtualProtect( pAddress, 1, PAGE_READWRITE, &dwOldProtect ) )
+            {
+                pAddress[0] = ucNewValue;
+                VirtualProtect( pAddress, 1, dwOldProtect, &dwOldProtect );
+            }
+        }
     }
 }

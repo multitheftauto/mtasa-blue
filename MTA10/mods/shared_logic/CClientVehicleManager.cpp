@@ -389,45 +389,11 @@ bool CClientVehicleManager::HasDamageModel ( eClientVehicleType Type )
 }
 
 
-vector < CClientVehicle* > ::iterator CClientVehicleManager::IterGet ( CClientVehicle* pVehicle )
-{
-    // Find it in our list
-    vector < CClientVehicle* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( *iter == pVehicle )
-        {
-            return iter;
-        }
-    }
-
-    // We couldn't find it
-    return m_List.begin ();
-}
-
-
-vector < CClientVehicle* > ::reverse_iterator CClientVehicleManager::IterGetReverse ( CClientVehicle* pVehicle )
-{
-    // Find it in our list
-    vector < CClientVehicle* > ::reverse_iterator iter = m_List.rbegin ();
-    for ( ; iter != m_List.rend (); iter++ )
-    {
-        if ( *iter == pVehicle )
-        {
-            return iter;
-        }
-    }
-
-    // We couldn't find it
-    return m_List.rbegin ();
-}
-
-
 void CClientVehicleManager::RemoveFromList ( CClientVehicle* pVehicle )
 {
     if ( m_bCanRemoveFromList )
     {
-        ListRemove ( m_List, pVehicle );
+        m_List.remove ( pVehicle );
     }
 }
 
@@ -470,7 +436,7 @@ void CClientVehicleManager::RestreamVehicles ( unsigned short usModel )
 {
     // Store the affected vehicles
     CClientVehicle* pVehicle;
-    std::vector < CClientVehicle* > ::iterator iter = IterBegin ();
+    std::vector < CClientVehicle* > ::const_iterator iter = IterBegin ();
     for ( ; iter != IterEnd (); iter++ )
     {
         pVehicle = *iter;

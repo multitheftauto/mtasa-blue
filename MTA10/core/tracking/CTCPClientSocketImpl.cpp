@@ -39,7 +39,7 @@ CTCPClientSocketImpl::~CTCPClientSocketImpl ( void )
     // Free our socket
     if ( m_Socket )
     {
-        CloseSocket ( m_Socket );
+        closesocket ( m_Socket );
         m_Socket = 0;
     }
 }
@@ -117,7 +117,7 @@ bool CTCPClientSocketImpl::Disconnect ( void )
     // Couldn't figure out how to gracefully close a connection and prepare the socket for reuse,
     // so I had to do this hacky approach
     //  Close the socket
-    CloseSocket ( m_Socket );
+    closesocket ( m_Socket );
 
     //  Recreate it
     m_Socket = socket ( AF_INET, SOCK_STREAM, 0 );

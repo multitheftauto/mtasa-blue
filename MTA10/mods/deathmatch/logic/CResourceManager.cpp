@@ -53,7 +53,7 @@ CResource* CResourceManager::Add ( unsigned short usID, char* szResourceName, CC
 
 CResource* CResourceManager::GetResource ( unsigned short usID )
 {
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         if ( ( *iter )->GetID() == usID )
@@ -65,7 +65,7 @@ CResource* CResourceManager::GetResource ( unsigned short usID )
 
 CResource* CResourceManager::GetResource ( const char* szResourceName )
 {
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         if ( strcmp ( ( *iter )->GetName(), szResourceName ) == 0 )
@@ -77,7 +77,7 @@ CResource* CResourceManager::GetResource ( const char* szResourceName )
 
 void CResourceManager::LoadUnavailableResources ( CClientEntity *pRootEntity )
 {
-    list < CResource* > ::iterator iter = m_resources.begin ();
+    list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
         if ( !( ( *iter )->GetActive () ) )
@@ -110,15 +110,7 @@ void CResourceManager::Remove ( CResource* pResource )
 
 bool CResourceManager::Exists ( CResource* pResource )
 {
-    list < CResource* > ::iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
-    {
-        if ( *iter == pResource )
-        {
-            return true;
-        }
-    }
-    return false;
+    return m_resources.Contains ( pResource );
 }
 
 

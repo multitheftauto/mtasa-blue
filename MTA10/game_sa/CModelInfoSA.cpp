@@ -598,6 +598,12 @@ void CModelInfoSA::AddRef ( bool bWaitForLoad, bool bHighPriority )
     }
 
     // Increment the references.
+    if ( m_dwReferences == 0 )
+    {
+        m_pInterface = ppModelInfo [ m_dwModelID ];
+        m_pInterface->usNumberOfRefs++;
+    }
+
     m_dwReferences++;
 }
 

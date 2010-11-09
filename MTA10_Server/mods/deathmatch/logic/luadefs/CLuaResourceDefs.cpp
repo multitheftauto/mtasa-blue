@@ -589,9 +589,8 @@ int CLuaResourceDefs::getResources ( lua_State* luaVM )
 {
     unsigned int uiIndex = 0;
     lua_newtable ( luaVM );
-    list<CResource *> * resources = m_pResourceManager->GetLoadedResources();
-    list < CResource* > ::iterator iter = resources->begin ();
-    for ( ; iter != resources->end (); iter++ )
+    list < CResource* > ::const_iterator iter = m_pResourceManager->IterBegin ();
+    for ( ; iter != m_pResourceManager->IterEnd (); iter++ )
     {
         lua_pushnumber ( luaVM, ++uiIndex );
         lua_pushresource ( luaVM, *iter );

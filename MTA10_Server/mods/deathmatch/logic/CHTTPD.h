@@ -32,6 +32,7 @@ public:
     ResponseCode HandleRequest ( HttpRequest * ipoHttpRequest,
                                  HttpResponse * ipoHttpResponse );
     void         HttpPulse     ( void );
+    bool         ShouldAllowConnection ( const char * szAddress );
     
     bool                        StartHTTPD ( const char* szIP, unsigned int port );
     inline void                 SetResource ( CResource * resource ) { m_resource = resource; }
@@ -51,6 +52,7 @@ private:
     class CAccount *            m_pGuestAccount;
     map < string, long long >   m_LoggedInMap;
     CConnectHistory             m_BruteForceProtect;
+    CConnectHistory             m_HttpDosProtect;
 };
 
 #endif

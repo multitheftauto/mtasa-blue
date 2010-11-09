@@ -15,10 +15,11 @@
 class CExceptionInformation
 {
 public:
+    virtual                     ~CExceptionInformation  ( void ) {}
     virtual unsigned int        GetCode                 ( void ) = 0;
-    virtual void*               GetOffset               ( void ) = 0;
-    virtual void*               GetReferencingOffset    ( void ) = 0;
-    virtual bool                GetModule               ( char * szOutputBuffer, int nOutputNameLength ) = 0;
+    virtual const char*         GetModulePathName       ( void ) = 0;
+    virtual const char*         GetModuleBaseName       ( void ) = 0;
+    virtual uint                GetAddressModuleOffset  ( void ) = 0;
 
     virtual unsigned long       GetEAX                  ( void ) = 0;
     virtual unsigned long       GetEBX                  ( void ) = 0;

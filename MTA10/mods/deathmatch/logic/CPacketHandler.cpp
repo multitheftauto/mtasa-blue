@@ -379,8 +379,8 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     }
 
     // Allow forcing of SingleDownloadOption with core config option <single_download>1</single_download>
-    bool bForceSingleDownload;
-    if ( g_pCore->GetCVars ()->Get ( "single_download", bForceSingleDownload ) && bForceSingleDownload )
+    int iSingleDownload;
+    if ( g_pCore->GetCVars ()->Get ( "single_download", iSingleDownload ) && iSingleDownload == 1 )
         iHTTPMaxConnectionsPerClient = 1;
 
     g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetMaxConnections( iHTTPMaxConnectionsPerClient );
@@ -1049,7 +1049,7 @@ void CPacketHandler::Packet_PlayerChangeNick ( NetBitStreamInterface& bitStream 
         std::string strNick;
         g_pCore->GetCVars ()->Get ( "nick", strNick );
         if ( strNick == "Player" )
-            g_pCore->GetCVars ()->Set ( "nick", std::string ( szNewNick ) );
+            g_pCore->GetCVars ()->Set ( "nick", SString ( "Player%d", ( rand () % 9000 ) + 1000 ) );
     }
 
     /*
@@ -1989,9 +1989,16 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     if ( !bitStream.Read ( &funBugs ) )
         return;
 
+    
+    bool bCrouchBug = false;
+    if ( bitStream.Version () >= 0x15 )
+        if ( !bitStream.ReadBit ( bCrouchBug ) )
+            return;
+
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_QUICKRELOAD, funBugs.data.bQuickReload );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTFIRE, funBugs.data.bFastFire );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTMOVE, funBugs.data.bFastMove );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, bCrouchBug );
 }
 
 
@@ -3706,23 +3713,26 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
         // * Ping compensation *
         // Vehicle or player?
         CClientPlayer * pLocalPlayer = g_pClientGame->GetLocalPlayer ();
-        if ( pLocalPlayer->GetOccupiedVehicleSeat () == 0 )
-            pMovedEntity = pLocalPlayer->GetRealOccupiedVehicle ();
-        if ( !pMovedEntity )
-            pMovedEntity = pLocalPlayer;
-
-        // Warp back in time to where we were when this explosion happened
-        unsigned short usLatency = ( unsigned short ) g_pNet->GetPing ();
-        if ( pCreator && pCreator != g_pClientGame->GetLocalPlayer () )
-            usLatency = pCreator->GetLatency ();
-        CVector vecWarpPosition;
-        if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecWarpPosition, usLatency ) )
+        if ( pLocalPlayer )
         {
-            pMovedEntity->GetPosition ( vecRestorePosition );
-            pMovedEntity->SetPosition ( vecWarpPosition );
+            if ( pLocalPlayer->GetOccupiedVehicleSeat () == 0 )
+                pMovedEntity = pLocalPlayer->GetRealOccupiedVehicle ();
+            if ( !pMovedEntity )
+                pMovedEntity = pLocalPlayer;
+
+            // Warp back in time to where we were when this explosion happened
+            unsigned short usLatency = ( unsigned short ) g_pNet->GetPing ();
+            if ( pCreator && pCreator != g_pClientGame->GetLocalPlayer () )
+                usLatency = pCreator->GetLatency ();
+            CVector vecWarpPosition;
+            if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecWarpPosition, usLatency ) )
+            {
+                pMovedEntity->GetPosition ( vecRestorePosition );
+                pMovedEntity->SetPosition ( vecWarpPosition );
+            }
+            else
+                pMovedEntity = NULL;
         }
-        else
-            pMovedEntity = NULL;
     }
 
     eExplosionType Type = static_cast < eExplosionType > ( explosionType.data.uiType );
@@ -4223,7 +4233,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 unlink ( pDownloadableResource->GetName () );
 
                                 // Queue the file to be downloaded
-                                pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, NULL, NULL, g_pClientGame->IsLocalGame () );
+                                pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame () );
 
                                 // If the file was successfully queued, increment the resources to be downloaded
                                 usResourcesToBeDownloaded++;
@@ -4355,6 +4365,6 @@ void CPacketHandler::Packet_UpdateInfo ( NetBitStreamInterface& bitStream )
     if ( BitStreamReadUsString( bitStream, strType ) &&
          BitStreamReadUsString( bitStream, strData ) )
     {
-        g_pCore->InitiateUpdate ( strType, g_pNet->GetConnectedServer () );
+        g_pCore->InitiateUpdate ( strType, strData, g_pNet->GetConnectedServer () );
     }
 }

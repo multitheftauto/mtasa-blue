@@ -98,8 +98,8 @@ int EHSServer::ClearIdleConnections ( )
 		// if it's been more than N seconds since a response has been
 		//   sent and there are no pending requests
 		if ( (*i)->StillReading ( ) &&
-			 time ( NULL ) - (*i)->LastActivity ( ) > m_nIdleTimeout &&
-			 (*i)->RequestsPending ( )
+			 ( time ( NULL ) - (*i)->LastActivity ( ) > m_nIdleTimeout || (*i)->m_iStopASAP ) &&
+			 !(*i)->RequestsPending ( )
 			  ) {
 
 			EHS_TRACE ( "Done reading because of idle timeout\n" );
@@ -161,7 +161,8 @@ EHSConnection::EHSConnection ( NetworkAbstraction * ipoNetworkAbstraction,
 	m_nResponses ( 0 ),
 	m_poNetworkAbstraction ( ipoNetworkAbstraction ),
 	m_poCurrentHttpRequest ( NULL ),
-	m_poEHSServer ( ipoEHSServer )
+	m_poEHSServer ( ipoEHSServer ),
+    m_iStopASAP ( 0 )
 {
     m_UnusedSyncId = 0;
 	UpdateLastActivity ( );
@@ -980,7 +981,29 @@ void EHSServer::CheckAcceptSocket ( )
 		if ( poNewClient == NULL ) {
 			return;
 		}
-		
+
+        // Flood detection		
+        if ( !m_poTopLevelEHS->ShouldAllowConnection ( poNewClient->GetAddress ().c_str () ) )
+        {
+
+		    MUTEX_LOCK ( m_oMutex );
+            // Stop all other connections using this address
+	        for ( EHSConnectionList::iterator i = m_oEHSConnectionList.begin ( );
+		          i != m_oEHSConnectionList.end ( );
+		          i++ ) {
+
+		        if ( (*i)->GetNetworkAbstraction ( )->GetAddress ( ) == poNewClient->GetAddress () )
+                {
+                    (*i)->m_iStopASAP = true;
+                }
+            }
+		    MUTEX_UNLOCK ( m_oMutex );
+
+            // Reject connection
+            delete poNewClient;
+            return;
+        }
+
 		// create a new EHSConnection object and initialize it
 		EHSConnection * poEHSConnection = 
 			new EHSConnection ( poNewClient, this );

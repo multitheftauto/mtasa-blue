@@ -51,6 +51,8 @@ class CGame;
 #include "packets/CDetonateSatchelsPacket.h"
 #include "packets/CCustomDataPacket.h"
 #include "packets/CCameraSyncPacket.h"
+#include "packets/CPlayerTransgressionPacket.h"
+#include "packets/CPlayerDiagnosticPacket.h"
 
 #include "CRPCFunctions.h"
 
@@ -155,6 +157,7 @@ public:
         GLITCH_QUICKRELOAD,
         GLITCH_FASTFIRE,
         GLITCH_FASTMOVE,
+        GLITCH_CROUCHBUG,
     };
 public:
                                 CGame                       ( void );
@@ -276,6 +279,8 @@ private:
     void                        Packet_CustomData           ( class CCustomDataPacket& Packet );
     void                        Packet_Voice_Data           ( class CVoiceDataPacket& Packet );
     void                        Packet_CameraSync           ( class CCameraSyncPacket& Packet );
+    void                        Packet_PlayerTransgression  ( class CPlayerTransgressionPacket& Packet );
+    void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
@@ -354,7 +359,7 @@ private:
     unsigned short              m_usFrames;
     unsigned short              m_usFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
-    bool                        m_Glitches[3];
+    bool                        m_Glitches[4];
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;

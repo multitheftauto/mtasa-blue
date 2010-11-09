@@ -57,10 +57,12 @@ class CCore;
 
 // Configuration file path (relative to Grand Theft Auto directory)
 #define MTA_CONFIG_PATH             "mta/coreconfig.xml"
+#define MTA_SERVER_CACHE_PATH       "mta/servercache.xml"
 #define CONFIG_ROOT                 "mainconfig"
 #define CONFIG_NODE_CVARS           "settings"                  // cvars node
 #define CONFIG_NODE_KEYBINDS        "binds"                     // keybinds node
 #define CONFIG_NODE_JOYPAD          "joypad"
+#define CONFIG_NODE_UPDATER         "updater"
 #define CONFIG_NODE_SERVER_INT      "internet_servers"          // backup of last successful master server list query
 #define CONFIG_NODE_SERVER_FAV      "favourite_servers"         // favourite servers list node
 #define CONFIG_NODE_SERVER_REC      "recently_played_servers"   // recently played servers list node
@@ -174,6 +176,7 @@ public:
     void                    SetClientMessageProcessor       ( pfnProcessMessage pfnMessageProcessor ) { m_pfnMessageProcessor = pfnMessageProcessor; };
     pfnProcessMessage       GetClientMessageProcessor       ( void ) { return m_pfnMessageProcessor; }
     void                    ChangeResolution                ( long width, long height, long depth );
+    void                    ApplyLoadingCrashPatch          ( void );
 
     void                    SetFocused                      ( bool bFocused )               { m_bFocused = bFocused; };
     bool                    IsFocused                       ( void )                        { return m_bFocused; };
@@ -192,7 +195,7 @@ public:
     void                    RegisterCommands                ( void );
     bool                    IsValidNick                     ( const char* szNick );     // Move somewhere else
     void                    Quit                            ( bool bInstantly = true );
-    void                    InitiateUpdate                  ( const char* szType, const char* szHost )      { m_pLocalGUI->InitiateUpdate ( szType, szHost ); }
+    void                    InitiateUpdate                  ( const char* szType, const char* szData, const char* szHost )      { m_pLocalGUI->InitiateUpdate ( szType, szData, szHost ); }
     bool                    IsOptionalUpdateInfoRequired    ( const char* szHost )                          { return m_pLocalGUI->IsOptionalUpdateInfoRequired ( szHost ); }
     void                    InitiateDataFilesFix            ( void )                                        { m_pLocalGUI->InitiateDataFilesFix (); }
 
