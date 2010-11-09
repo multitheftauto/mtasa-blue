@@ -12,8 +12,8 @@
 *
 *****************************************************************************/
 
+#include "UTF8.h"
 #ifdef WIN32
-    #include "UTF8.h"
     #include <direct.h>
     #include <shellapi.h>
 #endif

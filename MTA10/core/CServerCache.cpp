@@ -139,7 +139,7 @@ bool CServerCache::LoadServerCache ( void )
     CDataInfoSet dataSet;
 
     CXMLAccess XMLAccess ( pNode );
-    XMLAccess.GetSubNodeValue ( CONFIG_NODE_SERVER_INT "v1.1", dataSet );
+    XMLAccess.GetSubNodeValue ( CONFIG_NODE_SERVER_INT "11", dataSet );
 
     // Transfer each item from dataSet into m_ServerCachedMap
     for ( uint i = 0 ; i < dataSet.size () ; i++ )
@@ -225,7 +225,7 @@ bool CServerCache::SaveServerCache ( void )
 
     // Save XML data from dataSet
     CXMLAccess XMLAccess ( pNode );
-    XMLAccess.SetSubNodeValue ( CONFIG_NODE_SERVER_INT "v1.1", dataSet );
+    XMLAccess.SetSubNodeValue ( CONFIG_NODE_SERVER_INT "11", dataSet );
 
     m_pConfigFile->Write ();
     return true;
