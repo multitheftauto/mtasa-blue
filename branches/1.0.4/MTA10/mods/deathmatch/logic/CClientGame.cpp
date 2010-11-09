@@ -3284,7 +3284,7 @@ void CClientGame::ProjectileInitiateHandler ( CClientProjectile * pProjectile )
     if ( pProjectile->IsLocal () )
     {
         // Did the local player create this projectile?
-        if ( pProjectile->GetCreator () == m_pLocalPlayer )
+        if ( m_pLocalPlayer && pProjectile->GetCreator () == m_pLocalPlayer )
         {
             // Physics says our projectile should start off at our velocity
             CVector vecVelocity, vecPlayerVelocity;
@@ -3351,6 +3351,8 @@ void CClientGame::IdleHandler ( void )
 
 bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
 {
+    if ( !m_pLocalPlayer )
+        return true;
     CLuaArguments Arguments;
     Arguments.PushNumber ( ucWeaponType );
     return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );

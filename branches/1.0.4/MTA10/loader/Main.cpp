@@ -540,6 +540,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         TerminateProcess ( piLoadee.hProcess, 1 );
         return 1;
     }
+    FreeLibrary ( hCoreModule );
 
     // Wait until the splash has been displayed the required amount of time
     HideSplash ( true );
