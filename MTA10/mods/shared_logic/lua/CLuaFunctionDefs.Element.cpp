@@ -296,11 +296,18 @@ int CLuaFunctionDefs::GetElementRotation ( lua_State* luaVM )
     {
         // Grab the element, verify it
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+
+        const char* szRotationOrder = "default";
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) 
+        {
+            szRotationOrder = lua_tostring ( luaVM, 2 );
+        }
+
         if ( pEntity )
         {
             // Grab the rotation
             CVector vecRotation;
-            if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation ) )
+            if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation, szRotationOrder ) )
             {            
                 // Return it
                 lua_pushnumber ( luaVM, vecRotation.fX );
@@ -1561,6 +1568,12 @@ int CLuaFunctionDefs::SetElementRotation ( lua_State* luaVM )
         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
     {
+        const char* szRotationOrder = "default";
+        if ( lua_type ( luaVM, 5 ) == LUA_TSTRING ) 
+        {
+            szRotationOrder = lua_tostring ( luaVM, 5 );
+        }
+
         // Grab the element and the position to change to
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         CVector vecRotation ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
@@ -1571,7 +1584,7 @@ int CLuaFunctionDefs::SetElementRotation ( lua_State* luaVM )
         if ( pEntity )
         {
             // Try to set the position
-            if ( CStaticFunctionDefinitions::SetElementRotation ( *pEntity, vecRotation ) )
+            if ( CStaticFunctionDefinitions::SetElementRotation ( *pEntity, vecRotation, szRotationOrder ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

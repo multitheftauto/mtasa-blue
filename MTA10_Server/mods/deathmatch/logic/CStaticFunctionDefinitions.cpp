@@ -986,9 +986,15 @@ bool CStaticFunctionDefinitions::GetElementPosition ( CElement* pElement, CVecto
 }
 
 
-bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVector& vecRotation )
+bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVector& vecRotation, const char* szRotationOrder )
 {
     assert ( pElement );
+
+    eEulerRotationOrder desiredRotOrder = EulerRotationOrderFromString(szRotationOrder);
+    if (desiredRotOrder == EULER_INVALID)
+    {
+        return false;
+    }
 
     int iType = pElement->GetType ();
     switch ( iType )
@@ -997,7 +1003,7 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVecto
         case CElement::PLAYER:
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
-            vecRotation.fZ = ConvertRadiansToDegrees ( pPed->GetRotation () );
+            vecRotation.fZ = ConvertRadiansToDegrees ( pPed->GetRotation () ); //No conversion since only Z is used
 
             break;
         }
@@ -1005,6 +1011,10 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVecto
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             pVehicle->GetRotationDegrees ( vecRotation );
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZYX)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZYX, desiredRotOrder);
+            }
 
             break;
         }
@@ -1013,6 +1023,10 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVecto
             CObject* pObject = static_cast < CObject* > ( pElement );
             pObject->GetRotation ( vecRotation );
             ConvertRadiansToDegrees ( vecRotation );
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            }
 
             break;
         }
@@ -1091,9 +1105,15 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation )
+bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder )
 {
     assert ( pElement );
+
+    eEulerRotationOrder argumentRotOrder = EulerRotationOrderFromString(szRotationOrder);
+    if (argumentRotOrder == EULER_INVALID)
+    {
+        return false;
+    }
 
     int iType = pElement->GetType ();
     switch ( iType )
@@ -1102,21 +1122,37 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const 
         case CElement::PLAYER:
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
-            SetPedRotation( pPed, vecRotation.fZ );
+            SetPedRotation( pPed, vecRotation.fZ ); //No rotation order conversion required since only Z is used
 
             break;
         }
         case CElement::VEHICLE:
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            SetVehicleRotation( pVehicle, vecRotation );
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZYX)
+            {
+                SetVehicleRotation( pVehicle, vecRotation );
+            }
+            else
+            {
+                CVector vZYX = ConvertEulerRotationOrder( vecRotation, argumentRotOrder, EULER_ZYX ); 
+                SetVehicleRotation( pVehicle, vZYX );
+            }
 
             break;
         }
         case CElement::OBJECT:
         {
             CObject* pObject = static_cast < CObject* > ( pElement );
-            SetObjectRotation( pObject, vecRotation );
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
+            {
+                SetObjectRotation( pObject, vecRotation );
+            }
+            else
+            {
+                CVector vZXY = ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY );
+                SetObjectRotation( pObject, vZXY );
+            }
         }
         default: return false;
     }

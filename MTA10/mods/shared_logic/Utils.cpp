@@ -651,3 +651,153 @@ bool BitStreamReadUsString( class NetBitStreamInterface& bitStream, SString& str
 
     return bResult;
 }
+
+eEulerRotationOrder	EulerRotationOrderFromString(const char* szString)
+{
+    // We don't provide a conversion for EULER_MINUS_ZYZ since it's only meant to be used internally, not via scripts
+    if ( stricmp ( szString, "default" ) == 0)
+    {
+        return EULER_DEFAULT;
+    }
+    else if ( stricmp ( szString, "ZXY" ) == 0 )
+    {
+        return EULER_ZXY;
+    }
+    else if ( stricmp ( szString, "ZYX" ) == 0 )
+    {
+        return EULER_ZYX;
+    }
+    else
+    {
+        return EULER_INVALID;
+    }
+}
+
+// RX(theta)
+// | 1              0               0       |
+// | 0              c(theta)    -s(theta)   |
+// | 0              s(theta)    c(theta)    |
+
+// RY(theta)
+// | c(theta)       0               s(theta)    |
+// | 0              1               0           |          
+// | -s(theta)  0               c(theta)        |   
+
+// RZ(theta)
+// | c(theta)       -s(theta)   0               |
+// | s(theta)       c(theta)    0               |
+// | 0              0               1           |
+
+// ZXY = RZ(z).RX(x).RY(y)
+// | c(y)*c(z)-s(x)*s(y)*s(z)       -c(x)*s(z)                          s(x)*c(y)*s(z)+s(y)*c(z)        |
+// | c(y)*s(z)+s(x)*s(y)*c(z)       c(x)*c(z)                               s(y)*s(z)-s(x)*c(y)*c(z)    |
+// | -c(x)*s(y)                             s(x)                                        c(x)*c(y)       |
+
+// ZYX = RZ(z).RY(y).RX(x)
+// | c(y)*c(z)                              s(x)*s(y)*c(z)-c(x)*s(z)        s(x)*s(z)+c(x)*s(y)*c(z)    |
+// | c(y)*s(z)                              s(x)*s(y)*s(z)+c(x)*c(z)        c(x)*s(y)*s(z)-s(x)*c(z)    |
+// | -s(y)                                      s(x)*c(y)                               c(x)*c(y)       |
+
+CVector euler_ZXY_to_ZYX(const CVector& a_vZXY)
+{
+    CVector vZXY(a_vZXY);
+    ConvertDegreesToRadiansNoWrap(vZXY); //NoWrap for this conversion since it's used for cos/sin only
+
+    float cx = cos(vZXY.fX);
+    float sx = sin(vZXY.fX);
+    float cy = cos(vZXY.fY);
+    float sy = sin(vZXY.fY);
+    float cz = cos(vZXY.fZ);
+    float sz = sin(vZXY.fZ);
+
+    CVector vZYX;
+
+    //ZYX (unknown)     => A = s(x)*c(y)    /   c(x)*c(y)   = t(x)
+    //ZXY (known)       => A = s(x)     /   c(x)*c(y)   
+    vZYX.fX = atan2(sx, cx*cy);
+
+    //ZYX (unknown)     => B = c(y)*s(z)                    /   c(y)*c(z)                   = t(z)
+    //ZXY (known)       => B = c(y)*s(z)+s(x)*s(y)*c(z)     /   c(y)*c(z)-s(x)*s(y)*s(z)
+    vZYX.fZ = atan2(cy*sz+sx*sy*cz, cy*cz-sx*sy*sz);
+
+    //ZYX (unknown)     => C = -s(y)
+    //ZXY (known)       => C = -c(x)*s(y)
+    //Isn't asin not as good as atan2 ? solution tried with atan2 doesn't work that well though
+    vZYX.fY = asin(cx*sy);
+
+    ConvertRadiansToDegrees(vZYX);
+
+    return vZYX;
+}
+
+CVector euler_ZYX_to_ZXY(const CVector& a_vZYX)
+{
+    CVector vZYX(a_vZYX);
+    ConvertDegreesToRadiansNoWrap(vZYX); //NoWrap for this conversion since it's used for cos/sin only
+
+    float cx = cos(vZYX.fX);
+    float sx = sin(vZYX.fX);
+    float cy = cos(vZYX.fY);
+    float sy = sin(vZYX.fY);
+    float cz = cos(vZYX.fZ);
+    float sz = sin(vZYX.fZ);
+
+    CVector vZXY;
+
+    //ZXY (unknown)     => A = -c(x)*s(z)               /   c(x)*c(z)                   => t(z) = -A
+    //ZYX (known)       => A = s(x)*s(y)*c(z)-c(x)*s(z) /   s(x)*s(y)*s(z)+c(x)*c(z)   
+    vZXY.fZ = atan2(-(sx*sy*cz-cx*sz), sx*sy*sz+cx*cz);
+
+    //ZXY (unknown)     => B = -c(x)*s(y)   /       c(x)*c(y) => t(y) = -B
+    //ZYX (known)       => B =  -s(y)       /       c(x)*c(y)
+    vZXY.fY = atan2(sy, cx*cy);
+
+    //ZXY (unknown)     => C = s(x)
+    //ZYX (known)       => C =  s(x)*c(y)
+    //Isn't asin not as good as atan2 ? solution tried with atan2 doesn't work that well though
+    vZXY.fX = asin(sx*cy);
+
+    ConvertRadiansToDegrees(vZXY);
+    return  vZXY;
+}
+
+CVector    ConvertEulerRotationOrder    ( const CVector& a_vRotation, eEulerRotationOrder a_eSrcOrder, eEulerRotationOrder a_eDstOrder)
+{
+    if (a_eSrcOrder == a_eDstOrder      ||
+        a_eSrcOrder == EULER_DEFAULT    ||
+        a_eSrcOrder == EULER_INVALID    ||
+        a_eDstOrder == EULER_DEFAULT    ||
+        a_eDstOrder == EULER_INVALID)
+    {
+        return a_vRotation;
+    }
+
+    if (a_eSrcOrder == EULER_ZXY && a_eDstOrder == EULER_ZYX)
+    {
+        return euler_ZXY_to_ZYX(a_vRotation);
+    }
+    else if (a_eSrcOrder == EULER_ZYX && a_eDstOrder == EULER_ZXY)
+    {
+        return euler_ZYX_to_ZXY(a_vRotation);
+    }
+    else if (a_eSrcOrder == EULER_MINUS_ZYX)
+    {
+        CVector vZYX;
+        vZYX.fX = -a_vRotation.fX;
+        vZYX.fY = -a_vRotation.fY;
+        vZYX.fZ = -a_vRotation.fZ;
+        return ConvertEulerRotationOrder(vZYX, EULER_ZYX, a_eDstOrder);
+    }
+    else if (a_eDstOrder == EULER_MINUS_ZYX)
+    {
+        CVector vZYX = ConvertEulerRotationOrder(a_vRotation, a_eSrcOrder, EULER_ZYX);
+        vZYX.fX = -vZYX.fX;
+        vZYX.fY = -vZYX.fY;
+        vZYX.fZ = -vZYX.fZ;
+        return vZYX;
+    }
+    else
+    {
+        return a_vRotation;
+    }
+}
