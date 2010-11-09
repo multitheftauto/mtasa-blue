@@ -382,3 +382,50 @@ void CWorldSA::SetJetpackMaxHeight ( float fHeight )
 {
     *(float *)(VAR_fJetpackMaxHeight) = fHeight;
 }
+
+void CWorldSA::SetWindSpeed ( float fX, float fY, float fZ )
+{
+    //Disable
+    *(WORD *)(ADDR_WindSpeedSetX) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x90909090;
+    *(WORD *)(ADDR_WindSpeedSetY) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x90909090;
+    *(WORD *)(ADDR_WindSpeedSetZ) = 0xD9DD;
+    *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x90909090;
+
+    *(WORD *)(ADDR_WindSpeedSetX2) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x90909090;
+    *(WORD *)(ADDR_WindSpeedSetY2) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x90909090;
+    *(WORD *)(ADDR_WindSpeedSetZ2) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x90909090;
+
+    //Set
+    *(float *)(VAR_fWindSpeedX) = fX;
+    *(float *)(VAR_fWindSpeedY) = fY;
+    *(float *)(VAR_fWindSpeedZ) = fZ;
+}
+
+void CWorldSA::GetWindSpeed( float& fX, float& fY, float& fZ )
+{
+    fX = *(float *)(VAR_fWindSpeedX);
+    fY = *(float *)(VAR_fWindSpeedY);
+    fZ = *(float *)(VAR_fWindSpeedZ);
+}
+
+void CWorldSA::RestoreWindSpeed( void )
+{
+    *(WORD *)(ADDR_WindSpeedSetX) = 0x1DD9;
+    *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x00C813E0;
+    *(WORD *)(ADDR_WindSpeedSetY) = 0x1DD9;
+    *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x00C813E4;
+    *(WORD *)(ADDR_WindSpeedSetZ) = 0x1DD9;
+    *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x00C813E8;
+
+    *(WORD *)(ADDR_WindSpeedSetX2) = 0x15D9;
+    *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x00C813E0;
+    *(WORD *)(ADDR_WindSpeedSetY2) = 0x1DD9;
+    *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x00C813E4;
+    *(WORD *)(ADDR_WindSpeedSetZ2) = 0x1DD9;
+    *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x00C813E8;
+}

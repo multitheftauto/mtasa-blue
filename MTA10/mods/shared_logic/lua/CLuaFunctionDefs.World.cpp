@@ -1325,6 +1325,55 @@ int CLuaFunctionDefs::SetTrafficLightState ( lua_State *luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetWindSpeed ( lua_State *luaVM )
+{
+    float fX, fY, fZ;
+
+    if ( CStaticFunctionDefinitions::GetWindSpeed ( fX, fY, fZ ) )
+    {
+        lua_pushnumber ( luaVM, fX );
+        lua_pushnumber ( luaVM, fY );
+        lua_pushnumber ( luaVM, fZ );
+        return 3;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetWindSpeed ( lua_State *luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER && lua_type ( luaVM, 2 ) == LUA_TNUMBER && lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        float fX = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
+        float fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+        float fZ = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+
+        if ( CStaticFunctionDefinitions::SetWindSpeed ( fX, fY, fZ ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setWindSpeed" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetWindSpeed ( lua_State *luaVM )
+{
+    if ( CStaticFunctionDefinitions::RestoreWindSpeed ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::SetTrafficLightsLocked ( lua_State *luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )

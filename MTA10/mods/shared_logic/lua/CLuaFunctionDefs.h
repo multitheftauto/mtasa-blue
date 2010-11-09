@@ -657,6 +657,9 @@ public:
     LUA_DECLARE ( GetCloudsEnabled );
     LUA_DECLARE ( SetTrafficLightState );
     LUA_DECLARE ( SetTrafficLightsLocked );
+    LUA_DECLARE ( GetWindSpeed );
+    LUA_DECLARE ( SetWindSpeed );
+    LUA_DECLARE ( ResetWindSpeed );
 
     // Input functions
     LUA_DECLARE ( BindKey );
