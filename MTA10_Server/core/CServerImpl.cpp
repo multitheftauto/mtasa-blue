@@ -19,6 +19,7 @@
 #include "CCrashHandler.h"
 #include "MTAPlatform.h"
 #include "ErrorCodes.h"
+#include <assert.h>
 #include <cstdio>
 #include <signal.h>
 
@@ -30,6 +31,9 @@ using namespace std;
 
 bool g_bSilent = false;
 bool g_bNoTopBar = false;
+#ifndef WIN32
+bool g_bDaemonized = false;
+#endif
 
 #ifdef WIN32
 CServerImpl::CServerImpl ( CThreadCommandQueue* pThreadCommandQueue )
@@ -137,6 +141,22 @@ void CServerImpl::Printf ( const char* szFormat, ... )
     va_end ( ap );
 }
 
+#ifndef WIN32
+void CServerImpl::Daemonize () const
+{
+    if ( fork () ) exit ( 0 );
+
+    close ( 0 );
+    assert ( open ( "/dev/null", O_RDONLY ) == 0 );
+
+    close ( 1 );
+    assert ( open ( "/dev/null", O_WRONLY ) == 1 );
+
+    close ( 2 );
+    assert ( open ( "/dev/null", O_WRONLY ) == 2 );
+}
+#endif
+
 
 int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 {
@@ -145,6 +165,12 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     {
         return 1;
     }
+
+#ifndef WIN32
+    // Daemonize?
+    if ( g_bDaemonized )
+        Daemonize ();
+#endif
 
     if ( !g_bSilent )
     {
@@ -713,6 +739,12 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                 {
                     g_bSilent = true;
                 }
+#ifndef WIN32
+                else if ( strcmp ( szArguments [i], "-d" ) == 0 )
+                {
+                    g_bDaemonized = true;
+                }
+#endif
                 else if ( strcmp ( szArguments [i], "-t" ) == 0 )
                 {
                     g_bNoTopBar = true;

@@ -63,6 +63,9 @@ int main ( int argc, char* argv [] )
         {
             printf ( "Usage: %s [OPTION]\n\n", szLaunchFile ? szLaunchFile : "mtaserver" );
             printf ( "  -s                   Run server in silent mode\n" );
+#ifndef WIN32
+            printf ( "  -d                   Run server daemonized\n" );
+#endif
             printf ( "  -t                   Run server with a simple console\n" );
             printf ( "  -f                   Run server with a standard console (Default)\n" );
             printf ( "  -D [PATH]            Use as base directory\n" );
