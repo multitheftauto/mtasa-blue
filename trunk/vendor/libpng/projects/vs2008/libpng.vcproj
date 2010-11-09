@@ -116,7 +116,7 @@
 				OmitFramePointers="false"
 				AdditionalIncludeDirectories="../../../"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_SETJMP_NOT_SUPPORTED"
-				StringPooling="false"
+				StringPooling="true"
 				MinimalRebuild="false"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"

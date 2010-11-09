@@ -20,8 +20,6 @@
 #include <windows.h>
 #include <winsock.h>
 
-#define CloseSocket closesocket
-
 //typedef void (*PFNEVENT) ( CTCPSocket * );
 
 #include <stdio.h>

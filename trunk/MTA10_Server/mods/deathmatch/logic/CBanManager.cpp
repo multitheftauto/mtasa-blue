@@ -190,16 +190,7 @@ CBan* CBanManager::AddBan ( const SString& strBanner, const SString& strReason, 
 
 bool CBanManager::Exists ( CBan* pBan )
 {
-    list < CBan* >::const_iterator iter = m_BanManager.begin ();
-    for ( ; iter != m_BanManager.end (); iter++ )
-    {
-        if ( *iter == pBan )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return m_BanManager.Contains ( pBan );
 }
 
 
@@ -316,6 +307,18 @@ CBan* CBanManager::GetBan ( const char* szNick, unsigned int uiOccurrance )
         }
     }
 
+    return NULL;
+}
+
+
+CBan* CBanManager::GetBanFromSerial ( const char* szSerial )
+{
+    list < CBan* >::const_iterator iter = m_BanManager.begin ();
+    for ( ; iter != m_BanManager.end (); iter++ )
+    {
+        if ( (*iter)->GetSerial () == szSerial )
+            return *iter;
+    }
     return NULL;
 }
 

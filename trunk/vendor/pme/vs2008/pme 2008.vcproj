@@ -124,6 +124,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\pcre"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"

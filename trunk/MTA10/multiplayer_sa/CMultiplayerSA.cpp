@@ -215,6 +215,10 @@ DWORD RETURN_CrashFix_Misc11b =                              0x4D2E03;
 DWORD RETURN_CrashFix_Misc12a =                              0x4D41CA;
 DWORD RETURN_CrashFix_Misc12b =                              0x4D4222;
 
+#define HOOKPOS_CrashFix_Misc13                              0x4D464E
+DWORD RETURN_CrashFix_Misc13a =                              0x4D4654;
+DWORD RETURN_CrashFix_Misc13b =                              0x4D4764;
+
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -344,6 +348,7 @@ void HOOK_CrashFix_Misc9 ();
 void HOOK_CrashFix_Misc10 ();
 void HOOK_CrashFix_Misc11 ();
 void HOOK_CrashFix_Misc12 ();
+void HOOK_CrashFix_Misc13 ();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
@@ -472,6 +477,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc10, (DWORD)HOOK_CrashFix_Misc10, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc11, (DWORD)HOOK_CrashFix_Misc11, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
+    HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -4709,5 +4715,22 @@ void _declspec(naked) HOOK_CrashFix_Misc12 ()
         jmp     RETURN_CrashFix_Misc12a  // 4D41CA
     cont:
         jmp     RETURN_CrashFix_Misc12b  // 4D4222
+    }
+}
+
+
+void _declspec(naked) HOOK_CrashFix_Misc13 ()
+{
+    _asm
+    {
+        // Hooked from 0x4D464E  6 bytes
+        cmp     eax, 0x480
+        jb      cont  // Skip much code if eax is less than 0x480 (invalid anim)
+
+        mov     al, byte ptr [eax+0Ah] 
+        shr     al, 5
+        jmp     RETURN_CrashFix_Misc13a  // 4D4654
+    cont:
+        jmp     RETURN_CrashFix_Misc13b  // 4D478c
     }
 }

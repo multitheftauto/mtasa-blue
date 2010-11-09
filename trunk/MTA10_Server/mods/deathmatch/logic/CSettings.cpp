@@ -103,7 +103,7 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
     }
 
     // Iterate through all the setting subnodes
-    while ( pNode = pSource->FindSubNode ( "setting", uiCurrentIndex++ ) ) {
+    while ( ( pNode = pSource->FindSubNode ( "setting", uiCurrentIndex++ ) ) ) {
         std::string strContent;
         unsigned int uiResourceNameLength = 0;
 

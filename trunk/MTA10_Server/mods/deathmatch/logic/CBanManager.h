@@ -48,6 +48,7 @@ public:
 
     CBan*               GetBan                  ( const char* szIP );
     CBan*               GetBan                  ( const char* szNick, unsigned int uiOccurrance );
+    CBan*               GetBanFromSerial        ( const char* szSerial );
 
     unsigned int        GetBansWithNick         ( const char* szNick );
     unsigned int        GetBansWithBanner       ( const char* szBanner );
@@ -65,7 +66,7 @@ public:
 private:
     SString             m_strPath;
 
-    list < CBan* >      m_BanManager;
+    CMappedList < CBan* >   m_BanManager;
 
     time_t              m_tUpdate;
 

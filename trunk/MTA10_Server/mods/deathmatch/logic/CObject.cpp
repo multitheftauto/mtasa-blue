@@ -176,7 +176,7 @@ const CVector& CObject::GetPosition ( void )
         m_vecPosition = m_moveData.vecStartPosition + vecJourney;
     }
 
-    UpdateSpatialData ();     // Not sure this is necessary
+    UpdateSpatialData ();     // This is necessary because 'GetAttachedPosition ( m_vecPosition )' can change alter this objects position
     // Finally, return it
     return m_vecPosition;
 }

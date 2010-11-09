@@ -318,7 +318,8 @@ void CServerBrowser::Update ( void )
     CServerList *pList = GetServerList ( Type );
 
     // Update the current server list class
-    pList->Pulse ();
+    if ( IsVisible () )
+        pList->Pulse ();
 
     // If an update is needed, the serverbrowser is visible and it has gone some time since last update
     if ( ( pList->IsUpdated () || m_PrevServerBrowserType != Type ) && m_ulLastUpdateTime < CClientTime::GetTime () - SERVER_BROWSER_UPDATE_INTERVAL )
@@ -434,27 +435,20 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
     }
 
     // Loop the server list
-    CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
-    int j = 0;
-    int k = pList->GetServerCount ();
-    if ( k > 0 )
+    for ( CServerListIterator it = pList->IteratorBegin () ; it != pList->IteratorEnd (); it++ )
     {
-        for ( CServerListIterator i = i_b; i != i_e; i++ )
-        {
-            CServerListItem * pServer = *i;
+        CServerListItem * pServer = *it;
 
-            // Add the item to the list
-            if ( ( pServer->bScanned || (pServer->bSkipped && m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ()) ) &&
-                 ( !pServer->bAddedToList[ Type ] || bClearServerList ) )
-                AddServerToList ( pServer, Type );
-            j++;
+        // Add/update the item to the list
+        if ( ( ( pServer->bScanned || pServer->nMaxPlayers ) || (pServer->bMaybeOffline && m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ()) ) &&
+             ( pServer->revisionInList[ Type ] != pServer->uiRevision || bClearServerList ) )
+        {
+            pServer->revisionInList[ Type ] = pServer->uiRevision;
+            AddServerToList ( pServer, Type );
         }
+
     }
 
-    /*
-    SString strTitle = SString::Printf ( "Server Browser - %d servers - %d/%d players", iNumServers, iNumPlayers, iNumPlayerSlots );
-    m_pWindow->SetText ( strTitle );
-    */
     m_pServerList [ Type ]->ForceUpdate ();
     pList->SetUpdated ( false );
 }
@@ -462,8 +456,6 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
 
 void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserType Type )
 {
-    pServer->bAddedToList[ Type ] = true;
-
     bool bIncludeEmpty  = m_pIncludeEmpty [ Type ]->GetSelected ();
     bool bIncludeFull   = m_pIncludeFull [ Type ]->GetSelected ();
     bool bIncludeLocked = m_pIncludeLocked [ Type ]->GetSelected ();
@@ -475,15 +467,9 @@ void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserT
 
     if ( !strServerSearchText.empty() )
     {
-        for ( unsigned int i = 0; i < strServerSearchText.length (); i++ ) 
-            strServerSearchText[i] = tolower ( strServerSearchText[i] );
-
         // Search for the search text in the servername
-        std::string strServerName = pServer->strName;
-        for ( unsigned int i = 0; i < strServerName.length (); i ++ ) 
-            strServerName[i] = tolower ( strServerName[i] );
-
-        bServerSearchFound = strServerName.find(strServerSearchText) != string::npos;
+        SString strServerName = pServer->strName;
+        bServerSearchFound = strServerName.ContainsI ( strServerSearchText );
     }
 
     if ( !strPlayerSearchText.empty() )
@@ -492,19 +478,12 @@ void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserT
 
         if ( pServer->nPlayers > 0 )
         {
-            for ( unsigned int i = 0; i < strPlayerSearchText.length (); i++ ) 
-                strPlayerSearchText[i] = tolower ( strPlayerSearchText[i] );
-
             // Search for the search text in the names of the players in the server
             for ( unsigned int i = 0; i < pServer->vecPlayers.size (); i++ ) 
             {
-                std::string strPlayerName = pServer->vecPlayers[i].c_str ();
-                std::string strPlayerNameLower = strPlayerName;
+                SString strPlayerName = pServer->vecPlayers[i];
 
-                for ( unsigned int j = 0; j < strPlayerNameLower.length (); j++ )
-                    strPlayerNameLower[j] = tolower ( strPlayerNameLower[j] );
-
-                if ( strPlayerNameLower.find(strPlayerSearchText) != string::npos )
+                if ( strPlayerName.ContainsI ( strPlayerSearchText ) )
                 {
                     bPlayerSearchFound = true;
                     int k = m_pServerPlayerList [ Type ]->AddRow ( true );
@@ -520,32 +499,40 @@ void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserT
         ( !pServer->bPassworded || bIncludeLocked ) && bServerSearchFound && bPlayerSearchFound
        )
     {
-        // Create a new row
-        int iIndex = m_pServerList [ Type ]->AddRow ( true );
-
         // Format some text data
-        char buf[32] = {0};
-        stringstream ssPlayers;
-        ssPlayers << pServer->nPlayers << " / " << pServer->nMaxPlayers;
-        std::string strEndpoint = pServer->strHost + ":" + itoa ( pServer->usGamePort, buf, 10 );
+        SString strPlayers ( "%d / %d", pServer->nPlayers, pServer->nMaxPlayers );
+        SString strEndpoint ( "%s:%d", pServer->strHost.c_str (), pServer->usGamePort );
+
+        // Get existing row
+        int iIndex = -1;
+        {
+            int iRowCount = m_pServerList [ Type ]->GetRowCount ();
+            for ( int i = 0 ; i < iRowCount ; i++ )
+            {
+                SString strOtherEndPoint = m_pServerList [ Type ]->GetItemText ( i, m_hHost [ Type ] );
+                if ( strOtherEndPoint == strEndpoint )
+                {
+                    iIndex = i;
+                    break;
+                }
+            }
+        }
+        // Create a new row if not found
+        if ( iIndex == - 1 )
+            iIndex = m_pServerList [ Type ]->AddRow ( true );
+
 
         // The row index could change at any point here if list sorting is enabled
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hName [ Type ],     pServer->strName.c_str (), false, false, true );
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hGame [ Type ],     pServer->strType.c_str (), false, false, true );
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hMap [ Type ],      pServer->strMap.c_str (), false, false, true );
-        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hHost [ Type ],     strEndpoint.c_str (), false, false, true );
-        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPlayers [ Type ],  ssPlayers.str ().c_str (), true, false, true );
-        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPing [ Type ],     itoa ( pServer->nPing, buf, 10 ), true, false, true );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hHost [ Type ],     strEndpoint, false, false, true );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPlayers [ Type ],  strPlayers, true, false, true );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPing [ Type ],     SString ( "%d", pServer->nPing ), true, false, true );
 
         // Locked icon
-        if ( pServer->bPassworded )
-        {
-            m_pServerList [ Type ]->SetItemImage ( iIndex, m_hLocked [ Type ], m_pLockedIcon );
-        }
-        if ( pServer->bSerials )
-        {
-            m_pServerList [ Type ]->SetItemImage ( iIndex, m_hSerial [ Type ], m_pSerialIcon );
-        }
+        m_pServerList [ Type ]->SetItemImage ( iIndex, m_hLocked [ Type ], pServer->bPassworded ? m_pLockedIcon : NULL );
+        m_pServerList [ Type ]->SetItemImage ( iIndex, m_hSerial [ Type ], pServer->bSerials    ? m_pSerialIcon : NULL );
     }
 }
 
@@ -982,24 +969,6 @@ bool CServerBrowser::LoadServerList ( CXMLNode* pNode, const std::string& strTag
     }
     pList->SetUpdated ( true );
     return true;
-}
-
-
-void CServerBrowser::LoadInternetList()
-{
-    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ),
-            CONFIG_INTERNET_LIST_TAG, GetInternetList () );
-}
-
-
-void CServerBrowser::SaveInternetList()
-{
-    CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    CXMLNode* pRecent = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT );
-    if ( !pRecent )
-        pRecent = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_INT );
-    SaveServerList ( pRecent, CONFIG_INTERNET_LIST_TAG, GetInternetList () );
 }
 
 

@@ -12,14 +12,19 @@
 
 #include "StdInc.h"
 #include <assert.h>
+#include <tchar.h>
+#include <strsafe.h>
+#define BUFSIZE 512
 
 static bool bCancelPressed = false;
+static bool bOkPressed = false;
 static HWND hwndSplash = NULL;
 static unsigned long ulSplashStartTime = 0;
 static HWND hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
-
+SString GetWMIOSVersion ( void );
+static HWND hwndCrashedDialog = NULL;
 
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
@@ -96,46 +101,245 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 }
 
 
-bool TerminateGTAIfRunning ( void )
+///////////////////////////////////////////////////////////////////////////
+//
+// devicePathToWin32Path
+//
+// Code from the merky depths of MSDN
+//
+///////////////////////////////////////////////////////////////////////////
+SString devicePathToWin32Path ( const SString& strDevicePath ) 
 {
-    DWORD dwProcessIDs[250];
-    DWORD pBytesReturned = 0;
-    unsigned int uiListSize = 50;
-    if ( EnumProcesses ( dwProcessIDs, 250 * sizeof(DWORD), &pBytesReturned ) )
-    {
-        for ( unsigned int i = 0; i < pBytesReturned / sizeof ( DWORD ); i++ )
-        {
-            // Open the process
-            HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, dwProcessIDs[i]);
-            if ( hProcess )
-            {
-                HMODULE pModule;
-                DWORD cbNeeded;
-                if ( EnumProcessModules ( hProcess, &pModule, sizeof ( HMODULE ), &cbNeeded ) )
-                {
-                    char szModuleName[500];
-                    if ( GetModuleFileNameEx( hProcess, pModule, szModuleName, 500 ) )
-                    {
-                        if ( strcmpi ( szModuleName + strlen ( szModuleName ) - strlen ( "gta_sa.exe" ), "gta_sa.exe" ) == 0 )
-                        {
-                            if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA: SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION ) == IDYES )
-                            {
-                                TerminateProcess ( hProcess, 0 );
-                                CloseHandle ( hProcess );
-                                return true;
-                            }
+    TCHAR pszFilename[MAX_PATH+2];
+    strncpy ( pszFilename, strDevicePath, MAX_PATH );
+    pszFilename[MAX_PATH] = 0;
 
-                            return false;
-                        } 
+    // Translate path with device name to drive letters.
+    TCHAR szTemp[BUFSIZE];
+    szTemp[0] = '\0';
+
+    if (GetLogicalDriveStrings(BUFSIZE-1, szTemp)) 
+    {
+        TCHAR szName[MAX_PATH];
+        TCHAR szDrive[3] = TEXT(" :");
+        BOOL bFound = FALSE;
+        TCHAR* p = szTemp;
+
+        do 
+        {
+            // Copy the drive letter to the template string
+            *szDrive = *p;
+
+            // Look up each device name
+            if (QueryDosDevice(szDrive, szName, MAX_PATH))
+            {
+                UINT uNameLen = _tcslen(szName);
+
+                if (uNameLen < MAX_PATH) 
+                {
+                    bFound = _tcsnicmp(pszFilename, szName, uNameLen) == 0;
+
+                    if (bFound && *(pszFilename + uNameLen) == _T('\\')) 
+                    {
+                        // Reconstruct pszFilename using szTempFile
+                        // Replace device path with DOS path
+                        TCHAR szTempFile[MAX_PATH];
+                        StringCchPrintf(szTempFile,
+                        MAX_PATH,
+                        TEXT("%s%s"),
+                        szDrive,
+                        pszFilename+uNameLen);
+                        StringCchCopyN(pszFilename, MAX_PATH+1, szTempFile, _tcslen(szTempFile));
                     }
                 }
+            }
+            // Go to the next NULL character.
+            while (*p++);
 
-                // Close the process
-                CloseHandle ( hProcess );
+        } while (!bFound && *p); // end of string
+    }
+    return pszFilename;
+}
+
+
+typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameA)(__in HANDLE hProcess, __in DWORD dwFlags, __out_ecount_part(*lpdwSize, *lpdwSize) LPSTR lpExeName, __inout PDWORD lpdwSize);
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetPossibleProcessPathFilenames
+//
+// Get all image names for a processID
+//
+///////////////////////////////////////////////////////////////////////////
+std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
+{
+    static LPFN_QueryFullProcessImageNameA fnQueryFullProcessImageNameA = NULL;
+    static bool bDoneGetProcAddress = false;
+
+    std::vector < SString > result;
+
+    if ( !bDoneGetProcAddress )
+    {
+        // Find 'QueryFullProcessImageNameA'
+        bDoneGetProcAddress = true;
+        HMODULE hModule = GetModuleHandle ( "Kernel32.dll" );
+        fnQueryFullProcessImageNameA = static_cast < LPFN_QueryFullProcessImageNameA > ( static_cast < PVOID > ( GetProcAddress( hModule, "QueryFullProcessImageNameA" ) ) );
+    }
+
+    if ( fnQueryFullProcessImageNameA )
+    {
+        for ( int i = 0 ; i < 2 ; i++ )
+        {
+            HANDLE hProcess = OpenProcess ( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
+
+            if ( hProcess )
+            {
+                TCHAR szProcessName[MAX_PATH] = TEXT("");
+                DWORD dwSize = sizeof(szProcessName)/sizeof(TCHAR);
+                DWORD bOk = fnQueryFullProcessImageNameA ( hProcess, 0, szProcessName, &dwSize );
+                CloseHandle( hProcess );
+
+                if ( bOk && strlen ( szProcessName ) > 0 )
+                    ListAddUnique ( result, SString ( SStringX ( szProcessName ) ) );
             }
         }
     }
 
+    {
+        HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
+
+        if ( hProcess )
+        {
+            TCHAR szProcessName[MAX_PATH] = TEXT("");
+            DWORD bOk = GetModuleFileNameEx ( hProcess, NULL, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+            CloseHandle ( hProcess );
+
+            if ( bOk && strlen ( szProcessName ) > 0 )
+                ListAddUnique ( result, SString ( SStringX ( szProcessName ) ) );
+        }
+    }
+
+    for ( int i = 0 ; i < 2 ; i++ )
+    {
+        HANDLE hProcess = OpenProcess ( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
+
+        if ( hProcess )
+        {
+            TCHAR szProcessName[MAX_PATH] = TEXT("");
+            DWORD bOk = GetProcessImageFileName ( hProcess, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+            CloseHandle( hProcess );
+
+            if ( bOk && strlen ( szProcessName ) > 0 )
+                ListAddUnique ( result, SString ( SStringX ( devicePathToWin32Path ( szProcessName ) ) ) );
+        }
+    }
+
+    return result;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// MyEnumProcesses
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+std::vector < DWORD > MyEnumProcesses ( void )
+{
+    uint uiSize = 200;
+    std::vector < DWORD > processIdList;
+    while ( true )
+    {
+        processIdList.resize ( uiSize );
+        DWORD pBytesReturned = 0;
+        if ( !EnumProcesses ( &processIdList[0], uiSize * sizeof(DWORD), &pBytesReturned ) )
+        {
+            processIdList.clear ();
+            break;
+        }
+        uint uiNumProcessIds = pBytesReturned / sizeof(DWORD);
+
+        if ( uiNumProcessIds != uiSize )
+        {
+            processIdList.resize ( uiNumProcessIds );
+            break;
+        }
+
+        uiSize *= 2;
+    }
+
+    return processIdList;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetGTAProcessList
+//
+// Get list of process id's with the image name ending in "gta_sa.exe"
+//
+///////////////////////////////////////////////////////////////////////////
+std::vector < DWORD > GetGTAProcessList ( void )
+{
+    std::vector < DWORD > result;
+
+    uint uiNumFound = 0;
+    std::vector < DWORD > processIdList = MyEnumProcesses ();
+    for ( uint i = 0; i < processIdList.size (); i++ )
+    {
+        DWORD processId = processIdList[i];
+        // Skip 64 bit processes to avoid errors
+        if ( !Is32bitProcess ( processId ) )
+            continue;
+
+        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
+        for ( uint i = 0; i < filenameList.size (); i++ )
+            if ( filenameList[i].EndsWith ( "gta_sa.exe" ) )
+                result.push_back ( processId );
+    }
+    return result;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// TerminateGTAIfRunning
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+bool TerminateGTAIfRunning ( void )
+{
+    std::vector < DWORD > processIdList = GetGTAProcessList ();
+
+    if ( processIdList.size () )
+    {
+        if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION ) == IDNO )
+            return false;
+
+        // Try to stop all GTA process id's
+        for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
+        {
+            for ( std::vector < DWORD > ::iterator iter = processIdList.begin () ; iter != processIdList.end (); ++iter )
+            {
+                HANDLE hProcess = OpenProcess ( PROCESS_TERMINATE, 0, *iter );
+                if ( hProcess )
+                {
+                    TerminateProcess ( hProcess, 0 );
+                    CloseHandle ( hProcess );
+                }
+            }
+            Sleep ( 1000 );
+            processIdList = GetGTAProcessList ();
+        }
+
+        if ( processIdList.size () )
+        {
+            MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_YESNO | MB_ICONQUESTION );
+            return false;
+        }
+    }
     return true;
 }
 
@@ -149,6 +353,9 @@ int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
             {  
                 case IDCANCEL:
                     bCancelPressed = true;
+                    return TRUE; 
+                case IDOK:
+                    bOkPressed = true;
                     return TRUE; 
             } 
     } 
@@ -195,10 +402,13 @@ void HideSplash ( bool bOnlyDelay  )
 //
 // General error message box
 //
-long DisplayErrorMessageBox ( const SString& strMessage )
+long DisplayErrorMessageBox ( const SString& strMessage, const SString& strTroubleType )
 {
     HideSplash ();
     MessageBox( 0, strMessage, "Error!", MB_ICONEXCLAMATION|MB_OK );
+
+    if ( strTroubleType != "" )
+        BrowseToSolution ( strTroubleType, true );
     return 1;
 }
 
@@ -246,6 +456,28 @@ void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, co
         RegSetValueEx ( hkTemp, szValue, NULL, REG_SZ, (LPBYTE)szBuffer, strlen(szBuffer) + 1 );
         RegCloseKey ( hkTemp );
     }
+}
+
+
+SString GetMTASAModuleFileName ( void )
+{
+    // Get current module full path
+    char szBuffer[64000];
+    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+    return szBuffer;
+}
+
+
+SString GetLaunchPath ( void )
+{
+    // Get current module full path
+    char szBuffer[64000];
+    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
+
+    // Strip the module name out of the path.
+    PathRemoveFileSpec ( szBuffer );
+
+    return szBuffer;
 }
 
 
@@ -434,40 +666,74 @@ void StartPseudoProgress( HINSTANCE hInstance, const SString& strTitle, const SS
 
 void StopPseudoProgress( void )
 {
-    UpdateProgress( 60, 100 );
-    Sleep ( 100 );
-    UpdateProgress( 90, 100 );
-    Sleep ( 100 );
-    HideProgressDialog ();
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// FindFiles
-//
-// Find all files or directories at a path
-//
-///////////////////////////////////////////////////////////////
-std::vector < SString > FindFiles ( const SString& strMatch, bool bFiles, bool bDirectories )
-{
-    std::vector < SString > result;
-
-    WIN32_FIND_DATA findData;
-    HANDLE hFind = FindFirstFile ( strMatch, &findData );
-    if( hFind != INVALID_HANDLE_VALUE )
+    if ( hwndProgressDialog )
     {
-        do
-        {
-            if ( ( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) ? bDirectories : bFiles )
-                if ( strcmp ( findData.cFileName, "." ) && strcmp ( findData.cFileName, ".." ) )
-                    result.push_back ( findData.cFileName );
-        }
-        while( FindNextFile( hFind, &findData ) );
-        FindClose( hFind );
+        UpdateProgress( 60, 100 );
+        Sleep ( 100 );
+        UpdateProgress( 90, 100 );
+        Sleep ( 100 );
+        HideProgressDialog ();
     }
-    return result;
 }
+
+
+
+
+///////////////////////////////////////////////////////////////
+//
+// Crashed dialog
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString ShowCrashedDialog( HINSTANCE hInstance, const SString& strMessage )
+{
+    if ( !hwndCrashedDialog )
+    {
+        HideSplash ();
+        bCancelPressed = false;
+        bOkPressed = false;
+        hwndCrashedDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_CRASHED_DIALOG), 0, DialogProc );
+        SetWindowText ( GetDlgItem( hwndCrashedDialog, IDC_CRASH_INFO_EDIT ), strMessage );
+        SendDlgItemMessage( hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK, GetApplicationSetting ( "diagnostics", "send-dumps" ) != "no" ? BST_CHECKED : BST_UNCHECKED, 0 );
+    }
+    SetForegroundWindow ( hwndCrashedDialog );
+    SetWindowPos ( hwndCrashedDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+
+    while ( !bCancelPressed && !bOkPressed )
+    {
+        MSG msg;
+        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        {
+            if( GetMessage( &msg, NULL, 0, 0 ) )
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        Sleep( 10 );
+    }
+
+    LRESULT res = SendMessageA( GetDlgItem( hwndCrashedDialog, IDC_SEND_DUMP_CHECK ), BM_GETCHECK, 0, 0 );
+    SetApplicationSetting ( "diagnostics", "send-dumps", res ? "yes" : "no" );
+
+    if ( bCancelPressed )
+        return "quit";
+    //if ( bOkPressed )
+        return "ok";
+}
+
+
+void HideCrashedDialog ( void )
+{
+    if ( hwndCrashedDialog )
+    {
+        DestroyWindow ( hwndCrashedDialog );
+        hwndCrashedDialog = NULL;
+    }
+}
+
+
 
 
 ///////////////////////////////////////////////////////////////
@@ -477,8 +743,11 @@ std::vector < SString > FindFiles ( const SString& strMatch, bool bFiles, bool b
 // Return a list of files inside strPath
 //
 ///////////////////////////////////////////////////////////////
-void FindFilesRecursive ( const SString& strPath, std::vector < SString >& outFileList )
+void FindFilesRecursive ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth )
 {
+    SString strPath, strMatch;
+    strPathMatch.Split ( "\\", &strPath, &strMatch, -1 );
+
     std::list < SString > toDoList;
     toDoList.push_back ( strPath );
     while ( toDoList.size () )
@@ -486,8 +755,8 @@ void FindFilesRecursive ( const SString& strPath, std::vector < SString >& outFi
         SString strPathHere = toDoList.front ();
         toDoList.pop_front ();
 
-        std::vector < SString > fileListHere = FindFiles ( strPathHere + "\\*", true, false );
-        std::vector < SString > dirListHere = FindFiles ( strPathHere + "\\*", false, true );
+        std::vector < SString > fileListHere = FindFiles ( strPathHere + "\\" + strMatch, true, false );
+        std::vector < SString > dirListHere = FindFiles ( strPathHere + "\\" + strMatch, false, true );
 
         for ( unsigned int i = 0 ; i < fileListHere.size (); i++ )
         {
@@ -581,128 +850,78 @@ void MakeRandomIndexList ( int Size, std::vector < int >& outList )
 
 ///////////////////////////////////////////////////////////////
 //
-// CheckPermissions
+// GetOSVersion
 //
-// Return false if permissions are not correct
+// Affected by compatibility mode
 //
 ///////////////////////////////////////////////////////////////
-bool CheckPermissions ( const std::string& strPath, unsigned int uiMaxTimeMs )
+SString GetOSVersion ( void )
 {
-    srand ( GetTickCount () );
-
-    std::vector < SString > stopList;
-    stopList.push_back ( "resource" );
-    stopList.push_back ( "dumps" );
-    stopList.push_back ( "screenshots" );
-
-    std::vector < SString > filePathList;
-    std::vector < SString > dirPathList;
-    FindRelevantFiles ( strPath, filePathList, dirPathList, stopList, 500, 60 );
-
-    unsigned long ulStartTime = GetTickCount ();
-
-    float fRatio = dirPathList.size () / Max < float > ( 1, (float)filePathList.size () + dirPathList.size () );
-    fRatio = Clamp ( 1/5.f, fRatio, 1/2.f );
-
-    {
-        std::vector < int > indexList;
-        MakeRandomIndexList ( dirPathList.size (), indexList );
-        for ( unsigned int i = 0 ; i < dirPathList.size (); i++ )
-        {
-            int idx = indexList[i];
-            if ( ( idx % 10 ) == 0 )
-            {
-                unsigned long ulTimeElapsed = GetTickCount () - ulStartTime;
-                if ( ulTimeElapsed > uiMaxTimeMs * fRatio )
-                    break;          
-            }
-
-            if ( !HasUsersGotFullAccess ( dirPathList[idx] ) )
-                return false;
-        }
-    }
-
-    {
-        std::vector < int > indexList;
-        MakeRandomIndexList ( filePathList.size (), indexList );
-        for ( unsigned int i = 0 ; i < filePathList.size (); i++ )
-        {
-            int idx = indexList[i];
-            if ( ( idx % 10 ) == 0 )
-            {
-                unsigned long ulTimeElapsed = GetTickCount () - ulStartTime;
-                if ( ulTimeElapsed > uiMaxTimeMs )
-                    break;
-            }
-
-            if ( !HasUsersGotFullAccess ( filePathList[idx] ) )
-                return false;
-        }
-    }
-
-    return true;
+    OSVERSIONINFO versionInfo;
+    memset ( &versionInfo, 0, sizeof ( versionInfo ) );
+    versionInfo.dwOSVersionInfoSize = sizeof ( versionInfo );
+    GetVersionEx ( &versionInfo );
+    return SString ( "%d.%d", versionInfo.dwMajorVersion, versionInfo.dwMinorVersion );
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// FixPermissions
+// GetRealOSVersion
+//
+// Ignoring compatibility mode
+//
+///////////////////////////////////////////////////////////////
+SString GetRealOSVersion ( void )
+{
+    SString strVersionAndBuild = GetWMIOSVersion ();
+    std::vector < SString > parts;
+    strVersionAndBuild.Split ( ".", parts );
+    uint uiMajor = parts.size () > 0 ? atoi ( parts[0] ) : 0;
+    uint uiMinor = parts.size () > 1 ? atoi ( parts[1] ) : 0;
+    return SString ( "%u.%u", uiMajor, uiMinor );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// IsUserAdmin
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void FixPermissions ( const std::string& strPath )
+BOOL IsUserAdmin(VOID)
+/*++ 
+Routine Description: This routine returns TRUE if the caller's
+process is a member of the Administrators local group. Caller is NOT
+expected to be impersonating anyone and is expected to be able to
+open its own process and process token. 
+Arguments: None. 
+Return Value: 
+   TRUE - Caller has Administrators local group. 
+   FALSE - Caller does not have Administrators local group. --
+*/ 
 {
-    std::vector < SString > stopList;
-    std::vector < SString > filePathList;
-    std::vector < SString > dirPathList;
-    FindRelevantFiles ( strPath, filePathList, dirPathList, stopList, 0, 0 );
-
-    int Total = dirPathList.size () + filePathList.size ();
-
-    int iFilesChecked = 0;
-    int iFilesFixed = 0;
-    int iFilesNotFixed = 0;
-
-    int iDirsChecked = 0;
-    int iDirsFixed = 0;
-    int iDirsNotFixed = 0;
-
-    for ( unsigned int i = 0 ; i < dirPathList.size (); i++ )
+    BOOL b;
+    SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+    PSID AdministratorsGroup; 
+    b = AllocateAndInitializeSid(
+        &NtAuthority,
+        2,
+        SECURITY_BUILTIN_DOMAIN_RID,
+        DOMAIN_ALIAS_RID_ADMINS,
+        0, 0, 0, 0, 0, 0,
+        &AdministratorsGroup); 
+    if(b) 
     {
-        const SString& strDirPathName = dirPathList[i];
-        if ( ( i % 10 ) == 0 )
-            if ( UpdateProgress ( i + Total, Total * 2, SString ( "%s", strDirPathName.substr ( strPath.length () ).c_str () ) ) )
-                goto cancel;
-
-        iDirsChecked++;
-        if ( !HasUsersGotFullAccess( strDirPathName ) )
-            if ( !DoSetOnFile ( false, strDirPathName, "(BU)","FullAccess" ) )
-                iDirsFixed++;
-            else
-                iDirsNotFixed++;
+        if (!CheckTokenMembership( NULL, AdministratorsGroup, &b)) 
+        {
+             b = FALSE;
+        } 
+        FreeSid(AdministratorsGroup); 
     }
 
-    for ( unsigned int i = 0 ; i < filePathList.size (); i++ )
-    {
-        const SString& strFilePathName = filePathList[i];
-        if ( ( i % 10 ) == 0 )
-            if ( UpdateProgress ( i + dirPathList.size () + Total, Total * 2, SString ( "%s", strFilePathName.substr ( strPath.length () ).c_str () ) ) )
-                goto cancel;
-
-        iFilesChecked++;
-        if ( !HasUsersGotFullAccess( strFilePathName ) )
-            if ( !DoSetOnFile ( false, strFilePathName, "(BU)","FullAccess" ) )
-                iFilesFixed++;
-            else
-                iFilesNotFixed++;
-    }
-
-cancel:
-    AddReportLog ( SString ( "WinMain: Fix permissions end - Dirs: %d/%d/%d/%d  Files: %d/%d/%d/%d"
-                , dirPathList.size (), iDirsChecked, iDirsFixed, iDirsNotFixed
-                , filePathList.size (), iFilesChecked, iFilesFixed, iFilesNotFixed
-                 ) );
+    return(b);
 }
 
 
@@ -713,10 +932,9 @@ cancel:
 //
 //
 ///////////////////////////////////////////////////////////////
-bool IsVistaOrHigher()
+bool IsVistaOrHigher ( void )
 {
-    SString strVersion = ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "CurrentVersion" );
-    int iMajor = atoi ( strVersion );
+    int iMajor = atoi ( GetRealOSVersion () );
     return iMajor >= 6;
 }
 
@@ -730,6 +948,8 @@ bool IsVistaOrHigher()
 ///////////////////////////////////////////////////////////////
 bool MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" )
 {
+    AddReportLog ( 1081, SString ( "ShellExecute bBlocking:%d %s %s '%s'", bBlocking, strAction.c_str (), strFile.c_str (), strParameters.c_str () ) );
+
     SHELLEXECUTEINFO info;
     memset( &info, 0, sizeof ( info ) );
     info.cbSize = sizeof ( info );
@@ -772,138 +992,420 @@ bool ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile,
 }
 
 
-///////////////////////////////////////////////////////////////
 //
-// ConformPath
+// QueryWMI
+//
+// Code based on the example from:
+// ms-help://MS.VSCC.v90/MS.MSDNQTR.v90.en/wmisdk/wmi/example__getting_wmi_data_from_the_local_computer.htm
+//
+
+#define _WIN32_DCOM
+using namespace std;
+#include <comdef.h>
+#include <Wbemidl.h>
+
+# pragma comment(lib, "wbemuuid.lib")
+
+
+#define DECODE_NAME_WMI(txt) DECODE_TEXT(txt,0xB5)
+
+/////////////////////////////////////////////////////////////////////
+//
+// QueryWMI
 //
 //
 //
-///////////////////////////////////////////////////////////////
-SString ConformPath ( const SString& strInPath )
+/////////////////////////////////////////////////////////////////////
+static bool QueryWMI ( const SString& strQuery, const SString& strKeys, std::vector < std::vector < SString > >& vecResults )
 {
-    SString strPath = strInPath;
-    // '/' to '\'
-    strPath = strPath.Replace ( "/", "\\" );
-    // no '\\'
-    strPath = strPath.Replace ( "\\\\", "\\" );
-    // no trailing '\'
-    strPath = strPath.TrimEnd ( "\\" );
-    return strPath;
-}
+    HRESULT hres;
 
+    // Step 1: --------------------------------------------------
+    // Initialize COM. ------------------------------------------
 
-///////////////////////////////////////////////////////////////
-//
-// PathJoin
-//
-//
-//
-///////////////////////////////////////////////////////////////
-SString PathJoin ( const SString& A, const SString& B )
-{
-    return ConformPath ( A + "\\" + B );
-}
+    // This has already been done somewhere else.
 
-
-///////////////////////////////////////////////////////////////
-//
-// DelTree
-//
-//
-//
-///////////////////////////////////////////////////////////////
-bool DelTree ( const SString& strPath, const SString& strInsideHere )
-{
-    // Safety: Make sure strPath is inside strInsideHere
-    if ( strPath.ToLower ().substr ( 0, strInsideHere.length () ) != strInsideHere.ToLower () )
+    hres = CoInitializeEx(0, COINIT_MULTITHREADED);
+    if (FAILED(hres))
     {
-        assert ( 0 );
+        OutputDebugString ( SString ( "Failed to initialize COM library. Error code = %x\n", hres ) );
+        return "";
+    }
+
+    // Step 2: --------------------------------------------------
+    // Set general COM security levels --------------------------
+    // Note: If you are using Windows 2000, you need to specify -
+    // the default authentication credentials for a user by using
+    // a SOLE_AUTHENTICATION_LIST structure in the pAuthList ----
+    // parameter of CoInitializeSecurity ------------------------
+
+    hres =  CoInitializeSecurity(
+        NULL, 
+        -1,                          // COM authentication
+        NULL,                        // Authentication services
+        NULL,                        // Reserved
+        RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
+        RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
+        NULL,                        // Authentication info
+        EOAC_NONE,                   // Additional capabilities 
+        NULL                         // Reserved
+        );
+                      
+    // Error here can be non fatal
+
+    if (FAILED(hres))
+    {
+#if MTA_DEBUG
+        OutputDebugString ( SString ( "QueryWMI - Failed to initialize security. Error code = %x\n", hres ) );
+#endif
+        return "";
+    }
+    
+    // Step 3: ---------------------------------------------------
+    // Obtain the initial locator to WMI -------------------------
+
+    IWbemLocator *pLoc = NULL;
+
+    hres = CoCreateInstance(
+        CLSID_WbemLocator,             
+        0, 
+        CLSCTX_INPROC_SERVER, 
+        IID_IWbemLocator, (LPVOID *) &pLoc);
+ 
+    if (FAILED(hres))
+    {
+#if MTA_DEBUG
+        OutputDebugString ( SString ( "QueryWMI - Failed to create IWbemLocator object. Error code = %x\n", hres ) );
+#endif
         return false;
     }
 
-    const SString strMTASAPath = ConformPath ( GetMTASAPath () );
+    // Step 4: -----------------------------------------------------
+    // Connect to WMI through the IWbemLocator::ConnectServer method
 
-    DWORD dwBufferSize = strPath.length () + 3;
-    char *szBuffer = static_cast < char* > ( alloca ( dwBufferSize ) );
-    memset ( szBuffer, 0, dwBufferSize );
-    strncpy ( szBuffer, strPath, strPath.length () );
-    SHFILEOPSTRUCT sfos;
-
-    sfos.hwnd = NULL;
-    sfos.wFunc = FO_DELETE;
-    sfos.pFrom = szBuffer;
-    sfos.pTo = NULL;
-    sfos.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT | FOF_ALLOWUNDO;
-
-    int status = SHFileOperation(&sfos);
-    return status == 0;
-}
+    IWbemServices *pSvc = NULL;
 
 
-///////////////////////////////////////////////////////////////
-//
-// MkDir
-//
-//
-//
-///////////////////////////////////////////////////////////////
-bool MkDir ( const SString& strInPath )
-{
-    SString strPath = ConformPath ( strInPath ) + "\\";
-    MakeSureDirExists ( strPath );
-    return true;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// FileCopy
-//
-// Copies a single file.
-//
-///////////////////////////////////////////////////////////////
-bool FileCopy ( const SString& strSrc, const SString& strDest )
-{
-    MakeSureDirExists ( strDest );
-
-    FILE* fhSrc = fopen ( strSrc, "rb" );
-    if ( !fhSrc )
+    // Connect to the root\cimv2 namespace with
+    // the current user and obtain pointer pSvc
+    // to make IWbemServices calls.
+    hres = pLoc->ConnectServer(
+         _bstr_t( "ROOT\\CIMV2" ), // Object path of WMI namespace
+         NULL,                    // User name. NULL = current user
+         NULL,                    // User password. NULL = current
+         0,                       // Locale. NULL indicates current
+         NULL,                    // Security flags.
+         0,                       // Authority (e.g. Kerberos)
+         0,                       // Context object 
+         &pSvc                    // pointer to IWbemServices proxy
+         );
+   
+    if (FAILED(hres))
     {
+        pLoc->Release();     
+#if MTA_DEBUG
+        OutputDebugString ( SString ( "QueryWMI - Could not connect. Error code = %x\n", hres ) );
+#endif
         return false;
     }
 
-    FILE* fhDst = fopen ( strDest, "wb" );
-    if ( !fhDst )
+    // Step 5: --------------------------------------------------
+    // Set security levels on the proxy -------------------------
+
+    hres = CoSetProxyBlanket(
+       pSvc,                        // Indicates the proxy to set
+       RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
+       RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
+       NULL,                        // Server principal name 
+       RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
+       RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
+       NULL,                        // client identity
+       EOAC_NONE                    // proxy capabilities 
+    );
+
+    if (FAILED(hres))
     {
-        fclose ( fhSrc );
+        pSvc->Release();
+        pLoc->Release();     
+#if MTA_DEBUG
+        OutputDebugString ( SString ( "QueryWMI - Could not set proxy blanket. Error code = %x\n", hres ) );
+#endif
         return false;
     }
 
-    char cBuffer[16384];
-    while ( true )
+    // Step 6: --------------------------------------------------
+    // Use the IWbemServices pointer to make requests of WMI ----
+    IEnumWbemClassObject* pEnumerator = NULL;
+    hres = pSvc->ExecQuery(
+        bstr_t("WQL"),
+        bstr_t( "SELECT * FROM " ) + bstr_t ( strQuery ),
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
+        NULL,
+        &pEnumerator);
+    
+    if (FAILED(hres))
     {
-        size_t dataLength = fread ( cBuffer, 1, 16384, fhSrc );
-        if ( dataLength == 0 )
+        pSvc->Release();
+        pLoc->Release();
+#if MTA_DEBUG
+        OutputDebugString ( SString ( "QueryWMI - Query failed. Error code = %x\n", hres ) );
+#endif
+        return false;
+    }
+
+    // Step 7: -------------------------------------------------
+    // Get the data from the query in step 6 -------------------
+ 
+    IWbemClassObject *pclsObj;
+    ULONG uReturn = 0;
+
+    // Get list of keys to find values for
+    std::vector < SString > vecKeys;
+    SString ( strKeys ).Split ( ",", vecKeys );
+
+    // Reserve 20 rows for results
+    vecResults.reserve ( 20 );
+
+    // Fill each row
+    while (pEnumerator)
+    {
+        HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, 
+            &pclsObj, &uReturn);
+
+        if(0 == uReturn)
+        {
             break;
-        fwrite ( cBuffer, 1, dataLength, fhDst );
+        }
+
+        VARIANT vtProp;
+
+        // Add result row
+        vecResults.insert ( vecResults.end (), std::vector < SString > () );
+        vecResults.back().reserve ( vecKeys.size () );
+
+        // Fill each cell
+        for ( unsigned int i = 0 ; i < vecKeys.size () ; i++ )
+        {
+            string strKey = vecKeys[i];
+            string strValue;
+
+            wstring wstrKey( strKey.begin (), strKey.end () );
+            hr = pclsObj->Get ( wstrKey.c_str (), 0, &vtProp, 0, 0 );
+
+            VariantChangeType( &vtProp, &vtProp, 0, VT_BSTR );
+            if ( vtProp.vt == VT_BSTR )
+                strValue = _bstr_t ( vtProp.bstrVal );
+            VariantClear ( &vtProp );
+
+            vecResults.back().insert ( vecResults.back().end (), strValue );
+        }
+
+        pclsObj->Release();
     }
 
-    fclose ( fhSrc );
-    fclose ( fhDst );
+    // Cleanup
+    // ========
+    
+    pSvc->Release();
+    pLoc->Release();
+    pEnumerator->Release();
+
     return true;
 }
 
 
-///////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 //
-// GetCurrentDir
+// GetWMIOSVersion
 //
 //
 //
-///////////////////////////////////////////////////////////////
-SString GetCurrentDir ( void )
+/////////////////////////////////////////////////////////////////////
+SString GetWMIOSVersion ( void )
 {
-    char szCurDir [ 1024 ] = "";
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    return szCurDir;
+    std::vector < std::vector < SString > > vecResults;
+
+    QueryWMI ( "Win32_OperatingSystem", "Version", vecResults );
+
+    if ( vecResults.empty () )
+        return "";
+
+    const SString& strVersion  = vecResults[0][0];
+    return strVersion;
 }
+
+
+static SString HashBuffer ( char* pData, uint uiLength )
+{
+    DWORD dwSum1 = 0;
+    DWORD dwSum2 = 0x1234;
+    for ( uint i = 0 ; i < uiLength ; i++ )
+    {
+        dwSum1 += pData[i];
+        dwSum2 += pData[i];
+        dwSum2 ^= ( dwSum2 << 2 ) + 0x93;
+    }
+    return SString ( "%08x%08x%08x", dwSum1, dwSum2, uiLength );
+}
+
+
+/////////////////////////////////////////////////////////////////////
+//
+// UpdateMTAVersionApplicationSetting
+//
+// Make sure "mta-version-ext" is correct. eg "1.0.4-9.01234.2.000"
+//
+/////////////////////////////////////////////////////////////////////
+void UpdateMTAVersionApplicationSetting ( void )
+{
+#ifdef MTA_DEBUG
+    SString strFilename = "netc_d.dll";
+#else
+    SString strFilename = "netc.dll";
+#endif
+
+    //
+    // Determine NetRev number
+    //
+
+    // Get saved status
+    SString strOldHash = GetApplicationSetting ( "netc-hash" );
+    unsigned short usNetRev = 65535;
+    unsigned short usNetRel = 0;
+    std::vector < SString > parts;
+    GetApplicationSetting ( "mta-version-ext" ).Split ( ".", parts );
+    if ( parts.size () == 6 )
+    {
+        usNetRev = atoi ( parts[4] );
+        usNetRel = atoi ( parts[5] );
+    }
+
+    // Get path to the relevant file
+    SString strNetLibPath = PathJoin ( GetLaunchPath (), "mta" );
+    SString strNetLibPathFilename = PathJoin ( strNetLibPath, strFilename );
+
+    // Hash the file
+    std::vector < char > buffer;
+    FileLoad ( strNetLibPathFilename, buffer );
+    SString strNewHash = "none";
+    if ( buffer.size () )
+        strNewHash = HashBuffer ( &buffer.at ( 0 ), buffer.size () );
+
+#ifdef MTA_DEBUG
+    // Force update
+    strNewHash = "x";
+#endif
+    // Only loadup the dll if the hash has changed, or we don't have a previous valid netrev value
+    if ( strNewHash != strOldHash || usNetRev == 65535 )
+    {
+        SString strPrevCurDir = GetCurrentWorkingDirectory ();
+        SetCurrentDirectory ( strNetLibPath );
+        SetDllDirectory( strNetLibPath );
+
+        HMODULE hModule = LoadLibrary ( strNetLibPathFilename );
+
+        if ( hModule )
+        {
+            typedef unsigned short (*PFNGETNETREV) ( void );
+            PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
+            if ( pfnGetNetRev )
+                usNetRev = pfnGetNetRev ();
+            PFNGETNETREV pfnGetNetRel = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRel" ) ) );
+            if ( pfnGetNetRel )
+                usNetRel = pfnGetNetRel ();
+
+            FreeLibrary ( hModule );
+        }
+
+        SetCurrentDirectory ( strPrevCurDir );
+        SetDllDirectory( strPrevCurDir );
+
+        SetApplicationSetting ( "netc-hash", strNewHash );
+    }
+
+    SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
+                                ,MTASA_VERSION_MAJOR
+                                ,MTASA_VERSION_MINOR
+                                ,MTASA_VERSION_MAINTENANCE
+                                ,MTASA_VERSION_TYPE
+                                ,MTASA_VERSION_BUILD
+                                ,usNetRev == 65535 ? '+' : usNetRev + '0'
+                                ,usNetRel
+                                ) );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// Is32bitProcess
+//
+// Determine if processID is a 32 bit process or not.
+// Assumes current process is 32 bit.
+//
+// (Calling GetModuleFileNameEx or EnumProcessModules on a 64bit process from a 32bit process can cause problems)
+//
+///////////////////////////////////////////////////////////////////////////
+bool Is32bitProcess ( DWORD processID )
+{
+    typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+    static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;
+    static bool bDoneGetProcAddress = false;
+    static bool bDoneIs64BitOS = false;
+    static bool bIs64BitOS = false;
+
+    if ( !bDoneGetProcAddress )
+    {
+        // Find 'IsWow64Process'
+        bDoneGetProcAddress = true;
+        HMODULE hModule = GetModuleHandle ( "Kernel32.dll" );
+        fnIsWow64Process = static_cast < LPFN_ISWOW64PROCESS > ( static_cast < PVOID > ( GetProcAddress( hModule, "IsWow64Process" ) ) );
+    }
+
+    // Function not there? Must be 32bit everything
+    if ( !fnIsWow64Process )
+        return true;
+
+
+    // See if this is a 64 bit O/S
+    if ( !bDoneIs64BitOS )
+    {
+        bDoneIs64BitOS = true;
+
+        // We know current process is 32 bit. See if it is running under WOW64
+        BOOL bIsWow64 = FALSE;
+        BOOL bOk = fnIsWow64Process ( GetCurrentProcess (), &bIsWow64 );
+        if ( bOk )
+        {
+            // Must be 64bit O/S if current (32 bit) process is running under WOW64
+            if ( bIsWow64 )
+                bIs64BitOS = true;
+        }
+    }
+
+    // Not 64 bit O/S? Must be 32bit everything
+    if ( !bIs64BitOS )
+        return true;
+
+    // Call 'IsWow64Process' on query process
+    for ( int i = 0 ; i < 2 ; i++ )
+    {
+        HANDLE hProcess = OpenProcess( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
+
+        if ( hProcess )
+        {
+            BOOL bIsWow64 = FALSE;
+            BOOL bOk = fnIsWow64Process ( hProcess, &bIsWow64 );
+            CloseHandle( hProcess );
+
+            if ( bOk )
+            {
+                if ( bIsWow64 == FALSE )
+                    return false;       // 64 bit O/S and process not running under WOW64, so it must be a 64 bit process
+                return true;
+            }
+        }
+    }
+
+    return false;   // Can't determine. Guess it's 64 bit
+}
+

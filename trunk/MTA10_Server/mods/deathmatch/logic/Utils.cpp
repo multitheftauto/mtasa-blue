@@ -63,6 +63,8 @@ bool DoesDirectoryExist ( const char* szPath )
 
 #ifdef WIN32
     DWORD dwAtr = GetFileAttributes ( szPath );
+    if ( dwAtr == INVALID_FILE_ATTRIBUTES )
+        return false;
     return ( ( dwAtr & FILE_ATTRIBUTE_DIRECTORY) != 0 );     
 #else
     struct stat Info;

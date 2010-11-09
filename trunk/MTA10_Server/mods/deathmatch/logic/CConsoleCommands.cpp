@@ -980,7 +980,7 @@ bool CConsoleCommands::Me ( CConsole* pConsole, const char* szArguments, CClient
                         if ( bContinue )
                         {
                             // Log it in the console
-                            CLogger::LogPrintf ( "CHAT: %s\n", strEcho );
+                            CLogger::LogPrintf ( "CHAT: %s\n", strEcho.c_str () );
 
                             // Broadcast the message to all clients
                             pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( strEcho, CHATCOLOR_ME ) );

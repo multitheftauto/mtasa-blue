@@ -7944,8 +7944,8 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
     // If the ban was added
     if ( pBan )
     {
-        // Initialize the message value
-        SString strMessage = "";
+        // Initialize the details value
+        SString strDetails;
 
         // Check if there's a reason
         size_t sizeReason = strReason.length( );
@@ -7955,12 +7955,26 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
             if ( sizeReason > MAX_BAN_REASON_LENGTH )
                 strReason = strReason.substr ( 0, MAX_BAN_REASON_LENGTH - 3 ) + "...";
 
-            // Format the responsible element and the reason into the message string
-            strMessage.Format ( "You were banned by %s (%s)", strResponsible.c_str(), strReason.c_str() );
+            // Add reason to the details
+            strDetails += " (" + strReason + ")";
         }
-        else
-            // Format the responsible element and the reason into the message string
-            strMessage.Format ( "You were banned by %s", strResponsible.c_str() );
+
+        // Check if there's a duration
+        SString strDurationDesc = pBan->GetDurationDesc ();
+        if ( strDurationDesc.length () )
+        {
+            // Add duration to the details
+            strDetails += " (" + strDurationDesc + ")";
+        }
+
+
+        // Format the responsible element and the reason/duration into the message string
+        SString strMessage ( "You were banned by %s%s", strResponsible.c_str(), strDetails.c_str () );
+
+        // Limit overall length of message
+        if ( strMessage.length () > 255 )
+            strMessage = strMessage.substr ( 0, 255 );
+
 
         // Set the account or serial if either one is set to be banned
         if ( bUsernameSpecified ) pBan->SetAccount ( strUsername );
@@ -7994,11 +8008,11 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
 
         // Log
         if ( bIPSpecified )
-            CLogger::LogPrintf ( "BAN: %s was banned by %s\n", strIP.c_str(), strResponsible.c_str() );
+            CLogger::LogPrintf ( "BAN: %s was banned by %s%s\n", strIP.c_str(), strResponsible.c_str(), strDetails.c_str () );
         else if ( bUsernameSpecified )
-            CLogger::LogPrintf ( "BAN: %s was banned by %s\n", strUsername.c_str(), strResponsible.c_str() );
+            CLogger::LogPrintf ( "BAN: %s was banned by %s%s\n", strUsername.c_str(), strResponsible.c_str(), strDetails.c_str () );
         else
-            CLogger::LogPrintf ( "BAN: Serial ban was added by %s\n", strResponsible.c_str() );
+            CLogger::LogPrintf ( "BAN: Serial ban was added by %s%s\n", strResponsible.c_str(), strDetails.c_str () );
 
         // Initialize a variable to indicate whether the ban's nick has been set
         bool bNickSet = false;

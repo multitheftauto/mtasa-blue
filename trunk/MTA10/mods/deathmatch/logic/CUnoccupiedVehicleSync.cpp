@@ -95,7 +95,7 @@ void CUnoccupiedVehicleSync::RemoveVehicle ( CDeathmatchVehicle* pVehicle )
 void CUnoccupiedVehicleSync::ClearVehicles ( void )
 {
     // Mark all vehicles as 'not syncing'
-    list < CDeathmatchVehicle* > ::iterator iter = m_List.begin ();
+    list < CDeathmatchVehicle* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
         (*iter)->SetIsSyncing ( false );
@@ -108,13 +108,7 @@ void CUnoccupiedVehicleSync::ClearVehicles ( void )
 
 bool CUnoccupiedVehicleSync::Exists ( CDeathmatchVehicle * pVehicle )
 {
-    list < CDeathmatchVehicle* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( *iter == pVehicle )
-            return true;
-    }
-    return false;
+    return m_List.Contains ( pVehicle );
 }
 
 
@@ -233,7 +227,7 @@ void CUnoccupiedVehicleSync::UpdateDamageModels ( void )
     // Got any items?
     if ( m_List.size () > 0 )
     {
-        list < CDeathmatchVehicle* > ::iterator iter = m_List.begin ();
+        list < CDeathmatchVehicle* > ::const_iterator iter = m_List.begin ();
         for ( ; iter != m_List.end (); iter++ )
         {
             // Sync its damage model changes if neccessary
@@ -254,7 +248,7 @@ void CUnoccupiedVehicleSync::UpdateStates ( void )
         {
             // Write each vehicle to it
             bool bAnyVehicleAdded = false;
-            list < CDeathmatchVehicle* > ::iterator iter = m_List.begin ();
+            list < CDeathmatchVehicle* > ::const_iterator iter = m_List.begin ();
             for ( ; iter != m_List.end (); iter++ )
             {
                 if ( WriteVehicleInformation ( pBitStream, *iter ) )

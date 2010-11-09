@@ -19,6 +19,10 @@ class CAccountManager;
 #include "CAccount.h"
 #include "CXMLConfig.h"
 
+
+//
+// CAccountManager
+//
 class CAccountManager: public CXMLConfig
 {
     friend class CAccount;
@@ -68,7 +72,7 @@ public:
     inline list < CAccount* > ::const_iterator  IterEnd     ( void )                    { return m_List.end (); };
 
 protected:
-    list < CAccount* >          m_List;
+    CMappedList < CAccount* >   m_List;
     bool                        m_bRemoveFromList;
 
     bool                        m_bAutoLogin;

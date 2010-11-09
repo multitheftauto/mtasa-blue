@@ -45,6 +45,9 @@ public:
     inline const std::string&   GetAccount              ( void )                        { return m_strAccount; };
     void                        SetAccount              ( const std::string& strAccount ){ m_strAccount = strAccount; };
 
+    SString                     GetDurationDesc         ( void );
+    SString                     GetReasonText           ( void ) const;
+
 private:
     std::string                 m_strIP;
     std::string                 m_strNick;

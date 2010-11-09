@@ -13,5 +13,4 @@
 
 #include "MTAPlatform.h"
 #include "SharedUtil.h"
-#include "SString.h"
 #include "../version.h"

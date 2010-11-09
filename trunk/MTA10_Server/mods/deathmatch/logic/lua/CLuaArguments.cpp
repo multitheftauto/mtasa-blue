@@ -15,6 +15,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
 
 extern CGame* g_pGame;
 
@@ -186,6 +187,7 @@ void CLuaArguments::PushArguments ( CLuaArguments& Arguments )
 bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments * returnValues ) const
 {
     assert ( pLuaMain );
+    TIMEUS startTime = GetTimeUs ();
 
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
@@ -228,7 +230,8 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
         while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
             lua_pop ( luaVM, 1 );
     }
-        
+
+    GetPerfStatManager ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.m_iFunction ), GetTimeUs() - startTime );
     return true;
 }
 
@@ -237,6 +240,7 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
 {
     assert ( pLuaMain );
     assert ( szFunction );
+    TIMEUS startTime = GetTimeUs ();
 
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
@@ -287,6 +291,7 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
             lua_pop ( luaVM, 1 );
     }
         
+    GetPerfStatManager ()->UpdateLuaTiming ( pLuaMain, szFunction, GetTimeUs() - startTime );
     return true;
 }
 

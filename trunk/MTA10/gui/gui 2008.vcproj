@@ -43,6 +43,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;&quot;../../vendor/cegui-0.4.0-custom/include&quot;;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"

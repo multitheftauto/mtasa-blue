@@ -37,6 +37,8 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_iHTTPMaxConnectionsPerClient = 4;
+    m_iHTTPThreadCount = 8;
+    m_iHTTPDosThreshold = 20;
     m_iEnableClientChecks = -1;
     m_bAutoUpdateAntiCheatEnabled = true;
     m_bJoinFloodProtectionEnabled = true;
@@ -175,6 +177,14 @@ bool CMainConfig::Load ( const char* szFilename )
     GetInteger ( m_pRootNode, "httpmaxconnectionsperclient", m_iHTTPMaxConnectionsPerClient, 1, 8 );
     m_iHTTPMaxConnectionsPerClient = Clamp ( 1, m_iHTTPMaxConnectionsPerClient, 8 );
 
+    // httpthreadcount
+    GetInteger ( m_pRootNode, "httpthreadcount", m_iHTTPThreadCount, 1, 20 );
+    m_iHTTPThreadCount = Clamp ( 1, m_iHTTPThreadCount, 20 );
+
+    // httpdosthreshold
+    GetInteger ( m_pRootNode, "httpdosthreshold", m_iHTTPDosThreshold, 1, 10000 );
+    m_iHTTPDosThreshold = Clamp ( 1, m_iHTTPDosThreshold, 10000 );
+
     // verifyclientsettings
     GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );
 
@@ -186,6 +196,16 @@ bool CMainConfig::Load ( const char* szFilename )
         for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
             if ( (*it).length () )
                 MapSet ( m_DisableACMap, *it, 1 );
+    }
+
+    {
+        SString strEnable;
+        GetString ( m_pRootNode, "enablediagnostic", strEnable );
+        std::vector < SString > tagList;
+        strEnable.Split ( ",", tagList );
+        for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
+            if ( (*it).length () )
+                MapSet ( m_EnableDiagnosticMap, *it, 1 );
     }
 
     // minclientversion - Minimum client version or kick

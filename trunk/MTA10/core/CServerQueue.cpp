@@ -297,7 +297,7 @@ void CServerQueue::DoPulse( void )
     if ( IsVisible() )
     {
         // Pulse the server query
-        m_Server.Pulse ();
+        m_Server.Pulse ( true );
 
         // Do we need a refresh?
         if ( ( m_Server.bScanned && (CClientTime::GetTime () - m_ulLastUpdateTime) >=  SERVER_UPDATE_INTERVAL ) || m_bRequiresUpdate )

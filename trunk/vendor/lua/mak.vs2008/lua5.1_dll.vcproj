@@ -44,6 +44,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
 				PreprocessorDefinitions="LUA_USE_APICHECK"
+				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"

@@ -36,7 +36,12 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     m_pSaveFile->CreateTable ( "accounts", "id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT", true );
     m_pSaveFile->CreateTable ( "userdata", "id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT, type INTEGER", true );
     m_pSaveFile->CreateTable ( "settings", "id INTEGER PRIMARY KEY, key TEXT, value INTEGER", true );
-    
+
+    // Select/update speed up: Add index for popular WHERE uses
+    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME on accounts(name)" );
+    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_USERDATA_USERID on userdata(userid)" );
+    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY on userdata(userid,key)" );
+
     //Create a new RegistryResult
     CRegistryResult result;
 
@@ -422,7 +427,7 @@ bool CAccountManager::Save ( const char* szFileName )
     m_bChangedSinceSaved = false;
     m_llLastTimeSaved = GetTickCount64_ ();
 
-    list < CAccount* > ::iterator iter = m_List.begin ();
+    list < CAccount* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
     {
         if ( (*iter)->IsRegistered () && (*iter)->HasChanged() )
@@ -459,7 +464,7 @@ CAccount* CAccountManager::Get ( const char* szName, bool bRegistered )
     if ( szName && szName [ 0 ] )
     {
         unsigned int uiHash = HashString ( szName );
-        list < CAccount* > ::iterator iter = m_List.begin ();
+        list < CAccount* > ::const_iterator iter = m_List.begin ();
         for ( ; iter != m_List.end () ; iter++ )
         {
             CAccount* pAccount = *iter;
@@ -481,7 +486,7 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
     if ( szName && szName [ 0 ] && szIP && szIP [ 0 ] )
     {
         unsigned int uiHash = HashString ( szName );
-        list < CAccount* > ::iterator iter = m_List.begin ();
+        list < CAccount* > ::const_iterator iter = m_List.begin ();
         for ( ; iter != m_List.end () ; iter++ )
         {
             CAccount* pAccount = *iter;
@@ -503,21 +508,13 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
 
 bool CAccountManager::Exists ( CAccount* pAccount )
 {
-    list < CAccount* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
-    {
-        if ( *iter == pAccount )
-        {
-            return true;
-        }
-    }
-    return false;
+    return m_List.Contains ( pAccount );
 }
 
 
 void CAccountManager::RemoveFromList ( CAccount* pAccount )
 {
-    if ( m_bRemoveFromList && !m_List.empty() )
+    if ( m_bRemoveFromList )
     {
         m_List.remove ( pAccount );
     }
@@ -536,7 +533,7 @@ void CAccountManager::MarkAsChanged ( CAccount* pAccount )
 void CAccountManager::RemoveAll ( void )
 {
     m_bRemoveFromList = false;
-    list < CAccount* > ::iterator iter = m_List.begin ();
+    list < CAccount* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
     {
         delete *iter;

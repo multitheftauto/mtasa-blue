@@ -332,7 +332,7 @@ long WINAPI CModManager::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pException
 
                 // The client wants us to terminate the process
                 DumpCoreLog ( pExceptionInformation );
-                DumpMiniDump ( pException );
+                DumpMiniDump ( pException, pExceptionInformation );
                 RunErrorTool ( pExceptionInformation );
                 TerminateProcess ( GetCurrentProcess (), 1 );
             }
@@ -340,7 +340,7 @@ long WINAPI CModManager::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pException
             {
                 // Double-fault, terminate the process
                 DumpCoreLog ( pExceptionInformation );
-                DumpMiniDump ( pException );
+                DumpMiniDump ( pException, pExceptionInformation );
                 RunErrorTool ( pExceptionInformation );
                 TerminateProcess ( GetCurrentProcess (), 1 );
             }
@@ -356,7 +356,7 @@ long WINAPI CModManager::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pException
 
     // Terminate the process
     DumpCoreLog ( pExceptionInformation );
-    DumpMiniDump ( pException );
+    DumpMiniDump ( pException, pExceptionInformation );
     RunErrorTool ( pExceptionInformation );
     TerminateProcess ( GetCurrentProcess (), 1 );
     return EXCEPTION_CONTINUE_SEARCH;
@@ -372,30 +372,24 @@ void CModManager::DumpCoreLog ( CExceptionInformation* pExceptionInformation )
         // Header
         fprintf ( pFile, "%s", "** -- Unhandled exception -- **\n\n" );
 
-        // Write the mod name
-        //fprintf ( pFile, "Mod name = %s\n", "TODO" );
-
         // Write the time
         time_t timeTemp;
         time ( &timeTemp );
-        fprintf ( pFile, "Time = %s", ctime ( &timeTemp ) );
 
-#define MAX_MODULE_PATH 512
-        char * szModulePath = new char[MAX_MODULE_PATH];
-        if ( pExceptionInformation->GetModule( szModulePath, MAX_MODULE_PATH ) )
-        {
-           fprintf ( pFile, "Module = %s\n", szModulePath );
-        }
-        delete [] szModulePath;
-#undef MAX_MODULE_PATH
+        SString strMTAVersionFull = SString ( "%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting ( "mta-version-ext" ).SplitRight ( ".", NULL, -2 ) );
+
+        SString strInfo;
+        strInfo += SString ( "Version = %s\n", strMTAVersionFull.c_str () );
+        strInfo += SString ( "Time = %s", ctime ( &timeTemp ) );
+
+        strInfo += SString ( "Module = %s\n", pExceptionInformation->GetModulePathName () );
 
         // Write the basic exception information
-        fprintf ( pFile, "Code = 0x%08X\n", pExceptionInformation->GetCode () );
-        fprintf ( pFile, "Offset = 0x%08X\n\n", pExceptionInformation->GetOffset () );
-        //fprintf ( pFile, "Referencing offset = 0x%08X\n\n", pExceptionInformation->GetReferencingOffset () );
+        strInfo += SString ( "Code = 0x%08X\n", pExceptionInformation->GetCode () );
+        strInfo += SString ( "Offset = 0x%08X\n\n", pExceptionInformation->GetAddressModuleOffset () );
 
         // Write the register info
-        fprintf ( pFile, "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n" \
+        strInfo += SString ( "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n" \
                          "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X  FLG=%08X\n" \
                          "CS=%04X   DS=%04X  SS=%04X  ES=%04X   " \
                          "FS=%04X  GS=%04X\n\n",
@@ -416,16 +410,22 @@ void CModManager::DumpCoreLog ( CExceptionInformation* pExceptionInformation )
                          pExceptionInformation->GetFS (),
                          pExceptionInformation->GetGS () );
 
+
+        fprintf ( pFile, "%s", strInfo.c_str () );
+
         // End of unhandled exception
         fprintf ( pFile, "%s", "** -- End of unhandled exception -- **\n\n\n" );
         
         // Close the file
         fclose ( pFile );
+
+        // For the crash dialog
+        SetApplicationSetting ( "diagnostics", "last-crash-info", strInfo );
     }
 }
 
 
-void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
+void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation )
 {
     // Try to load the DLL in our directory
     HMODULE hDll = NULL;
@@ -477,16 +477,32 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
                 // Create the dump directory
                 CreateDirectory ( CalcMTASAPath ( "mta\\dumps" ), 0 );
 
-                // Add a log entry.
-                SString strFilename ( "mta\\dumps\\client_%s_%02d%02d%04d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG,
-                                                                                         SystemTime.wMonth,
-                                                                                         SystemTime.wDay,
-                                                                                         SystemTime.wYear,
-                                                                                         SystemTime.wHour,
-                                                                                         SystemTime.wMinute );
+                SString strModuleName = pExceptionInformation->GetModuleBaseName ();
+                strModuleName = strModuleName.ReplaceI ( ".dll", "" ).Replace ( ".exe", "" ).Replace ( "_", "" ).Replace ( ".", "" ).Replace ( "-", "" );
+                if ( strModuleName.length () == 0 )
+                    strModuleName = "unknown";
+
+                SString strMTAVersionFull = SString ( "%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting ( "mta-version-ext" ).SplitRight ( ".", NULL, -2 ) );
+                SString strSerialPart = GetApplicationSetting ( "serial" ).substr ( 0, 8 );
+
+                SString strFilename ( "mta\\dumps\\client_%s_%s_%06x_%x_%s_%04d%02d%02d_%02d%02d.dmp",
+                                             strMTAVersionFull.c_str (),
+                                             strModuleName.c_str (),
+                                             pExceptionInformation->GetAddressModuleOffset (),
+                                             pExceptionInformation->GetCode () & 0xffff,
+                                             strSerialPart.c_str (),
+                                             SystemTime.wYear,
+                                             SystemTime.wDay,
+                                             SystemTime.wMonth,
+                                             SystemTime.wHour,
+                                             SystemTime.wMinute
+                                           );
 
                 // Copy the file
                 CopyFile ( CalcMTASAPath ( "mta\\core.dmp" ), CalcMTASAPath ( strFilename ), false );
+
+                // For the dump uploader
+                SetApplicationSetting ( "diagnostics", "last-dump-save", CalcMTASAPath ( strFilename ) );
             }
         }
 
@@ -497,47 +513,55 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
 
 void CModManager::RunErrorTool ( CExceptionInformation* pExceptionInformation )
 {
-// MTA Error Reporter is not currently used
-#if 0 
-    // Populate arguments for the error reporter
-    SString strBuffer = SString::Printf ( "0x%08X", pExceptionInformation->GetOffset () );
-    
-    // Grab the GTA install path
-    HKEY hkey = NULL;
-    DWORD dwBufferSize = MAX_PATH;
-    char szGTASARoot [MAX_PATH];
-    szGTASARoot [0] = 0;
-    DWORD dwType = 0;
-    RegOpenKey ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", &hkey );
-    if ( hkey ) 
-    {
-        RegQueryValueEx ( hkey, "GTA:SA Path", NULL, &dwType, (LPBYTE)szGTASARoot, &dwBufferSize );
-        RegCloseKey ( hkey );
-    }
+// MTA Error Reporter is now integrated into the launcher
 
-    if ( szGTASARoot [0] != 0 )
-    {
-        // Append \MTA\MTA Error Reporter.exe
-        size_t sizeRoot = strlen ( szGTASARoot );
-        if ( szGTASARoot [sizeRoot-1] != '\\' )
-        {
-            szGTASARoot [sizeRoot] = '\\';
-            szGTASARoot [sizeRoot+1] = 0;
-        }
+    // Only do once
+    static bool bDoneReport = false;
+    if ( bDoneReport )
+        return;
+    bDoneReport = false;
 
-        char szMTASARoot [MAX_PATH];
-        strcat ( szGTASARoot, "MTA" );
-        strcpy ( szMTASARoot, szGTASARoot );
-        strcat ( szGTASARoot, "\\MTA Error Reporter.exe" );
+    // Log the basic exception information
+    SString strMessage ( "Crash 0x%08X 0x%08X %s"
+                         " EAX=%08X EBX=%08X ECX=%08X EDX=%08X ESI=%08X"
+                         " EDI=%08X EBP=%08X ESP=%08X EIP=%08X FLG=%08X"
+                         " CS=%04X DS=%04X SS=%04X ES=%04X"
+                         " FS=%04X GS=%04X",
+                         pExceptionInformation->GetCode (),
+                         pExceptionInformation->GetAddressModuleOffset (),
+                         pExceptionInformation->GetModulePathName (),
+                         pExceptionInformation->GetEAX (),
+                         pExceptionInformation->GetEBX (),
+                         pExceptionInformation->GetECX (),
+                         pExceptionInformation->GetEDX (),
+                         pExceptionInformation->GetESI (),
+                         pExceptionInformation->GetEDI (),
+                         pExceptionInformation->GetEBP (),
+                         pExceptionInformation->GetESP (),
+                         pExceptionInformation->GetEIP (),
+                         pExceptionInformation->GetEFlags (),
+                         pExceptionInformation->GetCS (),
+                         pExceptionInformation->GetDS (),
+                         pExceptionInformation->GetSS (),
+                         pExceptionInformation->GetES (),
+                         pExceptionInformation->GetFS (),
+                         pExceptionInformation->GetGS ()
+                        );
 
-        // Launch the error reporter
-        ShellExecute ( 0, "open", szGTASARoot, strBuffer, szMTASARoot, 1 );
-    }
-    else
-    {
-        ShellExecute ( 0, "open", "MTA Error Reporter.exe", strBuffer, "mta", 1 );
-    }
+    AddReportLog ( 3120, strMessage );
+
+    // Try relaunch with crashed flag
+    SString strMTASAPath = GetMTASABaseDir ();
+    SetCurrentDirectory ( strMTASAPath );
+    SetDllDirectory( strMTASAPath );
+
+#ifdef MTA_DEBUG
+    #define MTA_EXE_NAME            "Multi Theft Auto_d.exe"
+#else
+    #define MTA_EXE_NAME            "Multi Theft Auto.exe"
 #endif
+    SString strFile = strMTASAPath + "\\" + MTA_EXE_NAME;
+    ShellExecute( NULL, "open", strFile, "install_stage=crashed", NULL, SW_SHOWNORMAL );
 }
 
 

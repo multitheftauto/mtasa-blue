@@ -270,11 +270,11 @@ bool CXMLFileImpl::BuildSubElements ( CXMLNodeImpl* pNode )
         // Iterate the children
         TiXmlNode* pChild = NULL;
         TiXmlElement* pElement;
-        while ( pChild = pRawNode->IterateChildren ( pChild ) )
+        while ( ( pChild = pRawNode->IterateChildren ( pChild ) ) )
         {
             // If it's not a comment or something else, build it to our tree
             // TODO: Support comments
-            if ( pElement = pChild->ToElement () )
+            if ( ( pElement = pChild->ToElement () ) )
             {
                 // Create the child and build its subnodes again
                 CXMLNodeImpl* pTempNode = new CXMLNodeImpl ( this, pNode, *pElement );

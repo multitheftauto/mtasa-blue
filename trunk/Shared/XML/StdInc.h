@@ -26,7 +26,6 @@
 #include "CXMLImpl.h"
 #include "SharedUtil.h"
 #include "CXMLArray.h"
-#include "SString.h"
 
 // XML includes
 #include <xml/CXMLCommon.h>

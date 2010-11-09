@@ -21,6 +21,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
 
 extern CGame* g_pGame;
 
@@ -9401,7 +9402,7 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
     lua_settable ( luaVM, -3 );
 
     // strtok until we're out of tokens
-    while ( szToken = strtok ( NULL, szDelimiter ) )
+    while ( ( szToken = strtok ( NULL, szDelimiter ) ) )
     {
         // Add the token to the table
         lua_pushnumber ( luaVM, ++uiCount );
@@ -10522,7 +10523,7 @@ int CLuaFunctionDefinitions::AddAccount ( lua_State* luaVM )
             const char* szPassword = lua_tostring ( luaVM, 2 );
 
             CAccount* pAccount;
-            if ( pAccount = CStaticFunctionDefinitions::AddAccount ( szName, szPassword ) )
+            if ( ( pAccount = CStaticFunctionDefinitions::AddAccount ( szName, szPassword ) ) )
             {
                 lua_pushaccount ( luaVM, pAccount );
                 return 1;
@@ -11419,7 +11420,7 @@ int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
             } else {
                 // We need to return multiply entries, so push all subnodes
                 char *szDataValue;
-                while ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) {
+                while ( ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) ) {
                     PUSH_SETTING ( pSubNode, szDataValue );
                 }
                 // Push a table and return
@@ -11571,5 +11572,57 @@ int CLuaFunctionDefinitions::GetModules ( lua_State* luaVM )
         lua_pushstring ( luaVM, (*iter).szFileName );
         lua_settable ( luaVM, -3 );
     }
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        CPerfStatResult Result;
+        SString strCatagory = lua_tostring ( luaVM, 1 );
+        SString strOptions;
+        SString strFilter;
+
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            strOptions = lua_tostring ( luaVM, 2 );
+
+        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            strFilter = lua_tostring ( luaVM, 3 );
+
+        GetPerfStatManager ()->GetStats ( &Result, strCatagory, strOptions, strFilter );
+
+        lua_newtable ( luaVM );
+        for ( int c = 0; c < Result.ColumnCount () ; c++ )
+        {
+            const SString& name = Result.ColumnName ( c );
+            lua_pushnumber ( luaVM, c+1 );                      // row index number (starting at 1, not 0)
+            lua_pushlstring ( luaVM, (char *)name.c_str (), name.length() );
+            lua_settable ( luaVM, -3 );
+        }
+
+        lua_newtable ( luaVM );
+        for ( int r = 0; r < Result.RowCount () ; r++ )
+        {
+            lua_newtable ( luaVM );                             // new table
+            lua_pushnumber ( luaVM, r+1 );                      // row index number (starting at 1, not 0)
+            lua_pushvalue ( luaVM, -2 );                        // value
+            lua_settable ( luaVM, -4 );                         // refer to the top level table
+
+            for ( int c = 0; c < Result.ColumnCount () ; c++ )
+            {
+                SString& cell = Result.Data ( c, r );
+                lua_pushnumber ( luaVM, c+1 );
+                lua_pushlstring ( luaVM, (char *)cell.c_str (), cell.length () );
+                lua_settable ( luaVM, -3 );
+            }
+            lua_pop ( luaVM, 1 );                               // pop the inner table
+        }
+        return 2;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPerformanceStats" );
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }

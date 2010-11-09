@@ -18,10 +18,13 @@ class CVersionUpdaterInterface
 {
 public:
     virtual                ~CVersionUpdaterInterface        ( void ) {}
+    virtual bool            SaveConfigToXML                 ( void ) = 0;
+    virtual void            EnableChecking                  ( bool bOn ) = 0;
     virtual void            DoPulse                         ( void ) = 0;
-    virtual void            InitiateUpdate                  ( const SString& strType, const SString& strHost ) = 0;
+    virtual void            InitiateUpdate                  ( const SString& strType, const SString& strData, const SString& strHost ) = 0;
     virtual bool            IsOptionalUpdateInfoRequired    ( const SString& strHost ) = 0;
     virtual void            InitiateDataFilesFix            ( void ) = 0;
+    virtual void            InitiateManualCheck             ( void ) = 0;
 };
 
 CVersionUpdaterInterface* GetVersionUpdater ();

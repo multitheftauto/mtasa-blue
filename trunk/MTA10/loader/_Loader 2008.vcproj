@@ -50,6 +50,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
@@ -325,10 +326,6 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\AccessControl.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Install.cpp"
 				>
 			</File>
@@ -350,10 +347,6 @@
 			</File>
 			<File
 				RelativePath=".\Utils.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ViewACLs.cpp"
 				>
 			</File>
 		</Filter>

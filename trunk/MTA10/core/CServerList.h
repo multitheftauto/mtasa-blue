@@ -84,7 +84,7 @@ public:
 
     ~CServerListItem ( void )
     {
-        closesocket ( m_Socket );
+        CloseSocket ();
     }
 
     static bool         Parse           ( const char* szAddress, in_addr& Address )
@@ -120,22 +120,32 @@ public:
         nPlayers = 0;
         nMaxPlayers = 0;
         nPing = 0;
+        uiNoReplyCount = 0;
         m_ulQueryStart = 0;
+        uiQueryRetryCount = 0;
+        uiRevision = 1;
+        bMaybeOffline = false;
         for ( int i = 0 ; i < SERVER_BROWSER_TYPE_COUNT ; i++ )
-            bAddedToList[i] = false;
+            revisionInList[i] = -1;
 
         strHost = inet_ntoa ( Address );
         strName = SString ( "%s:%d", inet_ntoa ( Address ), usGamePort );
-        
-        // Initialize sockets
-        m_Socket = socket ( PF_INET, SOCK_DGRAM, IPPROTO_UDP );
-        u_long flag = 1;
-        ioctlsocket ( m_Socket, FIONBIO, &flag );
+
+        m_Socket = INVALID_SOCKET;
+    }
+
+    void                CloseSocket     ( void )
+    {
+        if ( m_Socket != INVALID_SOCKET )
+        {
+            closesocket ( m_Socket );
+            m_Socket = INVALID_SOCKET;
+        }
     }
 
     bool                ParseQuery      ( const char * szBuffer, unsigned int nLength );
     void                Query           ( void );
-    std::string         Pulse           ( void );
+    std::string         Pulse           ( bool bCanSendQuery );
 
     in_addr             Address;        // IP-address
     unsigned short      usQueryPort;    // Query port
@@ -147,7 +157,11 @@ public:
     bool                bSerials;       // Serial verification on
     bool                bScanned;
     bool                bSkipped;
-    bool                bAddedToList[ SERVER_BROWSER_TYPE_COUNT ];
+    bool                bMaybeOffline;
+    uint                revisionInList[ SERVER_BROWSER_TYPE_COUNT ];
+    uint                uiNoReplyCount;
+    uint                uiQueryRetryCount;
+    uint                uiRevision;
 
     std::string         strGame;        // Game name
     std::string         strVersion;     // Game version
@@ -200,6 +214,7 @@ protected:
     std::list < CServerListItem* >          m_Servers;
     std::string                             m_strStatus;
     std::string                             m_strStatus2;
+    long long                               m_llLastTickCount;
 };
 
 // Internet list (grabs the master server list on refresh)

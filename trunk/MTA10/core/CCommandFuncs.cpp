@@ -75,9 +75,12 @@ void CCommandFuncs::Ver ( const char* szParameters )
 
     // Compose version string
     unsigned short usNetRev = CCore::GetSingleton ().GetNetwork ()->GetNetRev ();
+    unsigned short usNetRel = CCore::GetSingleton ().GetNetwork ()->GetNetRel ();
     SString strVersion = BLUE_VERSION_STRING;
-    if ( usNetRev > 0 )
+    if ( usNetRev > 0 || usNetRel > 0 )
         strVersion = strVersion.Replace ( "\n", SString ( ".%d\n", usNetRev ) );
+    if ( usNetRel > 0 )
+        strVersion = strVersion.Replace ( "\n", SString ( ".%03d\n", usNetRel ) );
     CLocalGUI::GetSingleton ( ).EchoConsole ( strVersion );
 }
 
