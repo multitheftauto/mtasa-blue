@@ -855,6 +855,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled );
     CLuaCFunctions::AddFunction ( "setTrafficLightState", CLuaFunctionDefs::SetTrafficLightState );
     CLuaCFunctions::AddFunction ( "setTrafficLightsLocked", CLuaFunctionDefs::SetTrafficLightsLocked );
+    CLuaCFunctions::AddFunction ( "setWindSpeed", CLuaFunctionDefs::SetWindSpeed );
+    CLuaCFunctions::AddFunction ( "getWindSpeed", CLuaFunctionDefs::GetWindSpeed );
+    CLuaCFunctions::AddFunction ( "resetWindSpeed", CLuaFunctionDefs::ResetWindSpeed );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );

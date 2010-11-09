@@ -441,6 +441,9 @@ public:
     static bool                         SetJetpackMaxHeight                 ( float fHeight );
     static bool                         SetTrafficLightState                ( unsigned char ucState );
     static bool                         SetTrafficLightsLocked              ( bool bLocked );
+    static bool                         SetWindSpeed                        ( float fX, float fY, float fZ );
+    static bool                         RestoreWindSpeed                    ( void );
+    static bool                         GetWindSpeed                        ( float& fX, float& fY, float& fZ );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );

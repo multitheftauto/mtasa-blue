@@ -5140,6 +5140,23 @@ bool CStaticFunctionDefinitions::SetTrafficLightsLocked ( bool bLocked )
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetWindSpeed ( float fX, float fY, float fZ )
+{
+    g_pGame->GetWorld ()->SetWindSpeed ( fX, fY, fZ );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::RestoreWindSpeed ( void )
+{
+    g_pGame->GetWorld ()->RestoreWindSpeed ( );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetWindSpeed ( float& fX, float& fY, float& fZ )
+{
+    g_pGame->GetWorld ()->GetWindSpeed ( fX, fY, fZ );
+    return true;
+}
 
 bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled ( const char* szPropName )
 {
