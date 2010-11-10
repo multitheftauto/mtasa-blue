@@ -368,6 +368,84 @@ int CLuaFunctionDefs::EngineSetAsynchronousLoading ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::EngineLoadIFP ( lua_State* luaVM )
+{
+   if ( ( lua_type ( luaVM, 1 ) == LUA_TSTRING ) )
+    {
+        // Grab our virtual machine and grab our resource from that.
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            // Grab this resource
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
+            {
+                // Grab the filename
+                SString strFile = ( lua_istype ( luaVM, 1, LUA_TSTRING ) ? lua_tostring ( luaVM, 1 ) : "" );
+                
+                SString strPath;
+                // Is this a legal filepath?
+                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+                {
+                    // Grab the resource root entity
+                    CClientEntity* pRoot = pResource->GetResourceIFPRoot ();
+
+                    // Create a IFP element
+                    CClientIFP* pIFP = new CClientIFP ( m_pManager, INVALID_ELEMENT_ID );
+
+                    // Try to load the IFP file
+                    if ( pIFP->LoadIFP ( strPath ) )
+                    {
+                        // Success loading the file. Set parent to IFP root
+                        pIFP->SetParent ( pRoot );
+
+                        // Return the IFP element
+                        lua_pushelement ( luaVM, pIFP );
+                        return 1;
+                    }
+                    else
+                    {
+                        // Delete it again
+                        delete pIFP;
+                    }
+                }
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "engineLoadIFP", "ifp", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "engineLoadIFP" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::EngineUnloadIFP ( lua_State* luaVM )
+{
+   if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
+    {
+        CClientIFP* pAnim = ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) ? lua_toifp ( luaVM, 1 ) : NULL );
+        if ( pAnim )
+        {
+            pAnim->Remove ();
+            delete pAnim;
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "engineUnloadIFP", "filepath", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "engineUnloadIFP" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 // TODO: int CLuaFunctionDefs::EngineReplaceMatchingAtomics ( lua_State* luaVM )
 int CLuaFunctionDefs::EngineReplaceMatchingAtomics ( lua_State* luaVM )
 {

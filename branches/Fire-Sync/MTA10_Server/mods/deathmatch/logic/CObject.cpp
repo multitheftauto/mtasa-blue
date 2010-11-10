@@ -29,6 +29,9 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
     m_usModel = 0xFFFF;
     m_moveData.bActive = false;
     m_ucAlpha = 255;
+    m_fScale  = 1;
+
+    m_bCollisionsEnabled = true;
 
     // Add us to the manager's list
     pObjectManager->AddToList ( this );
@@ -47,6 +50,8 @@ CObject::CObject ( const CObject& Copy ) : CElement ( Copy.m_pParent, Copy.m_pXM
     m_vecRotation = Copy.m_vecRotation;
     // TODO: copy move data properly
     m_moveData.bActive = false;
+
+    m_bCollisionsEnabled = Copy.m_bCollisionsEnabled;
 
     // Add us to the manager's list
     m_pObjectManager->AddToList ( this );
@@ -130,6 +135,15 @@ bool CObject::ReadSpecialData ( void )
     if ( !GetCustomDataBool ( "doublesided", m_bDoubleSided, true ) )
         m_bDoubleSided = false;
 
+    if ( !GetCustomDataFloat ( "scale", m_fScale, true ) )
+        m_fScale = 1;
+
+    if ( !GetCustomDataBool ( "collisions", m_bCollisionsEnabled, true ) )
+        m_bCollisionsEnabled = true;
+
+    if ( GetCustomDataInt ( "alpha", iTemp, true ) )
+        m_ucAlpha = static_cast < unsigned char > ( iTemp );
+
     // Success
     return true;
 }
@@ -162,7 +176,7 @@ const CVector& CObject::GetPosition ( void )
         m_vecPosition = m_moveData.vecStartPosition + vecJourney;
     }
 
-    UpdateSpatialData ();     // Not sure this is necessary
+    UpdateSpatialData ();     // This is necessary because 'GetAttachedPosition ( m_vecPosition )' can change alter this objects position
     // Finally, return it
     return m_vecPosition;
 }

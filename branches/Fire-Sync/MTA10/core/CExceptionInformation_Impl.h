@@ -21,12 +21,14 @@ class CExceptionInformation_Impl : public CExceptionInformation
 {
 public:
                             CExceptionInformation_Impl  ( void );
-    inline                  ~CExceptionInformation_Impl ( void )            {};
+    inline                  ~CExceptionInformation_Impl ( void );//            {};
 
     inline unsigned int     GetCode                     ( void )            { return m_uiCode; };
-    inline void*            GetOffset                   ( void )            { return m_pOffset; };
-    inline void*            GetReferencingOffset        ( void )            { return m_pReferencingOffset; };
-    bool                    GetModule                   ( char * szModuleName, int nOutputNameLength );
+    inline void*            GetAddress                  ( void )            { return m_pAddress; };
+    bool                    GetModule                   ( char * szModuleName, int nOutputNameLength, void** ppModuleBaseAddress );
+    virtual const char*         GetModulePathName       ( void )            { return m_szModulePathName; };
+    virtual const char*         GetModuleBaseName       ( void )            { return m_szModuleBaseName; };
+    virtual uint                GetAddressModuleOffset  ( void )            { return m_uiAddressModuleOffset; };
 
     inline unsigned long    GetEAX                      ( void )            { return m_ulEAX; };
     inline unsigned long    GetEBX                      ( void )            { return m_ulEBX; };
@@ -49,8 +51,10 @@ public:
 
 private:
     unsigned int            m_uiCode;
-    void*                   m_pOffset;
-    void*                   m_pReferencingOffset;
+    void*                   m_pAddress;
+    char*                   m_szModulePathName;
+    const char*             m_szModuleBaseName;
+    uint                    m_uiAddressModuleOffset;
     unsigned long           m_ulEAX;
     unsigned long           m_ulEBX;
     unsigned long           m_ulECX;

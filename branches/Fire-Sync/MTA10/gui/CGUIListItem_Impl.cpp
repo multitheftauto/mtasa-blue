@@ -45,6 +45,8 @@ CGUIListItem_Impl::CGUIListItem_Impl ( const char* szText, unsigned int uiType, 
 
 CGUIListItem_Impl::~CGUIListItem_Impl ( void )
 {
+    if ( m_deleteDataCallback )
+        m_deleteDataCallback(m_pData);
     delete m_pListItem;
 }
 
@@ -65,10 +67,8 @@ void CGUIListItem_Impl::SetFont ( const char *szFontName )
 void CGUIListItem_Impl::SetText ( const char *pszText )
 {
     CEGUI::String strText;
-
-    if ( pszText )
-        strText.assign ( pszText );
-    m_pListItem->setText ( strText );
+    strText.assign ( (CEGUI::utf8*) pszText );
+    m_pListItem->setText( strText );
 }
 
 
@@ -91,7 +91,7 @@ void CGUIListItem_Impl::SetImage ( CGUIStaticImage* pImage )
     if ( ItemType == Type::ImageItem )
     {
         CGUIStaticImage_Impl* pImageImpl = (CGUIStaticImage_Impl*) pImage;
-        reinterpret_cast < CEGUI::ListboxImageItem* > ( m_pListItem ) -> setImage ( pImageImpl->GetDirectImage () );
+        reinterpret_cast < CEGUI::ListboxImageItem* > ( m_pListItem ) -> setImage ( pImageImpl ? pImageImpl->GetDirectImage () : NULL );
     }
 }
 

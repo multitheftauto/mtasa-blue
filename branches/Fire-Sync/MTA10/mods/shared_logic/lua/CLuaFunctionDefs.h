@@ -50,6 +50,7 @@ public:
     LUA_DECLARE ( GetResourceRootElement );
     LUA_DECLARE ( GetResourceGUIElement );
     LUA_DECLARE ( GetResourceDynamicElementRoot );
+    LUA_DECLARE ( GetResourceExportedFunctions );
 
     // Event functions
     LUA_DECLARE ( AddEvent );
@@ -129,6 +130,7 @@ public:
     LUA_DECLARE ( IsElementSyncer );
     LUA_DECLARE ( IsElementCollidableWith );
     LUA_DECLARE ( IsElementDoubleSided );
+    LUA_DECLARE ( GetElementCollisionsEnabled );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
@@ -340,13 +342,17 @@ public:
     LUA_DECLARE ( SetTrainSpeed );
     LUA_DECLARE ( SetVehicleGravity );
     LUA_DECLARE ( SetVehicleHeadLightColor );
+    LUA_DECLARE ( SetVehicleTurretPosition );
 #if WITH_VEHICLE_HANDLING
     LUA_DECLARE ( SetVehicleHandlingData );
 #endif
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );
+    
+    // Object get funcs
     LUA_DECLARE ( IsObjectStatic );
+    LUA_DECLARE ( GetObjectScale );
 
     // Object set funcs
     LUA_DECLARE ( SetObjectRotation );
@@ -424,6 +430,7 @@ public:
     LUA_DECLARE ( GetCameraMatrix );
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
+    LUA_DECLARE ( GetCameraGoggleEffect );
 
     // Cam set funcs
     LUA_DECLARE ( SetCameraMatrix );
@@ -432,6 +439,7 @@ public:
     LUA_DECLARE ( FadeCamera );
     LUA_DECLARE ( SetCameraClip );
     LUA_DECLARE ( SetCameraView );
+    LUA_DECLARE ( SetCameraGoggleEffect );
 
     // Cursor funcs
     LUA_DECLARE ( GetCursorPosition );
@@ -457,6 +465,8 @@ public:
     LUA_DECLARE ( EngineReplaceVehiclePart );
     LUA_DECLARE ( EngineSetModelLODDistance );
     LUA_DECLARE ( EngineSetAsynchronousLoading );
+    LUA_DECLARE ( EngineLoadIFP );
+    LUA_DECLARE ( EngineUnloadIFP );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
@@ -467,6 +477,8 @@ public:
     LUA_DECLARE ( dxDrawImageSection );
     LUA_DECLARE ( dxGetTextWidth );
     LUA_DECLARE ( dxGetFontHeight );
+    LUA_DECLARE ( LoadFont );
+    LUA_DECLARE ( UnloadFont );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
@@ -645,6 +657,9 @@ public:
     LUA_DECLARE ( GetCloudsEnabled );
     LUA_DECLARE ( SetTrafficLightState );
     LUA_DECLARE ( SetTrafficLightsLocked );
+    LUA_DECLARE ( GetWindSpeed );
+    LUA_DECLARE ( SetWindSpeed );
+    LUA_DECLARE ( ResetWindSpeed );
 
     // Input functions
     LUA_DECLARE ( BindKey );
@@ -717,6 +732,7 @@ public:
 
     // Community funcs
     LUA_DECLARE ( GetPlayerUserName );
+    LUA_DECLARE ( GetPlayerSerial );
 
     // Utility vector math functions
     LUA_DECLARE ( GetDistanceBetweenPoints2D );
@@ -738,6 +754,13 @@ public:
 #endif
 
     LUA_DECLARE ( GetVersion );
+
+    // UTF functions
+    LUA_DECLARE ( UtfLen );
+    LUA_DECLARE ( UtfSeek );
+    LUA_DECLARE ( UtfSub );
+    LUA_DECLARE ( UtfChar );
+    LUA_DECLARE ( UtfCode );
 
 private:
     // Static references to objects

@@ -53,6 +53,7 @@
 				PrecompiledHeaderThrough=""
 				ProgramDataBaseFileName="vc70.pdb"
 				WarningLevel="3"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4996"
 			/>
@@ -115,7 +116,7 @@
 				OmitFramePointers="false"
 				AdditionalIncludeDirectories="../../../"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PNG_DEBUG=1;PNG_SETJMP_NOT_SUPPORTED"
-				StringPooling="false"
+				StringPooling="true"
 				MinimalRebuild="false"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
@@ -195,6 +196,7 @@
 				EnableFunctionLevelLinking="false"
 				PrecompiledHeaderThrough=""
 				WarningLevel="3"
+				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4996"
 			/>

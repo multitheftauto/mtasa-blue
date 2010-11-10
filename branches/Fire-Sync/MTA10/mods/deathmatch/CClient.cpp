@@ -37,7 +37,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     if ( GetDaysUntilExpire () < -1 )
     {
         MessageBox ( NULL, "This version has expired.", "MTA: San Andreas " MTA_DM_BUILDTAG_LONG, MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 #endif
 

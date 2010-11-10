@@ -29,9 +29,6 @@ CConnectManager::CConnectManager ( void )
     m_tConnectStarted = 0;
 
     m_pOnCancelClick = new GUI_CALLBACK ( &CConnectManager::Event_OnCancelClick, this );
-
-    // Set default MTU size
-    m_usMTUSize = NET_MTU_DSL;
 }
 
 
@@ -80,9 +77,6 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket, true );
-
-    // Set our MTU size to the default
-    pNet->SetMTUSize ( m_usMTUSize );
 
     // Try to start a network to connect
     if ( !pNet->StartNetwork ( szHost, usPort ) )
@@ -253,24 +247,18 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
         // The packet we're expecting?
         if ( ucPacketID == PACKET_ID_MOD_NAME )
         {
-            // Read out the mod to load
-            char* szModName = new char [ BitStream.GetNumberOfBytesUsed () + 1 ];
-            memset ( szModName, 0, BitStream.GetNumberOfBytesUsed () + 1 );
-            if ( BitStream.Read ( szModName, BitStream.GetNumberOfBytesUsed () ) )
+            // Read packet data
+            unsigned short usServerBitStreamVersion = 0x01;
+            BitStream.Read ( usServerBitStreamVersion );
+
+            SString strModName;
+            BitStream.ReadString ( strModName );
+
+            // Process packet data
+            CCore::GetSingleton ().GetNetwork ()->SetServerBitStreamVersion ( usServerBitStreamVersion );
+
+            if ( strModName != "" )
             {
-                // Backward compatibly examine the bytes following the mod name
-                BitStream.ResetReadPointer ();
-                BitStream.Read ( szModName, strlen ( szModName ) );
-                char cPad;
-                BitStream.Read ( cPad );
-                unsigned short usServerBitStreamVersion = 0x01;
-                BitStream.Read ( usServerBitStreamVersion );    // This will silently fail for < 1.0.2 and leave the bitstream version at 0x01
-                CCore::GetSingleton ().GetNetwork ()->SetServerBitStreamVersion ( usServerBitStreamVersion );
-
-                // Limit the nick length for servers that have a problem with max length nicks
-                if ( usServerBitStreamVersion < 0x06 )
-                    g_pConnectManager->m_strNick = g_pConnectManager->m_strNick.substr ( 0, MAX_PLAYER_NICK_LENGTH - 1 );
-
                 // Populate the arguments to pass it (-c host port nick)
                 SString strArguments ( "%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str() );
 
@@ -310,10 +298,10 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 g_pConnectManager->m_tConnectStarted = 0;
 
                 // Load the mod
-                if ( !CModManager::GetSingleton ().Load ( szModName, strArguments ) )
+                if ( !CModManager::GetSingleton ().Load ( strModName, strArguments ) )
                 {
                     // Failed loading the mod
-                    strArguments.Format ( "No such mod installed (%s)", szModName );
+                    strArguments.Format ( "No such mod installed (%s)", strModName.c_str() );
                     CCore::GetSingleton ().ShowMessageBox ( "Error", strArguments, MB_BUTTON_OK | MB_ICON_ERROR );
                     g_pConnectManager->Abort ();
                 }
@@ -324,8 +312,6 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 CCore::GetSingleton ().ShowMessageBox ( "Error", "Bad server response (2)", MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pConnectManager->Abort ();
             }
-
-            delete [] szModName;
         }
         else
         {

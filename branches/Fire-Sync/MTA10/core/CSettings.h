@@ -119,8 +119,6 @@ protected:
     CGUIButton*         m_pButtonCancel;
     CGUILabel*          m_pLabelNick;
     CGUIEdit*           m_pEditNick;
-    CGUILabel*          m_pLabelConnection;
-    CGUIComboBox*       m_pComboConnection;
     CGUICheckBox*       m_pSavePasswords;
 
     CGUILabel*          m_pVideoGeneralLabel;
@@ -149,8 +147,21 @@ protected:
     CGUILabel*          m_pAsyncLabelInfo;
     CGUILabel*          m_pAsyncLabel;
     CGUIComboBox*       m_pAsyncCombo;
+    CGUILabel*          m_pAudioGeneralLabel;
+    CGUILabel*          m_pUserTrackGeneralLabel;
+    CGUILabel*          m_pSingleDownloadLabelInfo;
+    CGUILabel*          m_pSingleDownloadLabel;
+    CGUIComboBox*       m_pSingleDownloadCombo;
+    CGUILabel*          m_pBrowserSpeedLabelInfo;
+    CGUILabel*          m_pBrowserSpeedLabel;
+    CGUIComboBox*       m_pBrowserSpeedCombo;
+    CGUILabel*          m_pUpdateBuildTypeLabelInfo;
+    CGUILabel*          m_pUpdateBuildTypeLabel;
+    CGUIComboBox*       m_pUpdateBuildTypeCombo;
+    CGUIButton*         m_pButtonUpdate;
+    CGUILabel*          m_pAdvancedMiscLabel;
+    CGUILabel*          m_pAdvancedUpdaterLabel;
 
-    
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
     CGUILabel*          m_pLabelMTAVolume;
@@ -160,6 +171,12 @@ protected:
     CGUIScrollBar*      m_pAudioRadioVolume;
     CGUIScrollBar*      m_pAudioSFXVolume;
     CGUIScrollBar*      m_pAudioMTAVolume;
+    CGUICheckBox*       m_pCheckBoxAudioEqualizer;
+    CGUICheckBox*       m_pCheckBoxAudioAutotune;
+    CGUILabel*          m_pAudioUsertrackLabel;
+    CGUICheckBox*       m_pCheckBoxUserAutoscan;
+    CGUILabel*          m_pLabelUserTrackMode;
+    CGUIComboBox*       m_pComboUsertrackMode;
 
     CGUIGridList*       m_pBindsList;
     CGUIButton*         m_pBindsDefButton;
@@ -237,6 +254,7 @@ protected:
     bool                OnChatGreenChanged      ( CGUIElement* pElement );
     bool                OnChatBlueChanged       ( CGUIElement* pElement );
     bool                OnChatAlphaChanged      ( CGUIElement* pElement );
+    bool                OnUpdateButtonClick     ( CGUIElement* pElement );
 
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 

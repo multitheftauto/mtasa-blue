@@ -14,6 +14,7 @@
 #define __CXMLATTRIBUTES_H
 
 #include <list>
+#include "SharedUtil.h"
 
 class CXMLAttribute;
 

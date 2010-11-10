@@ -59,9 +59,6 @@ public:
     virtual int                         GetPing                     ( void ) = 0;
     virtual unsigned long               GetTime                     ( void ) = 0;
 
-    virtual unsigned int                GetMTUSize                  ( void ) = 0;
-    virtual bool                        SetMTUSize                  ( unsigned int uiSize ) = 0;
-
     virtual const char *                GetLocalIP                  ( void ) = 0;
     virtual void                        GetSerial                   ( char* szSerial, size_t maxLength ) = 0;
 
@@ -80,6 +77,12 @@ public:
 
     virtual void                        GetStatus                   ( char* szStatus, size_t maxLength ) = 0;
     virtual unsigned short              GetNetRev                   ( void ) = 0;
+    virtual unsigned short              GetNetRel                   ( void ) = 0;
+
+    virtual const char*                 GetNextBuffer               ( void ) = 0;
+    virtual const char*                 GetDiagnosticStatus         ( void ) = 0;
+
+    virtual bool                        VerifySignature             ( const char* pData, unsigned long ulSize ) = 0;
 };
 
 #endif

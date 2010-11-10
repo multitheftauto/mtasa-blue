@@ -87,6 +87,8 @@ void CQuestionBox::Show ( void )
 
     m_pWindow->SetVisible ( true );
     m_pWindow->Activate ();
+    m_pWindow->SetAlwaysOnTop ( true );
+    m_pWindow->BringToFront ();
 }
 
 
@@ -94,6 +96,7 @@ void CQuestionBox::Reset ( void )
 {
     Hide ();
     m_uiLastButton = -1;
+    m_strMsg = "";
     SetTitle ( "" );
     SetMessage ( "" );
     SetCallback ( NULL );
@@ -111,7 +114,13 @@ void CQuestionBox::SetTitle ( const SString& strTitle )
 
 void CQuestionBox::SetMessage ( const SString& strMsg )
 {
+    m_strMsg = strMsg;
     m_pMessage->SetText ( strMsg );
+}
+
+void CQuestionBox::AppendMessage ( const SString& strMsg )
+{
+    m_pMessage->SetText ( SString ( m_strMsg + strMsg ) );
 }
 
 

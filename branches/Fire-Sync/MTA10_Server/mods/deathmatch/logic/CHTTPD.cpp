@@ -18,12 +18,15 @@ extern CGame * g_pGame;
 
 CHTTPD::CHTTPD ( void )
     : m_BruteForceProtect( 4, 30000, 60000 * 5 )     // Max of 4 attempts per 30 seconds, then 5 minute ignore
+    , m_HttpDosProtect( 0, 0, 0 )
 {
     m_resource = NULL;
     m_server = NULL;
     m_bStartedServer = false;
 
     m_pGuestAccount = new CAccount ( g_pGame->GetAccountManager (), false, "http_guest" );
+
+    m_HttpDosProtect = CConnectHistory ( g_pGame->GetConfig ()->GetHTTPDosThreshold (), 10000, 60000 * 1 );     // Max of 'n' connections per 10 seconds, then 1 minute ignore
 }
 
 
@@ -63,7 +66,7 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
         }
 
         parameters[ "mode" ] = "threadpool";        // or "singlethreaded"/"threadpool"
-        parameters[ "threadcount" ] = 5;                // unnecessary because 1 is the default
+        parameters[ "threadcount" ] = g_pGame->GetConfig ()->GetHTTPThreadCount ();
 
         bResult = ( StartServer ( parameters ) == STARTSERVER_SUCCESS );
         m_bStartedServer = true;
@@ -215,4 +218,23 @@ void CHTTPD::HttpPulse ( void )
             iter++;
     }
 
+}
+
+//
+// Do DoS check here
+//
+bool CHTTPD::ShouldAllowConnection ( const char * szAddress )
+{
+    if ( m_HttpDosProtect.IsFlooding ( szAddress ) )
+        return false;
+
+    m_HttpDosProtect.AddConnect ( szAddress );
+
+    if ( m_HttpDosProtect.IsFlooding ( szAddress ) )
+    {
+        CLogger::AuthPrintf ( "HTTP: Connection flood from '%s'. Ignoring for 1 min.\n", szAddress );
+        return false;
+    }
+
+    return true;
 }

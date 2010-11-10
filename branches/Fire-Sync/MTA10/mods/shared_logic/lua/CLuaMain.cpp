@@ -206,11 +206,10 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
     if ( m_luaVM )
     {
         // Run the script
-        std::string strRes = ConformResourcePath ( szFileName );
-        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, strRes.c_str () ) )
+        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, SString ( "@%s", szFileName ) ) )
         {
             // Print the error
-            strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
             if ( strRes.length () )
             {
                 CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );

@@ -56,7 +56,7 @@ public:
     static CClientEntity*               GetElementChild                     ( CClientEntity& Entity, unsigned int uiIndex );
     static bool                         GetElementMatrix                    ( CClientEntity& Entity, CMatrix& matrix );
     static bool                         GetElementPosition                  ( CClientEntity& Entity, CVector & vecPosition );
-    static bool                         GetElementRotation                  ( CClientEntity& Entity, CVector & vecRotation );
+    static bool                         GetElementRotation                  ( CClientEntity& Entity, CVector & vecRotation, const char* szRotationOrder );
     static bool                         GetElementVelocity                  ( CClientEntity& Entity, CVector& vecVelocity );
     static bool                         GetElementInterior                  ( CClientEntity& Entity, unsigned char& ucInterior );
     static bool                         GetElementZoneName                  ( CClientEntity& Entity, char* szBuffer, unsigned int uiBufferLength, bool bCitiesOnly = false );
@@ -72,13 +72,14 @@ public:
     static bool                         IsElementInWater                    ( CClientEntity& Entity, bool & bInWater );
     static bool                         IsElementSyncer                     ( CClientEntity& Entity, bool & bIsSyncer );
     static bool                         IsElementCollidableWith             ( CClientEntity& Entity, CClientEntity& ThisEntity, bool & bCanCollide );
+    static bool                         GetElementCollisionsEnabled         ( CClientEntity& Entity );
     // Element set funcs
     static CClientDummy*                CreateElement                       ( CResource& Resource, const char* szTypeName, const char* szID );
     static bool                         DestroyElement                      ( CClientEntity& Entity );
     static bool                         SetElementData                      ( CClientEntity& Entity, const char* szName, CLuaArgument& Variable, CLuaMain& LuaMain, bool bSynchronize );
     static bool                         RemoveElementData                   ( CClientEntity& Entity, const char* szName );
     static bool                         SetElementPosition                  ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true );
-    static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation );
+    static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder );
     static bool                         SetElementVelocity                  ( CClientEntity& Element, const CVector& vecVelocity );
     static bool                         SetElementParent                    ( CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain );
     static bool                         SetElementInterior                  ( CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
@@ -215,6 +216,7 @@ public:
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );
     static bool                         IsObjectStatic                      ( CClientObject& Object, bool & bStatic );
+    static bool                         GetObjectScale                      ( CClientObject& Object, float& fScale );
 
     // Object set funcs
     static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );
@@ -289,7 +291,12 @@ public:
     // Cursor funcs
     static bool                         GetCursorPosition                   ( CVector2D& vecCursor, CVector& vecWorld );
     static bool                         IsCursorShowing                     ( bool& bShowing );
-    
+
+    // Drawing funcs
+    static void                         DrawText                            ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, const char* szFont, bool bPostGUI, CResource* pResource );
+    static bool                         LoadFont                            ( std::string strFullFilePath, bool bBold,  unsigned int uiSize, std::string strMetaPath, CResource* pResource );
+    static bool                         UnloadFont                          ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource );
+
     // GUI funcs
     static bool                         GUIGetInputEnabled                  ( void );
     static void                         GUISetInputEnabled                  ( bool bEnabled );
@@ -321,6 +328,7 @@ public:
     static void                         GUISetProperty                      ( CClientEntity& Element, const char* szProperty, const char* szValue );
     static void                         GUISetText                          ( CClientEntity& Element, const char* szText );
     static bool                         GUISetFont                          ( CClientEntity& Element, const char* szFont );
+    static bool                         GUIUnloadFont                       ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource );
     static void                         GUISetSize                          ( CClientEntity& Element, const CVector2D& vecSize, bool bRelative );
     static void                         GUISetPosition                      ( CClientEntity& Element, const CVector2D& vecPosition, bool bRelative );
     static void                         GUISetVisible                       ( CClientEntity& Element, bool bFlag );
@@ -361,7 +369,8 @@ public:
     static inline void                  GUIGridListAutoSizeColumn           ( CClientGUIElement& GUIElement, unsigned int uiColumn )                                    { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AutoSizeColumn ( uiColumn ); };
     static void                         GUIGridListClear                    ( CClientEntity& Element );
     static inline void                  GUIGridListSetItemText              ( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szText, bool bSection, bool bNumber, bool bFast )   { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemText ( iRow, iColumn, szText, bNumber, bSection, bFast ); };
-    static inline void                  GUIGridListSetItemData              ( CClientGUIElement& GUIElement, int iRow, int iColumn, const char *szData )                { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemData ( iRow, iColumn, szData ); };
+    static void                         GUIGridListSetItemData              ( CClientGUIElement& GUIElement, int iRow, int iColumn, CLuaArgument* Variable );
+    static void                         GUIItemDataDestroyCallback          ( void* m_data );
     static void                         GUIGridListSetSelectionMode         ( CClientEntity& Element, unsigned int uiMode );
     static inline void                  GUIGridListSetSelectedItem          ( CClientGUIElement& GUIElement, int iRow, int iColumn, bool bReset )                       { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItem ( iRow, iColumn, bReset ); };
     static inline void                  GUIGridListSetItemColor             ( CClientGUIElement& GUIElement, int iRow, int iColumn, int iRed, int iGreen, int iBlue, int iAlpha )       { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemColor ( iRow, iColumn, iRed, iGreen, iBlue, iAlpha ); };
@@ -432,6 +441,9 @@ public:
     static bool                         SetJetpackMaxHeight                 ( float fHeight );
     static bool                         SetTrafficLightState                ( unsigned char ucState );
     static bool                         SetTrafficLightsLocked              ( bool bLocked );
+    static bool                         SetWindSpeed                        ( float fX, float fY, float fZ );
+    static bool                         RestoreWindSpeed                    ( void );
+    static bool                         GetWindSpeed                        ( float& fX, float& fY, float& fZ );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );

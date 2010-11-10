@@ -45,6 +45,9 @@ void CMessageLoopHook::ApplyHook ( HWND hFocusWindow )
 
         // Subclass the window procedure.
         m_HookedWindowProc = SubclassWindow ( hFocusWindow, ProcessMessage );
+
+        // Enable Unicode (UTF-16) characters in WM_CHAR messages
+        SetWindowLongW ( hFocusWindow, GWL_WNDPROC, GetWindowLong ( hFocusWindow, GWL_WNDPROC ) );
     }
 }
 
@@ -256,7 +259,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 {
                     if ( !GetVideoModeManager ()->IsWindowed () )
                     {
-                        if ( !CLocalGUI::GetSingleton ().GetMainMenu ()->HasStarted () )
+                        if ( !CLocalGUI::GetSingleton ().GetMainMenu () || !CLocalGUI::GetSingleton ().GetMainMenu ()->HasStarted () )
                             return true;    // No auto-minimize
 
                         if ( GetVideoModeManager ()->IsMultiMonitor ()

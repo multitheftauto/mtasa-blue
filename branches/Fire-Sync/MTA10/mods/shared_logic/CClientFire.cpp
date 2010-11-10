@@ -18,7 +18,6 @@ CClientFire::CClientFire ( CClientManager* pManager, ElementID ID, CVector& vecP
     // TODO: Add a server-side fire manager
     m_pManager = pManager->GetFireManager ( ); // needs verification
     m_pFire = g_pGame->GetFireManager ( )->StartFire ( vecPosition, fSize );
-    m_pFireInterface->bSilent = false;
     SetNumOfGenerationsAllowed ( 0 );
     SetSilent ( bSilent );
     SetTypeName ( "fire" );

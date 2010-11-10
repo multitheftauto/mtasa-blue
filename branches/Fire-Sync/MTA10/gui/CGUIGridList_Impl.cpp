@@ -99,7 +99,7 @@ unsigned int CGUIGridList_Impl::AddColumn ( const char* szTitle, float fWidth )
 {
     // Create a new column with an unique handle
     int hUniqueHandle = GetUniqueHandle ();
-    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addColumn ( szTitle, hUniqueHandle, fWidth );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addColumn ( ((CEGUI::utf8*)szTitle), hUniqueHandle, fWidth );
 
     int iColumnIndex = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getColumnWithID ( hUniqueHandle );
 
@@ -278,13 +278,13 @@ void* CGUIGridList_Impl::GetItemData ( int iRow, int hColumn )
 }
 
 
-void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, void* pData )
+void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, void* pData, CGUICallback<void,void*> deleteDataCallback )
 {
     // Get the current item at that offset and set the text
     CGUIListItem* pItem = GetItem ( iRow, hColumn );
     if ( pItem )
     {
-        pItem->SetData ( pData );
+        pItem->SetData ( pData, deleteDataCallback );
     }
 }
 
@@ -467,6 +467,7 @@ void CGUIGridList_Impl::SetItemImage ( int iRow, int hColumn, CGUIStaticImage* p
         pItem->SetImage ( pImage );
     }
     else
+    if ( pImage )
     {
         // If it doesn't, create it and set it in the gridlist
         CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl*) pImage );

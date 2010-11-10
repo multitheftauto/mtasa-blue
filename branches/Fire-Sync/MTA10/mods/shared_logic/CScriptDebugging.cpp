@@ -173,7 +173,7 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State* luaVM, cons
         lua_getinfo ( luaVM, "nlS", &debugInfo );
 
         // Make sure this function isn't defined in a string (eg: from runcode)
-        if ( debugInfo.linedefined != 0 )
+        if ( debugInfo.source[0] == '@' )
         {
             std::string strFilename = ConformResourcePath ( debugInfo.source );
 
@@ -182,7 +182,7 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State* luaVM, cons
         }
         else
         {
-            strText = SString ( "%s%s (string-defined function)", szPrePend, szMessage );
+            strText = SString ( "%s%s %s", szPrePend, szMessage, debugInfo.short_src );
        }
     }
     else

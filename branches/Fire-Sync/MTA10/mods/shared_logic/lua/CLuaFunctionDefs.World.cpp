@@ -233,10 +233,20 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
         {    
             // Got a collision?
             CVector vecColPosition;
+            CVector vecColNormal;
+
+            int iMaterial = -1;
+            int iLighting = -1;
+            int iPiece = -1;
+
             if ( pColPoint )
             {
                 // Get the collision position
                 vecColPosition = *pColPoint->GetPosition ();
+                vecColNormal = *pColPoint->GetNormal();
+                iMaterial = pColPoint->GetSurfaceTypeB(); //From test, only B function return relevant data
+                iLighting = pColPoint->GetLightingB();
+                iPiece = pColPoint->GetPieceTypeB();
 
                 // Delete the colpoint
                 pColPoint->Destroy ();
@@ -248,11 +258,21 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
                 lua_pushnumber ( luaVM, vecColPosition.fX );
                 lua_pushnumber ( luaVM, vecColPosition.fY );
                 lua_pushnumber ( luaVM, vecColPosition.fZ );
+
                 if ( pColEntity )
                     lua_pushelement ( luaVM, pColEntity );
                 else
                     lua_pushnil ( luaVM );
-                return 5;
+
+                lua_pushnumber ( luaVM, vecColNormal.fX );
+                lua_pushnumber ( luaVM, vecColNormal.fY );
+                lua_pushnumber ( luaVM, vecColNormal.fZ );
+
+                lua_pushinteger ( luaVM, iMaterial );
+                lua_pushinteger ( luaVM, iLighting );
+                lua_pushinteger ( luaVM, iPiece );
+
+                return 11;
             }
             return 1;
         }
@@ -1301,6 +1321,55 @@ int CLuaFunctionDefs::SetTrafficLightState ( lua_State *luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetWindSpeed ( lua_State *luaVM )
+{
+    float fX, fY, fZ;
+
+    if ( CStaticFunctionDefinitions::GetWindSpeed ( fX, fY, fZ ) )
+    {
+        lua_pushnumber ( luaVM, fX );
+        lua_pushnumber ( luaVM, fY );
+        lua_pushnumber ( luaVM, fZ );
+        return 3;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetWindSpeed ( lua_State *luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER && lua_type ( luaVM, 2 ) == LUA_TNUMBER && lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        float fX = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
+        float fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+        float fZ = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+
+        if ( CStaticFunctionDefinitions::SetWindSpeed ( fX, fY, fZ ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setWindSpeed" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetWindSpeed ( lua_State *luaVM )
+{
+    if ( CStaticFunctionDefinitions::RestoreWindSpeed ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
 
     lua_pushboolean ( luaVM, false );
     return 1;

@@ -175,14 +175,6 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
         {
             CVARS_SET ( "nick", std::string ( szParameters ) );
         }
-
-        if ( strlen ( szParameters ) >= MAX_PLAYER_NICK_LENGTH &&
-             CCore::GetSingleton ().GetNetwork () &&
-             CCore::GetSingleton ().GetNetwork ()->GetServerBitStreamVersion () < 0x06 )
-        {
-            // Limit the nick length for servers that have a problem with max length nicks
-            szParameters [ MAX_PLAYER_NICK_LENGTH - 1 ] = 0;             
-        }
     }
 
     // Try to execute the handler

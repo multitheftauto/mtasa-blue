@@ -121,5 +121,11 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     funBugs.data.bFastMove    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTMOVE );
     BitStream.Write ( &funBugs );
 
+    if ( BitStream.Version () >= 0x15 )
+    {
+        bool bCrouchBug = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CROUCHBUG );
+        BitStream.WriteBit ( bCrouchBug );
+    }
+
     return true;
 }

@@ -74,6 +74,7 @@ enum eClientEntityType
     CCLIENTHANDLING,
     CCLIENTWATER,
     CCLIENTFIRE,
+    CCLIENTIFP,
     CCLIENTUNKNOWN,
 };
 

@@ -40,6 +40,16 @@
 #define NUM_StreamRepeatSectorRows                          16
 #define NUM_StreamRepeatSectorCols                          16
 #define VAR_fJetpackMaxHeight                               0x8703D8
+#define VAR_fWindSpeedX										0xC813E0
+#define VAR_fWindSpeedY										0xC813E4
+#define VAR_fWindSpeedZ										0xC813E8
+#define ADDR_WindSpeedSetX									0x72C616
+#define ADDR_WindSpeedSetY									0x72C622
+#define ADDR_WindSpeedSetZ									0x72C636
+#define ADDR_WindSpeedSetX2									0x72C40C
+#define ADDR_WindSpeedSetY2									0x72C417
+#define ADDR_WindSpeedSetZ2									0x72C4EF
+
 
 #include <game/CWorld.h>
 #include "CEntitySA.h"
@@ -65,6 +75,9 @@ public:
     DWORD       GetCurrentArea            ( void );
     void        SetCurrentArea            ( DWORD dwArea );
     void        SetJetpackMaxHeight       ( float fHeight );
+    void        SetWindSpeed              ( float fX, float fY, float fZ );
+    void        GetWindSpeed              ( float& fX, float& fY, float& fZ );
+    void        RestoreWindSpeed          ( void );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)

@@ -132,7 +132,7 @@ public:
     //
 
     virtual CGUIWindow*         CreateWnd               ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
-    virtual CGUIFont*           CreateFnt               ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uExtraGlyphs[] = 0, bool bAutoScale = false ) = 0;
+    virtual CGUIFont*           CreateFnt               ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false ) = 0;
     virtual CGUITexture*        CreateTexture           ( void ) = 0;
 
     virtual void                SetCursorEnabled        ( bool bEnabled ) = 0;
@@ -146,6 +146,7 @@ public:
     virtual CGUIFont*           GetBoldFont             ( void ) = 0;
     virtual CGUIFont*           GetClearFont            ( void ) = 0;
     virtual CGUIFont*           GetSansFont             ( void ) = 0;
+    virtual bool                IsFontPresent           ( const char* szFont ) = 0;
 
     virtual void                SetWorkingDirectory     ( const char * szDir ) = 0;
 

@@ -207,6 +207,18 @@ DWORD RETURN_CrashFix_Misc9b =                              0x73983A;
 #define HOOKPOS_CrashFix_Misc10                              0x5334FE
 DWORD RETURN_CrashFix_Misc10a =                              0x533504;
 
+#define HOOKPOS_CrashFix_Misc11                              0x4D2C62
+DWORD RETURN_CrashFix_Misc11a =                              0x4D2C67;
+DWORD RETURN_CrashFix_Misc11b =                              0x4D2E03;
+
+#define HOOKPOS_CrashFix_Misc12                              0x4D41C5
+DWORD RETURN_CrashFix_Misc12a =                              0x4D41CA;
+DWORD RETURN_CrashFix_Misc12b =                              0x4D4222;
+
+#define HOOKPOS_CrashFix_Misc13                              0x4D464E
+DWORD RETURN_CrashFix_Misc13a =                              0x4D4654;
+DWORD RETURN_CrashFix_Misc13b =                              0x4D4764;
+
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -334,6 +346,9 @@ void HOOK_CrashFix_Misc7 ();
 void HOOK_CrashFix_Misc8 ();
 void HOOK_CrashFix_Misc9 ();
 void HOOK_CrashFix_Misc10 ();
+void HOOK_CrashFix_Misc11 ();
+void HOOK_CrashFix_Misc12 ();
+void HOOK_CrashFix_Misc13 ();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
@@ -460,6 +475,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc8, (DWORD)HOOK_CrashFix_Misc8, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc9, (DWORD)HOOK_CrashFix_Misc9, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc10, (DWORD)HOOK_CrashFix_Misc10, 6 );
+    HookInstall(HOOKPOS_CrashFix_Misc11, (DWORD)HOOK_CrashFix_Misc11, 5 );
+    HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
+    HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -3067,6 +3085,16 @@ void CMultiplayerSA::SetThermalVisionEnabled ( bool bEnabled )
     }
 }
 
+bool CMultiplayerSA::IsNightVisionEnabled ( )
+{
+    return (*(BYTE *)0xC402B8 == 1 );
+}
+
+bool CMultiplayerSA::IsThermalVisionEnabled ( )
+{
+    return (*(BYTE *)0xC402B9 == 1 );
+}
+
 
 float CMultiplayerSA::GetGlobalGravity ( void )
 {
@@ -3164,7 +3192,7 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
     {
         ucDesignatedLightState = 1; //Amber
     }
-    else if ( ucTrafficLightState == 12 )
+    else if ( ucTrafficLightState == 9 )
     {
         ucDesignatedLightState = 4;  //Off
     }
@@ -3191,7 +3219,7 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
     {
         ucDesignatedLightState = 1; //Amber
     }
-    else if ( ucTrafficLightState == 12 )
+    else if ( ucTrafficLightState == 9 )
     {
         ucDesignatedLightState = 4; //Off
     }
@@ -4651,5 +4679,58 @@ void _declspec(naked) HOOK_CrashFix_Misc10 ()
         mov     dword ptr [ecx+8],0 
         add     esp, 18h 
         ret     8  
+    }
+}
+
+
+// #5576
+void _declspec(naked) HOOK_CrashFix_Misc11 ()
+{
+    _asm
+    {
+        // Hooked from 0x4D2C62  5 bytes
+        test    ecx, ecx 
+        je      cont  // Skip much code if ecx is zero (invalid anim somthing)
+
+        mov     eax, dword ptr [ecx+10h] 
+        test    eax, eax 
+        jmp     RETURN_CrashFix_Misc11a  // 4D2C67
+    cont:
+        jmp     RETURN_CrashFix_Misc11b  // 4D2E03
+    }
+}
+
+
+// #5530
+void _declspec(naked) HOOK_CrashFix_Misc12 ()
+{
+    _asm
+    {
+        // Hooked from 0x4D41C5  5 bytes
+        test    edi, edi 
+        je      cont  // Skip much code if edi is zero (invalid anim somthing)
+
+        mov     al, byte ptr [edi+0Bh] 
+        test    al, al 
+        jmp     RETURN_CrashFix_Misc12a  // 4D41CA
+    cont:
+        jmp     RETURN_CrashFix_Misc12b  // 4D4222
+    }
+}
+
+
+void _declspec(naked) HOOK_CrashFix_Misc13 ()
+{
+    _asm
+    {
+        // Hooked from 0x4D464E  6 bytes
+        cmp     eax, 0x480
+        jb      cont  // Skip much code if eax is less than 0x480 (invalid anim)
+
+        mov     al, byte ptr [eax+0Ah] 
+        shr     al, 5
+        jmp     RETURN_CrashFix_Misc13a  // 4D4654
+    cont:
+        jmp     RETURN_CrashFix_Misc13b  // 4D478c
     }
 }

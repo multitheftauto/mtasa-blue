@@ -28,7 +28,7 @@ public:
                                                               eHTTPDownloadType ucHTTPDownloadType,
                                                               unsigned short usHTTPDownloadPort,
                                                               const char* szHTTPDownloadURL,
-                                                              int iHTTPConnectionsPerClient,
+                                                              int iHTTPMaxConnectionsPerClient,
                                                               int iEnableClientChecks );
 
     inline ePacketID        GetPacketID             ( void ) const      { return PACKET_ID_SERVER_JOINEDGAME; };
@@ -43,7 +43,7 @@ private:
     eHTTPDownloadType       m_ucHTTPDownloadType;
     unsigned short          m_usHTTPDownloadPort;
     char                    m_szHTTPDownloadURL [MAX_HTTP_DOWNLOAD_URL + 1];
-    int                     m_iHTTPConnectionsPerClient;
+    int                     m_iHTTPMaxConnectionsPerClient;
     int                     m_iEnableClientChecks;
 };
 

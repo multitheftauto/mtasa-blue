@@ -40,7 +40,6 @@ class CCore;
 #include <core/CClientBase.h>
 #include <core/CCoreInterface.h>
 #include "CDirect3DData.h"
-#include "CResManager.h"
 #include "tracking/CTCPManager.h"
 #include "CClientVariables.h"
 #include "CKeyBinds.h"
@@ -58,10 +57,12 @@ class CCore;
 
 // Configuration file path (relative to Grand Theft Auto directory)
 #define MTA_CONFIG_PATH             "mta/coreconfig.xml"
+#define MTA_SERVER_CACHE_PATH       "mta/servercache.xml"
 #define CONFIG_ROOT                 "mainconfig"
 #define CONFIG_NODE_CVARS           "settings"                  // cvars node
 #define CONFIG_NODE_KEYBINDS        "binds"                     // keybinds node
 #define CONFIG_NODE_JOYPAD          "joypad"
+#define CONFIG_NODE_UPDATER         "updater"
 #define CONFIG_NODE_SERVER_INT      "internet_servers"          // backup of last successful master server list query
 #define CONFIG_NODE_SERVER_FAV      "favourite_servers"         // favourite servers list node
 #define CONFIG_NODE_SERVER_REC      "recently_played_servers"   // recently played servers list node
@@ -96,10 +97,6 @@ public:
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
 
     void                    SaveConfig                      ( void );
-
-    #ifndef MTA_DEBUG
-    CResManager *           GetResManager                   ( void );
-    #endif
 
     // Debug
     void                    DebugEcho                       ( const char* szText );
@@ -174,13 +171,12 @@ public:
     // Hooks
     void                    ApplyHooks                      ( void );
     HWND                    GetHookedWindow                 ( void );
-    void                    SetRenderDevice                 ( IUnknown* pDevice );
     void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput );
-    bool                    GetResetNeeded                  ( void );
     void                    CallSetCursorPos                ( int X, int Y ) { m_pSetCursorPosHook->CallSetCursorPos(X,Y); }
     void                    SetClientMessageProcessor       ( pfnProcessMessage pfnMessageProcessor ) { m_pfnMessageProcessor = pfnMessageProcessor; };
     pfnProcessMessage       GetClientMessageProcessor       ( void ) { return m_pfnMessageProcessor; }
     void                    ChangeResolution                ( long width, long height, long depth );
+    void                    ApplyLoadingCrashPatch          ( void );
 
     void                    SetFocused                      ( bool bFocused )               { m_bFocused = bFocused; };
     bool                    IsFocused                       ( void )                        { return m_bFocused; };
@@ -199,7 +195,7 @@ public:
     void                    RegisterCommands                ( void );
     bool                    IsValidNick                     ( const char* szNick );     // Move somewhere else
     void                    Quit                            ( bool bInstantly = true );
-    void                    InitiateUpdate                  ( const char* szType, const char* szHost )      { m_pLocalGUI->InitiateUpdate ( szType, szHost ); }
+    void                    InitiateUpdate                  ( const char* szType, const char* szData, const char* szHost )      { m_pLocalGUI->InitiateUpdate ( szType, szData, szHost ); }
     bool                    IsOptionalUpdateInfoRequired    ( const char* szHost )                          { return m_pLocalGUI->IsOptionalUpdateInfoRequired ( szHost ); }
     void                    InitiateDataFilesFix            ( void )                                        { m_pLocalGUI->InitiateDataFilesFix (); }
 
@@ -222,7 +218,6 @@ private:
     CCommands *                 m_pCommands;
     CDirect3DData *             m_pDirect3DData;
     CConnectManager*            m_pConnectManager;
-    IUnknown *                  m_pRenderDevice;
 
     // Instances (put new classes here!)
     CXMLFile*                   m_pConfigFile;
@@ -250,9 +245,6 @@ private:
     // Mod manager
     CModManager*                m_pModManager; 
 
-    // Resolution manager
-    CResManager*                m_pResManager;
-
     // Module interfaces.
     CGame *                     m_pGame;
     CNet *                      m_pNet;
@@ -264,7 +256,6 @@ private:
 
     CKeyBinds*                  m_pKeyBinds;
 
-    bool                        m_bResetNeeded;
     bool                        m_bFirstFrame;
     bool                        m_bIsOfflineMod;
     bool                        m_bCursorToggleControls;

@@ -256,8 +256,18 @@ int CLuaFunctionDefs::GetVehicleOccupants ( lua_State* luaVM )
             // Create a new table
             lua_newtable ( luaVM );
 
+            // Get the maximum amount of passengers
+            unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( pVehicle->GetModel ( ) );
+
+            // Make sure that if the vehicle doesn't have any seats, the function returns false
+            if ( ucMaxPassengers == 255 )
+            {
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+
             // Add All Occupants
-            for ( unsigned char ucSeat = 0; ucSeat <= CClientVehicleManager::GetMaxPassengerCount ( pVehicle->GetModel () ); ++ ucSeat )
+            for ( unsigned char ucSeat = 0; ucSeat <= ucMaxPassengers; ++ ucSeat )
             {
                 CClientPed* pPed = pVehicle->GetOccupant ( ucSeat );
                 if ( pPed )
@@ -2300,6 +2310,29 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setVehicleHeadLightColor" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetVehicleTurretPosition ( lua_State *luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA
+        && lua_type( luaVM, 2 ) == LUA_TNUMBER
+        && lua_type( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            float fHorizontal = ( float ) lua_tonumber ( luaVM, 2 );
+            float fVertical   = ( float ) lua_tonumber ( luaVM, 3 );
+
+            pVehicle->SetTurretRotation ( fHorizontal, fVertical );
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
 
     lua_pushboolean ( luaVM, false );
     return 1;

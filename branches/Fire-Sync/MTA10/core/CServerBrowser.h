@@ -69,8 +69,6 @@ public:
     CServerList*        GetFavouritesList       ( void ) { return &m_ServersFavourites; };
     CServerList*        GetRecentList           ( void ) { return &m_ServersRecent; };
 
-    void                LoadInternetList        ( );
-    void                SaveInternetList        ( );
     void                SaveRecentlyPlayedList  ( );
     void                SaveFavouritesList      ( );
 

@@ -71,8 +71,17 @@ void CCommandFuncs::Ver ( const char* szParameters )
 {
     ShowCursor(TRUE);
     HCURSOR hc = LoadCursor ( NULL, IDC_ARROW );
-    SetCursor ( hc );  
-    CLocalGUI::GetSingleton ( ).EchoConsole ( BLUE_VERSION_STRING );
+    SetCursor ( hc );
+
+    // Compose version string
+    unsigned short usNetRev = CCore::GetSingleton ().GetNetwork ()->GetNetRev ();
+    unsigned short usNetRel = CCore::GetSingleton ().GetNetwork ()->GetNetRel ();
+    SString strVersion = BLUE_VERSION_STRING;
+    if ( usNetRev > 0 || usNetRel > 0 )
+        strVersion = strVersion.Replace ( "\n", SString ( ".%d\n", usNetRev ) );
+    if ( usNetRel > 0 )
+        strVersion = strVersion.Replace ( "\n", SString ( ".%03d\n", usNetRel ) );
+    CLocalGUI::GetSingleton ( ).EchoConsole ( strVersion );
 }
 
 void CCommandFuncs::ScreenShot ( const char* szParameters )
@@ -235,28 +244,6 @@ void CCommandFuncs::Unload ( const char* szParameters )
     }
 }
 
-
-void CCommandFuncs::ConnectionType ( const char *szParameters )
-{
-    unsigned short usMTUSize = 0;
-
-    if ( strcmpi ( szParameters, "lan" ) == 0 ) {
-        usMTUSize = NET_MTU_LAN;
-    } else if ( strcmpi ( szParameters, "dsl" ) == 0 ) {
-        usMTUSize = NET_MTU_DSL;
-    } else if ( strcmpi ( szParameters, "modem" ) == 0 ) {
-        usMTUSize = NET_MTU_MODEM;
-    } else {
-        CCore::GetSingleton ().GetConsole ()->Print ( "Please specify a correct connection type (lan, dsl or modem)" );
-    }
-
-    if ( usMTUSize <= 0 ) 
-        return;
-
-    CCore::GetSingleton ().GetConnectManager ()->SetMTUSize ( usMTUSize );
-    CVARS_SET ( "mtu_size", usMTUSize );
-    CCore::GetSingleton ().GetConsole ()->Printf ( "MTU size was set to %u", usMTUSize );
-}
 
 void CCommandFuncs::Connect ( const char* szParameters )
 {

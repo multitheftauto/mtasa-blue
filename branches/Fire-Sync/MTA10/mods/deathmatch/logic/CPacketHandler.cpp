@@ -321,7 +321,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     bitStream.Read ( ucNumberOfPlayers );
 
     // Can't be 0
-    if ( ucNumberOfPlayers == 0 || ucNumberOfPlayers > MAX_PLAYER_COUNT )
+    if ( ucNumberOfPlayers == 0 )
     {
         RaiseProtocolError ( 6 );
         return;
@@ -339,14 +339,11 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
 
     // Get amount of checking to do, as determined by the server
     int iEnableClientChecks = -1;
-    if ( bitStream.Version () >= 0x05 )
-        bitStream.Read ( iEnableClientChecks );
+    bitStream.Read ( iEnableClientChecks );
 
     // Limit number of http request if required by the server
-    int iHTTPConnectionsPerClient = 32;
-    if ( bitStream.Version () >= 0x04 )
-        bitStream.Read ( iHTTPConnectionsPerClient );
-    g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetMaxConnections( iHTTPConnectionsPerClient );
+    int iHTTPMaxConnectionsPerClient = 4;
+    bitStream.Read ( iHTTPMaxConnectionsPerClient );
 
     // HTTP Download Type
     unsigned char ucHTTPDownloadType;
@@ -369,15 +366,12 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
             g_pClientGame->m_strHTTPDownloadURL = SString ( "http://%s:%d", g_pNet->GetConnectedServer(), ulHTTPDownloadPort );
 
             // We are downloading from the internal HTTP Server, therefore disable multiple downloads
-            g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( true );
+            iHTTPMaxConnectionsPerClient = 1;
             break;
         }
         case HTTP_DOWNLOAD_ENABLED_URL:
         {
             BitStreamReadUsString( bitStream, g_pClientGame->m_strHTTPDownloadURL );
-
-            // We are downloading from a URL, therefore allow multiple downloads
-            g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( false );
             break;
         }
     default:
@@ -385,10 +379,11 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     }
 
     // Allow forcing of SingleDownloadOption with core config option <single_download>1</single_download>
-    bool bForceSingleDownload;
-    if ( g_pCore->GetCVars ()->Get ( "single_download", bForceSingleDownload ) && bForceSingleDownload )
-        g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetSingleDownloadOption ( true );
-        
+    int iSingleDownload;
+    if ( g_pCore->GetCVars ()->Get ( "single_download", iSingleDownload ) && iSingleDownload == 1 )
+        iHTTPMaxConnectionsPerClient = 1;
+
+    g_pCore->GetNetwork ()->GetHTTPDownloadManager ()->SetMaxConnections( iHTTPMaxConnectionsPerClient );
 
     // Make the camera black until we spawn
     // Anyone want to document wtf these values are?  Why are we putting seemingly "random"
@@ -1054,7 +1049,7 @@ void CPacketHandler::Packet_PlayerChangeNick ( NetBitStreamInterface& bitStream 
         std::string strNick;
         g_pCore->GetCVars ()->Get ( "nick", strNick );
         if ( strNick == "Player" )
-            g_pCore->GetCVars ()->Set ( "nick", std::string ( szNewNick ) );
+            g_pCore->GetCVars ()->Set ( "nick", SString ( "Player%d", ( rand () % 9000 ) + 1000 ) );
     }
 
     /*
@@ -1092,34 +1087,38 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
     unsigned char ucRed;
     unsigned char ucGreen;
     unsigned char ucBlue;
-    unsigned char ucColorCoded;
+    bool ucColorCoded;
     if ( bitStream.Read ( ucRed ) &&
          bitStream.Read ( ucGreen ) &&
          bitStream.Read ( ucBlue ) &&
-         bitStream.Read ( ucColorCoded ) )
+         bitStream.ReadBit ( ucColorCoded ) )
     {
         // Valid length?
+
         int iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed () - 4;
-        if ( iNumberOfBytesUsed >= MIN_CHATECHO_LENGTH && iNumberOfBytesUsed <= MAX_CHATECHO_LENGTH )
+        if ( iNumberOfBytesUsed >= MIN_CHATECHO_LENGTH  )
         {
             // Read the message into a buffer
-            char szMessage [MAX_CHATECHO_LENGTH + 1];
+            char* szMessage = new char[iNumberOfBytesUsed + 1];
             bitStream.Read ( szMessage, iNumberOfBytesUsed );
             szMessage [iNumberOfBytesUsed] = 0;
+            if ( SharedUtil::ConvertToUTF8(szMessage).size() <= MAX_CHATECHO_LENGTH )
+            {
+                // Strip it for bad characters
+                StripControlCodes ( szMessage, ' ' );
 
-            // Strip it for bad characters
-            StripControlCodes ( szMessage, ' ' );
+                // Call an event
+                CLuaArguments Arguments;
+                Arguments.PushString ( szMessage );
+                Arguments.PushNumber ( ucRed );
+                Arguments.PushNumber ( ucGreen );
+                Arguments.PushNumber ( ucBlue );
+                g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
 
-            // Call an event
-            CLuaArguments Arguments;
-            Arguments.PushString ( szMessage );
-            Arguments.PushNumber ( ucRed );
-            Arguments.PushNumber ( ucGreen );
-            Arguments.PushNumber ( ucBlue );
-            g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
-
-            // Echo it
-            g_pCore->ChatEchoColor ( szMessage, ucRed, ucGreen, ucBlue, ( ucColorCoded == 1 ) );
+                // Echo it
+                g_pCore->ChatEchoColor ( szMessage, ucRed, ucGreen, ucBlue, ucColorCoded );
+                delete[] szMessage;
+            }
         }
     }
 }
@@ -1304,6 +1303,10 @@ void CPacketHandler::Packet_VehicleSpawn ( NetBitStreamInterface& bitStream )
         pVehicle->SetTurretRotation ( 0.0f, 0.0f );
         pVehicle->SetSirenOrAlarmActive ( false );
         pVehicle->SetAdjustablePropertyValue ( 0 );
+        CClientVehicle* pTowedBy = pVehicle->GetTowedByVehicle ();
+        if ( pTowedBy )
+            pTowedBy->SetTowedVehicle( NULL );
+        pVehicle->AttachTo ( NULL );
 
         // Call the onClientVehicleRespawn event
         CLuaArguments Arguments;
@@ -1986,9 +1989,16 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     if ( !bitStream.Read ( &funBugs ) )
         return;
 
+    
+    bool bCrouchBug = false;
+    if ( bitStream.Version () >= 0x15 )
+        if ( !bitStream.ReadBit ( bCrouchBug ) )
+            return;
+
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_QUICKRELOAD, funBugs.data.bQuickReload );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTFIRE, funBugs.data.bFastFire );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTMOVE, funBugs.data.bFastMove );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, bCrouchBug );
 }
 
 
@@ -2034,6 +2044,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // unsigned char        (1)     - entity interior
     // unsigned short       (2)     - entity dimension
     // ElementID            (2)     - attached to entity id
+    // bool                 (1)     - collisions enabled
     // ???                  (?)     - custom data
 
     // Objects:
@@ -2041,6 +2052,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // CVector              (12)    - rotation
     // unsigned short       (2)     - object model id
     // unsigned char        (1)     - alpha
+    // float                (4)     - scale
 
     // Pickups:
     // CVector              (12)    - position
@@ -2138,6 +2150,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         ElementID ParentID;
         unsigned char ucInterior;
         unsigned short usDimension;
+        bool bCollisonsEnabled;
 
         if ( bitStream.ReadCompressed ( EntityID ) &&
              bitStream.Read ( ucEntityTypeID ) &&
@@ -2146,20 +2159,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
              bitStream.ReadCompressed ( usDimension ) &&
              bitStream.ReadBit ( bIsAttached ) )
         {
-            /*
-#ifdef MTA_DEBUG
-            char* names [ 17 ] = { "dummy", "player", "vehicle", "object", "marker", "blip",
-                                   "pickup", "radar_area", "spawnpoint", "remoteclient", "console",
-                                   "path_node", "world_mesh", "team", "ped", "colshape", "unknown" };
-            g_pCore->GetConsole ()->Printf ( "* Entity-add: %s - %u - parent: %u", names [ ( ucEntityTypeID <= 16 ) ? ucEntityTypeID : 16 ], EntityID, ParentID );
-
-            if ( FILE * file = fopen ( "entity-add.txt", "a" ) )
-            {
-                fprintf ( file, "entity-type: %s - id: %u - parent: %u\n", names [ ( ucEntityTypeID <= 16 ) ? ucEntityTypeID : 16 ], EntityID, ParentID );
-                fclose ( file );
-            }
-#endif
-            */
 
             if ( bIsAttached )
             {
@@ -2167,6 +2166,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 bitStream.Read ( &attachedPosition );
                 bitStream.Read ( &attachedRotation );
             }
+
+            // Check element collisions enabled ( for use later on )
+            bitStream.ReadBit ( bCollisonsEnabled );
 
             // Read custom data
             CCustomData* pCustomData = new CCustomData;
@@ -2314,11 +2316,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             return;
                         }
 
-                        if ( bitStream.Version () >= 0x0c )
-                        {
-                            if ( bitStream.ReadBit () )
-                                pObject->SetDoubleSided ( true );
-                        }
+                        if ( bitStream.ReadBit () )
+                            pObject->SetDoubleSided ( true );
 
                         bool bIsMoving;
                         if ( bitStream.ReadBit ( bIsMoving ) && bIsMoving )
@@ -2332,7 +2331,13 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                                                          rotationRadians.data.vecRotation,
                                                          ulMoveTimeLeft );
                             }
-                        }                                 
+                        }
+
+                        float fScale;
+                        if ( bitStream.Read ( fScale ) )
+                            pObject->SetScale ( fScale );
+
+                        pObject->SetCollisionEnabled ( bCollisonsEnabled );
                     }
 
                     break;
@@ -2600,6 +2605,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // Set the matrix
                     pVehicle->SetPosition ( position.data.vecPosition );
                     pVehicle->SetRotationDegrees ( rotationDegrees.data.vecRotation );
+
+                    // Set collidable state
+                    pVehicle->SetCollisionEnabled ( bCollisonsEnabled );
 
                     break;
                 }
@@ -2870,9 +2878,6 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( &alpha );
                     pPed->SetAlpha ( alpha.data.ucAlpha );
 
-                    if ( bitStream.Version () < 0x07 )
-                        break;
-
                     // clothes
                     unsigned char ucNumClothes, ucTextureLength, ucModelLength, ucType;
                     if ( bitStream.Read ( ucNumClothes ) )
@@ -2902,6 +2907,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             pPed->RebuildModel ( true );
                         }
                     }
+
+                    // Collisions
+                    pPed->SetUsesCollision ( bCollisonsEnabled );
+                    
                     break;
                 }
 
@@ -3590,8 +3599,7 @@ void CPacketHandler::Packet_TextItem( NetBitStreamInterface& bitStream )
             bitStream.Read ( color.B );
             bitStream.Read ( color.A );
             bitStream.Read ( ucFormat );
-            if ( bitStream.Version() >= 0x03 )
-                bitStream.Read ( ucShadowAlpha );
+            bitStream.Read ( ucShadowAlpha );
 
             // Read out the text size
             unsigned short usTextLength = 0;
@@ -3705,23 +3713,26 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
         // * Ping compensation *
         // Vehicle or player?
         CClientPlayer * pLocalPlayer = g_pClientGame->GetLocalPlayer ();
-        if ( pLocalPlayer->GetOccupiedVehicleSeat () == 0 )
-            pMovedEntity = pLocalPlayer->GetRealOccupiedVehicle ();
-        if ( !pMovedEntity )
-            pMovedEntity = pLocalPlayer;
-
-        // Warp back in time to where we were when this explosion happened
-        unsigned short usLatency = ( unsigned short ) g_pNet->GetPing ();
-        if ( pCreator && pCreator != g_pClientGame->GetLocalPlayer () )
-            usLatency = pCreator->GetLatency ();
-        CVector vecWarpPosition;
-        if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecWarpPosition, usLatency ) )
+        if ( pLocalPlayer )
         {
-            pMovedEntity->GetPosition ( vecRestorePosition );
-            pMovedEntity->SetPosition ( vecWarpPosition );
+            if ( pLocalPlayer->GetOccupiedVehicleSeat () == 0 )
+                pMovedEntity = pLocalPlayer->GetRealOccupiedVehicle ();
+            if ( !pMovedEntity )
+                pMovedEntity = pLocalPlayer;
+
+            // Warp back in time to where we were when this explosion happened
+            unsigned short usLatency = ( unsigned short ) g_pNet->GetPing ();
+            if ( pCreator && pCreator != g_pClientGame->GetLocalPlayer () )
+                usLatency = pCreator->GetLatency ();
+            CVector vecWarpPosition;
+            if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecWarpPosition, usLatency ) )
+            {
+                pMovedEntity->GetPosition ( vecRestorePosition );
+                pMovedEntity->SetPosition ( vecWarpPosition );
+            }
+            else
+                pMovedEntity = NULL;
         }
-        else
-            pMovedEntity = NULL;
     }
 
     eExplosionType Type = static_cast < eExplosionType > ( explosionType.data.uiType );
@@ -3754,6 +3765,11 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
                 // Make sure the vehicle's blown
                 CClientVehicle * pExplodingVehicle = static_cast < CClientVehicle * > ( pOrigin );
                 pExplodingVehicle->Blow ( false );
+                
+                // Call onClientVehicleExplode
+                CLuaArguments Arguments;
+                pExplodingVehicle->CallEvent ( "onClientVehicleExplode", Arguments, true );
+
                 if ( !bCancelExplosion )
                     g_pClientGame->m_pManager->GetExplosionManager ()->Create ( EXP_TYPE_GRENADE, position.data.vecPosition, pCreator, true, -1.0f, false, WEAPONTYPE_EXPLOSION );
                 break;
@@ -4169,8 +4185,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
 
                     bitStream.Read ( ucChunkSubType );
                     bitStream.Read ( chunkChecksum.ulCRC );
-                    if ( bitStream.Version () >= 0x08 )
-                        bitStream.Read ( (char*)chunkChecksum.mD5, sizeof ( chunkChecksum.mD5 ) );
+                    bitStream.Read ( (char*)chunkChecksum.mD5, sizeof ( chunkChecksum.mD5 ) );
                     bitStream.Read ( dChunkDataSize );
 
                     // Don't bother with empty files
@@ -4218,7 +4233,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 unlink ( pDownloadableResource->GetName () );
 
                                 // Queue the file to be downloaded
-                                pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, NULL, NULL, g_pClientGame->IsLocalGame () );
+                                pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame () );
 
                                 // If the file was successfully queued, increment the resources to be downloaded
                                 usResourcesToBeDownloaded++;
@@ -4350,6 +4365,6 @@ void CPacketHandler::Packet_UpdateInfo ( NetBitStreamInterface& bitStream )
     if ( BitStreamReadUsString( bitStream, strType ) &&
          BitStreamReadUsString( bitStream, strData ) )
     {
-        g_pCore->InitiateUpdate ( strType, g_pNet->GetConnectedServer () );
+        g_pCore->InitiateUpdate ( strType, strData, g_pNet->GetConnectedServer () );
     }
 }

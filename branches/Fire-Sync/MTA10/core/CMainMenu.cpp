@@ -151,6 +151,10 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC ),
         CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList () );
 
+    // Remove unused node
+    if ( CXMLNode* pOldNode = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ) )
+        pConfig->DeleteSubNode ( pOldNode );
+
     // This class is destroyed when the video mode is changed (vid), so the config can already be loaded
     // If it is already loaded (and this constructor is not called on startup) then load the menu options
 //    if ( CClientVariables::GetSingleton ().IsLoaded () )
@@ -314,7 +318,9 @@ void CMainMenu::Update ( void )
         // Initialize our 3D scene once the device is available
         IDirect3DDevice9 * pDevice = m_pGraphics->GetDevice ();
         if ( !m_bInitialized && pDevice )
-        {            
+        {
+            CCore::GetSingleton ().GetNetwork ()->Reset ();
+            GetVersionUpdater ()->EnableChecking ( true );
             m_bInitialized = true;
 
             // If the static flag has not already been set

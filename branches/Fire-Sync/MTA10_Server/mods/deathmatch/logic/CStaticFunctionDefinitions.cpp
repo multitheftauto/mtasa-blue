@@ -804,6 +804,34 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer ( CElement* pElement )
     return NULL;
 }
 
+bool CStaticFunctionDefinitions::GetElementCollisionsEnabled ( CElement* pElement )
+{
+    assert ( pElement );
+
+    switch ( pElement->GetType () )
+    {
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+            return pVehicle->GetCollisionEnabled ( );
+        }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            return pObject->GetCollisionEnabled ( );
+        }
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            CPed* pPed = static_cast < CPed* > ( pElement );
+            return pPed->GetCollisionEnabled ( );
+        }
+        default: return false;
+    }
+
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::IsElementInWater ( CElement* pElement, bool & bInWater )
 {
@@ -842,7 +870,7 @@ bool CStaticFunctionDefinitions::SetElementID ( CElement* pElement, const char* 
     // Tell the clients of the name change
     unsigned short usIDLength = static_cast < unsigned short > ( strlen ( szID ) );
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( usIDLength );
     BitStream.pBitStream->Write ( szID, usIDLength );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_NAME, *BitStream.pBitStream ) );
@@ -939,8 +967,8 @@ bool CStaticFunctionDefinitions::SetElementParent ( CElement* pElement, CElement
         pElement->SetParentObject ( pParent );
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( pElement->GetID () );
-        BitStream.pBitStream->Write ( pParent->GetID () );
+        BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
+        BitStream.pBitStream->WriteCompressed ( pParent->GetID () );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_PARENT, *BitStream.pBitStream ) );
         return true;
     }
@@ -958,9 +986,15 @@ bool CStaticFunctionDefinitions::GetElementPosition ( CElement* pElement, CVecto
 }
 
 
-bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVector& vecRotation )
+bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVector& vecRotation, const char* szRotationOrder )
 {
     assert ( pElement );
+
+    eEulerRotationOrder desiredRotOrder = EulerRotationOrderFromString(szRotationOrder);
+    if (desiredRotOrder == EULER_INVALID)
+    {
+        return false;
+    }
 
     int iType = pElement->GetType ();
     switch ( iType )
@@ -969,7 +1003,7 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVecto
         case CElement::PLAYER:
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
-            vecRotation.fZ = ConvertRadiansToDegrees ( pPed->GetRotation () );
+            vecRotation.fZ = ConvertRadiansToDegrees ( pPed->GetRotation () ); //No conversion since only Z is used
 
             break;
         }
@@ -977,6 +1011,10 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVecto
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             pVehicle->GetRotationDegrees ( vecRotation );
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZYX)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZYX, desiredRotOrder);
+            }
 
             break;
         }
@@ -985,6 +1023,10 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVecto
             CObject* pObject = static_cast < CObject* > ( pElement );
             pObject->GetRotation ( vecRotation );
             ConvertRadiansToDegrees ( vecRotation );
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            }
 
             break;
         }
@@ -1040,7 +1082,7 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
 
     // Construct the set position packet
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( vecPosition.fX );
     BitStream.pBitStream->Write ( vecPosition.fY );
     BitStream.pBitStream->Write ( vecPosition.fZ );
@@ -1063,9 +1105,15 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation )
+bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder )
 {
     assert ( pElement );
+
+    eEulerRotationOrder argumentRotOrder = EulerRotationOrderFromString(szRotationOrder);
+    if (argumentRotOrder == EULER_INVALID)
+    {
+        return false;
+    }
 
     int iType = pElement->GetType ();
     switch ( iType )
@@ -1074,21 +1122,37 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const 
         case CElement::PLAYER:
         {
             CPed* pPed = static_cast < CPed* > ( pElement );
-            SetPedRotation( pPed, vecRotation.fZ );
+            SetPedRotation( pPed, vecRotation.fZ ); //No rotation order conversion required since only Z is used
 
             break;
         }
         case CElement::VEHICLE:
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            SetVehicleRotation( pVehicle, vecRotation );
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZYX)
+            {
+                SetVehicleRotation( pVehicle, vecRotation );
+            }
+            else
+            {
+                CVector vZYX = ConvertEulerRotationOrder( vecRotation, argumentRotOrder, EULER_ZYX ); 
+                SetVehicleRotation( pVehicle, vZYX );
+            }
 
             break;
         }
         case CElement::OBJECT:
         {
             CObject* pObject = static_cast < CObject* > ( pElement );
-            SetObjectRotation( pObject, vecRotation );
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
+            {
+                SetObjectRotation( pObject, vecRotation );
+            }
+            else
+            {
+                CVector vZXY = ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY );
+                SetObjectRotation( pObject, vZXY );
+            }
         }
         default: return false;
     }
@@ -1124,7 +1188,7 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const 
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( vecVelocity.fX );
     BitStream.pBitStream->Write ( vecVelocity.fY );
     BitStream.pBitStream->Write ( vecVelocity.fZ );
@@ -1162,7 +1226,7 @@ bool CStaticFunctionDefinitions::SetElementInterior ( CElement* pElement, unsign
 
         // Tell everyone
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( pElement->GetID () );
+        BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
         BitStream.pBitStream->Write ( ucInterior );
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bSetPosition ) ? 1 : 0 ) );
         if ( bSetPosition )
@@ -1222,7 +1286,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
             pElement->SetDimension ( usDimension );
 
             CBitStream bitStream;
-            bitStream.pBitStream->Write ( pElement->GetID () );
+            bitStream.pBitStream->WriteCompressed ( pElement->GetID () );
             bitStream.pBitStream->Write ( usDimension );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_DIMENSION, *bitStream.pBitStream ) );
 
@@ -1253,7 +1317,7 @@ bool CStaticFunctionDefinitions::AttachElements ( CElement* pElement, CElement* 
                 pElement->AttachTo ( pAttachedToElement );
 
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( pElement->GetID () );
+                BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
                 BitStream.pBitStream->Write ( pAttachedToElement->GetID () );
                 BitStream.pBitStream->Write ( vecPosition.fX );
                 BitStream.pBitStream->Write ( vecPosition.fY );
@@ -1288,7 +1352,7 @@ bool CStaticFunctionDefinitions::DetachElements ( CElement* pElement, CElement* 
             pElement->GenerateSyncTimeContext ();
 
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pElement->GetID () );
+            BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
             BitStream.pBitStream->Write ( pElement->GetSyncTimeContext () );
             BitStream.pBitStream->Write ( vecPosition.fX );
             BitStream.pBitStream->Write ( vecPosition.fY );
@@ -1341,7 +1405,7 @@ bool CStaticFunctionDefinitions::SetElementAlpha ( CElement* pElement, unsigned 
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( ucAlpha );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_ALPHA, *BitStream.pBitStream ) );
 
@@ -1357,7 +1421,7 @@ bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, boo
     pElement->SetDoubleSided ( bDoubleSided );
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->WriteBit ( bDoubleSided );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ), NULL, PACKET_ORDERING_GAME, 0x0c );
 
@@ -1404,7 +1468,7 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( fHealth );
     BitStream.pBitStream->Write ( pElement->GenerateSyncTimeContext () );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_HEALTH, *BitStream.pBitStream ) );
@@ -1466,7 +1530,7 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pElement->GetID () );
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->Write ( usModel );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_MODEL, *BitStream.pBitStream ) );
 
@@ -1491,7 +1555,7 @@ bool CStaticFunctionDefinitions::SetElementAttachedOffsets ( CElement* pElement,
         rotation.data.vecRotation = vecRotation;
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( pElement->GetID () );
+        BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
         position.Write ( *BitStream.pBitStream );
         rotation.Write ( *BitStream.pBitStream );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_ATTACHED_OFFSETS, *BitStream.pBitStream ) );
@@ -1538,6 +1602,42 @@ bool CStaticFunctionDefinitions::SetElementSyncer ( CElement* pElement, CPlayer*
         default: return false;
     }
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CElement* pElement, bool bEnable )
+{
+    assert ( pElement );
+
+    switch ( pElement->GetType () )
+    {
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+            pVehicle->SetCollisionEnabled ( bEnable );
+            break;
+        }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            pObject->SetCollisionEnabled ( bEnable );
+            break;
+        }
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            CPed* pPed = static_cast < CPed* > ( pElement );
+            pPed->SetCollisionEnabled ( bEnable );
+            break;
+        }
+        default: return false;
+    }
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
+    BitStream.pBitStream->WriteBit ( bEnable );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_COLLISIONS_ENABLED, *BitStream.pBitStream ) );
+
+    return true;
 }
 
 
@@ -2276,8 +2376,25 @@ bool CStaticFunctionDefinitions::SetPlayerMuted ( CElement* pElement, bool bMute
     if ( IS_PLAYER ( pElement ) )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
-        pPlayer->SetMuted ( bMuted );
-        return true;
+
+        if ( bMuted != pPlayer->IsMuted ( ) )
+        {
+            bool bEventCancelled = false;
+
+            CLuaArguments arguments;
+
+            if ( bMuted )
+                bEventCancelled = !pPlayer->CallEvent ( "onPlayerMute", arguments );
+            else
+                bEventCancelled = !pPlayer->CallEvent ( "onPlayerUnmute", arguments );
+
+            if ( !bEventCancelled )
+            {
+                pPlayer->SetMuted ( bMuted );
+                
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -5022,6 +5139,22 @@ bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CVehicle* pVehicle, 
 }
 
 
+bool CStaticFunctionDefinitions::SetVehicleTurretPosition ( CVehicle* pVehicle, float fHorizontal, float fVertical )
+{
+    assert ( pVehicle );
+
+    pVehicle->SetTurretPosition ( fHorizontal, fVertical );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( pVehicle->GetID () );
+    BitStream.pBitStream->Write ( fHorizontal );
+    BitStream.pBitStream->Write ( fVertical );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_TURRET_POSITION, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
 CMarker* CStaticFunctionDefinitions::CreateMarker ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo )
 {
     assert ( szType );
@@ -5495,6 +5628,26 @@ bool CStaticFunctionDefinitions::SetObjectRotation ( CElement* pElement, const C
         BitStream.pBitStream->Write ( vecRadians.fY );
         BitStream.pBitStream->Write ( vecRadians.fZ );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_OBJECT_ROTATION, *BitStream.pBitStream ) );
+    }
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetObjectScale ( CElement* pElement, float fScale )
+{
+    RUN_CHILDREN SetObjectScale ( *iter, fScale );
+
+    if ( IS_OBJECT ( pElement ) )
+    {
+        CObject* pObject = static_cast < CObject* > ( pElement );
+
+        pObject->SetScale ( fScale );
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( pObject->GetID () );
+        BitStream.pBitStream->Write ( fScale );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_OBJECT_SCALE, *BitStream.pBitStream ) );
     }
 
     return true;
@@ -7040,7 +7193,7 @@ bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char u
 }
 bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState, bool bForced )
 {
-    if ( ucState >= 0 && ucState < 13 )
+    if ( ucState >= 0 && ucState < 10 )
     {
         g_pGame->SetTrafficLightState ( ucState );
  
@@ -7661,111 +7814,127 @@ bool CStaticFunctionDefinitions::LogOut ( CPlayer* pPlayer )
 }
 
 
-bool CStaticFunctionDefinitions::KickPlayer ( CPlayer* pPlayer, CPlayer* pResponsible, const char* szReason )
+bool CStaticFunctionDefinitions::KickPlayer ( CPlayer* pPlayer, SString strResponsible, SString strReason )
 {
+    // Make sure we have a player
     assert ( pPlayer );
 
-    const char* szResponsible = "Console";
-    if ( pResponsible )
-        szResponsible = pResponsible->GetNick ();
+    // If our responsible string is too long, crop it to size and display ... in the end so it's obvious it's cropped
+    if ( strResponsible.length( ) > MAX_KICK_RESPONSIBLE_LENGTH )
+        strResponsible = strResponsible.substr ( 0, MAX_KICK_RESPONSIBLE_LENGTH - 3 ) + "...";
 
-
-    const char* szReasonPointer = NULL;
-    char szMessage [256];
-    szMessage [0] = '\0';
+    // Declare the strings for use later on
+    SString strMessage;
+    SString strInfoMessage;
+    
+    // Get the size of the reason
+    size_t sizeReason = strReason.length ( );
 
     // Got any reason?
-    if ( szReason )
+    if ( sizeReason >= MIN_KICK_REASON_LENGTH )
     {
-        size_t sizeReason = strlen ( szReason );
-        if ( sizeReason >= MIN_KICK_REASON_LENGTH && sizeReason <= MAX_KICK_REASON_LENGTH )
-        {
-            _snprintf ( szMessage, 256, "You were kicked by %s (%s)", szResponsible, szReason );
-            szReasonPointer = szReason;
-        }
-        else
-        {
-            _snprintf ( szMessage, 256, "You were kicked by %s", szResponsible );
-        }
-    }
-    else
-    {
-        _snprintf ( szMessage, 256, "You were kicked by %s", szResponsible );
-    }
-    szMessage[255] = '\0';
+        // If our reaon string is too long, crop it to size and display ... in the end so it's obvious it's cropped
+        if ( sizeReason > MAX_KICK_REASON_LENGTH )
+            strReason = strReason.substr ( 0, MAX_KICK_REASON_LENGTH - 3 ) + "...";
 
-    // Make a message to send to everyone else
-    char szInfoMessage [256];
-    if ( szReasonPointer )
-    {
-        _snprintf ( szInfoMessage, 256, "%s was kicked from the game by %s (%s)", pPlayer->GetNick (), szResponsible, szReasonPointer );
+        // Now create the messages which will be displayed to both the kicked player and the console
+        strMessage.Format ( "You were kicked by %s (%s)", strResponsible.c_str( ), strReason.c_str( ) );
+        strInfoMessage.Format ( "%s was kicked from the game by %s (%s)", pPlayer->GetNick( ), strResponsible.c_str( ), strReason.c_str( ) );
     }
     else
     {
-        _snprintf ( szInfoMessage, 256, "%s was kicked from the game by %s", pPlayer->GetNick (), szResponsible );
+        // Now create the messages which will be displayed to both the kicked player and the console
+        strMessage.Format ( "You were kicked by %s", strResponsible.c_str( ) );
+        strInfoMessage.Format ( "%s was kicked from the game by %s", pPlayer->GetNick( ), strResponsible.c_str( ) );
     }
-    szInfoMessage [255] = 0;
 
     // Tell the player that was kicked why. QuitPlayer will delete the player.
-    pPlayer->Send ( CPlayerDisconnectedPacket ( szMessage ) );
-    g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_KICK, false, szReason, szResponsible );
+    pPlayer->Send ( CPlayerDisconnectedPacket ( strMessage.c_str ( ) ) );
+    g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_KICK, false, strReason.c_str( ), strResponsible.c_str( ) );
 
     // Tell everyone else that he was kicked from the game including console
     // m_pPlayerManager->BroadcastOnlyJoined ( CChatEchoPacket ( szInfoMessage, CHATCOLOR_INFO ) );
-    CLogger::LogPrintf ( "KICK: %s\n", szInfoMessage );
+    CLogger::LogPrintf ( "KICK: %s\n", strInfoMessage.c_str ( ) );
 
     return true;
 }
 
 
-CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, const char* szReason, time_t tUnban )
+CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, SString strResponsible, SString strReason, time_t tUnban )
 {
+    // Make sure we have a player
     assert ( pPlayer );
 
+    // Initialize variables
     CBan* pBan = NULL;
-    const char* szResponsible = "Console";
-    if ( pResponsible )
-        szResponsible = pResponsible->GetNick ();
 
-    char szMessage [256];
-    char szInfoMessage [256];
+    SString strMessage;
+    SString strInfoMessage;
 
-    // Got any reason?
-    _snprintf ( szMessage, 255, "You were banned by %s", szResponsible );
-    _snprintf ( szInfoMessage, 255, "%s was banned from the game by %s", pPlayer->GetNick (), szResponsible );
-    if ( szReason )
+    // If the responsible string is too long, crop it
+    if ( strResponsible.length ( ) > MAX_BAN_RESPONSIBLE_LENGTH )
+        strResponsible = strResponsible.substr ( 0, MAX_BAN_RESPONSIBLE_LENGTH - 3 ) + "...";
+
+    // Check if there's a reason
+    size_t sizeReason = strReason.length( );
+    if ( sizeReason >= MIN_BAN_REASON_LENGTH )
     {
-        size_t sizeReason = strlen ( szReason );
-        if ( sizeReason >= MIN_BAN_REASON_LENGTH && sizeReason <= MAX_BAN_REASON_LENGTH )
-        {
-            _snprintf ( szMessage, 255, "%s (%s)", szMessage, szReason );
-            _snprintf ( szInfoMessage, 255, "%s (%s)", szInfoMessage, szReason );
-        }
+        // If the reason is too long, crop it
+        if ( sizeReason > MAX_BAN_REASON_LENGTH )
+            strReason = strReason.substr ( 0, MAX_BAN_REASON_LENGTH - 3 ) + "...";
+
+        // Format the messages for both the banned player and the console
+        strMessage.Format     ( "You were banned by %s (%s)", strResponsible.c_str(), strReason.c_str() );
+        strInfoMessage.Format ( "%s was banned from the game by %s (%s)", pPlayer->GetNick(), strResponsible.c_str(), strReason.c_str() );
+    }
+    else
+    {
+        // Format the messages for both the banned player and the console
+        strMessage.Format     ( "You were banned by %s", strResponsible.c_str() );
+        strInfoMessage.Format ( "%s was banned from the game by %s", pPlayer->GetNick(), strResponsible.c_str() );
     }
 
     // Ban the player
     if ( bIP )
-        pBan = m_pBanManager->AddBan ( pPlayer, pResponsible, ( szReason ) ? szReason : "Unknown", tUnban );
-    // Can not ban by username or serial if serial verification is not enabled
-    else if ( m_pMainConfig->GetSerialVerificationEnabled () && ( bUsername || bSerial ) )
-        pBan = m_pBanManager->AddBan ( pResponsible, ( szReason ) ? szReason : "Unknown", tUnban );
+        pBan = m_pBanManager->AddBan ( pPlayer, strResponsible, strReason, tUnban );
+    else if (  bUsername || bSerial )
+        pBan = m_pBanManager->AddBan ( strResponsible, strReason, tUnban );
 
+    // If the ban was successful
     if ( pBan )
     {
-        if ( m_pMainConfig->GetSerialVerificationEnabled () )
-        {
-            if ( bUsername ) pBan->SetAccount ( pPlayer->GetSerialUser () );
-            if ( bSerial ) pBan->SetSerial ( pPlayer->GetSerial () );
+        // Set the data if banned by either username or serial
+        if ( bUsername ) pBan->SetAccount ( pPlayer->GetSerialUser () );
+        if ( bSerial ) pBan->SetSerial ( pPlayer->GetSerial () );
 
-            m_pBanManager->SaveBanList ();
+        // Initialize a variable to check whether the event was cancelled or not
+        bool bEventCancelled = false;
+
+        // Check if we passed a responsible player
+        if ( pResponsible )
+        {
+            // Call the event with the responsible player as the source
+            CLuaArguments Arguments;
+            Arguments.PushUserData ( pBan );
+            bEventCancelled = !pResponsible->CallEvent ( "onBan", Arguments );
+        }
+        else
+        {
+            // Call the event with the root element as the source
+            CLuaArguments Arguments;
+            Arguments.PushUserData ( pBan );
+            bEventCancelled = !m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
         }
 
-        // Call the event
-        CLuaArguments Arguments1;
-        Arguments1.PushUserData ( pBan );
-        if ( pResponsible )
-            Arguments1.PushUserData ( pResponsible );
-        m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments1 );
+        // If the event was cancelled, remove the ban and abort the function
+        if ( bEventCancelled )
+        {
+            m_pBanManager->RemoveBan ( pBan );
+            return NULL;
+        }
+
+        // Save the ban list
+        m_pBanManager->SaveBanList ();
 
         // Call the event
         CLuaArguments Arguments;
@@ -7775,12 +7944,12 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
         pPlayer->CallEvent ( "onPlayerBan", Arguments );
 
         // Tell the player that was banned why. QuitPlayer will delete the player.
-        pPlayer->Send ( CPlayerDisconnectedPacket ( szMessage ) );
-        g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_BAN, false, szReason, szResponsible );
+        pPlayer->Send ( CPlayerDisconnectedPacket ( strMessage.c_str() ) );
+        g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str() );
 
         // Tell everyone else that he was banned from the game including console
         // m_pPlayerManager->BroadcastOnlyJoined ( CChatEchoPacket ( szInfoMessage, CHATCOLOR_INFO ) );
-        CLogger::LogPrintf ( "BAN: %s\n", szInfoMessage );
+        CLogger::LogPrintf ( "BAN: %s\n", strInfoMessage.c_str() );
 
         return pBan;
     }
@@ -7788,72 +7957,141 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
 }
 
 
-CBan* CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason, time_t tUnban )
+CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, SString strSerial, CPlayer* pResponsible, SString strResponsible, SString strReason, time_t tUnban )
 {
     CBan* pBan = NULL;
 
-    // Got an IP?
-    if ( szIP )
-        pBan = m_pBanManager->AddBan ( szIP, pResponsible, szReason, tUnban );
-    // If not IP provided make sure a username or serial are there
-    else if ( szUsername || szSerial )
-        pBan = m_pBanManager->AddBan ( pResponsible, szReason, tUnban );
+    // Check if the IP, username or serial are specified
+    bool bIPSpecified       = strIP.length      ( ) > 0;
+    bool bUsernameSpecified = strUsername.length( ) > 0;
+    bool bSerialSpecified   = strSerial.length  ( ) > 0;
 
+    // Crop the responsible string if too long
+    if ( strResponsible.length ( ) > MAX_BAN_RESPONSIBLE_LENGTH )
+        strResponsible = strResponsible.substr ( 0, MAX_BAN_RESPONSIBLE_LENGTH - 3 ) + "...";
+
+    // Got an IP?
+    if ( bIPSpecified )
+        pBan = m_pBanManager->AddBan ( strIP, strResponsible, strReason, tUnban );
+    // If not IP provided make sure a username or serial are there
+    else if ( bUsernameSpecified || bSerialSpecified )
+        pBan = m_pBanManager->AddBan ( strResponsible, strReason, tUnban );
+
+    // If the ban was added
     if ( pBan )
     {
-        char szMessage [256];
-        szMessage[0] = '\0';
+        // Initialize the details value
+        SString strDetails;
 
-        _snprintf ( szMessage, 255, "You were banned by %s", ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+        // Check if there's a reason
+        size_t sizeReason = strReason.length( );
+        if ( sizeReason >= MIN_BAN_REASON_LENGTH )
+        {
+            // If it's too long, crop it
+            if ( sizeReason > MAX_BAN_REASON_LENGTH )
+                strReason = strReason.substr ( 0, MAX_BAN_REASON_LENGTH - 3 ) + "...";
 
-        if ( szUsername ) pBan->SetAccount ( szUsername );
-        if ( szSerial ) pBan->SetSerial ( szSerial );
+            // Add reason to the details
+            strDetails += " (" + strReason + ")";
+        }
 
-        if ( szUsername || szSerial )
-            m_pBanManager->SaveBanList ();
+        // Check if there's a duration
+        SString strDurationDesc = pBan->GetDurationDesc ();
+        if ( strDurationDesc.length () )
+        {
+            // Add duration to the details
+            strDetails += " (" + strDurationDesc + ")";
+        }
 
-        // Call the event
-        CLuaArguments Arguments;
-        Arguments.PushUserData ( pBan );
+
+        // Format the responsible element and the reason/duration into the message string
+        SString strMessage ( "You were banned by %s%s", strResponsible.c_str(), strDetails.c_str () );
+
+        // Limit overall length of message
+        if ( strMessage.length () > 255 )
+            strMessage = strMessage.substr ( 0, 255 );
+
+
+        // Set the account or serial if either one is set to be banned
+        if ( bUsernameSpecified ) pBan->SetAccount ( strUsername );
+        if ( bSerialSpecified )   pBan->SetSerial  ( strSerial );
+
+        // Initialize a variable to check whether the event was cancelled or not
+        bool bEventCancelled = false;
+
+        // Check if we passed a responsible player
         if ( pResponsible )
-            Arguments.PushUserData ( pResponsible );
-        m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
+        {
+            // Call the event with the responsible player as the source
+            CLuaArguments Arguments;
+            Arguments.PushUserData ( pBan );
+            bEventCancelled = !pResponsible->CallEvent ( "onBan", Arguments );
+        }
+        else
+        {
+            // Call the event with the root element as the source
+            CLuaArguments Arguments;
+            Arguments.PushUserData ( pBan );
+            bEventCancelled = !m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
+        }
+
+        // If the event was cancelled, remove the ban and abort the function
+        if ( bEventCancelled )
+        {
+            m_pBanManager->RemoveBan ( pBan );
+            return NULL;
+        }
 
         // Log
-        if ( szIP )
-            CLogger::LogPrintf ( "BAN: %s was banned by %s\n", szIP, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
-        else if ( szUsername )
-            CLogger::LogPrintf ( "BAN: %s was banned by %s\n", szUsername, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+        if ( bIPSpecified )
+            CLogger::LogPrintf ( "BAN: %s was banned by %s%s\n", strIP.c_str(), strResponsible.c_str(), strDetails.c_str () );
+        else if ( bUsernameSpecified )
+            CLogger::LogPrintf ( "BAN: %s was banned by %s%s\n", strUsername.c_str(), strResponsible.c_str(), strDetails.c_str () );
         else
-            CLogger::LogPrintf ( "BAN: Serial ban was added by %s\n", szIP, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+            CLogger::LogPrintf ( "BAN: Serial ban was added by %s%s\n", strResponsible.c_str(), strDetails.c_str () );
+
+        // Initialize a variable to indicate whether the ban's nick has been set
+        bool bNickSet = false;
 
         // Loop through players to see if we should kick anyone
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
         for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
         {
+            // Default to not banning; if the IP, serial and username don't match, we don't want to kick the guy out
             bool bBan = false;
 
-            if ( szIP )
+            // Check if the player's IP matches the specified one, if specified
+            if ( bIPSpecified )
             {
                 char szPlayerIP [20];
                 ( *iter )->GetSourceIP ( szPlayerIP );
-                bBan = strcmp ( szIP, szPlayerIP ) == 0;
+                bBan = strcmp ( strIP.c_str(), szPlayerIP ) == 0;
             }
 
-            if ( !bBan && szUsername )
+            // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
+            if ( !bBan && bUsernameSpecified )
             {
-                const std::string& strUsername = (*iter)->GetSerialUser ();
-                bBan = stricmp ( strUsername.c_str (), szUsername ) == 0;
+                const std::string& strPlayerUsername = (*iter)->GetSerialUser ();
+                bBan = stricmp ( strPlayerUsername.c_str (), strUsername.c_str () ) == 0;
             }
 
-            if ( !bBan && szSerial )
+            // Check if the player's serial matches the specified one, if specified, and he wasn't banned over IP or username yet
+            if ( !bBan && bSerialSpecified )
             {
-                const std::string& strSerial = (*iter)->GetSerial ();
-                bBan = stricmp ( strSerial.c_str (), szSerial ) == 0;
+                const std::string& strPlayerSerial = (*iter)->GetSerial ();
+                bBan = stricmp ( strPlayerSerial.c_str (), strSerial.c_str () ) == 0;
             }
 
+            // If either the IP, serial or username matched
             if ( bBan )
             {
+                // Set the nick of the ban if this hasn't been done yet
+                if ( !bNickSet )
+                {
+                    pBan->SetNick ( (*iter)->GetNick() );
+                    bNickSet = true;
+                }
+
                 // Call the event
                 CLuaArguments Arguments;
                 Arguments.PushUserData ( pBan );
@@ -7862,10 +8100,15 @@ CBan* CStaticFunctionDefinitions::AddBan ( const char* szIP, const char* szUsern
                 (*iter)->CallEvent ( "onPlayerBan", Arguments );
 
                 // Tell the player that was banned why. QuitPlayer will delete the player.
-                (*iter)->Send ( CPlayerDisconnectedPacket ( szMessage ) );
-                g_pGame->QuitPlayer ( **iter, CClient::QUIT_BAN, false, szReason, ( pResponsible ) ? pResponsible->GetNick () : "Console" );
+                (*iter)->Send ( CPlayerDisconnectedPacket ( strMessage.c_str() ) );
+                g_pGame->QuitPlayer ( **iter, CClient::QUIT_BAN, false, strReason.c_str (), strResponsible.c_str () );
             }
         }
+
+        // Save the ban list (at the end of the function so it saves after the nick has been set)
+        m_pBanManager->SaveBanList ();
+
+        // Return the ban
         return pBan;
     }
     return NULL;

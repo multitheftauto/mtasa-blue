@@ -19,7 +19,9 @@
 #include "CCrashHandler.h"
 #include "MTAPlatform.h"
 #include "ErrorCodes.h"
+#include <assert.h>
 #include <cstdio>
+#include <signal.h>
 
 // Define libraries
 char szNetworkLibName[] = "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
@@ -29,6 +31,9 @@ using namespace std;
 
 bool g_bSilent = false;
 bool g_bNoTopBar = false;
+#ifndef WIN32
+bool g_bDaemonized = false;
+#endif
 
 #ifdef WIN32
 CServerImpl::CServerImpl ( CThreadCommandQueue* pThreadCommandQueue )
@@ -136,6 +141,22 @@ void CServerImpl::Printf ( const char* szFormat, ... )
     va_end ( ap );
 }
 
+#ifndef WIN32
+void CServerImpl::Daemonize () const
+{
+    if ( fork () ) exit ( 0 );
+
+    close ( 0 );
+    assert ( open ( "/dev/null", O_RDONLY ) == 0 );
+
+    close ( 1 );
+    assert ( open ( "/dev/null", O_WRONLY ) == 1 );
+
+    close ( 2 );
+    assert ( open ( "/dev/null", O_WRONLY ) == 2 );
+}
+#endif
+
 
 int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 {
@@ -144,6 +165,12 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     {
         return 1;
     }
+
+#ifndef WIN32
+    // Daemonize?
+    if ( g_bDaemonized )
+        Daemonize ();
+#endif
 
     if ( !g_bSilent )
     {
@@ -253,6 +280,8 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             // net.dll doesn't like our version number
             Print ( "Network module not compatible!\n" );
             Print ( "Press Q to shut down the server!\n" );
+            Print ( "\n\n\n(If this is a custom build,\n" );
+            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n" );
             WaitForKey ( 'q' );
             DestroyWindow ( );
             return ERROR_NETWORK_LIBRARY_FAILED;
@@ -665,6 +694,14 @@ void CServerImpl::HandleInput ( void )
 
 bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
 {
+#ifndef WIN32
+    // Default to a simple console if running under 'nohup'
+    struct sigaction sa;
+    sigaction ( SIGHUP, NULL, &sa );
+    if ( sa.sa_handler == SIG_IGN )
+        g_bNoTopBar = true;
+#endif
+
     // Iterate our arguments
     unsigned char ucNext = 0;
     for ( int i = 0; i < iArgumentCount; i++ )
@@ -702,9 +739,19 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                 {
                     g_bSilent = true;
                 }
+#ifndef WIN32
+                else if ( strcmp ( szArguments [i], "-d" ) == 0 )
+                {
+                    g_bDaemonized = true;
+                }
+#endif
                 else if ( strcmp ( szArguments [i], "-t" ) == 0 )
                 {
                     g_bNoTopBar = true;
+                }
+                else if ( strcmp ( szArguments [i], "-f" ) == 0 )
+                {
+                    g_bNoTopBar = false;
                 }
 
                 #ifdef WIN32

@@ -31,7 +31,7 @@ public:
 
 private:
     CWaterPoly*                m_pPoly;
-    CClientWaterManager*       m_pManager;
+    CClientWaterManager*       m_pWaterManager;
 
     friend CClientWaterManager;
 };

@@ -84,6 +84,9 @@ public:
     bool                LoadFonts               ( void );
     bool                DestroyFonts            ( void );
 
+    bool                LoadFont                ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont );
+    bool                DestroyFont             ( std::string strFontPath );
+
     float               GetDXFontHeight         ( float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXCharacterWidth     ( char c, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXTextExtent         ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
@@ -271,7 +274,7 @@ private:
     struct sDrawQueueItem
     {
         eDrawQueueType      eType;
-        std::string         strText;
+        std::wstring        strText;
 
         // Queue item data based on the eType.
         union

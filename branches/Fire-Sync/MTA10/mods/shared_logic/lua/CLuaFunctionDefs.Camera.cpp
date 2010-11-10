@@ -82,6 +82,21 @@ int CLuaFunctionDefs::GetCameraInterior ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetCameraGoggleEffect ( lua_State *luaVM )
+{
+    bool bNightVision   = g_pMultiplayer->IsNightVisionEnabled   ( );
+    bool bThermalVision = g_pMultiplayer->IsThermalVisionEnabled ( );
+
+    if ( bNightVision )
+        lua_pushstring ( luaVM, "nightvision" );
+    else if ( bThermalVision )
+        lua_pushstring ( luaVM, "thermalvision" );
+    else
+        lua_pushstring ( luaVM, "normal" );
+
+    return 1;
+}
+
 
 int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 {
@@ -260,6 +275,46 @@ int CLuaFunctionDefs::SetCameraView ( lua_State* luaVM )
 
         lua_pushboolean ( luaVM, true );
         return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetCameraGoggleEffect ( lua_State *luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        bool    bSuccess = false;
+        SString strMode  = lua_tostring ( luaVM, 1 );
+
+        if ( strMode.compare ( "nightvision" ) == 0 )
+        {
+            g_pMultiplayer->SetNightVisionEnabled   ( true );
+            g_pMultiplayer->SetThermalVisionEnabled ( false );
+            
+            bSuccess = true;
+        }
+        else if ( strMode.compare ( "thermalvision" ) == 0 )
+        {
+            g_pMultiplayer->SetNightVisionEnabled   ( false );
+            g_pMultiplayer->SetThermalVisionEnabled ( true );
+
+            bSuccess = true;
+        }
+        else if ( strMode.compare ( "normal" ) == 0 )
+        {
+            g_pMultiplayer->SetNightVisionEnabled   ( false );
+            g_pMultiplayer->SetThermalVisionEnabled ( false );
+
+            bSuccess = true;
+        }
+
+        if ( bSuccess )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
 
     lua_pushboolean ( luaVM, false );

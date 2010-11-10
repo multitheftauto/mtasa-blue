@@ -24,7 +24,7 @@ public:
     virtual void                    SetText                 ( const char *pszText ) = 0;
 
     virtual void*                   GetData                 ( void ) const = 0;
-    virtual void                    SetData                 ( void* pData ) = 0;
+    virtual void                    SetData                 ( void* pData, CGUICallback<void,void*> deleteDataCallback = NULL ) = 0;
     virtual void                    SetData                 ( const char* pszData ) = 0;
 
     virtual void                    SetDisabled             ( bool bDisabled ) = 0;

@@ -97,6 +97,34 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             }
             else
                 BitStream.WriteBit ( false );
+
+            // Entity collisions enabled
+            bool bCollisionsEnabled = true;
+
+            switch ( pElement->GetType() )
+            {
+                case CElement::VEHICLE:
+                {
+                    CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+                    bCollisionsEnabled = pVehicle->GetCollisionEnabled ( );
+                    break;
+                }
+                case CElement::OBJECT:
+                {
+                    CObject* pObject = static_cast < CObject* > ( pElement );
+                    bCollisionsEnabled = pObject->GetCollisionEnabled ( );
+                    break;
+                }
+                case CElement::PED:
+                case CElement::PLAYER:
+                {
+                    CPed* pPed = static_cast < CPed* > ( pElement );
+                    bCollisionsEnabled = pPed->GetCollisionEnabled ( );
+                    break;
+                }
+            }
+
+            BitStream.WriteBit ( bCollisionsEnabled );
             
             // Write custom data
             CCustomData* pCustomData = pElement->GetCustomDataPointer ();
@@ -160,12 +188,11 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     alpha.data.ucAlpha = pObject->GetAlpha ();
                     BitStream.Write ( &alpha );
 
-                    if ( BitStream.Version () >= 0x0c )
-                    {
-                        bool bIsDoubleSided = pObject->IsDoubleSided ();
-                        BitStream.WriteBit ( bIsDoubleSided );
-                    }
+                    // Double sided
+                    bool bIsDoubleSided = pObject->IsDoubleSided ();
+                    BitStream.WriteBit ( bIsDoubleSided );
 
+                    // Moving
                     bool bIsMoving = pObject->IsMoving ();
                     BitStream.WriteBit ( bIsMoving );
 
@@ -180,6 +207,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         BitStream.Write ( &rotationRadians );
                     }
 
+                    // Scale
+                    float fScale = pObject->GetScale ();
+                    BitStream.Write ( fScale );
 
                     break;
                 }
@@ -565,9 +595,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     SEntityAlphaSync alpha;
                     alpha.data.ucAlpha = pPed->GetAlpha ();
                     BitStream.Write ( &alpha );
-
-                    if ( BitStream.Version () < 0x07 )
-                        break;
 
                     // clothes
                     unsigned char ucNumClothes = 0;

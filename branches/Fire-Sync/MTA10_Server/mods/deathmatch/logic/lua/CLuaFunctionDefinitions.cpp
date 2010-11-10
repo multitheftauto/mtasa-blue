@@ -14,12 +14,14 @@
 *               Kevin Whiteside <>
 *               lil_Toady <>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
 
 extern CGame* g_pGame;
 
@@ -2555,7 +2557,8 @@ int CLuaFunctionDefinitions::ShowPlayerHudComponent ( lua_State* luaVM )
             SHudComponent hudComponents [] = { { "ammo" }, { "weapon" }, { "health" },
                                                { "breath" }, { "armour" }, { "money" },
                                                { "vehicle_name" }, { "area_name" }, { "radar" },
-                                               { "clock" }, { "\0" } };
+                                               { "clock" }, { "radio" } , { "wanted" },
+                                               { "all" }, { "\0" } };
 
             if ( szComponent && szComponent [ 0 ] )
             {
@@ -3657,8 +3660,18 @@ int CLuaFunctionDefinitions::GetVehicleOccupants ( lua_State* luaVM )
             // Create a new table
             lua_newtable ( luaVM );
 
+            // Get the maximum amount of passengers
+            unsigned char ucMaxPassengers = pVehicle->GetMaxPassengers ();
+
+            // Make sure that if the vehicle doesn't have any seats, the function returns false
+            if ( ucMaxPassengers == 255 )
+            {
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+
             // Add All Occupants
-            for ( unsigned char ucSeat = 0; ucSeat <= pVehicle->GetMaxPassengers (); ++ ucSeat )
+            for ( unsigned char ucSeat = 0; ucSeat <= ucMaxPassengers; ++ ucSeat )
             {
                 CPed* pPed = pVehicle->GetOccupant ( ucSeat );
                 if ( pPed )
@@ -5733,6 +5746,29 @@ int CLuaFunctionDefinitions::SetVehicleHeadLightColor ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetVehicleTurretPosition ( lua_State *luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA
+        && lua_type( luaVM, 2 ) == LUA_TNUMBER
+        && lua_type( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            float fHorizontal = ( float ) lua_tonumber ( luaVM, 2 );
+            float fVertical   = ( float ) lua_tonumber ( luaVM, 3 );
+
+            if ( CStaticFunctionDefinitions::SetVehicleTurretPosition ( pVehicle, fHorizontal, fVertical ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
 {
@@ -6745,6 +6781,27 @@ int CLuaFunctionDefinitions::GetObjectRotation ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetObjectScale ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CObject* pObject = lua_toobject ( luaVM, 1 );
+        if ( pObject )
+        {
+            lua_pushnumber ( luaVM, pObject->GetScale ( ) );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getObjectScale", "object", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getObjectScale" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::SetObjectRotation ( lua_State* luaVM )
 {
     int iArgumentType1 = lua_type ( luaVM, 1 );
@@ -6776,6 +6833,32 @@ int CLuaFunctionDefinitions::SetObjectRotation ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setObjectRotation" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetObjectScale ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+    {
+        CObject* pObject = lua_toobject ( luaVM, 1 );
+        if ( pObject && IS_OBJECT ( pObject ) )
+        {
+            float fScale = (float) lua_tonumber ( luaVM, 2 );
+
+            if ( CStaticFunctionDefinitions::SetObjectScale ( pObject, fScale ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setObjectScale", "object", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setObjectScale" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -9319,7 +9402,7 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
     lua_settable ( luaVM, -3 );
 
     // strtok until we're out of tokens
-    while ( szToken = strtok ( NULL, szDelimiter ) )
+    while ( ( szToken = strtok ( NULL, szDelimiter ) ) )
     {
         // Add the token to the table
         lua_pushnumber ( luaVM, ++uiCount );
@@ -9572,6 +9655,136 @@ int CLuaFunctionDefinitions::Dereference ( lua_State* luaVM )
         return 1;
     }
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::UtfLen ( lua_State* luaVM )
+{
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "utfLen" );
+
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+    std::string strInput = lua_tostring ( luaVM, 1 );
+    lua_pushnumber ( luaVM, SharedUtil::ConvertToUTF8(strInput).size() );
+
+    return 1;
+}
+
+int CLuaFunctionDefinitions::UtfSeek ( lua_State* luaVM )
+{
+        // Grab argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "utfSeek" );
+        lua_pushnil ( luaVM );
+        return 1;
+    }
+    int iPos = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
+    std::string strInput = lua_tostring ( luaVM, 1 );
+    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
+    if ( iPos <= static_cast < int >(strUTF.size()) && iPos >= 0 )
+    {
+        strUTF = strUTF.substr(0,iPos);
+        lua_pushnumber ( luaVM, SharedUtil::ConvertToANSI(strUTF).size() );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::UtfSub ( lua_State* L )
+{
+        // Grab argument types
+    int iArgument1 = lua_type ( L, 1 );
+    int iArgument2 = lua_type ( L, 2 );
+
+    if ( ( lua_type ( L, 1 ) != LUA_TSTRING ) || ( lua_type ( L, 2 ) != LUA_TNUMBER ) )
+    {
+        m_pScriptDebugging->LogBadType ( L, "utfSub" );
+        lua_pushnil ( L );
+        return 1;
+    }
+    //Ripped and modded Lua source.  It's pretty disgusting, i know.
+
+    const char *s = lua_tostring(L, 1);
+    std::wstring strUTF = SharedUtil::ConvertToUTF8(s);
+    size_t l = static_cast < int > ( strUTF.size() );
+
+    ptrdiff_t start = luaL_checkinteger(L, 2);
+    ptrdiff_t end = luaL_optinteger(L, 3, -1);
+
+    //posrelat them both
+    if (start < 0) start += (ptrdiff_t)l + 1;
+        start = (start >= 0) ? start : 0;
+
+    if (end < 0) end += (ptrdiff_t)l + 1;
+        end = (end >= 0) ? end : 0;
+
+    if (start < 1) start = 1;
+    if (end > (ptrdiff_t)l) end = (ptrdiff_t)l;
+    if (start <= end)
+    {
+        strUTF = strUTF.substr(start-1, end-start+1);
+        lua_pushstring(L, SharedUtil::ConvertToANSI(strUTF).c_str());
+    }
+    else lua_pushliteral(L, "");
+    return 1;
+}
+
+int CLuaFunctionDefinitions::UtfChar ( lua_State* luaVM )
+{
+        // Grab argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TNUMBER ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "utfChar" );
+        lua_pushnil ( luaVM );
+        return 1;
+    }
+    int iChar = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
+    if ( iChar > 65534 || iChar < 32 )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "utfChar" );
+        lua_pushnil ( luaVM );
+        return 1;
+    }
+
+    // Generate a null-terminating string for our character
+    wchar_t wUNICODE[2] = { iChar, '\0' };
+
+    // Convert our UTF character into an ANSI string
+    std::string strANSI = SharedUtil::ConvertToANSI(wUNICODE);
+
+    lua_pushstring ( luaVM, strANSI.c_str() );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::UtfCode ( lua_State* luaVM )
+{
+        // Grab argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "utfCode" );
+        lua_pushnil ( luaVM );
+        return 1;
+    }
+    std::string strInput = lua_tostring ( luaVM, 1 );
+    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
+    unsigned long ulCode = strUTF.c_str()[0];
+
+    lua_pushnumber ( luaVM, ulCode );
     return 1;
 }
 
@@ -10310,7 +10523,7 @@ int CLuaFunctionDefinitions::AddAccount ( lua_State* luaVM )
             const char* szPassword = lua_tostring ( luaVM, 2 );
 
             CAccount* pAccount;
-            if ( pAccount = CStaticFunctionDefinitions::AddAccount ( szName, szPassword ) )
+            if ( ( pAccount = CStaticFunctionDefinitions::AddAccount ( szName, szPassword ) ) )
             {
                 lua_pushaccount ( luaVM, pAccount );
                 return 1;
@@ -10577,23 +10790,31 @@ int CLuaFunctionDefinitions::KickPlayer ( lua_State* luaVM )
     {
         if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
         {
-            CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-            CPlayer* pResponsible = NULL;
-            const char* szReason = NULL;
+            CPlayer* pPlayer       = lua_toplayer ( luaVM, 1 );
+            SString strResponsible = "Console";
+            SString strReason      = "";
 
             if ( lua_type ( luaVM, 2 ) == LUA_TLIGHTUSERDATA )
             {
-                pResponsible = lua_toplayer ( luaVM, 2 );
+                CPlayer* pResponsible = lua_toplayer ( luaVM, 2 );
+
+                if ( pResponsible )
+                    strResponsible = pResponsible->GetNick ( );
 
                 if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
-                    szReason = lua_tostring ( luaVM, 3 );
+                    strReason = lua_tostring ( luaVM, 3 );
+            }
+            else if ( lua_type ( luaVM, 2 ) == LUA_TSTRING && lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            {
+                strResponsible = lua_tostring ( luaVM, 2 );
+                strReason      = lua_tostring ( luaVM, 3 );
             }
             else if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-                szReason = lua_tostring ( luaVM, 2 );
+                strReason      = lua_tostring ( luaVM, 2 );
 
             if ( pPlayer )
             {
-                if ( CStaticFunctionDefinitions::KickPlayer ( pPlayer, pResponsible, szReason ) )
+                if ( CStaticFunctionDefinitions::KickPlayer ( pPlayer, strResponsible, strReason ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -10613,64 +10834,68 @@ int CLuaFunctionDefinitions::KickPlayer ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
 {
-    // Grab our virtual machine
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+        CPlayer* pPlayer       = lua_toplayer ( luaVM, 1 );
+        CPlayer* pResponsible  = NULL;
+        SString strResponsible = "Console";
+        SString strReason      = "";
+
+        bool bIP       = true;
+        bool bUsername = false;
+        bool bSerial   = false;
+
+        // Check if the player should be banned over IP
+        if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+            bIP = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
+
+        // Check if the player should be banned over username
+        if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
+            bUsername = ( lua_toboolean ( luaVM, 3 ) ) ? true : false;
+
+        // Check if the player should be banned over serial
+        if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
+            bSerial = ( lua_toboolean ( luaVM, 4 ) ) ? true : false;
+
+        // Get the responsible element or string
+        if ( lua_type ( luaVM, 5 ) == LUA_TLIGHTUSERDATA )
         {
-            CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
-            CPlayer* pResponsible = NULL;
-            const char* szReason = NULL;
+            pResponsible = lua_toplayer ( luaVM, 5 );
 
-            bool bIP = true;
-            bool bUsername = false;
-            bool bSerial = false;
+            // If the responsible element is a player, set the responsible string to his nick
+            if ( pResponsible )
+                strResponsible = pResponsible->GetNick();
+        }
+        else if ( lua_type ( luaVM, 5 ) == LUA_TSTRING )
+            strResponsible = lua_tostring( luaVM, 5 );
 
-            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+        // Get the ban reason
+        if ( lua_type ( luaVM, 6 ) == LUA_TSTRING )
+            strReason = lua_tostring ( luaVM, 6 );
+
+        // Get the unban time
+        time_t tUnban = 0;
+        if ( lua_type ( luaVM, 7 ) == LUA_TNUMBER || lua_type ( luaVM, 7 ) == LUA_TSTRING )
+        {
+            tUnban = ( time_t ) atoi ( lua_tostring ( luaVM, 7 ) );
+            if ( tUnban > 0 ) tUnban += time ( NULL );
+        }
+
+        // If we have a player to be banned
+        if ( pPlayer )
+        {
+            CBan* pBan = NULL;
+            if ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, strResponsible, strReason, tUnban ) )
             {
-                bIP = ( lua_toboolean ( luaVM, 2 ) ) ? true : false;
+                lua_pushban ( luaVM, pBan );
+                return 1;
             }
-
-            if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN )
-            {
-                bUsername = ( lua_toboolean ( luaVM, 3 ) ) ? true : false;
-            }
-
-            if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
-            {
-                bSerial = ( lua_toboolean ( luaVM, 4 ) ) ? true : false;
-            }
-
-            if ( lua_type ( luaVM, 5 ) == LUA_TLIGHTUSERDATA )
-            {
-                pResponsible = lua_toplayer ( luaVM, 5 );
-            }
-            if ( lua_type ( luaVM, 6 ) == LUA_TSTRING )
-                szReason = lua_tostring ( luaVM, 6 );
-
-            time_t tUnban = 0;
-            if ( lua_type ( luaVM, 7 ) == LUA_TNUMBER || lua_type ( luaVM, 7 ) == LUA_TSTRING )
-            {
-                tUnban = ( time_t ) atoi ( lua_tostring ( luaVM, 7 ) );
-                if ( tUnban > 0 ) tUnban += time ( NULL );
-            }
-
-            if ( pPlayer )
-            {
-                CBan* pBan = NULL;
-                if ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, szReason, tUnban ) )
-                {
-                    lua_pushban ( luaVM, pBan );
-                    return 1;
-                }
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "banPlayer", "player", 1 );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM, "banPlayer" );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "banPlayer", "player", 1 );
     }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "banPlayer" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -10683,37 +10908,47 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
          ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) ||
          ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) )
     {
-        const char* szIP = NULL;
-        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-        {
-            szIP = lua_tostring ( luaVM, 1 );
-        }
-
-        const char* szUsername = NULL;
-        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-        {
-            szUsername = lua_tostring ( luaVM, 2 );
-        }
-
-        const char* szSerial = NULL;
-        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
-        {
-            szSerial = lua_tostring ( luaVM, 3 );
-        }
+        // Initialize the required variables
+        SString strIP          = "";
+        SString strUsername    = "";
+        SString strSerial      = "";
+        SString strResponsible = "Console";
+        SString strReason      = "";
 
         CPlayer* pResponsible = NULL;
-        if ( lua_type ( luaVM, 4 ) == LUA_TLIGHTUSERDATA )
-        {
-            pResponsible = lua_toplayer ( luaVM, 4 );
-        }
-
-        const char* szReason = NULL;
-        if ( lua_type ( luaVM, 5 ) == LUA_TSTRING )
-        {
-            szReason = lua_tostring ( luaVM, 5 );
-        }
 
         time_t tUnban = 0;
+
+        // Get the IP parameter
+        if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+            strIP = lua_tostring ( luaVM, 1 );
+
+        // Get the username
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            strUsername = lua_tostring ( luaVM, 2 );
+
+        // Get the serial
+        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            strSerial = lua_tostring ( luaVM, 3 );
+
+        // Get the responsible string, and - if applicable - the responsible player
+        if ( lua_type ( luaVM, 4 ) == LUA_TLIGHTUSERDATA )
+        {
+            // Get the responsible player
+            pResponsible = lua_toplayer ( luaVM, 4 );
+
+            // If it actually is a player, get its nick and set the responsible string to it
+            if ( pResponsible )
+                strResponsible = pResponsible->GetNick ( );
+        }
+        else if ( lua_type ( luaVM, 4 ) == LUA_TSTRING )
+            strResponsible = lua_tostring ( luaVM, 4 );
+
+        // Let's not forget about the reason
+        if ( lua_type ( luaVM, 5 ) == LUA_TSTRING )
+            strReason = lua_tostring ( luaVM, 5 );
+
+        // And the time at which the ban will be removed might be useful as well
         if ( lua_type ( luaVM, 6 ) == LUA_TNUMBER || lua_type ( luaVM, 6 ) == LUA_TSTRING )
         {
             tUnban = ( time_t ) atoi ( lua_tostring ( luaVM, 6 ) );
@@ -10721,7 +10956,7 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
         }
 
         CBan* pBan = NULL;
-        if ( pBan = CStaticFunctionDefinitions::AddBan ( szIP, szUsername, szSerial, pResponsible, szReason, tUnban ) )
+        if ( pBan = CStaticFunctionDefinitions::AddBan ( strIP, strUsername, strSerial, pResponsible, strResponsible, strReason, tUnban ) )
         {
             lua_pushban ( luaVM, pBan );
             return 1;
@@ -11185,7 +11420,7 @@ int CLuaFunctionDefinitions::Get ( lua_State* luaVM )
             } else {
                 // We need to return multiply entries, so push all subnodes
                 char *szDataValue;
-                while ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) {
+                while ( ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) ) {
                     PUSH_SETTING ( pSubNode, szDataValue );
                 }
                 // Push a table and return
@@ -11337,5 +11572,57 @@ int CLuaFunctionDefinitions::GetModules ( lua_State* luaVM )
         lua_pushstring ( luaVM, (*iter).szFileName );
         lua_settable ( luaVM, -3 );
     }
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        CPerfStatResult Result;
+        SString strCatagory = lua_tostring ( luaVM, 1 );
+        SString strOptions;
+        SString strFilter;
+
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            strOptions = lua_tostring ( luaVM, 2 );
+
+        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            strFilter = lua_tostring ( luaVM, 3 );
+
+        GetPerfStatManager ()->GetStats ( &Result, strCatagory, strOptions, strFilter );
+
+        lua_newtable ( luaVM );
+        for ( int c = 0; c < Result.ColumnCount () ; c++ )
+        {
+            const SString& name = Result.ColumnName ( c );
+            lua_pushnumber ( luaVM, c+1 );                      // row index number (starting at 1, not 0)
+            lua_pushlstring ( luaVM, (char *)name.c_str (), name.length() );
+            lua_settable ( luaVM, -3 );
+        }
+
+        lua_newtable ( luaVM );
+        for ( int r = 0; r < Result.RowCount () ; r++ )
+        {
+            lua_newtable ( luaVM );                             // new table
+            lua_pushnumber ( luaVM, r+1 );                      // row index number (starting at 1, not 0)
+            lua_pushvalue ( luaVM, -2 );                        // value
+            lua_settable ( luaVM, -4 );                         // refer to the top level table
+
+            for ( int c = 0; c < Result.ColumnCount () ; c++ )
+            {
+                SString& cell = Result.Data ( c, r );
+                lua_pushnumber ( luaVM, c+1 );
+                lua_pushlstring ( luaVM, (char *)cell.c_str (), cell.length () );
+                lua_settable ( luaVM, -3 );
+            }
+            lua_pop ( luaVM, 1 );                               // pop the inner table
+        }
+        return 2;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPerformanceStats" );
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }

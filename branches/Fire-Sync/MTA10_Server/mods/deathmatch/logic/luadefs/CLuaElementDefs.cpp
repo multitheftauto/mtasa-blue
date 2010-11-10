@@ -57,6 +57,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementHealth", CLuaElementDefs::getElementHealth );
     CLuaCFunctions::AddFunction ( "getElementModel", CLuaElementDefs::getElementModel );
     CLuaCFunctions::AddFunction ( "getElementSyncer", CLuaElementDefs::getElementSyncer );
+    CLuaCFunctions::AddFunction ( "getElementCollisionsEnabled", CLuaElementDefs::getElementCollisionsEnabled );
 
     // Attachement
     CLuaCFunctions::AddFunction ( "attachElements", CLuaElementDefs::attachElements );
@@ -88,6 +89,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementHealth", CLuaElementDefs::setElementHealth );
     CLuaCFunctions::AddFunction ( "setElementModel", CLuaElementDefs::setElementModel );
     CLuaCFunctions::AddFunction ( "setElementSyncer", CLuaElementDefs::setElementSyncer );
+    CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", CLuaElementDefs::setElementCollisionsEnabled );
 }
 
 
@@ -525,11 +527,18 @@ int CLuaElementDefs::getElementRotation ( lua_State* luaVM )
     {
         // Grab the element, verify it
         CElement* pElement = lua_toelement ( luaVM, 1 );
+
+        const char* szRotationOrder = "default";
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) 
+        {
+            szRotationOrder = lua_tostring ( luaVM, 2 );
+        }
+
         if ( pElement )
         {
             // Grab the rotation
             CVector vecRotation;
-            if ( CStaticFunctionDefinitions::GetElementRotation ( pElement, vecRotation ) )
+            if ( CStaticFunctionDefinitions::GetElementRotation ( pElement, vecRotation, szRotationOrder ) )
             {
                 // Return it
                 lua_pushnumber ( luaVM, vecRotation.fX );
@@ -1163,7 +1172,7 @@ int CLuaElementDefs::getElementSyncer ( lua_State* luaVM )
         if ( pElement )
         {
             CElement* pSyncer = NULL;
-            if ( pSyncer = CStaticFunctionDefinitions::GetElementSyncer ( pElement ) )
+            if ( ( pSyncer = CStaticFunctionDefinitions::GetElementSyncer ( pElement ) ) )
             {
                 lua_pushelement ( luaVM, pSyncer );
                 return 1;
@@ -1174,6 +1183,27 @@ int CLuaElementDefs::getElementSyncer ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getElementSyncer" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaElementDefs::getElementCollisionsEnabled ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+
+        if ( pElement )
+        {
+            lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetElementCollisionsEnabled ( pElement ) );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementCollisionsEnabled", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getElementCollisionsEnabled" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1463,8 +1493,15 @@ int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
                 CVector vecRotation = CVector ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
                                                 static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
                                                 static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
+
+                const char* szRotationOrder = "default";
+                if ( lua_type ( luaVM, 5 ) == LUA_TSTRING ) 
+                {
+                    szRotationOrder = lua_tostring ( luaVM, 5 );
+                }
+
                 // Set the rotation
-                if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation ) )
+                if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, szRotationOrder ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -1864,6 +1901,31 @@ int CLuaElementDefs::setElementSyncer ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementSyncer" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaElementDefs::setElementCollisionsEnabled ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        bool bEnable       = lua_toboolean ( luaVM, 2 ) ? true : false;
+
+        if ( pElement )
+        {
+            if ( CStaticFunctionDefinitions::SetElementCollisionsEnabled ( pElement, bEnable ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementCollisionsEnabled", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementCollisionsEnabled" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

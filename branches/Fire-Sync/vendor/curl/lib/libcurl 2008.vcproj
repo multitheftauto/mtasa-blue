@@ -249,6 +249,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories=".,..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;BUILDING_LIBCURL;FORCE_BUILD=2"
+				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"

@@ -137,6 +137,8 @@ public:
 
     virtual void                        SetNightVisionEnabled       ( bool bEnabled ) = 0;
     virtual void                        SetThermalVisionEnabled     ( bool bEnabled ) = 0;
+    virtual bool                        IsNightVisionEnabled        ( ) = 0;
+    virtual bool                        IsThermalVisionEnabled      ( ) = 0;
 
     virtual void                        RebuildMultiplayerPlayer    ( class CPed * player ) = 0;
 

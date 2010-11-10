@@ -49,7 +49,6 @@
 #pragma warning(disable : 4786)
 
 // to use winsock2.h instead of winsock.h
-#define _WIN32_WINNT 0x0400
 #include <windows.h>
 
 #include <time.h>
@@ -74,6 +73,7 @@
 #endif // end platform headers   //
 ///////////////////////////////////
 
+#include "SharedUtil.h"
 
 // STL headers
 #include <algorithm>
@@ -154,6 +154,7 @@ class EHSConnection {
 	int m_nPort;
 
   public:
+    int m_iStopASAP;
 
 	/// Constructor
 	EHSConnection ( NetworkAbstraction * ipoNetworkAbstraction,
@@ -302,6 +303,9 @@ class EHS {
 
 	/// This function should be defined by the subclass
 	virtual void HttpPulse ( void ) {};
+
+	/// This function should be defined by the subclass
+	virtual bool ShouldAllowConnection ( const char * szAddress ) { return true; }
 
 	/// makes this EHS object get its data from another EHS -- useful for having secure and normal connections share same data
 	void SetSourceEHS ( EHS & iroSourceEHS );

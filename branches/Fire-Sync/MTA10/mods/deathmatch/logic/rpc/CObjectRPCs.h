@@ -25,6 +25,7 @@ public:
     DECLARE_RPC ( SetObjectRotation );
     DECLARE_RPC ( MoveObject );
     DECLARE_RPC ( StopObject );
+    DECLARE_RPC ( SetObjectScale );
 };
 
 #endif

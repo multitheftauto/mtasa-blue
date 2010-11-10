@@ -233,9 +233,8 @@ void CGUIElement_Impl::GetMaximumSize ( CVector2D& vecSize )
 void CGUIElement_Impl::SetText ( const char *szText )
 {
     CEGUI::String strText;
-
-    if ( szText ) strText.assign ( szText );
-    m_pWindow->setText ( strText );
+    strText.assign((CEGUI::utf8*)szText);
+    m_pWindow->setText( strText );
 }
 
 
