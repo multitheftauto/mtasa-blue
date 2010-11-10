@@ -383,7 +383,7 @@ void CWorldSA::SetJetpackMaxHeight ( float fHeight )
     *(float *)(VAR_fJetpackMaxHeight) = fHeight;
 }
 
-void CWorldSA::SetWindSpeed ( float fX, float fY, float fZ )
+void CWorldSA::SetWindVelocity ( float fX, float fY, float fZ )
 {
     //Disable
     *(WORD *)(ADDR_WindSpeedSetX) = 0xD8DD;
@@ -406,14 +406,14 @@ void CWorldSA::SetWindSpeed ( float fX, float fY, float fZ )
     *(float *)(VAR_fWindSpeedZ) = fZ;
 }
 
-void CWorldSA::GetWindSpeed( float& fX, float& fY, float& fZ )
+void CWorldSA::GetWindVelocity ( float& fX, float& fY, float& fZ )
 {
     fX = *(float *)(VAR_fWindSpeedX);
     fY = *(float *)(VAR_fWindSpeedY);
     fZ = *(float *)(VAR_fWindSpeedZ);
 }
 
-void CWorldSA::RestoreWindSpeed( void )
+void CWorldSA::RestoreWindVelocity ( void )
 {
     *(WORD *)(ADDR_WindSpeedSetX) = 0x1DD9;
     *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x00C813E0;

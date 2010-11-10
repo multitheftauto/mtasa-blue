@@ -75,9 +75,9 @@ public:
     DWORD       GetCurrentArea            ( void );
     void        SetCurrentArea            ( DWORD dwArea );
     void        SetJetpackMaxHeight       ( float fHeight );
-    void        SetWindSpeed              ( float fX, float fY, float fZ );
-    void        GetWindSpeed              ( float& fX, float& fY, float& fZ );
-    void        RestoreWindSpeed          ( void );
+    void        SetWindVelocity           ( float fX, float fY, float fZ );
+    void        GetWindVelocity           ( float& fX, float& fY, float& fZ );
+    void        RestoreWindVelocity       ( void );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)

@@ -4410,7 +4410,7 @@ void CClientGame::ResetMapInfo ( void )
     m_pBlendedWeather->SetWeather ( 0 );
 
     // Wind
-    g_pGame->GetWorld ()->RestoreWindSpeed ( );
+    g_pGame->GetWorld ()->RestoreWindVelocity ( );
 
     // Sky-gradient
     g_pMultiplayer->ResetSky ();

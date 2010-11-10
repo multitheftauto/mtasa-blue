@@ -5140,21 +5140,21 @@ bool CStaticFunctionDefinitions::SetTrafficLightsLocked ( bool bLocked )
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetWindSpeed ( float fX, float fY, float fZ )
+bool CStaticFunctionDefinitions::SetWindVelocity ( float fX, float fY, float fZ )
 {
-    g_pGame->GetWorld ()->SetWindSpeed ( fX, fY, fZ );
+    g_pGame->GetWorld ()->SetWindVelocity ( fX, fY, fZ );
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreWindSpeed ( void )
+bool CStaticFunctionDefinitions::RestoreWindVelocity ( void )
 {
-    g_pGame->GetWorld ()->RestoreWindSpeed ( );
+    g_pGame->GetWorld ()->RestoreWindVelocity ( );
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWindSpeed ( float& fX, float& fY, float& fZ )
+bool CStaticFunctionDefinitions::GetWindVelocity ( float& fX, float& fY, float& fZ )
 {
-    g_pGame->GetWorld ()->GetWindSpeed ( fX, fY, fZ );
+    g_pGame->GetWorld ()->GetWindVelocity ( fX, fY, fZ );
     return true;
 }
 

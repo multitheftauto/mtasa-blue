@@ -34,9 +34,9 @@ public:
     virtual DWORD       GetCurrentArea              ( void ) = 0;
     virtual void        SetCurrentArea              ( DWORD dwArea ) = 0;
     virtual void        SetJetpackMaxHeight         ( float fHeight ) = 0;
-    virtual void        SetWindSpeed                ( float fX, float fY, float fZ ) = 0;
-    virtual void        GetWindSpeed                ( float& fX, float& fY, float& fZ ) = 0;
-    virtual void        RestoreWindSpeed            ( void ) = 0;
+    virtual void        SetWindVelocity             ( float fX, float fY, float fZ ) = 0;
+    virtual void        GetWindVelocity             ( float& fX, float& fY, float& fZ ) = 0;
+    virtual void        RestoreWindVelocity         ( void ) = 0;
 };
 
 #endif
