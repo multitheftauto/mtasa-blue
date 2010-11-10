@@ -1325,11 +1325,11 @@ int CLuaFunctionDefs::SetTrafficLightState ( lua_State *luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetWindSpeed ( lua_State *luaVM )
+int CLuaFunctionDefs::GetWindVelocity ( lua_State *luaVM )
 {
     float fX, fY, fZ;
 
-    if ( CStaticFunctionDefinitions::GetWindSpeed ( fX, fY, fZ ) )
+    if ( CStaticFunctionDefinitions::GetWindVelocity ( fX, fY, fZ ) )
     {
         lua_pushnumber ( luaVM, fX );
         lua_pushnumber ( luaVM, fY );
@@ -1341,7 +1341,7 @@ int CLuaFunctionDefs::GetWindSpeed ( lua_State *luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::SetWindSpeed ( lua_State *luaVM )
+int CLuaFunctionDefs::SetWindVelocity ( lua_State *luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER && lua_type ( luaVM, 2 ) == LUA_TNUMBER && lua_type ( luaVM, 3 ) == LUA_TNUMBER )
     {
@@ -1349,7 +1349,7 @@ int CLuaFunctionDefs::SetWindSpeed ( lua_State *luaVM )
         float fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
         float fZ = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
 
-        if ( CStaticFunctionDefinitions::SetWindSpeed ( fX, fY, fZ ) )
+        if ( CStaticFunctionDefinitions::SetWindVelocity ( fX, fY, fZ ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -1362,9 +1362,9 @@ int CLuaFunctionDefs::SetWindSpeed ( lua_State *luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::ResetWindSpeed ( lua_State *luaVM )
+int CLuaFunctionDefs::ResetWindVelocity ( lua_State *luaVM )
 {
-    if ( CStaticFunctionDefinitions::RestoreWindSpeed ( ) )
+    if ( CStaticFunctionDefinitions::RestoreWindVelocity ( ) )
     {
         lua_pushboolean ( luaVM, true );
         return 1;
