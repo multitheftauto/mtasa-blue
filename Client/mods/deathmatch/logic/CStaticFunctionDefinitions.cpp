@@ -4128,9 +4128,14 @@ bool CStaticFunctionDefinitions::DetonateSatchels(void)
     return false;
 }
 
-bool CStaticFunctionDefinitions::CreateFire(CVector& vecPosition, float fSize)
+CClientFire* CStaticFunctionDefinitions::CreateFire(CResource& Resource, CVector& vecPosition, float fSize)
 {
-    return g_pGame->GetFireManager()->StartFire(vecPosition, fSize) != NULL;
+    CClientFire* pFire = new CClientFire(m_pManager, INVALID_ELEMENT_ID, vecPosition, fSize);
+    if (pFire) {
+        pFire->SetParent(Resource.GetResourceDynamicEntity());
+        return pFire;
+    }
+    return NULL;
 }
 
 bool CStaticFunctionDefinitions::ExtinguishFireInRadius(CVector& vecPosition, float fRadius)

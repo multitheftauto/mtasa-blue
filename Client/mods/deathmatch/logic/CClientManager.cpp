@@ -53,6 +53,7 @@ CClientManager::CClientManager(void)
     m_pEffectManager = new CClientEffectManager(this);
     m_pPointLightsManager = new CClientPointLightsManager(this);
     m_pPacketRecorder = new CClientPacketRecorder(this);
+    m_pFireManager = new CClientFireManager(this);
 
     m_bBeingDeleted = false;
     m_bGameUnloadedFlag = false;
@@ -173,6 +174,9 @@ CClientManager::~CClientManager(void)
 
     delete m_pPointLightsManager;
     m_pPointLightsManager = NULL;
+
+    delete m_pFireManager;
+    m_pFireManager = NULL;
 }
 
 //

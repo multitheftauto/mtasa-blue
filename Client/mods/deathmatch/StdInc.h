@@ -68,6 +68,7 @@
 #include <CClientEntity.h>
 #include <CClientSpatialDatabase.h>
 #include <CClientExplosionManager.h>
+#include <CClientFire.h>
 #include <CClientPed.h>
 #include <CClientPlayerClothes.h>
 #include <CClientPlayerVoice.h>
@@ -118,6 +119,7 @@
 #include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaEngineDefs.h>
+#include <luadefs/CLuaFireDefs.h>
 #include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
 #include <luadefs/CLuaObjectDefs.h>

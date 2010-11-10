@@ -308,7 +308,7 @@ public:
     static bool DetonateSatchels(void);
 
     // Fire funcs
-    static bool CreateFire(CVector& vecPosition, float fSize);
+    static CClientFire* CreateFire(CResource& resource, CVector& vecPosition, float fSize);
     static bool ExtinguishFireInRadius(CVector& vecPosition, float fRadius);
     static bool ExtinguishAllFires();
 

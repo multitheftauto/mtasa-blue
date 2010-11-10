@@ -28,11 +28,11 @@ int CLuaFireDefs::CreateFire(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::CreateFire(vecPosition, fSize))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        CResource* pResource = pLuaMain->GetResource();
+    
+        lua_pushelement(luaVM, CStaticFunctionDefinitions::CreateFire(*pResource, vecPosition, fSize));
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
