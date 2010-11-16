@@ -13,6 +13,7 @@
 
 class CServerList;
 class CServerListItem;
+class CMasterServerManagerInterface;
 
 #ifndef __CSERVERLIST_H
 #define __CSERVERLIST_H
@@ -163,15 +164,15 @@ public:
     uint                uiQueryRetryCount;
     uint                uiRevision;
 
-    std::string         strGame;        // Game name
-    std::string         strVersion;     // Game version
-    std::string         strName;        // Server name
-    std::string         strHost;        // Server host as IP
-    std::string         strHostName;    // Server host as name
-    std::string         strType;        // Game type
-    std::string         strMap;         // Map name
+    SString             strGame;        // Game name
+    SString             strVersion;     // Game version
+    SString             strName;        // Server name
+    SString             strHost;        // Server host as IP
+    SString             strHostName;    // Server host as name
+    SString             strType;        // Game type
+    SString             strMap;         // Map name
 
-    std::vector < std::string >
+    std::vector < SString >
                         vecPlayers;
 
 private:
@@ -185,7 +186,7 @@ class CServerList
 {
 public:
                                             CServerList             ( void );
-                                            ~CServerList            ( void );
+    virtual                                 ~CServerList            ( void );
 
     // Base implementation scans all listed servers
     virtual void                            Pulse                   ( void );
@@ -221,13 +222,14 @@ protected:
 class CServerListInternet : public CServerList
 {
 public:
+                                            CServerListInternet     ( void );
+                                            ~CServerListInternet    ( void );
     void                                    Pulse                   ( void );
     void                                    Refresh                 ( void );
 
 private:
-    bool                                    ParseList               ( const char *szBuffer, unsigned int nLength );
 
-    CHTTPClient                             m_HTTP;
+    CMasterServerManagerInterface*          m_pMasterServerManager;
     unsigned long                           m_ulStartTime;
 };
 

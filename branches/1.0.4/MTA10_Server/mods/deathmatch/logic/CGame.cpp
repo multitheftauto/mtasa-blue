@@ -125,6 +125,8 @@ CGame::CGame ( void )
 
     m_bCloudsEnabled = true;
 
+    m_llLastAnnouceTime = 0;
+
     memset( m_bGarageStates, 0, sizeof(bool) * MAX_GARAGES );
 
     // init our mutex
@@ -343,6 +345,8 @@ void CGame::DoPulse ( void )
     m_ElementDeleter.DoDeleteAll ();
 
     GetPerfStatManager ()->DoPulse ();
+
+    PulseMasterServerAnnounce ();
 
     // Unlock the critical section again
     Unlock();
@@ -661,26 +665,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
         if ( m_pMainConfig->GetASEEnabled () )
         {
-            // Query Wojjie's game-monitor.com
-            CTCPImpl * pTCP = new CTCPImpl ();
-            pTCP->Initialize ();
-
-            char szURL[256] = { '\0' };
-            CLogger::LogPrint ( "Querying game-monitor.com master server... " );
-            _snprintf ( szURL, sizeof(szURL) - 1, QUERY_URL_GAME_MONITOR, usServerPort + 123);
-
-            CHTTPRequest * request = new CHTTPRequest ( szURL );
-            request->SetLocalIP ( strServerIP );
-            CHTTPResponse * response = request->Send ( pTCP );
-            if ( !response )
-                CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
-            else if ( response->GetErrorCode () != 200 )
-                CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
-            else
-                CLogger::LogPrintfNoStamp ( "success!\n");
-
-            delete pTCP;
-            delete request;
+            PulseMasterServerAnnounce ();
         }
 
         if ( !m_pMainConfig->GetDontBroadcastLan() )
@@ -763,6 +748,72 @@ void CGame::Stop ( void )
         m_pVoiceServer->Shutdown();
     }
 #endif
+}
+
+
+// Remind master server once every 24 hrs
+void CGame::PulseMasterServerAnnounce ( void )
+{
+    if ( m_llLastAnnouceTime == 0 || GetTickCount64_ () - m_llLastAnnouceTime > 24 * 60 * 60 * 1000 )
+    {
+        bool bFirstPass = m_llLastAnnouceTime == 0;
+        m_llLastAnnouceTime = GetTickCount64_ ();
+
+        // If ASE is enabled
+        if ( m_pMainConfig->GetASEEnabled () )
+        {
+            const SString strServerIP = m_pMainConfig->GetServerIP ();
+            unsigned short usServerPort = m_pMainConfig->GetServerPort ();
+            unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
+
+            struct {
+                SString strDesc;
+                SString strURL;
+                bool bRepeat;
+            } masterServerList[] = {
+                                     { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false },
+                                     { "Querying backup master server... ", SString ( "http://nightly.mtasa.com/ase/add.php?g=%u&a=%u&h=%u", usServerPort, usServerPort + 123, usHTTPPort ), true },
+                                   };
+
+            for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )
+            {
+                const SString& strDesc = masterServerList[i].strDesc;
+                const SString& strURL = masterServerList[i].strURL;
+                bool bRepeat = masterServerList[i].bRepeat;
+
+                // Don't repeat request for some servers
+                if ( !bFirstPass && !bRepeat )
+                    continue;
+
+                // Only log on first pass
+                if ( bFirstPass )
+                    CLogger::LogPrint ( strDesc );
+
+                // Send request
+                CTCPImpl * pTCP = new CTCPImpl ();
+                pTCP->Initialize ();
+                CHTTPRequest * request = new CHTTPRequest ( strURL );
+                request->SetLocalIP ( strServerIP );
+                CHTTPResponse * response = request->Send ( pTCP );
+
+                // Only log on first pass
+                if ( bFirstPass )
+                {
+                    if ( !response )
+                        CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
+                    else if ( response->GetErrorCode () != 200 )
+                        CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
+                    else
+                        CLogger::LogPrintfNoStamp ( "success!\n");
+                }
+
+                if ( response )
+                    delete response;
+                delete pTCP;
+                delete request;
+            }
+        }
+    }
 }
 
 

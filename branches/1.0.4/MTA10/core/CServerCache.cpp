@@ -246,14 +246,15 @@ void CServerCache::GetServerCachedInfo ( CServerListItem* pItem )
     key.usGamePort = pItem->usGamePort;
     if ( CCachedInfo* pInfo = MapFind ( m_ServerCachedMap, key ) )
     {
-        pItem->nPlayers         = pInfo->nPlayers;
-        pItem->nMaxPlayers      = pInfo->nMaxPlayers;
-        pItem->nPing            = pInfo->nPing;
-        pItem->bPassworded      = pInfo->bPassworded ? true : false;
-        pItem->strName          = pInfo->strName;
-        pItem->strType          = pInfo->strType;
-        pItem->strMap           = pInfo->strMap;
-        pItem->uiNoReplyCount   = pInfo->uiNoReplyCount;
+        // Only used cached values if nothing has been set yet
+        if ( pItem->nMaxPlayers == 0 )      pItem->nPlayers         = pInfo->nPlayers;
+        if ( pItem->nMaxPlayers == 0 )      pItem->nMaxPlayers      = pInfo->nMaxPlayers;
+                                            pItem->nPing            = pInfo->nPing;
+                                            pItem->bPassworded      = pInfo->bPassworded ? true : false;
+        if ( pItem->strName.empty () )      pItem->strName          = pInfo->strName;
+        if ( pItem->strType.empty () )      pItem->strType          = pInfo->strType;
+        if ( pItem->strMap.empty () )       pItem->strMap           = pInfo->strMap;
+                                            pItem->uiNoReplyCount   = pInfo->uiNoReplyCount;
     }
 }
 

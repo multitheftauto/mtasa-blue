@@ -565,6 +565,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CServerBrowser.MasterServerManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerBrowser.RemoteMasterServer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CServerCache.cpp"
 				>
 			</File>
@@ -903,6 +911,14 @@
 			</File>
 			<File
 				RelativePath=".\CServerBrowser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerBrowser.MasterServerManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerBrowser.RemoteMasterServer.h"
 				>
 			</File>
 			<File

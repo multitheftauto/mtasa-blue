@@ -12,6 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CServerBrowser.MasterServerManager.h"
 
 using namespace std;
 
@@ -70,9 +71,6 @@ void CServerList::Pulse ( void )
     iNumQueries = Clamp ( 0, iNumQueries, SERVER_LIST_QUERIES_PER_PULSE );
     int iNumTicksUsed = iNumQueries * iTicksPerQuery;
     m_llLastTickCount += iNumTicksUsed;
-#if MTA_DEBUG
-    OutputDebugLine ( SString ( "%08x  Size: %d  iNumQueries: %d", this, m_Servers.size(), iNumQueries ) );
-#endif
 
     unsigned int n = m_Servers.size ();
     unsigned int uiQueriesSent = 0;
@@ -111,6 +109,10 @@ void CServerList::Pulse ( void )
     // Store the new number of scanned servers
     m_nScanned += uiRepliesParsed;
     m_nSkipped += uiNoReplies;
+#if MTA_DEBUG
+    OutputDebugLine ( SString ( "%08x  Size: %d  m_nScanned:%d  m_nSkipped:%d [%d]  iNumQueries: %d", this, m_Servers.size(), m_nScanned, m_nSkipped, m_nScanned+m_nSkipped, iNumQueries ) );
+#endif
+
     if ( m_nScanned + m_nSkipped == n ) {
         ss << "   " << uiActiveServers << " servers";
         // We are no longer refreshing
@@ -171,10 +173,24 @@ void CServerList::Refresh ( void )
     m_iRevision++;
 }
 
+
+CServerListInternet::CServerListInternet ( void )
+{
+    m_pMasterServerManager = NewMasterServerManager ();
+}
+
+
+CServerListInternet::~CServerListInternet ( void )
+{
+    delete m_pMasterServerManager;
+    m_pMasterServerManager = NULL;
+}
+
+
 void CServerListInternet::Refresh ( void )
 {   // Gets the server list from the master server and refreshes
     m_ulStartTime = CClientTime::GetTime ();
-    m_HTTP.Get ( SERVER_LIST_MASTER_URL );
+    m_pMasterServerManager->Refresh ();
     m_iPass = 1;
     m_bUpdated = true;
 
@@ -195,11 +211,11 @@ void CServerListInternet::Pulse ( void )
         m_strStatus2 = "";
         m_bUpdated = true;
         
-        // Attempt to get the HTTP data
-        CHTTPBuffer buffer;
-        if ( m_HTTP.GetData ( buffer ) ) {
-            // We got the data, parse it and switch pass
-            if ( ParseList ( buffer.GetData (), buffer.GetSize () ) ) {
+        // Attempt to get the data
+        if ( m_pMasterServerManager->HasData () )
+        {
+            if ( m_pMasterServerManager->ParseList ( m_Servers ) )
+            {
                 m_iPass++;
                 GetServerCache ()->GetServerListCachedInfo ( this );
             } else {
@@ -227,37 +243,6 @@ void CServerListInternet::Pulse ( void )
         // We are scanning our known servers (second pass)
         CServerList::Pulse ();
     }
-}
-
-
-bool CServerListInternet::ParseList ( const char *szBuffer, unsigned int nLength )
-{
-    unsigned int i = 0, j = 0;
-
-    // Read out the server count
-    if ( nLength < 2 ) return false;
-    unsigned int uiCount = ntohs ( *((unsigned short*)&szBuffer[0]) );
-    i = 2;
-
-    // Add all servers until we hit the count or nLength
-    while ( i < ( nLength - 6 ) && uiCount-- ) {
-
-        // Read the IPv4-address
-        in_addr _Address;
-        _Address.S_un.S_un_b.s_b1 = szBuffer[i];
-        _Address.S_un.S_un_b.s_b2 = szBuffer[i+1];
-        _Address.S_un.S_un_b.s_b3 = szBuffer[i+2];
-        _Address.S_un.S_un_b.s_b4 = szBuffer[i+3];
-
-        // Read the query port
-        unsigned short _usQueryPort = ntohs ( *((unsigned short*)(&szBuffer[i+4])) );
-        CServerListItem& item = *new CServerListItem ( _Address, _usQueryPort );
-
-        // Add the server
-        m_Servers.push_back ( &item );
-        i += 6;
-    }
-    return true;
 }
 
 
@@ -353,13 +338,15 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
         int error = WSAGetLastError();
         if ( len >= 0 ) {
             // Parse data
-            ParseQuery ( szBuffer, len );
-            CloseSocket ();
-            bMaybeOffline = false;
-            uiNoReplyCount = 0;
-            uiRevision++;           // To flag browser gui update
-            GetServerCache ()->SetServerCachedInfo ( this );    // Save parsed info in the cache
-            return "ParsedQuery";
+            if ( ParseQuery ( szBuffer, len ) )
+            {
+                CloseSocket ();
+                bMaybeOffline = false;
+                uiNoReplyCount = 0;
+                uiRevision++;           // To flag browser gui update
+                GetServerCache ()->SetServerCachedInfo ( this );    // Save parsed info in the cache
+                return "ParsedQuery";
+            }
         }
 
         if ( CClientTime::GetTime () - m_ulQueryStart > SERVER_LIST_ITEM_TIMEOUT )

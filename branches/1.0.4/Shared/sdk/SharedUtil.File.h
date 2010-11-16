@@ -37,6 +37,11 @@ namespace SharedUtil
     bool            FileAppend                      ( const SString& strFilename, const SString& strBuffer, bool bForce = true );
 
     //
+    // Get a file size
+    //
+    uint            FileSize                        ( const SString& strFilename );
+
+    //
     // Ensure all directories exist to the file
     //
     void            MakeSureDirExists               ( const SString& strPath );

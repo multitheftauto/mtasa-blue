@@ -261,6 +261,7 @@ CHTTPResponse * CHTTPRequest::Send ( CTCP * pTCP )
     CHTTPResponse* pResponse = new CHTTPResponse ();
     if ( !pResponse->Parse ( strReplyHeader, strReplyBody ) )
     {
+        delete pResponse;
         return NULL;
     }
 

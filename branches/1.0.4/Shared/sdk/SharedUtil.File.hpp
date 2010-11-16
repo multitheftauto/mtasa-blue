@@ -40,7 +40,8 @@ bool SharedUtil::DirectoryExists ( const SString& strPath )
     return ( ( dwAtr & FILE_ATTRIBUTE_DIRECTORY) != 0 );     
 #else
     struct stat Info;
-    stat ( strPath, &Info );
+    if ( stat ( strPath, &Info ) == -1 )
+        return false;
     return ( S_ISDIR ( Info.st_mode ) );
 #endif
 }
@@ -152,6 +153,24 @@ bool SharedUtil::FileAppend ( const SString& strFilename, const void* pBuffer, u
         bSaveOk = ( fwrite ( pBuffer, 1, ulSize, fh ) == ulSize );
     fclose ( fh );
     return bSaveOk;
+}
+
+
+//
+// Get a file size
+//
+uint SharedUtil::FileSize ( const SString& strFilename  )
+{
+    // Open
+    FILE* fh = fopen ( strFilename, "rb" );
+    if ( !fh )
+        return 0;
+    // Get size
+    fseek ( fh, 0, SEEK_END );
+    uint size = ftell ( fh );
+    // Close
+    fclose ( fh );
+    return size;
 }
 
 

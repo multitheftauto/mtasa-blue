@@ -246,6 +246,8 @@ public:
     void                        SetCloudsEnabled            ( bool bEnabled );
     bool                        GetCloudsEnabled            ( void );
 
+    void                        PulseMasterServerAnnounce   ( void );
+
 private:
     void                        AddBuiltInEvents            ( void );
 
@@ -353,6 +355,8 @@ private:
 
     //Clouds Enabled
     bool                        m_bCloudsEnabled;
+
+    long long                   m_llLastAnnouceTime;
 };
 
 #endif
