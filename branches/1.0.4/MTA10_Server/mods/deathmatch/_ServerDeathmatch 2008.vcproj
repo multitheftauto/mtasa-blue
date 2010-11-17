@@ -2239,6 +2239,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\utils\COpenPortsTester.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\Shared\sdk\ieee754.h"
 					>
 				</File>

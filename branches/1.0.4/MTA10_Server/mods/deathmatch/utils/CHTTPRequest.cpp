@@ -136,6 +136,11 @@ void CHTTPRequest::AddValue ( CHTTPValue * pValue )
 
 CHTTPResponse * CHTTPRequest::Send ( CTCP * pTCP )
 {
+    return GetResponse ( SendRequest ( pTCP ) );
+}
+
+CTCPClientSocket * CHTTPRequest::SendRequest ( CTCP * pTCP )
+{
     std::string strBuffer;
     if ( !m_strRemoteFile.empty () )
     {
@@ -236,6 +241,13 @@ CHTTPResponse * CHTTPRequest::Send ( CTCP * pTCP )
                 m_DataSentHandler ( lAmountSent, strPOSTData.size () );
         }
     }
+    return pSocket;
+}
+
+CHTTPResponse * CHTTPRequest::GetResponse ( CTCPClientSocket* pSocket )
+{
+    if ( !pSocket )
+        return NULL;
 
     // Read out the reply header
     std::string strReplyHeader;

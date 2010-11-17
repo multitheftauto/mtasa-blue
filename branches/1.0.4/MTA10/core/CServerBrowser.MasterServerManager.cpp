@@ -57,7 +57,7 @@ CMasterServerManagerInterface* NewMasterServerManager ( void )
 CMasterServerManager::CMasterServerManager ( void )
 {
     m_MasterServerList.push_back ( NewRemoteMasterServer ( "http://nightly.mtasa.com/ase/mta-1.0/" ) );
-    //m_MasterServerList.push_back ( NewRemoteMasterServer ( "http://1mgg.com/affil/mta-1.0" ) );
+    m_MasterServerList.push_back ( NewRemoteMasterServer ( "http://1mgg.com/affil/mta-1.0" ) );
 }
 
 

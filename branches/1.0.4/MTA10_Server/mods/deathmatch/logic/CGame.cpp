@@ -20,6 +20,7 @@
 
 #include "StdInc.h"
 #include "CPerfStatManager.h"
+#include "../utils/COpenPortsTester.h"
 
 #define MAX_KEYSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
@@ -126,6 +127,7 @@ CGame::CGame ( void )
     m_bCloudsEnabled = true;
 
     m_llLastAnnouceTime = 0;
+    m_pOpenPortsTester = NULL;
 
     memset( m_bGarageStates, 0, sizeof(bool) * MAX_GARAGES );
 
@@ -207,6 +209,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pResourceDownloader );
     SAFE_DELETE ( m_pRPCFunctions );
     SAFE_DELETE ( m_pWaterManager );
+    SAFE_DELETE ( m_pOpenPortsTester );
 
     // Clear our global pointer
     g_pGame = NULL;
@@ -347,6 +350,9 @@ void CGame::DoPulse ( void )
     GetPerfStatManager ()->DoPulse ();
 
     PulseMasterServerAnnounce ();
+
+    if ( m_pOpenPortsTester )
+        m_pOpenPortsTester->Poll ();
 
     // Unlock the critical section again
     Unlock();
@@ -726,6 +732,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // inside CServer.cpp in deathmatch mod aswell.
     CLogger::LogPrint ( "Server started and is ready to accept connections!\n" );
 
+    // Create port tester
+    m_pOpenPortsTester = new COpenPortsTester ();
+
+    // Add help hint
+    CLogger::LogPrint ( "Type 'help' for a list of commands.\n" );
+
     return true;
 }
 
@@ -748,6 +760,13 @@ void CGame::Stop ( void )
         m_pVoiceServer->Shutdown();
     }
 #endif
+}
+
+
+void CGame::StartOpenPortsTest ( void )
+{
+    if ( m_pOpenPortsTester )
+        m_pOpenPortsTester->Start ();
 }
 
 

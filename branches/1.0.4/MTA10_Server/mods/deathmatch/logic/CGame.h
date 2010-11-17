@@ -247,6 +247,7 @@ public:
     bool                        GetCloudsEnabled            ( void );
 
     void                        PulseMasterServerAnnounce   ( void );
+    void                        StartOpenPortsTest          ( void );
 
 private:
     void                        AddBuiltInEvents            ( void );
@@ -357,6 +358,7 @@ private:
     bool                        m_bCloudsEnabled;
 
     long long                   m_llLastAnnouceTime;
+    class COpenPortsTester*     m_pOpenPortsTester;
 };
 
 #endif
