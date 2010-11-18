@@ -299,7 +299,8 @@ public:
 
     // GUI funcs
     static bool                         GUIGetInputEnabled                  ( void );
-    static void                         GUISetInputEnabled                  ( bool bEnabled );
+    static bool                         GUIGetInputMode                     ( std::string& a_rstrResult );
+    static bool                         GUISetInputMode                     ( const std::string& a_rstrInputMode );
 
     static CClientGUIElement*           GUICreateWindow                     ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative );
     static CClientGUIElement*           GUICreateLabel                      ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );

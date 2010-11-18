@@ -371,6 +371,8 @@ private:
     bool                                OnMouseWheel                    ( CGUIMouseEventArgs Args );
     bool                                OnMove                          ( CGUIElement * pElement );
     bool                                OnSize                          ( CGUIElement * pElement );
+    bool                                OnFocusGain                     ( CGUIFocusEventArgs Args );
+    bool                                OnFocusLoss                     ( CGUIFocusEventArgs Args );
 
     float                               m_fMarkerBounce;
     // Network update functions

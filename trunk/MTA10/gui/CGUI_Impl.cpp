@@ -120,9 +120,11 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMoved             , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_Moved, this ) );
     pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventSized             , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_Sized, this ) );
     pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventRedrawRequested   , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_RedrawRequested, this ) );
-
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventActivated         , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_FocusGained, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventDeactivated       , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_FocusLost, this ) );
+    
     // Disallow input routing to the GUI
-    m_bSwitchGUIInput = false;
+    m_eInputMode = INPUTMODE_ALLOW_BINDS;
 
     // Reset the working directory
     m_szWorkingDirectory[MAX_PATH] = 0;
@@ -233,18 +235,96 @@ void CGUI_Impl::ProcessKeyboardInput ( unsigned long ulKey, bool bIsDown )
     }
 }
 
-
-void CGUI_Impl::SetGUIInputEnabled ( bool bEnabled )
-{   // inline?
-    m_bSwitchGUIInput = bEnabled;
-}
-
-
 bool CGUI_Impl::GetGUIInputEnabled ( void )
-{   // inline?
-    return m_bSwitchGUIInput;
+{  
+    switch (m_eInputMode)
+    {
+    case INPUTMODE_ALLOW_BINDS:
+        return false;
+        break;
+    case INPUTMODE_NO_BINDS:
+        return true;
+        break;
+    case INPUTMODE_NO_BINDS_ON_EDIT:
+        {
+            CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
+            if (!pActiveWindow || pActiveWindow == m_pTop || !pActiveWindow->isVisible())
+            {
+                return false;
+            }
+            if (pActiveWindow->getType() == "CGUI/Editbox")
+            {
+                CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(pActiveWindow);
+                return (!pEditBox->isReadOnly() && pEditBox->hasInputFocus());
+            }
+            else if (pActiveWindow->getType() == "CGUI/MultiLineEditbox")
+            {
+                CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
+                return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
+            }
+            return false;
+        }
+        break;
+    default:
+        return false;
+    }
 }
 
+void CGUI_Impl::SetGUIInputMode( eInputMode a_eMode )
+{
+    m_eInputMode = a_eMode;
+}
+
+eInputMode CGUI_Impl::GetGUIInputMode( void )
+{
+    return m_eInputMode;
+}
+
+eInputMode CGUI_Impl::GetInputModeFromString ( const std::string& a_rstrMode ) const
+{
+    const char* szMode = a_rstrMode.c_str();
+    if ( stricmp(szMode, "allow_binds") == 0 )
+    {
+        return INPUTMODE_ALLOW_BINDS;
+    }
+    else if ( stricmp(szMode, "no_binds") == 0 )
+    {
+        return INPUTMODE_NO_BINDS;
+    }
+    else if ( stricmp(szMode, "no_binds_when_editing") == 0 )
+    {
+        return INPUTMODE_NO_BINDS_ON_EDIT;
+    }
+    else
+    {
+        return INPUTMODE_INVALID;
+    }
+}
+
+ 
+bool CGUI_Impl::GetStringFromInputMode ( eInputMode a_eMode, std::string& a_rstrResult ) const
+{
+    switch (a_eMode)
+    {
+    case INPUTMODE_ALLOW_BINDS:
+        {
+            a_rstrResult = "allow_binds";
+            return true;
+        }
+    case INPUTMODE_NO_BINDS:            
+        {
+            a_rstrResult = "no_binds";
+            return true;
+        }
+    case INPUTMODE_NO_BINDS_ON_EDIT:    
+        {
+            a_rstrResult = "no_binds_when_editing";
+            return true;
+        }
+    default:                           
+        return false;
+    }
+}
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
 {
@@ -1107,6 +1187,51 @@ bool CGUI_Impl::Event_RedrawRequested ( const CEGUI::EventArgs& Args )
     return true;
 }
 
+bool CGUI_Impl::Event_FocusGained ( const CEGUI::EventArgs& Args )
+{
+    if ( m_FocusGainedHandlers[ m_Channel ] )
+    {
+        const CEGUI::ActivationEventArgs& e = reinterpret_cast < const CEGUI::ActivationEventArgs& > ( Args );
+
+        CGUIFocusEventArgs NewArgs;
+
+        // get the newly actived CGUIElement
+        NewArgs.pActivatedWindow = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
+       
+        // get the newly deactivated CGUIElement
+        NewArgs.pDeactivatedWindow = NULL;
+        if ( e.otherWindow )
+        {
+             NewArgs.pDeactivatedWindow = reinterpret_cast < CGUIElement* > ( ( e.otherWindow )->getUserData () );
+        }
+         
+        m_FocusGainedHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
+}
+
+bool CGUI_Impl::Event_FocusLost ( const CEGUI::EventArgs& Args )
+{
+    if ( m_FocusLostHandlers[ m_Channel ] )
+    {
+        const CEGUI::ActivationEventArgs& e = reinterpret_cast < const CEGUI::ActivationEventArgs& > ( Args );
+        
+        CGUIFocusEventArgs NewArgs;
+
+        // get the newly deactived CGUIElement
+        NewArgs.pDeactivatedWindow = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
+
+        // get the newly activated CGUIElement
+        NewArgs.pActivatedWindow = NULL;
+        if ( e.otherWindow )
+        {
+             NewArgs.pActivatedWindow = reinterpret_cast < CGUIElement* > ( ( e.otherWindow )->getUserData () );
+        }
+
+        m_FocusLostHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
+}
 
 void CGUI_Impl::AddToRedrawQueue ( CGUIElement* pWindow )
 {
@@ -1363,6 +1488,8 @@ void CGUI_Impl::ClearInputHandlers ( eInputChannel channel )
     m_MouseWheelHandlers[ channel ]         = GUI_CALLBACK_MOUSE ();
     m_MovedHandlers[ channel ]              = GUI_CALLBACK ();
     m_SizedHandlers[ channel ]              = GUI_CALLBACK ();
+    m_FocusGainedHandlers[ channel ]        = GUI_CALLBACK_FOCUS ();
+    m_FocusLostHandlers[ channel ]          = GUI_CALLBACK_FOCUS ();
 }
 
 void CGUI_Impl::ClearSystemKeys ( void )

@@ -3720,12 +3720,24 @@ bool CStaticFunctionDefinitions::GUIGetInputEnabled ( void )
     return m_pGUI->GetGUIInputEnabled ();
 }
 
-
-void CStaticFunctionDefinitions::GUISetInputEnabled ( bool bEnabled )
-{   // can't inline because statics are defined in .cpp not .h
-    m_pGUI->SetGUIInputEnabled ( bEnabled );
+bool CStaticFunctionDefinitions::GUISetInputMode ( const std::string& a_rstrInputMode )
+{
+    eInputMode inputMode = m_pGUI->GetInputModeFromString ( a_rstrInputMode );
+    if ( inputMode == INPUTMODE_INVALID )
+    {
+        return false;
+    }
+    else
+    {
+        m_pGUI->SetGUIInputMode ( inputMode );
+        return true;
+    }
 }
 
+bool CStaticFunctionDefinitions::GUIGetInputMode ( std::string& a_rstrResult )
+{
+    return m_pGUI->GetStringFromInputMode ( m_pGUI->GetGUIInputMode(), a_rstrResult );
+}
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative )
 {

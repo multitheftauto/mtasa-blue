@@ -31,14 +31,43 @@ int CLuaFunctionDefs::GUISetInputEnabled ( lua_State* luaVM )
 {
     bool bRet = false;
 
-    if ( lua_istype ( luaVM, 1, LUA_TBOOLEAN ) ) {
-        CStaticFunctionDefinitions::GUISetInputEnabled ( lua_toboolean ( luaVM, 1 ) ? true : false );
-        bRet = true;
-    }   // else: error, bad arguments
+    if ( lua_istype ( luaVM, 1, LUA_TBOOLEAN ) ) 
+    {
+        bRet = CStaticFunctionDefinitions::GUISetInputMode ( lua_toboolean ( luaVM, 1 ) ? "no_binds" : "allow_binds" ); 
+    }  
 
     lua_pushboolean ( luaVM, bRet );
     return 1;
 }
+
+int CLuaFunctionDefs::GUISetInputMode ( lua_State* luaVM )
+{
+    bool bRet = false;
+
+    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) ) 
+    {
+        bRet = CStaticFunctionDefinitions::GUISetInputMode ( lua_tostring ( luaVM, 1 ) );
+    }
+
+    lua_pushboolean ( luaVM, bRet );
+    return 1;
+}
+
+int CLuaFunctionDefs::GUIGetInputMode ( lua_State* luaVM )
+{
+    std::string strMode;
+    if ( CStaticFunctionDefinitions::GUIGetInputMode ( strMode ) )
+    {
+        lua_pushstring ( luaVM, strMode.c_str() );
+        return 1;
+    }
+    else
+    {
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+}
+
 
 
 int CLuaFunctionDefs::GUIIsChatBoxInputActive ( lua_State* luaVM )

@@ -663,6 +663,8 @@ void CLuaManager::LoadCFunctions ( void )
     // GUI funcs
     CLuaCFunctions::AddFunction ( "guiGetInputEnabled", CLuaFunctionDefs::GUIGetInputEnabled );
     CLuaCFunctions::AddFunction ( "guiSetInputEnabled", CLuaFunctionDefs::GUISetInputEnabled );
+    CLuaCFunctions::AddFunction ( "guiGetInputMode", CLuaFunctionDefs::GUIGetInputMode );
+    CLuaCFunctions::AddFunction ( "guiSetInputMode", CLuaFunctionDefs::GUISetInputMode );
 
     CLuaCFunctions::AddFunction ( "isChatBoxInputActive", CLuaFunctionDefs::GUIIsChatBoxInputActive );
     CLuaCFunctions::AddFunction ( "isConsoleActive", CLuaFunctionDefs::GUIIsConsoleActive );
