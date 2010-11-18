@@ -500,7 +500,9 @@ public:
     
     // GUI funcs
     LUA_DECLARE ( GUIGetInputEnabled );
+    LUA_DECLARE ( GUIGetInputMode );
     LUA_DECLARE ( GUISetInputEnabled );
+    LUA_DECLARE ( GUISetInputMode );
     LUA_DECLARE ( GUIIsChatBoxInputActive );
     LUA_DECLARE ( GUIIsConsoleActive );
     LUA_DECLARE ( GUIIsDebugViewActive );

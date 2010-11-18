@@ -65,6 +65,15 @@ enum eInputChannel
     INPUT_MOD = 1,
     INPUT_CHANNEL_COUNT = 2,
 };
+
+enum eInputMode
+{
+    INPUTMODE_ALLOW_BINDS = 0,
+    INPUTMODE_NO_BINDS = 1,
+    INPUTMODE_NO_BINDS_ON_EDIT = 2,
+    INPUTMODE_INVALID = 0xFF,
+};
+
 #define CHECK_CHANNEL(channel) assert ( channel >= 0 && channel < INPUT_CHANNEL_COUNT )
 
 class CGUI
@@ -82,8 +91,11 @@ public:
     virtual void                ProcessCharacter        ( unsigned long ulCharacter ) = 0;
 
     //
-    virtual void                SetGUIInputEnabled      ( bool bEnabled ) = 0;
     virtual bool                GetGUIInputEnabled      ( void ) = 0;
+    virtual void                SetGUIInputMode         ( eInputMode a_eMode ) = 0;
+    virtual eInputMode          GetGUIInputMode         ( void ) = 0;
+    virtual eInputMode          GetInputModeFromString  ( const std::string& a_rstrMode ) const = 0;
+    virtual bool                GetStringFromInputMode  ( eInputMode a_eMode, std::string& a_rstrResult ) const = 0;
 
     //
     virtual CGUIMessageBox*     CreateMessageBox        ( const char* szTitle, const char* szMessage, unsigned int uiFlags ) = 0;
@@ -162,6 +174,8 @@ public:
     virtual void                SetMouseWheelHandler        ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback ) = 0;
     virtual void                SetMovedHandler             ( eInputChannel channel, const GUI_CALLBACK & Callback ) = 0;
     virtual void                SetSizedHandler             ( eInputChannel channel, const GUI_CALLBACK & Callback ) = 0;
+    virtual void                SetFocusGainedHandler       ( eInputChannel channel, const GUI_CALLBACK_FOCUS & Callback ) = 0;
+    virtual void                SetFocusLostHandler         ( eInputChannel channel, const GUI_CALLBACK_FOCUS & Callback ) = 0;
 
     virtual void                SelectInputHandlers         ( eInputChannel channel ) = 0;
     virtual void                ClearInputHandlers          ( eInputChannel channel ) = 0;

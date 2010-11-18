@@ -18,6 +18,7 @@ class CGUIElement;
 #define GUI_CALLBACK            CGUICallback < bool, CGUIElement * >
 #define GUI_CALLBACK_KEY        CGUICallback < bool, CGUIKeyEventArgs >
 #define GUI_CALLBACK_MOUSE      CGUICallback < bool, CGUIMouseEventArgs >
+#define GUI_CALLBACK_FOCUS      CGUICallback < bool, CGUIFocusEventArgs >
 
 // Represents any callback
 template < typename Ret, typename Arguments >

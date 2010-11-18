@@ -156,6 +156,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pCore->GetGUI ()->SetMouseWheelHandler        ( INPUT_MOD, GUI_CALLBACK_MOUSE ( &CClientGame::OnMouseWheel, this ) );
     g_pCore->GetGUI ()->SetMovedHandler             ( INPUT_MOD, GUI_CALLBACK ( &CClientGame::OnMove, this ) );
     g_pCore->GetGUI ()->SetSizedHandler             ( INPUT_MOD, GUI_CALLBACK ( &CClientGame::OnSize, this ) );
+    g_pCore->GetGUI ()->SetFocusGainedHandler       ( INPUT_MOD, GUI_CALLBACK_FOCUS ( &CClientGame::OnFocusGain, this ) );
+    g_pCore->GetGUI ()->SetFocusLostHandler         ( INPUT_MOD, GUI_CALLBACK_FOCUS ( &CClientGame::OnFocusLoss, this ) );
     g_pCore->GetGUI ()->SelectInputHandlers         ( INPUT_MOD );
 
     // Startup "entities from root" optimization for getElementsByType
@@ -323,7 +325,7 @@ CClientGame::~CClientGame ( void )
     }
 
     // Reset the GUI input mode
-    g_pCore->GetGUI ()->SetGUIInputEnabled ( false );
+    g_pCore->GetGUI ()->SetGUIInputMode ( INPUTMODE_ALLOW_BINDS );
 
     // Reset CGUI's global events
     g_pCore->GetGUI ()->ClearInputHandlers ( INPUT_MOD );
@@ -2466,6 +2468,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientMouseWheel", "", NULL, false );
     m_Events.AddEvent ( "onClientGUIMove", "", NULL, false );
     m_Events.AddEvent ( "onClientGUISize", "", NULL, false );
+    m_Events.AddEvent ( "onClientGUIFocus", "", NULL, false );
+    m_Events.AddEvent ( "onClientGUIBlur", "", NULL, false );
 
     // Console events
     m_Events.AddEvent ( "onClientConsole", "text", NULL, false );
@@ -4792,6 +4796,42 @@ bool CClientGame::OnSize ( CGUIElement * pElement )
     return true;
 }
 
+bool CClientGame::OnFocusGain ( CGUIFocusEventArgs Args )
+{
+    if ( !Args.pActivatedWindow ) return false;
+
+    CLuaArguments Arguments;
+
+    CClientGUIElement * pActivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pActivatedWindow );
+    
+    if ( Args.pDeactivatedWindow )
+    {
+        CClientGUIElement * pDeactivatedGUIElement = pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pDeactivatedWindow );
+        if ( GetGUIManager ()->Exists ( pDeactivatedGUIElement ) ) pDeactivatedGUIElement->CallEvent ( "onClientGUIBlur", Arguments, true );
+    }
+
+    if ( GetGUIManager ()->Exists ( pActivatedGUIElement ) ) pActivatedGUIElement->CallEvent ( "onClientGUIFocus", Arguments, true );
+
+    return true;
+}
+
+bool CClientGame::OnFocusLoss ( CGUIFocusEventArgs Args )
+{
+    if ( !Args.pDeactivatedWindow ) return false;
+
+    CLuaArguments Arguments;
+
+    if ( Args.pActivatedWindow )
+    {
+        //pDeactivatedWindow looses focus but an other window is now gaining it so we let CClientGame::OnFocusGain trigger both events in the right order
+        return true;
+    }
+    
+    CClientGUIElement * pDeactivatedGUIElement = CGUI_GET_CCLIENTGUIELEMENT ( Args.pDeactivatedWindow );
+    if ( GetGUIManager ()->Exists ( pDeactivatedGUIElement ) ) pDeactivatedGUIElement->CallEvent ( "onClientGUIBlur", Arguments, true );
+
+    return true;
+}
 
 #ifdef MTA_DEBUG
 AddressInfo * CClientGame::GetAddressInfo ( unsigned long ulOffset, AddressInfo * pAddressInfo )
