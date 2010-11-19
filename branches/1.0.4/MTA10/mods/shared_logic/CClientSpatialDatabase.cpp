@@ -247,12 +247,12 @@ bool CClientSpatialDatabaseImpl::IsValidSphere ( const CSphere& sphere )
         return false;
 
     // Check radius within limits
-    if ( sphere.fRadius < -10000 || sphere.fRadius > 10000 )
+    if ( sphere.fRadius < -12000 || sphere.fRadius > 12000 )        // radius = sqrt(worldlimits*worldlimits + worldlimits*worldlimits)
         return false;
 
     // Check position within limits
     float fDistSquared2D = sphere.vecPosition.fX * sphere.vecPosition.fX + sphere.vecPosition.fY * sphere.vecPosition.fY;
-    if ( fDistSquared2D > 10000 * 10000 )
+    if ( fDistSquared2D > 12000 * 12000 )
         return false;
 
     return true;
