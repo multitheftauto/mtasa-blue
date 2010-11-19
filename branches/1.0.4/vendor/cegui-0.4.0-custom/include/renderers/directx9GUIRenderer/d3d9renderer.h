@@ -279,7 +279,7 @@ private:
 	*/
 	struct QuadInfo
 	{
-		LPDIRECT3DTEXTURE9	texture;
+		DirectX9Texture*  	texture;
 		Rect				position;
 		float				z;
 		Rect				texPosition;

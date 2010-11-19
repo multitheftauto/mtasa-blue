@@ -141,7 +141,8 @@ void DirectX9Renderer::addQuad(const Rect& dest_rect, float z, const Texture* te
 
 		quad.position		= dest_rect;
 		quad.z				= z;
-		quad.texture		= ((DirectX9Texture*)tex)->getD3DTexture();
+		quad.texture		= ((DirectX9Texture*)tex);
+
 		quad.texPosition	= texture_rect;
 		quad.topLeftCol		= colours.d_top_left.getARGB();
 		quad.topRightCol	= colours.d_top_right.getARGB();
@@ -177,8 +178,9 @@ void DirectX9Renderer::doRender(void)
 	{
 		const QuadInfo& quad = (*i);
 
+		LPDIRECT3DTEXTURE9 d3dTexture = quad.texture->getD3DTexture();
 		// flush & set texture if needed
-		if (d_currTexture != quad.texture)
+		if (d_currTexture != d3dTexture)
 		{
 			if (locked)
 			{
@@ -190,8 +192,8 @@ void DirectX9Renderer::doRender(void)
 			renderVBuffer();
 
 			// set new texture
-			d_device->SetTexture(0, quad.texture);
-			d_currTexture = quad.texture;
+			d_device->SetTexture(0, d3dTexture);
+			d_currTexture = d3dTexture;
 		}
 
 		if (!locked)
