@@ -162,6 +162,8 @@ protected:
     CGUILabel*          m_pAdvancedMiscLabel;
     CGUILabel*          m_pAdvancedUpdaterLabel;
 
+    CGUILabel*          m_pAudioGeneralLabel;
+    CGUILabel*          m_pUserTrackGeneralLabel;
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
     CGUILabel*          m_pLabelMTAVolume;
@@ -171,6 +173,12 @@ protected:
     CGUIScrollBar*      m_pAudioRadioVolume;
     CGUIScrollBar*      m_pAudioSFXVolume;
     CGUIScrollBar*      m_pAudioMTAVolume;
+    CGUICheckBox*       m_pCheckBoxAudioEqualizer;
+    CGUICheckBox*       m_pCheckBoxAudioAutotune;
+    CGUILabel*          m_pAudioUsertrackLabel;
+    CGUICheckBox*       m_pCheckBoxUserAutoscan;
+    CGUILabel*          m_pLabelUserTrackMode;
+    CGUIComboBox*       m_pComboUsertrackMode;
 
     CGUIGridList*       m_pBindsList;
     CGUIButton*         m_pBindsDefButton;

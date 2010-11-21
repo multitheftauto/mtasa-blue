@@ -357,8 +357,14 @@ CSettings::CSettings ( void )
     /**
      *  Audio tab
      **/
+    m_pAudioGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "General" ) );
+    m_pAudioGeneralLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pAudioGeneralLabel->GetPosition ( vecTemp, false );
+    m_pAudioGeneralLabel->AutoSize ( "General  " );
+    m_pAudioGeneralLabel->SetFont ( "default-bold-small" );
+
     m_pLabelRadioVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Radio volume:" ) );
-    m_pLabelRadioVolume->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pLabelRadioVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ), false );
     m_pLabelRadioVolume->GetPosition ( vecTemp, false );
     m_pLabelRadioVolume->AutoSize ( "Radio volume:" );
 
@@ -385,6 +391,14 @@ CSettings::CSettings ( void )
     m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioSFXVolume->SetProperty ( "StepSize", "0.015625" );
 
+    m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Radio Equalizer", true ) );
+    m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxAudioEqualizer->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pCheckBoxAudioAutotune = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Radio Auto-tune", true ) );
+    m_pCheckBoxAudioAutotune->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 13.0f ) );
+    m_pCheckBoxAudioAutotune->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
     m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "MTA volume:" ) );
     m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelMTAVolume->GetPosition ( vecTemp, false );
@@ -398,6 +412,30 @@ CSettings::CSettings ( void )
     m_pAudioMTAVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioMTAVolume->SetProperty ( "StepSize", "0.01" );
+
+    m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Usertrack options" ) );
+    m_pAudioUsertrackLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ), false );
+    m_pAudioUsertrackLabel->GetPosition ( vecTemp, false );
+    m_pAudioUsertrackLabel->AutoSize ( "Usertrack options  " );
+    m_pAudioUsertrackLabel->SetFont ( "default-bold-small" );
+
+    m_pLabelUserTrackMode = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Play mode:" ) );
+    m_pLabelUserTrackMode->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pLabelUserTrackMode->GetPosition ( vecTemp, false );
+    m_pLabelUserTrackMode->AutoSize ( "Play mode:" );
+
+    m_pComboUsertrackMode = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAudio, "" ) );
+    m_pComboUsertrackMode->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pComboUsertrackMode->SetSize ( CVector2D ( 160.0f, 80.0f ) );
+    m_pComboUsertrackMode->AddItem ( "Radio" )->SetData ( (void*)0 );
+    m_pComboUsertrackMode->AddItem ( "Random" )->SetData ( (void*)1 );
+    m_pComboUsertrackMode->AddItem ( "Sequential" )->SetData ( (void*)2 );
+    m_pComboUsertrackMode->SetReadOnly ( true );
+
+    m_pCheckBoxUserAutoscan = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Automatic Media Scan", true ) );
+    m_pCheckBoxUserAutoscan->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pCheckBoxUserAutoscan->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxUserAutoscan->GetPosition ( vecTemp, false );
 
     /**
      *  Video tab
@@ -1795,6 +1833,15 @@ void CSettings::LoadData ( void )
     m_pAudioRadioVolume->SetScrollPosition ( (float)m_ucOldRadioVolume / 64.0f );
     m_ucOldSFXVolume = gameSettings->GetSFXVolume();
     m_pAudioSFXVolume->SetScrollPosition ( (float)m_ucOldSFXVolume / 64.0f );
+
+    m_pCheckBoxAudioEqualizer->SetSelected ( gameSettings->IsRadioEqualizerEnabled () );
+    m_pCheckBoxAudioAutotune->SetSelected ( gameSettings->IsRadioAutotuneEnabled () );
+    m_pCheckBoxUserAutoscan->SetSelected ( gameSettings->IsUsertrackAutoScan () );
+
+    unsigned int uiUsertrackMode = gameSettings->GetUsertrackMode ();
+    if ( uiUsertrackMode == 0 ) m_pComboUsertrackMode->SetText ( "Radio" );
+    else if ( uiUsertrackMode == 1 ) m_pComboUsertrackMode->SetText ( "Random" );
+    else if ( uiUsertrackMode == 2 ) m_pComboUsertrackMode->SetText ( "Sequential" );
     
     CVARS_GET ( "mtavolume", m_fOldMTAVolume );
     m_fOldMTAVolume = max( 0.0f, min( 1.0f, m_fOldMTAVolume ) );
@@ -2046,6 +2093,16 @@ void CSettings::SaveData ( void )
     {
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "update_build_type", iSelected );
+    }
+
+    // Audio
+    gameSettings->SetRadioEqualizerEnabled ( m_pCheckBoxAudioEqualizer->GetSelected() );
+    gameSettings->SetRadioAutotuneEnabled ( m_pCheckBoxAudioAutotune->GetSelected() );
+    gameSettings->SetUsertrackAutoScan ( m_pCheckBoxUserAutoscan->GetSelected() );
+
+    if ( CGUIListItem* pSelected = m_pComboUsertrackMode->GetSelectedItem () )
+    {
+        gameSettings->SetUsertrackMode ( (int) pSelected->GetData() );
     }
 
     // Map alpha
