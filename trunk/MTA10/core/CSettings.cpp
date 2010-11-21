@@ -988,6 +988,13 @@ bool CSettings::OnJoypadDefaultClick ( CGUIElement* pElement )
     // Load the default binds
     GetJoystickManager ()->SetDefaults ();
 
+    // Load the default mouse settings
+    CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();   
+
+    m_pFlyWithMouse->SetSelected ( pController->GetFlyWithMouse () );
+    m_pSteerWithMouse->SetSelected ( pController->GetSteerWithMouse () );
+    m_pInvertMouse->SetSelected ( pController->IsMouseInverted () );
+
     // Update the GUI
     UpdateJoypadTab ();
 
@@ -2444,9 +2451,9 @@ bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
 
 bool CSettings::OnMouseSensivityChanged ( CGUIElement* pElement )
 {
-    int fMouseSensivity = ( m_pMouseSensivity->GetScrollPosition () ) * 100;
+    int iMouseSensivity = ( m_pMouseSensivity->GetScrollPosition () ) * 100;
 
-    m_pLabelMouseSensivityValue->SetText ( SString("%i%%", fMouseSensivity ).c_str () );
+    m_pLabelMouseSensivityValue->SetText ( SString("%i%%", iMouseSensivity ).c_str () );
     return true;
 }
 
