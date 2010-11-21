@@ -5132,9 +5132,15 @@ bool CStaticFunctionDefinitions::SetBlurLevel ( unsigned char ucLevel )
 
 bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
 {
-    g_pGame->GetWorld ()->SetJetpackMaxHeight ( fHeight );
-    return true;
+    if ( fHeight >= -20 )
+    {
+        g_pGame->GetWorld ()->SetJetpackMaxHeight ( fHeight );
+        return true;
+    }
+
+    return false;
 }
+
 bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
 {
     if ( ucState >= 0 && ucState < 10 )

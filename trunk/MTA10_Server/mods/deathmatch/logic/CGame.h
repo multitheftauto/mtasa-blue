@@ -14,6 +14,7 @@
 *               Kevin Whiteside <>
 *               lil_Toady <>
 *               Peter Beverloo <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -227,6 +228,8 @@ public:
     inline bool                 GetTrafficLightsLocked      ( void )        { return m_bTrafficLightsLocked; }
     inline void                 SetTrafficLightsLocked      ( bool bLocked ) { m_bTrafficLightsLocked = bLocked; }
 
+    inline float                GetJetpackMaxHeight         ( void ) { return m_fJetpackMaxHeight; }
+    inline void                 SetJetpackMaxHeight         ( float fMaxHeight ) { m_fJetpackMaxHeight = fMaxHeight; }
 
     inline float                GetGameSpeed                ( void )        { return m_fGameSpeed; }
     inline void                 SetGameSpeed                ( float fGameSpeed )  { m_fGameSpeed = fGameSpeed; }
@@ -343,6 +346,7 @@ private:
 
     float                       m_fGravity;
     float                       m_fGameSpeed;
+    float                       m_fJetpackMaxHeight;
 
     unsigned char               m_ucTrafficLightState;
     bool                        m_bTrafficLightsLocked;

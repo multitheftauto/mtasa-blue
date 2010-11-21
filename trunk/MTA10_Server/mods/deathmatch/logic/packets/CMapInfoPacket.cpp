@@ -8,6 +8,7 @@
 *               Jax <>
 *               lil_Toady <>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -36,7 +37,8 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  unsigned char ucSkyGradientBG,
                                  unsigned char ucSkyGradientBB,
                                  unsigned short usFPSLimit,
-                                 bool bCloudsEnabled )
+                                 bool bCloudsEnabled,
+                                 float fJetpackMaxHeight )
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -60,6 +62,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_ucSkyGradientBB = ucSkyGradientBB;
     m_usFPSLimit = usFPSLimit;
     m_bCloudsEnabled = bCloudsEnabled;
+    m_fJetpackMaxHeight = fJetpackMaxHeight;
 }
 
 
@@ -126,6 +129,8 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         bool bCrouchBug = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CROUCHBUG );
         BitStream.WriteBit ( bCrouchBug );
     }
+
+    BitStream.Write ( m_fJetpackMaxHeight );
 
     return true;
 }

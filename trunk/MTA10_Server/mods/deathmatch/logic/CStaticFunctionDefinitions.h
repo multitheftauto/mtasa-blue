@@ -452,6 +452,7 @@ public:
     static bool                 IsGarageOpen                        ( unsigned char ucGarageID, bool& bIsOpen );
     static bool                 GetTrafficLightState                ( unsigned char& ucState );
     static bool                 GetTrafficLightsLocked              ( bool& bLocked );
+    static bool                 GetJetpackMaxHeight                 ( float& fMaxHeight );
 
     // General world set funcs
     static bool                 SetTime                             ( unsigned char ucHour, unsigned char ucMinute );
@@ -471,6 +472,7 @@ public:
     static bool                 GetCloudsEnabled                    ( void );
     static bool                 SetTrafficLightState                ( unsigned char ucState, bool bForced = false );
     static bool                 SetTrafficLightsLocked              ( bool bLocked );
+    static bool                 SetJetpackMaxHeight                 ( float fMaxHeight );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );

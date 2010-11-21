@@ -14,6 +14,7 @@
 *               Kevin Whiteside <>
 *               lil_Toady <>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -7171,6 +7172,11 @@ bool CStaticFunctionDefinitions::GetTrafficLightsLocked ( bool& bLocked )
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetJetpackMaxHeight ( float& fMaxHeight )
+{
+    fMaxHeight = g_pGame->GetJetpackMaxHeight ();
+    return true;
+}
 
 bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char ucMinute )
 {
@@ -7213,6 +7219,23 @@ bool CStaticFunctionDefinitions::SetTrafficLightsLocked ( bool bLocked )
 {
     g_pGame->SetTrafficLightsLocked ( bLocked );
     return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fMaxHeight )
+{
+    if ( fMaxHeight >= -20 )
+    {
+        g_pGame->SetJetpackMaxHeight ( fMaxHeight );
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( fMaxHeight );
+        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_JETPACK_MAXHEIGHT, *BitStream.pBitStream ) );
+
+        return true;
+    }
+
+    return false;
 }
 
 

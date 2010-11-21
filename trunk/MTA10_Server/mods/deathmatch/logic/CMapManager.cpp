@@ -420,6 +420,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     float fGameSpeed = g_pGame->GetGameSpeed ();
     float fWaveHeight = g_pGame->GetWaterManager ()->GetGlobalWaveHeight ();
     float fWaterLevel = g_pGame->GetWaterManager ()->GetGlobalWaterLevel ();
+    float fJetpackMaxHeight = g_pGame->GetJetpackMaxHeight ();
+
     // Get the sky gradient
     bool bHasSkyGradient = g_pGame->HasSkyGradient ();
     unsigned char ucTopRed, ucTopGreen, ucTopBlue;
@@ -460,7 +462,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucBottomGreen,
                                    ucBottomBlue,
                                    usFPSLimit,
-                                   bCloudsEnabled) );
+                                   bCloudsEnabled,
+                                   fJetpackMaxHeight ) );
 
     // Send him all the elements
     SendMapInformation ( Player );

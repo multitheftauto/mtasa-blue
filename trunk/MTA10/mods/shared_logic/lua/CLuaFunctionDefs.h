@@ -637,6 +637,7 @@ public:
     LUA_DECLARE ( GetBlurLevel );
     LUA_DECLARE ( GetTrafficLightState );
     LUA_DECLARE ( AreTrafficLightsLocked );
+    LUA_DECLARE ( GetJetpackMaxHeight );
 
     LUA_DECLARE ( SetTime );
     LUA_DECLARE ( SetSkyGradient );

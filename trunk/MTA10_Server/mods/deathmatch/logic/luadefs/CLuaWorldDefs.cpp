@@ -7,6 +7,7 @@
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               lil_Toady <>
 *               Kevin Whiteside <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -28,6 +29,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isGarageOpen", CLuaWorldDefs::isGarageOpen );
     CLuaCFunctions::AddFunction ( "getTrafficLightState", CLuaWorldDefs::getTrafficLightState );
     CLuaCFunctions::AddFunction ( "areTrafficLightsLocked", CLuaWorldDefs::areTrafficLightsLocked );
+    CLuaCFunctions::AddFunction ( "getJetpackMaxHeight", CLuaWorldDefs::getJetpackMaxHeight );
 
     // Set
     CLuaCFunctions::AddFunction ( "setTime", CLuaWorldDefs::setTime );
@@ -47,7 +49,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaWorldDefs::getCloudsEnabled );
     CLuaCFunctions::AddFunction ( "setTrafficLightState", CLuaWorldDefs::setTrafficLightState );
     CLuaCFunctions::AddFunction ( "setTrafficLightsLocked", CLuaWorldDefs::setTrafficLightsLocked );
-
+    CLuaCFunctions::AddFunction ( "setJetpackMaxHeight", CLuaWorldDefs::setJetpackMaxHeight );
 }
 
 
@@ -293,6 +295,26 @@ int CLuaWorldDefs::setTrafficLightsLocked ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightsLocked" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaWorldDefs::setJetpackMaxHeight ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
+    {
+        float fMaxHeight = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
+        if ( CStaticFunctionDefinitions::SetJetpackMaxHeight ( fMaxHeight ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setJetpackMaxHeight" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -561,6 +583,7 @@ int CLuaWorldDefs::isGlitchEnabled ( lua_State* luaVM )
     lua_pushnil ( luaVM );
     return 1;
 }
+
 int CLuaWorldDefs::setCloudsEnabled ( lua_State* luaVM )
 {
     int iArgument = lua_type ( luaVM, 1 );
@@ -579,8 +602,22 @@ int CLuaWorldDefs::setCloudsEnabled ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 int CLuaWorldDefs::getCloudsEnabled ( lua_State* luaVM )
 {
      lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetCloudsEnabled ( ) );
      return 1;
+}
+
+int CLuaWorldDefs::getJetpackMaxHeight ( lua_State* luaVM )
+{
+    float fMaxHeight;
+    if ( CStaticFunctionDefinitions::GetJetpackMaxHeight ( fMaxHeight ) )
+    {
+        lua_pushnumber ( luaVM, fMaxHeight );
+        return 1;
+    }
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }

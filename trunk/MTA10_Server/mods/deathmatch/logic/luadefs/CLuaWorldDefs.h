@@ -7,6 +7,7 @@
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               lil_Toady <>
 *               Kevin Whiteside <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -36,6 +37,7 @@ public:
     static int      getCloudsEnabled                    ( lua_State* luaVM );
     static int      getTrafficLightState                ( lua_State* luaVM );
     static int      areTrafficLightsLocked              ( lua_State* luaVM );
+    static int      getJetpackMaxHeight                 ( lua_State* luaVM );
 
     // Set
     static int      setTime                             ( lua_State* luaVM );
@@ -53,6 +55,7 @@ public:
     static int      setCloudsEnabled                    ( lua_State* luaVM );
     static int      setTrafficLightState                ( lua_State* luaVM );
     static int      setTrafficLightsLocked              ( lua_State* luaVM );
+    static int      setJetpackMaxHeight                 ( lua_State* luaVM );
 };
 
 #endif
