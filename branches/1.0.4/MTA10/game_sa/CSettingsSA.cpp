@@ -116,6 +116,50 @@ void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
     pGame->GetAudio ()->SetEffectsMasterVolume ( ucVolume );
 }
 
+unsigned int CSettingsSA::GetUsertrackMode ( void )
+{
+    // 0 = radio, 1 = random, 2 = sequential
+    return *(BYTE *)VAR_bUsertrackMode;
+}
+
+void CSettingsSA::SetUsertrackMode ( unsigned int uiMode )
+{
+    *(BYTE *)VAR_bUsertrackMode = uiMode;
+}
+
+bool CSettingsSA::IsUsertrackAutoScan ( void )
+{
+    // 1 = yes, 0 = no
+    return ( ( *(BYTE *)VAR_bUsertrackAutoScan == 1 ) ? true : false );
+}
+
+void CSettingsSA::SetUsertrackAutoScan ( bool bEnable )
+{
+    *(BYTE *)VAR_bUsertrackAutoScan = ( ( bEnable ) ? 1 : 0 );
+}
+
+bool CSettingsSA::IsRadioEqualizerEnabled ( void )
+{
+    // 1 = on, 0 = off
+    return ( ( *(BYTE *)VAR_bRadioEqualizer == 1 ) ? true : false );
+}
+
+void CSettingsSA::SetRadioEqualizerEnabled ( bool bEnable )
+{
+    *(BYTE *)VAR_bRadioEqualizer = ( ( bEnable ) ? 1 : 0 );
+}
+
+bool CSettingsSA::IsRadioAutotuneEnabled ( void )
+{
+    // 1 = on, 0 = off
+    return ( ( *(BYTE *)VAR_bRadioAutotune == 1 ) ? true : false );
+}
+
+void CSettingsSA::SetRadioAutotuneEnabled ( bool bEnable )
+{
+    *(BYTE *)VAR_bRadioAutotune = ( ( bEnable ) ? 1 : 0 );
+}
+
 // Minimum is 0.925 and maximum is 1.8
 float CSettingsSA::GetDrawDistance ( void )
 {
@@ -147,12 +191,23 @@ void CSettingsSA::SetBrightness ( unsigned int uiBrightness )
 unsigned int CSettingsSA::GetFXQuality ( )
 {
     // 0 = low, 1 = medium, 2 = high, 3 = very high
-    return *(BYTE*)VAR_fFxQuality;
+    return *(BYTE *)VAR_bFxQuality;
 }
 
 void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 {
-    *(BYTE *)VAR_fFxQuality = fxQualityId;
+    *(BYTE *)VAR_bFxQuality = fxQualityId;
+}
+
+float CSettingsSA::GetMouseSensivity ( )
+{
+    // 0.000312 (min) - 0.005000 (max)
+    return *(FLOAT *)VAR_fMouseSensivity;
+}
+
+void CSettingsSA::SetMouseSensivity ( float fSensivity )
+{
+    *(FLOAT *)VAR_fMouseSensivity = fSensivity;
 }
 
 void CSettingsSA::Save ()
