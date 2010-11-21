@@ -7,6 +7,7 @@
 *  DEVELOPERS:  Jax <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -34,6 +35,7 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_GLITCH_ENABLED, SetGlitchEnabled, "SetGlitchEnabled" );
     AddHandler ( SET_CLOUDS_ENABLED, SetCloudsEnabled, "SetCloudsEnabled" );
     AddHandler ( SET_TRAFFIC_LIGHT_STATE, SetTrafficLightState, "SetTrafficLightState" );
+    AddHandler ( SET_JETPACK_MAXHEIGHT, SetJetpackMaxHeight, "SetJetpackMaxHeight" );
 }
 
 
@@ -231,5 +233,15 @@ void CWorldRPCs::SetTrafficLightState ( NetBitStreamInterface& bitStream )
        // We ignore updating the serverside traffic light state if it's blocked, unless script forced it
         if ( bForced || !g_pMultiplayer->GetTrafficLightsLocked() )
             g_pMultiplayer->SetTrafficLightState ( (unsigned char)* &ucTrafficLightState );
+    }
+}
+
+void CWorldRPCs::SetJetpackMaxHeight ( NetBitStreamInterface& bitStream )
+{
+    float fJetpackMaxHeight;
+
+    if ( bitStream.Read ( fJetpackMaxHeight ) )
+    {
+        g_pGame->GetWorld ()->SetJetpackMaxHeight ( fJetpackMaxHeight );
     }
 }

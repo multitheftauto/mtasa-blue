@@ -39,6 +39,7 @@ public:
     DECLARE_RPC ( SetGlitchEnabled );
     DECLARE_RPC ( SetCloudsEnabled );
     DECLARE_RPC ( SetTrafficLightState );
+    DECLARE_RPC ( SetJetpackMaxHeight );
 };
 
 #endif

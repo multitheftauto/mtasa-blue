@@ -946,6 +946,12 @@ int CLuaFunctionDefs::AreTrafficLightsLocked ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetJetpackMaxHeight ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetJetpackMaxHeight () );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::GetBlurLevel ( lua_State* luaVM )
 {

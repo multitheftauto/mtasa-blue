@@ -1995,6 +1995,12 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         if ( !bitStream.ReadBit ( bCrouchBug ) )
             return;
 
+    float fJetpackMaxHeight = 100;
+    if ( !bitStream.Read ( fJetpackMaxHeight ) )
+        return;
+
+    g_pGame->GetWorld ()->SetJetpackMaxHeight ( fJetpackMaxHeight );
+
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_QUICKRELOAD, funBugs.data.bQuickReload );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTFIRE, funBugs.data.bFastFire );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTMOVE, funBugs.data.bFastMove );

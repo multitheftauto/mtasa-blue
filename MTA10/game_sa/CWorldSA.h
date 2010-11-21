@@ -5,6 +5,7 @@
 *  FILE:        game_sa/CWorldSA.h
 *  PURPOSE:     Header file for game world
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -75,6 +76,7 @@ public:
     DWORD       GetCurrentArea            ( void );
     void        SetCurrentArea            ( DWORD dwArea );
     void        SetJetpackMaxHeight       ( float fHeight );
+    float       GetJetpackMaxHeight       ( void );
     void        SetWindVelocity           ( float fX, float fY, float fZ );
     void        GetWindVelocity           ( float& fX, float& fY, float& fZ );
     void        RestoreWindVelocity       ( void );
