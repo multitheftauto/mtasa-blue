@@ -112,7 +112,7 @@ CSettings::CSettings ( void )
     m_pControlsScrollPane->SetPosition ( CVector2D ( 0.0f, 0.0f ), true );
     m_pControlsScrollPane->SetSize ( CVector2D ( 1.0f, 1.0f ), true );
     m_pControlsScrollPane->SetVerticalScrollStepSize ( 0.15f );
-    m_pControlsScrollPane->SetVerticalScrollBar(true);
+    m_pControlsScrollPane->SetVerticalScrollBar ( true );
     CGUIElement* pControlsPane = m_pControlsScrollPane;
 #else
     CGUIElement* pControlsPane = pTabControls;
@@ -130,10 +130,25 @@ CSettings::CSettings ( void )
     m_pInvertMouse->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Steer with mouse", true ) );
-    m_pSteerWithMouse->SetPosition ( CVector2D ( 0.5f, 0.1f ), true );
+    m_pSteerWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
+
+    m_pLabelMouseSensivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Mouse sensivity:" ) );
+    m_pLabelMouseSensivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
+    m_pLabelMouseSensivity->GetPosition ( vecTemp, false );
+    m_pLabelMouseSensivity->AutoSize ( "Mouse sensivity:" );
+
+    m_pMouseSensivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pControlsPane ) );
+    m_pMouseSensivity->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY ) );
+    m_pMouseSensivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pMouseSensivity->SetProperty ( "StepSize", "0.00004688" );
+
+    m_pLabelMouseSensivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "0%") );
+    m_pLabelMouseSensivityValue->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY ) );
+    m_pLabelMouseSensivityValue->AutoSize ( "100%" );
 
     m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Fly with mouse", true ) );
-    m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
+    m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
+    m_pFlyWithMouse->GetPosition ( vecTemp, false );
 
     //Joypad options
     m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Joypad options" ) );
@@ -342,18 +357,18 @@ CSettings::CSettings ( void )
     m_pAudioRadioVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioRadioVolume->SetProperty ( "StepSize", "0.015625" );
 
-    m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
+    m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelRadioVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
-    m_pLabelRadioVolumeValue->AutoSize ( "64 " );
+    m_pLabelRadioVolumeValue->AutoSize ( "100%" );
 
     m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "SFX volume:" ) );
     m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelSFXVolume->GetPosition ( vecTemp, false );
     m_pLabelSFXVolume->AutoSize ( "SFX volume:" );
 
-    m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
+    m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelSFXVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
-    m_pLabelSFXVolumeValue->AutoSize ( "64 " );
+    m_pLabelSFXVolumeValue->AutoSize ( "100%" );
 
     m_pAudioSFXVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
@@ -373,7 +388,7 @@ CSettings::CSettings ( void )
     m_pLabelMTAVolume->GetPosition ( vecTemp, false );
     m_pLabelMTAVolume->AutoSize ( "MTA volume:" );
 
-    m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
+    m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelMTAVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
     m_pLabelMTAVolumeValue->AutoSize ( "100%" );
 
@@ -780,6 +795,7 @@ CSettings::CSettings ( void )
     m_pAudioMTAVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMTAVolumeChanged, this ) );
     m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
+    m_pMouseSensivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensivityChanged, this ) );
     /*
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -1782,6 +1798,10 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "fly_with_mouse", bVar ); m_pFlyWithMouse->SetSelected ( bVar );
     CVARS_GET ( "classic_controls", bVar ); m_pClassicControls->SetSelected ( bVar );
 
+    CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+
+    m_pMouseSensivity->SetScrollPosition ( ( gameSettings->GetMouseSensivity () - 0.000312f ) / 0.004688f );
+
     // Community
     CVARS_GET ( "community_username", strVar );
     if ( !strVar.empty () ) m_pEditUser->SetText ( strVar.c_str () );
@@ -1789,8 +1809,6 @@ void CSettings::LoadData ( void )
     if ( !strVar.empty () ) m_pEditPass->SetText ( strVar.c_str () );
 
     // Audio
-    CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-
     m_ucOldRadioVolume = gameSettings->GetRadioVolume();
     m_pAudioRadioVolume->SetScrollPosition ( (float)m_ucOldRadioVolume / 64.0f );
     m_ucOldSFXVolume = gameSettings->GetSFXVolume();
@@ -2017,6 +2035,7 @@ void CSettings::SaveData ( void )
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
+    gameSettings->SetMouseSensivity ( ( m_pMouseSensivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
 
     // Visual FX Quality
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
@@ -2423,6 +2442,14 @@ bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
     return true;
 }
 
+bool CSettings::OnMouseSensivityChanged ( CGUIElement* pElement )
+{
+    int fMouseSensivity = ( m_pMouseSensivity->GetScrollPosition () ) * 100;
+
+    m_pLabelMouseSensivityValue->SetText ( SString("%i%%", fMouseSensivity ).c_str () );
+    return true;
+}
+
 bool CSettings::OnMapAlphaChanged ( CGUIElement* pElement )
 {
     int iAlpha = ( m_pMapAlpha->GetScrollPosition () ) * 100;
@@ -2433,8 +2460,8 @@ bool CSettings::OnMapAlphaChanged ( CGUIElement* pElement )
 
 bool CSettings::OnRadioVolumeChanged ( CGUIElement* pElement)
 {
-    unsigned char ucVolume = m_pAudioRadioVolume->GetScrollPosition () * 64.0f;
-    m_pLabelRadioVolumeValue->SetText ( SString("%i", ucVolume).c_str() );
+    unsigned char ucVolume = m_pAudioRadioVolume->GetScrollPosition () * 100.0f;
+    m_pLabelRadioVolumeValue->SetText ( SString("%i%%", ucVolume).c_str() );
 
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
     gameSettings->SetRadioVolume ( ucVolume );    return true;
@@ -2442,8 +2469,8 @@ bool CSettings::OnRadioVolumeChanged ( CGUIElement* pElement)
 
 bool CSettings::OnSFXVolumeChanged ( CGUIElement* pElement)
 {
-    unsigned char ucVolume = m_pAudioSFXVolume->GetScrollPosition () * 64.0f;
-    m_pLabelSFXVolumeValue->SetText ( SString("%i", ucVolume).c_str() );
+    unsigned char ucVolume = m_pAudioSFXVolume->GetScrollPosition () * 100.0f;
+    m_pLabelSFXVolumeValue->SetText ( SString("%i%%", ucVolume).c_str() );
 
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
     gameSettings->SetSFXVolume ( ucVolume );

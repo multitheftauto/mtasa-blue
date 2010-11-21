@@ -202,6 +202,9 @@ protected:
     CGUICheckBox*       m_pInvertMouse;
     CGUICheckBox*       m_pSteerWithMouse;
     CGUICheckBox*       m_pFlyWithMouse;
+    CGUILabel*          m_pLabelMouseSensivity;
+    CGUIScrollBar*      m_pMouseSensivity;
+    CGUILabel*          m_pLabelMouseSensivityValue;
 
     CGUILabel*          m_pControlsJoypadLabel;
     CGUIScrollPane*     m_pControlsInputTypePane;
@@ -255,6 +258,7 @@ protected:
     bool                OnChatBlueChanged       ( CGUIElement* pElement );
     bool                OnChatAlphaChanged      ( CGUIElement* pElement );
     bool                OnUpdateButtonClick     ( CGUIElement* pElement );
+    bool                OnMouseSensivityChanged ( CGUIElement* pElement );
 
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 
