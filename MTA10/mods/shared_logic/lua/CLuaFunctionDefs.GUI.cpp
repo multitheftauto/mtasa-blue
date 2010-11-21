@@ -15,6 +15,7 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Florian Busse <flobu@gmx.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *****************************************************************************/
 
@@ -93,18 +94,17 @@ int CLuaFunctionDefs::GUIIsDebugViewActive ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIIsMainMenuActive ( lua_State* luaVM )
 {
-    lua_pushboolean ( luaVM, g_pCore->IsSettingsVisible () || g_pCore->IsMenuVisible () );
+    lua_pushboolean ( luaVM, g_pCore->IsMenuVisible () );
     return 1;
 }
 
 
 int CLuaFunctionDefs::GUIIsMTAWindowActive ( lua_State* luaVM )
 {
-    bool bActive = g_pCore->IsChatInputEnabled () ||
-        g_pCore->IsSettingsVisible () ||
+    bool bActive = ( g_pCore->IsChatInputEnabled () ||
         g_pCore->IsMenuVisible () ||
         g_pCore->GetConsole ()->IsVisible () ||
-        g_pClientGame->GetTransferBox ()->IsVisible ();
+        g_pClientGame->GetTransferBox ()->IsVisible () );
 
     lua_pushboolean ( luaVM, bActive );
     return 1;
