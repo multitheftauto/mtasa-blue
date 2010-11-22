@@ -106,8 +106,8 @@ public:
     virtual unsigned int    GetFXQuality            ( void ) = 0;
     virtual void            SetFXQuality            ( unsigned int fxQualityId ) = 0;
 
-    virtual float           GetMouseSensivity       ( void ) = 0;
-    virtual void            SetMouseSensivity       ( float fSensivity ) = 0;
+    virtual float           GetMouseSensitivity     ( void ) = 0;
+    virtual void            SetMouseSensitivity     ( float fSensitivity ) = 0;
 
     virtual void            Save                    ( void ) = 0;
 };

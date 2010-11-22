@@ -26,7 +26,7 @@
 #define VAR_bMouseSteering      0xC1CC02
 #define VAR_bMouseFlying        0xC1CC03
 #define VAR_bFxQuality          0xA9AE54
-#define VAR_fMouseSensivity     0xB6EC1C
+#define VAR_fMouseSensitivity   0xB6EC1C
 
 #define VAR_bUsertrackMode      0xBA67F8
 #define VAR_bUsertrackAutoScan  0xBA680D
@@ -113,8 +113,8 @@ public:
     unsigned int            GetFXQuality                ( void );
     void                    SetFXQuality                ( unsigned int fxQualityId );
 
-    float                   GetMouseSensivity           ( void );
-    void                    SetMouseSensivity           ( float fSensivity );
+    float                   GetMouseSensitivity         ( void );
+    void                    SetMouseSensitivity         ( float fSensitivity );
 
     void                    Save                        ( void );
 
