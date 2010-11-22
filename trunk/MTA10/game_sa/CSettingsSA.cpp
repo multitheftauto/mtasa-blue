@@ -199,15 +199,15 @@ void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
     *(BYTE *)VAR_bFxQuality = fxQualityId;
 }
 
-float CSettingsSA::GetMouseSensivity ( )
+float CSettingsSA::GetMouseSensitivity ( )
 {
     // 0.000312 (min) - 0.005000 (max)
-    return *(FLOAT *)VAR_fMouseSensivity;
+    return *(FLOAT *)VAR_fMouseSensitivity;
 }
 
-void CSettingsSA::SetMouseSensivity ( float fSensivity )
+void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
 {
-    *(FLOAT *)VAR_fMouseSensivity = fSensivity;
+    *(FLOAT *)VAR_fMouseSensitivity = fSensitivity;
 }
 
 void CSettingsSA::Save ()
