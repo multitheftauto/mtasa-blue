@@ -132,19 +132,19 @@ CSettings::CSettings ( void )
     m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Steer with mouse", true ) );
     m_pSteerWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
 
-    m_pLabelMouseSensivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Mouse sensivity:" ) );
-    m_pLabelMouseSensivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
-    m_pLabelMouseSensivity->GetPosition ( vecTemp, false );
-    m_pLabelMouseSensivity->AutoSize ( "Mouse sensivity:" );
+    m_pLabelMouseSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Mouse sensitivity:" ) );
+    m_pLabelMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
+    m_pLabelMouseSensitivity->GetPosition ( vecTemp, false );
+    m_pLabelMouseSensitivity->AutoSize ( "Mouse sensitivity:" );
 
-    m_pMouseSensivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pControlsPane ) );
-    m_pMouseSensivity->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY ) );
-    m_pMouseSensivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pMouseSensivity->SetProperty ( "StepSize", "0.00004688" );
+    m_pMouseSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pControlsPane ) );
+    m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY ) );
+    m_pMouseSensitivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pMouseSensitivity->SetProperty ( "StepSize", "0.00004688" );
 
-    m_pLabelMouseSensivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "0%") );
-    m_pLabelMouseSensivityValue->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY ) );
-    m_pLabelMouseSensivityValue->AutoSize ( "100%" );
+    m_pLabelMouseSensitivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "0%") );
+    m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY ) );
+    m_pLabelMouseSensitivityValue->AutoSize ( "100%" );
 
     m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Fly with mouse", true ) );
     m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
@@ -811,7 +811,7 @@ CSettings::CSettings ( void )
     m_pAudioMTAVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMTAVolumeChanged, this ) );
     m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
-    m_pMouseSensivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensivityChanged, this ) );
+    m_pMouseSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensitivityChanged, this ) );
     /*
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -1820,7 +1820,7 @@ void CSettings::LoadData ( void )
 
     CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
 
-    m_pMouseSensivity->SetScrollPosition ( ( gameSettings->GetMouseSensivity () - 0.000312f ) / 0.004688f );
+    m_pMouseSensitivity->SetScrollPosition ( ( gameSettings->GetMouseSensitivity () - 0.000312f ) / 0.004688f );
 
     // Community
     CVARS_GET ( "community_username", strVar );
@@ -2058,7 +2058,7 @@ void CSettings::SaveData ( void )
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
-    gameSettings->SetMouseSensivity ( ( m_pMouseSensivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
+    gameSettings->SetMouseSensitivity ( ( m_pMouseSensitivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
 
     // Visual FX Quality
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
@@ -2465,11 +2465,11 @@ bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
     return true;
 }
 
-bool CSettings::OnMouseSensivityChanged ( CGUIElement* pElement )
+bool CSettings::OnMouseSensitivityChanged ( CGUIElement* pElement )
 {
-    int iMouseSensivity = ( m_pMouseSensivity->GetScrollPosition () ) * 100;
+    int iMouseSensitivity = ( m_pMouseSensitivity->GetScrollPosition () ) * 100;
 
-    m_pLabelMouseSensivityValue->SetText ( SString("%i%%", iMouseSensivity ).c_str () );
+    m_pLabelMouseSensitivityValue->SetText ( SString("%i%%", iMouseSensitivity ).c_str () );
     return true;
 }
 
@@ -2487,25 +2487,29 @@ bool CSettings::OnRadioVolumeChanged ( CGUIElement* pElement)
     m_pLabelRadioVolumeValue->SetText ( SString("%i%%", ucVolume).c_str() );
 
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
-    gameSettings->SetRadioVolume ( ucVolume );    return true;
+    gameSettings->SetRadioVolume ( m_pAudioRadioVolume->GetScrollPosition () * 64 );
+
+    return true;
 }
 
 bool CSettings::OnSFXVolumeChanged ( CGUIElement* pElement)
 {
     unsigned char ucVolume = m_pAudioSFXVolume->GetScrollPosition () * 100.0f;
-    m_pLabelSFXVolumeValue->SetText ( SString("%i%%", ucVolume).c_str() );
+    m_pLabelSFXVolumeValue->SetText ( SString ( "%i%%", ucVolume ).c_str () );
 
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
-    gameSettings->SetSFXVolume ( ucVolume );
+    gameSettings->SetSFXVolume ( m_pAudioSFXVolume->GetScrollPosition () * 64 );
+
     return true;
 }
 
 bool CSettings::OnMTAVolumeChanged ( CGUIElement* pElement)
 {
     int iVolume = m_pAudioMTAVolume->GetScrollPosition () * 100.0f;
-    m_pLabelMTAVolumeValue->SetText ( SString("%i%%", iVolume).c_str() );
+    m_pLabelMTAVolumeValue->SetText ( SString ( "%i%%", iVolume ).c_str () );
     
     CVARS_SET ( "mtavolume", m_pAudioMTAVolume->GetScrollPosition () );
+
     return true;
 }
 
