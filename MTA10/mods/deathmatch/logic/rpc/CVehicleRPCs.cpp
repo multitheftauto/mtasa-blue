@@ -155,19 +155,19 @@ void CVehicleRPCs::SetVehicleColor ( NetBitStreamInterface& bitStream )
     CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
     if ( pVehicle )
     {
-        unsigned char ucColor1;
-        bitStream.Read ( ucColor1 );
+        CVehicleColor vehColor;
+        uchar ucNumColors = 0;
+        bitStream.ReadBits ( &ucNumColors, 2 );
+        for ( uint i = 0 ; i <= ucNumColors ; i++ )
+        {
+            SColor RGBColor = 0;
+            bitStream.Read ( RGBColor.R );
+            bitStream.Read ( RGBColor.G );
+            bitStream.Read ( RGBColor.B );
+            vehColor.SetRGBColor ( i, RGBColor );
+        }
 
-        unsigned char ucColor2;
-        bitStream.Read ( ucColor2 );
-
-        unsigned char ucColor3;
-        bitStream.Read ( ucColor3 );
-
-        unsigned char ucColor4;
-        bitStream.Read ( ucColor4 );
-
-        pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
+        pVehicle->SetColor ( vehColor );
     }
 }
 

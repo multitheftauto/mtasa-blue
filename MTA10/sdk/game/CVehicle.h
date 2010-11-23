@@ -101,8 +101,8 @@ public:
 
     virtual void                PlaceBikeOnRoadProperly     () = 0;
     virtual void                PlaceAutomobileOnRoadProperly() = 0;
-    virtual void                SetColor                    ( unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4 ) = 0;
-    virtual void                GetColor                    ( unsigned char* color1, unsigned char* color2, unsigned char* color3, unsigned char* color4 ) = 0;
+    virtual void                SetColor                    ( SColor color1, SColor color2, SColor color3, SColor color4, int ) = 0;
+    virtual void                GetColor                    ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, int ) = 0;
     virtual void                Fix                         () = 0;
     virtual bool                IsSirenOrAlarmActive        () = 0;
     virtual void                SetSirenOrAlarmActive       ( bool bActive ) = 0;

@@ -22,6 +22,7 @@ extern CGameSA* pGame;
 CVehicleSA::CVehicleSA ()
     : m_ucAlpha ( 255 ), m_bIsDerailable ( true ), m_vecGravity ( 0.0f, 0.0f, -1.0f ), m_HeadLightColor ( SColorRGBA ( 255, 255, 255, 255 ) )
 {
+    assert ( 0 );   // Never used ?
 }
 
 /**
@@ -52,7 +53,7 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
     }
 
     m_pInterface = reinterpret_cast < CEntitySAInterface* > ( dwReturn );
-
+#if 0
     this->BeingDeleted = FALSE;
 
     m_pInterface->bStreamingDontDelete = true;
@@ -86,12 +87,15 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
     GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargetted = true;
 
     this->internalID = pGame->GetPools ()->GetVehicleRef ( (DWORD *)this->GetVehicleInterface () );
+#else
+    Init ();    // Use common setup
+#endif
 }
 
 CVehicleSA::CVehicleSA ( CVehicleSAInterface * vehicleInterface )
 {
     m_pInterface = vehicleInterface;
-
+#if 0
     m_pInterface->bStreamingDontDelete = true;
     m_pInterface->bDontStream = true;
     this->BeingDeleted = FALSE;
@@ -112,6 +116,54 @@ CVehicleSA::CVehicleSA ( CVehicleSAInterface * vehicleInterface )
 
     m_bIsDerailable = true;
     m_ucAlpha = 255;
+#else
+    Init ();    // Use common setup
+#endif
+}
+
+void CVehicleSA::Init ( void )
+{
+    m_pInterface->bStreamingDontDelete = true;
+    m_pInterface->bDontStream = true;
+    this->BeingDeleted = FALSE;
+
+    // Store our CVehicleSA pointer in the vehicle's time of creation member (as it won't get modified later and as far as I know it isn't used for something important)
+    GetVehicleInterface ()->m_pVehicle = this;
+
+    // Unlock doors as they spawn randomly with locked doors
+    LockDoors ( false );
+
+    // Reset the car countss to 0 so that this vehicle doesn't affect the population vehicles
+    for ( int i = 0; i < 5; i++ )
+    {
+        *(DWORD *)(VARS_CarCounts + i * sizeof(DWORD)) = 0;
+    }
+
+    // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
+    this->damageManager = new CDamageManagerSA( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
+
+    // Replace the handling interface with our own to prevent handlig.cfg cheats and allow custom handling stuff.
+    // We don't use SA's array because we want one handling per vehicle type and also allow custom handlings
+    // per car later.
+    /*CHandlingEntry* pEntry = pGame->GetHandlingManager ()->CreateHandlingData ();
+    //CHandlingEntry* pEntry = pGame->GetHandlingManager ()->GetHandlingData ( dwModelID );
+    pEntry->ApplyHandlingData ( pGame->GetHandlingManager ()->GetHandlingData ( dwModelID ) );  // We need to do that so vehicle handling wont get corrupted
+    SetHandlingData ( pEntry );
+    pEntry->Recalculate ();*/
+
+    GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargetted = true;
+
+    this->internalID = pGame->GetPools ()->GetVehicleRef ( (DWORD *)this->GetVehicleInterface () );
+
+    m_bIsDerailable = true;
+    m_ucAlpha = 255;
+    m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
+    m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
+
+    m_RGBColors[0] = CVehicleColor::GetRGBFromPaletteIndex ( ((CVehicleSAInterface *)(this->GetInterface()))->m_colour1 );
+    m_RGBColors[1] = CVehicleColor::GetRGBFromPaletteIndex ( ((CVehicleSAInterface *)(this->GetInterface()))->m_colour2 );
+    m_RGBColors[2] = CVehicleColor::GetRGBFromPaletteIndex ( ((CVehicleSAInterface *)(this->GetInterface()))->m_colour3 );
+    m_RGBColors[3] = CVehicleColor::GetRGBFromPaletteIndex ( ((CVehicleSAInterface *)(this->GetInterface()))->m_colour4 );
 }
 
 // DESTRUCTOR
@@ -878,20 +930,20 @@ void CVehicleSA::PlaceAutomobileOnRoadProperly()
     }
 }
 
-void CVehicleSA::SetColor ( unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4 )
+void CVehicleSA::SetColor ( SColor color1, SColor color2, SColor color3, SColor color4, int )
 {
-    ((CVehicleSAInterface *)(this->GetInterface()))->m_colour1 = color1;
-    ((CVehicleSAInterface *)(this->GetInterface()))->m_colour2 = color2;
-    ((CVehicleSAInterface *)(this->GetInterface()))->m_colour3 = color3;
-    ((CVehicleSAInterface *)(this->GetInterface()))->m_colour3 = color4;
+    m_RGBColors[0] = color1;
+    m_RGBColors[1] = color2;
+    m_RGBColors[2] = color3;
+    m_RGBColors[3] = color4;
 }
 
-void CVehicleSA::GetColor ( unsigned char* color1, unsigned char* color2, unsigned char* color3, unsigned char* color4 )
+void CVehicleSA::GetColor ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, int )
 {
-    *color1 = ((CVehicleSAInterface *)(this->GetInterface()))->m_colour1;
-    *color2 = ((CVehicleSAInterface *)(this->GetInterface()))->m_colour2;
-    *color3 = ((CVehicleSAInterface *)(this->GetInterface()))->m_colour3;
-    *color4 = ((CVehicleSAInterface *)(this->GetInterface()))->m_colour4;
+    *color1 = m_RGBColors[0];
+    *color2 = m_RGBColors[1];
+    *color3 = m_RGBColors[2];
+    *color4 = m_RGBColors[3];
 }
 
 // works with firetrucks & tanks

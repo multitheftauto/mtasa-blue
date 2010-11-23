@@ -219,6 +219,12 @@ DWORD RETURN_CrashFix_Misc12b =                              0x4D4222;
 DWORD RETURN_CrashFix_Misc13a =                              0x4D4654;
 DWORD RETURN_CrashFix_Misc13b =                              0x4D4764;
 
+#define HOOKPOS_VehColCB                              0x04C838D
+DWORD RETURN_VehColCB =                              0x04C83AA;
+
+#define HOOKPOS_VehCol                              0x06D6603
+DWORD RETURN_VehCol =                              0x06D660C;
+
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -349,6 +355,8 @@ void HOOK_CrashFix_Misc10 ();
 void HOOK_CrashFix_Misc11 ();
 void HOOK_CrashFix_Misc12 ();
 void HOOK_CrashFix_Misc13 ();
+void HOOK_VehColCB ();
+void HOOK_VehCol ();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
@@ -478,6 +486,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc11, (DWORD)HOOK_CrashFix_Misc11, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
+    HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
+    HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -4732,5 +4742,63 @@ void _declspec(naked) HOOK_CrashFix_Misc13 ()
         jmp     RETURN_CrashFix_Misc13a  // 4D4654
     cont:
         jmp     RETURN_CrashFix_Misc13b  // 4D478c
+    }
+}
+
+
+static SColor vehColors[4];
+
+void _cdecl SaveVehColors ( DWORD dwThis )
+{
+    CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwThis );
+    if ( pVehicle )
+    {
+        pVehicle->GetColor ( &vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], 0 );
+    }
+}
+
+
+void _declspec(naked) HOOK_VehCol ()
+{
+    _asm
+    {
+        // Get vehColors for this vehicle
+        pushad
+        push esi
+        call SaveVehColors
+        add esp, 4
+        popad
+
+        // Hooked from 006D6603  9 bytes
+        mov         dl, 3
+        mov         al, 2
+        mov         cl, 1
+        push        edx  
+        xor         edx,edx 
+        mov         dl,byte ptr [esi+434h] 
+        mov         dl, 0
+
+        jmp     RETURN_VehCol  // 006D660C
+    }
+}
+
+
+void _declspec(naked) HOOK_VehColCB ()
+{
+    _asm
+    {
+        // Hooked from 004C838D  29 bytes
+
+        // Apply vehColors for this vehicle
+        mov         cl,byte ptr [esi*4+vehColors.R] 
+        mov         byte ptr [eax+4],cl
+
+        mov         cl,byte ptr [esi*4+vehColors.G] 
+        mov         byte ptr [eax+5],cl
+
+        mov         cl,byte ptr [esi*4+vehColors.B] 
+        mov         byte ptr [eax+6],cl
+
+        jmp     RETURN_VehColCB  // 004C83AA
     }
 }

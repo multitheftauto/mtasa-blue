@@ -2247,14 +2247,14 @@ bool CStaticFunctionDefinitions::GetVehicleCurrentGear ( CClientVehicle& Vehicle
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleColor ( CClientEntity& Entity, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+bool CStaticFunctionDefinitions::SetVehicleColor ( CClientEntity& Entity, const CVehicleColor& color )
 {
-    RUN_CHILDREN SetVehicleColor ( **iter, ucRed, ucGreen, ucBlue, ucAlpha );
+    RUN_CHILDREN SetVehicleColor ( **iter, color );
 
     if ( IS_VEHICLE ( &Entity ) )
     {
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-        Vehicle.SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        Vehicle.SetColor ( color );
 
         return true;
     }

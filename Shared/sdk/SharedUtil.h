@@ -40,3 +40,4 @@ typedef unsigned char   uint8;
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.File.h"
 #include "SharedUtil.Time.h"
+#include "SharedUtil.Game.h"

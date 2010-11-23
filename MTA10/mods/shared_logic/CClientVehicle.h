@@ -157,8 +157,8 @@ public:
     void                        Blow                    ( bool bAllowMovement = false );
     inline bool                 IsVehicleBlown          ( void ) { return m_bBlown; };
 
-    void                        GetColor                ( unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 );
-    void                        SetColor                ( unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4 );
+    CVehicleColor&              GetColor                ( void );
+    void                        SetColor                ( const CVehicleColor& color );
 
     void                        GetTurretRotation       ( float& fHorizontal, float& fVertical );
     void                        SetTurretRotation       ( float fHorizontal, float fVertical );
@@ -456,10 +456,7 @@ protected:
     bool                        m_bJustBlewUp;
     eEntityStatus               m_NormalStatus;
     bool                        m_bColorSaved;
-    unsigned char               m_ucColor1;
-    unsigned char               m_ucColor2;
-    unsigned char               m_ucColor3;
-    unsigned char               m_ucColor4;
+    CVehicleColor               m_Color;
     bool                        m_bIsFrozen;
     bool                        m_bScriptFrozen;
     bool                        m_bFrozenWaitingForGroundToLoad;

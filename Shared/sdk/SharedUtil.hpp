@@ -18,3 +18,4 @@
 #include "SharedUtil.Misc.hpp"
 #include "SharedUtil.File.hpp"
 #include "SharedUtil.Time.hpp"
+#include "SharedUtil.Game.hpp"

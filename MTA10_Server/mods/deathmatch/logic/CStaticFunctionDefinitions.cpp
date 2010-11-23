@@ -3808,19 +3808,12 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle ( CResource* pResource, unsi
     return NULL;
 }
 
-
-bool CStaticFunctionDefinitions::GetVehicleColor ( CVehicle* pVehicle, unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 )
+bool CStaticFunctionDefinitions::GetVehicleColor ( CVehicle* pVehicle, CVehicleColor& color )
 {
     assert ( pVehicle );
-
-    const CVehicleColor& Color = pVehicle->GetColor ();
-    ucColor1 = Color.GetColor1 ();
-    ucColor2 = Color.GetColor2 ();
-    ucColor3 = Color.GetColor3 ();
-    ucColor4 = Color.GetColor4 ();
+    color = pVehicle->GetColor ();
     return true;
 }
-
 
 bool CStaticFunctionDefinitions::GetVehicleModelFromName ( const char* szName, unsigned short& usID )
 {
@@ -4205,19 +4198,29 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle,
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleColor ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+bool CStaticFunctionDefinitions::SetVehicleColor ( CElement* pElement, const CVehicleColor& color )
 {
     assert ( pElement );
-    RUN_CHILDREN SetVehicleColor ( *iter, ucRed, ucGreen, ucBlue, ucAlpha );
+    RUN_CHILDREN SetVehicleColor ( *iter, color );
 
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-        pVehicle->SetColor ( CVehicleColor ( ucRed, ucGreen, ucBlue, ucAlpha ) );
+        pVehicle->SetColor ( color );
 
         CBitStream BitStream;
         BitStream.pBitStream->Write ( pVehicle->GetID () );
-        BitStream.pBitStream->Write ( pVehicle->GetColor ().GetColor () );
+
+        CVehicleColor& vehColor = pVehicle->GetColor ();
+        uchar ucNumColors = vehColor.GetNumColorsUsed () - 1;
+        BitStream.pBitStream->WriteBits ( &ucNumColors, 2 );
+        for ( uint i = 0 ; i <= ucNumColors ; i++ )
+        {
+            SColor RGBColor = vehColor.GetRGBColor ( i );
+            BitStream.pBitStream->Write ( RGBColor.R );
+            BitStream.pBitStream->Write ( RGBColor.G );
+            BitStream.pBitStream->Write ( RGBColor.B );
+        }
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_COLOR, *BitStream.pBitStream ) );
     }
 

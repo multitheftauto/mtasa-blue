@@ -735,32 +735,24 @@ void CClientVehicle::Blow ( bool bAllowMovement )
 }
 
 
-void CClientVehicle::GetColor ( unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 )
+CVehicleColor& CClientVehicle::GetColor ( void )
 {
     if ( m_pVehicle )
     {
-        m_pVehicle->GetColor ( &ucColor1, &ucColor2, &ucColor3, &ucColor4 );
+        SColor colors[4];
+        m_pVehicle->GetColor ( &colors[0], &colors[1], &colors[2], &colors[3], 0 );
+        m_Color.SetRGBColors ( colors[0], colors[1], colors[2], colors[3] );
     }
-    else
-    {
-        ucColor1 = m_ucColor1;
-        ucColor2 = m_ucColor2;
-        ucColor3 = m_ucColor3;
-        ucColor4 = m_ucColor4;
-    }
+    return m_Color;
 }
 
-
-void CClientVehicle::SetColor ( unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4 )
+void CClientVehicle::SetColor ( const CVehicleColor& color )
 {
+    m_Color = color;
     if ( m_pVehicle )
     {
-        m_pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
+        m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
     }
-    m_ucColor1 = ucColor1;
-    m_ucColor2 = ucColor2;
-    m_ucColor3 = ucColor3;
-    m_ucColor4 = ucColor4;
     m_bColorSaved = true;
 }
 
@@ -2125,7 +2117,7 @@ void CClientVehicle::Create ( void )
         // Restore the color
         if ( m_bColorSaved )
         {
-            m_pVehicle->SetColor ( m_ucColor1, m_ucColor2, m_ucColor3, m_ucColor4 );
+            m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
         }
 
         // Link us with stored next and previous vehicles

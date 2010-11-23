@@ -293,11 +293,17 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     health.data.fValue = pVehicle->GetHealth ();
                     BitStream.Write ( &health );
 
-                    // Color as 4 unsigned chars
-                    BitStream.Write ( pVehicle->GetColor ().GetColor1 () );
-                    BitStream.Write ( pVehicle->GetColor ().GetColor2 () );
-                    BitStream.Write ( pVehicle->GetColor ().GetColor3 () );
-                    BitStream.Write ( pVehicle->GetColor ().GetColor4 () );
+                    // Color
+                    CVehicleColor& vehColor = pVehicle->GetColor ();
+                    uchar ucNumColors = vehColor.GetNumColorsUsed () - 1;
+                    BitStream.WriteBits ( &ucNumColors, 2 );
+                    for ( uint i = 0 ; i <= ucNumColors ; i++ )
+                    {
+                        SColor RGBColor = vehColor.GetRGBColor ( i );
+                        BitStream.Write ( RGBColor.R );
+                        BitStream.Write ( RGBColor.G );
+                        BitStream.Write ( RGBColor.B );
+                    }
 
                     // Paintjob
                     SPaintjobSync paintjob;

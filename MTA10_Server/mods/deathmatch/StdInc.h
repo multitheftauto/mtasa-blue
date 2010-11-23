@@ -223,7 +223,6 @@
 #include "CTextItem.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CVehicle.h"
-#include "CVehicleColor.h"
 #include "CVehicleColorManager.h"
 #include "CVehicleDefaultColors.h"
 #include "CVehicleManager.h"
