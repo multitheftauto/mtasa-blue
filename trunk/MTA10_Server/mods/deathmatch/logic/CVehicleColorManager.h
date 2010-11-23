@@ -14,7 +14,6 @@
 #ifndef __CVEHICLECOLORMANAGER_H
 #define __CVEHICLECOLORMANAGER_H
 
-#include "CVehicleColor.h"
 #include <list>
 
 class CVehicleColors

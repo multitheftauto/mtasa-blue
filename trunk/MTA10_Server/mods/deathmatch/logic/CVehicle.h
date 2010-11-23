@@ -20,7 +20,6 @@ class CVehicle;
 #include "packets/CPacket.h"
 #include "CElement.h"
 #include "CEvents.h"
-#include "CVehicleColor.h"
 #include "CVehicleUpgrades.h"
 
 #define MAX_VEHICLE_SEATS 9
@@ -134,7 +133,7 @@ public:
 
     eVehicleType                    GetVehicleType          ( void )                        { return m_eVehicleType; };
 
-    inline const CVehicleColor&     GetColor                ( void )                        { return m_Color; };
+    inline CVehicleColor&           GetColor                ( void )                        { return m_Color; };
     inline void                     SetColor                ( const CVehicleColor& Color )  { m_Color = Color; };
 
     inline bool                     IsFrozen                ( void )                        { return m_bIsFrozen; };

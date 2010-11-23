@@ -37,7 +37,7 @@ CVehicleColor CVehicleColors::GetRandomColor ( void )
     }
 
     // No items, return default color (black)
-    return CVehicleColor ( 0, 0, 0, 0 );
+    return CVehicleColor ();
 }
 
 bool CVehicleColorManager::Load ( const char* szFilename )
@@ -97,7 +97,9 @@ bool CVehicleColorManager::Load ( const char* szFilename )
                     }
 
                     // Add it to the list
-                    AddColor ( usModel, CVehicleColor ( ucColor1, ucColor2, ucColor3, ucColor4 ) );
+                    CVehicleColor color;
+                    color.SetPaletteColors ( ucColor1, ucColor2, ucColor3, ucColor4 );
+                    AddColor ( usModel, color );
                 }
             }
         }
@@ -158,6 +160,6 @@ CVehicleColor CVehicleColorManager::GetRandomColor ( unsigned short usModel )
     }
     else
     {
-        return CVehicleColor ( 0, 0, 0, 0 );
+        return CVehicleColor ();
     }
 }

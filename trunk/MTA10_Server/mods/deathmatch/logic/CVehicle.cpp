@@ -246,18 +246,31 @@ bool CVehicle::ReadSpecialData ( void )
     char szTemp [ 256 ];
     if ( GetCustomDataString ( "color", szTemp, 256, true ) )
     {
-        char* sz1 = strtok ( szTemp, "," );
-        char* sz2 = strtok ( NULL, "," );
-        char* sz3 = strtok ( NULL, "," );
-        char* sz4 = strtok ( NULL, "," );
+        uchar ucValues[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        char* sz1 = strtok ( szTemp, ", " );
         if ( sz1 )
-            m_Color.SetColor1 ( atoi ( sz1 ) );
-        if ( sz2 )
-            m_Color.SetColor2 ( atoi ( sz2 ) );
-        if ( sz3 )
-            m_Color.SetColor3 ( atoi ( sz3 ) );
-        if ( sz4 )
-            m_Color.SetColor4 ( atoi ( sz4 ) );
+            ucValues[0] = atoi ( sz1 );
+
+        int i;
+        for ( i = 1 ; i < 12 ; i++ )
+        {
+            char* szn =  strtok ( NULL, ", " );
+            if ( !szn )
+                break;
+            ucValues[i] = atoi ( szn );
+        }
+
+        if ( i == 3 || i == 6 || i == 9 || i == 12 )
+        {
+            m_Color.SetRGBColors (  SColorRGBA ( ucValues[0], ucValues[1], ucValues[2], 0 ),
+                                    SColorRGBA ( ucValues[3], ucValues[4], ucValues[5], 0 ),
+                                    SColorRGBA ( ucValues[6], ucValues[7], ucValues[8], 0 ),
+                                    SColorRGBA ( ucValues[9], ucValues[10], ucValues[11], 0 ) );
+        }
+        else
+        {
+            m_Color.SetPaletteColors ( ucValues[0], ucValues[1], ucValues[2], ucValues[3] );
+        }
     }            
 
     if ( GetCustomDataInt ( "paintjob", iTemp, true ) )
@@ -274,7 +287,7 @@ bool CVehicle::ReadSpecialData ( void )
             else
             {
                 bool bTemp = true;
-                while ( char* token = strtok ( ( bTemp ) ? szTemp : NULL, "," ) )
+                while ( char* token = strtok ( ( bTemp ) ? szTemp : NULL, ", " ) )
                 {
                     bTemp = false;
                     unsigned short usUpgrade = static_cast < unsigned short > ( atoi ( token ) );

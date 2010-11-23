@@ -503,12 +503,14 @@ private:
     CVector                     m_vecGravity;
     SColor                      m_HeadLightColor;
     RwObject                    m_WheelObjects[4];
+    SColor                      m_RGBColors[4];
 
 public:
                                 CVehicleSA                      ();
                                 CVehicleSA                      ( CVehicleSAInterface * vehicleInterface );
                                 CVehicleSA                      ( eVehicleTypes dwModelID );
                                 ~CVehicleSA                     ();
+    void                        Init                            ( void );
 
     // Override of CPhysicalSA::SetMoveSpeed to take trains into account
     VOID                        SetMoveSpeed                    ( CVector* vecMoveSpeed );
@@ -577,8 +579,8 @@ public:
 
     void                        PlaceBikeOnRoadProperly         ();
     void                        PlaceAutomobileOnRoadProperly   ();
-    void                        SetColor                        ( unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4 );
-    void                        GetColor                        ( unsigned char* color1, unsigned char* color2, unsigned char* color3, unsigned char* color4 );
+    void                        SetColor                        ( SColor color1, SColor color2, SColor color3, SColor color4, int );
+    void                        GetColor                        ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, int );
     bool                        IsSirenOrAlarmActive            ();
     void                        SetSirenOrAlarmActive           ( bool bActive );
     inline void                 SetAlpha                        ( unsigned char ucAlpha ) { m_ucAlpha = ucAlpha; }

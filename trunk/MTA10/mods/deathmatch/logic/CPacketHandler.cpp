@@ -1282,20 +1282,20 @@ void CPacketHandler::Packet_VehicleSpawn ( NetBitStreamInterface& bitStream )
         pVehicle->SetTurnSpeed ( CVector ( 0.0f, 0.0f, 0.0f ) );
 
         // Read out the color
-        unsigned char ucColor1 = 0;
-        bitStream.Read ( ucColor1 );
-
-        unsigned char ucColor2 = 0;
-        bitStream.Read ( ucColor2 );
-
-        unsigned char ucColor3 = 0;
-        bitStream.Read ( ucColor3 );
-
-        unsigned char ucColor4 = 0;
-        bitStream.Read ( ucColor4 );
+        CVehicleColor vehColor;
+        uchar ucNumColors = 0;
+        bitStream.ReadBits ( &ucNumColors, 2 );
+        for ( uint i = 0 ; i <= ucNumColors ; i++ )
+        {
+            SColor RGBColor = 0;
+            bitStream.Read ( RGBColor.R );
+            bitStream.Read ( RGBColor.G );
+            bitStream.Read ( RGBColor.B );
+            vehColor.SetRGBColor ( i, RGBColor );
+        }
 
         // Set the color
-        pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
+        pVehicle->SetColor ( vehColor );
 
         // Fix its damage and reset things such as landing gears
         pVehicle->Fix ();
@@ -2451,20 +2451,27 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
 
                     // Read out the color
-                    unsigned char ucColor1;
-                    unsigned char ucColor2;
-                    unsigned char ucColor3;
-                    unsigned char ucColor4;
-                    SPaintjobSync paintjob;
-                    if ( !bitStream.Read ( ucColor1 ) ||
-                         !bitStream.Read ( ucColor2 ) ||
-                         !bitStream.Read ( ucColor3 ) ||
-                         !bitStream.Read ( ucColor4 ) ||
-                         !bitStream.Read ( &paintjob ) )
+                    CVehicleColor vehColor;
+                    uchar ucNumColors = 0;
+                    if ( !bitStream.ReadBits ( &ucNumColors, 2 ) )
+                        return RaiseProtocolError ( 41 );
+
+                    for ( uint i = 0 ; i <= ucNumColors ; i++ )
                     {
-                        RaiseProtocolError ( 41 );
-                        return;
+                        SColor RGBColor = 0;
+                        if ( !bitStream.Read ( RGBColor.R ) ||
+                             !bitStream.Read ( RGBColor.G ) ||
+                             !bitStream.Read ( RGBColor.B ) )
+                        {
+                            return RaiseProtocolError ( 41 );
+                        }
+                        vehColor.SetRGBColor ( i, RGBColor );
                     }
+
+                    // Read out the paintjob
+                    SPaintjobSync paintjob;
+                    if ( !bitStream.Read ( &paintjob ) )
+                        return RaiseProtocolError ( 41 );
 
                     // Read out the vehicle damage sync model
                     SVehicleDamageSync damage ( true, true, true, true, false );
@@ -2487,7 +2494,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // Set the health, color and paintjob
                     pVehicle->SetHealth ( health.data.fValue );
                     pVehicle->SetPaintjob ( paintjob.data.ucPaintjob );
-                    pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
+                    pVehicle->SetColor ( vehColor );
 
                     // Setup our damage model
                     for ( int i = 0 ; i < MAX_DOORS ; i++ ) pVehicle->SetDoorStatus ( i, damage.data.ucDoorStates [ i ] );

@@ -217,7 +217,7 @@ public:
     static CVehicle*            CreateVehicle                       ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, char* szRegPlate = NULL, bool bDirection = false );
 
     // Vehicle get functions
-    static bool                 GetVehicleColor                     ( CVehicle* pVehicle, unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 );
+    static bool                 GetVehicleColor                     ( CVehicle* pVehicle, CVehicleColor& color );
     static bool                 GetVehicleModelFromName             ( const char* szName, unsigned short& usID );
     static bool                 GetVehicleMaxPassengers             ( CVehicle* pVehicle, unsigned char& ucMaxPassengers );
     static bool                 GetVehicleName                      ( CVehicle* pVehicle, char* szName );
@@ -255,7 +255,7 @@ public:
     // Vehicle set functions
     static bool                 FixVehicle                          ( CElement* pElement );
     static bool                 BlowVehicle                         ( CElement* pElement, bool bExplode );
-    static bool                 SetVehicleColor                     ( CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    static bool                 SetVehicleColor                     ( CElement* pElement, const CVehicleColor& color );
     static bool                 SetVehicleLandingGearDown           ( CElement* pElement, bool bLandingGearDown );
     static bool                 SetVehicleLocked                    ( CElement* pElement, bool bLocked );
     static bool                 SetVehicleDoorsUndamageable         ( CElement* pElement, bool bDoorsUndamageable );

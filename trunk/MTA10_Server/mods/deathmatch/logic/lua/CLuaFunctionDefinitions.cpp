@@ -3392,21 +3392,35 @@ int CLuaFunctionDefinitions::GetVehicleColor ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
+        bool bRGB = false;
+        if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+            bRGB = lua_toboolean ( luaVM, 2 ) ? true : false;
+
         CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            unsigned char ucColor1;
-            unsigned char ucColor2;
-            unsigned char ucColor3;
-            unsigned char ucColor4;
-
-            if ( CStaticFunctionDefinitions::GetVehicleColor ( pVehicle, ucColor1, ucColor2, ucColor3, ucColor4 ) )
+            CVehicleColor color;
+            if ( CStaticFunctionDefinitions::GetVehicleColor ( pVehicle, color ) )
             {
-                lua_pushnumber ( luaVM, ucColor1 );
-                lua_pushnumber ( luaVM, ucColor2 );
-                lua_pushnumber ( luaVM, ucColor3 );
-                lua_pushnumber ( luaVM, ucColor4 );
-                return 4;
+                if ( bRGB )
+                {
+                    for ( uint i = 0 ; i < 4 ; i++ )
+                    {
+                        SColor RGBColor = color.GetRGBColor ( i );
+                        lua_pushnumber ( luaVM, RGBColor.R );
+                        lua_pushnumber ( luaVM, RGBColor.G );
+                        lua_pushnumber ( luaVM, RGBColor.B );
+                    }
+                    return 12;
+                }
+                else
+                {
+                    lua_pushnumber ( luaVM, color.GetPaletteColor ( 0 ) );
+                    lua_pushnumber ( luaVM, color.GetPaletteColor ( 1 ) );
+                    lua_pushnumber ( luaVM, color.GetPaletteColor ( 2 ) );
+                    lua_pushnumber ( luaVM, color.GetPaletteColor ( 3 ) );
+                    return 4;
+                }
             }
         }
         else
@@ -4697,34 +4711,46 @@ int CLuaFunctionDefinitions::SetVehicleTurnVelocity ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetVehicleColor ( lua_State* luaVM )
 {
-    int iArgumentType2 = lua_type ( luaVM, 2 );
-    int iArgumentType3 = lua_type ( luaVM, 3 );
-    int iArgumentType4 = lua_type ( luaVM, 4 );
-    int iArgumentType5 = lua_type ( luaVM, 5 );
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-         ( iArgumentType2 == LUA_TNUMBER || iArgumentType2 == LUA_TSTRING ) &&
-         ( iArgumentType3 == LUA_TNUMBER || iArgumentType3 == LUA_TSTRING ) &&
-         ( iArgumentType4 == LUA_TNUMBER || iArgumentType4 == LUA_TSTRING ) &&
-         ( iArgumentType5 == LUA_TNUMBER || iArgumentType5 == LUA_TSTRING ) )
+    // Count up number of args after the first one
+    uchar ucParams[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    int i;
+    for ( i = 0 ; i < 12 ; i++ )
+    {
+        int iArgumentType = lua_type ( luaVM, i + 2 );
+        if ( iArgumentType == LUA_TNUMBER || iArgumentType == LUA_TSTRING )
+        {
+            ucParams[i] = static_cast < unsigned char > ( Clamp ( 0.0, lua_tonumber ( luaVM, i + 2 ), 255.0 ) );
+        }
+        else
+            break;
+    }
+
+    if  ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+          ( i == 3 || i == 4 || i == 6 || i == 9 || i == 12 ) )
     {
         CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
         {
-            double dColor1 = lua_tonumber ( luaVM, 2 );
-            double dColor2 = lua_tonumber ( luaVM, 3 );
-            double dColor3 = lua_tonumber ( luaVM, 4 );
-            double dColor4 = lua_tonumber ( luaVM, 5 );
+            CVehicleColor color;
 
-            if ( dColor1 >= 0 && dColor1 <= 255 &&
-                 dColor2 >= 0 && dColor2 <= 255 &&
-                 dColor3 >= 0 && dColor3 <= 255 &&
-                 dColor4 >= 0 && dColor4 <= 255 )
+            if ( i == 4 )
             {
-                if ( CStaticFunctionDefinitions::SetVehicleColor ( pElement, static_cast < unsigned char > ( dColor1 ), static_cast < unsigned char > ( dColor2 ), static_cast < unsigned char > ( dColor3 ), static_cast < unsigned char > ( dColor4 ) ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                // 4 args mean palette colours
+                color.SetPaletteColors ( ucParams[0], ucParams[1], ucParams[2], ucParams[3] );
+            }
+            else
+            {
+                // 3,6,9 or 12 args mean rgb colours
+                color.SetRGBColors ( SColorRGBA ( ucParams[0], ucParams[1], ucParams[2], 0 ),
+                                     SColorRGBA ( ucParams[3], ucParams[4], ucParams[5], 0 ),
+                                     SColorRGBA ( ucParams[6], ucParams[7], ucParams[8], 0 ),
+                                     SColorRGBA ( ucParams[9], ucParams[10], ucParams[11], 0 ) );
+            }
+
+            if ( CStaticFunctionDefinitions::SetVehicleColor ( pElement, color ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
         }
         else

@@ -786,10 +786,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CVehicleColor.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CVehicleColorManager.cpp"
 					>
 				</File>
@@ -1820,10 +1816,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CVehicle.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CVehicleColor.h"
 					>
 				</File>
 				<File

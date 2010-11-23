@@ -182,7 +182,7 @@ public:
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );
     static bool                         BlowVehicle                         ( CClientEntity& Entity, bool bExplode );
-    static bool                         SetVehicleColor                     ( CClientEntity& Entity, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    static bool                         SetVehicleColor                     ( CClientEntity& Entity, const CVehicleColor& color );
     static bool                         SetVehicleLandingGearDown           ( CClientEntity& Entity, bool bLandingGearDown );
     static bool                         SetVehicleLocked                    ( CClientEntity& Entity, bool bLocked );
     static bool                         SetVehicleDoorsUndamageable         ( CClientEntity& Entity, bool bDoorsUndamageable );
