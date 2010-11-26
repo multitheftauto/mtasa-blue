@@ -2478,6 +2478,9 @@ void CClientGame::AddBuiltInEvents ( void )
     // Chat events
     m_Events.AddEvent ( "onClientChatMessage", "test, r, g, b", NULL, false );
 
+    // Debug events
+    m_Events.AddEvent ( "onClientDebugMessage", "message, level, file, line", NULL, false );
+
     // Game events
     m_Events.AddEvent ( "onClientPreRender", "", NULL, false );
     m_Events.AddEvent ( "onClientRender", "", NULL, false );

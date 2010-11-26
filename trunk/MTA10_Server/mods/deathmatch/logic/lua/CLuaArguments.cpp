@@ -205,8 +205,21 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
     int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
-        std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
-        g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
+        SString strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
+        
+        vector <SString> vecSplit;
+        strRes.Split ( ":", vecSplit );
+        
+        if ( vecSplit.size ( ) >= 3 )
+        {
+            SString strFile = vecSplit[0];
+            int     iLine   = atoi ( vecSplit[1].c_str ( ) );
+            SString strMsg  = vecSplit[2].substr ( 1 );
+            
+            g_pGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
+        }
+        else
+            g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
 
         // cleanup the stack
         while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
