@@ -127,7 +127,7 @@ void CScriptDebugging::LogInformation ( lua_State* luaVM, const char* szFormat, 
     va_end ( marker );
 
     // Log it
-    LogString ( "INFO: ", NULL, szBuffer, 3 );
+    LogString ( "INFO: ", luaVM, szBuffer, 3 );
 }
 
 
@@ -160,6 +160,61 @@ void CScriptDebugging::LogError ( lua_State* luaVM, const char* szFormat, ... )
 
     // Log it
     LogString ( "ERROR: ", luaVM, szBuffer, 1 );
+}
+
+void CScriptDebugging::LogError ( SString strFile, int iLine, SString strMsg )
+{
+    SString strText = SString ( "ERROR: %s:%d: %s", strFile.c_str (), iLine, strMsg.c_str () );
+
+    // Prepare onDebugMessage
+    CLuaArguments Arguments;
+    Arguments.PushString ( strMsg.c_str ( ) );
+    Arguments.PushNumber ( 1 );
+
+    // Push the file name (if any)
+    if ( strFile.length ( ) > 0 )
+        Arguments.PushString ( strFile.c_str ( ) );
+    else
+        Arguments.PushNil ( );
+
+    // Push the line (if any)
+    if ( iLine > -1 )
+        Arguments.PushNumber ( iLine );
+    else
+        Arguments.PushNil ( );
+    
+    // Call onDebugMessage
+    g_pGame->GetMapManager ( )->GetRootElement ( )->CallEvent ( "onDebugMessage", Arguments );
+
+    // Log it to the file if enough level
+    if ( m_uiLogFileLevel >= 1 )
+    {
+        PrintLog ( strText );
+    }
+
+    // Log to console
+    CLogger::LogPrintf( "%s\n", strText.c_str () );
+
+/*    if ( m_uiHtmlLogLevel >= uiMinimumDebugLevel )
+    {
+        if ( luaVM )
+        {
+            CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
+            if ( pLuaMain )
+            {
+                CResourceFile * file = pLuaMain->GetResourceFile();
+                if ( file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML )
+                {
+                    CResourceHTMLItem * html = (CResourceHTMLItem *)file;
+                    html->AppendToPageBuffer ( strText );
+                    html->AppendToPageBuffer ( "<br/>" );
+                }
+            }
+        }
+    }*/
+
+    // Tell the players
+    Broadcast ( CDebugEchoPacket ( strText, 1, 255, 255, 255 ), 1 );
 }
 
 void CScriptDebugging::LogBadPointer ( lua_State* luaVM, const char* szFunction, const char* szArgumentType, unsigned int uiArgument )
@@ -218,9 +273,14 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
 
 void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, const char* szMessage, unsigned int uiMinimumDebugLevel, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
 {
-    // Add file/line number if required
     SString strText;
     lua_Debug debugInfo;
+
+    // Initialize values for onDebugMessage
+    SString strMsg  = szMessage;
+    SString strFile = "";
+    int     iLine   = -1;
+
     if ( luaVM && lua_getstack ( luaVM, 1, &debugInfo ) )
     {
         lua_getinfo ( luaVM, "nlS", &debugInfo );
@@ -228,21 +288,50 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, con
         // Make sure this function isn't defined in a string (eg: from runcode)
         if ( debugInfo.source[0] == '@' )
         {
-            std::string strFilename = ConformResourcePath ( debugInfo.source );
+            // Get and store the location of the debug message
+            strFile = ConformResourcePath ( debugInfo.source );
+            iLine   = debugInfo.currentline;
 
-            // Populate a message to print/send
-            strText = SString ( "%s%s:%d: %s", szPrePend, strFilename.c_str (), debugInfo.currentline, szMessage );
+            // Populate a message to print/send (unless "info" type)
+            if ( uiMinimumDebugLevel < 3 )
+                strText = SString ( "%s%s:%d: %s", szPrePend, strFile.c_str (), debugInfo.currentline, szMessage );
         }
         else
         {
-            strText = SString ( "%s%s %s", szPrePend, szMessage, debugInfo.short_src );
-       }
+            strFile = debugInfo.short_src;
+
+            if ( uiMinimumDebugLevel < 3 )
+                strText = SString ( "%s%s %s", szPrePend, szMessage, strFile );
+        }
     }
     else
     {
         strText = SString ( "%s%s", szPrePend, szMessage );
     }
 
+    // Create a different message if type is "INFO"
+    if ( uiMinimumDebugLevel > 2 )
+        strText = SString ( "%s%s", szPrePend, szMessage );
+
+    // Prepare onDebugMessage
+    CLuaArguments Arguments;
+    Arguments.PushString ( strMsg.c_str ( ) );
+    Arguments.PushNumber ( uiMinimumDebugLevel );
+
+    // Push the file name (if any)
+    if ( strFile.length ( ) > 0 )
+        Arguments.PushString ( strFile.c_str ( ) );
+    else
+        Arguments.PushNil ( );
+
+    // Push the line (if any)
+    if ( iLine > -1 )
+        Arguments.PushNumber ( iLine );
+    else
+        Arguments.PushNil ( );
+    
+    // Call onDebugMessage
+    g_pGame->GetMapManager ( )->GetRootElement ( )->CallEvent ( "onDebugMessage", Arguments );
 
     // Log it to the file if enough level
     if ( m_uiLogFileLevel >= uiMinimumDebugLevel )

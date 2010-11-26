@@ -1233,6 +1233,9 @@ void CGame::AddBuiltInEvents ( void )
     // Console events
     m_Events.AddEvent ( "onConsole", "text", NULL, false );
 
+    // Debug events
+    m_Events.AddEvent ( "onDebugMessage", "message, level, file, line", NULL, false );
+
     // Ban events
     m_Events.AddEvent ( "onBan", "ip", NULL, false );
     m_Events.AddEvent ( "onUnban", "ip", NULL, false );
