@@ -640,6 +640,7 @@ public:
     LUA_DECLARE ( GetJetpackMaxHeight );
 
     LUA_DECLARE ( SetTime );
+    LUA_DECLARE ( GetSkyGradient );
     LUA_DECLARE ( SetSkyGradient );
     LUA_DECLARE ( ResetSkyGradient );
     LUA_DECLARE ( GetWaterColor );

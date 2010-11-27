@@ -46,6 +46,7 @@ public:
     static int      setGravity                          ( lua_State* luaVM );
     static int      setGameSpeed                        ( lua_State* luaVM );
     static int      setWaveHeight                       ( lua_State* luaVM );
+    static int      getSkyGradient                      ( lua_State* luaVM );
     static int      setSkyGradient                      ( lua_State* luaVM );
     static int      resetSkyGradient                    ( lua_State* luaVM );
     static int      setFPSLimit                         ( lua_State* luaVM );

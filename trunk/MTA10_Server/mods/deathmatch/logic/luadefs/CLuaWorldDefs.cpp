@@ -38,6 +38,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setGravity", CLuaWorldDefs::setGravity );
     CLuaCFunctions::AddFunction ( "setGameSpeed", CLuaWorldDefs::setGameSpeed );
     CLuaCFunctions::AddFunction ( "setWaveHeight", CLuaWorldDefs::setWaveHeight );
+    CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaWorldDefs::getSkyGradient );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaWorldDefs::setSkyGradient );
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
     CLuaCFunctions::AddFunction ( "setFPSLimit", CLuaWorldDefs::setFPSLimit );
@@ -419,6 +420,27 @@ int CLuaWorldDefs::setWaveHeight ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setWaveHeight" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaWorldDefs::getSkyGradient ( lua_State* luaVM )
+{
+    unsigned char ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB;
+    bool bSuccess = CStaticFunctionDefinitions::GetSkyGradient ( ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB );
+
+    if ( bSuccess )
+    {
+        lua_pushnumber ( luaVM, ucTopR );
+        lua_pushnumber ( luaVM, ucTopG );
+        lua_pushnumber ( luaVM, ucTopB );
+        lua_pushnumber ( luaVM, ucBottomR );
+        lua_pushnumber ( luaVM, ucBottomG );
+        lua_pushnumber ( luaVM, ucBottomB );
+        return 6;
+    }
 
     lua_pushboolean ( luaVM, false );
     return 1;

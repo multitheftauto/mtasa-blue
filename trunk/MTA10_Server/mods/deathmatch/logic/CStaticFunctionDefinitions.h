@@ -464,6 +464,7 @@ public:
     static bool                 SetGravity                          ( float fGravity );
     static bool                 SetGameSpeed                        ( float fSpeed );
     static bool                 SetWaveHeight                       ( float fHeight );
+    static bool                 GetSkyGradient                      ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue );
     static bool                 SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );
     static bool                 ResetSkyGradient                    ( void );
     static bool                 SetFPSLimit                         ( unsigned short usLimit );
