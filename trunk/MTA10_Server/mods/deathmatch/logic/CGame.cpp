@@ -1245,7 +1245,7 @@ void CGame::AddBuiltInEvents ( void )
 
 void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
 {
-    unsigned long ulDiff = (ulCurrentTime - m_ulLastTrafficUpdate)*m_fGameSpeed;
+    unsigned long ulDiff = static_cast < unsigned long > ( (ulCurrentTime - m_ulLastTrafficUpdate)*m_fGameSpeed );
     unsigned char ucNewState = 0xFF;
 
     if ( ulDiff >= 1000 )

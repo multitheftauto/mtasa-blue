@@ -346,7 +346,7 @@ int CLuaACLDefs::aclListRights ( lua_State* luaVM )
         {
 			// Check if we want all the types
 			bool bAll = true;
-			CAccessControlListRight::ERightType eAllowed;
+			CAccessControlListRight::ERightType eAllowed = (CAccessControlListRight::ERightType)-1;
 			if ( lua_isstring ( luaVM, 2 ) )
 			{
 				bAll = false;

@@ -134,7 +134,7 @@ namespace SharedUtil
         if ( m_bRGBColorsWrong )
         {
             m_bRGBColorsWrong = false;
-            for ( int i = 0 ; i < NUMELMS( m_RGBColors ) ; i++ )
+            for ( uint i = 0 ; i < NUMELMS( m_RGBColors ) ; i++ )
                 m_RGBColors[i] = GetRGBFromPaletteIndex ( m_ucPaletteColors[i] );
         }
     }
@@ -145,7 +145,7 @@ namespace SharedUtil
         if ( m_bPaletteColorsWrong )
         {
             m_bPaletteColorsWrong = false;
-            for ( int i = 0 ; i < NUMELMS( m_ucPaletteColors ) ; i++ )
+            for ( uint i = 0 ; i < NUMELMS( m_ucPaletteColors ) ; i++ )
                 m_ucPaletteColors[i] = GetPaletteIndexFromRGB ( m_RGBColors[i] );
         }
     }
@@ -191,7 +191,7 @@ namespace SharedUtil
     {
         ulong ulBestDist = 0xFFFFFFFF;
         uchar ucBestMatch = 0;
-        for ( int i = 0 ; i < NUMELMS( paletteColorTable8 ) / 4 ; i++ )
+        for ( uint i = 0 ; i < NUMELMS( paletteColorTable8 ) / 4 ; i++ )
         {
             int r = paletteColorTable8[ i * 4 + 0 ] - color.R;
             int g = paletteColorTable8[ i * 4 + 1 ] - color.G;
