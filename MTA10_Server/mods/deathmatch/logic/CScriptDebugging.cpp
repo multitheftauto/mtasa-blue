@@ -301,7 +301,7 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, con
             strFile = debugInfo.short_src;
 
             if ( uiMinimumDebugLevel < 3 )
-                strText = SString ( "%s%s %s", szPrePend, szMessage, strFile );
+                strText = SString ( "%s%s %s", szPrePend, szMessage, strFile.c_str () );
         }
     }
     else

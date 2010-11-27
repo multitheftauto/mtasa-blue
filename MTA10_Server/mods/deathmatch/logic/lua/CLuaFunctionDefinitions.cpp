@@ -9755,10 +9755,6 @@ int CLuaFunctionDefinitions::UtfLen ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::UtfSeek ( lua_State* luaVM )
 {
-        // Grab argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-
     if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "utfSeek" );
@@ -9781,10 +9777,6 @@ int CLuaFunctionDefinitions::UtfSeek ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::UtfSub ( lua_State* L )
 {
-        // Grab argument types
-    int iArgument1 = lua_type ( L, 1 );
-    int iArgument2 = lua_type ( L, 2 );
-
     if ( ( lua_type ( L, 1 ) != LUA_TSTRING ) || ( lua_type ( L, 2 ) != LUA_TNUMBER ) )
     {
         m_pScriptDebugging->LogBadType ( L, "utfSub" );
@@ -9820,10 +9812,6 @@ int CLuaFunctionDefinitions::UtfSub ( lua_State* L )
 
 int CLuaFunctionDefinitions::UtfChar ( lua_State* luaVM )
 {
-        // Grab argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-
     if ( ( lua_type ( luaVM, 1 ) != LUA_TNUMBER ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "utfChar" );
@@ -9850,10 +9838,6 @@ int CLuaFunctionDefinitions::UtfChar ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::UtfCode ( lua_State* luaVM )
 {
-        // Grab argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-
     if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "utfCode" );
@@ -10965,7 +10949,7 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
         if ( pPlayer )
         {
             CBan* pBan = NULL;
-            if ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, strResponsible, strReason, tUnban ) )
+            if ( ( pBan = CStaticFunctionDefinitions::BanPlayer ( pPlayer, bIP, bUsername, bSerial, pResponsible, strResponsible, strReason, tUnban ) ) )
             {
                 lua_pushban ( luaVM, pBan );
                 return 1;
@@ -11036,7 +11020,7 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
         }
 
         CBan* pBan = NULL;
-        if ( pBan = CStaticFunctionDefinitions::AddBan ( strIP, strUsername, strSerial, pResponsible, strResponsible, strReason, tUnban ) )
+        if ( ( pBan = CStaticFunctionDefinitions::AddBan ( strIP, strUsername, strSerial, pResponsible, strResponsible, strReason, tUnban ) ) )
         {
             lua_pushban ( luaVM, pBan );
             return 1;

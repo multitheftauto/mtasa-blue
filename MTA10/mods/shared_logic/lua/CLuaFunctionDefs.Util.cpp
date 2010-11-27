@@ -573,10 +573,6 @@ int CLuaFunctionDefs::UtfLen ( lua_State* luaVM )
 
 int CLuaFunctionDefs::UtfSeek ( lua_State* luaVM )
 {
-        // Grab argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-
     if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "utfSeek" );
@@ -599,10 +595,6 @@ int CLuaFunctionDefs::UtfSeek ( lua_State* luaVM )
 
 int CLuaFunctionDefs::UtfSub ( lua_State* L )
 {
-        // Grab argument types
-    int iArgument1 = lua_type ( L, 1 );
-    int iArgument2 = lua_type ( L, 2 );
-
     if ( ( lua_type ( L, 1 ) != LUA_TSTRING ) || ( lua_type ( L, 2 ) != LUA_TNUMBER ) )
     {
         m_pScriptDebugging->LogBadType ( L, "utfSub" );
@@ -638,9 +630,6 @@ int CLuaFunctionDefs::UtfSub ( lua_State* L )
 
 int CLuaFunctionDefs::UtfChar ( lua_State* luaVM )
 {
-        // Grab argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-
     if ( ( lua_type ( luaVM, 1 ) != LUA_TNUMBER ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "utfChar" );
@@ -667,8 +656,6 @@ int CLuaFunctionDefs::UtfChar ( lua_State* luaVM )
 
 int CLuaFunctionDefs::UtfCode ( lua_State* luaVM )
 {
-        // Grab argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
     if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "utfCode" );
