@@ -1287,6 +1287,35 @@ void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
     }
 }
 
+bool CMultiplayerSA::HasSkyColor ( )
+{
+    return bUsingCustomSkyGradient;
+}
+
+void CMultiplayerSA::GetSkyColor ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue )
+{
+    if ( HasSkyColor ( ) )
+    {
+        TopRed  = ucSkyGradientTopR;
+        TopGreen = ucSkyGradientTopG;
+        TopBlue  = ucSkyGradientTopB;
+
+        BottomRed   = ucSkyGradientBottomR;
+        BottomGreen = ucSkyGradientBottomG;
+        BottomBlue  = ucSkyGradientBottomB;
+    }
+    else
+    {
+        TopRed   = *(BYTE *)0xB7C4C4;
+        TopGreen = *(BYTE *)0xB7C4C6;
+        TopBlue  = *(BYTE *)0xB7C4C8;
+
+        BottomRed   = *(BYTE *)0xB7C4CA;
+        BottomGreen = *(BYTE *)0xB7C4CC;
+        BottomBlue  = *(BYTE *)0xB7C4CE;
+    }
+}
+
 void CMultiplayerSA::SetSkyColor ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue )
 {
     bUsingCustomSkyGradient = true;
@@ -1310,10 +1339,20 @@ bool CMultiplayerSA::HasWaterColor ( )
 
 void CMultiplayerSA::GetWaterColor ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha )
 {
-    fWaterRed   = fWaterColorR;
-    fWaterGreen = fWaterColorG;
-    fWaterBlue  = fWaterColorB;
-    fWaterAlpha = fWaterColorA;
+    if ( HasWaterColor ( ) )
+    {
+        fWaterRed   = fWaterColorR;
+        fWaterGreen = fWaterColorG;
+        fWaterBlue  = fWaterColorB;
+        fWaterAlpha = fWaterColorA;
+    }
+    else
+    {
+        fWaterRed   = *(float *)0xB7C508;
+        fWaterGreen = *(float *)0xB7C50C;
+        fWaterBlue  = *(float *)0xB7C510;
+        fWaterAlpha = *(float *)0xB7C514;
+    }
 }
 
 void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha )

@@ -426,6 +426,7 @@ public:
     static bool                         AreTrafficLightsLocked              ( bool& bLocked );
 
     static bool                         SetTime                             ( unsigned char ucHour, unsigned char ucMin );
+    static bool                         GetSkyGradient                      ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue );
     static bool                         SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );
     static bool                         ResetSkyGradient                    ( void );
     static bool                         GetWaterColor                       ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );

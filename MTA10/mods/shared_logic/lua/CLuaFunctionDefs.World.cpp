@@ -1002,6 +1002,21 @@ int CLuaFunctionDefs::SetTime ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetSkyGradient ( lua_State* luaVM )
+{
+    unsigned char ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB;
+    CStaticFunctionDefinitions::GetSkyGradient ( ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB );
+
+    lua_pushnumber ( luaVM, ucTopR );
+    lua_pushnumber ( luaVM, ucTopG );
+    lua_pushnumber ( luaVM, ucTopB );
+    lua_pushnumber ( luaVM, ucBottomR );
+    lua_pushnumber ( luaVM, ucBottomG );
+    lua_pushnumber ( luaVM, ucBottomB );
+    return 6;
+}
+
+
 int CLuaFunctionDefs::SetSkyGradient ( lua_State* luaVM )
 {
     // Verify the argument types
@@ -1059,19 +1074,13 @@ int CLuaFunctionDefs::GetWaterColor ( lua_State* luaVM )
 {
     float fRed, fGreen, fBlue, fAlpha;
 
-    bool bSuccess = CStaticFunctionDefinitions::GetWaterColor ( fRed, fGreen, fBlue, fAlpha );
+    CStaticFunctionDefinitions::GetWaterColor ( fRed, fGreen, fBlue, fAlpha );
 
-    if ( bSuccess )
-    {
-        lua_pushnumber ( luaVM, fRed );
-        lua_pushnumber ( luaVM, fGreen );
-        lua_pushnumber ( luaVM, fBlue );
-        lua_pushnumber ( luaVM, fAlpha );
-        return 4;
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
+    lua_pushnumber ( luaVM, fRed );
+    lua_pushnumber ( luaVM, fGreen );
+    lua_pushnumber ( luaVM, fBlue );
+    lua_pushnumber ( luaVM, fAlpha );
+    return 4;
 }
 
 
