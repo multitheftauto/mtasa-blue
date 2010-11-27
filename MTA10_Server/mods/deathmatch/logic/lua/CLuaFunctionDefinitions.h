@@ -380,6 +380,9 @@ public:
     static int      SetWaterLevel                       ( lua_State* luaVM );
     static int      GetWaterVertexPosition              ( lua_State* luaVM );
     static int      SetWaterVertexPosition              ( lua_State* luaVM );
+    static int      GetWaterColor                       ( lua_State* luaVM );
+    static int      SetWaterColor                       ( lua_State* luaVM );
+    static int      ResetWaterColor                     ( lua_State* luaVM );
 
     // Weapon funcs
     static int      GetWeaponNameFromID                 ( lua_State* luaVM );

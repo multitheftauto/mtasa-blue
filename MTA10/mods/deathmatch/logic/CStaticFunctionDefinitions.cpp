@@ -5208,6 +5208,17 @@ bool CStaticFunctionDefinitions::ResetSkyGradient ( void )
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetWaterColor ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha )
+{
+    if ( g_pMultiplayer->HasWaterColor ( ) )
+    {
+        g_pMultiplayer->GetWaterColor ( fWaterRed, fWaterGreen, fWaterBlue, fWaterAlpha );
+        return true;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha )
 {
     g_pMultiplayer->SetWaterColor ( fWaterRed, fWaterGreen, fWaterBlue, fWaterAlpha );

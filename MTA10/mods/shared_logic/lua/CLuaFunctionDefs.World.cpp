@@ -1055,6 +1055,26 @@ int CLuaFunctionDefs::ResetSkyGradient ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetWaterColor ( lua_State* luaVM )
+{
+    float fRed, fGreen, fBlue, fAlpha;
+
+    bool bSuccess = CStaticFunctionDefinitions::GetWaterColor ( fRed, fGreen, fBlue, fAlpha );
+
+    if ( bSuccess )
+    {
+        lua_pushnumber ( luaVM, fRed );
+        lua_pushnumber ( luaVM, fGreen );
+        lua_pushnumber ( luaVM, fBlue );
+        lua_pushnumber ( luaVM, fAlpha );
+        return 4;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetWaterColor ( lua_State* luaVM )
 {
     // Verify the argument types

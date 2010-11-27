@@ -157,6 +157,8 @@ void CGame::ResetMapInfo ( void )
     m_bTrafficLightsLocked = false;
     m_ucTrafficLightState = 0;
     m_ulLastTrafficUpdate = 0;
+
+    g_pGame->SetHasWaterColor ( false );
 }
 
 CGame::~CGame ( void )

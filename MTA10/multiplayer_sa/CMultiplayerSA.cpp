@@ -1303,6 +1303,19 @@ void CMultiplayerSA::ResetSky ( void )
     bUsingCustomSkyGradient = false;
 }
 
+bool CMultiplayerSA::HasWaterColor ( )
+{
+    return bUsingCustomWaterColor;
+}
+
+void CMultiplayerSA::GetWaterColor ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha )
+{
+    fWaterRed   = fWaterColorR;
+    fWaterGreen = fWaterColorG;
+    fWaterBlue  = fWaterColorB;
+    fWaterAlpha = fWaterColorA;
+}
+
 void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha )
 {
     bUsingCustomWaterColor = true;

@@ -434,6 +434,9 @@ public:
     static bool                 SetWaterLevel                       ( CWater* pWater, float fLevel );
     static bool                 GetWaterVertexPosition              ( CWater* pWater, int iVertexIndex, CVector& vecPosition );
     static bool                 SetWaterVertexPosition              ( CWater* pWater, int iVertexIndex, CVector& vecPosition );
+    static bool                 GetWaterColor                       ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha );
+    static bool                 SetWaterColor                       ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
+    static bool                 ResetWaterColor                     ( );
 
     // Standard server functions
     static unsigned char        GetMaxPlayers                       ( void );

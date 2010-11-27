@@ -8445,6 +8445,60 @@ int CLuaFunctionDefinitions::SetWaterVertexPosition ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetWaterColor ( lua_State* luaVM )
+{
+    unsigned char ucRed, ucGreen, ucBlue, ucAlpha;
+
+    bool bColorOverride = CStaticFunctionDefinitions::GetWaterColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+
+    if ( bColorOverride )
+    {
+        lua_pushnumber ( luaVM, ucRed );
+        lua_pushnumber ( luaVM, ucGreen );
+        lua_pushnumber ( luaVM, ucBlue );
+        lua_pushnumber ( luaVM, ucAlpha );
+
+        return 4;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetWaterColor ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER && lua_type ( luaVM, 2 ) == LUA_TNUMBER && lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        unsigned char ucRed   = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+        unsigned char ucGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+        unsigned char ucBlue  = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+        unsigned char ucAlpha = 200;
+        
+        if ( lua_type ( luaVM, 4 ) == LUA_TNUMBER )
+            ucAlpha = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+
+        if ( CStaticFunctionDefinitions::SetWaterColor ( ucRed, ucGreen, ucBlue, ucAlpha ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::ResetWaterColor ( lua_State *luaVM )
+{
+    bool bSuccess = CStaticFunctionDefinitions::ResetWaterColor ( );
+
+    lua_pushboolean ( luaVM, bSuccess );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::CreateColCircle ( lua_State* luaVM )
 {
     // Verify the argument types

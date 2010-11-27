@@ -440,6 +440,13 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     // Garage states
     bool* pbGarageStates = g_pGame->GetGarageStates();
     bool bCloudsEnabled = g_pGame->GetCloudsEnabled();
+
+    // Water color
+    bool bOverrideWaterColor;
+    unsigned char ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha;
+    bOverrideWaterColor = g_pGame->HasWaterColor ( );
+    g_pGame->GetWaterColor ( ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha );
+
     // Send the packet to the given player
     Player.Send ( CMapInfoPacket ( ucCurrentWeather,
                                    ucWeatherBlendingTo,
@@ -463,7 +470,12 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucBottomBlue,
                                    usFPSLimit,
                                    bCloudsEnabled,
-                                   fJetpackMaxHeight ) );
+                                   fJetpackMaxHeight,
+                                   bOverrideWaterColor,
+                                   ucWaterRed,
+                                   ucWaterGreen,
+                                   ucWaterBlue,
+                                   ucWaterAlpha) );
 
     // Send him all the elements
     SendMapInformation ( Player );
