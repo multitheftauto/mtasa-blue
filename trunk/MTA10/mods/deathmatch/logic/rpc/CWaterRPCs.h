@@ -22,6 +22,8 @@ public:
 
     DECLARE_RPC ( SetWaterLevel );
     DECLARE_RPC ( SetWaterVertexPosition );
+    DECLARE_RPC ( SetWaterColor );
+    DECLARE_RPC ( ResetWaterColor );
 };
 
 #endif

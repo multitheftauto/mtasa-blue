@@ -38,7 +38,12 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  unsigned char ucSkyGradientBB,
                                  unsigned short usFPSLimit,
                                  bool bCloudsEnabled,
-                                 float fJetpackMaxHeight )
+                                 float fJetpackMaxHeight,
+                                 bool bOverrideWaterColor,
+                                 unsigned char ucWaterRed,
+                                 unsigned char ucWaterGreen,
+                                 unsigned char ucWaterBlue,
+                                 unsigned char ucWaterAlpha)
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -63,6 +68,11 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_usFPSLimit = usFPSLimit;
     m_bCloudsEnabled = bCloudsEnabled;
     m_fJetpackMaxHeight = fJetpackMaxHeight;
+    m_bOverrideWaterColor = bOverrideWaterColor;
+    m_ucWaterRed = ucWaterRed;
+    m_ucWaterGreen = ucWaterGreen;
+    m_ucWaterBlue = ucWaterBlue;
+    m_ucWaterAlpha = ucWaterAlpha;
 }
 
 
@@ -131,6 +141,15 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     }
 
     BitStream.Write ( m_fJetpackMaxHeight );
+
+    BitStream.WriteBit ( m_bOverrideWaterColor );
+    if ( m_bOverrideWaterColor )
+    {
+        BitStream.Write ( m_ucWaterRed );
+        BitStream.Write ( m_ucWaterGreen );
+        BitStream.Write ( m_ucWaterBlue );
+        BitStream.Write ( m_ucWaterAlpha );
+    }
 
     return true;
 }

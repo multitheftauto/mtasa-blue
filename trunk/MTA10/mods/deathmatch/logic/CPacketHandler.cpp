@@ -1995,16 +1995,37 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         if ( !bitStream.ReadBit ( bCrouchBug ) )
             return;
 
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_QUICKRELOAD, funBugs.data.bQuickReload );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTFIRE, funBugs.data.bFastFire );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTMOVE, funBugs.data.bFastMove );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, bCrouchBug );
+
     float fJetpackMaxHeight = 100;
     if ( !bitStream.Read ( fJetpackMaxHeight ) )
         return;
 
     g_pGame->GetWorld ()->SetJetpackMaxHeight ( fJetpackMaxHeight );
 
-    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_QUICKRELOAD, funBugs.data.bQuickReload );
-    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTFIRE, funBugs.data.bFastFire );
-    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTMOVE, funBugs.data.bFastMove );
-    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, bCrouchBug );
+    bool bOverrideWaterColor = false;
+    unsigned char ucRed, ucGreen, ucBlue, ucAlpha;
+    
+    if ( !bitStream.ReadBit ( bOverrideWaterColor ) )
+    {
+        return;
+    }
+
+    if ( bOverrideWaterColor )
+    {
+        if ( !bitStream.Read ( ucRed ) ||
+             !bitStream.Read ( ucGreen ) ||
+             !bitStream.Read ( ucBlue ) ||
+             !bitStream.Read ( ucAlpha ) )
+        {
+            return;
+        }
+
+        CStaticFunctionDefinitions::SetWaterColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+    }
 }
 
 

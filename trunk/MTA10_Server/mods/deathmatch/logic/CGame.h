@@ -240,6 +240,12 @@ public:
     inline void                 GetSkyGradient              ( unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB ) { ucTR = m_ucSkyGradientTR; ucTG = m_ucSkyGradientTG; ucTB = m_ucSkyGradientTB; ucBR = m_ucSkyGradientBR; ucBG = m_ucSkyGradientBG; ucBB = m_ucSkyGradientBB; }
     inline void                 SetSkyGradient              ( unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB ) { m_ucSkyGradientTR = ucTR; m_ucSkyGradientTG = ucTG; m_ucSkyGradientTB = ucTB; m_ucSkyGradientBR = ucBR; m_ucSkyGradientBG = ucBG; m_ucSkyGradientBB = ucBB; }
 
+    inline bool                 HasWaterColor               ( void )        { return m_bOverrideWaterColor; }
+    inline void                 SetHasWaterColor            ( bool bOverrideWaterColor ) { m_bOverrideWaterColor = bOverrideWaterColor; }
+
+    inline void                 GetWaterColor               ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha ) { ucRed = m_ucWaterRed; ucGreen = m_ucWaterGreen; ucBlue = m_ucWaterBlue; ucAlpha = m_ucWaterAlpha; }
+    inline void                 SetWaterColor               ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha ) { m_ucWaterRed = ucRed; m_ucWaterGreen = ucGreen; m_ucWaterBlue = ucBlue; m_ucWaterAlpha = ucAlpha; }
+
     inline bool*                GetGarageStates             ( void )        { return m_bGarageStates; }
 
     void                        Lock                        ( void );
@@ -355,6 +361,9 @@ private:
     unsigned char               m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char               m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
     bool                        m_bHasSkyGradient;
+
+    bool                        m_bOverrideWaterColor;
+    unsigned char               m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;
 
     bool                        m_bGarageStates[MAX_GARAGES];
 

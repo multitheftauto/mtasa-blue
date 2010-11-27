@@ -74,6 +74,8 @@ public:
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
     void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue );
     void                        ResetSky                    ();
+    bool                        HasWaterColor               ();
+    void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );
     void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
     void                        ResetWater                  ();
     void                        SetCloudsEnabled            ( bool bDisabled );

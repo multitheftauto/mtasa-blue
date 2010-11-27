@@ -6804,6 +6804,46 @@ bool CStaticFunctionDefinitions::SetWaterVertexPosition ( CWater* pWater, int iV
 }
 
 
+bool CStaticFunctionDefinitions::GetWaterColor ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha )
+{
+    if ( g_pGame->HasWaterColor ( ) )
+    {
+        g_pGame->GetWaterColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+        return true;
+    }
+
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetWaterColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
+{
+    g_pGame->SetWaterColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+    g_pGame->SetHasWaterColor ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( ucRed );
+    BitStream.pBitStream->Write ( ucGreen );
+    BitStream.pBitStream->Write ( ucBlue );
+    BitStream.pBitStream->Write ( ucAlpha );
+
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WATER_COLOR, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetWaterColor ( )
+{
+    g_pGame->SetHasWaterColor ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_WATER_COLOR, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
 CColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource* pResource, const CVector& vecPosition, float fRadius )
 {
     //CColCircle * pColShape = new CColCircle ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, fRadius );

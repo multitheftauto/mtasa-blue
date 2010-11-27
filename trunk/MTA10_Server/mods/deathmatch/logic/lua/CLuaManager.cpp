@@ -554,6 +554,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWaterLevel", CLuaFunctionDefinitions::SetWaterLevel );
     CLuaCFunctions::AddFunction ( "getWaterVertexPosition", CLuaFunctionDefinitions::GetWaterVertexPosition );
     CLuaCFunctions::AddFunction ( "setWaterVertexPosition", CLuaFunctionDefinitions::SetWaterVertexPosition );
+    CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefinitions::GetWaterColor );
+    CLuaCFunctions::AddFunction ( "setWaterColor", CLuaFunctionDefinitions::SetWaterColor );
+    CLuaCFunctions::AddFunction ( "resetWaterColor", CLuaFunctionDefinitions::ResetWaterColor );
 
     // Weapon funcs
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefinitions::GetWeaponNameFromID );

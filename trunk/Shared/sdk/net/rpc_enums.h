@@ -178,16 +178,15 @@ enum eRPCFunctions
 
     // bitstream version 0x0c
     SET_ELEMENT_DOUBLESIDED,
-
     SET_TRAFFIC_LIGHT_STATE,
-
     SET_VEHICLE_TURRET_POSITION,
-
     SET_OBJECT_SCALE,
-
     SET_ELEMENT_COLLISIONS_ENABLED,
-
     SET_JETPACK_MAXHEIGHT,
+
+    // bitstream version 0x16
+    SET_WATER_COLOR,
+    RESET_WATER_COLOR,
 
     NUM_RPC_FUNCS
 };
