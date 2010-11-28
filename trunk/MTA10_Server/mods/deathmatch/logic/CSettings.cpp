@@ -257,6 +257,7 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
     char szQueryResource[MAX_RESOURCE_LENGTH] = {0};
     SettingStatus eStatus;
     bool bDeleteNode, bExists;
+    SString strOldValue;
 
     // Check for empty strings
     if ( strlen ( szSetting ) < 1 ) return false;
@@ -315,6 +316,9 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
                      strcmpi ( pResource->GetName ().c_str (), szLocalResource ) != 0 )
                     return false;
 
+                // Get the node's current value
+                strOldValue = pAttributes->Find ( "value" )->GetValue ();
+
                 // Set the node's value
                 pAttributes->Find ( "value" )->SetValue ( szContent );
 
@@ -322,6 +326,19 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
                 if ( bPrefix )
                     pAttributes->Find ( "name" )->SetValue ( szBuffer );
             }
+
+            // Trigger onSettingChange
+            CLuaArguments Arguments;
+            Arguments.PushString ( szSetting );
+
+            if ( strOldValue.length () > 0 )
+                Arguments.PushString ( strOldValue.c_str () );
+            else
+                Arguments.PushNil ();
+
+            Arguments.PushString ( szContent );
+
+            g_pGame->GetMapManager ()->GetRootElement ()->CallEvent ( "onSettingChange", Arguments );
 
             // Save the XML file
             m_pFile->Write ();
