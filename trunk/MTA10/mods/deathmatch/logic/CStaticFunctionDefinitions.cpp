@@ -741,6 +741,36 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled ( CClientEntity& En
 }
 
 
+bool CStaticFunctionDefinitions::IsElementFrozen ( CClientEntity& Entity, bool& bFrozen )
+{
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        {
+            CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+            bFrozen = Ped.IsFrozen ();
+            break;
+        }
+        case CCLIENTVEHICLE:
+        {
+            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+            bFrozen = Vehicle.IsFrozen ();
+            break;
+        }
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            bFrozen = Object.IsStatic ();
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
+}
+
+
 CClientDummy* CStaticFunctionDefinitions::CreateElement ( CResource& Resource, const char* szTypeName, const char* szID )
 {
     assert ( szTypeName );
@@ -2864,6 +2894,36 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Enti
     }
 
     return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetElementFrozen ( CClientEntity& Entity, bool bFrozen )
+{
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        {
+            CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+            Ped.SetFrozen ( bFrozen );
+            break;
+        }
+        case CCLIENTVEHICLE:
+        {
+            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+            Vehicle.SetFrozen ( bFrozen );
+            break;
+        }
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            Object.SetStatic ( bFrozen );
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
 }
 
 

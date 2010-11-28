@@ -187,6 +187,7 @@ enum eRPCFunctions
     // bitstream version 0x16
     SET_WATER_COLOR,
     RESET_WATER_COLOR,
+    SET_ELEMENT_FROZEN,
 
     NUM_RPC_FUNCS
 };

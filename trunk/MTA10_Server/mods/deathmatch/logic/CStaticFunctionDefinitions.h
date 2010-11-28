@@ -77,6 +77,7 @@ public:
     static bool                 GetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation );
     static CElement*            GetElementSyncer                    ( CElement* pElement );
     static bool                 GetElementCollisionsEnabled         ( CElement* pElement );
+    static bool                 IsElementFrozen                     ( CElement* pElement, bool& bFrozen );
 
     // Element set funcs
     static bool                 ClearElementVisibleTo               ( CElement* pElement );
@@ -99,6 +100,7 @@ public:
     static bool                 SetElementAttachedOffsets           ( CElement* pElement, CVector & vecPosition, CVector & vecRotation );
     static bool                 SetElementSyncer                    ( CElement* pElement, CPlayer* pPlayer, bool bEnable = true );
     static bool                 SetElementCollisionsEnabled         ( CElement* pElement, bool bEnable );
+    static bool                 SetElementFrozen                    ( CElement* pElement, bool bFrozen );
 
     // Scoreboard
     static bool                 AddScoreboardColumn                 ( const char* szID, const char* szName, float fWidth );

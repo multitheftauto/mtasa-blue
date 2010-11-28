@@ -57,6 +57,7 @@ public:
     static int      isElementInWater                    ( lua_State* luaVM );
     static int      getElementSyncer                    ( lua_State* luaVM );
     static int      getElementCollisionsEnabled         ( lua_State* luaVM );
+    static int      isElementFrozen                     ( lua_State* luaVM );
 
     // Visible to
     static int      clearElementVisibleTo               ( lua_State* luaVM );
@@ -91,6 +92,7 @@ public:
     static int      setElementModel                     ( lua_State* luaVM );
     static int      setElementSyncer                    ( lua_State* luaVM );
     static int      setElementCollisionsEnabled         ( lua_State* luaVM );
+    static int      setElementFrozen                    ( lua_State* luaVM );
 };
 
 #endif

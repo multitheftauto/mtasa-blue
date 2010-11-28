@@ -211,6 +211,10 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     float fScale = pObject->GetScale ();
                     BitStream.Write ( fScale );
 
+                    // Static
+                    bool bStatic = pObject->IsStatic ();
+                    BitStream.WriteBit ( bStatic );
+
                     break;
                 }
 

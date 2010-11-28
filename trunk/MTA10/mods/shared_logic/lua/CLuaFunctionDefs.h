@@ -131,6 +131,7 @@ public:
     LUA_DECLARE ( IsElementCollidableWith );
     LUA_DECLARE ( IsElementDoubleSided );
     LUA_DECLARE ( GetElementCollisionsEnabled );
+    LUA_DECLARE ( IsElementFrozen );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
@@ -153,6 +154,7 @@ public:
     LUA_DECLARE ( SetElementModel );
     LUA_DECLARE ( SetElementCollidableWith );
     LUA_DECLARE ( SetElementDoubleSided );
+    LUA_DECLARE ( SetElementFrozen );
 
     // Radio functions
     LUA_DECLARE ( SetRadioChannel );

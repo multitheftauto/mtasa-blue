@@ -34,6 +34,7 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( SET_ELEMENT_ATTACHED_OFFSETS,   SetElementAttachedOffsets,   "SetElementAttachedOffsets" );
     AddHandler ( SET_ELEMENT_DOUBLESIDED,        SetElementDoubleSided,       "SetElementDoubleSided" );
     AddHandler ( SET_ELEMENT_COLLISIONS_ENABLED, SetElementCollisionsEnabled, "SetElementCollisionsEnabled" );
+    AddHandler ( SET_ELEMENT_FROZEN,             SetElementFrozen,            "SetElementFrozen" );
 }
 
 
@@ -539,6 +540,45 @@ void CElementRPCs::SetElementCollisionsEnabled ( NetBitStreamInterface& bitStrea
                 {
                     CClientObject* pObject = static_cast < CClientObject * > ( pEntity );
                     pObject->SetCollisionEnabled ( bEnable );
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void CElementRPCs::SetElementFrozen ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    bool bFrozen;
+
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.ReadBit ( bFrozen ) )
+    {
+        CClientEntity * pEntity = CElementIDs::GetElement ( ID );
+        if ( pEntity )
+        {
+            switch ( pEntity->GetType () )
+            {
+                case CCLIENTPED:
+                case CCLIENTPLAYER:
+                {
+                    CClientPed* pPed = static_cast < CClientPed * > ( pEntity );
+                    pPed->SetFrozen ( bFrozen );
+                    break;
+                }
+
+                case CCLIENTVEHICLE:
+                {
+                    CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pEntity );
+                    pVehicle->SetFrozen ( bFrozen );
+                    break;
+                }
+
+                case CCLIENTOBJECT:
+                {
+                    CClientObject* pObject = static_cast < CClientObject * > ( pEntity );
+                    pObject->SetStatic ( bFrozen );
                     break;
                 }
             }
