@@ -144,6 +144,10 @@ bool CObject::ReadSpecialData ( void )
     if ( GetCustomDataInt ( "alpha", iTemp, true ) )
         m_ucAlpha = static_cast < unsigned char > ( iTemp );
 
+    bool bFrozen;
+    if ( GetCustomDataBool ( "frozen", bFrozen, true ) )
+        m_bIsStatic = bFrozen;
+
     // Success
     return true;
 }

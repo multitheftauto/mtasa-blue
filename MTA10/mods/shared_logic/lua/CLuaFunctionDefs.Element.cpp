@@ -1238,6 +1238,30 @@ int CLuaFunctionDefs::GetElementCollisionsEnabled ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::IsElementFrozen ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            bool bFrozen;
+            if ( CStaticFunctionDefinitions::IsElementFrozen ( *pEntity, bFrozen ) )
+            {
+                lua_pushboolean ( luaVM, bFrozen );
+                return 1;
+            }        
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementFrozen", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "isElementFrozen" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::IsElementStreamedIn ( lua_State* luaVM )
 {
@@ -2016,6 +2040,33 @@ int CLuaFunctionDefs::SetElementDoubleSided ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementDoubleSided" );
+
+    // Failure
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetElementFrozen ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
+    {
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            bool bFrozen = lua_toboolean ( luaVM, 2 ) ? true : false;
+
+            if ( CStaticFunctionDefinitions::SetElementFrozen ( *pEntity, bFrozen ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementFrozen", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementFrozen" );
 
     // Failure
     lua_pushboolean ( luaVM, false );

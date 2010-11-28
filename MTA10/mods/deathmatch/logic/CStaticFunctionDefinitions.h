@@ -73,6 +73,8 @@ public:
     static bool                         IsElementSyncer                     ( CClientEntity& Entity, bool & bIsSyncer );
     static bool                         IsElementCollidableWith             ( CClientEntity& Entity, CClientEntity& ThisEntity, bool & bCanCollide );
     static bool                         GetElementCollisionsEnabled         ( CClientEntity& Entity );
+    static bool                         IsElementFrozen                     ( CClientEntity& Entity, bool& bFrozen );
+
     // Element set funcs
     static CClientDummy*                CreateElement                       ( CResource& Resource, const char* szTypeName, const char* szID );
     static bool                         DestroyElement                      ( CClientEntity& Entity );
@@ -92,6 +94,7 @@ public:
     static bool                         SetElementModel                     ( CClientEntity& Entity, unsigned short usModel );
     static bool                         SetElementCollisionsEnabled         ( CClientEntity& Entity, bool bEnabled );
     static bool                         SetElementCollidableWith            ( CClientEntity& Entity, CClientEntity& ThisEntity, bool bCanCollide );
+    static bool                         SetElementFrozen                    ( CClientEntity& Entity, bool bFrozen );
 
     // Radio funcs
     static bool                         SetRadioChannel                     ( unsigned char& ucChannel );

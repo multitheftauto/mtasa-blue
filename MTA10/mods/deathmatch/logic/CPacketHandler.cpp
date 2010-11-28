@@ -2080,6 +2080,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // unsigned short       (2)     - object model id
     // unsigned char        (1)     - alpha
     // float                (4)     - scale
+    // bool                 (1)     - static
 
     // Pickups:
     // CVector              (12)    - position
@@ -2363,6 +2364,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         float fScale;
                         if ( bitStream.Read ( fScale ) )
                             pObject->SetScale ( fScale );
+
+                        bool bStatic;
+                        if ( bitStream.ReadBit ( bStatic ) )
+                            pObject->SetStatic ( bStatic );
 
                         pObject->SetCollisionEnabled ( bCollisonsEnabled );
                     }

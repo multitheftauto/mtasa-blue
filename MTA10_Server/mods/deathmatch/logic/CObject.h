@@ -69,6 +69,9 @@ public:
     inline bool                 GetCollisionEnabled     ( void )                        { return m_bCollisionsEnabled; }
     inline void                 SetCollisionEnabled     ( bool bCollisionEnabled )      { m_bCollisionsEnabled = bCollisionEnabled; }
 
+    inline bool                 IsStatic                ( void )                        { return m_bIsStatic; }
+    inline void                 SetStatic               ( bool bStatic )                { m_bIsStatic = bStatic; }
+
 private:
     CObjectManager*             m_pObjectManager;
     char                        m_szName [MAX_ELEMENT_NAME_LENGTH + 1];
@@ -76,6 +79,7 @@ private:
     unsigned char               m_ucAlpha;
     unsigned short              m_usModel;
     float                       m_fScale;
+    bool                        m_bIsStatic;
 
 protected:
     bool                        m_bCollisionsEnabled;

@@ -834,6 +834,38 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled ( CElement* pElemen
 }
 
 
+bool CStaticFunctionDefinitions::IsElementFrozen ( CElement* pElement, bool &bFrozen )
+{
+    assert ( pElement );
+
+    switch ( pElement->GetType () )
+    {
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            CPed* pPed = static_cast < CPed* > ( pElement );
+            bFrozen = pPed->IsFrozen ();
+            break;
+        }
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+            bFrozen = pVehicle->IsFrozen ();
+            break;
+        }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            bFrozen = pObject->IsStatic ();
+            break;
+        }
+        default: return false;
+    }
+
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::IsElementInWater ( CElement* pElement, bool & bInWater )
 {
     assert ( pElement );
@@ -1637,6 +1669,43 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CElement* pElemen
     BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
     BitStream.pBitStream->WriteBit ( bEnable );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_COLLISIONS_ENABLED, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementFrozen ( CElement* pElement, bool bFrozen )
+{
+    assert ( pElement );
+    RUN_CHILDREN SetElementFrozen ( *iter, bFrozen );
+
+    switch ( pElement->GetType () )
+    {
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            CPed * pPed = static_cast < CPed* > ( pElement );
+            pPed->SetFrozen ( bFrozen );
+            break;
+        }
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+            pVehicle->SetFrozen ( bFrozen );
+            break;
+        }
+        case CElement::OBJECT:
+        {
+            CObject * pObject = static_cast < CObject* > ( pElement );
+            pObject->SetStatic ( bFrozen );
+            break;
+        }
+        default: return false;
+    }
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteCompressed ( pElement->GetID () );
+    BitStream.pBitStream->WriteBit ( bFrozen );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_FROZEN, *BitStream.pBitStream ) );
 
     return true;
 }

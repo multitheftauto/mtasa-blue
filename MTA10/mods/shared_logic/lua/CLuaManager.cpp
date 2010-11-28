@@ -306,6 +306,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isElementCollidableWith", CLuaFunctionDefs::IsElementCollidableWith );
     CLuaCFunctions::AddFunction ( "isElementDoubleSided", CLuaFunctionDefs::IsElementDoubleSided );
     CLuaCFunctions::AddFunction ( "getElementCollisionsEnabled", CLuaFunctionDefs::GetElementCollisionsEnabled );
+    CLuaCFunctions::AddFunction ( "isElementFrozen", CLuaFunctionDefs::IsElementFrozen );
 
     // Element set funcs
     CLuaCFunctions::AddFunction ( "createElement", CLuaFunctionDefs::CreateElement );
@@ -328,6 +329,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", CLuaFunctionDefs::SetElementCollisionsEnabled );
     CLuaCFunctions::AddFunction ( "setElementCollidableWith", CLuaFunctionDefs::SetElementCollidableWith );
     CLuaCFunctions::AddFunction ( "setElementDoubleSided", CLuaFunctionDefs::SetElementDoubleSided );
+    CLuaCFunctions::AddFunction ( "setElementFrozen", CLuaFunctionDefs::SetElementFrozen );
 
     // Sound effects and synth funcs
     CLuaCFunctions::AddFunction ( "playSound", CLuaFunctionDefs::PlaySound );

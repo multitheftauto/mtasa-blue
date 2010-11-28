@@ -578,6 +578,12 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashClient["xmlNodeGetSubNodes"]        = "Replaced|xmlNodeGetChildren";
         hashClient["xmlNodeFindSubNode"]        = "Replaced|xmlFindChild";
         hashClient["xmlCreateSubNode"]          = "Replaced|xmlCreateChild";
+        hashClient["isPedFrozen"]               = "Replaced|isElementFrozen";
+        hashClient["isVehicleFrozen"]           = "Replaced|isElementFrozen";
+        hashClient["isObjectStatic"]            = "Replaced|isElementFrozen";
+        hashClient["setPedFrozen"]              = "Replaced|setElementFrozen";
+        hashClient["setVehicleFrozen"]          = "Replaced|setElementFrozen";
+        hashClient["setObjectStatic"]           = "Replaced|setElementFrozen";
 
         // Client functions. (from the wiki but missing in the code)
         // Camera
@@ -650,6 +656,11 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashServer["xmlNodeGetSubNodes"]        = "Replaced|xmlNodeGetChildren";
         hashServer["xmlCreateSubNode"]          = "Replaced|xmlCreateChild";
         hashServer["xmlFindSubNode"]            = "Replaced|xmlFindChild";
+
+        hashClient["isPedFrozen"]               = "Replaced|isElementFrozen";
+        hashClient["isVehicleFrozen"]           = "Replaced|isElementFrozen";
+        hashClient["setPedFrozen"]              = "Replaced|setElementFrozen";
+        hashClient["setVehicleFrozen"]          = "Replaced|setElementFrozen";
 
         // Server functions. (from the wiki but missing/not clear in the code)
         // Camera
