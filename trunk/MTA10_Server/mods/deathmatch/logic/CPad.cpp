@@ -103,10 +103,10 @@ void CPad::UpdateKeys ( void )
             m_ControlStates [ 0 ].bState = ( m_csCurrentState.ButtonCircle ) ? true : false;
             m_ControlStates [ 1 ].bState = ( m_csCurrentState.RightShoulder2 ) ? true : false;
             m_ControlStates [ 2 ].bState = ( m_csCurrentState.LeftShoulder2 ) ? true : false;
-            m_ControlStates [ 3 ].bState = ( m_csCurrentState.LeftStickY <= -128 );
-            m_ControlStates [ 4 ].bState = ( m_csCurrentState.LeftStickY >= 127 );
-            m_ControlStates [ 5 ].bState = ( m_csCurrentState.LeftStickX <= -128 );
-            m_ControlStates [ 6 ].bState = ( m_csCurrentState.LeftStickX >= 127 );
+            m_ControlStates [ 3 ].bState = ( m_csCurrentState.LeftStickY < 0 ); // forwards
+            m_ControlStates [ 4 ].bState = ( m_csCurrentState.LeftStickY > 0 ); // backwards
+            m_ControlStates [ 5 ].bState = ( m_csCurrentState.LeftStickX < 0 ); // left 
+            m_ControlStates [ 6 ].bState = ( m_csCurrentState.LeftStickX > 0 ); // right
             m_ControlStates [ 7 ].bState = ( m_csCurrentState.RightShoulder2 ) ? true : false;
             m_ControlStates [ 8 ].bState = ( m_csCurrentState.LeftShoulder2 ) ? true : false;
             m_ControlStates [ 9 ].bState = ( m_csCurrentState.LeftShoulder2 ) ? true : false;
@@ -128,10 +128,10 @@ void CPad::UpdateKeys ( void )
         {
             m_ControlStates [ 17 ].bState = ( m_csCurrentState.ButtonCircle ) ? true : false;
             m_ControlStates [ 18 ].bState = ( m_csCurrentState.LeftShoulder1 ) ? true : false;
-            m_ControlStates [ 19 ].bState = ( m_csCurrentState.LeftStickX <= -128 );
-            m_ControlStates [ 20 ].bState = ( m_csCurrentState.LeftStickX >= 127 );
-            m_ControlStates [ 21 ].bState = ( m_csCurrentState.LeftStickY <= -128 );
-            m_ControlStates [ 22 ].bState = ( m_csCurrentState.LeftStickY >= 127 );
+            m_ControlStates [ 19 ].bState = ( m_csCurrentState.LeftStickX < 0 ); 
+            m_ControlStates [ 20 ].bState = ( m_csCurrentState.LeftStickX > 0 );
+            m_ControlStates [ 21 ].bState = ( m_csCurrentState.LeftStickY < 0 );
+            m_ControlStates [ 22 ].bState = ( m_csCurrentState.LeftStickY > 0 );
             m_ControlStates [ 23 ].bState = ( m_csCurrentState.ButtonCross ) ? true : false;
             m_ControlStates [ 24 ].bState = ( m_csCurrentState.ButtonSquare ) ? true : false;
             m_ControlStates [ 25 ].bState = ( m_csCurrentState.DPadUp ) ? true : false;
@@ -145,10 +145,10 @@ void CPad::UpdateKeys ( void )
             m_ControlStates [ 33 ].bState = ( m_csCurrentState.LeftShoulder2 ? true : false &&
                                               m_csCurrentState.RightShoulder2 ? true : false );
             // Mouse Look
-            m_ControlStates [ 35 ].bState = ( m_csCurrentState.RightStickX >= 127 );
-            m_ControlStates [ 36 ].bState = ( m_csCurrentState.RightStickX <= -128 );
-            m_ControlStates [ 37 ].bState = ( m_csCurrentState.RightStickY >= 127 );
-            m_ControlStates [ 38 ].bState = ( m_csCurrentState.RightStickY <= -128 );
+            m_ControlStates [ 35 ].bState = ( m_csCurrentState.RightStickX > 0 );
+            m_ControlStates [ 36 ].bState = ( m_csCurrentState.RightStickX < 0 );
+            m_ControlStates [ 37 ].bState = ( m_csCurrentState.RightStickY > 0 );
+            m_ControlStates [ 38 ].bState = ( m_csCurrentState.RightStickY < 0 );
 
         }
         m_ControlStates [ 9 ].bState = ( m_csCurrentState.ButtonTriangle ); // Enter Exit
