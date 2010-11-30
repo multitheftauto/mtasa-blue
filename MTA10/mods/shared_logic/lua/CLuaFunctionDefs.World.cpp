@@ -1409,6 +1409,26 @@ int CLuaFunctionDefs::ResetWindVelocity ( lua_State *luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::AreInteriorSoundsEnabled ( lua_State* luaVM)
+{
+    lua_pushboolean ( luaVM, g_pMultiplayer->AreInteriorSoundsEnabled ( ) );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetInteriorSoundsEnabled ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
+    {
+        g_pMultiplayer->SetInteriorSoundsEnabled ( lua_toboolean ( luaVM, 1 ) ? true : false );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::SetTrafficLightsLocked ( lua_State *luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )

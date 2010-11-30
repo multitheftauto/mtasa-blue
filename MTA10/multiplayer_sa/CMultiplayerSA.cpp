@@ -244,6 +244,7 @@ float fLocalPlayerCameraRotation = 0.0f;
 bool bCustomCameraRotation = false;
 unsigned char ucTrafficLightState = 0;
 bool bTrafficLightsBlocked = false;
+bool bInteriorSoundsEnabled = true;
 
 bool bUsingCustomSkyGradient = false;
 BYTE ucSkyGradientTopR = 0;
@@ -1254,6 +1255,36 @@ void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
         *(WORD *)0x60B4F6 = 0x08EB;
     else
         *(WORD *)0x60B4F6 = 0x027C;
+}
+
+bool CMultiplayerSA::AreInteriorSoundsEnabled ( )
+{
+    return bInteriorSoundsEnabled;
+}
+
+void CMultiplayerSA::SetInteriorSoundsEnabled ( bool bEnabled )
+{
+    // The function which 
+    BYTE originalCode[6] = {0x89, 0x2d, 0xbc, 0xdc, 0xb6, 0x00};
+
+    if ( bEnabled )
+    {
+        // Restore the function responsible for interior sounds
+        memcpy ( (LPVOID)0x508450, &originalCode, 6 );
+        memcpy ( (LPVOID)0x508817, &originalCode, 6 );
+    }
+    else
+    {
+        // Nop the function responsible for interior sounds
+        memset ( (LPVOID)0x508450, 0x90, 6 );
+        memset ( (LPVOID)0x508817, 0x90, 6 );
+    }
+
+    // Toggle the interior sound on/off, depending on what the scripter wants
+    *(bool *)0xB6DCBC = bEnabled;
+
+    // If we just store it, we can always return the on/off state later on
+    bInteriorSoundsEnabled = bEnabled;
 }
 
 void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )

@@ -82,6 +82,8 @@ public:
     void                        ResetWater                  ();
     void                        SetCloudsEnabled            ( bool bDisabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
+    bool                        AreInteriorSoundsEnabled    ();
+    void                        SetInteriorSoundsEnabled    ( bool bEnabled );
 
     void                        SetNightVisionEnabled       ( bool bEnabled );
     void                        SetThermalVisionEnabled     ( bool bEnabled );

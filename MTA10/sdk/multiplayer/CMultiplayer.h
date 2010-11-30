@@ -137,6 +137,8 @@ public:
     virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;
     virtual void                        ResetWater                  ( void ) = 0;
     virtual void                        SetCloudsEnabled            ( bool bDisabled ) = 0;
+    virtual bool                        AreInteriorSoundsEnabled    () = 0;
+    virtual void                        SetInteriorSoundsEnabled    ( bool bEnabled ) = 0;
     virtual void                        DisableEnterExitVehicleKey  ( bool bDisabled ) = 0;
 
     virtual void                        SetNightVisionEnabled       ( bool bEnabled ) = 0;
