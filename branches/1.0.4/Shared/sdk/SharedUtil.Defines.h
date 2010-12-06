@@ -15,7 +15,7 @@
 //
 #define WITH_VEHICLE_HANDLING 0
 
-// Enable WITH_ALLOC_TRACKING to monitor module memory usage. *Has a negative performance impact*
+// Enable WITH_ALLOC_TRACKING to monitor server module memory usage. *Has a negative performance impact*
 #define WITH_ALLOC_TRACKING 0
 
 //

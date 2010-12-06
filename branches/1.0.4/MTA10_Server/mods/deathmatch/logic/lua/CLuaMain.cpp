@@ -474,7 +474,7 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
                 if ( iPos >= 0 )
                     strFilename = strFilename.substr ( iPos + 1 );
 
-                strText = SString ( "@%s:%d", strFilename.c_str (), debugInfo.currentline, iLuaFunction );
+                strText = SString ( "@%s:%d", strFilename.c_str (), debugInfo.currentline != -1 ? debugInfo.currentline : debugInfo.linedefined, iLuaFunction );
             }
             else
             {

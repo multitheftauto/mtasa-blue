@@ -24,12 +24,12 @@ public:
     // CMasterServerManagerInterface
     virtual void            Refresh                     ( void );
     virtual bool            HasData                     ( void );
-    virtual bool            ParseList                   ( std::list < CServerListItem* >& itemList );
+    virtual bool            ParseList                   ( CServerListItemList& itemList );
 
     // CMasterServerManager
 protected:
 
-    long long                                       m_llStartTime;
+    CElapsedTime                                    m_ElapsedTime;
     std::vector < CRemoteMasterServerInterface* >   m_MasterServerList;
 };
 
@@ -56,8 +56,6 @@ CMasterServerManagerInterface* NewMasterServerManager ( void )
 ///////////////////////////////////////////////////////////////
 CMasterServerManager::CMasterServerManager ( void )
 {
-    m_MasterServerList.push_back ( NewRemoteMasterServer ( "http://nightly.mtasa.com/ase/mta-1.0/" ) );
-    m_MasterServerList.push_back ( NewRemoteMasterServer ( "http://1mgg.com/affil/mta-1.0" ) );
 }
 
 
@@ -86,11 +84,21 @@ CMasterServerManager::~CMasterServerManager ( void )
 ///////////////////////////////////////////////////////////////
 void CMasterServerManager::Refresh ( void )
 {
+    // Create master server list if required
+    if ( m_MasterServerList.empty () )
+    {
+        std::vector < SString > resultList;
+        GetVersionUpdater ()->GetAseServerList ( resultList );
+
+        for ( uint i = 0 ; i < resultList.size () ; i++ )
+            m_MasterServerList.push_back ( NewRemoteMasterServer ( resultList[i] ) );
+    }
+
     // Pass on refresh request
     for ( uint i = 0 ; i < m_MasterServerList.size () ; i++ )
         m_MasterServerList[i]->Refresh ();
 
-    m_llStartTime = GetTickCount64_ ();
+    m_ElapsedTime = CElapsedTime ();
 }
 
 
@@ -115,7 +123,7 @@ bool CMasterServerManager::HasData ( void )
         return true;
 
     // If one server responded, and it's been 4 seconds, then success
-    if ( uiHasDataCount >= 1 && GetTickCount64_ () - m_llStartTime > 4000 )
+    if ( uiHasDataCount >= 1 && m_ElapsedTime.Get () > 4000 )
         return true;
 
     return false;
@@ -129,7 +137,7 @@ bool CMasterServerManager::HasData ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CMasterServerManager::ParseList ( std::list < CServerListItem* >& itemList )
+bool CMasterServerManager::ParseList ( CServerListItemList& itemList )
 {
     uint uiParsedCount = 0;
 

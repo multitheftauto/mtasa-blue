@@ -24,6 +24,7 @@ template<> CServerBrowser * CSingleton < CServerBrowser >::m_pSingleton = NULL;
 
 #define BROWSER_DEFAULTWIDTH    720.0f
 #define BROWSER_DEFAULTHEIGHT    495.0f
+#define PLAYER_LIST_PENDING_TEXT "  ..loading.."
 
 CServerBrowser::CServerBrowser ( void )
 {
@@ -68,12 +69,6 @@ CServerBrowser::CServerBrowser ( void )
     m_pLockedIcon->SetVisible ( false );
     m_pLockedIcon->SetFrameEnabled ( false );
     m_pLockedIcon->LoadFromFile ( "cgui\\images\\locked.png" );
-
-    // Serial verification icon
-    m_pSerialIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pWindow ) );
-    m_pSerialIcon->SetVisible ( false );
-    m_pSerialIcon->SetFrameEnabled ( false );
-    m_pSerialIcon->LoadFromFile ( "cgui\\images\\shield.png" );
 
     //Set necessary handlers
     m_pButtonBack->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnBackClick, this ) );
@@ -131,6 +126,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pServerList [ type ] = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pTab [ type ] ) );
     m_pServerList [ type ]->SetPosition ( CVector2D ( 0.02f, 0.10f ), true );
     m_pServerList [ type ]->SetSize ( CVector2D ( 0.80f, 0.815f ), true );
+    m_pServerList [ type ]->SetIgnoreTextSpacer ( true );
     m_pServerListRevision [ type ] = 0;
     
     // Server player list label
@@ -170,29 +166,49 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pPlayerSearchIcon [ type ]->SetSize ( CVector2D ( 16, 14 ), false );
     m_pPlayerSearchIcon [ type ]->LoadFromFile ( "cgui\\images\\magnfglasssmall.png" );
 
+    // Include label
+    m_pLabelInclude [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTab [ type ], "Include:" ) );
+    m_pLabelInclude [ type ]->SetPosition ( CVector2D ( 0.275f, 0.045f ), true ); 
+    m_pLabelInclude [ type ]->AutoSize ( m_pLabelInclude [ type ]->GetText ().c_str () );
+
     // Include checkboxes
-    m_pIncludeEmpty [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Empty", true ) );
-    m_pIncludeEmpty [ type ]->SetPosition ( CVector2D ( 0.225f, 0.045f ), true );
+    m_pIncludeEmpty [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Empty", true ) );
+    m_pIncludeEmpty [ type ]->SetPosition ( CVector2D ( 0.350f, 0.045f ), true );
+    m_pIncludeEmpty [ type ]->SetSize ( CVector2D ( 53, 17 ) );
     m_pIncludeEmpty [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
 
-    m_pIncludeFull [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Full", true ) );
-    m_pIncludeFull [ type ]->SetPosition ( CVector2D ( 0.38f, 0.045f ), true );
+    m_pIncludeFull [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Full", true ) );
+    m_pIncludeFull [ type ]->SetPosition ( CVector2D ( 0.435f, 0.045f ), true );
+    m_pIncludeFull [ type ]->SetSize ( CVector2D ( 35, 17 ) );
     m_pIncludeFull [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
 
-    m_pIncludeLocked [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Locked", true ) );
-    m_pIncludeLocked [ type ]->SetPosition ( CVector2D ( 0.515f, 0.045f ), true );
+    m_pIncludeLocked [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Locked", true ) );
+    m_pIncludeLocked [ type ]->SetPosition ( CVector2D ( 0.501f, 0.045f ), true );
+    m_pIncludeLocked [ type ]->SetSize ( CVector2D ( 57, 17 ) );
     m_pIncludeLocked [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
 
+#if MTA_DEBUG
+    if ( type != ServerBrowserType::LAN )
+#else
     if ( type != ServerBrowserType::INTERNET && type != ServerBrowserType::LAN )
+#endif
     {
-        m_pIncludeOffline [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Include Offline", true ) );
-        m_pIncludeOffline [ type ]->SetPosition ( CVector2D ( 0.675f, 0.045f ), true );
+        m_pIncludeOffline [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Offline", true ) );
+        m_pIncludeOffline [ type ]->SetPosition ( CVector2D ( 0.595f, 0.045f ), true );
+        m_pIncludeOffline [ type ]->SetSize ( CVector2D ( 53, 17 ) );
         m_pIncludeOffline [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
     }
     else
     {
         m_pIncludeOffline [ type ] = NULL;
     }
+
+    m_pIncludeOtherVersions [ type ] = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTab [ type ], "Other Versions", false ) );
+    m_pIncludeOtherVersions [ type ]->SetPosition ( CVector2D ( 0.682f, 0.045f ), true );
+    m_pIncludeOtherVersions [ type ]->SetSize ( CVector2D ( 99, 17 ) );
+    m_pIncludeOtherVersions [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
+    m_pIncludeOtherVersions [ type ]->SetVisible ( false );
+
 
     // Buttons
     
@@ -240,7 +256,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonFavourites [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFavouritesClick, this ) );
 
     // Server List Columns
-    m_hSerial [ type ] = m_pServerList [ type ]->AddColumn ( "", 0.03f );
+    m_hVersion [ type ] = m_pServerList [ type ]->AddColumn ( "", 0.03f );
     m_hLocked [ type ] = m_pServerList [ type ]->AddColumn ( "", 0.03f );
     m_hName [ type ] = m_pServerList [ type ]->AddColumn ( "Name", 0.50f );
     m_hPlayers [ type ] = m_pServerList [ type ]->AddColumn ( "Players", 0.14f );
@@ -249,7 +265,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_hMap [ type ] = m_pServerList [ type ]->AddColumn ( "Map", 0.25f );
     m_hHost [ type ] = m_pServerList [ type ]->AddColumn ( "Host", 0.25f );
 
-    // Disable resizing of the first and second columns (Serial Auth & Locked)
+    // Disable resizing of the first and second columns (Version & Locked)
     m_pServerList [ type ]->SetColumnSegmentSizingEnabled(0, false);
     m_pServerList [ type ]->SetColumnSegmentSizingEnabled(1, false);
 
@@ -272,9 +288,11 @@ void CServerBrowser::DeleteTab ( ServerBrowserType type )
     delete m_pEditPlayerSearch [ type ];
     delete m_pPlayerSearchIcon [ type ];
 
+    delete m_pLabelInclude [ type ];
     delete m_pIncludeEmpty [ type ];
     delete m_pIncludeFull [ type ];
     delete m_pIncludeLocked [ type ];
+    delete m_pIncludeOtherVersions [ type ];
 
     if ( m_pIncludeOffline [ type ] )
     {
@@ -335,7 +353,10 @@ void CServerBrowser::Update ( void )
 
         // Update last viewed tab
         m_PrevServerBrowserType = Type;
+
+        UpdateSelectedServerPlayerList ( Type );
     }
+
 }
 
 CVector2D CServerBrowser::GetSize ( void )
@@ -376,10 +397,13 @@ bool CServerBrowser::OnWindowSize ( CGUIElement* pElement )
     //Make sure the Icon columns are of the correct size.  Its of a forced relative size - 0.03*562 was the default size.
     for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
     {
-        m_pServerList [ i ]->SetColumnWidth ( 0, 18.0f, false );
+        //m_pServerList [ i ]->SetColumnWidth ( 0, 18.0f, false );
         m_pServerList [ i ]->SetColumnWidth ( 1, 18.0f, false );
     }
-        
+
+#if MTA_DEBUG
+    m_pServerList [ GetCurrentServerBrowserType () ]->Sort( 2, CGUIGridList::SortDirection::None );
+#endif
     return true;
 }
 
@@ -419,6 +443,29 @@ bool CServerBrowser::IsVisible ( void )
 
 void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServerList )
 {
+    GetVersionUpdater ()->GetBlockedVersionMap ( m_blockedVersionMap );
+
+#if MTA_DEBUG
+    // Selecting 'Nightly update' in debug build will show other versions
+    SString strUpdateBuildType;
+    CVARS_GET ( "update_build_type", strUpdateBuildType );
+    if ( strUpdateBuildType == "2" )
+        m_blockedVersionMap.clear ();
+#endif
+
+    // Setting this in coreconfig will show other versions
+    bool bForceBrowseOtherVersions = false;
+    CVARS_GET ( "force_browse_other_versions", bForceBrowseOtherVersions );
+    if ( bForceBrowseOtherVersions )
+        m_blockedVersionMap.clear ();
+
+    // Save sort info
+    uint uiSortColumn;
+    CGUIGridList::SortDirection sortDirection;
+    m_pServerList [ Type ]->GetSort( uiSortColumn, sortDirection );
+
+    // Disable sorting
+    m_pServerList [ Type ]->Sort( uiSortColumn, CGUIGridList::SortDirection::None );
 
     // Get the appropriate server list
     CServerList* pList = GetServerList ( Type );
@@ -434,31 +481,47 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
         m_pServerPlayerList [ Type ]->Clear ();
     }
 
+    bool bIncludeOffline = m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ();
+
     // Loop the server list
     for ( CServerListIterator it = pList->IteratorBegin () ; it != pList->IteratorEnd (); it++ )
     {
         CServerListItem * pServer = *it;
 
-        // Add/update the item to the list
-        if ( ( ( pServer->bScanned || pServer->nPing ) || (pServer->bMaybeOffline && m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ()) ) &&
-             ( pServer->revisionInList[ Type ] != pServer->uiRevision || bClearServerList ) )
+        // Add/update/remove the item to the list
+        if ( pServer->revisionInList[ Type ] != pServer->uiRevision || bClearServerList )
         {
             pServer->revisionInList[ Type ] = pServer->uiRevision;
             AddServerToList ( pServer, Type );
         }
-
     }
+    bool bIncludeOtherVersions = m_pIncludeOtherVersions [ Type ]->IsVisible () && m_pIncludeOtherVersions [ Type ]->GetSelected ();
+    ServerBrowserType type = Type;
+
+    if ( bIncludeOtherVersions )
+    {
+        m_pServerList [ type ]->SetColumnWidth ( 0, 34, false );
+    }
+    else
+    {
+        m_pServerList [ type ]->SetColumnWidth ( 0, 0.03f, true );
+    }
+
+    // Re-enable sorting
+    m_pServerList [ Type ]->Sort( uiSortColumn, sortDirection );
 
     m_pServerList [ Type ]->ForceUpdate ();
     pList->SetUpdated ( false );
 }
 
 
-void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserType Type )
+void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const ServerBrowserType Type )
 {
     bool bIncludeEmpty  = m_pIncludeEmpty [ Type ]->GetSelected ();
     bool bIncludeFull   = m_pIncludeFull [ Type ]->GetSelected ();
     bool bIncludeLocked = m_pIncludeLocked [ Type ]->GetSelected ();
+    bool bIncludeOffline = m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ();
+    bool bIncludeOtherVersions = m_pIncludeOtherVersions [ Type ]->IsVisible () && m_pIncludeOtherVersions [ Type ]->GetSelected ();
     bool bServerSearchFound = true;
     bool bPlayerSearchFound = true;
 
@@ -493,46 +556,118 @@ void CServerBrowser::AddServerToList ( CServerListItem * pServer, ServerBrowserT
         }
     }
 
+
+    //
+    // Add or remove ?
+    //
+
+    bool bAddServer;
+
+    bool bIsOtherVersion    = ( !pServer->strVersion.empty () ) && ( pServer->strVersion != MTA_DM_ASE_VERSION );
+    bool bIsOffline         = ( pServer->bMaybeOffline ) || ( pServer->MaybeWontRespond () );
+    bool bLowQuality        = ( pServer->GetDataQuality () <= SERVER_INFO_ASE_0 );
+    bool bIsEmpty           = ( pServer->nPlayers == 0 ) && ( pServer->nMaxPlayers != 0 );
+    bool bIsFull            = ( pServer->nPlayers >= pServer->nMaxPlayers ) && ( pServer->nMaxPlayers != 0 );
+    bool bIsLocked          = pServer->bPassworded;
+    bool bIsBlockedVersion  = bIsOtherVersion && MapContains ( m_blockedVersionMap, pServer->strVersion );
+
+    // Maybe switch on 'Other version' checkbox
+    if ( bIsOtherVersion && !bIsBlockedVersion )
+    {
+        if ( !m_pIncludeOtherVersions [ Type ]->IsVisible () )
+        {
+            m_pIncludeOtherVersions [ Type ]->SetSelected ( true );
+            m_pIncludeOtherVersions [ Type ]->SetVisible ( true );
+        }
+    }
+
     if (
-        ( pServer->nPlayers > 0 || bIncludeEmpty ) &&
-        ( pServer->nPlayers < pServer->nMaxPlayers || pServer->nPlayers == 0 || pServer->nMaxPlayers == 0 || bIncludeFull ) &&
-        ( !pServer->bPassworded || bIncludeLocked ) && bServerSearchFound && bPlayerSearchFound
+        ( !pServer->strVersion.empty () || bIsOffline ) &&
+        ( !bLowQuality || bIsOffline ) &&
+        ( !bIsEmpty || bIncludeEmpty ) &&
+        ( !bIsFull || bIncludeFull ) &&
+        ( !bIsLocked || bIncludeLocked ) &&
+        ( !bIsOffline || bIncludeOffline ) &&
+        ( !bIsOtherVersion || bIncludeOtherVersions ) &&
+        ( !bIsBlockedVersion ) &&
+        ( bServerSearchFound ) &&
+        ( bPlayerSearchFound )
        )
     {
-        // Format some text data
-        SString strPlayers ( "%d / %d", pServer->nPlayers, pServer->nMaxPlayers );
-        SString strEndpoint ( "%s:%d", pServer->strHost.c_str (), pServer->usGamePort );
+        bAddServer = true;
+    }
+    else
+    {
+        bAddServer = false;
+    }
 
-        // Get existing row
-        int iIndex = -1;
+
+    if ( !bAddServer )
+    {
+        //
+        // Remove server from list
+        //
+
+        int iIndex = FindRowFromServer ( Type, pServer );
+        if ( iIndex != -1 )
         {
-            int iRowCount = m_pServerList [ Type ]->GetRowCount ();
-            for ( int i = 0 ; i < iRowCount ; i++ )
-            {
-                SString strOtherEndPoint = m_pServerList [ Type ]->GetItemText ( i, m_hHost [ Type ] );
-                if ( strOtherEndPoint == strEndpoint )
-                {
-                    iIndex = i;
-                    break;
-                }
-            }
+            m_pServerList [ Type ]->RemoveRow ( iIndex );
         }
-        // Create a new row if not found
+    }
+    else
+    {
+        //
+        // Add/update server in list
+        //
+
+        // Get existing row or create a new row if not found
+        int iIndex = FindRowFromServer ( Type, pServer );
         if ( iIndex == - 1 )
             iIndex = m_pServerList [ Type ]->AddRow ( true );
 
+        const SString strVersion          = !bIncludeOtherVersions ? "" : pServer->strVersion;
+        const SString strVersionSortKey   = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
+
+        const SString strPlayers          = pServer->nMaxPlayers == 0 ? "" : SString ( "%d / %d", pServer->nPlayers, pServer->nMaxPlayers );
+        const SString strPlayersSortKey   = SString ( "%04d-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0 ) + pServer->strTieBreakSortKey;
+
+        const SString strPing             = pServer->nPing == 9999 ? "" : SString ( "%d", pServer->nPing );
+        const SString strPingSortKey      = SString ( "%04d-", pServer->nPing ) + pServer->strTieBreakSortKey;
 
         // The row index could change at any point here if list sorting is enabled
-        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hName [ Type ],     pServer->strName.c_str (), false, false, true );
-        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hGame [ Type ],     pServer->strType.c_str (), false, false, true );
-        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hMap [ Type ],      pServer->strMap.c_str (), false, false, true );
-        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hHost [ Type ],     strEndpoint, false, false, true );
-        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPlayers [ Type ],  strPlayers, true, false, true );
-        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPing [ Type ],     SString ( "%d", pServer->nPing ), true, false, true );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hVersion [ Type ], strVersion, false, false, true, strVersionSortKey );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hName [ Type ],    pServer->strName, false, false, true, pServer->strNameSortKey );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hGame [ Type ],    pServer->strGameMode, false, false, true );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hMap [ Type ],     pServer->strMap, false, false, true );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hHost [ Type ],    pServer->GetEndpoint (), false, false, true, pServer->GetEndpointSortKey () );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPlayers [ Type ], strPlayers, false, false, true, strPlayersSortKey );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPing [ Type ],    strPing, false, false, true, strPingSortKey );
 
         // Locked icon
         m_pServerList [ Type ]->SetItemImage ( iIndex, m_hLocked [ Type ], pServer->bPassworded ? m_pLockedIcon : NULL );
-        m_pServerList [ Type ]->SetItemImage ( iIndex, m_hSerial [ Type ], pServer->bSerials    ? m_pSerialIcon : NULL );
+
+        // Data for later use
+        m_pServerList [ Type ]->SetItemData ( iIndex, m_hHost [ Type ], (void*)pServer->Address.s_addr );
+        m_pServerList [ Type ]->SetItemData ( iIndex, m_hMap [ Type ], (void*)pServer->usGamePort );
+
+        // Colours
+        SColor color = SColorRGBA ( 255,255,255,255 );
+
+#if MTA_DEBUG
+        if ( pServer->uiCacheNoReplyCount )                     color.R /= 2;
+        if ( pServer->bMasterServerSaysNoResponse )             color.G /= 2;
+#endif
+        if ( bIsOtherVersion )                                  color.B /= 2;
+        if ( pServer->bMaybeOffline )                           color.A /= 2;
+
+        m_pServerList [ Type ]->SetItemColor ( iIndex, m_hVersion [ Type ], color.R, color.G, color.B, color.A );
+        m_pServerList [ Type ]->SetItemColor ( iIndex, m_hLocked [ Type ],  color.R, color.G, color.B, color.A );
+        m_pServerList [ Type ]->SetItemColor ( iIndex, m_hName [ Type ],    color.R, color.G, color.B, color.A );
+        m_pServerList [ Type ]->SetItemColor ( iIndex, m_hPlayers [ Type ], color.R, color.G, color.B, color.A );
+        m_pServerList [ Type ]->SetItemColor ( iIndex, m_hPing [ Type ],    color.R, color.G, color.B, color.A );
+        m_pServerList [ Type ]->SetItemColor ( iIndex, m_hGame [ Type ],    color.R, color.G, color.B, color.A );
+        m_pServerList [ Type ]->SetItemColor ( iIndex, m_hMap [ Type ],     color.R, color.G, color.B, color.A );
+        m_pServerList [ Type ]->SetItemColor ( iIndex, m_hHost [ Type ],    color.R, color.G, color.B, color.A );
     }
 }
 
@@ -557,8 +692,6 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
 {
     ServerBrowserType Type = GetCurrentServerBrowserType ();
 
-    char buf[32];
-
     if ( pElement == m_pServerPlayerList [ Type ] && m_pServerPlayerList [ Type ]->GetSelectedCount () >= 1 )
     {
         // Get the selected row of the player gridlist
@@ -579,10 +712,9 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
                 {
                     // We found the server on which the player is
                     // Walk the server gridlist looking for the server host to get the row index
-                    std::string strEndpoint = pServer->strHost + ":" + itoa ( pServer->usGamePort, buf, 10 );
                     for ( int k = 0; k < m_pServerList [ Type ]->GetRowCount (); k++ )
                     {
-                        if ( strEndpoint.compare ( m_pServerList [ Type ]->GetItemText ( k, m_hHost [ Type ] ) ) == 0 )
+                        if ( pServer->GetEndpoint ().compare ( m_pServerList [ Type ]->GetItemText ( k, m_hHost [ Type ] ) ) == 0 )
                         {
                             // We found the index, select it
                             m_pServerList [ Type ]->SetSelectedItem ( k, m_hHost [ Type ], true );
@@ -594,7 +726,7 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
                                 CVARS_GET ( "save_server_passwords", bSavedPasswords );
                                 if ( pServer->bPassworded && bSavedPasswords )
                                 {
-                                    m_pEditPassword [ Type ]->SetText ( GetServerPassword(strEndpoint).c_str() );
+                                    m_pEditPassword [ Type ]->SetText ( GetServerPassword( pServer->GetEndpoint () ).c_str() );
                                 }
                                 else
                                 {
@@ -612,7 +744,7 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
             }
         }
     }
- 
+
     // If there is one item selected
     if ( m_pServerList [ Type ]->GetSelectedCount () >= 1 )
     {
@@ -622,36 +754,34 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
         // Get the selected row
         int iSelectedIndex = m_pServerList [ Type ]->GetSelectedItemRow ();
 
-        // Walk the server list looking for this server
-        CServerList * pList = GetServerList ( Type );
-        CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
-        std::string strSelectedEndpoint = m_pServerList [ Type ]->GetItemText ( iSelectedIndex, m_hHost [ Type ] );
-        for ( i = i_b; i != i_e; i++ ) 
+        CServerListItem * pServer = FindSelectedServer ( Type );
+        if ( pServer )
         {
-            CServerListItem * pServer = *i;
-            std::string strEndpoint = pServer->strHost + ":" + itoa ( pServer->usGamePort, buf, 10 );
-            if ( strSelectedEndpoint.compare ( strEndpoint ) == 0 ) 
+            // We found the server, add all the players
+            for ( unsigned int j = 0; j < pServer->vecPlayers.size (); j++ ) 
             {
-                // We found the server, add all the players
-                for ( unsigned int j = 0; j < pServer->vecPlayers.size (); j++ ) 
-                {
-                    int k = m_pServerPlayerList [ Type ]->AddRow ();
-                    m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], pServer->vecPlayers[j].c_str () );
-                }
+                int k = m_pServerPlayerList [ Type ]->AddRow ();
+                m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], pServer->vecPlayers[j].c_str () );
+            }
 
-                // It's not the same server as was selected before, so we update the password
-                if ( iSelectedIndex != m_iSelectedServer[ Type ] )
+            if ( pServer->nPlayers && !pServer->vecPlayers.size () )
+            {
+                int k = m_pServerPlayerList [ Type ]->AddRow ();
+                m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], PLAYER_LIST_PENDING_TEXT );
+            }
+
+            // It's not the same server as was selected before, so we update the password
+            if ( iSelectedIndex != m_iSelectedServer[ Type ] )
+            {
+                bool bSavedPasswords;
+                CVARS_GET ( "save_server_passwords", bSavedPasswords );
+                if ( pServer->bPassworded && bSavedPasswords )
                 {
-                    bool bSavedPasswords;
-                    CVARS_GET ( "save_server_passwords", bSavedPasswords );
-                    if ( pServer->bPassworded && bSavedPasswords )
-                    {
-                        m_pEditPassword [ Type ]->SetText ( GetServerPassword(strEndpoint).c_str() );
-                    }
-                    else
-                    {
-                        m_pEditPassword [ Type ]->SetText ( "" );
-                    }
+                    m_pEditPassword [ Type ]->SetText ( GetServerPassword( pServer->GetEndpoint () ).c_str() );
+                }
+                else
+                {
+                    m_pEditPassword [ Type ]->SetText ( "" );
                 }
             }
         }
@@ -688,56 +818,37 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
     ServerBrowserType Type = GetCurrentServerBrowserType ();
     m_pServerPlayerList [ Type ]->Clear ();
 
-    char buf[32];
- 
     // If there is one item selected
-    if ( m_pServerList [ Type ]->GetSelectedCount () >= 1 )
+    if ( CServerListItem * pServer = FindSelectedServer ( Type ) )
     {
-        // Get the selected row
-        int iSelectedIndex = m_pServerList [ Type ]->GetSelectedItemRow ();
-
-        // Walk the server list looking for this server
-        CServerList * pList = GetServerList ( Type );
-        CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
-        std::string strSelectedEndpoint = m_pServerList [ Type ]->GetItemText ( iSelectedIndex, m_hHost [ Type ] );
-        for ( i = i_b; i != i_e; i++ ) {
-            CServerListItem * pServer = *i;
-            std::string strEndpoint = pServer->strHost + ":" + itoa ( pServer->usGamePort, buf, 10 );
-            if ( strSelectedEndpoint.compare ( strEndpoint ) == 0 )
-            {
-                if ( ( pServer->bSerials ) && ( !g_pCore->GetCommunity()->IsLoggedIn() ) )
-                {
-                    m_pCommunityLogin.SetVisible ( true );
-                    return true;
-                }
-                // Get the nick from the config
-                std::string strNick;
-                CVARS_GET ( "nick", strNick );
-
-                // Valid nick?
-                if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
-                {
-                    CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new!", MB_BUTTON_OK | MB_ICON_INFO );
-                    return true;
-                }
-
-                // Password buffer
-                char szPassword [48];
-                szPassword [47] = 0;
-                strncpy ( szPassword, m_pEditPassword [ Type ]->GetText ().c_str (), 47 );
-                
-                bool bSavedPasswords;
-                CVARS_GET ( "save_server_passwords", bSavedPasswords );
-                if ( pServer->bPassworded && bSavedPasswords )
-                {
-                    SetServerPassword ( strEndpoint, ( std::string )szPassword );
-                }
-                
-
-                // Start the connect
-                CCore::GetSingleton ().GetConnectManager ()->Connect ( pServer->strHost.c_str (), pServer->usGamePort, strNick.c_str (), szPassword );
-            }
+        if ( ( pServer->bSerials ) && ( !g_pCore->GetCommunity()->IsLoggedIn() ) )
+        {
+            m_pCommunityLogin.SetVisible ( true );
+            return true;
         }
+        // Get the nick from the config
+        std::string strNick;
+        CVARS_GET ( "nick", strNick );
+
+        // Valid nick?
+        if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
+        {
+            CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new!", MB_BUTTON_OK | MB_ICON_INFO );
+            return true;
+        }
+
+        // Password buffer
+        SString strPassword = SString ( m_pEditPassword [ Type ]->GetText () ).Left ( 47 );
+
+        bool bSavedPasswords;
+        CVARS_GET ( "save_server_passwords", bSavedPasswords );
+        if ( pServer->bPassworded && bSavedPasswords )
+        {
+            SetServerPassword ( pServer->GetEndpoint (), strPassword );
+        }
+
+        // Start the connect
+        CCore::GetSingleton ().GetConnectManager ()->Connect ( pServer->strHost.c_str (), pServer->usGamePort, strNick.c_str (), strPassword );
     }
     else
     {
@@ -787,19 +898,15 @@ bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
 
             CServerListItem::Parse ( szHost, Address );
 
-            CServerListItem pServer ( Address, usPort );
-
             if ( currentServerBrowserType == ServerBrowserType::FAVOURITES )
             {
-                m_ServersFavourites.Remove ( pServer );
+                m_ServersFavourites.Remove ( Address, usPort );
                 SaveFavouritesList();
             }
             else
             {
-                // Make sure the user didn't pull a Talidan and add the server again
-                if ( !m_ServersFavourites.Exists ( pServer ) )
+                if ( m_ServersFavourites.AddUnique ( Address, usPort ) )
                 {
-                    m_ServersFavourites.Add ( pServer );
                     SaveFavouritesList();
                 }
             }
@@ -885,7 +992,7 @@ bool CServerBrowser::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 bool CServerBrowser::OnFilterChanged ( CGUIElement* pElement )
 {
     UpdateServerList ( GetCurrentServerBrowserType (), true );
-    SaveOptions ( );
+    //SaveOptions ( );  Slow
 
     return true;
 }
@@ -924,13 +1031,9 @@ bool CServerBrowser::OnFavouritesByIPAddClick ( CGUIElement* pElement )
         return true;
     }
 
-    // Construct list item
-    CServerListItem Item ( Address, iPort, strHost );
-
     // Add the item if it doesn't already exist
-    if ( !m_ServersFavourites.Exists ( Item ) )
+    if ( m_ServersFavourites.AddUnique ( Address, iPort ) )
     {
-        m_ServersFavourites.Add ( Item );
         SaveFavouritesList();
         UpdateServerList ( ServerBrowserType::FAVOURITES );
     }
@@ -965,7 +1068,7 @@ bool CServerBrowser::LoadServerList ( CXMLNode* pNode, const std::string& strTag
                 {
                     iPort = atoi ( pPortAttribute->GetValue ().c_str () ) + SERVER_LIST_QUERY_PORT_OFFSET;
                     if ( iPort > 0 )
-                        pList->Add ( CServerListItem ( Address, iPort ) );
+                        pList->AddUnique ( Address, iPort );
                 }
             }
         }
@@ -1005,28 +1108,22 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
 
     // Iterate through the list, adding any items to our node
     CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
-    int j = 0;
-    int k = pList->GetServerCount ();
-    if ( k > 0 )
+    for ( CServerListIterator i = i_b; i != i_e; i++ )
     {
-        for ( CServerListIterator i = i_b; i != i_e; i++ )
-        {
-            CServerListItem * pServer = *i;
+        CServerListItem * pServer = *i;
 
-            // Add the item to the node
-            CXMLNode * pSubNode = pNode->CreateSubNode ( strTagName.c_str () );
-            if ( pSubNode )
-            {
-                CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Create ( "host" );
-                std::string strHost = pServer->strHost;
-                if ( !pServer->strHostName.empty () )
-                    strHost = pServer->strHostName;
-                pHostAttribute->SetValue ( strHost.c_str () );
-                
-                CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Create ( "port" );
-                pPortAttribute->SetValue ( pServer->usGamePort );
-            }
-            j++;
+        // Add the item to the node
+        CXMLNode * pSubNode = pNode->CreateSubNode ( strTagName.c_str () );
+        if ( pSubNode )
+        {
+            CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Create ( "host" );
+            std::string strHost = pServer->strHost;
+            if ( !pServer->strHostName.empty () )
+                strHost = pServer->strHostName;
+            pHostAttribute->SetValue ( strHost.c_str () );
+            
+            CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Create ( "port" );
+            pPortAttribute->SetValue ( pServer->usGamePort );
         }
     }
     return true;
@@ -1066,6 +1163,10 @@ void CServerBrowser::LoadOptions ( CXMLNode* pNode )
                     CXMLAttribute* pIncludeLocked = pSubNode->GetAttributes ( ).Find ( "include_locked" );
                     if ( pIncludeLocked )
                         m_pIncludeLocked[ i ]->SetSelected ( pIncludeLocked->GetValue ( ).compare ( "1" ) == 0 );
+
+                    //CXMLAttribute* pIncludeOtherVersions = pSubNode->GetAttributes ( ).Find ( "include_other_versions" );
+                    //if ( pIncludeOtherVersions )
+                    //    m_pIncludeOtherVersions[ i ]->SetSelected ( pIncludeOtherVersions->GetValue ( ).compare ( "1" ) == 0 );
 
                     // load 'include offline' if the checkbox exists
                     if ( m_pIncludeOffline[ i ] )
@@ -1131,6 +1232,9 @@ void CServerBrowser::SaveOptions ( )
             CXMLAttribute* pIncludeLocked = pSubNode->GetAttributes ( ).Create ( "include_locked" );
             pIncludeLocked->SetValue ( m_pIncludeLocked [ ui ]->GetSelected ( ) );
 
+            //CXMLAttribute* pIncludeOtherVersions = pSubNode->GetAttributes ( ).Create ( "include_other_versions" );
+            //pIncludeOtherVersions->SetValue ( m_pIncludeOtherVersions [ ui ]->GetSelected ( ) );
+
             // Only recently played & favorites have 'Include offline'
             if ( m_pIncludeOffline [ ui ] )
             {
@@ -1181,7 +1285,6 @@ void CServerBrowser::SetServerPassword ( const std::string& strHost, const std::
                 }
             }
         }
-        
     }
 
     // Otherwise create the node from scratch
@@ -1232,5 +1335,150 @@ void CServerBrowser::ClearServerPasswords ()
     {
         pServerPasswords->DeleteAllSubNodes();
         pConfig->DeleteSubNode ( pServerPasswords );
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// CServerBrowser::FindSelectedServer
+//
+//
+//
+/////////////////////////////////////////////////////////////////
+CServerListItem* CServerBrowser::FindSelectedServer ( ServerBrowserType Type )
+{
+    if ( m_pServerList [ Type ]->GetSelectedCount () >= 1 )
+    {
+        return FindServerFromRow ( Type, m_pServerList [ Type ]->GetSelectedItemRow () );
+    }
+    return NULL;
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// CServerBrowser::FindServerFromRow
+//
+//
+//
+/////////////////////////////////////////////////////////////////
+CServerListItem* CServerBrowser::FindServerFromRow ( ServerBrowserType Type, int iRow )
+{
+    CServerList * pList = GetServerList ( Type );
+    CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
+    std::string strSelectedEndpoint = m_pServerList [ Type ]->GetItemText ( iRow, m_hHost [ Type ] );
+    for ( i = i_b; i != i_e; i++ ) 
+    {
+        CServerListItem * pServer = *i;
+        if ( pServer->GetEndpoint () == strSelectedEndpoint )
+            return pServer;
+    }
+    return NULL;
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// CServerBrowser::FindRowFromServer
+//
+//
+//
+/////////////////////////////////////////////////////////////////
+int CServerBrowser::FindRowFromServer ( ServerBrowserType Type, const CServerListItem * pServer )
+{
+    ulong ulIp = pServer->Address.s_addr;
+    ushort usPort = pServer->usGamePort;
+
+    CGUIGridList* pServerList = m_pServerList [ Type ];
+    CGUIHandle hHost = m_hHost [ Type ];
+    CGUIHandle hMap = m_hMap [ Type ];
+
+    int iRowCount = pServerList->GetRowCount ();
+    for ( int i = 0 ; i < iRowCount ; i++ )
+    {
+        if ( ulIp == (ulong)pServerList->GetItemData ( i, hHost ) )
+        {
+            if ( usPort == (ushort)pServerList->GetItemData ( i, hMap ) )
+            {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// CServerBrowser::UpdateSelectedServerPlayerList
+//
+// Update GUI player list if select server gets query response
+//
+/////////////////////////////////////////////////////////////////
+void CServerBrowser::UpdateSelectedServerPlayerList ( ServerBrowserType Type )
+{
+    // If there is one item selected
+    if ( m_pServerList [ Type ]->GetSelectedCount () >= 1 )
+    {
+        // Get the selected row
+        int iSelectedIndex = m_pServerList [ Type ]->GetSelectedItemRow ();
+
+        // Get number of players as defined in the gridlist
+        int iNumPlayers = atoi ( m_pServerList [ Type ]->GetItemText ( iSelectedIndex, m_hPlayers [ Type ] ) );
+
+        // Get number of rows in the gui player list
+        int iNumPlayerRows = m_pServerPlayerList [ Type ]->GetRowCount ();
+
+        // If number of rows in player list is less than number of players in server item,
+        if ( iNumPlayers > iNumPlayerRows || iNumPlayerRows == 1 && iNumPlayers == 1 )
+        {
+            // find server item
+            CServerListItem * pServer = FindSelectedServer ( Type );
+
+            if ( pServer && pServer->vecPlayers.size () > 0 )
+            {
+                bool bUpdatePlayerList = false;
+                if ( iNumPlayerRows == 1 && pServer->vecPlayers.size () == 1 )
+                {
+                    SString strPlayerName = m_pServerPlayerList [ Type ]->GetItemText ( 0, m_hPlayerName [ Type ] );
+                    if ( strPlayerName == PLAYER_LIST_PENDING_TEXT )
+                        bUpdatePlayerList = true;
+                }
+                if ( (int)pServer->vecPlayers.size () > iNumPlayerRows || bUpdatePlayerList )
+                {
+                    m_pServerPlayerList [ Type ]->Clear ();
+
+                    // Add all the players
+                    for ( unsigned int j = 0; j < pServer->vecPlayers.size (); j++ ) 
+                    {
+                        int k = m_pServerPlayerList [ Type ]->AddRow ();
+                        m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], pServer->vecPlayers[j].c_str () );
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////
+//
+// CServerBrowser::GetVisibleEndPointList
+//
+// Get list servers that are visible in the GUI
+//
+/////////////////////////////////////////////////////////////////
+void CServerBrowser::GetVisibleEndPointList ( std::vector < SAddressPort >& outEndpointList )
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType ();
+
+    int iFirst, iLast;
+    m_pServerList [ Type ]->GetVisibleRowRange ( iFirst, iLast );
+    for ( int i = iFirst; i >= 0 && i <= iLast ; i++ )
+    {
+        ulong ulIp = (ulong)m_pServerList [ Type ]->GetItemData ( i, m_hHost [ Type ] );
+        ushort usPort = (ushort)m_pServerList [ Type ]->GetItemData ( i, m_hMap [ Type ] );
+        outEndpointList.push_back ( SAddressPort ( (in_addr&)ulIp, usPort ) );
     }
 }

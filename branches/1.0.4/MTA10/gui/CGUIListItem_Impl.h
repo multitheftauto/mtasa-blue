@@ -35,7 +35,7 @@ public:
                             ~CGUIListItem_Impl      ( void );
 
     std::string             GetText                 ( void ) const;
-    void                    SetText                 ( const char *pszText );
+    void                    SetText                 ( const char *pszText, const char *pszSortText = NULL );
 
     void*                   GetData                 ( void ) const                { return m_pData; }
     void                    SetData                 ( void* pData )               { m_pData = pData; }

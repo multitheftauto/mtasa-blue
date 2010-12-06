@@ -25,7 +25,7 @@ CGUIListItem_Impl::CGUIListItem_Impl ( const char* szText, unsigned int uiType, 
             m_pListItem = new CEGUI::ListboxTextItem ( CEGUI::String ( szText ) );
             break;
         case Type::ImageItem:
-            m_pListItem = new CEGUI::ListboxImageItem ( *pImage->GetDirectImage () );
+            m_pListItem = new CEGUI::ListboxImageItem ( pImage ? pImage->GetDirectImage () : NULL );
             break;
         case Type::NumberItem:
             m_pListItem = new CEGUI::ListboxNumberItem ( CEGUI::String ( szText ) );
@@ -62,13 +62,13 @@ void CGUIListItem_Impl::SetFont ( const char *szFontName )
 }
 
 
-void CGUIListItem_Impl::SetText ( const char *pszText )
+void CGUIListItem_Impl::SetText ( const char *pszText, const char *pszSortText )
 {
     CEGUI::String strText;
 
     if ( pszText )
         strText.assign ( pszText );
-    m_pListItem->setText ( strText );
+    m_pListItem->setText ( strText, pszSortText );
 }
 
 

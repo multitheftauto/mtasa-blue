@@ -785,13 +785,15 @@ void CGame::PulseMasterServerAnnounce ( void )
             unsigned short usServerPort = m_pMainConfig->GetServerPort ();
             unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
 
+            SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
+
             struct {
                 SString strDesc;
                 SString strURL;
                 bool bRepeat;
             } masterServerList[] = {
                                      { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false },
-                                     { "Querying backup master server... ", SString ( "http://nightly.mtasa.com/ase/add.php?g=%u&a=%u&h=%u", usServerPort, usServerPort + 123, usHTTPPort ), true },
+                                     { "Querying backup master server... ", SString ( "http://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion ), true },
                                    };
 
             for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )

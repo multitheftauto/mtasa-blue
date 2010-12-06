@@ -35,6 +35,9 @@ public:
     virtual bool        IsOptionalUpdateInfoRequired        ( const SString& strHost );
     virtual void        InitiateDataFilesFix                ( void );
     virtual void        InitiateManualCheck                 ( void );
+    virtual void        GetAseServerList                    ( std::vector < SString >& outResult );
+    virtual void        InitiateSidegradeLaunch             ( const SString& strVersion, const SString& strHost, ushort usPort, const SString& strName, const SString& strPassword );
+    virtual void        GetBlockedVersionMap                ( std::map < SString, int >& outBlockedVersionMap );
 
     // CVersionUpdater functions
 
@@ -60,6 +63,7 @@ public:
     void                _UseDataFilesURLs                   ( void );
     void                _UseReportLogURLs                   ( void );
     void                _UseCrashDumpURLs                   ( void );
+    void                _UseSidegradeURLs                   ( void );
     void                _UseReportLogPostContent            ( void );
     void                _UseCrashDumpPostContent            ( void );
     void                _ActionReconnect                    ( void );
@@ -88,6 +92,11 @@ public:
     void                _PollDownload                       ( void );
     void                _StartSendPost                      ( void );
     void                _PollSendPost                       ( void );
+    void                _CheckSidegradeRequirements         ( void );
+    void                _DoSidegradeLaunch                  ( void );
+    void                _DialogSidegradeDownloadQuestion    ( void );
+    void                _DialogSidegradeLaunchQuestion      ( void );
+    void                _DialogSidegradeQueryError          ( void );
 
     void                _ProcessMasterFetch                 ( void );
     void                _ProcessPatchFileQuery              ( void );
@@ -109,6 +118,13 @@ public:
     SString                             m_strServerSaysType;
     SString                             m_strServerSaysData;
     SString                             m_strServerSaysHost;
+
+    SString                             m_strSidegradeVersion;
+    SString                             m_strSidegradeHost;
+    ushort                              m_usSidegradePort;
+    SString                             m_strSidegradeName;
+    SString                             m_strSidegradePassword;
+    SString                             m_strSidegradePath;
 
     bool                                m_bCheckedTimeForVersionCheck;
     bool                                m_bCheckedTimeForMasterFetch;
@@ -254,6 +270,9 @@ bool CVersionUpdater::LoadConfigFromXML ( void )
         XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
         XMLAccess.GetSubNodeValue ( "gtadatafiles.serverlist",      m_MasterConfig.gtadatafiles.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "trouble.serverlist",           m_MasterConfig.trouble.serverInfoMap );
+        XMLAccess.GetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
+        XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
+        XMLAccess.GetSubNodeValue ( "sidegrade.nobrowselist",       m_MasterConfig.sidegrade.nobrowseInfoMap );
 
         UpdateTroubleURL ();
     }
@@ -303,6 +322,9 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         XMLAccess.SetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
         XMLAccess.SetSubNodeValue ( "gtadatafiles.serverlist",      m_MasterConfig.gtadatafiles.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "trouble.serverlist",           m_MasterConfig.trouble.serverInfoMap );
+        XMLAccess.SetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
+        XMLAccess.SetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
+        XMLAccess.SetSubNodeValue ( "sidegrade.nobrowselist",       m_MasterConfig.sidegrade.nobrowseInfoMap );
     }
 
     return true;
@@ -536,6 +558,78 @@ void CVersionUpdater::InitiateManualCheck ( void )
     {
         // Pretend to do a check if less than a minute since last check
         RunProgram ( "ManualCheckSim" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::InitiateSidegradeLaunch
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::InitiateSidegradeLaunch ( const SString& strVersion, const SString& strHost, ushort usPort, const SString& strName, const SString& strPassword )
+{
+    m_strSidegradeVersion = strVersion;
+    m_strSidegradeHost = strHost;
+    m_usSidegradePort = usPort;
+    m_strSidegradeName = strName;
+    m_strSidegradePassword = strPassword;
+
+    m_strServerSaysHost = SString ( "%s:%d", *strHost, usPort );
+    RunProgram ( "SidegradeLaunch" );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::GetAseServerList
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::GetAseServerList ( std::vector < SString >& outResult )
+{
+    outResult = MakeServerList ( m_MasterConfig.ase.serverInfoMap );
+
+    // Backup plan if list is empty
+    if ( outResult.empty () )
+        outResult.push_back ( "http://1mgg.com/affil/mta" );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::GetBlockedVersionMap
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::GetBlockedVersionMap ( std::map < SString, int >& outBlockedVersionMap )
+{
+    outBlockedVersionMap.clear ();
+
+    //
+    // Find list for our version
+    //
+    const CDataInfoSet& dataInfoSet = m_MasterConfig.sidegrade.nobrowseInfoMap;
+    for ( uint i = 0 ; i < dataInfoSet.size () ; i++ )
+    {
+        const SDataInfoItem& line = dataInfoSet[i];
+        const SString* pstrVersion = MapFind ( line.attributeMap, "version" );
+        if ( pstrVersion && *pstrVersion == MTA_DM_ASE_VERSION )
+        {
+            std::vector < SString > blockedVersionList;
+            line.strValue.Split ( ";", blockedVersionList );
+
+            for ( uint i = 0 ; i < blockedVersionList.size () ; i++ )
+            {
+                outBlockedVersionMap[ blockedVersionList[i] ] = 1;
+            }
+
+            break;
+        }
     }
 }
 
@@ -918,6 +1012,44 @@ void CVersionUpdater::InitPrograms ()
         ADDINST (     _End );
     }
 
+
+    //
+    // SidegradeLaunch
+    //
+    {
+        SString strProgramName = "SidegradeLaunch";
+        MapSet ( m_ProgramMap, strProgramName, CProgram () );
+        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
+
+        ADDINST (   _CheckSidegradeRequirements );                      // Check if other version already installed
+        ADDCOND ( "if ProcessResponse.!installed goto NOTINSTALLED" );  // Other version present and valid?
+            ADDINST (   _DialogSidegradeLaunchQuestion );                   // Does user want to launch and connect using the other version?
+            ADDCOND ( "if QuestionResponse.!Yes goto NOLAUNCH" );
+                ADDINST (   _DoSidegradeLaunch );                                   // If user says 'Yes', then launch
+            ADDLABL ( "NOLAUNCH:" );
+            ADDINST (   _End );
+       
+        ADDLABL ( "NOTINSTALLED:" );                                    // If not installed, check if it is downloadable
+        ADDINST (   _UseSidegradeURLs );                                // Use sidegrade URLs
+        ADDINST (   _StartDownload );                                   // Fetch file info from server
+        ADDINST (   _ProcessPatchFileQuery );
+        ADDCOND ( "if ProcessResponse.update goto HASFILE" );           // Does server have the required file?
+            ADDINST (   _DialogSidegradeQueryError );                       // If no download available, show message
+            ADDINST (   _End );
+
+        ADDLABL ( "HASFILE:" );
+        ADDINST (   _DialogSidegradeDownloadQuestion );                 // If it is downloadable, ask user what to do
+        ADDCOND ( "if QuestionResponse.Yes goto YESDOWNLOAD" );
+            ADDINST (     _End );                                           // If user says 'No', then finish
+
+        ADDLABL ( "YESDOWNLOAD:" );                                     // If user says yes, download and run installer
+        ADDINST (   _DialogDownloading );                               // Show "Downloading..." message
+        ADDINST (   _UseProvidedURLs );
+        ADDINST (   _StartDownload );                                   // Fetch file binary from mirror
+        ADDINST (   _ProcessPatchFileDownload );
+        ADDINST (   _DialogDataFilesResult );                           // Show "ok/failed" message
+        ADDINST (   _End );
+    }
 }
 
 
@@ -980,6 +1112,123 @@ void CVersionUpdater::RunProgram ( const SString& strProgramName )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_CheckSidegradeRequirements
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_CheckSidegradeRequirements ( void )
+{
+    // Is version allowed to be launched?
+
+    // Find reg settings for other version
+    SString strRegPath ( "..\\%s", *m_strSidegradeVersion );
+
+    m_strSidegradePath = GetRegistryValue ( strRegPath, "Last Run Path" );
+    SString strLaunchHash = GetRegistryValue ( strRegPath, "Last Run Path Hash" );
+    SString strLaunchVersion = GetRegistryValue ( strRegPath, "Last Run Path Version" );
+
+    // Validate strLaunchVersion
+    bool bVersionMatch = ( strLaunchVersion == m_strSidegradeVersion );
+
+    // Validate strLaunchPath
+    bool bLaunchPathValid = false;
+    {
+        MD5 md5;
+        CMD5Hasher Hasher;
+        if ( Hasher.Calculate ( m_strSidegradePath, md5 ) )
+        {
+            char szHashResult[33];
+            Hasher.ConvertToHex ( md5, szHashResult );
+
+            if ( strLaunchHash == szHashResult )
+                bLaunchPathValid = true;
+        }
+    }
+
+    if ( bVersionMatch && bLaunchPathValid )
+    {
+        m_ConditionMap.SetCondition ( "ProcessResponse", "installed" );
+    }
+    else
+    {
+        m_ConditionMap.SetCondition ( "ProcessResponse", "notinstalled" );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_DoSidegradeLaunch
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_DoSidegradeLaunch ( void )
+{
+    SString strURL ( "mtasa://%s:%s@%s:%d", *m_strSidegradeName, *m_strSidegradePassword, *m_strSidegradeHost, m_usSidegradePort );
+    SetOnQuitCommand ( "open", m_strSidegradePath, strURL );
+    Push ( _ExitGame );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_DialogSidegradeDownloadQuestion
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_DialogSidegradeDownloadQuestion ( void )
+{
+    GetQuestionBox ().Reset ();
+    GetQuestionBox ().SetTitle ( SString ( "MTA:SA %s required", *m_strSidegradeVersion ) );
+    GetQuestionBox ().SetMessage ( SString ( "An updated version of MTA:SA %s is required to join the selected server.\n\n"
+                                             "Do you want to download and install MTA:SA %s ?", *m_strSidegradeVersion, *m_strSidegradeVersion ) );
+    GetQuestionBox ().SetButton ( 0, "No" );
+    GetQuestionBox ().SetButton ( 1, "Yes" );
+    GetQuestionBox ().Show ();
+    Push ( _PollQuestionNoYes );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_DialogSidegradeLaunchQuestion
+//
+// If can launch other version, ask for user confirmation
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_DialogSidegradeLaunchQuestion ( void )
+{
+    GetQuestionBox ().Reset ();
+    GetQuestionBox ().SetTitle ( SString ( "MTA:SA %s required", *m_strSidegradeVersion ) );
+    GetQuestionBox ().SetMessage ( SString ( "Do you want to launch MTA:SA %s and connect to this server ?", *m_strSidegradeVersion ) );
+    GetQuestionBox ().SetButton ( 0, "No" );
+    GetQuestionBox ().SetButton ( 1, "Yes" );
+    GetQuestionBox ().Show ();
+    Push ( _PollQuestionNoYes );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_DialogSidegradeQueryError
+//
+// No download file for other version
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_DialogSidegradeQueryError ( void )
+{
+    GetQuestionBox ().Reset ();
+    GetQuestionBox ().SetTitle ( SString ( "MTA:SA %s required", *m_strSidegradeVersion ) );
+    GetQuestionBox ().SetMessage ( "It is not possible to connect at this time.\n\nPlease try later." );
+    GetQuestionBox ().SetButton ( 0, "OK" );
+    GetQuestionBox ().Show ();
+    Push ( _PollAnyButton );
+}
 
 
 ///////////////////////////////////////////////////////////////
@@ -1629,6 +1878,9 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
     XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   newMasterConfig.crashdump.iMaxHistoryLength );
     XMLAccess.GetSubNodeValue ( "gtadatafiles.serverlist",      newMasterConfig.gtadatafiles.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "trouble.serverlist",           newMasterConfig.trouble.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "ase.serverlist",               newMasterConfig.ase.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         newMasterConfig.sidegrade.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "sidegrade.nobrowselist",       newMasterConfig.sidegrade.nobrowseInfoMap );
 
     if ( newMasterConfig.IsValid () )
     {
@@ -1654,6 +1906,20 @@ void CVersionUpdater::UpdateTroubleURL ( void )
     std::vector < SString > serverList = MakeServerList ( m_MasterConfig.trouble.serverInfoMap );
     if ( serverList.size () && serverList[0].length () > 4 )
         SetApplicationSetting ( "trouble-url", serverList[0] );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_UseSidegradeURLs
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseSidegradeURLs ( void )
+{
+    m_JobInfo = SJobInfo ();
+    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.sidegrade.serverInfoMap );
 }
 
 
@@ -2138,6 +2404,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "%TYPE%", m_strServerSaysType );
     strQueryURL = strQueryURL.Replace ( "%DATA%", m_strServerSaysData );
     strQueryURL = strQueryURL.Replace ( "%REFER%", m_strServerSaysHost );
+    strQueryURL = strQueryURL.Replace ( "%WANTVER%", m_strSidegradeVersion );
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );

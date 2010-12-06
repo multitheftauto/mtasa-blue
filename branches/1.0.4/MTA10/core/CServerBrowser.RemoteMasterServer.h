@@ -14,7 +14,7 @@ public:
     // CRemoteMasterServerInterface
     virtual void            Refresh                     ( void ) = 0;
     virtual bool            HasData                     ( void ) = 0;
-    virtual bool            ParseList                   ( std::list < CServerListItem* >& itemList ) = 0;
+    virtual bool            ParseList                   ( CServerListItemList& itemList ) = 0;
 };
 
 CRemoteMasterServerInterface* NewRemoteMasterServer ( const SString& strURL );

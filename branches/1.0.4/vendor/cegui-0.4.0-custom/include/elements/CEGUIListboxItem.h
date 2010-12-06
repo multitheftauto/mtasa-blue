@@ -78,6 +78,7 @@ public:
 		String object containing the current text for the list box item.
 	*/
 	const String&	getText(void) const		{return d_itemText;}
+	const String&	getSortText(void) const		{return d_itemSortText.empty () ? d_itemText : d_itemSortText;}
 	const String&	getTooltipText(void) const		{return d_tooltipText;}
 
 	/*!
@@ -187,7 +188,7 @@ public:
 	\return
 		Nothing.
 	*/
-	void	setText(const String& text)		{d_itemText = text;}
+	void	setText(const String& text, const char* sortText);
 
 	void	setTooltipText(const String& text)		{d_tooltipText = text;}
 
@@ -365,7 +366,7 @@ public:
 	\return
 		Size object describing the size of the list box item in pixels.
 	*/
-	virtual	Size	getPixelSize(void) const	= 0;
+	virtual	Size	getPixelSize(void)	= 0;
 
 
 	/*!
@@ -395,14 +396,14 @@ public:
 	\brief
 		Less-than operator, compares item texts.
 	*/
-	virtual	bool	operator<(const ListboxItem& rhs) const		{return d_itemText < rhs.getText();}
+	virtual	bool	operator<(const ListboxItem& rhs) const		{return getSortText() < rhs.getSortText();}
 
 
 	/*!
 	\brief
 		Greater-than operator, compares item texts.
 	*/
-	virtual	bool	operator>(const ListboxItem& rhs) const		{return d_itemText > rhs.getText();}
+	virtual	bool	operator>(const ListboxItem& rhs) const		{return getSortText() > rhs.getSortText();}
 
 
 protected:
@@ -429,15 +430,18 @@ protected:
 		Implementation Data
 	*************************************************************************/
 	String	d_itemText;		//!< Text for this list box item.  If not rendered, this is still used for list sorting.
+	String	d_itemSortText; // Used for sorting if not empty
 	String  d_tooltipText;  //!< Text for the individual tooltip of this item
 	uint	d_itemID;		//!< ID code assigned by client code.  This has no meaning within the GUI system.
 	void*	d_itemData;		//!< Pointer to some client code data.  This has no meaning within the GUI system.
 	bool	d_selected;		//!< true if this item is selected.  false if the item is not selected.
 	bool	d_disabled;		//!< true if this item is disabled.  false if the item is not disabled.
 	bool	d_autoDelete;	//!< true if the system should destroy this item, false if client code will destroy the item.
+	bool	d_bSizeChanged;
 	const Window*	d_owner;	//!< Pointer to the window that owns this item.
 	ColourRect		d_selectCols;		//!< Colours used for selection highlighting.
 	const Image*	d_selectBrush;		//!< Image used for rendering selection.
+    Size    d_savedPixelSize;
 };
 
 } // End of  CEGUI namespace section

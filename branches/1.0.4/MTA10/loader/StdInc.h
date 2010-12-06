@@ -11,6 +11,7 @@
 #include <shlobj.h>
 #include <Psapi.h>
 
+#define MTA_CLIENT
 #include "SharedUtil.h"
 #include "Main.h"
 #include "Install.h"

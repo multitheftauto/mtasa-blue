@@ -25,6 +25,9 @@ public:
     virtual bool            IsOptionalUpdateInfoRequired    ( const SString& strHost ) = 0;
     virtual void            InitiateDataFilesFix            ( void ) = 0;
     virtual void            InitiateManualCheck             ( void ) = 0;
+    virtual void            GetAseServerList                ( std::vector < SString >& outResult ) = 0;
+    virtual void            InitiateSidegradeLaunch         ( const SString& strVersion, const SString& strHost, ushort usPort, const SString& strName, const SString& strPassword ) = 0;
+    virtual void            GetBlockedVersionMap            ( std::map < SString, int >& outBlockedVersionMap ) = 0;
 };
 
 CVersionUpdaterInterface* GetVersionUpdater ();

@@ -26,7 +26,7 @@ class CServerBrowser;
 #define SERVER_BROWSER_TYPE_COUNT           4
 
 // Server browser list update interval (in ms)
-#define SERVER_BROWSER_UPDATE_INTERVAL      250
+#define SERVER_BROWSER_UPDATE_INTERVAL      1000
 
 #include "CMainMenu.h"
 #include "CServerList.h"
@@ -82,6 +82,12 @@ public:
     std::string         GetServerPassword       ( const std::string& strHost );
     void                ClearServerPasswords    ( void );
 
+    CServerListItem*    FindSelectedServer      ( ServerBrowserType Type );
+    CServerListItem*    FindServerFromRow       ( ServerBrowserType Type, int iRow );
+    int                 FindRowFromServer       ( ServerBrowserType Type, const CServerListItem * pServer );
+    void                UpdateSelectedServerPlayerList ( ServerBrowserType Type );
+    void                GetVisibleEndPointList  ( std::vector < SAddressPort >& outEndpointList );
+
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
@@ -94,7 +100,6 @@ protected:
     CGUIButton*         m_pButtonBack;
     CGUILabel*          m_pServerListStatus;
     CGUIStaticImage*    m_pLockedIcon;
-    CGUIStaticImage*    m_pSerialIcon;
     CGUIButton*         m_pButtonFavouritesByIP;
 
     // Classes
@@ -113,10 +118,12 @@ protected:
     CGUIEdit*           m_pEditServerSearch [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIStaticImage*    m_pServerSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
 
+    CGUILabel*          m_pLabelInclude [ SERVER_BROWSER_TYPE_COUNT ];
     CGUICheckBox*       m_pIncludeEmpty [ SERVER_BROWSER_TYPE_COUNT ];
     CGUICheckBox*       m_pIncludeFull [ SERVER_BROWSER_TYPE_COUNT ];
     CGUICheckBox*       m_pIncludeLocked [ SERVER_BROWSER_TYPE_COUNT ];
     CGUICheckBox*       m_pIncludeOffline [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUICheckBox*       m_pIncludeOtherVersions [ SERVER_BROWSER_TYPE_COUNT ];
 
     CGUIButton*         m_pButtonConnect [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIButton*         m_pButtonRefresh [ SERVER_BROWSER_TYPE_COUNT ];
@@ -129,7 +136,7 @@ protected:
     CGUIStaticImage*    m_pPlayerSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
 
     // Server list columns
-    CGUIHandle          m_hSerial [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIHandle          m_hVersion [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hLocked [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hName [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hPing [ SERVER_BROWSER_TYPE_COUNT ];
@@ -147,7 +154,7 @@ private:
 
     void                    UpdateServerList                ( ServerBrowserType Type, bool bClearServerList = false);
     CServerList *           GetServerList                   ( ServerBrowserType Type );
-    void                    AddServerToList                 ( CServerListItem * pServer, ServerBrowserType Type );
+    void                    AddServerToList                 ( const CServerListItem * pServer, const ServerBrowserType Type );
     
     bool                    OnClick                         ( CGUIElement* pElement );
     bool                    OnDoubleClick                   ( CGUIElement* pElement );
@@ -172,6 +179,8 @@ private:
     bool                    m_firstTimeBrowseServer;
     bool                    m_bOptionsLoaded;
     ServerBrowserType       m_PrevServerBrowserType;
+
+    std::map < SString, int > m_blockedVersionMap;
 };
 
 #endif

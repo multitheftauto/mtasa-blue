@@ -7,6 +7,8 @@
 #define IDI_ICON1                       110
 #define IDD_PROGRESS_DIALOG             111
 #define IDD_CRASHED_DIALOG              114
+#define IDB_NAG1                        120
+#define IDB_NAG2                        121
 #define IDC_PROGRESS_BAR                1001
 #define IDC_PROGRESS_STATIC             1002
 #define IDC_SEND_DUMP_CHECK             1004
@@ -18,7 +20,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        115
+#define _APS_NEXT_RESOURCE_VALUE        122
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           101

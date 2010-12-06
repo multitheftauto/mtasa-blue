@@ -41,6 +41,7 @@
 // Game can not be included here because of conflicting classnames (CText)
 
 // Core-level includes
+#define MTA_CLIENT
 #include "SharedUtil.h"
 #include "CrashHandler.h"
 #include "CCore.h"

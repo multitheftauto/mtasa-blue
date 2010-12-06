@@ -55,7 +55,7 @@ public:
     virtual void                    Clear                   ( void ) = 0;
     virtual CGUIListItem*           GetItem                 ( int iRow, int hColumn ) = 0;
     virtual char*                   GetItemText             ( int iRow, int hColumn ) = 0;
-    virtual int                     SetItemText             ( int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bFast = false ) = 0;
+    virtual int                     SetItemText             ( int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bFast = false, const char* szSortText = NULL ) = 0;
     virtual void                    SetItemData             ( int iRow, int hColumn, void* pData ) = 0;
     virtual void                    SetItemData             ( int iRow, int hColumn, const char* pszData ) = 0;
     virtual void*                   GetItemData             ( int iRow, int hColumn ) = 0;
@@ -70,6 +70,7 @@ public:
     virtual int                     GetColumnIndex          ( int hColumn ) = 0;
     virtual int                     GetItemColumnIndex      ( CGUIListItem* pItem ) = 0;
     virtual int                     GetItemRowIndex         ( CGUIListItem* pItem ) = 0;
+    virtual void                    GetVisibleRowRange      ( int& iFirst, int& iLast ) = 0;
     virtual int                     GetSelectedCount        ( void ) = 0;
     virtual CGUIListItem*           GetSelectedItem         ( void ) = 0;
     virtual CGUIListItem*           GetNextSelectedItem     ( CGUIListItem* pItem ) = 0;
@@ -78,6 +79,7 @@ public:
     virtual int                     GetRowCount             ( void ) = 0;
 
     virtual void                    Sort                    ( unsigned int uiColumn, SortDirection direction ) = 0;
+    virtual void                    GetSort                 ( unsigned int& uiColumn, SortDirection& direction ) = 0;
 
     virtual bool                    IsColumnSegmentSizingEnabled         ( int hColumn ) = 0;
     virtual void                    SetColumnSegmentSizingEnabled        ( int hColumn, bool bEnabled ) = 0;

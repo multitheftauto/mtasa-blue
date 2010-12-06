@@ -15,6 +15,7 @@
 #include <tchar.h>
 #include <strsafe.h>
 #define BUFSIZE 512
+#include "../sdk/utils/CMD5Hasher.cpp"  // :O
 
 static bool bCancelPressed = false;
 static bool bOkPressed = false;
@@ -413,52 +414,6 @@ long DisplayErrorMessageBox ( const SString& strMessage, const SString& strTroub
 }
 
 
-//
-// Read a registry string value
-//
-SString ReadRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, int* iResult )
-{
-    // Clear output
-    SString strOutResult = "";
-
-    bool bResult = false;
-    HKEY hkTemp = NULL;
-    if ( RegOpenKeyEx ( hkRoot, szSubKey, 0, KEY_READ, &hkTemp ) == ERROR_SUCCESS ) 
-    {
-        DWORD dwBufferSize;
-        if ( RegQueryValueExA ( hkTemp, szValue, NULL, NULL, NULL, &dwBufferSize ) == ERROR_SUCCESS )
-        {
-            char *szBuffer = static_cast < char* > ( alloca ( dwBufferSize + 1 ) );
-            if ( RegQueryValueExA ( hkTemp, szValue, NULL, NULL, (LPBYTE)szBuffer, &dwBufferSize ) == ERROR_SUCCESS )
-            {
-                strOutResult = szBuffer;
-                bResult = true;
-            }
-        }
-        RegCloseKey ( hkTemp );
-    }
-    if ( iResult )
-        *iResult = bResult;
-    return strOutResult;
-}
-
-
-//
-// Write a registry string value
-//
-
-void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, const char* szBuffer )
-{
-    HKEY hkTemp;
-    RegCreateKeyEx ( hkRoot, szSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkTemp, NULL );
-    if ( hkTemp )
-    {
-        RegSetValueEx ( hkTemp, szValue, NULL, REG_SZ, (LPBYTE)szBuffer, strlen(szBuffer) + 1 );
-        RegCloseKey ( hkTemp );
-    }
-}
-
-
 SString GetMTASAModuleFileName ( void )
 {
     // Get current module full path
@@ -493,11 +448,27 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
         char szBuffer[64000];
         GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
 
+        SString strHash = "-";
+        {
+            MD5 md5;
+            CMD5Hasher Hasher;
+            if ( Hasher.Calculate ( szBuffer, md5 ) )
+            {
+                char szHashResult[33];
+                Hasher.ConvertToHex ( md5, szHashResult );
+                strHash = szHashResult;
+            }
+        }
+
+        SetRegistryValue ( "", "Last Run Path", szBuffer );
+        SetRegistryValue ( "", "Last Run Path Hash", strHash );
+        SetRegistryValue ( "", "Last Run Path Version", MTA_DM_ASE_VERSION );
+
         // Strip the module name out of the path.
         PathRemoveFileSpec ( szBuffer );
 
         // Save to a temp registry key
-        WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "Last Run Location", szBuffer );
+        SetRegistryValue ( "", "Last Run Location", szBuffer );
         g_strMTASAPath = szBuffer;
     }
 }
@@ -513,7 +484,7 @@ SString GetMTASAPath ( void )
 
 int GetGamePath ( SString& strOutResult )
 {
-    SString strRegPath = ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path" );
+    SString strRegPath = GetRegistryValue ( "", "GTA:SA Path" );
 
     if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) == 0 )
     {
@@ -559,7 +530,7 @@ int GetGamePath ( SString& strOutResult )
     
         if ( FileExists( SString ( "%s\\%s", strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
         {
-            WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", strOutResult );
+            SetRegistryValue ( "", "GTA:SA Path", strOutResult );
         }
         else
         {
@@ -961,7 +932,10 @@ bool MyShellExecute ( bool bBlocking, const SString& strAction, const SString& s
     info.nShow = SW_SHOWNORMAL;
     bool bResult = ShellExecuteExA( &info ) != FALSE;
     if ( bBlocking && info.hProcess )
+    {
         WaitForSingleObject ( info.hProcess, INFINITE );
+        CloseHandle ( info.hProcess );
+    }
     return bResult;
 }
 

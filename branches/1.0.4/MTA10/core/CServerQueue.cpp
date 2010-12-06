@@ -319,7 +319,7 @@ void CServerQueue::DoPulse( void )
             // Set our GUI elements to display the server information
             m_pServerNameLabel->SetText(m_Server.strName.c_str());
             m_pServerIPLabel->SetText(m_Server.strHost.c_str());
-            m_pGamemodeLabel->SetText(m_Server.strType.c_str());
+            m_pGamemodeLabel->SetText(m_Server.strGameMode.c_str());
             m_pMapLabel->SetText(m_Server.strMap.c_str());
             m_pPlayersLabel->SetText(SString("%i/%i", m_Server.nPlayers, m_Server.nMaxPlayers).c_str());
             
@@ -358,7 +358,7 @@ void CServerQueue::DoPulse( void )
             // Set the text of the GUI elements to the previous data (or blank)
             m_pServerNameLabel->SetText(m_Server.strName.c_str());
             m_pServerIPLabel->SetText(m_Server.strHost.c_str());
-            m_pGamemodeLabel->SetText(m_Server.strType.c_str());
+            m_pGamemodeLabel->SetText(m_Server.strGameMode.c_str());
             m_pMapLabel->SetText(m_Server.strMap.c_str());
             m_pPlayersLabel->SetText(SString("%i/%i", m_Server.nPlayers, m_Server.nMaxPlayers).c_str());
             m_pPasswordedLabel->SetText(m_Server.bPassworded ? "Yes" : "No");

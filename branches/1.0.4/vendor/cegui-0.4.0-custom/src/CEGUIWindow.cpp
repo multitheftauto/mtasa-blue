@@ -898,6 +898,8 @@ void Window::setClippedByParent(bool setting)
 *************************************************************************/
 void Window::setText(const String& text)
 {
+    if ( text == d_text )
+        return;
 	d_text = text;
     WindowEventArgs args(this);
 	onTextChanged(args);

@@ -26,9 +26,6 @@ void    HideSplash                  ( bool bOnlyDelay = false );
 
 long    DisplayErrorMessageBox      ( const SString& strMessage, const SString& strTroubleType = "" );
 
-SString ReadRegistryStringValue     ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, int* iResult = NULL );
-void    WriteRegistryStringValue    ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, const char* szBuffer );
-
 void    SetMTASAPathSource          ( bool bReadFromRegistry );
 SString GetMTASAPath                ( void );
 int     GetGamePath                 ( SString& strOutResult );

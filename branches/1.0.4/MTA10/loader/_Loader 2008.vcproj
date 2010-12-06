@@ -334,6 +334,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SplashWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SplashWindow.h"
+				>
+			</File>
+			<File
 				RelativePath=".\StdInc.cpp"
 				>
 				<FileConfiguration
@@ -389,6 +397,14 @@
 			</File>
 			<File
 				RelativePath=".\resource\mtaicon.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\nag1.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\nag2.bmp"
 				>
 			</File>
 			<File

@@ -86,8 +86,8 @@ public:
         if ( m_iPortTestStage != 1 )
             return;
 
-        // Wait for 6 seconds to minimize server stalling
-        if ( GetTickCount64_ () - m_llPortTestStartTime < 6000 )
+        // Wait for 10 seconds to minimize server stalling
+        if ( GetTickCount64_ () - m_llPortTestStartTime < 10 * 1000 )
             return;
 
         m_iPortTestStage = 0;

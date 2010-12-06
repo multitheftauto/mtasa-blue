@@ -241,26 +241,6 @@ SString SharedUtil::PathJoin ( const SString& str1, const SString& str2, const S
     return PathConform ( strResult );
 }
 
-/*
-std::vector < SString > SharedUtil::PathSplit ( const SString& strPath )
-{
-    SString strResult = str1;
-    if ( str2.length () )
-       strResult += PATH_SEPERATOR + str2; 
-    if ( str3.length () )
-       strResult += PATH_SEPERATOR + str3; 
-    if ( str4.length () )
-       strResult += PATH_SEPERATOR + str4; 
-    if ( str5.length () )
-       strResult += PATH_SEPERATOR + str5;
-    return PathConform ( strResult );
-}
-
-void SharedUtil::PathExtractLast ( std::vector < SString >& outList, const SString& strPath )
-{
-}
-*/
-
 #ifdef WIN32
 SString SharedUtil::GetMTALocalAppDataPath ( void )
 {

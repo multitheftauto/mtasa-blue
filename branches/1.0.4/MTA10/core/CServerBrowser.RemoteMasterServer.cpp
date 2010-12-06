@@ -23,14 +23,14 @@ public:
     // CRemoteMasterServerInterface
     virtual void            Refresh                     ( void );
     virtual bool            HasData                     ( void );
-    virtual bool            ParseList                   ( std::list < CServerListItem* >& itemList );
+    virtual bool            ParseList                   ( CServerListItemList& itemList );
 
     // CRemoteMasterServer
     void                    Init                        ( const SString& strURL );
 protected:
-    bool                    ParseListVer0               ( std::list < CServerListItem* >& itemList );
-    bool                    ParseListVer1               ( std::list < CServerListItem* >& itemList );
-    CServerListItem*        GetServerListItem           ( std::list < CServerListItem* >& itemList, in_addr Address, ushort usQueryPort );
+    bool                    ParseListVer0               ( CServerListItemList& itemList );
+    bool                    ParseListVer2               ( CServerListItemList& itemList );
+    CServerListItem*        GetServerListItem           ( CServerListItemList& itemList, in_addr Address, ushort usQueryPort );
 
     long long               m_llLastRefreshTime;
     SString                 m_strStage;
@@ -143,7 +143,7 @@ bool CRemoteMasterServer::HasData ( void )
 // Parse reply from master server
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::ParseList ( std::list < CServerListItem* >& itemList )
+bool CRemoteMasterServer::ParseList ( CServerListItemList& itemList )
 {
     CBufferReadStream stream ( m_Data, true );
 
@@ -157,8 +157,8 @@ bool CRemoteMasterServer::ParseList ( std::list < CServerListItem* >& itemList )
     if ( usVersion == 0 )
         return ParseListVer0 ( itemList );
     else
-    if ( usVersion == 1 )
-        return ParseListVer1 ( itemList );
+    if ( usVersion == 2 )
+        return ParseListVer2 ( itemList );
     else
         return true;
 }
@@ -171,7 +171,7 @@ bool CRemoteMasterServer::ParseList ( std::list < CServerListItem* >& itemList )
 // Standard Game Monitor reply
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::ParseListVer0 ( std::list < CServerListItem* >& itemList )
+bool CRemoteMasterServer::ParseListVer0 ( CServerListItemList& itemList )
 {
     CBufferReadStream stream ( m_Data, true );
 
@@ -180,6 +180,12 @@ bool CRemoteMasterServer::ParseListVer0 ( std::list < CServerListItem* >& itemLi
 
     unsigned short usCount = 0;
     stream.Read ( usCount );
+
+#if MTA_DEBUG
+    uint uiNumServers = usCount;
+    uint uiNumServersUpdated = 0;
+    uint uiNumServersBefore = itemList.size ();
+#endif
 
     while ( !stream.AtEnd ( 6 ) && usCount-- )
     {
@@ -192,9 +198,21 @@ bool CRemoteMasterServer::ParseListVer0 ( std::list < CServerListItem* >& itemLi
         stream.Read ( Address.S_un.S_un_b.s_b4 );
         stream.Read ( usQueryPort );
 
-        // Add or update item
-        GetServerListItem ( itemList, Address, usQueryPort );
+        // Add or find item to update
+        CServerListItem* pItem = GetServerListItem ( itemList, Address, usQueryPort );
+
+        if ( pItem->ShouldAllowDataQuality ( SERVER_INFO_ASE_0 ) )
+        {
+            pItem->SetDataQuality ( SERVER_INFO_ASE_0 );
+#if MTA_DEBUG
+            uiNumServersUpdated++;
+#endif
+        }
     }
+
+#if MTA_DEBUG
+    OutputDebugLine ( SString ( "%d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
+#endif
 
     return true;
 }
@@ -202,12 +220,12 @@ bool CRemoteMasterServer::ParseListVer0 ( std::list < CServerListItem* >& itemLi
 
 ///////////////////////////////////////////////////////////////
 //
-// CRemoteMasterServer::ParseListVer1
+// CRemoteMasterServer::ParseListVer2
 //
 // Extended reply
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::ParseListVer1 ( std::list < CServerListItem* >& itemList )
+bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
 {
     CBufferReadStream stream ( m_Data, true );
 
@@ -229,22 +247,44 @@ bool CRemoteMasterServer::ParseListVer1 ( std::list < CServerListItem* >& itemLi
     //bool bHasPort           = ( uiFlags & 0x0002 ) != 0;
     bool bHasPlayerCount    = ( uiFlags & 0x0004 ) != 0;
     bool bHasMaxPlayerCount = ( uiFlags & 0x0008 ) != 0;
-    bool bHasGame           = ( uiFlags & 0x0010 ) != 0;
+    bool bHasGameName       = ( uiFlags & 0x0010 ) != 0;
     bool bHasName           = ( uiFlags & 0x0020 ) != 0;
-    bool bHasType           = ( uiFlags & 0x0040 ) != 0;
+    bool bHasGameMode       = ( uiFlags & 0x0040 ) != 0;
     bool bHasMap            = ( uiFlags & 0x0080 ) != 0;
     bool bHasVersion        = ( uiFlags & 0x0100 ) != 0;
     bool bHasPassworded     = ( uiFlags & 0x0200 ) != 0;
     bool bHasSerials        = ( uiFlags & 0x0400 ) != 0;
     bool bHasPlayers        = ( uiFlags & 0x0800 ) != 0;
+    bool bHasRespondingFlag = ( uiFlags & 0x1000 ) != 0;
+
+    // Read sequence number
+    uint uiSequenceNumber = 0;
+    stream.Read ( uiSequenceNumber );
 
     // Read server count
     uint uiCount = 0;
     stream.Read ( uiCount );
 
+#if MTA_DEBUG
+    struct SItem
+    {
+        int iTotal;
+        int iNoResponse;
+    };
+    std::map < SString, SItem > totalMap;
+
+    uint uiNumServers = uiCount;
+    uint uiNumServersUpdated = 0;
+    uint uiNumServersBefore = itemList.size ();
+#endif
+
     // Add all servers until we hit the count or run out of data
     while ( !stream.AtEnd ( 6 ) && uiCount-- )
     {
+        ushort usLength = 0;        // Length of data for this server
+        stream.Read ( usLength );
+        uint uiSkipPos = stream.Tell () + usLength - 2;
+
         in_addr             Address;        // IP-address
         unsigned short      usGamePort;     // Game port
 
@@ -254,29 +294,57 @@ bool CRemoteMasterServer::ParseListVer1 ( std::list < CServerListItem* >& itemLi
         // Add or find item to update
         CServerListItem* pItem = GetServerListItem ( itemList, Address, usGamePort + 123 );
 
-        if ( bHasPlayerCount )          stream.Read ( pItem->nPlayers );
-        if ( bHasMaxPlayerCount )       stream.Read ( pItem->nMaxPlayers );
-        if ( bHasGame )                 stream.ReadString ( pItem->strGame, true );
-        if ( bHasName )                 stream.ReadString ( pItem->strName, true );
-        if ( bHasType )                 stream.ReadString ( pItem->strType, true );
-        if ( bHasMap )                  stream.ReadString ( pItem->strMap, true );
-        if ( bHasVersion )              stream.ReadString ( pItem->strVersion, true );
-        if ( bHasPassworded )           stream.Read ( pItem->bPassworded );
-        if ( bHasSerials )              stream.Read ( pItem->bSerials );
-
-        if ( bHasPlayers )
+        if ( pItem->ShouldAllowDataQuality ( SERVER_INFO_ASE_2 ) )
         {
-            ushort usPlayerListSize = 0;
-            stream.Read ( usPlayerListSize );
+            pItem->SetDataQuality ( SERVER_INFO_ASE_2 );
 
-            for ( uint i = 0 ; i < usPlayerListSize ; i++ )
+            if ( bHasPlayerCount )          stream.Read ( pItem->nPlayers );
+            if ( bHasMaxPlayerCount )       stream.Read ( pItem->nMaxPlayers );
+            if ( bHasGameName )             stream.ReadString ( pItem->strGameName, true );
+            if ( bHasName )                 stream.ReadString ( pItem->strName, true );
+            if ( bHasGameMode )             stream.ReadString ( pItem->strGameMode, true );
+            if ( bHasMap )                  stream.ReadString ( pItem->strMap, true );
+            if ( bHasVersion )              stream.ReadString ( pItem->strVersion, true );
+            if ( bHasPassworded )           stream.Read ( pItem->bPassworded );
+            if ( bHasSerials )              stream.Read ( pItem->bSerials );
+
+            if ( bHasPlayers )
             {
-                SString strPlayer;
-                stream.ReadString ( strPlayer, true );
-                pItem->vecPlayers.push_back ( strPlayer );
+                ushort usPlayerListSize = 0;
+                stream.Read ( usPlayerListSize );
+
+                for ( uint i = 0 ; i < usPlayerListSize ; i++ )
+                {
+                    SString strPlayer;
+                    stream.ReadString ( strPlayer, true );
+                    pItem->vecPlayers.push_back ( strPlayer );
+                }
             }
+
+            if ( bHasRespondingFlag )
+            {
+                stream.Read ( pItem->bMasterServerSaysNoResponse );
+            }
+
+            pItem->PostChange ();
+
+#if MTA_DEBUG
+            uiNumServersUpdated++;
+            totalMap[ pItem->strVersion ].iTotal += 1;
+            if ( pItem->bMasterServerSaysNoResponse )
+                totalMap[ pItem->strVersion ].iNoResponse += 1;
+#endif
         }
+
+        // Make sure past all data for this server
+        stream.Seek ( uiSkipPos );
     }
+
+#if MTA_DEBUG
+    OutputDebugLine ( SString ( "%d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
+    for ( std::map < SString, SItem >::iterator iter = totalMap.begin () ; iter != totalMap.end () ; ++iter )
+        OutputDebugLine ( SString ( "version '%s' - %d total  %d noresponse", *iter->first, iter->second.iTotal, iter->second.iNoResponse ) );
+#endif
 
     return true;
 }
@@ -289,16 +357,12 @@ bool CRemoteMasterServer::ParseListVer1 ( std::list < CServerListItem* >& itemLi
 // Find or add list item for the address and port
 //
 ///////////////////////////////////////////////////////////////
-CServerListItem* CRemoteMasterServer::GetServerListItem ( std::list < CServerListItem* >& itemList, in_addr Address, ushort usQueryPort )
+CServerListItem* CRemoteMasterServer::GetServerListItem ( CServerListItemList& itemList, in_addr Address, ushort usQueryPort )
 {
-    for ( std::list < CServerListItem* > ::iterator iter = itemList.begin () ; iter != itemList.end () ; ++iter )
-    {
-        CServerListItem* pItem = *iter;
-        if ( pItem->Address.S_un.S_addr == Address.S_un.S_addr && pItem->usQueryPort == usQueryPort )
-            return pItem;
-    }
-    CServerListItem* pItem = new CServerListItem ( Address, usQueryPort );
-    itemList.push_back ( pItem );
-    return pItem;
+    CServerListItem* pItem = itemList.Find ( Address, usQueryPort );
+    if ( pItem )
+        return pItem;
+
+    return itemList.Add ( Address, usQueryPort );
 }
 

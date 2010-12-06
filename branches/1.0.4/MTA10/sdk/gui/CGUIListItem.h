@@ -21,7 +21,7 @@ public:
     virtual                         ~CGUIListItem           ( void ) {};
 
     virtual std::string             GetText                 ( void ) const = 0;
-    virtual void                    SetText                 ( const char *pszText ) = 0;
+    virtual void                    SetText                 ( const char *pszText, const char *pszSortText = NULL ) = 0;
 
     virtual void*                   GetData                 ( void ) const = 0;
     virtual void                    SetData                 ( void* pData ) = 0;

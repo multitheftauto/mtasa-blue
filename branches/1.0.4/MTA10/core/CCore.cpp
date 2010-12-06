@@ -100,35 +100,17 @@ CCore::CCore ( void )
     memset ( m_szInstallRoot, 0, MAX_PATH );
     memset ( m_szGTAInstallRoot, 0, MAX_PATH );
 
-    // Open the MTA registry key
-    HKEY hkey = NULL;
-    DWORD dwBufferSize = MAX_PATH;
-    DWORD dwType = 0;
-    if ( RegOpenKeyEx ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS ) 
+    SString strInstallRoot = GetMTASABaseDir ();
+
+    SString strGTAInstallRoot = GetRegistryValue ( "", "GTA:SA Path" );
+    if ( strGTAInstallRoot.empty () )
     {
-        // Read out the MTA installpath
-        if ( RegQueryValueEx ( hkey, "Last Run Location", NULL, &dwType, (LPBYTE)m_szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
-             strlen ( m_szInstallRoot ) == 0 )
-        {
-            MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK );
-            RegCloseKey ( hkey );
-            TerminateProcess ( GetCurrentProcess (), 9 );
-        }
-
-        // Read out the GTA installpath
-        dwBufferSize = MAX_PATH;
-        dwType = 0;
-        if ( RegQueryValueEx ( hkey, "GTA:SA Path", NULL, &dwType, (LPBYTE)m_szGTAInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
-             strlen ( m_szGTAInstallRoot ) == 0 )
-        {
-            MessageBox ( 0, "There is no GTA path specified in the registry, please reinstall.", "Error", MB_OK );
-            RegCloseKey ( hkey );
-            TerminateProcess ( GetCurrentProcess (), 9 );
-        }
-
-        RegCloseKey ( hkey );
+        MessageBox ( 0, "There is no GTA path specified in the registry, please reinstall.", "Error", MB_OK );
+        TerminateProcess ( GetCurrentProcess (), 9 );
     }
 
+    STRNCPY ( m_szInstallRoot, strInstallRoot, sizeof ( m_szInstallRoot ) );
+    STRNCPY ( m_szGTAInstallRoot, strGTAInstallRoot, sizeof ( m_szGTAInstallRoot ) );
 
     // Remove the trailing / from the installroot incase it has
     size_t sizeInstallRoot = strlen ( m_szInstallRoot );
@@ -1646,11 +1628,11 @@ void CCore::UpdateRecentlyPlayed()
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
         CServerList* pRecentList = pServerBrowser->GetRecentList ();
-        CServerListItem RecentServer ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
-        pRecentList->Remove ( RecentServer );
-        pRecentList->Add ( RecentServer, true );
+        pRecentList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
+        pRecentList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET, true );
         pServerBrowser->SaveRecentlyPlayedList();
 
+/* This won't work here
         // Set as our current server for xfire
         if ( XfireIsLoaded () )
         {
@@ -1663,6 +1645,7 @@ void CCore::UpdateRecentlyPlayed()
 
             XfireSetCustomGameData ( 2, szKey, szValue ); 
         }
+*/
     }
     //Save our configuration file
     CCore::GetSingleton ().SaveConfig ();
