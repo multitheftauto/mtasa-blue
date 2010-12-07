@@ -435,3 +435,34 @@ void CWorldSA::RestoreWindVelocity ( void )
     *(WORD *)(ADDR_WindSpeedSetZ2) = 0x1DD9;
     *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x00C813E8;
 }
+
+float CWorldSA::GetFogDistance ( )
+{
+    return *(float *)(VAR_fFogDistance);
+}
+
+void CWorldSA::SetFogDistance ( float fDistance )
+{
+    *(BYTE *)0x55FCC8 = 0xDD;
+    *(BYTE *)0x55FCC9 = 0xD8;
+    *(BYTE *)0x55FCCA = 0x90;
+
+    *(BYTE *)0x5613A3 = 0xDD;
+    *(BYTE *)0x5613A4 = 0xD8;
+    *(BYTE *)0x5613A5 = 0x90;
+
+    *(BYTE *)0x560A23 = 0xDD;
+    *(BYTE *)0x560A24 = 0xD8;
+    *(BYTE *)0x560A25 = 0x90;
+
+    *(float *)(VAR_fFogDistance) = fDistance;
+}
+
+void CWorldSA::RestoreFogDistance ( )
+{
+    BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
+
+    memcpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
+    memcpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
+    memcpy ( (LPVOID)0x560A23, &originalFstp, 3 );
+}
