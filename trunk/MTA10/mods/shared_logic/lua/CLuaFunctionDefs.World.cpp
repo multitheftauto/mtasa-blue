@@ -1457,6 +1457,34 @@ int CLuaFunctionDefs::ResetRainLevel ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetFogDistance ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetFogDistance());
+    return 1;
+}
+
+int CLuaFunctionDefs::SetFogDistance ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        g_pGame->GetWorld ()->SetFogDistance ( lua_tonumber ( luaVM, 1 ) );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetFogDistance ( lua_State* luaVM )
+{
+    g_pGame->GetWorld ()->RestoreFogDistance ();
+
+    lua_pushboolean ( luaVM, true );
+    return 1;
+}
+
 int CLuaFunctionDefs::SetTrafficLightsLocked ( lua_State *luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
