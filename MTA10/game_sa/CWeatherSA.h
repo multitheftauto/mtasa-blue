@@ -35,6 +35,7 @@ public:
     bool                        IsRaining               ( void );
     float                       GetAmountOfRain         ( void );
     void                        SetAmountOfRain         ( float fAmount );
+    void                        ResetAmountOfRain       ( void );
 
 private:
     static unsigned char*       VAR_CurrentWeather;

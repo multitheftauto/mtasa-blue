@@ -1429,6 +1429,34 @@ int CLuaFunctionDefs::SetInteriorSoundsEnabled ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetRainLevel ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pGame->GetWeather ()->GetAmountOfRain ());
+    return 1;
+}
+
+int CLuaFunctionDefs::SetRainLevel ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        g_pGame->GetWeather ()->SetAmountOfRain ( lua_tonumber ( luaVM, 1 ) );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetRainLevel ( lua_State* luaVM )
+{
+    g_pGame->GetWeather ()->ResetAmountOfRain ( );
+
+    lua_pushboolean ( luaVM, true );
+    return 1;
+}
+
 int CLuaFunctionDefs::SetTrafficLightsLocked ( lua_State *luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )

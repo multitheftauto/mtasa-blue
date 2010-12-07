@@ -88,5 +88,30 @@ float CWeatherSA::GetAmountOfRain ( void )
 
 void CWeatherSA::SetAmountOfRain ( float fAmount )
 {
+    // Nop the functions which don't like us take care of the rain
+    *(BYTE *)0x72C686 = 0xDD;
+    *(BYTE *)0x72C687 = 0xD8;
+
+    memset ( (void*)0x72C688, 0x90, 4 );
+
+    *(BYTE *)0x72BC92 = 0xDD;
+    *(BYTE *)0x72BC93 = 0xD8;
+
+    memset ( (void*)0x72BC94, 0x90, 4 );
+    
+    memset ( (void*)0x72BC72, 0x90, 5 );
+
+    // Set the amount of rain
     *VAR_AmountOfRain = fAmount;
+}
+
+void CWeatherSA::ResetAmountOfRain ( void )
+{
+    BYTE originalMov[5]   = {0xA3, 0x24, 0x13, 0xC8, 0x00};       // 0x72BC72
+    BYTE originalFstp1[6] = {0xD9, 0x1D, 0x24, 0x13, 0xC8, 0x00}; // 0x72BC92
+    BYTE originalFstp2[6] = {0xD9, 0x1D, 0x24, 0x13, 0xC8, 0x00}; // 0x72C686
+
+    memcpy ( (LPVOID)0x72BC72, &originalMov,   5 );
+    memcpy ( (LPVOID)0x72BC92, &originalFstp1, 6 );
+    memcpy ( (LPVOID)0x72C686, &originalFstp2, 6 );
 }

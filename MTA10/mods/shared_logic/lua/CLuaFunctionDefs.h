@@ -669,6 +669,9 @@ public:
     LUA_DECLARE ( ResetWindVelocity );
     LUA_DECLARE ( AreInteriorSoundsEnabled );
     LUA_DECLARE ( SetInteriorSoundsEnabled );
+    LUA_DECLARE ( GetRainLevel );
+    LUA_DECLARE ( SetRainLevel );
+    LUA_DECLARE ( ResetRainLevel );
 
     // Input functions
     LUA_DECLARE ( BindKey );

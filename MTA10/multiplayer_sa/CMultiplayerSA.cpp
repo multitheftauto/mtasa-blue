@@ -1264,7 +1264,7 @@ bool CMultiplayerSA::AreInteriorSoundsEnabled ( )
 
 void CMultiplayerSA::SetInteriorSoundsEnabled ( bool bEnabled )
 {
-    // The function which 
+    // The function which should be restored when re-enabling interior sounds
     BYTE originalCode[6] = {0x89, 0x2d, 0xbc, 0xdc, 0xb6, 0x00};
 
     if ( bEnabled )
