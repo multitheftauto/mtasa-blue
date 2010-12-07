@@ -20,6 +20,9 @@ namespace SharedUtil
     void SetRegistryValue ( const SString& strPath, const SString& strKey, const SString& strValue );
     SString GetRegistryValue ( const SString& strPath, const SString& strKey );
 
+    int ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
+    int ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
+
     //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only

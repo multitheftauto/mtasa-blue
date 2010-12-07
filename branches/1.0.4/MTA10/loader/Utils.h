@@ -41,9 +41,6 @@ SString GetRealOSVersion            ( void );
 bool    IsVistaOrHigher             ( void );
 BOOL    IsUserAdmin                 ( void );
 
-bool    ShellExecuteBlocking        ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" );
-bool    ShellExecuteNonBlocking     ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" );
-
 void    StartPseudoProgress         ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
 void    StopPseudoProgress          ( void );
 

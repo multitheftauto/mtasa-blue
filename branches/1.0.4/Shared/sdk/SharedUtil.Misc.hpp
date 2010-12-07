@@ -357,7 +357,7 @@ void SharedUtil::BrowseToSolution ( const SString& strType, bool bAskQuestion, b
         strQueryURL = strQueryURL.Replace ( "%VERSION%", GetApplicationSetting ( "mta-version-ext" ) );
         strQueryURL = strQueryURL.Replace ( "%ID%", GetApplicationSetting ( "serial" ) );
         strQueryURL = strQueryURL.Replace ( "%TROUBLE%", strType );
-        ShellExecute ( NULL, "open", strQueryURL.c_str (), NULL, NULL, SW_SHOWNORMAL );
+        ShellExecuteNonBlocking ( "open", strQueryURL.c_str () );
     }
 
     if ( bTerminateProcess )
@@ -439,6 +439,78 @@ SString SharedUtil::ExpandEnvString ( const SString& strInput )
     return envBuf;
 }
 #endif
+
+
+
+///////////////////////////////////////////////////////////////
+//
+// MyShellExecute
+//
+//
+//
+///////////////////////////////////////////////////////////////
+static int MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strInFile, const SString& strInParameters = "", const SString& strDirectory = "", int nShowCmd = SW_SHOWNORMAL )
+{
+    SString strFile = strInFile;
+    SString strParameters = strInParameters;
+
+    if ( strAction == "open" && strFile.BeginsWithI ( "http://" ) && strParameters.empty () )
+    {
+        strParameters = "url.dll,FileProtocolHandler " + strFile;
+        strFile = "rundll32.exe";
+    }
+
+    if ( bBlocking )
+    {
+        SHELLEXECUTEINFO info;
+        memset( &info, 0, sizeof ( info ) );
+        info.cbSize = sizeof ( info );
+        info.fMask = SEE_MASK_NOCLOSEPROCESS;
+        info.lpVerb = strAction;
+        info.lpFile = strFile;
+        info.lpParameters = strParameters;
+        info.lpDirectory = strDirectory;
+        info.nShow = nShowCmd;
+        bool bResult = ShellExecuteExA( &info ) != FALSE;
+        if ( info.hProcess )
+        {
+            WaitForSingleObject ( info.hProcess, INFINITE );
+            CloseHandle ( info.hProcess );
+        }
+        return bResult;
+    }
+    else
+    {
+        int iResult = (int)ShellExecute ( NULL, strAction, strFile, strParameters, strDirectory, nShowCmd );
+        return iResult;
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// SharedUtil::ShellExecuteBlocking
+//
+//
+//
+///////////////////////////////////////////////////////////////
+int SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
+{
+    return MyShellExecute ( true, strAction, strFile, strParameters, strDirectory );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// SharedUtil::ShellExecuteNonBlocking
+//
+//
+//
+///////////////////////////////////////////////////////////////
+int SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
+{
+    return MyShellExecute ( false, strAction, strFile, strParameters, strDirectory );
+}
 
 
 #endif  // MTA_CLIENT

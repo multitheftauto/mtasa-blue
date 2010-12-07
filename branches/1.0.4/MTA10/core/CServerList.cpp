@@ -56,12 +56,12 @@ void CServerList::Clear ( void )
 void CServerList::Pulse ( void )
 {
     // Get QueriesPerSecond setting
-    int iQueriesPerSecond = 100;
+    int iQueriesPerSecond = 50;
     int iVar;
     CVARS_GET ( "browser_speed", iVar );
     if ( iVar == 0 ) iQueriesPerSecond = 4;
     else if ( iVar == 1 ) iQueriesPerSecond = 10;
-    else if ( iVar == 2 ) iQueriesPerSecond = 100;
+    else if ( iVar == 2 ) iQueriesPerSecond = 50;
 
     long long llTickCount = GetTickCount64_ ();
     // Ensure m_llLastTickCount is initialized
@@ -369,7 +369,7 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
             if ( uiQueryRetryCount == 0 )
                 uiCacheNoReplyCount++;       // Keep a persistent count of failures. (When uiCacheNoReplyCount gets to 3, the server is removed from the Server Cache)
 
-            uint uiMaxRetries = GetDataQuality () <= SERVER_INFO_ASE_0 || MaybeWontRespond () ? 0 : 1;
+            uint uiMaxRetries = GetDataQuality () <= SERVER_INFO_ASE_0 || MaybeWontRespond () ? 0 : 2;
 
             if ( uiQueryRetryCount < uiMaxRetries )
             {

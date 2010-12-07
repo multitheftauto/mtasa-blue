@@ -614,7 +614,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
             if ( lpOperation && lpFile )
             {
-                ShellExecute( NULL, lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd );            
+                ShellExecuteNonBlocking( lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd );            
             }
         }
     }
@@ -720,7 +720,13 @@ void MaybeShowNag ( void )
             if ( iResult == IDYES )
             {
                 MessageBox( 0, "Your web browser will now open and show you the voting infomation.", "MTA: San Andreas", MB_ICONINFORMATION|MB_OK );
-                ShellExecute ( NULL, "open", "http://nightly.mtasa.com/moddb2010/", NULL, NULL, SW_SHOWNORMAL );
+                int iResult = (int)ShellExecuteNonBlocking ( "open", "http://nightly.mtasa.com/moddb2010/" );
+                if ( iResult < 32 )
+                {                   
+                    MessageBox( 0, "If browsing fails, please go to:\n\nhttp://nightly.mtasa.com/moddb2010/", "MTA: San Andreas", MB_ICONINFORMATION|MB_OK );
+                    AddReportLog ( 5400, SString ( "Browse failed %d", iResult ) );
+                }
+
                 TerminateProcess ( GetCurrentProcess (), 0 );
             }
         }

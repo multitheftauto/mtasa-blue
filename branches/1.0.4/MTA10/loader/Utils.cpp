@@ -910,62 +910,6 @@ bool IsVistaOrHigher ( void )
 }
 
 
-///////////////////////////////////////////////////////////////
-//
-// MyShellExecute
-//
-//
-//
-///////////////////////////////////////////////////////////////
-bool MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" )
-{
-    AddReportLog ( 1081, SString ( "ShellExecute bBlocking:%d %s %s '%s'", bBlocking, strAction.c_str (), strFile.c_str (), strParameters.c_str () ) );
-
-    SHELLEXECUTEINFO info;
-    memset( &info, 0, sizeof ( info ) );
-    info.cbSize = sizeof ( info );
-    info.fMask = SEE_MASK_NOCLOSEPROCESS;
-    info.lpVerb = strAction;
-    info.lpFile = strFile;
-    info.lpParameters = strParameters;
-    info.lpDirectory = strDirectory;
-    info.nShow = SW_SHOWNORMAL;
-    bool bResult = ShellExecuteExA( &info ) != FALSE;
-    if ( bBlocking && info.hProcess )
-    {
-        WaitForSingleObject ( info.hProcess, INFINITE );
-        CloseHandle ( info.hProcess );
-    }
-    return bResult;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// ShellExecuteBlocking
-//
-//
-//
-///////////////////////////////////////////////////////////////
-bool ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory )
-{
-    return MyShellExecute ( true, strAction, strFile, strParameters, strDirectory );
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// ShellExecuteNonBlocking
-//
-//
-//
-///////////////////////////////////////////////////////////////
-bool ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory )
-{
-    return MyShellExecute ( false, strAction, strFile, strParameters, strDirectory );
-}
-
-
 //
 // QueryWMI
 //
