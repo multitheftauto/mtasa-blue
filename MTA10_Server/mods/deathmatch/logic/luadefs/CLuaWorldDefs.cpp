@@ -276,6 +276,47 @@ int CLuaWorldDefs::setTrafficLightState ( lua_State* luaVM )
             return 1;
         }
     }
+    else if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        const char* szParam1 = lua_tostring ( luaVM, 1 );
+        if ( ! stricmp ( szParam1, "auto" ) )
+        {
+            bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( false ) &&
+                       CStaticFunctionDefinitions::SetTrafficLightState ( 0 );
+            lua_pushboolean ( luaVM, bOk );
+            return 1;
+        }
+        else if ( ! stricmp ( szParam1, "disabled" ) )
+        {
+            bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( true ) &&
+                       CStaticFunctionDefinitions::SetTrafficLightState ( 9 );
+            lua_pushboolean ( luaVM, bOk );
+            return 1;
+        }
+        else
+        {
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            {
+                // Perform a conversion from two string parameters to a state number.
+                const char* szColorNS = szParam1;
+                const char* szColorEW = lua_tostring ( luaVM, 2 );
+
+                unsigned char ucState;
+                if ( SharedUtil::GetTrafficLightStateFromStrings ( szColorNS, szColorEW, ucState ) )
+                {
+                    // Change it.
+                    bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( true ) &&
+                               CStaticFunctionDefinitions::SetTrafficLightState ( ucState );
+                    lua_pushboolean ( luaVM, bOk );
+                    return 1;
+                }
+                else
+                    m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
+            }
+            else
+                m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
+        }
+    }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
 

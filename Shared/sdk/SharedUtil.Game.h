@@ -13,6 +13,9 @@
 namespace SharedUtil
 {
 
+    bool            GetTrafficLightStateFromStrings ( const char* szColorNS, const char* szColorEW,
+                                                      unsigned char& ucOutput );
+
     class CVehicleColor
     {
     public:
