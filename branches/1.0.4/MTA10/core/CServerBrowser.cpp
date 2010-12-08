@@ -564,7 +564,8 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
     bool bAddServer;
 
     bool bIsOtherVersion    = ( !pServer->strVersion.empty () ) && ( pServer->strVersion != MTA_DM_ASE_VERSION );
-    bool bIsOffline         = ( pServer->bMaybeOffline ) || ( pServer->MaybeWontRespond () );
+    bool bIsOffline         = ( pServer->bSkipped ) || ( pServer->MaybeWontRespond () );
+    bool bWasGoodNowFailing = ( !bIsOffline ) && ( pServer->bMaybeOffline );
     bool bLowQuality        = ( pServer->GetDataQuality () <= SERVER_INFO_ASE_0 );
     bool bIsEmpty           = ( pServer->nPlayers == 0 ) && ( pServer->nMaxPlayers != 0 );
     bool bIsFull            = ( pServer->nPlayers >= pServer->nMaxPlayers ) && ( pServer->nMaxPlayers != 0 );
@@ -587,7 +588,7 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
         ( !bIsEmpty || bIncludeEmpty ) &&
         ( !bIsFull || bIncludeFull ) &&
         ( !bIsLocked || bIncludeLocked ) &&
-        ( !bIsOffline || bIncludeOffline ) &&
+        ( !bIsOffline || bIncludeOffline || bWasGoodNowFailing ) &&
         ( !bIsOtherVersion || bIncludeOtherVersions ) &&
         ( !bIsBlockedVersion ) &&
         ( bServerSearchFound ) &&
@@ -658,7 +659,8 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
         if ( pServer->bMasterServerSaysNoResponse )             color.G /= 2;
 #endif
         if ( bIsOtherVersion )                                  color.B /= 2;
-        if ( pServer->bMaybeOffline )                           color.A /= 2;
+        if ( pServer->bMaybeOffline )                           color.A = color.A / 3 * 2;
+        if ( pServer->bSkipped )                                color.A = color.A / 4 * 3;
 
         m_pServerList [ Type ]->SetItemColor ( iIndex, m_hVersion [ Type ], color.R, color.G, color.B, color.A );
         m_pServerList [ Type ]->SetItemColor ( iIndex, m_hLocked [ Type ],  color.R, color.G, color.B, color.A );

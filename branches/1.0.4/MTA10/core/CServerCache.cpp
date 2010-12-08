@@ -265,6 +265,13 @@ void CServerCache::GetServerCachedInfo ( CServerListItem* pItem )
 
             pItem->PostChange ();
         }
+        else
+        if ( pItem->GetDataQuality () < SERVER_INFO_QUERY )
+        {
+            // Allow cache to fill in certain missing data if query not done yet
+            if ( pItem->strGameMode.empty () )      pItem->strGameMode  = pInfo->strGameMode;
+            if ( pItem->strMap.empty () )           pItem->strMap       = pInfo->strMap;
+        }
     }
 }
 

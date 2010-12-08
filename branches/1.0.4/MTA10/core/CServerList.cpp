@@ -366,16 +366,16 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
             bMaybeOffline = true;       // Flag to help 'Include offline' browser option
             nPlayers = 0;               // We don't have player names, so zero this now
             uiRevision++;               // To flag browser gui update
-            if ( uiQueryRetryCount == 0 )
-                uiCacheNoReplyCount++;       // Keep a persistent count of failures. (When uiCacheNoReplyCount gets to 3, the server is removed from the Server Cache)
-
-            uint uiMaxRetries = GetDataQuality () <= SERVER_INFO_ASE_0 || MaybeWontRespond () ? 0 : 2;
+            uint uiMaxRetries = GetDataQuality () <= SERVER_INFO_ASE_0 || MaybeWontRespond () ? 0 : 1;
 
             if ( uiQueryRetryCount < uiMaxRetries )
             {
                 // Try again
                 uiQueryRetryCount++;
                 uiRevision++;           // To flag browser gui update
+#if MTA_DEBUG
+                strGameMode = SString ( "%d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
+#endif
                 if ( GetDataQuality () > SERVER_INFO_ASE_0 )
                     GetServerCache ()->SetServerCachedInfo ( this );
                 Query ();
@@ -384,8 +384,12 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
             else
             {
                 // Give up
+                uiCacheNoReplyCount++;  // Keep a persistent count of failures. (When uiCacheNoReplyCount gets to 3, the server is removed from the Server Cache)
                 bSkipped = true;
-                uiRevision++;           // To flag browser gui update
+                uiRevision++;           // To flag browser gui update#if MTA_DEBUG
+#if MTA_DEBUG
+                strGameMode = SString ( "noreply %d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
+#endif
                 CloseSocket ();
                 if ( GetDataQuality () > SERVER_INFO_ASE_0 )
                     GetServerCache ()->SetServerCachedInfo ( this );
