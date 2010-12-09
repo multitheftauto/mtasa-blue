@@ -300,7 +300,7 @@ void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, const char* pszData
 }
 
 
-int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, bool bNumber, bool bSection, bool bFast )
+int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, bool bNumber, bool bSection, bool bFast, const char* szSortText )
 {
     try
     {
@@ -315,7 +315,7 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
                 // Set section properties
                 pItem->SetFont ( "default-bold-small" );
                 pItem->SetDisabled ( true );
-                pItem->SetText ( szText );
+                pItem->SetText ( szText, szSortText );
             }
             else
             {
@@ -338,11 +338,11 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
 
                     szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH-1] = NULL;
 
-                    pItem->SetText ( szBuf );
+                    pItem->SetText ( szBuf, szSortText );
                 }
                 else
                 {
-                    pItem->SetText ( szText );
+                    pItem->SetText ( szText, szSortText );
                 }
             }
         }
@@ -352,6 +352,9 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
 
             // If it doesn't, create it and set it in the gridlist
             pItem = new CGUIListItem_Impl ( szText, bNumber );
+
+            if ( szSortText )
+                pItem->SetText ( szText, szSortText );
 
             CEGUI::ListboxItem* pListboxItem = pItem->GetListItem ();
             win->setItem ( pListboxItem, hColumn, iRow, bFast );
@@ -380,7 +383,7 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
                 }
 
                 szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH-1] = NULL;               
-                pItem->SetText ( szBuf );
+                pItem->SetText ( szBuf, szSortText );
             }
         }
 
@@ -467,12 +470,12 @@ void CGUIGridList_Impl::SetItemImage ( int iRow, int hColumn, CGUIStaticImage* p
         pItem->SetImage ( pImage );
     }
     else
-    if ( pImage )
+    //if ( pImage )
     {
         // If it doesn't, create it and set it in the gridlist
         CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl*) pImage );
         CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
-        reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setItem ( pListboxItem, hColumn, iRow );
+        reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setItem ( pListboxItem, hColumn, iRow, true );
 
         // Put our new item in the map
         m_Items [ pNewItem->GetListItem () ] = pNewItem;
@@ -543,6 +546,12 @@ void CGUIGridList_Impl::SetSelectionMode ( SelectionMode mode )
     catch ( CEGUI::Exception )
     {
     }
+}
+
+
+void CGUIGridList_Impl::GetVisibleRowRange ( int& iFirst, int& iLast )
+{
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getVisibleRowRange ( iFirst, iLast );
 }
 
 
@@ -631,6 +640,25 @@ void CGUIGridList_Impl::Sort ( unsigned int uiColumn, SortDirection direction )
     }
 }
 
+void CGUIGridList_Impl::GetSort ( unsigned int& uiColumn, SortDirection& direction )
+{
+    uiColumn = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getSortColumn();
+
+    switch ( reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getSortDirection() )
+    {
+    case CEGUI::ListHeaderSegment::Ascending:
+        direction = SortDirection::Ascending;
+        break;
+
+    case CEGUI::ListHeaderSegment::Descending:
+        direction = SortDirection::Descending;
+        break;
+
+    default:
+        direction = SortDirection::None;
+        break;
+    }
+}
 
 void CGUIGridList_Impl::SetSortColumnHandler ( GUI_CALLBACK Callback )
 {

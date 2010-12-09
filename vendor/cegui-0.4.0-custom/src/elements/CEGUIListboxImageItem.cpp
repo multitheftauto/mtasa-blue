@@ -35,9 +35,9 @@ namespace CEGUI
 /*************************************************************************
 	Constructor
 *************************************************************************/
-ListboxImageItem::ListboxImageItem(const Image& image, uint item_id, void* item_data, bool disabled, bool auto_delete) :
+ListboxImageItem::ListboxImageItem(const Image* image, uint item_id, void* item_data, bool disabled, bool auto_delete) :
 	ListboxItem("", item_id, item_data, disabled, auto_delete),
-	d_image(&image)
+	d_image(image)
 {
 }
 
@@ -58,8 +58,11 @@ const Image* ListboxImageItem::getImage(void) const
 /*************************************************************************
 	Return the rendered pixel size of this list box item.
 *************************************************************************/
-Size ListboxImageItem::getPixelSize(void) const
+Size ListboxImageItem::getPixelSize(void)
 {
+    if ( !d_bSizeChanged )
+        return d_savedPixelSize;
+
 	Size tmp(0,0);
 
 	if (d_image != NULL)
@@ -68,6 +71,8 @@ Size ListboxImageItem::getPixelSize(void) const
 		tmp.d_width		= PixelAligned(d_image->getWidth());
 	}
 
+    d_bSizeChanged = false; 
+    d_savedPixelSize = tmp;
 	return tmp;
 }
 

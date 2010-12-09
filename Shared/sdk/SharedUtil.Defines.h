@@ -15,7 +15,7 @@
 //
 #define WITH_VEHICLE_HANDLING 0
 
-// Enable WITH_ALLOC_TRACKING to monitor module memory usage. *Has a negative performance impact*
+// Enable WITH_ALLOC_TRACKING to monitor server module memory usage. *Has a negative performance impact*
 #define WITH_ALLOC_TRACKING 0
 
 //
@@ -58,3 +58,9 @@
 #else
     #define PATH_SEPERATOR "/"
 #endif
+
+
+// Auto clear a class when new'ed. (Won't work for inline creation.)
+#define ZERO_ON_NEW \
+    void* operator new ( size_t size )              { void* ptr = ::operator new(size); memset(ptr,0,size); return ptr; } \
+    void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }

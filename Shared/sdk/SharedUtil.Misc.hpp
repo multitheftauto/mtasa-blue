@@ -18,38 +18,34 @@
     #include <shellapi.h>
 #endif
 
+#ifdef MTA_CLIENT
 #ifdef WIN32
 
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=%VERSION%&id=%ID%&tr=%TROUBLE%"
+
+
+#ifndef MTA_DM_ASE_VERSION
+    #include <../../MTA10/version.h>
+#endif
+
 
 //
 // Get startup directory as saved in the registry by the launcher
 // Used in the Win32 Client only
 //
-SString SharedUtil::GetMTASABaseDir()
+SString SharedUtil::GetMTASABaseDir ( void )
 {
-    static TCHAR szInstallRoot[MAX_PATH]=TEXT("");
-    if( !szInstallRoot[0] )
+    static SString strInstallRoot;
+    if ( strInstallRoot.empty () )
     {
-        memset ( szInstallRoot, 0, MAX_PATH );
-
-        HKEY hkey = NULL;
-        DWORD dwBufferSize = MAX_PATH;
-        DWORD dwType = 0;
-        if ( RegOpenKeyEx ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS )
+        strInstallRoot = GetRegistryValue ( "", "Last Run Location" );
+        if ( strInstallRoot.empty () )
         {
-            // Read out the MTA installpath
-            if ( RegQueryValueEx ( hkey, "Last Run Location", NULL, &dwType, (LPBYTE)szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
-                strlen ( szInstallRoot ) == 0 )
-            {
-                MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK );
-                RegCloseKey ( hkey );
-                TerminateProcess ( GetCurrentProcess (), 9 );
-            }
-            RegCloseKey ( hkey );
+            MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK );
+            TerminateProcess ( GetCurrentProcess (), 9 );
         }
     }
-    return szInstallRoot;
+    return strInstallRoot;
 }
 
 //
@@ -68,7 +64,7 @@ SString SharedUtil::CalcMTASAPath ( const SString& strPath )
 //
 // Write a registry string value
 //
-static void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, const SString& strBuffer )
+static void WriteRegistryStringValue ( HKEY hkRoot, const char* szSubKey, const char* szValue, const SString& strBuffer )
 {
     HKEY hkTemp;
     RegCreateKeyEx ( hkRoot, szSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkTemp, NULL );
@@ -82,7 +78,7 @@ static void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szVa
 //
 // Read a registry string value
 //
-static SString ReadRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, int* iResult )
+static SString ReadRegistryStringValue ( HKEY hkRoot, const char* szSubKey, const char* szValue, int* iResult )
 {
     // Clear output
     SString strOutResult = "";
@@ -112,11 +108,61 @@ static SString ReadRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR sz
 //
 // Delete a registry key and its subkeys
 //
-static bool DeleteRegistryKey ( HKEY hkRoot, LPCSTR szSubKey )
+static bool DeleteRegistryKey ( HKEY hkRoot, const char* szSubKey )
 {
     return RegDeleteKey ( hkRoot, szSubKey ) == ERROR_SUCCESS;
 }
 
+
+
+//
+// MakeRegistryPath
+//
+// Turns "Settings"
+// into  "Software\\Multi Theft Auto: San Andreas 1.1\\Settings"
+// 
+static SString MakeRegistryPath ( const SString& strInPath )
+{
+    SString strPath = strInPath;
+    SString strUsingASEVersion = MTA_DM_ASE_VERSION;
+
+    // Use version from path instead?
+    if ( strPath.Left ( 3 ) == "..\\" )
+    {
+        strPath.Right ( strPath.length () - 3 ).Split ( "\\", &strUsingASEVersion, &strPath );
+    }
+
+    SString strVersionAppend = SString ( " %s", *strUsingASEVersion );
+
+    // Remove nightly appendage
+    strVersionAppend = strVersionAppend.TrimEnd ( "n" );
+
+    // 1.0 has no version number in the reg path
+    if ( strVersionAppend == " 1.0" )
+        strVersionAppend = "";
+
+    SString strResult = PathJoin ( "Software\\Multi Theft Auto: San Andreas" + strVersionAppend, strPath );
+    strResult = strResult.TrimEnd ( "\\" );
+    return strResult;
+}
+
+//
+// Registry values
+// 
+void SharedUtil::SetRegistryValue ( const SString& strPath, const SString& strKey, const SString& strValue )
+{
+    WriteRegistryStringValue ( HKEY_CURRENT_USER, MakeRegistryPath ( strPath ), strKey, strValue );
+}
+
+SString SharedUtil::GetRegistryValue ( const SString& strPath, const SString& strKey )
+{
+    return ReadRegistryStringValue ( HKEY_CURRENT_USER, MakeRegistryPath ( strPath ), strKey, NULL );
+}
+
+bool DeleteRegistryValue ( const SString& strPathKey )
+{
+    return DeleteRegistryKey ( HKEY_CURRENT_USER, strPathKey );
+}
 
 
 //
@@ -126,7 +172,7 @@ void SharedUtil::SetOnQuitCommand ( const SString& strOperation, const SString& 
 {
     // Encode into a string and set a registry key
     SString strValue ( "%s\t%s\t%s\t%s\t%s", strOperation.c_str (), strFile.c_str (), strParameters.c_str (), strDirectory.c_str (), strShowCmd.c_str () );
-    WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnQuitCommand", strValue );
+    SetRegistryValue ( "", "OnQuitCommand", strValue );
 }
 
 
@@ -139,7 +185,7 @@ void SharedUtil::SetOnRestartCommand ( const SString& strOperation, const SStrin
     // Encode into a string and set a registry key
     SString strVersion ( "%d.%d.%d-%d.%05d" ,MTASA_VERSION_MAJOR ,MTASA_VERSION_MINOR ,MTASA_VERSION_MAINTENANCE ,MTASA_VERSION_TYPE ,MTASA_VERSION_BUILD );
     SString strValue ( "%s\t%s\t%s\t%s\t%s\t%s", strOperation.c_str (), strFile.c_str (), strParameters.c_str (), strDirectory.c_str (), strShowCmd.c_str (), strVersion.c_str () );
-    WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnRestartCommand", strValue );
+    SetRegistryValue ( "", "OnRestartCommand", strValue );
 }
 
 
@@ -148,7 +194,7 @@ void SharedUtil::SetOnRestartCommand ( const SString& strOperation, const SStrin
 //
 bool SharedUtil::GetOnRestartCommand ( SString& strOperation, SString& strFile, SString& strParameters, SString& strDirectory, SString& strShowCmd )
 {
-    SString strOnRestartCommand = ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnRestartCommand", NULL );
+    SString strOnRestartCommand = GetRegistryValue ( "", "OnRestartCommand" );
     SetOnRestartCommand ( "" );
 
     std::vector < SString > vecParts;
@@ -181,14 +227,12 @@ bool SharedUtil::GetOnRestartCommand ( SString& strOperation, SString& strFile, 
 //
 void SharedUtil::SetApplicationSetting ( const SString& strPath, const SString& strKey, const SString& strValue )
 {
-    SString strRegFullPath  = SStringX( "Software\\Multi Theft Auto: San Andreas\\Settings\\" ) + strPath.Replace( ".", "\\" );
-    WriteRegistryStringValue ( HKEY_CURRENT_USER, strRegFullPath, strKey, strValue );
+    SetRegistryValue ( PathJoin ( "Settings", strPath ), strKey, strValue );
 }
 
 SString SharedUtil::GetApplicationSetting ( const SString& strPath, const SString& strKey )
 {
-    SString strRegFullPath  = SStringX( "Software\\Multi Theft Auto: San Andreas\\Settings\\" ) + strPath.Replace( ".", "\\" );
-    return ReadRegistryStringValue ( HKEY_CURRENT_USER, strRegFullPath, strKey, NULL );
+    return GetRegistryValue ( PathJoin ( "Settings", strPath ), strKey );
 }
 
 //
@@ -241,8 +285,7 @@ int SharedUtil::GetApplicationSettingInt ( const SString& strPathKey )
 // Delete a setting key
 static bool DeleteApplicationSettingKey ( const SString& strPathKey )
 {
-    SString strRegFullPath  = SStringX( "Software\\Multi Theft Auto: San Andreas\\Settings\\" ) + strPathKey.Replace( ".", "\\" );
-    return DeleteRegistryKey ( HKEY_CURRENT_USER, strRegFullPath );
+    return DeleteRegistryValue ( "Settings." + strPathKey );
 }
 
 
@@ -315,7 +358,7 @@ void SharedUtil::BrowseToSolution ( const SString& strType, bool bAskQuestion, b
         strQueryURL = strQueryURL.Replace ( "%VERSION%", GetApplicationSetting ( "mta-version-ext" ) );
         strQueryURL = strQueryURL.Replace ( "%ID%", GetApplicationSetting ( "serial" ) );
         strQueryURL = strQueryURL.Replace ( "%TROUBLE%", strType );
-        ShellExecute ( NULL, "open", strQueryURL.c_str (), NULL, NULL, SW_SHOWNORMAL );
+        ShellExecuteNonBlocking ( "open", strQueryURL.c_str () );
     }
 
     if ( bTerminateProcess )
@@ -381,6 +424,99 @@ SString SharedUtil::GetReportLogContents ( void )
 #endif
 
 
+#ifdef ExpandEnvironmentStringsForUser
+//
+// eg "%HOMEDRIVE%" -> "C:"
+//
+SString SharedUtil::ExpandEnvString ( const SString& strInput )
+{
+    HANDLE hProcessToken;
+    if ( !OpenProcessToken ( GetCurrentProcess (), TOKEN_IMPERSONATE | TOKEN_QUERY | TOKEN_DUPLICATE, &hProcessToken ) )
+        return strInput;
+
+    const static int iBufferSize = 32000;
+    char envBuf [ iBufferSize + 2 ];
+    ExpandEnvironmentStringsForUser ( hProcessToken, strInput, envBuf, iBufferSize );
+    return envBuf;
+}
+#endif
+
+
+
+///////////////////////////////////////////////////////////////
+//
+// MyShellExecute
+//
+//
+//
+///////////////////////////////////////////////////////////////
+static int MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strInFile, const SString& strInParameters = "", const SString& strDirectory = "", int nShowCmd = SW_SHOWNORMAL )
+{
+    SString strFile = strInFile;
+    SString strParameters = strInParameters;
+
+    if ( strAction == "open" && strFile.BeginsWithI ( "http://" ) && strParameters.empty () )
+    {
+        strParameters = "url.dll,FileProtocolHandler " + strFile;
+        strFile = "rundll32.exe";
+    }
+
+    if ( bBlocking )
+    {
+        SHELLEXECUTEINFO info;
+        memset( &info, 0, sizeof ( info ) );
+        info.cbSize = sizeof ( info );
+        info.fMask = SEE_MASK_NOCLOSEPROCESS;
+        info.lpVerb = strAction;
+        info.lpFile = strFile;
+        info.lpParameters = strParameters;
+        info.lpDirectory = strDirectory;
+        info.nShow = nShowCmd;
+        bool bResult = ShellExecuteExA( &info ) != FALSE;
+        if ( info.hProcess )
+        {
+            WaitForSingleObject ( info.hProcess, INFINITE );
+            CloseHandle ( info.hProcess );
+        }
+        return bResult;
+    }
+    else
+    {
+        int iResult = (int)ShellExecute ( NULL, strAction, strFile, strParameters, strDirectory, nShowCmd );
+        return iResult;
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// SharedUtil::ShellExecuteBlocking
+//
+//
+//
+///////////////////////////////////////////////////////////////
+int SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
+{
+    return MyShellExecute ( true, strAction, strFile, strParameters, strDirectory );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// SharedUtil::ShellExecuteNonBlocking
+//
+//
+//
+///////////////////////////////////////////////////////////////
+int SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
+{
+    return MyShellExecute ( false, strAction, strFile, strParameters, strDirectory );
+}
+
+
+#endif  // MTA_CLIENT
+
+
 static char ToHexChar ( char c )
 {
     return c > 9 ? c - 10 + 'A' : c + '0';
@@ -428,23 +564,6 @@ SString SharedUtil::UnescapeString ( const SString& strText, char cSpecialChar )
     }
     return strResult;
 }
-
-#ifdef ExpandEnvironmentStringsForUser
-//
-// eg "%HOMEDRIVE%" -> "C:"
-//
-SString SharedUtil::ExpandEnvString ( const SString& strInput )
-{
-    HANDLE hProcessToken;
-    if ( !OpenProcessToken ( GetCurrentProcess (), TOKEN_IMPERSONATE | TOKEN_QUERY | TOKEN_DUPLICATE, &hProcessToken ) )
-        return strInput;
-
-    const static int iBufferSize = 32000;
-    char envBuf [ iBufferSize + 2 ];
-    ExpandEnvironmentStringsForUser ( hProcessToken, strInput, envBuf, iBufferSize );
-    return envBuf;
-}
-#endif
 
 
 //

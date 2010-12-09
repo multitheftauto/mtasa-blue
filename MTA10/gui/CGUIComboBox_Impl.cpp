@@ -170,7 +170,7 @@ bool CGUIComboBox_Impl::SetItemText ( int index, const char* szText )
         CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
         CEGUI::String strText;
         strText.assign( (CEGUI::utf8*) szText ); // assign as UTF8 string
-        pItem->setText( strText );
+        pItem->setText( strText, NULL );
         if( pItem->isSelected( ) ) // if this is currently selected, let's update the editbox.
         {
             strText.assign( (CEGUI::utf8*) szText );

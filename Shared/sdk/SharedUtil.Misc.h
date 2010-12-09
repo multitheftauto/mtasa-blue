@@ -17,11 +17,17 @@ namespace SharedUtil
     class CArgMap;
 #ifdef WIN32
 
+    void SetRegistryValue ( const SString& strPath, const SString& strKey, const SString& strValue );
+    SString GetRegistryValue ( const SString& strPath, const SString& strKey );
+
+    int ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
+    int ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
+
     //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only
     //
-    SString GetMTASABaseDir();
+    SString GetMTASABaseDir ( void );
 
     //
     // Turns a relative MTASA path i.e. "MTA\file.dat"
@@ -248,11 +254,13 @@ namespace SharedUtil
 
     // Remove key from collection
     template < class T, class V, class TR, class T2 >
-    void MapRemove ( std::map < T, V, TR >& collection, const T2& key )
+    bool MapRemove ( std::map < T, V, TR >& collection, const T2& key )
     {
         typename std::map < T, V, TR > ::iterator it = collection.find ( key );
-        if ( it != collection.end () )
-            collection.erase ( it );
+        if ( it == collection.end () )
+            return false;
+        collection.erase ( it );
+        return true;
     }
 
     // Find value in collection

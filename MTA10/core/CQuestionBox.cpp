@@ -89,6 +89,7 @@ void CQuestionBox::Show ( void )
     m_pWindow->Activate ();
     m_pWindow->SetAlwaysOnTop ( true );
     m_pWindow->BringToFront ();
+    g_pCore->RemoveMessageBox ();
 }
 
 

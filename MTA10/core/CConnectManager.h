@@ -29,24 +29,28 @@ public:
     bool            Reconnect           ( const char* szHost, unsigned short usPort, const char* szPassword );
 
     bool            Abort               ( void );
-    inline bool     IsConnecting        ( void )                                                                { return m_bIsConnecting; };
 
     void            DoPulse             ( void );
 
     static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream );
 
 private:
+    bool            ConnectContinue     ( void );
+
     bool            Event_OnCancelClick ( CGUIElement * pElement );
 
     std::string     m_strHost;
     unsigned short  m_usPort;
     std::string     m_strNick;
     std::string     m_strPassword;
+    bool            m_bIsDetectingVersion;
     bool            m_bIsConnecting;
     bool            m_bReconnect;
     time_t          m_tConnectStarted;
 
     GUI_CALLBACK*   m_pOnCancelClick;
+
+    CServerListItem* m_pServerItem;
 
     bool CheckNickProvided ( const char* szNick );
 };
