@@ -13,6 +13,7 @@
 
 class CServerList;
 class CServerListItem;
+class CMasterServerManagerInterface;
 
 #ifndef __CSERVERLIST_H
 #define __CSERVERLIST_H
@@ -42,6 +43,15 @@ class CServerListItem;
 // Timeout for one server in the server list to respond to a query (in ms)
 #define SERVER_LIST_ITEM_TIMEOUT       8000
 
+
+enum
+{
+    SERVER_INFO_NONE,
+    SERVER_INFO_ASE_0,
+    SERVER_INFO_CACHE,
+    SERVER_INFO_ASE_2,
+    SERVER_INFO_QUERY,
+};
 
 class CServerListItem
 {
@@ -80,6 +90,7 @@ public:
         usGamePort = copy.usGamePort;
         strHostName = copy.strHostName;
         Init ();
+        uiTieBreakPosition = copy.uiTieBreakPosition;
     }
 
     ~CServerListItem ( void )
@@ -119,19 +130,29 @@ public:
         bPassworded = false;
         nPlayers = 0;
         nMaxPlayers = 0;
-        nPing = 0;
-        uiNoReplyCount = 0;
-        m_ulQueryStart = 0;
+        nPing = 9999;
+        uiCacheNoReplyCount = 0;
+        m_ElapsedTime.Reset ();
         uiQueryRetryCount = 0;
         uiRevision = 1;
         bMaybeOffline = false;
+        bMasterServerSaysNoResponse = false;
         for ( int i = 0 ; i < SERVER_BROWSER_TYPE_COUNT ; i++ )
             revisionInList[i] = -1;
 
         strHost = inet_ntoa ( Address );
         strName = SString ( "%s:%d", inet_ntoa ( Address ), usGamePort );
+        strEndpoint = strName;
+        strEndpointSortKey = SString ( "%02x%02x%02x%02x-%04x",
+                                        Address.S_un.S_un_b.s_b1, Address.S_un.S_un_b.s_b2,
+                                        Address.S_un.S_un_b.s_b3, Address.S_un.S_un_b.s_b4,
+                                        usGamePort );
 
         m_Socket = INVALID_SOCKET;
+
+        uiTieBreakPosition = 1000;
+        m_iDataQuality = SERVER_INFO_NONE;
+        m_iTimeoutLength = SERVER_LIST_ITEM_TIMEOUT;
     }
 
     void                CloseSocket     ( void )
@@ -146,6 +167,7 @@ public:
     bool                ParseQuery      ( const char * szBuffer, unsigned int nLength );
     void                Query           ( void );
     std::string         Pulse           ( bool bCanSendQuery );
+    void                ResetForRefresh            ( void );
 
     in_addr             Address;        // IP-address
     unsigned short      usQueryPort;    // Query port
@@ -158,34 +180,226 @@ public:
     bool                bScanned;
     bool                bSkipped;
     bool                bMaybeOffline;
+    bool                bMasterServerSaysNoResponse;
     uint                revisionInList[ SERVER_BROWSER_TYPE_COUNT ];
-    uint                uiNoReplyCount;
+    uint                uiCacheNoReplyCount;
     uint                uiQueryRetryCount;
     uint                uiRevision;
 
-    std::string         strGame;        // Game name
-    std::string         strVersion;     // Game version
-    std::string         strName;        // Server name
-    std::string         strHost;        // Server host as IP
-    std::string         strHostName;    // Server host as name
-    std::string         strType;        // Game type
-    std::string         strMap;         // Map name
+    SString             strGameName;    // Game name. Always 'mta'
+    SString             strVersion;     // Game version
+    SString             strName;        // Server name
+    SString             strHost;        // Server host as IP
+    SString             strHostName;    // Server host as name
+    SString             strGameMode;    // Gamemode
+    SString             strMap;         // Map name
+    SString             strEndpoint;    // IP:port as a string
 
-    std::vector < std::string >
+    SString             strNameSortKey;         // Server name as a sortable string
+    SString             strVersionSortKey;      // Game version as a sortable string
+    SString             strEndpointSortKey;     // IP:port as a sortable string
+    uint                uiTieBreakPosition;
+    SString             strTieBreakSortKey;
+
+    std::vector < SString >
                         vecPlayers;
 
+
+    bool WaitingToSendQuery ( void ) const
+    {
+        return !bScanned && !bSkipped && m_Socket == INVALID_SOCKET;
+    }
+
+    const SString& GetEndpoint ( void ) const
+    {
+        return strEndpoint;
+    }
+
+    const SString& GetEndpointSortKey ( void ) const
+    {
+        return strEndpointSortKey;
+    }
+
+    void PostChange ( void )
+    {
+        // Update tie break sort key
+        strTieBreakSortKey = SString ( "%04d", uiTieBreakPosition );
+
+        // Update version sort key
+        strVersionSortKey = strVersion;
+
+        if ( strVersionSortKey.empty () )
+            strVersionSortKey = "0.0";
+
+        if ( isdigit ( strVersionSortKey.Right ( 1 )[0] ) )
+            strVersionSortKey += 'z';
+
+        SString strTemp;
+        for ( uint i = 0 ; i < strVersionSortKey.length () ; i++ )
+        {
+            uchar c = strVersionSortKey[i];
+            if ( isdigit ( c ) )
+                c = '9' - c + '0';
+            else
+            if ( isalpha ( c ) )
+                c = 'z' - c + 'a';
+            strTemp += c;
+        }
+        strVersionSortKey = strTemp;
+
+        // Update name sort key
+        strNameSortKey = "";
+        for ( uint i = 0 ; i < strName.length () ; i++ )
+        {
+            uchar c = strName[i];
+            if ( isalpha(c) )
+                strNameSortKey += toupper ( c );
+        }
+    }
+
+    const SString& GetVersionSortKey ( void ) const
+    {
+        return strVersionSortKey;
+    }
+
+    bool MaybeWontRespond ( void ) const
+    {
+        if ( bMasterServerSaysNoResponse || uiCacheNoReplyCount > 0 )
+            if ( GetDataQuality () < SERVER_INFO_QUERY )
+                return true;
+        return false;
+    }
+
+    bool ShouldAllowDataQuality ( int iDataQuality )
+    {
+        return iDataQuality >= m_iDataQuality;
+    }
+    void SetDataQuality ( int iDataQuality )
+    {
+        m_iDataQuality = iDataQuality;
+        uiRevision++;
+    }
+    int GetDataQuality ( void ) const
+    {
+        return m_iDataQuality;
+    }
+
+    int                 m_iTimeoutLength;
 protected:
     int                 m_Socket;
-    unsigned long       m_ulQueryStart;
+    CElapsedTime        m_ElapsedTime;
+    int                 m_iDataQuality;
 };
 
 typedef std::list<CServerListItem*>::const_iterator CServerListIterator;
+
+
+// Address and port combo
+struct SAddressPort
+{
+    ulong   m_ulIp;
+    ushort  m_usPort;
+    SAddressPort ( in_addr Address, ushort usPort ) : m_ulIp ( Address.s_addr ), m_usPort ( usPort ) {}
+    bool operator < ( const SAddressPort& other ) const
+    {
+        return m_ulIp < other.m_ulIp || 
+                ( m_ulIp == other.m_ulIp &&
+                    ( m_usPort < other.m_usPort ) );
+    }
+};
+
+
+////////////////////////////////////////////////
+//
+// class CServerListItemList
+//
+// Keeps track of list items in a map
+// 
+////////////////////////////////////////////////
+class CServerListItemList
+{
+    std::list < CServerListItem* >                  m_List;
+    std::map < SAddressPort, CServerListItem* >     m_Map;
+public:
+
+    std::list<CServerListItem*>::iterator begin()
+    {
+        return m_List.begin ();
+    }
+
+    std::list<CServerListItem*>::iterator end()
+    {
+        return m_List.end ();
+    }
+
+    size_t size() const
+    {
+        return m_List.size ();
+    }
+
+    void clear()
+    {
+        m_List.clear ();
+        m_Map.clear ();
+    }
+
+    CServerListItem* Find ( in_addr Address, ushort usQueryPort )
+    {
+        SAddressPort key ( Address, usQueryPort );
+        if ( CServerListItem** ppItem = MapFind ( m_Map, key ) )
+            return *ppItem;
+        return NULL;
+    }
+
+    CServerListItem* Add ( in_addr Address, ushort usQueryPort, bool bAtFront = false )
+    {
+        SAddressPort key ( Address, usQueryPort );
+        assert ( !MapContains ( m_Map, key ) );
+        CServerListItem* pItem = new CServerListItem ( Address, usQueryPort );
+        MapSet ( m_Map, key, pItem );
+        pItem->uiTieBreakPosition = 5000;
+        if ( !m_List.empty () )
+        {
+            if ( bAtFront )
+                pItem->uiTieBreakPosition = m_List.front ()->uiTieBreakPosition - 1;
+            else
+                pItem->uiTieBreakPosition = m_List.back ()->uiTieBreakPosition + 1;
+        }
+        if ( bAtFront )
+            m_List.push_front ( pItem );
+        else
+            m_List.push_back ( pItem );
+        return pItem;
+    }
+
+    bool Remove ( in_addr Address, ushort usQueryPort )
+    {
+        SAddressPort key ( Address, usQueryPort );
+        if ( MapRemove ( m_Map, key ) )
+        {
+            for ( CServerListIterator iter = m_List.begin (); iter != m_List.end (); iter++ )
+            {
+                CServerListItem* pItem = *iter;
+                if ( pItem->Address.s_addr == Address.s_addr && pItem->usQueryPort == usQueryPort )
+                {
+                    m_List.erase ( iter );
+                    delete pItem;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+};
+
+
+
 
 class CServerList
 {
 public:
                                             CServerList             ( void );
-                                            ~CServerList            ( void );
+    virtual                                 ~CServerList            ( void );
 
     // Base implementation scans all listed servers
     virtual void                            Pulse                   ( void );
@@ -195,11 +409,9 @@ public:
     CServerListIterator                     IteratorEnd             ( void )                        { return m_Servers.end (); };
     unsigned int                            GetServerCount          ( void )                        { return m_Servers.size (); };
 
-    void                                    Add                     ( CServerListItem Server, bool addAtFront = false );
-    void                                    Remove                  ( CServerListItem* pServer )    { m_Servers.remove ( pServer ); delete pServer; };
+    bool                                    AddUnique               ( in_addr Address, ushort usQueryPort, bool addAtFront = false );
     void                                    Clear                   ( void );
-    bool                                    Exists                  ( CServerListItem Server );
-    void                                    Remove                  ( CServerListItem Server );
+    void                                    Remove                  ( in_addr Address, ushort usQueryPort );
 
     std::string&                            GetStatus               ( void )                        { return m_strStatus; };
     bool                                    IsUpdated               ( void )                        { return m_bUpdated; };
@@ -211,7 +423,7 @@ protected:
     unsigned int                            m_nScanned;
     unsigned int                            m_nSkipped;
     int                                     m_iRevision;
-    std::list < CServerListItem* >          m_Servers;
+    CServerListItemList                     m_Servers;
     std::string                             m_strStatus;
     std::string                             m_strStatus2;
     long long                               m_llLastTickCount;
@@ -221,14 +433,15 @@ protected:
 class CServerListInternet : public CServerList
 {
 public:
+                                            CServerListInternet     ( void );
+                                            ~CServerListInternet    ( void );
     void                                    Pulse                   ( void );
     void                                    Refresh                 ( void );
 
 private:
-    bool                                    ParseList               ( const char *szBuffer, unsigned int nLength );
 
-    CHTTPClient                             m_HTTP;
-    unsigned long                           m_ulStartTime;
+    CMasterServerManagerInterface*          m_pMasterServerManager;
+    CElapsedTime                            m_ElapsedTime;
 };
 
 // LAN list (scans for LAN-broadcasted servers on refresh)

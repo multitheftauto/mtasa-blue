@@ -82,6 +82,7 @@ public:
     // Construct from a static function pointer
     CGUICallback ( Ret ( *pF )( Arguments ) )
     {
+        memset ( m_Callback, 0, sizeof(m_Callback) );
         if ( pF )
         {
             new(m_Callback) CGUICallbackFree < Ret, Arguments > ( pF );
@@ -92,6 +93,7 @@ public:
     template < class T >
     CGUICallback ( Ret ( T::*pF )( Arguments ), T* pObj )
     {
+        memset ( m_Callback, 0, sizeof(m_Callback) );
         if ( pF )
         {
             new(m_Callback) CGUICallbackMethod < T, Ret, Arguments > ( pF, pObj );

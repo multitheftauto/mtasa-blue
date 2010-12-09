@@ -658,7 +658,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         SetCurrentDirectory ( strMTASAPath );
         SetDllDirectory( strMTASAPath );
 
-        SString strOnQuitCommand = ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnQuitCommand" );
+        SString strOnQuitCommand = GetRegistryValue ( "", "OnQuitCommand" );
 
         std::vector < SString > vecParts;
         strOnQuitCommand.Split ( "\t", vecParts );
@@ -684,7 +684,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
             if ( lpOperation && lpFile )
             {
-                ShellExecute( NULL, lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd );            
+                ShellExecuteNonBlocking( lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd );            
             }
         }
     }

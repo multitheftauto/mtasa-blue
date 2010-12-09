@@ -754,6 +754,15 @@ namespace
             CDataInfoSet    serverInfoMap;
         } trouble;
 
+        struct {
+            CDataInfoSet    serverInfoMap;
+        } ase;
+
+        struct {
+            CDataInfoSet    serverInfoMap;
+            CDataInfoSet    nobrowseInfoMap;
+        } sidegrade;
+
 
         bool IsValid () const
         {
@@ -763,6 +772,7 @@ namespace
                     && crashdump.serverInfoMap.size ()
                     && gtadatafiles.serverInfoMap.size ()
                     && trouble.serverInfoMap.size ()
+                    && ase.serverInfoMap.size ()
                     ;
         }
     };

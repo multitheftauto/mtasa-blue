@@ -25,10 +25,13 @@ CConnectManager::CConnectManager ( void )
 
     m_usPort = 0;
     m_bReconnect = false;
+    m_bIsDetectingVersion = false;
     m_bIsConnecting = false;
     m_tConnectStarted = 0;
 
     m_pOnCancelClick = new GUI_CALLBACK ( &CConnectManager::Event_OnCancelClick, this );
+
+    m_pServerItem = NULL;
 }
 
 
@@ -40,6 +43,7 @@ CConnectManager::~CConnectManager ( void )
         m_pOnCancelClick = NULL;
     }
 
+    SAFE_DELETE ( m_pServerItem );
     g_pConnectManager = NULL;
 }
 
@@ -75,30 +79,57 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     pNet->Reset ();
     assert ( pNet->GetServerBitStreamVersion () == 0 );
 
-    // Set our packet handler
-    pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket, true );
+    // Save input
+    m_strHost = szHost;
+    m_strNick = szNick;
+    m_strPassword = szPassword;
+    m_usPort = usPort;
 
-    // Try to start a network to connect
-    if ( !pNet->StartNetwork ( szHost, usPort ) )
+    // Parse host into a server item
+    in_addr Address;
+    if ( !CServerListItem::Parse ( m_strHost.c_str(), Address ) )
     {
-        SString strBuffer ( "Connecting to %s at port %u failed!", szHost, usPort );
+        SString strBuffer = "Connecting failed. Invalid host provided!";
         CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
         return false;
     }
 
-    m_strHost = szHost;
-    m_strNick = szNick;
-    m_strPassword = szPassword;
+    // Start server version detection
+    m_bIsDetectingVersion = true;
 
-    // Store the port and that we're connecting
-    m_usPort = usPort;
+    SAFE_DELETE ( m_pServerItem );
+    m_pServerItem = new CServerListItem ( Address, m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+    m_pServerItem->m_iTimeoutLength = 2000;
+
+    SString strBuffer ( "Connecting to %s:%u ..", m_strHost.c_str(), m_usPort );
+    CCore::GetSingleton ().ShowMessageBox ( "CONNECTING", strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
+    return true;
+}
+
+    
+
+
+bool CConnectManager::ConnectContinue ( void )
+{
+    CNet* pNet = CCore::GetSingleton ().GetNetwork ();
+
+    // Set our packet handler
+    pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket, true );
+
+    // Try to start a network to connect
+    if ( !pNet->StartNetwork ( m_strHost.c_str (), m_usPort ) )
+    {
+        SString strBuffer ( "Connecting to %s at port %u failed!", m_strHost.c_str (), m_usPort );
+        CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
+        return false;
+    }
+
     m_bIsConnecting = true;
     m_tConnectStarted = time ( NULL );
 
     // Display the status box
-    SString strBuffer ( "Connecting to %s:%u ...", m_strHost.c_str(), usPort );
+    SString strBuffer ( "Connecting to %s:%u ...", m_strHost.c_str(), m_usPort );
     CCore::GetSingleton ().ShowMessageBox ( "CONNECTING", strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
-
     return true;
 }
 
@@ -151,6 +182,7 @@ bool CConnectManager::Abort ( void )
 
     m_usPort = 0;
     m_bIsConnecting = false;
+    m_bIsDetectingVersion = false;
     m_tConnectStarted = 0;
 
     // Success
@@ -160,6 +192,34 @@ bool CConnectManager::Abort ( void )
 
 void CConnectManager::DoPulse ( void )
 {
+    // Are we getting the server version?
+    if ( m_bIsDetectingVersion )
+    {
+        m_pServerItem->Pulse ( true );
+        if ( m_pServerItem->bSkipped )
+        {
+            // Can't determine server version, just try connect anyway
+            m_bIsDetectingVersion = false;
+            ConnectContinue ();
+        }
+        else
+        if ( m_pServerItem->bScanned )
+        {
+            // Got version, now see what to do
+            m_bIsDetectingVersion = false;
+            if ( m_pServerItem->strVersion == MTA_DM_ASE_VERSION )
+            {
+                // Version match, continue connect
+                ConnectContinue ();
+            }
+            else
+            {
+                // Version mis-match. See about launching compatible .exe
+                GetVersionUpdater ()->InitiateSidegradeLaunch ( m_pServerItem->strVersion, m_strHost.c_str(), m_usPort, m_strNick.c_str (), m_strPassword.c_str() );
+            }
+        }
+    }
+    else
     // Are we connecting?
     if ( m_bIsConnecting )
     {

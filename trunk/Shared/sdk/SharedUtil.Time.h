@@ -34,4 +34,38 @@ namespace SharedUtil
 
     // Get the local time as a sortable string.
     SString     GetLocalTimeString ( bool bDate = false, bool bMilliseconds = false );
+
+
+    //
+    // Simple class to measure time passing
+    // Main feature is the limit on how much time is allowed to pass between each Get()
+    //
+    class CElapsedTime
+    {
+        long long   m_llUpdateTime;
+        long        m_lElapsedTime;
+        long        m_lMaxIncrement;
+    public:
+
+        CElapsedTime ( long lMaxIncrement = 500 )
+            : m_lMaxIncrement ( lMaxIncrement )
+        {
+            Reset ();
+        }
+
+        void Reset ( void )
+        {
+            m_llUpdateTime = GetTickCount64_ ();
+            m_lElapsedTime = 0;
+        }
+
+        long Get ( void )
+        {
+            long long llTime = GetTickCount64_ ();
+            m_lElapsedTime += Min ( m_lMaxIncrement, static_cast < long > ( llTime - m_llUpdateTime ) );
+            m_llUpdateTime = llTime;
+            return m_lElapsedTime;
+        }
+    };
+
 }

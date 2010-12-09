@@ -33,6 +33,8 @@ typedef unsigned char   uint8;
 #include <algorithm>
 #include <limits>
 #include <assert.h>
+#include <stdio.h>
+#include <string.h>
 #include <string>
 #include <stdarg.h>
 #include <assert.h>
@@ -40,4 +42,5 @@ typedef unsigned char   uint8;
 #include "SharedUtil.Misc.h"
 #include "SharedUtil.File.h"
 #include "SharedUtil.Time.h"
+#include "SharedUtil.Buffer.h"
 #include "SharedUtil.Game.h"

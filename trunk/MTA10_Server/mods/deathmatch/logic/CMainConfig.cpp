@@ -530,6 +530,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "ver", CConsoleCommands::Ver, false );
     RegisterCommand ( "sver", CConsoleCommands::Ver, false );
     RegisterCommand ( "ase", CConsoleCommands::Ase, false );
+    RegisterCommand ( "openports", CConsoleCommands::OpenPortsTest, false );
 
     return true;
 }

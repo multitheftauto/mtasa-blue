@@ -26,9 +26,6 @@ void    HideSplash                  ( bool bOnlyDelay = false );
 
 long    DisplayErrorMessageBox      ( const SString& strMessage, const SString& strTroubleType = "" );
 
-SString ReadRegistryStringValue     ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, int* iResult = NULL );
-void    WriteRegistryStringValue    ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, const char* szBuffer );
-
 void    SetMTASAPathSource          ( bool bReadFromRegistry );
 SString GetMTASAPath                ( void );
 int     GetGamePath                 ( SString& strOutResult );
@@ -43,9 +40,6 @@ SString GetOSVersion                ( void );
 SString GetRealOSVersion            ( void );
 bool    IsVistaOrHigher             ( void );
 BOOL    IsUserAdmin                 ( void );
-
-bool    ShellExecuteBlocking        ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" );
-bool    ShellExecuteNonBlocking     ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "" );
 
 void    StartPseudoProgress         ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
 void    StopPseudoProgress          ( void );

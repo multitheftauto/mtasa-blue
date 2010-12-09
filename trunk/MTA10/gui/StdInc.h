@@ -15,6 +15,7 @@
 #include <renderers/directx9GUIRenderer/d3d9renderer.h>
 #include <renderers/directx9GUIRenderer/d3d9texture.h>
 
+#define MTA_CLIENT
 #include "SharedUtil.h"
 #include "CGUITabListItem.h"
 #include "CGUITabList.h"

@@ -21,6 +21,7 @@
 
 #include "StdInc.h"
 #include "CPerfStatManager.h"
+#include "../utils/COpenPortsTester.h"
 
 #define MAX_KEYSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
@@ -126,6 +127,9 @@ CGame::CGame ( void )
 
     m_bCloudsEnabled = true;
 
+    m_llLastAnnouceTime = 0;
+    m_pOpenPortsTester = NULL;
+
     m_bTrafficLightsLocked = false;
     m_ucTrafficLightState = 0;
     m_ulLastTrafficUpdate = 0;
@@ -219,6 +223,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pResourceDownloader );
     SAFE_DELETE ( m_pRPCFunctions );
     SAFE_DELETE ( m_pWaterManager );
+    SAFE_DELETE ( m_pOpenPortsTester );
 
     // Clear our global pointer
     g_pGame = NULL;
@@ -364,6 +369,11 @@ void CGame::DoPulse ( void )
     m_ElementDeleter.DoDeleteAll ();
 
     GetPerfStatManager ()->DoPulse ();
+
+    PulseMasterServerAnnounce ();
+
+    if ( m_pOpenPortsTester )
+        m_pOpenPortsTester->Poll ();
 
     // Unlock the critical section again
     Unlock();
@@ -677,26 +687,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
         if ( m_pMainConfig->GetASEEnabled () )
         {
-            // Query Wojjie's game-monitor.com
-            CTCPImpl * pTCP = new CTCPImpl ();
-            pTCP->Initialize ();
-
-            char szURL[256] = { '\0' };
-            CLogger::LogPrint ( "Querying game-monitor.com master server... " );
-            _snprintf ( szURL, sizeof(szURL) - 1, QUERY_URL_GAME_MONITOR, usServerPort + 123);
-
-            CHTTPRequest * request = new CHTTPRequest ( szURL );
-            request->SetLocalIP ( strServerIP );
-            CHTTPResponse * response = request->Send ( pTCP );
-            if ( !response )
-                CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
-            else if ( response->GetErrorCode () != 200 )
-                CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
-            else
-                CLogger::LogPrintfNoStamp ( "success!\n");
-
-            delete pTCP;
-            delete request;
+            PulseMasterServerAnnounce ();
         }
 
         if ( !m_pMainConfig->GetDontBroadcastLan() )
@@ -753,6 +744,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // inside CServer.cpp in deathmatch mod aswell.
     CLogger::LogPrint ( "Server started and is ready to accept connections!\n" );
 
+    // Create port tester
+    m_pOpenPortsTester = new COpenPortsTester ();
+
+    // Add help hint
+    CLogger::LogPrint ( "Type 'help' for a list of commands.\n" );
+
     return true;
 }
 
@@ -775,6 +772,81 @@ void CGame::Stop ( void )
         m_pVoiceServer->Shutdown();
     }
 #endif
+}
+
+
+void CGame::StartOpenPortsTest ( void )
+{
+    if ( m_pOpenPortsTester )
+        m_pOpenPortsTester->Start ();
+}
+
+
+// Remind master server once every 24 hrs
+void CGame::PulseMasterServerAnnounce ( void )
+{
+    if ( m_llLastAnnouceTime == 0 || GetTickCount64_ () - m_llLastAnnouceTime > 24 * 60 * 60 * 1000 )
+    {
+        bool bFirstPass = m_llLastAnnouceTime == 0;
+        m_llLastAnnouceTime = GetTickCount64_ ();
+
+        // If ASE is enabled
+        if ( m_pMainConfig->GetASEEnabled () )
+        {
+            const SString strServerIP = m_pMainConfig->GetServerIP ();
+            unsigned short usServerPort = m_pMainConfig->GetServerPort ();
+            unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
+
+            SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
+
+            struct {
+                SString strDesc;
+                SString strURL;
+                bool bRepeat;
+            } masterServerList[] = {
+                                     { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false },
+                                     { "Querying backup master server... ", SString ( "http://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion ), true },
+                                   };
+
+            for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )
+            {
+                const SString& strDesc = masterServerList[i].strDesc;
+                const SString& strURL = masterServerList[i].strURL;
+                bool bRepeat = masterServerList[i].bRepeat;
+
+                // Don't repeat request for some servers
+                if ( !bFirstPass && !bRepeat )
+                    continue;
+
+                // Only log on first pass
+                if ( bFirstPass )
+                    CLogger::LogPrint ( strDesc );
+
+                // Send request
+                CTCPImpl * pTCP = new CTCPImpl ();
+                pTCP->Initialize ();
+                CHTTPRequest * request = new CHTTPRequest ( strURL );
+                request->SetLocalIP ( strServerIP );
+                CHTTPResponse * response = request->Send ( pTCP );
+
+                // Only log on first pass
+                if ( bFirstPass )
+                {
+                    if ( !response )
+                        CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
+                    else if ( response->GetErrorCode () != 200 )
+                        CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
+                    else
+                        CLogger::LogPrintfNoStamp ( "success!\n");
+                }
+
+                if ( response )
+                    delete response;
+                delete pTCP;
+                delete request;
+            }
+        }
+    }
 }
 
 

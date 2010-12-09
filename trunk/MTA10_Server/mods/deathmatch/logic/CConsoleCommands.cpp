@@ -1881,3 +1881,14 @@ bool CConsoleCommands::Ase ( CConsole* pConsole, const char* szArguments, CClien
     }
     return false;
 }
+
+
+bool CConsoleCommands::OpenPortsTest ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        g_pGame->StartOpenPortsTest ();
+        return true;
+    }
+    return false;
+}

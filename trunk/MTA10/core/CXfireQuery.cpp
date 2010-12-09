@@ -40,7 +40,7 @@ bool CXfireServerInfo::ParseQuery ( const char * szBuffer, unsigned int nLength 
     unsigned int i = 4;
 
     // Game
-    if ( !ReadString ( strGame, szBuffer, i, nLength ) )
+    if ( !ReadString ( strGameName, szBuffer, i, nLength ) )
         return false;
 
     // Server name
@@ -48,7 +48,7 @@ bool CXfireServerInfo::ParseQuery ( const char * szBuffer, unsigned int nLength 
         return false;
 
     // Game type
-    if ( !ReadString ( strType, szBuffer, i, nLength ) )
+    if ( !ReadString ( strGameMode, szBuffer, i, nLength ) )
         return false;
 
     // Map name

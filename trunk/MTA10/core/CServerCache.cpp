@@ -35,10 +35,11 @@ namespace
         CValueInt       nMaxPlayers;    // Maximum players
         CValueInt       nPing;          // Ping time
         CValueInt       bPassworded;    // Password protected
-        CValueInt       uiNoReplyCount;
+        CValueInt       uiCacheNoReplyCount;
         SString         strName;        // Server name
-        SString         strType;        // Game type
+        SString         strGameMode;    // Game mode
         SString         strMap;         // Map name
+        SString         strVersion;     // Version
     };
 }
 
@@ -55,7 +56,7 @@ class CServerCache : public CServerCacheInterface
 public:
     virtual bool        SaveServerCache             ( void );
     virtual void        GetServerCachedInfo         ( CServerListItem* pItem );
-    virtual void        SetServerCachedInfo         ( CServerListItem* pItem );
+    virtual void        SetServerCachedInfo         ( const CServerListItem* pItem );
     virtual void        GetServerListCachedInfo     ( CServerList *pList );
     virtual bool        GenerateServerList          ( CServerList *pList );
 
@@ -157,10 +158,11 @@ bool CServerCache::LoadServerCache ( void )
         if ( const SString* pString = MapFind ( item.attributeMap, "nMaxPlayers" ) )    info.nMaxPlayers.SetFromString ( *pString );
         if ( const SString* pString = MapFind ( item.attributeMap, "nPing" ) )          info.nPing.SetFromString ( *pString );
         if ( const SString* pString = MapFind ( item.attributeMap, "bPassworded" ) )    info.bPassworded.SetFromString ( *pString );
-        if ( const SString* pString = MapFind ( item.attributeMap, "uiNoReplyCount" ) ) info.uiNoReplyCount.SetFromString ( *pString );
+        if ( const SString* pString = MapFind ( item.attributeMap, "uiNoReplyCount" ) ) info.uiCacheNoReplyCount.SetFromString ( *pString );
         if ( const SString* pString = MapFind ( item.attributeMap, "strName" ) )        info.strName    = *pString;
-        if ( const SString* pString = MapFind ( item.attributeMap, "strType" ) )        info.strType    = *pString;
+        if ( const SString* pString = MapFind ( item.attributeMap, "strGameMode" ) )    info.strGameMode = *pString;
         if ( const SString* pString = MapFind ( item.attributeMap, "strMap" ) )         info.strMap     = *pString;
+        if ( const SString* pString = MapFind ( item.attributeMap, "strVersion" ) )     info.strVersion = *pString;
 
         if ( key.ulIp == 0 )
             continue;
@@ -203,7 +205,7 @@ bool CServerCache::SaveServerCache ( void )
         const CCachedInfo& info = it->second;
 
         // Don't save cache of non responding servers
-        if ( info.nMaxPlayers == 0 || info.uiNoReplyCount > 3 )
+        if ( info.nMaxPlayers == 0 || info.uiCacheNoReplyCount > 3 )
             continue;
 
         SDataInfoItem item;
@@ -216,10 +218,11 @@ bool CServerCache::SaveServerCache ( void )
         MapSet ( item.attributeMap, "nMaxPlayers",      info.nMaxPlayers.ToString () );
         MapSet ( item.attributeMap, "nPing",            info.nPing.ToString () );
         MapSet ( item.attributeMap, "bPassworded",      info.bPassworded.ToString () );
-        MapSet ( item.attributeMap, "uiNoReplyCount",   info.uiNoReplyCount.ToString () );
+        MapSet ( item.attributeMap, "uiNoReplyCount",   info.uiCacheNoReplyCount.ToString () );
         MapSet ( item.attributeMap, "strName",          info.strName );
-        MapSet ( item.attributeMap, "strType",          info.strType );
+        MapSet ( item.attributeMap, "strGameMode",      info.strGameMode );
         MapSet ( item.attributeMap, "strMap",           info.strMap );
+        MapSet ( item.attributeMap, "strVersion",       info.strVersion );
         dataSet.push_back( item );
     }
 
@@ -246,14 +249,29 @@ void CServerCache::GetServerCachedInfo ( CServerListItem* pItem )
     key.usGamePort = pItem->usGamePort;
     if ( CCachedInfo* pInfo = MapFind ( m_ServerCachedMap, key ) )
     {
-        pItem->nPlayers         = pInfo->nPlayers;
-        pItem->nMaxPlayers      = pInfo->nMaxPlayers;
-        pItem->nPing            = pInfo->nPing;
-        pItem->bPassworded      = pInfo->bPassworded ? true : false;
-        pItem->strName          = pInfo->strName;
-        pItem->strType          = pInfo->strType;
-        pItem->strMap           = pInfo->strMap;
-        pItem->uiNoReplyCount   = pInfo->uiNoReplyCount;
+        if ( pItem->ShouldAllowDataQuality ( SERVER_INFO_CACHE ) )
+        {
+            pItem->SetDataQuality ( SERVER_INFO_CACHE );
+
+            pItem->nPlayers         = pInfo->nPlayers;
+            pItem->nMaxPlayers      = pInfo->nMaxPlayers;
+            pItem->nPing            = pInfo->nPing;
+            pItem->bPassworded      = pInfo->bPassworded ? true : false;
+            pItem->strName          = pInfo->strName;
+            pItem->strGameMode      = pInfo->strGameMode;
+            pItem->strMap           = pInfo->strMap;
+            pItem->strVersion       = pInfo->strVersion;
+            pItem->uiCacheNoReplyCount = pInfo->uiCacheNoReplyCount;
+
+            pItem->PostChange ();
+        }
+        else
+        if ( pItem->GetDataQuality () < SERVER_INFO_QUERY )
+        {
+            // Allow cache to fill in certain missing data if query not done yet
+            if ( pItem->strGameMode.empty () )      pItem->strGameMode  = pInfo->strGameMode;
+            if ( pItem->strMap.empty () )           pItem->strMap       = pInfo->strMap;
+        }
     }
 }
 
@@ -265,7 +283,7 @@ void CServerCache::GetServerCachedInfo ( CServerListItem* pItem )
 // Store cached info for a single server
 //
 ///////////////////////////////////////////////////////////////
-void CServerCache::SetServerCachedInfo ( CServerListItem* pItem )
+void CServerCache::SetServerCachedInfo ( const CServerListItem* pItem )
 {
     CCachedKey key;
     key.ulIp = pItem->Address.s_addr;
@@ -282,9 +300,10 @@ void CServerCache::SetServerCachedInfo ( CServerListItem* pItem )
     pInfo->nPing            = pItem->nPing;
     pInfo->bPassworded      = pItem->bPassworded;
     pInfo->strName          = pItem->strName;
-    pInfo->strType          = pItem->strType;
+    pInfo->strGameMode      = pItem->strGameMode;
     pInfo->strMap           = pItem->strMap;
-    pInfo->uiNoReplyCount   = pItem->uiNoReplyCount;
+    pInfo->strVersion       = pItem->strVersion;
+    pInfo->uiCacheNoReplyCount   = pItem->uiCacheNoReplyCount;
 }
 
 
@@ -331,12 +350,14 @@ bool CServerCache::GenerateServerList ( CServerList *pList )
         const CCachedInfo& info = it->second;
 
         // Don't add non responding servers
-        if ( info.nMaxPlayers == 0 || info.uiNoReplyCount > 3 )
+        if ( info.nMaxPlayers == 0 || info.uiCacheNoReplyCount > 3 )
             continue;
 
         ushort usGamePort = key.usGamePort + SERVER_LIST_QUERY_PORT_OFFSET;
         if ( usGamePort > 0 )
-            pList->Add ( CServerListItem ( (in_addr&)key.ulIp, usGamePort ) );
+        {
+            pList->AddUnique ( (in_addr&)key.ulIp, usGamePort );
+        }
     }
 
     pList->SetUpdated ( true );
