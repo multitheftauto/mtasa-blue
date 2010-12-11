@@ -242,19 +242,21 @@ SString SharedUtil::PathJoin ( const SString& str1, const SString& str2, const S
 }
 
 #ifdef WIN32
+#ifdef MTA_CLIENT
 SString SharedUtil::GetMTALocalAppDataPath ( void )
 {
     char szResult[MAX_PATH] = "";
     SHGetFolderPath( NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szResult );
-    return PathJoin ( szResult, "MTA San Andreas" );
+    return PathJoin ( szResult, "MTA San Andreas" + GetVersionAppendString () );
 }
 
 SString SharedUtil::GetMTATempPath ( void )
 {
     char szResult[4030] = "";
     GetTempPath( 4000, szResult );
-    return PathJoin ( szResult, "MTA" );
+    return PathJoin ( szResult, "MTA" + GetVersionAppendString () );
 }
+#endif
 #endif
 
 

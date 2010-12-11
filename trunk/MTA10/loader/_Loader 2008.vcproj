@@ -77,7 +77,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="C:/Program Files/MTA San Andreas/Multi Theft Auto_d.exe"
+				OutputFile="C:/Program Files/MTA San Andreas 1.1/Multi Theft Auto_d.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -176,7 +176,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="c:\program files\MTA San Andreas\Multi Theft Auto.exe"
+				OutputFile="c:\program files\MTA San Andreas 1.1\Multi Theft Auto.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -280,7 +280,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="..\..\output\MTA San Andreas\Multi Theft Auto.exe"
+				OutputFile="..\..\output\MTA San Andreas 1.1\Multi Theft Auto.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"

@@ -114,6 +114,23 @@ static bool DeleteRegistryKey ( HKEY hkRoot, const char* szSubKey )
 }
 
 
+//
+// GetVersionAppendString
+//
+SString SharedUtil::GetVersionAppendString ( const SString& strUsingASEVersion )
+{
+    SString strVersionAppend = SString ( " %s", strUsingASEVersion.empty () ? MTA_DM_ASE_VERSION : *strUsingASEVersion );
+
+    // Remove nightly appendage
+    strVersionAppend = strVersionAppend.TrimEnd ( "n" );
+
+    // 1.0 has no version number in the path
+    if ( strVersionAppend == " 1.0" )
+        strVersionAppend = "";
+
+    return strVersionAppend;
+}
+
 
 //
 // MakeRegistryPath
@@ -132,16 +149,7 @@ static SString MakeRegistryPath ( const SString& strInPath )
         strPath.Right ( strPath.length () - 3 ).Split ( "\\", &strUsingASEVersion, &strPath );
     }
 
-    SString strVersionAppend = SString ( " %s", *strUsingASEVersion );
-
-    // Remove nightly appendage
-    strVersionAppend = strVersionAppend.TrimEnd ( "n" );
-
-    // 1.0 has no version number in the reg path
-    if ( strVersionAppend == " 1.0" )
-        strVersionAppend = "";
-
-    SString strResult = PathJoin ( "Software\\Multi Theft Auto: San Andreas" + strVersionAppend, strPath );
+    SString strResult = PathJoin ( "Software\\Multi Theft Auto: San Andreas" + GetVersionAppendString ( strUsingASEVersion ), strPath );
     strResult = strResult.TrimEnd ( "\\" );
     return strResult;
 }

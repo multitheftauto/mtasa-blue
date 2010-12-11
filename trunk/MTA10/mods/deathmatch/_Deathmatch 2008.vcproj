@@ -74,17 +74,17 @@
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="libv2.lib lua5.1d.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlibd_2008.lib Iphlpapi.lib"
 				ShowProgress="0"
-				OutputFile="C:\Program Files\MTA San Andreas\mods\deathmatch\Client_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.1\mods\deathmatch\Client_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../vendor/bass/lib;../../../vendor/lua/lib;../../../vendor/libv2/lib;../../../vendor/zlib/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="C:\Program Files\MTA San Andreas\mods\deathmatch\Client_d.pdb"
+				ProgramDatabaseFile=".\Debug/Client_d.pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary=""
+				ImportLibrary=".\Debug/Client.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -166,7 +166,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/FIXED:NO"
 				AdditionalDependencies="libv2.lib lua5.1.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib_2008.lib"
-				OutputFile="C:\Program Files\MTA San Andreas\mods\deathmatch\Client.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.1\mods\deathmatch\Client.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../vendor/bass/lib;../../../vendor/lua/lib;../../../vendor/libv2/lib;../../../vendor/zlib/lib"
@@ -182,7 +182,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary=""
+				ImportLibrary=".\Release/Client.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -264,7 +264,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/FIXED:NO"
 				AdditionalDependencies="libv2.lib lua5.1.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib_2008.lib"
-				OutputFile="..\..\..\output\MTA San Andreas\mods\deathmatch\client.dll"
+				OutputFile="..\..\..\output\MTA San Andreas 1.1\mods\deathmatch\client.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../vendor/bass/lib;../../../vendor/lua/lib;../../../vendor/libv2/lib;../../../vendor/zlib/lib"
@@ -280,7 +280,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary=""
+				ImportLibrary=".\Release/Client.lib"
 				TargetMachine="1"
 			/>
 			<Tool
