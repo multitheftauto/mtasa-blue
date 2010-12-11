@@ -75,7 +75,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib Imagehlp.lib"
-				OutputFile="C:\Program Files\MTA San Andreas\server\core_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.1\server\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../dependencies"
@@ -85,6 +85,7 @@
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
+				ImportLibrary=".\Debug/core_d.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -173,7 +174,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib Imagehlp.lib"
-				OutputFile="C:\Program Files\MTA San Andreas\server\core.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.1\server\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../dependencies"
@@ -187,6 +188,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
+				ImportLibrary=".\Release/core.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -275,7 +277,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib Imagehlp.lib"
-				OutputFile="..\..\output\MTA San Andreas\server\core.dll"
+				OutputFile="..\..\output\MTA San Andreas 1.1\server\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../dependencies"
@@ -289,6 +291,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
+				ImportLibrary=".\Release/core.lib"
 				TargetMachine="1"
 			/>
 			<Tool

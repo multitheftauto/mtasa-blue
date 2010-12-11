@@ -17,6 +17,7 @@ namespace SharedUtil
     class CArgMap;
 #ifdef WIN32
 
+    SString GetVersionAppendString ( const SString& strUsingASEVersion = "" );
     void SetRegistryValue ( const SString& strPath, const SString& strKey, const SString& strValue );
     SString GetRegistryValue ( const SString& strPath, const SString& strKey );
 
