@@ -170,7 +170,7 @@ void CVehicleSA::Init ( void )
     DWORD dwFunc = ((CVehicleSAInterfaceVTBL *)this->GetVehicleInterface()->vtbl)->GetDoorAngleOpenRatio_;
     if ( dwFunc == FUNC_CAutomobile__GetDoorAngleOpenRatio )
         dwOffset = 1464;
-    else if ( dwFunc == FUNC_CTrain__GetDoorAngleOpenRation )
+    else if ( dwFunc == FUNC_CTrain__GetDoorAngleOpenRatio )
         dwOffset = 1496;
     else
         dwOffset = 0; // Other vehicles don't have door information.

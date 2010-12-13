@@ -509,13 +509,30 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStr
     // Door angles.
     if ( CVehicleManager::HasDoors ( usModel ) )
     {
-        SFloatAsBitsSync<8> angle ( 0.0f, 1.0f, true );
+        SFloatAsBitsSync<7> angle ( 0.0f, 1.0f, true );
+        bool bUncompressed;
+        bool bZero;
+
         for ( unsigned int i = 2; i < 6; ++i )
         {
-            if ( !BitStream.Read ( &angle ) )
+            if ( !BitStream.ReadBit ( bUncompressed ) )
                 return;
 
-            pVehicle->SetDoorAngleRatio ( i, angle.data.fValue );
+            if ( bUncompressed == false )
+            {
+                if ( !BitStream.ReadBit ( bZero ) )
+                    return;
+                if ( bZero == true )
+                    pVehicle->SetDoorAngleRatio ( i, 0.0f );
+                else
+                    pVehicle->SetDoorAngleRatio ( i, 1.0f );
+            }
+            else
+            {
+                if ( !BitStream.Read ( &angle ) )
+                    return;
+                pVehicle->SetDoorAngleRatio ( i, angle.data.fValue );
+            }
         }
     }
 }
@@ -542,11 +559,20 @@ void CVehiclePuresyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitSt
     // Door angles.
     if ( CVehicleManager::HasDoors ( usModel ) )
     {
-        SFloatAsBitsSync<8> angle ( 0.0f, 1.0f, true );
+        SFloatAsBitsSync<7> angle ( 0.0f, 1.0f, true );
         for ( unsigned int i = 2; i < 6; ++i )
         {
             angle.data.fValue = pVehicle->GetDoorAngleRatio ( i );
-            BitStream.Write ( &angle );
+            if ( angle.data.fValue == 0.0f || angle.data.fValue == 1.0f )
+            {
+                BitStream.WriteBit ( false );
+                BitStream.WriteBit ( angle.data.fValue == 0.0f );
+            }
+            else
+            {
+                BitStream.WriteBit ( true );
+                BitStream.Write ( &angle );
+            }
         }
     }
 }
