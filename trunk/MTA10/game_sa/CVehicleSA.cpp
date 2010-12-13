@@ -217,6 +217,8 @@ VOID CVehicleSA::SetMoveSpeed ( CVector* vecMoveSpeed )
     }
     memcpy((void *)dwReturn, vecMoveSpeed, sizeof(CVector));
 
+    // INACCURATE. Use Get/SetTrainSpeed instead of Get/SetMoveSpeed. (Causes issue #4829).
+#if 0
     // In case of train: calculate on-rail speed
     WORD wModelID = GetModelIndex();
     if ( wModelID == 537 || wModelID == 538 || wModelID == 569 || wModelID == 570 || wModelID == 590 || wModelID == 449 )
@@ -244,6 +246,7 @@ VOID CVehicleSA::SetMoveSpeed ( CVector* vecMoveSpeed )
             pInterf->m_fTrainSpeed = vecDirection.DotProduct ( vecMoveSpeed );
         }
     }
+#endif
 }
 
 CVehicleSAInterface * CVehicleSA::GetNextCarriageInTrain ( void )
