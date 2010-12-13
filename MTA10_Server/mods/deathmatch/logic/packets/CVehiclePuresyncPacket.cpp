@@ -505,6 +505,19 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStr
             pVehicle->SetAdjustableProperty ( usAdjustableProperty );
         }
     }
+
+    // Door angles.
+    if ( CVehicleManager::HasDoors ( usModel ) )
+    {
+        SFloatAsBitsSync<8> angle ( 0.0f, 1.0f, true );
+        for ( unsigned int i = 2; i < 6; ++i )
+        {
+            if ( !BitStream.Read ( &angle ) )
+                return;
+
+            pVehicle->SetDoorAngleRatio ( i, angle.data.fValue );
+        }
+    }
 }
 
 
@@ -524,5 +537,16 @@ void CVehiclePuresyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitSt
     if ( CVehicleManager::HasAdjustableProperty ( usModel ) )
     {
         BitStream.Write ( pVehicle->GetAdjustableProperty () );
+    }
+
+    // Door angles.
+    if ( CVehicleManager::HasDoors ( usModel ) )
+    {
+        SFloatAsBitsSync<8> angle ( 0.0f, 1.0f, true );
+        for ( unsigned int i = 2; i < 6; ++i )
+        {
+            angle.data.fValue = pVehicle->GetDoorAngleRatio ( i );
+            BitStream.Write ( &angle );
+        }
     }
 }

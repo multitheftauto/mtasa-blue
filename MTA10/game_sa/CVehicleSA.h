@@ -27,6 +27,7 @@ class CVehicleSA;
 #include "CPoolsSA.h"
 #include "CHandlingManagerSA.h"
 #include "CDamageManagerSA.h"
+#include "CDoorSA.h"
 
 #define SIZEOF_CHELI                            2584
 
@@ -154,6 +155,9 @@ class CVehicleSA;
 
 #define VAR_CVehicle_SpecialColModels           0xc1cc78
 
+#define FUNC_CAutomobile__GetDoorAngleOpenRatio 0x6A2270
+#define FUNC_CTrain__GetDoorAngleOpenRation     0x6F59C0
+
 typedef struct
 {
     short sX;               // x coordinate times 8
@@ -166,50 +170,50 @@ typedef struct
 class CVehicleSAInterfaceVTBL : public CEntitySAInterfaceVTBL
 {
 public:
-    DWORD ProcessEntityCollision; 
-    DWORD ProcessControlCollisionCheck;
-    DWORD ProcessControlInputs;
-    DWORD GetComponentWorldPosition;
-    DWORD IsComponentPresent;
-    DWORD OpenDoor;
-    DWORD ProcessOpenDoor;
-    DWORD GetDoorAngleOpenRatio;
-    DWORD GetDoorAngleOpenRatio_;
-    DWORD IsDoorReady;
-    DWORD IsDoorReady_;
-    DWORD IsDoorFullyOpen;
-    DWORD IsDoorFullyOpen_;
-    DWORD IsDoorClosed;
-    DWORD IsDoorClosed_;
-    DWORD IsDoorMissing;
-    DWORD IsDoorMissing_;
-    DWORD IsOpenTopCar;
-    DWORD RemoveRefsToVehicle;
-    DWORD BlowUpCar;
-    DWORD BlowUpCarCutSceneNoExtras;
-    DWORD SetUpWheelColModel;
-    DWORD BurstTyre;
-    DWORD IsRoomForPedToLeaveCar;
-    DWORD ProcessDrivingAnims;
-    DWORD GetRideAnimData;
-    DWORD SetupSuspensionLines;
-    DWORD AddMovingCollisionSpeed;
-    DWORD Fix;
-    DWORD SetupDamageAfterLoad;
-    DWORD DoBurstAndSoftGroundRatios;
-    DWORD GetHeightAboveRoad;
-    DWORD PlayCarHorn;
-    DWORD GetNumContactWheels;
-    DWORD VehicleDamage;
-    DWORD CanPedStepOutCar;
-    DWORD CanPedJumpOutCar;
-    DWORD GetTowHitchPos;
-    DWORD GetTowbarPos;
-    DWORD SetTowLink;
-    DWORD BreakTowLink;
-    DWORD FindWheelWidth;
-    DWORD Save;
-    DWORD Load;
+    DWORD ProcessEntityCollision;           // +58h
+    DWORD ProcessControlCollisionCheck;     // +5Ch
+    DWORD ProcessControlInputs;             // +60h
+    DWORD GetComponentWorldPosition;        // +64h
+    DWORD IsComponentPresent;               // +68h
+    DWORD OpenDoor;                         // +6Ch
+    DWORD ProcessOpenDoor;                  // +70h
+    DWORD GetDoorAngleOpenRatio;            // +74h
+    DWORD GetDoorAngleOpenRatio_;           // +78h
+    DWORD IsDoorReady;                      // +7Ch
+    DWORD IsDoorReady_;                     // +80h
+    DWORD IsDoorFullyOpen;                  // +84h
+    DWORD IsDoorFullyOpen_;                 // +88h
+    DWORD IsDoorClosed;                     // +8Ch
+    DWORD IsDoorClosed_;                    // +90h
+    DWORD IsDoorMissing;                    // +94h
+    DWORD IsDoorMissing_;                   // +98h
+    DWORD IsOpenTopCar;                     // +9Ch
+    DWORD RemoveRefsToVehicle;              // +A0h
+    DWORD BlowUpCar;                        // +A4h
+    DWORD BlowUpCarCutSceneNoExtras;        // +A8h
+    DWORD SetUpWheelColModel;               // +ACh
+    DWORD BurstTyre;                        // +B0h
+    DWORD IsRoomForPedToLeaveCar;           // +B4h
+    DWORD ProcessDrivingAnims;              // +B8h
+    DWORD GetRideAnimData;                  // +BCh
+    DWORD SetupSuspensionLines;             // +C0h
+    DWORD AddMovingCollisionSpeed;          // +C4h
+    DWORD Fix;                              // +C8h
+    DWORD SetupDamageAfterLoad;             // +CCh
+    DWORD DoBurstAndSoftGroundRatios;       // +D0h
+    DWORD GetHeightAboveRoad;               // +D4h
+    DWORD PlayCarHorn;                      // +D8h
+    DWORD GetNumContactWheels;              // +DCh
+    DWORD VehicleDamage;                    // +E0h
+    DWORD CanPedStepOutCar;                 // +E4h
+    DWORD CanPedJumpOutCar;                 // +E8h
+    DWORD GetTowHitchPos;                   // +ECh
+    DWORD GetTowbarPos;                     // +F0h
+    DWORD SetTowLink;                       // +F4h
+    DWORD BreakTowLink;                     // +F8h
+    DWORD FindWheelWidth;                   // +FCh
+    DWORD Save;                             // +100h
+    DWORD Load;                             // +104h
 };
 
 struct CVehicleFlags
@@ -504,6 +508,7 @@ private:
     SColor                      m_HeadLightColor;
     RwObject                    m_WheelObjects[4];
     SColor                      m_RGBColors[4];
+    CDoorSA                     m_doors[6];
 
 public:
                                 CVehicleSA                      ();
@@ -542,6 +547,8 @@ public:
     bool                        CanPedLeanOut                   ( CPed* pPed );
     bool                        CanPedStepOutCar                ( bool bUnknown );
 
+    CDoorSA*                    GetDoor                         ( unsigned char ucDoor );
+    void                        OpenDoor                        ( unsigned char ucDoor, float fRatio, bool bMakeNoise = false );
     bool                        AreDoorsLocked                  ();
     void                        LockDoors                       ( bool bLocked );
     bool                        AreDoorsUndamageable            ();

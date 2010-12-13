@@ -164,6 +164,26 @@ void CVehicleSA::Init ( void )
     m_RGBColors[1] = CVehicleColor::GetRGBFromPaletteIndex ( ((CVehicleSAInterface *)(this->GetInterface()))->m_colour2 );
     m_RGBColors[2] = CVehicleColor::GetRGBFromPaletteIndex ( ((CVehicleSAInterface *)(this->GetInterface()))->m_colour3 );
     m_RGBColors[3] = CVehicleColor::GetRGBFromPaletteIndex ( ((CVehicleSAInterface *)(this->GetInterface()))->m_colour4 );
+
+    // Initialize doors depending on the vtable.
+    DWORD dwOffset;
+    DWORD dwFunc = ((CVehicleSAInterfaceVTBL *)this->GetVehicleInterface()->vtbl)->GetDoorAngleOpenRatio_;
+    if ( dwFunc == FUNC_CAutomobile__GetDoorAngleOpenRatio )
+        dwOffset = 1464;
+    else if ( dwFunc == FUNC_CTrain__GetDoorAngleOpenRation )
+        dwOffset = 1496;
+    else
+        dwOffset = 0; // Other vehicles don't have door information.
+
+    if ( dwOffset != 0 )
+    {
+        for ( unsigned int i = 0; i < sizeof(m_doors)/sizeof(m_doors[0]); ++i )
+        {
+            DWORD dwInterface = (DWORD)GetInterface ();
+            DWORD dwDoorAddress = dwInterface + 1464 + i*24;
+            m_doors[i].SetInterface ( (CDoorSAInterface *)dwDoorAddress );
+        }
+    }
 }
 
 // DESTRUCTOR
@@ -455,6 +475,36 @@ bool CVehicleSA::CanPedJumpOutCar ( CPed* pPed )
     }
 
     return bReturn;
+}
+
+CDoorSA* CVehicleSA::GetDoor ( unsigned char ucDoor )
+{
+    if ( ucDoor <= 5 )
+        return & m_doors [ ucDoor ];
+    return 0;
+}
+
+void CVehicleSA::OpenDoor ( unsigned char ucDoor, float fRatio, bool bMakeNoise )
+{
+    DWORD dwThis = (DWORD) m_pInterface;
+    DWORD dwFunc = ((CVehicleSAInterfaceVTBL*)GetVehicleInterface()->vtbl)->OpenDoor;
+
+    // Grab the car node index for the given door id
+    static int s_iCarNodeIndexes [6] = { 0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09 };
+    DWORD dwIdx = s_iCarNodeIndexes [ ucDoor ];
+    DWORD dwDoor = ucDoor;
+    DWORD dwMakeNoise = bMakeNoise;
+
+    _asm
+    {
+        mov     ecx, dwThis
+        push    dwMakeNoise
+        push    fRatio
+        push    dwDoor
+        push    dwIdx
+        push    0
+        call    dwFunc
+    }
 }
 
 bool CVehicleSA::AreDoorsLocked ( void )

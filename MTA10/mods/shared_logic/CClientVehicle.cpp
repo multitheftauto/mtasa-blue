@@ -81,6 +81,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bSireneOrAlarmActive = false;
     m_bLandingGearDown = true;
     m_usAdjustablePropertyValue = 0;
+    for ( unsigned int i = 0; i < 6; ++i )
+        m_fDoorAngleRatio [ i ] = 0.0f;
     m_bDoorsLocked = false;
     m_bDoorsUndamageable = false;
     m_bCanShootPetrolTank = true;
@@ -598,6 +600,43 @@ void CClientVehicle::SetVisible ( bool bVisible )
     m_bVisible = bVisible;
 }
 
+void CClientVehicle::SetDoorAngleRatio ( unsigned char ucDoor, float fRatio )
+{
+    bool bAllow = true;
+    unsigned char ucSeat;
+
+    // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
+    switch ( ucDoor )
+    {
+        case 2:
+            bAllow = m_pOccupyingDriver == 0;
+            break;
+        case 3:
+        case 4:
+        case 5:
+            ucSeat = ucDoor - 2;
+            bAllow = m_pOccupyingPassengers [ ucSeat ] == 0;
+            break;
+    }
+
+    if ( bAllow )
+    {
+        if ( m_pVehicle )
+        {
+            m_pVehicle->OpenDoor ( ucDoor, fRatio, false );
+        }
+        m_fDoorAngleRatio [ ucDoor ] = fRatio;
+    }
+}
+
+float CClientVehicle::GetDoorAngleRatio ( unsigned char ucDoor )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetDoor ( ucDoor )->GetAngleOpenRatio ();
+    }
+    return m_fDoorAngleRatio [ ucDoor ];
+}
 
 bool CClientVehicle::AreDoorsLocked ( void )
 {
@@ -2069,6 +2108,8 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetSirenOrAlarmActive ( m_bSireneOrAlarmActive );
         SetLandingGearDown ( m_bLandingGearDown );
         _SetAdjustablePropertyValue ( m_usAdjustablePropertyValue );
+        for ( unsigned char i = 0; i < 6; ++i )
+            m_pVehicle->GetDoor ( i )->Open ( m_fDoorAngleRatio [ i ] );
         m_pVehicle->LockDoors ( m_bDoorsLocked );
         m_pVehicle->SetDoorsUndamageable ( m_bDoorsUndamageable );
         m_pVehicle->SetCanShootPetrolTank ( m_bCanShootPetrolTank );

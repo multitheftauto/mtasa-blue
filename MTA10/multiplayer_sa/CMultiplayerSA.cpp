@@ -48,6 +48,7 @@ unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
 unsigned long CMultiplayerSA::HOOKPOS_EndWorldColors;
 unsigned long CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList;
 unsigned long CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking;
+unsigned long CMultiplayerSA::HOOKPOS_CAutomobile__ProcessSwingingDoor;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
@@ -362,6 +363,8 @@ void HOOK_VehCol ();
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
 
+void HOOK_CAutomobile__ProcessSwingingDoor ();
+
 void vehicle_lights_init ();
 
 CMultiplayerSA::CMultiplayerSA()
@@ -489,6 +492,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
+    //HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -4894,3 +4898,42 @@ void _declspec(naked) HOOK_VehColCB ()
         jmp     RETURN_VehColCB  // 004C83AA
     }
 }
+
+#if 0
+// CAutomobile swinging open doors. Process it only when the automobile driver is the local player or has no driver.
+static DWORD dwSwingingDoorAutomobile;
+static const DWORD dwSwingingRet1 = 0x6A9DB6;
+static const DWORD dwSwingingRet2 = 0x6AA1DA;
+bool AllowSwingingDoors ()
+{
+    CVehicleSAInterface* pVehicle = (CVehicleSAInterface *)dwSwingingDoorAutomobile;
+    return pVehicle->pDriver == 0 || IsLocalPlayer ( pVehicle->pDriver );
+}
+
+void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor ()
+{
+    _asm
+    {
+        mov     ecx, [esi+eax*4+0x648]
+        pushad
+        mov     dwSwingingDoorAutomobile, ecx
+    }
+
+    if ( AllowSwingingDoors() )
+    {
+        _asm
+        {
+            popad
+            jmp     dwSwingingRet1
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            jmp     dwSwingingRet2
+        }
+    }
+}
+#endif

@@ -17,6 +17,7 @@
 #include "CPhysical.h"
 #include "CDamageManager.h"
 #include "CHandlingManager.h"
+#include "CDoor.h"
 
 #include <CVector.h>
 
@@ -69,6 +70,8 @@ public:
     virtual bool                CanPedLeanOut               ( CPed* pPed ) = 0;
     virtual bool                CanPedStepOutCar            ( bool bUnknown ) = 0;
 
+    virtual CDoor*              GetDoor                     ( unsigned char ucDoor ) = 0;
+    virtual void                OpenDoor                    ( unsigned char ucDoor, float fRatio, bool bMakeNoise = false ) = 0;
     virtual bool                AreDoorsLocked              () = 0;
     virtual void                LockDoors                   ( bool bLocked ) = 0;
     virtual bool                AreDoorsUndamageable        () = 0;

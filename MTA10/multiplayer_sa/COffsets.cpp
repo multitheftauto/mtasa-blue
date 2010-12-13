@@ -78,9 +78,10 @@ void COffsetsMP::InitializeCommon10 ( void )
     CMultiplayerSA::HOOKPOS_EndWorldColors =                                                0x561795;
     CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList =                          0x563357;
     CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking =                            0x4C05B9;
+    CMultiplayerSA::HOOKPOS_CAutomobile__ProcessSwingingDoor =                              0x6A9DAF;
 
     CMultiplayerSA::FUNC_CStreaming_Update =                                                0x40E670;
     CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName =                            0x507030;
     CMultiplayerSA::FUNC_CHud_Draw =                                                        0x58FAE0;
-    CMultiplayerSA::FUNC_CPlayerInfoBase =                                                  0xB7CD98;    
+    CMultiplayerSA::FUNC_CPlayerInfoBase =                                                  0xB7CD98;
 }
