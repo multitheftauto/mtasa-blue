@@ -165,6 +165,8 @@ public:
 
     CVehicleColor&                  RandomizeColor          ( void );
 
+    inline float                    GetDoorAngleRatio       ( unsigned char ucDoor )        { return m_fDoorAngleRatio [ ucDoor ]; }
+    inline void                     SetDoorAngleRatio       ( unsigned char ucDoor, float fRatio ) { m_fDoorAngleRatio [ ucDoor ] = fRatio; }
     inline bool                     IsLocked                ( void )                        { return m_bLocked; };
     inline void                     SetLocked               ( bool bLocked )                { m_bLocked = bLocked; };
 
@@ -318,6 +320,7 @@ private:
     char                            m_szRegPlate [9];
     unsigned char                   m_ucPaintjob;
 
+    float                           m_fDoorAngleRatio [ 6 ];
     bool                            m_bLocked;
     bool                            m_bDoorsUndamageable;
     bool                            m_bEngineOn;

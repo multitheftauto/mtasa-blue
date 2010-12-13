@@ -145,6 +145,8 @@ public:
     bool                        IsVisible               ( void );
     void                        SetVisible              ( bool bVisible );
 
+    void                        SetDoorAngleRatio       ( unsigned char ucDoor, float fRatio );
+    float                       GetDoorAngleRatio       ( unsigned char ucDoor );
     bool                        AreDoorsLocked          ( void );
     void                        SetDoorsLocked          ( bool bLocked );
 
@@ -441,6 +443,7 @@ protected:
     bool                        m_bLandingGearDown;
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
+    float                       m_fDoorAngleRatio [ 6 ];
     bool                        m_bDoorsLocked;
     bool                        m_bDoorsUndamageable;
     bool                        m_bCanShootPetrolTank;

@@ -1560,6 +1560,17 @@ void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamIn
             pVehicle->SetAdjustablePropertyValue ( usAdjustableProperty );
         }
     }
+
+    // Read door angles.
+    if ( CClientVehicleManager::HasDoors ( iModelID ) )
+    {
+        SFloatAsBitsSync<8> angle ( 0.0f, 1.0f, true );
+        for ( unsigned char i = 2; i < 6; ++i )
+        {
+            BitStream.Read ( &angle );
+            pVehicle->SetDoorAngleRatio ( i, angle.data.fValue );
+        }
+    }
 }
 
 
@@ -1580,6 +1591,17 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     if ( CClientVehicleManager::HasAdjustableProperty ( iModelID ) )
     {
         BitStream.Write ( pVehicle->GetAdjustablePropertyValue () );
+    }
+
+    // Sync door angles.
+    if ( CClientVehicleManager::HasDoors ( iModelID ) )
+    {
+        SFloatAsBitsSync<8> angle ( 0.0f, 1.0f, true );
+        for ( unsigned char i = 2; i < 6; ++i )
+        {
+            angle.data.fValue = pVehicle->GetDoorAngleRatio ( i );
+            BitStream.Write ( &angle );
+        }
     }
 }
 

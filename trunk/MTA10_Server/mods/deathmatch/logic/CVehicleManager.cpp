@@ -251,6 +251,59 @@ bool CVehicleManager::IsTrailer ( unsigned int uiVehicleModel )
              ( gs_vehicleTypes [uiVehicleModel - 400] == VEHICLE_TRAILER ) );
 }
 
+bool CVehicleManager::HasDamageModel ( unsigned short usModel )
+{
+    return HasDamageModel ( GetVehicleType ( usModel ) );
+}
+
+
+bool CVehicleManager::HasDamageModel ( eVehicleType Type )
+{
+    switch ( Type )
+    {
+        case VEHICLE_TRAILER:
+        case VEHICLE_MONSTERTRUCK:
+        case VEHICLE_QUADBIKE:
+        case VEHICLE_HELI:
+        case VEHICLE_PLANE:
+        case VEHICLE_CAR:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool CVehicleManager::HasDoors ( unsigned short usModel )
+{
+    bool bHasDoors = false;
+
+    if ( HasDamageModel ( usModel ) == true )
+    {
+        switch ( usModel )
+        {
+            case VT_BFINJECT:
+            case VT_RCBANDIT:
+            case VT_CADDY:
+            case VT_RCRAIDER:
+            case VT_BAGGAGE:
+            case VT_DOZER:
+            case VT_FORKLIFT:
+            case VT_TRACTOR:
+            case VT_RCTIGER:
+            case VT_BANDITO:
+            case VT_KART:
+            case VT_MOWER:
+            case VT_RCCAM:
+            case VT_RCGOBLIN:
+                break;
+            default:
+                bHasDoors = true;
+        }
+    }
+
+    return bHasDoors;
+}
+
 CVehicleColor CVehicleManager::GetRandomColor ( unsigned short usModel )
 {
     return m_ColorManager.GetRandomColor ( usModel );

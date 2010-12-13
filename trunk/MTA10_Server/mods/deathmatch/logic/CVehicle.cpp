@@ -54,6 +54,8 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_ulIdleRespawnTime = 60000;
 
     m_bEngineOn = false;
+    for ( unsigned int i = 0; i < 6; ++i )
+        m_fDoorAngleRatio [ i ] = 0.0f;
     m_bLocked = false;
     m_bDoorsUndamageable = false;
     m_bDamageProof = false;

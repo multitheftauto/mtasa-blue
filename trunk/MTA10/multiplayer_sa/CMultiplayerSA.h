@@ -175,6 +175,7 @@ private:
     static unsigned long        HOOKPOS_EndWorldColors;
     static unsigned long        HOOKPOS_CWorld_ProcessVerticalLineSectorList;
     static unsigned long        HOOKPOS_ComputeDamageResponse_StartChoking;
+    static unsigned long        HOOKPOS_CAutomobile__ProcessSwingingDoor;
 
     static unsigned long        FUNC_CStreaming_Update;
     static unsigned long        FUNC_CAudioEngine__DisplayRadioStationName;

@@ -380,12 +380,49 @@ bool CClientVehicleManager::HasDamageModel ( unsigned long ulModel )
 
 bool CClientVehicleManager::HasDamageModel ( eClientVehicleType Type )
 {
-    return ( Type == CLIENTVEHICLE_TRAILER ||
-             Type == CLIENTVEHICLE_MONSTERTRUCK ||
-             Type == CLIENTVEHICLE_QUADBIKE ||
-             Type == CLIENTVEHICLE_HELI ||
-             Type == CLIENTVEHICLE_PLANE ||
-             Type == CLIENTVEHICLE_CAR );
+    switch ( Type )
+    {
+        case CLIENTVEHICLE_TRAILER:
+        case CLIENTVEHICLE_MONSTERTRUCK:
+        case CLIENTVEHICLE_QUADBIKE:
+        case CLIENTVEHICLE_HELI:
+        case CLIENTVEHICLE_PLANE:
+        case CLIENTVEHICLE_CAR:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool CClientVehicleManager::HasDoors ( unsigned long ulModel )
+{
+    bool bHasDoors = false;
+
+    if ( HasDamageModel ( ulModel ) == true )
+    {
+        switch ( ulModel )
+        {
+            case VT_BFINJECT:
+            case VT_RCBANDIT:
+            case VT_CADDY:
+            case VT_RCRAIDER:
+            case VT_BAGGAGE:
+            case VT_DOZER:
+            case VT_FORKLIFT:
+            case VT_TRACTOR:
+            case VT_RCTIGER:
+            case VT_BANDITO:
+            case VT_KART:
+            case VT_MOWER:
+            case VT_RCCAM:
+            case VT_RCGOBLIN:
+                break;
+            default:
+                bHasDoors = true;
+        }
+    }
+
+    return bHasDoors;
 }
 
 
