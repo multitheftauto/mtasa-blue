@@ -25,7 +25,7 @@
     #define MTA_DM_VERSIONSTRING        QUOTE_DEFINE ( MTASA_VERSION_MAJOR ) "." QUOTE_DEFINE ( MTASA_VERSION_MINOR ) "." QUOTE_DEFINE ( MTASA_VERSION_MAINTENANCE )
 #endif
 #define MTA_DM_FULL_STRING          "MTA:SA Client"
-#define MTA_DM_BITSTREAM_VERSION    0x17
+#define MTA_DM_BITSTREAM_VERSION    0x16
 
 
 // Compile types
@@ -73,7 +73,7 @@
 
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
-#define _NETCODE_VERSION                0x0190      // Increment when net messages change
+#define _NETCODE_VERSION                0x0191      // Increment when net messages change
 #define _CLIENT_NET_MODULE_VERSION      0x0023      // Lvl9 wizards only
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
