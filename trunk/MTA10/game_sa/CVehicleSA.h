@@ -156,7 +156,7 @@ class CVehicleSA;
 #define VAR_CVehicle_SpecialColModels           0xc1cc78
 
 #define FUNC_CAutomobile__GetDoorAngleOpenRatio 0x6A2270
-#define FUNC_CTrain__GetDoorAngleOpenRation     0x6F59C0
+#define FUNC_CTrain__GetDoorAngleOpenRatio      0x6F59C0
 
 typedef struct
 {

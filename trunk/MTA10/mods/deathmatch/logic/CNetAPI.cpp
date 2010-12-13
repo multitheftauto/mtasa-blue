@@ -1564,11 +1564,26 @@ void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamIn
     // Read door angles.
     if ( CClientVehicleManager::HasDoors ( iModelID ) )
     {
-        SFloatAsBitsSync<8> angle ( 0.0f, 1.0f, true );
+        SFloatAsBitsSync<7> angle ( 0.0f, 1.0f, true );
+        bool bUncompressed;
+        bool bZero;
+
         for ( unsigned char i = 2; i < 6; ++i )
         {
-            BitStream.Read ( &angle );
-            pVehicle->SetDoorAngleRatio ( i, angle.data.fValue );
+            BitStream.ReadBit ( bUncompressed );
+            if ( bUncompressed == false )
+            {
+                BitStream.ReadBit ( bZero );
+                if ( bZero )
+                    pVehicle->SetDoorAngleRatio ( i, 0.0f );
+                else
+                    pVehicle->SetDoorAngleRatio ( i, 1.0f );
+            }
+            else
+            {
+                BitStream.Read ( &angle );
+                pVehicle->SetDoorAngleRatio ( i, angle.data.fValue );
+            }
         }
     }
 }
@@ -1596,11 +1611,22 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     // Sync door angles.
     if ( CClientVehicleManager::HasDoors ( iModelID ) )
     {
-        SFloatAsBitsSync<8> angle ( 0.0f, 1.0f, true );
+        SFloatAsBitsSync<7> angle ( 0.0f, 1.0f, true );
         for ( unsigned char i = 2; i < 6; ++i )
         {
             angle.data.fValue = pVehicle->GetDoorAngleRatio ( i );
-            BitStream.Write ( &angle );
+
+            // The most common state will be the fully open or closed door.
+            if ( angle.data.fValue == 0.0f || angle.data.fValue > 1.0f )
+            {
+                BitStream.WriteBit ( false );
+                BitStream.WriteBit ( angle.data.fValue == 0.0f );
+            }
+            else
+            {
+                BitStream.WriteBit ( true );
+                BitStream.Write ( &angle );
+            }
         }
     }
 }
