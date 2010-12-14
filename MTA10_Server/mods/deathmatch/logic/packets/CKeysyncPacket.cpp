@@ -223,7 +223,7 @@ void CKeysyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStreamInter
     if ( CVehicleManager::HasTurret ( usModel ) )
     {
         // Read out the turret position
-        SVehicleSpecific vehicle;
+        SVehicleTurretSync vehicle;
         BitStream.Read ( &vehicle );
 
         // Set the data
@@ -239,7 +239,7 @@ void CKeysyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitStreamInte
     if ( CVehicleManager::HasTurret ( usModel ) )
     {
         // Grab the turret position
-        SVehicleSpecific vehicle;
+        SVehicleTurretSync vehicle;
         pVehicle->GetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
         BitStream.Write ( &vehicle );

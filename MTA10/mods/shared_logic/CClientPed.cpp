@@ -1235,9 +1235,6 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     // Transfer WaitingForGroundToLoad state to vehicle
     if ( m_bIsLocalPlayer )
     {
-        if ( uiSeat == 0 )
-            pVehicle->SetSwingingDoorsAllowed ( true );
-
         if ( IsFrozenWaitingForGroundToLoad () )
         {
             SetFrozenWaitingForGroundToLoad ( false );
@@ -1277,8 +1274,9 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         // if the local player is entering it. This is so we don't
         // get screwed up with camera not following and similar issues.
         if ( m_bIsLocalPlayer )
-        {            
+        {
             pVehicle->AddStreamReference ();
+            pVehicle->SetSwingingDoorsAllowed ( true );
         }
 
         // Warp the player into the car's driverseat
@@ -3738,7 +3736,9 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     if ( uiSeat == 0 )
     {
         if ( m_bIsLocalPlayer )
+        {
             pVehicle->SetSwingingDoorsAllowed ( true );
+        }
 
         if ( m_pPlayerPed )
         {
