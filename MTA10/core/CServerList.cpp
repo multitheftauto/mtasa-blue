@@ -498,7 +498,8 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     bPassworded = ( szBuffer[i++] == 1 );
     bSerials = ( szBuffer[i++] == 1 );
 
-    if ( atof(strVersion) <= 1.0f )
+    bool bUseChars = atof(strVersion) <= 1.0f || strVersion[strVersion.length() - 1] == 'n';
+    if ( bUseChars )
     {
         nPlayers = (unsigned char)szBuffer[i++];
         nMaxPlayers = (unsigned char)szBuffer[i++];
