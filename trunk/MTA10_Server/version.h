@@ -84,7 +84,7 @@
     #define MTA_DM_NETCODE_VERSION              _NETCODE_VERSION
     #define MTA_DM_SERVER_NET_MODULE_VERSION    _SERVER_NET_MODULE_VERSION
 #else
-    #define MTA_DM_ASE_VERSION                  _ASE_VERSION "n"
+    #define MTA_DM_ASE_VERSION                  _ASE_VERSION "N"
     #define MTA_DM_NETCODE_VERSION              ( _NETCODE_VERSION + 0x4000 )
     #define MTA_DM_SERVER_NET_MODULE_VERSION    ( _SERVER_NET_MODULE_VERSION + 0x4000 )
 #endif
