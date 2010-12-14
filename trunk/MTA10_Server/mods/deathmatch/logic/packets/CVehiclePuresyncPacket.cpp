@@ -488,7 +488,7 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStr
     if ( CVehicleManager::HasTurret ( usModel ) ) 
     {
         // Read out the turret position
-        SVehicleSpecific vehicle;
+        SVehicleTurretSync vehicle;
         if ( !BitStream.Read ( &vehicle ) )
             return;
 
@@ -509,30 +509,13 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStr
     // Door angles.
     if ( CVehicleManager::HasDoors ( usModel ) )
     {
-        SFloatAsBitsSync<7> angle ( 0.0f, 1.0f, true );
-        bool bUncompressed;
-        bool bZero;
+        SDoorAngleSync door;
 
         for ( unsigned int i = 2; i < 6; ++i )
         {
-            if ( !BitStream.ReadBit ( bUncompressed ) )
+            if ( !BitStream.Read ( &door ) )
                 return;
-
-            if ( bUncompressed == false )
-            {
-                if ( !BitStream.ReadBit ( bZero ) )
-                    return;
-                if ( bZero == true )
-                    pVehicle->SetDoorAngleRatio ( i, 0.0f );
-                else
-                    pVehicle->SetDoorAngleRatio ( i, 1.0f );
-            }
-            else
-            {
-                if ( !BitStream.Read ( &angle ) )
-                    return;
-                pVehicle->SetDoorAngleRatio ( i, angle.data.fValue );
-            }
+            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle );
         }
     }
 }
@@ -544,7 +527,7 @@ void CVehiclePuresyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitSt
     unsigned short usModel = pVehicle->GetModel ();
     if ( CVehicleManager::HasTurret ( usModel ) )
     {
-        SVehicleSpecific vehicle;
+        SVehicleTurretSync vehicle;
         pVehicle->GetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
         BitStream.Write ( &vehicle );
@@ -559,20 +542,11 @@ void CVehiclePuresyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitSt
     // Door angles.
     if ( CVehicleManager::HasDoors ( usModel ) )
     {
-        SFloatAsBitsSync<7> angle ( 0.0f, 1.0f, true );
+        SDoorAngleSync door;
         for ( unsigned int i = 2; i < 6; ++i )
         {
-            angle.data.fValue = pVehicle->GetDoorAngleRatio ( i );
-            if ( angle.data.fValue == 0.0f || angle.data.fValue == 1.0f )
-            {
-                BitStream.WriteBit ( false );
-                BitStream.WriteBit ( angle.data.fValue == 0.0f );
-            }
-            else
-            {
-                BitStream.WriteBit ( true );
-                BitStream.Write ( &angle );
-            }
+            door.data.fAngle = pVehicle->GetDoorAngleRatio ( i );
+            BitStream.Write ( &door );
         }
     }
 }

@@ -1517,7 +1517,7 @@ void CNetAPI::ReadSmallVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     int iModelID = pVehicle->GetModel ();
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
-        SVehicleSpecific vehicle;
+        SVehicleTurretSync vehicle;
         BitStream.Read ( &vehicle );
 
         pVehicle->SetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
@@ -1531,7 +1531,7 @@ void CNetAPI::WriteSmallVehicleSpecific ( CClientVehicle* pVehicle, NetBitStream
     int iModelID = pVehicle->GetModel ();
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
-        SVehicleSpecific vehicle;
+        SVehicleTurretSync vehicle;
         pVehicle->GetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
         BitStream.Write ( &vehicle );
@@ -1545,7 +1545,7 @@ void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamIn
     int iModelID = pVehicle->GetModel ();
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
-        SVehicleSpecific vehicle;
+        SVehicleTurretSync vehicle;
         BitStream.Read ( &vehicle );
 
         pVehicle->SetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
@@ -1564,26 +1564,11 @@ void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamIn
     // Read door angles.
     if ( CClientVehicleManager::HasDoors ( iModelID ) )
     {
-        SFloatAsBitsSync<7> angle ( 0.0f, 1.0f, true );
-        bool bUncompressed;
-        bool bZero;
-
+        SDoorAngleSync door;
         for ( unsigned char i = 2; i < 6; ++i )
         {
-            BitStream.ReadBit ( bUncompressed );
-            if ( bUncompressed == false )
-            {
-                BitStream.ReadBit ( bZero );
-                if ( bZero )
-                    pVehicle->SetDoorAngleRatio ( i, 0.0f );
-                else
-                    pVehicle->SetDoorAngleRatio ( i, 1.0f );
-            }
-            else
-            {
-                BitStream.Read ( &angle );
-                pVehicle->SetDoorAngleRatio ( i, angle.data.fValue );
-            }
+            BitStream.Read ( &door );
+            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle );
         }
     }
 }
@@ -1596,7 +1581,7 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
         // Grab the turret position
-        SVehicleSpecific vehicle;
+        SVehicleTurretSync vehicle;
         pVehicle->GetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
         BitStream.Write ( &vehicle );
@@ -1611,22 +1596,11 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     // Sync door angles.
     if ( CClientVehicleManager::HasDoors ( iModelID ) )
     {
-        SFloatAsBitsSync<7> angle ( 0.0f, 1.0f, true );
+        SDoorAngleSync door;
         for ( unsigned char i = 2; i < 6; ++i )
         {
-            angle.data.fValue = pVehicle->GetDoorAngleRatio ( i );
-
-            // The most common state will be the fully open or closed door.
-            if ( angle.data.fValue == 0.0f || angle.data.fValue > 1.0f )
-            {
-                BitStream.WriteBit ( false );
-                BitStream.WriteBit ( angle.data.fValue == 0.0f );
-            }
-            else
-            {
-                BitStream.WriteBit ( true );
-                BitStream.Write ( &angle );
-            }
+            door.data.fAngle = pVehicle->GetDoorAngleRatio ( i );
+            BitStream.Write ( &door );
         }
     }
 }

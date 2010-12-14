@@ -326,7 +326,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     unsigned short usModel = pVehicle->GetModel ();
                     if ( CVehicleManager::HasTurret ( usModel ) )
                     {
-                        SVehicleSpecific specific;
+                        SVehicleTurretSync specific;
                         specific.data.fTurretX = pVehicle->GetTurretPositionX ();
                         specific.data.fTurretY = pVehicle->GetTurretPositionY ();
                         BitStream.Write ( &specific );
@@ -336,6 +336,17 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     if ( CVehicleManager::HasAdjustableProperty ( usModel ) )
                     {
                         BitStream.WriteCompressed ( pVehicle->GetAdjustableProperty () );
+                    }
+
+                    // If the vehicle has doors, sync their open angle ratios.
+                    if ( CVehicleManager::HasDoors ( usModel ) )
+                    {
+                        SDoorAngleSync door;
+                        for ( unsigned char i = 0; i < 6; ++i )
+                        {
+                            door.data.fAngle = pVehicle->GetDoorAngleRatio ( i );
+                            BitStream.Write ( &door );
+                        }
                     }
 
                     // Write all the upgrades

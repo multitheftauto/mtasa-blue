@@ -805,7 +805,7 @@ struct SSmallKeysyncSync : public ISyncStructure
     } data;
 };
 
-struct SVehicleSpecific : public ISyncStructure
+struct SVehicleTurretSync : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -836,7 +836,56 @@ struct SVehicleSpecific : public ISyncStructure
     } data;
 };
 
+struct SDoorAngleSync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        bool bUncompressed;
+        bool bNotZero;
 
+        if ( !bitStream.ReadBit ( bUncompressed ) ) 
+            return false;
+        if ( bUncompressed == false )
+        {
+            if ( !bitStream.ReadBit ( bNotZero ) )
+                return false;
+            if ( bNotZero )
+                data.fAngle = 1.0f;
+            else
+                data.fAngle = 0.0f;
+        }
+        else
+        {
+            SFloatAsBitsSync<7> fl ( 0.0f, 1.0f, true );
+            if ( !fl.Read ( bitStream ) )
+                return false;
+            data.fAngle = fl.data.fValue;
+        }
+
+        return true;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        if ( data.fAngle == 0.0f || data.fAngle == 1.0f )
+        {
+            bitStream.WriteBit ( false );
+            bitStream.WriteBit ( data.fAngle == 1.0f );
+        }
+        else
+        {
+            bitStream.WriteBit ( true );
+            SFloatAsBitsSync<7> fl ( 0.0f, 1.0f, true );
+            fl.data.fValue = data.fAngle;
+            bitStream.Write ( &fl );
+        }
+    }
+
+    struct
+    {
+        float fAngle;
+    } data;
+};
 
 //////////////////////////////////////////
 //                                      //

@@ -4903,17 +4903,20 @@ void _declspec(naked) HOOK_VehColCB ()
 static DWORD dwSwingingDoorAutomobile;
 static const DWORD dwSwingingRet1 = 0x6A9DB6;
 static const DWORD dwSwingingRet2 = 0x6AA1DA;
-bool AllowSwingingDoors ()
+static bool AllowSwingingDoors ()
 {
     CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwSwingingDoorAutomobile );
-    return pVehicle == 0 || pVehicle->AreSwingingDoorsAllowed ();
+    if ( pVehicle == 0 || pVehicle->AreSwingingDoorsAllowed() )
+        return true;
+    else
+        return false;
 }
 
 void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor ()
 {
     _asm
     {
-        mov     dwSwingingDoorAutomobile, ecx
+        mov     dwSwingingDoorAutomobile, esi
         mov     ecx, [esi+eax*4+0x648]
         pushad
     }

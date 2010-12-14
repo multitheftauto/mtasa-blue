@@ -2128,7 +2128,7 @@ void CClientVehicle::Create ( void )
         SetLandingGearDown ( m_bLandingGearDown );
         _SetAdjustablePropertyValue ( m_usAdjustablePropertyValue );
         for ( unsigned char i = 0; i < 6; ++i )
-            m_pVehicle->GetDoor ( i )->Open ( m_fDoorAngleRatio [ i ] );
+            m_pVehicle->OpenDoor ( i, m_fDoorAngleRatio [ i ] );
         m_pVehicle->SetSwingingDoorsAllowed ( m_bSwingingDoorsAllowed );
         m_pVehicle->LockDoors ( m_bDoorsLocked );
         m_pVehicle->SetDoorsUndamageable ( m_bDoorsUndamageable );

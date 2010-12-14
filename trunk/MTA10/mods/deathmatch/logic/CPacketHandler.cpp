@@ -2100,6 +2100,12 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // float                (4)     - turret position x (if applies)
     // float                (4)     - turret position y (if applies)
     // unsigned short       (2)     - adjustable property (if applies)
+    // SDoorAngleSync       (?)     - Door #0 angle ratio.
+    // SDoorAngleSync       (?)     - Door #1 angle ratio.
+    // SDoorAngleSync       (?)     - Door #2 angle ratio.
+    // SDoorAngleSync       (?)     - Door #3 angle ratio.
+    // SDoorAngleSync       (?)     - Door #4 angle ratio.
+    // SDoorAngleSync       (?)     - Door #5 angle ratio.
     // bool                         - landing gear down?  (if applies)
     // bool                         - sirenes on?  (if applies)
     // unsigned char        (1)     - no. of upgrades
@@ -2532,7 +2538,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // If the vehicle has a turret, read out its position
                     if ( CClientVehicleManager::HasTurret ( usModel ) )
                     {
-                        SVehicleSpecific specific;
+                        SVehicleTurretSync specific;
                         bitStream.Read ( &specific );
                         pVehicle->SetTurretRotation ( specific.data.fTurretX, specific.data.fTurretY );
                     }
@@ -2543,6 +2549,17 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         unsigned short usAdjustableProperty;
                         bitStream.ReadCompressed ( usAdjustableProperty );
                         pVehicle->SetAdjustablePropertyValue ( usAdjustableProperty );
+                    }
+
+                    // If the vehicle has doors, read out the open angle ratio.
+                    if ( CClientVehicleManager::HasDoors ( usModel ) )
+                    {
+                        SDoorAngleSync door;
+                        for ( unsigned char i = 0; i < 6; ++i )
+                        {
+                            bitStream.Read ( &door );
+                            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle );
+                        }
                     }
 
                     // Read out the upgrades
