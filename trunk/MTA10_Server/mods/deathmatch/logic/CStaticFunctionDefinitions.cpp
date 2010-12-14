@@ -7146,9 +7146,9 @@ bool CStaticFunctionDefinitions::GetClothesTypeName ( unsigned char ucType, char
 }
 
 
-unsigned char CStaticFunctionDefinitions::GetMaxPlayers ( void )
+unsigned int CStaticFunctionDefinitions::GetMaxPlayers ( void )
 {
-    return static_cast < unsigned char > ( m_pMainConfig->GetMaxPlayers () );
+    return m_pMainConfig->GetMaxPlayers ();
 }
 
 
