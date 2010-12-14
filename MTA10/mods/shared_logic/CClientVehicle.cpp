@@ -83,6 +83,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_usAdjustablePropertyValue = 0;
     for ( unsigned int i = 0; i < 6; ++i )
         m_fDoorAngleRatio [ i ] = 0.0f;
+    m_bSwingingDoorsAllowed = false;
     m_bDoorsLocked = false;
     m_bDoorsUndamageable = false;
     m_bCanShootPetrolTank = true;
@@ -636,6 +637,24 @@ float CClientVehicle::GetDoorAngleRatio ( unsigned char ucDoor )
         return m_pVehicle->GetDoor ( ucDoor )->GetAngleOpenRatio ();
     }
     return m_fDoorAngleRatio [ ucDoor ];
+}
+
+void CClientVehicle::SetSwingingDoorsAllowed ( bool bAllowed )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetSwingingDoorsAllowed ( bAllowed );
+    }
+    m_bSwingingDoorsAllowed = bAllowed;
+}
+
+bool CClientVehicle::AreSwingingDoorsAllowed () const
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->AreSwingingDoorsAllowed ();
+    }
+    return m_bSwingingDoorsAllowed;
 }
 
 bool CClientVehicle::AreDoorsLocked ( void )
@@ -2110,6 +2129,7 @@ void CClientVehicle::Create ( void )
         _SetAdjustablePropertyValue ( m_usAdjustablePropertyValue );
         for ( unsigned char i = 0; i < 6; ++i )
             m_pVehicle->GetDoor ( i )->Open ( m_fDoorAngleRatio [ i ] );
+        m_pVehicle->SetSwingingDoorsAllowed ( m_bSwingingDoorsAllowed );
         m_pVehicle->LockDoors ( m_bDoorsLocked );
         m_pVehicle->SetDoorsUndamageable ( m_bDoorsUndamageable );
         m_pVehicle->SetCanShootPetrolTank ( m_bCanShootPetrolTank );

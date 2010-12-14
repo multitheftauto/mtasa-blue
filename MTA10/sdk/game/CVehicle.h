@@ -72,6 +72,8 @@ public:
 
     virtual CDoor*              GetDoor                     ( unsigned char ucDoor ) = 0;
     virtual void                OpenDoor                    ( unsigned char ucDoor, float fRatio, bool bMakeNoise = false ) = 0;
+    virtual void                SetSwingingDoorsAllowed     ( bool bAllowed ) = 0;
+    virtual bool                AreSwingingDoorsAllowed     () const = 0;
     virtual bool                AreDoorsLocked              () = 0;
     virtual void                LockDoors                   ( bool bLocked ) = 0;
     virtual bool                AreDoorsUndamageable        () = 0;

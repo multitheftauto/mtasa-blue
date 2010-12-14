@@ -184,6 +184,7 @@ void CVehicleSA::Init ( void )
             m_doors[i].SetInterface ( (CDoorSAInterface *)dwDoorAddress );
         }
     }
+    m_bSwingingDoorsAllowed = false;
 }
 
 // DESTRUCTOR
@@ -505,6 +506,16 @@ void CVehicleSA::OpenDoor ( unsigned char ucDoor, float fRatio, bool bMakeNoise 
         push    0
         call    dwFunc
     }
+}
+
+void CVehicleSA::SetSwingingDoorsAllowed ( bool bAllowed )
+{
+    m_bSwingingDoorsAllowed = bAllowed;
+}
+
+bool CVehicleSA::AreSwingingDoorsAllowed () const
+{
+    return m_bSwingingDoorsAllowed;
 }
 
 bool CVehicleSA::AreDoorsLocked ( void )

@@ -492,7 +492,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
-    //HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
+    HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -4899,24 +4899,23 @@ void _declspec(naked) HOOK_VehColCB ()
     }
 }
 
-#if 0
-// CAutomobile swinging open doors. Process it only when the automobile driver is the local player or has no driver.
+// Check if this vehicle is allowed to process swinging doors.
 static DWORD dwSwingingDoorAutomobile;
 static const DWORD dwSwingingRet1 = 0x6A9DB6;
 static const DWORD dwSwingingRet2 = 0x6AA1DA;
 bool AllowSwingingDoors ()
 {
-    CVehicleSAInterface* pVehicle = (CVehicleSAInterface *)dwSwingingDoorAutomobile;
-    return pVehicle->pDriver == 0 || IsLocalPlayer ( pVehicle->pDriver );
+    CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwSwingingDoorAutomobile );
+    return pVehicle == 0 || pVehicle->AreSwingingDoorsAllowed ();
 }
 
 void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor ()
 {
     _asm
     {
+        mov     dwSwingingDoorAutomobile, ecx
         mov     ecx, [esi+eax*4+0x648]
         pushad
-        mov     dwSwingingDoorAutomobile, ecx
     }
 
     if ( AllowSwingingDoors() )
@@ -4936,4 +4935,3 @@ void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor ()
         }
     }
 }
-#endif

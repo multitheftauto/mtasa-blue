@@ -1235,6 +1235,9 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     // Transfer WaitingForGroundToLoad state to vehicle
     if ( m_bIsLocalPlayer )
     {
+        if ( uiSeat == 0 )
+            pVehicle->SetSwingingDoorsAllowed ( true );
+
         if ( IsFrozenWaitingForGroundToLoad () )
         {
             SetFrozenWaitingForGroundToLoad ( false );
@@ -1383,6 +1386,8 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
 
     if ( pVehicle )
     {
+        pVehicle->SetSwingingDoorsAllowed ( false );
+
         // Warp the player out of the vehicle
         CVehicle* pGameVehicle = pVehicle->m_pVehicle;
         if ( pGameVehicle )
@@ -3732,6 +3737,9 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     // Driverseat
     if ( uiSeat == 0 )
     {
+        if ( m_bIsLocalPlayer )
+            pVehicle->SetSwingingDoorsAllowed ( true );
+
         if ( m_pPlayerPed )
         {
             // Grab the game vehicle. If it exists, begin walking the player into it
