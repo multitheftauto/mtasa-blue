@@ -856,7 +856,7 @@ struct SDoorAngleSync : public ISyncStructure
         }
         else
         {
-            SFloatAsBitsSync<7> fl ( 0.0f, 1.0f, true );
+            SFloatAsBitsSync<10> fl ( 0.0f, 1.0f, true );
             if ( !fl.Read ( bitStream ) )
                 return false;
             data.fAngle = fl.data.fValue;
@@ -875,7 +875,7 @@ struct SDoorAngleSync : public ISyncStructure
         else
         {
             bitStream.WriteBit ( true );
-            SFloatAsBitsSync<7> fl ( 0.0f, 1.0f, true );
+            SFloatAsBitsSync<10> fl ( 0.0f, 1.0f, true );
             fl.data.fValue = data.fAngle;
             bitStream.Write ( &fl );
         }

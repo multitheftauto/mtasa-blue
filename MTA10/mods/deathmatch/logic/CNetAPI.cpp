@@ -1568,7 +1568,7 @@ void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamIn
         for ( unsigned char i = 2; i < 6; ++i )
         {
             BitStream.Read ( &door );
-            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle );
+            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle, TICK_RATE );
         }
     }
 }
