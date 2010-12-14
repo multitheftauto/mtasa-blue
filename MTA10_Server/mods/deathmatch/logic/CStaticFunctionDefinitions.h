@@ -441,7 +441,7 @@ public:
     static bool                 ResetWaterColor                     ( );
 
     // Standard server functions
-    static unsigned char        GetMaxPlayers                       ( void );
+    static unsigned int         GetMaxPlayers                       ( void );
     static bool                 OutputChatBox                       ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded );
     static bool                 OutputConsole                       ( const char* szText, CElement* pElement );
 

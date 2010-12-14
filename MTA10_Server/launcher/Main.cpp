@@ -73,7 +73,7 @@ int main ( int argc, char* argv [] )
             printf ( "  --ip [ADDR]          Set IP address\n" );
             printf ( "  --port [PORT]        Set port\n" );
             printf ( "  --httpport [PORT]    Set http port\n" );
-            printf ( "  --maxplayers [2-250] Set maxplayers\n" );
+            printf ( "  --maxplayers [max]   Set maxplayers\n" );
             return 1;
         }
     }

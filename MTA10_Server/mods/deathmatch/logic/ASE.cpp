@@ -318,9 +318,11 @@ std::string ASE::QueryXfireLight ( void )
     // passworded
     reply << ( unsigned char ) ( ( m_pMainConfig->HasPassword () ) ? 1 : 0 );
     // players count
-    reply << ( unsigned char ) m_pPlayerManager->CountJoined ();
+    unsigned short usJoined = htons ( m_pPlayerManager->CountJoined () );
+    reply << (unsigned char)(usJoined & 0xFF) << (unsigned char)((usJoined >> 8) & 0xFF);
     // players max
-    reply << ( unsigned char ) m_pMainConfig->GetMaxPlayers ();
+    unsigned short usMax = htons ( m_pMainConfig->GetMaxPlayers () );
+    reply << (unsigned char)(usMax & 0xFF) << (unsigned char)((usMax >> 8) & 0xFF);
 
     return reply.str();
 }
@@ -371,9 +373,11 @@ std::string ASE::QueryLight ( void )
     // serial verification?
     reply << ( unsigned char ) ( ( m_pMainConfig->GetSerialVerificationEnabled() ) ? 1 : 0 );
     // players count
-    reply << ( unsigned char ) m_pPlayerManager->CountJoined ();
+    unsigned short usJoined = htons ( m_pPlayerManager->CountJoined () );
+    reply << (unsigned char)(usJoined & 0xFF) << (unsigned char)((usJoined >> 8) & 0xFF);
     // players max
-    reply << ( unsigned char ) m_pMainConfig->GetMaxPlayers ();
+    unsigned short usMax = htons ( m_pMainConfig->GetMaxPlayers () );
+    reply << (unsigned char)(usMax & 0xFF) << (unsigned char)((usMax >> 8) & 0xFF);
 
     // players
     CPlayer* pPlayer = NULL;
