@@ -1423,7 +1423,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         }
 
                         // Start animating him in
-                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat );
+                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor );
 
                         // Remember that this player is working on entering a vehicle
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_GETTING_IN );
@@ -1472,6 +1472,12 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                     case CClientGame::VEHICLE_NOTIFY_IN_ABORT_RETURN:
                     {
+                        unsigned char ucDoor;
+                        SDoorAngleSync door;
+
+                        bitStream.Read ( ucDoor );
+                        bitStream.Read ( &door );
+
                         // If local player, we are now allowed to enter it again
                         if ( pPlayer->IsLocalPlayer () )
                         {
@@ -1493,6 +1499,9 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                                 }
                             }
                         }
+
+                        // Set the door angle.
+                        pVehicle->SetDoorAngleRatio ( ucDoor + 2, door.data.fAngle, 0, true );
 
 
                         // Make sure he's removed from the vehicle
@@ -1631,7 +1640,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                             pJacked->SetVehicleInOutState ( VEHICLE_INOUT_GETTING_JACKED );
 
                         // Start animating him in
-                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat );
+                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor );
 
                         // Remember that this player is working on leaving a vehicle
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_JACKING );
@@ -2558,7 +2567,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         for ( unsigned char i = 0; i < 6; ++i )
                         {
                             bitStream.Read ( &door );
-                            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle, 0 );
+                            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle, 0, true );
                         }
                     }
 

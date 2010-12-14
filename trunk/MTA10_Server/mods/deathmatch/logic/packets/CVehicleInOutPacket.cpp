@@ -105,7 +105,28 @@ bool CVehicleInOutPacket::Read ( NetBitStreamInterface& BitStream )
     }
     else if ( m_ucAction == CGame::VEHICLE_NOTIFY_JACK_ABORT )
     {
-        return BitStream.Read ( m_ucStartedJacking );
+        SDoorAngleSync door;
+        bool bStartedJacking;
+        if ( BitStream.Read ( m_ucDoor ) &&
+             BitStream.Read ( &door ) &&
+             BitStream.ReadBit ( bStartedJacking ) )
+        {
+            m_ucStartedJacking = bStartedJacking;
+            m_fDoorAngle = door.data.fAngle;
+        }
+        else
+            return false;
+    }
+    else if ( m_ucAction == CGame::VEHICLE_NOTIFY_IN_ABORT )
+    {
+        SDoorAngleSync door;
+        if ( BitStream.Read ( m_ucDoor ) &&
+             BitStream.Read ( &door ) )
+        {
+            m_fDoorAngle = door.data.fAngle;
+        }
+        else
+            return false;
     }
     return true;
 }
@@ -142,6 +163,14 @@ bool CVehicleInOutPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( m_pCorrectVector->fY );
                 BitStream.Write ( m_pCorrectVector->fZ );
             }
+        }
+
+        if ( m_ucAction == CGame::VEHICLE_NOTIFY_IN_ABORT_RETURN )
+        {
+            BitStream.Write ( m_ucDoor );
+            SDoorAngleSync door;
+            door.data.fAngle = m_fDoorAngle;
+            BitStream.Write ( &door );
         }
 
         return true;

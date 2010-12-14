@@ -145,7 +145,7 @@ public:
     bool                        IsVisible               ( void );
     void                        SetVisible              ( bool bVisible );
 
-    void                        SetDoorAngleRatio       ( unsigned char ucDoor, float fRatio, unsigned long ulDelay = 0 );
+    void                        SetDoorAngleRatio       ( unsigned char ucDoor, float fRatio, unsigned long ulDelay = 0, bool bForced = false );
     float                       GetDoorAngleRatio       ( unsigned char ucDoor );
     void                        SetSwingingDoorsAllowed ( bool bAllowed );
     bool                        AreSwingingDoorsAllowed () const;

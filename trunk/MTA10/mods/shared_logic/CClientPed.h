@@ -201,7 +201,7 @@ public:
     CClientVehicle*             GetClosestVehicleInRange    ( bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors, bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL, float fWithinRange = 6000.0f );
     bool                        GetClosestDoor              ( CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor, CVector* pClosestDoorPosition = NULL );
 
-    void                        GetIntoVehicle              ( CClientVehicle* pVehicle, unsigned int uiSeat = 0 );
+    void                        GetIntoVehicle              ( CClientVehicle* pVehicle, unsigned int uiSeat = 0, unsigned char ucDoor = 0 );
     void                        GetOutOfVehicle             ( void );
 
     void                        WarpIntoVehicle             ( CClientVehicle* pVehicle, unsigned int uiSeat = 0 );
@@ -568,6 +568,7 @@ public:
     bool                        m_bSpeechEnabled;
     bool                        m_bStealthAiming;
     float                       m_fLighting;
+    unsigned char               m_ucEnteringDoor;
 
     bool                        m_bBulletImpactData;
     CClientEntity*              m_pBulletImpactEntity;

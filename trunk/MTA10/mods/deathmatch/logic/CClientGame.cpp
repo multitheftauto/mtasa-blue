@@ -1502,8 +1502,12 @@ void CClientGame::UpdateVehicleInOut ( void )
                                         bAlreadyStartedJacking = true;
                                     }
                                 }
+                                pBitStream->Write ( m_pLocalPlayer->m_ucEnteringDoor );
+                                SDoorAngleSync door;
+                                door.data.fAngle = pVehicle->GetDoorAngleRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
+                                pBitStream->Write ( &door );
                             }
-                            pBitStream->Write ( static_cast < unsigned char > ( ( bAlreadyStartedJacking ) ? 1 : 0 ) );
+                            pBitStream->WriteBit ( bAlreadyStartedJacking );
 
 #ifdef MTA_DEBUG
                             g_pCore->GetConsole ()->Printf ( "* Sent_InOut: vehicle_notify_jack_abort" );
@@ -1512,6 +1516,14 @@ void CClientGame::UpdateVehicleInOut ( void )
                         else
                         {
                             pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_NOTIFY_IN_ABORT ) );
+                            CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
+                            if ( pVehicle )
+                            {
+                                pBitStream->Write ( m_pLocalPlayer->m_ucEnteringDoor );
+                                SDoorAngleSync door;
+                                door.data.fAngle = pVehicle->GetDoorAngleRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
+                                pBitStream->Write ( &door );
+                            }
 
 #ifdef MTA_DEBUG
                             g_pCore->GetConsole ()->Printf ( "* Sent_InOut: vehicle_notify_in_abort" );
