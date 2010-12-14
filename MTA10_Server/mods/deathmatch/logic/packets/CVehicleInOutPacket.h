@@ -45,6 +45,7 @@ public:
     inline bool             GetOnWater                  ( void )                        { return m_ucOnWater ? true : false; };
     inline ElementID        GetID                ( void )                        { return m_ID; };
     inline unsigned char    GetSeat                     ( void )                        { return m_ucSeat; };
+    inline float            GetDoorAngle                ( void )                        { return m_fDoorAngle; }
     inline unsigned char    GetAction                   ( void )                        { return m_ucAction; };
     inline ElementID        GetPlayerIn                 ( void )                        { return m_PlayerIn; };
     inline ElementID        GetPlayerOut                ( void )                        { return m_PlayerOut; };
@@ -52,6 +53,7 @@ public:
 
     inline void             SetID                ( ElementID ID )         { m_ID = ID; };
     inline void             SetSeat                     ( unsigned char ucSeat )        { m_ucSeat = ucSeat; };
+    inline void             SetDoorAngle                ( float fDoorAngle )            { m_fDoorAngle = fDoorAngle; }
     inline void             SetAction                   ( unsigned char ucAction )      { m_ucAction = ucAction; };
     inline void             SetPlayerIn                 ( ElementID PlayerIn )          { m_PlayerIn = PlayerIn; };
     inline void             SetPlayerOut                ( ElementID PlayerOut )         { m_PlayerOut = PlayerOut; };
@@ -69,6 +71,7 @@ private:
     CVector *               m_pCorrectVector;
     unsigned char           m_ucOnWater;
     unsigned char           m_ucDoor;
+    float                   m_fDoorAngle;
 };
 
 #endif

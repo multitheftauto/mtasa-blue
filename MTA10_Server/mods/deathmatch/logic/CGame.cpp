@@ -2416,14 +2416,21 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat ();
                                 if ( pPlayer == pVehicle->GetOccupant ( ucOccupiedSeat ) )
                                 {
+                                    unsigned char ucDoor = Packet.GetDoor ();
+                                    float fDoorAngle = Packet.GetDoorAngle ();
+
                                     // Mark that he's in no vehicle
                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
                                     pPlayer->SetOccupiedVehicle ( NULL, 0 );
                                     pVehicle->SetOccupant ( NULL, ucOccupiedSeat );
 
+                                    // Update the door angle.
+                                    pVehicle->SetDoorAngleRatio ( ucDoor + 2, fDoorAngle );
+
                                     // Tell everyone he's in (they should warp him in)
-                                    CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN );
+                                    CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor );
                                     Reply.SetSourceElement ( pPlayer );
+                                    Reply.SetDoorAngle ( fDoorAngle );
                                     m_pPlayerManager->BroadcastOnlyJoined ( Reply );
                                 }
                             }
@@ -2691,6 +2698,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                             // Is the sender jacking?
                             if ( pPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_JACKING )
                             {
+                                unsigned char ucDoor = Packet.GetDoor ();
+                                float fAngle = Packet.GetDoorAngle ();
                                 CPed* pJacked = pVehicle->GetOccupant ( 0 );
 
                                 // Mark that the jacker is in no vehicle
@@ -2699,9 +2708,13 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 pPlayer->SetJackingVehicle ( NULL );
                                 pVehicle->SetJackingPlayer ( NULL );
 
+                                // Set the door angle.
+                                pVehicle->SetDoorAngleRatio ( ucDoor, fAngle );
+
                                 // Tell everyone he aborted
-                                CVehicleInOutPacket Reply ( ID, 0, VEHICLE_NOTIFY_IN_ABORT_RETURN );
+                                CVehicleInOutPacket Reply ( ID, 0, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor );
                                 Reply.SetSourceElement ( pPlayer );
+                                Reply.SetDoorAngle ( fAngle );
                                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );
 
                                 // The jacked is still inside?

@@ -170,6 +170,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bStealthAiming = false;
     m_fLighting = 0.0f;
     m_bBulletImpactData = false;
+    m_ucEnteringDoor = 0xFF;
 
     // Time based interpolation
     m_interp.pTargetOriginSource = NULL;
@@ -1207,7 +1208,7 @@ void CClientPed::GetOutOfVehicle ( void )
 }
 
 
-void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat )
+void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor )
 {
     // TODO: add checks to ensure we don't try to use the wrong seats for bikes etc
     // Eventually remove us from a previous vehicle
@@ -1216,6 +1217,7 @@ void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat 
     // Do it
     _GetIntoVehicle ( pVehicle, uiSeat );
     m_uiOccupiedVehicleSeat = uiSeat;
+    m_ucEnteringDoor = ucDoor;
     m_bForceGettingIn = true;
 }
 

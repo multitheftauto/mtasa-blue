@@ -621,7 +621,7 @@ void CClientVehicle::ResetDoorInterpolation ()
     for ( unsigned char i = 0; i < 6; ++i )
     {
         if ( m_doorInterp.ulTargetTime [ i ] != 0 )
-            SetDoorAngleRatio ( i, m_doorInterp.fTarget [ i ], 0 );
+            SetDoorAngleRatio ( i, m_doorInterp.fTarget [ i ], 0, true );
         m_doorInterp.ulTargetTime [ i ] = 0;
     }
 }
@@ -637,7 +637,7 @@ void CClientVehicle::ProcessDoorInterpolation ()
             if ( m_doorInterp.ulTargetTime [ i ] <= ulTime )
             {
                 // Interpolation finished.
-                SetDoorAngleRatio ( i, m_doorInterp.fTarget [ i ], 0 );
+                SetDoorAngleRatio ( i, m_doorInterp.fTarget [ i ], 0, true );
                 m_doorInterp.ulTargetTime [ i ] = 0;
             }
             else
@@ -646,29 +646,32 @@ void CClientVehicle::ProcessDoorInterpolation ()
                 unsigned long ulDelay = m_doorInterp.ulTargetTime [ i ] - m_doorInterp.ulStartTime [ i ];
                 float fStep = ulElapsedTime / (float)ulDelay;
                 float fRatio = SharedUtil::Lerp ( m_doorInterp.fStart [ i ], fStep, m_doorInterp.fTarget [ i ] );
-                SetDoorAngleRatio ( i, fRatio, 0 );
+                SetDoorAngleRatio ( i, fRatio, 0, true );
             }
         }
     }
 }
 
-void CClientVehicle::SetDoorAngleRatio ( unsigned char ucDoor, float fRatio, unsigned long ulDelay )
+void CClientVehicle::SetDoorAngleRatio ( unsigned char ucDoor, float fRatio, unsigned long ulDelay, bool bForced )
 {
     bool bAllow = true;
     unsigned char ucSeat;
 
     // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
-    switch ( ucDoor )
+    if ( bForced == false )
     {
-        case 2:
-            bAllow = m_pOccupyingDriver == 0;
-            break;
-        case 3:
-        case 4:
-        case 5:
-            ucSeat = ucDoor - 2;
-            bAllow = m_pOccupyingPassengers [ ucSeat ] == 0;
-            break;
+        switch ( ucDoor )
+        {
+            case 2:
+                bAllow = m_pOccupyingDriver == 0;
+                break;
+            case 3:
+            case 4:
+            case 5:
+                ucSeat = ucDoor - 2;
+                bAllow = m_pOccupyingPassengers [ ucSeat ] == 0;
+                break;
+        }
     }
 
     if ( bAllow )
@@ -2186,8 +2189,6 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetSirenOrAlarmActive ( m_bSireneOrAlarmActive );
         SetLandingGearDown ( m_bLandingGearDown );
         _SetAdjustablePropertyValue ( m_usAdjustablePropertyValue );
-        for ( unsigned char i = 0; i < 6; ++i )
-            m_pVehicle->OpenDoor ( i, m_fDoorAngleRatio [ i ] );
         m_pVehicle->SetSwingingDoorsAllowed ( m_bSwingingDoorsAllowed );
         m_pVehicle->LockDoors ( m_bDoorsLocked );
         m_pVehicle->SetDoorsUndamageable ( m_bDoorsUndamageable );
@@ -2332,6 +2333,10 @@ void CClientVehicle::Create ( void )
         // Reset the interpolation
         ResetInterpolation ();
         ResetDoorInterpolation ();
+
+        for ( unsigned char i = 0; i < 6; ++i )
+            SetDoorAngleRatio ( i, m_fDoorAngleRatio [ i ], 0, true );
+
 
 #if WITH_VEHICLE_HANDLING
         // Re-apply handling entry
