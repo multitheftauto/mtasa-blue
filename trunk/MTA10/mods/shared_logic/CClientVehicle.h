@@ -145,13 +145,19 @@ public:
     bool                        IsVisible               ( void );
     void                        SetVisible              ( bool bVisible );
 
-    void                        SetDoorAngleRatio       ( unsigned char ucDoor, float fRatio );
+    void                        SetDoorAngleRatio       ( unsigned char ucDoor, float fRatio, unsigned long ulDelay = 0 );
     float                       GetDoorAngleRatio       ( unsigned char ucDoor );
     void                        SetSwingingDoorsAllowed ( bool bAllowed );
     bool                        AreSwingingDoorsAllowed () const;
     bool                        AreDoorsLocked          ( void );
     void                        SetDoorsLocked          ( bool bLocked );
 
+private:
+    void                        SetDoorAngleRatioInterpolated   ( unsigned char ucDoor, float fRatio, unsigned long ulDelay );
+    void                        ResetDoorInterpolation          ();
+    void                        ProcessDoorInterpolation        ();
+
+public:
     bool                        AreDoorsUndamageable    ( void );
     void                        SetDoorsUndamageable    ( bool bUndamageable );
 
@@ -446,6 +452,13 @@ protected:
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
     float                       m_fDoorAngleRatio [ 6 ];
+    struct
+    {
+        float                   fStart  [ 6 ];
+        float                   fTarget [ 6 ];
+        unsigned long           ulStartTime [ 6 ];
+        unsigned long           ulTargetTime [ 6 ];
+    } m_doorInterp;
     bool                        m_bSwingingDoorsAllowed;
     bool                        m_bDoorsLocked;
     bool                        m_bDoorsUndamageable;

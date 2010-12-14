@@ -2558,7 +2558,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         for ( unsigned char i = 0; i < 6; ++i )
                         {
                             bitStream.Read ( &door );
-                            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle );
+                            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle, 0 );
                         }
                     }
 
