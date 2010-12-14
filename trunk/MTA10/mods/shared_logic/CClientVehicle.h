@@ -147,6 +147,8 @@ public:
 
     void                        SetDoorAngleRatio       ( unsigned char ucDoor, float fRatio );
     float                       GetDoorAngleRatio       ( unsigned char ucDoor );
+    void                        SetSwingingDoorsAllowed ( bool bAllowed );
+    bool                        AreSwingingDoorsAllowed () const;
     bool                        AreDoorsLocked          ( void );
     void                        SetDoorsLocked          ( bool bLocked );
 
@@ -444,6 +446,7 @@ protected:
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
     float                       m_fDoorAngleRatio [ 6 ];
+    bool                        m_bSwingingDoorsAllowed;
     bool                        m_bDoorsLocked;
     bool                        m_bDoorsUndamageable;
     bool                        m_bCanShootPetrolTank;

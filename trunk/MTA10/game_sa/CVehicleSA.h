@@ -509,6 +509,7 @@ private:
     RwObject                    m_WheelObjects[4];
     SColor                      m_RGBColors[4];
     CDoorSA                     m_doors[6];
+    bool                        m_bSwingingDoorsAllowed;
 
 public:
                                 CVehicleSA                      ();
@@ -549,6 +550,8 @@ public:
 
     CDoorSA*                    GetDoor                         ( unsigned char ucDoor );
     void                        OpenDoor                        ( unsigned char ucDoor, float fRatio, bool bMakeNoise = false );
+    void                        SetSwingingDoorsAllowed         ( bool bAllowed );
+    bool                        AreSwingingDoorsAllowed         () const;
     bool                        AreDoorsLocked                  ();
     void                        LockDoors                       ( bool bLocked );
     bool                        AreDoorsUndamageable            ();
