@@ -167,7 +167,7 @@ public:
 // Upper player limit
 #define MAX_PLAYER_COUNT 65535
 #if MAX_PLAYER_COUNT > 65535
-    #error MAX_PLAYER_COUNT "macro can't exceed 254"
+    #error MAX_PLAYER_COUNT "macro can't exceed 65535"
 #endif
 
 // Max mapname length
