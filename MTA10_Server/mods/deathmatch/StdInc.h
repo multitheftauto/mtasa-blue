@@ -121,6 +121,11 @@
 #include "lua/CLuaCFunctions.h"
 #include "lua/CLuaArguments.h"
 
+// Shared includes
+#include "CEasingCurve.h"
+#include "TInterpolation.h"
+#include "CPositionRotationAnimation.h"
+
 // Logic includes
 #include "ASE.h"
 #include "ASEQuerySDK.h"
@@ -238,6 +243,10 @@
 #include "Utils.h"
 
 #include "CStaticFunctionDefinitions.h"
+
+// Shared includes
+#include "CEasingCurve.h"
+#include "CPositionRotationAnimation.h"
 
 // Utility includes
 #include "utils/CHTTPClient.h"

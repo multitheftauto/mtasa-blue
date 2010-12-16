@@ -48,8 +48,7 @@ void CObjectRPCs::SetObjectRotation ( NetBitStreamInterface& bitStream )
                 // Set the new rotation
                 pObject->SetRotationRadians ( vecRotation );
 
-                // Update our target rotation
-                pObject->SetTargetRotation ( vecRotation );
+                // Kayl: removed update of target rotation, move uses delta and anyway setRotation is NOT possible when moving
             }
         }
     }
@@ -66,34 +65,16 @@ void CObjectRPCs::MoveObject ( NetBitStreamInterface& bitStream )
         CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( ID ) );
         if ( pObject )
         {
-            // Read out the new time, position and rotation
-            unsigned long ulTime;
-            CVector vecSourcePosition;
-            CVector vecSourceRotation;
-            CVector vecTargetPosition;
-            CVector vecTargetRotation;
-            if ( bitStream.Read ( ulTime ) &&
-                 bitStream.Read ( vecSourcePosition.fX ) &&
-                 bitStream.Read ( vecSourcePosition.fY ) &&
-                 bitStream.Read ( vecSourcePosition.fZ ) &&
-                 bitStream.Read ( vecSourceRotation.fX ) &&
-                 bitStream.Read ( vecSourceRotation.fY ) &&
-                 bitStream.Read ( vecSourceRotation.fZ ) &&
-                 bitStream.Read ( vecTargetPosition.fX ) &&
-                 bitStream.Read ( vecTargetPosition.fY ) &&
-                 bitStream.Read ( vecTargetPosition.fZ ) &&
-                 bitStream.Read ( vecTargetRotation.fX ) &&
-                 bitStream.Read ( vecTargetRotation.fY ) &&
-                 bitStream.Read ( vecTargetRotation.fZ ) )
-            {
-                // Set it to the source position, then make it move towards that position
-                pObject->SetOrientation ( vecSourcePosition, vecSourceRotation );
-                pObject->StartMovement ( vecTargetPosition, vecTargetRotation, ulTime );
+            CPositionRotationAnimation* pAnimation = CPositionRotationAnimation::FromBitStream ( bitStream );
+
+            if ( pAnimation )
+            {            
+                pObject->StartMovement ( *pAnimation );
+                delete pAnimation;
             }
         }
     }
 }
-
 
 void CObjectRPCs::StopObject ( NetBitStreamInterface& bitStream )
 {

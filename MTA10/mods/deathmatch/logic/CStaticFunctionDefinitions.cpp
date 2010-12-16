@@ -2970,20 +2970,17 @@ bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, cons
 
         Object.SetRotationDegrees ( vecRotation );
 
-        // Update our target rotation
-        // Jax: no idea what NoWrap is, copied from moveObject
-        CVector vecRadiansNoWrap = vecRotation;
-        ConvertDegreesToRadiansNoWrap ( vecRadiansNoWrap );
-        Object.SetTargetRotation ( vecRadiansNoWrap );
+        // Kayl: removed setTargetRotation, if we want consistency target WAS a delta not an absolute value and serverside doesn't allow rotation
+        // change while moving so in theory it shouldn't have been used
     }
 
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation )
+bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot )
 {
-    RUN_CHILDREN MoveObject ( **iter, ulTime, vecPosition, vecRotation );
+    RUN_CHILDREN MoveObject ( **iter, ulTime, vecPosition, vecDeltaRotation, a_szEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
 
     if ( IS_OBJECT ( &Entity ) )
     {
@@ -2995,11 +2992,22 @@ bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned lo
         Object.GetRotationRadians ( vecSourceRotation );
 
         // Convert the target rotation given to radians (don't wrap around as these can be rotated more than 360)
-        CVector vecRadians = vecRotation;
-        ConvertDegreesToRadiansNoWrap ( vecRadians );
+        CVector vecDeltaRadians = vecDeltaRotation;
+        ConvertDegreesToRadiansNoWrap ( vecDeltaRadians );
 
-        Object.SetOrientation ( vecSourcePosition, vecSourceRotation );
-        Object.StartMovement ( vecPosition, vecRadians, ulTime );
+        CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( a_szEasingType );
+        if (easingType == CEasingCurve::EASING_INVALID )
+        {
+            return false;
+        }
+
+        CPositionRotationAnimation animation;
+        animation.SetSourceValue ( SPositionRotation ( vecSourcePosition, vecSourceRotation ) );
+        animation.SetTargetValue ( SPositionRotation ( vecPosition, vecDeltaRadians ), true );
+        animation.SetEasing ( easingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
+        animation.SetDuration ( ulTime );
+
+        Object.StartMovement ( animation );
     }
 
     return true;

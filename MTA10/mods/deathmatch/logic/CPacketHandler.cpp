@@ -2365,14 +2365,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         bool bIsMoving;
                         if ( bitStream.ReadBit ( bIsMoving ) && bIsMoving )
                         {
-                            unsigned long ulMoveTimeLeft;
-                            if ( bitStream.ReadCompressed ( ulMoveTimeLeft ) &&
-                                 bitStream.Read ( &position ) &&
-                                 bitStream.Read ( &rotationRadians ) )
+                            CPositionRotationAnimation* pAnimation = CPositionRotationAnimation::FromBitStream ( bitStream );
+                            if ( pAnimation != NULL )
                             {
-                                pObject->StartMovement ( position.data.vecPosition,
-                                                         rotationRadians.data.vecRotation,
-                                                         ulMoveTimeLeft );
+                                pObject->StartMovement ( *pAnimation );
+                                delete pAnimation;
                             }
                         }
 

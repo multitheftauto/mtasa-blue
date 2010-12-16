@@ -169,6 +169,11 @@ int CLuaFunctionDefs::MoveObject ( lua_State* luaVM )
             vecTargetPosition.fY = static_cast < float > ( atof ( lua_tostring ( luaVM, 4 ) ) );
             vecTargetPosition.fZ = static_cast < float > ( atof ( lua_tostring ( luaVM, 5 ) ) );
 
+            const char* szEasingType = "Linear";
+            double fEasingPeriod = 0.3f;
+            double fEasingAmplitude = 1.0f;
+            double fEasingOvershoot = 1.70158f;
+
             int iArgument6 = lua_type ( luaVM, 6 );
             if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
             {
@@ -183,11 +188,35 @@ int CLuaFunctionDefs::MoveObject ( lua_State* luaVM )
                     if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
                     {
                         vecTargetRotation.fZ = static_cast < float > ( atof ( lua_tostring ( luaVM, 8 ) ) );
+
+                        int iArgument9 = lua_type ( luaVM, 9 );
+                        if ( iArgument9 == LUA_TSTRING )
+                        {
+                            szEasingType = lua_tostring ( luaVM, 9 );
+
+                            int iArgument10 = lua_type ( luaVM, 10 );
+                            if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
+                            {
+                                fEasingPeriod = atof ( lua_tostring ( luaVM, 10 ) ); 
+
+                                int iArgument11 = lua_type ( luaVM, 11 );
+                                if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
+                                {
+                                    fEasingAmplitude = atof ( lua_tostring ( luaVM, 11 ) ); 
+
+                                    int iArgument12 = lua_type ( luaVM, 12 );
+                                    if ( iArgument12 == LUA_TNUMBER || iArgument12 == LUA_TSTRING )
+                                    {
+                                        fEasingOvershoot = atof ( lua_tostring ( luaVM, 12 ) ); 
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-
-            if ( CStaticFunctionDefinitions::MoveObject ( *pEntity, ulTime, vecTargetPosition, vecTargetRotation ) )
+            
+            if ( CStaticFunctionDefinitions::MoveObject ( *pEntity, ulTime, vecTargetPosition, vecTargetRotation, szEasingType, fEasingPeriod, fEasingAmplitude, fEasingOvershoot ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

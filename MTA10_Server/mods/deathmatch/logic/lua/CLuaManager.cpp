@@ -587,6 +587,8 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility vector math functions
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints2D", CLuaFunctionDefinitions::GetDistanceBetweenPoints2D );
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints3D", CLuaFunctionDefinitions::GetDistanceBetweenPoints3D );
+    CLuaCFunctions::AddFunction ( "getEasingValue", CLuaFunctionDefinitions::GetEasingValue );
+    CLuaCFunctions::AddFunction ( "interpolateBetween", CLuaFunctionDefinitions::InterpolateBetween );
 
     // Util funcs
     CLuaCFunctions::AddFunction ( "getTickCount", CLuaFunctionDefinitions::GetTickCount_ );
