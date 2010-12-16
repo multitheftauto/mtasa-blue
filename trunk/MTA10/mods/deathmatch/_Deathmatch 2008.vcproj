@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -140,7 +140,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -238,7 +238,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -1209,6 +1209,18 @@
 					</FileConfiguration>
 				</File>
 			</Filter>
+			<Filter
+				Name="shared"
+				>
+				<File
+					RelativePath="..\..\..\Shared\animation\CEasingCurve.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1938,6 +1950,22 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="shared"
+				>
+				<File
+					RelativePath="..\..\..\Shared\animation\CEasingCurve.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\animation\TInterpolation.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>

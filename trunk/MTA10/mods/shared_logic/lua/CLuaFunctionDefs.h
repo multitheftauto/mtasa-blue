@@ -752,6 +752,8 @@ public:
     // Utility vector math functions
     LUA_DECLARE ( GetDistanceBetweenPoints2D );
     LUA_DECLARE ( GetDistanceBetweenPoints3D );
+    LUA_DECLARE ( GetEasingValue );
+    LUA_DECLARE ( InterpolateBetween );
 
     // Map funcs
     LUA_DECLARE ( IsPlayerMapForced );

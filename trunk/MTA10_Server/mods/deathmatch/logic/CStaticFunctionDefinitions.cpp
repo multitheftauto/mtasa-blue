@@ -5727,9 +5727,9 @@ bool CStaticFunctionDefinitions::SetObjectScale ( CElement* pElement, float fSca
 }
 
 
-bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation )
+bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot )
 {
-    RUN_CHILDREN MoveObject ( pResource, *iter, ulTime, vecPosition, vecRotation );
+    RUN_CHILDREN MoveObject ( pResource, *iter, ulTime, vecPosition, vecRotation, a_szEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
 
     if ( IS_OBJECT ( pElement ) )
     {
@@ -5741,11 +5741,23 @@ bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* p
         pObject->GetRotation ( vecSourceRotation );
 
         // Convert the target rotation given to radians (don't wrap around as these can be rotated more than 360)
-        CVector vecRadians = vecRotation;
-        ConvertDegreesToRadiansNoWrap ( vecRadians );
+        CVector vecDeltaRadians = vecRotation;
+        ConvertDegreesToRadiansNoWrap ( vecDeltaRadians );
+
+        CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( a_szEasingType );
+        if (easingType == CEasingCurve::EASING_INVALID )
+        {
+            return false;
+        }
+
+        CPositionRotationAnimation moveAnimation;
+        moveAnimation.SetSourceValue ( SPositionRotation ( vecSourcePosition, vecSourceRotation ) );
+        moveAnimation.SetTargetValue ( SPositionRotation ( vecPosition, vecDeltaRadians ), true );
+        moveAnimation.SetEasing ( easingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
+        moveAnimation.SetDuration ( ulTime );
 
         // Start moving it here so we can keep track of the position/rotation
-        pObject->Move ( vecPosition, vecSourceRotation + vecRadians, ulTime );
+        pObject->Move ( moveAnimation );
 
         // Has this resource started yet?
         if ( pResource->HasStarted() )
@@ -5753,19 +5765,9 @@ bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* p
             // Tell the players
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pObject->GetID () );
-            BitStream.pBitStream->Write ( ulTime );
-            BitStream.pBitStream->Write ( vecSourcePosition.fX );
-            BitStream.pBitStream->Write ( vecSourcePosition.fY );
-            BitStream.pBitStream->Write ( vecSourcePosition.fZ );
-            BitStream.pBitStream->Write ( vecSourceRotation.fX );
-            BitStream.pBitStream->Write ( vecSourceRotation.fY );
-            BitStream.pBitStream->Write ( vecSourceRotation.fZ );
-            BitStream.pBitStream->Write ( vecPosition.fX );
-            BitStream.pBitStream->Write ( vecPosition.fY );
-            BitStream.pBitStream->Write ( vecPosition.fZ );
-            BitStream.pBitStream->Write ( vecRadians.fX );
-            BitStream.pBitStream->Write ( vecRadians.fY );
-            BitStream.pBitStream->Write ( vecRadians.fZ );
+
+            moveAnimation.ToBitStream ( *BitStream.pBitStream, false );
+
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( MOVE_OBJECT, *BitStream.pBitStream ) );
         }        
     }

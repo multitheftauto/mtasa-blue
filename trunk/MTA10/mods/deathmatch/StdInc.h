@@ -89,6 +89,11 @@
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
 
+// Shared includes
+#include "CEasingCurve.h"
+#include "TInterpolation.h"
+#include "CPositionRotationAnimation.h"
+
 // Deathmatch includes
 #include "Client.h"
 #include "ClientCommands.h"

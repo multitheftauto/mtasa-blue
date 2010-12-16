@@ -54,7 +54,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;../../../vendor/sqlite;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -156,7 +156,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;../../../vendor/sqlite;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -260,7 +260,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;../../../vendor/sqlite;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -1366,6 +1366,18 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="shared"
+				>
+				<File
+					RelativePath="..\..\..\Shared\animation\CEasingCurve.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -2266,6 +2278,22 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="shared"
+				>
+				<File
+					RelativePath="..\..\..\Shared\animation\CEasingCurve.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\Shared\animation\TInterpolation.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

@@ -414,6 +414,8 @@ public:
     // Utility vector math functions
     static int      GetDistanceBetweenPoints2D          ( lua_State* luaVM );
     static int      GetDistanceBetweenPoints3D          ( lua_State* luaVM );
+    static int      GetEasingValue                      ( lua_State* luaVM );
+    static int      InterpolateBetween                  ( lua_State* luaVM );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them

@@ -10,33 +10,24 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #ifndef __COBJECT_H
 #define __COBJECT_H
 
+//Kayl: There is now too many includes here, try to make it work with StdInc.h if possible
 #include "CElement.h"
 #include "CEvents.h"
 #include "Utils.h"
 
-struct SObjectMoveData
-{
-    bool            bActive;
-    CVector         vecStartPosition;
-    CVector         vecStopPosition;
-    CVector         vecStartRotation;
-    CVector         vecStopRotation;
-    unsigned long   ulTime;
-    unsigned long   ulTimeStart;
-    // Saves calculating more than once
-    unsigned long   ulTimeStop;
-};
+#include "CEasingCurve.h"
+#include "TInterpolation.h"
+#include "CPositionRotationAnimation.h"
 
 class CObject : public CElement
 {    
 
 public:
-                                CObject                 ( CElement* pParent, CXMLNode* pNode, class CObjectManager* pObjectManager );
-                                CObject                 ( const CObject& Copy );
+    explicit                    CObject                 ( CElement* pParent, CXMLNode* pNode, class CObjectManager* pObjectManager );
+    explicit                    CObject                 ( const CObject& Copy );
                                 ~CObject                ( void );
 
     bool                        IsEntity                ( void )                    { return true; }
@@ -51,9 +42,9 @@ public:
     void                        SetRotation             ( const CVector& vecRotation );
 
     bool                        IsMoving                ( void );
-    void                        Move                    ( const CVector& vecPosition, const CVector& vecRotation, unsigned long ulTime );
+    void                        Move                    ( const CPositionRotationAnimation& a_rMoveAnimation );
     void                        StopMoving              ( void );
-    unsigned long               GetMoveTimeLeft         ( void );
+    const CPositionRotationAnimation*   GetMoveAnimation    ( );
 
     void                        AttachTo                ( CElement* pElement );
 
@@ -85,7 +76,7 @@ protected:
     bool                        m_bCollisionsEnabled;
 
 public:
-    SObjectMoveData             m_moveData;
+    CPositionRotationAnimation* m_pMoveAnimation;
 };
 
 #endif

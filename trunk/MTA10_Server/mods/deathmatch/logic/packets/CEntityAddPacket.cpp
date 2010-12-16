@@ -193,18 +193,15 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.WriteBit ( bIsDoubleSided );
 
                     // Moving
-                    bool bIsMoving = pObject->IsMoving ();
-                    BitStream.WriteBit ( bIsMoving );
-
-                    if ( bIsMoving )
+                    const CPositionRotationAnimation* pMoveAnimation = pObject->GetMoveAnimation ();
+                    if ( pMoveAnimation )
                     {
-                        BitStream.WriteCompressed ( pObject->GetMoveTimeLeft () );
-
-                        position.data.vecPosition = pObject->m_moveData.vecStopPosition;
-                        BitStream.Write ( &position );
-
-                        rotationRadians.data.vecRotation = pObject->m_moveData.vecStopRotation - rotationRadians.data.vecRotation;
-                        BitStream.Write ( &rotationRadians );
+                         BitStream.WriteBit ( true );
+                         pMoveAnimation->ToBitStream ( BitStream, true );
+                    }
+                    else
+                    {
+                        BitStream.WriteBit ( false );
                     }
 
                     // Scale

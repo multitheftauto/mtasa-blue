@@ -470,6 +470,129 @@ int CLuaFunctionDefs::GetDistanceBetweenPoints3D ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetEasingValue ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+
+    if ( ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) || iArgument2 != LUA_TSTRING )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "getEasingValue" );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+    
+    float fProgress = static_cast < float > ( atof ( lua_tostring ( luaVM, 1 ) ) );
+
+    const char* szEasingType = "Linear";
+    double fEasingPeriod = 0.3f;
+    double fEasingAmplitude = 1.0f;
+    double fEasingOvershoot = 1.70158f;
+
+    szEasingType = lua_tostring ( luaVM, 2 );
+
+    int iArgument3 = lua_type ( luaVM, 3 );
+    if ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING )
+    {
+        fEasingPeriod = atof ( lua_tostring ( luaVM, 3 ) ); 
+
+        int iArgument4 = lua_type ( luaVM, 4 );
+        if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
+        {
+            fEasingAmplitude = atof ( lua_tostring ( luaVM, 4 ) ); 
+
+            int iArgument5 = lua_type ( luaVM, 5 );
+            if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
+            {
+                fEasingOvershoot = atof ( lua_tostring ( luaVM, 5 ) ); 
+            }
+        }
+    }
+
+    CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( szEasingType );
+    if ( easingType == CEasingCurve::EASING_INVALID )
+    {
+        m_pScriptDebugging->LogError ( luaVM, "getEasingValue - Unknown easing type '%s'", szEasingType);
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
+    CEasingCurve easingCurve ( easingType );
+    easingCurve.SetParams ( fEasingPeriod, fEasingAmplitude, fEasingOvershoot );
+    lua_pushnumber ( luaVM, easingCurve.ValueForProgress ( fProgress ) ); 
+    return 1;
+}
+
+int CLuaFunctionDefs::InterpolateBetween ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+    int iArgument5 = lua_type ( luaVM, 5 );
+    int iArgument6 = lua_type ( luaVM, 6 );
+    int iArgument7 = lua_type ( luaVM, 7 );
+    int iArgument8 = lua_type ( luaVM, 8 );
+
+    if (    ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) &&
+        ( iArgument2 != LUA_TNUMBER && iArgument2 != LUA_TSTRING ) &&
+        ( iArgument3 != LUA_TNUMBER && iArgument3 != LUA_TSTRING ) &&
+        ( iArgument4 != LUA_TNUMBER && iArgument4 != LUA_TSTRING ) &&
+        ( iArgument5 != LUA_TNUMBER && iArgument5 != LUA_TSTRING ) &&
+        ( iArgument6 != LUA_TNUMBER && iArgument6 != LUA_TSTRING ) &&
+        ( iArgument7 != LUA_TNUMBER && iArgument7 != LUA_TSTRING ) &&
+        ( iArgument8 != LUA_TSTRING ) )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "interpolateBetween" );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
+    CVector vecPointA ( static_cast < float > ( atof ( lua_tostring ( luaVM, 1 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 2 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 3 ) ) ) );
+    CVector vecPointB ( static_cast < float > ( atof ( lua_tostring ( luaVM, 4 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 5 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 6 ) ) ) );
+
+    float fProgress = static_cast < float > ( atof ( lua_tostring ( luaVM, 7 ) ) );
+
+    const char* szEasingType = "Linear";
+    double fEasingPeriod = 0.3f;
+    double fEasingAmplitude = 1.0f;
+    double fEasingOvershoot = 1.70158f;
+
+    szEasingType = lua_tostring ( luaVM, 8 );
+
+    int iArgument9 = lua_type ( luaVM, 9 );
+    if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
+    {
+        fEasingPeriod = atof ( lua_tostring ( luaVM, 9 ) ); 
+
+        int iArgument10 = lua_type ( luaVM, 10 );
+        if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
+        {
+            fEasingAmplitude = atof ( lua_tostring ( luaVM, 10 ) ); 
+
+            int iArgument11 = lua_type ( luaVM, 11 );
+            if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
+            {
+                fEasingOvershoot = atof ( lua_tostring ( luaVM, 11 ) ); 
+            }
+        }
+    }
+
+    CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( szEasingType );
+    if ( easingType == CEasingCurve::EASING_INVALID )
+    {
+        m_pScriptDebugging->LogError ( luaVM, "interpolateBetween - Unknown easing type '%s'", szEasingType);
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
+    CVector vecResult = TInterpolation < CVector >::Interpolate ( vecPointA, vecPointB, fProgress, easingType, fEasingPeriod, fEasingAmplitude, fEasingOvershoot );
+    lua_pushnumber ( luaVM, vecResult.fX );
+    lua_pushnumber ( luaVM, vecResult.fY );
+    lua_pushnumber ( luaVM, vecResult.fZ );
+    return 3;
+}
+
 
 int CLuaFunctionDefs::Md5 ( lua_State* luaVM )
 {

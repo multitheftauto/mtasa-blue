@@ -340,7 +340,7 @@ public:
     // Object set functions
     static bool                 SetObjectRotation                   ( CElement* pElement, const CVector& vecRotation );
     static bool                 SetObjectScale                      ( CElement* pElement, float fScale );
-    static bool                 MoveObject                          ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation );
+    static bool                 MoveObject                          ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
     static bool                 StopObject                          ( CElement* pElement );
 
     // Radar area create/destroy funcs

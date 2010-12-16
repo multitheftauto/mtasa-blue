@@ -952,6 +952,8 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility vector math functions
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints2D", CLuaFunctionDefs::GetDistanceBetweenPoints2D );
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints3D", CLuaFunctionDefs::GetDistanceBetweenPoints3D );
+    CLuaCFunctions::AddFunction ( "getEasingValue", CLuaFunctionDefs::GetEasingValue );
+    CLuaCFunctions::AddFunction ( "interpolateBetween", CLuaFunctionDefs::InterpolateBetween );
 
     // Map funcs
     CLuaCFunctions::AddFunction ( "isPlayerMapForced", CLuaFunctionDefs::IsPlayerMapForced );
