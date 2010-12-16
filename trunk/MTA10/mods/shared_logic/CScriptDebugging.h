@@ -51,6 +51,7 @@ private:
     CLuaManager*                    m_pLuaManager;
     unsigned int                    m_uiLogFileLevel;
     FILE*                           m_pLogFile;
+    bool                            m_bTriggeringOnClientDebugMessage;
 };
 
 #endif

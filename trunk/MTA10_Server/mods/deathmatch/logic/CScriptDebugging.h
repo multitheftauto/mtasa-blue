@@ -56,6 +56,7 @@ private:
     unsigned int                    m_uiHtmlLogLevel;
     FILE*                           m_pLogFile;
     list < class CPlayer* >         m_Players;
+    bool                            m_bTriggeringOnDebugMessage;
 };
 
 #endif

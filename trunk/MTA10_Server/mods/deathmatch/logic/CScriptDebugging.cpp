@@ -23,6 +23,7 @@ CScriptDebugging::CScriptDebugging ( CLuaManager* pLuaManager )
     m_uiLogFileLevel = 0;
     m_uiHtmlLogLevel = 0;
     m_pLogFile = NULL;
+    m_bTriggeringOnDebugMessage = false;
 }
 
 
@@ -166,25 +167,32 @@ void CScriptDebugging::LogError ( SString strFile, int iLine, SString strMsg )
 {
     SString strText = SString ( "ERROR: %s:%d: %s", strFile.c_str (), iLine, strMsg.c_str () );
 
-    // Prepare onDebugMessage
-    CLuaArguments Arguments;
-    Arguments.PushString ( strMsg.c_str ( ) );
-    Arguments.PushNumber ( 1 );
+    if ( !m_bTriggeringOnDebugMessage )
+    {
+        m_bTriggeringOnDebugMessage = true;
 
-    // Push the file name (if any)
-    if ( strFile.length ( ) > 0 )
-        Arguments.PushString ( strFile.c_str ( ) );
-    else
-        Arguments.PushNil ( );
+        // Prepare onDebugMessage
+        CLuaArguments Arguments;
+        Arguments.PushString ( strMsg.c_str ( ) );
+        Arguments.PushNumber ( 1 );
 
-    // Push the line (if any)
-    if ( iLine > -1 )
-        Arguments.PushNumber ( iLine );
-    else
-        Arguments.PushNil ( );
-    
-    // Call onDebugMessage
-    g_pGame->GetMapManager ( )->GetRootElement ( )->CallEvent ( "onDebugMessage", Arguments );
+        // Push the file name (if any)
+        if ( strFile.length ( ) > 0 )
+            Arguments.PushString ( strFile.c_str ( ) );
+        else
+            Arguments.PushNil ( );
+
+        // Push the line (if any)
+        if ( iLine > -1 )
+            Arguments.PushNumber ( iLine );
+        else
+            Arguments.PushNil ( );
+        
+        // Call onDebugMessage
+        g_pGame->GetMapManager ( )->GetRootElement ( )->CallEvent ( "onDebugMessage", Arguments );
+
+        m_bTriggeringOnDebugMessage = false;
+    }
 
     // Log it to the file if enough level
     if ( m_uiLogFileLevel >= 1 )
@@ -194,24 +202,6 @@ void CScriptDebugging::LogError ( SString strFile, int iLine, SString strMsg )
 
     // Log to console
     CLogger::LogPrintf( "%s\n", strText.c_str () );
-
-/*    if ( m_uiHtmlLogLevel >= uiMinimumDebugLevel )
-    {
-        if ( luaVM )
-        {
-            CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
-            if ( pLuaMain )
-            {
-                CResourceFile * file = pLuaMain->GetResourceFile();
-                if ( file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML )
-                {
-                    CResourceHTMLItem * html = (CResourceHTMLItem *)file;
-                    html->AppendToPageBuffer ( strText );
-                    html->AppendToPageBuffer ( "<br/>" );
-                }
-            }
-        }
-    }*/
 
     // Tell the players
     Broadcast ( CDebugEchoPacket ( strText, 1, 255, 255, 255 ), 1 );
@@ -313,25 +303,35 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, con
     if ( uiMinimumDebugLevel > 2 )
         strText = SString ( "%s%s", szPrePend, szMessage );
 
-    // Prepare onDebugMessage
-    CLuaArguments Arguments;
-    Arguments.PushString ( strMsg.c_str ( ) );
-    Arguments.PushNumber ( uiMinimumDebugLevel );
+    // Check whether onDebugMessage is currently being triggered
+    if ( !m_bTriggeringOnDebugMessage )
+    {
+        // Make sure the state of onDebugMessage being triggered can be retrieved later
+        m_bTriggeringOnDebugMessage = true;
 
-    // Push the file name (if any)
-    if ( strFile.length ( ) > 0 )
-        Arguments.PushString ( strFile.c_str ( ) );
-    else
-        Arguments.PushNil ( );
+        // Prepare onDebugMessage
+        CLuaArguments Arguments;
+        Arguments.PushString ( strMsg.c_str ( ) );
+        Arguments.PushNumber ( uiMinimumDebugLevel );
 
-    // Push the line (if any)
-    if ( iLine > -1 )
-        Arguments.PushNumber ( iLine );
-    else
-        Arguments.PushNil ( );
-    
-    // Call onDebugMessage
-    g_pGame->GetMapManager ( )->GetRootElement ( )->CallEvent ( "onDebugMessage", Arguments );
+        // Push the file name (if any)
+        if ( strFile.length ( ) > 0 )
+            Arguments.PushString ( strFile.c_str ( ) );
+        else
+            Arguments.PushNil ( );
+
+        // Push the line (if any)
+        if ( iLine > -1 )
+            Arguments.PushNumber ( iLine );
+        else
+            Arguments.PushNil ( );
+        
+        // Call onDebugMessage
+        g_pGame->GetMapManager ( )->GetRootElement ( )->CallEvent ( "onDebugMessage", Arguments );
+
+        // Reset trigger state, so onDebugMessage can be called again at a later moment
+        m_bTriggeringOnDebugMessage = false;
+    }
 
     // Log it to the file if enough level
     if ( m_uiLogFileLevel >= uiMinimumDebugLevel )
@@ -342,6 +342,7 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State * luaVM, con
     // Log to console
     CLogger::LogPrintf( "%s\n", strText.c_str () );
 
+    // Not sure what this is for, seems pretty useless
     if ( m_uiHtmlLogLevel >= uiMinimumDebugLevel )
     {
         if ( luaVM )
