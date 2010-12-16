@@ -22,6 +22,7 @@ CScriptDebugging::CScriptDebugging ( CLuaManager* pLuaManager )
     m_pLuaManager = pLuaManager;
     m_uiLogFileLevel = 0;
     m_pLogFile = NULL;
+    m_bTriggeringOnClientDebugMessage = false;
 }
 
 #if 0   // Currently unused
@@ -106,25 +107,32 @@ void CScriptDebugging::LogError ( SString strFile, int iLine, SString strMsg )
 {
     SString strText = SString ( "ERROR: %s:%d: %s", strFile.c_str (), iLine, strMsg.c_str () );
 
-    // Prepare onDebugMessage
-    CLuaArguments Arguments;
-    Arguments.PushString ( strMsg.c_str ( ) );
-    Arguments.PushNumber ( 1 );
+    if ( !m_bTriggeringOnClientDebugMessage )
+    {
+        m_bTriggeringOnClientDebugMessage = true;
 
-    // Push the file name (if any)
-    if ( strFile.length ( ) > 0 )
-        Arguments.PushString ( strFile.c_str ( ) );
-    else
-        Arguments.PushNil ( );
+        // Prepare onDebugMessage
+        CLuaArguments Arguments;
+        Arguments.PushString ( strMsg.c_str ( ) );
+        Arguments.PushNumber ( 1 );
 
-    // Push the line (if any)
-    if ( iLine > -1 )
-        Arguments.PushNumber ( iLine );
-    else
-        Arguments.PushNil ( );
-    
-    // Call onDebugMessage
-    g_pClientGame->GetRootEntity ( )->CallEvent ( "onClientDebugMessage", Arguments, false );
+        // Push the file name (if any)
+        if ( strFile.length ( ) > 0 )
+            Arguments.PushString ( strFile.c_str ( ) );
+        else
+            Arguments.PushNil ( );
+
+        // Push the line (if any)
+        if ( iLine > -1 )
+            Arguments.PushNumber ( iLine );
+        else
+            Arguments.PushNil ( );
+        
+        // Call onDebugMessage
+        g_pClientGame->GetRootEntity ( )->CallEvent ( "onClientDebugMessage", Arguments, false );
+
+        m_bTriggeringOnClientDebugMessage = false;
+    }
 
     // Log it to the file if enough level
     if ( m_uiLogFileLevel >= 1 )
@@ -239,25 +247,32 @@ void CScriptDebugging::LogString ( const char* szPrePend, lua_State* luaVM, cons
     if ( uiMinimumDebugLevel > 2 )
         strText = SString ( "%s%s", szPrePend, szMessage );
 
-    // Prepare onClientDebugMessage
-    CLuaArguments Arguments;
-    Arguments.PushString ( strMsg.c_str ( ) );
-    Arguments.PushNumber ( uiMinimumDebugLevel );
+    if ( !m_bTriggeringOnClientDebugMessage )
+    {
+        m_bTriggeringOnClientDebugMessage = true;
 
-    // Push the file name (if any)
-    if ( strFile.length ( ) > 0 )
-        Arguments.PushString ( strFile.c_str ( ) );
-    else
-        Arguments.PushNil ( );
+        // Prepare onClientDebugMessage
+        CLuaArguments Arguments;
+        Arguments.PushString ( strMsg.c_str ( ) );
+        Arguments.PushNumber ( uiMinimumDebugLevel );
 
-    // Push the line (if any)
-    if ( iLine > -1 )
-        Arguments.PushNumber ( iLine );
-    else
-        Arguments.PushNil ( );
-    
-    // Call onClientDebugMessage
-    g_pClientGame->GetRootEntity ( )->CallEvent ( "onClientDebugMessage", Arguments, false );
+        // Push the file name (if any)
+        if ( strFile.length ( ) > 0 )
+            Arguments.PushString ( strFile.c_str ( ) );
+        else
+            Arguments.PushNil ( );
+
+        // Push the line (if any)
+        if ( iLine > -1 )
+            Arguments.PushNumber ( iLine );
+        else
+            Arguments.PushNil ( );
+        
+        // Call onClientDebugMessage
+        g_pClientGame->GetRootEntity ( )->CallEvent ( "onClientDebugMessage", Arguments, false );
+
+        m_bTriggeringOnClientDebugMessage = false;
+    }
 
     // Log it to the file if enough level
     if ( m_uiLogFileLevel >= uiMinimumDebugLevel )
