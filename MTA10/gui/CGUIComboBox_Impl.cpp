@@ -191,9 +191,10 @@ bool CGUIComboBox_Impl::SetSelectedItemByIndex ( int index )
     {
         reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> clearAllSelections( );
 
-        if( index == 0 )
+        if( index == -1 )
         {
             m_pWindow->setText ( storedCaption );
+            return true;
         }
         else
         {
