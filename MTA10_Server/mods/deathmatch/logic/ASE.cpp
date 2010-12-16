@@ -298,6 +298,10 @@ std::string ASE::QueryXfireLight ( void )
 {
     std::stringstream reply;
 
+    int iJoinedPlayers = m_pPlayerManager->CountJoined ();
+    int iMaxPlayers = m_pMainConfig->GetMaxPlayers ();
+    SString strPlayerCount = SString ( "%d/%d", iJoinedPlayers, iMaxPlayers );
+
     reply << "EYE3";
     // game
     reply << ( unsigned char ) 4;
@@ -308,9 +312,11 @@ std::string ASE::QueryXfireLight ( void )
     // game type
     reply << ( unsigned char ) ( m_strGameType.length() + 1 );
     reply << m_strGameType;
-    // map name
-    reply << ( unsigned char ) ( m_strMapName.length() + 1 );
+    // map name with backwardly compatible large player count
+    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 );
     reply << m_strMapName;
+    reply << ( unsigned char ) 0;
+    reply << strPlayerCount;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
     reply << ( unsigned char ) ( temp.length() + 1 );
@@ -318,11 +324,9 @@ std::string ASE::QueryXfireLight ( void )
     // passworded
     reply << ( unsigned char ) ( ( m_pMainConfig->HasPassword () ) ? 1 : 0 );
     // players count
-    unsigned short usJoined = htons ( m_pPlayerManager->CountJoined () );
-    reply << (unsigned char)(usJoined & 0xFF) << (unsigned char)((usJoined >> 8) & 0xFF);
+    reply << ( unsigned char ) Min ( iJoinedPlayers, 255 );
     // players max
-    unsigned short usMax = htons ( m_pMainConfig->GetMaxPlayers () );
-    reply << (unsigned char)(usMax & 0xFF) << (unsigned char)((usMax >> 8) & 0xFF);
+    reply << ( unsigned char ) Min ( iMaxPlayers, 255 );
 
     return reply.str();
 }
@@ -348,6 +352,10 @@ std::string ASE::QueryLight ( void )
 {
     std::stringstream reply;
 
+    int iJoinedPlayers = m_pPlayerManager->CountJoined ();
+    int iMaxPlayers = m_pMainConfig->GetMaxPlayers ();
+    SString strPlayerCount = SString ( "%d/%d", iJoinedPlayers, iMaxPlayers );
+
     reply << "EYE2";
     // game
     reply << ( unsigned char ) 4;
@@ -361,9 +369,11 @@ std::string ASE::QueryLight ( void )
     // game type
     reply << ( unsigned char ) ( m_strGameType.length() + 1 );
     reply << m_strGameType;
-    // map name
-    reply << ( unsigned char ) ( m_strMapName.length() + 1 );
+    // map name with backwardly compatible large player count
+    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 );
     reply << m_strMapName;
+    reply << ( unsigned char ) 0;
+    reply << strPlayerCount;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
     reply << ( unsigned char ) ( temp.length() + 1 );
@@ -373,11 +383,9 @@ std::string ASE::QueryLight ( void )
     // serial verification?
     reply << ( unsigned char ) ( ( m_pMainConfig->GetSerialVerificationEnabled() ) ? 1 : 0 );
     // players count
-    unsigned short usJoined = htons ( m_pPlayerManager->CountJoined () );
-    reply << (unsigned char)(usJoined & 0xFF) << (unsigned char)((usJoined >> 8) & 0xFF);
+    reply << ( unsigned char ) Min ( iJoinedPlayers, 255 );
     // players max
-    unsigned short usMax = htons ( m_pMainConfig->GetMaxPlayers () );
-    reply << (unsigned char)(usMax & 0xFF) << (unsigned char)((usMax >> 8) & 0xFF);
+    reply << ( unsigned char ) Min ( iMaxPlayers, 255 );
 
     // players
     CPlayer* pPlayer = NULL;

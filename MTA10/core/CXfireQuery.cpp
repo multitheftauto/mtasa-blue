@@ -66,19 +66,19 @@ bool CXfireServerInfo::ParseQuery ( const char * szBuffer, unsigned int nLength 
     }
 
     bPassworded = ( szBuffer[i++] == 1 );
+    nPlayers = (unsigned char)szBuffer[i++];
+    nMaxPlayers = (unsigned char)szBuffer[i++];
 
-    bool bUseChars = atof(strVersion) <= 1.0f || strVersion[strVersion.length() - 1] == 'n';
-    if ( bUseChars )
+    // Recover large player count if present
+    SString strPlayerCount = strMap.Right ( strMap.length () - strlen ( strMap ) - 1 );
+    if ( !strPlayerCount.empty () )
     {
-        nPlayers = (unsigned char)szBuffer[i++];
-        nMaxPlayers = (unsigned char)szBuffer[i++];
-    }
-    else
-    {
-        nPlayers = ntohs ( *(unsigned short *)&szBuffer[i] );
-        i += 2;
-        nMaxPlayers = ntohs ( *(unsigned short *)&szBuffer[i] );
-        i += 2;
+        SString strJoinedPlayers, strMaxPlayers;
+        if ( strPlayerCount.Split ( "/", &strJoinedPlayers, &strMaxPlayers ) )
+        {
+            nPlayers = atoi ( strJoinedPlayers );
+            nMaxPlayers = atoi ( strMaxPlayers );
+        }
     }
 
     return true;
