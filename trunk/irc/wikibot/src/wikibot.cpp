@@ -394,6 +394,7 @@ void WikiBot::OnWikiRequest(const IRCUser* source, const std::string& channel, c
   info->bot = this;
 
   pthread_create(&info->thread, 0, WikiRequest_Thread, info);
+  pthread_detach(info->thread);
 }
 
 void* WikiBot::WikiRequest_Thread ( void* _info )
@@ -499,7 +500,6 @@ void WikiBot::WikiRequest(const std::string& source, const std::string& channel,
   HTTPClient http(m_config.data.wiki.address, m_httpWikiAddr, m_httpWikiBindAddr, m_config.data.wiki.ssl);
 
   std::string path ( m_config.data.wiki.path );
-  path.append ( "?title=" );
   std::string funcName_ ( funcName );
   funcName_[0] = toupper(funcName_[0]);
   path.append ( funcName_ );
@@ -511,6 +511,15 @@ void WikiBot::WikiRequest(const std::string& source, const std::string& channel,
   fullPath.append ( path );
 
   if (!http.Ok()) return;
+
+  if (http.ResponseStatus() == 404)
+  {
+    SendChannel(IRCText("%B%s%B: '%s' not found. Try using the search page: "
+                        "http://%s%s?search=%s&go=Go",
+                        source.c_str(), funcName.c_str(), m_config.data.wiki.address,
+                        m_config.data.wiki.path, funcName.c_str()), channel.c_str());
+    return;
+  }
 
   if (http.ResponseStatus() != 200)
   {
