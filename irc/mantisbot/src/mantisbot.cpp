@@ -361,6 +361,7 @@ bool MantisBot::Run()
       }
 
       pthread_create(&mantisThread, 0, CheckForChanges_thread, this);
+	  pthread_detach(mantisThread);
       m_selector.SetTimeout(updatedelay * 1000);
     }
     else
