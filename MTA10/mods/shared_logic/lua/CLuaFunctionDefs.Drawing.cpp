@@ -593,9 +593,9 @@ int CLuaFunctionDefs::LoadFont ( lua_State* luaVM )
                     bool bBold = false;
                     unsigned int uiSize = 9;
                     if ( lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
-                        bBold = lua_toboolean ( luaVM, 2 );
+                        bBold = lua_toboolean ( luaVM, 2 ) ? true : false;
                     if ( lua_istype ( luaVM, 3, LUA_TNUMBER ) )
-                        uiSize = lua_tonumber ( luaVM, 3 );
+                        uiSize = static_cast < uint > ( lua_tonumber ( luaVM, 3 ) );
 
                     bResult = CStaticFunctionDefinitions::LoadFont ( strPath, bBold, uiSize, strMetaPath, pResource );
                 }

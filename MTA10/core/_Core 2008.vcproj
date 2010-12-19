@@ -289,7 +289,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib"
-				OutputFile="..\..\output\MTA San Andreas 1.1\mta\core.dll"
+				OutputFile="..\..\output\MTA San Andreas\mta\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"

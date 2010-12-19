@@ -109,7 +109,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\..\libcurl.dll &quot;..\..\..\output\MTA San Andreas 1.1\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurl.dll &quot;..\..\..\output\MTA San Andreas 1.1\server\&quot;"
+				CommandLine="xcopy /y ..\..\libcurl.dll &quot;..\..\..\output\MTA San Andreas\MTA\&quot; &amp;&amp; xcopy /y ..\..\libcurl.dll &quot;..\..\..\output\MTA San Andreas\server\&quot;"
 			/>
 		</Configuration>
 		<Configuration

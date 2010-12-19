@@ -286,7 +286,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\..\output\MTA San Andreas 1.1\mta\game_sa.dll"
+				OutputFile="..\..\output\MTA San Andreas\mta\game_sa.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"

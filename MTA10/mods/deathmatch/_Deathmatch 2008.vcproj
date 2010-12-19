@@ -264,7 +264,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/FIXED:NO"
 				AdditionalDependencies="libv2.lib lua5.1.lib bass.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib_2008.lib"
-				OutputFile="..\..\..\output\MTA San Andreas 1.1\mods\deathmatch\client.dll"
+				OutputFile="..\..\..\output\MTA San Andreas\mods\deathmatch\client.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../vendor/bass/lib;../../../vendor/lua/lib;../../../vendor/libv2/lib;../../../vendor/zlib/lib"

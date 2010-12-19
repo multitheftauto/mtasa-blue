@@ -231,7 +231,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\..\output\MTA San Andreas 1.1\server\MTA Server.exe"
+				OutputFile="..\..\output\MTA San Andreas\server\MTA Server.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
