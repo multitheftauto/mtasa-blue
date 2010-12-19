@@ -113,6 +113,10 @@ public:
     virtual void                    InitiateUpdate                  ( const char* szType, const char* szData, const char* szHost ) = 0;
     virtual bool                    IsOptionalUpdateInfoRequired    ( const char* szHost ) = 0;
     virtual void                    InitiateDataFilesFix            ( void ) = 0;
+
+    virtual uint                    GetFrameRateLimit               ( void ) = 0;
+    virtual void                    SetFrameRateLimit               ( uint uiFrameRateLimit ) = 0;
+    virtual void                    ApplyFrameRateLimit             ( void ) = 0;
 };
 
 #endif

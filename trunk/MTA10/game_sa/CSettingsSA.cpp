@@ -22,16 +22,7 @@ unsigned long CSettingsSA::FUNC_SetDrawDistance;
 CSettingsSA::CSettingsSA ( void )
 {
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
-}
-
-bool CSettingsSA::IsFrameLimiterEnabled ( void )
-{
-    return m_pInterface->bFrameLimiter;
-}
-
-void CSettingsSA::SetFrameLimiterEnabled ( bool bEnabled )
-{
-    m_pInterface->bFrameLimiter = bEnabled;
+    m_pInterface->bFrameLimiter = false;
 }
 
 bool CSettingsSA::IsWideScreenEnabled ( void )

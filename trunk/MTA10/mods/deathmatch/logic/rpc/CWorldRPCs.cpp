@@ -182,12 +182,10 @@ void CWorldRPCs::SetFPSLimit ( NetBitStreamInterface& bitStream )
     int iVal;
     g_pCore->GetCVars ()->Get ( "fps_limit", iVal );
 
-    if ( iVal > sFPSLimit )
-        // For some reason it needs that kind of hacky precision
-        g_pGame->SetFramelimiter ( (unsigned long) ( (float)sFPSLimit * 1.333f ) );
+    if ( sFPSLimit > 0 && iVal > sFPSLimit || iVal == 0 )
+        g_pCore->SetFrameRateLimit ( sFPSLimit );
     else
-        g_pGame->SetFramelimiter ( (unsigned long) ( (float)iVal * 1.3f ) );
-
+        g_pCore->SetFrameRateLimit ( iVal );
 }
 
 void CWorldRPCs::SetGarageOpen ( NetBitStreamInterface& bitStream )

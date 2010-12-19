@@ -192,6 +192,11 @@ CCore::CCore ( void )
     //Create our current server and set the update time to zero
     m_pCurrentServer = new CXfireServerInfo();
     m_tXfireUpdate = 0;
+
+    // No initial fps limit
+    m_uiFrameRateLimit = 0;
+    m_dLastTimeMs = 0;
+    m_dPrevOverrun = 0;
 }
 
 CCore::~CCore ( void )
@@ -1772,4 +1777,44 @@ void CCore::ApplyLoadingCrashPatch ( void )
             }
         }
     }
+}
+
+
+//
+// Do FPS limiting
+//
+void CCore::ApplyFrameRateLimit ( void )
+{
+    if ( m_uiFrameRateLimit < 1 )
+        return;
+
+    // Calc required time in ms between frames
+    const double dTargetTimeToUse = 1000.0 / m_uiFrameRateLimit;
+
+    // Get actual time in ms since last frame
+    double dTimeUsed = CClientTime::GetTimeNano() * 1000.0 - m_dLastTimeMs;
+
+    if ( dTimeUsed < dTargetTimeToUse )
+    {
+        // Frame has spare time
+        double dSpare = dTargetTimeToUse - dTimeUsed;
+
+        // Take away any overrun from the previous frame
+        dSpare -= m_dPrevOverrun;
+        m_dPrevOverrun = 0;
+
+        // Use up remaining spare time
+        if ( dSpare > 0 )
+        {
+            dSpare = Min < double > ( dSpare, 100 );
+            Sleep( (DWORD)dSpare );
+        }
+    }
+    else
+    {
+        // Frame has overrun
+        m_dPrevOverrun = Min < double > ( dTimeUsed - dTargetTimeToUse, dTargetTimeToUse / 2 );
+    }
+
+    m_dLastTimeMs = CClientTime::GetTimeNano() * 1000.0;
 }
