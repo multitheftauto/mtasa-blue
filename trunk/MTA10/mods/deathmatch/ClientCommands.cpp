@@ -35,7 +35,7 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
     // Has the core already handled this command?
     if ( !bHandled )
     {
-        char szBuffer [256];
+        //char szBuffer [256];
         CLuaArguments Arguments;
 
         const char* szCommandBufferPointer = szCommand;

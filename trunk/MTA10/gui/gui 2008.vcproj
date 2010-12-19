@@ -254,7 +254,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib d3dx9.lib dxerr.lib CEGUIBase_2008.lib DirectX9GUIRenderer_2008.lib CEGUIFalagardBase_2008.lib freetype2110.lib"
-				OutputFile="..\..\output\MTA San Andreas 1.1\mta\cgui.dll"
+				OutputFile="..\..\output\MTA San Andreas\mta\cgui.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../vendor/cegui-0.4.0-custom/lib"

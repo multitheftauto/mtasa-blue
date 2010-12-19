@@ -1480,7 +1480,7 @@ int CLuaFunctionDefs::SetRainLevel ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        g_pGame->GetWeather ()->SetAmountOfRain ( lua_tonumber ( luaVM, 1 ) );
+        g_pGame->GetWeather ()->SetAmountOfRain ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -1508,7 +1508,7 @@ int CLuaFunctionDefs::SetFogDistance ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        g_pGame->GetWorld ()->SetFogDistance ( lua_tonumber ( luaVM, 1 ) );
+        g_pGame->GetWorld ()->SetFogDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;

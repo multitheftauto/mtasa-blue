@@ -280,7 +280,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="..\..\output\MTA San Andreas 1.1\Multi Theft Auto.exe"
+				OutputFile="..\..\output\MTA San Andreas\Multi Theft Auto.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
