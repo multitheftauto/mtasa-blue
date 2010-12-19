@@ -3151,13 +3151,6 @@ void CClientGame::Event_OnIngame ( void )
     // Unpause the game
     g_pGame->Pause ( false );
 
-    // Make sure the framelimiter is enabled
-    CGameSettings* pSettings = g_pGame->GetSettings ();
-    //if ( !pSettings->IsFrameLimiterEnabled () ) ChrML: Disabled this because it gives people with fast computers an advantage
-    {
-        pSettings->SetFrameLimiterEnabled ( true );
-    }
-
     // Disable parts of the Hud
     CHud* pHud = g_pGame->GetHud ();
     pHud->DisableHelpText ( true );
@@ -3181,9 +3174,6 @@ void CClientGame::Event_OnIngame ( void )
     // Stop us getting 4 stars if we visit the SF or LV
     //g_pGame->GetPlayerInfo()->GetWanted()->SetMaximumWantedLevel ( 0 );
     g_pGame->GetPlayerInfo()->GetWanted()->SetWantedLevel ( 0 );  
-
-    // Set the FPS limit
-    g_pGame->SetFramelimiter ( 60 );    // about 40fps
 
     // Reset anything from last game
     ResetMapInfo ();

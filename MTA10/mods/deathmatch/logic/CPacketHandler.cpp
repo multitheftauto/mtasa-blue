@@ -1965,17 +1965,16 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     unsigned short usFPSLimit = 36;
     bitStream.ReadCompressed ( usFPSLimit );
 
-    unsigned int iVal;
-    g_pCore->GetCVars ()->Get ( "fps_limit", iVal );
+    unsigned int uiVal;
+    g_pCore->GetCVars ()->Get ( "fps_limit", uiVal );
 
-    if ( iVal > ( unsigned long ) usFPSLimit )
+    if ( usFPSLimit > 0 && uiVal > usFPSLimit || uiVal == 0 )
     {
-        // For some reason it needs that kind of hacky precision
-        g_pGame->SetFramelimiter ( (unsigned long) ( (float)usFPSLimit * 1.333f ) );
+        g_pCore->SetFrameRateLimit ( usFPSLimit );
     }
     else
     {
-        g_pGame->SetFramelimiter ( (unsigned long) ( (float)iVal * 1.3f ) );
+        g_pCore->SetFrameRateLimit ( uiVal );
     }
 
 

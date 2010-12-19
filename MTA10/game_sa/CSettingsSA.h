@@ -82,8 +82,6 @@ private:
 public:
                             CSettingsSA                 ( void );
 
-    bool                    IsFrameLimiterEnabled       ( void );
-    void                    SetFrameLimiterEnabled      ( bool bEnabled );
     bool                    IsWideScreenEnabled         ( void );
     void                    SetWideScreenEnabled        ( bool bEnabled );
     unsigned int            GetNumVideoModes            ( void );

@@ -492,26 +492,6 @@ void CGameSA::SetTimeScale ( float fTimeScale )
 }
 
 
-unsigned long CGameSA::GetFramelimiter ( void )
-{
-    return *VAR_Framelimiter;
-}
-
-
-void CGameSA::SetFramelimiter ( unsigned long ulFramelimiter )
-{
-    if ( ulFramelimiter == 0 )
-    {
-        m_pSettings->SetFrameLimiterEnabled ( false );
-    }
-    else
-    {
-        m_pSettings->SetFrameLimiterEnabled ( true );
-        *VAR_Framelimiter = ulFramelimiter;
-    }
-}
-
-
 unsigned char CGameSA::GetBlurLevel ( void )
 {
     return * ( unsigned char * ) 0x8D5104;
