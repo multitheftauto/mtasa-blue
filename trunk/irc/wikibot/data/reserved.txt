@@ -26,3 +26,6 @@ team
 acl
 aclgroup
 ifp
+ban
+textdisplay
+textitem
