@@ -199,10 +199,11 @@ bool WikiBot::Initialize(int argc, char* argv[], char* environment[])
 {
   /* Read command-line options */
   static struct option long_options[] = {
-    { "conffile", true,   0,  'f' },
-    { "help",     false,  0,  'h' },
-    { "verbose",  false,  0,  'v' },
-    { 0,          0,      0,   0  },
+    { "conffile",       true,   0,  'f' },
+    { "help",           false,  0,  'h' },
+    { "verbose",        false,  0,  'v' },
+    { "reservedfile",   true,   0,  'r' },
+    { 0,                0,      0,   0  },
   };
   int option_index = 0;
   int getopt_retval = 0;
@@ -212,7 +213,7 @@ bool WikiBot::Initialize(int argc, char* argv[], char* environment[])
 
   while (1)
   {
-    getopt_retval = getopt_long(argc, argv, "f:hv", long_options, &option_index);
+    getopt_retval = getopt_long(argc, argv, "f:hvr", long_options, &option_index);
     if (getopt_retval == -1)
     {
       break;
@@ -234,6 +235,11 @@ bool WikiBot::Initialize(int argc, char* argv[], char* environment[])
       case 'v':
       {
         m_daemonize = false;
+        break;
+      }
+      case 'r':
+      {
+        setReservedWordsPath ( optarg );
         break;
       }
     }
@@ -405,92 +411,6 @@ void* WikiBot::WikiRequest_Thread ( void* _info )
   return 0;
 }
 
-static inline void ColorizeSyntax ( std::string& syntax )
-{
-  size_t p = 0;
-  size_t p2;
-
-  /* First colorize brackets and parenthesis */
-  const char flowChars [] = { '[', ']', '(', ')', 0 };
-  size_t charPos;
-
-  while ( 1 )
-  {
-    charPos = std::string::npos;
-
-    for ( unsigned int i = 0; flowChars[i] != 0; ++i )
-    {
-      p2 = syntax.find ( flowChars[i], p );
-      if ( p2 != std::string::npos )
-      {
-        if ( charPos == std::string::npos || p2 < charPos )
-          charPos = p2;
-      }
-    }
-
-    if ( charPos == std::string::npos )
-      break;
-
-    syntax = syntax.substr(0, charPos) + "\002" + syntax[charPos] + "\002" + syntax.substr(charPos+1);;
-    p = charPos + 3;
-  }
-
-  /* Colorize types */
-  unsigned int typeFound;
-  size_t typePos;
-
-  const char* types[] = { "int", "float", "bool", "function", "string",
-                          "vehicle", "ped", "player", "colshape", "marker",
-                          "pickup", "blip", "radararea", "projectile", "txd",
-                          "dff", "col", "sound", "resource", "xmlnode",
-                          "timer", "file", "gui-element", "element", "team",
-                          0 };
-
-  p = 0;
-  while ( 1 )
-  {
-    typePos = std::string::npos;
-
-    for ( unsigned int i = 0; types[i] != 0; ++i )
-    {
-      p2 = syntax.find ( types[i], p );
-      if ( p2 != std::string::npos )
-      {
-        if ( typePos == std::string::npos || p2 < typePos )
-        {
-          typeFound = i;
-          typePos = p2;
-        }
-      }
-    }
-
-    if ( typePos == std::string::npos )
-      break;
-
-    size_t typeLength = strlen ( types [ typeFound ] );
-    syntax = syntax.substr(0, typePos) + "\002\00303" + types [ typeFound ] + "\003\002" + syntax.substr(typePos + typeLength);
-
-    p = typePos + typeLength + 6;
-
-    /* Find the next delimiter */
-    const char delimiters [] = { '(', ',', ')', 0 };
-    size_t delimiterPos = std::string::npos;
-
-    for ( unsigned int i = 0; delimiters[i] != 0; ++i )
-    {
-      p2 = syntax.find ( delimiters[i], p );
-      if ( p2 != std::string::npos )
-      {
-        if ( delimiterPos == std::string::npos || p2 < delimiterPos )
-          delimiterPos = p2;
-      }
-    }
-
-    if ( delimiterPos != std::string::npos )
-      p = delimiterPos + 1;
-  }
-}
-
 void WikiBot::WikiRequest(const std::string& source, const std::string& channel, const std::string& funcName)
 {
   char tmp[HTTP_BUFFER_SIZE];
@@ -586,11 +506,12 @@ void WikiBot::WikiRequest(const std::string& source, const std::string& channel,
           if ( p2 != std::string::npos )
           {
             std::string clientSyntax = buffer.substr ( client + 31, p2 - client - 31 );
+            char colorizedSyntax [ 1024 ];
 
-            ColorizeSyntax ( serverSyntax );
-            ColorizeSyntax ( clientSyntax );
-            SendChannel(IRCText("%B%C07Server%C:%B %s", serverSyntax.c_str()), channel.c_str());
-            SendChannel(IRCText("%B%C04Client%C:%B %s", clientSyntax.c_str()), channel.c_str());
+            colorizeSyntax ( serverSyntax.c_str(), colorizedSyntax, sizeof(colorizedSyntax) );
+            SendChannel(IRCText("%B%C07Server%C:%B %s", colorizedSyntax), channel.c_str());
+            colorizeSyntax ( clientSyntax.c_str(), colorizedSyntax, sizeof(colorizedSyntax) );
+            SendChannel(IRCText("%B%C04Client%C:%B %s", colorizedSyntax), channel.c_str());
           }
         }
       }
@@ -602,16 +523,17 @@ void WikiBot::WikiRequest(const std::string& source, const std::string& channel,
       if ( p2 != std::string::npos )
       {
         std::string syntax = buffer.substr ( def + 31, p2 - def - 31 );
-        ColorizeSyntax ( syntax );
+        char colorizedSyntax [ 1024 ];
+        colorizeSyntax ( syntax.c_str(), colorizedSyntax, sizeof(colorizedSyntax) );
 
         if ( isServer && isClient )
-          SendChannel(IRCText("%B%C07Server%C/%C04Client%C:%B %s", syntax.c_str()), channel.c_str());
+          SendChannel(IRCText("%B%C07Server%C/%C04Client%C:%B %s", colorizedSyntax), channel.c_str());
         else if ( isServer )
-          SendChannel(IRCText("%B%C07Server%C:%B %s", syntax.c_str()), channel.c_str());
+          SendChannel(IRCText("%B%C07Server%C:%B %s", colorizedSyntax), channel.c_str());
         else if ( isClient )
-          SendChannel(IRCText("%B%C04Client%C:%B %s", syntax.c_str()), channel.c_str());
+          SendChannel(IRCText("%B%C04Client%C:%B %s", colorizedSyntax), channel.c_str());
         else
-          SendChannel(IRCText("%BSyntax:%B %s", syntax.c_str()), channel.c_str());
+          SendChannel(IRCText("%BSyntax:%B %s", colorizedSyntax), channel.c_str());
       }
     }
   }
@@ -633,8 +555,10 @@ void WikiBot::WikiRequest(const std::string& source, const std::string& channel,
       p2 = buffer.find("|", def + 31 );
       if ( p2 != std::string::npos )
       {
+        char colorizedSyntax [ 1024 ];
         params = buffer.substr ( def + 31, p2 - def - 31 );
-        ColorizeSyntax ( params );
+        colorizeSyntax ( params.c_str(), colorizedSyntax, sizeof(colorizedSyntax) );
+        params.assign ( colorizedSyntax );
       }
     }
 

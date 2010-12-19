@@ -696,6 +696,9 @@ ac_ct_CXX
 CXXDEPMODE
 am__fastdepCXX_TRUE
 am__fastdepCXX_FALSE
+LEX
+LEX_OUTPUT_ROOT
+LEXLIB
 CPP
 GREP
 EGREP
@@ -2221,7 +2224,7 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 ac_config_headers="$ac_config_headers config.h"
 
-ac_config_files="$ac_config_files Makefile src/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile data/Makefile"
 
 
 # Checks for programs.
@@ -3787,10 +3790,219 @@ fi
 
 
 
+for ac_prog in flex lex
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_LEX+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$LEX"; then
+  ac_cv_prog_LEX="$LEX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_LEX="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+LEX=$ac_cv_prog_LEX
+if test -n "$LEX"; then
+  { echo "$as_me:$LINENO: result: $LEX" >&5
+echo "${ECHO_T}$LEX" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$LEX" && break
+done
+test -n "$LEX" || LEX=":"
+
+if test "x$LEX" != "x:"; then
+  cat >conftest.l <<_ACEOF
+%%
+a { ECHO; }
+b { REJECT; }
+c { yymore (); }
+d { yyless (1); }
+e { yyless (input () != 0); }
+f { unput (yytext[0]); }
+. { BEGIN INITIAL; }
+%%
+#ifdef YYTEXT_POINTER
+extern char *yytext;
+#endif
+int
+main (void)
+{
+  return ! yylex () + ! yywrap ();
+}
+_ACEOF
+{ (ac_try="$LEX conftest.l"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$LEX conftest.l") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
+{ echo "$as_me:$LINENO: checking lex output file root" >&5
+echo $ECHO_N "checking lex output file root... $ECHO_C" >&6; }
+if test "${ac_cv_prog_lex_root+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+if test -f lex.yy.c; then
+  ac_cv_prog_lex_root=lex.yy
+elif test -f lexyy.c; then
+  ac_cv_prog_lex_root=lexyy
+else
+  { { echo "$as_me:$LINENO: error: cannot find output from $LEX; giving up" >&5
+echo "$as_me: error: cannot find output from $LEX; giving up" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_prog_lex_root" >&5
+echo "${ECHO_T}$ac_cv_prog_lex_root" >&6; }
+LEX_OUTPUT_ROOT=$ac_cv_prog_lex_root
+
+if test -z "${LEXLIB+set}"; then
+  { echo "$as_me:$LINENO: checking lex library" >&5
+echo $ECHO_N "checking lex library... $ECHO_C" >&6; }
+if test "${ac_cv_lib_lex+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+    ac_save_LIBS=$LIBS
+    ac_cv_lib_lex='none needed'
+    for ac_lib in '' -lfl -ll; do
+      LIBS="$ac_lib $ac_save_LIBS"
+      cat >conftest.$ac_ext <<_ACEOF
+`cat $LEX_OUTPUT_ROOT.c`
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_lex=$ac_lib
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+      test "$ac_cv_lib_lex" != 'none needed' && break
+    done
+    LIBS=$ac_save_LIBS
+
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_lex" >&5
+echo "${ECHO_T}$ac_cv_lib_lex" >&6; }
+  test "$ac_cv_lib_lex" != 'none needed' && LEXLIB=$ac_cv_lib_lex
+fi
+
+
+{ echo "$as_me:$LINENO: checking whether yytext is a pointer" >&5
+echo $ECHO_N "checking whether yytext is a pointer... $ECHO_C" >&6; }
+if test "${ac_cv_prog_lex_yytext_pointer+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  # POSIX says lex can declare yytext either as a pointer or an array; the
+# default is implementation-dependent.  Figure out which it is, since
+# not all implementations provide the %pointer and %array declarations.
+ac_cv_prog_lex_yytext_pointer=no
+ac_save_LIBS=$LIBS
+LIBS="$LEXLIB $ac_save_LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#define YYTEXT_POINTER 1
+`cat $LEX_OUTPUT_ROOT.c`
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_prog_lex_yytext_pointer=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_save_LIBS
+
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_prog_lex_yytext_pointer" >&5
+echo "${ECHO_T}$ac_cv_prog_lex_yytext_pointer" >&6; }
+if test $ac_cv_prog_lex_yytext_pointer = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define YYTEXT_POINTER 1
+_ACEOF
+
+fi
+rm -f conftest.l $LEX_OUTPUT_ROOT.c
+
+fi
+case $LEX in
+:) { { echo "$as_me:$LINENO: error: No lex program found" >&5
+echo "$as_me: error: No lex program found" >&2;}
+   { (exit 1); exit 1; }; };;
+esac
+
 # Checks for libraries.
 
 # Checks for header files.
-
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5493,6 +5705,7 @@ do
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "data/Makefile") CONFIG_FILES="$CONFIG_FILES data/Makefile" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
@@ -5637,6 +5850,9 @@ ac_ct_CXX!$ac_ct_CXX$ac_delim
 CXXDEPMODE!$CXXDEPMODE$ac_delim
 am__fastdepCXX_TRUE!$am__fastdepCXX_TRUE$ac_delim
 am__fastdepCXX_FALSE!$am__fastdepCXX_FALSE$ac_delim
+LEX!$LEX$ac_delim
+LEX_OUTPUT_ROOT!$LEX_OUTPUT_ROOT$ac_delim
+LEXLIB!$LEXLIB$ac_delim
 CPP!$CPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
@@ -5644,7 +5860,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 86; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 89; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
