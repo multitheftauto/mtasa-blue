@@ -47,6 +47,9 @@ public:
     virtual void        GetSunColor                 ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue ) = 0;
     virtual void        SetSunColor                 ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue ) = 0;
     virtual void        ResetSunColor               ( ) = 0;
+    virtual float       GetSunSize                  ( ) = 0;
+    virtual void        SetSunSize                  ( float fSize ) = 0;
+    virtual void        ResetSunSize                ( ) = 0;
 };
 
 #endif

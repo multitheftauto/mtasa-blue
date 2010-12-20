@@ -1401,6 +1401,24 @@ int CLuaFunctionDefs::SetTrafficLightState ( lua_State *luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetTrafficLightsLocked ( lua_State *luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
+    {
+        bool bLocked = lua_toboolean ( luaVM, 1 ) ? true : false;
+        if ( CStaticFunctionDefinitions::SetTrafficLightsLocked ( bLocked ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1 ;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightsLocked" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetWindVelocity ( lua_State *luaVM )
 {
     float fX, fY, fZ;
@@ -1614,21 +1632,30 @@ int CLuaFunctionDefs::ResetSunColor ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::SetTrafficLightsLocked ( lua_State *luaVM )
+int CLuaFunctionDefs::GetSunSize ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
+    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetSunSize () );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetSunSize ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        bool bLocked = lua_toboolean ( luaVM, 1 ) ? true : false;
-        if ( CStaticFunctionDefinitions::SetTrafficLightsLocked ( bLocked ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1 ;
-        }
+        g_pGame->GetWorld ()->SetSunSize ( (float) lua_tonumber ( luaVM, 1 ) );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightsLocked" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
+int CLuaFunctionDefs::ResetSunSize ( lua_State* luaVM )
+{
+    g_pGame->GetWorld ()->ResetSunSize ();
+
+    lua_pushboolean ( luaVM, true );
+    return 1;
+}
