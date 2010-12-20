@@ -672,6 +672,9 @@ public:
     LUA_DECLARE ( GetRainLevel );
     LUA_DECLARE ( SetRainLevel );
     LUA_DECLARE ( ResetRainLevel );
+    LUA_DECLARE ( GetFarClipDistance );
+    LUA_DECLARE ( SetFarClipDistance );
+    LUA_DECLARE ( ResetFarClipDistance );
     LUA_DECLARE ( GetFogDistance );
     LUA_DECLARE ( SetFogDistance );
     LUA_DECLARE ( ResetFogDistance );

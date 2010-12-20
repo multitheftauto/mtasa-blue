@@ -38,6 +38,9 @@ public:
     virtual void        SetWindVelocity             ( float fX, float fY, float fZ ) = 0;
     virtual void        GetWindVelocity             ( float& fX, float& fY, float& fZ ) = 0;
     virtual void        RestoreWindVelocity         ( void ) = 0;
+    virtual void        SetFarClipDistance          ( float fDistance ) = 0;
+    virtual float       GetFarClipDistance          ( void ) = 0;
+    virtual void        RestoreFarClipDistance      ( void ) = 0;
     virtual void        SetFogDistance              ( float fDistance ) = 0;
     virtual float       GetFogDistance              ( void ) = 0;
     virtual void        RestoreFogDistance          ( void ) = 0;

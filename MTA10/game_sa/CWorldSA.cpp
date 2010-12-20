@@ -436,12 +436,12 @@ void CWorldSA::RestoreWindVelocity ( void )
     *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x00C813E8;
 }
 
-float CWorldSA::GetFogDistance ( )
+float CWorldSA::GetFarClipDistance ( )
 {
-    return *(float *)(VAR_fFogDistance);
+    return *(float *)(VAR_fFarClipDistance);
 }
 
-void CWorldSA::SetFogDistance ( float fDistance )
+void CWorldSA::SetFarClipDistance ( float fDistance )
 {
     *(BYTE *)0x55FCC8 = 0xDD;
     *(BYTE *)0x55FCC9 = 0xD8;
@@ -455,14 +455,35 @@ void CWorldSA::SetFogDistance ( float fDistance )
     *(BYTE *)0x560A24 = 0xD8;
     *(BYTE *)0x560A25 = 0x90;
 
-    *(float *)(VAR_fFogDistance) = fDistance;
+    *(float *)(VAR_fFarClipDistance) = fDistance;
 }
 
-void CWorldSA::RestoreFogDistance ( )
+void CWorldSA::RestoreFarClipDistance ( )
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
 
     memcpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
     memcpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
     memcpy ( (LPVOID)0x560A23, &originalFstp, 3 );
+}
+
+float CWorldSA::GetFogDistance ( )
+{
+    return *(float *)(VAR_fFogDistance);
+}
+
+void CWorldSA::SetFogDistance ( float fDistance )
+{
+    *(BYTE *)0x55FCDB = 0xDD;
+    *(BYTE *)0x55FCDC = 0xD8;
+    *(BYTE *)0x55FCDD = 0x90;
+
+    *(float *)(VAR_fFogDistance) = fDistance;
+}
+
+void CWorldSA::RestoreFogDistance ( )
+{
+    BYTE originalFstp[3] = {0xD9, 0x5E, 0x54};
+
+    memcpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
 }
