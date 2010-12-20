@@ -9593,6 +9593,8 @@ int CLuaFunctionDefinitions::GetCTime ( lua_State* luaVM )
     ret.PushNumber(time->tm_yday);
     ret.PushString("isdst");
     ret.PushNumber(time->tm_isdst);
+    ret.PushString("timestamp");
+    ret.PushNumber((double) timer);
 
     ret.PushAsTable(luaVM);
 
