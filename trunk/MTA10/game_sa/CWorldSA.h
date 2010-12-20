@@ -44,7 +44,8 @@
 #define VAR_fWindSpeedX										0xC813E0
 #define VAR_fWindSpeedY										0xC813E4
 #define VAR_fWindSpeedZ										0xC813E8
-#define VAR_fFogDistance                                    0xB7C4F0
+#define VAR_fFarClipDistance                                0xB7C4F0
+#define VAR_fFogDistance                                    0xB7C4F4
 #define ADDR_WindSpeedSetX									0x72C616
 #define ADDR_WindSpeedSetY									0x72C622
 #define ADDR_WindSpeedSetZ									0x72C636
@@ -81,6 +82,9 @@ public:
     void        SetWindVelocity           ( float fX, float fY, float fZ );
     void        GetWindVelocity           ( float& fX, float& fY, float& fZ );
     void        RestoreWindVelocity       ( void );
+    float       GetFarClipDistance        ( void );
+    void        SetFarClipDistance        ( float fDistance );
+    void        RestoreFarClipDistance    ( void );
     float       GetFogDistance            ( void );
     void        SetFogDistance            ( float fDistance );
     void        RestoreFogDistance        ( void );
