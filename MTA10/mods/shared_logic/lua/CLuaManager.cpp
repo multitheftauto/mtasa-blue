@@ -879,6 +879,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSunColor", CLuaFunctionDefs::GetSunColor );
     CLuaCFunctions::AddFunction ( "setSunColor", CLuaFunctionDefs::SetSunColor );
     CLuaCFunctions::AddFunction ( "resetSunColor", CLuaFunctionDefs::ResetSunColor );
+    CLuaCFunctions::AddFunction ( "getSunSize", CLuaFunctionDefs::GetSunSize );
+    CLuaCFunctions::AddFunction ( "setSunSize", CLuaFunctionDefs::SetSunSize );
+    CLuaCFunctions::AddFunction ( "resetSunSize", CLuaFunctionDefs::ResetSunSize );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );

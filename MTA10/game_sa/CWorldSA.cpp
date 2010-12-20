@@ -535,3 +535,24 @@ void CWorldSA::ResetSunColor ( )
     memcpy ( (LPVOID)0x55FA8D, &originalMov, 3 );
     *(BYTE *)0x55FA90 = 0x3A;
 }
+
+float CWorldSA::GetSunSize ( )
+{
+    return *(float *)(VAR_fSunSize) / 10;
+}
+
+void CWorldSA::SetSunSize ( float fSize )
+{
+    *(BYTE *)0x55FA9D = 0xDD;
+    *(BYTE *)0x55FA9E = 0xD8;
+    *(BYTE *)0x55FA9F = 0x90;
+
+    *(float *)VAR_fSunSize = fSize * 10;
+}
+
+void CWorldSA::ResetSunSize ( )
+{
+    *(BYTE *)0x55FA9D = 0xD9;
+    *(BYTE *)0x55FA9E = 0x5E;
+    *(BYTE *)0x55FA9F = 0x3C;
+}

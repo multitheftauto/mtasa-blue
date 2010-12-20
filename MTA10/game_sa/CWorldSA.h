@@ -52,6 +52,7 @@
 #define VAR_ucSunCoronaR                                    0xB7C4D6
 #define VAR_ucSunCoronaG                                    0xB7C4D8
 #define VAR_ucSunCoronaB                                    0xB7C4DA
+#define VAR_fSunSize                                        0xB7C4DC
 #define ADDR_WindSpeedSetX									0x72C616
 #define ADDR_WindSpeedSetY									0x72C622
 #define ADDR_WindSpeedSetZ									0x72C636
@@ -97,6 +98,9 @@ public:
     void        GetSunColor               ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue );
     void        SetSunColor               ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue );
     void        ResetSunColor             ( );
+    float       GetSunSize                ( );
+    void        SetSunSize                ( float fSize );
+    void        ResetSunSize              ( );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)
