@@ -678,6 +678,9 @@ public:
     LUA_DECLARE ( GetFogDistance );
     LUA_DECLARE ( SetFogDistance );
     LUA_DECLARE ( ResetFogDistance );
+    LUA_DECLARE ( GetSunColor );
+    LUA_DECLARE ( SetSunColor );
+    LUA_DECLARE ( ResetSunColor );
 
     // Input functions
     LUA_DECLARE ( BindKey );

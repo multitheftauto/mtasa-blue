@@ -46,6 +46,12 @@
 #define VAR_fWindSpeedZ										0xC813E8
 #define VAR_fFarClipDistance                                0xB7C4F0
 #define VAR_fFogDistance                                    0xB7C4F4
+#define VAR_ucSunCoreR                                      0xB7C4D0
+#define VAR_ucSunCoreG                                      0xB7C4D2
+#define VAR_ucSunCoreB                                      0xB7C4D4
+#define VAR_ucSunCoronaR                                    0xB7C4D6
+#define VAR_ucSunCoronaG                                    0xB7C4D8
+#define VAR_ucSunCoronaB                                    0xB7C4DA
 #define ADDR_WindSpeedSetX									0x72C616
 #define ADDR_WindSpeedSetY									0x72C622
 #define ADDR_WindSpeedSetZ									0x72C636
@@ -88,6 +94,9 @@ public:
     float       GetFogDistance            ( void );
     void        SetFogDistance            ( float fDistance );
     void        RestoreFogDistance        ( void );
+    void        GetSunColor               ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue );
+    void        SetSunColor               ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue );
+    void        ResetSunColor             ( );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)

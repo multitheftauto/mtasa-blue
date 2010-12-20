@@ -44,6 +44,9 @@ public:
     virtual void        SetFogDistance              ( float fDistance ) = 0;
     virtual float       GetFogDistance              ( void ) = 0;
     virtual void        RestoreFogDistance          ( void ) = 0;
+    virtual void        GetSunColor                 ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue ) = 0;
+    virtual void        SetSunColor                 ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue ) = 0;
+    virtual void        ResetSunColor               ( ) = 0;
 };
 
 #endif
