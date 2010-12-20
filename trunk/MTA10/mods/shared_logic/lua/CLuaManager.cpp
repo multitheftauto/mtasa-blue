@@ -876,6 +876,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getFogDistance", CLuaFunctionDefs::GetFogDistance );
     CLuaCFunctions::AddFunction ( "setFogDistance", CLuaFunctionDefs::SetFogDistance );
     CLuaCFunctions::AddFunction ( "resetFogDistance", CLuaFunctionDefs::ResetFogDistance );
+    CLuaCFunctions::AddFunction ( "getSunColor", CLuaFunctionDefs::GetSunColor );
+    CLuaCFunctions::AddFunction ( "setSunColor", CLuaFunctionDefs::SetSunColor );
+    CLuaCFunctions::AddFunction ( "resetSunColor", CLuaFunctionDefs::ResetSunColor );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );

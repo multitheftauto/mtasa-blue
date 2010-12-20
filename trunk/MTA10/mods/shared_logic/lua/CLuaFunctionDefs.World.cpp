@@ -1554,6 +1554,66 @@ int CLuaFunctionDefs::ResetFogDistance ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetSunColor ( lua_State* luaVM )
+{
+    unsigned char ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue;
+    
+    g_pGame->GetWorld ()->GetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
+
+    lua_pushnumber ( luaVM, ucCoreRed );
+    lua_pushnumber ( luaVM, ucCoreGreen );
+    lua_pushnumber ( luaVM, ucCoreBlue );
+    lua_pushnumber ( luaVM, ucCoronaRed );
+    lua_pushnumber ( luaVM, ucCoronaGreen );
+    lua_pushnumber ( luaVM, ucCoronaBlue );
+
+    return 6;
+}
+
+int CLuaFunctionDefs::SetSunColor ( lua_State* luaVM )
+{
+    // Verify the argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+    int iArgument5 = lua_type ( luaVM, 5 );
+    int iArgument6 = lua_type ( luaVM, 6 );
+
+    unsigned char ucCoreRed   = 0;
+    unsigned char ucCoreGreen = 0;
+    unsigned char ucCoreBlue  = 0;
+    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) )
+        ucCoreRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+    if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+        ucCoreGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+    if ( ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
+        ucCoreBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+
+    unsigned char ucCoronaRed   = ucCoreRed;
+    unsigned char ucCoronaGreen = ucCoreGreen;
+    unsigned char ucCoronaBlue  = ucCoreBlue;
+    if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+        ucCoronaRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+    if ( ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
+        ucCoronaGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+    if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
+        ucCoronaBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
+
+    g_pGame->GetWorld ()->SetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
+
+    lua_pushboolean ( luaVM, true );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetSunColor ( lua_State* luaVM )
+{
+    g_pGame->GetWorld ()->ResetSunColor ();
+
+    lua_pushboolean ( luaVM, true );
+    return 1;
+}
+
 int CLuaFunctionDefs::SetTrafficLightsLocked ( lua_State *luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
