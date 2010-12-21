@@ -52,7 +52,6 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     if ( result.nRows == 0 )
     {
         //Set our settings and clear the accounts/userdata tables just in case
-        m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "autologin", SQLITE_INTEGER, 0 );
         m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "XMLParsed", SQLITE_INTEGER, 0 );
         //Tell the Server to load the xml file rather than the SQL
         m_bLoadXML = true;
@@ -63,10 +62,6 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
         for (int i = 0;i < result.nRows;i++) 
         {
             SString strSetting = (char *)result.Data[i][0].pVal;
-            //Do we have a result for autologin
-            if ( strSetting == "autologin" )
-                //Set the Auto login variable
-                m_bAutoLogin = result.Data[i][1].nVal == 1 ? true : false;
 
             //Do we have a result for XMLParsed
             if ( strSetting == "XMLParsed" ) 
@@ -88,12 +83,10 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
             //Tell the Server to load the xml file rather than the SQL
             m_bLoadXML = true;
         }
-        else if (result.nRows == 1) 
-        {
-            //if the results is one and we didn't trigger the other if statement then we are missing autologin so insert it
-            m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "autologin", SQLITE_INTEGER, 0 );
-        }
     }
+
+    //Check whether autologin was enabled in the main config
+    m_bAutoLogin = g_pGame->GetConfig()->IsAutoLoginEnabled();
 }
 void CAccountManager::ClearSQLDatabase ( void )
 {    
@@ -451,8 +444,7 @@ bool CAccountManager::Save ( const char* szFileName )
 
 bool CAccountManager::SaveSettings ()
 {
-    //Update our autologin and XML Load SQL entries
-    m_pSaveFile->Query ( "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, m_bAutoLogin ? 1 : 0, "autologin" );
+    //Update our XML Load SQL entry
     m_pSaveFile->Query ( "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, 1, "XMLParsed" );
 
     return true;
