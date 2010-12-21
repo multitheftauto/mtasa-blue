@@ -139,6 +139,9 @@ void CLuaMain::InitVM ( void )
     lua_pushelement ( m_luaVM, m_pResource->GetResourceGUIEntity () );
     lua_setglobal ( m_luaVM, "guiRoot" );
 
+    lua_pushelement ( m_luaVM, g_pClientGame->GetLocalPlayer() );
+    lua_setglobal ( m_luaVM, "localPlayer" );
+
     // Load pre-loaded lua code
     LoadScript ( szPreloadedScript );
 }
