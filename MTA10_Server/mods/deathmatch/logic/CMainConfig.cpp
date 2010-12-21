@@ -47,6 +47,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bAutoUpdateIncludedResources = false;
     m_bDontBroadcastLan = false;
     m_usFPSLimit = 36;
+    m_bAutoLogin = false;
 }
 
 
@@ -299,6 +300,8 @@ bool CMainConfig::Load ( const char* szFilename )
     {
         m_strAccessControlListFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "acl.xml" );
     }
+
+    GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
 
     return true;
 }

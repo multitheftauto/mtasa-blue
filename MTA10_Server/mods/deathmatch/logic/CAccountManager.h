@@ -48,7 +48,7 @@ public:
     bool                        LogOut                      ( CClient* pClient, CClient* pEchoClient );
 
     inline bool                 IsAutoLoginEnabled          ( void )                    { return m_bAutoLogin; }
-    inline bool                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; SaveSettings(); return bEnabled; }
+    inline void                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; }
 
     CLuaArgument*               GetAccountData              ( CAccount* pAccount, char* szKey );
     bool                        SetAccountData              ( CAccount* pAccount, char* szKey, SString strValue, int iType );

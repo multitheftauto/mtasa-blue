@@ -76,6 +76,7 @@ public:
     bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
     const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
+    inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     void                            SetFPSLimit                     ( unsigned short usFPS );
@@ -120,6 +121,7 @@ private:
     std::map < SString, int >       m_EnableDiagnosticMap;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
+    bool                            m_bAutoLogin;
 };
 
 #endif
