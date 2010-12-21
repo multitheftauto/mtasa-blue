@@ -34,7 +34,6 @@ deathmatch_la_SOURCES = \
 	StdInc.cpp
 
 deathmatch_la_LIBADD = \
-	@PCRE_LIBS@ \
 	-lplatform \
 	-lsqlite3
 
@@ -43,6 +42,7 @@ deathmatch_la_LDFLAGS = \
 	-L../../sdk/ \
 	$(top_builddir)/vendor/ehs/.libs/libehs.a \
 	$(top_builddir)/vendor/pme/.libs/libpme.a \
+	$(top_builddir)/vendor/pcre/.libs/libpcre.a \
 	$(top_builddir)/vendor/lua/src/.libs/liblua.a \
 	$(top_builddir)/vendor/json-c/.libs/libjson.a
 
