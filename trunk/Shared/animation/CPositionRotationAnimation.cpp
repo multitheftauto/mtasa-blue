@@ -41,12 +41,12 @@ void CPositionRotationAnimation::SetSourceValue ( const SPositionRotation& a_rVa
     else if ( rvecRotation.fZ >= 2*PI )
         rvecRotation.fZ -= 2.0f * PI;
 
-    TInterpolation::SetSourceValue ( realValue );
+    TInterpolation < SPositionRotation > ::SetSourceValue ( realValue );
 }
 
 void CPositionRotationAnimation::SetTargetValue ( const SPositionRotation& a_rValue, bool a_bDeltaRotationMode )
 {
-    TInterpolation::SetTargetValue ( a_rValue );
+    TInterpolation < SPositionRotation > ::SetTargetValue ( a_rValue );
    
     m_bDeltaRotationMode = a_bDeltaRotationMode;
     

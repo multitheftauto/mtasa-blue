@@ -229,6 +229,8 @@ void CEasingCurve_Impl::setType ( CEasingCurve::eType a_eType )
         m_pSimpleFunction = &easeCosineCurve;
         m_bFinishesAtOne = false;
         break;
+    default:
+        break;
     }
 }
 

@@ -65,6 +65,8 @@ namespace SharedUtil
                         default: break;
                     }
                     break;
+                default:
+                    break;
             }
 
             ucOutput = ucState;
