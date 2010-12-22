@@ -41,6 +41,7 @@ public:
     virtual bool MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent)=0;
     virtual char * GetTaskName()=0;
     virtual class CTaskSAInterface* GetInterface ( void )=0;
+    virtual bool IsValid ( void )=0;
     virtual void SetAsPedTask ( CPed * pPed, const int iTaskPriority, const bool bForceNewTask = false )=0;
     virtual void SetAsSecondaryPedTask ( CPed * pPed, const int iType )=0;
 

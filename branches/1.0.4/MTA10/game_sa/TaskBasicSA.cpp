@@ -19,6 +19,7 @@ CTaskComplexUseMobilePhoneSA::CTaskComplexUseMobilePhoneSA ( const int iDuration
     DEBUG_TRACE("CTaskComplexUseMobilePhoneSA::CTaskComplexUseMobilePhoneSA(const int iDuration)");
 
     this->CreateTaskInterface ( sizeof(CTaskComplexUseMobilePhoneSAInterface ) );
+    if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskComplexUseMobilePhone__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
 
@@ -42,6 +43,7 @@ CTaskSimpleRunAnimSA::CTaskSimpleRunAnimSA (    const AssocGroupId animGroup,
 
     // TODO: Find out the real size
     this->CreateTaskInterface ( 1024 );
+    if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskSimpleRunAnim__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
 
@@ -73,6 +75,7 @@ CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA (  const char* pAnimName,
 
     // TODO: Find out the real size
     this->CreateTaskInterface ( 1024 );
+    if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskSimpleRunNamedAnim__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
 
@@ -107,6 +110,7 @@ CTaskComplexDieSA::CTaskComplexDieSA ( const eWeaponType eMeansOfDeath,
 
     // TODO: Find out the real size
     this->CreateTaskInterface ( 1024 );
+    if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskComplexDie__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
 
@@ -134,6 +138,7 @@ CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA ( bool bKiller, CPed * pPed, 
 
     // TODO: Find out the real size
     this->CreateTaskInterface ( 1024 );
+    if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskSimpleStealthKill__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
     DWORD dwPedInterface = (DWORD)pPed->GetPedInterface ();
@@ -155,6 +160,7 @@ CTaskComplexSunbatheSA::CTaskComplexSunbatheSA ( CObject* pTowel, const bool bSt
 
     // TODO: Find out the real size
     this->CreateTaskInterface ( 1024 );
+    if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskComplexSunbathe__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
     DWORD dwObjectInterface = 0;
@@ -184,6 +190,7 @@ CTaskSimplePlayerOnFootSA::CTaskSimplePlayerOnFootSA()
 {
     DEBUG_TRACE("CTaskSimplePlayerOnFootSA::CTaskSimplePlayerOnFootSA");
     this->CreateTaskInterface(sizeof(CTaskSimplePlayerOnFootSAInterface));
+    if ( !IsValid () ) return;
     DWORD dwFunc = (DWORD)FUNC_CTASKSimplePlayerOnFoot__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
 
@@ -201,6 +208,7 @@ CTaskComplexFacialSA::CTaskComplexFacialSA()
 {
     DEBUG_TRACE("CTaskComplexFacialSA::CTaskComplexFacialSA");
     this->CreateTaskInterface(sizeof(CTaskComplexFacialSAInterface));
+    if ( !IsValid () ) return;
     DWORD dwFunc = (DWORD)FUNC_CTASKComplexFacial__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
 
