@@ -1300,6 +1300,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onTrailerDetach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onVehicleStartEnter", "player, seat, jacked", NULL, false );
     m_Events.AddEvent ( "onVehicleStartExit", "player, seat, jacker", NULL, false );
+    m_Events.AddEvent ( "onVehicleStopEnter", "player, seat", NULL, false );
     m_Events.AddEvent ( "onVehicleEnter", "player, seat, jacked", NULL, false );
     m_Events.AddEvent ( "onVehicleExit", "player, seat, jacker", NULL, false );
     m_Events.AddEvent ( "onVehicleExplode", "", NULL, false );
@@ -2432,6 +2433,12 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     Reply.SetSourceElement ( pPlayer );
                                     Reply.SetDoorAngle ( fDoorAngle );
                                     m_pPlayerManager->BroadcastOnlyJoined ( Reply );
+
+                                    // Call the vehicle->player event
+                                    CLuaArguments Arguments;
+                                    Arguments.PushElement ( pPlayer );         // player
+                                    Arguments.PushNumber ( ucOccupiedSeat );   // seat
+                                    pVehicle->CallEvent ( "onVehicleStopEnter", Arguments );
                                 }
                             }
 
