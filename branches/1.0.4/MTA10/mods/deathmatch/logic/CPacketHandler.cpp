@@ -1936,7 +1936,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     unsigned int iVal;
     g_pCore->GetCVars ()->Get ( "fps_limit", iVal );
 
-    if ( iVal > ( unsigned long ) usFPSLimit )
+    if ( usFPSLimit > 0 && iVal > usFPSLimit || iVal == 0 )
     {
         // For some reason it needs that kind of hacky precision
         g_pGame->SetFramelimiter ( (unsigned long) ( (float)usFPSLimit * 1.333f ) );
