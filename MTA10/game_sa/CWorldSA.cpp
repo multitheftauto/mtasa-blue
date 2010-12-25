@@ -396,7 +396,7 @@ void CWorldSA::SetWindVelocity ( float fX, float fY, float fZ )
     *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x90909090;
     *(WORD *)(ADDR_WindSpeedSetY) = 0xD8DD;
     *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x90909090;
-    *(WORD *)(ADDR_WindSpeedSetZ) = 0xD9DD;
+    *(WORD *)(ADDR_WindSpeedSetZ) = 0xD8DD;
     *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x90909090;
 
     *(WORD *)(ADDR_WindSpeedSetX2) = 0xD8DD;
