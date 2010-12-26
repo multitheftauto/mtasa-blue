@@ -411,7 +411,7 @@ void CServerImpl::MainLoop ( void )
         }
 
         // Limit the pulses to avoid heavy CPU usage
-        Sleep ( 10 );
+        Sleep ( 1 );
     }
 
     // Unload the current mod
