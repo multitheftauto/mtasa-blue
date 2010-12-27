@@ -7,8 +7,6 @@
 #define IDI_ICON1                       110
 #define IDD_PROGRESS_DIALOG             111
 #define IDD_CRASHED_DIALOG              114
-#define IDB_NAG1                        120
-#define IDB_NAG2                        121
 #define IDC_PROGRESS_BAR                1001
 #define IDC_PROGRESS_STATIC             1002
 #define IDC_SEND_DUMP_CHECK             1004

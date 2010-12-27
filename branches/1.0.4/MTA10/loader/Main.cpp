@@ -13,7 +13,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "SplashWindow.h"
 #include "direct.h"
 #include <time.h>
 
@@ -172,9 +171,6 @@ int ChangeInstallUPLBlocking ( const CUPL& UPLOld, const SString& strStageNew, c
 int DoInstallStage ( const CUPL& UPL ) 
 {
     AddReportLog ( 1046, SString ( "DoInstallStage: '%s'", UPL.ToString ().c_str () ) );
-
-    if ( UPL.Get( INSTALL_STAGE ) != "initial" )
-        NotifyNonStandardStart ();
 
     if ( UPL.Get( INSTALL_STAGE ) == "crashed" )
     {
@@ -487,8 +483,6 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         }    
     }
 
-    MaybeShowNag ();
-
     //////////////////////////////////////////////////////////
     //
     // Hook 'n' go
@@ -622,117 +616,6 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     // Success, maybe
     return dwExitCode;
 }
-
-
-//////////////////////////////////////////////////////////
-//
-// NotifyNonStandardStart
-//
-// Don't show nag!
-//
-//////////////////////////////////////////////////////////
-void NotifyNonStandardStart ( void )
-{
-    // Make sure next time show is at least 10 mins aways
-    int iTimeNow = static_cast < int > ( time ( NULL ) );
-    int iTimeNextShow = GetApplicationSettingInt ( "moddb-nag", "next-time-show" );
-    iTimeNextShow = Max ( iTimeNextShow, iTimeNow + 60 * 10 );
-    SetApplicationSettingInt ( "moddb-nag", "next-time-show", iTimeNextShow );
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// MaybeShowNag
-//
-//
-//
-//////////////////////////////////////////////////////////
-void MaybeShowNag ( void )
-{
-    // Show max of once per 18 hrs
-    // Don't show after 14 dec 1800 UDT
-    // Don't show after crash :D
-    // Show nag1 until top button has been pressed
-    // Then show nag2 until bottom button has been pressed
-
-    // Dont show after 14 dec 1800 UDT
-    {
-        time_t t = time ( NULL );
-        tm* tmp = gmtime ( &t );
-        char outstr[200] = { 0 };
-        strftime ( outstr, sizeof ( outstr ), "%Y-%m-%d %H:%M:%S", tmp );
-        if ( SStringX ( "2010-12-14 18:00:00" ) < outstr )
-        {
-            return;
-        }
-    }
-
-    // Show once per 18 hrs
-    bool bTimeForNag = false;
-    {
-#if MTA_DEBUG
-        int iInterval = 60;
-#else
-        int iInterval = 60 * 60 * 18;
-#endif
-        int iTimeNow = static_cast < int > ( time ( NULL ) );
-        int iTimeNextShow = GetApplicationSettingInt ( "moddb-nag", "next-time-show" );
-        iTimeNextShow = Min ( iTimeNextShow, iTimeNow + iInterval );
-        if ( iTimeNextShow < iTimeNow )
-        {
-            iTimeNextShow = iTimeNow + iInterval;
-            bTimeForNag = true;
-        }
-        SetApplicationSettingInt ( "moddb-nag", "next-time-show", iTimeNextShow );
-    }
-
-
-    if ( bTimeForNag )
-    {
-        int iWhichNag = GetApplicationSettingInt ( "moddb-nag", "which-one" );
-        if ( iWhichNag == 0 || iWhichNag == 1 )
-        {
-            HideSplash ();  // Hide standard MTA splash
-            SplashWindow &splash = SplashWindow::GetInstance();
-            splash.Initialize( g_hInstance, iWhichNag );
-            splash.Show();
-
-            int iResult = 0;
-            while ( !iResult )
-            {
-                iResult = splash.PulseMessagePump();
-            }
-            
-            splash.Shutdown();
-
-            // Show nag1 until top button has been pressed
-            if ( iWhichNag == 0 && iResult == IDYES )
-                iWhichNag++;
-            else
-            // Then show nag2 until bottom button has been pressed
-            if ( iWhichNag == 1 && iResult == IDNO )
-                iWhichNag++;
-
-            SetApplicationSettingInt ( "moddb-nag", "which-one", iWhichNag );
-
-            // Launch thing
-            if ( iResult == IDYES )
-            {
-                MessageBox( 0, "Your web browser will now open and show you the voting infomation.", "MTA: San Andreas", MB_ICONINFORMATION|MB_OK );
-                int iResult = (int)ShellExecuteNonBlocking ( "open", "http://nightly.mtasa.com/moddb2010/" );
-                if ( iResult < 32 )
-                {                   
-                    MessageBox( 0, "If browsing fails, please go to:\n\nhttp://nightly.mtasa.com/moddb2010/", "MTA: San Andreas", MB_ICONINFORMATION|MB_OK );
-                    AddReportLog ( 5400, SString ( "Browse failed %d", iResult ) );
-                }
-
-                TerminateProcess ( GetCurrentProcess (), 0 );
-            }
-        }
-    }
-}
-
 
 };
 
