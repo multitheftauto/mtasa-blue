@@ -15,7 +15,7 @@
 
 #define CGUIWINDOW_NAME "CGUI/FrameWindow"
 
-CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption )
+CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption, const SString& strLayoutFile )
 {
     m_pManager = pGUI;
 
@@ -24,10 +24,27 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
     pGUI->GetUniqueName ( szUnique );
 
     // Create the window and set default settings
-    m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIWINDOW_NAME, szUnique );
+
+    if ( !strLayoutFile.empty () )
+    {
+        // Load from XML file
+        m_pWindow = pGUI->GetWindowManager ()->loadWindowLayout ( strLayoutFile );
+    }
+
+    if ( !m_pWindow )
+    {
+        // Create new here
+        m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIWINDOW_NAME, szUnique );
+        m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect (0.10f, 0.10f, 0.60f, 0.90f) );
+        m_pWindow->setAlpha ( 0.8f );
+
+        // Give the window a caption
+        CEGUI::String strText;
+        strText.assign( (CEGUI::utf8*)szCaption ); // assign as UTF8 string
+        m_pWindow->setText ( strText );
+    }
+
     m_pWindow->setDestroyedByParent ( false );
-    m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect (0.10f, 0.10f, 0.60f, 0.90f) );
-    m_pWindow->setAlpha ( 0.8f );
     
     // Store the pointer to this CGUI element in the CEGUI element
     m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
@@ -38,11 +55,6 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
  
     // Some window specific style options
     reinterpret_cast < CEGUI::FrameWindow* > ( m_pWindow ) -> setTitlebarFont ( "default-bold-small" );
-    
-    // Give the window a caption
-    CEGUI::String strText;
-    strText.assign( (CEGUI::utf8*)szCaption ); // assign as UTF8 string
-    m_pWindow->setText ( strText );
 
     // Register our events
     m_pWindow->subscribeEvent ( CEGUI::FrameWindow::EventCloseClicked, CEGUI::Event::Subscriber ( &CGUIWindow_Impl::Event_OnCloseClick, this ) );

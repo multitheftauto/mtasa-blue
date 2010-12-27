@@ -13,6 +13,7 @@
 #include "StdInc.h"
 #include <utils/CMD5Hasher.h>
 #include "CVersionUpdater.Util.hpp"
+#include "CNewsBrowser.h"
 
 
 ///////////////////////////////////////////////////////////////
@@ -25,6 +26,8 @@
 class CVersionUpdater : public CVersionUpdaterInterface
 {
 public:
+    ZERO_ON_NEW
+
     // CVersionUpdaterInterface interface
                         CVersionUpdater                     ( void );
     virtual             ~CVersionUpdater                    ( void );
@@ -38,6 +41,7 @@ public:
     virtual void        GetAseServerList                    ( std::vector < SString >& outResult );
     virtual void        InitiateSidegradeLaunch             ( const SString& strVersion, const SString& strHost, ushort usPort, const SString& strName, const SString& strPassword );
     virtual void        GetBlockedVersionMap                ( std::map < SString, int >& outBlockedVersionMap );
+    virtual void        GetNewsSettings                     ( SString& strOutOldestPost, uint& uiOutMaxHistoryLength );
 
     // CVersionUpdater functions
 
@@ -64,6 +68,7 @@ public:
     void                _UseReportLogURLs                   ( void );
     void                _UseCrashDumpURLs                   ( void );
     void                _UseSidegradeURLs                   ( void );
+    void                _UseNewsUpdateURLs                  ( void );
     void                _UseReportLogPostContent            ( void );
     void                _UseCrashDumpPostContent            ( void );
     void                _ActionReconnect                    ( void );
@@ -71,6 +76,7 @@ public:
     void                _End                                ( void );
     void                _ExitGame                           ( void );
     void                _ResetVersionCheckTimer             ( void );
+    void                _ResetNewsCheckTimer                ( void );
     void                _ResetMasterCheckTimer              ( void );
     void                _ResetManualCheckTimer              ( void );
     void                _PollQuestionNoYes                  ( void );
@@ -85,6 +91,7 @@ public:
     void                _DialogUpdateQueryError             ( void );
     void                _DialogUpdateResult                 ( void );
     void                _QUpdateResult                      ( void );
+    void                _QUpdateNewsResult                  ( void );
     void                _DialogDataFilesQuestion            ( void );
     void                _DialogDataFilesQueryError          ( void );
     void                _DialogDataFilesResult              ( void );
@@ -127,6 +134,7 @@ public:
     SString                             m_strSidegradePath;
 
     bool                                m_bCheckedTimeForVersionCheck;
+    bool                                m_bCheckedTimeForNewsUpdate;
     bool                                m_bCheckedTimeForMasterFetch;
     bool                                m_bLoadedConfig;
     bool                                m_bSentCrashDump;
@@ -139,6 +147,7 @@ public:
     CReportWrap*                        m_pReportWrap;
     SString                             m_strLastQueryURL;
     bool                                m_bEnabled;
+    uint                                m_uiFrameCounter;
 
     SUpdaterMasterConfig                m_MasterConfig;
     SUpdaterVarConfig                   m_VarConfig;
@@ -251,6 +260,8 @@ bool CVersionUpdater::LoadConfigFromXML ( void )
         // Stuff for here
         XMLAccess.GetSubNodeValue ( "version_lastchecktime",        m_VarConfig.version_lastCheckTime );
         XMLAccess.GetSubNodeValue ( "master_lastchecktime",         m_VarConfig.master_lastCheckTime );
+        XMLAccess.GetSubNodeValue ( "news_lastchecktime",           m_VarConfig.news_lastCheckTime );
+        XMLAccess.GetSubNodeValue ( "news_lastnewsdate",            m_VarConfig.news_lastNewsDate );
         XMLAccess.GetSubNodeValue ( "crashdump_historylist",        m_VarConfig.crashdump_history );
     }
 
@@ -273,6 +284,10 @@ bool CVersionUpdater::LoadConfigFromXML ( void )
         XMLAccess.GetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "sidegrade.nobrowselist",       m_MasterConfig.sidegrade.nobrowseInfoMap );
+        XMLAccess.GetSubNodeValue ( "news.serverlist",              m_MasterConfig.news.serverInfoMap );
+        XMLAccess.GetSubNodeValue ( "news.interval",                m_MasterConfig.news.interval );
+        XMLAccess.GetSubNodeValue ( "news.oldestpost",              m_MasterConfig.news.strOldestPost );
+        XMLAccess.GetSubNodeValue ( "news.maxhistorylength",        m_MasterConfig.news.iMaxHistoryLength );
 
         UpdateTroubleURL ();
     }
@@ -303,6 +318,8 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         // Stuff for here
         XMLAccess.SetSubNodeValue ( "version_lastchecktime",        m_VarConfig.version_lastCheckTime );
         XMLAccess.SetSubNodeValue ( "master_lastchecktime",         m_VarConfig.master_lastCheckTime );
+        XMLAccess.SetSubNodeValue ( "news_lastchecktime",           m_VarConfig.news_lastCheckTime );
+        XMLAccess.SetSubNodeValue ( "news_lastnewsdate",            m_VarConfig.news_lastNewsDate );
         XMLAccess.SetSubNodeValue ( "crashdump_historylist",        m_VarConfig.crashdump_history );
     }
 
@@ -325,6 +342,10 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         XMLAccess.SetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "sidegrade.nobrowselist",       m_MasterConfig.sidegrade.nobrowseInfoMap );
+        XMLAccess.SetSubNodeValue ( "news.serverlist",              m_MasterConfig.news.serverInfoMap );
+        XMLAccess.SetSubNodeValue ( "news.interval",                m_MasterConfig.news.interval );
+        XMLAccess.SetSubNodeValue ( "news.oldestpost",              m_MasterConfig.news.strOldestPost );
+        XMLAccess.SetSubNodeValue ( "news.maxhistorylength",        m_MasterConfig.news.iMaxHistoryLength );
     }
 
     return true;
@@ -423,6 +444,41 @@ void CVersionUpdater::DoPulse ( void )
         if ( secondsSinceCheck > m_MasterConfig.version.interval.ToSeconds () || secondsSinceCheck < 0 )
         {
             RunProgram ( "VersionCheck" );
+        }
+    }
+
+    //
+    // Time for news update?
+    //
+    if ( !m_bCheckedTimeForNewsUpdate && !IsBusy () )
+    {
+        // Show news browser?
+        if ( GetApplicationSettingInt ( "news-updated" ) == 1 )
+        {
+            if ( !GetQuestionBox ().IsVisible () )
+            {
+                if ( m_uiFrameCounter++ > 10 )
+                {
+                    SetApplicationSettingInt ( "news-updated", 0 );
+                    CLocalGUI::GetSingleton ().GetMainMenu ()->GetNewsBrowser ()->SetVisible ( true );
+                }
+            }
+            else
+                m_uiFrameCounter = 0;
+        }
+
+        if ( GetApplicationSettingInt ( "news-updated" ) != 1 )
+        {
+            m_bCheckedTimeForNewsUpdate = true;
+
+            time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.news_lastCheckTime.ToSeconds ();
+            OutputDebugLine ( SString ( "news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
+
+            // Only check once an interval
+            if ( secondsSinceCheck > m_MasterConfig.news.interval.ToSeconds () || secondsSinceCheck < 0 )
+            {
+                RunProgram ( "NewsUpdate" );
+            }
         }
     }
 
@@ -1050,6 +1106,38 @@ void CVersionUpdater::InitPrograms ()
         ADDINST (   _DialogDataFilesResult );                           // Show "ok/failed" message
         ADDINST (   _End );
     }
+
+
+    //
+    // NewsUpdate
+    //
+    {
+        SString strProgramName = "NewsUpdate";
+        MapSet ( m_ProgramMap, strProgramName, CProgram () );
+        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
+
+        ADDINST (   _UseNewsUpdateURLs );                       // Use news serverlist
+        ADDINST (   _StartDownload );                           // Fetch update info from update server
+        ADDINST (   _ProcessPatchFileQuery );
+        ADDCOND ( "if ProcessResponse.silent goto silentdload");  // If update server says 'silent' then goto silentdload:
+        ADDCOND ( "if ProcessResponse.noupdate goto noupdate");   // If update server says 'noupdate' then goto noupdate:
+        ADDINST (   _End );
+
+        ADDLABL ( "silentdload:" );
+        ADDINST (   _UseProvidedURLs );
+        ADDINST (   _StartDownload );                           // Fetch update binary from update mirror
+        ADDINST (   _ProcessPatchFileDownload );
+        ADDINST (   _QUpdateNewsResult );                       // Maybe update news install queue
+        ADDINST (   _End );
+
+        ADDLABL ( "noupdate:" );
+        ADDINST (   _ResetNewsCheckTimer );                 // Wait interval before checking again
+        ADDINST (   _End );
+
+        ADDLABL ( "end:" );
+        ADDINST (   _End );
+    }
+
 }
 
 
@@ -1295,6 +1383,20 @@ void CVersionUpdater::_ResetVersionCheckTimer ( void )
 {
     OutputDebugLine ( SStringX ( "_ResetVersionCheckTimer" ) );
     m_VarConfig.version_lastCheckTime = CDateTime::Now ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_ResetNewsCheckTimer
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_ResetNewsCheckTimer ( void )
+{
+    OutputDebugLine ( SStringX ( "_ResetNewsCheckTimer" ) );
+    m_VarConfig.news_lastCheckTime = CDateTime::Now ();
 }
 
 
@@ -1632,6 +1734,52 @@ void CVersionUpdater::_QUpdateResult ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CVersionUpdater::_QUpdateNewsResult
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_QUpdateNewsResult ( void )
+{
+    if ( m_ConditionMap.IsConditionTrue ( "Download.Ok" ) )
+    {
+        // Handle success
+        if ( m_JobInfo.strStatus == "silent" )
+        {
+            // Calc news date from filename
+            SString strDate = m_JobInfo.strFilename.SplitRight ( "-" ).SplitLeft ( "." );
+
+            if ( strDate.length () == 10 )
+            {
+                // Add to install news queue
+                CArgMap queue;
+                queue.SetFromString ( GetApplicationSetting ( "news-install" ) );
+                queue.Set ( strDate, m_JobInfo.strSaveLocation );
+                SetApplicationSetting ( "news-install", queue.ToString () );
+
+                // Set last news date
+                m_VarConfig.news_lastNewsDate = strDate;
+                CCore::GetSingleton ().SaveConfig ();
+
+                // See if there is more news after this one
+                m_bCheckedTimeForNewsUpdate = false;
+            }
+           
+        }
+#if MTA_DEBUG
+        else
+            MessageBox ( NULL, "_QUpdateNewsResult m_JobInfo.strStatus != 'silent'", m_JobInfo.strStatus, MB_OK );
+#endif
+    }
+#if MTA_DEBUG
+    else
+        MessageBox ( NULL, "_QUpdateNewsResult Download.!Ok", "Error", MB_OK );
+#endif
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CVersionUpdater::_DialogDataFilesQuestion
 //
 //
@@ -1881,6 +2029,10 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
     XMLAccess.GetSubNodeValue ( "ase.serverlist",               newMasterConfig.ase.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         newMasterConfig.sidegrade.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "sidegrade.nobrowselist",       newMasterConfig.sidegrade.nobrowseInfoMap );
+    XMLAccess.GetSubNodeValue ( "news.serverlist",              newMasterConfig.news.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "news.interval",                newMasterConfig.news.interval );
+    XMLAccess.GetSubNodeValue ( "news.oldestpost",              newMasterConfig.news.strOldestPost );
+    XMLAccess.GetSubNodeValue ( "news.maxhistorylength",        newMasterConfig.news.iMaxHistoryLength );
 
     if ( newMasterConfig.IsValid () )
     {
@@ -1911,6 +2063,20 @@ void CVersionUpdater::UpdateTroubleURL ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CVersionUpdater::GetNewsSettings
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::GetNewsSettings ( SString& strOutOldestPost, uint& uiOutMaxHistoryLength )
+{
+    strOutOldestPost = m_MasterConfig.news.strOldestPost;
+    uiOutMaxHistoryLength = m_MasterConfig.news.iMaxHistoryLength;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CVersionUpdater::_UseSidegradeURLs
 //
 //
@@ -1920,6 +2086,21 @@ void CVersionUpdater::_UseSidegradeURLs ( void )
 {
     m_JobInfo = SJobInfo ();
     m_JobInfo.serverList = MakeServerList ( m_MasterConfig.sidegrade.serverInfoMap );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::_UseNewsUpdateURLs
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::_UseNewsUpdateURLs ( void )
+{
+    m_JobInfo = SJobInfo ();
+    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.news.serverInfoMap );
+    m_JobInfo.bShowDownloadPercent = false;
 }
 
 
@@ -2405,6 +2586,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "%DATA%", m_strServerSaysData );
     strQueryURL = strQueryURL.Replace ( "%REFER%", m_strServerSaysHost );
     strQueryURL = strQueryURL.Replace ( "%WANTVER%", m_strSidegradeVersion );
+    strQueryURL = strQueryURL.Replace ( "%LASTNEWS%", m_VarConfig.news_lastNewsDate );
 
     // Perform the HTTP request
     m_HTTP.Get ( strQueryURL );

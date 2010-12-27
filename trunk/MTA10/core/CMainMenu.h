@@ -25,8 +25,9 @@ class CMainMenu;
 #include "CCredits.h"
 #include "CGraphics.h"
 #include "CMainMenuScene.h"
+class CNewsBrowser;
 
-#define CORE_MTA_MENU_ITEMS     8
+#define CORE_MTA_MENU_ITEMS     9
 
 class CMainMenu
 {
@@ -67,6 +68,7 @@ public:
     CSettings*          GetSettingsWindow               ( void ) { return &m_Settings; };
     CQuickConnect*      GetQuickConnectWindow           ( void ) { return &m_QuickConnect; };
     CQuestionBox*       GetQuestionWindow               ( void ) { return &m_QuestionBox; };
+    CNewsBrowser*       GetNewsBrowser                  ( void ) { return m_pNewsBrowser; };
 
     void                OnInvalidate                    ( IDirect3DDevice9 * pDevice );
     void                OnRestore                       ( IDirect3DDevice9 * pDevice );
@@ -95,6 +97,7 @@ private:
     bool                OnSettingsButtonClick           ( CGUIElement* pElement );
     bool                OnAboutButtonClick              ( CGUIElement* pElement );
     bool                OnQuitButtonClick               ( CGUIElement* pElement );
+    bool                OnNewsButtonClick               ( CGUIElement* pElement );
 
     bool                OnItemEnter                     ( CGUIElement* pElement );
     bool                OnItemLeave                     ( CGUIElement* pElement );
@@ -117,6 +120,7 @@ private:
     CQuestionBox        m_QuestionBox;
     CQuickConnect       m_QuickConnect;
     CSettings           m_Settings;
+    CNewsBrowser*       m_pNewsBrowser;
     CCredits            m_Credits;
     CServerBrowser      m_ServerBrowser;
 	CServerQueue		m_ServerQueue;
@@ -161,7 +165,9 @@ private:
         MENU_ITEM_MAP_EDITOR,
         MENU_ITEM_SETTINGS,
         MENU_ITEM_ABOUT,
-        MENU_ITEM_QUIT
+        MENU_ITEM_QUIT,
+        MENU_ITEM_NEWS,
+        MENU_ITEM_MAX
     };
 
     // Fade states

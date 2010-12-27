@@ -20,7 +20,7 @@
 class CGUIWindow_Impl : public CGUIWindow, public CGUIElement_Impl, public CGUITabList
 {
 public:
-                        CGUIWindow_Impl         ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "" );
+                        CGUIWindow_Impl         ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "", const SString& strLayoutFile = "" );
                         ~CGUIWindow_Impl        ( void );
 
     void                SetMovable              ( bool bMovable );

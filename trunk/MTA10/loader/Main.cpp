@@ -269,6 +269,9 @@ int DoInstallStage ( const CUPL& UPL )
         return ChangeInstallUPL ( UPL, "launch", "near", "no" );
     }
 
+    // Update news if any there
+    InstallNewsItems ();
+
     // Default to launching MTA
     AddReportLog ( 1051, SString ( "DoInstallStage: LaunchGame cwd:%s", GetCurrentWorkingDirectory ().c_str () ) );
     return LaunchGame ( g_lpCmdLine );
@@ -333,6 +336,56 @@ SString CheckOnRestartCommand ( void )
         }
     }
     return "no update";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// InstallNewsItems
+//
+//
+//
+//////////////////////////////////////////////////////////
+void InstallNewsItems ( void )
+{
+    // Get install news queue
+    CArgMap queue;
+    queue.SetFromString ( GetApplicationSetting ( "news-install" ) );
+    SetApplicationSetting ( "news-install", "" );
+
+    std::vector < SString > keyList;
+    queue.GetKeys ( keyList );
+    for ( uint i = 0 ; i < keyList.size () ; i++ )
+    {
+        // Install each file
+        SString strDate = keyList[i];
+        SString strFileLocation = queue.Get ( strDate );
+
+        // Save cwd
+        SString strSavedDir = GetCurrentWorkingDirectory ();
+
+        // Calc and make target dir
+        SString strTargetDir = PathJoin ( GetMTALocalAppDataPath (), "news", strDate );
+        MkDir ( strTargetDir );
+
+        // Extract into target dir
+        SetCurrentDirectory ( strTargetDir );
+        ShellExecuteBlocking ( "open", strFileLocation, "-s" );
+
+        // Restore cwd
+        SetCurrentDirectory ( strSavedDir );
+
+        // Check result
+        if ( FileExists ( PathJoin ( strTargetDir, "files.xml" ) ) )
+        {
+            SetApplicationSettingInt ( "news-updated", 1 );
+            AddReportLog ( 2051, SString ( "InstallNewsItems ok for '%s'", *strDate ) );
+        }
+        else
+        {
+            AddReportLog ( 4048, SString ( "InstallNewsItems failed with '%s' '%s' '%s'", *strDate, *strFileLocation, *strTargetDir ) );
+        }
+    }
 }
 
 
