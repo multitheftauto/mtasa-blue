@@ -333,7 +333,11 @@ CVector2D CGUIElement_Impl::RelativeToAbsolute ( const CVector2D& Vector )
 void CGUIElement_Impl::SetParent ( CGUIElement* pParent )
 {
     if ( pParent )
-        ((CGUIElement_Impl*)pParent)->m_pWindow->addChildWindow ( m_pWindow );
+    {
+        CGUIElement_Impl* pElement = dynamic_cast < CGUIElement_Impl* > ( pParent );
+        if ( pElement )
+            pElement->m_pWindow->addChildWindow ( m_pWindow );
+    }
     m_pParent = pParent;
 }
 

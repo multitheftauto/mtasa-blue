@@ -185,6 +185,9 @@ public:
     virtual void                SetTransferBoxVisible       ( bool bVisible ) = 0;
 
     virtual void                CleanDeadPool               ( void ) = 0;
+
+    virtual CGUIWindow*         LoadLayout                  ( CGUIElement* pParent, const SString& strFilename ) = 0;
+    virtual bool                LoadImageset                ( const SString& strFilename ) = 0;
 };
 
 #endif

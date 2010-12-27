@@ -978,4 +978,12 @@ namespace SharedUtil
         iValue = iDefault;
         return false;
     }
+
+    // All keys
+    void CArgMap::GetKeys ( std::vector < SString >& outList  ) const
+    {
+        for ( std::multimap < SString, SString > ::const_iterator iter = m_Map.begin () ; iter != m_Map.end () ; ++iter )
+            outList.push_back ( iter->first );
+    }
+
 }
