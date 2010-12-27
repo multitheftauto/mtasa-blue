@@ -1273,6 +1273,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerStealthKill", "target", NULL, false );
     m_Events.AddEvent ( "onPlayerMute", "", NULL, false );
     m_Events.AddEvent ( "onPlayerUnmute", "", NULL, false );
+    m_Events.AddEvent ( "onPlayerCommand", "command", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onPedWasted", "ammo, killer, weapon, bodypart", NULL, false );
