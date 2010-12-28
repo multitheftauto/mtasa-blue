@@ -1451,6 +1451,35 @@ int CLuaFunctionDefs::DestroyElement ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetElementID ( lua_State* luaVM )
+{
+    // Correct type?
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
+         lua_istype ( luaVM, 2, LUA_TSTRING ) )
+    {
+        // Grab the element
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            const char* szID = lua_tostring ( luaVM, 2 );
+            // It returns false if we tried to change ID of server-created element
+            if ( CStaticFunctionDefinitions::SetElementID ( *pEntity, szID ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementID", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setElementID" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
 {
     // Grab the vm
