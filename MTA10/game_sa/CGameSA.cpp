@@ -148,6 +148,7 @@ CGameSA::CGameSA()
 
     // Change pool sizes here
     m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );  // Default is 500
+    m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );  // Default is 350
 }
 
 CGameSA::~CGameSA ( void )
