@@ -712,6 +712,8 @@ namespace
     {
         CDateTime       master_lastCheckTime;
         CDateTime       version_lastCheckTime;
+        CDateTime       news_lastCheckTime;
+        SString         news_lastNewsDate;
         CDataInfoSet    crashdump_history;
     };
 
@@ -763,6 +765,12 @@ namespace
             CDataInfoSet    nobrowseInfoMap;
         } sidegrade;
 
+        struct {
+            CDataInfoSet    serverInfoMap;
+            CTimeSpan       interval;
+            SString         strOldestPost;
+            CValueInt       iMaxHistoryLength;
+        } news;
 
         bool IsValid () const
         {
@@ -773,6 +781,7 @@ namespace
                     && gtadatafiles.serverInfoMap.size ()
                     && trouble.serverInfoMap.size ()
                     && ase.serverInfoMap.size ()
+                    && !news.strOldestPost.empty ()
                     ;
         }
     };

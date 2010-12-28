@@ -372,6 +372,34 @@ void CGUI_Impl::AddChild ( CGUIElement_Impl* pChild )
     m_pTop->addChildWindow ( pChild->GetWindow () );
 }
 
+CGUIWindow* CGUI_Impl::LoadLayout ( CGUIElement* pParent, const SString& strFilename )
+{
+    try
+    {
+        return new CGUIWindow_Impl ( this, pParent, "szCaption", strFilename );
+    }
+	catch (...)
+    {
+        return NULL;
+    }
+}
+
+bool CGUI_Impl::LoadImageset ( const SString& strFilename )
+{
+    try
+    {
+        return GetImageSetManager()->createImageset ( strFilename ) != NULL;
+    }
+	catch (CEGUI::AlreadyExistsException exc)
+    {
+        return true;
+    }
+	catch (...)
+    {
+        return false;
+    }
+}
+
 
 CEGUI::FontManager* CGUI_Impl::GetFontManager ( void )
 {

@@ -14,6 +14,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include "CNewsBrowser.h"
 
 #define NATIVE_RES_X    1024.0f
 #define NATIVE_RES_Y    768.0f
@@ -40,6 +41,8 @@ static short WaitForMenu = 0;
 
 CMainMenu::CMainMenu ( CGUI* pManager )
 {
+    m_pNewsBrowser = new CNewsBrowser ();
+
     // Initialize
     m_pManager = pManager;
     m_bIsVisible = false;
@@ -108,7 +111,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
         ChangeCommunityState ( true, strUsername );
 
     // Determine some variables based on the current screen size
-    unsigned int uiItemStartY = ScreenSize.fY / 2;
+    unsigned int uiItemStartY = ScreenSize.fY / 2 - 30;
     //unsigned int uiItemHeight = ( uiItemStartY / 1.55f ) / CORE_MTA_MENU_ITEMS;
     unsigned int uiItemHeight = 30;
 
@@ -120,7 +123,8 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     CreateItem ( MENU_ITEM_MAP_EDITOR,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*4 ), "MAP EDITOR",           GUI_CALLBACK ( &CMainMenu::OnEditorButtonClick, this ) );
     CreateItem ( MENU_ITEM_SETTINGS,       CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*5 ), "SETTINGS",             GUI_CALLBACK ( &CMainMenu::OnSettingsButtonClick, this ) );
     CreateItem ( MENU_ITEM_ABOUT,          CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*6 ), "ABOUT",                GUI_CALLBACK ( &CMainMenu::OnAboutButtonClick, this ) );
-    CreateItem ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ), "QUIT",                 GUI_CALLBACK ( &CMainMenu::OnQuitButtonClick, this ) );
+    CreateItem ( MENU_ITEM_NEWS,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ), "NEWS",                 GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
+    CreateItem ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*8 ), "QUIT",                 GUI_CALLBACK ( &CMainMenu::OnQuitButtonClick, this ) );
 
     //Refresh all positions
     RefreshPositions ( );
@@ -134,6 +138,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_ServerQueue.SetVisible ( false );
     m_Settings.SetVisible ( false );
     m_Credits.SetVisible ( false );
+    m_pNewsBrowser->SetVisible ( false );
 
     // We're not ingame
     SetIsIngame ( false );
@@ -190,7 +195,7 @@ void CMainMenu::RefreshPositions ( void )
     m_pCommunityLabel->SetPosition ( CVector2D ( 40.0f, ScreenSize.fY - 20.0f ) );
 
     //Set our individual item positions
-    unsigned int uiItemStartY = ScreenSize.fY / 2;
+    unsigned int uiItemStartY = ScreenSize.fY / 2 - 30;
     unsigned int uiItemHeight = 30;
     SetItemPosition ( MENU_ITEM_DISCONNECT,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY ), false );
     SetItemPosition ( MENU_ITEM_QUICK_CONNECT,  CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*1 ), false );
@@ -199,7 +204,8 @@ void CMainMenu::RefreshPositions ( void )
     SetItemPosition ( MENU_ITEM_MAP_EDITOR,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*4 ), false );
     SetItemPosition ( MENU_ITEM_SETTINGS,       CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*5 ), false );
     SetItemPosition ( MENU_ITEM_ABOUT,          CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*6 ), false );
-    SetItemPosition ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ), false );
+    SetItemPosition ( MENU_ITEM_NEWS,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ), false );
+    SetItemPosition ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*8 ), false );
 }
 
 void CMainMenu::Update ( void )
@@ -320,7 +326,6 @@ void CMainMenu::Update ( void )
         if ( !m_bInitialized && pDevice )
         {
             CCore::GetSingleton ().GetNetwork ()->Reset ();
-            GetVersionUpdater ()->EnableChecking ( true );
             m_bInitialized = true;
 
             // If the static flag has not already been set
@@ -346,6 +351,8 @@ void CMainMenu::Update ( void )
 
         // it takes 250 frames for the menu to be shown, we seem to update this twice a frame
         if ( WaitForMenu >= 250 ) {
+            if ( !m_bStarted )
+                GetVersionUpdater ()->EnableChecking ( true );
             m_bIsVisible = true;
             m_bStarted = true;
         } else
@@ -648,6 +655,17 @@ bool CMainMenu::OnQuitButtonClick ( CGUIElement* pElement )
 
     // Send "exit" command to the command handler
     CCommands::GetSingleton ().Execute ( "exit", "" );
+
+    return true;
+}
+
+
+bool CMainMenu::OnNewsButtonClick ( CGUIElement* pElement )
+{
+    // Return if we haven't faded in yet
+    if ( m_ucFade != FADE_VISIBLE ) return false;
+
+    m_pNewsBrowser->SetVisible ( true );
 
     return true;
 }

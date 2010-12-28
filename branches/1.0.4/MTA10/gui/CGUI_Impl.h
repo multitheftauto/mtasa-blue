@@ -195,6 +195,8 @@ public:
     void                            RemoveFromRedrawQueue       ( CGUIElement* pWindow );
 
     void                            CleanDeadPool               ( void );
+    CGUIWindow*                     LoadLayout                  ( CGUIElement* pParent, const SString& strFilename );
+    bool                            LoadImageset                ( const SString& strFilename );
 
 private:
     CGUIButton*                     _CreateButton               ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );

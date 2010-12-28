@@ -549,6 +549,7 @@ namespace SharedUtil
         SString     Get                 ( const SString& strInCmd ) const;                                                  // First result as string
         bool        Get                 ( const SString& strInCmd, std::vector < SString >& outList ) const;                // All results as strings
         bool        Get                 ( const SString& strInCmd, int& iValue, int iDefault = 0 ) const;                   // First result as int
+        void        GetKeys             ( std::vector < SString >& outList  ) const;                                        // All keys
     };
 
 
