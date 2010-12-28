@@ -19,6 +19,7 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA ( char* idString, int effectorBoneTag
     DWORD dwFunc = FUNC_CTaskSimpleIKChain__Constructor;
     // TODO: Find out the real size
     this->CreateTaskInterface ( 1024 );
+    if ( !IsValid () ) return;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwEntityInterface = 0;
     if ( pEntity ) dwEntityInterface = ( DWORD ) pEntity->GetInterface ();
@@ -50,6 +51,7 @@ CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA ( char* idString, CEntity* pEntity,
     DWORD dwFunc = FUNC_CTaskSimpleIKLookAt__Constructor;
     // TODO: Find out the real size
     this->CreateTaskInterface ( 1024 );
+    if ( !IsValid () ) return;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwEntityInterface = 0;
     if ( pEntity ) dwEntityInterface = ( DWORD ) pEntity->GetInterface ();
@@ -145,6 +147,7 @@ CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA ( CEntity* pEntity, int t
     DWORD dwFunc = FUNC_CTaskSimpleTriggerLookAt__Constructor;
     // TODO: Find out the real size
     this->CreateTaskInterface ( 1024 );
+    if ( !IsValid () ) return;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwEntityInterface = 0;
     if ( pEntity ) dwEntityInterface = ( DWORD ) pEntity->GetInterface ();

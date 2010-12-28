@@ -109,6 +109,10 @@ public:
     int                     GetNumberOfUsedSpaces   ( ePools pools );
     void                    DumpPoolsStatus         ( );
 
+    int                     GetPoolDefaultCapacity  ( ePools pool );
+    int                     GetPoolCapacity         ( ePools pool );
+    void                    SetPoolCapacity         ( ePools pool, int iValue );
+
     // stuff that really maybe should be elsewhere or not, perhaps
     CEntryInfoNodePool*             GetEntryInfoNodePool            ( );
     CPointerNodeSingleLinkPool*     GetPointerNodeSingleLinkPool    ( );

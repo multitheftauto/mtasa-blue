@@ -146,6 +146,8 @@ CGameSA::CGameSA()
     m_Cheats [ CHEAT_NEVERWANTED      ] = new SCheatSA((BYTE *)VAR_NeverWanted, false);
     m_Cheats [ CHEAT_HEALTARMORMONEY  ] = new SCheatSA((BYTE *)VAR_HealthArmorMoney, false);
 
+    // Change pool sizes here
+    m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );  // Default is 500
 }
 
 CGameSA::~CGameSA ( void )
