@@ -1027,6 +1027,7 @@ void CGame::JoinPlayer ( CPlayer& Player )
                                               m_pMainConfig->GetHTTPPort (),
                                               m_pMainConfig->GetHTTPDownloadURL ().c_str (),
                                               m_pMainConfig->GetHTTPMaxConnectionsPerClient (),
+                                              m_pMainConfig->GetHTTPMaxConnectionsLegacy (),
                                               m_pMainConfig->GetEnableClientChecks () ) );
 }
 

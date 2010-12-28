@@ -37,6 +37,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_iHTTPMaxConnectionsPerClient = 4;
+    m_bHTTPMaxConnectionsLegacy = true;
     m_iHTTPThreadCount = 8;
     m_iHTTPDosThreshold = 20;
     m_iEnableClientChecks = -1;
@@ -189,6 +190,11 @@ bool CMainConfig::Load ( const char* szFilename )
     // httpmaxconnectionsperclient
     GetInteger ( m_pRootNode, "httpmaxconnectionsperclient", m_iHTTPMaxConnectionsPerClient, 1, 8 );
     m_iHTTPMaxConnectionsPerClient = Clamp ( 1, m_iHTTPMaxConnectionsPerClient, 8 );
+
+    // httpmaxconnectionslegacy
+    iResult = GetBoolean ( m_pRootNode, "httpmaxconnectionslegacy", m_bHTTPMaxConnectionsLegacy );
+    if ( iResult != IS_SUCCESS )
+        m_bHTTPMaxConnectionsLegacy = true;
 
     // httpthreadcount
     GetInteger ( m_pRootNode, "httpthreadcount", m_iHTTPThreadCount, 1, 20 );

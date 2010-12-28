@@ -29,6 +29,7 @@ public:
                                                               unsigned short usHTTPDownloadPort,
                                                               const char* szHTTPDownloadURL,
                                                               int iHTTPMaxConnectionsPerClient,
+                                                              bool bHTTPMaxConnectionsLegacy,
                                                               int iEnableClientChecks );
 
     inline ePacketID        GetPacketID             ( void ) const      { return PACKET_ID_SERVER_JOINEDGAME; };
@@ -44,6 +45,7 @@ private:
     unsigned short          m_usHTTPDownloadPort;
     char                    m_szHTTPDownloadURL [MAX_HTTP_DOWNLOAD_URL + 1];
     int                     m_iHTTPMaxConnectionsPerClient;
+    bool                    m_bHTTPMaxConnectionsLegacy;
     int                     m_iEnableClientChecks;
 };
 
