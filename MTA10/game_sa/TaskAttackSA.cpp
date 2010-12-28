@@ -17,6 +17,7 @@ CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA ( CEntity *pTargetEntity, con
     DEBUG_TRACE("CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA ( CEntity *pTargetEntity, const CVector *pVecTarget, float fAbortRange, char FrequencyPercentage, char nDrivebyStyle, bool bSeatRHS )");
 
     this->CreateTaskInterface ( sizeof ( CTaskSimpleGangDriveBySAInterface ) );
+    if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskSimpleGangDriveBy__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
     DWORD dwTargetEntity = ( pTargetEntity ) ? ( DWORD ) pTargetEntity->GetInterface () : 0;
@@ -39,6 +40,7 @@ CTaskSimpleUseGunSA::CTaskSimpleUseGunSA ( CEntity *pTargetEntity, CVector vecTa
     DEBUG_TRACE("CTaskSimpleUseGunSA::CTaskSimpleUseGunSA ( CEntity *pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, unsigned char bAimImmediate )");
 
     this->CreateTaskInterface ( sizeof ( CTaskSimpleUseGunSAInterface ) );
+    if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
     DWORD dwTargetEntity = ( pTargetEntity ) ? ( DWORD ) pTargetEntity->GetInterface () : 0;
@@ -123,6 +125,7 @@ CTaskSimpleFightSA::CTaskSimpleFightSA ( CEntity *pTargetEntity, int nCommand, u
     DEBUG_TRACE("CTaskSimpleFightSA::CTaskSimpleFightSA ( CEntity *pTargetEntity, int nCommand, unsigned int nIdlePeriod )");
 
     this->CreateTaskInterface ( sizeof ( CTaskSimpleFightSAInterface ) );
+    if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskSimpleFight__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
     DWORD dwTargetEntity = ( pTargetEntity ) ? ( DWORD ) pTargetEntity->GetInterface () : 0;

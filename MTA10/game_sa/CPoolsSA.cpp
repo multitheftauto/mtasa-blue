@@ -1068,6 +1068,100 @@ void CPoolsSA::DumpPoolsStatus ()
     #endif
 }
 
+
+int CPoolsSA::GetPoolDefaultCapacity ( ePools pool )
+{
+    switch ( pool )
+    {
+        case BUILDING_POOL:             return 13000;
+        case PED_POOL:                  return 140;
+        case OBJECT_POOL:               return 350;
+        case DUMMY_POOL:                return 2500;
+        case VEHICLE_POOL:              return 110;
+        case COL_MODEL_POOL:            return 10150;
+        case TASK_POOL:                 return 500;
+        case EVENT_POOL:                return 200;
+        case TASK_ALLOCATOR_POOL:       return 16;
+        case PED_INTELLIGENCE_POOL:     return 140;
+        case PED_ATTRACTOR_POOL:        return 64;
+        case ENTRY_INFO_NODE_POOL:      return 500;
+        case NODE_ROUTE_POOL:           return 64;
+        case PATROL_ROUTE_POOL:         return 32;
+        case POINT_ROUTE_POOL:          return 64;
+        case POINTER_DOUBLE_LINK_POOL:  return 3200;
+        case POINTER_SINGLE_LINK_POOL:  return 70000;
+    }
+    return 0;
+}
+
+
+int CPoolsSA::GetPoolCapacity ( ePools pool )
+{
+    DWORD iPtr = NULL;
+    DWORD cPtr = NULL;
+    switch ( pool )
+    {
+        case BUILDING_POOL:             iPtr = 0x55105F; break;
+        case PED_POOL:                  iPtr = 0x550FF2; break;
+        case OBJECT_POOL:               iPtr = 0x551097; break;
+        case DUMMY_POOL:                iPtr = 0x5510CF; break;
+        case VEHICLE_POOL:              cPtr = 0x55102A; break;
+        case COL_MODEL_POOL:            iPtr = 0x551107; break;
+        case TASK_POOL:                 iPtr = 0x55113F; break;
+        case EVENT_POOL:                iPtr = 0x551177; break;
+        case TASK_ALLOCATOR_POOL:       cPtr = 0x55124E; break;
+        case PED_INTELLIGENCE_POOL:     iPtr = 0x551283; break;
+        case PED_ATTRACTOR_POOL:        cPtr = 0x5512BC; break;
+        case ENTRY_INFO_NODE_POOL:      iPtr = 0x550FBA; break;
+        case NODE_ROUTE_POOL:           cPtr = 0x551219; break;
+        case PATROL_ROUTE_POOL:         cPtr = 0x5511E4; break;
+        case POINT_ROUTE_POOL:          cPtr = 0x5511AF; break;
+        case POINTER_DOUBLE_LINK_POOL:  iPtr = 0x550F82; break;
+        case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
+    }
+    if ( iPtr )
+        return *(int*)iPtr;
+
+    if ( cPtr )
+        return *(char*)cPtr;
+
+    return 0;
+}
+
+
+// Must be called before CPools::Initialise()
+void CPoolsSA::SetPoolCapacity ( ePools pool, int iValue )
+{
+    DWORD iPtr = NULL;
+    DWORD cPtr = NULL;
+    switch ( pool )
+    {
+        case BUILDING_POOL:             iPtr = 0x55105F; break;
+        case PED_POOL:                  iPtr = 0x550FF2; break;
+        case OBJECT_POOL:               iPtr = 0x551097; break;
+        case DUMMY_POOL:                iPtr = 0x5510CF; break;
+        case VEHICLE_POOL:              iPtr = 0x55102A; break;
+        case COL_MODEL_POOL:            iPtr = 0x551107; break;
+        case TASK_POOL:                 iPtr = 0x55113F; break;
+        case EVENT_POOL:                iPtr = 0x551177; break;
+        case TASK_ALLOCATOR_POOL:       cPtr = 0x55124E; break;     // 0 - 127
+        case PED_INTELLIGENCE_POOL:     iPtr = 0x551283; break;
+        case PED_ATTRACTOR_POOL:        cPtr = 0x5512BB; break;     // 0 - 127
+        case ENTRY_INFO_NODE_POOL:      iPtr = 0x550FBA; break;
+        case NODE_ROUTE_POOL:           cPtr = 0x551218; break;     // 0 - 127
+        case PATROL_ROUTE_POOL:         cPtr = 0x5511E4; break;     // 0 - 127
+        case POINT_ROUTE_POOL:          cPtr = 0x5511AF; break;     // 0 - 127
+        case POINTER_DOUBLE_LINK_POOL:  iPtr = 0x550F82; break;
+        case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
+    }
+    if ( iPtr )
+        *(int*)iPtr = iValue;
+
+    if ( cPtr )
+        *(char*)cPtr = iValue;
+}
+
+
 int CPoolsSA::GetNumberOfUsedSpaces ( ePools pool )
 {
     DWORD dwFunc = NULL;

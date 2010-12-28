@@ -122,7 +122,12 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     // Ensure DllDirectory has not been changed
     char szDllDirectory[ MAX_PATH + 1 ] = {'\0'};
     GetDllDirectory( sizeof ( szDllDirectory ), szDllDirectory );
-    assert ( stricmp( CalcMTASAPath ( "mta" ), szDllDirectory ) == 0 );
+    if ( stricmp( CalcMTASAPath ( "mta" ), szDllDirectory ) != 0 )
+    {
+        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", szDllDirectory, *CalcMTASAPath ( "mta" ) ) );
+        SetDllDirectory( CalcMTASAPath ( "mta" ) );
+    }
+    
 
     // Load the library and use the supplied path as an extra place to search for dependencies
     m_hClientDLL = LoadLibraryEx ( itMod->second.c_str (), NULL, LOAD_WITH_ALTERED_SEARCH_PATH );

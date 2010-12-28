@@ -11,11 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CGame.h>
-#include <utils/CMD5Hasher.h>
 #include "CNewsBrowser.h"
-
-using namespace std;
 
 extern CCore* g_pCore;
 
