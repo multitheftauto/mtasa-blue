@@ -311,6 +311,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Element set funcs
     CLuaCFunctions::AddFunction ( "createElement", CLuaFunctionDefs::CreateElement );
     CLuaCFunctions::AddFunction ( "destroyElement", CLuaFunctionDefs::DestroyElement );
+    CLuaCFunctions::AddFunction ( "setElementID", CLuaFunctionDefs::SetElementID );
     CLuaCFunctions::AddFunction ( "setElementParent", CLuaFunctionDefs::SetElementParent );
     CLuaCFunctions::AddFunction ( "setElementData", CLuaFunctionDefs::SetElementData );
     //CLuaCFunctions::AddFunction ( "removeElementData", CLuaFunctionDefs::RemoveElementData ); TODO Clientside

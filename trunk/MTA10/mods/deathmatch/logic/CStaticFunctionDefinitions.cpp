@@ -822,6 +822,23 @@ bool CStaticFunctionDefinitions::DestroyElement ( CClientEntity& Entity )
 }
 
 
+bool CStaticFunctionDefinitions::SetElementID ( CClientEntity& Entity, const char* szID )
+{
+    assert ( szID );
+
+    // Change ID only for client-created elements
+    if ( Entity.IsLocalEntity () )
+    {
+        // Set the new ID
+        Entity.SetName ( szID );
+
+        return true;
+    }
+
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const char* szName, CLuaArgument& Variable, CLuaMain& LuaMain, bool bSynchronize )
 {
     assert ( szName );

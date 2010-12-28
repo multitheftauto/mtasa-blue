@@ -136,6 +136,7 @@ public:
     // Element set funcs
     LUA_DECLARE ( CreateElement );
     LUA_DECLARE ( DestroyElement );
+    LUA_DECLARE ( SetElementID );
     LUA_DECLARE ( SetElementData );
     LUA_DECLARE ( RemoveElementData );
     LUA_DECLARE ( SetElementPosition );
