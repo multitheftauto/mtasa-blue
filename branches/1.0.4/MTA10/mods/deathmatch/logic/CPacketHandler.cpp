@@ -2170,7 +2170,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     if ( ucNameLength <= 32 )
                     {
                         // Add it only if the name is longer than 0
-                        if ( ucNameLength > 0 )
+                        //if ( ucNameLength > 0 )
                         {
                             char szName [ 33 ] = { '\0' };
                             CLuaArgument Argument;
@@ -2180,7 +2180,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
                             Argument.ReadFromBitStream ( bitStream );
 
-                            pCustomData->Set ( szName, Argument, NULL );
+                            if ( ucNameLength > 0 )
+                                pCustomData->Set ( szName, Argument, NULL );
                         }
                     }
                     else

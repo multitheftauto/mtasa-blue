@@ -112,9 +112,12 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                 if ( bSynchronized )
                 {
                     unsigned char ucNameLength = static_cast < unsigned char > ( strlen ( szName ) );
-                    BitStream.Write ( ucNameLength );
-                    BitStream.Write ( szName, ucNameLength );
-                    pArgument->WriteToBitStream ( BitStream );
+                    if ( ucNameLength > 0 && ucNameLength <= 32 )
+                    {
+                        BitStream.Write ( ucNameLength );
+                        BitStream.Write ( szName, ucNameLength );
+                        pArgument->WriteToBitStream ( BitStream );
+                    }
                 }
             }
 
