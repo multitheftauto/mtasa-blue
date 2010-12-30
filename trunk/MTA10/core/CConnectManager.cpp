@@ -94,25 +94,6 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
         return false;
     }
 
-    // Start server version detection
-    m_bIsDetectingVersion = true;
-
-    SAFE_DELETE ( m_pServerItem );
-    m_pServerItem = new CServerListItem ( Address, m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
-    m_pServerItem->m_iTimeoutLength = 2000;
-
-    SString strBuffer ( "Connecting to %s:%u ..", m_strHost.c_str(), m_usPort );
-    CCore::GetSingleton ().ShowMessageBox ( "CONNECTING", strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
-    return true;
-}
-
-    
-
-
-bool CConnectManager::ConnectContinue ( void )
-{
-    CNet* pNet = CCore::GetSingleton ().GetNetwork ();
-
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket, true );
 
@@ -126,6 +107,12 @@ bool CConnectManager::ConnectContinue ( void )
 
     m_bIsConnecting = true;
     m_tConnectStarted = time ( NULL );
+
+    // Start server version detection
+    SAFE_DELETE ( m_pServerItem );
+    m_pServerItem = new CServerListItem ( Address, m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+    m_pServerItem->m_iTimeoutLength = 2000;
+    m_bIsDetectingVersion = true;
 
     // Display the status box
     SString strBuffer ( "Connecting to %s:%u ...", m_strHost.c_str(), m_usPort );
@@ -184,6 +171,7 @@ bool CConnectManager::Abort ( void )
     m_bIsConnecting = false;
     m_bIsDetectingVersion = false;
     m_tConnectStarted = 0;
+    SAFE_DELETE ( m_pServerItem );
 
     // Success
     return true;
@@ -192,37 +180,28 @@ bool CConnectManager::Abort ( void )
 
 void CConnectManager::DoPulse ( void )
 {
-    // Are we getting the server version?
-    if ( m_bIsDetectingVersion )
-    {
-        m_pServerItem->Pulse ( true );
-        if ( m_pServerItem->bSkipped )
-        {
-            // Can't determine server version, just try connect anyway
-            m_bIsDetectingVersion = false;
-            ConnectContinue ();
-        }
-        else
-        if ( m_pServerItem->bScanned )
-        {
-            // Got version, now see what to do
-            m_bIsDetectingVersion = false;
-            if ( m_pServerItem->strVersion == MTA_DM_ASE_VERSION )
-            {
-                // Version match, continue connect
-                ConnectContinue ();
-            }
-            else
-            {
-                // Version mis-match. See about launching compatible .exe
-                GetVersionUpdater ()->InitiateSidegradeLaunch ( m_pServerItem->strVersion, m_strHost.c_str(), m_usPort, m_strNick.c_str (), m_strPassword.c_str() );
-            }
-        }
-    }
-    else
     // Are we connecting?
     if ( m_bIsConnecting )
     {
+        // Are we also getting the server version?
+        if ( m_bIsDetectingVersion )
+        {
+            m_pServerItem->Pulse ( true );
+            // Got some sort of result?
+            if ( m_pServerItem->bSkipped || m_pServerItem->bScanned )
+            {
+                m_bIsDetectingVersion = false;
+                // Is different version?
+                if ( m_pServerItem->bScanned && m_pServerItem->strVersion != MTA_DM_ASE_VERSION )
+                {
+                    // Version mis-match. See about launching compatible .exe
+                    GetVersionUpdater ()->InitiateSidegradeLaunch ( m_pServerItem->strVersion, m_strHost.c_str(), m_usPort, m_strNick.c_str (), m_strPassword.c_str() );
+                    Abort ();
+                    return;
+                }
+            }
+        }
+
         // Time to timeout the connection?
         if ( time ( NULL ) >= m_tConnectStarted + 8 )
         {
@@ -355,6 +334,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
 
                 g_pConnectManager->m_usPort = 0;
                 g_pConnectManager->m_bIsConnecting = false;
+                g_pConnectManager->m_bIsDetectingVersion = false;
                 g_pConnectManager->m_tConnectStarted = 0;
 
                 // Load the mod
