@@ -42,8 +42,6 @@ public:
 
 
 private:
-    bool            ConnectContinue     ( void );
-
     bool            Event_OnCancelClick ( CGUIElement * pElement );
 
     unsigned short  m_usMTUSize;
