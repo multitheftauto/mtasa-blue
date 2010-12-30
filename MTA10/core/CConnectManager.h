@@ -35,8 +35,6 @@ public:
     static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream );
 
 private:
-    bool            ConnectContinue     ( void );
-
     bool            Event_OnCancelClick ( CGUIElement * pElement );
 
     std::string     m_strHost;
