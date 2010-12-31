@@ -571,6 +571,7 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
     bool bIsFull            = ( pServer->nPlayers >= pServer->nMaxPlayers ) && ( pServer->nMaxPlayers != 0 );
     bool bIsLocked          = pServer->bPassworded;
     bool bIsBlockedVersion  = bIsOtherVersion && MapContains ( m_blockedVersionMap, pServer->strVersion );
+    bool bIsBlockedServer   = ( pServer->uiMasterServerSaysRestrictions & ASE_FLAG_RESTRICTIONS ) != false;
 
     // Maybe switch on 'Other version' checkbox
     if ( bIsOtherVersion && !bIsBlockedVersion )
@@ -591,6 +592,7 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
         ( !bIsOffline || bIncludeOffline || bWasGoodNowFailing ) &&
         ( !bIsOtherVersion || bIncludeOtherVersions ) &&
         ( !bIsBlockedVersion ) &&
+        ( !bIsBlockedServer ) &&
         ( bServerSearchFound ) &&
         ( bPlayerSearchFound )
        )
@@ -657,6 +659,7 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
 #if MTA_DEBUG
         if ( pServer->uiCacheNoReplyCount )                     color.R /= 2;
         if ( pServer->bMasterServerSaysNoResponse )             color.G /= 2;
+        if ( pServer->uiMasterServerSaysRestrictions )          color.B /= 4;
 #endif
         if ( bIsOtherVersion )                                  color.B /= 2;
         if ( pServer->bMaybeOffline )                           color.A = color.A / 3 * 2;

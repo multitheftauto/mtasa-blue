@@ -46,6 +46,24 @@ class CMasterServerManagerInterface;
 
 enum
 {
+    ASE_FLAG_ADDRESS            =   0x0001,
+    ASE_FLAG_PORT               =   0x0002,
+    ASE_FLAG_PLAYER_COUNT       =   0x0004,
+    ASE_FLAG_MAX_PLAYER_COUNT   =   0x0008,
+    ASE_FLAG_GAME_NAME          =   0x0010,
+    ASE_FLAG_NAME               =   0x0020,
+    ASE_FLAG_GAME_MODE          =   0x0040,
+    ASE_FLAG_MAP                =   0x0080,
+    ASE_FLAG_VERSION            =   0x0100,
+    ASE_FLAG_PASSWORDED         =   0x0200,
+    ASE_FLAG_SERIALS            =   0x0400,
+    ASE_FLAG_PLAYER_LIST        =   0x0800,
+    ASE_FLAG_RESPONDING         =   0x1000,
+    ASE_FLAG_RESTRICTIONS       =   0x2000,
+};
+
+enum
+{
     SERVER_INFO_NONE,
     SERVER_INFO_ASE_0,
     SERVER_INFO_CACHE,
@@ -137,6 +155,7 @@ public:
         uiRevision = 1;
         bMaybeOffline = false;
         bMasterServerSaysNoResponse = false;
+        uiMasterServerSaysRestrictions = 0;
         for ( int i = 0 ; i < SERVER_BROWSER_TYPE_COUNT ; i++ )
             revisionInList[i] = -1;
 
@@ -181,6 +200,7 @@ public:
     bool                bSkipped;
     bool                bMaybeOffline;
     bool                bMasterServerSaysNoResponse;
+    uint                uiMasterServerSaysRestrictions;
     uint                revisionInList[ SERVER_BROWSER_TYPE_COUNT ];
     uint                uiCacheNoReplyCount;
     uint                uiQueryRetryCount;

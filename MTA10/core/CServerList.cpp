@@ -465,29 +465,40 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     strHost = szIP;
 
     // Game
-    if ( !ReadString ( strGameName, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_GAME_NAME ) == false )
+        strGameName = strTemp;
 
     // Port
     if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
-    usGamePort      = atoi ( strTemp.c_str () );
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PORT ) == false )
+        usGamePort = atoi ( strTemp.c_str () );
 
     // Server name
-    if ( !ReadString ( strName, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_NAME ) == false )
+        strName = strTemp;
 
     // Game type
-    if ( !ReadString ( strGameMode, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_GAME_MODE ) == false )
+        strGameMode = strTemp;
 
     // Map name
-    if ( !ReadString ( strMap, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAP ) == false )
+        strMap = strTemp;
 
     // Version
-    if ( !ReadString ( strVersion, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_VERSION ) == false )
+        strVersion = strTemp;
 
     // Got space for password, serial verification, player count, players max?
     if ( i + 4 > nLength )
@@ -495,22 +506,17 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
         return false;
     }
 
-    bPassworded = ( szBuffer[i++] == 1 );
-    bSerials = ( szBuffer[i++] == 1 );
-    nPlayers = (unsigned char)szBuffer[i++];
-    nMaxPlayers = (unsigned char)szBuffer[i++];
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PASSWORDED ) == false )
+        bPassworded = ( szBuffer[i++] == 1 );
 
-    // Recover large player count if present
-    SString strPlayerCount = strMap.Right ( strMap.length () - strlen ( strMap ) - 1 );
-    if ( !strPlayerCount.empty () )
-    {
-        SString strJoinedPlayers, strMaxPlayers;
-        if ( strPlayerCount.Split ( "/", &strJoinedPlayers, &strMaxPlayers ) )
-        {
-            nPlayers = atoi ( strJoinedPlayers );
-            nMaxPlayers = atoi ( strMaxPlayers );
-        }
-    }
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_SERIALS ) == false )
+        bSerials = ( szBuffer[i++] == 1 );
+
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_COUNT ) == false )
+        nPlayers = (unsigned char)szBuffer[i++];
+
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAX_PLAYER_COUNT ) == false )
+        nMaxPlayers = (unsigned char)szBuffer[i++];
 
     // Get player nicks
     vecPlayers.clear ();
@@ -524,7 +530,8 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
             std::string strResult = RemoveColorCode ( strPlayer.c_str () );
             if ( strResult.length () == 0 )
                 strResult = strPlayer;
-            vecPlayers.push_back ( strResult );
+            if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_LIST ) == false )
+                vecPlayers.push_back ( strResult );
         }
     }
 
