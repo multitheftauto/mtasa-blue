@@ -27,7 +27,7 @@ class CMainMenu;
 #include "CMainMenuScene.h"
 class CNewsBrowser;
 
-#define CORE_MTA_MENU_ITEMS     9
+#define CORE_MTA_MENU_ITEMS     12
 
 class CMainMenu
 {
@@ -80,6 +80,8 @@ public:
     void                ChangeCommunityState            ( bool bIn, const std::string& strUsername );
     bool                HasStarted                      ( void ) { return m_bStarted; };
 
+    void                SetNewsHeadline                 ( int iIndex, const SString& strContent, bool bIsNew );
+
 private:
     void                SetStaticBackground             ( bool bEnabled );
 
@@ -102,7 +104,7 @@ private:
     bool                OnItemEnter                     ( CGUIElement* pElement );
     bool                OnItemLeave                     ( CGUIElement* pElement );
 
-	void				ShowServerQueue					( void );
+    void                ShowServerQueue                 ( void );
     void                HideServerQueue                 ( void );
 
     CGUI*               m_pManager;
@@ -123,7 +125,7 @@ private:
     CNewsBrowser*       m_pNewsBrowser;
     CCredits            m_Credits;
     CServerBrowser      m_ServerBrowser;
-	CServerQueue		m_ServerQueue;
+    CServerQueue        m_ServerQueue;
 
     // Properties
     bool                m_bIsIngame;
@@ -156,6 +158,8 @@ private:
     unsigned char       m_ucFade;
     float               m_fFader;
 
+    CGUILabel*          m_pNewLabels[3];
+
     // Main menu items
     enum eMenuItems {
         MENU_ITEM_DISCONNECT,
@@ -167,6 +171,9 @@ private:
         MENU_ITEM_ABOUT,
         MENU_ITEM_QUIT,
         MENU_ITEM_NEWS,
+        MENU_ITEM_NEWS_ITEM_1,
+        MENU_ITEM_NEWS_ITEM_2,
+        MENU_ITEM_NEWS_ITEM_3,
         MENU_ITEM_MAX
     };
 

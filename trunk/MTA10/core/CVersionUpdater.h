@@ -18,6 +18,7 @@ class CVersionUpdaterInterface
 {
 public:
     virtual                ~CVersionUpdaterInterface        ( void ) {}
+    virtual bool            LoadConfigFromXML               ( void ) = 0;
     virtual bool            SaveConfigToXML                 ( void ) = 0;
     virtual void            EnableChecking                  ( bool bOn ) = 0;
     virtual void            DoPulse                         ( void ) = 0;
