@@ -38,6 +38,8 @@
 #define CORE_MTA_HEADER_Y           60
 
 static short WaitForMenu = 0;
+static const SColor headlineColors [] = { SColorRGBA ( 233, 234, 106, 255 ), SColorRGBA ( 233/2, 234/2, 106/2, 255 ), SColorRGBA ( 233/4, 234/4, 106/4, 255 ) };
+
 
 CMainMenu::CMainMenu ( CGUI* pManager )
 {
@@ -110,21 +112,31 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     if ( CCore::GetSingleton().GetCommunity()->IsLoggedIn() && !strUsername.empty() )
         ChangeCommunityState ( true, strUsername );
 
-    // Determine some variables based on the current screen size
-    unsigned int uiItemStartY = ScreenSize.fY / 2 - 30;
-    //unsigned int uiItemHeight = ( uiItemStartY / 1.55f ) / CORE_MTA_MENU_ITEMS;
-    unsigned int uiItemHeight = 30;
-
     // Create the menu items
-    CreateItem ( MENU_ITEM_DISCONNECT,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY ),                  "DISCONNECT",           GUI_CALLBACK ( &CMainMenu::OnDisconnectButtonClick, this ) );
-    CreateItem ( MENU_ITEM_QUICK_CONNECT,  CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*1 ), "QUICK CONNECT",        GUI_CALLBACK ( &CMainMenu::OnQuickConnectButtonClick, this ) );
-    CreateItem ( MENU_ITEM_BROWSE_SERVERS, CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*2 ), "BROWSE SERVERS",       GUI_CALLBACK ( &CMainMenu::OnBrowseServersButtonClick, this ) );
-    CreateItem ( MENU_ITEM_HOST_GAME,      CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*3 ), "HOST GAME",            GUI_CALLBACK ( &CMainMenu::OnHostGameButtonClick, this ) );
-    CreateItem ( MENU_ITEM_MAP_EDITOR,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*4 ), "MAP EDITOR",           GUI_CALLBACK ( &CMainMenu::OnEditorButtonClick, this ) );
-    CreateItem ( MENU_ITEM_SETTINGS,       CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*5 ), "SETTINGS",             GUI_CALLBACK ( &CMainMenu::OnSettingsButtonClick, this ) );
-    CreateItem ( MENU_ITEM_ABOUT,          CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*6 ), "ABOUT",                GUI_CALLBACK ( &CMainMenu::OnAboutButtonClick, this ) );
-    CreateItem ( MENU_ITEM_NEWS,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ), "NEWS",                 GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
-    CreateItem ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*8 ), "QUIT",                 GUI_CALLBACK ( &CMainMenu::OnQuitButtonClick, this ) );
+    CreateItem ( MENU_ITEM_DISCONNECT,     CVector2D ( 0, 0 ),      "DISCONNECT",           GUI_CALLBACK ( &CMainMenu::OnDisconnectButtonClick, this ) );
+    CreateItem ( MENU_ITEM_QUICK_CONNECT,  CVector2D ( 0, 0 ),      "QUICK CONNECT",        GUI_CALLBACK ( &CMainMenu::OnQuickConnectButtonClick, this ) );
+    CreateItem ( MENU_ITEM_BROWSE_SERVERS, CVector2D ( 0, 0 ),      "BROWSE SERVERS",       GUI_CALLBACK ( &CMainMenu::OnBrowseServersButtonClick, this ) );
+    CreateItem ( MENU_ITEM_HOST_GAME,      CVector2D ( 0, 0 ),      "HOST GAME",            GUI_CALLBACK ( &CMainMenu::OnHostGameButtonClick, this ) );
+    CreateItem ( MENU_ITEM_MAP_EDITOR,     CVector2D ( 0, 0 ),      "MAP EDITOR",           GUI_CALLBACK ( &CMainMenu::OnEditorButtonClick, this ) );
+    CreateItem ( MENU_ITEM_SETTINGS,       CVector2D ( 0, 0 ),      "SETTINGS",             GUI_CALLBACK ( &CMainMenu::OnSettingsButtonClick, this ) );
+    CreateItem ( MENU_ITEM_ABOUT,          CVector2D ( 0, 0 ),      "ABOUT",                GUI_CALLBACK ( &CMainMenu::OnAboutButtonClick, this ) );
+    CreateItem ( MENU_ITEM_NEWS,           CVector2D ( 0, 0 ),      "NEWS :",               GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
+    CreateItem ( MENU_ITEM_NEWS_ITEM_1,    CVector2D ( 0, 0 ),      " ",                    GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
+    CreateItem ( MENU_ITEM_NEWS_ITEM_2,    CVector2D ( 0, 0 ),      " ",                    GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
+    CreateItem ( MENU_ITEM_NEWS_ITEM_3,    CVector2D ( 0, 0 ),      " ",                    GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
+    CreateItem ( MENU_ITEM_QUIT,           CVector2D ( 0, 0 ),      "QUIT",                 GUI_CALLBACK ( &CMainMenu::OnQuitButtonClick, this ) );
+
+    // Create 'new' stickers
+    for ( uint i = 0 ; i < NUMELMS ( m_pNewLabels ) ; i++ )
+    {
+        CGUILabel*& pLabel =  m_pNewLabels[i];
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pBackground, "NEW" ) );
+        pLabel->SetFont ( "default-small" );
+        pLabel->SetTextColor ( 255, 0, 0 );
+        pLabel->AutoSize ( pLabel->GetText ().c_str () );
+        pLabel->SetAlpha ( 0.7f );
+        pLabel->SetVisible ( false );
+    }
 
     //Refresh all positions
     RefreshPositions ( );
@@ -195,7 +207,7 @@ void CMainMenu::RefreshPositions ( void )
     m_pCommunityLabel->SetPosition ( CVector2D ( 40.0f, ScreenSize.fY - 20.0f ) );
 
     //Set our individual item positions
-    unsigned int uiItemStartY = ScreenSize.fY / 2 - 30;
+    unsigned int uiItemStartY = ScreenSize.fY / 2 - 30 - ( ScreenSize.fY < 600 ? 40 : 0 );
     unsigned int uiItemHeight = 30;
     SetItemPosition ( MENU_ITEM_DISCONNECT,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY ), false );
     SetItemPosition ( MENU_ITEM_QUICK_CONNECT,  CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*1 ), false );
@@ -205,7 +217,10 @@ void CMainMenu::RefreshPositions ( void )
     SetItemPosition ( MENU_ITEM_SETTINGS,       CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*5 ), false );
     SetItemPosition ( MENU_ITEM_ABOUT,          CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*6 ), false );
     SetItemPosition ( MENU_ITEM_NEWS,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ), false );
-    SetItemPosition ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*8 ), false );
+    SetItemPosition ( MENU_ITEM_NEWS_ITEM_1,    CVector2D ( CORE_MTA_MENUITEMS_START_X + 60, uiItemStartY + uiItemHeight*7 ), false );
+    SetItemPosition ( MENU_ITEM_NEWS_ITEM_2,    CVector2D ( CORE_MTA_MENUITEMS_START_X + 60, uiItemStartY + uiItemHeight*7 + 14 ), false );
+    SetItemPosition ( MENU_ITEM_NEWS_ITEM_3,    CVector2D ( CORE_MTA_MENUITEMS_START_X + 60, uiItemStartY + uiItemHeight*7 + 28 ), false );
+    SetItemPosition ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*8 + 15 ), false );
 }
 
 void CMainMenu::Update ( void )
@@ -352,7 +367,10 @@ void CMainMenu::Update ( void )
         // it takes 250 frames for the menu to be shown, we seem to update this twice a frame
         if ( WaitForMenu >= 250 ) {
             if ( !m_bStarted )
+            {
+                m_pNewsBrowser->CreateHeadlines ();
                 GetVersionUpdater ()->EnableChecking ( true );
+            }
             m_bIsVisible = true;
             m_bStarted = true;
         } else
@@ -562,7 +580,7 @@ bool CMainMenu::OnBrowseServersButtonClick ( CGUIElement* pElement )
 
 void CMainMenu::ShowServerQueue ( void )
 {
-	m_ServerQueue.SetVisible ( true );
+    m_ServerQueue.SetVisible ( true );
 }
 
 void CMainMenu::HideServerQueue ( void )
@@ -665,7 +683,18 @@ bool CMainMenu::OnNewsButtonClick ( CGUIElement* pElement )
     // Return if we haven't faded in yet
     if ( m_ucFade != FADE_VISIBLE ) return false;
 
+    int iIndex = 0;
+    if ( pElement )
+    {
+        // Calc index from color
+        CGUIColor color = dynamic_cast < CGUILabel* > ( pElement )->GetTextColor ();
+        for ( uint i = 0 ; i < NUMELMS ( headlineColors ) ; i++ )
+            if ( color.R == headlineColors[i].R )
+                iIndex = i;
+    }
+
     m_pNewsBrowser->SetVisible ( true );
+    m_pNewsBrowser->SwitchToTab ( iIndex );
 
     return true;
 }
@@ -865,4 +894,31 @@ void CMainMenu::ChangeCommunityState ( bool bIn, const std::string& strUsername 
     }
     m_pCommunityLabel->SetText ( "Not logged in" );
     m_pCommunityLabel->AutoSize ( "Not logged in" );
+}
+
+
+void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bIsNew )
+{
+    if ( iIndex < 0 || iIndex > 2 )
+        return;
+
+    // Headline
+    CGUILabel* pItem = m_pItems[ MENU_ITEM_NEWS_ITEM_1 + iIndex ];
+    SColor color = headlineColors[ iIndex ];
+    pItem->SetTextColor ( color.R, color.G, color.B );
+    pItem->SetText ( strContent );
+    pItem->AutoSize ( strContent );
+    float fWidth = pItem->GetTextExtent ();
+    CVector2D vecPos = pItem->GetPosition ();
+
+    // 'NEW' sticker
+    CGUILabel* pNewLabel = m_pNewLabels[ iIndex ];
+    pNewLabel->SetVisible ( bIsNew );
+    pNewLabel->SetPosition ( vecPos + CVector2D ( fWidth + 5, -4 ) );
+
+    // Hide NEWS: label if top item is blank
+    if ( iIndex == 0 )
+        m_pItems [ MENU_ITEM_NEWS ]->SetVisible ( !strContent.empty () );
+
+    RefreshPositions ();
 }

@@ -13,6 +13,15 @@
 #ifndef __CNEWSBROWSER_H
 #define __CNEWSBROWSER_H
 
+struct SNewsItem
+{
+    SString                     strContentFullDir;
+    SString                     strHeadline;
+    SString                     strLayoutFilename;
+    std::vector < SString >     imagesetFilenameList;
+};
+
+
 class CNewsBrowser
 {
 public:
@@ -22,14 +31,18 @@ public:
 
     void                SetVisible              ( bool bVisible );
     bool                IsVisible               ( void );
+    void                CreateHeadlines         ( void );
+    void                SwitchToTab             ( int iIndex );
 
 protected:
-    void                AddNewsTab              ( const SString& strTitle, const SString& strContent );
-    CGUIWindow*         LoadLayoutAndImages     ( CGUIElement* pParent, const SString& strFilename );
+    void                InitNewsItemList        ( void );
+    void                AddNewsTab              ( const SNewsItem& newsItem );
+    CGUIWindow*         LoadLayoutAndImages     ( CGUIElement* pParent, const SNewsItem& newsItem );
     void                CreateGUI               ( void );
     void                DestroyGUI              ( void );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
 
+    std::vector < SNewsItem >       m_NewsitemList;
     CGUIWindow*                     m_pWindow;
     CGUITabPanel*                   m_pTabPanel;
     CGUIButton*                     m_pButtonOK;

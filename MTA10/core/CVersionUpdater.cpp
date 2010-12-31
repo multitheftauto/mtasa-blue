@@ -31,6 +31,7 @@ public:
     // CVersionUpdaterInterface interface
                         CVersionUpdater                     ( void );
     virtual             ~CVersionUpdater                    ( void );
+    virtual bool        LoadConfigFromXML                   ( void );
     virtual bool        SaveConfigToXML                     ( void );
     virtual void        EnableChecking                      ( bool bOn );
     virtual void        DoPulse                             ( void );
@@ -52,7 +53,6 @@ public:
 
     // Util
     CXMLNode*           GetXMLConfigNode                    ( bool bCreateIfRequired );
-    bool                LoadConfigFromXML                   ( void );
     bool                IsBusy                              ( void );
     void                ResetEverything                     ( void );
     CReportWrap*        GetReportWrap                       ( void );
@@ -292,6 +292,7 @@ bool CVersionUpdater::LoadConfigFromXML ( void )
         UpdateTroubleURL ();
     }
 
+    m_bLoadedConfig = true;
     return true;
 }
 
@@ -389,17 +390,8 @@ CReportWrap* CVersionUpdater::GetReportWrap()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::DoPulse ( void )
 {
-    if ( !m_bEnabled )
+    if ( !m_bEnabled || !m_bLoadedConfig )
         return;
-
-    //
-    // Loaded config?
-    //
-    if ( !m_bLoadedConfig && !IsBusy () )
-    {
-        m_bLoadedConfig = true;
-        LoadConfigFromXML ();
-    }
 
     //
     // Time for master check?
@@ -452,33 +444,15 @@ void CVersionUpdater::DoPulse ( void )
     //
     if ( !m_bCheckedTimeForNewsUpdate && !IsBusy () )
     {
-        // Show news browser?
-        if ( GetApplicationSettingInt ( "news-updated" ) == 1 )
+        m_bCheckedTimeForNewsUpdate = true;
+
+        time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.news_lastCheckTime.ToSeconds ();
+        OutputDebugLine ( SString ( "news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
+
+        // Only check once an interval
+        if ( secondsSinceCheck > m_MasterConfig.news.interval.ToSeconds () || secondsSinceCheck < 0 )
         {
-            if ( !GetQuestionBox ().IsVisible () )
-            {
-                if ( m_uiFrameCounter++ > 10 )
-                {
-                    SetApplicationSettingInt ( "news-updated", 0 );
-                    CLocalGUI::GetSingleton ().GetMainMenu ()->GetNewsBrowser ()->SetVisible ( true );
-                }
-            }
-            else
-                m_uiFrameCounter = 0;
-        }
-
-        if ( GetApplicationSettingInt ( "news-updated" ) != 1 )
-        {
-            m_bCheckedTimeForNewsUpdate = true;
-
-            time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.news_lastCheckTime.ToSeconds ();
-            OutputDebugLine ( SString ( "news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
-
-            // Only check once an interval
-            if ( secondsSinceCheck > m_MasterConfig.news.interval.ToSeconds () || secondsSinceCheck < 0 )
-            {
-                RunProgram ( "NewsUpdate" );
-            }
+            RunProgram ( "NewsUpdate" );
         }
     }
 
