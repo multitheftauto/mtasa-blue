@@ -256,6 +256,7 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
     bool bHasSerials        = ( uiFlags & 0x0400 ) != 0;
     bool bHasPlayers        = ( uiFlags & 0x0800 ) != 0;
     bool bHasRespondingFlag = ( uiFlags & 0x1000 ) != 0;
+    bool bHasRestrictionFlags = ( uiFlags & 0x2000 ) != 0;
 
     // Read sequence number
     uint uiSequenceNumber = 0;
@@ -324,6 +325,11 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
             if ( bHasRespondingFlag )
             {
                 stream.Read ( pItem->bMasterServerSaysNoResponse );
+            }
+
+            if ( bHasRestrictionFlags )
+            {
+                stream.Read ( pItem->uiMasterServerSaysRestrictions );
             }
 
             pItem->PostChange ();

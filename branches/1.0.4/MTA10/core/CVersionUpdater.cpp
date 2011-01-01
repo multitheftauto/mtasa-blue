@@ -44,6 +44,7 @@ public:
     virtual void        GetNewsSettings                     ( SString& strOutOldestPost, uint& uiOutMaxHistoryLength );
 
     // CVersionUpdater functions
+    bool                EnsureLoadedConfigFromXML           ( void );
 
     // Command lists
     void                InitPrograms                        ( void );
@@ -52,7 +53,6 @@ public:
 
     // Util
     CXMLNode*           GetXMLConfigNode                    ( bool bCreateIfRequired );
-    bool                LoadConfigFromXML                   ( void );
     bool                IsBusy                              ( void );
     void                ResetEverything                     ( void );
     CReportWrap*        GetReportWrap                       ( void );
@@ -238,13 +238,18 @@ CXMLNode* CVersionUpdater::GetXMLConfigNode ( bool bCreateIfRequired )
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::LoadFromXML
+// CVersionUpdater::EnsureLoadedConfigFromXML
 //
 // Load settings
 //
 ///////////////////////////////////////////////////////////////
-bool CVersionUpdater::LoadConfigFromXML ( void )
+bool CVersionUpdater::EnsureLoadedConfigFromXML ( void )
 {
+    if ( m_bLoadedConfig )
+        return false;
+
+    m_bLoadedConfig = true;
+
     // Reset
     m_MasterConfig = SUpdaterMasterConfig ();
 
@@ -305,6 +310,9 @@ bool CVersionUpdater::LoadConfigFromXML ( void )
 ///////////////////////////////////////////////////////////////
 bool CVersionUpdater::SaveConfigToXML ( void )
 {
+    if ( !m_bLoadedConfig )
+        return false;
+
     CXMLNode* pMainNode = GetXMLConfigNode ( true );
 
     if ( !pMainNode )
@@ -362,6 +370,7 @@ bool CVersionUpdater::SaveConfigToXML ( void )
 void CVersionUpdater::EnableChecking( bool bOn )
 {
     m_bEnabled = bOn;
+    EnsureLoadedConfigFromXML ();
 }
 
 
@@ -392,14 +401,7 @@ void CVersionUpdater::DoPulse ( void )
     if ( !m_bEnabled )
         return;
 
-    //
-    // Loaded config?
-    //
-    if ( !m_bLoadedConfig && !IsBusy () )
-    {
-        m_bLoadedConfig = true;
-        LoadConfigFromXML ();
-    }
+    EnsureLoadedConfigFromXML ();
 
     //
     // Time for master check?
@@ -452,33 +454,15 @@ void CVersionUpdater::DoPulse ( void )
     //
     if ( !m_bCheckedTimeForNewsUpdate && !IsBusy () )
     {
-        // Show news browser?
-        if ( GetApplicationSettingInt ( "news-updated" ) == 1 )
+        m_bCheckedTimeForNewsUpdate = true;
+
+        time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.news_lastCheckTime.ToSeconds ();
+        OutputDebugLine ( SString ( "news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
+
+        // Only check once an interval
+        if ( secondsSinceCheck > m_MasterConfig.news.interval.ToSeconds () || secondsSinceCheck < 0 )
         {
-            if ( !GetQuestionBox ().IsVisible () )
-            {
-                if ( m_uiFrameCounter++ > 10 )
-                {
-                    SetApplicationSettingInt ( "news-updated", 0 );
-                    CLocalGUI::GetSingleton ().GetMainMenu ()->GetNewsBrowser ()->SetVisible ( true );
-                }
-            }
-            else
-                m_uiFrameCounter = 0;
-        }
-
-        if ( GetApplicationSettingInt ( "news-updated" ) != 1 )
-        {
-            m_bCheckedTimeForNewsUpdate = true;
-
-            time_t secondsSinceCheck = CDateTime::Now ().ToSeconds () - m_VarConfig.news_lastCheckTime.ToSeconds ();
-            OutputDebugLine ( SString ( "news timeSinceCheck: %d  time till next check: %d", (int)(secondsSinceCheck), (int)(m_MasterConfig.news.interval.ToSeconds () - secondsSinceCheck) ) );
-
-            // Only check once an interval
-            if ( secondsSinceCheck > m_MasterConfig.news.interval.ToSeconds () || secondsSinceCheck < 0 )
-            {
-                RunProgram ( "NewsUpdate" );
-            }
+            RunProgram ( "NewsUpdate" );
         }
     }
 
@@ -647,6 +631,8 @@ void CVersionUpdater::InitiateSidegradeLaunch ( const SString& strVersion, const
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::GetAseServerList ( std::vector < SString >& outResult )
 {
+    EnsureLoadedConfigFromXML ();
+
     outResult = MakeServerList ( m_MasterConfig.ase.serverInfoMap );
 
     // Backup plan if list is empty
@@ -664,6 +650,8 @@ void CVersionUpdater::GetAseServerList ( std::vector < SString >& outResult )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::GetBlockedVersionMap ( std::map < SString, int >& outBlockedVersionMap )
 {
+    EnsureLoadedConfigFromXML ();
+
     outBlockedVersionMap.clear ();
 
     //
@@ -2070,6 +2058,7 @@ void CVersionUpdater::UpdateTroubleURL ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::GetNewsSettings ( SString& strOutOldestPost, uint& uiOutMaxHistoryLength )
 {
+    EnsureLoadedConfigFromXML ();
     strOutOldestPost = m_MasterConfig.news.strOldestPost;
     uiOutMaxHistoryLength = m_MasterConfig.news.iMaxHistoryLength;
 }

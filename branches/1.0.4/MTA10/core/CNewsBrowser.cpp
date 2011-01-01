@@ -15,6 +15,14 @@
 
 extern CCore* g_pCore;
 
+
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::CNewsBrowser
+//
+//
+//
+////////////////////////////////////////////////////
 CNewsBrowser::CNewsBrowser ( void )
 {
     m_pWindow = NULL;
@@ -23,14 +31,121 @@ CNewsBrowser::CNewsBrowser ( void )
 }
 
 
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::~CNewsBrowser
+//
+//
+//
+////////////////////////////////////////////////////
 CNewsBrowser::~CNewsBrowser ( void )
 {
     DestroyGUI ();
 }
 
 
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::InitNewsItemList
+//
+//
+//
+////////////////////////////////////////////////////
+void CNewsBrowser::InitNewsItemList ( void )
+{
+    m_NewsitemList.clear ();
+
+    // Find all sub-directories in 'news' directory
+    SString strAllNewsDir = PathJoin ( GetMTALocalAppDataPath (), "news" );
+    std::vector < SString > directoryList = FindFiles ( strAllNewsDir + "\\*", false, true );
+    std::sort ( directoryList.begin (), directoryList.end () );
+
+    // Get news settings
+    SString strOldestPost;
+    uint uiMaxHistoryLength;
+    GetVersionUpdater ()->GetNewsSettings ( strOldestPost, uiMaxHistoryLength );
+
+    // Process each sub-directory
+    for ( uint i = 0; i < directoryList.size () ; i++ )
+    {
+        SString strItemDir = directoryList[ directoryList.size () - 1 - i ];
+        if ( strItemDir < strOldestPost )
+            continue;   // Post too old
+        if ( m_NewsitemList.size () >= uiMaxHistoryLength )
+            continue;   // Post count too high
+
+        SNewsItem newsItem;
+        newsItem.strContentFullDir = PathJoin ( strAllNewsDir, strItemDir );
+
+        // Get filenames from XML file
+        CXMLFile* pFile = g_pCore->GetXML ()->CreateXML ( PathJoin ( newsItem.strContentFullDir, "files.xml" ) );
+        if ( pFile )
+        {
+            pFile->Parse ();
+            CXMLNode* pRoot = pFile->GetRootNode ();
+
+            if ( pRoot )
+            {
+                // Headline text
+                CXMLNode* pHeadline = pRoot->FindSubNode ( "headline", 0 );
+                if ( pHeadline )
+                    newsItem.strHeadline = pHeadline->GetTagContent ();
+
+                // Layout filename
+                CXMLNode* pLayout = pRoot->FindSubNode ( "layout", 0 );
+                if ( pLayout )
+                    newsItem.strLayoutFilename = pLayout->GetTagContent ();
+
+                // Imageset filenames
+                CXMLNode* pImages = pRoot->FindSubNode ( "imagesetlist", 0 );
+                if ( pImages )
+                    for ( uint i = 0 ; i < pImages->GetSubNodeCount () ; i++ )
+                        newsItem.imagesetFilenameList.push_back ( pImages->GetSubNode ( i )->GetTagContent () );
+            }
+
+            delete pFile;
+        }
+
+        // Add to news item list if valid
+        if ( !newsItem.strHeadline.empty () && !newsItem.strLayoutFilename.empty () )
+            m_NewsitemList.push_back ( newsItem );
+    }
+}
+
+
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::CreateHeadlines
+//
+//
+//
+////////////////////////////////////////////////////
+void CNewsBrowser::CreateHeadlines ( void )
+{
+    InitNewsItemList ();
+    bool bNewsUpdated = GetApplicationSettingInt ( "news-updated" ) == 1;
+
+    uint i;
+    // Process each news item
+    for ( i = 0; i < m_NewsitemList.size () ; i++ )
+        CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->SetNewsHeadline ( i, m_NewsitemList[i].strHeadline, i < 1 && bNewsUpdated );
+
+    // Clear unused slots
+    for ( ; i < 3 ; i++ )
+        CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->SetNewsHeadline ( i, "", false );
+}
+
+
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::CreateGUI
+//
+//
+//
+////////////////////////////////////////////////////
 void CNewsBrowser::CreateGUI ( void )
 {
+    CreateHeadlines ();
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Create the window
@@ -59,30 +174,20 @@ void CNewsBrowser::CreateGUI ( void )
     m_pTabPanel->SetPosition ( CVector2D ( 0, 20.0f ) );
     m_pTabPanel->SetSize ( CVector2D ( 640.0f, 480.0f - 60 ) );
 
-    // Find all sub-directories in 'news' directory
-    SString strAllNewsDir = PathJoin ( GetMTALocalAppDataPath (), "news" );
-    std::vector < SString > directoryList = FindFiles ( strAllNewsDir + "\\*", false, true );
-    std::sort ( directoryList.begin (), directoryList.end () );
-
-    // Get news settings
-    SString strOldestPost;
-    uint uiMaxHistoryLength;
-    GetVersionUpdater ()->GetNewsSettings ( strOldestPost, uiMaxHistoryLength );
-
-    // Process each sub-directory
-    for ( uint i = 0; i < directoryList.size () ; i++ )
+    for ( uint i = 0; i < m_NewsitemList.size () ; i++ )
     {
-        SString strItemDir = directoryList[ directoryList.size () - 1 - i ];
-        if ( strItemDir < strOldestPost )
-            continue;   // Post too old
-        if ( i >= uiMaxHistoryLength )
-            continue;   // Post count too high
-
-        AddNewsTab ( strItemDir, PathJoin ( strAllNewsDir, strItemDir ) );
+        AddNewsTab ( m_NewsitemList[i] );
     }
 }
 
 
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::DestroyGUI
+//
+//
+//
+////////////////////////////////////////////////////
 void CNewsBrowser::DestroyGUI ( void )
 {
     // Destroy
@@ -113,11 +218,18 @@ void CNewsBrowser::DestroyGUI ( void )
 }
 
 
-void CNewsBrowser::AddNewsTab ( const SString& strTitle, const SString& strContentDir )
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::AddNewsTab
+//
+//
+//
+////////////////////////////////////////////////////
+void CNewsBrowser::AddNewsTab ( const SNewsItem& newsItem )
 {
     CGUI *pManager = g_pCore->GetGUI ();
 
-    CGUITab* pTab = m_pTabPanel->CreateTab ( strTitle );
+    CGUITab* pTab = m_pTabPanel->CreateTab ( "News" );
     m_TabList.push_back ( pTab );
 
     //Create everything under a scrollpane
@@ -130,10 +242,10 @@ void CNewsBrowser::AddNewsTab ( const SString& strTitle, const SString& strConte
 
     // Switch cwd
     SString cwd = GetCurrentWorkingDirectory ();
-    SetCurrentDirectory ( strContentDir );
+    SetCurrentDirectory ( newsItem.strContentFullDir );
 
     // Load files
-    CGUIWindow* pWindow = LoadLayoutAndImages ( m_pScrollPane, strContentDir );
+    CGUIWindow* pWindow = LoadLayoutAndImages ( m_pScrollPane, newsItem );
     m_TabContentList.push_back ( pWindow );
 
     // Set tab name from content window title
@@ -149,65 +261,66 @@ void CNewsBrowser::AddNewsTab ( const SString& strTitle, const SString& strConte
 }
 
 
-CGUIWindow* CNewsBrowser::LoadLayoutAndImages ( CGUIElement* pParent, const SString& strContentDir )
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::LoadLayoutAndImages
+//
+//
+//
+////////////////////////////////////////////////////
+CGUIWindow* CNewsBrowser::LoadLayoutAndImages ( CGUIElement* pParent, const SNewsItem& newsItem )
 {
     CGUI *pManager = g_pCore->GetGUI ();
 
-    SString strLayoutFilename;
-    std::vector < SString > outList;
-
-    // Get filenames from XML file
-    CXMLFile* pFile = g_pCore->GetXML ()->CreateXML ( "files.xml" );
-    if ( pFile )
-    {
-        pFile->Parse ();
-        CXMLNode* pRoot = pFile->GetRootNode ();
-
-        if ( pRoot )
-        {
-            // Layout filename
-            CXMLNode* pLayout = pRoot->FindSubNode ( "layout", 0 );
-            if ( pLayout )
-                strLayoutFilename = pLayout->GetTagContent ();
-
-            // Imageset filenames
-            CXMLNode* pImages = pRoot->FindSubNode ( "imagesetlist", 0 );
-            if ( pImages )
-                for ( uint i = 0 ; i < pImages->GetSubNodeCount () ; i++ )
-                    outList.push_back ( pImages->GetSubNode ( i )->GetTagContent () );
-        }
-
-        delete pFile;
-    }
-
     // Make sure we have the layout filename
-    if ( strLayoutFilename.empty () )
+    if ( newsItem.strLayoutFilename.empty () )
     {
-        AddReportLog ( 3302, SString ( "CNewsBrowser::LoadLayout: Problem loading %s", *strContentDir ) );
+        AddReportLog ( 3302, SString ( "CNewsBrowser::LoadLayout: Problem loading %s", *newsItem.strContentFullDir ) );
         return NULL;
     }
 
     // Load any imagesets
-    for ( uint i = 0 ; i < outList.size () ; i++ )
+    for ( uint i = 0 ; i < newsItem.imagesetFilenameList.size () ; i++ )
     {
-        if ( !pManager->LoadImageset( outList[i] ) )
+        if ( !pManager->LoadImageset( newsItem.imagesetFilenameList[i] ) )
         {
-            AddReportLog ( 3303, SString ( "CNewsBrowser::LoadLayout: Problem with LoadImageset [%s] %s", *strContentDir, *outList[i] ) );
+            AddReportLog ( 3303, SString ( "CNewsBrowser::LoadLayout: Problem with LoadImageset [%s] %s", *newsItem.strContentFullDir, *newsItem.imagesetFilenameList[i] ) );
             return NULL;
         }
     }
 
     // Load layout
-    CGUIWindow* pWindow = pManager->LoadLayout ( pParent, strLayoutFilename );
+    CGUIWindow* pWindow = pManager->LoadLayout ( pParent, newsItem.strLayoutFilename );
     if ( !pWindow )
     {
-        AddReportLog ( 3304, SString ( "CNewsBrowser::LoadLayout: Problem with LoadLayout [%s] %s", *strContentDir, *strLayoutFilename ) );
+        AddReportLog ( 3304, SString ( "CNewsBrowser::LoadLayout: Problem with LoadLayout [%s] %s", *newsItem.strContentFullDir, *newsItem.strLayoutFilename ) );
         return NULL;
     }
     return pWindow;
 }
 
 
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::SwitchToTab
+//
+//
+//
+////////////////////////////////////////////////////
+void CNewsBrowser::SwitchToTab ( int iIndex )
+{
+    if ( iIndex >= 0 && iIndex < (int)m_TabList.size () )
+        m_pTabPanel->SetSelectedTab ( m_TabList[iIndex] );
+}
+
+
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::SetVisible
+//
+//
+//
+////////////////////////////////////////////////////
 void CNewsBrowser::SetVisible ( bool bVisible )
 {
     if ( !bVisible && !m_pWindow )
@@ -232,16 +345,35 @@ void CNewsBrowser::SetVisible ( bool bVisible )
         m_pWindow->Activate ();
         m_pWindow->SetAlwaysOnTop ( true );
         m_pWindow->BringToFront ();
+        if ( GetApplicationSettingInt ( "news-updated" ) == 1 )
+        {
+            SetApplicationSettingInt ( "news-updated", 0 );
+            CreateHeadlines ();
+        }
     }
 }
 
 
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::IsVisible
+//
+//
+//
+////////////////////////////////////////////////////
 bool CNewsBrowser::IsVisible ( void )
 {
     return m_pWindow && m_pWindow->IsVisible ();
 }
 
 
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::OnOKButtonClick
+//
+//
+//
+////////////////////////////////////////////////////
 bool CNewsBrowser::OnOKButtonClick ( CGUIElement* pElement )
 {
     // Close the window
