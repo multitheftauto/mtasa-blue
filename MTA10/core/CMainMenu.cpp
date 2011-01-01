@@ -144,6 +144,9 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     // Disable the disconnect item
     DisableItem ( MENU_ITEM_DISCONNECT, true );
 
+    // Disable the news item incase there is no news
+    DisableItem ( MENU_ITEM_NEWS, true );
+
     // Submenu's
     m_QuickConnect.SetVisible ( false );
     m_ServerBrowser.SetVisible ( false );
@@ -916,9 +919,14 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bI
     pNewLabel->SetVisible ( bIsNew );
     pNewLabel->SetPosition ( vecPos + CVector2D ( fWidth + 5, -4 ) );
 
-    // Hide NEWS: label if top item is blank
+    // Hide NEWS label if top item is blank
     if ( iIndex == 0 )
-        m_pItems [ MENU_ITEM_NEWS ]->SetVisible ( !strContent.empty () );
+    {
+        if ( strContent.empty () )
+            DisableItem ( MENU_ITEM_NEWS, true );
+        else
+            EnableItem ( MENU_ITEM_NEWS );
+    }
 
     RefreshPositions ();
 }
