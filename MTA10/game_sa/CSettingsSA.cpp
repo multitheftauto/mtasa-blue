@@ -201,6 +201,27 @@ void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
     *(FLOAT *)VAR_fMouseSensitivity = fSensitivity;
 }
 
+unsigned int CSettingsSA::GetAntiAliasing ( )
+{
+    // 1 = disabled, 2 = 1x, 3 = 2x, 4 = 3x
+    return m_pInterface->dwAntiAliasing;
+}
+
+void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing )
+{
+    DWORD dwFunc = FUNC_SetAntiAliasing;
+    _asm
+    {
+        push    uiAntiAliasing
+        call    dwFunc
+        add     esp, 4
+    }
+    m_pInterface->dwAntiAliasing = uiAntiAliasing;
+
+    // We need to reapply current video mode
+    SetCurrentVideoMode ( m_pInterface->dwVideoMode, false ); 
+}
+
 void CSettingsSA::Save ()
 {
     _asm
