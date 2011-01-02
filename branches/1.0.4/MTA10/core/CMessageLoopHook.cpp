@@ -92,6 +92,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
         return true;
     }
 
+    // Disable the system context menu by clicking in the process icon or pressing ALT+SPACE.
+    if ( uMsg == WM_SYSCOMMAND )
+    {
+        if ( wParam == 0xF093 || wParam == SC_KEYMENU || wParam == SC_MOUSEMENU )
+            return 0;
+    }
+
     // Quit message?
     if ( uMsg == WM_CLOSE )
     {
