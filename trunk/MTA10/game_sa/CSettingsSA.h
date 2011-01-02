@@ -40,6 +40,8 @@
 #define CLASS_CGamma 0xC92134
 #define FUNC_CGamma_SetGamma 0x747200
 
+#define FUNC_SetAntiAliasing    0x7F8A90
+
 struct CSettingsSAInterface // see code around 0x57CE9A for where these are
 {
     BYTE pad1[4];
@@ -65,9 +67,11 @@ struct CSettingsSAInterface // see code around 0x57CE9A for where these are
     bool bInvertPadY2;          // 0xB4
     bool bSwapPadAxis1;         // 0xB5
     bool bSwapPadAxis2;         // 0xB6
-    BYTE pad6[0x19];
+    BYTE pad6[0x11];
+    DWORD dwAntiAliasing;       // 0xC8
+    DWORD dwFrontendAA;         // 0xCC (anti-aliasing value in the single-player settings menu. Useless for MTA).
     bool bUseKeyboardAndMouse;  // 0xD0
-    BYTE pad7[3];
+    BYTE pad8[3];
     DWORD dwVideoMode;          // 0xD4
     DWORD dwPrevVideoMode;      // 0xD8
 };
@@ -113,6 +117,9 @@ public:
 
     float                   GetMouseSensitivity         ( void );
     void                    SetMouseSensitivity         ( float fSensitivity );
+
+    unsigned int            GetAntiAliasing             ( void );
+    void                    SetAntiAliasing             ( unsigned int uiAntiAliasing );
 
     void                    Save                        ( void );
 
