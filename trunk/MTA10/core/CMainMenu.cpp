@@ -38,7 +38,7 @@
 #define CORE_MTA_HEADER_Y           60
 
 static short WaitForMenu = 0;
-static const SColor headlineColors [] = { SColorRGBA ( 233, 234, 106, 255 ), SColorRGBA ( 233/2, 234/2, 106/2, 255 ), SColorRGBA ( 233/4, 234/4, 106/4, 255 ) };
+static const SColor headlineColors [] = { SColorRGBA ( 233, 234, 106, 255 ), SColorRGBA ( 233/6*4, 234/6*4, 106/6*4, 255 ), SColorRGBA ( 233/7*3, 234/7*3, 106/7*3, 255 ) };
 
 
 CMainMenu::CMainMenu ( CGUI* pManager )
@@ -120,7 +120,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     CreateItem ( MENU_ITEM_MAP_EDITOR,     CVector2D ( 0, 0 ),      "MAP EDITOR",           GUI_CALLBACK ( &CMainMenu::OnEditorButtonClick, this ) );
     CreateItem ( MENU_ITEM_SETTINGS,       CVector2D ( 0, 0 ),      "SETTINGS",             GUI_CALLBACK ( &CMainMenu::OnSettingsButtonClick, this ) );
     CreateItem ( MENU_ITEM_ABOUT,          CVector2D ( 0, 0 ),      "ABOUT",                GUI_CALLBACK ( &CMainMenu::OnAboutButtonClick, this ) );
-    CreateItem ( MENU_ITEM_NEWS,           CVector2D ( 0, 0 ),      "NEWS :",               GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
+    CreateItem ( MENU_ITEM_NEWS,           CVector2D ( 0, 0 ),      "NEWS",                 GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
     CreateItem ( MENU_ITEM_NEWS_ITEM_1,    CVector2D ( 0, 0 ),      " ",                    GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
     CreateItem ( MENU_ITEM_NEWS_ITEM_2,    CVector2D ( 0, 0 ),      " ",                    GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
     CreateItem ( MENU_ITEM_NEWS_ITEM_3,    CVector2D ( 0, 0 ),      " ",                    GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
@@ -188,6 +188,8 @@ CMainMenu::~CMainMenu ( void )
     for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ ) {
         if ( m_pItems[i] )
             delete m_pItems[i];
+        if ( m_pItemShadows[i] )
+            delete m_pItemShadows[i];
     }
 
     // Destroy GUI items
@@ -219,11 +221,11 @@ void CMainMenu::RefreshPositions ( void )
     SetItemPosition ( MENU_ITEM_MAP_EDITOR,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*4 ), false );
     SetItemPosition ( MENU_ITEM_SETTINGS,       CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*5 ), false );
     SetItemPosition ( MENU_ITEM_ABOUT,          CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*6 ), false );
-    SetItemPosition ( MENU_ITEM_NEWS,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ), false );
-    SetItemPosition ( MENU_ITEM_NEWS_ITEM_1,    CVector2D ( CORE_MTA_MENUITEMS_START_X + 60, uiItemStartY + uiItemHeight*7 ), false );
-    SetItemPosition ( MENU_ITEM_NEWS_ITEM_2,    CVector2D ( CORE_MTA_MENUITEMS_START_X + 60, uiItemStartY + uiItemHeight*7 + 14 ), false );
-    SetItemPosition ( MENU_ITEM_NEWS_ITEM_3,    CVector2D ( CORE_MTA_MENUITEMS_START_X + 60, uiItemStartY + uiItemHeight*7 + 28 ), false );
-    SetItemPosition ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*8 + 15 ), false );
+    SetItemPosition ( MENU_ITEM_NEWS,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 - 14 * 4 - 10 ), true );
+    SetItemPosition ( MENU_ITEM_NEWS_ITEM_1,    CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 - 14 * 3 ), true );
+    SetItemPosition ( MENU_ITEM_NEWS_ITEM_2,    CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 - 14 * 2 ), true );
+    SetItemPosition ( MENU_ITEM_NEWS_ITEM_3,    CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 - 14 * 1  ), true );
+    SetItemPosition ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ), false );
 }
 
 void CMainMenu::Update ( void )
@@ -254,6 +256,7 @@ void CMainMenu::Update ( void )
 
             // Set the alpha value
             if ( m_pItems[i] ) m_pItems[i]->SetAlpha ( Clamp ( 0.f, m_fFader, fMax ) );
+            if ( m_pItemShadows[i] ) m_pItemShadows[i]->SetAlpha ( Clamp ( 0.f, m_fFader, fMax ) );
         }
         m_pBackground->SetAlpha ( Clamp ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
         m_pHeader->SetAlpha ( m_fFader );
@@ -300,6 +303,7 @@ void CMainMenu::Update ( void )
 
             // Set the alpha value
             if ( m_pItems[i] ) m_pItems[i]->SetAlpha ( Clamp ( 0.f, m_fFader, fMax ) );
+            if ( m_pItemShadows[i] ) m_pItemShadows[i]->SetAlpha ( Clamp ( 0.f, m_fFader, fMax ) );
         }
         m_pBackground->SetAlpha ( Clamp ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
         m_pHeader->SetAlpha ( m_fFader );
@@ -321,6 +325,7 @@ void CMainMenu::Update ( void )
 
             for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ ) {
                 if ( m_pItems[i] ) m_pItems[i]->SetVisible ( false );
+                if ( m_pItemShadows[i] ) m_pItemShadows[i]->SetVisible ( false );
             }
 
             // Fade to the credits, so fade in again with the background widget visible only
@@ -492,6 +497,7 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
         for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ )
         {
             if ( m_pItems[i] ) m_pItems[i]->SetVisible ( reinterpret_cast < int > ( m_pItems[i]->GetUserData () ) != ITEM_HIDDEN );
+            if ( m_pItemShadows[i] ) m_pItemShadows[i]->SetVisible ( m_pItems[i]->IsVisible () );
         }
     }
 }
@@ -767,6 +773,7 @@ bool CMainMenu::OnItemLeave ( CGUIElement* pElement )
 void CMainMenu::CreateItem ( unsigned int uiIndex, CVector2D vecPosition, const char *szText, GUI_CALLBACK pHandler )
 {
     CGUILabel * pItem = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pBackground, szText ) );
+    CGUILabel * pItemShadow = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pBackground, szText ) );
 
     // Set the position, font face and size
     pItem->SetPosition ( vecPosition );
@@ -788,6 +795,7 @@ void CMainMenu::CreateItem ( unsigned int uiIndex, CVector2D vecPosition, const 
 
     // Store the item in the array
     m_pItems[uiIndex] = pItem;
+    m_pItemShadows[uiIndex] = pItemShadow;
     m_uiItems++;
 
     // Enable the item
@@ -840,6 +848,7 @@ void CMainMenu::EnableItem ( unsigned int uiIndex )
 
         // Always show
         m_pItems[uiIndex]->SetVisible ( true );
+        m_pItemShadows[uiIndex]->SetVisible ( true );
     }
 }
 
@@ -852,6 +861,7 @@ void CMainMenu::DisableItem ( unsigned int uiIndex, bool bHide )
         // Hide if needed
         if ( bHide ) {
             m_pItems[uiIndex]->SetVisible ( false );
+            m_pItemShadows[uiIndex]->SetVisible ( false );
             m_pItems[uiIndex]->SetUserData ( reinterpret_cast < void* > ( ITEM_HIDDEN ) );
         } else {
             m_pItems[uiIndex]->SetUserData ( reinterpret_cast < void* > ( ITEM_DISABLED ) );
@@ -859,11 +869,34 @@ void CMainMenu::DisableItem ( unsigned int uiIndex, bool bHide )
     }
 }
 
-void CMainMenu::SetItemPosition ( unsigned int uiIndex, CVector2D vecPosition, bool bRelative )
+void CMainMenu::SetItemPosition ( unsigned int uiIndex, CVector2D vecPosition, bool bRight )
 {
     if ( m_pItems[uiIndex] ) 
     {
-        m_pItems[uiIndex]->SetPosition ( vecPosition, bRelative );
+        CGUILabel* pItem = m_pItems [ uiIndex ];
+        CGUILabel* pItemShadow = m_pItemShadows [ uiIndex ];
+
+        if ( bRight )
+            pItem->SetPosition ( CVector2D ( m_pManager->GetResolution ().fX - pItem->GetTextExtent () - vecPosition.fX, vecPosition.fY ) );
+        else
+            pItem->SetPosition ( vecPosition );
+
+        // Update shadow
+        pItemShadow->SetText ( pItem->GetText ().c_str () );
+        pItemShadow->SetPosition ( pItem->GetPosition () + CVector2D ( 1, 1 ) );
+        pItemShadow->SetSize ( pItem->GetSize () );
+        pItemShadow->SetFont ( pItem->GetFont ().c_str () );
+        pItemShadow->SetAlwaysOnTop ( !pItem->IsAlwaysOnTop () );
+        pItem->SetAlwaysOnTop ( !pItem->IsAlwaysOnTop () );
+        pItemShadow->SetAlwaysOnTop ( pItem->IsAlwaysOnTop () );
+        pItem->SetAlwaysOnTop ( pItem->IsAlwaysOnTop () );
+        pItemShadow->BringToFront ();
+        pItem->BringToFront ();
+        pItemShadow->SetVisible ( pItem->IsVisible () );
+        pItemShadow->SetAlpha ( pItem->GetAlpha () );
+
+        // Set the text color to black
+        pItemShadow->SetTextColor ( 0, 0, 0 );
     }
 }
 
@@ -911,13 +944,11 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bI
     pItem->SetTextColor ( color.R, color.G, color.B );
     pItem->SetText ( strContent );
     pItem->AutoSize ( strContent );
-    float fWidth = pItem->GetTextExtent ();
-    CVector2D vecPos = pItem->GetPosition ();
 
     // 'NEW' sticker
     CGUILabel* pNewLabel = m_pNewLabels[ iIndex ];
     pNewLabel->SetVisible ( bIsNew );
-    pNewLabel->SetPosition ( vecPos + CVector2D ( fWidth + 5, -4 ) );
+    pNewLabel->SetPosition ( CVector2D ( m_pManager->GetResolution ().fX - CORE_MTA_MENUITEMS_START_X + 5, pItem->GetPosition ().fY - 4 ) );
 
     // Hide NEWS label if top item is blank
     if ( iIndex == 0 )
