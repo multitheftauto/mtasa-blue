@@ -3598,9 +3598,22 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             if ( ( IS_PLAYER ( pDamagedPed ) && !pDamagedPed->CallEvent ( "onClientPlayerDamage", Arguments, true ) ) || ( !IS_PLAYER ( pDamagedPed ) && !pDamagedPed->CallEvent ( "onClientPedDamage", Arguments, true ) ) )
             {
                 // Stop here if they cancelEvent it
+                if ( pDamagedPed->IsLocalPlayer () )
+                {
+                    // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
+                    fPreviousHealth = pDamagedPed->m_fHealth;
+                    fPreviousArmor = pDamagedPed->m_fArmor;
+                }
                 pDamagedPed->GetGamePlayer ()->SetHealth ( fPreviousHealth );
                 pDamagedPed->GetGamePlayer ()->SetArmor ( fPreviousArmor );
                 return false;
+            }
+
+            if ( pDamagedPed->IsLocalPlayer () )
+            {
+                // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
+                fCurrentHealth = pDamagedPed->GetGamePlayer ()->GetHealth ();
+                fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
             }
 
             bool bIsBeingShotWhilstAiming = ( weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun () );
