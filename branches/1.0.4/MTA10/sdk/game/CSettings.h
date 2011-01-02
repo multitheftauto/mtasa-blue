@@ -109,6 +109,9 @@ public:
     virtual float           GetMouseSensitivity     ( void ) = 0;
     virtual void            SetMouseSensitivity     ( float fSensitivity ) = 0;
 
+    virtual unsigned int    GetAntiAliasing         ( void ) = 0;
+    virtual void            SetAntiAliasing         ( unsigned int uiAntiAliasing ) = 0;
+
     virtual void            Save                    ( void ) = 0;
 };
 

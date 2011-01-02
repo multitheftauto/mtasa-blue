@@ -499,14 +499,12 @@ CSettings::CSettings ( void )
 
     m_pVideoRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Menu rendering options" ) );
     m_pVideoRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
-    m_pVideoRenderingLabel->GetPosition ( vecTemp, false );
     m_pVideoRenderingLabel->AutoSize ( "Menu rendering options  " );
     m_pVideoRenderingLabel->SetFont ( "default-bold-small" );
 
     m_pCheckBoxMenuDynamic = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Dynamic scene rendering", true ) );
     m_pCheckBoxMenuDynamic->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pCheckBoxMenuDynamic->SetSize ( CVector2D ( 174.0f, 16.0f ) );
-    m_pCheckBoxMenuDynamic->GetPosition ( vecTemp, false );
     m_pCheckBoxMenuDynamic->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_DYNAMIC );
 
     m_pCheckBoxMenuVideo = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Video surface rendering", true ) );
@@ -524,7 +522,6 @@ CSettings::CSettings ( void )
     m_pCheckBoxMenuDynamic->SetVisible ( false );
     m_pCheckBoxMenuVideo->SetVisible ( false );
     m_pCheckBoxMenuPostEffects->SetVisible ( false );
-    vecTemp.fY -= 60;
 
     m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
@@ -539,6 +536,20 @@ CSettings::CSettings ( void )
     m_pComboFxQuality->AddItem ( "High" )->SetData ( (void*)2 );
     m_pComboFxQuality->AddItem ( "Very high" )->SetData ( (void*)3 );
     m_pComboFxQuality->SetReadOnly ( true );
+
+    m_pAntiAliasingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anti-aliasing:" ) );
+    m_pAntiAliasingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pAntiAliasingLabel->GetPosition ( vecTemp, false );
+    m_pAntiAliasingLabel->AutoSize ( "Anti-aliasing: " );
+
+    m_pComboAntiAliasing = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
+    m_pComboAntiAliasing->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
+    m_pComboAntiAliasing->SetSize ( CVector2D ( 200.0f, 95.0f ) );
+    m_pComboAntiAliasing->AddItem ( "Off" )->SetData ( (void*)1 );
+    m_pComboAntiAliasing->AddItem ( "1x" )->SetData ( (void*)2 );
+    m_pComboAntiAliasing->AddItem ( "2x" )->SetData ( (void*)3 );
+    m_pComboAntiAliasing->AddItem ( "3x" )->SetData ( (void*)4 );
+    m_pComboAntiAliasing->SetReadOnly ( true );
 
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
     m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 42.0f ) );
@@ -1865,6 +1876,12 @@ void CSettings::LoadData ( void )
     else if ( FxQuality == 2 ) m_pComboFxQuality->SetText ( "High" );
     else if ( FxQuality == 3 ) m_pComboFxQuality->SetText ( "Very high" );
 
+    char AntiAliasing = gameSettings->GetAntiAliasing();
+    if ( AntiAliasing == 1 ) m_pComboAntiAliasing->SetText ( "Off" );
+    else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( "1x" );
+    else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( "2x" );
+    else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( "3x" );
+
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
 
@@ -2064,6 +2081,12 @@ void CSettings::SaveData ( void )
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
     {
         gameSettings->SetFXQuality ( ( int ) pQualitySelected->GetData() );
+    }
+
+    // Anti-aliasing
+    if ( CGUIListItem* pAntiAliasingSelected = m_pComboAntiAliasing->GetSelectedItem () )
+    {
+        gameSettings->SetAntiAliasing ( ( int ) pAntiAliasingSelected->GetData() );
     }
 
     // Async loading
