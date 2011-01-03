@@ -76,6 +76,34 @@ else
 	USE_BUNDLED_PCRE
 fi
 
+# google sparsehash (for mods/deathmatch)
+AC_ARG_ENABLE([system-sparsehash],
+	[AS_HELP_STRING([--disable-system-sparsehash],
+	                [don't use system sparsehash])])
+
+AC_ARG_VAR([SPARSEHASH_CFLAGS], [C compiler flags for sparsehash])
+AC_ARG_VAR([SPARSEHASH_LIBS], [linker flags for sparsehash])
+
+AC_DEFUN([USE_BUNDLED_SPARSEHASH], [
+	SPARSEHASH_CFLAGS="-I\$(top_builddir)/vendor/sparsehash/current/src"
+])
+
+if test "x$enable_system_sparsehash" != "xno" ; then
+	save_CPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS $SPARSEHASH_CFLAGS"
+	AC_CHECK_HEADERS([google/sparse_hash_map],, [
+		if test "x$enable_system_sparsehash" != "xyes" ; then
+			AC_MSG_WARN(["system sparsehash not found, using bundled one"])
+			USE_BUNDLED_SPARSEHASH
+		else
+			AC_MSG_ERROR(["system sparsehash not found"])
+		fi
+	])
+else
+	USE_BUNDLED_SPARSEHASH
+fi
+CPPFLAGS="$save_CPPFLAGS"
+
 # sqlite3
 AX_LIB_SQLITE3()
 
@@ -148,9 +176,6 @@ AC_C_CONST
 AC_C_INLINE
 
 AC_LANG(C++)
-
-# Check for google sparsehash
-AC_CHECK_HEADERS([google/sparse_hash_map],,AC_MSG_ERROR([can't find google sparse_hash_map]))
 
 # Checks for library functions.
 
