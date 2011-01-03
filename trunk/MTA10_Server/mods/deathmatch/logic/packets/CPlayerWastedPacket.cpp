@@ -42,28 +42,47 @@ CPlayerWastedPacket::CPlayerWastedPacket ( CPed * pPed, CElement * pKiller, unsi
 
 bool CPlayerWastedPacket::Read ( NetBitStreamInterface& BitStream )
 {
-    return BitStream.Read ( m_AnimGroup ) &&
-           BitStream.Read ( m_AnimID ) &&
-           BitStream.Read ( m_Killer ) &&
-           BitStream.Read ( m_ucKillerWeapon ) &&
-           BitStream.Read ( m_ucBodyPart ) &&
-           BitStream.Read ( m_vecPosition.fX ) &&
-           BitStream.Read ( m_vecPosition.fY ) &&
-           BitStream.Read ( m_vecPosition.fZ ) &&
-           BitStream.Read ( m_usAmmo );
+    SWeaponTypeSync weapon;
+    SBodypartSync bodyPart;
+    SPositionSync pos ( false );
+
+    if ( BitStream.ReadCompressed ( m_AnimGroup ) &&
+         BitStream.ReadCompressed ( m_AnimID ) &&
+         BitStream.ReadCompressed ( m_Killer ) &&
+         BitStream.Read ( &weapon ) &&
+         BitStream.Read ( &bodyPart ) &&
+         BitStream.Read ( &pos ) )
+    {
+        SWeaponAmmoSync ammo ( weapon.data.ucWeaponType, true, false );
+        if ( BitStream.Read ( &ammo ) )
+        {
+            m_vecPosition = pos.data.vecPosition;
+            m_ucBodyPart = bodyPart.data.uiBodypart;
+            m_ucKillerWeapon = weapon.data.ucWeaponType;
+            m_usAmmo = ammo.data.usTotalAmmo;
+            return true;
+        }
+    }
+    return false;
 }
 
 
 bool CPlayerWastedPacket::Write ( NetBitStreamInterface& BitStream ) const
 {    
-    BitStream.Write ( m_PlayerID );
-    BitStream.Write ( m_Killer );
-    BitStream.Write ( m_ucKillerWeapon );
-    BitStream.Write ( m_ucBodyPart );
-    BitStream.Write ( ( unsigned char ) ( ( m_bStealth ) ? 1 : 0 ) );    
+    SWeaponTypeSync weapon;
+    SBodypartSync bodyPart;
+
+    weapon.data.ucWeaponType = m_ucKillerWeapon;
+    bodyPart.data.uiBodypart = m_ucBodyPart;
+
+    BitStream.WriteCompressed ( m_PlayerID );
+    BitStream.WriteCompressed ( m_Killer );
+    BitStream.Write ( &weapon );
+    BitStream.Write ( &bodyPart );
+    BitStream.WriteBit ( m_bStealth );    
     BitStream.Write ( m_ucTimeContext );
-    BitStream.Write ( m_AnimGroup );
-    BitStream.Write ( m_AnimID );
+    BitStream.WriteCompressed ( m_AnimGroup );
+    BitStream.WriteCompressed ( m_AnimID );
 
     return true;
 }

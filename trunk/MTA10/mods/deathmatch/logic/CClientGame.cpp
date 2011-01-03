@@ -1369,8 +1369,9 @@ void CClientGame::UpdateVehicleInOut ( void )
                     if ( pBitStream )
                     {
                         // Write the car id and the action id (enter complete)
-                        pBitStream->Write ( m_VehicleInOutID );
-                        pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_NOTIFY_OUT ) );
+                        pBitStream->WriteCompressed ( m_VehicleInOutID );
+                        unsigned char ucAction = VEHICLE_NOTIFY_OUT;
+                        pBitStream->WriteBits ( &ucAction, 4 );
 
                         // Send it and destroy the packet
                         g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
@@ -1434,24 +1435,24 @@ void CClientGame::UpdateVehicleInOut ( void )
                     if ( pBitStream )
                     {
                         // Write the car id and the action id (enter complete)
-                        pBitStream->Write ( m_VehicleInOutID );
+                        pBitStream->WriteCompressed ( m_VehicleInOutID );
+                        unsigned char ucAction;
 
                         if ( m_bIsJackingVehicle )
                         {
-                            pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_NOTIFY_JACK ) );
-
+                            ucAction = static_cast < unsigned char > ( VEHICLE_NOTIFY_JACK );
 #ifdef MTA_DEBUG
                             g_pCore->GetConsole ()->Printf ( "* Sent_InOut: vehicle_notify_jack" );
 #endif
                         }
                         else
                         {
-                            pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_NOTIFY_IN ) );
-
+                            ucAction = static_cast < unsigned char > ( VEHICLE_NOTIFY_IN );
 #ifdef MTA_DEBUG
                             g_pCore->GetConsole ()->Printf ( "* Sent_InOut: vehicle_notify_in" );
 #endif
                         }
+                        pBitStream->WriteBits ( &ucAction, 4 );
 
                         // Send it and destroy the packet
                         g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
@@ -1483,10 +1484,12 @@ void CClientGame::UpdateVehicleInOut ( void )
                     if ( pBitStream )
                     {
                         // Write the car id and the action id (enter complete)
-                        pBitStream->Write ( m_VehicleInOutID );
+                        pBitStream->WriteCompressed ( m_VehicleInOutID );
+                        unsigned char ucAction;
                         if ( m_bIsJackingVehicle )
                         {
-                            pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_NOTIFY_JACK_ABORT ) );
+                            ucAction = static_cast < unsigned char > ( VEHICLE_NOTIFY_JACK_ABORT );
+                            pBitStream->WriteBits ( &ucAction, 4 );
 
                             // Did we start jacking them?
                             bool bAlreadyStartedJacking = false;
@@ -1502,7 +1505,7 @@ void CClientGame::UpdateVehicleInOut ( void )
                                         bAlreadyStartedJacking = true;
                                     }
                                 }
-                                pBitStream->Write ( m_pLocalPlayer->m_ucEnteringDoor );
+                                pBitStream->WriteBits ( &(m_pLocalPlayer->m_ucEnteringDoor ), 3 );
                                 SDoorAngleSync door;
                                 door.data.fAngle = pVehicle->GetDoorAngleRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
                                 pBitStream->Write ( &door );
@@ -1515,11 +1518,12 @@ void CClientGame::UpdateVehicleInOut ( void )
                         }
                         else
                         {
-                            pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_NOTIFY_IN_ABORT ) );
+                            ucAction = static_cast < unsigned char > ( VEHICLE_NOTIFY_IN_ABORT );
+                            pBitStream->WriteBits ( &ucAction, 4 );
                             CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( CElementIDs::GetElement ( m_VehicleInOutID ) );
                             if ( pVehicle )
                             {
-                                pBitStream->Write ( m_pLocalPlayer->m_ucEnteringDoor );
+                                pBitStream->WriteBits ( &(m_pLocalPlayer->m_ucEnteringDoor ), 3 );
                                 SDoorAngleSync door;
                                 door.data.fAngle = pVehicle->GetDoorAngleRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
                                 pBitStream->Write ( &door );
@@ -1596,8 +1600,9 @@ void CClientGame::UpdateVehicleInOut ( void )
                 if ( pBitStream )
                 {
                     // Vehicle id
-                    pBitStream->Write ( pOccupiedVehicle->GetID () );
-                    pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_NOTIFY_FELL_OFF ) );
+                    pBitStream->WriteCompressed ( pOccupiedVehicle->GetID () );
+                    unsigned char ucAction = static_cast < unsigned char > ( VEHICLE_NOTIFY_FELL_OFF );
+                    pBitStream->WriteBits ( &ucAction, 4 );
 
                     // Send it and destroy the packet
                     g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
@@ -3916,8 +3921,9 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                     if ( pBitStream )
                     {
                         // Write the vehicle id to it and that we're requesting to get out of it
-                        pBitStream->Write ( pOccupiedVehicle->GetID () );
-                        pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_REQUEST_OUT ) );
+                        pBitStream->WriteCompressed ( pOccupiedVehicle->GetID () );
+                        unsigned char ucAction = static_cast < unsigned char > ( VEHICLE_REQUEST_OUT );
+                        pBitStream->WriteBits ( &ucAction, 4 );
 
                         // Send and destroy it
                         g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
@@ -3976,11 +3982,15 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                                 if ( pBitStream )
                                                 {
                                                     // Write the vehicle id to it and that we're requesting to get into it
-                                                    pBitStream->Write ( pVehicle->GetID () );
-                                                    pBitStream->Write ( static_cast < unsigned char > ( VEHICLE_REQUEST_IN ) );
-                                                    pBitStream->Write ( static_cast < unsigned char > ( uiSeat ) );
-                                                    pBitStream->Write ( static_cast < unsigned char > ( pVehicle->IsOnWater() ) );
-                                                    pBitStream->Write ( static_cast < unsigned char > ( uiDoor ) );
+                                                    pBitStream->WriteCompressed ( pVehicle->GetID () );
+                                                    unsigned char ucAction = static_cast < unsigned char > ( VEHICLE_REQUEST_IN );
+                                                    unsigned char ucSeat = static_cast < unsigned char > ( uiSeat );
+                                                    bool bIsOnWater = pVehicle->IsOnWater ();
+                                                    unsigned char ucDoor = static_cast < unsigned char > ( uiDoor );
+                                                    pBitStream->WriteBits ( &ucAction, 4 );
+                                                    pBitStream->WriteBits ( &ucSeat, 3 );
+                                                    pBitStream->WriteBit ( bIsOnWater );
+                                                    pBitStream->WriteBits ( &ucDoor, 3 );
 
                                                     // Send and destroy it
                                                     g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
@@ -4540,25 +4550,31 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
             m_pLocalPlayer->SetDeadOnNetwork( true );
 
             // Write some death info
-            pBitStream->Write ( animGroup );
-            pBitStream->Write ( animID );
+            pBitStream->WriteCompressed ( animGroup );
+            pBitStream->WriteCompressed ( animID );
 
-            pBitStream->Write ( damagerID );
-            pBitStream->Write ( ucWeapon );
-            pBitStream->Write ( ucBodyPiece );
+            pBitStream->WriteCompressed ( damagerID );
+
+            SWeaponTypeSync weapon;
+            weapon.data.ucWeaponType = ucWeapon;
+            pBitStream->Write ( &weapon );
+
+            SBodypartSync bodyPart;
+            bodyPart.data.uiBodypart = ucBodyPiece;
+            pBitStream->Write ( &bodyPart );
 
             // Write the position we died in
-            CVector vecPosition;
-            m_pLocalPlayer->GetPosition ( vecPosition );
-            pBitStream->Write ( vecPosition.fX );
-            pBitStream->Write ( vecPosition.fY );
-            pBitStream->Write ( vecPosition.fZ );
+            SPositionSync pos ( false );
+            m_pLocalPlayer->GetPosition ( pos.data.vecPosition );
+            pBitStream->Write ( &pos );
 
             // The ammo in our weapon and write the ammo total
             CWeapon* pPlayerWeapon = m_pLocalPlayer->GetWeapon();
-            unsigned short usAmmo = 0;
-            if ( pPlayerWeapon ) usAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
-            pBitStream->Write ( usAmmo );
+            SWeaponAmmoSync ammo ( ucWeapon, true, false );
+            ammo.data.usTotalAmmo = 0;
+            if ( pPlayerWeapon )
+                ammo.data.usTotalAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
+            pBitStream->Write ( &ammo );
             
             // Send the packet
             g_pNet->SendPacket ( PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );

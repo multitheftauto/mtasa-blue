@@ -20,7 +20,7 @@ CVehicleInOutPacket::CVehicleInOutPacket ( void )
     m_ucAction = 0;
     m_ucFailReason = 0xFF;
     m_pCorrectVector = NULL;
-    m_ucOnWater = 0xFF;
+    m_bOnWater = false;
     m_ucDoor = 0;
 }
 
@@ -34,7 +34,7 @@ CVehicleInOutPacket::CVehicleInOutPacket ( ElementID ID,
     m_ucAction = ucAction;
     m_ucFailReason = 0xFF;
     m_pCorrectVector = NULL;
-    m_ucOnWater = 0xFF;
+    m_bOnWater = false;
     m_ucDoor = 0;
 }
 
@@ -48,7 +48,7 @@ CVehicleInOutPacket::CVehicleInOutPacket ( ElementID ID,
     m_ucAction = ucAction;
     m_ucFailReason = 0xFF;
     m_pCorrectVector = NULL;
-    m_ucOnWater = 0xFF;
+    m_bOnWater = false;
     m_ucDoor = ucDoor;
 }
 
@@ -66,7 +66,7 @@ CVehicleInOutPacket::CVehicleInOutPacket ( ElementID ID,
     m_ucStartedJacking = 0;
     m_ucFailReason = 0xFF;
     m_pCorrectVector = NULL;
-    m_ucOnWater = 0xFF;
+    m_bOnWater = false;
     m_ucDoor = 0;
 }
 
@@ -85,7 +85,7 @@ bool CVehicleInOutPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // Read out the vehicle id
     m_ID = INVALID_ELEMENT_ID;
-    BitStream.Read ( m_ID );
+    BitStream.ReadCompressed ( m_ID );
     if ( m_ID == INVALID_ELEMENT_ID )
     {
         return false;
@@ -93,21 +93,21 @@ bool CVehicleInOutPacket::Read ( NetBitStreamInterface& BitStream )
 
     // Read out the action id
     m_ucAction = 0xFF;
-    if ( !BitStream.Read ( m_ucAction ) )
+    if ( !BitStream.ReadBits ( &m_ucAction, 4 ) )
         return false;
 
     // If the action is requesting to get in, read out the "passenger" flag too
     if ( m_ucAction == CGame::VEHICLE_REQUEST_IN )
     {
-        return BitStream.Read ( m_ucSeat ) &&
-               BitStream.Read ( m_ucOnWater ) &&
-               BitStream.Read ( m_ucDoor );
+        return BitStream.ReadBits ( &m_ucSeat, 3 ) &&
+               BitStream.ReadBit  ( m_bOnWater ) &&
+               BitStream.ReadBits ( &m_ucDoor, 3 );
     }
     else if ( m_ucAction == CGame::VEHICLE_NOTIFY_JACK_ABORT )
     {
         SDoorAngleSync door;
         bool bStartedJacking;
-        if ( BitStream.Read ( m_ucDoor ) &&
+        if ( BitStream.ReadBits ( &m_ucDoor, 3 ) &&
              BitStream.Read ( &door ) &&
              BitStream.ReadBit ( bStartedJacking ) )
         {
@@ -120,7 +120,7 @@ bool CVehicleInOutPacket::Read ( NetBitStreamInterface& BitStream )
     else if ( m_ucAction == CGame::VEHICLE_NOTIFY_IN_ABORT )
     {
         SDoorAngleSync door;
-        if ( BitStream.Read ( m_ucDoor ) &&
+        if ( BitStream.ReadBits ( &m_ucDoor, 3 ) &&
              BitStream.Read ( &door ) )
         {
             m_fDoorAngle = door.data.fAngle;
@@ -137,21 +137,21 @@ bool CVehicleInOutPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_pSourceElement && m_ID )
     {
         ElementID ID = m_pSourceElement->GetID ();
-        BitStream.Write ( ID );
+        BitStream.WriteCompressed ( ID );
 
-        BitStream.Write ( m_ID );
-        BitStream.Write ( m_ucSeat );
-        BitStream.Write ( m_ucAction );
+        BitStream.WriteCompressed ( m_ID );
+        BitStream.WriteBits ( &m_ucSeat, 3 );
+        BitStream.WriteBits ( &m_ucAction, 4 );
 
         if ( m_ucAction == CGame::VEHICLE_REQUEST_IN_CONFIRMED || m_ucAction == CGame::VEHICLE_REQUEST_JACK_CONFIRMED )
         {
-            BitStream.Write ( m_ucDoor );
+            BitStream.WriteBits ( &m_ucDoor, 3 );
         }
         // If the action id is VEHICLE_NOTIFY_JACK_RETURN, send the in/out player chars aswell
         if ( m_ucAction == CGame::VEHICLE_NOTIFY_JACK_RETURN )
         {
-            BitStream.Write ( m_PlayerIn );
-            BitStream.Write ( m_PlayerOut );
+            BitStream.WriteCompressed ( m_PlayerIn );
+            BitStream.WriteCompressed ( m_PlayerOut );
         }
 
         if ( m_ucAction == 9 /*VEHICLE_ATTEMPT_FAILED*/ )
@@ -159,15 +159,15 @@ bool CVehicleInOutPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( m_ucFailReason );
             if ( m_ucFailReason == 5 /*FAIL_DISTANCE*/ && m_pCorrectVector )
             {
-                BitStream.Write ( m_pCorrectVector->fX );
-                BitStream.Write ( m_pCorrectVector->fY );
-                BitStream.Write ( m_pCorrectVector->fZ );
+                SPositionSync pos ( false );
+                pos.data.vecPosition = *m_pCorrectVector;
+                BitStream.Write ( &pos );
             }
         }
 
         if ( m_ucAction == CGame::VEHICLE_NOTIFY_IN_ABORT_RETURN )
         {
-            BitStream.Write ( m_ucDoor );
+            BitStream.WriteBits ( &m_ucDoor, 3 );
             SDoorAngleSync door;
             door.data.fAngle = m_fDoorAngle;
             BitStream.Write ( &door );
