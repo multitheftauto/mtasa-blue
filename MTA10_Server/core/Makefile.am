@@ -1,5 +1,6 @@
 INCLUDES += -I$(srcdir)/../sdk/
 INCLUDES += -I$(srcdir)/../../Shared/sdk/
+INCLUDES += $(CURSES_CFLAGS)
 
 if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch
@@ -19,7 +20,8 @@ endif
 libdir = $(outputdir)
 lib_LTLIBRARIES = core.la
 core_la_LIBTOOLFLAGS = --tag=disable-static
-core_la_LDFLAGS = -lcurses -module -avoid-version
+core_la_LIBADD = $(CURSES_LIBS)
+core_la_LDFLAGS = -module -avoid-version
 core_la_SOURCES = \
 	CCrashHandlerAPI.cpp \
 	CCrashHandlerAPI.h \

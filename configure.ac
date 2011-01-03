@@ -108,6 +108,30 @@ CPPFLAGS="$save_CPPFLAGS"
 # bundled version seems to be for windows
 PKG_CHECK_MODULES([SQLITE3], [sqlite3])
 
+# curses (for MTA10_Server/{core,sdk})
+AC_ARG_VAR([CURSES_CFLAGS], [C compiler flags for curses])
+AC_ARG_VAR([CURSES_LIBS], [linker flags for curses])
+
+save_CPPFLAGS="$CPPFLAGS"
+save_LIBS="$LIBS"
+CPPFLAGS="$CPPFLAGS $CURSES_CFLAGS"
+LIBS="$LIBS $CURSES_LIBS"
+
+if test -z "$CURSES_CFLAGS" ; then
+	AC_CHECK_HEADER([curses.h],
+		[],
+		[AC_MSG_ERROR([can't find curses headers])])
+fi
+
+if test -z "$CURSES_LIBS" ; then
+	AC_CHECK_LIB([curses], [stdscr],
+		[CURSES_LIBS=-lcurses],
+		[AC_MSG_ERROR([can't find curses libraries])])
+fi
+
+CPPFLAGS="$save_CPPFLAGS"
+LIBS="$save_LIBS"
+
 # Checking for a 64-bit system
 AC_MSG_CHECKING([uname -m for detecting host operating system architecture])
 ARCH=`uname -m`
@@ -155,15 +179,12 @@ AC_C_BIGENDIAN([AC_DEFINE(USING_BIG_ENDIAN)],[AC_DEFINE(USING_LITTLE_ENDIAN)],[]
 # Check for zlib
 AX_CHECK_ZLIB()
 
-# Check for curses
-AC_CHECK_LIB(curses, stdscr,, AC_MSG_ERROR([can't find curses]))
-
 # Define compile/library flags.
 AC_SUBST(AM_CXXFLAGS, "$AM_CXXFLAGS $INCLUDES -Wall -DTIXML_USE_STL")
 AC_SUBST(AM_LDFLAGS, "$AM_LDFLAGS -lstdc++")
 
 # Checks for header files.
-AC_CHECK_HEADERS(curses.h fcntl.h limits.h strings.h syslog.h unistd.h [sys/param.h] stdarg.h,, AC_MSG_ERROR([You are missing one or more header(s)]))
+AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/param.h] stdarg.h,, AC_MSG_ERROR([You are missing one or more header(s)]))
 
 # Check for libraries
 AC_CHECK_FUNCS(strndup strerror vsnprintf vasprintf open vsyslog strncasecmp)
