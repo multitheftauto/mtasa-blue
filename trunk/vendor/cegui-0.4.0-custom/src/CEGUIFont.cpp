@@ -365,6 +365,14 @@ void Font::defineFontGlyphs(const String& glyph_set)
 	Logger::getSingleton().logEvent("Font '" + d_name + "' now has the following glyphs defined: '" + d_glyphset + "'.", Informative);
 }
 
+/*************************************************************************
+	Add characters to the current set of glyphs available for this font
+*************************************************************************/
+void Font::extendFontGlyphs (const String glyph_set ) const
+{
+    const_cast<Font*>( this )->defineFontGlyphs(d_glyphset + glyph_set);
+}
+
 
 /*************************************************************************
 	Return the required texture size required to store imagery for the

@@ -107,7 +107,7 @@ Window* WindowManager::createWindow(const String& type, const String& name)
 	d_windowRegistry[finalName] = newWindow;
 
     // Hack to store the first editbox so that we can force text redraw
-    if ( type == "CGUI/Editbox" && !m_editBox )
+    if ( !m_editBox && type == "CGUI/Editbox" )
     {
         m_editBox = newWindow;
     }
