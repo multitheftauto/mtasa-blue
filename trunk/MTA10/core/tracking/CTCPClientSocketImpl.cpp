@@ -16,10 +16,15 @@
 
 CTCPClientSocketImpl::CTCPClientSocketImpl ( void )
 {
+    m_uiID = 0;
+
     m_iRefCount = 1;
 
     // Init
+    m_usPort = 0;
+    m_bIsResolvingHost = false;
     m_bIsConnected = false;
+    m_pAsyncHostResolving = NULL;
     m_Socket = 0;
     m_szLastError [0] = 0;
 
@@ -42,6 +47,13 @@ CTCPClientSocketImpl::~CTCPClientSocketImpl ( void )
         closesocket ( m_Socket );
         m_Socket = 0;
     }
+
+    // Cancel active host resolving
+    if ( m_bIsResolvingHost )
+    {
+        WSACancelAsyncRequest ( m_pAsyncHostResolving );
+        m_bIsResolvingHost = false;
+    }
 }
 
 void CTCPClientSocketImpl::AddRef ( void )
@@ -57,10 +69,19 @@ void CTCPClientSocketImpl::Release ( void )
 
 bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort )
 {
+    // Save the port
+    m_usPort = usPort;
+
     // If we're already connected, disconnect
     if ( m_bIsConnected )
     {
         Disconnect ();
+    }
+
+    // If we have active host resolving, cancel it
+    if ( m_bIsResolvingHost )
+    {
+        WSACancelAsyncRequest ( m_pAsyncHostResolving );
     }
 
     // Got a socket?
@@ -71,19 +92,26 @@ bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort )
         return false;
     }
 
-    // Resolve it
-    hostent* pHostInfo = gethostbyname ( szHost );      // Windows function, uses blocking sockets
-    if ( !pHostInfo )
+    // Start async resolving it
+    m_pAsyncHostResolving = WSAAsyncGetHostByName ( CCore::GetSingleton ().GetHookedWindow (), WM_ASYNCTRAP + m_uiID, szHost, m_pHostInfo, MAXGETHOSTSTRUCT );
+    if ( !m_pAsyncHostResolving )
     {
-        strcpy ( m_szLastError, "Unable to resolve" );
+        // Failed
+        strcpy ( m_szLastError, "Unable to start resolving" );
         return false;
     }
+    m_bIsResolvingHost = true;
+    return true;
+}
 
+
+void CTCPClientSocketImpl::ConnectContinue ( void )
+{
     // Create a sockaddr_in structure and set the data
     sockaddr_in SockAddr;
     SockAddr.sin_family = AF_INET;
-    SockAddr.sin_port = htons ( usPort );
-    SockAddr.sin_addr = *( ( in_addr* ) *pHostInfo->h_addr_list );
+    SockAddr.sin_port = htons ( m_usPort );
+    SockAddr.sin_addr = *( ( in_addr* ) *reinterpret_cast < hostent* > ( m_pHostInfo )->h_addr_list );
 
     // Try to connect
     int status = connect ( m_Socket, ( sockaddr* )( &SockAddr ), sizeof ( SockAddr ) );
@@ -91,10 +119,9 @@ bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort )
         status = WSAGetLastError ();
     }
 
-    // Mark us as connected and return success
+    // Mark us as connected
     // ACHTUNG: m_bIsConnected should be set by OnConnect!
     //m_bIsConnected = true;
-    return true;
 }
 
 
@@ -183,6 +210,9 @@ int CTCPClientSocketImpl::WriteBuffer ( const void* pInput, int iSize )
 
 bool CTCPClientSocketImpl::Initialize ( unsigned int uiID )
 {
+    // Save the ID
+    m_uiID = uiID;
+
     // Create a socket
     m_Socket = socket ( AF_INET, SOCK_STREAM, 0 );
     if ( !m_Socket ) 
@@ -199,6 +229,25 @@ bool CTCPClientSocketImpl::Initialize ( unsigned int uiID )
 
 void CTCPClientSocketImpl::FireEvent ( LPARAM lType )
 {
+    // Are we resolving host? If so, we got this event from WSAAsyncGetHostByName
+    if ( m_bIsResolvingHost )
+    {
+        m_bIsResolvingHost = false;
+
+        // Get error code
+        unsigned short usError = WSAGETASYNCERROR ( lType );
+        // Succeeded? Continue
+        if ( !usError )
+        {
+            ConnectContinue ();
+        }
+        else
+        {
+            strcpy ( m_szLastError, "Unable to resolve" );
+        }
+        return;
+    }
+
     // Check event type
     switch ( WSAGETSELECTEVENT ( lType ) )
     {
