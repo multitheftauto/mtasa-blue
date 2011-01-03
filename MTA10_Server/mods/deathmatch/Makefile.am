@@ -15,10 +15,11 @@ BUILT_SOURCES = StdInc.h.gch
 AM_CXXFLAGS += -Winvalid-pch
 
 StdInc.h.gch: StdInc.h
-	-rm -f StdInc.h.gch
-	$(CXX) -fPIC -DPIC $(DEFS) $(DEFAULT_INCLUDES) \
-		$(AM_CXXFLAGS) $(CXXFLAGS) $(CPPFLAGS) \
-		$(INCLUDES) -o StdInc.h.gch -xc++-header StdInc.h
+	$(LIBTOOL) --tag=CXX $(deathmatch_la_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile \
+		$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+		$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)  \
+		-o StdInc.h.lo $^
+	$(LN_S) -f .libs/StdInc.h.o $@
 
 clean-local:
 	-rm -f StdInc.h.gch
@@ -31,8 +32,7 @@ deathmatch_la_SOURCES = \
 	Server.cpp \
 	CServer.cpp \
 	$(UTILS) \
-	$(LOGIC) \
-	StdInc.cpp
+	$(LOGIC)
 
 deathmatch_la_LIBADD = \
 	-lplatform \

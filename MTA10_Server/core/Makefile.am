@@ -6,10 +6,11 @@ BUILT_SOURCES = StdInc.h.gch
 AM_CXXFLAGS += -Winvalid-pch
 
 StdInc.h.gch: StdInc.h
-	-rm -f StdInc.h.gch
-	$(CXX) -fPIC -DPIC $(DEFS) $(DEFAULT_INCLUDES) \
-		$(AM_CXXFLAGS) $(CXXFLAGS) $(CPPFLAGS) \
-		$(INCLUDES) -o StdInc.h.gch -xc++-header StdInc.h
+	$(LIBTOOL) --tag=CXX $(core_la_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile \
+		$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+		$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)  \
+		-o StdInc.h.lo $^
+	$(LN_S) -f .libs/StdInc.h.o $@
 
 clean-local:
 	-rm -f StdInc.h.gch
@@ -20,7 +21,6 @@ lib_LTLIBRARIES = core.la
 core_la_LIBTOOLFLAGS = --tag=disable-static
 core_la_LDFLAGS = -lcurses -module -avoid-version
 core_la_SOURCES = \
-	StdInc.cpp \
 	CCrashHandlerAPI.cpp \
 	CCrashHandlerAPI.h \
 	CCrashHandler.cpp \
