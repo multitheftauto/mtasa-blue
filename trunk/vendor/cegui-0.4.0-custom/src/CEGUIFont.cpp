@@ -355,6 +355,13 @@ void Font::defineFontGlyphs(const String& glyph_set)
 	d_glyphset = glyph_set;
 	defineFontGlyphs_impl();
 
+    //Hack to force redraw of text.  We grab the first editbox created, and make it's redrawn (thereby refreshing all text)
+    Window* pEditBox = WindowManager::getSingleton().m_editBox;
+    if ( pEditBox )
+    {
+        pEditBox->requestRedraw();
+    }
+
 	Logger::getSingleton().logEvent("Font '" + d_name + "' now has the following glyphs defined: '" + d_glyphset + "'.", Informative);
 }
 
@@ -687,7 +694,7 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
     String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
 	for (size_t c = 0; c < char_count; ++c)
 	{
-        strNewGlyphs += OnGlyphDrawn(text[c],true);
+        strNewGlyphs += OnGlyphDrawn(text[c]);
     }
     if ( strNewGlyphs != d_glyphset )
     {
@@ -740,7 +747,7 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
     String strNewGlyphs = cleanGlyphCache(d_glyphset);  //Purge unused glyphs
 	for (size_t c = 0; c < char_count; ++c)
 	{
-        strNewGlyphs += OnGlyphDrawn(text[c],true);
+        strNewGlyphs += OnGlyphDrawn(text[c]);
     }
     if ( strNewGlyphs != d_glyphset )
     {
@@ -1323,7 +1330,7 @@ bool Font::isGlyphBeingUsed (unsigned long ulGlyph) const
 /*************************************************************************
 !Talidan!: Callback for when a glyph has just been used from this font
 *************************************************************************/
-String Font::OnGlyphDrawn ( unsigned long ulGlyph, bool bCreateNewCache ) const
+String Font::OnGlyphDrawn ( unsigned long ulGlyph ) const
 {
     //std::map< unsigned long, unsigned long >* m_pGlyphCache = &m_GlyphCache;
     // Are we an ASCII character (always loaded), or out of range character?
@@ -1370,9 +1377,6 @@ String Font::OnGlyphDrawn ( unsigned long ulGlyph, bool bCreateNewCache ) const
         m_pGlyphCache->insert ( std::pair<unsigned long,unsigned long>(ulGlyphToUpdate,clock()/CLOCKS_PER_SEC) );
         return "";
     }
-
-    if ( !bCreateNewCache )
-        return "";
 
     // Not in any other cache, let's create a new cache
     m_pGlyphCache->insert ( std::pair<unsigned long,unsigned long>(ulGlyph,clock()/CLOCKS_PER_SEC) );

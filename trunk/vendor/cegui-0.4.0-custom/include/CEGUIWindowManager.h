@@ -386,6 +386,9 @@ public:
 		Return a WindowManager::WindowIterator object to iterate over the currently defined Windows.
 	*/
 	WindowIterator	getIterator(void) const;
+
+    // Hack to store our first created editbox
+    Window* m_editBox;
 };
 
 } // End of  CEGUI namespace section

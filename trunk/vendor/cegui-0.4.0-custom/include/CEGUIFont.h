@@ -674,7 +674,7 @@ public:
 	\brief
 		hacked callback for when a Glyph has been rendered
 	*/
-    String	OnGlyphDrawn ( unsigned long ulGlyph, bool bLoadNewGlyphs ) const;
+    String	OnGlyphDrawn ( unsigned long ulGlyph ) const;
 
     String	cleanGlyphCache ( String strCache ) const;
 
