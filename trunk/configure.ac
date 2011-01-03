@@ -52,10 +52,29 @@ AC_ARG_ENABLE(debug,
 
 # Checks for libraries.
 
-# pcre
-#AX_PATH_LIB_PCRE()
-#AC_SUBST(PCRE_CFLAGS)
-#AC_SUBST(PCRE_LIBS)
+# pcre (for bundled pme.h)
+AC_ARG_ENABLE([system-pcre], 
+	[AS_HELP_STRING([--disable-system-pcre],
+	                [don't use system PCRE])])
+
+AC_DEFUN([USE_BUNDLED_PCRE], [
+	PCRE_CFLAGS="-I\$(top_builddir)/vendor/pcre"
+	PCRE_LIBS="\$(top_builddir)/vendor/pcre/libpcre.la"
+	# probably include a check if it was already built
+])
+
+if test "x$enable_system_pcre" != "xno" ; then
+	PKG_CHECK_MODULES([PCRE], [libpcre],, [
+		if test "x$enable_system_pcre" != "xyes" ; then
+			AC_MSG_WARN(["system PCRE not found, using bundled one"])
+			USE_BUNDLED_PCRE
+		else
+			AC_MSG_ERROR(["system PCRE not found"])
+		fi
+	])
+else
+	USE_BUNDLED_PCRE
+fi
 
 # sqlite3
 AX_LIB_SQLITE3()
@@ -114,11 +133,11 @@ AX_CHECK_ZLIB()
 AC_CHECK_LIB(curses, stdscr,, AC_MSG_ERROR([can't find curses]))
 
 # Define compile/library flags.
-AC_SUBST(AM_CXXFLAGS, "$AM_CXXFLAGS $INCLUDES $PCRE_CFLAGS -Wall -DTIXML_USE_STL")
+AC_SUBST(AM_CXXFLAGS, "$AM_CXXFLAGS $INCLUDES -Wall -DTIXML_USE_STL")
 AC_SUBST(AM_LDFLAGS, "$AM_LDFLAGS -lstdc++")
 
 # Checks for header files.
-AC_CHECK_HEADERS(curses.h sqlite3.h pcre.h fcntl.h limits.h strings.h syslog.h unistd.h [sys/param.h] stdarg.h,, AC_MSG_ERROR([You are missing one or more header(s)]))
+AC_CHECK_HEADERS(curses.h sqlite3.h fcntl.h limits.h strings.h syslog.h unistd.h [sys/param.h] stdarg.h,, AC_MSG_ERROR([You are missing one or more header(s)]))
 
 # Check for libraries
 AC_CHECK_FUNCS(strndup strerror vsnprintf vasprintf open vsyslog strncasecmp)
