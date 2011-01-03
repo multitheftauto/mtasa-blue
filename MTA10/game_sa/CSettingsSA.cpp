@@ -207,19 +207,21 @@ unsigned int CSettingsSA::GetAntiAliasing ( )
     return m_pInterface->dwAntiAliasing;
 }
 
-void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing )
+void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing, bool bOnRestart )
 {
-    DWORD dwFunc = FUNC_SetAntiAliasing;
-    _asm
+    if ( !bOnRestart )
     {
-        push    uiAntiAliasing
-        call    dwFunc
-        add     esp, 4
+        DWORD dwFunc = FUNC_SetAntiAliasing;
+        _asm
+        {
+            push    uiAntiAliasing
+            call    dwFunc
+            add     esp, 4
+        }
+        SetCurrentVideoMode ( m_pInterface->dwVideoMode, false );
     }
-    m_pInterface->dwAntiAliasing = uiAntiAliasing;
 
-    // We need to reapply current video mode
-    SetCurrentVideoMode ( m_pInterface->dwVideoMode, false ); 
+    m_pInterface->dwAntiAliasing = uiAntiAliasing;
 }
 
 void CSettingsSA::Save ()
