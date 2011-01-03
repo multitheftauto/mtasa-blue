@@ -734,7 +734,6 @@ HWND CCore::GetHookedWindow ( void )
 void CCore::HideMainMenu ( void )
 {
     m_pLocalGUI->GetMainMenu ()->SetVisible ( false );
-    m_pLocalGUI->GetMainMenu ()->SetServerBrowserVisible ( false );
 }
 
 void CCore::HideQuickConnect ( void )

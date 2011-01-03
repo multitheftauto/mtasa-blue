@@ -62,8 +62,6 @@ public:
     void                SetIsIngame                     ( bool bIsIngame );
     bool                GetIsIngame                     ( void );
 
-    void                SetServerBrowserVisible         ( bool bVisible );
-
     CServerBrowser*     GetServerBrowser                ( void ) { return &m_ServerBrowser; };
     CSettings*          GetSettingsWindow               ( void ) { return &m_Settings; };
     CQuickConnect*      GetQuickConnectWindow           ( void ) { return &m_QuickConnect; };
@@ -86,7 +84,7 @@ private:
     void                SetStaticBackground             ( bool bEnabled );
 
     void                CreateItem                      ( unsigned int uiIndex, CVector2D vecPosition, const char *szText, GUI_CALLBACK pHandler );
-    void                SetItemPosition                 ( unsigned int uiIndex, CVector2D vecPosition, bool bRelative = false );
+    void                SetItemPosition                 ( unsigned int uiIndex, CVector2D vecPosition, bool bRight = false );
     void                EnableItem                      ( unsigned int uiIndex );
     void                DisableItem                     ( unsigned int uiIndex, bool bHide = false );
 
@@ -116,6 +114,7 @@ private:
 
     // Main menu pane and items
     CGUILabel*          m_pItems[CORE_MTA_MENU_ITEMS];
+    CGUILabel*          m_pItemShadows[CORE_MTA_MENU_ITEMS];
     unsigned int        m_uiItems;
 
     // Submenu classes
