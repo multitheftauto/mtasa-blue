@@ -85,7 +85,11 @@ AC_ARG_VAR([SPARSEHASH_CFLAGS], [C compiler flags for sparsehash])
 AC_ARG_VAR([SPARSEHASH_LIBS], [linker flags for sparsehash])
 
 AC_DEFUN([USE_BUNDLED_SPARSEHASH], [
+	HAVE_BUNDLED_SPARSEHASH=yes
+	# for created sparseconfig.h
 	SPARSEHASH_CFLAGS="-I\$(top_builddir)/vendor/sparsehash/current/src"
+	# for the rest
+	SPARSEHASH_CFLAGS+=" -I\$(top_srcdir)/vendor/sparsehash/current/src"
 ])
 
 if test "x$enable_system_sparsehash" != "xno" ; then
@@ -203,6 +207,10 @@ AC_LANG(C++)
 #   http://readlist.com/lists/lists.sourceforge.net/mingw-users/2/12488.html
 AC_CONFIG_SUBDIRS([vendor/lua])
 AC_CONFIG_SUBDIRS([vendor/json-c])
+
+if test "x$HAVE_BUNDLED_SPARSEHASH" = "xyes" ; then
+	AC_CONFIG_SUBDIRS([vendor/sparsehash/current])
+fi
 
 # Generate makefiles
 AC_CONFIG_FILES([
