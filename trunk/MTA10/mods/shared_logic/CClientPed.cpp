@@ -1671,7 +1671,13 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
     {
         LockHealth ( 0.0f );
         LockArmor ( 0.0f );
-    }    
+    }
+
+    // Silently remove the ped satchels
+    DestroySatchelCharges ( false, true );
+
+    // Stop pressing buttons
+    SetControllerState ( CControllerState () );
 }
 
 
@@ -3058,7 +3064,7 @@ void CClientPed::_CreateModel ( void )
         {
             // TODO: use TASK_SIMPLE_DEAD
             Kill ( WEAPONTYPE_UNARMED, 0 );
-        }       
+        }
 
         // Are we still playing a looped animation?
         if ( m_bLoopAnimation && m_pAnimationBlock )

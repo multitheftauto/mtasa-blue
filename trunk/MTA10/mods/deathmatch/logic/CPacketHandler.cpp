@@ -940,12 +940,6 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
             // Kill our ped in the correct way
             pPed->Kill ( ( eWeaponType ) ucWeapon, ucBodyPart, ( ucStealth == 1 ), animGroup, animID );
 
-            // Silently remove his satchels
-            pPed->DestroySatchelCharges ( false, true );
-
-            // Stop pressing buttons
-            pPed->SetControllerState ( CControllerState () );
-
             // Call the onClientPlayerWasted event
             CLuaArguments Arguments;
             if ( pKiller ) Arguments.PushElement ( pKiller );
