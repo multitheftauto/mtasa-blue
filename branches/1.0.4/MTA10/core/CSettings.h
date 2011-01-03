@@ -142,8 +142,6 @@ protected:
     CGUILabel*          m_pBrightnessLabel;
     CGUIScrollBar*      m_pBrightness;
     CGUILabel*          m_pBrightnessValueLabel;
-    CGUIComboBox*       m_pComboAntiAliasing;
-    CGUILabel*          m_pAntiAliasingLabel;
     CGUILabel*          m_pMapAlphaLabel;
     CGUIScrollBar*      m_pMapAlpha;
     CGUILabel*          m_pMapAlphaValueLabel;
