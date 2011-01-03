@@ -1654,7 +1654,7 @@ void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
 
         // Create a new packet to send to everyone
         CPlayerWastedPacket ReturnWastedPacket ( pPlayer, pKiller, Packet.m_ucKillerWeapon, Packet.m_ucBodyPart, false, Packet.m_AnimGroup, Packet.m_AnimID );
-        m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket );
+        m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket, pPlayer );
 
         // Tell our scripts the player has died
         CLuaArguments Arguments;
