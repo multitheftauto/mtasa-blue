@@ -227,7 +227,7 @@ void DirectX9Renderer::doRender(void)
                     CEGUI::String strFontName = strImgName.substr(6,pos-6);
 
                     CEGUI::Font* pFont = System::getSingleton().getFontManager()->getFont(strFontName);
-                    pFont->OnGlyphDrawn(ulCodepoint, false);
+                    pFont->OnGlyphDrawn(ulCodepoint);
                 }
             }
         }

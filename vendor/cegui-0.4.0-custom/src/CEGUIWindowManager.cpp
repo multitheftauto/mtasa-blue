@@ -58,6 +58,7 @@ const String WindowManager::GeneratedWindowNameBase("__cewin_uid_");
 WindowManager::WindowManager(void) :
     d_uid_counter(0)
 {
+    m_editBox = NULL;
     Logger::getSingleton().logEvent((utf8*)"CEGUI::WindowManager singleton created");
 }
 
@@ -104,6 +105,12 @@ Window* WindowManager::createWindow(const String& type, const String& name)
     newWindow->initialise();
 
 	d_windowRegistry[finalName] = newWindow;
+
+    // Hack to store the first editbox so that we can force text redraw
+    if ( type == "CGUI/Editbox" && !m_editBox )
+    {
+        m_editBox = newWindow;
+    }
 
 	return newWindow;
 }
