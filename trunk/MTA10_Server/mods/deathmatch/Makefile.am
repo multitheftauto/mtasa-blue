@@ -37,7 +37,7 @@ deathmatch_la_SOURCES = \
 	$(LOGIC)
 
 deathmatch_la_LIBADD = \
-	-lplatform \
+	../../sdk/libplatform.la \
 	$(SPARSEHASH_LIBS) \
 	$(SQLITE3_LIBS)
 
