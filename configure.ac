@@ -108,9 +108,6 @@ CPPFLAGS="$save_CPPFLAGS"
 # bundled version seems to be for windows
 PKG_CHECK_MODULES([SQLITE3], [sqlite3])
 
-# curl
-AC_CHECK_CURL(7)
-
 # Checking for a 64-bit system
 AC_MSG_CHECKING([uname -m for detecting host operating system architecture])
 ARCH=`uname -m`
