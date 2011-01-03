@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../vendor/bochs"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -87,7 +87,7 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../vendor/bochs"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -157,7 +157,7 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories="..\..\dependencies\libv2;..\..\dependencies\irrklang;..\..\..\Shared\publicsdk\include;..\..\Voice;.\;..\shared_logic;../../../Shared/XML/interface;../../dependencies;../../dependencies/lua/include;../../dependencies/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../vendor/bochs"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -785,7 +785,25 @@
 					Name="utils"
 					Filter="">
 					<File
-						RelativePath="..\shared_logic\utils\zip\crc32.cpp">
+						RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.cpp">
+						<FileConfiguration
+							Name="Debug|Win32">
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32">
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32">
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"/>
+						</FileConfiguration>
 					</File>
 				</Filter>
 				<Filter
@@ -1355,7 +1373,7 @@
 					Name="utils"
 					Filter="">
 					<File
-						RelativePath="..\shared_logic\utils\zip\crc32.h">
+						RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.h">
 					</File>
 				</Filter>
 				<Filter

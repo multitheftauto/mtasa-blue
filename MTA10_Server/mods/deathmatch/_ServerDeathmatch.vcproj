@@ -28,7 +28,7 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories=".;./logic;../../dependencies;../../dependencies/pthreads/include;../../dependencies/pcre/include;../../dependencies/pme;../../../Shared/publicsdk/include;../../dependencies/sqlite;logic/common;../../dependencies/zlib;../../dependencies/json;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories=".;./logic;../../dependencies;../../dependencies/pthreads/include;../../dependencies/pcre/include;../../dependencies/pme;../../../Shared/publicsdk/include;../../dependencies/sqlite;logic/common;../../dependencies/zlib;../../dependencies/json;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../vendor/bochs;../../../vendor/bob_withers"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -100,7 +100,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;./logic;../../dependencies;../../dependencies/pthreads/include;../../dependencies/pcre/include;../../dependencies/pme;../../../Shared/publicsdk/include;../../dependencies/sqlite;logic/common;../../dependencies/zlib;../../dependencies/json;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories=".;./logic;../../dependencies;../../dependencies/pthreads/include;../../dependencies/pcre/include;../../dependencies/pme;../../../Shared/publicsdk/include;../../dependencies/sqlite;logic/common;../../dependencies/zlib;../../dependencies/json;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../vendor/bochs;../../../vendor/bob_withers"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -175,7 +175,7 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories=".;./logic;../../dependencies;../../dependencies/pthreads/include;../../dependencies/pcre/include;../../dependencies/pme;../../../Shared/publicsdk/include;../../dependencies/sqlite;logic/common;../../dependencies/zlib;../../dependencies/json;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
+				AdditionalIncludeDirectories=".;./logic;../../dependencies;../../dependencies/pthreads/include;../../dependencies/pcre/include;../../dependencies/pme;../../../Shared/publicsdk/include;../../dependencies/sqlite;logic/common;../../dependencies/zlib;../../dependencies/json;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../vendor/bochs;../../../vendor/bob_withers"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -845,24 +845,57 @@
 				Name="utils"
 				Filter="">
 				<File
-					RelativePath=".\utils\base64.cpp">
+					RelativePath="..\..\..\vendor\bob_withers\base64.cpp">
 					<FileConfiguration
-						Name="Release|Win32">
+						Name="Release|Win32"
+						>
 						<Tool
 							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
+							UsePrecompiledHeader="0"
+						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Win32">
+						Name="Debug|Win32"
+						>
 						<Tool
 							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
+							UsePrecompiledHeader="0"
+						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Nightly|Win32">
+						Name="Nightly|Win32"
+						>
 						<Tool
 							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.cpp">
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Nightly|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
 					</FileConfiguration>
 				</File>
 				<File
@@ -880,27 +913,6 @@
 				<Filter
 					Name="zip"
 					Filter="">
-					<File
-						RelativePath=".\utils\zip\crc32.cpp">
-						<FileConfiguration
-							Name="Release|Win32">
-							<Tool
-								Name="VCCLCompilerTool"
-								UsePrecompiledHeader="0"/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|Win32">
-							<Tool
-								Name="VCCLCompilerTool"
-								UsePrecompiledHeader="0"/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Nightly|Win32">
-							<Tool
-								Name="VCCLCompilerTool"
-								UsePrecompiledHeader="0"/>
-						</FileConfiguration>
-					</File>
 					<File
 						RelativePath=".\utils\zip\ioapi.c">
 						<FileConfiguration
@@ -1642,7 +1654,10 @@
 				Name="utils"
 				Filter="">
 				<File
-					RelativePath=".\utils\base64.h">
+					RelativePath="..\..\..\vendor\bob_withers\base64.h">
+				</File>
+				<File
+					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.h">
 				</File>
 				<File
 					RelativePath=".\utils\CHTTPResponse.h">
@@ -1650,9 +1665,6 @@
 				<Filter
 					Name="zip"
 					Filter="">
-					<File
-						RelativePath=".\utils\zip\crc32.h">
-					</File>
 					<File
 						RelativePath=".\utils\zip\ioapi.h">
 					</File>

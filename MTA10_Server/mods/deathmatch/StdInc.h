@@ -36,7 +36,7 @@
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
-#include "utils/zip/crc32.h"
+#include <bochs_internal/crc32.h>
 #include "CMD5Hasher.h"
 #include "CChecksum.h"
 
@@ -260,7 +260,7 @@
 #include "utils/CTCPServerSocketImpl.h"
 #include "utils/CTCPSocket.h"
 #include "utils/CTCPSocketImpl.h"
-#include "utils/base64.h"
+#include <base64.h>
 
 // Module includes
 #include "CServer.h"
