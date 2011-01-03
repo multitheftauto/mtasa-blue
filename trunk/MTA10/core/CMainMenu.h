@@ -62,8 +62,6 @@ public:
     void                SetIsIngame                     ( bool bIsIngame );
     bool                GetIsIngame                     ( void );
 
-    void                SetServerBrowserVisible         ( bool bVisible );
-
     CServerBrowser*     GetServerBrowser                ( void ) { return &m_ServerBrowser; };
     CSettings*          GetSettingsWindow               ( void ) { return &m_Settings; };
     CQuickConnect*      GetQuickConnectWindow           ( void ) { return &m_QuickConnect; };

@@ -486,6 +486,7 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
         m_Settings.SetVisible ( false );
         m_Credits.SetVisible ( false );
         m_pCommunityLabel->SetVisible ( false );
+        m_pNewsBrowser->SetVisible ( false );
 
 //        m_bIsInSubWindow = false;
     } else {
@@ -538,13 +539,6 @@ void CMainMenu::SetIsIngame ( bool bIsIngame )
 bool CMainMenu::GetIsIngame ( void )
 {
     return m_bIsIngame;
-}
-
-
-void CMainMenu::SetServerBrowserVisible ( bool bVisible )
-{
-    m_ServerBrowser.SetVisible ( bVisible );
-//    m_bIsInSubWindow = bVisible;
 }
 
 
