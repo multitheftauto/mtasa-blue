@@ -40,14 +40,11 @@ deathmatch_la_SOURCES = \
 
 deathmatch_la_LIBADD = \
 	../../sdk/libplatform.la \
+	$(top_builddir)/vendor/ehs/libehs.la \
+	$(top_builddir)/vendor/lua/src/liblua.la \
+	$(top_builddir)/vendor/json-c/libjson.la \
 	$(SPARSEHASH_LIBS) \
 	$(SQLITE3_LIBS)
 
 deathmatch_la_LDFLAGS = \
-	-module -avoid-version \
-	-L../../sdk/ \
-	$(top_builddir)/vendor/ehs/.libs/libehs.a \
-	$(top_builddir)/vendor/pme/.libs/libpme.a \
-	$(top_builddir)/vendor/lua/src/.libs/liblua.a \
-	$(top_builddir)/vendor/json-c/.libs/libjson.a
-
+	-module -avoid-version
