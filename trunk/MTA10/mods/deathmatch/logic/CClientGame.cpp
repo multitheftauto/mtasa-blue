@@ -4542,12 +4542,24 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
 {
     // Are we not already marked as dead? and have we run out of health?
     if ( !m_pLocalPlayer->IsDeadOnNetwork () && m_pLocalPlayer->GetHealth () == 0.0f )
-    {    
+    {
         // Send the "i am dead" packet
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
         if ( pBitStream )
         {
             m_pLocalPlayer->SetDeadOnNetwork( true );
+
+            // Call the onClientPlayerWasted event
+            CClientEntity * pKiller = ( damagerID != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement ( damagerID ) : NULL;
+            CLuaArguments Arguments;
+            if ( pKiller ) Arguments.PushElement ( pKiller );
+            else Arguments.PushBoolean ( false );
+            if ( ucWeapon != 0xFF ) Arguments.PushNumber ( ucWeapon );
+            else Arguments.PushBoolean ( false );
+            if ( ucBodyPiece != 0xFF ) Arguments.PushNumber ( ucBodyPiece );
+            else Arguments.PushBoolean ( false );
+            Arguments.PushBoolean ( false );
+            m_pLocalPlayer->CallEvent ( "onClientPlayerWasted", Arguments, true );
 
             // Write some death info
             pBitStream->WriteCompressed ( animGroup );
