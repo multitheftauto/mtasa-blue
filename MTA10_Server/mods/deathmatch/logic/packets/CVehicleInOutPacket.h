@@ -42,8 +42,8 @@ public:
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
     inline unsigned char    GetDoor                     ( void )                        { return m_ucDoor; };
-    inline bool             GetOnWater                  ( void )                        { return m_ucOnWater ? true : false; };
-    inline ElementID        GetID                ( void )                        { return m_ID; };
+    inline bool             GetOnWater                  ( void )                        { return m_bOnWater; };
+    inline ElementID        GetID                       ( void )                        { return m_ID; };
     inline unsigned char    GetSeat                     ( void )                        { return m_ucSeat; };
     inline float            GetDoorAngle                ( void )                        { return m_fDoorAngle; }
     inline unsigned char    GetAction                   ( void )                        { return m_ucAction; };
@@ -51,14 +51,14 @@ public:
     inline ElementID        GetPlayerOut                ( void )                        { return m_PlayerOut; };
     inline unsigned char    GetStartedJacking           ( void )                        { return m_ucStartedJacking; };
 
-    inline void             SetID                ( ElementID ID )         { m_ID = ID; };
+    inline void             SetID                       ( ElementID ID )                { m_ID = ID; };
     inline void             SetSeat                     ( unsigned char ucSeat )        { m_ucSeat = ucSeat; };
     inline void             SetDoorAngle                ( float fDoorAngle )            { m_fDoorAngle = fDoorAngle; }
     inline void             SetAction                   ( unsigned char ucAction )      { m_ucAction = ucAction; };
     inline void             SetPlayerIn                 ( ElementID PlayerIn )          { m_PlayerIn = PlayerIn; };
     inline void             SetPlayerOut                ( ElementID PlayerOut )         { m_PlayerOut = PlayerOut; };
     inline void             SetFailReason               ( unsigned char ucReason )      { m_ucFailReason = ucReason; }
-    inline void             SetCorrectVector            ( const CVector & vector )            { m_pCorrectVector = new CVector ( vector.fX, vector.fY, vector.fZ ); }
+    inline void             SetCorrectVector            ( const CVector & vector )      { m_pCorrectVector = new CVector ( vector.fX, vector.fY, vector.fZ ); }
 
 private:
     ElementID               m_ID;
@@ -69,7 +69,7 @@ private:
     unsigned char           m_ucStartedJacking;
     unsigned char           m_ucFailReason;
     CVector *               m_pCorrectVector;
-    unsigned char           m_ucOnWater;
+    bool                    m_bOnWater;
     unsigned char           m_ucDoor;
     float                   m_fDoorAngle;
 };

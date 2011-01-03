@@ -903,20 +903,21 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
     ElementID KillerID;
-    unsigned char ucWeapon;
-    unsigned char ucBodyPart;
-    unsigned char ucStealth;
+    SWeaponTypeSync weapon;
+    SBodypartSync bodyPart;
+    bool bStealth;
     unsigned char ucTimeContext;
     AssocGroupId animGroup;
     AnimationId animID;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( KillerID ) &&
-         bitStream.Read ( ucWeapon ) &&
-         bitStream.Read ( ucBodyPart ) &&
-         bitStream.Read ( ucStealth ) &&
+
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.ReadCompressed ( KillerID ) &&
+         bitStream.Read ( &weapon ) &&
+         bitStream.Read ( &bodyPart ) &&
+         bitStream.ReadBit ( bStealth ) &&
          bitStream.Read ( ucTimeContext ) &&
-         bitStream.Read ( animGroup ) &&
-         bitStream.Read ( animID ) )
+         bitStream.ReadCompressed ( animGroup ) &&
+         bitStream.ReadCompressed ( animID ) )
     {
         // Grab the ped that was killed
         CClientPed * pPed = g_pClientGame->GetPedManager ()->Get ( ID, true );
@@ -931,24 +932,26 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
             pPed->SetSyncTimeContext ( ucTimeContext );
 
             // Is this a stealth kill? and do we have a killer ped?
-            if ( ucStealth == 1 && pKiller && IS_PED ( pKiller ) )
+            if ( bStealth && pKiller && IS_PED ( pKiller ) )
             {
                 // Make our killer ped do the stealth kill animation
                 CClientPed* pKillerPed = static_cast < CClientPed * > ( pKiller );
                 pKillerPed->StealthKill ( pPed );               
             }
             // Kill our ped in the correct way
-            pPed->Kill ( ( eWeaponType ) ucWeapon, ucBodyPart, ( ucStealth == 1 ), animGroup, animID );
+            pPed->Kill ( ( eWeaponType ) weapon.data.ucWeaponType,
+                         bodyPart.data.uiBodypart,
+                         bStealth, animGroup, animID );
 
             // Call the onClientPlayerWasted event
             CLuaArguments Arguments;
             if ( pKiller ) Arguments.PushElement ( pKiller );
             else Arguments.PushBoolean ( false );
-            if ( ucWeapon != 0xFF ) Arguments.PushNumber ( ucWeapon );
+            if ( weapon.data.ucWeaponType != 0xFF ) Arguments.PushNumber ( weapon.data.ucWeaponType );
             else Arguments.PushBoolean ( false );
-            if ( ucBodyPart != 0xFF ) Arguments.PushNumber ( ucBodyPart );
+            if ( bodyPart.data.uiBodypart != 0xFF ) Arguments.PushNumber ( bodyPart.data.uiBodypart );
             else Arguments.PushBoolean ( false );
-            Arguments.PushBoolean ( ( ucStealth == 1 ) );
+            Arguments.PushBoolean ( bStealth );
             if ( IS_PLAYER ( pPed ) )
                 pPed->CallEvent ( "onClientPlayerWasted", Arguments, true );
             else
@@ -1357,7 +1360,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
     // Read out the player id
     ElementID PlayerID;
-    if ( bitStream.Read ( PlayerID ) )
+    if ( bitStream.ReadCompressed ( PlayerID ) )
     {
         CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerID );
         if ( pPlayer )
@@ -1367,13 +1370,13 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
             // Read out the vehicle id
             ElementID ID = INVALID_ELEMENT_ID;
-            bitStream.Read ( ID );
+            bitStream.ReadCompressed ( ID );
             CClientVehicle* pVehicle = g_pClientGame->m_pVehicleManager->Get ( ID );
             if ( pVehicle )
             {
                 // Read out the seat id
                 unsigned char ucSeat = 0xFF;
-                bitStream.Read ( ucSeat );
+                bitStream.ReadBits ( &ucSeat, 3 );
                 if ( ucSeat == 0xFF )
                 {
                     RaiseProtocolError ( 28 );
@@ -1382,7 +1385,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                 // Read out the action
                 unsigned char ucAction = 0xFF;
-                bitStream.Read ( ucAction );
+                bitStream.ReadBits ( &ucAction, 4 );
 
 #ifdef MTA_DEBUG
                 if ( pPlayer->IsLocalPlayer () )
@@ -1401,7 +1404,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                     case CClientGame::VEHICLE_REQUEST_IN_CONFIRMED:
                     {
                         unsigned char ucDoor = 0xFF;
-                        bitStream.Read ( ucDoor );
+                        bitStream.ReadBits ( &ucDoor, 3 );
                         // If it's the local player, set some stuff
                         if ( pPlayer->IsLocalPlayer () )
                         {
@@ -1469,7 +1472,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         unsigned char ucDoor;
                         SDoorAngleSync door;
 
-                        bitStream.Read ( ucDoor );
+                        bitStream.ReadBits ( &ucDoor, 3 );
                         bitStream.Read ( &door );
 
                         // If local player, we are now allowed to enter it again
@@ -1607,7 +1610,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                     case CClientGame::VEHICLE_REQUEST_JACK_CONFIRMED:
                     {
                         unsigned char ucDoor = 0xFF;
-                        bitStream.Read ( ucDoor );
+                        bitStream.ReadBits ( &ucDoor, 3 );
                         // Grab the player model getting jacked
                         CClientPed* pJacked = pVehicle->GetOccupant ( ucSeat );
 
@@ -1657,13 +1660,13 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                     {
                         // Read out the player that's going into the vehicle
                         ElementID PlayerInside = INVALID_ELEMENT_ID;
-                        bitStream.Read ( PlayerInside );
+                        bitStream.ReadCompressed ( PlayerInside );
                         CClientPlayer* pInsidePlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerInside );
                         if ( pInsidePlayer )
                         {
                             // And the one dumping out on the outside
                             ElementID PlayerOutside = INVALID_ELEMENT_ID;
-                            bitStream.Read ( PlayerOutside );
+                            bitStream.ReadCompressed ( PlayerOutside );
                             CClientPlayer* pOutsidePlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerOutside );
                             if ( pOutsidePlayer )
                             {
@@ -1751,13 +1754,11 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                             // Is the vehicle too far away?
                         if ( ucReason == 5 /*FAIL_DISTANCE*/ )
                         {
-                            CVector vecPosition;
-                            if ( bitStream.Read ( vecPosition.fX ) &&
-                                    bitStream.Read ( vecPosition.fY ) &&
-                                    bitStream.Read ( vecPosition.fZ ) )
+                            SPositionSync pos ( false );
+                            if ( bitStream.Read ( &pos ) )
                             {
                                 // Make sure we have the right position for this vehicle
-                                pVehicle->SetPosition ( vecPosition );
+                                pVehicle->SetPosition ( pos.data.vecPosition );
                             }
                         }
 #if MTA_DEBUG
