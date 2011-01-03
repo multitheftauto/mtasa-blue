@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;_DEBUG;MTA_DEBUG;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -140,7 +140,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -238,7 +238,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
+				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/include;../../../vendor/zlib;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;COMPILE_FOR_SA;MTA_SCRIPT_LOGGING;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -1152,8 +1152,32 @@
 					Name="utils"
 					>
 					<File
-						RelativePath="..\shared_logic\utils\zip\crc32.cpp"
+						RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.cpp"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
 					</File>
 				</Filter>
 				<Filter
@@ -1926,7 +1950,7 @@
 					Name="utils"
 					>
 					<File
-						RelativePath="..\shared_logic\utils\zip\crc32.h"
+						RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.h"
 						>
 					</File>
 				</Filter>

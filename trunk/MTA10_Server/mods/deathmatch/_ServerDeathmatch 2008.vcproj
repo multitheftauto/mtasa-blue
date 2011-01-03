@@ -54,7 +54,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -157,7 +157,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -262,7 +262,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -1153,7 +1153,35 @@
 				Name="utils"
 				>
 				<File
-					RelativePath=".\utils\base64.cpp"
+					RelativePath="..\..\..\vendor\bob_withers\base64.cpp"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Nightly|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.cpp"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1199,34 +1227,6 @@
 				<Filter
 					Name="zip"
 					>
-					<File
-						RelativePath=".\utils\zip\crc32.cpp"
-						>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Nightly|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-					</File>
 					<File
 						RelativePath=".\utils\zip\ioapi.c"
 						>
@@ -2238,7 +2238,11 @@
 				Name="utils"
 				>
 				<File
-					RelativePath=".\utils\base64.h"
+					RelativePath="..\..\..\vendor\bob_withers\base64.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.h"
 					>
 				</File>
 				<File
@@ -2256,10 +2260,6 @@
 				<Filter
 					Name="zip"
 					>
-					<File
-						RelativePath=".\utils\zip\crc32.h"
-						>
-					</File>
 					<File
 						RelativePath=".\utils\zip\ioapi.h"
 						>
