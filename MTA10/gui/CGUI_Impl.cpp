@@ -328,29 +328,7 @@ bool CGUI_Impl::GetStringFromInputMode ( eInputMode a_eMode, std::string& a_rstr
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
 {
-    if ( ulCharacter < 127 ) // we have any char from ASCII 
-    {
-        // injecting as is
-        m_pSystem->injectChar( ulCharacter );
-    }
-    else // we have any char from Extended ASCII, any ANSI code page or UNICODE range
-    {
-        // we need temp input string of unsigned char
-        unsigned char ucANSI[2] = { (unsigned char) ulCharacter, 0 };
-
-        // also we need temp output string of wchar_t
-        WCHAR *wUNICODE;
-        wUNICODE = new WCHAR[1];
-
-        // converting ANSI temp string to UNICODE temp string
-        MultiByteToWideChar( CP_THREAD_ACP, 0, (LPCSTR) ucANSI, -1, wUNICODE, 1 ); // can be CP_ACP too
-
-        // injecting unicode char
-        m_pSystem->injectChar( (unsigned long) wUNICODE[0] );
-
-        // temp UNICODE string no needs more
-        delete [] wUNICODE;
-    }
+    m_pSystem->injectChar( ulCharacter );
 }
 
 

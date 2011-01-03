@@ -288,13 +288,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
 
                 // Call GTA's window procedure.
-                return CallWindowProc ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
+                return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
             }
         }
     }
 
     // Tell windows to handle this message.
-    return DefWindowProc ( hwnd, uMsg, wParam, lParam );
+    return DefWindowProcW ( hwnd, uMsg, wParam, lParam );
 }
 
 
