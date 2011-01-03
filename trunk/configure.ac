@@ -104,8 +104,9 @@ else
 fi
 CPPFLAGS="$save_CPPFLAGS"
 
-# sqlite3
-AX_LIB_SQLITE3()
+# sqlite3 (for mods/deathmatch)
+# bundled version seems to be for windows
+PKG_CHECK_MODULES([SQLITE3], [sqlite3])
 
 # curl
 AC_CHECK_CURL(7)
@@ -165,7 +166,7 @@ AC_SUBST(AM_CXXFLAGS, "$AM_CXXFLAGS $INCLUDES -Wall -DTIXML_USE_STL")
 AC_SUBST(AM_LDFLAGS, "$AM_LDFLAGS -lstdc++")
 
 # Checks for header files.
-AC_CHECK_HEADERS(curses.h sqlite3.h fcntl.h limits.h strings.h syslog.h unistd.h [sys/param.h] stdarg.h,, AC_MSG_ERROR([You are missing one or more header(s)]))
+AC_CHECK_HEADERS(curses.h fcntl.h limits.h strings.h syslog.h unistd.h [sys/param.h] stdarg.h,, AC_MSG_ERROR([You are missing one or more header(s)]))
 
 # Check for libraries
 AC_CHECK_FUNCS(strndup strerror vsnprintf vasprintf open vsyslog strncasecmp)
