@@ -2034,17 +2034,36 @@ void CSettings::SaveData ( void )
     bool bNextWindowed;
     bool bNextFSMinimize;
     GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
+    int iAntiAliasing = gameSettings->GetAntiAliasing ();
 
     // update from gui
     bNextWindowed = m_pCheckBoxWindowed->GetSelected ();
     if ( CGUIListItem* pSelected = m_pComboResolution->GetSelectedItem () )
         iNextVidMode = ( int ) pSelected->GetData();
     bNextFSMinimize = m_pCheckBoxMinimize->GetSelected();
+    if ( CGUIListItem* pSelected = m_pComboAntiAliasing->GetSelectedItem () )
+        iAntiAliasing = ( int ) pSelected->GetData();
 
     // change
-    if ( GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize ) )
+    bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
+    bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged )
     {
-        SString strMessage ( "Resolution%s will be changed when you next start MTA", bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () ? "/Full Screen Minimize" : "" );
+        SString strChangedOptions;
+        if ( bIsVideoModeChanged )
+        {
+            strChangedOptions += "Resolution";
+            if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
+                strChangedOptions += "/Full Screen Minimize";
+            if ( bIsAntiAliasingChanged )
+                strChangedOptions += " and Anti-aliasing";
+        }
+        else
+        {
+            strChangedOptions += "Anti-aliasing";
+        }
+
+        SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
         strMessage += "\n\nDo you want to restart now?";
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
         pQuestionBox->Reset ();
@@ -2056,6 +2075,7 @@ void CSettings::SaveData ( void )
         pQuestionBox->Show ();
     }
 
+    gameSettings->SetAntiAliasing ( iAntiAliasing, true );
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
@@ -2065,12 +2085,6 @@ void CSettings::SaveData ( void )
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
     {
         gameSettings->SetFXQuality ( ( int ) pQualitySelected->GetData() );
-    }
-
-    // Anti-aliasing
-    if ( CGUIListItem* pAntiAliasingSelected = m_pComboAntiAliasing->GetSelectedItem () )
-    {
-        gameSettings->SetAntiAliasing ( ( int ) pAntiAliasingSelected->GetData() );
     }
 
     // Async loading

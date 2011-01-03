@@ -119,7 +119,7 @@ public:
     void                    SetMouseSensitivity         ( float fSensitivity );
 
     unsigned int            GetAntiAliasing             ( void );
-    void                    SetAntiAliasing             ( unsigned int uiAntiAliasing );
+    void                    SetAntiAliasing             ( unsigned int uiAntiAliasing, bool bOnRestart );
 
     void                    Save                        ( void );
 
