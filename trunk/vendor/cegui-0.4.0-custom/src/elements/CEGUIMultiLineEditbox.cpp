@@ -1508,13 +1508,14 @@ void MultiLineEditbox::onTextChanged(WindowEventArgs& e)
     if ((d_text.length() == 0) || (d_text[d_text.length() - 1] != '\n'))
         d_text.append(1, '\n');
 
-    // base class processing
-    Window::onTextChanged(e);
-
     // clear selection
     clearSelection();
     // layout new text
     formatText();
+
+    // base class processing
+    Window::onTextChanged(e);
+
     // layout child windows (scrollbars) since text layout may have changed
     performChildWindowLayout();
     // ensure carat is still within the text
