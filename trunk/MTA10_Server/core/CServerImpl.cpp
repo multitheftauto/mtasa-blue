@@ -192,6 +192,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 
         SetConsoleWindowInfo ( m_hConsole, TRUE, &ScrnBufferInfo.srWindow );
         SetConsoleScreenBufferSize( m_hConsole, ScrnBufferInfo.dwSize );
+        SetConsoleOutputCP(CP_UTF8);
 #else
         // Initialize the window and any necessary curses options
         initscr ( );
@@ -530,10 +531,10 @@ void CServerImpl::HandleInput ( void )
 #ifdef WIN32
     if ( kbhit () )
     {
-        iStdIn = getch();
+        iStdIn = _getwch();
     }
 #else
-    iStdIn = getch();
+    iStdIn = _getwch();
     if ( iStdIn == ERR)
         iStdIn = 0;
 #endif
@@ -560,18 +561,18 @@ void CServerImpl::HandleInput ( void )
             {
                 // Clear the input window
                 wclear ( m_wndInput );
-                printw ( "%s\n", m_szInputBuffer );
+                printw ( "%s\n", ConvertToANSI(m_szInputBuffer).c_str() );
             }
 #endif
 
             if ( m_uiInputCount > 0 )
             {
                 // Check for the most important command: quit
-                if ( !stricmp ( m_szInputBuffer, "quit" ) || !stricmp ( m_szInputBuffer, "exit" ) )
+                if ( !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("quit").c_str() ) || !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("exit").c_str() ) )
                 {
                     m_bRequestedQuit = true;
                 }
-                else if ( !stricmp ( m_szInputBuffer, "reset" ) )
+                else if ( !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("reset").c_str() ) )
                 {
                     m_bRequestedReset = true;
                     m_bRequestedQuit = true;
@@ -579,7 +580,7 @@ void CServerImpl::HandleInput ( void )
                 else
                 {
                     // Otherwise, pass the command to the mod's input handler
-                    m_pModManager->HandleInput ( m_szInputBuffer );
+                    m_pModManager->HandleInput ( ConvertToANSI(m_szInputBuffer).c_str() );
                 }
             }
 
@@ -606,7 +607,7 @@ void CServerImpl::HandleInput ( void )
                 SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
             if ( kbhit () )
             {
-                iStdIn = getch();
+                iStdIn = _getwch();
             }
             switch ( iStdIn )
             {
@@ -614,40 +615,40 @@ void CServerImpl::HandleInput ( void )
 
         case KEY_LEFT:
         {
-            char szBuffer [255];
+            wchar_t szBuffer [255];
             memset ( szBuffer, 0, sizeof ( szBuffer ) );
 
             if ( m_uiInputCount > 0 )
             {
                 m_uiInputCount--;
             }
-            strncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
+            wcsncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
             szBuffer[m_uiInputCount] = 0;
 #ifdef WIN32
-            Printf ( "\r%s", szBuffer );
+            Printf ( "\r%s", ConvertToANSI(szBuffer).c_str() );
 #else
             if ( !g_bSilent )
-                wprintw ( m_wndInput, "\r%s", szBuffer );
+                wprintw ( m_wndInput, "\r%s", ConvertToANSI(szBuffer).c_str() );
 #endif
             break;
         }
 
         case KEY_RIGHT:
         {
-            char szBuffer [255];
+            wchar_t szBuffer [255];
             memset ( szBuffer, 0, sizeof ( szBuffer ) );
 
-            if ( m_uiInputCount < strlen ( m_szInputBuffer ) )
+            if ( m_uiInputCount < wcslen ( m_szInputBuffer ) )
             {
                 m_uiInputCount++;
             }
-            strncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
+            wcsncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
             szBuffer[m_uiInputCount] = 0;
 #ifdef WIN32
-            Printf ( "\r%s", szBuffer );
+            Printf ( "\r%s", ConvertToANSI(szBuffer).c_str() );
 #else
             if ( !g_bSilent )
-                wprintw ( m_wndInput, "\r%s", szBuffer );
+                wprintw ( m_wndInput, "\r%s", ConvertToANSI(szBuffer).c_str() );
 #endif
             break;
         }
@@ -674,10 +675,11 @@ void CServerImpl::HandleInput ( void )
                 SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
 
             // Echo the input
-            Printf ( "%c", iStdIn );
+            WCHAR wUNICODE[2] = { iStdIn, 0 };
+            Printf ( "%s", ConvertToANSI(wUNICODE).c_str() );
 #else
             if ( !g_bSilent )
-                wprintw ( m_wndInput, "%c", iStdIn );
+                wprintw ( m_wndInput, "%s", ConvertToANSI(wUNICODE).c_str() );
 #endif
 
             m_szInputBuffer[m_uiInputCount++] = iStdIn;
