@@ -603,10 +603,9 @@ void CServerImpl::HandleInput ( void )
             // Color the text
             if ( !g_bSilent )
                 SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
-            if ( kbhit () )
-            {
-                iStdIn = _getwch();
-            }
+
+            iStdIn = _getwch();
+
             switch ( iStdIn )
             {
 #endif
