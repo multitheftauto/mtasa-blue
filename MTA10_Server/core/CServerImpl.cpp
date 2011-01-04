@@ -221,6 +221,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         }
         // Create the input window
         m_wndInput = subwin ( stdscr, 1, COLS, LINES - 1, 0 );
+        scrollok ( m_wndInput, TRUE );
         wbkgd ( m_wndInput, COLOR_PAIR ( 2 ) );
 
         // Create the menu window
