@@ -166,8 +166,6 @@ public:
     static int      GiveWeapon                          ( lua_State* luaVM );
     static int      TakeWeapon                          ( lua_State* luaVM );
     static int      TakeAllWeapons                      ( lua_State* luaVM );
-    static int      GiveWeaponAmmo                      ( lua_State* luaVM );
-    static int      TakeWeaponAmmo                      ( lua_State* luaVM );
     static int      SetWeaponAmmo                       ( lua_State* luaVM );
     static int      GetSlotFromWeapon                   ( lua_State* luaVM );
 

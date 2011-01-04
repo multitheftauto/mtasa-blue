@@ -209,10 +209,8 @@ public:
 
     // Weapon give/take functions
     static bool                 GiveWeapon                          ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo, bool bSetAsCurrent = false );
-    static bool                 TakeWeapon                          ( CElement* pElement, unsigned char ucWeaponID );
+    static bool                 TakeWeapon                          ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo = 9999 );
     static bool                 TakeAllWeapons                      ( CElement* pElement );
-    static bool                 GiveWeaponAmmo                      ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo );
-    static bool                 TakeWeaponAmmo                      ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo );
     static bool                 SetWeaponAmmo                       ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo, unsigned short usAmmoInClip );
 
     // Vehicle create/destroy functions

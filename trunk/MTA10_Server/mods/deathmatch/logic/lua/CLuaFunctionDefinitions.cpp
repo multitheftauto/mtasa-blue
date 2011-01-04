@@ -3107,16 +3107,22 @@ int CLuaFunctionDefinitions::TakeWeapon ( lua_State* luaVM )
     // Verify the arguments
     int iArgument1 = lua_type ( luaVM, 1 );
     int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
     if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
+         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNONE ) )
     {
         // Grab the arguments
         CElement* pElement = lua_toelement ( luaVM, 1 );
         unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+        unsigned short usAmmo = 9999;
+        if ( iArgument3 != LUA_TNONE )
+            usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );	
+
         if ( pElement )
         {
             // Do it
-            if ( CStaticFunctionDefinitions::TakeWeapon ( pElement, ucWeaponID ) )
+            if ( CStaticFunctionDefinitions::TakeWeapon ( pElement, ucWeaponID, usAmmo ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -3154,72 +3160,6 @@ int CLuaFunctionDefinitions::TakeAllWeapons ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "takeAllWeapons" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefinitions::GiveWeaponAmmo ( lua_State* luaVM )
-{
-    // Verify the arguments
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-        unsigned short usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );
-
-        if ( pElement )
-        {
-            if ( CStaticFunctionDefinitions::GiveWeaponAmmo ( pElement, ucWeaponID, usAmmo ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "giveWeaponAmmo", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "giveWeaponAmmo" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefinitions::TakeWeaponAmmo ( lua_State* luaVM )
-{
-    // Verify the arguments
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        unsigned char ucWeaponID = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-        unsigned short usAmmo = static_cast < unsigned short > ( lua_tonumber ( luaVM, 3 ) );
-
-        if ( pElement )
-        {
-            if ( CStaticFunctionDefinitions::TakeWeaponAmmo ( pElement, ucWeaponID, usAmmo ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "takeWeaponAmmo", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "takeWeaponAmmo" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
