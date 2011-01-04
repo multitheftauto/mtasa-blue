@@ -392,6 +392,10 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Startup the getElementsByType from root optimizations
     CElement::StartupEntitiesFromRoot ();
 
+    // Create the root element.
+    CDummy* pRootElement = new CDummy ( NULL, NULL, NULL );
+    pRootElement->SetTypeName ( "root" );
+
     m_pGroups = new CGroups;
     m_pClock = new CClock;
     m_pBlipManager = new CBlipManager;
@@ -408,7 +412,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pTeamManager = new CTeamManager;
     m_pPedManager = new CPedManager;
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
-    m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter );
+    m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter, pRootElement );
     m_pACLManager = new CAccessControlListManager;
 
     m_pRegisteredCommands = new CRegisteredCommands ( m_pACLManager );

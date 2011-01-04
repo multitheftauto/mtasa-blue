@@ -52,7 +52,8 @@ public:
                                                               CGroups* pGroups,
                                                               CEvents* pEvents,
                                                               class CScriptDebugging* pScriptDebugging,
-                                                              CElementDeleter* pElementDeleter );
+                                                              CElementDeleter* pElementDeleter,
+                                                              CDummy* pRootElement );
                                 ~CMapManager                ( void );
 
     CBlendedWeather*            GetWeather                  ( void )    { return m_pBlendedWeather; };
