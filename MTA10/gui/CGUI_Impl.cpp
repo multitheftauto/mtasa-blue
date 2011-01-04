@@ -597,6 +597,24 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
     // Cast it to a set of keyboard arguments
     const CEGUI::KeyEventArgs& KeyboardArgs = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
 
+    // Call the callback if present
+    if ( m_KeyDownHandlers[ m_Channel ] )
+    {
+        const CEGUI::KeyEventArgs& e = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
+        CGUIKeyEventArgs NewArgs;
+
+        // copy the variables
+        NewArgs.codepoint = e.codepoint;
+        NewArgs.scancode = (CGUIKeys::Scan) e.scancode;
+        NewArgs.sysKeys = e.sysKeys;
+
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
+        NewArgs.pWindow = pElement;
+
+        m_KeyDownHandlers[ m_Channel ] ( NewArgs );
+    }
+
     switch ( KeyboardArgs.scancode )
     {
         // Cut/Copy keys
@@ -712,6 +730,12 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                         {
                             // Turn our event window into an editbox
                             CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );      
+                            //Don't paste if we're read only
+                            if ( WndEdit->isReadOnly() )
+                            {
+                                CloseClipboard();
+                                return true;
+                            }
                             strEditText = WndEdit->getText ();
                             iSelectionStart = WndEdit->getSelectionStartIndex ();
                             iSelectionLength = WndEdit->getSelectionLength();
@@ -721,7 +745,13 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                         }
                         else
                         {
-                            CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );      
+                            CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );    
+                            //Don't paste if we're read only
+                            if ( WndEdit->isReadOnly() )
+                            {
+                                CloseClipboard();
+                                return true;
+                            }
                             strEditText = WndEdit->getText ();
                             iSelectionStart = WndEdit->getSelectionStartIndex ();
                             iSelectionLength = WndEdit->getSelectionLength();
@@ -851,23 +881,6 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
         }
     }
 
-    // Call the callback if present
-    if ( m_KeyDownHandlers[ m_Channel ] )
-    {
-        const CEGUI::KeyEventArgs& e = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
-        CGUIKeyEventArgs NewArgs;
-
-        // copy the variables
-        NewArgs.codepoint = e.codepoint;
-        NewArgs.scancode = (CGUIKeys::Scan) e.scancode;
-        NewArgs.sysKeys = e.sysKeys;
-
-        // get the CGUIElement
-        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
-        NewArgs.pWindow = pElement;
-
-        m_KeyDownHandlers[ m_Channel ] ( NewArgs );
-    }
     return true;
 }
 
