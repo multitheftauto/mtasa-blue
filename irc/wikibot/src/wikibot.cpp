@@ -378,7 +378,13 @@ void WikiBot::SendChannel(const IRCText& msg, const char* channel)
 {
   if (!channel)
     channel = m_config.data.channels[0].name;
-  m_client.Send(IRCMessagePrivmsg(channel, msg));
+  std::vector < std::string > lines;
+  Split ( msg.GetText(), lines, '\n' );
+  for ( std::vector<std::string>::const_iterator i = lines.begin ();
+        i != lines.end(); ++i )
+  {
+    m_client.Send(IRCMessagePrivmsg(channel, *i));
+  }
 }
 
 /* Commands */
