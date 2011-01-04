@@ -613,13 +613,15 @@ void CServerImpl::HandleInput ( void )
 
         case KEY_LEFT:
         {
+            if ( m_uiInputCount <= 0 )
+            {
+                break;
+            }
+
             wchar_t szBuffer [255];
             memset ( szBuffer, 0, sizeof ( szBuffer ) );
 
-            if ( m_uiInputCount > 0 )
-            {
-                m_uiInputCount--;
-            }
+            m_uiInputCount--;
             wcsncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
             szBuffer[m_uiInputCount] = 0;
 #ifdef WIN32
@@ -633,13 +635,15 @@ void CServerImpl::HandleInput ( void )
 
         case KEY_RIGHT:
         {
+            if ( m_uiInputCount == wcslen ( m_szInputBuffer ) )
+            {
+                break;
+            }
+
             wchar_t szBuffer [255];
             memset ( szBuffer, 0, sizeof ( szBuffer ) );
 
-            if ( m_uiInputCount < wcslen ( m_szInputBuffer ) )
-            {
-                m_uiInputCount++;
-            }
+            m_uiInputCount++;
             wcsncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
             szBuffer[m_uiInputCount] = 0;
 #ifdef WIN32
