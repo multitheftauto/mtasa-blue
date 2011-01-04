@@ -236,12 +236,6 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         else
             move ( 0, 0 );
         refresh ( );
-
-        // Set our STDIN to non-blocking, if we're on POSIX
-        int flags;
-        flags = fcntl(0, F_GETFL);
-        flags |= O_NONBLOCK;
-        fcntl(0, F_SETFL, flags);
 #endif
     }
 
