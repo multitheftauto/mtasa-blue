@@ -618,17 +618,18 @@ void CServerImpl::HandleInput ( void )
                 break;
             }
 
+#ifdef WIN32
             wchar_t szBuffer [255];
             memset ( szBuffer, 0, sizeof ( szBuffer ) );
 
             m_uiInputCount--;
             wcsncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
             szBuffer[m_uiInputCount] = 0;
-#ifdef WIN32
+
             Printf ( "\r%s", ConvertToANSI(szBuffer).c_str() );
 #else
             if ( !g_bSilent )
-                wprintw ( m_wndInput, "\r%s", ConvertToANSI(szBuffer).c_str() );
+                wmove ( m_wndInput, 0, --m_uiInputCount );
 #endif
             break;
         }
@@ -640,17 +641,18 @@ void CServerImpl::HandleInput ( void )
                 break;
             }
 
+#ifdef WIN32
             wchar_t szBuffer [255];
             memset ( szBuffer, 0, sizeof ( szBuffer ) );
 
             m_uiInputCount++;
             wcsncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
             szBuffer[m_uiInputCount] = 0;
-#ifdef WIN32
+
             Printf ( "\r%s", ConvertToANSI(szBuffer).c_str() );
 #else
             if ( !g_bSilent )
-                wprintw ( m_wndInput, "\r%s", ConvertToANSI(szBuffer).c_str() );
+                wmove ( m_wndInput, 0, ++m_uiInputCount );
 #endif
             break;
         }
