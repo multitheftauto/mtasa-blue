@@ -20,6 +20,7 @@
 #include "MTAPlatform.h"
 #include "ErrorCodes.h"
 #include <assert.h>
+#include <clocale>
 #include <cstdio>
 #include <signal.h>
 
@@ -194,6 +195,9 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         SetConsoleScreenBufferSize( m_hConsole, ScrnBufferInfo.dwSize );
         SetConsoleOutputCP(CP_UTF8);
 #else
+        // support user locales
+        std::setlocale(LC_ALL, "");
+
         // Initialize the window and any necessary curses options
         initscr ( );
         keypad ( stdscr, TRUE );
