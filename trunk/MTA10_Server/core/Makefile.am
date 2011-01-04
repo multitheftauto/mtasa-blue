@@ -6,12 +6,17 @@ if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch
 AM_CXXFLAGS += -Winvalid-pch
 
-StdInc.h.gch: StdInc.h
+StdInc.h.gch:
 	$(LIBTOOL) --tag=CXX $(core_la_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile \
 		$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 		$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)  \
-		-o StdInc.h.lo $^
-	$(LN_S) -f .libs/StdInc.h.o $@
+		-o core_la-StdInc.h.lo $(srcdir)/StdInc.h \
+		-MT core_la-StdInc.h.gch -MD -MP -MF $(DEPDIR)/core_la-StdInc.h.Tpo
+
+	$(am__mv) $(DEPDIR)/core_la-StdInc.h.Tpo $(DEPDIR)/core_la-StdInc.h.Plo
+	$(am__mv) .libs/core_la-StdInc.h.o $@
+
+include ./$(DEPDIR)/core_la-StdInc.h.Plo
 
 clean-local:
 	-rm -f StdInc.h.gch
