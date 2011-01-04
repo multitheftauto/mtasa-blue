@@ -34,7 +34,8 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
                            CGroups* pGroups,
                            CEvents* pEvents,                           
                            class CScriptDebugging* pScriptDebugging,
-                           CElementDeleter* pElementDeleter )
+                           CElementDeleter* pElementDeleter,
+                           CDummy* pRootElement )
 {
     // Init
     m_pBlipManager = pBlipManager;
@@ -54,8 +55,7 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
     m_pScriptDebugging = pScriptDebugging;
     m_pElementDeleter = pElementDeleter;
 
-    m_pRootElement = new CDummy ( NULL, NULL, NULL );
-    m_pRootElement->SetTypeName ( "root" );
+    m_pRootElement = pRootElement;
 
     m_ulLastRespawnTime = 0;
 
