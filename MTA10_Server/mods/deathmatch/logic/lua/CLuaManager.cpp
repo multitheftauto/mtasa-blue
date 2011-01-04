@@ -340,8 +340,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "giveWeapon", CLuaFunctionDefinitions::GiveWeapon );
     CLuaCFunctions::AddFunction ( "takeWeapon", CLuaFunctionDefinitions::TakeWeapon );
     CLuaCFunctions::AddFunction ( "takeAllWeapons", CLuaFunctionDefinitions::TakeAllWeapons );
-    CLuaCFunctions::AddFunction ( "giveWeaponAmmo", CLuaFunctionDefinitions::GiveWeaponAmmo );
-    CLuaCFunctions::AddFunction ( "takeWeaponAmmo", CLuaFunctionDefinitions::TakeWeaponAmmo );
     CLuaCFunctions::AddFunction ( "setWeaponAmmo", CLuaFunctionDefinitions::SetWeaponAmmo );
     CLuaCFunctions::AddFunction ( "getSlotFromWeapon", CLuaFunctionDefinitions::GetSlotFromWeapon );
 

@@ -692,6 +692,10 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashServer["unbanIP"]                   = "Removed|Please manually update this.  Refer to the wiki for details";
         hashServer["unbanSerial"]               = "Removed|Please manually update this.  Refer to the wiki for details";
         hashServer["getBansXML"]                = "Removed|Please manually update this.  Refer to the wiki for details";
+
+        // Weapon
+        hashServer["giveWeaponAmmo"]            = "Replaced|giveWeapon";
+        hashServer["takeWeaponAmmo"]            = "Replaced|takeWeapon";
     }
 
     // Which hash?
