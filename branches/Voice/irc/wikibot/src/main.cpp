@@ -41,9 +41,10 @@ void ShowHelp(int argc, char* argv[])
   fprintf(stdout, "\n");
   fprintf(stdout, "Usage: %s [options]\n\n", argv[0]);
   fprintf(stdout, "Options are:\n");
-  fprintf(stdout, "\t-h|--help\tShows this help\n");
-  fprintf(stdout, "\t-f|--conffile\tUse a specific config file\n");
-  fprintf(stdout, "\t-v|--verbose\tVerbose mode\n");
+  fprintf(stdout, "\t-h|--help\t\tShows this help\n");
+  fprintf(stdout, "\t-f|--conffile\t\tUse a specific config file\n");
+  fprintf(stdout, "\t-v|--verbose\t\tVerbose mode\n");
+  fprintf(stdout, "\t-r|--reservedfile\tSet the file to fetch the reserved words from\n");
 }
 
 static void sighandler(int signum)

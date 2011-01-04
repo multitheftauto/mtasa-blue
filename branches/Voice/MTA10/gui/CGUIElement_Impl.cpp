@@ -233,9 +233,8 @@ void CGUIElement_Impl::GetMaximumSize ( CVector2D& vecSize )
 void CGUIElement_Impl::SetText ( const char *szText )
 {
     CEGUI::String strText;
-
-    if ( szText ) strText.assign ( szText );
-    m_pWindow->setText ( strText );
+    strText.assign((CEGUI::utf8*)szText);
+    m_pWindow->setText( strText );
 }
 
 
@@ -334,7 +333,11 @@ CVector2D CGUIElement_Impl::RelativeToAbsolute ( const CVector2D& Vector )
 void CGUIElement_Impl::SetParent ( CGUIElement* pParent )
 {
     if ( pParent )
-        ((CGUIElement_Impl*)pParent)->m_pWindow->addChildWindow ( m_pWindow );
+    {
+        CGUIElement_Impl* pElement = dynamic_cast < CGUIElement_Impl* > ( pParent );
+        if ( pElement )
+            pElement->m_pWindow->addChildWindow ( m_pWindow );
+    }
     m_pParent = pParent;
 }
 

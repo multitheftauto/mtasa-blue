@@ -48,7 +48,7 @@ protected:
 
     bool                                Event_OnSelectionAccepted  ( const CEGUI::EventArgs& e );
     CGUIListItem_Impl*                  GetListItem               ( CEGUI::ListboxItem* pItem );
-    std::string                         storedCaption;
+    CEGUI::String                       storedCaption;
     GUI_CALLBACK                        m_OnSelectChange;
 };
 

@@ -91,13 +91,7 @@ void CPedSync::ClearPeds ( void )
 
 bool CPedSync::Exists ( CClientPed* pPed )
 {
-    list < CClientPed* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( *iter == pPed )
-            return true;
-    }
-    return false;
+    return m_List.Contains ( pPed );
 }
 
 
@@ -239,7 +233,7 @@ void CPedSync::Update ( void )
         if ( pBitStream )
         {
             // Write each ped to it
-            list < CClientPed* > ::iterator iter = m_List.begin ();
+            list < CClientPed* > ::const_iterator iter = m_List.begin ();
             for ( ; iter != m_List.end (); iter++ )
             {
                 WritePedInformation ( pBitStream, *iter );

@@ -54,6 +54,10 @@ public:
 #define MIN_CHAT_LENGTH 1
 #define MAX_CHAT_LENGTH 96
 
+// Min and max number of characters in a console command
+#define MIN_COMMAND_LENGTH 1
+#define MAX_COMMAND_LENGTH 255
+
 // Min and max number of characters in chat echos
 #define MIN_CHATECHO_LENGTH 1
 #define MAX_CHATECHO_LENGTH 128
@@ -75,13 +79,14 @@ public:
 #define MAX_DISCONNECT_REASON_LENGTH 127
 
 // Max kick string length that can be sent
-#define MIN_KICK_REASON_LENGTH 1
-#define MAX_KICK_REASON_LENGTH 64
+#define MIN_KICK_REASON_LENGTH      1
+#define MAX_KICK_REASON_LENGTH      64
+#define MAX_KICK_RESPONSIBLE_LENGTH 30
 
 // Max ban string length that can be sent
-#define MIN_BAN_REASON_LENGTH 1
-#define MAX_BAN_REASON_LENGTH 64
-
+#define MIN_BAN_REASON_LENGTH      1
+#define MAX_BAN_REASON_LENGTH      64
+#define MAX_BAN_RESPONSIBLE_LENGTH 30
 
 // Couple of defines to ensure proper configuration
 #if MAX_CHAT_LENGTH > 255
@@ -95,9 +100,9 @@ public:
 #define MAX_VALID_WEATHER 255
 
 // Upper player limit
-#define MAX_PLAYER_COUNT 250
-#if MAX_PLAYER_COUNT > 254
-    #error MAX_PLAYER_COUNT "macro can't exceed 254"
+#define MAX_PLAYER_COUNT 65535
+#if MAX_PLAYER_COUNT > 65535
+    #error MAX_PLAYER_COUNT "macro can't exceed 65535"
 #endif
 
 // Game Type
@@ -133,9 +138,6 @@ public:
 
 // Server FPS limit (in milliseconds)
 #define FPS_LIMIT                   16
-
-// Default MTU size
-#define MTU_SIZE_DEFAULT            1264
 
 // Max garages
 #define MAX_GARAGES                 50

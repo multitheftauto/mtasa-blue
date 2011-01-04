@@ -20,109 +20,67 @@ extern CClientGame * g_pClientGame;
 CDeathmatchObject::CDeathmatchObject ( CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel ) : CClientObject ( pManager, ID, usModel )
 {
     m_pMovingObjectsManager = pMovingObjectsManager;
-    m_ulStartTime = 0;
-    m_ulTargetTime = 0;
+    m_pMoveAnimation = NULL;
 }
 
 
 CDeathmatchObject::~CDeathmatchObject ( void )
 {
-    m_pMovingObjectsManager->Remove ( this );
+    _StopMovement ( true );
 }
 
 
-void CDeathmatchObject::StartMovement ( const CVector& vecTargetPosition, const CVector& vecTargetRotation, unsigned long ulTime )
+void CDeathmatchObject::StartMovement ( const CPositionRotationAnimation& a_rMoveAnimation )
 {
-    // More than 0 ms to move?
-    if ( ulTime > 0 )
+    if ( m_pMoveAnimation != NULL )
     {
-        // Set our data
-        m_ulStartTime = CClientTime::GetTime ();
-        m_ulTargetTime = m_ulStartTime + ulTime;
-        GetPosition ( m_vecStartPosition );
-        GetRotationRadians ( m_vecStartRotation );
-        m_vecTargetPosition = vecTargetPosition;
-        m_vecTargetRotation = vecTargetRotation;
+        _StopMovement ( true );
+    }
 
-        // Get the start rotation between 0 and 2*pi
-        if ( m_vecStartRotation.fX < 0 )
-            m_vecStartRotation.fX += 2.0f * PI;
-        else if ( m_vecStartRotation.fX >= 2*PI )
-            m_vecStartRotation.fX -= 2.0f * PI;
-
-        if ( m_vecStartRotation.fY < 0 )
-            m_vecStartRotation.fY += 2.0f * PI;
-        else if ( m_vecStartRotation.fY >= 2*PI )
-            m_vecStartRotation.fY -= 2.0f * PI;
-
-        if ( m_vecStartRotation.fZ < 0 )
-            m_vecStartRotation.fZ += 2.0f * PI;
-        else if ( m_vecStartRotation.fZ >= 2*PI )
-            m_vecStartRotation.fZ -= 2.0f * PI;
-
+    if ( a_rMoveAnimation.IsRunning () )
+    {
         // Add us to the moving object's manager
         m_pMovingObjectsManager->Add ( this );
+        m_pMoveAnimation = new CPositionRotationAnimation ( a_rMoveAnimation );
     }
     else
     {
-        SetPosition ( vecTargetPosition );
-        SetRotationRadians ( vecTargetRotation );
+        SPositionRotation positionRotation;
+        a_rMoveAnimation.GetFinalValue ( positionRotation );
+        SetOrientation ( positionRotation.m_vecPosition, positionRotation.m_vecRotation );
     }
 }
 
 
 void CDeathmatchObject::StopMovement ( void )
 {
-    // Prevent it from moving in the future
-    m_ulStartTime = 0;
-    m_ulTargetTime = 0;
+   _StopMovement ( true );
 }
 
-
-void CDeathmatchObject::FinishMovement ( void )
+void CDeathmatchObject::_StopMovement ( bool a_bUnregister )
 {
-    // Prevent it from moving in the future
-    m_ulStartTime = 0;
-    m_ulTargetTime = 0;
-
-    // Set the target position/rotation (ensures accuracy)
-    SetPosition ( m_vecTargetPosition );
-    SetRotationRadians ( m_vecStartRotation + m_vecTargetRotation );
+    if ( m_pMoveAnimation != NULL )
+    {
+        if ( a_bUnregister )
+        {
+            m_pMovingObjectsManager->Remove ( this );
+        }
+        delete m_pMoveAnimation;
+        m_pMoveAnimation = NULL;
+    }
 }
-
 
 void CDeathmatchObject::UpdateMovement ( void )
 {
-    // Got a start and end time?
-    if ( m_ulStartTime != 0 )
+    SPositionRotation positionRotation;
+    bool bStillRunning = m_pMoveAnimation->GetValue ( positionRotation );
+   
+    SetOrientation ( positionRotation.m_vecPosition, positionRotation.m_vecRotation );
+    
+    if ( !bStillRunning )
     {
-        // We're past our end time?
-        unsigned long ulCurrentTime = CClientTime::GetTime ();
-        if ( ulCurrentTime < m_ulTargetTime )
-        {
-            // Grab the movement duration and the time passed as floats
-            float fDuration = static_cast < float > ( m_ulTargetTime - m_ulStartTime );
-            float fTimePassed = static_cast < float > ( ulCurrentTime - m_ulStartTime );
-
-            // Grab the delta position and rotation
-            CVector vecDeltaPosition = m_vecTargetPosition - m_vecStartPosition;
-            CVector vecRotation = m_vecTargetRotation;
-
-            // Divide it on the duration and multiply with the time passed
-            vecDeltaPosition /= fDuration;
-            vecDeltaPosition *= fTimePassed;
-            vecRotation /= fDuration;
-            vecRotation *= fTimePassed;
-
-            CVector vecPosition = m_vecStartPosition + vecDeltaPosition;
-
-            // Plus the position with our new interpolated delta position and set it
-            SetOrientation ( vecPosition, m_vecStartRotation + vecRotation );
-        }
-        else
-        {
-            FinishMovement ();
-        }
+        _StopMovement ( false ); //We don't unregister ourselves here since CDeathmatchObject::UpdateMovement is called from an iteration in CMovingObjectsManager::DoPulse
+        // and we are automatically removed from the list after CDeathmatchObject::UpdateMovement if we are finished
     }
 }
 

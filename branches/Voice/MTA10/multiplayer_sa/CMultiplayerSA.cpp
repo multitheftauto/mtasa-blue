@@ -48,6 +48,7 @@ unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
 unsigned long CMultiplayerSA::HOOKPOS_EndWorldColors;
 unsigned long CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList;
 unsigned long CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking;
+unsigned long CMultiplayerSA::HOOKPOS_CAutomobile__ProcessSwingingDoor;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
@@ -207,6 +208,24 @@ DWORD RETURN_CrashFix_Misc9b =                              0x73983A;
 #define HOOKPOS_CrashFix_Misc10                              0x5334FE
 DWORD RETURN_CrashFix_Misc10a =                              0x533504;
 
+#define HOOKPOS_CrashFix_Misc11                              0x4D2C62
+DWORD RETURN_CrashFix_Misc11a =                              0x4D2C67;
+DWORD RETURN_CrashFix_Misc11b =                              0x4D2E03;
+
+#define HOOKPOS_CrashFix_Misc12                              0x4D41C5
+DWORD RETURN_CrashFix_Misc12a =                              0x4D41CA;
+DWORD RETURN_CrashFix_Misc12b =                              0x4D4222;
+
+#define HOOKPOS_CrashFix_Misc13                              0x4D464E
+DWORD RETURN_CrashFix_Misc13a =                              0x4D4654;
+DWORD RETURN_CrashFix_Misc13b =                              0x4D4764;
+
+#define HOOKPOS_VehColCB                              0x04C838D
+DWORD RETURN_VehColCB =                              0x04C83AA;
+
+#define HOOKPOS_VehCol                              0x06D6603
+DWORD RETURN_VehCol =                              0x06D660C;
+
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -226,6 +245,7 @@ float fLocalPlayerCameraRotation = 0.0f;
 bool bCustomCameraRotation = false;
 unsigned char ucTrafficLightState = 0;
 bool bTrafficLightsBlocked = false;
+bool bInteriorSoundsEnabled = true;
 
 bool bUsingCustomSkyGradient = false;
 BYTE ucSkyGradientTopR = 0;
@@ -334,9 +354,16 @@ void HOOK_CrashFix_Misc7 ();
 void HOOK_CrashFix_Misc8 ();
 void HOOK_CrashFix_Misc9 ();
 void HOOK_CrashFix_Misc10 ();
+void HOOK_CrashFix_Misc11 ();
+void HOOK_CrashFix_Misc12 ();
+void HOOK_CrashFix_Misc13 ();
+void HOOK_VehColCB ();
+void HOOK_VehCol ();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
+
+void HOOK_CAutomobile__ProcessSwingingDoor ();
 
 void vehicle_lights_init ();
 
@@ -460,6 +487,12 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc8, (DWORD)HOOK_CrashFix_Misc8, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc9, (DWORD)HOOK_CrashFix_Misc9, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc10, (DWORD)HOOK_CrashFix_Misc10, 6 );
+    HookInstall(HOOKPOS_CrashFix_Misc11, (DWORD)HOOK_CrashFix_Misc11, 5 );
+    HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
+    HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
+    HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
+    HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
+    HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -1228,6 +1261,36 @@ void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
         *(WORD *)0x60B4F6 = 0x027C;
 }
 
+bool CMultiplayerSA::AreInteriorSoundsEnabled ( )
+{
+    return bInteriorSoundsEnabled;
+}
+
+void CMultiplayerSA::SetInteriorSoundsEnabled ( bool bEnabled )
+{
+    // The function which should be restored when re-enabling interior sounds
+    BYTE originalCode[6] = {0x89, 0x2d, 0xbc, 0xdc, 0xb6, 0x00};
+
+    if ( bEnabled )
+    {
+        // Restore the function responsible for interior sounds
+        memcpy ( (LPVOID)0x508450, &originalCode, 6 );
+        memcpy ( (LPVOID)0x508817, &originalCode, 6 );
+    }
+    else
+    {
+        // Nop the function responsible for interior sounds
+        memset ( (LPVOID)0x508450, 0x90, 6 );
+        memset ( (LPVOID)0x508817, 0x90, 6 );
+    }
+
+    // Toggle the interior sound on/off, depending on what the scripter wants
+    *(bool *)0xB6DCBC = bEnabled;
+
+    // If we just store it, we can always return the on/off state later on
+    bInteriorSoundsEnabled = bEnabled;
+}
+
 void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
 {
     //volumetric clouds
@@ -1259,6 +1322,35 @@ void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
     }
 }
 
+bool CMultiplayerSA::HasSkyColor ( )
+{
+    return bUsingCustomSkyGradient;
+}
+
+void CMultiplayerSA::GetSkyColor ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue )
+{
+    if ( HasSkyColor ( ) )
+    {
+        TopRed  = ucSkyGradientTopR;
+        TopGreen = ucSkyGradientTopG;
+        TopBlue  = ucSkyGradientTopB;
+
+        BottomRed   = ucSkyGradientBottomR;
+        BottomGreen = ucSkyGradientBottomG;
+        BottomBlue  = ucSkyGradientBottomB;
+    }
+    else
+    {
+        TopRed   = *(BYTE *)0xB7C4C4;
+        TopGreen = *(BYTE *)0xB7C4C6;
+        TopBlue  = *(BYTE *)0xB7C4C8;
+
+        BottomRed   = *(BYTE *)0xB7C4CA;
+        BottomGreen = *(BYTE *)0xB7C4CC;
+        BottomBlue  = *(BYTE *)0xB7C4CE;
+    }
+}
+
 void CMultiplayerSA::SetSkyColor ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue )
 {
     bUsingCustomSkyGradient = true;
@@ -1273,6 +1365,29 @@ void CMultiplayerSA::SetSkyColor ( unsigned char TopRed, unsigned char TopGreen,
 void CMultiplayerSA::ResetSky ( void )
 {
     bUsingCustomSkyGradient = false;
+}
+
+bool CMultiplayerSA::HasWaterColor ( )
+{
+    return bUsingCustomWaterColor;
+}
+
+void CMultiplayerSA::GetWaterColor ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha )
+{
+    if ( HasWaterColor ( ) )
+    {
+        fWaterRed   = fWaterColorR;
+        fWaterGreen = fWaterColorG;
+        fWaterBlue  = fWaterColorB;
+        fWaterAlpha = fWaterColorA;
+    }
+    else
+    {
+        fWaterRed   = *(float *)0xB7C508;
+        fWaterGreen = *(float *)0xB7C50C;
+        fWaterBlue  = *(float *)0xB7C510;
+        fWaterAlpha = *(float *)0xB7C514;
+    }
 }
 
 void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha )
@@ -3067,6 +3182,16 @@ void CMultiplayerSA::SetThermalVisionEnabled ( bool bEnabled )
     }
 }
 
+bool CMultiplayerSA::IsNightVisionEnabled ( )
+{
+    return (*(BYTE *)0xC402B8 == 1 );
+}
+
+bool CMultiplayerSA::IsThermalVisionEnabled ( )
+{
+    return (*(BYTE *)0xC402B9 == 1 );
+}
+
 
 float CMultiplayerSA::GetGlobalGravity ( void )
 {
@@ -3164,7 +3289,7 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
     {
         ucDesignatedLightState = 1; //Amber
     }
-    else if ( ucTrafficLightState == 12 )
+    else if ( ucTrafficLightState == 9 )
     {
         ucDesignatedLightState = 4;  //Off
     }
@@ -3191,7 +3316,7 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
     {
         ucDesignatedLightState = 1; //Amber
     }
-    else if ( ucTrafficLightState == 12 )
+    else if ( ucTrafficLightState == 9 )
     {
         ucDesignatedLightState = 4; //Off
     }
@@ -4651,5 +4776,165 @@ void _declspec(naked) HOOK_CrashFix_Misc10 ()
         mov     dword ptr [ecx+8],0 
         add     esp, 18h 
         ret     8  
+    }
+}
+
+
+// #5576
+void _declspec(naked) HOOK_CrashFix_Misc11 ()
+{
+    _asm
+    {
+        // Hooked from 0x4D2C62  5 bytes
+        test    ecx, ecx 
+        je      cont  // Skip much code if ecx is zero (invalid anim somthing)
+
+        mov     eax, dword ptr [ecx+10h] 
+        test    eax, eax 
+        jmp     RETURN_CrashFix_Misc11a  // 4D2C67
+    cont:
+        jmp     RETURN_CrashFix_Misc11b  // 4D2E03
+    }
+}
+
+
+// #5530
+void _declspec(naked) HOOK_CrashFix_Misc12 ()
+{
+    _asm
+    {
+        // Hooked from 0x4D41C5  5 bytes
+        test    edi, edi 
+        je      cont  // Skip much code if edi is zero (invalid anim somthing)
+
+        mov     al, byte ptr [edi+0Bh] 
+        test    al, al 
+        jmp     RETURN_CrashFix_Misc12a  // 4D41CA
+    cont:
+        jmp     RETURN_CrashFix_Misc12b  // 4D4222
+    }
+}
+
+
+void _declspec(naked) HOOK_CrashFix_Misc13 ()
+{
+    _asm
+    {
+        // Hooked from 0x4D464E  6 bytes
+        cmp     eax, 0x480
+        jb      cont  // Skip much code if eax is less than 0x480 (invalid anim)
+
+        mov     al, byte ptr [eax+0Ah] 
+        shr     al, 5
+        jmp     RETURN_CrashFix_Misc13a  // 4D4654
+    cont:
+        jmp     RETURN_CrashFix_Misc13b  // 4D478c
+    }
+}
+
+
+static SColor vehColors[4];
+
+void _cdecl SaveVehColors ( DWORD dwThis )
+{
+    CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwThis );
+    if ( pVehicle )
+    {
+        pVehicle->GetColor ( &vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], 0 );
+
+        // 0xFF00FF and 0x00FFFF both result in black for some reason
+        for ( uint i = 0 ; i < NUMELMS( vehColors ) ; i++ )
+        {
+            if ( vehColors[i] == 0xFF00FF )
+                vehColors[i] = 0xFF01FF;
+            if ( vehColors[i] == 0x00FFFF )
+                vehColors[i] = 0x01FFFF;
+        }
+    }
+}
+
+
+void _declspec(naked) HOOK_VehCol ()
+{
+    _asm
+    {
+        // Get vehColors for this vehicle
+        pushad
+        push esi
+        call SaveVehColors
+        add esp, 4
+        popad
+
+        // Hooked from 006D6603  9 bytes
+        mov         dl, 3
+        mov         al, 2
+        mov         cl, 1
+        push        edx  
+        xor         edx,edx 
+        mov         dl,byte ptr [esi+434h] 
+        mov         dl, 0
+
+        jmp     RETURN_VehCol  // 006D660C
+    }
+}
+
+
+void _declspec(naked) HOOK_VehColCB ()
+{
+    _asm
+    {
+        // Hooked from 004C838D  29 bytes
+
+        // Apply vehColors for this vehicle
+        mov         cl,byte ptr [esi*4+vehColors.R] 
+        mov         byte ptr [eax+4],cl
+
+        mov         cl,byte ptr [esi*4+vehColors.G] 
+        mov         byte ptr [eax+5],cl
+
+        mov         cl,byte ptr [esi*4+vehColors.B] 
+        mov         byte ptr [eax+6],cl
+
+        jmp     RETURN_VehColCB  // 004C83AA
+    }
+}
+
+// Check if this vehicle is allowed to process swinging doors.
+static DWORD dwSwingingDoorAutomobile;
+static const DWORD dwSwingingRet1 = 0x6A9DB6;
+static const DWORD dwSwingingRet2 = 0x6AA1DA;
+static bool AllowSwingingDoors ()
+{
+    CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwSwingingDoorAutomobile );
+    if ( pVehicle == 0 || pVehicle->AreSwingingDoorsAllowed() )
+        return true;
+    else
+        return false;
+}
+
+void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor ()
+{
+    _asm
+    {
+        mov     dwSwingingDoorAutomobile, esi
+        mov     ecx, [esi+eax*4+0x648]
+        pushad
+    }
+
+    if ( AllowSwingingDoors() )
+    {
+        _asm
+        {
+            popad
+            jmp     dwSwingingRet1
+        }
+    }
+    else
+    {
+        _asm
+        {
+            popad
+            jmp     dwSwingingRet2
+        }
     }
 }

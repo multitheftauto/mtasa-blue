@@ -54,6 +54,8 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_ulIdleRespawnTime = 60000;
 
     m_bEngineOn = false;
+    for ( unsigned int i = 0; i < 6; ++i )
+        m_fDoorAngleRatio [ i ] = 0.0f;
     m_bLocked = false;
     m_bDoorsUndamageable = false;
     m_bDamageProof = false;
@@ -70,6 +72,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bTrainDirection = true;
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
+    m_bCollisionsEnabled = true;
 
     // Initialize the occupied Players
     for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )
@@ -245,18 +248,31 @@ bool CVehicle::ReadSpecialData ( void )
     char szTemp [ 256 ];
     if ( GetCustomDataString ( "color", szTemp, 256, true ) )
     {
-        char* sz1 = strtok ( szTemp, "," );
-        char* sz2 = strtok ( NULL, "," );
-        char* sz3 = strtok ( NULL, "," );
-        char* sz4 = strtok ( NULL, "," );
+        uchar ucValues[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        char* sz1 = strtok ( szTemp, ", " );
         if ( sz1 )
-            m_Color.SetColor1 ( atoi ( sz1 ) );
-        if ( sz2 )
-            m_Color.SetColor2 ( atoi ( sz2 ) );
-        if ( sz3 )
-            m_Color.SetColor3 ( atoi ( sz3 ) );
-        if ( sz4 )
-            m_Color.SetColor4 ( atoi ( sz4 ) );
+            ucValues[0] = atoi ( sz1 );
+
+        int i;
+        for ( i = 1 ; i < 12 ; i++ )
+        {
+            char* szn =  strtok ( NULL, ", " );
+            if ( !szn )
+                break;
+            ucValues[i] = atoi ( szn );
+        }
+
+        if ( i == 3 || i == 6 || i == 9 || i == 12 )
+        {
+            m_Color.SetRGBColors (  SColorRGBA ( ucValues[0], ucValues[1], ucValues[2], 0 ),
+                                    SColorRGBA ( ucValues[3], ucValues[4], ucValues[5], 0 ),
+                                    SColorRGBA ( ucValues[6], ucValues[7], ucValues[8], 0 ),
+                                    SColorRGBA ( ucValues[9], ucValues[10], ucValues[11], 0 ) );
+        }
+        else
+        {
+            m_Color.SetPaletteColors ( ucValues[0], ucValues[1], ucValues[2], ucValues[3] );
+        }
     }            
 
     if ( GetCustomDataInt ( "paintjob", iTemp, true ) )
@@ -273,7 +289,7 @@ bool CVehicle::ReadSpecialData ( void )
             else
             {
                 bool bTemp = true;
-                while ( char* token = strtok ( ( bTemp ) ? szTemp : NULL, "," ) )
+                while ( char* token = strtok ( ( bTemp ) ? szTemp : NULL, ", " ) )
                 {
                     bTemp = false;
                     unsigned short usUpgrade = static_cast < unsigned short > ( atoi ( token ) );
@@ -287,15 +303,23 @@ bool CVehicle::ReadSpecialData ( void )
     }
 
     if ( GetCustomDataString ( "plate", szTemp, 9, true ) )
-    {
         SetRegPlate ( szTemp );
-    }
 
     if ( GetCustomDataInt ( "interior", iTemp, true ) )
         m_ucInterior = static_cast < unsigned char > ( iTemp );
 
     if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
+
+    if ( !GetCustomDataBool ( "collisions", m_bCollisionsEnabled, true ) )
+        m_bCollisionsEnabled = true;
+
+    if ( GetCustomDataInt ( "alpha", iTemp, true ) )
+        m_ucAlpha = static_cast < unsigned char > ( iTemp );
+
+    bool bFrozen;
+    if ( GetCustomDataBool ( "frozen", bFrozen, true ) )
+        m_bIsFrozen = bFrozen;
 
     return true;
 }
@@ -589,6 +613,8 @@ void CVehicle::SpawnAt ( const CVector& vecPosition, const CVector& vecRotation 
     memset ( m_ucLightStates, 0, sizeof ( m_ucLightStates ) );
     SetLandingGearDown ( true );
     SetAdjustableProperty ( 0 );
+    SetTowedByVehicle ( NULL );
+    AttachTo ( NULL );
     
     CVector vecNull;
 

@@ -72,15 +72,23 @@ public:
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
+    bool                        HasSkyColor                 ();
+    void                        GetSkyColor                 ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue );
     void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue );
     void                        ResetSky                    ();
+    bool                        HasWaterColor               ();
+    void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );
     void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
     void                        ResetWater                  ();
     void                        SetCloudsEnabled            ( bool bDisabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
+    bool                        AreInteriorSoundsEnabled    ();
+    void                        SetInteriorSoundsEnabled    ( bool bEnabled );
 
     void                        SetNightVisionEnabled       ( bool bEnabled );
     void                        SetThermalVisionEnabled     ( bool bEnabled );
+    bool                        IsNightVisionEnabled        ( );
+    bool                        IsThermalVisionEnabled      ( );
 
     void                        AllowWindowsCursorShowing   ( bool bAllow );
 
@@ -167,6 +175,7 @@ private:
     static unsigned long        HOOKPOS_EndWorldColors;
     static unsigned long        HOOKPOS_CWorld_ProcessVerticalLineSectorList;
     static unsigned long        HOOKPOS_ComputeDamageResponse_StartChoking;
+    static unsigned long        HOOKPOS_CAutomobile__ProcessSwingingDoor;
 
     static unsigned long        FUNC_CStreaming_Update;
     static unsigned long        FUNC_CAudioEngine__DisplayRadioStationName;

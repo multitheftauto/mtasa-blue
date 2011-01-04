@@ -20,7 +20,7 @@
 class CGUIFont_Impl : public CGUIFont
 {
 public:
-                            CGUIFont_Impl           ( class CGUI_Impl* pManager, const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uExtraGlyphs[] = 0, bool bAutoScale = false );
+                            CGUIFont_Impl           ( class CGUI_Impl* pManager, const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false );
                             ~CGUIFont_Impl          ( void );
 
     void                    SetAntiAliasingEnabled  ( bool bAntialiased );
@@ -37,6 +37,11 @@ public:
     CEGUI::Font*            GetFont                 ( void );
 
     void                    DrawTextString          ( const char *szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY );
+
+    void                    defineFontGlyphs        ( unsigned int uExtraGlyphs[] );
+    void                    defineFontGlyphs        ( const char* szExtraGlyphs );
+
+    bool                    isGlyphBeingUsed        (unsigned long ulGlyph);
 
 private:
     CEGUI::Font*            m_pFont;

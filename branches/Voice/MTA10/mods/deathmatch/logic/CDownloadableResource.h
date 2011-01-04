@@ -16,16 +16,12 @@
 
 #ifndef _WINDOWS_
 
-#define WIN32_LEAN_AND_MEAN     // Exclude all uncommon functions from windows.h to reduce executable size
-
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0400     // So we can use IsDebuggerPresent()
-#endif
+#define WIN32_LEAN_AND_MEAN     // Exclude all uncommon functions from windows.h to reduce build time by 100ms
 
 #include <windows.h>
 #endif
 
-#include "../../shared_logic/utils/zip/crc32.h"
+#include <bochs_internal/crc32.h>
 #include "CChecksum.h"
 
 class CDownloadableResource

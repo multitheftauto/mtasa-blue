@@ -25,8 +25,13 @@
 
 #define VAR_bMouseSteering      0xC1CC02
 #define VAR_bMouseFlying        0xC1CC03
-#define VAR_fFxQuality          0xA9AE54
-#define VAR_fMouseSensivity     0xB6EC1C
+#define VAR_bFxQuality          0xA9AE54
+#define VAR_fMouseSensitivity   0xB6EC1C
+
+#define VAR_bUsertrackMode      0xBA67F8
+#define VAR_bUsertrackAutoScan  0xBA680D
+#define VAR_bRadioEqualizer     0xBA6799
+#define VAR_bRadioAutotune      0xBA6795
 
 #define CLASS_CAudioEngine 0xB6BC90
 #define FUNC_CAudioEngine_SetEffectsMasterVolume 0x506E10
@@ -34,6 +39,8 @@
 
 #define CLASS_CGamma 0xC92134
 #define FUNC_CGamma_SetGamma 0x747200
+
+#define FUNC_SetAntiAliasing    0x7F8A90
 
 struct CSettingsSAInterface // see code around 0x57CE9A for where these are
 {
@@ -60,9 +67,11 @@ struct CSettingsSAInterface // see code around 0x57CE9A for where these are
     bool bInvertPadY2;          // 0xB4
     bool bSwapPadAxis1;         // 0xB5
     bool bSwapPadAxis2;         // 0xB6
-    BYTE pad6[0x19];
+    BYTE pad6[0x11];
+    DWORD dwAntiAliasing;       // 0xC8
+    DWORD dwFrontendAA;         // 0xCC (anti-aliasing value in the single-player settings menu. Useless for MTA).
     bool bUseKeyboardAndMouse;  // 0xD0
-    BYTE pad7[3];
+    BYTE pad8[3];
     DWORD dwVideoMode;          // 0xD4
     DWORD dwPrevVideoMode;      // 0xD8
 };
@@ -77,8 +86,6 @@ private:
 public:
                             CSettingsSA                 ( void );
 
-    bool                    IsFrameLimiterEnabled       ( void );
-    void                    SetFrameLimiterEnabled      ( bool bEnabled );
     bool                    IsWideScreenEnabled         ( void );
     void                    SetWideScreenEnabled        ( bool bEnabled );
     unsigned int            GetNumVideoModes            ( void );
@@ -89,6 +96,15 @@ public:
     void                    SetRadioVolume              ( unsigned char ucVolume );
     unsigned char           GetSFXVolume                ( void );
     void                    SetSFXVolume                ( unsigned char ucVolume );
+    unsigned int            GetUsertrackMode            ( void );
+    void                    SetUsertrackMode            ( unsigned int uiMode );
+    bool                    IsUsertrackAutoScan         ( void );
+    void                    SetUsertrackAutoScan        ( bool bEnable );
+    bool                    IsRadioEqualizerEnabled     ( void );
+    void                    SetRadioEqualizerEnabled    ( bool bEnable );
+    bool                    IsRadioAutotuneEnabled      ( void );
+    void                    SetRadioAutotuneEnabled     ( bool bEnable );
+
 
     float                   GetDrawDistance             ( void );
     void                    SetDrawDistance             ( float fDrawDistance );
@@ -99,8 +115,11 @@ public:
     unsigned int            GetFXQuality                ( void );
     void                    SetFXQuality                ( unsigned int fxQualityId );
 
-    float                   GetMouseSensivity           ( void );
-    void                    SetMouseSensivity           ( float fSensivity );
+    float                   GetMouseSensitivity         ( void );
+    void                    SetMouseSensitivity         ( float fSensitivity );
+
+    unsigned int            GetAntiAliasing             ( void );
+    void                    SetAntiAliasing             ( unsigned int uiAntiAliasing, bool bOnRestart );
 
     void                    Save                        ( void );
 

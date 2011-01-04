@@ -37,7 +37,7 @@ public:
     bool                        CanBeDestroyed          ( void );
 
 private:
-    std::list < class CClientEntity* >      m_List;
+    CMappedList < class CClientEntity* >    m_List;
     bool                                    m_bAllowUnreference;
 };
 

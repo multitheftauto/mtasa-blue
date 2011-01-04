@@ -36,6 +36,7 @@ public:
         QUEUE_STOP,
         QUEUE_STOPALL,
         QUEUE_RESTART,
+        QUEUE_RESTART2,
     };
 
     struct sResourceStartFlags
@@ -55,6 +56,7 @@ private:
         CResource*          pResource;
         eResourceQueue      eQueue;
         sResourceStartFlags Flags;
+        vector < SString >  dependents;
     };
 
 public:
@@ -69,7 +71,9 @@ public:
     void                        UnloadRemovedResources          ( void );
     void                        CheckResourceDependencies       ( void );
     void                        ListResourcesLoaded             ( void );
-    list <CResource *>*         GetLoadedResources              ( void );
+    std::list < CResource* > ::const_iterator  IterBegin        ( void )            { return m_resources.begin (); };
+    std::list < CResource* > ::const_iterator  IterEnd          ( void )            { return m_resources.end (); };
+
     bool                        Refresh                         ( bool bRefreshAll = false );
     void                        Upgrade                         ( void );
     inline unsigned int         GetResourceLoadedCount          ( void )            { return m_uiResourceLoadedCount; }
@@ -82,7 +86,7 @@ public:
     bool                        Reload                          ( CResource* pResource );
     bool                        StopAllResources                ( void );
 
-    void                        QueueResource                   ( CResource* pResource, eResourceQueue eQueueTypebConfigs, const sResourceStartFlags* Flags );
+    void                        QueueResource                   ( CResource* pResource, eResourceQueue eQueueType, const sResourceStartFlags* Flags, list < CResource* > * dependents = NULL );
     void                        ProcessQueue                    ( void );
     void                        RemoveFromQueue                 ( CResource* pResource );
 
@@ -101,7 +105,7 @@ public:
 
 private:
     char                        m_szResourceDirectory[260];
-    list<CResource *>           m_resources;
+    CMappedList < CResource* >  m_resources;
     unsigned int                m_uiResourceLoadedCount;
     unsigned int                m_uiResourceFailedCount;
     bool                        m_bResourceListChanged;

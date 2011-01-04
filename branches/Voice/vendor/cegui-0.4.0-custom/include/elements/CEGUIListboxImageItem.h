@@ -51,7 +51,7 @@ public:
 	\brief
 		base class constructor
 	*/
-	ListboxImageItem(const Image& image, uint item_id = 0, void* item_data = NULL, bool disabled = false, bool auto_delete = true);
+	ListboxImageItem(const Image* image, uint item_id = 0, void* item_data = NULL, bool disabled = false, bool auto_delete = true);
 
 
 	/*!
@@ -87,7 +87,7 @@ public:
 	\return
 		Nothing
 	*/
-	void	setImage(const Image* image)		{d_image = image;}
+	void	setImage(const Image* image)		{d_bSizeChanged |= (d_image != image); d_image = image;}
 
 
 	/*************************************************************************
@@ -110,7 +110,7 @@ public:
 	/*************************************************************************
 		Required implementations of pure virtuals from the base class.
 	*************************************************************************/
-    Size getPixelSize(void) const;
+    Size getPixelSize(void);
     void draw(const Vector3& position, float alpha, const Rect& clipper) const;
     void draw(RenderCache& cache,const Rect& targetRect, float zBase,  float alpha, const Rect* clipper) const;
 

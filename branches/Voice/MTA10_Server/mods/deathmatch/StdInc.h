@@ -36,8 +36,7 @@
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
-#include "SString.h"
-#include "utils/zip/crc32.h"
+#include <bochs_internal/crc32.h>
 #include "CMD5Hasher.h"
 #include "CChecksum.h"
 
@@ -122,6 +121,11 @@
 #include "lua/CLuaArgument.h"
 #include "lua/CLuaCFunctions.h"
 #include "lua/CLuaArguments.h"
+
+// Shared includes
+#include "CEasingCurve.h"
+#include "TInterpolation.h"
+#include "CPositionRotationAnimation.h"
 
 // Logic includes
 #include "ASE.h"
@@ -225,7 +229,6 @@
 #include "CTextItem.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CVehicle.h"
-#include "CVehicleColor.h"
 #include "CVehicleColorManager.h"
 #include "CVehicleDefaultColors.h"
 #include "CVehicleManager.h"
@@ -242,6 +245,10 @@
 
 #include "CStaticFunctionDefinitions.h"
 
+// Shared includes
+#include "CEasingCurve.h"
+#include "CPositionRotationAnimation.h"
+
 // Utility includes
 #include "utils/CHTTPClient.h"
 #include "utils/CHTTPRequest.h"
@@ -254,7 +261,7 @@
 #include "utils/CTCPServerSocketImpl.h"
 #include "utils/CTCPSocket.h"
 #include "utils/CTCPSocketImpl.h"
-#include "utils/base64.h"
+#include <base64.h>
 
 // Module includes
 #include "CServer.h"

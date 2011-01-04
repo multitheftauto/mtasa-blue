@@ -50,6 +50,7 @@ public:
     DECLARE_RPC ( SetTrainSpeed );
     DECLARE_RPC ( SetVehicleTaxiLightOn );
     DECLARE_RPC ( SetVehicleHeadLightColor );
+    DECLARE_RPC ( SetVehicleTurretPosition );
 };
 
 #endif

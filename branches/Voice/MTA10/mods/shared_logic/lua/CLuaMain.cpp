@@ -139,6 +139,9 @@ void CLuaMain::InitVM ( void )
     lua_pushelement ( m_luaVM, m_pResource->GetResourceGUIEntity () );
     lua_setglobal ( m_luaVM, "guiRoot" );
 
+    lua_pushelement ( m_luaVM, g_pClientGame->GetLocalPlayer() );
+    lua_setglobal ( m_luaVM, "localPlayer" );
+
     // Load pre-loaded lua code
     LoadScript ( szPreloadedScript );
 }
@@ -190,8 +193,21 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-                g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
+                SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+        
+                std::vector <SString> vecSplit;
+                strRes.Split ( ":", vecSplit );
+                
+                if ( vecSplit.size ( ) >= 3 )
+                {
+                    SString strFile = vecSplit[0];
+                    int     iLine   = atoi ( vecSplit[1].c_str ( ) );
+                    SString strMsg  = vecSplit[2].substr ( 1 );
+                    
+                    g_pClientGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
+                }
+                else
+                    g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
             }
             return true;
         }
@@ -206,11 +222,10 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
     if ( m_luaVM )
     {
         // Run the script
-        std::string strRes = ConformResourcePath ( szFileName );
-        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, strRes.c_str () ) )
+        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, SString ( "@%s", szFileName ) ) )
         {
             // Print the error
-            strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
             if ( strRes.length () )
             {
                 CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
@@ -228,8 +243,21 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-                g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
+                SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+        
+                std::vector <SString> vecSplit;
+                strRes.Split ( ":", vecSplit );
+                
+                if ( vecSplit.size ( ) >= 3 )
+                {
+                    SString strFile = vecSplit[0];
+                    int     iLine   = atoi ( vecSplit[1].c_str ( ) );
+                    SString strMsg  = vecSplit[2].substr ( 1 );
+                    
+                    g_pClientGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
+                }
+                else
+                    g_pClientGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
             }
             return true;
         }

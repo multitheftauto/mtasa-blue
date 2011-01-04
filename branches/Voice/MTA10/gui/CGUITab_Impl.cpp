@@ -24,7 +24,11 @@ CGUITab_Impl::CGUITab_Impl ( CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const c
     // Create the window and set default settings
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( "DefaultWindow", szUnique );
     m_pWindow->setDestroyedByParent ( false );
-    m_pWindow->setText ( szCaption );
+
+    CEGUI::String strText;
+    strText.assign( (CEGUI::utf8*) szCaption ); // assign as UTF8 string
+    m_pWindow->setText ( strText );
+
 
     // Store the pointer to this CGUI element in the CEGUI element
     m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
@@ -57,6 +61,6 @@ void CGUITab_Impl::SetCaption ( const char* szCaption )
 {
     CEGUI::String strCaption;
 
-    if ( szCaption ) strCaption.assign ( szCaption );
+    if ( szCaption ) strCaption.assign ( (CEGUI::utf8*)szCaption );
     m_pWindow->setText ( strCaption );
 }

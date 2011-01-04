@@ -20,14 +20,19 @@ FLOAT CDoorSA::GetAngleOpenRatio ( )
 {
     DEBUG_TRACE("FLOAT CDoorSA::GetAngleOpenRatio ( )");
     DWORD dwFunction = FUNC_GetAngleOpenRatio;
-    DWORD dwPointer = (DWORD)this;
+    DWORD dwPointer = (DWORD)GetInterface();
     FLOAT fReturn = 0.0f;
-    _asm
+
+    if ( dwPointer != 0 )
     {
-        mov     ecx, dwPointer
-        call    dwFunction
-        fstp    fReturn
+        _asm
+        {
+            mov     ecx, dwPointer
+            call    dwFunction
+            fstp    fReturn
+        }
     }
+
     return fReturn;
 }
 
@@ -39,14 +44,19 @@ BOOL CDoorSA::IsClosed (  )
 {
     DEBUG_TRACE("BOOL CDoorSA::IsClosed (  )");
     DWORD dwFunction = FUNC_IsClosed;
-    DWORD dwPointer = (DWORD)this;
+    DWORD dwPointer = (DWORD)GetInterface();
     BYTE bReturn = 0;
-    _asm
+
+    if ( dwPointer != 0 )
     {
-        mov     ecx, dwPointer
-        call    dwFunction
-        mov     bReturn, al
+        _asm
+        {
+            mov     ecx, dwPointer
+            call    dwFunction
+            mov     bReturn, al
+        }
     }
+
     return bReturn;
 }
 
@@ -59,14 +69,19 @@ BOOL CDoorSA::IsFullyOpen (  )
 {
     DEBUG_TRACE("BOOL CDoorSA::IsFullyOpen (  )");
     DWORD dwFunction = FUNC_IsFullyOpen;
-    DWORD dwPointer = (DWORD)this;
+    DWORD dwPointer = (DWORD)GetInterface();
     BYTE bReturn = 0;
-    _asm
+
+    if ( dwPointer != 0 )
     {
-        mov     ecx, dwPointer
-        call    dwFunction
-        mov     bReturn, al
+        _asm
+        {
+            mov     ecx, dwPointer
+            call    dwFunction
+            mov     bReturn, al
+        }
     }
+
     return bReturn;
 }
 
@@ -75,15 +90,19 @@ BOOL CDoorSA::IsFullyOpen (  )
  * @param fUnknown Not sure...
  * \todo Check what the parameter for Open does
  */
-VOID CDoorSA::Open ( float fUnknown )
+VOID CDoorSA::Open ( float fAngleRatio )
 {
-    DEBUG_TRACE("VOID CDoorSA::Open ( float fUnknown )");
+    DEBUG_TRACE("VOID CDoorSA::Open ( float fAngleRatio )");
     DWORD dwFunction = FUNC_Open;
-    DWORD dwPointer = (DWORD)this;
-    _asm
+    DWORD dwPointer = (DWORD)GetInterface();
+
+    if ( dwPointer != 0 )
     {
-        mov     ecx, dwPointer
-        push    fUnknown
-        call    dwFunction
+        _asm
+        {
+            mov     ecx, dwPointer
+            push    fAngleRatio
+            call    dwFunction
+        }
     }
 }

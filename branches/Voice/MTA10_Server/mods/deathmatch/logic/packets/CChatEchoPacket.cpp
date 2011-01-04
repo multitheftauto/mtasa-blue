@@ -18,14 +18,14 @@ bool CChatEchoPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( m_ucRed );
     BitStream.Write ( m_ucGreen );
     BitStream.Write ( m_ucBlue );
-    BitStream.Write ( static_cast < unsigned char > ( ( m_bColorCoded ) ? 1 : 0 ) );
+    BitStream.WriteBit ( m_bColorCoded );
 
     // Too short?
-    size_t sizeMessage = strlen ( m_szMessage );
+    size_t sizeMessage = strlen ( m_strMessage.c_str() );
     if ( sizeMessage >= MIN_CHATECHO_LENGTH )
     {
         // Write the string
-        BitStream.Write ( const_cast < char* > ( m_szMessage ), sizeMessage );
+        BitStream.Write ( const_cast < char* > ( m_strMessage.c_str() ), sizeMessage );
         return true;
     }
 

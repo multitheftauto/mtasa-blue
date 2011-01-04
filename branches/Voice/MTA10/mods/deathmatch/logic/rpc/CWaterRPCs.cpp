@@ -17,6 +17,8 @@ void CWaterRPCs::LoadFunctions ( void )
 {
     AddHandler ( SET_WATER_LEVEL, SetWaterLevel, "SetWaterLevel" );
     AddHandler ( SET_WATER_VERTEX_POSITION, SetWaterVertexPosition, "SetWaterVertexPosition" );
+    AddHandler ( SET_WATER_COLOR, SetWaterColor, "SetWaterColor" );
+    AddHandler ( RESET_WATER_COLOR, ResetWaterColor, "ResetWaterColor" );
 }
 
 void CWaterRPCs::SetWaterLevel ( NetBitStreamInterface& bitStream )
@@ -92,4 +94,22 @@ void CWaterRPCs::SetWaterVertexPosition ( NetBitStreamInterface& bitStream )
             pWater->SetVertexPosition ( ucVertexID, vecPosition );
         }
     }
+}
+
+void CWaterRPCs::SetWaterColor ( NetBitStreamInterface& bitStream )
+{
+    unsigned char ucRed, ucGreen, ucBlue, ucAlpha;
+
+    if ( bitStream.Read ( ucRed ) &&
+         bitStream.Read ( ucGreen ) &&
+         bitStream.Read ( ucBlue ) &&
+         bitStream.Read ( ucAlpha ) )
+    {
+        CStaticFunctionDefinitions::SetWaterColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+    }
+}
+
+void CWaterRPCs::ResetWaterColor ( NetBitStreamInterface& bitStream )
+{
+    CStaticFunctionDefinitions::ResetWaterColor ( );
 }

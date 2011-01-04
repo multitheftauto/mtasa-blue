@@ -5,6 +5,7 @@
 *  FILE:        game_sa/CHudSA.cpp
 *  PURPOSE:     HUD display
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -338,6 +339,36 @@ void CHudSA::DisableClock ( bool bDisabled )
     *(int *)VAR_DisableClock = bDisabled ? 0 : 1;
 }
 
+void CHudSA::DisableRadioName ( bool bDisabled )
+{
+    static BYTE byteOriginal = 0;
+    if ( bDisabled && !byteOriginal )
+    {
+        byteOriginal = *(BYTE *)FUNC_DrawRadioName;
+        *(BYTE *)FUNC_DrawRadioName = 0xC3;
+    }
+    else if ( !bDisabled && byteOriginal )
+    {
+        *(BYTE *)FUNC_DrawRadioName = byteOriginal;
+        byteOriginal = 0;
+    }
+}
+
+void CHudSA::DisableWantedLevel ( bool bDisabled )
+{
+    static BYTE byteOriginal = 0;
+    if ( bDisabled && !byteOriginal )
+    {
+        byteOriginal = *(BYTE *)FUNC_DrawWantedLevel;
+        *(BYTE *)FUNC_DrawWantedLevel = 0xC3;
+    }
+    else if ( !bDisabled && byteOriginal )
+    {
+        *(BYTE *)FUNC_DrawWantedLevel = byteOriginal;
+        byteOriginal = 0;
+    }
+}
+
 void CHudSA::DisableAll ( bool bDisabled )
 {
     DisableAmmo ( bDisabled );
@@ -353,4 +384,6 @@ void CHudSA::DisableAll ( bool bDisabled )
     DisableAreaName ( bDisabled );
     DisableRadar ( bDisabled );
     DisableClock ( bDisabled );
+    DisableRadioName ( bDisabled );
+    DisableWantedLevel ( bDisabled );
 }

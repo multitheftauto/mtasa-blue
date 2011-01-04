@@ -105,14 +105,14 @@ bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
         m_pEvents->RemoveAllEvents ( vm );
         m_pRegisteredCommands->CleanUpForVM ( vm );
 
-        // Remove it from our list
-        if ( !m_virtualMachines.empty() ) m_virtualMachines.remove ( vm );
-
         // Delete it unless it is already
         if ( !vm->BeingDeleted () )
         {
             delete vm;
         }
+
+        // Remove it from our list
+        if ( !m_virtualMachines.empty() ) m_virtualMachines.remove ( vm );
 
         return true;
     }
@@ -430,6 +430,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setTrainDirection", CLuaFunctionDefinitions::SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", CLuaFunctionDefinitions::SetTrainSpeed );
     CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", CLuaFunctionDefinitions::SetVehicleHeadLightColor );
+    CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", CLuaFunctionDefinitions::SetVehicleTurretPosition );
 
     // Marker functions
     CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefinitions::CreateMarker );
@@ -470,9 +471,11 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Object get funcs
     CLuaCFunctions::AddFunction ( "getObjectRotation", CLuaFunctionDefinitions::GetObjectRotation );
+    CLuaCFunctions::AddFunction ( "getObjectScale", CLuaFunctionDefinitions::GetObjectScale );
 
     // Object set funcs
     CLuaCFunctions::AddFunction ( "setObjectRotation", CLuaFunctionDefinitions::SetObjectRotation );
+    CLuaCFunctions::AddFunction ( "setObjectScale", CLuaFunctionDefinitions::SetObjectScale );
     CLuaCFunctions::AddFunction ( "moveObject", CLuaFunctionDefinitions::MoveObject );
     CLuaCFunctions::AddFunction ( "stopObject", CLuaFunctionDefinitions::StopObject );
 
@@ -551,6 +554,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWaterLevel", CLuaFunctionDefinitions::SetWaterLevel );
     CLuaCFunctions::AddFunction ( "getWaterVertexPosition", CLuaFunctionDefinitions::GetWaterVertexPosition );
     CLuaCFunctions::AddFunction ( "setWaterVertexPosition", CLuaFunctionDefinitions::SetWaterVertexPosition );
+    CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefinitions::GetWaterColor );
+    CLuaCFunctions::AddFunction ( "setWaterColor", CLuaFunctionDefinitions::SetWaterColor );
+    CLuaCFunctions::AddFunction ( "resetWaterColor", CLuaFunctionDefinitions::ResetWaterColor );
 
     // Weapon funcs
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefinitions::GetWeaponNameFromID );
@@ -581,6 +587,8 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility vector math functions
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints2D", CLuaFunctionDefinitions::GetDistanceBetweenPoints2D );
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints3D", CLuaFunctionDefinitions::GetDistanceBetweenPoints3D );
+    CLuaCFunctions::AddFunction ( "getEasingValue", CLuaFunctionDefinitions::GetEasingValue );
+    CLuaCFunctions::AddFunction ( "interpolateBetween", CLuaFunctionDefinitions::InterpolateBetween );
 
     // Util funcs
     CLuaCFunctions::AddFunction ( "getTickCount", CLuaFunctionDefinitions::GetTickCount_ );
@@ -596,6 +604,13 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getColorFromString", CLuaFunctionDefinitions::GetColorFromString );
     CLuaCFunctions::AddFunction ( "ref", CLuaFunctionDefinitions::Reference );
     CLuaCFunctions::AddFunction ( "deref", CLuaFunctionDefinitions::Dereference );
+    // UTF functions
+    CLuaCFunctions::AddFunction ( "utfLen", CLuaFunctionDefinitions::UtfLen );
+    CLuaCFunctions::AddFunction ( "utfSeek", CLuaFunctionDefinitions::UtfSeek );
+    CLuaCFunctions::AddFunction ( "utfSub", CLuaFunctionDefinitions::UtfSub );
+    CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefinitions::UtfChar );
+    CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefinitions::UtfCode );
+
     CLuaCFunctions::AddFunction ( "getValidPedModels", CLuaFunctionDefinitions::GetValidPedModels );
 
     // Loaded map funcs
@@ -635,6 +650,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "executeSQLUpdate", CLuaFunctionDefinitions::ExecuteSQLUpdate );
     CLuaCFunctions::AddFunction ( "executeSQLInsert", CLuaFunctionDefinitions::ExecuteSQLInsert );
     CLuaCFunctions::AddFunction ( "executeSQLQuery", CLuaFunctionDefinitions::ExecuteSQLQuery );
+    CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefinitions::GetPerformanceStats );
 
     // Account get functions
     CLuaCFunctions::AddFunction ( "getAccountName", CLuaFunctionDefinitions::GetAccountName );

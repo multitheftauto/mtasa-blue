@@ -63,13 +63,17 @@ int main ( int argc, char* argv [] )
         {
             printf ( "Usage: %s [OPTION]\n\n", szLaunchFile ? szLaunchFile : "mtaserver" );
             printf ( "  -s                   Run server in silent mode\n" );
+#ifndef WIN32
+            printf ( "  -d                   Run server daemonized\n" );
+#endif
             printf ( "  -t                   Run server with a simple console\n" );
+            printf ( "  -f                   Run server with a standard console (Default)\n" );
             printf ( "  -D [PATH]            Use as base directory\n" );
             printf ( "  --config [FILE]      Alternate mtaserver.conf file\n" );
             printf ( "  --ip [ADDR]          Set IP address\n" );
             printf ( "  --port [PORT]        Set port\n" );
             printf ( "  --httpport [PORT]    Set http port\n" );
-            printf ( "  --maxplayers [2-128] Set maxplayers\n" );
+            printf ( "  --maxplayers [max]   Set maxplayers\n" );
             return 1;
         }
     }

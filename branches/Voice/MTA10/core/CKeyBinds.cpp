@@ -2648,6 +2648,15 @@ void CKeyBinds::BindCommand ( const char* szCmdLine )
 
 void CKeyBinds::UnbindCommand ( const char* szCmdLine )
 {
+    CConsoleInterface* pConsole = m_pCore->GetConsole (); 
+
+    char* szError = "* Syntax: unbind <all/key> [<up/down> <command>]";
+    if ( szCmdLine == NULL )
+    {
+        pConsole->Print ( szError );
+        return;
+    }
+
     // Copy the buffer
     char* szTemp = new char [ strlen ( szCmdLine ) + 16 ];
     strcpy ( szTemp, szCmdLine );
@@ -2655,8 +2664,6 @@ void CKeyBinds::UnbindCommand ( const char* szCmdLine )
     // Split it up into bind key and command
     char* szKey = strtok ( szTemp, " " );
     char* szCommand = strtok ( NULL, " " );
-
-    CConsoleInterface* pConsole = m_pCore->GetConsole ();
 
     if ( szKey )
     {
@@ -2707,7 +2714,7 @@ void CKeyBinds::UnbindCommand ( const char* szCmdLine )
         }
     }
     else
-        pConsole->Print ( "* Syntax: unbind <all/key> [<up/down> <command>]" );
+        pConsole->Print ( szError );
 
     delete [] szTemp;
 }

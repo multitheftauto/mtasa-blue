@@ -44,7 +44,7 @@ private:
     void                            WritePedInformation                 ( NetBitStreamInterface* pBitStream, CClientPed* pPed );
 
     CClientPedManager*              m_pPedManager;
-    std::list < CClientPed* >       m_List;
+    CMappedList < CClientPed* >     m_List;
     unsigned long                   m_ulLastSyncTime;
 };
 

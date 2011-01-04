@@ -256,7 +256,7 @@ bool CXMLNodeImpl::GetTagContent ( unsigned int& uiContent )
         return false;
 
     // Check the range
-    if ( lValue < 0 || lValue > UINT_MAX )
+    if ( lValue < 0 /*|| lValue > UINT_MAX*/ )
         return false;
     else
     {

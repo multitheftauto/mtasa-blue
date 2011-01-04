@@ -22,7 +22,7 @@ edit = 	sed \
 	  -e 's,%lua_datadir%,$(datadir),g' \
 	  -e 's,%lua_libdir%,$(libdir),g'
 
-luaconf.h : $(srcdir)/luaconf.h.template
+luaconf.h : luaconf.h.template
 	rm -f luaconf.h luaconf.h.tmp
-	$(edit) $(srcdir)/luaconf.h.template > luaconf.h.tmp
+	$(edit) luaconf.h.template > luaconf.h.tmp
 	mv luaconf.h.tmp luaconf.h

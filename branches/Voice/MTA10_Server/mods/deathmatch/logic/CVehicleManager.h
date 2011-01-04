@@ -51,6 +51,9 @@ public:
     static bool                         HasAdjustableProperty       ( unsigned int uiVehicleModel );
     static bool                         HasSmokeTrail               ( unsigned int uiVehicleModel );
     static bool                         IsTrailer                   ( unsigned int uiVehicleModel );
+    static bool                         HasDamageModel              ( unsigned short usModel );
+    static bool                         HasDamageModel              ( enum eVehicleType Type );
+    static bool                         HasDoors                    ( unsigned short usModel );
 
     inline CVehicleColorManager*        GetColorManager             ( void )                            { return &m_ColorManager; };
     CVehicleColor                       GetRandomColor              ( unsigned short usModel );

@@ -51,6 +51,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="./tinyxml;../sdk"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;TIXML_USE_STL;_CRT_SECURE_NO_WARNINGS;FORCE_BUILD=1"
+				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="true"
@@ -114,7 +115,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas\server\&quot;"
+				CommandLine="xcopy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas 1.1\mta\&quot; &amp;&amp; xcopy /y xmll_d.dll &quot;C:\Program Files\MTA San Andreas 1.1\server\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -221,7 +222,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y xmll.dll &quot;C:\Program Files\MTA San Andreas\mta\&quot; &amp;&amp; xcopy /y xmll.dll &quot;C:\Program Files\MTA San Andreas\server\&quot;"
+				CommandLine="xcopy /y xmll.dll &quot;C:\Program Files\MTA San Andreas 1.1\mta\&quot; &amp;&amp; xcopy /y xmll.dll &quot;C:\Program Files\MTA San Andreas 1.1\server\&quot;"
 			/>
 		</Configuration>
 		<Configuration

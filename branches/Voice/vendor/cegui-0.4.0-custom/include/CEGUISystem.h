@@ -237,6 +237,15 @@ public:
 	*/
 	Renderer*	getRenderer(void) const			{return d_renderer;}
 
+	/*!
+	\brief
+		Return a pointer to the FontManager object being used by the system
+
+	\return
+		Pointer to the Renderer object used by the system.
+	*/
+	FontManager*	getFontManager(void) const			{return d_fontManager;}
+
 
 	/*!
 	\brief
@@ -980,6 +989,7 @@ private:
 	Renderer*	d_renderer;			//!< Holds the pointer to the Renderer object given to us in the constructor
     ResourceProvider* d_resourceProvider;      //!< Holds the pointer to the ResourceProvider object given to us by the renderer or the System constructor.
 	Font*		d_defaultFont;		//!< Holds a pointer to the default GUI font.
+    FontManager* d_fontManager;     //!< Holds a pointer to the FontManager object in the constructor
 	bool		d_gui_redraw;		//!< True if GUI should be re-drawn, false if render should re-use last times queue.
 
 	Window*		d_wndWithMouse;		//!< Pointer to the window that currently contains the mouse.

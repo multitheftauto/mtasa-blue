@@ -112,7 +112,7 @@ CSettings::CSettings ( void )
     m_pControlsScrollPane->SetPosition ( CVector2D ( 0.0f, 0.0f ), true );
     m_pControlsScrollPane->SetSize ( CVector2D ( 1.0f, 1.0f ), true );
     m_pControlsScrollPane->SetVerticalScrollStepSize ( 0.15f );
-    m_pControlsScrollPane->SetVerticalScrollBar(true);
+    m_pControlsScrollPane->SetVerticalScrollBar ( true );
     CGUIElement* pControlsPane = m_pControlsScrollPane;
 #else
     CGUIElement* pControlsPane = pTabControls;
@@ -130,10 +130,25 @@ CSettings::CSettings ( void )
     m_pInvertMouse->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pSteerWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Steer with mouse", true ) );
-    m_pSteerWithMouse->SetPosition ( CVector2D ( 0.5f, 0.1f ), true );
+    m_pSteerWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
+
+    m_pLabelMouseSensitivity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Mouse sensitivity:" ) );
+    m_pLabelMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16.0f ) );
+    m_pLabelMouseSensitivity->GetPosition ( vecTemp, false );
+    m_pLabelMouseSensitivity->AutoSize ( "Mouse sensitivity:" );
+
+    m_pMouseSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pControlsPane ) );
+    m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY ) );
+    m_pMouseSensitivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pMouseSensitivity->SetProperty ( "StepSize", "0.00004688" );
+
+    m_pLabelMouseSensitivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "0%") );
+    m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY ) );
+    m_pLabelMouseSensitivityValue->AutoSize ( "100%" );
 
     m_pFlyWithMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Fly with mouse", true ) );
-    m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
+    m_pFlyWithMouse->SetPosition ( CVector2D ( vecTemp.fX + 320, vecTemp.fY ) );
+    m_pFlyWithMouse->GetPosition ( vecTemp, false );
 
     //Joypad options
     m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Joypad options" ) );
@@ -317,20 +332,6 @@ CSettings::CSettings ( void )
     m_pEditNick->SetMaxLength ( MAX_PLAYER_NICK_LENGTH );
     m_pEditNick->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnOKButtonClick, this ) );
 
-    m_pLabelConnection = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Connection:" ) );
-    m_pLabelConnection->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 26.0f ) );
-    m_pLabelConnection->GetPosition ( vecTemp, false );
-    m_pLabelConnection->AutoSize ( "Connection:" );
-
-    m_pComboConnection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabMultiplayer, "" ) );
-    m_pComboConnection->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 1.0f ) );
-    m_pComboConnection->GetPosition ( vecTemp, false );
-    m_pComboConnection->SetSize ( CVector2D ( 178.0f, 90.0f ) );
-    m_pComboConnection->SetReadOnly ( true );
-    m_pComboConnection->AddItem ( "Lan" );
-    m_pComboConnection->AddItem ( "DSL" );
-    m_pComboConnection->AddItem ( "Modem" );
-
     m_pSavePasswords = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Save server passwords", true ) );
     m_pSavePasswords->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 50.0f ) );
     m_pSavePasswords->GetPosition ( vecTemp, false );
@@ -340,8 +341,14 @@ CSettings::CSettings ( void )
     /**
      *  Audio tab
      **/
+    m_pAudioGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "General" ) );
+    m_pAudioGeneralLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pAudioGeneralLabel->GetPosition ( vecTemp, false );
+    m_pAudioGeneralLabel->AutoSize ( "General  " );
+    m_pAudioGeneralLabel->SetFont ( "default-bold-small" );
+
     m_pLabelRadioVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Radio volume:" ) );
-    m_pLabelRadioVolume->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pLabelRadioVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ), false );
     m_pLabelRadioVolume->GetPosition ( vecTemp, false );
     m_pLabelRadioVolume->AutoSize ( "Radio volume:" );
 
@@ -350,30 +357,38 @@ CSettings::CSettings ( void )
     m_pAudioRadioVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioRadioVolume->SetProperty ( "StepSize", "0.015625" );
 
-    m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
+    m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelRadioVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
-    m_pLabelRadioVolumeValue->AutoSize ( "64 " );
+    m_pLabelRadioVolumeValue->AutoSize ( "100%" );
 
     m_pLabelSFXVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "SFX volume:" ) );
     m_pLabelSFXVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelSFXVolume->GetPosition ( vecTemp, false );
     m_pLabelSFXVolume->AutoSize ( "SFX volume:" );
 
-    m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
+    m_pLabelSFXVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelSFXVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
-    m_pLabelSFXVolumeValue->AutoSize ( "64 " );
+    m_pLabelSFXVolumeValue->AutoSize ( "100%" );
 
     m_pAudioSFXVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioSFXVolume->SetProperty ( "StepSize", "0.015625" );
 
+    m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Radio Equalizer", true ) );
+    m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxAudioEqualizer->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
+    m_pCheckBoxAudioAutotune = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Radio Auto-tune", true ) );
+    m_pCheckBoxAudioAutotune->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 13.0f ) );
+    m_pCheckBoxAudioAutotune->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
     m_pLabelMTAVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "MTA volume:" ) );
     m_pLabelMTAVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pLabelMTAVolume->GetPosition ( vecTemp, false );
     m_pLabelMTAVolume->AutoSize ( "MTA volume:" );
 
-    m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0") );
+    m_pLabelMTAVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelMTAVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
     m_pLabelMTAVolumeValue->AutoSize ( "100%" );
 
@@ -381,6 +396,30 @@ CSettings::CSettings ( void )
     m_pAudioMTAVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioMTAVolume->SetProperty ( "StepSize", "0.01" );
+
+    m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Usertrack options" ) );
+    m_pAudioUsertrackLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ), false );
+    m_pAudioUsertrackLabel->GetPosition ( vecTemp, false );
+    m_pAudioUsertrackLabel->AutoSize ( "Usertrack options  " );
+    m_pAudioUsertrackLabel->SetFont ( "default-bold-small" );
+
+    m_pLabelUserTrackMode = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Play mode:" ) );
+    m_pLabelUserTrackMode->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pLabelUserTrackMode->GetPosition ( vecTemp, false );
+    m_pLabelUserTrackMode->AutoSize ( "Play mode:" );
+
+    m_pComboUsertrackMode = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAudio, "" ) );
+    m_pComboUsertrackMode->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pComboUsertrackMode->SetSize ( CVector2D ( 160.0f, 80.0f ) );
+    m_pComboUsertrackMode->AddItem ( "Radio" )->SetData ( (void*)0 );
+    m_pComboUsertrackMode->AddItem ( "Random" )->SetData ( (void*)1 );
+    m_pComboUsertrackMode->AddItem ( "Sequential" )->SetData ( (void*)2 );
+    m_pComboUsertrackMode->SetReadOnly ( true );
+
+    m_pCheckBoxUserAutoscan = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Automatic Media Scan", true ) );
+    m_pCheckBoxUserAutoscan->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pCheckBoxUserAutoscan->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    m_pCheckBoxUserAutoscan->GetPosition ( vecTemp, false );
 
     /**
      *  Video tab
@@ -444,14 +483,12 @@ CSettings::CSettings ( void )
 
     m_pVideoRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Menu rendering options" ) );
     m_pVideoRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
-    m_pVideoRenderingLabel->GetPosition ( vecTemp, false );
     m_pVideoRenderingLabel->AutoSize ( "Menu rendering options  " );
     m_pVideoRenderingLabel->SetFont ( "default-bold-small" );
 
     m_pCheckBoxMenuDynamic = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Dynamic scene rendering", true ) );
     m_pCheckBoxMenuDynamic->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pCheckBoxMenuDynamic->SetSize ( CVector2D ( 174.0f, 16.0f ) );
-    m_pCheckBoxMenuDynamic->GetPosition ( vecTemp, false );
     m_pCheckBoxMenuDynamic->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_DYNAMIC );
 
     m_pCheckBoxMenuVideo = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Video surface rendering", true ) );
@@ -469,7 +506,6 @@ CSettings::CSettings ( void )
     m_pCheckBoxMenuDynamic->SetVisible ( false );
     m_pCheckBoxMenuVideo->SetVisible ( false );
     m_pCheckBoxMenuPostEffects->SetVisible ( false );
-    vecTemp.fY -= 60;
 
     m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
@@ -484,6 +520,20 @@ CSettings::CSettings ( void )
     m_pComboFxQuality->AddItem ( "High" )->SetData ( (void*)2 );
     m_pComboFxQuality->AddItem ( "Very high" )->SetData ( (void*)3 );
     m_pComboFxQuality->SetReadOnly ( true );
+
+    m_pAntiAliasingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anti-aliasing:" ) );
+    m_pAntiAliasingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pAntiAliasingLabel->GetPosition ( vecTemp, false );
+    m_pAntiAliasingLabel->AutoSize ( "Anti-aliasing: " );
+
+    m_pComboAntiAliasing = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
+    m_pComboAntiAliasing->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
+    m_pComboAntiAliasing->SetSize ( CVector2D ( 200.0f, 95.0f ) );
+    m_pComboAntiAliasing->AddItem ( "Off" )->SetData ( (void*)1 );
+    m_pComboAntiAliasing->AddItem ( "1x" )->SetData ( (void*)2 );
+    m_pComboAntiAliasing->AddItem ( "2x" )->SetData ( (void*)3 );
+    m_pComboAntiAliasing->AddItem ( "3x" )->SetData ( (void*)4 );
+    m_pComboAntiAliasing->SetReadOnly ( true );
 
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
     m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 42.0f ) );
@@ -642,25 +692,103 @@ CSettings::CSettings ( void )
     /**
      *  Advanced tab
      **/
-    vecTemp = CVector2D ( 15.f, 27.f );
+    vecTemp = CVector2D ( 12.f, 12.f );
 
+    // Misc section label
+    m_pAdvancedMiscLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Misc" ) );
+    m_pAdvancedMiscLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pAdvancedMiscLabel->SetFont ( "default-bold-small" );
+    m_pAdvancedMiscLabel->AutoSize ( "Misc" );
+    vecTemp.fY += 20;
+
+    // Asynchronous Loading
     m_pAsyncLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Asynchronous Loading:" ) );
-    m_pAsyncLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
-    m_pAsyncLabel->GetPosition ( vecTemp, false );
+    m_pAsyncLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pAsyncLabel->AutoSize ( m_pAsyncLabel->GetText ().c_str () );
 
     m_pAsyncCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pAsyncCombo->SetPosition ( CVector2D ( vecTemp.fX + 141.0f, vecTemp.fY - 1.0f ) );
+    m_pAsyncCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
     m_pAsyncCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
     m_pAsyncCombo->AddItem ( "Off" )->SetData ( (void*)0 );
     m_pAsyncCombo->AddItem ( "On" )->SetData ( (void*)2 );
     m_pAsyncCombo->AddItem ( "Auto" )->SetData ( (void*)1 );
     m_pAsyncCombo->SetReadOnly ( true );
 
-    m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "(Experimental feature which\n may improve performance)" ) );
-    m_pAsyncLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 332.f, vecTemp.fY - 4.f ) );
+    m_pAsyncLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental feature which\nmay improve performance." ) );
+    m_pAsyncLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pAsyncLabelInfo->SetFont ( "default-bold-small" );
     m_pAsyncLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
+
+    // Browser scan speed
+    m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Browser speed:" ) );
+    m_pBrowserSpeedLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pBrowserSpeedLabel->AutoSize ( m_pBrowserSpeedLabel->GetText ().c_str () );
+
+    m_pBrowserSpeedCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pBrowserSpeedCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pBrowserSpeedCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pBrowserSpeedCombo->AddItem ( "Very slow" )->SetData ( (void*)0 );
+    m_pBrowserSpeedCombo->AddItem ( "Slow" )->SetData ( (void*)1 );
+    m_pBrowserSpeedCombo->AddItem ( "Fast" )->SetData ( (void*)2 );
+    m_pBrowserSpeedCombo->SetReadOnly ( true );
+
+    m_pBrowserSpeedLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Older routers may require\na slower scan speed." ) );
+    m_pBrowserSpeedLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pBrowserSpeedLabelInfo->SetFont ( "default-bold-small" );
+    m_pBrowserSpeedLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40-4;
+
+    // Single download
+    m_pSingleDownloadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Single connection:" ) );
+    m_pSingleDownloadLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pSingleDownloadLabel->AutoSize ( m_pSingleDownloadLabel->GetText ().c_str () );
+
+    m_pSingleDownloadCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pSingleDownloadCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pSingleDownloadCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pSingleDownloadCombo->AddItem ( "Default" )->SetData ( (void*)0 );
+    m_pSingleDownloadCombo->AddItem ( "On" )->SetData ( (void*)1 );
+    m_pSingleDownloadCombo->SetReadOnly ( true );
+
+    m_pSingleDownloadLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Switch on to use only one\nconnection when downloading." ) );
+    m_pSingleDownloadLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pSingleDownloadLabelInfo->SetFont ( "default-bold-small" );
+    m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 40;
+
+    // Auto updater section label
+    m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Auto updater" ) );
+    m_pAdvancedUpdaterLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pAdvancedUpdaterLabel->SetFont ( "default-bold-small" );
+    m_pAdvancedUpdaterLabel->AutoSize ( "Auto updater" );
+    vecTemp.fY += 20;
+
+    // Update build type
+    m_pUpdateBuildTypeLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Update build type:" ) );
+    m_pUpdateBuildTypeLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pUpdateBuildTypeLabel->AutoSize ( m_pUpdateBuildTypeLabel->GetText ().c_str () );
+
+    m_pUpdateBuildTypeCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pUpdateBuildTypeCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pUpdateBuildTypeCombo->AddItem ( "Default" )->SetData ( (void*)0 );
+    m_pUpdateBuildTypeCombo->AddItem ( "Beta" )->SetData ( (void*)1 );
+    m_pUpdateBuildTypeCombo->AddItem ( "Nightly" )->SetData ( (void*)2 );
+    m_pUpdateBuildTypeCombo->SetReadOnly ( true );
+
+    m_pUpdateBuildTypeLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Select default unless you like\nfilling out bug reports." ) );
+    m_pUpdateBuildTypeLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pUpdateBuildTypeLabelInfo->SetFont ( "default-bold-small" );
+    m_pUpdateBuildTypeLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 35;
+
+    // Check for updates
+    m_pButtonUpdate = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, "Check for update now" ) );
+    m_pButtonUpdate->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pButtonUpdate->SetSize ( CVector2D ( 168.0f, 24.0f ) );
+    m_pButtonUpdate->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnUpdateButtonClick, this ) );
+    vecTemp.fY += 30;
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
@@ -678,6 +806,7 @@ CSettings::CSettings ( void )
     m_pAudioMTAVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMTAVolumeChanged, this ) );
     m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
+    m_pMouseSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensitivityChanged, this ) );
     /*
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -869,6 +998,13 @@ bool CSettings::OnJoypadDefaultClick ( CGUIElement* pElement )
 {
     // Load the default binds
     GetJoystickManager ()->SetDefaults ();
+
+    // Load the default mouse settings
+    CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();   
+
+    m_pFlyWithMouse->SetSelected ( pController->GetFlyWithMouse () );
+    m_pSteerWithMouse->SetSelected ( pController->GetSteerWithMouse () );
+    m_pInvertMouse->SetSelected ( pController->IsMouseInverted () );
 
     // Update the GUI
     UpdateJoypadTab ();
@@ -1671,14 +1807,6 @@ void CSettings::LoadData ( void )
         m_pEditNick->SetText ( "Player" );
     }
 
-    // Connection type
-    unsigned int uiMTUSize = NET_MTU_LAN;
-    CVARS_GET ( "mtu_size", uiMTUSize );
-    if ( uiMTUSize == NET_MTU_LAN ) m_pComboConnection->SetText ( "Lan" );
-    else if ( uiMTUSize == NET_MTU_DSL ) m_pComboConnection->SetText ( "DSL" );
-    else if ( uiMTUSize == NET_MTU_MODEM ) m_pComboConnection->SetText ( "Modem" );
-    else m_pComboConnection->SetText ( "Unknown" );
-
     // Save server password
     CVARS_GET ( "save_server_passwords", bVar ); m_pSavePasswords->SetSelected ( bVar );
 
@@ -1688,6 +1816,10 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "fly_with_mouse", bVar ); m_pFlyWithMouse->SetSelected ( bVar );
     CVARS_GET ( "classic_controls", bVar ); m_pClassicControls->SetSelected ( bVar );
 
+    CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+
+    m_pMouseSensitivity->SetScrollPosition ( ( gameSettings->GetMouseSensitivity () - 0.000312f ) / 0.004688f );
+
     // Community
     CVARS_GET ( "community_username", strVar );
     if ( !strVar.empty () ) m_pEditUser->SetText ( strVar.c_str () );
@@ -1695,12 +1827,19 @@ void CSettings::LoadData ( void )
     if ( !strVar.empty () ) m_pEditPass->SetText ( strVar.c_str () );
 
     // Audio
-    CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-
     m_ucOldRadioVolume = gameSettings->GetRadioVolume();
     m_pAudioRadioVolume->SetScrollPosition ( (float)m_ucOldRadioVolume / 64.0f );
     m_ucOldSFXVolume = gameSettings->GetSFXVolume();
     m_pAudioSFXVolume->SetScrollPosition ( (float)m_ucOldSFXVolume / 64.0f );
+
+    m_pCheckBoxAudioEqualizer->SetSelected ( gameSettings->IsRadioEqualizerEnabled () );
+    m_pCheckBoxAudioAutotune->SetSelected ( gameSettings->IsRadioAutotuneEnabled () );
+    m_pCheckBoxUserAutoscan->SetSelected ( gameSettings->IsUsertrackAutoScan () );
+
+    unsigned int uiUsertrackMode = gameSettings->GetUsertrackMode ();
+    if ( uiUsertrackMode == 0 ) m_pComboUsertrackMode->SetText ( "Radio" );
+    else if ( uiUsertrackMode == 1 ) m_pComboUsertrackMode->SetText ( "Random" );
+    else if ( uiUsertrackMode == 2 ) m_pComboUsertrackMode->SetText ( "Sequential" );
     
     CVARS_GET ( "mtavolume", m_fOldMTAVolume );
     m_fOldMTAVolume = max( 0.0f, min( 1.0f, m_fOldMTAVolume ) );
@@ -1723,6 +1862,12 @@ void CSettings::LoadData ( void )
     else if ( FxQuality == 1 ) m_pComboFxQuality->SetText ( "Medium" );
     else if ( FxQuality == 2 ) m_pComboFxQuality->SetText ( "High" );
     else if ( FxQuality == 3 ) m_pComboFxQuality->SetText ( "Very high" );
+
+    char AntiAliasing = gameSettings->GetAntiAliasing();
+    if ( AntiAliasing == 1 ) m_pComboAntiAliasing->SetText ( "Off" );
+    else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( "1x" );
+    else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( "2x" );
+    else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( "3x" );
 
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
@@ -1766,8 +1911,25 @@ void CSettings::LoadData ( void )
     int iVar;
     CVARS_GET ( "async_loading", iVar );
     if ( iVar == 0 ) m_pAsyncCombo->SetText ( "Off" );
-    else if ( iVar == 2 ) m_pAsyncCombo->SetText ( "On" );
     else if ( iVar == 1 ) m_pAsyncCombo->SetText ( "Auto" );
+    else if ( iVar == 2 ) m_pAsyncCombo->SetText ( "On" );
+
+    // Browser speed
+    CVARS_GET ( "browser_speed", iVar );
+    if ( iVar == 0 ) m_pBrowserSpeedCombo->SetText ( "Very slow" );
+    else if ( iVar == 1 ) m_pBrowserSpeedCombo->SetText ( "Slow" );
+    else if ( iVar == 2 ) m_pBrowserSpeedCombo->SetText ( "Fast" );
+
+    // Single download
+    CVARS_GET ( "single_download", iVar );
+    if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( "Default" );
+    else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( "On" );
+
+    // Update build type
+    CVARS_GET ( "update_build_type", iVar );
+    if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( "Default" );
+    else if ( iVar == 1 ) m_pUpdateBuildTypeCombo->SetText ( "Beta" );
+    else if ( iVar == 2 ) m_pUpdateBuildTypeCombo->SetText ( "Nightly" );
 
     // Map alpha
     CVARS_GET ( "mapalpha", iVar);
@@ -1845,9 +2007,6 @@ void CSettings::SaveData ( void )
         CVARS_SET ( "nick", m_pEditNick->GetText () );
     }
 
-    // Connection type
-    CCommandFuncs::ConnectionType ( m_pComboConnection->GetText().c_str() );
-
     // Server pass saving
     bool bServerPasswords = m_pSavePasswords->GetSelected ();
     CVARS_SET ( "save_server_passwords", bServerPasswords );
@@ -1875,17 +2034,36 @@ void CSettings::SaveData ( void )
     bool bNextWindowed;
     bool bNextFSMinimize;
     GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
+    int iAntiAliasing = gameSettings->GetAntiAliasing ();
 
     // update from gui
     bNextWindowed = m_pCheckBoxWindowed->GetSelected ();
     if ( CGUIListItem* pSelected = m_pComboResolution->GetSelectedItem () )
         iNextVidMode = ( int ) pSelected->GetData();
     bNextFSMinimize = m_pCheckBoxMinimize->GetSelected();
+    if ( CGUIListItem* pSelected = m_pComboAntiAliasing->GetSelectedItem () )
+        iAntiAliasing = ( int ) pSelected->GetData();
 
     // change
-    if ( GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize ) )
+    bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
+    bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged )
     {
-        SString strMessage ( "Resolution%s will be changed when you next start MTA", bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () ? "/Full Screen Minimize" : "" );
+        SString strChangedOptions;
+        if ( bIsVideoModeChanged )
+        {
+            strChangedOptions += "Resolution";
+            if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
+                strChangedOptions += "/Full Screen Minimize";
+            if ( bIsAntiAliasingChanged )
+                strChangedOptions += " and Anti-aliasing";
+        }
+        else
+        {
+            strChangedOptions += "Anti-aliasing";
+        }
+
+        SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
         strMessage += "\n\nDo you want to restart now?";
         CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
         pQuestionBox->Reset ();
@@ -1897,9 +2075,11 @@ void CSettings::SaveData ( void )
         pQuestionBox->Show ();
     }
 
+    gameSettings->SetAntiAliasing ( iAntiAliasing, true );
     gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
+    gameSettings->SetMouseSensitivity ( ( m_pMouseSensitivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
 
     // Visual FX Quality
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
@@ -1913,6 +2093,37 @@ void CSettings::SaveData ( void )
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "async_loading", iSelected );
         g_pCore->GetGame ()->SetAsyncLoadingFromSettings ( iSelected == 1, iSelected == 2 );
+    }
+
+    // Audio
+    gameSettings->SetRadioEqualizerEnabled ( m_pCheckBoxAudioEqualizer->GetSelected() );
+    gameSettings->SetRadioAutotuneEnabled ( m_pCheckBoxAudioAutotune->GetSelected() );
+    gameSettings->SetUsertrackAutoScan ( m_pCheckBoxUserAutoscan->GetSelected() );
+
+    if ( CGUIListItem* pSelected = m_pComboUsertrackMode->GetSelectedItem () )
+    {
+        gameSettings->SetUsertrackMode ( (int) pSelected->GetData() );
+    }
+
+    // Browser speed
+    if ( CGUIListItem* pSelected = m_pBrowserSpeedCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "browser_speed", iSelected );
+    }
+
+    // Single download
+    if ( CGUIListItem* pSelected = m_pSingleDownloadCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "single_download", iSelected );
+    }
+
+    // Update build type
+    if ( CGUIListItem* pSelected = m_pUpdateBuildTypeCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "update_build_type", iSelected );
     }
 
     // Map alpha
@@ -1937,6 +2148,10 @@ void CSettings::SaveData ( void )
 
     strVar = m_pChatScaleX->GetText () + " " + m_pChatScaleY->GetText ();
     CVARS_SET ( "chat_scale", strVar );
+
+    // Test error reporter
+    if ( m_pChatLines->GetText () == "crashme" )
+        *((int*)NULL) = 0;      
 
     CVARS_SET ( "chat_lines", m_pChatLines->GetText () );
     CVARS_SET ( "chat_width", m_pChatWidth->GetText () );
@@ -2271,6 +2486,14 @@ bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
     return true;
 }
 
+bool CSettings::OnMouseSensitivityChanged ( CGUIElement* pElement )
+{
+    int iMouseSensitivity = ( m_pMouseSensitivity->GetScrollPosition () ) * 100;
+
+    m_pLabelMouseSensitivityValue->SetText ( SString("%i%%", iMouseSensitivity ).c_str () );
+    return true;
+}
+
 bool CSettings::OnMapAlphaChanged ( CGUIElement* pElement )
 {
     int iAlpha = ( m_pMapAlpha->GetScrollPosition () ) * 100;
@@ -2281,29 +2504,33 @@ bool CSettings::OnMapAlphaChanged ( CGUIElement* pElement )
 
 bool CSettings::OnRadioVolumeChanged ( CGUIElement* pElement)
 {
-    unsigned char ucVolume = m_pAudioRadioVolume->GetScrollPosition () * 64.0f;
-    m_pLabelRadioVolumeValue->SetText ( SString("%i", ucVolume).c_str() );
+    unsigned char ucVolume = m_pAudioRadioVolume->GetScrollPosition () * 100.0f;
+    m_pLabelRadioVolumeValue->SetText ( SString("%i%%", ucVolume).c_str() );
 
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
-    gameSettings->SetRadioVolume ( ucVolume );    return true;
+    gameSettings->SetRadioVolume ( m_pAudioRadioVolume->GetScrollPosition () * 64 );
+
+    return true;
 }
 
 bool CSettings::OnSFXVolumeChanged ( CGUIElement* pElement)
 {
-    unsigned char ucVolume = m_pAudioSFXVolume->GetScrollPosition () * 64.0f;
-    m_pLabelSFXVolumeValue->SetText ( SString("%i", ucVolume).c_str() );
+    unsigned char ucVolume = m_pAudioSFXVolume->GetScrollPosition () * 100.0f;
+    m_pLabelSFXVolumeValue->SetText ( SString ( "%i%%", ucVolume ).c_str () );
 
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
-    gameSettings->SetSFXVolume ( ucVolume );
+    gameSettings->SetSFXVolume ( m_pAudioSFXVolume->GetScrollPosition () * 64 );
+
     return true;
 }
 
 bool CSettings::OnMTAVolumeChanged ( CGUIElement* pElement)
 {
     int iVolume = m_pAudioMTAVolume->GetScrollPosition () * 100.0f;
-    m_pLabelMTAVolumeValue->SetText ( SString("%i%%", iVolume).c_str() );
+    m_pLabelMTAVolumeValue->SetText ( SString ( "%i%%", iVolume ).c_str () );
     
     CVARS_SET ( "mtavolume", m_pAudioMTAVolume->GetScrollPosition () );
+
     return true;
 }
 
@@ -2372,5 +2599,18 @@ bool CSettings::OnChatAlphaChanged ( CGUIElement* pElement)
     else if ( pScrollBar == m_pChatAlpha [ ChatColorType::CHAT_COLOR_INPUT_TEXT ] )
         m_pChatAlphaValue [ ChatColorType::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
 
+    return true;
+}
+
+bool CSettings::OnUpdateButtonClick ( CGUIElement* pElement )
+{
+    // Update build type
+    if ( CGUIListItem* pSelected = m_pUpdateBuildTypeCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "update_build_type", iSelected );
+    }
+
+    GetVersionUpdater ()->InitiateManualCheck ();
     return true;
 }

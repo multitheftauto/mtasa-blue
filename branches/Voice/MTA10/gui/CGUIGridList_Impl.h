@@ -41,8 +41,8 @@ public:
     void                                Clear                   ( void );
     CGUIListItem*                       GetItem                 ( int iRow, int hColumn );
     char*                               GetItemText             ( int iRow, int hColumn );
-    int                                 SetItemText             ( int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bFast = false );
-    void                                SetItemData             ( int iRow, int hColumn, void* pData );
+    int                                 SetItemText             ( int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bFast = false, const char* szSortText = NULL );
+    void                                SetItemData             ( int iRow, int hColumn, void* pData, CGUICallback<void,void*> deleteDataCallback = NULL );
     void                                SetItemData             ( int iRow, int hColumn, const char* pszData );
     void*                               GetItemData             ( int iRow, int hColumn );
     void                                SetItemColor            ( int iRow, int hColumn, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha );
@@ -56,6 +56,7 @@ public:
     int                                 GetColumnIndex          ( int hColumn );
     int                                 GetItemColumnIndex      ( CGUIListItem* pItem );
     int                                 GetItemRowIndex         ( CGUIListItem* pItem );
+    void                                GetVisibleRowRange      ( int& iFirst, int& iLast );
     int                                 GetSelectedCount        ( void );
     CGUIListItem*                       GetSelectedItem         ( void );
     CGUIListItem*                       GetNextSelectedItem     ( CGUIListItem* pItem );
@@ -67,6 +68,7 @@ public:
     void                                SetColumnSegmentSizingEnabled    ( int hColumn, bool bEnabled );
 
     void                                Sort                    ( unsigned int uiColumn, SortDirection direction );
+    void                                GetSort                 ( unsigned int& uiColumn, SortDirection& direction );
 
     void                                SetSelectedItem         ( int iRow, int hColumn, bool bReset );
 

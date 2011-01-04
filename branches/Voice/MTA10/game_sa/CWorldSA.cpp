@@ -8,6 +8,7 @@
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
 *               Jax <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -381,4 +382,177 @@ void CWorldSA::SetCurrentArea ( DWORD dwArea )
 void CWorldSA::SetJetpackMaxHeight ( float fHeight )
 {
     *(float *)(VAR_fJetpackMaxHeight) = fHeight;
+}
+
+float CWorldSA::GetJetpackMaxHeight ( void )
+{
+    return *(float *)(VAR_fJetpackMaxHeight);
+}
+
+void CWorldSA::SetWindVelocity ( float fX, float fY, float fZ )
+{
+    //Disable
+    *(WORD *)(ADDR_WindSpeedSetX) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x90909090;
+    *(WORD *)(ADDR_WindSpeedSetY) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x90909090;
+    *(WORD *)(ADDR_WindSpeedSetZ) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x90909090;
+
+    *(WORD *)(ADDR_WindSpeedSetX2) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x90909090;
+    *(WORD *)(ADDR_WindSpeedSetY2) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x90909090;
+    *(WORD *)(ADDR_WindSpeedSetZ2) = 0xD8DD;
+    *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x90909090;
+
+    //Set
+    *(float *)(VAR_fWindSpeedX) = fX;
+    *(float *)(VAR_fWindSpeedY) = fY;
+    *(float *)(VAR_fWindSpeedZ) = fZ;
+}
+
+void CWorldSA::GetWindVelocity ( float& fX, float& fY, float& fZ )
+{
+    fX = *(float *)(VAR_fWindSpeedX);
+    fY = *(float *)(VAR_fWindSpeedY);
+    fZ = *(float *)(VAR_fWindSpeedZ);
+}
+
+void CWorldSA::RestoreWindVelocity ( void )
+{
+    *(WORD *)(ADDR_WindSpeedSetX) = 0x1DD9;
+    *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x00C813E0;
+    *(WORD *)(ADDR_WindSpeedSetY) = 0x1DD9;
+    *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x00C813E4;
+    *(WORD *)(ADDR_WindSpeedSetZ) = 0x1DD9;
+    *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x00C813E8;
+
+    *(WORD *)(ADDR_WindSpeedSetX2) = 0x15D9;
+    *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x00C813E0;
+    *(WORD *)(ADDR_WindSpeedSetY2) = 0x1DD9;
+    *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x00C813E4;
+    *(WORD *)(ADDR_WindSpeedSetZ2) = 0x1DD9;
+    *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x00C813E8;
+}
+
+float CWorldSA::GetFarClipDistance ( )
+{
+    return *(float *)(VAR_fFarClipDistance);
+}
+
+void CWorldSA::SetFarClipDistance ( float fDistance )
+{
+    *(BYTE *)0x55FCC8 = 0xDD;
+    *(BYTE *)0x55FCC9 = 0xD8;
+    *(BYTE *)0x55FCCA = 0x90;
+
+    *(BYTE *)0x5613A3 = 0xDD;
+    *(BYTE *)0x5613A4 = 0xD8;
+    *(BYTE *)0x5613A5 = 0x90;
+
+    *(BYTE *)0x560A23 = 0xDD;
+    *(BYTE *)0x560A24 = 0xD8;
+    *(BYTE *)0x560A25 = 0x90;
+
+    *(float *)(VAR_fFarClipDistance) = fDistance;
+}
+
+void CWorldSA::RestoreFarClipDistance ( )
+{
+    BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
+
+    memcpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
+    memcpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
+    memcpy ( (LPVOID)0x560A23, &originalFstp, 3 );
+}
+
+float CWorldSA::GetFogDistance ( )
+{
+    return *(float *)(VAR_fFogDistance);
+}
+
+void CWorldSA::SetFogDistance ( float fDistance )
+{
+    *(BYTE *)0x55FCDB = 0xDD;
+    *(BYTE *)0x55FCDC = 0xD8;
+    *(BYTE *)0x55FCDD = 0x90;
+
+    *(float *)(VAR_fFogDistance) = fDistance;
+}
+
+void CWorldSA::RestoreFogDistance ( )
+{
+    BYTE originalFstp[3] = {0xD9, 0x5E, 0x54};
+
+    memcpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
+}
+
+void CWorldSA::GetSunColor ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
+{
+    ucCoreRed   = *(BYTE *)(VAR_ucSunCoreR);
+    ucCoreGreen = *(BYTE *)(VAR_ucSunCoreG);
+    ucCoreBlue  = *(BYTE *)(VAR_ucSunCoreB);
+
+    ucCoronaRed   = *(BYTE *)(VAR_ucSunCoronaR);
+    ucCoronaGreen = *(BYTE *)(VAR_ucSunCoronaG);
+    ucCoronaBlue  = *(BYTE *)(VAR_ucSunCoronaB);
+}
+
+void CWorldSA::SetSunColor ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue )
+{
+    memset ( (LPVOID)0x55F9B2, 0x90, 4 );
+    memset ( (LPVOID)0x55F9DD, 0x90, 4 );
+    memset ( (LPVOID)0x55FA08, 0x90, 4 );
+    memset ( (LPVOID)0x55FA33, 0x90, 4 );
+    memset ( (LPVOID)0x55FA5E, 0x90, 4 );
+    memset ( (LPVOID)0x55FA8D, 0x90, 4 );
+
+    *(BYTE *)(VAR_ucSunCoreR) = ucCoreRed;
+    *(BYTE *)(VAR_ucSunCoreG) = ucCoreGreen;
+    *(BYTE *)(VAR_ucSunCoreB) = ucCoreBlue;
+
+    *(BYTE *)(VAR_ucSunCoronaR) = ucCoronaRed;
+    *(BYTE *)(VAR_ucSunCoronaG) = ucCoronaGreen;
+    *(BYTE *)(VAR_ucSunCoronaB) = ucCoronaBlue;
+}
+
+void CWorldSA::ResetSunColor ( )
+{
+    BYTE originalMov[3] = {0x66, 0x89, 0x46};
+
+    memcpy ( (LPVOID)0x55F9B2, &originalMov, 3 );
+    *(BYTE *)0x55F9B5 = 0x30;
+    memcpy ( (LPVOID)0x55F9DD, &originalMov, 3 );
+    *(BYTE *)0x55F9E0 = 0x32;
+    memcpy ( (LPVOID)0x55FA08, &originalMov, 3 );
+    *(BYTE *)0x55FA0B = 0x34;
+
+    memcpy ( (LPVOID)0x55FA33, &originalMov, 3 );
+    *(BYTE *)0x55FA36 = 0x36;
+    memcpy ( (LPVOID)0x55FA5E, &originalMov, 3 );
+    *(BYTE *)0x55FA61 = 0x38;
+    memcpy ( (LPVOID)0x55FA8D, &originalMov, 3 );
+    *(BYTE *)0x55FA90 = 0x3A;
+}
+
+float CWorldSA::GetSunSize ( )
+{
+    return *(float *)(VAR_fSunSize) / 10;
+}
+
+void CWorldSA::SetSunSize ( float fSize )
+{
+    *(BYTE *)0x55FA9D = 0xDD;
+    *(BYTE *)0x55FA9E = 0xD8;
+    *(BYTE *)0x55FA9F = 0x90;
+
+    *(float *)VAR_fSunSize = fSize * 10;
+}
+
+void CWorldSA::ResetSunSize ( )
+{
+    *(BYTE *)0x55FA9D = 0xD9;
+    *(BYTE *)0x55FA9E = 0x5E;
+    *(BYTE *)0x55FA9F = 0x3C;
 }

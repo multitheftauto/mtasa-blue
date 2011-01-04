@@ -85,9 +85,11 @@ CClientEntity::~CClientEntity ( void )
     }
 
     // Remove from parent
-    ClearChildren ();
-    SetParent ( NULL );
-
+    if ( !g_pClientGame->IsBeingDeleted () )
+    {
+        ClearChildren ();
+        SetParent ( NULL );
+    }
     // Reset our index in the element array
     if ( m_ID != INVALID_ELEMENT_ID )
     {
@@ -168,13 +170,15 @@ CClientEntity::~CClientEntity ( void )
     }
 
     // Remove from spatial database
-    GetClientSpatialDatabase ()->RemoveEntity ( this );
+    if ( !g_pClientGame->IsBeingDeleted () )
+        GetClientSpatialDatabase ()->RemoveEntity ( this );
 
     // Ensure not referenced in the disabled collisions list
     assert ( !MapContains ( g_pClientGame->m_AllDisabledCollisions, this ) );
 
     // Ensure nothing has inadvertently set a parent
-    assert ( m_pParent == NULL );
+    if ( !g_pClientGame->IsBeingDeleted () )
+        assert ( m_pParent == NULL );
 }
 
 

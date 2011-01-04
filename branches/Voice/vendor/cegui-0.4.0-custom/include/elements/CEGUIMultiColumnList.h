@@ -535,6 +535,8 @@ public:
 	*/
 	uint	getNominatedSelectionRow(void) const;
 
+    // Return the range of visible rows
+    void    getVisibleRowRange(int &first, int& last) const;
 
 	/*!
 	\brief
@@ -1573,6 +1575,8 @@ protected:
 	typedef std::vector<ListRow>		ListItemGrid;
 	ListItemGrid	d_grid;			//!< Holds the list box data.
 
+    uint    d_firstVisibleRow;
+    uint    d_lastVisibleRow;
 
 private:
 	/*************************************************************************

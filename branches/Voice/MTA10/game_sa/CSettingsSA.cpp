@@ -22,16 +22,7 @@ unsigned long CSettingsSA::FUNC_SetDrawDistance;
 CSettingsSA::CSettingsSA ( void )
 {
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
-}
-
-bool CSettingsSA::IsFrameLimiterEnabled ( void )
-{
-    return m_pInterface->bFrameLimiter;
-}
-
-void CSettingsSA::SetFrameLimiterEnabled ( bool bEnabled )
-{
-    m_pInterface->bFrameLimiter = bEnabled;
+    m_pInterface->bFrameLimiter = false;
 }
 
 bool CSettingsSA::IsWideScreenEnabled ( void )
@@ -116,6 +107,50 @@ void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
     pGame->GetAudio ()->SetEffectsMasterVolume ( ucVolume );
 }
 
+unsigned int CSettingsSA::GetUsertrackMode ( void )
+{
+    // 0 = radio, 1 = random, 2 = sequential
+    return *(BYTE *)VAR_bUsertrackMode;
+}
+
+void CSettingsSA::SetUsertrackMode ( unsigned int uiMode )
+{
+    *(BYTE *)VAR_bUsertrackMode = uiMode;
+}
+
+bool CSettingsSA::IsUsertrackAutoScan ( void )
+{
+    // 1 = yes, 0 = no
+    return ( ( *(BYTE *)VAR_bUsertrackAutoScan == 1 ) ? true : false );
+}
+
+void CSettingsSA::SetUsertrackAutoScan ( bool bEnable )
+{
+    *(BYTE *)VAR_bUsertrackAutoScan = ( ( bEnable ) ? 1 : 0 );
+}
+
+bool CSettingsSA::IsRadioEqualizerEnabled ( void )
+{
+    // 1 = on, 0 = off
+    return ( ( *(BYTE *)VAR_bRadioEqualizer == 1 ) ? true : false );
+}
+
+void CSettingsSA::SetRadioEqualizerEnabled ( bool bEnable )
+{
+    *(BYTE *)VAR_bRadioEqualizer = ( ( bEnable ) ? 1 : 0 );
+}
+
+bool CSettingsSA::IsRadioAutotuneEnabled ( void )
+{
+    // 1 = on, 0 = off
+    return ( ( *(BYTE *)VAR_bRadioAutotune == 1 ) ? true : false );
+}
+
+void CSettingsSA::SetRadioAutotuneEnabled ( bool bEnable )
+{
+    *(BYTE *)VAR_bRadioAutotune = ( ( bEnable ) ? 1 : 0 );
+}
+
 // Minimum is 0.925 and maximum is 1.8
 float CSettingsSA::GetDrawDistance ( void )
 {
@@ -147,23 +182,46 @@ void CSettingsSA::SetBrightness ( unsigned int uiBrightness )
 unsigned int CSettingsSA::GetFXQuality ( )
 {
     // 0 = low, 1 = medium, 2 = high, 3 = very high
-    return *(BYTE *)VAR_fFxQuality;
+    return *(BYTE *)VAR_bFxQuality;
 }
 
 void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 {
-    *(BYTE *)VAR_fFxQuality = fxQualityId;
+    *(BYTE *)VAR_bFxQuality = fxQualityId;
 }
 
-float CSettingsSA::GetMouseSensivity ( )
+float CSettingsSA::GetMouseSensitivity ( )
 {
     // 0.000312 (min) - 0.005000 (max)
-    return *(FLOAT *)VAR_fMouseSensivity;
+    return *(FLOAT *)VAR_fMouseSensitivity;
 }
 
-void CSettingsSA::SetMouseSensivity ( float fSensivity )
+void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
 {
-    *(FLOAT *)VAR_fMouseSensivity = fSensivity;
+    *(FLOAT *)VAR_fMouseSensitivity = fSensitivity;
+}
+
+unsigned int CSettingsSA::GetAntiAliasing ( )
+{
+    // 1 = disabled, 2 = 1x, 3 = 2x, 4 = 3x
+    return m_pInterface->dwAntiAliasing;
+}
+
+void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing, bool bOnRestart )
+{
+    if ( !bOnRestart )
+    {
+        DWORD dwFunc = FUNC_SetAntiAliasing;
+        _asm
+        {
+            push    uiAntiAliasing
+            call    dwFunc
+            add     esp, 4
+        }
+        SetCurrentVideoMode ( m_pInterface->dwVideoMode, false );
+    }
+
+    m_pInterface->dwAntiAliasing = uiAntiAliasing;
 }
 
 void CSettingsSA::Save ()

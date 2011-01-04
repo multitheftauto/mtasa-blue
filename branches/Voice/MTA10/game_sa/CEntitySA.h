@@ -47,28 +47,28 @@
 class CEntitySAInterfaceVTBL
 {   
 public:
-    DWORD SCALAR_DELETING_DESTRUCTOR;
-    DWORD Add_CRect;
-    DWORD Add;
-    DWORD Remove;
-    DWORD SetIsStatic;
-    DWORD SetModelIndex;
-    DWORD SetModelIndexNoCreate;
-    DWORD CreateRwObject;
-    DWORD DeleteRwObject;
-    DWORD GetBoundRect;
-    DWORD ProcessControl;
-    DWORD ProcessCollision;
-    DWORD ProcessShift;
-    DWORD TestCollision;
-    DWORD Teleport;
-    DWORD SpecialEntityPreCollisionStuff;
-    DWORD SpecialEntityCalcCollisionSteps;
-    DWORD PreRender;
-    DWORD Render;
-    DWORD SetupLighting;
-    DWORD RemoveLighting;
-    DWORD FlagToDestroyWhenNextProcessed;
+    DWORD SCALAR_DELETING_DESTRUCTOR;       // +0h
+    DWORD Add_CRect;                        // +4h
+    DWORD Add;                              // +8h
+    DWORD Remove;                           // +Ch
+    DWORD SetIsStatic;                      // +10h
+    DWORD SetModelIndex;                    // +14h
+    DWORD SetModelIndexNoCreate;            // +18h
+    DWORD CreateRwObject;                   // +1Ch
+    DWORD DeleteRwObject;                   // +20h
+    DWORD GetBoundRect;                     // +24h
+    DWORD ProcessControl;                   // +28h
+    DWORD ProcessCollision;                 // +2Ch
+    DWORD ProcessShift;                     // +30h
+    DWORD TestCollision;                    // +34h
+    DWORD Teleport;                         // +38h
+    DWORD SpecialEntityPreCollisionStuff;   // +3Ch
+    DWORD SpecialEntityCalcCollisionSteps;  // +40h
+    DWORD PreRender;                        // +44h
+    DWORD Render;                           // +48h
+    DWORD SetupLighting;                    // +4Ch
+    DWORD RemoveLighting;                   // +50h
+    DWORD FlagToDestroyWhenNextProcessed;   // +54h
 };
 
 

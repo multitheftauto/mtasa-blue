@@ -6,6 +6,7 @@
 *  PURPOSE:     Controller configuration manager
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Jax <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -85,30 +86,30 @@ void CControllerConfigManagerSA::SetInputType ( unsigned char ucInputType )
 
 bool CControllerConfigManagerSA::IsMouseInverted ( void )
 {
-    return ( * ( unsigned char * ) ( 0xBA6745 ) == 0 );
+    return ( * ( BYTE * ) ( 0xBA6745 ) == 0 );
 }
 
 void CControllerConfigManagerSA::SetMouseInverted ( bool bInverted )
 {
-    * ( unsigned char * ) ( 0xBA6745 ) = ( bInverted ) ? 0 : 1;
+    * ( BYTE * ) ( 0xBA6745 ) = ( bInverted ) ? 0 : 1;
 }
 
 bool CControllerConfigManagerSA::GetFlyWithMouse ( void )
 {
-    return ( * ( unsigned char * ) ( 0xC1CC03 ) == 1 );
+    return ( * ( BYTE * ) ( 0xC1CC03 ) == 1 );
 }
 
 void CControllerConfigManagerSA::SetFlyWithMouse ( bool bFlyWithMouse )
 {
-    * ( unsigned char * ) ( 0xC1CC03 ) = ( bFlyWithMouse ) ? 1 : 0;
+    * ( BYTE * ) ( 0xC1CC03 ) = ( bFlyWithMouse ) ? 1 : 0;
 }
 
 bool CControllerConfigManagerSA::GetSteerWithMouse ( void )
 {
-    return ( * ( unsigned char * ) ( 0xC1CC02 ) == 1 );
+    return ( * ( BYTE * ) ( 0xC1CC02 ) == 1 );
 }
 
 void CControllerConfigManagerSA::SetSteerWithMouse ( bool bSteerWithMouse )
 {
-    * ( unsigned char * ) ( 0xC1CC02 ) = ( bSteerWithMouse ) ? 1 : 0;
+    * ( BYTE * ) ( 0xC1CC02 ) = ( bSteerWithMouse ) ? 1 : 0;
 }

@@ -349,4 +349,35 @@ int CLuaFunctionDefs::GetResourceDynamicElementRoot ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetResourceExportedFunctions ( lua_State *luaVM )
+{
+    CResource* resource = NULL;
+    
+    // resource
+    if ( argtype ( 1, LUA_TLIGHTUSERDATA ) )
+        resource = lua_toresource ( luaVM, 1 );
+    else if ( argtype ( 1, LUA_TNONE ) )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+            resource = pLuaMain->GetResource ();
+    }
 
+    if ( resource )
+    {
+        lua_newtable ( luaVM );
+        unsigned int uiIndex = 0;
+        list<CExportedFunction *>::iterator iterd = resource->IterBeginExportedFunctions();
+        for ( ; iterd != resource->IterEndExportedFunctions(); iterd++ )
+        {
+            lua_pushnumber ( luaVM, ++uiIndex );
+            lua_pushstring ( luaVM, (*iterd)->GetFunctionName () );
+            lua_settable ( luaVM, -3 );
+        }
+        return 1;
+    }
+    
+    m_pScriptDebugging->LogBadType ( luaVM, "getResourceExportedFunctions" );
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

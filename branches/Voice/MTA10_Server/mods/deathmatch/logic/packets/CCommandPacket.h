@@ -18,17 +18,17 @@
 class CCommandPacket : public CPacket
 {
 public:
-    inline                  CCommandPacket          ( void )                { m_szCommand [0] = 0; };
+    inline                  CCommandPacket          ( void )                { m_strCommand = ""; };
 
     inline ePacketID        GetPacketID             ( void ) const          { return static_cast < ePacketID > ( PACKET_ID_COMMAND ); };
     inline unsigned long    GetFlags                ( void ) const          { return PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool                    Read                    ( NetBitStreamInterface& BitStream );
 
-    inline const char*      GetCommand              ( void ) const          { return m_szCommand; };
+    inline const char*      GetCommand              ( void ) const          { return m_strCommand.c_str(); };
 
 private:
-    char                    m_szCommand [256];
+    std::string             m_strCommand;
 };
 
 #endif

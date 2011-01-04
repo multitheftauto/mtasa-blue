@@ -19,6 +19,7 @@
 #include <game/CGame.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
+#include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #include "SharedUtil.hpp"
 
 using SharedUtil::CalcMTASAPath;
@@ -99,35 +100,17 @@ CCore::CCore ( void )
     memset ( m_szInstallRoot, 0, MAX_PATH );
     memset ( m_szGTAInstallRoot, 0, MAX_PATH );
 
-    // Open the MTA registry key
-    HKEY hkey = NULL;
-    DWORD dwBufferSize = MAX_PATH;
-    DWORD dwType = 0;
-    if ( RegOpenKeyEx ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", 0, KEY_READ, &hkey ) == ERROR_SUCCESS ) 
+    SString strInstallRoot = GetMTASABaseDir ();
+
+    SString strGTAInstallRoot = GetRegistryValue ( "..\\1.0", "GTA:SA Path" );
+    if ( strGTAInstallRoot.empty () )
     {
-        // Read out the MTA installpath
-        if ( RegQueryValueEx ( hkey, "Last Run Location", NULL, &dwType, (LPBYTE)m_szInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
-             strlen ( m_szInstallRoot ) == 0 )
-        {
-            MessageBox ( 0, "Multi Theft Auto has not been installed properly, please reinstall.", "Error", MB_OK );
-            RegCloseKey ( hkey );
-            TerminateProcess ( GetCurrentProcess (), 9 );
-        }
-
-        // Read out the GTA installpath
-        dwBufferSize = MAX_PATH;
-        dwType = 0;
-        if ( RegQueryValueEx ( hkey, "GTA:SA Path", NULL, &dwType, (LPBYTE)m_szGTAInstallRoot, &dwBufferSize ) != ERROR_SUCCESS ||
-             strlen ( m_szGTAInstallRoot ) == 0 )
-        {
-            MessageBox ( 0, "There is no GTA path specified in the registry, please reinstall.", "Error", MB_OK );
-            RegCloseKey ( hkey );
-            TerminateProcess ( GetCurrentProcess (), 9 );
-        }
-
-        RegCloseKey ( hkey );
+        MessageBox ( 0, "There is no GTA path specified in the registry, please reinstall.", "Error", MB_OK );
+        TerminateProcess ( GetCurrentProcess (), 9 );
     }
 
+    STRNCPY ( m_szInstallRoot, strInstallRoot, sizeof ( m_szInstallRoot ) );
+    STRNCPY ( m_szGTAInstallRoot, strGTAInstallRoot, sizeof ( m_szGTAInstallRoot ) );
 
     // Remove the trailing / from the installroot incase it has
     size_t sizeInstallRoot = strlen ( m_szInstallRoot );
@@ -168,13 +151,9 @@ CCore::CCore ( void )
     // Create the mod manager
     m_pModManager               = new CModManager;
 
-    // Create a resolution manager (for screen res)
-    m_pResManager               = new CResManager;
-
     m_pfnMessageProcessor       = NULL;
     m_pMessageBox = NULL;
 
-    m_bResetNeeded = false;
     m_bFirstFrame = true;
     m_bIsOfflineMod = false;
     m_bQuitOnPulse = false;
@@ -213,6 +192,11 @@ CCore::CCore ( void )
     //Create our current server and set the update time to zero
     m_pCurrentServer = new CXfireServerInfo();
     m_tXfireUpdate = 0;
+
+    // No initial fps limit
+    m_uiFrameRateLimit = 0;
+    m_dLastTimeMs = 0;
+    m_dPrevOverrun = 0;
 }
 
 CCore::~CCore ( void )
@@ -354,6 +338,8 @@ void CCore::SaveConfig ( void )
         if ( !pBindsNode )
             pBindsNode = GetConfig ()->CreateSubNode ( CONFIG_NODE_KEYBINDS );
         m_pKeyBinds->SaveToXML ( pBindsNode );
+        GetVersionUpdater ()->SaveConfigToXML ();
+        GetServerCache ()->SaveServerCache ();
         m_pConfigFile->Write ();
     }
 }
@@ -761,7 +747,6 @@ HWND CCore::GetHookedWindow ( void )
 void CCore::HideMainMenu ( void )
 {
     m_pLocalGUI->GetMainMenu ()->SetVisible ( false );
-    m_pLocalGUI->GetMainMenu ()->SetServerBrowserVisible ( false );
 }
 
 void CCore::HideQuickConnect ( void )
@@ -771,6 +756,8 @@ void CCore::HideQuickConnect ( void )
 
 void CCore::ApplyHooks ( )
 { 
+    ApplyLoadingCrashPatch ();
+
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook ( );
     m_pDirect3DHookManager->ApplyHook ( );
@@ -818,15 +805,15 @@ void CCore::CreateGame ( )
         if ( m_pGame->GetGameVersion () >= VERSION_11 )
         {
             MessageBox ( 0, "Only GTA:SA version 1.0 is supported!  You are now being redirected to a page where you can patch your version.", "Error", MB_OK|MB_ICONEXCLAMATION );
-            ShellExecute ( NULL, _T("open"), "http://multitheftauto.com/downgrade", NULL, NULL, SW_SHOWNORMAL );
-            TerminateProcess ( GetCurrentProcess (), 0 );
+            BrowseToSolution ( "downgrade" );
+            TerminateProcess ( GetCurrentProcess (), 1 );
         }
     }
     else
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "Game module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 }
 
@@ -865,7 +852,7 @@ void CCore::CreateMultiplayer ( )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "Multiplayer module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 }
 
@@ -903,7 +890,7 @@ void CCore::InitGUI ( IUnknown* pDevice )
     } else {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "GUI module could not be initialized!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     // Set the working directory for CGUI
@@ -942,7 +929,7 @@ void CCore::CreateGUI ( void )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "GUI module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
     WriteDebugEvent ( "GUI loaded." );
 
@@ -985,7 +972,8 @@ void CCore::CreateNetwork ( )
     if ( m_NetModule.IsOk () == false )
     {
         MessageBox ( 0, "Network module not found!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        BrowseToSolution ( "netc-not-loadable", true );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     // Network module compatibility check
@@ -995,7 +983,8 @@ void CCore::CreateNetwork ( )
     {
         // net.dll doesn't like our version number
         MessageBox ( 0, "Network module not compatible!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        BrowseToSolution ( "netc-not-compatible", true );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     // Get client initializer function from DLL's routine.
@@ -1012,10 +1001,24 @@ void CCore::CreateNetwork ( )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "Network module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     SetCurrentDirectory ( szCurDir );
+
+    // Set mta version for report log here
+    SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%d.%03d"
+                                ,MTASA_VERSION_MAJOR
+                                ,MTASA_VERSION_MINOR
+                                ,MTASA_VERSION_MAINTENANCE
+                                ,MTASA_VERSION_TYPE
+                                ,MTASA_VERSION_BUILD
+                                ,m_pNet->GetNetRev ()
+                                ,m_pNet->GetNetRel ()
+                                ) );
+    char szSerial [ 64 ];
+    m_pNet->GetSerial ( szSerial, sizeof ( szSerial ) );
+    SetApplicationSetting ( "serial", szSerial );
 }
 
 
@@ -1056,7 +1059,7 @@ void CCore::CreateXML ( )
     {
         // USE CLANGUAGELOCALE HERE.
         MessageBox ( 0, "XML module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
     SetCurrentDirectory ( szCurDir );
@@ -1323,7 +1326,6 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "unbind",            "unbinds a key (key)",              CCommandFuncs::Unbind );
     m_pCommands->Add ( "copygtacontrols",   "copies the default gta controls",  CCommandFuncs::CopyGTAControls );
     m_pCommands->Add ( "screenshot",        "outputs a screenshot",             CCommandFuncs::ScreenShot );
-    m_pCommands->Add ( "connectiontype",    "sets the connection type (type)",  CCommandFuncs::ConnectionType );
     m_pCommands->Add ( "saveconfig",        "immediately saves the config",     CCommandFuncs::SaveConfig );
 
     m_pCommands->Add ( "cleardebug",        "clears the debug view",            CCommandFuncs::DebugClear );
@@ -1335,18 +1337,6 @@ void CCore::RegisterCommands ( )
 #ifdef MTA_DEBUG
     //m_pCommands->Add ( "pools",               "read out the pool values",         CCommandFuncs::PoolRelocations );
 #endif
-}
-
-
-bool CCore::GetResetNeeded ( )
-{
-    return m_bResetNeeded;
-}
-
-
-void CCore::SetRenderDevice ( IUnknown* pDevice )
-{
-    m_pRenderDevice = pDevice;
 }
 
 
@@ -1400,14 +1390,6 @@ bool CCore::IsValidNick ( const char* szNick )
 
     return false;
 }
-
-
-#ifndef MTA_DEBUG
-CResManager * CCore::GetResManager ( void )
-{
-    return m_pResManager;
-}
-#endif
 
 
 void CCore::Quit ( bool bInstantly )
@@ -1698,9 +1680,8 @@ void CCore::UpdateRecentlyPlayed()
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
         CServerList* pRecentList = pServerBrowser->GetRecentList ();
-        CServerListItem RecentServer ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
-        pRecentList->Remove ( RecentServer );
-        pRecentList->Add ( RecentServer, true );
+        pRecentList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
+        pRecentList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET, true );
         pServerBrowser->SaveRecentlyPlayedList();
 
     }
@@ -1730,7 +1711,7 @@ SString CCore::UpdateXfire( void )
             //Format a player count
             SString strPlayerCount("%i / %i", m_pCurrentServer->nPlayers, m_pCurrentServer->nMaxPlayers);
             // Set as our custom date
-            SetXfireData( m_pCurrentServer->strName, m_pCurrentServer->strVersion, m_pCurrentServer->bPassworded, m_pCurrentServer->strType, m_pCurrentServer->strMap, strNick, strPlayerCount );
+            SetXfireData( m_pCurrentServer->strName, m_pCurrentServer->strVersion, m_pCurrentServer->bPassworded, m_pCurrentServer->strGameMode, m_pCurrentServer->strMap, strNick, strPlayerCount );
         }
         //Return the result
         return strResult;
@@ -1767,4 +1748,72 @@ void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bo
         
         XfireSetCustomGameData ( 7, szKey, szValue );
     }
+}
+
+
+//
+// Patch to fix loading crash.
+// Has to be done before the main window is created.
+//
+void CCore::ApplyLoadingCrashPatch ( void )
+{
+    uchar* pAddress = (uchar*)0x7468F9;
+    uchar ucOldValue = 183;
+    uchar ucNewValue = 57;
+
+    MEMORY_BASIC_INFORMATION info;
+    VirtualQuery( pAddress, &info, sizeof(MEMORY_BASIC_INFORMATION) );
+
+    if ( info.State == MEM_COMMIT && info.Protect & ( PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_READONLY | PAGE_READWRITE ) )
+    {
+        if ( pAddress[0] == ucOldValue )
+        {
+            DWORD dwOldProtect;
+            if ( VirtualProtect( pAddress, 1, PAGE_READWRITE, &dwOldProtect ) )
+            {
+                pAddress[0] = ucNewValue;
+                VirtualProtect( pAddress, 1, dwOldProtect, &dwOldProtect );
+            }
+        }
+    }
+}
+
+
+//
+// Do FPS limiting
+//
+void CCore::ApplyFrameRateLimit ( void )
+{
+    if ( m_uiFrameRateLimit < 1 )
+        return;
+
+    // Calc required time in ms between frames
+    const double dTargetTimeToUse = 1000.0 / m_uiFrameRateLimit;
+
+    // Get actual time in ms since last frame
+    double dTimeUsed = CClientTime::GetTimeNano() * 1000.0 - m_dLastTimeMs;
+
+    if ( dTimeUsed < dTargetTimeToUse )
+    {
+        // Frame has spare time
+        double dSpare = dTargetTimeToUse - dTimeUsed;
+
+        // Take away any overrun from the previous frame
+        dSpare -= m_dPrevOverrun;
+        m_dPrevOverrun = 0;
+
+        // Use up remaining spare time
+        if ( dSpare > 0 )
+        {
+            dSpare = Min < double > ( dSpare, 100 );
+            Sleep( (DWORD)dSpare );
+        }
+    }
+    else
+    {
+        // Frame has overrun
+        m_dPrevOverrun = Min < double > ( dTimeUsed - dTargetTimeToUse, dTargetTimeToUse / 2 );
+    }
+
+    m_dLastTimeMs = CClientTime::GetTimeNano() * 1000.0;
 }

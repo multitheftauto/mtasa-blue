@@ -257,6 +257,7 @@ public:
     static int      SetTrainDirection                   ( lua_State* luaVM );
     static int      SetTrainSpeed                       ( lua_State* luaVM );
     static int      SetVehicleHeadLightColor            ( lua_State* luaVM );
+    static int      SetVehicleTurretPosition            ( lua_State* luaVM );
 
     // Marker create/destroy functions
     static int      CreateMarker                        ( lua_State* luaVM );
@@ -298,10 +299,12 @@ public:
     // Object get functions
     static int      GetObjectName                       ( lua_State* luaVM );
     static int      GetObjectRotation                   ( lua_State* luaVM );
+    static int      GetObjectScale                      ( lua_State* luaVM );
 
     // Object set functions
     static int      SetObjectName                       ( lua_State* luaVM );
     static int      SetObjectRotation                   ( lua_State* luaVM );
+    static int      SetObjectScale                      ( lua_State* luaVM );
     static int      MoveObject                          ( lua_State* luaVM );
     static int      StopObject                          ( lua_State* luaVM );
 
@@ -377,6 +380,9 @@ public:
     static int      SetWaterLevel                       ( lua_State* luaVM );
     static int      GetWaterVertexPosition              ( lua_State* luaVM );
     static int      SetWaterVertexPosition              ( lua_State* luaVM );
+    static int      GetWaterColor                       ( lua_State* luaVM );
+    static int      SetWaterColor                       ( lua_State* luaVM );
+    static int      ResetWaterColor                     ( lua_State* luaVM );
 
     // Weapon funcs
     static int      GetWeaponNameFromID                 ( lua_State* luaVM );
@@ -408,6 +414,8 @@ public:
     // Utility vector math functions
     static int      GetDistanceBetweenPoints2D          ( lua_State* luaVM );
     static int      GetDistanceBetweenPoints3D          ( lua_State* luaVM );
+    static int      GetEasingValue                      ( lua_State* luaVM );
+    static int      InterpolateBetween                  ( lua_State* luaVM );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
@@ -424,6 +432,11 @@ public:
     static int      GetColorFromString                  ( lua_State* luaVM );
     static int      Reference                           ( lua_State* luaVM );
     static int      Dereference                         ( lua_State* luaVM );
+    static int      UtfLen                              ( lua_State* luaVM );
+    static int      UtfSeek                             ( lua_State* luaVM );
+    static int      UtfSub                              ( lua_State* luaVM );
+    static int      UtfChar                             ( lua_State* luaVM );
+    static int      UtfCode                             ( lua_State* luaVM );
     static int      GetValidPedModels                   ( lua_State* luaVM );
 
     // Loaded Map Functions
@@ -454,6 +467,7 @@ public:
     static int      ExecuteSQLSelect                    ( lua_State* luaVM );
     static int      ExecuteSQLUpdate                    ( lua_State* luaVM );
     static int      ExecuteSQLQuery                     ( lua_State* luaVM );
+    static int      GetPerformanceStats                 ( lua_State* luaVM );
 
     // Account get funcs
     static int      GetAccount                          ( lua_State* luaVM );

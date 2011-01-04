@@ -61,7 +61,7 @@ void CBanManager::DoPulse ( void )
 }
 
 
-CBan* CBanManager::AddBan ( CPlayer* pPlayer, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddBan ( CPlayer* pPlayer, const SString& strBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     if ( pPlayer )
     {
@@ -70,14 +70,12 @@ CBan* CBanManager::AddBan ( CPlayer* pPlayer, CClient* pBanner, const char* szRe
 
         if ( IsValidIP ( szIP ) && !IsSpecificallyBanned ( szIP ) )
         {
-            CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
+            CBan* pBan = AddBan ( strBanner, strReason, tTimeOfUnban );
             pBan->SetNick ( pPlayer->GetNick() );
             pBan->SetIP ( szIP );
 
             g_pNetServer->AddBan ( szIP );
 
-            // Save the list
-            SaveBanList ();
             return pBan;
         }
     }
@@ -86,17 +84,15 @@ CBan* CBanManager::AddBan ( CPlayer* pPlayer, CClient* pBanner, const char* szRe
 }
 
 
-CBan* CBanManager::AddBan ( const char* szIP, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddBan ( const SString& strIP, const SString& strBanner, const SString& strReason, time_t tTimeOfUnban )
 {
-    if ( IsValidIP ( szIP ) && !IsSpecificallyBanned ( szIP ) )
+    if ( IsValidIP ( strIP.c_str() ) && !IsSpecificallyBanned ( strIP.c_str() ) )
     {
-        CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
-        pBan->SetIP ( szIP );
+        CBan* pBan = AddBan ( strBanner, strReason, tTimeOfUnban );
+        pBan->SetIP ( strIP );
 
-        g_pNetServer->AddBan ( szIP );
+        g_pNetServer->AddBan ( strIP.c_str() );
 
-        // Save the list
-        SaveBanList ();
         return pBan;
     }
 
@@ -104,13 +100,13 @@ CBan* CBanManager::AddBan ( const char* szIP, CClient* pBanner, const char* szRe
 }
 
 
-CBan* CBanManager::AddSerialBan ( CPlayer* pPlayer, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddSerialBan ( CPlayer* pPlayer, CClient* pBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     if ( pPlayer )
     {
         if ( !pPlayer->GetSerial ().empty() && !IsSerialBanned ( pPlayer->GetSerial ().c_str () ) )
         {
-            CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
+            CBan* pBan = AddBan ( pBanner->GetNick(), strReason, tTimeOfUnban );
             pBan->SetNick ( pPlayer->GetNick() );
             pBan->SetSerial ( pPlayer->GetSerial () );
             SaveBanList ();
@@ -123,12 +119,12 @@ CBan* CBanManager::AddSerialBan ( CPlayer* pPlayer, CClient* pBanner, const char
 }
 
 
-CBan* CBanManager::AddSerialBan ( const char* szSerial, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddSerialBan ( const SString& strSerial, CClient* pBanner, const SString& strReason, time_t tTimeOfUnban )
 {
-    if ( /*IsValidSerial ( szSerial ) &&*/ !IsSerialBanned ( szSerial ) )
+    if ( /*IsValidSerial ( szSerial ) &&*/ !IsSerialBanned ( strSerial.c_str() ) )
     {
-        CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
-        pBan->SetSerial ( szSerial );
+        CBan* pBan = AddBan ( pBanner->GetNick(), strReason, tTimeOfUnban );
+        pBan->SetSerial ( strSerial );
         SaveBanList ();
 
         return pBan;
@@ -138,13 +134,13 @@ CBan* CBanManager::AddSerialBan ( const char* szSerial, CClient* pBanner, const 
 }
 
 
-CBan* CBanManager::AddAccountBan ( CPlayer* pPlayer, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddAccountBan ( CPlayer* pPlayer, CClient* pBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     if ( pPlayer )
     {
         if ( !pPlayer->GetSerialUser ().empty() && !IsAccountBanned ( pPlayer->GetSerialUser ().c_str () ) )
         {
-            CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
+            CBan* pBan = AddBan ( pBanner->GetNick(), strReason, tTimeOfUnban );
             pBan->SetNick ( pPlayer->GetNick() );
             pBan->SetAccount ( pPlayer->GetSerialUser () );
             SaveBanList ();
@@ -157,12 +153,12 @@ CBan* CBanManager::AddAccountBan ( CPlayer* pPlayer, CClient* pBanner, const cha
 }
 
 
-CBan* CBanManager::AddAccountBan ( const char* szAccount, CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddAccountBan ( const SString& strAccount, CClient* pBanner, const SString& strReason, time_t tTimeOfUnban )
 {
-    if ( !IsAccountBanned ( szAccount ) )
+    if ( !IsAccountBanned ( strAccount.c_str() ) )
     {
-        CBan* pBan = AddBan ( pBanner, szReason, tTimeOfUnban );
-        pBan->SetSerial ( szAccount );
+        CBan* pBan = AddBan ( pBanner->GetNick(), strReason, tTimeOfUnban );
+        pBan->SetSerial ( strAccount );
         SaveBanList ();
 
         return pBan;
@@ -172,18 +168,18 @@ CBan* CBanManager::AddAccountBan ( const char* szAccount, CClient* pBanner, cons
 }
 
 
-CBan* CBanManager::AddBan ( CClient* pBanner, const char* szReason, time_t tTimeOfUnban )
+CBan* CBanManager::AddBan ( const SString& strBanner, const SString& strReason, time_t tTimeOfUnban )
 {
     // Create the ban and assign its values
     CBan* pBan = new CBan;
     pBan->SetTimeOfBan ( time ( NULL ) );
     pBan->SetTimeOfUnban ( tTimeOfUnban );
 
-    if ( szReason )
-        pBan->SetReason ( szReason );
+    if ( strReason.length() > 0 )
+        pBan->SetReason ( strReason.c_str() );
 
-    if ( pBanner )
-        pBan->SetBanner ( pBanner->GetNick () );
+    if ( strBanner.length() > 0 )
+        pBan->SetBanner ( strBanner );
 
     // Add it to the back of our banned list, add it to net server's ban list
     m_BanManager.push_back ( pBan );
@@ -194,16 +190,7 @@ CBan* CBanManager::AddBan ( CClient* pBanner, const char* szReason, time_t tTime
 
 bool CBanManager::Exists ( CBan* pBan )
 {
-    list < CBan* >::const_iterator iter = m_BanManager.begin ();
-    for ( ; iter != m_BanManager.end (); iter++ )
-    {
-        if ( *iter == pBan )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return m_BanManager.Contains ( pBan );
 }
 
 
@@ -320,6 +307,18 @@ CBan* CBanManager::GetBan ( const char* szNick, unsigned int uiOccurrance )
         }
     }
 
+    return NULL;
+}
+
+
+CBan* CBanManager::GetBanFromSerial ( const char* szSerial )
+{
+    list < CBan* >::const_iterator iter = m_BanManager.begin ();
+    for ( ; iter != m_BanManager.end (); iter++ )
+    {
+        if ( (*iter)->GetSerial () == szSerial )
+            return *iter;
+    }
     return NULL;
 }
 

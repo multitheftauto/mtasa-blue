@@ -193,7 +193,10 @@ HRESULT CProxyDirect3DDevice9::Present                        ( CONST RECT* pSou
     m_pData->GetTransform ( D3DTS_PROJECTION, &projMatrix );
     m_pDevice->SetTransform ( D3DTS_PROJECTION, &projMatrix );
 
-    return m_pDevice->Present ( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
+    HRESULT hr = m_pDevice->Present ( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
+
+    CCore::GetSingleton ().ApplyFrameRateLimit ();
+    return hr;
 }
 
 HRESULT CProxyDirect3DDevice9::GetBackBuffer                  ( UINT iSwapChain,UINT iBackBuffer,D3DBACKBUFFER_TYPE Type,IDirect3DSurface9** ppBackBuffer )
@@ -321,6 +324,17 @@ HRESULT CProxyDirect3DDevice9::BeginScene                     ( VOID )
 
     // Call our event handler.
     CDirect3DEvents9::OnBeginScene ( m_pDevice );
+
+    // Possible fix for missing textures on some chipsets
+    m_pDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_MODULATE );
+    m_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+    m_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+    m_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_MODULATE );
+    m_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+    m_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+
+    m_pDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
+    m_pDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
 
     return hResult;
 }

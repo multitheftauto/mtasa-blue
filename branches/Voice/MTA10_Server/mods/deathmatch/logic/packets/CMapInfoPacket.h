@@ -8,6 +8,7 @@
 *               Jax <>
 *               lil_Toady <>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -42,7 +43,13 @@ public:
                                                       unsigned char ucSkyGradientBG = 0,
                                                       unsigned char ucSkyGradientBB = 0,
                                                       unsigned short usFPSLimit = 36,
-                                                      bool bCloudsEnabled = true);
+                                                      bool bCloudsEnabled = true,
+                                                      float fJetpackMaxHeight = 100,
+                                                      bool bOverrideWaterColor = false,
+                                                      unsigned char ucWaterRed = 0,
+                                                      unsigned char ucWaterGreen = 0,
+                                                      unsigned char ucWaterBlue = 0,
+                                                      unsigned char ucWaterAlpha = 0);
 
     inline ePacketID        GetPacketID             ( void ) const              { return PACKET_ID_MAP_INFO; };
     inline unsigned long    GetFlags                ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -68,6 +75,12 @@ private:
     unsigned short          m_usFPSLimit;
     bool*                   m_pbGarageStates;
     bool                    m_bCloudsEnabled;
+    float                   m_fJetpackMaxHeight;
+    bool                    m_bOverrideWaterColor;
+    unsigned char           m_ucWaterRed;
+    unsigned char           m_ucWaterGreen;
+    unsigned char           m_ucWaterBlue;
+    unsigned char           m_ucWaterAlpha;
 };
 
 #endif

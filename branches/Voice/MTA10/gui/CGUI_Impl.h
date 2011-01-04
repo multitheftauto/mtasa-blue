@@ -77,8 +77,11 @@ public:
     void                            ProcessCharacter            ( unsigned long ulCharacter );
 
     //
-    void                            SetGUIInputEnabled          ( bool bEnabled );
     bool                            GetGUIInputEnabled          ( void );
+    void                            SetGUIInputMode             ( eInputMode a_eMode );
+    eInputMode                      GetGUIInputMode             ( void ); 
+    eInputMode                      GetInputModeFromString      ( const std::string& a_rstrMode ) const;
+    bool                            GetStringFromInputMode      ( eInputMode a_eMode, std::string& a_rstrResult ) const;
 
     //
     CGUIMessageBox*                 CreateMessageBox            ( const char* szTitle, const char* szMessage, unsigned int uiFlags );
@@ -129,7 +132,7 @@ public:
     //
 
     CGUITexture*                    CreateTexture               ( void );
-    CGUIFont*                       CreateFnt                   ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uExtraGlyphs[] = 0, bool bAutoScale = false );
+    CGUIFont*                       CreateFnt                   ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false );
 
     void                            SetCursorEnabled            ( bool bEnabled );
     bool                            IsCursorEnabled             ( void );
@@ -153,6 +156,7 @@ public:
     CGUIFont*                       GetSAHeaderFont             ( void );
     CGUIFont*                       GetSAGothicFont             ( void );
     CGUIFont*                       GetSansFont                 ( void );
+    bool                            IsFontPresent               ( const char* szFont ) { return m_pFontManager->isFontPresent(szFont); }
 
     void                            SetWorkingDirectory         ( const char * szDir );
     inline const char*              GetWorkingDirectory         ( void )    { return const_cast < const char* > ( m_szWorkingDirectory ); }
@@ -169,6 +173,8 @@ public:
     void                            SetMouseWheelHandler         ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback )  { CHECK_CHANNEL ( channel ); m_MouseWheelHandlers[ channel ] = Callback; }
     void                            SetMovedHandler              ( eInputChannel channel, const GUI_CALLBACK & Callback )        { CHECK_CHANNEL ( channel ); m_MovedHandlers[ channel ] = Callback; }
     void                            SetSizedHandler              ( eInputChannel channel, const GUI_CALLBACK & Callback )        { CHECK_CHANNEL ( channel ); m_SizedHandlers[ channel ] = Callback; }
+    void                            SetFocusGainedHandler        ( eInputChannel channel, const GUI_CALLBACK_FOCUS & Callback )  { CHECK_CHANNEL ( channel ); m_FocusGainedHandlers[ channel ] = Callback; }
+    void                            SetFocusLostHandler          ( eInputChannel channel, const GUI_CALLBACK_FOCUS & Callback )  { CHECK_CHANNEL ( channel ); m_FocusLostHandlers[ channel ] = Callback; }
 
     void                            SelectInputHandlers          ( eInputChannel channel )                                       { CHECK_CHANNEL ( channel ); m_Channel = channel; }
     void                            ClearInputHandlers           ( eInputChannel channel );
@@ -190,11 +196,15 @@ public:
     bool                            Event_Moved                 ( const CEGUI::EventArgs& e );
     bool                            Event_Sized                 ( const CEGUI::EventArgs& e );
     bool                            Event_RedrawRequested       ( const CEGUI::EventArgs& e );
+    bool                            Event_FocusGained           ( const CEGUI::EventArgs& e );
+    bool                            Event_FocusLost             ( const CEGUI::EventArgs& e );
 
     void                            AddToRedrawQueue            ( CGUIElement* pWindow );
     void                            RemoveFromRedrawQueue       ( CGUIElement* pWindow );
 
     void                            CleanDeadPool               ( void );
+    CGUIWindow*                     LoadLayout                  ( CGUIElement* pParent, const SString& strFilename );
+    bool                            LoadImageset                ( const SString& strFilename );
 
 private:
     CGUIButton*                     _CreateButton               ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
@@ -235,7 +245,7 @@ private:
 
     unsigned long                   m_ulPreviousUnique;
 
-    bool                            m_bSwitchGUIInput;
+    eInputMode                      m_eInputMode;
 
     GUI_CALLBACK_KEY                m_CharacterKeyHandlers[ INPUT_CHANNEL_COUNT ];
     GUI_CALLBACK_KEY                m_KeyDownHandlers[ INPUT_CHANNEL_COUNT ];
@@ -249,6 +259,8 @@ private:
     GUI_CALLBACK_MOUSE              m_MouseWheelHandlers[ INPUT_CHANNEL_COUNT ];
     GUI_CALLBACK                    m_MovedHandlers[ INPUT_CHANNEL_COUNT ];
     GUI_CALLBACK                    m_SizedHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_FOCUS              m_FocusGainedHandlers[ INPUT_CHANNEL_COUNT ];
+    GUI_CALLBACK_FOCUS              m_FocusLostHandlers[ INPUT_CHANNEL_COUNT ];
 
     eInputChannel                   m_Channel;
 

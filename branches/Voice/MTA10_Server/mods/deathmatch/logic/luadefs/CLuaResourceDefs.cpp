@@ -56,6 +56,7 @@ void CLuaResourceDefs::LoadFunctions ( void )
 
     // Misc
     CLuaCFunctions::AddFunction ( "call", CLuaResourceDefs::call );
+    CLuaCFunctions::AddFunction ( "refreshResources", CLuaResourceDefs::refreshResources );
 }
 
 
@@ -588,9 +589,8 @@ int CLuaResourceDefs::getResources ( lua_State* luaVM )
 {
     unsigned int uiIndex = 0;
     lua_newtable ( luaVM );
-    list<CResource *> * resources = m_pResourceManager->GetLoadedResources();
-    list < CResource* > ::iterator iter = resources->begin ();
-    for ( ; iter != resources->end (); iter++ )
+    list < CResource* > ::const_iterator iter = m_pResourceManager->IterBegin ();
+    for ( ; iter != m_pResourceManager->IterEnd (); iter++ )
     {
         lua_pushnumber ( luaVM, ++uiIndex );
         lua_pushresource ( luaVM, *iter );
@@ -964,20 +964,15 @@ int CLuaResourceDefs::getResourceMapRootElement ( lua_State* luaVM )
 int CLuaResourceDefs::getResourceExportedFunctions ( lua_State* luaVM )
 {
     CResource* resource = NULL;
-    char * szConfigName = NULL;
+    
     // resource
     if ( argtype ( 1, LUA_TLIGHTUSERDATA ) )
-    {
         resource = lua_toresource ( luaVM, 1 );
-        szConfigName = (char *)lua_tostring ( luaVM, 2 );
-    }
     else if ( argtype ( 1, LUA_TNONE ) )
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
-        {
             resource = pLuaMain->GetResource ();
-        }
     }
 
     if ( resource )
@@ -1087,5 +1082,18 @@ int CLuaResourceDefs::call ( lua_State* luaVM )
         m_pScriptDebugging->LogBadType ( luaVM, "call" );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaResourceDefs::refreshResources ( lua_State* luaVM )
+{
+    bool bRefreshAll = false;
+    
+    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
+        bRefreshAll = lua_toboolean ( luaVM, 1 ) ? true : false;
+
+    m_pResourceManager->Refresh ( bRefreshAll );
+
+    lua_pushboolean ( luaVM, true );
     return 1;
 }

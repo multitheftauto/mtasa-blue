@@ -380,46 +380,49 @@ bool CClientVehicleManager::HasDamageModel ( unsigned long ulModel )
 
 bool CClientVehicleManager::HasDamageModel ( eClientVehicleType Type )
 {
-    return ( Type == CLIENTVEHICLE_TRAILER ||
-             Type == CLIENTVEHICLE_MONSTERTRUCK ||
-             Type == CLIENTVEHICLE_QUADBIKE ||
-             Type == CLIENTVEHICLE_HELI ||
-             Type == CLIENTVEHICLE_PLANE ||
-             Type == CLIENTVEHICLE_CAR );
+    switch ( Type )
+    {
+        case CLIENTVEHICLE_TRAILER:
+        case CLIENTVEHICLE_MONSTERTRUCK:
+        case CLIENTVEHICLE_QUADBIKE:
+        case CLIENTVEHICLE_HELI:
+        case CLIENTVEHICLE_PLANE:
+        case CLIENTVEHICLE_CAR:
+            return true;
+        default:
+            return false;
+    }
 }
 
-
-vector < CClientVehicle* > ::iterator CClientVehicleManager::IterGet ( CClientVehicle* pVehicle )
+bool CClientVehicleManager::HasDoors ( unsigned long ulModel )
 {
-    // Find it in our list
-    vector < CClientVehicle* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    bool bHasDoors = false;
+
+    if ( HasDamageModel ( ulModel ) == true )
     {
-        if ( *iter == pVehicle )
+        switch ( ulModel )
         {
-            return iter;
+            case VT_BFINJECT:
+            case VT_RCBANDIT:
+            case VT_CADDY:
+            case VT_RCRAIDER:
+            case VT_BAGGAGE:
+            case VT_DOZER:
+            case VT_FORKLIFT:
+            case VT_TRACTOR:
+            case VT_RCTIGER:
+            case VT_BANDITO:
+            case VT_KART:
+            case VT_MOWER:
+            case VT_RCCAM:
+            case VT_RCGOBLIN:
+                break;
+            default:
+                bHasDoors = true;
         }
     }
 
-    // We couldn't find it
-    return m_List.begin ();
-}
-
-
-vector < CClientVehicle* > ::reverse_iterator CClientVehicleManager::IterGetReverse ( CClientVehicle* pVehicle )
-{
-    // Find it in our list
-    vector < CClientVehicle* > ::reverse_iterator iter = m_List.rbegin ();
-    for ( ; iter != m_List.rend (); iter++ )
-    {
-        if ( *iter == pVehicle )
-        {
-            return iter;
-        }
-    }
-
-    // We couldn't find it
-    return m_List.rbegin ();
+    return bHasDoors;
 }
 
 
@@ -427,7 +430,7 @@ void CClientVehicleManager::RemoveFromList ( CClientVehicle* pVehicle )
 {
     if ( m_bCanRemoveFromList )
     {
-        ListRemove ( m_List, pVehicle );
+        m_List.remove ( pVehicle );
     }
 }
 
@@ -470,7 +473,7 @@ void CClientVehicleManager::RestreamVehicles ( unsigned short usModel )
 {
     // Store the affected vehicles
     CClientVehicle* pVehicle;
-    std::vector < CClientVehicle* > ::iterator iter = IterBegin ();
+    std::vector < CClientVehicle* > ::const_iterator iter = IterBegin ();
     for ( ; iter != IterEnd (); iter++ )
     {
         pVehicle = *iter;

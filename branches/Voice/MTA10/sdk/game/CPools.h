@@ -109,6 +109,10 @@ public:
     virtual int             GetNumberOfUsedSpaces   ( ePools pool ) = 0;
     virtual void            DumpPoolsStatus         ( ) = 0;
 
+    virtual int             GetPoolDefaultCapacity  ( ePools pool ) = 0;
+    virtual int             GetPoolCapacity         ( ePools pool ) = 0;
+    virtual void            SetPoolCapacity         ( ePools pool, int iValue ) = 0;
+
     virtual CEntryInfoNodePool*             GetEntryInfoNodePool            ( ) = 0;
     virtual CPointerNodeSingleLinkPool*     GetPointerNodeSingleLinkPool    ( ) = 0;
     virtual CPointerNodeDoubleLinkPool*     GetPointerNodeDoubleLinkPool    ( ) = 0;

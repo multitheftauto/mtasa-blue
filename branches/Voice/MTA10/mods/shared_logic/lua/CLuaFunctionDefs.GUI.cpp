@@ -15,6 +15,7 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Florian Busse <flobu@gmx.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *****************************************************************************/
 
@@ -31,14 +32,43 @@ int CLuaFunctionDefs::GUISetInputEnabled ( lua_State* luaVM )
 {
     bool bRet = false;
 
-    if ( lua_istype ( luaVM, 1, LUA_TBOOLEAN ) ) {
-        CStaticFunctionDefinitions::GUISetInputEnabled ( lua_toboolean ( luaVM, 1 ) ? true : false );
-        bRet = true;
-    }   // else: error, bad arguments
+    if ( lua_istype ( luaVM, 1, LUA_TBOOLEAN ) ) 
+    {
+        bRet = CStaticFunctionDefinitions::GUISetInputMode ( lua_toboolean ( luaVM, 1 ) ? "no_binds" : "allow_binds" ); 
+    }  
 
     lua_pushboolean ( luaVM, bRet );
     return 1;
 }
+
+int CLuaFunctionDefs::GUISetInputMode ( lua_State* luaVM )
+{
+    bool bRet = false;
+
+    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) ) 
+    {
+        bRet = CStaticFunctionDefinitions::GUISetInputMode ( lua_tostring ( luaVM, 1 ) );
+    }
+
+    lua_pushboolean ( luaVM, bRet );
+    return 1;
+}
+
+int CLuaFunctionDefs::GUIGetInputMode ( lua_State* luaVM )
+{
+    std::string strMode;
+    if ( CStaticFunctionDefinitions::GUIGetInputMode ( strMode ) )
+    {
+        lua_pushstring ( luaVM, strMode.c_str() );
+        return 1;
+    }
+    else
+    {
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+}
+
 
 
 int CLuaFunctionDefs::GUIIsChatBoxInputActive ( lua_State* luaVM )
@@ -64,18 +94,17 @@ int CLuaFunctionDefs::GUIIsDebugViewActive ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIIsMainMenuActive ( lua_State* luaVM )
 {
-    lua_pushboolean ( luaVM, g_pCore->IsSettingsVisible () || g_pCore->IsMenuVisible () );
+    lua_pushboolean ( luaVM, g_pCore->IsMenuVisible () );
     return 1;
 }
 
 
 int CLuaFunctionDefs::GUIIsMTAWindowActive ( lua_State* luaVM )
 {
-    bool bActive = g_pCore->IsChatInputEnabled () ||
-        g_pCore->IsSettingsVisible () ||
+    bool bActive = ( g_pCore->IsChatInputEnabled () ||
         g_pCore->IsMenuVisible () ||
         g_pCore->GetConsole ()->IsVisible () ||
-        g_pClientGame->GetTransferBox ()->IsVisible ();
+        g_pClientGame->GetTransferBox ()->IsVisible () );
 
     lua_pushboolean ( luaVM, bActive );
     return 1;
@@ -746,11 +775,17 @@ int CLuaFunctionDefs::GUISetFont ( lua_State* luaVM )
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
         lua_istype ( luaVM, 2, LUA_TSTRING ) )
     {
-        const char *szFont = lua_tostring ( luaVM, 2 );
+        SString strFont = lua_tostring ( luaVM, 2 );
+        // If our font is a filepath, it's a custom font
+        CResource* pResource =  m_pLuaManager->GetVirtualMachine(luaVM)->GetResource();
+        std::string strPath, strMetaPath;
+        if ( CResourceManager::ParseResourcePathInput( strFont, pResource, strPath, strMetaPath ) && FileExists (strPath) )
+            strFont = SString("%s/%s", pResource->GetName(), strMetaPath.c_str());
+
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            bResult = CStaticFunctionDefinitions::GUISetFont ( *pEntity, szFont );
+            bResult = CStaticFunctionDefinitions::GUISetFont ( *pEntity, strFont );
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "guiSetFont", "gui-element", 1 );
@@ -760,7 +795,6 @@ int CLuaFunctionDefs::GUISetFont ( lua_State* luaVM )
     lua_pushboolean ( luaVM, bResult );
     return 1;
 }
-
 
 int CLuaFunctionDefs::GUIBringToFront ( lua_State* luaVM )
 {
@@ -1836,14 +1870,14 @@ int CLuaFunctionDefs::GUIGridListGetItemData ( lua_State* luaVM )
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
         {
-            const char* szData = reinterpret_cast < const char* > (
+            CLuaArgument* pVariable = reinterpret_cast < CLuaArgument* > (
                 static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () ) -> GetItemData (
                     static_cast < int > ( lua_tonumber ( luaVM, 2 ) ), 
                     static_cast < int > ( lua_tonumber ( luaVM, 3 ) )
                 )
             );
-            if ( szData )
-                lua_pushstring ( luaVM, szData );
+            if ( pVariable )
+                pVariable->Push(luaVM);
             else
                 lua_pushnil ( luaVM );
 
@@ -1924,17 +1958,18 @@ int CLuaFunctionDefs::GUIGridListSetItemData ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
          lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
-         lua_istype ( luaVM, 3, LUA_TNUMBER ) &&
-         lua_istype ( luaVM, 4, LUA_TSTRING ) )
+         lua_istype ( luaVM, 3, LUA_TNUMBER ) )
     {
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
         {
+            CLuaArgument* Variable = new CLuaArgument();
+            Variable->Read ( luaVM, 4 );
             CStaticFunctionDefinitions::GUIGridListSetItemData (
                 *pGUIElement,
                 static_cast < int > ( lua_tonumber ( luaVM, 2 ) ),
                 static_cast < int > ( lua_tonumber ( luaVM, 3 ) ),
-                lua_tostring ( luaVM, 4 )
+                Variable
             );
 
             lua_pushboolean ( luaVM, true );

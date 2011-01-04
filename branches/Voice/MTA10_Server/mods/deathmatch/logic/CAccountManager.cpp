@@ -36,7 +36,12 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     m_pSaveFile->CreateTable ( "accounts", "id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT", true );
     m_pSaveFile->CreateTable ( "userdata", "id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT, type INTEGER", true );
     m_pSaveFile->CreateTable ( "settings", "id INTEGER PRIMARY KEY, key TEXT, value INTEGER", true );
-    
+
+    // Select/update speed up: Add index for popular WHERE uses
+    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_ACCOUNTS_NAME on accounts(name)" );
+    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_USERDATA_USERID on userdata(userid)" );
+    m_pSaveFile->Query ( "CREATE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY on userdata(userid,key)" );
+
     //Create a new RegistryResult
     CRegistryResult result;
 
@@ -47,7 +52,6 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
     if ( result.nRows == 0 )
     {
         //Set our settings and clear the accounts/userdata tables just in case
-        m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "autologin", SQLITE_INTEGER, 0 );
         m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "XMLParsed", SQLITE_INTEGER, 0 );
         //Tell the Server to load the xml file rather than the SQL
         m_bLoadXML = true;
@@ -58,10 +62,6 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
         for (int i = 0;i < result.nRows;i++) 
         {
             SString strSetting = (char *)result.Data[i][0].pVal;
-            //Do we have a result for autologin
-            if ( strSetting == "autologin" )
-                //Set the Auto login variable
-                m_bAutoLogin = result.Data[i][1].nVal == 1 ? true : false;
 
             //Do we have a result for XMLParsed
             if ( strSetting == "XMLParsed" ) 
@@ -83,12 +83,10 @@ CAccountManager::CAccountManager ( char* szFileName, SString strBuffer ): CXMLCo
             //Tell the Server to load the xml file rather than the SQL
             m_bLoadXML = true;
         }
-        else if (result.nRows == 1) 
-        {
-            //if the results is one and we didn't trigger the other if statement then we are missing autologin so insert it
-            m_pSaveFile->Query ( "INSERT INTO settings (key, value) VALUES(?,?)", "autologin", SQLITE_INTEGER, 0 );
-        }
     }
+
+    //Check whether autologin was enabled in the main config
+    m_bAutoLogin = g_pGame->GetConfig()->IsAutoLoginEnabled();
 }
 void CAccountManager::ClearSQLDatabase ( void )
 {    
@@ -323,7 +321,7 @@ bool CAccountManager::Load( const char* szFileName )
             // Try to repair name
             if ( strName.length () <= 256 )
             {
-                strName = strName.ReplaceSubString ( "\"\"", "\"" ).substr ( 0, 64 );
+                strName = strName.Replace ( "\"\"", "\"" ).substr ( 0, 64 );
                 bChanged = true;
             }
 
@@ -422,7 +420,7 @@ bool CAccountManager::Save ( const char* szFileName )
     m_bChangedSinceSaved = false;
     m_llLastTimeSaved = GetTickCount64_ ();
 
-    list < CAccount* > ::iterator iter = m_List.begin ();
+    list < CAccount* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
     {
         if ( (*iter)->IsRegistered () && (*iter)->HasChanged() )
@@ -446,8 +444,7 @@ bool CAccountManager::Save ( const char* szFileName )
 
 bool CAccountManager::SaveSettings ()
 {
-    //Update our autologin and XML Load SQL entries
-    m_pSaveFile->Query ( "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, m_bAutoLogin ? 1 : 0, "autologin" );
+    //Update our XML Load SQL entry
     m_pSaveFile->Query ( "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, 1, "XMLParsed" );
 
     return true;
@@ -459,7 +456,7 @@ CAccount* CAccountManager::Get ( const char* szName, bool bRegistered )
     if ( szName && szName [ 0 ] )
     {
         unsigned int uiHash = HashString ( szName );
-        list < CAccount* > ::iterator iter = m_List.begin ();
+        list < CAccount* > ::const_iterator iter = m_List.begin ();
         for ( ; iter != m_List.end () ; iter++ )
         {
             CAccount* pAccount = *iter;
@@ -481,7 +478,7 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
     if ( szName && szName [ 0 ] && szIP && szIP [ 0 ] )
     {
         unsigned int uiHash = HashString ( szName );
-        list < CAccount* > ::iterator iter = m_List.begin ();
+        list < CAccount* > ::const_iterator iter = m_List.begin ();
         for ( ; iter != m_List.end () ; iter++ )
         {
             CAccount* pAccount = *iter;
@@ -503,21 +500,13 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
 
 bool CAccountManager::Exists ( CAccount* pAccount )
 {
-    list < CAccount* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
-    {
-        if ( *iter == pAccount )
-        {
-            return true;
-        }
-    }
-    return false;
+    return m_List.Contains ( pAccount );
 }
 
 
 void CAccountManager::RemoveFromList ( CAccount* pAccount )
 {
-    if ( m_bRemoveFromList && !m_List.empty() )
+    if ( m_bRemoveFromList )
     {
         m_List.remove ( pAccount );
     }
@@ -536,7 +525,7 @@ void CAccountManager::MarkAsChanged ( CAccount* pAccount )
 void CAccountManager::RemoveAll ( void )
 {
     m_bRemoveFromList = false;
-    list < CAccount* > ::iterator iter = m_List.begin ();
+    list < CAccount* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; iter++ )
     {
         delete *iter;
