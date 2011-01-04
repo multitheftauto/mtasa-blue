@@ -13,6 +13,7 @@ static struct
     char* data;
     size_t length;
     size_t curLength;
+    size_t curLineLength;
 } gs_output;
 
 static void SafeAppend(const char* str, ...)
@@ -25,11 +26,25 @@ static void SafeAppend(const char* str, ...)
         len = vsnprintf ( &gs_output.data[gs_output.curLength], gs_output.length - gs_output.curLength, str, vl );
         va_end ( vl );
 
+        // This code stinks, but it's not a critical application...
+        gs_output.curLineLength += len;
+        if ( gs_output.curLineLength > 300 )
+        {
+            gs_output.data[gs_output.curLength] = '\n';
+            ++gs_output.curLength;
+            gs_output.curLineLength = 0;
+            va_start ( vl, str );
+            len = vsnprintf ( &gs_output.data[gs_output.curLength], gs_output.length - gs_output.curLength, str, vl );
+            va_end ( vl );
+        }
+
         gs_output.curLength += len;
         if ( gs_output.curLength >= gs_output.length )
             gs_bOk = false;
         else
+        {
             gs_output.data[gs_output.curLength] = '\0';
+        }
     }
 }
 
@@ -120,6 +135,7 @@ bool colorizeSyntax ( const char* source, char* dest, size_t destLength )
     gs_output.length = destLength;
     gs_output.data = dest;
     gs_output.curLength = 0;
+    gs_output.curLineLength = 0;
     gs_bOk = true;
     YY_BUFFER_STATE state = yy_scan_string ( sourceCopy );
     while ( yylex() != 0 );
