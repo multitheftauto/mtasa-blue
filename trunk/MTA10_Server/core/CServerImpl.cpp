@@ -57,7 +57,7 @@ CServerImpl::CServerImpl ( void )
     m_pNetwork = NULL;
     m_bRequestedQuit = false;
     m_bRequestedReset = false;
-    memset(&m_szInputBuffer, 0, sizeof ( m_szInputBuffer ) * sizeof ( char ) );
+    memset(&m_szInputBuffer, 0, sizeof ( m_szInputBuffer ));
     memset(&m_szTag, 0, sizeof ( m_szTag ) * sizeof ( char ) );
     m_uiInputCount = 0;
 
@@ -536,7 +536,7 @@ void CServerImpl::HandleInput ( void )
         return;
 
     // Add the character to the buffer
-    if ( m_uiInputCount >= sizeof ( m_szInputBuffer ) )
+    if ( m_uiInputCount >= sizeof ( m_szInputBuffer ) / sizeof ( wchar_t ) )
     {
         memset(&m_szInputBuffer, 0, sizeof ( m_szInputBuffer ) );
         m_uiInputCount = 0;
