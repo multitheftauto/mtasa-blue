@@ -588,6 +588,11 @@ void CServerImpl::HandleInput ( void )
 
         case KEY_BACKSPACE: // Backspace
         case 0x7F:
+            if ( m_uiInputCount == 0 )
+            {
+                break;
+            }
+
             // Insert a blank space + backspace
 #ifdef WIN32
             Printf ( "%c %c", 0x08, 0x08 );
