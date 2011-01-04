@@ -535,13 +535,6 @@ void CServerImpl::HandleInput ( void )
     if ( iStdIn == 0 )
         return;
 
-    // Add the character to the buffer
-    if ( m_uiInputCount >= sizeof ( m_szInputBuffer ) / sizeof ( wchar_t ) )
-    {
-        memset(&m_szInputBuffer, 0, sizeof ( m_szInputBuffer ) );
-        m_uiInputCount = 0;
-    }
-
     switch ( iStdIn )
     {
         case '\n':  // Newlines and carriage returns
@@ -550,6 +543,9 @@ void CServerImpl::HandleInput ( void )
             // Echo a newline
             Printf ( "\n" );
 #else
+            // set string termination (required for compare/string functions
+            m_szInputBuffer[m_uiInputCount] = 0;
+
             if ( !g_bSilent )
             {
                 // Clear the input window
@@ -671,6 +667,12 @@ void CServerImpl::HandleInput ( void )
 #endif
 
         default:
+            if ( m_uiInputCount == sizeof ( m_szInputBuffer ) / sizeof ( wchar_t ) - 1 )
+            {
+                // entered 254 characters, wait for user to confirm/remove
+                break;
+            }
+
 #ifdef WIN32
             // Color the text
             if ( !g_bSilent )
