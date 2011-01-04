@@ -122,14 +122,16 @@ CPPFLAGS="$CPPFLAGS $CURSES_CFLAGS"
 LIBS="$LIBS $CURSES_LIBS"
 
 if test -z "$CURSES_CFLAGS" ; then
-	AC_CHECK_HEADER([curses.h],
+	AC_CHECK_HEADER([ncursesw/curses.h],
 		[],
 		[AC_MSG_ERROR([can't find curses headers])])
 fi
 
 if test -z "$CURSES_LIBS" ; then
-	AC_CHECK_LIB([curses], [stdscr],
-		[CURSES_LIBS=-lcurses],
+	LIBS="${LIBS} -lncursesw"
+	AC_TRY_LINK([#include <ncurses.h>],
+		[chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr();],
+		[CURSES_LIBS=-lncursesw],
 		[AC_MSG_ERROR([can't find curses libraries])])
 fi
 

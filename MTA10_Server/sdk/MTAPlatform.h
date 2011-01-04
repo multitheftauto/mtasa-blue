@@ -72,7 +72,7 @@ extern "C" bool g_bNoTopBar;
     #include <string.h>
     #include <string>
     #include <fcntl.h>
-    #include <curses.h>
+    #include <ncursesw/curses.h>
     #include <dlfcn.h>
     #include <sys/time.h>
     #include <sys/times.h>

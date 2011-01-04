@@ -33,7 +33,7 @@ class CServerImpl;
 #include "CThreadCommandQueue.h"
 
 #ifndef WIN32
-#include <curses.h>
+#include <ncursesw/curses.h>
 #endif
 
 #define SERVER_RESET_RETURN 500
