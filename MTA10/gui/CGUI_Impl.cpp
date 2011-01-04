@@ -670,7 +670,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                     EmptyClipboard ();
 
                     // Allocate the clipboard buffer and copy the data
-                    HGLOBAL hBuf = GlobalAlloc ( GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) );
+                    HGLOBAL hBuf = GlobalAlloc ( GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) + sizeof(wchar_t) );
                     wchar_t* buf = reinterpret_cast < wchar_t* > ( GlobalLock ( hBuf ) );
                     wcscpy ( buf , strUTF.c_str () );
                     GlobalUnlock ( hBuf );
