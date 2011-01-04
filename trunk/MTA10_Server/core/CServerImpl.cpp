@@ -525,7 +525,7 @@ void CServerImpl::ShowInfoTag ( char* szTag )
 
 void CServerImpl::HandleInput ( void )
 {
-    int iStdIn = 0;
+    wint_t iStdIn = 0;
 
     // Get the STDIN input
 #ifdef WIN32
@@ -534,8 +534,7 @@ void CServerImpl::HandleInput ( void )
         iStdIn = _getwch();
     }
 #else
-    iStdIn = _getwch();
-    if ( iStdIn == ERR)
+    if ( get_wch(&iStdIn) == ERR )
         iStdIn = 0;
 #endif
 
@@ -568,11 +567,19 @@ void CServerImpl::HandleInput ( void )
             if ( m_uiInputCount > 0 )
             {
                 // Check for the most important command: quit
+#ifdef WIN32
                 if ( !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("quit").c_str() ) || !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("exit").c_str() ) )
+#else
+                if ( !wcscasecmp ( m_szInputBuffer, ConvertToUTF8("quit").c_str() ) || !wcscasecmp ( m_szInputBuffer, ConvertToUTF8("exit").c_str() ) )
+#endif
                 {
                     m_bRequestedQuit = true;
                 }
+#ifdef WIN32
                 else if ( !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("reset").c_str() ) )
+#else
+                else if ( !wcscasecmp ( m_szInputBuffer, ConvertToUTF8("reset").c_str() ) )
+#endif
                 {
                     m_bRequestedReset = true;
                     m_bRequestedQuit = true;
@@ -678,6 +685,7 @@ void CServerImpl::HandleInput ( void )
             WCHAR wUNICODE[2] = { iStdIn, 0 };
             Printf ( "%s", ConvertToANSI(wUNICODE).c_str() );
 #else
+            wchar_t wUNICODE[2] = { iStdIn, 0 };
             if ( !g_bSilent )
                 wprintw ( m_wndInput, "%s", ConvertToANSI(wUNICODE).c_str() );
 #endif
