@@ -4399,17 +4399,29 @@ void CPacketHandler::Packet_DetonateSatchels ( NetBitStreamInterface& bitStream 
 void CPacketHandler::Packet_VoiceData ( NetBitStreamInterface& bitStream )
 {
     unsigned short usPacketSize;
-    if ( bitStream.Read ( usPacketSize ) )
-    {
-        char * pBuf = new char[usPacketSize];
-        if ( bitStream.Read ( pBuf, usPacketSize ) )
+    ElementID PlayerID;
+    if ( bitStream.ReadCompressed ( PlayerID ) )
+    {       
+        CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerID );
+        if ( pPlayer && bitStream.Read ( usPacketSize ) )
         {
-            if ( g_pClientGame->GetVoice() )
+            char * pBuf = new char[usPacketSize];
+            if ( bitStream.Read ( pBuf, usPacketSize ) )
             {
-                if ( g_pClientGame->GetVoice()->IsEnabled() )
+                if ( pPlayer->GetVoice() )
                 {
-                    g_pClientGame->GetVoice()->DecodeAndBuffer(pBuf, usPacketSize );
+                    //if ( pPlayer->GetVoice()->IsEnabled() )
+                    {
+                        pPlayer->GetVoice()->DecodeAndBuffer(pBuf, usPacketSize);
+                    }
                 }
+                /*if ( g_pClientGame->GetVoiceRecorder() )
+                {
+                    if ( g_pClientGame->GetVoiceRecorder() )
+                    {
+                        g_pClientGame->GetVoiceRecorder()->DecodeAndBuffer(pBuf, usPacketSize);
+                    }
+                }*/
             }
         }
     }

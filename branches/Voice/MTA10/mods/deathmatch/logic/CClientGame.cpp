@@ -213,7 +213,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_llLastTransgressionTime = 0;
 
     // MTA Voice
-    m_pVoice = new CVoice();
+    m_pVoiceRecorder = new CVoiceRecorder();
 
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
@@ -333,9 +333,8 @@ CClientGame::~CClientGame ( void )
     m_pTransferBox->Hide();
     m_pBigPacketTransferBox->Hide();
 
-    m_pVoice->DeInit();
-    delete m_pVoice;
-    m_pVoice = NULL;
+    delete m_pVoiceRecorder;
+    m_pVoiceRecorder = NULL;
 
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler ( NULL );
@@ -626,9 +625,9 @@ void CClientGame::DoPulsePreFrame ( void )
 
     if ( m_Status == CClientGame::STATUS_JOINED )
     {
-        if ( m_pVoice->IsEnabled() )
+        if ( m_pVoiceRecorder->IsEnabled() )
         {
-            m_pVoice->DoPulse();
+            m_pVoiceRecorder->DoPulse();
         }
     }
 }
@@ -5045,8 +5044,8 @@ bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
 
 void CClientGame::InitVoice( bool bEnabled, unsigned int uiServerSampleRate )
 {
-    if ( m_pVoice )
+    if ( m_pVoiceRecorder )
     {
-        m_pVoice -> Init ( bEnabled, uiServerSampleRate );
+        m_pVoiceRecorder -> Init ( bEnabled, uiServerSampleRate );
     }
 }

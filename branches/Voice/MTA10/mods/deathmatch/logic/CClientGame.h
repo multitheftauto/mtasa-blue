@@ -55,7 +55,7 @@
 #include "../../shared_logic/CClientGUIElement.h"
 #include "CVariableBuffer.h"
 #include "CLocalServer.h"
-#include "CVoice.h"
+#include "CVoiceRecorder.h"
 
 #ifdef MTA_DEBUG
     struct AddressInfo 
@@ -216,7 +216,7 @@ public:
 
     // Accessors
 
-    inline CVoice*                      GetVoice                        ( void )        { return m_pVoice; };
+    inline CVoiceRecorder*              GetVoiceRecorder                ( void )        { return m_pVoiceRecorder; };
     inline CClientManager*              GetManager                      ( void )        { return m_pManager; };
     inline CClientObjectManager*        GetObjectManager                ( void )        { return m_pObjectManager; };
     inline CClientPickupManager*        GetPickupManager                ( void )        { return m_pPickupManager; };
@@ -496,7 +496,7 @@ private:
 
     // Revised facilities
     CServer                             m_Server;
-    CVoice*                             m_pVoice;
+    CVoiceRecorder*                     m_pVoiceRecorder;
 
     CClientPlayer*                      m_pLocalPlayer;
     ElementID                           m_LocalID;

@@ -44,6 +44,8 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
 
     m_bNetworkDead = false;
 
+    m_voice = NULL;
+
     // If it's the local player, add the model
     if ( m_bIsLocalPlayer )
     {
@@ -57,8 +59,15 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     {
         // Enable weapon processing for players
         m_remoteDataStorage->SetProcessPlayerWeapon ( true );
-    }
 
+        // Enable voice playback for remote players
+        if ( true ) //If voice is enabled
+        {
+            //m_voice = new CClientPlayerVoice ( this, g_pClientGame->GetVoiceRecorder() );
+            //m_voice->Init();
+        }
+    }
+    m_voice = new CClientPlayerVoice ( this, g_pClientGame->GetVoiceRecorder() );
     // Set all our default stats
     m_pTeam = NULL;
 
@@ -105,6 +114,8 @@ CClientPlayer::~CClientPlayer ( void )
         delete m_pStatusIcon;
         m_pStatusIcon = NULL;
     }
+
+    delete m_voice;
 }
 
 

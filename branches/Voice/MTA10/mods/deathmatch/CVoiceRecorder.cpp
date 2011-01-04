@@ -1,7 +1,20 @@
-#include "StdInc.h"
-#include "CVoice.h"
+/*****************************************************************************
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        mods/deathmatch/logic/CVoiceRecorderRecorder.cpp
+*  PURPOSE:     Transfer box GUI
+*  DEVELOPERS:  Philip Farquharson <philip@philipfarquharson.co.uk>
+*               Talidan <>
+*
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
+*
+*****************************************************************************/
 
-CVoice::CVoice( void )
+#include "StdInc.h"
+#include "CVoiceRecorder.h"
+
+CVoiceRecorder::CVoiceRecorder( void )
 {
     m_bEnabled = false;
 
@@ -35,7 +48,7 @@ CVoice::CVoice( void )
     m_bCopiedOutgoingBufferToBufferedOutput = false;
 }
 
-CVoice::~CVoice( void )
+CVoiceRecorder::~CVoiceRecorder( void )
 {
     DeInit();
 }
@@ -43,18 +56,19 @@ CVoice::~CVoice( void )
 // TODO: Replace this with BASS
 static int PACallback( void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, PaTimestamp outTime, void *userData )
 {
-    CVoice* pVoice = static_cast < CVoice* > ( userData );
+    //CVoiceRecorder* pVoice = static_cast < CVoiceRecorder* > ( userData );
+    CClientPlayerVoice* pVoice = static_cast < CClientPlayerVoice* > ( userData );
 
     if ( pVoice->IsEnabled() )
     {
-        pVoice->SendFrame(inputBuffer);
-        pVoice->ReceiveFrame(outputBuffer);
+        g_pClientGame->GetVoiceRecorder()->SendFrame(inputBuffer);
+        //pVoice->ReceiveFrame(outputBuffer);
     }
 
     return 0;
 }
 
-void CVoice::Init( bool bEnabled, unsigned int uiServerSampleRate )
+void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate )
 {
     m_bEnabled = bEnabled;
 
@@ -90,7 +104,7 @@ void CVoice::Init( bool bEnabled, unsigned int uiServerSampleRate )
     m_pSpeexDecoderState = speex_decoder_init(speexMode);
 
     Pa_Initialize();
-    Pa_OpenStream( &m_pAudioStream, Pa_GetDefaultInputDeviceID(), 1, paInt16, NULL, Pa_GetDefaultOutputDeviceID(), 1, paInt16, NULL, m_SampleRate, iFramesPerBuffer, 0, 0, PACallback, this );
+    Pa_OpenStream( &m_pAudioStream, Pa_GetDefaultInputDeviceID(), 1, paInt16, NULL, Pa_GetDefaultOutputDeviceID(), 1, paInt16, NULL, m_SampleRate, iFramesPerBuffer, 0, 0, PACallback, g_pClientGame->GetLocalPlayer()->GetVoice() );
     Pa_StartStream( m_pAudioStream );
 
     // Initialize our outgoing buffer
@@ -108,7 +122,7 @@ void CVoice::Init( bool bEnabled, unsigned int uiServerSampleRate )
     m_uiIncomingWriteIndex=0;
 }
 
-void CVoice::DeInit( void )
+void CVoiceRecorder::DeInit( void )
 {
     if ( m_bEnabled )
     {
@@ -157,7 +171,7 @@ void CVoice::DeInit( void )
     }
 }
 
-const SpeexMode* CVoice::getSpeexModeFromSampleRate( void )
+const SpeexMode* CVoiceRecorder::getSpeexModeFromSampleRate( void )
 {
     switch (m_SampleRate)
     {
@@ -171,7 +185,7 @@ const SpeexMode* CVoice::getSpeexModeFromSampleRate( void )
     return &speex_wb_mode;
 }
 
-CVoice::eSampleRate CVoice::convertServerSampleRate( unsigned int uiServerSampleRate )
+CVoiceRecorder::eSampleRate CVoiceRecorder::convertServerSampleRate( unsigned int uiServerSampleRate )
 {
     switch ( uiServerSampleRate )
     {
@@ -185,7 +199,7 @@ CVoice::eSampleRate CVoice::convertServerSampleRate( unsigned int uiServerSample
     return SAMPLERATE_WIDEBAND;
 }
 
-void CVoice::UpdatePTTState( unsigned int uiState )
+void CVoiceRecorder::UpdatePTTState( unsigned int uiState )
 {
     if ( !m_bEnabled )
         return;
@@ -225,7 +239,7 @@ void CVoice::UpdatePTTState( unsigned int uiState )
     }
 }
 
-void CVoice::DoPulse( void )
+void CVoiceRecorder::DoPulse( void )
 {
     char *pInputBuffer;
     char bufTempOutput[2048];
@@ -284,9 +298,9 @@ void CVoice::DoPulse( void )
 
                 unsigned int uiBytesWritten = speex_bits_write(&speexBits, bufTempOutput, 2048);
 
-                #ifdef VOICE_DEBUG_LOCAL_PLAYBACK
-                DecodeAndBuffer(bufTempOutput, uiBytesWritten);
-                #endif
+                //#ifdef VOICE_DEBUG_LOCAL_PLAYBACK
+                g_pClientGame->GetLocalPlayer()->GetVoice()->DecodeAndBuffer(bufTempOutput, uiBytesWritten);
+                //#endif
 
                 NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
                 if ( pBitStream )
@@ -385,7 +399,7 @@ void CVoice::DoPulse( void )
     }
 }
 
-void CVoice::SendFrame( const void* inputBuffer )
+void CVoiceRecorder::SendFrame( const void* inputBuffer )
 {
     if ( m_VoiceState != VOICESTATE_AWAITING_INPUT && m_bEnabled && inputBuffer )
     {
@@ -414,7 +428,7 @@ void CVoice::SendFrame( const void* inputBuffer )
     }
 }
 
-void CVoice::ReceiveFrame( void* outputBuffer )
+void CVoiceRecorder::ReceiveFrame( void* outputBuffer )
 {
     // Cast our output buffer to short
     short *pOutBuffer = (short*)outputBuffer;
@@ -434,7 +448,7 @@ void CVoice::ReceiveFrame( void* outputBuffer )
     m_bZeroBufferedOutput=true;
 }
 
-void CVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten)
+void CVoiceRecorder::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten )
 {
     if ( m_bEnabled )
     {

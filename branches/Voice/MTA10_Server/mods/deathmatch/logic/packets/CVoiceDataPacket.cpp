@@ -69,6 +69,9 @@ bool CVoiceDataPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     if ( m_usActualDataLength )
     {
+            // Write the source player
+            ElementID ID = m_pSourceElement->GetID();
+            BitStream.WriteCompressed ( ID );
             // Write the length as an unsigned short and then write the string
             BitStream.Write ( m_usActualDataLength );
             BitStream.Write ( reinterpret_cast < char * > ( m_pBuffer ), m_usActualDataLength );

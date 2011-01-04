@@ -736,7 +736,7 @@ void COMMAND_ShowSyncData ( const char* szCmdLine )
 
 void COMMAND_VoicePushToTalk ( const char* szCmdLine)
 {
-    g_pClientGame->GetVoice()-> UpdatePTTState ( atoi(szCmdLine) );
+    g_pClientGame->GetVoiceRecorder()-> UpdatePTTState ( atoi(szCmdLine) );
 }
 
 #if defined (MTA_DEBUG) || defined (MTA_BETA)
