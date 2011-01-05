@@ -1,4 +1,6 @@
 ZIPDIR=$(srcdir)/../../../vendor/zip/
+LUADIR=$(srcdir)/../../../vendor/lua
+LUABDIR=$(builddir)/../../../vendor/lua
 
 INCLUDES += -I$(srcdir)/logic/
 INCLUDES += -I$(srcdir)/../../sdk/
@@ -11,6 +13,8 @@ INCLUDES += -I$(srcdir)/../../../vendor/bob_withers/
 INCLUDES += -I$(srcdir)/../../../vendor/bochs/
 INCLUDES += -I$(srcdir)/../../../Shared/animation/
 INCLUDES += -I$(ZIPDIR)/
+INCLUDES += -I$(LUADIR)/src
+INCLUDES += -I$(LUABDIR)/src
 INCLUDES += $(SPARSEHASH_CFLAGS)
 INCLUDES += $(SQLITE3_CFLAGS)
 
@@ -49,7 +53,7 @@ deathmatch_la_SOURCES = \
 deathmatch_la_LIBADD = \
 	../../sdk/libplatform.la \
 	$(top_builddir)/vendor/ehs/libehs.la \
-	$(top_builddir)/vendor/lua/src/liblua.la \
+	$(LUABDIR)/src/liblua.la \
 	$(top_builddir)/vendor/json-c/libjson.la \
 	$(SPARSEHASH_LIBS) \
 	$(SQLITE3_LIBS)
