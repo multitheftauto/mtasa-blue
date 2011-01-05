@@ -18,9 +18,9 @@
 
 extern "C"
 {
-    #include "include/lua.h"
-    #include "include/lualib.h"
-    #include "include/lauxlib.h"
+    #include <lua.h>
+    #include <lualib.h>
+    #include <lauxlib.h>
 }
 
 #ifdef WIN32
