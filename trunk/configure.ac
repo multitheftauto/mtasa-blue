@@ -60,9 +60,9 @@ AC_ARG_ENABLE([system-pcre],
 	                [don't use system PCRE])])
 
 AC_DEFUN([USE_BUNDLED_PCRE], [
+	HAVE_BUNDLED_PCRE=yes
 	PCRE_CFLAGS="-I\$(top_builddir)/vendor/pcre"
 	PCRE_LIBS="\$(top_builddir)/vendor/pcre/libpcre.la"
-	# probably include a check if it was already built
 ])
 
 if test "x$enable_system_pcre" != "xno" ; then
@@ -214,6 +214,10 @@ AC_CONFIG_SUBDIRS([vendor/json-c])
 
 if test "x$HAVE_BUNDLED_SPARSEHASH" = "xyes" ; then
 	AC_CONFIG_SUBDIRS([vendor/sparsehash/current])
+fi
+
+if test "x$HAVE_BUNDLED_PCRE" = "xyes" ; then
+	AC_CONFIG_SUBDIRS([vendor/pcre])
 fi
 
 AC_ARG_ENABLE([enable-ircbots],
