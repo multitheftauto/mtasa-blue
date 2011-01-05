@@ -214,9 +214,17 @@ if test "x$HAVE_BUNDLED_SPARSEHASH" = "xyes" ; then
 	AC_CONFIG_SUBDIRS([vendor/sparsehash/current])
 fi
 
+AC_ARG_ENABLE([enable-ircbots],
+	[AS_HELP_STRING([--enable-ircbots], [build the irc bots])])
+
+if test "x$enable_ircbots" = "xyes" ; then
+	AC_CONFIG_SUBDIRS([irc/mantisbot irc/wikibot irc/rsl])
+fi
+
 # Generate makefiles
 AC_CONFIG_FILES([
 	Makefile
+	irc/Makefile
 	vendor/Makefile
 	vendor/tinyxml/Makefile
 	vendor/pme/Makefile
