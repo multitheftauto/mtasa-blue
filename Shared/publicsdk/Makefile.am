@@ -12,7 +12,8 @@ libml_base_la_SOURCES = \
 # the windows project uses the internal LUA, why?
 
 libml_base_la_CXXFLAGS = \
-	-I$(top_srcdir)/vendor/lua/src/
+	-I$(top_srcdir)/vendor/lua/src/ \
+	-I$(top_builddir)/vendor/lua/src/
 
 libml_base_la_LIBADD = \
 	$(top_builddir)/vendor/lua/src/liblua.la
