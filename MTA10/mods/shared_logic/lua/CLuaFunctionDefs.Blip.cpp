@@ -309,6 +309,28 @@ int CLuaFunctionDefs::GetBlipOrdering ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetBlipVisibleDistance ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CClientRadarMarker* pMarker = lua_toblip ( luaVM, 1 );
+        if ( pMarker )
+        {
+            float fVisibleDistance = pMarker->GetVisibleDistance ();
+            lua_pushnumber ( luaVM, fVisibleDistance );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getBlipVisibleDistance", "blip", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getBlipVisibleDistance" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::SetBlipIcon ( lua_State* luaVM )
 {
     int iArgument1 = lua_type ( luaVM, 1 );
@@ -426,6 +448,35 @@ int CLuaFunctionDefs::SetBlipOrdering ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setBlipOrdering" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetBlipVisibleDistance ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
+        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+    {
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            float fVisibleDistance = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+
+            if ( CStaticFunctionDefinitions::SetBlipVisibleDistance ( *pEntity, fVisibleDistance ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setBlipVisibleDistance", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setBlipVisibleDistance" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

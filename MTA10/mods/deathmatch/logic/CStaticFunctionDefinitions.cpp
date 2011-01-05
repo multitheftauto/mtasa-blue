@@ -3466,6 +3466,22 @@ bool CStaticFunctionDefinitions::SetBlipOrdering ( CClientEntity& Entity, short 
 }
 
 
+bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CClientEntity& Entity, float fVisibleDistance )
+{
+    RUN_CHILDREN SetBlipVisibleDistance ( **iter, fVisibleDistance );
+
+    if ( IS_RADARMARKER ( &Entity ) )
+    {
+        CClientRadarMarker& Marker = static_cast < CClientRadarMarker& > ( Entity );
+
+        Marker.SetVisibleDistance ( fVisibleDistance );
+        return true;
+    }
+
+    return false;
+}
+
+
 CClientMarker* CStaticFunctionDefinitions::CreateMarker ( CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color )
 {
     assert ( szType );

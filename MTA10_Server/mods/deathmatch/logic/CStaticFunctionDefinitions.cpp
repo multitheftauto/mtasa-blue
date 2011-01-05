@@ -5482,6 +5482,15 @@ bool CStaticFunctionDefinitions::GetBlipColor ( CBlip* pBlip, SColor& outColor )
 }
 
 
+bool CStaticFunctionDefinitions::GetBlipVisibleDistance ( CBlip* pBlip, float& fVisibleDistance )
+{
+    assert ( pBlip );
+
+    fVisibleDistance = pBlip->m_fVisibleDistance;
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetBlipOrdering ( CBlip* pBlip, short& sOrdering )
 {
     assert ( pBlip );
@@ -5508,8 +5517,12 @@ bool CStaticFunctionDefinitions::SetBlipIcon ( CElement* pElement, unsigned char
                 pBlip->m_ucIcon = ucIcon;
 
                 CBitStream bitStream;
-                bitStream.pBitStream->Write ( pBlip->GetID () );
-                bitStream.pBitStream->Write ( ucIcon );
+                bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
+
+                SBlipIconSync icon;
+                icon.data.ucIcon = ucIcon;
+                bitStream.pBitStream->Write ( &icon );
+
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_ICON, *bitStream.pBitStream ) );
 
                 return true;
@@ -5536,8 +5549,12 @@ bool CStaticFunctionDefinitions::SetBlipSize ( CElement* pElement, unsigned char
                 pBlip->m_ucSize = ucSize;
 
                 CBitStream bitStream;
-                bitStream.pBitStream->Write ( pBlip->GetID () );
-                bitStream.pBitStream->Write ( ucSize );
+                bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
+
+                SBlipSizeSync size;
+                size.data.ucSize = ucSize;
+                bitStream.pBitStream->Write ( &size );
+
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_SIZE, *bitStream.pBitStream ) );
 
                 return true;
@@ -5564,11 +5581,11 @@ bool CStaticFunctionDefinitions::SetBlipColor ( CElement* pElement, const SColor
             pBlip->SetColor ( color );
 
             CBitStream bitStream;
-            bitStream.pBitStream->Write ( pBlip->GetID () );
-            bitStream.pBitStream->Write ( color.R );
-            bitStream.pBitStream->Write ( color.G );
-            bitStream.pBitStream->Write ( color.B );
-            bitStream.pBitStream->Write ( color.A );
+            bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
+
+            SColorSync colorSync ( color );
+            bitStream.pBitStream->Write ( &colorSync );
+
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_COLOR, *bitStream.pBitStream ) );
 
             return true;
@@ -5592,9 +5609,38 @@ bool CStaticFunctionDefinitions::SetBlipOrdering ( CElement* pElement, short sOr
             pBlip->m_sOrdering = sOrdering;
 
             CBitStream bitStream;
-            bitStream.pBitStream->Write ( pBlip->GetID () );
+            bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
             bitStream.pBitStream->Write ( sOrdering );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_ORDERING, *bitStream.pBitStream ) );
+
+            return true;
+        }
+    }
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CElement* pElement, float fVisibleDistance )
+{
+    RUN_CHILDREN SetBlipVisibleDistance ( *iter, fVisibleDistance );
+
+    if ( IS_BLIP ( pElement ) )
+    {
+        // Grab the blip and set the new visible distance
+        CBlip* pBlip = static_cast < CBlip* > ( pElement );
+        if ( pBlip->m_fVisibleDistance != fVisibleDistance )
+        {
+            pBlip->m_fVisibleDistance = fVisibleDistance;
+
+            CBitStream bitStream;
+            bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
+
+            SFloatAsBitsSync<20> visibleDistance ( 0.0, 99999.0, true );
+            visibleDistance.data.fValue = fVisibleDistance;
+            bitStream.pBitStream->Write ( &visibleDistance );
+
+            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_VISIBLE_DISTANCE, *bitStream.pBitStream ) );
 
             return true;
         }

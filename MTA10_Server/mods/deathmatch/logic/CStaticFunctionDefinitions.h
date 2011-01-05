@@ -322,12 +322,14 @@ public:
     static bool                 GetBlipSize                         ( CBlip* pBlip, unsigned char& ucSize );
     static bool                 GetBlipColor                        ( CBlip* pBlip, SColor& outColor );
     static bool                 GetBlipOrdering                     ( CBlip* pBlip, short& sOrdering );
+    static bool                 GetBlipVisibleDistance              ( CBlip* pBlip, float& fVisibleDistance );
 
     // Blip set functions
     static bool                 SetBlipIcon                         ( CElement* pElement, unsigned char ucIcon );
     static bool                 SetBlipSize                         ( CElement* pElement, unsigned char ucSize );
     static bool                 SetBlipColor                        ( CElement* pElement, const SColor color );
     static bool                 SetBlipOrdering                     ( CElement* pElement, short sOrdering );
+    static bool                 SetBlipVisibleDistance              ( CElement* pElement, float fVisibleDistance );
 
     // Object create/destroy functions
     static CObject*             CreateObject                        ( CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );
