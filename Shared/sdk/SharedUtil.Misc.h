@@ -581,6 +581,8 @@ namespace SharedUtil
         // list only
         typename LIST_TYPE ::iterator               begin ( void )          { return m_List.begin (); }
         typename LIST_TYPE ::iterator               end ( void )            { return m_List.end (); }
+        typename LIST_TYPE ::reverse_iterator       rbegin ( void )         { return m_List.rbegin (); }
+        typename LIST_TYPE ::reverse_iterator       rend ( void )           { return m_List.rend (); }
         uint                                        size ( void ) const     { return m_List.size (); }
         bool                                        empty ( void ) const    { return m_List.empty (); }
         const T&                                    back ( void ) const     { return m_List.back (); }
