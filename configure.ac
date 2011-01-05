@@ -52,6 +52,8 @@ AC_ARG_ENABLE(debug,
 
 # Checks for libraries.
 
+PKG_PROG_PKG_CONFIG
+
 # pcre (for bundled pme.h)
 AC_ARG_ENABLE([system-pcre], 
 	[AS_HELP_STRING([--disable-system-pcre],
