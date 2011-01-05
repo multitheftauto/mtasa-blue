@@ -37,43 +37,44 @@ CHandlingManager::CHandlingManager ( void )
     }
     
     // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
-    
+    // http://projectcerbera.com/gta/sa/tutorials/handling
+
     m_HandlingNames["mass"] =                           HANDLING_MASS;                          // works
     m_HandlingNames["turnMass"] =                       HANDLING_TURNMASS;                      // works
-    m_HandlingNames["dragCoeff"] =                      HANDLING_DRAGCOEFF;                     // doesn't seem to work
+    m_HandlingNames["dragCoeff"] =                      HANDLING_DRAGCOEFF;                     // works
     m_HandlingNames["centerOfMass"] =                   HANDLING_CENTEROFMASS;                  // works but its model based
-    m_HandlingNames["percentSubmerged"] =               HANDLING_PERCENTSUBMERGED;              // LSOD when driving into water and its model based
+    m_HandlingNames["percentSubmerged"] =               HANDLING_PERCENTSUBMERGED;              // works
     m_HandlingNames["tractionMultiplier"] =             HANDLING_TRACTIONMULTIPLIER;            // works
-    m_HandlingNames["driveType"] =                      HANDLING_DRIVETYPE;                     // doesn't seem to work
-    m_HandlingNames["engineType"] =                     HANDLING_ENGINETYPE;                    // doesn't seem to work
-    m_HandlingNames["numberOfGears"] =                  HANDLING_NUMOFGEARS;                    // LSOD when setting but works with lower values
+    m_HandlingNames["driveType"] =                      HANDLING_DRIVETYPE;                     // works
+    m_HandlingNames["engineType"] =                     HANDLING_ENGINETYPE;                    // what is this supposed to do?*
+    m_HandlingNames["numberOfGears"] =                  HANDLING_NUMOFGEARS;                    // works
     m_HandlingNames["engineAcceleration"] =             HANDLING_ENGINEACCELERATION;            // works
     m_HandlingNames["engineInertia"] =                  HANDLING_ENGINEINERTIA;                 // works
     m_HandlingNames["maxVelocity"] =                    HANDLING_MAXVELOCITY;                   // works
-    m_HandlingNames["brakeDeceleration"] =              HANDLING_BRAKEDECELERATION;             // works with lower values
-    m_HandlingNames["brakeBias"] =                      HANDLING_BRAKEBIAS;                     // doesn't seem to work
-    m_HandlingNames["ABS"] =                            HANDLING_ABS;                           // doesn't seem to work
+    m_HandlingNames["brakeDeceleration"] =              HANDLING_BRAKEDECELERATION;             // works with lower values - needs cap
+    m_HandlingNames["brakeBias"] =                      HANDLING_BRAKEBIAS;                     // works
+    m_HandlingNames["ABS"] =                            HANDLING_ABS;                           // not sure*
     m_HandlingNames["steeringLock"] =                   HANDLING_STEERINGLOCK;                  // works
     m_HandlingNames["tractionLoss"] =                   HANDLING_TRACTIONLOSS;                  // works
     m_HandlingNames["tractionBias"] =                   HANDLING_TRACTIONBIAS;                  // works
     m_HandlingNames["suspensionForceLevel"] =           HANDLING_SUSPENSION_FORCELEVEL;         // works
-    m_HandlingNames["suspensionDamping"] =              HANDLING_SUSPENSION_DAMPING;            // doesn't seem to work
-    m_HandlingNames["suspensionHighSpeedDamping"] =     HANDLING_SUSPENSION_HIGHSPEEDDAMPING;   // doesn't seem to work
-    m_HandlingNames["suspensionUpperLimit"] =           HANDLING_SUSPENSION_UPPER_LIMIT;        // doesn't seem to work
-    m_HandlingNames["suspensionLowerLimit"] =           HANDLING_SUSPENSION_LOWER_LIMIT;        // doesn't seem to work
+    m_HandlingNames["suspensionDamping"] =              HANDLING_SUSPENSION_DAMPING;            // doesn't seem to work*
+    m_HandlingNames["suspensionHighSpeedDamping"] =     HANDLING_SUSPENSION_HIGHSPEEDDAMPING;   // doesn't seem to work*
+    m_HandlingNames["suspensionUpperLimit"] =           HANDLING_SUSPENSION_UPPER_LIMIT;        // doesn't seem to work*
+    m_HandlingNames["suspensionLowerLimit"] =           HANDLING_SUSPENSION_LOWER_LIMIT;        // doesn't seem to work*
     m_HandlingNames["suspensionFrontRearBias"] =        HANDLING_SUSPENSION_FRONTREARBIAS;      // works
-    m_HandlingNames["suspensionAntiDiveMultiplier"] =   HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER; // doesn't seem to work
+    m_HandlingNames["suspensionAntiDiveMultiplier"] =   HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER; // works
     m_HandlingNames["collisionDamageMultiplier"] =      HANDLING_COLLISIONDAMAGEMULTIPLIER;     // works
-    m_HandlingNames["seatOffsetDistance"] =             HANDLING_SEATOFFSETDISTANCE;            // doesn't seem to work
-    m_HandlingNames["monetary"] =                       HANDLING_MONETARY;                      // doesn't seem to work
+    m_HandlingNames["seatOffsetDistance"] =             HANDLING_SEATOFFSETDISTANCE;            // works
+    m_HandlingNames["monetary"] =                       HANDLING_MONETARY;                      // doesn't seem to work*
     m_HandlingNames["handlingFlags"] =                  HANDLING_HANDLINGFLAGS;                 // not tested but we need another way to set these values in lua cause it has no bit functions
     m_HandlingNames["modelFlags"] =                     HANDLING_MODELFLAGS;                    // not tested but we need another way to set these values in lua cause it has no bit functions
-    m_HandlingNames["headLight"] =                      HANDLING_HEADLIGHT;                     // doesn't seem to work
-    m_HandlingNames["tailLight"] =                      HANDLING_TAILLIGHT;                     // doesn't seem to work
-    m_HandlingNames["animGroup"] =                      HANDLING_ANIMGROUP;                     // doesn't seem to work
+    m_HandlingNames["headLight"] =                      HANDLING_HEADLIGHT;                     // doesn't seem to work*
+    m_HandlingNames["tailLight"] =                      HANDLING_TAILLIGHT;                     // doesn't seem to work*
+    m_HandlingNames["animGroup"] =                      HANDLING_ANIMGROUP;                     // needs more testing - tried and player couldn't find the door model thing? *
 
 }
-
+//* needs testing by someone who knows more about handling
 
 CHandlingManager::~CHandlingManager ( void )
 {
