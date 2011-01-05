@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories=".;shipped_for_mta_win32"
 				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=2"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -115,7 +115,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories=".;shipped_for_mta_win32"
 				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -193,7 +193,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories=".;shipped_for_mta_win32"
 				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -355,7 +355,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\config.h"
+				RelativePath=".\shipped_for_mta_win32\config.h"
 				>
 			</File>
 			<File
