@@ -36,7 +36,7 @@
 #include "commands.h"
 #include "configuration.h"
 #include "keys.h"
-#include "tinyxml.h"
+#include <tinyxml.h>
 
 // HTTP download buffer size
 #define HTTP_BUFFER_SIZE   1024
