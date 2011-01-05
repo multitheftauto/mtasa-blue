@@ -219,6 +219,7 @@ fi
 if test "x$HAVE_BUNDLED_PCRE" = "xyes" ; then
 	AC_CONFIG_SUBDIRS([vendor/pcre])
 fi
+AM_CONDITIONAL([WANT_PCRE], [test "x$HAVE_BUNDLED_PCRE" != "xyes"])
 
 AC_ARG_ENABLE([enable-ircbots],
 	[AS_HELP_STRING([--enable-ircbots], [build the irc bots])])
