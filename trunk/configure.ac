@@ -221,6 +221,8 @@ if test "x$enable_ircbots" = "xyes" ; then
 	AC_CONFIG_SUBDIRS([irc/mantisbot irc/wikibot irc/rsl])
 fi
 
+AM_CONDITIONAL([WANT_IRCBOTS], [test "x$enable_ircbots" = "xyes"])
+
 # Generate makefiles
 AC_CONFIG_FILES([
 	Makefile
