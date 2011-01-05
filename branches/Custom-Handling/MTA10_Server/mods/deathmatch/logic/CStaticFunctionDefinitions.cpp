@@ -4243,6 +4243,27 @@ bool CStaticFunctionDefinitions::GetVehicleHandling ( CVehicle* pVehicle, eHandl
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleHandling ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue )
+{
+    assert ( pVehicle );
+
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    if ( GetEntryHandling ( pEntry, eProperty, uiValue ) )
+        return true;
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleHandling ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue )
+{
+    assert ( pVehicle );
+
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+    if ( GetEntryHandling ( pEntry, eProperty, ucValue ) )
+        return true;
+
+    return false;
+}
 
 bool CStaticFunctionDefinitions::GetModelHandling ( eVehicleTypes eModel, eHandlingProperty eProperty, CVector& vecValue, bool origin )
 {
@@ -4303,6 +4324,17 @@ bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandl
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandlingProperty eProperty, CVector vecValue )
+{
+    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData ( eModel );
+
+    if ( pEntry )
+    {
+        if ( SetEntryHandling ( pEntry, eProperty, vecValue ) )
+            return true;
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandlingProperty eProperty, std::string strValue )
 {
@@ -4317,15 +4349,27 @@ bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandl
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandlingProperty eProperty, CVector vecValue )
+bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char ucValue )
 {
     CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData ( eModel );
-
     if ( pEntry )
     {
-        if ( SetEntryHandling ( pEntry, eProperty, vecValue ) )
+        if ( SetEntryHandling ( pEntry, eProperty, ucValue ) )
             return true;
     }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned int uiValue )
+{
+    CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData ( eModel );
+    if ( pEntry )
+    {
+        if ( SetEntryHandling ( pEntry, eProperty, uiValue ) )
+            return true;
+    }
+
     return false;
 }
 
@@ -4399,24 +4443,6 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_SEATOFFSETDISTANCE:
                 fValue = pEntry->GetSeatOffsetDistance ();
                 break;
-            case HANDLING_PERCENTSUBMERGED: // unsigned int
-                fValue = (float)pEntry->GetPercentSubmerged ();
-                break;
-            case HANDLING_MONETARY:
-                fValue = (float)pEntry->GetMonetary ();
-                break;
-            case HANDLING_HANDLINGFLAGS:
-                fValue = (float)pEntry->GetHandlingFlags ();
-                break;
-            case HANDLING_MODELFLAGS:
-                fValue = (float)pEntry->GetModelFlags ();
-                break;
-            case HANDLING_NUMOFGEARS: // unsigned char
-                fValue = (float)pEntry->GetNumberOfGears ();
-                break;
-            case HANDLING_ANIMGROUP:
-                fValue = (float)pEntry->GetAnimGroup ();
-                break;
             case HANDLING_ABS: // bool
                 fValue = (float)(pEntry->GetABS () ? 1 : 0);
                 break;
@@ -4427,6 +4453,49 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int &uiValue )
+{
+    if ( pEntry )
+    {
+        switch ( eProperty )
+        {
+            case HANDLING_PERCENTSUBMERGED: // unsigned int
+                uiValue = pEntry->GetPercentSubmerged ();
+                break;
+            case HANDLING_MONETARY:
+                uiValue = pEntry->GetMonetary ();
+                break;
+            case HANDLING_HANDLINGFLAGS:
+                uiValue = pEntry->GetHandlingFlags ();
+                break;
+            case HANDLING_MODELFLAGS:
+                uiValue = pEntry->GetModelFlags ();
+                break;
+            default:
+                return false;
+        }
+    }
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char &ucValue )
+{
+    if ( pEntry )
+    {
+        switch ( eProperty )
+        {
+            case HANDLING_NUMOFGEARS:
+                ucValue = pEntry->GetNumberOfGears ();
+                break;
+            case HANDLING_ANIMGROUP:
+                ucValue = pEntry->GetAnimGroup ();
+                break;
+            default:
+                return false;
+        }
+    }
+    return true;
+}
 
 bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue )
 {
@@ -4500,6 +4569,49 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int uiValue )
+{
+    if ( pEntry )
+    {
+        switch ( eProperty )
+        {
+            case HANDLING_PERCENTSUBMERGED:
+                pEntry->SetPercentSubmerged ( uiValue );
+                break;
+            case HANDLING_MONETARY:
+                pEntry->SetMonetary ( uiValue );
+                break;
+            case HANDLING_HANDLINGFLAGS:
+                pEntry->SetHandlingFlags ( uiValue );
+                break;
+            case HANDLING_MODELFLAGS:
+                pEntry->SetModelFlags ( uiValue );
+                break;
+            default:
+                return false;
+        }
+    }
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char ucValue )
+{
+    if ( pEntry )
+    {
+        switch ( eProperty )
+        {
+            case HANDLING_NUMOFGEARS:
+                pEntry->SetNumberOfGears ( ucValue );
+                break;
+            case HANDLING_ANIMGROUP:
+                pEntry->SetAnimGroup ( ucValue );
+                break;
+            default:
+                return false;
+        }
+    }
+    return true;
+}
 
 bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float fValue )
 {
@@ -4569,24 +4681,6 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
                 break;
             case HANDLING_SEATOFFSETDISTANCE:
                 pEntry->SetSeatOffsetDistance ( fValue );
-                break;
-            case HANDLING_PERCENTSUBMERGED:
-                pEntry->SetPercentSubmerged ( (unsigned int)fValue );
-                break;
-            case HANDLING_MONETARY:
-                pEntry->SetMonetary ( (unsigned int)fValue );
-                break;
-            case HANDLING_HANDLINGFLAGS:
-                pEntry->SetHandlingFlags ( (unsigned int)fValue );
-                break;
-            case HANDLING_MODELFLAGS:
-                pEntry->SetModelFlags ( (unsigned int)fValue );
-                break;
-            case HANDLING_NUMOFGEARS:
-                pEntry->SetNumberOfGears ( (unsigned char)fValue );
-                break;
-            case HANDLING_ANIMGROUP:
-                pEntry->SetAnimGroup ( (unsigned char)fValue );
                 break;
             case HANDLING_ABS:
                 pEntry->SetABS ( ( fValue > 0.0f ) ? true : false );
@@ -5691,6 +5785,47 @@ bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CVehicle* pVehicle, 
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
     return true;
 }*/
+bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned char ucValue )
+{
+    assert ( pVehicle );
+    
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+
+    if ( pEntry )
+    {
+        if ( SetEntryHandling ( pEntry, eProperty, ucValue ) )
+        {
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( pVehicle->GetID () );
+            BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
+            BitStream.pBitStream->Write ( ucValue );
+            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned int uiValue )
+{
+    assert ( pVehicle );
+    
+    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+
+    if ( pEntry )
+    {
+        if ( SetEntryHandling ( pEntry, eProperty, uiValue ) )
+        {
+            CBitStream BitStream;
+            BitStream.pBitStream->Write ( pVehicle->GetID () );
+            BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
+            BitStream.pBitStream->Write ( uiValue );
+            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+            return true;
+        }
+    }
+    return false;
+}
 
 bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandlingProperty eProperty, float fValue )
 {

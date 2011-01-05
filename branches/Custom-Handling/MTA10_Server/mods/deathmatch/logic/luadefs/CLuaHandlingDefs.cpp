@@ -2762,17 +2762,43 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                             case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
                             case HANDLING_COLLISIONDAMAGEMULTIPLIER:
                             case HANDLING_SEATOFFSETDISTANCE:
+                                {
+                                   if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+                                    {
+                                        float fValue = (float)lua_tonumber ( luaVM, 3 );
+                                        if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, fValue ) )
+                                        {
+                                            lua_pushboolean ( luaVM, true );
+                                            return 1;
+                                        }
+                                    }
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                    break;
+                                }
                             case HANDLING_PERCENTSUBMERGED: // unsigned int
                             case HANDLING_MONETARY:
                             case HANDLING_HANDLINGFLAGS:
                             case HANDLING_MODELFLAGS:
+                                {
+                                    if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+                                    {
+                                        unsigned int uiValue = (unsigned int)lua_tonumber ( luaVM, 3 );
+                                        if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, uiValue ) )
+                                        {
+                                            lua_pushboolean ( luaVM, true );
+                                            return 1;
+                                        }
+                                    }
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
+                                    break;
+                                }
                             case HANDLING_NUMOFGEARS:
                             case HANDLING_ANIMGROUP:
                                 {
                                     if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
                                     {
-                                        float fValue = (float)lua_tonumber ( luaVM, 3 );
-                                        if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, fValue ) )
+                                        unsigned char ucValue = (unsigned char)lua_tonumber ( luaVM, 3 );
+                                        if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, ucValue ) )
                                         {
                                             lua_pushboolean ( luaVM, true );
                                             return 1;
