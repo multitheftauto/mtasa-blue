@@ -1,2 +1,2 @@
-SUBDIRS = tinyxml pme ehs json-c lua
+SUBDIRS = tinyxml pme ehs json-c lua sparsehash/current
 

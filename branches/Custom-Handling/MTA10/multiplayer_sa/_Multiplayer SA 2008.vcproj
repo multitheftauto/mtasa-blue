@@ -50,6 +50,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;MULTIPLAYERSA_EXPORTS;COMPILE_FOR_SA;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="true"
@@ -79,7 +80,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas\mta\multiplayer_SA_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.1\mta\multiplayer_SA_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -179,7 +180,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="C:\Program Files\MTA San Andreas\MTA\multiplayer_sa.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.1\MTA\multiplayer_sa.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"

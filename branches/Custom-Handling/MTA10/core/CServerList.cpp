@@ -12,6 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CServerBrowser.MasterServerManager.h"
 
 using namespace std;
 
@@ -36,41 +37,95 @@ CServerList::~CServerList ( void )
 
 void CServerList::Clear ( void )
 {
+#if 1
     // Clear all entries
     for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ )
         delete *i;
     m_Servers.clear ();
+#else
+    for ( std::list<CServerListItem*>::iterator i = m_Servers.begin (); i != m_Servers.end (); i++ )
+        (*i)->ResetForRefresh ();
+#endif
     m_nScanned = 0;
     m_nSkipped = 0;
     m_iRevision++;
+    m_llLastTickCount = 0;
 }
 
 
 void CServerList::Pulse ( void )
 {
-    unsigned int n = m_Servers.size ();
+    // Get QueriesPerSecond setting
+    int iQueriesPerSecond = 50;
+    int iVar;
+    CVARS_GET ( "browser_speed", iVar );
+    if ( iVar == 0 ) iQueriesPerSecond = 4;
+    else if ( iVar == 1 ) iQueriesPerSecond = 10;
+    else if ( iVar == 2 ) iQueriesPerSecond = 50;
+
+    long long llTickCount = GetTickCount64_ ();
+    // Ensure m_llLastTickCount is initialized
+    m_llLastTickCount = m_llLastTickCount ? m_llLastTickCount : llTickCount;
+    // Ensure m_llLastTickCount is in range
+    m_llLastTickCount = Clamp ( llTickCount - 1000, m_llLastTickCount, llTickCount );
+
+    // Calc number of queries this pulse
+    int iTicksPerQuery = 1000 / Max ( 1, iQueriesPerSecond );
+    int iDeltaTicks = llTickCount - m_llLastTickCount;
+    int iNumQueries = iDeltaTicks / Max ( 1, iTicksPerQuery );
+    iNumQueries = Clamp ( 0, iNumQueries, SERVER_LIST_QUERIES_PER_PULSE );
+    int iNumTicksUsed = iNumQueries * iTicksPerQuery;
+    m_llLastTickCount += iNumTicksUsed;
+
     unsigned int uiQueriesSent = 0;
+    unsigned int uiQueriesResent = 0;
     unsigned int uiRepliesParsed = 0;
     unsigned int uiNoReplies = 0;
+    unsigned int uiActiveServers = 0;
+
+    // If a query is going to be done this pass, try to find high priority items first
+    if ( iNumQueries > 0 )
+    {
+        std::vector < SAddressPort > endpointList;
+        CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->GetVisibleEndPointList ( endpointList );
+
+        for ( std::vector < SAddressPort >::iterator iter = endpointList.begin (); iter != endpointList.end (); ++iter )
+        {
+            CServerListItem* pServer = m_Servers.Find ( (in_addr&)iter->m_ulIp, iter->m_usPort+123 );
+            if ( pServer && pServer->WaitingToSendQuery () )
+            {
+                std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries );
+                assert ( strResult == "SentQuery" );
+                uiQueriesSent++;
+                if ( (int)uiQueriesSent >= iNumQueries )
+                    break;
+            }
+        }
+    }
 
     // Scan all servers in our list, and keep the value of scanned servers
-    for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ ) {
+    for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ )
+    {
         CServerListItem * pServer = *i;
-        std::string strResult = pServer->Pulse ();
+        uint uiPrevRevision = pServer->uiRevision;
+        std::string strResult = pServer->Pulse ( (int)( uiQueriesSent /*+ uiQueriesResent*/ ) < iNumQueries );
+        if ( uiPrevRevision != pServer->uiRevision )
+            m_bUpdated |= true;         // Flag GUI update
         if ( strResult == "SentQuery" )
             uiQueriesSent++;
+        else
+        if ( strResult == "ResentQuery" )
+            uiQueriesResent++;
         else
         if ( strResult == "ParsedQuery" )
             uiRepliesParsed++;
         else
         if ( strResult == "NoReply" )
             uiNoReplies++;
-           
-        if ( uiQueriesSent >= SERVER_LIST_QUERIES_PER_PULSE ) break;
-    }
 
-    // If we queried any new servers, we should toggle the GUI update flag
-    m_bUpdated = m_bUpdated || ( uiRepliesParsed > 0 ) || ( uiNoReplies > 0 );
+        if ( pServer->nMaxPlayers && !pServer->bMaybeOffline && !pServer->MaybeWontRespond () )
+            uiActiveServers++;
+    }
 
     // Check whether we are done scanning
     std::stringstream ss;
@@ -78,46 +133,38 @@ void CServerList::Pulse ( void )
     // Store the new number of scanned servers
     m_nScanned += uiRepliesParsed;
     m_nSkipped += uiNoReplies;
-    if ( m_nScanned + m_nSkipped == n ) {
-        ss << "Found " << m_nScanned << " / " << m_nScanned + m_nSkipped << " servers";
+#if MTA_DEBUG
+    //OutputDebugLine ( SString ( "%08x  Size: %d  m_nScanned:%d  m_nSkipped:%d [%d]  iNumQueries: %d", this, m_Servers.size(), m_nScanned, m_nSkipped, m_nScanned+m_nSkipped, iNumQueries ) );
+#endif
+
+    if ( m_nScanned + m_nSkipped == m_Servers.size () ) {
         // We are no longer refreshing
         m_iPass = 0;
-    } else {
-        ss << "Scanned " << m_nScanned << " / " << m_nScanned + m_nSkipped << " servers";
     }
+
+    ss << "   " << uiActiveServers << " server";
+    if ( uiActiveServers != 1 )
+        ss << "s";
+    if ( m_iPass )
+        ss << "...";
 
     // Update our status message
     m_strStatus = ss.str () + m_strStatus2;
 }
 
 
-bool CServerList::Exists ( CServerListItem Server )
+// Return true if did add
+bool CServerList::AddUnique ( in_addr Address, ushort usQueryPort, bool addAtFront )
 {
-    // Look for a duplicate entry
-    for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ )
-        if ( **i == Server ) return true;
-    return false;
+    if ( m_Servers.Find ( Address, usQueryPort ) )
+        return false;
+    m_Servers.Add ( Address, usQueryPort, addAtFront );
+    return true;
 }
 
-void CServerList::Add ( CServerListItem Server, bool addAtFront )
+void CServerList::Remove ( in_addr Address, ushort usQueryPort )
 {
-    if ( addAtFront )
-        m_Servers.push_front ( new CServerListItem ( Server ) );
-    else
-        m_Servers.push_back ( new CServerListItem ( Server ) );
-}
-
-void CServerList::Remove ( CServerListItem Server )
-{
-    // Look for a duplicate entry
-    for ( CServerListIterator i = m_Servers.begin (); i != m_Servers.end (); i++ )
-    {
-        if ( **i == Server )
-        {
-            m_Servers.remove ( *i );
-            return;
-        }
-    }
+    m_Servers.Remove ( Address, usQueryPort );
 }
 
 
@@ -138,10 +185,24 @@ void CServerList::Refresh ( void )
     m_iRevision++;
 }
 
+
+CServerListInternet::CServerListInternet ( void )
+{
+    m_pMasterServerManager = NewMasterServerManager ();
+}
+
+
+CServerListInternet::~CServerListInternet ( void )
+{
+    delete m_pMasterServerManager;
+    m_pMasterServerManager = NULL;
+}
+
+
 void CServerListInternet::Refresh ( void )
 {   // Gets the server list from the master server and refreshes
-    m_ulStartTime = CClientTime::GetTime ();
-    m_HTTP.Get ( SERVER_LIST_MASTER_URL );
+    m_ElapsedTime.Reset ();
+    m_pMasterServerManager->Refresh ();
     m_iPass = 1;
     m_bUpdated = true;
 
@@ -152,7 +213,7 @@ void CServerListInternet::Refresh ( void )
 
 void CServerListInternet::Pulse ( void )
 {   // We also need to take care of the master server list here
-    unsigned long ulTime = CClientTime::GetTime () - m_ulStartTime;
+    unsigned long ulTime = m_ElapsedTime.Get ();
 
     if ( m_iPass == 1 ) {
         // We are polling for the master server list (first pass)
@@ -162,12 +223,13 @@ void CServerListInternet::Pulse ( void )
         m_strStatus2 = "";
         m_bUpdated = true;
         
-        // Attempt to get the HTTP data
-        CHTTPBuffer buffer;
-        if ( m_HTTP.GetData ( buffer ) ) {
-            // We got the data, parse it and switch pass
-            if ( ParseList ( buffer.GetData (), buffer.GetSize () ) ) {
+        // Attempt to get the data
+        if ( m_pMasterServerManager->HasData () )
+        {
+            if ( m_pMasterServerManager->ParseList ( m_Servers ) )
+            {
                 m_iPass++;
+                GetServerCache ()->GetServerListCachedInfo ( this );
             } else {
                 // Abort
                 m_strStatus = "Master server list could not be parsed.";
@@ -184,51 +246,15 @@ void CServerListInternet::Pulse ( void )
         if ( m_iPass == 0 )
         {
             // If query failed, load from backup
-            CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->LoadInternetList();
+            GetServerCache ()->GenerateServerList ( this );
+            GetServerCache ()->GetServerListCachedInfo ( this );
             m_strStatus2 = string ( "  (Backup server list)" );
             m_iPass = 2;
-        }
-        else
-        if ( m_iPass == 2 )
-        {
-            // If query succeeded, save to backup
-            CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->SaveInternetList();
         }
     } else if ( m_iPass == 2 ) {
         // We are scanning our known servers (second pass)
         CServerList::Pulse ();
     }
-}
-
-
-bool CServerListInternet::ParseList ( const char *szBuffer, unsigned int nLength )
-{
-    unsigned int i = 0, j = 0;
-
-    // Read out the server count
-    if ( nLength < 2 ) return false;
-    unsigned int uiCount = ntohs ( *((unsigned short*)&szBuffer[0]) );
-    i = 2;
-
-    // Add all servers until we hit the count or nLength
-    while ( i < ( nLength - 6 ) && uiCount-- ) {
-
-        // Read the IPv4-address
-        in_addr _Address;
-        _Address.S_un.S_un_b.s_b1 = szBuffer[i];
-        _Address.S_un.S_un_b.s_b2 = szBuffer[i+1];
-        _Address.S_un.S_un_b.s_b3 = szBuffer[i+2];
-        _Address.S_un.S_un_b.s_b4 = szBuffer[i+3];
-
-        // Read the query port
-        unsigned short _usQueryPort = ntohs ( *((unsigned short*)(&szBuffer[i+4])) );
-        CServerListItem& item = *new CServerListItem ( _Address, _usQueryPort );
-
-        // Add the server
-        m_Servers.push_back ( &item );
-        i += 6;
-    }
-    return true;
 }
 
 
@@ -252,9 +278,8 @@ void CServerListLAN::Pulse ( void )
         if ( recvfrom ( m_Socket, szBuffer, sizeof (szBuffer), 0, (sockaddr *) &m_Remote, &len ) > 10 )
             if ( strncmp ( szBuffer, SERVER_LIST_SERVER_BROADCAST_STR, strlen ( SERVER_LIST_SERVER_BROADCAST_STR ) ) == 0 ) {
                 unsigned short usPort = ( unsigned short ) atoi ( &szBuffer[strlen ( SERVER_LIST_SERVER_BROADCAST_STR ) + 1] );
-                CServerListItem Server ( m_Remote.sin_addr, usPort );
                 // Add the server if doesn't already exist
-                if ( !Exists ( Server ) ) Add ( Server );
+                AddUnique ( m_Remote.sin_addr, usPort );
             }
 
     // Scan our already known servers
@@ -304,14 +329,16 @@ void CServerListLAN::Discover ( void )
 }
 
 
-std::string CServerListItem::Pulse ( void )
+std::string CServerListItem::Pulse ( bool bCanSendQuery )
 {   // Queries the server on it's query port (ASE protocol)
     // and returns whether it is done scanning
     if ( bScanned || bSkipped ) return "Done";
 
     char szBuffer[SERVER_LIST_QUERY_BUFFER] = {0};
 
-    if ( m_ulQueryStart == 0 ) {
+    if ( WaitingToSendQuery () ) {
+        if ( !bCanSendQuery )
+            return "NotSentQuery";
         Query ();
         return "SentQuery";
     } else {
@@ -322,14 +349,52 @@ std::string CServerListItem::Pulse ( void )
         int error = WSAGetLastError();
         if ( len >= 0 ) {
             // Parse data
-            ParseQuery ( szBuffer, len );
-            return "ParsedQuery";
+            if ( ParseQuery ( szBuffer, len ) )
+            {
+                CloseSocket ();
+                bMaybeOffline = false;
+                SetDataQuality ( SERVER_INFO_QUERY );
+                uiCacheNoReplyCount = 0;
+                uiRevision++;           // To flag browser gui update
+                GetServerCache ()->SetServerCachedInfo ( this );    // Save parsed info in the cache
+                return "ParsedQuery";
+            }
         }
 
-        if ( CClientTime::GetTime () - m_ulQueryStart > SERVER_LIST_ITEM_TIMEOUT )
+        if ( m_ElapsedTime.Get () > SERVER_LIST_ITEM_TIMEOUT )
         {
-            bSkipped = true;
-            return "NoReply";
+            bMaybeOffline = true;       // Flag to help 'Include offline' browser option
+            nPlayers = 0;               // We don't have player names, so zero this now
+            uiRevision++;               // To flag browser gui update
+            uint uiMaxRetries = GetDataQuality () <= SERVER_INFO_ASE_0 || MaybeWontRespond () ? 0 : 1;
+
+            if ( uiQueryRetryCount < uiMaxRetries )
+            {
+                // Try again
+                uiQueryRetryCount++;
+                uiRevision++;           // To flag browser gui update
+#if MTA_DEBUG
+                //strGameMode = SString ( "%d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
+#endif
+                if ( GetDataQuality () > SERVER_INFO_ASE_0 )
+                    GetServerCache ()->SetServerCachedInfo ( this );
+                Query ();
+                return "ResentQuery";
+            }
+            else
+            {
+                // Give up
+                uiCacheNoReplyCount++;  // Keep a persistent count of failures. (When uiCacheNoReplyCount gets to 3, the server is removed from the Server Cache)
+                bSkipped = true;
+                uiRevision++;           // To flag browser gui update#if MTA_DEBUG
+#if MTA_DEBUG
+                //strGameMode = SString ( "noreply %d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
+#endif
+                CloseSocket ();
+                if ( GetDataQuality () > SERVER_INFO_ASE_0 )
+                    GetServerCache ()->SetServerCachedInfo ( this );
+                return "NoReply";
+            }
         }
 
         return "WaitingReply";
@@ -345,9 +410,16 @@ void CServerListItem::Query ( void )
     addr.sin_addr = Address;
     addr.sin_port = htons ( usQueryPort );
 
-    int ret = sendto ( m_Socket, "r", 1, 0, (sockaddr *) &addr, sizeof(addr) );
-    if ( ret == 1 )
-        m_ulQueryStart = CClientTime::GetTime ();
+    // Initialize socket on demand
+    if ( m_Socket == INVALID_SOCKET )
+    {
+        m_Socket = socket ( PF_INET, SOCK_DGRAM, IPPROTO_UDP );
+        u_long flag = 1;
+        ioctlsocket ( m_Socket, FIONBIO, &flag );
+    }
+
+    sendto ( m_Socket, "r", 1, 0, (sockaddr *) &addr, sizeof(addr) );
+    m_ElapsedTime.Reset ();
 }
 
 
@@ -383,7 +455,7 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     const char* szIP = inet_ntoa ( Address );
 
     // Calculate the ping/latency
-    nPing = ( CClientTime::GetTime () - m_ulQueryStart );
+    nPing = m_ElapsedTime.Get ();
 
     // Parse relevant data
     std::string strTemp;
@@ -393,32 +465,40 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     strHost = szIP;
 
     // Game
-    if ( !ReadString ( strGame, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_GAME_NAME ) == false )
+        strGameName = strTemp;
 
     // Port
     if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
-    usGamePort      = atoi ( strTemp.c_str () );
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PORT ) == false )
+        usGamePort = atoi ( strTemp.c_str () );
 
     // Server name
-    if ( !ReadString ( strName, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_NAME ) == false )
+        strName = strTemp;
 
     // Game type
-    if ( !ReadString ( strType, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_GAME_MODE ) == false )
+        strGameMode = strTemp;
 
     // Map name
-    if ( !ReadString ( strMap, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAP ) == false )
+        strMap = strTemp;
 
     // Version
-    if ( !ReadString ( strVersion, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
-
-    if ( strVersion != MTA_DM_ASE_VERSION )
-        return false;
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_VERSION ) == false )
+        strVersion = strTemp;
 
     // Got space for password, serial verification, player count, players max?
     if ( i + 4 > nLength )
@@ -426,10 +506,17 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
         return false;
     }
 
-    bPassworded = ( szBuffer[i++] == 1 );
-    bSerials = ( szBuffer[i++] == 1 );
-    nPlayers = (unsigned char)szBuffer[i++];
-    nMaxPlayers = (unsigned char)szBuffer[i++];
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PASSWORDED ) == false )
+        bPassworded = ( szBuffer[i++] == 1 );
+
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_SERIALS ) == false )
+        bSerials = ( szBuffer[i++] == 1 );
+
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_COUNT ) == false )
+        nPlayers = (unsigned char)szBuffer[i++];
+
+    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAX_PLAYER_COUNT ) == false )
+        nMaxPlayers = (unsigned char)szBuffer[i++];
 
     // Get player nicks
     vecPlayers.clear ();
@@ -443,10 +530,27 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
             std::string strResult = RemoveColorCode ( strPlayer.c_str () );
             if ( strResult.length () == 0 )
                 strResult = strPlayer;
-            vecPlayers.push_back ( strResult );
+            if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_LIST ) == false )
+                vecPlayers.push_back ( strResult );
         }
     }
 
     bScanned = true;
+
+    PostChange ();
     return true;
+}
+
+
+void CServerListItem::ResetForRefresh ( void )
+{
+    CloseSocket ();
+    bScanned = false;
+    bSkipped = false;
+    m_ElapsedTime.Reset ();
+    uiQueryRetryCount = 0;
+
+    if ( m_iDataQuality > SERVER_INFO_ASE_2 )
+        m_iDataQuality = SERVER_INFO_ASE_2;
+    bMaybeOffline = false;
 }

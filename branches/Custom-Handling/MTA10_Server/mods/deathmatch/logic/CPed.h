@@ -223,6 +223,9 @@ public:
     inline bool                                 IsStealthAiming             ( void )                        { return m_bStealthAiming; }
     inline void                                 SetStealthAiming            ( bool bAiming )                { m_bStealthAiming = bAiming; }
 
+    inline bool                                 GetCollisionEnabled         ( void )                        { return m_bCollisionsEnabled; }
+    inline void                                 SetCollisionEnabled         ( bool bCollisionEnabled )      { m_bCollisionsEnabled = bCollisionEnabled; }
+
 protected:
     unsigned short                              m_usModel;
     CMatrix                                     m_Matrix;    
@@ -268,6 +271,7 @@ protected:
     CVehicle*                                   m_pJackingVehicle;
 
     bool                                        m_bSyncable;
+    bool                                        m_bCollisionsEnabled;
 
 private:
     CPedManager*                                m_pPedManager;

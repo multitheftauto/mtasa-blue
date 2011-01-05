@@ -50,8 +50,21 @@ ListboxItem::ListboxItem(const String& text, uint item_id, void* item_data, bool
     d_autoDelete(auto_delete),
 	d_owner(NULL),
     d_selectCols(DefaultSelectionColour, DefaultSelectionColour, DefaultSelectionColour, DefaultSelectionColour),
-	d_selectBrush(NULL)
+	d_selectBrush(NULL),
+    d_bSizeChanged(true),
+    d_savedPixelSize(10,10)
 {
+}
+
+
+void ListboxItem::setText(const String& text, const char* sortText)
+{
+    d_bSizeChanged |= (d_itemText != text);
+    d_itemText = text;
+    if ( sortText )
+        d_itemSortText.assign ( sortText );
+    else
+        d_itemSortText.clear ();
 }
 
 

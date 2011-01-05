@@ -25,8 +25,9 @@ class CMainMenu;
 #include "CCredits.h"
 #include "CGraphics.h"
 #include "CMainMenuScene.h"
+class CNewsBrowser;
 
-#define CORE_MTA_MENU_ITEMS     8
+#define CORE_MTA_MENU_ITEMS     12
 
 class CMainMenu
 {
@@ -61,12 +62,11 @@ public:
     void                SetIsIngame                     ( bool bIsIngame );
     bool                GetIsIngame                     ( void );
 
-    void                SetServerBrowserVisible         ( bool bVisible );
-
     CServerBrowser*     GetServerBrowser                ( void ) { return &m_ServerBrowser; };
     CSettings*          GetSettingsWindow               ( void ) { return &m_Settings; };
     CQuickConnect*      GetQuickConnectWindow           ( void ) { return &m_QuickConnect; };
     CQuestionBox*       GetQuestionWindow               ( void ) { return &m_QuestionBox; };
+    CNewsBrowser*       GetNewsBrowser                  ( void ) { return m_pNewsBrowser; };
 
     void                OnInvalidate                    ( IDirect3DDevice9 * pDevice );
     void                OnRestore                       ( IDirect3DDevice9 * pDevice );
@@ -78,11 +78,13 @@ public:
     void                ChangeCommunityState            ( bool bIn, const std::string& strUsername );
     bool                HasStarted                      ( void ) { return m_bStarted; };
 
+    void                SetNewsHeadline                 ( int iIndex, const SString& strContent, bool bIsNew );
+
 private:
     void                SetStaticBackground             ( bool bEnabled );
 
     void                CreateItem                      ( unsigned int uiIndex, CVector2D vecPosition, const char *szText, GUI_CALLBACK pHandler );
-    void                SetItemPosition                 ( unsigned int uiIndex, CVector2D vecPosition, bool bRelative = false );
+    void                SetItemPosition                 ( unsigned int uiIndex, CVector2D vecPosition, bool bRight = false );
     void                EnableItem                      ( unsigned int uiIndex );
     void                DisableItem                     ( unsigned int uiIndex, bool bHide = false );
 
@@ -95,11 +97,12 @@ private:
     bool                OnSettingsButtonClick           ( CGUIElement* pElement );
     bool                OnAboutButtonClick              ( CGUIElement* pElement );
     bool                OnQuitButtonClick               ( CGUIElement* pElement );
+    bool                OnNewsButtonClick               ( CGUIElement* pElement );
 
     bool                OnItemEnter                     ( CGUIElement* pElement );
     bool                OnItemLeave                     ( CGUIElement* pElement );
 
-	void				ShowServerQueue					( void );
+    void                ShowServerQueue                 ( void );
     void                HideServerQueue                 ( void );
 
     CGUI*               m_pManager;
@@ -111,15 +114,17 @@ private:
 
     // Main menu pane and items
     CGUILabel*          m_pItems[CORE_MTA_MENU_ITEMS];
+    CGUILabel*          m_pItemShadows[CORE_MTA_MENU_ITEMS];
     unsigned int        m_uiItems;
 
     // Submenu classes
     CQuestionBox        m_QuestionBox;
     CQuickConnect       m_QuickConnect;
     CSettings           m_Settings;
+    CNewsBrowser*       m_pNewsBrowser;
     CCredits            m_Credits;
     CServerBrowser      m_ServerBrowser;
-	CServerQueue		m_ServerQueue;
+    CServerQueue        m_ServerQueue;
 
     // Properties
     bool                m_bIsIngame;
@@ -152,6 +157,8 @@ private:
     unsigned char       m_ucFade;
     float               m_fFader;
 
+    CGUILabel*          m_pNewLabels[3];
+
     // Main menu items
     enum eMenuItems {
         MENU_ITEM_DISCONNECT,
@@ -161,7 +168,12 @@ private:
         MENU_ITEM_MAP_EDITOR,
         MENU_ITEM_SETTINGS,
         MENU_ITEM_ABOUT,
-        MENU_ITEM_QUIT
+        MENU_ITEM_QUIT,
+        MENU_ITEM_NEWS,
+        MENU_ITEM_NEWS_ITEM_1,
+        MENU_ITEM_NEWS_ITEM_2,
+        MENU_ITEM_NEWS_ITEM_3,
+        MENU_ITEM_MAX
     };
 
     // Fade states

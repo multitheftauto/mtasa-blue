@@ -49,7 +49,7 @@ private:
     bool                            WriteVehicleInformation             ( NetBitStreamInterface* pBitStream, CDeathmatchVehicle* pVehicle );
 
     CClientVehicleManager*          m_pVehicleManager;
-    std::list < CDeathmatchVehicle* > m_List;
+    CMappedList < CDeathmatchVehicle* > m_List;
     unsigned long                   m_ulLastSyncTime;
 };
 

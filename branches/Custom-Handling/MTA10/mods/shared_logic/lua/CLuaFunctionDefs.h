@@ -50,6 +50,7 @@ public:
     LUA_DECLARE ( GetResourceRootElement );
     LUA_DECLARE ( GetResourceGUIElement );
     LUA_DECLARE ( GetResourceDynamicElementRoot );
+    LUA_DECLARE ( GetResourceExportedFunctions );
 
     // Event functions
     LUA_DECLARE ( AddEvent );
@@ -129,10 +130,13 @@ public:
     LUA_DECLARE ( IsElementSyncer );
     LUA_DECLARE ( IsElementCollidableWith );
     LUA_DECLARE ( IsElementDoubleSided );
+    LUA_DECLARE ( GetElementCollisionsEnabled );
+    LUA_DECLARE ( IsElementFrozen );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
     LUA_DECLARE ( DestroyElement );
+    LUA_DECLARE ( SetElementID );
     LUA_DECLARE ( SetElementData );
     LUA_DECLARE ( RemoveElementData );
     LUA_DECLARE ( SetElementPosition );
@@ -151,6 +155,7 @@ public:
     LUA_DECLARE ( SetElementModel );
     LUA_DECLARE ( SetElementCollidableWith );
     LUA_DECLARE ( SetElementDoubleSided );
+    LUA_DECLARE ( SetElementFrozen );
 
     // Radio functions
     LUA_DECLARE ( SetRadioChannel );
@@ -340,13 +345,17 @@ public:
     LUA_DECLARE ( SetTrainSpeed );
     LUA_DECLARE ( SetVehicleGravity );
     LUA_DECLARE ( SetVehicleHeadLightColor );
+    LUA_DECLARE ( SetVehicleTurretPosition );
 #if WITH_VEHICLE_HANDLING
     LUA_DECLARE ( SetVehicleHandlingData );
 #endif
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );
+    
+    // Object get funcs
     LUA_DECLARE ( IsObjectStatic );
+    LUA_DECLARE ( GetObjectScale );
 
     // Object set funcs
     LUA_DECLARE ( SetObjectRotation );
@@ -424,6 +433,7 @@ public:
     LUA_DECLARE ( GetCameraMatrix );
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
+    LUA_DECLARE ( GetCameraGoggleEffect );
 
     // Cam set funcs
     LUA_DECLARE ( SetCameraMatrix );
@@ -432,6 +442,7 @@ public:
     LUA_DECLARE ( FadeCamera );
     LUA_DECLARE ( SetCameraClip );
     LUA_DECLARE ( SetCameraView );
+    LUA_DECLARE ( SetCameraGoggleEffect );
 
     // Cursor funcs
     LUA_DECLARE ( GetCursorPosition );
@@ -457,6 +468,8 @@ public:
     LUA_DECLARE ( EngineReplaceVehiclePart );
     LUA_DECLARE ( EngineSetModelLODDistance );
     LUA_DECLARE ( EngineSetAsynchronousLoading );
+    LUA_DECLARE ( EngineLoadIFP );
+    LUA_DECLARE ( EngineUnloadIFP );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
@@ -467,6 +480,8 @@ public:
     LUA_DECLARE ( dxDrawImageSection );
     LUA_DECLARE ( dxGetTextWidth );
     LUA_DECLARE ( dxGetFontHeight );
+    LUA_DECLARE ( LoadFont );
+    LUA_DECLARE ( UnloadFont );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
@@ -488,7 +503,9 @@ public:
     
     // GUI funcs
     LUA_DECLARE ( GUIGetInputEnabled );
+    LUA_DECLARE ( GUIGetInputMode );
     LUA_DECLARE ( GUISetInputEnabled );
+    LUA_DECLARE ( GUISetInputMode );
     LUA_DECLARE ( GUIIsChatBoxInputActive );
     LUA_DECLARE ( GUIIsConsoleActive );
     LUA_DECLARE ( GUIIsDebugViewActive );
@@ -623,10 +640,13 @@ public:
     LUA_DECLARE ( GetBlurLevel );
     LUA_DECLARE ( GetTrafficLightState );
     LUA_DECLARE ( AreTrafficLightsLocked );
+    LUA_DECLARE ( GetJetpackMaxHeight );
 
     LUA_DECLARE ( SetTime );
+    LUA_DECLARE ( GetSkyGradient );
     LUA_DECLARE ( SetSkyGradient );
     LUA_DECLARE ( ResetSkyGradient );
+    LUA_DECLARE ( GetWaterColor );
     LUA_DECLARE ( SetWaterColor );
     LUA_DECLARE ( ResetWaterColor );
     LUA_DECLARE ( SetWeather );
@@ -645,6 +665,26 @@ public:
     LUA_DECLARE ( GetCloudsEnabled );
     LUA_DECLARE ( SetTrafficLightState );
     LUA_DECLARE ( SetTrafficLightsLocked );
+    LUA_DECLARE ( GetWindVelocity );
+    LUA_DECLARE ( SetWindVelocity );
+    LUA_DECLARE ( ResetWindVelocity );
+    LUA_DECLARE ( AreInteriorSoundsEnabled );
+    LUA_DECLARE ( SetInteriorSoundsEnabled );
+    LUA_DECLARE ( GetRainLevel );
+    LUA_DECLARE ( SetRainLevel );
+    LUA_DECLARE ( ResetRainLevel );
+    LUA_DECLARE ( GetFarClipDistance );
+    LUA_DECLARE ( SetFarClipDistance );
+    LUA_DECLARE ( ResetFarClipDistance );
+    LUA_DECLARE ( GetFogDistance );
+    LUA_DECLARE ( SetFogDistance );
+    LUA_DECLARE ( ResetFogDistance );
+    LUA_DECLARE ( GetSunColor );
+    LUA_DECLARE ( SetSunColor );
+    LUA_DECLARE ( ResetSunColor );
+    LUA_DECLARE ( GetSunSize );
+    LUA_DECLARE ( SetSunSize );
+    LUA_DECLARE ( ResetSunSize );
 
     // Input functions
     LUA_DECLARE ( BindKey );
@@ -717,10 +757,13 @@ public:
 
     // Community funcs
     LUA_DECLARE ( GetPlayerUserName );
+    LUA_DECLARE ( GetPlayerSerial );
 
     // Utility vector math functions
     LUA_DECLARE ( GetDistanceBetweenPoints2D );
     LUA_DECLARE ( GetDistanceBetweenPoints3D );
+    LUA_DECLARE ( GetEasingValue );
+    LUA_DECLARE ( InterpolateBetween );
 
     // Map funcs
     LUA_DECLARE ( IsPlayerMapForced );
@@ -738,6 +781,13 @@ public:
 #endif
 
     LUA_DECLARE ( GetVersion );
+
+    // UTF functions
+    LUA_DECLARE ( UtfLen );
+    LUA_DECLARE ( UtfSeek );
+    LUA_DECLARE ( UtfSub );
+    LUA_DECLARE ( UtfChar );
+    LUA_DECLARE ( UtfCode );
 
 private:
     // Static references to objects

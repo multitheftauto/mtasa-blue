@@ -93,6 +93,9 @@ public:
     void                SetLocalIP ( const char* szLocalIP ) { m_strLocalIP = szLocalIP ? szLocalIP : ""; }
     void                AddValue ( CHTTPValue * pValue );
     CHTTPResponse *     Send ( CTCP * pTCP );
+    CTCPClientSocket *  SendRequest ( CTCP * pTCP );
+    CHTTPResponse *     GetResponse ( CTCPClientSocket* pSocket );
+
     void                SetDataSentHandler ( DataSentHandler * handler );
 };
 

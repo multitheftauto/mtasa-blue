@@ -45,6 +45,9 @@ void CMessageLoopHook::ApplyHook ( HWND hFocusWindow )
 
         // Subclass the window procedure.
         m_HookedWindowProc = SubclassWindow ( hFocusWindow, ProcessMessage );
+
+        // Enable Unicode (UTF-16) characters in WM_CHAR messages
+        SetWindowLongW ( hFocusWindow, GWL_WNDPROC, GetWindowLong ( hFocusWindow, GWL_WNDPROC ) );
     }
 }
 
@@ -90,6 +93,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
     if ( uMsg == WM_KILLFOCUS || (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE) )
     {
         return true;
+    }
+
+    // Disable the system context menu by clicking in the process icon or pressing ALT+SPACE.
+    if ( uMsg == WM_SYSCOMMAND )
+    {
+        if ( wParam == 0xF093 || wParam == SC_KEYMENU || wParam == SC_MOUSEMENU )
+            return 0;
     }
 
     // Quit message?
@@ -256,7 +266,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 {
                     if ( !GetVideoModeManager ()->IsWindowed () )
                     {
-                        if ( !CLocalGUI::GetSingleton ().GetMainMenu ()->HasStarted () )
+                        if ( !CLocalGUI::GetSingleton ().GetMainMenu () || !CLocalGUI::GetSingleton ().GetMainMenu ()->HasStarted () )
                             return true;    // No auto-minimize
 
                         if ( GetVideoModeManager ()->IsMultiMonitor ()
@@ -278,13 +288,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
 
                 // Call GTA's window procedure.
-                return CallWindowProc ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
+                return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
             }
         }
     }
 
     // Tell windows to handle this message.
-    return DefWindowProc ( hwnd, uMsg, wParam, lParam );
+    return DefWindowProcW ( hwnd, uMsg, wParam, lParam );
 }
 
 

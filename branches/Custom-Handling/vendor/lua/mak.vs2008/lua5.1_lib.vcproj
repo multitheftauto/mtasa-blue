@@ -44,6 +44,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="../include"
 				PreprocessorDefinitions="LUA_USE_APICHECK;WIN32_LEAN_AND_MEAN"
+				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -123,7 +124,7 @@
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				CompileAs="1"
 				DisableSpecificWarnings="4996"
 			/>
@@ -194,7 +195,7 @@
 				EnableEnhancedInstructionSet="0"
 				RuntimeTypeInfo="true"
 				WarningLevel="3"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				CompileAs="1"
 				DisableSpecificWarnings="4996"
 			/>

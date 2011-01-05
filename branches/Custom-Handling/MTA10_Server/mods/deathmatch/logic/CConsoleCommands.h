@@ -67,6 +67,7 @@ public:
 
     static bool         Ver             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         Ase             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         OpenPortsTest   ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 };
 
 #endif

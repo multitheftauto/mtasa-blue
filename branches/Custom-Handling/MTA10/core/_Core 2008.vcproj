@@ -80,9 +80,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlibd_2008.lib libpng2008d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9d.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib"
 				ShowProgress="0"
-				OutputFile="C:\Program Files\MTA San Andreas\mta\core_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas 1.1\mta\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
@@ -183,8 +183,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib"
-				OutputFile="C:\Program Files\MTA San Andreas\MTA\core.dll"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib"
+				OutputFile="C:\Program Files\MTA San Andreas 1.1\MTA\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/lib;../../vendor/zlib/lib;../../vendor/detours/lib"
@@ -288,7 +288,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib_2008.lib libpng2008.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -493,6 +493,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CNewsBrowser.cpp"
+				>
+			</File>
+			<File
 				RelativePath="Core.cpp"
 				>
 			</File>
@@ -557,15 +561,27 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CResManager.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CScreenShot.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\CServerBrowser.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerBrowser.MasterServerManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerBrowser.RemoteMasterServer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerCache.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerCache.h"
 				>
 			</File>
 			<File
@@ -582,10 +598,6 @@
 			</File>
 			<File
 				RelativePath=".\CSettings.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CText.cpp"
 				>
 			</File>
 			<File
@@ -758,19 +770,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CDirect3DEvents8.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CDirect3DEvents9.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CDirect3DHook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CDirect3DHook8.h"
 				>
 			</File>
 			<File
@@ -819,14 +823,6 @@
 			</File>
 			<File
 				RelativePath=".\CFileSystemMemoryHandleManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CGenericManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CGenericManagerItem.h"
 				>
 			</File>
 			<File
@@ -882,15 +878,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CNewsBrowser.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Core.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CPEHookUtils.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CProxyDirect3D8.h"
 				>
 			</File>
 			<File
@@ -922,10 +918,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CResManager.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CScreenShot.h"
 				>
 			</File>
@@ -934,7 +926,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CServerBrowser.MasterServerManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerBrowser.RemoteMasterServer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CServerList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerQueue.h"
 				>
 			</File>
 			<File
@@ -950,11 +954,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CText.h"
+				RelativePath=".\CVersionUpdater.h"
 				>
 			</File>
 			<File
-				RelativePath=".\CVersionUpdater.h"
+				RelativePath=".\CVersionUpdater.Util.hpp"
 				>
 			</File>
 			<File
@@ -1018,14 +1022,6 @@
 				>
 				<File
 					RelativePath=".\CExceptionInformation_Impl.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="utils"
-				>
-				<File
-					RelativePath=".\client\utils\CMD5Hasher.h"
 					>
 				</File>
 			</Filter>
@@ -1613,6 +1609,34 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.AllocTracking.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.AllocTracking.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Defines.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.File.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.File.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Game.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Game.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.h"
 					>
 				</File>
@@ -1621,7 +1645,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Misc.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Misc.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Time.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Time.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SString.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SString.hpp"
 					>
 				</File>
 			</Filter>

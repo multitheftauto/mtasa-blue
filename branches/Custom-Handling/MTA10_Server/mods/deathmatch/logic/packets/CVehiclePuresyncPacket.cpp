@@ -488,7 +488,7 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStr
     if ( CVehicleManager::HasTurret ( usModel ) ) 
     {
         // Read out the turret position
-        SVehicleSpecific vehicle;
+        SVehicleTurretSync vehicle;
         if ( !BitStream.Read ( &vehicle ) )
             return;
 
@@ -505,6 +505,19 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStr
             pVehicle->SetAdjustableProperty ( usAdjustableProperty );
         }
     }
+
+    // Door angles.
+    if ( CVehicleManager::HasDoors ( usModel ) )
+    {
+        SDoorAngleSync door;
+
+        for ( unsigned int i = 2; i < 6; ++i )
+        {
+            if ( !BitStream.Read ( &door ) )
+                return;
+            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle );
+        }
+    }
 }
 
 
@@ -514,7 +527,7 @@ void CVehiclePuresyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitSt
     unsigned short usModel = pVehicle->GetModel ();
     if ( CVehicleManager::HasTurret ( usModel ) )
     {
-        SVehicleSpecific vehicle;
+        SVehicleTurretSync vehicle;
         pVehicle->GetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
         BitStream.Write ( &vehicle );
@@ -524,5 +537,16 @@ void CVehiclePuresyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitSt
     if ( CVehicleManager::HasAdjustableProperty ( usModel ) )
     {
         BitStream.Write ( pVehicle->GetAdjustableProperty () );
+    }
+
+    // Door angles.
+    if ( CVehicleManager::HasDoors ( usModel ) )
+    {
+        SDoorAngleSync door;
+        for ( unsigned int i = 2; i < 6; ++i )
+        {
+            door.data.fAngle = pVehicle->GetDoorAngleRatio ( i );
+            BitStream.Write ( &door );
+        }
     }
 }

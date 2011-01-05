@@ -97,6 +97,11 @@ public:
     void                            DestroyXML              ( CXMLNode* pRootNode );
     void                            SaveXML                 ( CXMLNode * pRootNode );
     bool                            XMLExists               ( CXMLFile* pFile );
+    unsigned long                   GetXMLFileCount         ( void ) const                  { return m_XMLFiles.size (); };
+    unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
+    unsigned long                   GetElementCount         ( void ) const                  { return m_pResource && m_pResource->GetElementGroup () ? m_pResource->GetElementGroup ()->GetCount () : 0; };
+    unsigned long                   GetTextDisplayCount     ( void ) const                  { return m_Displays.size (); };
+    unsigned long                   GetTextItemCount        ( void ) const                  { return m_TextItems.size (); };
 
     CTextDisplay *                  CreateDisplay           ( void );
     void                            DestroyDisplay          ( CTextDisplay * pDisplay );
@@ -119,6 +124,7 @@ public:
     void                            RegisterHTMLDFunctions  ( void );
 
     void                            InitVM                  ( void );
+    const SString&                  GetFunctionTag          ( int iFunctionNumber );
 private:
     void                            InitSecurity            ( void );
 
@@ -148,6 +154,7 @@ private:
     unsigned long                   m_ulFunctionEnterTime;
 public:
     std::map < const void*, CRefInfo >      m_CallbackTable;
+    std::map < int, SString >       m_FunctionTagMap;
 };
 
 #endif

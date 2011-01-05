@@ -43,7 +43,6 @@ public:
     DECLARE_COMMAND_HANDLER ( CopyGTAControls );
     DECLARE_COMMAND_HANDLER ( HUD );
     DECLARE_COMMAND_HANDLER ( ScreenShot );
-    DECLARE_COMMAND_HANDLER ( ConnectionType );
     DECLARE_COMMAND_HANDLER ( SaveConfig );
     
     DECLARE_COMMAND_HANDLER ( DebugClear )

@@ -8,6 +8,7 @@
 *               Jax <>
 *               lil_Toady <>
 *               Alberto Alonso <rydencillo@gmail.com>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -36,7 +37,13 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  unsigned char ucSkyGradientBG,
                                  unsigned char ucSkyGradientBB,
                                  unsigned short usFPSLimit,
-                                 bool bCloudsEnabled )
+                                 bool bCloudsEnabled,
+                                 float fJetpackMaxHeight,
+                                 bool bOverrideWaterColor,
+                                 unsigned char ucWaterRed,
+                                 unsigned char ucWaterGreen,
+                                 unsigned char ucWaterBlue,
+                                 unsigned char ucWaterAlpha)
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -60,6 +67,12 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_ucSkyGradientBB = ucSkyGradientBB;
     m_usFPSLimit = usFPSLimit;
     m_bCloudsEnabled = bCloudsEnabled;
+    m_fJetpackMaxHeight = fJetpackMaxHeight;
+    m_bOverrideWaterColor = bOverrideWaterColor;
+    m_ucWaterRed = ucWaterRed;
+    m_ucWaterGreen = ucWaterGreen;
+    m_ucWaterBlue = ucWaterBlue;
+    m_ucWaterAlpha = ucWaterAlpha;
 }
 
 
@@ -120,6 +133,23 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     funBugs.data.bFastFire    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTFIRE );
     funBugs.data.bFastMove    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTMOVE );
     BitStream.Write ( &funBugs );
+
+    if ( BitStream.Version () >= 0x15 )
+    {
+        bool bCrouchBug = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CROUCHBUG );
+        BitStream.WriteBit ( bCrouchBug );
+    }
+
+    BitStream.Write ( m_fJetpackMaxHeight );
+
+    BitStream.WriteBit ( m_bOverrideWaterColor );
+    if ( m_bOverrideWaterColor )
+    {
+        BitStream.Write ( m_ucWaterRed );
+        BitStream.Write ( m_ucWaterGreen );
+        BitStream.Write ( m_ucWaterBlue );
+        BitStream.Write ( m_ucWaterAlpha );
+    }
 
     return true;
 }

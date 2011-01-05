@@ -22,7 +22,7 @@ public:
     virtual FLOAT           GetAngleOpenRatio ( )=0;
     virtual BOOL            IsClosed (  )=0;
     virtual BOOL            IsFullyOpen (  )=0;
-    virtual VOID            Open ( float fUnknown )=0;
+    virtual VOID            Open ( float fRatio )=0;
     virtual eDoorState      GetDoorState()=0;
 };
 

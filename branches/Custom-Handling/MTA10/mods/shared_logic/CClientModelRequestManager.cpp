@@ -320,14 +320,15 @@ void CClientModelRequestManager::DoPulse ( void )
         if ( m_CancelQueue.size () > 0 )
         {
             // Cancel every entity in our cancel list
-            list < CClientEntity* > ::iterator iter = m_CancelQueue.begin ();
-            for ( ; iter != m_CancelQueue.end (); ++iter )
+            list < CClientEntity* > cancelQueueCopy = m_CancelQueue;
+            m_CancelQueue.clear ();
+
+            list < CClientEntity* > ::iterator iter = cancelQueueCopy.begin ();
+            for ( ; iter != cancelQueueCopy.end (); ++iter )
             {
                 Cancel ( *iter, false );
             }
 
-            // Clear our cancel list
-            m_CancelQueue.clear ();
         }
     }
 }

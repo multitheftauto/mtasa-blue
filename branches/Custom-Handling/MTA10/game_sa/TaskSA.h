@@ -90,6 +90,7 @@ public:
     // our function(s)
     void                SetInterface            ( CTaskSAInterface* pInterface ) { TaskInterface = pInterface; };
     CTaskSAInterface*   GetInterface            ( void )                         {return this->TaskInterface;}
+    bool                IsValid                 ( void )                         { return this->GetInterface() != NULL; }
 
     void                CreateTaskInterface     ( size_t nSize );
 
@@ -136,5 +137,84 @@ public:
     CTask* ControlSubTask(CPed* pPed);
 };
 
+
+//
+// 'Safe' task news
+// Will return NULL if the created task is not valid
+//
+template < class T >
+static T* ValidNewTask ( T* pTask )
+{
+   if ( pTask->IsValid () )
+        return pTask;
+    delete pTask;
+    return NULL;
+}
+
+template < class T >
+static T* NewTask ( void )
+{
+    return ValidNewTask ( new T () );
+}
+
+template < class T, class A >
+static T* NewTask ( const A& a )
+{
+    return ValidNewTask ( new T ( a ) );
+}
+
+template < class T, class A, class B >
+static T* NewTask ( const A& a, const B& b )
+{
+    return ValidNewTask ( new T ( a, b ) );
+}
+
+template < class T, class A, class B, class C >
+static T* NewTask ( const A& a, const B& b, const C& c )
+{
+    return ValidNewTask ( new T ( a, b, c ) );
+}
+
+template < class T, class A, class B, class C, class D >
+static T* NewTask ( const A& a, const B& b, const C& c, const D& d )
+{
+    return ValidNewTask ( new T ( a, b, c, d ) );
+}
+
+template < class T, class A, class B, class C, class D, class E >
+static T* NewTask ( const A& a, const B& b, const C& c, const D& d, const E& e )
+{
+    return ValidNewTask ( new T ( a, b, c, d, e ) );
+}
+
+template < class T, class A, class B, class C, class D, class E, class F >
+static T* NewTask ( const A& a, const B& b, const C& c, const D& d, const E& e, const F& f )
+{
+    return ValidNewTask ( new T ( a, b, c, d, e, f ) );
+}
+
+template < class T, class A, class B, class C, class D, class E, class F, class G >
+static T* NewTask ( const A& a, const B& b, const C& c, const D& d, const E& e, const F& f, const G& g )
+{
+    return ValidNewTask ( new T ( a, b, c, d, e, f, g ) );
+}
+
+template < class T, class A, class B, class C, class D, class E, class F, class G, class H >
+static T* NewTask ( const A& a, const B& b, const C& c, const D& d, const E& e, const F& f, const G& g, const H& h )
+{
+    return ValidNewTask ( new T ( a, b, c, d, e, f, g, h ) );
+}
+
+template < class T, class A, class B, class C, class D, class E, class F, class G, class H, class I >
+static T* NewTask ( const A& a, const B& b, const C& c, const D& d, const E& e, const F& f, const G& g, const H& h, const I& i )
+{
+    return ValidNewTask ( new T ( a, b, c, d, e, f, g, h, i ) );
+}
+
+template < class T, class A, class B, class C, class D, class E, class F, class G, class H, class I, class J >
+static T* NewTask ( const A& a, const B& b, const C& c, const D& d, const E& e, const F& f, const G& g, const H& h, const I& i, const J& j )
+{
+    return ValidNewTask ( new T ( a, b, c, d, e, f, g, h, i, j ) );
+}
 
 #endif

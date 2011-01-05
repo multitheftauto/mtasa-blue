@@ -39,6 +39,8 @@ public:
     virtual void                DisableAreaName ( bool bDisabled )=0;
     virtual void                DisableRadar ( bool bDisabled )=0;
     virtual void                DisableClock ( bool bDisabled )=0;
+    virtual void                DisableRadioName ( bool bDisabled )=0;
+    virtual void                DisableWantedLevel ( bool bDisabled )=0;
     virtual void                DisableAll ( bool bDisabled )=0;
 };
 

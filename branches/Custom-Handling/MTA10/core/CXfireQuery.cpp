@@ -40,7 +40,7 @@ bool CXfireServerInfo::ParseQuery ( const char * szBuffer, unsigned int nLength 
     unsigned int i = 4;
 
     // Game
-    if ( !ReadString ( strGame, szBuffer, i, nLength ) )
+    if ( !ReadString ( strGameName, szBuffer, i, nLength ) )
         return false;
 
     // Server name
@@ -48,7 +48,7 @@ bool CXfireServerInfo::ParseQuery ( const char * szBuffer, unsigned int nLength 
         return false;
 
     // Game type
-    if ( !ReadString ( strType, szBuffer, i, nLength ) )
+    if ( !ReadString ( strGameMode, szBuffer, i, nLength ) )
         return false;
 
     // Map name
@@ -68,6 +68,18 @@ bool CXfireServerInfo::ParseQuery ( const char * szBuffer, unsigned int nLength 
     bPassworded = ( szBuffer[i++] == 1 );
     nPlayers = (unsigned char)szBuffer[i++];
     nMaxPlayers = (unsigned char)szBuffer[i++];
+
+    // Recover large player count if present
+    SString strPlayerCount = strMap.Right ( strMap.length () - strlen ( strMap ) - 1 );
+    if ( !strPlayerCount.empty () )
+    {
+        SString strJoinedPlayers, strMaxPlayers;
+        if ( strPlayerCount.Split ( "/", &strJoinedPlayers, &strMaxPlayers ) )
+        {
+            nPlayers = atoi ( strJoinedPlayers );
+            nMaxPlayers = atoi ( strMaxPlayers );
+        }
+    }
 
     return true;
 }

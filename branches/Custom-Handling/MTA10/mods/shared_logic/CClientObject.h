@@ -70,6 +70,7 @@ public:
     
     inline unsigned char            GetAlpha                ( void )                            { return m_ucAlpha; }   
     void                            SetAlpha                ( unsigned char ucAlpha );
+    inline float                    GetScale                ( void )                            { return m_fScale; }
     void                            SetScale                ( float fScale );
 
     inline bool                     IsCollisionEnabled      ( void )                            { return m_bUsesCollision; };

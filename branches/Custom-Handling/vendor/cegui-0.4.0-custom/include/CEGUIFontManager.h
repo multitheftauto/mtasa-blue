@@ -233,6 +233,30 @@ public:
     */
     void writeFontToStream(const String& name, OutStream& out_stream) const;
 
+    /*!
+    \brief
+        Sets a substitute font of the given name
+
+    \param name
+        String holding the name of the Font to be used as the substitute.
+
+    \return
+        Nothing.
+    */
+    void setSubstituteFont(const String& name,  uint size, const String& resourceGroup = "") const;
+
+    /*!
+    \brief
+        Gets a substitute glyph incase a given font doenst have a glyph
+
+    \param name
+        Glyph id of the glyph.
+
+    \return
+        The FT_GlyphSlot containing the glyph.
+    */
+    void* getSubstituteGlyph(unsigned long ulGlyph) const;
+
 
 private:
 	/*************************************************************************
@@ -243,6 +267,9 @@ private:
 
 	struct FontManagerImplData;
 	FontManagerImplData*	d_implData;
+
+    struct CEGUI::Font::FontImplData;
+    CEGUI::Font::FontImplData*	d_subfntdata;	//!< Implementation data
 
 
 public:

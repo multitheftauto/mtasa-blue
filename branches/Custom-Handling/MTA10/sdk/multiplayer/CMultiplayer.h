@@ -128,15 +128,23 @@ public:
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;
+    virtual bool                        HasSkyColor                 () = 0;
+    virtual void                        GetSkyColor                 ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue ) = 0;
     virtual void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue ) = 0;
     virtual void                        ResetSky                    () = 0;
+    virtual bool                        HasWaterColor               () = 0;
+    virtual void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha ) = 0;
     virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;
     virtual void                        ResetWater                  ( void ) = 0;
     virtual void                        SetCloudsEnabled            ( bool bDisabled ) = 0;
+    virtual bool                        AreInteriorSoundsEnabled    () = 0;
+    virtual void                        SetInteriorSoundsEnabled    ( bool bEnabled ) = 0;
     virtual void                        DisableEnterExitVehicleKey  ( bool bDisabled ) = 0;
 
     virtual void                        SetNightVisionEnabled       ( bool bEnabled ) = 0;
     virtual void                        SetThermalVisionEnabled     ( bool bEnabled ) = 0;
+    virtual bool                        IsNightVisionEnabled        ( ) = 0;
+    virtual bool                        IsThermalVisionEnabled      ( ) = 0;
 
     virtual void                        RebuildMultiplayerPlayer    ( class CPed * player ) = 0;
 

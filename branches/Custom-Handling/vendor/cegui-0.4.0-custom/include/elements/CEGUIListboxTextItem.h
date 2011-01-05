@@ -100,7 +100,7 @@ public:
 	\return
 		Nothing
 	*/
-	void	setFont(const Font* font)		{d_font = font;}
+	void	setFont(const Font* font)		{d_bSizeChanged |= (d_font != font); d_font = font;}
 
 
 	/*!
@@ -167,7 +167,7 @@ public:
 	/*************************************************************************
 		Required implementations of pure virtuals from the base class.
 	*************************************************************************/
-    Size getPixelSize(void) const;
+    Size getPixelSize(void);
     void draw(const Vector3& position, float alpha, const Rect& clipper) const;
     void draw(RenderCache& cache,const Rect& targetRect, float zBase,  float alpha, const Rect* clipper) const;
 

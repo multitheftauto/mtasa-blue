@@ -97,6 +97,34 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             }
             else
                 BitStream.WriteBit ( false );
+
+            // Entity collisions enabled
+            bool bCollisionsEnabled = true;
+
+            switch ( pElement->GetType() )
+            {
+                case CElement::VEHICLE:
+                {
+                    CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+                    bCollisionsEnabled = pVehicle->GetCollisionEnabled ( );
+                    break;
+                }
+                case CElement::OBJECT:
+                {
+                    CObject* pObject = static_cast < CObject* > ( pElement );
+                    bCollisionsEnabled = pObject->GetCollisionEnabled ( );
+                    break;
+                }
+                case CElement::PED:
+                case CElement::PLAYER:
+                {
+                    CPed* pPed = static_cast < CPed* > ( pElement );
+                    bCollisionsEnabled = pPed->GetCollisionEnabled ( );
+                    break;
+                }
+            }
+
+            BitStream.WriteBit ( bCollisionsEnabled );
             
             // Write custom data
             CCustomData* pCustomData = pElement->GetCustomDataPointer ();
@@ -160,26 +188,29 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     alpha.data.ucAlpha = pObject->GetAlpha ();
                     BitStream.Write ( &alpha );
 
-                    if ( BitStream.Version () >= 0x0c )
+                    // Double sided
+                    bool bIsDoubleSided = pObject->IsDoubleSided ();
+                    BitStream.WriteBit ( bIsDoubleSided );
+
+                    // Moving
+                    const CPositionRotationAnimation* pMoveAnimation = pObject->GetMoveAnimation ();
+                    if ( pMoveAnimation )
                     {
-                        bool bIsDoubleSided = pObject->IsDoubleSided ();
-                        BitStream.WriteBit ( bIsDoubleSided );
+                         BitStream.WriteBit ( true );
+                         pMoveAnimation->ToBitStream ( BitStream, true );
+                    }
+                    else
+                    {
+                        BitStream.WriteBit ( false );
                     }
 
-                    bool bIsMoving = pObject->IsMoving ();
-                    BitStream.WriteBit ( bIsMoving );
+                    // Scale
+                    float fScale = pObject->GetScale ();
+                    BitStream.Write ( fScale );
 
-                    if ( bIsMoving )
-                    {
-                        BitStream.WriteCompressed ( pObject->GetMoveTimeLeft () );
-
-                        position.data.vecPosition = pObject->m_moveData.vecStopPosition;
-                        BitStream.Write ( &position );
-
-                        rotationRadians.data.vecRotation = pObject->m_moveData.vecStopRotation - rotationRadians.data.vecRotation;
-                        BitStream.Write ( &rotationRadians );
-                    }
-
+                    // Static
+                    bool bStatic = pObject->IsStatic ();
+                    BitStream.WriteBit ( bStatic );
 
                     break;
                 }
@@ -263,11 +294,17 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     health.data.fValue = pVehicle->GetHealth ();
                     BitStream.Write ( &health );
 
-                    // Color as 4 unsigned chars
-                    BitStream.Write ( pVehicle->GetColor ().GetColor1 () );
-                    BitStream.Write ( pVehicle->GetColor ().GetColor2 () );
-                    BitStream.Write ( pVehicle->GetColor ().GetColor3 () );
-                    BitStream.Write ( pVehicle->GetColor ().GetColor4 () );
+                    // Color
+                    CVehicleColor& vehColor = pVehicle->GetColor ();
+                    uchar ucNumColors = vehColor.GetNumColorsUsed () - 1;
+                    BitStream.WriteBits ( &ucNumColors, 2 );
+                    for ( uint i = 0 ; i <= ucNumColors ; i++ )
+                    {
+                        SColor RGBColor = vehColor.GetRGBColor ( i );
+                        BitStream.Write ( RGBColor.R );
+                        BitStream.Write ( RGBColor.G );
+                        BitStream.Write ( RGBColor.B );
+                    }
 
                     // Paintjob
                     SPaintjobSync paintjob;
@@ -286,7 +323,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     unsigned short usModel = pVehicle->GetModel ();
                     if ( CVehicleManager::HasTurret ( usModel ) )
                     {
-                        SVehicleSpecific specific;
+                        SVehicleTurretSync specific;
                         specific.data.fTurretX = pVehicle->GetTurretPositionX ();
                         specific.data.fTurretY = pVehicle->GetTurretPositionY ();
                         BitStream.Write ( &specific );
@@ -296,6 +333,17 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     if ( CVehicleManager::HasAdjustableProperty ( usModel ) )
                     {
                         BitStream.WriteCompressed ( pVehicle->GetAdjustableProperty () );
+                    }
+
+                    // If the vehicle has doors, sync their open angle ratios.
+                    if ( CVehicleManager::HasDoors ( usModel ) )
+                    {
+                        SDoorAngleSync door;
+                        for ( unsigned char i = 0; i < 6; ++i )
+                        {
+                            door.data.fAngle = pVehicle->GetDoorAngleRatio ( i );
+                            BitStream.Write ( &door );
+                        }
                     }
 
                     // Write all the upgrades
@@ -603,9 +651,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     SEntityAlphaSync alpha;
                     alpha.data.ucAlpha = pPed->GetAlpha ();
                     BitStream.Write ( &alpha );
-
-                    if ( BitStream.Version () < 0x07 )
-                        break;
 
                     // clothes
                     unsigned char ucNumClothes = 0;

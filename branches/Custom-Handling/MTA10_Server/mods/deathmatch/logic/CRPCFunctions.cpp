@@ -144,6 +144,16 @@ void CRPCFunctions::PlayerWeapon ( NetBitStreamInterface & bitStream )
         SWeaponSlotSync slot;
         bitStream.Read ( &slot );
         unsigned int uiSlot = slot.data.uiSlot;
+        unsigned char ucPrevSlot = m_pSourcePlayer->GetWeaponSlot ();
+
+        if ( uiSlot != ucPrevSlot )
+        {
+            CLuaArguments Arguments;
+            Arguments.PushNumber ( m_pSourcePlayer->GetWeaponType ( ucPrevSlot ) );
+            Arguments.PushNumber ( m_pSourcePlayer->GetWeaponType ( uiSlot ) );
+
+            m_pSourcePlayer->CallEvent ( "onPlayerWeaponSwitch", Arguments );
+        }
 
         m_pSourcePlayer->SetWeaponSlot ( uiSlot );
         CWeapon* pWeapon = m_pSourcePlayer->GetWeapon ( uiSlot );

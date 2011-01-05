@@ -19,7 +19,10 @@
 #include "CCrashHandler.h"
 #include "MTAPlatform.h"
 #include "ErrorCodes.h"
+#include <assert.h>
+#include <clocale>
 #include <cstdio>
+#include <signal.h>
 
 // Define libraries
 char szNetworkLibName[] = "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
@@ -29,6 +32,9 @@ using namespace std;
 
 bool g_bSilent = false;
 bool g_bNoTopBar = false;
+#ifndef WIN32
+bool g_bDaemonized = false;
+#endif
 
 #ifdef WIN32
 CServerImpl::CServerImpl ( CThreadCommandQueue* pThreadCommandQueue )
@@ -52,7 +58,7 @@ CServerImpl::CServerImpl ( void )
     m_pNetwork = NULL;
     m_bRequestedQuit = false;
     m_bRequestedReset = false;
-    memset(&m_szInputBuffer, 0, sizeof ( m_szInputBuffer ) * sizeof ( char ) );
+    memset(&m_szInputBuffer, 0, sizeof ( m_szInputBuffer ));
     memset(&m_szTag, 0, sizeof ( m_szTag ) * sizeof ( char ) );
     m_uiInputCount = 0;
 
@@ -136,6 +142,22 @@ void CServerImpl::Printf ( const char* szFormat, ... )
     va_end ( ap );
 }
 
+#ifndef WIN32
+void CServerImpl::Daemonize () const
+{
+    if ( fork () ) exit ( 0 );
+
+    close ( 0 );
+    assert ( open ( "/dev/null", O_RDONLY ) == 0 );
+
+    close ( 1 );
+    assert ( open ( "/dev/null", O_WRONLY ) == 1 );
+
+    close ( 2 );
+    assert ( open ( "/dev/null", O_WRONLY ) == 2 );
+}
+#endif
+
 
 int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 {
@@ -144,6 +166,12 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     {
         return 1;
     }
+
+#ifndef WIN32
+    // Daemonize?
+    if ( g_bDaemonized )
+        Daemonize ();
+#endif
 
     if ( !g_bSilent )
     {
@@ -165,7 +193,11 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 
         SetConsoleWindowInfo ( m_hConsole, TRUE, &ScrnBufferInfo.srWindow );
         SetConsoleScreenBufferSize( m_hConsole, ScrnBufferInfo.dwSize );
+        SetConsoleOutputCP(CP_UTF8);
 #else
+        // support user locales
+        std::setlocale(LC_ALL, "");
+
         // Initialize the window and any necessary curses options
         initscr ( );
         keypad ( stdscr, TRUE );
@@ -193,6 +225,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         }
         // Create the input window
         m_wndInput = subwin ( stdscr, 1, COLS, LINES - 1, 0 );
+        scrollok ( m_wndInput, TRUE );
         wbkgd ( m_wndInput, COLOR_PAIR ( 2 ) );
 
         // Create the menu window
@@ -208,12 +241,6 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         else
             move ( 0, 0 );
         refresh ( );
-
-        // Set our STDIN to non-blocking, if we're on POSIX
-        int flags;
-        flags = fcntl(0, F_GETFL);
-        flags |= O_NONBLOCK;
-        fcntl(0, F_SETFL, flags);
 #endif
     }
 
@@ -253,6 +280,8 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             // net.dll doesn't like our version number
             Print ( "Network module not compatible!\n" );
             Print ( "Press Q to shut down the server!\n" );
+            Print ( "\n\n\n(If this is a custom build,\n" );
+            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n" );
             WaitForKey ( 'q' );
             DestroyWindow ( );
             return ERROR_NETWORK_LIBRARY_FAILED;
@@ -495,29 +524,21 @@ void CServerImpl::ShowInfoTag ( char* szTag )
 
 void CServerImpl::HandleInput ( void )
 {
-    int iStdIn = 0;
+    wint_t iStdIn = 0;
 
     // Get the STDIN input
 #ifdef WIN32
     if ( kbhit () )
     {
-        iStdIn = getch();
+        iStdIn = _getwch();
     }
 #else
-    iStdIn = getch();
-    if ( iStdIn == ERR)
+    if ( get_wch(&iStdIn) == ERR )
         iStdIn = 0;
 #endif
 
     if ( iStdIn == 0 )
         return;
-
-    // Add the character to the buffer
-    if ( m_uiInputCount >= sizeof ( m_szInputBuffer ) )
-    {
-        memset(&m_szInputBuffer, 0, sizeof ( m_szInputBuffer ) );
-        m_uiInputCount = 0;
-    }
 
     switch ( iStdIn )
     {
@@ -527,22 +548,33 @@ void CServerImpl::HandleInput ( void )
             // Echo a newline
             Printf ( "\n" );
 #else
+            // set string termination (required for compare/string functions
+            m_szInputBuffer[m_uiInputCount] = 0;
+
             if ( !g_bSilent )
             {
                 // Clear the input window
                 wclear ( m_wndInput );
-                printw ( "%s\n", m_szInputBuffer );
+                printw ( "%s\n", ConvertToANSI(m_szInputBuffer).c_str() );
             }
 #endif
 
             if ( m_uiInputCount > 0 )
             {
                 // Check for the most important command: quit
-                if ( !stricmp ( m_szInputBuffer, "quit" ) || !stricmp ( m_szInputBuffer, "exit" ) )
+#ifdef WIN32
+                if ( !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("quit").c_str() ) || !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("exit").c_str() ) )
+#else
+                if ( !wcscasecmp ( m_szInputBuffer, ConvertToUTF8("quit").c_str() ) || !wcscasecmp ( m_szInputBuffer, ConvertToUTF8("exit").c_str() ) )
+#endif
                 {
                     m_bRequestedQuit = true;
                 }
-                else if ( !stricmp ( m_szInputBuffer, "reset" ) )
+#ifdef WIN32
+                else if ( !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("reset").c_str() ) )
+#else
+                else if ( !wcscasecmp ( m_szInputBuffer, ConvertToUTF8("reset").c_str() ) )
+#endif
                 {
                     m_bRequestedReset = true;
                     m_bRequestedQuit = true;
@@ -550,7 +582,7 @@ void CServerImpl::HandleInput ( void )
                 else
                 {
                     // Otherwise, pass the command to the mod's input handler
-                    m_pModManager->HandleInput ( m_szInputBuffer );
+                    m_pModManager->HandleInput ( ConvertToANSI(m_szInputBuffer).c_str() );
                 }
             }
 
@@ -559,6 +591,12 @@ void CServerImpl::HandleInput ( void )
         break;
 
         case KEY_BACKSPACE: // Backspace
+        case 0x7F:
+            if ( m_uiInputCount == 0 )
+            {
+                break;
+            }
+
             // Insert a blank space + backspace
 #ifdef WIN32
             Printf ( "%c %c", 0x08, 0x08 );
@@ -575,50 +613,55 @@ void CServerImpl::HandleInput ( void )
             // Color the text
             if ( !g_bSilent )
                 SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
-            if ( kbhit () )
-            {
-                iStdIn = getch();
-            }
+
+            iStdIn = _getwch();
+
             switch ( iStdIn )
             {
 #endif
 
         case KEY_LEFT:
         {
-            char szBuffer [255];
+            if ( m_uiInputCount <= 0 )
+            {
+                break;
+            }
+
+#ifdef WIN32
+            wchar_t szBuffer [255];
             memset ( szBuffer, 0, sizeof ( szBuffer ) );
 
-            if ( m_uiInputCount > 0 )
-            {
-                m_uiInputCount--;
-            }
-            strncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
+            m_uiInputCount--;
+            wcsncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
             szBuffer[m_uiInputCount] = 0;
-#ifdef WIN32
-            Printf ( "\r%s", szBuffer );
+
+            Printf ( "\r%s", ConvertToANSI(szBuffer).c_str() );
 #else
             if ( !g_bSilent )
-                wprintw ( m_wndInput, "\r%s", szBuffer );
+                wmove ( m_wndInput, 0, --m_uiInputCount );
 #endif
             break;
         }
 
         case KEY_RIGHT:
         {
-            char szBuffer [255];
+            if ( m_uiInputCount == wcslen ( m_szInputBuffer ) )
+            {
+                break;
+            }
+
+#ifdef WIN32
+            wchar_t szBuffer [255];
             memset ( szBuffer, 0, sizeof ( szBuffer ) );
 
-            if ( m_uiInputCount < strlen ( m_szInputBuffer ) )
-            {
-                m_uiInputCount++;
-            }
-            strncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
+            m_uiInputCount++;
+            wcsncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
             szBuffer[m_uiInputCount] = 0;
-#ifdef WIN32
-            Printf ( "\r%s", szBuffer );
+
+            Printf ( "\r%s", ConvertToANSI(szBuffer).c_str() );
 #else
             if ( !g_bSilent )
-                wprintw ( m_wndInput, "\r%s", szBuffer );
+                wmove ( m_wndInput, 0, ++m_uiInputCount );
 #endif
             break;
         }
@@ -639,16 +682,24 @@ void CServerImpl::HandleInput ( void )
 #endif
 
         default:
+            if ( m_uiInputCount == sizeof ( m_szInputBuffer ) / sizeof ( wchar_t ) - 1 )
+            {
+                // entered 254 characters, wait for user to confirm/remove
+                break;
+            }
+
 #ifdef WIN32
             // Color the text
             if ( !g_bSilent )
                 SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
 
             // Echo the input
-            Printf ( "%c", iStdIn );
+            WCHAR wUNICODE[2] = { iStdIn, 0 };
+            Printf ( "%s", ConvertToANSI(wUNICODE).c_str() );
 #else
+            wchar_t wUNICODE[2] = { iStdIn, 0 };
             if ( !g_bSilent )
-                wprintw ( m_wndInput, "%c", iStdIn );
+                wprintw ( m_wndInput, "%s", ConvertToANSI(wUNICODE).c_str() );
 #endif
 
             m_szInputBuffer[m_uiInputCount++] = iStdIn;
@@ -665,6 +716,14 @@ void CServerImpl::HandleInput ( void )
 
 bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
 {
+#ifndef WIN32
+    // Default to a simple console if running under 'nohup'
+    struct sigaction sa;
+    sigaction ( SIGHUP, NULL, &sa );
+    if ( sa.sa_handler == SIG_IGN )
+        g_bNoTopBar = true;
+#endif
+
     // Iterate our arguments
     unsigned char ucNext = 0;
     for ( int i = 0; i < iArgumentCount; i++ )
@@ -702,9 +761,19 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                 {
                     g_bSilent = true;
                 }
+#ifndef WIN32
+                else if ( strcmp ( szArguments [i], "-d" ) == 0 )
+                {
+                    g_bDaemonized = true;
+                }
+#endif
                 else if ( strcmp ( szArguments [i], "-t" ) == 0 )
                 {
                     g_bNoTopBar = true;
+                }
+                else if ( strcmp ( szArguments [i], "-f" ) == 0 )
+                {
+                    g_bNoTopBar = false;
                 }
 
                 #ifdef WIN32

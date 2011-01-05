@@ -16,12 +16,22 @@ bool CCommandPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // Read out the command
     int iNumberOfBytesUsed = BitStream.GetNumberOfBytesUsed ();
-    if ( iNumberOfBytesUsed > 0 && iNumberOfBytesUsed < 255 )
+    if ( iNumberOfBytesUsed > MIN_COMMAND_LENGTH )
     {
-        BitStream.Read ( m_szCommand, iNumberOfBytesUsed );
-        m_szCommand [iNumberOfBytesUsed] = 0;
-        return true;
+        char* szBuffer = new char[iNumberOfBytesUsed+1];
+        BitStream.Read ( szBuffer, iNumberOfBytesUsed );
+        szBuffer [iNumberOfBytesUsed] = 0;
+        std::wstring strCommandUTF = SharedUtil::ConvertToUTF8(szBuffer);
+
+        if ( strCommandUTF.size() <= MAX_COMMAND_LENGTH )
+        {
+            m_strCommand = szBuffer;
+            delete[] szBuffer;
+            return true;
+        }
+        delete[] szBuffer;
     }
 
     return false;
 }
+ 

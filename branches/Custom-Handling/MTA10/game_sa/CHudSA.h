@@ -5,6 +5,7 @@
 *  FILE:        game_sa/CHudSA.h
 *  PURPOSE:     Header file for HUD display class
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -44,6 +45,8 @@
 #define FUNC_DrawHelpText           0x58B6E0
 #define FUNC_DrawAreaName           0x58AA50
 #define FUNC_DrawRadar              0x58A330
+#define FUNC_DrawRadioName          0x4E9E50
+#define FUNC_DrawWantedLevel        0x58D9A0
 
 #define CODE_ShowMoney              0x58F47D
 
@@ -70,6 +73,8 @@ public:
     void                DisableAreaName ( bool bDisabled );
     void                DisableRadar ( bool bDisabled );
     void                DisableClock ( bool bDisabled );
+    void                DisableRadioName ( bool bDisabled );
+    void                DisableWantedLevel ( bool bDisabled );
     void                DisableAll ( bool bDisabled );
 };
 

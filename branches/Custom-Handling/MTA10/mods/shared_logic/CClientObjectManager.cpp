@@ -340,7 +340,7 @@ void CClientObjectManager::UpdateLimitInfo ( void )
 bool CClientObjectManager::IsObjectLimitReached ( void )
 {
     // Make sure we haven't run out of entry node info's, single link nodes or double link nodes
-    #define MAX_ENTRYINFONODES          2200    // Real limit is 2300
+    #define MAX_ENTRYINFONODES          3500    // Real limit is 4096
     #define MAX_POINTERNODESINGLELINK   65000   // Real limit is 70000
     #define MAX_POINTERNODESDOUBLELINK  3600    // Real limit is 4000
 
@@ -355,7 +355,7 @@ bool CClientObjectManager::IsObjectLimitReached ( void )
 
     // Allow max 250 objects at once for now.
     // TODO: The real limit is up to 350 but we're limited by other limits.
-    return g_pGame->GetPools ()->GetObjectCount () >= 250;
+    return g_pGame->GetPools ()->GetObjectCount () >= 500;
 }
 
 

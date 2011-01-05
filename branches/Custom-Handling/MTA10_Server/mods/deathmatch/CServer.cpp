@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define ALLOC_STATS_MODULE_NAME "deathmatch"
 #include "SharedUtil.hpp"
 
 CServerInterface* g_pServerInterface = NULL;

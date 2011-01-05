@@ -19,6 +19,10 @@ class CAccountManager;
 #include "CAccount.h"
 #include "CXMLConfig.h"
 
+
+//
+// CAccountManager
+//
 class CAccountManager: public CXMLConfig
 {
     friend class CAccount;
@@ -44,7 +48,7 @@ public:
     bool                        LogOut                      ( CClient* pClient, CClient* pEchoClient );
 
     inline bool                 IsAutoLoginEnabled          ( void )                    { return m_bAutoLogin; }
-    inline bool                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; SaveSettings(); return bEnabled; }
+    inline void                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; }
 
     CLuaArgument*               GetAccountData              ( CAccount* pAccount, char* szKey );
     bool                        SetAccountData              ( CAccount* pAccount, char* szKey, SString strValue, int iType );
@@ -68,7 +72,7 @@ public:
     inline list < CAccount* > ::const_iterator  IterEnd     ( void )                    { return m_List.end (); };
 
 protected:
-    list < CAccount* >          m_List;
+    CMappedList < CAccount* >   m_List;
     bool                        m_bRemoveFromList;
 
     bool                        m_bAutoLogin;

@@ -12,221 +12,48 @@
 *
 *****************************************************************************/
 
-#include "Main.h"
-#include "Utils.h"
-#include "resource.h"
-#include <shlwapi.h>
-#include <stdio.h>
-#include "shellapi.h"
-
-#include "SharedUtil.h"
-#include "SharedUtil.hpp"
-using SharedUtil::CalcMTASAPath;
-
-#ifndef _WINDOWS_
-#define WIN32_LEAN_AND_MEAN     // Exclude all uncommon functions from windows.h to reduce executable size
-//#define _WIN32_WINNT 0x0400     // So we can use IsDebuggerPresent()
-#include <windows.h>
-#endif
-
-#include <shlobj.h>
-#include <Psapi.h>
+#include "StdInc.h"
+#include "direct.h"
 
 HANDLE g_hMutex = CreateMutex(NULL, FALSE, TEXT(MTA_GUID));
 
-bool TerminateGTAIfRunning ( void )
+// Command line as map
+class CUPL : public CArgMap
 {
-    DWORD dwProcessIDs[250];
-    DWORD pBytesReturned = 0;
-    unsigned int uiListSize = 50;
-    if ( EnumProcesses ( dwProcessIDs, 250 * sizeof(DWORD), &pBytesReturned ) )
-    {
-        for ( unsigned int i = 0; i < pBytesReturned / sizeof ( DWORD ); i++ )
-        {
-            // Open the process
-            HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, dwProcessIDs[i]);
-            if ( hProcess )
-            {
-                HMODULE pModule;
-                DWORD cbNeeded;
-                if ( EnumProcessModules ( hProcess, &pModule, sizeof ( HMODULE ), &cbNeeded ) )
-                {
-                    char szModuleName[500];
-                    if ( GetModuleFileNameEx( hProcess, pModule, szModuleName, 500 ) )
-                    {
-                        if ( strcmpi ( szModuleName + strlen ( szModuleName ) - strlen ( "gta_sa.exe" ), "gta_sa.exe" ) == 0 )
-                        {
-                            if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA: SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION ) == IDYES )
-                            {
-                                TerminateProcess ( hProcess, 0 );
-                                CloseHandle ( hProcess );
-                                return true;
-                            }
+public:
+    CUPL ( void )
+        :  CArgMap ( "=", "&" )
+    {}
+};
 
-                            return false;
-                        } 
-                    }
-                }
-
-                // Close the process
-                CloseHandle ( hProcess );
-            }
-        }
-    }
-
-    return true;
-}
+// Common command line keys
+#define INSTALL_STAGE       "install_stage"
+#define INSTALL_LOCATION    "install_loc"
+#define ADMIN_STATE         "admin_state"
+#define SILENT_OPT          "silent_opt"
 
 
+HINSTANCE g_hInstance = NULL;
+LPSTR g_lpCmdLine = NULL;
+
+class CMainHack
+{
+public:
+
+///////////////////////////////////////////////////////////////
 //
-// General error message box
+// WinMain
 //
-long DisplayErrorMessageBox ( HWND& hwndSplash, const SString& strMessage )
-{
-    if ( hwndSplash )
-        DestroyWindow ( hwndSplash );
-    MessageBox( 0, strMessage, "Error!", MB_ICONEXCLAMATION|MB_OK );
-    return 1;
-}
-
 //
-// Read a registry string value
 //
-
-SString ReadRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, int* iResult = NULL )
-{
-    // Clear output
-    SString strOutResult = "";
-
-    bool bResult = false;
-    HKEY hkTemp = NULL;
-    if ( RegOpenKeyEx ( hkRoot, szSubKey, 0, KEY_READ, &hkTemp ) == ERROR_SUCCESS ) 
-    {
-        DWORD dwBufferSize;
-        if ( RegQueryValueExA ( hkTemp, szValue, NULL, NULL, NULL, &dwBufferSize ) == ERROR_SUCCESS )
-        {
-            char *szBuffer = static_cast < char* > ( alloca ( dwBufferSize + 1 ) );
-            if ( RegQueryValueExA ( hkTemp, szValue, NULL, NULL, (LPBYTE)szBuffer, &dwBufferSize ) == ERROR_SUCCESS )
-            {
-                strOutResult = szBuffer;
-                bResult = true;
-            }
-        }
-        RegCloseKey ( hkTemp );
-    }
-    if ( iResult )
-        *iResult = bResult;
-    return strOutResult;
-}
-
-
-//
-// Write a registry string value
-//
-
-void WriteRegistryStringValue ( HKEY hkRoot, LPCSTR szSubKey, LPCSTR szValue, char* szBuffer )
-{
-    HKEY hkTemp;
-    RegCreateKeyEx ( hkRoot, szSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkTemp, NULL );
-    if ( hkTemp )
-    {
-        RegSetValueEx ( hkTemp, szValue, NULL, REG_SZ, (LPBYTE)szBuffer, strlen(szBuffer) + 1 );
-        RegCloseKey ( hkTemp );
-    }
-}
-
-
-SString GetMTASAPath ( void )
-{
-    // Get current module full path
-    char szBuffer[64000];
-    GetModuleFileName ( NULL, szBuffer, sizeof(szBuffer) - 1 );
-
-    // Strip the module name out of the path.
-    PathRemoveFileSpec ( szBuffer );
-
-    // Save to a temp registry key
-    WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "Last Run Location", szBuffer );
-    return szBuffer;
-}
-
-
-int GetGamePath ( SString& strOutResult )
-{
-    SString strRegPath = ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path" );
-
-    if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) == 0 )
-    {
-        if ( strlen( strRegPath.c_str () ) )
-        {
-            // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-            if ( strchr ( strRegPath.c_str (), '?' ) > 0 )
-                return -1;
-
-            SString strExePath ( "%s\\%s", strRegPath.c_str (), MTA_GTAEXE_NAME );
-            if ( FileExists( strExePath  ) )
-            {
-                strOutResult = strRegPath;
-                return 1;
-            }
-            strExePath = SString( "%s\\%s", strRegPath.c_str (), MTA_GTASTEAMEXE_NAME );
-            if ( FileExists( strExePath  ) )
-            {
-                return -2;
-            }
-        }
-    }
-    BROWSEINFO bi = { 0 };
-    bi.lpszTitle = "Select your Grand Theft Auto: San Andreas Installation Directory";
-    LPITEMIDLIST pidl = SHBrowseForFolder ( &bi );
-
-    if ( pidl != 0 )
-    {
-        char szBuffer[MAX_PATH];
-        // get the name of the  folder
-        if ( SHGetPathFromIDListA ( pidl, szBuffer ) )
-        {
-            strOutResult = szBuffer;
-        }
-
-        // free memory used
-        IMalloc * imalloc = 0;
-        if ( SUCCEEDED( SHGetMalloc ( &imalloc )) )
-        {
-            imalloc->Free ( pidl );
-            imalloc->Release ( );
-        }
-    
-        if ( FileExists( SString ( "%s\\%s", strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
-        {
-            WriteRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "GTA:SA Path", strOutResult );
-        }
-        else
-        {
-            if ( MessageBox ( NULL, "Could not find gta_sa.exe at the path you have selected. Choose another folder?", "Error", MB_OKCANCEL ) == IDOK )
-            {
-                return GetGamePath ( strOutResult );
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
-{
-    return 1;
-}
-
+///////////////////////////////////////////////////////////////
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+
+    //////////////////////////////////////////////////////////
+    //
+    // Handle duplicate launching, or running from mtasa:// URI ?
+    //
     if ( GetLastError() == ERROR_ALREADY_EXISTS )
     {
         if ( strcmp ( lpCmdLine, "" ) != 0 )
@@ -258,35 +85,474 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
     }
 
-    if ( !TerminateGTAIfRunning () )
+
+
+    g_hInstance = hInstance;
+    g_lpCmdLine = lpCmdLine;
+
+#ifndef MTA_DEBUG
+    ShowSplash ( hInstance );
+#endif
+
+    //////////////////////////////////////////////////////////
+    //
+    // Parse command line
+    //
+
+    CUPL UPL;
+    UPL.SetFromString ( lpCmdLine );
+
+    // Set command line defaults if required
+    if ( !UPL.Contains ( INSTALL_STAGE ) )      UPL.Set ( INSTALL_STAGE, "initial" );
+    if ( !UPL.Contains ( INSTALL_LOCATION ) )   UPL.Set ( INSTALL_LOCATION, "near" );
+    if ( !UPL.Contains ( ADMIN_STATE ) )        UPL.Set ( ADMIN_STATE, "no" );   // Could be yes, but assuming 'no' works best
+
+    // If not running from the launch directory, get the launch directory location from the registry
+    if ( UPL.Get ( INSTALL_LOCATION ) == "far" )
+        SetMTASAPathSource ( true );
+    else
+        SetMTASAPathSource ( false );
+
+    // Update some settings which are used by ReportLog
+    UpdateMTAVersionApplicationSetting ();
+    SetApplicationSetting ( "os-version", GetOSVersion () );
+    SetApplicationSetting ( "real-os-version", GetRealOSVersion () );
+    SetApplicationSetting ( "is-admin", IsUserAdmin () ? "1" : "0" );
+
+    // Initial report line
+    DWORD dwProcessId = GetCurrentProcessId();
+    SString GotPathFrom = ( UPL.Get( INSTALL_LOCATION ) == "far" ) ? "registry" : "module location";
+    AddReportLog ( 1041, SString ( "* Launch * pid:%d '%s' MTASAPath set from %s '%s'", dwProcessId, GetMTASAModuleFileName ().c_str (), GotPathFrom.c_str (), GetMTASAPath ().c_str () ) );
+
+    // Do next stage
+    int iReturnCode = DoInstallStage ( UPL );
+
+    AddReportLog ( 1044, SString ( "* End (%d)* pid:%d",  iReturnCode, dwProcessId ) );
+    return iReturnCode;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// ChangeInstallUPL
+//
+//
+//
+//////////////////////////////////////////////////////////
+int _ChangeInstallUPL ( const CUPL& UPLOld, const CUPL& UPLNew, bool bBlocking )
+{
+    AddReportLog ( 1045, SString ( "ChangeInstallUPL: '%s' -> '%s'", UPLOld.ToString ().c_str (), UPLNew.ToString ().c_str () ) );
+
+    const SString strLocationOld    = UPLOld.Get ( INSTALL_LOCATION );
+    const SString strAdminOld       = UPLOld.Get ( ADMIN_STATE );
+
+    const SString strLocationNew    = UPLNew.Get ( INSTALL_LOCATION );
+    const SString strAdminNew       = UPLNew.Get ( ADMIN_STATE );
+
+
+    // If loc or admin state is changing, relaunch
+    if ( strLocationOld != strLocationNew || strAdminOld != strAdminNew )
     {
-        MessageBox ( 0, "MTA: SA couldn't start because an another instance of GTA is running.", "Error", MB_ICONERROR );
-        return 0;
+        if ( strAdminOld == "yes" && strAdminNew == "no" )
+            return 0;   // admin is always an inner process. Exit to drop rights.
+
+        SString strAction = strAdminNew == "yes" ? "runas" : "open";
+        SString strFile;
+        if ( strLocationNew == "far" )
+            strFile = PathJoin ( GetCurrentWorkingDirectory (), MTA_EXE_NAME_RELEASE );
+        else
+            strFile = PathJoin ( GetMTASAPath (), MTA_EXE_NAME_RELEASE );
+
+        if ( bBlocking )
+        {
+            if ( ShellExecuteBlocking ( strAction, strFile, UPLNew.ToString () ) )
+                return 0;
+        }
+        else
+        {
+            if ( ShellExecuteNonBlocking ( strAction, strFile, UPLNew.ToString () ) )
+                return 0;
+        }
     }
 
-    PROCESS_INFORMATION piLoadee;
-    STARTUPINFO siLoadee;
+    return DoInstallStage ( UPLNew );
+}
 
+
+int ChangeInstallUPL ( const CUPL& UPLOld, const SString& strStageNew, const SString& strLocationNew, const SString& strAdminNew, const CUPL& UPLOptions = CUPL() )
+{
+    CUPL UPLNew = UPLOld;
+    if ( strStageNew    != "*" )   UPLNew.Set ( INSTALL_STAGE, strStageNew );
+    if ( strLocationNew != "*" )   UPLNew.Set ( INSTALL_LOCATION,   strLocationNew );
+    if ( strAdminNew    != "*" )   UPLNew.Set ( ADMIN_STATE,   strAdminNew );
+    UPLNew.Merge ( UPLOptions );
+    return _ChangeInstallUPL ( UPLOld, UPLNew, false );
+}
+
+int ChangeInstallUPLBlocking ( const CUPL& UPLOld, const SString& strStageNew, const SString& strLocationNew, const SString& strAdminNew, const CUPL& UPLOptions = CUPL() )
+{
+    CUPL UPLNew = UPLOld;
+    if ( strStageNew    != "*" )   UPLNew.Set ( INSTALL_STAGE, strStageNew );
+    if ( strLocationNew != "*" )   UPLNew.Set ( INSTALL_LOCATION,   strLocationNew );
+    if ( strAdminNew    != "*" )   UPLNew.Set ( ADMIN_STATE,   strAdminNew );
+    UPLNew.Merge ( UPLOptions );
+    return _ChangeInstallUPL ( UPLOld, UPLNew, true );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// DoInstallStage
+//
+//
+//
+//////////////////////////////////////////////////////////
+int DoInstallStage ( const CUPL& UPL ) 
+{
+    AddReportLog ( 1046, SString ( "DoInstallStage: '%s'", UPL.ToString ().c_str () ) );
+
+    if ( UPL.Get( INSTALL_STAGE ) == "crashed" )
+    {
+        // Crashed before gta game started ?
+        if ( WatchDogIsSectionOpen ( "L1" ) )
+            WatchDogIncCounter ( "CR1" );
+
+        const SString strResult = HandlePostCrash ();
+        if ( strResult.Contains ( "quit" ) )
+            return 0;
+        return ChangeInstallUPL ( UPL, "initial", "*", "*" );     
+    }
+    else
+    if ( UPL.Get( INSTALL_STAGE ) == "initial" )
+    {
+        const SString strResult = CheckOnRestartCommand ();
+        if ( strResult.Contains ( "install" ) )
+        {
+            SString strLocation = strResult.Contains ( "far" ) ? "far" : "near";
+            CUPL UPLOptions;
+            UPLOptions.Set ( SILENT_OPT, strResult.Contains ( "silent" ) ? "yes" : "no" );
+            // This may launch new .exe in temp dir if required
+            return ChangeInstallUPL ( UPL, "copy_files", strLocation, "no", UPLOptions );
+        }
+        else
+        if ( !strResult.Contains ( "no update" ) )
+        {
+            AddReportLog ( 4047, SString ( "DoInstallStage: CheckOnRestartCommand returned %s", strResult.c_str () ) );
+        }
+    }
+    else
+    if ( UPL.Get( INSTALL_STAGE ) == "copy_files" )
+    {
+        WatchDogReset ();
+        // Install new files
+        if ( !InstallFiles ( UPL.Get( SILENT_OPT ) != "no" ) )
+        {
+            if ( UPL.Get( ADMIN_STATE ) != "yes" )
+            {
+                AddReportLog ( 3048, SString ( "DoInstallStage: Install - trying as admin %s", "" ) );
+                // The only place the admin process is launched.
+                // Wait for it to finish before continuing here.
+                ChangeInstallUPLBlocking ( UPL, "*", "*", "yes" );
+            }
+            else
+            {
+                AddReportLog ( 5049, SString ( "DoInstallStage: Couldn't install files %s", "" ) );
+                int iResponse = MessageBox ( NULL, "Could not update due to file conflicts. Please close other applications and retry", "Error", MB_RETRYCANCEL | MB_ICONERROR );
+                if ( iResponse == IDRETRY )
+                    return DoInstallStage ( UPL );
+                //return 1;   // failure
+            }
+        }
+        else
+            AddReportLog ( 2050, SString ( "DoInstallStage: Install ok %s", "" ) );
+
+        return ChangeInstallUPL ( UPL, "launch", "near", "no" );
+    }
+
+    // Update news if any there
+    InstallNewsItems ();
+
+    // Default to launching MTA
+    AddReportLog ( 1051, SString ( "DoInstallStage: LaunchGame cwd:%s", GetCurrentWorkingDirectory ().c_str () ) );
+    return LaunchGame ( g_lpCmdLine );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// CheckOnRestartCommand
+//
+//
+//
+//////////////////////////////////////////////////////////
+SString CheckOnRestartCommand ( void )
+{
+    const SString strMTASAPath = GetMTASAPath ();
+
+    SetCurrentDirectory ( strMTASAPath );
+    SetDllDirectory( strMTASAPath );
+
+    SString strOperation, strFile, strParameters, strDirectory, strShowCmd;
+    if ( GetOnRestartCommand ( strOperation, strFile, strParameters, strDirectory, strShowCmd ) )
+    {
+        if ( strOperation == "files" || strOperation == "silent" )
+        {
+            //
+            // Update
+            //
+
+            // Make temp path name and go there
+            SString strArchivePath, strArchiveName;
+            strFile.Split ( "\\", &strArchivePath, &strArchiveName, -1 );
+
+            SString strTempPath = MakeUniquePath ( strArchivePath + "\\_" + strArchiveName + "_tmp_" );
+
+            if ( !MkDir ( strTempPath ) )
+                return "FileError1";
+
+            if ( !SetCurrentDirectory ( strTempPath ) )
+                return "FileError2";
+
+            // Start progress bar
+            if ( strOperation != "silent" )
+               StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Installing update..." );
+
+            // Run self extracting archive to extract files into the temp directory
+            ShellExecuteBlocking ( "open", strFile, "-s" );
+
+            // Stop progress bar
+            StopPseudoProgress();
+
+            // If a new "Multi Theft Auto.exe" exists, let that complete the install
+            if ( FileExists ( MTA_EXE_NAME_RELEASE ) )
+                return "install from far " + strOperation;
+
+            // Otherwise use the current exe to install
+            return "install from near " + strOperation;
+        }
+        else
+        {
+            AddReportLog ( 5052, SString ( "CheckOnRestartCommand: Unknown restart command %s", strOperation.c_str () ) );
+        }
+    }
+    return "no update";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// InstallNewsItems
+//
+//
+//
+//////////////////////////////////////////////////////////
+void InstallNewsItems ( void )
+{
+    // Get install news queue
+    CArgMap queue;
+    queue.SetFromString ( GetApplicationSetting ( "news-install" ) );
+    SetApplicationSetting ( "news-install", "" );
+
+    std::vector < SString > keyList;
+    queue.GetKeys ( keyList );
+    for ( uint i = 0 ; i < keyList.size () ; i++ )
+    {
+        // Install each file
+        SString strDate = keyList[i];
+        SString strFileLocation = queue.Get ( strDate );
+
+        // Save cwd
+        SString strSavedDir = GetCurrentWorkingDirectory ();
+
+        // Calc and make target dir
+        SString strTargetDir = PathJoin ( GetMTALocalAppDataPath (), "news", strDate );
+        MkDir ( strTargetDir );
+
+        // Extract into target dir
+        SetCurrentDirectory ( strTargetDir );
+        ShellExecuteBlocking ( "open", strFileLocation, "-s" );
+
+        // Restore cwd
+        SetCurrentDirectory ( strSavedDir );
+
+        // Check result
+        if ( FileExists ( PathJoin ( strTargetDir, "files.xml" ) ) )
+        {
+            SetApplicationSettingInt ( "news-updated", 1 );
+            AddReportLog ( 2051, SString ( "InstallNewsItems ok for '%s'", *strDate ) );
+        }
+        else
+        {
+            AddReportLog ( 4048, SString ( "InstallNewsItems failed with '%s' '%s' '%s'", *strDate, *strFileLocation, *strTargetDir ) );
+        }
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// HandlePostCrash
+//
+//
+//
+//////////////////////////////////////////////////////////
+SString HandlePostCrash ( void )
+{
+    HideSplash ();
+
+    SString strMessage = GetApplicationSetting ( "diagnostics", "last-crash-info" );
+
+    strMessage = strMessage.Replace ( "\r", "" ).Replace ( "\n", "\r\n" );
+
+    SString strResult = ShowCrashedDialog ( g_hInstance, strMessage );
+    HideCrashedDialog ();
+    return strResult;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// HandleTrouble
+//
+//
+//
+//////////////////////////////////////////////////////////
+void HandleTrouble ( void )
+{
+    int iResponse = MessageBox ( NULL, "There may be trouble.\n\nDo you want to revert to an earlier version of MTA:SA?", "", MB_YESNO | MB_ICONERROR );
+    if ( iResponse == IDYES )
+    {
+        MessageBox ( NULL, "Your browser will now download an installer which may fix the trouble.\n\nIf the page fails to load, please goto www.mtasa.com", "", MB_OK | MB_ICONINFORMATION );
+        BrowseToSolution ( "crashing-before-gtagame", false, true );
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// LaunchGame
+//
+//
+//
+//////////////////////////////////////////////////////////
+int LaunchGame ( LPSTR lpCmdLine )
+{
+    // Check for unclean stop on previous run
+    if ( WatchDogIsSectionOpen ( "L0" ) )
+        WatchDogSetUncleanStop ( true );
+    else
+        WatchDogSetUncleanStop ( false );
+
+    // Reset counter if gta game was run last time
+    if ( !WatchDogIsSectionOpen ( "L1" ) )
+        WatchDogClearCounter ( "CR1" );
+
+    // If crashed 3 times in a row before starting the game, do something
+    if ( WatchDogGetCounter ( "CR1" ) >= 3 )
+    {
+        WatchDogReset ();
+        HandleTrouble ();
+    }
+
+    WatchDogBeginSection ( "L0" );
+    WatchDogBeginSection ( "L1" );
+
+    int iReturnCode = DoLaunchGame ( lpCmdLine );
+
+    if ( iReturnCode == 0 )
+    {
+        WatchDogClearCounter ( "CR1" );
+        WatchDogCompletedSection ( "L0" );
+    }
+
+    return iReturnCode;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// DoLaunchGame
+//
+//
+//
+//////////////////////////////////////////////////////////
+int DoLaunchGame ( LPSTR lpCmdLine )
+{
+    ////////////////////////////////////////////////////////////
+    ////
+    //// Handle duplicate launching, or running from mtasa:// URI ?
+    ////
+    //if ( GetLastError() == ERROR_ALREADY_EXISTS )
+    //{
+    //    if ( strcmp ( lpCmdLine, "" ) != 0 )
+    //    {
+    //        COPYDATASTRUCT cdStruct;
+
+    //        cdStruct.cbData = strlen(lpCmdLine)+1;
+    //        cdStruct.lpData = const_cast<char *>((lpCmdLine));
+    //        cdStruct.dwData = URI_CONNECT;
+
+    //        HWND hwMTAWindow = FindWindow( NULL, "MTA: San Andreas" );
+    //        if( hwMTAWindow != NULL )
+    //        {
+    //            SendMessage( hwMTAWindow,
+    //                        WM_COPYDATA,
+    //                        NULL,
+    //                        (LPARAM)&cdStruct );
+    //        }
+    //        else
+    //        {
+    //            MessageBox( 0, "Can't send WM_COPYDATA", "Error", MB_ICONERROR );
+    //            return 0;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        MessageBox ( 0, "Another instance of MTA is already running.", "Error", MB_ICONERROR );
+    //        return 0;
+    //    }
+    //}
+
+    //////////////////////////////////////////////////////////
+    //
+    // Handle GTA already running
+    //
+    if ( !TerminateGTAIfRunning () )
+    {
+        DisplayErrorMessageBox ( "MTA: SA couldn't start because an another instance of GTA is running." );
+        return 1;
+    }
+
+    //////////////////////////////////////////////////////////
+    //
+    // Get path to GTASA
+    //
     SString strGTAPath;
     int iResult = GetGamePath ( strGTAPath );
     if ( iResult == 0 ) {
-        MessageBox ( 0, "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas.", "Error!", MB_ICONEXCLAMATION | MB_OK );
+        DisplayErrorMessageBox ( "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas.", "reg-entries-missing" );
         return 5;
     }
     else if ( iResult == -1 ) {
-        MessageBox ( 0, "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas.", "Error!", MB_ICONEXCLAMATION | MB_OK );
+        DisplayErrorMessageBox ( "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas." );
         return 5;
     }
     else if ( iResult == -2 ) {
-        MessageBox ( 0, "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue.", "Error", MB_OK|MB_ICONEXCLAMATION );
-        ShellExecute ( NULL, "open", "http://multitheftauto.com/downgrade/steam", NULL, NULL, SW_SHOWNORMAL );
+        DisplayErrorMessageBox ( "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue." );
+        BrowseToSolution ( "downgrade-steam" );
         return 5;
     }
 
-    SString strMTASAPath = GetMTASAPath ();
+    const SString strMTASAPath = GetMTASAPath ();
 
+    SetCurrentDirectory ( strMTASAPath );
+    SetDllDirectory( strMTASAPath );
+
+    //////////////////////////////////////////////////////////
+    //
+    // Show splash screen
+    //
     // If we aren't compiling in debug-mode...
-    HWND hwndSplash = NULL;
     #ifndef MTA_DEBUG
     #ifndef MTA_ALLOW_DEBUG
         // Are we debugged? Quit... if not compiled debug
@@ -297,29 +563,30 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
 
         // Show the splash and wait 2 seconds
-        hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
-        Sleep ( 1000 );
+        ShowSplash ( g_hInstance );
     #endif
     #endif
 
-
-    // Basic check for the data files
+    //////////////////////////////////////////////////////////
+    //
+    // Basic check for some essential files
+    //
     if ( !FileExists ( strMTASAPath + "\\mta\\cgui\\CGUI.png" ) )
     {
         // Check if CGUI.png exists
-        return DisplayErrorMessageBox ( hwndSplash, "Load failed. Please ensure that the data files have been installed correctly." );
+        return DisplayErrorMessageBox ( "Load failed. Please ensure that the data files have been installed correctly.", "mta-datafiles-missing" );
     }
 
     // Check for client file
     if ( !FileExists ( strMTASAPath + "\\" +  CHECK_DM_CLIENT_NAME ) )
     {
-        return DisplayErrorMessageBox ( hwndSplash, "Load failed. Please ensure that '" CHECK_DM_CLIENT_NAME "' is installed correctly." );
+        return DisplayErrorMessageBox ( "Load failed. Please ensure that '" CHECK_DM_CLIENT_NAME "' is installed correctly.", "client-missing" );
     }
 
     // Check for lua file
     if ( !FileExists ( strMTASAPath + "\\" + CHECK_DM_LUA_NAME ) )
     {
-        return DisplayErrorMessageBox ( hwndSplash, "Load failed. Please ensure that '" CHECK_DM_LUA_NAME "' is installed correctly." );
+        return DisplayErrorMessageBox ( "Load failed. Please ensure that '" CHECK_DM_LUA_NAME "' is installed correctly.", "lua-missing" );
     }
 
     // Grab the MTA folder
@@ -330,7 +597,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     SetCurrentDirectory ( strGTAPath );
     if ( !FileExists( strGTAEXEPath ) )
     {
-        return DisplayErrorMessageBox ( hwndSplash, SString ( "Load failed. Could not find gta_sa.exe in %s.", strGTAPath.c_str () ) );
+        return DisplayErrorMessageBox ( SString ( "Load failed. Could not find gta_sa.exe in %s.", strGTAPath.c_str () ), "gta_sa-missing" );
     }
 
     // Make sure important dll's do not exist in the wrong place
@@ -339,11 +606,18 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     {
         if ( FileExists( strGTAPath + "\\" + dllCheckList[i] ) )
         {
-            return DisplayErrorMessageBox ( hwndSplash, SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ) );
+            return DisplayErrorMessageBox ( SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ), "file-clash" );
         }    
     }
 
+
+    //////////////////////////////////////////////////////////
+    //
+    // Hook 'n' go
+    //
     // Launch GTA using CreateProcess
+    PROCESS_INFORMATION piLoadee;
+    STARTUPINFO siLoadee;
     memset( &piLoadee, 0, sizeof ( PROCESS_INFORMATION ) );
     memset( &siLoadee, 0, sizeof ( STARTUPINFO ) );
     siLoadee.cb = sizeof ( STARTUPINFO );
@@ -360,9 +634,9 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                               &siLoadee,
                               &piLoadee ) )
     {
-        DisplayErrorMessageBox ( hwndSplash, "Could not start Grand Theft Auto: San Andreas.  "
-                          "Please try restarting, or if the problem persists,"
-                          "contact MTA at www.multitheftauto.com." );
+        DisplayErrorMessageBox ( "Could not start Grand Theft Auto: San Andreas.  "
+                            "Please try restarting, or if the problem persists,"
+                            "contact MTA at www.multitheftauto.com.", "createprocess-fail" );
         return 2;
     }
 
@@ -371,9 +645,9 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // Check if the core (mta_blue.dll or mta_blue_d.dll exists)
     if ( !FileExists ( strCoreDLL ) )
     {
-        DisplayErrorMessageBox ( hwndSplash, "Load failed.  Please ensure that "
-                          "the file core.dll is in the modules "
-                           "directory within the MTA root directory." );
+        DisplayErrorMessageBox ( "Load failed.  Please ensure that "
+                            "the file core.dll is in the modules "
+                            "directory within the MTA root directory.", "core-missing" );
 
         // Kill GTA and return errorcode
         TerminateProcess ( piLoadee.hProcess, 1 );
@@ -386,16 +660,23 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     HMODULE hCoreModule = LoadLibrary( strCoreDLL );
     if ( hCoreModule == NULL )
     {
-        DisplayErrorMessageBox ( hwndSplash, "Load failed.  Please ensure that \n"
+        DisplayErrorMessageBox ( "Load failed.  Please ensure that \n"
                             "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed." );
+                            "and the latest DirectX is correctly installed.", "vc-redist-missing" );
         // Kill GTA and return errorcode
         TerminateProcess ( piLoadee.hProcess, 1 );
         return 1;
     }
+    FreeLibrary ( hCoreModule );
+
+    // Wait until the splash has been displayed the required amount of time
+    HideSplash ( true );
 
     // Inject the core into GTA
     RemoteLoadLibrary ( piLoadee.hProcess, strCoreDLL );
+
+    // Actually hide the splash
+    HideSplash ();
     
     // Clear previous on quit commands
     SetOnQuitCommand ( "" );
@@ -403,54 +684,74 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // Resume execution for the game.
     ResumeThread ( piLoadee.hThread );
 
-    if ( hwndSplash )
-        DestroyWindow ( hwndSplash );
+    // Wait for game to exit
+    if ( piLoadee.hThread)
+        WaitForSingleObject ( piLoadee.hProcess, INFINITE );
 
-    //#ifdef MTA_DEBUG
-    WaitForSingleObject ( piLoadee.hProcess, INFINITE );
-    //#endif
+    // Get its exit code
+    DWORD dwExitCode = -1;
+    GetExitCodeProcess( piLoadee.hProcess, &dwExitCode );
 
-
+    //////////////////////////////////////////////////////////
+    //
+    // On exit
+    //
     // Cleanup and exit.
     CloseHandle ( piLoadee.hProcess );
     CloseHandle ( piLoadee.hThread );
     CloseHandle ( g_hMutex );
 
 
+    //////////////////////////////////////////////////////////
+    //
+    // Handle OnQuitCommand
+    //
     // Maybe spawn an exe
-    SetCurrentDirectory ( strMTASAPath );
-    SetDllDirectory( strMTASAPath );
-
-    SString strOnQuitCommand = ReadRegistryStringValue ( HKEY_CURRENT_USER, "Software\\Multi Theft Auto: San Andreas", "OnQuitCommand" );
-
-    std::vector < SString > vecParts;
-    strOnQuitCommand.Split ( "\t", vecParts );
-    if ( vecParts.size () > 4 )
     {
-        SString strOperation = vecParts[0];
-        SString strFile = vecParts[1];
-        SString strParameters = vecParts[2];
-        SString strDirectory = vecParts[3];
-        SString strShowCmd = vecParts[4];
+        SetCurrentDirectory ( strMTASAPath );
+        SetDllDirectory( strMTASAPath );
 
-        if ( strOperation == "restart" )
+        SString strOnQuitCommand = GetRegistryValue ( "", "OnQuitCommand" );
+
+        std::vector < SString > vecParts;
+        strOnQuitCommand.Split ( "\t", vecParts );
+        if ( vecParts.size () > 4 && vecParts[0].length () )
         {
-            strOperation = "open";
-            strFile = strMTASAPath + "\\" + MTA_EXE_NAME;
-        }
+            SString strOperation = vecParts[0];
+            SString strFile = vecParts[1];
+            SString strParameters = vecParts[2];
+            SString strDirectory = vecParts[3];
+            SString strShowCmd = vecParts[4];
 
-        LPCTSTR lpOperation     = strOperation == "" ? NULL : strOperation.c_str ();
-        LPCTSTR lpFile          = strFile.c_str ();
-        LPCTSTR lpParameters    = strParameters == "" ? NULL : strParameters.c_str ();
-        LPCTSTR lpDirectory     = strDirectory == "" ? NULL : strDirectory.c_str ();
-        INT nShowCmd            = strShowCmd == "" ? SW_SHOWNORMAL : atoi( strShowCmd );
+            if ( strOperation == "restart" )
+            {
+                strOperation = "open";
+                strFile = strMTASAPath + "\\" + MTA_EXE_NAME;
+            }
 
-        if ( lpOperation && lpFile )
-        {
-            ShellExecute( NULL, lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd );            
+            LPCTSTR lpOperation     = strOperation == "" ? NULL : strOperation.c_str ();
+            LPCTSTR lpFile          = strFile.c_str ();
+            LPCTSTR lpParameters    = strParameters == "" ? NULL : strParameters.c_str ();
+            LPCTSTR lpDirectory     = strDirectory == "" ? NULL : strDirectory.c_str ();
+            INT nShowCmd            = strShowCmd == "" ? SW_SHOWNORMAL : atoi( strShowCmd );
+
+            if ( lpOperation && lpFile )
+            {
+                ShellExecuteNonBlocking( lpOperation, lpFile, lpParameters, lpDirectory, nShowCmd );            
+            }
         }
     }
 
-    // Success
-    return 0;
+    // Success, maybe
+    return dwExitCode;
+}
+
+
+};
+
+// To avoid having to forward declare functions in this file
+int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+{
+    CMainHack MainHack;
+    return MainHack.WinMain ( hInstance, hPrevInstance, lpCmdLine, nCmdShow );
 }

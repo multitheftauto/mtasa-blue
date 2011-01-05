@@ -39,7 +39,6 @@ public:
     bool                            LoadExtended                    ( void );
     bool                            Save                            ( const char* szFileName = NULL );
 
-    inline unsigned int             GetMTUSize                      ( void )        { return m_uiMTUSize; };
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
     void                            SetServerName                   ( std::string strServerName );
     std::string                     GetServerIP                     ( void );
@@ -56,7 +55,9 @@ public:
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
     inline const std::string&       GetHTTPDownloadURL              ( void )        { return m_strHTTPDownloadURL; };
-    inline int                      GetHTTPConnectionsPerClient     ( void )        { return m_iHTTPConnectionsPerClient; };
+    inline int                      GetHTTPMaxConnectionsPerClient  ( void )        { return m_iHTTPMaxConnectionsPerClient; };
+    inline int                      GetHTTPThreadCount              ( void )        { return m_iHTTPThreadCount; };
+    inline int                      GetHTTPDosThreshold             ( void )        { return m_iHTTPDosThreshold; };
     inline int                      GetEnableClientChecks           ( void )        { return m_iEnableClientChecks; };
     inline const std::string&       GetLogFile                      ( void )        { return m_strLogFile; };
     inline const std::string&       GetAuthFile                     ( void )        { return m_strAuthFile; };
@@ -70,10 +71,12 @@ public:
     inline bool                     GetDontBroadcastLan             ( void )        { return m_bDontBroadcastLan; };
     inline bool                     GetSerialVerificationEnabled    ( void )        { return m_bVerifySerials; };
     bool                            IsDisableAC                     ( const char* szTagAC )     { return MapContains ( m_DisableACMap, szTagAC ); };
+    bool                            IsEnableDiagnostic              ( const char* szTag )       { return MapContains ( m_EnableDiagnosticMap, szTag ); };
     bool                            IsBelowMinimumClient            ( const char* szVersion )   { return m_strMinClientVersion.length () && m_strMinClientVersion > szVersion; }
     bool                            IsBelowRecommendedClient        ( const char* szVersion )   { return m_strRecommendedClientVersion.length () && m_strRecommendedClientVersion > szVersion; }
     const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
+    inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     void                            SetFPSLimit                     ( unsigned short usFPS );
@@ -88,7 +91,6 @@ private:
     CXMLNode*                       m_pRootNode;
     CCommandLineParser*             m_pCommandLineParser;
 
-    unsigned int                    m_uiMTUSize;
     std::string                     m_strServerIP;
     std::string                     m_strServerName;
     unsigned short                  m_usServerPort;
@@ -99,7 +101,9 @@ private:
     unsigned short                  m_usHTTPPort;
     eHTTPDownloadType               m_ucHTTPDownloadType;
     std::string                     m_strHTTPDownloadURL;
-    int                             m_iHTTPConnectionsPerClient;
+    int                             m_iHTTPMaxConnectionsPerClient;
+    int                             m_iHTTPThreadCount;
+    int                             m_iHTTPDosThreshold;
     int                             m_iEnableClientChecks;
     std::string                     m_strLogFile;
     std::string                     m_strAuthFile;
@@ -114,8 +118,10 @@ private:
     unsigned short                  m_usFPSLimit;
     bool                            m_bDontBroadcastLan;
     std::map < SString, int >       m_DisableACMap;
+    std::map < SString, int >       m_EnableDiagnosticMap;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
+    bool                            m_bAutoLogin;
 };
 
 #endif

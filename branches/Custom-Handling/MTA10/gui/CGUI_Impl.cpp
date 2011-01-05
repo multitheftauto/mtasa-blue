@@ -20,6 +20,7 @@ using std::list;
 #define CGUI_MTA_DEFAULT_FONT       "tahoma.ttf"        // %WINDIR%/font/<...>
 #define CGUI_MTA_DEFAULT_FONT_BOLD  "tahomabd.ttf"      // %WINDIR%/font/<...>
 #define CGUI_MTA_CLEAR_FONT         "verdana.ttf"       // %WINDIR%/font/<...>
+#define CGUI_MTA_SUBSTITUTE_FONT    "cgui/unifont-5.1.20080907.ttf"  // GTA/MTA/<...>
 #define CGUI_MTA_SANS_FONT          "cgui/sans.ttf"     // GTA/MTA/<...>
 #define CGUI_SA_HEADER_FONT         "cgui/saheader.ttf" // GTA/MTA/<...>
 #define CGUI_SA_GOTHIC_FONT         "cgui/sagothic.ttf" // GTA/MTA/<...>
@@ -66,16 +67,21 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     // Load our fonts
     char szWinDir[64], szFont[128];
     GetWindowsDirectory ( szWinDir, 64 );
+
+    m_pFontManager->setSubstituteFont ( CGUI_MTA_SUBSTITUTE_FONT, 9 );
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT );
-    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9 );
-    m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7 );
+    m_pDefaultFont = (CGUIFont_Impl*) CreateFnt ( "default-normal", szFont, 9, 0 );
+    m_pSmallFont = (CGUIFont_Impl*) CreateFnt ( "default-small", szFont, 7, 0 );
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_DEFAULT_FONT_BOLD );
-    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8 );
+    m_pBoldFont = (CGUIFont_Impl*) CreateFnt ( "default-bold-small", szFont, 8, 0 );
+
     _snprintf ( &szFont[0], 128, "%s\\fonts\\%s", szWinDir, CGUI_MTA_CLEAR_FONT );
     m_pClearFont = (CGUIFont_Impl*) CreateFnt ( "clear-normal", szFont, 9 );
-    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, 0, true );
-    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, 0, true );
-    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, 0, false );
+    m_pSAHeaderFont = (CGUIFont_Impl*) CreateFnt ( "sa-header", CGUI_SA_HEADER_FONT, CGUI_SA_HEADER_SIZE, 0, true );
+    m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, true );
+    m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, false );
     // ACHTUNG: These font creations can throw exceptions!
 
     // Load bluescheme
@@ -114,9 +120,11 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventMoved             , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_Moved, this ) );
     pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventSized             , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_Sized, this ) );
     pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventRedrawRequested   , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_RedrawRequested, this ) );
-
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventActivated         , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_FocusGained, this ) );
+    pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventDeactivated       , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_FocusLost, this ) );
+    
     // Disallow input routing to the GUI
-    m_bSwitchGUIInput = false;
+    m_eInputMode = INPUTMODE_ALLOW_BINDS;
 
     // Reset the working directory
     m_szWorkingDirectory[MAX_PATH] = 0;
@@ -176,7 +184,7 @@ void CGUI_Impl::Restore ( void )
     catch ( CEGUI::RendererException& exception )
     {
         MessageBox ( 0, exception.getMessage().c_str (), "CEGUI Exception", MB_OK|MB_ICONERROR );
-        TerminateProcess ( GetCurrentProcess (), 0 );
+        TerminateProcess ( GetCurrentProcess (), 1 );
     }
 }
 
@@ -227,22 +235,100 @@ void CGUI_Impl::ProcessKeyboardInput ( unsigned long ulKey, bool bIsDown )
     }
 }
 
-
-void CGUI_Impl::SetGUIInputEnabled ( bool bEnabled )
-{   // inline?
-    m_bSwitchGUIInput = bEnabled;
-}
-
-
 bool CGUI_Impl::GetGUIInputEnabled ( void )
-{   // inline?
-    return m_bSwitchGUIInput;
+{  
+    switch (m_eInputMode)
+    {
+    case INPUTMODE_ALLOW_BINDS:
+        return false;
+        break;
+    case INPUTMODE_NO_BINDS:
+        return true;
+        break;
+    case INPUTMODE_NO_BINDS_ON_EDIT:
+        {
+            CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
+            if (!pActiveWindow || pActiveWindow == m_pTop || !pActiveWindow->isVisible())
+            {
+                return false;
+            }
+            if (pActiveWindow->getType() == "CGUI/Editbox")
+            {
+                CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(pActiveWindow);
+                return (!pEditBox->isReadOnly() && pEditBox->hasInputFocus());
+            }
+            else if (pActiveWindow->getType() == "CGUI/MultiLineEditbox")
+            {
+                CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
+                return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
+            }
+            return false;
+        }
+        break;
+    default:
+        return false;
+    }
 }
 
+void CGUI_Impl::SetGUIInputMode( eInputMode a_eMode )
+{
+    m_eInputMode = a_eMode;
+}
+
+eInputMode CGUI_Impl::GetGUIInputMode( void )
+{
+    return m_eInputMode;
+}
+
+eInputMode CGUI_Impl::GetInputModeFromString ( const std::string& a_rstrMode ) const
+{
+    const char* szMode = a_rstrMode.c_str();
+    if ( stricmp(szMode, "allow_binds") == 0 )
+    {
+        return INPUTMODE_ALLOW_BINDS;
+    }
+    else if ( stricmp(szMode, "no_binds") == 0 )
+    {
+        return INPUTMODE_NO_BINDS;
+    }
+    else if ( stricmp(szMode, "no_binds_when_editing") == 0 )
+    {
+        return INPUTMODE_NO_BINDS_ON_EDIT;
+    }
+    else
+    {
+        return INPUTMODE_INVALID;
+    }
+}
+
+ 
+bool CGUI_Impl::GetStringFromInputMode ( eInputMode a_eMode, std::string& a_rstrResult ) const
+{
+    switch (a_eMode)
+    {
+    case INPUTMODE_ALLOW_BINDS:
+        {
+            a_rstrResult = "allow_binds";
+            return true;
+        }
+    case INPUTMODE_NO_BINDS:            
+        {
+            a_rstrResult = "no_binds";
+            return true;
+        }
+    case INPUTMODE_NO_BINDS_ON_EDIT:    
+        {
+            a_rstrResult = "no_binds_when_editing";
+            return true;
+        }
+    default:                           
+        return false;
+    }
+}
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
 {
-    m_pSystem->injectChar ( ulCharacter );
+    m_pSystem->injectChar( ulCharacter );
 }
 
 
@@ -276,9 +362,9 @@ CGUIEdit* CGUI_Impl::_CreateEdit ( CGUIElement_Impl* pParent, const char* szText
 }
 
 
-CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int uExtraGlyphs[], bool bAutoScale )
+CGUIFont* CGUI_Impl::CreateFnt ( const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale )
 {
-    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, uExtraGlyphs, bAutoScale );
+    return new CGUIFont_Impl ( this, szFontName, szFontFile, uSize, uFlags, bAutoScale );
 }
 
 
@@ -370,6 +456,34 @@ bool CGUI_Impl::IsCursorEnabled ( void )
 void CGUI_Impl::AddChild ( CGUIElement_Impl* pChild )
 {
     m_pTop->addChildWindow ( pChild->GetWindow () );
+}
+
+CGUIWindow* CGUI_Impl::LoadLayout ( CGUIElement* pParent, const SString& strFilename )
+{
+    try
+    {
+        return new CGUIWindow_Impl ( this, pParent, "szCaption", strFilename );
+    }
+	catch (...)
+    {
+        return NULL;
+    }
+}
+
+bool CGUI_Impl::LoadImageset ( const SString& strFilename )
+{
+    try
+    {
+        return GetImageSetManager()->createImageset ( strFilename ) != NULL;
+    }
+	catch (CEGUI::AlreadyExistsException exc)
+    {
+        return true;
+    }
+	catch (...)
+    {
+        return false;
+    }
 }
 
 
@@ -483,6 +597,24 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
     // Cast it to a set of keyboard arguments
     const CEGUI::KeyEventArgs& KeyboardArgs = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
 
+    // Call the callback if present
+    if ( m_KeyDownHandlers[ m_Channel ] )
+    {
+        const CEGUI::KeyEventArgs& e = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
+        CGUIKeyEventArgs NewArgs;
+
+        // copy the variables
+        NewArgs.codepoint = e.codepoint;
+        NewArgs.scancode = (CGUIKeys::Scan) e.scancode;
+        NewArgs.sysKeys = e.sysKeys;
+
+        // get the CGUIElement
+        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
+        NewArgs.pWindow = pElement;
+
+        m_KeyDownHandlers[ m_Channel ] ( NewArgs );
+    }
+
     switch ( KeyboardArgs.scancode )
     {
         // Cut/Copy keys
@@ -548,18 +680,21 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                 // If we got something to copy
                 if ( strTemp.length () > 0 )
                 {
+                    // Convert it to Unicode
+                    std::wstring strUTF = SharedUtil::ConvertToUTF8(strTemp.c_str());
+
                     // Open and empty the clipboard
                     OpenClipboard ( NULL );
                     EmptyClipboard ();
 
                     // Allocate the clipboard buffer and copy the data
-                    HGLOBAL hBuf = GlobalAlloc ( GMEM_DDESHARE, strTemp.length () + 1 );
-                    char* buf = reinterpret_cast < char* > ( GlobalLock ( hBuf ) );
-                    strcpy ( buf , strTemp.c_str () );
+                    HGLOBAL hBuf = GlobalAlloc ( GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) + sizeof(wchar_t) );
+                    wchar_t* buf = reinterpret_cast < wchar_t* > ( GlobalLock ( hBuf ) );
+                    wcscpy ( buf , strUTF.c_str () );
                     GlobalUnlock ( hBuf );
 
                     // Copy the data into the clipboard
-                    SetClipboardData ( CF_TEXT , hBuf );
+                    SetClipboardData ( CF_UNICODETEXT , hBuf );
 
                     // Close the clipboard
                     CloseClipboard( );
@@ -575,75 +710,144 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
             if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {
                 CEGUI::Window* Wnd = reinterpret_cast < CEGUI::Window* > ( KeyboardArgs.window );
-                if ( Wnd->getType ( ) == "CGUI/Editbox" )
+                if ( Wnd->getType ( ) == "CGUI/Editbox" || Wnd->getType () == "CGUI/MultiLineEditbox" )
                 {
                     // Open the clipboard
                     OpenClipboard( NULL );
 
-                    // Turn our event window into an editbox
-                    CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
-
                     // Get the clipboard's data and put it into a char array
-                    const char * ClipboardBuffer = reinterpret_cast < const char* > ( GetClipboardData ( CF_TEXT ) );
+                    const wchar_t * ClipboardBuffer = reinterpret_cast < const wchar_t* > ( GetClipboardData ( CF_UNICODETEXT ) );
 
                     // Check to make sure we have valid data.
                     if ( ClipboardBuffer )
                     {
-                        SString strClipboardText ( "%s", ClipboardBuffer );
+                        size_t iSelectionStart, iSelectionLength, iMaxLength, iCaratIndex;
+                        CEGUI::String strEditText;
+                        bool bReplaceNewLines = true;
+                        bool bIsBoxFull = false;
+
+                        if ( Wnd->getType ( ) == "CGUI/Editbox" )
+                        {
+                            // Turn our event window into an editbox
+                            CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );      
+                            //Don't paste if we're read only
+                            if ( WndEdit->isReadOnly() )
+                            {
+                                CloseClipboard();
+                                return true;
+                            }
+                            strEditText = WndEdit->getText ();
+                            iSelectionStart = WndEdit->getSelectionStartIndex ();
+                            iSelectionLength = WndEdit->getSelectionLength();
+                            iMaxLength = WndEdit->getMaxTextLength();
+                            iCaratIndex = WndEdit->getCaratIndex();
+                            strEditText = WndEdit->getText();
+                        }
+                        else
+                        {
+                            CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );    
+                            //Don't paste if we're read only
+                            if ( WndEdit->isReadOnly() )
+                            {
+                                CloseClipboard();
+                                return true;
+                            }
+                            strEditText = WndEdit->getText ();
+                            iSelectionStart = WndEdit->getSelectionStartIndex ();
+                            iSelectionLength = WndEdit->getSelectionLength();
+                            iMaxLength = WndEdit->getMaxTextLength();
+                            iCaratIndex = WndEdit->getCaratIndex();
+                            strEditText = WndEdit->getText();
+                            bReplaceNewLines = false;
+                        }
+
+                        std::wstring strClipboardText = ClipboardBuffer;
                         size_t iNewlineIndex;
 
                         // Remove the newlines inserting spaces instead
-                        do
+                        if ( bReplaceNewLines )
                         {
-                            iNewlineIndex = strClipboardText.find ( '\n' );
-                            if ( iNewlineIndex != SString::npos )
+                            do
                             {
-                                if ( iNewlineIndex > 0 && strClipboardText[ iNewlineIndex - 1 ] == '\r' )
+                                iNewlineIndex = strClipboardText.find ( '\n' );
+                                if ( iNewlineIndex != SString::npos )
                                 {
-                                    // \r\n
-                                    strClipboardText [ iNewlineIndex - 1 ] = ' ';
-                                    strClipboardText.replace ( iNewlineIndex, strClipboardText.length () - iNewlineIndex,
-                                                              (const std::string&)strClipboardText, iNewlineIndex + 1,
-                                                              strClipboardText.length () - iNewlineIndex - 1 );
+                                    if ( iNewlineIndex > 0 && strClipboardText[ iNewlineIndex - 1 ] == '\r' )
+                                    {
+                                        // \r\n
+                                        strClipboardText [ iNewlineIndex - 1 ] = ' ';
+                                        strClipboardText.replace ( iNewlineIndex, strClipboardText.length () - iNewlineIndex,
+                                                                  strClipboardText.c_str(), iNewlineIndex + 1,
+                                                                  strClipboardText.length () - iNewlineIndex - 1 );
+                                    }
+                                    else
+                                    {
+                                        strClipboardText [ iNewlineIndex ] = ' ';
+                                    }
                                 }
-                                else
-                                {
-                                    strClipboardText [ iNewlineIndex ] = ' ';
-                                }
-                            }
-                        } while ( iNewlineIndex != SString::npos );
+                            } while ( iNewlineIndex != SString::npos );
+                        }
 
                         // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
-                        CEGUI::String tmp = WndEdit->getText ();
-                        if ( ( strClipboardText.length () + tmp.length () ) < WndEdit->getMaxTextLength( ) )
+                        std::wstring tmp = SharedUtil::ConvertToUTF8(strEditText.c_str());
+                        if ( ( strClipboardText.length () + tmp.length () ) < iMaxLength )
                         {
                             // Are there characters selected?
                             size_t sizeCaratIndex = 0;
-                            if ( WndEdit->getSelectionLength () > 0 )
+                            if ( iSelectionLength > 0 )
                             {
                                 // Replace what's selected with the pasted buffer and set the new carat index
-                                tmp.replace ( WndEdit->getSelectionStartIndex (), WndEdit->getSelectionLength (),
-                                              strClipboardText.c_str (), strClipboardText.length () );
-                                sizeCaratIndex = WndEdit->getSelectionStartIndex () + strClipboardText.length ();
+                                tmp.replace ( iSelectionStart, iSelectionLength,
+                                              strClipboardText.c_str(), strClipboardText.length () );
+                                sizeCaratIndex = iSelectionStart + strClipboardText.length ();
                             }
                             else
                             {
                                 // If not, insert the clipboard buffer where we were and set the new carat index
-                                tmp.insert ( WndEdit->getSelectionStartIndex (), strClipboardText.c_str (), strClipboardText.length () );
-                                sizeCaratIndex = WndEdit->getCaratIndex () + strClipboardText.length ();
+                                tmp.insert ( iSelectionStart, strClipboardText.c_str(), strClipboardText.length () );
+                                sizeCaratIndex = iCaratIndex + strClipboardText.length ();
                             }
 
                             // Set the new text and move the carat at the end of what we pasted
-                            WndEdit->setText ( tmp );
-                            WndEdit->setCaratIndex ( sizeCaratIndex );
+                            CEGUI::String strText((CEGUI::utf8*)SharedUtil::ConvertToANSI(tmp).c_str());
+                            strEditText = strText;
+                            iCaratIndex = sizeCaratIndex;
                         }
                         else
                         {
+                            bIsBoxFull = true;
+                        }
+                        if ( bIsBoxFull )
+                        {
                             // Fire an event if the editbox is full
-                            WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                            if ( Wnd->getType ( ) == "CGUI/Editbox" )
+                            {
+                                CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );  
+                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                            }
+                            else
+                            {
+                                CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );  
+                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                            }
+                        }
+                        else
+                        {
+                            if ( Wnd->getType ( ) == "CGUI/Editbox" )
+                            {
+                                CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );  
+                                WndEdit->setText ( strEditText );
+                                WndEdit->setCaratIndex ( iCaratIndex );
+                            }
+                            else
+                            {
+                                CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );  
+                                WndEdit->setText ( strEditText );
+                                WndEdit->setCaratIndex ( iCaratIndex );
+                            }
                         }
                     }
-
+                    
                     // Close the clipboard
                     CloseClipboard( );
                 }
@@ -677,23 +881,6 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
         }
     }
 
-    // Call the callback if present
-    if ( m_KeyDownHandlers[ m_Channel ] )
-    {
-        const CEGUI::KeyEventArgs& e = reinterpret_cast < const CEGUI::KeyEventArgs& > ( Args );
-        CGUIKeyEventArgs NewArgs;
-
-        // copy the variables
-        NewArgs.codepoint = e.codepoint;
-        NewArgs.scancode = (CGUIKeys::Scan) e.scancode;
-        NewArgs.sysKeys = e.sysKeys;
-
-        // get the CGUIElement
-        CGUIElement * pElement = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
-        NewArgs.pWindow = pElement;
-
-        m_KeyDownHandlers[ m_Channel ] ( NewArgs );
-    }
     return true;
 }
 
@@ -1019,6 +1206,51 @@ bool CGUI_Impl::Event_RedrawRequested ( const CEGUI::EventArgs& Args )
     return true;
 }
 
+bool CGUI_Impl::Event_FocusGained ( const CEGUI::EventArgs& Args )
+{
+    if ( m_FocusGainedHandlers[ m_Channel ] )
+    {
+        const CEGUI::ActivationEventArgs& e = reinterpret_cast < const CEGUI::ActivationEventArgs& > ( Args );
+
+        CGUIFocusEventArgs NewArgs;
+
+        // get the newly actived CGUIElement
+        NewArgs.pActivatedWindow = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
+       
+        // get the newly deactivated CGUIElement
+        NewArgs.pDeactivatedWindow = NULL;
+        if ( e.otherWindow )
+        {
+             NewArgs.pDeactivatedWindow = reinterpret_cast < CGUIElement* > ( ( e.otherWindow )->getUserData () );
+        }
+         
+        m_FocusGainedHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
+}
+
+bool CGUI_Impl::Event_FocusLost ( const CEGUI::EventArgs& Args )
+{
+    if ( m_FocusLostHandlers[ m_Channel ] )
+    {
+        const CEGUI::ActivationEventArgs& e = reinterpret_cast < const CEGUI::ActivationEventArgs& > ( Args );
+        
+        CGUIFocusEventArgs NewArgs;
+
+        // get the newly deactived CGUIElement
+        NewArgs.pDeactivatedWindow = reinterpret_cast < CGUIElement* > ( ( e.window )->getUserData () );
+
+        // get the newly activated CGUIElement
+        NewArgs.pActivatedWindow = NULL;
+        if ( e.otherWindow )
+        {
+             NewArgs.pActivatedWindow = reinterpret_cast < CGUIElement* > ( ( e.otherWindow )->getUserData () );
+        }
+
+        m_FocusLostHandlers[ m_Channel ] ( NewArgs );
+    }
+    return true;
+}
 
 void CGUI_Impl::AddToRedrawQueue ( CGUIElement* pWindow )
 {
@@ -1275,6 +1507,8 @@ void CGUI_Impl::ClearInputHandlers ( eInputChannel channel )
     m_MouseWheelHandlers[ channel ]         = GUI_CALLBACK_MOUSE ();
     m_MovedHandlers[ channel ]              = GUI_CALLBACK ();
     m_SizedHandlers[ channel ]              = GUI_CALLBACK ();
+    m_FocusGainedHandlers[ channel ]        = GUI_CALLBACK_FOCUS ();
+    m_FocusLostHandlers[ channel ]          = GUI_CALLBACK_FOCUS ();
 }
 
 void CGUI_Impl::ClearSystemKeys ( void )

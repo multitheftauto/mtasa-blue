@@ -44,6 +44,7 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_TRAIN_SPEED, SetTrainSpeed, "SetTrainSpeed" );
     AddHandler ( SET_TAXI_LIGHT_ON, SetVehicleTaxiLightOn, "SetVehicleTaxiLightOn" );
     AddHandler ( SET_VEHICLE_HEADLIGHT_COLOR, SetVehicleHeadLightColor, "SetVehicleHeadLightColor" );
+    AddHandler ( SET_VEHICLE_TURRET_POSITION, SetVehicleTurretPosition, "SetVehicleTurretPosition" );
 }
 
 
@@ -154,19 +155,19 @@ void CVehicleRPCs::SetVehicleColor ( NetBitStreamInterface& bitStream )
     CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
     if ( pVehicle )
     {
-        unsigned char ucColor1;
-        bitStream.Read ( ucColor1 );
+        CVehicleColor vehColor;
+        uchar ucNumColors = 0;
+        bitStream.ReadBits ( &ucNumColors, 2 );
+        for ( uint i = 0 ; i <= ucNumColors ; i++ )
+        {
+            SColor RGBColor = 0;
+            bitStream.Read ( RGBColor.R );
+            bitStream.Read ( RGBColor.G );
+            bitStream.Read ( RGBColor.B );
+            vehColor.SetRGBColor ( i, RGBColor );
+        }
 
-        unsigned char ucColor2;
-        bitStream.Read ( ucColor2 );
-
-        unsigned char ucColor3;
-        bitStream.Read ( ucColor3 );
-
-        unsigned char ucColor4;
-        bitStream.Read ( ucColor4 );
-
-        pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
+        pVehicle->SetColor ( vehColor );
     }
 }
 
@@ -604,6 +605,24 @@ void CVehicleRPCs::SetVehicleHeadLightColor ( NetBitStreamInterface& bitStream )
         if ( pVehicle )
         {
             pVehicle->SetHeadLightColor ( color );
+        }
+    }
+}
+
+void CVehicleRPCs::SetVehicleTurretPosition ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    float fHorizontal;
+    float fVertical;
+
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( fHorizontal ) &&
+         bitStream.Read ( fVertical ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {
+            pVehicle->SetTurretRotation ( fHorizontal, fVertical );
         }
     }
 }

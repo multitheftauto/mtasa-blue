@@ -13,12 +13,15 @@
 *               Chris McArthur <>
 *               Kevin Whiteside <>
 *               lil_Toady <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
+#include "../utils/COpenPortsTester.h"
 
 #define MAX_KEYSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
@@ -114,13 +117,18 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_QUICKRELOAD ] = false;
     m_Glitches [ GLITCH_FASTFIRE ] = false;
     m_Glitches [ GLITCH_FASTMOVE ] = false;
+    m_Glitches [ GLITCH_CROUCHBUG ] = false;
 
     //Glitch names (for Lua interface)
     m_GlitchNames["quickreload"] = GLITCH_QUICKRELOAD;
     m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
     m_GlitchNames["fastmove"] = GLITCH_FASTMOVE;
+    m_GlitchNames["crouchbug"] = GLITCH_CROUCHBUG;
 
     m_bCloudsEnabled = true;
+
+    m_llLastAnnouceTime = 0;
+    m_pOpenPortsTester = NULL;
 
     m_bTrafficLightsLocked = false;
     m_ucTrafficLightState = 0;
@@ -137,11 +145,14 @@ void CGame::ResetMapInfo ( void )
     // Add variables to get reset in resetMapInfo here
     m_fGravity = 0.008f;
     m_fGameSpeed = 1.0f;
+    m_fJetpackMaxHeight = 100;
+
     if ( m_pWaterManager )
     {
         m_pWaterManager->SetGlobalWaterLevel ( 0.0f );
         m_pWaterManager->SetGlobalWaveHeight ( 0.0f );
     }
+
     m_ucSkyGradientTR = 0, m_ucSkyGradientTG = 0, m_ucSkyGradientTB = 0;
     m_ucSkyGradientBR = 0, m_ucSkyGradientBG = 0, m_ucSkyGradientBB = 0;
     m_bHasSkyGradient = false;
@@ -150,6 +161,8 @@ void CGame::ResetMapInfo ( void )
     m_bTrafficLightsLocked = false;
     m_ucTrafficLightState = 0;
     m_ulLastTrafficUpdate = 0;
+
+    g_pGame->SetHasWaterColor ( false );
 }
 
 CGame::~CGame ( void )
@@ -193,7 +206,8 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pBanManager );
     SAFE_DELETE ( m_pTeamManager );
     SAFE_DELETE ( m_pMainConfig );
-    m_pRegistryManager->CloseRegistry ( m_pRegistry );
+    if ( m_pRegistryManager )
+        m_pRegistryManager->CloseRegistry ( m_pRegistry );
     m_pRegistry = NULL;
     SAFE_DELETE ( m_pAccountManager );
     SAFE_DELETE ( m_pRegistryManager );
@@ -209,6 +223,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pResourceDownloader );
     SAFE_DELETE ( m_pRPCFunctions );
     SAFE_DELETE ( m_pWaterManager );
+    SAFE_DELETE ( m_pOpenPortsTester );
 
     // Clear our global pointer
     g_pGame = NULL;
@@ -353,6 +368,13 @@ void CGame::DoPulse ( void )
     // Delete all items requested
     m_ElementDeleter.DoDeleteAll ();
 
+    GetPerfStatManager ()->DoPulse ();
+
+    PulseMasterServerAnnounce ();
+
+    if ( m_pOpenPortsTester )
+        m_pOpenPortsTester->Poll ();
+
     // Unlock the critical section again
     Unlock();
 }
@@ -370,6 +392,10 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Startup the getElementsByType from root optimizations
     CElement::StartupEntitiesFromRoot ();
 
+    // Create the root element.
+    CDummy* pRootElement = new CDummy ( NULL, NULL, NULL );
+    pRootElement->SetTypeName ( "root" );
+
     m_pGroups = new CGroups;
     m_pClock = new CClock;
     m_pBlipManager = new CBlipManager;
@@ -386,7 +412,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pTeamManager = new CTeamManager;
     m_pPedManager = new CPedManager;
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
-    m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter );
+    m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter, pRootElement );
     m_pACLManager = new CAccessControlListManager;
 
     m_pRegisteredCommands = new CRegisteredCommands ( m_pACLManager );
@@ -423,10 +449,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Let the main config handle selecting settings from the command line where appropriate
     m_pMainConfig->SetCommandLineParser ( &m_CommandLineParser );
 
-    const char* szServerIP = m_pMainConfig->GetServerIP ().c_str ();
-
-    if ( szServerIP && szServerIP [0] == '\0' )
-        szServerIP = NULL;
+    const SString strServerIP = m_pMainConfig->GetServerIP ();
 
     unsigned short usServerPort = m_pMainConfig->GetServerPort ();
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
@@ -442,9 +465,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Enable it if required
     if ( m_pMainConfig->IsHTTPEnabled () )
     {
-        if ( !m_pHTTPD->StartHTTPD ( szServerIP, m_pMainConfig->GetHTTPPort () ) )
+        if ( !m_pHTTPD->StartHTTPD ( strServerIP, m_pMainConfig->GetHTTPPort () ) )
         {
-            CLogger::ErrorPrintf ( "Could not start HTTP server on interface '%s' and port '%u'!\n", szServerIP, m_pMainConfig->GetHTTPPort () );
+            CLogger::ErrorPrintf ( "Could not start HTTP server on interface '%s' and port '%u'!\n", strServerIP.c_str (), m_pMainConfig->GetHTTPPort () );
             return false;
         }
     }
@@ -475,17 +498,15 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 "= \n" \
                                 "= Log file         : %s\n" \
                                 "= Maximum players  : %u\n" \
-                                "= MTU packet size  : %u\n" \
                                 "= HTTP port        : %u\n" \
                                 "===========================================================\n",
 
                                 MTA_DM_BUILDTAG_SHORT,
                                 m_pMainConfig->GetServerName ().c_str (),
-                                szServerIP ? szServerIP : "",
+                                strServerIP.c_str (),
                                 usServerPort,
                                 pszLogFileName,
                                 uiMaxPlayers,
-                                m_pMainConfig->GetMTUSize (),
                                 m_pMainConfig->IsHTTPEnabled () ? m_pMainConfig->GetHTTPPort () : 0 );
 
     if ( !bLogFile )
@@ -633,13 +654,10 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket, TRUE );
 
-    // Grab the MTU size
-    unsigned int uiMTUSize = m_pMainConfig->GetMTUSize ();
-
     // Try to start the network
-    if ( !g_pNetServer->StartNetwork ( szServerIP, usServerPort, uiMTUSize, uiMaxPlayers ) )
+    if ( !g_pNetServer->StartNetwork ( strServerIP, usServerPort, uiMaxPlayers ) )
     {
-        CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", szServerIP, usServerPort );
+        CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", strServerIP.c_str (), usServerPort );
         return false;
     }
 
@@ -666,33 +684,14 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // If ASE is enabled
     if ( m_pMainConfig->GetASEEnabled () || !m_pMainConfig->GetDontBroadcastLan() )
     {
-        m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), szServerIP, !m_pMainConfig->GetDontBroadcastLan() && !m_pMainConfig->GetASEEnabled () );
+        m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), strServerIP, !m_pMainConfig->GetDontBroadcastLan() && !m_pMainConfig->GetASEEnabled () );
 
         if ( m_pMainConfig->GetSerialVerificationEnabled () )
             m_pASE->SetRuleValue ( "SerialVerification", "yes" );
 
         if ( m_pMainConfig->GetASEEnabled () )
         {
-            // Query Wojjie's game-monitor.com
-            CTCPImpl * pTCP = new CTCPImpl ();
-            pTCP->Initialize ();
-
-            char szURL[256] = { '\0' };
-            CLogger::LogPrint ( "Querying game-monitor.com master server... " );
-            _snprintf ( szURL, sizeof(szURL) - 1, QUERY_URL_GAME_MONITOR, usServerPort + 123);
-
-            CHTTPRequest * request = new CHTTPRequest ( szURL );
-            request->SetLocalIP ( szServerIP );
-            CHTTPResponse * response = request->Send ( pTCP );
-            if ( !response )
-                CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
-            else if ( response->GetErrorCode () != 200 )
-                CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
-            else
-                CLogger::LogPrintfNoStamp ( "success!\n");
-
-            delete pTCP;
-            delete request;
+            PulseMasterServerAnnounce ();
         }
 
         if ( !m_pMainConfig->GetDontBroadcastLan() )
@@ -713,10 +712,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             CLogger::LogPrint ( "WARNING: Unable to open the given script debug logfile\n" );
         }
     }
-
-    // Set the autopatcher directory
-    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "" );
-    g_pNetServer->SetAutoPatcherDirectory ( (char*)strBuffer.c_str () );
 
 
 #ifdef MTA_VOICE
@@ -753,6 +748,12 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // inside CServer.cpp in deathmatch mod aswell.
     CLogger::LogPrint ( "Server started and is ready to accept connections!\n" );
 
+    // Create port tester
+    m_pOpenPortsTester = new COpenPortsTester ();
+
+    // Add help hint
+    CLogger::LogPrint ( "Type 'help' for a list of commands.\n" );
+
     return true;
 }
 
@@ -775,6 +776,81 @@ void CGame::Stop ( void )
         m_pVoiceServer->Shutdown();
     }
 #endif
+}
+
+
+void CGame::StartOpenPortsTest ( void )
+{
+    if ( m_pOpenPortsTester )
+        m_pOpenPortsTester->Start ();
+}
+
+
+// Remind master server once every 24 hrs
+void CGame::PulseMasterServerAnnounce ( void )
+{
+    if ( m_llLastAnnouceTime == 0 || GetTickCount64_ () - m_llLastAnnouceTime > 24 * 60 * 60 * 1000 )
+    {
+        bool bFirstPass = m_llLastAnnouceTime == 0;
+        m_llLastAnnouceTime = GetTickCount64_ ();
+
+        // If ASE is enabled
+        if ( m_pMainConfig->GetASEEnabled () )
+        {
+            const SString strServerIP = m_pMainConfig->GetServerIP ();
+            unsigned short usServerPort = m_pMainConfig->GetServerPort ();
+            unsigned short usHTTPPort = m_pMainConfig->GetHTTPPort ();
+
+            SString strVersion ( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
+
+            struct {
+                SString strDesc;
+                SString strURL;
+                bool bRepeat;
+            } masterServerList[] = {
+                                     { "Querying game-monitor.com master server... ", SString ( QUERY_URL_GAME_MONITOR, usServerPort + 123 ), false },
+                                     { "Querying backup master server... ", SString ( "http://master.mtasa.com/ase/add.php?g=%u&a=%u&h=%u&v=%s", usServerPort, usServerPort + 123, usHTTPPort, *strVersion ), true },
+                                   };
+
+            for ( uint i = 0 ; i < NUMELMS( masterServerList ) ; i++ )
+            {
+                const SString& strDesc = masterServerList[i].strDesc;
+                const SString& strURL = masterServerList[i].strURL;
+                bool bRepeat = masterServerList[i].bRepeat;
+
+                // Don't repeat request for some servers
+                if ( !bFirstPass && !bRepeat )
+                    continue;
+
+                // Only log on first pass
+                if ( bFirstPass )
+                    CLogger::LogPrint ( strDesc );
+
+                // Send request
+                CTCPImpl * pTCP = new CTCPImpl ();
+                pTCP->Initialize ();
+                CHTTPRequest * request = new CHTTPRequest ( strURL );
+                request->SetLocalIP ( strServerIP );
+                CHTTPResponse * response = request->Send ( pTCP );
+
+                // Only log on first pass
+                if ( bFirstPass )
+                {
+                    if ( !response )
+                        CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
+                    else if ( response->GetErrorCode () != 200 )
+                        CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
+                    else
+                        CLogger::LogPrintfNoStamp ( "success!\n");
+                }
+
+                if ( response )
+                    delete response;
+                delete pTCP;
+                delete request;
+            }
+        }
+    }
 }
 
 
@@ -921,6 +997,18 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_TRANSGRESSION:
+        {
+            Packet_PlayerTransgression ( static_cast < CPlayerTransgressionPacket& > ( Packet ) );
+            return true;
+        }
+
+        case PACKET_ID_PLAYER_DIAGNOSTIC:
+        {
+            Packet_PlayerDiagnostic ( static_cast < CPlayerDiagnosticPacket& > ( Packet ) );
+            return true;
+        }
+
         default:
             break;
     }
@@ -954,7 +1042,7 @@ void CGame::JoinPlayer ( CPlayer& Player )
                                               m_pMainConfig->GetHTTPDownloadType (),
                                               m_pMainConfig->GetHTTPPort (),
                                               m_pMainConfig->GetHTTPDownloadURL ().c_str (),
-                                              m_pMainConfig->GetHTTPConnectionsPerClient (),
+                                              m_pMainConfig->GetHTTPMaxConnectionsPerClient (),
                                               m_pMainConfig->GetEnableClientChecks () ) );
 }
 
@@ -1187,6 +1275,9 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerChangeNick", "oldnick, newnick", NULL, false );
     m_Events.AddEvent ( "onPlayerPrivateMessage", "text, player", NULL, false );
     m_Events.AddEvent ( "onPlayerStealthKill", "target", NULL, false );
+    m_Events.AddEvent ( "onPlayerMute", "", NULL, false );
+    m_Events.AddEvent ( "onPlayerUnmute", "", NULL, false );
+    m_Events.AddEvent ( "onPlayerCommand", "command", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onPedWasted", "ammo, killer, weapon, bodypart", NULL, false );
@@ -1214,6 +1305,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onTrailerDetach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onVehicleStartEnter", "player, seat, jacked", NULL, false );
     m_Events.AddEvent ( "onVehicleStartExit", "player, seat, jacker", NULL, false );
+    m_Events.AddEvent ( "onVehicleStopEnter", "player, seat", NULL, false );
     m_Events.AddEvent ( "onVehicleEnter", "player, seat, jacked", NULL, false );
     m_Events.AddEvent ( "onVehicleExit", "player, seat, jacker", NULL, false );
     m_Events.AddEvent ( "onVehicleExplode", "", NULL, false );
@@ -1221,14 +1313,20 @@ void CGame::AddBuiltInEvents ( void )
     // Console events
     m_Events.AddEvent ( "onConsole", "text", NULL, false );
 
+    // Debug events
+    m_Events.AddEvent ( "onDebugMessage", "message, level, file, line", NULL, false );
+
     // Ban events
     m_Events.AddEvent ( "onBan", "ip", NULL, false );
     m_Events.AddEvent ( "onUnban", "ip", NULL, false );
+
+    // Other events
+    m_Events.AddEvent ( "onSettingChange", "setting, oldValue, newValue", NULL, false );
 }
 
 void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
 {
-    unsigned long ulDiff = (ulCurrentTime - m_ulLastTrafficUpdate)*m_fGameSpeed;
+    unsigned long ulDiff = static_cast < unsigned long > ( (ulCurrentTime - m_ulLastTrafficUpdate)*m_fGameSpeed );
     unsigned char ucNewState = 0xFF;
 
     if ( ulDiff >= 1000 )
@@ -1262,9 +1360,8 @@ void CGame::Packet_PlayerJoin ( NetServerPlayerID& Source )
     if ( pBitStream )
     {
         // Write the mod name to the bitstream
-        pBitStream->Write ( const_cast < char* > ( "deathmatch" ), 10 );
-        pBitStream->Write ( static_cast < char > ( 0 ) );
         pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_BITSTREAM_VERSION ) );
+        pBitStream->WriteString ( "deathmatch" );
 
         // Send and destroy the bitstream
         g_pNetServer->SendPacket ( PACKET_ID_MOD_NAME, Source, pBitStream );
@@ -1374,19 +1471,8 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                                     // Tell the player
-                                    if ( Packet.GetBitStreamVersion () >= 0x0e )
-                                    {
-                                        pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", GetConfig ()->GetMinimumClientVersion () ) );
-                                        DisconnectPlayer ( this, *pPlayer, "" );
-                                    }
-                                    else
-                                    {
-                                        SString strMessage = "Disconnected: You need to update MTA to connect to this server.";
-                                        for ( int i = 0 ; i < 55 ; i++ )
-                                            strMessage += " ";
-                                        strMessage += "*         Update at www.mtasa.com";
-                                        DisconnectPlayer ( this, *pPlayer, strMessage );
-                                    }
+                                    pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", GetConfig ()->GetMinimumClientVersion () ) );
+                                    DisconnectPlayer ( this, *pPlayer, "" );
                                     return;
                                 }
 
@@ -1403,17 +1489,22 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 }
 
                                 // Check the serial for validity
-                                if ( !pPlayer->GetSerial ().empty() &&
-                                     m_pBanManager->IsSerialBanned ( pPlayer->GetSerial ().c_str () ) )
+                                if ( CBan* pBan = m_pBanManager->GetBanFromSerial ( pPlayer->GetSerial ().c_str () ) )
                                 {
+                                    // Make a message including the ban duration
+                                    SString strBanMessage = "Serial is banned";
+                                    SString strDurationDesc = pBan->GetDurationDesc ();
+                                    if ( strDurationDesc.length () )
+                                        strBanMessage += " (" + strDurationDesc + ")";
+
                                     // Tell the console
-                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (Serial is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
+                                    CLogger::LogPrintf ( "CONNECT: %s failed to connect (%s) (%s)\n", szNick, strBanMessage.c_str (), strIPAndSerial.c_str () );
+
+                                    // Make a message for the player
+                                    strBanMessage = std::string ( "Disconnected: " ) + strBanMessage;
 
                                     // Tell the player he's banned
-                                    if ( pPlayer->GetMTAVersion () <= 0x102 )
-                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned - If this is in error, ensure you have the lastest version of MTA." );
-                                    else
-                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: Serial is banned" );
+                                    DisconnectPlayer ( this, *pPlayer, strBanMessage );
                                     return;
                                 }
 
@@ -1567,7 +1658,7 @@ void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
 
         // Create a new packet to send to everyone
         CPlayerWastedPacket ReturnWastedPacket ( pPlayer, pKiller, Packet.m_ucKillerWeapon, Packet.m_ucBodyPart, false, Packet.m_AnimGroup, Packet.m_AnimID );
-        m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket );
+        m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket, pPlayer );
 
         // Tell our scripts the player has died
         CLuaArguments Arguments;
@@ -2331,15 +2422,28 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat ();
                                 if ( pPlayer == pVehicle->GetOccupant ( ucOccupiedSeat ) )
                                 {
+                                    unsigned char ucDoor = Packet.GetDoor ();
+                                    float fDoorAngle = Packet.GetDoorAngle ();
+
                                     // Mark that he's in no vehicle
                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
                                     pPlayer->SetOccupiedVehicle ( NULL, 0 );
                                     pVehicle->SetOccupant ( NULL, ucOccupiedSeat );
 
+                                    // Update the door angle.
+                                    pVehicle->SetDoorAngleRatio ( ucDoor + 2, fDoorAngle );
+
                                     // Tell everyone he's in (they should warp him in)
-                                    CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN );
+                                    CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor );
                                     Reply.SetSourceElement ( pPlayer );
+                                    Reply.SetDoorAngle ( fDoorAngle );
                                     m_pPlayerManager->BroadcastOnlyJoined ( Reply );
+
+                                    // Call the vehicle->player event
+                                    CLuaArguments Arguments;
+                                    Arguments.PushElement ( pPlayer );         // player
+                                    Arguments.PushNumber ( ucOccupiedSeat );   // seat
+                                    pVehicle->CallEvent ( "onVehicleStopEnter", Arguments );
                                 }
                             }
 
@@ -2606,6 +2710,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                             // Is the sender jacking?
                             if ( pPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_JACKING )
                             {
+                                unsigned char ucDoor = Packet.GetDoor ();
+                                float fAngle = Packet.GetDoorAngle ();
                                 CPed* pJacked = pVehicle->GetOccupant ( 0 );
 
                                 // Mark that the jacker is in no vehicle
@@ -2614,9 +2720,13 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 pPlayer->SetJackingVehicle ( NULL );
                                 pVehicle->SetJackingPlayer ( NULL );
 
+                                // Set the door angle.
+                                pVehicle->SetDoorAngleRatio ( ucDoor, fAngle );
+
                                 // Tell everyone he aborted
-                                CVehicleInOutPacket Reply ( ID, 0, VEHICLE_NOTIFY_IN_ABORT_RETURN );
+                                CVehicleInOutPacket Reply ( ID, 0, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor );
                                 Reply.SetSourceElement ( pPlayer );
+                                Reply.SetDoorAngle ( fAngle );
                                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );
 
                                 // The jacked is still inside?
@@ -2839,6 +2949,36 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
 }
 
 
+void CGame::Packet_PlayerTransgression ( CPlayerTransgressionPacket & Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // If ac# not disabled on this server, do a kick
+        if ( !g_pGame->GetConfig ()->IsDisableAC ( SString ( "%d", Packet.m_uiLevel ) ) )
+        {
+            SString strMessageCombo ( "AC #%d %s", Packet.m_uiLevel, Packet.m_strMessage.c_str () );
+            CStaticFunctionDefinitions::KickPlayer ( pPlayer, NULL, strMessageCombo );
+        }
+    }
+}
+
+
+void CGame::Packet_PlayerDiagnostic ( CPlayerDiagnosticPacket & Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // If diagnosticis enabled on this server, log it
+        if ( g_pGame->GetConfig ()->IsEnableDiagnostic ( SString ( "%d", Packet.m_uiLevel ) ) )
+        {
+            SString strMessageCombo ( "DIAGNOSTIC: %s #%d %s\n", pPlayer->GetNick (), Packet.m_uiLevel, Packet.m_strMessage.c_str () );
+            CLogger::LogPrint ( strMessageCombo );
+        }
+    }
+}
+
+
 void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char* szError )
 {
     char szIP [22];
@@ -2902,19 +3042,19 @@ void CGame::Unlock ( void )
 void CGame::SetGlitchEnabled ( const std::string& strGlitch, bool bEnabled )
 {
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
-    assert ( cGlitch >= 0 && cGlitch <= 2 );
+    assert ( cGlitch >= 0 && cGlitch <= 3 );
     m_Glitches[cGlitch] = bEnabled;
 }
 
 bool CGame::IsGlitchEnabled ( const std::string& strGlitch )
 {
     eGlitchType cGlitch = m_GlitchNames[strGlitch];
-    assert ( cGlitch >= 0 && cGlitch <= 2 );
+    assert ( cGlitch >= 0 && cGlitch <= 3 );
     return m_Glitches[cGlitch] ? true : false;
 }
 bool CGame::IsGlitchEnabled ( eGlitchType cGlitch )
 {
-    assert ( cGlitch >= 0 && cGlitch <= 2 );
+    assert ( cGlitch >= 0 && cGlitch <= 3 );
     return m_Glitches[cGlitch] || false;
 }
 

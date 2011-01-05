@@ -14,6 +14,7 @@
 *               Kevin Whiteside <>
 *               lil_Toady <>
 *               Peter Beverloo <>
+*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -51,6 +52,8 @@ class CGame;
 #include "packets/CDetonateSatchelsPacket.h"
 #include "packets/CCustomDataPacket.h"
 #include "packets/CCameraSyncPacket.h"
+#include "packets/CPlayerTransgressionPacket.h"
+#include "packets/CPlayerDiagnosticPacket.h"
 
 #include "CRPCFunctions.h"
 
@@ -155,6 +158,7 @@ public:
         GLITCH_QUICKRELOAD,
         GLITCH_FASTFIRE,
         GLITCH_FASTMOVE,
+        GLITCH_CROUCHBUG,
     };
 public:
                                 CGame                       ( void );
@@ -224,6 +228,8 @@ public:
     inline bool                 GetTrafficLightsLocked      ( void )        { return m_bTrafficLightsLocked; }
     inline void                 SetTrafficLightsLocked      ( bool bLocked ) { m_bTrafficLightsLocked = bLocked; }
 
+    inline float                GetJetpackMaxHeight         ( void ) { return m_fJetpackMaxHeight; }
+    inline void                 SetJetpackMaxHeight         ( float fMaxHeight ) { m_fJetpackMaxHeight = fMaxHeight; }
 
     inline float                GetGameSpeed                ( void )        { return m_fGameSpeed; }
     inline void                 SetGameSpeed                ( float fGameSpeed )  { m_fGameSpeed = fGameSpeed; }
@@ -233,6 +239,12 @@ public:
 
     inline void                 GetSkyGradient              ( unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB ) { ucTR = m_ucSkyGradientTR; ucTG = m_ucSkyGradientTG; ucTB = m_ucSkyGradientTB; ucBR = m_ucSkyGradientBR; ucBG = m_ucSkyGradientBG; ucBB = m_ucSkyGradientBB; }
     inline void                 SetSkyGradient              ( unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB ) { m_ucSkyGradientTR = ucTR; m_ucSkyGradientTG = ucTG; m_ucSkyGradientTB = ucTB; m_ucSkyGradientBR = ucBR; m_ucSkyGradientBG = ucBG; m_ucSkyGradientBB = ucBB; }
+
+    inline bool                 HasWaterColor               ( void )        { return m_bOverrideWaterColor; }
+    inline void                 SetHasWaterColor            ( bool bOverrideWaterColor ) { m_bOverrideWaterColor = bOverrideWaterColor; }
+
+    inline void                 GetWaterColor               ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha ) { ucRed = m_ucWaterRed; ucGreen = m_ucWaterGreen; ucBlue = m_ucWaterBlue; ucAlpha = m_ucWaterAlpha; }
+    inline void                 SetWaterColor               ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha ) { m_ucWaterRed = ucRed; m_ucWaterGreen = ucGreen; m_ucWaterBlue = ucBlue; m_ucWaterAlpha = ucAlpha; }
 
     inline bool*                GetGarageStates             ( void )        { return m_bGarageStates; }
 
@@ -250,6 +262,9 @@ public:
 
     void                        SetCloudsEnabled            ( bool bEnabled );
     bool                        GetCloudsEnabled            ( void );
+
+    void                        PulseMasterServerAnnounce   ( void );
+    void                        StartOpenPortsTest          ( void );
 
 private:
     void                        AddBuiltInEvents            ( void );
@@ -276,6 +291,8 @@ private:
     void                        Packet_CustomData           ( class CCustomDataPacket& Packet );
     void                        Packet_Voice_Data           ( class CVoiceDataPacket& Packet );
     void                        Packet_CameraSync           ( class CCameraSyncPacket& Packet );
+    void                        Packet_PlayerTransgression  ( class CPlayerTransgressionPacket& Packet );
+    void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
@@ -338,6 +355,7 @@ private:
 
     float                       m_fGravity;
     float                       m_fGameSpeed;
+    float                       m_fJetpackMaxHeight;
 
     unsigned char               m_ucTrafficLightState;
     bool                        m_bTrafficLightsLocked;
@@ -347,6 +365,9 @@ private:
     unsigned char               m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
     bool                        m_bHasSkyGradient;
 
+    bool                        m_bOverrideWaterColor;
+    unsigned char               m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;
+
     bool                        m_bGarageStates[MAX_GARAGES];
 
     // FPS statistics
@@ -354,7 +375,7 @@ private:
     unsigned short              m_usFrames;
     unsigned short              m_usFPS;
     std::map<std::string,eGlitchType> m_GlitchNames;
-    bool                        m_Glitches[3];
+    bool                        m_Glitches[4];
 
     // This is ticked to true when the app should end
     bool                        m_bIsFinished;
@@ -362,6 +383,9 @@ private:
 
     //Clouds Enabled
     bool                        m_bCloudsEnabled;
+
+    long long                   m_llLastAnnouceTime;
+    class COpenPortsTester*     m_pOpenPortsTester;
 };
 
 #endif

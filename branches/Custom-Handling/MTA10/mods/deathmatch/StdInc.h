@@ -1,7 +1,6 @@
 #pragma message("Compiling precompiled header.\n")
 
 #define WIN32_LEAN_AND_MEAN
-#define _WIN32_WINNT 0x500
 
 #include <windows.h>
 #include <string.h>
@@ -21,8 +20,8 @@
 #include <cstring>
 
 // SDK includes
+#define MTA_CLIENT
 #include "SharedUtil.h"
-#include "SString.h"
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>
@@ -70,6 +69,7 @@
 #include <CClientTask.h>
 #include <CClientTXD.h>
 #include <CClientWater.h>
+#include <CClientIFP.h>
 #include <CCustomData.h>
 #include <CConfig.h>
 #include <CDOMConfig.h>
@@ -87,6 +87,11 @@
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
+
+// Shared includes
+#include "CEasingCurve.h"
+#include "TInterpolation.h"
+#include "CPositionRotationAnimation.h"
 
 // Deathmatch includes
 #include "Client.h"

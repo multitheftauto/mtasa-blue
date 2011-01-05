@@ -5,11 +5,17 @@ if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch
 AM_CXXFLAGS += -Winvalid-pch
 
-StdInc.h.gch: StdInc.h
-	-rm -f StdInc.h.gch
-	$(CXX) -fPIC -DPIC $(DEFS) $(DEFAULT_INCLUDES) \
-		$(AM_CXXFLAGS) $(CXXFLAGS) $(CPPFLAGS) \
-		$(INCLUDES) -o StdInc.h.gch -xc++-header StdInc.h
+StdInc.h.gch:
+	$(LIBTOOL) --tag=CXX $(xmll_la_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile \
+		$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+		$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)  \
+		-o xmll_la-StdInc.h.lo $(srcdir)/StdInc.h \
+		-MT xmll_la-StdInc.h.gch -MD -MP -MF $(DEPDIR)/xmll_la-StdInc.h.Tpo
+
+	$(am__mv) $(DEPDIR)/xmll_la-StdInc.h.Tpo $(DEPDIR)/xmll_la-StdInc.h.Plo
+	$(am__mv) .libs/xmll_la-StdInc.h.o $@
+
+include ./$(DEPDIR)/xmll_la-StdInc.h.Plo
 
 clean-local:
 	-rm -f StdInc.h.gch
@@ -34,6 +40,4 @@ xmll_la_SOURCES = \
 	CXMLImpl.h \
 	CXMLNodeImpl.cpp \
 	CXMLNodeImpl.h \
-	StdInc.cpp \
-	StdInc.h \
 	XML.cpp

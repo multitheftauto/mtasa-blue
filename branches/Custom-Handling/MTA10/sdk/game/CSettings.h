@@ -76,8 +76,6 @@ struct VideoMode //RwVideoMode
 class CGameSettings
 {
 public:
-    virtual bool            IsFrameLimiterEnabled   ( void ) = 0;
-    virtual void            SetFrameLimiterEnabled  ( bool bEnabled ) = 0;
     virtual bool            IsWideScreenEnabled     ( void ) = 0;
     virtual void            SetWideScreenEnabled    ( bool bEnabled ) = 0;
     virtual unsigned int    GetNumVideoModes        ( void ) = 0;
@@ -88,6 +86,14 @@ public:
     virtual void            SetRadioVolume          ( unsigned char ucVolume ) = 0;
     virtual unsigned char   GetSFXVolume            ( void ) = 0;
     virtual void            SetSFXVolume            ( unsigned char ucVolume ) = 0;
+    virtual unsigned int    GetUsertrackMode        ( void ) = 0;
+    virtual void            SetUsertrackMode        ( unsigned int uiMode ) = 0;
+    virtual bool            IsUsertrackAutoScan     ( void ) = 0;
+    virtual void            SetUsertrackAutoScan    ( bool bEnable ) = 0;
+    virtual bool            IsRadioEqualizerEnabled ( void ) = 0;
+    virtual void            SetRadioEqualizerEnabled( bool bEnable ) = 0;
+    virtual bool            IsRadioAutotuneEnabled  ( void ) = 0;
+    virtual void            SetRadioAutotuneEnabled ( bool bEnable ) = 0;
 
     virtual float           GetDrawDistance         ( void ) = 0;
     virtual void            SetDrawDistance         ( float fDrawDistance ) = 0;
@@ -98,8 +104,11 @@ public:
     virtual unsigned int    GetFXQuality            ( void ) = 0;
     virtual void            SetFXQuality            ( unsigned int fxQualityId ) = 0;
 
-    virtual float           GetMouseSensivity       ( void ) = 0;
-    virtual void            SetMouseSensivity       ( float fSensivity ) = 0;
+    virtual float           GetMouseSensitivity     ( void ) = 0;
+    virtual void            SetMouseSensitivity     ( float fSensitivity ) = 0;
+
+    virtual unsigned int    GetAntiAliasing         ( void ) = 0;
+    virtual void            SetAntiAliasing         ( unsigned int uiAntiAliasing, bool bOnRestart ) = 0;
 
     virtual void            Save                    ( void ) = 0;
 };

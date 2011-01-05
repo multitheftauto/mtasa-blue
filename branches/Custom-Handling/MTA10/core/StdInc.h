@@ -6,6 +6,7 @@
 
 //#define WIN32_LEAN_AND_MEAN
 
+#include <sys/stat.h>
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <direct.h>
@@ -40,8 +41,8 @@
 // Game can not be included here because of conflicting classnames (CText)
 
 // Core-level includes
+#define MTA_CLIENT
 #include "SharedUtil.h"
-#include "SString.h"
 #include "CrashHandler.h"
 #include "CCore.h"
 #include "CDebugView.h"
@@ -60,3 +61,4 @@
 #include "UtilityMacros.h"
 #include "CJoystickManager.h"
 #include "CVideoModeManager.h"
+#include "CServerCache.h"

@@ -81,6 +81,15 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bSireneOrAlarmActive = false;
     m_bLandingGearDown = true;
     m_usAdjustablePropertyValue = 0;
+    for ( unsigned int i = 0; i < 6; ++i )
+    {
+        m_fDoorAngleRatio [ i ] = 0.0f;
+        m_doorInterp.fStart [ i ] = 0.0f;
+        m_doorInterp.fTarget [ i ] = 0.0f;
+        m_doorInterp.ulStartTime [ i ] = 0UL;
+        m_doorInterp.ulTargetTime [ i ] = 0UL;
+    }
+    m_bSwingingDoorsAllowed = false;
     m_bDoorsLocked = false;
     m_bDoorsUndamageable = false;
     m_bCanShootPetrolTank = true;
@@ -598,6 +607,116 @@ void CClientVehicle::SetVisible ( bool bVisible )
     m_bVisible = bVisible;
 }
 
+void CClientVehicle::SetDoorAngleRatioInterpolated ( unsigned char ucDoor, float fRatio, unsigned long ulDelay )
+{
+    unsigned long ulTime = CClientTime::GetTime ();
+    m_doorInterp.fStart [ ucDoor ] = m_fDoorAngleRatio [ ucDoor ];
+    m_doorInterp.fTarget [ ucDoor ] = fRatio;
+    m_doorInterp.ulStartTime [ ucDoor ] = ulTime;
+    m_doorInterp.ulTargetTime [ ucDoor ] = ulTime + ulDelay;
+}
+
+void CClientVehicle::ResetDoorInterpolation ()
+{
+    for ( unsigned char i = 0; i < 6; ++i )
+    {
+        if ( m_doorInterp.ulTargetTime [ i ] != 0 )
+            SetDoorAngleRatio ( i, m_doorInterp.fTarget [ i ], 0, true );
+        m_doorInterp.ulTargetTime [ i ] = 0;
+    }
+}
+
+void CClientVehicle::ProcessDoorInterpolation ()
+{
+    unsigned long ulTime = CClientTime::GetTime ();
+
+    for ( unsigned char i = 0; i < 6; ++i )
+    {
+        if ( m_doorInterp.ulTargetTime [ i ] != 0 )
+        {
+            if ( m_doorInterp.ulTargetTime [ i ] <= ulTime )
+            {
+                // Interpolation finished.
+                SetDoorAngleRatio ( i, m_doorInterp.fTarget [ i ], 0, true );
+                m_doorInterp.ulTargetTime [ i ] = 0;
+            }
+            else
+            {
+                unsigned long ulElapsedTime = ulTime - m_doorInterp.ulStartTime [ i ];
+                unsigned long ulDelay = m_doorInterp.ulTargetTime [ i ] - m_doorInterp.ulStartTime [ i ];
+                float fStep = ulElapsedTime / (float)ulDelay;
+                float fRatio = SharedUtil::Lerp ( m_doorInterp.fStart [ i ], fStep, m_doorInterp.fTarget [ i ] );
+                SetDoorAngleRatio ( i, fRatio, 0, true );
+            }
+        }
+    }
+}
+
+void CClientVehicle::SetDoorAngleRatio ( unsigned char ucDoor, float fRatio, unsigned long ulDelay, bool bForced )
+{
+    bool bAllow = true;
+    unsigned char ucSeat;
+
+    // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
+    if ( bForced == false )
+    {
+        switch ( ucDoor )
+        {
+            case 2:
+                bAllow = m_pOccupyingDriver == 0;
+                break;
+            case 3:
+            case 4:
+            case 5:
+                ucSeat = ucDoor - 2;
+                bAllow = m_pOccupyingPassengers [ ucSeat ] == 0;
+                break;
+        }
+    }
+
+    if ( bAllow )
+    {
+        if ( ulDelay == 0UL )
+        {
+            if ( m_pVehicle )
+            {
+                m_pVehicle->OpenDoor ( ucDoor, fRatio, false );
+            }
+            m_fDoorAngleRatio [ ucDoor ] = fRatio;
+        }
+        else
+        {
+            SetDoorAngleRatioInterpolated ( ucDoor, fRatio, ulDelay );
+        }
+    }
+}
+
+float CClientVehicle::GetDoorAngleRatio ( unsigned char ucDoor )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetDoor ( ucDoor )->GetAngleOpenRatio ();
+    }
+    return m_fDoorAngleRatio [ ucDoor ];
+}
+
+void CClientVehicle::SetSwingingDoorsAllowed ( bool bAllowed )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetSwingingDoorsAllowed ( bAllowed );
+    }
+    m_bSwingingDoorsAllowed = bAllowed;
+}
+
+bool CClientVehicle::AreSwingingDoorsAllowed () const
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->AreSwingingDoorsAllowed ();
+    }
+    return m_bSwingingDoorsAllowed;
+}
 
 bool CClientVehicle::AreDoorsLocked ( void )
 {
@@ -735,32 +854,24 @@ void CClientVehicle::Blow ( bool bAllowMovement )
 }
 
 
-void CClientVehicle::GetColor ( unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 )
+CVehicleColor& CClientVehicle::GetColor ( void )
 {
     if ( m_pVehicle )
     {
-        m_pVehicle->GetColor ( &ucColor1, &ucColor2, &ucColor3, &ucColor4 );
+        SColor colors[4];
+        m_pVehicle->GetColor ( &colors[0], &colors[1], &colors[2], &colors[3], 0 );
+        m_Color.SetRGBColors ( colors[0], colors[1], colors[2], colors[3] );
     }
-    else
-    {
-        ucColor1 = m_ucColor1;
-        ucColor2 = m_ucColor2;
-        ucColor3 = m_ucColor3;
-        ucColor4 = m_ucColor4;
-    }
+    return m_Color;
 }
 
-
-void CClientVehicle::SetColor ( unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4 )
+void CClientVehicle::SetColor ( const CVehicleColor& color )
 {
+    m_Color = color;
     if ( m_pVehicle )
     {
-        m_pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
+        m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
     }
-    m_ucColor1 = ucColor1;
-    m_ucColor2 = ucColor2;
-    m_ucColor3 = ucColor3;
-    m_ucColor4 = ucColor4;
     m_bColorSaved = true;
 }
 
@@ -1910,6 +2021,7 @@ void CClientVehicle::StreamedInPulse ( void )
         */
 
         Interpolate ();
+        ProcessDoorInterpolation ();
 
         // Grab our current position
         CVector vecPosition = *m_pVehicle->GetPosition ();
@@ -2077,6 +2189,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetSirenOrAlarmActive ( m_bSireneOrAlarmActive );
         SetLandingGearDown ( m_bLandingGearDown );
         _SetAdjustablePropertyValue ( m_usAdjustablePropertyValue );
+        m_pVehicle->SetSwingingDoorsAllowed ( m_bSwingingDoorsAllowed );
         m_pVehicle->LockDoors ( m_bDoorsLocked );
         m_pVehicle->SetDoorsUndamageable ( m_bDoorsUndamageable );
         m_pVehicle->SetCanShootPetrolTank ( m_bCanShootPetrolTank );
@@ -2125,7 +2238,7 @@ void CClientVehicle::Create ( void )
         // Restore the color
         if ( m_bColorSaved )
         {
-            m_pVehicle->SetColor ( m_ucColor1, m_ucColor2, m_ucColor3, m_ucColor4 );
+            m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
         }
 
         // Link us with stored next and previous vehicles
@@ -2219,6 +2332,11 @@ void CClientVehicle::Create ( void )
 
         // Reset the interpolation
         ResetInterpolation ();
+        ResetDoorInterpolation ();
+
+        for ( unsigned char i = 0; i < 6; ++i )
+            SetDoorAngleRatio ( i, m_fDoorAngleRatio [ i ], 0, true );
+
 
 #if WITH_VEHICLE_HANDLING
         // Re-apply handling entry

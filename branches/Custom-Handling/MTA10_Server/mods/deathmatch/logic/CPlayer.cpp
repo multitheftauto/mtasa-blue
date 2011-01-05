@@ -150,14 +150,6 @@ void CPlayer::DoPulse ( void )
     {
         m_pPlayerTextManager->Process ();
     }
-
-    if ( m_bPendingKick )
-    {
-        m_bPendingKick = false;
-        CElement* pElement = CElementIDs::GetElement ( m_PendingKickResponsibleID );
-        CPlayer* pResponsible = static_cast < CPlayer* > ( pElement && IS_PLAYER ( pElement ) ? pElement : NULL );
-        CStaticFunctionDefinitions::KickPlayer ( this, pResponsible, m_strPendingKickReason );
-    }
 }
 
 

@@ -29,6 +29,7 @@ public:
     DECLARE_RPC ( SetGravity );
     DECLARE_RPC ( SetGameSpeed );
     DECLARE_RPC ( SetWaveHeight );
+    DECLARE_RPC ( GetSkyGradient );
     DECLARE_RPC ( SetSkyGradient );
     DECLARE_RPC ( ResetSkyGradient );
     DECLARE_RPC ( SetBlurLevel );
@@ -39,6 +40,7 @@ public:
     DECLARE_RPC ( SetGlitchEnabled );
     DECLARE_RPC ( SetCloudsEnabled );
     DECLARE_RPC ( SetTrafficLightState );
+    DECLARE_RPC ( SetJetpackMaxHeight );
 };
 
 #endif

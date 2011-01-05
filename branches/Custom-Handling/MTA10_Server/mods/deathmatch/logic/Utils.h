@@ -189,8 +189,6 @@ inline bool IsVisibleCharacter ( unsigned char c )
     return c >= 32 && c <= 126;
 }
 
-
-void            MakeSureDirExists           ( const char* szPath );
 bool            FileCopy                    ( const char* szPathNameSrc, const char* szPathDst );
 
 inline SString SQLEscape ( const SString& strEscapeString, bool bSingleQuotes, bool bDoubleQuotes )
@@ -206,4 +204,18 @@ inline SString SQLEscape ( const SString& strEscapeString, bool bSingleQuotes, b
     }
     return strParsedQuery;
 }
+
+// Maths utility functions
+enum eEulerRotationOrder
+{
+    EULER_DEFAULT,
+    EULER_ZXY,
+    EULER_ZYX,
+    EULER_MINUS_ZYX,
+    EULER_INVALID = 0xFF,
+};
+
+eEulerRotationOrder EulerRotationOrderFromString( const char* szString );
+CVector             ConvertEulerRotationOrder   ( const CVector& a_vRotation, eEulerRotationOrder a_eSrcOrder, eEulerRotationOrder a_eDstOrder );
+
 #endif

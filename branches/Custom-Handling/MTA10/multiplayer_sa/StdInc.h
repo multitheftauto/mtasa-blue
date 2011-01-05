@@ -14,10 +14,10 @@
 #include <vector>
 
 // SDK includes
+#define MTA_CLIENT
 #include "SharedUtil.h"
 #include <game/CGame.h>
 #include <CMatrix_Pad.h>
-#include "SString.h"
 
 // Multiplayer includes
 #include "multiplayersa_init.h"

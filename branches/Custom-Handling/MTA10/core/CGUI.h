@@ -109,7 +109,7 @@ public:
     int                 GetVisibleWindows           ( );
     void                SetVisibleWindows           ( bool bEnable );
 
-    void                InitiateUpdate              ( const char* szType, const char* szHost )      { m_pVersionUpdater->InitiateUpdate ( szType, szHost ); }
+    void                InitiateUpdate              ( const char* szType, const char* szData, const char* szHost )      { m_pVersionUpdater->InitiateUpdate ( szType, szData, szHost ); }
     bool                IsOptionalUpdateInfoRequired( const char* szHost )                          { return m_pVersionUpdater->IsOptionalUpdateInfoRequired ( szHost ); }
     void                InitiateDataFilesFix        ( void )                                        { m_pVersionUpdater->InitiateDataFilesFix (); }
 

@@ -140,7 +140,7 @@ void CXMLAttributesImpl::CreateAttributes ( void )
             // Add it
             new CXMLAttributeImpl ( *this, m_Node, *pAttrib );
         }
-        while ( pAttrib = pAttrib->Next () );
+        while ( ( pAttrib = pAttrib->Next () ) );
     }
 }
 

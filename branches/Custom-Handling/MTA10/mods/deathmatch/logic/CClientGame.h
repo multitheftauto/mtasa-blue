@@ -48,6 +48,7 @@
 #include "CEvents.h"
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
+#include "CScriptFontLoader.h"
 #include "CElementDeleter.h"
 #include "CFoo.h"
 #include "../../shared_logic/CRegisteredCommands.h"
@@ -172,6 +173,7 @@ public:
         GLITCH_QUICKRELOAD,
         GLITCH_FASTFIRE,
         GLITCH_FASTMOVE,
+        GLITCH_CROUCHBUG,
         NUM_GLITCHES
     };
     class CStoredWeaponSlot
@@ -230,6 +232,7 @@ public:
     inline CResourceManager*            GetResourceManager              ( void )        { return m_pResourceManager; }
     inline CLuaManager*                 GetLuaManager                   ( void )        { return m_pLuaManager; }
     inline CScriptKeyBinds*             GetScriptKeyBinds               ( void )        { return m_pScriptKeyBinds; }
+    inline CScriptFontLoader*           GetScriptFontLoader             ( void )        { return m_pScriptFontLoader; }
     inline CScriptDebugging*            GetScriptDebugging              ( void )        { return m_pScriptDebugging; }
     inline CRegisteredCommands*         GetRegisteredCommands           ( void )        { return &m_RegisteredCommands; }
     inline CZoneNames*                  GetZoneNames                    ( void )        { return m_pZoneNames; };
@@ -348,6 +351,7 @@ public:
     void                                ChangeVehicleWeapon             ( bool bNext );
     void                                NotifyBigPacketProgress         ( unsigned long ulBytesReceived, unsigned long ulTotalSize );
     bool                                IsDownloadingBigPacket          ( ) const                       { return m_bReceivingBigPacket; }
+    bool                                IsBeingDeleted                  ( void )                        { return m_bBeingDeleted; }
 
 private:
     #ifdef MTA_VOICE
@@ -367,6 +371,8 @@ private:
     bool                                OnMouseWheel                    ( CGUIMouseEventArgs Args );
     bool                                OnMove                          ( CGUIElement * pElement );
     bool                                OnSize                          ( CGUIElement * pElement );
+    bool                                OnFocusGain                     ( CGUIFocusEventArgs Args );
+    bool                                OnFocusLoss                     ( CGUIFocusEventArgs Args );
 
     float                               m_fMarkerBounce;
     // Network update functions
@@ -417,7 +423,7 @@ private:
     static void                         StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     static bool                         StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
-    
+ 
     bool                                DamageHandler                   ( CPed* pDamagePed, CEventDamage * pEvent );
     void                                FireHandler                     ( CFire* pFire );
     bool                                BreakTowLinkHandler             ( CVehicle* pTowedVehicle );
@@ -430,7 +436,7 @@ private:
     void                                AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     bool                                ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
-    
+   
     static bool                         StaticProcessMessage            ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                                ProcessMessage                  ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
@@ -487,6 +493,7 @@ private:
     CTransferBox*                       m_pTransferBox;
     CResourceManager*                   m_pResourceManager;
     CScriptKeyBinds*                    m_pScriptKeyBinds;
+    CScriptFontLoader*                  m_pScriptFontLoader;
     CElementDeleter                     m_ElementDeleter;
     CZoneNames*                         m_pZoneNames;
     CPacketHandler*                     m_pPacketHandler;
@@ -586,6 +593,11 @@ private:
 
     DWORD                               m_dwFrameTimeSlice;     // how long it took (in ms) to process the current frame
     DWORD                               m_dwLastFrameTick;      // time at which the previous frame was processed
+
+    long long                           m_llLastTransgressionTime;
+    SString                             m_strLastDiagnosticStatus;
+
+    bool                                m_bBeingDeleted;        // To enable speedy disconnect
 
     // Cache for speeding up collision processing
 public:

@@ -36,7 +36,9 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bAseEnabled = false;
     m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
-    m_iHTTPConnectionsPerClient = 32;
+    m_iHTTPMaxConnectionsPerClient = 4;
+    m_iHTTPThreadCount = 8;
+    m_iHTTPDosThreshold = 20;
     m_iEnableClientChecks = -1;
     m_bAutoUpdateAntiCheatEnabled = true;
     m_bJoinFloodProtectionEnabled = true;
@@ -44,8 +46,8 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_uiScriptDebugLogLevel = 0;
     m_bAutoUpdateIncludedResources = false;
     m_bDontBroadcastLan = false;
-    m_uiMTUSize = MTU_SIZE_DEFAULT;
     m_usFPSLimit = 36;
+    m_bAutoLogin = false;
 }
 
 
@@ -116,18 +118,6 @@ bool CMainConfig::Load ( const char* szFilename )
         return false;
     }
 
-    // Grab the MTU size
-    iResult = GetInteger ( m_pRootNode, "mtusize", iTemp, 1, 65535 );
-    if ( iResult == IS_SUCCESS )
-    {
-        m_uiMTUSize = iTemp;
-    }
-    else
-    {
-        if ( iResult != DOESNT_EXIST )
-            CLogger::ErrorPrintf ( "MTU packet size must be between 1 and 65535, defaulting to %u\n", m_uiMTUSize );
-    }
-
     // Grab the max players
     iResult = GetInteger ( m_pRootNode, "maxplayers", iTemp, 1, MAX_PLAYER_COUNT );
     if ( iResult == IS_SUCCESS )
@@ -184,9 +174,17 @@ bool CMainConfig::Load ( const char* szFilename )
         m_strHTTPDownloadURL = "";
     }
 
-    // httpconnectionsperclient
-    GetInteger ( m_pRootNode, "httpconnectionsperclient", m_iHTTPConnectionsPerClient, 2, 32 );
-    m_iHTTPConnectionsPerClient = Clamp ( 0, m_iHTTPConnectionsPerClient, 32 );
+    // httpmaxconnectionsperclient
+    GetInteger ( m_pRootNode, "httpmaxconnectionsperclient", m_iHTTPMaxConnectionsPerClient, 1, 8 );
+    m_iHTTPMaxConnectionsPerClient = Clamp ( 1, m_iHTTPMaxConnectionsPerClient, 8 );
+
+    // httpthreadcount
+    GetInteger ( m_pRootNode, "httpthreadcount", m_iHTTPThreadCount, 1, 20 );
+    m_iHTTPThreadCount = Clamp ( 1, m_iHTTPThreadCount, 20 );
+
+    // httpdosthreshold
+    GetInteger ( m_pRootNode, "httpdosthreshold", m_iHTTPDosThreshold, 1, 10000 );
+    m_iHTTPDosThreshold = Clamp ( 1, m_iHTTPDosThreshold, 10000 );
 
     // verifyclientsettings
     GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );
@@ -199,6 +197,16 @@ bool CMainConfig::Load ( const char* szFilename )
         for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
             if ( (*it).length () )
                 MapSet ( m_DisableACMap, *it, 1 );
+    }
+
+    {
+        SString strEnable;
+        GetString ( m_pRootNode, "enablediagnostic", strEnable );
+        std::vector < SString > tagList;
+        strEnable.Split ( ",", tagList );
+        for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
+            if ( (*it).length () )
+                MapSet ( m_EnableDiagnosticMap, *it, 1 );
     }
 
     // minclientversion - Minimum client version or kick
@@ -292,6 +300,8 @@ bool CMainConfig::Load ( const char* szFilename )
     {
         m_strAccessControlListFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "acl.xml" );
     }
+
+    GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
 
     return true;
 }
@@ -523,6 +533,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "ver", CConsoleCommands::Ver, false );
     RegisterCommand ( "sver", CConsoleCommands::Ver, false );
     RegisterCommand ( "ase", CConsoleCommands::Ase, false );
+    RegisterCommand ( "openports", CConsoleCommands::OpenPortsTest, false );
 
     return true;
 }

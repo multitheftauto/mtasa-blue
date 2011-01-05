@@ -34,7 +34,8 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
                            CGroups* pGroups,
                            CEvents* pEvents,                           
                            class CScriptDebugging* pScriptDebugging,
-                           CElementDeleter* pElementDeleter )
+                           CElementDeleter* pElementDeleter,
+                           CDummy* pRootElement )
 {
     // Init
     m_pBlipManager = pBlipManager;
@@ -54,8 +55,7 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
     m_pScriptDebugging = pScriptDebugging;
     m_pElementDeleter = pElementDeleter;
 
-    m_pRootElement = new CDummy ( NULL, NULL, NULL );
-    m_pRootElement->SetTypeName ( "root" );
+    m_pRootElement = pRootElement;
 
     m_ulLastRespawnTime = 0;
 
@@ -411,6 +411,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     float fGameSpeed = g_pGame->GetGameSpeed ();
     float fWaveHeight = g_pGame->GetWaterManager ()->GetGlobalWaveHeight ();
     float fWaterLevel = g_pGame->GetWaterManager ()->GetGlobalWaterLevel ();
+    float fJetpackMaxHeight = g_pGame->GetJetpackMaxHeight ();
+
     // Get the sky gradient
     bool bHasSkyGradient = g_pGame->HasSkyGradient ();
     unsigned char ucTopRed, ucTopGreen, ucTopBlue;
@@ -429,6 +431,13 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     // Garage states
     bool* pbGarageStates = g_pGame->GetGarageStates();
     bool bCloudsEnabled = g_pGame->GetCloudsEnabled();
+
+    // Water color
+    bool bOverrideWaterColor;
+    unsigned char ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha;
+    bOverrideWaterColor = g_pGame->HasWaterColor ( );
+    g_pGame->GetWaterColor ( ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha );
+
     // Send the packet to the given player
     Player.Send ( CMapInfoPacket ( ucCurrentWeather,
                                    ucWeatherBlendingTo,
@@ -451,7 +460,13 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucBottomGreen,
                                    ucBottomBlue,
                                    usFPSLimit,
-                                   bCloudsEnabled) );
+                                   bCloudsEnabled,
+                                   fJetpackMaxHeight,
+                                   bOverrideWaterColor,
+                                   ucWaterRed,
+                                   ucWaterGreen,
+                                   ucWaterBlue,
+                                   ucWaterAlpha) );
 
     // Send him all the elements
     SendMapInformation ( Player );
@@ -521,6 +536,7 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
     Player.SetTeam ( pTeam, true );
     Player.SetInterior ( ucInterior );
     Player.SetDimension ( usDimension );
+    Player.AttachTo ( NULL );
 
     // Call onPlayerSpawn
     CLuaArguments OnPlayerSpawnArguments;

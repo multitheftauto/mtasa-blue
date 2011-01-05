@@ -57,6 +57,7 @@ CTaskComplexWanderStandardSA::CTaskComplexWanderStandardSA(const int iMoveState,
 {
     DEBUG_TRACE("CTaskComplexWanderStandardSA::CTaskComplexWanderStandardSA(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly)");
     this->CreateTaskInterface(sizeof(CTaskComplexWanderStandardSAInterface));
+    if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskComplexWanderStandard__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     _asm

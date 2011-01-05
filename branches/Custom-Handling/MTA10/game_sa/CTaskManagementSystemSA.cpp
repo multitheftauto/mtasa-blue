@@ -43,6 +43,9 @@ CTaskManagementSystemSA::~CTaskManagementSystemSA ( void )
 
 CTask * CTaskManagementSystemSA::AddTask ( CTaskSA * pTask )
 {
+    if ( !pTask )
+        return NULL;
+    assert ( pTask->IsValid () );
     STaskListItem* pItem = new STaskListItem;
     pItem->pTaskSA = pTask;
     pItem->taskInterface = pTask->GetInterface ();
@@ -51,11 +54,14 @@ CTask * CTaskManagementSystemSA::AddTask ( CTaskSA * pTask )
     return pTask;
 }
 
+// Only called from HOOK_CTask_Operator_Delete
 void CTaskManagementSystemSA::RemoveTask ( CTaskSAInterface * pTaskInterface )
 {
     // Stops crash on exit
     if ( m_TaskList.size () == 0 )
         return;
+
+    assert ( pTaskInterface );
 
     // Find it in our list
     STaskListItem* pItem;
@@ -232,6 +238,8 @@ CTask * CTaskManagementSystemSA::CreateAppropriateTask ( CTaskSAInterface * pTas
             pTaskSA = new CTaskSA;
             break;
     }
+
+    assert ( pTaskSA && !pTaskSA->GetInterface () );
 
     // Set the internal interface
     pTaskSA->SetInterface ( pTaskInterface );

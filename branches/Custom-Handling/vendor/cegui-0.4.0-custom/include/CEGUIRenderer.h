@@ -110,7 +110,7 @@ public:
 	\return
 		Nothing
 	*/
-	virtual	void	addQuad(const Rect& dest_rect, float z, const Texture* tex, const Rect& texture_rect, const ColourRect& colours, QuadSplitMode quad_split_mode) = 0;
+	virtual	void	addQuad(const Rect& dest_rect, float z, const Texture* tex, const Rect& texture_rect, const ColourRect& colours, QuadSplitMode quad_split_mode, const Image* image = NULL ) = 0;
 
 
 	/*!

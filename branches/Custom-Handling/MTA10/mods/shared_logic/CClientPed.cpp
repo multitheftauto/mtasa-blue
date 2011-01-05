@@ -170,6 +170,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bStealthAiming = false;
     m_fLighting = 0.0f;
     m_bBulletImpactData = false;
+    m_ucEnteringDoor = 0xFF;
 
     // Time based interpolation
     m_interp.pTargetOriginSource = NULL;
@@ -1207,7 +1208,7 @@ void CClientPed::GetOutOfVehicle ( void )
 }
 
 
-void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat )
+void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor )
 {
     // TODO: add checks to ensure we don't try to use the wrong seats for bikes etc
     // Eventually remove us from a previous vehicle
@@ -1216,6 +1217,7 @@ void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat 
     // Do it
     _GetIntoVehicle ( pVehicle, uiSeat );
     m_uiOccupiedVehicleSeat = uiSeat;
+    m_ucEnteringDoor = ucDoor;
     m_bForceGettingIn = true;
 }
 
@@ -1274,8 +1276,9 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         // if the local player is entering it. This is so we don't
         // get screwed up with camera not following and similar issues.
         if ( m_bIsLocalPlayer )
-        {            
+        {
             pVehicle->AddStreamReference ();
+            pVehicle->SetSwingingDoorsAllowed ( true );
         }
 
         // Warp the player into the car's driverseat
@@ -1383,6 +1386,8 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
 
     if ( pVehicle )
     {
+        pVehicle->SetSwingingDoorsAllowed ( false );
+
         // Warp the player out of the vehicle
         CVehicle* pGameVehicle = pVehicle->m_pVehicle;
         if ( pGameVehicle )
@@ -1666,7 +1671,13 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
     {
         LockHealth ( 0.0f );
         LockArmor ( 0.0f );
-    }    
+    }
+
+    // Silently remove the ped satchels
+    DestroySatchelCharges ( false, true );
+
+    // Stop pressing buttons
+    SetControllerState ( CControllerState () );
 }
 
 
@@ -2359,7 +2370,7 @@ void CClientPed::StreamedInPulse ( void )
             // If we're USE_GUN, but aren't pressing the fire or aim keys we must be
             // in a post-fire state where the player is preparing to move back to 
             // a normal stance.  This can normally be cut using the crouch key, so block it
-            if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTMOVE ) )
+            if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG ) )
             {
                 if ( Current.RightShoulder1 == 0 && Current.LeftShoulder1 == 0 && Current.ButtonCircle == 0 )
                     Current.ShockButtonL = 0;
@@ -3053,7 +3064,7 @@ void CClientPed::_CreateModel ( void )
         {
             // TODO: use TASK_SIMPLE_DEAD
             Kill ( WEAPONTYPE_UNARMED, 0 );
-        }       
+        }
 
         // Are we still playing a looped animation?
         if ( m_bLoopAnimation && m_pAnimationBlock )
@@ -3732,6 +3743,11 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     // Driverseat
     if ( uiSeat == 0 )
     {
+        if ( m_bIsLocalPlayer )
+        {
+            pVehicle->SetSwingingDoorsAllowed ( true );
+        }
+
         if ( m_pPlayerPed )
         {
             // Grab the game vehicle. If it exists, begin walking the player into it

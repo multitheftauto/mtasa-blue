@@ -52,16 +52,91 @@ AC_ARG_ENABLE(debug,
 
 # Checks for libraries.
 
-# pcre
-AX_PATH_LIB_PCRE()
-AC_SUBST(PCRE_CFLAGS)
-AC_SUBST(PCRE_LIBS)
+# pcre (for bundled pme.h)
+AC_ARG_ENABLE([system-pcre], 
+	[AS_HELP_STRING([--disable-system-pcre],
+	                [don't use system PCRE])])
 
-# sqlite3
-AX_LIB_SQLITE3()
+AC_DEFUN([USE_BUNDLED_PCRE], [
+	PCRE_CFLAGS="-I\$(top_builddir)/vendor/pcre"
+	PCRE_LIBS="\$(top_builddir)/vendor/pcre/libpcre.la"
+	# probably include a check if it was already built
+])
 
-# curl
-AC_CHECK_CURL(7)
+if test "x$enable_system_pcre" != "xno" ; then
+	PKG_CHECK_MODULES([PCRE], [libpcre],, [
+		if test "x$enable_system_pcre" != "xyes" ; then
+			AC_MSG_WARN(["system PCRE not found, using bundled one"])
+			USE_BUNDLED_PCRE
+		else
+			AC_MSG_ERROR(["system PCRE not found"])
+		fi
+	])
+else
+	USE_BUNDLED_PCRE
+fi
+
+# google sparsehash (for mods/deathmatch)
+AC_ARG_ENABLE([system-sparsehash],
+	[AS_HELP_STRING([--disable-system-sparsehash],
+	                [don't use system sparsehash])])
+
+AC_ARG_VAR([SPARSEHASH_CFLAGS], [C compiler flags for sparsehash])
+AC_ARG_VAR([SPARSEHASH_LIBS], [linker flags for sparsehash])
+
+AC_DEFUN([USE_BUNDLED_SPARSEHASH], [
+	HAVE_BUNDLED_SPARSEHASH=yes
+	# for created sparseconfig.h
+	SPARSEHASH_CFLAGS="-I\$(top_builddir)/vendor/sparsehash/current/src"
+	# for the rest
+	SPARSEHASH_CFLAGS+=" -I\$(top_srcdir)/vendor/sparsehash/current/src"
+])
+
+if test "x$enable_system_sparsehash" != "xno" ; then
+	save_CPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS $SPARSEHASH_CFLAGS"
+	AC_CHECK_HEADERS([google/sparse_hash_map],, [
+		if test "x$enable_system_sparsehash" != "xyes" ; then
+			AC_MSG_WARN(["system sparsehash not found, using bundled one"])
+			USE_BUNDLED_SPARSEHASH
+		else
+			AC_MSG_ERROR(["system sparsehash not found"])
+		fi
+	])
+else
+	USE_BUNDLED_SPARSEHASH
+fi
+CPPFLAGS="$save_CPPFLAGS"
+
+# sqlite3 (for mods/deathmatch)
+# bundled version seems to be for windows
+PKG_CHECK_MODULES([SQLITE3], [sqlite3])
+
+# curses (for MTA10_Server/{core,sdk})
+AC_ARG_VAR([CURSES_CFLAGS], [C compiler flags for curses])
+AC_ARG_VAR([CURSES_LIBS], [linker flags for curses])
+
+save_CPPFLAGS="$CPPFLAGS"
+save_LIBS="$LIBS"
+CPPFLAGS="$CPPFLAGS $CURSES_CFLAGS"
+LIBS="$LIBS $CURSES_LIBS"
+
+if test -z "$CURSES_CFLAGS" ; then
+	AC_CHECK_HEADER([ncursesw/curses.h],
+		[],
+		[AC_MSG_ERROR([can't find curses headers])])
+fi
+
+if test -z "$CURSES_LIBS" ; then
+	LIBS="${LIBS} -lncursesw"
+	AC_TRY_LINK([#include <ncurses.h>],
+		[chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr();],
+		[CURSES_LIBS=-lncursesw],
+		[AC_MSG_ERROR([can't find curses libraries])])
+fi
+
+CPPFLAGS="$save_CPPFLAGS"
+LIBS="$save_LIBS"
 
 # Checking for a 64-bit system
 AC_MSG_CHECKING([uname -m for detecting host operating system architecture])
@@ -110,15 +185,12 @@ AC_C_BIGENDIAN([AC_DEFINE(USING_BIG_ENDIAN)],[AC_DEFINE(USING_LITTLE_ENDIAN)],[]
 # Check for zlib
 AX_CHECK_ZLIB()
 
-# Check for curses
-AC_CHECK_LIB(curses, stdscr,, AC_MSG_ERROR([can't find curses]))
-
 # Define compile/library flags.
-AC_SUBST(AM_CXXFLAGS, "$AM_CXXFLAGS $INCLUDES $PCRE_CFLAGS -Wall -DTIXML_USE_STL")
+AC_SUBST(AM_CXXFLAGS, "$AM_CXXFLAGS $INCLUDES -Wall -DTIXML_USE_STL")
 AC_SUBST(AM_LDFLAGS, "$AM_LDFLAGS -lstdc++")
 
 # Checks for header files.
-AC_CHECK_HEADERS(curses.h sqlite3.h pcre.h fcntl.h limits.h strings.h syslog.h unistd.h [sys/param.h] stdarg.h,, AC_MSG_ERROR([You are missing one or more header(s)]))
+AC_CHECK_HEADERS(fcntl.h limits.h strings.h syslog.h unistd.h [sys/param.h] stdarg.h,, AC_MSG_ERROR([You are missing one or more header(s)]))
 
 # Check for libraries
 AC_CHECK_FUNCS(strndup strerror vsnprintf vasprintf open vsyslog strncasecmp)
@@ -130,9 +202,6 @@ AC_C_INLINE
 
 AC_LANG(C++)
 
-# Check for google sparsehash
-AC_CHECK_HEADERS([google/sparse_hash_map],,AC_MSG_ERROR([can't find google sparse_hash_map]))
-
 # Checks for library functions.
 
 # Configure subdirectories where necessary
@@ -140,6 +209,10 @@ AC_CHECK_HEADERS([google/sparse_hash_map],,AC_MSG_ERROR([can't find google spars
 #   http://readlist.com/lists/lists.sourceforge.net/mingw-users/2/12488.html
 AC_CONFIG_SUBDIRS([vendor/lua])
 AC_CONFIG_SUBDIRS([vendor/json-c])
+
+if test "x$HAVE_BUNDLED_SPARSEHASH" = "xyes" ; then
+	AC_CONFIG_SUBDIRS([vendor/sparsehash/current])
+fi
 
 # Generate makefiles
 AC_CONFIG_FILES([

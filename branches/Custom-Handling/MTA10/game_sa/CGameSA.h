@@ -182,9 +182,6 @@ public:
     float                   GetTimeScale ( void );
     void                    SetTimeScale ( float fTimeScale );
 
-    unsigned long           GetFramelimiter         ( void );
-    void                    SetFramelimiter         ( unsigned long ulFramelimiter );
-
     BOOL                    InitLocalPlayer(  );
 
     float                   GetGravity              ( void );

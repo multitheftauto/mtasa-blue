@@ -16,11 +16,11 @@
 #include <vector>
 
 // SDK includes
+#define MTA_CLIENT
 #include "SharedUtil.h"
 #include <game/CGame.h>
 #include <game/CWanted.h>
 #include <ijsify.h>
-#include "SString.h"
 
 // Game includes
 #include "CEntitySA.h"

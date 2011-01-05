@@ -35,6 +35,7 @@ distribution.
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "SharedUtil.h"
 #include <string.h>
 #include <assert.h>
 

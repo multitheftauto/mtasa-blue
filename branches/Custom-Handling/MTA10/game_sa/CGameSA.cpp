@@ -146,6 +146,9 @@ CGameSA::CGameSA()
     m_Cheats [ CHEAT_NEVERWANTED      ] = new SCheatSA((BYTE *)VAR_NeverWanted, false);
     m_Cheats [ CHEAT_HEALTARMORMONEY  ] = new SCheatSA((BYTE *)VAR_HealthArmorMoney, false);
 
+    // Change pool sizes here
+    m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );  // Default is 500
+    m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );  // Default is 350
 }
 
 CGameSA::~CGameSA ( void )
@@ -489,26 +492,6 @@ float CGameSA::GetTimeScale ( void )
 void CGameSA::SetTimeScale ( float fTimeScale )
 {
     *VAR_TimeScale = fTimeScale;
-}
-
-
-unsigned long CGameSA::GetFramelimiter ( void )
-{
-    return *VAR_Framelimiter;
-}
-
-
-void CGameSA::SetFramelimiter ( unsigned long ulFramelimiter )
-{
-    if ( ulFramelimiter == 0 )
-    {
-        m_pSettings->SetFrameLimiterEnabled ( false );
-    }
-    else
-    {
-        m_pSettings->SetFrameLimiterEnabled ( true );
-        *VAR_Framelimiter = ulFramelimiter;
-    }
 }
 
 

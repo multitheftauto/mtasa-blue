@@ -15,20 +15,22 @@ extern CGame* g_pGame;
 
 CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow ) : CClientEntity ( ID )
 {
-    m_pManager = pManager->GetWaterManager ();
+    m_pManager = pManager;
+    m_pWaterManager = pManager->GetWaterManager ();
     m_pPoly = g_pGame->GetWaterManager ()->CreateQuad ( vecBL, vecBR, vecTL, vecTR, bShallow );
     SetTypeName ( "water" );
 
-    m_pManager->AddToList ( this );
+    m_pWaterManager->AddToList ( this );
 }
 
 CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow ) : CClientEntity ( ID )
 {
-    m_pManager = pManager->GetWaterManager ();
+    m_pManager = pManager;
+    m_pWaterManager = pManager->GetWaterManager ();
     m_pPoly = g_pGame->GetWaterManager ()->CreateTriangle ( vecL, vecR, vecTB, bShallow );
     SetTypeName ( "water" );
 
-    m_pManager->AddToList ( this );
+    m_pWaterManager->AddToList ( this );
 }
 
 CClientWater::~CClientWater ()
@@ -110,5 +112,5 @@ bool CClientWater::SetVertexPosition ( int iVertexIndex, CVector& vecPosition, v
 
 void CClientWater::Unlink ()
 {
-    m_pManager->RemoveFromList ( this );
+    m_pWaterManager->RemoveFromList ( this );
 }
