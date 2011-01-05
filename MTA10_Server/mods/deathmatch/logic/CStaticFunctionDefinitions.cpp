@@ -1841,13 +1841,31 @@ CPed* CStaticFunctionDefinitions::CreatePed ( CResource* pResource, unsigned sho
         CPed * pPed = m_pPedManager->Create ( usModel, pResource->GetDynamicElementRoot () );
         if ( pPed )
         {
+            // Convert the rotation to radians
+            float fRotationRadians = ConvertDegreesToRadians ( fRotation );
+            // Clamp it to -PI .. PI
+            if ( fRotationRadians < -PI )
+            {
+                do
+                {
+                    fRotationRadians += PI * 2.0f;
+                } while ( fRotationRadians < -PI );
+            }
+            else if ( fRotationRadians > PI )
+            {
+                do
+                {
+                    fRotationRadians -= PI * 2.0f;
+                } while ( fRotationRadians > PI );
+            }
+
             pPed->SetPosition ( vecPosition );
             pPed->SetIsDead ( false );
             pPed->SetSpawned ( true );
             pPed->SetHealth ( 100.0f );
             pPed->SetSyncable ( bSynced );
 
-            pPed->SetRotation ( fRotation );
+            pPed->SetRotation ( fRotationRadians );
 
             CEntityAddPacket Packet;
             Packet.Add ( pPed );

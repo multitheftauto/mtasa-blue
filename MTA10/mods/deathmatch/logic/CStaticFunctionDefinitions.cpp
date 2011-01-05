@@ -2098,11 +2098,29 @@ CClientPed* CStaticFunctionDefinitions::CreatePed ( CResource& Resource, unsigne
     // Valid model?
     if ( CClientPlayerManager::IsValidModel ( ulModel ) )
     {
+        // Convert the rotation to radians
+        float fRotationRadians = ConvertDegreesToRadians ( fRotation );
+        // Clamp it to -PI .. PI
+        if ( fRotationRadians < -PI )
+        {
+            do
+            {
+                fRotationRadians += PI * 2.0f;
+            } while ( fRotationRadians < -PI );
+        }
+        else if ( fRotationRadians > PI )
+        {
+            do
+            {
+                fRotationRadians -= PI * 2.0f;
+            } while ( fRotationRadians > PI );
+        }
+
         // Create it
         CClientPed* pPed = new CClientPed ( m_pManager, ulModel, INVALID_ELEMENT_ID );
         pPed->SetParent ( Resource.GetResourceDynamicEntity() );
         pPed->SetPosition ( vecPosition );
-        pPed->SetCurrentRotation ( fRotation );
+        pPed->SetCurrentRotation ( fRotationRadians );
         return pPed;
     }
 
