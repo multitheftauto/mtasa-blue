@@ -223,6 +223,7 @@ AC_CONFIG_FILES([
 	vendor/ehs/Makefile
 	Shared/Makefile
 	Shared/XML/Makefile
+	Shared/publicsdk/Makefile
 	MTA10_Server/Makefile
 	MTA10_Server/sdk/Makefile
 	MTA10_Server/core/Makefile
