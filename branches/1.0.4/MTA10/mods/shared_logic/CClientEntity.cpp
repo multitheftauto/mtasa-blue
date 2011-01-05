@@ -1303,7 +1303,7 @@ void CClientEntity::AddEntityFromRoot ( unsigned int uiTypeHash, CClientEntity* 
     assert ( CClientEntity::IsFromRoot ( pEntity ) );
 
     // Insert into list
-    std::list < CClientEntity* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
+    CMappedList < CClientEntity* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
     listEntities.remove ( pEntity );
     listEntities.push_front ( pEntity );
 
@@ -1324,7 +1324,7 @@ void CClientEntity::RemoveEntityFromRoot ( unsigned int uiTypeHash, CClientEntit
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        std::list < CClientEntity* >& listEntities = find->second;
+        CMappedList < CClientEntity* >& listEntities = find->second;
         listEntities.remove ( pEntity );
         if ( listEntities.size () == 0 )
             ms_mapEntitiesFromRoot.erase ( find );
@@ -1345,7 +1345,7 @@ void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, CLuaMain* pLu
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        std::list < CClientEntity* >& listEntities = find->second;
+        CMappedList < CClientEntity* >& listEntities = find->second;
         CClientEntity* pEntity;
         lua_State* luaVM = pLuaMain->GetVirtualMachine ();
         unsigned int uiIndex = 0;
