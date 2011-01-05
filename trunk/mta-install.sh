@@ -7,7 +7,7 @@ if [ ! -f "Makefile" ]; then
   exit
 fi
 
-make install
+make -C MTA10_Server install
 
 cp -n MTA10_Server/mods/deathmatch/acl.xml MTA10_Server/output/mods/deathmatch/acl.xml 
 cp -n MTA10_Server/mods/deathmatch/mtaserver.conf MTA10_Server/output/mods/deathmatch/mtaserver.conf
