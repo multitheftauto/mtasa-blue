@@ -5,7 +5,7 @@ wikibot_LDADD=$(top_builddir)/../rsl/librsl.la -lpthread
 
 wikibot_mkpasswd_SOURCES=mkpasswd.cpp keys.cpp
 
-AM_CPPFLAGS=-I$(top_srcdir)/include -I$(top_srcdir)/.. -pthread -DDATADIR='"$(datadir)"'
+AM_CPPFLAGS=-I$(top_srcdir)/include -I$(top_srcdir)/.. -I$(top_builddir)/.. -pthread -DDATADIR='"$(datadir)"'
 
 syntax.c: syntax.l
 	$(LEX) -o $@ $<
