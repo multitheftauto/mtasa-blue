@@ -595,11 +595,13 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getBlipSize", CLuaFunctionDefs::GetBlipSize );
     CLuaCFunctions::AddFunction ( "getBlipColor", CLuaFunctionDefs::GetBlipColor );
     CLuaCFunctions::AddFunction ( "getBlipOrdering", CLuaFunctionDefs::GetBlipOrdering );
+    CLuaCFunctions::AddFunction ( "getBlipVisibleDistance", CLuaFunctionDefs::GetBlipVisibleDistance );
 
     CLuaCFunctions::AddFunction ( "setBlipIcon", CLuaFunctionDefs::SetBlipIcon );
     CLuaCFunctions::AddFunction ( "setBlipSize", CLuaFunctionDefs::SetBlipSize );
     CLuaCFunctions::AddFunction ( "setBlipColor", CLuaFunctionDefs::SetBlipColor );
     CLuaCFunctions::AddFunction ( "setBlipOrdering", CLuaFunctionDefs::SetBlipOrdering );
+    CLuaCFunctions::AddFunction ( "setBlipVisibleDistance", CLuaFunctionDefs::SetBlipVisibleDistance );
 
     // Marker create/destroy funcs
     CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefs::CreateMarker );

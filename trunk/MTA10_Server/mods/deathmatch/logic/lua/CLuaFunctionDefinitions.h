@@ -284,12 +284,14 @@ public:
     static int      GetBlipSize                         ( lua_State* luaVM );
     static int      GetBlipColor                        ( lua_State* luaVM );
     static int      GetBlipOrdering                     ( lua_State* luaVM );
+    static int      GetBlipVisibleDistance              ( lua_State* luaVM );
 
     // Blip set functions
     static int      SetBlipIcon                         ( lua_State* luaVM );
     static int      SetBlipSize                         ( lua_State* luaVM );
     static int      SetBlipColor                        ( lua_State* luaVM );
     static int      SetBlipOrdering                     ( lua_State* luaVM );
+    static int      SetBlipVisibleDistance              ( lua_State* luaVM );
 
     // Object create/destroy functions
     static int      CreateObject                        ( lua_State* luaVM );

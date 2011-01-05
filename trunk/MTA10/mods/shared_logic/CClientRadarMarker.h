@@ -86,6 +86,9 @@ public:
     inline short                        GetOrdering                     ( void )                        { return m_sOrdering; }
     void                                SetOrdering                     ( short sOrdering );
 
+    inline float                        GetVisibleDistance              ( void )                        { return m_fVisibleDistance; }
+    inline void                         SetVisibleDistance              ( float fVisibleDistance )      { m_fVisibleDistance = fVisibleDistance; }
+
     bool                                IsInVisibleDistance             ( void );
 
 private:

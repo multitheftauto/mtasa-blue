@@ -1780,4 +1780,48 @@ struct SMouseButtonSync : public ISyncStructure
 };
 
 
+//////////////////////////////////////////
+//                                      //
+//                Blips                 //
+//                                      //
+//////////////////////////////////////////
+struct SBlipIconSync : public ISyncStructure
+{
+    enum { BITCOUNT = 6 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucIcon : 6;
+    } data;
+};
+
+struct SBlipSizeSync : public ISyncStructure
+{
+    enum { BITCOUNT = 5 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
+    }
+
+    struct
+    {
+        unsigned char ucSize : 5;
+    } data;
+};
+
+
 #pragma pack(pop)

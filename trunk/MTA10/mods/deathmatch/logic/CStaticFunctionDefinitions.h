@@ -265,6 +265,7 @@ public:
     static bool                         SetBlipSize                         ( CClientEntity& Entity, unsigned char ucSize );
     static bool                         SetBlipColor                        ( CClientEntity& Entity, const SColor color );
     static bool                         SetBlipOrdering                     ( CClientEntity& Entity, short sOrdering );
+    static bool                         SetBlipVisibleDistance              ( CClientEntity& Entity, float fVisibleDistance );
 
     // Marker create/destroy funcs
     static CClientMarker*               CreateMarker                        ( CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color );

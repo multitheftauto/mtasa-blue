@@ -25,6 +25,7 @@ public:
     DECLARE_RPC ( SetBlipSize );
     DECLARE_RPC ( SetBlipColor );
     DECLARE_RPC ( SetBlipOrdering );
+    DECLARE_RPC ( SetBlipVisibleDistance );
 
 };
 

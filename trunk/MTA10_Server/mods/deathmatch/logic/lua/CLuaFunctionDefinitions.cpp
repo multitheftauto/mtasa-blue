@@ -6519,6 +6519,31 @@ int CLuaFunctionDefinitions::GetBlipOrdering ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetBlipVisibleDistance ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        CBlip* pBlip = lua_toblip ( luaVM, 1 );
+        if ( pBlip )
+        {
+            float fVisibleDistance;
+            if ( CStaticFunctionDefinitions::GetBlipVisibleDistance ( pBlip, fVisibleDistance ) )
+            {
+                lua_pushnumber ( luaVM, fVisibleDistance );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getBlipVisibleDistance", "blip", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getBlipVisibleDistance" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefinitions::SetBlipIcon ( lua_State* luaVM )
 {
     int iArgument1 = lua_type ( luaVM, 1 );
@@ -6636,6 +6661,35 @@ int CLuaFunctionDefinitions::SetBlipOrdering ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setBlipOrdering" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetBlipVisibleDistance ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
+         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        if ( pElement )
+        {
+            float fVisibleDistance = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+
+            if ( CStaticFunctionDefinitions::SetBlipVisibleDistance ( pElement, fVisibleDistance ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setBlipVisibleDistance", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setBlipVisibleDistance" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
