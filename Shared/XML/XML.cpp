@@ -16,6 +16,9 @@ CXMLImpl* pXMLInterface = NULL;
 
 _DECLSPEC_EX CXML* InitXMLInterface()
 {
+    // this is required during parsing, see resources project fallout/help.xml @r659
+    TiXmlBase::SetCondenseWhiteSpace(false);
+
     pXMLInterface = new CXMLImpl;
     return pXMLInterface;
 }
