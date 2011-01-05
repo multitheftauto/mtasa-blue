@@ -567,6 +567,85 @@ namespace
 
     ///////////////////////////////////////////////////////////////
     //
+    // CFilterMap
+    //
+    // Change "+all,-{1000~2006},+2003,-{2050},-2611,-{3120},-{4002~4100},+{4010~4020}"
+    // into a map which can be queried using IsFiltered()
+    //
+    ///////////////////////////////////////////////////////////////
+    class CFilterMap
+    {
+    public:
+        CFilterMap ( const SString& strFilterDesc )
+        {
+            SetAll ( '+' );
+            AddString ( strFilterDesc );
+        }
+
+        bool IsFiltered ( int iValue )
+        {
+            if ( MapContains ( idMap, iValue ) )
+                return cDefaultType == '+';
+            return cDefaultType == '-';
+        }
+
+    protected:
+        void AddString ( const SString& strFilterDesc )
+        {
+            std::vector < SString > partList;
+            strFilterDesc.Split ( ",", partList );
+            for ( uint i = 0; i < partList.size () ; i++ )
+            {
+                const SString& part = partList [ i ];
+                char cType = part.Left ( 1 )[0];
+
+                SString strRest = part.Right ( part.length () - 1 );
+                strRest = strRest.Replace ( "{", "" ).Replace ( "}", "" );
+
+                SString strFrom, strTo;
+                strRest.Split ( "~", &strFrom, &strTo );
+
+                if ( strFrom == "all" )
+                    SetAll ( cType );
+                else
+                if ( strTo.empty () )
+                    AddSingle ( cType, atoi ( strFrom ) );
+                else
+                {
+                    const int iTo = atoi ( strTo );
+                    for ( int i = atoi ( strFrom ) ; i <= iTo ; i++ )
+                        AddSingle ( cType, i );
+                } 
+            }
+        }
+
+        void AddSingle ( char cType, int iValue )
+        {
+            if ( cType != cDefaultType )
+            {
+                // Add
+                MapSet ( idMap, iValue, true );
+            }
+            else
+            {
+                // Remove
+                MapRemove ( idMap, iValue );
+            }
+        }
+
+        void SetAll ( char cType )
+        {
+            idMap.clear ();
+            cDefaultType = cType;
+        }
+
+        std::map < uint, bool >     idMap;
+        char                        cDefaultType;
+    };
+
+
+    ///////////////////////////////////////////////////////////////
+    //
     // CReportWrap
     //
     // gawd knows
@@ -591,7 +670,7 @@ namespace
         void SaveReportSettings ( void ) const
         {
             CArgMap m_ArgMap ( "@", ";" );
-            m_ArgMap.Set ( "filter", strFilter );
+            m_ArgMap.Set ( "filter2", strFilter );
             m_ArgMap.Set ( "min", iMinSize );
             m_ArgMap.Set ( "max", iMaxSize );
             CVARS_SET ( "reportsettings", m_ArgMap.ToString () );
@@ -609,7 +688,7 @@ namespace
             CArgMap m_ArgMap ( "@", ";" );
             m_ArgMap.SetFromString ( strSettings );
             // If build is 30 days old, default no report logging
-            m_ArgMap.Get ( "filter", strFilter, GetBuildAge () < 30 ? "2000-9999" : "0" );
+            m_ArgMap.Get ( "filter2", strFilter, GetBuildAge () < 30 ? "+all" : "-all" );
             m_ArgMap.Get ( "min", iMinSize, DEFAULT_MIN_SIZE );
             m_ArgMap.Get ( "max", iMaxSize, DEFAULT_MAX_SIZE );
             SaveReportSettings ();
@@ -617,7 +696,7 @@ namespace
 
         SString GetFilter ( void ) const
         {
-            return strFilter != "" ? strFilter : "1-9999";
+            return strFilter != "" ? strFilter : "+all";
         }
 
         int GetMinSize ( void ) const
@@ -639,29 +718,7 @@ namespace
 
         static SString GetLogContents ( const SString& strIdFilter, int iMaxSize = 0 )
         {
-            // Make id filter map
-            std::map < uint, bool > idMap;
-            {
-                std::vector < SString > parts;
-                strIdFilter.Split ( ",", parts );
-
-                for ( uint i = 0 ; i < parts.size () ; i++ )
-                {
-                    SString strFrom, strTo;
-                    if ( parts[i].Split ( "-", &strFrom, &strTo ) )
-                    {
-                        // Range
-                        const int iTo = atoi ( strTo );
-                        for ( int i = atoi ( strFrom ) ; i < iTo ; i++ )
-                            idMap[i] = true;
-                    }
-                    else
-                    {
-                        // Single
-                        idMap[ atoi ( strFrom ) ] = true;
-                    }
-                }
-            }
+            CFilterMap filterMap ( strIdFilter );
 
             // Load file into a string
             SString strContent = GetReportLogContents ();
@@ -677,7 +734,7 @@ namespace
             {
                 SString strLeft, strRight;
                 lines[i].Split ( ",", &strLeft, NULL );
-                if ( MapContains ( idMap, atoi ( strLeft ) ) )
+                if ( !filterMap.IsFiltered ( atoi ( strLeft ) ) )
                 {
                     size += lines[i].length ();
                     if ( iMaxSize && size > iMaxSize )
@@ -711,6 +768,7 @@ namespace
     struct SUpdaterVarConfig
     {
         CDateTime       master_lastCheckTime;
+        SString         master_highestNotifyRevision;
         CDateTime       version_lastCheckTime;
         CDateTime       news_lastCheckTime;
         SString         news_lastNewsDate;

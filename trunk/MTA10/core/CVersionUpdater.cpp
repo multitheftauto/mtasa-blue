@@ -148,6 +148,7 @@ public:
     SString                             m_strLastQueryURL;
     bool                                m_bEnabled;
     uint                                m_uiFrameCounter;
+    int                                 m_iForceMasterConfigRefreshCount;
 
     SUpdaterMasterConfig                m_MasterConfig;
     SUpdaterVarConfig                   m_VarConfig;
@@ -180,17 +181,8 @@ CVersionUpdaterInterface* GetVersionUpdater ()
 ///////////////////////////////////////////////////////////////
 CVersionUpdater::CVersionUpdater ( void )
 {
-    m_pReportWrap = NULL;
-    m_llTimeStart = 0;
-    m_bCheckedTimeForVersionCheck = false;
-    m_bCheckedTimeForMasterFetch = false;
-    m_bSentCrashDump = false;
-    m_bSentReportLog = false;
     InitPrograms ();
     CheckPrograms ();
-    m_llTimeLastManualCheck = 0;
-    m_bEnabled = false;
-    m_bLoadedConfig = false;
 }
 
 
@@ -265,6 +257,7 @@ bool CVersionUpdater::EnsureLoadedConfigFromXML ( void )
         // Stuff for here
         XMLAccess.GetSubNodeValue ( "version_lastchecktime",        m_VarConfig.version_lastCheckTime );
         XMLAccess.GetSubNodeValue ( "master_lastchecktime",         m_VarConfig.master_lastCheckTime );
+        XMLAccess.GetSubNodeValue ( "master_highestnotifyrevision", m_VarConfig.master_highestNotifyRevision );
         XMLAccess.GetSubNodeValue ( "news_lastchecktime",           m_VarConfig.news_lastCheckTime );
         XMLAccess.GetSubNodeValue ( "news_lastnewsdate",            m_VarConfig.news_lastNewsDate );
         XMLAccess.GetSubNodeValue ( "crashdump_historylist",        m_VarConfig.crashdump_history );
@@ -326,6 +319,7 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         // Stuff for here
         XMLAccess.SetSubNodeValue ( "version_lastchecktime",        m_VarConfig.version_lastCheckTime );
         XMLAccess.SetSubNodeValue ( "master_lastchecktime",         m_VarConfig.master_lastCheckTime );
+        XMLAccess.SetSubNodeValue ( "master_highestnotifyrevision", m_VarConfig.master_highestNotifyRevision );
         XMLAccess.SetSubNodeValue ( "news_lastchecktime",           m_VarConfig.news_lastCheckTime );
         XMLAccess.SetSubNodeValue ( "news_lastnewsdate",            m_VarConfig.news_lastNewsDate );
         XMLAccess.SetSubNodeValue ( "crashdump_historylist",        m_VarConfig.crashdump_history );
@@ -769,9 +763,15 @@ std::vector < SString > CVersionUpdater::MakeServerList ( const CDataInfoSet& da
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::OnPossibleConfigProblem ( void )
 {
-    // Queue master config refresh
-    m_VarConfig.master_lastCheckTime.SetFromSeconds ( 0 );
-    m_bCheckedTimeForMasterFetch = false;
+    // Limit number of times this can be done
+    if ( m_iForceMasterConfigRefreshCount < 1 )
+    {
+        m_iForceMasterConfigRefreshCount++;
+
+        // Queue master config refresh
+        m_VarConfig.master_lastCheckTime.SetFromSeconds ( 0 );
+        m_bCheckedTimeForMasterFetch = false;
+    }
 }
 
 
@@ -1929,7 +1929,7 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
     XMLAccess.GetSubNodeValue ( "file.size",                    m_JobInfo.iFilesize );
     XMLAccess.GetSubNodeValue ( "file.md5",                     m_JobInfo.strMD5 );
     XMLAccess.GetSubNodeValue ( "serverlist",                   m_JobInfo.serverInfoMap );
-    XMLAccess.GetSubNodeValue ( "reportsettings.filter",        strReportSettingsFilter );
+    XMLAccess.GetSubNodeValue ( "reportsettings.filter2",       strReportSettingsFilter );
     XMLAccess.GetSubNodeValue ( "reportsettings.minsize",       strReportSettingsMin );
     XMLAccess.GetSubNodeValue ( "reportsettings.maxsize",       strReportSettingsMax );
     XMLAccess.GetSubNodeValue ( "notifymasterrevision",         strNotifyMasterRevision );
@@ -1937,10 +1937,16 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
     // Process
     if ( strNotifyMasterRevision.length () && strNotifyMasterRevision > m_MasterConfig.master.strRevision )
     {
-        // If version check file says there is a new master config file, force update next time
-        m_VarConfig.master_lastCheckTime.SetFromSeconds ( 0 );
-        if ( m_JobInfo.strStatus == "noupdate" )
-            m_bCheckedTimeForMasterFetch = false;   // Do it this time if no update here
+        // Only do next bit when 'notify revision' increases (prevents superfluous downloads when notify revision is (incorrectly) higher than actual revision)
+        if ( strNotifyMasterRevision < m_VarConfig.master_highestNotifyRevision )
+        {
+            m_VarConfig.master_highestNotifyRevision = strNotifyMasterRevision;
+
+            // If version check file says there is a new master config file, force update next time
+            m_VarConfig.master_lastCheckTime.SetFromSeconds ( 0 );
+            if ( m_JobInfo.strStatus == "noupdate" )
+                OnPossibleConfigProblem ();   // Do it this time if no update here
+        }
     }
 
     // If some sort of error read the file data, re-get the master config
@@ -1950,7 +1956,7 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
     // Maybe modify report settings
     if ( strReportSettingsFilter.length () )
     {
-        SString strReportSettings = SString ( "filter@%s;min@%s;max@%s", strReportSettingsFilter.c_str (), strReportSettingsMin.c_str (), strReportSettingsMax.c_str () ); 
+        SString strReportSettings = SString ( "filter2@%s;min@%s;max@%s", strReportSettingsFilter.c_str (), strReportSettingsMin.c_str (), strReportSettingsMax.c_str () ); 
         GetReportWrap ()->SetSettings ( strReportSettings );
     }
 
