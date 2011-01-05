@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include"
+				AdditionalIncludeDirectories="..\..\vendor\lua\src"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="./lib/lua5.1.lib"
+				AdditionalDependencies="..\..\vendor\lua\lib\lua5.1sd_2008.lib"
 				OutputFile="$(OutDir)/ml_base.dll"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="MSVCRT"
@@ -130,7 +130,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".\include"
+				AdditionalIncludeDirectories="..\..\vendor\lua\src"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				TreatWChar_tAsBuiltInType="true"
@@ -152,7 +152,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="./lib/lua5.1.lib"
+				AdditionalDependencies="..\..\vendor\lua\lib\lua5.1s_2008.lib"
 				OutputFile="$(OutDir)/ml_base.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile=""
@@ -270,19 +270,19 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\lauxlib.h"
+					RelativePath="..\..\vendor\lua\src\lauxlib.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\lua.h"
+					RelativePath="..\..\vendor\lua\src\lua.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\luaconf.h"
+					RelativePath="..\..\vendor\lua\src\luaconf.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\lualib.h"
+					RelativePath="..\..\vendor\lua\src\lualib.h"
 					>
 				</File>
 			</Filter>
