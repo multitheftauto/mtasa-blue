@@ -33,8 +33,8 @@ StdInc.h.gch:
 		-o deathmatch_la-StdInc.h.lo $(srcdir)/StdInc.h \
 		-MT deathmatch_la-StdInc.h.gch -MD -MP -MF $(DEPDIR)/deathmatch_la-StdInc.h.Tpo
 
-	$(am__mv) $(DEPDIR)/deathmatch_la-StdInc.h.Tpo $(DEPDIR)/deathmatch_la-StdInc.h.Plo
-	$(am__mv) .libs/deathmatch_la-StdInc.h.o $@
+	mv -f $(DEPDIR)/deathmatch_la-StdInc.h.Tpo $(DEPDIR)/deathmatch_la-StdInc.h.Plo
+	mv -f .libs/deathmatch_la-StdInc.h.o $@
 
 include ./$(DEPDIR)/deathmatch_la-StdInc.h.Plo
 

@@ -13,8 +13,8 @@ StdInc.h.gch:
 		-o core_la-StdInc.h.lo $(srcdir)/StdInc.h \
 		-MT core_la-StdInc.h.gch -MD -MP -MF $(DEPDIR)/core_la-StdInc.h.Tpo
 
-	$(am__mv) $(DEPDIR)/core_la-StdInc.h.Tpo $(DEPDIR)/core_la-StdInc.h.Plo
-	$(am__mv) .libs/core_la-StdInc.h.o $@
+	mv -f $(DEPDIR)/core_la-StdInc.h.Tpo $(DEPDIR)/core_la-StdInc.h.Plo
+	mv -f .libs/core_la-StdInc.h.o $@
 
 include ./$(DEPDIR)/core_la-StdInc.h.Plo
 
