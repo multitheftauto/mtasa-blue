@@ -24,9 +24,10 @@ endif
 libdir = $(outputdir)
 lib_LTLIBRARIES = xmll.la
 xmll_la_LIBTOOLFLAGS = --tag=disable-static
+xmll_la_LIBADD = \
+	../../vendor/tinyxml/libtinyxml.la
 xmll_la_LDFLAGS = \
-	-module -avoid-version \
-	-L../../vendor/tinyxml -ltinyxml
+	-module -avoid-version
 xmll_la_SOURCES = \
 	CXMLArray.cpp \
 	CXMLArray.h \
