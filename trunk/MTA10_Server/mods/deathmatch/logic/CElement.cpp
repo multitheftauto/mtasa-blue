@@ -1201,7 +1201,7 @@ void CElement::AddEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity, b
     assert ( CElement::IsFromRoot ( pEntity ) );
 
     // Insert into list
-    std::list < CElement* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
+    CMappedList < CElement* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
     listEntities.remove ( pEntity );
     listEntities.push_front ( pEntity );
 
@@ -1222,7 +1222,7 @@ void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        std::list < CElement* >& listEntities = find->second;
+        CMappedList < CElement* >& listEntities = find->second;
         listEntities.remove ( pEntity );
         if ( listEntities.size () == 0 )
             ms_mapEntitiesFromRoot.erase ( find );
@@ -1243,7 +1243,7 @@ void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        const std::list < CElement* >& listEntities = find->second;
+        CMappedList < CElement* >& listEntities = find->second;
         CElement* pEntity;
         unsigned int uiIndex = 0;
 
