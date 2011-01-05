@@ -12,8 +12,8 @@ StdInc.h.gch:
 		-o xmll_la-StdInc.h.lo $(srcdir)/StdInc.h \
 		-MT xmll_la-StdInc.h.gch -MD -MP -MF $(DEPDIR)/xmll_la-StdInc.h.Tpo
 
-	$(am__mv) $(DEPDIR)/xmll_la-StdInc.h.Tpo $(DEPDIR)/xmll_la-StdInc.h.Plo
-	$(am__mv) .libs/xmll_la-StdInc.h.o $@
+	mv -f $(DEPDIR)/xmll_la-StdInc.h.Tpo $(DEPDIR)/xmll_la-StdInc.h.Plo
+	mv -f .libs/xmll_la-StdInc.h.o $@
 
 include ./$(DEPDIR)/xmll_la-StdInc.h.Plo
 
