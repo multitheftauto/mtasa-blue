@@ -7,4 +7,4 @@ mantisbot_mkpasswd_SOURCES=mkpasswd.cpp keys.cpp
 AM_CPPFLAGS=-I$(top_srcdir)/include -I$(top_srcdir)/.. -I$(top_builddir)/.. -pthread
 
 mantisbot_LDADD += $(top_builddir)/../../vendor/tinyxml/libtinyxml.la
-AM_CPPFLAGS+=-I$(top_srcdir)/../../vendor/tinyxml/ -DTINYXML_USE_STL
+AM_CPPFLAGS+=-I$(top_srcdir)/../../vendor/tinyxml/ -DTIXML_USE_STL
