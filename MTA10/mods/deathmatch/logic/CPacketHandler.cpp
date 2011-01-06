@@ -2738,7 +2738,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.ReadCompressed ( sOrdering );
 
                     // Read out the visible distance
-                    SNumberSync < unsigned short, 14 > visibleDistance;
+                    SIntegerSync < unsigned short, 14 > visibleDistance;
                     bitStream.Read ( &visibleDistance );
 
                     // Make a blip with the given ID
@@ -2748,7 +2748,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pBlip->SetPosition ( position.data.vecPosition );
 
                     // Read out the icon
-                    SNumberSync < unsigned char, 6 > icon;
+                    SIntegerSync < unsigned char, 6 > icon;
                     bitStream.Read ( &icon );                    
 
                     // Set the icon if it's valid
@@ -2758,7 +2758,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     if ( icon == 0 )
                     {
                         // Read out the size
-                        SNumberSync < unsigned char, 5 > size;
+                        SIntegerSync < unsigned char, 5 > size;
                         bitStream.Read ( &size );
 
                         // Read out the color

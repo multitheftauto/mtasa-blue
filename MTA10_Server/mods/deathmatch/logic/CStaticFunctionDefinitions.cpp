@@ -5519,7 +5519,7 @@ bool CStaticFunctionDefinitions::SetBlipIcon ( CElement* pElement, unsigned char
                 CBitStream bitStream;
                 bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
 
-                SNumberSync < unsigned char, 6 > icon ( ucIcon );
+                SIntegerSync < unsigned char, 6 > icon ( ucIcon );
                 bitStream.pBitStream->Write ( &icon );
 
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_ICON, *bitStream.pBitStream ) );
@@ -5550,7 +5550,7 @@ bool CStaticFunctionDefinitions::SetBlipSize ( CElement* pElement, unsigned char
                 CBitStream bitStream;
                 bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
 
-                SNumberSync < unsigned char, 5 > size ( ucSize );
+                SIntegerSync < unsigned char, 5 > size ( ucSize );
                 bitStream.pBitStream->Write ( &size );
 
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_SIZE, *bitStream.pBitStream ) );
@@ -5634,7 +5634,7 @@ bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CElement* pElement, un
             CBitStream bitStream;
             bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
 
-            SNumberSync < unsigned short, 14 > visibleDistance ( usVisibleDistance );
+            SIntegerSync < unsigned short, 14 > visibleDistance ( usVisibleDistance );
             bitStream.pBitStream->Write ( &visibleDistance );
 
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_VISIBLE_DISTANCE, *bitStream.pBitStream ) );
