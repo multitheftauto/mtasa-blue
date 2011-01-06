@@ -234,19 +234,19 @@ AM_CONDITIONAL([WANT_IRCBOTS], [test "x$enable_ircbots" = "xyes"])
 AC_CONFIG_FILES([
 	Makefile
 	irc/Makefile
-	vendor/Makefile
-	vendor/tinyxml/Makefile
-	vendor/pme/Makefile
-	vendor/ehs/Makefile
-	Shared/Makefile
-	Shared/XML/Makefile
-	Shared/publicsdk/Makefile
 	MTA10_Server/Makefile
-	MTA10_Server/sdk/Makefile
 	MTA10_Server/core/Makefile
+	MTA10_Server/launcher/Makefile
 	MTA10_Server/mods/Makefile
 	MTA10_Server/mods/deathmatch/Makefile
-	MTA10_Server/launcher/Makefile
+	MTA10_Server/sdk/Makefile
+	Shared/Makefile
+	Shared/publicsdk/Makefile
+	Shared/XML/Makefile
+	vendor/Makefile
+	vendor/ehs/Makefile
+	vendor/pme/Makefile
+	vendor/tinyxml/Makefile
 ])
 
 AC_OUTPUT
