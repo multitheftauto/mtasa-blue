@@ -18,13 +18,13 @@ Var Install_Dir
 ; Don't forget to update the BUILD_NUMBER
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "1948"
-!define PRODUCT_VERSION "1.1 Data-r${BUILD_NUMBER}"
+!define BUILD_NUMBER "2113"
+!define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "mtasa-1.1-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
 
 
-!define PRODUCT_NAME "MTA:SA"
+!define PRODUCT_NAME "MTA:SA 1.1"
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
 !define PRODUCT_WEB_SITE "http://www.multitheftauto.com"
@@ -70,9 +70,9 @@ FunctionEnd
 Function .onInit
 	Call DoRightsElevation
 
-	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" ; start of fix for #3743
+	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" ; start of fix for #3743
 	${If} $Install_Dir == '' 
-		strcpy $INSTDIR "$PROGRAMFILES\MTA San Andreas"
+		strcpy $INSTDIR "$PROGRAMFILES\MTA San Andreas 1.1"
 	${Else} 
 		strcpy $INSTDIR $Install_Dir
 	${EndIf} ; end of fix for #3743
@@ -83,7 +83,7 @@ Function .onInit
 FunctionEnd
 
 Function .onInstSuccess
-	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" $INSTDIR
+	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" $INSTDIR
 
 	;UAC::Unload ;Must call unload!
 FunctionEnd
@@ -97,13 +97,13 @@ InstType /NOCUSTOM
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "${INSTALL_OUTPUT}"
 
-InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location"
+InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location"
 ShowInstDetails show
 
 Section "Data files" SEC01
 	SectionIn 1 RO ; section is required
 
-	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" $INSTDIR
+	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" $INSTDIR
 
 	SetOverwrite on
 
