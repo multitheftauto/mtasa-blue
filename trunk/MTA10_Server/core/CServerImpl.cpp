@@ -204,6 +204,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         nonl ( );
         cbreak ( );
         noecho ( );
+        nodelay ( stdscr, TRUE );
         idlok ( stdscr, FALSE );
         scrollok ( stdscr, TRUE );
         if ( !g_bNoTopBar )
