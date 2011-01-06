@@ -35,19 +35,19 @@ void CBlipRPCs::SetBlipIcon ( NetBitStreamInterface& bitStream )
 {
     // Read out the blip ID and the icon id
     ElementID ID;
-    SBlipIconSync icon;
+    SNumberSync < unsigned char, 6 > icon;
     if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( &icon ) )
     {
         // Valid range?
-        if ( icon.data.ucIcon <= RADAR_MARKER_LIMIT )
+        if ( icon <= RADAR_MARKER_LIMIT )
         {
             // Grab the blip
             CClientRadarMarker* pMarker = m_pRadarMarkerManager->Get ( ID );
             if ( pMarker )
             {
                 // Set the new icon
-                pMarker->SetSprite ( icon.data.ucIcon );
+                pMarker->SetSprite ( icon );
             }
         }
     }
@@ -58,7 +58,7 @@ void CBlipRPCs::SetBlipSize ( NetBitStreamInterface& bitStream )
 {
     // Read out the blip ID and the size
     ElementID ID;
-    SBlipSizeSync size;
+    SNumberSync < unsigned char, 5 > size;
     if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( &size ) )
     {
@@ -67,7 +67,7 @@ void CBlipRPCs::SetBlipSize ( NetBitStreamInterface& bitStream )
         if ( pMarker )
         {
             // Set the new size
-            pMarker->SetScale ( size.data.ucSize );
+            pMarker->SetScale ( size );
         }
     }
 }
@@ -98,7 +98,7 @@ void CBlipRPCs::SetBlipOrdering ( NetBitStreamInterface& bitStream )
     ElementID ID;
     short sOrdering;
     if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( sOrdering ) )
+         bitStream.ReadCompressed ( sOrdering ) )
     {
         // Grab the blip
         CClientRadarMarker* pMarker = m_pRadarMarkerManager->Get ( ID );
@@ -115,7 +115,7 @@ void CBlipRPCs::SetBlipVisibleDistance ( NetBitStreamInterface& bitStream )
 {
     // Read out the blip ID and the distance
     ElementID ID;
-    SFloatAsBitsSync<20> visibleDistance ( 0.0, 99999.0, true );
+    SNumberSync < unsigned short, 14 > visibleDistance;
     if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( &visibleDistance ) )
     {
@@ -124,7 +124,7 @@ void CBlipRPCs::SetBlipVisibleDistance ( NetBitStreamInterface& bitStream )
         if ( pMarker )
         {
             // Set the new visible distance
-            pMarker->SetVisibleDistance ( visibleDistance.data.fValue );
+            pMarker->SetVisibleDistance ( visibleDistance );
         }
     }
 }

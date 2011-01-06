@@ -50,7 +50,7 @@ public:
     };
 
 public:
-                                        CClientRadarMarker              ( class CClientManager* pManager, ElementID ID, short usOrdering = 0, float fVisibleDistance = 99999.0f );
+                                        CClientRadarMarker              ( class CClientManager* pManager, ElementID ID, short usOrdering = 0, unsigned short usVisibleDistance = 16383 );
                                         ~CClientRadarMarker             ( void );
 
     void                                Unlink                          ( void );
@@ -86,8 +86,8 @@ public:
     inline short                        GetOrdering                     ( void )                        { return m_sOrdering; }
     void                                SetOrdering                     ( short sOrdering );
 
-    inline float                        GetVisibleDistance              ( void )                        { return m_fVisibleDistance; }
-    inline void                         SetVisibleDistance              ( float fVisibleDistance )      { m_fVisibleDistance = fVisibleDistance; }
+    inline unsigned short               GetVisibleDistance              ( void )                        { return m_usVisibleDistance; }
+    inline void                         SetVisibleDistance              ( unsigned short usVisibleDistance ) { m_usVisibleDistance = usVisibleDistance; }
 
     bool                                IsInVisibleDistance             ( void );
 
@@ -117,7 +117,7 @@ private:
 
     bool                                m_bIsVisible;
     short                               m_sOrdering;
-    float                               m_fVisibleDistance;
+    unsigned short                      m_usVisibleDistance;
 };
 
 #endif

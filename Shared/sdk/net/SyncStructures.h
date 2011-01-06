@@ -74,6 +74,35 @@ private:
     };
 };
 
+// Useful when we don't need all bits of numeric type
+template < typename type, unsigned int bits >
+struct SNumberSync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), bits );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), bits );
+    }
+
+    SNumberSync ( void ) { }
+    SNumberSync ( type value )
+    {
+        data.value = value;
+    }
+
+    operator type ( void ) const
+    {
+        return data.value;
+    }
+
+    struct
+    {
+        type value : bits;
+    } data;
+};
 
 //////////////////////////////////////////
 //                                      //
@@ -1776,50 +1805,6 @@ struct SMouseButtonSync : public ISyncStructure
     struct
     {
         unsigned char ucButton : 3;
-    } data;
-};
-
-
-//////////////////////////////////////////
-//                                      //
-//                Blips                 //
-//                                      //
-//////////////////////////////////////////
-struct SBlipIconSync : public ISyncStructure
-{
-    enum { BITCOUNT = 6 };
-
-    bool Read ( NetBitStreamInterface& bitStream )
-    {
-        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
-    }
-    void Write ( NetBitStreamInterface& bitStream ) const
-    {
-        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
-    }
-
-    struct
-    {
-        unsigned char ucIcon : 6;
-    } data;
-};
-
-struct SBlipSizeSync : public ISyncStructure
-{
-    enum { BITCOUNT = 5 };
-
-    bool Read ( NetBitStreamInterface& bitStream )
-    {
-        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), BITCOUNT );
-    }
-    void Write ( NetBitStreamInterface& bitStream ) const
-    {
-        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), BITCOUNT );
-    }
-
-    struct
-    {
-        unsigned char ucSize : 5;
     } data;
 };
 

@@ -19,7 +19,7 @@
 
 using SharedUtil::CalcMTASAPath;
 
-CClientRadarMarker::CClientRadarMarker ( CClientManager* pManager, ElementID ID, short sOrdering, float fVisibleDistance ) : CClientEntity ( ID )
+CClientRadarMarker::CClientRadarMarker ( CClientManager* pManager, ElementID ID, short sOrdering, unsigned short usVisibleDistance ) : CClientEntity ( ID )
 {
     // Init
     m_pManager = pManager;
@@ -35,7 +35,7 @@ CClientRadarMarker::CClientRadarMarker ( CClientManager* pManager, ElementID ID,
     m_pMapMarkerImage = NULL;
     m_eMapMarkerState = MAP_MARKER_OTHER;
     m_sOrdering = sOrdering;
-    m_fVisibleDistance = fVisibleDistance;
+    m_usVisibleDistance = usVisibleDistance;
 
     // Add us to the radar marker manager list
     m_pRadarMarkerManager->AddToList ( this );
@@ -375,7 +375,7 @@ void CClientRadarMarker::SetOrdering ( short sOrdering )
 bool CClientRadarMarker::IsInVisibleDistance ( void )
 {
     float fDistance = DistanceBetweenPoints3D ( m_vecPosition, m_pRadarMarkerManager->m_vecCameraPosition );
-    return ( fDistance <= m_fVisibleDistance );
+    return ( fDistance <= m_usVisibleDistance );
 }
 
 

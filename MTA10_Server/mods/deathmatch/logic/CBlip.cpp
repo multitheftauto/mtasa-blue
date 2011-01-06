@@ -22,7 +22,7 @@ CBlip::CBlip ( CElement* pParent, CXMLNode* pNode, CBlipManager* pBlipManager ) 
     m_ucSize = 2;
     m_ucIcon = 0;
     m_sOrdering = 0;
-    m_fVisibleDistance = 99999.0f;
+    m_usVisibleDistance = 16383;
 
     // Add us to manager's list
     m_pBlipManager->m_List.push_back ( this );
