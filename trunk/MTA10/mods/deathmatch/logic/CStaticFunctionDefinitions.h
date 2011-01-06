@@ -258,14 +258,14 @@ public:
     static bool                         PreloadMissionAudio                 ( unsigned short usSound, unsigned short usSlot );
 
     // Blip funcs
-    static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance );
-    static CClientRadarMarker*          CreateBlipAttachedTo                ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance );
+    static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance );
+    static CClientRadarMarker*          CreateBlipAttachedTo                ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance );
 
     static bool                         SetBlipIcon                         ( CClientEntity& Entity, unsigned char ucIcon );
     static bool                         SetBlipSize                         ( CClientEntity& Entity, unsigned char ucSize );
     static bool                         SetBlipColor                        ( CClientEntity& Entity, const SColor color );
     static bool                         SetBlipOrdering                     ( CClientEntity& Entity, short sOrdering );
-    static bool                         SetBlipVisibleDistance              ( CClientEntity& Entity, float fVisibleDistance );
+    static bool                         SetBlipVisibleDistance              ( CClientEntity& Entity, unsigned short usVisibleDistance );
 
     // Marker create/destroy funcs
     static CClientMarker*               CreateMarker                        ( CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color );

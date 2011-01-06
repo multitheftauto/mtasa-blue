@@ -6215,7 +6215,7 @@ int CLuaFunctionDefinitions::CreateBlip ( lua_State* luaVM )
         unsigned char ucSize = 2;
         SColorRGBA color ( 255, 0, 0, 255 );
         short sOrdering = 0;
-        float fVisibleDistance = 99999.0f;
+        unsigned short usVisibleDistance = 16383;
         CElement* pVisibleTo = m_pRootElement;
 
         // Read out the optional args
@@ -6257,7 +6257,7 @@ int CLuaFunctionDefinitions::CreateBlip ( lua_State* luaVM )
                                     int iArgument11 = lua_type ( luaVM, 11 );
                                     if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
                                     {
-                                        fVisibleDistance = static_cast < float > ( lua_tonumber ( luaVM, 11 ) );
+                                        usVisibleDistance = static_cast < unsigned short > ( lua_tonumber ( luaVM, 11 ) );
 
                                         // Read out the optional visibleto argument
                                         int iArgument12 = lua_type ( luaVM, 12 );
@@ -6285,7 +6285,7 @@ int CLuaFunctionDefinitions::CreateBlip ( lua_State* luaVM )
             if ( pResource )
             {
                 // Create the blip
-                CBlip* pBlip = CStaticFunctionDefinitions::CreateBlip ( pResource, vecPosition, ucIcon, ucSize, color, sOrdering, fVisibleDistance, pVisibleTo );
+                CBlip* pBlip = CStaticFunctionDefinitions::CreateBlip ( pResource, vecPosition, ucIcon, ucSize, color, sOrdering, usVisibleDistance, pVisibleTo );
                 if ( pBlip )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -6321,7 +6321,7 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
             unsigned char ucSize = 2;
             SColorRGBA color ( 255, 0, 0, 255 );
             short sOrdering = 0;
-            float fVisibleDistance = 99999.0f;
+            unsigned short usVisibleDistance = 16383;
             CElement* pVisibleTo = m_pRootElement;
 
             // Read out the optional args
@@ -6363,7 +6363,7 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
                                         int iArgument9 = lua_type ( luaVM, 9 );
                                         if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
                                         {
-                                            fVisibleDistance = static_cast < float > ( lua_tonumber ( luaVM, 9 ) );
+                                            usVisibleDistance = static_cast < unsigned short > ( lua_tonumber ( luaVM, 9 ) );
 
                                             // Read out the optional visibleto argument
                                             int iArgument10 = lua_type ( luaVM, 10 );
@@ -6390,7 +6390,7 @@ int CLuaFunctionDefinitions::CreateBlipAttachedTo ( lua_State* luaVM )
                 if ( resource )
                 {
                     // Create the blip
-                    CBlip* pBlip = CStaticFunctionDefinitions::CreateBlipAttachedTo ( resource, pElement, ucIcon, ucSize, color, sOrdering, fVisibleDistance, pVisibleTo );
+                    CBlip* pBlip = CStaticFunctionDefinitions::CreateBlipAttachedTo ( resource, pElement, ucIcon, ucSize, color, sOrdering, usVisibleDistance, pVisibleTo );
                     if ( pBlip )
                     {
                         pBlip->SetParentObject ( resource->GetDynamicElementRoot() );
@@ -6526,10 +6526,10 @@ int CLuaFunctionDefinitions::GetBlipVisibleDistance ( lua_State* luaVM )
         CBlip* pBlip = lua_toblip ( luaVM, 1 );
         if ( pBlip )
         {
-            float fVisibleDistance;
-            if ( CStaticFunctionDefinitions::GetBlipVisibleDistance ( pBlip, fVisibleDistance ) )
+            unsigned short usVisibleDistance;
+            if ( CStaticFunctionDefinitions::GetBlipVisibleDistance ( pBlip, usVisibleDistance ) )
             {
-                lua_pushnumber ( luaVM, fVisibleDistance );
+                lua_pushnumber ( luaVM, usVisibleDistance );
                 return 1;
             }
         }
@@ -6677,9 +6677,9 @@ int CLuaFunctionDefinitions::SetBlipVisibleDistance ( lua_State* luaVM )
         CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
         {
-            float fVisibleDistance = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
+            unsigned short usVisibleDistance = static_cast < unsigned short > ( lua_tonumber ( luaVM, 2 ) );
 
-            if ( CStaticFunctionDefinitions::SetBlipVisibleDistance ( pElement, fVisibleDistance ) )
+            if ( CStaticFunctionDefinitions::SetBlipVisibleDistance ( pElement, usVisibleDistance ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

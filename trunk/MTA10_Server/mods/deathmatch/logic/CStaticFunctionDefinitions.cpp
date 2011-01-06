@@ -5384,7 +5384,7 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CElement* pElement, const char*
 }
 
 
-CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance, CElement* pVisibleTo )
+CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance, CElement* pVisibleTo )
 {
     // Valid icon and size?
     if ( CBlipManager::IsValidIcon ( ucIcon ) && ucSize <= 25 )
@@ -5400,7 +5400,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVec
             pBlip->m_ucSize = ucSize;
             pBlip->SetColor ( color );
             pBlip->m_sOrdering = sOrdering;
-            pBlip->m_fVisibleDistance = fVisibleDistance;
+            pBlip->m_usVisibleDistance = usVisibleDistance;
 
             // Make him visible to the given element
             if ( pVisibleTo )
@@ -5420,7 +5420,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVec
 }
 
 
-CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance, CElement* pVisibleTo )
+CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance, CElement* pVisibleTo )
 {
     assert ( pElement );
     // Valid icon and size?
@@ -5434,7 +5434,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, 
             pBlip->m_ucSize = ucSize;
             pBlip->SetColor ( color );
             pBlip->m_sOrdering = sOrdering;
-            pBlip->m_fVisibleDistance = fVisibleDistance;
+            pBlip->m_usVisibleDistance = usVisibleDistance;
 
             // Set his visible to element
             if ( pVisibleTo )
@@ -5482,11 +5482,11 @@ bool CStaticFunctionDefinitions::GetBlipColor ( CBlip* pBlip, SColor& outColor )
 }
 
 
-bool CStaticFunctionDefinitions::GetBlipVisibleDistance ( CBlip* pBlip, float& fVisibleDistance )
+bool CStaticFunctionDefinitions::GetBlipVisibleDistance ( CBlip* pBlip, unsigned short& usVisibleDistance )
 {
     assert ( pBlip );
 
-    fVisibleDistance = pBlip->m_fVisibleDistance;
+    usVisibleDistance = pBlip->m_usVisibleDistance;
     return true;
 }
 
@@ -5519,8 +5519,7 @@ bool CStaticFunctionDefinitions::SetBlipIcon ( CElement* pElement, unsigned char
                 CBitStream bitStream;
                 bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
 
-                SBlipIconSync icon;
-                icon.data.ucIcon = ucIcon;
+                SNumberSync < unsigned char, 6 > icon ( ucIcon );
                 bitStream.pBitStream->Write ( &icon );
 
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_ICON, *bitStream.pBitStream ) );
@@ -5551,8 +5550,7 @@ bool CStaticFunctionDefinitions::SetBlipSize ( CElement* pElement, unsigned char
                 CBitStream bitStream;
                 bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
 
-                SBlipSizeSync size;
-                size.data.ucSize = ucSize;
+                SNumberSync < unsigned char, 5 > size ( ucSize );
                 bitStream.pBitStream->Write ( &size );
 
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_SIZE, *bitStream.pBitStream ) );
@@ -5610,7 +5608,7 @@ bool CStaticFunctionDefinitions::SetBlipOrdering ( CElement* pElement, short sOr
 
             CBitStream bitStream;
             bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
-            bitStream.pBitStream->Write ( sOrdering );
+            bitStream.pBitStream->WriteCompressed ( sOrdering );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_ORDERING, *bitStream.pBitStream ) );
 
             return true;
@@ -5621,23 +5619,22 @@ bool CStaticFunctionDefinitions::SetBlipOrdering ( CElement* pElement, short sOr
 }
 
 
-bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CElement* pElement, float fVisibleDistance )
+bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CElement* pElement, unsigned short usVisibleDistance )
 {
-    RUN_CHILDREN SetBlipVisibleDistance ( *iter, fVisibleDistance );
+    RUN_CHILDREN SetBlipVisibleDistance ( *iter, usVisibleDistance );
 
     if ( IS_BLIP ( pElement ) )
     {
         // Grab the blip and set the new visible distance
         CBlip* pBlip = static_cast < CBlip* > ( pElement );
-        if ( pBlip->m_fVisibleDistance != fVisibleDistance )
+        if ( pBlip->m_usVisibleDistance != usVisibleDistance )
         {
-            pBlip->m_fVisibleDistance = fVisibleDistance;
+            pBlip->m_usVisibleDistance = usVisibleDistance;
 
             CBitStream bitStream;
             bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
 
-            SFloatAsBitsSync<20> visibleDistance ( 0.0, 99999.0, true );
-            visibleDistance.data.fValue = fVisibleDistance;
+            SNumberSync < unsigned short, 14 > visibleDistance ( usVisibleDistance );
             bitStream.pBitStream->Write ( &visibleDistance );
 
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_VISIBLE_DISTANCE, *bitStream.pBitStream ) );

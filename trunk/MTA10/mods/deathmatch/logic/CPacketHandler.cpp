@@ -2738,35 +2738,34 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.ReadCompressed ( sOrdering );
 
                     // Read out the visible distance
-                    float fVisibleDistance;
-                    bitStream.Read ( fVisibleDistance );
+                    SNumberSync < unsigned short, 14 > visibleDistance;
+                    bitStream.Read ( &visibleDistance );
 
                     // Make a blip with the given ID
-                    CClientRadarMarker* pBlip = new CClientRadarMarker ( g_pClientGame->m_pManager, EntityID, sOrdering, fVisibleDistance );
+                    CClientRadarMarker* pBlip = new CClientRadarMarker ( g_pClientGame->m_pManager, EntityID, sOrdering, visibleDistance );
                     pEntity = pBlip;
 
                     pBlip->SetPosition ( position.data.vecPosition );
 
                     // Read out the icon
-                    unsigned char ucIcon;
-                    bitStream.Read ( ucIcon );                    
+                    SNumberSync < unsigned char, 6 > icon;
+                    bitStream.Read ( &icon );                    
 
                     // Set the icon if it's valid
-                    if ( ucIcon <= RADAR_MARKER_LIMIT ) pBlip->SetSprite ( ucIcon );
-
-                    unsigned char ucSize = 0;
+                    if ( icon <= RADAR_MARKER_LIMIT ) pBlip->SetSprite ( icon );
 
                     // Read out size and color if there's no icon
-                    if ( ucIcon == 0 )
+                    if ( icon == 0 )
                     {
                         // Read out the size
-                        bitStream.Read ( ucSize );
+                        SNumberSync < unsigned char, 5 > size;
+                        bitStream.Read ( &size );
 
                         // Read out the color
                         SColorSync color;
                         bitStream.Read ( &color );
 
-                        pBlip->SetScale ( ucSize );
+                        pBlip->SetScale ( size );
                         pBlip->SetColor ( color );
                     }                    
 

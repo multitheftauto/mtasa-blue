@@ -3372,9 +3372,9 @@ bool CStaticFunctionDefinitions::PreloadMissionAudio ( unsigned short usSound, u
 }
 
 
-CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance )
+CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance )
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
+    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance );
     if ( pBlip )
     {
         pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -3387,9 +3387,9 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource
 }
 
 
-CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance )
+CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance )
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
+    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance );
     if ( pBlip )
     {
         pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -3466,15 +3466,15 @@ bool CStaticFunctionDefinitions::SetBlipOrdering ( CClientEntity& Entity, short 
 }
 
 
-bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CClientEntity& Entity, float fVisibleDistance )
+bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CClientEntity& Entity, unsigned short usVisibleDistance )
 {
-    RUN_CHILDREN SetBlipVisibleDistance ( **iter, fVisibleDistance );
+    RUN_CHILDREN SetBlipVisibleDistance ( **iter, usVisibleDistance );
 
     if ( IS_RADARMARKER ( &Entity ) )
     {
         CClientRadarMarker& Marker = static_cast < CClientRadarMarker& > ( Entity );
 
-        Marker.SetVisibleDistance ( fVisibleDistance );
+        Marker.SetVisibleDistance ( usVisibleDistance );
         return true;
     }
 
