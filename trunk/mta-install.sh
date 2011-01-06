@@ -12,9 +12,9 @@ make -C Shared/XML install
 
 data_files="acl.xml banlist.xml mtaserver.conf vehiclecolors.conf"
 for i in $data_files ; do
-	if [ ! -e "MTA10_Server/output/mods/deathmatch/$i" ] ; then
-		cp MTA10_Server/mods/deathmatch/$i MTA10_Server/output/mods/deathmatch/$i
-	fi
+  if [ ! -e "MTA10_Server/output/mods/deathmatch/$i" ] ; then
+    cp MTA10_Server/mods/deathmatch/"$i" MTA10_Server/output/mods/deathmatch/"$i"
+  fi
 done
 
 cd MTA10_Server/output
