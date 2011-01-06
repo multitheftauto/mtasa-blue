@@ -74,9 +74,9 @@ private:
     };
 };
 
-// Useful when we don't need all bits of numeric type
+// Useful when we don't need all bits of integer type
 template < typename type, unsigned int bits >
-struct SNumberSync : public ISyncStructure
+struct SIntegerSync : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -87,9 +87,13 @@ struct SNumberSync : public ISyncStructure
         bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), bits );
     }
 
-    SNumberSync ( void ) { }
-    SNumberSync ( type value )
+    SIntegerSync ( void )
     {
+        assert ( bits <= sizeof ( type ) * 8 );
+    }
+    SIntegerSync ( type value )
+    {
+        SIntegerSync ();
         data.value = value;
     }
 

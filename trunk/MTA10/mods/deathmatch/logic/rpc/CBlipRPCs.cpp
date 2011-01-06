@@ -35,7 +35,7 @@ void CBlipRPCs::SetBlipIcon ( NetBitStreamInterface& bitStream )
 {
     // Read out the blip ID and the icon id
     ElementID ID;
-    SNumberSync < unsigned char, 6 > icon;
+    SIntegerSync < unsigned char, 6 > icon;
     if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( &icon ) )
     {
@@ -58,7 +58,7 @@ void CBlipRPCs::SetBlipSize ( NetBitStreamInterface& bitStream )
 {
     // Read out the blip ID and the size
     ElementID ID;
-    SNumberSync < unsigned char, 5 > size;
+    SIntegerSync < unsigned char, 5 > size;
     if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( &size ) )
     {
@@ -115,7 +115,7 @@ void CBlipRPCs::SetBlipVisibleDistance ( NetBitStreamInterface& bitStream )
 {
     // Read out the blip ID and the distance
     ElementID ID;
-    SNumberSync < unsigned short, 14 > visibleDistance;
+    SIntegerSync < unsigned short, 14 > visibleDistance;
     if ( bitStream.ReadCompressed ( ID ) &&
          bitStream.Read ( &visibleDistance ) )
     {

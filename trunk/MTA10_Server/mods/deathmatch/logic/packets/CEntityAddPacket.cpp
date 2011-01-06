@@ -469,16 +469,16 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.WriteCompressed ( pBlip->m_sOrdering );
 
                     // Write the visible distance
-                    SNumberSync < unsigned short, 14 > visibleDistance ( pBlip->m_usVisibleDistance );
+                    SIntegerSync < unsigned short, 14 > visibleDistance ( pBlip->m_usVisibleDistance );
                     BitStream.Write ( &visibleDistance );
 
                     // Write the icon
-                    SNumberSync < unsigned char, 6 > icon ( pBlip->m_ucIcon );
+                    SIntegerSync < unsigned char, 6 > icon ( pBlip->m_ucIcon );
                     BitStream.Write ( &icon );
                     if ( pBlip->m_ucIcon == 0 )
                     {
                         // Write the size
-                        SNumberSync < unsigned char, 5 > size ( pBlip->m_ucSize );
+                        SIntegerSync < unsigned char, 5 > size ( pBlip->m_ucSize );
                         BitStream.Write ( &size );
 
                         // Write the color
