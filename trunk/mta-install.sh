@@ -10,8 +10,13 @@ fi
 make -C MTA10_Server install
 make -C Shared/XML install
 
-cp -n MTA10_Server/mods/deathmatch/acl.xml MTA10_Server/output/mods/deathmatch/acl.xml 
-cp -n MTA10_Server/mods/deathmatch/mtaserver.conf MTA10_Server/output/mods/deathmatch/mtaserver.conf
+data_files="acl.xml banlist.xml mtaserver.conf vehiclecolors.conf"
+for i in $data_files ; do
+	if [ ! -e "MTA10_Server/output/mods/deathmatch/$i" ] ; then
+		cp MTA10_Server/mods/deathmatch/$i MTA10_Server/output/mods/deathmatch/$i
+	fi
+done
+
 cd MTA10_Server/output
 if [ ! -d  "mods/deathmatch/resources" ]; then
     svn export http://mtasa-resources.googlecode.com/svn/trunk/required mods/deathmatch/resources
