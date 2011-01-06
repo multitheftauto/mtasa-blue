@@ -729,7 +729,7 @@ json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map 
 
 bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
 {
-    json_object* object = json_tokener_parse ( const_cast < char* > ( szJSON ) );
+    json_object* object = json_tokener_parse ( szJSON );
     if ( !is_error(object) )
     {
         if ( json_object_get_type ( object ) == json_type_array )
