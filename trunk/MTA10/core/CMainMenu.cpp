@@ -57,6 +57,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     // Initialize
     m_pManager = pManager;
     m_bIsVisible = false;
+    m_bIsFullyVisible = false;
     m_bIsIngame = true;
 //    m_bIsInSubWindow = false;
     m_fFader = 0;
@@ -332,6 +333,12 @@ void CMainMenu::SetMenuUnhovered () //Dehighlight all our items
 
 void CMainMenu::Update ( void )
 {
+    if ( m_bFrameDelay )
+    {
+        m_bFrameDelay = false;
+        return;
+    }
+
     // Get the game interface and the system state
     CGame* pGame = CCore::GetSingleton ().GetGame ();
     eSystemState SystemState = pGame->GetSystemState ();
@@ -352,84 +359,87 @@ void CMainMenu::Update ( void )
         m_pDisconnect->image->SetAlpha(fAlpha);
     }
 
-    // Grab our cursor position
-    tagPOINT cursor;
-    GetCursorPos ( &cursor );
-    
-    HWND hookedWindow = CCore::GetSingleton().GetHookedWindow();
-
-    tagPOINT windowPos = { 0 };
-    ClientToScreen( hookedWindow, &windowPos );
-
-    CVector2D vecResolution = CCore::GetSingleton ().GetGUI ()->GetResolution ();
-    cursor.x -= windowPos.x;
-    cursor.y -= windowPos.y;
-    if ( cursor.x < 0 )
-        cursor.x = 0;
-    else if ( cursor.x > ( long ) vecResolution.fX )
-        cursor.x = ( long ) vecResolution.fX;
-    if ( cursor.y < 0 )
-        cursor.y = 0;
-    else if ( cursor.y > ( long ) vecResolution.fY )
-        cursor.y = ( long ) vecResolution.fY;
-
-    // If we're within our highlight bounding box
-    if ( m_bMouseOverMenu && ( cursor.x > m_menuAX ) && ( cursor.y > m_menuAY ) && ( cursor.x < m_menuBX ) && ( cursor.y < m_menuBY ) )
+    if ( m_bIsFullyVisible )
     {
-        float fHoveredIndex = ((cursor.y-m_menuAY) / (float)(m_menuBY-m_menuAY) * m_menuItems.size());
-        fHoveredIndex = Clamp <float> ( 0, fHoveredIndex, m_menuItems.size()-1 );
-        sMenuItem* pItem = m_menuItems[(int)floor(fHoveredIndex)];
-        int iSizeX = (pItem->nativeSizeX/NATIVE_RES_X)*m_iMenuSizeX;
+        // Grab our cursor position
+        tagPOINT cursor;
+        GetCursorPos ( &cursor );
         
-        if (cursor.x < (iSizeX + m_menuAX) )
+        HWND hookedWindow = CCore::GetSingleton().GetHookedWindow();
+
+        tagPOINT windowPos = { 0 };
+        ClientToScreen( hookedWindow, &windowPos );
+
+        CVector2D vecResolution = CCore::GetSingleton ().GetGUI ()->GetResolution ();
+        cursor.x -= windowPos.x;
+        cursor.y -= windowPos.y;
+        if ( cursor.x < 0 )
+            cursor.x = 0;
+        else if ( cursor.x > ( long ) vecResolution.fX )
+            cursor.x = ( long ) vecResolution.fX;
+        if ( cursor.y < 0 )
+            cursor.y = 0;
+        else if ( cursor.y > ( long ) vecResolution.fY )
+            cursor.y = ( long ) vecResolution.fY;
+
+        // If we're within our highlight bounding box
+        if ( m_bMouseOverMenu && ( cursor.x > m_menuAX ) && ( cursor.y > m_menuAY ) && ( cursor.x < m_menuBX ) && ( cursor.y < m_menuBY ) )
         {
-            if ( ( m_pHoveredItem ) && ( m_pHoveredItem != pItem ) )
+            float fHoveredIndex = ((cursor.y-m_menuAY) / (float)(m_menuBY-m_menuAY) * m_menuItems.size());
+            fHoveredIndex = Clamp <float> ( 0, fHoveredIndex, m_menuItems.size()-1 );
+            sMenuItem* pItem = m_menuItems[(int)floor(fHoveredIndex)];
+            int iSizeX = (pItem->nativeSizeX/NATIVE_RES_X)*m_iMenuSizeX;
+            
+            if (cursor.x < (iSizeX + m_menuAX) )
             {
-                m_unhoveredItems.insert(m_pHoveredItem);
+                if ( ( m_pHoveredItem ) && ( m_pHoveredItem != pItem ) )
+                {
+                    m_unhoveredItems.insert(m_pHoveredItem);
+                    m_pHoveredItem = pItem;
+                }
+                else
+                {
+                    m_pHoveredItem = NULL;
+                }
                 m_pHoveredItem = pItem;
             }
-            else
-            {
+            else if ( m_pHoveredItem )
+            {         
+                m_unhoveredItems.insert(m_pHoveredItem);
                 m_pHoveredItem = NULL;
             }
-            m_pHoveredItem = pItem;
+            
+            if ( m_pHoveredItem )
+            {
+                float fProgress = (m_pHoveredItem->image->GetAlpha()-CORE_MTA_NORMAL_ALPHA)/(CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
+			    // Let's work out what the target progress should be by working out the time passed
+			    fProgress = ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA) + fProgress;
+                SetItemHoverProgress ( m_pHoveredItem, fProgress, true );
+            }
+
         }
         else if ( m_pHoveredItem )
-        {         
+        {
             m_unhoveredItems.insert(m_pHoveredItem);
             m_pHoveredItem = NULL;
         }
-        
-        if ( m_pHoveredItem )
-        {
-            float fProgress = (m_pHoveredItem->image->GetAlpha()-CORE_MTA_NORMAL_ALPHA)/(CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
-			// Let's work out what the target progress should be by working out the time passed
-			fProgress = ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA) + fProgress;
-            SetItemHoverProgress ( m_pHoveredItem, fProgress, true );
-        }
 
-    }
-    else if ( m_pHoveredItem )
-    {
-        m_unhoveredItems.insert(m_pHoveredItem);
-        m_pHoveredItem = NULL;
-    }
-
-    // Let's unhover our recently un-moused over items
-    std::set<sMenuItem*>::iterator it = m_unhoveredItems.begin();
-    while (it != m_unhoveredItems.end())
-    {
-        float fProgress = ((*it)->image->GetAlpha()-CORE_MTA_NORMAL_ALPHA)/(CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
-		// Let's work out what the target progress should be by working out the time passed
-		fProgress = fProgress - ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA);
-        if ( SetItemHoverProgress ( (*it), fProgress, false ) )
+        // Let's unhover our recently un-moused over items
+        std::set<sMenuItem*>::iterator it = m_unhoveredItems.begin();
+        while (it != m_unhoveredItems.end())
         {
-            std::set<sMenuItem*>::iterator itToErase = it;
-            it--;
-            m_unhoveredItems.erase(itToErase);
+            float fProgress = ((*it)->image->GetAlpha()-CORE_MTA_NORMAL_ALPHA)/(CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
+		    // Let's work out what the target progress should be by working out the time passed
+		    fProgress = fProgress - ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA);
+            if ( SetItemHoverProgress ( (*it), fProgress, false ) )
+            {
+                std::set<sMenuItem*>::iterator itToErase = it;
+                it--;
+                m_unhoveredItems.erase(itToErase);
+            }
+            else
+                it++;
         }
-        else
-            it++;
     }
 
     if ( m_iMoveStartPos )
@@ -479,7 +489,7 @@ void CMainMenu::Update ( void )
         if ( m_fFader >= fFadeTarget ) {
             m_ucFade = FADE_VISIBLE;
             m_bIsVisible = true;
-
+            m_bIsFullyVisible = true;
         }
     }
     // Fade out
@@ -495,6 +505,7 @@ void CMainMenu::Update ( void )
 
         // If the fade is complete
         if ( m_fFader <= 0 ) {
+            m_bIsFullyVisible = false;
             m_ucFade = FADE_INVISIBLE;
             m_bIsVisible = false;
 
@@ -578,6 +589,7 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
     // If we're hiding, hide any subwindows we might've had (prevent escaping hiding mousecursor issue)
     if ( !bVisible )
     {
+        m_bFrameDelay = true;
         SetMenuUnhovered ();
         m_QuickConnect.SetVisible ( false );
         m_ServerBrowser.SetVisible ( false );
@@ -588,6 +600,8 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
 
 //        m_bIsInSubWindow = false;
     } else {
+        m_bFrameDelay = true;
+        SetMenuUnhovered ();
         m_pFiller->SetVisible ( true );
         m_pFiller2->SetVisible ( true );
         m_pBackground->SetVisible ( true );

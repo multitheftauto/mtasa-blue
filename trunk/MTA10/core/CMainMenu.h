@@ -126,6 +126,8 @@ private:
     // Properties
     bool                m_bIsIngame;
     bool                m_bIsVisible;
+    bool                m_bIsFullyVisible;
+    bool                m_bFrameDelay;
     bool                m_bIsInSubWindow;
     bool                m_bHideGame;
 
