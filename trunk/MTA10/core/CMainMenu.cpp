@@ -279,7 +279,7 @@ CMainMenu::~CMainMenu ( void )
     // don't delete it when we iterate the list and delete it separately - the
     // menu item itself still exists even when it's no in the list of menu
     // items. Perhaps there should be a separate list of loaded items really.
-    for ( std::deque<sMenuItem*>::iterator it = m_menuItems.begin(); it != m_menuItems.end(); it++ )
+    for ( std::deque<sMenuItem*>::iterator it = m_menuItems.begin(); it != m_menuItems.end(); ++it )
     {   
         if ( (*it) != m_pDisconnect )
         {
@@ -287,8 +287,6 @@ CMainMenu::~CMainMenu ( void )
             delete (*it);
         }   
     }
-
-    m_menuItems.clear();
 
     delete m_pDisconnect->image;
     delete m_pDisconnect;
