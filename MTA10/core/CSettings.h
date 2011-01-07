@@ -128,9 +128,6 @@ protected:
     CGUICheckBox*       m_pCheckBoxWideScreen;
     CGUICheckBox*       m_pCheckBoxMinimize;
     CGUILabel*          m_pVideoRenderingLabel;
-    CGUICheckBox*       m_pCheckBoxMenuDynamic;
-    CGUICheckBox*       m_pCheckBoxMenuVideo;
-    CGUICheckBox*       m_pCheckBoxMenuPostEffects;
     CGUILabel*          m_pMapRenderingLabel;
     CGUIComboBox*       m_pComboFxQuality;
     CGUILabel*          m_pFXQualityLabel;
@@ -244,7 +241,6 @@ protected:
     bool                OnJoypadDefaultClick    ( CGUIElement* pElement );
     bool                OnBindsDefaultClick     ( CGUIElement* pElement );
     bool                OnBindsListClick        ( CGUIElement* pElement );
-    bool                OnCheckBoxClick         ( CGUIElement* pElement );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
     bool                OnLoginButtonClick      ( CGUIElement* pElement );
@@ -296,11 +292,6 @@ private:
 
     std::list < SKeyBindSection *> m_pKeyBindSections;
 
-    enum eCheckBox {
-        CHECKBOX_MENU_DYNAMIC,
-        CHECKBOX_MENU_VIDEO,
-        CHECKBOX_MENU_POSTEFFECTS
-    };
 };
 
 #endif
