@@ -264,29 +264,33 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 CMainMenu::~CMainMenu ( void )
 {
     // Destroy GUI items
-    delete m_pBackground;
+    delete m_pBackground;   
     delete m_pFiller;
+    delete m_pFiller2;
     delete m_pLatestNews;
     delete m_pVersion;
+    delete m_pMenuArea;
 
     // Destroy community label
     delete m_pCommunityLabel;
 
-    while ( m_menuItems.begin() != m_menuItems.end() )
-    {
-        std::deque<sMenuItem*>::iterator it = m_menuItems.begin();
+    // Destroy the menu items. Note: The disconnect item isn't always in the
+    // list of menu items (it's only in there when we're in game). This means we
+    // don't delete it when we iterate the list and delete it separately - the
+    // menu item itself still exists even when it's no in the list of menu
+    // items. Perhaps there should be a separate list of loaded items really.
+    for ( std::deque<sMenuItem*>::iterator it = m_menuItems.begin(); it != m_menuItems.end(); it++ )
+    {   
         if ( (*it) != m_pDisconnect )
         {
-            sMenuItem* item = (*it);
-            delete item;
-            m_menuItems.erase(it);
-        }
-        else
-        {
-            m_menuItems.erase(it);
-        }
+            delete (*it)->image;
+            delete (*it);
+        }   
     }
 
+    m_menuItems.clear();
+
+    delete m_pDisconnect->image;
     delete m_pDisconnect;
 }
 
