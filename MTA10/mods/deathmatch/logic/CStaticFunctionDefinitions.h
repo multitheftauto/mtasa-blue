@@ -254,7 +254,7 @@ public:
 
     // Audio funcs
     static bool                         PlayMissionAudio                    ( const CVector& vecPosition, unsigned short usSound );
-    static bool                         PlaySoundFrontEnd                   ( unsigned long ulSound );
+    static bool                         PlaySoundFrontEnd                   ( unsigned char ucSound );
     static bool                         PreloadMissionAudio                 ( unsigned short usSound, unsigned short usSlot );
 
     // Blip funcs

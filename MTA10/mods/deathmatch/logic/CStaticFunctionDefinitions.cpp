@@ -3357,9 +3357,9 @@ bool CStaticFunctionDefinitions::PlayMissionAudio ( const CVector& vecPosition, 
 }
 
 
-bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned long ulSound )
+bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned char ucSound )
 {
-    g_pGame->GetAudio ()->PlayFrontEndSound ( ulSound );
+    g_pGame->GetAudio ()->PlayFrontEndSound ( ucSound );
     return true;
 }
 
