@@ -16,120 +16,214 @@
 #include <game/CGame.h>
 #include "CNewsBrowser.h"
 
-#define NATIVE_RES_X    1024.0f
-#define NATIVE_RES_Y    768.0f
-#define MAX_RES_X       NATIVE_RES_X
-#define MAX_RES_Y       NATIVE_RES_Y
+#define NATIVE_RES_X    1280.0f
+#define NATIVE_RES_Y    1024.0f
 
-#define CORE_MTA_MENUITEMS_START_X  80
+#define CORE_MTA_MENUITEMS_START_X  0.168
 
 #define CORE_MTA_BG_MAX_ALPHA       1.00f   //ACHTUNG: Set to 1 for now due to GTA main menu showing through (no delay inserted between Entering game... and loading screen)
+#define CORE_MTA_BG_INGAME_ALPHA    0.90f
 #define CORE_MTA_FADER              0.05f // 1/20
 #define CORE_MTA_FADER_CREDITS      0.01f
+
+#define CORE_MTA_HOVER_SCALE        1.0f
+#define CORE_MTA_NORMAL_SCALE       0.6f
+#define CORE_MTA_HOVER_ALPHA        1.0f
+#define CORE_MTA_NORMAL_ALPHA       0.6f
 
 #define CORE_MTA_HIDDEN_ALPHA       0.0f
 #define CORE_MTA_DISABLED_ALPHA     0.4f
 #define CORE_MTA_ENABLED_ALPHA      1.0f
 
-#define CORE_MTA_STATIC_BG          "cgui\\images\\static.png"
+#define CORE_MTA_ANIMATION_TIME     200
+#define CORE_MTA_MOVE_ANIM_TIME     600
+
+#define CORE_MTA_STATIC_BG          "cgui\\images\\background.png"
 #define CORE_MTA_FILLER             "cgui\\images\\mta_filler.png"
-#define CORE_MTA_HEADER             "cgui\\images\\mta_header.png"
-#define CORE_MTA_HEADER_X           580
-#define CORE_MTA_HEADER_Y           60
+#define CORE_MTA_VERSION            "cgui\\images\\version.png"
+#define CORE_MTA_LATEST_NEWS        "cgui\\images\\latest_news.png"
 
 static short WaitForMenu = 0;
 static const SColor headlineColors [] = { SColorRGBA ( 233, 234, 106, 255 ), SColorRGBA ( 233/6*4, 234/6*4, 106/6*4, 255 ), SColorRGBA ( 233/7*3, 234/7*3, 106/7*3, 255 ) };
 
-
 CMainMenu::CMainMenu ( CGUI* pManager )
 {
     m_pNewsBrowser = new CNewsBrowser ();
+
+    ulPreviousTick = GetTickCount ();
+    m_pHoveredItem = NULL;
+    m_iMoveStartPos = 0;
 
     // Initialize
     m_pManager = pManager;
     m_bIsVisible = false;
     m_bIsIngame = true;
 //    m_bIsInSubWindow = false;
-    m_bInitialized = false;
-    m_bStarted = false;
-    m_bStaticBackground = false;
-    m_pRenderTarget = NULL;
     m_fFader = 0;
-    m_uiItems = 0;
     m_ucFade = FADE_INVISIBLE;
-    m_bFadeToCredits = false;
-
-    m_iButtons =            6;
-    m_fWindowX =            260.0f;
-    m_fWindowY =            330.0f;
-    m_fButtonSpacer =       4.0f;
-    m_fButtonSpacerTop =    23.0f;
-    m_fButtonSpacerLeft =   7.0f;
 
     // Adjust window size to resolution
     CVector2D ScreenSize = m_pManager->GetResolution ();
-    if ( ScreenSize.fX < NATIVE_RES_X ) {
-        m_fWindowX *= ScreenSize.fX / MAX_RES_X;
-        m_fWindowY *= ScreenSize.fY / MAX_RES_Y;
+    m_ScreenSize = ScreenSize;
+
+    // First let's work out our x and y offsets
+    if ( ScreenSize.fX > ScreenSize.fY ) //If the monitor is a normal landscape one
+    {
+		float iRatioSizeY = ScreenSize.fY / NATIVE_RES_Y;
+		m_iMenuSizeX = NATIVE_RES_X * iRatioSizeY;
+		m_iMenuSizeY = ScreenSize.fY;
+		m_iXOff = (ScreenSize.fX - m_iMenuSizeX)*0.5f;
+		m_iYOff = 0;
     }
-    m_fButtonWidth =    m_fWindowX-m_fButtonSpacerLeft*2;
-    m_fButtonHeight =   (m_fWindowY-m_fButtonSpacerTop-m_fButtonSpacer*(m_iButtons+1))/m_iButtons;
-
-    // Scene background image
-    m_pBackground = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
-    m_pBackground->LoadFromFile ( CORE_MTA_STATIC_BG );
-    m_pBackground->MoveToBack ();
-    m_pBackground->SetVisible ( false );
-    m_pBackground->SetAlpha ( 0 );
-    m_pBackground->SetZOrderingEnabled ( false );
-
-    // Filler background image
+    else //Otherwise our monitor is in a portrait resolution, so we cant fill the background by y
+    {
+		float iRatioSizeX = ScreenSize.fX / NATIVE_RES_X;
+		m_iMenuSizeY = NATIVE_RES_Y * iRatioSizeX;
+		m_iMenuSizeX = ScreenSize.fX;
+		m_iXOff = 0;
+		m_iYOff = (ScreenSize.fY - m_iMenuSizeY)*0.5f;
+    }
+    // First create our filler black background image, which covers the whole screen
     m_pFiller = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
     m_pFiller->LoadFromFile ( CORE_MTA_FILLER );
-    m_pFiller->SetFrameEnabled ( false );
     m_pFiller->SetVisible ( false );
     m_pFiller->MoveToBack ();
-    m_pFiller->SetVisible ( false );
-    m_pFiller->SetEnabled ( false );
+    m_pFiller->SetZOrderingEnabled ( false );
+    m_pFiller->SetAlwaysOnTop ( true );
+    m_pFiller->MoveToBack ();
+    m_pFiller->SetSize(CVector2D(m_iXOff,ScreenSize.fY),false);
 
-    // Header image
-    m_pHeader = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pBackground ) );
-    assert ( m_pHeader->LoadFromFile ( CORE_MTA_HEADER ) == true );
-    //m_pHeader->MoveToBack ();
-    m_pHeader->SetFrameEnabled ( false );
-    m_pHeader->SetVisible ( false );
-    m_pHeader->SetSize ( CVector2D ( CORE_MTA_HEADER_X, CORE_MTA_HEADER_Y ) );
-    m_pHeader->SetAlpha ( 0 );
+    // Background image
+    m_pBackground = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+    m_pBackground->LoadFromFile ( CORE_MTA_STATIC_BG );
+    //m_pBackground->SetParent ( m_pFiller );
+    m_pBackground->SetProperty("InheritsAlpha", "False" );
+    m_pBackground->SetPosition ( CVector2D(m_iXOff,m_iYOff), false);   
+    m_pBackground->SetSize ( CVector2D(m_iMenuSizeX,m_iMenuSizeY), false);
+    m_pBackground->SetZOrderingEnabled ( false );
+    m_pBackground->SetAlwaysOnTop ( true );
+    m_pBackground->MoveToBack ();
+    m_pBackground->SetAlpha(0);
+    m_pBackground->SetVisible ( false );
 
-    m_pCommunityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pBackground, "Not logged in" ) );
+    m_pFiller2 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+    m_pFiller2->LoadFromFile ( CORE_MTA_FILLER );
+    m_pFiller2->SetVisible ( false );
+    m_pFiller2->SetZOrderingEnabled ( false );
+    m_pFiller2->SetAlwaysOnTop ( true );
+    m_pFiller2->MoveToBack ();
+    m_pFiller2->SetPosition(CVector2D(m_iXOff+m_iMenuSizeX,0));
+    m_pFiller2->SetSize(ScreenSize,false);
+
+    // Create the image showing the version number
+    m_pVersion = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+    m_pVersion->LoadFromFile ( CORE_MTA_VERSION );
+    m_pVersion->SetParent ( m_pBackground );
+    m_pVersion->SetPosition ( CVector2D(0.845f,0.528f), true);
+    m_pVersion->SetSize ( CVector2D((32/NATIVE_RES_X)*m_iMenuSizeX,(32/NATIVE_RES_Y)*m_iMenuSizeY), false);
+    m_pVersion->SetProperty("InheritsAlpha", "False" );
+
+    m_pCommunityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pFiller, "Not logged in" ) );
     m_pCommunityLabel->AutoSize ( "Not logged in" );
     m_pCommunityLabel->SetAlwaysOnTop ( true );
     m_pCommunityLabel->SetAlpha ( 0.7f );
     m_pCommunityLabel->SetVisible ( false );
+    m_pCommunityLabel->SetPosition ( CVector2D ( 40.0f, ScreenSize.fY - 20.0f ) );
 
     std::string strUsername;
     CCore::GetSingleton().GetCommunity()->GetUsername ( strUsername );
     if ( CCore::GetSingleton().GetCommunity()->IsLoggedIn() && !strUsername.empty() )
         ChangeCommunityState ( true, strUsername );
 
-    // Create the menu items
-    CreateItem ( MENU_ITEM_DISCONNECT,     CVector2D ( 0, 0 ),      "DISCONNECT",           GUI_CALLBACK ( &CMainMenu::OnDisconnectButtonClick, this ) );
-    CreateItem ( MENU_ITEM_QUICK_CONNECT,  CVector2D ( 0, 0 ),      "QUICK CONNECT",        GUI_CALLBACK ( &CMainMenu::OnQuickConnectButtonClick, this ) );
-    CreateItem ( MENU_ITEM_BROWSE_SERVERS, CVector2D ( 0, 0 ),      "BROWSE SERVERS",       GUI_CALLBACK ( &CMainMenu::OnBrowseServersButtonClick, this ) );
-    CreateItem ( MENU_ITEM_HOST_GAME,      CVector2D ( 0, 0 ),      "HOST GAME",            GUI_CALLBACK ( &CMainMenu::OnHostGameButtonClick, this ) );
-    CreateItem ( MENU_ITEM_MAP_EDITOR,     CVector2D ( 0, 0 ),      "MAP EDITOR",           GUI_CALLBACK ( &CMainMenu::OnEditorButtonClick, this ) );
-    CreateItem ( MENU_ITEM_SETTINGS,       CVector2D ( 0, 0 ),      "SETTINGS",             GUI_CALLBACK ( &CMainMenu::OnSettingsButtonClick, this ) );
-    CreateItem ( MENU_ITEM_ABOUT,          CVector2D ( 0, 0 ),      "ABOUT",                GUI_CALLBACK ( &CMainMenu::OnAboutButtonClick, this ) );
-    CreateItem ( MENU_ITEM_NEWS,           CVector2D ( 0, 0 ),      "NEWS",                 GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
-    CreateItem ( MENU_ITEM_NEWS_ITEM_1,    CVector2D ( 0, 0 ),      " ",                    GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
-    CreateItem ( MENU_ITEM_NEWS_ITEM_2,    CVector2D ( 0, 0 ),      " ",                    GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
-    CreateItem ( MENU_ITEM_NEWS_ITEM_3,    CVector2D ( 0, 0 ),      " ",                    GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this ) );
-    CreateItem ( MENU_ITEM_QUIT,           CVector2D ( 0, 0 ),      "QUIT",                 GUI_CALLBACK ( &CMainMenu::OnQuitButtonClick, this ) );
+    // Our disconnect item is shown/hidden dynamically, so we store it seperately
+    m_pDisconnect = CreateItem ( MENU_ITEM_DISCONNECT, "cgui\\images\\menu_disconnect.png",    CVector2D ( 0.168f, 0.615f ),    CVector2D ( 278, 34 ) );
+    m_pDisconnect->image->SetVisible(false);
 
-    // Create 'new' stickers
-    for ( uint i = 0 ; i < NUMELMS ( m_pNewLabels ) ; i++ )
+    // Create the menu items
+    //Filepath, Relative position, absolute native size
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUICK_CONNECT,  "cgui\\images\\menu_quick_connect.png",    CVector2D ( 0.168f, 0.615f ),    CVector2D ( 358, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, 0.662f ),    CVector2D ( 390, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, 0.709f ),    CVector2D ( 251, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "cgui\\images\\menu_map_editor.png",       CVector2D ( 0.168f, 0.756f ),    CVector2D ( 261, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "cgui\\images\\menu_settings.png",         CVector2D ( 0.168f, 0.803f ),    CVector2D ( 207, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "cgui\\images\\menu_about.png",            CVector2D ( 0.168f, 0.850f ),    CVector2D ( 150, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, 0.897f ),    CVector2D ( 102, 34 ) ) );
+
+    // We store the position of the top item, and the second item.  These will be useful later
+    m_iFirstItemTop  = (m_menuItems.front()->image)->GetPosition().fY;
+    m_iSecondItemTop = (m_menuItems[1]->image)->GetPosition().fY;
+    
+    // Store some mosue over bounding box positions
+    m_menuAX = (0.168f*m_iMenuSizeX) + m_iXOff;             //Left side of the items
+    m_menuAY = m_iFirstItemTop;                             //Top side of the items
+	m_menuBX =  m_menuAX + ((390/NATIVE_RES_X)*m_iMenuSizeX); //Right side of the items. We add the longest picture (browse_servers)
+
+    m_pMenuArea = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage(m_pBackground) );
+    m_pMenuArea->LoadFromFile ( CORE_MTA_FILLER );
+    m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
+    m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
+    m_pMenuArea->SetAlpha(0);
+    m_pMenuArea->SetZOrderingEnabled(false);
+    m_pMenuArea->SetClickHandler ( GUI_CALLBACK ( &CMainMenu::OnMenuClick, this ) );
+    m_pMenuArea->SetMouseEnterHandler ( GUI_CALLBACK ( &CMainMenu::OnMenuEnter, this ) );
+    m_pMenuArea->SetMouseLeaveHandler ( GUI_CALLBACK ( &CMainMenu::OnMenuExit, this ) );
+
+    float fDrawSizeX = (365/NATIVE_RES_X)*m_iMenuSizeX; //Right aligned
+    float fDrawSizeY = (52/NATIVE_RES_Y)*m_iMenuSizeY;
+    float fDrawPosX = 0.83f*m_iMenuSizeX - fDrawSizeX;
+    float fDrawPosY = 0.60f*m_iMenuSizeY;
+    m_pLatestNews = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+    m_pLatestNews->LoadFromFile ( CORE_MTA_LATEST_NEWS );
+    m_pLatestNews->SetParent ( m_pBackground );
+    m_pLatestNews->SetPosition ( CVector2D(fDrawPosX,fDrawPosY), false);
+    m_pLatestNews->SetSize ( CVector2D(fDrawSizeX,fDrawSizeY), false);
+    m_pLatestNews->SetProperty("InheritsAlpha", "False" );
+    m_pLatestNews->SetVisible(false);
+
+    // Create news item stuff
+    fDrawPosX -= 25;
+    fDrawPosY += fDrawSizeY - 8;
+    for ( uint i = 0 ; i < CORE_MTA_NEWS_ITEMS ; i++ )
     {
-        CGUILabel*& pLabel =  m_pNewLabels[i];
+        fDrawPosY += 20;
+        // Create our shadow and item
+        CGUILabel * pItemShadow = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pBackground, " " ) );
+        CGUILabel * pItem = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pBackground, " " ) );
+
+        pItem->SetFont ( "sans" );
+        pItemShadow->SetFont ( "sans" );
+        pItem->SetHorizontalAlign ( CGUI_ALIGN_RIGHT );
+        pItemShadow->SetHorizontalAlign ( CGUI_ALIGN_RIGHT );
+
+        pItem->SetSize( CVector2D (fDrawSizeX, 14), false );
+        pItemShadow->SetSize( CVector2D (fDrawSizeX, 15), false );
+
+        pItem->SetPosition( CVector2D (fDrawPosX, fDrawPosY), false );
+        pItemShadow->SetPosition( CVector2D (fDrawPosX + 1, fDrawPosY + 1), false );
+
+        pItemShadow->SetTextColor ( 112, 112, 112 );
+
+        // Set the handlers
+        pItem->SetClickHandler ( GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this )  );
+
+        // Store the item in the array
+        m_pNewsItemLabels[i] = pItem;
+        m_pNewsItemShadowLabels[i] = pItemShadow;
+
+        // Create our date label
+        fDrawPosY += 15;
+        CGUILabel * pItemDate = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pBackground, " " ) );
+
+        pItemDate->SetFont ( "default-small" );
+        pItemDate->SetHorizontalAlign ( CGUI_ALIGN_RIGHT );
+
+        pItemDate->SetSize( CVector2D (fDrawSizeX, 13), false );
+        pItemDate->SetPosition( CVector2D (fDrawPosX, fDrawPosY), false );
+
+        m_pNewsItemDateLabels[i] = pItemDate;
+
+        // Create 'NEW' sticker
+        CGUILabel*& pLabel =  m_pNewsItemNEWLabels[i];
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pBackground, "NEW" ) );
         pLabel->SetFont ( "default-small" );
         pLabel->SetTextColor ( 255, 0, 0 );
@@ -137,15 +231,6 @@ CMainMenu::CMainMenu ( CGUI* pManager )
         pLabel->SetAlpha ( 0.7f );
         pLabel->SetVisible ( false );
     }
-
-    //Refresh all positions
-    RefreshPositions ( );
-
-    // Disable the disconnect item
-    DisableItem ( MENU_ITEM_DISCONNECT, true );
-
-    // Disable the news item incase there is no news
-    DisableItem ( MENU_ITEM_NEWS, true );
 
     // Submenu's
     m_QuickConnect.SetVisible ( false );
@@ -161,9 +246,6 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     // Store the pointer to the graphics subsystem
     m_pGraphics = CGraphics::GetSingletonPtr ();
 
-    // Null the scene pointer
-    m_pMainMenuScene = new CMainMenuScene ( this );
-
     // Load the server lists
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
     m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_FAV ),
@@ -175,57 +257,77 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     if ( CXMLNode* pOldNode = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ) )
         pConfig->DeleteSubNode ( pOldNode );
 
-    // This class is destroyed when the video mode is changed (vid), so the config can already be loaded
-    // If it is already loaded (and this constructor is not called on startup) then load the menu options
-//    if ( CClientVariables::GetSingleton ().IsLoaded () )
-//      LoadMenuOptions ();
 }
 
 
 CMainMenu::~CMainMenu ( void )
 {
-    // Delete menu items
-    for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ ) {
-        if ( m_pItems[i] )
-            delete m_pItems[i];
-        if ( m_pItemShadows[i] )
-            delete m_pItemShadows[i];
-    }
-
     // Destroy GUI items
     delete m_pBackground;
     delete m_pFiller;
-    delete m_pHeader;
+    delete m_pLatestNews;
+    delete m_pVersion;
 
     // Destroy community label
     delete m_pCommunityLabel;
 
-    // Destroy the scene
-    delete m_pMainMenuScene;
+    while ( m_menuItems.begin() != m_menuItems.end() )
+    {
+        std::deque<sMenuItem*>::iterator it = m_menuItems.begin();
+        if ( (*it) != m_pDisconnect )
+        {
+            sMenuItem* item = (*it);
+            delete item;
+            m_menuItems.erase(it);
+        }
+        else
+        {
+            m_menuItems.erase(it);
+        }
+    }
+
+    delete m_pDisconnect;
 }
 
-void CMainMenu::RefreshPositions ( void )
+void CMainMenu::SetMenuVerticalPosition ( int iPosY )
 {
-    CVector2D ScreenSize = m_pManager->GetResolution ();
-    m_pFiller->SetSize ( ScreenSize );
-    m_pHeader->SetPosition ( CVector2D ( ScreenSize.fX/2 - CORE_MTA_HEADER_X/2, ScreenSize.fY/6 ), false );
-    m_pCommunityLabel->SetPosition ( CVector2D ( 40.0f, ScreenSize.fY - 20.0f ) );
+	if ( m_pHoveredItem )
+    {
+        m_unhoveredItems.insert ( m_pHoveredItem );
+        m_pHoveredItem = NULL;
+    }
 
-    //Set our individual item positions
-    unsigned int uiItemStartY = ScreenSize.fY / 2 - 30 - ( ScreenSize.fY < 600 ? 40 : 0 );
-    unsigned int uiItemHeight = 30;
-    SetItemPosition ( MENU_ITEM_DISCONNECT,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY ), false );
-    SetItemPosition ( MENU_ITEM_QUICK_CONNECT,  CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*1 ), false );
-    SetItemPosition ( MENU_ITEM_BROWSE_SERVERS, CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*2 ), false );
-    SetItemPosition ( MENU_ITEM_HOST_GAME,      CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*3 ), false );
-    SetItemPosition ( MENU_ITEM_MAP_EDITOR,     CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*4 ), false );
-    SetItemPosition ( MENU_ITEM_SETTINGS,       CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*5 ), false );
-    SetItemPosition ( MENU_ITEM_ABOUT,          CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*6 ), false );
-    SetItemPosition ( MENU_ITEM_NEWS,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 - 14 * 4 - 10 ), true );
-    SetItemPosition ( MENU_ITEM_NEWS_ITEM_1,    CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 - 14 * 3 ), true );
-    SetItemPosition ( MENU_ITEM_NEWS_ITEM_2,    CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 - 14 * 2 ), true );
-    SetItemPosition ( MENU_ITEM_NEWS_ITEM_3,    CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 - 14 * 1  ), true );
-    SetItemPosition ( MENU_ITEM_QUIT,           CVector2D ( CORE_MTA_MENUITEMS_START_X, uiItemStartY + uiItemHeight*7 ), false );
+    int iMoveY = iPosY - m_menuAY;
+    
+    std::deque<sMenuItem*>::iterator it = m_menuItems.begin();
+    for ( it; it != m_menuItems.end(); it++ )
+    {
+        CVector2D vOrigPos = (*it)->image->GetPosition(false);
+        (*it)->drawPositionY = (*it)->drawPositionY + iMoveY;
+        (*it)->image->SetPosition( CVector2D(vOrigPos.fX,vOrigPos.fY + iMoveY), false);
+    }
+	
+    m_menuAY = iPosY;
+	m_menuBY = m_menuBY + iMoveY;
+    m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
+    m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
+}
+
+void CMainMenu::SetMenuUnhovered () //Dehighlight all our items
+{
+    if ( m_bIsIngame )  //CEGUI hack
+    {
+        float fAlpha = m_pDisconnect->image->GetAlpha();
+        m_pDisconnect->image->SetAlpha(0.35f);
+        m_pDisconnect->image->SetAlpha(fAlpha);
+        SetItemHoverProgress ( m_pDisconnect, 0, false );
+    }
+    m_pHoveredItem = NULL;
+    std::deque<sMenuItem*>::iterator it = m_menuItems.begin();
+    for ( it; it != m_menuItems.end(); it++ )
+    {
+        SetItemHoverProgress ( (*it), 0, false );
+    }
 }
 
 void CMainMenu::Update ( void )
@@ -237,78 +339,156 @@ void CMainMenu::Update ( void )
     m_Credits.Update ();
     m_Settings.Update ();
 
+    unsigned long ulCurrentTick = GetTickCount();
+    unsigned long ulTimePassed = ulCurrentTick - ulPreviousTick;
+
+    if ( m_bHideGame )
+        m_pGraphics->DrawRectangle(0,0,m_ScreenSize.fX,m_ScreenSize.fY,0xFF000000);
+
+    if ( m_bIsIngame )  //CEGUI hack
+    {
+        float fAlpha = m_pDisconnect->image->GetAlpha();
+        m_pDisconnect->image->SetAlpha(0.35f);
+        m_pDisconnect->image->SetAlpha(fAlpha);
+    }
+
+    // Grab our cursor position
+    tagPOINT cursor;
+    GetCursorPos ( &cursor );
+    
+    HWND hookedWindow = CCore::GetSingleton().GetHookedWindow();
+
+    tagPOINT windowPos = { 0 };
+    ClientToScreen( hookedWindow, &windowPos );
+
+    CVector2D vecResolution = CCore::GetSingleton ().GetGUI ()->GetResolution ();
+    cursor.x -= windowPos.x;
+    cursor.y -= windowPos.y;
+    if ( cursor.x < 0 )
+        cursor.x = 0;
+    else if ( cursor.x > ( long ) vecResolution.fX )
+        cursor.x = ( long ) vecResolution.fX;
+    if ( cursor.y < 0 )
+        cursor.y = 0;
+    else if ( cursor.y > ( long ) vecResolution.fY )
+        cursor.y = ( long ) vecResolution.fY;
+
+    // If we're within our highlight bounding box
+    if ( m_bMouseOverMenu && ( cursor.x > m_menuAX ) && ( cursor.y > m_menuAY ) && ( cursor.x < m_menuBX ) && ( cursor.y < m_menuBY ) )
+    {
+        float fHoveredIndex = ((cursor.y-m_menuAY) / (float)(m_menuBY-m_menuAY) * m_menuItems.size());
+        fHoveredIndex = Clamp <float> ( 0, fHoveredIndex, m_menuItems.size()-1 );
+        sMenuItem* pItem = m_menuItems[(int)floor(fHoveredIndex)];
+        int iSizeX = (pItem->nativeSizeX/NATIVE_RES_X)*m_iMenuSizeX;
+        
+        if (cursor.x < (iSizeX + m_menuAX) )
+        {
+            if ( ( m_pHoveredItem ) && ( m_pHoveredItem != pItem ) )
+            {
+                m_unhoveredItems.insert(m_pHoveredItem);
+                m_pHoveredItem = pItem;
+            }
+            else
+            {
+                m_pHoveredItem = NULL;
+            }
+            m_pHoveredItem = pItem;
+        }
+        else if ( m_pHoveredItem )
+        {         
+            m_unhoveredItems.insert(m_pHoveredItem);
+            m_pHoveredItem = NULL;
+        }
+        
+        if ( m_pHoveredItem )
+        {
+            float fProgress = (m_pHoveredItem->image->GetAlpha()-CORE_MTA_NORMAL_ALPHA)/(CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
+			// Let's work out what the target progress should be by working out the time passed
+			fProgress = ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA) + fProgress;
+            SetItemHoverProgress ( m_pHoveredItem, fProgress, true );
+        }
+
+    }
+    else if ( m_pHoveredItem )
+    {
+        m_unhoveredItems.insert(m_pHoveredItem);
+        m_pHoveredItem = NULL;
+    }
+
+    // Let's unhover our recently un-moused over items
+    std::set<sMenuItem*>::iterator it = m_unhoveredItems.begin();
+    while (it != m_unhoveredItems.end())
+    {
+        float fProgress = ((*it)->image->GetAlpha()-CORE_MTA_NORMAL_ALPHA)/(CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
+		// Let's work out what the target progress should be by working out the time passed
+		fProgress = fProgress - ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA);
+        if ( SetItemHoverProgress ( (*it), fProgress, false ) )
+        {
+            std::set<sMenuItem*>::iterator itToErase = it;
+            it--;
+            m_unhoveredItems.erase(itToErase);
+        }
+        else
+            it++;
+    }
+
+    if ( m_iMoveStartPos )
+    {
+        float fTickDifference = ulCurrentTick - m_ulMoveStartTick;
+        float fMoveTime = (fTickDifference/CORE_MTA_MOVE_ANIM_TIME);
+        fMoveTime = Clamp <float> ( 0, fMoveTime, 1 );
+        // Use OutQuad easing to smoothen the movement
+        fMoveTime = -fMoveTime*(fMoveTime-2);
+
+        SetMenuVerticalPosition ( fMoveTime*(m_iMoveTargetPos - m_iMoveStartPos) + m_iMoveStartPos );
+        m_pDisconnect->image->SetAlpha ( m_bIsIngame ? fMoveTime*CORE_MTA_NORMAL_ALPHA : (1-fMoveTime)*CORE_MTA_NORMAL_ALPHA );
+
+        if ( fMoveTime == 1 )
+        {
+            m_iMoveStartPos = 0;
+            if ( !m_bIsIngame )
+                m_pDisconnect->image->SetVisible(false);
+            else
+            {
+                m_menuItems.push_front(m_pDisconnect);
+                m_menuAY =  m_pDisconnect->image->GetPosition(false).fY;
+                m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
+                m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
+            }
+        }
+    }
+
     // Fade in
     if ( m_ucFade == FADE_IN ) {
-        for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ ) {
-            // Determine the clamping value
-            float fMax = CORE_MTA_ENABLED_ALPHA;
-            switch ( reinterpret_cast < int > ( m_pItems[i]->GetUserData () ) ) {
-                case ITEM_DISABLED:
-                    fMax = CORE_MTA_DISABLED_ALPHA;
-                    break;
-                case ITEM_HIDDEN:
-                    fMax = CORE_MTA_HIDDEN_ALPHA;
-                    break;
-                case ITEM_ENABLED:
-                default:
-                    break;
-            }
-
-            // Set the alpha value
-            if ( m_pItems[i] ) m_pItems[i]->SetAlpha ( Clamp ( 0.f, m_fFader, fMax ) );
-            if ( m_pItemShadows[i] ) m_pItemShadows[i]->SetAlpha ( Clamp ( 0.f, m_fFader, fMax ) );
-        }
-        m_pBackground->SetAlpha ( Clamp ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
-        m_pHeader->SetAlpha ( m_fFader );
 
         // Increment the fader (use the other define if we're fading to the credits)
-        if ( m_bFadeToCredits )
-            m_fFader += CORE_MTA_FADER_CREDITS;
-        else
-            m_fFader += CORE_MTA_FADER;
+        m_fFader += CORE_MTA_FADER;
+
+        float fFadeTarget = m_bIsIngame ? CORE_MTA_BG_INGAME_ALPHA : CORE_MTA_BG_MAX_ALPHA;
+
+        m_pFiller->SetAlpha ( Clamp <float> ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
+        m_pFiller2->SetAlpha ( Clamp <float> ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
+        m_pBackground->SetAlpha ( Clamp <float> ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
 
         if ( m_fFader > 0.0f )
+        {
             m_bIsVisible = true;     // Make cursor appear faster
+        }
 
         // If the fade is complete
-        if ( m_fFader >= 1 ) {
+        if ( m_fFader >= fFadeTarget ) {
             m_ucFade = FADE_VISIBLE;
             m_bIsVisible = true;
 
-            // Fade to the credits
-            if ( m_bFadeToCredits ) {
-                m_bFadeToCredits = false;
-
-                // Start the credits scene
-                m_pMainMenuScene->StartCredits ();
-            }
         }
     }
     // Fade out
     else if ( m_ucFade == FADE_OUT ) {
-        for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ ) {
-            // Determine the clamping value
-            float fMax = CORE_MTA_ENABLED_ALPHA;
-            switch ( reinterpret_cast < int > ( m_pItems[i]->GetUserData () ) ) {
-                case ITEM_DISABLED:
-                    fMax = CORE_MTA_DISABLED_ALPHA;
-                    break;
-                case ITEM_HIDDEN:
-                    fMax = CORE_MTA_HIDDEN_ALPHA;
-                    break;
-                case ITEM_ENABLED:
-                default:
-                    break;
-            }
-
-            // Set the alpha value
-            if ( m_pItems[i] ) m_pItems[i]->SetAlpha ( Clamp ( 0.f, m_fFader, fMax ) );
-            if ( m_pItemShadows[i] ) m_pItemShadows[i]->SetAlpha ( Clamp ( 0.f, m_fFader, fMax ) );
-        }
-        m_pBackground->SetAlpha ( Clamp ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
-        m_pHeader->SetAlpha ( m_fFader );
-
         m_fFader -= CORE_MTA_FADER;
+
+        m_pFiller->SetAlpha ( Clamp ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
+        m_pFiller2->SetAlpha ( Clamp ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
+        m_pBackground->SetAlpha ( Clamp ( 0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA ) );
 
         if ( m_fFader < 1.0f )
             m_bIsVisible = false;    // Make cursor disappear faster
@@ -319,59 +499,15 @@ void CMainMenu::Update ( void )
             m_bIsVisible = false;
 
             // Turn the widgets invisible
-            m_pBackground->SetVisible ( false );
-            m_pHeader->SetVisible ( false );
-//          m_pFiller->SetVisible ( false );
-
-            for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ ) {
-                if ( m_pItems[i] ) m_pItems[i]->SetVisible ( false );
-                if ( m_pItemShadows[i] ) m_pItemShadows[i]->SetVisible ( false );
-            }
-
-            // Fade to the credits, so fade in again with the background widget visible only
-            if ( m_bFadeToCredits ) {
-                m_ucFade = FADE_IN;
-                m_fFader = 0.0f;
-
-                m_pBackground->SetVisible ( true );
-
-                // Initialize the credits scene
-                m_pMainMenuScene->PreStartCredits ();
-            }
+            m_pFiller->SetVisible ( false );
+            m_pFiller2->SetVisible ( false );
+            m_pBackground->SetVisible(false);
         }
     }
 
     // Force the mainmenu on if we're at GTA's mainmenu or not ingame
     if ( ( SystemState == 7 || SystemState == 9 ) && !m_bIsIngame )
     {
-        // Initialize our 3D scene once the device is available
-        IDirect3DDevice9 * pDevice = m_pGraphics->GetDevice ();
-        if ( !m_bInitialized && pDevice )
-        {
-            CCore::GetSingleton ().GetNetwork ()->Reset ();
-            m_bInitialized = true;
-
-            // If the static flag has not already been set
-            if ( m_bStaticBackground )
-            {
-                SetStaticBackground ( true );
-            }
-            else
-            {
-                // Create the texture to be used in the background
-                CVector2D ScreenSize = m_pManager->GetResolution ();
-                m_pRenderTarget = m_pManager->CreateTexture ();
-                m_pRenderTarget->CreateTexture ( ScreenSize.fX, ScreenSize.fY );
-                m_pBackground->LoadFromTexture ( m_pRenderTarget );
-
-                // Initialize the scene class
-                if ( m_pMainMenuScene->Init3DScene ( m_pRenderTarget->GetD3DTexture (), ScreenSize ) == false ) {
-                    // If the scene initialisation failed, we need to use a static background
-                    SetStaticBackground ( true );
-                }
-            }
-        }
-
         // it takes 250 frames for the menu to be shown, we seem to update this twice a frame
         if ( WaitForMenu >= 250 ) {
             if ( !m_bStarted )
@@ -394,60 +530,21 @@ void CMainMenu::Update ( void )
         {
             if ( m_ucFade == FADE_INVISIBLE )
                 Show ( false );
-
-            // Only draw the 3D scene if we have a dynamic background
-            if ( !m_bStaticBackground && m_bInitialized )
-                m_pMainMenuScene->Draw3DScene ();
         }
         else
         {
             if ( m_ucFade == FADE_INVISIBLE )
                 Show ( true );
-            /*
-            m_pBackground->SetVisible ( false );
-            m_pFiller->SetVisible ( false );
-            m_pHeader->SetVisible ( false );
-            */
         }
-
-        // If we're in a submenu, hide the mainmenu dialog, if not, show it
-        /*
-        if ( m_bIsInSubWindow )
-        {
-            m_pWindow->SetVisible ( false );
-        }
-        else
-        {
-            m_pWindow->SetVisible ( true );
-        }
-        */
     }
     else
     {
         if ( m_ucFade == FADE_VISIBLE )
             Hide ();
-        /*
-        static bool bDelayedFrame = false;
-        if ( SystemState == 8 && !bDelayedFrame )
-        {
-            bDelayedFrame = true;
-
-            // Show mainmenu and background
-            m_pWindow->SetVisible ( false );
-            m_pBackground->SetVisible ( true );
-            m_pFiller->SetVisible ( true );
-            m_pHeader->SetVisible ( true );
-        }
-        else
-        {
-            // Hide mainmenu and background
-            m_pWindow->SetVisible ( false );
-            m_pBackground->SetVisible ( false );
-            m_pFiller->SetVisible ( false );
-            m_pHeader->SetVisible ( false );
-        }
-        */
     }
+
+
+    ulPreviousTick = GetTickCount();
 
     // Call subdialog pulses
     m_ServerBrowser.Update ();
@@ -481,6 +578,7 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
     // If we're hiding, hide any subwindows we might've had (prevent escaping hiding mousecursor issue)
     if ( !bVisible )
     {
+        SetMenuUnhovered ();
         m_QuickConnect.SetVisible ( false );
         m_ServerBrowser.SetVisible ( false );
         m_Settings.SetVisible ( false );
@@ -490,17 +588,13 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
 
 //        m_bIsInSubWindow = false;
     } else {
+        m_pFiller->SetVisible ( true );
+        m_pFiller2->SetVisible ( true );
         m_pBackground->SetVisible ( true );
-        m_pHeader->SetVisible ( true );
-        m_pFiller->SetVisible ( !bOverlay );
         m_pCommunityLabel->SetVisible ( true );
-
-        for ( unsigned int i = 0; i < CORE_MTA_MENU_ITEMS; i++ )
-        {
-            if ( m_pItems[i] ) m_pItems[i]->SetVisible ( reinterpret_cast < int > ( m_pItems[i]->GetUserData () ) != ITEM_HIDDEN );
-            if ( m_pItemShadows[i] ) m_pItemShadows[i]->SetVisible ( m_pItems[i]->IsVisible () );
-        }
     }
+
+    m_bHideGame = !bOverlay;
 }
 
 
@@ -517,21 +611,23 @@ void CMainMenu::SetIsIngame ( bool bIsIngame )
     {
         m_bIsIngame = bIsIngame;
 
-        // If we're in-game
-        if ( bIsIngame ) {
-            // Load and enable the static background
-            SetStaticBackground ( true );
-
-            // Enable the disconnect item
-            EnableItem ( MENU_ITEM_DISCONNECT );
-        } else {
-            // Disable the disconnect item
-            DisableItem ( MENU_ITEM_DISCONNECT, true );
+        m_ulMoveStartTick = GetTickCount();
+        if ( bIsIngame )
+        {
+            m_pDisconnect->image->SetVisible(true);
+            m_iMoveTargetPos = m_iSecondItemTop;
         }
-
-        // Remove the filler, if needed
-        if ( m_bIsVisible )
-            m_pFiller->SetVisible ( !bIsIngame );
+        else
+        {
+            if ( m_menuItems.front() == m_pDisconnect )
+                m_menuItems.pop_front();
+            
+            m_menuAY = m_menuItems.front()->image->GetPosition().fY;
+            m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
+            m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
+            m_iMoveTargetPos = m_iFirstItemTop;
+        }
+        m_iMoveStartPos = m_menuAY;
     }
 }
 
@@ -541,6 +637,38 @@ bool CMainMenu::GetIsIngame ( void )
     return m_bIsIngame;
 }
 
+bool CMainMenu::OnMenuEnter ( CGUIElement* pElement )
+{
+    m_bMouseOverMenu = true;
+    return true;
+}
+
+bool CMainMenu::OnMenuExit ( CGUIElement* pElement )
+{
+    m_bMouseOverMenu = false;
+    return true;
+}
+
+bool CMainMenu::OnMenuClick ( CGUIElement* pElement )
+{
+    // Handle all our clicks to the menu from here
+    if ( m_pHoveredItem )
+    {
+        switch (m_pHoveredItem->menuType)
+        {
+            case MENU_ITEM_DISCONNECT:      OnDisconnectButtonClick   (pElement);    break;
+            case MENU_ITEM_QUICK_CONNECT:   OnQuickConnectButtonClick (pElement);    break;
+            case MENU_ITEM_BROWSE_SERVERS:  OnBrowseServersButtonClick(pElement);    break;
+            case MENU_ITEM_HOST_GAME:       OnHostGameButtonClick     (pElement);    break;
+            case MENU_ITEM_MAP_EDITOR:      OnEditorButtonClick       (pElement);    break;
+            case MENU_ITEM_SETTINGS:        OnSettingsButtonClick     (pElement);    break;
+            case MENU_ITEM_ABOUT:           OnAboutButtonClick        (pElement);    break;
+            case MENU_ITEM_QUIT:            OnQuitButtonClick         (pElement);    break;
+            default: break;
+        }
+    }
+    return true;
+}
 
 bool CMainMenu::OnQuickConnectButtonClick ( CGUIElement* pElement )
 {
@@ -652,18 +780,7 @@ bool CMainMenu::OnAboutButtonClick ( CGUIElement* pElement )
 
     // Determine if we're ingame or if the background is set to static
     // If so, show the old credits dialog
-    if ( m_bIsIngame || m_bStaticBackground ) {
-        m_Credits.SetVisible ( true );
-    } else {
-        if ( CModManager::GetSingleton ().IsLoaded () )
-        {
-            CModManager::GetSingleton ().RequestUnload ();    // Hide host game menu
-            return false;
-        }
-        Hide ();
-        m_bFadeToCredits = true;
-        SetVisible ( false );
-    }
+    m_Credits.SetVisible ( true );
 
     return true;
 }
@@ -703,214 +820,69 @@ bool CMainMenu::OnNewsButtonClick ( CGUIElement* pElement )
 }
 
 
-void CMainMenu::OnInvalidate ( IDirect3DDevice9 * pDevice )
-{
-    if ( !m_bInitialized ) return;
+sMenuItem* CMainMenu::CreateItem ( unsigned char menuType, const char* szFilePath, CVector2D vecRelPosition, CVector2D vecNativeSize )
+{ 
+    // Make our positions absolute
+	int iPosX = vecRelPosition.fX*m_iMenuSizeX;
+    int iPosY = vecRelPosition.fY*m_iMenuSizeY;
 
-    if ( m_pRenderTarget && !m_bStaticBackground ) {
-        delete m_pRenderTarget;
-        m_pRenderTarget = NULL;
-    }
+    // Make our sizes relative to the size of menu, but in absolute coordinates
+	int iSizeX = (vecNativeSize.fX/NATIVE_RES_X)*m_iMenuSizeX;
+    int iSizeY = (vecNativeSize.fY/NATIVE_RES_Y)*m_iMenuSizeY;
+	
+    // Mark our bounding box's bottom value.
+	m_menuBY = (iPosY + (iSizeY*CORE_MTA_HOVER_SCALE)/2) + m_iYOff;
+	
+    // Reduced their size down to unhovered size.
+	iSizeX = iSizeX*CORE_MTA_NORMAL_SCALE;
+    iSizeY = iSizeY*CORE_MTA_NORMAL_SCALE;
+	// Grab our draw position from which we enlarge from
+    iPosY = iPosY - (iSizeY/2);
 
-    // Notify the scene class
-    if ( !m_bStaticBackground )
-        m_pMainMenuScene->OnInvalidate ( pDevice );
+    CGUIStaticImage* pImage = reinterpret_cast < CGUIStaticImage* > ( m_pManager->CreateStaticImage () );
+    pImage->LoadFromFile ( szFilePath );
+    pImage->SetParent ( m_pBackground );
+    pImage->SetPosition ( CVector2D(iPosX,iPosY), false);
+    pImage->SetSize ( CVector2D(iSizeX,iSizeY), false);
+    pImage->SetProperty("InheritsAlpha", "False" );
+    pImage->SetAlpha ( CORE_MTA_NORMAL_ALPHA );
+
+    sMenuItem* s = new sMenuItem();
+    s->menuType = menuType;
+    s->drawPositionX = vecRelPosition.fX*m_iMenuSizeX;
+    s->drawPositionY = vecRelPosition.fY*m_iMenuSizeY;
+    s->nativeSizeX = vecNativeSize.fX;
+    s->nativeSizeY = vecNativeSize.fY;
+    s->image = pImage;
+    return s;
 }
 
-
-void CMainMenu::OnRestore ( IDirect3DDevice9 * pDevice )
+bool CMainMenu::SetItemHoverProgress ( sMenuItem* pItem, float fProgress, bool bHovering )
 {
-    if ( !m_bInitialized ) return;
+		fProgress = Clamp <float> ( 0, fProgress, 1 );
 
-    //CVector2D ScreenSize = m_pManager->GetResolution ();
-    D3DVIEWPORT9 Viewport;
-    HRESULT hr = pDevice->GetViewport ( &Viewport );
-    if ( FAILED(hr) )
-    {
-        MessageBox ( NULL, "Failed to get the viewport size", "Error", MB_BUTTON_OK | MB_ICON_ERROR );
-    }
-    CVector2D ScreenSize(Viewport.Width,Viewport.Height);
-
-    // If we use the dynamic background
-    if ( !m_bStaticBackground )
-    {
-        // Recreate the render target
-        m_pRenderTarget = m_pManager->CreateTexture ();
-        m_pRenderTarget ->CreateTexture ( ScreenSize.fX, ScreenSize.fY );
-        m_pBackground->LoadFromTexture ( m_pRenderTarget );
-
-        // Notify the scene class
-        if ( m_pMainMenuScene )
-            m_pMainMenuScene->OnRestore ( pDevice, ScreenSize, m_pRenderTarget->GetD3DTexture () );
-    }
-}
-
-
-bool CMainMenu::OnItemEnter ( CGUIElement* pElement )
-{
-    // If we're not fading, and if the element is enabled
-    if ( m_ucFade == FADE_VISIBLE && reinterpret_cast < int > ( pElement->GetUserData() ) == ITEM_ENABLED )
-        pElement->SetAlpha ( 0.8f );
-    return true;
-}
-
-
-bool CMainMenu::OnItemLeave ( CGUIElement* pElement )
-{
-    // If we're not fading, and if the element is enabled
-    if ( m_ucFade == FADE_VISIBLE && reinterpret_cast < int > ( pElement->GetUserData() ) == ITEM_ENABLED )
-        pElement->SetAlpha ( 1.0f );
-    return true;
-}
-
-
-void CMainMenu::CreateItem ( unsigned int uiIndex, CVector2D vecPosition, const char *szText, GUI_CALLBACK pHandler )
-{
-    CGUILabel * pItem = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pBackground, szText ) );
-    CGUILabel * pItemShadow = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pBackground, szText ) );
-
-    // Set the position, font face and size
-    pItem->SetPosition ( vecPosition );
-    //pItem->SetSize ( CVector2D ( 200, 64 ) );
-    pItem->SetFont ( "sans" );
-    pItem->AutoSize ( szText );
-    //pItem->BringToFront ();
-    pItem->SetAlwaysOnTop ( true );
-    pItem->SetVisible ( false );
-    pItem->SetAlpha ( 0 );
-
-    // Set the text color to white
-    pItem->SetTextColor ( 255, 255, 255 );
-
-    // Set the handlers
-    pItem->SetClickHandler ( pHandler );
-    pItem->SetMouseEnterHandler ( GUI_CALLBACK ( &CMainMenu::OnItemEnter, this ) );
-    pItem->SetMouseLeaveHandler ( GUI_CALLBACK ( &CMainMenu::OnItemLeave, this ) );
-
-    // Store the item in the array
-    m_pItems[uiIndex] = pItem;
-    m_pItemShadows[uiIndex] = pItemShadow;
-    m_uiItems++;
-
-    // Enable the item
-    EnableItem ( uiIndex );
-}
-
-
-void CMainMenu::SetStaticBackground ( bool bEnabled )
-{
-    if ( !m_bInitialized && bEnabled == m_bStaticBackground ) return;
-
-    if ( bEnabled ) {
-        // If we're initialized, we can load the background straight away
-        if ( m_bInitialized ) {
-            // Enable the static background
-            m_pBackground->LoadFromFile ( CORE_MTA_STATIC_BG );
-            m_pBackground->SetAlwaysOnTop ( true );
-            m_pBackground->MoveToBack ();   // ChrML: Put it on top, but move it to the back of the "always on top" order
+        // Use OutQuad equation for easing, or OutQuad for unhovering
+        fProgress = bHovering ? -fProgress*(fProgress-2) : fProgress*fProgress;
         
-            // Destroy the dynamic scene
-            m_pMainMenuScene->Destroy3DScene ();
+        // Work out the target scale
+		float fTargetScale = (CORE_MTA_HOVER_SCALE-CORE_MTA_NORMAL_SCALE)*(fProgress) + CORE_MTA_NORMAL_SCALE;
+		
+		// Work out our current progress based upon the alpha value now
+		pItem->image->SetAlpha ( (CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA)*(fProgress) + CORE_MTA_NORMAL_ALPHA );
+		
+        int iSizeX = (pItem->nativeSizeX/NATIVE_RES_X)*m_iMenuSizeX*fTargetScale;
+        int iSizeY = (pItem->nativeSizeY/NATIVE_RES_Y)*m_iMenuSizeY*fTargetScale;
 
-            // Destroy the render target as we don't need it anymore
-            if ( m_pRenderTarget ) {
-                delete m_pRenderTarget;
-                m_pRenderTarget = NULL;
-            }
-        } // Otherwise, Update will handle it on initialisation
-    } else {
-        // Enable the dynamic scene (force reinitialisation in Update)
-        m_bInitialized = false;
-    }
-    m_bStaticBackground = bEnabled;
+        // Aligned to the left horizontally, aligned to the centre vertically
+        int iPosX = pItem->drawPositionX;
+        int iPosY = (pItem->drawPositionY) - (iSizeY*0.5);
+		
+        pItem->image->SetPosition ( CVector2D(iPosX, iPosY), false );
+        pItem->image->SetSize ( CVector2D(iSizeX, iSizeY), false );    
 
-    // And disable the dynamic scene option (if we're not ingame, cause that means Init3DScene has failed)
-    if (!m_bIsIngame) {
-        DWORD dwSelect = (DWORD) !m_bStaticBackground;
-        int iMenuOptions;
-        CVARS_GET ( "menu_options", iMenuOptions );
-        CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_DYNAMIC ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_DYNAMIC )) );
-    }
+        //Return whether the hovering has maxed out
+        return bHovering ? (fProgress == 1) : (fProgress == 0);
 }
-
-
-void CMainMenu::EnableItem ( unsigned int uiIndex )
-{
-    if ( m_pItems[uiIndex] ) {
-        m_pItems[uiIndex]->SetUserData ( reinterpret_cast < void* > ( ITEM_ENABLED ) );
-        m_pItems[uiIndex]->SetEnabled ( true );
-
-        // Always show
-        m_pItems[uiIndex]->SetVisible ( true );
-        m_pItemShadows[uiIndex]->SetVisible ( true );
-    }
-}
-
-
-void CMainMenu::DisableItem ( unsigned int uiIndex, bool bHide )
-{
-    if ( m_pItems[uiIndex] ) {
-        m_pItems[uiIndex]->SetEnabled ( false );
-
-        // Hide if needed
-        if ( bHide ) {
-            m_pItems[uiIndex]->SetVisible ( false );
-            m_pItemShadows[uiIndex]->SetVisible ( false );
-            m_pItems[uiIndex]->SetUserData ( reinterpret_cast < void* > ( ITEM_HIDDEN ) );
-        } else {
-            m_pItems[uiIndex]->SetUserData ( reinterpret_cast < void* > ( ITEM_DISABLED ) );
-        }
-    }
-}
-
-void CMainMenu::SetItemPosition ( unsigned int uiIndex, CVector2D vecPosition, bool bRight )
-{
-    if ( m_pItems[uiIndex] ) 
-    {
-        CGUILabel* pItem = m_pItems [ uiIndex ];
-        CGUILabel* pItemShadow = m_pItemShadows [ uiIndex ];
-
-        if ( bRight )
-            pItem->SetPosition ( CVector2D ( m_pManager->GetResolution ().fX - pItem->GetTextExtent () - vecPosition.fX, vecPosition.fY ) );
-        else
-            pItem->SetPosition ( vecPosition );
-
-        // Update shadow
-        pItemShadow->SetText ( pItem->GetText ().c_str () );
-        pItemShadow->SetPosition ( pItem->GetPosition () + CVector2D ( 1, 1 ) );
-        pItemShadow->SetSize ( pItem->GetSize () );
-        pItemShadow->SetFont ( pItem->GetFont ().c_str () );
-        pItemShadow->SetAlwaysOnTop ( !pItem->IsAlwaysOnTop () );
-        pItem->SetAlwaysOnTop ( !pItem->IsAlwaysOnTop () );
-        pItemShadow->SetAlwaysOnTop ( pItem->IsAlwaysOnTop () );
-        pItem->SetAlwaysOnTop ( pItem->IsAlwaysOnTop () );
-        pItemShadow->BringToFront ();
-        pItem->BringToFront ();
-        pItemShadow->SetVisible ( pItem->IsVisible () );
-        pItemShadow->SetAlpha ( pItem->GetAlpha () );
-
-        // Set the text color to black
-        pItemShadow->SetTextColor ( 0, 0, 0 );
-    }
-}
-
-
-
-void CMainMenu::LoadMenuOptions ( void )
-{
-    // Force all 3D scene options off
-    CVARS_SET ( "menu_options", 0 );
-
-    int iMenuOptions;
-    CVARS_GET ( "menu_options", iMenuOptions );
-    
-    // Reload the menu options, in case they have changed
-    SetStaticBackground                            ( !(iMenuOptions & eMenuOptions::MENU_DYNAMIC) );            // Dynamic or static
-    if ( !m_bStaticBackground ) {
-        m_pMainMenuScene->SetPostProcessingEnabled ( (iMenuOptions & eMenuOptions::MENU_POSTEFFECTS_ENABLED) > 0 );   // Post-effects
-    }
-}
-
 
 void CMainMenu::ChangeCommunityState ( bool bIn, const std::string& strUsername )
 {
@@ -932,26 +904,22 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bI
     if ( iIndex < 0 || iIndex > 2 )
         return;
 
+    m_pLatestNews->SetVisible(true);
+
     // Headline
-    CGUILabel* pItem = m_pItems[ MENU_ITEM_NEWS_ITEM_1 + iIndex ];
+    CGUILabel* pItem = m_pNewsItemLabels[ iIndex ];
+    CGUILabel* pItemShadow = m_pNewsItemShadowLabels[ iIndex ];
     SColor color = headlineColors[ iIndex ];
     pItem->SetTextColor ( color.R, color.G, color.B );
     pItem->SetText ( strContent );
-    pItem->AutoSize ( strContent );
+    pItemShadow->SetText ( strContent );
+
+    // Set our Date labels
+    CGUILabel* pItemDate = m_pNewsItemDateLabels[ iIndex ];
+    pItemDate->SetText ( "2012-12-21" );
 
     // 'NEW' sticker
-    CGUILabel* pNewLabel = m_pNewLabels[ iIndex ];
+    CGUILabel* pNewLabel = m_pNewsItemNEWLabels[ iIndex ];
     pNewLabel->SetVisible ( bIsNew );
-    pNewLabel->SetPosition ( CVector2D ( m_pManager->GetResolution ().fX - CORE_MTA_MENUITEMS_START_X + 5, pItem->GetPosition ().fY - 4 ) );
-
-    // Hide NEWS label if top item is blank
-    if ( iIndex == 0 )
-    {
-        if ( strContent.empty () )
-            DisableItem ( MENU_ITEM_NEWS, true );
-        else
-            EnableItem ( MENU_ITEM_NEWS );
-    }
-
-    RefreshPositions ();
+    pNewLabel->SetPosition ( CVector2D ( pItem->GetPosition ().fX + 4, pItem->GetPosition ().fY - 4 ) );
 }

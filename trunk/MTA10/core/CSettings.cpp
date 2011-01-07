@@ -486,27 +486,6 @@ CSettings::CSettings ( void )
     m_pVideoRenderingLabel->AutoSize ( "Menu rendering options  " );
     m_pVideoRenderingLabel->SetFont ( "default-bold-small" );
 
-    m_pCheckBoxMenuDynamic = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Dynamic scene rendering", true ) );
-    m_pCheckBoxMenuDynamic->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
-    m_pCheckBoxMenuDynamic->SetSize ( CVector2D ( 174.0f, 16.0f ) );
-    m_pCheckBoxMenuDynamic->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_DYNAMIC );
-
-    m_pCheckBoxMenuVideo = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Video surface rendering", true ) );
-    m_pCheckBoxMenuVideo->SetPosition ( CVector2D ( vecTemp.fX + 200.0f, vecTemp.fY ) );
-    m_pCheckBoxMenuVideo->SetSize ( CVector2D ( 174.0f, 20.0f ) );
-    m_pCheckBoxMenuVideo->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_VIDEO );
-
-    m_pCheckBoxMenuPostEffects = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "PS2.0 post-effects", true ) );
-    m_pCheckBoxMenuPostEffects->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 16 ) );
-    m_pCheckBoxMenuPostEffects->SetSize ( CVector2D ( 174.0f, 16.0f ) );
-    m_pCheckBoxMenuPostEffects->SetUserData ( (void*) eCheckBox::CHECKBOX_MENU_POSTEFFECTS );
-
-    // Hide options relating to the 3D scene
-    m_pVideoRenderingLabel->SetVisible ( false );
-    m_pCheckBoxMenuDynamic->SetVisible ( false );
-    m_pCheckBoxMenuVideo->SetVisible ( false );
-    m_pCheckBoxMenuPostEffects->SetVisible ( false );
-
     m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pFXQualityLabel->GetPosition ( vecTemp, false );
@@ -796,9 +775,6 @@ CSettings::CSettings ( void )
     m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
     m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
     m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnRegisterButtonClick, this ) );
-    m_pCheckBoxMenuDynamic->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
-    m_pCheckBoxMenuVideo->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
-    m_pCheckBoxMenuPostEffects->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCheckBoxClick, this ) );
     m_pChatLoadPreset->SetClickHandler ( GUI_CALLBACK( &CSettings::OnChatLoadPresetClick, this ) );
     m_pMapAlpha->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMapAlphaChanged, this ) );
     m_pAudioRadioVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnRadioVolumeChanged, this ) );
@@ -840,17 +816,6 @@ void CSettings::Update ( void )
 {
     // Once each 30 frames
     if ( m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL ) {
-        // Check if any of the settings have been changed by core
-        int iMenuOptions;
-        CVARS_GET ( "menu_options", iMenuOptions );
-        bool bCompare = false;
-
-        bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_DYNAMIC) > 0;
-        if ( m_pCheckBoxMenuDynamic->GetSelected () != bCompare )       m_pCheckBoxMenuDynamic->SetSelected ( bCompare );
-        bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED) > 0;
-        if ( m_pCheckBoxMenuVideo->GetSelected () != bCompare )         m_pCheckBoxMenuVideo->SetSelected ( bCompare );
-        bCompare = (iMenuOptions & CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED) > 0;
-        if ( m_pCheckBoxMenuPostEffects->GetSelected () != bCompare )   m_pCheckBoxMenuPostEffects->SetSelected ( bCompare );
 
         UpdateJoypadTab ();
 
@@ -1623,50 +1588,6 @@ void CSettings::SetVisible ( bool bVisible )
 bool CSettings::IsVisible ( void )
 {
     return m_pWindow->IsVisible ();
-}
-
-
-bool CSettings::OnCheckBoxClick ( CGUIElement* pElement )
-{
-    // Can't cast directly to CGUICheckBox (or check for matching pointers),
-    // because the vtables don't align (pElement is off by +4).
-    // So use eCheckBox.
-
-    eCheckBox CheckBoxId = (eCheckBox) reinterpret_cast < int > ( pElement->GetUserData () );
-
-    int iMenuOptions;
-    CVARS_GET ( "menu_options", iMenuOptions );
-
-    do {
-        // [Menu rendering options - Dynamic scene rendering]
-        if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_DYNAMIC ) {
-            DWORD dwSelect = (DWORD) m_pCheckBoxMenuDynamic->GetSelected ();
-            CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_DYNAMIC ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_DYNAMIC )) );
-            break;
-        }
-
-        // [Menu rendering options - Video surface rendering]
-        else if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_VIDEO ) {
-            DWORD dwSelect = (DWORD) m_pCheckBoxMenuVideo->GetSelected ();
-            CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_VIDEO_ENABLED )) );
-            break;
-        }
-
-        // [Menu rendering options - PS2.0 post-effects]
-        else if ( CheckBoxId == eCheckBox::CHECKBOX_MENU_POSTEFFECTS ) {
-            DWORD dwSelect = (DWORD) m_pCheckBoxMenuPostEffects->GetSelected ();
-            CVARS_SET ( "menu_options", (unsigned int)(( iMenuOptions & ~CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED ) | ( dwSelect * CMainMenu::eMenuOptions::MENU_POSTEFFECTS_ENABLED )) );
-            break;
-        }
-
-        // No valid candidates
-        return false;
-    } while ( false );
-
-    // Let the menu load the new values
-    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->LoadMenuOptions ();
-
-    return true;
 }
 
 
