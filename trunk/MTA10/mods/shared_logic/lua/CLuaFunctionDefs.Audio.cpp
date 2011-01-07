@@ -588,10 +588,10 @@ int CLuaFunctionDefs::PlaySoundFrontEnd ( lua_State* luaVM )
     int iArgument1 = lua_type ( luaVM, 1 );
     if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
     {
-        unsigned long ulSound = static_cast < unsigned long > ( lua_tonumber ( luaVM, 1 ) );
-        if ( ulSound <= 101 )
+        unsigned char ucSound = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+        if ( ucSound <= 101 )
         {
-            if ( CStaticFunctionDefinitions::PlaySoundFrontEnd ( ulSound ) )
+            if ( CStaticFunctionDefinitions::PlaySoundFrontEnd ( ucSound ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

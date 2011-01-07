@@ -6215,10 +6215,10 @@ bool CStaticFunctionDefinitions::CreateFire ( const CVector& vecPosition, float 
 }
 
 
-bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( CElement* pElement, unsigned long ulSound )
+bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( CElement* pElement, unsigned char ucSound )
 {
     assert ( pElement );
-    RUN_CHILDREN PlaySoundFrontEnd ( *iter, ulSound );
+    RUN_CHILDREN PlaySoundFrontEnd ( *iter, ucSound );
 
     if ( IS_PLAYER ( pElement ) )
     {
@@ -6226,8 +6226,11 @@ bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( CElement* pElement, unsigne
 
         // Tell them to play a sound
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( (unsigned char) AUDIO_FRONTEND );
-        BitStream.pBitStream->Write ( ulSound );
+//      BitStream.pBitStream->Write ( (unsigned char) AUDIO_FRONTEND );
+
+        SIntegerSync < unsigned char, 7 > sound ( ucSound );
+        BitStream.pBitStream->Write ( &sound );
+
         pPlayer->Send ( CLuaPacket ( PLAY_SOUND, *BitStream.pBitStream ) );
     }
 

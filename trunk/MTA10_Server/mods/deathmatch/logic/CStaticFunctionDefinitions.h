@@ -393,7 +393,7 @@ public:
     static bool                 CreateFire                          ( const CVector& vecPosition, float fSize, CElement* pElement );
 
     // Audio funcs
-    static bool                 PlaySoundFrontEnd                   ( CElement* pElement, unsigned long ulSound );
+    static bool                 PlaySoundFrontEnd                   ( CElement* pElement, unsigned char ucSound );
     static bool                 PlayMissionAudio                    ( CElement* pElement, CVector* vecPosition, unsigned short usSlot );
     static bool                 PreloadMissionAudio                 ( CElement* pElement, unsigned short usAudio, unsigned short usSlot );
 

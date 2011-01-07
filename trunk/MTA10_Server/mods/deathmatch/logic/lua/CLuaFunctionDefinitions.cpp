@@ -7470,11 +7470,11 @@ int CLuaFunctionDefinitions::PlaySoundFrontEnd ( lua_State* luaVM )
         CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
         {
-            unsigned long ulSound = static_cast < unsigned long > ( lua_tonumber ( luaVM, 2 ) );
+            unsigned char ucSound = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
 
-            if ( ulSound <= 101 )
+            if ( ucSound <= 101 )
             {
-                if ( CStaticFunctionDefinitions::PlaySoundFrontEnd ( pElement, ulSound ) )
+                if ( CStaticFunctionDefinitions::PlaySoundFrontEnd ( pElement, ucSound ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
