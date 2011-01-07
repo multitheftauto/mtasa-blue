@@ -633,21 +633,25 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                     // Turn our event window into an editbox
                     CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );
 
-                    // Get the text from the editbox
-                    size_t sizeSelectionStart = WndEdit->getSelectionStartIndex ();
-                    size_t sizeSelectionLength = WndEdit->getSelectionLength ();
-                    strTemp = WndEdit->getText ().substr ( sizeSelectionStart, sizeSelectionLength );
-
-                    // If the user cut, remove the text too
-                    if ( KeyboardArgs.scancode == CEGUI::Key::Scan::X )
+                    // Don't allow cutting/copying if the editbox is masked
+                    if ( !WndEdit->isTextMasked () )
                     {
-                        // Read only?
-                        if ( !WndEdit->isReadOnly () )
+                        // Get the text from the editbox
+                        size_t sizeSelectionStart = WndEdit->getSelectionStartIndex ();
+                        size_t sizeSelectionLength = WndEdit->getSelectionLength ();
+                        strTemp = WndEdit->getText ().substr ( sizeSelectionStart, sizeSelectionLength );
+
+                        // If the user cut, remove the text too
+                        if ( KeyboardArgs.scancode == CEGUI::Key::Scan::X )
                         {
-                            // Remove the text from the source
-                            CEGUI::String strTemp2 = WndEdit->getText ();
-                            strTemp2.replace ( sizeSelectionStart, sizeSelectionLength, "", 0 );
-                            WndEdit->setText ( strTemp2 );
+                            // Read only?
+                            if ( !WndEdit->isReadOnly () )
+                            {
+                                // Remove the text from the source
+                                CEGUI::String strTemp2 = WndEdit->getText ();
+                                strTemp2.replace ( sizeSelectionStart, sizeSelectionLength, "", 0 );
+                                WndEdit->setText ( strTemp2 );
+                            }
                         }
                     }
                 }
