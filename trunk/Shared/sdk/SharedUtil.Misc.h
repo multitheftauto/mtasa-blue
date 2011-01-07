@@ -432,7 +432,7 @@ namespace SharedUtil
     //
     // ID 'stack'
     //
-    // Note: IDs run (and must run) from 1 to Capacity
+    // Note: IDs run from 1 to Capacity
     //
     template < typename T, unsigned long INITIAL_MAX_STACK_SIZE, T INVALID_STACK_ID >
     class CStack
@@ -451,7 +451,7 @@ namespace SharedUtil
 
         unsigned long GetUnusedAmount ( void ) const
         {
-            return m_Stack.size ();
+            return m_Queue.size ();
         }
 
         void ExpandBy ( unsigned long ulAmount )
@@ -460,9 +460,9 @@ namespace SharedUtil
             const unsigned long ulNewSize = m_ulCapacity + ulAmount;
 
             // Add ID's for new items
-            for ( T ID = ulNewSize; ID > ulOldSize; --ID )
+            for ( T ID = ulOldSize + 1; ID <= ulNewSize; ++ID )
             {
-                m_Stack.push_back( ID );
+                m_Queue.push_front( ID );
             }
             m_ulCapacity = ulNewSize;
         }
@@ -470,10 +470,10 @@ namespace SharedUtil
         T Pop ( void )
         {
             // Got any items? Pop from the back
-            if ( m_Stack.size () > 0 )
+            if ( m_Queue.size () > 0 )
             {
-                T ID = m_Stack.back();
-                m_Stack.pop_back ();
+                T ID = m_Queue.back();
+                m_Queue.pop_back ();
                 return ID;
             }
 
@@ -483,15 +483,15 @@ namespace SharedUtil
 
         void Push ( T ID )
         {
-            assert ( m_Stack.size () < m_ulCapacity );
+            assert ( m_Queue.size () < m_ulCapacity );
             assert ( ID != INVALID_STACK_ID );
             // Push to the front
-            return m_Stack.push_back ( ID );
+            return m_Queue.push_front ( ID );
         }
 
     private:
         unsigned long       m_ulCapacity;
-        std::vector < T >   m_Stack;
+        std::deque < T >    m_Queue;
     };
 
 
