@@ -27,7 +27,7 @@
 // Allow 100k server elements and 100k client elements
 #define MAX_SERVER_ELEMENTS 100000
 #define MAX_CLIENT_ELEMENTS 100000
-typedef unsigned long ElementID;
+typedef unsigned int ElementID;
 
 // Event name characteristics
 #define MAX_EVENT_NAME_LENGTH 512
