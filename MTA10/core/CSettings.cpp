@@ -481,11 +481,6 @@ CSettings::CSettings ( void )
     m_pBrightnessValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
     m_pBrightnessValueLabel->AutoSize ( "100% " );
 
-    m_pVideoRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Menu rendering options" ) );
-    m_pVideoRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
-    m_pVideoRenderingLabel->AutoSize ( "Menu rendering options  " );
-    m_pVideoRenderingLabel->SetFont ( "default-bold-small" );
-
     m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pFXQualityLabel->GetPosition ( vecTemp, false );
