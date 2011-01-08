@@ -115,6 +115,8 @@ CPPFLAGS="$save_CPPFLAGS"
 PKG_CHECK_MODULES([SQLITE3], [sqlite3])
 
 # curses (for MTA10_Server/{core,sdk})
+AC_ARG_VAR([CURSES_LIB], [linker flags for curses])
+
 AX_WITH_CURSES
 
 if test "x$ax_cv_ncursesw" != "xyes" ; then
