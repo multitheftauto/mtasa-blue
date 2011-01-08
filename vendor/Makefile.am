@@ -1,6 +1,10 @@
-if WANT_IRCBOTS
+if WANT_PCRE
 PCRE_DIR = pcre
 endif
 
-SUBDIRS = tinyxml $(PCRE_DIR) pme ehs json-c lua sparsehash/current
+if WANT_SPARSEHASH
+SPARSEHASH_DIR = sparsehash/current
+endif
+
+SUBDIRS = tinyxml $(PCRE_DIR) pme ehs json-c lua $(SPARSEHASH_DIR)
 
