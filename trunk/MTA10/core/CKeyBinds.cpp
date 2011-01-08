@@ -1775,12 +1775,9 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage ( UINT uMsg, WPARAM wParam
     if ( IsFakeCtrl_L ( uMsg, wParam, lParam ) )
         return NULL;
 
-    /* lil_Toady: Not sure who added this and why, commented out for a test,
-                  as shift must be bindable
     if ( wParam == 0x10 &&
          ( uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP ) )
         return NULL;
-    */
 
     bool bFirstHit = ( lParam & 0x40000000 ) ? false:true;
     if ( uMsg == WM_MBUTTONDOWN || uMsg == WM_MBUTTONUP || uMsg == WM_XBUTTONDOWN ||
@@ -2044,26 +2041,29 @@ void CKeyBinds::DoPreFramePulse ( void )
     }
 
     // HACK: shift keys
-    bool bLeftShift = ( GetAsyncKeyState ( VK_LSHIFT ) & 0x8000 ) != 0;
-    bool bRightShift = ( GetAsyncKeyState ( VK_RSHIFT ) & 0x8000 ) != 0;
-
-    if ( bLeftShift != bPreLeftShift )
+    if ( m_pCore->IsFocused () )
     {
-        if ( bLeftShift )
-            ProcessKeyStroke ( &g_bkKeys [ 9 ], true );
-        else
-            ProcessKeyStroke ( &g_bkKeys [ 9 ], false );
+        bool bLeftShift = ( GetKeyState ( VK_LSHIFT ) & 0x8000 ) != 0;
+        bool bRightShift = ( GetKeyState ( VK_RSHIFT ) & 0x8000 ) != 0;
 
-        bPreLeftShift = bLeftShift;
-    }
-    if ( bRightShift != bPreRightShift )
-    {
-        if ( bRightShift )
-            ProcessKeyStroke ( &g_bkKeys [ 10 ], true );
-        else
-            ProcessKeyStroke ( &g_bkKeys [ 10 ], false );
+        if ( bLeftShift != bPreLeftShift )
+        {
+            if ( bLeftShift )
+                ProcessKeyStroke ( &g_bkKeys [ 9 ], true );
+            else
+                ProcessKeyStroke ( &g_bkKeys [ 9 ], false );
 
-        bPreRightShift = bRightShift;
+            bPreLeftShift = bLeftShift;
+        }
+        if ( bRightShift != bPreRightShift )
+        {
+            if ( bRightShift )
+                ProcessKeyStroke ( &g_bkKeys [ 10 ], true );
+            else
+                ProcessKeyStroke ( &g_bkKeys [ 10 ], false );
+
+            bPreRightShift = bRightShift;
+        }
     }
 }
 
