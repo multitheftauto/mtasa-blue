@@ -115,6 +115,7 @@ public:
     void            ApplyHandlingData               ( CHandlingEntry* pData );
 
     // Get functions
+    tHandlingData   GetHandlingData                 ( void )          { return m_Handling; };
     float           GetMass                         ( void ) const    { return m_Handling.fMass; };
     float           GetTurnMass                     ( void ) const    { return m_Handling.fTurnMass; };
     float           GetDragCoeff                    ( void ) const    { return m_Handling.fDragCoeff; };

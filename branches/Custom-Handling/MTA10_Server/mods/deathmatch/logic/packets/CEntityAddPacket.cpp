@@ -415,42 +415,49 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         BitStream.WriteBit ( false );
 
                     // Write handling
-                    SVehicleHandlingSync handling;
-                    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
-                    handling.data.fMass                         = pEntry->GetMass ();
-                    handling.data.fTurnMass                     = pEntry->GetTurnMass ();
-                    handling.data.fDragCoeff                    = pEntry->GetDragCoeff ();
-                    handling.data.vecCenterOfMass               = pEntry->GetCenterOfMass ();
-                    handling.data.uiPercentSubmerged            = pEntry->GetPercentSubmerged ();
-                    handling.data.fTractionMultiplier           = pEntry->GetTractionMultiplier ();
-                    handling.data.ucDriveType                   = pEntry->GetCarDriveType ();
-                    handling.data.ucEngineType                  = pEntry->GetCarEngineType ();
-                    handling.data.ucNumberOfGears               = pEntry->GetNumberOfGears ();
-                    handling.data.fEngineAcceleration          = pEntry->GetEngineAcceleration ();
-                    handling.data.fEngineInertia                = pEntry->GetEngineInertia ();
-                    handling.data.fMaxVelocity                  = pEntry->GetMaxVelocity ();
-                    handling.data.fBrakeDeceleration           = pEntry->GetBrakeDeceleration ();
-                    handling.data.fBrakeBias                    = pEntry->GetBrakeBias ();
-                    handling.data.ucABS                         = pEntry->GetABS () ? 1 : 0;
-                    handling.data.fSteeringLock                 = pEntry->GetSteeringLock ();
-                    handling.data.fTractionLoss                 = pEntry->GetTractionLoss ();
-                    handling.data.fTractionBias                 = pEntry->GetTractionBias ();
-                    handling.data.fSuspensionForceLevel         = pEntry->GetSuspensionForceLevel ();
-                    handling.data.fSuspensionDamping            = pEntry->GetSuspensionDamping ();
-                    handling.data.fSuspensionHighSpdDamping     = pEntry->GetSuspensionHighSpeedDamping ();
-                    handling.data.fSuspensionUpperLimit         = pEntry->GetSuspensionUpperLimit ();
-                    handling.data.fSuspensionLowerLimit         = pEntry->GetSuspensionLowerLimit ();
-                    handling.data.fSuspensionFrontRearBias      = pEntry->GetSuspensionFrontRearBias ();
-                    handling.data.fSuspensionAntidiveMultiplier = pEntry->GetSuspensionAntidiveMultiplier ();
-                    handling.data.fCollisionDamageMultiplier    = pEntry->GetCollisionDamageMultiplier ();
-                    handling.data.uiModelFlags                  = pEntry->GetModelFlags ();
-                    handling.data.uiHandlingFlags               = pEntry->GetHandlingFlags ();
-                    handling.data.fSeatOffsetDistance           = pEntry->GetSeatOffsetDistance ();
-                    handling.data.uiMonetary                    = pEntry->GetMonetary ();
-                    handling.data.ucHeadLight                   = pEntry->GetHeadLight ();
-                    handling.data.ucTailLight                   = pEntry->GetTailLight ();
-                    handling.data.ucAnimGroup                   = pEntry->GetAnimGroup ();
-                    BitStream.Write ( &handling );
+                    if ( g_pGame->GetHandlingManager()->HasModelHandlingChanged ( static_cast < eVehicleTypes > ( pVehicle->GetModel() ) ) )
+                    {
+                        BitStream.WriteBit ( true );
+                        SVehicleHandlingSync handling;
+                        CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+
+                        handling.data.fMass                         = pEntry->GetMass ();
+                        handling.data.fTurnMass                     = pEntry->GetTurnMass ();
+                        handling.data.fDragCoeff                    = pEntry->GetDragCoeff ();
+                        handling.data.vecCenterOfMass               = pEntry->GetCenterOfMass ();
+                        handling.data.uiPercentSubmerged            = pEntry->GetPercentSubmerged ();
+                        handling.data.fTractionMultiplier           = pEntry->GetTractionMultiplier ();
+                        handling.data.ucDriveType                   = pEntry->GetCarDriveType ();
+                        handling.data.ucEngineType                  = pEntry->GetCarEngineType ();
+                        handling.data.ucNumberOfGears               = pEntry->GetNumberOfGears ();
+                        handling.data.fEngineAcceleration          = pEntry->GetEngineAcceleration ();
+                        handling.data.fEngineInertia                = pEntry->GetEngineInertia ();
+                        handling.data.fMaxVelocity                  = pEntry->GetMaxVelocity ();
+                        handling.data.fBrakeDeceleration           = pEntry->GetBrakeDeceleration ();
+                        handling.data.fBrakeBias                    = pEntry->GetBrakeBias ();
+                        handling.data.ucABS                         = pEntry->GetABS () ? 1 : 0;
+                        handling.data.fSteeringLock                 = pEntry->GetSteeringLock ();
+                        handling.data.fTractionLoss                 = pEntry->GetTractionLoss ();
+                        handling.data.fTractionBias                 = pEntry->GetTractionBias ();
+                        handling.data.fSuspensionForceLevel         = pEntry->GetSuspensionForceLevel ();
+                        handling.data.fSuspensionDamping            = pEntry->GetSuspensionDamping ();
+                        handling.data.fSuspensionHighSpdDamping     = pEntry->GetSuspensionHighSpeedDamping ();
+                        handling.data.fSuspensionUpperLimit         = pEntry->GetSuspensionUpperLimit ();
+                        handling.data.fSuspensionLowerLimit         = pEntry->GetSuspensionLowerLimit ();
+                        handling.data.fSuspensionFrontRearBias      = pEntry->GetSuspensionFrontRearBias ();
+                        handling.data.fSuspensionAntidiveMultiplier = pEntry->GetSuspensionAntidiveMultiplier ();
+                        handling.data.fCollisionDamageMultiplier    = pEntry->GetCollisionDamageMultiplier ();
+                        handling.data.uiModelFlags                  = pEntry->GetModelFlags ();
+                        handling.data.uiHandlingFlags               = pEntry->GetHandlingFlags ();
+                        handling.data.fSeatOffsetDistance           = pEntry->GetSeatOffsetDistance ();
+                        handling.data.uiMonetary                    = pEntry->GetMonetary ();
+                        handling.data.ucHeadLight                   = pEntry->GetHeadLight ();
+                        handling.data.ucTailLight                   = pEntry->GetTailLight ();
+                        handling.data.ucAnimGroup                   = pEntry->GetAnimGroup ();
+                        BitStream.Write ( &handling );
+                    }
+                    else
+                        BitStream.WriteBit ( false );
 
                     break;
                 }                

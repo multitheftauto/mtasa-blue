@@ -33,8 +33,10 @@ public:
 
     eHandlingTypes              GetHandlingID                   ( eVehicleTypes eModel );
 
-    // Helper function
+    // Helper functions
     eHandlingProperty           GetPropertyEnumFromName         ( std::string strName);
+    bool                        HasModelHandlingChanged         ( eVehicleTypes eModel);
+    void                        SetModelHandlingHasChanged      ( eVehicleTypes eModel, bool bChanged );
 
     std::map < std::string, eHandlingProperty > m_HandlingNames;
 private:
@@ -48,6 +50,8 @@ private:
 
     // Array with the model handling entries
     static CHandlingEntry*      m_pModelEntries [VT_MAX];
+
+    bool                        m_bModelHandlingChanged[VT_MAX];
 };
 
 #endif

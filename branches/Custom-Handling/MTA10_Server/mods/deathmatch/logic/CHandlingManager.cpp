@@ -150,6 +150,21 @@ eHandlingProperty CHandlingManager::GetPropertyEnumFromName ( std::string strNam
     return HANDLING_MAX;
 }
 
+bool CHandlingManager::HasModelHandlingChanged ( eVehicleTypes eModel )
+{
+    // Within range?
+    if ( eModel >= 400 && eModel < VT_MAX )
+    {
+        return m_bModelHandlingChanged[eModel];
+    }
+    return false;
+}
+
+void CHandlingManager::SetModelHandlingHasChanged ( eVehicleTypes eModel, bool bChanged )
+{
+    m_bModelHandlingChanged[eModel] = bChanged;
+}
+
 
 // Return the handling manager id
 eHandlingTypes  CHandlingManager::GetHandlingID ( eVehicleTypes eModel )

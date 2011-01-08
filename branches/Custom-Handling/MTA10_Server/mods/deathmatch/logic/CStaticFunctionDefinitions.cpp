@@ -4318,7 +4318,10 @@ bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandl
     if ( pEntry )
     {
         if ( SetEntryHandling ( pEntry, eProperty, fValue ) )
+        {
+            g_pGame->GetHandlingManager()->SetModelHandlingHasChanged ( eModel, true );
             return true;
+        }
     }
 
     return false;
@@ -4331,7 +4334,10 @@ bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandl
     if ( pEntry )
     {
         if ( SetEntryHandling ( pEntry, eProperty, vecValue ) )
+        {
+            g_pGame->GetHandlingManager()->SetModelHandlingHasChanged ( eModel, true );
             return true;
+        }
     }
     return false;
 }
@@ -4343,7 +4349,10 @@ bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandl
     {
         unsigned char ucChar;
         if ( SetEntryHandling ( pEntry, eProperty, strValue, ucChar ) )
+        {
+            g_pGame->GetHandlingManager()->SetModelHandlingHasChanged ( eModel, true );
             return true;
+        }
     }
 
     return false;
@@ -4355,7 +4364,10 @@ bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandl
     if ( pEntry )
     {
         if ( SetEntryHandling ( pEntry, eProperty, ucValue ) )
+        {
+            g_pGame->GetHandlingManager()->SetModelHandlingHasChanged ( eModel, true );
             return true;
+        }
     }
 
     return false;
@@ -4367,7 +4379,10 @@ bool CStaticFunctionDefinitions::SetModelHandling ( eVehicleTypes eModel, eHandl
     if ( pEntry )
     {
         if ( SetEntryHandling ( pEntry, eProperty, uiValue ) )
+        {
+            g_pGame->GetHandlingManager()->SetModelHandlingHasChanged ( eModel, true );
             return true;
+        }
     }
 
     return false;
