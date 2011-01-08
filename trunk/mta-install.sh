@@ -29,8 +29,10 @@ if [ -f "mtasa-1.1-custom-net-linux.tar.gz" ]; then
 fi
 
 if [ "$(which wget)" ]; then
-  wget http://mtasa-blue.googlecode.com/files/mtasa-1.1-custom-net-linux.tar.gz 
-  tar -x -z -f mtasa-1.1-custom-net-linux.tar.gz
+  wget http://nightly.mtasa.com/?multitheftauto_linux-1.1-latest -O multitheftauto_linux-1.1-latest.tar.gz
+  tar -xzf multitheftauto_linux-1.1-latest.tar.gz --transform 's:[^/]*:latest_nightly:'
+  mv latest_nightly/net.so .
+  rm -rf latest_nightly multitheftauto_linux-1.1-latest.tar.gz
 else
   echo "Warning: Please download net.so from http://mtasa-blue.googlecode.com/files/mtasa-1.1-custom-net-linux.tar.gz"
 fi
