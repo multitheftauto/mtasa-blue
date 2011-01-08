@@ -458,7 +458,8 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     nPing = m_ElapsedTime.Get ();
 
     // Parse relevant data
-    std::string strTemp;
+    SString strTemp;
+    SString strMapTemp;
     unsigned int i = 4;
 
     // IP
@@ -489,10 +490,10 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
         strGameMode = strTemp;
 
     // Map name
-    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
+    if ( !ReadString ( strMapTemp, szBuffer, i, nLength ) )
         return false;
     if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAP ) == false )
-        strMap = strTemp;
+        strMap = strMapTemp;
 
     // Version
     if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
@@ -517,6 +518,20 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
 
     if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAX_PLAYER_COUNT ) == false )
         nMaxPlayers = (unsigned char)szBuffer[i++];
+
+    // Recover large player count if present
+    SString strPlayerCount = strMapTemp.Right ( strMapTemp.length () - strlen ( strMapTemp ) - 1 );
+    if ( !strPlayerCount.empty () )
+    {
+        SString strJoinedPlayers, strMaxPlayers;
+        if ( strPlayerCount.Split ( "/", &strJoinedPlayers, &strMaxPlayers ) )
+        {
+            if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_COUNT ) == false )
+                nPlayers = atoi ( strJoinedPlayers );
+            if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAX_PLAYER_COUNT ) == false )
+                nMaxPlayers = atoi ( strMaxPlayers );
+        }
+    }
 
     // Get player nicks
     vecPlayers.clear ();
