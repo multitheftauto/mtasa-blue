@@ -115,30 +115,11 @@ CPPFLAGS="$save_CPPFLAGS"
 PKG_CHECK_MODULES([SQLITE3], [sqlite3])
 
 # curses (for MTA10_Server/{core,sdk})
-AC_ARG_VAR([CURSES_CFLAGS], [C compiler flags for curses])
-AC_ARG_VAR([CURSES_LIBS], [linker flags for curses])
+AX_WITH_CURSES
 
-save_CPPFLAGS="$CPPFLAGS"
-save_LIBS="$LIBS"
-CPPFLAGS="$CPPFLAGS $CURSES_CFLAGS"
-LIBS="$LIBS $CURSES_LIBS"
-
-if test -z "$CURSES_CFLAGS" ; then
-	AC_CHECK_HEADER([ncursesw/curses.h],
-		[],
-		[AC_MSG_ERROR([can't find curses headers])])
+if test "x$ax_cv_ncursesw" != "xyes" ; then
+	AC_MSG_ERROR([can't find ncursesw])
 fi
-
-if test -z "$CURSES_LIBS" ; then
-	LIBS="${LIBS} -lncursesw"
-	AC_TRY_LINK([#include <ncurses.h>],
-		[chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr();],
-		[CURSES_LIBS=-lncursesw],
-		[AC_MSG_ERROR([can't find curses libraries])])
-fi
-
-CPPFLAGS="$save_CPPFLAGS"
-LIBS="$save_LIBS"
 
 # Checking for a 64-bit system
 AC_MSG_CHECKING([uname -m for detecting host operating system architecture])
