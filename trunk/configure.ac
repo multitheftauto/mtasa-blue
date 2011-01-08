@@ -215,11 +215,12 @@ AC_CONFIG_SUBDIRS([vendor/json-c])
 if test "x$HAVE_BUNDLED_SPARSEHASH" = "xyes" ; then
 	AC_CONFIG_SUBDIRS([vendor/sparsehash/current])
 fi
+AM_CONDITIONAL([WANT_SPARSEHASH], [test "x$HAVE_BUNDLED_SPARSEHASH" = "xyes"])
 
 if test "x$HAVE_BUNDLED_PCRE" = "xyes" ; then
 	AC_CONFIG_SUBDIRS([vendor/pcre])
 fi
-AM_CONDITIONAL([WANT_PCRE], [test "x$HAVE_BUNDLED_PCRE" != "xyes"])
+AM_CONDITIONAL([WANT_PCRE], [test "x$HAVE_BUNDLED_PCRE" = "xyes"])
 
 AC_ARG_ENABLE([enable-ircbots],
 	[AS_HELP_STRING([--enable-ircbots], [build the irc bots])])
