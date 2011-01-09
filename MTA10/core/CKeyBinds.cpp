@@ -270,6 +270,11 @@ CKeyBinds::~CKeyBinds ( void )
 
 bool CKeyBinds::ProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+    // Don't process Shift keys here, we have a hack for that
+    if ( wParam == 0x10 &&
+        ( uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP ) )
+        return false;
+
     bool bState;
     const SBindableKey * pKey = GetBindableFromMessage ( uMsg, wParam, lParam, bState );
     if ( pKey )
@@ -1773,10 +1778,6 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage ( UINT uMsg, WPARAM wParam
 
     // Prevents a simulated lctrl with Alt Gr keys
     if ( IsFakeCtrl_L ( uMsg, wParam, lParam ) )
-        return NULL;
-
-    if ( wParam == 0x10 &&
-         ( uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP ) )
         return NULL;
 
     bool bFirstHit = ( lParam & 0x40000000 ) ? false:true;
