@@ -41,7 +41,11 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                 {
                     if ( lua_type ( luaVM, 3 ) == LUA_TNIL )
                     {
-                        if ( CStaticFunctionDefinitions::ResetVehicleHandlingProperty ( pVehicle, eProperty ) )
+                        bool bUseOriginal = false;
+                        if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
+                            bUseOriginal = lua_toboolean ( luaVM, 4 ) ? true : false;
+
+                        if ( CStaticFunctionDefinitions::ResetVehicleHandlingProperty ( pVehicle, eProperty, bUseOriginal ) )
                         {
                             lua_pushboolean ( luaVM, true );
                             return 1;
@@ -173,9 +177,13 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                     }
                 }
             }
-            else if ( lua_type ( luaVM, 2 ) == LUA_TNIL )
+            else if ( lua_type ( luaVM, 2 ) == LUA_TNIL || lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
             {
-                if ( CStaticFunctionDefinitions::ResetVehicleHandling ( pVehicle ) )
+                bool bUseOriginal = false;
+                if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+                    bUseOriginal = lua_toboolean ( luaVM, 2 ) ? true : false;
+
+                if ( CStaticFunctionDefinitions::ResetVehicleHandling ( pVehicle, bUseOriginal ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;

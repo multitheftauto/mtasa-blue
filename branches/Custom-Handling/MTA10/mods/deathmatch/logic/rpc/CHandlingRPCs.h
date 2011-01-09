@@ -22,6 +22,7 @@ class CHandlingRPCs : public CRPCFunctions
 public:
     static void                 LoadFunctions           ( void );
 
+    DECLARE_RPC ( SetVehicleHandling );
     DECLARE_RPC ( SetVehicleHandlingProperty );
     DECLARE_RPC ( RestoreVehicleHandlingProperty );
     DECLARE_RPC ( RestoreVehicleHandling );

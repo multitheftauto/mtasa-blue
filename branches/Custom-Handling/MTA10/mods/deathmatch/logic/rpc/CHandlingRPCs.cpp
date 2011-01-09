@@ -14,9 +14,11 @@
 
 #include <StdInc.h>
 #include "CHandlingRPCs.h"
+#include "net/SyncStructures.h"
 
 void CHandlingRPCs::LoadFunctions ( void )
 {
+    AddHandler ( SET_VEHICLE_HANDLING, SetVehicleHandling, "SetVehicleHandling" );
     AddHandler ( SET_VEHICLE_HANDLING_PROPERTY, SetVehicleHandlingProperty, "SetVehicleHandlingProperty" );
     AddHandler ( RESET_VEHICLE_HANDLING_PROPERTY, RestoreVehicleHandlingProperty, "RestoreVehicleHandlingProperty" );
     AddHandler ( RESET_VEHICLE_HANDLING, RestoreVehicleHandling, "RestoreVehicleHandling" );
@@ -60,6 +62,62 @@ enum eHandlingProperty
     HANDLING_TAILLIGHT,
     HANDLING_ANIMGROUP,
 };
+
+
+void CHandlingRPCs::SetVehicleHandling ( NetBitStreamInterface& bitStream )
+{
+    // Read out the vehicle id and property id
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
+    {
+        // Grab it and check its type
+        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
+        if ( pEntity && pEntity->GetType () == CCLIENTVEHICLE )
+        {
+            // Grab the vehicle handling entry
+            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pEntity );
+            CHandlingEntry* pEntry = Vehicle.GetHandlingData();
+
+            SVehicleHandlingSync handling;
+            bitStream.Read ( &handling );
+            pEntry->SetMass ( handling.data.fMass );
+            pEntry->SetTurnMass ( handling.data.fTurnMass );
+            pEntry->SetDragCoeff ( handling.data.fDragCoeff );
+            pEntry->SetCenterOfMass ( handling.data.vecCenterOfMass );
+            pEntry->SetPercentSubmerged ( handling.data.uiPercentSubmerged );
+            pEntry->SetTractionMultiplier ( handling.data.fTractionMultiplier );
+            pEntry->SetCarDriveType ( (CHandlingEntry::eDriveType)handling.data.ucDriveType );
+            pEntry->SetCarEngineType ( (CHandlingEntry::eEngineType)handling.data.ucEngineType );
+            pEntry->SetNumberOfGears ( handling.data.ucNumberOfGears );
+            pEntry->SetEngineAcceleration ( handling.data.fEngineAcceleration );
+            pEntry->SetEngineInertia ( handling.data.fEngineInertia );
+            pEntry->SetMaxVelocity ( handling.data.fMaxVelocity );
+            pEntry->SetBrakeDeceleration ( handling.data.fBrakeDeceleration );
+            pEntry->SetBrakeBias ( handling.data.fBrakeBias );
+            pEntry->SetABS ( handling.data.ucABS ? true : false );
+            pEntry->SetSteeringLock ( handling.data.fSteeringLock );
+            pEntry->SetTractionLoss ( handling.data.fTractionLoss );
+            pEntry->SetTractionBias ( handling.data.fTractionBias );
+            pEntry->SetSuspensionForceLevel ( handling.data.fSuspensionForceLevel );
+            pEntry->SetSuspensionDamping ( handling.data.fSuspensionDamping );
+            pEntry->SetSuspensionHighSpeedDamping ( handling.data.fSuspensionHighSpdDamping );
+            pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
+            pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
+            pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
+            pEntry->SetSuspensionAntidiveMultiplier ( handling.data.fSuspensionAntidiveMultiplier );
+            pEntry->SetCollisionDamageMultiplier ( handling.data.fCollisionDamageMultiplier );
+            pEntry->SetModelFlags ( handling.data.uiModelFlags );
+            pEntry->SetHandlingFlags ( handling.data.uiHandlingFlags );
+            pEntry->SetSeatOffsetDistance ( handling.data.fSeatOffsetDistance );
+            pEntry->SetMonetary ( handling.data.uiMonetary );
+            pEntry->SetHeadLight ( (CHandlingEntry::eLightType)handling.data.ucHeadLight );
+            pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
+            pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
+            
+            Vehicle.ApplyHandling();
+        }
+    }
+}
 
 
 void CHandlingRPCs::SetVehicleHandlingProperty ( NetBitStreamInterface& bitStream )

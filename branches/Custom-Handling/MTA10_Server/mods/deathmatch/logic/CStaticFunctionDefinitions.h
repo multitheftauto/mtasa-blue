@@ -308,8 +308,8 @@ public:
     static bool                 SetVehicleHeadLightColor            ( CVehicle* pVehicle, const SColor color );
     static bool                 SetVehicleTurretPosition            ( CVehicle* pVehicle, float fHorizontal, float fVertical );
     //static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, bool bValue );
-    static bool                 ResetVehicleHandling                ( CVehicle* pVehicle );
-    static bool                 ResetVehicleHandlingProperty        ( CVehicle* pVehicle, eHandlingProperty eProperty );
+    static bool                 ResetVehicleHandling                ( CVehicle* pVehicle, bool bUseOriginal );
+    static bool                 ResetVehicleHandlingProperty        ( CVehicle* pVehicle, eHandlingProperty eProperty, bool bUseOriginal );
     static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, float fValue );
     static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, CVector vecValue );
     static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, std::string strValue );
