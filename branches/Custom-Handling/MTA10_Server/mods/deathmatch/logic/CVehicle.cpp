@@ -74,6 +74,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
     m_bCollisionsEnabled = true;
+    m_bHandlingChanged = false;
 
     // Initialize the occupied Players
     for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )
@@ -717,4 +718,5 @@ void CVehicle::GenerateHandlingData ()
     // Apply the model handling info
     m_pHandlingEntry->ApplyHandlingData( g_pGame->GetHandlingManager ()->GetModelHandlingData ( static_cast < eVehicleTypes > ( m_usModel ) ) );
 
+    m_bHandlingChanged = false;
 }

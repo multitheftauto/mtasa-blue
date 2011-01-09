@@ -266,6 +266,9 @@ public:
     inline bool                     IsHeliSearchLightVisible ( void )                       { return m_bHeliSearchLightVisible; }
     inline void                     SetHeliSearchLightVisible ( bool bVisible )             { m_bHeliSearchLightVisible = bVisible; }
 
+    inline bool                     HasHandlingChanged      ( void )                        { return m_bHandlingChanged; }
+    inline void                     SetHasHandlingChanged   ( bool bChanged )               { m_bHandlingChanged = bChanged; }
+
     inline bool                     GetCollisionEnabled     ( void )                        { return m_bCollisionsEnabled; }
     inline void                     SetCollisionEnabled     ( bool bCollisionEnabled )      { m_bCollisionsEnabled = bCollisionEnabled; }
 
@@ -361,6 +364,7 @@ private:
     bool                            m_bCollisionsEnabled;
 
     CHandlingEntry*                 m_pHandlingEntry;
+    bool                            m_bHandlingChanged;
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;

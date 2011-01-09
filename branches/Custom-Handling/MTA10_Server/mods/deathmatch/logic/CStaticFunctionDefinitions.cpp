@@ -5810,6 +5810,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandl
     {
         if ( SetEntryHandling ( pEntry, eProperty, ucValue ) )
         {
+            pVehicle->SetHasHandlingChanged ( true );
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pVehicle->GetID () );
             BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
@@ -5831,6 +5832,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandl
     {
         if ( SetEntryHandling ( pEntry, eProperty, uiValue ) )
         {
+            pVehicle->SetHasHandlingChanged ( true );
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pVehicle->GetID () );
             BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
@@ -5852,6 +5854,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandl
     {
         if ( SetEntryHandling ( pEntry, eProperty, fValue ) )
         {
+            pVehicle->SetHasHandlingChanged ( true );
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pVehicle->GetID () );
             BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
@@ -5874,6 +5877,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandl
         unsigned char ucChar;
         if ( SetEntryHandling ( pEntry, eProperty, strValue, ucChar ) )
         {
+            pVehicle->SetHasHandlingChanged ( true );
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pVehicle->GetID () );
             BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
@@ -5895,6 +5899,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandl
     {
         if ( SetEntryHandling ( pEntry, eProperty, vecValue ) )
         {
+            pVehicle->SetHasHandlingChanged ( true );
             CBitStream BitStream;
             BitStream.pBitStream->Write ( pVehicle->GetID () );
             BitStream.pBitStream->Write ( HANDLING_CENTEROFMASS );

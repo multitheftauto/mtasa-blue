@@ -415,7 +415,8 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         BitStream.WriteBit ( false );
 
                     // Write handling
-                    if ( g_pGame->GetHandlingManager()->HasModelHandlingChanged ( static_cast < eVehicleTypes > ( pVehicle->GetModel() ) ) )
+                    if ( g_pGame->GetHandlingManager()->HasModelHandlingChanged ( static_cast < eVehicleTypes > ( pVehicle->GetModel() ) )
+                        || pVehicle->HasHandlingChanged() )
                     {
                         BitStream.WriteBit ( true );
                         SVehicleHandlingSync handling;

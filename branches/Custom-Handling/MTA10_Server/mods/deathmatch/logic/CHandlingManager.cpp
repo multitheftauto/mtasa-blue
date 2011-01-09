@@ -34,6 +34,7 @@ CHandlingManager::CHandlingManager ( void )
     for ( int i = 0; i < VT_MAX; i++ )
     {
         m_pModelEntries [i] = new CHandlingEntry ( &m_OriginalHandlingData [GetHandlingID( (eVehicleTypes)i )] );
+        m_bModelHandlingChanged [i] = false;
     }
     
     // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
