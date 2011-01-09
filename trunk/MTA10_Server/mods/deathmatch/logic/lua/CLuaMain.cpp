@@ -18,6 +18,10 @@
 #include "StdInc.h"
 #include "CPerfStatManager.h"
 
+#ifndef WIN32
+#include <clocale>
+#endif
+
 static CLuaManager* m_pLuaManager;
 
 #define HOOK_INSTRUCTION_COUNT 1000000
@@ -227,7 +231,11 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
         else
         {
             ResetInstructionCount ();
+#ifndef WIN32
+            std::setlocale(LC_ALL, "C");
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            std::setlocale(LC_ALL, "");
+#endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -261,7 +269,11 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
         if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
+#ifndef WIN32
+            std::setlocale(LC_ALL, "C");
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+            std::setlocale(LC_ALL, "");
+#endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
