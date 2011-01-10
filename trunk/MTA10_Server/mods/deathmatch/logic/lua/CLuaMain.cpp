@@ -233,7 +233,9 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
             ResetInstructionCount ();
 #ifndef WIN32
             std::setlocale(LC_ALL, "C");
+#endif
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+#ifndef WIN32
             std::setlocale(LC_ALL, "");
 #endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
@@ -271,7 +273,9 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
             ResetInstructionCount ();
 #ifndef WIN32
             std::setlocale(LC_ALL, "C");
+#endif
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
+#ifndef WIN32
             std::setlocale(LC_ALL, "");
 #endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
