@@ -208,7 +208,9 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
 
 #ifndef WIN32
     std::setlocale(LC_ALL, "C");
+#endif
     int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
+#ifndef WIN32
     std::setlocale(LC_ALL, "");
 #endif
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
@@ -280,7 +282,9 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
     try {
 #ifndef WIN32
         std::setlocale(LC_ALL, "C");
+#endif
         iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
+#ifndef WIN32
         std::setlocale(LC_ALL, "");
 #endif
     }
