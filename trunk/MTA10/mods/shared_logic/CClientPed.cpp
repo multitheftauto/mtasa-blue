@@ -27,7 +27,8 @@ extern CClientGame* g_pClientGame;
 
 #define INVALID_VALUE   0xFFFFFFFF
 
-#define PED_INTERPOLATION_WARP_THRESHOLD        12.5f
+#define PED_INTERPOLATION_WARP_THRESHOLD            5   // Minimal threshold
+#define PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  5   // Units to increment the threshold per speed unit
 
 enum eAnimGroups
 {    
@@ -4623,7 +4624,10 @@ void CClientPed::UpdateTargetPosition ( void )
         CVector vecNewPosition = vecCurrentPosition + vecCompensation;
 
         // Check if the distance to interpolate is too far.
-        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > PED_INTERPOLATION_WARP_THRESHOLD )
+        CVector vecVelocity;
+        GetMoveSpeed ( vecVelocity );
+        float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
+        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > fThreshold )
         {
             // Abort all interpolation
             m_interp.pos.ulFinishTime = 0;
