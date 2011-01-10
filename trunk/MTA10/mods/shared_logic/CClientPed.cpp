@@ -27,7 +27,7 @@ extern CClientGame* g_pClientGame;
 
 #define INVALID_VALUE   0xFFFFFFFF
 
-#define PED_INTERPOLATION_WARP_THRESHOLD        5
+#define PED_INTERPOLATION_WARP_THRESHOLD        12.5f
 
 enum eAnimGroups
 {    
