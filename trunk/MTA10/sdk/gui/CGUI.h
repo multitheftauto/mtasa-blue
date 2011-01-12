@@ -80,6 +80,8 @@ class CGUI
 {
 public:
 
+    virtual void                SetSkin                 ( const char* szName ) = 0;
+
     virtual void                Draw                    ( void ) = 0;
     virtual void                Invalidate              ( void ) = 0;
     virtual void                Restore                 ( void ) = 0;

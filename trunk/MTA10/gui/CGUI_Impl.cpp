@@ -29,6 +29,7 @@ using std::list;
 #define CGUI_MTA_SANS_FONT_SIZE     9
 
 CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
+    : m_HasSchemeLoaded(false)
 {
     // Init
     m_pDevice = pDevice;
@@ -83,10 +84,38 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     m_pSAGothicFont = (CGUIFont_Impl*) CreateFnt ( "sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, true );
     m_pSansFont = (CGUIFont_Impl*) CreateFnt ( "sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, false );
     // ACHTUNG: These font creations can throw exceptions!
+}
 
-    // Load bluescheme
-    CEGUI::SchemeManager::getSingleton().loadScheme("cgui/CGUI.xml");
+
+CGUI_Impl::~CGUI_Impl ( void )
+{
+
+}
+
+void CGUI_Impl::SetSkin ( const char* szName )
+{
+    if(m_HasSchemeLoaded)
+    {
+        CEGUI::SchemeManager::getSingleton().unloadScheme(m_CurrentSchemeName);
+    }
+
+    // Load the GUI scheme
+    SString savedWorkingDirectory = GetCurrentWorkingDirectory();
+    SString skinDirectory = PathJoin ( m_szWorkingDirectory, "..", "skins", szName );
+    CEGUI::Logger::getSingleton().logEvent("Set skin directory to:");
+    CEGUI::Logger::getSingleton().logEvent(skinDirectory.c_str());
+    SetCurrentDirectory(skinDirectory);
+
+    CEGUI::Scheme* scheme = CEGUI::SchemeManager::getSingleton().loadScheme("CGUI.xml");
+    m_CurrentSchemeName = scheme->getName().c_str();
+    m_HasSchemeLoaded = true;
+
+    SetCurrentDirectory(savedWorkingDirectory);
+
     CEGUI::System::getSingleton().setDefaultMouseCursor("CGUI-Images", "MouseArrow");
+
+    // Destroy any windows we already have
+    CEGUI::WindowManager::getSingleton().destroyAllWindows();
 
     // Create dummy GUI root
     m_pTop = reinterpret_cast < CEGUI::DefaultWindow* > ( m_pWindowManager->createWindow ( "DefaultWindow", "guiroot" ) );
@@ -104,6 +133,20 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     // Used to create unique names for widget instances
     m_ulPreviousUnique = 0;
 
+    SubscribeToMouseEvents();
+
+    // Disallow input routing to the GUI
+    m_eInputMode = INPUTMODE_ALLOW_BINDS;
+
+    // Reset the working directory
+    m_szWorkingDirectory[MAX_PATH] = 0;
+
+    // The transfer box is not visible by default
+    m_bTransferBoxVisible = false;
+}
+
+void CGUI_Impl::SubscribeToMouseEvents()
+{
     // Mouse events
     CEGUI::GlobalEventSet * pEvents = CEGUI::GlobalEventSet::getSingletonPtr ();
 
@@ -122,23 +165,7 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventRedrawRequested   , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_RedrawRequested, this ) );
     pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventActivated         , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_FocusGained, this ) );
     pEvents->subscribeEvent ( "Window/" + CEGUI::Window::EventDeactivated       , CEGUI::Event::Subscriber ( &CGUI_Impl::Event_FocusLost, this ) );
-    
-    // Disallow input routing to the GUI
-    m_eInputMode = INPUTMODE_ALLOW_BINDS;
-
-    // Reset the working directory
-    m_szWorkingDirectory[MAX_PATH] = 0;
-
-    // The transfer box is not visible by default
-    m_bTransferBoxVisible = false;
 }
-
-
-CGUI_Impl::~CGUI_Impl ( void )
-{
-
-}
-
 
 CVector2D CGUI_Impl::GetResolution ( void )
 {

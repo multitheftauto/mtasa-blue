@@ -109,6 +109,9 @@ CServerBrowser::~CServerBrowser ( void )
     DeleteTab ( ServerBrowserType::FAVOURITES );
     DeleteTab ( ServerBrowserType::RECENTLY_PLAYED );
 
+    // Unload the locked icon
+    m_pLockedIcon->Clear();
+
     // Delete the GUI items
     delete m_pServerListStatus;
     delete m_pButtonBack;
