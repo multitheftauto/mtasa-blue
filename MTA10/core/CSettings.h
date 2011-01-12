@@ -26,6 +26,7 @@ class CSettings;
 #include "CMainMenu.h"
 #include "CCore.h"
 
+#define SKINS_PATH                    "skins/*"
 #define CHAT_PRESETS_PATH             "mta/chatboxpresets.xml"
 #define CHAT_PRESETS_ROOT             "chatboxpresets"
 
@@ -209,6 +210,9 @@ protected:
     CGUIRadioButton*    m_pStandardControls;
     CGUIRadioButton*    m_pClassicControls;
 
+    CGUIComboBox*       m_pInterfaceSkinSelector;
+    CGUIButton*         m_pInterfaceLoadSkin;
+
     CGUIComboBox*       m_pChatPresets;
     CGUIButton*         m_pChatLoadPreset;
 
@@ -221,6 +225,8 @@ protected:
     CGUILabel*          m_pChatGreenValue   [ ChatColorType::CHAT_COLOR_MAX ];
     CGUILabel*          m_pChatBlueValue    [ ChatColorType::CHAT_COLOR_MAX ];
     CGUILabel*          m_pChatAlphaValue   [ ChatColorType::CHAT_COLOR_MAX ];
+
+    CGUIScrollPane*     m_pInterfacePaneScroller;
 
     CGUIScrollPane*     m_pPaneChatFont;
     CGUIRadioButton*    m_pRadioChatFont    [ eChatFont::CHAT_FONT_MAX ];
@@ -261,11 +267,17 @@ protected:
 
     bool                OnChatLoadPresetClick   ( CGUIElement* pElement );
 
+    bool                OnLoadSkinButtonClick   ( CGUIElement* pElement );
+
+    bool                OnSkinChanged ( CGUIElement* pElement );
+
 private:
     void                ProcessKeyBinds         ( void );
     void                ProcessJoypad           ( void );
 
     void                SaveData                ( void );
+
+    void                LoadSkins               ( void );
 
     void                LoadChatPresets         ( void );
     void                CreateChatColorTab      ( ChatColorType eType, const char* szName, CGUITabPanel* pParent );

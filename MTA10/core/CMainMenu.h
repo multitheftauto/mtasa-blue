@@ -56,7 +56,7 @@ public:
     void                Show                            ( bool bOverlay );
     void                Hide                            ( void );
 
-    void                SetVisible                      ( bool bVisible, bool bOverlay = true );
+    void                SetVisible                      ( bool bVisible, bool bOverlay = true, bool bFrameDelay = true );
     bool                IsVisible                       ( void );
     bool                IsFading                        ( void )    { return m_ucFade == FADE_IN || m_ucFade == FADE_OUT; }
 

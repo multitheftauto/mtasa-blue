@@ -154,7 +154,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_iFirstItemTop  = (m_menuItems.front()->image)->GetPosition().fY;
     m_iSecondItemTop = (m_menuItems[1]->image)->GetPosition().fY;
     
-    // Store some mosue over bounding box positions
+    // Store some mouse over bounding box positions
     m_menuAX = (0.168f*m_iMenuSizeX) + m_iXOff;             //Left side of the items
     m_menuAY = m_iFirstItemTop;                             //Top side of the items
 	m_menuBX =  m_menuAX + ((390/NATIVE_RES_X)*m_iMenuSizeX); //Right side of the items. We add the longest picture (browse_servers)
@@ -233,7 +233,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
         pLabel->SetVisible ( false );
     }
 
-    // Submenu's
+    // Submenus
     m_QuickConnect.SetVisible ( false );
     m_ServerBrowser.SetVisible ( false );
     m_ServerQueue.SetVisible ( false );
@@ -257,7 +257,6 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     // Remove unused node
     if ( CXMLNode* pOldNode = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ) )
         pConfig->DeleteSubNode ( pOldNode );
-
 }
 
 
@@ -577,7 +576,7 @@ void CMainMenu::Hide ( void )
 }
 
 
-void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
+void CMainMenu::SetVisible ( bool bVisible, bool bOverlay, bool bFrameDelay )
 {
     CMultiplayer* pMultiplayer = CCore::GetSingleton ().GetMultiplayer ();
     pMultiplayer->DisablePadHandler ( bVisible );
@@ -591,7 +590,7 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
     // If we're hiding, hide any subwindows we might've had (prevent escaping hiding mousecursor issue)
     if ( !bVisible )
     {
-        m_bFrameDelay = true;
+        m_bFrameDelay = bFrameDelay;
         SetMenuUnhovered ();
         m_QuickConnect.SetVisible ( false );
         m_ServerBrowser.SetVisible ( false );
@@ -602,7 +601,7 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay )
 
 //        m_bIsInSubWindow = false;
     } else {
-        m_bFrameDelay = true;
+        m_bFrameDelay = bFrameDelay;
         SetMenuUnhovered ();
         m_pFiller->SetVisible ( true );
         m_pFiller2->SetVisible ( true );

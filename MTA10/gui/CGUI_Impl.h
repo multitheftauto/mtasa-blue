@@ -66,6 +66,8 @@ public:
                                     CGUI_Impl                   ( IDirect3DDevice9* pDevice );
                                     ~CGUI_Impl                  ( void );
 
+    void                            SetSkin                     ( const char* szName );
+
     void                            Draw                        ( void );
     void                            Invalidate                  ( void );
     void                            Restore                     ( void );
@@ -221,6 +223,8 @@ private:
     CGUIScrollBar*                  _CreateScrollBar            ( bool bHorizontal, CGUIElement_Impl* pParent = NULL );
     CGUIComboBox*                   _CreateComboBox             ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
 	
+    void                            SubscribeToMouseEvents();
+
     IDirect3DDevice9*               m_pDevice;
 
     CEGUI::Renderer*                m_pRenderer;
@@ -267,6 +271,9 @@ private:
     char                            m_szWorkingDirectory [ MAX_PATH + 1 ];
 
     bool                            m_bTransferBoxVisible;
+
+    bool                            m_HasSchemeLoaded;
+    SString                         m_CurrentSchemeName;
 };
 
 #endif

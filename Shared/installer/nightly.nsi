@@ -607,6 +607,20 @@ DontInstallRedist:
 			${EndIf}
 			#############################################################
 
+            !ifndef LIGHTBUILD
+                SetOutPath "$INSTDIR\skins\Classic"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.lnf.xml"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.png"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.xml"
+                
+                SetOutPath "$INSTDIR\skins\Square"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Square\CGUI.is.xml"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Square\CGUI.lnf.xml"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Square\CGUI.png"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Square\CGUI.xml"                
+            !endif
+            
 			File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
@@ -628,10 +642,6 @@ DontInstallRedist:
 				File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 
 				SetOutPath "$INSTDIR\MTA\cgui"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.is.xml"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.lnf.xml"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.png"
-				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.xml"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Font.xsd"
 				File "${FILES_ROOT}\MTA San Andreas\mta\cgui\GUIScheme.xsd"
