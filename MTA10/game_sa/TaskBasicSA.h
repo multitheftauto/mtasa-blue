@@ -26,6 +26,7 @@
 #define FUNC_CTaskSimpleRunNamedAnim__Constructor           0x61A990
 #define FUNC_CTaskComplexDie__Constructor                   0x630040
 #define FUNC_CTaskSimpleStealthKill__Constructor            0x6225F0
+#define FUNC_CTaskSimpleDead__Constructor                   0x630590
 #define FUNC_CTaskComplexSunbathe__Constructor              0x631F80
 #define FUNC_CTASKSimplePlayerOnFoot__Constructor           0x685750
 #define FUNC_CTASKComplexFacial__Constructor                0x690D20
@@ -168,6 +169,22 @@ public:
                                class CPed * pPed,
                                const AssocGroupId animGroup );
 };
+
+class CTaskSimpleDeadSAInterface : public CTaskSimpleSAInterface
+{
+public:
+    unsigned int    uiDeathTimeMS;
+    bool            bUnk2;
+};
+
+class CTaskSimpleDeadSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleDead
+{
+public:
+    CTaskSimpleDeadSA ( void ) {};
+    CTaskSimpleDeadSA ( unsigned int uiDeathTimeMS, bool bUnk2 );
+};
+
+
 
 class CAnimBlock;
 

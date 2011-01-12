@@ -200,6 +200,15 @@ CTaskSimpleStealthKill* CTasksSA::CreateTaskSimpleStealthKill ( bool bKiller, cl
     return pTask;
 }
 
+CTaskSimpleDead* CTasksSA::CreateTaskSimpleDead ( unsigned int uiDeathTimeMS, bool bUnk )
+{
+    DEBUG_TRACE("CTaskSimpleDead* CTasksSA::CreateTaskSimpleDead ( unsigned int uiDeathTimeMS, bool bUnk )");
+
+    CTaskSimpleDeadSA * pTask = NewTask < CTaskSimpleDeadSA > ( uiDeathTimeMS, bUnk );
+    m_pTaskManagementSystem->AddTask ( pTask );
+    return pTask;
+}
+
 
 CTaskComplexSunbathe* CTasksSA::CreateTaskComplexSunbathe ( class CObject* pTowel, const bool bStartStanding )
 {

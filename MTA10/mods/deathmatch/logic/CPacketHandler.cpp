@@ -941,7 +941,7 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
             // Kill our ped in the correct way
             pPed->Kill ( ( eWeaponType ) weapon.data.ucWeaponType,
                          bodyPart.data.uiBodypart,
-                         bStealth, animGroup, animID );
+                         bStealth, false, animGroup, animID );
 
             // Call the onClientPlayerWasted event
             CLuaArguments Arguments;
