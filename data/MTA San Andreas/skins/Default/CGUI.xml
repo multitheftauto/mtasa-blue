@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<GUIScheme Name="CGUI-Skin">
+	<Imageset Name="CGUI-Images" Filename="CGUI.is.xml" />
+	<LookNFeel Filename="CGUI.lnf.xml" />
+	<WindowSet Filename="CEGUIFalagardBase" />
+	<FalagardMapping WindowType="CGUI/Titlebar" TargetType="Falagard/Titlebar" LookNFeel="CGUI/Titlebar" />
+	<FalagardMapping WindowType="CGUI/Button" TargetType="Falagard/Button" LookNFeel="CGUI/Button" />
+	<FalagardMapping WindowType="CGUI/FrameWindow" TargetType="Falagard/FrameWindow" LookNFeel="CGUI/FrameWindow" />
+	<FalagardMapping WindowType="CGUI/Editbox" TargetType="Falagard/Editbox" LookNFeel="CGUI/Editbox" />
+	<FalagardMapping WindowType="CGUI/VerticalScrollbarThumb" TargetType="Falagard/Thumb" LookNFeel="CGUI/VerticalScrollbarThumb" />
+	<FalagardMapping WindowType="CGUI/VerticalScrollbar" TargetType="Falagard/Scrollbar" LookNFeel="CGUI/VerticalScrollbar" />
+	<FalagardMapping WindowType="CGUI/HorizontalScrollbarThumb" TargetType="Falagard/Thumb" LookNFeel="CGUI/HorizontalScrollbarThumb" />
+	<FalagardMapping WindowType="CGUI/HorizontalScrollbar" TargetType="Falagard/Scrollbar" LookNFeel="CGUI/HorizontalScrollbar" />
+	<FalagardMapping WindowType="CGUI/StaticImage" TargetType="Falagard/StaticImage" LookNFeel="CGUI/StaticImage" />
+	<FalagardMapping WindowType="CGUI/StaticText" TargetType="Falagard/StaticText" LookNFeel="CGUI/StaticText" />
+	<FalagardMapping WindowType="CGUI/MultiLineEditbox" TargetType="Falagard/MultiLineEditbox" LookNFeel="CGUI/MultiLineEditbox" />
+	<FalagardMapping WindowType="CGUI/MultiColumnList" TargetType="Falagard/MultiColumnList" LookNFeel="CGUI/MultiColumnList" />
+	<FalagardMapping WindowType="CGUI/ListHeader" TargetType="Falagard/ListHeader" LookNFeel="CGUI/ListHeader" />
+	<FalagardMapping WindowType="CGUI/ListHeaderSegment" TargetType="Falagard/ListHeaderSegment" LookNFeel="CGUI/ListHeaderSegment" />
+  <FalagardMapping WindowType="CGUI/TabButton" TargetType="Falagard/TabButton" LookNFeel="CGUI/TabButton" />
+	<FalagardMapping WindowType="CGUI/TabControl" TargetType="Falagard/TabControl" LookNFeel="CGUI/TabControl" />
+	<FalagardMapping WindowType="CGUI/TabPane" TargetType="Falagard/TabPane" LookNFeel="CGUI/TabPane" />
+	<FalagardMapping WindowType="CGUI/ProgressBar" TargetType="Falagard/ProgressBar" LookNFeel="CGUI/ProgressBar" />
+	<FalagardMapping WindowType="CGUI/Checkbox" TargetType="Falagard/Checkbox" LookNFeel="CGUI/Checkbox" />
+	<FalagardMapping WindowType="CGUI/RadioButton" TargetType="Falagard/RadioButton" LookNFeel="CGUI/RadioButton" />
+	<FalagardMapping WindowType="CGUI/ScrollablePane" TargetType="Falagard/ScrollablePane" LookNFeel="CGUI/ScrollablePane" />
+	<FalagardMapping WindowType="CGUI/ComboDropList" TargetType="Falagard/ComboDropList" LookNFeel="CGUI/ComboDropList" />
+	<FalagardMapping WindowType="CGUI/ComboEditbox" TargetType="Falagard/Editbox" LookNFeel="CGUI/ComboEditbox" />
+	<FalagardMapping WindowType="CGUI/Combobox" TargetType="Falagard/Combobox" LookNFeel="CGUI/Combobox" />
+	<FalagardMapping WindowType="CGUI/ImageButton" TargetType="Falagard/Button" LookNFeel="CGUI/ImageButton" />
+<!--	
+	<FalagardMapping WindowType="CGUI/ComboDropList" TargetType="Falagard/ComboDropList" LookNFeel="CGUI/ComboDropList" />
+	<FalagardMapping WindowType="CGUI/ComboboxButton" TargetType="Falagard/Button" LookNFeel="CGUI/ComboboxButton" />
+	<FalagardMapping WindowType="CGUI/Combobox" TargetType="Falagard/Combobox" LookNFeel="CGUI/Combobox" />
+	<FalagardMapping WindowType="CGUI/ProgressBar" TargetType="Falagard/ProgressBar" LookNFeel="CGUI/ProgressBar" />
+	<FalagardMapping WindowType="CGUI/ScrollablePane" TargetType="Falagard/ScrollablePane" LookNFeel="CGUI/ScrollablePane" />
+-->
+</GUIScheme>

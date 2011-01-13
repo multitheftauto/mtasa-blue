@@ -18,7 +18,7 @@ Var Install_Dir
 ; Don't forget to update the BUILD_NUMBER
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "2280"
+!define BUILD_NUMBER "2311"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "mtasa-1.1-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
@@ -124,12 +124,20 @@ Section "Data files" SEC01
 	;File "${FILES_ROOT}\MTA San Andreas\mta\xv.ax"
 	;File "${FILES_ROOT}\MTA San Andreas\mta\xvidcore.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
+
+	SetOutPath "$INSTDIR\skins\Classic"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.xml"
+    
+    SetOutPath "$INSTDIR\skins\Default"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"
 	
 	SetOutPath "$INSTDIR\MTA\cgui"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.is.xml"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.lnf.xml"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.png"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\CGUI.xml"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Font.xsd"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\GUIScheme.xsd"

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Imageset Name="CGUI-Images" Imagefile="cgui/CGUI.png" NativeHorzRes="800" NativeVertRes="600" AutoScaled="false">
+<Imageset Name="CGUI-Images" Imagefile="CGUI.png" NativeHorzRes="800" NativeVertRes="600" AutoScaled="false">
 	<Image Name="GenericBrush" XPos="28" YPos="8" Width="1" Height="1" />
   <Image Name="ListboxSelectionBrush" XPos="28" YPos="8" Width="1" Height="1" />
   

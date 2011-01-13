@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <GUIScheme Name="CGUI-Skin">
-	<Imageset Name="CGUI-Images" Filename="cgui/CGUI.is.xml" />
-	<LookNFeel Filename="cgui/CGUI.lnf.xml" />
+	<Imageset Name="CGUI-Images" Filename="CGUI.is.xml" />
+	<LookNFeel Filename="CGUI.lnf.xml" />
 	<WindowSet Filename="CEGUIFalagardBase" />
 	<FalagardMapping WindowType="CGUI/Titlebar" TargetType="Falagard/Titlebar" LookNFeel="CGUI/Titlebar" />
 	<FalagardMapping WindowType="CGUI/Button" TargetType="Falagard/Button" LookNFeel="CGUI/Button" />
