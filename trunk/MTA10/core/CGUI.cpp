@@ -23,7 +23,7 @@ template<> CLocalGUI * CSingleton < CLocalGUI >::m_pSingleton = NULL;
 #endif
 #define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
 
-const char* DEFAULT_SKIN_NAME = "Square"; // TODO: Change to whatever the default skin is if it changes
+const char* DEFAULT_SKIN_NAME = "Default"; // TODO: Change to whatever the default skin is if it changes
 
 CLocalGUI::CLocalGUI ( void )
 {
@@ -83,7 +83,7 @@ void CLocalGUI::SetSkin( const char* szName )
         }
         catch(...)
         {
-            // Even the default Square skin doesn't work, so give up
+            // Even the default skin doesn't work, so give up
             MessageBox ( 0, "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA.", "Error", MB_OK );
             TerminateProcess ( GetCurrentProcess (), 9 );
         }
