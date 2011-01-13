@@ -614,11 +614,11 @@ DontInstallRedist:
                 File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.png"
                 File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.xml"
                 
-                SetOutPath "$INSTDIR\skins\Square"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Square\CGUI.is.xml"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Square\CGUI.lnf.xml"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Square\CGUI.png"
-                File "${FILES_ROOT}\MTA San Andreas\skins\Square\CGUI.xml"                
+                SetOutPath "$INSTDIR\skins\Default"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.is.xml"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
+                File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"                
             !endif
             
 			File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
