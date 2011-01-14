@@ -19,6 +19,8 @@
 
 using std::list;
 
+class CObject;
+
 class CObjectManager
 {
     friend class CObject;
