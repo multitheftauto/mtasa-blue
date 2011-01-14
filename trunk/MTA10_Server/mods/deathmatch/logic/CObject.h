@@ -16,6 +16,7 @@
 //Kayl: There is now too many includes here, try to make it work with StdInc.h if possible
 #include "CElement.h"
 #include "CEvents.h"
+#include "CObjectManager.h"
 #include "Utils.h"
 
 #include "CEasingCurve.h"
@@ -23,7 +24,8 @@
 #include "CPositionRotationAnimation.h"
 
 class CObject : public CElement
-{    
+{
+    friend class CPlayer;
 
 public:
     explicit                    CObject                 ( CElement* pParent, CXMLNode* pNode, class CObjectManager* pObjectManager );
@@ -63,6 +65,18 @@ public:
     inline bool                 IsStatic                ( void )                        { return m_bIsStatic; }
     inline void                 SetStatic               ( bool bStatic )                { m_bIsStatic = bStatic; }
 
+    inline float                GetHealth               ( void )                        { return m_fHealth; }
+    inline void                 SetHealth               ( float fHealth )               { m_fHealth = fHealth; }
+
+    inline bool                 IsBreakable             ( void )                        { return m_pObjectManager->IsBreakableModel ( m_usModel ) && m_bBreakable; }
+    inline bool                 SetBreakable            ( bool bBreakable )             { m_bBreakable = bBreakable; }
+
+    inline bool                 IsSyncable              ( void )                        { return m_bSyncable; }
+    inline void                 SetSyncable             ( bool bSyncable )              { m_bSyncable = bSyncable; }
+
+    inline CPlayer*             GetSyncer               ( void )                        { return m_pSyncer; }
+    void                        SetSyncer               ( CPlayer* pPlayer );
+
 private:
     CObjectManager*             m_pObjectManager;
     char                        m_szName [MAX_ELEMENT_NAME_LENGTH + 1];
@@ -71,6 +85,10 @@ private:
     unsigned short              m_usModel;
     float                       m_fScale;
     bool                        m_bIsStatic;
+    float                       m_fHealth;
+    bool                        m_bBreakable;
+    bool                        m_bSyncable;
+    CPlayer*                    m_pSyncer;
 
 protected:
     bool                        m_bCollisionsEnabled;

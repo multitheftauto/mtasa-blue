@@ -39,6 +39,7 @@
 #include "rpc/CRPCFunctions.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CPedSync.h"
+#include "CObjectSync.h"
 #include "CRadarMap.h"
 #include "CClientTeamManager.h"
 #include "CClientPedManager.h"
@@ -251,6 +252,7 @@ public:
 
     inline CUnoccupiedVehicleSync*      GetUnoccupiedVehicleSync        ( void )        { return m_pUnoccupiedVehicleSync; }
     inline CPedSync*                    GetPedSync                      ( void )        { return m_pPedSync; }
+    inline CObjectSync*                 GetObjectSync                   ( void )        { return m_pObjectSync; }
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
 
@@ -483,6 +485,7 @@ private:
     CRPCFunctions*                      m_pRPCFunctions;
     CUnoccupiedVehicleSync*             m_pUnoccupiedVehicleSync;
     CPedSync*                           m_pPedSync;
+    CObjectSync*                        m_pObjectSync;
     CMovingObjectsManager*              m_pMovingObjectsManager;
     CNametags*                          m_pNametags;
     CNetAPI*                            m_pNetAPI;

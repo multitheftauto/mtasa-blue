@@ -19,7 +19,7 @@
 class CDeathmatchObject : public CClientObject
 {
 public:
-                                        CDeathmatchObject               ( CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel );
+                                        CDeathmatchObject               ( CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, class CObjectSync* pObjectSync, ElementID ID, unsigned short usModel );
                                         ~CDeathmatchObject              ( void );
 
     // CClientEntity interface
@@ -40,6 +40,7 @@ public:
 
 protected:
     class CMovingObjectsManager*        m_pMovingObjectsManager;
+    class CObjectSync*                  m_pObjectSync;
 
     void                                _StopMovement                    ( bool a_bUnregister );
    

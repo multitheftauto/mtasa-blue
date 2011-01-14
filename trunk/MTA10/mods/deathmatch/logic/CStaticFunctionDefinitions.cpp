@@ -597,6 +597,12 @@ bool CStaticFunctionDefinitions::GetElementHealth ( CClientEntity& Entity, float
             fHealth = Vehicle.GetHealth ();
             break;
         }
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            fHealth = Object.GetHealth ();
+            break;
+        }
         default: return false;
     }
     return true;
@@ -677,6 +683,13 @@ bool CStaticFunctionDefinitions::IsElementSyncer ( CClientEntity& Entity, bool &
             CDeathmatchVehicle* Vehicle = static_cast < CDeathmatchVehicle* > ( &Entity );
             if ( Vehicle )
                 bIsSyncer = m_pClientGame->GetUnoccupiedVehicleSync()->Exists ( Vehicle );
+            break;
+        }
+        case CCLIENTOBJECT:
+        {
+            CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( &Entity );
+            if ( pObject )
+                bIsSyncer = m_pClientGame->GetObjectSync ()->Exists ( pObject );
             break;
         }
         default: return false;
@@ -1246,6 +1259,12 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CClientEntity& Entity, float
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
             Vehicle.SetHealth ( fHealth );
+            break;
+        }
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            Object.SetHealth ( fHealth );
             break;
         }
         default: return false;
@@ -2966,7 +2985,7 @@ CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, u
 {
     if ( CClientObjectManager::IsValidModel ( usModelID ) )
     {
-        CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, INVALID_ELEMENT_ID, usModelID );
+        CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, m_pClientGame->GetObjectSync (), INVALID_ELEMENT_ID, usModelID );
         if ( pObject )
         {
             pObject->SetParent ( Resource.GetResourceDynamicEntity () );

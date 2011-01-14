@@ -187,9 +187,11 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
     }
 
     // See if unoccupied sync can handle it
-    if ( g_pClientGame->m_pUnoccupiedVehicleSync->ProcessPacket ( ucPacketID, bitStream ) )
+    if ( g_pClientGame->GetUnoccupiedVehicleSync ()->ProcessPacket ( ucPacketID, bitStream ) )
         return true;
-    else if ( g_pClientGame->m_pPedSync->ProcessPacket ( ucPacketID, bitStream ) )
+    else if ( g_pClientGame->GetPedSync ()->ProcessPacket ( ucPacketID, bitStream ) )
+        return true;
+    else if ( g_pClientGame->GetObjectSync ()->ProcessPacket ( ucPacketID, bitStream ) )
         return true;
 
     return false;
@@ -2084,6 +2086,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // unsigned char        (1)     - alpha
     // float                (4)     - scale
     // bool                 (1)     - static
+    // SObjectHealthSync    (?)     - health
 
     // Pickups:
     // CVector              (12)    - position
@@ -2340,7 +2343,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
 
                         // Create the object and put it at its position
-                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID );
+                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, g_pClientGame->m_pObjectSync, EntityID, usObjectID );
                         pEntity = pObject;
                         if ( pObject )
                         {
@@ -2374,6 +2377,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         bool bStatic;
                         if ( bitStream.ReadBit ( bStatic ) )
                             pObject->SetStatic ( bStatic );
+
+                        SObjectHealthSync health;
+                        if ( bitStream.Read ( &health ) )
+                            pObject->SetHealth ( health.data.fValue );
 
                         pObject->SetCollisionEnabled ( bCollisonsEnabled );
                     }

@@ -473,6 +473,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\logic\CObjectSync.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPacketHandler.cpp"
 					>
 				</File>
@@ -1340,6 +1344,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CNetworkStats.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CObjectSync.h"
 					>
 				</File>
 				<File
