@@ -730,6 +730,12 @@ bool CStaticFunctionDefinitions::GetElementHealth ( CElement* pElement, float& f
             fHealth = pVehicle->GetHealth ();
             break;
         }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            fHealth = pObject->GetHealth ();
+            break;
+        }
         default: return false;
     }
 
@@ -798,6 +804,12 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer ( CElement* pElement )
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             return pVehicle->IsUnoccupiedSyncable () ? static_cast < CElement* > ( pVehicle->GetSyncer() ) : NULL;
+            break;
+        }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            return pObject->IsSyncable () ? static_cast < CElement* > ( pObject->GetSyncer () ) : NULL;
             break;
         }
     }
@@ -1497,6 +1509,12 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
             pVehicle->SetHealthChangeTime ( GetTickCount () );
             break;
         }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            pObject->SetHealth ( fHealth );
+            break;
+        }
         default: return false;
     }
 
@@ -1629,6 +1647,14 @@ bool CStaticFunctionDefinitions::SetElementSyncer ( CElement* pElement, CPlayer*
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             pVehicle->SetUnoccupiedSyncable ( bEnable );
             g_pGame->GetUnoccupiedVehicleSync()->OverrideSyncer ( pVehicle, pPlayer );
+            return true;
+            break;
+        }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            pObject->SetSyncable ( bEnable );
+            g_pGame->GetObjectSync ()->OverrideSyncer ( pObject, pPlayer );
             return true;
             break;
         }

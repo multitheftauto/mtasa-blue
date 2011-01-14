@@ -44,6 +44,7 @@ public:
     inline CObjectSAInterface * GetObjectInterface  ( void )    { return ( CObjectSAInterface * ) GetInterface (); }
 
     void                        Explode             ( void );
+    void                        Break               ( void );
     void                        SetScale            ( float fScale );
     void                        SetHealth           ( float fHealth );
     float                       GetHealth           ( void );

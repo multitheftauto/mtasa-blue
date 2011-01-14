@@ -182,6 +182,11 @@ struct SVehicleHealthSync : public SFloatAsBitsSync < 12 >
     SVehicleHealthSync () : SFloatAsBitsSync<12> ( 0.f, 2000.0f, true ) {}
 };
 
+struct SObjectHealthSync : public SFloatAsBitsSync < 11 >
+{
+    SObjectHealthSync () : SFloatAsBitsSync<11> ( 0.f, 1000.0f, true ) {}
+};
+
 
 //////////////////////////////////////////
 //                                      //

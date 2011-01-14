@@ -605,6 +605,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CObjectSync.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPacketTranslator.cpp"
 					>
 				</File>
@@ -901,6 +905,14 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CMapInfoPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CObjectStartSyncPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CObjectSyncPacket.cpp"
 						>
 					</File>
 					<File
@@ -1646,6 +1658,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CObjectSync.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPacketTranslator.h"
 					>
 				</File>
@@ -1954,6 +1970,18 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CMapInfoPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CObjectStartSyncPacket.h"
+						>
+					</File>
+  					<File
+						RelativePath=".\logic\packets\CObjectStopSyncPacket.h"
+						>
+					</File>
+  					<File
+						RelativePath=".\logic\packets\CObjectSyncPacket.h"
 						>
 					</File>
 					<File

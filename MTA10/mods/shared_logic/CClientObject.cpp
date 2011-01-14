@@ -39,6 +39,8 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
     m_bUsesCollision = true;
     m_ucAlpha = 255;
     m_fScale = 1.0f;
+    m_fHealth = 1000.0f;
+    m_bBreakable = true;
 
     m_pModelInfo = g_pGame->GetModelInfo ( usModel );
 
@@ -304,6 +306,28 @@ void CClientObject::SetCollisionEnabled ( bool bCollisionEnabled )
 }
 
 
+float CClientObject::GetHealth ( void )
+{
+    if ( m_pObject )
+    {
+        return m_pObject->GetHealth ();
+    }
+
+    return m_fHealth;
+}
+
+
+void CClientObject::SetHealth ( float fHealth )
+{
+    if ( m_pObject )
+    {
+        m_pObject->SetHealth ( fHealth );
+    }
+
+    m_fHealth = fHealth;
+}
+
+
 void CClientObject::StreamIn ( bool bInstantly )
 {
     // We need to load now?
@@ -332,6 +356,12 @@ void CClientObject::StreamIn ( bool bInstantly )
 
 void CClientObject::StreamOut ( void )
 {
+    // Save the health
+    if ( m_pObject )
+    {
+        m_fHealth = m_pObject->GetHealth ();
+    }
+
     // Destroy the object.
     Destroy ();
 
@@ -392,6 +422,7 @@ void CClientObject::Create ( void )
                 if ( m_fScale != 1.0f ) SetScale ( m_fScale );
                 m_pObject->SetAreaCode ( m_ucInterior );
                 SetAlpha ( m_ucAlpha );
+                m_pObject->SetHealth ( m_fHealth );
 
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities ();

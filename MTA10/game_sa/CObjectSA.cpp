@@ -224,6 +224,19 @@ void CObjectSA::Explode()
     }
 }
 
+void CObjectSA::Break ()
+{
+    // Works only if health is 0
+    DWORD dwFunc = 0x5A0D90;
+    DWORD dwThis = (DWORD) GetInterface ();
+
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+}
+
 void CObjectSA::SetScale( float faScale )
 {
     DWORD dwFunc = 0x4745E0;

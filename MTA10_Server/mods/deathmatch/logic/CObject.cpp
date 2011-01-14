@@ -30,6 +30,10 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
     m_pMoveAnimation = NULL;
     m_ucAlpha = 255;
     m_fScale  = 1;
+    m_fHealth = 1000.0f;
+    m_bBreakable = true;
+    m_bSyncable = true;
+    m_pSyncer = NULL;
 
     m_bCollisionsEnabled = true;
 
@@ -70,6 +74,9 @@ CObject::~CObject ( void )
         delete m_pMoveAnimation;
         m_pMoveAnimation = NULL;
     }
+
+    // Remove syncer
+    SetSyncer ( NULL );
 
     // Unlink us from manager
     Unlink ();
@@ -330,5 +337,30 @@ void CObject::AttachTo ( CElement * pElement )
     {
         // Remove us from our managers attached list
         m_pObjectManager->m_Attached.remove ( this );
+    }
+}
+
+void CObject::SetSyncer ( CPlayer* pPlayer )
+{
+    // Prevent a recursive call loop when setting a syncer
+    static bool bAlreadyIn = false;
+    if ( !bAlreadyIn )
+    {
+        // Update the last player if any
+        bAlreadyIn = true;
+        if ( m_pSyncer )
+        {
+            m_pSyncer->RemoveSyncingObject ( this );
+        }
+
+        // Update the new player
+        if ( pPlayer )
+        {
+            pPlayer->AddSyncingObject ( this );
+        }
+        bAlreadyIn = false;
+
+        // Set it
+        m_pSyncer = pPlayer;
     }
 }

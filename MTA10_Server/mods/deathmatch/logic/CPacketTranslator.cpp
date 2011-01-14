@@ -121,6 +121,10 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
             pTemp = new CCameraSyncPacket;
             break;
 
+        case PACKET_ID_OBJECT_SYNC:
+            pTemp = new CObjectSyncPacket;
+            break;
+
         case PACKET_ID_PLAYER_TRANSGRESSION:
             pTemp = new CPlayerTransgressionPacket;
             break;

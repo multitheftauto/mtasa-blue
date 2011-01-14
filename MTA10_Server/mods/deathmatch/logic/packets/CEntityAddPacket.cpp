@@ -212,6 +212,11 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     bool bStatic = pObject->IsStatic ();
                     BitStream.WriteBit ( bStatic );
 
+                    // Health
+                    SObjectHealthSync health;
+                    health.data.fValue = pObject->GetHealth ();
+                    BitStream.Write ( &health );
+
                     break;
                 }
 

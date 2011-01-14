@@ -25,6 +25,7 @@ class CPlayer;
 #include "CPlayerTextManager.h"
 #include "CTeam.h"
 #include "CPad.h"
+#include "CObject.h"
 #include "packets/CPacket.h"
 
 class CKeyBinds;
@@ -135,6 +136,14 @@ public:
     inline unsigned int                         CountSyncingPeds            ( void )                        { return static_cast < unsigned int > ( m_SyncingPeds.size () ); };
     inline std::list < CPed* > ::const_iterator IterSyncingPedBegin         ( void )                        { return m_SyncingPeds.begin (); };
     inline std::list < CPed* > ::const_iterator IterSyncingPedEnd           ( void )                        { return m_SyncingPeds.end (); };
+
+    void                                        AddSyncingObject            ( CObject* pObject );
+    void                                        RemoveSyncingObject         ( CObject* pObject );
+    void                                        RemoveAllSyncingObjects     ( void );
+
+    inline unsigned int                         CountSyncingObjects         ( void )                        { return static_cast < unsigned int > ( m_SyncingObjects.size () ); };
+    inline std::list < CObject* > ::const_iterator IterSyncingObjectBegin   ( void )                        { return m_SyncingObjects.begin (); };
+    inline std::list < CObject* > ::const_iterator IterSyncingObjectEnd     ( void )                        { return m_SyncingObjects.end (); };
 
     inline unsigned int                         GetScriptDebugLevel         ( void )                        { return m_uiScriptDebugLevel; };
     bool                                        SetScriptDebugLevel         ( unsigned int uiLevel );
@@ -248,6 +257,7 @@ private:
 
     std::list < CVehicle* >                     m_SyncingVehicles;
     std::list < CPed* >                         m_SyncingPeds;
+    std::list < CObject* >                      m_SyncingObjects;
 
     unsigned int                                m_uiScriptDebugLevel;   
 

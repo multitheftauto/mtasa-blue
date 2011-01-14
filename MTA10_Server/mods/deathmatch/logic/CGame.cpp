@@ -99,6 +99,7 @@ CGame::CGame ( void )
     m_pLanBroadcast = NULL;
     m_pPedSync = NULL;
     m_pWaterManager = NULL;
+    m_pObjectSync = NULL;
 
 #ifdef MTA_VOICE
     m_pVoiceServer = NULL;
@@ -188,6 +189,7 @@ CGame::~CGame ( void )
     m_ElementDeleter.DoDeleteAll ();
     SAFE_DELETE ( m_pUnoccupiedVehicleSync );
     SAFE_DELETE ( m_pPedSync );
+    SAFE_DELETE ( m_pObjectSync );
     SAFE_DELETE ( m_pConsole );
     SAFE_DELETE ( m_pMapManager );
     SAFE_DELETE ( m_pLuaManager );
@@ -339,6 +341,7 @@ void CGame::DoPulse ( void )
     m_pMapManager->DoPulse ();
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
+    m_pObjectSync->DoPulse ();
     m_pBanManager->DoPulse ();
     m_pAccountManager->DoPulse ();
     m_pRegistryManager->DoPulse ();
@@ -560,6 +563,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pResourceManager->Refresh();
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pPlayerManager, m_pVehicleManager );
     m_pPedSync = new CPedSync ( m_pPlayerManager, m_pPedManager );
+    m_pObjectSync = new CObjectSync ( m_pPlayerManager, m_pObjectManager );
     // Must be created before all clients
     m_pConsoleClient = new CConsoleClient ( m_pConsole );
 
@@ -1015,6 +1019,10 @@ bool CGame::ProcessPacket ( CPacket& Packet )
         return true;
     }
     else if ( m_pPedSync->ProcessPacket ( Packet ) )
+    {
+        return true;
+    }
+    else if ( m_pObjectSync->ProcessPacket ( Packet ) )
     {
         return true;
     }

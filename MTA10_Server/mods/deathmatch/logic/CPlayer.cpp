@@ -115,6 +115,7 @@ CPlayer::~CPlayer ( void )
     // Make sure nobody's syncing us
     RemoveAllSyncingVehicles ();
     RemoveAllSyncingPeds ();
+    RemoveAllSyncingObjects ();
 
     // Delete the player text manager
     delete m_pPlayerTextManager;
@@ -334,6 +335,51 @@ void CPlayer::RemoveAllSyncingPeds ( void )
     // Unreference us from all
     list < CPed* > ::const_iterator iter = m_SyncingPeds.begin ();
     for ( ; iter != m_SyncingPeds.end (); iter++ )
+    {
+        (*iter)->m_pSyncer = NULL;
+    }
+}
+
+
+void CPlayer::AddSyncingObject ( CObject* pObject )
+{
+    // Prevent a recursive call loop when setting a syncer
+    static bool bAlreadyIn = false;
+    if ( !bAlreadyIn )
+    {
+        // Update the object
+        bAlreadyIn = true;
+        pObject->SetSyncer ( this );
+        bAlreadyIn = false;
+
+        // Add it to our list
+        m_SyncingObjects.push_back ( pObject );
+    }
+}
+
+
+void CPlayer::RemoveSyncingObject ( CObject* pObject )
+{
+    // Prevent a recursive call loop when setting a syncer
+    static bool bAlreadyIn = false;
+    if ( !bAlreadyIn )
+    {
+        // Update the object
+        bAlreadyIn = true;
+        pObject->SetSyncer ( NULL );
+        bAlreadyIn = false;
+
+        // Remove it from our list
+        if ( !m_SyncingObjects.empty() ) m_SyncingObjects.remove ( pObject );
+    }
+}
+
+
+void CPlayer::RemoveAllSyncingObjects ( void )
+{
+    // Unreference us from all
+    list < CObject* > ::const_iterator iter = m_SyncingObjects.begin ();
+    for ( ; iter != m_SyncingObjects.end (); iter++ )
     {
         (*iter)->m_pSyncer = NULL;
     }
