@@ -192,7 +192,7 @@ bool CObjectManager::IsBreakableModel ( unsigned long ulObjectModel )
     // Initialize map if required
     if ( breakableModelMap.size () == 0 )
     {
-        for ( int i = 0; i < sizeof ( g_usBreakableModelList ) / sizeof ( g_usBreakableModelList[0] ) ; i++ )
+        for ( uint i = 0; i < sizeof ( g_usBreakableModelList ) / sizeof ( g_usBreakableModelList[0] ) ; i++ )
             breakableModelMap[ g_usBreakableModelList[i] ] = 0;
     }
 
