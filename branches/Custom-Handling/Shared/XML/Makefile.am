@@ -12,8 +12,8 @@ StdInc.h.gch:
 		-o xmll_la-StdInc.h.lo $(srcdir)/StdInc.h \
 		-MT xmll_la-StdInc.h.gch -MD -MP -MF $(DEPDIR)/xmll_la-StdInc.h.Tpo
 
-	$(am__mv) $(DEPDIR)/xmll_la-StdInc.h.Tpo $(DEPDIR)/xmll_la-StdInc.h.Plo
-	$(am__mv) .libs/xmll_la-StdInc.h.o $@
+	mv -f $(DEPDIR)/xmll_la-StdInc.h.Tpo $(DEPDIR)/xmll_la-StdInc.h.Plo
+	mv -f .libs/xmll_la-StdInc.h.o $@
 
 include ./$(DEPDIR)/xmll_la-StdInc.h.Plo
 
@@ -24,9 +24,10 @@ endif
 libdir = $(outputdir)
 lib_LTLIBRARIES = xmll.la
 xmll_la_LIBTOOLFLAGS = --tag=disable-static
+xmll_la_LIBADD = \
+	../../vendor/tinyxml/libtinyxml.la
 xmll_la_LDFLAGS = \
-	-module -avoid-version \
-	-L../../vendor/tinyxml -ltinyxml
+	-module -avoid-version
 xmll_la_SOURCES = \
 	CXMLArray.cpp \
 	CXMLArray.h \

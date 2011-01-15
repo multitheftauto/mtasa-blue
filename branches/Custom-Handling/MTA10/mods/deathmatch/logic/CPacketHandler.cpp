@@ -187,9 +187,11 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
     }
 
     // See if unoccupied sync can handle it
-    if ( g_pClientGame->m_pUnoccupiedVehicleSync->ProcessPacket ( ucPacketID, bitStream ) )
+    if ( g_pClientGame->GetUnoccupiedVehicleSync ()->ProcessPacket ( ucPacketID, bitStream ) )
         return true;
-    else if ( g_pClientGame->m_pPedSync->ProcessPacket ( ucPacketID, bitStream ) )
+    else if ( g_pClientGame->GetPedSync ()->ProcessPacket ( ucPacketID, bitStream ) )
+        return true;
+    else if ( g_pClientGame->GetObjectSync ()->ProcessPacket ( ucPacketID, bitStream ) )
         return true;
 
     return false;
@@ -941,7 +943,7 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
             // Kill our ped in the correct way
             pPed->Kill ( ( eWeaponType ) weapon.data.ucWeaponType,
                          bodyPart.data.uiBodypart,
-                         bStealth, animGroup, animID );
+                         bStealth, false, animGroup, animID );
 
             // Call the onClientPlayerWasted event
             CLuaArguments Arguments;
@@ -2084,6 +2086,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // unsigned char        (1)     - alpha
     // float                (4)     - scale
     // bool                 (1)     - static
+    // SObjectHealthSync    (?)     - health
 
     // Pickups:
     // CVector              (12)    - position
@@ -2340,7 +2343,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
 
                         // Create the object and put it at its position
-                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID );
+                        CDeathmatchObject* pObject = new CDeathmatchObject ( g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, g_pClientGame->m_pObjectSync, EntityID, usObjectID );
                         pEntity = pObject;
                         if ( pObject )
                         {
@@ -2374,6 +2377,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         bool bStatic;
                         if ( bitStream.ReadBit ( bStatic ) )
                             pObject->SetStatic ( bStatic );
+
+                        SObjectHealthSync health;
+                        if ( bitStream.Read ( &health ) )
+                            pObject->SetHealth ( health.data.fValue );
 
                         pObject->SetCollisionEnabled ( bCollisonsEnabled );
                     }
@@ -2780,35 +2787,34 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.ReadCompressed ( sOrdering );
 
                     // Read out the visible distance
-                    float fVisibleDistance;
-                    bitStream.Read ( fVisibleDistance );
+                    SIntegerSync < unsigned short, 14 > visibleDistance;
+                    bitStream.Read ( &visibleDistance );
 
                     // Make a blip with the given ID
-                    CClientRadarMarker* pBlip = new CClientRadarMarker ( g_pClientGame->m_pManager, EntityID, sOrdering, fVisibleDistance );
+                    CClientRadarMarker* pBlip = new CClientRadarMarker ( g_pClientGame->m_pManager, EntityID, sOrdering, visibleDistance );
                     pEntity = pBlip;
 
                     pBlip->SetPosition ( position.data.vecPosition );
 
                     // Read out the icon
-                    unsigned char ucIcon;
-                    bitStream.Read ( ucIcon );                    
+                    SIntegerSync < unsigned char, 6 > icon;
+                    bitStream.Read ( &icon );                    
 
                     // Set the icon if it's valid
-                    if ( ucIcon <= RADAR_MARKER_LIMIT ) pBlip->SetSprite ( ucIcon );
-
-                    unsigned char ucSize = 0;
+                    if ( icon <= RADAR_MARKER_LIMIT ) pBlip->SetSprite ( icon );
 
                     // Read out size and color if there's no icon
-                    if ( ucIcon == 0 )
+                    if ( icon == 0 )
                     {
                         // Read out the size
-                        bitStream.Read ( ucSize );
+                        SIntegerSync < unsigned char, 5 > size;
+                        bitStream.Read ( &size );
 
                         // Read out the color
                         SColorSync color;
                         bitStream.Read ( &color );
 
-                        pBlip->SetScale ( ucSize );
+                        pBlip->SetScale ( size );
                         pBlip->SetColor ( color );
                     }                    
 

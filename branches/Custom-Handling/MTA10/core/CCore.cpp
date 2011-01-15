@@ -626,11 +626,6 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
 }
 
-void CCore::ApplyMenuSettings ( void )
-{
-    m_pLocalGUI->GetMainMenu ()->LoadMenuOptions ();
-}
-
 void CCore::ApplyCommunityState ( void )
 {
     bool bLoggedIn = g_pCore->GetCommunity()->IsLoggedIn();
@@ -1181,7 +1176,6 @@ void CCore::DoPostFramePulse ( )
         ApplyConsoleSettings ();
         ApplyServerBrowserSettings ();
         ApplyGameSettings ();
-        ApplyMenuSettings ();
 
         m_pGUI->SetMouseClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
         m_pGUI->SetMouseDoubleClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );

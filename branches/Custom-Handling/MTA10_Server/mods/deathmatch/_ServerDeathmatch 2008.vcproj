@@ -54,7 +54,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -157,7 +157,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -262,7 +262,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -605,6 +605,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CObjectSync.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPacketTranslator.cpp"
 					>
 				</File>
@@ -901,6 +905,14 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CMapInfoPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CObjectStartSyncPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CObjectSyncPacket.cpp"
 						>
 					</File>
 					<File
@@ -1228,7 +1240,7 @@
 					Name="zip"
 					>
 					<File
-						RelativePath=".\utils\zip\ioapi.c"
+						RelativePath="..\..\..\vendor\zip\ioapi.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1256,7 +1268,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\utils\zip\iowin32.c"
+						RelativePath="..\..\..\vendor\zip\iowin32.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1284,7 +1296,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\utils\zip\mztools.c"
+						RelativePath="..\..\..\vendor\zip\mztools.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1312,7 +1324,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\utils\zip\unzip.c"
+						RelativePath="..\..\..\vendor\zip\unzip.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1340,7 +1352,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\utils\zip\zip.c"
+						RelativePath="..\..\..\vendor\zip\zip.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1391,7 +1403,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\utils\zip\crypt.h"
+				RelativePath="..\..\..\vendor\zip\crypt.h"
 				>
 			</File>
 			<File
@@ -1643,6 +1655,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CObjectStreamItem.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CObjectSync.h"
 					>
 				</File>
 				<File
@@ -1957,6 +1973,18 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CObjectStartSyncPacket.h"
+						>
+					</File>
+  					<File
+						RelativePath=".\logic\packets\CObjectStopSyncPacket.h"
+						>
+					</File>
+  					<File
+						RelativePath=".\logic\packets\CObjectSyncPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPacket.h"
 						>
 					</File>
@@ -2261,23 +2289,23 @@
 					Name="zip"
 					>
 					<File
-						RelativePath=".\utils\zip\ioapi.h"
+						RelativePath="..\..\..\vendor\zip\ioapi.h"
 						>
 					</File>
 					<File
-						RelativePath=".\utils\zip\iowin32.h"
+						RelativePath="..\..\..\vendor\zip\iowin32.h"
 						>
 					</File>
 					<File
-						RelativePath=".\utils\zip\mztools.h"
+						RelativePath="..\..\..\vendor\zip\mztools.h"
 						>
 					</File>
 					<File
-						RelativePath=".\utils\zip\unzip.h"
+						RelativePath="..\..\..\vendor\zip\unzip.h"
 						>
 					</File>
 					<File
-						RelativePath=".\utils\zip\zip.h"
+						RelativePath="..\..\..\vendor\zip\zip.h"
 						>
 					</File>
 				</Filter>

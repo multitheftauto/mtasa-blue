@@ -133,7 +133,6 @@ public:
     void                    ApplyConsoleSettings            ( void );
     void                    ApplyServerBrowserSettings      ( void );
     void                    ApplyGameSettings               ( void );
-    void                    ApplyMenuSettings               ( void );
     void                    ApplyCommunityState             ( void );
     void                    UpdateRecentlyPlayed            ( void );
 

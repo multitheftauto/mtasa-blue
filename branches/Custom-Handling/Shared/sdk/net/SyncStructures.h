@@ -74,6 +74,39 @@ private:
     };
 };
 
+// Useful when we don't need all bits of integer type
+template < typename type, unsigned int bits >
+struct SIntegerSync : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), bits );
+    }
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), bits );
+    }
+
+    SIntegerSync ( void )
+    {
+        assert ( bits <= sizeof ( type ) * 8 );
+    }
+    SIntegerSync ( type value )
+    {
+        SIntegerSync ();
+        data.value = value;
+    }
+
+    operator type ( void ) const
+    {
+        return data.value;
+    }
+
+    struct
+    {
+        type value : bits;
+    } data;
+};
 
 //////////////////////////////////////////
 //                                      //
@@ -147,6 +180,11 @@ struct SPlayerArmorSync : public SFloatAsBitsSync < 8 >
 struct SVehicleHealthSync : public SFloatAsBitsSync < 12 >
 {
     SVehicleHealthSync () : SFloatAsBitsSync<12> ( 0.f, 2000.0f, true ) {}
+};
+
+struct SObjectHealthSync : public SFloatAsBitsSync < 11 >
+{
+    SObjectHealthSync () : SFloatAsBitsSync<11> ( 0.f, 1000.0f, true ) {}
 };
 
 

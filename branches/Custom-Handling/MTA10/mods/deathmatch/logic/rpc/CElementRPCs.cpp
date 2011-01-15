@@ -448,6 +448,13 @@ void CElementRPCs::SetElementHealth ( NetBitStreamInterface& bitStream )
                     pVehicle->SetHealth ( fHealth );
                     break;
                 }
+
+                case CCLIENTOBJECT:
+                {
+                    CClientObject* pObject = static_cast < CClientObject * > ( pEntity );
+                    pObject->SetHealth ( fHealth );
+                    break;
+                }
             }
         }
     }

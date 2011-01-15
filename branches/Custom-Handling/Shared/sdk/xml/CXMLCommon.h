@@ -20,7 +20,7 @@ enum eXMLClass
     CXML_ATTR
 };
 
-#define INVALID_XML_ID 0x0
+#define INVALID_XML_ID 0xFFFFFFFF
 
 class CXMLCommon
 {

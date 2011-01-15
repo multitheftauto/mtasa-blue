@@ -459,12 +459,14 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getBlipSize", CLuaFunctionDefinitions::GetBlipSize );
     CLuaCFunctions::AddFunction ( "getBlipColor", CLuaFunctionDefinitions::GetBlipColor );
     CLuaCFunctions::AddFunction ( "getBlipOrdering", CLuaFunctionDefinitions::GetBlipOrdering );
+    CLuaCFunctions::AddFunction ( "getBlipVisibleDistance", CLuaFunctionDefinitions::GetBlipVisibleDistance );
 
     // Blip set funcs
     CLuaCFunctions::AddFunction ( "setBlipIcon", CLuaFunctionDefinitions::SetBlipIcon );
     CLuaCFunctions::AddFunction ( "setBlipSize", CLuaFunctionDefinitions::SetBlipSize );
     CLuaCFunctions::AddFunction ( "setBlipColor", CLuaFunctionDefinitions::SetBlipColor );
     CLuaCFunctions::AddFunction ( "setBlipOrdering", CLuaFunctionDefinitions::SetBlipOrdering );
+    CLuaCFunctions::AddFunction ( "setBlipVisibleDistance", CLuaFunctionDefinitions::SetBlipVisibleDistance );
     
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefinitions::CreateObject );

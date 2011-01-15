@@ -49,7 +49,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./tinyxml;../sdk"
+				AdditionalIncludeDirectories="../../vendor/tinyxml;../sdk"
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;TIXML_USE_STL;_CRT_SECURE_NO_WARNINGS;FORCE_BUILD=1"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -157,7 +157,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="./tinyxml;../sdk"
+				AdditionalIncludeDirectories="../../vendor/tinyxml;../sdk"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE;TIXML_USE_STL;_CRT_SECURE_NO_WARNINGS;FORCE_BUILD=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -264,7 +264,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="./tinyxml;../sdk"
+				AdditionalIncludeDirectories="../../vendor/tinyxml;../sdk"
 				PreprocessorDefinitions="WIN32;MTA_RELEASE;TIXML_USE_STL;_CRT_SECURE_NO_WARNINGS;FORCE_BUILD=1"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -401,7 +401,7 @@
 				Name="tinyxml"
 				>
 				<File
-					RelativePath=".\tinyxml\tinystr.cpp"
+					RelativePath="..\..\vendor\tinyxml\tinystr.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -429,7 +429,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\tinyxml\tinyxml.cpp"
+					RelativePath="..\..\vendor\tinyxml\tinyxml.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -457,7 +457,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\tinyxml\tinyxmlerror.cpp"
+					RelativePath="..\..\vendor\tinyxml\tinyxmlerror.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -485,7 +485,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\tinyxml\tinyxmlparser.cpp"
+					RelativePath="..\..\vendor\tinyxml\tinyxmlparser.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -550,11 +550,11 @@
 				Name="tinyxml"
 				>
 				<File
-					RelativePath=".\tinyxml\tinystr.h"
+					RelativePath="..\..\vendor\tinyxml\tinystr.h"
 					>
 				</File>
 				<File
-					RelativePath=".\tinyxml\tinyxml.h"
+					RelativePath="..\..\vendor\tinyxml\tinyxml.h"
 					>
 				</File>
 			</Filter>

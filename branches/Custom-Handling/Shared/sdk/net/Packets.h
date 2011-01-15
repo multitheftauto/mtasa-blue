@@ -120,6 +120,11 @@ enum ePacketID
     // Camera related packets
     PACKET_ID_CAMERA_SYNC,
 
+    // Object sync
+    PACKET_ID_OBJECT_STARTSYNC,
+    PACKET_ID_OBJECT_STOPSYNC,
+    PACKET_ID_OBJECT_SYNC,
+
     // Bitstream 0x0e
     PACKET_ID_UPDATE_INFO,
 

@@ -12,6 +12,7 @@
 
 #include <StdInc.h>
 #include "CBlipRPCs.h"
+#include "net/SyncStructures.h"
 
 void CBlipRPCs::LoadFunctions ( void )
 {
@@ -20,6 +21,7 @@ void CBlipRPCs::LoadFunctions ( void )
     AddHandler ( SET_BLIP_SIZE, SetBlipSize, "SetBlipSize" );
     AddHandler ( SET_BLIP_COLOR, SetBlipColor, "SetBlipColor" );
     AddHandler ( SET_BLIP_ORDERING, SetBlipOrdering, "SetBlipOrdering" );
+    AddHandler ( SET_BLIP_VISIBLE_DISTANCE, SetBlipVisibleDistance, "SetBlipVisibleDistance" );
 }
 
 
@@ -33,19 +35,19 @@ void CBlipRPCs::SetBlipIcon ( NetBitStreamInterface& bitStream )
 {
     // Read out the blip ID and the icon id
     ElementID ID;
-    unsigned char ucIcon;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucIcon ) )
+    SIntegerSync < unsigned char, 6 > icon;
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &icon ) )
     {
         // Valid range?
-        if ( ucIcon <= RADAR_MARKER_LIMIT )
+        if ( icon <= RADAR_MARKER_LIMIT )
         {
             // Grab the blip
             CClientRadarMarker* pMarker = m_pRadarMarkerManager->Get ( ID );
             if ( pMarker )
             {
                 // Set the new icon
-                pMarker->SetSprite ( ucIcon );
+                pMarker->SetSprite ( icon );
             }
         }
     }
@@ -54,18 +56,18 @@ void CBlipRPCs::SetBlipIcon ( NetBitStreamInterface& bitStream )
 
 void CBlipRPCs::SetBlipSize ( NetBitStreamInterface& bitStream )
 {
-    // Read out the blip ID and the icon id
+    // Read out the blip ID and the size
     ElementID ID;
-    unsigned char ucSize;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucSize ) )
+    SIntegerSync < unsigned char, 5 > size;
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &size ) )
     {
         // Grab the blip
         CClientRadarMarker* pMarker = m_pRadarMarkerManager->Get ( ID );
         if ( pMarker )
         {
             // Set the new size
-            pMarker->SetScale ( ucSize );
+            pMarker->SetScale ( size );
         }
     }
 }
@@ -75,12 +77,9 @@ void CBlipRPCs::SetBlipColor ( NetBitStreamInterface& bitStream )
 {
     // Read out the blip ID and the color
     ElementID ID;
-    SColor color;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( color.R ) &&
-         bitStream.Read ( color.G ) &&
-         bitStream.Read ( color.B ) &&
-         bitStream.Read ( color.A ) )
+    SColorSync color;
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &color ) )
     {
         // Grab the blip
         CClientRadarMarker* pMarker = m_pRadarMarkerManager->Get ( ID );
@@ -95,11 +94,11 @@ void CBlipRPCs::SetBlipColor ( NetBitStreamInterface& bitStream )
 
 void CBlipRPCs::SetBlipOrdering ( NetBitStreamInterface& bitStream )
 {
-    // Read out the blip ID and the color
+    // Read out the blip ID and the ordering
     ElementID ID;
     short sOrdering;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( sOrdering ) )
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.ReadCompressed ( sOrdering ) )
     {
         // Grab the blip
         CClientRadarMarker* pMarker = m_pRadarMarkerManager->Get ( ID );
@@ -107,6 +106,25 @@ void CBlipRPCs::SetBlipOrdering ( NetBitStreamInterface& bitStream )
         {
             // Set the new color
             pMarker->SetOrdering ( sOrdering );
+        }
+    }
+}
+
+
+void CBlipRPCs::SetBlipVisibleDistance ( NetBitStreamInterface& bitStream )
+{
+    // Read out the blip ID and the distance
+    ElementID ID;
+    SIntegerSync < unsigned short, 14 > visibleDistance;
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &visibleDistance ) )
+    {
+        // Grab the blip
+        CClientRadarMarker* pMarker = m_pRadarMarkerManager->Get ( ID );
+        if ( pMarker )
+        {
+            // Set the new visible distance
+            pMarker->SetVisibleDistance ( visibleDistance );
         }
     }
 }

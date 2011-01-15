@@ -153,6 +153,24 @@ CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA ( bool bKiller, CPed * pPed, 
     }
 }
 
+CTaskSimpleDeadSA::CTaskSimpleDeadSA ( unsigned int uiDeathTimeMS, bool bUnk2 )
+{
+    DEBUG_TRACE("CTaskSimpleDeadSA::CTaskSimpleDeadSA ( int iUnk1, bool bUnk2 )");
+
+    this->CreateTaskInterface ( sizeof(CTaskSimpleDeadSAInterface) );
+    if ( !IsValid () ) return;
+    DWORD dwFunc = FUNC_CTaskSimpleDead__Constructor;
+    DWORD dwThisInterface = (DWORD)this->GetInterface ();
+    
+    _asm
+    {
+        mov     ecx, dwThisInterface
+        push    bUnk2
+        push    uiDeathTimeMS
+        call    dwFunc
+    }
+}
+
 
 CTaskComplexSunbatheSA::CTaskComplexSunbatheSA ( CObject* pTowel, const bool bStartStanding )
 {

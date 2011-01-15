@@ -7,10 +7,16 @@ if [ ! -f "Makefile" ]; then
   exit
 fi
 
-make install
+make -C MTA10_Server install
+make -C Shared/XML install
 
-cp -n MTA10_Server/mods/deathmatch/acl.xml MTA10_Server/output/mods/deathmatch/acl.xml 
-cp -n MTA10_Server/mods/deathmatch/mtaserver.conf MTA10_Server/output/mods/deathmatch/mtaserver.conf
+data_files="acl.xml banlist.xml mtaserver.conf vehiclecolors.conf"
+for i in $data_files ; do
+  if [ ! -e "MTA10_Server/output/mods/deathmatch/$i" ] ; then
+    cp MTA10_Server/mods/deathmatch/"$i" MTA10_Server/output/mods/deathmatch/"$i"
+  fi
+done
+
 cd MTA10_Server/output
 if [ ! -d  "mods/deathmatch/resources" ]; then
     svn export http://mtasa-resources.googlecode.com/svn/trunk/required mods/deathmatch/resources
@@ -23,8 +29,10 @@ if [ -f "mtasa-1.1-custom-net-linux.tar.gz" ]; then
 fi
 
 if [ "$(which wget)" ]; then
-  wget http://mtasa-blue.googlecode.com/files/mtasa-1.1-custom-net-linux.tar.gz 
-  tar -x -z -f mtasa-1.1-custom-net-linux.tar.gz
+  wget http://nightly.mtasa.com/?multitheftauto_linux-1.1-latest -O multitheftauto_linux-1.1-latest.tar.gz
+  tar -xzf multitheftauto_linux-1.1-latest.tar.gz --transform 's:[^/]*:latest_nightly:'
+  mv latest_nightly/net.so .
+  rm -rf latest_nightly multitheftauto_linux-1.1-latest.tar.gz
 else
   echo "Warning: Please download net.so from http://mtasa-blue.googlecode.com/files/mtasa-1.1-custom-net-linux.tar.gz"
 fi

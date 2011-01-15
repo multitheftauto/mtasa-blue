@@ -202,7 +202,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="if exist &quot;..\obj&quot; (rmdir /s/q &quot;..\obj&quot;)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

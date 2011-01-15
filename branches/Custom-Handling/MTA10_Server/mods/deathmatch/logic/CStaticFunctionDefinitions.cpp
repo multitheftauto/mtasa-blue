@@ -730,6 +730,12 @@ bool CStaticFunctionDefinitions::GetElementHealth ( CElement* pElement, float& f
             fHealth = pVehicle->GetHealth ();
             break;
         }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            fHealth = pObject->GetHealth ();
+            break;
+        }
         default: return false;
     }
 
@@ -798,6 +804,12 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer ( CElement* pElement )
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             return pVehicle->IsUnoccupiedSyncable () ? static_cast < CElement* > ( pVehicle->GetSyncer() ) : NULL;
+            break;
+        }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            return pObject->IsSyncable () ? static_cast < CElement* > ( pObject->GetSyncer () ) : NULL;
             break;
         }
     }
@@ -1497,6 +1509,12 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
             pVehicle->SetHealthChangeTime ( GetTickCount () );
             break;
         }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            pObject->SetHealth ( fHealth );
+            break;
+        }
         default: return false;
     }
 
@@ -1629,6 +1647,14 @@ bool CStaticFunctionDefinitions::SetElementSyncer ( CElement* pElement, CPlayer*
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             pVehicle->SetUnoccupiedSyncable ( bEnable );
             g_pGame->GetUnoccupiedVehicleSync()->OverrideSyncer ( pVehicle, pPlayer );
+            return true;
+            break;
+        }
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( pElement );
+            pObject->SetSyncable ( bEnable );
+            g_pGame->GetObjectSync ()->OverrideSyncer ( pObject, pPlayer );
             return true;
             break;
         }
@@ -1841,13 +1867,31 @@ CPed* CStaticFunctionDefinitions::CreatePed ( CResource* pResource, unsigned sho
         CPed * pPed = m_pPedManager->Create ( usModel, pResource->GetDynamicElementRoot () );
         if ( pPed )
         {
+            // Convert the rotation to radians
+            float fRotationRadians = ConvertDegreesToRadians ( fRotation );
+            // Clamp it to -PI .. PI
+            if ( fRotationRadians < -PI )
+            {
+                do
+                {
+                    fRotationRadians += PI * 2.0f;
+                } while ( fRotationRadians < -PI );
+            }
+            else if ( fRotationRadians > PI )
+            {
+                do
+                {
+                    fRotationRadians -= PI * 2.0f;
+                } while ( fRotationRadians > PI );
+            }
+
             pPed->SetPosition ( vecPosition );
             pPed->SetIsDead ( false );
             pPed->SetSpawned ( true );
             pPed->SetHealth ( 100.0f );
             pPed->SetSyncable ( bSynced );
 
-            pPed->SetRotation ( fRotation );
+            pPed->SetRotation ( fRotationRadians );
 
             CEntityAddPacket Packet;
             Packet.Add ( pPed );
@@ -6303,7 +6347,7 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CElement* pElement, const char*
 }
 
 
-CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance, CElement* pVisibleTo )
+CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance, CElement* pVisibleTo )
 {
     // Valid icon and size?
     if ( CBlipManager::IsValidIcon ( ucIcon ) && ucSize <= 25 )
@@ -6319,7 +6363,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVec
             pBlip->m_ucSize = ucSize;
             pBlip->SetColor ( color );
             pBlip->m_sOrdering = sOrdering;
-            pBlip->m_fVisibleDistance = fVisibleDistance;
+            pBlip->m_usVisibleDistance = usVisibleDistance;
 
             // Make him visible to the given element
             if ( pVisibleTo )
@@ -6339,7 +6383,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVec
 }
 
 
-CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance, CElement* pVisibleTo )
+CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance, CElement* pVisibleTo )
 {
     assert ( pElement );
     // Valid icon and size?
@@ -6353,7 +6397,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, 
             pBlip->m_ucSize = ucSize;
             pBlip->SetColor ( color );
             pBlip->m_sOrdering = sOrdering;
-            pBlip->m_fVisibleDistance = fVisibleDistance;
+            pBlip->m_usVisibleDistance = usVisibleDistance;
 
             // Set his visible to element
             if ( pVisibleTo )
@@ -6401,6 +6445,15 @@ bool CStaticFunctionDefinitions::GetBlipColor ( CBlip* pBlip, SColor& outColor )
 }
 
 
+bool CStaticFunctionDefinitions::GetBlipVisibleDistance ( CBlip* pBlip, unsigned short& usVisibleDistance )
+{
+    assert ( pBlip );
+
+    usVisibleDistance = pBlip->m_usVisibleDistance;
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetBlipOrdering ( CBlip* pBlip, short& sOrdering )
 {
     assert ( pBlip );
@@ -6427,8 +6480,11 @@ bool CStaticFunctionDefinitions::SetBlipIcon ( CElement* pElement, unsigned char
                 pBlip->m_ucIcon = ucIcon;
 
                 CBitStream bitStream;
-                bitStream.pBitStream->Write ( pBlip->GetID () );
-                bitStream.pBitStream->Write ( ucIcon );
+                bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
+
+                SIntegerSync < unsigned char, 6 > icon ( ucIcon );
+                bitStream.pBitStream->Write ( &icon );
+
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_ICON, *bitStream.pBitStream ) );
 
                 return true;
@@ -6455,8 +6511,11 @@ bool CStaticFunctionDefinitions::SetBlipSize ( CElement* pElement, unsigned char
                 pBlip->m_ucSize = ucSize;
 
                 CBitStream bitStream;
-                bitStream.pBitStream->Write ( pBlip->GetID () );
-                bitStream.pBitStream->Write ( ucSize );
+                bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
+
+                SIntegerSync < unsigned char, 5 > size ( ucSize );
+                bitStream.pBitStream->Write ( &size );
+
                 m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_SIZE, *bitStream.pBitStream ) );
 
                 return true;
@@ -6483,11 +6542,11 @@ bool CStaticFunctionDefinitions::SetBlipColor ( CElement* pElement, const SColor
             pBlip->SetColor ( color );
 
             CBitStream bitStream;
-            bitStream.pBitStream->Write ( pBlip->GetID () );
-            bitStream.pBitStream->Write ( color.R );
-            bitStream.pBitStream->Write ( color.G );
-            bitStream.pBitStream->Write ( color.B );
-            bitStream.pBitStream->Write ( color.A );
+            bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
+
+            SColorSync colorSync ( color );
+            bitStream.pBitStream->Write ( &colorSync );
+
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_COLOR, *bitStream.pBitStream ) );
 
             return true;
@@ -6511,9 +6570,37 @@ bool CStaticFunctionDefinitions::SetBlipOrdering ( CElement* pElement, short sOr
             pBlip->m_sOrdering = sOrdering;
 
             CBitStream bitStream;
-            bitStream.pBitStream->Write ( pBlip->GetID () );
-            bitStream.pBitStream->Write ( sOrdering );
+            bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
+            bitStream.pBitStream->WriteCompressed ( sOrdering );
             m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_ORDERING, *bitStream.pBitStream ) );
+
+            return true;
+        }
+    }
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CElement* pElement, unsigned short usVisibleDistance )
+{
+    RUN_CHILDREN SetBlipVisibleDistance ( *iter, usVisibleDistance );
+
+    if ( IS_BLIP ( pElement ) )
+    {
+        // Grab the blip and set the new visible distance
+        CBlip* pBlip = static_cast < CBlip* > ( pElement );
+        if ( pBlip->m_usVisibleDistance != usVisibleDistance )
+        {
+            pBlip->m_usVisibleDistance = usVisibleDistance;
+
+            CBitStream bitStream;
+            bitStream.pBitStream->WriteCompressed ( pBlip->GetID () );
+
+            SIntegerSync < unsigned short, 14 > visibleDistance ( usVisibleDistance );
+            bitStream.pBitStream->Write ( &visibleDistance );
+
+            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_BLIP_VISIBLE_DISTANCE, *bitStream.pBitStream ) );
 
             return true;
         }
@@ -7091,10 +7178,10 @@ bool CStaticFunctionDefinitions::CreateFire ( const CVector& vecPosition, float 
 }
 
 
-bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( CElement* pElement, unsigned long ulSound )
+bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( CElement* pElement, unsigned char ucSound )
 {
     assert ( pElement );
-    RUN_CHILDREN PlaySoundFrontEnd ( *iter, ulSound );
+    RUN_CHILDREN PlaySoundFrontEnd ( *iter, ucSound );
 
     if ( IS_PLAYER ( pElement ) )
     {
@@ -7102,8 +7189,11 @@ bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( CElement* pElement, unsigne
 
         // Tell them to play a sound
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( (unsigned char) AUDIO_FRONTEND );
-        BitStream.pBitStream->Write ( ulSound );
+//      BitStream.pBitStream->Write ( (unsigned char) AUDIO_FRONTEND );
+
+        SIntegerSync < unsigned char, 7 > sound ( ucSound );
+        BitStream.pBitStream->Write ( &sound );
+
         pPlayer->Send ( CLuaPacket ( PLAY_SOUND, *BitStream.pBitStream ) );
     }
 

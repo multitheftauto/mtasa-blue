@@ -1,1 +1,1 @@
-SUBDIRS = XML
+SUBDIRS = XML publicsdk

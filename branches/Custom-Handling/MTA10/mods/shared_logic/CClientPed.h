@@ -228,7 +228,7 @@ public:
 
     bool                        IsDying                     ( void );
     bool                        IsDead                      ( void );
-    void                        Kill                        ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, AssocGroupId animGroup = 0, AnimationId animID = 15 );
+    void                        Kill                        ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, bool bSetDirectlyDead = false, AssocGroupId animGroup = 0, AnimationId animID = 15 );
     void                        StealthKill                 ( CClientPed * pPed );
 
     inline int                  GetRespawnState             ( void )                                    { return m_pRespawnState; };

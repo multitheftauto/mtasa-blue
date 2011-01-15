@@ -212,6 +212,11 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     bool bStatic = pObject->IsStatic ();
                     BitStream.WriteBit ( bStatic );
 
+                    // Health
+                    SObjectHealthSync health;
+                    health.data.fValue = pObject->GetHealth ();
+                    BitStream.Write ( &health );
+
                     break;
                 }
 
@@ -515,15 +520,17 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.WriteCompressed ( pBlip->m_sOrdering );
 
                     // Write the visible distance
-                    BitStream.Write ( pBlip->m_fVisibleDistance );
+                    SIntegerSync < unsigned short, 14 > visibleDistance ( pBlip->m_usVisibleDistance );
+                    BitStream.Write ( &visibleDistance );
 
                     // Write the icon
-                    unsigned char ucIcon = pBlip->m_ucIcon;
-                    BitStream.Write ( ucIcon );
-                    if ( ucIcon == 0 )
+                    SIntegerSync < unsigned char, 6 > icon ( pBlip->m_ucIcon );
+                    BitStream.Write ( &icon );
+                    if ( pBlip->m_ucIcon == 0 )
                     {
                         // Write the size
-                        BitStream.Write ( pBlip->m_ucSize );
+                        SIntegerSync < unsigned char, 5 > size ( pBlip->m_ucSize );
+                        BitStream.Write ( &size );
 
                         // Write the color
                         SColorSync color;

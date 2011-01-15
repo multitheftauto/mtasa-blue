@@ -13,7 +13,7 @@
 #define _bits_h_
 
 #define hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x) & 7) + 9)
-#define error_ptr(error) ((void*)error)
+#define error_ptr(error) ((void*)(unsigned long)((long)(error)))
 #define is_error(ptr) ((unsigned long)ptr > (unsigned long)-4000L)
 
 #endif

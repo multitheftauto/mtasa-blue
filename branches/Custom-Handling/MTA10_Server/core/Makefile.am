@@ -1,6 +1,5 @@
 INCLUDES += -I$(srcdir)/../sdk/
 INCLUDES += -I$(srcdir)/../../Shared/sdk/
-INCLUDES += $(CURSES_CFLAGS)
 
 if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch
@@ -13,8 +12,8 @@ StdInc.h.gch:
 		-o core_la-StdInc.h.lo $(srcdir)/StdInc.h \
 		-MT core_la-StdInc.h.gch -MD -MP -MF $(DEPDIR)/core_la-StdInc.h.Tpo
 
-	$(am__mv) $(DEPDIR)/core_la-StdInc.h.Tpo $(DEPDIR)/core_la-StdInc.h.Plo
-	$(am__mv) .libs/core_la-StdInc.h.o $@
+	mv -f $(DEPDIR)/core_la-StdInc.h.Tpo $(DEPDIR)/core_la-StdInc.h.Plo
+	mv -f .libs/core_la-StdInc.h.o $@
 
 include ./$(DEPDIR)/core_la-StdInc.h.Plo
 
@@ -25,7 +24,7 @@ endif
 libdir = $(outputdir)
 lib_LTLIBRARIES = core.la
 core_la_LIBTOOLFLAGS = --tag=disable-static
-core_la_LIBADD = $(CURSES_LIBS)
+core_la_LIBADD = $(CURSES_LIB)
 core_la_LDFLAGS = -module -avoid-version
 core_la_SOURCES = \
 	CCrashHandlerAPI.cpp \

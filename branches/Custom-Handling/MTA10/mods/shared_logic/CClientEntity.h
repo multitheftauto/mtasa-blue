@@ -305,7 +305,7 @@ private:
     static void                     _GetEntitiesFromRoot        ( unsigned int uiTypeHash, std::map < CClientEntity*, int >& mapResults );
 #endif
 
-    typedef google::dense_hash_map < unsigned int, std::list < CClientEntity* > > t_mapEntitiesFromRoot;
+    typedef google::dense_hash_map < unsigned int, CMappedList < CClientEntity* > > t_mapEntitiesFromRoot;
     static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
     static bool                     ms_bEntitiesFromRootInitialized;
 };

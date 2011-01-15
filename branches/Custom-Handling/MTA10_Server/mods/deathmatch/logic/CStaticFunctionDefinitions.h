@@ -347,8 +347,8 @@ public:
     static bool                 SetMarkerIcon                       ( CElement* pElement, const char* szIcon );
 
     // Blip create/destroy functions
-    static CBlip*               CreateBlip                          ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance, CElement* pVisibleTo );
-    static CBlip*               CreateBlipAttachedTo                ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance, CElement* pVisibleTo );
+    static CBlip*               CreateBlip                          ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance, CElement* pVisibleTo );
+    static CBlip*               CreateBlipAttachedTo                ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance, CElement* pVisibleTo );
     static bool                 DestroyBlipsAttachedTo              ( CElement* pElement );
 
     // Blip get functions
@@ -356,12 +356,14 @@ public:
     static bool                 GetBlipSize                         ( CBlip* pBlip, unsigned char& ucSize );
     static bool                 GetBlipColor                        ( CBlip* pBlip, SColor& outColor );
     static bool                 GetBlipOrdering                     ( CBlip* pBlip, short& sOrdering );
+    static bool                 GetBlipVisibleDistance              ( CBlip* pBlip, unsigned short& usVisibleDistance );
 
     // Blip set functions
     static bool                 SetBlipIcon                         ( CElement* pElement, unsigned char ucIcon );
     static bool                 SetBlipSize                         ( CElement* pElement, unsigned char ucSize );
     static bool                 SetBlipColor                        ( CElement* pElement, const SColor color );
     static bool                 SetBlipOrdering                     ( CElement* pElement, short sOrdering );
+    static bool                 SetBlipVisibleDistance              ( CElement* pElement, unsigned short usVisibleDistance );
 
     // Object create/destroy functions
     static CObject*             CreateObject                        ( CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );
@@ -425,7 +427,7 @@ public:
     static bool                 CreateFire                          ( const CVector& vecPosition, float fSize, CElement* pElement );
 
     // Audio funcs
-    static bool                 PlaySoundFrontEnd                   ( CElement* pElement, unsigned long ulSound );
+    static bool                 PlaySoundFrontEnd                   ( CElement* pElement, unsigned char ucSound );
     static bool                 PlayMissionAudio                    ( CElement* pElement, CVector* vecPosition, unsigned short usSlot );
     static bool                 PreloadMissionAudio                 ( CElement* pElement, unsigned short usAudio, unsigned short usSlot );
 

@@ -99,6 +99,7 @@ class CSettings;
 class CTeamManager;
 class CUnoccupiedVehicleSync;
 class CPedSync;
+class CObjectSync;
 class CVehicleManager;
 class CZoneNames;
 class CLanBroadcast;
@@ -187,6 +188,7 @@ public:
     inline CTeamManager*            GetTeamManager              ( void )        { return m_pTeamManager; }
     inline CUnoccupiedVehicleSync*  GetUnoccupiedVehicleSync    ( void )        { return m_pUnoccupiedVehicleSync; }
     inline CPedSync*                GetPedSync                  ( void )        { return m_pPedSync; }
+    inline CObjectSync*             GetObjectSync               ( void )        { return m_pObjectSync; }
     inline CConsole*                GetConsole                  ( void )        { return m_pConsole; }
     inline CRegistryManager*        GetRegistryManager          ( void )        { return m_pRegistryManager; }
     inline CRegistry*               GetRegistry                 ( void )        { return m_pRegistry; }
@@ -321,6 +323,7 @@ private:
     CConsole*                       m_pConsole;
     CUnoccupiedVehicleSync*         m_pUnoccupiedVehicleSync;
     CPedSync*                       m_pPedSync;
+    CObjectSync*                    m_pObjectSync;
     CMarkerManager*                 m_pMarkerManager;
     CClock*                         m_pClock;
     CBanManager*                    m_pBanManager;

@@ -382,11 +382,13 @@ public:
     LUA_DECLARE ( GetBlipSize );
     LUA_DECLARE ( GetBlipColor );
     LUA_DECLARE ( GetBlipOrdering );
+    LUA_DECLARE ( GetBlipVisibleDistance );
 
     LUA_DECLARE ( SetBlipIcon );
     LUA_DECLARE ( SetBlipSize );
     LUA_DECLARE ( SetBlipColor );
     LUA_DECLARE ( SetBlipOrdering );
+    LUA_DECLARE ( SetBlipVisibleDistance );
 
     // Marker funcs
     LUA_DECLARE ( CreateMarker );

@@ -374,8 +374,7 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
         }
         else
         {
-            void* ptype = va_arg( vl, void* );
-            switch ( (int)ptype )
+            switch ( va_arg( vl, int ) )
             {
                 case SQLITE_INTEGER:
                 {
@@ -412,13 +411,9 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
                 break;
 
                 default:
-                {
-                    // If can't match type, assume it's a string
-                    const char* szValue = (const char*)ptype;
-                    assert ( szValue );
-                    strParsedQuery += SString ( "'%s'", SQLEscape ( szValue, true, false ).c_str () );
-                }
-                break;
+                    // someone passed a value without specifying its type
+                    assert ( 0 );
+                    break;
             }
         }
     }

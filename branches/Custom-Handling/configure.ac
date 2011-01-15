@@ -52,15 +52,17 @@ AC_ARG_ENABLE(debug,
 
 # Checks for libraries.
 
+PKG_PROG_PKG_CONFIG
+
 # pcre (for bundled pme.h)
 AC_ARG_ENABLE([system-pcre], 
 	[AS_HELP_STRING([--disable-system-pcre],
 	                [don't use system PCRE])])
 
 AC_DEFUN([USE_BUNDLED_PCRE], [
+	HAVE_BUNDLED_PCRE=yes
 	PCRE_CFLAGS="-I\$(top_builddir)/vendor/pcre"
 	PCRE_LIBS="\$(top_builddir)/vendor/pcre/libpcre.la"
-	# probably include a check if it was already built
 ])
 
 if test "x$enable_system_pcre" != "xno" ; then
@@ -113,30 +115,13 @@ CPPFLAGS="$save_CPPFLAGS"
 PKG_CHECK_MODULES([SQLITE3], [sqlite3])
 
 # curses (for MTA10_Server/{core,sdk})
-AC_ARG_VAR([CURSES_CFLAGS], [C compiler flags for curses])
-AC_ARG_VAR([CURSES_LIBS], [linker flags for curses])
+AC_ARG_VAR([CURSES_LIB], [linker flags for curses])
 
-save_CPPFLAGS="$CPPFLAGS"
-save_LIBS="$LIBS"
-CPPFLAGS="$CPPFLAGS $CURSES_CFLAGS"
-LIBS="$LIBS $CURSES_LIBS"
+AX_WITH_CURSES
 
-if test -z "$CURSES_CFLAGS" ; then
-	AC_CHECK_HEADER([ncursesw/curses.h],
-		[],
-		[AC_MSG_ERROR([can't find curses headers])])
+if test "x$ax_cv_ncursesw" != "xyes" ; then
+	AC_MSG_ERROR([can't find ncursesw])
 fi
-
-if test -z "$CURSES_LIBS" ; then
-	LIBS="${LIBS} -lncursesw"
-	AC_TRY_LINK([#include <ncurses.h>],
-		[chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr();],
-		[CURSES_LIBS=-lncursesw],
-		[AC_MSG_ERROR([can't find curses libraries])])
-fi
-
-CPPFLAGS="$save_CPPFLAGS"
-LIBS="$save_LIBS"
 
 # Checking for a 64-bit system
 AC_MSG_CHECKING([uname -m for detecting host operating system architecture])
@@ -213,22 +198,39 @@ AC_CONFIG_SUBDIRS([vendor/json-c])
 if test "x$HAVE_BUNDLED_SPARSEHASH" = "xyes" ; then
 	AC_CONFIG_SUBDIRS([vendor/sparsehash/current])
 fi
+AM_CONDITIONAL([WANT_SPARSEHASH], [test "x$HAVE_BUNDLED_SPARSEHASH" = "xyes"])
+
+if test "x$HAVE_BUNDLED_PCRE" = "xyes" ; then
+	AC_CONFIG_SUBDIRS([vendor/pcre])
+fi
+AM_CONDITIONAL([WANT_PCRE], [test "x$HAVE_BUNDLED_PCRE" = "xyes"])
+
+AC_ARG_ENABLE([enable-ircbots],
+	[AS_HELP_STRING([--enable-ircbots], [build the irc bots])])
+
+if test "x$enable_ircbots" = "xyes" ; then
+	AC_CONFIG_SUBDIRS([irc/mantisbot irc/wikibot irc/rsl])
+fi
+
+AM_CONDITIONAL([WANT_IRCBOTS], [test "x$enable_ircbots" = "xyes"])
 
 # Generate makefiles
 AC_CONFIG_FILES([
 	Makefile
-	vendor/Makefile
-	vendor/tinyxml/Makefile
-	vendor/pme/Makefile
-	vendor/ehs/Makefile
-	Shared/Makefile
-	Shared/XML/Makefile
+	irc/Makefile
 	MTA10_Server/Makefile
-	MTA10_Server/sdk/Makefile
 	MTA10_Server/core/Makefile
+	MTA10_Server/launcher/Makefile
 	MTA10_Server/mods/Makefile
 	MTA10_Server/mods/deathmatch/Makefile
-	MTA10_Server/launcher/Makefile
+	MTA10_Server/sdk/Makefile
+	Shared/Makefile
+	Shared/publicsdk/Makefile
+	Shared/XML/Makefile
+	vendor/Makefile
+	vendor/ehs/Makefile
+	vendor/pme/Makefile
+	vendor/tinyxml/Makefile
 ])
 
 AC_OUTPUT

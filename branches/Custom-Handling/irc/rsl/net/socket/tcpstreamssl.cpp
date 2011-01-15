@@ -75,7 +75,7 @@ void SocketStreamTCPSSL::SetHandle(int handle)
 
   if (!m_ssl && handle != -1)
   {
-    SSL_METHOD* method = SSLv23_method();
+    SSL_METHOD const* method = SSLv23_method();
     SSL_CTX* ctx = SSL_CTX_new(method);
 
     if (m_certFile)

@@ -208,6 +208,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Our management classes
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pVehicleManager );
     m_pPedSync = new CPedSync ( m_pPedManager );
+    m_pObjectSync = new CObjectSync ( m_pObjectManager );
     m_pNametags = new CNametags ( m_pManager );
     m_pRadarMap = new CRadarMap ( m_pManager );
 
@@ -404,6 +405,7 @@ CClientGame::~CClientGame ( void )
     delete m_pRPCFunctions;
     delete m_pUnoccupiedVehicleSync;
     delete m_pPedSync;
+    delete m_pObjectSync;
     delete m_pBlendedWeather;
     m_pBlendedWeather = NULL;
     delete m_pMovingObjectsManager;
@@ -913,6 +915,7 @@ void CClientGame::DoPulses ( void )
     m_pNetAPI->DoPulse ();
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
+    m_pObjectSync->DoPulse ();
     m_pLuaManager->DoPulse ();
 
     #ifdef MTA_DEBUG
@@ -3734,7 +3737,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
                         AnimationId animID = pEvent->GetAnimId ();
-                        pDamagedPed->Kill ( weaponUsed, m_ucDamageBodyPiece, false, animGroup, animID );
+                        pDamagedPed->Kill ( weaponUsed, m_ucDamageBodyPiece, false, false, animGroup, animID );
                         return true;
                     }
                     if ( fPreviousHealth > 0.0f )

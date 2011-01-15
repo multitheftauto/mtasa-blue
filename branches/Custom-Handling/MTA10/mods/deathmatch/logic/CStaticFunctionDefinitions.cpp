@@ -597,6 +597,12 @@ bool CStaticFunctionDefinitions::GetElementHealth ( CClientEntity& Entity, float
             fHealth = Vehicle.GetHealth ();
             break;
         }
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            fHealth = Object.GetHealth ();
+            break;
+        }
         default: return false;
     }
     return true;
@@ -677,6 +683,13 @@ bool CStaticFunctionDefinitions::IsElementSyncer ( CClientEntity& Entity, bool &
             CDeathmatchVehicle* Vehicle = static_cast < CDeathmatchVehicle* > ( &Entity );
             if ( Vehicle )
                 bIsSyncer = m_pClientGame->GetUnoccupiedVehicleSync()->Exists ( Vehicle );
+            break;
+        }
+        case CCLIENTOBJECT:
+        {
+            CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( &Entity );
+            if ( pObject )
+                bIsSyncer = m_pClientGame->GetObjectSync ()->Exists ( pObject );
             break;
         }
         default: return false;
@@ -1246,6 +1259,12 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CClientEntity& Entity, float
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
             Vehicle.SetHealth ( fHealth );
+            break;
+        }
+        case CCLIENTOBJECT:
+        {
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
+            Object.SetHealth ( fHealth );
             break;
         }
         default: return false;
@@ -2098,11 +2117,29 @@ CClientPed* CStaticFunctionDefinitions::CreatePed ( CResource& Resource, unsigne
     // Valid model?
     if ( CClientPlayerManager::IsValidModel ( ulModel ) )
     {
+        // Convert the rotation to radians
+        float fRotationRadians = ConvertDegreesToRadians ( fRotation );
+        // Clamp it to -PI .. PI
+        if ( fRotationRadians < -PI )
+        {
+            do
+            {
+                fRotationRadians += PI * 2.0f;
+            } while ( fRotationRadians < -PI );
+        }
+        else if ( fRotationRadians > PI )
+        {
+            do
+            {
+                fRotationRadians -= PI * 2.0f;
+            } while ( fRotationRadians > PI );
+        }
+
         // Create it
         CClientPed* pPed = new CClientPed ( m_pManager, ulModel, INVALID_ELEMENT_ID );
         pPed->SetParent ( Resource.GetResourceDynamicEntity() );
         pPed->SetPosition ( vecPosition );
-        pPed->SetCurrentRotation ( fRotation );
+        pPed->SetCurrentRotation ( fRotationRadians );
         return pPed;
     }
 
@@ -2948,7 +2985,7 @@ CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, u
 {
     if ( CClientObjectManager::IsValidModel ( usModelID ) )
     {
-        CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, INVALID_ELEMENT_ID, usModelID );
+        CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, m_pClientGame->GetObjectSync (), INVALID_ELEMENT_ID, usModelID );
         if ( pObject )
         {
             pObject->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -3339,9 +3376,9 @@ bool CStaticFunctionDefinitions::PlayMissionAudio ( const CVector& vecPosition, 
 }
 
 
-bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned long ulSound )
+bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned char ucSound )
 {
-    g_pGame->GetAudio ()->PlayFrontEndSound ( ulSound );
+    g_pGame->GetAudio ()->PlayFrontEndSound ( ucSound );
     return true;
 }
 
@@ -3354,9 +3391,9 @@ bool CStaticFunctionDefinitions::PreloadMissionAudio ( unsigned short usSound, u
 }
 
 
-CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance )
+CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance )
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
+    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance );
     if ( pBlip )
     {
         pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -3369,9 +3406,9 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource
 }
 
 
-CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance )
+CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance )
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
+    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance );
     if ( pBlip )
     {
         pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -3441,6 +3478,22 @@ bool CStaticFunctionDefinitions::SetBlipOrdering ( CClientEntity& Entity, short 
         CClientRadarMarker& Marker = static_cast < CClientRadarMarker& > ( Entity );
 
         Marker.SetOrdering ( sOrdering );
+        return true;
+    }
+
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CClientEntity& Entity, unsigned short usVisibleDistance )
+{
+    RUN_CHILDREN SetBlipVisibleDistance ( **iter, usVisibleDistance );
+
+    if ( IS_RADARMARKER ( &Entity ) )
+    {
+        CClientRadarMarker& Marker = static_cast < CClientRadarMarker& > ( Entity );
+
+        Marker.SetVisibleDistance ( usVisibleDistance );
         return true;
     }
 

@@ -99,6 +99,7 @@ CGame::CGame ( void )
     m_pLanBroadcast = NULL;
     m_pPedSync = NULL;
     m_pWaterManager = NULL;
+    m_pObjectSync = NULL;
 
 #ifdef MTA_VOICE
     m_pVoiceServer = NULL;
@@ -188,6 +189,7 @@ CGame::~CGame ( void )
     m_ElementDeleter.DoDeleteAll ();
     SAFE_DELETE ( m_pUnoccupiedVehicleSync );
     SAFE_DELETE ( m_pPedSync );
+    SAFE_DELETE ( m_pObjectSync );
     SAFE_DELETE ( m_pConsole );
     SAFE_DELETE ( m_pMapManager );
     SAFE_DELETE ( m_pLuaManager );
@@ -339,6 +341,7 @@ void CGame::DoPulse ( void )
     m_pMapManager->DoPulse ();
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
+    m_pObjectSync->DoPulse ();
     m_pBanManager->DoPulse ();
     m_pAccountManager->DoPulse ();
     m_pRegistryManager->DoPulse ();
@@ -392,10 +395,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Startup the getElementsByType from root optimizations
     CElement::StartupEntitiesFromRoot ();
 
-    // Create the root element.
-    CDummy* pRootElement = new CDummy ( NULL, NULL, NULL );
-    pRootElement->SetTypeName ( "root" );
-
     m_pGroups = new CGroups;
     m_pClock = new CClock;
     m_pBlipManager = new CBlipManager;
@@ -412,7 +411,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pTeamManager = new CTeamManager;
     m_pPedManager = new CPedManager;
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
-    m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter, pRootElement );
+    m_pMapManager = new CMapManager ( m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pClock, m_pLuaManager, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter );
     m_pACLManager = new CAccessControlListManager;
 
     m_pRegisteredCommands = new CRegisteredCommands ( m_pACLManager );
@@ -564,6 +563,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pResourceManager->Refresh();
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pPlayerManager, m_pVehicleManager );
     m_pPedSync = new CPedSync ( m_pPlayerManager, m_pPedManager );
+    m_pObjectSync = new CObjectSync ( m_pPlayerManager, m_pObjectManager );
     // Must be created before all clients
     m_pConsoleClient = new CConsoleClient ( m_pConsole );
 
@@ -1019,6 +1019,10 @@ bool CGame::ProcessPacket ( CPacket& Packet )
         return true;
     }
     else if ( m_pPedSync->ProcessPacket ( Packet ) )
+    {
+        return true;
+    }
+    else if ( m_pObjectSync->ProcessPacket ( Packet ) )
     {
         return true;
     }

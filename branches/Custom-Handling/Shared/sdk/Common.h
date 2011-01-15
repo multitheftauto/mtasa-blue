@@ -17,8 +17,8 @@
 #define NET_DISCONNECT_REASON_SIZE  256
 
 // Element IDs
-#define RESERVED_ELEMENT_ID 0xFFFFFFFF
-#define INVALID_ELEMENT_ID 0x0
+#define RESERVED_ELEMENT_ID 0xFFFFFFFE
+#define INVALID_ELEMENT_ID 0xFFFFFFFF
 
 // Element name characteristics
 #define MAX_TYPENAME_LENGTH 32
@@ -27,7 +27,7 @@
 // Allow 100k server elements and 100k client elements
 #define MAX_SERVER_ELEMENTS 100000
 #define MAX_CLIENT_ELEMENTS 100000
-typedef unsigned long ElementID;
+typedef unsigned int ElementID;
 
 // Event name characteristics
 #define MAX_EVENT_NAME_LENGTH 512

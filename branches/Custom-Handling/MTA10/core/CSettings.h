@@ -26,6 +26,7 @@ class CSettings;
 #include "CMainMenu.h"
 #include "CCore.h"
 
+#define SKINS_PATH                    "skins/*"
 #define CHAT_PRESETS_PATH             "mta/chatboxpresets.xml"
 #define CHAT_PRESETS_ROOT             "chatboxpresets"
 
@@ -127,10 +128,6 @@ protected:
     CGUICheckBox*       m_pCheckBoxWindowed;
     CGUICheckBox*       m_pCheckBoxWideScreen;
     CGUICheckBox*       m_pCheckBoxMinimize;
-    CGUILabel*          m_pVideoRenderingLabel;
-    CGUICheckBox*       m_pCheckBoxMenuDynamic;
-    CGUICheckBox*       m_pCheckBoxMenuVideo;
-    CGUICheckBox*       m_pCheckBoxMenuPostEffects;
     CGUILabel*          m_pMapRenderingLabel;
     CGUIComboBox*       m_pComboFxQuality;
     CGUILabel*          m_pFXQualityLabel;
@@ -213,6 +210,9 @@ protected:
     CGUIRadioButton*    m_pStandardControls;
     CGUIRadioButton*    m_pClassicControls;
 
+    CGUIComboBox*       m_pInterfaceSkinSelector;
+    CGUIButton*         m_pInterfaceLoadSkin;
+
     CGUIComboBox*       m_pChatPresets;
     CGUIButton*         m_pChatLoadPreset;
 
@@ -225,6 +225,8 @@ protected:
     CGUILabel*          m_pChatGreenValue   [ ChatColorType::CHAT_COLOR_MAX ];
     CGUILabel*          m_pChatBlueValue    [ ChatColorType::CHAT_COLOR_MAX ];
     CGUILabel*          m_pChatAlphaValue   [ ChatColorType::CHAT_COLOR_MAX ];
+
+    CGUIScrollPane*     m_pInterfacePaneScroller;
 
     CGUIScrollPane*     m_pPaneChatFont;
     CGUIRadioButton*    m_pRadioChatFont    [ eChatFont::CHAT_FONT_MAX ];
@@ -244,7 +246,6 @@ protected:
     bool                OnJoypadDefaultClick    ( CGUIElement* pElement );
     bool                OnBindsDefaultClick     ( CGUIElement* pElement );
     bool                OnBindsListClick        ( CGUIElement* pElement );
-    bool                OnCheckBoxClick         ( CGUIElement* pElement );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
     bool                OnLoginButtonClick      ( CGUIElement* pElement );
@@ -266,11 +267,17 @@ protected:
 
     bool                OnChatLoadPresetClick   ( CGUIElement* pElement );
 
+    bool                OnLoadSkinButtonClick   ( CGUIElement* pElement );
+
+    bool                OnSkinChanged ( CGUIElement* pElement );
+
 private:
     void                ProcessKeyBinds         ( void );
     void                ProcessJoypad           ( void );
 
     void                SaveData                ( void );
+
+    void                LoadSkins               ( void );
 
     void                LoadChatPresets         ( void );
     void                CreateChatColorTab      ( ChatColorType eType, const char* szName, CGUITabPanel* pParent );
@@ -296,11 +303,6 @@ private:
 
     std::list < SKeyBindSection *> m_pKeyBindSections;
 
-    enum eCheckBox {
-        CHECKBOX_MENU_DYNAMIC,
-        CHECKBOX_MENU_VIDEO,
-        CHECKBOX_MENU_POSTEFFECTS
-    };
 };
 
 #endif

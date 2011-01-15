@@ -27,7 +27,8 @@ extern CClientGame* g_pClientGame;
 
 #define INVALID_VALUE   0xFFFFFFFF
 
-#define PED_INTERPOLATION_WARP_THRESHOLD        5
+#define PED_INTERPOLATION_WARP_THRESHOLD            5   // Minimal threshold
+#define PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  5   // Units to increment the threshold per speed unit
 
 enum eAnimGroups
 {    
@@ -1632,7 +1633,7 @@ bool CClientPed::IsDead ( void )
     return false;
 }
 
-void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth, AssocGroupId animGroup, AnimationId animID )
+void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth, bool bSetDirectlyDead, AssocGroupId animGroup, AnimationId animID )
 {
     // Don't change task if already dead or dying
     if ( m_pPlayerPed && !IsDead () && !IsDying () )
@@ -1645,7 +1646,16 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
             pTask->MakeAbortable ( m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL );
         }
 
-        if ( bStealth )
+        if ( bSetDirectlyDead )
+        {
+            // TODO: Avoid the animation, try to make it go directly to the last animation frame.
+            pTask = g_pGame->GetTasks ()->CreateTaskSimpleDead ( GetTickCount(), true );
+            if ( pTask )
+            {
+                pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_DEFAULT );
+            }
+        }
+        else if ( bStealth )
         {
             pTask = g_pGame->GetTasks ()->CreateTaskSimpleStealthKill ( false, m_pPlayerPed, 87 );
             if ( pTask )
@@ -3062,8 +3072,7 @@ void CClientPed::_CreateModel ( void )
         // Are we dead?
         if ( m_fHealth == 0.0f )
         {
-            // TODO: use TASK_SIMPLE_DEAD
-            Kill ( WEAPONTYPE_UNARMED, 0 );
+            Kill ( WEAPONTYPE_UNARMED, 0, false, true );
         }
 
         // Are we still playing a looped animation?
@@ -4623,7 +4632,10 @@ void CClientPed::UpdateTargetPosition ( void )
         CVector vecNewPosition = vecCurrentPosition + vecCompensation;
 
         // Check if the distance to interpolate is too far.
-        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > PED_INTERPOLATION_WARP_THRESHOLD )
+        CVector vecVelocity;
+        GetMoveSpeed ( vecVelocity );
+        float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
+        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > fThreshold )
         {
             // Abort all interpolation
             m_interp.pos.ulFinishTime = 0;
