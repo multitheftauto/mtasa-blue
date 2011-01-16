@@ -343,10 +343,10 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     // If the vehicle has doors, sync their open angle ratios.
                     if ( CVehicleManager::HasDoors ( usModel ) )
                     {
-                        SDoorAngleSync door;
+                        SDoorOpenRatioSync door;
                         for ( unsigned char i = 0; i < 6; ++i )
                         {
-                            door.data.fAngle = pVehicle->GetDoorAngleRatio ( i );
+                            door.data.fRatio = pVehicle->GetDoorOpenRatio ( i );
                             BitStream.Write ( &door );
                         }
                     }

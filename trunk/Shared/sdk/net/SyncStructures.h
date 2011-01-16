@@ -874,7 +874,7 @@ struct SVehicleTurretSync : public ISyncStructure
     } data;
 };
 
-struct SDoorAngleSync : public ISyncStructure
+struct SDoorOpenRatioSync : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -888,16 +888,16 @@ struct SDoorAngleSync : public ISyncStructure
             if ( !bitStream.ReadBit ( bNotZero ) )
                 return false;
             if ( bNotZero )
-                data.fAngle = 1.0f;
+                data.fRatio = 1.0f;
             else
-                data.fAngle = 0.0f;
+                data.fRatio = 0.0f;
         }
         else
         {
             SFloatAsBitsSync<10> fl ( 0.0f, 1.0f, true );
             if ( !fl.Read ( bitStream ) )
                 return false;
-            data.fAngle = fl.data.fValue;
+            data.fRatio = fl.data.fValue;
         }
 
         return true;
@@ -905,23 +905,23 @@ struct SDoorAngleSync : public ISyncStructure
 
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        if ( data.fAngle == 0.0f || data.fAngle == 1.0f )
+        if ( data.fRatio == 0.0f || data.fRatio == 1.0f )
         {
             bitStream.WriteBit ( false );
-            bitStream.WriteBit ( data.fAngle == 1.0f );
+            bitStream.WriteBit ( data.fRatio == 1.0f );
         }
         else
         {
             bitStream.WriteBit ( true );
             SFloatAsBitsSync<10> fl ( 0.0f, 1.0f, true );
-            fl.data.fValue = data.fAngle;
+            fl.data.fValue = data.fRatio;
             bitStream.Write ( &fl );
         }
     }
 
     struct
     {
-        float fAngle;
+        float fRatio;
     } data;
 };
 

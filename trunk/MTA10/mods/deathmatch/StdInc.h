@@ -39,6 +39,7 @@
 #include <CBox.h>
 #include <ijsify.h>
 #include <Common.h>
+#include "net/SyncStructures.h"
 
 // Shared logic includes
 #include <Utils.h>

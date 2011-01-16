@@ -45,6 +45,7 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_TAXI_LIGHT_ON, SetVehicleTaxiLightOn, "SetVehicleTaxiLightOn" );
     AddHandler ( SET_VEHICLE_HEADLIGHT_COLOR, SetVehicleHeadLightColor, "SetVehicleHeadLightColor" );
     AddHandler ( SET_VEHICLE_TURRET_POSITION, SetVehicleTurretPosition, "SetVehicleTurretPosition" );
+    AddHandler ( SET_VEHICLE_DOOR_OPEN_RATIO, SetVehicleDoorOpenRatio, "SetVehicleDoorOpenRatio" );
 }
 
 
@@ -552,6 +553,24 @@ void CVehicleRPCs::SetVehicleTurretPosition ( CClientEntity* pSource, NetBitStre
         if ( pVehicle )
         {
             pVehicle->SetTurretRotation ( fHorizontal, fVertical );
+        }
+    }
+}
+
+void CVehicleRPCs::SetVehicleDoorOpenRatio ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    SIntegerSync < unsigned char, 3 > ucDoor;
+    SDoorOpenRatioSync angle;
+    unsigned int uiTime;
+
+    if ( bitStream.Read ( &ucDoor ) &&
+         bitStream.Read ( &angle ) &&
+         bitStream.ReadCompressed ( uiTime ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        if ( pVehicle )
+        {
+            pVehicle->SetDoorOpenRatio ( ucDoor, angle.data.fRatio, uiTime, true );
         }
     }
 }

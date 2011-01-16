@@ -491,6 +491,7 @@ void CLuaManager::LoadCFunctions ( void )
 #if WITH_VEHICLE_HANDLING
     CLuaCFunctions::AddFunction ( "getVehicleHandling", CLuaFunctionDefs::GetVehicleHandlingData );
 #endif
+    CLuaCFunctions::AddFunction ( "getVehicleDoorOpenRatio", CLuaFunctionDefs::GetVehicleDoorOpenRatio );
 
     // Vehicle set funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefs::CreateVehicle );
@@ -530,6 +531,7 @@ void CLuaManager::LoadCFunctions ( void )
 #if WITH_VEHICLE_HANDLING
     CLuaCFunctions::AddFunction ( "setVehicleHandling", CLuaFunctionDefs::SetVehicleHandlingData );
 #endif
+    CLuaCFunctions::AddFunction ( "setVehicleDoorOpenRatio", CLuaFunctionDefs::SetVehicleDoorOpenRatio );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );

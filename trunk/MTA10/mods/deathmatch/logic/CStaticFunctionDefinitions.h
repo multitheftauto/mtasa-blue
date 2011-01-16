@@ -215,7 +215,8 @@ public:
     static bool                         SetTrainDerailable                  ( CClientVehicle& Vehicle, bool bDerailable );
     static bool                         SetTrainDirection                   ( CClientVehicle& Vehicle, bool bDirection );
     static bool                         SetTrainSpeed                       ( CClientVehicle& Vehicle, float fSpeed );
-    static bool                         SetVehicleHeadLightColor            ( CClientVehicle& Vehicle, const SColor color );
+    static bool                         SetVehicleHeadLightColor            ( CClientEntity& Vehicle, const SColor color );
+    static bool                         SetVehicleDoorOpenRatio             ( CClientEntity& Vehicle, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0 );
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation );

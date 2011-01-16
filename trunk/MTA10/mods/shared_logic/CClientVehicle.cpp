@@ -84,7 +84,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_usAdjustablePropertyValue = 0;
     for ( unsigned int i = 0; i < 6; ++i )
     {
-        m_fDoorAngleRatio [ i ] = 0.0f;
+        m_fDoorOpenRatio [ i ] = 0.0f;
         m_doorInterp.fStart [ i ] = 0.0f;
         m_doorInterp.fTarget [ i ] = 0.0f;
         m_doorInterp.ulStartTime [ i ] = 0UL;
@@ -608,10 +608,10 @@ void CClientVehicle::SetVisible ( bool bVisible )
     m_bVisible = bVisible;
 }
 
-void CClientVehicle::SetDoorAngleRatioInterpolated ( unsigned char ucDoor, float fRatio, unsigned long ulDelay )
+void CClientVehicle::SetDoorOpenRatioInterpolated ( unsigned char ucDoor, float fRatio, unsigned long ulDelay )
 {
     unsigned long ulTime = CClientTime::GetTime ();
-    m_doorInterp.fStart [ ucDoor ] = m_fDoorAngleRatio [ ucDoor ];
+    m_doorInterp.fStart [ ucDoor ] = m_fDoorOpenRatio [ ucDoor ];
     m_doorInterp.fTarget [ ucDoor ] = fRatio;
     m_doorInterp.ulStartTime [ ucDoor ] = ulTime;
     m_doorInterp.ulTargetTime [ ucDoor ] = ulTime + ulDelay;
@@ -622,7 +622,7 @@ void CClientVehicle::ResetDoorInterpolation ()
     for ( unsigned char i = 0; i < 6; ++i )
     {
         if ( m_doorInterp.ulTargetTime [ i ] != 0 )
-            SetDoorAngleRatio ( i, m_doorInterp.fTarget [ i ], 0, true );
+            SetDoorOpenRatio ( i, m_doorInterp.fTarget [ i ], 0, true );
         m_doorInterp.ulTargetTime [ i ] = 0;
     }
 }
@@ -638,7 +638,7 @@ void CClientVehicle::ProcessDoorInterpolation ()
             if ( m_doorInterp.ulTargetTime [ i ] <= ulTime )
             {
                 // Interpolation finished.
-                SetDoorAngleRatio ( i, m_doorInterp.fTarget [ i ], 0, true );
+                SetDoorOpenRatio ( i, m_doorInterp.fTarget [ i ], 0, true );
                 m_doorInterp.ulTargetTime [ i ] = 0;
             }
             else
@@ -647,13 +647,13 @@ void CClientVehicle::ProcessDoorInterpolation ()
                 unsigned long ulDelay = m_doorInterp.ulTargetTime [ i ] - m_doorInterp.ulStartTime [ i ];
                 float fStep = ulElapsedTime / (float)ulDelay;
                 float fRatio = SharedUtil::Lerp ( m_doorInterp.fStart [ i ], fStep, m_doorInterp.fTarget [ i ] );
-                SetDoorAngleRatio ( i, fRatio, 0, true );
+                SetDoorOpenRatio ( i, fRatio, 0, true );
             }
         }
     }
 }
 
-void CClientVehicle::SetDoorAngleRatio ( unsigned char ucDoor, float fRatio, unsigned long ulDelay, bool bForced )
+void CClientVehicle::SetDoorOpenRatio ( unsigned char ucDoor, float fRatio, unsigned long ulDelay, bool bForced )
 {
     bool bAllow = true;
     unsigned char ucSeat;
@@ -683,22 +683,22 @@ void CClientVehicle::SetDoorAngleRatio ( unsigned char ucDoor, float fRatio, uns
             {
                 m_pVehicle->OpenDoor ( ucDoor, fRatio, false );
             }
-            m_fDoorAngleRatio [ ucDoor ] = fRatio;
+            m_fDoorOpenRatio [ ucDoor ] = fRatio;
         }
         else
         {
-            SetDoorAngleRatioInterpolated ( ucDoor, fRatio, ulDelay );
+            SetDoorOpenRatioInterpolated ( ucDoor, fRatio, ulDelay );
         }
     }
 }
 
-float CClientVehicle::GetDoorAngleRatio ( unsigned char ucDoor )
+float CClientVehicle::GetDoorOpenRatio ( unsigned char ucDoor )
 {
     if ( m_pVehicle )
     {
         return m_pVehicle->GetDoor ( ucDoor )->GetAngleOpenRatio ();
     }
-    return m_fDoorAngleRatio [ ucDoor ];
+    return m_fDoorOpenRatio [ ucDoor ];
 }
 
 void CClientVehicle::SetSwingingDoorsAllowed ( bool bAllowed )
@@ -2336,7 +2336,7 @@ void CClientVehicle::Create ( void )
         ResetDoorInterpolation ();
 
         for ( unsigned char i = 0; i < 6; ++i )
-            SetDoorAngleRatio ( i, m_fDoorAngleRatio [ i ], 0, true );
+            SetDoorOpenRatio ( i, m_fDoorOpenRatio [ i ], 0, true );
 
 
 #if WITH_VEHICLE_HANDLING

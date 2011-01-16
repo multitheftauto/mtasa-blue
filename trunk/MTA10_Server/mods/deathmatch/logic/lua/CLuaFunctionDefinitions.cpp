@@ -5736,6 +5736,67 @@ int CLuaFunctionDefinitions::SetVehicleTurretPosition ( lua_State *luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetVehicleDoorOpenRatio ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TNUMBER &&
+         lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        if ( pElement )
+        {
+            unsigned char ucDoor = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            float fRatio = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+            unsigned long ulTime = 0;
+
+            if ( lua_type ( luaVM, 4 ) == LUA_TNUMBER )
+                ulTime = static_cast < unsigned long > ( lua_tonumber ( luaVM, 4 ) );
+
+            if ( CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( pElement, ucDoor, fRatio, ulTime ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleDoorOpenRatio", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleDoorOpenRatio" );
+
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetVehicleDoorOpenRatio ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            unsigned char ucDoor = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            float fRatio;
+
+            if ( CStaticFunctionDefinitions::GetVehicleDoorOpenRatio ( pVehicle, ucDoor, fRatio ) )
+            {
+                lua_pushnumber ( luaVM, fRatio );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleDoorOpenRatio", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleDoorOpenRatio" );
+
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
 {
     // Valid position arguments?
