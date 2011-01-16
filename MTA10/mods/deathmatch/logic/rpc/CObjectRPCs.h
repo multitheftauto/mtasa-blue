@@ -21,11 +21,11 @@ public:
     static void                 LoadFunctions           ( void );
 
     DECLARE_RPC ( DestroyAllObjects );
-    DECLARE_RPC ( SetModel );
-    DECLARE_RPC ( SetObjectRotation );
-    DECLARE_RPC ( MoveObject );
-    DECLARE_RPC ( StopObject );
-    DECLARE_RPC ( SetObjectScale );
+    DECLARE_ELEMENT_RPC ( SetModel );
+    DECLARE_ELEMENT_RPC ( SetObjectRotation );
+    DECLARE_ELEMENT_RPC ( MoveObject );
+    DECLARE_ELEMENT_RPC ( StopObject );
+    DECLARE_ELEMENT_RPC ( SetObjectScale );
 };
 
 #endif

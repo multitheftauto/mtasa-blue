@@ -21,9 +21,9 @@ class CHandlingRPCs : public CRPCFunctions
 public:
     static void                 LoadFunctions           ( void );
 
-    DECLARE_RPC ( HandlingAddDefault );
-    DECLARE_RPC ( HandlingRemoveDefault );
-    DECLARE_RPC ( HandlingSetProperty );
+    DECLARE_ELEMENT_RPC ( HandlingAddDefault );
+    DECLARE_ELEMENT_RPC ( HandlingRemoveDefault );
+    DECLARE_ELEMENT_RPC ( HandlingSetProperty );
 };
 
 #endif

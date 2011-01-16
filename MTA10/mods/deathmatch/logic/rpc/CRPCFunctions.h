@@ -5,6 +5,7 @@
 *  FILE:        mods/deathmatch/logic/rpc/CRPCFunctions.h
 *  PURPOSE:     Header for RPC functions class
 *  DEVELOPERS:  Jax <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -16,6 +17,7 @@
 class CRPCFunctions;
 
 #define DECLARE_RPC(a) static void a ( class NetBitStreamInterface& bitStream );
+#define DECLARE_ELEMENT_RPC(a) static void a ( CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream );
 
 class CRPCFunctions
 {
@@ -24,10 +26,17 @@ protected:
 private:
 
     typedef void (*pfnRPCHandler) ( class NetBitStreamInterface& bitStream );
+    typedef void (*pfnElementRPCHandler) ( CClientEntity* pSourceEntity, class NetBitStreamInterface& bitStream );
     struct SRPCHandler
     {
         SRPCHandler () { Callback = NULL; szName[0] = '\0'; }
         pfnRPCHandler Callback;
+        char szName [ 32 ];
+    };
+    struct SElementRPCHandler
+    {
+        SElementRPCHandler () { Callback = NULL; szName[0] = '\0'; }
+        pfnElementRPCHandler Callback;
         char szName [ 32 ];
     };
 
@@ -36,8 +45,9 @@ public:
     virtual                     ~CRPCFunctions                          ( void );
 
     void                        AddHandlers                             ( void );
-    static void                 AddHandler                              ( unsigned char ucID, pfnRPCHandler Callback, char * szName = "unknown" );
-    void                        ProcessPacket                           ( class NetBitStreamInterface& bitStream );
+    static void                 AddHandler                              ( unsigned char ucID, pfnRPCHandler Callback, const char * szName = "unknown" );
+    static void                 AddHandler                              ( unsigned char ucID, pfnElementRPCHandler Callback, const char * szName = "unknown" );
+    void                        ProcessPacket                           ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream );
 
     bool                        m_bShowRPCs;
 
@@ -65,6 +75,7 @@ protected:
     #include "net/rpc_enums.h"
 
     static SRPCHandler          m_RPCHandlers [ NUM_RPC_FUNCS ];
+    static SElementRPCHandler   m_ElementRPCHandlers [ NUM_RPC_FUNCS ];
 };
 
 #endif

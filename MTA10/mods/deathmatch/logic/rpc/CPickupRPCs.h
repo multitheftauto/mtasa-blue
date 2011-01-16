@@ -21,8 +21,8 @@ public:
     static void                 LoadFunctions           ( void );
 
     DECLARE_RPC ( DestroyAllPickups );
-    DECLARE_RPC ( SetPickupType );
-    DECLARE_RPC ( SetPickupVisible );
+    DECLARE_ELEMENT_RPC ( SetPickupType );
+    DECLARE_ELEMENT_RPC ( SetPickupVisible );
 };
 
 #endif

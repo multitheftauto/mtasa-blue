@@ -23,16 +23,14 @@ void CMarkerRPCs::LoadFunctions ( void )
 }
 
 
-void CMarkerRPCs::SetMarkerType ( NetBitStreamInterface& bitStream )
+void CMarkerRPCs::SetMarkerType ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the ID and the type
-    ElementID ID;
     unsigned char ucType;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucType ) )
+    if ( bitStream.Read ( ucType ) )
     {
         // Grab the marker
-        CClientMarker* pMarker = m_pMarkerManager->Get ( ID );
+        CClientMarker* pMarker = m_pMarkerManager->Get ( pSource->GetID () );
         if ( pMarker )
         {
             // Set the new type
@@ -42,19 +40,17 @@ void CMarkerRPCs::SetMarkerType ( NetBitStreamInterface& bitStream )
 }
 
 
-void CMarkerRPCs::SetMarkerColor ( NetBitStreamInterface& bitStream )
+void CMarkerRPCs::SetMarkerColor ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the ID and the color
-    ElementID ID;
     SColor color;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( color.B ) &&
+    if ( bitStream.Read ( color.B ) &&
          bitStream.Read ( color.G ) &&
          bitStream.Read ( color.R ) &&
          bitStream.Read ( color.A ) )
     {
         // Grab the marker
-        CClientMarker* pMarker = m_pMarkerManager->Get ( ID );
+        CClientMarker* pMarker = m_pMarkerManager->Get ( pSource->GetID () );
         if ( pMarker )
         {
             // Set the new position
@@ -64,16 +60,14 @@ void CMarkerRPCs::SetMarkerColor ( NetBitStreamInterface& bitStream )
 }
 
 
-void CMarkerRPCs::SetMarkerSize ( NetBitStreamInterface& bitStream )
+void CMarkerRPCs::SetMarkerSize ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the ID and the color
-    ElementID ID;
     float fSize;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( fSize ) )
+    if ( bitStream.Read ( fSize ) )
     {
         // Grab the marker
-        CClientMarker* pMarker = m_pMarkerManager->Get ( ID );
+        CClientMarker* pMarker = m_pMarkerManager->Get ( pSource->GetID () );
         if ( pMarker )
         {
             // Set the new position
@@ -83,16 +77,14 @@ void CMarkerRPCs::SetMarkerSize ( NetBitStreamInterface& bitStream )
 }
 
 
-void CMarkerRPCs::SetMarkerTarget ( NetBitStreamInterface& bitStream )
+void CMarkerRPCs::SetMarkerTarget ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the marker id and if there's a new target
-    ElementID ID;
     unsigned char ucTemp;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucTemp ) )
+    if ( bitStream.Read ( ucTemp ) )
     {
         // Grab the marker
-        CClientMarker* pMarker = m_pMarkerManager->Get ( ID );
+        CClientMarker* pMarker = m_pMarkerManager->Get ( pSource->GetID () );
         if ( pMarker )
         {
             // Grab the checkpoint marker from it
@@ -138,15 +130,14 @@ void CMarkerRPCs::SetMarkerTarget ( NetBitStreamInterface& bitStream )
 }
 
 
-void CMarkerRPCs::SetMarkerIcon ( NetBitStreamInterface& bitStream )
+void CMarkerRPCs::SetMarkerIcon ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the marker id and icon
-    ElementID ID;
     unsigned char ucIcon;
-    if ( bitStream.Read ( ID ) && bitStream.Read ( ucIcon ) )
+    if ( bitStream.Read ( ucIcon ) )
     {
         // Grab the marker
-        CClientMarker* pMarker = m_pMarkerManager->Get ( ID );
+        CClientMarker* pMarker = m_pMarkerManager->Get ( pSource->GetID () );
         if ( pMarker )
         {
             // Convert it to a checkpoint

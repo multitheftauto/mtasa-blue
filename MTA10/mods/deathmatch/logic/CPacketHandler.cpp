@@ -128,9 +128,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_PickupHitConfirm ( bitStream );
             return true;
 
-        // Functions fro LUA scripts server side
+        // Functions from LUA scripts server side
         case PACKET_ID_LUA:
-            Packet_Lua ( bitStream );
+        case PACKET_ID_LUA_ELEMENT_RPC:
+            Packet_Lua ( ucPacketID, bitStream );
             return true;
 
         case PACKET_ID_TEXT_ITEM:
@@ -3594,11 +3595,11 @@ void CPacketHandler::Packet_PickupHitConfirm ( NetBitStreamInterface& bitStream 
 }
 
 
-void CPacketHandler::Packet_Lua ( NetBitStreamInterface& bitStream )
+void CPacketHandler::Packet_Lua ( unsigned char ucPacketID, NetBitStreamInterface& bitStream )
 {
     if ( g_pClientGame->m_pRPCFunctions )
     {
-        g_pClientGame->m_pRPCFunctions->ProcessPacket ( bitStream );
+        g_pClientGame->m_pRPCFunctions->ProcessPacket ( ucPacketID, bitStream );
     }
 }
 

@@ -105,14 +105,12 @@ void CPlayerRPCs::ForcePlayerMap ( NetBitStreamInterface& bitStream )
 }
 
 
-void CPlayerRPCs::SetPlayerNametagText ( NetBitStreamInterface& bitStream )
+void CPlayerRPCs::SetPlayerNametagText ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID PlayerID;
     unsigned short usTextLength;
-    if ( bitStream.Read ( PlayerID ) &&
-         bitStream.Read ( usTextLength ) )
+    if ( bitStream.Read ( usTextLength ) )
     {
-        CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+        CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
         if ( pPlayer )
         {
             char* szText = NULL;
@@ -133,45 +131,34 @@ void CPlayerRPCs::SetPlayerNametagText ( NetBitStreamInterface& bitStream )
 }
 
 
-void CPlayerRPCs::SetPlayerNametagColor ( NetBitStreamInterface& bitStream )
+void CPlayerRPCs::SetPlayerNametagColor ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID PlayerID;
     unsigned char ucR, ucG, ucB;
-    if ( bitStream.Read ( PlayerID ) &&
-         bitStream.Read ( ucR ) &&
+    if ( bitStream.Read ( ucR ) &&
          bitStream.Read ( ucG ) &&
          bitStream.Read ( ucB ) )
     {
-        CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+        CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
         if ( pPlayer )
-        {
             pPlayer->SetNametagOverrideColor ( ucR, ucG, ucB );
-        }
     }
 }
 
 
-void CPlayerRPCs::RemovePlayerNametagColor ( NetBitStreamInterface& bitStream )
+void CPlayerRPCs::RemovePlayerNametagColor ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID PlayerID;
-    if ( bitStream.Read ( PlayerID ) )
-    {
-        CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
-        if ( pPlayer )
-        {
-            pPlayer->RemoveNametagOverrideColor ();
-        }
-    }
+    CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
+    if ( pPlayer )
+        pPlayer->RemoveNametagOverrideColor ();
 }
 
 
-void CPlayerRPCs::SetPlayerNametagShowing ( NetBitStreamInterface& bitStream )
+void CPlayerRPCs::SetPlayerNametagShowing ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID PlayerID;
     unsigned char ucShowing;
-    if ( bitStream.Read ( PlayerID ) && bitStream.Read ( ucShowing ) )
+    if ( bitStream.Read ( ucShowing ) )
     {
-        CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+        CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
         if ( pPlayer )
         {
             pPlayer->SetNametagShowing ( ( ucShowing == 1 ) );

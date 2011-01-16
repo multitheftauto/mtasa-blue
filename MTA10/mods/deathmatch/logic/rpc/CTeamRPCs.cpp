@@ -22,19 +22,17 @@ void CTeamRPCs::LoadFunctions ( void )
 }
 
 
-void CTeamRPCs::SetTeamName ( NetBitStreamInterface& bitStream )
+void CTeamRPCs::SetTeamName ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID TeamID;
     unsigned short usNameLength;
-    if ( bitStream.Read ( TeamID ) &&
-         bitStream.Read ( usNameLength ) )
+    if ( bitStream.Read ( usNameLength ) )
     {
         char* szName = new char [ usNameLength + 1 ];
         szName [ usNameLength ] = NULL;
 
         if ( bitStream.Read ( szName, usNameLength ) )
         {
-            CClientTeam* pTeam = m_pTeamManager->GetTeam ( TeamID );
+            CClientTeam* pTeam = m_pTeamManager->GetTeam ( pSource->GetID () );
             if ( pTeam )
             {
                 pTeam->SetTeamName ( szName );
@@ -45,14 +43,14 @@ void CTeamRPCs::SetTeamName ( NetBitStreamInterface& bitStream )
 }
 
 
-void CTeamRPCs::SetTeamColor ( NetBitStreamInterface& bitStream )
+void CTeamRPCs::SetTeamColor ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID TeamID;
     unsigned char ucRed, ucGreen, ucBlue;
-    if ( bitStream.Read ( TeamID ) && bitStream.Read ( ucRed ) &&
-         bitStream.Read ( ucGreen ) && bitStream.Read ( ucBlue ) )
+    if ( bitStream.Read ( ucRed ) &&
+         bitStream.Read ( ucGreen ) &&
+         bitStream.Read ( ucBlue ) )
     {
-        CClientTeam* pTeam = m_pTeamManager->GetTeam ( TeamID );
+        CClientTeam* pTeam = m_pTeamManager->GetTeam ( pSource->GetID () );
         if ( pTeam )
         {
             pTeam->SetColor ( ucRed, ucGreen, ucBlue );
@@ -61,36 +59,33 @@ void CTeamRPCs::SetTeamColor ( NetBitStreamInterface& bitStream )
 }
 
 
-void CTeamRPCs::SetPlayerTeam ( NetBitStreamInterface& bitStream )
+void CTeamRPCs::SetPlayerTeam ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     ElementID PlayerID;
-    ElementID TeamID;
-    if ( bitStream.Read ( PlayerID ) &&
-         bitStream.Read ( TeamID ) )
+    if ( bitStream.ReadCompressed ( PlayerID ) )
     {
         CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+        CClientTeam* pTeam = NULL;
+        if ( pSource != NULL && pSource->GetType () == CCLIENTTEAM )
+            pTeam = static_cast < CClientTeam * > ( pSource );
+
         if ( pPlayer )
         {
-            CClientTeam* pTeam = NULL;
-            if ( TeamID != INVALID_ELEMENT_ID )
-                pTeam = m_pTeamManager->GetTeam ( TeamID );
-
             pPlayer->SetTeam ( pTeam, true );
         }
     }
 }
 
 
-void CTeamRPCs::SetTeamFriendlyFire ( NetBitStreamInterface& bitStream )
+void CTeamRPCs::SetTeamFriendlyFire ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID TeamID;
-    unsigned char ucFriendlyFire;
-    if ( bitStream.Read ( TeamID ) && bitStream.Read ( ucFriendlyFire ) )
+    bool bFriendlyFire;
+    if ( bitStream.ReadBit ( bFriendlyFire ) )
     {
-        CClientTeam* pTeam = m_pTeamManager->GetTeam ( TeamID );
+        CClientTeam* pTeam = m_pTeamManager->GetTeam ( pSource->GetID () );
         if ( pTeam )
         {
-            pTeam->SetFriendlyFire ( ( ucFriendlyFire == 1 ) );
+            pTeam->SetFriendlyFire ( bFriendlyFire );
         }
     }
 }

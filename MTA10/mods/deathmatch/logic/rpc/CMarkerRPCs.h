@@ -20,11 +20,11 @@ class CMarkerRPCs : public CRPCFunctions
 public:
     static void                 LoadFunctions           ( void );
 
-    DECLARE_RPC ( SetMarkerType );
-    DECLARE_RPC ( SetMarkerColor );
-    DECLARE_RPC ( SetMarkerSize );
-    DECLARE_RPC ( SetMarkerTarget );
-    DECLARE_RPC ( SetMarkerIcon );
+    DECLARE_ELEMENT_RPC ( SetMarkerType );
+    DECLARE_ELEMENT_RPC ( SetMarkerColor );
+    DECLARE_ELEMENT_RPC ( SetMarkerSize );
+    DECLARE_ELEMENT_RPC ( SetMarkerTarget );
+    DECLARE_ELEMENT_RPC ( SetMarkerIcon );
 };
 
 #endif

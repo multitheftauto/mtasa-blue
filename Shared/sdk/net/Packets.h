@@ -97,6 +97,7 @@ enum ePacketID
     // Map related packets
     PACKET_ID_MAP_LIST,
     PACKET_ID_LUA,
+    PACKET_ID_LUA_ELEMENT_RPC,
 
     // GUI related packets
     PACKET_ID_TEXT_ITEM,

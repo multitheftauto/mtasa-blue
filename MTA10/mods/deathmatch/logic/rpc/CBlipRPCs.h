@@ -21,11 +21,11 @@ public:
     static void                 LoadFunctions           ( void );
 
     DECLARE_RPC ( DestroyAllBlips );
-    DECLARE_RPC ( SetBlipIcon );
-    DECLARE_RPC ( SetBlipSize );
-    DECLARE_RPC ( SetBlipColor );
-    DECLARE_RPC ( SetBlipOrdering );
-    DECLARE_RPC ( SetBlipVisibleDistance );
+    DECLARE_ELEMENT_RPC ( SetBlipIcon );
+    DECLARE_ELEMENT_RPC ( SetBlipSize );
+    DECLARE_ELEMENT_RPC ( SetBlipColor );
+    DECLARE_ELEMENT_RPC ( SetBlipOrdering );
+    DECLARE_ELEMENT_RPC ( SetBlipVisibleDistance );
 
 };
 
