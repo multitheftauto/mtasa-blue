@@ -54,6 +54,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #ifndef MTA_DEBUG
     ShowSplash ( hInstance );
 #endif
+    ClearPendingBrowseToSolution ();
 
     //////////////////////////////////////////////////////////
     //
@@ -225,8 +226,10 @@ int DoInstallStage ( const CUPL& UPL )
             }
         }
         else
+        {
+            UpdateMTAVersionApplicationSetting ();
             AddReportLog ( 2050, SString ( "DoInstallStage: Install ok %s", "" ) );
-
+        }
         return ChangeInstallUPL ( UPL, "launch", "near", "no" );
     }
 
@@ -276,7 +279,7 @@ SString CheckOnRestartCommand ( void )
 
             // Start progress bar
             if ( strOperation != "silent" )
-               StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Installing update..." );
+               StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Extracting files..." );
 
             // Run self extracting archive to extract files into the temp directory
             ShellExecuteBlocking ( "open", strFile, "-s" );
@@ -665,6 +668,9 @@ int DoLaunchGame ( LPSTR lpCmdLine )
             }
         }
     }
+
+    // Maybe show help if trouble was encountered
+    ProcessPendingBrowseToSolution ();
 
     // Success, maybe
     return dwExitCode;

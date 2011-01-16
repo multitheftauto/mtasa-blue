@@ -337,7 +337,7 @@ bool TerminateGTAIfRunning ( void )
 
         if ( processIdList.size () )
         {
-            MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_YESNO | MB_ICONQUESTION );
+            MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_OK | MB_ICONQUESTION );
             return false;
         }
     }

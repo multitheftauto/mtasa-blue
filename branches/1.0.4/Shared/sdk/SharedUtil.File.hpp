@@ -366,8 +366,36 @@ bool SharedUtil::FileCopy ( const SString& strSrc, const SString& strDest, bool 
 SString SharedUtil::GetCurrentWorkingDirectory ( void )
 {
     char szCurDir [ 1024 ] = "";
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
+    ::GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
     return szCurDir;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// GetCurrentDirectory
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString SharedUtil::GetCurrentDirectory ( void )
+{
+    char szCurDir [ 1024 ] = "";
+    ::GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
+    return szCurDir;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// GetWindowsDirectory
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString SharedUtil::GetWindowsDirectory ( void )
+{
+    char szWinDir [ MAX_PATH ] = "";
+    ::GetWindowsDirectory ( szWinDir, sizeof ( szWinDir ) );
+    return szWinDir;
 }
 #endif
 

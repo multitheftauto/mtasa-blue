@@ -27,7 +27,6 @@ const unsigned char g_szPixel [] = { 0x42, 0x4D, 0x3A, 0, 0, 0, 0, 0, 0, 0, 0x36
 CGraphics::CGraphics ( CLocalGUI* pGUI )
 {
     m_pGUI = pGUI;
-    m_pFont = NULL;
     memset ( m_pDXFonts, 0, sizeof ( m_pDXFonts ) );
     memset ( m_pBigDXFonts, 0, sizeof ( m_pBigDXFonts ) );
     m_pDevice = NULL;
@@ -38,7 +37,6 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pOriginalTarget = NULL;
 
     m_bIsDrawing = false;
-    m_bCEGUI = false;
 }
 
 
@@ -86,27 +84,6 @@ void CGraphics::EndDrawing ( void )
         m_bIsDrawing = false;
     }
 }
-
-int CGraphics::GetTextExtent ( const char* szText, float fScale )
-{
-    // If we got a font, use it to calculate the extent of the given text
-    if ( m_pFont )
-    {
-        return static_cast < int > ( m_pFont->GetTextExtent ( szText, fScale / 2 ) );
-    }
-    return 0;
-}
-
-
-int CGraphics::GetTextHeight ( float fScale )
-{
-    if ( m_pFont )
-    {
-        return static_cast < int > ( m_pFont->GetFontHeight ( fScale / 2 ) );
-    }
-    return 0;
-}
-
 
 void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
 {   
@@ -160,48 +137,6 @@ void CGraphics::DrawText ( int iX, int iY, unsigned long dwColor, float fScale, 
     va_end ( ap );
 
     DrawText ( iX, iY, iX, iY, dwColor, szBuffer, fScale, fScale, DT_NOCLIP );
-}
-
-
-void CGraphics::DrawTextCEGUI ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScale, unsigned long ulFormat )
-{
-    // Create a font?
-    if ( !m_pFont )
-    {
-        // Load it
-        char szFont[128];
-        GetWindowsDirectory ( szFont, 128 );
-        strcat ( &szFont[0], "\\fonts\\arial.ttf" );
-        m_pFont = CCore::GetSingleton ().GetGUI ()->CreateFnt ( "arial", szFont, 18, 0 );
-
-        if ( m_pFont != NULL ) {
-            // Proceed with the font
-            m_pFont->SetAntiAliasingEnabled ( true );
-            m_pFont->SetNativeResolution ( 800, 600 );
-            m_pFont->SetAutoScalingEnabled ( true );
-            return;
-        } else {
-            // Prevent invalid file from crashing us
-            static bool bHasWarned = false;
-            if ( !bHasWarned )
-            {
-                m_pGUI->GetConsole ()->Echo ( "WARNING: arial.ttf could not be located. No text is drawn." );
-                bHasWarned = true;
-            }
-            return;
-        }
-    }
-
-    // Start drawing
-    BeginSingleDrawing ( );
-
-    #pragma message(__LOC__"(IJs) Using the font directly to render text is a big performance issue (hence our FPS drop on nametags, displays, etc.), since there is no caching at all.")
-
-    // Draw it
-    m_pFont->DrawTextString ( szText, CRect2D ( ( float ) uiLeft, ( float ) uiTop, ( float ) uiRight, ( float ) uiBottom ), 1.0f, CRect2D ( 0, 0, 2000, 2000 ), ulFormat, ulColor, fScale / 2, fScale / 2 );
-
-    // End drawing
-    EndSingleDrawing ( );
 }
 
 

@@ -22,10 +22,11 @@ CMultiplayerSA* pMultiplayer = 0;
 // in order for proper initialization to occur.
 
 extern "C" _declspec(dllexport)
-CMultiplayer* InitMultiplayerInterface(CGame* pGame)
+CMultiplayer* InitMultiplayerInterface(CCoreInterface* pCore)
 {   
     // set the internal pointer to the game class
-    pGameInterface = pGame;
+    pGameInterface = pCore->GetGame ();
+    assert ( pGameInterface );
 
     // create an instance of our multiplayer class
     pMultiplayer = new CMultiplayerSA;
