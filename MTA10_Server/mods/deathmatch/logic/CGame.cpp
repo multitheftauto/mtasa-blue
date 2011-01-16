@@ -2434,7 +2434,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     pVehicle->SetOccupant ( NULL, ucOccupiedSeat );
 
                                     // Update the door angle.
-                                    pVehicle->SetDoorAngleRatio ( ucDoor + 2, fDoorAngle );
+                                    pVehicle->SetDoorOpenRatio ( ucDoor + 2, fDoorAngle );
 
                                     // Tell everyone he's in (they should warp him in)
                                     CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor );
@@ -2724,7 +2724,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 pVehicle->SetJackingPlayer ( NULL );
 
                                 // Set the door angle.
-                                pVehicle->SetDoorAngleRatio ( ucDoor, fAngle );
+                                pVehicle->SetDoorOpenRatio ( ucDoor, fAngle );
 
                                 // Tell everyone he aborted
                                 CVehicleInOutPacket Reply ( ID, 0, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor );

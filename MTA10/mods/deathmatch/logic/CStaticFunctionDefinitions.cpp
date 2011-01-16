@@ -2877,10 +2877,18 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float 
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientVehicle& Vehicle, const SColor color )
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientEntity& Entity, const SColor color )
 {
-    Vehicle.SetHeadLightColor ( color );
-    return true;
+    RUN_CHILDREN SetVehicleHeadLightColor ( **iter, color );
+
+    if ( IS_VEHICLE(&Entity) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+        Vehicle.SetHeadLightColor ( color );
+        return true;
+    }
+
+    return false;
 }
 
 
@@ -2890,6 +2898,19 @@ bool CStaticFunctionDefinitions::GetVehicleEngineState ( CClientVehicle & Vehicl
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( CClientEntity& Entity, unsigned char ucDoor, float fRatio, unsigned long ulTime )
+{
+    RUN_CHILDREN SetVehicleDoorOpenRatio ( **iter, ucDoor, fRatio, ulTime );
+
+    if ( IS_VEHICLE(&Entity) )
+    {
+        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+        Vehicle.SetDoorOpenRatio ( ucDoor, fRatio, ulTime, true );
+        return true;
+    }
+
+    return false;
+}
 
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CClientEntity& Entity, bool bEnabled )
 {

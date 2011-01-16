@@ -2316,8 +2316,8 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
          ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
          ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
     {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
         {
             SColor color;
             color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
@@ -2325,7 +2325,7 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
             color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
             color.A = 255;
 
-            if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( *pVehicle, color ) )
+            if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( *pEntity, color ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -3535,3 +3535,57 @@ int CLuaFunctionDefs::GetVehicleHandlingData ( lua_State* luaVM )
     return 1;
 }
 #endif      //  WITH_VEHICLE_HANDLING
+
+int CLuaFunctionDefs::SetVehicleDoorOpenRatio ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TNUMBER &&
+         lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
+        if ( pEntity )
+        {
+            unsigned char ucDoor = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            float fRatio = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+            unsigned long ulTime = 0UL;
+
+            if ( lua_type ( luaVM, 4 ) == LUA_TNUMBER )
+                ulTime = static_cast < unsigned long > ( lua_tonumber ( luaVM, 4 ) );
+
+            if ( CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( *pEntity, ucDoor, fRatio, ulTime ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleDoorOpenRatio", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleDoorOpenRatio" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetVehicleDoorOpenRatio ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+    {
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            unsigned char ucDoor = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            lua_pushnumber ( luaVM, pVehicle->GetDoorOpenRatio ( ucDoor ) );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleDoorOpenRatio", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleDoorOpenRatio" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

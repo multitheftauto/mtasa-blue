@@ -51,6 +51,7 @@ public:
     DECLARE_ELEMENT_RPC ( SetVehicleTaxiLightOn );
     DECLARE_ELEMENT_RPC ( SetVehicleHeadLightColor );
     DECLARE_ELEMENT_RPC ( SetVehicleTurretPosition );
+    DECLARE_ELEMENT_RPC ( SetVehicleDoorOpenRatio );
 };
 
 #endif

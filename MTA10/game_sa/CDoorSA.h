@@ -60,7 +60,7 @@ public:
     FLOAT           GetAngleOpenRatio ( );
     BOOL            IsClosed (  );
     BOOL            IsFullyOpen (  );
-    VOID            Open ( float fAngleRatio );
+    VOID            Open ( float fOpenRatio );
     eDoorState      GetDoorState() { return (eDoorState)this->GetInterface()->m_nDoorState; };
 };
 

@@ -4207,6 +4207,16 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle,
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleDoorOpenRatio ( CVehicle* pVehicle, unsigned char ucDoor, float& fRatio )
+{
+    if ( pVehicle != NULL )
+    {
+        fRatio = pVehicle->GetDoorOpenRatio ( ucDoor );
+        return true;
+    }
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::SetVehicleColor ( CElement* pElement, const CVehicleColor& color )
 {
@@ -5134,6 +5144,30 @@ bool CStaticFunctionDefinitions::SetVehicleTurretPosition ( CVehicle* pVehicle, 
     m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_TURRET_POSITION, *BitStream.pBitStream ) );
 
     return true;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( CElement* pElement, unsigned char ucDoor, float fRatio, unsigned long ulTime )
+{
+    RUN_CHILDREN SetVehicleDoorOpenRatio ( *iter, ucDoor, fRatio, ulTime );
+
+    if ( IS_VEHICLE(pElement) )
+    {
+        CVehicle& Vehicle = static_cast < CVehicle& > ( *pElement );
+        Vehicle.SetDoorOpenRatio ( ucDoor, fRatio );
+
+        CBitStream BitStream;
+        SIntegerSync < unsigned char, 3 > ucDoorSync ( ucDoor );
+        SDoorOpenRatioSync angle;
+        angle.data.fRatio = fRatio;
+        BitStream.pBitStream->Write ( &ucDoorSync );
+        BitStream.pBitStream->Write ( &angle );
+        BitStream.pBitStream->WriteCompressed ( static_cast < unsigned int > ( ulTime ) );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( &Vehicle, SET_VEHICLE_DOOR_OPEN_RATIO, *BitStream.pBitStream ) );
+
+        return true;
+    }
+
+    return false;
 }
 
 
