@@ -1139,7 +1139,10 @@ void CMultiplayerSA::InitHooks()
     memset ( (void *)0x57BA57, 0x90, 6 );
 
     // Disable the loading screen tune.
-    memset ( (void *)0x748CF6, 0x90, 5 );
+    if ( version == VERSION_US_10 )
+        memset ( (void *)0x748CF6, 0x90, 5 );
+    else if ( version == VERSION_EU_10 )
+        memset ( (void *)0x748D46, 0x90, 5 );
 
     // Do not render the loading screen.
     memset ( (void *)0x590D7C, 0x90, 5 );
