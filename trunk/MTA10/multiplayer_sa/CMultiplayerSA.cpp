@@ -1137,6 +1137,14 @@ void CMultiplayerSA::InitHooks()
 
     // Disable the GTASA main menu.
     memset ( (void *)0x57BA57, 0x90, 6 );
+
+    // Disable the loading screen tune.
+    memset ( (void *)0x748CF6, 0x90, 5 );
+
+    // Do not render the loading screen.
+    memset ( (void *)0x590D7C, 0x90, 5 );
+    memset ( (void *)0x590DB3, 0x90, 5 );
+    memcpy ( (void *)0x590D9F, "\xC3\x90\x90\x90\x90", 5 );
 }
 
 
