@@ -1134,6 +1134,9 @@ void CMultiplayerSA::InitHooks()
 
     // Make sure DirectInput mouse device is set non-exclusive (may not be needed?)
     *(DWORD *)0x7469A0 = 0x909000B0;
+
+    // Disable the GTASA main menu.
+    memset ( (void *)0x57BA57, 0x90, 6 );
 }
 
 
