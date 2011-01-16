@@ -49,6 +49,8 @@
 #define IS_TEAM(element)     ((element)->GetType()==CElement::TEAM)
 #define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
 
+typedef CIntrusiveList < class CElement > CChildListType;
+
 class CElement
 {
     friend class CPerPlayerEntity;
@@ -103,7 +105,6 @@ public:
     CElement*                                   FindChildByType             ( const char* szType, unsigned int uiIndex, bool bRecursive );
     void                                        FindAllChildrenByType       ( const char* szType, lua_State* pLua );
     void                                        GetChildren                 ( lua_State* pLua );
-    std::list < CElement * >                    GetChildrenList             ( void )        { return m_Children; }
     bool                                        IsMyChild                   ( CElement* pElement, bool bRecursive );
     void                                        ClearChildren               ( void );
 
@@ -137,10 +138,10 @@ public:
     void                                        CleanUpForVM                ( CLuaMain* pLuaMain, bool bRecursive );
 
     inline unsigned int                         CountChildren               ( void )                        { return static_cast < unsigned int > ( m_Children.size () ); };
-    inline std::list < CElement* > ::const_iterator          IterBegin           ( void )                   { return m_Children.begin (); };
-    inline std::list < CElement* > ::const_iterator          IterEnd             ( void )                   { return m_Children.end (); };
-    inline std::list < CElement* > ::const_reverse_iterator  IterReverseBegin    ( void )                   { return m_Children.rbegin (); };
-    inline std::list < CElement* > ::const_reverse_iterator  IterReverseEnd      ( void )                   { return m_Children.rend (); };
+    CChildListType ::const_iterator             IterBegin                   ( void )                        { return m_Children.begin (); };
+    CChildListType ::const_iterator             IterEnd                     ( void )                        { return m_Children.end (); };
+    CChildListType ::const_reverse_iterator     IterReverseBegin            ( void )                        { return m_Children.rbegin (); };
+    CChildListType ::const_reverse_iterator     IterReverseEnd              ( void )                        { return m_Children.rend (); };
 
     inline int                                  GetType                     ( void )                        { return m_iType; };
     virtual bool                                IsEntity                    ( void )                        { return false; };
@@ -227,6 +228,11 @@ protected:
     void                                        CallEventNoParent           ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL );
     void                                        CallParentEvent             ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL );
 
+public:
+    CIntrusiveListNode < CElement >             m_FromRootNode;     // Our node entry in the 'EntitiesFromRoot' list
+protected:
+    CIntrusiveListNode < CElement >             m_ChildrenNode;     // Our node entry in the parent object m_Children list
+
     CMapEventManager*                           m_pEventManager;
     CCustomData*                                m_pCustomData;
 
@@ -243,7 +249,7 @@ protected:
     unsigned int                                m_uiTypeHash;
     std::string                                 m_strTypeName;
     std::string                                 m_strName;
-    std::list < CElement* >                     m_Children;
+    CChildListType                              m_Children;
 
     std::list < class CPerPlayerEntity* >       m_ElementReferenced;
     std::list < class CColShape* >              m_Collisions;
@@ -280,10 +286,6 @@ private:
     void                            _FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults );
     static void                     _GetEntitiesFromRoot        ( unsigned int uiTypeHash, std::map < CElement*, int >& mapResults );
 #endif
-
-    typedef google::dense_hash_map < unsigned int, CMappedList < CElement* > > t_mapEntitiesFromRoot;
-    static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
-    static bool                     ms_bEntitiesFromRootInitialized;
 };
 
 #endif

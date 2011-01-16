@@ -51,7 +51,7 @@ void CElementDeleter::DeleteRecursive ( class CClientEntity* pElement )
 {
     // Gather a list over children (we can't use the list as it changes)
     list < CClientEntity* > Children;
-    list < CClientEntity* > ::const_iterator iterCopy = pElement->IterBegin ();
+    CChildListType ::const_iterator iterCopy = pElement->IterBegin ();
     for ( ; iterCopy != pElement->IterEnd (); ++iterCopy )
     {
         Children.push_back ( *iterCopy );

@@ -309,7 +309,7 @@ void CPerPlayerEntity::AddPlayersBelow ( CElement* pElement, list < CPlayer* >& 
     }
 
     // Call ourself on all its children elements
-    list < CElement* > ::const_iterator iterChildren = pElement->IterBegin ();
+    CChildListType ::const_iterator iterChildren = pElement->IterBegin ();
     for ( ; iterChildren != pElement->IterEnd (); iterChildren++ )
     {
         AddPlayersBelow ( *iterChildren, Added );
@@ -336,7 +336,7 @@ void CPerPlayerEntity::RemovePlayersBelow ( CElement* pElement, list < CPlayer* 
     }
 
     // Call ourself on all our children
-    list < CElement* > ::const_iterator iterChildren = pElement->IterBegin ();
+    CChildListType ::const_iterator iterChildren = pElement->IterBegin ();
     for ( ; iterChildren != pElement->IterEnd (); iterChildren++ )
     {
         RemovePlayersBelow ( *iterChildren, Removed );

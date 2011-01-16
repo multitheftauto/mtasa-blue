@@ -50,8 +50,8 @@ static CClientProjectileManager*                    m_pProjectileManager;
 static CClientSoundManager*                         m_pSoundManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN list<CClientEntity*>::const_iterator iter=Entity.IterBegin();for(;iter!=Entity.IterEnd();iter++)
-#define RUN_CHILDREN_BACKWARDS list<CClientEntity*>::const_reverse_iterator iter=pEntity->IterReverseBegin();for(;iter!=pEntity->IterReverseEnd();iter++)
+#define RUN_CHILDREN CChildListType::const_iterator iter=Entity.IterBegin();for(;iter!=Entity.IterEnd();iter++)
+#define RUN_CHILDREN_BACKWARDS CChildListType::const_reverse_iterator iter=pEntity->IterReverseBegin();for(;iter!=pEntity->IterReverseEnd();iter++)
 
 
 CStaticFunctionDefinitions::CStaticFunctionDefinitions (
@@ -266,7 +266,7 @@ CClientEntity* CStaticFunctionDefinitions::GetElementChild ( CClientEntity& Enti
 {
     // Grab it
     unsigned int uiCurrent = 0;
-    list < CClientEntity* > ::const_iterator iter = Entity.IterBegin ();
+    CChildListType ::const_iterator iter = Entity.IterBegin ();
     for ( ; iter != Entity.IterEnd (); iter++ )
     {
         if ( uiIndex == uiCurrent++ )
@@ -806,7 +806,7 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement ( CResource& Resource, c
 bool CStaticFunctionDefinitions::DestroyElement ( CClientEntity& Entity )
 {
     // Run us on all its children
-    list < CClientEntity* > ::const_iterator iter = Entity.IterBegin ();
+    CChildListType ::const_iterator iter = Entity.IterBegin ();
     while ( iter != Entity.IterEnd () )
     {
         if ( DestroyElement ( **iter ) )
