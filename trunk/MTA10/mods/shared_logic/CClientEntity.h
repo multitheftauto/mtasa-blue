@@ -85,6 +85,7 @@ class CLuaArgument;
 class CLuaArguments;
 class CLuaMain;
 class CMapEventManager;
+typedef CIntrusiveList < class CClientEntity > CChildListType;
 
 class CClientEntity
 {
@@ -131,8 +132,8 @@ public:
     inline void                                 SetBeingDeleted         ( bool bBeingDeleted )      { m_bBeingDeleted = bBeingDeleted; }
     void                                        ClearChildren           ( void );
 
-    std::list < CClientEntity* > ::const_iterator IterBegin             ( void )                    { return m_Children.begin (); }
-    std::list < CClientEntity* > ::const_iterator IterEnd               ( void )                    { return m_Children.end (); }
+    CChildListType ::const_iterator             IterBegin               ( void )                    { return m_Children.begin (); }
+    CChildListType ::const_iterator             IterEnd                 ( void )                    { return m_Children.end (); }
 
     inline ElementID                            GetID                   ( void )                    { return m_ID; };
     void                                        SetID                   ( ElementID ID );
@@ -249,10 +250,15 @@ public:
 
     float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
+public:
+    CIntrusiveListNode < CClientEntity >        m_FromRootNode;     // Our node entry in the 'EntitiesFromRoot' list
 protected:
+    CIntrusiveListNode < CClientEntity >        m_ChildrenNode;     // Our node entry in the parent object m_Children list
+
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
-    std::list < CClientEntity* >                m_Children;
+    CChildListType                              m_Children;
+
     CCustomData*                                m_pCustomData;
 
     ElementID                                   m_ID;
@@ -306,9 +312,6 @@ private:
     static void                     _GetEntitiesFromRoot        ( unsigned int uiTypeHash, std::map < CClientEntity*, int >& mapResults );
 #endif
 
-    typedef google::dense_hash_map < unsigned int, CMappedList < CClientEntity* > > t_mapEntitiesFromRoot;
-    static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
-    static bool                     ms_bEntitiesFromRootInitialized;
 };
 
 #endif

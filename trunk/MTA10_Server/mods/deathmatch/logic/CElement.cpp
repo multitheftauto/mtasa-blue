@@ -19,7 +19,12 @@
 
 extern CGame* g_pGame;
 
+#pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
+
 CElement::CElement ( CElement* pParent, CXMLNode* pNode )
+        : m_FromRootNode ( this )
+        , m_ChildrenNode ( this )
+        , m_Children ( &CElement::m_ChildrenNode )
 {
     // Allocate us an unique ID
     m_ID = CElementIDs::PopUniqueID ( this );
@@ -130,6 +135,10 @@ CElement::~CElement ( void )
 
     // Ensure nothing has inadvertently set a parent
     assert ( m_pParent == NULL );
+
+    // Ensure intrusive list nodes have been isolated
+    assert ( m_FromRootNode.m_pOuterItem == this && !m_FromRootNode.m_pPrev && !m_FromRootNode.m_pNext );
+    assert ( m_ChildrenNode.m_pOuterItem == this && !m_ChildrenNode.m_pPrev && !m_ChildrenNode.m_pNext );
 }
 
 
@@ -223,7 +232,7 @@ void CElement::GetChildren ( lua_State* pLua )
 
     // Add all our children to the table on top of the given lua main's stack
     unsigned int uiIndex = 0;
-    list < CElement* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         // Add it to the table
@@ -244,7 +253,7 @@ bool CElement::IsMyChild ( CElement* pElement, bool bRecursive )
         return true;
 
     // Is he our child directly?
-    list < CElement* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         // Return true if this is our child. If not check if he's one of our children's children if we were asked to do a recursive search.
@@ -269,13 +278,8 @@ void CElement::ClearChildren ( void )
     assert ( m_pParent != this );
 
     // Process our children - Move up to our parent
-    list < CElement* > cloneList = m_Children;
-    list < CElement* > ::const_iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ; ++iter )
-        (*iter)->SetParentObject ( m_pParent );
-
-    // This list should now be empty
-    assert ( m_Children.size () == 0 );
+    while ( m_Children.size () )
+        (*m_Children.begin())->SetParentObject ( m_pParent );
 }
 
 
@@ -397,7 +401,7 @@ void CElement::DeleteEvents ( CLuaMain* pLuaMain, bool bRecursive )
     // Delete it from all our children's events
     if ( bRecursive )
     {
-        list < CElement* > ::const_iterator iter = m_Children.begin ();
+        CChildListType ::const_iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
             (*iter)->DeleteEvents ( pLuaMain, true );
@@ -675,7 +679,7 @@ bool CElement::DeleteCustomData ( const char* szName, bool bRecursive )
     // If recursive, delete our children's data
     if ( bRecursive )
     {
-        list < CElement* > ::const_iterator iter = m_Children.begin ();
+        CChildListType ::const_iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
             // Delete it. If we deleted any, remember that we've done that so we can return true.
@@ -697,7 +701,7 @@ void CElement::DeleteAllCustomData ( CLuaMain* pLuaMain, bool bRecursive )
     // If recursive, delete our children's data
     if ( bRecursive )
     {
-        list < CElement* > ::const_iterator iter = m_Children.begin ();
+        CChildListType ::const_iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
             (*iter)->DeleteAllCustomData ( pLuaMain, true );
@@ -714,7 +718,7 @@ CXMLNode* CElement::OutputToXML ( CXMLNode* pNodeParent )
     m_pCustomData->OutputToXML ( pNode );
 
     // Go through each child element and call this function on it
-    list < CElement* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         (*iter)->OutputToXML ( pNode );
@@ -732,7 +736,7 @@ void CElement::CleanUpForVM ( CLuaMain* pLuaMain, bool bRecursive )
     // If recursive, do it on our children too
     if ( bRecursive )
     {
-        list < CElement* > ::const_iterator iter = m_Children.begin ();
+        CChildListType ::const_iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
             (*iter)->CleanUpForVM ( pLuaMain, true );
@@ -808,7 +812,7 @@ void CElement::UpdatePerPlayerEntities ( void )
     UpdatePerPlayer ();
 
     // Call ourselves on our children
-    list < CElement* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         (*iter)->UpdatePerPlayerEntities ();
@@ -857,7 +861,7 @@ CElement* CElement::FindChildIndex ( const char* szName, unsigned int uiIndex, u
     assert ( szName );
 
     // Look among our children
-    list < CElement* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         // Name matches?
@@ -893,7 +897,7 @@ CElement* CElement::FindChildIndex ( const char* szName, unsigned int uiIndex, u
 CElement* CElement::FindChildByTypeIndex ( unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive )
 {
     // Look among our children
-    list < CElement* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         // Name matches?
@@ -940,7 +944,7 @@ void CElement::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, lua_State* 
     }
 
     // Call us on the children
-    list < CElement* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         (*iter)->FindAllChildrenByTypeIndex ( uiTypeHash, pLua, uiIndex );
@@ -957,7 +961,7 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
     }
 
     // Call it on all our children
-    list < CElement* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         (*iter)->CallEventNoParent ( szName, Arguments, pSource, pCaller );
@@ -1164,8 +1168,11 @@ bool CElement::CanUpdateSync ( unsigned char ucRemote )
 
 
 // Entities from root optimization for getElementsByType
-CElement::t_mapEntitiesFromRoot CElement::ms_mapEntitiesFromRoot;
-bool CElement::ms_bEntitiesFromRootInitialized = false;
+typedef CIntrusiveListExt < CElement, &CElement::m_FromRootNode > CFromRootListType;
+typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
+static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
+static bool                     ms_bEntitiesFromRootInitialized = false;
+
 
 void CElement::StartupEntitiesFromRoot ()
 {
@@ -1201,12 +1208,12 @@ void CElement::AddEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity, b
     assert ( CElement::IsFromRoot ( pEntity ) );
 
     // Insert into list
-    CMappedList < CElement* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
+    CFromRootListType& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
     listEntities.remove ( pEntity );
     listEntities.push_front ( pEntity );
 
     // Apply to child elements as well
-    list < CElement* > ::const_iterator iter = pEntity->IterBegin ();
+    CChildListType ::const_iterator iter = pEntity->IterBegin ();
     for ( ; iter != pEntity->IterEnd (); iter++ )
         CElement::AddEntityFromRoot ( (*iter)->GetTypeHash (), *iter, false );
 
@@ -1222,14 +1229,14 @@ void CElement::RemoveEntityFromRoot ( unsigned int uiTypeHash, CElement* pEntity
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        CMappedList < CElement* >& listEntities = find->second;
+        CFromRootListType& listEntities = find->second;
         listEntities.remove ( pEntity );
         if ( listEntities.size () == 0 )
             ms_mapEntitiesFromRoot.erase ( find );
     }
 
     // Apply to child elements as well
-    list < CElement* > ::const_iterator iter = pEntity->IterBegin ();
+    CChildListType ::const_iterator iter = pEntity->IterBegin ();
     for ( ; iter != pEntity->IterEnd (); iter++ )
         CElement::RemoveEntityFromRoot ( (*iter)->GetTypeHash (), *iter );
 }
@@ -1243,11 +1250,11 @@ void CElement::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* pLua )
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        CMappedList < CElement* >& listEntities = find->second;
+        CFromRootListType& listEntities = find->second;
         CElement* pEntity;
         unsigned int uiIndex = 0;
 
-        for ( std::list < CElement* >::const_reverse_iterator i = listEntities.rbegin ();
+        for ( CChildListType::const_reverse_iterator i = listEntities.rbegin ();
               i != listEntities.rend ();
               ++i )
         {
@@ -1320,7 +1327,7 @@ void CElement::_FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::map <
     }
 
     // Call us on the children
-    list < CElement* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         (*iter)->_FindAllChildrenByTypeIndex ( uiTypeHash, mapResults );
@@ -1333,11 +1340,11 @@ void CElement::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < CEleme
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        const std::list < CElement* >& listEntities = find->second;
+        CChildListType& listEntities = find->second;
         CElement* pEntity;
         unsigned int uiIndex = 0;
 
-        for ( std::list < CElement* >::const_reverse_iterator i = listEntities.rbegin ();
+        for ( CChildListType::const_reverse_iterator i = listEntities.rbegin ();
               i != listEntities.rend ();
               ++i )
         {
