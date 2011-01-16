@@ -29,12 +29,14 @@ public:
     void            UnloadModule        ( );
 
     inline bool     IsOk                ( ) const { return m_bStatus; }
+    const SString&  GetLastErrorMessage ( void ) const;
     
     PVOID           GetFunctionPointer  ( const std::string& FunctionName );
 
 private:
     HMODULE     m_hLoadedModule;
     bool        m_bStatus;
+    SString     m_strLastError;
 };
 
 #endif

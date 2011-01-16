@@ -354,10 +354,52 @@ void SharedUtil::WatchDogSetUncleanStop ( bool bOn )
 //
 // Direct players to info about trouble
 //
-void SharedUtil::BrowseToSolution ( const SString& strType, bool bAskQuestion, bool bTerminateProcess )
+void SharedUtil::BrowseToSolution ( const SString& strType, bool bAskQuestion, bool bTerminateProcess, bool bDoOnExit, const SString& strMessageBoxMessage )
 {
     AddReportLog ( 3200, SString ( "Trouble %s", *strType ) );
 
+    // Put args into a string and save in the registry
+    CArgMap argMap;
+    argMap.Set ( "type", strType );
+    argMap.Set ( "bAskQuestion", bAskQuestion );
+    argMap.Set ( "message", strMessageBoxMessage );
+    SetApplicationSetting ( "pending-browse-to-solution", argMap.ToString () );
+
+    // Do it now if required
+    if ( !bDoOnExit )
+        ProcessPendingBrowseToSolution ();
+
+    // Exit if required
+    if ( bTerminateProcess )
+        TerminateProcess ( GetCurrentProcess (), 1 );
+}
+
+//
+// Process next BrowseToSolution
+//
+void SharedUtil::ProcessPendingBrowseToSolution ( void )
+{
+    SString strType, strMessageBoxMessage;
+    int bAskQuestion;
+
+    // Get args from the registry
+    CArgMap argMap;
+    argMap.SetFromString ( GetApplicationSetting ( "pending-browse-to-solution" ) );
+    argMap.Get ( "type", strType );
+    argMap.Get ( "message", strMessageBoxMessage );
+    argMap.Get ( "bAskQuestion", bAskQuestion );
+
+    // Check if anything to do
+    if ( strType.empty () )
+        return;
+
+    ClearPendingBrowseToSolution ();
+
+    // Show message box if required
+    if ( !strMessageBoxMessage.empty () )
+        MessageBox ( 0, strMessageBoxMessage, "Error", MB_OK|MB_ICONEXCLAMATION );
+
+    // Ask question if required, and then launch URL
     if ( !bAskQuestion || IDYES == MessageBox( 0, "Do you want to see some on-line help about this problem ?", "MTA: San Andreas", MB_ICONQUESTION|MB_YESNO ) )
     {
         SString strQueryURL = GetApplicationSetting ( "trouble-url" );
@@ -368,9 +410,14 @@ void SharedUtil::BrowseToSolution ( const SString& strType, bool bAskQuestion, b
         strQueryURL = strQueryURL.Replace ( "%TROUBLE%", strType );
         ShellExecuteNonBlocking ( "open", strQueryURL.c_str () );
     }
+}
 
-    if ( bTerminateProcess )
-        TerminateProcess ( GetCurrentProcess (), 1 );
+//
+// Clear BrowseToSolution
+//
+void SharedUtil::ClearPendingBrowseToSolution ( void )
+{
+    SetApplicationSetting ( "pending-browse-to-solution", "" );
 }
 
 

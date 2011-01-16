@@ -73,7 +73,10 @@ namespace SharedUtil
     bool            WatchDogWasUncleanStop          ( void );
     void            WatchDogSetUncleanStop          ( bool bOn );
 
-    void            BrowseToSolution                ( const SString& strType, bool bAskQuestion = false, bool bTerminateProcess = false );
+    void            BrowseToSolution                ( const SString& strType, bool bAskQuestion = false, bool bTerminateProcess = false, bool bDoOnExit = false, const SString& strMessageBoxMessage = "" );
+    void            ProcessPendingBrowseToSolution  ( void );
+    void            ClearPendingBrowseToSolution    ( void );
+
 #endif
 
     SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
