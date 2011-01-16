@@ -11672,30 +11672,66 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetPacketInfo ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
 {
     unsigned long ulBits [ 256 ];
     unsigned long ulCount [ 256 ];
-    g_pNetServer->GetPacketLogData ( ulBits, ulCount );
-    lua_createtable ( luaVM, 256, 1 );
 
-    for ( unsigned int i = 0; i < 256; ++i )
+    lua_createtable ( luaVM, 0, 2 );
+
+    lua_pushstring ( luaVM, "in" );
+    lua_createtable ( luaVM, 0, 2 );
     {
-        lua_createtable ( luaVM, 0, 2 );
-
+        g_pNetServer->GetNetworkUsageData ( CNetServer::STATS_INCOMING_TRAFFIC, ulBits, ulCount );
+        
         lua_pushstring ( luaVM, "bits" );
-        lua_pushnumber ( luaVM, ulBits [ i ] );
+        lua_createtable ( luaVM, 255, 1 );
+        for ( unsigned int i = 0; i < 256; ++i )
+        {
+            lua_pushnumber ( luaVM, ulBits[i] );
+            lua_rawseti ( luaVM, -2, i );
+        }
         lua_rawset ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "count" );
-        lua_pushnumber ( luaVM, ulCount [ i ] );
+        lua_createtable ( luaVM, 255, 1 );
+        for ( unsigned int i = 0; i < 256; ++i )
+        {
+            lua_pushnumber ( luaVM, ulCount[i] );
+            lua_rawseti ( luaVM, -2, i );
+        }
+        lua_rawset ( luaVM, -3 );
+    }
+    lua_rawset ( luaVM, -3 );
+
+    lua_pushstring ( luaVM, "out" );
+    lua_createtable ( luaVM, 0, 2 );
+    {
+        g_pNetServer->GetNetworkUsageData ( CNetServer::STATS_OUTGOING_TRAFFIC, ulBits, ulCount );
+
+        lua_pushstring ( luaVM, "bits" );
+        lua_createtable ( luaVM, 255, 1 );
+        for ( unsigned int i = 0; i < 256; ++i )
+        {
+            lua_pushnumber ( luaVM, ulBits[i] );
+            lua_rawseti ( luaVM, -2, i );
+        }
         lua_rawset ( luaVM, -3 );
 
-        lua_rawseti ( luaVM, -2, i );
+        lua_pushstring ( luaVM, "count" );
+        lua_createtable ( luaVM, 255, 1 );
+        for ( unsigned int i = 0; i < 256; ++i )
+        {
+            lua_pushnumber ( luaVM, ulCount[i] );
+            lua_rawseti ( luaVM, -2, i );
+        }
+        lua_rawset ( luaVM, -3 );
     }
+    lua_rawset ( luaVM, -3 );
 
     return 1;
 }
+
 
 
 int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )

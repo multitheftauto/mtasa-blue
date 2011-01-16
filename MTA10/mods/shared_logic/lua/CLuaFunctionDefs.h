@@ -774,7 +774,7 @@ public:
 
     // Utility
     LUA_DECLARE ( Md5 );
-    LUA_DECLARE ( GetPacketInfo );
+    LUA_DECLARE ( GetNetworkUsageData );
 
 #ifdef MTA_VOICE
     // Voice funcs

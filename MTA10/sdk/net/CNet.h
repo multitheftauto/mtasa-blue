@@ -20,6 +20,12 @@
 class CNet
 {
 public:
+    enum ENetworkUsageDirection
+    {
+        STATS_INCOMING_TRAFFIC = 0,
+        STATS_OUTGOING_TRAFFIC = 1
+    };
+
     virtual void                        ResetNetwork                ( void ) = 0;
     virtual bool                        StartNetwork                ( const char* szServerHost, unsigned short usServerPort, const char* szServerPassword = NULL ) = 0;
     virtual void                        StopNetwork                 ( void ) = 0;
@@ -54,7 +60,7 @@ public:
     virtual unsigned int                GetBitsReceived             ( void ) = 0;
     virtual float                       GetCompressionRatio         ( void ) = 0;
     virtual float                       GetDecompressionRatio       ( void ) = 0;
-    virtual void                        GetPacketLogData            ( unsigned long* ulBytes, unsigned long* ulCount ) = 0;
+    virtual void                        GetNetworkUsageData         ( ENetworkUsageDirection dir, unsigned long ulTotalBits[256], unsigned long ulCount[256] ) = 0;
 
     virtual int                         GetPing                     ( void ) = 0;
     virtual unsigned long               GetTime                     ( void ) = 0;
