@@ -29,17 +29,15 @@ void CRadarRPCs::DestroyAllRadarAreas ( NetBitStreamInterface& bitStream )
 }
 
 
-void CRadarRPCs::SetRadarAreaSize ( NetBitStreamInterface& bitStream )
+void CRadarRPCs::SetRadarAreaSize ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the radar area id and the size
-    ElementID ID;
     CVector2D vecSize;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( vecSize.fX ) &&
+    if ( bitStream.Read ( vecSize.fX ) &&
          bitStream.Read ( vecSize.fY ) )
     {
         // Grab the radar area
-        CClientRadarArea* pArea = m_pRadarAreaManager->Get ( ID );
+        CClientRadarArea* pArea = m_pRadarAreaManager->Get ( pSource->GetID () );
         if ( pArea )
         {
             // Set the new size
@@ -49,19 +47,17 @@ void CRadarRPCs::SetRadarAreaSize ( NetBitStreamInterface& bitStream )
 }
 
 
-void CRadarRPCs::SetRadarAreaColor ( NetBitStreamInterface& bitStream )
+void CRadarRPCs::SetRadarAreaColor ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the radar area id and the color
-    ElementID ID;
     SColor color;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( color.R ) &&
+    if ( bitStream.Read ( color.R ) &&
          bitStream.Read ( color.G ) &&
          bitStream.Read ( color.B ) &&
          bitStream.Read ( color.A ) )
     {
         // Grab the radar area
-        CClientRadarArea* pArea = m_pRadarAreaManager->Get ( ID );
+        CClientRadarArea* pArea = m_pRadarAreaManager->Get ( pSource->GetID () );
         if ( pArea )
         {
             // Set the new color
@@ -71,20 +67,18 @@ void CRadarRPCs::SetRadarAreaColor ( NetBitStreamInterface& bitStream )
 }
 
 
-void CRadarRPCs::SetRadarAreaFlashing ( NetBitStreamInterface& bitStream )
+void CRadarRPCs::SetRadarAreaFlashing ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the radar area id and the flashing status
-    ElementID ID;
-    unsigned char ucFlashing;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucFlashing ) )
+    bool bFlashing;
+    if ( bitStream.ReadBit ( bFlashing ) )
     {
         // Grab the radar area
-        CClientRadarArea* pArea = m_pRadarAreaManager->Get ( ID );
+        CClientRadarArea* pArea = m_pRadarAreaManager->Get ( pSource->GetID () );
         if ( pArea )
         {
             // Set the new flashing status
-            pArea->SetFlashing ( ucFlashing != 0 );
+            pArea->SetFlashing ( bFlashing );
         }
     }
 }

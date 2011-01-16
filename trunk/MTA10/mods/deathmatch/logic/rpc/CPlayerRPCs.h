@@ -24,10 +24,10 @@ public:
     DECLARE_RPC ( SetPlayerMoney );       
     DECLARE_RPC ( ShowPlayerHudComponent );
     DECLARE_RPC ( ForcePlayerMap );
-    DECLARE_RPC ( SetPlayerNametagText );
-    DECLARE_RPC ( SetPlayerNametagColor );
-    DECLARE_RPC ( RemovePlayerNametagColor );
-    DECLARE_RPC ( SetPlayerNametagShowing );      
+    DECLARE_ELEMENT_RPC ( SetPlayerNametagText );
+    DECLARE_ELEMENT_RPC ( SetPlayerNametagColor );
+    DECLARE_ELEMENT_RPC ( RemovePlayerNametagColor );
+    DECLARE_ELEMENT_RPC ( SetPlayerNametagShowing );      
 };
 
 #endif

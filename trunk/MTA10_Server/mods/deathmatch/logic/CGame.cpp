@@ -1943,11 +1943,10 @@ void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
             // Tell our clients to update their data. Send to everyone but the one we got this packet from.
             unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
             CBitStream BitStream;
-            BitStream.pBitStream->WriteCompressed ( ID );
             BitStream.pBitStream->WriteCompressed ( usNameLength );
             BitStream.pBitStream->Write ( szName, usNameLength );
             Value.WriteToBitStream ( *BitStream.pBitStream );
-            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_DATA, *BitStream.pBitStream ), pSourcePlayer );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DATA, *BitStream.pBitStream ), pSourcePlayer );
         }
     }
 }

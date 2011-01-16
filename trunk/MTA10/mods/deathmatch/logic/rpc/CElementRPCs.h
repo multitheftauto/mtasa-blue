@@ -20,23 +20,23 @@ class CElementRPCs : public CRPCFunctions
 public:
     static void                 LoadFunctions           ( void );
 
-    DECLARE_RPC ( SetElementParent );
-    DECLARE_RPC ( SetElementData );
-    DECLARE_RPC ( RemoveElementData );
-    DECLARE_RPC ( SetElementPosition );
-    DECLARE_RPC ( SetElementVelocity );
-    DECLARE_RPC ( SetElementInterior );
-    DECLARE_RPC ( SetElementDimension );
-    DECLARE_RPC ( AttachElements );
-    DECLARE_RPC ( DetachElements );
-    DECLARE_RPC ( SetElementAlpha );
-    DECLARE_RPC ( SetElementName );
-    DECLARE_RPC ( SetElementHealth );
-    DECLARE_RPC ( SetElementModel );
-    DECLARE_RPC ( SetElementAttachedOffsets );
-    DECLARE_RPC ( SetElementDoubleSided );
-    DECLARE_RPC ( SetElementCollisionsEnabled );
-    DECLARE_RPC ( SetElementFrozen );
+    DECLARE_ELEMENT_RPC ( SetElementParent );
+    DECLARE_ELEMENT_RPC ( SetElementData );
+    DECLARE_ELEMENT_RPC ( RemoveElementData );
+    DECLARE_ELEMENT_RPC ( SetElementPosition );
+    DECLARE_ELEMENT_RPC ( SetElementVelocity );
+    DECLARE_ELEMENT_RPC ( SetElementInterior );
+    DECLARE_ELEMENT_RPC ( SetElementDimension );
+    DECLARE_ELEMENT_RPC ( AttachElements );
+    DECLARE_ELEMENT_RPC ( DetachElements );
+    DECLARE_ELEMENT_RPC ( SetElementAlpha );
+    DECLARE_ELEMENT_RPC ( SetElementName );
+    DECLARE_ELEMENT_RPC ( SetElementHealth );
+    DECLARE_ELEMENT_RPC ( SetElementModel );
+    DECLARE_ELEMENT_RPC ( SetElementAttachedOffsets );
+    DECLARE_ELEMENT_RPC ( SetElementDoubleSided );
+    DECLARE_ELEMENT_RPC ( SetElementCollisionsEnabled );
+    DECLARE_ELEMENT_RPC ( SetElementFrozen );
 };
 
 #endif

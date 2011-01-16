@@ -152,12 +152,11 @@ void CMarker::SetPosition ( const CVector& vecPosition )
 
         // Tell all the players that know about us
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( m_ID );
         BitStream.pBitStream->Write ( vecPosition.fX );
         BitStream.pBitStream->Write ( vecPosition.fY );
         BitStream.pBitStream->Write ( vecPosition.fZ );
         BitStream.pBitStream->Write ( GetSyncTimeContext () );
-        BroadcastOnlyVisible ( CLuaPacket ( SET_ELEMENT_POSITION, *BitStream.pBitStream ) );
+        BroadcastOnlyVisible ( CElementRPCPacket ( this, SET_ELEMENT_POSITION, *BitStream.pBitStream ) );
     }
 }
 
@@ -179,12 +178,11 @@ void CMarker::SetTarget ( const CVector* pTargetVector )
 
                 // Tell everyone that knows about this marker
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( m_ID );
                 BitStream.pBitStream->Write ( static_cast < unsigned char > ( 1 ) );
                 BitStream.pBitStream->Write ( m_vecTarget.fX );
                 BitStream.pBitStream->Write ( m_vecTarget.fY );
                 BitStream.pBitStream->Write ( m_vecTarget.fZ );
-                BroadcastOnlyVisible ( CLuaPacket ( SET_MARKER_TARGET, *BitStream.pBitStream ) );
+                BroadcastOnlyVisible ( CElementRPCPacket ( this, SET_MARKER_TARGET, *BitStream.pBitStream ) );
             }
             else
             {
@@ -206,9 +204,8 @@ void CMarker::SetTarget ( const CVector* pTargetVector )
             {
                 // Tell everyone that knows about this marker
                 CBitStream BitStream;
-                BitStream.pBitStream->Write ( m_ID );
                 BitStream.pBitStream->Write ( static_cast < unsigned char > ( 0 ) );
-                BroadcastOnlyVisible ( CLuaPacket ( SET_MARKER_TARGET, *BitStream.pBitStream ) );
+                BroadcastOnlyVisible ( CElementRPCPacket ( this, SET_MARKER_TARGET, *BitStream.pBitStream ) );
             }
         }
     }
@@ -227,9 +224,8 @@ void CMarker::SetMarkerType ( unsigned char ucType )
 
         // Tell all players
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( m_ID );
         BitStream.pBitStream->Write ( ucType );
-        BroadcastOnlyVisible ( CLuaPacket ( SET_MARKER_TYPE, *BitStream.pBitStream ) );
+        BroadcastOnlyVisible ( CElementRPCPacket ( this, SET_MARKER_TYPE, *BitStream.pBitStream ) );
 
         // Is the new type not a checkpoint or a ring? Remove the target
         if ( ucType != CMarker::TYPE_CHECKPOINT && ucType != CMarker::TYPE_RING )
@@ -251,9 +247,8 @@ void CMarker::SetSize ( float fSize )
 
         // Tell all players
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( m_ID );
         BitStream.pBitStream->Write ( fSize );
-        BroadcastOnlyVisible ( CLuaPacket ( SET_MARKER_SIZE, *BitStream.pBitStream ) );
+        BroadcastOnlyVisible ( CElementRPCPacket ( this, SET_MARKER_SIZE, *BitStream.pBitStream ) );
     }
 }
 
@@ -268,12 +263,11 @@ void CMarker::SetColor ( const SColor color )
 
         // Tell all the players
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( m_ID );
         BitStream.pBitStream->Write ( color.B  );
         BitStream.pBitStream->Write ( color.G );
         BitStream.pBitStream->Write ( color.R );
         BitStream.pBitStream->Write ( color.A );
-        BroadcastOnlyVisible ( CLuaPacket ( SET_MARKER_COLOR, *BitStream.pBitStream ) );
+        BroadcastOnlyVisible ( CElementRPCPacket ( this, SET_MARKER_COLOR, *BitStream.pBitStream ) );
     }
 }
 
@@ -286,9 +280,8 @@ void CMarker::SetIcon ( unsigned char ucIcon )
 
         // Tell everyone that knows about this marker
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( m_ID );
         BitStream.pBitStream->Write ( m_ucIcon );
-        BroadcastOnlyVisible ( CLuaPacket ( SET_MARKER_ICON, *BitStream.pBitStream ) );
+        BroadcastOnlyVisible ( CElementRPCPacket ( this, SET_MARKER_ICON, *BitStream.pBitStream ) );
     }
 }
 

@@ -24,14 +24,12 @@ void CWeaponRPCs::LoadFunctions ( void )
 }
 
 
-void CWeaponRPCs::GiveWeapon ( NetBitStreamInterface& bitStream )
+void CWeaponRPCs::GiveWeapon ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out weapon id and ammo amount
-    ElementID ID;
     SWeaponTypeSync weaponType;
 
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( &weaponType ) )
+    if ( bitStream.Read ( &weaponType ) )
     {
         SWeaponAmmoSync ammo ( weaponType.data.ucWeaponType, true, false );
         if ( bitStream.Read ( &ammo ) )
@@ -40,7 +38,7 @@ void CWeaponRPCs::GiveWeapon ( NetBitStreamInterface& bitStream )
             unsigned char ucWeaponID = weaponType.data.ucWeaponType;
             unsigned short usAmmo = ammo.data.usTotalAmmo;
 
-            CClientPed * pPed = m_pPedManager->Get ( ID, true );
+            CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
             if ( pPed )
             {
                 // Don't change remote players weapons (affects sync)
@@ -114,18 +112,16 @@ void CWeaponRPCs::GiveWeapon ( NetBitStreamInterface& bitStream )
 }
 
 
-void CWeaponRPCs::TakeWeapon ( NetBitStreamInterface& bitStream )
+void CWeaponRPCs::TakeWeapon ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out weapon id and ammo amount
-    ElementID ID;
     SWeaponTypeSync weaponType;
 
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( &weaponType )  )
+    if ( bitStream.Read ( &weaponType )  )
     {
         unsigned char ucWeaponID = weaponType.data.ucWeaponType;
 
-        CClientPed * pPed = m_pPedManager->Get ( ID, true );
+        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
         if ( pPed )
         {
             // Is the weapon id valid? (may not be neccessary, just being safe)
@@ -173,30 +169,24 @@ void CWeaponRPCs::TakeWeapon ( NetBitStreamInterface& bitStream )
 }
 
 
-void CWeaponRPCs::TakeAllWeapons ( NetBitStreamInterface& bitStream )
+void CWeaponRPCs::TakeAllWeapons ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
-    if ( bitStream.ReadCompressed ( ID ) )
+    CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+    if ( pPed )
     {
-        CClientPed * pPed = m_pPedManager->Get ( ID, true );
-        if ( pPed )
-        {
-            // Remove all our weapons
-            pPed->RemoveAllWeapons ();
-        }
+        // Remove all our weapons
+        pPed->RemoveAllWeapons ();
     }
 }
 
 
-void CWeaponRPCs::SetWeaponSlot ( NetBitStreamInterface& bitStream )
+void CWeaponRPCs::SetWeaponSlot ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     SWeaponSlotSync slot;
 
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( &slot ) )
+    if ( bitStream.Read ( &slot ) )
     {
-        CClientPed * pPed = m_pPedManager->Get ( ID, true );
+        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
         if ( pPed )
         {
             pPed->SetCurrentWeaponSlot ( (eWeaponSlot) slot.data.uiSlot );
@@ -205,12 +195,10 @@ void CWeaponRPCs::SetWeaponSlot ( NetBitStreamInterface& bitStream )
 }
 
 
-void CWeaponRPCs::SetWeaponAmmo ( NetBitStreamInterface& bitStream )
+void CWeaponRPCs::SetWeaponAmmo ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     SWeaponTypeSync weaponType;
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( &weaponType ) )
+    if ( bitStream.Read ( &weaponType ) )
     {
         unsigned char ucWeaponID = weaponType.data.ucWeaponType;
         SWeaponAmmoSync ammo ( ucWeaponID, true, true );
@@ -220,7 +208,7 @@ void CWeaponRPCs::SetWeaponAmmo ( NetBitStreamInterface& bitStream )
             unsigned short usAmmo = ammo.data.usTotalAmmo;
             unsigned short usAmmoInClip = ammo.data.usAmmoInClip;
 
-            CClientPed * pPed = m_pPedManager->Get ( ID, true );
+            CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
             if ( pPed )
             {
                 // Valid weapon id?

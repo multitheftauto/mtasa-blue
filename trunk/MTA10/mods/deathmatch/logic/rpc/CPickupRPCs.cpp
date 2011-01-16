@@ -28,16 +28,14 @@ void CPickupRPCs::DestroyAllPickups ( NetBitStreamInterface& bitStream )
 }
 
 
-void CPickupRPCs::SetPickupType ( NetBitStreamInterface& bitStream )
+void CPickupRPCs::SetPickupType ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the pickup id and the position vector
-    ElementID ID;
     unsigned char ucType;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucType ) )
+    if ( bitStream.Read ( ucType ) )
     {
         // Grab the pickup
-        CClientPickup* pPickup = m_pPickupManager->Get ( ID );
+        CClientPickup* pPickup = m_pPickupManager->Get ( pSource->GetID () );
         if ( pPickup )
         {
             if ( ucType == CClientPickup::ARMOR || ucType == CClientPickup::HEALTH )
@@ -82,16 +80,14 @@ void CPickupRPCs::SetPickupType ( NetBitStreamInterface& bitStream )
 }
 
 
-void CPickupRPCs::SetPickupVisible ( NetBitStreamInterface& bitStream )
+void CPickupRPCs::SetPickupVisible ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the pickup id and the is visible flag
-    ElementID ID;
     unsigned char ucVisible;
-    if ( bitStream.Read ( ID ) &&
-         bitStream.Read ( ucVisible ) )
+    if ( bitStream.Read ( ucVisible ) )
     {
         // Grab the pickup
-        CClientPickup* pPickup = m_pPickupManager->Get ( ID );
+        CClientPickup* pPickup = m_pPickupManager->Get ( pSource->GetID () );
         if ( pPickup )
         {
             // Set whether it's visible or not
