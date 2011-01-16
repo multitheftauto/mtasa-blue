@@ -1026,11 +1026,14 @@ bool System::injectChar(utf32 code_point)
 		Window* dest = getKeyboardTargetWindow();
 
         // Make sure the glyph is loaded for this font
-        const Font* destFont = dest->getFont(true);
-        String newGlyphCache = destFont->OnGlyphDrawn(code_point);
-        if ( newGlyphCache != "" )
+        if ( dest != NULL )
         {
-            destFont->extendFontGlyphs ( newGlyphCache );
+            const Font* destFont = dest->getFont(true);
+            String newGlyphCache = destFont->OnGlyphDrawn(code_point);
+            if ( newGlyphCache != "" )
+            {
+                destFont->extendFontGlyphs ( newGlyphCache );
+            }
         }
 
 		// loop backwards until event is handled or we run out of windows.
