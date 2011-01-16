@@ -31,7 +31,8 @@ extern CClientGame* g_pClientGame;
 
 // Maximum distance between current position and target position (for interpolation)
 // before we disable interpolation and warp to the position instead
-#define VEHICLE_INTERPOLATION_WARP_THRESHOLD    20
+#define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
+#define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  1.8f
 
 CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
 {
@@ -3093,7 +3094,10 @@ void CClientVehicle::UpdateTargetPosition ( void )
         CVector vecNewPosition = vecCurrentPosition + vecCompensation;
 
         // Check if the distance to interpolate is too far.
-        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > VEHICLE_INTERPOLATION_WARP_THRESHOLD )
+        CVector vecVelocity;
+        GetMoveSpeed ( vecVelocity );
+        float fThreshold = ( VEHICLE_INTERPOLATION_WARP_THRESHOLD + VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
+        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > fThreshold )
         {
             // Abort all interpolation
             m_interp.pos.ulFinishTime = 0;
