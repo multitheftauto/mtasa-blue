@@ -54,9 +54,6 @@ public:
     void                BeginSingleDrawing      ( void );
     void                EndSingleDrawing        ( void );
 
-    void                SetCEGUIUsed            ( bool bCEGUI )     { m_bCEGUI = bCEGUI; };
-    bool                GetCEGUIUsed            ( void )            { return m_bCEGUI; };
-
     // Transformation functions
     void                CalcWorldCoors          ( CVector * vecScreen, CVector * vecWorld );
     void                CalcScreenCoors         ( CVector * vecWorld, CVector * vecScreen );
@@ -65,7 +62,6 @@ public:
     void                Draw3DBox               ( float fX, float fY, float fZ, float fL, float fW, float fH, DWORD dwColor, bool bWireframe = false );
     void                DrawText                ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont * pDXFont = NULL );
     void                DrawText                ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... );
-    void                DrawTextCEGUI           ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScale, unsigned long ulFormat );
     void                DrawText2DA             ( int uiX, int uiY, unsigned long ulColor, float fScale, const char* szDisplayText, ... );
     void                DrawText3DA             ( float fX, float fY, float fZ, unsigned long ulColor, float fScale, const char* szDisplayText, ... );
     void                DrawLine                ( float fX1, float fY1, float fX2, float fY2, unsigned long ulColor );
@@ -90,9 +86,6 @@ public:
     float               GetDXFontHeight         ( float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXCharacterWidth     ( char c, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXTextExtent         ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
-
-    int                 GetTextExtent           ( const char* szText, float fScale );
-    int                 GetTextHeight           ( float fScale );
 
     // Textures
     IDirect3DTexture9*  CreateTexture           ( DWORD* dwBitMap, unsigned int uiWidth, unsigned int uiHeight );
@@ -156,10 +149,8 @@ private:
     ID3DXFont*          GetBigFont              ( ID3DXFont* pDXFont );
 
     CLocalGUI*          m_pGUI;
-    CGUIFont*           m_pFont;
 
     bool                m_bIsDrawing;
-    bool                m_bCEGUI;
 
     LPD3DXSPRITE        m_pDXSprite;
     IDirect3DTexture9 * m_pDXPixelTexture;
