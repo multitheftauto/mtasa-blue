@@ -20,6 +20,12 @@
 class CNetServer
 {
 public:
+    enum ENetworkUsageDirection
+    {
+        STATS_INCOMING_TRAFFIC = 0,
+        STATS_OUTGOING_TRAFFIC = 1
+    };
+
     // szIP can be NULL if autochoosing is wanted.
     virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers ) = 0;
     virtual void                            StopNetwork                     ( void ) = 0;
@@ -44,7 +50,7 @@ public:
     virtual void                            RemoveBan                       ( const char* szIP ) = 0;
     virtual bool                            IsBanned                        ( const char* szIP ) = 0;
 
-    virtual void                            GetPacketLogData                ( unsigned long* ulBits, unsigned long* ulCount ) = 0;
+    virtual void                            GetNetworkUsageData             ( CNetServer::ENetworkUsageDirection, unsigned long ulBits[256], unsigned long ulCount[256] ) = 0;
 
     virtual void                            Kick                            ( NetServerPlayerID &PlayerID ) = 0;
 
