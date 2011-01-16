@@ -452,21 +452,21 @@ int CLuaHandlingDefs::GetVehicleHandling ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier() );
                 lua_setfield ( luaVM, -2, "tractionMultiplier" );
                 CHandlingEntry::eDriveType eDriveType=pEntry->GetCarDriveType();
-                if (eDriveType==CHandlingEntry::eDriveType::FWD)
+                if (eDriveType==CHandlingEntry::FWD)
                     lua_pushstring(luaVM,"fwd");
-                else if (eDriveType==CHandlingEntry::eDriveType::RWD)
+                else if (eDriveType==CHandlingEntry::RWD)
                     lua_pushstring(luaVM,"rwd");
-                else if (eDriveType==CHandlingEntry::eDriveType::FOURWHEEL)
+                else if (eDriveType==CHandlingEntry::FOURWHEEL)
                     lua_pushstring(luaVM,"awd");
                 else // What the ... (yeah, security)
                     lua_pushnil ( luaVM );
                 lua_setfield ( luaVM, -2, "driveType" );
                 CHandlingEntry::eEngineType eEngineType=pEntry->GetCarEngineType();
-                if (eEngineType==CHandlingEntry::eEngineType::PETROL)
+                if (eEngineType==CHandlingEntry::PETROL)
                     lua_pushstring(luaVM,"petrol");
-                else if (eEngineType==CHandlingEntry::eEngineType::DIESEL)
+                else if (eEngineType==CHandlingEntry::DIESEL)
                     lua_pushstring(luaVM,"diesel");
-                else if (eEngineType==CHandlingEntry::eEngineType::ELECTRIC)
+                else if (eEngineType==CHandlingEntry::ELECTRIC)
                     lua_pushstring(luaVM,"electric");
                 else
                     lua_pushnil ( luaVM );
@@ -516,21 +516,21 @@ int CLuaHandlingDefs::GetVehicleHandling ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, pEntry->GetMonetary() );
                 lua_setfield ( luaVM, -2, "monetary" );
                 CHandlingEntry::eLightType eHeadType=pEntry->GetHeadLight();
-                if (eHeadType==CHandlingEntry::eLightType::LONG)
+                if (eHeadType==CHandlingEntry::LONG)
                     lua_pushstring(luaVM,"long");
-                else if (eHeadType==CHandlingEntry::eLightType::SMALL)
+                else if (eHeadType==CHandlingEntry::SMALL)
                     lua_pushstring(luaVM,"small");
-                else if (eHeadType==CHandlingEntry::eLightType::BIG)
+                else if (eHeadType==CHandlingEntry::BIG)
                     lua_pushstring(luaVM,"big");
                 else
                     lua_pushnil( luaVM );
                 lua_setfield ( luaVM, -2, "headLight" );
                 CHandlingEntry::eLightType eTailType=pEntry->GetTailLight();
-                if (eTailType==CHandlingEntry::eLightType::LONG)
+                if (eTailType==CHandlingEntry::LONG)
                     lua_pushstring(luaVM,"long");
-                else if (eTailType==CHandlingEntry::eLightType::SMALL)
+                else if (eTailType==CHandlingEntry::SMALL)
                     lua_pushstring(luaVM,"small");
-                else if (eTailType==CHandlingEntry::eLightType::BIG)
+                else if (eTailType==CHandlingEntry::BIG)
                     lua_pushstring(luaVM,"big");
                 else
                     lua_pushnil( luaVM );
@@ -675,21 +675,21 @@ int CLuaHandlingDefs::GetModelHandling ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier() );
                 lua_setfield ( luaVM, -2, "tractionMultiplier" );
                 CHandlingEntry::eDriveType eDriveType=pEntry->GetCarDriveType();
-                if (eDriveType==CHandlingEntry::eDriveType::FWD)
+                if (eDriveType==CHandlingEntry::FWD)
                     lua_pushstring(luaVM,"fwd");
-                else if (eDriveType==CHandlingEntry::eDriveType::RWD)
+                else if (eDriveType==CHandlingEntry::RWD)
                     lua_pushstring(luaVM,"rwd");
-                else if (eDriveType==CHandlingEntry::eDriveType::FOURWHEEL)
+                else if (eDriveType==CHandlingEntry::FOURWHEEL)
                     lua_pushstring(luaVM,"awd");
                 else // What the ... (yeah, security)
                     lua_pushnil ( luaVM );
                 lua_setfield ( luaVM, -2, "driveType" );
                 CHandlingEntry::eEngineType eEngineType=pEntry->GetCarEngineType();
-                if (eEngineType==CHandlingEntry::eEngineType::PETROL)
+                if (eEngineType==CHandlingEntry::PETROL)
                     lua_pushstring(luaVM,"petrol");
-                else if (eEngineType==CHandlingEntry::eEngineType::DIESEL)
+                else if (eEngineType==CHandlingEntry::DIESEL)
                     lua_pushstring(luaVM,"diesel");
-                else if (eEngineType==CHandlingEntry::eEngineType::ELECTRIC)
+                else if (eEngineType==CHandlingEntry::ELECTRIC)
                     lua_pushstring(luaVM,"electric");
                 else
                     lua_pushnil ( luaVM );
@@ -739,21 +739,21 @@ int CLuaHandlingDefs::GetModelHandling ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, pEntry->GetMonetary() );
                 lua_setfield ( luaVM, -2, "monetary" );
                 CHandlingEntry::eLightType eHeadType=pEntry->GetHeadLight();
-                if (eHeadType==CHandlingEntry::eLightType::LONG)
+                if (eHeadType==CHandlingEntry::LONG)
                     lua_pushstring(luaVM,"long");
-                else if (eHeadType==CHandlingEntry::eLightType::SMALL)
+                else if (eHeadType==CHandlingEntry::SMALL)
                     lua_pushstring(luaVM,"small");
-                else if (eHeadType==CHandlingEntry::eLightType::BIG)
+                else if (eHeadType==CHandlingEntry::BIG)
                     lua_pushstring(luaVM,"big");
                 else
                     lua_pushnil( luaVM );
                 lua_setfield ( luaVM, -2, "headLight" );
                 CHandlingEntry::eLightType eTailType=pEntry->GetTailLight();
-                if (eTailType==CHandlingEntry::eLightType::LONG)
+                if (eTailType==CHandlingEntry::LONG)
                     lua_pushstring(luaVM,"long");
-                else if (eTailType==CHandlingEntry::eLightType::SMALL)
+                else if (eTailType==CHandlingEntry::SMALL)
                     lua_pushstring(luaVM,"small");
-                else if (eTailType==CHandlingEntry::eLightType::BIG)
+                else if (eTailType==CHandlingEntry::BIG)
                     lua_pushstring(luaVM,"big");
                 else
                     lua_pushnil( luaVM );
@@ -898,21 +898,21 @@ int CLuaHandlingDefs::GetOriginalHandling ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier() );
                 lua_setfield ( luaVM, -2, "tractionMultiplier" );
                 CHandlingEntry::eDriveType eDriveType=pEntry->GetCarDriveType();
-                if (eDriveType==CHandlingEntry::eDriveType::FWD)
+                if (eDriveType==CHandlingEntry::FWD)
                     lua_pushstring(luaVM,"fwd");
-                else if (eDriveType==CHandlingEntry::eDriveType::RWD)
+                else if (eDriveType==CHandlingEntry::RWD)
                     lua_pushstring(luaVM,"rwd");
-                else if (eDriveType==CHandlingEntry::eDriveType::FOURWHEEL)
+                else if (eDriveType==CHandlingEntry::FOURWHEEL)
                     lua_pushstring(luaVM,"awd");
                 else // What the ... (yeah, security)
                     lua_pushnil ( luaVM );
                 lua_setfield ( luaVM, -2, "driveType" );
                 CHandlingEntry::eEngineType eEngineType=pEntry->GetCarEngineType();
-                if (eEngineType==CHandlingEntry::eEngineType::PETROL)
+                if (eEngineType==CHandlingEntry::PETROL)
                     lua_pushstring(luaVM,"petrol");
-                else if (eEngineType==CHandlingEntry::eEngineType::DIESEL)
+                else if (eEngineType==CHandlingEntry::DIESEL)
                     lua_pushstring(luaVM,"diesel");
-                else if (eEngineType==CHandlingEntry::eEngineType::ELECTRIC)
+                else if (eEngineType==CHandlingEntry::ELECTRIC)
                     lua_pushstring(luaVM,"electric");
                 else
                     lua_pushnil ( luaVM );
@@ -962,21 +962,21 @@ int CLuaHandlingDefs::GetOriginalHandling ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, pEntry->GetMonetary() );
                 lua_setfield ( luaVM, -2, "monetary" );
                 CHandlingEntry::eLightType eHeadType=pEntry->GetHeadLight();
-                if (eHeadType==CHandlingEntry::eLightType::LONG)
+                if (eHeadType==CHandlingEntry::LONG)
                     lua_pushstring(luaVM,"long");
-                else if (eHeadType==CHandlingEntry::eLightType::SMALL)
+                else if (eHeadType==CHandlingEntry::SMALL)
                     lua_pushstring(luaVM,"small");
-                else if (eHeadType==CHandlingEntry::eLightType::BIG)
+                else if (eHeadType==CHandlingEntry::BIG)
                     lua_pushstring(luaVM,"big");
                 else
                     lua_pushnil( luaVM );
                 lua_setfield ( luaVM, -2, "headLight" );
                 CHandlingEntry::eLightType eTailType=pEntry->GetTailLight();
-                if (eTailType==CHandlingEntry::eLightType::LONG)
+                if (eTailType==CHandlingEntry::LONG)
                     lua_pushstring(luaVM,"long");
-                else if (eTailType==CHandlingEntry::eLightType::SMALL)
+                else if (eTailType==CHandlingEntry::SMALL)
                     lua_pushstring(luaVM,"small");
-                else if (eTailType==CHandlingEntry::eLightType::BIG)
+                else if (eTailType==CHandlingEntry::BIG)
                     lua_pushstring(luaVM,"big");
                 else
                     lua_pushnil( luaVM );

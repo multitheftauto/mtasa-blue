@@ -4595,11 +4595,11 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_DRIVETYPE:
             {
                 CHandlingEntry::eDriveType eDriveType = pEntry->GetCarDriveType ();
-                if ( eDriveType == CHandlingEntry::eDriveType::FWD )
+                if ( eDriveType == CHandlingEntry::FWD )
                     strValue = "fwd";
-                else if ( eDriveType == CHandlingEntry::eDriveType::RWD )
+                else if ( eDriveType == CHandlingEntry::RWD )
                     strValue = "rwd";
-                else if (eDriveType == CHandlingEntry::eDriveType::FOURWHEEL )
+                else if (eDriveType == CHandlingEntry::FOURWHEEL )
                     strValue = "awd";
                 else
                     return false;
@@ -4608,11 +4608,11 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_ENGINETYPE:
             {
                 CHandlingEntry::eEngineType eEngineType = pEntry->GetCarEngineType ();
-                if ( eEngineType == CHandlingEntry::eEngineType::PETROL )
+                if ( eEngineType == CHandlingEntry::PETROL )
                     strValue = "petrol";
-                else if ( eEngineType == CHandlingEntry::eEngineType::DIESEL )
+                else if ( eEngineType == CHandlingEntry::DIESEL )
                     strValue = "diesel";
-                else if ( eEngineType == CHandlingEntry::eEngineType::ELECTRIC )
+                else if ( eEngineType == CHandlingEntry::ELECTRIC )
                     strValue = "electric";
                 else
                     return false;
@@ -4621,13 +4621,13 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_HEADLIGHT:
             {
                 CHandlingEntry::eLightType eHeadType = pEntry->GetHeadLight ();
-                if ( eHeadType == CHandlingEntry::eLightType::SMALL )
+                if ( eHeadType == CHandlingEntry::SMALL )
                     strValue = "small";
-                else if ( eHeadType == CHandlingEntry::eLightType::LONG )
+                else if ( eHeadType == CHandlingEntry::LONG )
                     strValue = "long";
-                else if ( eHeadType == CHandlingEntry::eLightType::BIG )
+                else if ( eHeadType == CHandlingEntry::BIG )
                     strValue = "big";
-                else if ( eHeadType == CHandlingEntry::eLightType::TALL )
+                else if ( eHeadType == CHandlingEntry::TALL )
                     strValue = "tall";
                 else
                     return false;
@@ -4636,13 +4636,13 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_TAILLIGHT:
             {
                 CHandlingEntry::eLightType eTailType = pEntry->GetTailLight ();
-                if ( eTailType == CHandlingEntry::eLightType::SMALL )
+                if ( eTailType == CHandlingEntry::SMALL )
                     strValue = "small";
-                else if ( eTailType == CHandlingEntry::eLightType::LONG )
+                else if ( eTailType == CHandlingEntry::LONG )
                     strValue = "long";
-                else if ( eTailType == CHandlingEntry::eLightType::BIG )
+                else if ( eTailType == CHandlingEntry::BIG )
                     strValue = "big";
-                else if ( eTailType == CHandlingEntry::eLightType::TALL )
+                else if ( eTailType == CHandlingEntry::TALL )
                     strValue = "tall";
                 else
                     return false;
@@ -4811,18 +4811,18 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             {
                 if ( strValue == "fwd" )
                 {
-                    pEntry->SetCarDriveType ( CHandlingEntry::eDriveType::FWD );
-                    ucChar = CHandlingEntry::eDriveType::FWD;
+                    pEntry->SetCarDriveType ( CHandlingEntry::FWD );
+                    ucChar = CHandlingEntry::FWD;
                 }
                 else if ( strValue == "rwd" )
                 {
-                    pEntry->SetCarDriveType ( CHandlingEntry::eDriveType::RWD );
-                    ucChar = CHandlingEntry::eDriveType::RWD;
+                    pEntry->SetCarDriveType ( CHandlingEntry::RWD );
+                    ucChar = CHandlingEntry::RWD;
                 }
                 else if ( strValue == "awd" )
                 {
-                    pEntry->SetCarDriveType ( CHandlingEntry::eDriveType::FOURWHEEL );
-                    ucChar = CHandlingEntry::eDriveType::FOURWHEEL;
+                    pEntry->SetCarDriveType ( CHandlingEntry::FOURWHEEL );
+                    ucChar = CHandlingEntry::FOURWHEEL;
                 }
                 else
                     return false;
@@ -4832,18 +4832,18 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             {
                 if ( strValue == "petrol" )
                 {
-                    pEntry->SetCarEngineType ( CHandlingEntry::eEngineType::PETROL );
-                    ucChar = CHandlingEntry::eEngineType::PETROL;
+                    pEntry->SetCarEngineType ( CHandlingEntry::PETROL );
+                    ucChar = CHandlingEntry::PETROL;
                 }
                 else if ( strValue == "diesel" )
                 {
-                    pEntry->SetCarEngineType ( CHandlingEntry::eEngineType::DIESEL );
-                    ucChar = CHandlingEntry::eEngineType::DIESEL;
+                    pEntry->SetCarEngineType ( CHandlingEntry::DIESEL );
+                    ucChar = CHandlingEntry::DIESEL;
                 }
                 else if ( strValue == "electric" )
                 {
-                    pEntry->SetCarEngineType ( CHandlingEntry::eEngineType::ELECTRIC );
-                    ucChar = CHandlingEntry::eEngineType::ELECTRIC;
+                    pEntry->SetCarEngineType ( CHandlingEntry::ELECTRIC );
+                    ucChar = CHandlingEntry::ELECTRIC;
                 }
                 else
                     return false;
@@ -4853,23 +4853,23 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             {
                 if ( strValue == "small" )
                 {
-                    pEntry->SetHeadLight ( CHandlingEntry::eLightType::SMALL );
-                    ucChar = CHandlingEntry::eLightType::SMALL;
+                    pEntry->SetHeadLight ( CHandlingEntry::SMALL );
+                    ucChar = CHandlingEntry::SMALL;
                 }
                 else if ( strValue == "long" )
                 {
-                    pEntry->SetHeadLight ( CHandlingEntry::eLightType::LONG );
-                    ucChar = CHandlingEntry::eLightType::LONG;
+                    pEntry->SetHeadLight ( CHandlingEntry::LONG );
+                    ucChar = CHandlingEntry::LONG;
                 }
                 else if ( strValue == "big" )
                 {
-                    pEntry->SetHeadLight ( CHandlingEntry::eLightType::BIG );
-                    ucChar = CHandlingEntry::eLightType::BIG;
+                    pEntry->SetHeadLight ( CHandlingEntry::BIG );
+                    ucChar = CHandlingEntry::BIG;
                 }
                 else if ( strValue == "tall" )
                 {
-                    pEntry->SetHeadLight ( CHandlingEntry::eLightType::TALL );
-                    ucChar = CHandlingEntry::eLightType::TALL;
+                    pEntry->SetHeadLight ( CHandlingEntry::TALL );
+                    ucChar = CHandlingEntry::TALL;
                 }
                 else
                     return false;
@@ -4879,23 +4879,23 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             {
                 if ( strValue == "small" )
                 {
-                    pEntry->SetTailLight ( CHandlingEntry::eLightType::SMALL );
-                    ucChar = CHandlingEntry::eLightType::SMALL;
+                    pEntry->SetTailLight ( CHandlingEntry::SMALL );
+                    ucChar = CHandlingEntry::SMALL;
                 }
                 else if ( strValue == "long" )
                 {
-                    pEntry->SetTailLight ( CHandlingEntry::eLightType::LONG );
-                    ucChar = CHandlingEntry::eLightType::LONG;
+                    pEntry->SetTailLight ( CHandlingEntry::LONG );
+                    ucChar = CHandlingEntry::LONG;
                 }
                 else if ( strValue == "big" )
                 {
-                    pEntry->SetTailLight ( CHandlingEntry::eLightType::BIG );
-                    ucChar = CHandlingEntry::eLightType::BIG;
+                    pEntry->SetTailLight ( CHandlingEntry::BIG );
+                    ucChar = CHandlingEntry::BIG;
                 }
                 else if ( strValue == "tall" )
                 {
-                    pEntry->SetTailLight ( CHandlingEntry::eLightType::TALL );
-                    ucChar = CHandlingEntry::eLightType::TALL;
+                    pEntry->SetTailLight ( CHandlingEntry::TALL );
+                    ucChar = CHandlingEntry::TALL;
                 }
                 else
                     return false;
