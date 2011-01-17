@@ -5806,7 +5806,7 @@ bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CVehicle* pVehicle, 
     BitStream.pBitStream->Write ( pVehicle->GetID () );
     BitStream.pBitStream->Write ( HANDLING_ABS );
     BitStream.pBitStream->Write ( bValue );
-    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
     return true;
 }*/
 bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned char ucValue )
@@ -5821,10 +5821,9 @@ bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandl
         {
             pVehicle->SetHasHandlingChanged ( true );
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pVehicle->GetID () );
             BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
             BitStream.pBitStream->Write ( ucValue );
-            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
             return true;
         }
     }
@@ -5843,10 +5842,9 @@ bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandl
         {
             pVehicle->SetHasHandlingChanged ( true );
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pVehicle->GetID () );
             BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
             BitStream.pBitStream->Write ( uiValue );
-            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
             return true;
         }
     }
@@ -5865,10 +5863,9 @@ bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandl
         {
             pVehicle->SetHasHandlingChanged ( true );
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pVehicle->GetID () );
             BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
             BitStream.pBitStream->Write ( fValue );
-            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
             return true;
         }
     }
@@ -5888,10 +5885,9 @@ bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandl
         {
             pVehicle->SetHasHandlingChanged ( true );
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pVehicle->GetID () );
             BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
             BitStream.pBitStream->Write ( ucChar );
-            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
             return true;
         }
     }
@@ -5910,12 +5906,11 @@ bool CStaticFunctionDefinitions::SetVehicleHandling ( CVehicle* pVehicle, eHandl
         {
             pVehicle->SetHasHandlingChanged ( true );
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( pVehicle->GetID () );
             BitStream.pBitStream->Write ( static_cast < unsigned  char > ( eProperty ) );
             BitStream.pBitStream->Write ( vecValue.fX );
             BitStream.pBitStream->Write ( vecValue.fY );
             BitStream.pBitStream->Write ( vecValue.fZ );
-            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
             return true;
         }
     }
@@ -5931,12 +5926,11 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling ( CVehicle* pVehicle, bool
     CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
     CHandlingEntry* pNewEntry;
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pVehicle->GetID () );
 
     if ( bUseOriginal )
     {
         pNewEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetOriginalHandlingData( eModel );
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_VEHICLE_HANDLING, *BitStream.pBitStream ) );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, RESET_VEHICLE_HANDLING, *BitStream.pBitStream ) );
     }
     else
     {
@@ -5977,7 +5971,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling ( CVehicle* pVehicle, bool
         handling.data.ucTailLight                   = pNewEntry->GetTailLight ();
         handling.data.ucAnimGroup                   = pNewEntry->GetAnimGroup ();
         BitStream.pBitStream->Write ( &handling );
-        m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING, *BitStream.pBitStream ) );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING, *BitStream.pBitStream ) );
     }
 
     pEntry->ApplyHandlingData( pNewEntry );
@@ -5991,7 +5985,6 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty ( CVehicle* pVehic
     eVehicleTypes eModel = (eVehicleTypes) pVehicle->GetModel ();
     CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( pVehicle->GetID () );
     BitStream.pBitStream->Write ( static_cast < unsigned char > ( eProperty ) );
 
     float fValue;
@@ -6032,7 +6025,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty ( CVehicle* pVehic
 
     
     
-    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING_PROPERTY, *BitStream.pBitStream ) );
 
     return true;
 }
