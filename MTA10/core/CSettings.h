@@ -97,6 +97,8 @@ public:
     void                SetVisible              ( bool bVisible );
     bool                IsVisible               ( void );
 
+    void                SetIsModLoaded          ( bool bLoaded );
+
     void                LoadData                ( void );
 
     inline bool         IsCapturingKey          ( void )            { return m_bCaptureKey; }
@@ -267,8 +269,6 @@ protected:
 
     bool                OnChatLoadPresetClick   ( CGUIElement* pElement );
 
-    bool                OnLoadSkinButtonClick   ( CGUIElement* pElement );
-
     bool                OnSkinChanged ( CGUIElement* pElement );
 
 private:
@@ -292,6 +292,8 @@ private:
     unsigned int        m_uiCaptureKey;
     bool                m_bCaptureKey;
     bool                m_bCaptureAxis;
+
+    bool                m_bIsModLoaded;
 
     unsigned char       m_ucOldRadioVolume;
     unsigned char       m_ucOldSFXVolume;

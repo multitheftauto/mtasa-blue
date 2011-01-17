@@ -625,6 +625,7 @@ void CMainMenu::SetIsIngame ( bool bIsIngame )
     if ( m_bIsIngame != bIsIngame )
     {
         m_bIsIngame = bIsIngame;
+        m_Settings.SetIsModLoaded ( bIsIngame );
 
         m_ulMoveStartTick = GetTickCount();
         if ( bIsIngame )
