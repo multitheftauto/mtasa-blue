@@ -74,6 +74,10 @@ CTransferBox::CTransferBox ( void )
 
 CTransferBox::~CTransferBox ( void )
 {
+    for ( unsigned int i = 0; i < TRANSFERBOX_FRAMES; i++ ) {
+        delete m_pIcon[i];
+    }
+
     if ( m_pWindow != NULL )
         delete m_pWindow;
     if ( m_pInfo != NULL )
