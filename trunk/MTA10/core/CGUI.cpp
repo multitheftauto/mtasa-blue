@@ -250,7 +250,13 @@ void CLocalGUI::DoPulse ( void )
 
         if(currentSkinName != m_LastSkinName)
         {
-            SetSkin(currentSkinName);
+            if ( !CCore::GetSingleton ().GetModManager()->IsLoaded() )
+                SetSkin(currentSkinName);
+            else
+            {
+                CCore::GetSingleton ().GetConsole()->Printf ( "Please disconnect before changing skin" );
+                cvars->Set("current_skin", m_LastSkinName );
+            }
         }
     }
 }
