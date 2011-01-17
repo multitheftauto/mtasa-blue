@@ -56,6 +56,7 @@
 #include "packets/CKeysyncPacket.h"
 #include "packets/CLuaEventPacket.h"
 #include "packets/CLuaPacket.h"
+#include "packets/CElementRPCPacket.h"
 #include "packets/CMapInfoPacket.h"
 #include "packets/CObjectStartSyncPacket.h"
 #include "packets/CObjectStopSyncPacket.h"

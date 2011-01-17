@@ -301,6 +301,7 @@ public:
 #if WITH_VEHICLE_HANDLING
     LUA_DECLARE ( GetVehicleHandlingData );
 #endif
+    LUA_DECLARE ( GetVehicleDoorOpenRatio );
 
     // Vehicle set functions
     LUA_DECLARE ( FixVehicle );
@@ -349,6 +350,7 @@ public:
 #if WITH_VEHICLE_HANDLING
     LUA_DECLARE ( SetVehicleHandlingData );
 #endif
+    LUA_DECLARE ( SetVehicleDoorOpenRatio );
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );
@@ -774,7 +776,7 @@ public:
 
     // Utility
     LUA_DECLARE ( Md5 );
-    LUA_DECLARE ( GetPacketInfo );
+    LUA_DECLARE ( GetNetworkUsageData );
 
 #ifdef MTA_VOICE
     // Voice funcs

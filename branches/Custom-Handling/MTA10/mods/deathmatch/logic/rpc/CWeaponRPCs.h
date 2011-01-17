@@ -20,13 +20,13 @@ class CWeaponRPCs : public CRPCFunctions
 public:
     static void                 LoadFunctions           ( void );
 
-    DECLARE_RPC ( GiveWeapon );
-    DECLARE_RPC ( TakeWeapon );
-    DECLARE_RPC ( TakeAllWeapons );
-    DECLARE_RPC ( GiveWeaponAmmo );
-    DECLARE_RPC ( TakeWeaponAmmo );
-    DECLARE_RPC ( SetWeaponAmmo );
-    DECLARE_RPC ( SetWeaponSlot );
+    DECLARE_ELEMENT_RPC ( GiveWeapon );
+    DECLARE_ELEMENT_RPC ( TakeWeapon );
+    DECLARE_ELEMENT_RPC ( TakeAllWeapons );
+    DECLARE_ELEMENT_RPC ( GiveWeaponAmmo );
+    DECLARE_ELEMENT_RPC ( TakeWeaponAmmo );
+    DECLARE_ELEMENT_RPC ( SetWeaponAmmo );
+    DECLARE_ELEMENT_RPC ( SetWeaponSlot );
 };
 
 #endif

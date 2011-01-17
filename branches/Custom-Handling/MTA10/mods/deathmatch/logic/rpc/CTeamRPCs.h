@@ -20,11 +20,11 @@ class CTeamRPCs : public CRPCFunctions
 public:
     static void                 LoadFunctions           ( void );
 
-    DECLARE_RPC ( RemoveTeam );
-    DECLARE_RPC ( SetTeamName );
-    DECLARE_RPC ( SetTeamColor );
-    DECLARE_RPC ( SetPlayerTeam );
-    DECLARE_RPC ( SetTeamFriendlyFire );
+    DECLARE_ELEMENT_RPC ( RemoveTeam );
+    DECLARE_ELEMENT_RPC ( SetTeamName );
+    DECLARE_ELEMENT_RPC ( SetTeamColor );
+    DECLARE_ELEMENT_RPC ( SetPlayerTeam );
+    DECLARE_ELEMENT_RPC ( SetTeamFriendlyFire );
 };
 
 #endif

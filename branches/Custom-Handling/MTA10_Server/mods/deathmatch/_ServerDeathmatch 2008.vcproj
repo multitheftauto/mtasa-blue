@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Server - Deathmatch"
 	ProjectGUID="{DC99F9D4-7C17-4A36-9F21-CEE075E42292}"
 	RootNamespace="Server - Deathmatch"
@@ -876,6 +876,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CElementRPCPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CEntityAddPacket.cpp"
 						>
 					</File>
@@ -1193,6 +1197,14 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\utils\CHTTPRequest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\CHTTPResponse.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.cpp"
 					>
 					<FileConfiguration
@@ -1219,14 +1231,6 @@
 							UsePrecompiledHeader="0"
 						/>
 					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\utils\CHTTPRequest.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\CHTTPResponse.cpp"
-					>
 				</File>
 				<File
 					RelativePath=".\utils\CTCPClientSocketImpl.cpp"
@@ -1941,6 +1945,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CElementRPCPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CEntityAddPacket.h"
 						>
 					</File>
@@ -1976,11 +1984,11 @@
 						RelativePath=".\logic\packets\CObjectStartSyncPacket.h"
 						>
 					</File>
-  					<File
+					<File
 						RelativePath=".\logic\packets\CObjectStopSyncPacket.h"
 						>
 					</File>
-  					<File
+					<File
 						RelativePath=".\logic\packets\CObjectSyncPacket.h"
 						>
 					</File>
@@ -2270,15 +2278,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.h"
-					>
-				</File>
-				<File
 					RelativePath=".\utils\CHTTPResponse.h"
 					>
 				</File>
 				<File
 					RelativePath=".\utils\COpenPortsTester.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.h"
 					>
 				</File>
 				<File

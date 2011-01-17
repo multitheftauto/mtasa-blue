@@ -145,15 +145,15 @@ public:
     bool                        IsVisible               ( void );
     void                        SetVisible              ( bool bVisible );
 
-    void                        SetDoorAngleRatio       ( unsigned char ucDoor, float fRatio, unsigned long ulDelay = 0, bool bForced = false );
-    float                       GetDoorAngleRatio       ( unsigned char ucDoor );
+    void                        SetDoorOpenRatio        ( unsigned char ucDoor, float fRatio, unsigned long ulDelay = 0, bool bForced = false );
+    float                       GetDoorOpenRatio        ( unsigned char ucDoor );
     void                        SetSwingingDoorsAllowed ( bool bAllowed );
     bool                        AreSwingingDoorsAllowed () const;
     bool                        AreDoorsLocked          ( void );
     void                        SetDoorsLocked          ( bool bLocked );
 
 private:
-    void                        SetDoorAngleRatioInterpolated   ( unsigned char ucDoor, float fRatio, unsigned long ulDelay );
+    void                        SetDoorOpenRatioInterpolated    ( unsigned char ucDoor, float fRatio, unsigned long ulDelay );
     void                        ResetDoorInterpolation          ();
     void                        ProcessDoorInterpolation        ();
 
@@ -451,7 +451,7 @@ protected:
     bool                        m_bLandingGearDown;
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
-    float                       m_fDoorAngleRatio [ 6 ];
+    float                       m_fDoorOpenRatio [ 6 ];
     struct
     {
         float                   fStart  [ 6 ];

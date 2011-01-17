@@ -101,18 +101,9 @@ void CClientTextDisplay::Render ( void )
             unsigned int uiShadowOffset = Max ( 1, (int)(m_fScale * m_fGlobalScale) );
             SColorRGBA rgbaShadowColor ( 0, 0, 0, m_Color.A * m_ucShadowAlpha / 255 );
 
-            if ( g_pCore->GetGraphics ()->GetCEGUIUsed () )
-            {
-                if ( rgbaShadowColor.A > 0 )
-                    g_pCore->GetGraphics ()->DrawTextCEGUI ( uiX - 17 + uiShadowOffset, uiY + uiShadowOffset, uiX - 17 + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_szCaption, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );
-                g_pCore->GetGraphics ()->DrawTextCEGUI ( uiX - 17, uiY, uiX - 17, uiY, m_Color, m_szCaption, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );
-            }
-            else
-            {               
-                if ( rgbaShadowColor.A > 0 )
-                    g_pCore->GetGraphics ()->DrawText ( uiX + uiShadowOffset, uiY + uiShadowOffset, uiX + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
-                g_pCore->GetGraphics ()->DrawText ( uiX, uiY, uiX, uiY, m_Color, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
-            }
+            if ( rgbaShadowColor.A > 0 )
+                g_pCore->GetGraphics ()->DrawText ( uiX + uiShadowOffset, uiY + uiShadowOffset, uiX + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
+            g_pCore->GetGraphics ()->DrawText ( uiX, uiY, uiX, uiY, m_Color, m_szCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
         }
     }
 }

@@ -13,7 +13,7 @@
 //
 // System wide defines
 //
-#define WITH_VEHICLE_HANDLING 0
+#define WITH_VEHICLE_HANDLING 1
 
 // Enable WITH_ALLOC_TRACKING to monitor server module memory usage. *Has a negative performance impact*
 #define WITH_ALLOC_TRACKING 0

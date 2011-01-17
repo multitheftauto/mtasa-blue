@@ -1509,8 +1509,8 @@ void CClientGame::UpdateVehicleInOut ( void )
                                     }
                                 }
                                 pBitStream->WriteBits ( &(m_pLocalPlayer->m_ucEnteringDoor ), 3 );
-                                SDoorAngleSync door;
-                                door.data.fAngle = pVehicle->GetDoorAngleRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
+                                SDoorOpenRatioSync door;
+                                door.data.fRatio = pVehicle->GetDoorOpenRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
                                 pBitStream->Write ( &door );
                             }
                             pBitStream->WriteBit ( bAlreadyStartedJacking );
@@ -1527,8 +1527,8 @@ void CClientGame::UpdateVehicleInOut ( void )
                             if ( pVehicle )
                             {
                                 pBitStream->WriteBits ( &(m_pLocalPlayer->m_ucEnteringDoor ), 3 );
-                                SDoorAngleSync door;
-                                door.data.fAngle = pVehicle->GetDoorAngleRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
+                                SDoorOpenRatioSync door;
+                                door.data.fRatio = pVehicle->GetDoorOpenRatio ( m_pLocalPlayer->m_ucEnteringDoor + 2 );
                                 pBitStream->Write ( &door );
                             }
 

@@ -213,6 +213,7 @@ public:
     static int      GetTrainSpeed                       ( lua_State* luaVM );
     static int      IsVehicleBlown                      ( lua_State* luaVM );
     static int      GetVehicleHeadLightColor            ( lua_State* luaVM );
+    static int      GetVehicleDoorOpenRatio             ( lua_State* luaVM );
 
     // Vehicle set functions
     static int      FixVehicle                          ( lua_State* luaVM );
@@ -256,6 +257,7 @@ public:
     static int      SetTrainSpeed                       ( lua_State* luaVM );
     static int      SetVehicleHeadLightColor            ( lua_State* luaVM );
     static int      SetVehicleTurretPosition            ( lua_State* luaVM );
+    static int      SetVehicleDoorOpenRatio             ( lua_State* luaVM );
 
     // Marker create/destroy functions
     static int      CreateMarker                        ( lua_State* luaVM );
@@ -525,7 +527,7 @@ public:
 
     // Utility
     static int      Md5                                 ( lua_State* luaVM );
-    static int      GetPacketInfo                       ( lua_State* luaVM );
+    static int      GetNetworkUsageData                 ( lua_State* luaVM );
     static int      GetVersion                          ( lua_State* luaVM );
     static int      GetModules                          ( lua_State* luaVM );
     static int      GetModuleInfo                       ( lua_State* luaVM );

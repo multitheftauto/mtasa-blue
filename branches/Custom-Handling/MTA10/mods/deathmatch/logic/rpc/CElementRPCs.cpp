@@ -38,17 +38,16 @@ void CElementRPCs::LoadFunctions ( void )
 }
 
 
-void CElementRPCs::SetElementParent ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementParent ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the entity id and parent id
-    ElementID ID, ParentID;
-    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( ParentID ) )
+    ElementID ParentID;
+    if ( bitStream.ReadCompressed ( ParentID ) )
     {
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         CClientEntity* pParent = CElementIDs::GetElement ( ParentID );
-        if ( pEntity && pParent )
+        if ( pParent )
         {
-            pEntity->SetParent ( pParent );
+            pSource->SetParent ( pParent );
         }
         else
         {
@@ -62,11 +61,10 @@ void CElementRPCs::SetElementParent ( NetBitStreamInterface& bitStream )
 }
 
 
-void CElementRPCs::SetElementData ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementData ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     unsigned short usNameLength;
-    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( usNameLength ) )
+    if ( bitStream.ReadCompressed ( usNameLength ) )
     {
         char* szName = new char [ usNameLength + 1 ];
         szName [ usNameLength ] = NULL;
@@ -74,24 +72,19 @@ void CElementRPCs::SetElementData ( NetBitStreamInterface& bitStream )
         CLuaArgument Argument;
         if ( bitStream.Read ( szName, usNameLength ) && Argument.ReadFromBitStream ( bitStream ) )
         {
-            CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-            if ( pEntity )
-            {
-                pEntity->SetCustomData ( szName, Argument, NULL );
-            }
-        }            
+            pSource->SetCustomData ( szName, Argument, NULL );
+        }
         delete [] szName;
     }
 }
 
 
-void CElementRPCs::RemoveElementData ( NetBitStreamInterface& bitStream )
+void CElementRPCs::RemoveElementData ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the entity id and name length
-    ElementID ID;
     unsigned short usNameLength;
     bool bRecursive;
-    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( usNameLength ) )
+    if ( bitStream.ReadCompressed ( usNameLength ) )
     {
         // Allocate a buffer for the name
         char* szName = new char [ usNameLength + 1 ];
@@ -101,13 +94,8 @@ void CElementRPCs::RemoveElementData ( NetBitStreamInterface& bitStream )
         if ( bitStream.Read ( szName, usNameLength ) &&
              bitStream.ReadBit ( bRecursive ) )
         {
-            // Grab the entity
-            CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-            if ( pEntity )
-            {
-                // Remove that name
-                pEntity->DeleteCustomData ( szName, bRecursive );
-            }
+            // Remove that name
+            pSource->DeleteCustomData ( szName, bRecursive );
         }
 
         // Delete the name buffer
@@ -116,191 +104,167 @@ void CElementRPCs::RemoveElementData ( NetBitStreamInterface& bitStream )
 }
 
 
-void CElementRPCs::SetElementPosition ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementPosition ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the entity id and the position
-    ElementID ID;
     CVector vecPosition;
     unsigned char ucTimeContext;
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( vecPosition.fX ) &&
+    if ( bitStream.Read ( vecPosition.fX ) &&
          bitStream.Read ( vecPosition.fY ) &&
          bitStream.Read ( vecPosition.fZ ) &&
          bitStream.Read ( ucTimeContext ) )
     {
-        // Grab the entity
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
-        {            
-            // Update the sync context to the new one
-            pEntity->SetSyncTimeContext ( ucTimeContext );
+        // Update the sync context to the new one
+        pSource->SetSyncTimeContext ( ucTimeContext );
 
-            // If it's a player, use Teleport
-            if ( pEntity->GetType () == CCLIENTPLAYER )
+        // If it's a player, use Teleport
+        if ( pSource->GetType () == CCLIENTPLAYER )
+        {
+            unsigned char ucWarp = 1;
+            bitStream.Read ( ucWarp );
+
+            CClientPlayer* pPlayer = static_cast < CClientPlayer* > ( pSource );
+
+            if ( ucWarp )
             {
-                unsigned char ucWarp = 1;
-                bitStream.Read ( ucWarp );
-
-                CClientPlayer* pPlayer = static_cast < CClientPlayer* > ( pEntity );
-
-                if ( ucWarp )
-                {
-                    pPlayer->Teleport ( vecPosition );
-                    pPlayer->ResetInterpolation ();
-                }
-                else
-                {
-                    pPlayer->SetPosition ( vecPosition );
-                }
-
-                // If local player, reset return position (so we can't warp back if connection fails)
-                if ( pPlayer->IsLocalPlayer () )
-                {
-                    m_pClientGame->GetNetAPI ()->ResetReturnPosition ();
-                }
-            }
-            else if ( pEntity->GetType () == CCLIENTVEHICLE ) 
-            {
-                CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pEntity );
-                pVehicle->RemoveTargetPosition ();
-                pVehicle->SetPosition ( vecPosition );
+                pPlayer->Teleport ( vecPosition );
+                pPlayer->ResetInterpolation ();
             }
             else
             {
-                // Set its position
-                pEntity->SetPosition ( vecPosition );
+                pPlayer->SetPosition ( vecPosition );
             }
+
+            // If local player, reset return position (so we can't warp back if connection fails)
+            if ( pPlayer->IsLocalPlayer () )
+            {
+                m_pClientGame->GetNetAPI ()->ResetReturnPosition ();
+            }
+        }
+        else if ( pSource->GetType () == CCLIENTVEHICLE ) 
+        {
+            CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );
+            pVehicle->RemoveTargetPosition ();
+            pVehicle->SetPosition ( vecPosition );
+        }
+        else
+        {
+            // Set its position
+            pSource->SetPosition ( vecPosition );
         }
     }
 }
 
 
-void CElementRPCs::SetElementVelocity ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the entity id and the speed
-    ElementID ID;
     CVector vecVelocity;
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( vecVelocity.fX ) &&
+    if ( bitStream.Read ( vecVelocity.fX ) &&
          bitStream.Read ( vecVelocity.fY ) &&
          bitStream.Read ( vecVelocity.fZ ) )
     {
-        // Grab the entity
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
+        switch ( pSource->GetType () )
         {
-            switch ( pEntity->GetType () )
+            case CCLIENTPED:
+            case CCLIENTPLAYER:
             {
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
-                {
-                    CClientPed* pPed = static_cast < CClientPed* > ( pEntity );
+                CClientPed* pPed = static_cast < CClientPed* > ( pSource );
 
-                    pPed->SetMoveSpeed ( vecVelocity );
-                    pPed->ResetInterpolation ();
+                pPed->SetMoveSpeed ( vecVelocity );
+                pPed->ResetInterpolation ();
 
-                    // If local player, reset return position (so we can't warp back if connection fails)
-                    if ( pPed->IsLocalPlayer () )
-                    {
-                        m_pClientGame->GetNetAPI ()->ResetReturnPosition ();
-                    }
-                    break;
-                }
-                case CCLIENTVEHICLE:
+                // If local player, reset return position (so we can't warp back if connection fails)
+                if ( pPed->IsLocalPlayer () )
                 {
-                    CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pEntity );                    
-                    pVehicle->SetMoveSpeed ( vecVelocity );
-
-                    break;
+                    m_pClientGame->GetNetAPI ()->ResetReturnPosition ();
                 }
-                case CCLIENTOBJECT:
-                {
-                    CClientObject * pObject = static_cast < CClientObject * > ( pEntity );
-                    pObject->SetMoveSpeed ( vecVelocity );
-                    
-                    break;
-                }
+                break;
             }
-        }
-    }
-}
-
-
-void CElementRPCs::SetElementInterior ( NetBitStreamInterface& bitStream )
-{
-    ElementID ID;
-    unsigned char ucInterior, ucSetPosition;
-    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( ucInterior ) && bitStream.Read ( ucSetPosition ) )
-    {
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
-        {
-            pEntity->SetInterior ( ucInterior );
-
-            if ( ucSetPosition == 1 )
+            case CCLIENTVEHICLE:
             {
-                CVector vecPosition;
-                if ( bitStream.Read ( vecPosition.fX ) &&
-                     bitStream.Read ( vecPosition.fY ) &&
-                     bitStream.Read ( vecPosition.fZ ) )
-                {
-                    pEntity->SetPosition ( vecPosition );
-                }
+                CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );                    
+                pVehicle->SetMoveSpeed ( vecVelocity );
+
+                break;
             }
-        }
-    }
-}
-
-
-void CElementRPCs::SetElementDimension ( NetBitStreamInterface& bitStream )
-{
-    ElementID ID;
-    unsigned short usDimension;
-    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( usDimension ) )
-    {
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
-        {
-            if ( pEntity->GetType () == CCLIENTTEAM )
+            case CCLIENTOBJECT:
             {
-                CClientTeam* pTeam = static_cast < CClientTeam* > ( pEntity );
-                list < CClientPlayer* > ::const_iterator iter = pTeam->IterBegin ();
-                for ( ; iter != pTeam->IterEnd () ; iter++ )
-                {
-                    CClientPlayer* pPlayer = *iter;
-                    if ( pPlayer->IsLocalPlayer () )
-                    {
-                        // Update all of our streamers/managers to the local player's dimension
-                        m_pClientGame->SetAllDimensions ( usDimension );
-                    }
-
-                    pPlayer->SetDimension ( usDimension );
-                }
-            }
-            else
-            {
-                if ( pEntity->GetType () == CCLIENTPLAYER )
-                {
-                    CClientPlayer* pPlayer = static_cast < CClientPlayer* > ( pEntity );
-                    if ( pPlayer->IsLocalPlayer () )
-                    {
-                        // Update all of our streamers/managers to the local player's dimension
-                        m_pClientGame->SetAllDimensions ( usDimension );
-                    }         
-                }
+                CClientObject * pObject = static_cast < CClientObject * > ( pSource );
+                pObject->SetMoveSpeed ( vecVelocity );
                 
-                pEntity->SetDimension ( usDimension );
+                break;
             }
         }
     }
 }
 
 
-void CElementRPCs::AttachElements ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementInterior ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID, usAttachedToID;
+    unsigned char ucInterior, ucSetPosition;
+    if ( bitStream.Read ( ucInterior ) && bitStream.Read ( ucSetPosition ) )
+    {
+        pSource->SetInterior ( ucInterior );
+
+        if ( ucSetPosition == 1 )
+        {
+            CVector vecPosition;
+            if ( bitStream.Read ( vecPosition.fX ) &&
+                 bitStream.Read ( vecPosition.fY ) &&
+                 bitStream.Read ( vecPosition.fZ ) )
+            {
+                pSource->SetPosition ( vecPosition );
+            }
+        }
+    }
+}
+
+
+void CElementRPCs::SetElementDimension ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    unsigned short usDimension;
+    if ( bitStream.Read ( usDimension ) )
+    {
+        if ( pSource->GetType () == CCLIENTTEAM )
+        {
+            CClientTeam* pTeam = static_cast < CClientTeam* > ( pSource );
+            list < CClientPlayer* > ::const_iterator iter = pTeam->IterBegin ();
+            for ( ; iter != pTeam->IterEnd () ; iter++ )
+            {
+                CClientPlayer* pPlayer = *iter;
+                if ( pPlayer->IsLocalPlayer () )
+                {
+                    // Update all of our streamers/managers to the local player's dimension
+                    m_pClientGame->SetAllDimensions ( usDimension );
+                }
+
+                pPlayer->SetDimension ( usDimension );
+            }
+        }
+        else
+        {
+            if ( pSource->GetType () == CCLIENTPLAYER )
+            {
+                CClientPlayer* pPlayer = static_cast < CClientPlayer* > ( pSource );
+                if ( pPlayer->IsLocalPlayer () )
+                {
+                    // Update all of our streamers/managers to the local player's dimension
+                    m_pClientGame->SetAllDimensions ( usDimension );
+                }         
+            }
+            
+            pSource->SetDimension ( usDimension );
+        }
+    }
+}
+
+
+void CElementRPCs::AttachElements ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    ElementID usAttachedToID;
     CVector vecPosition, vecRotation;
-    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( usAttachedToID ) &&
+    if ( bitStream.Read ( usAttachedToID ) &&
         bitStream.Read ( vecPosition.fX ) &&
         bitStream.Read ( vecPosition.fY ) &&
         bitStream.Read ( vecPosition.fZ ) &&
@@ -308,286 +272,235 @@ void CElementRPCs::AttachElements ( NetBitStreamInterface& bitStream )
         bitStream.Read ( vecRotation.fY ) &&
         bitStream.Read ( vecRotation.fZ ) )
     {
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         CClientEntity* pAttachedToEntity = CElementIDs::GetElement ( usAttachedToID );
-        if ( pEntity && pAttachedToEntity )
+        if ( pAttachedToEntity )
         {
-            pEntity->SetAttachedOffsets ( vecPosition, vecRotation );
-            pEntity->AttachTo ( pAttachedToEntity );
+            pSource->SetAttachedOffsets ( vecPosition, vecRotation );
+            pSource->AttachTo ( pAttachedToEntity );
         }
     }
 }
 
 
-void CElementRPCs::DetachElements ( NetBitStreamInterface& bitStream )
+void CElementRPCs::DetachElements ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     unsigned char ucTimeContext;
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( ucTimeContext ) )
+    if ( bitStream.Read ( ucTimeContext ) )
     {
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
-        {
-            pEntity->SetSyncTimeContext ( ucTimeContext );
-            pEntity->AttachTo ( NULL );
+        pSource->SetSyncTimeContext ( ucTimeContext );
+        pSource->AttachTo ( NULL );
 
-            CVector vecPosition;
-            if ( bitStream.Read ( vecPosition.fX ) &&
-                 bitStream.Read ( vecPosition.fY ) &&
-                 bitStream.Read ( vecPosition.fZ ) )
-            {
-                pEntity->SetPosition ( vecPosition );
-            }
+        CVector vecPosition;
+        if ( bitStream.Read ( vecPosition.fX ) &&
+             bitStream.Read ( vecPosition.fY ) &&
+             bitStream.Read ( vecPosition.fZ ) )
+        {
+            pSource->SetPosition ( vecPosition );
         }
     }
 }
 
 
-void CElementRPCs::SetElementAlpha ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementAlpha ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     unsigned char ucAlpha;
-    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( ucAlpha ) )
+    if ( bitStream.Read ( ucAlpha ) )
     {
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
+        switch ( pSource->GetType () )
         {
-            switch ( pEntity->GetType () )
+            case CCLIENTPED:
+            case CCLIENTPLAYER:
             {
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
-                {
-                    CClientPed* pPed = static_cast < CClientPed* > ( pEntity );
-                    pPed->SetAlpha ( ucAlpha );
-                    break;
-                }                
-                case CCLIENTVEHICLE:
-                {
-                    CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pEntity );
-                    pVehicle->SetAlpha ( ucAlpha );
-                    break;
-                }
-                case CCLIENTOBJECT:
-                {
-                    CClientObject * pObject = static_cast < CClientObject* > ( pEntity );
-                    pObject->SetAlpha ( ucAlpha );
-                    break;
-                }
-                default: break;
+                CClientPed* pPed = static_cast < CClientPed* > ( pSource );
+                pPed->SetAlpha ( ucAlpha );
+                break;
+            }                
+            case CCLIENTVEHICLE:
+            {
+                CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );
+                pVehicle->SetAlpha ( ucAlpha );
+                break;
             }
+            case CCLIENTOBJECT:
+            {
+                CClientObject * pObject = static_cast < CClientObject* > ( pSource );
+                pObject->SetAlpha ( ucAlpha );
+                break;
+            }
+            default: break;
         }
     }
 }
 
 
-void CElementRPCs::SetElementDoubleSided ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementDoubleSided ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     bool bDoubleSided;
-    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadBit ( bDoubleSided ) )
+    if ( bitStream.ReadBit ( bDoubleSided ) )
     {
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
-        {
-            pEntity->SetDoubleSided ( bDoubleSided );
-        }
+        pSource->SetDoubleSided ( bDoubleSided );
     }
 }
 
 
-void CElementRPCs::SetElementName ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementName ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     unsigned short usNameLength;
-    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( usNameLength ) )
+    if ( bitStream.Read ( usNameLength ) )
     {
         char* szName = new char [ usNameLength + 1 ];
         szName [ usNameLength ] = 0;
 
         if ( bitStream.Read ( szName, usNameLength ) )
         {
-            CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-            if ( pEntity )
-            {
-                pEntity->SetName ( szName );
-            }
-        }            
+            pSource->SetName ( szName );
+        }
         delete [] szName;
     }
 }
 
 
-void CElementRPCs::SetElementHealth ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementHealth ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     float fHealth;
     unsigned char ucTimeContext;
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( fHealth ) &&
+    if ( bitStream.Read ( fHealth ) &&
          bitStream.Read ( ucTimeContext ) )
     {
-        CClientEntity * pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
+        pSource->SetSyncTimeContext ( ucTimeContext );
+
+        switch ( pSource->GetType () )
         {
-            pEntity->SetSyncTimeContext ( ucTimeContext );
-
-            switch ( pEntity->GetType () )
+            case CCLIENTPED:
+            case CCLIENTPLAYER:
             {
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
-                {
-                    CClientPed* pPed = static_cast < CClientPed * > ( pEntity );                    
-                    pPed->SetHealth ( fHealth );
-                    break;
-                }
+                CClientPed* pPed = static_cast < CClientPed * > ( pSource );                    
+                pPed->SetHealth ( fHealth );
+                break;
+            }
 
-                case CCLIENTVEHICLE:
-                {
-                    CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pEntity );
-                    pVehicle->SetHealth ( fHealth );
-                    break;
-                }
+            case CCLIENTVEHICLE:
+            {
+                CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pSource );
+                pVehicle->SetHealth ( fHealth );
+                break;
+            }
 
-                case CCLIENTOBJECT:
-                {
-                    CClientObject* pObject = static_cast < CClientObject * > ( pEntity );
-                    pObject->SetHealth ( fHealth );
-                    break;
-                }
+            case CCLIENTOBJECT:
+            {
+                CClientObject* pObject = static_cast < CClientObject * > ( pSource );
+                pObject->SetHealth ( fHealth );
+                break;
             }
         }
     }
 }
 
 
-void CElementRPCs::SetElementModel ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementModel ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     unsigned short usModel;
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.Read ( usModel ) )
+    if ( bitStream.Read ( usModel ) )
     {
-        CClientEntity * pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
+        switch ( pSource->GetType () )
         {
-            switch ( pEntity->GetType () )
+            case CCLIENTPED:
+            case CCLIENTPLAYER:
             {
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
-                {
-                    CClientPed* pPed = static_cast < CClientPed * > ( pEntity );
-                    pPed->SetModel ( usModel );
-                    break;
-                }
+                CClientPed* pPed = static_cast < CClientPed * > ( pSource );
+                pPed->SetModel ( usModel );
+                break;
+            }
 
-                case CCLIENTVEHICLE:
-                {
-                    CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pEntity );
-                    pVehicle->SetModelBlocking ( usModel );
-                    break;
-                }
+            case CCLIENTVEHICLE:
+            {
+                CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pSource );
+                pVehicle->SetModelBlocking ( usModel );
+                break;
+            }
 
-                case CCLIENTOBJECT:
-                {
-                    CClientObject* pObject = static_cast < CClientObject * > ( pEntity );
-                    pObject->SetModel ( usModel );
-                    break;
-                }
+            case CCLIENTOBJECT:
+            {
+                CClientObject* pObject = static_cast < CClientObject * > ( pSource );
+                pObject->SetModel ( usModel );
+                break;
             }
         }
     }
 }
 
 
-void CElementRPCs::SetElementAttachedOffsets ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementAttachedOffsets ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     SPositionSync position ( true );
     SRotationDegreesSync rotation ( true );
-    if ( bitStream.ReadCompressed ( ID ) && position.Read ( bitStream ) && rotation.Read ( bitStream ) )
+    if ( position.Read ( bitStream ) && rotation.Read ( bitStream ) )
     {
-        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
-        {
-            pEntity->SetAttachedOffsets ( position.data.vecPosition, rotation.data.vecRotation );
-        }
+        pSource->SetAttachedOffsets ( position.data.vecPosition, rotation.data.vecRotation );
     }
 }
 
-void CElementRPCs::SetElementCollisionsEnabled ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementCollisionsEnabled ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     bool bEnable;
 
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.ReadBit ( bEnable ) )
+    if ( bitStream.ReadBit ( bEnable ) )
     {
-        CClientEntity * pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
+        switch ( pSource->GetType () )
         {
-            switch ( pEntity->GetType () )
+            case CCLIENTPED:
+            case CCLIENTPLAYER:
             {
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
-                {
-                    CClientPed* pPed = static_cast < CClientPed * > ( pEntity );
-                    pPed->SetUsesCollision ( bEnable );
-                    break;
-                }
+                CClientPed* pPed = static_cast < CClientPed * > ( pSource );
+                pPed->SetUsesCollision ( bEnable );
+                break;
+            }
 
-                case CCLIENTVEHICLE:
-                {
-                    CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pEntity );
-                    pVehicle->SetCollisionEnabled ( bEnable );
-                    break;
-                }
+            case CCLIENTVEHICLE:
+            {
+                CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pSource );
+                pVehicle->SetCollisionEnabled ( bEnable );
+                break;
+            }
 
-                case CCLIENTOBJECT:
-                {
-                    CClientObject* pObject = static_cast < CClientObject * > ( pEntity );
-                    pObject->SetCollisionEnabled ( bEnable );
-                    break;
-                }
+            case CCLIENTOBJECT:
+            {
+                CClientObject* pObject = static_cast < CClientObject * > ( pSource );
+                pObject->SetCollisionEnabled ( bEnable );
+                break;
             }
         }
     }
 }
 
-void CElementRPCs::SetElementFrozen ( NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementFrozen ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    ElementID ID;
     bool bFrozen;
 
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.ReadBit ( bFrozen ) )
+    if ( bitStream.ReadBit ( bFrozen ) )
     {
-        CClientEntity * pEntity = CElementIDs::GetElement ( ID );
-        if ( pEntity )
+        switch ( pSource->GetType () )
         {
-            switch ( pEntity->GetType () )
+            case CCLIENTPED:
+            case CCLIENTPLAYER:
             {
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
-                {
-                    CClientPed* pPed = static_cast < CClientPed * > ( pEntity );
-                    pPed->SetFrozen ( bFrozen );
-                    break;
-                }
+                CClientPed* pPed = static_cast < CClientPed * > ( pSource );
+                pPed->SetFrozen ( bFrozen );
+                break;
+            }
 
-                case CCLIENTVEHICLE:
-                {
-                    CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pEntity );
-                    pVehicle->SetFrozen ( bFrozen );
-                    break;
-                }
+            case CCLIENTVEHICLE:
+            {
+                CClientVehicle* pVehicle = static_cast < CClientVehicle * > ( pSource );
+                pVehicle->SetFrozen ( bFrozen );
+                break;
+            }
 
-                case CCLIENTOBJECT:
-                {
-                    CClientObject* pObject = static_cast < CClientObject * > ( pEntity );
-                    pObject->SetStatic ( bFrozen );
-                    break;
-                }
+            case CCLIENTOBJECT:
+            {
+                CClientObject* pObject = static_cast < CClientObject * > ( pSource );
+                pObject->SetStatic ( bFrozen );
+                break;
             }
         }
     }

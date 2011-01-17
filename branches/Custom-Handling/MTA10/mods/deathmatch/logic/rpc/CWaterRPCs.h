@@ -20,8 +20,9 @@ class CWaterRPCs : public CRPCFunctions
 public:
     static void                 LoadFunctions           ( void );
 
-    DECLARE_RPC ( SetWaterLevel );
-    DECLARE_RPC ( SetWaterVertexPosition );
+    DECLARE_RPC ( SetGTAWaterLevel );
+    DECLARE_ELEMENT_RPC ( SetWaterElementLevel );
+    DECLARE_ELEMENT_RPC ( SetWaterVertexPosition );
     DECLARE_RPC ( SetWaterColor );
     DECLARE_RPC ( ResetWaterColor );
 };

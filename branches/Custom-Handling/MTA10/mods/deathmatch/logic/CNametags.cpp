@@ -454,19 +454,10 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
         // Draw his name
         unsigned char ucR, ucG, ucB;
         pPlayer->GetNametagColor ( ucR, ucG, ucB );
-        if ( g_pCore->GetGraphics ()->GetCEGUIUsed () )
-        {
-            // Draw shadow first
-            g_pCore->GetGraphics ()->DrawTextCEGUI ( ( int ) vecScreenPosition.fX + 1 - 17, ( int ) vecScreenPosition.fY + 1, ( int ) vecScreenPosition.fX + 1 - 17, ( int ) vecScreenPosition.fY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, DT_NOCLIP | DT_CENTER );
-            g_pCore->GetGraphics ()->DrawTextCEGUI ( ( int ) vecScreenPosition.fX - 17, ( int ) vecScreenPosition.fY, ( int ) vecScreenPosition.fX - 17, ( int ) vecScreenPosition.fY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, DT_NOCLIP | DT_CENTER );
-        }
-        else
-        {               
-            // Draw shadow first
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-        }
-        
+        // Draw shadow first
+        g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+        g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+
         // We need to draw health tags?
         if ( m_bDrawHealth )
         {

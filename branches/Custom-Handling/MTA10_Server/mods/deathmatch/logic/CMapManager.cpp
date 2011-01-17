@@ -371,7 +371,7 @@ void CMapManager::BroadcastElements ( CElement* pElement, bool bBroadcastAll )
 void CMapManager::BroadcastElementChildren ( CElement* pElement, CEntityAddPacket &Packet, list < CPerPlayerEntity* > &pPerPlayerList, bool bBroadcastAll )
 {
     CElement * pTemp;
-    list < CElement* > ::const_iterator iter = pElement->IterBegin ();
+    CChildListType ::const_iterator iter = pElement->IterBegin ();
     for ( ; iter != pElement->IterEnd(); iter++ )
     {
         pTemp = *iter;
@@ -617,7 +617,7 @@ void CMapManager::SetUpVisibleToReferences ( CElement* pElement )
     }
 
     // Run us on all its children
-    list < CElement* > ::const_iterator iter = pElement->IterBegin ();
+    CChildListType ::const_iterator iter = pElement->IterBegin ();
     for ( ; iter != pElement->IterEnd (); iter++ )
     {
         SetUpVisibleToReferences ( *iter );

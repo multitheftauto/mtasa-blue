@@ -23,9 +23,14 @@ extern CClientGame* g_pClientGame;
 
 #define snprintf _snprintf
 
+#pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
+
 int CClientEntity::iCount = 0;
 
 CClientEntity::CClientEntity ( ElementID ID )
+        : m_FromRootNode ( this )
+        , m_ChildrenNode ( this )
+        , m_Children ( &CClientEntity::m_ChildrenNode )
 {
     #ifdef MTA_DEBUG
         ++iCount;
@@ -85,11 +90,9 @@ CClientEntity::~CClientEntity ( void )
     }
 
     // Remove from parent
-    if ( !g_pClientGame->IsBeingDeleted () )
-    {
-        ClearChildren ();
-        SetParent ( NULL );
-    }
+    ClearChildren ();
+    SetParent ( NULL );
+
     // Reset our index in the element array
     if ( m_ID != INVALID_ELEMENT_ID )
     {
@@ -177,8 +180,11 @@ CClientEntity::~CClientEntity ( void )
     assert ( !MapContains ( g_pClientGame->m_AllDisabledCollisions, this ) );
 
     // Ensure nothing has inadvertently set a parent
-    if ( !g_pClientGame->IsBeingDeleted () )
-        assert ( m_pParent == NULL );
+    assert ( m_pParent == NULL );
+
+    // Ensure intrusive list nodes have been isolated
+    assert ( m_FromRootNode.m_pOuterItem == this && !m_FromRootNode.m_pPrev && !m_FromRootNode.m_pNext );
+    assert ( m_ChildrenNode.m_pOuterItem == this && !m_ChildrenNode.m_pPrev && !m_ChildrenNode.m_pNext );
 }
 
 
@@ -258,7 +264,7 @@ bool CClientEntity::IsMyChild ( CClientEntity* pEntity, bool bRecursive )
         return true;
 
     // Is he our child directly?
-    list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         // Return true if this is our child. If not check if he's one of our children's children if we were asked to do a recursive search.
@@ -283,13 +289,8 @@ void CClientEntity::ClearChildren ( void )
     assert ( m_pParent != this );
 
     // Process our children - Move up to our parent
-    list < CClientEntity* > cloneList = m_Children;
-    list < CClientEntity* > ::const_iterator iter = cloneList.begin ();
-    for ( ; iter != cloneList.end () ; ++iter )
-        (*iter)->SetParent ( m_pParent );
-
-    // This list should now be empty
-    assert ( m_Children.size () == 0 );
+    while ( m_Children.size () )
+        (*m_Children.begin())->SetParent ( m_pParent );
 }
 
 
@@ -528,7 +529,7 @@ bool CClientEntity::DeleteCustomData ( const char* szName, bool bRecursive )
     // If recursive, delete our children's data
     if ( bRecursive )
     {
-        list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+        CChildListType ::const_iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
             // Delete it. If we deleted any, remember that we've done that so we can return true.
@@ -550,7 +551,7 @@ void CClientEntity::DeleteAllCustomData ( CLuaMain* pLuaMain, bool bRecursive )
     // If recursive, delete our children's data
     if ( bRecursive )
     {
-        list < CClientEntity* > ::iterator iter = m_Children.begin ();
+        CChildListType ::iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
             (*iter)->DeleteAllCustomData ( pLuaMain, true );
@@ -740,7 +741,7 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
     // Call it on all our children
     if ( ! m_Children.empty () )
     {
-        list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+        CChildListType ::const_iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
             (*iter)->CallEventNoParent ( szName, Arguments, pSource );
@@ -781,7 +782,7 @@ void CClientEntity::DeleteEvents ( CLuaMain* pLuaMain, bool bRecursive )
     // Delete it from all our children's events
     if ( bRecursive )
     {
-        list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+        CChildListType ::const_iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
             (*iter)->DeleteEvents ( pLuaMain, true );
@@ -804,7 +805,7 @@ void CClientEntity::CleanUpForVM ( CLuaMain* pLuaMain, bool bRecursive )
     // If recursive, do it on our children too
     if ( bRecursive )
     {
-        list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+        CChildListType ::const_iterator iter = m_Children.begin ();
         for ( ; iter != m_Children.end (); iter++ )
         {
             (*iter)->CleanUpForVM ( pLuaMain, true );
@@ -841,7 +842,7 @@ CClientEntity* CClientEntity::FindChildIndex ( const char* szName, unsigned int 
     assert ( szName );
 
     // Look among our children
-    list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         CClientEntity* pChild = *iter;
@@ -902,7 +903,7 @@ CClientEntity* CClientEntity::FindChildByType ( const char* szType, unsigned int
 CClientEntity* CClientEntity::FindChildByTypeIndex ( unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive )
 {
     // Look among our children
-    list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         // Name matches?
@@ -976,7 +977,7 @@ void CClientEntity::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, CLuaMa
     }
 
     // Call us on the children
-    list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         (*iter)->FindAllChildrenByTypeIndex ( uiTypeHash, pLuaMain, uiIndex, bStreamedIn );
@@ -990,7 +991,7 @@ void CClientEntity::GetChildren ( CLuaMain* pLuaMain )
 
     // Add all our children to the table on top of the given lua main's stack
     unsigned int uiIndex = 0;
-    list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         // Add it to the table
@@ -1158,15 +1159,15 @@ unsigned int CClientEntity::GetTypeID ( const char* szTypeName )
 void CClientEntity::DeleteClientChildren ( void )
 {
     // Gather a list over children (we can't use the list as it changes)
-    list < CClientEntity* > Children;
-    list < CClientEntity* > ::const_iterator iterCopy = m_Children.begin ();
+    std::list < CClientEntity* > Children;
+    CChildListType ::const_iterator iterCopy = m_Children.begin ();
     for ( ; iterCopy != m_Children.end (); iterCopy++ )
     {
         Children.push_back ( *iterCopy );
     }
 
     // Call ourselves on each child of this to go as deep as possible and start deleting there
-    list < CClientEntity* > ::const_iterator iter = Children.begin ();
+    std::list < CClientEntity* > ::const_iterator iter = Children.begin ();
     for ( ; iter != Children.end (); iter++ )
     {
         (*iter)->DeleteClientChildren ();
@@ -1274,8 +1275,10 @@ RpClump * CClientEntity::GetClump ( void )
 
 
 // Entities from root optimization for getElementsByType
-CClientEntity::t_mapEntitiesFromRoot CClientEntity::ms_mapEntitiesFromRoot;
-bool CClientEntity::ms_bEntitiesFromRootInitialized = false;
+typedef CIntrusiveListExt < CClientEntity, &CClientEntity::m_FromRootNode > CFromRootListType;
+typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
+static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
+static bool                     ms_bEntitiesFromRootInitialized = false;
 
 void CClientEntity::StartupEntitiesFromRoot ()
 {
@@ -1303,12 +1306,12 @@ void CClientEntity::AddEntityFromRoot ( unsigned int uiTypeHash, CClientEntity* 
     assert ( CClientEntity::IsFromRoot ( pEntity ) );
 
     // Insert into list
-    CMappedList < CClientEntity* >& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
+    CFromRootListType& listEntities = ms_mapEntitiesFromRoot [ uiTypeHash ];
     listEntities.remove ( pEntity );
     listEntities.push_front ( pEntity );
 
     // Apply to child elements as well
-    list < CClientEntity* > ::const_iterator iter = pEntity->IterBegin ();
+    CChildListType ::const_iterator iter = pEntity->IterBegin ();
     for ( ; iter != pEntity->IterEnd (); iter++ )
         CClientEntity::AddEntityFromRoot ( (*iter)->GetTypeHash (), *iter, false );
 
@@ -1324,14 +1327,14 @@ void CClientEntity::RemoveEntityFromRoot ( unsigned int uiTypeHash, CClientEntit
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        CMappedList < CClientEntity* >& listEntities = find->second;
+        CFromRootListType& listEntities = find->second;
         listEntities.remove ( pEntity );
         if ( listEntities.size () == 0 )
             ms_mapEntitiesFromRoot.erase ( find );
     }
 
     // Apply to child elements as well
-    list < CClientEntity* > ::const_iterator iter = pEntity->IterBegin ();
+    CChildListType ::const_iterator iter = pEntity->IterBegin ();
     for ( ; iter != pEntity->IterEnd (); iter++ )
         CClientEntity::RemoveEntityFromRoot ( (*iter)->GetTypeHash (), *iter );
 }
@@ -1345,12 +1348,12 @@ void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, CLuaMain* pLu
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        CMappedList < CClientEntity* >& listEntities = find->second;
+        CFromRootListType& listEntities = find->second;
         CClientEntity* pEntity;
         lua_State* luaVM = pLuaMain->GetVirtualMachine ();
         unsigned int uiIndex = 0;
 
-        for ( std::list < CClientEntity* >::const_reverse_iterator i = listEntities.rbegin ();
+        for ( CFromRootListType::reverse_iterator i = listEntities.rbegin ();
               i != listEntities.rend ();
               ++i )
         {
@@ -1428,7 +1431,7 @@ void CClientEntity::_FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, std::
     }
 
     // Call us on the children
-    list < CClientEntity* > ::const_iterator iter = m_Children.begin ();
+    CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
         (*iter)->_FindAllChildrenByTypeIndex ( uiTypeHash, mapResults );
@@ -1441,11 +1444,11 @@ void CClientEntity::_GetEntitiesFromRoot ( unsigned int uiTypeHash, std::map < C
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
     if ( find != ms_mapEntitiesFromRoot.end () )
     {
-        const std::list < CClientEntity* >& listEntities = find->second;
+        CFromRootListType& listEntities = find->second;
         CClientEntity* pEntity;
         unsigned int uiIndex = 0;
 
-        for ( std::list < CClientEntity* >::const_reverse_iterator i = listEntities.rbegin ();
+        for ( CFromRootListType::const_reverse_iterator i = listEntities.rbegin ();
               i != listEntities.rend ();
               ++i )
         {

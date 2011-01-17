@@ -41,12 +41,6 @@ public:
 
     virtual IDirect3DDevice9 *      GetDevice           ( void ) = 0;
 
-    virtual void                    SetCEGUIUsed        ( bool bCEGUI ) = 0;
-    virtual bool                    GetCEGUIUsed        ( void ) = 0;
-
-    virtual int                     GetTextExtent       ( const char* szText, float fScale ) = 0;
-    virtual int                     GetTextHeight       ( float fScale ) = 0;
-
     virtual void                    Draw3DBox           ( float fX, float fY, float fZ, float fL, float fW, float fH, DWORD dwColor, bool bWireframe ) = 0;
     virtual void                    CalcWorldCoors      ( CVector * vecScreen, CVector * vecWorld ) = 0;
     virtual void                    CalcScreenCoors     ( CVector * vecWorld, CVector * vecScreen ) = 0;
@@ -55,7 +49,6 @@ public:
     virtual void                    DrawText            ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... ) = 0;
 
     virtual void                    DrawText2DA         ( int iX, int iY, unsigned long ulColor, float fScale, const char* szDisplayText, ... ) = 0;
-    virtual void                    DrawTextCEGUI       ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScale, unsigned long ulFormat ) = 0;
     virtual void                    DrawText3DA         ( float fX, float fY, float fZ, unsigned long ulColor, float fScale, const char* szDisplayText, ... ) = 0;
     virtual void                    DrawLine            ( float fX1, float fY1, float fX2, float fY2, unsigned long ulColor ) = 0;
     virtual void                    DrawLine3D          ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f ) = 0;

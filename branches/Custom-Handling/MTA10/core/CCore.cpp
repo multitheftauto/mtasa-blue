@@ -772,42 +772,112 @@ void CCore::SetCenterCursor ( bool bEnabled )
         m_pSetCursorPosHook->DisableSetCursorPos ();
 }
 
-void CCore::CreateGame ( )
+
+////////////////////////////////////////////////////////////////////////
+//
+// LoadModule
+//
+// Attempt to load a module. Returns if successful.
+// On failure, displays message box and terminates the current process.
+//
+////////////////////////////////////////////////////////////////////////
+void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString& strModuleName )
 {
-    // Create function pointer type and variable.
-    typedef CGame* (*pfnGameInitializer) ( );
-    pfnGameInitializer pfnGameInit;
+    WriteDebugEvent ( "Loading " + strName.ToLower () );
+
+    // Ensure DllDirectory has not been changed
+    char szDllDirectory[ MAX_PATH + 1 ] = {'\0'};
+    GetDllDirectory( sizeof ( szDllDirectory ), szDllDirectory );
+    if ( CalcMTASAPath ( "mta" ).CompareI ( szDllDirectory ) != true )
+    {
+        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", szDllDirectory, *CalcMTASAPath ( "mta" ) ) );
+        SetDllDirectory( CalcMTASAPath ( "mta" ) );
+    }
+
+    // Switch to MTA dir
+    SString strSavedCwd = SharedUtil::GetCurrentDirectory ();
+    SetCurrentDirectory ( CalcMTASAPath ( "mta" ) );
 
     // Load approrpiate compilation-specific library.
 #ifdef MTA_DEBUG
-    m_GameModule.LoadModule ( CalcMTASAPath ( "mta/game_sa_d.dll" ) );
-# else
-    m_GameModule.LoadModule ( CalcMTASAPath ( "mta/game_sa.dll" ) );
-
+    SString strModuleFileName = strModuleName + "_d.dll";
+#else
+    SString strModuleFileName = strModuleName + ".dll";
 #endif
+    m_Loader.LoadModule ( CalcMTASAPath ( PathJoin ( "mta", strModuleFileName ) ) );
+
+    if ( m_Loader.IsOk () == false )
+    {
+        MessageBox ( 0, SString ( "Error loading %s module! (%s)", *strName.ToLower (), *m_Loader.GetLastErrorMessage () ), "Error", MB_OK|MB_ICONEXCLAMATION );
+        BrowseToSolution ( strModuleName + "-not-loadable", true, true );
+    }
+
+    // Restore current directory
+    SetCurrentDirectory ( strSavedCwd );
+
+    WriteDebugEvent ( strName + " loaded." );
+}
 
 
-    // Get client initializer function from DLL's routine.
-    pfnGameInit = static_cast< pfnGameInitializer > 
-    ( m_GameModule.GetFunctionPointer ( "GetGameInterface" ) );
+////////////////////////////////////////////////////////////////////////
+//
+// InitModule
+//
+// Attempt to initialize a loaded module. Returns if successful.
+// On failure, displays message box and terminates the current process.
+//
+////////////////////////////////////////////////////////////////////////
+template < class T, class U >
+T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& strInitializer, U* pObj )
+{
+    // Switch to MTA dir
+    SString strSavedCwd = SharedUtil::GetCurrentDirectory ();
+    SetCurrentDirectory ( CalcMTASAPath ( "mta" ) );
+
+    // Get initializer function from DLL.
+    typedef T* (*PFNINITIALIZER) ( U* );
+    PFNINITIALIZER pfnInit = static_cast < PFNINITIALIZER > ( m_Loader.GetFunctionPointer ( strInitializer ) );
+
+    if ( pfnInit == NULL )
+    {
+        MessageBox ( 0, strName + " module is incorrect!", "Error", MB_OK | MB_ICONEXCLAMATION );
+        TerminateProcess ( GetCurrentProcess (), 1 );
+    }
 
     // If we have a valid initializer, call it.
-    if ( pfnGameInit != NULL )
-    {
-        WriteDebugEvent ( "Game loaded." );
-        m_pGame = pfnGameInit ( );
+    T* pResult = pfnInit ( pObj );
 
-        if ( m_pGame->GetGameVersion () >= VERSION_11 )
-        {
-            MessageBox ( 0, "Only GTA:SA version 1.0 is supported!  You are now being redirected to a page where you can patch your version.", "Error", MB_OK|MB_ICONEXCLAMATION );
-            BrowseToSolution ( "downgrade" );
-            TerminateProcess ( GetCurrentProcess (), 1 );
-        }
-    }
-    else
+    // Restore current directory
+    SetCurrentDirectory ( strSavedCwd );
+
+    WriteDebugEvent ( strName + " initialized." );
+    return pResult;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+//
+// CreateModule
+//
+// Attempt to load and initialize a module. Returns if successful.
+// On failure, displays message box and terminates the current process.
+//
+////////////////////////////////////////////////////////////////////////
+template < class T, class U >
+T* CreateModule ( CModuleLoader& m_Loader, const SString& strName, const SString& strModuleName, const SString& strInitializer, U* pObj )
+{
+    LoadModule ( m_Loader, strName, strModuleName );
+    return InitModule < T > ( m_Loader, strName, strInitializer, pObj );
+}
+
+
+void CCore::CreateGame ( )
+{
+    m_pGame = CreateModule < CGame > ( m_GameModule, "Game", "game_sa", "GetGameInterface", this );
+    if ( m_pGame->GetGameVersion () >= VERSION_11 )
     {
-        // USE CLANGUAGELOCALE HERE.
-        MessageBox ( 0, "Game module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
+        MessageBox ( 0, "Only GTA:SA version 1.0 is supported!  You are now being redirected to a page where you can patch your version.", "Error", MB_OK|MB_ICONEXCLAMATION );
+        BrowseToSolution ( "downgrade" );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 }
@@ -815,40 +885,7 @@ void CCore::CreateGame ( )
 
 void CCore::CreateMultiplayer ( )
 {
-    // Check to see if our game has been created.
-    if ( m_pGame == NULL )
-    {
-        // Inform user that loading failed.
-        return;
-    }
-
-    // Create function pointer type and variable.
-    typedef CMultiplayer* (*pfnMultiplayerInitializer) ( CGame * );
-    pfnMultiplayerInitializer pfnMultiplayerInit;
-
-    // Load appropriate compilation-specific library.
-#ifdef MTA_DEBUG
-    m_MultiplayerModule.LoadModule ( CalcMTASAPath ( "mta/multiplayer_sa_d.dll" ) );
-# else
-    m_MultiplayerModule.LoadModule ( CalcMTASAPath ( "mta/multiplayer_sa.dll" ) );
-#endif
-
-    // Get client initializer function from DLL's routine.
-    pfnMultiplayerInit = static_cast< pfnMultiplayerInitializer > 
-    ( m_MultiplayerModule.GetFunctionPointer ( "InitMultiplayerInterface" ) );
-
-    // If we have a valid initializer, call it.
-    if ( pfnMultiplayerInit != NULL )
-    {
-        WriteDebugEvent ( "Multiplayer loaded." );
-        m_pMultiplayer = pfnMultiplayerInit ( m_pGame );
-    }
-    else
-    {
-        // USE CLANGUAGELOCALE HERE.
-        MessageBox ( 0, "Multiplayer module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 1 );
-    }
+    m_pMultiplayer = CreateModule < CMultiplayer > ( m_MultiplayerModule, "Multiplayer", "multiplayer_sa", "InitMultiplayerInterface", this );
 }
 
 
@@ -860,38 +897,11 @@ void CCore::DeinitGUI ( void )
 
 void CCore::InitGUI ( IUnknown* pDevice )
 {
-    // Initializes the GUI by calling the InitGUIInterface-function in the GUI dll
-
-    CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-    char                    szCurDir [ 1024 ];
-    bool                    bReturn = false;
-
-    // Set the current directory.
-    FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-    FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-
-    typedef CGUI* (*pfnGUIInitializer) ( IDirect3DDevice9* );
-    pfnGUIInitializer pfnGUIInit;
-
-    pfnGUIInit = static_cast < pfnGUIInitializer > ( m_GUIModule.GetFunctionPointer ( "InitGUIInterface" ) );
-    if ( pfnGUIInit != NULL )
-    {
-        IDirect3DDevice9 *dev = reinterpret_cast < IDirect3DDevice9* > ( pDevice );
-        m_pGUI = pfnGUIInit ( dev );
-        WriteDebugEvent ( "GUI initialized." );
-    } else {
-        // USE CLANGUAGELOCALE HERE.
-        MessageBox ( 0, "GUI module could not be initialized!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 1 );
-    }
+    IDirect3DDevice9 *dev = reinterpret_cast < IDirect3DDevice9* > ( pDevice );
+    m_pGUI = InitModule < CGUI > ( m_GUIModule, "GUI", "InitGUIInterface", dev );
 
     // Set the working directory for CGUI
-    m_pGUI->SetWorkingDirectory ( WorkingDirectory.c_str ( ) );
-
-    SetCurrentDirectory ( szCurDir );
+    m_pGUI->SetWorkingDirectory ( CalcMTASAPath ( "MTA" ) );
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = GetInstallRoot () + std::string ( "\\screenshots" );
@@ -902,33 +912,7 @@ void CCore::InitGUI ( IUnknown* pDevice )
 
 void CCore::CreateGUI ( void )
 {
-    // Should only be called once, use InitGUI to init the GUI, which can be called again (after a destruction of the GUI)
-
-    CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-    char                    szCurDir [ 1024 ];
-    bool                    bReturn = false;
-
-    // Set the current directory.
-    FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-    FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-
-#ifdef MTA_DEBUG
-    bReturn = m_GUIModule.LoadModule ( "cgui_d.dll" );
-#else
-    bReturn = m_GUIModule.LoadModule ( "cgui.dll" );
-#endif
-    if ( !bReturn )
-    {
-        // USE CLANGUAGELOCALE HERE.
-        MessageBox ( 0, "GUI module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 1 );
-    }
-    WriteDebugEvent ( "GUI loaded." );
-
-    SetCurrentDirectory ( szCurDir );
+    LoadModule ( m_GUIModule, "GUI", "cgui" );
 }
 
 void CCore::DestroyGUI ( )
@@ -944,32 +928,7 @@ void CCore::DestroyGUI ( )
 
 void CCore::CreateNetwork ( )
 {
-    // Create function pointer type and variable.
-    typedef CNet* (*pfnNetInitializer) ( );
-    pfnNetInitializer pfnNetInit;
-
-    CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-    char                    szCurDir [ 1024 ];
-
-    // Set the current directory.
-    FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-    FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-
-    // Load approrpiate compilation-specific library.
-#ifdef _DEBUG
-    m_NetModule.LoadModule ( "netc_d.dll" );
-#else
-    m_NetModule.LoadModule ( "netc.dll" );
-#endif
-    if ( m_NetModule.IsOk () == false )
-    {
-        MessageBox ( 0, "Network module not found!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        BrowseToSolution ( "netc-not-loadable", true );
-        TerminateProcess ( GetCurrentProcess (), 1 );
-    }
+    m_pNet = CreateModule < CNet > ( m_NetModule, "Network", "netc", "InitNetInterface", this );
 
     // Network module compatibility check
     typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long );
@@ -981,25 +940,6 @@ void CCore::CreateNetwork ( )
         BrowseToSolution ( "netc-not-compatible", true );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
-
-    // Get client initializer function from DLL's routine.
-    pfnNetInit = static_cast< pfnNetInitializer > 
-    ( m_NetModule.GetFunctionPointer ( "InitNetInterface" ) );
-
-    // If we have a valid initializer, call it.
-    if ( pfnNetInit != NULL )
-    {
-        WriteDebugEvent ( "Network loaded." );
-        m_pNet = pfnNetInit ( );
-    }
-    else
-    {
-        // USE CLANGUAGELOCALE HERE.
-        MessageBox ( 0, "Network module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 1 );
-    }
-
-    SetCurrentDirectory ( szCurDir );
 
     // Set mta version for report log here
     SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%d.%03d"
@@ -1019,47 +959,8 @@ void CCore::CreateNetwork ( )
 
 void CCore::CreateXML ( )
 {
-    // Create function pointer type and variable.
-    typedef CXML* (*pfnXMLInitializer) ( );
-    pfnXMLInitializer pfnXMLInit;
-
-    CFilePathTranslator     FileTranslator;
-    string                  WorkingDirectory;
-    char                    szCurDir [ 1024 ];
-
-    // Set the current directory.
-    FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
-    FileTranslator.GetCurrentWorkingDirectory ( WorkingDirectory );
-    GetCurrentDirectory ( sizeof ( szCurDir ), szCurDir );
-    SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
-
-    // Load approrpiate compilation-specific library.
-#ifdef MTA_DEBUG
-    m_XMLModule.LoadModule ( "xmll_d.dll" );
-#else
-    m_XMLModule.LoadModule ( "xmll.dll" );
-#endif
-
-    // Get client initializer function from DLL's routine.
-    pfnXMLInit = static_cast< pfnXMLInitializer > 
-    ( m_XMLModule.GetFunctionPointer ( "InitXMLInterface" ) );
-
-    // If we have a valid initializer, call it.
-    if ( pfnXMLInit != NULL )
-    {
-        WriteDebugEvent ( "XML loaded." );
-        m_pXML = pfnXMLInit ( );
-    }
-    else
-    {
-        // USE CLANGUAGELOCALE HERE.
-        MessageBox ( 0, "XML module could not be located!", "Error", MB_OK|MB_ICONEXCLAMATION );
-        TerminateProcess ( GetCurrentProcess (), 1 );
-    }
-
-    SetCurrentDirectory ( szCurDir );
-
-    
+    m_pXML = CreateModule < CXML > ( m_XMLModule, "XML", "xmll", "InitXMLInterface", this );
+   
     // Load config XML file
     m_pConfigFile = m_pXML->CreateXML ( CalcMTASAPath ( MTA_CONFIG_PATH ) );
     if ( !m_pConfigFile ) {

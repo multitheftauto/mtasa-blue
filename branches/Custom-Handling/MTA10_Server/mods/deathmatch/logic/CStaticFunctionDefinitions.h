@@ -251,6 +251,8 @@ public:
     static bool                 GetTrainSpeed                       ( CVehicle* pVehicle, float& fSpeed );
     static bool                 IsVehicleBlown                      ( CVehicle* pVehicle );
     static bool                 GetVehicleHeadLightColor            ( CVehicle* pVehicle, SColor& outColor );
+    static bool                 GetVehicleDoorOpenRatio             ( CVehicle* pVehicle, unsigned char ucDoor, float& fRatio );
+
     static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, float& fValue );
     static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue );
     static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue );
@@ -307,6 +309,8 @@ public:
     static bool                 SetTrainSpeed                       ( CVehicle* pVehicle, float fSpeed );
     static bool                 SetVehicleHeadLightColor            ( CVehicle* pVehicle, const SColor color );
     static bool                 SetVehicleTurretPosition            ( CVehicle* pVehicle, float fHorizontal, float fVertical );
+    static bool                 SetVehicleDoorOpenRatio             ( CElement* pElement, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0 );
+
     //static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, bool bValue );
     static bool                 ResetVehicleHandling                ( CVehicle* pVehicle, bool bUseOriginal );
     static bool                 ResetVehicleHandlingProperty        ( CVehicle* pVehicle, eHandlingProperty eProperty, bool bUseOriginal );

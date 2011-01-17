@@ -123,6 +123,11 @@ void WindowManager::destroyWindow(Window* window)
 {
 	if (window != NULL)
 	{
+        // If our first editbox is destroyed, we need a new one
+        if ( window == m_editBox )
+        {
+            m_editBox = NULL;
+        }
 		// this is done because the name is used for the log after the window is destroyed,
 		// if we just did getName() we would get a const ref to the Window's internal name
 		// string which is destroyed along with the window so wouldn't exist when the log tried

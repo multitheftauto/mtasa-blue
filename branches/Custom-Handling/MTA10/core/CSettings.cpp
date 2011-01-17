@@ -47,6 +47,7 @@ CSettings::CSettings ( void )
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
+    m_bIsModLoaded = false;
     m_bCaptureKey = false;
     m_dwFrameCount = 0;
     CVector2D vecTemp;
@@ -64,6 +65,7 @@ CSettings::CSettings ( void )
     m_pWindow->SetSize ( CVector2D ( 560.0f, 360.0f ) );
     m_pWindow->SetSizingEnabled ( false );
     m_pWindow->SetAlwaysOnTop ( true );
+    m_pWindow->BringToFront ();
 
     // Create the tab panel and necessary tabs
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
@@ -560,10 +562,6 @@ CSettings::CSettings ( void )
     m_pInterfaceSkinSelector->SetSize ( CVector2D ( 340.0f, 200.0f ) );
     m_pInterfaceSkinSelector->SetReadOnly ( true );
 
-    m_pInterfaceLoadSkin = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pInterfacePaneScroller, "Load" ) );
-    m_pInterfaceLoadSkin->SetPosition ( CVector2D ( 410.0f, 40.0f ) );
-    m_pInterfaceLoadSkin->SetSize ( CVector2D ( 100.0f, 24.0f ) );
-
     {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "Chat" ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 80.0f ) );
@@ -810,7 +808,6 @@ CSettings::CSettings ( void )
     m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
     m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnRegisterButtonClick, this ) );
     m_pChatLoadPreset->SetClickHandler ( GUI_CALLBACK( &CSettings::OnChatLoadPresetClick, this ) );
-    m_pInterfaceLoadSkin->SetClickHandler ( GUI_CALLBACK(&CSettings::OnLoadSkinButtonClick, this) );
     m_pInterfaceSkinSelector->SetSelectionHandler ( GUI_CALLBACK(&CSettings::OnSkinChanged, this) );
     m_pMapAlpha->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMapAlphaChanged, this ) );
     m_pAudioRadioVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnRadioVolumeChanged, this ) );
@@ -1612,6 +1609,7 @@ void CSettings::SetVisible ( bool bVisible )
     // Load the config file if the dialog is shown
     if ( bVisible )
     {
+        m_pWindow->BringToFront ();
         m_pWindow->Activate ();
         LoadData ();
 
@@ -1621,12 +1619,19 @@ void CSettings::SetVisible ( bool bVisible )
         // Re-initialize the binds list
         Initialize ();
     }
+
+    m_pWindow->SetZOrderingEnabled(!bVisible); //Message boxes dont appear on top otherwise
 }
 
 
 bool CSettings::IsVisible ( void )
 {
     return m_pWindow->IsVisible ();
+}
+
+void CSettings::SetIsModLoaded ( bool bLoaded )
+{
+    m_bIsModLoaded = bLoaded;
 }
 
 
@@ -1866,6 +1871,17 @@ void CSettings::LoadData ( void )
         if ( currentInfo.width == vidModemInfo.width && currentInfo.height == vidModemInfo.height && currentInfo.depth == vidModemInfo.depth )
             m_pComboResolution->SetText ( strMode );
     }
+
+    // Skins
+    std::string currentSkin;
+    CVARS_GET("current_skin", currentSkin);
+    unsigned int uiIndex = 0;
+    std::string strItemText = m_pInterfaceSkinSelector->GetItemText( uiIndex );
+    while ( strItemText != currentSkin )
+    {
+        strItemText = m_pInterfaceSkinSelector->GetItemText( ++uiIndex );
+    }
+    m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
 
     // Async loading
     int iVar;
@@ -2120,6 +2136,11 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "chat_line_life", GetMilliseconds ( m_pChatLineLife ) );
     CVARS_SET ( "chat_line_fade_out", GetMilliseconds ( m_pChatLineFadeout ) );
 
+    // Set our new skin last, as it'll destroy all our GUI
+    CGUIListItem* pItem = m_pInterfaceSkinSelector->GetSelectedItem ();
+    if ( pItem )
+        CVARS_SET("current_skin", pItem->GetText());
+
     // Save the config here
     CCore::GetSingleton ().SaveConfig ();
     // Save the single player settings (e.g. video mode, volume)
@@ -2306,10 +2327,6 @@ void CSettings::LoadSkins()
         if(currentSkin == (*it))
             m_pInterfaceSkinSelector->SetSelectedItemByIndex(m_pInterfaceSkinSelector->GetItemIndex(item));
     }   
-
-    // The current skin should be selected, so clicking the Load button will do
-    // nothing, so we disable it.
-    m_pInterfaceLoadSkin->SetEnabled(false);
 }
 
 void CSettings::LoadChatColorFromString ( ChatColorType eType, const string& strColor )
@@ -2452,18 +2469,6 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
     return true;
 }
 
-bool CSettings::OnLoadSkinButtonClick ( CGUIElement* pElement )
-{
-    CGUIListItem* pItem = m_pInterfaceSkinSelector->GetSelectedItem ();
-    if ( !pItem )
-        return true;
-
-    CVARS_SET("current_skin", pItem->GetText());
-
-    m_pInterfaceLoadSkin->SetEnabled(false); 
-
-    return true;
-}
 
 bool CSettings::OnSkinChanged ( CGUIElement* pElement )
 {
@@ -2473,7 +2478,22 @@ bool CSettings::OnSkinChanged ( CGUIElement* pElement )
 
     std::string currentSkin;
     CVARS_GET("current_skin", currentSkin);
-    m_pInterfaceLoadSkin->SetEnabled(pItem->GetText() != currentSkin);
+    std::string newSkin = pItem->GetText();
+
+    if ( m_bIsModLoaded )
+    {
+        // Reset our item
+        unsigned int uiIndex = 0;
+        std::string strItemText = m_pInterfaceSkinSelector->GetItemText( uiIndex );
+        while ( strItemText != currentSkin )
+        {
+            strItemText = m_pInterfaceSkinSelector->GetItemText( ++uiIndex );
+        }
+        m_pInterfaceSkinSelector->SetSelectedItemByIndex(uiIndex);
+        g_pCore->ShowMessageBox ( "Error", "Please disconnect before changing skin", MB_BUTTON_OK | MB_ICON_INFO );
+        m_pWindow->MoveToBack();
+        return true;
+    }
 
     return true;
 }

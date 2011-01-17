@@ -1564,11 +1564,11 @@ void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamIn
     // Read door angles.
     if ( CClientVehicleManager::HasDoors ( iModelID ) )
     {
-        SDoorAngleSync door;
+        SDoorOpenRatioSync door;
         for ( unsigned char i = 2; i < 6; ++i )
         {
             BitStream.Read ( &door );
-            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle, TICK_RATE );
+            pVehicle->SetDoorOpenRatio ( i, door.data.fRatio, TICK_RATE );
         }
     }
 }
@@ -1596,10 +1596,10 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     // Sync door angles.
     if ( CClientVehicleManager::HasDoors ( iModelID ) )
     {
-        SDoorAngleSync door;
+        SDoorOpenRatioSync door;
         for ( unsigned char i = 2; i < 6; ++i )
         {
-            door.data.fAngle = pVehicle->GetDoorAngleRatio ( i );
+            door.data.fRatio = pVehicle->GetDoorOpenRatio ( i );
             BitStream.Write ( &door );
         }
     }

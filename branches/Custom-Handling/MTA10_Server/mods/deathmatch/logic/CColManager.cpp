@@ -171,7 +171,7 @@ void CColManager::DoHitDetectionOld ( const CVector& vecLastPosition, const CVec
 {
     if ( bChildren )
     {
-        list < CElement* > ::const_iterator iter = pEntity->IterBegin ();
+        CChildListType ::const_iterator iter = pEntity->IterBegin ();
         for ( ; iter != pEntity->IterEnd (); iter++ )
         {
             DoHitDetectionOld ( (*iter)->GetLastPosition(), (*iter)->GetPosition(), 0.0f, *iter, pJustThis, true );

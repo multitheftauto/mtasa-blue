@@ -5736,6 +5736,67 @@ int CLuaFunctionDefinitions::SetVehicleTurretPosition ( lua_State *luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetVehicleDoorOpenRatio ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TNUMBER &&
+         lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        CElement* pElement = lua_toelement ( luaVM, 1 );
+        if ( pElement )
+        {
+            unsigned char ucDoor = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            float fRatio = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+            unsigned long ulTime = 0;
+
+            if ( lua_type ( luaVM, 4 ) == LUA_TNUMBER )
+                ulTime = static_cast < unsigned long > ( lua_tonumber ( luaVM, 4 ) );
+
+            if ( CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( pElement, ucDoor, fRatio, ulTime ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleDoorOpenRatio", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleDoorOpenRatio" );
+
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefinitions::GetVehicleDoorOpenRatio ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
+         lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+    {
+        CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
+        {
+            unsigned char ucDoor = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+            float fRatio;
+
+            if ( CStaticFunctionDefinitions::GetVehicleDoorOpenRatio ( pVehicle, ucDoor, fRatio ) )
+            {
+                lua_pushnumber ( luaVM, fRatio );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleDoorOpenRatio", "vehicle", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleDoorOpenRatio" );
+
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
 {
     // Valid position arguments?
@@ -11672,30 +11733,66 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefinitions::GetPacketInfo ( lua_State* luaVM )
+int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
 {
     unsigned long ulBits [ 256 ];
     unsigned long ulCount [ 256 ];
-    g_pNetServer->GetPacketLogData ( ulBits, ulCount );
-    lua_createtable ( luaVM, 256, 1 );
 
-    for ( unsigned int i = 0; i < 256; ++i )
+    lua_createtable ( luaVM, 0, 2 );
+
+    lua_pushstring ( luaVM, "in" );
+    lua_createtable ( luaVM, 0, 2 );
     {
-        lua_createtable ( luaVM, 0, 2 );
-
+        g_pNetServer->GetNetworkUsageData ( CNetServer::STATS_INCOMING_TRAFFIC, ulBits, ulCount );
+        
         lua_pushstring ( luaVM, "bits" );
-        lua_pushnumber ( luaVM, ulBits [ i ] );
+        lua_createtable ( luaVM, 255, 1 );
+        for ( unsigned int i = 0; i < 256; ++i )
+        {
+            lua_pushnumber ( luaVM, ulBits[i] );
+            lua_rawseti ( luaVM, -2, i );
+        }
         lua_rawset ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "count" );
-        lua_pushnumber ( luaVM, ulCount [ i ] );
+        lua_createtable ( luaVM, 255, 1 );
+        for ( unsigned int i = 0; i < 256; ++i )
+        {
+            lua_pushnumber ( luaVM, ulCount[i] );
+            lua_rawseti ( luaVM, -2, i );
+        }
+        lua_rawset ( luaVM, -3 );
+    }
+    lua_rawset ( luaVM, -3 );
+
+    lua_pushstring ( luaVM, "out" );
+    lua_createtable ( luaVM, 0, 2 );
+    {
+        g_pNetServer->GetNetworkUsageData ( CNetServer::STATS_OUTGOING_TRAFFIC, ulBits, ulCount );
+
+        lua_pushstring ( luaVM, "bits" );
+        lua_createtable ( luaVM, 255, 1 );
+        for ( unsigned int i = 0; i < 256; ++i )
+        {
+            lua_pushnumber ( luaVM, ulBits[i] );
+            lua_rawseti ( luaVM, -2, i );
+        }
         lua_rawset ( luaVM, -3 );
 
-        lua_rawseti ( luaVM, -2, i );
+        lua_pushstring ( luaVM, "count" );
+        lua_createtable ( luaVM, 255, 1 );
+        for ( unsigned int i = 0; i < 256; ++i )
+        {
+            lua_pushnumber ( luaVM, ulCount[i] );
+            lua_rawseti ( luaVM, -2, i );
+        }
+        lua_rawset ( luaVM, -3 );
     }
+    lua_rawset ( luaVM, -3 );
 
     return 1;
 }
+
 
 
 int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )

@@ -128,9 +128,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_PickupHitConfirm ( bitStream );
             return true;
 
-        // Functions fro LUA scripts server side
+        // Functions from LUA scripts server side
         case PACKET_ID_LUA:
-            Packet_Lua ( bitStream );
+        case PACKET_ID_LUA_ELEMENT_RPC:
+            Packet_Lua ( ucPacketID, bitStream );
             return true;
 
         case PACKET_ID_TEXT_ITEM:
@@ -1472,7 +1473,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                     case CClientGame::VEHICLE_NOTIFY_IN_ABORT_RETURN:
                     {
                         unsigned char ucDoor;
-                        SDoorAngleSync door;
+                        SDoorOpenRatioSync door;
 
                         bitStream.ReadBits ( &ucDoor, 3 );
                         bitStream.Read ( &door );
@@ -1500,7 +1501,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         }
 
                         // Set the door angle.
-                        pVehicle->SetDoorAngleRatio ( ucDoor + 2, door.data.fAngle, 0, true );
+                        pVehicle->SetDoorOpenRatio ( ucDoor + 2, door.data.fRatio, 0, true );
 
 
                         // Make sure he's removed from the vehicle
@@ -2561,11 +2562,11 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // If the vehicle has doors, read out the open angle ratio.
                     if ( CClientVehicleManager::HasDoors ( usModel ) )
                     {
-                        SDoorAngleSync door;
+                        SDoorOpenRatioSync door;
                         for ( unsigned char i = 0; i < 6; ++i )
                         {
                             bitStream.Read ( &door );
-                            pVehicle->SetDoorAngleRatio ( i, door.data.fAngle, 0, true );
+                            pVehicle->SetDoorOpenRatio ( i, door.data.fRatio, 0, true );
                         }
                     }
 
@@ -3367,11 +3368,11 @@ void CPacketHandler::Packet_PickupHitConfirm ( NetBitStreamInterface& bitStream 
 }
 
 
-void CPacketHandler::Packet_Lua ( NetBitStreamInterface& bitStream )
+void CPacketHandler::Packet_Lua ( unsigned char ucPacketID, NetBitStreamInterface& bitStream )
 {
     if ( g_pClientGame->m_pRPCFunctions )
     {
-        g_pClientGame->m_pRPCFunctions->ProcessPacket ( bitStream );
+        g_pClientGame->m_pRPCFunctions->ProcessPacket ( ucPacketID, bitStream );
     }
 }
 
