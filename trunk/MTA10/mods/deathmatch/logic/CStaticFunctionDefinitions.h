@@ -428,8 +428,6 @@ public:
     static bool                         IsWorldSpecialPropertyEnabled       ( const char* szPropName );
     static bool                         SetCloudsEnabled                    ( bool bEnabled );
     static bool                         GetCloudsEnabled                    ( void );
-    static bool                         SetHeatHazeEnabled                  ( int iEnabled );
-    static int                          GetHeatHazeEnabled                  ( void );
     static bool                         GetTrafficLightState                ( unsigned char& ucState );
     static bool                         AreTrafficLightsLocked              ( bool& bLocked );
 

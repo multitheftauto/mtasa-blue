@@ -127,7 +127,6 @@ CGame::CGame ( void )
     m_GlitchNames["crouchbug"] = GLITCH_CROUCHBUG;
 
     m_bCloudsEnabled = true;
-    m_iHeatHazeEnabled = 2;
 
     m_llLastAnnouceTime = 0;
     m_pOpenPortsTester = NULL;
@@ -159,7 +158,6 @@ void CGame::ResetMapInfo ( void )
     m_ucSkyGradientBR = 0, m_ucSkyGradientBG = 0, m_ucSkyGradientBB = 0;
     m_bHasSkyGradient = false;
     m_bCloudsEnabled = true;
-    m_iHeatHazeEnabled = 2;
 
     m_bTrafficLightsLocked = false;
     m_ucTrafficLightState = 0;
@@ -3078,13 +3076,4 @@ void CGame::SetCloudsEnabled ( bool bEnabled )
 bool CGame::GetCloudsEnabled ( void )
 {
     return m_bCloudsEnabled;
-}
-
-void CGame::SetHeatHazeEnabled ( int iEnabled )
-{
-    m_iHeatHazeEnabled = iEnabled;
-}
-int CGame::GetHeatHazeEnabled ( void )
-{
-    return m_iHeatHazeEnabled;
 }

@@ -48,6 +48,7 @@ public:
     void                        SetCenterOfWorld            ( CEntity * entity, CVector * vecPosition, FLOAT fHeading );
     void                        DisablePadHandler           ( bool bDisabled );
     void                        DisableEnterExitVehicleKey  ( bool bDisabled );
+    void                        DisableHeatHazeEffect       ( bool bDisable );
     void                        DisableAllVehicleWeapons    ( bool bDisable );
     void                        DisableZoneNames            ( bool bDisabled );
     void                        DisableBirds                ( bool bDisabled );
@@ -80,7 +81,6 @@ public:
     void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
     void                        ResetWater                  ();
     void                        SetCloudsEnabled            ( bool bDisabled );
-    void                        SetHeatHazeEnabled          ( int iEnabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
     bool                        AreInteriorSoundsEnabled    ();
     void                        SetInteriorSoundsEnabled    ( bool bEnabled );

@@ -1928,13 +1928,9 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     g_pClientGame->m_bShowNametags  = flags.data.bShowNametags;
     g_pClientGame->m_bShowRadar     = flags.data.bShowRadar;
     g_pClientGame->m_bCloudsEnabled = flags.data.bCloudsEnabled;
-    g_pClientGame->m_iHeatHazeEnabled = flags.data.ucHeatHazeEnabled;
    
     //Set Clouds
     g_pMultiplayer->SetCloudsEnabled( g_pClientGame->GetCloudsEnabled() ); 
-   
-    //Set HeatHaze
-    g_pMultiplayer->SetHeatHazeEnabled( g_pClientGame->GetHeatHazeEnabled() ); 
 
     // Read out the gravity
     float fGravity;
@@ -1999,10 +1995,16 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     if ( !bitStream.Read ( &funBugs ) )
         return;
 
+    
+    bool bCrouchBug = false;
+    if ( bitStream.Version () >= 0x15 )
+        if ( !bitStream.ReadBit ( bCrouchBug ) )
+            return;
+
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_QUICKRELOAD, funBugs.data.bQuickReload );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTFIRE, funBugs.data.bFastFire );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTMOVE, funBugs.data.bFastMove );
-    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, funBugs.data.bCrouchBug );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, bCrouchBug );
 
     float fJetpackMaxHeight = 100;
     if ( !bitStream.Read ( fJetpackMaxHeight ) )

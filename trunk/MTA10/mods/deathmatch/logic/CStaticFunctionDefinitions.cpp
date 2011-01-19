@@ -5501,7 +5501,6 @@ bool CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled ( const char* sz
 {
     return g_pGame->SetCheatEnabled ( szPropName, bEnabled );
 }
-
 bool CStaticFunctionDefinitions::SetCloudsEnabled ( bool bEnabled )
 {
     g_pMultiplayer->SetCloudsEnabled ( bEnabled );
@@ -5511,17 +5510,6 @@ bool CStaticFunctionDefinitions::SetCloudsEnabled ( bool bEnabled )
 bool CStaticFunctionDefinitions::GetCloudsEnabled ( )
 {
     return g_pClientGame->GetCloudsEnabled ();
-}
-
-bool CStaticFunctionDefinitions::SetHeatHazeEnabled ( int iEnabled )
-{
-    g_pMultiplayer->SetHeatHazeEnabled ( iEnabled );
-    g_pClientGame->SetHeatHazeEnabled ( iEnabled );
-    return true;
-}
-int CStaticFunctionDefinitions::GetHeatHazeEnabled ( )
-{
-    return g_pClientGame->GetHeatHazeEnabled ();
 }
 
 

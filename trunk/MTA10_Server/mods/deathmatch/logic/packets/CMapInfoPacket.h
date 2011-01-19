@@ -44,7 +44,6 @@ public:
                                                       unsigned char ucSkyGradientBB = 0,
                                                       unsigned short usFPSLimit = 36,
                                                       bool bCloudsEnabled = true,
-                                                      int iHeatHazeEnabled = true,
                                                       float fJetpackMaxHeight = 100,
                                                       bool bOverrideWaterColor = false,
                                                       unsigned char ucWaterRed = 0,
@@ -76,7 +75,6 @@ private:
     unsigned short          m_usFPSLimit;
     bool*                   m_pbGarageStates;
     bool                    m_bCloudsEnabled;
-    int                     m_iHeatHazeEnabled;
     float                   m_fJetpackMaxHeight;
     bool                    m_bOverrideWaterColor;
     unsigned char           m_ucWaterRed;

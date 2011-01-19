@@ -1240,31 +1240,9 @@ void CMultiplayerSA::DisablePadHandler ( bool bDisabled )
         MemPut < BYTE > ( 0x7449F0, 0x8B );  //         *(BYTE *)0x7449F0 = 0x8B;
 }
 
-// 0-off  1-on  2-timed
-void CMultiplayerSA::SetHeatHazeEnabled ( int iEnabled )
+void CMultiplayerSA::DisableHeatHazeEffect ( bool bDisable )
 {
-    int iHourStart, iHourEnd;
-    switch ( iEnabled )
-    {
-        case 2:
-            iHourStart = 10;    // Default times
-            iHourEnd = 19;
-            break;
-
-        case 1:
-            iHourStart = 0;    // 24 hrs
-            iHourEnd = 24;
-            break;
-
-        case 0:
-        default:
-            iHourStart = 38;    // 0 hrs
-            iHourEnd = 39;
-            break;
-    }
-
-    MemPut < int > ( 0x8D50D4, iHourStart );
-    MemPut < int > ( 0x8D50D8, iHourEnd );
+    MemPut < bool > ( 0xC402BA, bDisable );  //     *(bool *)0xC402BA = bDisable;
 }
 
 void CMultiplayerSA::DisableAllVehicleWeapons ( bool bDisable )
