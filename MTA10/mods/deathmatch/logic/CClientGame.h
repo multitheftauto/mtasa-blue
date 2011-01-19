@@ -348,9 +348,6 @@ public:
     bool                                SetCloudsEnabled                ( bool bEnabled );
     bool                                GetCloudsEnabled                ( void );
 
-    bool                                SetHeatHazeEnabled              ( int iEnabled );
-    int                                 GetHeatHazeEnabled              ( void );
-
     inline CTransferBox*                GetTransferBox                  ( void )                        { return m_pTransferBox; };
 
     void                                ChangeVehicleWeapon             ( bool bNext );
@@ -583,7 +580,6 @@ private:
 
     //Clouds Enabled
     bool                                m_bCloudsEnabled;
-    int                                 m_iHeatHazeEnabled;
 
     unsigned long                       m_ulMinuteDuration;
 
