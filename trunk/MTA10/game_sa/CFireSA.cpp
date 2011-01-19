@@ -51,7 +51,7 @@ VOID CFireSA::SetPosition ( CVector & vecPosition )
 {
     DEBUG_TRACE("VOID CFireSA::SetPosition ( CVector & vecPosition )");
     this->internalInterface->entityTarget = 0;
-    memcpy(&internalInterface->vecPosition, &vecPosition, sizeof(CVector));
+    MemCpy8 (&internalInterface->vecPosition, &vecPosition, sizeof(CVector));
 }
 
 /**

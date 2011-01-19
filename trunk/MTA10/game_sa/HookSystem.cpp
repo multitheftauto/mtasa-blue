@@ -19,10 +19,10 @@ BOOL HookInstall( DWORD dwInstallAddress,
                   int iJmpCodeSize )
 {
     BYTE JumpBytes[MAX_JUMPCODE_SIZE];
-    memset ( JumpBytes, 0x90, MAX_JUMPCODE_SIZE );
+    MemSet8 ( JumpBytes, 0x90, MAX_JUMPCODE_SIZE );
     if ( CreateJump ( dwInstallAddress, dwHookHandler, JumpBytes ) )
     {
-        memcpy ( (PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize );
+        MemCpy8 ( (PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize );
         return TRUE;
     }
     else
@@ -36,6 +36,6 @@ BOOL HookInstall( DWORD dwInstallAddress,
 BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray )
 {
     ByteArray[0] = 0xE9;
-    *(DWORD *)(&ByteArray[1]) = dwTo - (dwFrom + 5);
+    MemPut < DWORD > ( &ByteArray[1], dwTo - (dwFrom + 5) );  //     *(DWORD *)(&ByteArray[1]) = dwTo - (dwFrom + 5);
     return ByteArray;
 }

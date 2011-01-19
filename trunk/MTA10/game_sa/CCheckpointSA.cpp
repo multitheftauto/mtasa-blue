@@ -15,7 +15,7 @@
 VOID CCheckpointSA::SetPosition(CVector * vecPosition)
 {
     DEBUG_TRACE("VOID CCheckpointSA::SetPosition(CVector * vecPosition)");
-    memcpy(&this->GetInterface()->m_pos, vecPosition, sizeof(CVector));
+    MemCpy8 (&this->GetInterface()->m_pos, vecPosition, sizeof(CVector));
 }
 
 CVector * CCheckpointSA::GetPosition()
@@ -27,7 +27,7 @@ CVector * CCheckpointSA::GetPosition()
 VOID CCheckpointSA::SetPointDirection(CVector * vecPointDirection)
 {
     DEBUG_TRACE("VOID CCheckpointSA::SetPointDirection(CVector * vecPointDirection)");
-    memcpy(&this->GetInterface()->m_pointDir, vecPointDirection, sizeof(CVector));
+    MemCpy8 (&this->GetInterface()->m_pointDir, vecPointDirection, sizeof(CVector));
 }
 
 CVector * CCheckpointSA::GetPointDirection()

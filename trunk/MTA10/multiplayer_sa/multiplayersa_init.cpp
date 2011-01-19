@@ -15,6 +15,7 @@
 
 CGame* pGameInterface = 0;
 CMultiplayerSA* pMultiplayer = 0;
+CNet* g_pNet = NULL;
 
 //-----------------------------------------------------------
 // This function uses the initialized data sections of the executables
@@ -26,7 +27,9 @@ CMultiplayer* InitMultiplayerInterface(CCoreInterface* pCore)
 {   
     // set the internal pointer to the game class
     pGameInterface = pCore->GetGame ();
+    g_pNet = pCore->GetNetwork ();
     assert ( pGameInterface );
+    assert ( g_pNet );
 
     // create an instance of our multiplayer class
     pMultiplayer = new CMultiplayerSA;
@@ -37,3 +40,14 @@ CMultiplayer* InitMultiplayerInterface(CCoreInterface* pCore)
 }
 
 //-----------------------------------------------------------
+
+
+void MemSet8 ( void* dwDest, int cValue, uint uiAmount )
+{
+    g_pNet->ResetStub ( 'MSet', dwDest, cValue, uiAmount );
+}
+
+void MemCpy8 ( void* dwDest, const void* dwSrc, uint uiAmount )
+{
+    g_pNet->ResetStub ( 'MCpy', dwDest, dwSrc, uiAmount );
+}

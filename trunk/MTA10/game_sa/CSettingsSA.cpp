@@ -115,7 +115,7 @@ unsigned int CSettingsSA::GetUsertrackMode ( void )
 
 void CSettingsSA::SetUsertrackMode ( unsigned int uiMode )
 {
-    *(BYTE *)VAR_bUsertrackMode = uiMode;
+    MemPut < BYTE > ( VAR_bUsertrackMode, uiMode );  //     *(BYTE *)VAR_bUsertrackMode = uiMode;
 }
 
 bool CSettingsSA::IsUsertrackAutoScan ( void )
@@ -126,7 +126,7 @@ bool CSettingsSA::IsUsertrackAutoScan ( void )
 
 void CSettingsSA::SetUsertrackAutoScan ( bool bEnable )
 {
-    *(BYTE *)VAR_bUsertrackAutoScan = ( ( bEnable ) ? 1 : 0 );
+    MemPut < BYTE > ( VAR_bUsertrackAutoScan, ( ( bEnable ) ? 1 : 0 ) );  //     *(BYTE *)VAR_bUsertrackAutoScan = ( ( bEnable ) ? 1 : 0 );
 }
 
 bool CSettingsSA::IsRadioEqualizerEnabled ( void )
@@ -137,7 +137,7 @@ bool CSettingsSA::IsRadioEqualizerEnabled ( void )
 
 void CSettingsSA::SetRadioEqualizerEnabled ( bool bEnable )
 {
-    *(BYTE *)VAR_bRadioEqualizer = ( ( bEnable ) ? 1 : 0 );
+    MemPut < BYTE > ( VAR_bRadioEqualizer, ( ( bEnable ) ? 1 : 0 ) );  //     *(BYTE *)VAR_bRadioEqualizer = ( ( bEnable ) ? 1 : 0 );
 }
 
 bool CSettingsSA::IsRadioAutotuneEnabled ( void )
@@ -148,7 +148,7 @@ bool CSettingsSA::IsRadioAutotuneEnabled ( void )
 
 void CSettingsSA::SetRadioAutotuneEnabled ( bool bEnable )
 {
-    *(BYTE *)VAR_bRadioAutotune = ( ( bEnable ) ? 1 : 0 );
+    MemPut < BYTE > ( VAR_bRadioAutotune, ( ( bEnable ) ? 1 : 0 ) );  //     *(BYTE *)VAR_bRadioAutotune = ( ( bEnable ) ? 1 : 0 );
 }
 
 // Minimum is 0.925 and maximum is 1.8
@@ -187,7 +187,7 @@ unsigned int CSettingsSA::GetFXQuality ( )
 
 void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 {
-    *(BYTE *)VAR_bFxQuality = fxQualityId;
+    MemPut < BYTE > ( VAR_bFxQuality, fxQualityId );  //     *(BYTE *)VAR_bFxQuality = fxQualityId;
 }
 
 float CSettingsSA::GetMouseSensitivity ( )
@@ -198,7 +198,7 @@ float CSettingsSA::GetMouseSensitivity ( )
 
 void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
 {
-    *(FLOAT *)VAR_fMouseSensitivity = fSensitivity;
+    MemPut < FLOAT > ( VAR_fMouseSensitivity, fSensitivity );  //     *(FLOAT *)VAR_fMouseSensitivity = fSensitivity;
 }
 
 unsigned int CSettingsSA::GetAntiAliasing ( )

@@ -104,11 +104,11 @@ void CCoronasSA::DisableSunAndMoon ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DoSunAndMoon;
-        *(BYTE *)FUNC_DoSunAndMoon = 0xC3;
+        MemPut < BYTE > ( FUNC_DoSunAndMoon, 0xC3 );  //         *(BYTE *)FUNC_DoSunAndMoon = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_DoSunAndMoon = byteOriginal;
+        MemPut < BYTE > ( FUNC_DoSunAndMoon, byteOriginal );  //         *(BYTE *)FUNC_DoSunAndMoon = byteOriginal;
         byteOriginal = 0;
     }
 }

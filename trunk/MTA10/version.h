@@ -74,7 +74,7 @@
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
 #define _NETCODE_VERSION                0x019C      // Increment when net messages change
-#define _CLIENT_NET_MODULE_VERSION      0x0024      // Lvl9 wizards only
+#define _CLIENT_NET_MODULE_VERSION      0x0025      // Lvl9 wizards only
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
 #if defined(MTA_DM_CONNECT_TO_PUBLIC)

@@ -17,6 +17,7 @@
 #define MTA_CLIENT
 #include "SharedUtil.h"
 #include <core/CCoreInterface.h>
+#include <net/CNet.h>
 #include <game/CGame.h>
 #include <CMatrix_Pad.h>
 

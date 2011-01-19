@@ -97,7 +97,7 @@ public:
     FLOAT                       GetTargetRange() { return GetInterface()->m_fTargetRange; };
     VOID                        SetTargetRange ( FLOAT fRange ) { GetInterface()->m_fTargetRange = fRange; };
     CVector                     * GetFireOffset() { return &GetInterface()->m_vecFireOffset; };
-    VOID                        SetFireOffset ( CVector * vecFireOffset ) { memcpy(&GetInterface()->m_vecFireOffset, vecFireOffset, sizeof(CVector)); };
+    VOID                        SetFireOffset ( CVector * vecFireOffset ) { MemCpy8 (&GetInterface()->m_vecFireOffset, vecFireOffset, sizeof(CVector)); };
     short                       GetDamagePerHit() { return GetInterface()->m_nDamage; };
     VOID                        SetDamagePerHit ( short sDamagePerHit ) { GetInterface()->m_nDamage = sDamagePerHit; };
     float                       GetAccuracy ( void )                        { return internalInterface->m_fAccuracy; };

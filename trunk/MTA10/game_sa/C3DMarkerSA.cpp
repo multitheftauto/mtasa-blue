@@ -17,20 +17,20 @@
 void C3DMarkerSA::GetMatrix ( CMatrix * pMatrix )
 {
     CMatrix_Padded * mat = &GetInterface ()->m_mat;
-    memcpy ( &pMatrix->vPos, &mat->vPos, sizeof ( CVector ) );
-    memcpy ( &pMatrix->vFront, &mat->vFront, sizeof ( CVector ) );
-    memcpy ( &pMatrix->vRight, &mat->vRight, sizeof ( CVector ) );
-    memcpy ( &pMatrix->vUp, &mat->vUp, sizeof ( CVector ) );
+    MemCpy8 ( &pMatrix->vPos, &mat->vPos, sizeof ( CVector ) );
+    MemCpy8 ( &pMatrix->vFront, &mat->vFront, sizeof ( CVector ) );
+    MemCpy8 ( &pMatrix->vRight, &mat->vRight, sizeof ( CVector ) );
+    MemCpy8 ( &pMatrix->vUp, &mat->vUp, sizeof ( CVector ) );
 }
 
 
 void C3DMarkerSA::SetMatrix ( CMatrix * pMatrix )
 {
     CMatrix_Padded * mat = &GetInterface ()->m_mat;
-    memcpy ( &mat->vPos, &pMatrix->vPos, sizeof ( CVector ) );
-    memcpy ( &mat->vFront, &pMatrix->vFront, sizeof ( CVector ) );
-    memcpy ( &mat->vRight, &pMatrix->vRight, sizeof ( CVector ) );
-    memcpy ( &mat->vUp, &pMatrix->vUp, sizeof ( CVector ) );
+    MemCpy8 ( &mat->vPos, &pMatrix->vPos, sizeof ( CVector ) );
+    MemCpy8 ( &mat->vFront, &pMatrix->vFront, sizeof ( CVector ) );
+    MemCpy8 ( &mat->vRight, &pMatrix->vRight, sizeof ( CVector ) );
+    MemCpy8 ( &mat->vUp, &pMatrix->vUp, sizeof ( CVector ) );
 }
 
 VOID C3DMarkerSA::SetPosition(CVector * vecPosition)
