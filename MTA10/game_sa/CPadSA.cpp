@@ -17,39 +17,39 @@
 CControllerState * CPadSA::GetCurrentControllerState(CControllerState * ControllerState)
 {
     DEBUG_TRACE("CControllerState * CPadSA::GetCurrentControllerState(CControllerState * ControllerState)");
-    MemCpy8 (ControllerState, &this->internalInterface->NewState, sizeof(CControllerState));
+    MemCpy (ControllerState, &this->internalInterface->NewState, sizeof(CControllerState));
     return ControllerState;
 }
 
 CControllerState * CPadSA::GetLastControllerState(CControllerState * ControllerState)
 {
     DEBUG_TRACE("CControllerState * CPadSA::GetLastControllerState(CControllerState * ControllerState)");
-    MemCpy8 (ControllerState, &this->internalInterface->OldState, sizeof(CControllerState));
+    MemCpy (ControllerState, &this->internalInterface->OldState, sizeof(CControllerState));
     return ControllerState;
 }
 
 VOID CPadSA::SetCurrentControllerState(CControllerState * ControllerState)
 {
     DEBUG_TRACE("VOID CPadSA::SetCurrentControllerState(CControllerState * ControllerState)");
-    MemCpy8 (&this->internalInterface->NewState, ControllerState, sizeof(CControllerState));
+    MemCpy (&this->internalInterface->NewState, ControllerState, sizeof(CControllerState));
 }
 
 VOID CPadSA::SetLastControllerState(CControllerState * ControllerState)
 {
     DEBUG_TRACE("VOID CPadSA::SetLastControllerState(CControllerState * ControllerState)");
-    MemCpy8 (&this->internalInterface->OldState, ControllerState, sizeof(CControllerState));
+    MemCpy (&this->internalInterface->OldState, ControllerState, sizeof(CControllerState));
 }
 
 VOID CPadSA::Store()
 {
     DEBUG_TRACE("VOID CPadSA::Store()");
-    MemCpy8 (&this->StoredPad, this->internalInterface, sizeof(CPadSAInterface));
+    MemCpy (&this->StoredPad, this->internalInterface, sizeof(CPadSAInterface));
 }
 
 VOID CPadSA::Restore()
 {
     DEBUG_TRACE("VOID CPadSA::Restore()");
-    MemCpy8 (this->internalInterface, &this->StoredPad, sizeof(CPadSAInterface));
+    MemCpy (this->internalInterface, &this->StoredPad, sizeof(CPadSAInterface));
 }
 
 bool CPadSA::IsEnabled ( void )

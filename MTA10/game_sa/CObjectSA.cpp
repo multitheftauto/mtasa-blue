@@ -52,7 +52,7 @@ CObjectSA::CObjectSA( DWORD dwModel )
 
     DWORD dwFunc = 0x538090; // CFileLoader__LoadObjectInstance
     CFileObjectInstance fileLoader;
-    MemSet8 (&fileLoader, 0, sizeof(CFileObjectInstance));
+    MemSet (&fileLoader, 0, sizeof(CFileObjectInstance));
     fileLoader.modelId = dwModel;
     fileLoader.rr = 1;
     fileLoader.areaNumber = 0;

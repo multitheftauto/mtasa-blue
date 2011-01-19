@@ -632,12 +632,12 @@ bool CWaterManagerSA::DeletePoly ( CWaterPoly* pPoly )
 
     if ( pPoly->GetType () == WATER_POLY_QUAD )
     {
-        MemSet8 ( ((CWaterQuadSA *)pPoly)->GetInterface (), 0, sizeof ( CWaterQuadSAInterface ) );
+        MemSet ( ((CWaterQuadSA *)pPoly)->GetInterface (), 0, sizeof ( CWaterQuadSAInterface ) );
         (*(DWORD *)VAR_NumWaterQuads)--;
     }
     else
     {
-        MemSet8 ( ((CWaterTriangleSA *)pPoly)->GetInterface (), 0, sizeof ( CWaterTriangleSAInterface ) );
+        MemSet ( ((CWaterTriangleSA *)pPoly)->GetInterface (), 0, sizeof ( CWaterTriangleSAInterface ) );
         (*(DWORD *)VAR_NumWaterTriangles)--;
     }
     return true;
@@ -703,8 +703,8 @@ void CWaterManagerSA::SetWaveLevel ( float fWaveLevel )
         // DISABLE the game resetting the wave level
         MemPut < BYTE > ( 0x72C665, 0xDD );  //         *(BYTE *)0x72C665 = 0xDD;
         MemPut < BYTE > ( 0x72C666, 0xD8 );  //         *(BYTE *)0x72C666 = 0xD8;
-        MemSet8 ( (void*)0x72C667, 0x90, 4 );
-        MemSet8 ( (void*)0x72C659, 0x90, 10 );
+        MemSet ( (void*)0x72C667, 0x90, 4 );
+        MemSet ( (void*)0x72C659, 0x90, 10 );
 
         MemPut < float > ( VAR_WaveLevel, fWaveLevel );  //         *(float *)VAR_WaveLevel = fWaveLevel;
     }
@@ -791,7 +791,7 @@ void CWaterManagerSA::UndoChanges ( void* pChangeSource )
 void CWaterManagerSA::RebuildIndex ()
 {
     // Rebuilds the list of polygons of each zone
-    MemSet8 ( (void *)ARRAY_WaterZones, 0, NUM_WaterZones * sizeof ( CWaterPolyEntrySAInterface ) );
+    MemSet ( (void *)ARRAY_WaterZones, 0, NUM_WaterZones * sizeof ( CWaterPolyEntrySAInterface ) );
     MemPut < DWORD > ( VAR_NumWaterZonePolys, 0 );  //     *(DWORD *)VAR_NumWaterZonePolys = 0;
     ( (BuildWaterIndex_t) FUNC_BuildWaterIndex ) ();
 }
@@ -801,8 +801,8 @@ void CWaterManagerSA::Reset ()
     // Resets all water to the original single player configuration
     UndoChanges ();
 
-    MemSet8 ( m_QuadPool, 0, sizeof ( m_QuadPool ) );
-    MemSet8 ( m_TrianglePool, 0, sizeof ( m_TrianglePool ) );
+    MemSet ( m_QuadPool, 0, sizeof ( m_QuadPool ) );
+    MemSet ( m_TrianglePool, 0, sizeof ( m_TrianglePool ) );
 
     ( (ReadWaterConfiguration_t) FUNC_ReadWaterConfiguration )();
 

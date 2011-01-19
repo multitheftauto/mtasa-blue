@@ -92,14 +92,14 @@ void CWeatherSA::SetAmountOfRain ( float fAmount )
     MemPut < BYTE > ( 0x72C686, 0xDD );  //     *(BYTE *)0x72C686 = 0xDD;
     MemPut < BYTE > ( 0x72C687, 0xD8 );  //     *(BYTE *)0x72C687 = 0xD8;
 
-    MemSet8 ( (void*)0x72C688, 0x90, 4 );
+    MemSet ( (void*)0x72C688, 0x90, 4 );
 
     MemPut < BYTE > ( 0x72BC92, 0xDD );  //     *(BYTE *)0x72BC92 = 0xDD;
     MemPut < BYTE > ( 0x72BC93, 0xD8 );  //     *(BYTE *)0x72BC93 = 0xD8;
 
-    MemSet8 ( (void*)0x72BC94, 0x90, 4 );
+    MemSet ( (void*)0x72BC94, 0x90, 4 );
     
-    MemSet8 ( (void*)0x72BC72, 0x90, 5 );
+    MemSet ( (void*)0x72BC72, 0x90, 5 );
 
     // Set the amount of rain
     *VAR_AmountOfRain = fAmount;
@@ -111,7 +111,7 @@ void CWeatherSA::ResetAmountOfRain ( void )
     BYTE originalFstp1[6] = {0xD9, 0x1D, 0x24, 0x13, 0xC8, 0x00}; // 0x72BC92
     BYTE originalFstp2[6] = {0xD9, 0x1D, 0x24, 0x13, 0xC8, 0x00}; // 0x72C686
 
-    MemCpy8 ( (LPVOID)0x72BC72, &originalMov,   5 );
-    MemCpy8 ( (LPVOID)0x72BC92, &originalFstp1, 6 );
-    MemCpy8 ( (LPVOID)0x72C686, &originalFstp2, 6 );
+    MemCpy ( (LPVOID)0x72BC72, &originalMov,   5 );
+    MemCpy ( (LPVOID)0x72BC92, &originalFstp1, 6 );
+    MemCpy ( (LPVOID)0x72C686, &originalFstp2, 6 );
 }

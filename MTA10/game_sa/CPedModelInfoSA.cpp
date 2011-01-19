@@ -16,7 +16,7 @@
 
 CPedModelInfoSAInterface::CPedModelInfoSAInterface ( void )
 {
-    MemSet8 ( this, 0, sizeof ( CPedModelInfoSAInterface ) );
+    MemSet ( this, 0, sizeof ( CPedModelInfoSAInterface ) );
     VFTBL = ( CBaseModelInfo_SA_VTBL * ) VAR_CPedModelInfo_VTBL;
     pColModel = ( CColModelSAInterface * ) VAR_CTempColModels_ModelPed1;
     MemPut < DWORD > ( &pad, 0xFFFFFFFF );  //     * ( DWORD * ) &pad = 0xFFFFFFFF;

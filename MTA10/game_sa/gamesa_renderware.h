@@ -201,8 +201,8 @@ CClothesBuilder_CopyTexture_t   CClothesBuilder_CopyTexture     = (CClothesBuild
 // Matrix copying
 void RwFrameCopyMatrix ( RwFrame * dst, RwFrame * src ) {
     if ( dst == NULL || src == NULL ) return;
-    MemCpy8 (&dst->modelling,&src->modelling,sizeof(RwMatrix));
-    MemCpy8 (&dst->ltm,&src->ltm,sizeof(RwMatrix));
+    MemCpy (&dst->modelling,&src->modelling,sizeof(RwMatrix));
+    MemCpy (&dst->ltm,&src->ltm,sizeof(RwMatrix));
 }
 
 // Recursive RwFrame children searching function

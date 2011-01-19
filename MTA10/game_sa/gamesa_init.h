@@ -18,49 +18,49 @@
 extern CGameSA * pGame;
 
 
-void MemSet8 ( void* dwDest, int cValue, uint uiAmount );
-void MemCpy8 ( void* dwDest, const void* dwSrc, uint uiAmount );
+void MemSet ( void* dwDest, int cValue, uint uiAmount );
+void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount );
 
 template < class T, class U >
 void MemPut ( U ptr, const T value )
 {
-    MemCpy8 ( (void*)ptr, &value, sizeof ( T ) );
+    MemCpy ( (void*)ptr, &value, sizeof ( T ) );
 }
 
 template < class T, class U >
 void MemAdd ( U ptr, const T value )
 {
     T current;
-    MemCpy8 ( &current, (void*)ptr, sizeof ( T ) );
+    MemCpy ( &current, (void*)ptr, sizeof ( T ) );
     current += value;
-    MemCpy8 ( (void*)ptr, &current, sizeof ( T ) );
+    MemCpy ( (void*)ptr, &current, sizeof ( T ) );
 }
 
 template < class T, class U >
 void MemSub ( U ptr, const T value )
 {
     T current;
-    MemCpy8 ( &current, (void*)ptr, sizeof ( T ) );
+    MemCpy ( &current, (void*)ptr, sizeof ( T ) );
     current -= value;
-    MemCpy8 ( (void*)ptr, &current, sizeof ( T ) );
+    MemCpy ( (void*)ptr, &current, sizeof ( T ) );
 }
 
 template < class T, class U >
 void MemAnd ( U ptr, const T value )
 {
     T current;
-    MemCpy8 ( &current, (void*)ptr, sizeof ( T ) );
+    MemCpy ( &current, (void*)ptr, sizeof ( T ) );
     current &= value;
-    MemCpy8 ( (void*)ptr, &current, sizeof ( T ) );
+    MemCpy ( (void*)ptr, &current, sizeof ( T ) );
 }
 
 template < class T, class U >
 void MemOr ( U ptr, const T value )
 {
     T current;
-    MemCpy8 ( &current, (void*)ptr, sizeof ( T ) );
+    MemCpy ( &current, (void*)ptr, sizeof ( T ) );
     current |= value;
-    MemCpy8 ( (void*)ptr, &current, sizeof ( T ) );
+    MemCpy ( (void*)ptr, &current, sizeof ( T ) );
 }
 
 #endif

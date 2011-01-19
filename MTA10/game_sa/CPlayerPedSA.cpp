@@ -66,7 +66,7 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
     // Copy the local player data so we're defaulted to something good
     CPlayerPedSA* pLocalPlayerSA = dynamic_cast < CPlayerPedSA* > ( pools->GetPedFromRef ( (DWORD)1 ) );
     if ( pLocalPlayerSA )
-        MemCpy8 ( m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface ())->pPlayerData, sizeof ( CPlayerPedDataSAInterface ) );
+        MemCpy ( m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface ())->pPlayerData, sizeof ( CPlayerPedDataSAInterface ) );
 
     // Replace the player ped data in our ped interface with the one we just created
     GetPlayerPedInterface ()->pPlayerData = m_pData;

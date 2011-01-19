@@ -17,7 +17,7 @@ CHandlingEntrySA::CHandlingEntrySA ( void )
 {
     // Create a new interface and zero it
     m_pHandlingSA = new tHandlingDataSA;
-    MemSet8 ( m_pHandlingSA, 0, sizeof ( tHandlingDataSA ) );
+    MemSet ( m_pHandlingSA, 0, sizeof ( tHandlingDataSA ) );
     m_bDeleteInterface = true;
 
     // We have no original data
@@ -40,7 +40,7 @@ CHandlingEntrySA::CHandlingEntrySA ( tHandlingDataSA* pOriginal )
     m_pHandlingSA = NULL;
     m_pOriginalData = NULL;
     m_bDeleteInterface = false;
-    MemCpy8 ( &m_Handling, pOriginal, sizeof ( tHandlingDataSA ) );
+    MemCpy ( &m_Handling, pOriginal, sizeof ( tHandlingDataSA ) );
 }
 
 
@@ -95,7 +95,7 @@ void CHandlingEntrySA::Recalculate ( void )
     if ( m_pHandlingSA )
     {
         // Copy our stored field to GTA's
-        MemCpy8 ( m_pHandlingSA, &m_Handling, sizeof ( m_Handling ) );
+        MemCpy ( m_pHandlingSA, &m_Handling, sizeof ( m_Handling ) );
 
         // Call GTA's function that calculates the final values from the read values
         DWORD dwFunc = 0x6F5080;
@@ -115,7 +115,7 @@ void CHandlingEntrySA::Restore ( void )
     if ( m_pOriginalData )
     {
         // Copy default stuff over gta's data
-        MemCpy8 ( &m_Handling, m_pOriginalData, sizeof ( tHandlingDataSA ) );
+        MemCpy ( &m_Handling, m_pOriginalData, sizeof ( tHandlingDataSA ) );
 
         // Recalculate the fields
         Recalculate ();
