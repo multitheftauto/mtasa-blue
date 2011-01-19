@@ -73,7 +73,7 @@ VOID CHudSA::SetVehicleName( char * szName )
     }
     else
     {
-        *(DWORD *)VAR_VehicleNamePtr = 0;
+        MemPut < DWORD > ( VAR_VehicleNamePtr, 0 );  //         *(DWORD *)VAR_VehicleNamePtr = 0;
     }
 }
 
@@ -94,7 +94,7 @@ VOID CHudSA::SetZoneName( char * szName )
     }
     else
     {
-        *(DWORD *)VAR_ZoneNamePtr = 0;
+        MemPut < DWORD > ( VAR_ZoneNamePtr, 0 );  //         *(DWORD *)VAR_ZoneNamePtr = 0;
     }
 }
 
@@ -102,9 +102,9 @@ VOID CHudSA::Disable ( bool bDisabled )
 {
     DEBUG_TRACE("VOID CHudSA::Disable ( bool bDisabled )");
     if ( bDisabled )
-        *(BYTE *)FUNC_Draw = 0xC3;
+        MemPut < BYTE > ( FUNC_Draw, 0xC3 );  //         *(BYTE *)FUNC_Draw = 0xC3;
     else
-        *(BYTE *)FUNC_Draw = 0x80;
+        MemPut < BYTE > ( FUNC_Draw, 0x80 );  //         *(BYTE *)FUNC_Draw = 0x80;
 
 }
 
@@ -174,11 +174,11 @@ void CHudSA::DisableAmmo ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawAmmo;
-        *(BYTE *)FUNC_DrawAmmo = 0xC3;
+        MemPut < BYTE > ( FUNC_DrawAmmo, 0xC3 );  //         *(BYTE *)FUNC_DrawAmmo = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_DrawAmmo = byteOriginal;
+        MemPut < BYTE > ( FUNC_DrawAmmo, byteOriginal );  //         *(BYTE *)FUNC_DrawAmmo = byteOriginal;
         byteOriginal = 0;
     }
 }
@@ -189,11 +189,11 @@ void CHudSA::DisableWeaponIcon ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawWeaponIcon;
-        *(BYTE *)FUNC_DrawWeaponIcon = 0xC3;
+        MemPut < BYTE > ( FUNC_DrawWeaponIcon, 0xC3 );  //         *(BYTE *)FUNC_DrawWeaponIcon = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_DrawWeaponIcon = byteOriginal;
+        MemPut < BYTE > ( FUNC_DrawWeaponIcon, byteOriginal );  //         *(BYTE *)FUNC_DrawWeaponIcon = byteOriginal;
         byteOriginal = 0;
     }
 }
@@ -204,11 +204,11 @@ void CHudSA::DisableHealth ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_PrintHealthForPlayer;
-        *(BYTE *)FUNC_PrintHealthForPlayer = 0xC3;
+        MemPut < BYTE > ( FUNC_PrintHealthForPlayer, 0xC3 );  //         *(BYTE *)FUNC_PrintHealthForPlayer = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_PrintHealthForPlayer = byteOriginal;
+        MemPut < BYTE > ( FUNC_PrintHealthForPlayer, byteOriginal );  //         *(BYTE *)FUNC_PrintHealthForPlayer = byteOriginal;
         byteOriginal = 0;
     }
 }
@@ -219,11 +219,11 @@ void CHudSA::DisableBreath ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_PrintBreathForPlayer;
-        *(BYTE *)FUNC_PrintBreathForPlayer = 0xC3;
+        MemPut < BYTE > ( FUNC_PrintBreathForPlayer, 0xC3 );  //         *(BYTE *)FUNC_PrintBreathForPlayer = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_PrintBreathForPlayer = byteOriginal;
+        MemPut < BYTE > ( FUNC_PrintBreathForPlayer, byteOriginal );  //         *(BYTE *)FUNC_PrintBreathForPlayer = byteOriginal;
         byteOriginal = 0;
     }
 }
@@ -234,11 +234,11 @@ void CHudSA::DisableArmour ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_PrintArmourForPlayer;
-        *(BYTE *)FUNC_PrintArmourForPlayer = 0xC3;
+        MemPut < BYTE > ( FUNC_PrintArmourForPlayer, 0xC3 );  //         *(BYTE *)FUNC_PrintArmourForPlayer = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_PrintArmourForPlayer = byteOriginal;
+        MemPut < BYTE > ( FUNC_PrintArmourForPlayer, byteOriginal );  //         *(BYTE *)FUNC_PrintArmourForPlayer = byteOriginal;
         byteOriginal = 0;
     }
 }
@@ -249,11 +249,11 @@ void CHudSA::DisableVitalStats ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawVitalStats;
-        *(BYTE *)FUNC_DrawVitalStats = 0xC3;
+        MemPut < BYTE > ( FUNC_DrawVitalStats, 0xC3 );  //         *(BYTE *)FUNC_DrawVitalStats = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_DrawVitalStats = byteOriginal;
+        MemPut < BYTE > ( FUNC_DrawVitalStats, byteOriginal );  //         *(BYTE *)FUNC_DrawVitalStats = byteOriginal;
         byteOriginal = 0;
     }
 }
@@ -264,12 +264,12 @@ void CHudSA::DisableMoney ( bool bDisabled )
     if ( bDisabled && !dwOriginal )
     {
         dwOriginal = *(DWORD *)CODE_ShowMoney;
-        *(BYTE *)CODE_ShowMoney       = 0x90;
-        *(BYTE *)(CODE_ShowMoney + 1) = 0xE9;
+        MemPut < BYTE > ( CODE_ShowMoney, 0x90 );  //         *(BYTE *)CODE_ShowMoney       = 0x90;
+        MemPut < BYTE > ( CODE_ShowMoney + 1, 0xE9 );  //         *(BYTE *)(CODE_ShowMoney + 1) = 0xE9;
     }
     else if ( !bDisabled && dwOriginal )
     {
-        *(DWORD *)CODE_ShowMoney = dwOriginal;
+        MemPut < DWORD > ( CODE_ShowMoney, dwOriginal );  //         *(DWORD *)CODE_ShowMoney = dwOriginal;
         dwOriginal = 0;
     }
 }
@@ -280,11 +280,11 @@ void CHudSA::DisableVehicleName ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawVehicleName;
-        *(BYTE *)FUNC_DrawVehicleName = 0xC3;
+        MemPut < BYTE > ( FUNC_DrawVehicleName, 0xC3 );  //         *(BYTE *)FUNC_DrawVehicleName = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_DrawVehicleName = byteOriginal;
+        MemPut < BYTE > ( FUNC_DrawVehicleName, byteOriginal );  //         *(BYTE *)FUNC_DrawVehicleName = byteOriginal;
         byteOriginal = 0;
     }
 }
@@ -295,11 +295,11 @@ void CHudSA::DisableHelpText ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawHelpText;
-        *(BYTE *)FUNC_DrawHelpText = 0xC3;
+        MemPut < BYTE > ( FUNC_DrawHelpText, 0xC3 );  //         *(BYTE *)FUNC_DrawHelpText = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_DrawHelpText = byteOriginal;
+        MemPut < BYTE > ( FUNC_DrawHelpText, byteOriginal );  //         *(BYTE *)FUNC_DrawHelpText = byteOriginal;
         byteOriginal = 0;
     }
 }
@@ -310,11 +310,11 @@ void CHudSA::DisableAreaName ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawAreaName;
-        *(BYTE *)FUNC_DrawAreaName = 0xC3;
+        MemPut < BYTE > ( FUNC_DrawAreaName, 0xC3 );  //         *(BYTE *)FUNC_DrawAreaName = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_DrawAreaName = byteOriginal;
+        MemPut < BYTE > ( FUNC_DrawAreaName, byteOriginal );  //         *(BYTE *)FUNC_DrawAreaName = byteOriginal;
         byteOriginal = 0;
     }
 }
@@ -325,18 +325,18 @@ void CHudSA::DisableRadar ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawRadar;
-        *(BYTE *)FUNC_DrawRadar = 0xC3;
+        MemPut < BYTE > ( FUNC_DrawRadar, 0xC3 );  //         *(BYTE *)FUNC_DrawRadar = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_DrawRadar = byteOriginal;
+        MemPut < BYTE > ( FUNC_DrawRadar, byteOriginal );  //         *(BYTE *)FUNC_DrawRadar = byteOriginal;
         byteOriginal = 0;
     }
 }
 
 void CHudSA::DisableClock ( bool bDisabled )
 {
-    *(int *)VAR_DisableClock = bDisabled ? 0 : 1;
+    MemPut < int > ( VAR_DisableClock, bDisabled ? 0 : 1 );  //     *(int *)VAR_DisableClock = bDisabled ? 0 : 1;
 }
 
 void CHudSA::DisableRadioName ( bool bDisabled )
@@ -345,11 +345,11 @@ void CHudSA::DisableRadioName ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawRadioName;
-        *(BYTE *)FUNC_DrawRadioName = 0xC3;
+        MemPut < BYTE > ( FUNC_DrawRadioName, 0xC3 );  //         *(BYTE *)FUNC_DrawRadioName = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_DrawRadioName = byteOriginal;
+        MemPut < BYTE > ( FUNC_DrawRadioName, byteOriginal );  //         *(BYTE *)FUNC_DrawRadioName = byteOriginal;
         byteOriginal = 0;
     }
 }
@@ -360,11 +360,11 @@ void CHudSA::DisableWantedLevel ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_DrawWantedLevel;
-        *(BYTE *)FUNC_DrawWantedLevel = 0xC3;
+        MemPut < BYTE > ( FUNC_DrawWantedLevel, 0xC3 );  //         *(BYTE *)FUNC_DrawWantedLevel = 0xC3;
     }
     else if ( !bDisabled && byteOriginal )
     {
-        *(BYTE *)FUNC_DrawWantedLevel = byteOriginal;
+        MemPut < BYTE > ( FUNC_DrawWantedLevel, byteOriginal );  //         *(BYTE *)FUNC_DrawWantedLevel = byteOriginal;
         byteOriginal = 0;
     }
 }

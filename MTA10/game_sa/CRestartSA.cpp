@@ -18,7 +18,7 @@
 VOID CRestartSA::CancelOverrideRestart (  )
 {
     DEBUG_TRACE("VOID CRestartSA::CancelOverrideRestart (  )");
-    *(BYTE *)VAR_OverrideNextRestart = 0;
+    MemPut < BYTE > ( VAR_OverrideNextRestart, 0 );  //     *(BYTE *)VAR_OverrideNextRestart = 0;
 }
 
 /**
@@ -30,9 +30,9 @@ VOID CRestartSA::CancelOverrideRestart (  )
 VOID CRestartSA::OverrideNextRestart ( CVector * vecPosition, FLOAT fRotation )
 {
     DEBUG_TRACE("VOID CRestartSA::OverrideNextRestart ( CVector * vecPosition, FLOAT fRotation )");
-    *(BYTE *)VAR_OverrideNextRestart = 1;
-    memcpy((void *)VAR_OverrideNextRestartPosition, vecPosition, sizeof(CVector));
-    *(FLOAT *)VAR_OverrideNextRestartRotation = fRotation;
+    MemPut < BYTE > ( VAR_OverrideNextRestart, 1 );  //     *(BYTE *)VAR_OverrideNextRestart = 1;
+    MemCpy8 ((void *)VAR_OverrideNextRestartPosition, vecPosition, sizeof(CVector));
+    MemPut < FLOAT > ( VAR_OverrideNextRestartRotation, fRotation );  //     *(FLOAT *)VAR_OverrideNextRestartRotation = fRotation;
 }
 
 /**

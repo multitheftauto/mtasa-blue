@@ -223,9 +223,9 @@ void CWorldSA::IgnoreEntity(CEntity * pEntity)
     CEntitySA* pEntitySA = dynamic_cast < CEntitySA* > ( pEntity );
 
     if ( pEntitySA )
-        *(DWORD *)VAR_IgnoredEntity = (DWORD) pEntitySA->GetInterface ();
+        MemPut < DWORD > ( VAR_IgnoredEntity, (DWORD) pEntitySA->GetInterface () );  //         *(DWORD *)VAR_IgnoredEntity = (DWORD) pEntitySA->GetInterface ();
     else
-        *(DWORD *)VAR_IgnoredEntity = 0;
+        MemPut < DWORD > ( VAR_IgnoredEntity, 0 );  //         *(DWORD *)VAR_IgnoredEntity = 0;
 }
 
 // technically this is in CTheZones
@@ -368,7 +368,7 @@ DWORD CWorldSA::GetCurrentArea ( void )
 
 void CWorldSA::SetCurrentArea ( DWORD dwArea )
 {
-    *(DWORD *)VAR_currArea = dwArea;
+    MemPut < DWORD > ( VAR_currArea, dwArea );  //     *(DWORD *)VAR_currArea = dwArea;
 
     DWORD dwFunc = FUNC_RemoveBuildingsNotInArea;
     _asm
@@ -381,7 +381,7 @@ void CWorldSA::SetCurrentArea ( DWORD dwArea )
 
 void CWorldSA::SetJetpackMaxHeight ( float fHeight )
 {
-    *(float *)(VAR_fJetpackMaxHeight) = fHeight;
+    MemPut < float > ( VAR_fJetpackMaxHeight, fHeight );  //     *(float *)(VAR_fJetpackMaxHeight) = fHeight;
 }
 
 float CWorldSA::GetJetpackMaxHeight ( void )
@@ -392,24 +392,24 @@ float CWorldSA::GetJetpackMaxHeight ( void )
 void CWorldSA::SetWindVelocity ( float fX, float fY, float fZ )
 {
     //Disable
-    *(WORD *)(ADDR_WindSpeedSetX) = 0xD8DD;
-    *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x90909090;
-    *(WORD *)(ADDR_WindSpeedSetY) = 0xD8DD;
-    *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x90909090;
-    *(WORD *)(ADDR_WindSpeedSetZ) = 0xD8DD;
-    *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x90909090;
+    MemPut < WORD > ( ADDR_WindSpeedSetX, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetX) = 0xD8DD;
+    MemPut < DWORD > ( ADDR_WindSpeedSetX + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x90909090;
+    MemPut < WORD > ( ADDR_WindSpeedSetY, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetY) = 0xD8DD;
+    MemPut < DWORD > ( ADDR_WindSpeedSetY + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x90909090;
+    MemPut < WORD > ( ADDR_WindSpeedSetZ, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetZ) = 0xD8DD;
+    MemPut < DWORD > ( ADDR_WindSpeedSetZ + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x90909090;
 
-    *(WORD *)(ADDR_WindSpeedSetX2) = 0xD8DD;
-    *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x90909090;
-    *(WORD *)(ADDR_WindSpeedSetY2) = 0xD8DD;
-    *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x90909090;
-    *(WORD *)(ADDR_WindSpeedSetZ2) = 0xD8DD;
-    *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x90909090;
+    MemPut < WORD > ( ADDR_WindSpeedSetX2, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetX2) = 0xD8DD;
+    MemPut < DWORD > ( ADDR_WindSpeedSetX2 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x90909090;
+    MemPut < WORD > ( ADDR_WindSpeedSetY2, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetY2) = 0xD8DD;
+    MemPut < DWORD > ( ADDR_WindSpeedSetY2 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x90909090;
+    MemPut < WORD > ( ADDR_WindSpeedSetZ2, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetZ2) = 0xD8DD;
+    MemPut < DWORD > ( ADDR_WindSpeedSetZ2 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x90909090;
 
     //Set
-    *(float *)(VAR_fWindSpeedX) = fX;
-    *(float *)(VAR_fWindSpeedY) = fY;
-    *(float *)(VAR_fWindSpeedZ) = fZ;
+    MemPut < float > ( VAR_fWindSpeedX, fX );  //     *(float *)(VAR_fWindSpeedX) = fX;
+    MemPut < float > ( VAR_fWindSpeedY, fY );  //     *(float *)(VAR_fWindSpeedY) = fY;
+    MemPut < float > ( VAR_fWindSpeedZ, fZ );  //     *(float *)(VAR_fWindSpeedZ) = fZ;
 }
 
 void CWorldSA::GetWindVelocity ( float& fX, float& fY, float& fZ )
@@ -421,19 +421,19 @@ void CWorldSA::GetWindVelocity ( float& fX, float& fY, float& fZ )
 
 void CWorldSA::RestoreWindVelocity ( void )
 {
-    *(WORD *)(ADDR_WindSpeedSetX) = 0x1DD9;
-    *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x00C813E0;
-    *(WORD *)(ADDR_WindSpeedSetY) = 0x1DD9;
-    *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x00C813E4;
-    *(WORD *)(ADDR_WindSpeedSetZ) = 0x1DD9;
-    *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x00C813E8;
+    MemPut < WORD > ( ADDR_WindSpeedSetX, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetX) = 0x1DD9;
+    MemPut < DWORD > ( ADDR_WindSpeedSetX + 2, 0x00C813E0 );  //     *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x00C813E0;
+    MemPut < WORD > ( ADDR_WindSpeedSetY, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetY) = 0x1DD9;
+    MemPut < DWORD > ( ADDR_WindSpeedSetY + 2, 0x00C813E4 );  //     *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x00C813E4;
+    MemPut < WORD > ( ADDR_WindSpeedSetZ, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetZ) = 0x1DD9;
+    MemPut < DWORD > ( ADDR_WindSpeedSetZ + 2, 0x00C813E8 );  //     *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x00C813E8;
 
-    *(WORD *)(ADDR_WindSpeedSetX2) = 0x15D9;
-    *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x00C813E0;
-    *(WORD *)(ADDR_WindSpeedSetY2) = 0x1DD9;
-    *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x00C813E4;
-    *(WORD *)(ADDR_WindSpeedSetZ2) = 0x1DD9;
-    *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x00C813E8;
+    MemPut < WORD > ( ADDR_WindSpeedSetX2, 0x15D9 );  //     *(WORD *)(ADDR_WindSpeedSetX2) = 0x15D9;
+    MemPut < DWORD > ( ADDR_WindSpeedSetX2 + 2, 0x00C813E0 );  //     *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x00C813E0;
+    MemPut < WORD > ( ADDR_WindSpeedSetY2, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetY2) = 0x1DD9;
+    MemPut < DWORD > ( ADDR_WindSpeedSetY2 + 2, 0x00C813E4 );  //     *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x00C813E4;
+    MemPut < WORD > ( ADDR_WindSpeedSetZ2, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetZ2) = 0x1DD9;
+    MemPut < DWORD > ( ADDR_WindSpeedSetZ2 + 2, 0x00C813E8 );  //     *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x00C813E8;
 }
 
 float CWorldSA::GetFarClipDistance ( )
@@ -443,28 +443,28 @@ float CWorldSA::GetFarClipDistance ( )
 
 void CWorldSA::SetFarClipDistance ( float fDistance )
 {
-    *(BYTE *)0x55FCC8 = 0xDD;
-    *(BYTE *)0x55FCC9 = 0xD8;
-    *(BYTE *)0x55FCCA = 0x90;
+    MemPut < BYTE > ( 0x55FCC8, 0xDD );  //     *(BYTE *)0x55FCC8 = 0xDD;
+    MemPut < BYTE > ( 0x55FCC9, 0xD8 );  //     *(BYTE *)0x55FCC9 = 0xD8;
+    MemPut < BYTE > ( 0x55FCCA, 0x90 );  //     *(BYTE *)0x55FCCA = 0x90;
 
-    *(BYTE *)0x5613A3 = 0xDD;
-    *(BYTE *)0x5613A4 = 0xD8;
-    *(BYTE *)0x5613A5 = 0x90;
+    MemPut < BYTE > ( 0x5613A3, 0xDD );  //     *(BYTE *)0x5613A3 = 0xDD;
+    MemPut < BYTE > ( 0x5613A4, 0xD8 );  //     *(BYTE *)0x5613A4 = 0xD8;
+    MemPut < BYTE > ( 0x5613A5, 0x90 );  //     *(BYTE *)0x5613A5 = 0x90;
 
-    *(BYTE *)0x560A23 = 0xDD;
-    *(BYTE *)0x560A24 = 0xD8;
-    *(BYTE *)0x560A25 = 0x90;
+    MemPut < BYTE > ( 0x560A23, 0xDD );  //     *(BYTE *)0x560A23 = 0xDD;
+    MemPut < BYTE > ( 0x560A24, 0xD8 );  //     *(BYTE *)0x560A24 = 0xD8;
+    MemPut < BYTE > ( 0x560A25, 0x90 );  //     *(BYTE *)0x560A25 = 0x90;
 
-    *(float *)(VAR_fFarClipDistance) = fDistance;
+    MemPut < float > ( VAR_fFarClipDistance, fDistance );  //     *(float *)(VAR_fFarClipDistance) = fDistance;
 }
 
 void CWorldSA::RestoreFarClipDistance ( )
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
 
-    memcpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
-    memcpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
-    memcpy ( (LPVOID)0x560A23, &originalFstp, 3 );
+    MemCpy8 ( (LPVOID)0x55FCC8, &originalFstp, 3 );
+    MemCpy8 ( (LPVOID)0x5613A3, &originalFstp, 3 );
+    MemCpy8 ( (LPVOID)0x560A23, &originalFstp, 3 );
 }
 
 float CWorldSA::GetFogDistance ( )
@@ -474,18 +474,18 @@ float CWorldSA::GetFogDistance ( )
 
 void CWorldSA::SetFogDistance ( float fDistance )
 {
-    *(BYTE *)0x55FCDB = 0xDD;
-    *(BYTE *)0x55FCDC = 0xD8;
-    *(BYTE *)0x55FCDD = 0x90;
+    MemPut < BYTE > ( 0x55FCDB, 0xDD );  //     *(BYTE *)0x55FCDB = 0xDD;
+    MemPut < BYTE > ( 0x55FCDC, 0xD8 );  //     *(BYTE *)0x55FCDC = 0xD8;
+    MemPut < BYTE > ( 0x55FCDD, 0x90 );  //     *(BYTE *)0x55FCDD = 0x90;
 
-    *(float *)(VAR_fFogDistance) = fDistance;
+    MemPut < float > ( VAR_fFogDistance, fDistance );  //     *(float *)(VAR_fFogDistance) = fDistance;
 }
 
 void CWorldSA::RestoreFogDistance ( )
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x54};
 
-    memcpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
+    MemCpy8 ( (LPVOID)0x55FCDB, &originalFstp, 3 );
 }
 
 void CWorldSA::GetSunColor ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
@@ -501,39 +501,39 @@ void CWorldSA::GetSunColor ( unsigned char& ucCoreRed, unsigned char& ucCoreGree
 
 void CWorldSA::SetSunColor ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue )
 {
-    memset ( (LPVOID)0x55F9B2, 0x90, 4 );
-    memset ( (LPVOID)0x55F9DD, 0x90, 4 );
-    memset ( (LPVOID)0x55FA08, 0x90, 4 );
-    memset ( (LPVOID)0x55FA33, 0x90, 4 );
-    memset ( (LPVOID)0x55FA5E, 0x90, 4 );
-    memset ( (LPVOID)0x55FA8D, 0x90, 4 );
+    MemSet8 ( (LPVOID)0x55F9B2, 0x90, 4 );
+    MemSet8 ( (LPVOID)0x55F9DD, 0x90, 4 );
+    MemSet8 ( (LPVOID)0x55FA08, 0x90, 4 );
+    MemSet8 ( (LPVOID)0x55FA33, 0x90, 4 );
+    MemSet8 ( (LPVOID)0x55FA5E, 0x90, 4 );
+    MemSet8 ( (LPVOID)0x55FA8D, 0x90, 4 );
 
-    *(BYTE *)(VAR_ucSunCoreR) = ucCoreRed;
-    *(BYTE *)(VAR_ucSunCoreG) = ucCoreGreen;
-    *(BYTE *)(VAR_ucSunCoreB) = ucCoreBlue;
+    MemPut < BYTE > ( VAR_ucSunCoreR, ucCoreRed );  //     *(BYTE *)(VAR_ucSunCoreR) = ucCoreRed;
+    MemPut < BYTE > ( VAR_ucSunCoreG, ucCoreGreen );  //     *(BYTE *)(VAR_ucSunCoreG) = ucCoreGreen;
+    MemPut < BYTE > ( VAR_ucSunCoreB, ucCoreBlue );  //     *(BYTE *)(VAR_ucSunCoreB) = ucCoreBlue;
 
-    *(BYTE *)(VAR_ucSunCoronaR) = ucCoronaRed;
-    *(BYTE *)(VAR_ucSunCoronaG) = ucCoronaGreen;
-    *(BYTE *)(VAR_ucSunCoronaB) = ucCoronaBlue;
+    MemPut < BYTE > ( VAR_ucSunCoronaR, ucCoronaRed );  //     *(BYTE *)(VAR_ucSunCoronaR) = ucCoronaRed;
+    MemPut < BYTE > ( VAR_ucSunCoronaG, ucCoronaGreen );  //     *(BYTE *)(VAR_ucSunCoronaG) = ucCoronaGreen;
+    MemPut < BYTE > ( VAR_ucSunCoronaB, ucCoronaBlue );  //     *(BYTE *)(VAR_ucSunCoronaB) = ucCoronaBlue;
 }
 
 void CWorldSA::ResetSunColor ( )
 {
     BYTE originalMov[3] = {0x66, 0x89, 0x46};
 
-    memcpy ( (LPVOID)0x55F9B2, &originalMov, 3 );
-    *(BYTE *)0x55F9B5 = 0x30;
-    memcpy ( (LPVOID)0x55F9DD, &originalMov, 3 );
-    *(BYTE *)0x55F9E0 = 0x32;
-    memcpy ( (LPVOID)0x55FA08, &originalMov, 3 );
-    *(BYTE *)0x55FA0B = 0x34;
+    MemCpy8 ( (LPVOID)0x55F9B2, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55F9B5, 0x30 );  //     *(BYTE *)0x55F9B5 = 0x30;
+    MemCpy8 ( (LPVOID)0x55F9DD, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55F9E0, 0x32 );  //     *(BYTE *)0x55F9E0 = 0x32;
+    MemCpy8 ( (LPVOID)0x55FA08, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55FA0B, 0x34 );  //     *(BYTE *)0x55FA0B = 0x34;
 
-    memcpy ( (LPVOID)0x55FA33, &originalMov, 3 );
-    *(BYTE *)0x55FA36 = 0x36;
-    memcpy ( (LPVOID)0x55FA5E, &originalMov, 3 );
-    *(BYTE *)0x55FA61 = 0x38;
-    memcpy ( (LPVOID)0x55FA8D, &originalMov, 3 );
-    *(BYTE *)0x55FA90 = 0x3A;
+    MemCpy8 ( (LPVOID)0x55FA33, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55FA36, 0x36 );  //     *(BYTE *)0x55FA36 = 0x36;
+    MemCpy8 ( (LPVOID)0x55FA5E, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55FA61, 0x38 );  //     *(BYTE *)0x55FA61 = 0x38;
+    MemCpy8 ( (LPVOID)0x55FA8D, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55FA90, 0x3A );  //     *(BYTE *)0x55FA90 = 0x3A;
 }
 
 float CWorldSA::GetSunSize ( )
@@ -543,16 +543,16 @@ float CWorldSA::GetSunSize ( )
 
 void CWorldSA::SetSunSize ( float fSize )
 {
-    *(BYTE *)0x55FA9D = 0xDD;
-    *(BYTE *)0x55FA9E = 0xD8;
-    *(BYTE *)0x55FA9F = 0x90;
+    MemPut < BYTE > ( 0x55FA9D, 0xDD );  //     *(BYTE *)0x55FA9D = 0xDD;
+    MemPut < BYTE > ( 0x55FA9E, 0xD8 );  //     *(BYTE *)0x55FA9E = 0xD8;
+    MemPut < BYTE > ( 0x55FA9F, 0x90 );  //     *(BYTE *)0x55FA9F = 0x90;
 
-    *(float *)VAR_fSunSize = fSize * 10;
+    MemPut < float > ( VAR_fSunSize, fSize * 10 );  //     *(float *)VAR_fSunSize = fSize * 10;
 }
 
 void CWorldSA::ResetSunSize ( )
 {
-    *(BYTE *)0x55FA9D = 0xD9;
-    *(BYTE *)0x55FA9E = 0x5E;
-    *(BYTE *)0x55FA9F = 0x3C;
+    MemPut < BYTE > ( 0x55FA9D, 0xD9 );  //     *(BYTE *)0x55FA9D = 0xD9;
+    MemPut < BYTE > ( 0x55FA9E, 0x5E );  //     *(BYTE *)0x55FA9E = 0x5E;
+    MemPut < BYTE > ( 0x55FA9F, 0x3C );  //     *(BYTE *)0x55FA9F = 0x3C;
 }

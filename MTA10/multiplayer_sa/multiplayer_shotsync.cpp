@@ -103,8 +103,8 @@ VOID InitShotsyncHooks()
     HookInstall ( HOOKPOS_CWeapon_DoBulletImpact, (DWORD)HOOK_CWeapon_DoBulletImpact, 7 );
 
     /*  
-    *(BYTE *)0x73FDEC = 0x90;
-    *(BYTE *)0x73FDED = 0xE9;
+    MemPut < BYTE > ( 0x73FDEC, 0x90 );  //     *(BYTE *)0x73FDEC = 0x90;
+    MemPut < BYTE > ( 0x73FDED, 0xE9 );  //     *(BYTE *)0x73FDED = 0xE9;
     */
 
     m_pools = pGameInterface->GetPools();
@@ -190,7 +190,7 @@ VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector
             if ( data->ProcessPlayerWeapon () )
             {
                 DWORD dwPointerToVector = (DWORD)&data->m_shotSyncData.m_vecShotTarget;
-                *(DWORD *)vecTargetPos = dwPointerToVector;
+                MemPut < DWORD > ( vecTargetPos, dwPointerToVector );  //                 *(DWORD *)vecTargetPos = dwPointerToVector;
                 if ( data->m_shotSyncData.m_bUseOrigin )
                     *origin = data->m_shotSyncData.m_vecShotOrigin;
             }
@@ -1053,7 +1053,7 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit ()
     }
 
     // Make sure we include car tyres in our ProcessLineOfSight check
-    * ( unsigned char * ) ( VAR_CWorld_IncludeCarTyres ) = 1;
+    MemPut < unsigned char > ( VAR_CWorld_IncludeCarTyres, 1 );  //     * ( unsigned char * ) ( VAR_CWorld_IncludeCarTyres ) = 1;
 
     _asm
     {
@@ -1242,21 +1242,21 @@ VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
         OutputDebugString(szDebug);
         
         
-        memcpy(vecTargetVector, &RemotePlayerTargetVectors[GetContextSwitchPedID()], sizeof(CVector));
-        memcpy(vecStartVector, &RemotePlayerStartVectors[GetContextSwitchPedID()], sizeof(CVector));
+        MemCpy8 (vecTargetVector, &RemotePlayerTargetVectors[GetContextSwitchPedID()], sizeof(CVector));
+        MemCpy8 (vecStartVector, &RemotePlayerStartVectors[GetContextSwitchPedID()], sizeof(CVector));
     }
     else
     {
         // Its the Local Player, so save the data so it can be sent
-        memcpy(&LocalPlayerShotOriginVector, vecShotOrigin, sizeof(CVector));
+        MemCpy8 (&LocalPlayerShotOriginVector, vecShotOrigin, sizeof(CVector));
 
         sprintf(szDebug, "Saved Local Shot Origin Vector  %f  %f  %f", 
             LocalPlayerShotOriginVector.fX, 
             LocalPlayerShotOriginVector.fY, 
             LocalPlayerShotOriginVector.fZ);
         OutputDebugString(szDebug);*/
-    /*  memcpy(&LocalPlayerTargetVector, vecTargetVector, sizeof(CVector));
-        memcpy(&LocalPlayerStartVector, vecStartVector, sizeof(CVector));
+    /*  MemCpy8 (&LocalPlayerTargetVector, vecTargetVector, sizeof(CVector));
+        MemCpy8 (&LocalPlayerStartVector, vecStartVector, sizeof(CVector));
         
         sprintf(szDebug, "Saved Local Target Vectors  %f  %f  %f", 
             LocalPlayerTargetVector.fX, 
@@ -1315,8 +1315,8 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
             RemotePlayerCrossProducts[GetContextSwitchPedID()].fY, 
             RemotePlayerCrossProducts[GetContextSwitchPedID()].fZ, vecCrossProduct);
         OutputDebugString(szDebug);
-        memset(vecCrossProduct,0,sizeof(CVector));
-    //  memcpy(vecCrossProduct, &RemotePlayerCrossProducts[GetContextSwitchPedID()], sizeof(CVector));
+        MemSet8 (vecCrossProduct,0,sizeof(CVector));
+    //  MemCpy8 (vecCrossProduct, &RemotePlayerCrossProducts[GetContextSwitchPedID()], sizeof(CVector));
     }
     else
     {
@@ -1337,7 +1337,7 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
             pushad
         }
 
-        memcpy(&LocalPlayerCrossProduct, vecCrossProduct, sizeof(CVector));
+        MemCpy8 (&LocalPlayerCrossProduct, vecCrossProduct, sizeof(CVector));
         sprintf(szDebug, "SHOTGUN: Saved Local Cross Product  %f  %f  %f", 
             LocalPlayerCrossProduct.fX, 
             LocalPlayerCrossProduct.fY, 

@@ -27,7 +27,7 @@ CVector * CPhysicalSA::GetMoveSpeed(CVector * vecMoveSpeed)
         call    dwFunc
         mov     dwReturn, eax
     }
-    memcpy(vecMoveSpeed, (void *)dwReturn, sizeof(CVector));
+    MemCpy8 (vecMoveSpeed, (void *)dwReturn, sizeof(CVector));
     return vecMoveSpeed;
 }
 
@@ -43,7 +43,7 @@ CVector * CPhysicalSA::GetTurnSpeed(CVector * vecTurnSpeed)
         call    dwFunc
         mov     dwReturn, eax
     }
-    memcpy(vecTurnSpeed, (void *)dwReturn, sizeof(CVector));
+    MemCpy8 (vecTurnSpeed, (void *)dwReturn, sizeof(CVector));
     return vecTurnSpeed;
 }
 
@@ -59,7 +59,7 @@ VOID CPhysicalSA::SetMoveSpeed(CVector * vecMoveSpeed)
         call    dwFunc
         mov     dwReturn, eax
     }
-    memcpy((void *)dwReturn, vecMoveSpeed, sizeof(CVector));
+    MemCpy8 ((void *)dwReturn, vecMoveSpeed, sizeof(CVector));
 }
 
 VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)
@@ -74,7 +74,7 @@ VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)
         call    dwFunc
         mov     dwReturn, eax
     }
-    memcpy((void *)dwReturn, vecTurnSpeed, sizeof(CVector));
+    MemCpy8 ((void *)dwReturn, vecTurnSpeed, sizeof(CVector));
 }
 
 float CPhysicalSA::GetMass ( void )
@@ -318,7 +318,7 @@ FLOAT CPhysicalSA::GetAirResistance()
 
 VOID CPhysicalSA::SetCenterOfMass(CVector * vecCenterOfMass)
 {
-    memcpy(&((CPhysicalSAInterface *)this->GetInterface())->vecCenterOfMass, vecCenterOfMass, sizeof(CVector));
+    MemCpy8 (&((CPhysicalSAInterface *)this->GetInterface())->vecCenterOfMass, vecCenterOfMass, sizeof(CVector));
 }
 
 CVector * CPhysicalSA::GetCenterOfMass()
