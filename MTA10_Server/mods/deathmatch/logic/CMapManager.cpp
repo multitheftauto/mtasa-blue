@@ -440,6 +440,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     // Garage states
     bool* pbGarageStates = g_pGame->GetGarageStates();
     bool bCloudsEnabled = g_pGame->GetCloudsEnabled();
+    int iHeatHazeEnabled = g_pGame->GetHeatHazeEnabled();
 
     // Water color
     bool bOverrideWaterColor;
@@ -470,6 +471,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucBottomBlue,
                                    usFPSLimit,
                                    bCloudsEnabled,
+                                   iHeatHazeEnabled,
                                    fJetpackMaxHeight,
                                    bOverrideWaterColor,
                                    ucWaterRed,

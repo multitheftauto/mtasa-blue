@@ -667,6 +667,8 @@ public:
     LUA_DECLARE ( SetJetpackMaxHeight );
     LUA_DECLARE ( SetCloudsEnabled );
     LUA_DECLARE ( GetCloudsEnabled );
+    LUA_DECLARE ( SetHeatHazeEnabled );
+    LUA_DECLARE ( GetHeatHazeEnabled );
     LUA_DECLARE ( SetTrafficLightState );
     LUA_DECLARE ( SetTrafficLightsLocked );
     LUA_DECLARE ( GetWindVelocity );

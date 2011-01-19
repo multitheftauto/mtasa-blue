@@ -125,6 +125,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetThermalVisionEnabled ( false );
 
     m_bCloudsEnabled = true;
+    m_iHeatHazeEnabled = 2;
 
     #ifdef MTA_VOICE
     m_pVoice = VoiceCreate();
@@ -4454,9 +4455,13 @@ void CClientGame::ResetMapInfo ( void )
     // Water-colour
     g_pMultiplayer->ResetWater ();
 
-     // Sky-gradient
+     // Clouds
     g_pMultiplayer->SetCloudsEnabled ( true );
     g_pClientGame->SetCloudsEnabled ( true );
+
+     // HeatHaze
+    g_pMultiplayer->SetHeatHazeEnabled ( 2 );
+    g_pClientGame->SetHeatHazeEnabled ( 2 );
 
     // Cheats
     g_pGame->ResetCheats ();
@@ -5061,6 +5066,16 @@ bool CClientGame::SetCloudsEnabled ( bool bEnabled )
 bool CClientGame::GetCloudsEnabled ( void )
 {
     return m_bCloudsEnabled;
+}
+
+bool CClientGame::SetHeatHazeEnabled ( int iEnabled )
+{
+   m_iHeatHazeEnabled = iEnabled;
+   return true;
+}
+int CClientGame::GetHeatHazeEnabled ( void )
+{
+    return m_iHeatHazeEnabled;
 }
 
 #pragma code_seg(".text")

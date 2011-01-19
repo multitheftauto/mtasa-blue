@@ -265,6 +265,9 @@ public:
     void                        SetCloudsEnabled            ( bool bEnabled );
     bool                        GetCloudsEnabled            ( void );
 
+    void                        SetHeatHazeEnabled          ( int iEnabled );
+    int                         GetHeatHazeEnabled          ( void );
+
     void                        PulseMasterServerAnnounce   ( void );
     void                        StartOpenPortsTest          ( void );
 
@@ -386,6 +389,9 @@ private:
 
     //Clouds Enabled
     bool                        m_bCloudsEnabled;
+
+    //HeatHaze
+    int                         m_iHeatHazeEnabled;
 
     long long                   m_llLastAnnouceTime;
     class COpenPortsTester*     m_pOpenPortsTester;

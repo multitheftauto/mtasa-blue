@@ -1342,6 +1342,37 @@ int CLuaFunctionDefs::GetCloudsEnabled ( lua_State* luaVM )
       return 1;
 }
 
+int CLuaFunctionDefs::SetHeatHazeEnabled ( lua_State* luaVM )
+{
+    int iArgument = lua_type ( luaVM, 1 );
+    if ( iArgument == LUA_TBOOLEAN || iArgument == LUA_TNIL || iArgument == LUA_TNONE )
+    {
+        int iEnabled = 2;
+        if ( iArgument == LUA_TBOOLEAN )
+            iEnabled = lua_toboolean ( luaVM, 1 ) ? 1 : 0;
+        if ( CStaticFunctionDefinitions::SetHeatHazeEnabled ( iEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setHeatHazeEnabled" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetHeatHazeEnabled ( lua_State* luaVM )
+{
+    int iEnabled = CStaticFunctionDefinitions::GetHeatHazeEnabled ();
+    if ( iEnabled == 2 )
+        lua_pushnil ( luaVM );
+    else
+        lua_pushboolean ( luaVM, iEnabled ? true : false );
+    return 1;
+}
+
 int CLuaFunctionDefs::SetTrafficLightState ( lua_State *luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )

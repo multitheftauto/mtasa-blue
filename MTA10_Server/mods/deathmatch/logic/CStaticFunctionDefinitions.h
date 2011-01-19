@@ -478,6 +478,8 @@ public:
     static bool                 IsGlitchEnabled                     ( const std::string& strGlitchName, bool& bEnabled );
     static bool                 SetCloudsEnabled                    ( bool bEnabled );
     static bool                 GetCloudsEnabled                    ( void );
+    static bool                 SetHeatHazeEnabled                  ( int iEnabled );
+    static int                  GetHeatHazeEnabled                  ( void );
     static bool                 SetTrafficLightState                ( unsigned char ucState, bool bForced = false );
     static bool                 SetTrafficLightsLocked              ( bool bLocked );
     static bool                 SetJetpackMaxHeight                 ( float fMaxHeight );
