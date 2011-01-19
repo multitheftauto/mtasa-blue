@@ -865,6 +865,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setJetpackMaxHeight", CLuaFunctionDefs::SetJetpackMaxHeight );
     CLuaCFunctions::AddFunction ( "setCloudsEnabled", CLuaFunctionDefs::SetCloudsEnabled );
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled );
+    CLuaCFunctions::AddFunction ( "setHeatHazeEnabled", CLuaFunctionDefs::SetHeatHazeEnabled );
+    CLuaCFunctions::AddFunction ( "getHeatHazeEnabled", CLuaFunctionDefs::GetHeatHazeEnabled );
     CLuaCFunctions::AddFunction ( "setTrafficLightState", CLuaFunctionDefs::SetTrafficLightState );
     CLuaCFunctions::AddFunction ( "setTrafficLightsLocked", CLuaFunctionDefs::SetTrafficLightsLocked );
     CLuaCFunctions::AddFunction ( "setWindVelocity", CLuaFunctionDefs::SetWindVelocity );

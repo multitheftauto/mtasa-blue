@@ -442,7 +442,7 @@ void CRadarMap::InternalSetRadarEnabled ( bool bEnabled )
         g_pCore->SetDebugVisible ( false );
 
         // Disable graphical effects
-        g_pMultiplayer->DisableHeatHazeEffect ( true );
+        g_pMultiplayer->SetHeatHazeEnabled ( 0 );
     }
     else
     {
@@ -452,7 +452,7 @@ void CRadarMap::InternalSetRadarEnabled ( bool bEnabled )
         g_pCore->SetDebugVisible ( m_bDebugVisible );
 
         // Enable graphical effects
-        g_pMultiplayer->DisableHeatHazeEffect ( false );
+        g_pMultiplayer->SetHeatHazeEnabled ( g_pClientGame->GetHeatHazeEnabled () );
     }
 }
 

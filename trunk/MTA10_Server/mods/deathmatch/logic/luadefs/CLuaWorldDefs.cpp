@@ -48,6 +48,8 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isGlitchEnabled", CLuaWorldDefs::isGlitchEnabled );
     CLuaCFunctions::AddFunction ( "setCloudsEnabled", CLuaWorldDefs::setCloudsEnabled );
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaWorldDefs::getCloudsEnabled );
+    CLuaCFunctions::AddFunction ( "setHeatHazeEnabled", CLuaWorldDefs::setHeatHazeEnabled );
+    CLuaCFunctions::AddFunction ( "getHeatHazeEnabled", CLuaWorldDefs::getHeatHazeEnabled );
     CLuaCFunctions::AddFunction ( "setTrafficLightState", CLuaWorldDefs::setTrafficLightState );
     CLuaCFunctions::AddFunction ( "setTrafficLightsLocked", CLuaWorldDefs::setTrafficLightsLocked );
     CLuaCFunctions::AddFunction ( "setJetpackMaxHeight", CLuaWorldDefs::setJetpackMaxHeight );
@@ -670,6 +672,37 @@ int CLuaWorldDefs::getCloudsEnabled ( lua_State* luaVM )
 {
      lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetCloudsEnabled ( ) );
      return 1;
+}
+
+int CLuaWorldDefs::setHeatHazeEnabled ( lua_State* luaVM )
+{
+    int iArgument = lua_type ( luaVM, 1 );
+    if ( iArgument == LUA_TBOOLEAN || iArgument == LUA_TNIL || iArgument == LUA_TNONE )
+    {
+        int iEnabled = 2;
+        if ( iArgument == LUA_TBOOLEAN )
+            iEnabled = lua_toboolean ( luaVM, 1 ) ? 1 : 0;
+        if ( CStaticFunctionDefinitions::SetHeatHazeEnabled ( iEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setHeatHazeEnabled" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getHeatHazeEnabled ( lua_State* luaVM )
+{
+    int iEnabled = CStaticFunctionDefinitions::GetHeatHazeEnabled ();
+    if ( iEnabled == 2 )
+        lua_pushnil ( luaVM );
+    else
+        lua_pushboolean ( luaVM, iEnabled ? true : false );
+    return 1;
 }
 
 int CLuaWorldDefs::getJetpackMaxHeight ( lua_State* luaVM )

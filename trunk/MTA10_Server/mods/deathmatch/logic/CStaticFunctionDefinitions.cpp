@@ -7560,6 +7560,21 @@ bool CStaticFunctionDefinitions::GetCloudsEnabled ( void )
     return g_pGame->GetCloudsEnabled ();
 }
 
+bool CStaticFunctionDefinitions::SetHeatHazeEnabled ( int iEnabled )
+{
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBits ( &iEnabled, 2 );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_HEATHAZE_ENABLED, *BitStream.pBitStream ) );
+
+    g_pGame->SetHeatHazeEnabled ( iEnabled );
+    return true;
+
+}
+int CStaticFunctionDefinitions::GetHeatHazeEnabled ( void )
+{
+    return g_pGame->GetHeatHazeEnabled ();
+}
+
 CElement* CStaticFunctionDefinitions::GetRootElement ( void )
 {
     return m_pMapManager->GetRootElement ();

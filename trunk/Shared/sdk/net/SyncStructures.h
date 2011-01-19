@@ -1466,7 +1466,7 @@ struct SExplosionTypeSync : public ISyncStructure
 //////////////////////////////////////////
 struct SMapInfoFlagsSync : public ISyncStructure
 {
-    enum { BITCOUNT = 3 };
+    enum { BITCOUNT = 5 };
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -1482,6 +1482,7 @@ struct SMapInfoFlagsSync : public ISyncStructure
         bool bShowNametags : 1;
         bool bShowRadar : 1;
         bool bCloudsEnabled : 1;
+        uchar ucHeatHazeEnabled : 2;
     } data;
 };
 
@@ -1493,7 +1494,7 @@ struct SMapInfoFlagsSync : public ISyncStructure
 //////////////////////////////////////////
 struct SFunBugsStateSync : public ISyncStructure
 {
-    enum { BITCOUNT = 3 };
+    enum { BITCOUNT = 4 };
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -1509,6 +1510,7 @@ struct SFunBugsStateSync : public ISyncStructure
         bool bQuickReload : 1;
         bool bFastFire : 1;
         bool bFastMove : 1;
+        bool bCrouchBug : 1;
     } data;
 };
 

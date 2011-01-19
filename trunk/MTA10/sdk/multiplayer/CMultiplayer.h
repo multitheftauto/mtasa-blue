@@ -104,7 +104,6 @@ public:
     virtual void                        HideRadar                   ( bool bHide ) = 0;
     virtual void                        SetCenterOfWorld            ( class CEntity * entity, class CVector * vecPosition, FLOAT fHeading ) = 0;
     virtual void                        DisablePadHandler           ( bool bDisabled ) = 0;
-    virtual void                        DisableHeatHazeEffect       ( bool bDisable ) = 0;
     virtual void                        DisableAllVehicleWeapons    ( bool bDisable ) = 0;
     virtual void                        DisableZoneNames            ( bool bDisabled ) = 0; // move to CHud
     virtual void                        DisableBirds                ( bool bDisabled ) = 0;
@@ -137,6 +136,7 @@ public:
     virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;
     virtual void                        ResetWater                  ( void ) = 0;
     virtual void                        SetCloudsEnabled            ( bool bDisabled ) = 0;
+    virtual void                        SetHeatHazeEnabled          ( int iEnabled ) = 0;
     virtual bool                        AreInteriorSoundsEnabled    () = 0;
     virtual void                        SetInteriorSoundsEnabled    ( bool bEnabled ) = 0;
     virtual void                        DisableEnterExitVehicleKey  ( bool bDisabled ) = 0;

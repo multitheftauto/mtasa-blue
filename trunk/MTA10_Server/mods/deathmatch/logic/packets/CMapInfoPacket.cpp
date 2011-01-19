@@ -38,6 +38,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  unsigned char ucSkyGradientBB,
                                  unsigned short usFPSLimit,
                                  bool bCloudsEnabled,
+                                 int iHeatHazeEnabled,
                                  float fJetpackMaxHeight,
                                  bool bOverrideWaterColor,
                                  unsigned char ucWaterRed,
@@ -67,6 +68,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_ucSkyGradientBB = ucSkyGradientBB;
     m_usFPSLimit = usFPSLimit;
     m_bCloudsEnabled = bCloudsEnabled;
+    m_iHeatHazeEnabled = iHeatHazeEnabled;
     m_fJetpackMaxHeight = fJetpackMaxHeight;
     m_bOverrideWaterColor = bOverrideWaterColor;
     m_ucWaterRed = ucWaterRed;
@@ -105,6 +107,7 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     flags.data.bShowNametags  = m_bShowNametags;
     flags.data.bShowRadar     = m_bShowRadar;
     flags.data.bCloudsEnabled = m_bCloudsEnabled;
+    flags.data.ucHeatHazeEnabled = m_iHeatHazeEnabled;
     BitStream.Write ( &flags );
 
     // Write any other world conditions
@@ -132,13 +135,8 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     funBugs.data.bQuickReload = g_pGame->IsGlitchEnabled ( CGame::GLITCH_QUICKRELOAD );
     funBugs.data.bFastFire    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTFIRE );
     funBugs.data.bFastMove    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTMOVE );
+    funBugs.data.bCrouchBug    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CROUCHBUG );
     BitStream.Write ( &funBugs );
-
-    if ( BitStream.Version () >= 0x15 )
-    {
-        bool bCrouchBug = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CROUCHBUG );
-        BitStream.WriteBit ( bCrouchBug );
-    }
 
     BitStream.Write ( m_fJetpackMaxHeight );
 
