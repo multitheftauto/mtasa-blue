@@ -1568,11 +1568,19 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                         // Tell the console
                         CLogger::LogPrintf ( "CONNECT: %s failed to connect (Bad version) (%s)\n", szNick, strIPAndSerial.c_str () );
 
-                        // Tell the player that the problem
-                        char szReturn [128];
-                        _snprintf ( szReturn, 128, "Disconnected: Bad version (client: %X, server: %X)\n", Packet.GetNetVersion (), MTA_DM_NETCODE_VERSION );
-                        szReturn [127] = '\0';
-                        DisconnectPlayer ( this, *pPlayer, szReturn );
+                        // Tell the player the problem
+                        SString strMessage;
+                        if ( MTASA_VERSION_BUILD == 0 )
+                            strMessage = SString ( "Disconnected: Bad version (client: %X, server: %X)\n", Packet.GetNetVersion (), MTA_DM_NETCODE_VERSION );
+                        else
+                        {
+                            int iClientBuild = atoi ( Packet.GetPlayerVersion().SubStr ( 8, 5 ) );
+                            if ( iClientBuild < MTASA_VERSION_BUILD )
+                                strMessage = SString ( "Disconnected: Server is running a newer build (%d)\n", MTASA_VERSION_BUILD );
+                            else
+                                strMessage = SString ( "Disconnected: Server is running an older build (%d)\n", MTASA_VERSION_BUILD );
+                        }
+                        DisconnectPlayer ( this, *pPlayer, strMessage );
                     }
                 }
                 else
