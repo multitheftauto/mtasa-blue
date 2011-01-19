@@ -23,7 +23,7 @@ CPoolsSA::CPoolsSA()
     m_bGetVehicleEnabled = true;
     m_ulBuildingCount= 0;
 
-    MemSet8 (&Buildings,0,sizeof(CBuilding *) * MAX_BUILDINGS);
+    MemSet (&Buildings,0,sizeof(CBuilding *) * MAX_BUILDINGS);
 
     EntryInfoNodePool = new CEntryInfoNodePoolSA();
     PointerNodeDoubleLinkPool = new CPointerNodeDoubleLinkPoolSA();
@@ -951,7 +951,7 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
     DEBUG_TRACE("CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )");
 
     // clean the existing array
-    MemSet8 ( (void *)VAR_TrainModelArray, 0, 32 * sizeof(DWORD) );
+    MemSet ( (void *)VAR_TrainModelArray, 0, 32 * sizeof(DWORD) );
 
     // now load the models we're going to use and add them to the array
     for ( int i = 0; i < iSize; i++ )

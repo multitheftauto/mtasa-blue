@@ -1242,21 +1242,21 @@ VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
         OutputDebugString(szDebug);
         
         
-        MemCpy8 (vecTargetVector, &RemotePlayerTargetVectors[GetContextSwitchPedID()], sizeof(CVector));
-        MemCpy8 (vecStartVector, &RemotePlayerStartVectors[GetContextSwitchPedID()], sizeof(CVector));
+        MemCpy (vecTargetVector, &RemotePlayerTargetVectors[GetContextSwitchPedID()], sizeof(CVector));
+        MemCpy (vecStartVector, &RemotePlayerStartVectors[GetContextSwitchPedID()], sizeof(CVector));
     }
     else
     {
         // Its the Local Player, so save the data so it can be sent
-        MemCpy8 (&LocalPlayerShotOriginVector, vecShotOrigin, sizeof(CVector));
+        MemCpy (&LocalPlayerShotOriginVector, vecShotOrigin, sizeof(CVector));
 
         sprintf(szDebug, "Saved Local Shot Origin Vector  %f  %f  %f", 
             LocalPlayerShotOriginVector.fX, 
             LocalPlayerShotOriginVector.fY, 
             LocalPlayerShotOriginVector.fZ);
         OutputDebugString(szDebug);*/
-    /*  MemCpy8 (&LocalPlayerTargetVector, vecTargetVector, sizeof(CVector));
-        MemCpy8 (&LocalPlayerStartVector, vecStartVector, sizeof(CVector));
+    /*  MemCpy (&LocalPlayerTargetVector, vecTargetVector, sizeof(CVector));
+        MemCpy (&LocalPlayerStartVector, vecStartVector, sizeof(CVector));
         
         sprintf(szDebug, "Saved Local Target Vectors  %f  %f  %f", 
             LocalPlayerTargetVector.fX, 
@@ -1315,8 +1315,8 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
             RemotePlayerCrossProducts[GetContextSwitchPedID()].fY, 
             RemotePlayerCrossProducts[GetContextSwitchPedID()].fZ, vecCrossProduct);
         OutputDebugString(szDebug);
-        MemSet8 (vecCrossProduct,0,sizeof(CVector));
-    //  MemCpy8 (vecCrossProduct, &RemotePlayerCrossProducts[GetContextSwitchPedID()], sizeof(CVector));
+        MemSet (vecCrossProduct,0,sizeof(CVector));
+    //  MemCpy (vecCrossProduct, &RemotePlayerCrossProducts[GetContextSwitchPedID()], sizeof(CVector));
     }
     else
     {
@@ -1337,7 +1337,7 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
             pushad
         }
 
-        MemCpy8 (&LocalPlayerCrossProduct, vecCrossProduct, sizeof(CVector));
+        MemCpy (&LocalPlayerCrossProduct, vecCrossProduct, sizeof(CVector));
         sprintf(szDebug, "SHOTGUN: Saved Local Cross Product  %f  %f  %f", 
             LocalPlayerCrossProduct.fX, 
             LocalPlayerCrossProduct.fY, 

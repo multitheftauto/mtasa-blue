@@ -462,9 +462,9 @@ void CWorldSA::RestoreFarClipDistance ( )
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
 
-    MemCpy8 ( (LPVOID)0x55FCC8, &originalFstp, 3 );
-    MemCpy8 ( (LPVOID)0x5613A3, &originalFstp, 3 );
-    MemCpy8 ( (LPVOID)0x560A23, &originalFstp, 3 );
+    MemCpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
+    MemCpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
+    MemCpy ( (LPVOID)0x560A23, &originalFstp, 3 );
 }
 
 float CWorldSA::GetFogDistance ( )
@@ -485,7 +485,7 @@ void CWorldSA::RestoreFogDistance ( )
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x54};
 
-    MemCpy8 ( (LPVOID)0x55FCDB, &originalFstp, 3 );
+    MemCpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
 }
 
 void CWorldSA::GetSunColor ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
@@ -501,12 +501,12 @@ void CWorldSA::GetSunColor ( unsigned char& ucCoreRed, unsigned char& ucCoreGree
 
 void CWorldSA::SetSunColor ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue )
 {
-    MemSet8 ( (LPVOID)0x55F9B2, 0x90, 4 );
-    MemSet8 ( (LPVOID)0x55F9DD, 0x90, 4 );
-    MemSet8 ( (LPVOID)0x55FA08, 0x90, 4 );
-    MemSet8 ( (LPVOID)0x55FA33, 0x90, 4 );
-    MemSet8 ( (LPVOID)0x55FA5E, 0x90, 4 );
-    MemSet8 ( (LPVOID)0x55FA8D, 0x90, 4 );
+    MemSet ( (LPVOID)0x55F9B2, 0x90, 4 );
+    MemSet ( (LPVOID)0x55F9DD, 0x90, 4 );
+    MemSet ( (LPVOID)0x55FA08, 0x90, 4 );
+    MemSet ( (LPVOID)0x55FA33, 0x90, 4 );
+    MemSet ( (LPVOID)0x55FA5E, 0x90, 4 );
+    MemSet ( (LPVOID)0x55FA8D, 0x90, 4 );
 
     MemPut < BYTE > ( VAR_ucSunCoreR, ucCoreRed );  //     *(BYTE *)(VAR_ucSunCoreR) = ucCoreRed;
     MemPut < BYTE > ( VAR_ucSunCoreG, ucCoreGreen );  //     *(BYTE *)(VAR_ucSunCoreG) = ucCoreGreen;
@@ -521,18 +521,18 @@ void CWorldSA::ResetSunColor ( )
 {
     BYTE originalMov[3] = {0x66, 0x89, 0x46};
 
-    MemCpy8 ( (LPVOID)0x55F9B2, &originalMov, 3 );
+    MemCpy ( (LPVOID)0x55F9B2, &originalMov, 3 );
     MemPut < BYTE > ( 0x55F9B5, 0x30 );  //     *(BYTE *)0x55F9B5 = 0x30;
-    MemCpy8 ( (LPVOID)0x55F9DD, &originalMov, 3 );
+    MemCpy ( (LPVOID)0x55F9DD, &originalMov, 3 );
     MemPut < BYTE > ( 0x55F9E0, 0x32 );  //     *(BYTE *)0x55F9E0 = 0x32;
-    MemCpy8 ( (LPVOID)0x55FA08, &originalMov, 3 );
+    MemCpy ( (LPVOID)0x55FA08, &originalMov, 3 );
     MemPut < BYTE > ( 0x55FA0B, 0x34 );  //     *(BYTE *)0x55FA0B = 0x34;
 
-    MemCpy8 ( (LPVOID)0x55FA33, &originalMov, 3 );
+    MemCpy ( (LPVOID)0x55FA33, &originalMov, 3 );
     MemPut < BYTE > ( 0x55FA36, 0x36 );  //     *(BYTE *)0x55FA36 = 0x36;
-    MemCpy8 ( (LPVOID)0x55FA5E, &originalMov, 3 );
+    MemCpy ( (LPVOID)0x55FA5E, &originalMov, 3 );
     MemPut < BYTE > ( 0x55FA61, 0x38 );  //     *(BYTE *)0x55FA61 = 0x38;
-    MemCpy8 ( (LPVOID)0x55FA8D, &originalMov, 3 );
+    MemCpy ( (LPVOID)0x55FA8D, &originalMov, 3 );
     MemPut < BYTE > ( 0x55FA90, 0x3A );  //     *(BYTE *)0x55FA90 = 0x3A;
 }
 

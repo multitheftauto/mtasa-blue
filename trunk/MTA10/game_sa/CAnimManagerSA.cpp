@@ -16,9 +16,9 @@ using std::list;
 
 CAnimManagerSA::CAnimManagerSA ( void )
 {
-    MemSet8 ( m_pAnimAssocGroups, 0, sizeof ( m_pAnimAssocGroups ) );
-    MemSet8 ( m_pAnimations, 0, sizeof ( m_pAnimations ) );
-    MemSet8 ( m_pAnimBlocks, 0, sizeof ( m_pAnimBlocks ) );
+    MemSet ( m_pAnimAssocGroups, 0, sizeof ( m_pAnimAssocGroups ) );
+    MemSet ( m_pAnimations, 0, sizeof ( m_pAnimations ) );
+    MemSet ( m_pAnimBlocks, 0, sizeof ( m_pAnimBlocks ) );
 }
 
 

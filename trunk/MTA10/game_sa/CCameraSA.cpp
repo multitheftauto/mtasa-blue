@@ -207,14 +207,14 @@ CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )
     CMatrix_Padded * pCamMatrix = &this->GetInterface()->m_cameraMatrix; // ->Placeable.matrix;
     if ( pCamMatrix )
     {
-        MemCpy8 (&matrix->vFront,     &pCamMatrix->vFront,    sizeof(CVector));
-        MemCpy8 (&matrix->vPos,           &pCamMatrix->vPos,          sizeof(CVector));
-        MemCpy8 (&matrix->vUp,            &pCamMatrix->vUp,           sizeof(CVector));
-        MemCpy8 (&matrix->vRight,         &pCamMatrix->vRight,            sizeof(CVector));   
+        MemCpy (&matrix->vFront,     &pCamMatrix->vFront,    sizeof(CVector));
+        MemCpy (&matrix->vPos,           &pCamMatrix->vPos,          sizeof(CVector));
+        MemCpy (&matrix->vUp,            &pCamMatrix->vUp,           sizeof(CVector));
+        MemCpy (&matrix->vRight,         &pCamMatrix->vRight,            sizeof(CVector));   
     }
     else
     {
-        MemSet8 (matrix, 0, sizeof(CMatrix));
+        MemSet (matrix, 0, sizeof(CMatrix));
     }
     return matrix;
 }
@@ -225,10 +225,10 @@ VOID CCameraSA::SetMatrix ( CMatrix * matrix )
     CMatrix_Padded * pCamMatrix = this->GetInterface()->Placeable.matrix;
     if ( pCamMatrix )
     {
-        MemCpy8 (&pCamMatrix->vFront,     &matrix->vFront,    sizeof(CVector));
-        MemCpy8 (&pCamMatrix->vPos,           &matrix->vPos,          sizeof(CVector));
-        MemCpy8 (&pCamMatrix->vUp,            &matrix->vUp,           sizeof(CVector));
-        MemCpy8 (&pCamMatrix->vRight,         &matrix->vRight,            sizeof(CVector));
+        MemCpy (&pCamMatrix->vFront,     &matrix->vFront,    sizeof(CVector));
+        MemCpy (&pCamMatrix->vPos,           &matrix->vPos,          sizeof(CVector));
+        MemCpy (&pCamMatrix->vUp,            &matrix->vUp,           sizeof(CVector));
+        MemCpy (&pCamMatrix->vRight,         &matrix->vRight,            sizeof(CVector));
     }   
 }
 

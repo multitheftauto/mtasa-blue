@@ -36,12 +36,12 @@ CGame * GetGameInterface( CCoreInterface* pCore )
 //-----------------------------------------------------------
 
 
-void MemSet8 ( void* dwDest, int cValue, uint uiAmount )
+void MemSet ( void* dwDest, int cValue, uint uiAmount )
 {
-    g_pNet->ResetStub ( 'MSet', dwDest, cValue, uiAmount );
+    g_pNet->ResetStub ( 1297311092, dwDest, cValue, uiAmount );
 }
 
-void MemCpy8 ( void* dwDest, const void* dwSrc, uint uiAmount )
+void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
 {
-    g_pNet->ResetStub ( 'MCpy', dwDest, dwSrc, uiAmount );
+    g_pNet->ResetStub ( 1296265337, dwDest, dwSrc, uiAmount );
 }

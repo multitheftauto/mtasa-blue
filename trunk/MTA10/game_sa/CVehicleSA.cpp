@@ -236,7 +236,7 @@ VOID CVehicleSA::SetMoveSpeed ( CVector* vecMoveSpeed )
         call    dwFunc
         mov     dwReturn, eax
     }
-    MemCpy8 ((void *)dwReturn, vecMoveSpeed, sizeof(CVector));
+    MemCpy ((void *)dwReturn, vecMoveSpeed, sizeof(CVector));
 
     // INACCURATE. Use Get/SetTrainSpeed instead of Get/SetMoveSpeed. (Causes issue #4829).
 #if 0

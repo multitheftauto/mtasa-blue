@@ -71,15 +71,15 @@ VOID InitKeysyncHooks()
     
     // not strictly for keysync, to make CPlayerPed::GetPlayerInfoForThisPlayerPed always return the local playerinfo
     //00609FF2     EB 1F          JMP SHORT gta_sa_u.0060A013
-    MemSet8 ((void *)0x609FF2, 0xEB, 1);
-    MemSet8 ((void *)0x609FF3, 0x1F, 1);
-    MemSet8 ((void *)0x609FF4, 0x90, 1);
-    MemSet8 ((void *)0x609FF5, 0x90, 1);
-    MemSet8 ((void *)0x609FF6, 0x90, 1);
+    MemSet ((void *)0x609FF2, 0xEB, 1);
+    MemSet ((void *)0x609FF3, 0x1F, 1);
+    MemSet ((void *)0x609FF4, 0x90, 1);
+    MemSet ((void *)0x609FF5, 0x90, 1);
+    MemSet ((void *)0x609FF6, 0x90, 1);
     
     // and this is to fix bike sync (I hope)
     //006BC9EB   9090               NOP NOP
-    MemSet8 ((void *)0x6BC9EB, 0x90, 2);
+    MemSet ((void *)0x6BC9EB, 0x90, 2);
 }
 
 extern CPed* pContextSwitchedPed;
@@ -190,9 +190,9 @@ void PostContextSwitch ( void )
 
     // ChrML: This causes the aiming issues
     // Restore the local player stats    
-    MemCpy8 ( (void *)0xb79380, &localStatsData.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
-    MemCpy8 ( (void *)0xb79000, &localStatsData.StatTypesInt, sizeof(int) * MAX_INT_STATS );
-    MemCpy8 ( (void *)0xb78f10, &localStatsData.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
+    MemCpy ( (void *)0xb79380, &localStatsData.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
+    MemCpy ( (void *)0xb79000, &localStatsData.StatTypesInt, sizeof(int) * MAX_INT_STATS );
+    MemCpy ( (void *)0xb78f10, &localStatsData.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
 }
 
 VOID ReturnContextToLocalPlayer()
@@ -209,7 +209,7 @@ VOID ReturnContextToLocalPlayer()
                 // Store any changes the game has made to the pad
                 CPad* pLocalPad = pGameInterface->GetPad ();
                 CPadSAInterface* pLocalPadInterface = ( (CPadSA*) pLocalPad )->GetInterface ();
-                MemCpy8 ( &data->m_pad, pLocalPadInterface, sizeof ( CPadSAInterface ) );            
+                MemCpy ( &data->m_pad, pLocalPadInterface, sizeof ( CPadSAInterface ) );            
             }
         }
 
@@ -240,16 +240,16 @@ VOID ReturnContextToLocalPlayer()
         // Store any changes to the local-players stats?
         if ( !bLocalStatsStatic )
         {
-            MemCpy8 ( &localStatsData.StatTypesFloat, (void *)0xb79380, sizeof(float) * MAX_FLOAT_STATS );
-            MemCpy8 ( &localStatsData.StatTypesInt, (void *)0xb79000, sizeof(int) * MAX_INT_STATS );
-            MemCpy8 ( &localStatsData.StatReactionValue, (void *)0xb78f10, sizeof(float) * MAX_REACTION_STATS );
+            MemCpy ( &localStatsData.StatTypesFloat, (void *)0xb79380, sizeof(float) * MAX_FLOAT_STATS );
+            MemCpy ( &localStatsData.StatTypesInt, (void *)0xb79000, sizeof(int) * MAX_INT_STATS );
+            MemCpy ( &localStatsData.StatReactionValue, (void *)0xb78f10, sizeof(float) * MAX_REACTION_STATS );
         }
     }
 
     // radio change on startup hack
     //0050237C   90               NOP
-    MemSet8 ((void *)0x50237C, 0x90, 5);
-    MemSet8 ((void *)0x5023A3, 0x90, 5);
+    MemSet ((void *)0x50237C, 0x90, 5);
+    MemSet ((void *)0x5023A3, 0x90, 5);
 
     // We need to set this back, even if its the local player
     pGameInterface->SetGravity ( fGlobalGravity );
@@ -298,7 +298,7 @@ void SwitchContext ( CPed* thePed )
                     }
 
                     // Change the local player's pad to the remote player's
-                    MemCpy8 ( pLocalPadInterface, &data->m_pad, sizeof ( CPadSAInterface ) );
+                    MemCpy ( pLocalPadInterface, &data->m_pad, sizeof ( CPadSAInterface ) );
 
                     // this is to fix the horn/siren
                     pLocalPad->SetHornHistoryValue ( ( cs->ShockButtonL == 255 ) );
@@ -338,8 +338,8 @@ void SwitchContext ( CPed* thePed )
                     MemPut < bool > ( 0xC402B8, false );  //                     *(bool *)0xC402B8 = false;
 
                     // Remove the code making players cough on fire extinguisher and teargas
-                    MemSet8 ( (void*) 0x4C03F0, 0x90, 3 );
-                    MemSet8 ( (void*) 0x4C03F8, 0x90, 7 );
+                    MemSet ( (void*) 0x4C03F0, 0x90, 3 );
+                    MemSet ( (void*) 0x4C03F8, 0x90, 7 );
 
                     // Prevent it calling ClearWeaponTarget for remote players
                     MemPut < BYTE > ( 0x609C80, 0xC3 );  //                     *(BYTE *)0x609C80 = 0xC3;
@@ -377,9 +377,9 @@ void SwitchContext ( CPed* thePed )
                     // Change the local player's stats to the remote player's
                     if ( data )
                     {
-                        MemCpy8 ( (void *)0xb79380, data->m_stats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
-                        MemCpy8 ( (void *)0xb79000, data->m_stats.StatTypesInt, sizeof(int) * MAX_INT_STATS );
-                        MemCpy8 ( (void *)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
+                        MemCpy ( (void *)0xb79380, data->m_stats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
+                        MemCpy ( (void *)0xb79000, data->m_stats.StatTypesInt, sizeof(int) * MAX_INT_STATS );
+                        MemCpy ( (void *)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
                     }                 
 
                     /*

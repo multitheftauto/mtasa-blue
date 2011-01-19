@@ -256,10 +256,10 @@ CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix ) const
     DEBUG_TRACE("CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix )");
     if ( m_pInterface->Placeable.matrix && matrix )
     {
-        MemCpy8 (&matrix->vFront,     &m_pInterface->Placeable.matrix->vFront, sizeof(CVector));
-        MemCpy8 (&matrix->vPos,           &m_pInterface->Placeable.matrix->vPos, sizeof(CVector));
-        MemCpy8 (&matrix->vUp,            &m_pInterface->Placeable.matrix->vUp, sizeof(CVector));
-        MemCpy8 (&matrix->vRight,         &m_pInterface->Placeable.matrix->vRight, sizeof(CVector));
+        MemCpy (&matrix->vFront,     &m_pInterface->Placeable.matrix->vFront, sizeof(CVector));
+        MemCpy (&matrix->vPos,           &m_pInterface->Placeable.matrix->vPos, sizeof(CVector));
+        MemCpy (&matrix->vUp,            &m_pInterface->Placeable.matrix->vUp, sizeof(CVector));
+        MemCpy (&matrix->vRight,         &m_pInterface->Placeable.matrix->vRight, sizeof(CVector));
         return matrix;
     }
     else
@@ -273,10 +273,10 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
     DEBUG_TRACE("VOID CEntitySA::SetMatrix ( CMatrix * matrix )");
     if ( m_pInterface->Placeable.matrix && matrix )
     {
-        MemCpy8 (&m_pInterface->Placeable.matrix->vFront,     &matrix->vFront, sizeof(CVector));
-        MemCpy8 (&m_pInterface->Placeable.matrix->vPos,           &matrix->vPos, sizeof(CVector));
-        MemCpy8 (&m_pInterface->Placeable.matrix->vUp,            &matrix->vUp, sizeof(CVector));
-        MemCpy8 (&m_pInterface->Placeable.matrix->vRight,         &matrix->vRight, sizeof(CVector));
+        MemCpy (&m_pInterface->Placeable.matrix->vFront,     &matrix->vFront, sizeof(CVector));
+        MemCpy (&m_pInterface->Placeable.matrix->vPos,           &matrix->vPos, sizeof(CVector));
+        MemCpy (&m_pInterface->Placeable.matrix->vUp,            &matrix->vUp, sizeof(CVector));
+        MemCpy (&m_pInterface->Placeable.matrix->vRight,         &matrix->vRight, sizeof(CVector));
 
         m_pInterface->Placeable.m_transform.m_translate = matrix->vPos;
 

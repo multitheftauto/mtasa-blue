@@ -402,8 +402,8 @@ void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures
                 RwTexture* pNewTex = RwTextureCreate ( pTex->raster );
 
                 // Copy over additional properties
-                MemCpy8 ( &pNewTex->name, &pTex->name, RW_TEXTURE_NAME_LENGTH );
-                MemCpy8 ( &pNewTex->mask, &pTex->mask, RW_TEXTURE_NAME_LENGTH );
+                MemCpy ( &pNewTex->name, &pTex->name, RW_TEXTURE_NAME_LENGTH );
+                MemCpy ( &pNewTex->mask, &pTex->mask, RW_TEXTURE_NAME_LENGTH );
                 pNewTex->flags = pTex->flags;
                 
                 pTex = pNewTex;
