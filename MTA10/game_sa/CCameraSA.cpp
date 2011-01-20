@@ -516,13 +516,9 @@ void CCameraSA::SetCameraClip ( bool bObjects, bool bVehicles )
     bCameraClipVehicles = bVehicles;
 }
 
-void _declspec(naked) HOOK_Camera_CollisionDetection ()
-{
-    _asm
-    {
-        pushad
-    }
 
+void _cdecl DoCameraCollisionDetectionPokes ()
+{
     if ( !bCameraClipObjects )
     {
         MemPut < char > ( VAR_CameraClipDynamicObjects, 0 );  //         *(char*)VAR_CameraClipDynamicObjects = 0;
@@ -533,9 +529,14 @@ void _declspec(naked) HOOK_Camera_CollisionDetection ()
 
     if ( !bCameraClipVehicles )
         MemPut < char > ( VAR_CameraClipVehicles, 0 );  //         *(char*)VAR_CameraClipVehicles = 0;
+}
 
+void _declspec(naked) HOOK_Camera_CollisionDetection ()
+{
     _asm
     {
+        pushad
+        call DoCameraCollisionDetectionPokes
         popad
         sub         esp,24h
         push        ebx 

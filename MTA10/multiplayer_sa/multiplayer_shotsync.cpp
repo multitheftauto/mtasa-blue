@@ -1004,6 +1004,11 @@ static void CheckInVehicleDamage()
     }
 }
 
+void _cdecl DoFireInstantHitPokes ( void )
+{
+    MemPut < unsigned char > ( VAR_CWorld_IncludeCarTyres, 1 );  //     * ( unsigned char * ) ( VAR_CWorld_IncludeCarTyres ) = 1;
+}
+
 DWORD dwFunc_CWeapon_FireInstantHit_ret = 0x740B6E;
 DWORD dwFunc_CWorld_ProcessLineOfSight = 0x56BA00;
 void _declspec(naked) HOOK_CWeapon_FireInstantHit ()
@@ -1053,7 +1058,7 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit ()
     }
 
     // Make sure we include car tyres in our ProcessLineOfSight check
-    MemPut < unsigned char > ( VAR_CWorld_IncludeCarTyres, 1 );  //     * ( unsigned char * ) ( VAR_CWorld_IncludeCarTyres ) = 1;
+    _asm call DoFireInstantHitPokes
 
     _asm
     {
