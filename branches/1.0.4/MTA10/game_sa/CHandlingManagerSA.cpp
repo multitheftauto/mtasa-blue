@@ -91,6 +91,7 @@ void DumpHandlingData ( tHandlingDataSA* pData )
 
 __declspec(naked) void Hook_Calculate ( void )
 {
+    FUNCTION_PROLOG
     tHandlingDataSA *pData;
     DWORD dwHandlingData;
     _asm
@@ -104,6 +105,7 @@ __declspec(naked) void Hook_Calculate ( void )
 
     _asm
     {
+        _FUNCTION_EPILOG
         ret         4
     }
 }
@@ -586,9 +588,11 @@ __declspec(naked) void CHandlingManagerSA::Hook_LoadHandlingCfg ( void )
         call        eax
     };
 
+    FUNCTION_PROLOG
     // Calculate handling.cfg values. We've already initialized them
     // like they would come from handling.cfg
     LoadHandlingCfg ();
+    FUNCTION_EPILOG
 
     _asm
     {
@@ -607,7 +611,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
 {
 #if (USE_GTASA_HANDLING == FALSE)
     // Reset
-    memset ( m_OriginalHandlingData, 0, sizeof ( m_OriginalHandlingData ) );
+    MemSet ( m_OriginalHandlingData, 0, sizeof ( m_OriginalHandlingData ) );
 
     // NB: Don't waste your time changing this manually. Use the dumping code
     //     commented out at the bottom :)

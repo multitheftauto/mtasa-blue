@@ -206,14 +206,14 @@ CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )
     CMatrix_Padded * pCamMatrix = &this->GetInterface()->m_cameraMatrix; // ->Placeable.matrix;
     if ( pCamMatrix )
     {
-        memcpy(&matrix->vFront,     &pCamMatrix->vFront,    sizeof(CVector));
-        memcpy(&matrix->vPos,           &pCamMatrix->vPos,          sizeof(CVector));
-        memcpy(&matrix->vUp,            &pCamMatrix->vUp,           sizeof(CVector));
-        memcpy(&matrix->vRight,         &pCamMatrix->vRight,            sizeof(CVector));   
+        MemCpy (&matrix->vFront,     &pCamMatrix->vFront,    sizeof(CVector));
+        MemCpy (&matrix->vPos,           &pCamMatrix->vPos,          sizeof(CVector));
+        MemCpy (&matrix->vUp,            &pCamMatrix->vUp,           sizeof(CVector));
+        MemCpy (&matrix->vRight,         &pCamMatrix->vRight,            sizeof(CVector));   
     }
     else
     {
-        memset(matrix, 0, sizeof(CMatrix));
+        MemSet (matrix, 0, sizeof(CMatrix));
     }
     return matrix;
 }
@@ -224,10 +224,10 @@ VOID CCameraSA::SetMatrix ( CMatrix * matrix )
     CMatrix_Padded * pCamMatrix = this->GetInterface()->Placeable.matrix;
     if ( pCamMatrix )
     {
-        memcpy(&pCamMatrix->vFront,     &matrix->vFront,    sizeof(CVector));
-        memcpy(&pCamMatrix->vPos,           &matrix->vPos,          sizeof(CVector));
-        memcpy(&pCamMatrix->vUp,            &matrix->vUp,           sizeof(CVector));
-        memcpy(&pCamMatrix->vRight,         &matrix->vRight,            sizeof(CVector));
+        MemCpy (&pCamMatrix->vFront,     &matrix->vFront,    sizeof(CVector));
+        MemCpy (&pCamMatrix->vPos,           &matrix->vPos,          sizeof(CVector));
+        MemCpy (&pCamMatrix->vUp,            &matrix->vUp,           sizeof(CVector));
+        MemCpy (&pCamMatrix->vRight,         &matrix->vRight,            sizeof(CVector));
     }   
 }
 
@@ -522,16 +522,20 @@ void _declspec(naked) HOOK_Camera_CollisionDetection ()
         pushad
     }
 
+    FUNCTION_PROLOG
+
     if ( !bCameraClipObjects )
     {
-        *(char*)VAR_CameraClipDynamicObjects = 0;
-        *(char*)VAR_CameraClipStaticObjects = 0;
+        MemPut < char > ( VAR_CameraClipDynamicObjects, 0 );  //         *(char*)VAR_CameraClipDynamicObjects = 0;
+        MemPut < char > ( VAR_CameraClipStaticObjects, 0 );  //         *(char*)VAR_CameraClipStaticObjects = 0;
     }
     else
-        *(char*)VAR_CameraClipStaticObjects = 1;
+        MemPut < char > ( VAR_CameraClipStaticObjects, 1 );  //         *(char*)VAR_CameraClipStaticObjects = 1;
 
     if ( !bCameraClipVehicles )
-        *(char*)VAR_CameraClipVehicles = 0;
+        MemPut < char > ( VAR_CameraClipVehicles, 0 );  //         *(char*)VAR_CameraClipVehicles = 0;
+
+    FUNCTION_EPILOG
 
     _asm
     {

@@ -62,7 +62,7 @@ void CPlayerInfoSA::SetPlayerMoney ( long lMoney )
 {
     DEBUG_TRACE("void CPlayerInfoSA::SetPlayerMoney ( unsigned long ulMoney )");
     //internalInterface->DisplayScore = ulMoney;
-    * ( long * ) ( 0xB7CE50 ) = lMoney;
+    MemPut < long > ( 0xB7CE50, lMoney );  //     * ( long * ) ( 0xB7CE50 ) = lMoney;
 }
 
 /**

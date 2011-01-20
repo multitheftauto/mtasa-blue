@@ -85,8 +85,8 @@ CBuildingSA::CBuildingSA( DWORD dwModel )
     }*/
 
     /*building->m_pLod = (CBuildingSAInterface*)-1;
-    *(DWORD *)0xBCC0D8 = 1;
-    *(DWORD *)0xBCC0E0 = (DWORD)building;
+    MemPut < DWORD > ( 0xBCC0D8, 1 );  //     *(DWORD *)0xBCC0D8 = 1;
+    MemPut < DWORD > ( 0xBCC0E0, (DWORD)building );  //     *(DWORD *)0xBCC0E0 = (DWORD)building;
     dwFunc = 0x5B51E0;
     _asm
     {
@@ -113,8 +113,8 @@ CBuildingSA::CBuildingSA( DWORD dwModel )
     this->SetInterface((CEntitySAInterface*)dwThis);
     
     //DWORD * Index = (DWORD *)0xBCC0D8;
-    *(DWORD *)(0xBCC0E0) = dwThis;
-    *(DWORD *)0xBCC0D8 = 1;
+    MemPut < DWORD > ( 0xBCC0E0, dwThis );  //     *(DWORD *)(0xBCC0E0) = dwThis;
+    MemPut < DWORD > ( 0xBCC0D8, 1 );  //     *(DWORD *)0xBCC0D8 = 1;
 
     dwFunc = 0x404DE0; // CIplStore__SetupRelatedIpls
     DWORD dwTemp = 0;

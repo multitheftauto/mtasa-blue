@@ -222,9 +222,9 @@ void CWorldSA::IgnoreEntity(CEntity * pEntity)
     CEntitySA* pEntitySA = dynamic_cast < CEntitySA* > ( pEntity );
 
     if ( pEntitySA )
-        *(DWORD *)VAR_IgnoredEntity = (DWORD) pEntitySA->GetInterface ();
+        MemPut < DWORD > ( VAR_IgnoredEntity, (DWORD) pEntitySA->GetInterface () );  //         *(DWORD *)VAR_IgnoredEntity = (DWORD) pEntitySA->GetInterface ();
     else
-        *(DWORD *)VAR_IgnoredEntity = 0;
+        MemPut < DWORD > ( VAR_IgnoredEntity, 0 );  //         *(DWORD *)VAR_IgnoredEntity = 0;
 }
 
 // technically this is in CTheZones
@@ -367,7 +367,7 @@ DWORD CWorldSA::GetCurrentArea ( void )
 
 void CWorldSA::SetCurrentArea ( DWORD dwArea )
 {
-    *(DWORD *)VAR_currArea = dwArea;
+    MemPut < DWORD > ( VAR_currArea, dwArea );  //     *(DWORD *)VAR_currArea = dwArea;
 
     DWORD dwFunc = FUNC_RemoveBuildingsNotInArea;
     _asm
@@ -380,5 +380,5 @@ void CWorldSA::SetCurrentArea ( DWORD dwArea )
 
 void CWorldSA::SetJetpackMaxHeight ( float fHeight )
 {
-    *(float *)(VAR_fJetpackMaxHeight) = fHeight;
+    MemPut < float > ( VAR_fJetpackMaxHeight, fHeight );  //     *(float *)(VAR_fJetpackMaxHeight) = fHeight;
 }

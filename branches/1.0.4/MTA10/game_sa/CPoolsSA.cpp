@@ -23,7 +23,7 @@ CPoolsSA::CPoolsSA()
     m_bGetVehicleEnabled = true;
     m_ulBuildingCount= 0;
 
-    memset(&Buildings,0,sizeof(CBuilding *) * MAX_BUILDINGS);
+    MemSet (&Buildings,0,sizeof(CBuilding *) * MAX_BUILDINGS);
 
     EntryInfoNodePool = new CEntryInfoNodePoolSA();
     PointerNodeDoubleLinkPool = new CPointerNodeDoubleLinkPoolSA();
@@ -951,7 +951,7 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
     DEBUG_TRACE("CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )");
 
     // clean the existing array
-    memset ( (void *)VAR_TrainModelArray, 0, 32 * sizeof(DWORD) );
+    MemSet ( (void *)VAR_TrainModelArray, 0, 32 * sizeof(DWORD) );
 
     // now load the models we're going to use and add them to the array
     for ( int i = 0; i < iSize; i++ )
@@ -960,7 +960,7 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
             dwModels[i] == 538 || dwModels[i] == 569 || 
             dwModels[i] == 590 )
         {
-            *(DWORD *)(VAR_TrainModelArray + i * 4) = dwModels[i];
+            MemPut < DWORD > ( VAR_TrainModelArray + i * 4, dwModels[i] );  //             *(DWORD *)(VAR_TrainModelArray + i * 4) = dwModels[i];
         }
     }
 
@@ -1155,10 +1155,10 @@ void CPoolsSA::SetPoolCapacity ( ePools pool, int iValue )
         case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
     }
     if ( iPtr )
-        *(int*)iPtr = iValue;
+        MemPut < int > ( iPtr, iValue );  //         *(int*)iPtr = iValue;
 
     if ( cPtr )
-        *(char*)cPtr = iValue;
+        MemPut < char > ( cPtr, iValue );  //         *(char*)cPtr = iValue;
 }
 
 

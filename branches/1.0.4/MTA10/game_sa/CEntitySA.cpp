@@ -256,10 +256,10 @@ CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix ) const
     DEBUG_TRACE("CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix )");
     if ( m_pInterface->Placeable.matrix && matrix )
     {
-        memcpy(&matrix->vFront,     &m_pInterface->Placeable.matrix->vFront, sizeof(CVector));
-        memcpy(&matrix->vPos,           &m_pInterface->Placeable.matrix->vPos, sizeof(CVector));
-        memcpy(&matrix->vUp,            &m_pInterface->Placeable.matrix->vUp, sizeof(CVector));
-        memcpy(&matrix->vRight,         &m_pInterface->Placeable.matrix->vRight, sizeof(CVector));
+        MemCpy (&matrix->vFront,     &m_pInterface->Placeable.matrix->vFront, sizeof(CVector));
+        MemCpy (&matrix->vPos,           &m_pInterface->Placeable.matrix->vPos, sizeof(CVector));
+        MemCpy (&matrix->vUp,            &m_pInterface->Placeable.matrix->vUp, sizeof(CVector));
+        MemCpy (&matrix->vRight,         &m_pInterface->Placeable.matrix->vRight, sizeof(CVector));
         return matrix;
     }
     else
@@ -273,10 +273,10 @@ VOID CEntitySA::SetMatrix ( CMatrix * matrix )
     DEBUG_TRACE("VOID CEntitySA::SetMatrix ( CMatrix * matrix )");
     if ( m_pInterface->Placeable.matrix && matrix )
     {
-        memcpy(&m_pInterface->Placeable.matrix->vFront,     &matrix->vFront, sizeof(CVector));
-        memcpy(&m_pInterface->Placeable.matrix->vPos,           &matrix->vPos, sizeof(CVector));
-        memcpy(&m_pInterface->Placeable.matrix->vUp,            &matrix->vUp, sizeof(CVector));
-        memcpy(&m_pInterface->Placeable.matrix->vRight,         &matrix->vRight, sizeof(CVector));
+        MemCpy (&m_pInterface->Placeable.matrix->vFront,     &matrix->vFront, sizeof(CVector));
+        MemCpy (&m_pInterface->Placeable.matrix->vPos,           &matrix->vPos, sizeof(CVector));
+        MemCpy (&m_pInterface->Placeable.matrix->vUp,            &matrix->vUp, sizeof(CVector));
+        MemCpy (&m_pInterface->Placeable.matrix->vRight,         &matrix->vRight, sizeof(CVector));
 
         m_pInterface->Placeable.m_transform.m_translate = matrix->vPos;
 
@@ -404,8 +404,8 @@ VOID CEntitySA::SetAlpha(DWORD dwAlpha)
 bool CEntitySA::IsOnScreen ()
 {
     /**(BYTE *)0x534540 = 0x83;
-    *(BYTE *)0x534541 = 0xEC;
-    *(BYTE *)0x534542 = 0x10;
+    MemPut < BYTE > ( 0x534541, 0xEC );  //     *(BYTE *)0x534541 = 0xEC;
+    MemPut < BYTE > ( 0x534542, 0x10 );  //     *(BYTE *)0x534542 = 0x10;
 */
     DWORD dwFunc = FUNC_IsVisible; //FUNC_IsOnScreen;
     DWORD dwThis = (DWORD) m_pInterface;
@@ -417,9 +417,9 @@ bool CEntitySA::IsOnScreen ()
         mov     bReturn, al
     }
 /*
-    *(BYTE *)0x534540 = 0xB0;
-    *(BYTE *)0x534541 = 0x01;
-    *(BYTE *)0x534542 = 0xC3;
+    MemPut < BYTE > ( 0x534540, 0xB0 );  //     *(BYTE *)0x534540 = 0xB0;
+    MemPut < BYTE > ( 0x534541, 0x01 );  //     *(BYTE *)0x534541 = 0x01;
+    MemPut < BYTE > ( 0x534542, 0xC3 );  //     *(BYTE *)0x534542 = 0xC3;
 */
     return bReturn;
 }

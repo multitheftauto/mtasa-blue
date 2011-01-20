@@ -18,7 +18,7 @@ CWantedSA::CWantedSA ( void )
     // TODO: Call GTA's new operator for CWanted. Lack of proper initialization might be causing crashes.
 
     internalInterface = new CWantedSAInterface;
-    memset ( internalInterface, 0, sizeof ( CWantedSAInterface ) );
+    MemSet ( internalInterface, 0, sizeof ( CWantedSAInterface ) );
 
     m_bDontDelete = false;
 }

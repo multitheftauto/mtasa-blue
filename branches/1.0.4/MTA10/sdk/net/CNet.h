@@ -86,6 +86,8 @@ public:
     virtual const char*                 GetDiagnosticStatus         ( void ) = 0;
 
     virtual bool                        VerifySignature             ( const char* pData, unsigned long ulSize ) = 0;
+
+    virtual void                        ResetStub                   ( DWORD dwType, ... ) = 0;
 };
 
 #endif

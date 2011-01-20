@@ -401,8 +401,8 @@ void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures
                 RwTexture* pNewTex = RwTextureCreate ( pTex->raster );
 
                 // Copy over additional properties
-                memcpy ( &pNewTex->name, &pTex->name, RW_TEXTURE_NAME_LENGTH );
-                memcpy ( &pNewTex->mask, &pTex->mask, RW_TEXTURE_NAME_LENGTH );
+                MemCpy ( &pNewTex->name, &pTex->name, RW_TEXTURE_NAME_LENGTH );
+                MemCpy ( &pNewTex->mask, &pTex->mask, RW_TEXTURE_NAME_LENGTH );
                 pNewTex->flags = pTex->flags;
                 
                 pTex = pNewTex;
@@ -664,7 +664,7 @@ void CRenderWareSA::ReplaceAllAtomicsInModel ( RpClump * pSrc, unsigned short us
     data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
     data.pClump = pCopy;
 
-    *((DWORD*)DWORD_AtomicsReplacerModelID) = usModelID;
+    MemPut < DWORD > ( (DWORD*)DWORD_AtomicsReplacerModelID, usModelID );  //     *((DWORD*)DWORD_AtomicsReplacerModelID) = usModelID;
     RpClumpForAllAtomics ( pCopy, AtomicsReplacer, &data );
 
     // Get rid of the now empty copied clump
@@ -745,8 +745,8 @@ void CRenderWareSA::ReplaceCollisions ( CColModel* pCol, unsigned short usModelI
     // Apply some low-level hacks (copies the old col area and sets a flag)
     DWORD pColModelInterface = (DWORD)pColModel->GetInterface ();
     DWORD pOldColModelInterface = *((DWORD *) pPool [ usModelID ] + 20);
-    *((BYTE *)( pPool [usModelID ] + 0x13 )) |= 8;
-    *((BYTE *)( pColModelInterface + 40 )) = *((BYTE *)( pOldColModelInterface + 40 ));
+    MemOr < BYTE > ( pPool [usModelID ] + 0x13, 8 );  //     *((BYTE *)( pPool [usModelID ] + 0x13 )) |= 8;
+    MemPut < BYTE > ( pColModelInterface + 40, *((BYTE *)( pOldColModelInterface + 40 )) );  //     *((BYTE *)( pColModelInterface + 40 )) = *((BYTE *)( pOldColModelInterface + 40 ));
 
     // TODO: It seems that on entering the game, when this function is executed, the modelinfo array for this
     // model is still zero, leading to a crash!

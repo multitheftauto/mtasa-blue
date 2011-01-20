@@ -45,8 +45,8 @@ static CPedManager*                                 m_pPedManager;
 static CWaterManager*                               m_pWaterManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN list<CElement*>::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
-#define RUN_CHILDREN_BACKWARDS list<CElement*>::const_reverse_iterator iter=pElement->IterReverseBegin();for(;iter!=pElement->IterReverseEnd();iter++)
+#define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
+#define RUN_CHILDREN_BACKWARDS CChildListType::const_reverse_iterator iter=pElement->IterReverseBegin();for(;iter!=pElement->IterReverseEnd();iter++)
 
 CStaticFunctionDefinitions::CStaticFunctionDefinitions ( CGame * pGame )
 {
@@ -224,7 +224,7 @@ CDummy* CStaticFunctionDefinitions::CreateElement ( CResource* pResource, const 
 bool CStaticFunctionDefinitions::DestroyElement ( CElement* pElement )
 {
     // Run us on all its children
-    list < CElement* > ::const_iterator iter = pElement->IterBegin ();
+    CChildListType ::const_iterator iter = pElement->IterBegin ();
     while ( iter != pElement->IterEnd () )
     {
         if ( DestroyElement ( *iter ) )
@@ -278,11 +278,14 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
     if ( bCloneChildren )
     {
         // Copy the current children list (prevents a continuous loop)
-        list < CElement* > currentChildren = pElement->GetChildrenList ();
+        std::list < CElement* > copyList;
+        for ( CChildListType ::iterator iter = pElement->IterBegin (); iter != pElement->IterEnd (); iter++ )
+        {
+            copyList.push_back ( *iter );
+        }
 
         // Loop through the children list doing this (cloning elements)
-        list < CElement * > ::iterator iter = currentChildren.begin ();
-        for ( ; iter != currentChildren.end (); iter++ )
+        for ( std::list < CElement* > ::iterator iter = copyList.begin (); iter != copyList.end (); iter++ )
         {
             CloneElement ( pResource, *iter, vecPosition, true );
         }
@@ -495,7 +498,7 @@ CElement* CStaticFunctionDefinitions::GetElementChild ( CElement* pElement, unsi
 
     // Grab it
     unsigned int uiCurrent = 0;
-    list < CElement* > ::const_iterator iter = pElement->IterBegin ();
+    CChildListType ::const_iterator iter = pElement->IterBegin ();
     for ( ; iter != pElement->IterEnd (); iter++ )
     {
         if ( uiIndex == uiCurrent++ )
@@ -7282,7 +7285,7 @@ CElement* CStaticFunctionDefinitions::GetRootElement ( void )
 
     if ( bChildren )
     {
-        list < CElement* > ::const_iterator iter = pElement->IterBegin();
+        CChildListType ::const_iterator iter = pElement->IterBegin();
         for ( ; iter != pElement->IterEnd(); iter++ )
         {
             (*iter)->OutputToXML ( pNode );

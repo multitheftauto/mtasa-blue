@@ -71,78 +71,78 @@ VOID InitKeysyncHooks()
     
     // not strictly for keysync, to make CPlayerPed::GetPlayerInfoForThisPlayerPed always return the local playerinfo
     //00609FF2     EB 1F          JMP SHORT gta_sa_u.0060A013
-    memset((void *)0x609FF2, 0xEB, 1);
-    memset((void *)0x609FF3, 0x1F, 1);
-    memset((void *)0x609FF4, 0x90, 1);
-    memset((void *)0x609FF5, 0x90, 1);
-    memset((void *)0x609FF6, 0x90, 1);
+    MemSet ((void *)0x609FF2, 0xEB, 1);
+    MemSet ((void *)0x609FF3, 0x1F, 1);
+    MemSet ((void *)0x609FF4, 0x90, 1);
+    MemSet ((void *)0x609FF5, 0x90, 1);
+    MemSet ((void *)0x609FF6, 0x90, 1);
     
     // and this is to fix bike sync (I hope)
     //006BC9EB   9090               NOP NOP
-    memset((void *)0x6BC9EB, 0x90, 2);
+    MemSet ((void *)0x6BC9EB, 0x90, 2);
 }
 
 extern CPed* pContextSwitchedPed;
 void PostContextSwitch ( void )
 {
     // Prevent the game making remote player's weapons get switched by the local player's
-    *(BYTE *)0x60D850 = 0x56;
-    *(BYTE *)0x60D851 = 0x57;
-    *(BYTE *)0x60D852 = 0x8B;
+    MemPut < BYTE > ( 0x60D850, 0x56 );  //     *(BYTE *)0x60D850 = 0x56;
+    MemPut < BYTE > ( 0x60D851, 0x57 );  //     *(BYTE *)0x60D851 = 0x57;
+    MemPut < BYTE > ( 0x60D852, 0x8B );  //     *(BYTE *)0x60D852 = 0x8B;
 
     // Prevent it calling ClearWeaponTarget for remote players
-    *(BYTE *)0x609C80 = 0x57;
+    MemPut < BYTE > ( 0x609C80, 0x57 );  //     *(BYTE *)0x609C80 = 0x57;
 
     // Prevent CCamera::SetNewPlayerWeaponMode being called
-    *(BYTE *)0x50BFB0 = 0x66;
-    *(BYTE *)0x50BFB1 = 0x8B; 
-    *(BYTE *)0x50BFB2 = 0x44;
+    MemPut < BYTE > ( 0x50BFB0, 0x66 );  //     *(BYTE *)0x50BFB0 = 0x66;
+    MemPut < BYTE > ( 0x50BFB1, 0x8B );  //     *(BYTE *)0x50BFB1 = 0x8B;
+    MemPut < BYTE > ( 0x50BFB2, 0x44 );  //     *(BYTE *)0x50BFB2 = 0x44;
 
     // This is so weapon clicks and similar don't play for us when done remotly
-    *(BYTE *)0x60F273 = 0x75;
-    *(BYTE *)0x60F260 = 0x74;
-    *(BYTE *)0x60F261 = 0x13;
+    MemPut < BYTE > ( 0x60F273, 0x75 );  //     *(BYTE *)0x60F273 = 0x75;
+    MemPut < BYTE > ( 0x60F260, 0x74 );  //     *(BYTE *)0x60F260 = 0x74;
+    MemPut < BYTE > ( 0x60F261, 0x13 );  //     *(BYTE *)0x60F261 = 0x13;
 
     // Prevent it calling CCamera::ClearPlayerWeaponMode for remote players
-    *(BYTE *)0x50AB10 = 0x33;
+    MemPut < BYTE > ( 0x50AB10, 0x33 );  //     *(BYTE *)0x50AB10 = 0x33;
 
     // this is to prevent shooting players following the local camera
-    *(BYTE *)0x687099 = 0x75;
+    MemPut < BYTE > ( 0x687099, 0x75 );  //     *(BYTE *)0x687099 = 0x75;
 
     // Prevent rockets firing oddly
     //*(BYTE *)0x73811C = 0x0F;
     //*(BYTE *)0x73811D = 0x84;
 
     // Prevent it marking targets of remote players
-    *(BYTE *)0x742BF0 = 0x8B;
+    MemPut < BYTE > ( 0x742BF0, 0x8B );  //     *(BYTE *)0x742BF0 = 0x8B;
 
     // Restore the mouse look state back to the default
-    *(bool *)0xB6EC2E = bMouseLookEnabled;
+    MemPut < bool > ( 0xB6EC2E, bMouseLookEnabled );  //     *(bool *)0xB6EC2E = bMouseLookEnabled;
 
     // Restore the visual goggle mode back
-    *(bool *)0xC402B9 = bInfraredVisionEnabled;
-    *(bool *)0xC402B8 = bNightVisionEnabled;
+    MemPut < bool > ( 0xC402B9, bInfraredVisionEnabled );  //     *(bool *)0xC402B9 = bInfraredVisionEnabled;
+    MemPut < bool > ( 0xC402B8, bNightVisionEnabled );  //     *(bool *)0xC402B8 = bNightVisionEnabled;
 
     // Make players cough on fire extinguisher and teargas again
-    *(unsigned char*) 0x4C03F0 = 0x83;
-    *(unsigned char*) 0x4C03F1 = 0xF8;
-    *(unsigned char*) 0x4C03F2 = 0x29;
-    *(unsigned char*) 0x4C03F8 = 0x74;
-    *(unsigned char*) 0x4C03F9 = 0x09;
-    *(unsigned char*) 0x4C03FA = 0x83;
-    *(unsigned char*) 0x4C03FB = 0xF8;
-    *(unsigned char*) 0x4C03FC = 0x2A;
-    *(unsigned char*) 0x4C03FD = 0x74;
-    *(unsigned char*) 0x4C03FE = 0x04;
+    MemPut < unsigned char > ( 0x4C03F0, 0x83 );  //     *(unsigned char*) 0x4C03F0 = 0x83;
+    MemPut < unsigned char > ( 0x4C03F1, 0xF8 );  //     *(unsigned char*) 0x4C03F1 = 0xF8;
+    MemPut < unsigned char > ( 0x4C03F2, 0x29 );  //     *(unsigned char*) 0x4C03F2 = 0x29;
+    MemPut < unsigned char > ( 0x4C03F8, 0x74 );  //     *(unsigned char*) 0x4C03F8 = 0x74;
+    MemPut < unsigned char > ( 0x4C03F9, 0x09 );  //     *(unsigned char*) 0x4C03F9 = 0x09;
+    MemPut < unsigned char > ( 0x4C03FA, 0x83 );  //     *(unsigned char*) 0x4C03FA = 0x83;
+    MemPut < unsigned char > ( 0x4C03FB, 0xF8 );  //     *(unsigned char*) 0x4C03FB = 0xF8;
+    MemPut < unsigned char > ( 0x4C03FC, 0x2A );  //     *(unsigned char*) 0x4C03FC = 0x2A;
+    MemPut < unsigned char > ( 0x4C03FD, 0x74 );  //     *(unsigned char*) 0x4C03FD = 0x74;
+    MemPut < unsigned char > ( 0x4C03FE, 0x04 );  //     *(unsigned char*) 0x4C03FE = 0x04;
 
     // make the CCamera::Using1stPersonWeaponMode function return true
     if ( b1stPersonWeaponModeHackInPlace)
     {
         b1stPersonWeaponModeHackInPlace = false;
 
-        *(BYTE *)0x50BFF0 = 0x66;
-        *(BYTE *)0x50BFF1 = 0x8B;
-        *(BYTE *)0x50BFF2 = 0x81;
+        MemPut < BYTE > ( 0x50BFF0, 0x66 );  //         *(BYTE *)0x50BFF0 = 0x66;
+        MemPut < BYTE > ( 0x50BFF1, 0x8B );  //         *(BYTE *)0x50BFF1 = 0x8B;
+        MemPut < BYTE > ( 0x50BFF2, 0x81 );  //         *(BYTE *)0x50BFF2 = 0x81;
     }
 
 
@@ -153,12 +153,12 @@ void PostContextSwitch ( void )
         // ^
         // 006AEA25   90               NOP
         // 006AEA26   E9 60010000      JMP gta_sa.006AEB8B
-        *(BYTE *)0x6AEA25 = 0x0F;
-        *(BYTE *)0x6AEA26 = 0x85;
+        MemPut < BYTE > ( 0x6AEA25, 0x0F );  //         *(BYTE *)0x6AEA25 = 0x0F;
+        MemPut < BYTE > ( 0x6AEA26, 0x85 );  //         *(BYTE *)0x6AEA26 = 0x85;
         
         // Prevent the game making remote players vehicle's audio behave like locals (and deleting 
         // radio etc when they are removed) - issue #95
-        *(BYTE *)0x50230C = 0x1;
+        MemPut < BYTE > ( 0x50230C, 0x1 );  //         *(BYTE *)0x50230C = 0x1;
 
         bRadioHackInstalled = FALSE;
     }
@@ -182,9 +182,9 @@ void PostContextSwitch ( void )
 
     // ChrML: This causes the aiming issues
     // Restore the local player stats    
-    memcpy ( (void *)0xb79380, &localStatsData.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
-    memcpy ( (void *)0xb79000, &localStatsData.StatTypesInt, sizeof(int) * MAX_INT_STATS );
-    memcpy ( (void *)0xb78f10, &localStatsData.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
+    MemCpy ( (void *)0xb79380, &localStatsData.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
+    MemCpy ( (void *)0xb79000, &localStatsData.StatTypesInt, sizeof(int) * MAX_INT_STATS );
+    MemCpy ( (void *)0xb78f10, &localStatsData.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
 }
 
 VOID ReturnContextToLocalPlayer()
@@ -201,13 +201,13 @@ VOID ReturnContextToLocalPlayer()
                 // Store any changes the game has made to the pad
                 CPad* pLocalPad = pGameInterface->GetPad ();
                 CPadSAInterface* pLocalPadInterface = ( (CPadSA*) pLocalPad )->GetInterface ();
-                memcpy ( &data->m_pad, pLocalPadInterface, sizeof ( CPadSAInterface ) );            
+                MemCpy ( &data->m_pad, pLocalPadInterface, sizeof ( CPadSAInterface ) );            
             }
         }
 
         pGameInterface->GetPad()->Restore();
         
-        *(float *)VAR_CameraRotation = fLocalPlayerCameraRotation;
+        MemPut < float > ( VAR_CameraRotation, fLocalPlayerCameraRotation );  //         *(float *)VAR_CameraRotation = fLocalPlayerCameraRotation;
 
         bNotInLocalContext = false;
 
@@ -216,7 +216,7 @@ VOID ReturnContextToLocalPlayer()
         if ( pLocalPlayerPedSA )
         {
             CEntitySAInterface * ped = pLocalPlayerPedSA->GetInterface();
-            *(DWORD *)0xB7CD98 = (DWORD)ped;
+            MemPut < DWORD > ( 0xB7CD98, (DWORD)ped );  //             *(DWORD *)0xB7CD98 = (DWORD)ped;
         }
 
 
@@ -232,16 +232,16 @@ VOID ReturnContextToLocalPlayer()
         // Store any changes to the local-players stats?
         if ( !bLocalStatsStatic )
         {
-            memcpy ( &localStatsData.StatTypesFloat, (void *)0xb79380, sizeof(float) * MAX_FLOAT_STATS );
-            memcpy ( &localStatsData.StatTypesInt, (void *)0xb79000, sizeof(int) * MAX_INT_STATS );
-            memcpy ( &localStatsData.StatReactionValue, (void *)0xb78f10, sizeof(float) * MAX_REACTION_STATS );
+            MemCpy ( &localStatsData.StatTypesFloat, (void *)0xb79380, sizeof(float) * MAX_FLOAT_STATS );
+            MemCpy ( &localStatsData.StatTypesInt, (void *)0xb79000, sizeof(int) * MAX_INT_STATS );
+            MemCpy ( &localStatsData.StatReactionValue, (void *)0xb78f10, sizeof(float) * MAX_REACTION_STATS );
         }
     }
 
     // radio change on startup hack
     //0050237C   90               NOP
-    memset((void *)0x50237C, 0x90, 5);
-    memset((void *)0x5023A3, 0x90, 5);
+    MemSet ((void *)0x50237C, 0x90, 5);
+    MemSet ((void *)0x5023A3, 0x90, 5);
 
     // We need to set this back, even if its the local player
     pGameInterface->SetGravity ( fGlobalGravity );
@@ -284,13 +284,13 @@ void SwitchContext ( CPed* thePed )
                         b1stPersonWeaponModeHackInPlace = true;
                         
                         // make the CCamera::Using1stPersonWeaponMode function return true
-                        *(BYTE *)0x50BFF0 = 0xB0; // MOV AL, 1
-                        *(BYTE *)0x50BFF1 = 0x01;
-                        *(BYTE *)0x50BFF2 = 0xC3; // RETN
+                        MemPut < BYTE > ( 0x50BFF0, 0xB0 );  //                         *(BYTE *)0x50BFF0 = 0xB0;
+                        MemPut < BYTE > ( 0x50BFF1, 0x01 );  //                         *(BYTE *)0x50BFF1 = 0x01;
+                        MemPut < BYTE > ( 0x50BFF2, 0xC3 );  //                         *(BYTE *)0x50BFF2 = 0xC3;
                     }
 
                     // Change the local player's pad to the remote player's
-                    memcpy ( pLocalPadInterface, &data->m_pad, sizeof ( CPadSAInterface ) );
+                    MemCpy ( pLocalPadInterface, &data->m_pad, sizeof ( CPadSAInterface ) );
 
                     // this is to fix the horn/siren
                     pLocalPad->SetHornHistoryValue ( ( cs->ShockButtonL == 255 ) );
@@ -299,7 +299,7 @@ void SwitchContext ( CPed* thePed )
 
                     // this is to make movement work correctly
                     fLocalPlayerCameraRotation = *(float *)VAR_CameraRotation;
-                    *(float *)VAR_CameraRotation = data->m_fCameraRotation;
+                    MemPut < float > ( VAR_CameraRotation, data->m_fCameraRotation );  //                     *(float *)VAR_CameraRotation = data->m_fCameraRotation;
 
                     // Change the gravity to the remote player's
                     pGameInterface->SetGravity ( data->m_fGravity );
@@ -325,16 +325,16 @@ void SwitchContext ( CPed* thePed )
 
                     // Disable the goggles
                     bInfraredVisionEnabled = *(bool *)0xC402B9;
-                    *(bool *)0xC402B9 = false;
+                    MemPut < bool > ( 0xC402B9, false );  //                     *(bool *)0xC402B9 = false;
                     bNightVisionEnabled = *(bool *)0xC402B8;
-                    *(bool *)0xC402B8 = false;
+                    MemPut < bool > ( 0xC402B8, false );  //                     *(bool *)0xC402B8 = false;
 
                     // Remove the code making players cough on fire extinguisher and teargas
-                    memset ( (void*) 0x4C03F0, 0x90, 3 );
-                    memset ( (void*) 0x4C03F8, 0x90, 7 );
+                    MemSet ( (void*) 0x4C03F0, 0x90, 3 );
+                    MemSet ( (void*) 0x4C03F8, 0x90, 7 );
 
                     // Prevent it calling ClearWeaponTarget for remote players
-                    *(BYTE *)0x609C80 = 0xC3;
+                    MemPut < BYTE > ( 0x609C80, 0xC3 );  //                     *(BYTE *)0x609C80 = 0xC3;
 
                     // Prevent rockets firing oddly
                     //*(BYTE *)0x73811C = 0x90;
@@ -342,36 +342,36 @@ void SwitchContext ( CPed* thePed )
 
                     
                     // This is so weapon clicks and similar don't play for us when done remotly
-                    *(BYTE *)0x60F273 = 0xEB; 
-                    *(BYTE *)0x60F260 = 0x90;
-                    *(BYTE *)0x60F261 = 0x90;
+                    MemPut < BYTE > ( 0x60F273, 0xEB );  //                     *(BYTE *)0x60F273 = 0xEB;
+                    MemPut < BYTE > ( 0x60F260, 0x90 );  //                     *(BYTE *)0x60F260 = 0x90;
+                    MemPut < BYTE > ( 0x60F261, 0x90 );  //                     *(BYTE *)0x60F261 = 0x90;
                     
 
                     // Prevent CCamera::SetNewPlayerWeaponMode being called
-                    *(BYTE *)0x50BFB0 = 0xC2; // RETN 0xC
-                    *(BYTE *)0x50BFB1 = 0x0C; 
-                    *(BYTE *)0x50BFB2 = 0x00;
+                    MemPut < BYTE > ( 0x50BFB0, 0xC2 );  //                     *(BYTE *)0x50BFB0 = 0xC2;
+                    MemPut < BYTE > ( 0x50BFB1, 0x0C );  //                     *(BYTE *)0x50BFB1 = 0x0C;
+                    MemPut < BYTE > ( 0x50BFB2, 0x00 );  //                     *(BYTE *)0x50BFB2 = 0x00;
 
                     // Prevent it calling CCamera::ClearPlayerWeaponMode for remote players
-                    *(BYTE *)0x50AB10 = 0xC3;
+                    MemPut < BYTE > ( 0x50AB10, 0xC3 );  //                     *(BYTE *)0x50AB10 = 0xC3;
 
                     // Prevent it marking targets of remote players
-                    *(BYTE *)0x742BF0 = 0xC3;
+                    MemPut < BYTE > ( 0x742BF0, 0xC3 );  //                     *(BYTE *)0x742BF0 = 0xC3;
 
                     // this is to prevent shooting players following the local camera
-                    *(BYTE *)0x687099 = 0xEB;
+                    MemPut < BYTE > ( 0x687099, 0xEB );  //                     *(BYTE *)0x687099 = 0xEB;
 
                     // Prevent the game making remote player's weapons get switched by the local player's
-                    *(BYTE *)0x60D850 = 0xC2;
-                    *(BYTE *)0x60D851 = 0x04;
-                    *(BYTE *)0x60D852 = 0x00;
+                    MemPut < BYTE > ( 0x60D850, 0xC2 );  //                     *(BYTE *)0x60D850 = 0xC2;
+                    MemPut < BYTE > ( 0x60D851, 0x04 );  //                     *(BYTE *)0x60D851 = 0x04;
+                    MemPut < BYTE > ( 0x60D852, 0x00 );  //                     *(BYTE *)0x60D852 = 0x00;
 
                     // Change the local player's stats to the remote player's
                     if ( data )
                     {
-                        memcpy ( (void *)0xb79380, data->m_stats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
-                        memcpy ( (void *)0xb79000, data->m_stats.StatTypesInt, sizeof(int) * MAX_INT_STATS );
-                        memcpy ( (void *)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
+                        MemCpy ( (void *)0xb79380, data->m_stats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
+                        MemCpy ( (void *)0xb79000, data->m_stats.StatTypesInt, sizeof(int) * MAX_INT_STATS );
+                        MemCpy ( (void *)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
                     }                 
 
                     /*
@@ -396,7 +396,7 @@ void SwitchContext ( CPed* thePed )
                     if ( thePedSA )
                     {
                         CEntitySAInterface * ped = thePedSA->GetInterface();
-                        *(DWORD *)0xB7CD98 = (DWORD)ped;
+                        MemPut < DWORD > ( 0xB7CD98, (DWORD)ped );  //                         *(DWORD *)0xB7CD98 = (DWORD)ped;
                     }
 
                     // Remember that we're not in the local player's context any more (for switching back)
@@ -418,7 +418,7 @@ void SwitchContext ( CPed* thePed )
             pGameInterface->SetGravity ( fLocalPlayerGravity );
 
             if ( bCustomCameraRotation )
-                *(float *)VAR_CameraRotation = fLocalPlayerCameraRotation;    
+                MemPut < float > ( VAR_CameraRotation, fLocalPlayerCameraRotation );  //                 *(float *)VAR_CameraRotation = fLocalPlayerCameraRotation;
         }
     }
 }
@@ -453,17 +453,17 @@ void SwitchContext ( CVehicle* pVehicle )
         {
             // Prevent the game making remote players vehicle's audio behave like locals (and deleting 
             // radio etc when they are removed) - issue #95
-            *(BYTE *)0x50230C = 0x0;
+            MemPut < BYTE > ( 0x50230C, 0x0 );  //             *(BYTE *)0x50230C = 0x0;
 
-            *(BYTE *)(dwVehicle + 312 + 0xA5) = 0; // set the is local player's flag to 0 on the audio entity for the vehicle
+            MemPut < BYTE > ( dwVehicle + 312 + 0xA5, 0 );  //             *(BYTE *)(dwVehicle + 312 + 0xA5) = 0;
 
             // For tanks, to prevent our mouse movement affecting remote tanks
             // 006AEA25   0F85 60010000    JNZ gta_sa.006AEB8B
             // V
             // 006AEA25   90               NOP
             // 006AEA26   E9 60010000      JMP gta_sa.006AEB8B
-            *(BYTE *)0x6AEA25 = 0x90;
-            *(BYTE *)0x6AEA26 = 0xE9;
+            MemPut < BYTE > ( 0x6AEA25, 0x90 );  //             *(BYTE *)0x6AEA25 = 0x90;
+            MemPut < BYTE > ( 0x6AEA26, 0xE9 );  //             *(BYTE *)0x6AEA26 = 0xE9;
 
             bRadioHackInstalled = TRUE;
         }
@@ -471,18 +471,18 @@ void SwitchContext ( CVehicle* pVehicle )
         {
 
             //0050237C  |. E8 9F37FFFF    CALL gta_sa_u.004F5B20
-            *(BYTE *)(0x50237C + 0) = 0xE8;
-            *(BYTE *)(0x50237C + 1) = 0x9F;
-            *(BYTE *)(0x50237C + 2) = 0x37;
-            *(BYTE *)(0x50237C + 3) = 0xFF;
-            *(BYTE *)(0x50237C + 4) = 0xFF;
+            MemPut < BYTE > ( 0x50237C + 0, 0xE8 );  //             *(BYTE *)(0x50237C + 0) = 0xE8;
+            MemPut < BYTE > ( 0x50237C + 1, 0x9F );  //             *(BYTE *)(0x50237C + 1) = 0x9F;
+            MemPut < BYTE > ( 0x50237C + 2, 0x37 );  //             *(BYTE *)(0x50237C + 2) = 0x37;
+            MemPut < BYTE > ( 0x50237C + 3, 0xFF );  //             *(BYTE *)(0x50237C + 3) = 0xFF;
+            MemPut < BYTE > ( 0x50237C + 4, 0xFF );  //             *(BYTE *)(0x50237C + 4) = 0xFF;
 
             //0x5023A3
-            *(BYTE *)(0x5023A3 + 0) = 0xE8;
-            *(BYTE *)(0x5023A3 + 1) = 0xB8;
-            *(BYTE *)(0x5023A3 + 2) = 0x37;
-            *(BYTE *)(0x5023A3 + 3) = 0xFF;
-            *(BYTE *)(0x5023A3 + 4) = 0xFF;
+            MemPut < BYTE > ( 0x5023A3 + 0, 0xE8 );  //             *(BYTE *)(0x5023A3 + 0) = 0xE8;
+            MemPut < BYTE > ( 0x5023A3 + 1, 0xB8 );  //             *(BYTE *)(0x5023A3 + 1) = 0xB8;
+            MemPut < BYTE > ( 0x5023A3 + 2, 0x37 );  //             *(BYTE *)(0x5023A3 + 2) = 0x37;
+            MemPut < BYTE > ( 0x5023A3 + 3, 0xFF );  //             *(BYTE *)(0x5023A3 + 3) = 0xFF;
+            MemPut < BYTE > ( 0x5023A3 + 4, 0xFF );  //             *(BYTE *)(0x5023A3 + 4) = 0xFF;
         }
     }
 }
@@ -511,6 +511,8 @@ static CSavedRegs PlayerPed__ProcessControl_Saved;
 
 VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 {
+    FUNCTION_PROLOG
+
     // Assumes no reentrancy
     _asm
     {
@@ -543,6 +545,7 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -569,6 +572,7 @@ void CPlayerPed__ProcessControl_Abort()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -578,6 +582,7 @@ void CPlayerPed__ProcessControl_Abort()
 
 VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -599,6 +604,7 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -607,6 +613,7 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 
 VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -628,6 +635,7 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -636,6 +644,7 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 
 VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -657,6 +666,7 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -665,6 +675,7 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 
 VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -686,6 +697,7 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -694,6 +706,7 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 
 VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -715,6 +728,7 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -723,6 +737,7 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 
 VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -744,6 +759,7 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -752,6 +768,7 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 
 VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -773,6 +790,7 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -781,6 +799,7 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 
 VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -802,6 +821,7 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -810,6 +830,7 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 
 VOID _declspec(naked) HOOK_CBike__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -831,6 +852,7 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -839,6 +861,7 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
 
 VOID _declspec(naked) HOOK_CHeli__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -860,6 +883,7 @@ VOID _declspec(naked) HOOK_CHeli__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }

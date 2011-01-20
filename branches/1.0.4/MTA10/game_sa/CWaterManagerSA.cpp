@@ -205,7 +205,7 @@ CWaterPolyEntrySAInterface* CWaterZoneSA::AddPoly ( EWaterPolyType type, WORD wI
         g_pWaterManager->m_ZonePolyPool [ wOffset + 2 ].m_wValue = 0;
         m_pInterface->m_wValue = MAKE_POLYENTRY ( WATER_POLY_LIST, wOffset );
 
-        *(DWORD *)VAR_NumWaterZonePolys += 3;
+        MemAdd < DWORD > ( VAR_NumWaterZonePolys, 3 );  //         *(DWORD *)VAR_NumWaterZonePolys += 3;
         return &g_pWaterManager->m_ZonePolyPool [ wOffset + 1 ];
     }
     else
@@ -285,7 +285,7 @@ bool CWaterZoneSA::RemovePoly ( EWaterPolyType type, WORD wID )
                          POLYENTRY_ID ( pZoneInterface ) > wOffset )
                         pZoneInterface->m_wValue -= 3;
                 }
-                *(DWORD *)VAR_NumWaterZonePolys -= 3;
+                MemSub < DWORD > ( VAR_NumWaterZonePolys, 3 );  //                 *(DWORD *)VAR_NumWaterZonePolys -= 3;
                 return true;
             }
             else
@@ -368,7 +368,7 @@ void CWaterManagerSA::RelocatePools ()
         DWORD dwDelta = (DWORD)pNewPool - *pXrefGroup [ 0 ];
         for ( DWORD** ppXref = pXrefGroup; *ppXref; ppXref++ )
         {
-            **ppXref += dwDelta;
+            MemAdd < DWORD > ( *ppXref, dwDelta );   // **ppXref += dwDelta;
         }
     }
 }
@@ -437,21 +437,21 @@ void CWaterManagerSA::InstallHooks ()
 {
     HookInstall ( 0x6E9E23, (DWORD)Hook6E9E23, 6 );
     
-    *(DWORD *)0x6EFCD9 = (DWORD)Hook6EFCD7 - 0x6EFCDD;
+    MemPut < DWORD > ( 0x6EFCD9, (DWORD)Hook6EFCD7 - 0x6EFCDD );  //     *(DWORD *)0x6EFCD9 = (DWORD)Hook6EFCD7 - 0x6EFCDD;
 
-    *(DWORD *)0x6EFBC7 = 0x05EBED33;
-    *(DWORD *)0x6EFBCB = 0x90909090;
-    *(BYTE *)0x6EFBCF = 0x46;
-    *(DWORD *)0x6EFBDA = (DWORD)Hook6EFBD8 - 0x6EFBDE;
-    *(BYTE *)0x6EFBFB = 0x17;
-    *(BYTE *)0x6EFC02 = 0x13;
-    *(BYTE *)0x6EFC04 = 0x57;
-    *(BYTE *)0x6EFC07 = 0x53;
-    *(BYTE *)0x6EFC0A = 0x57;
-    *(BYTE *)0x6EFC10 = 0x53;
-    *(BYTE *)0x6EFCB2 = 0x45;
-    *(BYTE *)0x6EFCB4 = 0xE8;
-    *(BYTE *)0x6EFCB7 = 0x14;
+    MemPut < DWORD > ( 0x6EFBC7, 0x05EBED33 );  //     *(DWORD *)0x6EFBC7 = 0x05EBED33;
+    MemPut < DWORD > ( 0x6EFBCB, 0x90909090 );  //     *(DWORD *)0x6EFBCB = 0x90909090;
+    MemPut < BYTE > ( 0x6EFBCF, 0x46 );  //     *(BYTE *)0x6EFBCF = 0x46;
+    MemPut < DWORD > ( 0x6EFBDA, (DWORD)Hook6EFBD8 - 0x6EFBDE );  //     *(DWORD *)0x6EFBDA = (DWORD)Hook6EFBD8 - 0x6EFBDE;
+    MemPut < BYTE > ( 0x6EFBFB, 0x17 );  //     *(BYTE *)0x6EFBFB = 0x17;
+    MemPut < BYTE > ( 0x6EFC02, 0x13 );  //     *(BYTE *)0x6EFC02 = 0x13;
+    MemPut < BYTE > ( 0x6EFC04, 0x57 );  //     *(BYTE *)0x6EFC04 = 0x57;
+    MemPut < BYTE > ( 0x6EFC07, 0x53 );  //     *(BYTE *)0x6EFC07 = 0x53;
+    MemPut < BYTE > ( 0x6EFC0A, 0x57 );  //     *(BYTE *)0x6EFC0A = 0x57;
+    MemPut < BYTE > ( 0x6EFC10, 0x53 );  //     *(BYTE *)0x6EFC10 = 0x53;
+    MemPut < BYTE > ( 0x6EFCB2, 0x45 );  //     *(BYTE *)0x6EFCB2 = 0x45;
+    MemPut < BYTE > ( 0x6EFCB4, 0xE8 );  //     *(BYTE *)0x6EFCB4 = 0xE8;
+    MemPut < BYTE > ( 0x6EFCB7, 0x14 );  //     *(BYTE *)0x6EFCB7 = 0x14;
 }
 
 CWaterZoneSA* CWaterManagerSA::GetZoneContaining ( float fX, float fY )
@@ -632,12 +632,12 @@ bool CWaterManagerSA::DeletePoly ( CWaterPoly* pPoly )
 
     if ( pPoly->GetType () == WATER_POLY_QUAD )
     {
-        memset ( ((CWaterQuadSA *)pPoly)->GetInterface (), 0, sizeof ( CWaterQuadSAInterface ) );
+        MemSet ( ((CWaterQuadSA *)pPoly)->GetInterface (), 0, sizeof ( CWaterQuadSAInterface ) );
         (*(DWORD *)VAR_NumWaterQuads)--;
     }
     else
     {
-        memset ( ((CWaterTriangleSA *)pPoly)->GetInterface (), 0, sizeof ( CWaterTriangleSAInterface ) );
+        MemSet ( ((CWaterTriangleSA *)pPoly)->GetInterface (), 0, sizeof ( CWaterTriangleSAInterface ) );
         (*(DWORD *)VAR_NumWaterTriangles)--;
     }
     return true;
@@ -696,34 +696,34 @@ void CWaterManagerSA::SetWaveLevel ( float fWaveLevel )
     if ( fWaveLevel >= 0.0f )
     {
         // DISABLE the game resetting the wave level
-        *(BYTE *)0x72C665 = 0xDD;
-        *(BYTE *)0x72C666 = 0xD8;
-        memset( (void*)0x72C667, 0x90, 4 );
-        memset( (void*)0x72C659, 0x90, 10 );
+        MemPut < BYTE > ( 0x72C665, 0xDD );  //         *(BYTE *)0x72C665 = 0xDD;
+        MemPut < BYTE > ( 0x72C666, 0xD8 );  //         *(BYTE *)0x72C666 = 0xD8;
+        MemSet ( (void*)0x72C667, 0x90, 4 );
+        MemSet ( (void*)0x72C659, 0x90, 10 );
 
-        *(float *)VAR_WaveLevel = fWaveLevel;
+        MemPut < float > ( VAR_WaveLevel, fWaveLevel );  //         *(float *)VAR_WaveLevel = fWaveLevel;
     }
     else
     {
-        *(BYTE *)0x72C665 = 0xD9;
-        *(BYTE *)0x72C666 = 0x1D;
-        *(BYTE *)0x72C667 = 0xE8;
-        *(BYTE *)0x72C668 = 0x12;
-        *(BYTE *)0x72C669 = 0xC8;
-        *(BYTE *)0x72C66A = 0x00;
+        MemPut < BYTE > ( 0x72C665, 0xD9 );  //         *(BYTE *)0x72C665 = 0xD9;
+        MemPut < BYTE > ( 0x72C666, 0x1D );  //         *(BYTE *)0x72C666 = 0x1D;
+        MemPut < BYTE > ( 0x72C667, 0xE8 );  //         *(BYTE *)0x72C667 = 0xE8;
+        MemPut < BYTE > ( 0x72C668, 0x12 );  //         *(BYTE *)0x72C668 = 0x12;
+        MemPut < BYTE > ( 0x72C669, 0xC8 );  //         *(BYTE *)0x72C669 = 0xC8;
+        MemPut < BYTE > ( 0x72C66A, 0x00 );  //         *(BYTE *)0x72C66A = 0x00;
 
-        *(BYTE *)0x72C659 = 0xC7;
-        *(BYTE *)0x72C65A = 0x05;
-        *(BYTE *)0x72C65B = 0xE8;
-        *(BYTE *)0x72C65C = 0x12;
-        *(BYTE *)0x72C65D = 0xC8;
-        *(BYTE *)0x72C65E = 0x00;
-        *(BYTE *)0x72C65F = 0x00;
-        *(BYTE *)0x72C660 = 0x00;
-        *(BYTE *)0x72C661 = 0x80;
-        *(BYTE *)0x72C662 = 0x3F;
+        MemPut < BYTE > ( 0x72C659, 0xC7 );  //         *(BYTE *)0x72C659 = 0xC7;
+        MemPut < BYTE > ( 0x72C65A, 0x05 );  //         *(BYTE *)0x72C65A = 0x05;
+        MemPut < BYTE > ( 0x72C65B, 0xE8 );  //         *(BYTE *)0x72C65B = 0xE8;
+        MemPut < BYTE > ( 0x72C65C, 0x12 );  //         *(BYTE *)0x72C65C = 0x12;
+        MemPut < BYTE > ( 0x72C65D, 0xC8 );  //         *(BYTE *)0x72C65D = 0xC8;
+        MemPut < BYTE > ( 0x72C65E, 0x00 );  //         *(BYTE *)0x72C65E = 0x00;
+        MemPut < BYTE > ( 0x72C65F, 0x00 );  //         *(BYTE *)0x72C65F = 0x00;
+        MemPut < BYTE > ( 0x72C660, 0x00 );  //         *(BYTE *)0x72C660 = 0x00;
+        MemPut < BYTE > ( 0x72C661, 0x80 );  //         *(BYTE *)0x72C661 = 0x80;
+        MemPut < BYTE > ( 0x72C662, 0x3F );  //         *(BYTE *)0x72C662 = 0x3F;
 
-        *(float *)VAR_WaveLevel = 0.6f;
+        MemPut < float > ( VAR_WaveLevel, 0.6f );  //         *(float *)VAR_WaveLevel = 0.6f;
     }
 }
 
@@ -786,8 +786,8 @@ void CWaterManagerSA::UndoChanges ( void* pChangeSource )
 void CWaterManagerSA::RebuildIndex ()
 {
     // Rebuilds the list of polygons of each zone
-    memset ( (void *)ARRAY_WaterZones, 0, NUM_WaterZones * sizeof ( CWaterPolyEntrySAInterface ) );
-    *(DWORD *)VAR_NumWaterZonePolys = 0;
+    MemSet ( (void *)ARRAY_WaterZones, 0, NUM_WaterZones * sizeof ( CWaterPolyEntrySAInterface ) );
+    MemPut < DWORD > ( VAR_NumWaterZonePolys, 0 );  //     *(DWORD *)VAR_NumWaterZonePolys = 0;
     ( (BuildWaterIndex_t) FUNC_BuildWaterIndex ) ();
 }
 
@@ -796,8 +796,8 @@ void CWaterManagerSA::Reset ()
     // Resets all water to the original single player configuration
     UndoChanges ();
 
-    memset ( m_QuadPool, 0, sizeof ( m_QuadPool ) );
-    memset ( m_TrianglePool, 0, sizeof ( m_TrianglePool ) );
+    MemSet ( m_QuadPool, 0, sizeof ( m_QuadPool ) );
+    MemSet ( m_TrianglePool, 0, sizeof ( m_TrianglePool ) );
 
     ( (ReadWaterConfiguration_t) FUNC_ReadWaterConfiguration )();
 
