@@ -2829,8 +2829,8 @@ void _declspec(naked) HOOK_CObject_Render ()
     }
 }
 
-// Note: This hook is called at the end of the function that sets the world colours (sky gradient, water colour, etc).
-void _declspec(naked) HOOK_EndWorldColors ()
+
+void _cdecl DoEndWorldColorsPokes ()
 {
     if ( bUsingCustomSkyGradient )
     {
@@ -2849,8 +2849,14 @@ void _declspec(naked) HOOK_EndWorldColors ()
         MemPut < float > ( 0xB7C510, fWaterColorB );  //         *(float *)0xB7C510 = fWaterColorB;
         MemPut < float > ( 0xB7C514, fWaterColorA );  //         *(float *)0xB7C514 = fWaterColorA;
     }
+}
+
+// Note: This hook is called at the end of the function that sets the world colours (sky gradient, water colour, etc).
+void _declspec(naked) HOOK_EndWorldColors ()
+{
      _asm
     {
+        call DoEndWorldColorsPokes
         ret
     }
 }
