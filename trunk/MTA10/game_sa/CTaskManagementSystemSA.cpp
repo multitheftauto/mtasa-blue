@@ -258,9 +258,7 @@ VOID _declspec(naked) HOOK_CTask_Operator_Delete()
         pushad
     }
 
-    FUNCTION_PROLOG
     ((CTaskManagementSystemSA *)(pGame->GetTaskManagementSystem()))->RemoveTask ( pTempTaskInterface );
-    FUNCTION_EPILOG
 
     // Continue on our merry way....
     _asm
