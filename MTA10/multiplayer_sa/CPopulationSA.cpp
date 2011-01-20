@@ -168,9 +168,7 @@ VOID _declspec(naked) HOOK_EndOf_CPopulation__Add()
         pushad
     }
 
-    FUNCTION_PROLOG
     pSingleton->AddPed ( pPedStorage );
-    FUNCTION_EPILOG
 
     _asm
     {
@@ -211,9 +209,7 @@ VOID _declspec(naked) HOOK_CPopulation__RemovePed()
         }
     }
 
-    FUNCTION_PROLOG
     pSingleton->RemovePed(pPedStorage);
-    FUNCTION_EPILOG
 
     _asm
     {

@@ -91,7 +91,6 @@ void DumpHandlingData ( tHandlingDataSA* pData )
 
 __declspec(naked) void Hook_Calculate ( void )
 {
-    FUNCTION_PROLOG
     tHandlingDataSA *pData;
     DWORD dwHandlingData;
     _asm
@@ -105,7 +104,6 @@ __declspec(naked) void Hook_Calculate ( void )
 
     _asm
     {
-        _FUNCTION_EPILOG
         ret         4
     }
 }
@@ -588,11 +586,9 @@ __declspec(naked) void CHandlingManagerSA::Hook_LoadHandlingCfg ( void )
         call        eax
     };
 
-    FUNCTION_PROLOG
     // Calculate handling.cfg values. We've already initialized them
     // like they would come from handling.cfg
     LoadHandlingCfg ();
-    FUNCTION_EPILOG
 
     _asm
     {

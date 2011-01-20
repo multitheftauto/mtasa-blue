@@ -269,7 +269,6 @@ VOID _declspec(naked) HOOK_SkipAim ()
         // Store all the registers
         pushad
     }
-    FUNCTION_PROLOG
 
     // Grab the player for this interface
     pATargetingPed = m_pools->GetPed ( (DWORD *)pAPed );
@@ -301,7 +300,6 @@ VOID _declspec(naked) HOOK_SkipAim ()
     // Return to the correct place wheter we put our arms up or not
     if ( *pSkipAim )
     {
-        FUNCTION_EPILOG
         _asm
         {
             // Restore all registers
@@ -314,7 +312,6 @@ VOID _declspec(naked) HOOK_SkipAim ()
     }
     else
     {
-        FUNCTION_EPILOG
         _asm
         {
             // Restore all registers
@@ -345,7 +342,6 @@ VOID _declspec(naked) HOOK_IKChainManager_PointArm ()
         pushad
     }
     
-    FUNCTION_PROLOG
     // Grab the player for this interface
     pATargetingPed = m_pools->GetPed ( (DWORD *)pAPed );
     if ( pATargetingPed )
@@ -374,7 +370,6 @@ VOID _declspec(naked) HOOK_IKChainManager_PointArm ()
             }
         }
     }
-    FUNCTION_EPILOG
 
     _asm
     {
@@ -407,7 +402,6 @@ VOID _declspec(naked) HOOK_IKChainManager_LookAt ()
         pushad
     }
 
-    FUNCTION_PROLOG
     // Jax: this gets called on vehicle collision and pTargetVector is null
     if ( pTargetVector )
     {
@@ -440,7 +434,6 @@ VOID _declspec(naked) HOOK_IKChainManager_LookAt ()
             }
         }
     }
-    FUNCTION_EPILOG
 
     _asm
     {
@@ -480,10 +473,8 @@ VOID _declspec(naked) HOOK_CWeapon__Fire()
 
     // Weapon inaccuracy and animations problems may be fixed by blanking out the CWeapon variables nTimer and beyond.
 
-    FUNCTION_PROLOG
     bWeaponFire = true;
     WriteTargetDataForPed ( pShootingPed, vecTargetPosition, vecOrigin );
-    FUNCTION_EPILOG
 
      _asm
     {
@@ -510,9 +501,7 @@ VOID _declspec(naked) HOOK_CWeapon__PostFire()
         pushad
     }
 
-    FUNCTION_PROLOG
     Event_PostFire ();
-    FUNCTION_EPILOG
 
     _asm
     {
@@ -533,9 +522,7 @@ VOID _declspec(naked) HOOK_CWeapon__PostFire2() // handles the FALSE exit point 
         pushad
     }
 
-    FUNCTION_PROLOG
     Event_PostFire ();
-    FUNCTION_EPILOG
 
     _asm
     {
@@ -562,9 +549,7 @@ void _declspec(naked) HOOK_CWeapon_DoBulletImpact ()
         pushad
     }
 
-    FUNCTION_PROLOG
     Event_BulletImpact ();
-    FUNCTION_EPILOG
 
     _asm
     {
@@ -586,9 +571,7 @@ VOID _declspec(naked) HOOK_CTaskSimpleGangDriveBy__PlayerTarget()
     }
 
     // either store or change the data
-    FUNCTION_PROLOG
     WriteGunDirectionDataForPed ( pPedInterfaceTemp, 0, 0, &cTempGunDirection );
-    FUNCTION_EPILOG
 
     // cTempGunDirection may be modified by the function, so write it back
     _asm
@@ -618,9 +601,7 @@ VOID _declspec(naked) HOOK_CPedIK__PointGunInDirection()
     }
 
     // either store or change the data
-    FUNCTION_PROLOG
     WriteGunDirectionDataForPed ( (CPedSAInterface *)((DWORD)pPedIKInterface - 1292), fDirectionX, fDirectionY, 0 );
-    FUNCTION_EPILOG
 
     // replacement code
     _asm
@@ -654,10 +635,8 @@ void _declspec(naked) HOOK_CWeapon__Fire_Sniper()
         pushad
     }
 
-    FUNCTION_PROLOG
     if ( IsLocalPlayer(pPedInterfaceTemp) )
     {
-        FUNCTION_EPILOG
         // use sniper (local players)
         _asm
         {
@@ -673,7 +652,6 @@ void _declspec(naked) HOOK_CWeapon__Fire_Sniper()
     }
     else
     {
-        FUNCTION_EPILOG
         // use instanthit (remote players)
         _asm
         {
@@ -731,10 +709,8 @@ void _declspec(naked) HOOK_CEventDamage__AffectsPed()
         pushad
     }
 
-    FUNCTION_PROLOG
     if ( ProcessDamageEvent ( event, affectsPed ) )
     {
-        FUNCTION_EPILOG
         // they want the damage to happen!
         _asm
         {
@@ -751,8 +727,8 @@ void _declspec(naked) HOOK_CEventDamage__AffectsPed()
     }
     else
     {
-        FUNCTION_EPILOG
         // they want the player to escape unscathed
+
         _asm
         {
             popad
@@ -804,9 +780,7 @@ void _declspec(naked) HOOK_CFireManager__StartFire()
         pushad
     }
 
-    FUNCTION_PROLOG
     ProcessStartFire ( tempFire );
-    FUNCTION_EPILOG
 
     _asm
     {
@@ -845,9 +819,7 @@ void _declspec(naked) HOOK_CFireManager__StartFire_()
         pushad
     }
 
-    FUNCTION_PROLOG
     ProcessStartFire ( tempFire );
-    FUNCTION_EPILOG
 
     _asm
     {
@@ -959,10 +931,8 @@ void _declspec(naked) HOOK_CProjectileInfo__AddProjectile()
 
         pushad
     }
-    FUNCTION_PROLOG
     if ( ProcessProjectileAdd() )
     { // projectile should be created
-        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -973,7 +943,6 @@ void _declspec(naked) HOOK_CProjectileInfo__AddProjectile()
     }
     else
     {
-        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -992,9 +961,7 @@ void _declspec(naked) HOOK_CProjectile__CProjectile()
         pushad
     }
 
-    FUNCTION_PROLOG
     ProcessProjectile ();
-    FUNCTION_EPILOG
 
     _asm
     {
@@ -1086,7 +1053,6 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit ()
     }
 
     // Make sure we include car tyres in our ProcessLineOfSight check
-    FUNCTION_PROLOG
     MemPut < unsigned char > ( VAR_CWorld_IncludeCarTyres, 1 );  //     * ( unsigned char * ) ( VAR_CWorld_IncludeCarTyres ) = 1;
 
     _asm
@@ -1097,7 +1063,6 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit ()
     }
 
     CheckInVehicleDamage();
-    FUNCTION_EPILOG
 
     _asm
     {
@@ -1142,10 +1107,8 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_CameraMode ()
         pushad
     }
 
-    FUNCTION_PROLOG
     if ( FireInstantHit_CameraMode () )
     {
-        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -1154,7 +1117,6 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_CameraMode ()
     }
     else
     {
-        FUNCTION_EPILOG
         if ( sFireInstantHit_CameraMode_camMode == 0x35 )
         {
             _asm
@@ -1218,10 +1180,8 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_IsPlayer ()
         mov     pFireInstantHit_IsPlayerPed, ecx
         pushad
     }
-    FUNCTION_PROLOG
     if ( !FireInstantHit_IsPlayer () )
     {
-        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -1232,7 +1192,6 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_IsPlayer ()
     }
     else
     {
-        FUNCTION_EPILOG
         _asm
         {
             popad

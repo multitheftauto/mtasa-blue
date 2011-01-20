@@ -75,9 +75,7 @@ VOID _declspec(naked) HOOK_CText_Get()
         pushad
     }
 
-    FUNCTION_PROLOG
     szReplacementText = GetReplacementText(szText);
-    FUNCTION_EPILOG
     if ( szReplacementText != NULL )
     {
         //OutputDebugString("Replaced Text!");
