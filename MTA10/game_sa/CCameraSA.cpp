@@ -523,6 +523,8 @@ void _declspec(naked) HOOK_Camera_CollisionDetection ()
         pushad
     }
 
+    FUNCTION_PROLOG
+
     if ( !bCameraClipObjects )
     {
         MemPut < char > ( VAR_CameraClipDynamicObjects, 0 );  //         *(char*)VAR_CameraClipDynamicObjects = 0;
@@ -533,6 +535,8 @@ void _declspec(naked) HOOK_Camera_CollisionDetection ()
 
     if ( !bCameraClipVehicles )
         MemPut < char > ( VAR_CameraClipVehicles, 0 );  //         *(char*)VAR_CameraClipVehicles = 0;
+
+    FUNCTION_EPILOG
 
     _asm
     {

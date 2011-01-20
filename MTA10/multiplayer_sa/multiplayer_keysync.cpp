@@ -527,6 +527,8 @@ static CSavedRegs PlayerPed__ProcessControl_Saved;
 
 VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 {
+    FUNCTION_PROLOG
+
     // Assumes no reentrancy
     _asm
     {
@@ -559,6 +561,7 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -585,6 +588,7 @@ void CPlayerPed__ProcessControl_Abort()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -594,6 +598,7 @@ void CPlayerPed__ProcessControl_Abort()
 
 VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -615,6 +620,7 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -623,6 +629,7 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
 
 VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -644,6 +651,7 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -652,6 +660,7 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
 
 VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -673,6 +682,7 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -681,6 +691,7 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
 
 VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -702,6 +713,7 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -710,6 +722,7 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
 
 VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -731,6 +744,7 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -739,6 +753,7 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
 
 VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -760,6 +775,7 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -768,6 +784,7 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
 
 VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -789,6 +806,7 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -797,6 +815,7 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
 
 VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -818,6 +837,7 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -826,6 +846,7 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
 
 VOID _declspec(naked) HOOK_CBike__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -847,6 +868,7 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }
@@ -855,6 +877,7 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
 
 VOID _declspec(naked) HOOK_CHeli__ProcessControl()
 {
+    FUNCTION_PROLOG
     _asm
     {
         mov     dwCurrentVehicle, ecx
@@ -876,6 +899,7 @@ VOID _declspec(naked) HOOK_CHeli__ProcessControl()
     _asm
     {
         popad
+        _FUNCTION_EPILOG
         retn
     }
 }

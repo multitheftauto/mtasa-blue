@@ -1882,8 +1882,11 @@ void _declspec(naked) HOOK_Trailer_BreakTowLink()
         pushad
     }
 
+    FUNCTION_PROLOG
+
     if ( CallBreakTowLinkHandler ( towingVehicle ) )
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -1892,6 +1895,7 @@ void _declspec(naked) HOOK_Trailer_BreakTowLink()
     }
     else
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -1934,8 +1938,10 @@ void _declspec(naked) HOOK_CBike_ProcessRiderAnims ()
         pushad
     }
 
+    FUNCTION_PROLOG
     if ( ProcessRiderAnims ( pRiderPed ) )
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -1944,6 +1950,7 @@ void _declspec(naked) HOOK_CBike_ProcessRiderAnims ()
     }
     else
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -2068,14 +2075,17 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
         pushad
     }
 
+    FUNCTION_PROLOG
     // Call the explosion handler
     if ( !CallExplosionHandler () )
     {
+        FUNCTION_EPILOG
         _asm    popad
         _asm    retn // if they return false from the handler, they don't want the explosion to show
     }
     else
     {
+        FUNCTION_EPILOG
         _asm popad
     }
 
@@ -2149,8 +2159,10 @@ void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
         pushad
     }
 
+    FUNCTION_PROLOG
     if ( processGrab() )
     {
+        FUNCTION_EPILOG
         _asm {
             popad
             mov     eax, 0x67DAD6
@@ -2159,6 +2171,7 @@ void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
     }
     else
     {
+        FUNCTION_EPILOG
         _asm {
             popad
             mov     eax, 0x67DAD1
@@ -2189,6 +2202,7 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem ()
         pushad
     }
 
+    FUNCTION_PROLOG
     // If we got a matrix and it is an explosion type?
     if ( pCreateFxSystem_Matrix != 0 &&
          strncmp ( szCreateFxSystem_ExplosionType, "explosion", 9 ) == 0 )
@@ -2205,6 +2219,7 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem ()
         // Use the same pointer. This is not an explosion or it is 0.
         pNewCreateFxSystem_Matrix = pCreateFxSystem_Matrix;
     }
+    FUNCTION_EPILOG
 
     _asm 
     {
@@ -2240,11 +2255,13 @@ void _declspec(naked) HOOK_FxManager_DestroyFxSystem ()
         pushad
     }
 
+    FUNCTION_PROLOG
     // Grab the matrix pointer in it
     pDestroyFxSystem_Matrix = *( (DWORD**) ( dwDestroyFxSystem_Pointer + 12 ) );
 
     // Delete it if it's in our list
     RemoveFxSystemPointer ( pDestroyFxSystem_Matrix );
+    FUNCTION_EPILOG
 
     _asm 
     {
@@ -2285,8 +2302,10 @@ void _declspec(naked) HOOK_CCam_ProcessFixed ()
         mov CCam_ProcessFixed_pCam, ecx
     }
 
+    FUNCTION_PROLOG
     if ( CCam_ProcessFixed ( CCam_ProcessFixed_pCam ) )
     {
+        FUNCTION_EPILOG
         _asm
         {
             ret 10h
@@ -2294,6 +2313,7 @@ void _declspec(naked) HOOK_CCam_ProcessFixed ()
     }
     else
     {
+        FUNCTION_EPILOG
         _asm
         {
             mov ecx, CCam_ProcessFixed_pCam
@@ -2353,8 +2373,10 @@ void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ()
         mov     pProcessPlayerWeaponPed, eax
         pushad
     }
+    FUNCTION_PROLOG
     if ( ProcessPlayerWeapon () )
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -2365,6 +2387,7 @@ void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon ()
     }
     else
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -2390,8 +2413,10 @@ void _declspec(naked) HOOK_CPed_IsPlayer ()
         mov    pIsPlayerPed, ecx
         pushad
     }
+    FUNCTION_PROLOG
     if ( IsPlayer () )
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -2401,6 +2426,7 @@ void _declspec(naked) HOOK_CPed_IsPlayer ()
     }
     else
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -2529,7 +2555,9 @@ void _declspec(naked) HOOK_CRunningScript_Process()
         pushad
     }
 
+    FUNCTION_PROLOG
     CRunningScript_Process ();
+    FUNCTION_EPILOG
 
     _asm
     {
@@ -2552,9 +2580,12 @@ train_would_derail:
         mov     pDerailingTrain, esi
     }
 
+    FUNCTION_PROLOG
+
     // At this point we know that GTA wants to derail the train
     if ( pDerailingTrain->m_pVehicle->IsDerailable () )
     {
+         FUNCTION_EPILOG
         // Go back to the derailment code
         _asm
         {
@@ -2565,6 +2596,7 @@ train_would_derail:
     }
     else
     {
+         FUNCTION_EPILOG
         _asm
         {
             popad
@@ -2708,7 +2740,9 @@ void _declspec(naked) HOOK_CVehicle_SetupRender()
         pushad
     }
 
+    FUNCTION_PROLOG
     SetVehicleAlpha ( );
+    FUNCTION_EPILOG
 
     _asm
     {
@@ -2727,7 +2761,9 @@ void _declspec(naked) HOOK_CVehicle_ResetAfterRender ()
         pushad
     }
 
+    FUNCTION_PROLOG
     RestoreAlphaValues ();
+    FUNCTION_EPILOG
 
     _asm
     {
@@ -2773,8 +2809,9 @@ void _declspec(naked) HOOK_CObject_PostRender ()
     {
         pushad
     }
-
+    FUNCTION_PROLOG
     RestoreAlphaValues ( );
+    FUNCTION_EPILOG
 
     _asm
     {
@@ -2792,8 +2829,9 @@ void _declspec(naked) HOOK_CObject_Render ()
         mov         dwAlphaEntity, ecx
         pushad 
     }
-
+    FUNCTION_PROLOG
     SetObjectAlpha ( );
+    FUNCTION_EPILOG
 
     _asm
     {
@@ -2832,6 +2870,7 @@ void _declspec(naked) HOOK_CObject_Render ()
 // Note: This hook is called at the end of the function that sets the world colours (sky gradient, water colour, etc).
 void _declspec(naked) HOOK_EndWorldColors ()
 {
+    FUNCTION_PROLOG
     if ( bUsingCustomSkyGradient )
     {
         MemPut < BYTE > ( 0xB7C4C4, ucSkyGradientTopR );  //         *(BYTE *)0xB7C4C4 = ucSkyGradientTopR;
@@ -2849,6 +2888,7 @@ void _declspec(naked) HOOK_EndWorldColors ()
         MemPut < float > ( 0xB7C510, fWaterColorB );  //         *(float *)0xB7C510 = fWaterColorB;
         MemPut < float > ( 0xB7C514, fWaterColorA );  //         *(float *)0xB7C514 = fWaterColorA;
     }
+    FUNCTION_EPILOG
      _asm
     {
         ret
@@ -4020,7 +4060,9 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_2 ()
         pushad
     }
 
+    FUNCTION_PROLOG
     CVehicle_DoHeadLightBeam ();
+    FUNCTION_EPILOG
     
     _asm
     {
@@ -4036,7 +4078,9 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1 ()
     // 160, 160, 140
     _asm pushad
 
+    FUNCTION_PROLOG
     CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 160.0f, 160.0f, 140.0f );
+    FUNCTION_EPILOG
 
     _asm
     {
@@ -4062,7 +4106,9 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2 ()
     // 160, 160, 140
     _asm pushad
 
+    FUNCTION_PROLOG
     CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 160.0f, 160.0f, 140.0f );
+    FUNCTION_EPILOG
 
     _asm
     {
@@ -4089,7 +4135,9 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin ()
     // 45, 45, 45
     _asm pushad
  
+    FUNCTION_PROLOG
     CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 45.0f, 45.0f, 45.0f );
+    FUNCTION_EPILOG
 
     _asm
     {
@@ -4113,7 +4161,9 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle ()
     // 45, 45, 45
     __asm pushad
 
+    FUNCTION_PROLOG
     CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 45.0f, 45.0f, 45.0f );
+    FUNCTION_EPILOG
 
     _asm
     {
@@ -4336,7 +4386,10 @@ void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse ()
 
         pushad
     }
+
+    FUNCTION_PROLOG
     CEventHandler_ComputeKnockOffBikeResponse ();
+    FUNCTION_EPILOG
     
     _asm
     {
@@ -4451,8 +4504,10 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill ()
         pushad
     }
 
+    FUNCTION_PROLOG
     if ( CPed_GetWeaponSkill () )
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -4462,6 +4517,7 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill ()
     }
     else
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -4584,9 +4640,11 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList ()
         pushad
     }
 
+    FUNCTION_PROLOG
     // Carry on with collision? (sets the CElement->bUsesCollision flag check)
     if ( CPhysical_ProcessCollisionSectorList () )
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -4597,6 +4655,7 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList ()
     }
     else
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -4644,9 +4703,31 @@ void _declspec(naked) HOOK_CrashFix_Misc2 ()
     }
 }
 
+#ifdef MTA_DEBUG
+    //#define TEST_HOOK_CrashFix_Misc3
+#endif
 
 void _declspec(naked) HOOK_CrashFix_Misc3 ()
 {
+#ifdef TEST_HOOK_CrashFix_Misc3
+    FUNCTION_PROLOG
+    int tempVar;
+    _asm
+    {
+        mov     tempVar, ecx
+        pushad
+    }
+
+    if ( rand() % 100 < 20 )
+        tempVar = 0;
+
+    _asm
+    {
+        popad
+        mov     ecx, tempVar
+    }
+    FUNCTION_EPILOG
+#endif
     _asm
     {
         // Hooked from 00645FD9
@@ -4935,8 +5016,10 @@ void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor ()
         pushad
     }
 
+    FUNCTION_PROLOG
     if ( AllowSwingingDoors() )
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
@@ -4945,6 +5028,7 @@ void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor ()
     }
     else
     {
+        FUNCTION_EPILOG
         _asm
         {
             popad
