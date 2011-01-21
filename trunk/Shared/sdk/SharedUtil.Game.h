@@ -47,4 +47,30 @@ namespace SharedUtil
         bool            m_bRGBColorsWrong;
     };
 
+
+    struct SHeatHazeSettings
+    {
+        SHeatHazeSettings ( void )
+            : ucIntensity ( 0 )
+            , ucRandomShift ( 0 )
+            , usSpeedMin ( 1 )
+            , usSpeedMax ( 1 )
+            , sScanSizeX ( 1 )
+            , sScanSizeY ( 1 )
+            , usRenderSizeX ( 1 )
+            , usRenderSizeY ( 1 )
+            , bInsideBuilding ( false )
+        {}
+
+        uchar       ucIntensity;        //     0 to 255
+        uchar       ucRandomShift;      //     0 to 255
+        ushort      usSpeedMin;         //     0 to 1000
+        ushort      usSpeedMax;         //     0 to 1000
+        short       sScanSizeX;         // -1000 to 1000
+        short       sScanSizeY;         // -1000 to 1000
+        ushort      usRenderSizeX;      //     0 to 1000
+        ushort      usRenderSizeY;      //     0 to 1000
+        bool        bInsideBuilding;
+    };
+
 }

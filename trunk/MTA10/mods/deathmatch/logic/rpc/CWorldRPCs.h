@@ -32,6 +32,9 @@ public:
     DECLARE_RPC ( GetSkyGradient );
     DECLARE_RPC ( SetSkyGradient );
     DECLARE_RPC ( ResetSkyGradient );
+    DECLARE_RPC ( GetHeatHaze );
+    DECLARE_RPC ( SetHeatHaze );
+    DECLARE_RPC ( ResetHeatHaze );
     DECLARE_RPC ( SetBlurLevel );
     DECLARE_RPC ( SetWantedLevel );
     DECLARE_RPC ( ResetMapInfo );

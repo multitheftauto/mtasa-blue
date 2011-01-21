@@ -850,6 +850,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaFunctionDefs::GetSkyGradient );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaFunctionDefs::SetSkyGradient );
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaFunctionDefs::ResetSkyGradient );
+    CLuaCFunctions::AddFunction ( "getHeatHaze", CLuaFunctionDefs::GetHeatHaze );
+    CLuaCFunctions::AddFunction ( "setHeatHaze", CLuaFunctionDefs::SetHeatHaze );
+    CLuaCFunctions::AddFunction ( "resetHeatHaze", CLuaFunctionDefs::ResetHeatHaze );
     CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefs::GetWaterColor );
     CLuaCFunctions::AddFunction ( "setWaterColor", CLuaFunctionDefs::SetWaterColor );
     CLuaCFunctions::AddFunction ( "resetWaterColor", CLuaFunctionDefs::ResetWaterColor );

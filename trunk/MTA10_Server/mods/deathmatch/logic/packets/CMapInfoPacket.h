@@ -36,12 +36,14 @@ public:
                                                       float fWaterLevel,
                                                       bool bHasSkyGradient,
                                                       bool* pbGarageStates,
-                                                      unsigned char ucSkyGradientTR = 0,
-                                                      unsigned char ucSkyGradientTG = 0,
-                                                      unsigned char ucSkyGradientTB = 0,
-                                                      unsigned char ucSkyGradientBR = 0,
-                                                      unsigned char ucSkyGradientBG = 0,
-                                                      unsigned char ucSkyGradientBB = 0,
+                                                      unsigned char ucSkyGradientTR,
+                                                      unsigned char ucSkyGradientTG,
+                                                      unsigned char ucSkyGradientTB,
+                                                      unsigned char ucSkyGradientBR,
+                                                      unsigned char ucSkyGradientBG,
+                                                      unsigned char ucSkyGradientBB,
+                                                      bool bHasHeatHaze,
+                                                      const SHeatHazeSettings& heatHazeSettings,
                                                       unsigned short usFPSLimit = 36,
                                                       bool bCloudsEnabled = true,
                                                       float fJetpackMaxHeight = 100,
@@ -72,6 +74,8 @@ private:
     bool                    m_bHasSkyGradient;
     unsigned char           m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char           m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
+    bool                    m_bHasHeatHaze;
+    SHeatHazeSettings       m_HeatHazeSettings;
     unsigned short          m_usFPSLimit;
     bool*                   m_pbGarageStates;
     bool                    m_bCloudsEnabled;

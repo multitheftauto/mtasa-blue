@@ -428,6 +428,11 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     unsigned char ucBottomRed, ucBottomGreen, ucBottomBlue;
     g_pGame->GetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue );
 
+    // Get the heathaze
+    bool bHasHeatHaze = g_pGame->HasHeatHaze ();
+    SHeatHazeSettings heatHazeSettings;
+    g_pGame->GetHeatHaze ( heatHazeSettings );
+
     // Grab the current weather and the weather we're blending to if any
     // Also grab the time the blending starts/started
     unsigned char ucCurrentWeather = m_pBlendedWeather->GetWeather ();
@@ -468,6 +473,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucBottomRed,
                                    ucBottomGreen,
                                    ucBottomBlue,
+                                   bHasHeatHaze,
+                                   heatHazeSettings,
                                    usFPSLimit,
                                    bCloudsEnabled,
                                    fJetpackMaxHeight,

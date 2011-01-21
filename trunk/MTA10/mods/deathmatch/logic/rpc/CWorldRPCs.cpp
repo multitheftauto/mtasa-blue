@@ -27,6 +27,8 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_WAVE_HEIGHT, SetWaveHeight, "SetWaveHeight" );
     AddHandler ( SET_SKY_GRADIENT, SetSkyGradient, "SetSkyGradient" );
     AddHandler ( RESET_SKY_GRADIENT, ResetSkyGradient, "ResetSkyGradient" );
+    AddHandler ( SET_HEAT_HAZE, SetHeatHaze, "SetHeatHaze" );
+    AddHandler ( RESET_HEAT_HAZE, ResetHeatHaze, "ResetHeatHaze" );
     AddHandler ( SET_BLUR_LEVEL, SetBlurLevel, "SetBlurLevel" );
     AddHandler ( SET_WANTED_LEVEL, SetWantedLevel, "SetWantedLevel" );
     AddHandler ( RESET_MAP_INFO, ResetMapInfo, "ResetMapInfo" );
@@ -144,6 +146,22 @@ void CWorldRPCs::SetSkyGradient ( NetBitStreamInterface& bitStream )
 void CWorldRPCs::ResetSkyGradient ( NetBitStreamInterface& bitStream )
 {
     g_pMultiplayer->ResetSky ();
+}
+
+
+void CWorldRPCs::SetHeatHaze ( NetBitStreamInterface& bitStream )
+{
+    SHeatHazeSync heatHaze;
+    if ( bitStream.Read ( &heatHaze ) )
+    {
+        g_pMultiplayer->SetHeatHaze ( heatHaze );
+    }
+}
+
+
+void CWorldRPCs::ResetHeatHaze ( NetBitStreamInterface& bitStream )
+{
+    g_pMultiplayer->ResetHeatHaze ();
 }
 
 

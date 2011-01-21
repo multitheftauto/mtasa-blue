@@ -104,7 +104,6 @@ public:
     virtual void                        HideRadar                   ( bool bHide ) = 0;
     virtual void                        SetCenterOfWorld            ( class CEntity * entity, class CVector * vecPosition, FLOAT fHeading ) = 0;
     virtual void                        DisablePadHandler           ( bool bDisabled ) = 0;
-    virtual void                        DisableHeatHazeEffect       ( bool bDisable ) = 0;
     virtual void                        DisableAllVehicleWeapons    ( bool bDisable ) = 0;
     virtual void                        DisableZoneNames            ( bool bDisabled ) = 0; // move to CHud
     virtual void                        DisableBirds                ( bool bDisabled ) = 0;
@@ -132,6 +131,9 @@ public:
     virtual void                        GetSkyColor                 ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue ) = 0;
     virtual void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue ) = 0;
     virtual void                        ResetSky                    () = 0;
+    virtual void                        SetHeatHaze                 ( const SHeatHazeSettings& settings ) = 0;
+    virtual void                        GetHeatHaze                 ( SHeatHazeSettings& settings ) = 0;
+    virtual void                        ResetHeatHaze               ( void ) = 0;
     virtual bool                        HasWaterColor               () = 0;
     virtual void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha ) = 0;
     virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;

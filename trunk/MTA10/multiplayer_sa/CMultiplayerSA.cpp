@@ -1240,10 +1240,71 @@ void CMultiplayerSA::DisablePadHandler ( bool bDisabled )
         MemPut < BYTE > ( 0x7449F0, 0x8B );  //         *(BYTE *)0x7449F0 = 0x8B;
 }
 
-void CMultiplayerSA::DisableHeatHazeEffect ( bool bDisable )
+
+void CMultiplayerSA::GetHeatHaze ( SHeatHazeSettings& settings )
 {
-    MemPut < bool > ( 0xC402BA, bDisable );  //     *(bool *)0xC402BA = bDisable;
+    settings.ucIntensity = *(int*)0x8D50E8;
+    settings.ucRandomShift = *(int*)0xC402C0;
+    settings.usSpeedMin = *(int*)0x8D50EC;
+    settings.usSpeedMax = *(int*)0x8D50F0;
+    settings.sScanSizeX = *(int*)0xC40304;
+    settings.sScanSizeY = *(int*)0xC40308;
+    settings.usRenderSizeX = *(int*)0xC4030C;
+    settings.usRenderSizeY = *(int*)0xC40310;
+    settings.bInsideBuilding = *(bool*)0xC402BA;
 }
+
+
+void DoSetHeatHazePokes ( const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed, bool bAllowAutoTypeChange  )
+{
+    MemPut < int > ( 0x8D50D4, iHourStart );
+    MemPut < int > ( 0x8D50D8, iHourEnd );
+
+    MemPut < float > ( 0x8D50DC, fFadeSpeed );
+    MemPut < float > ( 0x8D50E0, fInsideBuildingFadeSpeed );
+
+    MemPut < int > ( 0x8D50E8, settings.ucIntensity );
+    MemPut < int > ( 0xC402C0, settings.ucRandomShift );
+    MemPut < int > ( 0x8D50EC, settings.usSpeedMin );
+    MemPut < int > ( 0x8D50F0, settings.usSpeedMax );
+    MemPut < int > ( 0xC40304, settings.sScanSizeX );
+    MemPut < int > ( 0xC40308, settings.sScanSizeY );
+    MemPut < int > ( 0xC4030C, settings.usRenderSizeX );
+    MemPut < int > ( 0xC40310, settings.usRenderSizeY );
+    MemPut < bool > ( 0xC402BA, settings.bInsideBuilding );
+
+    if ( bAllowAutoTypeChange )
+        MemPut < BYTE > ( 0x701455, 0x83 ); // sub
+    else
+        MemPut < BYTE > ( 0x701455, 0xC3 ); // retn
+}
+
+
+void CMultiplayerSA::SetHeatHaze ( const SHeatHazeSettings& settings )
+{
+    if ( settings.ucIntensity != 0 )
+        DoSetHeatHazePokes ( settings, 0, 24, 1.0f, 1.0f, false );    // 24 hrs
+    else
+        DoSetHeatHazePokes ( settings, 38, 39, 1.0f, 1.0f, false );   // 0 hrs
+}
+
+
+void CMultiplayerSA::ResetHeatHaze ( void )
+{
+    SHeatHazeSettings settings;
+    settings.ucIntensity = 0x50;
+    settings.ucRandomShift = 0x0;
+    settings.usSpeedMin = 0x0C;
+    settings.usSpeedMax = 0x12;
+    settings.sScanSizeX = 0x4B;
+    settings.sScanSizeY = 0x50;
+    settings.usRenderSizeX = 0x50;
+    settings.usRenderSizeY = 0x55;
+    settings.bInsideBuilding = false;
+
+    DoSetHeatHazePokes ( settings, 10, 19, 0.05f, 1.0f, true );   // defaults
+}
+
 
 void CMultiplayerSA::DisableAllVehicleWeapons ( bool bDisable )
 {

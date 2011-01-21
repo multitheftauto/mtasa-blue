@@ -49,6 +49,9 @@ public:
     static int      getSkyGradient                      ( lua_State* luaVM );
     static int      setSkyGradient                      ( lua_State* luaVM );
     static int      resetSkyGradient                    ( lua_State* luaVM );
+    static int      getHeatHaze                         ( lua_State* luaVM );
+    static int      setHeatHaze                         ( lua_State* luaVM );
+    static int      resetHeatHaze                       ( lua_State* luaVM );
     static int      setFPSLimit                         ( lua_State* luaVM );
     static int      setMinuteDuration                   ( lua_State* luaVM );
     static int      setGarageOpen                       ( lua_State* luaVM );

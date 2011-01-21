@@ -650,6 +650,9 @@ public:
     LUA_DECLARE ( GetSkyGradient );
     LUA_DECLARE ( SetSkyGradient );
     LUA_DECLARE ( ResetSkyGradient );
+    LUA_DECLARE ( GetHeatHaze );
+    LUA_DECLARE ( SetHeatHaze );
+    LUA_DECLARE ( ResetHeatHaze );
     LUA_DECLARE ( GetWaterColor );
     LUA_DECLARE ( SetWaterColor );
     LUA_DECLARE ( ResetWaterColor );
