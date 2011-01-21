@@ -2009,16 +2009,10 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     if ( !bitStream.Read ( &funBugs ) )
         return;
 
-    
-    bool bCrouchBug = false;
-    if ( bitStream.Version () >= 0x15 )
-        if ( !bitStream.ReadBit ( bCrouchBug ) )
-            return;
-
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_QUICKRELOAD, funBugs.data.bQuickReload );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTFIRE, funBugs.data.bFastFire );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTMOVE, funBugs.data.bFastMove );
-    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, bCrouchBug );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, funBugs.data.bCrouchBug );
 
     float fJetpackMaxHeight = 100;
     if ( !bitStream.Read ( fJetpackMaxHeight ) )
