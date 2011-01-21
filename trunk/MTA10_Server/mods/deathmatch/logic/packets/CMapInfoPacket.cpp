@@ -144,13 +144,8 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     funBugs.data.bQuickReload = g_pGame->IsGlitchEnabled ( CGame::GLITCH_QUICKRELOAD );
     funBugs.data.bFastFire    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTFIRE );
     funBugs.data.bFastMove    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTMOVE );
+    funBugs.data.bCrouchBug   = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CROUCHBUG );
     BitStream.Write ( &funBugs );
-
-    if ( BitStream.Version () >= 0x15 )
-    {
-        bool bCrouchBug = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CROUCHBUG );
-        BitStream.WriteBit ( bCrouchBug );
-    }
 
     BitStream.Write ( m_fJetpackMaxHeight );
 
