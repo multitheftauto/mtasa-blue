@@ -41,6 +41,9 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaWorldDefs::getSkyGradient );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaWorldDefs::setSkyGradient );
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
+    CLuaCFunctions::AddFunction ( "getHeatHaze", CLuaWorldDefs::getHeatHaze );
+    CLuaCFunctions::AddFunction ( "setHeatHaze", CLuaWorldDefs::setHeatHaze );
+    CLuaCFunctions::AddFunction ( "resetHeatHaze", CLuaWorldDefs::resetHeatHaze );
     CLuaCFunctions::AddFunction ( "setFPSLimit", CLuaWorldDefs::setFPSLimit );
     CLuaCFunctions::AddFunction ( "setMinuteDuration", CLuaWorldDefs::setMinuteDuration );
     CLuaCFunctions::AddFunction ( "setGarageOpen", CLuaWorldDefs::setGarageOpen );
@@ -490,38 +493,30 @@ int CLuaWorldDefs::getSkyGradient ( lua_State* luaVM )
 
 int CLuaWorldDefs::setSkyGradient ( lua_State* luaVM )
 {
-    // Verify the argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
+    CScriptArgReader argStream ( luaVM );
 
-    unsigned char ucTopRed = 0;
-    unsigned char ucTopGreen = 0;
-    unsigned char ucTopBlue = 0;
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) )
-        ucTopRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
-    if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
-        ucTopGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-    if ( ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
-        ucTopBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-    unsigned char ucBottomRed = 0;
-    unsigned char ucBottomGreen = 0;
-    unsigned char ucBottomBlue = 0;
-    if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
-        ucBottomRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-    if ( ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
-        ucBottomGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
-    if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
-        ucBottomBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
-        // Set the new sky gradient
-    if ( CStaticFunctionDefinitions::SetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue ) )
+    // Set the new sky gradient
+    uchar ucTopRed, ucTopGreen, ucTopBlue;
+    uchar ucBottomRed, ucBottomGreen, ucBottomBlue;
+
+    argStream.ReadNumber ( ucTopRed, 0 );
+    argStream.ReadNumber ( ucTopGreen, 0 );
+    argStream.ReadNumber ( ucTopBlue, 0 );
+    argStream.ReadNumber ( ucBottomRed, 0 );
+    argStream.ReadNumber ( ucBottomGreen, 0 );
+    argStream.ReadNumber ( ucBottomBlue, 0 );
+
+    if ( !argStream.HasErrors () )
     {
-        lua_pushboolean ( luaVM, true );
-        return 1;
+        // Set the new sky gradient
+        if ( CStaticFunctionDefinitions::SetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setSkyGradient" );
 
     // Return false
     lua_pushboolean ( luaVM, false );
@@ -540,6 +535,74 @@ int CLuaWorldDefs::resetSkyGradient ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaWorldDefs::getHeatHaze ( lua_State* luaVM )
+{
+    SHeatHazeSettings settings;
+    bool bSuccess = CStaticFunctionDefinitions::GetHeatHaze ( settings );
+
+    if ( bSuccess )
+    {
+        lua_pushnumber ( luaVM, settings.ucIntensity );
+        lua_pushnumber ( luaVM, settings.ucRandomShift );
+        lua_pushnumber ( luaVM, settings.usSpeedMin );
+        lua_pushnumber ( luaVM, settings.usSpeedMax );
+        lua_pushnumber ( luaVM, settings.sScanSizeX );
+        lua_pushnumber ( luaVM, settings.sScanSizeY );
+        lua_pushnumber ( luaVM, settings.usRenderSizeX );
+        lua_pushnumber ( luaVM, settings.usRenderSizeY );
+        lua_pushboolean ( luaVM, settings.bInsideBuilding );
+        return 9;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaWorldDefs::setHeatHaze ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    // Set the new heat haze settings
+    SHeatHazeSettings heatHaze;
+    argStream.ReadNumber ( heatHaze.ucIntensity );
+    argStream.ReadNumber ( heatHaze.ucRandomShift, 0 );
+    argStream.ReadNumber ( heatHaze.usSpeedMin, 12 );
+    argStream.ReadNumber ( heatHaze.usSpeedMax, 18 );
+    argStream.ReadNumber ( heatHaze.sScanSizeX, 75 );
+    argStream.ReadNumber ( heatHaze.sScanSizeY, 80 );
+    argStream.ReadNumber ( heatHaze.usRenderSizeX, 80 );
+    argStream.ReadNumber ( heatHaze.usRenderSizeY, 85 );
+    argStream.ReadBool ( heatHaze.bInsideBuilding, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetHeatHaze ( heatHaze ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setHeatHaze" );
+
+    // Return false
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaWorldDefs::resetHeatHaze ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetHeatHaze () )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaWorldDefs::setFPSLimit ( lua_State* luaVM )
 {

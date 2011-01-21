@@ -5374,6 +5374,28 @@ bool CStaticFunctionDefinitions::ResetSkyGradient ( void )
     return true;
 }
 
+
+bool CStaticFunctionDefinitions::GetHeatHaze ( SHeatHazeSettings& settings )
+{
+    g_pMultiplayer->GetHeatHaze ( settings );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetHeatHaze ( const SHeatHazeSettings& settings )
+{
+    g_pMultiplayer->SetHeatHaze ( settings );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetHeatHaze ( void )
+{
+    g_pMultiplayer->ResetHeatHaze ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetWaterColor ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha )
 {
     g_pMultiplayer->GetWaterColor ( fWaterRed, fWaterGreen, fWaterBlue, fWaterAlpha );

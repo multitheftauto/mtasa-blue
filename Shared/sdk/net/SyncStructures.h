@@ -1818,4 +1818,72 @@ struct SMouseButtonSync : public ISyncStructure
 };
 
 
+//////////////////////////////////////////
+//                                      //
+//              Heat haze               //
+//                                      //
+//////////////////////////////////////////
+struct SHeatHazeSync : public ISyncStructure
+{
+    SHeatHazeSync( void ) {}
+    SHeatHazeSync( const SHeatHazeSettings& settings )
+    {
+        data.settings = settings;
+    }
+
+    // To SHeatHazeSettings
+    operator SHeatHazeSettings( void ) const
+    {
+        return data.settings;
+    }
+
+    template < unsigned int bits, typename T >
+    bool ReadRange ( NetBitStreamInterface& bitStream, T& outvalue, const T low, const T hi )
+    {
+        T temp;
+        if ( !bitStream.ReadBits ( &temp, bits ) )
+            return false;
+        outvalue = Clamp < T > ( low, temp + low, hi );
+        return true;
+    }
+
+    template < unsigned int bits, typename T >
+    void WriteRange ( NetBitStreamInterface& bitStream, const T value, const T low, const T hi ) const
+    {
+        T temp = Clamp < T > ( low, value, hi ) - low;
+        bitStream.WriteBits ( &temp, bits );
+    }
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        return  bitStream.Read ( data.settings.ucIntensity ) &&
+                bitStream.Read ( data.settings.ucRandomShift ) &&
+                ReadRange < 10, ushort > ( bitStream, data.settings.usSpeedMin, 0, 1000 ) &&
+                ReadRange < 10, ushort > ( bitStream, data.settings.usSpeedMax, 0, 1000 ) &&
+                ReadRange < 11, short > ( bitStream, data.settings.sScanSizeX, -1000, 1000 ) &&
+                ReadRange < 11, short > ( bitStream, data.settings.sScanSizeY, -1000, 1000 ) &&
+                ReadRange < 10, ushort > ( bitStream, data.settings.usRenderSizeX, 0, 1000 ) &&
+                ReadRange < 10, ushort > ( bitStream, data.settings.usRenderSizeY, 0, 1000 ) &&
+                bitStream.ReadBit ( data.settings.bInsideBuilding );
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.Write ( data.settings.ucIntensity );
+        bitStream.Write ( data.settings.ucRandomShift );
+        WriteRange < 10, ushort > ( bitStream, data.settings.usSpeedMin, 0, 1000 );
+        WriteRange < 10, ushort > ( bitStream, data.settings.usSpeedMax, 0, 1000 );
+        WriteRange < 11, short > ( bitStream, data.settings.sScanSizeX, -1000, 1000 );
+        WriteRange < 11, short > ( bitStream, data.settings.sScanSizeY, -1000, 1000 );
+        WriteRange < 10, ushort > ( bitStream, data.settings.usRenderSizeX, 0, 1000 );
+        WriteRange < 10, ushort > ( bitStream, data.settings.usRenderSizeY, 0, 1000 );
+        bitStream.WriteBit ( data.settings.bInsideBuilding );
+    }
+
+    struct
+    {
+        SHeatHazeSettings settings;
+    } data;
+};
+
 #pragma pack(pop)

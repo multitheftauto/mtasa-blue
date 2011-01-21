@@ -435,6 +435,9 @@ public:
     static bool                         GetSkyGradient                      ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue );
     static bool                         SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );
     static bool                         ResetSkyGradient                    ( void );
+    static bool                         GetHeatHaze                         ( SHeatHazeSettings& settings );
+    static bool                         SetHeatHaze                         ( const SHeatHazeSettings& settings );
+    static bool                         ResetHeatHaze                       ( void );
     static bool                         GetWaterColor                       ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );
     static bool                         SetWaterColor                       ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
     static bool                         ResetWaterColor                     ( void );

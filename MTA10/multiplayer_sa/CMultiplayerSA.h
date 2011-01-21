@@ -48,7 +48,6 @@ public:
     void                        SetCenterOfWorld            ( CEntity * entity, CVector * vecPosition, FLOAT fHeading );
     void                        DisablePadHandler           ( bool bDisabled );
     void                        DisableEnterExitVehicleKey  ( bool bDisabled );
-    void                        DisableHeatHazeEffect       ( bool bDisable );
     void                        DisableAllVehicleWeapons    ( bool bDisable );
     void                        DisableZoneNames            ( bool bDisabled );
     void                        DisableBirds                ( bool bDisabled );
@@ -75,6 +74,9 @@ public:
     bool                        HasSkyColor                 ();
     void                        GetSkyColor                 ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue );
     void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue );
+    void                        SetHeatHaze                 ( const SHeatHazeSettings& settings );
+    void                        GetHeatHaze                 ( SHeatHazeSettings& settings );
+    void                        ResetHeatHaze               ( void );
     void                        ResetSky                    ();
     bool                        HasWaterColor               ();
     void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );

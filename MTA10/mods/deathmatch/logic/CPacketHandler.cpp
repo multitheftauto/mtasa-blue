@@ -1904,6 +1904,20 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     else
         g_pMultiplayer->ResetSky ();
 
+    // Read out the heat haze
+    bool bHasHeatHaze;
+    if ( !bitStream.ReadBit ( bHasHeatHaze ) )
+        return;
+    if ( bHasHeatHaze )
+    {
+        SHeatHazeSync heatHaze;
+        bitStream.Read ( &heatHaze );
+        g_pMultiplayer->SetHeatHaze ( heatHaze );
+    }
+    else
+        g_pMultiplayer->ResetHeatHaze ();
+
+
     // Read out the map time
     unsigned char ucClockHour;
     unsigned char ucClockMinute;

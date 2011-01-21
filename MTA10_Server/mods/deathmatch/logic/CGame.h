@@ -242,6 +242,12 @@ public:
     inline void                 GetSkyGradient              ( unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB ) { ucTR = m_ucSkyGradientTR; ucTG = m_ucSkyGradientTG; ucTB = m_ucSkyGradientTB; ucBR = m_ucSkyGradientBR; ucBG = m_ucSkyGradientBG; ucBB = m_ucSkyGradientBB; }
     inline void                 SetSkyGradient              ( unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB ) { m_ucSkyGradientTR = ucTR; m_ucSkyGradientTG = ucTG; m_ucSkyGradientTB = ucTB; m_ucSkyGradientBR = ucBR; m_ucSkyGradientBG = ucBG; m_ucSkyGradientBB = ucBB; }
 
+    inline bool                 HasHeatHaze                 ( void )        { return m_bHasHeatHaze; }
+    inline void                 SetHasHeatHaze              ( bool bHasHeatHaze ) { m_bHasHeatHaze = bHasHeatHaze; }
+
+    inline void                 GetHeatHaze                 ( SHeatHazeSettings& heatHazeSettings )         { heatHazeSettings = m_HeatHazeSettings; }
+    inline void                 SetHeatHaze                 ( const SHeatHazeSettings& heatHazeSettings )   { m_HeatHazeSettings = heatHazeSettings; }
+
     inline bool                 HasWaterColor               ( void )        { return m_bOverrideWaterColor; }
     inline void                 SetHasWaterColor            ( bool bOverrideWaterColor ) { m_bOverrideWaterColor = bOverrideWaterColor; }
 
@@ -367,6 +373,9 @@ private:
     unsigned char               m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char               m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
     bool                        m_bHasSkyGradient;
+
+    SHeatHazeSettings           m_HeatHazeSettings;
+    bool                        m_bHasHeatHaze;
 
     bool                        m_bOverrideWaterColor;
     unsigned char               m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;

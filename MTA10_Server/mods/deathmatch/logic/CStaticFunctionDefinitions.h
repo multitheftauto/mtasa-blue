@@ -471,6 +471,9 @@ public:
     static bool                 GetSkyGradient                      ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue );
     static bool                 SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );
     static bool                 ResetSkyGradient                    ( void );
+    static bool                 GetHeatHaze                         ( SHeatHazeSettings& heatHazeSettings );
+    static bool                 SetHeatHaze                         ( const SHeatHazeSettings& heatHazeSettings );
+    static bool                 ResetHeatHaze                       ( void );
     static bool                 SetFPSLimit                         ( unsigned short usLimit );
     static bool                 SetMinuteDuration                   ( unsigned long ulDuration );
     static bool                 SetGarageOpen                       ( unsigned char ucGarageID, bool bIsOpen );

@@ -157,6 +157,8 @@ void CGame::ResetMapInfo ( void )
     m_ucSkyGradientTR = 0, m_ucSkyGradientTG = 0, m_ucSkyGradientTB = 0;
     m_ucSkyGradientBR = 0, m_ucSkyGradientBG = 0, m_ucSkyGradientBB = 0;
     m_bHasSkyGradient = false;
+    m_HeatHazeSettings = SHeatHazeSettings ();
+    m_bHasHeatHaze = false;
     m_bCloudsEnabled = true;
 
     m_bTrafficLightsLocked = false;

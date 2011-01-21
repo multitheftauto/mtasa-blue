@@ -36,6 +36,8 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  unsigned char ucSkyGradientBR,
                                  unsigned char ucSkyGradientBG,
                                  unsigned char ucSkyGradientBB,
+                                 bool bHasHeatHaze,
+                                 const SHeatHazeSettings& heatHazeSettings,
                                  unsigned short usFPSLimit,
                                  bool bCloudsEnabled,
                                  float fJetpackMaxHeight,
@@ -65,6 +67,8 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_ucSkyGradientBR = ucSkyGradientBR;
     m_ucSkyGradientBG = ucSkyGradientBG;
     m_ucSkyGradientBB = ucSkyGradientBB;
+    m_bHasHeatHaze = bHasHeatHaze;
+    m_HeatHazeSettings = heatHazeSettings;
     m_usFPSLimit = usFPSLimit;
     m_bCloudsEnabled = bCloudsEnabled;
     m_fJetpackMaxHeight = fJetpackMaxHeight;
@@ -92,6 +96,14 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( m_ucSkyGradientBR );
         BitStream.Write ( m_ucSkyGradientBG );
         BitStream.Write ( m_ucSkyGradientBB );
+    }
+
+    // Write heat haze
+    BitStream.WriteBit ( m_bHasHeatHaze );
+    if ( m_bHasHeatHaze )
+    {
+        SHeatHazeSync heatHaze ( m_HeatHazeSettings );
+        BitStream.Write ( &heatHaze );
     }
 
     // Write the map hour

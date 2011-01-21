@@ -7517,6 +7517,40 @@ bool CStaticFunctionDefinitions::ResetSkyGradient ( void )
     return true;
 }
 
+
+bool CStaticFunctionDefinitions::GetHeatHaze ( SHeatHazeSettings& settings )
+{
+    if ( g_pGame->HasHeatHaze () )
+    {
+        g_pGame->GetHeatHaze ( settings );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetHeatHaze ( const SHeatHazeSettings& settings )
+{
+    g_pGame->SetHeatHaze ( settings );
+    g_pGame->SetHasHeatHaze ( true );
+
+    CBitStream BitStream;
+    SHeatHazeSync heatHaze ( settings );
+    BitStream.pBitStream->Write ( &heatHaze );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_HEAT_HAZE, *BitStream.pBitStream ) );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetHeatHaze ( void )
+{
+    g_pGame->SetHasHeatHaze ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_HEAT_HAZE, *BitStream.pBitStream ) );
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetGlitchEnabled ( const std::string& strGlitchName, bool bEnabled )
 {
     if ( g_pGame->IsGlitch ( strGlitchName ) )
