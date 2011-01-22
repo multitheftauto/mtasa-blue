@@ -100,6 +100,7 @@ void CGUI_Impl::SetSkin ( const char* szName )
 {
     if(m_HasSchemeLoaded)
     {
+        CEGUI::GlobalEventSet::getSingletonPtr ()->removeAllEvents();
         CEGUI::SchemeManager::getSingleton().unloadScheme(m_CurrentSchemeName);
     }
 
