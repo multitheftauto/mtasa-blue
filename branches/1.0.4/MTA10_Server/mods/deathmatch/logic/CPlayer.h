@@ -209,6 +209,10 @@ public:
     const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
     void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );
 
+    // Checks
+    void                                        SetWeaponCorrect            ( bool bWeaponCorrect );
+    bool                                        GetWeaponCorrect            ( void );
+
 private:
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
@@ -293,6 +297,8 @@ private:
     unsigned long                               m_ulLastReceivedSyncTime;
 
     std::map < std::string, std::string >       m_AnnounceValues;
+
+    uint                                        m_uiWeaponIncorrectCount;
 };
 
 #endif

@@ -59,7 +59,6 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                 }
             }
 
-            m_ulLastSyncReturnTime = CClientTime::GetTime ();   // Network trouble fix test
             return true;
         }
 
@@ -655,6 +654,13 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
         if ( pPlayerWeapon )
         {
             BitStream.WriteBit ( true );
+
+            // To confirm weapon type at the other end
+            if ( BitStream.Version () >= 0x16 )
+            {
+                unsigned char ucWeaponType = pPlayerWeapon->GetType ();
+                BitStream.Write ( ucWeaponType );
+            }
 
             // Write the type
             unsigned int uiSlot = pPlayerWeapon->GetSlot ();

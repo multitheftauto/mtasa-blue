@@ -25,6 +25,7 @@ public:
 
     static unsigned char    GetWeaponID         ( const char* szName );
     static const char*      GetWeaponName       ( unsigned char ucID );
+    static float            GetWeaponRange      ( unsigned char ucWeaponType );
 
     static char             GetSlotFromWeapon   ( unsigned char ucID );
 

@@ -89,6 +89,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_ulLastReceivedSyncTime = 0;
 
+    m_uiWeaponIncorrectCount = 0;
+
     // Add us to the manager
     pPlayerManager->AddToList ( this );
 }
@@ -605,4 +607,19 @@ const std::string& CPlayer::GetAnnounceValue ( const string& strKey ) const
 void CPlayer::SetAnnounceValue ( const string& strKey, const string& strValue )
 {
     m_AnnounceValues [ strKey ] = strValue;
+}
+
+
+void CPlayer::SetWeaponCorrect ( bool bWeaponCorrect )
+{
+    if ( bWeaponCorrect )
+        m_uiWeaponIncorrectCount = 0;
+    else
+        m_uiWeaponIncorrectCount++;
+}
+
+
+bool CPlayer::GetWeaponCorrect ( void )
+{
+    return m_uiWeaponIncorrectCount == 0;
 }

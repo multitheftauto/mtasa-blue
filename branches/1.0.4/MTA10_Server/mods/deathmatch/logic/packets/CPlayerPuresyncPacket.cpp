@@ -139,16 +139,25 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         if ( flags.data.bHasAWeapon )
         {
+            // Read client weapon data, but only apply it if the weapon matches with the server
+            uchar ucUseWeaponType = pSourcePlayer->GetWeaponType ();
+            bool bWeaponCorrect = true;
             if ( BitStream.Version () >= 0x0d )
             {
-                // Check client has the weapon we think he has
-                unsigned char ucWeaponType;
-                if ( !BitStream.Read ( ucWeaponType ) )
+               // Check client has the weapon we think he has
+                unsigned char ucClientWeaponType;
+                if ( !BitStream.Read ( ucClientWeaponType ) )
                     return false;
 
-                if ( pSourcePlayer->GetWeaponType () != ucWeaponType )
-                    return false;
+                if ( pSourcePlayer->GetWeaponType () != ucClientWeaponType )
+                {
+                    bWeaponCorrect = false;                 // Possibly old weapon data.
+                    ucUseWeaponType = ucClientWeaponType;   // Use the packet supplied weapon type to skip over the correct amount of data
+                }
             }
+
+            // Update check counts
+            pSourcePlayer->SetWeaponCorrect ( bWeaponCorrect );
 
             // Current weapon slot
             SWeaponSlotSync slot;
@@ -156,36 +165,46 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 return false;
             unsigned int uiSlot = slot.data.uiSlot;
 
-            pSourcePlayer->SetWeaponSlot ( uiSlot );
+            // Set weapon slot
+            if ( bWeaponCorrect )
+                pSourcePlayer->SetWeaponSlot ( uiSlot );
 
             if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
             {
                 // Read out the ammo states
-                SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), true, true );
+                SWeaponAmmoSync ammo ( ucUseWeaponType, true, true );
                 if ( !BitStream.Read ( &ammo ) )
                     return false;
-                pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
-                pSourcePlayer->SetWeaponTotalAmmo ( ammo.data.usTotalAmmo );
 
                 // Read out the aim data
-                SWeaponAimSync sync ( pSourcePlayer->GetWeaponRange (), ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle ) );
+                SWeaponAimSync sync ( CWeaponNames::GetWeaponRange ( ucUseWeaponType ), ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle ) );
                 if ( !BitStream.Read ( &sync ) )
                     return false;
 
-                // Set the arm directions and whether or not arms are up
-                pSourcePlayer->SetAimDirection ( sync.data.fArm );
-
-                // Read the aim data only if he's shooting or aiming
-                if ( sync.isFull() )
+                if ( bWeaponCorrect )
                 {
-                    pSourcePlayer->SetSniperSourceVector ( sync.data.vecOrigin );
-                    pSourcePlayer->SetTargettingVector ( sync.data.vecTarget );
+                    // Set the ammo states
+                    pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
+                    pSourcePlayer->SetWeaponTotalAmmo ( ammo.data.usTotalAmmo );
+
+                    // Set the arm directions and whether or not arms are up
+                    pSourcePlayer->SetAimDirection ( sync.data.fArm );
+
+                    // Read the aim data only if he's shooting or aiming
+                    if ( sync.isFull() )
+                    {
+                        pSourcePlayer->SetSniperSourceVector ( sync.data.vecOrigin );
+                        pSourcePlayer->SetTargettingVector ( sync.data.vecTarget );
+                    }
                 }
             }
             else
             {
-                pSourcePlayer->SetWeaponAmmoInClip ( 1 );
-                pSourcePlayer->SetWeaponTotalAmmo ( 1 );
+                if ( bWeaponCorrect )
+                {
+                    pSourcePlayer->SetWeaponAmmoInClip ( 1 );
+                    pSourcePlayer->SetWeaponTotalAmmo ( 1 );
+                }
             }
         }
         else
