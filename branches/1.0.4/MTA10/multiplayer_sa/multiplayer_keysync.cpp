@@ -548,7 +548,7 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
 }
 
 
-void CPlayerPed__ProcessControl_Abort()
+void  _declspec(naked) CPlayerPed__ProcessControl_Abort()
 {
     _asm
     {

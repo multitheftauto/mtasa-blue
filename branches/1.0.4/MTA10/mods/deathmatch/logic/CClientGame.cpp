@@ -4942,7 +4942,7 @@ bool CClientGame::GetCloudsEnabled ( void )
 #pragma code_seg(".text")
 bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
 {
-    int& iCheckStatus = *(int *)0x8A32A8;
+    int& iCheckStatus = g_pGame->GetCheckStatus ();
 
     if ( !g_pGame->VerifySADataFileNames () )
         iCheckStatus |= ( 1 << 11 );

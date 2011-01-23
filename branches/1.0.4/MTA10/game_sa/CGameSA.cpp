@@ -43,6 +43,7 @@ CGameSA::CGameSA()
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
+    m_iCheckStatus = 0;
 
     // Unprotect all of the GTASA code at once and leave it that way
     //DWORD oldProt;
