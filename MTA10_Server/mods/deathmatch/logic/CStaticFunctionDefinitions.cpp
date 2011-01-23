@@ -4209,7 +4209,7 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle,
 
 bool CStaticFunctionDefinitions::GetVehicleDoorOpenRatio ( CVehicle* pVehicle, unsigned char ucDoor, float& fRatio )
 {
-    if ( pVehicle != NULL )
+    if ( ucDoor <= 5 && pVehicle != NULL )
     {
         fRatio = pVehicle->GetDoorOpenRatio ( ucDoor );
         return true;
@@ -5148,23 +5148,26 @@ bool CStaticFunctionDefinitions::SetVehicleTurretPosition ( CVehicle* pVehicle, 
 
 bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( CElement* pElement, unsigned char ucDoor, float fRatio, unsigned long ulTime )
 {
-    RUN_CHILDREN SetVehicleDoorOpenRatio ( *iter, ucDoor, fRatio, ulTime );
-
-    if ( IS_VEHICLE(pElement) )
+    if ( ucDoor <= 5 )
     {
-        CVehicle& Vehicle = static_cast < CVehicle& > ( *pElement );
-        Vehicle.SetDoorOpenRatio ( ucDoor, fRatio );
+        RUN_CHILDREN SetVehicleDoorOpenRatio ( *iter, ucDoor, fRatio, ulTime );
 
-        CBitStream BitStream;
-        SIntegerSync < unsigned char, 3 > ucDoorSync ( ucDoor );
-        SDoorOpenRatioSync angle;
-        angle.data.fRatio = fRatio;
-        BitStream.pBitStream->Write ( &ucDoorSync );
-        BitStream.pBitStream->Write ( &angle );
-        BitStream.pBitStream->WriteCompressed ( static_cast < unsigned int > ( ulTime ) );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( &Vehicle, SET_VEHICLE_DOOR_OPEN_RATIO, *BitStream.pBitStream ) );
+        if ( IS_VEHICLE(pElement) )
+        {
+            CVehicle& Vehicle = static_cast < CVehicle& > ( *pElement );
+            Vehicle.SetDoorOpenRatio ( ucDoor, fRatio );
 
-        return true;
+            CBitStream BitStream;
+            SIntegerSync < unsigned char, 3 > ucDoorSync ( ucDoor );
+            SDoorOpenRatioSync angle;
+            angle.data.fRatio = fRatio;
+            BitStream.pBitStream->Write ( &ucDoorSync );
+            BitStream.pBitStream->Write ( &angle );
+            BitStream.pBitStream->WriteCompressed ( static_cast < unsigned int > ( ulTime ) );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( &Vehicle, SET_VEHICLE_DOOR_OPEN_RATIO, *BitStream.pBitStream ) );
+
+            return true;
+        }
     }
 
     return false;

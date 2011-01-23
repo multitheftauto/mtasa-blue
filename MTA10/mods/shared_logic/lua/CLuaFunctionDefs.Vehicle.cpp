@@ -3577,8 +3577,11 @@ int CLuaFunctionDefs::GetVehicleDoorOpenRatio ( lua_State* luaVM )
         if ( pVehicle )
         {
             unsigned char ucDoor = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            lua_pushnumber ( luaVM, pVehicle->GetDoorOpenRatio ( ucDoor ) );
-            return 1;
+            if ( ucDoor <= 5 )
+            {
+                lua_pushnumber ( luaVM, pVehicle->GetDoorOpenRatio ( ucDoor ) );
+                return 1;
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleDoorOpenRatio", "vehicle", 1 );
