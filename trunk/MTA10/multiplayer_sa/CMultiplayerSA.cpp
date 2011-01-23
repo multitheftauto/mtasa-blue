@@ -1148,6 +1148,14 @@ void CMultiplayerSA::InitHooks()
     MemSet ( (void *)0x590D7C, 0x90, 5 );
     MemSet ( (void *)0x590DB3, 0x90, 5 );
     MemCpy ( (void *)0x590D9F, "\xC3\x90\x90\x90\x90", 5 );
+
+    // Disable ped to player conversations.
+    MemSet ( (void *)0x53C127, 0x90, 10 );
+
+#if 0
+    // Mute peds (would break setPedVoice).
+    MemCpy ( (void *)0x5EFFE0, "\xC2\x18\x00\x90", 4 );
+#endif
 }
 
 
