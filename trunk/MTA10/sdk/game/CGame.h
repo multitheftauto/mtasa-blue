@@ -177,6 +177,7 @@ public:
 
     virtual bool                VerifySADataFileNames       () = 0;
     virtual bool                PerformChecks               () = 0;
+    virtual int&                GetCheckStatus              () = 0;
 
     virtual void                SetAsyncLoadingFromSettings     ( bool bSettingsDontUse, bool bSettingsEnabled ) = 0;
     virtual void                SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced ) = 0;
