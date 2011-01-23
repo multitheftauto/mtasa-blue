@@ -1685,30 +1685,35 @@ void CCore::ApplyFrameRateLimit ( void )
     // Calc required time in ms between frames
     const double dTargetTimeToUse = 1000.0 / m_uiFrameRateLimit;
 
-    // Get actual time in ms since last frame
-    double dTimeUsed = CClientTime::GetTimeNano() * 1000.0 - m_dLastTimeMs;
+    // Time now
+    double dTimeMs = CClientTime::GetTimeNano() * 1000.0;
+
+    // Get delta time in ms since last frame
+    double dTimeUsed = dTimeMs - m_dLastTimeMs;
+
+    // Apply any over/underrun carried over from the previous frame
+    dTimeUsed += m_dPrevOverrun;
 
     if ( dTimeUsed < dTargetTimeToUse )
     {
-        // Frame has spare time
+        // Have time spare - maybe eat some of that now
         double dSpare = dTargetTimeToUse - dTimeUsed;
 
-        // Take away any overrun from the previous frame
-        dSpare -= m_dPrevOverrun;
-        m_dPrevOverrun = 0;
+        double dUseUpNow = dSpare - dTargetTimeToUse * 0.75;
+        if ( dUseUpNow > 1 )
+            Sleep( static_cast < DWORD > ( floor ( dUseUpNow ) ) );
 
-        // Use up remaining spare time
-        if ( dSpare > 0 )
-        {
-            dSpare = Min < double > ( dSpare, 100 );
-            Sleep( (DWORD)dSpare );
-        }
-    }
-    else
-    {
-        // Frame has overrun
-        m_dPrevOverrun = Min < double > ( dTimeUsed - dTargetTimeToUse, dTargetTimeToUse / 2 );
+        // Redo timing calcs
+        dTimeMs = CClientTime::GetTimeNano() * 1000.0;
+        dTimeUsed = dTimeMs - m_dLastTimeMs;
+        dTimeUsed += m_dPrevOverrun;
     }
 
-    m_dLastTimeMs = CClientTime::GetTimeNano() * 1000.0;
+    // Update over/underrun for next frame
+    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
+
+    // Limit carry over
+    m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9, m_dPrevOverrun, dTargetTimeToUse * 0.9 );
+
+    m_dLastTimeMs = dTimeMs;
 }

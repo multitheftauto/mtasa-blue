@@ -4451,10 +4451,13 @@ void CClientGame::ResetMapInfo ( void )
     // Sky-gradient
     g_pMultiplayer->ResetSky ();
 
+    // Heat haze
+    g_pMultiplayer->ResetHeatHaze ();
+
     // Water-colour
     g_pMultiplayer->ResetWater ();
 
-     // Sky-gradient
+     // Clouds
     g_pMultiplayer->SetCloudsEnabled ( true );
     g_pClientGame->SetCloudsEnabled ( true );
 

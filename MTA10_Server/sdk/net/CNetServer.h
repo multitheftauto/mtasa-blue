@@ -67,7 +67,7 @@ public:
     virtual void                            EnablePortForwarding            ( unsigned short usPort, const char* szProtocol, bool bEnable ) = 0;
     virtual int                             GetPortForwardingStatus         ( unsigned short usPort, const char* szProtocol ) = 0;  // 0:closed  1:busy  2:open  -1:fail
 
-    virtual void                            ResetStub                       ( DWORD dwType, ... ) = 0;
+    virtual void                            ResetStub                       ( uint dwType, ... ) = 0;
 };
 
 #endif
