@@ -43,7 +43,7 @@ SWeaponName WeaponNames [] =
 {"Drowned"}, {"Fall"}, {"Unknown"}, {"Melee"}, {"Weapon"}, {"Flare"}, { "Tank Grenade" } };
 
 SWeaponSlot WeaponIDs [] =
-{{0},{0},{1},{1},{1},{1},{1},{1},{1},{1},{10},{10},{10},{-1},{10},{1},{8},{8},
+{{0},{0},{1},{1},{1},{1},{1},{1},{1},{1},{10},{10},{10},{-1},{10},{10},{8},{8},
 {8},{-1},{-1},{-1},{2},{2},{2},{3},{3},{3},{4},{4},{5},{5},{4},{6},{6},{7},
 {7},{7},{7},{8},{12},{9},{9},{9},{11},{11},{11},{-1}};
 
@@ -89,6 +89,24 @@ const char* CWeaponNames::GetWeaponName ( unsigned char ucID )
     }
 
     return szWeaponNameEmpty;
+}
+
+
+float CWeaponNames::GetWeaponRange ( unsigned char ucWeaponType )
+{
+    static const float s_fWeaponRanges [ 60 ] = {
+        1.6f,  1.6f,  1.6f,  1.6f,   1.6f,   1.6f,   1.6f,  1.6f,  1.6f,  1.6f,
+        1.6f,  1.6f,  1.6f,  0.0f,   1.6f,   1.6f,   40.0f, 40.0f, 40.0f, 0.0f,
+        0.0f,  0.0f,  35.0f, 35.0f,  35.0f,  40.0f,  35.0f, 40.0f, 35.0f, 45.0f,
+        70.0f, 90.0f, 35.0f, 100.0f, 300.0f, 55.0f,  55.0f, 5.1f,  75.0f, 40.0f,
+        25.0f, 6.1f,  10.1f, 100.0f, 100.0f, 100.0f, 1.6f,  0.0f,  0.0f,  0.0f,
+        0.0f,  0.0f,  0.0f,  0.0f,   0.0f,   0.0f,   0.0f,  0.0f,  0.0f,  0.0f
+    };
+
+    if ( ucWeaponType < 60 )
+        return s_fWeaponRanges [ ucWeaponType ];
+
+    return 0.0f;
 }
 
 

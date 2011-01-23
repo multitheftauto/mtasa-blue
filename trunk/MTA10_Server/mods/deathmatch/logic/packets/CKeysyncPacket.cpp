@@ -50,33 +50,56 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
 
             if ( bHasWeapon )
             {
+                // Read client weapon data, but only apply it if the weapon matches with the server
+                uchar ucUseWeaponType = pSourcePlayer->GetWeaponType ();
+                bool bWeaponCorrect = true;
+ 
+               // Check client has the weapon we think he has
+                unsigned char ucClientWeaponType;
+                if ( !BitStream.Read ( ucClientWeaponType ) )
+                    return false;
+
+                if ( pSourcePlayer->GetWeaponType () != ucClientWeaponType )
+                {
+                    bWeaponCorrect = false;                 // Possibly old weapon data.
+                    ucUseWeaponType = ucClientWeaponType;   // Use the packet supplied weapon type to skip over the correct amount of data
+                }
+
                 // Read out the current weapon slot and set it
                 SWeaponSlotSync slot;
                 if ( !BitStream.Read ( &slot ) )
                     return false;
                 unsigned int uiSlot = slot.data.uiSlot;
 
-                pSourcePlayer->SetWeaponSlot ( uiSlot );
+                if ( bWeaponCorrect )
+                    pSourcePlayer->SetWeaponSlot ( uiSlot );
 
                 // Did he have a weapon?
                 if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
                 {
                     // And ammo in clip
-                    SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
+                    SWeaponAmmoSync ammo ( ucUseWeaponType, false, true );
                     if ( !BitStream.Read ( &ammo ) )
                         return false;
-                    pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
 
                     // Read the aim data
-                    SWeaponAimSync aim ( pSourcePlayer->GetWeaponRange () );
+                    SWeaponAimSync aim ( CWeaponNames::GetWeaponRange ( ucUseWeaponType ) );
                     if ( !BitStream.Read ( &aim ) )
                         return false;
                     pSourcePlayer->SetSniperSourceVector ( aim.data.vecOrigin );
                     pSourcePlayer->SetTargettingVector ( aim.data.vecTarget );
 
-                    // Set the arm directions and whether or not arms are up
-                    pSourcePlayer->SetAimDirection ( aim.data.fArm );
-                    pSourcePlayer->SetAkimboArmUp ( flags.data.bAkimboTargetUp );
+                    if ( bWeaponCorrect )
+                    {
+                        pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
+
+                        pSourcePlayer->SetSniperSourceVector ( aim.data.vecOrigin );
+                        pSourcePlayer->SetTargettingVector ( aim.data.vecTarget );
+
+                        // Set the arm directions and whether or not arms are up
+                        pSourcePlayer->SetAimDirection ( aim.data.fArm );
+                        pSourcePlayer->SetAkimboArmUp ( flags.data.bAkimboTargetUp );
+                    }
 
                     // Read out the driveby direction
                     unsigned char ucDriveByDirection;
