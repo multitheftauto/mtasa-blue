@@ -165,8 +165,8 @@ public:
 
     CVehicleColor&                  RandomizeColor          ( void );
 
-    inline float                    GetDoorOpenRatio        ( unsigned char ucDoor )        { return m_fDoorOpenRatio [ ucDoor ]; }
-    inline void                     SetDoorOpenRatio        ( unsigned char ucDoor, float fRatio ) { m_fDoorOpenRatio [ ucDoor ] = fRatio; }
+    float                           GetDoorOpenRatio        ( unsigned char ucDoor ) const;
+    void                            SetDoorOpenRatio        ( unsigned char ucDoor, float fRatio );
     inline bool                     IsLocked                ( void )                        { return m_bLocked; };
     inline void                     SetLocked               ( bool bLocked )                { m_bLocked = bLocked; };
 

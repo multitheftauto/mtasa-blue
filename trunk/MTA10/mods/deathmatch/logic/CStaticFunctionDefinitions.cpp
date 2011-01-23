@@ -2900,13 +2900,16 @@ bool CStaticFunctionDefinitions::GetVehicleEngineState ( CClientVehicle & Vehicl
 
 bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( CClientEntity& Entity, unsigned char ucDoor, float fRatio, unsigned long ulTime )
 {
-    RUN_CHILDREN SetVehicleDoorOpenRatio ( **iter, ucDoor, fRatio, ulTime );
-
-    if ( IS_VEHICLE(&Entity) )
+    if ( ucDoor <= 5 )
     {
-        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-        Vehicle.SetDoorOpenRatio ( ucDoor, fRatio, ulTime, true );
-        return true;
+        RUN_CHILDREN SetVehicleDoorOpenRatio ( **iter, ucDoor, fRatio, ulTime );
+
+        if ( IS_VEHICLE(&Entity) )
+        {
+            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+            Vehicle.SetDoorOpenRatio ( ucDoor, fRatio, ulTime, true );
+            return true;
+        }
     }
 
     return false;

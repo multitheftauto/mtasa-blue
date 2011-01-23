@@ -658,47 +658,54 @@ void CClientVehicle::SetDoorOpenRatio ( unsigned char ucDoor, float fRatio, unsi
     bool bAllow = true;
     unsigned char ucSeat;
 
-    // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
-    if ( bForced == false )
+    if ( ucDoor <= 5 )
     {
-        switch ( ucDoor )
+        // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
+        if ( bForced == false )
         {
-            case 2:
-                bAllow = m_pOccupyingDriver == 0;
-                break;
-            case 3:
-            case 4:
-            case 5:
-                ucSeat = ucDoor - 2;
-                bAllow = m_pOccupyingPassengers [ ucSeat ] == 0;
-                break;
-        }
-    }
-
-    if ( bAllow )
-    {
-        if ( ulDelay == 0UL )
-        {
-            if ( m_pVehicle )
+            switch ( ucDoor )
             {
-                m_pVehicle->OpenDoor ( ucDoor, fRatio, false );
+                case 2:
+                    bAllow = m_pOccupyingDriver == 0;
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    ucSeat = ucDoor - 2;
+                    bAllow = m_pOccupyingPassengers [ ucSeat ] == 0;
+                    break;
             }
-            m_fDoorOpenRatio [ ucDoor ] = fRatio;
         }
-        else
+
+        if ( bAllow )
         {
-            SetDoorOpenRatioInterpolated ( ucDoor, fRatio, ulDelay );
+            if ( ulDelay == 0UL )
+            {
+                if ( m_pVehicle )
+                {
+                    m_pVehicle->OpenDoor ( ucDoor, fRatio, false );
+                }
+                m_fDoorOpenRatio [ ucDoor ] = fRatio;
+            }
+            else
+            {
+                SetDoorOpenRatioInterpolated ( ucDoor, fRatio, ulDelay );
+            }
         }
     }
 }
 
 float CClientVehicle::GetDoorOpenRatio ( unsigned char ucDoor )
 {
-    if ( m_pVehicle )
+    if ( ucDoor <= 5 )
     {
-        return m_pVehicle->GetDoor ( ucDoor )->GetAngleOpenRatio ();
+        if ( m_pVehicle )
+        {
+            return m_pVehicle->GetDoor ( ucDoor )->GetAngleOpenRatio ();
+        }
+        return m_fDoorOpenRatio [ ucDoor ];
     }
-    return m_fDoorOpenRatio [ ucDoor ];
+    return 0.0f;
 }
 
 void CClientVehicle::SetSwingingDoorsAllowed ( bool bAllowed )

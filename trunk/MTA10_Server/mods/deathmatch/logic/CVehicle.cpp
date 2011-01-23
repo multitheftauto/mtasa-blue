@@ -398,6 +398,16 @@ CVehicleColor& CVehicle::RandomizeColor ( void )
     return m_Color;
 }
 
+void CVehicle::SetDoorOpenRatio ( unsigned char ucDoor, float fRatio )
+{
+    if ( ucDoor <= 5 )
+        m_fDoorOpenRatio [ ucDoor ] = SharedUtil::Clamp ( 0.0f, fRatio, 1.0f );
+}
+
+float CVehicle::GetDoorOpenRatio ( unsigned char ucDoor ) const
+{
+    return (ucDoor <= 5) ? m_fDoorOpenRatio [ ucDoor ] : 0.0f;
+}
 
 void CVehicle::GetTurretPosition ( float& fPositionX, float& fPositionY )
 {
