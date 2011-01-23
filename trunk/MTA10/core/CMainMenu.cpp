@@ -60,6 +60,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_bIsFullyVisible = false;
     m_bIsIngame = true;
 //    m_bIsInSubWindow = false;
+    m_bStarted = false;
     m_fFader = 0;
     m_ucFade = FADE_INVISIBLE;
 
