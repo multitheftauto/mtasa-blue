@@ -1652,9 +1652,15 @@ void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bo
 //
 void CCore::ApplyLoadingCrashPatch ( void )
 {
-    uchar* pAddress = (uchar*)0x7468F9;
-    uchar ucOldValue = 183;
-    uchar ucNewValue = 57;
+    uchar* pAddress;
+
+    if ( *(WORD *)0x748ADD == 0x53FF )
+        pAddress = (uchar*)0x7468F9;    // US
+    else
+        pAddress = (uchar*)0x746949;    // EU
+
+    uchar ucOldValue = 0xB7;
+    uchar ucNewValue = 0x39;
 
     MEMORY_BASIC_INFORMATION info;
     VirtualQuery( pAddress, &info, sizeof(MEMORY_BASIC_INFORMATION) );

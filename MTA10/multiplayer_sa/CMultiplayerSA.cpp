@@ -4723,9 +4723,8 @@ void _declspec(naked) HOOK_CrashFix_Misc3 ()
         mov     edx,dword ptr [ecx+384h]
         jmp     RETURN_CrashFix_Misc3
     cont:
+        jmp     CPlayerPed__ProcessControl_Abort
     }
-
-    CPlayerPed__ProcessControl_Abort();
 }
 
 

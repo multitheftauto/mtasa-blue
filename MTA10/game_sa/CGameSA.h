@@ -202,6 +202,8 @@ public:
 
     bool                    VerifySADataFileNames   ();
     bool                    PerformChecks           ();
+    int&                    GetCheckStatus          ( void )            { return m_iCheckStatus; }
+
 
     void                    SetAsyncLoadingFromSettings     ( bool bSettingsDontUse, bool bSettingsEnabled );
     void                    SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced );
@@ -264,6 +266,7 @@ private:
     bool                    m_bAsyncScriptEnabled;
     bool                    m_bAsyncScriptForced;
     bool                    m_bASyncLoadingSuspended;
+    int                     m_iCheckStatus;
 
     static unsigned long*   VAR_SystemTime;
     static unsigned long*   VAR_IsAtMenu;
