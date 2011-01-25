@@ -1572,12 +1572,23 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 
                         // Tell the player the problem
                         SString strMessage;
+                        ushort usClientNetVersion = Packet.GetNetVersion ();
+                        ushort usServerNetVersion = MTA_DM_NETCODE_VERSION;
+                        ushort usClientBranchId = usClientNetVersion >> 12;
+                        ushort usServerBranchId = usServerNetVersion >> 12;
+
+                        if ( usClientBranchId != usServerBranchId )
+                        {
+                            strMessage = SString ( "Disconnected: Server from different branch (client: %X, server: %X)\n", usClientBranchId, usServerBranchId );
+                        }
+                        else
                         if ( MTASA_VERSION_BUILD == 0 )
-                            strMessage = SString ( "Disconnected: Bad version (client: %X, server: %X)\n", Packet.GetNetVersion (), MTA_DM_NETCODE_VERSION );
+                        {
+                            strMessage = SString ( "Disconnected: Bad version (client: %X, server: %X)\n", usClientNetVersion, usServerNetVersion );
+                        }
                         else
                         {
-                            int iClientBuild = atoi ( Packet.GetPlayerVersion().SubStr ( 8, 5 ) );
-                            if ( iClientBuild < MTASA_VERSION_BUILD )
+                            if ( usClientNetVersion < usServerNetVersion )
                                 strMessage = SString ( "Disconnected: Server is running a newer build (%d)\n", MTASA_VERSION_BUILD );
                             else
                                 strMessage = SString ( "Disconnected: Server is running an older build (%d)\n", MTASA_VERSION_BUILD );
