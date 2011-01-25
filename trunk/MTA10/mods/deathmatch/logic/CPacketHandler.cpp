@@ -1976,19 +1976,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     unsigned short usFPSLimit = 36;
     bitStream.ReadCompressed ( usFPSLimit );
-
-    unsigned int uiVal;
-    g_pCore->GetCVars ()->Get ( "fps_limit", uiVal );
-
-    if ( usFPSLimit > 0 && uiVal > usFPSLimit || uiVal == 0 )
-    {
-        g_pCore->SetFrameRateLimit ( usFPSLimit );
-    }
-    else
-    {
-        g_pCore->SetFrameRateLimit ( uiVal );
-    }
-
+    g_pCore->RecalculateFrameRateLimit ( usFPSLimit );
 
     // Read out the garage door states
     CGarages* pGarages = g_pCore->GetGame()->GetGarages();

@@ -199,7 +199,7 @@ public:
     void                    InitiateDataFilesFix            ( void )                                        { m_pLocalGUI->InitiateDataFilesFix (); }
 
     uint                    GetFrameRateLimit               ( void )                                        { return m_uiFrameRateLimit; }
-    void                    SetFrameRateLimit               ( uint uiFrameRateLimit )                       { m_uiFrameRateLimit = uiFrameRateLimit; }
+    void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 );
     void                    ApplyFrameRateLimit             ( void );
 
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
@@ -279,6 +279,7 @@ private:
     bool                        m_bQuitOnPulse;
     bool                        m_bDestroyMessageBox;
 
+    uint                        m_uiServerFrameRateLimit;
     uint                        m_uiFrameRateLimit;
     double                      m_dLastTimeMs;
     double                      m_dPrevOverrun;
