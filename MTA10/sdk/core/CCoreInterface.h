@@ -115,7 +115,7 @@ public:
     virtual void                    InitiateDataFilesFix            ( void ) = 0;
 
     virtual uint                    GetFrameRateLimit               ( void ) = 0;
-    virtual void                    SetFrameRateLimit               ( uint uiFrameRateLimit ) = 0;
+    virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 ) = 0;
     virtual void                    ApplyFrameRateLimit             ( void ) = 0;
 };
 

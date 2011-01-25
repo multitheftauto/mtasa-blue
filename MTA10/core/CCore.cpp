@@ -195,6 +195,7 @@ CCore::CCore ( void )
 
     // No initial fps limit
     m_uiFrameRateLimit = 0;
+    m_uiServerFrameRateLimit = 0;
     m_dLastTimeMs = 0;
     m_dPrevOverrun = 0;
 }
@@ -1677,6 +1678,30 @@ void CCore::ApplyLoadingCrashPatch ( void )
             }
         }
     }
+}
+
+
+//
+// Recalculate FPS limit to use
+//
+// Uses client rate from config
+// Uses server rate from argument, or last time if not supplied
+//
+void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit )
+{
+    // Save rate from server if valid
+    if ( uiServerFrameRateLimit != -1 )
+        m_uiServerFrameRateLimit = uiServerFrameRateLimit;
+
+    // Fetch client setting
+    uint uiClientRate;
+    g_pCore->GetCVars ()->Get ( "fps_limit", uiClientRate );
+
+    // Lowest wins (Although zero is highest)
+    if ( ( m_uiServerFrameRateLimit > 0 && uiClientRate > m_uiServerFrameRateLimit ) || uiClientRate == 0 )
+        m_uiFrameRateLimit = m_uiServerFrameRateLimit;
+    else
+        m_uiFrameRateLimit = uiClientRate;
 }
 
 
