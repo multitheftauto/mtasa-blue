@@ -27,6 +27,7 @@
 #define VAR_bMouseFlying        0xC1CC03
 #define VAR_bFxQuality          0xA9AE54
 #define VAR_fMouseSensitivity   0xB6EC1C
+#define VAR_bMipMapping         0xBA680C
 
 #define VAR_bUsertrackMode      0xBA67F8
 #define VAR_bUsertrackAutoScan  0xBA680D
@@ -120,6 +121,9 @@ public:
 
     unsigned int            GetAntiAliasing             ( void );
     void                    SetAntiAliasing             ( unsigned int uiAntiAliasing, bool bOnRestart );
+
+    bool                    IsMipMappingEnabled         ( void );
+	void                    SetMipMappingEnabled        ( bool bEnable );
 
     void                    Save                        ( void );
 

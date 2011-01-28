@@ -224,6 +224,16 @@ void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing, bool bOnRestart
     m_pInterface->dwAntiAliasing = uiAntiAliasing;
 }
 
+bool CSettingsSA::IsMipMappingEnabled ( void )
+{
+	return ( ( *(BYTE *)VAR_bMipMapping == 1 ) ? true : false );
+}
+
+void CSettingsSA::SetMipMappingEnabled ( bool bEnable )
+{
+	MemPut < BYTE > ( VAR_bMipMapping, ( ( bEnable ) ? 1 : 0 ) );
+}
+
 void CSettingsSA::Save ()
 {
     _asm
