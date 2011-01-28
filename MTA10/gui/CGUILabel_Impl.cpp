@@ -66,12 +66,8 @@ CGUILabel_Impl::~CGUILabel_Impl ( void )
 
 void CGUILabel_Impl::SetText ( const char *Text )
 {
-    CEGUI::String strText;
-
-    if ( Text ) strText.assign ( (CEGUI::utf8*) Text ); // assign as UTF8 string
-
     // Set the new text and size the text field after it
-    m_pWindow->setText ( strText );
+    m_pWindow->setText ( CGUI_Impl::GetUTFString(Text) );
 }
 
 

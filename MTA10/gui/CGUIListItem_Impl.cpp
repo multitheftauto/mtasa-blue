@@ -66,9 +66,7 @@ void CGUIListItem_Impl::SetFont ( const char *szFontName )
 
 void CGUIListItem_Impl::SetText ( const char *pszText, const char *pszSortText )
 {
-    CEGUI::String strText;
-    strText.assign ( (CEGUI::utf8*) pszText );
-    m_pListItem->setText( strText, pszSortText );
+    m_pListItem->setText( CGUI_Impl::GetUTFString(pszText), pszSortText );
 }
 
 

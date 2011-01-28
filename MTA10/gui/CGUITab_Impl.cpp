@@ -25,9 +25,7 @@ CGUITab_Impl::CGUITab_Impl ( CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const c
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( "DefaultWindow", szUnique );
     m_pWindow->setDestroyedByParent ( false );
 
-    CEGUI::String strText;
-    strText.assign( (CEGUI::utf8*) szCaption ); // assign as UTF8 string
-    m_pWindow->setText ( strText );
+    m_pWindow->setText ( CGUI_Impl::GetUTFString(szCaption) );
 
 
     // Store the pointer to this CGUI element in the CEGUI element
@@ -59,8 +57,5 @@ CGUITab_Impl::~CGUITab_Impl ( void )
 
 void CGUITab_Impl::SetCaption ( const char* szCaption )
 {
-    CEGUI::String strCaption;
-
-    if ( szCaption ) strCaption.assign ( (CEGUI::utf8*)szCaption );
-    m_pWindow->setText ( strCaption );
+    m_pWindow->setText ( CGUI_Impl::GetUTFString(szCaption) );
 }

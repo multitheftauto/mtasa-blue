@@ -32,15 +32,13 @@ CGUIComboBox_Impl::CGUIComboBox_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, co
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUICOMBOBOX_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
 
-    CEGUI::String strText;
-    strText.assign( (CEGUI::utf8*) szCaption ); // assign as UTF8 string
-    m_pWindow->setText ( strText );
+    // This needs a better alternative, so changing comboBox will change this - Jyrno42
+    storedCaption = CGUI_Impl::GetUTFString(szCaption);
+
+    m_pWindow->setText ( storedCaption );
 
     m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( 128.0f, 24.0f ) );
     m_pWindow->setVisible ( true );
-
-    // This needs a better alternative, so changing comboBox will change this - Jyrno42
-    storedCaption = strText;
 
     // Store the pointer to this CGUI element in the CEGUI element
     m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
@@ -168,13 +166,10 @@ bool CGUIComboBox_Impl::SetItemText ( int index, const char* szText )
     try
     {
         CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
-        CEGUI::String strText;
-        strText.assign( (CEGUI::utf8*) szText ); // assign as UTF8 string
-        pItem->setText( strText, NULL );
+        pItem->setText( CGUI_Impl::GetUTFString(szText), NULL );
         if( pItem->isSelected( ) ) // if this is currently selected, let's update the editbox.
         {
-            strText.assign( (CEGUI::utf8*) szText );
-            m_pWindow->setText ( strText );
+            m_pWindow->setText ( CGUI_Impl::GetUTFString(szText) );
         }
         return true;
     }

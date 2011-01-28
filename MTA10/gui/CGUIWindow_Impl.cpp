@@ -39,9 +39,7 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
         m_pWindow->setAlpha ( 0.8f );
 
         // Give the window a caption
-        CEGUI::String strText;
-        strText.assign( (CEGUI::utf8*)szCaption ); // assign as UTF8 string
-        m_pWindow->setText ( strText );
+        m_pWindow->setText ( CGUI_Impl::GetUTFString(szCaption) );
     }
 
     m_pWindow->setDestroyedByParent ( false );

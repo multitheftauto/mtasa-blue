@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "minibidi.c"
 #include "CEGUIExceptions.h"
 
 using std::list;
@@ -356,6 +357,15 @@ bool CGUI_Impl::GetStringFromInputMode ( eInputMode a_eMode, std::string& a_rstr
     default:                           
         return false;
     }
+}
+
+CEGUI::String CGUI_Impl::GetUTFString ( const char* szInput )
+{
+    std::wstring strLine = ConvertToUTF8(szInput); //Convert to a typical UTF8 string
+    int iCount = strLine.size();
+    wchar_t* wcsLineBidi = (wchar_t*)strLine.c_str();
+    doBidi ( wcsLineBidi, iCount, 1, 1 );  //Process our UTF string through MiniBidi, for Bidirectionalism
+    return CEGUI::String((CEGUI::utf8*)ConvertToANSI(std::wstring(wcsLineBidi)).c_str()); //Convert into a CEGUI String
 }
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
@@ -845,7 +855,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             }
 
                             // Set the new text and move the carat at the end of what we pasted
-                            CEGUI::String strText((CEGUI::utf8*)SharedUtil::ConvertToANSI(tmp).c_str());
+                            CEGUI::String strText(CGUI_Impl::GetUTFString(ConvertToANSI(tmp).c_str()));
                             strEditText = strText;
                             iCaratIndex = sizeCaratIndex;
                         }
