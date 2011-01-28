@@ -473,7 +473,7 @@ PostVC90Check:
 		StrCpy $2 "$2\steamapps\common\grand theft auto san andreas"
 		cont3:
 		!insertmacro ReplaceSubStr $2 "gta_sa.exe" ""
-		!insertmacro ReplaceSubStr $2 "/" "\"
+		!insertmacro ReplaceSubStr $MODIFIED_STR "/" "\"
 		strcpy $3 '"'
 		!insertmacro ReplaceSubStr $MODIFIED_STR $3 ""
 		strcpy $GTA_DIR $MODIFIED_STR
