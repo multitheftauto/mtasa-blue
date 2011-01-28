@@ -112,10 +112,7 @@ float CGUIFont_Impl::GetFontHeight ( float fScale )
 
 float CGUIFont_Impl::GetTextExtent ( const char* szText, float fScale )
 {
-    CEGUI::String strText;
-
-    if ( szText ) strText.assign ( szText );
-    return m_pFont->getTextExtent ( strText, fScale );
+    return m_pFont->getTextExtent ( CGUI_Impl::GetUTFString(szText), fScale );
 }
 
 
