@@ -127,6 +127,7 @@ protected:
     CGUILabel*          m_pVideoGeneralLabel;
     CGUILabel*          m_pVideoResolutionLabel;
     CGUIComboBox*       m_pComboResolution;
+	CGUICheckBox*       m_pCheckBoxMipMapping;
     CGUICheckBox*       m_pCheckBoxWindowed;
     CGUICheckBox*       m_pCheckBoxWideScreen;
     CGUICheckBox*       m_pCheckBoxMinimize;

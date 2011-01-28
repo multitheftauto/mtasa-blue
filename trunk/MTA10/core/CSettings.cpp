@@ -470,6 +470,10 @@ CSettings::CSettings ( void )
     m_pDrawDistanceValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
     m_pDrawDistanceValueLabel->AutoSize ( "100% " );
 
+    m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Mip Mapping", true ) );
+    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
+    m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
     m_pBrightnessLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Brightness:" ) );
     m_pBrightnessLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pBrightnessLabel->GetPosition ( vecTemp, false );
@@ -1816,6 +1820,7 @@ void CSettings::LoadData ( void )
     bool bNextFSMinimize;
     GetVideoModeManager ()->GetNextVideoMode ( nextVideoMode, bNextWindowed, bNextFSMinimize );
 
+	m_pCheckBoxMipMapping->SetSelected ( gameSettings->IsMipMappingEnabled () );
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
     m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
     m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
@@ -2056,6 +2061,7 @@ void CSettings::SaveData ( void )
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
     gameSettings->SetMouseSensitivity ( ( m_pMouseSensitivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
+	gameSettings->SetMipMappingEnabled ( m_pCheckBoxMipMapping->GetSelected () );
 
     // Visual FX Quality
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
