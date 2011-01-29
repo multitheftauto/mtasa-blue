@@ -120,7 +120,6 @@
       <right name="function.aclGroupRemoveACL" access="false"/>
       <right name="function.aclGroupAddObject" access="false"/>
       <right name="function.aclGroupRemoveObject" access="false"/>
-      <right name="function.setServerName" access="false"/>
       <right name="function.refreshResources" access="false"/>
    </acl>
    <acl name="Moderator">
@@ -203,7 +202,6 @@
       <right name="function.aclGroupRemoveACL" access="true"/>
       <right name="function.aclGroupAddObject" access="true"/>
       <right name="function.aclGroupRemoveObject" access="true"/>
-      <right name="function.setServerName" access="true"/>
       <right name="function.refreshResources" access="true"/>
    </acl>
    <acl name="RPC">

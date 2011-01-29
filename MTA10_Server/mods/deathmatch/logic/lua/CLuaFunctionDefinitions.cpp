@@ -10366,23 +10366,6 @@ int CLuaFunctionDefinitions::SetPlayerAnnounceValue ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefinitions::SetServerName ( lua_State* luaVM )
-{
-	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        std::string strServerName = lua_tostring ( luaVM, 1 );
-        if ( CStaticFunctionDefinitions::SetServerName ( strServerName ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setServerName" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
 
 int CLuaFunctionDefinitions::ExecuteSQLCreateTable ( lua_State* luaVM )
 {

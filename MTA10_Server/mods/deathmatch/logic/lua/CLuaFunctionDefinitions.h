@@ -459,7 +459,6 @@ public:
     static int      RemoveRuleValue                     ( lua_State* luaVM );
     static int      GetPlayerAnnounceValue              ( lua_State* luaVM );
     static int      SetPlayerAnnounceValue              ( lua_State* luaVM );
-    static int      SetServerName                       ( lua_State* luaVM );
 
     // Registry funcs
     static int      ExecuteSQLCreateTable               ( lua_State* luaVM );
