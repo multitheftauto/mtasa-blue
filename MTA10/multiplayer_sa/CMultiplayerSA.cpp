@@ -370,8 +370,8 @@ void vehicle_lights_init ();
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
-    //DWORD oldProt;
-    //VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
+    DWORD oldProt;
+    VirtualProtect((LPVOID)0x401000, 0x4A3000, PAGE_EXECUTE_READWRITE, &oldProt);
 
     // Initialize the offsets
     eGameVersion version = pGameInterface->GetGameVersion ();
