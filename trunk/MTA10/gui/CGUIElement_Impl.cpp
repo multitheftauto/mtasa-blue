@@ -238,7 +238,7 @@ void CGUIElement_Impl::SetText ( const char *szText )
 
 std::string CGUIElement_Impl::GetText ( void )
 {
-    return m_pWindow->getText ().c_str ();
+    return CGUI_Impl::GetUTFString(m_pWindow->getText ().c_str ()).c_str();
 }
 
 
