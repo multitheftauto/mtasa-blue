@@ -142,7 +142,7 @@ CSettings::CSettings ( void )
     m_pMouseSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pControlsPane ) );
     m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY ) );
     m_pMouseSensitivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pMouseSensitivity->SetProperty ( "StepSize", "0.00004688" );
+    m_pMouseSensitivity->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelMouseSensitivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "0%") );
     m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY ) );
@@ -357,7 +357,7 @@ CSettings::CSettings ( void )
     m_pAudioRadioVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioRadioVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pAudioRadioVolume->SetProperty ( "StepSize", "0.015625" );
+    m_pAudioRadioVolume->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelRadioVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
@@ -375,7 +375,7 @@ CSettings::CSettings ( void )
     m_pAudioSFXVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pAudioSFXVolume->SetProperty ( "StepSize", "0.015625" );
+    m_pAudioSFXVolume->SetProperty ( "StepSize", "0.01" );
 
     m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Radio Equalizer", true ) );
     m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
@@ -465,6 +465,7 @@ CSettings::CSettings ( void )
     m_pDrawDistance = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pDrawDistance->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
     m_pDrawDistance->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pDrawDistance->SetProperty ( "StepSize", "0.01" );
 
     m_pDrawDistanceValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
     m_pDrawDistanceValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
@@ -482,6 +483,7 @@ CSettings::CSettings ( void )
     m_pBrightness = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pBrightness->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
     m_pBrightness->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pBrightness->SetProperty ( "StepSize", "0.01" );
 
     m_pBrightnessValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
     m_pBrightnessValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
