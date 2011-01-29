@@ -40,7 +40,6 @@ public:
     bool                            Save                            ( const char* szFileName = NULL );
 
     inline const std::string&       GetServerName                   ( void )        { return m_strServerName; };
-    void                            SetServerName                   ( std::string strServerName );
     std::string                     GetServerIP                     ( void );
     unsigned short                  GetServerPort                   ( void );
     unsigned int                    GetMaxPlayers                   ( void );
