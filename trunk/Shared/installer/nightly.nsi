@@ -3,6 +3,7 @@
 !include Sections.nsh
 !include UAC.nsh
 !include GameExplorer.nsh
+!include WinVer.nsh
 
 XPStyle on
 RequestExecutionLevel user
@@ -18,24 +19,25 @@ Var CreateSMShortcuts
 Var CreateDesktopIcon
 Var RedistInstalled
 
-!define GUID "{DC86048C-6401-4356-8533-06EC8CC02AF3}"
+!define GUID "{DC86048C-6401-4356-8533-06EC8CC12AF4}"
 
 ; ###########################################################################################################
 !ifndef FILES_ROOT
 	!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
-	!define FILES_ROOT "C:\Build\output"
-	!define SERVER_FILES_ROOT "C:\Build\mta10_server\output"
-	!define FILES_MODULE_SDK "C:\Build\Shared\publicsdk"
+	!define FILES_ROOT "Install files builder/output"
+	!define SERVER_FILES_ROOT "Install files builder/output/server"
+	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
 	!define CLIENT_SETUP
 	!define INCLUDE_SERVER
-	!define INSTALL_OUTPUT "mtasa-1.0.exe"
+	!define INSTALL_OUTPUT "mtasa-1.1.0-unstable-00000-0-000-nsis.exe"
+	!define PRODUCT_VERSION "v1.1.0-unstable-00000-0-000"
 !endif
 !ifndef LIGHTBUILD
 	!define INCLUDE_DEVELOPMENT
 	!define INCLUDE_EDITOR
 !endif
 !ifndef PRODUCT_VERSION
-	!define PRODUCT_VERSION "v1.0"
+	!define PRODUCT_VERSION "v1.1.0"
 !endif
 !define EXPAND_DIALOG_X 134
 !define EXPAND_DIALOG_Y 60
@@ -45,18 +47,18 @@ Var RedistInstalled
 
 
 !ifdef CLIENT_SETUP
-	!define PRODUCT_NAME "MTA:SA"
+	!define PRODUCT_NAME "MTA:SA 1.1"
 !else
-	!define PRODUCT_NAME "MTA:SA Server"
+	!define PRODUCT_NAME "MTA:SA Server 1.1"
 !endif
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
 !define PRODUCT_WEB_SITE "http://www.multitheftauto.com"
 !ifdef CLIENT_SETUP
-	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto.exe"
+	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto 1.1.exe"
 	!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !else
-	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\MTA Server.exe"
+	!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\MTA Server 1.1.exe"
 	!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME} Server"
 !endif
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -130,304 +132,16 @@ LangString DESC_Blank ${LANG_ENGLISH}			""
 LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
 
-Var Dialog
-Var Label
-Var CreateAccountRadio
-Var LoginAccountRadio
-Var NoAccountRadio
-Var StoredUsername
-
-Function nsDialogsMtaBetaWelcomePage
-	!insertmacro MUI_HEADER_TEXT "MTA account" "About Multi Theft Auto accounts"
-	nsDialogs::Create /NOUNLOAD 1018
-	Pop $Dialog
-
-	${If} $Dialog == error
-		Abort
-	${EndIf}
-	
-	${NSD_CreateLabel} 0 0 100% 20u "Multi Theft Auto: San Andreas has a central login system that provides a unique username for each user."
-	Pop $Label
-
-	${NSD_CreateLabel} 0 20u 100% 20u "Although the system is entirely optional, some servers may prevent you joining without an account and some features may be unavailable to you."
-	Pop $Label
-	
-	${NSD_CreateLabel} 0 40u 100% 20u "Creating an account takes a few seconds."
-	Pop $Label
-
-	${NSD_CreateRadioButton} 0 60u 100% 13u "I want to create a new account"
-	Pop $CreateAccountRadio
-	SendMessage $CreateAccountRadio ${BM_SETCHECK} 1 0 ; check the first option
-	
-	ReadRegStr $StoredUsername HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Username"
-	StrLen $0 $StoredUsername
-	IntCmp $0 0 noAccountDataStored noAccountDataStored existingAccountStored
-	noAccountDataStored:
-	${NSD_CreateRadioButton} 0 73u 100% 13u "I've already got an account"
-	Pop $LoginAccountRadio
-	goto next
-	existingAccountStored:
-	${NSD_CreateRadioButton} 0 73u 100% 13u "I want to use my current account '$StoredUsername'"
-	Pop $LoginAccountRadio
-	SendMessage $CreateAccountRadio ${BM_SETCHECK} 0 0 ; check the first option
-	SendMessage $LoginAccountRadio ${BM_SETCHECK} 1 0 ; check the first option
-	next:
-	${NSD_CreateRadioButton} 0 86u 100% 13u "I don't want to create an account"
-	Pop $NoAccountRadio
-	
-	;EnableWindow $NoAccountRadio 0
-
-
-	nsDialogs::Show
-FunctionEnd
-
-Var ShouldCreateAccount
-Var ShouldLogin
-Var SkipLoginPage
-
-Function nsDialogsMtaBetaWelcomePageLeave
-	${NSD_GetState} $CreateAccountRadio $ShouldCreateAccount
-	${NSD_GetState} $LoginAccountRadio $ShouldLogin
-	IntCmp $ShouldCreateAccount 1 createAccount skip1 skip1
-	createAccount:
-	  
-	MessageBox MB_ICONINFORMATION|MB_OK "A web page is being opened in your web browser. Please use it to register for an account then return to the installer to enter your login details."
-	ExecShell "open" "http://community.mtasa.com/test/index.php?p=register"
-	
-	skip1:
-	${NSD_GetState} $NoAccountRadio $SkipLoginPage
-	IntCmp $SkipLoginPage 1 noAccount skip skip
-	noAccount:
-	MessageBox MB_ICONINFORMATION|MB_OK "If you want to create an account in the future, just reinstall MTA."
-	skip:
-FunctionEnd
-
-Var UsernameTxt
-Var Password1Txt
-Var Password2Txt
-Var EmailTxt
-
-Function nsDialogsCreateAccountPage
-	IntCmp $ShouldCreateAccount 1 createAccount
-	Abort ; skip this page if create account wasn't chosen
-	createAccount:
-	
-	!insertmacro MUI_HEADER_TEXT "MTA account" "Please fill in all the following fields to create a new account"
-	
-	nsDialogs::Create /NOUNLOAD 1018
-	Pop $Dialog
-
-	${If} $Dialog == error
-		Abort
-	${EndIf}
-
-	${NSD_CreateLabel} 0 2u 70u 13u "Username:"
-	Pop $Label
-	
-	${NSD_CreateText} 70u 0 60% 13u ""
-	Pop $UsernameTxt
-	
-	${NSD_CreateLabel} 0 20u 70u 13u "Password:"
-	Pop $Label
-
-	${NSD_CreatePassword} 70u 18u 60% 13u ""
-	Pop $Password1Txt
-
-	${NSD_CreateLabel} 0 38u 70u 13u "Confirm Password:"
-	Pop $Label
-
-	${NSD_CreatePassword} 70u 36u 60% 13u ""
-	Pop $Password2Txt
-	
-	${NSD_CreateLabel} 0 56u 70u 13u "Email:"
-	Pop $Label
-
-	${NSD_CreateText} 70u 54u 60% 13u ""
-	Pop $EmailTxt
-	
-	nsDialogs::Show
-	
-FunctionEnd
-
-Var Username
-Var Password1
-Var Password2
-Var Email
-
-; called when the create account next button is clicked
-Function nsDialogsCreateAccountPageLeave
-	 ${NSD_GetText} $UsernameTxt $Username
-	 ${NSD_GetText} $Password1Txt $Password1
-	 ${NSD_GetText} $Password2Txt $Password2
-	 ${NSD_GetText} $EmailTxt $Email
-
-	 StrCmpS $Password1 $Password2 cont badPassword
-	 badPassword:
-	 MessageBox MB_ICONINFORMATION|MB_OK "The passwords entered do not match. Please try again."
-	 Abort
-	 cont:
-FunctionEnd
-
-Var PasswordTxt
-
-Var StoredSerial
-
-Function nsDialogsLoginAccountPage
-
-	IntCmp $SkipLoginPage 1 skipLogin
-	
-	IntCmp $ShouldCreateAccount 1 loginAccount
-	
-	ReadRegStr $StoredUsername HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Username"
-	ReadRegStr $StoredSerial HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Serial"
-
-	StrLen $0 $StoredUsername
-	IntCmp $0 0 loginAccount
-	;Ver::CS $StoredUsername $StoredSerial
-	Pop $0
-	
-	StrCmp $0 "t" skipLogin cont
-	cont:
-	MessageBox MB_ICONINFORMATION|MB_OK "Your stored account is no longer valid. Please login again."
-	goto loginAccount
-
-	skipLogin:
-	Abort ; skip this page if create account wasn't chosen
-	loginAccount:
-
-	!insertmacro MUI_HEADER_TEXT "MTA account" "Please enter your account details to login"
-
-	nsDialogs::Create /NOUNLOAD 1018
-	Pop $Dialog
-
-	${If} $Dialog == error
-		Abort
-	${EndIf}
-
-	${NSD_CreateLabel} 0 2u 70u 13u "Username:"
-	Pop $Label
-
-	${NSD_CreateText} 70u 0 60% 13u $StoredUsername
-	Pop $UsernameTxt
-
-	${NSD_CreateLabel} 0 20u 70u 13u "Password:"
-	Pop $Label
-
-	${NSD_CreatePassword} 70u 18u 60% 13u ""
-	Pop $PasswordTxt
-	
-	${NSD_SetFocus} $UsernameTxt
-	
-	nsDialogs::Show
-FunctionEnd
-
-Var Password
-Var Serial
-Var SerialLength
-Function nsDialogsLoginAccountPageLeave
-	 ${NSD_GetText} $UsernameTxt $Username
-	 ${NSD_GetText} $PasswordTxt $Password
-	 
-	 ;Ver::Verify $Username $Password
-	 Pop $Serial
-	 StrLen $SerialLength $Serial
-	 IntCmp $SerialLength 19 is19 not19 not19
-	 not19:
-		   IntCmp $SerialLength 0 endP2
-		   MessageBox MB_ICONINFORMATION|MB_OK $Serial
-		   endP2:
-				 Abort
-	 is19:
-	 WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Username" $Username
-	 WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Serial" $Serial
-FunctionEnd
-
-
-Function SerialPage
-	;Display the InstallOptions dialog
-
-	Push ${TEMP1}
-	Push ${TEMP2}
-	Push ${TEMP3}
-	ReadRegStr ${TEMP1} HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Username"
-	WriteINIStr  "$PLUGINSDIR\serialdialog.ini" "Field 1" "State" ${TEMP1}
-
-	ReadRegStr ${TEMP3} HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Serial"
-
-	;Ver::CS ${TEMP1} ${TEMP3}
-	Pop $0
-
-	StrCmp $0 "t" skipLogin
-
-	!insertmacro MUI_HEADER_TEXT "MTA beta account login" "Please enter your MTA beta account login details"
-	!insertmacro MUI_INSTALLOPTIONS_DISPLAY "serialdialog.ini"
-
-skipLogin:
-	Pop ${TEMP3}
-	Pop ${TEMP2}
-	Pop ${TEMP1}
- 
-FunctionEnd
-
-Function ValidateSerial
-	ReadINIStr ${TEMP1} "$PLUGINSDIR\serialdialog.ini" "Field 1" "State"
-	ReadINIStr ${TEMP2} "$PLUGINSDIR\serialdialog.ini" "Field 2" "State"
-	;ReadINIStr ${TEMP3} "$PLUGINSDIR\serialdialog.ini" "Field 7" "State"
-
-	;Ver::Verify ${TEMP1} ${TEMP2}
-	Pop $0
-	StrLen $1 $0
-	IntCmp $1 19 is19 not19 not19
-	not19:
-		IntCmp $1 0 endP2
-		MessageBox MB_ICONINFORMATION|MB_OK $0
-		endP2:
-		Abort
-	is19:
-	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Username" ${TEMP1}
-	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Serial" $0
-FunctionEnd
-
 
 Function LaunchLink
 	!ifdef CLIENT_SETUP
 		SetOutPath "$INSTDIR"
-		!insertmacro UAC_AsUser_ExecShell "open" "Multi Theft Auto.exe" "" "" ""
+		!insertmacro UAC_AsUser_ExecShell "open" "Multi Theft Auto 1.1.exe" "" "" ""
 	!else
 		SetOutPath "$INSTDIR\Server"
-		!insertmacro UAC_AsUser_ExecShell "open" "MTA Server.exe" "" "" ""
+		!insertmacro UAC_AsUser_ExecShell "open" "MTA Server 1.1.exe" "" "" ""
 	!endif
 FunctionEnd
-
-Function MTACenterLogin
-	;  SetOutPath "$INSTDIR"
-	;  ExecWait "$INSTDIR\MTA Center Login.exe"
-FunctionEnd
-
-Var ClientSectionSelectedState
-/*
-Function .onSelChange
-	 Push $R0
-	 Push $R1
-	 SectionGetFlags ${SECGCLIENT} $R0
-	 IntOp $R0 $R0 & ${SF_SELECTED}
-	 MessageBox MB_ICONINFORMATION|MB_OK $R0
-	 MessageBox MB_ICONINFORMATION|MB_OK $ClientSectionSelectedState
-	 StrCmp $R0 $ClientSectionSelectedState client_is_selected client_is_not_selected
-	 client_is_selected:
-						SectionGetFlags ${SEC01} $R0
-						IntOp $R0 $R0 | ${SF_SELECTED}
-						SectionSetFlags ${SEC01} $R0
-						goto endit
-	 client_is_not_selected:
-						SectionGetFlags ${SEC01} $R0
-						IntOp $R0 $R0 ^ ${SF_SELECTED}
-						SectionSetFlags ${SEC01} $R0
-	endit:
-	Pop $R1
-	Pop $R0
-FunctionEnd
-*/
 
 Function .OnInstFailed
 	;UAC::Unload ;Must call unload!
@@ -446,9 +160,9 @@ DontInstallVC9Redist:
 	StrCpy $RedistInstalled "1"
 PostVC90Check:
 	
-	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" ; start of fix for #3743
+	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" ; start of fix for #3743
 	${If} $Install_Dir == '' 
-		strcpy $INSTDIR "$PROGRAMFILES\MTA San Andreas"
+		strcpy $INSTDIR "$PROGRAMFILES\MTA San Andreas 1.1"
 	${Else} 
 		strcpy $INSTDIR $Install_Dir
 	${EndIf} ; end of fix for #3743
@@ -486,7 +200,7 @@ FunctionEnd
 Function .onInstSuccess
 	!ifdef CLIENT_SETUP
 		WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
-		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" $INSTDIR
+		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" $INSTDIR
 
 		; Add the protocol handler
 		WriteRegStr HKCR "mtasa" "" "URL:MTA San Andreas Protocol"
@@ -497,37 +211,37 @@ Function .onInstSuccess
 	
 	; Start menu items
 	${If} $CreateSMShortcuts == 1
-		CreateDirectory "$SMPROGRAMS\MTA San Andreas"
+		CreateDirectory "$SMPROGRAMS\MTA San Andreas 1.1"
 
 		!ifdef CLIENT_SETUP
 			IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
 			SetOutPath "$INSTDIR"
-			Delete "$SMPROGRAMS\\MTA San Andreas\Play MTA San Andreas.lnk"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
+			Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Play MTA San Andreas.lnk"
+			CreateShortCut "$SMPROGRAMS\\MTA San Andreas 1.1\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
 				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
-				"" "Play Multi Theft Auto: San Andreas"
+				"" "Play Multi Theft Auto: San Andreas 1.1"
 			skip1:
 		!endif
 		
 		IfFileExists "$INSTDIR\Server\MTA Server.exe" 0 skip2
 		SetOutPath "$INSTDIR\Server"
-		CreateShortCut "$SMPROGRAMS\\MTA San Andreas\MTA Server.lnk" "$INSTDIR\Server\MTA Server.exe" \
+		CreateShortCut "$SMPROGRAMS\\MTA San Andreas 1.1\MTA Server.lnk" "$INSTDIR\Server\MTA Server.exe" \
 			"" "$INSTDIR\Server\MTA Server.exe" 2 SW_SHOWNORMAL \
-			"" "Run the Multi Theft Auto: San Andreas Server"
+			"" "Run the Multi Theft Auto: San Andreas 1.1 Server"
 		skip2:
 		
 		!ifdef CLIENT_SETUP
 			IfFileExists "$INSTDIR\Uninstall.exe" 0 skip3
 			SetOutPath "$INSTDIR"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas\Uninstall MTA San Andreas.lnk" "$INSTDIR\Uninstall.exe" \
+			CreateShortCut "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas.lnk" "$INSTDIR\Uninstall.exe" \
 				"" "$INSTDIR\Uninstall.exe" 0 SW_SHOWNORMAL \
-				"" "Uninstall Multi Theft Auto: San Andreas"
+				"" "Uninstall Multi Theft Auto: San Andreas 1.1"
 		!else
 			IfFileExists "$INSTDIR\server\Uninstall.exe" 0 skip3
 			SetOutPath "$INSTDIR"
-			CreateShortCut "$SMPROGRAMS\\MTA San Andreas\Uninstall MTA San Andreas Server.lnk" "$INSTDIR\server\Uninstall.exe" \
+			CreateShortCut "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas Server.lnk" "$INSTDIR\server\Uninstall.exe" \
 				"" "$INSTDIR\Server\Uninstall.exe" 0 SW_SHOWNORMAL \
-				"" "Uninstall Multi Theft Auto: San Andreas"
+				"" "Uninstall Multi Theft Auto: San Andreas 1.1"
 		!endif
 		skip3:
 	${EndIf}
@@ -536,10 +250,10 @@ Function .onInstSuccess
 		!ifdef CLIENT_SETUP
 			IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip4
 			SetOutPath "$INSTDIR"
-			Delete "$DESKTOP\Play MTA San Andreas.lnk"
-			CreateShortCut "$DESKTOP\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
+			Delete "$DESKTOP\Play MTA San Andreas 1.1.lnk"
+			CreateShortCut "$DESKTOP\MTA San Andreas 1.1.lnk" "$INSTDIR\Multi Theft Auto.exe" \
 				"" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
-				"" "Play Multi Theft Auto: San Andreas"
+				"" "Play Multi Theft Auto: San Andreas 1.1"
 			skip4:
 		!endif
 	${EndIf}
@@ -563,11 +277,11 @@ Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 !ifdef CLIENT_SETUP
 	OutFile "${INSTALL_OUTPUT}"
 !else
-	OutFile "MTA Server Setup.exe"
+	OutFile "MTA Server 1.1 Setup.exe"
 !endif
 
 ;InstallDir "$PROGRAMfiles San Andreas"
-InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location"
+InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location"
 ShowInstDetails show
 ShowUnInstDetails show
 
@@ -583,27 +297,30 @@ ShowUnInstDetails show
 DontInstallRedist:
 
 			WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
-			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Last Install Location" $INSTDIR
+			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" $INSTDIR
 
 			SetOutPath "$INSTDIR\MTA"
 			SetOverwrite on
 
 			#############################################################
 			# Make the directory "$INSTDIR" read write accessible by all users
-			StrCpy $3 "update"
-			!ifdef LIGHTBUILD
-				# For lightbuilds, if the install directory already exists, and there is no virtual store version,
-				# then skip updating permissions
-				IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
-					StrCpy $2 $INSTDIR "" 3
-					IfFileExists "$LOCALAPPDATA\VirtualStore\$2" skip1 0
-						StrCpy $3 "noupdate"
-				skip1:
-			!endif
+            StrCpy $3 "update"
+
+			#!ifdef LIGHTBUILD
+			#	# For lightbuilds, if the install directory already exists, and there is no virtual store version,
+			#	# then skip updating permissions
+			#	IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
+			#		StrCpy $2 $INSTDIR "" 3
+			#		IfFileExists "$LOCALAPPDATA\VirtualStore\$2" skip1 0
+			#			StrCpy $3 "noupdate"
+			#	skip1:
+			#!endif
 
 			${If} $3 == "update"
-				DetailPrint "Updating permissions. This could take a few minutes..."
-				AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
+    			${If} ${AtLeastWinVista}
+    				DetailPrint "Updating permissions. This could take a few minutes..."
+    				AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
+    			${EndIf}
 			${EndIf}
 			#############################################################
 
@@ -667,7 +384,10 @@ DontInstallRedist:
 			!endif
 
 			SetOutPath "$INSTDIR"
-			File "${FILES_ROOT}\MTA San Andreas\*" ; NOT RECURSIVE
+            File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe"
+			!ifndef LIGHTBUILD
+                File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe.dat"
+			!endif
 			
 			${GameExplorer_UpdateGame} ${GUID}
 			${If} ${Errors}
@@ -756,11 +476,11 @@ DontInstallRedist:
 	!ifndef LIGHTBUILD
 		SectionGroup "Optional Resources" SEC07
 			Section "AMX Emulation package"
-		SectionIn 1 2
-			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
-			SetOverwrite ifnewer
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\amx"
-		SectionEnd
+			SectionEnd
 			Section "Assault Gamemode"
 			SectionIn 1 2
 				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
@@ -1112,14 +832,16 @@ Section Uninstall
 
 		DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
 		DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
-		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas"
-		DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas"
+		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1"
+		DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1"
 		
 		${GameExplorer_RemoveGame} ${GUID}
 		
 		; Delete shortcuts
-		Delete "$SMPROGRAMS\\MTA San Andreas\MTA San Andreas.lnk"
-		Delete "$SMPROGRAMS\\MTA San Andreas\Uninstall MTA San Andreas.lnk"
+		Delete "$SMPROGRAMS\\MTA San Andreas 1.1\MTA San Andreas.lnk"
+		Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas.lnk"
+        Delete "$DESKTOP\MTA San Andreas 1.1.lnk"
+
 	!else
 		RmDir /r "$INSTDIR\server" ; for server only install
 	!endif
@@ -1127,9 +849,9 @@ Section Uninstall
 	RmDir "$INSTDIR" ; fix for #3898
 
 	; Delete shortcuts
-	Delete "$SMPROGRAMS\\MTA San Andreas\MTA Server.lnk"
-	Delete "$SMPROGRAMS\\MTA San Andreas\Uninstall MTA San Andreas Server.lnk"
-	RmDir /r "$SMPROGRAMS\\MTA San Andreas"
+	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\MTA Server.lnk"
+	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas Server.lnk"
+	RmDir /r "$SMPROGRAMS\\MTA San Andreas 1.1"
 	
 	SetAutoClose true
 SectionEnd
