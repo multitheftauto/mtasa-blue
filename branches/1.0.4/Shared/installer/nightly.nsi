@@ -3,6 +3,7 @@
 !include Sections.nsh
 !include UAC.nsh
 !include GameExplorer.nsh
+!include WinVer.nsh
 
 XPStyle on
 RequestExecutionLevel user
@@ -23,19 +24,20 @@ Var RedistInstalled
 ; ###########################################################################################################
 !ifndef FILES_ROOT
 	!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
-	!define FILES_ROOT "C:\Build\output"
-	!define SERVER_FILES_ROOT "C:\Build\mta10_server\output"
-	!define FILES_MODULE_SDK "C:\Build\Shared\publicsdk"
+	!define FILES_ROOT "Install files builder/output"
+	!define SERVER_FILES_ROOT "Install files builder/output/server"
+	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
 	!define CLIENT_SETUP
 	!define INCLUDE_SERVER
-	!define INSTALL_OUTPUT "mtasa-1.0.exe"
+	!define INSTALL_OUTPUT "mtasa-1.0.4-rc-00000-0-000-nsis.exe"
+	!define PRODUCT_VERSION "v1.0.4-rc-00000-0-000"
 !endif
 !ifndef LIGHTBUILD
 	!define INCLUDE_DEVELOPMENT
 	!define INCLUDE_EDITOR
 !endif
 !ifndef PRODUCT_VERSION
-	!define PRODUCT_VERSION "v1.0"
+	!define PRODUCT_VERSION "v1.0.4"
 !endif
 !define EXPAND_DIALOG_X 134
 !define EXPAND_DIALOG_Y 60
@@ -130,264 +132,6 @@ LangString DESC_Blank ${LANG_ENGLISH}			""
 LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
 
-Var Dialog
-Var Label
-Var CreateAccountRadio
-Var LoginAccountRadio
-Var NoAccountRadio
-Var StoredUsername
-
-Function nsDialogsMtaBetaWelcomePage
-	!insertmacro MUI_HEADER_TEXT "MTA account" "About Multi Theft Auto accounts"
-	nsDialogs::Create /NOUNLOAD 1018
-	Pop $Dialog
-
-	${If} $Dialog == error
-		Abort
-	${EndIf}
-	
-	${NSD_CreateLabel} 0 0 100% 20u "Multi Theft Auto: San Andreas has a central login system that provides a unique username for each user."
-	Pop $Label
-
-	${NSD_CreateLabel} 0 20u 100% 20u "Although the system is entirely optional, some servers may prevent you joining without an account and some features may be unavailable to you."
-	Pop $Label
-	
-	${NSD_CreateLabel} 0 40u 100% 20u "Creating an account takes a few seconds."
-	Pop $Label
-
-	${NSD_CreateRadioButton} 0 60u 100% 13u "I want to create a new account"
-	Pop $CreateAccountRadio
-	SendMessage $CreateAccountRadio ${BM_SETCHECK} 1 0 ; check the first option
-	
-	ReadRegStr $StoredUsername HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Username"
-	StrLen $0 $StoredUsername
-	IntCmp $0 0 noAccountDataStored noAccountDataStored existingAccountStored
-	noAccountDataStored:
-	${NSD_CreateRadioButton} 0 73u 100% 13u "I've already got an account"
-	Pop $LoginAccountRadio
-	goto next
-	existingAccountStored:
-	${NSD_CreateRadioButton} 0 73u 100% 13u "I want to use my current account '$StoredUsername'"
-	Pop $LoginAccountRadio
-	SendMessage $CreateAccountRadio ${BM_SETCHECK} 0 0 ; check the first option
-	SendMessage $LoginAccountRadio ${BM_SETCHECK} 1 0 ; check the first option
-	next:
-	${NSD_CreateRadioButton} 0 86u 100% 13u "I don't want to create an account"
-	Pop $NoAccountRadio
-	
-	;EnableWindow $NoAccountRadio 0
-
-
-	nsDialogs::Show
-FunctionEnd
-
-Var ShouldCreateAccount
-Var ShouldLogin
-Var SkipLoginPage
-
-Function nsDialogsMtaBetaWelcomePageLeave
-	${NSD_GetState} $CreateAccountRadio $ShouldCreateAccount
-	${NSD_GetState} $LoginAccountRadio $ShouldLogin
-	IntCmp $ShouldCreateAccount 1 createAccount skip1 skip1
-	createAccount:
-	  
-	MessageBox MB_ICONINFORMATION|MB_OK "A web page is being opened in your web browser. Please use it to register for an account then return to the installer to enter your login details."
-	ExecShell "open" "http://community.mtasa.com/test/index.php?p=register"
-	
-	skip1:
-	${NSD_GetState} $NoAccountRadio $SkipLoginPage
-	IntCmp $SkipLoginPage 1 noAccount skip skip
-	noAccount:
-	MessageBox MB_ICONINFORMATION|MB_OK "If you want to create an account in the future, just reinstall MTA."
-	skip:
-FunctionEnd
-
-Var UsernameTxt
-Var Password1Txt
-Var Password2Txt
-Var EmailTxt
-
-Function nsDialogsCreateAccountPage
-	IntCmp $ShouldCreateAccount 1 createAccount
-	Abort ; skip this page if create account wasn't chosen
-	createAccount:
-	
-	!insertmacro MUI_HEADER_TEXT "MTA account" "Please fill in all the following fields to create a new account"
-	
-	nsDialogs::Create /NOUNLOAD 1018
-	Pop $Dialog
-
-	${If} $Dialog == error
-		Abort
-	${EndIf}
-
-	${NSD_CreateLabel} 0 2u 70u 13u "Username:"
-	Pop $Label
-	
-	${NSD_CreateText} 70u 0 60% 13u ""
-	Pop $UsernameTxt
-	
-	${NSD_CreateLabel} 0 20u 70u 13u "Password:"
-	Pop $Label
-
-	${NSD_CreatePassword} 70u 18u 60% 13u ""
-	Pop $Password1Txt
-
-	${NSD_CreateLabel} 0 38u 70u 13u "Confirm Password:"
-	Pop $Label
-
-	${NSD_CreatePassword} 70u 36u 60% 13u ""
-	Pop $Password2Txt
-	
-	${NSD_CreateLabel} 0 56u 70u 13u "Email:"
-	Pop $Label
-
-	${NSD_CreateText} 70u 54u 60% 13u ""
-	Pop $EmailTxt
-	
-	nsDialogs::Show
-	
-FunctionEnd
-
-Var Username
-Var Password1
-Var Password2
-Var Email
-
-; called when the create account next button is clicked
-Function nsDialogsCreateAccountPageLeave
-	 ${NSD_GetText} $UsernameTxt $Username
-	 ${NSD_GetText} $Password1Txt $Password1
-	 ${NSD_GetText} $Password2Txt $Password2
-	 ${NSD_GetText} $EmailTxt $Email
-
-	 StrCmpS $Password1 $Password2 cont badPassword
-	 badPassword:
-	 MessageBox MB_ICONINFORMATION|MB_OK "The passwords entered do not match. Please try again."
-	 Abort
-	 cont:
-FunctionEnd
-
-Var PasswordTxt
-
-Var StoredSerial
-
-Function nsDialogsLoginAccountPage
-
-	IntCmp $SkipLoginPage 1 skipLogin
-	
-	IntCmp $ShouldCreateAccount 1 loginAccount
-	
-	ReadRegStr $StoredUsername HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Username"
-	ReadRegStr $StoredSerial HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Serial"
-
-	StrLen $0 $StoredUsername
-	IntCmp $0 0 loginAccount
-	;Ver::CS $StoredUsername $StoredSerial
-	Pop $0
-	
-	StrCmp $0 "t" skipLogin cont
-	cont:
-	MessageBox MB_ICONINFORMATION|MB_OK "Your stored account is no longer valid. Please login again."
-	goto loginAccount
-
-	skipLogin:
-	Abort ; skip this page if create account wasn't chosen
-	loginAccount:
-
-	!insertmacro MUI_HEADER_TEXT "MTA account" "Please enter your account details to login"
-
-	nsDialogs::Create /NOUNLOAD 1018
-	Pop $Dialog
-
-	${If} $Dialog == error
-		Abort
-	${EndIf}
-
-	${NSD_CreateLabel} 0 2u 70u 13u "Username:"
-	Pop $Label
-
-	${NSD_CreateText} 70u 0 60% 13u $StoredUsername
-	Pop $UsernameTxt
-
-	${NSD_CreateLabel} 0 20u 70u 13u "Password:"
-	Pop $Label
-
-	${NSD_CreatePassword} 70u 18u 60% 13u ""
-	Pop $PasswordTxt
-	
-	${NSD_SetFocus} $UsernameTxt
-	
-	nsDialogs::Show
-FunctionEnd
-
-Var Password
-Var Serial
-Var SerialLength
-Function nsDialogsLoginAccountPageLeave
-	 ${NSD_GetText} $UsernameTxt $Username
-	 ${NSD_GetText} $PasswordTxt $Password
-	 
-	 ;Ver::Verify $Username $Password
-	 Pop $Serial
-	 StrLen $SerialLength $Serial
-	 IntCmp $SerialLength 19 is19 not19 not19
-	 not19:
-		   IntCmp $SerialLength 0 endP2
-		   MessageBox MB_ICONINFORMATION|MB_OK $Serial
-		   endP2:
-				 Abort
-	 is19:
-	 WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Username" $Username
-	 WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Serial" $Serial
-FunctionEnd
-
-
-Function SerialPage
-	;Display the InstallOptions dialog
-
-	Push ${TEMP1}
-	Push ${TEMP2}
-	Push ${TEMP3}
-	ReadRegStr ${TEMP1} HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Username"
-	WriteINIStr  "$PLUGINSDIR\serialdialog.ini" "Field 1" "State" ${TEMP1}
-
-	ReadRegStr ${TEMP3} HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Serial"
-
-	;Ver::CS ${TEMP1} ${TEMP3}
-	Pop $0
-
-	StrCmp $0 "t" skipLogin
-
-	!insertmacro MUI_HEADER_TEXT "MTA beta account login" "Please enter your MTA beta account login details"
-	!insertmacro MUI_INSTALLOPTIONS_DISPLAY "serialdialog.ini"
-
-skipLogin:
-	Pop ${TEMP3}
-	Pop ${TEMP2}
-	Pop ${TEMP1}
- 
-FunctionEnd
-
-Function ValidateSerial
-	ReadINIStr ${TEMP1} "$PLUGINSDIR\serialdialog.ini" "Field 1" "State"
-	ReadINIStr ${TEMP2} "$PLUGINSDIR\serialdialog.ini" "Field 2" "State"
-	;ReadINIStr ${TEMP3} "$PLUGINSDIR\serialdialog.ini" "Field 7" "State"
-
-	;Ver::Verify ${TEMP1} ${TEMP2}
-	Pop $0
-	StrLen $1 $0
-	IntCmp $1 19 is19 not19 not19
-	not19:
-		IntCmp $1 0 endP2
-		MessageBox MB_ICONINFORMATION|MB_OK $0
-		endP2:
-		Abort
-	is19:
-	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Username" ${TEMP1}
-	WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "Serial" $0
-FunctionEnd
-
 
 Function LaunchLink
 	!ifdef CLIENT_SETUP
@@ -398,36 +142,6 @@ Function LaunchLink
 		!insertmacro UAC_AsUser_ExecShell "open" "MTA Server.exe" "" "" ""
 	!endif
 FunctionEnd
-
-Function MTACenterLogin
-	;  SetOutPath "$INSTDIR"
-	;  ExecWait "$INSTDIR\MTA Center Login.exe"
-FunctionEnd
-
-Var ClientSectionSelectedState
-/*
-Function .onSelChange
-	 Push $R0
-	 Push $R1
-	 SectionGetFlags ${SECGCLIENT} $R0
-	 IntOp $R0 $R0 & ${SF_SELECTED}
-	 MessageBox MB_ICONINFORMATION|MB_OK $R0
-	 MessageBox MB_ICONINFORMATION|MB_OK $ClientSectionSelectedState
-	 StrCmp $R0 $ClientSectionSelectedState client_is_selected client_is_not_selected
-	 client_is_selected:
-						SectionGetFlags ${SEC01} $R0
-						IntOp $R0 $R0 | ${SF_SELECTED}
-						SectionSetFlags ${SEC01} $R0
-						goto endit
-	 client_is_not_selected:
-						SectionGetFlags ${SEC01} $R0
-						IntOp $R0 $R0 ^ ${SF_SELECTED}
-						SectionSetFlags ${SEC01} $R0
-	endit:
-	Pop $R1
-	Pop $R0
-FunctionEnd
-*/
 
 Function .OnInstFailed
 	;UAC::Unload ;Must call unload!
@@ -591,19 +305,22 @@ DontInstallRedist:
 			#############################################################
 			# Make the directory "$INSTDIR" read write accessible by all users
 			StrCpy $3 "update"
-			!ifdef LIGHTBUILD
-				# For lightbuilds, if the install directory already exists, and there is no virtual store version,
-				# then skip updating permissions
-				IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
-					StrCpy $2 $INSTDIR "" 3
-					IfFileExists "$LOCALAPPDATA\VirtualStore\$2" skip1 0
-						StrCpy $3 "noupdate"
-				skip1:
-			!endif
+
+			#!ifdef LIGHTBUILD
+			#	# For lightbuilds, if the install directory already exists, and there is no virtual store version,
+			#	# then skip updating permissions
+			#	IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
+			#		StrCpy $2 $INSTDIR "" 3
+			#		IfFileExists "$LOCALAPPDATA\VirtualStore\$2" skip1 0
+			#			StrCpy $3 "noupdate"
+			#	skip1:
+			#!endif
 
 			${If} $3 == "update"
-				DetailPrint "Updating permissions. This could take a few minutes..."
-				AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
+    			${If} ${AtLeastWinVista}
+					DetailPrint "Updating permissions. This could take a few minutes..."
+					AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
+				${EndIf}
 			${EndIf}
 			#############################################################
 
@@ -651,7 +368,10 @@ DontInstallRedist:
 			!endif
 
 			SetOutPath "$INSTDIR"
-			File "${FILES_ROOT}\MTA San Andreas\*" ; NOT RECURSIVE
+            File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe"
+			!ifndef LIGHTBUILD
+                File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe.dat"
+			!endif
 			
 			${GameExplorer_UpdateGame} ${GUID}
 			${If} ${Errors}
@@ -740,11 +460,11 @@ DontInstallRedist:
 	!ifndef LIGHTBUILD
 		SectionGroup "Optional Resources" SEC07
 			Section "AMX Emulation package"
-		SectionIn 1 2
-			SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
-			SetOverwrite ifnewer
+			SectionIn 1 2
+				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
+				SetOverwrite ifnewer
 				File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\optional\amx"
-		SectionEnd
+			SectionEnd
 			Section "Assault Gamemode"
 			SectionIn 1 2
 				SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
@@ -1104,6 +824,7 @@ Section Uninstall
 		; Delete shortcuts
 		Delete "$SMPROGRAMS\\MTA San Andreas\MTA San Andreas.lnk"
 		Delete "$SMPROGRAMS\\MTA San Andreas\Uninstall MTA San Andreas.lnk"
+        Delete "$DESKTOP\MTA San Andreas.lnk"
 	!else
 		RmDir /r "$INSTDIR\server" ; for server only install
 	!endif
