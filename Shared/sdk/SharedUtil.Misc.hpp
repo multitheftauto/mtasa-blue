@@ -502,10 +502,10 @@ SString SharedUtil::ExpandEnvString ( const SString& strInput )
 //
 // MyShellExecute
 //
-//
+// Returns true if successful
 //
 ///////////////////////////////////////////////////////////////
-static int MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strInFile, const SString& strInParameters = "", const SString& strDirectory = "", int nShowCmd = SW_SHOWNORMAL )
+static bool MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strInFile, const SString& strInParameters = "", const SString& strDirectory = "", int nShowCmd = SW_SHOWNORMAL )
 {
     SString strFile = strInFile;
     SString strParameters = strInParameters;
@@ -538,7 +538,7 @@ static int MyShellExecute ( bool bBlocking, const SString& strAction, const SStr
     else
     {
         int iResult = (int)ShellExecute ( NULL, strAction, strFile, strParameters, strDirectory, nShowCmd );
-        return iResult;
+        return iResult > 32;
     }
 }
 
@@ -550,7 +550,7 @@ static int MyShellExecute ( bool bBlocking, const SString& strAction, const SStr
 //
 //
 ///////////////////////////////////////////////////////////////
-int SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
+bool SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
 {
     return MyShellExecute ( true, strAction, strFile, strParameters, strDirectory );
 }
@@ -563,7 +563,7 @@ int SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString& 
 //
 //
 ///////////////////////////////////////////////////////////////
-int SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
+bool SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
 {
     return MyShellExecute ( false, strAction, strFile, strParameters, strDirectory );
 }

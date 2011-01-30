@@ -196,3 +196,64 @@ bool InstallFiles ( bool bSilent )
     StopPseudoProgress();
     return bResult;
 }
+
+
+//////////////////////////////////////////////////////////
+//
+// CheckOnRestartCommand
+//
+// Changes current directory if required
+//
+//////////////////////////////////////////////////////////
+SString CheckOnRestartCommand ( void )
+{
+    const SString strMTASAPath = GetMTASAPath ();
+
+    SetCurrentDirectory ( strMTASAPath );
+    SetDllDirectory( strMTASAPath );
+
+    SString strOperation, strFile, strParameters, strDirectory, strShowCmd;
+    if ( GetOnRestartCommand ( strOperation, strFile, strParameters, strDirectory, strShowCmd ) )
+    {
+        if ( strOperation == "files" || strOperation == "silent" )
+        {
+            //
+            // Update
+            //
+
+            // Make temp path name and go there
+            SString strArchivePath, strArchiveName;
+            strFile.Split ( "\\", &strArchivePath, &strArchiveName, -1 );
+
+            SString strTempPath = MakeUniquePath ( strArchivePath + "\\_" + strArchiveName + "_tmp_" );
+
+            if ( !MkDir ( strTempPath ) )
+                return "FileError1";
+
+            if ( !SetCurrentDirectory ( strTempPath ) )
+                return "FileError2";
+
+            // Start progress bar
+            if ( strOperation != "silent" )
+               StartPseudoProgress( g_hInstance, "MTA: San Andreas", "Extracting files..." );
+
+            // Run self extracting archive to extract files into the temp directory
+            ShellExecuteBlocking ( "open", strFile, "-s" );
+
+            // Stop progress bar
+            StopPseudoProgress();
+
+            // If a new "Multi Theft Auto.exe" exists, let that complete the install
+            if ( FileExists ( MTA_EXE_NAME_RELEASE ) )
+                return "install from far " + strOperation;
+
+            // Otherwise use the current exe to install
+            return "install from near " + strOperation;
+        }
+        else
+        {
+            AddReportLog ( 5052, SString ( "CheckOnRestartCommand: Unknown restart command %s", strOperation.c_str () ) );
+        }
+    }
+    return "no update";
+}
