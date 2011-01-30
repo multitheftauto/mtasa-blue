@@ -392,6 +392,10 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
+				RelativePath=".\NEU\GDFImp.gdf.xml"
+				>
+			</File>
+			<File
 				RelativePath=".\GDFImp.rc"
 				>
 			</File>
