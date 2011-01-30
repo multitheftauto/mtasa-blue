@@ -19,7 +19,7 @@ Var CreateSMShortcuts
 Var CreateDesktopIcon
 Var RedistInstalled
 
-!define GUID "{DC86048C-6401-4356-8533-06EC8CC12AF4}"
+!define GUID "{DC86048C-6401-4356-8533-06EC8CC02AF3}"
 
 ; ###########################################################################################################
 !ifndef FILES_ROOT
