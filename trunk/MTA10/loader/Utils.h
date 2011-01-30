@@ -39,6 +39,8 @@ void    FindFilesRecursive          ( const SString& strPathMatch, std::vector <
 SString GetOSVersion                ( void );
 SString GetRealOSVersion            ( void );
 bool    IsVistaOrHigher             ( void );
+bool    IsWin7OrHigher              ( void );
+bool    IsWindowedMode              ( void );
 BOOL    IsUserAdmin                 ( void );
 
 void    StartPseudoProgress         ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
@@ -49,5 +51,10 @@ void    HideCrashedDialog           ( void );
 
 void    UpdateMTAVersionApplicationSetting    ( void );
 bool    Is32bitProcess              ( DWORD processID );
+
+bool    CreateSingleInstanceMutex   ( void );
+void    ReleaseSingleInstanceMutex  ( void );
+
+SString CheckOnRestartCommand       ( void );
 
 #endif

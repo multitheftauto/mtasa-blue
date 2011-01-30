@@ -326,6 +326,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\CInstallManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Install.cpp"
 				>
 			</File>
@@ -354,6 +358,14 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\CInstallManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CSequencer.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Install.h"
 				>

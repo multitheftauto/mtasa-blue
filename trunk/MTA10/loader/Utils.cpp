@@ -26,6 +26,7 @@ static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
 SString GetWMIOSVersion ( void );
 static HWND hwndCrashedDialog = NULL;
+static HANDLE g_hMutex = NULL;
 
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
@@ -296,7 +297,7 @@ std::vector < DWORD > GetGTAProcessList ( void )
 
         std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
         for ( uint i = 0; i < filenameList.size (); i++ )
-            if ( filenameList[i].EndsWith ( "gta_sa.exe" ) )
+            if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) || filenameList[i].EndsWith ( MTA_GTAWINDOWEDEXE_NAME ) )
                 result.push_back ( processId );
     }
     return result;
@@ -369,6 +370,7 @@ int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 //
 void ShowSplash ( HINSTANCE hInstance )
 {
+#ifndef MTA_DEBUG
     if ( !hwndSplash )
     {
         hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
@@ -376,6 +378,7 @@ void ShowSplash ( HINSTANCE hInstance )
     }
     SetForegroundWindow ( hwndSplash );
     SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+#endif
 }
 
 
@@ -910,6 +913,37 @@ bool IsVistaOrHigher ( void )
 }
 
 
+///////////////////////////////////////////////////////////////
+//
+// IsWin7OrHigher
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool IsWin7OrHigher ( void )
+{
+    SString strVersion = GetRealOSVersion ();
+    int iMajor = atoi ( strVersion );
+    int iMinor = atoi ( strVersion.SplitRight ( "." ) );
+    return iMajor > 7 || ( iMajor == 6 && iMajor >= 1 );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// IsWindowedMode
+//
+// Makes several assumptions, this
+//
+//////////////////////////////////////////////////////////
+bool IsWindowedMode ( void )
+{
+    SString strBuffer;
+    FileLoad ( PathJoin ( GetMTASAPath (), "mta", "coreconfig.xml" ), strBuffer );
+    return strBuffer.Contains ( "<display_windowed>1" );
+}
+
+
 //
 // QueryWMI
 //
@@ -971,13 +1005,13 @@ static bool QueryWMI ( const SString& strQuery, const SString& strKeys, std::vec
                       
     // Error here can be non fatal
 
-    if (FAILED(hres))
-    {
-#if MTA_DEBUG
-        OutputDebugString ( SString ( "QueryWMI - Failed to initialize security. Error code = %x\n", hres ) );
-#endif
-        return "";
-    }
+//    if (FAILED(hres))
+//    {
+//#if MTA_DEBUG
+//        OutputDebugString ( SString ( "QueryWMI - Failed to initialize security. Error code = %x\n", hres ) );
+//#endif
+//        return "";
+//    }
     
     // Step 3: ---------------------------------------------------
     // Obtain the initial locator to WMI -------------------------
@@ -1211,7 +1245,7 @@ void UpdateMTAVersionApplicationSetting ( void )
 
 #ifdef MTA_DEBUG
     // Force update
-    strNewHash = "x";
+    strNewHash = GetTimeString ();
 #endif
     // Only loadup the dll if the hash has changed, or we don't have a previous valid netrev value
     if ( strNewHash != strOldHash || usNetRev == 65535 )
@@ -1327,3 +1361,40 @@ bool Is32bitProcess ( DWORD processID )
     return false;   // Can't determine. Guess it's 64 bit
 }
 
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CreateSingleInstanceMutex
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+bool CreateSingleInstanceMutex ( void )
+{
+    HANDLE hMutex = CreateMutex ( NULL, FALSE, TEXT( MTA_GUID ) );
+
+    if ( GetLastError() == ERROR_ALREADY_EXISTS )
+    {
+        if ( hMutex )
+            CloseHandle ( hMutex );
+        return false;
+    }
+    assert ( !g_hMutex );
+    g_hMutex = hMutex;
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// ReleaseSingleInstanceMutex
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+void ReleaseSingleInstanceMutex ( void )
+{
+    assert ( g_hMutex );
+    CloseHandle ( g_hMutex );
+    g_hMutex = NULL;
+}
