@@ -521,6 +521,10 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     // Grab the MTA folder
     SString strGTAEXEPath = strGTAPath + "\\" + MTA_GTAEXE_NAME;
     SString strDir = strMTASAPath + "\\mta";
+
+    SString strGTAEXEWindowedPath = strGTAPath + "\\" + MTA_GTAWINDOWEDEXE_NAME;
+    if ( FileExists ( strGTAEXEWindowedPath ) && IsWindowedMode () && IsWin7OrHigher () )
+        strGTAEXEPath = strGTAEXEWindowedPath;
    
     // Make sure the gta executable exists
     SetCurrentDirectory ( strGTAPath );

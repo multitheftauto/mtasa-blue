@@ -711,7 +711,9 @@ namespace
 
         static void ClearLogContents ( const SString& strIdFilter )
         {
-            if ( strIdFilter == "" && FileExists ( CalcMTASAPath ( "_keep_report_" ) ) )
+            if ( strIdFilter == "-all" && FileExists ( CalcMTASAPath ( "_keep_report_" ) ) )
+                return;
+            if ( FileExists ( CalcMTASAPath ( "_keep_report_all_" ) ) )
                 return;
             SetReportLogContents ( GetLogContents ( strIdFilter ) );
         }

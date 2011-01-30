@@ -864,7 +864,7 @@ void CClientGame::DoPulses ( void )
         {
             strMessage = g_pNet->GetNextBuffer ();
             if ( strMessage.length () )
-                uiLevel = 4;
+                uiLevel = atoi ( strMessage.SplitLeft ( ":", &strMessage ) );
         }
 
         // Send message to the server

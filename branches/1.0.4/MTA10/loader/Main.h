@@ -17,6 +17,7 @@
 
 #define MTA_GTAEXE_NAME "gta_sa.exe"
 #define MTA_GTASTEAMEXE_NAME "gta-sa.exe"
+#define MTA_GTAWINDOWEDEXE_NAME "gta_sa_windowed.exe"
 #define MTA_EXE_NAME_RELEASE "Multi Theft Auto.exe"
 
 #ifdef MTA_DEBUG

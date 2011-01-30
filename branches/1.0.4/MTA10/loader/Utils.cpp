@@ -910,6 +910,37 @@ bool IsVistaOrHigher ( void )
 }
 
 
+///////////////////////////////////////////////////////////////
+//
+// IsWin7OrHigher
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool IsWin7OrHigher ( void )
+{
+    SString strVersion = GetRealOSVersion ();
+    int iMajor = atoi ( strVersion );
+    int iMinor = atoi ( strVersion.SplitRight ( "." ) );
+    return iMajor > 7 || ( iMajor == 6 && iMajor >= 1 );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// IsWindowedMode
+//
+// Makes several assumptions, this
+//
+//////////////////////////////////////////////////////////
+bool IsWindowedMode ( void )
+{
+    SString strBuffer;
+    FileLoad ( PathJoin ( GetMTASAPath (), "mta", "coreconfig.xml" ), strBuffer );
+    return strBuffer.Contains ( "<display_windowed>1" );
+}
+
+
 //
 // QueryWMI
 //
@@ -971,13 +1002,13 @@ static bool QueryWMI ( const SString& strQuery, const SString& strKeys, std::vec
                       
     // Error here can be non fatal
 
-    if (FAILED(hres))
-    {
-#if MTA_DEBUG
-        OutputDebugString ( SString ( "QueryWMI - Failed to initialize security. Error code = %x\n", hres ) );
-#endif
-        return "";
-    }
+//    if (FAILED(hres))
+//    {
+//#if MTA_DEBUG
+//        OutputDebugString ( SString ( "QueryWMI - Failed to initialize security. Error code = %x\n", hres ) );
+//#endif
+//        return "";
+//    }
     
     // Step 3: ---------------------------------------------------
     // Obtain the initial locator to WMI -------------------------
