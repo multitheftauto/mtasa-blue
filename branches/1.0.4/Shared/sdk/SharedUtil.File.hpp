@@ -20,11 +20,17 @@
 //
 bool SharedUtil::FileExists ( const SString& strFilename )
 {
-    FILE* fh = fopen ( strFilename, "rb" );
-    if ( !fh )
+#ifdef WIN32
+    DWORD dwAtr = GetFileAttributes ( strFilename );
+    if ( dwAtr == INVALID_FILE_ATTRIBUTES )
         return false;
-    fclose ( fh );
-    return true;
+    return ( ( dwAtr & FILE_ATTRIBUTE_DIRECTORY) == 0 );     
+#else
+    struct stat Info;
+    if ( stat ( strFilename, &Info ) == -1 )
+        return false;
+    return !( S_ISDIR ( Info.st_mode ) );
+#endif
 }
 
 

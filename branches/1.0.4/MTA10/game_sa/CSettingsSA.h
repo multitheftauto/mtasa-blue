@@ -23,15 +23,8 @@
 
 #define FUNC_CMenuManager_Save  0x57C660
 
-#define VAR_bMouseSteering      0xC1CC02
-#define VAR_bMouseFlying        0xC1CC03
-#define VAR_bFxQuality          0xA9AE54
+#define VAR_ucFxQuality         0xA9AE54
 #define VAR_fMouseSensitivity   0xB6EC1C
-
-#define VAR_bUsertrackMode      0xBA67F8
-#define VAR_bUsertrackAutoScan  0xBA680D
-#define VAR_bRadioEqualizer     0xBA6799
-#define VAR_bRadioAutotune      0xBA6795
 
 #define CLASS_CAudioEngine 0xB6BC90
 #define FUNC_CAudioEngine_SetEffectsMasterVolume 0x506E10
@@ -54,20 +47,24 @@ struct CSettingsSAInterface // see code around 0x57CE9A for where these are
     bool bLegend;               // 0x4A
     bool bUseWideScreen;        // 0x4B
     bool bFrameLimiter;         // 0x4C
-    bool bAutoRetune;           // 0x4D
+    bool bRadioAutotune;        // 0x4D
     bool pad4;
     BYTE ucSfxVolume;           // 0x4F
     BYTE ucRadioVolume;         // 0x50
-    BYTE ucRadioEq;             // 0x51
+    bool bRadioEqualizer;       // 0x51
     BYTE ucRadioStation;        // 0x52
-    BYTE pad5[0x5E];
+    BYTE pad5[0x5D];
+    BYTE ucUsertrackMode;       // 0xB0
     bool bInvertPadX1;          // 0xB1
     bool bInvertPadY1;          // 0xB2
     bool bInvertPadX2;          // 0xB3
     bool bInvertPadY2;          // 0xB4
     bool bSwapPadAxis1;         // 0xB5
     bool bSwapPadAxis2;         // 0xB6
-    BYTE pad6[0x11];
+    BYTE pad6[0xD];
+    bool bMipMapping;           // 0xC4 (setting appears to have no effect in gta 1.0)
+    bool bUsertrackAutoScan;    // 0xC5
+    BYTE pad7[0x2];
     DWORD dwAntiAliasing;       // 0xC8
     DWORD dwFrontendAA;         // 0xCC (anti-aliasing value in the single-player settings menu. Useless for MTA).
     bool bUseKeyboardAndMouse;  // 0xD0
