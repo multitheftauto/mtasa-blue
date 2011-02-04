@@ -444,17 +444,39 @@ CSettings::CSettings ( void )
     m_pComboResolution->SetReadOnly ( true );
 
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
-    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY - 3.0f ) );
     m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pCheckBoxWideScreen = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Wide Screen", true ) );
-    m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 13.0f ) );
+    m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 13.0f ) );
     m_pCheckBoxWideScreen->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
+    float fPosY =  vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Full Screen Minimize", true ) );
-    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 29.0f ) );
+    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, fPosY + 29.0f ) );
     m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-    m_pCheckBoxMinimize->SetVisible ( GetVideoModeManager ()->IsMultiMonitor () );
+    if ( !GetVideoModeManager ()->IsMultiMonitor () )
+    {
+        m_pCheckBoxMinimize->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
+    m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Disable Aero Desktop", true ) );
+    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 45.0f ) );
+    m_pCheckBoxDisableAero->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    if ( GetApplicationSetting ( "os-version" ) < "6.1" )
+    {
+        m_pCheckBoxDisableAero->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
+    m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Mip Mapping", true ) );
+    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 350.0f, vecTemp.fY + 61.0f ) );
+    m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+#ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
+    m_pCheckBoxMipMapping->SetVisible ( false );
+    fPosY -= 16.0f;
+#endif
 
     vecTemp.fY += 8;
     m_pDrawDistanceLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Draw Distance:" ) );
@@ -471,9 +493,6 @@ CSettings::CSettings ( void )
     m_pDrawDistanceValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
     m_pDrawDistanceValueLabel->AutoSize ( "100% " );
 
-    m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Mip Mapping", true ) );
-    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
-    m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pBrightnessLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Brightness:" ) );
     m_pBrightnessLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
@@ -1826,6 +1845,7 @@ void CSettings::LoadData ( void )
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
     m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
     m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
+    m_pCheckBoxDisableAero->SetSelected ( GetApplicationSettingInt ( "aero_enabled" ) ? false : true );
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
 
@@ -2026,11 +2046,13 @@ void CSettings::SaveData ( void )
     bNextFSMinimize = m_pCheckBoxMinimize->GetSelected();
     if ( CGUIListItem* pSelected = m_pComboAntiAliasing->GetSelectedItem () )
         iAntiAliasing = ( int ) pSelected->GetData();
+    int iAeroEnabled = m_pCheckBoxDisableAero->GetSelected() ? 0 : 1;
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged )
+    bool bIsAeroChanged = GetApplicationSettingInt ( "aero_enabled"  ) != iAeroEnabled;
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged )
     {
         SString strChangedOptions;
         if ( bIsVideoModeChanged )
@@ -2038,12 +2060,20 @@ void CSettings::SaveData ( void )
             strChangedOptions += "Resolution";
             if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
                 strChangedOptions += "/Full Screen Minimize";
-            if ( bIsAntiAliasingChanged )
-                strChangedOptions += " and Anti-aliasing";
         }
-        else
+
+        if ( bIsAntiAliasingChanged )
         {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += " and ";
             strChangedOptions += "Anti-aliasing";
+        }
+
+        if ( bIsAeroChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += " and ";
+            strChangedOptions += "Aero setting";
         }
 
         SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
@@ -2064,6 +2094,9 @@ void CSettings::SaveData ( void )
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
     gameSettings->SetMouseSensitivity ( ( m_pMouseSensitivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
 	gameSettings->SetMipMappingEnabled ( m_pCheckBoxMipMapping->GetSelected () );
+
+    // Update Aero override setting. This need to be a registry setting as it's done in the launcher
+    SetApplicationSettingInt ( "aero_enabled", m_pCheckBoxDisableAero->GetSelected() ? 0 : 1 );
 
     // Visual FX Quality
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )

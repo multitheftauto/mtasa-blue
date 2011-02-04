@@ -41,7 +41,8 @@ protected:
     SString         _InstallNewsItems               ( void );
     SString         _Quit                           ( void );
 
-    CSequencerType*   m_pSequencer;
+    CSequencerType*     m_pSequencer;
+    SString             m_strAdminReason;
 };
 
 CInstallManager* GetInstallManager ( void );

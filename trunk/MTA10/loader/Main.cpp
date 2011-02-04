@@ -112,6 +112,12 @@ void HandleTrouble ( void )
 //////////////////////////////////////////////////////////
 int LaunchGame ( LPSTR lpCmdLine )
 {
+    //
+    // "L0" is opened before the launch sequence and is closed if MTA shutsdown with no error
+    // "L1" is opened before the launch sequence and is closed if GTA is succesfully started
+    // "CR1" is a counter which is incremented if GTA was not started and MTA shutsdown with an error
+    //
+
     // Check for unclean stop on previous run
     if ( WatchDogIsSectionOpen ( "L0" ) )
         WatchDogSetUncleanStop ( true );
@@ -235,9 +241,9 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     SString strGTAEXEPath = strGTAPath + "\\" + MTA_GTAEXE_NAME;
     SString strDir = strMTASAPath + "\\mta";
 
-    SString strGTAEXEWindowedPath = strGTAPath + "\\" + MTA_GTAWINDOWEDEXE_NAME;
-    if ( FileExists ( strGTAEXEWindowedPath ) && IsWindowedMode () )
-        strGTAEXEPath = strGTAEXEWindowedPath;
+    SString strGTAEXEAeroPath = strGTAPath + "\\" + MTA_GTAAEROEXE_NAME;
+    if ( FileExists ( strGTAEXEAeroPath ) && GetApplicationSettingInt ( "aero_enabled" ) )
+        strGTAEXEPath = strGTAEXEAeroPath;
 
     // Make sure the gta executable exists
     SetCurrentDirectory ( strGTAPath );
