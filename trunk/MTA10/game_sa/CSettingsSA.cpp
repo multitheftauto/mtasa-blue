@@ -110,45 +110,45 @@ void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
 unsigned int CSettingsSA::GetUsertrackMode ( void )
 {
     // 0 = radio, 1 = random, 2 = sequential
-    return *(BYTE *)VAR_bUsertrackMode;
+    return m_pInterface->ucUsertrackMode;
 }
 
 void CSettingsSA::SetUsertrackMode ( unsigned int uiMode )
 {
-    MemPut < BYTE > ( VAR_bUsertrackMode, uiMode );  //     *(BYTE *)VAR_bUsertrackMode = uiMode;
+    m_pInterface->ucUsertrackMode = uiMode;
 }
 
 bool CSettingsSA::IsUsertrackAutoScan ( void )
 {
     // 1 = yes, 0 = no
-    return ( ( *(BYTE *)VAR_bUsertrackAutoScan == 1 ) ? true : false );
+    return m_pInterface->bUsertrackAutoScan;
 }
 
 void CSettingsSA::SetUsertrackAutoScan ( bool bEnable )
 {
-    MemPut < BYTE > ( VAR_bUsertrackAutoScan, ( ( bEnable ) ? 1 : 0 ) );  //     *(BYTE *)VAR_bUsertrackAutoScan = ( ( bEnable ) ? 1 : 0 );
+    m_pInterface->bUsertrackAutoScan = bEnable;
 }
 
 bool CSettingsSA::IsRadioEqualizerEnabled ( void )
 {
     // 1 = on, 0 = off
-    return ( ( *(BYTE *)VAR_bRadioEqualizer == 1 ) ? true : false );
+    return m_pInterface->bRadioEqualizer;
 }
 
 void CSettingsSA::SetRadioEqualizerEnabled ( bool bEnable )
 {
-    MemPut < BYTE > ( VAR_bRadioEqualizer, ( ( bEnable ) ? 1 : 0 ) );  //     *(BYTE *)VAR_bRadioEqualizer = ( ( bEnable ) ? 1 : 0 );
+    m_pInterface->bRadioEqualizer = bEnable;
 }
 
 bool CSettingsSA::IsRadioAutotuneEnabled ( void )
 {
     // 1 = on, 0 = off
-    return ( ( *(BYTE *)VAR_bRadioAutotune == 1 ) ? true : false );
+    return m_pInterface->bRadioAutotune;
 }
 
 void CSettingsSA::SetRadioAutotuneEnabled ( bool bEnable )
 {
-    MemPut < BYTE > ( VAR_bRadioAutotune, ( ( bEnable ) ? 1 : 0 ) );  //     *(BYTE *)VAR_bRadioAutotune = ( ( bEnable ) ? 1 : 0 );
+    m_pInterface->bRadioAutotune = bEnable;
 }
 
 // Minimum is 0.925 and maximum is 1.8
@@ -182,12 +182,12 @@ void CSettingsSA::SetBrightness ( unsigned int uiBrightness )
 unsigned int CSettingsSA::GetFXQuality ( )
 {
     // 0 = low, 1 = medium, 2 = high, 3 = very high
-    return *(BYTE *)VAR_bFxQuality;
+    return *(BYTE *)VAR_ucFxQuality;
 }
 
 void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 {
-    MemPut < BYTE > ( VAR_bFxQuality, fxQualityId );  //     *(BYTE *)VAR_bFxQuality = fxQualityId;
+    MemPut < BYTE > ( VAR_ucFxQuality, fxQualityId );
 }
 
 float CSettingsSA::GetMouseSensitivity ( )
@@ -226,12 +226,12 @@ void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing, bool bOnRestart
 
 bool CSettingsSA::IsMipMappingEnabled ( void )
 {
-	return ( ( *(BYTE *)VAR_bMipMapping == 1 ) ? true : false );
+	return m_pInterface->bMipMapping;
 }
 
 void CSettingsSA::SetMipMappingEnabled ( bool bEnable )
 {
-	MemPut < BYTE > ( VAR_bMipMapping, ( ( bEnable ) ? 1 : 0 ) );
+	m_pInterface->bMipMapping = bEnable;
 }
 
 void CSettingsSA::Save ()
