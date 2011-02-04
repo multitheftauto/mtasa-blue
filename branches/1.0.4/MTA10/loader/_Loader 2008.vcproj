@@ -392,14 +392,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nag1.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\nag2.bmp"
-				>
-			</File>
-			<File
 				RelativePath=".\resource\splash.bmp"
 				>
 			</File>
