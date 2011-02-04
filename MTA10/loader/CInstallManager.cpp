@@ -106,7 +106,7 @@ void CInstallManager::InitSequencer ( void )
                 CR "update_end: "
                 CR "            CALL SwitchBackFromTempExe "
                 CR " "        
-                CR "aero_check: "                               // Windows 7 windowed mode fix
+                CR "aero_check: "                               // Windows 7 aero desktop fix
                 CR "            CALL ProcessAeroChecks "
                 CR "            IF LastResult == ok GOTO aero_end: "
                 CR " "
@@ -274,6 +274,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
 {
     if ( !IsUserAdmin () )
     {
+        MessageBox( NULL, SString ( "MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease click 'Yes' in the next window.", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK );
         SetIsBlockingUserProcess ();
         ReleaseSingleInstanceMutex ();
         if ( ShellExecuteBlocking ( "runas", GetLauncherPathFilename (), GetSequencerSnapshot () ) )
@@ -287,6 +288,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
         }
         CreateSingleInstanceMutex ();
         ClearIsBlockingUserProcess ();
+        MessageBox( NULL, SString ( "MTA:SA could not complete the following task:\n\n  '%s'\n", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK );
     }
     return "fail";
 }
@@ -358,7 +360,7 @@ SString CInstallManager::_CheckOnRestartCommand ( void )
     else
     if ( !strResult.Contains ( "no update" ) )
     {
-        AddReportLog ( 4047, SString ( "ProcessStageInitial: CheckOnRestartCommand returned %s", strResult.c_str () ) );
+        AddReportLog ( 4047, SString ( "_CheckOnRestartCommand: CheckOnRestartCommand returned %s", strResult.c_str () ) );
     }
 
     return "no_action";
@@ -429,6 +431,7 @@ SString CInstallManager::_InstallFiles ( void )
         else
             AddReportLog ( 5049, SString ( "_InstallFiles: Couldn't install files %s", "" ) );
 
+        m_strAdminReason = "Install updated MTA:SA files";
         return "fail";
     }
     else
@@ -465,18 +468,21 @@ SString CInstallManager::_ShowCopyFailDialog ( void )
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessAeroChecks ( void )
 {
-    if ( IsWin7OrHigher () && IsWindowedMode () )
+    if ( GetApplicationSettingInt ( "aero_enabled" ) )
     {
         SString strGTAPath;
         if ( GetGamePath ( strGTAPath ) == 1 )
         {
             SString strGTAEXEPath = PathJoin ( strGTAPath , MTA_GTAEXE_NAME );
-            SString strGTAEXEWindowedPath = PathJoin ( strGTAPath, MTA_GTAWINDOWEDEXE_NAME );
-            if ( !FileExists ( strGTAEXEWindowedPath ) || FileSize ( strGTAEXEPath ) != FileSize ( strGTAEXEWindowedPath ) )
+            SString strGTAEXEAeroPath = PathJoin ( strGTAPath, MTA_GTAAEROEXE_NAME );
+            if ( !FileExists ( strGTAEXEAeroPath ) || FileSize ( strGTAEXEPath ) != FileSize ( strGTAEXEAeroPath ) )
             {
-                // Need to copy gta_sa_windowed.exe
-                if ( !FileCopy ( strGTAEXEPath, strGTAEXEWindowedPath ) )
+                // Need to copy gta_sa_aero.exe
+                if ( !FileCopy ( strGTAEXEPath, strGTAEXEAeroPath ) )
+                {
+                    m_strAdminReason = "Enable Aero desktop";
                     return "fail";
+                }
             }
         }
     }

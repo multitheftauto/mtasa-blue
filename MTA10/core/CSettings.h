@@ -131,6 +131,7 @@ protected:
     CGUICheckBox*       m_pCheckBoxWindowed;
     CGUICheckBox*       m_pCheckBoxWideScreen;
     CGUICheckBox*       m_pCheckBoxMinimize;
+    CGUICheckBox*       m_pCheckBoxDisableAero;
     CGUILabel*          m_pMapRenderingLabel;
     CGUIComboBox*       m_pComboFxQuality;
     CGUILabel*          m_pFXQualityLabel;

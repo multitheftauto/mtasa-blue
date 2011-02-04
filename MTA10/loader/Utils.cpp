@@ -297,7 +297,7 @@ std::vector < DWORD > GetGTAProcessList ( void )
 
         std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
         for ( uint i = 0; i < filenameList.size (); i++ )
-            if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) || filenameList[i].EndsWith ( MTA_GTAWINDOWEDEXE_NAME ) )
+            if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) || filenameList[i].EndsWith ( MTA_GTAAEROEXE_NAME ) )
                 result.push_back ( processId );
     }
     return result;
@@ -910,37 +910,6 @@ bool IsVistaOrHigher ( void )
 {
     int iMajor = atoi ( GetRealOSVersion () );
     return iMajor >= 6;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// IsWin7OrHigher
-//
-//
-//
-///////////////////////////////////////////////////////////////
-bool IsWin7OrHigher ( void )
-{
-    SString strVersion = GetRealOSVersion ();
-    int iMajor = atoi ( strVersion );
-    int iMinor = atoi ( strVersion.SplitRight ( "." ) );
-    return iMajor > 7 || ( iMajor == 6 && iMajor >= 1 );
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// IsWindowedMode
-//
-// Makes several assumptions, this
-//
-//////////////////////////////////////////////////////////
-bool IsWindowedMode ( void )
-{
-    SString strBuffer;
-    FileLoad ( PathJoin ( GetMTASAPath (), "mta", "coreconfig.xml" ), strBuffer );
-    return strBuffer.Contains ( "<display_windowed>1" );
 }
 
 
