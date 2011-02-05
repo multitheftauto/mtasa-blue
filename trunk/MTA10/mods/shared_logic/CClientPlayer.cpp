@@ -119,7 +119,7 @@ void CClientPlayer::UpdateAimPosition ( const CVector &vecAim )
     m_vecOldAim = m_vecCurrentAim;
     m_vecCurrentAim = vecAim;
     m_ulOldAimTime =  m_ulCurrentAimTime;
-    m_ulCurrentAimTime = GetTickCount();
+    m_ulCurrentAimTime = GetTickCount32();
     m_vecAimSpeed = GetExtrapolatedSpeed( m_vecOldAim, m_ulOldAimTime, m_vecCurrentAim, m_ulCurrentAimTime );
 }
 

@@ -180,7 +180,7 @@ void CChat::Draw ( void )
 
     float fLineDifference = CChat::GetFontHeight ( m_vecScale.fY );
     CVector2D vecPosition ( m_vecBackgroundPosition.fX + ( 5.0f * m_vecScale.fX ), m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY - ( fLineDifference * 1.25f ) );
-    unsigned long ulTime = GetTickCount ();
+    unsigned long ulTime = GetTickCount32 ();
     float fRcpChatLineFadeOut = 1.0f / m_ulChatLineFadeOut;
     bool bShadow = ( m_Color.A * m_fBackgroundAlpha == 0.f );
     bool bInputShadow = ( m_InputColor.A * m_fInputBackgroundAlpha == 0.f );
@@ -758,7 +758,7 @@ CChatLine::CChatLine ( void )
 
 void CChatLine::UpdateCreationTime ()
 {
-    m_ulCreationTime = GetTickCount ();
+    m_ulCreationTime = GetTickCount32 ();
 }
 
 bool CChatLine::IsColorCode ( const char* szColorCode )

@@ -1649,7 +1649,7 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
         if ( bSetDirectlyDead )
         {
             // TODO: Avoid the animation, try to make it go directly to the last animation frame.
-            pTask = g_pGame->GetTasks ()->CreateTaskSimpleDead ( GetTickCount(), true );
+            pTask = g_pGame->GetTasks ()->CreateTaskSimpleDead ( GetTickCount32(), true );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_DEFAULT );

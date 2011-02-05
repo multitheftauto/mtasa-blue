@@ -10,10 +10,25 @@
 *
 *****************************************************************************/
 
+#undef GetTickCount
+
 #ifndef WIN32
     unsigned long GetTickCount ( void );
     #include "sys/time.h"
 #endif
+
+//
+// Retrieves the number of milliseconds that have elapsed since the function was first called (plus a little bit to make it look good).
+// This keeps the counter as low as possible to delay any precision or wrap around issues.
+// Note: Return value is module dependent
+//
+uint SharedUtil::GetTickCount32 ( void )
+{
+    static const uint ulInitial = GetTickCount () - ( GetTickCount () % 300000 + 200000 );
+    uint ulNow = GetTickCount ();
+    return ulNow - ulInitial;
+}
+
 
 //
 // Retrieves the number of milliseconds that have elapsed since some arbitrary point in time.

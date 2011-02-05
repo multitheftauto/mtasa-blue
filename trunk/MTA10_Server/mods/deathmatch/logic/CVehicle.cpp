@@ -28,7 +28,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_fHealth = DEFAULT_VEHICLE_HEALTH;
     m_ulHealthChangeTime = 0;
     m_ulBlowTime = 0;
-    m_ulIdleTime = GetTickCount ();
+    m_ulIdleTime = GetTickCount32 ();
     m_fTurretPositionX = 0;
     m_fTurretPositionY = 0;
     m_bSirenActive = false;
