@@ -23,6 +23,9 @@
 #include <clocale>
 #include <cstdio>
 #include <signal.h>
+#ifdef WIN32
+    #include <Mmsystem.h>
+#endif
 
 // Define libraries
 char szNetworkLibName[] = "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
@@ -373,6 +376,10 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 
 void CServerImpl::MainLoop ( void )
 {
+#ifdef WIN32
+    timeBeginPeriod ( 1 );  // Change sleep resolution to 1ms
+#endif
+
     // Loop until a termination is requested
     while ( !m_bRequestedQuit )
     {
@@ -414,6 +421,10 @@ void CServerImpl::MainLoop ( void )
         // Limit the pulses to avoid heavy CPU usage
         Sleep ( 10 );
     }
+
+#ifdef WIN32
+    timeEndPeriod ( 1 );    // Restore previous sleep resolution
+#endif
 
     // Unload the current mod
     m_pModManager->Unload ();

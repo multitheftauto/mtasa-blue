@@ -74,7 +74,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib Imagehlp.lib"
+				AdditionalDependencies="wsock32.lib Imagehlp.lib Winmm.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.1\server\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -173,7 +173,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib Imagehlp.lib"
+				AdditionalDependencies="wsock32.lib Imagehlp.lib Winmm.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.1\server\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -276,7 +276,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib Imagehlp.lib"
+				AdditionalDependencies="wsock32.lib Imagehlp.lib Winmm.lib"
 				OutputFile="..\..\output\MTA San Andreas\server\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
