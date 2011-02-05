@@ -1052,7 +1052,7 @@ SCachedTextureInfo& CGraphics::CacheTexture ( const string& strFilename )
     }
 
     SCachedTextureInfo& info = iter->second;
-    info.ulTimeLastUsed = GetTickCount();
+    info.ulTimeLastUsed = GetTickCount32();
 
     return info;
 }
@@ -1072,7 +1072,7 @@ void CGraphics::ExpireCachedTextures ( bool bExpireAll )
     while ( iter != m_CachedTextureInfoMap.end () )
     {
         SCachedTextureInfo& info    = iter->second;
-        unsigned long ulAge         = GetTickCount() - info.ulTimeLastUsed;
+        unsigned long ulAge         = GetTickCount32() - info.ulTimeLastUsed;
         if ( ulAge > ulMaxAgeSeconds * 1000 || bExpireAll )
         {
             SAFE_RELEASE ( info.d3dTexture );

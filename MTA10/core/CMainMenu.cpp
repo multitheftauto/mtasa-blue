@@ -50,7 +50,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 {
     m_pNewsBrowser = new CNewsBrowser ();
 
-    ulPreviousTick = GetTickCount ();
+    ulPreviousTick = GetTickCount32 ();
     m_pHoveredItem = NULL;
     m_iMoveStartPos = 0;
 
@@ -348,7 +348,7 @@ void CMainMenu::Update ( void )
     m_Credits.Update ();
     m_Settings.Update ();
 
-    unsigned long ulCurrentTick = GetTickCount();
+    unsigned long ulCurrentTick = GetTickCount32();
     unsigned long ulTimePassed = ulCurrentTick - ulPreviousTick;
 
     if ( m_bHideGame )
@@ -557,7 +557,7 @@ void CMainMenu::Update ( void )
     }
 
 
-    ulPreviousTick = GetTickCount();
+    ulPreviousTick = GetTickCount32();
 
     // Call subdialog pulses
     m_ServerBrowser.Update ();
@@ -628,7 +628,7 @@ void CMainMenu::SetIsIngame ( bool bIsIngame )
         m_bIsIngame = bIsIngame;
         m_Settings.SetIsModLoaded ( bIsIngame );
 
-        m_ulMoveStartTick = GetTickCount();
+        m_ulMoveStartTick = GetTickCount32();
         if ( bIsIngame )
         {
             m_pDisconnect->image->SetVisible(true);

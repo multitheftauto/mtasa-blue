@@ -29,10 +29,6 @@
 
 #define SAFE_DELETE(p) { if(p) { delete (p); (p)=NULL; } }
 
-#ifndef WIN32
-unsigned long   GetTickCount                ( void );
-#endif
-
 bool            CheckNickProvided           ( const char* szNick );
 float           DistanceBetweenPoints2D     ( const CVector& vecPosition1, const CVector& vecPosition2 );
 float           DistanceBetweenPoints3D     ( const CVector& vecPosition1, const CVector& vecPosition2 );

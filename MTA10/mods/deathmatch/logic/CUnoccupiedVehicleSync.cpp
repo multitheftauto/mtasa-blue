@@ -165,7 +165,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleStartSync ( NetBitStreamInt
 
 #ifdef MTA_DEBUG
             pVehicle->m_pLastSyncer = g_pClientGame->GetLocalPlayer ();
-            pVehicle->m_ulLastSyncTime = GetTickCount ();
+            pVehicle->m_ulLastSyncTime = GetTickCount32 ();
             pVehicle->m_szLastSyncType = "unoccupied-start";
 #endif
         }
@@ -211,7 +211,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
                                                         pVehicle->SetDerailed ( vehicle.data.bDerailed );
 #ifdef MTA_DEBUG
                 pVehicle->m_pLastSyncer = NULL;
-                pVehicle->m_ulLastSyncTime = GetTickCount ();
+                pVehicle->m_ulLastSyncTime = GetTickCount32 ();
                 pVehicle->m_szLastSyncType = "unoccupied";
 #endif
             }

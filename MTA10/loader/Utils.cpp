@@ -374,7 +374,7 @@ void ShowSplash ( HINSTANCE hInstance )
     if ( !hwndSplash )
     {
         hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
-        ulSplashStartTime = GetTickCount ();
+        ulSplashStartTime = GetTickCount32 ();
     }
     SetForegroundWindow ( hwndSplash );
     SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
@@ -390,7 +390,7 @@ void HideSplash ( bool bOnlyDelay  )
     if ( hwndSplash )
     {
         // Show splash for at least two seconds
-        unsigned long ulTimeElapsed = GetTickCount () - ulSplashStartTime;
+        unsigned long ulTimeElapsed = GetTickCount32 () - ulSplashStartTime;
         if ( ulTimeElapsed < 2000 )
             Sleep ( 2000 - ulTimeElapsed );
 
@@ -572,7 +572,7 @@ void ShowProgressDialog( HINSTANCE hInstance, const SString& strTitle, bool bAll
         SetWindowText ( hwndProgressDialog, strTitle );
         HWND hwndButton = GetDlgItem( hwndProgressDialog, IDCANCEL );
         ShowWindow( hwndButton, bAllowCancel ? SW_SHOW : SW_HIDE );
-        ulProgressStartTime = GetTickCount ();
+        ulProgressStartTime = GetTickCount32 ();
     }
     SetForegroundWindow ( hwndProgressDialog );
     SetWindowPos ( hwndProgressDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
@@ -583,7 +583,7 @@ void HideProgressDialog ( void )
     if ( hwndProgressDialog )
     {
         // Show progress for at least two seconds
-        unsigned long ulTimeElapsed = GetTickCount () - ulProgressStartTime;
+        unsigned long ulTimeElapsed = GetTickCount32 () - ulProgressStartTime;
         if ( ulTimeElapsed < 2000 )
         {
             UpdateProgress( 100, 100 );
