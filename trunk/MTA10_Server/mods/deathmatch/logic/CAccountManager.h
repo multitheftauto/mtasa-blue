@@ -37,7 +37,7 @@ public:
     bool                        LoadSetting                 ( CXMLNode* pNode );
     bool                        Save                        ( const char* szFileName = NULL );
     bool                        Save                        ( CXMLNode* pParent );
-    void                        Save                        ( CAccount* pParent );
+    bool                        Save                        ( CAccount* pParent, SString* pStrError = NULL );
     bool                        SaveSettings                ( void );
 
     CAccount*                   Get                         ( const char* szName, bool bRegistered = true );
