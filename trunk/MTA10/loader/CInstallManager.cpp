@@ -463,25 +463,57 @@ SString CInstallManager::_ShowCopyFailDialog ( void )
 //
 // CInstallManager::_ProcessAeroChecks
 //
-// Create copy of gta_sa.exe to trick windows 7 into using aero
+// Change the link timestamp in gta_sa.exe to trick windows 7 into using aero
 //
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessAeroChecks ( void )
 {
-    if ( GetApplicationSettingInt ( "aero_enabled" ) )
+    // Check is Windows 7
+    if ( GetApplicationSetting ( "os-version" ) >= "6.1" )
     {
         SString strGTAPath;
         if ( GetGamePath ( strGTAPath ) == 1 )
         {
             SString strGTAEXEPath = PathJoin ( strGTAPath , MTA_GTAEXE_NAME );
-            SString strGTAEXEAeroPath = PathJoin ( strGTAPath, MTA_GTAAEROEXE_NAME );
-            if ( !FileExists ( strGTAEXEAeroPath ) || FileSize ( strGTAEXEPath ) != FileSize ( strGTAEXEAeroPath ) )
+            // Get the top byte of the file link timestamp
+            uchar ucTimeStamp = 0;
+            FILE* fh = fopen ( strGTAEXEPath, "rb" );
+            if ( fh )
             {
-                // Need to copy gta_sa_aero.exe
-                if ( !FileCopy ( strGTAEXEPath, strGTAEXEAeroPath ) )
+                if ( !fseek ( fh, 0x8B, SEEK_SET ) )
                 {
-                    m_strAdminReason = "Enable Aero desktop";
-                    return "fail";
+                    if ( fread ( &ucTimeStamp, sizeof ( ucTimeStamp ), 1, fh ) != 1 )
+                    {
+                        ucTimeStamp = 0;
+                    }
+                }
+                fclose ( fh );
+            }
+
+            const uchar AERO_DISABLED = 0x42;
+            const uchar AERO_ENABLED  = 0x43;
+
+            // Check it's a value we're expecting
+            bool bCanChangeAeroSetting = ( ucTimeStamp == AERO_DISABLED || ucTimeStamp == AERO_ENABLED );
+            SetApplicationSettingInt ( "aero-changeable", bCanChangeAeroSetting );
+
+            if ( bCanChangeAeroSetting )
+            {
+                uchar ucTimeStampRequired = GetApplicationSettingInt ( "aero-enabled" ) ? AERO_ENABLED : AERO_DISABLED;
+                if ( ucTimeStamp != ucTimeStampRequired )
+                {
+                    // Change needed!
+                    FILE* fh = fopen ( strGTAEXEPath, "r+b" );
+                    if ( !fh )
+                    {
+                        m_strAdminReason = "Update Aero setting";
+                        return "fail";
+                    }
+                    if ( !fseek ( fh, 0x8B, SEEK_SET ) )
+                    {
+                        fwrite ( &ucTimeStampRequired, sizeof ( ucTimeStampRequired ), 1, fh );
+                    }
+                    fclose ( fh );
                 }
             }
         }
