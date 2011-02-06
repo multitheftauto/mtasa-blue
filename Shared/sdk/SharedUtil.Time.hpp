@@ -43,8 +43,8 @@ long long SharedUtil::GetTickCount64_ ( void )
     criticalSection.Lock ();
 
     static long          lHightPart = 0;
-    static unsigned long ulWas      = GetTickCount ();
-    unsigned long        ulNow      = GetTickCount ();
+    static unsigned long ulWas      = GetTickCount32 ( true );
+    unsigned long        ulNow      = GetTickCount32 ( true );
     unsigned long        ulDelta    = ulNow - ulWas;
 
     // Detect wrap around
