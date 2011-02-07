@@ -410,7 +410,7 @@ std::string CGUIElement_Impl::GetFont ( void )
 void CGUIElement_Impl::SetProperty ( const char *szProperty, const char *szValue )
 {
     try {
-        m_pWindow->setProperty ( szProperty, szValue );
+        m_pWindow->setProperty ( CGUI_Impl::GetUTFString(szProperty), CGUI_Impl::GetUTFString(szValue) );
     } catch ( CEGUI::Exception e ) {}
 }
 
@@ -421,7 +421,7 @@ std::string CGUIElement_Impl::GetProperty ( const char *szProperty )
     try
     {
         // Return the string. std::string will copy it
-        strValue = m_pWindow->getProperty ( CEGUI::String ( szProperty ) );
+        strValue = CGUI_Impl::GetUTFString(m_pWindow->getProperty ( CGUI_Impl::GetUTFString ( szProperty ) ).c_str() );
     }
     catch ( CEGUI::Exception e )
     {}
