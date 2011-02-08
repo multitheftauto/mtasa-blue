@@ -1504,7 +1504,7 @@ int CLuaFunctionDefs::SetWindVelocity ( lua_State *luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setWindSpeed" );
+        m_pScriptDebugging->LogBadType ( luaVM, "setWindVelocity" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
