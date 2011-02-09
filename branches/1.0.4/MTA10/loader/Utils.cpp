@@ -296,7 +296,7 @@ std::vector < DWORD > GetGTAProcessList ( void )
 
         std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
         for ( uint i = 0; i < filenameList.size (); i++ )
-            if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) || filenameList[i].EndsWith ( MTA_GTAAEROEXE_NAME ) )
+            if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) )
                 result.push_back ( processId );
     }
     return result;

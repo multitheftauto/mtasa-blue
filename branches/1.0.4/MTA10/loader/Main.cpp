@@ -522,10 +522,6 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     SString strGTAEXEPath = strGTAPath + "\\" + MTA_GTAEXE_NAME;
     SString strDir = strMTASAPath + "\\mta";
 
-    SString strGTAEXEAeroPath = strGTAPath + "\\" + MTA_GTAAEROEXE_NAME;
-    if ( FileExists ( strGTAEXEAeroPath ) && FileSize ( strGTAEXEPath ) == FileSize ( strGTAEXEAeroPath ) )
-        strGTAEXEPath = strGTAEXEAeroPath;
-
     // Make sure the gta executable exists
     SetCurrentDirectory ( strGTAPath );
     if ( !FileExists( strGTAEXEPath ) )
