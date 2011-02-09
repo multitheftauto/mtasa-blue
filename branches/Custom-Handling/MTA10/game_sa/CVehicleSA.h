@@ -159,6 +159,8 @@ class CVehicleSA;
 #define FUNC_CTrain__GetDoorAngleOpenRatio      0x6F59C0
 
 #define FUNC_CAutomobile__RecalculateSuspension 0x6A65D0
+#define FUNC_CBike__RecalculateSuspension 0x6B89B0
+#define FUNC_CMTruck__RecalculateSuspension 0x6C7FB0
 
 typedef struct
 {

@@ -1890,19 +1890,27 @@ bool CVehicleSA::UpdateMovingCollision ( float fAngle )
     return bReturn;
 }
 
-
 void CVehicleSA::RecalculateSuspensionValues ( void )
 {
     CVehicleSAInterface * pInt = GetVehicleInterface();
     CModelInfo* pModelInfo = pGame->GetModelInfo ( this->GetModelIndex() );
-    if ( !pModelInfo->IsBike( ) && !pModelInfo->IsBmx( ) && !pModelInfo->IsBoat() ) //Bikes screw up here
+    
+    // Trains and Boats crash... Kart? o.O
+    if ( pModelInfo->IsBoat() || pModelInfo->GetModel() == 571 || pModelInfo->IsTrain() )
+        return;
+
+    DWORD dwFunc = FUNC_CAutomobile__RecalculateSuspension;
+    DWORD dwVeh = reinterpret_cast < DWORD > ( pInt );
+    
+    if ( pModelInfo->IsMonsterTruck() )
+        dwFunc = FUNC_CMTruck__RecalculateSuspension;
+    
+    if ( pModelInfo->IsBike() || pModelInfo->IsBmx() )
+        dwFunc = FUNC_CBike__RecalculateSuspension;
+
+    _asm 
     {
-        DWORD dwVeh = reinterpret_cast < DWORD > ( pInt );
-        DWORD dwFunc = FUNC_CAutomobile__RecalculateSuspension;
-        _asm 
-        {
-            mov ecx, dwVeh
-            call dwFunc
-        }
+        mov ecx, dwVeh
+        call dwFunc
     }
 }
