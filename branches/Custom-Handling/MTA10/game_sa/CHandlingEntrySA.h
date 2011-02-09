@@ -16,7 +16,7 @@
 
 #include <game/CHandlingEntry.h>
 #include "Common.h"
-
+#define FUNC_CAutomobile__Recalculate 0x6F5080
 // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
 // http://www.gtamodding.com/index.php?title=Memory_Addresses_%28SA%29#Handling
 

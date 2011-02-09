@@ -1636,8 +1636,9 @@ void CVehicleSA::SetHandlingData ( CHandlingEntry* pHandling )
     m_pHandlingData = static_cast < CHandlingEntrySA* > ( pHandling );
 
     // Put it in our interface
-    CVehicleSAInterface* pInt = GetVehicleInterface();
-    m_pHandlingData->Recalculate();
+    CVehicleSAInterface* pInt = GetVehicleInterface ();
+    m_pHandlingData->Recalculate ( );
+    RecalculateSuspensionValues ( );
     pInt->pHandlingData = m_pHandlingData->GetInterface ();
     /*pInt->dwHandlingFlags = m_pHandlingData->GetInterface ()->uiHandlingFlags;
     pInt->fMass = m_pHandlingData->GetInterface ()->fMass;
@@ -1655,11 +1656,12 @@ void CVehicleSA::SetHandlingData ( CHandlingEntry* pHandling )
 void CVehicleSA::UpdateHandlingStatus ( void )
 {
     // Not supposed to happen
-    if (!m_pHandlingData)
+    if ( !m_pHandlingData )
         return;
 
     // Put it in our interface
-    CVehicleSAInterface* pInt = GetVehicleInterface();
+    CVehicleSAInterface* pInt = GetVehicleInterface ();
+    RecalculateSuspensionValues ( );
     pInt->dwHandlingFlags = m_pHandlingData->GetInterface ()->uiHandlingFlags;
     pInt->fMass = m_pHandlingData->GetInterface ()->fMass;
     pInt->fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
@@ -1886,4 +1888,21 @@ bool CVehicleSA::UpdateMovingCollision ( float fAngle )
     // Restore our driver
     vehicle->pDriver = pDriver;
     return bReturn;
+}
+
+
+void CVehicleSA::RecalculateSuspensionValues ( void )
+{
+    CVehicleSAInterface * pInt = GetVehicleInterface();
+    CModelInfo* pModelInfo = pGame->GetModelInfo ( this->GetModelIndex() );
+    if ( !pModelInfo->IsBike( ) && !pModelInfo->IsBmx( ) && !pModelInfo->IsBoat() ) //Bikes screw up here
+    {
+        DWORD dwVeh = reinterpret_cast < DWORD > ( pInt );
+        DWORD dwFunc = FUNC_CAutomobile__RecalculateSuspension;
+        _asm 
+        {
+            mov ecx, dwVeh
+            call dwFunc
+        }
+    }
 }

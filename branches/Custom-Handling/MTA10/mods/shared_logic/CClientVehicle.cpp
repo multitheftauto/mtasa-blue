@@ -961,7 +961,9 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         // Reset handling to fit the vehicle
         m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData ( (eVehicleTypes)usModel );
         m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
-        m_pHandlingEntry->Recalculate ();
+        m_pHandlingEntry->Recalculate ( );
+        GetGameVehicle()->RecalculateSuspensionValues ( );
+
 #endif
 
         // Create the vehicle if we're streamed in
@@ -3574,7 +3576,7 @@ void CClientVehicle::ApplyHandling( void )
 {
     if ( m_pVehicle )
     {
-        m_pVehicle->GetHandlingData()->Recalculate();
+        m_pVehicle->GetHandlingData()->Recalculate( );
         // Update vehicle settings
         m_pVehicle->UpdateHandlingStatus ();
     }

@@ -3155,7 +3155,8 @@ _ttf:
                 CHandlingEntry *pEntry=pVehicle->GetHandlingData ();
                 const CHandlingEntry *pOriginalEntry=pVehicle->GetOriginalHandlingData ();
                 pEntry->ApplyHandlingData ( (CHandlingEntry*)pOriginalEntry );
-                pEntry->Recalculate ();
+                pEntry->Recalculate ( );
+                pVehicle->GetGameVehicle()->RecalculateSuspensionValues ( );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }

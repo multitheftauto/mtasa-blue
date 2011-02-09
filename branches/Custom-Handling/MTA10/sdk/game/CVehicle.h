@@ -219,6 +219,7 @@ public:
     virtual bool                 UpdateMovingCollision                  ( float fAngle ) = 0;
 
     virtual void                 UpdateHandlingStatus                   ( void ) = 0;
+    virtual void                 RecalculateSuspensionValues            ( void ) = 0;
 };
 
 #endif

@@ -62,7 +62,7 @@ void CHandlingEntrySA::Recalculate ( void )
         memcpy ( m_pHandlingSA, &m_Handling, sizeof ( m_Handling ) );
 
         // Call GTA's function that calculates the final values from the read values
-        DWORD dwFunc = 0x6F5080;
+        DWORD dwFunc = FUNC_CAutomobile__Recalculate;
         DWORD dwHandling = reinterpret_cast < DWORD > ( m_pHandlingSA );
         _asm
         {

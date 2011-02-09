@@ -158,6 +158,8 @@ class CVehicleSA;
 #define FUNC_CAutomobile__GetDoorAngleOpenRatio 0x6A2270
 #define FUNC_CTrain__GetDoorAngleOpenRatio      0x6F59C0
 
+#define FUNC_CAutomobile__RecalculateSuspension 0x6A65D0
+
 typedef struct
 {
     short sX;               // x coordinate times 8
@@ -705,6 +707,7 @@ public:
     bool                        UpdateMovingCollision           ( float fAngle );
 
     void                        UpdateHandlingStatus            ( void );
+    void                        RecalculateSuspensionValues     ( void );
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 };
