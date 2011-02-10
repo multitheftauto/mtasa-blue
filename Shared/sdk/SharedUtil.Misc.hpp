@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "UTF8.h"
+#include "minibidi.c"
 #ifdef WIN32
     #include <direct.h>
     #include <shellapi.h>
@@ -783,6 +784,14 @@ std::wstring SharedUtil::ConvertToUTF8 (const std::string& input)
 std::string SharedUtil::ConvertToANSI (const std::wstring& input)
 {
     return utf8_wcstombs (input);
+}
+
+std::wstring SharedUtil::GetBidiString (const std::wstring input)
+{
+    int iCount = input.size();
+    wchar_t* wcsLineBidi = (wchar_t*)input.c_str();
+    doBidi ( wcsLineBidi, iCount, 1, 1 );  //Process our UTF string through MiniBidi, for Bidirectionalism
+    return wcsLineBidi;
 }
 
 

@@ -84,7 +84,8 @@ public:
     eInputMode                      GetGUIInputMode             ( void ); 
     eInputMode                      GetInputModeFromString      ( const std::string& a_rstrMode ) const;
     bool                            GetStringFromInputMode      ( eInputMode a_eMode, std::string& a_rstrResult ) const;
-    static CEGUI::String            GetUTFString                ( const char* szInput );
+    static CEGUI::String            GetUTFString                ( std::string strInput );
+    static CEGUI::String            GetUTFString                ( std::wstring strInput );
 
     //
     CGUIMessageBox*                 CreateMessageBox            ( const char* szTitle, const char* szMessage, unsigned int uiFlags );
