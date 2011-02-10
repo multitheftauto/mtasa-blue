@@ -19,6 +19,10 @@ extern CCore* g_pCore;
 
 template<> CMessageLoopHook * CSingleton< CMessageLoopHook >::m_pSingleton = NULL;
 
+WPARAM  CMessageLoopHook::m_LastVirtualKeyCode = NULL;
+UCHAR   CMessageLoopHook::m_LastScanCode = NULL;
+BYTE*   CMessageLoopHook::m_LastKeyboardState = new BYTE;
+
 CMessageLoopHook::CMessageLoopHook ( )
 {
     WriteDebugEvent ( "CMessageLoopHook::CMessageLoopHook" );
@@ -32,7 +36,6 @@ CMessageLoopHook::~CMessageLoopHook ( )
     WriteDebugEvent ( "CMessageLoopHook::~CMessageLoopHook" );
     m_HookedWindowProc      = NULL;
     m_HookedWindowHandle    = NULL;
-
 }
 
 
@@ -223,6 +226,22 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
         if ( !bWasCaptureKey )
         {
+            // Store our keydown for backup unicode translation
+            if ( uMsg == WM_KEYDOWN )
+            {
+                m_LastVirtualKeyCode = wParam;
+                m_LastScanCode = (BYTE)((lParam >> 16) & 0x000F);
+                GetKeyboardState( m_LastKeyboardState );
+            }
+            // If it was a question mark character, we may have an unprocessed unicode character
+            if ( uMsg == WM_CHAR && wParam == 0x3F )
+            {
+                wchar_t* wcsUnicode = new wchar_t[1];
+                ToUnicodeEx ( m_LastVirtualKeyCode, m_LastScanCode, m_LastKeyboardState, wcsUnicode, 1, 0, GetKeyboardLayout(0) );
+                wParam = (WPARAM)wcsUnicode[0];
+                delete wcsUnicode;
+            }
+
             // Lead the message through the keybinds message processor
             g_pCore->GetKeyBinds ()->ProcessMessage ( hwnd, uMsg, wParam, lParam );
 

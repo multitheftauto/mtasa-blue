@@ -40,6 +40,11 @@ class CMessageLoopHook : public CSingleton < CMessageLoopHook >
 
     WNDPROC     m_HookedWindowProc;
     HWND        m_HookedWindowHandle;
+
+    static WPARAM      m_LastVirtualKeyCode;
+    static UCHAR       m_LastScanCode;
+    static BYTE*       m_LastKeyboardState;
+  
 };
 
 #endif
