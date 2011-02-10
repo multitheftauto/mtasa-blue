@@ -1756,7 +1756,7 @@ void CClientGame::UpdateTrailers ( void )
 {
     // This function is here to re-attach trailers if they fall off
     
-    unsigned long ulCurrentTime = GetTickCount ();
+    unsigned long ulCurrentTime = GetTickCount32 ();
 
     CClientVehicle * pVehicle = NULL, * pTrailer = NULL;
     CVehicle * pGameVehicle = NULL, * pGameTrailer = NULL;
@@ -3264,7 +3264,7 @@ bool CClientGame::BreakTowLinkHandler ( CVehicle* pTowedVehicle )
         if ( !bLegal )
         {
             // Save the time it broke (used in UpdateTrailers)
-            pVehicle->SetIllegalTowBreakTime ( GetTickCount () );
+            pVehicle->SetIllegalTowBreakTime ( GetTickCount32 () );
         }
     }
 
@@ -3325,7 +3325,7 @@ void CClientGame::PostWorldProcessHandler ( void )
     m_pManager->GetMarkerManager ()->DoPulse ();
 
     // Update frame time slice
-    DWORD dwCurrentTick = GetTickCount ();
+    DWORD dwCurrentTick = GetTickCount32 ();
     if ( m_dwLastFrameTick )
     {
         m_dwFrameTimeSlice = dwCurrentTick - m_dwLastFrameTick;
@@ -3437,7 +3437,7 @@ void CClientGame::DownloadFiles ( void )
         {
             if ( m_dwTransferStarted == 0 || m_bTransferReset )
             {
-                m_dwTransferStarted = GetTickCount ();
+                m_dwTransferStarted = GetTickCount32 ();
 
                 m_bTransferReset = false;
             }

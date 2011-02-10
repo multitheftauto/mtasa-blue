@@ -62,8 +62,8 @@ public:
     virtual void                            ClearClientBitStreamVersion     ( const NetServerPlayerID &PlayerID ) = 0;
     virtual unsigned short                  GetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID ) = 0;
 
-    virtual void                            ResetStub                       ( DWORD dwType, ... ) = 0;
-    virtual void                            ResetStub                       ( DWORD dwType, va_list ) = 0;
+    virtual void                            ResetStub                       ( uint dwType, ... ) = 0;
+    virtual void                            ResetStub                       ( uint dwType, va_list ) = 0;
 };
 
 #endif

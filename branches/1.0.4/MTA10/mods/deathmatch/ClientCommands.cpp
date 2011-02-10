@@ -666,7 +666,7 @@ void DumpPlayer ( CClientPlayer* pPlayer, FILE* pFile )
 void COMMAND_DumpPlayers ( const char* szCmdLine )
 {
     // Create a file to dump to
-    SString strBuffer ( "%s/dump_%i.txt", g_pClientGame->GetModRoot (), GetTickCount () );
+    SString strBuffer ( "%s/dump_%i.txt", g_pClientGame->GetModRoot (), GetTickCount32 () );
     FILE* pFile = fopen ( strBuffer, "w+" );
     if ( pFile )
     {

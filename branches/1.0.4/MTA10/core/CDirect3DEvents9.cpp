@@ -163,7 +163,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
         if ( !pSurface || pDevice->CreateRenderTarget ( ScreenSize.right, ScreenSize.bottom, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &ms_pSaveLockSurface, NULL ) != D3D_OK ) {
             CCore::GetSingleton ().GetConsole ()->Printf("Couldn't create a new render target.");
         } else {
-            unsigned long ulBeginTime = GetTickCount ();
+            unsigned long ulBeginTime = GetTickCount32 ();
 
             // Copy data from surface to surface
             if ( pDevice->StretchRect ( pSurface, &ScreenSize, ms_pSaveLockSurface, &ScreenSize, D3DTEXF_NONE ) != D3D_OK ) {
@@ -186,7 +186,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
             // Call the post-screenshot function
             CScreenShot::PostScreenShot ( strFileName );
 
-            CCore::GetSingleton ().GetConsole ()->Printf ( "Screenshot capture took %.2f seconds.", (float)(GetTickCount () - ulBeginTime) / 1000.0f );
+            CCore::GetSingleton ().GetConsole ()->Printf ( "Screenshot capture took %.2f seconds.", (float)(GetTickCount32 () - ulBeginTime) / 1000.0f );
         }
 
         CCore::GetSingleton().bScreenShot = false;

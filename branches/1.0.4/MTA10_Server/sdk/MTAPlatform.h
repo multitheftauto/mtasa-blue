@@ -103,9 +103,6 @@ extern "C" bool g_bNoTopBar;
         #define Sleep(duration) usleep(duration * 1000)
     #endif
 
-    // Win32 wrapper function
-    unsigned long GetTickCount ( void );
-
     // Itoa replacement function
     char* itoa ( int value, char* result, int base );
 

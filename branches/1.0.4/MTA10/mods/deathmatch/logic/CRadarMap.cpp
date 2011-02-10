@@ -43,7 +43,7 @@ CRadarMap::CRadarMap ( CClientManager* pManager )
     m_iRadarAlpha = iVar;
 
     // Set the update time to the current time
-    m_ulUpdateTime = GetTickCount ();
+    m_ulUpdateTime = GetTickCount32 ();
 
     // Get the window sizes and set the map variables to default zoom/movement
     m_uiHeight = g_pCore->GetGraphics ()->GetViewportHeight ();
@@ -167,10 +167,10 @@ void CRadarMap::DoPulse ( void )
         }
 
         // If the update time is more than 50ms behind
-        if ( GetTickCount () >= m_ulUpdateTime + 50 )
+        if ( GetTickCount32 () >= m_ulUpdateTime + 50 )
         {
             // Set the update time
-            m_ulUpdateTime = GetTickCount ();
+            m_ulUpdateTime = GetTickCount32 ();
 
             // If we are set to moving then do a zoom/move level jump
             if ( m_bIsMovingNorth )

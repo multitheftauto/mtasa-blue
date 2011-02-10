@@ -246,7 +246,7 @@ void CGame::DoPulse ( void )
     // Lock the critical section so http server won't interrupt in the middle of our pulse
     Lock ();
     // Calculate FPS
-    unsigned long ulCurrentTime = GetTickCount ();
+    unsigned long ulCurrentTime = GetTickCount32 ();
     unsigned long ulDiff = ulCurrentTime - m_ulLastFPSTime;
 
     // Update the progress rotator

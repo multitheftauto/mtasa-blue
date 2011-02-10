@@ -119,7 +119,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                     if ( pVehicle )
                     {
                         pVehicle->m_pLastSyncer = m_pPlayerManager->GetLocalPlayer ();
-                        pVehicle->m_ulLastSyncTime = GetTickCount ();
+                        pVehicle->m_ulLastSyncTime = GetTickCount32 ();
                         pVehicle->m_szLastSyncType = "pure";
                     }
                 }
@@ -1094,7 +1094,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         if ( pVehicle )
         {
             pVehicle->m_pLastSyncer = pPlayer;
-            pVehicle->m_ulLastSyncTime = GetTickCount ();
+            pVehicle->m_ulLastSyncTime = GetTickCount32 ();
             pVehicle->m_szLastSyncType = "pure";
         }
 #endif

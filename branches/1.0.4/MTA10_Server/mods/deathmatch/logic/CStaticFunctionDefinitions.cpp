@@ -1383,7 +1383,7 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
                 unsigned char ucHealth = static_cast < unsigned char > ( fHealth * 1.25f );
                 fHealth = static_cast < float > ( ucHealth ) / 1.25f;
                 pPed->SetHealth ( fHealth );
-                pPed->SetHealthChangeTime ( GetTickCount () );
+                pPed->SetHealthChangeTime ( GetTickCount32 () );
             }
             else
                 return false;
@@ -1393,7 +1393,7 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             pVehicle->SetHealth ( fHealth );
-            pVehicle->SetHealthChangeTime ( GetTickCount () );
+            pVehicle->SetHealthChangeTime ( GetTickCount32 () );
             break;
         }
         default: return false;
@@ -2519,7 +2519,7 @@ bool CStaticFunctionDefinitions::SetPedArmor ( CElement* pElement, float fArmor 
                     fArmor = 100.0f;
 
                 pPed->SetArmor ( fArmor );
-                pPed->SetArmorChangeTime ( GetTickCount () );
+                pPed->SetArmorChangeTime ( GetTickCount32 () );
 
                 unsigned char ucArmor = static_cast < unsigned char > ( fArmor * 1.25 );
 

@@ -596,7 +596,7 @@ void CUpdateSite::DownloadUpdateManifest()
     _snprintf ( szManifestURL, 511, "%s", m_strURL.c_str () ); // pointless currently
     szManifestURL[511] = '\0';
 
-    srand(GetTickCount());
+    srand(GetTickCount32());
     _snprintf ( szDownload, 511, "temp%d.xml", rand() );
     szDownload[511] = '\0';
     m_strManifestDownloadFileName = szDownload;

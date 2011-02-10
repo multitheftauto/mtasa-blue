@@ -203,8 +203,8 @@ public:
     inline void                                 IncrementPuresync           ( void )                        { m_uiPuresyncPackets++; }
     inline unsigned int                         GetPuresyncCount            ( void ) const                  { return m_uiPuresyncPackets; }
 
-    void                                        NotifyReceivedSync        ( void )                        { m_ulLastReceivedSyncTime = GetTickCount (); }
-    unsigned long                               GetTicksSinceLastReceivedSync ( void ) const              { return GetTickCount () - m_ulLastReceivedSyncTime; }
+    void                                        NotifyReceivedSync        ( void )                        { m_ulLastReceivedSyncTime = GetTickCount32 (); }
+    unsigned long                               GetTicksSinceLastReceivedSync ( void ) const              { return GetTickCount32 () - m_ulLastReceivedSyncTime; }
 
     const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
     void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );
