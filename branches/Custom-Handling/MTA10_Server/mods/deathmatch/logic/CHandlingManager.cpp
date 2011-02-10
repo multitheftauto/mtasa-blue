@@ -46,7 +46,7 @@ CHandlingManager::CHandlingManager ( void )
     m_HandlingNames["centerOfMass"] =                   HANDLING_CENTEROFMASS;                  // works
     m_HandlingNames["percentSubmerged"] =               HANDLING_PERCENTSUBMERGED;              // works
     m_HandlingNames["tractionMultiplier"] =             HANDLING_TRACTIONMULTIPLIER;            // works
-    m_HandlingNames["driveType"] =                      HANDLING_DRIVETYPE;                     // doesn't work
+    m_HandlingNames["driveType"] =                      HANDLING_DRIVETYPE;                     // works
     m_HandlingNames["engineType"] =                     HANDLING_ENGINETYPE;                    // works
     m_HandlingNames["numberOfGears"] =                  HANDLING_NUMOFGEARS;                    // works
     m_HandlingNames["engineAcceleration"] =             HANDLING_ENGINEACCELERATION;            // works
@@ -60,9 +60,9 @@ CHandlingManager::CHandlingManager ( void )
     m_HandlingNames["tractionBias"] =                   HANDLING_TRACTIONBIAS;                  // works
     m_HandlingNames["suspensionForceLevel"] =           HANDLING_SUSPENSION_FORCELEVEL;         // works
     m_HandlingNames["suspensionDamping"] =              HANDLING_SUSPENSION_DAMPING;            // works
-    m_HandlingNames["suspensionHighSpeedDamping"] =     HANDLING_SUSPENSION_HIGHSPEEDDAMPING;   // probably works but needs proper testing
-    m_HandlingNames["suspensionUpperLimit"] =           HANDLING_SUSPENSION_UPPER_LIMIT;        // doesn't work
-    m_HandlingNames["suspensionLowerLimit"] =           HANDLING_SUSPENSION_LOWER_LIMIT;        // doesn't work
+    m_HandlingNames["suspensionHighSpeedDamping"] =     HANDLING_SUSPENSION_HIGHSPEEDDAMPING;   // works
+    m_HandlingNames["suspensionUpperLimit"] =           HANDLING_SUSPENSION_UPPER_LIMIT;        // works
+    m_HandlingNames["suspensionLowerLimit"] =           HANDLING_SUSPENSION_LOWER_LIMIT;        // works
     m_HandlingNames["suspensionFrontRearBias"] =        HANDLING_SUSPENSION_FRONTREARBIAS;      // works
     m_HandlingNames["suspensionAntiDiveMultiplier"] =   HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER; // works
     m_HandlingNames["collisionDamageMultiplier"] =      HANDLING_COLLISIONDAMAGEMULTIPLIER;     // works

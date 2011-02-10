@@ -1894,11 +1894,12 @@ void CVehicleSA::RecalculateSuspensionValues ( void )
 {
     CVehicleSAInterface * pInt = GetVehicleInterface();
     CModelInfo* pModelInfo = pGame->GetModelInfo ( this->GetModelIndex() );
-    
-    // Trains and Boats crash... Kart? o.O
-    if ( pModelInfo->IsBoat() || pModelInfo->GetModel() == 571 || pModelInfo->IsTrain() )
+    DWORD dwModel = pModelInfo->GetModel();
+    // Trains (Their trailers do as well!) and boats crash obviously.
+    if ( pModelInfo->IsBoat() || pModelInfo->IsTrain() || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
         return;
 
+    // Trailers Work best using the CAutomobile version.
     DWORD dwFunc = FUNC_CAutomobile__RecalculateSuspension;
     DWORD dwVeh = reinterpret_cast < DWORD > ( pInt );
     

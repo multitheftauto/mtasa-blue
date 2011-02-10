@@ -160,6 +160,7 @@ class CVehicleSA;
 
 #define FUNC_CAutomobile__RecalculateSuspension 0x6A65D0
 #define FUNC_CBike__RecalculateSuspension 0x6B89B0
+#define FUNC_CTrailer__RecalculateSuspension 0x6F1A0
 #define FUNC_CMTruck__RecalculateSuspension 0x6C7FB0
 
 typedef struct
