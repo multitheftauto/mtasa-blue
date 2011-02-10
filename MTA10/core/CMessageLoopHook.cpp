@@ -21,7 +21,7 @@ template<> CMessageLoopHook * CSingleton< CMessageLoopHook >::m_pSingleton = NUL
 
 WPARAM  CMessageLoopHook::m_LastVirtualKeyCode = NULL;
 UCHAR   CMessageLoopHook::m_LastScanCode = NULL;
-BYTE*   CMessageLoopHook::m_LastKeyboardState = new BYTE;
+BYTE*   CMessageLoopHook::m_LastKeyboardState = new BYTE[256];
 
 CMessageLoopHook::CMessageLoopHook ( )
 {
