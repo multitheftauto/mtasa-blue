@@ -550,6 +550,8 @@ protected:
     CVector                     m_vecGravity;
     SColor                      m_HeadLightColor;
 
+    bool                        m_bUpdateHandling;
+
 public:
     CClientPlayer *             m_pLastSyncer;
     unsigned long               m_ulLastSyncTime;

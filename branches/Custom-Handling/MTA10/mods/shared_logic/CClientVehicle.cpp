@@ -134,6 +134,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
     m_fHeliRotorSpeed = 0.0f;
+    m_bUpdateHandling = false;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -2346,6 +2347,11 @@ void CClientVehicle::Create ( void )
         if ( m_pHandlingEntry )
         {
             m_pVehicle->SetHandlingData ( m_pHandlingEntry );
+            
+            if ( m_bUpdateHandling )
+            {
+                ApplyHandling();
+            }
         }
 #endif
         // Tell the streamer we've created this object
@@ -3580,6 +3586,7 @@ void CClientVehicle::ApplyHandling( void )
         // Update vehicle settings
         m_pVehicle->UpdateHandlingStatus ();
     }
+    m_bUpdateHandling = true;
 }
 
 
