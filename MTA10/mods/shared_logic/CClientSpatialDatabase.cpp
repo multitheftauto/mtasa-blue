@@ -180,6 +180,8 @@ void CClientSpatialDatabaseImpl::FlushUpdateQueue ( void )
     int iTotalToUpdate = m_UpdateQueue.size ();
     int iTotalUpdated = 0;
 
+    std::map < CClientEntity*, int > updateQueueCopy = m_UpdateQueue;
+    m_UpdateQueue.clear ();
     for ( std::map < CClientEntity*, int >::iterator it = m_UpdateQueue.begin (); it != m_UpdateQueue.end (); ++it )
     {
         CClientEntity* pEntity = it->first;
@@ -224,7 +226,6 @@ void CClientSpatialDatabaseImpl::FlushUpdateQueue ( void )
                                                 ) );
         #endif
     }
-    m_UpdateQueue.clear ();
 
     #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTB
         if ( iTotalToUpdate )
