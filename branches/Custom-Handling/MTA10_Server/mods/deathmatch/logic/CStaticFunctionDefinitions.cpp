@@ -4633,9 +4633,9 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_PERCENTSUBMERGED:
                 pEntry->SetPercentSubmerged ( uiValue );
                 break;
-            case HANDLING_MONETARY:
+            /*case HANDLING_MONETARY:
                 pEntry->SetMonetary ( uiValue );
-                break;
+                break;*/
             case HANDLING_HANDLINGFLAGS:
                 pEntry->SetHandlingFlags ( uiValue );
                 break;
@@ -4815,7 +4815,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
                     return false;
                 break;
             }
-            case HANDLING_HEADLIGHT:
+            /*case HANDLING_HEADLIGHT:
             {
                 if ( strValue == "small" )
                 {
@@ -4866,7 +4866,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
                 else
                     return false;
                 break;
-            }
+            }*/
             default:
                 return false;
         }
@@ -5966,9 +5966,9 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling ( CVehicle* pVehicle, bool
         handling.data.uiModelFlags                  = pNewEntry->GetModelFlags ();
         handling.data.uiHandlingFlags               = pNewEntry->GetHandlingFlags ();
         handling.data.fSeatOffsetDistance           = pNewEntry->GetSeatOffsetDistance ();
-        handling.data.uiMonetary                    = pNewEntry->GetMonetary ();
-        handling.data.ucHeadLight                   = pNewEntry->GetHeadLight ();
-        handling.data.ucTailLight                   = pNewEntry->GetTailLight ();
+        //handling.data.uiMonetary                    = pNewEntry->GetMonetary ();
+        //handling.data.ucHeadLight                   = pNewEntry->GetHeadLight ();
+        //handling.data.ucTailLight                   = pNewEntry->GetTailLight ();
         handling.data.ucAnimGroup                   = pNewEntry->GetAnimGroup ();
         BitStream.pBitStream->Write ( &handling );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_HANDLING, *BitStream.pBitStream ) );

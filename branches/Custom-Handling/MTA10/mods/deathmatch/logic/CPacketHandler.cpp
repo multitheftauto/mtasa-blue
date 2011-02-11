@@ -2701,9 +2701,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntry->SetModelFlags ( handling.data.uiModelFlags );
                         pEntry->SetHandlingFlags ( handling.data.uiHandlingFlags );
                         pEntry->SetSeatOffsetDistance ( handling.data.fSeatOffsetDistance );
-                        pEntry->SetMonetary ( handling.data.uiMonetary );
-                        pEntry->SetHeadLight ( (CHandlingEntry::eLightType)handling.data.ucHeadLight );
-                        pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
+                        //pEntry->SetMonetary ( handling.data.uiMonetary );
+                        //pEntry->SetHeadLight ( (CHandlingEntry::eLightType)handling.data.ucHeadLight );
+                        //pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
                         pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
                         pVehicle->ApplyHandling();
                     }

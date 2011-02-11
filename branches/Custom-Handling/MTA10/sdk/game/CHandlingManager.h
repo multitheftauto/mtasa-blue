@@ -19,6 +19,7 @@ class CHandlingManager
 public:
     virtual CHandlingEntry*         CreateHandlingData      ( void ) = 0;
     virtual const CHandlingEntry*   GetOriginalHandlingData ( enum eVehicleTypes eModel ) = 0;
+    virtual eHandlingProperty       GetPropertyEnumFromName ( std::string strName ) = 0;
 };
 
 #endif

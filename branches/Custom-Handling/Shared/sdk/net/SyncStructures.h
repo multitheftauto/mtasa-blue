@@ -1475,9 +1475,9 @@ struct SVehicleHandlingSync : public ISyncStructure
             bitStream.Read ( data.uiModelFlags ) &&
             bitStream.Read ( data.uiHandlingFlags ) &&
             bitStream.Read ( data.fSeatOffsetDistance ) &&
-            bitStream.Read ( data.uiMonetary ) &&
-            bitStream.Read ( data.ucHeadLight ) &&
-            bitStream.Read ( data.ucTailLight ) &&
+            //bitStream.Read ( data.uiMonetary ) &&
+            //bitStream.Read ( data.ucHeadLight ) &&
+            //bitStream.Read ( data.ucTailLight ) &&
             bitStream.Read ( data.ucAnimGroup )
             )
             return true;
@@ -1518,9 +1518,9 @@ struct SVehicleHandlingSync : public ISyncStructure
         bitStream.Write ( data.uiModelFlags );
         bitStream.Write ( data.uiHandlingFlags );
         bitStream.Write ( data.fSeatOffsetDistance );
-        bitStream.Write ( data.uiMonetary );
-        bitStream.Write ( data.ucHeadLight );
-        bitStream.Write ( data.ucTailLight );
+        //bitStream.Write ( data.uiMonetary );
+        //bitStream.Write ( data.ucHeadLight );
+		//bitStream.Write ( data.ucTailLight );
         bitStream.Write ( data.ucAnimGroup );
     }
 
@@ -1564,10 +1564,10 @@ struct SVehicleHandlingSync : public ISyncStructure
         unsigned int    uiModelFlags;                   // +204
         unsigned int    uiHandlingFlags;                // +208
         float           fSeatOffsetDistance;            // +212
-        unsigned int    uiMonetary;                     // +216
+        //unsigned int    uiMonetary;                     // +216
 
-        unsigned char   ucHeadLight;                    // +220
-        unsigned char   ucTailLight;                    // +221
+        //unsigned char   ucHeadLight;                    // +220
+        //unsigned char   ucTailLight;                    // +221
         unsigned char   ucAnimGroup;                    // +222
     } data;
 };

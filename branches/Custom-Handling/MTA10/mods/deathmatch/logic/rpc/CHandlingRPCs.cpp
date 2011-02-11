@@ -64,9 +64,9 @@ void CHandlingRPCs::SetVehicleHandling ( CClientEntity* pSource, NetBitStreamInt
         pEntry->SetModelFlags ( handling.data.uiModelFlags );
         pEntry->SetHandlingFlags ( handling.data.uiHandlingFlags );
         pEntry->SetSeatOffsetDistance ( handling.data.fSeatOffsetDistance );
-        pEntry->SetMonetary ( handling.data.uiMonetary );
-        pEntry->SetHeadLight ( (CHandlingEntry::eLightType)handling.data.ucHeadLight );
-        pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
+        //pEntry->SetMonetary ( handling.data.uiMonetary );
+        //pEntry->SetHeadLight ( (CHandlingEntry::eLightType)handling.data.ucHeadLight );
+        //pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
         pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
         
         Vehicle.ApplyHandling();
@@ -256,10 +256,10 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                     pHandlingEntry->SetSeatOffsetDistance ( fFloat );
                     break;
 
-                case HANDLING_MONETARY:
+                /*case HANDLING_MONETARY:
                     bitStream.Read ( uiInt );
                     pHandlingEntry->SetMonetary ( uiInt );
-                    break;
+                    break;*/
 
                 case HANDLING_HANDLINGFLAGS:
                     bitStream.Read ( uiInt );
@@ -271,7 +271,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                     pHandlingEntry->SetModelFlags ( uiInt );
                     break;
 
-                case HANDLING_HEADLIGHT:
+                /*case HANDLING_HEADLIGHT:
                     bitStream.Read ( ucChar );
                     if ( ucChar > CHandlingEntry::TALL )
                         ucChar = CHandlingEntry::TALL;
@@ -285,7 +285,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                         ucChar = CHandlingEntry::TALL;
 
                     pHandlingEntry->SetTailLight ( static_cast < CHandlingEntry::eLightType > ( ucChar ) );
-                    break;
+                    break;*/
 
                 case HANDLING_ANIMGROUP:
                     bitStream.Read ( ucChar );

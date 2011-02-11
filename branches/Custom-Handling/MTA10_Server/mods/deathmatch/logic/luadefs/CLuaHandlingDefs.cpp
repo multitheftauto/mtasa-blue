@@ -90,7 +90,7 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                     break;
                                 }
                             case HANDLING_PERCENTSUBMERGED: // unsigned int
-                            case HANDLING_MONETARY:
+                            //case HANDLING_MONETARY:
                             case HANDLING_HANDLINGFLAGS:
                             case HANDLING_MODELFLAGS:
                                 {
@@ -141,8 +141,8 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                 }
                             case HANDLING_DRIVETYPE:
                             case HANDLING_ENGINETYPE:
-                            case HANDLING_HEADLIGHT:
-                            case HANDLING_TAILLIGHT:
+                            //case HANDLING_HEADLIGHT:
+                            //case HANDLING_TAILLIGHT:
                                 {
                                     if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
                                     {

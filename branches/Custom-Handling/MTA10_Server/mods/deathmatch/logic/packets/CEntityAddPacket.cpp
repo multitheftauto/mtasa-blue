@@ -456,9 +456,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         handling.data.uiModelFlags                  = pEntry->GetModelFlags ();
                         handling.data.uiHandlingFlags               = pEntry->GetHandlingFlags ();
                         handling.data.fSeatOffsetDistance           = pEntry->GetSeatOffsetDistance ();
-                        handling.data.uiMonetary                    = pEntry->GetMonetary ();
-                        handling.data.ucHeadLight                   = pEntry->GetHeadLight ();
-                        handling.data.ucTailLight                   = pEntry->GetTailLight ();
+                        //handling.data.uiMonetary                    = pEntry->GetMonetary ();
+                        //handling.data.ucHeadLight                   = pEntry->GetHeadLight ();
+                        //handling.data.ucTailLight                   = pEntry->GetTailLight ();
                         handling.data.ucAnimGroup                   = pEntry->GetAnimGroup ();
                         BitStream.Write ( &handling );
                     }

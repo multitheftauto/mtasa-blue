@@ -68,11 +68,11 @@ CHandlingManager::CHandlingManager ( void )
     m_HandlingNames["collisionDamageMultiplier"] =      HANDLING_COLLISIONDAMAGEMULTIPLIER;     // works
     m_HandlingNames["seatOffsetDistance"] =             HANDLING_SEATOFFSETDISTANCE;            // works
     m_HandlingNames["monetary"] =                       HANDLING_MONETARY;                      // useless as it only influences SP stats (value of damaged property)
-    m_HandlingNames["handlingFlags"] =                  HANDLING_HANDLINGFLAGS;                 // not tested but we need another way to set these values in lua cause it has no bit functions
-    m_HandlingNames["modelFlags"] =                     HANDLING_MODELFLAGS;                    // not tested but we need another way to set these values in lua cause it has no bit functions
+    m_HandlingNames["handlingFlags"] =                  HANDLING_HANDLINGFLAGS;                 // works
+    m_HandlingNames["modelFlags"] =                     HANDLING_MODELFLAGS;                    // works
     m_HandlingNames["headLight"] =                      HANDLING_HEADLIGHT;                     // doesn't work
     m_HandlingNames["tailLight"] =                      HANDLING_TAILLIGHT;                     // doesn't seem to work*
-    m_HandlingNames["animGroup"] =                      HANDLING_ANIMGROUP;                     // needs more testing - tried and player couldn't find the door model thing? *
+    m_HandlingNames["animGroup"] =                      HANDLING_ANIMGROUP;                     // works model based
 
 }
 //* needs testing by someone who knows more about handling

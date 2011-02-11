@@ -28,6 +28,8 @@ public:
 
     eHandlingTypes              GetHandlingID                   ( eVehicleTypes eModel );
 
+    eHandlingProperty           GetPropertyEnumFromName         ( std::string strName );
+
 private:
     void                        InitializeDefaultHandlings      ( void );
 
@@ -40,6 +42,8 @@ private:
 
     // Our wrapper classes for the classes GTA use and the original data
     static CHandlingEntrySA*    m_pOriginalEntries [HT_MAX];
+
+    std::map < std::string, eHandlingProperty > m_HandlingNames;
 };
 
 #endif
