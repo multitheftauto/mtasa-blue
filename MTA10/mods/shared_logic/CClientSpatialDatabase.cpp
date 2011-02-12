@@ -182,7 +182,7 @@ void CClientSpatialDatabaseImpl::FlushUpdateQueue ( void )
 
     std::map < CClientEntity*, int > updateQueueCopy = m_UpdateQueue;
     m_UpdateQueue.clear ();
-    for ( std::map < CClientEntity*, int >::iterator it = m_UpdateQueue.begin (); it != m_UpdateQueue.end (); ++it )
+    for ( std::map < CClientEntity*, int >::iterator it = updateQueueCopy.begin (); it != updateQueueCopy.end (); ++it )
     {
         CClientEntity* pEntity = it->first;
 
