@@ -137,6 +137,8 @@ bool CObject::ReadSpecialData ( void )
 
 const CVector& CObject::GetPosition ( void )
 {
+    CVector vecOldPosition = m_vecPosition;
+
     // Are we attached to something?
     if ( m_pAttachedTo ) GetAttachedPosition ( m_vecPosition );
 
@@ -162,7 +164,8 @@ const CVector& CObject::GetPosition ( void )
         m_vecPosition = m_moveData.vecStartPosition + vecJourney;
     }
 
-    UpdateSpatialData ();
+    if ( vecOldPosition != m_vecPosition )
+        UpdateSpatialData ();     // This is necessary because 'GetAttachedPosition ( m_vecPosition )' can change alter this objects position
     // Finally, return it
     return m_vecPosition;
 }
