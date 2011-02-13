@@ -40,7 +40,7 @@ class CTCPManager : public CSingleton < CTCPManager >
     bool                Initialize                  ( void );
     void                Reset                       ( void );
 
-    void                HandleEvent                 ( unsigned int uiID, LPARAM lType );
+    void                HandleEvent                 ( unsigned int uiID, WPARAM wParam, LPARAM lType );
 
     private:
 
