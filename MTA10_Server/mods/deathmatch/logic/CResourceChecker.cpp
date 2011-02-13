@@ -921,22 +921,27 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
 
 ///////////////////////////////////////////////////////////////
 //
-// CResourceChecker::Begin/EndUpgradeMode
+// CResourceChecker::LogUpgradeWarnings
 //
-// Static functions to globaly switch from checking mode, to upgrade mode.
+//
 //
 ///////////////////////////////////////////////////////////////
-bool CResourceChecker::m_bUpgradeScripts = false;
-
-void CResourceChecker::BeginUpgradeMode()
-{
-    m_bUpgradeScripts = true;
-}
-
-void CResourceChecker::EndUpgradeMode()
+void CResourceChecker::LogUpgradeWarnings ( CResource* pResource, const string& strResourceZip )
 {
     m_bUpgradeScripts = false;
-    CLogger::LogPrint( "Basic script upgrade completed.\n" );
+    CheckResourceForIssues( pResource, strResourceZip );
 }
 
 
+///////////////////////////////////////////////////////////////
+//
+// CResourceChecker::ApplyUpgradeModifications
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CResourceChecker::ApplyUpgradeModifications ( CResource* pResource, const string& strResourceZip )
+{
+    m_bUpgradeScripts = true;
+    CheckResourceForIssues( pResource, strResourceZip );
+}

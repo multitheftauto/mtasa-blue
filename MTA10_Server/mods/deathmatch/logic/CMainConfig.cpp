@@ -381,8 +381,10 @@ bool CMainConfig::LoadExtended ( void )
     pNode = NULL;
     uiCurrentIndex = 0;
     bool bFoundDefault = false;
-    bool bFirst = true;
-    bool bNoProgress = false;
+
+    CLogger::SetMinLogLevel ( LOGLEVEL_MEDIUM );
+    CLogger::LogPrint ( "Starting resources..." );
+    CLogger::ProgressDotsBegin ();
 
     do
     {
@@ -400,9 +402,7 @@ bool CMainConfig::LoadExtended ( void )
                 CResource * loadedResource = g_pGame->GetResourceManager ()->GetResource ( strBuffer.c_str () );
                 if ( !loadedResource )
                 {
-                    CLogger::LogPrintNoStamp ( "\n" );
                     CLogger::ErrorPrintf ( "Couldn't find resource %s. Check it exists.\n", strBuffer.c_str () );
-                    bNoProgress = true;
                 }
                 else
                 {
@@ -416,26 +416,13 @@ bool CMainConfig::LoadExtended ( void )
                              strStartup.compare ( "yes" ) == 0 ||
                              strStartup.compare ( "1" ) == 0 )
                         {
-                            CLogger::SetOutputEnabled ( false );
                             if ( loadedResource->Start( NULL, true ) )
                             {
-                                CLogger::SetOutputEnabled ( true );
-                                if ( !bNoProgress )
-                                {
-                                    if ( bFirst )
-                                        CLogger::LogPrint ( "Starting resources..." );
-                                    else
-                                        CLogger::LogPrintNoStamp ( "." );
-
-                                    bFirst = false;
-                                }
+                                CLogger::ProgressDotsUpdate ();
                             }
                             else
                             {
-                                CLogger::SetOutputEnabled ( true );
-                                CLogger::LogPrintNoStamp ( "\n" );
                                 CLogger::ErrorPrintf ( "Unable to start resource %s; %s\n", strBuffer.c_str (), loadedResource->GetFailureReason ().c_str () );
-                                bNoProgress = true;
                             }
                         }
                     }
@@ -472,9 +459,7 @@ bool CMainConfig::LoadExtended ( void )
                         }
                         else
                         {
-                            CLogger::LogPrintNoStamp ( "\n" );
                             CLogger::ErrorPrintf ( "More than one default resource specified!\n" );
-                            bNoProgress = true;
                         }
                     }
                 }
@@ -483,7 +468,8 @@ bool CMainConfig::LoadExtended ( void )
     }
     while ( pNode );
 
-    if ( !bNoProgress ) CLogger::LogPrintNoStamp ( "\n" );
+    CLogger::ProgressDotsEnd ();
+    CLogger::SetMinLogLevel ( LOGLEVEL_LOW );
 
     // Register the commands
     RegisterCommand ( "update", CConsoleCommands::Update, false );
