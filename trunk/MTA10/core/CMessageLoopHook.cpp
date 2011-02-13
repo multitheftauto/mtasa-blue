@@ -134,11 +134,11 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
             return true;
 
         // See if this is message was caused by our asynchronous sockets
-        if ( uMsg >= WM_ASYNCTRAP && uMsg <= ( WM_ASYNCTRAP + 255 ))
+        if ( uMsg >= WM_ASYNCTRAP && uMsg <= ( WM_ASYNCTRAP + 511 ))
         {
             /* ACHTUNG: uMsg - 10? Windows seems to add 10 or there's a bug in the message code. Hack! */
             // Let the CTCPManager handle it
-            CTCPManager::GetSingletonPtr ()->HandleEvent ( ( uMsg - WM_ASYNCTRAP ), lParam );
+            CTCPManager::GetSingletonPtr ()->HandleEvent ( ( uMsg - WM_ASYNCTRAP ), wParam, lParam );
         }
 
         bool bWasCaptureKey = false;

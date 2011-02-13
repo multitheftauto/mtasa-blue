@@ -35,7 +35,7 @@ public:
     virtual bool            Initialize          ( unsigned int uiID ) = 0;
 
     virtual const char*     GetLastError        ( void ) = 0;
-    virtual void            FireEvent           ( LPARAM lType ) = 0;
+    virtual void            FireEvent           ( bool bIsResolveEvent, uint uiResolveId, LPARAM lType ) = 0;
 
     virtual void            SetEventClass       ( void* pClass ) = 0;
     virtual void            SetEventRead        ( PFNEVENT pEvent ) = 0;
