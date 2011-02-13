@@ -34,13 +34,17 @@ bool CResourceScriptItem::Start ( void )
     // Load the file
     std::vector < char > buffer;
     FileLoad ( m_strResourceFileName, buffer );
+    unsigned int iSize = buffer.size();
 
     //UTF-8 BOM?  Compare by checking the standard UTF-8 BOM of 3 characters (in signed format, hence negative)
-    if ( buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 ) //Not UTF-8
-        // Load the resource text
-        m_pVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), buffer.size (), m_strResourceFileName.c_str() );
-    else // Load ignoring the first 3 bytes
-        m_pVM->LoadScriptFromBuffer ( &buffer.at ( 3 ), buffer.size ()-3, m_strResourceFileName.c_str() );
+    if ( iSize > 0 ) 
+    {
+        if ( buffer[0] != -0x11 || iSize < 1 || buffer[1] != -0x45 || iSize < 2 ||  buffer[2] != -0x41 ) //Not UTF-8
+                // Load the resource text
+                m_pVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, m_strResourceFileName.c_str() );
+        else // Load ignoring the first 3 bytes
+            m_pVM->LoadScriptFromBuffer ( &buffer.at ( 3 ), iSize-3, m_strResourceFileName.c_str() );
+    }
 
     return true;
 }
