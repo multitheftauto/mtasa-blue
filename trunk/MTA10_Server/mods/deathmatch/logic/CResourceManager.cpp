@@ -235,9 +235,12 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 
 void CResourceManager::Upgrade ( void )
 {
-    CResourceChecker::BeginUpgradeMode();
+    // Modify source files if needed
+    for ( list < CResource* > ::const_iterator iter = m_resources.begin () ; iter != m_resources.end (); iter++ )
+        (*iter)->ApplyUpgradeModifications ();
+
+    // Refresh everything
     Refresh ( true );
-    CResourceChecker::EndUpgradeMode();
 }
 
 char * CResourceManager::GetResourceDirectory ( void )
@@ -629,7 +632,9 @@ bool CResourceManager::Reload ( CResource* pResource )
 
 bool CResourceManager::StopAllResources ( void )
 {
+    CLogger::SetMinLogLevel ( LOGLEVEL_MEDIUM );
     CLogger::LogPrint ( "Stopping resources..." );
+    CLogger::ProgressDotsBegin ();
 
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
@@ -637,19 +642,18 @@ bool CResourceManager::StopAllResources ( void )
         CResource* pResource = *iter;
         if ( pResource->IsActive () )
         {
-            CLogger::SetOutputEnabled ( false );
 
             if ( pResource->IsPersistent () )
                 pResource->SetPersistent ( false );
 
             pResource->Stop ( true );
 
-            CLogger::SetOutputEnabled ( true );
-            CLogger::LogPrintNoStamp ( "." );
+            CLogger::ProgressDotsUpdate ();
         }
     }
 
-    CLogger::LogPrintNoStamp ( "\n" );
+    CLogger::ProgressDotsEnd ();
+    CLogger::SetMinLogLevel ( LOGLEVEL_LOW );
     return true;
 }
 

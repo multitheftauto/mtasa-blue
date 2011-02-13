@@ -9412,7 +9412,7 @@ int CLuaFunctionDefinitions::OutputServerLog ( lua_State* luaVM )
         const char* szText = lua_tostring ( luaVM, 1 );
 
         // Print it
-        CLogger::LogPrintf ( "%s\n", szText );
+        CLogger::LogPrintf ( LOGLEVEL_LOW, "%s\n", szText );
         lua_pushboolean ( luaVM, true );
         return 1;
     }

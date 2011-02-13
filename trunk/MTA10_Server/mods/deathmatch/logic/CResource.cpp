@@ -83,6 +83,8 @@ CResource::CResource ( CResourceManager * resourceManager, const char * szResour
 
     pthread_mutex_init(&m_mutex, NULL);
 
+    m_bDoneUpgradeWarnings = false;
+
     if ( bLoad )
         Load();
 }
@@ -377,7 +379,9 @@ bool CResource::Load ( void )
         Arguments.PushResource ( this );
         m_pRootElement->CallEvent ( "onResourceLoad", Arguments );*/
         //currently called before the events are initialised @Kevuwk
-    }
+
+        m_bDoneUpgradeWarnings = false;
+   }
 
     // Return if we successfully loaded
     return m_bLoaded;
@@ -594,9 +598,6 @@ bool CResource::HasResourceChanged ()
 {
     string strPath;
 
-    CResourceChecker resourceChecker;
-    resourceChecker.CheckResourceForIssues ( this, m_strResourceZip );
-
     list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
     for ( ; iterf != m_resourceFiles.end (); iterf++ )
     {
@@ -618,6 +619,12 @@ bool CResource::HasResourceChanged ()
 }
 
 
+void CResource::ApplyUpgradeModifications ( void )
+{
+    CResourceChecker ().ApplyUpgradeModifications ( this, m_strResourceZip );
+}
+
+
 bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, bool bStartIncludedResources, bool bConfigs, bool bMaps, bool bScripts, bool bHTML, bool bClientConfigs, bool bClientScripts, bool bClientFiles )
 {
     if ( m_bLoaded && !m_bActive )
@@ -628,6 +635,13 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         {
             // Start cancelled by another resource
             return false;
+        }
+
+        // CheckForIssues
+        if ( !m_bDoneUpgradeWarnings )
+        {
+            m_bDoneUpgradeWarnings = true;
+            CResourceChecker ().LogUpgradeWarnings ( this, m_strResourceZip );
         }
 
         m_bStarting = true;
@@ -670,7 +684,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
 
         // We're now active
         m_bActive = true;
-        CLogger::LogPrintf ( "Starting %s\n", m_strResourceName.c_str () );
+        CLogger::LogPrintf ( LOGLEVEL_LOW, "Starting %s\n", m_strResourceName.c_str () );
 
         // Remember the time we started
         time ( &m_timeStarted );
@@ -842,7 +856,7 @@ bool CResource::Stop ( bool bStopManually )
         m_bStopping = true;
 
         // Tell the log that we've stopped this resource
-        CLogger::LogPrintf ( "Stopping %s\n", m_strResourceName.c_str () );
+        CLogger::LogPrintf ( LOGLEVEL_LOW, "Stopping %s\n", m_strResourceName.c_str () );
 
         // Tell the modules we are stopping
         g_pGame->GetLuaManager ()->GetLuaModuleManager ()->_ResourceStopping ( m_pVM->GetVirtualMachine () );

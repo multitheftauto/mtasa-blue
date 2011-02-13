@@ -213,6 +213,7 @@ private:
     bool                    m_bClientScripts;
     bool                    m_bClientFiles;
     bool                    m_bHasStarted;
+    bool                    m_bDoneUpgradeWarnings;
 
     class CResourceManager *      m_resourceManager; 
     class CLuaMain *        m_pVM;
@@ -302,6 +303,7 @@ public:
     CChecksum               GenerateChecksum ( void );
     inline CChecksum        GetLastChecksum ( void ) { return m_checksum; }
     bool                    HasResourceChanged ( void );
+    void                    ApplyUpgradeModifications ( void );
 
     void                    AddTemporaryInclude ( CResource * resource );
     const std::string&      GetFailureReason ( void )
