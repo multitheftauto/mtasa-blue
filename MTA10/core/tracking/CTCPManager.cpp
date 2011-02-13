@@ -42,14 +42,17 @@ CTCPManager::~CTCPManager ( )
     }
 }
 
-void CTCPManager::HandleEvent ( unsigned int uiID, LPARAM lType )
+void CTCPManager::HandleEvent ( unsigned int uiInID, WPARAM wParam, LPARAM lType )
 {
+    uint uiID = uiInID & 255;
+    bool bIsResolveEvent = ( uiInID & 256 ) != 0;
+
     // Call the CTCP socket's event handler that's associated with the uiID argument
-    if ( m_pSocket[uiID] != NULL )
+    if ( m_pSocket[ uiID ] != NULL )
     {
         // We know it's a derived class for sure.. so static_cast it without any error checking
-        CTCPClientSocketImpl* pSocket = static_cast < CTCPClientSocketImpl* > ( m_pSocket[uiID] );
-        pSocket->FireEvent ( lType );
+        CTCPClientSocketImpl* pSocket = static_cast < CTCPClientSocketImpl* > ( m_pSocket[ uiID ] );
+        pSocket->FireEvent ( bIsResolveEvent, wParam, lType );
     }
 }
 
