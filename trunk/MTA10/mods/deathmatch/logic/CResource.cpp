@@ -314,7 +314,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
             if ( iSize > 0 && CChecksum::GenerateChecksumFromBuffer ( &buffer.at ( 0 ), iSize ).CompareWithLegacy ( pResourceFile->GetServerChecksum () ) )
             {
                 //UTF-8 BOM?  Compare by checking the standard UTF-8 BOM of 3 characters (in signed format, hence negative)
-                if ( buffer[0] != -0x11 || iSize < 1 || buffer[1] != -0x45 || iSize < 2 ||  buffer[2] != -0x41 ) //Not UTF-8
+                if ( iSize < 3 || buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 ) //Not UTF-8
                     // Load the resource text
                     m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName (), false );
                 else // Load ignoring the first 3 bytes
