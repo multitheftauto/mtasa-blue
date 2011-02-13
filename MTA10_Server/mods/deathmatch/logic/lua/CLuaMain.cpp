@@ -263,12 +263,25 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
     return false;
 }
 
-bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName )
+bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 )
 {
     if ( m_luaVM )
     {
+        std::string strUTFScript;
+        if ( !bUTF8 ) //If it's not a marked UTF-8 script
+        {
+            std::string strBuffer = std::string(cpBuffer);
+            strBuffer.resize(uiSize); //Clamp to end size;
+            strUTFScript = ConvertToANSI(TranslateToUTF8( strBuffer ));
+            if ( uiSize != strUTFScript.size() )
+            {
+                uiSize = strUTFScript.size();
+                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script '%s' is not encoded in UTF-8.  Loading as ANSI...", ConformResourcePath(szFileName).c_str() );
+            }
+        }
+
         // Run the script
-        if ( luaL_loadbuffer ( m_luaVM, cpBuffer, uiSize, SString ( "@%s", szFileName ) ) )
+        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", szFileName ) ) )
         {
             // Print the error
             std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );

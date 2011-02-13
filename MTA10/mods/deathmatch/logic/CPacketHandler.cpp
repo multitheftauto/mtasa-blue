@@ -1102,7 +1102,7 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
             char* szMessage = new char[iNumberOfBytesUsed + 1];
             bitStream.Read ( szMessage, iNumberOfBytesUsed );
             szMessage [iNumberOfBytesUsed] = 0;
-            if ( SharedUtil::ConvertToUTF8(szMessage).size() <= MAX_CHATECHO_LENGTH )
+            if ( ConvertToUTF8(szMessage).size() <= MAX_CHATECHO_LENGTH )
             {
                 // Strip it for bad characters
                 StripControlCodes ( szMessage, ' ' );

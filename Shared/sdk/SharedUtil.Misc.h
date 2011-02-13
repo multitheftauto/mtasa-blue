@@ -111,6 +111,8 @@ namespace SharedUtil
 
     std::string  ConvertToANSI (const std::wstring& ws);
 
+    std::wstring  TranslateToUTF8 (const std::string& s);
+
     std::wstring GetBidiString (const std::wstring ws);
 
 
