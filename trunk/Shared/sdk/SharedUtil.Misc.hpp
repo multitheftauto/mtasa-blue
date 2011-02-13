@@ -774,16 +774,28 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
 }
 
 
-// Convert a standard std::string into a UTF-8 std::wstring
+// Convert a standard ANSI junk std::string into a UTF-8 std::wstring
 std::wstring SharedUtil::ConvertToUTF8 (const std::string& input)
 {
     return utf8_mbstowcs (input);
 }
 
-// Convert a std::wstring into an ANSI encoded string
+// Reencode a UTF8 std::wstring into ANSI junk string
 std::string SharedUtil::ConvertToANSI (const std::wstring& input)
 {
     return utf8_wcstombs (input);
+}
+
+// Translate a true ANSI string to the UTF-8 equivalent (reencode+convert)
+std::wstring SharedUtil::TranslateToUTF8 ( const std::string& input )
+{
+    size_t len = mbstowcs ( NULL, input.c_str(), input.length() );
+    wchar_t* wcsOutput = new wchar_t[len+1];
+    mbstowcs ( wcsOutput, input.c_str(), input.length() );
+    wcsOutput[len] = NULL; //Null terminate the string
+    std::wstring strOutput(wcsOutput);
+    delete wcsOutput;
+    return strOutput;
 }
 
 std::wstring SharedUtil::GetBidiString (const std::wstring input)

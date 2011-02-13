@@ -84,9 +84,9 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
             strClumpedCommand = szCommandBufferPointer;
 
         // Convert to Unicode, and clamp it to a maximum command length
-        std::wstring strClumpedCommandUTF = SharedUtil::ConvertToUTF8(strClumpedCommand.c_str());
+        std::wstring strClumpedCommandUTF = ConvertToUTF8(strClumpedCommand.c_str());
         strClumpedCommandUTF.substr(0,MAX_COMMAND_LENGTH);
-        strClumpedCommand = SharedUtil::ConvertToANSI(strClumpedCommandUTF);
+        strClumpedCommand = ConvertToANSI(strClumpedCommandUTF);
 
         g_pClientGame->GetRegisteredCommands ()->ProcessCommand ( szCommandBufferPointer, szArguments );
 
