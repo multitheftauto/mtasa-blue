@@ -30,7 +30,18 @@ CResourceScriptItem::~CResourceScriptItem ( void )
 bool CResourceScriptItem::Start ( void )
 {
     m_pVM = m_resource->GetVirtualMachine();
-    m_pVM->LoadScriptFromFile ( m_strResourceFileName.c_str () );
+
+    // Load the file
+    std::vector < char > buffer;
+    FileLoad ( m_strResourceFileName, buffer );
+
+    //UTF-8 BOM?  Compare by checking the standard UTF-8 BOM of 3 characters (in signed format, hence negative)
+    if ( buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 ) //Not UTF-8
+        // Load the resource text
+        m_pVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), buffer.size (), m_strResourceFileName.c_str() );
+    else // Load ignoring the first 3 bytes
+        m_pVM->LoadScriptFromBuffer ( &buffer.at ( 3 ), buffer.size ()-3, m_strResourceFileName.c_str() );
+
     return true;
 }
 
