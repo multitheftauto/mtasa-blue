@@ -296,6 +296,34 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
 {
     map < string, long > doneWarningMap;
     long lLineNumber = 1;
+    bool bUTF8 = false;
+
+    // Check if this is a UTF-8 script
+    if ( strLuaSource.length() > 2 )
+    {
+        if ( strLuaSource.at(0) == -0x11 && strLuaSource.at(1) == -0x45 && strLuaSource.at(2) == -0x41 )
+            bUTF8 = true;
+    }
+
+    // If it's not a UTF8 script, does it contain foreign language characters that should be upgraded?
+    if ( !bUTF8 )
+    {
+        std::string strUTFScript = ConvertToANSI(TranslateToUTF8( strLuaSource ));
+        if ( strLuaSource.length () != strUTFScript.size() )
+        {
+            // In-place upgrade...
+            if ( strMode == "Upgrade" )
+            {
+                // Convert our script to ANSI, appending a BOM at the beginning
+                strLuaSource = "\xEF\xBB\xBF" + strUTFScript;
+            }
+            if ( strMode == "Warnings" )
+            {
+                m_ulDeprecatedWarningCount++;
+                CLogger::LogPrintf ( "WARNING: %s [%s] is encoded in ANSI instead of UTF-8.  Please convert your file to UTF-8.\n", strFileName.c_str (), bClientScript ? "Client" : "Server" );
+            }
+        }
+    }
 
     // Step through each identifier in the file.
     for ( long lPos = 0 ; lPos < (long)strLuaSource.length () ; lPos++ )

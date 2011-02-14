@@ -51,6 +51,7 @@ CResource::CResource ( CResourceManager * resourceManager, const char * szResour
     m_pNodeSettings = NULL;
     m_pNodeStorage = NULL;
     m_resourceManager = resourceManager;
+    m_zipfile = NULL;
 
     // store the name
     m_strResourceName = szResourceName ? szResourceName : "";
