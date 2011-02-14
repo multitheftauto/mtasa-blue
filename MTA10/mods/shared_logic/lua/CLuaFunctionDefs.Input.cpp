@@ -157,7 +157,7 @@ int CLuaFunctionDefs::BindKey ( lua_State* luaVM )
                 // Jax: grab our arguments first, luaM_toref pops the stack!
                 CLuaArguments Arguments;
                 Arguments.ReadArguments ( luaVM, 4 );
-                int iLuaFunction = luaM_toref ( luaVM, 3 );            
+                CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 3 );            
 
                 if ( VERIFY_FUNCTION ( iLuaFunction ) )
                 {
@@ -203,7 +203,7 @@ int CLuaFunctionDefs::UnbindKey ( lua_State* luaVM )
             }
             else
             {   
-                int iLuaFunction = 0;
+                CLuaFunctionRef iLuaFunction;
                 if ( lua_type ( luaVM, 3 ) == LUA_TFUNCTION )
                     iLuaFunction = luaM_toref ( luaVM, 3 );
 
@@ -454,7 +454,7 @@ int CLuaFunctionDefs::GetKeyBoundToFunction ( lua_State* luaVM )
     {
         if ( lua_type ( luaVM, 1 ) == LUA_TFUNCTION || lua_type ( luaVM, 1 ) == LUA_TSTRING )
         {
-            int iLuaFunction = luaM_toref ( luaVM, 1 );
+            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 1 );
             // get the key
             list < CScriptKeyBind* > ::const_iterator iter =  m_pClientGame->GetScriptKeyBinds ()->IterBegin ();
             for ( ; iter !=  m_pClientGame->GetScriptKeyBinds ()->IterEnd (); iter++ )

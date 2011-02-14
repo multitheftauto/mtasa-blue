@@ -19,15 +19,9 @@ extern "C"
     #include "lua.h"
     #include "lualib.h"
     #include "lauxlib.h"
-
-    LUALIB_API int luaM_toref (lua_State *L, int i);
 }
 
-#define abs_index(L, i) \
-    ((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
-    lua_gettop(L) + (i) + 1)
-#define FREELIST_REF    0
-#define RESERVED_REFS   2
+CLuaFunctionRef         luaM_toref              ( lua_State *luaVM, int iArgument );
 
 #define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
 
@@ -89,39 +83,5 @@ void                    lua_pushtimer       ( lua_State* luaVM, CLuaTimer* pElem
 void                    lua_pushxmlnode     ( lua_State* luaVM, CXMLNode* pElement );
 
 #define lua_istype(luavm, number,type) (lua_type(luavm,number) == type)
-
-// Custom Lua stack argument->reference function
-// This function should always be called last! (Since it pops the lua stack)
-static int luaM_toref (lua_State *L, int i) 
-{
-    int ref = -1;
-
-    // convert the function pointer to a string so we can use it as index
-    char buf[10] = {0};
-    char * index = itoa ( (int)lua_topointer ( L, i ), buf, 16 );
-
-    // get the callback table we made in CLuaMain::InitVM (at location 1)
-    lua_getref ( L, 1 );
-    lua_getfield ( L, -1, index );
-    ref = static_cast < int > ( lua_tonumber ( L, -1 ) );
-    lua_pop ( L, 1 );
-    lua_pop ( L, 1 );
-
-    // if it wasn't added yet, add it to the callback table and the registry
-    // else, get the reference from the table
-    if ( !ref ) {
-        // add a new reference (and get the id)
-        lua_settop ( L, i );
-        ref = lua_ref ( L, 1 );
-
-        // and add it to the callback table
-        lua_getref ( L, 1 );
-        lua_pushstring ( L, index );
-        lua_pushnumber ( L, ref );
-        lua_settable ( L, -3 );
-        lua_pop ( L, 1 );
-    }
-    return ref;
-}
 
 #endif

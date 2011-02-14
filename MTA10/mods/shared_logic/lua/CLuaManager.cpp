@@ -104,6 +104,17 @@ bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
 }
 
 
+void CLuaManager::ProcessPendingDeleteList ( void )
+{
+    while ( !m_PendingDeleteList.empty () )
+    {
+        lua_State* luaVM = m_PendingDeleteList.front ();
+        m_PendingDeleteList.pop_front ();
+        lua_close( luaVM );
+    }
+}
+
+
 void CLuaManager::DoPulse ( void )
 {
     list<CLuaMain *>::iterator iter = m_virtualMachines.begin ();
@@ -980,6 +991,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefs::Md5 );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData );
+    CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
 
 #ifdef MTA_VOICE
     // Voice funcs
