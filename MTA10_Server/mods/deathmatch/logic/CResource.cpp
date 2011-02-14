@@ -141,13 +141,16 @@ bool CResource::Load ( void )
         _snprintf ( szBuffer, MAX_PATH - 1, "%s/resources/%s.zip", szServerModPath, m_strResourceName.c_str () );
         m_strResourceZip = szBuffer;
 
-        // Open our zip file
-        m_zipfile = unzOpen ( m_strResourceZip.c_str () );
-        if ( !m_zipfile )
+        // Check for our resource directory
+        if ( DoesDirectoryExist ( m_strResourceDirectoryPath.c_str () ) )
         {
-            // OK, we didn't have a zip file, it must be a directory resource instead
-            //if ( chdir ( m_szResourceDirectoryPath ) != 0 )
-            if ( !DoesDirectoryExist ( m_strResourceDirectoryPath.c_str () ) )
+            m_bResourceIsZip = false;
+        }
+        else
+        {
+            // OK, we didn't have a resource directory, zip file, it must be a zip file instead
+            m_zipfile = unzOpen ( m_strResourceZip.c_str () );
+            if ( !m_zipfile )
             {
                 //Unregister EHS stuff
                 g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
@@ -158,25 +161,14 @@ bool CResource::Load ( void )
                 CLogger::ErrorPrintf ( szBuffer );
                 return false;
             }
-            else
-            {
-                //chdir ( szCurrentDirectory );
-                m_bResourceIsZip = false;
-            }
-        }
-        else
-        {
+
             // Close the zip file
             unzClose ( m_zipfile );
             m_zipfile = NULL;
             m_bResourceIsZip = true;
 
             // See if the dir already exists
-            //bool bDirExists = chdir ( m_szResourceCachePath ) == 0;
             bool bDirExists = DoesDirectoryExist ( m_strResourceCachePath.c_str () );
-
-            // Reset the current working dir
-            //chdir ( szCurrentDirectory );
 
             // If the folder doesn't exist, create it
             if ( !bDirExists )
