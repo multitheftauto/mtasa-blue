@@ -37,7 +37,7 @@ int CLuaFunctionDefs::AddCommandHandler ( lua_State* luaVM )
 
             // Grab the strings. Valid?
             const char* szKey = lua_tostring ( luaVM, 1 );
-            int iLuaFunction = luaM_toref ( luaVM, 2 );
+            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 2 );
             if ( szKey [0] != 0 && VERIFY_FUNCTION ( iLuaFunction ) )
             {
                 // Add them to our list over command handlers

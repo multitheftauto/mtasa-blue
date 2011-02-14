@@ -37,8 +37,8 @@ public:
                                         ~CStaticFunctionDefinitions         ( void );
 
     static bool                         AddEvent                            ( CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger );
-    static bool                         AddEventHandler                     ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, int iLuaFunction, bool bPropagated );
-    static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, int iLuaFunction );
+    static bool                         AddEventHandler                     ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
     static bool                         TriggerEvent                        ( const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled );
     static bool                         TriggerServerEvent                  ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments );
     static bool                         CancelEvent                         ( bool bCancel );
@@ -458,9 +458,9 @@ public:
     static bool                         GetWindVelocity                     ( float& fX, float& fY, float& fZ );
 
     // Input functions
-    static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );
+    static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, const char* szCommandName, const char* szArguments, const char* szResource );
-    static bool                         UnbindKey                           ( const char* szKey, CLuaMain* pLuaMain, const char* szHitState = 0, int iLuaFunction = LUA_REFNIL );
+    static bool                         UnbindKey                           ( const char* szKey, CLuaMain* pLuaMain, const char* szHitState = 0, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     static bool                         UnbindKey                           ( const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource );
     static bool                         GetKeyState                         ( const char* szKey, bool& bState );
     static bool                         GetControlState                     ( const char* szControl, bool& bState );

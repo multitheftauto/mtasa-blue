@@ -28,6 +28,12 @@ class CLuaMain;
 
 #include <list>
 
+struct CRefInfo
+{
+    unsigned long int ulUseCount;
+    int iFunction;
+};
+
 class CLuaMain //: public CClient
 {
 public:
@@ -46,12 +52,6 @@ public:
                                                               CRadarAreaManager* pRadarAreaManager,
                                                               CMapManager* pMapManager*/ );
                                     ~CLuaMain               ( void );
-
-    int                             GetClientType           ( void ) { /*return CClient::CLIENT_SCRIPT;*/ };
-    const char*                     GetNickPointer          ( void ) { return m_szScriptName; };
-
-    void                            SendEcho                ( const char* szEcho ) {};
-    void                            SendConsole             ( const char* szEcho ) {};
 
     inline int                      GetOwner                ( void )                        { return m_iOwner; };
     inline void                     SetOwner                ( int iOwner )                  { m_iOwner = iOwner; };
@@ -88,6 +88,7 @@ public:
     bool                            XMLExists               ( CXMLFile* pFile );
 
     void                            InitVM                  ( void );
+    const SString&                  GetFunctionTag          ( int iLuaFunction );
 private:
     void                            InitSecurity            ( void );
 
@@ -106,6 +107,9 @@ private:
     class CResource*                m_pResource;
 
     std::list < CXMLFile* >         m_XMLFiles;
+public:
+    std::map < const void*, CRefInfo >      m_CallbackTable;
+    std::map < int, SString >               m_FunctionTagMap;
 };
 
 
