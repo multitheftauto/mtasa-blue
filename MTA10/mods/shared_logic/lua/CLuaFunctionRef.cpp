@@ -83,64 +83,26 @@ void luaM_dec_use ( lua_State *luaVM, int iFunction, const void* pFuncPtr )
 }
 
 
-#if 0
-typedef CIntrusiveListExt < CLuaFunctionRef, &CLuaFunctionRef::m_FromRootNode > CFromRootListType2;
-static CFromRootListType2 g_LuaFunctionRefList;
-/*
-typedef google::dense_hash_map < unsigned int, CFromRootListType > t_mapEntitiesFromRoot;
-static t_mapEntitiesFromRoot    ms_mapEntitiesFromRoot;
-static bool                     ms_bEntitiesFromRootInitialized = false;
-
-void StartupEntitiesFromRoot ()
-{
-    if ( !ms_bEntitiesFromRootInitialized )
-    {
-        ms_mapEntitiesFromRoot.set_deleted_key ( (unsigned int)0x00000000 );
-        ms_mapEntitiesFromRoot.set_empty_key ( (unsigned int)0xFFFFFFFF );
-        ms_bEntitiesFromRootInitialized = true;
-    }
-}
-*/
-
-void CLuaFunctionRef::NotifyDestroyedLuaVM ( lua_State *luaVM )
-{
-    for ( CFromRootListType2::iterator iter = g_LuaFunctionRefList.begin (); iter != g_LuaFunctionRefList.end (); ++iter )
-    {
-        CLuaFunctionRef* pLuaFunctionRef = *iter;
-        if ( pLuaFunctionRef->m_luaVM == luaVM )
-            //pLuaFunctionRef->m_luaVM = NULL;
-            pLuaFunctionRef->m_luaVM = pLuaFunctionRef->m_luaVM;
-    }
-}
-#endif
-
-
 //
 // CLuaFunctionRef implementation
 //
 
 CLuaFunctionRef::CLuaFunctionRef ( void )
-    : m_FromRootNode ( this )
 {
-//    g_LuaFunctionRefList.push_front ( this );
     m_luaVM = NULL;
     m_iFunction = LUA_REFNIL;
     m_pFuncPtr = NULL;
 }
 
 CLuaFunctionRef::CLuaFunctionRef ( lua_State *luaVM, int iFunction, const void* pFuncPtr )
-    : m_FromRootNode ( this )
 {
-//    g_LuaFunctionRefList.push_front ( this );
     m_luaVM = luaVM;
     m_iFunction = iFunction;
     m_pFuncPtr = pFuncPtr;
 }
 
 CLuaFunctionRef::CLuaFunctionRef ( const CLuaFunctionRef& other )
-    : m_FromRootNode ( this )
 {
-//    g_LuaFunctionRefList.push_front ( this );
     m_luaVM = other.m_luaVM;
     m_iFunction = other.m_iFunction;
     m_pFuncPtr = other.m_pFuncPtr;
@@ -149,10 +111,7 @@ CLuaFunctionRef::CLuaFunctionRef ( const CLuaFunctionRef& other )
 
 CLuaFunctionRef::~CLuaFunctionRef ( void )
 {
-    if ( !m_FromRootNode.m_pPrev )
-        m_FromRootNode.m_pPrev = m_FromRootNode.m_pPrev;
     luaM_dec_use ( m_luaVM, m_iFunction, m_pFuncPtr );
-//    g_LuaFunctionRefList.remove ( this );
 }
 
 CLuaFunctionRef& CLuaFunctionRef::operator=( const CLuaFunctionRef& other )

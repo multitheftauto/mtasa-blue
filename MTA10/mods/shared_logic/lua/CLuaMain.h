@@ -86,6 +86,9 @@ public:
     void                            DestroyXML              ( CXMLNode* pRootNode );
     void                            SaveXML                 ( CXMLNode * pRootNode );
     bool                            XMLExists               ( CXMLFile* pFile );
+    unsigned long                   GetXMLFileCount         ( void ) const                  { return m_XMLFiles.size (); };
+    unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
+    unsigned long                   GetElementCount         ( void ) const;
 
     void                            InitVM                  ( void );
     const SString&                  GetFunctionTag          ( int iLuaFunction );
