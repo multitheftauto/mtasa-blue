@@ -30,7 +30,6 @@ public:
     lua_State *     m_luaVM;
     int             m_iFunction;
     const void*     m_pFuncPtr;
-    CIntrusiveListNode < CLuaFunctionRef >        m_FromRootNode;     // Our node entry in the 'GlobalLuaFunctionRefList'
 };
 
 

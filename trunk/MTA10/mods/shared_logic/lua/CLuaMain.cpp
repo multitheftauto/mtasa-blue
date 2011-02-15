@@ -416,6 +416,21 @@ void CLuaMain::SaveXML ( CXMLNode * pRootNode )
 
 ///////////////////////////////////////////////////////////////
 //
+// CLuaMain::GetElementCount
+//
+//
+//
+///////////////////////////////////////////////////////////////
+unsigned long CLuaMain::GetElementCount ( void ) const
+{
+    if ( m_pResource && m_pResource->GetElementGroup () ) 
+        return m_pResource->GetElementGroup ()->GetCount ();
+    return 0;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CLuaMain::GetFunctionTag
 //
 // Turn iFunctionNumber into something human readable

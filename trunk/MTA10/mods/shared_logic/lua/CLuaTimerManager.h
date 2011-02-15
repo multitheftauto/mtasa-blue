@@ -35,6 +35,7 @@ public:
     CLuaTimer*                  AddTimer                        ( lua_State* luaVM );
     void                        RemoveTimer                     ( CLuaTimer* pLuaTimer );
     void                        RemoveAllTimers                 ( void );
+    unsigned long               GetTimerCount                   ( void ) const              { return m_TimerList.size (); }
 
     void                        ResetTimer                      ( CLuaTimer* pLuaTimer );
 

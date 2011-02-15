@@ -347,11 +347,11 @@ void CClientPerfStatManagerImpl::UpdateLuaMemory ( CLuaMain* pLuaMain, int iMemU
     pLuaMainMemory->Delta += iMemUsed - pLuaMainMemory->Current;
     pLuaMainMemory->Current = iMemUsed;
     pLuaMainMemory->Max = Max ( pLuaMainMemory->Max, pLuaMainMemory->Current );
-/*
     pLuaMainMemory->OpenXMLFiles = pLuaMain->GetXMLFileCount ();
     pLuaMainMemory->Refs = pLuaMain->m_CallbackTable.size ();
     pLuaMainMemory->TimerCount = pLuaMain->GetTimerCount ();
     pLuaMainMemory->ElementCount = pLuaMain->GetElementCount ();
+/*
     pLuaMainMemory->TextDisplayCount = pLuaMain->GetTextDisplayCount ();
     pLuaMainMemory->TextItemCount = pLuaMain->GetTextItemCount ();
 */
