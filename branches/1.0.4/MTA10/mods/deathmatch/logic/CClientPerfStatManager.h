@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CPerfStatManager.cpp
+*  FILE:        mods/deathmatch/logic/CClientPerfStatManager.h
 *  PURPOSE:     Performance stats manager class
 *  DEVELOPERS:  Mr OCD
 *
@@ -10,19 +10,18 @@
 *
 *****************************************************************************/
 
-
-#ifndef __CPERFSTATMANAGER_H
-#define __CPERFSTATMANAGER_H
+#ifndef __CCLIENTPERFSTATMANAGER_H
+#define __CCLIENTPERFSTATMANAGER_H
 
 typedef unsigned long TIMEUS;
 TIMEUS GetTimeUs ( void );
 
 //
-// CPerfStatResult
+// CClientPerfStatResult
 //
 // Result of GetStats
 //
-class CPerfStatResult
+class CClientPerfStatResult
 {
     std::vector < SString > colNames;
     std::vector < SString > cellList;
@@ -30,7 +29,7 @@ class CPerfStatResult
     int iNumRows;
 public:
 
-    CPerfStatResult ()
+    CClientPerfStatResult ()
     {
         iNumColumns = 0;
         iNumRows = 0;
@@ -88,23 +87,23 @@ public:
 
 
 //
-// CPerfStatManager
+// CClientPerfStatManager
 //
-class CPerfStatManager
+class CClientPerfStatManager
 {
 public:
-    virtual             ~CPerfStatManager   ( void ) {}
+    virtual             ~CClientPerfStatManager   ( void ) {}
 
     virtual void        DoPulse             ( void ) = 0;
     virtual void        OnLuaMainCreate     ( CLuaMain* pLuaMain ) = 0;
     virtual void        OnLuaMainDestroy    ( CLuaMain* pLuaMain ) = 0;
-    virtual void        GetStats            ( CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter ) = 0;
+    virtual void        GetStats            ( CClientPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter ) = 0;
     virtual void        UpdateLuaMemory     ( CLuaMain* pLuaMain, int iMemUsed ) = 0;
     virtual void        UpdateLuaTiming     ( CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs ) = 0;
     virtual void        UpdateLibMemory     ( const SString& strLibName, int iMemUsed, int iMemUsedMax ) = 0;
 };
 
-CPerfStatManager* GetPerfStatManager ();
+CClientPerfStatManager* GetClientPerfStatManager ();
 
 
 #endif

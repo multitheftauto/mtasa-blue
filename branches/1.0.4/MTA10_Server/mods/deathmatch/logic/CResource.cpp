@@ -149,7 +149,7 @@ bool CResource::Load ( void )
         }
         else
         {
-            // OK, we didn't have a resource directory, zip file, it must be a zip file instead
+            // OK, we didn't have a resource directory, it must be a zip file instead
             m_zipfile = unzOpen ( m_strResourceZip.c_str () );
             if ( !m_zipfile )
             {

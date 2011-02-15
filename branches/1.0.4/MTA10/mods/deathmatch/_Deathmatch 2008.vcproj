@@ -377,6 +377,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CClientPerfStatManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CDeathmatchObject.cpp"
 					>
 				</File>
@@ -1120,6 +1124,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionRef.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\shared_logic\lua\CLuaMain.cpp"
 						>
 					</File>
@@ -1244,6 +1252,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CClientGame.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CClientPerfStatManager.h"
 					>
 				</File>
 				<File
@@ -1863,6 +1875,10 @@
 					</File>
 					<File
 						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.h"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionRef.h"
 						>
 					</File>
 					<File

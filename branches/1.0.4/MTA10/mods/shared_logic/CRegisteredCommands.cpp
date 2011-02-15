@@ -27,7 +27,7 @@ CRegisteredCommands::~CRegisteredCommands ( void )
 }
 
 
-bool CRegisteredCommands::AddCommand ( CLuaMain* pLuaMain, const char* szKey, int iLuaFunction, bool bCaseSensitive )
+bool CRegisteredCommands::AddCommand ( CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bCaseSensitive )
 {
     assert ( pLuaMain );
     assert ( szKey );
@@ -199,7 +199,7 @@ CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand ( const char* szK
 }
 
 
-void CRegisteredCommands::CallCommandHandler ( CLuaMain* pLuaMain, int iLuaFunction, const char* szKey, const char* szArguments )
+void CRegisteredCommands::CallCommandHandler ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments )
 {
     assert ( pLuaMain );
     assert ( szKey );

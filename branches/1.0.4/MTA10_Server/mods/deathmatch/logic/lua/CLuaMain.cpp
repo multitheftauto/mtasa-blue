@@ -470,7 +470,7 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
                 //std::string strFilename2 = ConformResourcePath ( debugInfo.source );
                 SString strFilename = debugInfo.source;
 
-                int iPos = strFilename.find_last_of ( '/' );
+                int iPos = strFilename.find_last_of ( "/\\" );
                 if ( iPos >= 0 )
                     strFilename = strFilename.substr ( iPos + 1 );
 

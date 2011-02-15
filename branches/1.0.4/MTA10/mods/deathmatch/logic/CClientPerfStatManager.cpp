@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CPerfStatManager.cpp
+*  FILE:        mods/deathmatch/logic/CClientPerfStatManager.cpp
 *  PURPOSE:     Performance stats manager class
 *  DEVELOPERS:  Mr OCD
 *
@@ -11,7 +11,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerfStatManager.h"
 #include "CDynamicLibrary.h"
 
 // microseconds
@@ -225,28 +224,28 @@ namespace
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl
+// CClientPerfStatManagerImpl
 //
 ///////////////////////////////////////////////////////////////
-class CPerfStatManagerImpl : public CPerfStatManager
+class CClientPerfStatManagerImpl : public CClientPerfStatManager
 {
 public:
-    // CPerfStatManager interface
-                        CPerfStatManagerImpl    ( void );
-    virtual             ~CPerfStatManagerImpl   ( void );
+    // CClientPerfStatManager interface
+                        CClientPerfStatManagerImpl    ( void );
+    virtual             ~CClientPerfStatManagerImpl   ( void );
     virtual void        DoPulse                 ( void );
     virtual void        OnLuaMainCreate         ( CLuaMain* pLuaMain );
     virtual void        OnLuaMainDestroy        ( CLuaMain* pLuaMain );
-    virtual void        GetStats                ( CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter );
+    virtual void        GetStats                ( CClientPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter );
     virtual void        UpdateLuaMemory         ( CLuaMain* pLuaMain, int iMemUsed );
     virtual void        UpdateLuaTiming         ( CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs );
     virtual void        UpdateLibMemory         ( const SString& strLibName, int iMemUsed, int iMemUsedMax );
 
-    // CPerfStatManagerImpl functions
-    void                GetLuaMemoryStats       ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter );
-    void                GetLuaTimingStats       ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter );
-    void                GetLibMemoryStats       ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter );
-    void                OutputTimingBlock       ( CPerfStatResult* pResult, const CTimingBlock& TimingBlock, int flags, const SString& BlockName, bool bSubBlock );
+    // CClientPerfStatManagerImpl functions
+    void                GetLuaMemoryStats       ( CClientPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter );
+    void                GetLuaTimingStats       ( CClientPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter );
+    void                GetLibMemoryStats       ( CClientPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter );
+    void                OutputTimingBlock       ( CClientPerfStatResult* pResult, const CTimingBlock& TimingBlock, int flags, const SString& BlockName, bool bSubBlock );
 
     CAllLuaTiming                   AllLuaTiming;
     CAllLuaMemory                   AllLuaMemory;
@@ -265,24 +264,24 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatManagerImpl* g_pPerfStatManagerImp = NULL;
+static CClientPerfStatManagerImpl* g_pClientPerfStatManagerImp = NULL;
 
-CPerfStatManager* GetPerfStatManager ()
+CClientPerfStatManager* GetClientPerfStatManager ()
 {
-    if ( !g_pPerfStatManagerImp )
-        g_pPerfStatManagerImp = new CPerfStatManagerImpl ();
-    return g_pPerfStatManagerImp;
+    if ( !g_pClientPerfStatManagerImp )
+        g_pClientPerfStatManagerImp = new CClientPerfStatManagerImpl ();
+    return g_pClientPerfStatManagerImp;
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::CPerfStatManagerImpl
+// CClientPerfStatManagerImpl::CClientPerfStatManagerImpl
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatManagerImpl::CPerfStatManagerImpl ( void )
+CClientPerfStatManagerImpl::CClientPerfStatManagerImpl ( void )
 {
     m_LastTickCount = 0;
     m_SecondCounter = 0;
@@ -291,24 +290,24 @@ CPerfStatManagerImpl::CPerfStatManagerImpl ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::CPerfStatManagerImpl
+// CClientPerfStatManagerImpl::CClientPerfStatManagerImpl
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatManagerImpl::~CPerfStatManagerImpl ( void )
+CClientPerfStatManagerImpl::~CClientPerfStatManagerImpl ( void )
 {
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::OnLuaMainCreate
+// CClientPerfStatManagerImpl::OnLuaMainCreate
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::OnLuaMainCreate ( CLuaMain* pLuaMain )
+void CClientPerfStatManagerImpl::OnLuaMainCreate ( CLuaMain* pLuaMain )
 {
     MapSet ( m_LuaMainMap, pLuaMain, 1 );
 }
@@ -316,12 +315,12 @@ void CPerfStatManagerImpl::OnLuaMainCreate ( CLuaMain* pLuaMain )
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::OnLuaMainDestroy
+// CClientPerfStatManagerImpl::OnLuaMainDestroy
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::OnLuaMainDestroy ( CLuaMain* pLuaMain )
+void CClientPerfStatManagerImpl::OnLuaMainDestroy ( CLuaMain* pLuaMain )
 {
     MapRemove ( m_LuaMainMap, pLuaMain );
     MapRemove ( AllLuaTiming.LuaMainTimingMap, pLuaMain );
@@ -331,12 +330,12 @@ void CPerfStatManagerImpl::OnLuaMainDestroy ( CLuaMain* pLuaMain )
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::LuaMemory
+// CClientPerfStatManagerImpl::LuaMemory
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::UpdateLuaMemory ( CLuaMain* pLuaMain, int iMemUsed )
+void CClientPerfStatManagerImpl::UpdateLuaMemory ( CLuaMain* pLuaMain, int iMemUsed )
 {
     CLuaMainMemory* pLuaMainMemory = MapFind ( AllLuaMemory.LuaMainMemoryMap, pLuaMain );
     if ( !pLuaMainMemory )
@@ -348,24 +347,25 @@ void CPerfStatManagerImpl::UpdateLuaMemory ( CLuaMain* pLuaMain, int iMemUsed )
     pLuaMainMemory->Delta += iMemUsed - pLuaMainMemory->Current;
     pLuaMainMemory->Current = iMemUsed;
     pLuaMainMemory->Max = Max ( pLuaMainMemory->Max, pLuaMainMemory->Current );
-
     pLuaMainMemory->OpenXMLFiles = pLuaMain->GetXMLFileCount ();
     pLuaMainMemory->Refs = pLuaMain->m_CallbackTable.size ();
     pLuaMainMemory->TimerCount = pLuaMain->GetTimerCount ();
     pLuaMainMemory->ElementCount = pLuaMain->GetElementCount ();
+/*
     pLuaMainMemory->TextDisplayCount = pLuaMain->GetTextDisplayCount ();
     pLuaMainMemory->TextItemCount = pLuaMain->GetTextItemCount ();
+*/
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::UpdateLibMemory
+// CClientPerfStatManagerImpl::UpdateLibMemory
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::UpdateLibMemory ( const SString& strLibName, int iMemUsed, int iMemUsedMax )
+void CClientPerfStatManagerImpl::UpdateLibMemory ( const SString& strLibName, int iMemUsed, int iMemUsedMax )
 {
     CLibMemory* pLibMemory = MapFind ( AllLibMemory.LibMemoryMap, strLibName );
     if ( !pLibMemory )
@@ -382,12 +382,12 @@ void CPerfStatManagerImpl::UpdateLibMemory ( const SString& strLibName, int iMem
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::UpdateLuaTiming
+// CClientPerfStatManagerImpl::UpdateLuaTiming
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::UpdateLuaTiming ( CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs )
+void CClientPerfStatManagerImpl::UpdateLuaTiming ( CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs )
 {
     CLuaMainTiming* pLuaMainTiming = MapFind ( AllLuaTiming.LuaMainTimingMap, pLuaMain );
     if ( !pLuaMainTiming )
@@ -419,12 +419,12 @@ void CPerfStatManagerImpl::UpdateLuaTiming ( CLuaMain* pLuaMain, const char* szE
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::DoPulse
+// CClientPerfStatManagerImpl::DoPulse
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::DoPulse ( void )
+void CClientPerfStatManagerImpl::DoPulse ( void )
 {
     long long llTickCount = GetTickCount64_ ();
     long long llDelta = llTickCount - m_LastTickCount;
@@ -452,12 +452,12 @@ void CPerfStatManagerImpl::DoPulse ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::GetStats
+// CClientPerfStatManagerImpl::GetStats
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::GetStats ( CPerfStatResult* pResult, const SString& strCategory, const SString& strOptions, const SString& strFilter )
+void CClientPerfStatManagerImpl::GetStats ( CClientPerfStatResult* pResult, const SString& strCategory, const SString& strOptions, const SString& strFilter )
 {
     pResult->Clear ();
 
@@ -501,12 +501,12 @@ void CPerfStatManagerImpl::GetStats ( CPerfStatResult* pResult, const SString& s
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::GetLuaMemoryStats
+// CClientPerfStatManagerImpl::GetLuaMemoryStats
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
+void CClientPerfStatManagerImpl::GetLuaMemoryStats ( CClientPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
 {
     //
     // Set option flags
@@ -521,7 +521,7 @@ void CPerfStatManagerImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const s
     {
         pResult->AddColumn ( "Lua memory help" );
         pResult->AddRow ()[0] ="Option h - This help";
-        pResult->AddRow ()[0] ="Option a - More accurate memory usage - Warning: Can slow server a little";
+        pResult->AddRow ()[0] ="Option a - More accurate memory usage - Warning: Can slow client a little";
         return;
     }
 
@@ -621,12 +621,12 @@ void CPerfStatManagerImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const s
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::GetLuaTimingStats
+// CClientPerfStatManagerImpl::GetLuaTimingStats
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::GetLuaTimingStats ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
+void CClientPerfStatManagerImpl::GetLuaTimingStats ( CClientPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
 {
     //
     // Set option flags
@@ -649,7 +649,7 @@ void CPerfStatManagerImpl::GetLuaTimingStats ( CPerfStatResult* pResult, const s
     //
     if ( bHelp )
     {
-        pResult->AddColumn ( "Lua timings help" );
+        pResult->AddColumn ( "cLua timings help" );
         pResult->AddRow ()[0] ="Option h - This help";
         pResult->AddRow ()[0] ="Option d - More detail";
         pResult->AddRow ()[0] ="Option 5 - Show 5 sec data";
@@ -706,12 +706,12 @@ void CPerfStatManagerImpl::GetLuaTimingStats ( CPerfStatResult* pResult, const s
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::OutputTimingBlock
+// CClientPerfStatManagerImpl::OutputTimingBlock
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::OutputTimingBlock ( CPerfStatResult* pResult, const CTimingBlock& TimingBlock, int flags, const SString& BlockName, bool bSubBlock )
+void CClientPerfStatManagerImpl::OutputTimingBlock ( CClientPerfStatResult* pResult, const CTimingBlock& TimingBlock, int flags, const SString& BlockName, bool bSubBlock )
 {
     const CTimingPair*  pairList[]      = { &TimingBlock.s5,  &TimingBlock.s60,   &TimingBlock.m5,    &TimingBlock.m60 };
     const TIMEUS        threshList[]    = { 5,                60,                 300,                3600 };
@@ -763,12 +763,12 @@ void CPerfStatManagerImpl::OutputTimingBlock ( CPerfStatResult* pResult, const C
 
 ///////////////////////////////////////////////////////////////
 //
-// CPerfStatManagerImpl::GetLibMemoryStats
+// CClientPerfStatManagerImpl::GetLibMemoryStats
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::GetLibMemoryStats ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
+void CClientPerfStatManagerImpl::GetLibMemoryStats ( CClientPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
 {
     //
     // Set option flags
@@ -789,6 +789,7 @@ void CPerfStatManagerImpl::GetLibMemoryStats ( CPerfStatResult* pResult, const s
 
 
     // Fetch mem stats from dlls
+    #if 0
     {
         if ( m_LibraryList.size () == 0 )
         {
@@ -797,8 +798,10 @@ void CPerfStatManagerImpl::GetLibMemoryStats ( CPerfStatResult* pResult, const s
                 const char* szName;
             } libs [] = {
                             { false,  "core", },
-                            { true,   "deathmatch", },
-                            { false,  "net", },
+                            { true,   "client", },
+                            { false,  "game_sa", },
+                            { false,  "multiplayer_sa", },
+                            { false,  "netc", },
                             { false,  "xmll", },
                         };
 
@@ -820,9 +823,9 @@ void CPerfStatManagerImpl::GetLibMemoryStats ( CPerfStatResult* pResult, const s
                 SString strPathFilename;
                 char szBuffer [MAX_PATH];
                 if ( bModDir )
-                    strPathFilename = g_pServerInterface->GetModManager ()->GetAbsolutePath ( info.strName );
+                    strPathFilename = g_pCoreInterface->GetModManager ()->GetAbsolutePath ( info.strName );
                 else
-                    strPathFilename = g_pServerInterface->GetAbsolutePath ( info.strName, szBuffer, MAX_PATH );
+                    strPathFilename = g_pCoreInterface->GetAbsolutePath ( info.strName, szBuffer, MAX_PATH );
 
                 if ( info.pLibrary->Load ( strPathFilename ) )
                 {
@@ -846,7 +849,7 @@ void CPerfStatManagerImpl::GetLibMemoryStats ( CPerfStatResult* pResult, const s
                 UpdateLibMemory ( info.strName, ( stats[0] + 1023 ) / 1024, ( stats[1] + 1023 ) / 1024 );
         }
     }
-
+    #endif
 
     pResult->AddColumn ( "name" );
     pResult->AddColumn ( "change" );

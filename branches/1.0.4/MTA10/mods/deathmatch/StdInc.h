@@ -96,6 +96,7 @@
 #include "HeapTrace.h"
 #include "logic/CClientGame.h"
 #include "net/Packets.h"
+#include "logic/CClientPerfStatManager.h"
 #include "logic/CDeathmatchVehicle.h"
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"

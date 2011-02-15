@@ -699,7 +699,7 @@ void CClientEntity::SetAttachedOffsets ( CVector & vecPosition, CVector & vecRot
 }
 
 
-bool CClientEntity::AddEvent ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction, bool bPropagated )
+bool CClientEntity::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
 {
     return m_pEventManager->Add ( pLuaMain, szName, iLuaFunction, bPropagated );
 }
@@ -768,7 +768,7 @@ void CClientEntity::CallParentEvent ( const char* szName, const CLuaArguments& A
 }
 
 
-bool CClientEntity::DeleteEvent ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction )
+bool CClientEntity::DeleteEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction )
 {
     return m_pEventManager->Delete ( pLuaMain, szName, iLuaFunction );
 }

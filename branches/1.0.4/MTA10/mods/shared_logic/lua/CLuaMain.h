@@ -28,6 +28,12 @@ class CLuaMain;
 
 #include <list>
 
+struct CRefInfo
+{
+    unsigned long int ulUseCount;
+    int iFunction;
+};
+
 class CLuaMain //: public CClient
 {
 public:
@@ -46,12 +52,6 @@ public:
                                                               CRadarAreaManager* pRadarAreaManager,
                                                               CMapManager* pMapManager*/ );
                                     ~CLuaMain               ( void );
-
-    int                             GetClientType           ( void ) { /*return CClient::CLIENT_SCRIPT;*/ };
-    const char*                     GetNickPointer          ( void ) { return m_szScriptName; };
-
-    void                            SendEcho                ( const char* szEcho ) {};
-    void                            SendConsole             ( const char* szEcho ) {};
 
     inline int                      GetOwner                ( void )                        { return m_iOwner; };
     inline void                     SetOwner                ( int iOwner )                  { m_iOwner = iOwner; };
@@ -86,8 +86,12 @@ public:
     void                            DestroyXML              ( CXMLNode* pRootNode );
     void                            SaveXML                 ( CXMLNode * pRootNode );
     bool                            XMLExists               ( CXMLFile* pFile );
+    unsigned long                   GetXMLFileCount         ( void ) const                  { return m_XMLFiles.size (); };
+    unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
+    unsigned long                   GetElementCount         ( void ) const;
 
     void                            InitVM                  ( void );
+    const SString&                  GetFunctionTag          ( int iLuaFunction );
 private:
     void                            InitSecurity            ( void );
 
@@ -106,6 +110,9 @@ private:
     class CResource*                m_pResource;
 
     std::list < CXMLFile* >         m_XMLFiles;
+public:
+    std::map < const void*, CRefInfo >      m_CallbackTable;
+    std::map < int, SString >               m_FunctionTagMap;
 };
 
 #endif

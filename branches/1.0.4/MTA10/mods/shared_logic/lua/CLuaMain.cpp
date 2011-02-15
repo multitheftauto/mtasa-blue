@@ -64,6 +64,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
     m_szScriptName [MAX_SCRIPTNAME_LENGTH] = 0;
     
     m_pResource = pResourceOwner;
+
+    GetClientPerfStatManager ()->OnLuaMainCreate ( this );
 }
 
 
@@ -75,6 +77,8 @@ CLuaMain::~CLuaMain ( void )
 
     // Delete the timer manager
     delete m_pLuaTimerManager;
+
+    GetClientPerfStatManager ()->OnLuaMainDestroy ( this );
 }
 
 bool CLuaMain::BeingDeleted ( void )
@@ -117,11 +121,6 @@ void CLuaMain::InitVM ( void )
     luaopen_string ( m_luaVM );
     luaopen_table ( m_luaVM );
     luaopen_debug ( m_luaVM );
-
-    // Create the callback table (at location 1 in the registry)
-    lua_pushnumber ( m_luaVM, 1 );
-    lua_newtable ( m_luaVM );
-    lua_settable ( m_luaVM, LUA_REGISTRYINDEX );
 
     // Register module functions
     CLuaCFunctions::RegisterFunctionsWithVM ( m_luaVM );
@@ -275,18 +274,28 @@ void CLuaMain::UnloadScript ( void )
 {
     // ACHTUNG: UNLOAD MODULES!
 
-    // End the lua vm
-    if ( m_luaVM )
-    {
-        lua_close( m_luaVM );
-        m_luaVM = NULL;
-    }
-
     // Delete all timers and events
     m_pLuaTimerManager->RemoveAllTimers ();
 
     // Delete all GUI elements
     //m_pLuaManager->m_pGUIManager->DeleteAll ( this );
+
+/*
+// done at server version:
+    // Delete all keybinds
+    list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+    for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
+    {
+        if ( (*iter)->IsJoined () )
+            (*iter)->GetKeyBinds ()->RemoveAllKeys ( this );
+    }
+*/
+    // End the lua vm
+    if ( m_luaVM )
+    {
+        m_pLuaManager->AddToPendingDeleteList ( m_luaVM );
+        m_luaVM = NULL;
+    }
 }
 
 
@@ -360,4 +369,79 @@ void CLuaMain::SaveXML ( CXMLNode * pRootNode )
             }
         }
     }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::GetElementCount
+//
+//
+//
+///////////////////////////////////////////////////////////////
+unsigned long CLuaMain::GetElementCount ( void ) const
+{
+    if ( m_pResource && m_pResource->GetElementGroup () ) 
+        return m_pResource->GetElementGroup ()->GetCount ();
+    return 0;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::GetFunctionTag
+//
+// Turn iFunctionNumber into something human readable
+//
+///////////////////////////////////////////////////////////////
+const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
+{
+    // Find existing
+    SString* pTag = MapFind ( m_FunctionTagMap, iLuaFunction );
+#ifndef MTA_DEBUG
+    if ( !pTag )
+#endif
+    {
+        // Create if required
+        SString strText;
+
+        lua_Debug debugInfo;
+        lua_getref ( m_luaVM, iLuaFunction );
+        if ( lua_getinfo( m_luaVM, ">nlS", &debugInfo ) )
+        {
+            // Make sure this function isn't defined in a string
+            if ( debugInfo.source[0] == '@' )
+            {
+                //std::string strFilename2 = ConformResourcePath ( debugInfo.source );
+                SString strFilename = debugInfo.source;
+
+                int iPos = strFilename.find_last_of ( "/\\" );
+                if ( iPos >= 0 )
+                    strFilename = strFilename.substr ( iPos + 1 );
+
+                strText = SString ( "@%s:%d", strFilename.c_str (), debugInfo.currentline != -1 ? debugInfo.currentline : debugInfo.linedefined, iLuaFunction );
+            }
+            else
+            {
+                strText = SString ( "@func_%d %s", iLuaFunction, debugInfo.short_src );
+            }
+        }
+        else
+        {
+            strText = SString ( "@func_%d NULL", iLuaFunction );
+        }
+
+    #ifdef MTA_DEBUG
+        if ( pTag )
+        {
+            // Check tag remains unchanged
+            assert ( strText == *pTag );
+            return *pTag;
+        }
+    #endif
+
+        MapSet ( m_FunctionTagMap, iLuaFunction, strText );
+        pTag = MapFind ( m_FunctionTagMap, iLuaFunction );
+    }
+    return *pTag;
 }

@@ -823,6 +823,8 @@ void CClientGame::DoPulsePostFrame ( void )
             }
         }
         #endif
+
+        GetClientPerfStatManager ()->DoPulse ();
     }
 
     // If we are not minimized we do the pulsing here
@@ -999,6 +1001,7 @@ void CClientGame::DoPulses ( void )
 
         // Get rid of our deleted elements
         m_ElementDeleter.DoDeleteAll ();
+        m_pLuaManager->ProcessPendingDeleteList ();
 
         // Get rid of deleted GUI elements
         g_pCore->GetGUI ()->CleanDeadPool ();
