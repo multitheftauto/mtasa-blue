@@ -16,7 +16,8 @@ using namespace std;
 
 FILE* CLogger::m_pLogFile = NULL;
 FILE* CLogger::m_pAuthFile = NULL;
-bool CLogger::m_bOutputEnabled = true;
+eLogLevel CLogger::m_MinLogLevel = LOGLEVEL_LOW;
+bool CLogger::m_bPrintingDots = false;
 
 #define MAX_STRING_LENGTH 2048
 void CLogger::LogPrintf ( const char* szFormat, ... )
@@ -37,6 +38,27 @@ void CLogger::LogPrint ( const char* szText )
 {
     // Timestamp and send to the console and logfile
     HandleLogPrint ( true, "", szText, true, true, false );
+}
+
+// As above, but with a log level
+void CLogger::LogPrintf ( eLogLevel logLevel, const char* szFormat, ... )
+{
+    // Compose the formatted message
+    char szBuffer [MAX_STRING_LENGTH];
+    va_list marker;
+    va_start ( marker, szFormat );
+    _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
+    va_end ( marker );
+
+    // Timestamp and send to the console and logfile
+    HandleLogPrint ( true, "", szBuffer, true, true, false, logLevel );
+}
+
+
+void CLogger::LogPrint ( eLogLevel logLevel, const char* szText )
+{
+    // Timestamp and send to the console and logfile
+    HandleLogPrint ( true, "", szText, true, true, false, logLevel );
 }
 
 
@@ -154,18 +176,47 @@ bool CLogger::SetAuthFile ( const char* szAuthFile )
     return true;
 }
 
-
-void CLogger::SetOutputEnabled ( bool bEnabled )
+//
+// Suppress unwanted output
+//
+void CLogger::SetMinLogLevel ( eLogLevel logLevel )
 {
-    m_bOutputEnabled = bEnabled;
+    m_MinLogLevel = logLevel;
 }
 
+//
+// Advanced animation to entertain user
+//
+void CLogger::ProgressDotsBegin ( void )
+{
+    m_bPrintingDots = true;
+}
+
+void CLogger::ProgressDotsUpdate ( void )
+{
+    if ( m_bPrintingDots )
+        HandleLogPrint ( false, "", ".", true, true, false );
+}
+
+void CLogger::ProgressDotsEnd ( void )
+{
+    if ( m_bPrintingDots )
+    {
+        m_bPrintingDots = false;
+        HandleLogPrint ( false, "", "\n", true, true, false );
+    }
+}
 
 // Handle where to send the message
-void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile, bool bToAuthFile )
+void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile, bool bToAuthFile, eLogLevel logLevel )
 {
-    if ( !m_bOutputEnabled )
+    // Suppress unwanted output
+    if ( logLevel < m_MinLogLevel )
         return;
+
+    // Handle interruption of progress dots
+    if ( m_bPrintingDots && ( bTimeStamp || strlen ( szPrePend ) != 0 || strlen ( szMessage ) > 1 || szMessage[0] != '.' ) )
+        ProgressDotsEnd ();
 
     // Put the timestamp at the beginning of the string
     string strOutputShort;

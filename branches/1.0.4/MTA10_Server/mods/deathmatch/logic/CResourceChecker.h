@@ -25,6 +25,10 @@
 class CResourceChecker
 {
 public:
+    void        LogUpgradeWarnings              ( CResource* pResource, const string& strResourceZip );
+    void        ApplyUpgradeModifications       ( CResource* pResource, const string& strResourceZip );
+
+protected:
     void        CheckResourceForIssues          ( CResource* pResource, const string& strResourceZip );
     void        CheckFileForIssues              ( const string& strPath, const string& strFileName, const string& strResourceName, bool bClientScript );
     void        CheckPngFileForIssues           ( const string& strPath, const string& strFileName, const string& strResourceName );
@@ -38,11 +42,7 @@ public:
     int         ReplaceFilesInZIP               ( const string& strOrigZip, const string& strTempZip, const vector < string >& pathInArchiveList, const vector < string >& upgradedFullPathList );
     bool        RenameBackupFile                ( const string& strOrigFilename, const string& strBakAppend );
 
-    static void BeginUpgradeMode                ( void );
-    static void EndUpgradeMode                  ( void );
-
-protected:
-    static bool         m_bUpgradeScripts;
+    bool                m_bUpgradeScripts;
     unsigned long       m_ulDeprecatedWarningCount;
     vector < string >   m_upgradedFullPathList;
 };
