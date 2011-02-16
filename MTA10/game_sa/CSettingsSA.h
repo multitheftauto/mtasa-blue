@@ -79,6 +79,7 @@ class CSettingsSA : public CGameSettings
 
 private:
     CSettingsSAInterface*   m_pInterface;
+    bool                    m_bVolumetricShadowsEnabled;
 
 public:
                             CSettingsSA                 ( void );
@@ -120,6 +121,9 @@ public:
 
     bool                    IsMipMappingEnabled         ( void );
 	void                    SetMipMappingEnabled        ( bool bEnable );
+
+	bool                    IsVolumetricShadowsEnabled     ( void );
+	void                    SetVolumetricShadowsEnabled    ( bool bEnable );
 
     void                    Save                        ( void );
 
