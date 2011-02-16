@@ -50,6 +50,7 @@ CSettings::CSettings ( void )
     m_bIsModLoaded = false;
     m_bCaptureKey = false;
     m_dwFrameCount = 0;
+    m_bShownVolumetricShadowsWarning = false;
     CVector2D vecTemp;
 
     // Create the window
@@ -508,6 +509,10 @@ CSettings::CSettings ( void )
     m_pBrightnessValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
     m_pBrightnessValueLabel->AutoSize ( "100% " );
 
+    m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Volumetric Shadows", true ) );
+    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 32.0f ) );
+    m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
     m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pFXQualityLabel->GetPosition ( vecTemp, false );
@@ -841,6 +846,8 @@ CSettings::CSettings ( void )
     m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
     m_pMouseSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensitivityChanged, this ) );
+    m_pComboFxQuality->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnFxQualityChanged, this ) );
+    m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
     /*
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -1861,6 +1868,12 @@ void CSettings::LoadData ( void )
     else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( "2x" );
     else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( "3x" );
 
+    // Volumetric shadows
+    bool bVolumetricShadowsEnabled;
+    CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
+	m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
+	m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
+
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
 
@@ -2103,6 +2116,11 @@ void CSettings::SaveData ( void )
     {
         gameSettings->SetFXQuality ( ( int ) pQualitySelected->GetData() );
     }
+
+    // Volumetric shadows
+    bool bVolumetricShadowsEnabled = m_pCheckBoxVolumetricShadows->GetSelected ();
+    CVARS_SET ( "volumetric_shadows", bVolumetricShadowsEnabled );
+	gameSettings->SetVolumetricShadowsEnabled ( bVolumetricShadowsEnabled );
 
     // Async loading
     if ( CGUIListItem* pSelected = m_pAsyncCombo->GetSelectedItem () )
@@ -2681,5 +2699,48 @@ bool CSettings::OnUpdateButtonClick ( CGUIElement* pElement )
     }
 
     GetVersionUpdater ()->InitiateManualCheck ();
+    return true;
+}
+
+bool CSettings::OnFxQualityChanged ( CGUIElement* pElement )
+{
+    CGUIListItem* pItem = m_pComboFxQuality->GetSelectedItem ();
+    if ( !pItem )
+        return true;
+
+    if ( ( int ) pItem->GetData() == 0 )
+    {
+        m_pCheckBoxVolumetricShadows->SetSelected ( false );
+        m_pCheckBoxVolumetricShadows->SetEnabled ( false );
+    }
+    else
+        m_pCheckBoxVolumetricShadows->SetEnabled ( true );
+        
+    return true;
+}
+
+void VolumetricShadowsCallBack ( void* ptr, unsigned int uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+    if ( uiButton == 0 )
+        ((CGUICheckBox*)ptr)->SetSelected ( false );
+}
+
+bool CSettings::OnVolumetricShadowsClick ( CGUIElement* pElement )
+{
+    if ( m_pCheckBoxVolumetricShadows->GetSelected () && !m_bShownVolumetricShadowsWarning )
+    {
+        m_bShownVolumetricShadowsWarning = true;
+        SStringX strMessage ( "Volmetric shadows can cause some systems to slow down." );
+        strMessage += "\n\nAre you sure you want to enable them?";
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( "PERFORMANCE WARNING" );
+        pQuestionBox->SetMessage ( strMessage );
+        pQuestionBox->SetButton ( 0, "No" );
+        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetCallback ( VolumetricShadowsCallBack, m_pCheckBoxVolumetricShadows );
+        pQuestionBox->Show ();
+    }
     return true;
 }
