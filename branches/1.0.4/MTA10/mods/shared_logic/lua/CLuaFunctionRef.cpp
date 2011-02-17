@@ -125,7 +125,7 @@ CLuaFunctionRef& CLuaFunctionRef::operator=( const CLuaFunctionRef& other )
     return *this;
 }
 
-CLuaFunctionRef::operator int() const
+int CLuaFunctionRef::ToInt ( void ) const
 {
     return m_iFunction;
 }

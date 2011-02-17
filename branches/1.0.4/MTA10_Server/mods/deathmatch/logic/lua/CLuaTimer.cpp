@@ -29,7 +29,7 @@ CLuaTimer::~CLuaTimer ( void )
 
 void CLuaTimer::ExecuteTimer ( CLuaMain* pLuaMain )
 {
-    if ( m_iLuaFunction != LUA_REFNIL )
+    if ( VERIFY_FUNCTION ( m_iLuaFunction ) )
     {
         m_Arguments.Call ( pLuaMain, m_iLuaFunction );
     }

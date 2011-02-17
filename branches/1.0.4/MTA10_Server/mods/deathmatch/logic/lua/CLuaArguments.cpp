@@ -194,7 +194,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
     assert ( luaVM );
     LUA_CHECKSTACK ( luaVM, 1 );
     int luaStackPointer = lua_gettop ( luaVM );
-    lua_getref ( luaVM, iLuaFunction );
+    lua_getref ( luaVM, iLuaFunction.ToInt () );
 
     // Push our arguments onto the stack
     PushArguments ( luaVM );

@@ -555,3 +555,56 @@ int CLuaFunctionDefs::GetVersion ( lua_State* luaVM )
 
     return 1;
 }
+
+
+int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        CClientPerfStatResult Result;
+        SString strCategory = lua_tostring ( luaVM, 1 );
+        SString strOptions;
+        SString strFilter;
+
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            strOptions = lua_tostring ( luaVM, 2 );
+
+        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            strFilter = lua_tostring ( luaVM, 3 );
+
+        GetClientPerfStatManager ()->GetStats ( &Result, strCategory, strOptions, strFilter );
+
+        lua_newtable ( luaVM );
+        for ( int c = 0; c < Result.ColumnCount () ; c++ )
+        {
+            const SString& name = Result.ColumnName ( c );
+            lua_pushnumber ( luaVM, c+1 );                      // row index number (starting at 1, not 0)
+            lua_pushlstring ( luaVM, (char *)name.c_str (), name.length() );
+            lua_settable ( luaVM, -3 );
+        }
+
+        lua_newtable ( luaVM );
+        for ( int r = 0; r < Result.RowCount () ; r++ )
+        {
+            lua_newtable ( luaVM );                             // new table
+            lua_pushnumber ( luaVM, r+1 );                      // row index number (starting at 1, not 0)
+            lua_pushvalue ( luaVM, -2 );                        // value
+            lua_settable ( luaVM, -4 );                         // refer to the top level table
+
+            for ( int c = 0; c < Result.ColumnCount () ; c++ )
+            {
+                SString& cell = Result.Data ( c, r );
+                lua_pushnumber ( luaVM, c+1 );
+                lua_pushlstring ( luaVM, (char *)cell.c_str (), cell.length () );
+                lua_settable ( luaVM, -3 );
+            }
+            lua_pop ( luaVM, 1 );                               // pop the inner table
+        }
+        return 2;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPerformanceStats" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

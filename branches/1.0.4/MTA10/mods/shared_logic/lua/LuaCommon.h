@@ -47,9 +47,6 @@ class CResource;
 class CXMLNode;
 
 
-#define VERIFY_FUNCTION(func) (func!=LUA_REFNIL)
-
-
 // Lua push/pop macros for our datatypes
 CClientRadarMarker*     lua_toblip          ( lua_State* luaVM, int iArgument );
 CClientColModel*        lua_tocolmodel      ( lua_State* luaVM, int iArgument );

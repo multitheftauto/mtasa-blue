@@ -148,7 +148,7 @@ void CKeyBinds::Call ( CKeyBind* pKeyBind )
             case KEY_BIND_FUNCTION:
             {
                 CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( pKeyBind );
-                if ( pBind->luaMain && pBind->m_iLuaFunction != LUA_REFNIL )
+                if ( pBind->luaMain && VERIFY_FUNCTION ( pBind->m_iLuaFunction ) )
                 {
                     CLuaArguments Arguments;
                     Arguments.PushElement ( m_pPlayer );
@@ -162,7 +162,7 @@ void CKeyBinds::Call ( CKeyBind* pKeyBind )
             case KEY_BIND_CONTROL_FUNCTION:
             {
                 CControlFunctionBind* pBind = static_cast < CControlFunctionBind* > ( pKeyBind );
-                if ( pBind->luaMain && pBind->m_iLuaFunction != LUA_REFNIL )
+                if ( pBind->luaMain && VERIFY_FUNCTION ( pBind->m_iLuaFunction ) )
                 {
                     CLuaArguments Arguments;
                     Arguments.PushElement ( m_pPlayer );
@@ -248,7 +248,7 @@ bool CKeyBinds::ProcessKey ( const char* szKey, bool bHitState, eKeyBindType bin
 
 bool CKeyBinds::AddKeyFunction ( const char* szKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
-    if ( szKey == NULL || iLuaFunction == LUA_REFNIL )
+    if ( szKey == NULL || IS_REFNIL ( iLuaFunction ) )
         return false;
 
     SBindableKey* pKey = GetBindableFromKey ( szKey );
@@ -305,7 +305,7 @@ bool CKeyBinds::RemoveKeyFunction ( const char* szKey, CLuaMain* pLuaMain, bool 
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {
-                        if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
+                        if ( IS_REFNIL ( iLuaFunction ) || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
 
@@ -344,7 +344,7 @@ bool CKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain, bool 
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {
-                        if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
+                        if ( IS_REFNIL ( iLuaFunction ) || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
                         }
@@ -445,7 +445,7 @@ bool CKeyBinds::RemoveControlFunction ( const char* szControl, CLuaMain* pLuaMai
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {                    
-                        if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
+                        if ( IS_REFNIL ( iLuaFunction ) || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
                             if ( m_bProcessingKey ) (*iter)->beingDeleted = true;
@@ -483,7 +483,7 @@ bool CKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* pLuaMai
                 {
                     if ( !bCheckHitState || pBind->bHitState == bHitState )
                     {                    
-                        if ( iLuaFunction == LUA_REFNIL || pBind->m_iLuaFunction == iLuaFunction )
+                        if ( IS_REFNIL ( iLuaFunction ) || pBind->m_iLuaFunction == iLuaFunction )
                         {
                             bFound = true;
                         }
