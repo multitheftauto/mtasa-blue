@@ -130,7 +130,7 @@ CLuaTimer* CLuaTimerManager::AddTimer ( lua_State* luaVM )
             Arguments.ReadArguments ( luaVM, 4 );
 
             CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 1 );
-            if ( iLuaFunction != LUA_REFNIL )
+            if ( VERIFY_FUNCTION ( iLuaFunction ) )
             {
                 // Add the timer
                 CLuaTimer* pLuaTimer = new CLuaTimer ( iLuaFunction, Arguments );

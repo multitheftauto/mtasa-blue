@@ -43,7 +43,6 @@ static CResourceManager*                                m_pResourceManager = NUL
 static CAccessControlListManager*                       m_pACLManager = NULL;
 static CLuaModuleManager*                               m_pLuaModuleManager = NULL;
 #define type(number,type) (lua_type(luaVM,number) == type)
-#define VERIFY_FUNCTION(func) (func!=LUA_REFNIL)
 
 
 void CLuaFunctionDefinitions::SetBlipManager ( CBlipManager* pBlipManager )
@@ -7751,7 +7750,7 @@ int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
                                     if ( strcmp ( szKey, pBind->boundKey->szKey ) == 0 )
                                     {
                                         lua_pushnumber ( luaVM, ++uiIndex );
-                                        lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction );
+                                        lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt () );
                                         lua_settable ( luaVM, -3 );
                                     }
                                 }
@@ -7765,7 +7764,7 @@ int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
                                     if ( strcmp ( szKey, pBind->boundControl->szControl ) == 0 )
                                     {
                                         lua_pushnumber ( luaVM, ++uiIndex );
-                                        lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction );
+                                        lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt () );
                                         lua_settable ( luaVM, -3 );
                                     }
                                 }

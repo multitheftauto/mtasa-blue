@@ -207,7 +207,7 @@ int CLuaFunctionDefs::UnbindKey ( lua_State* luaVM )
                 if ( lua_type ( luaVM, 3 ) == LUA_TFUNCTION )
                     iLuaFunction = luaM_toref ( luaVM, 3 );
 
-                if ( iLuaFunction == 0 || VERIFY_FUNCTION ( iLuaFunction ) )
+                if ( IS_REFNIL ( iLuaFunction ) || VERIFY_FUNCTION ( iLuaFunction ) )
                 {
                     if ( CStaticFunctionDefinitions::UnbindKey ( szKey, pLuaMain, szHitState, iLuaFunction ) )
                     {
@@ -411,7 +411,7 @@ int CLuaFunctionDefs::GetFunctionsBoundToKey ( lua_State* luaVM )
                                 if ( strcmp ( szKey, pBind->boundKey->szKey ) == 0 )
                                 {
                                     lua_pushnumber ( luaVM, ++uiIndex );
-                                    lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction );
+                                    lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt () );
                                     lua_settable ( luaVM, -3 );
                                 }
                             }
@@ -425,7 +425,7 @@ int CLuaFunctionDefs::GetFunctionsBoundToKey ( lua_State* luaVM )
                                 if ( strcmp ( szKey, pBind->boundControl->szControl ) == 0 )
                                 {
                                     lua_pushnumber ( luaVM, ++uiIndex );
-                                    lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction );
+                                    lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt () );
                                     lua_settable ( luaVM, -3 );
                                 }
                             }
