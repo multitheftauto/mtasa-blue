@@ -34,7 +34,7 @@ CLuaTimer::~CLuaTimer ( void )
 
 void CLuaTimer::ExecuteTimer ( CLuaMain* pLuaMain )
 {
-    if ( m_iLuaFunction != LUA_REFNIL && m_pArguments )
+    if ( VERIFY_FUNCTION ( m_iLuaFunction ) && m_pArguments )
         m_pArguments->Call ( pLuaMain, m_iLuaFunction );
 }
 

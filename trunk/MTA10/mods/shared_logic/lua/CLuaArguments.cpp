@@ -192,7 +192,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
     assert ( luaVM );
     LUA_CHECKSTACK ( luaVM, 1 );
     int luaStackPointer = lua_gettop ( luaVM );
-    lua_getref ( luaVM, iLuaFunction );
+    lua_getref ( luaVM, iLuaFunction.ToInt () );
 
     // Push our arguments onto the stack
     PushArguments ( luaVM );
@@ -245,7 +245,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
             lua_pop ( luaVM, 1 );
     }
         
-    GetClientPerfStatManager ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction ), GetTimeUs() - startTime );
+    GetClientPerfStatManager ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.ToInt () ), GetTimeUs() - startTime );
     return true;
 }
 
