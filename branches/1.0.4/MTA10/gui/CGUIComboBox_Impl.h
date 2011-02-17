@@ -32,13 +32,17 @@ public:
 
     void                        SetReadOnly                 ( bool bReadonly );
 
+    void                        SetSelectionHandler         ( GUI_CALLBACK Callback );
+
     #include "CGUIElement_Inc.h"
 
 protected:
 
     google::dense_hash_map < CEGUI::ListboxItem*, CGUIListItem_Impl* > m_Items;
 
-    CGUIListItem_Impl*          GetListItem                 ( CEGUI::ListboxItem* pItem );
+    bool                                Event_OnSelectionAccepted  ( const CEGUI::EventArgs& e );
+    CGUIListItem_Impl*                  GetListItem               ( CEGUI::ListboxItem* pItem );
+    GUI_CALLBACK                        m_OnSelectChange;
 };
 
 #endif

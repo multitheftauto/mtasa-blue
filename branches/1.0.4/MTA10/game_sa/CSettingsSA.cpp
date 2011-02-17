@@ -19,9 +19,19 @@ unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetDrawDistance;
 
+#define HOOKPOS_GetFxQuality                0x49EA50
+void HOOK_GetFxQuality ();
+
+#define HOOKPOS_StoreShadowForVehicle       0x70BDA0
+DWORD RETURN_StoreShadowForVehicle =        0x70BDA9;
+void HOOK_StoreShadowForVehicle ();
+
 CSettingsSA::CSettingsSA ( void )
 {
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
+    m_bVolumetricShadowsEnabled = false;
+    HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
+    HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
 }
 
 bool CSettingsSA::IsFrameLimiterEnabled ( void )
@@ -240,5 +250,95 @@ void CSettingsSA::Save ()
         mov ecx, CLASS_CMenuManager
         mov eax, FUNC_CMenuManager_Save
         call eax
+    }
+}
+
+bool CSettingsSA::IsVolumetricShadowsEnabled ( void )
+{
+	return m_bVolumetricShadowsEnabled;
+}
+
+void CSettingsSA::SetVolumetricShadowsEnabled ( bool bEnable )
+{
+	m_bVolumetricShadowsEnabled = bEnable;
+}
+
+//
+// Volumetric shadow hooks
+//
+DWORD dwFxQualityValue = 0;
+WORD usCallingForVehicleModel = 0;
+
+void _cdecl MaybeAlterFxQualityValue ( DWORD dwAddrCalledFrom )
+{
+    // Handle all calls from CVolumetricShadowMgr
+    if ( dwAddrCalledFrom > 0x70F990 && dwAddrCalledFrom < 0x711EB0 )
+    {
+        // Force blob shadows if volumetric shadows are not enabled
+        if ( !pGame->GetSettings ()->IsVolumetricShadowsEnabled () )
+            dwFxQualityValue = 0;
+
+        // These vehicles seem to have problems with volumetric shadows, so force blob shadows
+        switch ( usCallingForVehicleModel )
+        {
+            case 460:   // Skimmer
+            case 511:   // Beagle
+            case 572:   // Mower
+            case 590:   // Box Freight
+            case 592:   // Andromada
+                dwFxQualityValue = 0;
+        }
+        usCallingForVehicleModel = 0;
+    }
+    else
+    // Handle all calls from CPed::PreRenderAfterTest
+    if ( dwAddrCalledFrom > 0x5E65A0 && dwAddrCalledFrom < 0x5E7680 )
+    {
+        // Always use blob shadows for peds as realtime shadows are disabled in MTA (context switching issues)
+        dwFxQualityValue = 0;
+    }
+}
+
+// Hooked from 0x49EA50
+void _declspec(naked) HOOK_GetFxQuality ()
+{
+    _asm
+    {
+        pushad
+        mov     eax, [ecx+054h]         // Current FxQuality setting
+        mov     dwFxQualityValue, eax
+
+        mov     eax, [esp+32]           // Address GetFxQuality was called from
+        push    eax                     
+        call    MaybeAlterFxQualityValue
+        add     esp, 4
+    }
+
+    _asm
+    {
+        popad
+    }
+
+    _asm
+    {
+        mov     eax, dwFxQualityValue
+        retn
+    }
+}
+
+// Hook to discover what vehicle will be calling GetFxQuality
+void _declspec(naked) HOOK_StoreShadowForVehicle ()
+{
+    _asm
+    {
+        // Hooked from 0x70BDA0  5 bytes
+        mov     eax, [esp+4]        // Get vehicle
+        mov     ax, [eax+34]       // pEntity->m_nModelIndex
+        mov     usCallingForVehicleModel, ax
+        sub     esp, 44h 
+        push    ebx
+        mov     eax, 0x70F9B0   // CVolumetricShadowMgr::IsAvailable
+        call    eax
+        jmp     RETURN_StoreShadowForVehicle
     }
 }

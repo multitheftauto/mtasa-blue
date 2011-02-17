@@ -79,6 +79,7 @@ class CSettingsSA : public CGameSettings
 
 private:
     CSettingsSAInterface*   m_pInterface;
+    bool                    m_bVolumetricShadowsEnabled;
 
 public:
                             CSettingsSA                 ( void );
@@ -119,6 +120,9 @@ public:
 
     unsigned int            GetAntiAliasing             ( void );
     void                    SetAntiAliasing             ( unsigned int uiAntiAliasing, bool bOnRestart );
+
+	bool                    IsVolumetricShadowsEnabled     ( void );
+	void                    SetVolumetricShadowsEnabled    ( bool bEnable );
 
     void                    Save                        ( void );
 

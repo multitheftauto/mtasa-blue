@@ -27,6 +27,7 @@ public:
     virtual CGUIListItem*       AddItem             ( const char* szText ) = 0;
     virtual CGUIListItem*       GetSelectedItem     ( void ) = 0;
     virtual void                Clear               ( void ) = 0;
+    virtual void                SetSelectionHandler          ( GUI_CALLBACK Callback ) = 0;
 };
 
 #endif
