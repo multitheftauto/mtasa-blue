@@ -268,16 +268,19 @@ void CSettingsSA::SetVolumetricShadowsEnabled ( bool bEnable )
 // Volumetric shadow hooks
 //
 DWORD dwFxQualityValue = 0;
-DWORD dwCallingForVehicleModel = 0;
+WORD usCallingForVehicleModel = 0;
 
 void _cdecl MaybeAlterFxQualityValue ( DWORD dwAddrCalledFrom )
 {
-    if ( DWORD dwModelIndex = dwCallingForVehicleModel )
+    // Handle all calls from CVolumetricShadowMgr
+    if ( dwAddrCalledFrom > 0x70F990 && dwAddrCalledFrom < 0x711EB0 )
     {
-        dwCallingForVehicleModel = 0;
+        // Force blob shadows if volumetric shadows are not enabled
+        if ( !pGame->GetSettings ()->IsVolumetricShadowsEnabled () )
+            dwFxQualityValue = 0;
 
         // These vehicles seem to have problems with volumetric shadows, so force blob shadows
-        switch ( dwModelIndex )
+        switch ( usCallingForVehicleModel )
         {
             case 460:   // Skimmer
             case 511:   // Beagle
@@ -285,18 +288,10 @@ void _cdecl MaybeAlterFxQualityValue ( DWORD dwAddrCalledFrom )
             case 590:   // Box Freight
             case 592:   // Andromada
                 dwFxQualityValue = 0;
-                return;
         }
+        usCallingForVehicleModel = 0;
     }
-
-    // Handle all calls from CVolumetricShadowMgr
-    if ( dwAddrCalledFrom > 0x70F990 && dwAddrCalledFrom < 0x711EB0 )
-    {
-        // Force blob shadows if volumetric shadows are not enabled
-        if ( !pGame->GetSettings ()->IsVolumetricShadowsEnabled () )
-            dwFxQualityValue = 0;
-    }
-
+    else
     // Handle all calls from CPed::PreRenderAfterTest
     if ( dwAddrCalledFrom > 0x5E65A0 && dwAddrCalledFrom < 0x5E7680 )
     {
@@ -339,8 +334,8 @@ void _declspec(naked) HOOK_StoreShadowForVehicle ()
     {
         // Hooked from 0x70BDA0  5 bytes
         mov     eax, [esp+4]        // Get vehicle
-        mov     eax, [eax+34]       // pEntity->m_nModelIndex
-        mov     dwCallingForVehicleModel, eax
+        mov     ax, [eax+34]       // pEntity->m_nModelIndex
+        mov     usCallingForVehicleModel, ax
         sub     esp, 44h 
         push    ebx
         mov     eax, 0x70F9B0   // CVolumetricShadowMgr::IsAvailable
