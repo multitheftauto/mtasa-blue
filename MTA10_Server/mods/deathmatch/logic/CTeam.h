@@ -38,7 +38,7 @@ public:
     void                    AddPlayer               ( CPlayer* pPlayer, bool bChangePlayer = false );
     void                    RemovePlayer            ( CPlayer* pPlayer, bool bChangePlayer = false );
     void                    RemoveAllPlayers        ( void );
-    void                    GetPlayers              ( CLuaMain* pLuaMain );
+    void                    GetPlayers              ( lua_State* luaVM );
 
     void                    GetColor                ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue );
     void                    SetColor                ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );

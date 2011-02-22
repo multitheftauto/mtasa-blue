@@ -406,7 +406,7 @@ int CLuaFunctionDefs::GetElementChildren ( lua_State* luaVM )
                 lua_newtable ( luaVM );
 
                 // Add all the elements with a matching type to it
-                pEntity->GetChildren ( pLuaMain );
+                pEntity->GetChildren ( luaVM );
                 return 1;
             }
             else
@@ -550,7 +550,7 @@ int CLuaFunctionDefs::GetElementsByType ( lua_State* luaVM )
             lua_newtable ( luaVM );
 
             // Add all the elements with a matching type to it
-            startAt->FindAllChildrenByType ( szType, pLuaMain, bStreamedIn );
+            startAt->FindAllChildrenByType ( szType, luaVM, bStreamedIn );
             return 1;
         }
         else

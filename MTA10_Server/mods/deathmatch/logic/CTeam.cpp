@@ -138,9 +138,8 @@ void CTeam::RemoveAllPlayers ( void )
 }
 
 
-void CTeam::GetPlayers ( CLuaMain* pLuaMain )
+void CTeam::GetPlayers ( lua_State* luaVM )
 {
-    lua_State* luaVM = pLuaMain->GetVirtualMachine ();
     unsigned int uiIndex = 0;
     list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
