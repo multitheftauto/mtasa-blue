@@ -8275,9 +8275,8 @@ bool CStaticFunctionDefinitions::RemoveBan ( CBan* pBan, CPlayer* pResponsible )
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetBans ( CLuaMain* pLuaMain )
+bool CStaticFunctionDefinitions::GetBans ( lua_State* pLua )
 {
-    lua_State* pLua = pLuaMain->GetVM();
     list < CBan* > ::const_iterator iter = m_pBanManager->IterBegin();
     unsigned int uiIndex = 0;
 

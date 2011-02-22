@@ -58,7 +58,7 @@ public:
     inline CVehicleColorManager*        GetColorManager             ( void )                            { return &m_ColorManager; };
     CVehicleColor                       GetRandomColor              ( unsigned short usModel );
 
-    void                                GetVehiclesOfType           ( unsigned int uiModel, CLuaMain* pLuaMain );
+    void                                GetVehiclesOfType           ( unsigned int uiModel, lua_State* luaVM );
 
     list < CVehicle* > ::const_iterator IterBegin                   ( void )                            { return m_List.begin (); };
     list < CVehicle* > ::const_iterator IterEnd                     ( void )                            { return m_List.end (); };

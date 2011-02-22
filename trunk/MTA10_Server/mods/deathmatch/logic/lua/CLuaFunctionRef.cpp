@@ -95,7 +95,7 @@ CLuaFunctionRef::CLuaFunctionRef ( void )
 
 CLuaFunctionRef::CLuaFunctionRef ( lua_State *luaVM, int iFunction, const void* pFuncPtr )
 {
-    m_luaVM = luaVM;
+    m_luaVM = lua_getmainstate ( luaVM );
     m_iFunction = iFunction;
     m_pFuncPtr = pFuncPtr;
 }
