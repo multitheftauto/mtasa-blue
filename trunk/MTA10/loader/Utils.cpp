@@ -26,7 +26,8 @@ static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
 SString GetWMIOSVersion ( void );
 static HWND hwndCrashedDialog = NULL;
-static HANDLE g_hMutex = NULL;
+HANDLE g_hMutex = NULL;
+HMODULE hLibraryModule = NULL;
 
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
@@ -86,14 +87,13 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
         5 seconds which is way longer than this should take to prevent this application
         from deadlocking if something goes really wrong allowing us to kill the injected
         game executable and avoid user inconvenience.*/
-    WaitForSingleObject ( hThread, INFINITE );
+    WaitForObject ( hProcess, hThread, INFINITE, NULL );
+
 
     /* Get the handle of the remotely loaded DLL module */
     DWORD hLibModule = 0;
-    GetExitCodeThread ( hProcess, &hLibModule );
+    GetExitCodeThread ( hThread, &hLibModule );
 
-    // Wait for the LoadLibrary thread to finish
-    WaitForSingleObject( hThread, INFINITE );
 
     /* Clean up the resources we used to inject the DLL */
     VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
@@ -1172,6 +1172,52 @@ static SString HashBuffer ( char* pData, uint uiLength )
 
 /////////////////////////////////////////////////////////////////////
 //
+// GetLibraryHandle
+//
+//
+//
+/////////////////////////////////////////////////////////////////////
+HMODULE GetLibraryHandle ( const SString& strFilename )
+{
+    if ( !hLibraryModule )
+    {
+        // Get path to the relevant file
+        SString strLibPath = PathJoin ( GetLaunchPath (), "mta" );
+        SString strLibPathFilename = PathJoin ( strLibPath, strFilename );
+
+        SString strPrevCurDir = GetCurrentWorkingDirectory ();
+        SetCurrentDirectory ( strLibPath );
+        SetDllDirectory( strLibPath );
+
+        hLibraryModule = LoadLibrary ( strLibPathFilename );
+
+        SetCurrentDirectory ( strPrevCurDir );
+        SetDllDirectory( strPrevCurDir );
+    }
+
+    return hLibraryModule;
+}
+
+
+/////////////////////////////////////////////////////////////////////
+//
+// FreeLibraryHandle
+//
+//
+//
+/////////////////////////////////////////////////////////////////////
+void FreeLibraryHandle ( void )
+{
+    if ( hLibraryModule )
+    {
+        FreeLibrary ( hLibraryModule );
+        hLibraryModule = NULL;
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////
+//
 // UpdateMTAVersionApplicationSetting
 //
 // Make sure "mta-version-ext" is correct. eg "1.0.4-9.01234.2.000"
@@ -1190,7 +1236,6 @@ void UpdateMTAVersionApplicationSetting ( void )
     //
 
     // Get saved status
-    SString strOldHash = GetApplicationSetting ( "netc-hash" );
     unsigned short usNetRev = 65535;
     unsigned short usNetRel = 0;
     std::vector < SString > parts;
@@ -1201,47 +1246,16 @@ void UpdateMTAVersionApplicationSetting ( void )
         usNetRel = atoi ( parts[5] );
     }
 
-    // Get path to the relevant file
-    SString strNetLibPath = PathJoin ( GetLaunchPath (), "mta" );
-    SString strNetLibPathFilename = PathJoin ( strNetLibPath, strFilename );
-
-    // Hash the file
-    std::vector < char > buffer;
-    FileLoad ( strNetLibPathFilename, buffer );
-    SString strNewHash = "none";
-    if ( buffer.size () )
-        strNewHash = HashBuffer ( &buffer.at ( 0 ), buffer.size () );
-
-#ifdef MTA_DEBUG
-    // Force update
-    strNewHash = GetTimeString ();
-#endif
-    // Only loadup the dll if the hash has changed, or we don't have a previous valid netrev value
-    if ( strNewHash != strOldHash || usNetRev == 65535 )
+    HMODULE hModule = GetLibraryHandle ( strFilename );
+    if ( hModule )
     {
-        SString strPrevCurDir = GetCurrentWorkingDirectory ();
-        SetCurrentDirectory ( strNetLibPath );
-        SetDllDirectory( strNetLibPath );
-
-        HMODULE hModule = LoadLibrary ( strNetLibPathFilename );
-
-        if ( hModule )
-        {
-            typedef unsigned short (*PFNGETNETREV) ( void );
-            PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
-            if ( pfnGetNetRev )
-                usNetRev = pfnGetNetRev ();
-            PFNGETNETREV pfnGetNetRel = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRel" ) ) );
-            if ( pfnGetNetRel )
-                usNetRel = pfnGetNetRel ();
-
-            FreeLibrary ( hModule );
-        }
-
-        SetCurrentDirectory ( strPrevCurDir );
-        SetDllDirectory( strPrevCurDir );
-
-        SetApplicationSetting ( "netc-hash", strNewHash );
+        typedef unsigned short (*PFNGETNETREV) ( void );
+        PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
+        if ( pfnGetNetRev )
+            usNetRev = pfnGetNetRev ();
+        PFNGETNETREV pfnGetNetRel = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRel" ) ) );
+        if ( pfnGetNetRel )
+            usNetRel = pfnGetNetRel ();
     }
 
     SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
@@ -1366,4 +1380,102 @@ void ReleaseSingleInstanceMutex ( void )
     assert ( g_hMutex );
     CloseHandle ( g_hMutex );
     g_hMutex = NULL;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// WaitForObject
+//
+// Wait for object to finish
+// Returns non-zero if wait failed.
+//
+///////////////////////////////////////////////////////////////////////////
+uint WaitForObject ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex )
+{
+    uint uiResult = 0;
+
+    HMODULE hModule = GetLibraryHandle ( "kernel32.dll" );
+
+    if ( hModule )
+    {
+        typedef unsigned long (*PFNWaitForObject) ( HANDLE, ... );
+        PFNWaitForObject pfnWaitForObject = static_cast< PFNWaitForObject > ( static_cast < PVOID > ( GetProcAddress ( hModule, "WaitForObject" ) ) );
+
+        if ( !pfnWaitForObject || pfnWaitForObject ( hProcess, hThread, dwMilliseconds, hMutex ) )
+            uiResult = 1;
+    }
+
+    return uiResult;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetFileAge
+//
+// Returns time in seconds since a file/directory was created
+//
+///////////////////////////////////////////////////////////////////////////
+int GetFileAge ( const SString& strPathFilename )
+{
+    WIN32_FIND_DATA findFileData;
+    HANDLE hFind = FindFirstFile ( strPathFilename, &findFileData );
+    if ( hFind != INVALID_HANDLE_VALUE )
+    {
+        FindClose ( hFind );
+        FILETIME ftNow;
+        GetSystemTimeAsFileTime ( &ftNow );
+        LARGE_INTEGER creationTime = { findFileData.ftCreationTime.dwLowDateTime, findFileData.ftCreationTime.dwHighDateTime };
+        LARGE_INTEGER timeNow = { ftNow.dwLowDateTime, ftNow.dwHighDateTime };
+        return static_cast < int > ( ( timeNow.QuadPart - creationTime.QuadPart ) / ( LONGLONG ) 10000000 );
+    }
+    return 0;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CleanDownloadCache
+//
+// Remove old files from the download cache
+//
+///////////////////////////////////////////////////////////////////////////
+void CleanDownloadCache ( void )
+{
+    const uint uiMaxCleanTime = 5;                      // Limit clean time (seconds)
+    const uint uiCleanFileAge = 60 * 60 * 24 * 7;       // Delete files older than this
+
+    const time_t tMaxEndTime = time ( NULL ) + uiMaxCleanTime;
+
+    // Search possible cache locations
+    std::list < SString > cacheLocationList;
+    cacheLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache" ) );
+    cacheLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache" ) );
+    cacheLocationList.push_back ( GetMTATempPath () );
+
+    for ( ; !cacheLocationList.empty () ; cacheLocationList.pop_front () )
+    {
+        // Get list of files & directories in this cache location
+        const SString& strCacheLocation = cacheLocationList.front ();
+        const std::vector < SString > fileList = FindFiles ( PathJoin ( strCacheLocation, "\\*" ), true, true );
+
+        for ( uint i = 0 ; i < fileList.size () ; i++ )
+        {
+            const SString strPathFilename = PathJoin ( strCacheLocation, fileList[i] );
+            // Check if over 7 days old
+            if ( GetFileAge ( strPathFilename ) > uiCleanFileAge )
+            {
+                // Delete as directory or file
+                if ( DirectoryExists ( strPathFilename ) )
+                    DelTree ( strPathFilename, strCacheLocation );
+                else
+                    FileDelete ( strPathFilename );
+
+                // Check time spent
+                if ( time ( NULL ) > tMaxEndTime )
+                    break;
+            }
+        }
+    }
 }

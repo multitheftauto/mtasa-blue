@@ -10,6 +10,7 @@
 
 #include <shlobj.h>
 #include <Psapi.h>
+#include <time.h>
 
 #define MTA_CLIENT
 #include "SharedUtil.h"

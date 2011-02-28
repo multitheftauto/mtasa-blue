@@ -198,21 +198,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     //////////////////////////////////////////////////////////
     //
-    // Show splash screen
+    // Show splash screen and wait 2 seconds
     //
-    // If we aren't compiling in debug-mode...
-    #ifndef MTA_DEBUG
-    #ifndef MTA_ALLOW_DEBUG
-        // Are we debugged? Quit... if not compiled debug
-        if ( IsDebuggerPresent () )
-        {
-            // Exit without a message so it'll be a little harder for the hacksors
-            ExitProcess(-1);
-        }
-
-    #endif
-    #endif
-    // Show the splash and wait 2 seconds
     ShowSplash ( g_hInstance );
 
     //////////////////////////////////////////////////////////
@@ -334,7 +321,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     // Wait for game to exit
     if ( piLoadee.hThread)
-        WaitForSingleObject ( piLoadee.hProcess, INFINITE );
+        WaitForObject ( piLoadee.hProcess, NULL, INFINITE, g_hMutex );
 
     // Get its exit code
     DWORD dwExitCode = -1;
