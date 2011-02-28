@@ -1380,7 +1380,7 @@ bool CStaticFunctionDefinitions::GetPedTargetCollision ( CClientPed& Ped, CVecto
 }
 
 
-char* CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, int iIndex )
+bool CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, std::vector < SString >& outTaskHierarchy )
 {
     CTaskManager* pTaskManager = Ped.GetTaskManager ();
     if ( pTaskManager )
@@ -1391,20 +1391,16 @@ char* CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, u
         else
             pTask = pTaskManager->GetTaskSecondary ( uiTaskType );
 
-        unsigned int uiTempIndex = 0;
         while ( pTask )
         {
-            if ( uiTempIndex == iIndex )
-                break;
+            outTaskHierarchy.push_back ( pTask->GetTaskName () );
             pTask = pTask->GetSubTask ();
         }
-        if ( pTask )
-        {
-            return pTask->GetTaskName ();
-        }
+
+        return !outTaskHierarchy.empty ();
     }
 
-    return NULL;
+    return false;
 }
 
 

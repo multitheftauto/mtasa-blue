@@ -304,12 +304,6 @@ int CLuaFunctionDefs::GetPedTask ( lua_State* luaVM )
         CClientPed* pPed = lua_toped ( luaVM, 1 );
         const char* szPriority = lua_tostring ( luaVM, 2 );
         unsigned int uiTaskType = static_cast < unsigned int > ( lua_tonumber ( luaVM, 3 ) );
-        int iIndex = 0;
-
-        // Grab the index if provided
-        int iArgument4 = lua_type ( luaVM, 4 );
-        if ( iArgument4 == LUA_TSTRING || iArgument4 == LUA_TNUMBER )
-            iIndex = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
 
         // Valid ped?
         if ( pPed )
@@ -322,12 +316,13 @@ int CLuaFunctionDefs::GetPedTask ( lua_State* luaVM )
                 if ( ( bPrimary = !stricmp ( szPriority, "primary" ) ) ||
                     ( !stricmp ( szPriority, "secondary" ) ) )
                 {
-                    // Grab the taskname and return it
-                    char* szTaskName = CStaticFunctionDefinitions::GetPedTask ( *pPed, bPrimary, uiTaskType, iIndex );
-                    if ( szTaskName )
+                    // Grab the taskname list and return it
+                    std::vector < SString > taskHierarchy;
+                    if ( CStaticFunctionDefinitions::GetPedTask ( *pPed, bPrimary, uiTaskType, taskHierarchy ) )
                     {
-                        lua_pushstring ( luaVM, szTaskName );
-                        return 1;
+                        for ( uint i = 0 ; i < taskHierarchy.size () ; i++ )
+                            lua_pushstring ( luaVM, taskHierarchy[i] );
+                        return taskHierarchy.size ();
                     }
                 }
             }
