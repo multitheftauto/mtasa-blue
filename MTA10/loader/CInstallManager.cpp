@@ -91,31 +91,31 @@ void CInstallManager::InitSequencer ( void )
                 CR "initial: "
                 CR "            CALL CheckOnRestartCommand "
                 CR "            IF LastResult != ok GOTO update_end: "
-                CR " "
-                CR "            CALL MaybeSwitchToTempExe "     // Update game
+                CR " "                                              ////// Start of 'update game' //////
+                CR "            CALL MaybeSwitchToTempExe "         // If update files comes with and .exe, switch to that for the install
                 CR "copy_files: "
-                CR "            CALL InstallFiles "
+                CR "            CALL InstallFiles "                 // Try to install update files
                 CR "            IF LastResult == ok GOTO update_end: "
                 CR " "
-                CR "            CALL ChangeToAdmin "
+                CR "            CALL ChangeToAdmin "                // If install failed, try as admin
                 CR "            IF LastResult == ok GOTO copy_files: "
                 CR " "
-                CR "            CALL ShowCopyFailDialog "
+                CR "            CALL ShowCopyFailDialog "           // If install failed as admin, show message box
                 CR "            IF LastResult == retry GOTO copy_files: "
                 CR " "
-                CR "update_end: "
+                CR "update_end: "                                   ////// End of 'update game' //////
                 CR "            CALL SwitchBackFromTempExe "
                 CR " "        
-                CR "aero_check: "                               // Windows 7 aero desktop fix
-                CR "            CALL ProcessAeroChecks "
+                CR "aero_check: "                                   ////// Start of 'Windows 7 aero desktop fix' //////
+                CR "            CALL ProcessAeroChecks "            // Make changes to comply with user setting
                 CR "            IF LastResult == ok GOTO aero_end: "
                 CR " "
-                CR "            CALL ChangeToAdmin "
+                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
                 CR "            IF LastResult == ok GOTO aero_check: "
                 CR " "
-                CR "aero_end: "
-                CR "            CALL ChangeFromAdmin "
-                CR "            CALL InstallNewsItems "         // Install pending news
+                CR "aero_end: "                                     ////// End of 'Windows 7 aero desktop fix' //////
+                CR "            CALL ChangeFromAdmin "              
+                CR "            CALL InstallNewsItems "             // Install pending news
                 CR "            GOTO launch: "
                 CR " "
                 CR "crashed: "
@@ -176,6 +176,9 @@ SString CInstallManager::Continue ( const SString& strCommandLineIn  )
     for ( int i = 0 ; !m_pSequencer->AtEnd () && i < 1000 ; i++ )
         m_pSequencer->ProcessNextLine ();
 
+    // Remove unwanted files
+    CleanDownloadCache ();
+
     // Extract command line launch args
     SString strCommandLineOut;
     for ( int i = 0 ; i < m_pSequencer->GetVariableInt ( "_argc" ) ; i++ )
@@ -202,15 +205,12 @@ void CInstallManager::RestoreSequencerFromSnapshot ( const SString& strText )
     int iFirstArg = 0;
     if ( parts.size () > 0 && parts[0].Contains ( "=" ) )
     {
+        // Upgrade variables
+        if ( parts[0].Contains ( INSTALL_STAGE ) && !parts[0].Contains ( "_pc_label" ) )
+            parts[0] = parts[0].Replace ( INSTALL_STAGE, "_pc_label" );
+
         m_pSequencer->RestoreStateFromString ( parts[0] );
         iFirstArg++;
-    }
-
-    // Upgrade variables
-    if ( !m_pSequencer->GetVariable ( INSTALL_STAGE ).empty () && m_pSequencer->GetVariable ( "_pc_label" ).empty () )
-    {
-        m_pSequencer->SetVariable ( "_pc_label", m_pSequencer->GetVariable ( INSTALL_STAGE ) );
-        m_pSequencer->SetVariable ( INSTALL_STAGE, "" );
     }
 
     // Add any extra command line args

@@ -14,6 +14,7 @@
 #define __UTILS_H
 
 extern HINSTANCE g_hInstance;
+extern HANDLE g_hMutex;
 
 // Loads the given dll into hProcess. Returns 0 on failure or the handle to the
 // remote dll module on success.
@@ -54,5 +55,13 @@ bool    CreateSingleInstanceMutex   ( void );
 void    ReleaseSingleInstanceMutex  ( void );
 
 SString CheckOnRestartCommand       ( void );
+void    CleanDownloadCache          ( void );
+
+HMODULE GetLibraryHandle            ( const SString& strFilename );
+void    FreeLibraryHandle           ( void );
+uint    WaitForObject               ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex );
+
+#undef CREATE_SUSPENDED
+#define CREATE_SUSPENDED 5
 
 #endif
