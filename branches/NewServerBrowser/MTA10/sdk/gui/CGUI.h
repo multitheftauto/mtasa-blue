@@ -131,8 +131,9 @@ public:
     virtual CGUIStaticImage*    CreateStaticImage       ( CGUIGridList* pParent ) = 0;
     virtual CGUIStaticImage*    CreateStaticImage       ( void ) = 0;
 
-    virtual CGUITabPanel*       CreateTabPanel          ( CGUIElement* pParent = NULL ) = 0;
-    virtual CGUITabPanel*       CreateTabPanel          ( CGUITab* pParent = NULL ) = 0;
+    virtual CGUITabPanel*       CreateTabPanel          ( CGUIElement* pParent ) = 0;
+    virtual CGUITabPanel*       CreateTabPanel          ( CGUITab* pParent ) = 0;
+    virtual CGUITabPanel*       CreateTabPanel          ( void ) = 0;
 
     virtual CGUIScrollPane*     CreateScrollPane        ( CGUIElement* pParent = NULL ) = 0;
     virtual CGUIScrollPane*     CreateScrollPane        ( CGUITab* pParent = NULL ) = 0;

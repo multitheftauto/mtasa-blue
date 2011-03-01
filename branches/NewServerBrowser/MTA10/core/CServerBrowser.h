@@ -58,9 +58,6 @@ public:
     void                SetVisible              ( bool bVisible );
     bool                IsVisible               ( void );
     
-    void                SetSize                 ( CVector2D& vecSize );
-    CVector2D           GetSize                 ( void );
-
     bool                ConnectToSelectedServer ( void );
 
     static void         CompleteConnect         ( void );
@@ -82,6 +79,9 @@ public:
     std::string         GetServerPassword       ( const std::string& strHost );
     void                ClearServerPasswords    ( void );
 
+    void                SetStatusText           ( std::string strStatus );
+    void                SetAddressBarText       ( std::string strText );
+
     CServerListItem*    FindSelectedServer      ( ServerBrowserType Type );
     CServerListItem*    FindServerFromRow       ( ServerBrowserType Type, int iRow );
     int                 FindRowFromServer       ( ServerBrowserType Type, const CServerListItem * pServer );
@@ -94,16 +94,15 @@ protected:
 
     int                 m_iSelectedServer[ SERVER_BROWSER_TYPE_COUNT ];
 
+    CVector2D           m_WidgetSize;
+
     // Window widgets
-    CGUIWindow*         m_pWindow;
-    CGUITabPanel*       m_pTabs;
-    CGUIButton*         m_pButtonBack;
-    CGUILabel*          m_pServerListStatus;
+    CGUITabPanel*       m_pPanel;
     CGUIStaticImage*    m_pLockedIcon;
-    CGUIButton*         m_pButtonFavouritesByIP;
+    CGUIStaticImage*    m_pSearchPlayersIcon;
+    CGUIStaticImage*    m_pSearchServersIcon;
 
     // Classes
-    CFavouritesAddByIP  m_pFavouritesAddByIP;
     CCommunityLogin     m_pCommunityLogin;
   
     // Tab controls
@@ -126,14 +125,27 @@ protected:
     CGUICheckBox*       m_pIncludeOtherVersions [ SERVER_BROWSER_TYPE_COUNT ];
 
     CGUIButton*         m_pButtonConnect [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIStaticImage*    m_pButtonConnectIcon [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIButton*         m_pButtonRefresh [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIStaticImage*    m_pButtonRefreshIcon [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIButton*         m_pButtonInfo [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIStaticImage*    m_pButtonInfoIcon [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIButton*         m_pButtonFavourites [ SERVER_BROWSER_TYPE_COUNT ];
+
+    CGUIEdit*           m_pEditAddress [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIComboBox*       m_pComboAddressHistory  [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIStaticImage*    m_pAddressFavoriteIcon [ SERVER_BROWSER_TYPE_COUNT ];
+
+    CGUIComboBox*       m_pComboSearchType  [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIEdit*           m_pEditSearch  [ SERVER_BROWSER_TYPE_COUNT ];
+
+
     
     CGUILabel*          m_pLabelPassword [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIEdit*           m_pEditPassword [ SERVER_BROWSER_TYPE_COUNT ];
 
-    CGUIEdit*           m_pEditPlayerSearch [ SERVER_BROWSER_TYPE_COUNT ];
-    CGUIStaticImage*    m_pPlayerSearchIcon [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUILabel*          m_pServerListStatus [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIButton*          m_pButtonBack [ SERVER_BROWSER_TYPE_COUNT ];
 
     // Server list columns
     CGUIHandle          m_hVersion [ SERVER_BROWSER_TYPE_COUNT ];
@@ -149,6 +161,11 @@ protected:
     CGUIHandle          m_hPlayerName [ SERVER_BROWSER_TYPE_COUNT ];
 
 private:
+    enum
+    {
+        DATA_PSERVER = 1,  //Column which stores server pointer
+    };
+
     void                    CreateTab                       ( ServerBrowserType type, const char* szName );
     void                    DeleteTab                       ( ServerBrowserType type );
 
@@ -162,11 +179,9 @@ private:
     bool                    OnRefreshClick                  ( CGUIElement* pElement );
     bool                    OnFavouritesClick               ( CGUIElement* pElement );
     bool                    OnBackClick                     ( CGUIElement* pElement );
+    bool                    OnAddressChanged                ( CGUIElement* pElement );
     bool                    OnFilterChanged                 ( CGUIElement* pElement );
     bool                    OnTabChanged                    ( CGUIElement* pElement );
-    bool                    OnFavouritesByIPClick           ( CGUIElement* pElement );
-    bool                    OnFavouritesByIPAddClick        ( CGUIElement* pElement );
-    bool                    OnWindowSize                    ( CGUIElement* pElement );
 
     ServerBrowserType       GetCurrentServerBrowserType     ( void );
 

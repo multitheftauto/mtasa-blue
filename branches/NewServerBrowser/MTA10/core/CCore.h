@@ -131,7 +131,6 @@ public:
 
     // Configuration
     void                    ApplyConsoleSettings            ( void );
-    void                    ApplyServerBrowserSettings      ( void );
     void                    ApplyGameSettings               ( void );
     void                    ApplyCommunityState             ( void );
     void                    UpdateRecentlyPlayed            ( void );
@@ -203,6 +202,7 @@ public:
     void                    ApplyFrameRateLimit             ( void );
 
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
+    void                    GetConnectParametersFromURI     ( const char* szURI, std::string &strHost, unsigned short &usPort, std::string &strNick, std::string &strPassword );
     bool                    bScreenShot;
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
     const char *            GetCommandLineOption            ( const char* szOption );

@@ -180,6 +180,28 @@ bool CGUIComboBox_Impl::SetItemText ( int index, const char* szText )
     return false;
 }
 
+void CGUIComboBox_Impl::SetItemImage ( int index,  CGUIStaticImage* pImage )
+{
+    // Get the current item at that offset
+    CEGUI::ListboxItem* pCEGUIItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
+    CGUIListItem* pItem = GetListItem ( pCEGUIItem );
+
+    //if ( pItem != NULL )
+    {
+        pItem->SetImage ( pImage );
+    }/*
+    else
+    //if ( pImage )
+    {
+        // If it doesn't, create it and set it in the combobox
+        CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl*) pImage );
+        CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
+        reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> addItem ( pListboxItem );
+        // Put our new item in the map
+        m_Items [ pNewItem->GetListItem () ] = pNewItem;
+    }*/
+}
+
 bool CGUIComboBox_Impl::SetSelectedItemByIndex ( int index )
 {
     try

@@ -33,6 +33,7 @@ public:
     int                         GetItemIndex                ( CGUIListItem* pItem );
     const char*                 GetItemText                 ( int index );
     bool                        SetItemText                 ( int index, const char* szText );
+    void                        SetItemImage                ( int index,  CGUIStaticImage* pImage );
     bool                        SetSelectedItemByIndex      ( int index );
     void                        Clear                       ( void );
 

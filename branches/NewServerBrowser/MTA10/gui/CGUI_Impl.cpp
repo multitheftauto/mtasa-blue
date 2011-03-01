@@ -1491,6 +1491,10 @@ CGUITabPanel* CGUI_Impl::CreateTabPanel ( CGUITab* pParent )
     return _CreateTabPanel ( wnd );
 }
 
+CGUITabPanel* CGUI_Impl::CreateTabPanel ( void )
+{
+    return _CreateTabPanel ( NULL );
+}
 
 CGUIScrollPane* CGUI_Impl::CreateScrollPane ( CGUIElement* pParent )
 {

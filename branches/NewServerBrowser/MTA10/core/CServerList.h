@@ -431,7 +431,7 @@ public:
 
     bool                                    AddUnique               ( in_addr Address, ushort usQueryPort, bool addAtFront = false );
     void                                    Clear                   ( void );
-    void                                    Remove                  ( in_addr Address, ushort usQueryPort );
+    bool                                    Remove                  ( in_addr Address, ushort usQueryPort );
 
     std::string&                            GetStatus               ( void )                        { return m_strStatus; };
     bool                                    IsUpdated               ( void )                        { return m_bUpdated; };

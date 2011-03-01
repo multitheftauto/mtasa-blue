@@ -30,6 +30,7 @@ public:
     virtual int                 GetSelectedItemIndex         ( void ) = 0;
     virtual const char*         GetItemText                  ( int index ) = 0;
     virtual bool                SetItemText                  ( int index, const char* szText ) = 0;
+    virtual void                SetItemImage                  ( int index,  CGUIStaticImage* pImage ) = 0;
     virtual bool                SetSelectedItemByIndex       ( int index ) = 0;
     virtual int                 GetItemIndex                 ( CGUIListItem* pItem ) = 0;
     virtual void                Clear                        ( void ) = 0;
