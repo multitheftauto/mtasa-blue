@@ -68,9 +68,11 @@ class CCore;
 #define CONFIG_NODE_SERVER_REC      "recently_played_servers"   // recently played servers list node
 #define CONFIG_NODE_SERVER_OPTIONS  "serverbrowser_options"     // saved options for the server browser
 #define CONFIG_NODE_SERVER_SAVED    "server_passwords"    // This contains saved passwords (as appose to save_server_passwords which is a setting)
+#define CONFIG_NODE_SERVER_HISTORY  "connect_history"
 #define CONFIG_INTERNET_LIST_TAG    "internet_server"
 #define CONFIG_FAVOURITE_LIST_TAG   "favourite_server"
 #define CONFIG_RECENT_LIST_TAG      "recently_played_server"
+#define CONFIG_HISTORY_LIST_TAG     "connected_server"
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {

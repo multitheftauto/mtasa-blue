@@ -312,7 +312,7 @@ protected:
 };
 
 typedef std::list<CServerListItem*>::const_iterator CServerListIterator;
-
+typedef std::list<CServerListItem*>::const_reverse_iterator CServerListReverseIterator;
 
 // Address and port combo
 struct SAddressPort
@@ -350,6 +350,16 @@ public:
     std::list<CServerListItem*>::iterator end()
     {
         return m_List.end ();
+    }
+
+    std::list<CServerListItem*>::reverse_iterator rbegin()
+    {
+        return m_List.rbegin ();
+    }
+
+    std::list<CServerListItem*>::reverse_iterator rend()
+    {
+        return m_List.rend ();
     }
 
     size_t size() const
@@ -427,6 +437,8 @@ public:
 
     CServerListIterator                     IteratorBegin           ( void )                        { return m_Servers.begin (); };
     CServerListIterator                     IteratorEnd             ( void )                        { return m_Servers.end (); };
+    CServerListReverseIterator              ReverseIteratorBegin    ( void )                        { return m_Servers.rbegin (); };
+    CServerListReverseIterator              ReverseIteratorEnd      ( void )                        { return m_Servers.rend (); };
     unsigned int                            GetServerCount          ( void )                        { return m_Servers.size (); };
 
     bool                                    AddUnique               ( in_addr Address, ushort usQueryPort, bool addAtFront = false );

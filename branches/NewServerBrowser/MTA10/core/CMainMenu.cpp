@@ -254,6 +254,8 @@ CMainMenu::CMainMenu ( CGUI* pManager )
         CONFIG_FAVOURITE_LIST_TAG, m_ServerBrowser.GetFavouritesList () );
     m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC ),
         CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList () );
+    m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_HISTORY ),
+        CONFIG_HISTORY_LIST_TAG, m_ServerBrowser.GetHistoryList () );
 
     // Remove unused node
     if ( CXMLNode* pOldNode = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ) )

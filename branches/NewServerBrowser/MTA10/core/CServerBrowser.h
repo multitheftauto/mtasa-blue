@@ -65,6 +65,7 @@ public:
     CServerList*        GetInternetList         ( void ) { return &m_ServersInternet; };
     CServerList*        GetFavouritesList       ( void ) { return &m_ServersFavourites; };
     CServerList*        GetRecentList           ( void ) { return &m_ServersRecent; };
+    CServerList*        GetHistoryList          ( void ) { return &m_ServersHistory; };
 
     void                SaveRecentlyPlayedList  ( );
     void                SaveFavouritesList      ( );
@@ -73,7 +74,7 @@ public:
     void                SaveOptions             ( );
 
     bool                LoadServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList );
-    bool                SaveServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList );
+    bool                SaveServerList          ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList, unsigned int iLimit = 0 );
 
     void                SetServerPassword       ( const std::string& strHost, const std::string& strPassword );
     std::string         GetServerPassword       ( const std::string& strHost );
@@ -88,11 +89,20 @@ public:
     void                UpdateSelectedServerPlayerList ( ServerBrowserType Type );
     void                GetVisibleEndPointList  ( std::vector < SAddressPort >& outEndpointList );
 
+    bool                IsAddressBarAwaitingInput  ( void );
+    void                SetNextHistoryText      ( bool bDown );
+
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 
+    void                CreateHistoryList               ( void );
+
     int                 m_iSelectedServer[ SERVER_BROWSER_TYPE_COUNT ];
+
+    bool                m_bManualConnect;
+    std::string         m_strManualHost;
+    unsigned int        m_usManualPort;
 
     CVector2D           m_WidgetSize;
 
@@ -170,6 +180,7 @@ private:
     void                    DeleteTab                       ( ServerBrowserType type );
 
     void                    UpdateServerList                ( ServerBrowserType Type, bool bClearServerList = false);
+    void                    UpdateHistoryList               ( void );
     CServerList *           GetServerList                   ( ServerBrowserType Type );
     void                    AddServerToList                 ( const CServerListItem * pServer, const ServerBrowserType Type );
     
@@ -182,6 +193,7 @@ private:
     bool                    OnAddressChanged                ( CGUIElement* pElement );
     bool                    OnFilterChanged                 ( CGUIElement* pElement );
     bool                    OnTabChanged                    ( CGUIElement* pElement );
+    bool                    OnHistorySelected               ( CGUIElement* pElement );
 
     ServerBrowserType       GetCurrentServerBrowserType     ( void );
 
@@ -189,6 +201,7 @@ private:
     CServerListLAN          m_ServersLAN;
     CServerList             m_ServersFavourites;
     CServerList             m_ServersRecent;
+    CServerList             m_ServersHistory;
 
     unsigned long           m_ulLastUpdateTime;
     bool                    m_firstTimeBrowseServer;

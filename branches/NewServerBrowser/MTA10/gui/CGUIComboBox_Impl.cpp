@@ -180,6 +180,14 @@ bool CGUIComboBox_Impl::SetItemText ( int index, const char* szText )
     return false;
 }
 
+CGUIListItem* CGUIComboBox_Impl::GetItemByIndex ( int index )
+{
+    CEGUI::ListboxItem* pCEGUIItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
+    CGUIListItem* pItem = GetListItem ( pCEGUIItem );
+    return pItem;
+}
+
+
 void CGUIComboBox_Impl::SetItemImage ( int index,  CGUIStaticImage* pImage )
 {
     // Get the current item at that offset
@@ -262,6 +270,10 @@ CGUIListItem_Impl* CGUIComboBox_Impl::GetListItem ( CEGUI::ListboxItem* pItem )
     return it->second;
 }
 
+size_t CGUIComboBox_Impl::GetItemCount ( void )
+{
+    return reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getItemCount();
+}
 
 void CGUIComboBox_Impl::SetSelectionHandler ( GUI_CALLBACK Callback  )
 {

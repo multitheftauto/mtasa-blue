@@ -9,6 +9,7 @@
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Florian Busse <flobu@gmx.net>
 *               Sebas Lamers <sebasdevelopment@gmx.com>
+*               Dan Chowdhury <danthetaliban@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -36,6 +37,8 @@ template<> CServerBrowser * CSingleton < CServerBrowser >::m_pSingleton = NULL;
 #define SB_BACK_BUTTON_SIZE_Y   40  // Size of the back butt
 #define COMBOBOX_ARROW_SIZE_X   23  //Fixed CEGUI size of the 'combobox' arrow
 #define TAB_SIZE_Y              25  //Fixed CEGUI size of the Tab in a tab panel
+
+#define CONNECT_HISTORY_LIMIT   20
 
 #define PLAYER_LIST_PENDING_TEXT "  ..loading.."
 
@@ -167,10 +170,9 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 	fWidth = fWidth + COMBOBOX_ARROW_SIZE_X;
     m_pComboAddressHistory [ type ] = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( m_pTab [ type ], "" ) );
     m_pComboAddressHistory [ type ]->SetPosition ( CVector2D ( fX-1, fY + (SB_BUTTON_SIZE_Y-SB_SEARCHBAR_COMBOBOX_SIZE_Y)/2 ), false );
-    m_pComboAddressHistory [ type ]->SetSize ( CVector2D ( fWidth, 100 ), false );
-    m_pComboAddressHistory [ type ]->AddItem ( "1231.124.124" );
-    m_pComboAddressHistory [ type ]->AddItem ( "34.1515.123" );
+    m_pComboAddressHistory [ type ]->SetSize ( CVector2D ( fWidth, 200 ), false );
     m_pComboAddressHistory [ type ]->SetReadOnly ( true );
+    m_pComboAddressHistory [ type ]->SetSelectionHandler ( GUI_CALLBACK ( &CServerBrowser::OnHistorySelected, this ) );
 
     // Connect button + icon
 	fX = fX + fWidth + SB_SMALL_SPACER;
@@ -401,13 +403,18 @@ void CServerBrowser::Update ( void )
 
     // Update the current server list class
     if ( IsVisible () )
+    {
         pList->Pulse ();
+        m_ServersHistory.Pulse();
+    }
 
     // If an update is needed, the serverbrowser is visible and it has gone some time since last update
     if ( ( pList->IsUpdated () || m_PrevServerBrowserType != Type ) && m_ulLastUpdateTime < CClientTime::GetTime () - SERVER_BROWSER_UPDATE_INTERVAL )
     {
         // Update the GUI
         UpdateServerList ( Type , Type == RECENTLY_PLAYED );
+
+        UpdateHistoryList ();
 
         // Set the status string
         SetStatusText ( pList->GetStatus () );
@@ -440,6 +447,15 @@ void CServerBrowser::SetVisible ( bool bVisible )
                 m_iSelectedServer [ i ] = -1;
                 GetServerList ( (ServerBrowserType)i )->Refresh ();
             }
+            CreateHistoryList();
+
+            // Set the first item as our starting address
+            if ( m_pComboAddressHistory [ ServerBrowserType::INTERNET ]->GetItemCount() > 0 )
+            {
+                std::string strHistoryText = (const char*)m_pComboAddressHistory [ ServerBrowserType::INTERNET ]->GetItemByIndex(0)->GetData();
+                SetAddressBarText ( "mtasa://" + strHistoryText );
+            }
+
             m_firstTimeBrowseServer = false;
         }
     }
@@ -525,6 +541,60 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
     pList->SetUpdated ( false );
 }
 
+void CServerBrowser::CreateHistoryList ( void )
+{
+    // Clear our combo boxes first
+    for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+    {
+        m_pComboAddressHistory [ i ]->Clear();
+    }
+
+    // Populate our history
+    for ( CServerListReverseIterator it = m_ServersHistory.ReverseIteratorBegin () ; it != m_ServersHistory.ReverseIteratorEnd (); it++ )
+    {
+        CServerListItem * pServer = *it;
+        if ( pServer->strEndpoint )
+        {
+            for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+            {
+                m_pComboAddressHistory [ i ]->AddItem ( ("mtasa://" + pServer->strEndpoint ).c_str() )->SetData(pServer->strEndpoint.c_str());
+            }
+        }
+    }   
+    m_ServersHistory.Refresh();
+}
+
+void CServerBrowser::UpdateHistoryList ( void )
+{
+    // Assume our type is 0, then update all fields when appropriate
+    unsigned int Type = 0;
+
+    // Look through our combo box and process each item
+    CGUIComboBox* pServerList = m_pComboAddressHistory[ Type ];
+    int iRowCount = pServerList->GetItemCount();
+    for ( int i = 0 ; i < iRowCount ; i++ )
+    {
+        CGUIListItem* item = pServerList->GetItemByIndex(i);
+        const char* szAddress = (const char*)item->GetData();
+        
+        // Find our corresponding server item
+        for ( CServerListIterator it = m_ServersHistory.IteratorBegin () ; it != m_ServersHistory.IteratorEnd (); it++ )
+        {
+            CServerListItem * pServer = *it;
+            if ( pServer->strEndpoint == szAddress )
+            {
+                if ( pServer->strEndpoint != pServer->strName  )  //Do we have a real name for the server?
+                {
+                    for ( unsigned int index = 0; index < SERVER_BROWSER_TYPE_COUNT; index++ )
+                    {
+                        m_pComboAddressHistory[index]->SetItemText ( i, ("mtasa://" + pServer->strEndpoint + " | " + pServer->strName ).c_str() );
+                    } 
+                }
+                break;
+            }
+        }
+    }
+}
 
 void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const ServerBrowserType Type )
 {
@@ -787,6 +857,27 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     unsigned short usPort;
     std::string strHost, strNick, strPassword;
     std::string strURI = m_pEditAddress [ GetCurrentServerBrowserType() ]->GetText();
+
+    // Ensure we have something entered
+    if ( strURI.size() == 0 || strURI == "mtasa://" )
+    {
+        CCore::GetSingleton ().ShowMessageBox ( "Error", "No address specified!", MB_BUTTON_OK | MB_ICON_INFO );
+        return true;
+    }
+
+    // Ensure that the protocol is mtasa://
+    size_t iProtocolEnd = strURI.find("://");
+    if ( iProtocolEnd == -1 )
+    {
+        strURI = "mtasa://" + strURI;
+        m_pEditAddress [ GetCurrentServerBrowserType() ]->SetText(strURI.c_str());
+    }
+    else if ( strURI.substr(0,iProtocolEnd) != "mtasa" )// Is it the mtasa:// protocol?  Don't want noobs trying http etc
+    {
+        CCore::GetSingleton ().ShowMessageBox ( "Unknown protocol", "Please use the mtasa:// protocol!", MB_BUTTON_OK | MB_ICON_INFO );
+        return true;
+    }
+
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword );
 
     // Valid nick?
@@ -797,7 +888,29 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     }
 
     // Start the connect
-    CCore::GetSingleton ().GetConnectManager ()->Connect ( strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str() );
+    if ( CCore::GetSingleton ().GetConnectManager ()->Connect ( strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str() ) )
+    {
+        // If we connected to a server that wasn't selected in the server list, it was manually entered
+        for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+        {
+            int iSelectedItem = m_pServerList[i]->GetSelectedItemRow();
+            if ( iSelectedItem != -1 )
+            {
+                CServerListItem* pServer = (CServerListItem*)m_pServerList[i]->GetItemData(iSelectedItem,DATA_PSERVER);
+                if ( pServer->strEndpoint == ( strHost + ":" + SString("%u",usPort) ) )
+                {
+                    m_bManualConnect = false;
+                    return true;
+                }
+            }
+        }
+
+        // It was manually entered, so let's store some info for it.
+        // This info is then used after successful connection to put it into history
+        m_bManualConnect = true;
+        m_strManualHost = strHost;
+        m_usManualPort = usPort;
+    }
     return true;
 }
 
@@ -921,10 +1034,24 @@ bool CServerBrowser::OnAddressChanged ( CGUIElement* pElement )
     for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
     {
         m_pAddressFavoriteIcon[i]->SetAlpha ( 0.3f );
+    } 
+
+    // Adjust our other address bars to be consistent
+    for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+    {
+        if ( i != Type && strURI != m_pEditAddress[i]->GetText() )
+            m_pEditAddress[i]->SetText ( strURI.c_str() );
     }    
     return true;
 }
 
+bool CServerBrowser::OnHistorySelected ( CGUIElement* pElement )
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType();
+    std::string strHistoryText = (const char*)m_pComboAddressHistory [ Type ]->GetSelectedItem()->GetData();
+    SetAddressBarText ( "mtasa://" + strHistoryText );
+    return true;
+}
 
 bool CServerBrowser::OnBackClick ( CGUIElement* pElement )
 {
@@ -1054,6 +1181,12 @@ void CServerBrowser::SaveRecentlyPlayedList()
     if ( !pRecent )
         pRecent = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_REC );
     SaveServerList ( pRecent, CONFIG_RECENT_LIST_TAG, GetRecentList () );
+
+    // Save address history
+    CXMLNode* pHistory = pConfig->FindSubNode ( CONFIG_NODE_SERVER_HISTORY );
+    if ( !pHistory )
+        pHistory = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_HISTORY );
+    SaveServerList ( pHistory, CONFIG_HISTORY_LIST_TAG, GetHistoryList (), CONNECT_HISTORY_LIMIT );
 }
 
 
@@ -1067,7 +1200,7 @@ void CServerBrowser::SaveFavouritesList()
 }
 
 
-bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList )
+bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTagName, CServerList *pList, unsigned int iLimit )
 {
     if ( !pNode )
         return false;
@@ -1076,9 +1209,12 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
     pNode->DeleteAllSubNodes ();
 
     // Iterate through the list, adding any items to our node
+    unsigned int iProcessed = 0;
     CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
     for ( CServerListIterator i = i_b; i != i_e; i++ )
     {
+        if ( iLimit && iProcessed == iLimit )
+            break;
         CServerListItem * pServer = *i;
 
         // Add the item to the node
@@ -1094,6 +1230,7 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
             CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Create ( "port" );
             pPortAttribute->SetValue ( pServer->usGamePort );
         }
+        ++iProcessed;
     }
     return true;
 }
@@ -1352,9 +1489,6 @@ CServerListItem* CServerBrowser::FindServerFromRow ( ServerBrowserType Type, int
 /////////////////////////////////////////////////////////////////
 int CServerBrowser::FindRowFromServer ( ServerBrowserType Type, const CServerListItem * pServer )
 {
-    ulong ulIp = pServer->Address.s_addr;
-    ushort usPort = pServer->usGamePort;
-
     CGUIGridList* pServerList = m_pServerList [ Type ];
     int iRowCount = pServerList->GetRowCount ();
     for ( int i = 0 ; i < iRowCount ; i++ )
@@ -1456,4 +1590,40 @@ void CServerBrowser::SetAddressBarText ( std::string strText )
     {
         m_pEditAddress[i]->SetText ( strText.c_str() );
     }    
+}
+
+bool CServerBrowser::IsAddressBarAwaitingInput ( void )
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType ();
+    return m_pEditAddress[ Type ]->IsActive();
+}
+
+void CServerBrowser::SetNextHistoryText ( bool bDown )
+{
+    // Let's find our current position in the list
+    ServerBrowserType Type = GetCurrentServerBrowserType ();
+    CGUIComboBox* pServerList = m_pComboAddressHistory[ Type ];
+    int iRowCount = pServerList->GetItemCount();
+    for ( int i = 0 ; i < iRowCount ; i++ )
+    {
+        CGUIListItem* item = pServerList->GetItemByIndex(i);
+        const char* szAddress = (const char*)item->GetData();    
+        if ( ("mtasa://" + std::string(szAddress)) == m_pEditAddress[ Type ]->GetText() )
+        {
+            // We've found our row
+            i = bDown ? i+1 : i-1;
+
+            // Ensure we're in range
+            i = Clamp<int>(0, i, pServerList->GetItemCount()-1);
+            SetAddressBarText ( std::string("mtasa://") + (const char*)pServerList->GetItemByIndex(i)->GetData() );
+            m_pEditAddress[ Type ]->SetCaratAtEnd();
+            return;
+        }
+    }
+
+    // Otherwise, let's start at the beginning if we're heading down
+    if ( bDown && pServerList->GetItemCount() > 0 )
+    {
+        SetAddressBarText ( std::string("mtasa://") + (const char*)pServerList->GetItemByIndex(0)->GetData() );
+    }
 }
