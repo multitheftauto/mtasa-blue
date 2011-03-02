@@ -75,16 +75,16 @@ CServerBrowser::CServerBrowser ( void )
     m_pLockedIcon->LoadFromFile ( "cgui\\images\\serverbrowser\\locked.png" );
 
     // Create search filter types icon
-    m_pSearchPlayersIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
-    m_pSearchPlayersIcon->SetVisible ( false );
-    m_pSearchPlayersIcon->SetFrameEnabled ( false );
-    m_pSearchPlayersIcon->LoadFromFile ( "cgui\\images\\serverbrowser\\search-players.png" );
+    m_szSearchTypePath [ SearchType::ALL ]      =   "cgui\\images\\serverbrowser\\search-servers.png";
+    m_szSearchTypePath [ SearchType::PLAYERS ]  =   "cgui\\images\\serverbrowser\\search-players.png";
 
-    m_pSearchServersIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
-    m_pSearchServersIcon->SetVisible ( false );
-    m_pSearchServersIcon->SetFrameEnabled ( false );
-    m_pSearchServersIcon->LoadFromFile ( "cgui\\images\\serverbrowser\\search-servers.png" );
-
+    for ( unsigned int i=0; i != SearchType::MAX_SEARCH_TYPES; i++ )
+    {
+        m_pSearchIcons[ i ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+        m_pSearchIcons[ i ]->SetVisible ( false );
+        m_pSearchIcons[ i ]->SetFrameEnabled ( false );
+        m_pSearchIcons[ i ]->LoadFromFile ( m_szSearchTypePath [ i ]);
+    }
 
     // Create the tabs
     CreateTab ( ServerBrowserType::INTERNET, "Internet" );
@@ -114,8 +114,8 @@ CServerBrowser::~CServerBrowser ( void )
 
     // Unload the icon
     m_pLockedIcon->Clear();
-    m_pSearchPlayersIcon->Clear();
-    m_pSearchServersIcon->Clear();
+    for ( unsigned int i=0; i != SearchType::MAX_SEARCH_TYPES; i++ )
+        m_pSearchIcons[ i ]->Clear();
 
     // Delete the GUI items
     delete m_pPanel;
@@ -147,6 +147,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonRefreshIcon [ type ]->SetSize ( CVector2D(1,1), true );
     m_pButtonRefreshIcon [ type ]->LoadFromFile ( "cgui\\images\\serverbrowser\\refresh.png" );
     m_pButtonRefreshIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
+    m_pButtonRefreshIcon [ type ]->SetProperty ( "DistributeCapturedInputs","True" );
 
     // Address Bar + History Combo
 	fX = fX + SB_BUTTON_SIZE_X + SB_SMALL_SPACER;
@@ -200,22 +201,33 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pComboSearchType [ type ] = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( m_pTab [ type ], "" ) );
     m_pComboSearchType [ type ]->SetPosition ( CVector2D ( fX, fY + (SB_BUTTON_SIZE_Y-SB_SEARCHBAR_COMBOBOX_SIZE_Y)/2 ), false );
     m_pComboSearchType [ type ]->SetSize ( CVector2D ( SB_SEARCHBAR_COMBOBOX_SIZE_X, 68 ), false );
-    m_pComboSearchType [ type ]->AddItem ( "" );
-    m_pComboSearchType [ type ]->AddItem ( "" );
-    m_pComboSearchType [ type ]->SetItemImage ( 0, m_pSearchServersIcon );
-    m_pComboSearchType [ type ]->SetItemImage ( 1, m_pSearchPlayersIcon );
+
+    for ( unsigned int i=0; i != SearchType::MAX_SEARCH_TYPES; i++ )
+        m_pComboSearchType [ type ]->AddItem ( m_pSearchIcons[ i ] );
+
     m_pComboSearchType [ type ]->SetReadOnly ( true );
+    m_pComboSearchType [ type ]->SetSelectionHandler ( GUI_CALLBACK ( &CServerBrowser::OnSearchTypeSelected, this ) );
+    m_pSearchTypeIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pComboSearchType [ type ] ) );
+    m_pSearchTypeIcon [ type ]->SetPosition ( CVector2D(2,4), false );
+    m_pSearchTypeIcon [ type ]->SetSize ( CVector2D(SB_SEARCHBAR_COMBOBOX_SIZE_X-10,SB_SEARCHBAR_COMBOBOX_SIZE_Y -6), false );
+    m_pSearchTypeIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
+    m_pSearchTypeIcon [ type ]->SetAlwaysOnTop(true);
+    m_uiCurrentSearchType = SearchType::ALL;
+    m_pSearchTypeIcon [ type ]->LoadFromFile ( m_szSearchTypePath [ m_uiCurrentSearchType ] );
 
     fWidth = fSearchBarSizeX-SB_SEARCHBAR_COMBOBOX_SIZE_X;
     m_pEditSearch [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
     m_pEditSearch [ type ]->SetPosition ( CVector2D ( fX+SB_SEARCHBAR_COMBOBOX_SIZE_X, fY + (SB_BUTTON_SIZE_Y-SB_SEARCHBAR_COMBOBOX_SIZE_Y)/2 ), false );
     m_pEditSearch [ type ]->SetSize ( CVector2D ( fWidth, SB_SEARCHBAR_COMBOBOX_SIZE_Y ), false );
+    m_pEditSearch [ type ]->SetTextChangedHandler( GUI_CALLBACK( &CServerBrowser::OnFilterChanged, this ) );
 
     // Server search icon
     m_pServerSearchIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditSearch [ type ] ) );
     m_pServerSearchIcon [ type ]->SetPosition ( CVector2D ( fWidth - 18, (SB_SEARCHBAR_COMBOBOX_SIZE_Y-16)/2 ), false );
     m_pServerSearchIcon [ type ]->SetSize ( CVector2D ( 16, 16 ), false );
     m_pServerSearchIcon [ type ]->LoadFromFile ( "cgui\\images\\serverbrowser\\search.png" );
+    m_pServerSearchIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
+    m_pServerSearchIcon [ type ]->SetProperty ( "DistributeCapturedInputs","True" );
 
     // Create the serverlist
 	fX = 5;
@@ -346,6 +358,7 @@ void CServerBrowser::DeleteTab ( ServerBrowserType type )
 
     delete m_pEditAddress [ type ];
     delete m_pComboSearchType [ type ];
+    delete m_pSearchTypeIcon [ type ];
     delete m_pButtonInfoIcon [ type ];
     delete m_pButtonConnectIcon [ type ];
     delete m_pComboAddressHistory [ type ];
@@ -604,39 +617,38 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
     bool bIncludeOffline = m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ();
     bool bIncludeOtherVersions = m_pIncludeOtherVersions [ Type ]->IsVisible () && m_pIncludeOtherVersions [ Type ]->GetSelected ();
     bool bServerSearchFound = true;
-    bool bPlayerSearchFound = true;
 
-    /*std::string strServerSearchText = m_pEditServerSearch [ Type ]->GetText ();
-    std::string strPlayerSearchText = m_pEditPlayerSearch [ Type ]->GetText ();
+    std::string strServerSearchText = m_pEditSearch [ Type ]->GetText ();
 
     if ( !strServerSearchText.empty() )
     {
-        // Search for the search text in the servername
-        SString strServerName = pServer->strName;
-        bServerSearchFound = strServerName.ContainsI ( strServerSearchText );
-    }
-
-    if ( !strPlayerSearchText.empty() )
-    {
-        bPlayerSearchFound = false;
-
-        if ( pServer->nPlayers > 0 )
+        if ( m_uiCurrentSearchType == SearchType::ALL )
         {
-            // Search for the search text in the names of the players in the server
-            for ( unsigned int i = 0; i < pServer->vecPlayers.size (); i++ ) 
-            {
-                SString strPlayerName = pServer->vecPlayers[i];
+            // Search for the search text in the servername
+            SString strServerName = pServer->strName;
+            bServerSearchFound = strServerName.ContainsI ( strServerSearchText );
+        }
+        else if ( m_uiCurrentSearchType == SearchType::PLAYERS )
+        {
+            bServerSearchFound = false;
 
-                if ( strPlayerName.ContainsI ( strPlayerSearchText ) )
+            if ( pServer->nPlayers > 0 )
+            {
+                // Search for the search text in the names of the players in the server
+                for ( unsigned int i = 0; i < pServer->vecPlayers.size (); i++ ) 
                 {
-                    bPlayerSearchFound = true;
-                    int k = m_pServerPlayerList [ Type ]->AddRow ( true );
-                    m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], strPlayerName.c_str (), false, false, true );
+                    SString strPlayerName = pServer->vecPlayers[i];
+
+                    if ( strPlayerName.ContainsI ( strServerSearchText ) )
+                    {
+                        bServerSearchFound = true;
+                        int k = m_pServerPlayerList [ Type ]->AddRow ( true );
+                        m_pServerPlayerList [ Type ]->SetItemText ( k, m_hPlayerName [ Type ], strPlayerName.c_str (), false, false, true );
+                    }
                 }
             }
         }
     }
-    */
 
     //
     // Add or remove ?
@@ -674,8 +686,7 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
         ( !bIsOtherVersion || bIncludeOtherVersions ) &&
         ( !bIsBlockedVersion ) &&
         ( !bIsBlockedServer ) &&
-        ( bServerSearchFound ) &&
-        ( bPlayerSearchFound )
+        ( bServerSearchFound )
        )
     {
         bAddServer = true;
@@ -1053,6 +1064,17 @@ bool CServerBrowser::OnHistorySelected ( CGUIElement* pElement )
     return true;
 }
 
+bool CServerBrowser::OnSearchTypeSelected ( CGUIElement* pElement )
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType();
+    m_uiCurrentSearchType = m_pComboSearchType[ Type ]->GetSelectedItemIndex();
+
+    m_pSearchTypeIcon [ Type ]->LoadFromFile ( m_szSearchTypePath [ m_uiCurrentSearchType ] );
+
+    UpdateServerList ( GetCurrentServerBrowserType (), true );
+    return true;
+}
+
 bool CServerBrowser::OnBackClick ( CGUIElement* pElement )
 {
     CMainMenu *pMainMenu = CLocalGUI::GetSingleton ().GetMainMenu ();
@@ -1088,7 +1110,7 @@ bool CServerBrowser::OnMouseClick ( CGUIMouseEventArgs Args )
         OnClick ( m_pServerList [ ServerBrowserType::RECENTLY_PLAYED ] );
         return true;
     }
-    else if ( Args.pWindow == m_pServerPlayerList [ Type ] /*&& !m_pEditPlayerSearch [ Type ]->GetText ().empty()*/ )
+    else if ( Args.pWindow == m_pServerPlayerList [ Type ] && m_uiCurrentSearchType == SearchType::PLAYERS && !m_pEditSearch [ Type ]->GetText ().empty() )
     {
         OnClick ( m_pServerPlayerList [ Type ] );
         return true;
@@ -1289,8 +1311,8 @@ void CServerBrowser::LoadOptions ( CXMLNode* pNode )
 
                     // restore the search field contents
                     std::string strSearch = pSubNode->GetTagContent ( );
-                    //if ( strSearch.length ( ) > 0 )
-                        //m_pEditServerSearch [ i ]->SetText ( strSearch.c_str ( ) );
+                    if ( strSearch.length ( ) > 0 )
+                        m_pEditSearch [ i ]->SetText ( strSearch.c_str ( ) );
                 }
             }
         }
@@ -1356,11 +1378,11 @@ void CServerBrowser::SaveOptions ( )
             }
 
             // save the search box content
-            /*std::string strSearch = m_pEditServerSearch [ ui ]->GetText ( );
+            std::string strSearch = m_pEditSearch [ ui ]->GetText ( );
             if ( strSearch.length ( ) > 0 )
             {
                 pSubNode->SetTagContent ( strSearch.c_str ( ) );
-            }*/
+            }
         }
     }
     g_pCore->SaveConfig ( );

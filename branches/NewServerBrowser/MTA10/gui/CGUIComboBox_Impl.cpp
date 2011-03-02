@@ -77,6 +77,15 @@ CGUIListItem* CGUIComboBox_Impl::AddItem ( const char* szText )
     return pNewItem;
 }
 
+CGUIListItem* CGUIComboBox_Impl::AddItem ( CGUIStaticImage* pImage )
+{
+    CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl *)pImage );
+    CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
+    reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> addItem ( pListboxItem );
+    m_Items [ pNewItem->GetListItem () ] = pNewItem;
+    return pNewItem;
+}
+
 bool CGUIComboBox_Impl::RemoveItem ( int index )
 {
     try
@@ -185,29 +194,6 @@ CGUIListItem* CGUIComboBox_Impl::GetItemByIndex ( int index )
     CEGUI::ListboxItem* pCEGUIItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
     CGUIListItem* pItem = GetListItem ( pCEGUIItem );
     return pItem;
-}
-
-
-void CGUIComboBox_Impl::SetItemImage ( int index,  CGUIStaticImage* pImage )
-{
-    // Get the current item at that offset
-    CEGUI::ListboxItem* pCEGUIItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
-    CGUIListItem* pItem = GetListItem ( pCEGUIItem );
-
-    //if ( pItem != NULL )
-    {
-        pItem->SetImage ( pImage );
-    }/*
-    else
-    //if ( pImage )
-    {
-        // If it doesn't, create it and set it in the combobox
-        CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl*) pImage );
-        CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
-        reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> addItem ( pListboxItem );
-        // Put our new item in the map
-        m_Items [ pNewItem->GetListItem () ] = pNewItem;
-    }*/
 }
 
 bool CGUIComboBox_Impl::SetSelectedItemByIndex ( int index )

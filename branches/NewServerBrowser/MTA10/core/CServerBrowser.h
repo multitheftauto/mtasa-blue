@@ -25,6 +25,9 @@ class CServerBrowser;
 // Amount of server lists/tabs (ServerBrowserType)
 #define SERVER_BROWSER_TYPE_COUNT           4
 
+// Amount of search types
+#define SERVER_BROWSER_SEARCH_TYPE_COUNT    2
+
 // Server browser list update interval (in ms)
 #define SERVER_BROWSER_UPDATE_INTERVAL      1000
 
@@ -47,6 +50,13 @@ public:
         LAN,
         FAVOURITES,
         RECENTLY_PLAYED
+    };
+
+    enum SearchType
+    {
+        ALL = 0,
+        PLAYERS,
+        MAX_SEARCH_TYPES,
     };
 
 public:
@@ -100,6 +110,9 @@ protected:
 
     int                 m_iSelectedServer[ SERVER_BROWSER_TYPE_COUNT ];
 
+    const char*         m_szSearchTypePath[ SearchType::MAX_SEARCH_TYPES ];
+    CGUIStaticImage*    m_pSearchIcons[ SearchType::MAX_SEARCH_TYPES ];
+
     bool                m_bManualConnect;
     std::string         m_strManualHost;
     unsigned int        m_usManualPort;
@@ -109,8 +122,6 @@ protected:
     // Window widgets
     CGUITabPanel*       m_pPanel;
     CGUIStaticImage*    m_pLockedIcon;
-    CGUIStaticImage*    m_pSearchPlayersIcon;
-    CGUIStaticImage*    m_pSearchServersIcon;
 
     // Classes
     CCommunityLogin     m_pCommunityLogin;
@@ -144,6 +155,7 @@ protected:
 
     CGUIEdit*           m_pEditAddress [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIComboBox*       m_pComboAddressHistory  [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIStaticImage*    m_pSearchTypeIcon  [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIStaticImage*    m_pAddressFavoriteIcon [ SERVER_BROWSER_TYPE_COUNT ];
 
     CGUIComboBox*       m_pComboSearchType  [ SERVER_BROWSER_TYPE_COUNT ];
@@ -155,7 +167,7 @@ protected:
     CGUIEdit*           m_pEditPassword [ SERVER_BROWSER_TYPE_COUNT ];
 
     CGUILabel*          m_pServerListStatus [ SERVER_BROWSER_TYPE_COUNT ];
-    CGUIButton*          m_pButtonBack [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIButton*         m_pButtonBack [ SERVER_BROWSER_TYPE_COUNT ];
 
     // Server list columns
     CGUIHandle          m_hVersion [ SERVER_BROWSER_TYPE_COUNT ];
@@ -194,6 +206,7 @@ private:
     bool                    OnFilterChanged                 ( CGUIElement* pElement );
     bool                    OnTabChanged                    ( CGUIElement* pElement );
     bool                    OnHistorySelected               ( CGUIElement* pElement );
+    bool                    OnSearchTypeSelected            ( CGUIElement* pElement );
 
     ServerBrowserType       GetCurrentServerBrowserType     ( void );
 
@@ -206,6 +219,7 @@ private:
     unsigned long           m_ulLastUpdateTime;
     bool                    m_firstTimeBrowseServer;
     bool                    m_bOptionsLoaded;
+    unsigned int            m_uiCurrentSearchType;          
     ServerBrowserType       m_PrevServerBrowserType;
 
     std::map < SString, int > m_blockedVersionMap;
