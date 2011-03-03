@@ -2352,7 +2352,7 @@ void CVersionUpdater::_UseReportLogPostContent ( void )
     m_JobInfo.bPostContentBinary = false;
 
     // Wipe log here
-    GetReportWrap ()->ClearLogContents ( "" );
+    GetReportWrap ()->ClearLogContents ( "-all" );
 }
 
 
