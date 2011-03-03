@@ -3864,7 +3864,7 @@ int CLuaFunctionDefinitions::GetVehiclesOfType ( lua_State* luaVM )
             lua_newtable ( luaVM );
 
             // Add all the vehicles with a matching model
-            m_pVehicleManager->GetVehiclesOfType ( uiModel, pLuaMain );
+            m_pVehicleManager->GetVehiclesOfType ( uiModel, luaVM );
             return 1;
         }
         else
@@ -7973,7 +7973,7 @@ int CLuaFunctionDefinitions::GetPlayersInTeam ( lua_State* luaVM )
             {
                 lua_newtable ( luaVM );
 
-                pTeam->GetPlayers ( pLuaMain );
+                pTeam->GetPlayers ( luaVM );
                 return 1;
             }
             else
@@ -9501,7 +9501,7 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
         lua_newtable ( luaVM );
 
         // Add all the timers with less than ulTime left
-        pLuaMain->GetTimerManager ()->GetTimers ( ulTime, pLuaMain );
+        pLuaMain->GetTimerManager ()->GetTimers ( ulTime, luaVM );
         return 1;
     }
 
@@ -10759,7 +10759,7 @@ int CLuaFunctionDefinitions::GetBans ( lua_State* luaVM )
     {
         lua_newtable ( luaVM );
 
-        CStaticFunctionDefinitions::GetBans ( pLuaMain );
+        CStaticFunctionDefinitions::GetBans ( luaVM );
 
         return 1;
     }

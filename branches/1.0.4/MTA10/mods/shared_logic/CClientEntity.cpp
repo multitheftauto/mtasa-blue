@@ -936,10 +936,10 @@ CClientEntity* CClientEntity::FindChildByTypeIndex ( unsigned int uiTypeHash, un
 }
 
 
-void CClientEntity::FindAllChildrenByType ( const char* szType, CLuaMain* pLuaMain, bool bStreamedIn )
+void CClientEntity::FindAllChildrenByType ( const char* szType, lua_State* luaVM, bool bStreamedIn )
 {
     assert ( szType );
-    assert ( pLuaMain );
+    assert ( luaVM );
 
     // Add all children of the given type to the table
     unsigned int uiIndex = 0;
@@ -947,20 +947,18 @@ void CClientEntity::FindAllChildrenByType ( const char* szType, CLuaMain* pLuaMa
 
     if ( this == g_pClientGame->GetRootEntity () )
     {
-        GetEntitiesFromRoot ( uiTypeHash, pLuaMain, bStreamedIn );
+        GetEntitiesFromRoot ( uiTypeHash, luaVM, bStreamedIn );
     }
     else
     {
-        FindAllChildrenByTypeIndex ( uiTypeHash, pLuaMain, uiIndex, bStreamedIn );
+        FindAllChildrenByTypeIndex ( uiTypeHash, luaVM, uiIndex, bStreamedIn );
     }
 }
 
 
-void CClientEntity::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, CLuaMain* pLuaMain, unsigned int& uiIndex, bool bStreamedIn )
+void CClientEntity::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, lua_State* luaVM, unsigned int& uiIndex, bool bStreamedIn )
 {
-    assert ( pLuaMain );
-
-    lua_State* luaVM = pLuaMain->GetVirtualMachine ();
+    assert ( luaVM );
 
     // Our type matches?
     if ( m_uiTypeHash == uiTypeHash )
@@ -980,14 +978,14 @@ void CClientEntity::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, CLuaMa
     CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
-        (*iter)->FindAllChildrenByTypeIndex ( uiTypeHash, pLuaMain, uiIndex, bStreamedIn );
+        (*iter)->FindAllChildrenByTypeIndex ( uiTypeHash, luaVM, uiIndex, bStreamedIn );
     }
 }
 
 
-void CClientEntity::GetChildren ( CLuaMain* pLuaMain )
+void CClientEntity::GetChildren ( lua_State* luaVM )
 {
-    assert ( pLuaMain );
+    assert ( luaVM );
 
     // Add all our children to the table on top of the given lua main's stack
     unsigned int uiIndex = 0;
@@ -995,7 +993,6 @@ void CClientEntity::GetChildren ( CLuaMain* pLuaMain )
     for ( ; iter != m_Children.end (); iter++ )
     {
         // Add it to the table
-        lua_State* luaVM = pLuaMain->GetVirtualMachine ();
         lua_pushnumber ( luaVM, ++uiIndex );
         lua_pushelement ( luaVM, *iter );
         lua_settable ( luaVM, -3 );
@@ -1339,7 +1336,7 @@ void CClientEntity::RemoveEntityFromRoot ( unsigned int uiTypeHash, CClientEntit
         CClientEntity::RemoveEntityFromRoot ( (*iter)->GetTypeHash (), *iter );
 }
 
-void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, CLuaMain* pLuaMain, bool bStreamedIn )
+void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn )
 {
 #if CHECK_ENTITIES_FROM_ROOT
     _CheckEntitiesFromRoot ( uiTypeHash );
@@ -1350,7 +1347,6 @@ void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, CLuaMain* pLu
     {
         CFromRootListType& listEntities = find->second;
         CClientEntity* pEntity;
-        lua_State* luaVM = pLuaMain->GetVirtualMachine ();
         unsigned int uiIndex = 0;
 
         for ( CFromRootListType::reverse_iterator i = listEntities.rbegin ();

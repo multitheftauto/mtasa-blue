@@ -145,9 +145,9 @@ CLuaTimer* CLuaTimerManager::AddTimer ( lua_State* luaVM )
     return false;
 }
 
-void CLuaTimerManager::GetTimers ( unsigned long ulTime, CLuaMain* pLuaMain )
+void CLuaTimerManager::GetTimers ( unsigned long ulTime, lua_State* luaVM )
 {
-    assert ( pLuaMain );
+    assert ( luaVM );
 
     unsigned long ulCurrentTime = GetTime();
     // Add all the timers to the table
@@ -160,7 +160,6 @@ void CLuaTimerManager::GetTimers ( unsigned long ulTime, CLuaMain* pLuaMain )
         if ( ulTime == 0 || ulTimeLeft <= ulTime )
         {
             // Add it to the table
-            lua_State* luaVM = pLuaMain->GetVirtualMachine ();
             lua_pushnumber ( luaVM, ++uiIndex );
             lua_pushtimer ( luaVM, *iter );
             lua_settable ( luaVM, -3 );

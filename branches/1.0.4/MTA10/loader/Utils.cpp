@@ -1327,3 +1327,73 @@ bool Is32bitProcess ( DWORD processID )
     return false;   // Can't determine. Guess it's 64 bit
 }
 
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetFileAge
+//
+// Returns time in seconds since a file/directory was created
+//
+///////////////////////////////////////////////////////////////////////////
+int GetFileAge ( const SString& strPathFilename )
+{
+    WIN32_FIND_DATA findFileData;
+    HANDLE hFind = FindFirstFile ( strPathFilename, &findFileData );
+    if ( hFind != INVALID_HANDLE_VALUE )
+    {
+        FindClose ( hFind );
+        FILETIME ftNow;
+        GetSystemTimeAsFileTime ( &ftNow );
+        LARGE_INTEGER creationTime = { findFileData.ftCreationTime.dwLowDateTime, findFileData.ftCreationTime.dwHighDateTime };
+        LARGE_INTEGER timeNow = { ftNow.dwLowDateTime, ftNow.dwHighDateTime };
+        return static_cast < int > ( ( timeNow.QuadPart - creationTime.QuadPart ) / ( LONGLONG ) 10000000 );
+    }
+    return 0;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CleanDownloadCache
+//
+// Remove old files from the download cache
+//
+///////////////////////////////////////////////////////////////////////////
+void CleanDownloadCache ( void )
+{
+    const uint uiMaxCleanTime = 5;                      // Limit clean time (seconds)
+    const uint uiCleanFileAge = 60 * 60 * 24 * 7;       // Delete files older than this
+
+    const time_t tMaxEndTime = time ( NULL ) + uiMaxCleanTime;
+
+    // Search possible cache locations
+    std::list < SString > cacheLocationList;
+    cacheLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache" ) );
+    cacheLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache" ) );
+    cacheLocationList.push_back ( GetMTATempPath () );
+
+    for ( ; !cacheLocationList.empty () ; cacheLocationList.pop_front () )
+    {
+        // Get list of files & directories in this cache location
+        const SString& strCacheLocation = cacheLocationList.front ();
+        const std::vector < SString > fileList = FindFiles ( PathJoin ( strCacheLocation, "\\*" ), true, true );
+
+        for ( uint i = 0 ; i < fileList.size () ; i++ )
+        {
+            const SString strPathFilename = PathJoin ( strCacheLocation, fileList[i] );
+            // Check if over 7 days old
+            if ( GetFileAge ( strPathFilename ) > uiCleanFileAge )
+            {
+                // Delete as directory or file
+                if ( DirectoryExists ( strPathFilename ) )
+                    DelTree ( strPathFilename, strCacheLocation );
+                else
+                    FileDelete ( strPathFilename );
+
+                // Check time spent
+                if ( time ( NULL ) > tMaxEndTime )
+                    break;
+            }
+        }
+    }
+}

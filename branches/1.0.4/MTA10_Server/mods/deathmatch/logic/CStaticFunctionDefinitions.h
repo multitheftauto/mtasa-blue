@@ -511,7 +511,7 @@ public:
     static CBan*                AddBan                              ( const char* szIP, const char* szUsername, const char* szSerial, CPlayer* pResponsible, const char* szReason, time_t tUnban );
     static bool                 RemoveBan                           ( CBan* pBan, CPlayer* pResponsible = NULL );
 
-    static bool                 GetBans                             ( CLuaMain* pLuaMain );
+    static bool                 GetBans                             ( lua_State* luaVM );
 
     static bool                 GetBanIP                            ( CBan* pBan, char* szIP, size_t size );
     static bool                 GetBanSerial                        ( CBan* pBan, char* szSerial, size_t size );

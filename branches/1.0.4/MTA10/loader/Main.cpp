@@ -236,6 +236,9 @@ int DoInstallStage ( const CUPL& UPL )
     // Update news if any there
     InstallNewsItems ();
 
+    // Remove unwanted files
+    CleanDownloadCache ();
+
     // Default to launching MTA
     AddReportLog ( 1051, SString ( "DoInstallStage: LaunchGame cwd:%s", GetCurrentWorkingDirectory ().c_str () ) );
     return LaunchGame ( g_lpCmdLine );
