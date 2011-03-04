@@ -55,7 +55,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     assert ( szPassword );
 
     // Hide the server queue
-    CServerQueue::GetSingletonPtr()->SetVisible( false );
+    CServerInfo::GetSingletonPtr()->Hide( );
 
     // Are we already connecting?
     CNet* pNet = CCore::GetSingleton ().GetNetwork ();
@@ -84,6 +84,10 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_strNick = szNick;
     m_strPassword = szPassword;
     m_usPort = usPort;
+
+    m_strLastHost = m_strHost;
+    m_usLastPort = m_usPort;
+    m_strLastPassword = m_strPassword;
 
     // Parse host into a server item
     in_addr Address;
@@ -231,8 +235,7 @@ void CConnectManager::DoPulse ( void )
                         strError = "Disconnected: you are banned from this server";
                         break;
                     case ID_NO_FREE_INCOMING_CONNECTIONS:
-                        CServerQueue::GetSingletonPtr()->SetVisible( true );
-                        CServerQueue::GetSingletonPtr()->SetServerInformation(m_strHost.c_str(), m_usPort, m_strPassword.c_str());
+                        CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_QUEUE, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     case ID_DISCONNECTION_NOTIFICATION:
                         strError = "Disconnected: disconnected";
@@ -241,7 +244,7 @@ void CConnectManager::DoPulse ( void )
                         strError = "Disconnected: connection lost";
                         break;
                     case ID_INVALID_PASSWORD:
-                        strError = "Disconnected: invalid password";
+                        CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_PASSWORD, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     default:
                         strError = "Disconnected: connection refused";

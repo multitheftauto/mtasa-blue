@@ -131,6 +131,8 @@ public:
     void                    HideQuickConnect                ( void );
     void                    SetCenterCursor                 ( bool bEnabled );
 
+    void                    ShowServerInfo                  ( unsigned int WindowType );
+
     // Configuration
     void                    ApplyConsoleSettings            ( void );
     void                    ApplyGameSettings               ( void );

@@ -67,6 +67,7 @@ CServerBrowser::CServerBrowser ( void )
     m_pPanel->SetPosition ( CVector2D ( (resolution.fX - m_WidgetSize.fX)/2, (resolution.fY - m_WidgetSize.fY)/2 ) );
     m_pPanel->SetSize ( m_WidgetSize );
     m_pPanel->SetAlwaysOnTop ( true );
+    m_pPanel->SetZOrderingEnabled(false);
 
     // Create locked icon
     m_pLockedIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
@@ -191,6 +192,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonInfo [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "" ) );
     m_pButtonInfo [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pButtonInfo [ type ]->SetSize ( CVector2D ( SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y ), false );
+    m_pButtonInfo [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnInfoClick, this ) );
     m_pButtonInfoIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pButtonInfo [ type ] ) );
     m_pButtonInfoIcon [ type ]->SetSize ( CVector2D(1,1), true );
     m_pButtonInfoIcon [ type ]->LoadFromFile ( "cgui\\images\\serverbrowser\\info.png" );
@@ -200,7 +202,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 	fX = m_WidgetSize.fX - SB_SMALL_SPACER - fSearchBarSizeX;
     m_pComboSearchType [ type ] = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( m_pTab [ type ], "" ) );
     m_pComboSearchType [ type ]->SetPosition ( CVector2D ( fX, fY + (SB_BUTTON_SIZE_Y-SB_SEARCHBAR_COMBOBOX_SIZE_Y)/2 ), false );
-    m_pComboSearchType [ type ]->SetSize ( CVector2D ( SB_SEARCHBAR_COMBOBOX_SIZE_X, 68 ), false );
+    m_pComboSearchType [ type ]->SetSize ( CVector2D ( SB_SEARCHBAR_COMBOBOX_SIZE_X, 80 ), false );
 
     for ( unsigned int i=0; i != SearchType::MAX_SEARCH_TYPES; i++ )
         m_pComboSearchType [ type ]->AddItem ( m_pSearchIcons[ i ] );
@@ -209,7 +211,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pComboSearchType [ type ]->SetSelectionHandler ( GUI_CALLBACK ( &CServerBrowser::OnSearchTypeSelected, this ) );
     m_pSearchTypeIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pComboSearchType [ type ] ) );
     m_pSearchTypeIcon [ type ]->SetPosition ( CVector2D(2,4), false );
-    m_pSearchTypeIcon [ type ]->SetSize ( CVector2D(SB_SEARCHBAR_COMBOBOX_SIZE_X-10,SB_SEARCHBAR_COMBOBOX_SIZE_Y -6), false );
+    m_pSearchTypeIcon [ type ]->SetSize ( CVector2D(29,SB_SEARCHBAR_COMBOBOX_SIZE_Y -6), false );
     m_pSearchTypeIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
     m_pSearchTypeIcon [ type ]->SetAlwaysOnTop(true);
     m_uiCurrentSearchType = SearchType::ALL;
@@ -233,7 +235,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 	fX = 5;
 	fY = fY + SB_BUTTON_SIZE_Y + (SB_NAVBAR_SIZE_Y-SB_BUTTON_SIZE_X)/2;
     fWidth = m_WidgetSize.fX - SB_SMALL_SPACER - fPlayerListSizeX - fX;
-    float fHeight = m_WidgetSize.fY - SB_BACK_BUTTON_SIZE_Y - fY - TAB_SIZE_Y;
+    float fHeight = m_WidgetSize.fY - SB_SMALL_SPACER - SB_BACK_BUTTON_SIZE_Y - fY - TAB_SIZE_Y;
     m_pServerList [ type ] = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pTab [ type ] ) );
     m_pServerList [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pServerList [ type ]->SetSize ( CVector2D ( fWidth, fHeight ), false );
@@ -262,7 +264,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 
     // Server player list;
 	fX = fX + fWidth;
-	fHeight = m_WidgetSize.fY - SB_BACK_BUTTON_SIZE_Y - fY - TAB_SIZE_Y;
+	fHeight = m_WidgetSize.fY - SB_SMALL_SPACER - SB_BACK_BUTTON_SIZE_Y - fY - TAB_SIZE_Y;
     m_pServerPlayerList [ type ] = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pTab [ type ] ) );
     m_pServerPlayerList [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pServerPlayerList [ type ]->SetSize ( CVector2D ( fPlayerListSizeX, fHeight ), false );
@@ -273,7 +275,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     // Filters
     float fLineHeight = SB_BACK_BUTTON_SIZE_Y/2;
 	fX = SB_SMALL_SPACER;
-    fY = m_WidgetSize.fY - SB_BACK_BUTTON_SIZE_Y - TAB_SIZE_Y;
+    fY = m_WidgetSize.fY - SB_SMALL_SPACER/2 - SB_BACK_BUTTON_SIZE_Y - TAB_SIZE_Y;
 
     // Include label
     m_pLabelInclude [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTab [ type ], "Include:" ) );
@@ -333,7 +335,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 
     // Back button
     fX = m_WidgetSize.fX - fPlayerListSizeX - SB_SMALL_SPACER;
-    fY = m_WidgetSize.fY - SB_BACK_BUTTON_SIZE_Y - TAB_SIZE_Y;
+    fY = m_WidgetSize.fY - SB_SMALL_SPACER - SB_BACK_BUTTON_SIZE_Y - TAB_SIZE_Y;
     m_pButtonBack [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "Back" ) );
     m_pButtonBack [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pButtonBack [ type ]->SetSize ( CVector2D ( fPlayerListSizeX, SB_BACK_BUTTON_SIZE_Y ), false );
@@ -359,6 +361,7 @@ void CServerBrowser::DeleteTab ( ServerBrowserType type )
     delete m_pEditAddress [ type ];
     delete m_pComboSearchType [ type ];
     delete m_pSearchTypeIcon [ type ];
+    delete m_pServerSearchIcon  [ type ];
     delete m_pButtonInfoIcon [ type ];
     delete m_pButtonConnectIcon [ type ];
     delete m_pComboAddressHistory [ type ];
@@ -445,8 +448,10 @@ void CServerBrowser::Update ( void )
 
 void CServerBrowser::SetVisible ( bool bVisible )
 {
+    m_pPanel->SetZOrderingEnabled(true);
     m_pPanel->SetVisible ( bVisible );
     m_pPanel->BringToFront ();
+    m_pPanel->SetZOrderingEnabled(false);
 
     // Are we making this window visible?
     if ( bVisible )
@@ -471,6 +476,11 @@ void CServerBrowser::SetVisible ( bool bVisible )
 
             m_firstTimeBrowseServer = false;
         }
+
+        // Focus the address bar for power users
+        ServerBrowserType Type = GetCurrentServerBrowserType();
+        m_pEditAddress [ Type ]->Activate();
+        m_pEditAddress [ Type ]->SetCaratAtEnd();
     }
 }
 
@@ -894,8 +904,17 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     // Valid nick?
     if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
     {
-        CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new!", MB_BUTTON_OK | MB_ICON_INFO );
+        CCore::GetSingleton ().ShowMessageBox ( "Error", "Invalid nickname! Please go to Settings and set a new one!", MB_BUTTON_OK | MB_ICON_INFO );
         return true;
+    }
+
+    // If our password is empty, try and grab a saved password
+    if ( strPassword.empty() )
+    {
+        bool bSavedPasswords;
+        CVARS_GET ( "save_server_passwords", bSavedPasswords );
+        if ( bSavedPasswords )
+            strPassword = GetServerPassword( strHost + ":" + SString("%u",usPort) );
     }
 
     // Start the connect
@@ -908,7 +927,7 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
             if ( iSelectedItem != -1 )
             {
                 CServerListItem* pServer = (CServerListItem*)m_pServerList[i]->GetItemData(iSelectedItem,DATA_PSERVER);
-                if ( pServer->strEndpoint == ( strHost + ":" + SString("%u",usPort) ) )
+                if ( pServer->strHost == strHost && pServer->usGamePort == usPort )
                 {
                     m_bManualConnect = false;
                     return true;
@@ -957,6 +976,19 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
 
         // Password buffer
         SString strPassword = "";
+        if ( pServer->bPassworded )  // The server is passworded
+        {
+            // Do we have a saved password?
+            bool bSavedPasswords;
+            CVARS_GET ( "save_server_passwords", bSavedPasswords );
+            if ( bSavedPasswords )
+                strPassword = GetServerPassword( pServer->GetEndpoint ().c_str() );
+            else // Popup password entry form
+            {
+                CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_QUEUE, pServer->strHost.c_str (), pServer->usGamePort, "" );
+                return true;
+            }
+        }
 
         // Start the connect
         CCore::GetSingleton ().GetConnectManager ()->Connect ( pServer->strHost.c_str (), pServer->usGamePort, strNick.c_str (), strPassword );
@@ -976,6 +1008,16 @@ bool CServerBrowser::OnRefreshClick ( CGUIElement* pElement )
 
     GetServerList ( Type )->Refresh ();
 
+    return true;
+}
+
+bool CServerBrowser::OnInfoClick ( CGUIElement* pElement )
+{
+    unsigned short usPort;
+    std::string strHost, strNick, strPassword;
+    std::string strURI = m_pEditAddress [ GetCurrentServerBrowserType() ]->GetText();
+    g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword );
+    CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str() );
     return true;
 }
 
@@ -1033,7 +1075,7 @@ bool CServerBrowser::OnAddressChanged ( CGUIElement* pElement )
     for ( CServerListIterator i = i_b; i != i_e; i++ )
     {
         CServerListItem * pServer = *i;
-        if ( pServer->strEndpoint == ( strHost + ":" + SString("%u",usPort) ) )
+        if ( pServer->strHost == strHost && pServer->usGamePort == usPort )
         {
             for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
             {
@@ -1070,6 +1112,10 @@ bool CServerBrowser::OnSearchTypeSelected ( CGUIElement* pElement )
     m_uiCurrentSearchType = m_pComboSearchType[ Type ]->GetSelectedItemIndex();
 
     m_pSearchTypeIcon [ Type ]->LoadFromFile ( m_szSearchTypePath [ m_uiCurrentSearchType ] );
+
+    // Don't bother doing anything if the search bar is empty
+    if ( m_pEditSearch [ Type ]->GetText().empty() )
+        return true;
 
     UpdateServerList ( GetCurrentServerBrowserType (), true );
     return true;

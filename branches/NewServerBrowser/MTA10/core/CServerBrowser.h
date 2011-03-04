@@ -36,6 +36,7 @@ class CServerBrowser;
 #include "CSingleton.h"
 #include "CFavouritesAddByIP.h"
 #include "CCommunityLogin.h"
+#include "CServerInfo.h"
 #include <ctime>
 
 
@@ -200,6 +201,7 @@ private:
     bool                    OnDoubleClick                   ( CGUIElement* pElement );
     bool                    OnConnectClick                  ( CGUIElement* pElement );
     bool                    OnRefreshClick                  ( CGUIElement* pElement );
+    bool                    OnInfoClick                     ( CGUIElement* pElement );
     bool                    OnFavouritesClick               ( CGUIElement* pElement );
     bool                    OnBackClick                     ( CGUIElement* pElement );
     bool                    OnAddressChanged                ( CGUIElement* pElement );

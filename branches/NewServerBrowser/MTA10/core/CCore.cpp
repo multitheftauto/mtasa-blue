@@ -741,6 +741,12 @@ void CCore::HideQuickConnect ( void )
     m_pLocalGUI->GetMainMenu ()->GetQuickConnectWindow()->SetVisible( false );
 }
 
+void CCore::ShowServerInfo ( unsigned int WindowType )
+{
+    RemoveMessageBox ();
+    CServerInfo::GetSingletonPtr()->Show( (CServerInfo::eWindowType)WindowType );
+}
+
 void CCore::ApplyHooks ( )
 { 
     ApplyLoadingCrashPatch ();
@@ -1590,6 +1596,8 @@ void CCore::UpdateRecentlyPlayed()
         }
         
         pServerBrowser->SaveRecentlyPlayedList();
+        if ( !m_pConnectManager->m_strLastPassword.empty() )
+            pServerBrowser->SetServerPassword ( strHost + ":" + SString("%u",uiPort), m_pConnectManager->m_strLastPassword );
 
     }
     //Save our configuration file

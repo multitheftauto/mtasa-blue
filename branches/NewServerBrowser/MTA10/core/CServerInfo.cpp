@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CServerQueue.cpp
+*  FILE:        core/CServerInfo.cpp
 *  PURPOSE:     In-game server queue user interface
 *  DEVELOPERS:  Philip Farquharson <philip@philipfarquharson.co.uk>
 *
@@ -16,9 +16,9 @@ using namespace std;
 
 extern CCore* g_pCore;
 
-template<> CServerQueue * CSingleton < CServerQueue >::m_pSingleton = NULL;
+template<> CServerInfo * CSingleton < CServerInfo >::m_pSingleton = NULL;
 
-CServerQueue::CServerQueue ( void )
+CServerInfo::CServerInfo ( void )
 {
     CGUI *pManager = g_pCore->GetGUI ();
 
@@ -38,21 +38,23 @@ CServerQueue::CServerQueue ( void )
     m_pWindow->SetCloseButtonEnabled( false );
     m_pWindow->SetMovable( true );
     m_pWindow->SetSizingEnabled( false );
-    m_pWindow->SetPosition ( CVector2D ( vecResolution.fX / 2 - QUEUE_WINDOW_DEFAULTWIDTH / 2, vecResolution.fY / 2 - QUEUE_WINDOW_DEFAULTHEIGHT / 2  ), false );
-    m_pWindow->SetSize ( CVector2D ( QUEUE_WINDOW_DEFAULTWIDTH, QUEUE_WINDOW_DEFAULTHEIGHT ) );
+    m_pWindow->SetPosition ( CVector2D ( vecResolution.fX / 2 - INFO_WINDOW_DEFAULTWIDTH / 2, vecResolution.fY / 2 - INFO_WINDOW_DEFAULTHEIGHT / 2  ), false );
+    m_pWindow->SetSize ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH, INFO_WINDOW_DEFAULTHEIGHT ) );
+    m_pWindow->BringToFront();
+    m_pWindow->SetZOrderingEnabled(false);
     m_pWindow->SetAlwaysOnTop ( true );
-    m_pWindow->SetMinimumSize ( CVector2D ( QUEUE_WINDOW_DEFAULTWIDTH, QUEUE_WINDOW_DEFAULTHEIGHT ) );
+    m_pWindow->SetMinimumSize ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH, INFO_WINDOW_DEFAULTHEIGHT ) );
 
     unsigned int LabelTitlePosX = 0;
-    unsigned int LabelTitleSizeX = 0.3f*QUEUE_WINDOW_DEFAULTWIDTH;
-    unsigned int LabelPosX = 0.325f*QUEUE_WINDOW_DEFAULTWIDTH;
-    unsigned int LabelSizeX = 0.55f*QUEUE_WINDOW_DEFAULTWIDTH;
+    unsigned int LabelTitleSizeX = 0.3f*INFO_WINDOW_DEFAULTWIDTH;
+    unsigned int LabelPosX = 0.325f*INFO_WINDOW_DEFAULTWIDTH;
+    unsigned int LabelSizeX = 0.55f*INFO_WINDOW_DEFAULTWIDTH;
     unsigned int LabelSizeY = 15;
     unsigned int DrawPosY = 10; //Start position
 
     // Server Name
     m_pServerNameLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Name:" ) );
-    m_pServerNameLabelTitle->SetPosition ( CVector2D (LabelTitlePosX, DrawPosY+=QUEUE_LABEL_VSPACING+LabelSizeY ), false );
+    m_pServerNameLabelTitle->SetPosition ( CVector2D (LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
     m_pServerNameLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pServerNameLabelTitle->SetFont ( "default-bold-small" );
     m_pServerNameLabelTitle->SetHorizontalAlign(CGUIHorizontalAlign::CGUI_ALIGN_RIGHT);
@@ -64,7 +66,7 @@ CServerQueue::CServerQueue ( void )
 
     // Server IP
     m_pServerIPLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Server IP:" ) );
-    m_pServerIPLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=QUEUE_LABEL_VSPACING+LabelSizeY ), false );
+    m_pServerIPLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
     m_pServerIPLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pServerIPLabelTitle->SetFont ( "default-bold-small" );
     m_pServerIPLabelTitle->SetHorizontalAlign(CGUIHorizontalAlign::CGUI_ALIGN_RIGHT);
@@ -76,7 +78,7 @@ CServerQueue::CServerQueue ( void )
 
     // Gamemode
     m_pGamemodeLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Gamemode:" ) );
-    m_pGamemodeLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=QUEUE_LABEL_VSPACING+LabelSizeY ), false );
+    m_pGamemodeLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
     m_pGamemodeLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pGamemodeLabelTitle->SetFont ( "default-bold-small" );
     m_pGamemodeLabelTitle->SetHorizontalAlign(CGUIHorizontalAlign::CGUI_ALIGN_RIGHT);
@@ -87,7 +89,7 @@ CServerQueue::CServerQueue ( void )
 
     // Map
     m_pMapLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Map:" ) );
-    m_pMapLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=QUEUE_LABEL_VSPACING+LabelSizeY ), false );
+    m_pMapLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
     m_pMapLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pMapLabelTitle->SetFont ( "default-bold-small" );
     m_pMapLabelTitle->SetHorizontalAlign(CGUIHorizontalAlign::CGUI_ALIGN_RIGHT);
@@ -98,7 +100,7 @@ CServerQueue::CServerQueue ( void )
 
     // Players
     m_pPlayersLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Players:" ) );
-    m_pPlayersLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=QUEUE_LABEL_VSPACING+LabelSizeY ), false );
+    m_pPlayersLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
     m_pPlayersLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pPlayersLabelTitle->SetFont ( "default-bold-small" );
     m_pPlayersLabelTitle->SetHorizontalAlign(CGUIHorizontalAlign::CGUI_ALIGN_RIGHT);
@@ -109,7 +111,7 @@ CServerQueue::CServerQueue ( void )
 
     // Passworded
     m_pPasswordedLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Passworded:" ) );
-    m_pPasswordedLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=QUEUE_LABEL_VSPACING+LabelSizeY ), false );
+    m_pPasswordedLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
     m_pPasswordedLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pPasswordedLabelTitle->SetFont ( "default-bold-small" );
     m_pPasswordedLabelTitle->SetHorizontalAlign(CGUIHorizontalAlign::CGUI_ALIGN_RIGHT);
@@ -120,7 +122,7 @@ CServerQueue::CServerQueue ( void )
 
     // Latency
     m_pLatencyLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Latency:" ) );
-    m_pLatencyLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=QUEUE_LABEL_VSPACING+LabelSizeY ), false );
+    m_pLatencyLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
     m_pLatencyLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pLatencyLabelTitle->SetFont ( "default-bold-small" );
     m_pLatencyLabelTitle->SetHorizontalAlign(CGUIHorizontalAlign::CGUI_ALIGN_RIGHT);
@@ -131,36 +133,50 @@ CServerQueue::CServerQueue ( void )
 
     // Player list
     m_pServerPlayerList = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pWindow ) );
-    m_pServerPlayerList->SetPosition ( CVector2D ( QUEUE_WINDOW_HSPACING*2, DrawPosY+=(QUEUE_WINDOW_VSPACING+LabelSizeY) ), false );
-    unsigned int PlayerListHeight = (QUEUE_WINDOW_DEFAULTHEIGHT - QUEUE_WINDOW_VSPACING - QUEUE_BUTTON_HEIGHT - QUEUE_WINDOW_VSPACING - LabelSizeY - QUEUE_WINDOW_VSPACING) - DrawPosY;
-    m_pServerPlayerList->SetSize ( CVector2D ( QUEUE_WINDOW_DEFAULTWIDTH-QUEUE_WINDOW_HSPACING*4, PlayerListHeight	), false );
+    m_pServerPlayerList->SetPosition ( CVector2D ( INFO_WINDOW_HSPACING*2, DrawPosY+=(INFO_WINDOW_VSPACING+LabelSizeY) ), false );
+    unsigned int PlayerListHeight = (INFO_WINDOW_DEFAULTHEIGHT - INFO_WINDOW_VSPACING - INFO_BUTTON_HEIGHT - INFO_WINDOW_VSPACING - LabelSizeY - INFO_WINDOW_VSPACING) - DrawPosY;
+    m_pServerPlayerList->SetSize ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-INFO_WINDOW_HSPACING*4, PlayerListHeight	), false );
     m_pServerPlayerList->SetIgnoreTextSpacer ( true );
 
     // Column for player names
     m_hPlayerName = m_pServerPlayerList->AddColumn ( "Name", 0.9f );
 
     // Now we draw from the bottom
-    DrawPosY = QUEUE_WINDOW_DEFAULTHEIGHT - QUEUE_WINDOW_VSPACING;
+    DrawPosY = INFO_WINDOW_DEFAULTHEIGHT - INFO_WINDOW_VSPACING;
 
     // Close button
     m_pButtonClose = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Close" ) );
-    m_pButtonClose->SetPosition ( CVector2D ( QUEUE_WINDOW_DEFAULTWIDTH-(QUEUE_BUTTON_WIDTH*2)-(1.5f*QUEUE_WINDOW_HSPACING), DrawPosY-=QUEUE_BUTTON_HEIGHT ), false );
-    m_pButtonClose->SetSize ( CVector2D ( QUEUE_BUTTON_WIDTH, QUEUE_BUTTON_HEIGHT ), false );
-    m_pButtonClose->SetClickHandler ( GUI_CALLBACK ( &CServerQueue::OnCloseClicked, this ) );
+    m_pButtonClose->SetPosition ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-(INFO_BUTTON_WIDTH*2)-(1.5f*INFO_WINDOW_HSPACING), DrawPosY-=INFO_BUTTON_HEIGHT ), false );
+    m_pButtonClose->SetSize ( CVector2D ( INFO_BUTTON_WIDTH, INFO_BUTTON_HEIGHT ), false );
+    m_pButtonClose->SetClickHandler ( GUI_CALLBACK ( &CServerInfo::OnCloseClicked, this ) );
 
     // Join Game button
     m_pButtonJoinGame = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Join Game" ) );
-    m_pButtonJoinGame->SetPosition ( CVector2D ( QUEUE_WINDOW_DEFAULTWIDTH-QUEUE_BUTTON_WIDTH-QUEUE_WINDOW_HSPACING, DrawPosY ), false );
-    m_pButtonJoinGame->SetSize ( CVector2D ( QUEUE_BUTTON_WIDTH, QUEUE_BUTTON_HEIGHT ), false );
-    m_pButtonJoinGame->SetClickHandler ( GUI_CALLBACK ( &CServerQueue::OnJoinGameClicked, this ) );
+    m_pButtonJoinGame->SetPosition ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-INFO_BUTTON_WIDTH-INFO_WINDOW_HSPACING, DrawPosY ), false );
+    m_pButtonJoinGame->SetSize ( CVector2D ( INFO_BUTTON_WIDTH, INFO_BUTTON_HEIGHT ), false );
+    m_pButtonJoinGame->SetClickHandler ( GUI_CALLBACK ( &CServerInfo::OnJoinGameClicked, this ) );
+
+    // Password entry editbox
+    m_pEnterPasswordEdit = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pWindow, "" ) );
+    m_pEnterPasswordEdit->SetPosition ( CVector2D ( INFO_WINDOW_HSPACING*2, DrawPosY - 4 ), false );
+    m_pEnterPasswordEdit->SetSize ( CVector2D ( INFO_BUTTON_WIDTH*2, INFO_BUTTON_HEIGHT ), false );
+    m_pEnterPasswordEdit->SetMasked ( true );
+    m_pEnterPasswordEdit->SetTextAcceptedHandler ( GUI_CALLBACK ( &CServerInfo::OnJoinGameClicked, this ) );
 
     // Autojoin checkbox
     m_pCheckboxAutojoin = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pWindow, "Join the server as soon as a player slot is available.", true ) );
-    m_pCheckboxAutojoin->SetPosition ( CVector2D ( QUEUE_WINDOW_HSPACING*2, DrawPosY-=QUEUE_WINDOW_VSPACING+LabelSizeY ), false );
-    m_pCheckboxAutojoin->SetSize( CVector2D ( QUEUE_WINDOW_DEFAULTWIDTH, LabelSizeY ), false );
+    m_pCheckboxAutojoin->SetPosition ( CVector2D ( INFO_WINDOW_HSPACING*2, DrawPosY-=INFO_WINDOW_VSPACING+LabelSizeY ), false );
+    m_pCheckboxAutojoin->SetSize( CVector2D ( INFO_WINDOW_DEFAULTWIDTH, LabelSizeY ), false );
+
+    // Please enter password label
+    m_pEnterPasswordLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Please enter the password to the server:" ) );
+    m_pEnterPasswordLabel->SetPosition ( CVector2D ( INFO_WINDOW_HSPACING*2, DrawPosY ), false );
+    m_pEnterPasswordLabel->SetSize(CVector2D(INFO_WINDOW_DEFAULTWIDTH, LabelSizeY), false);
+    m_pEnterPasswordLabel->SetFont("default-bold-small");
+    m_pEnterPasswordLabel->SetTextColor(255,0,0);
 }
 
-CServerQueue::~CServerQueue ( void )
+CServerInfo::~CServerInfo ( void )
 {
     // Delete our GUI elements
     delete m_pWindow;
@@ -224,40 +240,91 @@ CServerQueue::~CServerQueue ( void )
         delete m_szPassword;
 }
 
-bool CServerQueue::OnCloseClicked ( CGUIElement* pElement )
+bool CServerInfo::OnCloseClicked ( CGUIElement* pElement )
 {
     // Hide this window
-    SetVisible( false );
+    m_pWindow->SetVisible( false );
     return true;
 }
 
-bool CServerQueue::OnJoinGameClicked ( CGUIElement* pElement )
+bool CServerInfo::OnJoinGameClicked ( CGUIElement* pElement )
 {
     // Attempt to connect to the server
     Connect();
     return true;
 }
 
-void CServerQueue::SetVisible( bool bVisible )
-{
-    // Set the visibility state
-    m_pWindow->SetVisible( bVisible );
-
-    // Are we showing when it was hidden before?
-    if ( bVisible ) 
-    {
-        // Reset and bring us to front
-        Reset();
-        m_pWindow->BringToFront ();
-    }
-}
-
-bool CServerQueue::IsVisible( void )
+bool CServerInfo::IsVisible( void )
 {
     return m_pWindow->IsVisible ();
 }
 
-void CServerQueue::SetServerInformation( const char* szHost, unsigned short usPort, const char* szPassword )
+void CServerInfo::Hide( void )
+{
+    m_pWindow->SetVisible ( false );
+}
+
+void CServerInfo::Show ( eWindowType WindowType )
+{
+   Show(WindowType, g_pCore->GetConnectManager()->m_strLastHost.c_str(), g_pCore->GetConnectManager()->m_usLastPort,"" );
+}
+
+void CServerInfo::Show( eWindowType WindowType, const char* szHost, unsigned short usPort, const char* szPassword )
+{
+    m_pWindow->SetZOrderingEnabled(true);
+    m_pWindow->SetVisible (true);
+    m_pWindow->BringToFront ();
+
+    m_pEnterPasswordEdit->SetText ( "" );
+
+    // Adjust our window according to what type of window we are displaying
+    float fHeight;
+    unsigned int LabelSizeY = 15;
+    float PlayerListHeight = (INFO_WINDOW_DEFAULTHEIGHT - INFO_WINDOW_VSPACING - INFO_BUTTON_HEIGHT - INFO_WINDOW_VSPACING - LabelSizeY - INFO_WINDOW_VSPACING) - m_pServerPlayerList->GetPosition().fY;
+    if ( WindowType == SERVER_INFO_QUEUE )
+    {
+        fHeight = INFO_WINDOW_DEFAULTHEIGHT;
+        m_pCheckboxAutojoin->SetVisible( true );
+        m_pEnterPasswordEdit->SetVisible( false );
+        m_pEnterPasswordLabel->SetVisible( false );
+        m_pWindow->SetText ( "SERVER IS FULL" );
+    }
+    else if ( WindowType == SERVER_INFO_PASSWORD )
+    {
+        fHeight = PASSWORD_WINDOW_DEFAULTHEIGHT;
+        m_pCheckboxAutojoin->SetVisible( false );
+        m_pEnterPasswordEdit->SetVisible( true );
+        m_pEnterPasswordLabel->SetVisible( true );
+        m_pWindow->SetText ( "PLEASE ENTER SERVER PASSWORD" );
+        m_bWaitingToActivatePassword = true;
+    }
+    else
+    {
+        PlayerListHeight += LabelSizeY;
+        fHeight = INFO_WINDOW_DEFAULTHEIGHT;
+        m_pCheckboxAutojoin->SetVisible( false );
+        m_pEnterPasswordEdit->SetVisible( false );
+        m_pEnterPasswordLabel->SetVisible( false );
+        m_pWindow->SetText ( "Information" );
+    }
+    float DrawPosY = fHeight - INFO_WINDOW_VSPACING - INFO_BUTTON_HEIGHT;
+
+    m_pCurrentWindowType = WindowType;
+   
+    m_pServerPlayerList->SetSize ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-INFO_WINDOW_HSPACING*4, PlayerListHeight	), false );
+
+    m_pWindow->SetSize ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH, fHeight ), false );
+
+    m_pButtonJoinGame->SetPosition ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-INFO_BUTTON_WIDTH-INFO_WINDOW_HSPACING, DrawPosY ), false );        
+    m_pButtonClose->SetPosition ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-(INFO_BUTTON_WIDTH*2)-(1.5f*INFO_WINDOW_HSPACING), DrawPosY ), false );
+
+    m_pWindow->SetZOrderingEnabled(false);
+    Reset();
+    SetServerInformation( szHost, usPort, szPassword );
+}
+
+
+void CServerInfo::SetServerInformation( const char* szHost, unsigned short usPort, const char* szPassword )
 {
     // Store the parameters in our class instance for later use
     m_usPort = usPort;
@@ -291,7 +358,7 @@ void CServerQueue::SetServerInformation( const char* szHost, unsigned short usPo
     Refresh();
 }
 
-void CServerQueue::DoPulse( void )
+void CServerInfo::DoPulse( void )
 {
     // Are we visible?
     if ( IsVisible() )
@@ -304,8 +371,8 @@ void CServerQueue::DoPulse( void )
         {
             m_bRequiresUpdate = false;
 
-            // Is auto join enabled?
-            if ( m_pCheckboxAutojoin->GetSelected() )
+            // Are we queing, and is auto join enabled?
+            if ( m_pCurrentWindowType == SERVER_INFO_QUEUE && m_pCheckboxAutojoin->GetSelected() )
             {
                 // Is a slot available?
                 if ( m_Server.nPlayers < m_Server.nMaxPlayers )
@@ -371,10 +438,17 @@ void CServerQueue::DoPulse( void )
 
             m_ulLastUpdateTime = CClientTime::GetTime ();
         }
+
+        if ( m_bWaitingToActivatePassword )
+        {
+            m_bWaitingToActivatePassword = false;
+            m_pWindow->Activate();
+            m_pEnterPasswordEdit->Activate();
+        }
     }
 }
 
-void CServerQueue::Refresh( void )
+void CServerInfo::Refresh( void )
 {
     // Reset the query variables
     m_Server.Init();
@@ -386,7 +460,7 @@ void CServerQueue::Refresh( void )
     m_Server.Query();
 }
 
-void CServerQueue::Reset ( void )
+void CServerInfo::Reset ( void )
 {
     // Set every GUI elements text to blank
     m_pServerNameLabel->SetText("");
@@ -398,15 +472,19 @@ void CServerQueue::Reset ( void )
     m_pLatencyLabel->SetText("");
 }
 
-void CServerQueue::Connect( void )
+void CServerInfo::Connect( void )
 {
     // Get the nick from the cfg
     std::string strNick;
     CVARS_GET ( "nick", strNick );
 
     // Hide the window
-    SetVisible( false );
+    m_pWindow->SetVisible( false );
+
+    std::string strPassword = m_szPassword;
+    if ( m_pCurrentWindowType == SERVER_INFO_PASSWORD )
+        strPassword = m_pEnterPasswordEdit->GetText();
 
     // Let's attempt to join
-    CCore::GetSingleton ().GetConnectManager ()->Connect ( m_szHost, m_usPort, strNick.c_str (), m_szPassword );
+    CCore::GetSingleton ().GetConnectManager ()->Connect ( m_szHost, m_usPort, strNick.c_str (), strPassword.c_str() );
 }
