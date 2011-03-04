@@ -143,13 +143,12 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 
     // Create the menu items
     //Filepath, Relative position, absolute native size
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUICK_CONNECT,  "cgui\\images\\menu_quick_connect.png",    CVector2D ( 0.168f, 0.615f ),    CVector2D ( 358, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, 0.662f ),    CVector2D ( 390, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, 0.709f ),    CVector2D ( 251, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "cgui\\images\\menu_map_editor.png",       CVector2D ( 0.168f, 0.756f ),    CVector2D ( 261, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "cgui\\images\\menu_settings.png",         CVector2D ( 0.168f, 0.803f ),    CVector2D ( 207, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "cgui\\images\\menu_about.png",            CVector2D ( 0.168f, 0.850f ),    CVector2D ( 150, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, 0.897f ),    CVector2D ( 102, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, 0.615f ),    CVector2D ( 390, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, 0.662f ),    CVector2D ( 251, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "cgui\\images\\menu_map_editor.png",       CVector2D ( 0.168f, 0.709f ),    CVector2D ( 261, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "cgui\\images\\menu_settings.png",         CVector2D ( 0.168f, 0.756f ),    CVector2D ( 207, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "cgui\\images\\menu_about.png",            CVector2D ( 0.168f, 0.803f ),    CVector2D ( 150, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, 0.850f ),    CVector2D ( 102, 34 ) ) );
 
     // We store the position of the top item, and the second item.  These will be useful later
     m_iFirstItemTop  = (m_menuItems.front()->image)->GetPosition().fY;
