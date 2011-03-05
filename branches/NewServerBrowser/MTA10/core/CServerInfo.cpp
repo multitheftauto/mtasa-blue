@@ -28,8 +28,6 @@ CServerInfo::CServerInfo ( void )
     m_szPassword = NULL;
     m_szHost = NULL;
 
-    m_bRequiresUpdate = false;
-
     // Obtain our screen resolution
     CVector2D vecResolution = CCore::GetSingleton().GetGUI()->GetResolution();
 
@@ -65,15 +63,15 @@ CServerInfo::CServerInfo ( void )
 
 
     // Server IP
-    m_pServerIPLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Server IP:" ) );
-    m_pServerIPLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
-    m_pServerIPLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
-    m_pServerIPLabelTitle->SetFont ( "default-bold-small" );
-    m_pServerIPLabelTitle->SetHorizontalAlign(CGUIHorizontalAlign::CGUI_ALIGN_RIGHT);
+    m_pServerAddressLabelTitle = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "Server Address:" ) );
+    m_pServerAddressLabelTitle->SetPosition ( CVector2D ( LabelTitlePosX, DrawPosY+=INFO_LABEL_VSPACING+LabelSizeY ), false );
+    m_pServerAddressLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
+    m_pServerAddressLabelTitle->SetFont ( "default-bold-small" );
+    m_pServerAddressLabelTitle->SetHorizontalAlign(CGUIHorizontalAlign::CGUI_ALIGN_RIGHT);
 
-    m_pServerIPLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "" ) );
-    m_pServerIPLabel->SetPosition ( CVector2D ( LabelPosX, DrawPosY ), false );
-    m_pServerIPLabel->SetSize(CVector2D(LabelSizeX, LabelSizeY), false);
+    m_pServerAddressLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "" ) );
+    m_pServerAddressLabel->SetPosition ( CVector2D ( LabelPosX, DrawPosY ), false );
+    m_pServerAddressLabel->SetSize(CVector2D(LabelSizeX, LabelSizeY), false);
 
 
     // Gamemode
@@ -139,7 +137,7 @@ CServerInfo::CServerInfo ( void )
     m_pServerPlayerList->SetIgnoreTextSpacer ( true );
 
     // Column for player names
-    m_hPlayerName = m_pServerPlayerList->AddColumn ( "Name", 0.9f );
+    m_hPlayerName = m_pServerPlayerList->AddColumn ( "Player list", 0.9f );
 
     // Now we draw from the bottom
     DrawPosY = INFO_WINDOW_DEFAULTHEIGHT - INFO_WINDOW_VSPACING;
@@ -185,8 +183,8 @@ CServerInfo::~CServerInfo ( void )
     delete m_pServerNameLabel;
     m_pServerNameLabel = 0;
 
-    delete m_pServerIPLabel;
-    m_pServerIPLabel = 0;
+    delete m_pServerAddressLabel;
+    m_pServerAddressLabel = 0;
 
     delete m_pGamemodeLabel;
     m_pGamemodeLabel = 0;
@@ -206,8 +204,8 @@ CServerInfo::~CServerInfo ( void )
     delete m_pServerNameLabelTitle;
     m_pServerNameLabelTitle = 0;
 
-    delete m_pServerIPLabelTitle;
-    m_pServerIPLabelTitle = 0;
+    delete m_pServerAddressLabelTitle;
+    m_pServerAddressLabelTitle = 0;
 
     delete m_pGamemodeLabelTitle;
     m_pGamemodeLabelTitle = 0;
@@ -235,6 +233,12 @@ CServerInfo::~CServerInfo ( void )
 
     delete m_pButtonClose;
     m_pButtonClose = 0;
+
+    delete m_pEnterPasswordLabel;
+    m_pEnterPasswordLabel = 0;
+
+    delete m_pEnterPasswordEdit;
+    m_pEnterPasswordEdit = 0;
 
     if ( m_szPassword )
         delete m_szPassword;
@@ -269,7 +273,7 @@ void CServerInfo::Show ( eWindowType WindowType )
    Show(WindowType, g_pCore->GetConnectManager()->m_strLastHost.c_str(), g_pCore->GetConnectManager()->m_usLastPort,"" );
 }
 
-void CServerInfo::Show( eWindowType WindowType, const char* szHost, unsigned short usPort, const char* szPassword )
+void CServerInfo::Show( eWindowType WindowType, const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem )
 {
     m_pWindow->SetZOrderingEnabled(true);
     m_pWindow->SetVisible (true);
@@ -319,12 +323,14 @@ void CServerInfo::Show( eWindowType WindowType, const char* szHost, unsigned sho
     m_pButtonClose->SetPosition ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-(INFO_BUTTON_WIDTH*2)-(1.5f*INFO_WINDOW_HSPACING), DrawPosY ), false );
 
     m_pWindow->SetZOrderingEnabled(false);
-    Reset();
-    SetServerInformation( szHost, usPort, szPassword );
+
+    pInitialServerListItem = pInitialServerListItem ? pInitialServerListItem : CCore::GetSingleton ().GetLocalGUI()->GetMainMenu()->GetServerBrowser()->FindServer ( szHost, usPort );
+
+    SetServerInformation( szHost, usPort, szPassword, pInitialServerListItem );
 }
 
 
-void CServerInfo::SetServerInformation( const char* szHost, unsigned short usPort, const char* szPassword )
+void CServerInfo::SetServerInformation( const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem )
 {
     // Store the parameters in our class instance for later use
     m_usPort = usPort;
@@ -352,7 +358,12 @@ void CServerInfo::SetServerInformation( const char* szHost, unsigned short usPor
     m_Server.usQueryPort = usPort + SERVER_LIST_QUERY_PORT_OFFSET;
     m_Server.usGamePort = usPort;
 
-    m_bRequiresUpdate = true;
+    if ( pInitialServerListItem )  // If we have a pointer to an already scanned server, we initially set text to this
+        ResetServerGUI ( pInitialServerListItem );
+    else // Otherwise, reset it to blank text
+        Reset();
+
+    m_pServerAddressLabel->SetText(SString("%s:%u",szHost,usPort));
 
     // Lets query the server now, as the previous data is out of date
     Refresh();
@@ -367,10 +378,8 @@ void CServerInfo::DoPulse( void )
         m_Server.Pulse ( true );
 
         // Do we need a refresh?
-        if ( ( m_Server.bScanned && (CClientTime::GetTime () - m_ulLastUpdateTime) >=  SERVER_UPDATE_INTERVAL ) || m_bRequiresUpdate )
+        if ( ( m_Server.bScanned && (CClientTime::GetTime () - m_ulLastUpdateTime) >=  SERVER_UPDATE_INTERVAL ) )
         {
-            m_bRequiresUpdate = false;
-
             // Are we queing, and is auto join enabled?
             if ( m_pCurrentWindowType == SERVER_INFO_QUEUE && m_pCheckboxAutojoin->GetSelected() )
             {
@@ -383,28 +392,7 @@ void CServerInfo::DoPulse( void )
                 }
             }
 
-            // Set our GUI elements to display the server information
-            m_pServerNameLabel->SetText(m_Server.strName.c_str());
-            m_pServerIPLabel->SetText(m_Server.strHost.c_str());
-            m_pGamemodeLabel->SetText(m_Server.strGameMode.c_str());
-            m_pMapLabel->SetText(m_Server.strMap.c_str());
-            m_pPlayersLabel->SetText(SString("%i/%i", m_Server.nPlayers, m_Server.nMaxPlayers).c_str());
-            
-            m_pPasswordedLabel->SetText(m_Server.bPassworded ? "Yes" : "No");
-            m_pLatencyLabel->SetText(SString("%i", m_Server.nPing));
-
-            // Clear our player list
-            m_pServerPlayerList->Clear();
-
-            // Iterate the list of players and add their names to the player list
-            for ( unsigned int i = 0; i < m_Server.vecPlayers.size (); i++ ) 
-            {
-                std::string strPlayerName = m_Server.vecPlayers[i].c_str ();
-
-                m_pServerPlayerList->AddRow(true);
-                m_pServerPlayerList->SetItemText(i, m_hPlayerName, strPlayerName.c_str(), false, false, true);
-            }
-
+            ResetServerGUI(&m_Server);
 
             m_ulLastUpdateTime = CClientTime::GetTime ();
 
@@ -420,21 +408,10 @@ void CServerInfo::DoPulse( void )
                 Refresh ();
             }
 
-            m_bRequiresUpdate = false;
-
-            // Set the text of the GUI elements to the previous data (or blank)
-            m_pServerNameLabel->SetText(m_Server.strName.c_str());
-            m_pServerIPLabel->SetText(m_Server.strHost.c_str());
-            m_pGamemodeLabel->SetText(m_Server.strGameMode.c_str());
-            m_pMapLabel->SetText(m_Server.strMap.c_str());
-            m_pPlayersLabel->SetText(SString("%i/%i", m_Server.nPlayers, m_Server.nMaxPlayers).c_str());
-            m_pPasswordedLabel->SetText(m_Server.bPassworded ? "Yes" : "No");
+            ResetServerGUI(&m_Server);
 
             // The server has timed out
             m_pLatencyLabel->SetText("Timed Out");
-
-            // Clear the player list
-            m_pServerPlayerList->Clear();
 
             m_ulLastUpdateTime = CClientTime::GetTime ();
         }
@@ -463,13 +440,15 @@ void CServerInfo::Refresh( void )
 void CServerInfo::Reset ( void )
 {
     // Set every GUI elements text to blank
-    m_pServerNameLabel->SetText("");
-    m_pServerIPLabel->SetText("");
+    m_pServerNameLabel->SetText("Querying...");
     m_pGamemodeLabel->SetText("");
     m_pMapLabel->SetText("");
     m_pPlayersLabel->SetText("");
     m_pPasswordedLabel->SetText("");
     m_pLatencyLabel->SetText("");
+    m_pServerPlayerList->Clear();
+
+    m_Server.Init();
 }
 
 void CServerInfo::Connect( void )
@@ -484,7 +463,43 @@ void CServerInfo::Connect( void )
     std::string strPassword = m_szPassword;
     if ( m_pCurrentWindowType == SERVER_INFO_PASSWORD )
         strPassword = m_pEnterPasswordEdit->GetText();
+    else if ( m_Server.bPassworded )  // If we're not in a passworded window, but the server is passworded
+    {
+        // Try to grab a saved password
+        strPassword = g_pCore->GetLocalGUI()->GetMainMenu()->GetServerBrowser()->GetServerPassword( m_Server.GetEndpoint ().c_str() );
+
+        if ( strPassword.empty() ) // No password could be found, repopup the window in password mode.
+        {
+            Show ( SERVER_INFO_PASSWORD, m_Server.strHost.c_str (), m_Server.usGamePort, "", &m_Server );
+            return;
+        }
+    }
 
     // Let's attempt to join
     CCore::GetSingleton ().GetConnectManager ()->Connect ( m_szHost, m_usPort, strNick.c_str (), strPassword.c_str() );
+}
+
+void CServerInfo::ResetServerGUI ( CServerListItem* pServer )
+{
+    // Set our GUI elements to display the server information
+    m_pServerNameLabel->SetText(pServer->strName.c_str());
+    m_pServerAddressLabel->SetText(pServer->strEndpoint.c_str());
+    m_pGamemodeLabel->SetText(pServer->strGameMode.c_str());
+    m_pMapLabel->SetText(pServer->strMap.c_str());
+    m_pPlayersLabel->SetText(SString("%i/%i", pServer->nPlayers, pServer->nMaxPlayers).c_str());
+    
+    m_pPasswordedLabel->SetText(pServer->bPassworded ? "Yes" : "No");
+    m_pLatencyLabel->SetText(SString("%i", pServer->nPing));
+
+    // Clear our player list
+    m_pServerPlayerList->Clear();
+
+    // Iterate the list of players and add their names to the player list
+    for ( unsigned int i = 0; i < pServer->vecPlayers.size (); i++ ) 
+    {
+        std::string strPlayerName = pServer->vecPlayers[i].c_str ();
+
+        m_pServerPlayerList->AddRow(true);
+        m_pServerPlayerList->SetItemText(i, m_hPlayerName, strPlayerName.c_str(), false, false, true);
+    }
 }

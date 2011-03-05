@@ -168,7 +168,9 @@ public:
                                         usGamePort );
 
         m_Socket = INVALID_SOCKET;
-
+        strGameMode = "";
+        strMap = "";
+        vecPlayers.clear();
         uiTieBreakPosition = 1000;
         m_iDataQuality = SERVER_INFO_NONE;
         m_iTimeoutLength = SERVER_LIST_ITEM_TIMEOUT;

@@ -911,10 +911,7 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     // If our password is empty, try and grab a saved password
     if ( strPassword.empty() )
     {
-        bool bSavedPasswords;
-        CVARS_GET ( "save_server_passwords", bSavedPasswords );
-        if ( bSavedPasswords )
-            strPassword = GetServerPassword( strHost + ":" + SString("%u",usPort) );
+        strPassword = GetServerPassword( strHost + ":" + SString("%u",usPort) );
     }
 
     // Start the connect
@@ -976,16 +973,13 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
 
         // Password buffer
         SString strPassword = "";
-        if ( pServer->bPassworded )  // The server is passworded
+        if ( pServer->bPassworded )  // The server is passworded, let's try and grab a saved password
         {
-            // Do we have a saved password?
-            bool bSavedPasswords;
-            CVARS_GET ( "save_server_passwords", bSavedPasswords );
-            if ( bSavedPasswords )
-                strPassword = GetServerPassword( pServer->GetEndpoint ().c_str() );
-            else // Popup password entry form
+            strPassword = GetServerPassword( pServer->GetEndpoint ().c_str() );
+
+            if ( strPassword.empty() ) // No password could be found, popup password entry.
             {
-                CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_QUEUE, pServer->strHost.c_str (), pServer->usGamePort, "" );
+                CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_PASSWORD, pServer->strHost.c_str (), pServer->usGamePort, "", pServer );
                 return true;
             }
         }
@@ -1436,6 +1430,11 @@ void CServerBrowser::SaveOptions ( )
 
 void CServerBrowser::SetServerPassword ( const std::string& strHost, const std::string& strPassword )
 {
+    bool bSavedPasswords;
+    CVARS_GET ( "save_server_passwords", bSavedPasswords );
+    if ( !bSavedPasswords )
+        return;
+
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
     CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
     if ( !pServerPasswords )
@@ -1472,6 +1471,12 @@ void CServerBrowser::SetServerPassword ( const std::string& strHost, const std::
 
 std::string CServerBrowser::GetServerPassword ( const std::string& strHost )
 {
+    // Password getting enabled?
+    bool bSavedPasswords;
+    CVARS_GET ( "save_server_passwords", bSavedPasswords );
+    if ( !bSavedPasswords )
+        return "";
+
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
     CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
     if ( !pServerPasswords )
@@ -1540,12 +1545,35 @@ CServerListItem* CServerBrowser::FindSelectedServer ( ServerBrowserType Type )
 CServerListItem* CServerBrowser::FindServerFromRow ( ServerBrowserType Type, int iRow )
 {
     CServerList * pList = GetServerList ( Type );
-    CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
     CServerListItem * pSelectedServer = (CServerListItem *)m_pServerList [ Type ]->GetItemData ( iRow, DATA_PSERVER );
     if ( pSelectedServer )
         return pSelectedServer;
     return NULL;
 }
+
+/////////////////////////////////////////////////////////////////
+//
+// CServerBrowser::FindServer
+//
+// Finds a server at any point in the active list
+//
+/////////////////////////////////////////////////////////////////
+CServerListItem* CServerBrowser::FindServer ( std::string strHost, unsigned short usPort )
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType ();
+    CServerList * pList = GetServerList ( Type );
+
+    CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
+    
+    for ( CServerListIterator i = i_b; i != i_e; i++ )
+    {
+        CServerListItem * pServer = *i;
+        if ( pServer->strHost == strHost && pServer->usGamePort == usPort )
+            return pServer;
+    }
+    return NULL;
+}
+
 
 
 /////////////////////////////////////////////////////////////////

@@ -49,16 +49,16 @@ public:
     bool			    IsVisible                   ( void );
     void                Hide                        ( void );
     void                Show                        ( eWindowType WindowType );
-    void                Show                        ( eWindowType WindowType, const char* szHost, unsigned short usPort, const char* szPassword );
+    void                Show                        ( eWindowType WindowType, const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL );
 
-    void                SetServerInformation        ( const char* szHost, unsigned short usPort, const char* szPassword );
+    void                SetServerInformation        ( const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL );
 
     void                DoPulse                     ( void );
 
 protected:
     CGUIWindow*         m_pWindow;
     CGUILabel*          m_pServerNameLabel;
-    CGUILabel*          m_pServerIPLabel;
+    CGUILabel*          m_pServerAddressLabel;
     CGUILabel*          m_pGamemodeLabel;
     CGUILabel*          m_pMapLabel;
     CGUILabel*          m_pPlayersLabel;
@@ -66,7 +66,7 @@ protected:
     CGUILabel*          m_pLatencyLabel;
 
     CGUILabel*          m_pServerNameLabelTitle;
-    CGUILabel*          m_pServerIPLabelTitle;
+    CGUILabel*          m_pServerAddressLabelTitle;
     CGUILabel*          m_pGamemodeLabelTitle;
     CGUILabel*          m_pMapLabelTitle;
     CGUILabel*          m_pPlayersLabelTitle;
@@ -90,8 +90,6 @@ private:
     eWindowType         m_pCurrentWindowType;
     bool                m_bWaitingToActivatePassword;
 
-    bool                m_bRequiresUpdate;
-
     const char*         m_szHost;
     unsigned short      m_usPort;
     const char*         m_szPassword;
@@ -99,6 +97,7 @@ private:
     void                Refresh                     ( void );
     void                Connect                     ( void );
     void                Reset                       ( void );
+    void                ResetServerGUI              ( CServerListItem* pServer );
 
     bool                OnCloseClicked              ( CGUIElement* pElement );
     bool                OnJoinGameClicked           ( CGUIElement* pElement );
