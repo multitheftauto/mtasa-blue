@@ -891,7 +891,7 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     if ( iProtocolEnd == -1 )
     {
         strURI = "mtasa://" + strURI;
-        m_pEditAddress [ GetCurrentServerBrowserType() ]->SetText(strURI.c_str());
+        SetAddressBarText(strURI);
     }
     else if ( strURI.substr(0,iProtocolEnd) != "mtasa" )// Is it the mtasa:// protocol?  Don't want noobs trying http etc
     {
@@ -1070,6 +1070,13 @@ bool CServerBrowser::OnAddressChanged ( CGUIElement* pElement )
     std::string strURI = m_pEditAddress [ Type ]->GetText();
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword );
     
+    // Adjust our other address bars to be consistent
+    for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+    {
+        if ( ( i != Type ) && ( strURI != m_pEditAddress[i]->GetText() ) )
+            m_pEditAddress[i]->SetText ( strURI.c_str() );
+    }
+
     // If this address exists in favourites, change our favourites icon
     CServerListIterator i, i_b = m_ServersFavourites.IteratorBegin (), i_e = m_ServersFavourites.IteratorEnd ();
     for ( CServerListIterator i = i_b; i != i_e; i++ )
@@ -1087,14 +1094,7 @@ bool CServerBrowser::OnAddressChanged ( CGUIElement* pElement )
     for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
     {
         m_pAddressFavoriteIcon[i]->SetAlpha ( 0.3f );
-    } 
-
-    // Adjust our other address bars to be consistent
-    for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
-    {
-        if ( i != Type && strURI != m_pEditAddress[i]->GetText() )
-            m_pEditAddress[i]->SetText ( strURI.c_str() );
-    }    
+    }   
     return true;
 }
 
