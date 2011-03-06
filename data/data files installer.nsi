@@ -18,7 +18,7 @@ Var Install_Dir
 ; Don't forget to update the BUILD_NUMBER
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "2332"
+!define BUILD_NUMBER "2442"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "mtasa-1.1-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
@@ -160,6 +160,9 @@ Section "Data files" SEC01
 
 	SetOutPath "$INSTDIR\MTA\cgui\images\transferset"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\transferset\*.png"
+	
+	SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
 
 	;SetOutPath "$INSTDIR\MTA\data"
 	;File "${FILES_ROOT}\MTA San Andreas\mta\data\*.png"
