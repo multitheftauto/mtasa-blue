@@ -222,7 +222,6 @@ CCore::~CCore ( void )
     // Store core variables to cvars
     CVARS_SET ( "console_pos",                  m_pLocalGUI->GetConsole ()->GetPosition () );
     CVARS_SET ( "console_size",                 m_pLocalGUI->GetConsole ()->GetSize () );
-    CVARS_SET ( "serverbrowser_size",           m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->GetSize () );
 
     // Delete interaction objects.
     delete m_pCommands;
@@ -606,15 +605,6 @@ void CCore::ApplyConsoleSettings ( void )
     pConsole->SetSize ( vec );
 }
 
-void CCore::ApplyServerBrowserSettings ( void )
-{
-    CVector2D vec;
-
-    CVARS_GET ( "serverbrowser_size", vec );
-    m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->SetSize ( vec );
-}
-
-
 void CCore::ApplyGameSettings ( void )
 {
     bool bval;
@@ -749,6 +739,12 @@ void CCore::HideMainMenu ( void )
 void CCore::HideQuickConnect ( void )
 {
     m_pLocalGUI->GetMainMenu ()->GetQuickConnectWindow()->SetVisible( false );
+}
+
+void CCore::ShowServerInfo ( unsigned int WindowType )
+{
+    RemoveMessageBox ();
+    CServerInfo::GetSingletonPtr()->Show( (CServerInfo::eWindowType)WindowType );
 }
 
 void CCore::ApplyHooks ( )
@@ -1077,7 +1073,6 @@ void CCore::DoPostFramePulse ( )
 
         // Apply all settings
         ApplyConsoleSettings ();
-        ApplyServerBrowserSettings ();
         ApplyGameSettings ();
 
         m_pGUI->SetMouseClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
@@ -1420,6 +1415,25 @@ const char* CCore::GetCommandLineOption ( const char* szOption )
 
 SString CCore::GetConnectCommandFromURI ( const char* szURI )
 {
+    unsigned short usPort;
+    std::string strHost, strNick, strPassword;
+    GetConnectParametersFromURI ( szURI, strHost, usPort, strNick, strPassword );
+
+    // Generate a string with the arguments to send to the mod IF we got a host
+    SString strDest;
+    if ( strHost.size() > 0 )
+    {
+        if ( strPassword.size() > 0 )
+            strDest.Format ( "connect %s %u %s %s", strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str () );
+        else
+            strDest.Format ( "connect %s %u %s", strHost.c_str (), usPort, strNick.c_str () );
+    }
+
+    return strDest;
+}
+
+void CCore::GetConnectParametersFromURI ( const char* szURI, std::string &strHost, unsigned short &usPort, std::string &strNick, std::string &strPassword )
+{
     // Grab the length of the string
     size_t sizeURI = strlen ( szURI );
     
@@ -1533,14 +1547,13 @@ SString CCore::GetConnectCommandFromURI ( const char* szURI )
     }
 
     // If we got any port, convert it to an integral type
-    unsigned short usPort = 22003;
+    usPort = 22003;
     if ( strlen ( szPort ) > 0 )
     {
         usPort = static_cast < unsigned short > ( atoi ( szPort ) );
     }
 
     // Grab the nickname
-    std::string strNick;
     if ( strlen ( szNickname ) > 0 )
     {
         strNick = szNickname;
@@ -1549,18 +1562,8 @@ SString CCore::GetConnectCommandFromURI ( const char* szURI )
     {
         CVARS_GET ( "nick", strNick );
     }
-
-    // Generate a string with the arguments to send to the mod IF we got a host
-    SString strDest;
-    if ( strlen ( szHost ) > 0 )
-    {
-        if ( strlen ( szPassword ) > 0 )
-            strDest.Format ( "connect %s %u %s %s", szHost, usPort, strNick.c_str (), szPassword );
-        else
-            strDest.Format ( "connect %s %u %s", szHost, usPort, strNick.c_str () );
-    }
-
-    return strDest;
+    strHost = szHost;
+    strPassword = szPassword;
 }
 
 
@@ -1579,7 +1582,22 @@ void CCore::UpdateRecentlyPlayed()
         CServerList* pRecentList = pServerBrowser->GetRecentList ();
         pRecentList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
         pRecentList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET, true );
+
+        // Update our address history if need be
+        if (    pServerBrowser->m_bManualConnect 
+             && strHost == pServerBrowser->m_strManualHost  
+             && uiPort == pServerBrowser->m_usManualPort
+           )
+        {
+            CServerList* pHistoryList = pServerBrowser->GetHistoryList ();
+            pHistoryList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
+            pHistoryList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET ); 
+            pServerBrowser->CreateHistoryList();
+        }
+        
         pServerBrowser->SaveRecentlyPlayedList();
+        if ( !m_pConnectManager->m_strLastPassword.empty() )
+            pServerBrowser->SetServerPassword ( strHost + ":" + SString("%u",uiPort), m_pConnectManager->m_strLastPassword );
 
     }
     //Save our configuration file

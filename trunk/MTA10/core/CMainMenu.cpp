@@ -143,13 +143,12 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 
     // Create the menu items
     //Filepath, Relative position, absolute native size
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUICK_CONNECT,  "cgui\\images\\menu_quick_connect.png",    CVector2D ( 0.168f, 0.615f ),    CVector2D ( 358, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, 0.662f ),    CVector2D ( 390, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, 0.709f ),    CVector2D ( 251, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "cgui\\images\\menu_map_editor.png",       CVector2D ( 0.168f, 0.756f ),    CVector2D ( 261, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "cgui\\images\\menu_settings.png",         CVector2D ( 0.168f, 0.803f ),    CVector2D ( 207, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "cgui\\images\\menu_about.png",            CVector2D ( 0.168f, 0.850f ),    CVector2D ( 150, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, 0.897f ),    CVector2D ( 102, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, 0.615f ),    CVector2D ( 390, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, 0.662f ),    CVector2D ( 251, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "cgui\\images\\menu_map_editor.png",       CVector2D ( 0.168f, 0.709f ),    CVector2D ( 261, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "cgui\\images\\menu_settings.png",         CVector2D ( 0.168f, 0.756f ),    CVector2D ( 207, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "cgui\\images\\menu_about.png",            CVector2D ( 0.168f, 0.803f ),    CVector2D ( 150, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, 0.850f ),    CVector2D ( 102, 34 ) ) );
 
     // We store the position of the top item, and the second item.  These will be useful later
     m_iFirstItemTop  = (m_menuItems.front()->image)->GetPosition().fY;
@@ -237,7 +236,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     // Submenus
     m_QuickConnect.SetVisible ( false );
     m_ServerBrowser.SetVisible ( false );
-    m_ServerQueue.SetVisible ( false );
+    m_ServerInfo.Hide ( );
     m_Settings.SetVisible ( false );
     m_Credits.SetVisible ( false );
     m_pNewsBrowser->SetVisible ( false );
@@ -254,6 +253,8 @@ CMainMenu::CMainMenu ( CGUI* pManager )
         CONFIG_FAVOURITE_LIST_TAG, m_ServerBrowser.GetFavouritesList () );
     m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC ),
         CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList () );
+    m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_HISTORY ),
+        CONFIG_HISTORY_LIST_TAG, m_ServerBrowser.GetHistoryList () );
 
     // Remove unused node
     if ( CXMLNode* pOldNode = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ) )
@@ -561,7 +562,7 @@ void CMainMenu::Update ( void )
 
     // Call subdialog pulses
     m_ServerBrowser.Update ();
-    m_ServerQueue.DoPulse ();
+    m_ServerInfo.DoPulse ();
 }
 
 
@@ -726,14 +727,9 @@ bool CMainMenu::OnBrowseServersButtonClick ( CGUIElement* pElement )
     return true;
 }
 
-void CMainMenu::ShowServerQueue ( void )
+void CMainMenu::HideServerInfo ( void )
 {
-    m_ServerQueue.SetVisible ( true );
-}
-
-void CMainMenu::HideServerQueue ( void )
-{
-    m_ServerQueue.SetVisible ( false );
+    m_ServerInfo.Hide ( );
 }
 
 

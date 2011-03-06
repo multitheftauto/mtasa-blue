@@ -162,9 +162,9 @@ bool CServerList::AddUnique ( in_addr Address, ushort usQueryPort, bool addAtFro
     return true;
 }
 
-void CServerList::Remove ( in_addr Address, ushort usQueryPort )
+bool CServerList::Remove ( in_addr Address, ushort usQueryPort )
 {
-    m_Servers.Remove ( Address, usQueryPort );
+    return m_Servers.Remove ( Address, usQueryPort );
 }
 
 

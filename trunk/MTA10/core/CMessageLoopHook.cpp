@@ -220,6 +220,19 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                             }
                         }
                     }
+                    else if ( uMsg == WM_KEYDOWN && CLocalGUI::GetSingleton().GetMainMenu()->GetServerBrowser()->IsAddressBarAwaitingInput() )
+                    {
+                        if ( wParam == VK_DOWN )
+                        {
+                            CLocalGUI::GetSingleton().GetMainMenu()->GetServerBrowser()->SetNextHistoryText ( true );
+                        }
+
+                        if ( wParam == VK_UP )
+                        {
+                            CLocalGUI::GetSingleton().GetMainMenu()->GetServerBrowser()->SetNextHistoryText ( false );
+                        }
+
+                    }
                 }
             }
         }
