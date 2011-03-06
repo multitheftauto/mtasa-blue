@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CServerQueue.h
+*  FILE:        core/CServerInfo.h
 *  PURPOSE:     Header file for server queue class
 *  DEVELOPERS:  Philip Farquharson <philip@philipfarquharson.co.uk>
 *
@@ -10,46 +10,55 @@
 *
 *****************************************************************************/
 
-class CServerQueue;
+class CServerInfo;
 
-#ifndef __CSERVERQUEUE_H
-#define __CSERVERQUEUE_H
+#ifndef __CServerInfo_H
+#define __CServerInfo_H
 
 // Update interval for the full server (in milliseconds)
 #define SERVER_UPDATE_INTERVAL		2500
 
 // Dimensions for our window
-#define QUEUE_WINDOW_DEFAULTWIDTH    370.0f
-#define QUEUE_WINDOW_DEFAULTHEIGHT   345.0f
+#define INFO_WINDOW_DEFAULTWIDTH        370.0f
+#define INFO_WINDOW_DEFAULTHEIGHT       345.0f
+#define PASSWORD_WINDOW_DEFAULTHEIGHT   375.0f
 
-#define QUEUE_WINDOW_HSPACING 20
-#define QUEUE_LABEL_VSPACING 0
-#define QUEUE_WINDOW_VSPACING 10
-#define QUEUE_BUTTON_HEIGHT 25
-#define QUEUE_BUTTON_WIDTH 110
+#define INFO_WINDOW_HSPACING 20
+#define INFO_LABEL_VSPACING 0
+#define INFO_WINDOW_VSPACING 10
+#define INFO_BUTTON_HEIGHT 25
+#define INFO_BUTTON_WIDTH 110
 
 #include "CServerList.h"
 #include "CSingleton.h"
 
-class CServerQueue : public CSingleton < CServerQueue >
+class CServerInfo : public CSingleton < CServerInfo >
 {
     friend class CCore;
 
 public:
-    explicit            CServerQueue                ( void );
-                        ~CServerQueue               ( void );
+    explicit            CServerInfo                ( void );
+                        ~CServerInfo               ( void );
 
-    void                SetVisible                  ( bool bVisible );
+    enum eWindowType {
+            SERVER_INFO_RAW = 0,
+            SERVER_INFO_QUEUE,
+            SERVER_INFO_PASSWORD,
+        };
+
     bool			    IsVisible                   ( void );
+    void                Hide                        ( void );
+    void                Show                        ( eWindowType WindowType );
+    void                Show                        ( eWindowType WindowType, const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL );
 
-    void                SetServerInformation        ( const char* szHost, unsigned short usPort, const char* szPassword );
+    void                SetServerInformation        ( const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL );
 
     void                DoPulse                     ( void );
 
 protected:
     CGUIWindow*         m_pWindow;
     CGUILabel*          m_pServerNameLabel;
-    CGUILabel*          m_pServerIPLabel;
+    CGUILabel*          m_pServerAddressLabel;
     CGUILabel*          m_pGamemodeLabel;
     CGUILabel*          m_pMapLabel;
     CGUILabel*          m_pPlayersLabel;
@@ -57,7 +66,7 @@ protected:
     CGUILabel*          m_pLatencyLabel;
 
     CGUILabel*          m_pServerNameLabelTitle;
-    CGUILabel*          m_pServerIPLabelTitle;
+    CGUILabel*          m_pServerAddressLabelTitle;
     CGUILabel*          m_pGamemodeLabelTitle;
     CGUILabel*          m_pMapLabelTitle;
     CGUILabel*          m_pPlayersLabelTitle;
@@ -69,14 +78,17 @@ protected:
 
     CGUICheckBox*       m_pCheckboxAutojoin;
 
+    CGUILabel*          m_pEnterPasswordLabel;
+    CGUIEdit*           m_pEnterPasswordEdit;
+
     CGUIButton*         m_pButtonJoinGame;
     CGUIButton*         m_pButtonClose;
 
 private:
     unsigned long       m_ulLastUpdateTime;
     CServerListItem     m_Server;
-
-    bool                m_bRequiresUpdate;
+    eWindowType         m_pCurrentWindowType;
+    bool                m_bWaitingToActivatePassword;
 
     const char*         m_szHost;
     unsigned short      m_usPort;
@@ -85,6 +97,7 @@ private:
     void                Refresh                     ( void );
     void                Connect                     ( void );
     void                Reset                       ( void );
+    void                ResetServerGUI              ( CServerListItem* pServer );
 
     bool                OnCloseClicked              ( CGUIElement* pElement );
     bool                OnJoinGameClicked           ( CGUIElement* pElement );

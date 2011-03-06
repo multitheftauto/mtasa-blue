@@ -17,7 +17,7 @@
 #include <ctime>
 #include <gui/CGUI.h>
 #include <xfire.h>
-#include "CServerQueue.h"
+#include "CServerInfo.h"
 
 class CConnectManager
 {
@@ -34,6 +34,9 @@ public:
 
     static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream );
 
+    std::string     m_strLastHost;
+    unsigned short  m_usLastPort;
+    std::string     m_strLastPassword;
 private:
     bool            Event_OnCancelClick ( CGUIElement * pElement );
 

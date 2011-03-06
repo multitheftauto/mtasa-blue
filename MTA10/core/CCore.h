@@ -68,9 +68,11 @@ class CCore;
 #define CONFIG_NODE_SERVER_REC      "recently_played_servers"   // recently played servers list node
 #define CONFIG_NODE_SERVER_OPTIONS  "serverbrowser_options"     // saved options for the server browser
 #define CONFIG_NODE_SERVER_SAVED    "server_passwords"    // This contains saved passwords (as appose to save_server_passwords which is a setting)
+#define CONFIG_NODE_SERVER_HISTORY  "connect_history"
 #define CONFIG_INTERNET_LIST_TAG    "internet_server"
 #define CONFIG_FAVOURITE_LIST_TAG   "favourite_server"
 #define CONFIG_RECENT_LIST_TAG      "recently_played_server"
+#define CONFIG_HISTORY_LIST_TAG     "connected_server"
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
@@ -129,9 +131,10 @@ public:
     void                    HideQuickConnect                ( void );
     void                    SetCenterCursor                 ( bool bEnabled );
 
+    void                    ShowServerInfo                  ( unsigned int WindowType );
+
     // Configuration
     void                    ApplyConsoleSettings            ( void );
-    void                    ApplyServerBrowserSettings      ( void );
     void                    ApplyGameSettings               ( void );
     void                    ApplyCommunityState             ( void );
     void                    UpdateRecentlyPlayed            ( void );
@@ -203,6 +206,7 @@ public:
     void                    ApplyFrameRateLimit             ( void );
 
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
+    void                    GetConnectParametersFromURI     ( const char* szURI, std::string &strHost, unsigned short &usPort, std::string &strNick, std::string &strPassword );
     bool                    bScreenShot;
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
     const char *            GetCommandLineOption            ( const char* szOption );

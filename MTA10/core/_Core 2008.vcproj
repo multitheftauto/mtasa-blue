@@ -589,7 +589,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CServerQueue.cpp"
+				RelativePath=".\CServerInfo.cpp"
 				>
 			</File>
 			<File
@@ -938,7 +938,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CServerQueue.h"
+				RelativePath=".\CServerInfo.h"
 				>
 			</File>
 			<File

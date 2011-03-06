@@ -77,6 +77,15 @@ CGUIListItem* CGUIComboBox_Impl::AddItem ( const char* szText )
     return pNewItem;
 }
 
+CGUIListItem* CGUIComboBox_Impl::AddItem ( CGUIStaticImage* pImage )
+{
+    CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl *)pImage );
+    CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
+    reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> addItem ( pListboxItem );
+    m_Items [ pNewItem->GetListItem () ] = pNewItem;
+    return pNewItem;
+}
+
 bool CGUIComboBox_Impl::RemoveItem ( int index )
 {
     try
@@ -180,6 +189,13 @@ bool CGUIComboBox_Impl::SetItemText ( int index, const char* szText )
     return false;
 }
 
+CGUIListItem* CGUIComboBox_Impl::GetItemByIndex ( int index )
+{
+    CEGUI::ListboxItem* pCEGUIItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
+    CGUIListItem* pItem = GetListItem ( pCEGUIItem );
+    return pItem;
+}
+
 bool CGUIComboBox_Impl::SetSelectedItemByIndex ( int index )
 {
     try
@@ -240,6 +256,10 @@ CGUIListItem_Impl* CGUIComboBox_Impl::GetListItem ( CEGUI::ListboxItem* pItem )
     return it->second;
 }
 
+size_t CGUIComboBox_Impl::GetItemCount ( void )
+{
+    return reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getItemCount();
+}
 
 void CGUIComboBox_Impl::SetSelectionHandler ( GUI_CALLBACK Callback  )
 {
