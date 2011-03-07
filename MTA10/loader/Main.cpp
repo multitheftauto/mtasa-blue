@@ -206,7 +206,7 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     //
     // Basic check for some essential files
     //
-    if ( !FileExists ( strMTASAPath + "\\skins\\Default\\CGUI.png" ) )
+    if ( !FileExists ( strMTASAPath + "\\MTA\\cgui\\images\\serverbrowser\\connect.png" ) )
     {
         // Check if CGUI.png exists
         return DisplayErrorMessageBox ( "Load failed. Please ensure that the data files have been installed correctly.", "mta-datafiles-missing" );
