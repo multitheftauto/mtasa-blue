@@ -44,6 +44,19 @@ public:
     DECLARE_RPC ( SetCloudsEnabled );
     DECLARE_RPC ( SetTrafficLightState );
     DECLARE_RPC ( SetJetpackMaxHeight );
+    DECLARE_RPC ( SetInteriorSoundsEnabled );
+    DECLARE_RPC ( SetRainLevel );
+    DECLARE_RPC ( SetSunSize );
+    DECLARE_RPC ( SetSunColor );
+    DECLARE_RPC ( SetWindVelocity );
+    DECLARE_RPC ( SetFarClipDistance );
+    DECLARE_RPC ( SetFogDistance );
+    DECLARE_RPC ( ResetRainLevel );
+    DECLARE_RPC ( ResetSunSize );
+    DECLARE_RPC ( ResetSunColor );
+    DECLARE_RPC ( ResetWindVelocity );
+    DECLARE_RPC ( ResetFarClipDistance );
+    DECLARE_RPC ( ResetFogDistance );
 };
 
 #endif

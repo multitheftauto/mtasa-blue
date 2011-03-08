@@ -38,6 +38,15 @@ public:
     static int      getTrafficLightState                ( lua_State* luaVM );
     static int      areTrafficLightsLocked              ( lua_State* luaVM );
     static int      getJetpackMaxHeight                 ( lua_State* luaVM );
+    static int      getHeatHaze                         ( lua_State* luaVM );
+    static int      getSkyGradient                      ( lua_State* luaVM );
+    static int      areInteriorSoundsEnabled            ( lua_State* luaVM );
+    static int      getRainLevel                        ( lua_State* luaVM );
+    static int      getSunSize                          ( lua_State* luaVM );
+    static int      getSunColor                         ( lua_State* luaVM );
+    static int      getWindVelocity                     ( lua_State* luaVM );
+    static int      getFarClipDistance                  ( lua_State* luaVM );
+    static int      getFogDistance                      ( lua_State* luaVM );
 
     // Set
     static int      setTime                             ( lua_State* luaVM );
@@ -46,12 +55,8 @@ public:
     static int      setGravity                          ( lua_State* luaVM );
     static int      setGameSpeed                        ( lua_State* luaVM );
     static int      setWaveHeight                       ( lua_State* luaVM );
-    static int      getSkyGradient                      ( lua_State* luaVM );
     static int      setSkyGradient                      ( lua_State* luaVM );
-    static int      resetSkyGradient                    ( lua_State* luaVM );
-    static int      getHeatHaze                         ( lua_State* luaVM );
     static int      setHeatHaze                         ( lua_State* luaVM );
-    static int      resetHeatHaze                       ( lua_State* luaVM );
     static int      setFPSLimit                         ( lua_State* luaVM );
     static int      setMinuteDuration                   ( lua_State* luaVM );
     static int      setGarageOpen                       ( lua_State* luaVM );
@@ -60,6 +65,23 @@ public:
     static int      setTrafficLightState                ( lua_State* luaVM );
     static int      setTrafficLightsLocked              ( lua_State* luaVM );
     static int      setJetpackMaxHeight                 ( lua_State* luaVM );
+    static int      setInteriorSoundsEnabled            ( lua_State* luaVM );
+    static int      setRainLevel                        ( lua_State* luaVM );
+    static int      setSunSize                          ( lua_State* luaVM );
+    static int      setSunColor                         ( lua_State* luaVM );
+    static int      setWindVelocity                     ( lua_State* luaVM );
+    static int      setFarClipDistance                  ( lua_State* luaVM );
+    static int      setFogDistance                      ( lua_State* luaVM );
+
+    // Reset
+    static int      resetSkyGradient                    ( lua_State* luaVM );
+    static int      resetHeatHaze                       ( lua_State* luaVM );
+    static int      resetRainLevel                      ( lua_State* luaVM );
+    static int      resetSunSize                        ( lua_State* luaVM );
+    static int      resetSunColor                       ( lua_State* luaVM );
+    static int      resetWindVelocity                   ( lua_State* luaVM );
+    static int      resetFarClipDistance                ( lua_State* luaVM );
+    static int      resetFogDistance                    ( lua_State* luaVM );
 };
 
 #endif

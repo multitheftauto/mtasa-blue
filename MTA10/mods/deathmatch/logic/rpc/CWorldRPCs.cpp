@@ -38,6 +38,20 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_CLOUDS_ENABLED, SetCloudsEnabled, "SetCloudsEnabled" );
     AddHandler ( SET_TRAFFIC_LIGHT_STATE, SetTrafficLightState, "SetTrafficLightState" );
     AddHandler ( SET_JETPACK_MAXHEIGHT, SetJetpackMaxHeight, "SetJetpackMaxHeight" );
+
+    AddHandler ( SET_INTERIOR_SOUNDS_ENABLED, SetInteriorSoundsEnabled, "SetInteriorSoundsEnabled" );
+    AddHandler ( SET_RAIN_LEVEL, SetRainLevel, "SetRainLevel" );
+    AddHandler ( SET_SUN_SIZE, SetSunSize, "SetSunSize" );
+    AddHandler ( SET_SUN_COLOR, SetSunColor, "SetSunColor" );
+    AddHandler ( SET_WIND_VELOCITY, SetWindVelocity, "SetWindVelocity" );
+    AddHandler ( SET_FAR_CLIP_DISTANCE, SetFarClipDistance, "SetFarClipDistance" );
+    AddHandler ( SET_FOG_DISTANCE, SetFogDistance, "SetFogDistance" );
+    AddHandler ( RESET_RAIN_LEVEL, ResetRainLevel, "ResetRainLevel" );
+    AddHandler ( RESET_SUN_SIZE, ResetSunSize, "ResetSunSize" );
+    AddHandler ( RESET_SUN_COLOR, ResetSunColor, "ResetSunColor" );
+    AddHandler ( RESET_WIND_VELOCITY, ResetWindVelocity, "ResetWindVelocity" );
+    AddHandler ( RESET_FAR_CLIP_DISTANCE, ResetFarClipDistance, "ResetFarClipDistance" );
+    AddHandler ( RESET_FOG_DISTANCE, ResetFogDistance, "ResetFogDistance" );
 }
 
 
@@ -253,4 +267,106 @@ void CWorldRPCs::SetJetpackMaxHeight ( NetBitStreamInterface& bitStream )
     {
         g_pGame->GetWorld ()->SetJetpackMaxHeight ( fJetpackMaxHeight );
     }
+}
+
+void CWorldRPCs::SetInteriorSoundsEnabled ( NetBitStreamInterface& bitStream )
+{
+    bool bEnable;
+
+    if ( bitStream.ReadBit ( bEnable ) )
+    {
+        g_pMultiplayer->SetInteriorSoundsEnabled ( bEnable );
+    }
+}
+
+void CWorldRPCs::SetRainLevel ( NetBitStreamInterface& bitStream )
+{
+    float fRainLevel;
+
+    if ( bitStream.Read ( fRainLevel ) )
+    {
+        g_pGame->GetWeather ()->SetAmountOfRain ( fRainLevel );
+    }
+}
+
+void CWorldRPCs::SetSunSize ( NetBitStreamInterface& bitStream )
+{
+    float fSunSize;
+
+    if ( bitStream.Read ( fSunSize ) )
+    {
+        g_pMultiplayer->SetSunSize ( fSunSize );
+    }
+}
+
+void CWorldRPCs::SetSunColor ( NetBitStreamInterface& bitStream )
+{
+    unsigned char ucCoreR, ucCoreG, ucCoreB;
+    unsigned char ucCoronaR, ucCoronaG, ucCoronaB;
+
+    if ( bitStream.Read ( ucCoreR ) && bitStream.Read ( ucCoreG ) && bitStream.Read ( ucCoreB )
+        && bitStream.Read ( ucCoronaR ) && bitStream.Read ( ucCoronaG ) && bitStream.Read ( ucCoronaB ) )
+    {
+        g_pMultiplayer->SetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB );
+    }
+}
+
+void CWorldRPCs::SetWindVelocity ( NetBitStreamInterface& bitStream )
+{
+    float fVelX, fVelY, fVelZ;
+
+    if ( bitStream.Read ( fVelX ) && bitStream.Read ( fVelY ) && bitStream.Read ( fVelZ ) )
+    {
+        g_pMultiplayer->SetWindVelocity ( fVelX, fVelY, fVelZ );
+    }
+}
+
+void CWorldRPCs::SetFarClipDistance ( NetBitStreamInterface& bitStream )
+{
+    float fFarClip;
+
+    if ( bitStream.Read ( fFarClip ) )
+    {
+        g_pMultiplayer->SetFarClipDistance ( fFarClip );
+    }
+}
+
+void CWorldRPCs::SetFogDistance ( NetBitStreamInterface& bitStream )
+{
+    float fFogDist;
+
+    if ( bitStream.Read ( fFogDist ) )
+    {
+        g_pMultiplayer->SetFogDistance ( fFogDist );
+    }
+}
+
+void CWorldRPCs::ResetRainLevel ( NetBitStreamInterface& bitStream )
+{
+    g_pGame->GetWeather ()->ResetAmountOfRain ( );
+}
+
+void CWorldRPCs::ResetSunSize ( NetBitStreamInterface& bitStream )
+{
+    g_pMultiplayer->ResetSunSize ( );
+}
+
+void CWorldRPCs::ResetSunColor ( NetBitStreamInterface& bitStream )
+{
+    g_pMultiplayer->ResetSunColor ( );
+}
+
+void CWorldRPCs::ResetWindVelocity ( NetBitStreamInterface& bitStream )
+{
+    g_pMultiplayer->RestoreWindVelocity ( );
+}
+
+void CWorldRPCs::ResetFarClipDistance ( NetBitStreamInterface& bitStream )
+{
+    g_pMultiplayer->RestoreFarClipDistance ( );
+}
+
+void CWorldRPCs::ResetFogDistance ( NetBitStreamInterface& bitStream )
+{
+    g_pMultiplayer->RestoreFogDistance ( );
 }

@@ -86,6 +86,21 @@ public:
     void                        RebuildMultiplayerPlayer    ( CPed * player );
     bool                        AreInteriorSoundsEnabled    ();
     void                        SetInteriorSoundsEnabled    ( bool bEnabled );
+    void                        SetWindVelocity             ( float fX, float fY, float fZ );
+    void                        GetWindVelocity             ( float& fX, float& fY, float& fZ );
+    void                        RestoreWindVelocity         ( void );
+    float                       GetFarClipDistance          ( void );
+    void                        SetFarClipDistance          ( float fDistance );
+    void                        RestoreFarClipDistance      ( void );
+    float                       GetFogDistance              ( void );
+    void                        SetFogDistance              ( float fDistance );
+    void                        RestoreFogDistance          ( void );
+    void                        GetSunColor                 ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue );
+    void                        SetSunColor                 ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue );
+    void                        ResetSunColor               ( );
+    float                       GetSunSize                  ( );
+    void                        SetSunSize                  ( float fSize );
+    void                        ResetSunSize                ( );
 
     void                        SetNightVisionEnabled       ( bool bEnabled );
     void                        SetThermalVisionEnabled     ( bool bEnabled );

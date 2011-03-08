@@ -460,6 +460,13 @@ public:
     static bool                 GetTrafficLightState                ( unsigned char& ucState );
     static bool                 GetTrafficLightsLocked              ( bool& bLocked );
     static bool                 GetJetpackMaxHeight                 ( float& fMaxHeight );
+    static bool                 AreInteriorSoundsEnabled            ( bool& bEnabled );
+    static bool                 GetRainLevel                        ( float& fRainLevel );
+    static bool                 GetSunSize                          ( float& fSunSize );
+    static bool                 GetSunColor                         ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB );
+    static bool                 GetWindVelocity                     ( float& fVelX, float& fVelY, float& fVelZ );
+    static bool                 GetFarClipDistance                  ( float& fFarClip );
+    static bool                 GetFogDistance                      ( float& fFogDist );
 
     // General world set funcs
     static bool                 SetTime                             ( unsigned char ucHour, unsigned char ucMinute );
@@ -484,6 +491,19 @@ public:
     static bool                 SetTrafficLightState                ( unsigned char ucState, bool bForced = false );
     static bool                 SetTrafficLightsLocked              ( bool bLocked );
     static bool                 SetJetpackMaxHeight                 ( float fMaxHeight );
+    static bool                 SetInteriorSoundsEnabled            ( bool bEnable );
+    static bool                 SetRainLevel                        ( float fRainLevel );
+    static bool                 SetSunSize                          ( float fSunSize );
+    static bool                 SetSunColor                         ( unsigned char ucCoreR, unsigned char ucCoreG, unsigned char ucCoreB, unsigned char ucCoronaR, unsigned char ucCoronaG, unsigned char ucCoronaB );
+    static bool                 SetWindVelocity                     ( float fVelX, float fVelY, float fVelZ );
+    static bool                 SetFarClipDistance                  ( float fFarClip );
+    static bool                 SetFogDistance                      ( float fFogDist );
+    static bool                 ResetRainLevel                      ( void );
+    static bool                 ResetSunSize                        ( void );
+    static bool                 ResetSunColor                       ( void );
+    static bool                 ResetWindVelocity                   ( void );
+    static bool                 ResetFarClipDistance                ( void );
+    static bool                 ResetFogDistance                    ( void );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );

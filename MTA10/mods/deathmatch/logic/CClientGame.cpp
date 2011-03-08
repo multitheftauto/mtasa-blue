@@ -4449,16 +4449,31 @@ void CClientGame::ResetMapInfo ( void )
     m_pBlendedWeather->SetWeather ( 0 );
 
     // Wind
-    g_pGame->GetWorld ()->RestoreWindVelocity ( );
+    g_pMultiplayer->RestoreWindVelocity ( );
+
+    // Far clip distance
+    g_pMultiplayer->RestoreFarClipDistance ( );
+
+    // Fog distance
+    g_pMultiplayer->RestoreFogDistance ( );
+
+    // Sun color
+    g_pMultiplayer->ResetSunColor ( );
+
+    // Sun size
+    g_pMultiplayer->ResetSunSize ( );
 
     // Sky-gradient
-    g_pMultiplayer->ResetSky ();
+    g_pMultiplayer->ResetSky ( );
 
     // Heat haze
-    g_pMultiplayer->ResetHeatHaze ();
+    g_pMultiplayer->ResetHeatHaze ( );
 
     // Water-colour
-    g_pMultiplayer->ResetWater ();
+    g_pMultiplayer->ResetWater ( );
+
+    // Re-enable interior sounds
+    g_pMultiplayer->SetInteriorSoundsEnabled ( true );
 
      // Clouds
     g_pMultiplayer->SetCloudsEnabled ( true );

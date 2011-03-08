@@ -248,11 +248,50 @@ public:
     inline void                 GetHeatHaze                 ( SHeatHazeSettings& heatHazeSettings )         { heatHazeSettings = m_HeatHazeSettings; }
     inline void                 SetHeatHaze                 ( const SHeatHazeSettings& heatHazeSettings )   { m_HeatHazeSettings = heatHazeSettings; }
 
+    inline bool                 AreInteriorSoundsEnabled    ( void )        { return m_bInteriorSoundsEnabled; }
+    inline void                 SetInteriorSoundsEnabled    ( bool bEnable )    { m_bInteriorSoundsEnabled = bEnable; }
+
     inline bool                 HasWaterColor               ( void )        { return m_bOverrideWaterColor; }
     inline void                 SetHasWaterColor            ( bool bOverrideWaterColor ) { m_bOverrideWaterColor = bOverrideWaterColor; }
 
     inline void                 GetWaterColor               ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha ) { ucRed = m_ucWaterRed; ucGreen = m_ucWaterGreen; ucBlue = m_ucWaterBlue; ucAlpha = m_ucWaterAlpha; }
     inline void                 SetWaterColor               ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha ) { m_ucWaterRed = ucRed; m_ucWaterGreen = ucGreen; m_ucWaterBlue = ucBlue; m_ucWaterAlpha = ucAlpha; }
+
+    inline bool                 HasRainLevel                ( void )        { return m_bOverrideRainLevel; }
+    inline void                 SetHasRainLevel             ( bool bOverrideRainLevel ) { m_bOverrideRainLevel = bOverrideRainLevel; }
+
+    inline float                GetRainLevel                ( void )        { return m_fRainLevel; }
+    inline void                 SetRainLevel                ( float& fRainLevel ) { m_fRainLevel = fRainLevel; }
+
+    inline bool                 HasSunSize                  ( void )        { return m_bOverrideSunSize; }
+    inline void                 SetHasSunSize               ( bool bOverrideSunSize ) { m_bOverrideSunSize = bOverrideSunSize; }
+
+    inline float                GetSunSize                  ( void )        { return m_fSunSize; }
+    inline void                 SetSunSize                  ( float& fSunSize ) { m_fSunSize = fSunSize; }
+
+    inline bool                 HasSunColor                 ( void )        { return m_bOverrideSunColor; }
+    inline void                 SetHasSunColor              ( bool bOverrideSunColor ) { m_bOverrideSunColor = bOverrideSunColor; }
+
+    inline void                 GetSunColor                 ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB )    { ucCoreR = m_ucSunCoreR; ucCoreG = m_ucSunCoreG; ucCoreB = m_ucSunCoreB; ucCoronaR = m_ucSunCoronaR; ucCoronaG = m_ucSunCoronaG; ucCoronaB = m_ucSunCoronaB; }
+    inline void                 SetSunColor                 ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB )    { m_ucSunCoreR = ucCoreR; m_ucSunCoreG = ucCoreG; m_ucSunCoreB = ucCoreB; m_ucSunCoronaR = ucCoronaR; m_ucSunCoronaG = ucCoronaG; m_ucSunCoronaB = ucCoronaB; }
+
+    inline bool                 HasWindVelocity             ( void )        { return m_bOverrideWindVelocity; }
+    inline void                 SetHasWindVelocity          ( bool bOverrideWindVelocity ) { m_bOverrideWindVelocity = bOverrideWindVelocity; }
+
+    inline void                 GetWindVelocity             ( float& fVelX, float& fVelY, float& fVelZ )    { fVelX = m_fWindVelX; fVelY = m_fWindVelY; fVelZ = m_fWindVelZ; }
+    inline void                 SetWindVelocity             ( float& fVelX, float& fVelY, float& fVelZ )    { m_fWindVelX = fVelX; m_fWindVelY = fVelY; m_fWindVelZ = fVelZ; }
+
+    inline bool                 HasFarClipDistance          ( void )        { return m_bOverrideFarClip; }
+    inline void                 SetHasFarClipDistance       ( bool bOverrideFarClip ) { m_bOverrideFarClip = bOverrideFarClip; }
+
+    inline float                GetFarClipDistance          ( void )        { return m_fFarClipDistance; }
+    inline void                 SetFarClipDistance          ( float& fFarClipDistance ) { m_fFarClipDistance = fFarClipDistance; }
+
+    inline bool                 HasFogDistance              ( void )        { return m_bOverrideFogDistance; }
+    inline void                 SetHasFogDistance           ( bool bOverrideFogDistance ) { m_bOverrideFogDistance = bOverrideFogDistance; }
+
+    inline float                GetFogDistance              ( void )        { return m_fFogDistance; }
+    inline void                 SetFogDistance              ( float& fFogDistance ) { m_fFogDistance = fFogDistance; }
 
     inline bool*                GetGarageStates             ( void )        { return m_bGarageStates; }
 
@@ -379,6 +418,26 @@ private:
 
     bool                        m_bOverrideWaterColor;
     unsigned char               m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;
+
+    bool                        m_bInteriorSoundsEnabled;
+
+    bool                        m_bOverrideRainLevel;
+    float                       m_fRainLevel;
+
+    bool                        m_bOverrideSunSize;
+    float                       m_fSunSize;
+
+    bool                        m_bOverrideSunColor;
+    unsigned char               m_ucSunCoreR, m_ucSunCoreG, m_ucSunCoreB, m_ucSunCoronaR, m_ucSunCoronaG, m_ucSunCoronaB;
+
+    bool                        m_bOverrideWindVelocity;
+    float                       m_fWindVelX, m_fWindVelY, m_fWindVelZ;
+
+    bool                        m_bOverrideFarClip;
+    float                       m_fFarClipDistance;
+
+    bool                        m_bOverrideFogDistance;
+    float                       m_fFogDistance;
 
     bool                        m_bGarageStates[MAX_GARAGES];
 
