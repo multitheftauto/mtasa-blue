@@ -4160,10 +4160,10 @@ bool CStaticFunctionDefinitions::FixVehicle ( CElement* pElement )
 }
 
 
-bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode )
+bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement )
 {
     assert ( pElement );
-    RUN_CHILDREN BlowVehicle ( *iter, bExplode );
+    RUN_CHILDREN BlowVehicle ( *iter );
 
     if ( IS_VEHICLE ( pElement ) )
     {
@@ -4178,13 +4178,12 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
             pVehicle->CallEvent ( "onVehicleExplode", Arguments );
         }
         pVehicle->SetHealth ( 0.0f );
-        pVehicle->SetBlowTime ( ::GetTime () );
+        //pVehicle->SetBlowTime ( ::GetTime () ); //This would make it blow up silently
         pVehicle->GenerateSyncTimeContext ();
         //Update our engine State
         pVehicle->SetEngineOn( false );
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( ( unsigned char ) ( ( bExplode ) ? 1 : 0 ) );
         BitStream.pBitStream->Write ( pVehicle->GetSyncTimeContext () );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, BLOW_VEHICLE, *BitStream.pBitStream ) );
         return true;

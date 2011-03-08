@@ -255,7 +255,7 @@ public:
 
     // Vehicle set functions
     static bool                 FixVehicle                          ( CElement* pElement );
-    static bool                 BlowVehicle                         ( CElement* pElement, bool bExplode );
+    static bool                 BlowVehicle                         ( CElement* pElement );
     static bool                 SetVehicleColor                     ( CElement* pElement, const CVehicleColor& color );
     static bool                 SetVehicleLandingGearDown           ( CElement* pElement, bool bLandingGearDown );
     static bool                 SetVehicleLocked                    ( CElement* pElement, bool bLocked );
