@@ -2031,6 +2031,92 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
         CStaticFunctionDefinitions::SetWaterColor ( ucRed, ucGreen, ucBlue, ucAlpha );
     }
+
+    // Interior sounds
+    bool bInteriorSoundsEnabled = true;
+    if ( !bitStream.ReadBit ( bInteriorSoundsEnabled ) )
+        return;
+
+    g_pMultiplayer->SetInteriorSoundsEnabled ( bInteriorSoundsEnabled );
+
+    // Rain level
+    bool bOverrideRainLevel = false;
+    float fRainLevel;
+    if ( !bitStream.ReadBit ( bOverrideRainLevel ) )
+        return;
+    if ( bOverrideRainLevel )
+    {
+        if ( !bitStream.Read ( fRainLevel ) )
+            return;
+
+        g_pGame->GetWeather ( )->SetAmountOfRain ( fRainLevel );
+    }
+
+    // Sun size
+    bool bOverrideSunSize = false;
+    float fSunSize;
+    if ( !bitStream.ReadBit ( bOverrideSunSize ) )
+        return;
+    if ( bOverrideSunSize )
+    {
+        if ( !bitStream.Read ( fSunSize ) )
+            return;
+
+        g_pMultiplayer->SetSunSize ( fSunSize );
+    }
+
+    // Sun color
+    bool bOverrideSunColor = false;
+    unsigned char ucSunCoreR, ucSunCoreG, ucSunCoreB, ucSunCoronaR, ucSunCoronaG, ucSunCoronaB;
+    if ( !bitStream.ReadBit ( bOverrideSunColor ) )
+        return;
+    if ( bOverrideSunColor )
+    {
+        if ( !bitStream.Read ( ucSunCoreR ) || !bitStream.Read ( ucSunCoreG ) || !bitStream.Read ( ucSunCoreB ) ||
+            !bitStream.Read ( ucSunCoronaR ) || !bitStream.Read ( ucSunCoronaG ) || !bitStream.Read ( ucSunCoronaB ) )
+            return;
+
+        g_pMultiplayer->SetSunColor ( ucSunCoreR, ucSunCoreG, ucSunCoreB, ucSunCoronaR, ucSunCoronaG, ucSunCoronaB );
+    }
+
+    // Wind velocity
+    bool bOverrideWindVelocity = false;
+    float fWindVelX, fWindVelY, fWindVelZ;
+    if ( !bitStream.ReadBit ( bOverrideWindVelocity ) )
+        return;
+    if ( bOverrideWindVelocity )
+    {
+        if ( !bitStream.Read ( fWindVelX ) || !bitStream.Read ( fWindVelY ) || !bitStream.Read ( fWindVelZ ) )
+            return;
+
+        g_pMultiplayer->SetWindVelocity ( fWindVelX, fWindVelY, fWindVelZ );
+    }
+
+    // Far clip distance
+    bool bOverrideFarClipDistance = false;
+    float fFarClip;
+    if ( !bitStream.ReadBit ( bOverrideFarClipDistance ) )
+        return;
+    if ( bOverrideFarClipDistance )
+    {
+        if ( !bitStream.Read ( fFarClip ) )
+            return;
+
+        g_pMultiplayer->SetFarClipDistance ( fFarClip );
+    }
+
+    // Fog distance
+    bool bOverrideFogDistance = false;
+    float fFogDistance;
+    if ( !bitStream.ReadBit ( bOverrideFogDistance ) )
+        return;
+    if ( bOverrideFogDistance )
+    {
+        if ( !bitStream.Read ( fFogDistance ) )
+            return;
+
+        g_pMultiplayer->SetFogDistance ( fFogDistance );
+    }
 }
 
 

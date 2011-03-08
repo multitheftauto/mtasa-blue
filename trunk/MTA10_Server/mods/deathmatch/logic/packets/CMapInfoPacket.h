@@ -51,7 +51,27 @@ public:
                                                       unsigned char ucWaterRed = 0,
                                                       unsigned char ucWaterGreen = 0,
                                                       unsigned char ucWaterBlue = 0,
-                                                      unsigned char ucWaterAlpha = 0);
+                                                      unsigned char ucWaterAlpha = 0,
+                                                      bool bInteriorSoundsEnabled = true,
+                                                      bool bOverrideRainLevel = false,
+                                                      float fRainLevel = 0,
+                                                      bool bOverrideSunSize = false,
+                                                      float fSunSize = 0,
+                                                      bool bOverrideSunColor = false,
+                                                      unsigned char ucSunCoreR = 0,
+                                                      unsigned char ucSunCoreG = 0,
+                                                      unsigned char ucSunCoreB = 0,
+                                                      unsigned char ucSunCoronaR = 0,
+                                                      unsigned char ucSunCoronaG = 0,
+                                                      unsigned char ucSunCoronaB = 0,
+                                                      bool bOverrideWindVelocity = false,
+                                                      float fWindVelX = 0,
+                                                      float fWindVelY = 0,
+                                                      float fWindVelZ = 0,
+                                                      bool bOverrideFarClipDistance = false,
+                                                      float fFarClip = 0,
+                                                      bool bOverrideFogDistance = false,
+                                                      float fFogDistance = 0);
 
     inline ePacketID        GetPacketID             ( void ) const              { return PACKET_ID_MAP_INFO; };
     inline unsigned long    GetFlags                ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -85,6 +105,26 @@ private:
     unsigned char           m_ucWaterGreen;
     unsigned char           m_ucWaterBlue;
     unsigned char           m_ucWaterAlpha;
+    bool                    m_bInteriorSoundsEnabled;
+    bool                    m_bOverrideRainLevel;
+    float                   m_fRainLevel;
+    bool                    m_bOverrideSunSize;
+    float                   m_fSunSize;
+    bool                    m_bOverrideSunColor;
+    unsigned char           m_ucSunCoreR;
+    unsigned char           m_ucSunCoreG;
+    unsigned char           m_ucSunCoreB;
+    unsigned char           m_ucSunCoronaR;
+    unsigned char           m_ucSunCoronaG;
+    unsigned char           m_ucSunCoronaB;
+    bool                    m_bOverrideWindVelocity;
+    float                   m_fWindVelX;
+    float                   m_fWindVelY;
+    float                   m_fWindVelZ;
+    bool                    m_bOverrideFarClipDistance;
+    float                   m_fFarClip;
+    bool                    m_bOverrideFogDistance;
+    float                   m_fFogDistance;
 };
 
 #endif

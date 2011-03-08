@@ -101,6 +101,14 @@ CGame::CGame ( void )
     m_pWaterManager = NULL;
     m_pObjectSync = NULL;
 
+    m_bInteriorSoundsEnabled = true;
+    m_bOverrideRainLevel = false;
+    m_bOverrideSunSize = false;
+    m_bOverrideSunColor = false;
+    m_bOverrideWindVelocity = false;
+    m_bOverrideFarClip = false;
+    m_bOverrideFogDistance = false;
+
 #ifdef MTA_VOICE
     m_pVoiceServer = NULL;
 #endif
@@ -166,6 +174,13 @@ void CGame::ResetMapInfo ( void )
     m_ulLastTrafficUpdate = 0;
 
     g_pGame->SetHasWaterColor ( false );
+    g_pGame->SetInteriorSoundsEnabled ( true );
+    g_pGame->SetHasFarClipDistance ( false );
+    g_pGame->SetHasFogDistance ( false );
+    g_pGame->SetHasRainLevel ( false );
+    g_pGame->SetHasSunColor ( false );
+    g_pGame->SetHasSunSize ( false );
+    g_pGame->SetHasWindVelocity ( false );
 }
 
 CGame::~CGame ( void )

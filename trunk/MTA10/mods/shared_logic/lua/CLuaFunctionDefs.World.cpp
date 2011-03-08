@@ -1572,7 +1572,7 @@ int CLuaFunctionDefs::ResetRainLevel ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetFarClipDistance ( lua_State* luaVM )
 {
-    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetFarClipDistance());
+    lua_pushnumber ( luaVM, g_pMultiplayer->GetFarClipDistance ( ) );
     return 1;
 }
 
@@ -1580,7 +1580,7 @@ int CLuaFunctionDefs::SetFarClipDistance ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        g_pGame->GetWorld ()->SetFarClipDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
+        g_pMultiplayer->SetFarClipDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -1592,7 +1592,7 @@ int CLuaFunctionDefs::SetFarClipDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ResetFarClipDistance ( lua_State* luaVM )
 {
-    g_pGame->GetWorld ()->RestoreFarClipDistance ();
+    g_pMultiplayer->RestoreFarClipDistance ();
 
     lua_pushboolean ( luaVM, true );
     return 1;
@@ -1600,7 +1600,7 @@ int CLuaFunctionDefs::ResetFarClipDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetFogDistance ( lua_State* luaVM )
 {
-    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetFogDistance());
+    lua_pushnumber ( luaVM, g_pMultiplayer->GetFogDistance());
     return 1;
 }
 
@@ -1608,7 +1608,7 @@ int CLuaFunctionDefs::SetFogDistance ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        g_pGame->GetWorld ()->SetFogDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
+        g_pMultiplayer->SetFogDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -1620,7 +1620,7 @@ int CLuaFunctionDefs::SetFogDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ResetFogDistance ( lua_State* luaVM )
 {
-    g_pGame->GetWorld ()->RestoreFogDistance ();
+    g_pMultiplayer->RestoreFogDistance ( );
 
     lua_pushboolean ( luaVM, true );
     return 1;
@@ -1630,7 +1630,7 @@ int CLuaFunctionDefs::GetSunColor ( lua_State* luaVM )
 {
     unsigned char ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue;
     
-    g_pGame->GetWorld ()->GetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
+    g_pMultiplayer->GetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
 
     lua_pushnumber ( luaVM, ucCoreRed );
     lua_pushnumber ( luaVM, ucCoreGreen );
@@ -1672,7 +1672,7 @@ int CLuaFunctionDefs::SetSunColor ( lua_State* luaVM )
     if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
         ucCoronaBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
 
-    g_pGame->GetWorld ()->SetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
+    g_pMultiplayer->SetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
 
     lua_pushboolean ( luaVM, true );
     return 1;
@@ -1680,7 +1680,7 @@ int CLuaFunctionDefs::SetSunColor ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ResetSunColor ( lua_State* luaVM )
 {
-    g_pGame->GetWorld ()->ResetSunColor ();
+    g_pMultiplayer->ResetSunColor ( );
 
     lua_pushboolean ( luaVM, true );
     return 1;
@@ -1688,7 +1688,7 @@ int CLuaFunctionDefs::ResetSunColor ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetSunSize ( lua_State* luaVM )
 {
-    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetSunSize () );
+    lua_pushnumber ( luaVM, g_pMultiplayer->GetSunSize ( ) );
     return 1;
 }
 
@@ -1696,7 +1696,7 @@ int CLuaFunctionDefs::SetSunSize ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        g_pGame->GetWorld ()->SetSunSize ( (float) lua_tonumber ( luaVM, 1 ) );
+        g_pMultiplayer->SetSunSize ( (float) lua_tonumber ( luaVM, 1 ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -1708,7 +1708,7 @@ int CLuaFunctionDefs::SetSunSize ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ResetSunSize ( lua_State* luaVM )
 {
-    g_pGame->GetWorld ()->ResetSunSize ();
+    g_pMultiplayer->ResetSunSize ();
 
     lua_pushboolean ( luaVM, true );
     return 1;

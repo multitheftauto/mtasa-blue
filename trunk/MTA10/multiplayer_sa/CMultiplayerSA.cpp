@@ -1374,6 +1374,174 @@ void CMultiplayerSA::SetInteriorSoundsEnabled ( bool bEnabled )
     bInteriorSoundsEnabled = bEnabled;
 }
 
+void CMultiplayerSA::SetWindVelocity ( float fX, float fY, float fZ )
+{
+    //Disable
+    MemPut < WORD > ( 0x72C616, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetX) = 0xD8DD;
+    MemPut < DWORD > ( 0x72C616 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x90909090;
+    MemPut < WORD > ( 0x72C622, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetY) = 0xD8DD;
+    MemPut < DWORD > ( 0x72C622 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x90909090;
+    MemPut < WORD > ( 0x72C636, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetZ) = 0xD8DD;
+    MemPut < DWORD > ( 0x72C636 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x90909090;
+
+    MemPut < WORD > ( 0x72C40C, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetX2) = 0xD8DD;
+    MemPut < DWORD > ( 0x72C40C + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x90909090;
+    MemPut < WORD > ( 0x72C417, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetY2) = 0xD8DD;
+    MemPut < DWORD > ( 0x72C417 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x90909090;
+    MemPut < WORD > ( 0x72C4EF, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetZ2) = 0xD8DD;
+    MemPut < DWORD > ( 0x72C4EF + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x90909090;
+
+    //Set
+    MemPut < float > ( 0xC813E0, fX );  //     *(float *)(VAR_fWindSpeedX) = fX;
+    MemPut < float > ( 0xC813E4, fY );  //     *(float *)(VAR_fWindSpeedY) = fY;
+    MemPut < float > ( 0xC813E8, fZ );  //     *(float *)(VAR_fWindSpeedZ) = fZ;
+}
+
+void CMultiplayerSA::GetWindVelocity ( float& fX, float& fY, float& fZ )
+{
+    fX = *(float *) 0xC813E0;
+    fY = *(float *) 0xC813E4;
+    fZ = *(float *) 0xC813E8;
+}
+
+void CMultiplayerSA::RestoreWindVelocity ( void )
+{
+    MemPut < WORD > ( 0x72C616, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetX) = 0x1DD9;
+    MemPut < DWORD > ( 0x72C616 + 2, 0x00C813E0 );  //     *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x00C813E0;
+    MemPut < WORD > ( 0x72C622, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetY) = 0x1DD9;
+    MemPut < DWORD > ( 0x72C622 + 2, 0x00C813E4 );  //     *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x00C813E4;
+    MemPut < WORD > ( 0x72C636, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetZ) = 0x1DD9;
+    MemPut < DWORD > ( 0x72C636 + 2, 0x00C813E8 );  //     *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x00C813E8;
+
+    MemPut < WORD > ( 0x72C40C, 0x15D9 );  //     *(WORD *)(ADDR_WindSpeedSetX2) = 0x15D9;
+    MemPut < DWORD > ( 0x72C40C + 2, 0x00C813E0 );  //     *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x00C813E0;
+    MemPut < WORD > ( 0x72C417, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetY2) = 0x1DD9;
+    MemPut < DWORD > ( 0x72C417 + 2, 0x00C813E4 );  //     *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x00C813E4;
+    MemPut < WORD > ( 0x72C4EF, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetZ2) = 0x1DD9;
+    MemPut < DWORD > ( 0x72C4EF + 2, 0x00C813E8 );  //     *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x00C813E8;
+}
+
+float CMultiplayerSA::GetFarClipDistance ( )
+{
+    return *(float *) 0xB7C4F0;
+}
+
+void CMultiplayerSA::SetFarClipDistance ( float fDistance )
+{
+    MemPut < BYTE > ( 0x55FCC8, 0xDD );  //     *(BYTE *)0x55FCC8 = 0xDD;
+    MemPut < BYTE > ( 0x55FCC9, 0xD8 );  //     *(BYTE *)0x55FCC9 = 0xD8;
+    MemPut < BYTE > ( 0x55FCCA, 0x90 );  //     *(BYTE *)0x55FCCA = 0x90;
+
+    MemPut < BYTE > ( 0x5613A3, 0xDD );  //     *(BYTE *)0x5613A3 = 0xDD;
+    MemPut < BYTE > ( 0x5613A4, 0xD8 );  //     *(BYTE *)0x5613A4 = 0xD8;
+    MemPut < BYTE > ( 0x5613A5, 0x90 );  //     *(BYTE *)0x5613A5 = 0x90;
+
+    MemPut < BYTE > ( 0x560A23, 0xDD );  //     *(BYTE *)0x560A23 = 0xDD;
+    MemPut < BYTE > ( 0x560A24, 0xD8 );  //     *(BYTE *)0x560A24 = 0xD8;
+    MemPut < BYTE > ( 0x560A25, 0x90 );  //     *(BYTE *)0x560A25 = 0x90;
+
+    MemPut < float > ( 0xB7C4F0, fDistance );  //     *(float *)(VAR_fFarClipDistance) = fDistance;
+}
+
+void CMultiplayerSA::RestoreFarClipDistance ( )
+{
+    BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
+
+    MemCpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
+    MemCpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
+    MemCpy ( (LPVOID)0x560A23, &originalFstp, 3 );
+}
+
+float CMultiplayerSA::GetFogDistance ( )
+{
+    return *(float *) 0xB7C4F4;
+}
+
+void CMultiplayerSA::SetFogDistance ( float fDistance )
+{
+    MemPut < BYTE > ( 0x55FCDB, 0xDD );  //     *(BYTE *)0x55FCDB = 0xDD;
+    MemPut < BYTE > ( 0x55FCDC, 0xD8 );  //     *(BYTE *)0x55FCDC = 0xD8;
+    MemPut < BYTE > ( 0x55FCDD, 0x90 );  //     *(BYTE *)0x55FCDD = 0x90;
+
+    MemPut < float > ( 0xB7C4F4, fDistance );  //     *(float *)(VAR_fFogDistance) = fDistance;
+}
+
+void CMultiplayerSA::RestoreFogDistance ( )
+{
+    BYTE originalFstp[3] = {0xD9, 0x5E, 0x54};
+
+    MemCpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
+}
+
+void CMultiplayerSA::GetSunColor ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
+{
+    ucCoreRed   = *(BYTE *) 0xB7C4D0;
+    ucCoreGreen = *(BYTE *) 0xB7C4D2;
+    ucCoreBlue  = *(BYTE *) 0xB7C4D4;
+
+    ucCoronaRed   = *(BYTE *) 0xB7C4D6;
+    ucCoronaGreen = *(BYTE *) 0xB7C4D8;
+    ucCoronaBlue  = *(BYTE *) 0xB7C4DA;
+}
+
+void CMultiplayerSA::SetSunColor ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue )
+{
+    MemSet ( (LPVOID)0x55F9B2, 0x90, 4 );
+    MemSet ( (LPVOID)0x55F9DD, 0x90, 4 );
+    MemSet ( (LPVOID)0x55FA08, 0x90, 4 );
+    MemSet ( (LPVOID)0x55FA33, 0x90, 4 );
+    MemSet ( (LPVOID)0x55FA5E, 0x90, 4 );
+    MemSet ( (LPVOID)0x55FA8D, 0x90, 4 );
+
+    MemPut < BYTE > ( 0xB7C4D0, ucCoreRed );  //     *(BYTE *)(VAR_ucSunCoreR) = ucCoreRed;
+    MemPut < BYTE > ( 0xB7C4D2, ucCoreGreen );  //     *(BYTE *)(VAR_ucSunCoreG) = ucCoreGreen;
+    MemPut < BYTE > ( 0xB7C4D4, ucCoreBlue );  //     *(BYTE *)(VAR_ucSunCoreB) = ucCoreBlue;
+
+    MemPut < BYTE > ( 0xB7C4D6, ucCoronaRed );  //     *(BYTE *)(VAR_ucSunCoronaR) = ucCoronaRed;
+    MemPut < BYTE > ( 0xB7C4D8, ucCoronaGreen );  //     *(BYTE *)(VAR_ucSunCoronaG) = ucCoronaGreen;
+    MemPut < BYTE > ( 0xB7C4DA, ucCoronaBlue );  //     *(BYTE *)(VAR_ucSunCoronaB) = ucCoronaBlue;
+}
+
+void CMultiplayerSA::ResetSunColor ( )
+{
+    BYTE originalMov[3] = {0x66, 0x89, 0x46};
+
+    MemCpy ( (LPVOID)0x55F9B2, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55F9B5, 0x30 );  //     *(BYTE *)0x55F9B5 = 0x30;
+    MemCpy ( (LPVOID)0x55F9DD, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55F9E0, 0x32 );  //     *(BYTE *)0x55F9E0 = 0x32;
+    MemCpy ( (LPVOID)0x55FA08, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55FA0B, 0x34 );  //     *(BYTE *)0x55FA0B = 0x34;
+
+    MemCpy ( (LPVOID)0x55FA33, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55FA36, 0x36 );  //     *(BYTE *)0x55FA36 = 0x36;
+    MemCpy ( (LPVOID)0x55FA5E, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55FA61, 0x38 );  //     *(BYTE *)0x55FA61 = 0x38;
+    MemCpy ( (LPVOID)0x55FA8D, &originalMov, 3 );
+    MemPut < BYTE > ( 0x55FA90, 0x3A );  //     *(BYTE *)0x55FA90 = 0x3A;
+}
+
+float CMultiplayerSA::GetSunSize ( )
+{
+    return *(float *)0xB7C4DC / 10;
+}
+
+void CMultiplayerSA::SetSunSize ( float fSize )
+{
+    MemPut < BYTE > ( 0x55FA9D, 0xDD );  //     *(BYTE *)0x55FA9D = 0xDD;
+    MemPut < BYTE > ( 0x55FA9E, 0xD8 );  //     *(BYTE *)0x55FA9E = 0xD8;
+    MemPut < BYTE > ( 0x55FA9F, 0x90 );  //     *(BYTE *)0x55FA9F = 0x90;
+
+    MemPut < float > ( 0xB7C4DC, fSize * 10 );  //     *(float *)VAR_fSunSize = fSize * 10;
+}
+
+void CMultiplayerSA::ResetSunSize ( )
+{
+    MemPut < BYTE > ( 0x55FA9D, 0xD9 );  //     *(BYTE *)0x55FA9D = 0xD9;
+    MemPut < BYTE > ( 0x55FA9E, 0x5E );  //     *(BYTE *)0x55FA9E = 0x5E;
+    MemPut < BYTE > ( 0x55FA9F, 0x3C );  //     *(BYTE *)0x55FA9F = 0x3C;
+}
+
 void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
 {
     //volumetric clouds

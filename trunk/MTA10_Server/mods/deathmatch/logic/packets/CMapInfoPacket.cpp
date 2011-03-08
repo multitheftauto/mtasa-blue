@@ -45,7 +45,27 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  unsigned char ucWaterRed,
                                  unsigned char ucWaterGreen,
                                  unsigned char ucWaterBlue,
-                                 unsigned char ucWaterAlpha)
+                                 unsigned char ucWaterAlpha,
+                                 bool bInteriorSoundsEnabled,
+                                 bool bOverrideRainLevel,
+                                 float fRainLevel,
+                                 bool bOverrideSunSize,
+                                 float fSunSize,
+                                 bool bOverrideSunColor,
+                                 unsigned char ucSunCoreR,
+                                 unsigned char ucSunCoreG,
+                                 unsigned char ucSunCoreB,
+                                 unsigned char ucSunCoronaR,
+                                 unsigned char ucSunCoronaG,
+                                 unsigned char ucSunCoronaB,
+                                 bool bOverrideWindVelocity,
+                                 float fWindVelX,
+                                 float fWindVelY,
+                                 float fWindVelZ,
+                                 bool bOverrideFarClipDistance,
+                                 float fFarClip,
+                                 bool bOverrideFogDistance,
+                                 float fFogDistance)
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -77,6 +97,26 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_ucWaterGreen = ucWaterGreen;
     m_ucWaterBlue = ucWaterBlue;
     m_ucWaterAlpha = ucWaterAlpha;
+    m_bInteriorSoundsEnabled = bInteriorSoundsEnabled;
+    m_bOverrideRainLevel = bOverrideRainLevel;
+    m_fRainLevel = fRainLevel;
+    m_bOverrideSunSize = bOverrideSunSize;
+    m_fSunSize = fSunSize;
+    m_bOverrideSunColor = bOverrideSunColor;
+    m_ucSunCoreR = ucSunCoreR;
+    m_ucSunCoreG = ucSunCoreG;
+    m_ucSunCoreB = ucSunCoreB;
+    m_ucSunCoronaR = ucSunCoronaR;
+    m_ucSunCoronaG = ucSunCoronaG;
+    m_ucSunCoronaB = ucSunCoronaB;
+    m_bOverrideWindVelocity = bOverrideWindVelocity;
+    m_fWindVelX = fWindVelX;
+    m_fWindVelY = fWindVelY;
+    m_fWindVelZ = fWindVelZ;
+    m_bOverrideFarClipDistance = bOverrideFarClipDistance;
+    m_fFarClip = fFarClip;
+    m_bOverrideFogDistance = bOverrideFogDistance;
+    m_fFogDistance = fFogDistance;
 }
 
 
@@ -156,6 +196,58 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( m_ucWaterGreen );
         BitStream.Write ( m_ucWaterBlue );
         BitStream.Write ( m_ucWaterAlpha );
+    }
+
+    // Interior sounds
+    BitStream.WriteBit ( m_bInteriorSoundsEnabled );
+
+    // Rain level
+    BitStream.WriteBit ( m_bOverrideRainLevel );
+    if ( m_bOverrideRainLevel )
+    {
+        BitStream.Write ( m_fRainLevel );
+    }
+
+    // Sun size
+    BitStream.WriteBit ( m_bOverrideSunSize );
+    if ( m_bOverrideSunSize )
+    {
+        BitStream.Write ( m_fSunSize );
+    }
+
+    // Sun color
+    BitStream.WriteBit ( m_bOverrideSunColor );
+    if ( m_bOverrideSunColor )
+    {
+        BitStream.Write ( m_ucSunCoreR );
+        BitStream.Write ( m_ucSunCoreG );
+        BitStream.Write ( m_ucSunCoreB );
+        BitStream.Write ( m_ucSunCoronaR );
+        BitStream.Write ( m_ucSunCoronaG );
+        BitStream.Write ( m_ucSunCoronaB );
+    }
+
+    // Wind velocity
+    BitStream.WriteBit ( m_bOverrideWindVelocity );
+    if ( m_bOverrideWindVelocity )
+    {
+        BitStream.Write ( m_fWindVelX );
+        BitStream.Write ( m_fWindVelY );
+        BitStream.Write ( m_fWindVelZ );
+    }
+
+    // Far clip distance
+    BitStream.WriteBit ( m_bOverrideFarClipDistance );
+    if ( m_bOverrideFarClipDistance )
+    {
+        BitStream.Write ( m_fFarClip );
+    }
+
+    // Fog distance
+    BitStream.WriteBit ( m_bOverrideFogDistance );
+    if ( m_bOverrideFogDistance )
+    {
+        BitStream.Write ( m_fFogDistance );
     }
 
     return true;

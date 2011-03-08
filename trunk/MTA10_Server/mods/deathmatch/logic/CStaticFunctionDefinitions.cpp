@@ -7261,6 +7261,79 @@ bool CStaticFunctionDefinitions::GetJetpackMaxHeight ( float& fMaxHeight )
     return true;
 }
 
+bool CStaticFunctionDefinitions::AreInteriorSoundsEnabled ( bool& bEnabled )
+{
+    bEnabled = g_pGame->AreInteriorSoundsEnabled ( );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetRainLevel ( float& fRainLevel )
+{
+    if ( g_pGame->HasRainLevel ( ) )
+    {
+        fRainLevel = g_pGame->GetRainLevel ( );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSunSize ( float& fSunSize )
+{
+    if ( g_pGame->HasSunSize ( ) )
+    {
+        fSunSize = g_pGame->GetSunSize ( );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSunColor ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB )
+{
+    if ( g_pGame->HasSunColor ( ) )
+    {
+        g_pGame->GetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWindVelocity ( float& fVelX, float& fVelY, float& fVelZ )
+{
+    if ( g_pGame->HasWindVelocity ( ) )
+    {
+        g_pGame->GetWindVelocity ( fVelX, fVelY, fVelZ );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetFarClipDistance ( float& fFarClip )
+{
+    if ( g_pGame->HasFarClipDistance ( ) )
+    {
+        fFarClip = g_pGame->GetFarClipDistance ( );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetFogDistance ( float& fFogDist )
+{
+    if ( g_pGame->HasFogDistance ( ) )
+    {
+        fFogDist = g_pGame->GetFogDistance ( );
+        return true;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char ucMinute )
 {
     // Verify the range
@@ -7319,6 +7392,156 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fMaxHeight )
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetInteriorSoundsEnabled ( bool bEnable )
+{
+    g_pGame->SetInteriorSoundsEnabled ( bEnable );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit ( bEnable );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_INTERIOR_SOUNDS_ENABLED, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetRainLevel ( float fRainLevel )
+{
+    g_pGame->SetRainLevel ( fRainLevel );
+    g_pGame->SetHasRainLevel ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fRainLevel );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_RAIN_LEVEL, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetSunSize ( float fSunSize )
+{
+    g_pGame->SetSunSize ( fSunSize );
+    g_pGame->SetHasSunSize ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fSunSize );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_SUN_SIZE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetSunColor ( unsigned char ucCoreR, unsigned char ucCoreG, unsigned char ucCoreB, unsigned char ucCoronaR, unsigned char ucCoronaG, unsigned char ucCoronaB )
+{
+    g_pGame->SetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB );
+    g_pGame->SetHasSunColor ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( ucCoreR );
+    BitStream.pBitStream->Write ( ucCoreG );
+    BitStream.pBitStream->Write ( ucCoreB );
+    BitStream.pBitStream->Write ( ucCoronaR );
+    BitStream.pBitStream->Write ( ucCoronaG );
+    BitStream.pBitStream->Write ( ucCoronaB );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_SUN_COLOR, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetWindVelocity ( float fVelX, float fVelY, float fVelZ )
+{
+    g_pGame->SetWindVelocity ( fVelX, fVelY, fVelZ );
+    g_pGame->SetHasWindVelocity ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fVelX );
+    BitStream.pBitStream->Write ( fVelY );
+    BitStream.pBitStream->Write ( fVelZ );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WIND_VELOCITY, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetFarClipDistance ( float fFarClip )
+{
+    g_pGame->SetFarClipDistance ( fFarClip );
+    g_pGame->SetHasFarClipDistance ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fFarClip );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_FAR_CLIP_DISTANCE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetFogDistance ( float fFogDist )
+{
+    g_pGame->SetFogDistance ( fFogDist );
+    g_pGame->SetHasFogDistance ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fFogDist );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_FOG_DISTANCE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetRainLevel ( )
+{
+    g_pGame->SetHasRainLevel ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_RAIN_LEVEL, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetSunSize ( )
+{
+    g_pGame->SetHasSunSize ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_SUN_SIZE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetSunColor ( )
+{
+    g_pGame->SetHasSunColor ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_SUN_COLOR, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetWindVelocity ( )
+{
+    g_pGame->SetHasWindVelocity ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_WIND_VELOCITY, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetFarClipDistance ( )
+{
+    g_pGame->SetHasFarClipDistance ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_FAR_CLIP_DISTANCE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetFogDistance ( )
+{
+    g_pGame->SetHasFogDistance ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_FOG_DISTANCE, *BitStream.pBitStream ) );
+
+    return true;
 }
 
 
