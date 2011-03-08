@@ -487,7 +487,20 @@ SString GetMTASAPath ( void )
 
 int GetGamePath ( SString& strOutResult )
 {
+    // Note: "SOFTWARE\Multi Theft Auto: San Andreas" is the shared multi-version location for "GTA:SA Path"
+
+    // Try "SOFTWARE\Multi Theft Auto: San Andreas" first   ( "..\\1.0" resolves to "SOFTWARE\Multi Theft Auto: San Andreas" )
     SString strRegPath = GetRegistryValue ( "..\\1.0", "GTA:SA Path" );
+
+    // Update/restore from backup location
+    {
+        SString strRegPathBackup = GetRegistryValue ( "", "GTA:SA Path Backup" );
+        if ( strRegPath.empty () )
+            strRegPath = strRegPathBackup;
+        else
+        if ( strRegPath != strRegPathBackup )
+            SetRegistryValue ( "", "GTA:SA Path Backup", strRegPath );
+    }
 
     if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) == 0 )
     {
@@ -534,6 +547,7 @@ int GetGamePath ( SString& strOutResult )
         if ( FileExists( SString ( "%s\\%s", strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
         {
             SetRegistryValue ( "..\\1.0", "GTA:SA Path", strOutResult );
+            SetRegistryValue ( "", "GTA:SA Path Backup", strOutResult );
         }
         else
         {
