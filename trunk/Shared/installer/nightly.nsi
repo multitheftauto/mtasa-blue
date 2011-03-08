@@ -186,6 +186,10 @@ PostVC90Check:
 		ReadRegStr $2 HKCU "Software\Valve\Steam" "SteamPath"
 		StrCpy $2 "$2\steamapps\common\grand theft auto san andreas"
 		cont3:
+		StrCmp $2 "" trynext4 cont4
+		trynext4:
+		ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "GTA:SA Path Backup"
+		cont4:
 		!insertmacro ReplaceSubStr $2 "gta_sa.exe" ""
 		!insertmacro ReplaceSubStr $MODIFIED_STR "/" "\"
 		strcpy $3 '"'
@@ -200,6 +204,7 @@ FunctionEnd
 Function .onInstSuccess
 	!ifdef CLIENT_SETUP
 		WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
+        WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "GTA:SA Path Backup" $GTA_DIR
 		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" $INSTDIR
 
 		; Add the protocol handler
@@ -297,6 +302,7 @@ ShowUnInstDetails show
 DontInstallRedist:
 
 			WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
+			WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "GTA:SA Path Backup" $GTA_DIR
 			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" $INSTDIR
 
 			SetOutPath "$INSTDIR\MTA"
@@ -778,7 +784,6 @@ FunctionEnd
 
 Section Uninstall
 	!ifdef CLIENT_SETUP
-		ReadRegStr $GTA_DIR HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
 		IfFileExists "$INSTDIR\server\mods\deathmatch\resources\*.*" ask 0 ;no maps folder, so delete everything
 		IfFileExists "$INSTDIR\screenshots\*.*" ask 0 ;no maps folder, so delete everything
 		IfFileExists "$INSTDIR\mods\deathmatch\resources\*.*" ask deleteall ;no maps folder, so delete everything
