@@ -790,6 +790,8 @@ std::string SharedUtil::ConvertToANSI (const std::wstring& input)
 std::wstring SharedUtil::TranslateToUTF8 ( const std::string& input )
 {
     size_t len = mbstowcs ( NULL, input.c_str(), input.length() );
+    if ( len == (size_t)-1 )
+        return L"?";
     wchar_t* wcsOutput = new wchar_t[len+1];
     mbstowcs ( wcsOutput, input.c_str(), input.length() );
     wcsOutput[len] = NULL; //Null terminate the string
@@ -801,9 +803,12 @@ std::wstring SharedUtil::TranslateToUTF8 ( const std::string& input )
 std::wstring SharedUtil::GetBidiString (const std::wstring input)
 {
     int iCount = input.size();
-    wchar_t* wcsLineBidi = (wchar_t*)input.c_str();
+    wchar_t* wcsLineBidi = new wchar_t[iCount + 1];
+    memcpy ( wcsLineBidi, input.c_str(), ( iCount + 1 ) * sizeof ( wchar_t ) );
     doBidi ( wcsLineBidi, iCount, 1, 1 );  //Process our UTF string through MiniBidi, for Bidirectionalism
-    return wcsLineBidi;
+    std::wstring strLineBidi(wcsLineBidi);
+    delete wcsLineBidi;
+    return strLineBidi;
 }
 
 
