@@ -912,7 +912,7 @@ void CMainMenu::ChangeCommunityState ( bool bIn, const std::string& strUsername 
 }
 
 
-void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bIsNew )
+void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew )
 {
     if ( iIndex < 0 || iIndex > 2 )
         return;
@@ -924,12 +924,12 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bI
     CGUILabel* pItemShadow = m_pNewsItemShadowLabels[ iIndex ];
     SColor color = headlineColors[ iIndex ];
     pItem->SetTextColor ( color.R, color.G, color.B );
-    pItem->SetText ( strContent );
-    pItemShadow->SetText ( strContent );
+    pItem->SetText ( strHeadline );
+    pItemShadow->SetText ( strHeadline );
 
     // Set our Date labels
     CGUILabel* pItemDate = m_pNewsItemDateLabels[ iIndex ];
-    pItemDate->SetText ( "2012-12-21" );
+    pItemDate->SetText ( strDate );
 
     // 'NEW' sticker
     CGUILabel* pNewLabel = m_pNewsItemNEWLabels[ iIndex ];
