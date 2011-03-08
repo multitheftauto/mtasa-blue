@@ -75,7 +75,7 @@ public:
     void                ChangeCommunityState            ( bool bIn, const std::string& strUsername );
     bool                HasStarted                      ( void ) { return m_bStarted; };
 
-    void                SetNewsHeadline                 ( int iIndex, const SString& strContent, bool bIsNew );
+    void                SetNewsHeadline                 ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew );
 
 private:
     sMenuItem*          CreateItem                      ( unsigned char menuType, const char* szFilePath, CVector2D vecRelPosition, CVector2D vecNativeSize );
