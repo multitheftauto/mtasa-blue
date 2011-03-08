@@ -62,7 +62,6 @@ void CMessageLoopHook::RemoveHook ( )
     }
 }
 
-
 LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd, 
                                                     UINT uMsg, 
                                                     WPARAM wParam, 
@@ -76,12 +75,10 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
     // Log our state
     if ( uMsg == WM_KILLFOCUS || (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE) )
     {
-        g_pCore->SetFocused ( false );
         CSetCursorPosHook::GetSingleton ().DisableSetCursorPos ();
     }
     else if ( uMsg == WM_SETFOCUS || (uMsg == WM_ACTIVATE && LOWORD(wParam) != WA_INACTIVE) )
     {
-        g_pCore->SetFocused ( true );
         if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
             CSetCursorPosHook::GetSingleton ().EnableSetCursorPos ();
     }

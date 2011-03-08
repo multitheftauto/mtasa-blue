@@ -159,7 +159,7 @@ CCore::CCore ( void )
     m_bQuitOnPulse = false;
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
-    m_bFocused = true;
+    m_bLastFocused = true;
 
     // Initialize time
     CClientTime::InitializeTime ();
@@ -1128,6 +1128,17 @@ void CCore::DoPostFramePulse ( )
         }
     }
 
+    if ( !IsFocused() && m_bLastFocused )
+    {
+        // Fix for #4948
+        m_pKeyBinds->CallAllGTAControlBinds ( CONTROL_BOTH, false );
+        m_bLastFocused = false;
+    }
+    else if ( IsFocused() && !m_bLastFocused )
+    {
+        m_bLastFocused = true;
+    }
+
     GetJoystickManager ()->DoPulse ();      // Note: This may indirectly call CMessageLoopHook::ProcessMessage
     m_pKeyBinds->DoPostFramePulse ();
 
@@ -1164,10 +1175,10 @@ void CCore::RegisterCommands ( )
 #if 0
     m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
     m_pCommands->Add ( "window",            "enter/leave windowed mode",        CCommandFuncs::Window );
-#endif
-
     m_pCommands->Add ( "load",              "loads a mod (name args)",          CCommandFuncs::Load );
     m_pCommands->Add ( "unload",            "unloads a mod (name)",             CCommandFuncs::Unload );
+#endif
+
     m_pCommands->Add ( "connect",           "connects to a server (host port nick pass)",   CCommandFuncs::Connect );
     m_pCommands->Add ( "reconnect",         "connects to a previous server",    CCommandFuncs::Reconnect );
     m_pCommands->Add ( "bind",              "binds a key (key control)",        CCommandFuncs::Bind );
