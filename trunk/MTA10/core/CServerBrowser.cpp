@@ -1666,9 +1666,10 @@ void CServerBrowser::GetVisibleEndPointList ( std::vector < SAddressPort >& outE
     m_pServerList [ Type ]->GetVisibleRowRange ( iFirst, iLast );
     for ( int i = iFirst; i >= 0 && i <= iLast ; i++ )
     {
-        ulong ulIp = (ulong)m_pServerList [ Type ]->GetItemData ( i, DATA_PSERVER );
-        ushort usPort = (ushort)m_pServerList [ Type ]->GetItemData ( i, m_hMap [ Type ] );
-        outEndpointList.push_back ( SAddressPort ( (in_addr&)ulIp, usPort ) );
+        if ( CServerListItem* pServer = (CServerListItem *)m_pServerList [ Type ]->GetItemData ( i, DATA_PSERVER ) )
+        {
+            outEndpointList.push_back ( SAddressPort ( pServer->Address, pServer->usGamePort ) );
+        }
     }
 }
 
