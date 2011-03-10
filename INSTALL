@@ -1,5 +1,14 @@
 #
-# First, compile pcre
+# First, compile sparsehash library
+#
+cd vendor/sparsehash/current
+autoreconf -fi
+sh ./configure
+make install
+cd ../../..
+
+#
+# Then, compile pcre
 #
 cd vendor/pcre
 autoreconf -fiv
@@ -12,4 +21,4 @@ cd ../..
 #
 autoreconf -fiv
 ./configure
-make
+make install
