@@ -41,6 +41,10 @@ namespace
         SString         strMap;         // Map name
         SString         strVersion;     // Version
     };
+
+    // Variables used for saving the screen shot file on a separate thread
+    static bool ms_bIsSaving = false;
+    static std::map < CCachedKey, CCachedInfo > ms_ServerCachedMap;
 }
 
 
@@ -54,7 +58,8 @@ namespace
 class CServerCache : public CServerCacheInterface
 {
 public:
-    virtual bool        SaveServerCache             ( void );
+    ZERO_ON_NEW
+    virtual void        SaveServerCache             ( void );
     virtual void        GetServerCachedInfo         ( CServerListItem* pItem );
     virtual void        SetServerCachedInfo         ( const CServerListItem* pItem );
     virtual void        GetServerListCachedInfo     ( CServerList *pList );
@@ -64,10 +69,12 @@ public:
                         ~CServerCache               ( void );
 protected:
     bool                LoadServerCache             ( void );
+    static DWORD        StaticThreadProc            ( LPVOID lpdwThreadParam );
+    static void         StaticSaveServerCache       ( void );
 
-    std::map < CCachedKey, CCachedInfo >            m_ServerCachedMap;
+    bool                                        m_bListChanged;
+    std::map < CCachedKey, CCachedInfo >        m_ServerCachedMap;
 };
-
 
 
 ///////////////////////////////////////////////////////////////
@@ -180,11 +187,63 @@ bool CServerCache::LoadServerCache ( void )
 // Save cache data to config
 //
 ///////////////////////////////////////////////////////////////
-bool CServerCache::SaveServerCache ( void )
+void CServerCache::SaveServerCache ( void )
+{
+    // Check if need to save
+    if ( !m_bListChanged )
+        return;
+
+    // Check if can save
+    if ( ms_bIsSaving )
+        return;
+
+    m_bListChanged = false;
+
+    // Copy vars for save thread
+    ms_ServerCachedMap = m_ServerCachedMap;
+
+    // Start save thread
+    HANDLE hThread = CreateThread ( NULL, 0, (LPTHREAD_START_ROUTINE)CServerCache::StaticThreadProc, NULL, CREATE_SUSPENDED, NULL );
+    if ( !hThread )
+    {
+        CCore::GetSingleton ().GetConsole ()->Printf ( "Could not create server cache thread." );
+    }
+    else
+    {
+        ms_bIsSaving = true;
+        SetThreadPriority ( hThread, THREAD_PRIORITY_LOWEST );
+        ResumeThread ( hThread );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CServerCache::StaticThreadProc
+//
+// SaveServerCache thread
+//
+///////////////////////////////////////////////////////////////
+DWORD CServerCache::StaticThreadProc ( LPVOID lpdwThreadParam )
+{
+    StaticSaveServerCache ();
+    ms_bIsSaving = false;
+    return 0;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CServerCache::StaticSaveServerCache
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CServerCache::StaticSaveServerCache ( void )
 {
     CXMLFile* m_pConfigFile = CCore::GetSingleton ().GetXML ()->CreateXML ( CalcMTASAPath ( MTA_SERVER_CACHE_PATH ) );
     if ( !m_pConfigFile )
-        return false;
+        return;
     m_pConfigFile->Parse ();
 
     CXMLNode* pNode = m_pConfigFile->GetRootNode ();
@@ -192,14 +251,14 @@ bool CServerCache::SaveServerCache ( void )
         pNode = m_pConfigFile->CreateRootNode ( "root" );
 
     if ( !pNode )
-        return false;
+        return;
 
     // Start by clearing out all previous nodes
     pNode->DeleteAllSubNodes ();
 
     // Transfer each item from m_ServerCachedMap into dataSet
     CDataInfoSet dataSet;
-    for ( std::map < CCachedKey, CCachedInfo >::iterator it = m_ServerCachedMap.begin () ; it != m_ServerCachedMap.end () ; ++it )
+    for ( std::map < CCachedKey, CCachedInfo >::iterator it = ms_ServerCachedMap.begin () ; it != ms_ServerCachedMap.end () ; ++it )
     {
         const CCachedKey& key = it->first;
         const CCachedInfo& info = it->second;
@@ -231,7 +290,6 @@ bool CServerCache::SaveServerCache ( void )
     XMLAccess.SetSubNodeValue ( CONFIG_NODE_SERVER_INT "11", dataSet );
 
     m_pConfigFile->Write ();
-    return true;
 }
 
 
@@ -295,6 +353,22 @@ void CServerCache::SetServerCachedInfo ( const CServerListItem* pItem )
         MapSet ( m_ServerCachedMap, key, CCachedInfo () );
         pInfo = MapFind ( m_ServerCachedMap, key );
     }
+
+    // Check if changed
+    if ( pInfo->nPlayers                == pItem->nPlayers
+         && pInfo->nMaxPlayers          == pItem->nMaxPlayers
+         //&& pInfo->nPing                == pItem->nPing
+         && pInfo->bPassworded          == pItem->bPassworded
+         && pInfo->strName              == pItem->strName
+         && pInfo->strGameMode          == pItem->strGameMode
+         //&& pInfo->strMap               == pItem->strMap
+         && pInfo->strVersion           == pItem->strVersion
+         && pInfo->uiCacheNoReplyCount  == pItem->uiCacheNoReplyCount )
+    {
+        return;
+    }
+
+    m_bListChanged = true;
     pInfo->nPlayers         = pItem->nPlayers;
     pInfo->nMaxPlayers      = pItem->nMaxPlayers;
     pInfo->nPing            = pItem->nPing;

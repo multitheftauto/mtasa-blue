@@ -57,6 +57,9 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Hide the server queue
     CServerInfo::GetSingletonPtr()->Hide( );
 
+    // Save the browser state
+    CServerBrowser::GetSingletonPtr()->SaveOptions( );
+
     // Are we already connecting?
     CNet* pNet = CCore::GetSingleton ().GetNetwork ();
     if ( m_bIsConnecting || pNet->IsConnected () )
