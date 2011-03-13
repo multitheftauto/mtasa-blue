@@ -585,11 +585,11 @@
 				>
 			</File>
 			<File
-				RelativePath="CServerList.cpp"
+				RelativePath=".\CServerInfo.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\CServerInfo.cpp"
+				RelativePath=".\CServerList.cpp"
 				>
 			</File>
 			<File
@@ -934,11 +934,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CServerList.h"
+				RelativePath=".\CServerInfo.h"
 				>
 			</File>
 			<File
-				RelativePath=".\CServerInfo.h"
+				RelativePath=".\CServerList.h"
 				>
 			</File>
 			<File
@@ -1613,6 +1613,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.Buffer.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Defines.h"
 					>
 				</File>
@@ -1662,6 +1666,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Shared\sdk\SString.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\UTF8.h"
 					>
 				</File>
 			</Filter>

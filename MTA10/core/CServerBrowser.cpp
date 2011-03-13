@@ -1122,6 +1122,8 @@ bool CServerBrowser::OnBackClick ( CGUIElement* pElement )
     m_pPanel->SetVisible ( false );
     pMainMenu->m_bIsInSubWindow = false;
 
+    SaveOptions ( );
+
     return true;
 }
 
