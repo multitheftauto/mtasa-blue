@@ -17,6 +17,7 @@ struct SNewsItem
 {
     SString                     strContentFullDir;
     SString                     strHeadline;
+    SString                     strDate;
     SString                     strLayoutFilename;
     std::vector < SString >     imagesetFilenameList;
 };

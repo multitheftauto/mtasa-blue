@@ -927,7 +927,7 @@ void CMainMenu::ChangeCommunityState ( bool bIn, const std::string& strUsername 
 }
 
 
-void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bIsNew )
+void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew )
 {
     if ( iIndex < 0 || iIndex > 2 )
         return;
@@ -936,8 +936,8 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bI
     CGUILabel* pItem = m_pItems[ MENU_ITEM_NEWS_ITEM_1 + iIndex ];
     SColor color = headlineColors[ iIndex ];
     pItem->SetTextColor ( color.R, color.G, color.B );
-    pItem->SetText ( strContent );
-    pItem->AutoSize ( strContent );
+    pItem->SetText ( strHeadline + "  -  " + strDate );
+    pItem->AutoSize ( strHeadline + "  -  " + strDate );
 
     // 'NEW' sticker
     CGUILabel* pNewLabel = m_pNewLabels[ iIndex ];
@@ -947,7 +947,7 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bI
     // Hide NEWS label if top item is blank
     if ( iIndex == 0 )
     {
-        if ( strContent.empty () )
+        if ( strHeadline.empty () )
             DisableItem ( MENU_ITEM_NEWS, true );
         else
             EnableItem ( MENU_ITEM_NEWS );

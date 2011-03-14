@@ -78,7 +78,7 @@ public:
     void                ChangeCommunityState            ( bool bIn, const std::string& strUsername );
     bool                HasStarted                      ( void ) { return m_bStarted; };
 
-    void                SetNewsHeadline                 ( int iIndex, const SString& strContent, bool bIsNew );
+    void                SetNewsHeadline                 ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew );
 
 private:
     void                SetStaticBackground             ( bool bEnabled );
