@@ -1157,6 +1157,10 @@ void CCore::OnModUnload ( )
     m_pGUI->SelectInputHandlers( INPUT_CORE );
     // remove unused events
     m_pGUI->ClearInputHandlers( INPUT_MOD );
+
+    // Ensure all these have been removed
+    m_pKeyBinds->RemoveAllFunctions ();
+    m_pKeyBinds->RemoveAllControlFunctions ();
 }
 
 
