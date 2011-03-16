@@ -2137,6 +2137,10 @@ void CVersionUpdater::_UseDataFilesURLs ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_ProcessPatchFileDownload ( void )
 {
+    // Check if the saved filename has already been set
+    if ( !m_JobInfo.strSaveLocation.empty () )
+        return;
+
     m_ConditionMap.SetCondition ( "ProcessResponse", "" );
     m_ConditionMap.SetCondition ( "Download", "" );
 
@@ -2225,6 +2229,67 @@ void CVersionUpdater::_ProcessPatchFileDownload ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_StartDownload ( void )
 {
+    if ( ! m_JobInfo.strFilename.empty () )
+    {
+        // See if file already exists in upcache
+        std::list < SString > saveLocationList;
+        saveLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache", m_JobInfo.strFilename ) );
+        saveLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache", m_JobInfo.strFilename ) );
+        saveLocationList.push_back ( GetMTATempPath () + m_JobInfo.strFilename );
+        saveLocationList.push_back ( PathJoin ( "\\temp", m_JobInfo.strFilename ) );
+
+        // Try each place
+        for ( std::list < SString > ::iterator iter = saveLocationList.begin () ; iter != saveLocationList.end () ; ++iter )
+        {
+            SString strPath, strFilename;
+            ExtractFilename ( *iter, &strPath, &strFilename );
+            SString strMain;
+            if ( ExtractExtention ( *iter, &strMain, NULL ) )
+            {
+                std::vector < SString > fileList = FindFiles ( strMain + "*", true, false );
+
+                for ( std::vector < SString > ::iterator iter = fileList.begin () ; iter != fileList.end () ; ++iter )
+                {
+                    // Check filesize and then md5 and then verify signature and then use that file
+                    SString strPathFilename = PathJoin ( strPath, *iter );
+
+                    // Check filesize
+                    if ( FileSize ( strPathFilename ) != m_JobInfo.iFilesize )
+                        continue;
+
+                    CBuffer buffer;
+                    buffer.LoadFromFile ( strPathFilename );
+
+                    // Check MD5
+                    // Hash data
+                    MD5 md5Result;
+                    CMD5Hasher().Calculate ( buffer.GetData (), buffer.GetSize (), md5Result );
+                    char szMD5[33];
+                    CMD5Hasher::ConvertToHex ( md5Result, szMD5 );
+                    if ( m_JobInfo.strMD5 != szMD5 )
+                    {
+                        AddReportLog ( 5807, SString ( "StartDownload: Cached file reuse - Size correct, but md5 did not match (%s)", *strPathFilename ) );
+                        continue;
+                    }
+
+                    // Check signature
+                    if ( !CCore::GetSingleton ().GetNetwork ()->VerifySignature ( buffer.GetData (), buffer.GetSize () ) )
+                    {
+                        AddReportLog ( 5808, SString ( "StartDownload: Cached file reuse - Size and md5 correct, but signature incorrect (%s)", *strPathFilename ) );
+                        continue;
+                    }
+
+                    // Reuse file now
+                    m_JobInfo.strSaveLocation = strPathFilename;
+                    m_ConditionMap.SetCondition ( "ProcessResponse", "" );
+                    m_ConditionMap.SetCondition ( "Download", "Ok" );
+                    AddReportLog ( 5809, SString ( "StartDownload: Cached file reuse - Size, md5 and signature correct (%s)", *strPathFilename ) );
+                    return;
+                }
+            }
+        }
+    }
+
     switch ( DoSendDownloadRequestToNextServer () )
     {
         case RES_FAIL:
