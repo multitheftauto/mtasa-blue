@@ -2028,6 +2028,36 @@ void CClientVehicle::StreamedInPulse ( void )
         }
         */
 
+        // Limit burnout turn speed to ensure smoothness
+        if ( m_pDriver )
+        {
+            CControllerState cs;
+            m_pDriver->GetControllerState ( cs );
+            bool bAcclerate = cs.ButtonCross > 128;
+            bool bBrake = cs.ButtonSquare > 128;
+
+            // Is doing burnout ?
+            if ( bAcclerate && bBrake )
+            {
+                CVector vecMoveSpeed;
+                m_pVehicle->GetMoveSpeed ( &vecMoveSpeed );
+                if ( fabsf ( vecMoveSpeed.fX ) < 0.06f * 2 && fabsf ( vecMoveSpeed.fY ) < 0.06f * 2 && fabsf ( vecMoveSpeed.fZ ) < 0.01f * 2 )
+                {
+                    CVector vecTurnSpeed;
+                    m_pVehicle->GetTurnSpeed ( &vecTurnSpeed );
+                    if ( fabsf ( vecTurnSpeed.fX ) < 0.006f * 2 && fabsf ( vecTurnSpeed.fY ) < 0.006f * 2 && fabsf ( vecTurnSpeed.fZ ) < 0.04f * 2 )
+                    {
+                        // Apply turn speed limit
+                        float fLength = vecTurnSpeed.Normalize ();
+                        fLength = Min ( fLength, 0.02f );
+                        vecTurnSpeed *= fLength;
+
+                        m_pVehicle->SetTurnSpeed ( &vecTurnSpeed );
+                    }
+                }
+            }
+        }
+
         Interpolate ();
         ProcessDoorInterpolation ();
 
