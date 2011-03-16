@@ -831,19 +831,19 @@ void SharedUtil::OutputDebugLine ( const char* szMessage )
 
 
 //
-// Return true if supplied string adheres to the new version format
+// Return true if supplied version string will sort correctly
 //
 bool SharedUtil::IsValidVersionString ( const SString& strVersion )
 {
-    SString strCheck = "0.0.0-0-00000.0";
-    if ( strCheck.length () != strVersion.length () )
-        return false;
-    for ( unsigned int i = 0 ; i < strVersion.length () ; i++ )
+    const SString strCheck = "0.0.0-0.00000.0.000";
+    uint uiLength = Min ( strCheck.length (), strVersion.length () );
+    for ( unsigned int i = 0 ; i < uiLength ; i++ )
     {
         char c = strVersion[i];
         char d = strCheck[i];
-        if ( c != d && isdigit( c ) != isdigit( d ) )
-            return false;
+        if ( !isdigit( c ) || !isdigit( d ) )
+            if ( c != d )
+                return false;
     }
     return true;
 }

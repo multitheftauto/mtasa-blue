@@ -209,22 +209,6 @@ bool CMainConfig::Load ( const char* szFilename )
                 MapSet ( m_EnableDiagnosticMap, *it, 1 );
     }
 
-    // minclientversion - Minimum client version or kick
-    GetString ( m_pRootNode, "minclientversion", m_strMinClientVersion );
-    if ( m_strMinClientVersion != "" && !IsValidVersionString ( m_strMinClientVersion ) )
-    {
-        CLogger::LogPrint ( "WARNING: Invalid value specified in \"minclientversion\"\n" );
-        m_strMinClientVersion = "";
-    }
-
-    // recommendedclientversion - Minimum client version or spam
-    GetString ( m_pRootNode, "recommendedclientversion", m_strRecommendedClientVersion );
-    if ( m_strRecommendedClientVersion != "" && !IsValidVersionString ( m_strRecommendedClientVersion ) )
-    {
-        CLogger::LogPrint ( "WARNING: Invalid value specified in \"recommendedclientversion\"\n" );
-        m_strRecommendedClientVersion = "";
-    }
-
     // ASE
     iResult = GetBoolean ( m_pRootNode, "ase", m_bAseEnabled );
     if ( iResult == INVALID_VALUE )
@@ -311,6 +295,22 @@ bool CMainConfig::LoadExtended ( void )
 {
     std::string strBuffer;
     int iTemp = 0, iResult = 0;
+
+    // minclientversion - Minimum client version or kick
+    GetString ( m_pRootNode, "minclientversion", m_strMinClientVersion );
+    if ( m_strMinClientVersion != "" && !IsValidVersionString ( m_strMinClientVersion ) )
+    {
+        CLogger::LogPrint ( "WARNING: Invalid value specified in \"minclientversion\"\n" );
+        m_strMinClientVersion = "";
+    }
+
+    // recommendedclientversion - Minimum client version or spam
+    GetString ( m_pRootNode, "recommendedclientversion", m_strRecommendedClientVersion );
+    if ( m_strRecommendedClientVersion != "" && !IsValidVersionString ( m_strRecommendedClientVersion ) )
+    {
+        CLogger::LogPrint ( "WARNING: Invalid value specified in \"recommendedclientversion\"\n" );
+        m_strRecommendedClientVersion = "";
+    }
 
     // Grab the script debuglog
     if ( GetString ( m_pRootNode, "scriptdebuglogfile", strBuffer, 1, 255 ) == IS_SUCCESS )
