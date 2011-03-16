@@ -3015,7 +3015,7 @@ void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
 }
 
 
-void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulDelay )
+void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ )
 {   
     // Are we streamed in?
     if ( m_pVehicle )
@@ -3025,6 +3025,21 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulD
         unsigned long ulTime = CClientTime::GetTime ();
         CVector vecLocalPosition;
         GetPosition ( vecLocalPosition );
+
+        // Cars under road fix hack
+        if ( bValidVelocityZ && m_eVehicleType != CLIENTVEHICLE_HELI && m_eVehicleType != CLIENTVEHICLE_PLANE )
+        {
+            // If remote z higher by too much and remote not doing any z movement, warp local z coord
+            float fDeltaZ = vecPosition.fZ - vecLocalPosition.fZ;
+            if ( fDeltaZ > 0.4f && fDeltaZ < 10.0f )
+            {
+                if ( fabsf ( fVelocityZ ) < 0.01f )
+                {
+                    vecLocalPosition.fZ = vecPosition.fZ;
+                    SetPosition ( vecLocalPosition );
+                }
+            }
+        }
 
 #ifdef MTA_DEBUG
         m_interp.pos.vecStart = vecLocalPosition;
