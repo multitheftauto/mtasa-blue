@@ -1909,6 +1909,36 @@ void CClientVehicle::StreamedInPulse ( void )
         }
         */
 
+        // Limit burnout turn speed to ensure smoothness
+        if ( m_pDriver )
+        {
+            CControllerState cs;
+            m_pDriver->GetControllerState ( cs );
+            bool bAcclerate = cs.ButtonCross > 128;
+            bool bBrake = cs.ButtonSquare > 128;
+
+            // Is doing burnout ?
+            if ( bAcclerate && bBrake )
+            {
+                CVector vecMoveSpeed;
+                m_pVehicle->GetMoveSpeed ( &vecMoveSpeed );
+                if ( fabsf ( vecMoveSpeed.fX ) < 0.06f * 2 && fabsf ( vecMoveSpeed.fY ) < 0.06f * 2 && fabsf ( vecMoveSpeed.fZ ) < 0.01f * 2 )
+                {
+                    CVector vecTurnSpeed;
+                    m_pVehicle->GetTurnSpeed ( &vecTurnSpeed );
+                    if ( fabsf ( vecTurnSpeed.fX ) < 0.006f * 2 && fabsf ( vecTurnSpeed.fY ) < 0.006f * 2 && fabsf ( vecTurnSpeed.fZ ) < 0.04f * 2 )
+                    {
+                        // Apply turn speed limit
+                        float fLength = vecTurnSpeed.Normalize ();
+                        fLength = Min ( fLength, 0.02f );
+                        vecTurnSpeed *= fLength;
+
+                        m_pVehicle->SetTurnSpeed ( &vecTurnSpeed );
+                    }
+                }
+            }
+        }
+
         Interpolate ();
 
         // Grab our current position
@@ -2859,7 +2889,7 @@ void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
 }
 
 
-void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulDelay )
+void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ )
 {   
     // Are we streamed in?
     if ( m_pVehicle )
@@ -2869,6 +2899,21 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulD
         unsigned long ulTime = CClientTime::GetTime ();
         CVector vecLocalPosition;
         GetPosition ( vecLocalPosition );
+
+        // Cars under road fix hack
+        if ( bValidVelocityZ && m_eVehicleType != CLIENTVEHICLE_HELI && m_eVehicleType != CLIENTVEHICLE_PLANE )
+        {
+            // If remote z higher by too much and remote not doing any z movement, warp local z coord
+            float fDeltaZ = vecPosition.fZ - vecLocalPosition.fZ;
+            if ( fDeltaZ > 0.4f && fDeltaZ < 10.0f )
+            {
+                if ( fabsf ( fVelocityZ ) < 0.01f )
+                {
+                    vecLocalPosition.fZ = vecPosition.fZ;
+                    SetPosition ( vecLocalPosition );
+                }
+            }
+        }
 
 #ifdef MTA_DEBUG
         m_interp.pos.vecStart = vecLocalPosition;
