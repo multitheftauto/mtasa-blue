@@ -279,6 +279,7 @@ ExplosionHandler * m_pExplosionHandler = NULL;
 BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler * m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler * m_pRender3DStuffHandler = NULL;
+PreWorldProcessHandler * m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler * m_pPostWorldProcessHandler = NULL;
 IdleHandler * m_pIdleHandler = NULL;
 AddAnimationHandler* m_pAddAnimationHandler = NULL;
@@ -1729,6 +1730,11 @@ void CMultiplayerSA::SetProcessCamHandler ( ProcessCamHandler* pProcessCamHandle
 void CMultiplayerSA::SetChokingHandler ( ChokingHandler* pChokingHandler )
 {
     m_pChokingHandler = pChokingHandler;
+}
+
+void CMultiplayerSA::SetPreWorldProcessHandler ( PreWorldProcessHandler * pHandler )
+{
+    m_pPreWorldProcessHandler = pHandler;
 }
 
 void CMultiplayerSA::SetPostWorldProcessHandler ( PostWorldProcessHandler * pHandler )
@@ -4103,6 +4109,14 @@ void _declspec(naked) HOOK_CGame_Process ()
 {
     _asm
     {
+        pushad
+    }
+
+    if ( m_pPreWorldProcessHandler ) m_pPreWorldProcessHandler ();
+
+    _asm
+    {
+        popad
         call    CALL_CWorld_Process
         mov     ecx, 0B72978h
         pushad

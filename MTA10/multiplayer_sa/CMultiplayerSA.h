@@ -63,6 +63,7 @@ public:
     void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler );
     void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler );
     void                        SetChokingHandler           ( ChokingHandler* pChokingHandler );
+    void                        SetPreWorldProcessHandler   ( PreWorldProcessHandler * pHandler );
     void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler );
     void                        SetIdleHandler              ( IdleHandler * pHandler );
     void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
