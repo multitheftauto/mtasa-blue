@@ -1459,7 +1459,7 @@ bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, boo
 
     CBitStream BitStream;
     BitStream.pBitStream->WriteBit ( bDoubleSided );
-    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ), NULL, PACKET_ORDERING_GAME, 0x0c );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ) );
 
     return true;
 }

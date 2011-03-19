@@ -54,7 +54,7 @@ public:
 
     void                                        Broadcast                       ( const CPacket& Packet, CPlayer* pSkip = NULL );
     void                                        Broadcast                       ( const CPacket& Packet, std::list < CPlayer * > & playersList );
-    void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME, unsigned short usMinBitstreamVersion = 0 );
+    void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL );
 
     static bool                                 IsValidPlayerModel              ( unsigned short usPlayerModel );
 

@@ -883,27 +883,18 @@ void CClientGame::DoPulses ( void )
             SString strMessageCombo  = SString( "AC #%d %s", uiLevel, strMessage.c_str () ).TrimEnd ( " " );
             m_llLastTransgressionTime = GetTickCount64_ ();
             AddReportLog ( 3100, strMessageCombo );
-            if ( g_pNet->GetServerBitStreamVersion () >= 0x12 )
-            {
-                // Inform the server if we can
-                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-                pBitStream->Write ( uiLevel );
-                pBitStream->WriteString ( strMessage );
-                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
-                g_pNet->DeallocateNetBitStream ( pBitStream );
-            }
-            else
-            {
-                // Otherwise, disconnect here
-                g_pCore->ShowMessageBox ( "Error", SString ( strMessageCombo + ": You were kicked from the game" ), MB_BUTTON_OK | MB_ICON_ERROR );
-                g_pCore->GetModManager ()->RequestUnload ();
-                return;
-            }
+
+            // Inform the server
+            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+            pBitStream->Write ( uiLevel );
+            pBitStream->WriteString ( strMessage );
+            g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
+            g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }
 
     // Send diagnostic info
-    if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED && g_pNet->GetServerBitStreamVersion () >= 0x14 )
+    if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED )
     {
         // Retrieve data
         SString strMessage = g_pNet->GetDiagnosticStatus ();
