@@ -13,11 +13,21 @@
 
 #include "StdInc.h"
 
+#define HOOKPOS_CAEAmbienceTrackManager_CheckForPause       0x4D6E21
+DWORD RETURN_CAEAmbienceTrackManager_CheckForPause =        0x4D6E27;
+void HOOK_CAEAmbienceTrackManager_CheckForPause ();
+
+
 CAudioSA::CAudioSA ()
 {
     m_bRadioOn = false;
     m_bRadioMuted = false;
     m_ucRadioChannel = 0;
+    m_bAmbientSoundsPaused = false;
+    m_bAmbientGeneralEnabled = true;
+    m_bAmbientGunfireEnabled = true;
+
+    HookInstall ( HOOKPOS_CAEAmbienceTrackManager_CheckForPause, (DWORD)HOOK_CAEAmbienceTrackManager_CheckForPause, 6 );
 }
 
 VOID CAudioSA::StopRadio()
@@ -350,5 +360,82 @@ VOID CAudioSA::PauseAllSound ( bool bPaused )
             mov     ecx, CLASS_CAudioEngine
             call    dwFunc
         }
+    }
+}
+
+VOID CAudioSA::PauseAmbientSounds ( bool bPaused )
+{
+    m_bAmbientSoundsPaused = bPaused;
+    UpdateAmbientSoundSettings ();
+}
+
+VOID CAudioSA::SetAmbientSoundEnabled ( eAmbientSoundType eType, bool bEnabled )
+{
+    if ( eType == AMBIENT_SOUND_GENERAL )
+    {
+        m_bAmbientGeneralEnabled = bEnabled;
+    }
+    else
+    if ( eType == AMBIENT_SOUND_GUNFIRE )
+    {
+        m_bAmbientGunfireEnabled = bEnabled;
+    }
+    UpdateAmbientSoundSettings ();
+}
+
+bool CAudioSA::IsAmbientSoundEnabled ( eAmbientSoundType eType )
+{
+    if ( m_bAmbientSoundsPaused )
+        return false;
+    if ( eType == AMBIENT_SOUND_GENERAL )
+        return m_bAmbientGeneralEnabled;
+    else
+    if ( eType == AMBIENT_SOUND_GUNFIRE )
+        return m_bAmbientGunfireEnabled;
+    else
+        return false;
+}
+
+VOID CAudioSA::ResetAmbientSounds ( void )
+{
+    SetAmbientSoundEnabled ( AMBIENT_SOUND_GENERAL, true );
+    SetAmbientSoundEnabled ( AMBIENT_SOUND_GUNFIRE, true );
+}
+
+VOID CAudioSA::UpdateAmbientSoundSettings ( void )
+{
+    // Update gunfire setting
+    if ( IsAmbientSoundEnabled ( AMBIENT_SOUND_GUNFIRE ) )
+        MemPut < BYTE > ( 0x507814, 0x85 );     // Enable gunfire (default)
+    else
+        MemPut < BYTE > ( 0x507814, 0x33 );     // No gunfire
+}
+
+
+bool _cdecl IsAmbientSoundGeneralEnabled ( void )
+{
+    if ( pGame )
+    {
+        return pGame->GetAudio ()->IsAmbientSoundEnabled ( AMBIENT_SOUND_GENERAL );
+    }
+    return false;
+}
+
+// Hook for manual ambient sound pause
+void _declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause ()
+{
+    _asm
+    {
+        // Hooked from 004D6E21  6 bytes
+        call IsAmbientSoundGeneralEnabled
+        test al, al
+        jnz skip
+        mov     dword ptr [esp+08h], 0      // Pause
+    skip:
+
+        // orig
+        mov     edi, [esp+08h]
+        xor     ecx, ecx
+        jmp     RETURN_CAEAmbienceTrackManager_CheckForPause  // 4D6E27
     }
 }

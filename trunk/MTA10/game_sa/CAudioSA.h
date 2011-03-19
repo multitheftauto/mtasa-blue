@@ -55,10 +55,19 @@ public:
     VOID PauseAllSound ( bool bPaused );
     VOID StopRadio();
     VOID StartRadio( unsigned int station );
+    void PauseAmbientSounds ( bool bPaused );
+    void SetAmbientSoundEnabled ( eAmbientSoundType eType, bool bEnabled );
+    bool IsAmbientSoundEnabled ( eAmbientSoundType eType );
+    void ResetAmbientSounds ( void );
+
+    void UpdateAmbientSoundSettings ( void );
 
     bool            m_bRadioOn;
     bool            m_bRadioMuted;
     unsigned char   m_ucRadioChannel;
+    bool            m_bAmbientSoundsPaused;
+    bool            m_bAmbientGeneralEnabled;
+    bool            m_bAmbientGunfireEnabled;
 };
 
 #endif
