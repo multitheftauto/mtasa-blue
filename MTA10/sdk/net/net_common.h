@@ -37,11 +37,11 @@ enum NetPacketPriority
 
 enum NetPacketReliability
 {
-    PACKET_RELIABILITY_UNRELIABLE = 0,
+    PACKET_RELIABILITY_UNRELIABLE = 0,          //  Can arrive out of order
     PACKET_RELIABILITY_UNRELIABLE_SEQUENCED,
-    PACKET_RELIABILITY_RELIABLE,
+    PACKET_RELIABILITY_RELIABLE,                //  Can arrive out of order
     PACKET_RELIABILITY_RELIABLE_ORDERED,
-    PACKET_RELIABILITY_RELIABLE_SEQUENCED   //     Can drop packets
+    PACKET_RELIABILITY_RELIABLE_SEQUENCED       //  Can drop packets
 };
 
 enum NetPacketOrdering

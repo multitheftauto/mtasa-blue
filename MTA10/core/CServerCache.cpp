@@ -314,7 +314,7 @@ void CServerCache::GetServerCachedInfo ( CServerListItem* pItem )
             pItem->nPlayers         = pInfo->nPlayers;
             pItem->nMaxPlayers      = pInfo->nMaxPlayers;
             pItem->nPing            = pInfo->nPing;
-            pItem->bPassworded      = pInfo->bPassworded ? true : false;
+            pItem->bPassworded      = ( pInfo->bPassworded != 0 );
             pItem->strName          = pInfo->strName;
             pItem->strGameMode      = pInfo->strGameMode;
             pItem->strMap           = pInfo->strMap;
@@ -358,7 +358,7 @@ void CServerCache::SetServerCachedInfo ( const CServerListItem* pItem )
     if ( pInfo->nPlayers                == pItem->nPlayers
          && pInfo->nMaxPlayers          == pItem->nMaxPlayers
          //&& pInfo->nPing                == pItem->nPing
-         && pInfo->bPassworded          == pItem->bPassworded
+         && ( pInfo->bPassworded != 0 ) == pItem->bPassworded
          && pInfo->strName              == pItem->strName
          && pInfo->strGameMode          == pItem->strGameMode
          //&& pInfo->strMap               == pItem->strMap
