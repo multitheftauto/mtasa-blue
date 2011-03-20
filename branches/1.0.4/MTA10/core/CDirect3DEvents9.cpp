@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.Misc.h"
 
 // Variables used for screen shot saving
 static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;

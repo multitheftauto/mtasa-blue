@@ -16,6 +16,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.Misc.h"
 
 using namespace std;
 

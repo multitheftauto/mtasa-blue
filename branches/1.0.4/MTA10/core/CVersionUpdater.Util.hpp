@@ -674,6 +674,7 @@ namespace
             m_ArgMap.Set ( "min", iMinSize );
             m_ArgMap.Set ( "max", iMaxSize );
             CVARS_SET ( "reportsettings", m_ArgMap.ToString () );
+            SetApplicationSetting ( "reportsettings", m_ArgMap.ToString () );
         }
 
         void LoadReportSettings ( void )

@@ -855,18 +855,23 @@ void CClientGame::DoPulses ( void )
     if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED && GetTickCount64_ () - m_llLastTransgressionTime > 60000 )
     {
         uint uiLevel = 0;
+        uint uiInform = 0;
         SString strMessage;
 
         // Is the player a cheater?
         if ( !m_pManager->GetAntiCheat ().PerformChecks () )
         {
             uiLevel = 1;
+            uiInform = 2;
         }
         else
         {
             strMessage = g_pNet->GetNextBuffer ();
             if ( strMessage.length () )
+            {
                 uiLevel = atoi ( strMessage.SplitLeft ( ":", &strMessage ) );
+                uiInform = atoi ( strMessage.SplitLeft ( ":", &strMessage ) );
+            }
         }
 
         // Send message to the server
@@ -874,8 +879,14 @@ void CClientGame::DoPulses ( void )
         {
             SString strMessageCombo  = SString( "AC #%d %s", uiLevel, strMessage.c_str () ).TrimEnd ( " " );
             m_llLastTransgressionTime = GetTickCount64_ ();
-            AddReportLog ( 3100, strMessageCombo );
-            if ( g_pNet->GetServerBitStreamVersion () >= 0x12 )
+            AddReportLog ( 3100, strMessageCombo + SString ( " (%d)", uiInform ) );
+
+            if ( uiInform == 2 && g_pNet->GetServerBitStreamVersion () < 0x12 )
+                uiInform = 0;
+            if ( uiInform == 1 && g_pNet->GetServerBitStreamVersion () < 0x14 )
+                uiInform = 0;
+
+            if ( uiInform == 2 )
             {
                 // Inform the server if we can
                 NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
@@ -885,6 +896,17 @@ void CClientGame::DoPulses ( void )
                 g_pNet->DeallocateNetBitStream ( pBitStream );
             }
             else
+            if ( uiInform == 1 )
+            {
+                // Log to the server if we can
+                m_strLastDiagnosticStatus = strMessage;
+                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                pBitStream->WriteString ( strMessage );
+                g_pNet->SendPacket ( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream );
+                g_pNet->DeallocateNetBitStream ( pBitStream );
+            }
+            else
+            if ( uiInform == 0 )
             {
                 // Otherwise, disconnect here
                 g_pCore->ShowMessageBox ( "Error", SString ( strMessageCombo + ": You were kicked from the game" ), MB_BUTTON_OK | MB_ICON_ERROR );

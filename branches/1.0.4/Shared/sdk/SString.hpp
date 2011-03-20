@@ -118,7 +118,7 @@ SString& SString::vFormat ( const char* szFormat, va_list vl )
 //
 // Split into parts
 //
-void SString::Split ( const SString& strDelim, std::vector < SString >& outResult, unsigned int uiMaxAmount ) const
+void SString::Split ( const SString& strDelim, std::vector < SString >& outResult, unsigned int uiMaxAmount, unsigned int uiMinAmount ) const
 {
     outResult.clear ();
     unsigned long ulStartPoint = 0;
@@ -131,13 +131,16 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
         {
             if ( ulStartPoint <= length () )
                 outResult.push_back ( substr ( ulStartPoint ) );
-            return;
+            break;
         }
 
         outResult.push_back ( substr ( ulStartPoint, ulPos - ulStartPoint ) );
 
         ulStartPoint = ulPos + strDelim.length ();
     }
+
+    while ( outResult.size () < uiMinAmount )
+        outResult.push_back ( "" );
 }
 
 //

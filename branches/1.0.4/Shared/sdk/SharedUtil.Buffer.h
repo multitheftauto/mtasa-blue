@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        SharedUtil.File.h
+*  FILE:        SharedUtil.Buffer.h
 *  PURPOSE:
 *  DEVELOPERS:  
 *
@@ -37,6 +37,11 @@ namespace SharedUtil
         void Clear ( void )
         {
             clear ();
+        }
+
+        bool IsEmpty ( void ) const
+        {
+            return empty ();
         }
 
         // Status
@@ -201,7 +206,7 @@ namespace SharedUtil
         virtual int             GetSize ( void ) const          { return pBuffer->GetSize (); }
         virtual const char*     GetData ( void ) const          { return pBuffer->GetData (); }
 
-        bool ReadBytes ( void* pData, int iLength, bool bToFromNetwork )
+        bool ReadBytes ( void* pData, int iLength, bool bToFromNetwork = false )
         {
             // Validate pos
             Seek ( Tell () );
@@ -215,6 +220,7 @@ namespace SharedUtil
         }
 
         void Read ( SString& );     // Not defined as it won't work
+        void Read ( CBuffer& );     // Not defined as it won't work
         bool ReadString ( SString& result, bool bByteLength = false, bool bDoesLengthIncludeLengthOfLength = false )
         {
             result = "";
@@ -241,6 +247,28 @@ namespace SharedUtil
                     return false;
 
                 result = std::string ( buffer, usLength );
+            }
+            return true;
+        }
+
+        bool ReadBuffer ( CBuffer& outResult )
+        {
+            outResult.Clear ();
+
+            // Get the length
+            unsigned short usLength = 0;
+            if ( !Read ( usLength ) )
+                return false;
+
+            if ( usLength )
+            {
+                // Read the data
+                outResult.SetSize ( usLength );
+                if ( !ReadBytes ( outResult.GetData (), usLength, false ) )
+                {
+                    outResult.Clear ();
+                    return false;
+                }
             }
             return true;
         }
@@ -272,7 +300,7 @@ namespace SharedUtil
 
         virtual int             GetSize ( void ) const          { return pBuffer->GetSize (); }
 
-        void WriteBytes ( const void* pData, int iLength, bool bToFromNetwork )
+        void WriteBytes ( const void* pData, int iLength, bool bToFromNetwork = false )
         {
             // Validate pos
             Seek ( Tell () );
@@ -283,6 +311,7 @@ namespace SharedUtil
         }
 
         void Write ( const SString& );     // Not defined as it won't work
+        void Write ( const CBuffer& );     // Not defined as it won't work
         void WriteString ( const SString& str, bool bByteLength = false, bool bDoesLengthIncludeLengthOfLength = false )
         {
             ushort usLength = str.length ();
@@ -296,6 +325,16 @@ namespace SharedUtil
 
             if ( usLength )
                 WriteBytes ( &str.at ( 0 ), usLength, false );
+        }
+
+        void WriteBuffer ( const CBuffer& inBuffer )
+        {
+            // Write the length
+            unsigned short usLength = inBuffer.GetSize ();
+            Write ( usLength );
+            // Write the data
+            if ( usLength )
+                WriteBytes ( inBuffer.GetData (), usLength, false );
         }
 
         template < class T >

@@ -14,6 +14,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.Misc.h"
 
 using std::list;
 
