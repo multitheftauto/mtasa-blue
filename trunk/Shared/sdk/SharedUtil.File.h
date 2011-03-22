@@ -52,6 +52,7 @@ namespace SharedUtil
     bool            ExtractExtention                ( const SString& strFilename, SString* strRest, SString* strExt );
 
     bool            FileDelete                      ( const SString& strFilename, bool bForce = true );
+    bool            FileRename                      ( const SString& strFilenameOld, const SString& strFilenameNew );
     bool            DelTree                         ( const SString& strPath, const SString& strInsideHere );
     bool            MkDir                           ( const SString& strInPath, bool bTree = true );
     bool            FileCopy                        ( const SString& strSrc, const SString& strDest, bool bForce = true );

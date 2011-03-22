@@ -532,7 +532,7 @@ void CCore::EnableChatInput ( char* szCommand, DWORD dwColor )
 {
     if ( m_pLocalGUI )
     {
-        if ( m_pGame->GetSystemState () == 9 /* GS_FRONTEND */ &&
+        if ( m_pGame->GetSystemState () == 9 /* GS_PLAYING_GAME */ &&
             m_pModManager->GetCurrentMod () != NULL &&
             !IsOfflineMod () &&
             !m_pGame->IsAtMenu () &&
@@ -1080,6 +1080,9 @@ void CCore::DoPostFramePulse ( )
 
         m_Community.Initialize ();
     }
+
+    if ( m_pGame->GetSystemState () == 5 ) // GS_INIT_ONCE
+        WatchDogCompletedSection ( "L2" );      // gta_sa.set seems ok
 
     // This is the first frame in the menu?
     if ( m_pGame->GetSystemState () == 7 ) // GS_FRONTEND
