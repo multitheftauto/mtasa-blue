@@ -856,7 +856,12 @@ void CGame::PulseMasterServerAnnounce ( void )
                     if ( !response )
                         CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
                     else if ( response->GetErrorCode () != 200 )
-                        CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
+                    {
+                        if ( response->GetErrorCode () == 500 && strDesc.ContainsI ( "game-monitor" ) )
+                            CLogger::LogPrintfNoStamp ( "unavailable!\n" );
+                        else
+                            CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
+                    }
                     else
                         CLogger::LogPrintfNoStamp ( "success!\n");
                 }
