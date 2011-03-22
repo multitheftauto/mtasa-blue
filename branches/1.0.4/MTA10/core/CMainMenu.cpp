@@ -106,6 +106,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pCommunityLabel->SetAlwaysOnTop ( true );
     m_pCommunityLabel->SetAlpha ( 0.7f );
     m_pCommunityLabel->SetVisible ( false );
+    m_pCommunityLabel->SetAlpha ( 0.0f );   // Go away
 
     std::string strUsername;
     CCore::GetSingleton().GetCommunity()->GetUsername ( strUsername );
