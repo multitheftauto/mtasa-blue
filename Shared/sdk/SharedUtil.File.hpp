@@ -86,6 +86,15 @@ bool SharedUtil::FileDelete ( const SString& strFilename, bool bForce )
     return unlink ( strFilename ) == 0;
 }
 
+bool SharedUtil::FileRename ( const SString& strFilenameOld, const SString& strFilenameNew )
+{
+#ifdef WIN32
+    return MoveFile ( strFilenameOld, strFilenameNew ) != 0;
+#else
+    return std::rename ( strFilenameOld, strFilenameNew ) == 0;
+#endif
+}
+
 //
 // Load binary data from a file into an array
 //

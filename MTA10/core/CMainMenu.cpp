@@ -540,7 +540,7 @@ void CMainMenu::Update ( void )
     {
         // If we're at the game's mainmenu, or ingame when m_bIsIngame is true show the background
         if ( SystemState == 7 ||                    // GS_FRONTEND
-             SystemState == 9 && !m_bIsIngame )     // GS_INGAME
+             SystemState == 9 && !m_bIsIngame )     // GS_PLAYING_GAME
         {
             if ( m_ucFade == FADE_INVISIBLE )
                 Show ( false );
