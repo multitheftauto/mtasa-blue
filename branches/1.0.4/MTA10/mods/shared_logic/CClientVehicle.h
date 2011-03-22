@@ -117,9 +117,6 @@ public:
     void                        GetPosition             ( CVector& vecPosition ) const;
     void                        SetPosition             ( const CVector& vecPosition )      { SetPosition ( vecPosition, true ); }
     void                        SetPosition             ( const CVector& vecPosition, bool bResetInterpolation );
-    void                        SetRoll                 ( const CVector& vecRoll );
-    void                        SetDirection            ( const CVector& vecDir );
-    void                        SetWas                  ( const CVector& vecWas );
 
     void                        GetRotationDegrees      ( CVector& vecRotation ) const;
     void                        GetRotationRadians      ( CVector& vecRotation ) const;

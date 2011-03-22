@@ -72,9 +72,6 @@ public:
     virtual VOID                        SetEntityStatus( eEntityStatus bStatus )=0;
     virtual eEntityStatus               GetEntityStatus( )=0;
     virtual bool                        IsOnScreen ()=0;
-    virtual void                        SetRoll ( CVector *vecRoll ) =0;
-    virtual void                        SetDirection ( CVector *vecDir ) = 0;
-    virtual void                        SetWas ( CVector *vecWas ) =0;
     virtual void                        SetUnderwater ( bool bUnderwater )=0;
     virtual bool                        GetUnderwater ( void )=0;
     virtual RwFrame *                   GetFrameFromId ( int id )=0;

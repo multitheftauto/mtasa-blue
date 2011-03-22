@@ -281,38 +281,6 @@ void CClientVehicle::GetPosition ( CVector& vecPosition ) const
 }
 
 
-void CClientVehicle::SetRoll ( const CVector &vecRoll )
-{
-    if ( m_pVehicle )
-    {
-        m_pVehicle->SetRoll ( const_cast < CVector* > ( &vecRoll ) );
-    }
-    m_Matrix.vRight = vecRoll;
-    m_matFrozen.vRight = vecRoll;
-}
-
-
-void CClientVehicle::SetDirection ( const CVector &vecDir )
-{
-    if ( m_pVehicle )
-    {
-        m_pVehicle->SetDirection ( const_cast < CVector* > ( &vecDir ) );
-    }
-    m_Matrix.vFront = vecDir;
-    m_matFrozen.vFront = vecDir;
-}
-
-void CClientVehicle::SetWas ( const CVector &vecWas )
-{
-    if ( m_pVehicle )
-    {
-        m_pVehicle->SetWas ( const_cast < CVector* > ( &vecWas ) );
-    }
-    m_Matrix.vUp = vecWas;
-    m_matFrozen.vUp = vecWas;
-}
-
-
 void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
 {
     // Is the local player in the vehicle
