@@ -194,9 +194,6 @@ public:
     VOID                        SetOrientation ( float fX, float fY, float fZ );
     VOID                        FixBoatOrientation ( void );        // eAi you might want to rename this
     VOID                        SetPosition ( CVector * vecPosition );
-    VOID                        SetRoll ( CVector * vecRoll );
-    VOID                        SetDirection ( CVector * vecDir );
-    VOID                        SetWas ( CVector * vecWas );
 
     void                        SetUnderwater ( bool bUnderwater );
     bool                        GetUnderwater ( void );
