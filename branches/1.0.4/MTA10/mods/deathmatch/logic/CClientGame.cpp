@@ -877,39 +877,51 @@ void CClientGame::DoPulses ( void )
         // Send message to the server
         if ( uiLevel )
         {
-            SString strMessageCombo  = SString( "AC #%d %s", uiLevel, strMessage.c_str () ).TrimEnd ( " " );
+            SString strPrefix = ( uiInform == 2 ) ? "AC" : ( uiInform == 1 ) ? "VF" : "SD";
+            SString strMessageCombo = SString( "%s #%d %s", *strPrefix, uiLevel, strMessage.c_str () ).TrimEnd ( " " );
             m_llLastTransgressionTime = GetTickCount64_ ();
             AddReportLog ( 3100, strMessageCombo + SString ( " (%d)", uiInform ) );
 
-            if ( uiInform == 2 && g_pNet->GetServerBitStreamVersion () < 0x12 )
-                uiInform = 0;
-            if ( uiInform == 1 && g_pNet->GetServerBitStreamVersion () < 0x14 )
-                uiInform = 0;
+            if ( uiInform > 0 )
+            {
 
-            if ( uiInform == 2 )
-            {
-                // Inform the server if we can
-                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-                pBitStream->Write ( uiLevel );
-                pBitStream->WriteString ( strMessage );
-                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
-                g_pNet->DeallocateNetBitStream ( pBitStream );
+                if ( g_pNet->GetServerBitStreamVersion () >= 0x18 )
+                {
+                    // The server will use the whole message as supplied here
+                    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                    pBitStream->Write ( uiLevel );
+                    pBitStream->WriteString ( strMessageCombo );
+                    g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
+                    g_pNet->DeallocateNetBitStream ( pBitStream );
+                }
+                else
+                if ( uiInform == 2 && g_pNet->GetServerBitStreamVersion () >= 0x12 )
+                {
+                    // The server will construct the message from bits
+                    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                    pBitStream->Write ( uiLevel );
+                    pBitStream->WriteString ( strMessage );
+                    g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
+                    g_pNet->DeallocateNetBitStream ( pBitStream );
+                }
+                else
+                {
+                    // Use the me command to get the server to show the supplied message
+                    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                    SString strCommand ( "me will be kicked (%s)", *strMessageCombo );
+                    pBitStream->Write ( strCommand, static_cast < int > ( strCommand.length () ) );
+                    g_pNet->SendPacket ( PACKET_ID_COMMAND, pBitStream );
+                    g_pNet->DeallocateNetBitStream ( pBitStream );
+
+                    g_pCore->ShowMessageBox ( "Error", SString ( "You were kicked from the game (" + strMessageCombo + ")" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                    g_pCore->GetModManager ()->RequestUnload ();
+                    return;
+                }
             }
             else
-            if ( uiInform == 1 )
-            {
-                // Log to the server if we can
-                m_strLastDiagnosticStatus = strMessage;
-                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-                pBitStream->WriteString ( strMessage );
-                g_pNet->SendPacket ( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream );
-                g_pNet->DeallocateNetBitStream ( pBitStream );
-            }
-            else
-            if ( uiInform == 0 )
             {
                 // Otherwise, disconnect here
-                g_pCore->ShowMessageBox ( "Error", SString ( strMessageCombo + ": You were kicked from the game" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->ShowMessageBox ( "Error", SString ( "You were kicked from the game (" + strMessageCombo + ")" ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
             }

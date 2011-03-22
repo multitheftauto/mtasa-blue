@@ -13,6 +13,7 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 #include <shellapi.h>
+#include "SharedUtil.Misc.h"
 
 using SharedUtil::CalcMTASAPath;
 

@@ -825,7 +825,7 @@ void CGame::PulseMasterServerAnnounce ( void )
                     else if ( response->GetErrorCode () != 200 )
                     {
                         if ( response->GetErrorCode () == 500 && strDesc.ContainsI ( "game-monitor" ) )
-                            CLogger::LogPrintfNoStamp ( "temporarily unavailable\n" );
+                            CLogger::LogPrintfNoStamp ( "unavailable!\n" );
                         else
                             CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
                     }
@@ -2912,7 +2912,9 @@ void CGame::Packet_PlayerTransgression ( CPlayerTransgressionPacket & Packet )
         // If ac# not disabled on this server, do a kick
         if ( !g_pGame->GetConfig ()->IsDisableAC ( SString ( "%d", Packet.m_uiLevel ) ) )
         {
-            SString strMessageCombo ( "AC #%d %s", Packet.m_uiLevel, Packet.m_strMessage.c_str () );
+            SString strMessageCombo = Packet.m_strMessage;
+            if ( pPlayer->GetBitStreamVersion () < 0x18 )
+                strMessageCombo = SString ( "AC #%d %s", Packet.m_uiLevel, Packet.m_strMessage.c_str () );
             CStaticFunctionDefinitions::KickPlayer ( pPlayer, NULL, strMessageCombo );
         }
     }

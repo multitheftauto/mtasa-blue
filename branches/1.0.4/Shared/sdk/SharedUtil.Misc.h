@@ -10,7 +10,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
+#pragma once
 
 namespace SharedUtil
 {
