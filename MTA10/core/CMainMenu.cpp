@@ -43,7 +43,7 @@
 #define CORE_MTA_VERSION            "cgui\\images\\version.png"
 #define CORE_MTA_LATEST_NEWS        "cgui\\images\\latest_news.png"
 
-static short WaitForMenu = 0;
+static int WaitForMenu = 0;
 static const SColor headlineColors [] = { SColorRGBA ( 233, 234, 106, 255 ), SColorRGBA ( 233/6*4, 234/6*4, 106/6*4, 255 ), SColorRGBA ( 233/7*3, 234/7*3, 106/7*3, 255 ) };
 
 CMainMenu::CMainMenu ( CGUI* pManager )
@@ -522,16 +522,26 @@ void CMainMenu::Update ( void )
     // Force the mainmenu on if we're at GTA's mainmenu or not ingame
     if ( ( SystemState == 7 || SystemState == 9 ) && !m_bIsIngame )
     {
-        // it takes 250 frames for the menu to be shown, we seem to update this twice a frame
-        if ( WaitForMenu >= 250 ) {
-            if ( !m_bStarted )
-            {
-                m_pNewsBrowser->CreateHeadlines ();
-                GetVersionUpdater ()->EnableChecking ( true );
-            }
+        // Cope with early finish
+        if ( pGame->HasCreditScreenFadedOut () )
+            WaitForMenu = Max ( WaitForMenu, 250 );
+
+        // Fade up
+        if ( WaitForMenu >= 250 )
+        {
             m_bIsVisible = true;
             m_bStarted = true;
-        } else
+        }
+
+        // Create headlines while the screen is still black
+        if ( WaitForMenu == 250 )
+            m_pNewsBrowser->CreateHeadlines ();
+
+        // Start updater after fade up is complete
+        if ( WaitForMenu == 275 )
+            GetVersionUpdater ()->EnableChecking ( true );
+
+        if ( WaitForMenu < 300 )
             WaitForMenu++;
     }
 

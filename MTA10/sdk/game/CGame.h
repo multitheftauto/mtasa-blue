@@ -183,6 +183,8 @@ public:
     virtual void                SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced ) = 0;
     virtual void                SuspendASyncLoading             ( bool bSuspend ) = 0;
     virtual bool                IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false ) = 0;
+
+    virtual bool                HasCreditScreenFadedOut         ( void ) = 0;
 };
 
 #endif

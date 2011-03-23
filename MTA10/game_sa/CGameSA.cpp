@@ -646,3 +646,11 @@ void CGameSA::SetupSpecialCharacters ( void )
     ModelInfo[317].MakePedModel ( "NURGRL2" );
     */
 }
+
+// Well, has it?
+bool CGameSA::HasCreditScreenFadedOut ( void )
+{
+    BYTE ucAlpha = *(BYTE*)0xBAB320;
+    bool bCreditScreenFadedOut = ( GetSystemState() >= 7 ) && ( ucAlpha < 6 );
+    return bCreditScreenFadedOut;
+}

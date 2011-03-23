@@ -210,6 +210,8 @@ public:
     void                    SuspendASyncLoading             ( bool bSuspend );
     bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );
 
+    bool                    HasCreditScreenFadedOut         ( void );
+
     void                    SetupSpecialCharacters  ( void );
 
 private:
