@@ -87,7 +87,7 @@ public:
     virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword ) = 0;
 
     virtual const char *            GetInstallRoot                  ( void ) = 0;
-    virtual SString                 GetModInstallRoot               ( char * szModName )=0;
+    virtual const char *            GetModInstallRoot               ( const char * szModName )=0;
     virtual const char *            GetGTAInstallRoot               ( void ) = 0;
 
     virtual void                    ShowServerInfo                  ( unsigned int WindowType ) = 0;
