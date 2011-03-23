@@ -1089,6 +1089,11 @@ void CCore::DoPostFramePulse ( )
     {
         // Wait 250 frames more than the time it took to get status 7 (fade-out time)
         static short WaitForMenu = 0;
+
+        // Cope with early finish
+        if ( m_pGame->HasCreditScreenFadedOut () )
+            WaitForMenu = 250;
+
         if ( WaitForMenu >= 250 )
         {
             if ( m_bFirstFrame )
