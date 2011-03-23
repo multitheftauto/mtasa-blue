@@ -148,7 +148,7 @@ public:
     void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL );
     void                    RemoveMessageBox                ( bool bNextFrame = false );
     bool                    IsOfflineMod                    ( void ) { return m_bIsOfflineMod; }
-    SString                 GetModInstallRoot               ( char * szModName );
+    const char *            GetModInstallRoot               ( const char * szModName );
     const char *            GetInstallRoot                  ( void );
     const char *            GetGTAInstallRoot               ( void );
 
@@ -258,6 +258,7 @@ private:
     // screen res
     DEVMODE                     m_Current;
 
+    SString                     m_strModInstallRoot;
     char                        m_szInstallRoot[MAX_PATH];
     char                        m_szGTAInstallRoot[MAX_PATH];
 
