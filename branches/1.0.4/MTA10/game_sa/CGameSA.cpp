@@ -614,3 +614,11 @@ bool CGameSA::IsASyncLoadingEnabled ( bool bIgnoreSuspend )
         return m_bAsyncScriptEnabled;
     return m_bAsyncSettingsEnabled;
 }
+
+// Well, has it?
+bool CGameSA::HasCreditScreenFadedOut ( void )
+{
+    BYTE ucAlpha = *(BYTE*)0xBAB320;
+    bool bCreditScreenFadedOut = ( GetSystemState() >= 7 ) && ( ucAlpha < 6 );
+    return bCreditScreenFadedOut;
+}

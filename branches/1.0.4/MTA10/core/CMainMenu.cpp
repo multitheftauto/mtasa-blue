@@ -37,7 +37,7 @@
 #define CORE_MTA_HEADER_X           580
 #define CORE_MTA_HEADER_Y           60
 
-static short WaitForMenu = 0;
+static int WaitForMenu = 0;
 static const SColor headlineColors [] = { SColorRGBA ( 233, 234, 106, 255 ), SColorRGBA ( 233/6*4, 234/6*4, 106/6*4, 255 ), SColorRGBA ( 233/7*3, 234/7*3, 106/7*3, 255 ) };
 
 
@@ -373,16 +373,26 @@ void CMainMenu::Update ( void )
             }
         }
 
-        // it takes 250 frames for the menu to be shown, we seem to update this twice a frame
-        if ( WaitForMenu >= 250 ) {
-            if ( !m_bStarted )
-            {
-                m_pNewsBrowser->CreateHeadlines ();
-                GetVersionUpdater ()->EnableChecking ( true );
-            }
+        // Cope with early finish
+        if ( pGame->HasCreditScreenFadedOut () )
+            WaitForMenu = Max ( WaitForMenu, 250 );
+
+        // Fade up
+        if ( WaitForMenu >= 250 )
+        {
             m_bIsVisible = true;
             m_bStarted = true;
-        } else
+        }
+
+        // Create headlines while the screen is still black
+        if ( WaitForMenu == 250 )
+            m_pNewsBrowser->CreateHeadlines ();
+
+        // Start updater after fade up is complete
+        if ( WaitForMenu == 275 )
+            GetVersionUpdater ()->EnableChecking ( true );
+
+        if ( WaitForMenu < 300 )
             WaitForMenu++;
     }
 
@@ -391,7 +401,7 @@ void CMainMenu::Update ( void )
     {
         // If we're at the game's mainmenu, or ingame when m_bIsIngame is true show the background
         if ( SystemState == 7 ||                    // GS_FRONTEND
-             SystemState == 9 && !m_bIsIngame )     // GS_INGAME
+             SystemState == 9 && !m_bIsIngame )     // GS_PLAYING_GAME
         {
             if ( m_ucFade == FADE_INVISIBLE )
                 Show ( false );

@@ -194,6 +194,11 @@ void CLocalGUI::Draw ( void )
 
     // Make sure our version labels are always visible
     static short WaitForMenu = 0;
+
+    // Cope with early finish
+    if ( pGame->HasCreditScreenFadedOut () )
+        WaitForMenu = 250;
+
     if ( SystemState == 7 || SystemState == 9 ) {
         if ( WaitForMenu < 250 ) {
             WaitForMenu++;

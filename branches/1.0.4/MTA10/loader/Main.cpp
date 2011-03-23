@@ -386,11 +386,58 @@ SString HandlePostCrash ( void )
 //////////////////////////////////////////////////////////
 void HandleTrouble ( void )
 {
-    int iResponse = MessageBox ( NULL, "There may be trouble.\n\nDo you want to revert to an earlier version of MTA:SA?", "", MB_YESNO | MB_ICONERROR );
+    int iResponse = MessageBox ( NULL, "Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR );
     if ( iResponse == IDYES )
     {
-        MessageBox ( NULL, "Your browser will now download an installer which may fix the trouble.\n\nIf the page fails to load, please goto www.mtasa.com", "", MB_OK | MB_ICONINFORMATION );
+        MessageBox ( NULL, "Your browser will now display a web page with some help infomation.\n\nIf the page fails to load, please goto www.mtasa.com", "MTA: San Andreas", MB_OK | MB_ICONINFORMATION );
         BrowseToSolution ( "crashing-before-gtagame", false, true );
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// HandleResetSettings
+//
+//
+//
+//////////////////////////////////////////////////////////
+void HandleResetSettings ( void )
+{
+    char szResult[MAX_PATH] = "";
+    SHGetFolderPath( NULL, CSIDL_PERSONAL, NULL, 0, szResult );
+    SString strSettingsFilename = PathJoin ( szResult, "GTA San Andreas User Files", "gta_sa.set" );
+    SString strSettingsFilenameBak = PathJoin ( szResult, "GTA San Andreas User Files", "gta_sa_old.set" );
+
+    if ( FileExists ( strSettingsFilename ) )
+    {
+        int iResponse = MessageBox ( NULL, "There seems to be a problem launching MTA:SA.\nResetting GTA settings can sometimes fix this problem.\n\nDo you want to reset GTA settings now?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR );
+        if ( iResponse == IDYES )
+        {
+            FileDelete ( strSettingsFilenameBak );
+            FileRename ( strSettingsFilename, strSettingsFilenameBak );
+            FileDelete ( strSettingsFilename );
+            if ( !FileExists ( strSettingsFilename ) )
+            {
+                AddReportLog ( 4053, "Deleted gta_sa.set" );
+                MessageBox ( NULL, "GTA settings have been reset.\n\nPress OK to continue.", "MTA: San Andreas", MB_OK | MB_ICONINFORMATION );
+            }
+            else
+            {
+                AddReportLog ( 5054, SString ( "Delete gta_sa.set failed with '%s'", *strSettingsFilename ) );
+                MessageBox ( NULL, SString ( "File could not be deleted: '%s'", *strSettingsFilename ), "Error", MB_OK | MB_ICONERROR );
+            }
+        }
+    }
+    else
+    {
+        // No settings to delete, or can't find them
+        int iResponse = MessageBox ( NULL, "Are you having problems running MTA:SA?.\n\nDo you want to see some online help?", "MTA: San Andreas", MB_YESNO | MB_ICONERROR );
+        if ( iResponse == IDYES )
+        {
+            MessageBox ( NULL, "Your browser will now display a web page with some help infomation.\n\nIf the page fails to load, please goto www.mtasa.com", "MTA: San Andreas", MB_OK | MB_ICONINFORMATION );
+            BrowseToSolution ( "crashing-before-gtalaunch", false, true );
+        }
     }
 }
 
@@ -404,9 +451,18 @@ void HandleTrouble ( void )
 //////////////////////////////////////////////////////////
 int LaunchGame ( LPSTR lpCmdLine )
 {
+    //
+    // "L0" is opened before the launch sequence and is closed if MTA shutsdown with no error
+    // "L1" is opened before the launch sequence and is closed if GTA is succesfully started
+    // "CR1" is a counter which is incremented if GTA was not started and MTA shutsdown with an error
+    //
+    // "L2" is opened before the launch sequence and is closed if the GTA loading screen is shown
+    // "CR2" is a counter which is incremented at startup, if the previous run didn't make it to the loading screen
+    //
+
     // Check for unclean stop on previous run
     if ( WatchDogIsSectionOpen ( "L0" ) )
-        WatchDogSetUncleanStop ( true );
+        WatchDogSetUncleanStop ( true );    // Flag to maybe do things differently if MTA exit code on last run was not 0
     else
         WatchDogSetUncleanStop ( false );
 
@@ -421,8 +477,22 @@ int LaunchGame ( LPSTR lpCmdLine )
         HandleTrouble ();
     }
 
-    WatchDogBeginSection ( "L0" );
-    WatchDogBeginSection ( "L1" );
+    // Check for possible gta_sa.set problems
+    if ( WatchDogIsSectionOpen ( "L2" ) )
+        WatchDogIncCounter ( "CR2" );       // Did not reach loading screen last time
+    else
+        WatchDogClearCounter ( "CR2" );
+
+    // If didn't reach loading screen 3 times in a row, do something
+    if ( WatchDogGetCounter ( "CR2" ) >= 3 )
+    {
+        WatchDogClearCounter ( "CR2" );
+        HandleResetSettings ();
+    }
+
+    WatchDogBeginSection ( "L0" );      // Gets closed if MTA exits with a return code of 0
+    WatchDogBeginSection ( "L1" );      // Gets closed when online game has started
+    WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
 
     int iReturnCode = DoLaunchGame ( lpCmdLine );
 
