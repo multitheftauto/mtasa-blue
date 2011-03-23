@@ -648,9 +648,10 @@ void CCore::SetOfflineMod ( bool bOffline )
 }
 
 
-SString CCore::GetModInstallRoot ( char * szModName )
+const char* CCore::GetModInstallRoot ( const char* szModName )
 {
-    return SString ( "%s\\mods\\%s", GetInstallRoot(), szModName );
+    m_strModInstallRoot = SString ( "%s\\mods\\%s", GetInstallRoot(), szModName );
+    return m_strModInstallRoot;
 }
 
 
