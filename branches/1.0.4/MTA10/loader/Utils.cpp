@@ -14,6 +14,7 @@
 #include <assert.h>
 #include <tchar.h>
 #include <strsafe.h>
+#include <Tlhelp32.h>
 #define BUFSIZE 512
 #include "../sdk/utils/CMD5Hasher.cpp"  // :O
 
@@ -276,6 +277,38 @@ std::vector < DWORD > MyEnumProcesses ( void )
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// FindProcessId
+//
+// Find a process id by process name
+//
+///////////////////////////////////////////////////////////////////////////
+DWORD FindProcessId ( const SString& processName )
+{
+	PROCESSENTRY32 processInfo;
+	processInfo.dwSize = sizeof ( processInfo );
+
+	HANDLE processesSnapshot = CreateToolhelp32Snapshot ( TH32CS_SNAPPROCESS, NULL );
+	if ( processesSnapshot == INVALID_HANDLE_VALUE )
+		return 0;
+
+	Process32First ( processesSnapshot , &processInfo );
+    do
+	{
+		if ( processName.CompareI ( processInfo.szExeFile ) )
+		{
+			CloseHandle ( processesSnapshot );
+			return processInfo.th32ProcessID;
+		}
+	}
+	while ( Process32Next ( processesSnapshot, &processInfo ) );
+	
+	CloseHandle ( processesSnapshot );
+	return 0;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
 // GetGTAProcessList
 //
 // Get list of process id's with the image name ending in "gta_sa.exe"
@@ -285,7 +318,6 @@ std::vector < DWORD > GetGTAProcessList ( void )
 {
     std::vector < DWORD > result;
 
-    uint uiNumFound = 0;
     std::vector < DWORD > processIdList = MyEnumProcesses ();
     for ( uint i = 0; i < processIdList.size (); i++ )
     {
@@ -299,6 +331,10 @@ std::vector < DWORD > GetGTAProcessList ( void )
             if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) )
                 result.push_back ( processId );
     }
+
+    if ( DWORD processId = FindProcessId ( MTA_GTAEXE_NAME ) )
+        ListAddUnique ( result, processId );
+
     return result;
 }
 
