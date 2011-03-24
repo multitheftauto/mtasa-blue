@@ -320,8 +320,8 @@ int CLuaACLDefs::aclSetRight ( lua_State* luaVM )
             pACLRight = pACL->AddRight ( szRightAftedDot, eType, bAccess );
             if ( pACLRight )
             {
-                // Return success
-                CLogger::LogPrintf ( "ACL: %s: Right '%s' %s added in ACL '%s'\n", GetResourceName ( luaVM ), szRight, bAccess ? "ALLOW" : "DISALLOW", pACL->GetName () );
+                // LOGLEVEL_LOW to stop spam from admin resource at new server startup
+                CLogger::LogPrintf ( LOGLEVEL_LOW, "ACL: %s: Right '%s' %s added in ACL '%s'\n", GetResourceName ( luaVM ), szRight, bAccess ? "ALLOW" : "DISALLOW", pACL->GetName () );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
