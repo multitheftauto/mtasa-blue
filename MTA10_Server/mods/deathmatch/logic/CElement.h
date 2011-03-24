@@ -270,7 +270,6 @@ protected:
     unsigned char                               m_ucInterior;
     bool                                        m_bDoubleSided;
     bool                                        m_bMapCreated;
-    bool                                        m_bUpdatingSpatialData;
 
     // Optimization for getElementsByType starting at root
 public:

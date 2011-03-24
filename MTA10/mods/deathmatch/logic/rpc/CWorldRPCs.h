@@ -29,12 +29,8 @@ public:
     DECLARE_RPC ( SetGravity );
     DECLARE_RPC ( SetGameSpeed );
     DECLARE_RPC ( SetWaveHeight );
-    DECLARE_RPC ( GetSkyGradient );
     DECLARE_RPC ( SetSkyGradient );
     DECLARE_RPC ( ResetSkyGradient );
-    DECLARE_RPC ( GetHeatHaze );
-    DECLARE_RPC ( SetHeatHaze );
-    DECLARE_RPC ( ResetHeatHaze );
     DECLARE_RPC ( SetBlurLevel );
     DECLARE_RPC ( SetWantedLevel );
     DECLARE_RPC ( ResetMapInfo );
@@ -42,21 +38,6 @@ public:
     DECLARE_RPC ( SetGarageOpen );
     DECLARE_RPC ( SetGlitchEnabled );
     DECLARE_RPC ( SetCloudsEnabled );
-    DECLARE_RPC ( SetTrafficLightState );
-    DECLARE_RPC ( SetJetpackMaxHeight );
-    DECLARE_RPC ( SetInteriorSoundsEnabled );
-    DECLARE_RPC ( SetRainLevel );
-    DECLARE_RPC ( SetSunSize );
-    DECLARE_RPC ( SetSunColor );
-    DECLARE_RPC ( SetWindVelocity );
-    DECLARE_RPC ( SetFarClipDistance );
-    DECLARE_RPC ( SetFogDistance );
-    DECLARE_RPC ( ResetRainLevel );
-    DECLARE_RPC ( ResetSunSize );
-    DECLARE_RPC ( ResetSunColor );
-    DECLARE_RPC ( ResetWindVelocity );
-    DECLARE_RPC ( ResetFarClipDistance );
-    DECLARE_RPC ( ResetFogDistance );
 };
 
 #endif

@@ -182,6 +182,9 @@ public:
     float                   GetTimeScale ( void );
     void                    SetTimeScale ( float fTimeScale );
 
+    unsigned long           GetFramelimiter         ( void );
+    void                    SetFramelimiter         ( unsigned long ulFramelimiter );
+
     BOOL                    InitLocalPlayer(  );
 
     float                   GetGravity              ( void );
@@ -211,8 +214,6 @@ public:
     bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );
 
     bool                    HasCreditScreenFadedOut         ( void );
-
-    void                    SetupSpecialCharacters  ( void );
 
 private:
     CPools                  * m_pPools;

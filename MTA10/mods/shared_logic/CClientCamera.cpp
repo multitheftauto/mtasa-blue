@@ -406,14 +406,9 @@ void CClientCamera::RestoreEntity ( CClientEntity* pEntity )
 }
 
 
-void CClientCamera::SetCameraView ( eVehicleCamMode eMode )
+bool CClientCamera::SetCameraMode ( eCamMode eMode )
 {
-    m_pCamera->SetCameraView ( eMode );
-}
-
-eVehicleCamMode CClientCamera::GetCameraView ()
-{
-    return (eVehicleCamMode)m_pCamera->GetCameraView();
+    return m_pCamera->TryToStartNewCamMode ( eMode );
 }
 
 
@@ -472,7 +467,6 @@ CClientEntity * CClientCamera::GetTargetEntity ( void )
 
 bool CClientCamera::ProcessFixedCamera ( CCam* pCam )
 {
-    assert ( pCam );
     // The purpose of this handler function is changing the Source, Front and Up vectors in CCam
     // when called by GTA. This is called when we are in fixed camera mode.
 

@@ -30,7 +30,7 @@
 #include "CResourceFile.h"
 #include "CResourceManager.h"
 #include "CElementGroup.h"
-#include <unzip.h>
+#include "../utils/zip/unzip.h"
 #include <list>
 #include <vector>
 #include "ehs/ehs.h"

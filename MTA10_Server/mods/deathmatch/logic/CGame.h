@@ -13,8 +13,6 @@
 *               Chris McArthur <>
 *               Kevin Whiteside <>
 *               lil_Toady <>
-*               Peter Beverloo <>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -99,7 +97,6 @@ class CSettings;
 class CTeamManager;
 class CUnoccupiedVehicleSync;
 class CPedSync;
-class CObjectSync;
 class CVehicleManager;
 class CZoneNames;
 class CLanBroadcast;
@@ -188,7 +185,6 @@ public:
     inline CTeamManager*            GetTeamManager              ( void )        { return m_pTeamManager; }
     inline CUnoccupiedVehicleSync*  GetUnoccupiedVehicleSync    ( void )        { return m_pUnoccupiedVehicleSync; }
     inline CPedSync*                GetPedSync                  ( void )        { return m_pPedSync; }
-    inline CObjectSync*             GetObjectSync               ( void )        { return m_pObjectSync; }
     inline CConsole*                GetConsole                  ( void )        { return m_pConsole; }
     inline CRegistryManager*        GetRegistryManager          ( void )        { return m_pRegistryManager; }
     inline CRegistry*               GetRegistry                 ( void )        { return m_pRegistry; }
@@ -224,15 +220,6 @@ public:
     inline float                GetGravity                  ( void )        { return m_fGravity; }
     inline void                 SetGravity                  ( float fGravity )  { m_fGravity = fGravity; }
 
-    inline unsigned char        GetTrafficLightState        ( void )        { return m_ucTrafficLightState; }
-    inline void                 SetTrafficLightState        ( unsigned char ucState ) { m_ucTrafficLightState = ucState; }
-
-    inline bool                 GetTrafficLightsLocked      ( void )        { return m_bTrafficLightsLocked; }
-    inline void                 SetTrafficLightsLocked      ( bool bLocked ) { m_bTrafficLightsLocked = bLocked; }
-
-    inline float                GetJetpackMaxHeight         ( void ) { return m_fJetpackMaxHeight; }
-    inline void                 SetJetpackMaxHeight         ( float fMaxHeight ) { m_fJetpackMaxHeight = fMaxHeight; }
-
     inline float                GetGameSpeed                ( void )        { return m_fGameSpeed; }
     inline void                 SetGameSpeed                ( float fGameSpeed )  { m_fGameSpeed = fGameSpeed; }
 
@@ -241,57 +228,6 @@ public:
 
     inline void                 GetSkyGradient              ( unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB ) { ucTR = m_ucSkyGradientTR; ucTG = m_ucSkyGradientTG; ucTB = m_ucSkyGradientTB; ucBR = m_ucSkyGradientBR; ucBG = m_ucSkyGradientBG; ucBB = m_ucSkyGradientBB; }
     inline void                 SetSkyGradient              ( unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB ) { m_ucSkyGradientTR = ucTR; m_ucSkyGradientTG = ucTG; m_ucSkyGradientTB = ucTB; m_ucSkyGradientBR = ucBR; m_ucSkyGradientBG = ucBG; m_ucSkyGradientBB = ucBB; }
-
-    inline bool                 HasHeatHaze                 ( void )        { return m_bHasHeatHaze; }
-    inline void                 SetHasHeatHaze              ( bool bHasHeatHaze ) { m_bHasHeatHaze = bHasHeatHaze; }
-
-    inline void                 GetHeatHaze                 ( SHeatHazeSettings& heatHazeSettings )         { heatHazeSettings = m_HeatHazeSettings; }
-    inline void                 SetHeatHaze                 ( const SHeatHazeSettings& heatHazeSettings )   { m_HeatHazeSettings = heatHazeSettings; }
-
-    inline bool                 AreInteriorSoundsEnabled    ( void )        { return m_bInteriorSoundsEnabled; }
-    inline void                 SetInteriorSoundsEnabled    ( bool bEnable )    { m_bInteriorSoundsEnabled = bEnable; }
-
-    inline bool                 HasWaterColor               ( void )        { return m_bOverrideWaterColor; }
-    inline void                 SetHasWaterColor            ( bool bOverrideWaterColor ) { m_bOverrideWaterColor = bOverrideWaterColor; }
-
-    inline void                 GetWaterColor               ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha ) { ucRed = m_ucWaterRed; ucGreen = m_ucWaterGreen; ucBlue = m_ucWaterBlue; ucAlpha = m_ucWaterAlpha; }
-    inline void                 SetWaterColor               ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha ) { m_ucWaterRed = ucRed; m_ucWaterGreen = ucGreen; m_ucWaterBlue = ucBlue; m_ucWaterAlpha = ucAlpha; }
-
-    inline bool                 HasRainLevel                ( void )        { return m_bOverrideRainLevel; }
-    inline void                 SetHasRainLevel             ( bool bOverrideRainLevel ) { m_bOverrideRainLevel = bOverrideRainLevel; }
-
-    inline float                GetRainLevel                ( void )        { return m_fRainLevel; }
-    inline void                 SetRainLevel                ( float& fRainLevel ) { m_fRainLevel = fRainLevel; }
-
-    inline bool                 HasSunSize                  ( void )        { return m_bOverrideSunSize; }
-    inline void                 SetHasSunSize               ( bool bOverrideSunSize ) { m_bOverrideSunSize = bOverrideSunSize; }
-
-    inline float                GetSunSize                  ( void )        { return m_fSunSize; }
-    inline void                 SetSunSize                  ( float& fSunSize ) { m_fSunSize = fSunSize; }
-
-    inline bool                 HasSunColor                 ( void )        { return m_bOverrideSunColor; }
-    inline void                 SetHasSunColor              ( bool bOverrideSunColor ) { m_bOverrideSunColor = bOverrideSunColor; }
-
-    inline void                 GetSunColor                 ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB )    { ucCoreR = m_ucSunCoreR; ucCoreG = m_ucSunCoreG; ucCoreB = m_ucSunCoreB; ucCoronaR = m_ucSunCoronaR; ucCoronaG = m_ucSunCoronaG; ucCoronaB = m_ucSunCoronaB; }
-    inline void                 SetSunColor                 ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB )    { m_ucSunCoreR = ucCoreR; m_ucSunCoreG = ucCoreG; m_ucSunCoreB = ucCoreB; m_ucSunCoronaR = ucCoronaR; m_ucSunCoronaG = ucCoronaG; m_ucSunCoronaB = ucCoronaB; }
-
-    inline bool                 HasWindVelocity             ( void )        { return m_bOverrideWindVelocity; }
-    inline void                 SetHasWindVelocity          ( bool bOverrideWindVelocity ) { m_bOverrideWindVelocity = bOverrideWindVelocity; }
-
-    inline void                 GetWindVelocity             ( float& fVelX, float& fVelY, float& fVelZ )    { fVelX = m_fWindVelX; fVelY = m_fWindVelY; fVelZ = m_fWindVelZ; }
-    inline void                 SetWindVelocity             ( float& fVelX, float& fVelY, float& fVelZ )    { m_fWindVelX = fVelX; m_fWindVelY = fVelY; m_fWindVelZ = fVelZ; }
-
-    inline bool                 HasFarClipDistance          ( void )        { return m_bOverrideFarClip; }
-    inline void                 SetHasFarClipDistance       ( bool bOverrideFarClip ) { m_bOverrideFarClip = bOverrideFarClip; }
-
-    inline float                GetFarClipDistance          ( void )        { return m_fFarClipDistance; }
-    inline void                 SetFarClipDistance          ( float& fFarClipDistance ) { m_fFarClipDistance = fFarClipDistance; }
-
-    inline bool                 HasFogDistance              ( void )        { return m_bOverrideFogDistance; }
-    inline void                 SetHasFogDistance           ( bool bOverrideFogDistance ) { m_bOverrideFogDistance = bOverrideFogDistance; }
-
-    inline float                GetFogDistance              ( void )        { return m_fFogDistance; }
-    inline void                 SetFogDistance              ( float& fFogDistance ) { m_fFogDistance = fFogDistance; }
 
     inline bool*                GetGarageStates             ( void )        { return m_bGarageStates; }
 
@@ -315,8 +251,6 @@ public:
 
 private:
     void                        AddBuiltInEvents            ( void );
-
-    void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
 
     void                        Packet_PlayerJoin           ( NetServerPlayerID& Source );
     void                        Packet_PlayerJoinData       ( class CPlayerJoinDataPacket& Packet );
@@ -368,7 +302,6 @@ private:
     CConsole*                       m_pConsole;
     CUnoccupiedVehicleSync*         m_pUnoccupiedVehicleSync;
     CPedSync*                       m_pPedSync;
-    CObjectSync*                    m_pObjectSync;
     CMarkerManager*                 m_pMarkerManager;
     CClock*                         m_pClock;
     CBanManager*                    m_pBanManager;
@@ -403,41 +336,10 @@ private:
 
     float                       m_fGravity;
     float                       m_fGameSpeed;
-    float                       m_fJetpackMaxHeight;
-
-    unsigned char               m_ucTrafficLightState;
-    bool                        m_bTrafficLightsLocked;
-    unsigned long               m_ulLastTrafficUpdate;
 
     unsigned char               m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char               m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
     bool                        m_bHasSkyGradient;
-
-    SHeatHazeSettings           m_HeatHazeSettings;
-    bool                        m_bHasHeatHaze;
-
-    bool                        m_bOverrideWaterColor;
-    unsigned char               m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;
-
-    bool                        m_bInteriorSoundsEnabled;
-
-    bool                        m_bOverrideRainLevel;
-    float                       m_fRainLevel;
-
-    bool                        m_bOverrideSunSize;
-    float                       m_fSunSize;
-
-    bool                        m_bOverrideSunColor;
-    unsigned char               m_ucSunCoreR, m_ucSunCoreG, m_ucSunCoreB, m_ucSunCoronaR, m_ucSunCoronaG, m_ucSunCoronaB;
-
-    bool                        m_bOverrideWindVelocity;
-    float                       m_fWindVelX, m_fWindVelY, m_fWindVelZ;
-
-    bool                        m_bOverrideFarClip;
-    float                       m_fFarClipDistance;
-
-    bool                        m_bOverrideFogDistance;
-    float                       m_fFogDistance;
 
     bool                        m_bGarageStates[MAX_GARAGES];
 

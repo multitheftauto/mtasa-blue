@@ -73,6 +73,7 @@ public:
 
     virtual VOID            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false, bool bHighPriority = false ) = 0;
     virtual VOID            Remove                  () = 0;
+    virtual VOID            LoadAllRequestedModels  () = 0;
     virtual BYTE            GetLevelFromPosition    ( CVector * vecPosition ) = 0;
     virtual BOOL            IsLoaded                () = 0;
     virtual BYTE            GetFlags                () = 0;

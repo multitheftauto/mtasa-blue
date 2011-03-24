@@ -649,7 +649,7 @@ bool CWaterManagerSA::GetWaterLevel ( CVector& vecPosition, float* pfLevel, bool
         ( vecPosition.fX, vecPosition.fY, vecPosition.fZ, pfLevel, bCheckWaves, pvecUnknown );
 }
 
-bool CWaterManagerSA::SetWaterLevel ( CVector* pvecPosition, float fLevel, void* pChangeSource, bool bSkipCustom )
+bool CWaterManagerSA::SetWaterLevel ( CVector* pvecPosition, float fLevel, void* pChangeSource )
 {
     if ( pvecPosition )
     {
@@ -666,11 +666,6 @@ bool CWaterManagerSA::SetWaterLevel ( CVector* pvecPosition, float fLevel, void*
         CVector vecVertexPos;
         for ( DWORD i = 0; i < *(DWORD *)VAR_NumWaterVertices; i++ )
         {
-            WORD wID = m_Vertices [ i ].GetID();
-            if ( wID >= NUM_DefWaterVertices && bSkipCustom )
-                continue;
-                
-          
             m_Vertices [ i ].GetPosition ( vecVertexPos );
             vecVertexPos.fZ = fLevel;
             m_Vertices [ i ].SetPosition ( vecVertexPos, pChangeSource );

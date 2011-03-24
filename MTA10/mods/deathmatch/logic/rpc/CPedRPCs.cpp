@@ -40,16 +40,18 @@ void CPedRPCs::LoadFunctions ( void )
 }
 
 
-void CPedRPCs::SetPedArmor ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedArmor ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     unsigned char ucArmor;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( ucArmor ) &&
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( ucArmor ) &&
          bitStream.Read ( ucTimeContext ) )
     {
         float fArmor = static_cast < float > ( ucArmor ) / 1.25f;
 
-        CClientPed* pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
             pPed->SetSyncTimeContext ( ucTimeContext );
@@ -59,14 +61,16 @@ void CPedRPCs::SetPedArmor ( CClientEntity* pSource, NetBitStreamInterface& bitS
 }
 
 
-void CPedRPCs::SetPedRotation ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedRotation ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     SPedRotationSync rotation;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( &rotation ) &&
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &rotation ) &&
          bitStream.Read ( ucTimeContext ) )
     {
-        CClientPed* pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
             pPed->SetCurrentRotation ( rotation.data.fRotation );
@@ -78,32 +82,41 @@ void CPedRPCs::SetPedRotation ( CClientEntity* pSource, NetBitStreamInterface& b
 }
 
 
-void CPedRPCs::GivePedJetPack ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::GivePedJetPack ( NetBitStreamInterface& bitStream )
 {
-    CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
-    if ( pPed )
+    ElementID ID;
+    if ( bitStream.ReadCompressed ( ID ) )
     {
-        pPed->SetHasJetPack ( true );
+        CClientPed * pPed = m_pPedManager->Get ( ID, true );
+        if ( pPed )
+        {
+            pPed->SetHasJetPack ( true );
+        }
     }
 }
 
 
-void CPedRPCs::RemovePedJetPack ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::RemovePedJetPack ( NetBitStreamInterface& bitStream )
 {
-    CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
-    if ( pPed )
+    ElementID ID;
+    if ( bitStream.ReadCompressed ( ID ) )
     {
-        pPed->SetHasJetPack ( false );
+        CClientPed * pPed = m_pPedManager->Get ( ID, true );
+        if ( pPed )
+        {
+            pPed->SetHasJetPack ( false );
+        }
     }
 }
 
 
-void CPedRPCs::RemovePedClothes ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::RemovePedClothes ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     unsigned char ucType;
-    if ( bitStream.Read ( ucType ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( ucType ) )
     {
-        CClientPed* pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
             CClientPlayerClothes* pClothes = pPed->GetClothes ();
@@ -116,12 +129,13 @@ void CPedRPCs::RemovePedClothes ( CClientEntity* pSource, NetBitStreamInterface&
 }
 
 
-void CPedRPCs::SetPedGravity ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedGravity ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     float fGravity;
-    if ( bitStream.Read ( fGravity ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( fGravity ) )
     {
-        CClientPed* pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
             if ( pPed->IsLocalPlayer () )
@@ -141,12 +155,13 @@ void CPedRPCs::SetPedGravity ( CClientEntity* pSource, NetBitStreamInterface& bi
 }
 
 
-void CPedRPCs::SetPedChoking ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedChoking ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     bool bChoking;
-    if ( bitStream.ReadBit ( bChoking ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadBit ( bChoking ) )
     {
-        CClientPed* pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
             pPed->SetChoking ( bChoking );
@@ -155,12 +170,13 @@ void CPedRPCs::SetPedChoking ( CClientEntity* pSource, NetBitStreamInterface& bi
 }
 
 
-void CPedRPCs::SetPedFightingStyle ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedFightingStyle ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     unsigned char ucStyle;
-    if ( bitStream.Read ( ucStyle ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.Read ( ucStyle ) )
     {
-        CClientPed* pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
             pPed->SetFightingStyle ( ( eFightingStyle ) ucStyle );
@@ -169,12 +185,13 @@ void CPedRPCs::SetPedFightingStyle ( CClientEntity* pSource, NetBitStreamInterfa
 }
 
 
-void CPedRPCs::SetPedMoveAnim ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedMoveAnim ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     unsigned int uiMoveAnim;
-    if ( bitStream.ReadCompressed ( uiMoveAnim ) )
+    if ( bitStream.ReadCompressed ( ID ) && bitStream.ReadCompressed ( uiMoveAnim ) )
     {
-        CClientPed* pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed* pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
             pPed->SetMoveAnim ( (eMoveAnim)uiMoveAnim );
@@ -183,18 +200,20 @@ void CPedRPCs::SetPedMoveAnim ( CClientEntity* pSource, NetBitStreamInterface& b
 }
 
 
-void CPedRPCs::WarpPedIntoVehicle ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::WarpPedIntoVehicle ( NetBitStreamInterface& bitStream )
 {
     // Read out the player and vehicle id
+    ElementID PedID;
     ElementID VehicleID;
     unsigned char ucSeat;
     unsigned char ucTimeContext;
-    if ( bitStream.ReadCompressed ( VehicleID ) &&
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadCompressed ( VehicleID ) &&
          bitStream.Read ( ucSeat ) &&
          bitStream.Read ( ucTimeContext ) )
     {
         // Grab the ped
-        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
             pPed->SetSyncTimeContext ( ucTimeContext );
@@ -239,63 +258,45 @@ void CPedRPCs::WarpPedIntoVehicle ( CClientEntity* pSource, NetBitStreamInterfac
 }
 
 
-void CPedRPCs::RemovePedFromVehicle ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::RemovePedFromVehicle ( NetBitStreamInterface& bitStream )
 {
     // Read out the player and vehicle id
+    ElementID PedID;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( ucTimeContext ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.Read ( ucTimeContext ) )
     {
         // Grab the ped
-        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
-            // Get the ped / player's occupied vehicle data before pulling it out
-            CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
+            pPed->SetSyncTimeContext ( ucTimeContext );
 
-            // Make sure the vehicle exists (otherwise warping into specific vehicles will crash)
-            if ( pVehicle )
+            // Remove the player from his vehicle
+            pPed->RemoveFromVehicle ();
+            pPed->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+            if ( pPed->m_bIsLocalPlayer )
             {
-                unsigned int uiSeat = pPed->GetOccupiedVehicleSeat();
-
-                pPed->SetSyncTimeContext ( ucTimeContext );
-
-                // Remove the player from his vehicle
-                pPed->RemoveFromVehicle ();
-                pPed->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
-                if ( pPed->m_bIsLocalPlayer )
-                {
-                    // Reset expectation of vehicle enter completion, in case we were removed while entering
-                    g_pClientGame->ResetVehicleInOut ();
-                }
-
-                // Call onClientPlayerVehicleExit
-                CLuaArguments Arguments;
-                Arguments.PushElement ( pVehicle ); // vehicle
-                Arguments.PushNumber ( uiSeat );    // seat
-                Arguments.PushBoolean ( false );    // jacker
-                pPed->CallEvent ( "onClientPlayerVehicleExit", Arguments, true );
-
-                // Call onClientVehicleExit
-                CLuaArguments Arguments2;
-                Arguments2.PushElement ( pPed );   // player
-                Arguments2.PushNumber ( uiSeat );  // seat
-                pVehicle->CallEvent ( "onClientVehicleExit", Arguments2, true );
+                // Reset expectation of vehicle enter completion, in case we were removed while entering
+                g_pClientGame->ResetVehicleInOut ();
             }
         }
     }
 }
 
 
-void CPedRPCs::SetPedDoingGangDriveby ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedDoingGangDriveby ( NetBitStreamInterface& bitStream )
 {
     // Read out the player and vehicle id
+    ElementID PedID;
     bool bDriveby;
     unsigned char ucTimeContext;
-    if ( bitStream.ReadBit ( bDriveby ) &&
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadBit ( bDriveby ) &&
          bitStream.Read ( ucTimeContext ) )
     {
         // Grab the ped
-        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
             pPed->SetSyncTimeContext ( ucTimeContext );
@@ -306,18 +307,20 @@ void CPedRPCs::SetPedDoingGangDriveby ( CClientEntity* pSource, NetBitStreamInte
 }
 
 
-void CPedRPCs::SetPedAnimation ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedAnimation ( NetBitStreamInterface& bitStream )
 {
     // Read out the player and vehicle id
+    ElementID PedID;   
     char szBlockName [ 64 ], szAnimName [ 64 ];
     unsigned char ucBlockSize, ucAnimSize;
     int iTime;
-    bool bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
+    bool bLoop, bUpdatePosition, bInterruptable;
 
-    if ( bitStream.Read ( ucBlockSize ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.Read ( ucBlockSize ) )
     {
         // Grab the ped
-        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
             if ( ucBlockSize > 0 )
@@ -330,15 +333,14 @@ void CPedRPCs::SetPedAnimation ( CClientEntity* pSource, NetBitStreamInterface& 
                          bitStream.Read ( iTime ) &&
                          bitStream.ReadBit ( bLoop ) &&
                          bitStream.ReadBit ( bUpdatePosition ) &&
-                         bitStream.ReadBit ( bInterruptable ) &&
-                         bitStream.ReadBit ( bFreezeLastFrame ) )
+                         bitStream.ReadBit ( bInterruptable ) )
                     {
                         szAnimName [ ucAnimSize ] = 0;
 
                         CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
                         if ( pBlock )
                         {
-                            pPed->RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
+                            pPed->RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
                         }
                     }
                 }
@@ -352,14 +354,16 @@ void CPedRPCs::SetPedAnimation ( CClientEntity* pSource, NetBitStreamInterface& 
 }
 
 
-void CPedRPCs::SetPedOnFire ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedOnFire ( NetBitStreamInterface& bitStream )
 {
+    ElementID PedID;
     bool bIsOnFire;
 
-    if ( bitStream.ReadBit ( bIsOnFire ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadBit ( bIsOnFire ) )
     {
         // Grab the ped
-        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
             pPed->SetOnFire( bIsOnFire );
@@ -368,14 +372,16 @@ void CPedRPCs::SetPedOnFire ( CClientEntity* pSource, NetBitStreamInterface& bit
 }
 
 
-void CPedRPCs::SetPedHeadless ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedHeadless ( NetBitStreamInterface& bitStream )
 {
+    ElementID PedID;
     bool bIsHeadless;
 
-    if ( bitStream.ReadBit ( bIsHeadless ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadBit ( bIsHeadless ) )
     {
         // Grab the ped
-        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
             pPed->SetHeadless ( bIsHeadless );
@@ -384,14 +390,16 @@ void CPedRPCs::SetPedHeadless ( CClientEntity* pSource, NetBitStreamInterface& b
 }
 
 
-void CPedRPCs::SetPedFrozen ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::SetPedFrozen ( NetBitStreamInterface& bitStream )
 {
+    ElementID PedID;
     bool bIsFrozen = 0;
 
-    if ( bitStream.ReadBit ( bIsFrozen ) )
+    if ( bitStream.ReadCompressed ( PedID ) &&
+         bitStream.ReadBit ( bIsFrozen ) )
     {
         // Grab the ped
-        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed * pPed = m_pPedManager->Get ( PedID, true );
         if ( pPed )
         {
             pPed->SetFrozen ( bIsFrozen );
@@ -400,11 +408,15 @@ void CPedRPCs::SetPedFrozen ( CClientEntity* pSource, NetBitStreamInterface& bit
 }
 
 
-void CPedRPCs::ReloadPedWeapon ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPedRPCs::ReloadPedWeapon ( NetBitStreamInterface& bitStream )
 {
-    CClientPed* pPed = m_pPedManager->Get ( pSource->GetID (), true );
-    if ( pPed )
+    ElementID ID;
+    if ( bitStream.ReadCompressed ( ID ) )
     {
-        pPed->ReloadWeapon ();            
+        CClientPed* pPed = m_pPedManager->Get ( ID, true );
+        if ( pPed )
+        {
+            pPed->ReloadWeapon ();            
+        }
     }
 }

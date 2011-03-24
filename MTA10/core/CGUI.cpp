@@ -23,8 +23,6 @@ template<> CLocalGUI * CSingleton < CLocalGUI >::m_pSingleton = NULL;
 #endif
 #define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
 
-const char* DEFAULT_SKIN_NAME = "Default"; // TODO: Change to whatever the default skin is if it changes
-
 CLocalGUI::CLocalGUI ( void )
 {
     m_pConsole = NULL;
@@ -42,8 +40,6 @@ CLocalGUI::CLocalGUI ( void )
     m_iVisibleWindows = 0;
 
     m_pVersionUpdater = GetVersionUpdater ();
-
-    m_LastSettingsRevision = -1;
 }
 
 
@@ -55,52 +51,8 @@ CLocalGUI::~CLocalGUI ( void )
     //delete m_pVersionUpdater;
 }
 
-void CLocalGUI::SetSkin( const char* szName )
-{
-    bool guiWasLoaded = m_pMainMenu != NULL;
-    if(guiWasLoaded)
-        DestroyWindows();
 
-    std::string error;
-
-    CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
-
-    try 
-    {
-        pGUI->SetSkin(szName);
-        m_LastSkinName = szName;
-    }
-    catch (...)
-    {
-        try
-        {
-            pGUI->SetSkin(DEFAULT_SKIN_NAME);
-
-            error = "The skin '" + std::string(szName) + "' that you have selected could not be loaded. MTA is now using the default skin instead.";
-            
-            CVARS_SET("current_skin", std::string(DEFAULT_SKIN_NAME));    
-            m_LastSkinName = DEFAULT_SKIN_NAME;
-        }
-        catch(...)
-        {
-            // Even the default skin doesn't work, so give up
-            MessageBox ( 0, "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA.", "Error", MB_OK );
-            TerminateProcess ( GetCurrentProcess (), 9 );
-        }
-    }
-
-    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
-    m_LastSettingsRevision = cvars->GetRevision();
-
-    if(guiWasLoaded)
-        CreateWindows(guiWasLoaded);
-
-    if(CCore::GetSingleton().GetConsole() && !error.empty())
-        CCore::GetSingleton().GetConsole()->Echo(error.c_str());
-
-}
-
-void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
+void CLocalGUI::CreateWindows ( void )
 {
     CFilePathTranslator     FileTranslator;
     string                  WorkingDirectory;
@@ -135,7 +87,7 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
 
     // Create mainmenu
     m_pMainMenu = new CMainMenu ( pGUI );
-    m_pMainMenu->SetVisible ( bGameIsAlreadyLoaded, !bGameIsAlreadyLoaded, false );
+    m_pMainMenu->SetVisible ( false );
 
     // Create console
     m_pConsole = new CConsole ( pGUI );
@@ -159,18 +111,6 @@ void CLocalGUI::CreateObjects ( IUnknown* pDevice )
 
     // Store the GUI manager pointer and create the GUI classes
     CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
-
-    // Set the CEGUI skin to whatever the user has selected
-    SString currentSkinName;
-    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
-    cvars->Get("current_skin", currentSkinName);
-    if(currentSkinName.empty())
-    {
-        currentSkinName = DEFAULT_SKIN_NAME; 
-        CVARS_SET("current_skin", currentSkinName);
-    }
-
-    SetSkin(currentSkinName);
 
     // Set the current directory.
     FileTranslator.SetCurrentWorkingDirectory ( "MTA" );
@@ -202,7 +142,7 @@ void CLocalGUI::CreateObjects ( IUnknown* pDevice )
         WriteDebugEvent ( "Font data load failure!" );
     }
 
-    CreateWindows ( false );
+    CreateWindows ();
 
     // Return the old current dir.
     SetCurrentDirectory ( szCurDir );
@@ -239,26 +179,6 @@ void CLocalGUI::DoPulse ( void )
 {
     m_CommunityRegistration.DoPulse ();
     m_pVersionUpdater->DoPulse ();
-
-    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
-    if(cvars->GetRevision() != m_LastSettingsRevision)
-    {
-        m_LastSettingsRevision = cvars->GetRevision();
-
-        SString currentSkinName;
-        cvars->Get("current_skin", currentSkinName);
-
-        if(currentSkinName != m_LastSkinName)
-        {
-            if ( !CCore::GetSingleton ().GetModManager()->IsLoaded() )
-                SetSkin(currentSkinName);
-            else
-            {
-                CCore::GetSingleton ().GetConsole()->Printf ( "Please disconnect before changing skin" );
-                cvars->Set("current_skin", m_LastSkinName );
-            }
-        }
-    }
 }
 
 

@@ -38,7 +38,6 @@ typedef bool ( ProcessCamHandler ) ( class CCam* pCam );
 typedef void ( DrawRadarAreasHandler ) ( void );
 typedef void ( Render3DStuffHandler ) ( void );
 typedef bool ( ChokingHandler ) ( unsigned char ucWeaponType );
-typedef void ( PreWorldProcessHandler ) ( void );
 typedef void ( PostWorldProcessHandler ) ( void );
 typedef void ( IdleHandler ) ( void );
 typedef void ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
@@ -105,6 +104,7 @@ public:
     virtual void                        HideRadar                   ( bool bHide ) = 0;
     virtual void                        SetCenterOfWorld            ( class CEntity * entity, class CVector * vecPosition, FLOAT fHeading ) = 0;
     virtual void                        DisablePadHandler           ( bool bDisabled ) = 0;
+    virtual void                        DisableHeatHazeEffect       ( bool bDisable ) = 0;
     virtual void                        DisableAllVehicleWeapons    ( bool bDisable ) = 0;
     virtual void                        DisableZoneNames            ( bool bDisabled ) = 0; // move to CHud
     virtual void                        DisableBirds                ( bool bDisabled ) = 0;
@@ -120,7 +120,6 @@ public:
     virtual void                        SetChokingHandler           ( ChokingHandler* pChokingHandler ) = 0;
     virtual void                        SetProjectileHandler        ( ProjectileHandler * pProjectileHandler ) = 0;
     virtual void                        SetProjectileStopHandler    ( ProjectileStopHandler * pProjectileHandler ) = 0;
-    virtual void                        SetPreWorldProcessHandler   ( PreWorldProcessHandler * pHandler ) = 0;
     virtual void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler ) = 0;
     virtual void                        SetIdleHandler              ( IdleHandler * pHandler ) = 0;
     virtual void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler ) = 0;
@@ -129,42 +128,15 @@ public:
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;
-    virtual bool                        HasSkyColor                 () = 0;
-    virtual void                        GetSkyColor                 ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue ) = 0;
     virtual void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue ) = 0;
     virtual void                        ResetSky                    () = 0;
-    virtual void                        SetHeatHaze                 ( const SHeatHazeSettings& settings ) = 0;
-    virtual void                        GetHeatHaze                 ( SHeatHazeSettings& settings ) = 0;
-    virtual void                        ResetHeatHaze               ( void ) = 0;
-    virtual bool                        HasWaterColor               () = 0;
-    virtual void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha ) = 0;
     virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;
     virtual void                        ResetWater                  ( void ) = 0;
     virtual void                        SetCloudsEnabled            ( bool bDisabled ) = 0;
-    virtual bool                        AreInteriorSoundsEnabled    () = 0;
-    virtual void                        SetInteriorSoundsEnabled    ( bool bEnabled ) = 0;
-    virtual void                        SetWindVelocity             ( float fX, float fY, float fZ ) = 0;
-    virtual void                        GetWindVelocity             ( float& fX, float& fY, float& fZ ) = 0;
-    virtual void                        RestoreWindVelocity         ( void ) = 0;
-    virtual void                        SetFarClipDistance          ( float fDistance ) = 0;
-    virtual float                       GetFarClipDistance          ( void ) = 0;
-    virtual void                        RestoreFarClipDistance      ( void ) = 0;
-    virtual void                        SetFogDistance              ( float fDistance ) = 0;
-    virtual float                       GetFogDistance              ( void ) = 0;
-    virtual void                        RestoreFogDistance          ( void ) = 0;
-    virtual void                        GetSunColor                 ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue ) = 0;
-    virtual void                        SetSunColor                 ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue ) = 0;
-    virtual void                        ResetSunColor               ( ) = 0;
-    virtual float                       GetSunSize                  ( ) = 0;
-    virtual void                        SetSunSize                  ( float fSize ) = 0;
-    virtual void                        ResetSunSize                ( ) = 0;
-
     virtual void                        DisableEnterExitVehicleKey  ( bool bDisabled ) = 0;
 
     virtual void                        SetNightVisionEnabled       ( bool bEnabled ) = 0;
     virtual void                        SetThermalVisionEnabled     ( bool bEnabled ) = 0;
-    virtual bool                        IsNightVisionEnabled        ( ) = 0;
-    virtual bool                        IsThermalVisionEnabled      ( ) = 0;
 
     virtual void                        RebuildMultiplayerPlayer    ( class CPed * player ) = 0;
 
@@ -193,12 +165,6 @@ public:
 
     virtual float                       GetLocalPlayerGravity       () = 0;
     virtual void                        SetLocalPlayerGravity       ( float fGravity ) = 0;
-
-    virtual unsigned char               GetTrafficLightState        () = 0;
-    virtual void                        SetTrafficLightState        ( unsigned char ucState ) = 0;
-
-    virtual bool                        GetTrafficLightsLocked      () = 0;
-    virtual void                        SetTrafficLightsLocked      ( bool bLocked ) = 0;
 
     virtual void                        SetLocalStatValue           ( unsigned short usStat, float fValue ) = 0;
     virtual void                        SetLocalStatsStatic         ( bool bStatic ) = 0;

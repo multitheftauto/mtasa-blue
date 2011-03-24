@@ -33,7 +33,7 @@ class CServerImpl;
 #include "CThreadCommandQueue.h"
 
 #ifndef WIN32
-#include <ncursesw/curses.h>
+#include <curses.h>
 #endif
 
 #define SERVER_RESET_RETURN 500
@@ -101,7 +101,7 @@ private:
     bool                m_bRequestedQuit;
     bool                m_bRequestedReset;
 
-    wchar_t             m_szInputBuffer[255];
+    char                m_szInputBuffer[255];
     unsigned int        m_uiInputCount;
     
     char                m_szTag[80];

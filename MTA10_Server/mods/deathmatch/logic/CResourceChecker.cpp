@@ -296,34 +296,6 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
 {
     map < string, long > doneWarningMap;
     long lLineNumber = 1;
-    bool bUTF8 = false;
-
-    // Check if this is a UTF-8 script
-    if ( strLuaSource.length() > 2 )
-    {
-        if ( strLuaSource.at(0) == -0x11 && strLuaSource.at(1) == -0x45 && strLuaSource.at(2) == -0x41 )
-            bUTF8 = true;
-    }
-
-    // If it's not a UTF8 script, does it contain foreign language characters that should be upgraded?
-    if ( !bUTF8 )
-    {
-        std::string strUTFScript = ConvertToANSI(TranslateToUTF8( strLuaSource ));
-        if ( strLuaSource.length () != strUTFScript.size() )
-        {
-            // In-place upgrade...
-            if ( strMode == "Upgrade" )
-            {
-                // Convert our script to ANSI, appending a BOM at the beginning
-                strLuaSource = "\xEF\xBB\xBF" + strUTFScript;
-            }
-            if ( strMode == "Warnings" )
-            {
-                m_ulDeprecatedWarningCount++;
-                CLogger::LogPrintf ( "WARNING: %s [%s] is encoded in ANSI instead of UTF-8.  Please convert your file to UTF-8.\n", strFileName.c_str (), bClientScript ? "Client" : "Server" );
-            }
-        }
-    }
 
     // Step through each identifier in the file.
     for ( long lPos = 0 ; lPos < (long)strLuaSource.length () ; lPos++ )
@@ -606,12 +578,6 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashClient["xmlNodeGetSubNodes"]        = "Replaced|xmlNodeGetChildren";
         hashClient["xmlNodeFindSubNode"]        = "Replaced|xmlFindChild";
         hashClient["xmlCreateSubNode"]          = "Replaced|xmlCreateChild";
-        hashClient["isPedFrozen"]               = "Replaced|isElementFrozen";
-        hashClient["isVehicleFrozen"]           = "Replaced|isElementFrozen";
-        hashClient["isObjectStatic"]            = "Replaced|isElementFrozen";
-        hashClient["setPedFrozen"]              = "Replaced|setElementFrozen";
-        hashClient["setVehicleFrozen"]          = "Replaced|setElementFrozen";
-        hashClient["setObjectStatic"]           = "Replaced|setElementFrozen";
 
         // Client functions. (from the wiki but missing in the code)
         // Camera
@@ -685,11 +651,6 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashServer["xmlCreateSubNode"]          = "Replaced|xmlCreateChild";
         hashServer["xmlFindSubNode"]            = "Replaced|xmlFindChild";
 
-        hashClient["isPedFrozen"]               = "Replaced|isElementFrozen";
-        hashClient["isVehicleFrozen"]           = "Replaced|isElementFrozen";
-        hashClient["setPedFrozen"]              = "Replaced|setElementFrozen";
-        hashClient["setVehicleFrozen"]          = "Replaced|setElementFrozen";
-
         // Server functions. (from the wiki but missing/not clear in the code)
         // Camera
         hashServer["getCameraPosition"]         = "Replaced|getCameraMatrix";
@@ -720,10 +681,6 @@ bool CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunction
         hashServer["unbanIP"]                   = "Removed|Please manually update this.  Refer to the wiki for details";
         hashServer["unbanSerial"]               = "Removed|Please manually update this.  Refer to the wiki for details";
         hashServer["getBansXML"]                = "Removed|Please manually update this.  Refer to the wiki for details";
-
-        // Weapon
-        hashServer["giveWeaponAmmo"]            = "Replaced|giveWeapon";
-        hashServer["takeWeaponAmmo"]            = "Replaced|takeWeapon";
     }
 
     // Which hash?

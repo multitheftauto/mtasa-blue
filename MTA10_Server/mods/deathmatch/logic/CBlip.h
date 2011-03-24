@@ -44,7 +44,7 @@ public:
     unsigned char               m_ucIcon;
     SColor                      m_Color;
     short                       m_sOrdering;
-    unsigned short              m_usVisibleDistance;
+    float                       m_fVisibleDistance;
 };
 
 #endif

@@ -155,14 +155,6 @@ void PostContextSwitch ( void )
         // 006AEA26   E9 60010000      JMP gta_sa.006AEB8B
         MemPut < BYTE > ( 0x6AEA25, 0x0F );  //         *(BYTE *)0x6AEA25 = 0x0F;
         MemPut < BYTE > ( 0x6AEA26, 0x85 );  //         *(BYTE *)0x6AEA26 = 0x85;
-
-        // Same for firetrucks and SWATs
-        // 00729B96   0F85 75010000    JNZ gta_sa.00729D11
-        // ^
-        // 00729B96   90               NOP
-        // 00729B97   E9 75010000      JMP gta_sa.00729D11
-        MemPut < BYTE > ( 0x729B96, 0x0F );  //         *(BYTE *)0x729B96 = 0x0F;
-        MemPut < BYTE > ( 0x729B97, 0x85 );  //         *(BYTE *)0x729B97 = 0x85;
         
         // Prevent the game making remote players vehicle's audio behave like locals (and deleting 
         // radio etc when they are removed) - issue #95
@@ -472,14 +464,6 @@ void SwitchContext ( CVehicle* pVehicle )
             // 006AEA26   E9 60010000      JMP gta_sa.006AEB8B
             MemPut < BYTE > ( 0x6AEA25, 0x90 );  //             *(BYTE *)0x6AEA25 = 0x90;
             MemPut < BYTE > ( 0x6AEA26, 0xE9 );  //             *(BYTE *)0x6AEA26 = 0xE9;
-
-            // Same for firetrucks and SWATs
-            // 00729B96   0F85 75010000    JNZ gta_sa.00729D11
-            // V
-            // 00729B96   90               NOP
-            // 00729B97   E9 75010000      JMP gta_sa.00729D11
-            MemPut < BYTE > ( 0x729B96, 0x90 );  //             *(BYTE *)0x729B96 = 0x90;
-            MemPut < BYTE > ( 0x729B97, 0xE9 );  //             *(BYTE *)0x729B97 = 0xE9;
 
             bRadioHackInstalled = TRUE;
         }

@@ -66,8 +66,12 @@ CGUILabel_Impl::~CGUILabel_Impl ( void )
 
 void CGUILabel_Impl::SetText ( const char *Text )
 {
+    CEGUI::String strText;
+
+    if ( Text ) strText.assign ( Text );
+
     // Set the new text and size the text field after it
-    m_pWindow->setText ( CGUI_Impl::GetUTFString(Text) );
+    m_pWindow->setText ( strText );
 }
 
 

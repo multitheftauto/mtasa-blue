@@ -19,17 +19,21 @@ void CWeaponRPCs::LoadFunctions ( void )
     AddHandler ( GIVE_WEAPON, GiveWeapon, "GiveWeapon" );
     AddHandler ( TAKE_WEAPON, TakeWeapon, "TakeWeapon" );
     AddHandler ( TAKE_ALL_WEAPONS, TakeAllWeapons, "TakeAllWeapons" );
+    AddHandler ( GIVE_WEAPON_AMMO, GiveWeaponAmmo, "GiveWeaponAmmo" );
+    AddHandler ( TAKE_WEAPON_AMMO, TakeWeaponAmmo, "TakeWeaponAmmo" );
     AddHandler ( SET_WEAPON_AMMO, SetWeaponAmmo, "SetWeaponAmmo" );
     AddHandler ( SET_WEAPON_SLOT, SetWeaponSlot, "SetWeaponSlot" );
 }
 
 
-void CWeaponRPCs::GiveWeapon ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CWeaponRPCs::GiveWeapon ( NetBitStreamInterface& bitStream )
 {
     // Read out weapon id and ammo amount
+    ElementID ID;
     SWeaponTypeSync weaponType;
 
-    if ( bitStream.Read ( &weaponType ) )
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &weaponType ) )
     {
         SWeaponAmmoSync ammo ( weaponType.data.ucWeaponType, true, false );
         if ( bitStream.Read ( &ammo ) )
@@ -38,7 +42,7 @@ void CWeaponRPCs::GiveWeapon ( CClientEntity* pSource, NetBitStreamInterface& bi
             unsigned char ucWeaponID = weaponType.data.ucWeaponType;
             unsigned short usAmmo = ammo.data.usTotalAmmo;
 
-            CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+            CClientPed * pPed = m_pPedManager->Get ( ID, true );
             if ( pPed )
             {
                 // Don't change remote players weapons (affects sync)
@@ -112,56 +116,28 @@ void CWeaponRPCs::GiveWeapon ( CClientEntity* pSource, NetBitStreamInterface& bi
 }
 
 
-void CWeaponRPCs::TakeWeapon ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CWeaponRPCs::TakeWeapon ( NetBitStreamInterface& bitStream )
 {
     // Read out weapon id and ammo amount
+    ElementID ID;
     SWeaponTypeSync weaponType;
 
-    if ( bitStream.Read ( &weaponType )  )
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &weaponType )  )
     {
         unsigned char ucWeaponID = weaponType.data.ucWeaponType;
 
-        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed * pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
-            // Is the weapon id valid? (may not be neccessary, just being safe)
-            if ( CClientPickupManager::IsValidWeaponID ( ucWeaponID ) )
+            // Don't change remote players weapons (affects sync)
+            if ( pPed->GetType () == CCLIENTPED || ( CClientPlayer * ) pPed == m_pPlayerManager->GetLocalPlayer () )
             {
-                // Have we ammo in packet? If so, we need to take the ammo, not weapon
-                SWeaponAmmoSync ammo ( ucWeaponID, true, false );
-                if ( bitStream.Read ( &ammo ) )
+                // Is the weapon id valid? (may not be neccessary, just being safe)
+                if ( CClientPickupManager::IsValidWeaponID ( ucWeaponID ) )
                 {
-                    unsigned short usAmmo = ammo.data.usTotalAmmo;
-
-                    // Do we have the weapon?
-                    CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
-                    if ( pPlayerWeapon == NULL ) return;
-
-                    unsigned char ucAmmoInClip = static_cast < unsigned char > ( pPlayerWeapon->GetAmmoInClip () );
-                    pPlayerWeapon->SetAmmoInClip ( 0 );
-
-                    unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal ();
-                    if ( ulWeaponAmmo - usAmmo < 0 )
-                        ulWeaponAmmo = 0;
-                    else
-                        ulWeaponAmmo -= usAmmo;
-
-                    // Update the ammo
-                    pPlayerWeapon->SetAmmoTotal ( ulWeaponAmmo );
-
-                    if ( pPlayerWeapon->GetAmmoTotal () > ucAmmoInClip )
-                        pPlayerWeapon->SetAmmoInClip ( ucAmmoInClip );
-                    else if ( pPlayerWeapon->GetAmmoTotal () <= ucAmmoInClip )
-                        pPlayerWeapon->SetAmmoInClip ( pPlayerWeapon->GetAmmoTotal () );
-                }
-                else
-                {
-                    // Don't change remote players weapons (affects sync)
-                    if ( pPed->IsLocalPlayer () )
-                    {
-                        // Remove the weapon
-                        pPed->RemoveWeapon ( static_cast < eWeaponType > ( ucWeaponID ) );
-                    }
+                    // Remove the weapon
+                    pPed->RemoveWeapon ( static_cast < eWeaponType > ( ucWeaponID ) );
                 }
             }
         }
@@ -169,24 +145,113 @@ void CWeaponRPCs::TakeWeapon ( CClientEntity* pSource, NetBitStreamInterface& bi
 }
 
 
-void CWeaponRPCs::TakeAllWeapons ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CWeaponRPCs::TakeAllWeapons ( NetBitStreamInterface& bitStream )
 {
-    CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
-    if ( pPed )
+    ElementID ID;
+    if ( bitStream.ReadCompressed ( ID ) )
     {
-        // Remove all our weapons
-        pPed->RemoveAllWeapons ();
+        CClientPed * pPed = m_pPedManager->Get ( ID, true );
+        if ( pPed )
+        {
+            // Remove all our weapons
+            pPed->RemoveAllWeapons ();
+        }
     }
 }
 
 
-void CWeaponRPCs::SetWeaponSlot ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CWeaponRPCs::GiveWeaponAmmo ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
+    SWeaponTypeSync weaponType;
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &weaponType ) )
+    {
+        unsigned char ucWeaponID = weaponType.data.ucWeaponType;
+        SWeaponAmmoSync ammo ( ucWeaponID, true, false );
+        if ( bitStream.Read ( &ammo ) )
+        {
+            unsigned short usAmmo = ammo.data.usTotalAmmo;
+            CClientPed * pPed = m_pPedManager->Get ( ID, true );
+            if ( pPed )
+            {
+                // Valid weapon id?
+                if ( !CClientPickupManager::IsValidWeaponID ( ucWeaponID ) ) return;
+
+                // Do we have it?
+                CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
+                if ( pPlayerWeapon == NULL ) return;
+
+                unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal ();
+                ulWeaponAmmo += usAmmo;
+                // Adjust the ammo to 9999 if it's above
+                if ( ulWeaponAmmo > 9999 )
+                {
+                    ulWeaponAmmo = 9999;
+                }
+
+                // Add the weapon ammo
+                pPlayerWeapon->SetAmmoTotal ( ulWeaponAmmo );
+            }
+        }
+    }
+}
+
+
+void CWeaponRPCs::TakeWeaponAmmo ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    SWeaponTypeSync weaponType;
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &weaponType ) )
+    {
+        unsigned char ucWeaponID = weaponType.data.ucWeaponType;
+        SWeaponAmmoSync ammo ( ucWeaponID, true, false );
+        if ( bitStream.Read ( &ammo ) )
+        {
+            unsigned short usAmmo = ammo.data.usTotalAmmo;
+
+            CClientPed * pPed = m_pPedManager->Get ( ID, true );
+            if ( pPed )
+            {
+                // Valid weapon id?
+                if ( !CClientPickupManager::IsValidWeaponID ( ucWeaponID ) ) return;
+
+                // Do we have it?
+                CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
+                if ( pPlayerWeapon == NULL ) return;
+
+                unsigned char ucAmmoInClip = static_cast < unsigned char > ( pPlayerWeapon->GetAmmoInClip () );
+                pPlayerWeapon->SetAmmoInClip ( 0 );
+
+                unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal ();
+                if ( ulWeaponAmmo - usAmmo < 0 )
+                    ulWeaponAmmo = 0;
+                else
+                    ulWeaponAmmo -= usAmmo;
+
+                // Remove the weapon ammo
+                pPlayerWeapon->SetAmmoTotal ( ulWeaponAmmo );
+
+                if ( pPlayerWeapon->GetAmmoTotal () > ucAmmoInClip )
+                    pPlayerWeapon->SetAmmoInClip ( ucAmmoInClip );
+                else if ( pPlayerWeapon->GetAmmoTotal () <= ucAmmoInClip )
+                    pPlayerWeapon->SetAmmoInClip ( pPlayerWeapon->GetAmmoTotal () );
+            }
+        }
+    }
+}
+
+
+void CWeaponRPCs::SetWeaponSlot ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
     SWeaponSlotSync slot;
 
-    if ( bitStream.Read ( &slot ) )
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &slot ) )
     {
-        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        CClientPed * pPed = m_pPedManager->Get ( ID, true );
         if ( pPed )
         {
             pPed->SetCurrentWeaponSlot ( (eWeaponSlot) slot.data.uiSlot );
@@ -195,10 +260,12 @@ void CWeaponRPCs::SetWeaponSlot ( CClientEntity* pSource, NetBitStreamInterface&
 }
 
 
-void CWeaponRPCs::SetWeaponAmmo ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CWeaponRPCs::SetWeaponAmmo ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     SWeaponTypeSync weaponType;
-    if ( bitStream.Read ( &weaponType ) )
+    if ( bitStream.ReadCompressed ( ID ) &&
+         bitStream.Read ( &weaponType ) )
     {
         unsigned char ucWeaponID = weaponType.data.ucWeaponType;
         SWeaponAmmoSync ammo ( ucWeaponID, true, true );
@@ -208,7 +275,7 @@ void CWeaponRPCs::SetWeaponAmmo ( CClientEntity* pSource, NetBitStreamInterface&
             unsigned short usAmmo = ammo.data.usTotalAmmo;
             unsigned short usAmmoInClip = ammo.data.usAmmoInClip;
 
-            CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+            CClientPed * pPed = m_pPedManager->Get ( ID, true );
             if ( pPed )
             {
                 // Valid weapon id?

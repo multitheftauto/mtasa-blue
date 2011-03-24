@@ -140,7 +140,7 @@ void SString::Split ( const SString& strDelim, std::vector < SString >& outResul
     }
 
     while ( outResult.size () < uiMinAmount )
-        outResult.push_back ( "" );        
+        outResult.push_back ( "" );
 }
 
 //

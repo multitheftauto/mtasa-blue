@@ -22,39 +22,45 @@ void CHandlingRPCs::LoadFunctions ( void )
 }
 
 
-void CHandlingRPCs::HandlingAddDefault ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CHandlingRPCs::HandlingAddDefault ( NetBitStreamInterface& bitStream )
 {
     // Read out handling id and vehicle type
+    ElementID ID;
     unsigned char ucVehicleType;
-    if ( bitStream.Read ( ucVehicleType ) )
+    if ( bitStream.Read ( ID ) && 
+         bitStream.Read ( ucVehicleType ) )
     {
         // Calculate vehicle ID
         eVehicleTypes eModel = static_cast < eVehicleTypes > ( ucVehicleType + 400 );
 
         // Grab it and check its type
-        if ( pSource->GetType () == CCLIENTHANDLING )
+        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
+        if ( pEntity && pEntity->GetType () == CCLIENTHANDLING )
         {
             // Make it as default for all of the given vehicle id's
-            static_cast < CClientHandling* > ( pSource ) ->AddDefaultTo ( eModel );
+            static_cast < CClientHandling* > ( pEntity ) ->AddDefaultTo ( eModel );
         }
     }
 }
 
 
-void CHandlingRPCs::HandlingRemoveDefault ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CHandlingRPCs::HandlingRemoveDefault ( NetBitStreamInterface& bitStream )
 {
     // Read out handling id and vehicle type
+    ElementID ID;
     unsigned char ucVehicleType;
-    if ( bitStream.Read ( ucVehicleType ) )
+    if ( bitStream.Read ( ID ) && 
+         bitStream.Read ( ucVehicleType ) )
     {
         // Calculate vehicle ID
         eVehicleTypes eModel = static_cast < eVehicleTypes > ( ucVehicleType + 400 );
 
         // Grab it and check its type
-        if ( pSource->GetType () == CCLIENTHANDLING )
+        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
+        if ( pEntity && pEntity->GetType () == CCLIENTHANDLING )
         {
             // Make it as default for all of the given vehicle id's
-            static_cast < CClientHandling* > ( pSource ) ->RemoveDefaultTo ( eModel );
+            static_cast < CClientHandling* > ( pEntity ) ->RemoveDefaultTo ( eModel );
         }
     }
 }
@@ -98,17 +104,20 @@ enum eHandlingProperty
 };
 
 
-void CHandlingRPCs::HandlingSetProperty ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CHandlingRPCs::HandlingSetProperty ( NetBitStreamInterface& bitStream )
 {
-    // Read out the property id
+    // Read out the handling id and property id
+    ElementID ID;
     unsigned char ucProperty;
-    if ( bitStream.Read ( ucProperty ) )
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( ucProperty ) )
     {
         // Grab it and check its type
-        if ( pSource->GetType () == CCLIENTHANDLING )
+        CClientEntity* pEntity = CElementIDs::GetElement ( ID );
+        if ( pEntity && pEntity->GetType () == CCLIENTHANDLING )
         {
             // Grab the handling class
-            CClientHandling& HandlingElement = static_cast < CClientHandling& > ( *pSource );
+            CClientHandling& HandlingElement = static_cast < CClientHandling& > ( *pEntity );
             
             // Temporary storage for reading out data
             union

@@ -27,16 +27,7 @@ public:
     eCGUIType                   GetType                     ( void ) { return CGUI_COMBOBOX; };
 
     CGUIListItem*               AddItem                     ( const char* szText );
-    CGUIListItem*               AddItem                     ( CGUIStaticImage* pImage );
-    bool                        RemoveItem                  ( int index );
-    CGUIListItem*               GetItemByIndex              ( int index );
     CGUIListItem*               GetSelectedItem             ( void );
-    int                         GetSelectedItemIndex        ( void );
-    size_t                      GetItemCount                ( void );
-    int                         GetItemIndex                ( CGUIListItem* pItem );
-    const char*                 GetItemText                 ( int index );
-    bool                        SetItemText                 ( int index, const char* szText );
-    bool                        SetSelectedItemByIndex      ( int index );
     void                        Clear                       ( void );
 
     void                        SetReadOnly                 ( bool bReadonly );
@@ -51,7 +42,6 @@ protected:
 
     bool                                Event_OnSelectionAccepted  ( const CEGUI::EventArgs& e );
     CGUIListItem_Impl*                  GetListItem               ( CEGUI::ListboxItem* pItem );
-    CEGUI::String                       storedCaption;
     GUI_CALLBACK                        m_OnSelectChange;
 };
 

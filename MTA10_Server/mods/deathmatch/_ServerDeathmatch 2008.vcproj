@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Server - Deathmatch"
 	ProjectGUID="{DC99F9D4-7C17-4A36-9F21-CEE075E42292}"
 	RootNamespace="Server - Deathmatch"
@@ -54,7 +54,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;../../../vendor/sqlite;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -82,9 +82,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="false"
 				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.1\server/mods/deathmatch/deathmatch.dll"
+				OutputFile="C:\Program Files\MTA San Andreas\server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;../../../vendor/json-c/lib;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
@@ -157,7 +156,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;../../../vendor/sqlite;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -187,9 +186,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="false"
 				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib"
-				OutputFile="C:\Program Files\MTA San Andreas 1.1\server/mods/deathmatch/deathmatch_d.dll"
+				OutputFile="C:\Program Files\MTA San Andreas\server/mods/deathmatch/deathmatch_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="logic/lib;../../../vendor/lua/lib;../../../vendor/json-c/lib;../../../vendor/ehs/lib;../../../vendor/pme/lib;../../../vendor/pcre/lib;../../../vendor/pthreads/lib;../../../vendor/sqlite/lib;../../../vendor/zlib/lib"
@@ -262,7 +260,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;../../../vendor/sqlite;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows"
 				PreprocessorDefinitions="BUILD_NUMBER=$(BUILD_NUMBER);BUILD_CONFIG_$(BUILD_CONFIGURATION);WIN32;MTA_RELEASE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -290,7 +288,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="false"
 				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
 				OutputFile="../../../output/MTA San Andreas/server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
@@ -605,10 +602,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CObjectSync.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CPacketTranslator.cpp"
 					>
 				</File>
@@ -793,6 +786,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CVehicleColor.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CVehicleColorManager.cpp"
 					>
 				</File>
@@ -876,10 +873,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CElementRPCPacket.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CEntityAddPacket.cpp"
 						>
 					</File>
@@ -909,14 +902,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CMapInfoPacket.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CObjectStartSyncPacket.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CObjectSyncPacket.cpp"
 						>
 					</File>
 					<File
@@ -1169,7 +1154,7 @@
 				Name="utils"
 				>
 				<File
-					RelativePath="..\..\..\vendor\bob_withers\base64.cpp"
+					RelativePath=".\utils\base64.cpp"
 					>
 					<FileConfiguration
 						Name="Release|Win32"
@@ -1205,34 +1190,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.cpp"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Nightly|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath=".\utils\CTCPClientSocketImpl.cpp"
 					>
 				</File>
@@ -1244,7 +1201,7 @@
 					Name="zip"
 					>
 					<File
-						RelativePath="..\..\..\vendor\zip\ioapi.c"
+						RelativePath=".\utils\zip\crc32.cpp"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1272,7 +1229,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\..\vendor\zip\iowin32.c"
+						RelativePath=".\utils\zip\ioapi.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1300,7 +1257,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\..\vendor\zip\mztools.c"
+						RelativePath=".\utils\zip\iowin32.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1328,7 +1285,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\..\vendor\zip\unzip.c"
+						RelativePath=".\utils\zip\mztools.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1356,7 +1313,35 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\..\vendor\zip\zip.c"
+						RelativePath=".\utils\zip\unzip.c"
+						>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\utils\zip\zip.c"
 						>
 						<FileConfiguration
 							Name="Release|Win32"
@@ -1385,18 +1370,6 @@
 					</File>
 				</Filter>
 			</Filter>
-			<Filter
-				Name="shared"
-				>
-				<File
-					RelativePath="..\..\..\Shared\animation\CEasingCurve.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1407,7 +1380,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\vendor\zip\crypt.h"
+				RelativePath=".\utils\zip\crypt.h"
 				>
 			</File>
 			<File
@@ -1662,10 +1635,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CObjectSync.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CPacketTranslator.h"
 					>
 				</File>
@@ -1854,6 +1823,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CVehicleColor.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CVehicleColorManager.h"
 					>
 				</File>
@@ -1945,10 +1918,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\packets\CElementRPCPacket.h"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\packets\CEntityAddPacket.h"
 						>
 					</File>
@@ -1978,18 +1947,6 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CMapInfoPacket.h"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CObjectStartSyncPacket.h"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CObjectStopSyncPacket.h"
-						>
-					</File>
-					<File
-						RelativePath=".\logic\packets\CObjectSyncPacket.h"
 						>
 					</File>
 					<File
@@ -2274,7 +2231,7 @@
 				Name="utils"
 				>
 				<File
-					RelativePath="..\..\..\vendor\bob_withers\base64.h"
+					RelativePath=".\utils\base64.h"
 					>
 				</File>
 				<File
@@ -2286,10 +2243,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\vendor\bochs\bochs_internal\crc32.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\Shared\sdk\ieee754.h"
 					>
 				</File>
@@ -2297,42 +2250,30 @@
 					Name="zip"
 					>
 					<File
-						RelativePath="..\..\..\vendor\zip\ioapi.h"
+						RelativePath=".\utils\zip\crc32.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\vendor\zip\iowin32.h"
+						RelativePath=".\utils\zip\ioapi.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\vendor\zip\mztools.h"
+						RelativePath=".\utils\zip\iowin32.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\vendor\zip\unzip.h"
+						RelativePath=".\utils\zip\mztools.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\vendor\zip\zip.h"
+						RelativePath=".\utils\zip\unzip.h"
+						>
+					</File>
+					<File
+						RelativePath=".\utils\zip\zip.h"
 						>
 					</File>
 				</Filter>
-			</Filter>
-			<Filter
-				Name="shared"
-				>
-				<File
-					RelativePath="..\..\..\Shared\animation\CEasingCurve.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\Shared\animation\CPositionRotationAnimation.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\Shared\animation\TInterpolation.h"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter

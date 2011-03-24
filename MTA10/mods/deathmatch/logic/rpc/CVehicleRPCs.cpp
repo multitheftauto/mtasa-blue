@@ -44,8 +44,6 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_TRAIN_SPEED, SetTrainSpeed, "SetTrainSpeed" );
     AddHandler ( SET_TAXI_LIGHT_ON, SetVehicleTaxiLightOn, "SetVehicleTaxiLightOn" );
     AddHandler ( SET_VEHICLE_HEADLIGHT_COLOR, SetVehicleHeadLightColor, "SetVehicleHeadLightColor" );
-    AddHandler ( SET_VEHICLE_TURRET_POSITION, SetVehicleTurretPosition, "SetVehicleTurretPosition" );
-    AddHandler ( SET_VEHICLE_DOOR_OPEN_RATIO, SetVehicleDoorOpenRatio, "SetVehicleDoorOpenRatio" );
 }
 
 
@@ -55,14 +53,16 @@ void CVehicleRPCs::DestroyAllVehicles ( NetBitStreamInterface& bitStream )
 }
 
 
-void CVehicleRPCs::FixVehicle ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::FixVehicle ( NetBitStreamInterface& bitStream )
 {
     // Read out the vehicle id
+    ElementID ID;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( ucTimeContext ) )
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( ucTimeContext ) )
     {
         // Grab the vehicle
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             // Fix it
@@ -73,14 +73,18 @@ void CVehicleRPCs::FixVehicle ( CClientEntity* pSource, NetBitStreamInterface& b
 }
 
 
-void CVehicleRPCs::BlowVehicle ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::BlowVehicle ( NetBitStreamInterface& bitStream )
 {
     // Read out the vehicle id and whether to explode or not
+    ElementID ID;
+    unsigned char ucExplode;
     unsigned char ucTimeContext;
-    if ( bitStream.Read ( ucTimeContext ) )
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( ucExplode ) &&
+         bitStream.Read ( ucTimeContext ) )
     {
         // Grab the vehicle
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             // Blow it and change the time context
@@ -91,77 +95,92 @@ void CVehicleRPCs::BlowVehicle ( CClientEntity* pSource, NetBitStreamInterface& 
 }
 
 
-void CVehicleRPCs::SetVehicleRotation ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleRotation ( NetBitStreamInterface& bitStream )
 {
-    // Grab the vehicle
-    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
-    if ( pVehicle )
-    {
-        // Read out the rotation
-        CVector vecRotation;
-        unsigned char ucTimeContext;
-        if ( bitStream.Read ( vecRotation.fX ) &&
-             bitStream.Read ( vecRotation.fY ) &&
-             bitStream.Read ( vecRotation.fZ ) &&
-             bitStream.Read ( ucTimeContext ) )
-        {      
-            // Set the new rotation
-            pVehicle->SetRotationDegrees ( vecRotation );
-            pVehicle->SetSyncTimeContext ( ucTimeContext );
-        }
-    }
-}
-
-
-void CVehicleRPCs::SetVehicleTurnSpeed ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
-{
-    // Grab the vehicle
-    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
-    if ( pVehicle )
-    {
-        // Read out the turn speed
-        CVector vecTurnSpeed;
-        if ( bitStream.Read ( vecTurnSpeed.fX ) &&
-             bitStream.Read ( vecTurnSpeed.fY ) &&
-             bitStream.Read ( vecTurnSpeed.fZ ) )
-        {
-            // Set the new movespeed
-            pVehicle->SetTurnSpeed ( vecTurnSpeed );
-        }
-    }
-}
-
-
-void CVehicleRPCs::SetVehicleColor ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
-{
-    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
-    if ( pVehicle )
-    {
-        CVehicleColor vehColor;
-        uchar ucNumColors = 0;
-        bitStream.ReadBits ( &ucNumColors, 2 );
-        for ( uint i = 0 ; i <= ucNumColors ; i++ )
-        {
-            SColor RGBColor = 0;
-            bitStream.Read ( RGBColor.R );
-            bitStream.Read ( RGBColor.G );
-            bitStream.Read ( RGBColor.B );
-            vehColor.SetRGBColor ( i, RGBColor );
-        }
-
-        pVehicle->SetColor ( vehColor );
-    }
-}
-
-
-void CVehicleRPCs::SetVehicleLocked ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
-{
-    // Read out the stuff
-    unsigned char ucLocked;
-    if ( bitStream.Read ( ucLocked ) )
+    // Read out the vehicle id
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
     {
         // Grab the vehicle
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {
+            // Read out the rotation
+            CVector vecRotation;
+            unsigned char ucTimeContext;
+            if ( bitStream.Read ( vecRotation.fX ) &&
+                 bitStream.Read ( vecRotation.fY ) &&
+                 bitStream.Read ( vecRotation.fZ ) &&
+                 bitStream.Read ( ucTimeContext ) )
+            {      
+                // Set the new rotation
+                pVehicle->SetRotationDegrees ( vecRotation );
+                pVehicle->SetSyncTimeContext ( ucTimeContext );
+            }
+        }
+    }
+}
+
+
+void CVehicleRPCs::SetVehicleTurnSpeed ( NetBitStreamInterface& bitStream )
+{
+    // Read out the vehicle id
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
+    {
+        // Grab the vehicle
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {
+            // Read out the turn speed
+            CVector vecTurnSpeed;
+            if ( bitStream.Read ( vecTurnSpeed.fX ) &&
+                 bitStream.Read ( vecTurnSpeed.fY ) &&
+                 bitStream.Read ( vecTurnSpeed.fZ ) )
+            {
+                // Set the new movespeed
+                pVehicle->SetTurnSpeed ( vecTurnSpeed );
+            }
+        }
+    }
+}
+
+
+void CVehicleRPCs::SetVehicleColor ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    bitStream.Read ( ID );
+
+    CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+    if ( pVehicle )
+    {
+        unsigned char ucColor1;
+        bitStream.Read ( ucColor1 );
+
+        unsigned char ucColor2;
+        bitStream.Read ( ucColor2 );
+
+        unsigned char ucColor3;
+        bitStream.Read ( ucColor3 );
+
+        unsigned char ucColor4;
+        bitStream.Read ( ucColor4 );
+
+        pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
+    }
+}
+
+
+void CVehicleRPCs::SetVehicleLocked ( NetBitStreamInterface& bitStream )
+{
+    // Read out the stuff
+    ElementID ID;
+    unsigned char ucLocked;
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( ucLocked ) )
+    {
+        // Grab the vehicle
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             // Set its locked state
@@ -171,14 +190,16 @@ void CVehicleRPCs::SetVehicleLocked ( CClientEntity* pSource, NetBitStreamInterf
 }
 
 
-void CVehicleRPCs::SetVehicleDoorsUndamageable ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleDoorsUndamageable ( NetBitStreamInterface& bitStream )
 {
     // Read out the stuff
+    ElementID ID;
     unsigned char ucDoorsUndamageable;
-    if ( bitStream.Read ( ucDoorsUndamageable ) )
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( ucDoorsUndamageable ) )
     {
         // Grab the vehicle
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             // Set its doors undamageable state
@@ -188,9 +209,12 @@ void CVehicleRPCs::SetVehicleDoorsUndamageable ( CClientEntity* pSource, NetBitS
 }
 
 
-void CVehicleRPCs::SetVehicleSireneOn ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleSireneOn ( NetBitStreamInterface& bitStream )
 {
-    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+    ElementID ID = 0;
+    bitStream.Read ( ID );
+
+    CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
     if ( pVehicle )
     {
         unsigned char ucSirenesOn;
@@ -204,12 +228,13 @@ void CVehicleRPCs::SetVehicleSireneOn ( CClientEntity* pSource, NetBitStreamInte
     }
 }
 
-void CVehicleRPCs::SetVehicleTaxiLightOn ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleTaxiLightOn ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     unsigned char ucTaxiLightOn;
-    if ( bitStream.Read ( ucTaxiLightOn ) )
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucTaxiLightOn ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             pVehicle->SetTaxiLightOn ( ucTaxiLightOn != 0 );
@@ -217,9 +242,12 @@ void CVehicleRPCs::SetVehicleTaxiLightOn ( CClientEntity* pSource, NetBitStreamI
     }
 }
 
-void CVehicleRPCs::SetVehicleLandingGearDown ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleLandingGearDown ( NetBitStreamInterface& bitStream )
 {
-    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+    ElementID ID;
+    bitStream.Read ( ID );
+
+    CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
     if ( pVehicle )
     {
         unsigned char ucLandingGearDown;
@@ -234,9 +262,12 @@ void CVehicleRPCs::SetVehicleLandingGearDown ( CClientEntity* pSource, NetBitStr
 }
 
 
-void CVehicleRPCs::SetHelicopterRotorSpeed ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetHelicopterRotorSpeed ( NetBitStreamInterface& bitStream )
 {
-    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+    ElementID ID = 0;
+    bitStream.Read ( ID );
+
+    CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
     if ( pVehicle )
     {
         unsigned char ucRotorSpeed;
@@ -250,117 +281,134 @@ void CVehicleRPCs::SetHelicopterRotorSpeed ( CClientEntity* pSource, NetBitStrea
 }
 
 
-void CVehicleRPCs::AddVehicleUpgrade ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::AddVehicleUpgrade ( NetBitStreamInterface& bitStream )
 {
-    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
-    if ( pVehicle )
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
     {
-        unsigned short usUpgrade;
-        if ( bitStream.Read ( usUpgrade ) )
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
         {
+            unsigned short usUpgrade;
+            if ( bitStream.Read ( usUpgrade ) )
+            {
+                CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
+                if ( pUpgrades )
+                {
+                    pUpgrades->AddUpgrade ( usUpgrade );
+                }
+            }
+        }
+    }
+}
+
+
+void CVehicleRPCs::AddAllVehicleUpgrades ( NetBitStreamInterface& bitStream )
+{
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
+        {           
             CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
             if ( pUpgrades )
             {
-                pUpgrades->AddUpgrade ( usUpgrade );
+                pUpgrades->AddAllUpgrades ();
             }
         }
     }
 }
 
 
-void CVehicleRPCs::AddAllVehicleUpgrades ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::RemoveVehicleUpgrade ( NetBitStreamInterface& bitStream )
 {
-    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
-    if ( pVehicle )
-    {           
-        CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
-        if ( pUpgrades )
-        {
-            pUpgrades->AddAllUpgrades ();
-        }
-    }
-}
-
-
-void CVehicleRPCs::RemoveVehicleUpgrade ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
-{
-    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
-    if ( pVehicle )
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
     {
-        unsigned char ucUpgrade;
-        if ( bitStream.Read ( ucUpgrade ) )
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
         {
-            // Convert back and add
-            unsigned short usUpgrade = ( ucUpgrade + 1000 );
-
-            CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
-            if ( pUpgrades )
+            unsigned char ucUpgrade;
+            if ( bitStream.Read ( ucUpgrade ) )
             {
-                pUpgrades->RemoveUpgrade ( usUpgrade );
+                // Convert back and add
+                unsigned short usUpgrade = ( ucUpgrade + 1000 );
+
+                CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
+                if ( pUpgrades )
+                {
+                    pUpgrades->RemoveUpgrade ( usUpgrade );
+                }
             }
         }
     }
 }
 
 
-void CVehicleRPCs::SetVehicleDamageState ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleDamageState ( NetBitStreamInterface& bitStream )
 {
-    CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
-    if ( pVehicle )
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
     {
-        unsigned char ucObject;
-        if ( bitStream.Read ( ucObject ) )
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
+        if ( pVehicle )
         {
-            switch ( ucObject )
+            unsigned char ucObject;
+            if ( bitStream.Read ( ucObject ) )
             {
-                case 0: // Door
+                switch ( ucObject )
                 {
-                    unsigned char ucDoor, ucState;
-                    if ( bitStream.Read ( ucDoor ) && bitStream.Read ( ucState ) )
+                    case 0: // Door
                     {
-                        pVehicle->SetDoorStatus ( ucDoor, ucState );
+                        unsigned char ucDoor, ucState;
+                        if ( bitStream.Read ( ucDoor ) && bitStream.Read ( ucState ) )
+                        {
+                            pVehicle->SetDoorStatus ( ucDoor, ucState );
+                        }
+                        break;
                     }
-                    break;
-                }
-                case 1: // Wheel
-                {
-                    unsigned char ucWheel, ucState;
-                    if ( bitStream.Read ( ucWheel ) && bitStream.Read ( ucState ) )
+                    case 1: // Wheel
                     {
-                        pVehicle->SetWheelStatus ( ucWheel, ucState, false );
+                        unsigned char ucWheel, ucState;
+                        if ( bitStream.Read ( ucWheel ) && bitStream.Read ( ucState ) )
+                        {
+                            pVehicle->SetWheelStatus ( ucWheel, ucState, false );
+                        }
+                        break;
                     }
-                    break;
-                }
-                case 2: // Light
-                {
-                    unsigned char ucLight, ucState;
-                    if ( bitStream.Read ( ucLight ) && bitStream.Read ( ucState ) )
+                    case 2: // Light
                     {
-                        pVehicle->SetLightStatus ( ucLight, ucState );
+                        unsigned char ucLight, ucState;
+                        if ( bitStream.Read ( ucLight ) && bitStream.Read ( ucState ) )
+                        {
+                            pVehicle->SetLightStatus ( ucLight, ucState );
+                        }
+                        break;
                     }
-                    break;
-                }
-                case 3: // Panel
-                {
-                    unsigned char ucPanel, ucState;
-                    if ( bitStream.Read ( ucPanel ) && bitStream.Read ( ucState ) )
+                    case 3: // Panel
                     {
-                        pVehicle->SetPanelStatus ( ucPanel, ucState );
+                        unsigned char ucPanel, ucState;
+                        if ( bitStream.Read ( ucPanel ) && bitStream.Read ( ucState ) )
+                        {
+                            pVehicle->SetPanelStatus ( ucPanel, ucState );
+                        }
                     }
+                    default: break;
                 }
-                default: break;
             }
         }
     }
 }
 
 
-void CVehicleRPCs::SetVehicleOverrideLights ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleOverrideLights ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     unsigned char ucLights;
-    if ( bitStream.Read ( ucLights ) )
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucLights ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             pVehicle->SetOverrideLights ( ucLights );
@@ -369,26 +417,28 @@ void CVehicleRPCs::SetVehicleOverrideLights ( CClientEntity* pSource, NetBitStre
 }
 
 
-void CVehicleRPCs::SetVehicleEngineState ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleEngineState (  NetBitStreamInterface& bitStream )
 {
-    bool bState;
-    if ( bitStream.ReadBit ( bState ) )
+    ElementID ID;
+    unsigned char ucState;
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucState ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
-            pVehicle->SetEngineOn ( bState );
+            pVehicle->SetEngineOn ( ucState == 1 );
         }
     }
 }
 
 
-void CVehicleRPCs::SetVehicleDirtLevel ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleDirtLevel (  NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     float fDirtLevel;
-    if ( bitStream.Read ( fDirtLevel ) )
+    if ( bitStream.Read ( ID ) && bitStream.Read ( fDirtLevel ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             pVehicle->SetDirtLevel ( fDirtLevel );
@@ -397,12 +447,13 @@ void CVehicleRPCs::SetVehicleDirtLevel ( CClientEntity* pSource, NetBitStreamInt
 }
 
 
-void CVehicleRPCs::SetVehicleDamageProof ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleDamageProof (  NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     unsigned char ucDamageProof;
-    if ( bitStream.Read ( ucDamageProof ) )
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucDamageProof ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             pVehicle->SetScriptCanBeDamaged ( ( ucDamageProof == 0 ) );
@@ -411,12 +462,13 @@ void CVehicleRPCs::SetVehicleDamageProof ( CClientEntity* pSource, NetBitStreamI
 }
 
 
-void CVehicleRPCs::SetVehiclePaintjob ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehiclePaintjob ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     unsigned char ucPaintjob;
-    if ( bitStream.Read ( ucPaintjob ) )
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucPaintjob ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             pVehicle->SetPaintjob ( ucPaintjob );
@@ -425,26 +477,28 @@ void CVehicleRPCs::SetVehiclePaintjob ( CClientEntity* pSource, NetBitStreamInte
 }
 
 
-void CVehicleRPCs::SetVehicleFuelTankExplodable ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleFuelTankExplodable ( NetBitStreamInterface& bitStream )
 {
-    bool bExplodable;
-    if ( bitStream.ReadBit ( bExplodable ) )
+    ElementID ID;
+    unsigned char ucExplodable;
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucExplodable ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
-            pVehicle->SetCanShootPetrolTank ( bExplodable );
+            pVehicle->SetCanShootPetrolTank ( ( ucExplodable == 1 ) );
         }
     }
 }
 
 
-void CVehicleRPCs::SetVehicleWheelStates ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleWheelStates ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     unsigned char ucWheelStates [ MAX_WHEELS ];
-    if ( bitStream.Read ( ( char * ) ucWheelStates, MAX_WHEELS ) )
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ( char * ) ucWheelStates, MAX_WHEELS ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             for ( int i = 0 ; i < MAX_WHEELS ; i++ ) pVehicle->SetWheelStatus ( i, ucWheelStates [ i ], false );
@@ -453,69 +507,82 @@ void CVehicleRPCs::SetVehicleWheelStates ( CClientEntity* pSource, NetBitStreamI
 }
 
 
-void CVehicleRPCs::SetVehicleFrozen ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleFrozen ( NetBitStreamInterface& bitStream )
 {
-    bool bFrozen;
-    if ( bitStream.ReadBit ( bFrozen ) )
+    ElementID ID;
+    unsigned char ucFrozen;
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucFrozen ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
-            pVehicle->SetScriptFrozen ( bFrozen );
-            pVehicle->SetFrozen ( bFrozen );
+            if ( ucFrozen == 0 )
+            {
+                pVehicle->SetScriptFrozen ( true );
+                pVehicle->SetFrozen ( true );
+            }
+            else
+            {
+                pVehicle->SetScriptFrozen ( false );
+                pVehicle->SetFrozen ( false );
+            }
         }
     }
 }
 
 
-void CVehicleRPCs::SetTrainDerailed ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetTrainDerailed ( NetBitStreamInterface& bitStream )
 {
-    bool bDerailed;
-    if ( bitStream.ReadBit ( bDerailed ) )
+    ElementID ID;
+    unsigned char ucDerailed;
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucDerailed ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
-            pVehicle->SetDerailed ( bDerailed );
+            pVehicle->SetDerailed ( ucDerailed != 0 );
         }
     }
 }
 
 
-void CVehicleRPCs::SetTrainDerailable ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetTrainDerailable ( NetBitStreamInterface& bitStream )
 {
-    bool bDerailable;
-    if ( bitStream.ReadBit ( bDerailable ) )
+    ElementID ID;
+    unsigned char ucDerailable;
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucDerailable ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
-            pVehicle->SetDerailable ( bDerailable );
+            pVehicle->SetDerailable ( ucDerailable != 0 );
         }
     }
 }
 
 
-void CVehicleRPCs::SetTrainDirection ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetTrainDirection ( NetBitStreamInterface& bitStream )
 {
-    bool bDirection;
-    if ( bitStream.ReadBit ( bDirection ) )
+    ElementID ID;
+    unsigned char ucDirection;
+    if ( bitStream.Read ( ID ) && bitStream.Read ( ucDirection ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
-            pVehicle->SetTrainDirection ( bDirection );
+            pVehicle->SetTrainDirection ( ucDirection != 0 );
         }
     }
 }
 
 
-void CVehicleRPCs::SetTrainSpeed ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetTrainSpeed ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     float fSpeed;
-    if ( bitStream.Read ( fSpeed ) )
+    if ( bitStream.Read ( ID ) && bitStream.Read ( fSpeed ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             pVehicle->SetTrainSpeed ( fSpeed );
@@ -524,51 +591,19 @@ void CVehicleRPCs::SetTrainSpeed ( CClientEntity* pSource, NetBitStreamInterface
 }
 
 
-void CVehicleRPCs::SetVehicleHeadLightColor ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetVehicleHeadLightColor ( NetBitStreamInterface& bitStream )
 {
+    ElementID ID;
     SColorRGBA color ( 255, 255, 255, 255 );
-    if ( bitStream.Read ( color.R ) &&
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( color.R ) &&
          bitStream.Read ( color.G ) &&
          bitStream.Read ( color.B ) )
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( ID );
         if ( pVehicle )
         {
             pVehicle->SetHeadLightColor ( color );
-        }
-    }
-}
-
-void CVehicleRPCs::SetVehicleTurretPosition ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
-{
-    float fHorizontal;
-    float fVertical;
-
-    if ( bitStream.Read ( fHorizontal ) &&
-         bitStream.Read ( fVertical ) )
-    {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
-        if ( pVehicle )
-        {
-            pVehicle->SetTurretRotation ( fHorizontal, fVertical );
-        }
-    }
-}
-
-void CVehicleRPCs::SetVehicleDoorOpenRatio ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
-{
-    SIntegerSync < unsigned char, 3 > ucDoor;
-    SDoorOpenRatioSync angle;
-    unsigned int uiTime;
-
-    if ( bitStream.Read ( &ucDoor ) &&
-         bitStream.Read ( &angle ) &&
-         bitStream.ReadCompressed ( uiTime ) )
-    {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
-        if ( pVehicle )
-        {
-            pVehicle->SetDoorOpenRatio ( ucDoor, angle.data.fRatio, uiTime, true );
         }
     }
 }

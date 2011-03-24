@@ -142,16 +142,18 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             // Read client weapon data, but only apply it if the weapon matches with the server
             uchar ucUseWeaponType = pSourcePlayer->GetWeaponType ();
             bool bWeaponCorrect = true;
-
-           // Check client has the weapon we think he has
-            unsigned char ucClientWeaponType;
-            if ( !BitStream.Read ( ucClientWeaponType ) )
-                return false;
-
-            if ( pSourcePlayer->GetWeaponType () != ucClientWeaponType )
+            if ( BitStream.Version () >= 0x0d )
             {
-                bWeaponCorrect = false;                 // Possibly old weapon data.
-                ucUseWeaponType = ucClientWeaponType;   // Use the packet supplied weapon type to skip over the correct amount of data
+               // Check client has the weapon we think he has
+                unsigned char ucClientWeaponType;
+                if ( !BitStream.Read ( ucClientWeaponType ) )
+                    return false;
+
+                if ( pSourcePlayer->GetWeaponType () != ucClientWeaponType )
+                {
+                    bWeaponCorrect = false;                 // Possibly old weapon data.
+                    ucUseWeaponType = ucClientWeaponType;   // Use the packet supplied weapon type to skip over the correct amount of data
+                }
             }
 
             // Update check counts

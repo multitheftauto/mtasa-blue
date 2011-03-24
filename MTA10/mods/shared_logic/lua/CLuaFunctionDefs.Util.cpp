@@ -297,8 +297,6 @@ int CLuaFunctionDefs::GetCTime ( lua_State* luaVM )
     ret.PushNumber(time->tm_yday);
     ret.PushString("isdst");
     ret.PushNumber(time->tm_isdst);
-    ret.PushString("timestamp");
-    ret.PushNumber((double) timer);
 
     ret.PushAsTable(luaVM);
 
@@ -472,129 +470,6 @@ int CLuaFunctionDefs::GetDistanceBetweenPoints3D ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetEasingValue ( lua_State* luaVM )
-{
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-
-    if ( ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) || iArgument2 != LUA_TSTRING )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM, "getEasingValue" );
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-    
-    float fProgress = static_cast < float > ( atof ( lua_tostring ( luaVM, 1 ) ) );
-
-    const char* szEasingType = "Linear";
-    double fEasingPeriod = 0.3f;
-    double fEasingAmplitude = 1.0f;
-    double fEasingOvershoot = 1.70158f;
-
-    szEasingType = lua_tostring ( luaVM, 2 );
-
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING )
-    {
-        fEasingPeriod = atof ( lua_tostring ( luaVM, 3 ) ); 
-
-        int iArgument4 = lua_type ( luaVM, 4 );
-        if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
-        {
-            fEasingAmplitude = atof ( lua_tostring ( luaVM, 4 ) ); 
-
-            int iArgument5 = lua_type ( luaVM, 5 );
-            if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
-            {
-                fEasingOvershoot = atof ( lua_tostring ( luaVM, 5 ) ); 
-            }
-        }
-    }
-
-    CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( szEasingType );
-    if ( easingType == CEasingCurve::EASING_INVALID )
-    {
-        m_pScriptDebugging->LogError ( luaVM, "getEasingValue - Unknown easing type '%s'", szEasingType);
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-
-    CEasingCurve easingCurve ( easingType );
-    easingCurve.SetParams ( fEasingPeriod, fEasingAmplitude, fEasingOvershoot );
-    lua_pushnumber ( luaVM, easingCurve.ValueForProgress ( fProgress ) ); 
-    return 1;
-}
-
-int CLuaFunctionDefs::InterpolateBetween ( lua_State* luaVM )
-{
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    int iArgument7 = lua_type ( luaVM, 7 );
-    int iArgument8 = lua_type ( luaVM, 8 );
-
-    if (    ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) &&
-        ( iArgument2 != LUA_TNUMBER && iArgument2 != LUA_TSTRING ) &&
-        ( iArgument3 != LUA_TNUMBER && iArgument3 != LUA_TSTRING ) &&
-        ( iArgument4 != LUA_TNUMBER && iArgument4 != LUA_TSTRING ) &&
-        ( iArgument5 != LUA_TNUMBER && iArgument5 != LUA_TSTRING ) &&
-        ( iArgument6 != LUA_TNUMBER && iArgument6 != LUA_TSTRING ) &&
-        ( iArgument7 != LUA_TNUMBER && iArgument7 != LUA_TSTRING ) &&
-        ( iArgument8 != LUA_TSTRING ) )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM, "interpolateBetween" );
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-
-    CVector vecPointA ( static_cast < float > ( atof ( lua_tostring ( luaVM, 1 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 2 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 3 ) ) ) );
-    CVector vecPointB ( static_cast < float > ( atof ( lua_tostring ( luaVM, 4 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 5 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 6 ) ) ) );
-
-    float fProgress = static_cast < float > ( atof ( lua_tostring ( luaVM, 7 ) ) );
-
-    const char* szEasingType = "Linear";
-    double fEasingPeriod = 0.3f;
-    double fEasingAmplitude = 1.0f;
-    double fEasingOvershoot = 1.70158f;
-
-    szEasingType = lua_tostring ( luaVM, 8 );
-
-    int iArgument9 = lua_type ( luaVM, 9 );
-    if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
-    {
-        fEasingPeriod = atof ( lua_tostring ( luaVM, 9 ) ); 
-
-        int iArgument10 = lua_type ( luaVM, 10 );
-        if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
-        {
-            fEasingAmplitude = atof ( lua_tostring ( luaVM, 10 ) ); 
-
-            int iArgument11 = lua_type ( luaVM, 11 );
-            if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
-            {
-                fEasingOvershoot = atof ( lua_tostring ( luaVM, 11 ) ); 
-            }
-        }
-    }
-
-    CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( szEasingType );
-    if ( easingType == CEasingCurve::EASING_INVALID )
-    {
-        m_pScriptDebugging->LogError ( luaVM, "interpolateBetween - Unknown easing type '%s'", szEasingType);
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-
-    CVector vecResult = TInterpolation < CVector >::Interpolate ( vecPointA, vecPointB, fProgress, easingType, fEasingPeriod, fEasingAmplitude, fEasingOvershoot );
-    lua_pushnumber ( luaVM, vecResult.fX );
-    lua_pushnumber ( luaVM, vecResult.fY );
-    lua_pushnumber ( luaVM, vecResult.fZ );
-    return 3;
-}
-
 
 int CLuaFunctionDefs::Md5 ( lua_State* luaVM )
 {
@@ -616,62 +491,27 @@ int CLuaFunctionDefs::Md5 ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetNetworkUsageData ( lua_State* luaVM )
+int CLuaFunctionDefs::GetPacketInfo ( lua_State* luaVM )
 {
     unsigned long ulBits [ 256 ];
     unsigned long ulCount [ 256 ];
+    g_pNet->GetPacketLogData ( ulBits, ulCount );
+    lua_createtable ( luaVM, 256, 1 );
 
-    lua_createtable ( luaVM, 0, 2 );
-
-    lua_pushstring ( luaVM, "in" );
-    lua_createtable ( luaVM, 0, 2 );
+    for ( unsigned int i = 0; i < 256; ++i )
     {
-        g_pNet->GetNetworkUsageData ( CNet::STATS_INCOMING_TRAFFIC, ulBits, ulCount );
-        
+        lua_createtable ( luaVM, 0, 2 );
+
         lua_pushstring ( luaVM, "bits" );
-        lua_createtable ( luaVM, 255, 1 );
-        for ( unsigned int i = 0; i < 256; ++i )
-        {
-            lua_pushnumber ( luaVM, ulBits[i] );
-            lua_rawseti ( luaVM, -2, i );
-        }
+        lua_pushnumber ( luaVM, ulBits [ i ] );
         lua_rawset ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "count" );
-        lua_createtable ( luaVM, 255, 1 );
-        for ( unsigned int i = 0; i < 256; ++i )
-        {
-            lua_pushnumber ( luaVM, ulCount[i] );
-            lua_rawseti ( luaVM, -2, i );
-        }
+        lua_pushnumber ( luaVM, ulCount [ i ] );
         lua_rawset ( luaVM, -3 );
+
+        lua_rawseti ( luaVM, -2, i );
     }
-    lua_rawset ( luaVM, -3 );
-
-    lua_pushstring ( luaVM, "out" );
-    lua_createtable ( luaVM, 0, 2 );
-    {
-        g_pNet->GetNetworkUsageData ( CNet::STATS_OUTGOING_TRAFFIC, ulBits, ulCount );
-
-        lua_pushstring ( luaVM, "bits" );
-        lua_createtable ( luaVM, 255, 1 );
-        for ( unsigned int i = 0; i < 256; ++i )
-        {
-            lua_pushnumber ( luaVM, ulBits[i] );
-            lua_rawseti ( luaVM, -2, i );
-        }
-        lua_rawset ( luaVM, -3 );
-
-        lua_pushstring ( luaVM, "count" );
-        lua_createtable ( luaVM, 255, 1 );
-        for ( unsigned int i = 0; i < 256; ++i )
-        {
-            lua_pushnumber ( luaVM, ulCount[i] );
-            lua_rawseti ( luaVM, -2, i );
-        }
-        lua_rawset ( luaVM, -3 );
-    }
-    lua_rawset ( luaVM, -3 );
 
     return 1;
 }
@@ -713,120 +553,6 @@ int CLuaFunctionDefs::GetVersion ( lua_State* luaVM )
     lua_pushstring ( luaVM, CStaticFunctionDefinitions::GetVersionSortable () );
     lua_settable   ( luaVM, -3 );
 
-    return 1;
-}
-
-int CLuaFunctionDefs::UtfLen ( lua_State* luaVM )
-{
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfLen" );
-
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-    std::string strInput = lua_tostring ( luaVM, 1 );
-    lua_pushnumber ( luaVM, ConvertToUTF8(strInput).size() );
-
-    return 1;
-}
-
-int CLuaFunctionDefs::UtfSeek ( lua_State* luaVM )
-{
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfSeek" );
-        lua_pushnil ( luaVM );
-        return 1;
-    }
-    int iPos = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-    std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = ConvertToUTF8(strInput);
-    if ( iPos <= static_cast < int >(strUTF.size()) && iPos >= 0 )
-    {
-        strUTF = strUTF.substr(0,iPos);
-        lua_pushnumber ( luaVM, ConvertToANSI(strUTF).size() );
-        return 1;
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::UtfSub ( lua_State* L )
-{
-    if ( ( lua_type ( L, 1 ) != LUA_TSTRING ) || ( lua_type ( L, 2 ) != LUA_TNUMBER ) )
-    {
-        m_pScriptDebugging->LogBadType ( L, "utfSub" );
-        lua_pushnil ( L );
-        return 1;
-    }
-    //Ripped and modded Lua source.  It's pretty disgusting, i know.
-
-    const char *s = lua_tostring(L, 1);
-    std::wstring strUTF = ConvertToUTF8(s);
-    size_t l = static_cast < int > ( strUTF.size() );
-
-    ptrdiff_t start = luaL_checkinteger(L, 2);
-    ptrdiff_t end = luaL_optinteger(L, 3, -1);
-
-    //posrelat them both
-    if (start < 0) start += (ptrdiff_t)l + 1;
-        start = (start >= 0) ? start : 0;
-
-    if (end < 0) end += (ptrdiff_t)l + 1;
-        end = (end >= 0) ? end : 0;
-
-    if (start < 1) start = 1;
-    if (end > (ptrdiff_t)l) end = (ptrdiff_t)l;
-    if (start <= end)
-    {
-        strUTF = strUTF.substr(start-1, end-start+1);
-        lua_pushstring(L, ConvertToANSI(strUTF).c_str());
-    }
-    else lua_pushliteral(L, "");
-    return 1;
-}
-
-int CLuaFunctionDefs::UtfChar ( lua_State* luaVM )
-{
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TNUMBER ) )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfChar" );
-        lua_pushnil ( luaVM );
-        return 1;
-    }
-    int iChar = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
-    if ( iChar > 65534 || iChar < 32 )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfChar" );
-        lua_pushnil ( luaVM );
-        return 1;
-    }
-
-    // Generate a null-terminating string for our character
-    wchar_t wUNICODE[2] = { iChar, '\0' };
-
-    // Convert our UTF character into an ANSI string
-    std::string strANSI = ConvertToANSI(wUNICODE);
-
-    lua_pushstring ( luaVM, strANSI.c_str() );
-    return 1;
-}
-
-int CLuaFunctionDefs::UtfCode ( lua_State* luaVM )
-{
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM, "utfCode" );
-        lua_pushnil ( luaVM );
-        return 1;
-    }
-    std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = ConvertToUTF8(strInput);
-    unsigned long ulCode = strUTF.c_str()[0];
-
-    lua_pushnumber ( luaVM, ulCode );
     return 1;
 }
 

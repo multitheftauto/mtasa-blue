@@ -18,7 +18,6 @@
 //
 // Adds some functionality to the std::string class
 //
-#include <stdarg.h>
 
 #ifdef WIN32
     #define va_copy(dest, orig) (dest) = (orig)

@@ -97,34 +97,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             }
             else
                 BitStream.WriteBit ( false );
-
-            // Entity collisions enabled
-            bool bCollisionsEnabled = true;
-
-            switch ( pElement->GetType() )
-            {
-                case CElement::VEHICLE:
-                {
-                    CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-                    bCollisionsEnabled = pVehicle->GetCollisionEnabled ( );
-                    break;
-                }
-                case CElement::OBJECT:
-                {
-                    CObject* pObject = static_cast < CObject* > ( pElement );
-                    bCollisionsEnabled = pObject->GetCollisionEnabled ( );
-                    break;
-                }
-                case CElement::PED:
-                case CElement::PLAYER:
-                {
-                    CPed* pPed = static_cast < CPed* > ( pElement );
-                    bCollisionsEnabled = pPed->GetCollisionEnabled ( );
-                    break;
-                }
-            }
-
-            BitStream.WriteBit ( bCollisionsEnabled );
             
             // Write custom data
             CCustomData* pCustomData = pElement->GetCustomDataPointer ();
@@ -140,9 +112,12 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                 if ( bSynchronized )
                 {
                     unsigned char ucNameLength = static_cast < unsigned char > ( strlen ( szName ) );
-                    BitStream.Write ( ucNameLength );
-                    BitStream.Write ( szName, ucNameLength );
-                    pArgument->WriteToBitStream ( BitStream );
+                    if ( ucNameLength > 0 && ucNameLength <= 32 )
+                    {
+                        BitStream.Write ( ucNameLength );
+                        BitStream.Write ( szName, ucNameLength );
+                        pArgument->WriteToBitStream ( BitStream );
+                    }
                 }
             }
 
@@ -188,34 +163,26 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     alpha.data.ucAlpha = pObject->GetAlpha ();
                     BitStream.Write ( &alpha );
 
-                    // Double sided
-                    bool bIsDoubleSided = pObject->IsDoubleSided ();
-                    BitStream.WriteBit ( bIsDoubleSided );
-
-                    // Moving
-                    const CPositionRotationAnimation* pMoveAnimation = pObject->GetMoveAnimation ();
-                    if ( pMoveAnimation )
+                    if ( BitStream.Version () >= 0x0c )
                     {
-                         BitStream.WriteBit ( true );
-                         pMoveAnimation->ToBitStream ( BitStream, true );
-                    }
-                    else
-                    {
-                        BitStream.WriteBit ( false );
+                        bool bIsDoubleSided = pObject->IsDoubleSided ();
+                        BitStream.WriteBit ( bIsDoubleSided );
                     }
 
-                    // Scale
-                    float fScale = pObject->GetScale ();
-                    BitStream.Write ( fScale );
+                    bool bIsMoving = pObject->IsMoving ();
+                    BitStream.WriteBit ( bIsMoving );
 
-                    // Static
-                    bool bStatic = pObject->IsStatic ();
-                    BitStream.WriteBit ( bStatic );
+                    if ( bIsMoving )
+                    {
+                        BitStream.WriteCompressed ( pObject->GetMoveTimeLeft () );
 
-                    // Health
-                    SObjectHealthSync health;
-                    health.data.fValue = pObject->GetHealth ();
-                    BitStream.Write ( &health );
+                        position.data.vecPosition = pObject->m_moveData.vecStopPosition;
+                        BitStream.Write ( &position );
+
+                        rotationRadians.data.vecRotation = pObject->m_moveData.vecStopRotation - rotationRadians.data.vecRotation;
+                        BitStream.Write ( &rotationRadians );
+                    }
+
 
                     break;
                 }
@@ -299,17 +266,11 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     health.data.fValue = pVehicle->GetHealth ();
                     BitStream.Write ( &health );
 
-                    // Color
-                    CVehicleColor& vehColor = pVehicle->GetColor ();
-                    uchar ucNumColors = vehColor.GetNumColorsUsed () - 1;
-                    BitStream.WriteBits ( &ucNumColors, 2 );
-                    for ( uint i = 0 ; i <= ucNumColors ; i++ )
-                    {
-                        SColor RGBColor = vehColor.GetRGBColor ( i );
-                        BitStream.Write ( RGBColor.R );
-                        BitStream.Write ( RGBColor.G );
-                        BitStream.Write ( RGBColor.B );
-                    }
+                    // Color as 4 unsigned chars
+                    BitStream.Write ( pVehicle->GetColor ().GetColor1 () );
+                    BitStream.Write ( pVehicle->GetColor ().GetColor2 () );
+                    BitStream.Write ( pVehicle->GetColor ().GetColor3 () );
+                    BitStream.Write ( pVehicle->GetColor ().GetColor4 () );
 
                     // Paintjob
                     SPaintjobSync paintjob;
@@ -328,7 +289,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     unsigned short usModel = pVehicle->GetModel ();
                     if ( CVehicleManager::HasTurret ( usModel ) )
                     {
-                        SVehicleTurretSync specific;
+                        SVehicleSpecific specific;
                         specific.data.fTurretX = pVehicle->GetTurretPositionX ();
                         specific.data.fTurretY = pVehicle->GetTurretPositionY ();
                         BitStream.Write ( &specific );
@@ -338,17 +299,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     if ( CVehicleManager::HasAdjustableProperty ( usModel ) )
                     {
                         BitStream.WriteCompressed ( pVehicle->GetAdjustableProperty () );
-                    }
-
-                    // If the vehicle has doors, sync their open angle ratios.
-                    if ( CVehicleManager::HasDoors ( usModel ) )
-                    {
-                        SDoorOpenRatioSync door;
-                        for ( unsigned char i = 0; i < 6; ++i )
-                        {
-                            door.data.fRatio = pVehicle->GetDoorOpenRatio ( i );
-                            BitStream.Write ( &door );
-                        }
                     }
 
                     // Write all the upgrades
@@ -474,17 +424,15 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.WriteCompressed ( pBlip->m_sOrdering );
 
                     // Write the visible distance
-                    SIntegerSync < unsigned short, 14 > visibleDistance ( pBlip->m_usVisibleDistance );
-                    BitStream.Write ( &visibleDistance );
+                    BitStream.Write ( pBlip->m_fVisibleDistance );
 
                     // Write the icon
-                    SIntegerSync < unsigned char, 6 > icon ( pBlip->m_ucIcon );
-                    BitStream.Write ( &icon );
-                    if ( pBlip->m_ucIcon == 0 )
+                    unsigned char ucIcon = pBlip->m_ucIcon;
+                    BitStream.Write ( ucIcon );
+                    if ( ucIcon == 0 )
                     {
                         // Write the size
-                        SIntegerSync < unsigned char, 5 > size ( pBlip->m_ucSize );
-                        BitStream.Write ( &size );
+                        BitStream.Write ( pBlip->m_ucSize );
 
                         // Write the color
                         SColorSync color;
@@ -620,6 +568,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     SEntityAlphaSync alpha;
                     alpha.data.ucAlpha = pPed->GetAlpha ();
                     BitStream.Write ( &alpha );
+
+                    if ( BitStream.Version () < 0x07 )
+                        break;
 
                     // clothes
                     unsigned char ucNumClothes = 0;

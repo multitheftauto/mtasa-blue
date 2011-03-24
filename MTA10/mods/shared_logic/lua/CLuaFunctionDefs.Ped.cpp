@@ -304,6 +304,12 @@ int CLuaFunctionDefs::GetPedTask ( lua_State* luaVM )
         CClientPed* pPed = lua_toped ( luaVM, 1 );
         const char* szPriority = lua_tostring ( luaVM, 2 );
         unsigned int uiTaskType = static_cast < unsigned int > ( lua_tonumber ( luaVM, 3 ) );
+        int iIndex = 0;
+
+        // Grab the index if provided
+        int iArgument4 = lua_type ( luaVM, 4 );
+        if ( iArgument4 == LUA_TSTRING || iArgument4 == LUA_TNUMBER )
+            iIndex = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
 
         // Valid ped?
         if ( pPed )
@@ -316,13 +322,12 @@ int CLuaFunctionDefs::GetPedTask ( lua_State* luaVM )
                 if ( ( bPrimary = !stricmp ( szPriority, "primary" ) ) ||
                     ( !stricmp ( szPriority, "secondary" ) ) )
                 {
-                    // Grab the taskname list and return it
-                    std::vector < SString > taskHierarchy;
-                    if ( CStaticFunctionDefinitions::GetPedTask ( *pPed, bPrimary, uiTaskType, taskHierarchy ) )
+                    // Grab the taskname and return it
+                    char* szTaskName = CStaticFunctionDefinitions::GetPedTask ( *pPed, bPrimary, uiTaskType, iIndex );
+                    if ( szTaskName )
                     {
-                        for ( uint i = 0 ; i < taskHierarchy.size () ; i++ )
-                            lua_pushstring ( luaVM, taskHierarchy[i] );
-                        return taskHierarchy.size ();
+                        lua_pushstring ( luaVM, szTaskName );
+                        return 1;
                     }
                 }
             }
@@ -986,29 +991,6 @@ int CLuaFunctionDefs::GetPedAnimation ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetPedMoveState ( lua_State* luaVM )
-{
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) )
-    {
-        CClientPed * pPed = lua_toped ( luaVM, 1 );
-        if ( pPed )
-        {
-            std::string strMoveState;
-            if ( CStaticFunctionDefinitions::GetPedMoveState ( *pPed, strMoveState ) )
-            {
-                lua_pushstring ( luaVM, strMoveState.c_str() );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "GetPedMoveState", "ped", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "GetPedMoveState" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
 
 int CLuaFunctionDefs::GetPedMoveAnim ( lua_State* luaVM )
 {
@@ -1571,7 +1553,6 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
             bool bLoop = true;
             bool bUpdatePosition = true;
             bool bInterruptable = true;
-            bool bFreezeLastFrame = true;
             if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szBlockName = lua_tostring ( luaVM, 2 );
             if ( lua_type ( luaVM, 3 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 3 );
             int iArgument4 = lua_type ( luaVM, 4 );
@@ -1581,12 +1562,10 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
                 bLoop = ( lua_toboolean ( luaVM, 5 ) ) ? true:false;
             if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
                 bUpdatePosition = ( lua_toboolean ( luaVM, 6 ) ) ? true:false;
-            if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )
+            if ( lua_type ( luaVM, 6 ) == LUA_TBOOLEAN )
                 bInterruptable = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
-            if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )
-                bFreezeLastFrame = ( lua_toboolean ( luaVM, 8 ) ) ? true:false;
 
-            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
+            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

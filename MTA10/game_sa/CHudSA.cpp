@@ -5,7 +5,6 @@
 *  FILE:        game_sa/CHudSA.cpp
 *  PURPOSE:     HUD display
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -339,36 +338,6 @@ void CHudSA::DisableClock ( bool bDisabled )
     MemPut < int > ( VAR_DisableClock, bDisabled ? 0 : 1 );  //     *(int *)VAR_DisableClock = bDisabled ? 0 : 1;
 }
 
-void CHudSA::DisableRadioName ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_DrawRadioName;
-        MemPut < BYTE > ( FUNC_DrawRadioName, 0xC3 );  //         *(BYTE *)FUNC_DrawRadioName = 0xC3;
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawRadioName, byteOriginal );  //         *(BYTE *)FUNC_DrawRadioName = byteOriginal;
-        byteOriginal = 0;
-    }
-}
-
-void CHudSA::DisableWantedLevel ( bool bDisabled )
-{
-    static BYTE byteOriginal = 0;
-    if ( bDisabled && !byteOriginal )
-    {
-        byteOriginal = *(BYTE *)FUNC_DrawWantedLevel;
-        MemPut < BYTE > ( FUNC_DrawWantedLevel, 0xC3 );  //         *(BYTE *)FUNC_DrawWantedLevel = 0xC3;
-    }
-    else if ( !bDisabled && byteOriginal )
-    {
-        MemPut < BYTE > ( FUNC_DrawWantedLevel, byteOriginal );  //         *(BYTE *)FUNC_DrawWantedLevel = byteOriginal;
-        byteOriginal = 0;
-    }
-}
-
 void CHudSA::DisableAll ( bool bDisabled )
 {
     DisableAmmo ( bDisabled );
@@ -384,6 +353,4 @@ void CHudSA::DisableAll ( bool bDisabled )
     DisableAreaName ( bDisabled );
     DisableRadar ( bDisabled );
     DisableClock ( bDisabled );
-    DisableRadioName ( bDisabled );
-    DisableWantedLevel ( bDisabled );
 }

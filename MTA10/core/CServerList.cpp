@@ -162,9 +162,9 @@ bool CServerList::AddUnique ( in_addr Address, ushort usQueryPort, bool addAtFro
     return true;
 }
 
-bool CServerList::Remove ( in_addr Address, ushort usQueryPort )
+void CServerList::Remove ( in_addr Address, ushort usQueryPort )
 {
-    return m_Servers.Remove ( Address, usQueryPort );
+    m_Servers.Remove ( Address, usQueryPort );
 }
 
 
@@ -374,7 +374,7 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
                 uiQueryRetryCount++;
                 uiRevision++;           // To flag browser gui update
 #if MTA_DEBUG
-                //strGameMode = SString ( "%d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
+                strGameMode = SString ( "%d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
 #endif
                 if ( GetDataQuality () > SERVER_INFO_ASE_0 )
                     GetServerCache ()->SetServerCachedInfo ( this );
@@ -388,7 +388,7 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery )
                 bSkipped = true;
                 uiRevision++;           // To flag browser gui update#if MTA_DEBUG
 #if MTA_DEBUG
-                //strGameMode = SString ( "noreply %d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
+                strGameMode = SString ( "noreply %d/%d Q:%d", uiQueryRetryCount, uiMaxRetries, GetDataQuality () );
 #endif
                 CloseSocket ();
                 if ( GetDataQuality () > SERVER_INFO_ASE_0 )
@@ -458,8 +458,7 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     nPing = m_ElapsedTime.Get ();
 
     // Parse relevant data
-    SString strTemp;
-    SString strMapTemp;
+    std::string strTemp;
     unsigned int i = 4;
 
     // IP
@@ -490,10 +489,10 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
         strGameMode = strTemp;
 
     // Map name
-    if ( !ReadString ( strMapTemp, szBuffer, i, nLength ) )
+    if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
     if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAP ) == false )
-        strMap = strMapTemp;
+        strMap = strTemp;
 
     // Version
     if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
@@ -518,20 +517,6 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
 
     if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAX_PLAYER_COUNT ) == false )
         nMaxPlayers = (unsigned char)szBuffer[i++];
-
-    // Recover large player count if present
-    SString strPlayerCount = strMapTemp.Right ( strMapTemp.length () - strlen ( strMapTemp ) - 1 );
-    if ( !strPlayerCount.empty () )
-    {
-        SString strJoinedPlayers, strMaxPlayers;
-        if ( strPlayerCount.Split ( "/", &strJoinedPlayers, &strMaxPlayers ) )
-        {
-            if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_COUNT ) == false )
-                nPlayers = atoi ( strJoinedPlayers );
-            if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_MAX_PLAYER_COUNT ) == false )
-                nMaxPlayers = atoi ( strMaxPlayers );
-        }
-    }
 
     // Get player nicks
     vecPlayers.clear ();

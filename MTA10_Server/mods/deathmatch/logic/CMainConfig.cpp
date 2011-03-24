@@ -37,6 +37,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_usHTTPPort = 0;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_iHTTPMaxConnectionsPerClient = 4;
+    m_bHTTPMaxConnectionsLegacy = true;
     m_iHTTPThreadCount = 8;
     m_iHTTPDosThreshold = 20;
     m_iEnableClientChecks = -1;
@@ -46,8 +47,8 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_uiScriptDebugLogLevel = 0;
     m_bAutoUpdateIncludedResources = false;
     m_bDontBroadcastLan = false;
+    m_uiMTUSize = MTU_SIZE_DEFAULT;
     m_usFPSLimit = 36;
-    m_bAutoLogin = false;
 }
 
 
@@ -118,6 +119,18 @@ bool CMainConfig::Load ( const char* szFilename )
         return false;
     }
 
+    // Grab the MTU size
+    iResult = GetInteger ( m_pRootNode, "mtusize", iTemp, 1, 65535 );
+    if ( iResult == IS_SUCCESS )
+    {
+        m_uiMTUSize = iTemp;
+    }
+    else
+    {
+        if ( iResult != DOESNT_EXIST )
+            CLogger::ErrorPrintf ( "MTU packet size must be between 1 and 65535, defaulting to %u\n", m_uiMTUSize );
+    }
+
     // Grab the max players
     iResult = GetInteger ( m_pRootNode, "maxplayers", iTemp, 1, MAX_PLAYER_COUNT );
     if ( iResult == IS_SUCCESS )
@@ -178,6 +191,11 @@ bool CMainConfig::Load ( const char* szFilename )
     GetInteger ( m_pRootNode, "httpmaxconnectionsperclient", m_iHTTPMaxConnectionsPerClient, 1, 8 );
     m_iHTTPMaxConnectionsPerClient = Clamp ( 1, m_iHTTPMaxConnectionsPerClient, 8 );
 
+    // httpmaxconnectionslegacy
+    iResult = GetBoolean ( m_pRootNode, "httpmaxconnectionslegacy", m_bHTTPMaxConnectionsLegacy );
+    if ( iResult != IS_SUCCESS )
+        m_bHTTPMaxConnectionsLegacy = true;
+
     // httpthreadcount
     GetInteger ( m_pRootNode, "httpthreadcount", m_iHTTPThreadCount, 1, 20 );
     m_iHTTPThreadCount = Clamp ( 1, m_iHTTPThreadCount, 20 );
@@ -195,8 +213,10 @@ bool CMainConfig::Load ( const char* szFilename )
         std::vector < SString > tagACList;
         strDisbaleAC.Split ( ",", tagACList );
         for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
-            if ( (*it).length () )
+            if ( isdigit(***it) )
                 MapSet ( m_DisableACMap, *it, 1 );
+
+        g_pNetServer->ResetStub ( 'delt', &m_DisableACMap );
     }
 
     {
@@ -284,8 +304,6 @@ bool CMainConfig::Load ( const char* szFilename )
     {
         m_strAccessControlListFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "acl.xml" );
     }
-
-    GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
 
     return true;
 }

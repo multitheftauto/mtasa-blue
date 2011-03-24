@@ -53,17 +53,21 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
                 // Read client weapon data, but only apply it if the weapon matches with the server
                 uchar ucUseWeaponType = pSourcePlayer->GetWeaponType ();
                 bool bWeaponCorrect = true;
- 
-               // Check client has the weapon we think he has
-                unsigned char ucClientWeaponType;
-                if ( !BitStream.Read ( ucClientWeaponType ) )
-                    return false;
-
-                if ( pSourcePlayer->GetWeaponType () != ucClientWeaponType )
+                if ( BitStream.Version () >= 0x16 )
                 {
-                    bWeaponCorrect = false;                 // Possibly old weapon data.
-                    ucUseWeaponType = ucClientWeaponType;   // Use the packet supplied weapon type to skip over the correct amount of data
+                   // Check client has the weapon we think he has
+                    unsigned char ucClientWeaponType;
+                    if ( !BitStream.Read ( ucClientWeaponType ) )
+                        return false;
+
+                    if ( pSourcePlayer->GetWeaponType () != ucClientWeaponType )
+                    {
+                        bWeaponCorrect = false;                 // Possibly old weapon data.
+                        ucUseWeaponType = ucClientWeaponType;   // Use the packet supplied weapon type to skip over the correct amount of data
+                    }
                 }
+                else
+                    bWeaponCorrect = pSourcePlayer->GetWeaponCorrect ();
 
                 // Read out the current weapon slot and set it
                 SWeaponSlotSync slot;
@@ -86,8 +90,6 @@ bool CKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
                     SWeaponAimSync aim ( CWeaponNames::GetWeaponRange ( ucUseWeaponType ) );
                     if ( !BitStream.Read ( &aim ) )
                         return false;
-                    pSourcePlayer->SetSniperSourceVector ( aim.data.vecOrigin );
-                    pSourcePlayer->SetTargettingVector ( aim.data.vecTarget );
 
                     if ( bWeaponCorrect )
                     {
@@ -246,7 +248,7 @@ void CKeysyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStreamInter
     if ( CVehicleManager::HasTurret ( usModel ) )
     {
         // Read out the turret position
-        SVehicleTurretSync vehicle;
+        SVehicleSpecific vehicle;
         BitStream.Read ( &vehicle );
 
         // Set the data
@@ -262,7 +264,7 @@ void CKeysyncPacket::WriteVehicleSpecific ( CVehicle* pVehicle, NetBitStreamInte
     if ( CVehicleManager::HasTurret ( usModel ) )
     {
         // Grab the turret position
-        SVehicleTurretSync vehicle;
+        SVehicleSpecific vehicle;
         pVehicle->GetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
         BitStream.Write ( &vehicle );

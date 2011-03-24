@@ -48,7 +48,6 @@ unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
 unsigned long CMultiplayerSA::HOOKPOS_EndWorldColors;
 unsigned long CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList;
 unsigned long CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking;
-unsigned long CMultiplayerSA::HOOKPOS_CAutomobile__ProcessSwingingDoor;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
@@ -84,9 +83,6 @@ DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
 #define FUNC_CRenderer_Render                               0x727140
 
 #define CALL_CBike_ProcessRiderAnims                        0x6BF425   // @ CBike::ProcessDrivingAnims
-
-#define CALL_CTrafficLights_GetPrimaryLightState 			0x49DB5F
-#define CALL_CTrafficLights_GetSecondaryLightState 			0x49DB6D
 
 #define HOOKPOS_CGame_Process                               0x53C095
 DWORD RETURN_CGame_Process =                                0x53C09F;
@@ -220,12 +216,6 @@ DWORD RETURN_CrashFix_Misc12b =                              0x4D4222;
 DWORD RETURN_CrashFix_Misc13a =                              0x4D4654;
 DWORD RETURN_CrashFix_Misc13b =                              0x4D4764;
 
-#define HOOKPOS_VehColCB                              0x04C838D
-DWORD RETURN_VehColCB =                              0x04C83AA;
-
-#define HOOKPOS_VehCol                              0x06D6603
-DWORD RETURN_VehCol =                              0x06D660C;
-
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -243,9 +233,6 @@ float fGlobalGravity = 0.008f;
 float fLocalPlayerGravity = 0.008f;
 float fLocalPlayerCameraRotation = 0.0f;
 bool bCustomCameraRotation = false;
-unsigned char ucTrafficLightState = 0;
-bool bTrafficLightsBlocked = false;
-bool bInteriorSoundsEnabled = true;
 
 bool bUsingCustomSkyGradient = false;
 BYTE ucSkyGradientTopR = 0;
@@ -279,7 +266,6 @@ ExplosionHandler * m_pExplosionHandler = NULL;
 BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler * m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler * m_pRender3DStuffHandler = NULL;
-PreWorldProcessHandler * m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler * m_pPostWorldProcessHandler = NULL;
 IdleHandler * m_pIdleHandler = NULL;
 AddAnimationHandler* m_pAddAnimationHandler = NULL;
@@ -358,13 +344,7 @@ void HOOK_CrashFix_Misc10 ();
 void HOOK_CrashFix_Misc11 ();
 void HOOK_CrashFix_Misc12 ();
 void HOOK_CrashFix_Misc13 ();
-void HOOK_VehColCB ();
-void HOOK_VehCol ();
 
-void HOOK_CTrafficLights_GetPrimaryLightState ();
-void HOOK_CTrafficLights_GetSecondaryLightState ();
-
-void HOOK_CAutomobile__ProcessSwingingDoor ();
 
 void vehicle_lights_init ();
 
@@ -491,9 +471,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc11, (DWORD)HOOK_CrashFix_Misc11, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
-    HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
-    HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
-    HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -501,9 +478,6 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( CALL_VehicleLookBehindUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_VehicleLookAsideUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_RenderScene_Plants, (DWORD)HOOK_RenderScene_Plants );
-
-    HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
-    HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -1135,28 +1109,6 @@ void CMultiplayerSA::InitHooks()
 
     // Make sure DirectInput mouse device is set non-exclusive (may not be needed?)
     MemPut < DWORD > ( 0x7469A0, 0x909000B0 );  //     *(DWORD *)0x7469A0 = 0x909000B0;
-
-    // Disable the GTASA main menu.
-    MemSet ( (void *)0x57BA57, 0x90, 6 );
-
-    // Disable the loading screen tune.
-    if ( version == VERSION_US_10 )
-        MemSet ( (void *)0x748CF6, 0x90, 5 );
-    else if ( version == VERSION_EU_10 )
-        MemSet ( (void *)0x748D46, 0x90, 5 );
-
-    // Do not render the loading screen.
-    MemSet ( (void *)0x590D7C, 0x90, 5 );
-    MemSet ( (void *)0x590DB3, 0x90, 5 );
-    MemCpy ( (void *)0x590D9F, "\xC3\x90\x90\x90\x90", 5 );
-
-    // Disable ped to player conversations.
-    MemSet ( (void *)0x53C127, 0x90, 10 );
-
-#if 0
-    // Mute peds (would break setPedVoice).
-    MemCpy ( (void *)0x5EFFE0, "\xC2\x18\x00\x90", 4 );
-#endif
 }
 
 
@@ -1249,71 +1201,10 @@ void CMultiplayerSA::DisablePadHandler ( bool bDisabled )
         MemPut < BYTE > ( 0x7449F0, 0x8B );  //         *(BYTE *)0x7449F0 = 0x8B;
 }
 
-
-void CMultiplayerSA::GetHeatHaze ( SHeatHazeSettings& settings )
+void CMultiplayerSA::DisableHeatHazeEffect ( bool bDisable )
 {
-    settings.ucIntensity = *(int*)0x8D50E8;
-    settings.ucRandomShift = *(int*)0xC402C0;
-    settings.usSpeedMin = *(int*)0x8D50EC;
-    settings.usSpeedMax = *(int*)0x8D50F0;
-    settings.sScanSizeX = *(int*)0xC40304;
-    settings.sScanSizeY = *(int*)0xC40308;
-    settings.usRenderSizeX = *(int*)0xC4030C;
-    settings.usRenderSizeY = *(int*)0xC40310;
-    settings.bInsideBuilding = *(bool*)0xC402BA;
+    MemPut < bool > ( 0xC402BA, bDisable );  //     *(bool *)0xC402BA = bDisable;
 }
-
-
-void DoSetHeatHazePokes ( const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed, bool bAllowAutoTypeChange  )
-{
-    MemPut < int > ( 0x8D50D4, iHourStart );
-    MemPut < int > ( 0x8D50D8, iHourEnd );
-
-    MemPut < float > ( 0x8D50DC, fFadeSpeed );
-    MemPut < float > ( 0x8D50E0, fInsideBuildingFadeSpeed );
-
-    MemPut < int > ( 0x8D50E8, settings.ucIntensity );
-    MemPut < int > ( 0xC402C0, settings.ucRandomShift );
-    MemPut < int > ( 0x8D50EC, settings.usSpeedMin );
-    MemPut < int > ( 0x8D50F0, settings.usSpeedMax );
-    MemPut < int > ( 0xC40304, settings.sScanSizeX );
-    MemPut < int > ( 0xC40308, settings.sScanSizeY );
-    MemPut < int > ( 0xC4030C, settings.usRenderSizeX );
-    MemPut < int > ( 0xC40310, settings.usRenderSizeY );
-    MemPut < bool > ( 0xC402BA, settings.bInsideBuilding );
-
-    if ( bAllowAutoTypeChange )
-        MemPut < BYTE > ( 0x701455, 0x83 ); // sub
-    else
-        MemPut < BYTE > ( 0x701455, 0xC3 ); // retn
-}
-
-
-void CMultiplayerSA::SetHeatHaze ( const SHeatHazeSettings& settings )
-{
-    if ( settings.ucIntensity != 0 )
-        DoSetHeatHazePokes ( settings, 0, 24, 1.0f, 1.0f, false );    // 24 hrs
-    else
-        DoSetHeatHazePokes ( settings, 38, 39, 1.0f, 1.0f, false );   // 0 hrs
-}
-
-
-void CMultiplayerSA::ResetHeatHaze ( void )
-{
-    SHeatHazeSettings settings;
-    settings.ucIntensity = 0x50;
-    settings.ucRandomShift = 0x0;
-    settings.usSpeedMin = 0x0C;
-    settings.usSpeedMax = 0x12;
-    settings.sScanSizeX = 0x4B;
-    settings.sScanSizeY = 0x50;
-    settings.usRenderSizeX = 0x50;
-    settings.usRenderSizeY = 0x55;
-    settings.bInsideBuilding = false;
-
-    DoSetHeatHazePokes ( settings, 10, 19, 0.05f, 1.0f, true );   // defaults
-}
-
 
 void CMultiplayerSA::DisableAllVehicleWeapons ( bool bDisable )
 {
@@ -1343,204 +1234,6 @@ void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
         MemPut < WORD > ( 0x60B4F6, 0x08EB );  //         *(WORD *)0x60B4F6 = 0x08EB;
     else
         MemPut < WORD > ( 0x60B4F6, 0x027C );  //         *(WORD *)0x60B4F6 = 0x027C;
-}
-
-bool CMultiplayerSA::AreInteriorSoundsEnabled ( )
-{
-    return bInteriorSoundsEnabled;
-}
-
-void CMultiplayerSA::SetInteriorSoundsEnabled ( bool bEnabled )
-{
-    // The function which should be restored when re-enabling interior sounds
-    BYTE originalCode[6] = {0x89, 0x2d, 0xbc, 0xdc, 0xb6, 0x00};
-
-    if ( bEnabled )
-    {
-        // Restore the function responsible for interior sounds
-        MemCpy ( (LPVOID)0x508450, &originalCode, 6 );
-        MemCpy ( (LPVOID)0x508817, &originalCode, 6 );
-    }
-    else
-    {
-        // Nop the function responsible for interior sounds
-        MemSet ( (LPVOID)0x508450, 0x90, 6 );
-        MemSet ( (LPVOID)0x508817, 0x90, 6 );
-    }
-
-    // Toggle the interior sound on/off, depending on what the scripter wants
-    MemPut < bool > ( 0xB6DCBC, bEnabled );  //     *(bool *)0xB6DCBC = bEnabled;
-
-    // If we just store it, we can always return the on/off state later on
-    bInteriorSoundsEnabled = bEnabled;
-}
-
-void CMultiplayerSA::SetWindVelocity ( float fX, float fY, float fZ )
-{
-    //Disable
-    MemPut < WORD > ( 0x72C616, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetX) = 0xD8DD;
-    MemPut < DWORD > ( 0x72C616 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x90909090;
-    MemPut < WORD > ( 0x72C622, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetY) = 0xD8DD;
-    MemPut < DWORD > ( 0x72C622 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x90909090;
-    MemPut < WORD > ( 0x72C636, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetZ) = 0xD8DD;
-    MemPut < DWORD > ( 0x72C636 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x90909090;
-
-    MemPut < WORD > ( 0x72C40C, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetX2) = 0xD8DD;
-    MemPut < DWORD > ( 0x72C40C + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x90909090;
-    MemPut < WORD > ( 0x72C417, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetY2) = 0xD8DD;
-    MemPut < DWORD > ( 0x72C417 + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x90909090;
-    MemPut < WORD > ( 0x72C4EF, 0xD8DD );  //     *(WORD *)(ADDR_WindSpeedSetZ2) = 0xD8DD;
-    MemPut < DWORD > ( 0x72C4EF + 2, 0x90909090 );  //     *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x90909090;
-
-    //Set
-    MemPut < float > ( 0xC813E0, fX );  //     *(float *)(VAR_fWindSpeedX) = fX;
-    MemPut < float > ( 0xC813E4, fY );  //     *(float *)(VAR_fWindSpeedY) = fY;
-    MemPut < float > ( 0xC813E8, fZ );  //     *(float *)(VAR_fWindSpeedZ) = fZ;
-}
-
-void CMultiplayerSA::GetWindVelocity ( float& fX, float& fY, float& fZ )
-{
-    fX = *(float *) 0xC813E0;
-    fY = *(float *) 0xC813E4;
-    fZ = *(float *) 0xC813E8;
-}
-
-void CMultiplayerSA::RestoreWindVelocity ( void )
-{
-    MemPut < WORD > ( 0x72C616, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetX) = 0x1DD9;
-    MemPut < DWORD > ( 0x72C616 + 2, 0x00C813E0 );  //     *(DWORD *)(ADDR_WindSpeedSetX + 2) = 0x00C813E0;
-    MemPut < WORD > ( 0x72C622, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetY) = 0x1DD9;
-    MemPut < DWORD > ( 0x72C622 + 2, 0x00C813E4 );  //     *(DWORD *)(ADDR_WindSpeedSetY + 2) = 0x00C813E4;
-    MemPut < WORD > ( 0x72C636, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetZ) = 0x1DD9;
-    MemPut < DWORD > ( 0x72C636 + 2, 0x00C813E8 );  //     *(DWORD *)(ADDR_WindSpeedSetZ + 2) = 0x00C813E8;
-
-    MemPut < WORD > ( 0x72C40C, 0x15D9 );  //     *(WORD *)(ADDR_WindSpeedSetX2) = 0x15D9;
-    MemPut < DWORD > ( 0x72C40C + 2, 0x00C813E0 );  //     *(DWORD *)(ADDR_WindSpeedSetX2 + 2) = 0x00C813E0;
-    MemPut < WORD > ( 0x72C417, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetY2) = 0x1DD9;
-    MemPut < DWORD > ( 0x72C417 + 2, 0x00C813E4 );  //     *(DWORD *)(ADDR_WindSpeedSetY2 + 2) = 0x00C813E4;
-    MemPut < WORD > ( 0x72C4EF, 0x1DD9 );  //     *(WORD *)(ADDR_WindSpeedSetZ2) = 0x1DD9;
-    MemPut < DWORD > ( 0x72C4EF + 2, 0x00C813E8 );  //     *(DWORD *)(ADDR_WindSpeedSetZ2 + 2) = 0x00C813E8;
-}
-
-float CMultiplayerSA::GetFarClipDistance ( )
-{
-    return *(float *) 0xB7C4F0;
-}
-
-void CMultiplayerSA::SetFarClipDistance ( float fDistance )
-{
-    MemPut < BYTE > ( 0x55FCC8, 0xDD );  //     *(BYTE *)0x55FCC8 = 0xDD;
-    MemPut < BYTE > ( 0x55FCC9, 0xD8 );  //     *(BYTE *)0x55FCC9 = 0xD8;
-    MemPut < BYTE > ( 0x55FCCA, 0x90 );  //     *(BYTE *)0x55FCCA = 0x90;
-
-    MemPut < BYTE > ( 0x5613A3, 0xDD );  //     *(BYTE *)0x5613A3 = 0xDD;
-    MemPut < BYTE > ( 0x5613A4, 0xD8 );  //     *(BYTE *)0x5613A4 = 0xD8;
-    MemPut < BYTE > ( 0x5613A5, 0x90 );  //     *(BYTE *)0x5613A5 = 0x90;
-
-    MemPut < BYTE > ( 0x560A23, 0xDD );  //     *(BYTE *)0x560A23 = 0xDD;
-    MemPut < BYTE > ( 0x560A24, 0xD8 );  //     *(BYTE *)0x560A24 = 0xD8;
-    MemPut < BYTE > ( 0x560A25, 0x90 );  //     *(BYTE *)0x560A25 = 0x90;
-
-    MemPut < float > ( 0xB7C4F0, fDistance );  //     *(float *)(VAR_fFarClipDistance) = fDistance;
-}
-
-void CMultiplayerSA::RestoreFarClipDistance ( )
-{
-    BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
-
-    MemCpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
-    MemCpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
-    MemCpy ( (LPVOID)0x560A23, &originalFstp, 3 );
-}
-
-float CMultiplayerSA::GetFogDistance ( )
-{
-    return *(float *) 0xB7C4F4;
-}
-
-void CMultiplayerSA::SetFogDistance ( float fDistance )
-{
-    MemPut < BYTE > ( 0x55FCDB, 0xDD );  //     *(BYTE *)0x55FCDB = 0xDD;
-    MemPut < BYTE > ( 0x55FCDC, 0xD8 );  //     *(BYTE *)0x55FCDC = 0xD8;
-    MemPut < BYTE > ( 0x55FCDD, 0x90 );  //     *(BYTE *)0x55FCDD = 0x90;
-
-    MemPut < float > ( 0xB7C4F4, fDistance );  //     *(float *)(VAR_fFogDistance) = fDistance;
-}
-
-void CMultiplayerSA::RestoreFogDistance ( )
-{
-    BYTE originalFstp[3] = {0xD9, 0x5E, 0x54};
-
-    MemCpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
-}
-
-void CMultiplayerSA::GetSunColor ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
-{
-    ucCoreRed   = *(BYTE *) 0xB7C4D0;
-    ucCoreGreen = *(BYTE *) 0xB7C4D2;
-    ucCoreBlue  = *(BYTE *) 0xB7C4D4;
-
-    ucCoronaRed   = *(BYTE *) 0xB7C4D6;
-    ucCoronaGreen = *(BYTE *) 0xB7C4D8;
-    ucCoronaBlue  = *(BYTE *) 0xB7C4DA;
-}
-
-void CMultiplayerSA::SetSunColor ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue )
-{
-    MemSet ( (LPVOID)0x55F9B2, 0x90, 4 );
-    MemSet ( (LPVOID)0x55F9DD, 0x90, 4 );
-    MemSet ( (LPVOID)0x55FA08, 0x90, 4 );
-    MemSet ( (LPVOID)0x55FA33, 0x90, 4 );
-    MemSet ( (LPVOID)0x55FA5E, 0x90, 4 );
-    MemSet ( (LPVOID)0x55FA8D, 0x90, 4 );
-
-    MemPut < BYTE > ( 0xB7C4D0, ucCoreRed );  //     *(BYTE *)(VAR_ucSunCoreR) = ucCoreRed;
-    MemPut < BYTE > ( 0xB7C4D2, ucCoreGreen );  //     *(BYTE *)(VAR_ucSunCoreG) = ucCoreGreen;
-    MemPut < BYTE > ( 0xB7C4D4, ucCoreBlue );  //     *(BYTE *)(VAR_ucSunCoreB) = ucCoreBlue;
-
-    MemPut < BYTE > ( 0xB7C4D6, ucCoronaRed );  //     *(BYTE *)(VAR_ucSunCoronaR) = ucCoronaRed;
-    MemPut < BYTE > ( 0xB7C4D8, ucCoronaGreen );  //     *(BYTE *)(VAR_ucSunCoronaG) = ucCoronaGreen;
-    MemPut < BYTE > ( 0xB7C4DA, ucCoronaBlue );  //     *(BYTE *)(VAR_ucSunCoronaB) = ucCoronaBlue;
-}
-
-void CMultiplayerSA::ResetSunColor ( )
-{
-    BYTE originalMov[3] = {0x66, 0x89, 0x46};
-
-    MemCpy ( (LPVOID)0x55F9B2, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55F9B5, 0x30 );  //     *(BYTE *)0x55F9B5 = 0x30;
-    MemCpy ( (LPVOID)0x55F9DD, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55F9E0, 0x32 );  //     *(BYTE *)0x55F9E0 = 0x32;
-    MemCpy ( (LPVOID)0x55FA08, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55FA0B, 0x34 );  //     *(BYTE *)0x55FA0B = 0x34;
-
-    MemCpy ( (LPVOID)0x55FA33, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55FA36, 0x36 );  //     *(BYTE *)0x55FA36 = 0x36;
-    MemCpy ( (LPVOID)0x55FA5E, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55FA61, 0x38 );  //     *(BYTE *)0x55FA61 = 0x38;
-    MemCpy ( (LPVOID)0x55FA8D, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55FA90, 0x3A );  //     *(BYTE *)0x55FA90 = 0x3A;
-}
-
-float CMultiplayerSA::GetSunSize ( )
-{
-    return *(float *)0xB7C4DC / 10;
-}
-
-void CMultiplayerSA::SetSunSize ( float fSize )
-{
-    MemPut < BYTE > ( 0x55FA9D, 0xDD );  //     *(BYTE *)0x55FA9D = 0xDD;
-    MemPut < BYTE > ( 0x55FA9E, 0xD8 );  //     *(BYTE *)0x55FA9E = 0xD8;
-    MemPut < BYTE > ( 0x55FA9F, 0x90 );  //     *(BYTE *)0x55FA9F = 0x90;
-
-    MemPut < float > ( 0xB7C4DC, fSize * 10 );  //     *(float *)VAR_fSunSize = fSize * 10;
-}
-
-void CMultiplayerSA::ResetSunSize ( )
-{
-    MemPut < BYTE > ( 0x55FA9D, 0xD9 );  //     *(BYTE *)0x55FA9D = 0xD9;
-    MemPut < BYTE > ( 0x55FA9E, 0x5E );  //     *(BYTE *)0x55FA9E = 0x5E;
-    MemPut < BYTE > ( 0x55FA9F, 0x3C );  //     *(BYTE *)0x55FA9F = 0x3C;
 }
 
 void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
@@ -1574,35 +1267,6 @@ void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
     }
 }
 
-bool CMultiplayerSA::HasSkyColor ( )
-{
-    return bUsingCustomSkyGradient;
-}
-
-void CMultiplayerSA::GetSkyColor ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue )
-{
-    if ( HasSkyColor ( ) )
-    {
-        TopRed  = ucSkyGradientTopR;
-        TopGreen = ucSkyGradientTopG;
-        TopBlue  = ucSkyGradientTopB;
-
-        BottomRed   = ucSkyGradientBottomR;
-        BottomGreen = ucSkyGradientBottomG;
-        BottomBlue  = ucSkyGradientBottomB;
-    }
-    else
-    {
-        TopRed   = *(BYTE *)0xB7C4C4;
-        TopGreen = *(BYTE *)0xB7C4C6;
-        TopBlue  = *(BYTE *)0xB7C4C8;
-
-        BottomRed   = *(BYTE *)0xB7C4CA;
-        BottomGreen = *(BYTE *)0xB7C4CC;
-        BottomBlue  = *(BYTE *)0xB7C4CE;
-    }
-}
-
 void CMultiplayerSA::SetSkyColor ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue )
 {
     bUsingCustomSkyGradient = true;
@@ -1617,29 +1281,6 @@ void CMultiplayerSA::SetSkyColor ( unsigned char TopRed, unsigned char TopGreen,
 void CMultiplayerSA::ResetSky ( void )
 {
     bUsingCustomSkyGradient = false;
-}
-
-bool CMultiplayerSA::HasWaterColor ( )
-{
-    return bUsingCustomWaterColor;
-}
-
-void CMultiplayerSA::GetWaterColor ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha )
-{
-    if ( HasWaterColor ( ) )
-    {
-        fWaterRed   = fWaterColorR;
-        fWaterGreen = fWaterColorG;
-        fWaterBlue  = fWaterColorB;
-        fWaterAlpha = fWaterColorA;
-    }
-    else
-    {
-        fWaterRed   = *(float *)0xB7C508;
-        fWaterGreen = *(float *)0xB7C50C;
-        fWaterBlue  = *(float *)0xB7C510;
-        fWaterAlpha = *(float *)0xB7C514;
-    }
 }
 
 void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha )
@@ -1730,11 +1371,6 @@ void CMultiplayerSA::SetProcessCamHandler ( ProcessCamHandler* pProcessCamHandle
 void CMultiplayerSA::SetChokingHandler ( ChokingHandler* pChokingHandler )
 {
     m_pChokingHandler = pChokingHandler;
-}
-
-void CMultiplayerSA::SetPreWorldProcessHandler ( PreWorldProcessHandler * pHandler )
-{
-    m_pPreWorldProcessHandler = pHandler;
 }
 
 void CMultiplayerSA::SetPostWorldProcessHandler ( PostWorldProcessHandler * pHandler )
@@ -2510,7 +2146,7 @@ bool CCam_ProcessFixed ( class CCamSAInterface* pCamInterface )
 {
     CCam* pCam = static_cast < CCameraSA* > ( pGameInterface->GetCamera () )->GetCam ( pCamInterface );
 
-    if ( m_pProcessCamHandler && pCam )
+    if ( m_pProcessCamHandler )
     {
         return m_pProcessCamHandler ( pCam );
     }
@@ -3445,16 +3081,6 @@ void CMultiplayerSA::SetThermalVisionEnabled ( bool bEnabled )
     }
 }
 
-bool CMultiplayerSA::IsNightVisionEnabled ( )
-{
-    return (*(BYTE *)0xC402B8 == 1 );
-}
-
-bool CMultiplayerSA::IsThermalVisionEnabled ( )
-{
-    return (*(BYTE *)0xC402B9 == 1 );
-}
-
 
 float CMultiplayerSA::GetGlobalGravity ( void )
 {
@@ -3537,82 +3163,6 @@ void _declspec(naked) HOOK_CollisionStreamRead ()
             ret
         }
     }
-}
-
-unsigned char ucDesignatedLightState = 0;
-void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
-{
-    _asm pushad
-
-    if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 )
-    {
-        ucDesignatedLightState = 0; //Green
-    }
-    else if ( ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7 )
-    {
-        ucDesignatedLightState = 1; //Amber
-    }
-    else if ( ucTrafficLightState == 9 )
-    {
-        ucDesignatedLightState = 4;  //Off
-    }
-    else
-        ucDesignatedLightState = 2;  //Red
-
-    _asm
-    {
-        popad
-        mov al, ucDesignatedLightState
-        retn
-    }
-}
-
-void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
-{
-    _asm pushad
-
-    if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 )
-    {
-        ucDesignatedLightState = 0; //Green
-    }
-    else if ( ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8 )
-    {
-        ucDesignatedLightState = 1; //Amber
-    }
-    else if ( ucTrafficLightState == 9 )
-    {
-        ucDesignatedLightState = 4; //Off
-    }
-    else
-        ucDesignatedLightState = 2; //Red
-
-    _asm
-    {
-        popad
-        mov al, ucDesignatedLightState
-        retn
-    }
-}
-
-
-unsigned char CMultiplayerSA::GetTrafficLightState ()
-{
-    return ucTrafficLightState;
-}
-
-void CMultiplayerSA::SetTrafficLightState ( unsigned char ucState )
-{
-    ucTrafficLightState = ucState;
-}
-
-bool CMultiplayerSA::GetTrafficLightsLocked ()
-{
-    return bTrafficLightsBlocked;
-}
-
-void CMultiplayerSA::SetTrafficLightsLocked ( bool bLocked )
-{
-    bTrafficLightsBlocked = bLocked;
 }
 
 // Allowing a created object into the vertical line test makes getGroundPosition, jetpacks and molotovs to work.
@@ -4109,14 +3659,6 @@ void _declspec(naked) HOOK_CGame_Process ()
 {
     _asm
     {
-        pushad
-    }
-
-    if ( m_pPreWorldProcessHandler ) m_pPreWorldProcessHandler ();
-
-    _asm
-    {
-        popad
         call    CALL_CWorld_Process
         mov     ecx, 0B72978h
         pushad
@@ -5099,112 +4641,5 @@ void _declspec(naked) HOOK_CrashFix_Misc13 ()
         jmp     RETURN_CrashFix_Misc13a  // 4D4654
     cont:
         jmp     RETURN_CrashFix_Misc13b  // 4D478c
-    }
-}
-
-
-static SColor vehColors[4];
-
-void _cdecl SaveVehColors ( DWORD dwThis )
-{
-    CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwThis );
-    if ( pVehicle )
-    {
-        pVehicle->GetColor ( &vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], 0 );
-
-        // 0xFF00FF and 0x00FFFF both result in black for some reason
-        for ( uint i = 0 ; i < NUMELMS( vehColors ) ; i++ )
-        {
-            if ( vehColors[i] == 0xFF00FF )
-                vehColors[i] = 0xFF01FF;
-            if ( vehColors[i] == 0x00FFFF )
-                vehColors[i] = 0x01FFFF;
-        }
-    }
-}
-
-
-void _declspec(naked) HOOK_VehCol ()
-{
-    _asm
-    {
-        // Get vehColors for this vehicle
-        pushad
-        push esi
-        call SaveVehColors
-        add esp, 4
-        popad
-
-        // Hooked from 006D6603  9 bytes
-        mov         dl, 3
-        mov         al, 2
-        mov         cl, 1
-        push        edx  
-        xor         edx,edx 
-        mov         dl,byte ptr [esi+434h] 
-        mov         dl, 0
-
-        jmp     RETURN_VehCol  // 006D660C
-    }
-}
-
-
-void _declspec(naked) HOOK_VehColCB ()
-{
-    _asm
-    {
-        // Hooked from 004C838D  29 bytes
-
-        // Apply vehColors for this vehicle
-        mov         cl,byte ptr [esi*4+vehColors.R] 
-        mov         byte ptr [eax+4],cl
-
-        mov         cl,byte ptr [esi*4+vehColors.G] 
-        mov         byte ptr [eax+5],cl
-
-        mov         cl,byte ptr [esi*4+vehColors.B] 
-        mov         byte ptr [eax+6],cl
-
-        jmp     RETURN_VehColCB  // 004C83AA
-    }
-}
-
-// Check if this vehicle is allowed to process swinging doors.
-static DWORD dwSwingingDoorAutomobile;
-static const DWORD dwSwingingRet1 = 0x6A9DB6;
-static const DWORD dwSwingingRet2 = 0x6AA1DA;
-static bool AllowSwingingDoors ()
-{
-    CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwSwingingDoorAutomobile );
-    if ( pVehicle == 0 || pVehicle->AreSwingingDoorsAllowed() )
-        return true;
-    else
-        return false;
-}
-
-void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor ()
-{
-    _asm
-    {
-        mov     dwSwingingDoorAutomobile, esi
-        mov     ecx, [esi+eax*4+0x648]
-        pushad
-    }
-
-    if ( AllowSwingingDoors() )
-    {
-        _asm
-        {
-            popad
-            jmp     dwSwingingRet1
-        }
-    }
-    else
-    {
-        _asm
-        {
-            popad
-            jmp     dwSwingingRet2
-        }
     }
 }

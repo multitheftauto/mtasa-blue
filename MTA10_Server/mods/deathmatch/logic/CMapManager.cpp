@@ -420,18 +420,11 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     float fGameSpeed = g_pGame->GetGameSpeed ();
     float fWaveHeight = g_pGame->GetWaterManager ()->GetGlobalWaveHeight ();
     float fWaterLevel = g_pGame->GetWaterManager ()->GetGlobalWaterLevel ();
-    float fJetpackMaxHeight = g_pGame->GetJetpackMaxHeight ();
-
     // Get the sky gradient
     bool bHasSkyGradient = g_pGame->HasSkyGradient ();
     unsigned char ucTopRed, ucTopGreen, ucTopBlue;
     unsigned char ucBottomRed, ucBottomGreen, ucBottomBlue;
     g_pGame->GetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue );
-
-    // Get the heathaze
-    bool bHasHeatHaze = g_pGame->HasHeatHaze ();
-    SHeatHazeSettings heatHazeSettings;
-    g_pGame->GetHeatHaze ( heatHazeSettings );
 
     // Grab the current weather and the weather we're blending to if any
     // Also grab the time the blending starts/started
@@ -445,43 +438,6 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     // Garage states
     bool* pbGarageStates = g_pGame->GetGarageStates();
     bool bCloudsEnabled = g_pGame->GetCloudsEnabled();
-
-    // Water color
-    bool bOverrideWaterColor;
-    unsigned char ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha;
-    bOverrideWaterColor = g_pGame->HasWaterColor ( );
-    g_pGame->GetWaterColor ( ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha );
-
-    // Interior sounds
-    bool bInteriorSoundsEnabled = g_pGame->AreInteriorSoundsEnabled ( );
-
-    // Rain level
-    bool bOverrideRainLevel = g_pGame->HasRainLevel ( );
-    float fRainLevel = g_pGame->GetRainLevel ( );
-
-    // Sun size
-    bool bOverrideSunSize = g_pGame->HasSunSize ( );
-    float fSunSize = g_pGame->GetSunSize ( );
-
-    // Sun color
-    bool bOverrideSunColor = g_pGame->HasSunColor ( );
-    unsigned char ucCoreR, ucCoreG, ucCoreB;
-    unsigned char ucCoronaR, ucCoronaG, ucCoronaB;
-    g_pGame->GetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB );
-
-    // Wind velocity
-    bool bOverrideWindVelocity = g_pGame->HasWindVelocity ( );
-    float fWindVelX, fWindVelY, fWindVelZ;
-    g_pGame->GetWindVelocity ( fWindVelX, fWindVelY, fWindVelZ );
-
-    // Far clip
-    bool bOverrideFarClipDistance = g_pGame->HasFarClipDistance ( );
-    float fFarClip = g_pGame->GetFarClipDistance ( );
-
-    // Fog distance
-    bool bOverrideFogDistance = g_pGame->HasFogDistance ( );
-    float fFogDistance = g_pGame->GetFogDistance ( );
-
     // Send the packet to the given player
     Player.Send ( CMapInfoPacket ( ucCurrentWeather,
                                    ucWeatherBlendingTo,
@@ -503,30 +459,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucBottomRed,
                                    ucBottomGreen,
                                    ucBottomBlue,
-                                   bHasHeatHaze,
-                                   heatHazeSettings,
                                    usFPSLimit,
-                                   bCloudsEnabled,
-                                   fJetpackMaxHeight,
-                                   bOverrideWaterColor,
-                                   ucWaterRed,
-                                   ucWaterGreen,
-                                   ucWaterBlue,
-                                   ucWaterAlpha,
-                                   bInteriorSoundsEnabled,
-                                   bOverrideRainLevel,
-                                   fRainLevel,
-                                   bOverrideSunSize,
-                                   fSunSize,
-                                   bOverrideSunColor,
-                                   ucCoreR, ucCoreG, ucCoreB,
-                                   ucCoronaR, ucCoronaG, ucCoronaB,
-                                   bOverrideWindVelocity,
-                                   fWindVelX, fWindVelY, fWindVelZ,
-                                   bOverrideFarClipDistance,
-                                   fFarClip,
-                                   bOverrideFogDistance,
-                                   fFogDistance ) );
+                                   bCloudsEnabled) );
 
     // Send him all the elements
     SendMapInformation ( Player );
@@ -596,7 +530,6 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
     Player.SetTeam ( pTeam, true );
     Player.SetInterior ( ucInterior );
     Player.SetDimension ( usDimension );
-    Player.AttachTo ( NULL );
 
     // Call onPlayerSpawn
     CLuaArguments OnPlayerSpawnArguments;

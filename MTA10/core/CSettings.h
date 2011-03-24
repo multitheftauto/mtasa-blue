@@ -26,7 +26,6 @@ class CSettings;
 #include "CMainMenu.h"
 #include "CCore.h"
 
-#define SKINS_PATH                    "skins/*"
 #define CHAT_PRESETS_PATH             "mta/chatboxpresets.xml"
 #define CHAT_PRESETS_ROOT             "chatboxpresets"
 
@@ -97,8 +96,6 @@ public:
     void                SetVisible              ( bool bVisible );
     bool                IsVisible               ( void );
 
-    void                SetIsModLoaded          ( bool bLoaded );
-
     void                LoadData                ( void );
 
     inline bool         IsCapturingKey          ( void )            { return m_bCaptureKey; }
@@ -122,16 +119,20 @@ protected:
     CGUIButton*         m_pButtonCancel;
     CGUILabel*          m_pLabelNick;
     CGUIEdit*           m_pEditNick;
+    CGUILabel*          m_pLabelConnection;
+    CGUIComboBox*       m_pComboConnection;
     CGUICheckBox*       m_pSavePasswords;
 
     CGUILabel*          m_pVideoGeneralLabel;
     CGUILabel*          m_pVideoResolutionLabel;
     CGUIComboBox*       m_pComboResolution;
-	CGUICheckBox*       m_pCheckBoxMipMapping;
     CGUICheckBox*       m_pCheckBoxWindowed;
     CGUICheckBox*       m_pCheckBoxWideScreen;
     CGUICheckBox*       m_pCheckBoxMinimize;
-    CGUICheckBox*       m_pCheckBoxDisableAero;
+    CGUILabel*          m_pVideoRenderingLabel;
+    CGUICheckBox*       m_pCheckBoxMenuDynamic;
+    CGUICheckBox*       m_pCheckBoxMenuVideo;
+    CGUICheckBox*       m_pCheckBoxMenuPostEffects;
     CGUILabel*          m_pMapRenderingLabel;
     CGUIComboBox*       m_pComboFxQuality;
     CGUILabel*          m_pFXQualityLabel;
@@ -151,8 +152,6 @@ protected:
     CGUILabel*          m_pAsyncLabelInfo;
     CGUILabel*          m_pAsyncLabel;
     CGUIComboBox*       m_pAsyncCombo;
-    CGUILabel*          m_pAudioGeneralLabel;
-    CGUILabel*          m_pUserTrackGeneralLabel;
     CGUILabel*          m_pSingleDownloadLabelInfo;
     CGUILabel*          m_pSingleDownloadLabel;
     CGUIComboBox*       m_pSingleDownloadCombo;
@@ -166,6 +165,8 @@ protected:
     CGUILabel*          m_pAdvancedMiscLabel;
     CGUILabel*          m_pAdvancedUpdaterLabel;
 
+    CGUILabel*          m_pAudioGeneralLabel;
+    CGUILabel*          m_pUserTrackGeneralLabel;
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
     CGUILabel*          m_pLabelMTAVolume;
@@ -215,9 +216,6 @@ protected:
     CGUIRadioButton*    m_pStandardControls;
     CGUIRadioButton*    m_pClassicControls;
 
-    CGUIComboBox*       m_pInterfaceSkinSelector;
-    CGUIButton*         m_pInterfaceLoadSkin;
-
     CGUIComboBox*       m_pChatPresets;
     CGUIButton*         m_pChatLoadPreset;
 
@@ -230,8 +228,6 @@ protected:
     CGUILabel*          m_pChatGreenValue   [ ChatColorType::CHAT_COLOR_MAX ];
     CGUILabel*          m_pChatBlueValue    [ ChatColorType::CHAT_COLOR_MAX ];
     CGUILabel*          m_pChatAlphaValue   [ ChatColorType::CHAT_COLOR_MAX ];
-
-    CGUIScrollPane*     m_pInterfacePaneScroller;
 
     CGUIScrollPane*     m_pPaneChatFont;
     CGUIRadioButton*    m_pRadioChatFont    [ eChatFont::CHAT_FONT_MAX ];
@@ -251,6 +247,7 @@ protected:
     bool                OnJoypadDefaultClick    ( CGUIElement* pElement );
     bool                OnBindsDefaultClick     ( CGUIElement* pElement );
     bool                OnBindsListClick        ( CGUIElement* pElement );
+    bool                OnCheckBoxClick         ( CGUIElement* pElement );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
     bool                OnLoginButtonClick      ( CGUIElement* pElement );
@@ -272,8 +269,6 @@ protected:
 
     bool                OnChatLoadPresetClick   ( CGUIElement* pElement );
 
-    bool                OnSkinChanged ( CGUIElement* pElement );
-
     bool                OnFxQualityChanged      ( CGUIElement* pElement );
     bool                OnVolumetricShadowsClick ( CGUIElement* pElement );
 
@@ -282,8 +277,6 @@ private:
     void                ProcessJoypad           ( void );
 
     void                SaveData                ( void );
-
-    void                LoadSkins               ( void );
 
     void                LoadChatPresets         ( void );
     void                CreateChatColorTab      ( ChatColorType eType, const char* szName, CGUITabPanel* pParent );
@@ -299,8 +292,6 @@ private:
     bool                m_bCaptureKey;
     bool                m_bCaptureAxis;
 
-    bool                m_bIsModLoaded;
-
     unsigned char       m_ucOldRadioVolume;
     unsigned char       m_ucOldSFXVolume;
     float               m_fOldMTAVolume;
@@ -312,6 +303,11 @@ private:
 
     std::list < SKeyBindSection *> m_pKeyBindSections;
 
+    enum eCheckBox {
+        CHECKBOX_MENU_DYNAMIC,
+        CHECKBOX_MENU_VIDEO,
+        CHECKBOX_MENU_POSTEFFECTS
+    };
 };
 
 #endif

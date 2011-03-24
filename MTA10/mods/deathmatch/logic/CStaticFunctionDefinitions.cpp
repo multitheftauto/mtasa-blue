@@ -12,8 +12,6 @@
 *               Kevin Whiteside <kevuwk@gmail.com>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
-*               Peter Beverloo <>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *               
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -38,7 +36,6 @@ static CClientTeamManager*                          m_pTeamManager;
 static CGUI*                                        m_pGUI;
 static CClientGUIManager*                           m_pGUIManager;
 static CScriptKeyBinds*                             m_pScriptKeyBinds;
-static CScriptFontLoader*                           m_pScriptFontLoader;
 static CClientMarkerManager*                        m_pMarkerManager;
 static CClientPickupManager*                        m_pPickupManager;
 static CMovingObjectsManager*                       m_pMovingObjectsManager;
@@ -77,7 +74,6 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     m_pGUI = pCore->GetGUI ();
     m_pGUIManager = pManager->GetGUIManager ();
     m_pScriptKeyBinds = m_pClientGame->GetScriptKeyBinds ();
-    m_pScriptFontLoader = m_pClientGame->GetScriptFontLoader();
     m_pMarkerManager = pManager->GetMarkerManager ();
     m_pPickupManager = pManager->GetPickupManager ();
     m_pMovingObjectsManager = m_pClientGame->GetMovingObjectsManager ();
@@ -293,14 +289,8 @@ bool CStaticFunctionDefinitions::GetElementPosition ( CClientEntity& Entity, CVe
 }
 
 
-bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVector& vecRotation, const char* szRotationOrder)
+bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVector& vecRotation )
 {
-    eEulerRotationOrder desiredRotOrder = EulerRotationOrderFromString(szRotationOrder);
-    if (desiredRotOrder == EULER_INVALID)
-    {
-        return false;
-    }
-
     int iType = Entity.GetType ();
     switch ( iType )
     {
@@ -315,34 +305,18 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             if ( vecRotation.fZ < 0 )
                 vecRotation.fZ = 360 + vecRotation.fZ;
 
-            if (desiredRotOrder != EULER_DEFAULT)
-            {
-                //In get, ped is Z-Y-X wheras in set it's -Z-Y-Z
-                //It's a bug in ped, but the goal here is not to fix it, so we hack
-                vecRotation.fZ = -vecRotation.fZ;
-                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_MINUS_ZYX, desiredRotOrder);
-            }
-
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
             Vehicle.GetRotationDegrees ( vecRotation );
-            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZYX)
-            {
-                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZYX, desiredRotOrder);
-            }
             break;
         }
         case CCLIENTOBJECT:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
             Object.GetRotationDegrees ( vecRotation );
-            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
-            {
-                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
-            }
             break;
         }
         case CCLIENTPROJECTILE:
@@ -373,7 +347,7 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CClientEntity& Entity, CVe
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.GetMoveSpeed ( vecVelocity );
+            Vehicle.GetMoveSpeed ( vecVelocity );            
             break;
         }
         case CCLIENTOBJECT:
@@ -386,12 +360,6 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CClientEntity& Entity, CVe
         {
             CClientProjectile& Projectile = static_cast < CClientProjectile& > ( Entity );
             Projectile.GetVelocity ( vecVelocity );
-            break;
-        }
-        case CCLIENTSOUND:
-        {
-            CClientSound& Sound = static_cast < CClientSound& > ( Entity );
-            Sound.GetVelocity ( vecVelocity );
             break;
         }
         default: return false;
@@ -537,13 +505,6 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
 }
 
 
-bool CStaticFunctionDefinitions::GetElementAttachedOffsets ( CClientEntity & Entity, CVector & vecPosition, CVector & vecRotation )
-{
-    Entity.GetAttachedOffsets ( vecPosition, vecRotation );
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::GetElementAlpha ( CClientEntity& Entity, unsigned char& ucAlpha )
 {
     switch ( Entity.GetType () )
@@ -595,12 +556,6 @@ bool CStaticFunctionDefinitions::GetElementHealth ( CClientEntity& Entity, float
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
             fHealth = Vehicle.GetHealth ();
-            break;
-        }
-        case CCLIENTOBJECT:
-        {
-            CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            fHealth = Object.GetHealth ();
             break;
         }
         default: return false;
@@ -685,13 +640,6 @@ bool CStaticFunctionDefinitions::IsElementSyncer ( CClientEntity& Entity, bool &
                 bIsSyncer = m_pClientGame->GetUnoccupiedVehicleSync()->Exists ( Vehicle );
             break;
         }
-        case CCLIENTOBJECT:
-        {
-            CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( &Entity );
-            if ( pObject )
-                bIsSyncer = m_pClientGame->GetObjectSync ()->Exists ( pObject );
-            break;
-        }
         default: return false;
     }
     return true;
@@ -725,62 +673,6 @@ bool CStaticFunctionDefinitions::IsElementCollidableWith ( CClientEntity& Entity
     }
 
     return false;
-}
-
-bool CStaticFunctionDefinitions::GetElementCollisionsEnabled ( CClientEntity& Entity )
-{
-    switch ( Entity.GetType () )
-    {
-        case CCLIENTVEHICLE:
-        {
-            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            return Vehicle.IsCollisionEnabled ( );
-        }
-        case CCLIENTOBJECT:
-        {
-            CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            return Object.IsCollisionEnabled ( );
-        }
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
-        {
-            CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-            return Ped.GetUsesCollision ( );
-        }
-        default: return false;
-    }
-
-    return false;
-}
-
-
-bool CStaticFunctionDefinitions::IsElementFrozen ( CClientEntity& Entity, bool& bFrozen )
-{
-    switch ( Entity.GetType () )
-    {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
-        {
-            CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-            bFrozen = Ped.IsFrozen ();
-            break;
-        }
-        case CCLIENTVEHICLE:
-        {
-            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            bFrozen = Vehicle.IsFrozen ();
-            break;
-        }
-        case CCLIENTOBJECT:
-        {
-            CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            bFrozen = Object.IsStatic ();
-            break;
-        }
-        default: return false;
-    }
-
-    return true;
 }
 
 
@@ -828,23 +720,6 @@ bool CStaticFunctionDefinitions::DestroyElement ( CClientEntity& Entity )
     if ( Entity.IsLocalEntity () && !Entity.IsSystemEntity () )
     {
         m_pClientGame->GetElementDeleter ()->Delete ( &Entity );
-        return true;
-    }
-
-    return false;
-}
-
-
-bool CStaticFunctionDefinitions::SetElementID ( CClientEntity& Entity, const char* szID )
-{
-    assert ( szID );
-
-    // Change ID only for client-created elements
-    if ( Entity.IsLocalEntity () )
-    {
-        // Set the new ID
-        Entity.SetName ( szID );
-
         return true;
     }
 
@@ -916,15 +791,9 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CClientEntity& Entity, con
 }
 
 
-bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder )
+bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, const CVector& vecRotation )
 {
-    RUN_CHILDREN SetElementRotation ( **iter, vecRotation, szRotationOrder);
-
-    eEulerRotationOrder argumentRotOrder = EulerRotationOrderFromString(szRotationOrder);
-    if (argumentRotOrder == EULER_INVALID)
-    {
-        return false;
-    }
+    RUN_CHILDREN SetElementRotation ( **iter, vecRotation );
 
     int iType = Entity.GetType ();
     switch ( iType )
@@ -933,47 +802,23 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
         case CCLIENTPLAYER:
         {
             CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_MINUS_ZYX)
-            {
-                Ped.SetRotationDegrees ( vecRotation );
-            }
-            else
-            {
-                Ped.SetRotationDegrees ( ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_MINUS_ZYX ) );
-            }
+            Ped.SetRotationDegrees ( vecRotation );
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZYX)
-            {
-                Vehicle.SetRotationDegrees ( vecRotation );
-            }
-            else
-            {
-                Vehicle.SetRotationDegrees ( ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZYX ) );            
-            }
-			
+            Vehicle.SetRotationDegrees ( vecRotation );            
             break;
         }
         case CCLIENTOBJECT:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
-            {
-                Object.SetRotationDegrees ( vecRotation );
-            }
-            else
-            {
-                Object.SetRotationDegrees ( ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY ) );
-            }
-            
+            Object.SetRotationDegrees ( vecRotation );
             break;
         }
         case CCLIENTPROJECTILE:
         {
-            //Didn't implement anything for projectiles since I couldn't really test (only non crashing element was satchel and its rotation is ugly)
             CClientProjectile& Projectile = static_cast < CClientProjectile& > ( Entity );
             Projectile.SetRotationDegrees ( const_cast < CVector& > ( vecRotation ) );
             break;
@@ -1003,7 +848,7 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CClientEntity& Entity, con
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.SetMoveSpeed ( vecVelocity );
+            Vehicle.SetMoveSpeed ( vecVelocity );            
             break;
         }
         case CCLIENTOBJECT:
@@ -1016,12 +861,6 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CClientEntity& Entity, con
         {
             CClientProjectile& Projectile = static_cast < CClientProjectile& > ( Entity );
             Projectile.SetVelocity ( const_cast < CVector& > ( vecVelocity ) );
-            break;
-        }
-        case CCLIENTSOUND:
-        {
-            CClientSound& Sound = static_cast < CClientSound& > ( Entity );
-            Sound.SetVelocity ( const_cast < CVector& > ( vecVelocity ) );
             break;
         }
 
@@ -1115,7 +954,6 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, un
         case CCLIENTPICKUP:
         case CCLIENTRADARAREA:
         case CCLIENTWORLDMESH:
-        case CCLIENTSOUND:
         {
             Entity.SetDimension ( usDimension );
 
@@ -1175,7 +1013,7 @@ bool CStaticFunctionDefinitions::DetachElements ( CClientEntity& Entity, CClient
     {
         if ( pAttachedToEntity == NULL || pActualAttachedToEntity == pAttachedToEntity )
         {
-            Entity.AttachTo ( NULL );
+            Entity.AttachTo ( NULL );            
             return true;
         }
     }
@@ -1259,12 +1097,6 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CClientEntity& Entity, float
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
             Vehicle.SetHealth ( fHealth );
-            break;
-        }
-        case CCLIENTOBJECT:
-        {
-            CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            Object.SetHealth ( fHealth );
             break;
         }
         default: return false;
@@ -1380,7 +1212,7 @@ bool CStaticFunctionDefinitions::GetPedTargetCollision ( CClientPed& Ped, CVecto
 }
 
 
-bool CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, std::vector < SString >& outTaskHierarchy )
+char* CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, int iIndex )
 {
     CTaskManager* pTaskManager = Ped.GetTaskManager ();
     if ( pTaskManager )
@@ -1391,16 +1223,20 @@ bool CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, un
         else
             pTask = pTaskManager->GetTaskSecondary ( uiTaskType );
 
+        unsigned int uiTempIndex = 0;
         while ( pTask )
         {
-            outTaskHierarchy.push_back ( pTask->GetTaskName () );
+            if ( uiTempIndex == iIndex )
+                break;
             pTask = pTask->GetSubTask ();
         }
-
-        return !outTaskHierarchy.empty ();
+        if ( pTask )
+        {
+            return pTask->GetTaskName ();
+        }
     }
 
-    return false;
+    return NULL;
 }
 
 
@@ -1462,13 +1298,6 @@ bool CStaticFunctionDefinitions::GetPedMoveAnim ( CClientPed & Ped, unsigned int
 {
     iMoveAnim = (unsigned int)Ped.GetMoveAnim();
     return true;
-}
-
-bool CStaticFunctionDefinitions::GetPedMoveState ( CClientPed & Ped, std::string& strMoveState )
-{
-    if ( Ped.GetMovementState(strMoveState) )
-        return true;
-    return false;
 }
 
 
@@ -1652,7 +1481,7 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
 bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucComponent, bool bShow )
 {
     enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_ALL };
+                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK };
     switch ( ucComponent )
     {
         case HUD_AMMO:
@@ -1685,15 +1514,6 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucCompon
             return true;
         case HUD_CLOCK:
             g_pGame->GetHud ()->DisableClock ( !bShow );
-            return true;
-        case HUD_RADIO:
-            g_pGame->GetHud ()->DisableRadioName ( !bShow );
-            return true;
-        case HUD_WANTED:
-            g_pGame->GetHud ()->DisableWantedLevel ( !bShow );
-            return true;
-        case HUD_ALL:
-            g_pGame->GetHud ()->DisableAll ( !bShow );
             return true;
     }
     return false;
@@ -1820,9 +1640,9 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike ( CClientEntity& Enti
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable )
 {    
-    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
+    RUN_CHILDREN SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
 
     if ( IS_PED ( &Entity ) )
     {
@@ -1832,7 +1652,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const 
             CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
             if ( pBlock )
             {
-                Ped.RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
+                Ped.RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable );
                 return true;
             }
         }
@@ -2113,29 +1933,11 @@ CClientPed* CStaticFunctionDefinitions::CreatePed ( CResource& Resource, unsigne
     // Valid model?
     if ( CClientPlayerManager::IsValidModel ( ulModel ) )
     {
-        // Convert the rotation to radians
-        float fRotationRadians = ConvertDegreesToRadians ( fRotation );
-        // Clamp it to -PI .. PI
-        if ( fRotationRadians < -PI )
-        {
-            do
-            {
-                fRotationRadians += PI * 2.0f;
-            } while ( fRotationRadians < -PI );
-        }
-        else if ( fRotationRadians > PI )
-        {
-            do
-            {
-                fRotationRadians -= PI * 2.0f;
-            } while ( fRotationRadians > PI );
-        }
-
         // Create it
         CClientPed* pPed = new CClientPed ( m_pManager, ulModel, INVALID_ELEMENT_ID );
         pPed->SetParent ( Resource.GetResourceDynamicEntity() );
         pPed->SetPosition ( vecPosition );
-        pPed->SetCurrentRotation ( fRotationRadians );
+        pPed->SetCurrentRotation ( fRotation );
         return pPed;
     }
 
@@ -2293,9 +2095,9 @@ bool CStaticFunctionDefinitions::FixVehicle ( CClientEntity& Entity )
 }
 
 
-bool CStaticFunctionDefinitions::BlowVehicle ( CClientEntity& Entity )
+bool CStaticFunctionDefinitions::BlowVehicle ( CClientEntity& Entity, bool bExplode )
 {
-    RUN_CHILDREN BlowVehicle ( **iter );
+    RUN_CHILDREN BlowVehicle ( **iter, bExplode );
 
     if ( IS_VEHICLE ( &Entity ) )
     {
@@ -2327,14 +2129,14 @@ bool CStaticFunctionDefinitions::GetVehicleCurrentGear ( CClientVehicle& Vehicle
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleColor ( CClientEntity& Entity, const CVehicleColor& color )
+bool CStaticFunctionDefinitions::SetVehicleColor ( CClientEntity& Entity, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
 {
-    RUN_CHILDREN SetVehicleColor ( **iter, color );
+    RUN_CHILDREN SetVehicleColor ( **iter, ucRed, ucGreen, ucBlue, ucAlpha );
 
     if ( IS_VEHICLE ( &Entity ) )
     {
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-        Vehicle.SetColor ( color );
+        Vehicle.SetColor ( ucRed, ucGreen, ucBlue, ucAlpha );
 
         return true;
     }
@@ -2873,18 +2675,10 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float 
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientEntity& Entity, const SColor color )
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientVehicle& Vehicle, const SColor color )
 {
-    RUN_CHILDREN SetVehicleHeadLightColor ( **iter, color );
-
-    if ( IS_VEHICLE(&Entity) )
-    {
-        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-        Vehicle.SetHeadLightColor ( color );
-        return true;
-    }
-
-    return false;
+    Vehicle.SetHeadLightColor ( color );
+    return true;
 }
 
 
@@ -2894,22 +2688,6 @@ bool CStaticFunctionDefinitions::GetVehicleEngineState ( CClientVehicle & Vehicl
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( CClientEntity& Entity, unsigned char ucDoor, float fRatio, unsigned long ulTime )
-{
-    if ( ucDoor <= 5 )
-    {
-        RUN_CHILDREN SetVehicleDoorOpenRatio ( **iter, ucDoor, fRatio, ulTime );
-
-        if ( IS_VEHICLE(&Entity) )
-        {
-            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.SetDoorOpenRatio ( ucDoor, fRatio, ulTime, true );
-            return true;
-        }
-    }
-
-    return false;
-}
 
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CClientEntity& Entity, bool bEnabled )
 {
@@ -2971,41 +2749,11 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Enti
 }
 
 
-bool CStaticFunctionDefinitions::SetElementFrozen ( CClientEntity& Entity, bool bFrozen )
-{
-    switch ( Entity.GetType () )
-    {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
-        {
-            CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-            Ped.SetFrozen ( bFrozen );
-            break;
-        }
-        case CCLIENTVEHICLE:
-        {
-            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.SetFrozen ( bFrozen );
-            break;
-        }
-        case CCLIENTOBJECT:
-        {
-            CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            Object.SetStatic ( bFrozen );
-            break;
-        }
-        default: return false;
-    }
-
-    return true;
-}
-
-
 CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation )
 {
     if ( CClientObjectManager::IsValidModel ( usModelID ) )
     {
-        CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, m_pClientGame->GetObjectSync (), INVALID_ELEMENT_ID, usModelID );
+        CClientObject* pObject = new CDeathmatchObject ( m_pManager, m_pMovingObjectsManager, INVALID_ELEMENT_ID, usModelID );
         if ( pObject )
         {
             pObject->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -3027,13 +2775,6 @@ bool CStaticFunctionDefinitions::IsObjectStatic ( CClientObject & Object, bool &
 }
 
 
-bool CStaticFunctionDefinitions::GetObjectScale ( CClientObject & Object, float& fScale )
-{
-    fScale = Object.GetScale ();
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, const CVector& vecRotation )
 {
     RUN_CHILDREN SetObjectRotation ( **iter, vecRotation );
@@ -3044,17 +2785,20 @@ bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, cons
 
         Object.SetRotationDegrees ( vecRotation );
 
-        // Kayl: removed setTargetRotation, if we want consistency target WAS a delta not an absolute value and serverside doesn't allow rotation
-        // change while moving so in theory it shouldn't have been used
+        // Update our target rotation
+        // Jax: no idea what NoWrap is, copied from moveObject
+        CVector vecRadiansNoWrap = vecRotation;
+        ConvertDegreesToRadiansNoWrap ( vecRadiansNoWrap );
+        Object.SetTargetRotation ( vecRadiansNoWrap );
     }
 
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot )
+bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation )
 {
-    RUN_CHILDREN MoveObject ( **iter, ulTime, vecPosition, vecDeltaRotation, a_szEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
+    RUN_CHILDREN MoveObject ( **iter, ulTime, vecPosition, vecRotation );
 
     if ( IS_OBJECT ( &Entity ) )
     {
@@ -3066,22 +2810,11 @@ bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned lo
         Object.GetRotationRadians ( vecSourceRotation );
 
         // Convert the target rotation given to radians (don't wrap around as these can be rotated more than 360)
-        CVector vecDeltaRadians = vecDeltaRotation;
-        ConvertDegreesToRadiansNoWrap ( vecDeltaRadians );
+        CVector vecRadians = vecRotation;
+        ConvertDegreesToRadiansNoWrap ( vecRadians );
 
-        CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( a_szEasingType );
-        if (easingType == CEasingCurve::EASING_INVALID )
-        {
-            return false;
-        }
-
-        CPositionRotationAnimation animation;
-        animation.SetSourceValue ( SPositionRotation ( vecSourcePosition, vecSourceRotation ) );
-        animation.SetTargetValue ( SPositionRotation ( vecPosition, vecDeltaRadians ), true );
-        animation.SetEasing ( easingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
-        animation.SetDuration ( ulTime );
-
-        Object.StartMovement ( animation );
+        Object.SetOrientation ( vecSourcePosition, vecSourceRotation );
+        Object.StartMovement ( vecPosition, vecRadians, ulTime );
     }
 
     return true;
@@ -3396,9 +3129,9 @@ bool CStaticFunctionDefinitions::PlayMissionAudio ( const CVector& vecPosition, 
 }
 
 
-bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned char ucSound )
+bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned long ulSound )
 {
-    g_pGame->GetAudio ()->PlayFrontEndSound ( ucSound );
+    g_pGame->GetAudio ()->PlayFrontEndSound ( ulSound );
     return true;
 }
 
@@ -3411,9 +3144,9 @@ bool CStaticFunctionDefinitions::PreloadMissionAudio ( unsigned short usSound, u
 }
 
 
-CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance )
+CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance )
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance );
+    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
     if ( pBlip )
     {
         pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -3426,9 +3159,9 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource
 }
 
 
-CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance )
+CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, float fVisibleDistance )
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance );
+    CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, fVisibleDistance );
     if ( pBlip )
     {
         pBlip->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -3498,22 +3231,6 @@ bool CStaticFunctionDefinitions::SetBlipOrdering ( CClientEntity& Entity, short 
         CClientRadarMarker& Marker = static_cast < CClientRadarMarker& > ( Entity );
 
         Marker.SetOrdering ( sOrdering );
-        return true;
-    }
-
-    return false;
-}
-
-
-bool CStaticFunctionDefinitions::SetBlipVisibleDistance ( CClientEntity& Entity, unsigned short usVisibleDistance )
-{
-    RUN_CHILDREN SetBlipVisibleDistance ( **iter, usVisibleDistance );
-
-    if ( IS_RADARMARKER ( &Entity ) )
-    {
-        CClientRadarMarker& Marker = static_cast < CClientRadarMarker& > ( Entity );
-
-        Marker.SetVisibleDistance ( usVisibleDistance );
         return true;
     }
 
@@ -3678,6 +3395,20 @@ bool CStaticFunctionDefinitions::SetMarkerIcon ( CClientEntity& Entity, const ch
 }
 
 
+bool CStaticFunctionDefinitions::GetCameraMode ( char * szBuffer, size_t sizeBuffer )
+{
+    assert ( szBuffer );
+    assert ( sizeBuffer );
+
+    if ( m_pCamera->IsInFixedMode () )
+        strncpy ( szBuffer, "fixed", sizeBuffer );
+    else
+        strncpy ( szBuffer, "player", sizeBuffer );
+
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetCameraMatrix ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV )
 {
     m_pCamera->GetPosition ( vecPosition );
@@ -3780,17 +3511,6 @@ bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, uns
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetCameraView ( unsigned short ucMode )
-{
-    m_pCamera->SetCameraView ( (eVehicleCamMode) ucMode );
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetCameraView ( unsigned short& ucMode )
-{
-    ucMode = m_pCamera->GetCameraView();
-    return true;
-}
 
 bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVector& vecWorld )
 {
@@ -3828,44 +3548,6 @@ bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVect
 }
 
 
-void CStaticFunctionDefinitions::DrawText ( int iLeft, int iTop,
-                                 int iRight, int iBottom,
-                                 unsigned long dwColor,
-                                 const char* szText,
-                                 float fScaleX,
-                                 float fScaleY,
-                                 unsigned long ulFormat,
-                                 const char* szFont,
-                                 bool bPostGUI, CResource* pResource )
-{
-    SString strFile = szFont;
-    SString strPath, strMetaPath;
-    ID3DXFont *pFont = NULL;
-    if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath, strMetaPath ) && FileExists(strPath) )
-    {
-        if ( m_pScriptFontLoader->GetDXFont(&pFont, strPath, strMetaPath, pResource, fScaleX, fScaleY) )
-        {
-            g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pFont, bPostGUI );
-            return;
-        }
-    }
-
-               
-    eFontType fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFont ) );
-    pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
-    g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pFont, bPostGUI );
-}
-
-bool CStaticFunctionDefinitions::LoadFont ( std::string strFullFilePath, bool bBold, unsigned int uiSize, std::string strMetaPath, CResource* pResource )
-{
-    return m_pScriptFontLoader->LoadFont(strFullFilePath, bBold, uiSize, strMetaPath, pResource );
-}
-
-bool CStaticFunctionDefinitions::UnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
-{
-    return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
-}
-
 bool CStaticFunctionDefinitions::IsCursorShowing ( bool& bShowing )
 {
     bShowing = m_pClientGame->AreCursorEventsEnabled () || m_pCore->IsCursorForcedVisible();
@@ -3878,24 +3560,12 @@ bool CStaticFunctionDefinitions::GUIGetInputEnabled ( void )
     return m_pGUI->GetGUIInputEnabled ();
 }
 
-bool CStaticFunctionDefinitions::GUISetInputMode ( const std::string& a_rstrInputMode )
-{
-    eInputMode inputMode = m_pGUI->GetInputModeFromString ( a_rstrInputMode );
-    if ( inputMode == INPUTMODE_INVALID )
-    {
-        return false;
-    }
-    else
-    {
-        m_pGUI->SetGUIInputMode ( inputMode );
-        return true;
-    }
+
+void CStaticFunctionDefinitions::GUISetInputEnabled ( bool bEnabled )
+{   // can't inline because statics are defined in .cpp not .h
+    m_pGUI->SetGUIInputEnabled ( bEnabled );
 }
 
-bool CStaticFunctionDefinitions::GUIGetInputMode ( std::string& a_rstrResult )
-{
-    return m_pGUI->GetStringFromInputMode ( m_pGUI->GetGUIInputMode(), a_rstrResult );
-}
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative )
 {
@@ -4217,169 +3887,6 @@ bool CStaticFunctionDefinitions::GUIDeleteTab ( CLuaMain& LuaMain, CClientGUIEle
     return true;
 }
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
-{
-    CGUIElement *pElement = m_pGUI->CreateComboBox ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
-    
-    // Disable editing of the box...
-    //CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( pElement );
-    static_cast < CGUIComboBox* > ( pElement ) -> SetReadOnly ( true );
-
-    // register to the gui manager
-    CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
-    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource()->GetResourceGUIEntity()  );
-
-    // set events
-    pGUIElement->SetEvents ( "onClientGUIComboBoxAccepted" );
-    static_cast < CGUIComboBox* > ( pElement ) -> SetSelectionHandler ( pGUIElement->GetCallback1 () );
-
-    return pGUIElement;
-}
-
-int CStaticFunctionDefinitions::GUIComboBoxAddItem ( CClientEntity& Entity, const char* szText )
-{
-    RUN_CHILDREN GUIComboBoxAddItem ( **iter, szText );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a combobox?
-        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
-        {
-            // Add a new item.
-            CGUIListItem* item = static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> AddItem ( szText );
-            // Return it's id + 1 so indexes start at 1.
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> GetItemIndex ( item );
-        }
-    }    
-
-    return 0;
-}
-
-bool CStaticFunctionDefinitions::GUIComboBoxRemoveItem ( CClientEntity& Entity, int index )
-{
-    RUN_CHILDREN GUIComboBoxRemoveItem ( **iter, index );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a combobox?
-        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
-        {
-            // Call RemoveItem with index - 1 so indexes are compatible internally ...
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> RemoveItem( index  );
-        }
-    }    
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::GUIComboBoxClear ( CClientEntity& Entity  )
-{
-    RUN_CHILDREN GUIComboBoxClear ( **iter );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a combobox?
-        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
-        {
-            // Clear the combobox
-            static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) ->Clear ( );
-            return true;
-        }
-    }    
-
-    return false;
-}
-
-int CStaticFunctionDefinitions::GUIComboBoxGetSelected ( CClientEntity& Entity )
-{
-    RUN_CHILDREN GUIComboBoxGetSelected ( **iter );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a combobox?
-        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
-        {
-            // return the selected + 1 so indexes start at 1...
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) ->GetSelectedItemIndex ( );
-        }
-    }    
-
-    return 0;
-}
-
-bool CStaticFunctionDefinitions::GUIComboBoxSetSelected ( CClientEntity& Entity, int index )
-{
-    RUN_CHILDREN GUIComboBoxSetSelected ( **iter, index );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a combobox?
-        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
-        {
-            // Call SetSelectedItem with index - 1 so indexes are compatible internally ...
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> SetSelectedItemByIndex( index );
-        }
-    }    
-
-    return false;
-}
-
-std::string CStaticFunctionDefinitions::GUIComboBoxGetItemText ( CClientEntity& Entity, int index )
-{
-    RUN_CHILDREN GUIComboBoxGetItemText ( **iter, index );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a combobox?
-        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
-        {
-            // Call GetItemText with index - 1 so indexes are compatible internally ...
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> GetItemText( index );
-        }
-    }    
-
-    return NULL;
-}
-
-bool CStaticFunctionDefinitions::GUIComboBoxSetItemText ( CClientEntity& Entity, int index, const char* szText )
-{
-    RUN_CHILDREN GUIComboBoxSetItemText ( **iter, index, szText );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a combobox?
-        if ( IS_CGUIELEMENT_COMBOBOX ( &GUIElement ) )
-        {
-            // Call SetItemText with index - 1 so indexes are compatible internally ...
-            return static_cast < CGUIComboBox* > ( GUIElement.GetCGUIElement () ) -> SetItemText( index, szText );
-        }
-    }    
-
-    return false;
-}
 
 void CStaticFunctionDefinitions::GUISetText ( CClientEntity& Entity, const char* szText )
 {
@@ -4408,12 +3915,6 @@ bool CStaticFunctionDefinitions::GUISetFont ( CClientEntity& Entity, const char*
     }
     return bResult;
 }
-
-bool CStaticFunctionDefinitions::GUIUnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
-{
-    return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
-}
-
 
 
 void CStaticFunctionDefinitions::GUISetSize ( CClientEntity& Entity, const CVector2D& vecSize, bool bRelative )
@@ -4836,32 +4337,6 @@ void CStaticFunctionDefinitions::GUIGridListClear ( CClientEntity& Entity )
             static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) ->Clear ();
         }
     }
-}
-
-void CStaticFunctionDefinitions::GUIGridListSetItemData ( CClientGUIElement& GUIElement, int iRow, int iColumn, CLuaArgument* Variable )
-{
-    //Delete any old data we might have
-    CLuaArgument* pVariable = reinterpret_cast < CLuaArgument* > (
-        static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> GetItemData (
-            iRow, 
-            iColumn
-        )
-    );
-    if ( pVariable )
-        delete pVariable;
-
-    static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetItemData ( 
-        iRow, 
-        iColumn, 
-        (void*)Variable, 
-        CGUICallback<void,void*>( &CStaticFunctionDefinitions::GUIItemDataDestroyCallback )
-    ); 
-}
-
-
-void CStaticFunctionDefinitions::GUIItemDataDestroyCallback ( void* data )
-{
-    delete (CLuaArgument*)(data);
 }
 
 
@@ -5290,47 +4765,7 @@ bool CStaticFunctionDefinitions::SetBlurLevel ( unsigned char ucLevel )
 
 bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
 {
-    if ( fHeight >= -20 )
-    {
-        g_pGame->GetWorld ()->SetJetpackMaxHeight ( fHeight );
-        return true;
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
-{
-    if ( ucState >= 0 && ucState < 10 )
-    {
-        g_pMultiplayer->SetTrafficLightState ( ucState );
-        return true;
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::SetTrafficLightsLocked ( bool bLocked )
-{
-    g_pMultiplayer->SetTrafficLightsLocked ( bLocked );
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetWindVelocity ( float fX, float fY, float fZ )
-{
-    g_pMultiplayer->SetWindVelocity ( fX, fY, fZ );
-    return true;
-}
-
-bool CStaticFunctionDefinitions::RestoreWindVelocity ( void )
-{
-    g_pMultiplayer->RestoreWindVelocity ( );
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetWindVelocity ( float& fX, float& fY, float& fZ )
-{
-    g_pMultiplayer->GetWindVelocity ( fX, fY, fZ );
+    g_pGame->GetWorld ()->SetJetpackMaxHeight ( fHeight );
     return true;
 }
 
@@ -5338,26 +4773,6 @@ bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled ( const char* szP
 {
     return g_pGame->IsCheatEnabled ( szPropName );
 }
-
-bool CStaticFunctionDefinitions::GetTrafficLightState ( unsigned char& ucState )
-{
-    ucState = g_pMultiplayer->GetTrafficLightState ();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::AreTrafficLightsLocked ( bool& bLocked )
-{
-    bLocked = g_pMultiplayer->GetTrafficLightsLocked ();
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::GetSkyGradient ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue )
-{
-    g_pMultiplayer->GetSkyColor ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue );
-    return true;
-}
-
 
 bool CStaticFunctionDefinitions::SetSkyGradient ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue )
 {
@@ -5370,34 +4785,6 @@ bool CStaticFunctionDefinitions::SetSkyGradient ( unsigned char ucTopRed, unsign
 bool CStaticFunctionDefinitions::ResetSkyGradient ( void )
 {
     g_pMultiplayer->ResetSky ();
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::GetHeatHaze ( SHeatHazeSettings& settings )
-{
-    g_pMultiplayer->GetHeatHaze ( settings );
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::SetHeatHaze ( const SHeatHazeSettings& settings )
-{
-    g_pMultiplayer->SetHeatHaze ( settings );
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::ResetHeatHaze ( void )
-{
-    g_pMultiplayer->ResetHeatHaze ();
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::GetWaterColor ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha )
-{
-    g_pMultiplayer->GetWaterColor ( fWaterRed, fWaterGreen, fWaterBlue, fWaterAlpha );
     return true;
 }
 
@@ -6104,17 +5491,17 @@ bool CStaticFunctionDefinitions::FxAddFootSplash ( CVector & vecPosition )
 }
 
 
-CClientSound* CStaticFunctionDefinitions::PlaySound ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop )
+CClientSound* CStaticFunctionDefinitions::PlaySound ( CResource* pResource, const char* szSound, bool bLoop )
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound2D ( strSound, bIsURL, bLoop );
+    CClientSound* pSound = m_pSoundManager->PlaySound2D ( szSound, bLoop );
     if ( pSound ) pSound->SetParent ( pResource->GetResourceDynamicEntity() );
     return pSound;
 }
 
 
-CClientSound* CStaticFunctionDefinitions::PlaySound3D ( CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop )
+CClientSound* CStaticFunctionDefinitions::PlaySound3D ( CResource* pResource, const char* szSound, CVector vecPosition, bool bLoop )
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound3D ( strSound, bIsURL, vecPosition, bLoop );
+    CClientSound* pSound = m_pSoundManager->PlaySound3D ( szSound, vecPosition, bLoop );
     if ( pSound ) pSound->SetParent ( pResource->GetResourceDynamicEntity() );
     return pSound;
 }
@@ -6215,23 +5602,6 @@ bool CStaticFunctionDefinitions::GetSoundMaxDistance ( CClientSound& Sound, floa
 {
     fDistance = Sound.GetMaxDistance ();
     return true;
-}
-
-bool CStaticFunctionDefinitions::GetSoundMetaTags ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags )
-{
-    strMetaTags = Sound.GetMetaTags ( strFormat );
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetSoundEffectEnabled ( CClientSound& Sound, const SString& strEffectName, bool bEnable )
-{
-    int iFxEffect = m_pSoundManager->GetFxEffectFromName ( strEffectName );
-
-    if ( iFxEffect >= 0 )
-        if ( Sound.SetFxEffect ( iFxEffect, bEnable ) )
-            return true;
-
-    return false;
 }
 
 #ifdef MTA_VOICE

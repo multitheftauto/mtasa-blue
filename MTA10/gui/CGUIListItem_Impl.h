@@ -38,7 +38,7 @@ public:
     void                    SetText                 ( const char *pszText, const char *pszSortText = NULL );
 
     void*                   GetData                 ( void ) const                { return m_pData; }
-    void                    SetData                 ( void* pData, CGUICallback<void,void*> deleteDataCallback = NULL )    { m_pData = pData; m_deleteDataCallback = deleteDataCallback; }
+    void                    SetData                 ( void* pData )               { m_pData = pData; }
     void                    SetData                 ( const char* pszData );
 
     void                    SetDisabled             ( bool bDisabled );
@@ -56,10 +56,9 @@ public:
     unsigned int            ItemType;
 
 private:
-    CEGUI::ListboxItem*         m_pListItem;
-    void*                       m_pData;
-    std::string                 m_strData;
-    CGUICallback<void,void*>    m_deleteDataCallback;
+    CEGUI::ListboxItem*     m_pListItem;
+    void*                   m_pData;
+    std::string             m_strData;
 };
 
 #endif

@@ -40,10 +40,4 @@ struct CGUIMouseEventArgs
     float                       wheelChange;
 };
 
-struct CGUIFocusEventArgs
-{
-    CGUIElement*                pActivatedWindow;
-    CGUIElement*                pDeactivatedWindow;
-};
-
 #endif

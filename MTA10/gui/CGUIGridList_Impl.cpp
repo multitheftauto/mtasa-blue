@@ -99,7 +99,7 @@ unsigned int CGUIGridList_Impl::AddColumn ( const char* szTitle, float fWidth )
 {
     // Create a new column with an unique handle
     int hUniqueHandle = GetUniqueHandle ();
-    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addColumn ( (CGUI_Impl::GetUTFString(szTitle)), hUniqueHandle, fWidth );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addColumn ( szTitle, hUniqueHandle, fWidth );
 
     int iColumnIndex = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getColumnWithID ( hUniqueHandle );
 
@@ -278,13 +278,13 @@ void* CGUIGridList_Impl::GetItemData ( int iRow, int hColumn )
 }
 
 
-void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, void* pData, CGUICallback<void,void*> deleteDataCallback )
+void CGUIGridList_Impl::SetItemData ( int iRow, int hColumn, void* pData )
 {
     // Get the current item at that offset and set the text
     CGUIListItem* pItem = GetItem ( iRow, hColumn );
     if ( pItem )
     {
-        pItem->SetData ( pData, deleteDataCallback );
+        pItem->SetData ( pData );
     }
 }
 

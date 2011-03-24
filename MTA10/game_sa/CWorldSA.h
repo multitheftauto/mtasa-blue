@@ -5,7 +5,6 @@
 *  FILE:        game_sa/CWorldSA.h
 *  PURPOSE:     Header file for game world
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -42,7 +41,6 @@
 #define NUM_StreamRepeatSectorCols                          16
 #define VAR_fJetpackMaxHeight                               0x8703D8
 
-
 #include <game/CWorld.h>
 #include "CEntitySA.h"
 
@@ -67,7 +65,6 @@ public:
     DWORD       GetCurrentArea            ( void );
     void        SetCurrentArea            ( DWORD dwArea );
     void        SetJetpackMaxHeight       ( float fHeight );
-    float       GetJetpackMaxHeight       ( void );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)

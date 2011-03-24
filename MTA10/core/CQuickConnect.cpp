@@ -24,7 +24,6 @@ CQuickConnect::CQuickConnect ( void )
     // Create the window
     m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "QUICK CONNECT" ) );
     m_pWindow->SetCloseButtonEnabled ( false );
-    m_pWindow->SetVisible(false);
     //m_pWindow->SetMovable ( false );
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();

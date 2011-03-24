@@ -52,15 +52,13 @@ private:
     CDoorSAInterface        * internalInterface;
 public:
     // constructor
-    CDoorSA(CDoorSAInterface * doorInterface = 0) { internalInterface = doorInterface; };
+    CDoorSA(CDoorSAInterface * doorInterface) { internalInterface = doorInterface; };
 
-    void SetInterface( CDoorSAInterface* doorInterface ) { internalInterface =  doorInterface; }
-    CDoorSAInterface* GetInterface() { return internalInterface; };
-
+    CDoorSAInterface    * GetInterface() { return internalInterface; };
     FLOAT           GetAngleOpenRatio ( );
     BOOL            IsClosed (  );
     BOOL            IsFullyOpen (  );
-    VOID            Open ( float fOpenRatio );
+    VOID            Open ( FLOAT fUnknown );
     eDoorState      GetDoorState() { return (eDoorState)this->GetInterface()->m_nDoorState; };
 };
 

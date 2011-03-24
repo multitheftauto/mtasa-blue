@@ -5,17 +5,11 @@ if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch
 AM_CXXFLAGS += -Winvalid-pch
 
-StdInc.h.gch:
-	$(LIBTOOL) --tag=CXX $(xmll_la_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile \
-		$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-		$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)  \
-		-o xmll_la-StdInc.h.lo $(srcdir)/StdInc.h \
-		-MT xmll_la-StdInc.h.gch -MD -MP -MF $(DEPDIR)/xmll_la-StdInc.h.Tpo
-
-	mv -f $(DEPDIR)/xmll_la-StdInc.h.Tpo $(DEPDIR)/xmll_la-StdInc.h.Plo
-	mv -f .libs/xmll_la-StdInc.h.o $@
-
-include ./$(DEPDIR)/xmll_la-StdInc.h.Plo
+StdInc.h.gch: StdInc.h
+	-rm -f StdInc.h.gch
+	$(CXX) -fPIC -DPIC $(DEFS) $(DEFAULT_INCLUDES) \
+		$(AM_CXXFLAGS) $(CXXFLAGS) $(CPPFLAGS) \
+		$(INCLUDES) -o StdInc.h.gch -xc++-header StdInc.h
 
 clean-local:
 	-rm -f StdInc.h.gch
@@ -24,10 +18,9 @@ endif
 libdir = $(outputdir)
 lib_LTLIBRARIES = xmll.la
 xmll_la_LIBTOOLFLAGS = --tag=disable-static
-xmll_la_LIBADD = \
-	../../vendor/tinyxml/libtinyxml.la
 xmll_la_LDFLAGS = \
-	-module -avoid-version
+	-module -avoid-version \
+	-L../../vendor/tinyxml -ltinyxml
 xmll_la_SOURCES = \
 	CXMLArray.cpp \
 	CXMLArray.h \
@@ -41,4 +34,6 @@ xmll_la_SOURCES = \
 	CXMLImpl.h \
 	CXMLNodeImpl.cpp \
 	CXMLNodeImpl.h \
+	StdInc.cpp \
+	StdInc.h \
 	XML.cpp

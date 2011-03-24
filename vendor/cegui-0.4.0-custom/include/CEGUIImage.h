@@ -379,10 +379,6 @@ public:
     */
     void writeXMLToStream(OutStream& out_stream) const;
 
-    //Talihax
-    void            setCodepoint(const unsigned long cp) { d_codepoint = cp; }
-    unsigned long   getCodepoint(void) const { return d_codepoint; }
-
 
 	friend class std::map<String, Image>;
 	friend struct std::pair<const String, Image>;
@@ -422,7 +418,7 @@ public:
 
 	\exception NullObjectException	Thrown if \a owner was NULL.
 	*/
-	Image(const Imageset* owner, const String& name, const Rect& area, const Point& render_offset, float horzScaling = 1.0f, float vertScaling = 1.0f, unsigned long ulCodepoint = 0 );
+	Image(const Imageset* owner, const String& name, const Rect& area, const Point& render_offset, float horzScaling = 1.0f, float vertScaling = 1.0f);
 
 
 
@@ -488,7 +484,6 @@ private:
 	float	d_scaledHeight;		//!< scaled image height.
 	Point	d_scaledOffset;		//!< scaled rendering offset.
 	String	d_name;				//!< name of this image.
-    unsigned long d_codepoint;
 };
 
 } // End of  CEGUI namespace section

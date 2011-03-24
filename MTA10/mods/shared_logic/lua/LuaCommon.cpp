@@ -57,15 +57,6 @@ CClientColShape* lua_tocolshape ( lua_State* luaVM, int iArgument )
     return NULL;
 }
 
-CScriptFile* lua_tofile ( lua_State* luaVM, int iArgument )
-{
-    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
-    if ( pElement && pElement->GetType () == SCRIPTFILE )
-        return static_cast < CScriptFile* > ( pElement );
-    else
-        return NULL;
-}
-
 CClientDFF* lua_todff ( lua_State* luaVM, int iArgument )
 {
     CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
@@ -242,17 +233,6 @@ CClientWater* lua_towater ( lua_State* luaVM, int iArgument )
     if ( pElement && pElement->GetType () == CCLIENTWATER )
     {
         return static_cast < CClientWater* > ( pElement );
-    }
-
-    return NULL;
-}
-
-CClientIFP* lua_toifp ( lua_State* luaVM, int iArgument )
-{
-    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
-    if ( pElement && pElement->GetType () == CCLIENTIFP  )
-    {
-        return static_cast < CClientIFP* > ( pElement );
     }
 
     return NULL;

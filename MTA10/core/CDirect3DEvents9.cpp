@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.Misc.h"
 
 // Variables used for screen shot saving
 static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;
@@ -66,6 +67,9 @@ void CDirect3DEvents9::OnInvalidate ( IDirect3DDevice9 *pDevice )
     // Invalidate the VMR9 Manager
     //CVideoManager::GetSingleton ().OnLostDevice ();
 
+    // Invalidate the main menu
+    CLocalGUI::GetSingleton().GetMainMenu ()->OnInvalidate ( pDevice );
+
     // Notify gui
     CLocalGUI::GetSingleton().Invalidate ();
 
@@ -78,6 +82,9 @@ void CDirect3DEvents9::OnRestore ( IDirect3DDevice9 *pDevice )
 
     // Restore the VMR9 manager
     //CVideoManager::GetSingleton ().OnResetDevice ( pDevice );
+
+    // Restore the main menu
+    CLocalGUI::GetSingleton().GetMainMenu ()->OnRestore ( pDevice );
 
     // Restore the GUI
     CLocalGUI::GetSingleton().Restore ();

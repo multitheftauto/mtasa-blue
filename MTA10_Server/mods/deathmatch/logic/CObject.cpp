@@ -27,15 +27,8 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
 
     m_pObjectManager = pObjectManager;
     m_usModel = 0xFFFF;
-    m_pMoveAnimation = NULL;
+    m_moveData.bActive = false;
     m_ucAlpha = 255;
-    m_fScale  = 1;
-    m_fHealth = 1000.0f;
-    m_bBreakable = true;
-    m_bSyncable = true;
-    m_pSyncer = NULL;
-
-    m_bCollisionsEnabled = true;
 
     // Add us to the manager's list
     pObjectManager->AddToList ( this );
@@ -52,14 +45,8 @@ CObject::CObject ( const CObject& Copy ) : CElement ( Copy.m_pParent, Copy.m_pXM
     m_usModel = Copy.m_usModel;
     m_vecPosition = Copy.m_vecPosition;
     m_vecRotation = Copy.m_vecRotation;
-    
-    m_pMoveAnimation = NULL;
-    if ( Copy.m_pMoveAnimation != NULL )
-    {
-        m_pMoveAnimation = new CPositionRotationAnimation ( *Copy.m_pMoveAnimation );
-    }
-    
-    m_bCollisionsEnabled = Copy.m_bCollisionsEnabled;
+    // TODO: copy move data properly
+    m_moveData.bActive = false;
 
     // Add us to the manager's list
     m_pObjectManager->AddToList ( this );
@@ -69,15 +56,6 @@ CObject::CObject ( const CObject& Copy ) : CElement ( Copy.m_pParent, Copy.m_pXM
 
 CObject::~CObject ( void )
 {
-    if  ( m_pMoveAnimation != NULL)
-    {
-        delete m_pMoveAnimation;
-        m_pMoveAnimation = NULL;
-    }
-
-    // Remove syncer
-    SetSyncer ( NULL );
-
     // Unlink us from manager
     Unlink ();
 }
@@ -152,19 +130,6 @@ bool CObject::ReadSpecialData ( void )
     if ( !GetCustomDataBool ( "doublesided", m_bDoubleSided, true ) )
         m_bDoubleSided = false;
 
-    if ( !GetCustomDataFloat ( "scale", m_fScale, true ) )
-        m_fScale = 1;
-
-    if ( !GetCustomDataBool ( "collisions", m_bCollisionsEnabled, true ) )
-        m_bCollisionsEnabled = true;
-
-    if ( GetCustomDataInt ( "alpha", iTemp, true ) )
-        m_ucAlpha = static_cast < unsigned char > ( iTemp );
-
-    bool bFrozen;
-    if ( GetCustomDataBool ( "frozen", bFrozen, true ) )
-        m_bIsStatic = bFrozen;
-
     // Success
     return true;
 }
@@ -180,13 +145,23 @@ const CVector& CObject::GetPosition ( void )
     // Are we moving?
     else if ( IsMoving () )
     {
-        SPositionRotation positionRotation;
-        bool bStillRunning = m_pMoveAnimation->GetValue ( positionRotation );
-        m_vecPosition = positionRotation.m_vecPosition;
-        if ( !bStillRunning )
-        {
-            StopMoving ();
-        }
+        // Calculate our current Position
+        unsigned long ulCurrentTime = GetTime ();
+
+        // Grab the difference between start and finish
+        CVector vecJourney = m_moveData.vecStopPosition - m_moveData.vecStartPosition;
+        
+        // Grab the duration the object takes to move
+        float fDuration = static_cast < float > ( m_moveData.ulTime );
+        // Grab the time that has passed since we started moving
+        float fTimePassed = static_cast < float > ( ulCurrentTime - m_moveData.ulTimeStart );
+
+        // How far along our journey should we be?
+        vecJourney /= fDuration;
+        vecJourney *= fTimePassed;
+
+        // Update our stored position
+        m_vecPosition = m_moveData.vecStartPosition + vecJourney;
     }
 
     if ( vecOldPosition != m_vecPosition )
@@ -225,14 +200,23 @@ void CObject::GetRotation ( CVector & vecRotation )
     // Are we moving?
     else if ( IsMoving () )
     {
-        SPositionRotation positionRotation;
-        bool bStillRunning = m_pMoveAnimation->GetValue ( positionRotation );
-        m_vecRotation = positionRotation.m_vecRotation;
-        if ( !bStillRunning )
-        {
-            StopMoving ();
-        }
-        vecRotation = m_vecRotation;
+        // Calculate our current rotation
+        unsigned long ulCurrentTime = GetTime ();
+
+        // Grab the difference between start and finish
+        CVector vecJourney = m_moveData.vecStopRotation - m_moveData.vecStartRotation;
+        
+        // Grab the duration the object takes to move
+        float fDuration = static_cast < float > ( m_moveData.ulTime );
+        // Grab the time that has passed since we started moving
+        float fTimePassed = static_cast < float > ( ulCurrentTime - m_moveData.ulTimeStart );
+
+        // How far along our journey should we be?
+        vecJourney /= fDuration;
+        vecJourney *= fTimePassed;
+
+        // Update our stored rotation
+        vecRotation = m_vecRotation = m_moveData.vecStartRotation + vecJourney;
     }
 }
 
@@ -257,21 +241,21 @@ void CObject::SetRotation ( const CVector& vecRotation )
 bool CObject::IsMoving ( void )
 {
     // Are we currently moving?
-    if ( m_pMoveAnimation != NULL )
+    if ( m_moveData.bActive )
     {
         // Should we have stopped moving by now?
-        if ( !m_pMoveAnimation->IsRunning() )
+        if ( GetTime () >= m_moveData.ulTimeStop )
         {
             // Stop our movement
             StopMoving ();
         }
     }
     // Are we still moving after the above check?
-    return ( m_pMoveAnimation != NULL );
+    return ( m_moveData.bActive );
 }
 
 
-void CObject::Move ( const CPositionRotationAnimation& a_rMoveAnimation )
+void CObject::Move ( const CVector& vecPosition, const CVector& vecRotation, unsigned long ulTime )
 {
     // Are we already moving?
     if ( IsMoving () )
@@ -280,19 +264,26 @@ void CObject::Move ( const CPositionRotationAnimation& a_rMoveAnimation )
         StopMoving ();
     }
 
-    if (a_rMoveAnimation.IsRunning() )
+    // If it's more than 0 milliseconds
+    if ( ulTime > 0 )
     {
-        m_pMoveAnimation = new CPositionRotationAnimation ( a_rMoveAnimation );
-        // Update the values since they might have changed since StopMoving () was called above
-        m_pMoveAnimation->SetSourceValue( SPositionRotation ( m_vecPosition, m_vecRotation ) );
+        // Setup our move data
+        m_moveData.vecStartPosition = GetPosition ();
+        m_moveData.vecStopPosition = vecPosition;
+        GetRotation ( m_moveData.vecStartRotation );
+        m_moveData.vecStopRotation = vecRotation;
+        m_moveData.ulTime = ulTime;
+        m_moveData.ulTimeStart = GetTime ();
+        m_moveData.ulTimeStop = m_moveData.ulTimeStart + ulTime; 
+        m_moveData.bActive = true;
     }
     // If we have a time of 0, move there now
     else
     {
-        SPositionRotation positionRotation;
-        a_rMoveAnimation.GetFinalValue ( positionRotation );
-        SetPosition ( positionRotation.m_vecPosition );
-        SetRotation ( positionRotation.m_vecRotation );
+        SetPosition ( vecPosition );
+        CVector vecTemp;
+        GetRotation ( vecTemp );
+        SetRotation ( vecTemp + vecRotation );
     }
 }
 
@@ -300,31 +291,62 @@ void CObject::Move ( const CPositionRotationAnimation& a_rMoveAnimation )
 void CObject::StopMoving ( void )
 {
     // Were we moving in the first place
-    if ( m_pMoveAnimation != NULL )
+    if ( m_moveData.bActive )
     {
-        SPositionRotation positionRotation;
-        m_pMoveAnimation->GetValue ( positionRotation );
-        m_vecPosition = positionRotation.m_vecPosition;
-        m_vecRotation = positionRotation.m_vecRotation;
-       
-        delete m_pMoveAnimation;
-        m_pMoveAnimation = NULL;
-       
+        m_moveData.bActive = false;
+
+        // Calculate our current Position
+        unsigned long ulCurrentTime = GetTime ();
+
+        if ( ulCurrentTime >= m_moveData.ulTimeStop )
+        {
+            m_vecPosition = m_moveData.vecStopPosition;
+            m_vecRotation = m_moveData.vecStopRotation;
+            UpdateSpatialData ();
+            return;
+        }
+
+        // Grab the difference between start and finish
+        CVector vecJourney = m_moveData.vecStopPosition - m_moveData.vecStartPosition;
+        
+        // Grab the duration the object takes to move
+        float fDuration = static_cast < float > ( m_moveData.ulTime );
+        // Grab the time that has passed since we started moving
+        float fTimePassed = static_cast < float > ( ulCurrentTime - m_moveData.ulTimeStart );
+
+        // How far along our journey should we be?
+        vecJourney /= fDuration;
+        vecJourney *= fTimePassed;
+
+        // Update our stored position
+        m_vecPosition = m_moveData.vecStartPosition + vecJourney;     
+
+        // Grab the difference between start and finish
+        vecJourney = m_moveData.vecStopRotation - m_moveData.vecStartRotation;
+
+        // How far along our journey should we be?
+        vecJourney /= fDuration;
+        vecJourney *= fTimePassed;
+
+        // Update our stored rotation
+        m_vecRotation = m_moveData.vecStartRotation + vecJourney;
         UpdateSpatialData ();
     }
 }
 
- const CPositionRotationAnimation* CObject::GetMoveAnimation ( )
- {
-     if ( IsMoving () ) //Call IsMoving since it will make sure the anim is stopped if it's finished
-     {        
-         return m_pMoveAnimation;
-     }
-     else
-     {
-         return NULL;
-     }
- }
+
+unsigned long CObject::GetMoveTimeLeft ( void )
+{
+    // Check that a movement is going on and that we aren't above the time its scheduled to finish
+    if ( IsMoving () )
+    {        
+        unsigned long ulCurrentTime = GetTime ();
+        return m_moveData.ulTimeStop - ulCurrentTime;
+    }
+
+    return 0;
+}
+
 
 void CObject::AttachTo ( CElement * pElement )
 {
@@ -340,30 +362,5 @@ void CObject::AttachTo ( CElement * pElement )
     {
         // Remove us from our managers attached list
         m_pObjectManager->m_Attached.remove ( this );
-    }
-}
-
-void CObject::SetSyncer ( CPlayer* pPlayer )
-{
-    // Prevent a recursive call loop when setting a syncer
-    static bool bAlreadyIn = false;
-    if ( !bAlreadyIn )
-    {
-        // Update the last player if any
-        bAlreadyIn = true;
-        if ( m_pSyncer )
-        {
-            m_pSyncer->RemoveSyncingObject ( this );
-        }
-
-        // Update the new player
-        if ( pPlayer )
-        {
-            pPlayer->AddSyncingObject ( this );
-        }
-        bAlreadyIn = false;
-
-        // Set it
-        m_pSyncer = pPlayer;
     }
 }

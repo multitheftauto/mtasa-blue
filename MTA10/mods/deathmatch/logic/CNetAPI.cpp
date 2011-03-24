@@ -656,8 +656,11 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
             BitStream.WriteBit ( true );
 
             // To confirm weapon type at the other end
-            unsigned char ucWeaponType = pPlayerWeapon->GetType ();
-            BitStream.Write ( ucWeaponType );
+            if ( BitStream.Version () >= 0x16 )
+            {
+                unsigned char ucWeaponType = pPlayerWeapon->GetType ();
+                BitStream.Write ( ucWeaponType );
+            }
 
             // Write the type
             unsigned int uiSlot = pPlayerWeapon->GetSlot ();
@@ -985,8 +988,11 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
 
     if ( flags.data.bHasAWeapon )
     {
-        unsigned char ucWeaponType = pPlayerWeapon->GetType ();
-        BitStream.Write ( ucWeaponType );
+        if ( BitStream.Version () >= 0x0d )
+        {
+            unsigned char ucWeaponType = pPlayerWeapon->GetType ();
+            BitStream.Write ( ucWeaponType );
+        }
 
         // Write the weapon slot
         unsigned int uiSlot = pPlayerWeapon->GetSlot ();
@@ -1520,7 +1526,7 @@ void CNetAPI::ReadSmallVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     int iModelID = pVehicle->GetModel ();
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
-        SVehicleTurretSync vehicle;
+        SVehicleSpecific vehicle;
         BitStream.Read ( &vehicle );
 
         pVehicle->SetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
@@ -1534,7 +1540,7 @@ void CNetAPI::WriteSmallVehicleSpecific ( CClientVehicle* pVehicle, NetBitStream
     int iModelID = pVehicle->GetModel ();
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
-        SVehicleTurretSync vehicle;
+        SVehicleSpecific vehicle;
         pVehicle->GetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
         BitStream.Write ( &vehicle );
@@ -1548,7 +1554,7 @@ void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamIn
     int iModelID = pVehicle->GetModel ();
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
-        SVehicleTurretSync vehicle;
+        SVehicleSpecific vehicle;
         BitStream.Read ( &vehicle );
 
         pVehicle->SetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
@@ -1563,17 +1569,6 @@ void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamIn
             pVehicle->SetAdjustablePropertyValue ( usAdjustableProperty );
         }
     }
-
-    // Read door angles.
-    if ( CClientVehicleManager::HasDoors ( iModelID ) )
-    {
-        SDoorOpenRatioSync door;
-        for ( unsigned char i = 2; i < 6; ++i )
-        {
-            BitStream.Read ( &door );
-            pVehicle->SetDoorOpenRatio ( i, door.data.fRatio, TICK_RATE );
-        }
-    }
 }
 
 
@@ -1584,7 +1579,7 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     if ( CClientVehicleManager::HasTurret ( iModelID ) )
     {
         // Grab the turret position
-        SVehicleTurretSync vehicle;
+        SVehicleSpecific vehicle;
         pVehicle->GetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
 
         BitStream.Write ( &vehicle );
@@ -1594,17 +1589,6 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
     if ( CClientVehicleManager::HasAdjustableProperty ( iModelID ) )
     {
         BitStream.Write ( pVehicle->GetAdjustablePropertyValue () );
-    }
-
-    // Sync door angles.
-    if ( CClientVehicleManager::HasDoors ( iModelID ) )
-    {
-        SDoorOpenRatioSync door;
-        for ( unsigned char i = 2; i < 6; ++i )
-        {
-            door.data.fRatio = pVehicle->GetDoorOpenRatio ( i );
-            BitStream.Write ( &door );
-        }
     }
 }
 

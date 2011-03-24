@@ -87,16 +87,6 @@ enum eCamMode
     MODE_AIMWEAPON_ATTACHED //65
 };
 
-enum eVehicleCamMode
-{
-    MODE_BUMPER,
-    MODE_CLOSE_EXTERNAL,
-    MODE_MIDDLE_EXTERNAL,
-    MODE_FAR_EXTERNAL,
-    MODE_LOW_EXTERNAL,
-    MODE_CINEMATIC
-};
-
 enum {FADE_OUT=0, FADE_IN};
 
 class CCamera
@@ -133,8 +123,6 @@ public:
     virtual RwMatrix *                  GetLTM ( void )=0;
     virtual CEntity *                   GetTargetEntity ( void )=0;
     virtual void                        SetCameraClip ( bool bObjects, bool bVehicles )=0;
-    virtual VOID                        SetCameraView ( BYTE dwCamMode )=0;
-    virtual BYTE                        GetCameraView ( void )=0;
 };
 
 

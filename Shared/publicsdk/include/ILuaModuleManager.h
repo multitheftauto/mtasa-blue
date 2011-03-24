@@ -18,20 +18,11 @@
 
 extern "C"
 {
-    #include <lua.h>
-    #include <lualib.h>
-    #include <lauxlib.h>
+    #include "lua.h"
+    #include "lualib.h"
+    #include "lauxlib.h"
 }
 #include <string>
-
-#ifndef __CChecksum_H
-class CChecksum
-{
-public:
-    unsigned long ulCRC;
-    unsigned char mD5 [16];
-};
-#endif
 
 /* Interface for modules until DP2.3 */
 class ILuaModuleManager

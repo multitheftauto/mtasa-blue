@@ -74,7 +74,7 @@ CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA (  const char* pAnimName,
     DEBUG_TRACE("CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA (  const char* pAnimName, const char* pAnimGroupName, const int flags, const float fBlendDelta, const int iTime = -1, const bool bDontInterrupt = false, const bool bRunInSequence = false, const bool bOffsetPed = false, const bool bHoldLastFrame = false )");
 
     // TODO: Find out the real size
-    this->CreateTaskInterface ( sizeof ( CTaskSimpleRunNamedAnimSAInterface ) );
+    this->CreateTaskInterface ( 1024 );
     if ( !IsValid () ) return;
     DWORD dwFunc = FUNC_CTaskSimpleRunNamedAnim__Constructor;
     DWORD dwThisInterface = (DWORD)this->GetInterface ();
@@ -149,24 +149,6 @@ CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA ( bool bKiller, CPed * pPed, 
         push    animGroup
         push    dwPedInterface
         push    bKiller
-        call    dwFunc
-    }
-}
-
-CTaskSimpleDeadSA::CTaskSimpleDeadSA ( unsigned int uiDeathTimeMS, bool bUnk2 )
-{
-    DEBUG_TRACE("CTaskSimpleDeadSA::CTaskSimpleDeadSA ( int iUnk1, bool bUnk2 )");
-
-    this->CreateTaskInterface ( sizeof(CTaskSimpleDeadSAInterface) );
-    if ( !IsValid () ) return;
-    DWORD dwFunc = FUNC_CTaskSimpleDead__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface ();
-    
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    bUnk2
-        push    uiDeathTimeMS
         call    dwFunc
     }
 }

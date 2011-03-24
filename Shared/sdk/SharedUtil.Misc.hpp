@@ -12,8 +12,6 @@
 *
 *****************************************************************************/
 
-#include "UTF8.h"
-#include "minibidi.c"
 #ifdef WIN32
     #include <direct.h>
     #include <shellapi.h>
@@ -115,23 +113,6 @@ static bool DeleteRegistryKey ( HKEY hkRoot, const char* szSubKey )
 }
 
 
-//
-// GetVersionAppendString
-//
-SString SharedUtil::GetVersionAppendString ( const SString& strUsingASEVersion )
-{
-    SString strVersionAppend = SString ( " %s", strUsingASEVersion.empty () ? MTA_DM_ASE_VERSION : *strUsingASEVersion );
-
-    // Remove nightly appendage
-    strVersionAppend = strVersionAppend.TrimEnd ( "n" );
-
-    // 1.0 has no version number in the path
-    if ( strVersionAppend == " 1.0" )
-        strVersionAppend = "";
-
-    return strVersionAppend;
-}
-
 
 //
 // MakeRegistryPath
@@ -150,7 +131,16 @@ static SString MakeRegistryPath ( const SString& strInPath )
         strPath.Right ( strPath.length () - 3 ).Split ( "\\", &strUsingASEVersion, &strPath );
     }
 
-    SString strResult = PathJoin ( "Software\\Multi Theft Auto: San Andreas" + GetVersionAppendString ( strUsingASEVersion ), strPath );
+    SString strVersionAppend = SString ( " %s", *strUsingASEVersion );
+
+    // Remove nightly appendage
+    strVersionAppend = strVersionAppend.TrimEnd ( "n" );
+
+    // 1.0 has no version number in the reg path
+    if ( strVersionAppend == " 1.0" )
+        strVersionAppend = "";
+
+    SString strResult = PathJoin ( "Software\\Multi Theft Auto: San Andreas" + strVersionAppend, strPath );
     strResult = strResult.TrimEnd ( "\\" );
     return strResult;
 }
@@ -503,10 +493,10 @@ SString SharedUtil::ExpandEnvString ( const SString& strInput )
 //
 // MyShellExecute
 //
-// Returns true if successful
+//
 //
 ///////////////////////////////////////////////////////////////
-static bool MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strInFile, const SString& strInParameters = "", const SString& strDirectory = "", int nShowCmd = SW_SHOWNORMAL )
+static int MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strInFile, const SString& strInParameters = "", const SString& strDirectory = "", int nShowCmd = SW_SHOWNORMAL )
 {
     SString strFile = strInFile;
     SString strParameters = strInParameters;
@@ -539,7 +529,7 @@ static bool MyShellExecute ( bool bBlocking, const SString& strAction, const SSt
     else
     {
         int iResult = (int)ShellExecute ( NULL, strAction, strFile, strParameters, strDirectory, nShowCmd );
-        return iResult > 32;
+        return iResult;
     }
 }
 
@@ -551,7 +541,7 @@ static bool MyShellExecute ( bool bBlocking, const SString& strAction, const SSt
 //
 //
 ///////////////////////////////////////////////////////////////
-bool SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
+int SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
 {
     return MyShellExecute ( true, strAction, strFile, strParameters, strDirectory );
 }
@@ -564,7 +554,7 @@ bool SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString&
 //
 //
 ///////////////////////////////////////////////////////////////
-bool SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
+int SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
 {
     return MyShellExecute ( false, strAction, strFile, strParameters, strDirectory );
 }
@@ -771,44 +761,6 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
     }
 
     return strOut;
-}
-
-
-// Convert a standard ANSI junk std::string into a UTF-8 std::wstring
-std::wstring SharedUtil::ConvertToUTF8 (const std::string& input)
-{
-    return utf8_mbstowcs (input);
-}
-
-// Reencode a UTF8 std::wstring into ANSI junk string
-std::string SharedUtil::ConvertToANSI (const std::wstring& input)
-{
-    return utf8_wcstombs (input);
-}
-
-// Translate a true ANSI string to the UTF-8 equivalent (reencode+convert)
-std::wstring SharedUtil::TranslateToUTF8 ( const std::string& input )
-{
-    size_t len = mbstowcs ( NULL, input.c_str(), input.length() );
-    if ( len == (size_t)-1 )
-        return L"?";
-    wchar_t* wcsOutput = new wchar_t[len+1];
-    mbstowcs ( wcsOutput, input.c_str(), input.length() );
-    wcsOutput[len] = NULL; //Null terminate the string
-    std::wstring strOutput(wcsOutput);
-    delete wcsOutput;
-    return strOutput;
-}
-
-std::wstring SharedUtil::GetBidiString (const std::wstring input)
-{
-    int iCount = input.size();
-    wchar_t* wcsLineBidi = new wchar_t[iCount + 1];
-    memcpy ( wcsLineBidi, input.c_str(), ( iCount + 1 ) * sizeof ( wchar_t ) );
-    doBidi ( wcsLineBidi, iCount, 1, 1 );  //Process our UTF string through MiniBidi, for Bidirectionalism
-    std::wstring strLineBidi(wcsLineBidi);
-    delete wcsLineBidi;
-    return strLineBidi;
 }
 
 

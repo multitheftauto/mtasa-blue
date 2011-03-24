@@ -2,13 +2,10 @@ INCLUDES += -I$(srcdir)/../core/
 INCLUDES += -I$(srcdir)/../sdk/
 INCLUDES += -I$(srcdir)/../../Shared/sdk/
 
-noinst_LTLIBRARIES = \
-	libplatform.la
+noinst_LIBRARIES = \
+	libplatform.a
 
-libplatform_la_SOURCES = \
+libplatform_a_SOURCES = \
 	MTAPlatform.cpp \
 	MTAPlatform.h
-
-libplatform_la_LIBADD = \
-	$(CURSES_LIB)
 

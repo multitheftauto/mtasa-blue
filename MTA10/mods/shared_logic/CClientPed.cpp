@@ -10,7 +10,6 @@
 *               Jax <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
-*               Fedor Sinev <fedorsinev@gmail.com>
 *
 *****************************************************************************/
 
@@ -27,8 +26,7 @@ extern CClientGame* g_pClientGame;
 
 #define INVALID_VALUE   0xFFFFFFFF
 
-#define PED_INTERPOLATION_WARP_THRESHOLD            5   // Minimal threshold
-#define PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  5   // Units to increment the threshold per speed unit
+#define PED_INTERPOLATION_WARP_THRESHOLD        5
 
 enum eAnimGroups
 {    
@@ -154,11 +152,8 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_pAnimationBlock = NULL;
     m_szAnimationName = NULL;
     m_bRequestedAnimation = false;
-    m_iTimeAnimation = -1;
     m_bLoopAnimation = false;    
     m_bUpdatePositionAnimation = false;
-    m_bInterruptableAnimation = false;
-    m_bFreezeLastFrameAnimation = true;
     m_bHeadless = false;
     m_bFrozen = false;
     m_bFrozenWaitingForGroundToLoad = false;
@@ -171,7 +166,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_bStealthAiming = false;
     m_fLighting = 0.0f;
     m_bBulletImpactData = false;
-    m_ucEnteringDoor = 0xFF;
 
     // Time based interpolation
     m_interp.pTargetOriginSource = NULL;
@@ -182,17 +176,6 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
 
     // Our default clothes
     m_pClothes->DefaultClothes ( false );
-
-    // Movement state names for Lua
-    m_MovementStateNames[MOVEMENTSTATE_STAND]       =    "stand";
-    m_MovementStateNames[MOVEMENTSTATE_WALK]        =    "walk";
-    m_MovementStateNames[MOVEMENTSTATE_POWERWALK]   =    "powerwalk";
-    m_MovementStateNames[MOVEMENTSTATE_JOG]         =    "jog";
-    m_MovementStateNames[MOVEMENTSTATE_SPRINT]      =    "sprint";
-    m_MovementStateNames[MOVEMENTSTATE_CROUCH]      =    "crouch";
-    //These two are inactive for now
-    m_MovementStateNames[MOVEMENTSTATE_CRAWL]       =    "crawl";
-    m_MovementStateNames[MOVEMENTSTATE_ROLL]        =    "roll";
 
     // Create the player model
     if ( m_bIsLocalPlayer )
@@ -1209,7 +1192,7 @@ void CClientPed::GetOutOfVehicle ( void )
 }
 
 
-void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor )
+void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat )
 {
     // TODO: add checks to ensure we don't try to use the wrong seats for bikes etc
     // Eventually remove us from a previous vehicle
@@ -1218,7 +1201,6 @@ void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat,
     // Do it
     _GetIntoVehicle ( pVehicle, uiSeat );
     m_uiOccupiedVehicleSeat = uiSeat;
-    m_ucEnteringDoor = ucDoor;
     m_bForceGettingIn = true;
 }
 
@@ -1231,7 +1213,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     {
         if ( pVehicle->IsStreamedIn () )
         {
-            g_pGame->GetStreaming()->LoadAllRequestedModels ();
+            pModelInfo->LoadAllRequestedModels ();
         }
     }
 
@@ -1277,9 +1259,8 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         // if the local player is entering it. This is so we don't
         // get screwed up with camera not following and similar issues.
         if ( m_bIsLocalPlayer )
-        {
+        {            
             pVehicle->AddStreamReference ();
-            pVehicle->SetSwingingDoorsAllowed ( true );
         }
 
         // Warp the player into the car's driverseat
@@ -1387,8 +1368,6 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
 
     if ( pVehicle )
     {
-        pVehicle->SetSwingingDoorsAllowed ( false );
-
         // Warp the player out of the vehicle
         CVehicle* pGameVehicle = pVehicle->m_pVehicle;
         if ( pGameVehicle )
@@ -1633,7 +1612,7 @@ bool CClientPed::IsDead ( void )
     return false;
 }
 
-void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth, bool bSetDirectlyDead, AssocGroupId animGroup, AnimationId animID )
+void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool bStealth, AssocGroupId animGroup, AnimationId animID )
 {
     // Don't change task if already dead or dying
     if ( m_pPlayerPed && !IsDead () && !IsDying () )
@@ -1646,16 +1625,7 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
             pTask->MakeAbortable ( m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL );
         }
 
-        if ( bSetDirectlyDead )
-        {
-            // TODO: Avoid the animation, try to make it go directly to the last animation frame.
-            pTask = g_pGame->GetTasks ()->CreateTaskSimpleDead ( GetTickCount32(), true );
-            if ( pTask )
-            {
-                pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_DEFAULT );
-            }
-        }
-        else if ( bStealth )
+        if ( bStealth )
         {
             pTask = g_pGame->GetTasks ()->CreateTaskSimpleStealthKill ( false, m_pPlayerPed, 87 );
             if ( pTask )
@@ -1681,13 +1651,7 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
     {
         LockHealth ( 0.0f );
         LockArmor ( 0.0f );
-    }
-
-    // Silently remove the ped satchels
-    DestroySatchelCharges ( false, true );
-
-    // Stop pressing buttons
-    SetControllerState ( CControllerState () );
+    }    
 }
 
 
@@ -2003,59 +1967,6 @@ bool CClientPed::HasWeapon ( eWeaponType weaponType )
     return false;
 }
 
-eMovementState CClientPed::GetMovementState ( void )
-{
-    // Do we have a player, and are we on foot? (streamed in)
-    if ( m_pPlayerPed && !GetRealOccupiedVehicle () )
-    {
-        CControllerState cs;
-        GetControllerState ( cs );
-
-        // Grab his controller state
-        bool bWalkKey = false;
-        if ( GetType () == CCLIENTPLAYER )
-            bWalkKey = CClientPad::GetControlState ( "walk", cs, true );
-        else
-            m_Pad.GetControlState("walk",bWalkKey);
-        
-        // Is he standing up?
-        if ( !IsDucked() )
-        {
-            unsigned int iRunState = m_pPlayerPed->GetRunState();
-
-            // Is he moving the contoller at all?
-            if ( iRunState == 1 && cs.LeftStickX == 0 && cs.LeftStickY == 0 )
-                return MOVEMENTSTATE_STAND;
-
-            //Is he either pressing the walk key, or has run state 1?
-            if ( iRunState == 1 || bWalkKey && iRunState == 6 )
-                return MOVEMENTSTATE_WALK;
-            else if ( iRunState == 4 )
-                return MOVEMENTSTATE_POWERWALK;
-            else if ( iRunState == 6 )
-                return MOVEMENTSTATE_JOG;
-            else if ( iRunState == 7 )
-                return MOVEMENTSTATE_SPRINT;
-        }
-        else
-        {
-            // Is he moving the contoller at all?
-            if ( cs.LeftStickX == 0 && cs.LeftStickY == 0 )
-                return MOVEMENTSTATE_CROUCH;
-        }
-    }
-    return MOVEMENTSTATE_UNKNOWN;
-}
-
-bool CClientPed::GetMovementState ( std::string& strStateName )
-{
-    eMovementState eCurrentMoveState = GetMovementState();
-    if ( eCurrentMoveState == MOVEMENTSTATE_UNKNOWN )
-        return false;
-
-    strStateName = m_MovementStateNames[eCurrentMoveState];
-    return true;
-}
 
 CTask* CClientPed::GetCurrentPrimaryTask ( void )
 {
@@ -2284,7 +2195,7 @@ void CClientPed::StreamedInPulse ( void )
         {
             m_iLoadAllModelsCounter--;
             if ( GetModelInfo () )
-                g_pGame->GetStreaming()->LoadAllRequestedModels();
+                GetModelInfo ()-> LoadAllRequestedModels ();
         }
 
 
@@ -2667,7 +2578,7 @@ void CClientPed::StreamedInPulse ( void )
                 char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
                 strcpy ( szAnimName, m_szAnimationName );
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
                 delete [] szAnimName;                
             }            
         }
@@ -3072,8 +2983,9 @@ void CClientPed::_CreateModel ( void )
         // Are we dead?
         if ( m_fHealth == 0.0f )
         {
-            Kill ( WEAPONTYPE_UNARMED, 0, false, true );
-        }
+            // TODO: use TASK_SIMPLE_DEAD
+            Kill ( WEAPONTYPE_UNARMED, 0 );
+        }       
 
         // Are we still playing a looped animation?
         if ( m_bLoopAnimation && m_pAnimationBlock )
@@ -3082,13 +2994,13 @@ void CClientPed::_CreateModel ( void )
             char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
             strcpy ( szAnimName, m_szAnimationName );
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+            RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
             delete [] szAnimName;
         }
 
         // Set the voice that corresponds to our model
         short sVoiceType, sVoiceID;
-        m_pModelInfo->GetVoice ( &sVoiceType, &sVoiceID );
+        static_cast < CPedModelInfo * > ( m_pModelInfo )->GetVoice ( &sVoiceType, &sVoiceID );
         SetVoice ( sVoiceType, sVoiceID );
 
         // Tell the streamer we created the player
@@ -3315,7 +3227,7 @@ void CClientPed::_ChangeModel ( void )
                 char * szAnimName = new char [ strlen ( m_szAnimationName ) + 1 ];
                 strcpy ( szAnimName, m_szAnimationName );
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, szAnimName, m_bLoopAnimation, m_bUpdatePositionAnimation );
                 delete [] szAnimName;
             }
 
@@ -3752,11 +3664,6 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     // Driverseat
     if ( uiSeat == 0 )
     {
-        if ( m_bIsLocalPlayer )
-        {
-            pVehicle->SetSwingingDoorsAllowed ( true );
-        }
-
         if ( m_pPlayerPed )
         {
             // Grab the game vehicle. If it exists, begin walking the player into it
@@ -4632,10 +4539,7 @@ void CClientPed::UpdateTargetPosition ( void )
         CVector vecNewPosition = vecCurrentPosition + vecCompensation;
 
         // Check if the distance to interpolate is too far.
-        CVector vecVelocity;
-        GetMoveSpeed ( vecVelocity );
-        float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
-        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > fThreshold )
+        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > PED_INTERPOLATION_WARP_THRESHOLD )
         {
             // Abort all interpolation
             m_interp.pos.ulFinishTime = 0;
@@ -4863,7 +4767,7 @@ void CClientPed::RunAnimation ( AssocGroupId animGroup, AnimationId animID )
 }
 
 
-void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame )
+void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bOffsetPed, bool bHoldLastFrame )
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -4873,36 +4777,8 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     // Are we streamed in?
     if ( m_pPlayerPed )
     {  
-        bool bLoaded = true;
-        
-        if( !pBlock->IsLoaded() )
+        if ( pBlock->IsLoaded () )
         {
-            int iTimeToWait = 50;
-
-            g_pGame->GetStreaming()->RequestAnimations( pBlock->GetIndex(), 4 );
-            g_pGame->GetStreaming()->LoadAllRequestedModels( );
-
-            while( !pBlock->IsLoaded() && iTimeToWait != 0 )
-            {
-                iTimeToWait--;
-                Sleep(10);
-            }
-
-            if( iTimeToWait == 0 )
-                bLoaded = false;
-        }
-
-        if ( bLoaded )
-        {
-            int flags = 0x10; // // Stops jaw fucking up, some speaking flag maybe   
-            if ( bLoop ) flags |= 0x2; // flag that triggers the loop (Maccer)
-            if ( bUpdatePosition ) 
-            {
-                // 0x40 enables position updating on Y-coord, 0x80 on X. (Maccer)
-                flags |= 0x40; 
-                flags |= 0x80;
-            }
-            
             // Kill any higher priority tasks if we dont want this anim interuptable
             if ( !bInterruptable )
             {
@@ -4910,9 +4786,12 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
                 KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
                 KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
             }
-            
-            if ( !bFreezeLastFrame ) flags |= 0x08; // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
-            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
+
+            int flags = 0;            
+            if ( bLoop ) flags |= 0x2;
+            flags |= 0x10;      // Stops jaw fucking up, some speaking flag maybe
+            if ( bUpdatePosition ) flags |= 0x40;
+            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bOffsetPed, bHoldLastFrame );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
@@ -4928,11 +4807,8 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     m_pAnimationBlock = pBlock;
     m_szAnimationName = new char [ strlen ( szAnimName ) + 1 ];
     strcpy ( m_szAnimationName, szAnimName ); 
-    m_iTimeAnimation = iTime;
     m_bLoopAnimation = bLoop;
     m_bUpdatePositionAnimation = bUpdatePosition;
-    m_bInterruptableAnimation = bInterruptable;
-    m_bFreezeLastFrameAnimation = bFreezeLastFrame;
 }
 
 
@@ -5140,36 +5016,27 @@ bool CClientPed::ShouldBeStealthAiming ( void )
         if ( GetCurrentWeaponType () == WEAPONTYPE_KNIFE )
         {
             // Do we have the aim key pressed?
-            CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
-            if ( pKeyBinds )
+            SBindableGTAControl* pAimControl = g_pCore->GetKeyBinds ()->GetBindableFromControl ( "aim_weapon" );
+            if ( pAimControl && pAimControl->bState )
             {
-                SBindableGTAControl* pAimControl = pKeyBinds->GetBindableFromControl ( "aim_weapon" );
-                if ( pAimControl && pAimControl->bState )
+                // Do we have a target ped?
+                CClientPed * pTargetPed = GetTargetedPed ();
+                if ( pTargetPed && pTargetPed->GetGamePlayer () )
                 {
-                    //We need to be either crouched, walking or standing
-                    SBindableGTAControl* pWalkControl = pKeyBinds->GetBindableFromControl ( "walk" );
-                    if ( m_pPlayerPed->GetRunState() == 1 || m_pPlayerPed->GetRunState() == 4 || pWalkControl && pWalkControl->bState )
+                    // Are we close enough to the target?
+                    CVector vecPos, vecPos_2;
+                    GetPosition ( vecPos );
+                    pTargetPed->GetPosition ( vecPos_2 );
+                    if ( DistanceBetweenPoints3D ( vecPos, vecPos_2 ) <= STEALTH_KILL_RANGE )
                     {
-                        // Do we have a target ped?
-                        CClientPed * pTargetPed = GetTargetedPed ();
-                        if ( pTargetPed && pTargetPed->GetGamePlayer () )
+                        // Grab our current anim
+                        CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
+                        if ( pAssoc )
                         {
-                            // Are we close enough to the target?
-                            CVector vecPos, vecPos_2;
-                            GetPosition ( vecPos );
-                            pTargetPed->GetPosition ( vecPos_2 );
-                            if ( DistanceBetweenPoints3D ( vecPos, vecPos_2 ) <= STEALTH_KILL_RANGE )
+                            // Our game checks for stealth killing
+                            if ( m_pPlayerPed->GetPedIntelligence ()->TestForStealthKill ( pTargetPed->GetGamePlayer (), false ) )
                             {
-                                // Grab our current anim
-                                CAnimBlendAssociation * pAssoc = GetFirstAnimation ();
-                                if ( pAssoc )
-                                {
-                                    // Our game checks for stealth killing
-                                    if ( m_pPlayerPed->GetPedIntelligence ()->TestForStealthKill ( pTargetPed->GetGamePlayer (), false ) )
-                                    {
-                                        return true;
-                                    }
-                                }
+                                return true;
                             }
                         }
                     }
@@ -5294,7 +5161,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
 
     // Load load load
     if ( GetModelInfo () )
-        g_pGame->GetStreaming()->LoadAllRequestedModels ();
+        GetModelInfo ()-> LoadAllRequestedModels ();
 
     // Start out with a fairly big radius to check, and shrink it down over time
     float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );

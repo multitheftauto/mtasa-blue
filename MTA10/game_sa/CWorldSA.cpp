@@ -8,7 +8,6 @@
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
 *               Jax <>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -382,9 +381,4 @@ void CWorldSA::SetCurrentArea ( DWORD dwArea )
 void CWorldSA::SetJetpackMaxHeight ( float fHeight )
 {
     MemPut < float > ( VAR_fJetpackMaxHeight, fHeight );  //     *(float *)(VAR_fJetpackMaxHeight) = fHeight;
-}
-
-float CWorldSA::GetJetpackMaxHeight ( void )
-{
-    return *(float *)(VAR_fJetpackMaxHeight);
 }

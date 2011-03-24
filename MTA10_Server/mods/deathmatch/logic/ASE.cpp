@@ -41,10 +41,6 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
     m_llLightLastTime = 0;
     m_lLightMinInterval = 10 * 1000;     // Update light query cache after 10 seconds
 
-    m_uiXfireLightLastPlayerCount = 0;
-    m_llXfireLightLastTime = 0;
-    m_lXfireLightMinInterval = 10 * 1000;     // Update XFire light query cache after 10 seconds
-
     m_ulMasterServerQueryCount = 0;
 
     m_strGameType = "MTA:SA";
@@ -133,11 +129,6 @@ void ASE::DoPulse ( void )
             case 'r':
             { // Our own lighter query for ingame browser - Release version only
                 strReply = QueryLightCached ();
-                break;
-            }
-            case 'x':
-            { // Our own lighter query for xfire updates
-                strReply = QueryXfireLightCached ();
                 break;
             }
             case 'v':
@@ -280,60 +271,6 @@ std::string ASE::QueryFull ( void )
 
 // Protect against a flood of server queries.
 // Send cached version unless player count has changed, or last re-cache is older than m_lLightMinInterval
-const std::string& ASE::QueryXfireLightCached ( void )
-{
-    long long llTime = GetTickCount64_ ();
-    unsigned int uiPlayerCount = m_pPlayerManager->CountJoined ();
-    if ( uiPlayerCount != m_uiXfireLightLastPlayerCount || llTime - m_llXfireLightLastTime > m_lLightMinInterval || m_strXfireLightCached == "" )
-    {
-        m_strXfireLightCached = QueryXfireLight ();
-        m_llXfireLightLastTime = llTime;
-        m_uiXfireLightLastPlayerCount = uiPlayerCount;
-    }
-    return m_strXfireLightCached;
-}
-
-
-std::string ASE::QueryXfireLight ( void )
-{
-    std::stringstream reply;
-
-    int iJoinedPlayers = m_pPlayerManager->CountJoined ();
-    int iMaxPlayers = m_pMainConfig->GetMaxPlayers ();
-    SString strPlayerCount = SString ( "%d/%d", iJoinedPlayers, iMaxPlayers );
-
-    reply << "EYE3";
-    // game
-    reply << ( unsigned char ) 4;
-    reply << "mta";
-    // server name
-    reply << ( unsigned char ) ( m_pMainConfig->GetServerName ().length() + 1 );
-    reply << m_pMainConfig->GetServerName ();
-    // game type
-    reply << ( unsigned char ) ( m_strGameType.length() + 1 );
-    reply << m_strGameType;
-    // map name with backwardly compatible large player count
-    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 );
-    reply << m_strMapName;
-    reply << ( unsigned char ) 0;
-    reply << strPlayerCount;
-    // version
-    std::string temp = MTA_DM_ASE_VERSION;
-    reply << ( unsigned char ) ( temp.length() + 1 );
-    reply << temp;
-    // passworded
-    reply << ( unsigned char ) ( ( m_pMainConfig->HasPassword () ) ? 1 : 0 );
-    // players count
-    reply << ( unsigned char ) Min ( iJoinedPlayers, 255 );
-    // players max
-    reply << ( unsigned char ) Min ( iMaxPlayers, 255 );
-
-    return reply.str();
-}
-
-
-// Protect against a flood of server queries.
-// Send cached version unless player count has changed, or last re-cache is older than m_lLightMinInterval
 const std::string& ASE::QueryLightCached ( void )
 {
     long long llTime = GetTickCount64_ ();
@@ -352,10 +289,6 @@ std::string ASE::QueryLight ( void )
 {
     std::stringstream reply;
 
-    int iJoinedPlayers = m_pPlayerManager->CountJoined ();
-    int iMaxPlayers = m_pMainConfig->GetMaxPlayers ();
-    SString strPlayerCount = SString ( "%d/%d", iJoinedPlayers, iMaxPlayers );
-
     reply << "EYE2";
     // game
     reply << ( unsigned char ) 4;
@@ -369,11 +302,9 @@ std::string ASE::QueryLight ( void )
     // game type
     reply << ( unsigned char ) ( m_strGameType.length() + 1 );
     reply << m_strGameType;
-    // map name with backwardly compatible large player count
-    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 );
+    // map name
+    reply << ( unsigned char ) ( m_strMapName.length() + 1 );
     reply << m_strMapName;
-    reply << ( unsigned char ) 0;
-    reply << strPlayerCount;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
     reply << ( unsigned char ) ( temp.length() + 1 );
@@ -383,9 +314,9 @@ std::string ASE::QueryLight ( void )
     // serial verification?
     reply << ( unsigned char ) ( ( m_pMainConfig->GetSerialVerificationEnabled() ) ? 1 : 0 );
     // players count
-    reply << ( unsigned char ) Min ( iJoinedPlayers, 255 );
+    reply << ( unsigned char ) m_pPlayerManager->CountJoined ();
     // players max
-    reply << ( unsigned char ) Min ( iMaxPlayers, 255 );
+    reply << ( unsigned char ) m_pMainConfig->GetMaxPlayers ();
 
     // players
     CPlayer* pPlayer = NULL;

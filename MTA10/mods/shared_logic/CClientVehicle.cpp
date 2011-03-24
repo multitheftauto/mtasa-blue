@@ -31,8 +31,7 @@ extern CClientGame* g_pClientGame;
 
 // Maximum distance between current position and target position (for interpolation)
 // before we disable interpolation and warp to the position instead
-#define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
-#define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  1.8f
+#define VEHICLE_INTERPOLATION_WARP_THRESHOLD    20
 
 CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
 {
@@ -82,15 +81,6 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bSireneOrAlarmActive = false;
     m_bLandingGearDown = true;
     m_usAdjustablePropertyValue = 0;
-    for ( unsigned int i = 0; i < 6; ++i )
-    {
-        m_fDoorOpenRatio [ i ] = 0.0f;
-        m_doorInterp.fStart [ i ] = 0.0f;
-        m_doorInterp.fTarget [ i ] = 0.0f;
-        m_doorInterp.ulStartTime [ i ] = 0UL;
-        m_doorInterp.ulTargetTime [ i ] = 0UL;
-    }
-    m_bSwingingDoorsAllowed = false;
     m_bDoorsLocked = false;
     m_bDoorsUndamageable = false;
     m_bCanShootPetrolTank = true;
@@ -576,123 +566,6 @@ void CClientVehicle::SetVisible ( bool bVisible )
     m_bVisible = bVisible;
 }
 
-void CClientVehicle::SetDoorOpenRatioInterpolated ( unsigned char ucDoor, float fRatio, unsigned long ulDelay )
-{
-    unsigned long ulTime = CClientTime::GetTime ();
-    m_doorInterp.fStart [ ucDoor ] = m_fDoorOpenRatio [ ucDoor ];
-    m_doorInterp.fTarget [ ucDoor ] = fRatio;
-    m_doorInterp.ulStartTime [ ucDoor ] = ulTime;
-    m_doorInterp.ulTargetTime [ ucDoor ] = ulTime + ulDelay;
-}
-
-void CClientVehicle::ResetDoorInterpolation ()
-{
-    for ( unsigned char i = 0; i < 6; ++i )
-    {
-        if ( m_doorInterp.ulTargetTime [ i ] != 0 )
-            SetDoorOpenRatio ( i, m_doorInterp.fTarget [ i ], 0, true );
-        m_doorInterp.ulTargetTime [ i ] = 0;
-    }
-}
-
-void CClientVehicle::ProcessDoorInterpolation ()
-{
-    unsigned long ulTime = CClientTime::GetTime ();
-
-    for ( unsigned char i = 0; i < 6; ++i )
-    {
-        if ( m_doorInterp.ulTargetTime [ i ] != 0 )
-        {
-            if ( m_doorInterp.ulTargetTime [ i ] <= ulTime )
-            {
-                // Interpolation finished.
-                SetDoorOpenRatio ( i, m_doorInterp.fTarget [ i ], 0, true );
-                m_doorInterp.ulTargetTime [ i ] = 0;
-            }
-            else
-            {
-                unsigned long ulElapsedTime = ulTime - m_doorInterp.ulStartTime [ i ];
-                unsigned long ulDelay = m_doorInterp.ulTargetTime [ i ] - m_doorInterp.ulStartTime [ i ];
-                float fStep = ulElapsedTime / (float)ulDelay;
-                float fRatio = SharedUtil::Lerp ( m_doorInterp.fStart [ i ], fStep, m_doorInterp.fTarget [ i ] );
-                SetDoorOpenRatio ( i, fRatio, 0, true );
-            }
-        }
-    }
-}
-
-void CClientVehicle::SetDoorOpenRatio ( unsigned char ucDoor, float fRatio, unsigned long ulDelay, bool bForced )
-{
-    bool bAllow = true;
-    unsigned char ucSeat;
-
-    if ( ucDoor <= 5 )
-    {
-        // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
-        if ( bForced == false )
-        {
-            switch ( ucDoor )
-            {
-                case 2:
-                    bAllow = m_pOccupyingDriver == 0;
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                    ucSeat = ucDoor - 2;
-                    bAllow = m_pOccupyingPassengers [ ucSeat ] == 0;
-                    break;
-            }
-        }
-
-        if ( bAllow )
-        {
-            if ( ulDelay == 0UL )
-            {
-                if ( m_pVehicle )
-                {
-                    m_pVehicle->OpenDoor ( ucDoor, fRatio, false );
-                }
-                m_fDoorOpenRatio [ ucDoor ] = fRatio;
-            }
-            else
-            {
-                SetDoorOpenRatioInterpolated ( ucDoor, fRatio, ulDelay );
-            }
-        }
-    }
-}
-
-float CClientVehicle::GetDoorOpenRatio ( unsigned char ucDoor )
-{
-    if ( ucDoor <= 5 )
-    {
-        if ( m_pVehicle )
-        {
-            return m_pVehicle->GetDoor ( ucDoor )->GetAngleOpenRatio ();
-        }
-        return m_fDoorOpenRatio [ ucDoor ];
-    }
-    return 0.0f;
-}
-
-void CClientVehicle::SetSwingingDoorsAllowed ( bool bAllowed )
-{
-    if ( m_pVehicle )
-    {
-        m_pVehicle->SetSwingingDoorsAllowed ( bAllowed );
-    }
-    m_bSwingingDoorsAllowed = bAllowed;
-}
-
-bool CClientVehicle::AreSwingingDoorsAllowed () const
-{
-    if ( m_pVehicle )
-    {
-        return m_pVehicle->AreSwingingDoorsAllowed ();
-    }
-    return m_bSwingingDoorsAllowed;
-}
 
 bool CClientVehicle::AreDoorsLocked ( void )
 {
@@ -830,24 +703,32 @@ void CClientVehicle::Blow ( bool bAllowMovement )
 }
 
 
-CVehicleColor& CClientVehicle::GetColor ( void )
+void CClientVehicle::GetColor ( unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 )
 {
     if ( m_pVehicle )
     {
-        SColor colors[4];
-        m_pVehicle->GetColor ( &colors[0], &colors[1], &colors[2], &colors[3], 0 );
-        m_Color.SetRGBColors ( colors[0], colors[1], colors[2], colors[3] );
+        m_pVehicle->GetColor ( &ucColor1, &ucColor2, &ucColor3, &ucColor4 );
     }
-    return m_Color;
+    else
+    {
+        ucColor1 = m_ucColor1;
+        ucColor2 = m_ucColor2;
+        ucColor3 = m_ucColor3;
+        ucColor4 = m_ucColor4;
+    }
 }
 
-void CClientVehicle::SetColor ( const CVehicleColor& color )
+
+void CClientVehicle::SetColor ( unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4 )
 {
-    m_Color = color;
     if ( m_pVehicle )
     {
-        m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
+        m_pVehicle->SetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
     }
+    m_ucColor1 = ucColor1;
+    m_ucColor2 = ucColor2;
+    m_ucColor3 = ucColor3;
+    m_ucColor4 = ucColor4;
     m_bColorSaved = true;
 }
 
@@ -2027,7 +1908,6 @@ void CClientVehicle::StreamedInPulse ( void )
         }
 
         Interpolate ();
-        ProcessDoorInterpolation ();
 
         // Grab our current position
         CVector vecPosition = *m_pVehicle->GetPosition ();
@@ -2195,7 +2075,6 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetSirenOrAlarmActive ( m_bSireneOrAlarmActive );
         SetLandingGearDown ( m_bLandingGearDown );
         _SetAdjustablePropertyValue ( m_usAdjustablePropertyValue );
-        m_pVehicle->SetSwingingDoorsAllowed ( m_bSwingingDoorsAllowed );
         m_pVehicle->LockDoors ( m_bDoorsLocked );
         m_pVehicle->SetDoorsUndamageable ( m_bDoorsUndamageable );
         m_pVehicle->SetCanShootPetrolTank ( m_bCanShootPetrolTank );
@@ -2244,7 +2123,7 @@ void CClientVehicle::Create ( void )
         // Restore the color
         if ( m_bColorSaved )
         {
-            m_pVehicle->SetColor ( m_Color.GetRGBColor ( 0 ), m_Color.GetRGBColor ( 1 ), m_Color.GetRGBColor ( 2 ), m_Color.GetRGBColor ( 3 ), 0 );
+            m_pVehicle->SetColor ( m_ucColor1, m_ucColor2, m_ucColor3, m_ucColor4 );
         }
 
         // Link us with stored next and previous vehicles
@@ -2338,11 +2217,6 @@ void CClientVehicle::Create ( void )
 
         // Reset the interpolation
         ResetInterpolation ();
-        ResetDoorInterpolation ();
-
-        for ( unsigned char i = 0; i < 6; ++i )
-            SetDoorOpenRatio ( i, m_fDoorOpenRatio [ i ], 0, true );
-
 
 #if WITH_VEHICLE_HANDLING
         // Re-apply handling entry
@@ -3114,10 +2988,7 @@ void CClientVehicle::UpdateTargetPosition ( void )
         CVector vecNewPosition = vecCurrentPosition + vecCompensation;
 
         // Check if the distance to interpolate is too far.
-        CVector vecVelocity;
-        GetMoveSpeed ( vecVelocity );
-        float fThreshold = ( VEHICLE_INTERPOLATION_WARP_THRESHOLD + VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
-        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > fThreshold )
+        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > VEHICLE_INTERPOLATION_WARP_THRESHOLD )
         {
             // Abort all interpolation
             m_interp.pos.ulFinishTime = 0;
@@ -3673,7 +3544,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
 
     // Load load load
     if ( GetModelInfo () )
-        g_pGame->GetStreaming()->LoadAllRequestedModels ();
+        GetModelInfo ()-> LoadAllRequestedModels ();
 
     // Start out with a fairly big radius to check, and shrink it down over time
     float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );

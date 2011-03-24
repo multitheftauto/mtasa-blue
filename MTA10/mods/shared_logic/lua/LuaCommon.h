@@ -28,7 +28,6 @@ CLuaFunctionRef         luaM_toref              ( lua_State *luaVM, int iArgumen
 // Predeclarations of our classes
 class CClientColModel;
 class CClientColShape;
-class CScriptFile;
 class CClientDFF;
 class CClientEntity;
 class CClientGUIElement;
@@ -42,7 +41,6 @@ class CClientTeam;
 class CClientTXD;
 class CClientVehicle;
 class CClientWater;
-class CClientIFP;
 class CClientRadarArea;
 class CLuaTimer;
 class CResource;
@@ -53,7 +51,6 @@ class CXMLNode;
 CClientRadarMarker*     lua_toblip          ( lua_State* luaVM, int iArgument );
 CClientColModel*        lua_tocolmodel      ( lua_State* luaVM, int iArgument );
 CClientColShape*        lua_tocolshape      ( lua_State* luaVM, int iArgument );
-CScriptFile*            lua_tofile          ( lua_State* luaVM, int iArgument );
 CClientDFF*             lua_todff           ( lua_State* luaVM, int iArgument );
 CClientEntity*          lua_toelement       ( lua_State* luaVM, int iArgument );
 CClientGUIElement*      lua_toguielement    ( lua_State* luaVM, int iArgument );
@@ -70,7 +67,6 @@ CClientTeam*            lua_toteam          ( lua_State* luaVM, int iArgument );
 CClientTXD*             lua_totxd           ( lua_State* luaVM, int iArgument );
 CClientVehicle*         lua_tovehicle       ( lua_State* luaVM, int iArgument );
 CClientWater*           lua_towater         ( lua_State* luaVM, int iArgument );
-CClientIFP*             lua_toifp           ( lua_State* luaVM, int iArgument );
 CXMLNode*               lua_toxmlnode       ( lua_State* luaVM, int iArgument );
 CClientRadarArea*       lua_toradararea     ( lua_State* luaVM, int iArgument );
 

@@ -376,12 +376,6 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation ( NetBitStreamInterface* pB
         vehicle.data.bDerailed = true;
     }
 
-    if ( pVehicle->IsInWater () )
-    {
-        bSyncVehicle = true;
-        vehicle.data.bIsInWater = true;
-    }
-
     // If nothing has changed we dont sync the vehicle
     if ( !bSyncVehicle )
         return false;

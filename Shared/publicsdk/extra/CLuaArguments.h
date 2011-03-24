@@ -21,7 +21,7 @@
 
 extern "C"
 {
-    #include <lua.h>
+    #include "../include/lua.h"
 }
 
 #include "CLuaArgument.h"

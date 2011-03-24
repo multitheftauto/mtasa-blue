@@ -90,8 +90,6 @@ public:
     virtual const char *            GetModInstallRoot               ( const char * szModName )=0;
     virtual const char *            GetGTAInstallRoot               ( void ) = 0;
 
-    virtual void                    ShowServerInfo                  ( unsigned int WindowType ) = 0;
-
     virtual void                    ForceCursorVisible              ( bool bVisible, bool bToggleControls = true ) = 0;
     virtual void                    SetMessageProcessor             ( pfnProcessMessage pfnMessageProcessor ) = 0;
     virtual void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL ) = 0;
@@ -115,10 +113,6 @@ public:
     virtual void                    InitiateUpdate                  ( const char* szType, const char* szData, const char* szHost ) = 0;
     virtual bool                    IsOptionalUpdateInfoRequired    ( const char* szHost ) = 0;
     virtual void                    InitiateDataFilesFix            ( void ) = 0;
-
-    virtual uint                    GetFrameRateLimit               ( void ) = 0;
-    virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 ) = 0;
-    virtual void                    ApplyFrameRateLimit             ( void ) = 0;
 };
 
 #endif

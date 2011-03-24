@@ -13,6 +13,7 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 #include <shellapi.h>
+#include "SharedUtil.Misc.h"
 
 using SharedUtil::CalcMTASAPath;
 
@@ -278,6 +279,10 @@ void CModManager::DoPulsePostFrame ( void )
     if ( m_pClientBase )
     {
         m_pClientBase->PostFrameExecutionHandler ();
+    }
+    else
+    {
+        CCore::GetSingleton ().GetNetwork ()->DoPulse ();
     }
 
     // Load/unload requested?

@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;shipped_for_mta_win32"
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=2"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -85,7 +85,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\pcre3d.dll &quot;C:\Program Files\MTA San Andreas 1.1\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\pcre3d.dll &quot;C:\Program Files\MTA San Andreas\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -115,7 +115,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;shipped_for_mta_win32"
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -163,7 +163,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /y ..\pcre3.dll &quot;C:\Program Files\MTA San Andreas 1.1\server\mods\deathmatch\&quot;"
+				CommandLine="xcopy /y ..\pcre3.dll &quot;C:\Program Files\MTA San Andreas\server\mods\deathmatch\&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -193,7 +193,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;shipped_for_mta_win32"
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="HAVE_CONFIG_H;FORCE_BUILD=2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -355,7 +355,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\shipped_for_mta_win32\config.h"
+				RelativePath=".\config.h"
 				>
 			</File>
 			<File

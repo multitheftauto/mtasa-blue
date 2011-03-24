@@ -664,21 +664,6 @@ public:
 	*/
 	const String& getAvailableGlyphs(void) const;
 
-	/*!
-	\brief
-		returns whether the image is being used (i.e. if 0 images of the glyph are drawn).
-	*/
-	bool	isGlyphBeingUsed (unsigned long ulGlyph) const;
-
-	/*!
-	\brief
-		hacked callback for when a Glyph has been rendered
-	*/
-    String	OnGlyphDrawn ( unsigned long ulGlyph ) const;
-
-    String	cleanGlyphCache ( String strCache ) const;
-    
-    void    extendFontGlyphs (const String glyph_set) const;
 
 	/*!
 	\brief
@@ -956,7 +941,7 @@ private:
 	\return
 		Nothing.
 	*/
-	void	drawGlyphToBuffer(void* glyph, argb_t* buffer, uint buf_width);
+	void	drawGlyphToBuffer(argb_t* buffer, uint buf_width);
 
 
 	/*!
@@ -1038,6 +1023,7 @@ private:
 	*/
 	float	getWrappedTextExtent(const String& text, float wrapWidth, float x_scale = 1.0f) const;
 
+
     /*!
     \brief
         Writes an xml representation of this Font to \a out_stream.
@@ -1093,8 +1079,6 @@ private:
 	float	d_nativeVertRes;		//!< native vertical resolution for this Imageset.
 
 	bool	d_antiAliased;			//!< True if the font should be rendered as anti-alaised by freeType.
-
-    std::map < unsigned long, unsigned long >   m_GlyphCache;
 };
 
 } // End of  CEGUI namespace section

@@ -296,18 +296,11 @@ int CLuaFunctionDefs::GetElementRotation ( lua_State* luaVM )
     {
         // Grab the element, verify it
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-
-        const char* szRotationOrder = "default";
-        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) 
-        {
-            szRotationOrder = lua_tostring ( luaVM, 2 );
-        }
-
         if ( pEntity )
         {
             // Grab the rotation
             CVector vecRotation;
-            if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation, szRotationOrder ) )
+            if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation ) )
             {            
                 // Return it
                 lua_pushnumber ( luaVM, vecRotation.fX );
@@ -975,40 +968,6 @@ int CLuaFunctionDefs::IsElementLocal ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::GetElementAttachedOffsets ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        // Grab the attached element
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        CVector vecPosition, vecRotation;
-
-        // Valid element?
-        if ( pEntity )
-        {
-            if ( CStaticFunctionDefinitions::GetElementAttachedOffsets ( *pEntity, vecPosition, vecRotation ) )
-            {
-                lua_pushnumber( luaVM, vecPosition.fX );
-                lua_pushnumber( luaVM, vecPosition.fY );
-                lua_pushnumber( luaVM, vecPosition.fZ );
-                lua_pushnumber( luaVM, vecRotation.fX );
-                lua_pushnumber( luaVM, vecRotation.fY );
-                lua_pushnumber( luaVM, vecRotation.fZ );
-                return 6;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementAttachedOffsets", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getElementAttachedOffsets" );
-
-    // Failed
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaFunctionDefs::GetElementAlpha ( lua_State* luaVM )
 {
     // Valid type?
@@ -1214,53 +1173,6 @@ int CLuaFunctionDefs::IsElementDoubleSided ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetElementCollisionsEnabled ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
-        {
-            if ( CStaticFunctionDefinitions::GetElementCollisionsEnabled ( *pEntity ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }        
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementCollisionsEnabled", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getElementCollisionsEnabled" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::IsElementFrozen ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
-        {
-            bool bFrozen;
-            if ( CStaticFunctionDefinitions::IsElementFrozen ( *pEntity, bFrozen ) )
-            {
-                lua_pushboolean ( luaVM, bFrozen );
-                return 1;
-            }        
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isElementFrozen", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "isElementFrozen" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
 
 
 int CLuaFunctionDefs::IsElementStreamedIn ( lua_State* luaVM )
@@ -1451,35 +1363,6 @@ int CLuaFunctionDefs::DestroyElement ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::SetElementID ( lua_State* luaVM )
-{
-    // Correct type?
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-         lua_istype ( luaVM, 2, LUA_TSTRING ) )
-    {
-        // Grab the element
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
-        {
-            const char* szID = lua_tostring ( luaVM, 2 );
-            // It returns false if we tried to change ID of server-created element
-            if ( CStaticFunctionDefinitions::SetElementID ( *pEntity, szID ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementID", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setElementID" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
 {
     // Grab the vm
@@ -1621,12 +1504,6 @@ int CLuaFunctionDefs::SetElementRotation ( lua_State* luaVM )
         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
     {
-        const char* szRotationOrder = "default";
-        if ( lua_type ( luaVM, 5 ) == LUA_TSTRING ) 
-        {
-            szRotationOrder = lua_tostring ( luaVM, 5 );
-        }
-
         // Grab the element and the position to change to
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         CVector vecRotation ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
@@ -1637,7 +1514,7 @@ int CLuaFunctionDefs::SetElementRotation ( lua_State* luaVM )
         if ( pEntity )
         {
             // Try to set the position
-            if ( CStaticFunctionDefinitions::SetElementRotation ( *pEntity, vecRotation, szRotationOrder ) )
+            if ( CStaticFunctionDefinitions::SetElementRotation ( *pEntity, vecRotation ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -2069,33 +1946,6 @@ int CLuaFunctionDefs::SetElementDoubleSided ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementDoubleSided" );
-
-    // Failure
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::SetElementFrozen ( lua_State* luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
-    {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
-        {
-            bool bFrozen = lua_toboolean ( luaVM, 2 ) ? true : false;
-
-            if ( CStaticFunctionDefinitions::SetElementFrozen ( *pEntity, bFrozen ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementFrozen", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setElementFrozen" );
 
     // Failure
     lua_pushboolean ( luaVM, false );

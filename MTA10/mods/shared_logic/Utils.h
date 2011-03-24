@@ -43,26 +43,6 @@ inline float HorizontalAngleBetweenPoints3D ( const CVector &vecPosition1, const
     return fRad;
     //return (fRad*180/PI);
 }
-inline float AngleBetweenPoints2D ( const CVector &vecPosition1, const CVector &vecPosition2 )
-{
-	float fRad = (PI*2) - atan2( ( vecPosition2.fX - vecPosition1.fX ), ( vecPosition2.fY - vecPosition1.fY ) );
-    // Clamp it to -PI .. PI
-    if ( fRad < -PI )
-    {
-        do
-        {
-            fRad += PI * 2.0f;
-        } while ( fRad < -PI );
-    }
-    else if ( fRad > PI )
-    {
-        do
-        {
-            fRad -= PI * 2.0f;
-        } while ( fRad > PI );
-    }
- 	return fRad;
-}
 inline float DistanceBetweenPoints3D ( const CVector& vecPosition1, const CVector& vecPosition2 )
 {
     float fDistanceX = vecPosition2.fX - vecPosition1.fX;
@@ -228,18 +208,6 @@ void            LongToDottedIP              ( unsigned long ulIP, char* szDotted
 
 bool            BitStreamReadUsString       ( class NetBitStreamInterface& bitStream, SString& strOut );
 
-// Maths utility functions
-enum eEulerRotationOrder
-{	
-    EULER_DEFAULT,
-    EULER_ZXY,
-    EULER_ZYX,
-    EULER_MINUS_ZYX,
-    EULER_INVALID = 0xFF,
-};
-
-eEulerRotationOrder EulerRotationOrderFromString(const char* szString);
-CVector             ConvertEulerRotationOrder   ( const CVector& a_vRotation, eEulerRotationOrder a_eSrcOrder, eEulerRotationOrder a_eDstOrder );
 
 // for debug
 #ifdef MTA_DEBUG

@@ -32,6 +32,9 @@ CConnectManager::CConnectManager ( void )
     m_pOnCancelClick = new GUI_CALLBACK ( &CConnectManager::Event_OnCancelClick, this );
 
     m_pServerItem = NULL;
+
+    // Set default MTU size
+    m_usMTUSize = NET_MTU_DSL;
 }
 
 
@@ -55,10 +58,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     assert ( szPassword );
 
     // Hide the server queue
-    CServerInfo::GetSingletonPtr()->Hide( );
-
-    // Save the browser state
-    CServerBrowser::GetSingletonPtr()->SaveOptions( );
+    CServerQueue::GetSingletonPtr()->SetVisible( false );
 
     // Are we already connecting?
     CNet* pNet = CCore::GetSingleton ().GetNetwork ();
@@ -88,10 +88,6 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_strPassword = szPassword;
     m_usPort = usPort;
 
-    m_strLastHost = m_strHost;
-    m_usLastPort = m_usPort;
-    m_strLastPassword = m_strPassword;
-
     // Parse host into a server item
     in_addr Address;
     if ( !CServerListItem::Parse ( m_strHost.c_str(), Address ) )
@@ -103,6 +99,9 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket, true );
+
+    // Set our MTU size to the default
+    pNet->SetMTUSize ( m_usMTUSize );
 
     // Try to start a network to connect
     if ( !pNet->StartNetwork ( m_strHost.c_str (), m_usPort ) )
@@ -238,7 +237,8 @@ void CConnectManager::DoPulse ( void )
                         strError = "Disconnected: you are banned from this server";
                         break;
                     case ID_NO_FREE_INCOMING_CONNECTIONS:
-                        CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_QUEUE, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
+                        CServerQueue::GetSingletonPtr()->SetVisible( true );
+                        CServerQueue::GetSingletonPtr()->SetServerInformation(m_strHost.c_str(), m_usPort, m_strPassword.c_str());
                         break;
                     case ID_DISCONNECTION_NOTIFICATION:
                         strError = "Disconnected: disconnected";
@@ -247,7 +247,7 @@ void CConnectManager::DoPulse ( void )
                         strError = "Disconnected: connection lost";
                         break;
                     case ID_INVALID_PASSWORD:
-                        CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_PASSWORD, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
+                        strError = "Disconnected: invalid password";
                         break;
                     default:
                         strError = "Disconnected: connection refused";
@@ -292,18 +292,24 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
         // The packet we're expecting?
         if ( ucPacketID == PACKET_ID_MOD_NAME )
         {
-            // Read packet data
-            unsigned short usServerBitStreamVersion = 0x01;
-            BitStream.Read ( usServerBitStreamVersion );
-
-            SString strModName;
-            BitStream.ReadString ( strModName );
-
-            // Process packet data
-            CCore::GetSingleton ().GetNetwork ()->SetServerBitStreamVersion ( usServerBitStreamVersion );
-
-            if ( strModName != "" )
+            // Read out the mod to load
+            char* szModName = new char [ BitStream.GetNumberOfBytesUsed () + 1 ];
+            memset ( szModName, 0, BitStream.GetNumberOfBytesUsed () + 1 );
+            if ( BitStream.Read ( szModName, BitStream.GetNumberOfBytesUsed () ) )
             {
+                // Backward compatibly examine the bytes following the mod name
+                BitStream.ResetReadPointer ();
+                BitStream.Read ( szModName, strlen ( szModName ) );
+                char cPad;
+                BitStream.Read ( cPad );
+                unsigned short usServerBitStreamVersion = 0x01;
+                BitStream.Read ( usServerBitStreamVersion );    // This will silently fail for < 1.0.2 and leave the bitstream version at 0x01
+                CCore::GetSingleton ().GetNetwork ()->SetServerBitStreamVersion ( usServerBitStreamVersion );
+
+                // Limit the nick length for servers that have a problem with max length nicks
+                if ( usServerBitStreamVersion < 0x06 )
+                    g_pConnectManager->m_strNick = g_pConnectManager->m_strNick.substr ( 0, MAX_PLAYER_NICK_LENGTH - 1 );
+
                 // Populate the arguments to pass it (-c host port nick)
                 SString strArguments ( "%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str() );
 
@@ -320,15 +326,6 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 CVARS_SET ( "port",     g_pConnectManager->m_usPort );
                 CVARS_SET ( "password", g_pConnectManager->m_strPassword );
 
-                //Conver the Address to an unsigned long
-                unsigned long ulAddr = inet_addr( g_pConnectManager->m_strHost.c_str() );
-
-                //Create an instance of the in_addr structure to store the address
-                in_addr Address;
-                //Set the address to the unsigned long we just created
-                Address.S_un.S_addr = ulAddr;
-                //Set the current server info and Add the ASE Offset to the Query port)
-                CCore::GetSingleton().SetCurrentServer ( Address, g_pConnectManager->m_usPort + 123 );
 
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
                 CCore::GetSingleton ().SaveConfig ();
@@ -344,10 +341,10 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 g_pConnectManager->m_tConnectStarted = 0;
 
                 // Load the mod
-                if ( !CModManager::GetSingleton ().Load ( strModName, strArguments ) )
+                if ( !CModManager::GetSingleton ().Load ( szModName, strArguments ) )
                 {
                     // Failed loading the mod
-                    strArguments.Format ( "No such mod installed (%s)", strModName.c_str() );
+                    strArguments.Format ( "No such mod installed (%s)", szModName );
                     CCore::GetSingleton ().ShowMessageBox ( "Error", strArguments, MB_BUTTON_OK | MB_ICON_ERROR );
                     g_pConnectManager->Abort ();
                 }
@@ -358,6 +355,8 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 CCore::GetSingleton ().ShowMessageBox ( "Error", "Bad server response (2)", MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pConnectManager->Abort ();
             }
+
+            delete [] szModName;
         }
         else
         {

@@ -17,10 +17,6 @@
 #include "CObject.h"
 #include <list>
 
-using std::list;
-
-class CObject;
-
 class CObjectManager
 {
     friend class CObject;
@@ -39,7 +35,6 @@ public:
     inline list < CObject* > ::const_iterator   IterEnd         ( void )                            { return m_List.end (); };
 
     static bool                 IsValidModel                    ( unsigned long ulObjectModel );
-    static bool                 IsBreakableModel                ( unsigned long ulObjectModel );
 
 private:
     inline void                 AddToList                       ( CObject* pObject )                { m_List.push_back ( pObject ); };

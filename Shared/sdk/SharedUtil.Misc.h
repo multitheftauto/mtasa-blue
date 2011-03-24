@@ -10,19 +10,18 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
+#pragma once
 
 namespace SharedUtil
 {
     class CArgMap;
 #ifdef WIN32
 
-    SString GetVersionAppendString ( const SString& strUsingASEVersion = "" );
     void SetRegistryValue ( const SString& strPath, const SString& strKey, const SString& strValue );
     SString GetRegistryValue ( const SString& strPath, const SString& strKey );
 
-    bool ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
-    bool ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
+    int ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
+    int ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
 
     //
     // Get startup directory as saved in the registry by the launcher
@@ -102,19 +101,6 @@ namespace SharedUtil
     // Try to make a path relative to the 'resources/' directory
     //
     SString ConformResourcePath ( const char* szRes );
-
-    //
-    // string stuff
-    //
-
-    std::wstring ConvertToUTF8 (const std::string& s);
-
-    std::string  ConvertToANSI (const std::wstring& ws);
-
-    std::wstring  TranslateToUTF8 (const std::string& s);
-
-    std::wstring GetBidiString (const std::wstring ws);
-
 
     //
     // Some templates

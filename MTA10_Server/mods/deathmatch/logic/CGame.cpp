@@ -13,7 +13,6 @@
 *               Chris McArthur <>
 *               Kevin Whiteside <>
 *               lil_Toady <>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -99,15 +98,6 @@ CGame::CGame ( void )
     m_pLanBroadcast = NULL;
     m_pPedSync = NULL;
     m_pWaterManager = NULL;
-    m_pObjectSync = NULL;
-
-    m_bInteriorSoundsEnabled = true;
-    m_bOverrideRainLevel = false;
-    m_bOverrideSunSize = false;
-    m_bOverrideSunColor = false;
-    m_bOverrideWindVelocity = false;
-    m_bOverrideFarClip = false;
-    m_bOverrideFogDistance = false;
 
 #ifdef MTA_VOICE
     m_pVoiceServer = NULL;
@@ -139,10 +129,6 @@ CGame::CGame ( void )
     m_llLastAnnouceTime = 0;
     m_pOpenPortsTester = NULL;
 
-    m_bTrafficLightsLocked = false;
-    m_ucTrafficLightState = 0;
-    m_ulLastTrafficUpdate = 0;
-
     memset( m_bGarageStates, 0, sizeof(bool) * MAX_GARAGES );
 
     // init our mutex
@@ -154,33 +140,15 @@ void CGame::ResetMapInfo ( void )
     // Add variables to get reset in resetMapInfo here
     m_fGravity = 0.008f;
     m_fGameSpeed = 1.0f;
-    m_fJetpackMaxHeight = 100;
-
     if ( m_pWaterManager )
     {
         m_pWaterManager->SetGlobalWaterLevel ( 0.0f );
         m_pWaterManager->SetGlobalWaveHeight ( 0.0f );
     }
-
     m_ucSkyGradientTR = 0, m_ucSkyGradientTG = 0, m_ucSkyGradientTB = 0;
     m_ucSkyGradientBR = 0, m_ucSkyGradientBG = 0, m_ucSkyGradientBB = 0;
     m_bHasSkyGradient = false;
-    m_HeatHazeSettings = SHeatHazeSettings ();
-    m_bHasHeatHaze = false;
     m_bCloudsEnabled = true;
-
-    m_bTrafficLightsLocked = false;
-    m_ucTrafficLightState = 0;
-    m_ulLastTrafficUpdate = 0;
-
-    g_pGame->SetHasWaterColor ( false );
-    g_pGame->SetInteriorSoundsEnabled ( true );
-    g_pGame->SetHasFarClipDistance ( false );
-    g_pGame->SetHasFogDistance ( false );
-    g_pGame->SetHasRainLevel ( false );
-    g_pGame->SetHasSunColor ( false );
-    g_pGame->SetHasSunSize ( false );
-    g_pGame->SetHasWindVelocity ( false );
 }
 
 CGame::~CGame ( void )
@@ -206,7 +174,6 @@ CGame::~CGame ( void )
     m_ElementDeleter.DoDeleteAll ();
     SAFE_DELETE ( m_pUnoccupiedVehicleSync );
     SAFE_DELETE ( m_pPedSync );
-    SAFE_DELETE ( m_pObjectSync );
     SAFE_DELETE ( m_pConsole );
     SAFE_DELETE ( m_pMapManager );
     SAFE_DELETE ( m_pLuaManager );
@@ -358,17 +325,9 @@ void CGame::DoPulse ( void )
     m_pMapManager->DoPulse ();
     m_pUnoccupiedVehicleSync->DoPulse ();
     m_pPedSync->DoPulse ();
-    m_pObjectSync->DoPulse ();
     m_pBanManager->DoPulse ();
     m_pAccountManager->DoPulse ();
     m_pRegistryManager->DoPulse ();
-
-	
-    // Handle the traffic light sync
-    if (m_bTrafficLightsLocked == false)
-    {
-        ProcessTrafficLights (ulCurrentTime);
-    }
 
     // Pulse ASE
     if ( m_pASE )
@@ -514,6 +473,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 "= \n" \
                                 "= Log file         : %s\n" \
                                 "= Maximum players  : %u\n" \
+                                "= MTU packet size  : %u\n" \
                                 "= HTTP port        : %u\n" \
                                 "===========================================================\n",
 
@@ -523,6 +483,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 usServerPort,
                                 pszLogFileName,
                                 uiMaxPlayers,
+                                m_pMainConfig->GetMTUSize (),
                                 m_pMainConfig->IsHTTPEnabled () ? m_pMainConfig->GetHTTPPort () : 0 );
 
     if ( !bLogFile )
@@ -580,7 +541,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pResourceManager->Refresh();
     m_pUnoccupiedVehicleSync = new CUnoccupiedVehicleSync ( m_pPlayerManager, m_pVehicleManager );
     m_pPedSync = new CPedSync ( m_pPlayerManager, m_pPedManager );
-    m_pObjectSync = new CObjectSync ( m_pPlayerManager, m_pObjectManager );
     // Must be created before all clients
     m_pConsoleClient = new CConsoleClient ( m_pConsole );
 
@@ -671,8 +631,11 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket, TRUE );
 
+    // Grab the MTU size
+    unsigned int uiMTUSize = m_pMainConfig->GetMTUSize ();
+
     // Try to start the network
-    if ( !g_pNetServer->StartNetwork ( strServerIP, usServerPort, uiMaxPlayers ) )
+    if ( !g_pNetServer->StartNetwork ( strServerIP, usServerPort, uiMTUSize, uiMaxPlayers ) )
     {
         CLogger::ErrorPrintf ( "Could not bind the server on interface '%s' and port '%u'!\n", strServerIP.c_str (), usServerPort );
         return false;
@@ -729,6 +692,10 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             CLogger::LogPrint ( "WARNING: Unable to open the given script debug logfile\n" );
         }
     }
+
+    // Set the autopatcher directory
+    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "" );
+    g_pNetServer->SetAutoPatcherDirectory ( (char*)strBuffer.c_str () );
 
 
 #ifdef MTA_VOICE
@@ -1044,10 +1011,6 @@ bool CGame::ProcessPacket ( CPacket& Packet )
     {
         return true;
     }
-    else if ( m_pObjectSync->ProcessPacket ( Packet ) )
-    {
-        return true;
-    }
 
     return false;
 }
@@ -1069,6 +1032,7 @@ void CGame::JoinPlayer ( CPlayer& Player )
                                               m_pMainConfig->GetHTTPPort (),
                                               m_pMainConfig->GetHTTPDownloadURL ().c_str (),
                                               m_pMainConfig->GetHTTPMaxConnectionsPerClient (),
+                                              m_pMainConfig->GetHTTPMaxConnectionsLegacy (),
                                               m_pMainConfig->GetEnableClientChecks () ) );
 }
 
@@ -1301,9 +1265,6 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerChangeNick", "oldnick, newnick", NULL, false );
     m_Events.AddEvent ( "onPlayerPrivateMessage", "text, player", NULL, false );
     m_Events.AddEvent ( "onPlayerStealthKill", "target", NULL, false );
-    m_Events.AddEvent ( "onPlayerMute", "", NULL, false );
-    m_Events.AddEvent ( "onPlayerUnmute", "", NULL, false );
-    m_Events.AddEvent ( "onPlayerCommand", "command", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onPedWasted", "ammo, killer, weapon, bodypart", NULL, false );
@@ -1331,7 +1292,6 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onTrailerDetach", "towedBy", NULL, false );
     m_Events.AddEvent ( "onVehicleStartEnter", "player, seat, jacked", NULL, false );
     m_Events.AddEvent ( "onVehicleStartExit", "player, seat, jacker", NULL, false );
-    m_Events.AddEvent ( "onVehicleStopEnter", "player, seat", NULL, false );
     m_Events.AddEvent ( "onVehicleEnter", "player, seat, jacked", NULL, false );
     m_Events.AddEvent ( "onVehicleExit", "player, seat, jacker", NULL, false );
     m_Events.AddEvent ( "onVehicleExplode", "", NULL, false );
@@ -1339,43 +1299,9 @@ void CGame::AddBuiltInEvents ( void )
     // Console events
     m_Events.AddEvent ( "onConsole", "text", NULL, false );
 
-    // Debug events
-    m_Events.AddEvent ( "onDebugMessage", "message, level, file, line", NULL, false );
-
     // Ban events
     m_Events.AddEvent ( "onBan", "ip", NULL, false );
     m_Events.AddEvent ( "onUnban", "ip", NULL, false );
-
-    // Other events
-    m_Events.AddEvent ( "onSettingChange", "setting, oldValue, newValue", NULL, false );
-}
-
-void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
-{
-    unsigned long ulDiff = static_cast < unsigned long > ( (ulCurrentTime - m_ulLastTrafficUpdate)*m_fGameSpeed );
-    unsigned char ucNewState = 0xFF;
-
-    if ( ulDiff >= 1000 )
-    {
-        if ( ( m_ucTrafficLightState == 0 || m_ucTrafficLightState == 3 ) && ulDiff >= 8000 ) // green
-        {
-            ucNewState = m_ucTrafficLightState + 1;
-        }
-        else if ( ( m_ucTrafficLightState == 1 || m_ucTrafficLightState == 4 ) && ulDiff >= 3000 ) // orange
-        {
-            ucNewState = ( m_ucTrafficLightState == 4 ) ? 0 : 2;
-        }
-        else if ( m_ucTrafficLightState == 2 && ulDiff >= 2000 ) // red
-        {
-            ucNewState = 3;
-        }
-
-        if ( ucNewState != 0xFF )
-        {
-            CStaticFunctionDefinitions::SetTrafficLightState (ucNewState);
-            m_ulLastTrafficUpdate = GetTickCount32 ();
-        }
-    }
 }
 
 
@@ -1386,8 +1312,9 @@ void CGame::Packet_PlayerJoin ( NetServerPlayerID& Source )
     if ( pBitStream )
     {
         // Write the mod name to the bitstream
+        pBitStream->Write ( const_cast < char* > ( "deathmatch" ), 10 );
+        pBitStream->Write ( static_cast < char > ( 0 ) );
         pBitStream->Write ( static_cast < unsigned short > ( MTA_DM_BITSTREAM_VERSION ) );
-        pBitStream->WriteString ( "deathmatch" );
 
         // Send and destroy the bitstream
         g_pNetServer->SendPacket ( PACKET_ID_MOD_NAME, Source, pBitStream );
@@ -1497,8 +1424,19 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                                     // Tell the player
-                                    pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", GetConfig ()->GetMinimumClientVersion () ) );
-                                    DisconnectPlayer ( this, *pPlayer, "" );
+                                    if ( Packet.GetBitStreamVersion () >= 0x0e )
+                                    {
+                                        pPlayer->Send ( CUpdateInfoPacket ( "Mandatory", GetConfig ()->GetMinimumClientVersion () ) );
+                                        DisconnectPlayer ( this, *pPlayer, "" );
+                                    }
+                                    else
+                                    {
+                                        SString strMessage = "Disconnected: You need to update MTA to connect to this server.";
+                                        for ( int i = 0 ; i < 55 ; i++ )
+                                            strMessage += " ";
+                                        strMessage += "*         Update at www.mtasa.com";
+                                        DisconnectPlayer ( this, *pPlayer, strMessage );
+                                    }
                                     return;
                                 }
 
@@ -1528,9 +1466,19 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 
                                     // Make a message for the player
                                     strBanMessage = std::string ( "Disconnected: " ) + strBanMessage;
+                                    if ( pPlayer->GetMTAVersion () <= 0x102 )
+                                        strBanMessage += " - If this is in error, ensure you have the lastest version of MTA.";
 
                                     // Tell the player he's banned
                                     DisconnectPlayer ( this, *pPlayer, strBanMessage );
+
+/*
+                                    // Tell the player he's banned
+                                    if ( pPlayer->GetMTAVersion () <= 0x102 )
+                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: %s - If this is in error, ensure you have the lastest version of MTA." );
+                                    else
+                                        DisconnectPlayer ( this, *pPlayer, "Disconnected: %s" );
+*/
                                     return;
                                 }
 
@@ -1590,30 +1538,11 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                         // Tell the console
                         CLogger::LogPrintf ( "CONNECT: %s failed to connect (Bad version) (%s)\n", szNick, strIPAndSerial.c_str () );
 
-                        // Tell the player the problem
-                        SString strMessage;
-                        ushort usClientNetVersion = Packet.GetNetVersion ();
-                        ushort usServerNetVersion = MTA_DM_NETCODE_VERSION;
-                        ushort usClientBranchId = usClientNetVersion >> 12;
-                        ushort usServerBranchId = usServerNetVersion >> 12;
-
-                        if ( usClientBranchId != usServerBranchId )
-                        {
-                            strMessage = SString ( "Disconnected: Server from different branch (client: %X, server: %X)\n", usClientBranchId, usServerBranchId );
-                        }
-                        else
-                        if ( MTASA_VERSION_BUILD == 0 )
-                        {
-                            strMessage = SString ( "Disconnected: Bad version (client: %X, server: %X)\n", usClientNetVersion, usServerNetVersion );
-                        }
-                        else
-                        {
-                            if ( usClientNetVersion < usServerNetVersion )
-                                strMessage = SString ( "Disconnected: Server is running a newer build (%d)\n", MTASA_VERSION_BUILD );
-                            else
-                                strMessage = SString ( "Disconnected: Server is running an older build (%d)\n", MTASA_VERSION_BUILD );
-                        }
-                        DisconnectPlayer ( this, *pPlayer, strMessage );
+                        // Tell the player that the problem
+                        char szReturn [128];
+                        _snprintf ( szReturn, 128, "Disconnected: Bad version (client: %X, server: %X)\n", Packet.GetNetVersion (), MTA_DM_NETCODE_VERSION );
+                        szReturn [127] = '\0';
+                        DisconnectPlayer ( this, *pPlayer, szReturn );
                     }
                 }
                 else
@@ -1703,7 +1632,7 @@ void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
 
         // Create a new packet to send to everyone
         CPlayerWastedPacket ReturnWastedPacket ( pPlayer, pKiller, Packet.m_ucKillerWeapon, Packet.m_ucBodyPart, false, Packet.m_AnimGroup, Packet.m_AnimID );
-        m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket, pPlayer );
+        m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket );
 
         // Tell our scripts the player has died
         CLuaArguments Arguments;
@@ -1984,10 +1913,11 @@ void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
             // Tell our clients to update their data. Send to everyone but the one we got this packet from.
             unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
             CBitStream BitStream;
+            BitStream.pBitStream->WriteCompressed ( ID );
             BitStream.pBitStream->WriteCompressed ( usNameLength );
             BitStream.pBitStream->Write ( szName, usNameLength );
             Value.WriteToBitStream ( *BitStream.pBitStream );
-            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DATA, *BitStream.pBitStream ), pSourcePlayer );
+            m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_ELEMENT_DATA, *BitStream.pBitStream ), pSourcePlayer );
         }
     }
 }
@@ -2466,28 +2396,15 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat ();
                                 if ( pPlayer == pVehicle->GetOccupant ( ucOccupiedSeat ) )
                                 {
-                                    unsigned char ucDoor = Packet.GetDoor ();
-                                    float fDoorAngle = Packet.GetDoorAngle ();
-
                                     // Mark that he's in no vehicle
                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
                                     pPlayer->SetOccupiedVehicle ( NULL, 0 );
                                     pVehicle->SetOccupant ( NULL, ucOccupiedSeat );
 
-                                    // Update the door angle.
-                                    pVehicle->SetDoorOpenRatio ( ucDoor + 2, fDoorAngle );
-
                                     // Tell everyone he's in (they should warp him in)
-                                    CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor );
+                                    CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_NOTIFY_IN_ABORT_RETURN );
                                     Reply.SetSourceElement ( pPlayer );
-                                    Reply.SetDoorAngle ( fDoorAngle );
                                     m_pPlayerManager->BroadcastOnlyJoined ( Reply );
-
-                                    // Call the vehicle->player event
-                                    CLuaArguments Arguments;
-                                    Arguments.PushElement ( pPlayer );         // player
-                                    Arguments.PushNumber ( ucOccupiedSeat );   // seat
-                                    pVehicle->CallEvent ( "onVehicleStopEnter", Arguments );
                                 }
                             }
 
@@ -2754,8 +2671,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                             // Is the sender jacking?
                             if ( pPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_JACKING )
                             {
-                                unsigned char ucDoor = Packet.GetDoor ();
-                                float fAngle = Packet.GetDoorAngle ();
                                 CPed* pJacked = pVehicle->GetOccupant ( 0 );
 
                                 // Mark that the jacker is in no vehicle
@@ -2764,13 +2679,9 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 pPlayer->SetJackingVehicle ( NULL );
                                 pVehicle->SetJackingPlayer ( NULL );
 
-                                // Set the door angle.
-                                pVehicle->SetDoorOpenRatio ( ucDoor, fAngle );
-
                                 // Tell everyone he aborted
-                                CVehicleInOutPacket Reply ( ID, 0, VEHICLE_NOTIFY_IN_ABORT_RETURN, ucDoor );
+                                CVehicleInOutPacket Reply ( ID, 0, VEHICLE_NOTIFY_IN_ABORT_RETURN );
                                 Reply.SetSourceElement ( pPlayer );
-                                Reply.SetDoorAngle ( fAngle );
                                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );
 
                                 // The jacked is still inside?
@@ -3001,7 +2912,9 @@ void CGame::Packet_PlayerTransgression ( CPlayerTransgressionPacket & Packet )
         // If ac# not disabled on this server, do a kick
         if ( !g_pGame->GetConfig ()->IsDisableAC ( SString ( "%d", Packet.m_uiLevel ) ) )
         {
-            SString strMessageCombo ( "AC #%d %s", Packet.m_uiLevel, Packet.m_strMessage.c_str () );
+            SString strMessageCombo = Packet.m_strMessage;
+            if ( pPlayer->GetBitStreamVersion () < 0x18 )
+                strMessageCombo = SString ( "AC #%d %s", Packet.m_uiLevel, Packet.m_strMessage.c_str () );
             CStaticFunctionDefinitions::KickPlayer ( pPlayer, NULL, strMessageCombo );
         }
     }

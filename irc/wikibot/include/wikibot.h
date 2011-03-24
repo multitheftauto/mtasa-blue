@@ -31,7 +31,6 @@
 #include <rsl/net/irc/client.h>
 #include <rsl/net/irc/text.h>
 #include "configuration.h"
-#include "syntax.h"
 
 #define DEFAULT_CONFIG_FILE "/etc/wikibot.conf"
 

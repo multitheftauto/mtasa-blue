@@ -24,12 +24,32 @@ bool CPlayerJoinDataPacket::Read ( NetBitStreamInterface& BitStream )
          !BitStream.Read ( m_usMTAVersion ) )
         return false;
 
-    if ( !BitStream.Read ( m_usBitStreamVersion ) )
-        return false;
+    if ( m_usMTAVersion < 0x0102 )
+    {
+        // Clients earlier than 1.0.2 do not have a bitstream version
+        m_usBitStreamVersion = 0x01;
+    }
+    else
+    {
+        if ( !BitStream.Read ( m_usBitStreamVersion ) )
+            return false;
+    }
 
-    BitStream.ReadString ( m_strPlayerVersion );
+    if ( m_usBitStreamVersion >= 0x0b )
+    {
+        unsigned int uiLength;
+        BitStream.ReadCompressed ( uiLength );
+        if ( uiLength < 1 || uiLength > 100 )
+            return false;
 
-    m_bOptionalUpdateInfoRequired = BitStream.ReadBit ();
+        m_strPlayerVersion.assign ( uiLength, 32 );
+        BitStream.Read ( &m_strPlayerVersion.at ( 0 ), uiLength );
+    }
+
+    if ( m_usBitStreamVersion >= 0x0e )
+        m_bOptionalUpdateInfoRequired = BitStream.ReadBit () && ( m_usBitStreamVersion >= 0x10 );
+    else
+        m_bOptionalUpdateInfoRequired = false;
 
     return ( BitStream.Read ( m_ucGameVersion ) &&
              BitStream.Read ( m_szNick, MAX_NICK_LENGTH ) &&

@@ -19,13 +19,6 @@ class CClientObject;
 
 #include "CClientStreamElement.h"
 
-struct SLastSyncedObjectData
-{
-    CVector vecPosition;
-    CVector vecRotation;
-    float   fHealth;
-};
-
 class CClientObject : public CClientStreamElement
 {
     friend class CClientObjectManager;
@@ -77,17 +70,10 @@ public:
     
     inline unsigned char            GetAlpha                ( void )                            { return m_ucAlpha; }   
     void                            SetAlpha                ( unsigned char ucAlpha );
-    inline float                    GetScale                ( void )                            { return m_fScale; }
     void                            SetScale                ( float fScale );
 
     inline bool                     IsCollisionEnabled      ( void )                            { return m_bUsesCollision; };
     void                            SetCollisionEnabled     ( bool bCollisionEnabled );
-
-    float                           GetHealth               ( void );
-    void                            SetHealth               ( float fHealth );
-
-    inline bool                     IsBreakable             ( void )                            { return m_pObjectManager->IsBreakableModel ( m_usModel ) && m_bBreakable; };
-    inline void                     SetBreakable            ( bool bBreakable )                 { m_bBreakable = bBreakable; };
 
     void                            ReCreate                ( void );
 protected:
@@ -114,14 +100,11 @@ protected:
     bool                                m_bUsesCollision;
     unsigned char                       m_ucAlpha;
     float                               m_fScale;
-    float                               m_fHealth;
-    bool                                m_bBreakable;
 
     CVector                             m_vecMoveSpeed;
 
 public:
     CObject*                            m_pObject;
-    SLastSyncedObjectData               m_LastSyncedData;
 };
 
 #endif

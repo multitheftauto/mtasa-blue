@@ -128,7 +128,7 @@ DirectX9Renderer::~DirectX9Renderer(void)
 /*************************************************************************
 	add's a quad to the list to be rendered
 *************************************************************************/
-void DirectX9Renderer::addQuad(const Rect& dest_rect, float z, const Texture* tex, const Rect& texture_rect, const ColourRect& colours, QuadSplitMode quad_split_mode, const Image* image)
+void DirectX9Renderer::addQuad(const Rect& dest_rect, float z, const Texture* tex, const Rect& texture_rect, const ColourRect& colours, QuadSplitMode quad_split_mode)
 {
 	// if not queueing, render directly (as in, right now!)
 	if (!d_queueing)
@@ -142,7 +142,7 @@ void DirectX9Renderer::addQuad(const Rect& dest_rect, float z, const Texture* te
 		quad.position		= dest_rect;
 		quad.z				= z;
 		quad.texture		= ((DirectX9Texture*)tex);
-        quad.image          = image;
+
 		quad.texPosition	= texture_rect;
 		quad.topLeftCol		= colours.d_top_left.getARGB();
 		quad.topRightCol	= colours.d_top_right.getARGB();
@@ -205,32 +205,6 @@ void DirectX9Renderer::doRender(void)
 
 			locked = true;
 		}
-
-        // Hack: Inform the Font class that this glyph has been used recently, if it's a glyph being drawn
-        if ( quad.image )
-        {
-            unsigned long ulCodepoint = quad.image->getCodepoint();
-            // Is it a glyph?
-            if ( ulCodepoint != 0 && ulCodepoint < 65534 && ulCodepoint > 127 )
-            {
-                String strImgName = quad.image->getName();
-                if ( strImgName.substr(0,6) == "glyph_" )
-                {
-                    CEGUI::String::size_type pos = strImgName.find_last_of(95);
-                    // Is the last character a '_'? Account for this specially as it ruins the algorithm
-                    CEGUI::String::size_type size = strImgName.length();
-                    if ( strImgName.substr(size-1) == "_" )
-                        pos = size-2;
-
-
-                    // Grab the font this belongs to from the name
-                    CEGUI::String strFontName = strImgName.substr(6,pos-6);
-
-                    CEGUI::Font* pFont = System::getSingleton().getFontManager()->getFont(strFontName);
-                    pFont->OnGlyphDrawn(ulCodepoint);
-                }
-            }
-        }
 
 		// setup Vertex 1...
 		buffmem->x = quad.position.d_left;

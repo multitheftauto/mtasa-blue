@@ -51,17 +51,6 @@ bool CConsole::HandleInput ( const char* szCommand, CClient* pClient, CClient* p
     // Does the key exist?
     if ( szKey && szKey [0] != 0 )
     {
-        if ( pClient->GetClientType() == CClient::CLIENT_PLAYER )
-        {
-            CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
-
-            CLuaArguments Arguments;
-            Arguments.PushString ( szKey );
-
-            if ( !pPlayer->CallEvent ( "onPlayerCommand", Arguments ) )
-                return false;
-        }
-
         CConsoleCommand* pCommand = GetCommand ( szKey );
         if ( pCommand )
         {

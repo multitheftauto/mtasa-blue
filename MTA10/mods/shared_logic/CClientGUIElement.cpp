@@ -74,9 +74,6 @@ CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLua
         case CGUI_SCROLLBAR:
             m_szCGUITypeName = "scrollbar";
             break;
-        case CGUI_COMBOBOX:
-            m_szCGUITypeName = "combobox";
-            break;
         default:
             m_szCGUITypeName = "unknown";
             break;
@@ -120,13 +117,10 @@ bool CClientGUIElement::_CallbackEvent1 ( CGUIElement* pCGUIElement )
     {
         CClientGUIElement* pElement = m_pGUIManager->Get ( pCGUIElement );
         if ( pElement )
-        {
             Arg.PushElement ( pElement );
-            pElement->CallEvent ( _szCallbackFunc1, Arg, true );
-            return true;
-        }
     }
-    return false;
+    CallEvent ( _szCallbackFunc1, Arg, true );
+    return true;
 }
 
 
@@ -137,11 +131,8 @@ bool CClientGUIElement::_CallbackEvent2 ( CGUIElement* pCGUIElement )
     {
         CClientGUIElement* pElement = m_pGUIManager->Get ( pCGUIElement );
         if ( pElement )
-        {
             Arg.PushElement ( pElement );
-            pElement->CallEvent ( _szCallbackFunc2, Arg, true );
-            return true;
-        }
     }
-    return false;
+    CallEvent ( _szCallbackFunc2, Arg, true );
+    return true;
 }

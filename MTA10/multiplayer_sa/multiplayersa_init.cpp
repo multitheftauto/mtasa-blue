@@ -12,6 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "SharedUtil.Misc.h"
 
 CGame* pGameInterface = 0;
 CMultiplayerSA* pMultiplayer = 0;
@@ -44,10 +45,10 @@ CMultiplayer* InitMultiplayerInterface(CCoreInterface* pCore)
 
 void MemSet ( void* dwDest, int cValue, uint uiAmount )
 {
-    g_pNet->ResetStub ( 1297311092, dwDest, cValue, uiAmount );
+    memset ( dwDest, cValue, uiAmount );
 }
 
 void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
 {
-    g_pNet->ResetStub ( 1296265337, dwDest, dwSrc, uiAmount );
+    memcpy ( dwDest, dwSrc, uiAmount );
 }

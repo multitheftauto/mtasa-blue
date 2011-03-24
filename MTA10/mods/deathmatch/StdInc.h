@@ -39,7 +39,6 @@
 #include <CBox.h>
 #include <ijsify.h>
 #include <Common.h>
-#include "net/SyncStructures.h"
 
 // Shared logic includes
 #include <Utils.h>
@@ -71,7 +70,6 @@
 #include <CClientTask.h>
 #include <CClientTXD.h>
 #include <CClientWater.h>
-#include <CClientIFP.h>
 #include <CCustomData.h>
 #include <CConfig.h>
 #include <CDOMConfig.h>
@@ -89,11 +87,6 @@
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
-
-// Shared includes
-#include "CEasingCurve.h"
-#include "TInterpolation.h"
-#include "CPositionRotationAnimation.h"
 
 // Deathmatch includes
 #include "Client.h"
