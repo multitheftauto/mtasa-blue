@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server - Deathmatch", "_ServerDeathmatch.vcproj", "{DC99F9D4-7C17-4A36-9F21-CEE075E42292}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Nightly = Nightly
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{DC99F9D4-7C17-4A36-9F21-CEE075E42292}.Debug.ActiveCfg = Debug|Win32
+		{DC99F9D4-7C17-4A36-9F21-CEE075E42292}.Debug.Build.0 = Debug|Win32
+		{DC99F9D4-7C17-4A36-9F21-CEE075E42292}.Nightly.ActiveCfg = Nightly|Win32
+		{DC99F9D4-7C17-4A36-9F21-CEE075E42292}.Nightly.Build.0 = Nightly|Win32
+		{DC99F9D4-7C17-4A36-9F21-CEE075E42292}.Release.ActiveCfg = Release|Win32
+		{DC99F9D4-7C17-4A36-9F21-CEE075E42292}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
