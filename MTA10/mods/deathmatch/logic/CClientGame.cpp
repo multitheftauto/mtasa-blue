@@ -311,7 +311,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     CClientTextDisplay::SetGlobalScale ( fScale );
 
     // Reset async loading script settings to default
-    g_pGame->SetAsyncLoadingFromScript ( false, false );
+    g_pGame->SetAsyncLoadingFromScript ( true, false );
 }
 
 
@@ -787,6 +787,16 @@ void CClientGame::DoPulsePostFrame ( void )
         if ( m_bShowFPS )
         {
             DrawFPS ();
+        }
+
+        // Draw a little star in the corner if async is on
+        if ( g_pGame->IsASyncLoadingEnabled ( true ) )
+        {
+            CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+            unsigned int uiHeight = pGraphics->GetViewportHeight ();
+            unsigned int uiWidth = pGraphics->GetViewportWidth ();
+            unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled () ? uiHeight - 7 : uiHeight - 12;
+            pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
         }
 
         // If we're in debug mode and are supposed to show task data, do it
