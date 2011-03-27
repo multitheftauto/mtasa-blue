@@ -109,7 +109,6 @@ public:
         PED,
         COLSHAPE,
         SCRIPTFILE,
-        HANDLING,
         WATER,
         UNKNOWN,
     };

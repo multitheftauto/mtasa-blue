@@ -500,8 +500,9 @@ class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
     friend class CPoolsSA;
 private:
-    CDamageManagerSA            * damageManager;
+    CDamageManagerSA*           m_pDamageManager;
     CHandlingEntrySA*           m_pHandlingData;
+    void*                       m_pSuspensionLines;
     bool                        m_bIsDerailable;
     unsigned char               m_ucAlpha;
     CVector                     m_vecGravity;
@@ -704,9 +705,14 @@ public:
     CColModel*                  GetSpecialColModel              ( void );
     bool                        UpdateMovingCollision           ( float fAngle );
 
-    void                        UpdateHandlingStatus            ( void );
+    void                        RecalculateHandling             ( void );
+
+    void*                       GetPrivateSuspensionLines       ( void );
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
+
+private:
+    void                        CopyGlobalSuspensionLinesToPrivate  ( void );
 };
 
 #endif

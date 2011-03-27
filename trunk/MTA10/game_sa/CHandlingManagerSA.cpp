@@ -12,23 +12,16 @@
 
 #include "StdInc.h"
 
-#define USE_GTASA_HANDLING          FALSE
-
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 
-#define Func_PostLoadHandlingCfg    0x5BFA90
 #define Func_Calculate              0x6F5080
-#define Func_GetOriginalHandling    0x6F52D0
-#define Func_GetPreviousHandling    0x6F5300
 #define Var_fTurnMassMultiplier     0x858B8C
 #define Var_fBasicDragCoeff         0x858C58
 
 DWORD CHandlingManagerSA::m_dwStore_LoadHandlingCfg = 0;
 
 tHandlingDataSA CHandlingManagerSA::m_OriginalHandlingData [HT_MAX];
-CHandlingEntrySA* CHandlingManagerSA::m_pEntries [HT_MAX];
 CHandlingEntrySA* CHandlingManagerSA::m_pOriginalEntries [HT_MAX];  
-tHandlingDataSA CHandlingManagerSA::m_RealHandlingData [HT_MAX];
 
 // Use the following code to dump handling data unrecalculated on GTA load.
 // NB: You need to disable the other hook in the constructor of the manager and uncomment the other
@@ -54,11 +47,11 @@ void DumpHandlingData ( tHandlingDataSA* pData )
     fprintf ( pFile, "    m_OriginalHandlingData [%u].Transmission.ucNumberOfGears = %u;\n", iCounter, pData->Transmission.ucNumberOfGears );
     fprintf ( pFile, "    m_OriginalHandlingData [%u].Transmission.uiHandlingFlags = %u;\n", iCounter, pData->Transmission.uiHandlingFlags );
 
-    fprintf ( pFile, "    m_OriginalHandlingData [%u].Transmission.fEngineAccelleration = %ff;\n", iCounter, pData->Transmission.fEngineAccelleration );
+    fprintf ( pFile, "    m_OriginalHandlingData [%u].Transmission.fEngineAcceleration = %ff;\n", iCounter, pData->Transmission.fEngineAcceleration );
     fprintf ( pFile, "    m_OriginalHandlingData [%u].Transmission.fEngineInertia = %ff;\n", iCounter, pData->Transmission.fEngineInertia );
     fprintf ( pFile, "    m_OriginalHandlingData [%u].Transmission.fMaxVelocity = %ff;\n", iCounter, pData->Transmission.fMaxVelocity );
 
-    fprintf ( pFile, "    m_OriginalHandlingData [%u].fBrakeDecelleration = %ff;\n", iCounter, pData->fBrakeDecelleration );
+    fprintf ( pFile, "    m_OriginalHandlingData [%u].fBrakeDeceleration = %ff;\n", iCounter, pData->fBrakeDeceleration );
     fprintf ( pFile, "    m_OriginalHandlingData [%u].fBrakeBias = %ff;\n", iCounter, pData->fBrakeBias );
     fprintf ( pFile, "    m_OriginalHandlingData [%u].bABS = false;\n", iCounter );
 
@@ -108,44 +101,46 @@ __declspec(naked) void Hook_Calculate ( void )
     }
 }
 
-// Fixme: Does return Vehicledata, I guess
-CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingTable ( eHandlingTypes eHandling )
+CHandlingManagerSA::CHandlingManagerSA ( void )
 {
-    tHandlingDataSA* pRet;
-    // GTA has a function for that
-    BYTE ucID = (BYTE)eHandling;
-    __asm
+    // Initialize all default handlings
+    InitializeDefaultHandlings ();
+
+    // Create a handling entry for every original handling data.
+    for ( int i = 0; i < HT_MAX; i++ )
     {
-        mov     ecx,ARRAY_HANDLINGDATA
-        xor     eax,eax
-        mov     al,ucID
-        mov     ebx,Func_GetOriginalHandling
-        push    eax
-        call    ebx
-        mov     pRet,eax
+        m_pOriginalEntries[i] = new CHandlingEntrySA ( &m_OriginalHandlingData[i] );
     }
-    //return (CHandlingEntry*)pRet;
-    return m_pEntries[eHandling];
+
+    // Uncomment this to dump
+    //HookInstall ( Func_Calculate, (DWORD) Hook_Calculate, 11 );
 }
 
-// Fixme: Retrives vehicle type specific handlingdata
-CHandlingEntry* CHandlingManagerSA::GetPreviousHandlingTable ( eHandlingTypes eHandling )
+
+CHandlingManagerSA::~CHandlingManagerSA ( void )
 {
-    tHandlingDataSA* pRet;
-    // Well, as above :P
-    BYTE ucID = (BYTE)eHandling;
-    __asm
+    // Destroy all original handling entries
+    for ( int i = 0; i < HT_MAX; i++ )
     {
-        mov     ecx,ARRAY_HANDLINGDATA
-        xor     eax,eax
-        mov     al,ucID
-        mov     ebx,Func_GetPreviousHandling
-        push    eax
-        call    ebx
-        mov     pRet,eax
+        delete m_pOriginalEntries[i];
     }
-    //return pRet;
-    return m_pEntries[eHandling-1];
+}
+
+CHandlingEntry* CHandlingManagerSA::CreateHandlingData ( void )
+{
+    return new CHandlingEntrySA ();
+}
+
+const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData ( eVehicleTypes eModel )
+{
+    // Within range?
+    if ( eModel >= 400 && eModel < VT_MAX )
+    {
+        // Return it
+        return m_pOriginalEntries [ GetHandlingID ( eModel ) ];
+    }
+
+    return NULL;
 }
 
 float CHandlingManagerSA::GetDragMultiplier ( void )
@@ -158,454 +153,229 @@ float CHandlingManagerSA::GetBasicDragCoeff ( void )
     return *(float*)(Var_fBasicDragCoeff);
 }
 
-CHandlingManagerSA::CHandlingManagerSA ( void )
-{
-    // Initialize all default handlings
-    InitializeDefaultHandlings ();
-
-    // Create a handling entry for every handling data.
-    for ( int i = 0; i < HT_MAX; i++ )
-    {
-        m_pEntries [i] = new CHandlingEntrySA ( &m_RealHandlingData [i], &m_OriginalHandlingData[i]);
-    }
-
-    // Create a handling entry for every original handling data.
-    for ( int i = 0; i < HT_MAX; i++ )
-    {
-        m_pOriginalEntries [i] = new CHandlingEntrySA ( &m_OriginalHandlingData [i] );
-    }
-
-    // Install load handling.cfg hook. We let GTA perform its normal loading, then we
-    // replace all the values by with our own default and let GTA calculate all the handling
-    // stuff again. We do it this way because GTA will crash later on if we don't, I think
-    // it does some additional initializing that GTA requires other than initing all the
-    // handlings.
-#if WITH_VEHICLE_HANDLING
-    HookInstall ( Func_PostLoadHandlingCfg, (DWORD) Hook_LoadHandlingCfg, 15 );
-#endif
-    // Uncomment this to dump
-    //HookInstall ( Func_Calculate, (DWORD) Hook_Calculate, 11 );
-}
-
-
-CHandlingManagerSA::~CHandlingManagerSA ( void )
-{
-    // // Destroy all original handling entries
-    for ( int i = 0; i < HT_MAX; i++ )
-    {
-        delete m_pOriginalEntries [i];
-    }
-
-    // Destroy all handling entries
-    for ( int i = 0; i < HT_MAX; i++ )
-    {
-        delete m_pEntries [i];
-    }
-}
-
-
-void CHandlingManagerSA::LoadDefaultHandlings ( void )
-{
-    // Create a handling entry for every handling data
-    for ( int i = 0; i < HT_MAX; i++ )
-    {
-        m_pEntries [i]->Restore ();
-    }    
-}
-
-
-CHandlingEntry* CHandlingManagerSA::CreateHandlingData ( void )
-{
-    return new CHandlingEntrySA ();
-}
-
-
-bool CHandlingManagerSA::ApplyHandlingData ( enum eVehicleTypes eModel, CHandlingEntry* pEntry )
-{
-    // Within range?
-    if ( eModel >= 400 && eModel < VT_MAX )
-    {
-        // Apply the data and return success
-        m_pEntries [GetHandlingID(eModel)]->ApplyHandlingData ( pEntry );
-        return true;
-    }
-
-    // Failed
-    return false;
-}
-
-
-/*bool CHandlingManagerSA::ApplyHandlingData ( CVehicle* pVehicle, CHandlingEntry* pEntry )
-{
-    // Create new handling and apply it
-    // Those entry have a higher priority than those global ones
-    //CHandlingEntrySA* pEntrySA = new CHandlingEntrySA;
-    //pEntrySA->ApplyHandlingData ( pEntry );
-    pVehicle->SetHandlingData ( pEntry );
-}*/
-
-/*bool CHandlingManagerSA::ApplyHandlingData ( CVehicleSA *pVehicle, CHandlingEntry* pEntry )
-{
-    
-}
-
-
-void CHandlingManagerSA::RemoveFromVeh ( CVehicle* pVeh )
-{
-    std::list < CHandlingEntrySA* > ::iterator iter = m_HandlingList.begin ();
-    for ( ; iter != m_HandlingList.end (); iter++ )
-    {
-        (*iter)->RemoveFromVeh
-    }
-}*/
-
-
-CHandlingEntry* CHandlingManagerSA::GetHandlingData ( eVehicleTypes eModel )
-{
-    // Within range?
-    if ( eModel >= 400 && eModel < VT_MAX )
-    {
-        // Return it
-        return m_pEntries [GetHandlingID(eModel)];
-    }
-
-    return NULL;
-}
-
-
-const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData ( eVehicleTypes eModel )
-{
-    // Within range?
-    if ( eModel >= 400 && eModel < VT_MAX )
-    {
-        // Return it
-        return m_pOriginalEntries [GetHandlingID(eModel)];
-    }
-
-    return NULL;
-}
-
 // Return the handling manager id
-eHandlingTypes  CHandlingManagerSA::GetHandlingID ( eVehicleTypes eModel )
+eHandlingTypes CHandlingManagerSA::GetHandlingID ( eVehicleTypes eModel )
 {
-    switch(eModel)
+    switch ( eModel )
     {
-    case VT_LANDSTAL: return HT_LANDSTAL;
-    case VT_BRAVURA: return HT_BRAVURA;
-    case VT_BUFFALO: return HT_BUFFALO;
-    case VT_LINERUN: return HT_LINERUN;
-    case VT_PEREN: return HT_PEREN;
-    case VT_SENTINEL: return HT_SENTINEL;
-    case VT_DUMPER: return HT_DUMPER;
-    case VT_FIRETRUK: return HT_FIRETRUK;
-    case VT_TRASH: return HT_TRASH;
-    case VT_STRETCH: return HT_STRETCH;
-    case VT_MANANA: return HT_MANANA;
-    case VT_INFERNUS: return HT_INFERNUS;
-    case VT_VOODOO: return HT_VOODOO;
-    case VT_PONY: return HT_PONY;
-    case VT_MULE: return HT_MULE;
-    case VT_CHEETAH: return HT_CHEETAH;
-    case VT_AMBULAN: return HT_AMBULAN;
-    case VT_LEVIATHN: return HT_LEVIATHN;
-    case VT_MOONBEAM: return HT_MOONBEAM;
-    case VT_ESPERANT: return HT_ESPERANT;
-    case VT_TAXI: return HT_TAXI;
-    case VT_WASHING: return HT_WASHING;
-    case VT_BOBCAT: return HT_BOBCAT;
-    case VT_MRWHOOP: return HT_MRWHOOP;
-    case VT_BFINJECT: return HT_BFINJECT;
-    case VT_HUNTER: return HT_HUNTER;
-    case VT_PREMIER: return HT_PREMIER;
-    case VT_ENFORCER: return HT_ENFORCER;
-    case VT_SECURICA: return HT_SECURICA;
-    case VT_BANSHEE: return HT_BANSHEE;
-    case VT_PREDATOR: return HT_PREDATOR;
-    case VT_BUS: return HT_BUS;
-    case VT_RHINO: return HT_RHINO;
-    case VT_BARRACKS: return HT_BARRACKS;
-    case VT_HOTKNIFE: return HT_HOTKNIFE;
-    case VT_ARTICT1: return HT_ARTICT1;
-    case VT_PREVION: return HT_PREVION;
-    case VT_COACH: return HT_COACH;
-    case VT_CABBIE: return HT_CABBIE;
-    case VT_STALLION: return HT_STALLION;
-    case VT_RUMPO: return HT_RUMPO;
-    case VT_RCBANDIT: return HT_RCBANDIT;
-    case VT_ROMERO: return HT_ROMERO;
-    case VT_PACKER: return HT_PACKER;
-    case VT_MONSTER: return HT_MONSTER;
-    case VT_ADMIRAL: return HT_ADMIRAL;
-    case VT_SQUALO: return HT_SQUALO;
-    case VT_SEASPAR: return HT_SEASPAR;
-    case VT_PIZZABOY: return HT_MOPED;
-    case VT_TRAM: return HT_TRAM;
-    case VT_ARTICT2: return HT_ARTICT2;
-    case VT_TURISMO: return HT_TURISMO;
-    case VT_SPEEDER: return HT_SPEEDER;
-    case VT_REEFER: return HT_REEFER;
-    case VT_TROPIC: return HT_TROPIC;
-    case VT_FLATBED: return HT_FLATBED;
-    case VT_YANKEE: return HT_YANKEE;
-    case VT_CADDY: return HT_GOLFCART;
-    case VT_SOLAIR: return HT_SOLAIR;
-    case VT_TOPFUN: return HT_TOPFUN;
-    case VT_SKIMMER: return HT_SEAPLANE;
-    case VT_PCJ600: return HT_BIKE;
-    case VT_FAGGIO: return HT_MOPED;
-    case VT_FREEWAY: return HT_FREEWAY;
-    case VT_RCBARON: return HT_RCBARON;
-    case VT_RCRAIDER: return HT_RCRAIDER;
-    case VT_GLENDALE: return HT_GLENDALE;
-    case VT_OCEANIC: return HT_OCEANIC;
-    case VT_SANCHEZ: return HT_DIRTBIKE;
-    case VT_SPARROW: return HT_SPARROW;
-    case VT_PATRIOT: return HT_PATRIOT;
-    case VT_QUAD: return HT_QUADBIKE;
-    case VT_COASTG: return HT_COASTGRD;
-    case VT_DINGHY: return HT_DINGHY;
-    case VT_HERMES: return HT_HERMES;
-    case VT_SABRE: return HT_SABRE;
-    case VT_RUSTLER: return HT_RUSTLER;
-    case VT_ZR350: return HT_ZR350;
-    case VT_WALTON: return HT_WALTON;
-    case VT_REGINA: return HT_REGINA;
-    case VT_COMET: return HT_COMET;
-    case VT_BMX: return HT_BMX;
-    case VT_BURRITO: return HT_BURRITO;
-    case VT_CAMPER: return HT_CAMPER;
-    case VT_MARQUIS: return HT_MARQUIS;
-    case VT_BAGGAGE: return HT_BAGGAGE;
-    case VT_DOZER: return HT_DOZER;
-    case VT_MAVERICK: return HT_MAVERICK;
-    case VT_VCNMAV: return HT_COASTMAV;
-    case VT_RANCHER: return HT_RANCHER;
-    case VT_FBIRANCH: return HT_FBIRANCH;
-    case VT_VIRGO: return HT_VIRGO;
-    case VT_GREENWOO: return HT_GREENWOO;
-    case VT_JETMAX: return HT_CUPBOAT;
-    case VT_HOTRING: return HT_HOTRING;
-    case VT_SANDKING: return HT_SANDKING;
-    case VT_BLISTAC: return HT_BLISTAC;
-    case VT_POLMAV: return HT_POLMAV;
-    case VT_BOXVILLE: return HT_BOXVILLE;
-    case VT_BENSON: return HT_BENSON;
-    case VT_MESA: return HT_MESA;
-    case VT_RCGOBLIN: return HT_RCGOBLIN;
-    case VT_HOTRINA: return HT_HOTRING;
-    case VT_HOTRINB: return HT_HOTRING;
-    case VT_BLOODRA: return HT_BLOODRA;
-    case VT_RNCHLURE: return HT_RANCHER;
-    case VT_SUPERGT: return HT_SUPERGT;
-    case VT_ELEGANT: return HT_ELEGANT;
-    case VT_JOURNEY: return HT_JOURNEY;
-    case VT_BIKE: return HT_CHOPPERB;
-    case VT_MTBIKE: return HT_MTB;
-    case VT_BEAGLE: return HT_BEAGLE;
-    case VT_CROPDUST: return HT_CROPDUST;
-    case VT_STUNT: return HT_STUNT;
-    case VT_PETRO: return HT_PETROL;
-    case VT_RDTRAIN: return HT_RDTRAIN;
-    case VT_NEBULA: return HT_NEBULA;
-    case VT_MAJESTIC: return HT_MAJESTIC;
-    case VT_BUCCANEE: return HT_BUCCANEE;
-    case VT_SHAMAL: return HT_SHAMAL;
-    case VT_HYDRA: return HT_HYDRA;
-    case VT_FCR900: return HT_FCR900;
-    case VT_NRG500: return HT_NRG500;
-    case VT_COPBIKE: return HT_HPV1000;
-    case VT_CEMENT: return HT_CEMENT;
-    case VT_TOWTRUCK: return HT_TOWTRUCK;
-    case VT_FORTUNE: return HT_FORTUNE;
-    case VT_CADRONA: return HT_CADRONA;
-    case VT_FBITRUCK: return HT_FBITRUCK;
-    case VT_WILLARD: return HT_WILLARD;
-    case VT_FORKLIFT: return HT_FORKLIFT;
-    case VT_TRACTOR: return HT_TRACTOR;
-    case VT_COMBINE: return HT_COMBINE;
-    case VT_FELTZER: return HT_FELTZER;
-    case VT_REMINGTN: return HT_REMINGTN;
-    case VT_SLAMVAN: return HT_SLAMVAN;
-    case VT_BLADE: return HT_BLADE;
-    case VT_FREIGHT: return HT_FREIGHT;
-    case VT_STREAK: return HT_STREAK;
-    case VT_VORTEX: return HT_VORTEX;
-    case VT_VINCENT: return HT_VINCENT;
-    case VT_BULLET: return HT_BULLET;
-    case VT_CLOVER: return HT_CLOVER;
-    case VT_SADLER: return HT_SADLER;
-    case VT_FIRELA: return HT_FIRETRUK;
-    case VT_HUSTLER: return HT_HUSTLER;
-    case VT_INTRUDER: return HT_INTRUDER;
-    case VT_PRIMO: return HT_PRIMO;
-    case VT_CARGOBOB: return HT_CARGOBOB;
-    case VT_TAMPA: return HT_TAMPA;
-    case VT_SUNRISE: return HT_SUNRISE;
-    case VT_MERIT: return HT_MERIT;
-    case VT_UTILITY: return HT_UTILITY;
-    case VT_NEVADA: return HT_NEVADA;
-    case VT_YOSEMITE: return HT_YOSEMITE;
-    case VT_WINDSOR: return HT_WINDSOR;
-    case VT_MONSTERA: return HT_MTRUCK_A;
-    case VT_MONSTERB: return HT_MTRUCK_B;
-    case VT_URANUS: return HT_URANUS;
-    case VT_JESTER: return HT_JESTER;
-    case VT_SULTAN: return HT_SULTAN;
-    case VT_STRATUM: return HT_STRATUM;
-    case VT_ELEGY: return HT_ELEGY;
-    case VT_RAINDANC: return HT_RAINDANC;
-    case VT_RCTIGER: return HT_RCTIGER;
-    case VT_FLASH: return HT_FLASH;
-    case VT_TAHOMA: return HT_TAHOMA;
-    case VT_SAVANNA: return HT_SAVANNA;
-    case VT_BANDITO: return HT_BANDITO;
-    case VT_FREIFLAT: return HT_FREIFLAT;
-    case VT_STREAKC: return HT_CSTREAK;
-    case VT_KART: return HT_KART;
-    case VT_MOWER: return HT_MOWER;
-    case VT_DUNERIDE: return HT_DUNE;
-    case VT_SWEEPER: return HT_SWEEPER;
-    case VT_BROADWAY: return HT_BROADWAY;
-    case VT_TORNADO: return HT_TORNADO;
-    case VT_AT400: return HT_AT400;
-    case VT_DFT30: return HT_DFT30;
-    case VT_HUNTLEY: return HT_HUNTLEY;
-    case VT_STAFFORD: return HT_STAFFORD;
-    case VT_BF400: return HT_BF400;
-    case VT_NEWSVAN: return HT_NEWSVAN;
-    case VT_TUG: return HT_TUG;
-    case VT_PETROTR: return HT_PETROTR;
-    case VT_EMPEROR: return HT_EMPEROR;
-    case VT_WAYFARER: return HT_WAYFARER;
-    case VT_EUROS: return HT_EUROS;
-    case VT_HOTDOG: return HT_HOTDOG;
-    case VT_CLUB: return HT_CLUB;
-    case VT_FREIBOX: return HT_FREIFLAT;
-    case VT_ARTICT3: return HT_ARTICT3;
-    case VT_ANDROM: return HT_ANDROM;
-    case VT_DODO: return HT_DODO;
-    case VT_RCCAM: return HT_RCCAM;
-    case VT_LAUNCH: return HT_LAUNCH;
-    case VT_COPCARLA: return HT_POLICE_LA;
-    case VT_COPCARSF: return HT_POLICE_SF;
-    case VT_COPCARVG: return HT_POLICE_VG;
-    case VT_COPCARRU: return HT_POLRANGER;
-    case VT_PICADOR: return HT_PICADOR;
-    case VT_SWATVAN: return HT_SWATVAN;
-    case VT_ALPHA: return HT_ALPHA;
-    case VT_PHOENIX: return HT_PHOENIX;
-    case VT_GLENSHIT: return HT_GLENDALE;
-    case VT_SADLSHIT: return HT_SADLER;
-    case VT_BAGBOXA: return HT_BAGBOXA;
-    case VT_BAGBOXB: return HT_BAGBOXB;
-    case VT_TUGSTAIR: return HT_STAIRS;
-    case VT_BOXBURG: return HT_BOXBURG;
-    case VT_FARMTR1: return HT_FARM_TR1;
-    case VT_UTILTR1: return HT_UTIL_TR1;
+        case VT_LANDSTAL: return HT_LANDSTAL;
+        case VT_BRAVURA: return HT_BRAVURA;
+        case VT_BUFFALO: return HT_BUFFALO;
+        case VT_LINERUN: return HT_LINERUN;
+        case VT_PEREN: return HT_PEREN;
+        case VT_SENTINEL: return HT_SENTINEL;
+        case VT_DUMPER: return HT_DUMPER;
+        case VT_FIRETRUK: return HT_FIRETRUK;
+        case VT_TRASH: return HT_TRASH;
+        case VT_STRETCH: return HT_STRETCH;
+        case VT_MANANA: return HT_MANANA;
+        case VT_INFERNUS: return HT_INFERNUS;
+        case VT_VOODOO: return HT_VOODOO;
+        case VT_PONY: return HT_PONY;
+        case VT_MULE: return HT_MULE;
+        case VT_CHEETAH: return HT_CHEETAH;
+        case VT_AMBULAN: return HT_AMBULAN;
+        case VT_LEVIATHN: return HT_LEVIATHN;
+        case VT_MOONBEAM: return HT_MOONBEAM;
+        case VT_ESPERANT: return HT_ESPERANT;
+        case VT_TAXI: return HT_TAXI;
+        case VT_WASHING: return HT_WASHING;
+        case VT_BOBCAT: return HT_BOBCAT;
+        case VT_MRWHOOP: return HT_MRWHOOP;
+        case VT_BFINJECT: return HT_BFINJECT;
+        case VT_HUNTER: return HT_HUNTER;
+        case VT_PREMIER: return HT_PREMIER;
+        case VT_ENFORCER: return HT_ENFORCER;
+        case VT_SECURICA: return HT_SECURICA;
+        case VT_BANSHEE: return HT_BANSHEE;
+        case VT_PREDATOR: return HT_PREDATOR;
+        case VT_BUS: return HT_BUS;
+        case VT_RHINO: return HT_RHINO;
+        case VT_BARRACKS: return HT_BARRACKS;
+        case VT_HOTKNIFE: return HT_HOTKNIFE;
+        case VT_ARTICT1: return HT_ARTICT1;
+        case VT_PREVION: return HT_PREVION;
+        case VT_COACH: return HT_COACH;
+        case VT_CABBIE: return HT_CABBIE;
+        case VT_STALLION: return HT_STALLION;
+        case VT_RUMPO: return HT_RUMPO;
+        case VT_RCBANDIT: return HT_RCBANDIT;
+        case VT_ROMERO: return HT_ROMERO;
+        case VT_PACKER: return HT_PACKER;
+        case VT_MONSTER: return HT_MONSTER;
+        case VT_ADMIRAL: return HT_ADMIRAL;
+        case VT_SQUALO: return HT_SQUALO;
+        case VT_SEASPAR: return HT_SEASPAR;
+        case VT_PIZZABOY: return HT_MOPED;
+        case VT_TRAM: return HT_TRAM;
+        case VT_ARTICT2: return HT_ARTICT2;
+        case VT_TURISMO: return HT_TURISMO;
+        case VT_SPEEDER: return HT_SPEEDER;
+        case VT_REEFER: return HT_REEFER;
+        case VT_TROPIC: return HT_TROPIC;
+        case VT_FLATBED: return HT_FLATBED;
+        case VT_YANKEE: return HT_YANKEE;
+        case VT_CADDY: return HT_GOLFCART;
+        case VT_SOLAIR: return HT_SOLAIR;
+        case VT_TOPFUN: return HT_TOPFUN;
+        case VT_SKIMMER: return HT_SEAPLANE;
+        case VT_PCJ600: return HT_BIKE;
+        case VT_FAGGIO: return HT_MOPED;
+        case VT_FREEWAY: return HT_FREEWAY;
+        case VT_RCBARON: return HT_RCBARON;
+        case VT_RCRAIDER: return HT_RCRAIDER;
+        case VT_GLENDALE: return HT_GLENDALE;
+        case VT_OCEANIC: return HT_OCEANIC;
+        case VT_SANCHEZ: return HT_DIRTBIKE;
+        case VT_SPARROW: return HT_SPARROW;
+        case VT_PATRIOT: return HT_PATRIOT;
+        case VT_QUAD: return HT_QUADBIKE;
+        case VT_COASTG: return HT_COASTGRD;
+        case VT_DINGHY: return HT_DINGHY;
+        case VT_HERMES: return HT_HERMES;
+        case VT_SABRE: return HT_SABRE;
+        case VT_RUSTLER: return HT_RUSTLER;
+        case VT_ZR350: return HT_ZR350;
+        case VT_WALTON: return HT_WALTON;
+        case VT_REGINA: return HT_REGINA;
+        case VT_COMET: return HT_COMET;
+        case VT_BMX: return HT_BMX;
+        case VT_BURRITO: return HT_BURRITO;
+        case VT_CAMPER: return HT_CAMPER;
+        case VT_MARQUIS: return HT_MARQUIS;
+        case VT_BAGGAGE: return HT_BAGGAGE;
+        case VT_DOZER: return HT_DOZER;
+        case VT_MAVERICK: return HT_MAVERICK;
+        case VT_VCNMAV: return HT_COASTMAV;
+        case VT_RANCHER: return HT_RANCHER;
+        case VT_FBIRANCH: return HT_FBIRANCH;
+        case VT_VIRGO: return HT_VIRGO;
+        case VT_GREENWOO: return HT_GREENWOO;
+        case VT_JETMAX: return HT_CUPBOAT;
+        case VT_HOTRING: return HT_HOTRING;
+        case VT_SANDKING: return HT_SANDKING;
+        case VT_BLISTAC: return HT_BLISTAC;
+        case VT_POLMAV: return HT_POLMAV;
+        case VT_BOXVILLE: return HT_BOXVILLE;
+        case VT_BENSON: return HT_BENSON;
+        case VT_MESA: return HT_MESA;
+        case VT_RCGOBLIN: return HT_RCGOBLIN;
+        case VT_HOTRINA: return HT_HOTRING;
+        case VT_HOTRINB: return HT_HOTRING;
+        case VT_BLOODRA: return HT_BLOODRA;
+        case VT_RNCHLURE: return HT_RANCHER;
+        case VT_SUPERGT: return HT_SUPERGT;
+        case VT_ELEGANT: return HT_ELEGANT;
+        case VT_JOURNEY: return HT_JOURNEY;
+        case VT_BIKE: return HT_CHOPPERB;
+        case VT_MTBIKE: return HT_MTB;
+        case VT_BEAGLE: return HT_BEAGLE;
+        case VT_CROPDUST: return HT_CROPDUST;
+        case VT_STUNT: return HT_STUNT;
+        case VT_PETRO: return HT_PETROL;
+        case VT_RDTRAIN: return HT_RDTRAIN;
+        case VT_NEBULA: return HT_NEBULA;
+        case VT_MAJESTIC: return HT_MAJESTIC;
+        case VT_BUCCANEE: return HT_BUCCANEE;
+        case VT_SHAMAL: return HT_SHAMAL;
+        case VT_HYDRA: return HT_HYDRA;
+        case VT_FCR900: return HT_FCR900;
+        case VT_NRG500: return HT_NRG500;
+        case VT_COPBIKE: return HT_HPV1000;
+        case VT_CEMENT: return HT_CEMENT;
+        case VT_TOWTRUCK: return HT_TOWTRUCK;
+        case VT_FORTUNE: return HT_FORTUNE;
+        case VT_CADRONA: return HT_CADRONA;
+        case VT_FBITRUCK: return HT_FBITRUCK;
+        case VT_WILLARD: return HT_WILLARD;
+        case VT_FORKLIFT: return HT_FORKLIFT;
+        case VT_TRACTOR: return HT_TRACTOR;
+        case VT_COMBINE: return HT_COMBINE;
+        case VT_FELTZER: return HT_FELTZER;
+        case VT_REMINGTN: return HT_REMINGTN;
+        case VT_SLAMVAN: return HT_SLAMVAN;
+        case VT_BLADE: return HT_BLADE;
+        case VT_FREIGHT: return HT_FREIGHT;
+        case VT_STREAK: return HT_STREAK;
+        case VT_VORTEX: return HT_VORTEX;
+        case VT_VINCENT: return HT_VINCENT;
+        case VT_BULLET: return HT_BULLET;
+        case VT_CLOVER: return HT_CLOVER;
+        case VT_SADLER: return HT_SADLER;
+        case VT_FIRELA: return HT_FIRETRUK;
+        case VT_HUSTLER: return HT_HUSTLER;
+        case VT_INTRUDER: return HT_INTRUDER;
+        case VT_PRIMO: return HT_PRIMO;
+        case VT_CARGOBOB: return HT_CARGOBOB;
+        case VT_TAMPA: return HT_TAMPA;
+        case VT_SUNRISE: return HT_SUNRISE;
+        case VT_MERIT: return HT_MERIT;
+        case VT_UTILITY: return HT_UTILITY;
+        case VT_NEVADA: return HT_NEVADA;
+        case VT_YOSEMITE: return HT_YOSEMITE;
+        case VT_WINDSOR: return HT_WINDSOR;
+        case VT_MONSTERA: return HT_MTRUCK_A;
+        case VT_MONSTERB: return HT_MTRUCK_B;
+        case VT_URANUS: return HT_URANUS;
+        case VT_JESTER: return HT_JESTER;
+        case VT_SULTAN: return HT_SULTAN;
+        case VT_STRATUM: return HT_STRATUM;
+        case VT_ELEGY: return HT_ELEGY;
+        case VT_RAINDANC: return HT_RAINDANC;
+        case VT_RCTIGER: return HT_RCTIGER;
+        case VT_FLASH: return HT_FLASH;
+        case VT_TAHOMA: return HT_TAHOMA;
+        case VT_SAVANNA: return HT_SAVANNA;
+        case VT_BANDITO: return HT_BANDITO;
+        case VT_FREIFLAT: return HT_FREIFLAT;
+        case VT_STREAKC: return HT_CSTREAK;
+        case VT_KART: return HT_KART;
+        case VT_MOWER: return HT_MOWER;
+        case VT_DUNERIDE: return HT_DUNE;
+        case VT_SWEEPER: return HT_SWEEPER;
+        case VT_BROADWAY: return HT_BROADWAY;
+        case VT_TORNADO: return HT_TORNADO;
+        case VT_AT400: return HT_AT400;
+        case VT_DFT30: return HT_DFT30;
+        case VT_HUNTLEY: return HT_HUNTLEY;
+        case VT_STAFFORD: return HT_STAFFORD;
+        case VT_BF400: return HT_BF400;
+        case VT_NEWSVAN: return HT_NEWSVAN;
+        case VT_TUG: return HT_TUG;
+        case VT_PETROTR: return HT_PETROTR;
+        case VT_EMPEROR: return HT_EMPEROR;
+        case VT_WAYFARER: return HT_WAYFARER;
+        case VT_EUROS: return HT_EUROS;
+        case VT_HOTDOG: return HT_HOTDOG;
+        case VT_CLUB: return HT_CLUB;
+        case VT_FREIBOX: return HT_FREIFLAT;
+        case VT_ARTICT3: return HT_ARTICT3;
+        case VT_ANDROM: return HT_ANDROM;
+        case VT_DODO: return HT_DODO;
+        case VT_RCCAM: return HT_RCCAM;
+        case VT_LAUNCH: return HT_LAUNCH;
+        case VT_COPCARLA: return HT_POLICE_LA;
+        case VT_COPCARSF: return HT_POLICE_SF;
+        case VT_COPCARVG: return HT_POLICE_VG;
+        case VT_COPCARRU: return HT_POLRANGER;
+        case VT_PICADOR: return HT_PICADOR;
+        case VT_SWATVAN: return HT_SWATVAN;
+        case VT_ALPHA: return HT_ALPHA;
+        case VT_PHOENIX: return HT_PHOENIX;
+        case VT_GLENSHIT: return HT_GLENDALE;
+        case VT_SADLSHIT: return HT_SADLER;
+        case VT_BAGBOXA: return HT_BAGBOXA;
+        case VT_BAGBOXB: return HT_BAGBOXB;
+        case VT_TUGSTAIR: return HT_STAIRS;
+        case VT_BOXBURG: return HT_BOXBURG;
+        case VT_FARMTR1: return HT_FARM_TR1;
+        case VT_UTILTR1: return HT_UTIL_TR1;
     }
     return HT_LANDSTAL;
 }
 
-
-void CHandlingManagerSA::LoadHandlingCfg ( void )
-{
-    // This is when GTA loads its default handlings. We do that for GTA so handling.cfg
-    // is not used anymore.
-    pGame->GetHandlingManager ()->LoadDefaultHandlings ();
-    
-    // Lets do some stuff here
-    // Uncomment code to dump vehicle information
-    /*FILE *fh = fopen("C:\\yo.txt", "a+");
-    FILE *hh = fopen("C:\\Programme\\Rockstar Games\\GTA San Andreas\\data\\vehicles.ide", "r");
-    DWORD n=0;
-    DWORD j=0;
-    BYTE fbuff[256][4096];
-
-    while (!feof(hh))
-    {
-        BYTE ucRead; fread(&ucRead,1,1,hh);
-        if (ucRead==' ' || ucRead=='    ')
-            continue;
-        if (ucRead=='\n')
-        {
-            fbuff[j][n]=0;
-            j++;
-            n=0;
-            continue;
-        }
-        fbuff[j][n]=ucRead;
-        n++;
-
-    }
-    fbuff[j][n]=0;
-
-    for (n=0; n<j; n++)
-    {
-        if (fbuff[n][0] == '#' || fbuff[n][0] == 0)
-            continue;
-        BYTE *item = (BYTE*)strtok((char*)fbuff[n],",");
-        if (strncmp((const char*)item,"cars",4)==0 || strncmp((const char*)item,"end",3)==0)
-            continue;
-        BYTE act=0;
-        do
-        {
-            // Convert item to uppercase
-            DWORD j;
-            for (j=0; j<strlen((const char*)item); j++)
-                if (islower(item[j])) item[j]=toupper(item[j]);
-            switch(act)
-            {
-            case 1:
-                fprintf(fh, "case VT_%s:", item);
-                break;
-            case 4:
-                fprintf(fh, " return HT_%s;\n", item);
-                break;
-            }
-            act++;
-        } while ( item = (BYTE*)strtok( NULL, "," ) );
-    }
-    fclose(hh);
-    fclose(fh);*/
-}
-
-
-__declspec(naked) void CHandlingManagerSA::Hook_LoadHandlingCfg ( void )
-{
-    _asm
-    {
-        // Save all registers
-        pushad
-
-        // Replaced code
-        mov         eax, 0x5BA8C0
-        call        eax
-
-        mov         ecx, 0xC2B9C8
-        mov         eax, 0x5BD830
-        call        eax
-    };
-
-    // Calculate handling.cfg values. We've already initialized them
-    // like they would come from handling.cfg
-    LoadHandlingCfg ();
-
-    _asm
-    {
-        // Restore registers
-        popad
-
-        // Go back in
-        mov         eax, Func_PostLoadHandlingCfg
-        add         eax, 15
-        jmp         eax
-    };
-}
-
-
 void CHandlingManagerSA::InitializeDefaultHandlings ( void )
 {
-#if (USE_GTASA_HANDLING == FALSE)
     // Reset
     MemSet ( m_OriginalHandlingData, 0, sizeof ( m_OriginalHandlingData ) );
 
@@ -622,10 +392,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [0].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [0].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [0].Transmission.uiHandlingFlags = 5242882;
-    m_OriginalHandlingData [0].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [0].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [0].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [0].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [0].fBrakeDecelleration = 6.200000f;
+    m_OriginalHandlingData [0].fBrakeDeceleration = 6.200000f;
     m_OriginalHandlingData [0].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [0].bABS = false;
     m_OriginalHandlingData [0].fSteeringLock = 35.000000f;
@@ -658,10 +428,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [1].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [1].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [1].Transmission.uiHandlingFlags = 1;
-    m_OriginalHandlingData [1].Transmission.fEngineAccelleration = 6.000000f;
+    m_OriginalHandlingData [1].Transmission.fEngineAcceleration = 6.000000f;
     m_OriginalHandlingData [1].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [1].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [1].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [1].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [1].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [1].bABS = false;
     m_OriginalHandlingData [1].fSteeringLock = 30.000000f;
@@ -694,10 +464,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [2].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [2].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [2].Transmission.uiHandlingFlags = 270532608;
-    m_OriginalHandlingData [2].Transmission.fEngineAccelleration = 11.200000f;
+    m_OriginalHandlingData [2].Transmission.fEngineAcceleration = 11.200000f;
     m_OriginalHandlingData [2].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [2].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [2].fBrakeDecelleration = 11.000000f;
+    m_OriginalHandlingData [2].fBrakeDeceleration = 11.000000f;
     m_OriginalHandlingData [2].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [2].bABS = false;
     m_OriginalHandlingData [2].fSteeringLock = 30.000000f;
@@ -730,10 +500,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [3].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [3].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [3].Transmission.uiHandlingFlags = 512;
-    m_OriginalHandlingData [3].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [3].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [3].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [3].Transmission.fMaxVelocity = 120.000000f;
-    m_OriginalHandlingData [3].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [3].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [3].fBrakeBias = 0.300000f;
     m_OriginalHandlingData [3].bABS = false;
     m_OriginalHandlingData [3].fSteeringLock = 25.000000f;
@@ -766,10 +536,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [4].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [4].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [4].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [4].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [4].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [4].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [4].Transmission.fMaxVelocity = 150.000000f;
-    m_OriginalHandlingData [4].fBrakeDecelleration = 4.000000f;
+    m_OriginalHandlingData [4].fBrakeDeceleration = 4.000000f;
     m_OriginalHandlingData [4].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [4].bABS = false;
     m_OriginalHandlingData [4].fSteeringLock = 30.000000f;
@@ -802,10 +572,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [5].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [5].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [5].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [5].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [5].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [5].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [5].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [5].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [5].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [5].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [5].bABS = false;
     m_OriginalHandlingData [5].fSteeringLock = 27.000000f;
@@ -838,10 +608,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [6].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [6].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [6].Transmission.uiHandlingFlags = 20185601;
-    m_OriginalHandlingData [6].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [6].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [6].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [6].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [6].fBrakeDecelleration = 3.170000f;
+    m_OriginalHandlingData [6].fBrakeDeceleration = 3.170000f;
     m_OriginalHandlingData [6].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [6].bABS = false;
     m_OriginalHandlingData [6].fSteeringLock = 30.000000f;
@@ -874,10 +644,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [7].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [7].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [7].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [7].Transmission.fEngineAccelleration = 10.800000f;
+    m_OriginalHandlingData [7].Transmission.fEngineAcceleration = 10.800000f;
     m_OriginalHandlingData [7].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [7].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [7].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [7].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [7].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [7].bABS = false;
     m_OriginalHandlingData [7].fSteeringLock = 27.000000f;
@@ -910,10 +680,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [8].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [8].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [8].Transmission.uiHandlingFlags = 512;
-    m_OriginalHandlingData [8].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [8].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [8].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [8].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [8].fBrakeDecelleration = 3.500000f;
+    m_OriginalHandlingData [8].fBrakeDeceleration = 3.500000f;
     m_OriginalHandlingData [8].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [8].bABS = false;
     m_OriginalHandlingData [8].fSteeringLock = 30.000000f;
@@ -946,10 +716,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [9].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [9].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [9].Transmission.uiHandlingFlags = 272629761;
-    m_OriginalHandlingData [9].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [9].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [9].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [9].Transmission.fMaxVelocity = 180.000000f;
-    m_OriginalHandlingData [9].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [9].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [9].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [9].bABS = false;
     m_OriginalHandlingData [9].fSteeringLock = 30.000000f;
@@ -982,10 +752,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [10].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [10].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [10].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [10].Transmission.fEngineAccelleration = 7.600000f;
+    m_OriginalHandlingData [10].Transmission.fEngineAcceleration = 7.600000f;
     m_OriginalHandlingData [10].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [10].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [10].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [10].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [10].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [10].bABS = false;
     m_OriginalHandlingData [10].fSteeringLock = 30.000000f;
@@ -1018,10 +788,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [11].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [11].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [11].Transmission.uiHandlingFlags = 12599296;
-    m_OriginalHandlingData [11].Transmission.fEngineAccelleration = 12.000000f;
+    m_OriginalHandlingData [11].Transmission.fEngineAcceleration = 12.000000f;
     m_OriginalHandlingData [11].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [11].Transmission.fMaxVelocity = 240.000000f;
-    m_OriginalHandlingData [11].fBrakeDecelleration = 11.000000f;
+    m_OriginalHandlingData [11].fBrakeDeceleration = 11.000000f;
     m_OriginalHandlingData [11].fBrakeBias = 0.510000f;
     m_OriginalHandlingData [11].bABS = false;
     m_OriginalHandlingData [11].fSteeringLock = 30.000000f;
@@ -1054,10 +824,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [12].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [12].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [12].Transmission.uiHandlingFlags = 37814280;
-    m_OriginalHandlingData [12].Transmission.fEngineAccelleration = 9.200000f;
+    m_OriginalHandlingData [12].Transmission.fEngineAcceleration = 9.200000f;
     m_OriginalHandlingData [12].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [12].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [12].fBrakeDecelleration = 6.500000f;
+    m_OriginalHandlingData [12].fBrakeDeceleration = 6.500000f;
     m_OriginalHandlingData [12].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [12].bABS = false;
     m_OriginalHandlingData [12].fSteeringLock = 30.000000f;
@@ -1090,10 +860,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [13].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [13].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [13].Transmission.uiHandlingFlags = 1;
-    m_OriginalHandlingData [13].Transmission.fEngineAccelleration = 6.000000f;
+    m_OriginalHandlingData [13].Transmission.fEngineAcceleration = 6.000000f;
     m_OriginalHandlingData [13].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [13].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [13].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [13].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [13].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [13].bABS = false;
     m_OriginalHandlingData [13].fSteeringLock = 30.000000f;
@@ -1126,10 +896,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [14].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [14].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [14].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [14].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [14].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [14].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [14].Transmission.fMaxVelocity = 140.000000f;
-    m_OriginalHandlingData [14].fBrakeDecelleration = 4.500000f;
+    m_OriginalHandlingData [14].fBrakeDeceleration = 4.500000f;
     m_OriginalHandlingData [14].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [14].bABS = false;
     m_OriginalHandlingData [14].fSteeringLock = 30.000000f;
@@ -1162,10 +932,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [15].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [15].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [15].Transmission.uiHandlingFlags = 2129920;
-    m_OriginalHandlingData [15].Transmission.fEngineAccelleration = 12.000000f;
+    m_OriginalHandlingData [15].Transmission.fEngineAcceleration = 12.000000f;
     m_OriginalHandlingData [15].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [15].Transmission.fMaxVelocity = 230.000000f;
-    m_OriginalHandlingData [15].fBrakeDecelleration = 11.100000f;
+    m_OriginalHandlingData [15].fBrakeDeceleration = 11.100000f;
     m_OriginalHandlingData [15].fBrakeBias = 0.480000f;
     m_OriginalHandlingData [15].bABS = false;
     m_OriginalHandlingData [15].fSteeringLock = 35.000000f;
@@ -1198,10 +968,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [16].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [16].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [16].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [16].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [16].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [16].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [16].Transmission.fMaxVelocity = 155.000000f;
-    m_OriginalHandlingData [16].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [16].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [16].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [16].bABS = false;
     m_OriginalHandlingData [16].fSteeringLock = 35.000000f;
@@ -1234,10 +1004,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [17].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [17].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [17].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [17].Transmission.fEngineAccelleration = 6.000000f;
+    m_OriginalHandlingData [17].Transmission.fEngineAcceleration = 6.000000f;
     m_OriginalHandlingData [17].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [17].Transmission.fMaxVelocity = 150.000000f;
-    m_OriginalHandlingData [17].fBrakeDecelleration = 5.500000f;
+    m_OriginalHandlingData [17].fBrakeDeceleration = 5.500000f;
     m_OriginalHandlingData [17].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [17].bABS = false;
     m_OriginalHandlingData [17].fSteeringLock = 30.000000f;
@@ -1270,10 +1040,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [18].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [18].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [18].Transmission.uiHandlingFlags = 268435456;
-    m_OriginalHandlingData [18].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [18].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [18].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [18].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [18].fBrakeDecelleration = 4.000000f;
+    m_OriginalHandlingData [18].fBrakeDeceleration = 4.000000f;
     m_OriginalHandlingData [18].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [18].bABS = false;
     m_OriginalHandlingData [18].fSteeringLock = 28.000000f;
@@ -1306,10 +1076,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [19].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [19].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [19].Transmission.uiHandlingFlags = 2097152;
-    m_OriginalHandlingData [19].Transmission.fEngineAccelleration = 7.600000f;
+    m_OriginalHandlingData [19].Transmission.fEngineAcceleration = 7.600000f;
     m_OriginalHandlingData [19].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [19].Transmission.fMaxVelocity = 180.000000f;
-    m_OriginalHandlingData [19].fBrakeDecelleration = 9.100000f;
+    m_OriginalHandlingData [19].fBrakeDeceleration = 9.100000f;
     m_OriginalHandlingData [19].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [19].bABS = false;
     m_OriginalHandlingData [19].fSteeringLock = 35.000000f;
@@ -1342,10 +1112,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [20].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [20].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [20].Transmission.uiHandlingFlags = 272629760;
-    m_OriginalHandlingData [20].Transmission.fEngineAccelleration = 8.400000f;
+    m_OriginalHandlingData [20].Transmission.fEngineAcceleration = 8.400000f;
     m_OriginalHandlingData [20].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [20].Transmission.fMaxVelocity = 180.000000f;
-    m_OriginalHandlingData [20].fBrakeDecelleration = 7.500000f;
+    m_OriginalHandlingData [20].fBrakeDeceleration = 7.500000f;
     m_OriginalHandlingData [20].fBrakeBias = 0.650000f;
     m_OriginalHandlingData [20].bABS = false;
     m_OriginalHandlingData [20].fSteeringLock = 30.000000f;
@@ -1378,10 +1148,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [21].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [21].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [21].Transmission.uiHandlingFlags = 1064964;
-    m_OriginalHandlingData [21].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [21].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [21].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [21].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [21].fBrakeDecelleration = 8.500000f;
+    m_OriginalHandlingData [21].fBrakeDeceleration = 8.500000f;
     m_OriginalHandlingData [21].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [21].bABS = false;
     m_OriginalHandlingData [21].fSteeringLock = 35.000000f;
@@ -1414,10 +1184,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [22].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [22].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [22].Transmission.uiHandlingFlags = 2;
-    m_OriginalHandlingData [22].Transmission.fEngineAccelleration = 5.600000f;
+    m_OriginalHandlingData [22].Transmission.fEngineAcceleration = 5.600000f;
     m_OriginalHandlingData [22].Transmission.fEngineInertia = 50.000000f;
     m_OriginalHandlingData [22].Transmission.fMaxVelocity = 145.000000f;
-    m_OriginalHandlingData [22].fBrakeDecelleration = 4.170000f;
+    m_OriginalHandlingData [22].fBrakeDeceleration = 4.170000f;
     m_OriginalHandlingData [22].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [22].bABS = false;
     m_OriginalHandlingData [22].fSteeringLock = 35.000000f;
@@ -1450,10 +1220,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [23].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [23].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [23].Transmission.uiHandlingFlags = 3179008;
-    m_OriginalHandlingData [23].Transmission.fEngineAccelleration = 12.000000f;
+    m_OriginalHandlingData [23].Transmission.fEngineAcceleration = 12.000000f;
     m_OriginalHandlingData [23].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [23].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [23].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [23].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [23].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [23].bABS = false;
     m_OriginalHandlingData [23].fSteeringLock = 35.000000f;
@@ -1486,10 +1256,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [24].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [24].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [24].Transmission.uiHandlingFlags = 270532616;
-    m_OriginalHandlingData [24].Transmission.fEngineAccelleration = 8.800000f;
+    m_OriginalHandlingData [24].Transmission.fEngineAcceleration = 8.800000f;
     m_OriginalHandlingData [24].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [24].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [24].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [24].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [24].fBrakeBias = 0.530000f;
     m_OriginalHandlingData [24].bABS = false;
     m_OriginalHandlingData [24].fSteeringLock = 35.000000f;
@@ -1522,10 +1292,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [25].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [25].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [25].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [25].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [25].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [25].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [25].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [25].fBrakeDecelleration = 5.400000f;
+    m_OriginalHandlingData [25].fBrakeDeceleration = 5.400000f;
     m_OriginalHandlingData [25].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [25].bABS = false;
     m_OriginalHandlingData [25].fSteeringLock = 27.000000f;
@@ -1558,10 +1328,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [26].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [26].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [26].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [26].Transmission.fEngineAccelleration = 6.000000f;
+    m_OriginalHandlingData [26].Transmission.fEngineAcceleration = 6.000000f;
     m_OriginalHandlingData [26].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [26].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [26].fBrakeDecelleration = 8.400000f;
+    m_OriginalHandlingData [26].fBrakeDeceleration = 8.400000f;
     m_OriginalHandlingData [26].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [26].bABS = false;
     m_OriginalHandlingData [26].fSteeringLock = 27.000000f;
@@ -1594,10 +1364,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [27].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [27].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [27].Transmission.uiHandlingFlags = 2097152;
-    m_OriginalHandlingData [27].Transmission.fEngineAccelleration = 13.200000f;
+    m_OriginalHandlingData [27].Transmission.fEngineAcceleration = 13.200000f;
     m_OriginalHandlingData [27].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [27].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [27].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [27].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [27].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [27].bABS = false;
     m_OriginalHandlingData [27].fSteeringLock = 34.000000f;
@@ -1630,10 +1400,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [28].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [28].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [28].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [28].Transmission.fEngineAccelleration = 5.600000f;
+    m_OriginalHandlingData [28].Transmission.fEngineAcceleration = 5.600000f;
     m_OriginalHandlingData [28].Transmission.fEngineInertia = 50.000000f;
     m_OriginalHandlingData [28].Transmission.fMaxVelocity = 130.000000f;
-    m_OriginalHandlingData [28].fBrakeDecelleration = 4.170000f;
+    m_OriginalHandlingData [28].fBrakeDeceleration = 4.170000f;
     m_OriginalHandlingData [28].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [28].bABS = false;
     m_OriginalHandlingData [28].fSteeringLock = 30.000000f;
@@ -1666,10 +1436,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [29].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [29].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [29].Transmission.uiHandlingFlags = 3180608;
-    m_OriginalHandlingData [29].Transmission.fEngineAccelleration = 16.000000f;
+    m_OriginalHandlingData [29].Transmission.fEngineAcceleration = 16.000000f;
     m_OriginalHandlingData [29].Transmission.fEngineInertia = 150.000000f;
     m_OriginalHandlingData [29].Transmission.fMaxVelocity = 80.000000f;
-    m_OriginalHandlingData [29].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [29].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [29].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [29].bABS = false;
     m_OriginalHandlingData [29].fSteeringLock = 35.000000f;
@@ -1702,10 +1472,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [30].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [30].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [30].Transmission.uiHandlingFlags = 1048576;
-    m_OriginalHandlingData [30].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [30].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [30].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [30].Transmission.fMaxVelocity = 180.000000f;
-    m_OriginalHandlingData [30].fBrakeDecelleration = 4.000000f;
+    m_OriginalHandlingData [30].fBrakeDeceleration = 4.000000f;
     m_OriginalHandlingData [30].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [30].bABS = false;
     m_OriginalHandlingData [30].fSteeringLock = 27.000000f;
@@ -1738,10 +1508,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [31].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [31].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [31].Transmission.uiHandlingFlags = 32768;
-    m_OriginalHandlingData [31].Transmission.fEngineAccelleration = 11.200000f;
+    m_OriginalHandlingData [31].Transmission.fEngineAcceleration = 11.200000f;
     m_OriginalHandlingData [31].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [31].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [31].fBrakeDecelleration = 11.000000f;
+    m_OriginalHandlingData [31].fBrakeDeceleration = 11.000000f;
     m_OriginalHandlingData [31].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [31].bABS = false;
     m_OriginalHandlingData [31].fSteeringLock = 30.000000f;
@@ -1774,10 +1544,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [32].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [32].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [32].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [32].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [32].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [32].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [32].Transmission.fMaxVelocity = 120.000000f;
-    m_OriginalHandlingData [32].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [32].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [32].fBrakeBias = 0.300000f;
     m_OriginalHandlingData [32].bABS = false;
     m_OriginalHandlingData [32].fSteeringLock = 25.000000f;
@@ -1810,10 +1580,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [33].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [33].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [33].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [33].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [33].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [33].Transmission.fEngineInertia = 7.000000f;
     m_OriginalHandlingData [33].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [33].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [33].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [33].fBrakeBias = 0.650000f;
     m_OriginalHandlingData [33].bABS = false;
     m_OriginalHandlingData [33].fSteeringLock = 35.000000f;
@@ -1846,10 +1616,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [34].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [34].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [34].Transmission.uiHandlingFlags = 2097152;
-    m_OriginalHandlingData [34].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [34].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [34].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [34].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [34].fBrakeDecelleration = 5.700000f;
+    m_OriginalHandlingData [34].fBrakeDeceleration = 5.700000f;
     m_OriginalHandlingData [34].fBrakeBias = 0.350000f;
     m_OriginalHandlingData [34].bABS = false;
     m_OriginalHandlingData [34].fSteeringLock = 30.000000f;
@@ -1882,10 +1652,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [35].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [35].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [35].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [35].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [35].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [35].Transmission.fEngineInertia = 6.000000f;
     m_OriginalHandlingData [35].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [35].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [35].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [35].fBrakeBias = 0.440000f;
     m_OriginalHandlingData [35].bABS = false;
     m_OriginalHandlingData [35].fSteeringLock = 40.000000f;
@@ -1918,10 +1688,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [36].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [36].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [36].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [36].Transmission.fEngineAccelleration = 9.200000f;
+    m_OriginalHandlingData [36].Transmission.fEngineAcceleration = 9.200000f;
     m_OriginalHandlingData [36].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [36].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [36].fBrakeDecelleration = 8.170000f;
+    m_OriginalHandlingData [36].fBrakeDeceleration = 8.170000f;
     m_OriginalHandlingData [36].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [36].bABS = false;
     m_OriginalHandlingData [36].fSteeringLock = 35.000000f;
@@ -1954,10 +1724,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [37].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [37].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [37].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [37].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [37].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [37].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [37].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [37].fBrakeDecelleration = 5.500000f;
+    m_OriginalHandlingData [37].fBrakeDeceleration = 5.500000f;
     m_OriginalHandlingData [37].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [37].bABS = false;
     m_OriginalHandlingData [37].fSteeringLock = 30.000000f;
@@ -1990,10 +1760,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [38].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [38].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [38].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [38].Transmission.fEngineAccelleration = 14.000000f;
+    m_OriginalHandlingData [38].Transmission.fEngineAcceleration = 14.000000f;
     m_OriginalHandlingData [38].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [38].Transmission.fMaxVelocity = 75.000000f;
-    m_OriginalHandlingData [38].fBrakeDecelleration = 5.500000f;
+    m_OriginalHandlingData [38].fBrakeDeceleration = 5.500000f;
     m_OriginalHandlingData [38].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [38].bABS = false;
     m_OriginalHandlingData [38].fSteeringLock = 25.000000f;
@@ -2026,10 +1796,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [39].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [39].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [39].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [39].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [39].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [39].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [39].Transmission.fMaxVelocity = 150.000000f;
-    m_OriginalHandlingData [39].fBrakeDecelleration = 4.000000f;
+    m_OriginalHandlingData [39].fBrakeDeceleration = 4.000000f;
     m_OriginalHandlingData [39].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [39].bABS = false;
     m_OriginalHandlingData [39].fSteeringLock = 30.000000f;
@@ -2062,10 +1832,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [40].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [40].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [40].Transmission.uiHandlingFlags = 4456448;
-    m_OriginalHandlingData [40].Transmission.fEngineAccelleration = 5.200000f;
+    m_OriginalHandlingData [40].Transmission.fEngineAcceleration = 5.200000f;
     m_OriginalHandlingData [40].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [40].Transmission.fMaxVelocity = 150.000000f;
-    m_OriginalHandlingData [40].fBrakeDecelleration = 5.700000f;
+    m_OriginalHandlingData [40].fBrakeDeceleration = 5.700000f;
     m_OriginalHandlingData [40].fBrakeBias = 0.350000f;
     m_OriginalHandlingData [40].bABS = false;
     m_OriginalHandlingData [40].fSteeringLock = 30.000000f;
@@ -2098,10 +1868,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [41].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [41].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [41].Transmission.uiHandlingFlags = 19923013;
-    m_OriginalHandlingData [41].Transmission.fEngineAccelleration = 18.000000f;
+    m_OriginalHandlingData [41].Transmission.fEngineAcceleration = 18.000000f;
     m_OriginalHandlingData [41].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [41].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [41].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [41].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [41].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [41].bABS = false;
     m_OriginalHandlingData [41].fSteeringLock = 35.000000f;
@@ -2134,10 +1904,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [42].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [42].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [42].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [42].Transmission.fEngineAccelleration = 8.800000f;
+    m_OriginalHandlingData [42].Transmission.fEngineAcceleration = 8.800000f;
     m_OriginalHandlingData [42].Transmission.fEngineInertia = 8.000000f;
     m_OriginalHandlingData [42].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [42].fBrakeDecelleration = 8.500000f;
+    m_OriginalHandlingData [42].fBrakeDeceleration = 8.500000f;
     m_OriginalHandlingData [42].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [42].bABS = false;
     m_OriginalHandlingData [42].fSteeringLock = 30.000000f;
@@ -2170,10 +1940,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [43].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [43].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [43].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [43].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [43].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [43].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [43].Transmission.fMaxVelocity = 150.000000f;
-    m_OriginalHandlingData [43].fBrakeDecelleration = 8.500000f;
+    m_OriginalHandlingData [43].fBrakeDeceleration = 8.500000f;
     m_OriginalHandlingData [43].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [43].bABS = false;
     m_OriginalHandlingData [43].fSteeringLock = 30.000000f;
@@ -2206,10 +1976,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [44].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [44].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [44].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [44].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [44].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [44].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [44].Transmission.fMaxVelocity = 140.000000f;
-    m_OriginalHandlingData [44].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [44].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [44].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [44].bABS = false;
     m_OriginalHandlingData [44].fSteeringLock = 27.000000f;
@@ -2242,10 +2012,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [45].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [45].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [45].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [45].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [45].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [45].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [45].Transmission.fMaxVelocity = 120.000000f;
-    m_OriginalHandlingData [45].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [45].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [45].fBrakeBias = 0.300000f;
     m_OriginalHandlingData [45].bABS = false;
     m_OriginalHandlingData [45].fSteeringLock = 25.000000f;
@@ -2278,10 +2048,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [46].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [46].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [46].Transmission.uiHandlingFlags = 12616705;
-    m_OriginalHandlingData [46].Transmission.fEngineAccelleration = 12.000000f;
+    m_OriginalHandlingData [46].Transmission.fEngineAcceleration = 12.000000f;
     m_OriginalHandlingData [46].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [46].Transmission.fMaxVelocity = 240.000000f;
-    m_OriginalHandlingData [46].fBrakeDecelleration = 11.000000f;
+    m_OriginalHandlingData [46].fBrakeDeceleration = 11.000000f;
     m_OriginalHandlingData [46].fBrakeBias = 0.510000f;
     m_OriginalHandlingData [46].bABS = false;
     m_OriginalHandlingData [46].fSteeringLock = 30.000000f;
@@ -2314,10 +2084,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [47].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [47].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [47].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [47].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [47].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [47].Transmission.fEngineInertia = 80.000000f;
     m_OriginalHandlingData [47].Transmission.fMaxVelocity = 140.000000f;
-    m_OriginalHandlingData [47].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [47].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [47].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [47].bABS = false;
     m_OriginalHandlingData [47].fSteeringLock = 27.000000f;
@@ -2350,10 +2120,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [48].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [48].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [48].Transmission.uiHandlingFlags = 1;
-    m_OriginalHandlingData [48].Transmission.fEngineAccelleration = 5.600000f;
+    m_OriginalHandlingData [48].Transmission.fEngineAcceleration = 5.600000f;
     m_OriginalHandlingData [48].Transmission.fEngineInertia = 40.000000f;
     m_OriginalHandlingData [48].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [48].fBrakeDecelleration = 4.500000f;
+    m_OriginalHandlingData [48].fBrakeDeceleration = 4.500000f;
     m_OriginalHandlingData [48].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [48].bABS = false;
     m_OriginalHandlingData [48].fSteeringLock = 30.000000f;
@@ -2386,10 +2156,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [49].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [49].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [49].Transmission.uiHandlingFlags = 34820;
-    m_OriginalHandlingData [49].Transmission.fEngineAccelleration = 6.000000f;
+    m_OriginalHandlingData [49].Transmission.fEngineAcceleration = 6.000000f;
     m_OriginalHandlingData [49].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [49].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [49].fBrakeDecelleration = 13.000000f;
+    m_OriginalHandlingData [49].fBrakeDeceleration = 13.000000f;
     m_OriginalHandlingData [49].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [49].bABS = false;
     m_OriginalHandlingData [49].fSteeringLock = 30.000000f;
@@ -2422,10 +2192,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [50].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [50].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [50].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [50].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [50].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [50].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [50].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [50].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [50].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [50].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [50].bABS = false;
     m_OriginalHandlingData [50].fSteeringLock = 30.000000f;
@@ -2458,10 +2228,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [51].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [51].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [51].Transmission.uiHandlingFlags = 1;
-    m_OriginalHandlingData [51].Transmission.fEngineAccelleration = 6.000000f;
+    m_OriginalHandlingData [51].Transmission.fEngineAcceleration = 6.000000f;
     m_OriginalHandlingData [51].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [51].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [51].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [51].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [51].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [51].bABS = false;
     m_OriginalHandlingData [51].fSteeringLock = 30.000000f;
@@ -2494,10 +2264,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [52].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [52].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [52].Transmission.uiHandlingFlags = 276824066;
-    m_OriginalHandlingData [52].Transmission.fEngineAccelleration = 8.800000f;
+    m_OriginalHandlingData [52].Transmission.fEngineAcceleration = 8.800000f;
     m_OriginalHandlingData [52].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [52].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [52].fBrakeDecelleration = 6.200000f;
+    m_OriginalHandlingData [52].fBrakeDeceleration = 6.200000f;
     m_OriginalHandlingData [52].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [52].bABS = false;
     m_OriginalHandlingData [52].fSteeringLock = 30.000000f;
@@ -2530,10 +2300,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [53].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [53].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [53].Transmission.uiHandlingFlags = 276824064;
-    m_OriginalHandlingData [53].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [53].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [53].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [53].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [53].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [53].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [53].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [53].bABS = false;
     m_OriginalHandlingData [53].fSteeringLock = 30.000000f;
@@ -2566,10 +2336,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [54].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [54].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [54].Transmission.uiHandlingFlags = 3145728;
-    m_OriginalHandlingData [54].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [54].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [54].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [54].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [54].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [54].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [54].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [54].bABS = false;
     m_OriginalHandlingData [54].fSteeringLock = 30.000000f;
@@ -2602,10 +2372,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [55].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [55].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [55].Transmission.uiHandlingFlags = 1;
-    m_OriginalHandlingData [55].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [55].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [55].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [55].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [55].fBrakeDecelleration = 3.500000f;
+    m_OriginalHandlingData [55].fBrakeDeceleration = 3.500000f;
     m_OriginalHandlingData [55].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [55].bABS = false;
     m_OriginalHandlingData [55].fSteeringLock = 28.000000f;
@@ -2638,10 +2408,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [56].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [56].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [56].Transmission.uiHandlingFlags = 268435462;
-    m_OriginalHandlingData [56].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [56].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [56].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [56].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [56].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [56].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [56].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [56].bABS = false;
     m_OriginalHandlingData [56].fSteeringLock = 35.000000f;
@@ -2674,10 +2444,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [57].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [57].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [57].Transmission.uiHandlingFlags = 12582912;
-    m_OriginalHandlingData [57].Transmission.fEngineAccelleration = 11.200000f;
+    m_OriginalHandlingData [57].Transmission.fEngineAcceleration = 11.200000f;
     m_OriginalHandlingData [57].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [57].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [57].fBrakeDecelleration = 11.100000f;
+    m_OriginalHandlingData [57].fBrakeDeceleration = 11.100000f;
     m_OriginalHandlingData [57].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [57].bABS = false;
     m_OriginalHandlingData [57].fSteeringLock = 30.000000f;
@@ -2710,10 +2480,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [58].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [58].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [58].Transmission.uiHandlingFlags = 268435462;
-    m_OriginalHandlingData [58].Transmission.fEngineAccelleration = 5.600000f;
+    m_OriginalHandlingData [58].Transmission.fEngineAcceleration = 5.600000f;
     m_OriginalHandlingData [58].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [58].Transmission.fMaxVelocity = 150.000000f;
-    m_OriginalHandlingData [58].fBrakeDecelleration = 6.500000f;
+    m_OriginalHandlingData [58].fBrakeDeceleration = 6.500000f;
     m_OriginalHandlingData [58].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [58].bABS = false;
     m_OriginalHandlingData [58].fSteeringLock = 35.000000f;
@@ -2746,10 +2516,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [59].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [59].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [59].Transmission.uiHandlingFlags = 1;
-    m_OriginalHandlingData [59].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [59].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [59].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [59].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [59].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [59].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [59].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [59].bABS = false;
     m_OriginalHandlingData [59].fSteeringLock = 30.000000f;
@@ -2782,10 +2552,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [60].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [60].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [60].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [60].Transmission.fEngineAccelleration = 12.000000f;
+    m_OriginalHandlingData [60].Transmission.fEngineAcceleration = 12.000000f;
     m_OriginalHandlingData [60].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [60].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [60].fBrakeDecelleration = 11.000000f;
+    m_OriginalHandlingData [60].fBrakeDeceleration = 11.000000f;
     m_OriginalHandlingData [60].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [60].bABS = false;
     m_OriginalHandlingData [60].fSteeringLock = 30.000000f;
@@ -2818,10 +2588,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [61].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [61].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [61].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [61].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [61].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [61].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [61].Transmission.fMaxVelocity = 150.000000f;
-    m_OriginalHandlingData [61].fBrakeDecelleration = 8.500000f;
+    m_OriginalHandlingData [61].fBrakeDeceleration = 8.500000f;
     m_OriginalHandlingData [61].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [61].bABS = false;
     m_OriginalHandlingData [61].fSteeringLock = 30.000000f;
@@ -2854,10 +2624,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [62].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [62].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [62].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [62].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [62].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [62].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [62].Transmission.fMaxVelocity = 120.000000f;
-    m_OriginalHandlingData [62].fBrakeDecelleration = 8.500000f;
+    m_OriginalHandlingData [62].fBrakeDeceleration = 8.500000f;
     m_OriginalHandlingData [62].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [62].bABS = false;
     m_OriginalHandlingData [62].fSteeringLock = 30.000000f;
@@ -2890,10 +2660,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [63].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [63].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [63].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [63].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [63].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [63].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [63].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [63].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [63].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [63].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [63].bABS = false;
     m_OriginalHandlingData [63].fSteeringLock = 30.000000f;
@@ -2926,10 +2696,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [64].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [64].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [64].Transmission.uiHandlingFlags = 3408416;
-    m_OriginalHandlingData [64].Transmission.fEngineAccelleration = 14.000000f;
+    m_OriginalHandlingData [64].Transmission.fEngineAcceleration = 14.000000f;
     m_OriginalHandlingData [64].Transmission.fEngineInertia = 150.000000f;
     m_OriginalHandlingData [64].Transmission.fMaxVelocity = 100.000000f;
-    m_OriginalHandlingData [64].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [64].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [64].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [64].bABS = false;
     m_OriginalHandlingData [64].fSteeringLock = 45.000000f;
@@ -2962,10 +2732,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [65].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [65].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [65].Transmission.uiHandlingFlags = 1048580;
-    m_OriginalHandlingData [65].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [65].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [65].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [65].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [65].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [65].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [65].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [65].bABS = false;
     m_OriginalHandlingData [65].fSteeringLock = 35.000000f;
@@ -2998,10 +2768,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [66].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [66].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [66].Transmission.uiHandlingFlags = 5242880;
-    m_OriginalHandlingData [66].Transmission.fEngineAccelleration = 8.800000f;
+    m_OriginalHandlingData [66].Transmission.fEngineAcceleration = 8.800000f;
     m_OriginalHandlingData [66].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [66].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [66].fBrakeDecelleration = 8.500000f;
+    m_OriginalHandlingData [66].fBrakeDeceleration = 8.500000f;
     m_OriginalHandlingData [66].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [66].bABS = false;
     m_OriginalHandlingData [66].fSteeringLock = 30.000000f;
@@ -3034,10 +2804,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [67].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [67].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [67].Transmission.uiHandlingFlags = 268435456;
-    m_OriginalHandlingData [67].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [67].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [67].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [67].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [67].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [67].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [67].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [67].bABS = false;
     m_OriginalHandlingData [67].fSteeringLock = 32.000000f;
@@ -3070,10 +2840,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [68].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [68].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [68].Transmission.uiHandlingFlags = 268435457;
-    m_OriginalHandlingData [68].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [68].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [68].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [68].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [68].fBrakeDecelleration = 5.400000f;
+    m_OriginalHandlingData [68].fBrakeDeceleration = 5.400000f;
     m_OriginalHandlingData [68].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [68].bABS = false;
     m_OriginalHandlingData [68].fSteeringLock = 30.000000f;
@@ -3106,10 +2876,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [69].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [69].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [69].Transmission.uiHandlingFlags = 12582912;
-    m_OriginalHandlingData [69].Transmission.fEngineAccelleration = 10.400000f;
+    m_OriginalHandlingData [69].Transmission.fEngineAcceleration = 10.400000f;
     m_OriginalHandlingData [69].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [69].Transmission.fMaxVelocity = 220.000000f;
-    m_OriginalHandlingData [69].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [69].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [69].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [69].bABS = false;
     m_OriginalHandlingData [69].fSteeringLock = 30.000000f;
@@ -3142,10 +2912,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [70].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [70].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [70].Transmission.uiHandlingFlags = 3246080;
-    m_OriginalHandlingData [70].Transmission.fEngineAccelleration = 11.200000f;
+    m_OriginalHandlingData [70].Transmission.fEngineAcceleration = 11.200000f;
     m_OriginalHandlingData [70].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [70].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [70].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [70].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [70].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [70].bABS = false;
     m_OriginalHandlingData [70].fSteeringLock = 30.000000f;
@@ -3178,10 +2948,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [71].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [71].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [71].Transmission.uiHandlingFlags = 12582912;
-    m_OriginalHandlingData [71].Transmission.fEngineAccelleration = 10.400000f;
+    m_OriginalHandlingData [71].Transmission.fEngineAcceleration = 10.400000f;
     m_OriginalHandlingData [71].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [71].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [71].fBrakeDecelleration = 11.000000f;
+    m_OriginalHandlingData [71].fBrakeDeceleration = 11.000000f;
     m_OriginalHandlingData [71].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [71].bABS = false;
     m_OriginalHandlingData [71].fSteeringLock = 30.000000f;
@@ -3214,10 +2984,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [72].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [72].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [72].Transmission.uiHandlingFlags = 513;
-    m_OriginalHandlingData [72].Transmission.fEngineAccelleration = 5.600000f;
+    m_OriginalHandlingData [72].Transmission.fEngineAcceleration = 5.600000f;
     m_OriginalHandlingData [72].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [72].Transmission.fMaxVelocity = 140.000000f;
-    m_OriginalHandlingData [72].fBrakeDecelleration = 4.500000f;
+    m_OriginalHandlingData [72].fBrakeDeceleration = 4.500000f;
     m_OriginalHandlingData [72].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [72].bABS = false;
     m_OriginalHandlingData [72].fSteeringLock = 30.000000f;
@@ -3250,10 +3020,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [73].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [73].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [73].Transmission.uiHandlingFlags = 1;
-    m_OriginalHandlingData [73].Transmission.fEngineAccelleration = 5.600000f;
+    m_OriginalHandlingData [73].Transmission.fEngineAcceleration = 5.600000f;
     m_OriginalHandlingData [73].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [73].Transmission.fMaxVelocity = 140.000000f;
-    m_OriginalHandlingData [73].fBrakeDecelleration = 4.500000f;
+    m_OriginalHandlingData [73].fBrakeDeceleration = 4.500000f;
     m_OriginalHandlingData [73].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [73].bABS = false;
     m_OriginalHandlingData [73].fSteeringLock = 30.000000f;
@@ -3286,10 +3056,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [74].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [74].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [74].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [74].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [74].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [74].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [74].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [74].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [74].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [74].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [74].bABS = false;
     m_OriginalHandlingData [74].fSteeringLock = 35.000000f;
@@ -3322,10 +3092,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [75].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [75].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [75].Transmission.uiHandlingFlags = 276824576;
-    m_OriginalHandlingData [75].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [75].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [75].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [75].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [75].fBrakeDecelleration = 6.200000f;
+    m_OriginalHandlingData [75].fBrakeDeceleration = 6.200000f;
     m_OriginalHandlingData [75].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [75].bABS = false;
     m_OriginalHandlingData [75].fSteeringLock = 35.000000f;
@@ -3358,10 +3128,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [76].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [76].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [76].Transmission.uiHandlingFlags = 8389120;
-    m_OriginalHandlingData [76].Transmission.fEngineAccelleration = 10.400000f;
+    m_OriginalHandlingData [76].Transmission.fEngineAcceleration = 10.400000f;
     m_OriginalHandlingData [76].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [76].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [76].fBrakeDecelleration = 6.200000f;
+    m_OriginalHandlingData [76].fBrakeDeceleration = 6.200000f;
     m_OriginalHandlingData [76].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [76].bABS = false;
     m_OriginalHandlingData [76].fSteeringLock = 35.000000f;
@@ -3394,10 +3164,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [77].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [77].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [77].Transmission.uiHandlingFlags = 2129920;
-    m_OriginalHandlingData [77].Transmission.fEngineAccelleration = 10.400000f;
+    m_OriginalHandlingData [77].Transmission.fEngineAcceleration = 10.400000f;
     m_OriginalHandlingData [77].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [77].Transmission.fMaxVelocity = 230.000000f;
-    m_OriginalHandlingData [77].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [77].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [77].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [77].bABS = false;
     m_OriginalHandlingData [77].fSteeringLock = 30.000000f;
@@ -3430,10 +3200,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [78].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [78].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [78].Transmission.uiHandlingFlags = 272629760;
-    m_OriginalHandlingData [78].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [78].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [78].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [78].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [78].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [78].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [78].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [78].bABS = false;
     m_OriginalHandlingData [78].fSteeringLock = 30.000000f;
@@ -3466,10 +3236,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [79].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [79].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [79].Transmission.uiHandlingFlags = 1;
-    m_OriginalHandlingData [79].Transmission.fEngineAccelleration = 5.600000f;
+    m_OriginalHandlingData [79].Transmission.fEngineAcceleration = 5.600000f;
     m_OriginalHandlingData [79].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [79].Transmission.fMaxVelocity = 140.000000f;
-    m_OriginalHandlingData [79].fBrakeDecelleration = 4.500000f;
+    m_OriginalHandlingData [79].fBrakeDeceleration = 4.500000f;
     m_OriginalHandlingData [79].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [79].bABS = false;
     m_OriginalHandlingData [79].fSteeringLock = 30.000000f;
@@ -3502,10 +3272,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [80].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [80].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [80].Transmission.uiHandlingFlags = 16777217;
-    m_OriginalHandlingData [80].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [80].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [80].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [80].Transmission.fMaxVelocity = 120.000000f;
-    m_OriginalHandlingData [80].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [80].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [80].fBrakeBias = 0.300000f;
     m_OriginalHandlingData [80].bABS = false;
     m_OriginalHandlingData [80].fSteeringLock = 35.000000f;
@@ -3538,10 +3308,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [81].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [81].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [81].Transmission.uiHandlingFlags = 512;
-    m_OriginalHandlingData [81].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [81].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [81].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [81].Transmission.fMaxVelocity = 120.000000f;
-    m_OriginalHandlingData [81].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [81].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [81].fBrakeBias = 0.300000f;
     m_OriginalHandlingData [81].bABS = false;
     m_OriginalHandlingData [81].fSteeringLock = 25.000000f;
@@ -3574,10 +3344,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [82].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [82].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [82].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [82].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [82].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [82].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [82].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [82].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [82].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [82].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [82].bABS = false;
     m_OriginalHandlingData [82].fSteeringLock = 30.000000f;
@@ -3610,10 +3380,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [83].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [83].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [83].Transmission.uiHandlingFlags = 272629760;
-    m_OriginalHandlingData [83].Transmission.fEngineAccelleration = 8.800000f;
+    m_OriginalHandlingData [83].Transmission.fEngineAcceleration = 8.800000f;
     m_OriginalHandlingData [83].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [83].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [83].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [83].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [83].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [83].bABS = false;
     m_OriginalHandlingData [83].fSteeringLock = 30.000000f;
@@ -3646,10 +3416,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [84].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [84].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [84].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [84].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [84].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [84].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [84].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [84].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [84].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [84].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [84].bABS = false;
     m_OriginalHandlingData [84].fSteeringLock = 35.000000f;
@@ -3682,10 +3452,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [85].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [85].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [85].Transmission.uiHandlingFlags = 262656;
-    m_OriginalHandlingData [85].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [85].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [85].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [85].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [85].fBrakeDecelleration = 3.170000f;
+    m_OriginalHandlingData [85].fBrakeDeceleration = 3.170000f;
     m_OriginalHandlingData [85].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [85].bABS = false;
     m_OriginalHandlingData [85].fSteeringLock = 30.000000f;
@@ -3718,10 +3488,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [86].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [86].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [86].Transmission.uiHandlingFlags = 18121216;
-    m_OriginalHandlingData [86].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [86].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [86].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [86].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [86].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [86].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [86].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [86].bABS = false;
     m_OriginalHandlingData [86].fSteeringLock = 45.000000f;
@@ -3754,10 +3524,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [87].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [87].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [87].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [87].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [87].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [87].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [87].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [87].fBrakeDecelleration = 8.170000f;
+    m_OriginalHandlingData [87].fBrakeDeceleration = 8.170000f;
     m_OriginalHandlingData [87].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [87].bABS = false;
     m_OriginalHandlingData [87].fSteeringLock = 35.000000f;
@@ -3790,10 +3560,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [88].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [88].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [88].Transmission.uiHandlingFlags = 2;
-    m_OriginalHandlingData [88].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [88].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [88].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [88].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [88].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [88].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [88].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [88].bABS = false;
     m_OriginalHandlingData [88].fSteeringLock = 30.000000f;
@@ -3826,10 +3596,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [89].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [89].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [89].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [89].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [89].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [89].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [89].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [89].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [89].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [89].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [89].bABS = false;
     m_OriginalHandlingData [89].fSteeringLock = 30.000000f;
@@ -3862,10 +3632,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [90].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [90].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [90].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [90].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [90].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [90].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [90].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [90].fBrakeDecelleration = 5.400000f;
+    m_OriginalHandlingData [90].fBrakeDeceleration = 5.400000f;
     m_OriginalHandlingData [90].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [90].bABS = false;
     m_OriginalHandlingData [90].fSteeringLock = 30.000000f;
@@ -3898,10 +3668,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [91].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [91].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [91].Transmission.uiHandlingFlags = 17039396;
-    m_OriginalHandlingData [91].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [91].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [91].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [91].Transmission.fMaxVelocity = 60.000000f;
-    m_OriginalHandlingData [91].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [91].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [91].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [91].bABS = false;
     m_OriginalHandlingData [91].fSteeringLock = 30.000000f;
@@ -3934,10 +3704,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [92].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [92].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [92].Transmission.uiHandlingFlags = 20185093;
-    m_OriginalHandlingData [92].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [92].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [92].Transmission.fEngineInertia = 90.000000f;
     m_OriginalHandlingData [92].Transmission.fMaxVelocity = 70.000000f;
-    m_OriginalHandlingData [92].fBrakeDecelleration = 15.000000f;
+    m_OriginalHandlingData [92].fBrakeDeceleration = 15.000000f;
     m_OriginalHandlingData [92].fBrakeBias = 0.200000f;
     m_OriginalHandlingData [92].bABS = false;
     m_OriginalHandlingData [92].fSteeringLock = 50.000000f;
@@ -3970,10 +3740,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [93].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [93].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [93].Transmission.uiHandlingFlags = 32;
-    m_OriginalHandlingData [93].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [93].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [93].Transmission.fEngineInertia = 80.000000f;
     m_OriginalHandlingData [93].Transmission.fMaxVelocity = 140.000000f;
-    m_OriginalHandlingData [93].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [93].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [93].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [93].bABS = false;
     m_OriginalHandlingData [93].fSteeringLock = 27.000000f;
@@ -4006,10 +3776,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [94].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [94].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [94].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [94].Transmission.fEngineAccelleration = 11.200000f;
+    m_OriginalHandlingData [94].Transmission.fEngineAcceleration = 11.200000f;
     m_OriginalHandlingData [94].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [94].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [94].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [94].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [94].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [94].bABS = false;
     m_OriginalHandlingData [94].fSteeringLock = 30.000000f;
@@ -4042,10 +3812,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [95].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [95].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [95].Transmission.uiHandlingFlags = 37814272;
-    m_OriginalHandlingData [95].Transmission.fEngineAccelleration = 9.200000f;
+    m_OriginalHandlingData [95].Transmission.fEngineAcceleration = 9.200000f;
     m_OriginalHandlingData [95].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [95].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [95].fBrakeDecelleration = 6.500000f;
+    m_OriginalHandlingData [95].fBrakeDeceleration = 6.500000f;
     m_OriginalHandlingData [95].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [95].bABS = false;
     m_OriginalHandlingData [95].fSteeringLock = 30.000000f;
@@ -4078,10 +3848,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [96].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [96].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [96].Transmission.uiHandlingFlags = 33619968;
-    m_OriginalHandlingData [96].Transmission.fEngineAccelleration = 16.000000f;
+    m_OriginalHandlingData [96].Transmission.fEngineAcceleration = 16.000000f;
     m_OriginalHandlingData [96].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [96].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [96].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [96].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [96].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [96].bABS = false;
     m_OriginalHandlingData [96].fSteeringLock = 28.000000f;
@@ -4114,10 +3884,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [97].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [97].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [97].Transmission.uiHandlingFlags = 302055424;
-    m_OriginalHandlingData [97].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [97].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [97].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [97].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [97].fBrakeDecelleration = 8.170000f;
+    m_OriginalHandlingData [97].fBrakeDeceleration = 8.170000f;
     m_OriginalHandlingData [97].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [97].bABS = false;
     m_OriginalHandlingData [97].fSteeringLock = 35.000000f;
@@ -4150,10 +3920,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [98].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [98].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [98].Transmission.uiHandlingFlags = 512;
-    m_OriginalHandlingData [98].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [98].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [98].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [98].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [98].fBrakeDecelleration = 3.170000f;
+    m_OriginalHandlingData [98].fBrakeDeceleration = 3.170000f;
     m_OriginalHandlingData [98].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [98].bABS = false;
     m_OriginalHandlingData [98].fSteeringLock = 30.000000f;
@@ -4186,10 +3956,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [99].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [99].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [99].Transmission.uiHandlingFlags = 512;
-    m_OriginalHandlingData [99].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [99].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [99].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [99].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [99].fBrakeDecelleration = 3.170000f;
+    m_OriginalHandlingData [99].fBrakeDeceleration = 3.170000f;
     m_OriginalHandlingData [99].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [99].bABS = false;
     m_OriginalHandlingData [99].fSteeringLock = 30.000000f;
@@ -4222,10 +3992,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [100].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [100].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [100].Transmission.uiHandlingFlags = 2;
-    m_OriginalHandlingData [100].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [100].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [100].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [100].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [100].fBrakeDecelleration = 5.400000f;
+    m_OriginalHandlingData [100].fBrakeDeceleration = 5.400000f;
     m_OriginalHandlingData [100].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [100].bABS = false;
     m_OriginalHandlingData [100].fSteeringLock = 30.000000f;
@@ -4258,10 +4028,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [101].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [101].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [101].Transmission.uiHandlingFlags = 2113536;
-    m_OriginalHandlingData [101].Transmission.fEngineAccelleration = 12.000000f;
+    m_OriginalHandlingData [101].Transmission.fEngineAcceleration = 12.000000f;
     m_OriginalHandlingData [101].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [101].Transmission.fMaxVelocity = 230.000000f;
-    m_OriginalHandlingData [101].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [101].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [101].fBrakeBias = 0.580000f;
     m_OriginalHandlingData [101].bABS = false;
     m_OriginalHandlingData [101].fSteeringLock = 30.000000f;
@@ -4294,10 +4064,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [102].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [102].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [102].Transmission.uiHandlingFlags = 268468228;
-    m_OriginalHandlingData [102].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [102].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [102].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [102].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [102].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [102].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [102].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [102].bABS = false;
     m_OriginalHandlingData [102].fSteeringLock = 35.000000f;
@@ -4330,10 +4100,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [103].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [103].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [103].Transmission.uiHandlingFlags = 1064964;
-    m_OriginalHandlingData [103].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [103].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [103].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [103].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [103].fBrakeDecelleration = 8.500000f;
+    m_OriginalHandlingData [103].fBrakeDeceleration = 8.500000f;
     m_OriginalHandlingData [103].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [103].bABS = false;
     m_OriginalHandlingData [103].fSteeringLock = 35.000000f;
@@ -4366,10 +4136,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [104].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [104].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [104].Transmission.uiHandlingFlags = 7340032;
-    m_OriginalHandlingData [104].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [104].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [104].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [104].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [104].fBrakeDecelleration = 6.200000f;
+    m_OriginalHandlingData [104].fBrakeDeceleration = 6.200000f;
     m_OriginalHandlingData [104].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [104].bABS = false;
     m_OriginalHandlingData [104].fSteeringLock = 35.000000f;
@@ -4402,10 +4172,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [105].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [105].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [105].Transmission.uiHandlingFlags = 8388608;
-    m_OriginalHandlingData [105].Transmission.fEngineAccelleration = 8.800000f;
+    m_OriginalHandlingData [105].Transmission.fEngineAcceleration = 8.800000f;
     m_OriginalHandlingData [105].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [105].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [105].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [105].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [105].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [105].bABS = false;
     m_OriginalHandlingData [105].fSteeringLock = 30.000000f;
@@ -4438,10 +4208,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [106].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [106].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [106].Transmission.uiHandlingFlags = 2;
-    m_OriginalHandlingData [106].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [106].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [106].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [106].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [106].fBrakeDecelleration = 5.400000f;
+    m_OriginalHandlingData [106].fBrakeDeceleration = 5.400000f;
     m_OriginalHandlingData [106].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [106].bABS = false;
     m_OriginalHandlingData [106].fSteeringLock = 30.000000f;
@@ -4474,10 +4244,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [107].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [107].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [107].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [107].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [107].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [107].Transmission.fEngineInertia = 7.000000f;
     m_OriginalHandlingData [107].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [107].fBrakeDecelleration = 5.400000f;
+    m_OriginalHandlingData [107].fBrakeDeceleration = 5.400000f;
     m_OriginalHandlingData [107].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [107].bABS = false;
     m_OriginalHandlingData [107].fSteeringLock = 30.000000f;
@@ -4510,10 +4280,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [108].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [108].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [108].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [108].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [108].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [108].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [108].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [108].fBrakeDecelleration = 8.170000f;
+    m_OriginalHandlingData [108].fBrakeDeceleration = 8.170000f;
     m_OriginalHandlingData [108].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [108].bABS = false;
     m_OriginalHandlingData [108].fSteeringLock = 35.000000f;
@@ -4546,10 +4316,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [109].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [109].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [109].Transmission.uiHandlingFlags = 1;
-    m_OriginalHandlingData [109].Transmission.fEngineAccelleration = 6.800000f;
+    m_OriginalHandlingData [109].Transmission.fEngineAcceleration = 6.800000f;
     m_OriginalHandlingData [109].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [109].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [109].fBrakeDecelleration = 5.400000f;
+    m_OriginalHandlingData [109].fBrakeDeceleration = 5.400000f;
     m_OriginalHandlingData [109].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [109].bABS = false;
     m_OriginalHandlingData [109].fSteeringLock = 30.000000f;
@@ -4582,10 +4352,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [110].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [110].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [110].Transmission.uiHandlingFlags = 4194305;
-    m_OriginalHandlingData [110].Transmission.fEngineAccelleration = 8.800000f;
+    m_OriginalHandlingData [110].Transmission.fEngineAcceleration = 8.800000f;
     m_OriginalHandlingData [110].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [110].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [110].fBrakeDecelleration = 9.000000f;
+    m_OriginalHandlingData [110].fBrakeDeceleration = 9.000000f;
     m_OriginalHandlingData [110].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [110].bABS = false;
     m_OriginalHandlingData [110].fSteeringLock = 30.000000f;
@@ -4618,10 +4388,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [111].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [111].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [111].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [111].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [111].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [111].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [111].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [111].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [111].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [111].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [111].bABS = false;
     m_OriginalHandlingData [111].fSteeringLock = 30.000000f;
@@ -4654,10 +4424,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [112].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [112].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [112].Transmission.uiHandlingFlags = 5260288;
-    m_OriginalHandlingData [112].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [112].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [112].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [112].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [112].fBrakeDecelleration = 8.500000f;
+    m_OriginalHandlingData [112].fBrakeDeceleration = 8.500000f;
     m_OriginalHandlingData [112].fBrakeBias = 0.300000f;
     m_OriginalHandlingData [112].bABS = false;
     m_OriginalHandlingData [112].fSteeringLock = 30.000000f;
@@ -4690,10 +4460,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [113].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [113].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [113].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [113].Transmission.fEngineAccelleration = 12.000000f;
+    m_OriginalHandlingData [113].Transmission.fEngineAcceleration = 12.000000f;
     m_OriginalHandlingData [113].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [113].Transmission.fMaxVelocity = 180.000000f;
-    m_OriginalHandlingData [113].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [113].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [113].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [113].bABS = false;
     m_OriginalHandlingData [113].fSteeringLock = 30.000000f;
@@ -4726,10 +4496,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [114].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [114].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [114].Transmission.uiHandlingFlags = 19923013;
-    m_OriginalHandlingData [114].Transmission.fEngineAccelleration = 18.000000f;
+    m_OriginalHandlingData [114].Transmission.fEngineAcceleration = 18.000000f;
     m_OriginalHandlingData [114].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [114].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [114].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [114].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [114].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [114].bABS = false;
     m_OriginalHandlingData [114].fSteeringLock = 35.000000f;
@@ -4762,10 +4532,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [115].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [115].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [115].Transmission.uiHandlingFlags = 19923013;
-    m_OriginalHandlingData [115].Transmission.fEngineAccelleration = 18.000000f;
+    m_OriginalHandlingData [115].Transmission.fEngineAcceleration = 18.000000f;
     m_OriginalHandlingData [115].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [115].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [115].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [115].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [115].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [115].bABS = false;
     m_OriginalHandlingData [115].fSteeringLock = 35.000000f;
@@ -4798,10 +4568,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [116].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [116].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [116].Transmission.uiHandlingFlags = 67108865;
-    m_OriginalHandlingData [116].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [116].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [116].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [116].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [116].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [116].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [116].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [116].bABS = false;
     m_OriginalHandlingData [116].fSteeringLock = 30.000000f;
@@ -4834,10 +4604,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [117].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [117].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [117].Transmission.uiHandlingFlags = 67108864;
-    m_OriginalHandlingData [117].Transmission.fEngineAccelleration = 11.200000f;
+    m_OriginalHandlingData [117].Transmission.fEngineAcceleration = 11.200000f;
     m_OriginalHandlingData [117].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [117].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [117].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [117].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [117].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [117].bABS = false;
     m_OriginalHandlingData [117].fSteeringLock = 30.000000f;
@@ -4870,10 +4640,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [118].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [118].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [118].Transmission.uiHandlingFlags = 67108866;
-    m_OriginalHandlingData [118].Transmission.fEngineAccelleration = 11.200000f;
+    m_OriginalHandlingData [118].Transmission.fEngineAcceleration = 11.200000f;
     m_OriginalHandlingData [118].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [118].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [118].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [118].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [118].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [118].bABS = false;
     m_OriginalHandlingData [118].fSteeringLock = 30.000000f;
@@ -4906,10 +4676,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [119].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [119].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [119].Transmission.uiHandlingFlags = 67108864;
-    m_OriginalHandlingData [119].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [119].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [119].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [119].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [119].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [119].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [119].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [119].bABS = false;
     m_OriginalHandlingData [119].fSteeringLock = 30.000000f;
@@ -4942,10 +4712,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [120].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [120].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [120].Transmission.uiHandlingFlags = 67108865;
-    m_OriginalHandlingData [120].Transmission.fEngineAccelleration = 11.200000f;
+    m_OriginalHandlingData [120].Transmission.fEngineAcceleration = 11.200000f;
     m_OriginalHandlingData [120].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [120].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [120].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [120].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [120].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [120].bABS = false;
     m_OriginalHandlingData [120].fSteeringLock = 35.000000f;
@@ -4978,10 +4748,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [121].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [121].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [121].Transmission.uiHandlingFlags = 64;
-    m_OriginalHandlingData [121].Transmission.fEngineAccelleration = 14.000000f;
+    m_OriginalHandlingData [121].Transmission.fEngineAcceleration = 14.000000f;
     m_OriginalHandlingData [121].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [121].Transmission.fMaxVelocity = 75.000000f;
-    m_OriginalHandlingData [121].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [121].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [121].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [121].bABS = false;
     m_OriginalHandlingData [121].fSteeringLock = 45.000000f;
@@ -5014,10 +4784,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [122].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [122].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [122].Transmission.uiHandlingFlags = 67108865;
-    m_OriginalHandlingData [122].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [122].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [122].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [122].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [122].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [122].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [122].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [122].bABS = false;
     m_OriginalHandlingData [122].fSteeringLock = 30.000000f;
@@ -5050,10 +4820,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [123].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [123].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [123].Transmission.uiHandlingFlags = 302055424;
-    m_OriginalHandlingData [123].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [123].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [123].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [123].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [123].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [123].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [123].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [123].bABS = false;
     m_OriginalHandlingData [123].fSteeringLock = 35.000000f;
@@ -5086,10 +4856,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [124].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [124].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [124].Transmission.uiHandlingFlags = 33619968;
-    m_OriginalHandlingData [124].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [124].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [124].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [124].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [124].fBrakeDecelleration = 8.170000f;
+    m_OriginalHandlingData [124].fBrakeDeceleration = 8.170000f;
     m_OriginalHandlingData [124].fBrakeBias = 0.520000f;
     m_OriginalHandlingData [124].bABS = false;
     m_OriginalHandlingData [124].fSteeringLock = 35.000000f;
@@ -5122,10 +4892,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [125].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [125].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [125].Transmission.uiHandlingFlags = 3179520;
-    m_OriginalHandlingData [125].Transmission.fEngineAccelleration = 14.000000f;
+    m_OriginalHandlingData [125].Transmission.fEngineAcceleration = 14.000000f;
     m_OriginalHandlingData [125].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [125].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [125].fBrakeDecelleration = 6.100000f;
+    m_OriginalHandlingData [125].fBrakeDeceleration = 6.100000f;
     m_OriginalHandlingData [125].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [125].bABS = false;
     m_OriginalHandlingData [125].fSteeringLock = 35.000000f;
@@ -5158,10 +4928,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [126].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [126].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [126].Transmission.uiHandlingFlags = 512;
-    m_OriginalHandlingData [126].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [126].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [126].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [126].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [126].fBrakeDecelleration = 3.170000f;
+    m_OriginalHandlingData [126].fBrakeDeceleration = 3.170000f;
     m_OriginalHandlingData [126].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [126].bABS = false;
     m_OriginalHandlingData [126].fSteeringLock = 30.000000f;
@@ -5194,10 +4964,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [127].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [127].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [127].Transmission.uiHandlingFlags = 512;
-    m_OriginalHandlingData [127].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [127].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [127].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [127].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [127].fBrakeDecelleration = 3.170000f;
+    m_OriginalHandlingData [127].fBrakeDeceleration = 3.170000f;
     m_OriginalHandlingData [127].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [127].bABS = false;
     m_OriginalHandlingData [127].fSteeringLock = 30.000000f;
@@ -5230,10 +5000,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [128].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [128].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [128].Transmission.uiHandlingFlags = 3179009;
-    m_OriginalHandlingData [128].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [128].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [128].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [128].Transmission.fMaxVelocity = 90.000000f;
-    m_OriginalHandlingData [128].fBrakeDecelleration = 15.000000f;
+    m_OriginalHandlingData [128].fBrakeDeceleration = 15.000000f;
     m_OriginalHandlingData [128].fBrakeBias = 0.200000f;
     m_OriginalHandlingData [128].bABS = false;
     m_OriginalHandlingData [128].fSteeringLock = 35.000000f;
@@ -5266,10 +5036,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [129].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [129].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [129].Transmission.uiHandlingFlags = 19955713;
-    m_OriginalHandlingData [129].Transmission.fEngineAccelleration = 4.800000f;
+    m_OriginalHandlingData [129].Transmission.fEngineAcceleration = 4.800000f;
     m_OriginalHandlingData [129].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [129].Transmission.fMaxVelocity = 60.000000f;
-    m_OriginalHandlingData [129].fBrakeDecelleration = 6.100000f;
+    m_OriginalHandlingData [129].fBrakeDeceleration = 6.100000f;
     m_OriginalHandlingData [129].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [129].bABS = false;
     m_OriginalHandlingData [129].fSteeringLock = 35.000000f;
@@ -5302,10 +5072,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [130].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [130].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [130].Transmission.uiHandlingFlags = 19922949;
-    m_OriginalHandlingData [130].Transmission.fEngineAccelleration = 14.000000f;
+    m_OriginalHandlingData [130].Transmission.fEngineAcceleration = 14.000000f;
     m_OriginalHandlingData [130].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [130].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [130].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [130].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [130].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [130].bABS = false;
     m_OriginalHandlingData [130].fSteeringLock = 35.000000f;
@@ -5338,10 +5108,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [131].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [131].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [131].Transmission.uiHandlingFlags = 19956225;
-    m_OriginalHandlingData [131].Transmission.fEngineAccelleration = 4.800000f;
+    m_OriginalHandlingData [131].Transmission.fEngineAcceleration = 4.800000f;
     m_OriginalHandlingData [131].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [131].Transmission.fMaxVelocity = 60.000000f;
-    m_OriginalHandlingData [131].fBrakeDecelleration = 6.100000f;
+    m_OriginalHandlingData [131].fBrakeDeceleration = 6.100000f;
     m_OriginalHandlingData [131].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [131].bABS = false;
     m_OriginalHandlingData [131].fSteeringLock = 35.000000f;
@@ -5374,10 +5144,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [132].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [132].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [132].Transmission.uiHandlingFlags = 33628416;
-    m_OriginalHandlingData [132].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [132].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [132].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [132].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [132].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [132].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [132].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [132].bABS = false;
     m_OriginalHandlingData [132].fSteeringLock = 25.000000f;
@@ -5410,10 +5180,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [133].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [133].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [133].Transmission.uiHandlingFlags = 33619968;
-    m_OriginalHandlingData [133].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [133].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [133].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [133].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [133].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [133].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [133].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [133].bABS = false;
     m_OriginalHandlingData [133].fSteeringLock = 35.000000f;
@@ -5446,10 +5216,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [134].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [134].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [134].Transmission.uiHandlingFlags = 512;
-    m_OriginalHandlingData [134].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [134].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [134].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [134].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [134].fBrakeDecelleration = 3.500000f;
+    m_OriginalHandlingData [134].fBrakeDeceleration = 3.500000f;
     m_OriginalHandlingData [134].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [134].bABS = false;
     m_OriginalHandlingData [134].fSteeringLock = 30.000000f;
@@ -5482,10 +5252,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [135].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [135].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [135].Transmission.uiHandlingFlags = 17412;
-    m_OriginalHandlingData [135].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [135].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [135].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [135].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [135].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [135].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [135].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [135].bABS = false;
     m_OriginalHandlingData [135].fSteeringLock = 35.000000f;
@@ -5518,10 +5288,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [136].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [136].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [136].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [136].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [136].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [136].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [136].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [136].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [136].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [136].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [136].bABS = false;
     m_OriginalHandlingData [136].fSteeringLock = 30.000000f;
@@ -5554,10 +5324,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [137].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [137].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [137].Transmission.uiHandlingFlags = 2;
-    m_OriginalHandlingData [137].Transmission.fEngineAccelleration = 6.000000f;
+    m_OriginalHandlingData [137].Transmission.fEngineAcceleration = 6.000000f;
     m_OriginalHandlingData [137].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [137].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [137].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [137].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [137].fBrakeBias = 0.800000f;
     m_OriginalHandlingData [137].bABS = false;
     m_OriginalHandlingData [137].fSteeringLock = 30.000000f;
@@ -5590,10 +5360,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [138].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [138].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [138].Transmission.uiHandlingFlags = 3179008;
-    m_OriginalHandlingData [138].Transmission.fEngineAccelleration = 6.000000f;
+    m_OriginalHandlingData [138].Transmission.fEngineAcceleration = 6.000000f;
     m_OriginalHandlingData [138].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [138].Transmission.fMaxVelocity = 170.000000f;
-    m_OriginalHandlingData [138].fBrakeDecelleration = 6.100000f;
+    m_OriginalHandlingData [138].fBrakeDeceleration = 6.100000f;
     m_OriginalHandlingData [138].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [138].bABS = false;
     m_OriginalHandlingData [138].fSteeringLock = 35.000000f;
@@ -5626,10 +5396,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [139].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [139].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [139].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [139].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [139].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [139].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [139].Transmission.fMaxVelocity = 120.000000f;
-    m_OriginalHandlingData [139].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [139].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [139].fBrakeBias = 0.300000f;
     m_OriginalHandlingData [139].bABS = false;
     m_OriginalHandlingData [139].fSteeringLock = 25.000000f;
@@ -5662,10 +5432,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [140].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [140].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [140].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [140].Transmission.fEngineAccelleration = 8.400000f;
+    m_OriginalHandlingData [140].Transmission.fEngineAcceleration = 8.400000f;
     m_OriginalHandlingData [140].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [140].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [140].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [140].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [140].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [140].bABS = false;
     m_OriginalHandlingData [140].fSteeringLock = 30.000000f;
@@ -5698,10 +5468,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [141].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [141].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [141].Transmission.uiHandlingFlags = 512;
-    m_OriginalHandlingData [141].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [141].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [141].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [141].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [141].fBrakeDecelleration = 3.170000f;
+    m_OriginalHandlingData [141].fBrakeDeceleration = 3.170000f;
     m_OriginalHandlingData [141].fBrakeBias = 0.400000f;
     m_OriginalHandlingData [141].bABS = false;
     m_OriginalHandlingData [141].fSteeringLock = 30.000000f;
@@ -5734,10 +5504,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [142].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [142].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [142].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [142].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [142].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [142].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [142].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [142].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [142].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [142].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [142].bABS = false;
     m_OriginalHandlingData [142].fSteeringLock = 30.000000f;
@@ -5770,10 +5540,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [143].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [143].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [143].Transmission.uiHandlingFlags = 513;
-    m_OriginalHandlingData [143].Transmission.fEngineAccelleration = 5.600000f;
+    m_OriginalHandlingData [143].Transmission.fEngineAcceleration = 5.600000f;
     m_OriginalHandlingData [143].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [143].Transmission.fMaxVelocity = 140.000000f;
-    m_OriginalHandlingData [143].fBrakeDecelleration = 4.500000f;
+    m_OriginalHandlingData [143].fBrakeDeceleration = 4.500000f;
     m_OriginalHandlingData [143].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [143].bABS = false;
     m_OriginalHandlingData [143].fSteeringLock = 30.000000f;
@@ -5806,10 +5576,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [144].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [144].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [144].Transmission.uiHandlingFlags = 12582912;
-    m_OriginalHandlingData [144].Transmission.fEngineAccelleration = 12.000000f;
+    m_OriginalHandlingData [144].Transmission.fEngineAcceleration = 12.000000f;
     m_OriginalHandlingData [144].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [144].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [144].fBrakeDecelleration = 11.000000f;
+    m_OriginalHandlingData [144].fBrakeDeceleration = 11.000000f;
     m_OriginalHandlingData [144].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [144].bABS = false;
     m_OriginalHandlingData [144].fSteeringLock = 30.000000f;
@@ -5842,10 +5612,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [145].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [145].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [145].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [145].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [145].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [145].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [145].Transmission.fMaxVelocity = 120.000000f;
-    m_OriginalHandlingData [145].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [145].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [145].fBrakeBias = 0.300000f;
     m_OriginalHandlingData [145].bABS = false;
     m_OriginalHandlingData [145].fSteeringLock = 25.000000f;
@@ -5878,10 +5648,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [146].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [146].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [146].Transmission.uiHandlingFlags = 16777216;
-    m_OriginalHandlingData [146].Transmission.fEngineAccelleration = 20.000000f;
+    m_OriginalHandlingData [146].Transmission.fEngineAcceleration = 20.000000f;
     m_OriginalHandlingData [146].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [146].Transmission.fMaxVelocity = 60.000000f;
-    m_OriginalHandlingData [146].fBrakeDecelleration = 5.500000f;
+    m_OriginalHandlingData [146].fBrakeDeceleration = 5.500000f;
     m_OriginalHandlingData [146].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [146].bABS = false;
     m_OriginalHandlingData [146].fSteeringLock = 25.000000f;
@@ -5914,10 +5684,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [147].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [147].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [147].Transmission.uiHandlingFlags = 270532616;
-    m_OriginalHandlingData [147].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [147].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [147].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [147].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [147].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [147].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [147].fBrakeBias = 0.530000f;
     m_OriginalHandlingData [147].bABS = false;
     m_OriginalHandlingData [147].fSteeringLock = 35.000000f;
@@ -5950,10 +5720,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [148].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [148].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [148].Transmission.uiHandlingFlags = 270532616;
-    m_OriginalHandlingData [148].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [148].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [148].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [148].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [148].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [148].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [148].fBrakeBias = 0.530000f;
     m_OriginalHandlingData [148].bABS = false;
     m_OriginalHandlingData [148].fSteeringLock = 35.000000f;
@@ -5986,10 +5756,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [149].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [149].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [149].Transmission.uiHandlingFlags = 270532616;
-    m_OriginalHandlingData [149].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [149].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [149].Transmission.fEngineInertia = 10.000000f;
     m_OriginalHandlingData [149].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [149].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [149].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [149].fBrakeBias = 0.530000f;
     m_OriginalHandlingData [149].bABS = false;
     m_OriginalHandlingData [149].fSteeringLock = 35.000000f;
@@ -6022,10 +5792,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [150].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [150].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [150].Transmission.uiHandlingFlags = 3180544;
-    m_OriginalHandlingData [150].Transmission.fEngineAccelleration = 12.000000f;
+    m_OriginalHandlingData [150].Transmission.fEngineAcceleration = 12.000000f;
     m_OriginalHandlingData [150].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [150].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [150].fBrakeDecelleration = 6.200000f;
+    m_OriginalHandlingData [150].fBrakeDeceleration = 6.200000f;
     m_OriginalHandlingData [150].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [150].bABS = false;
     m_OriginalHandlingData [150].fSteeringLock = 35.000000f;
@@ -6058,10 +5828,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [151].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [151].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [151].Transmission.uiHandlingFlags = 1064964;
-    m_OriginalHandlingData [151].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [151].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [151].Transmission.fEngineInertia = 20.000000f;
     m_OriginalHandlingData [151].Transmission.fMaxVelocity = 165.000000f;
-    m_OriginalHandlingData [151].fBrakeDecelleration = 8.500000f;
+    m_OriginalHandlingData [151].fBrakeDeceleration = 8.500000f;
     m_OriginalHandlingData [151].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [151].bABS = false;
     m_OriginalHandlingData [151].fSteeringLock = 35.000000f;
@@ -6094,10 +5864,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [152].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [152].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [152].Transmission.uiHandlingFlags = 16777216;
-    m_OriginalHandlingData [152].Transmission.fEngineAccelleration = 9.600000f;
+    m_OriginalHandlingData [152].Transmission.fEngineAcceleration = 9.600000f;
     m_OriginalHandlingData [152].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [152].Transmission.fMaxVelocity = 110.000000f;
-    m_OriginalHandlingData [152].fBrakeDecelleration = 6.400000f;
+    m_OriginalHandlingData [152].fBrakeDeceleration = 6.400000f;
     m_OriginalHandlingData [152].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [152].bABS = false;
     m_OriginalHandlingData [152].fSteeringLock = 27.000000f;
@@ -6130,10 +5900,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [153].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [153].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [153].Transmission.uiHandlingFlags = 2097152;
-    m_OriginalHandlingData [153].Transmission.fEngineAccelleration = 9.200000f;
+    m_OriginalHandlingData [153].Transmission.fEngineAcceleration = 9.200000f;
     m_OriginalHandlingData [153].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [153].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [153].fBrakeDecelleration = 7.000000f;
+    m_OriginalHandlingData [153].fBrakeDeceleration = 7.000000f;
     m_OriginalHandlingData [153].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [153].bABS = false;
     m_OriginalHandlingData [153].fSteeringLock = 30.000000f;
@@ -6166,10 +5936,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [154].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [154].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [154].Transmission.uiHandlingFlags = 2097152;
-    m_OriginalHandlingData [154].Transmission.fEngineAccelleration = 10.400000f;
+    m_OriginalHandlingData [154].Transmission.fEngineAcceleration = 10.400000f;
     m_OriginalHandlingData [154].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [154].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [154].fBrakeDecelleration = 6.000000f;
+    m_OriginalHandlingData [154].fBrakeDeceleration = 6.000000f;
     m_OriginalHandlingData [154].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [154].bABS = false;
     m_OriginalHandlingData [154].fSteeringLock = 30.000000f;
@@ -6202,10 +5972,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [155].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [155].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [155].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [155].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [155].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [155].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [155].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [155].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [155].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [155].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [155].bABS = false;
     m_OriginalHandlingData [155].fSteeringLock = 30.000000f;
@@ -6238,10 +6008,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [156].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [156].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [156].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [156].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [156].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [156].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [156].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [156].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [156].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [156].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [156].bABS = false;
     m_OriginalHandlingData [156].fSteeringLock = 30.000000f;
@@ -6274,10 +6044,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [157].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [157].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [157].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [157].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [157].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [157].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [157].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [157].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [157].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [157].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [157].bABS = false;
     m_OriginalHandlingData [157].fSteeringLock = 30.000000f;
@@ -6310,10 +6080,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [158].Transmission.ucEngineType = 'D';
     m_OriginalHandlingData [158].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [158].Transmission.uiHandlingFlags = 513;
-    m_OriginalHandlingData [158].Transmission.fEngineAccelleration = 5.600000f;
+    m_OriginalHandlingData [158].Transmission.fEngineAcceleration = 5.600000f;
     m_OriginalHandlingData [158].Transmission.fEngineInertia = 25.000000f;
     m_OriginalHandlingData [158].Transmission.fMaxVelocity = 140.000000f;
-    m_OriginalHandlingData [158].fBrakeDecelleration = 4.500000f;
+    m_OriginalHandlingData [158].fBrakeDeceleration = 4.500000f;
     m_OriginalHandlingData [158].fBrakeBias = 0.600000f;
     m_OriginalHandlingData [158].bABS = false;
     m_OriginalHandlingData [158].fSteeringLock = 30.000000f;
@@ -6346,10 +6116,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [159].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [159].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [159].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [159].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [159].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [159].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [159].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [159].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [159].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [159].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [159].bABS = false;
     m_OriginalHandlingData [159].fSteeringLock = 30.000000f;
@@ -6382,10 +6152,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [160].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [160].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [160].Transmission.uiHandlingFlags = 4;
-    m_OriginalHandlingData [160].Transmission.fEngineAccelleration = 8.000000f;
+    m_OriginalHandlingData [160].Transmission.fEngineAcceleration = 8.000000f;
     m_OriginalHandlingData [160].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [160].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [160].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [160].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [160].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [160].bABS = false;
     m_OriginalHandlingData [160].fSteeringLock = 30.000000f;
@@ -6418,10 +6188,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [161].Transmission.ucEngineType = 'E';
     m_OriginalHandlingData [161].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [161].Transmission.uiHandlingFlags = 34820;
-    m_OriginalHandlingData [161].Transmission.fEngineAccelleration = 6.000000f;
+    m_OriginalHandlingData [161].Transmission.fEngineAcceleration = 6.000000f;
     m_OriginalHandlingData [161].Transmission.fEngineInertia = 30.000000f;
     m_OriginalHandlingData [161].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [161].fBrakeDecelleration = 13.000000f;
+    m_OriginalHandlingData [161].fBrakeDeceleration = 13.000000f;
     m_OriginalHandlingData [161].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [161].bABS = false;
     m_OriginalHandlingData [161].fSteeringLock = 30.000000f;
@@ -6454,10 +6224,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [162].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [162].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [162].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [162].Transmission.fEngineAccelleration = 20.000000f;
+    m_OriginalHandlingData [162].Transmission.fEngineAcceleration = 20.000000f;
     m_OriginalHandlingData [162].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [162].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [162].fBrakeDecelleration = 15.000000f;
+    m_OriginalHandlingData [162].fBrakeDeceleration = 15.000000f;
     m_OriginalHandlingData [162].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [162].bABS = false;
     m_OriginalHandlingData [162].fSteeringLock = 35.000000f;
@@ -6490,10 +6260,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [163].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [163].Transmission.ucNumberOfGears = 3;
     m_OriginalHandlingData [163].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [163].Transmission.fEngineAccelleration = 12.000000f;
+    m_OriginalHandlingData [163].Transmission.fEngineAcceleration = 12.000000f;
     m_OriginalHandlingData [163].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [163].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [163].fBrakeDecelleration = 14.000000f;
+    m_OriginalHandlingData [163].fBrakeDeceleration = 14.000000f;
     m_OriginalHandlingData [163].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [163].bABS = false;
     m_OriginalHandlingData [163].fSteeringLock = 35.000000f;
@@ -6526,10 +6296,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [164].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [164].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [164].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [164].Transmission.fEngineAccelleration = 20.000000f;
+    m_OriginalHandlingData [164].Transmission.fEngineAcceleration = 20.000000f;
     m_OriginalHandlingData [164].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [164].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [164].fBrakeDecelleration = 14.000000f;
+    m_OriginalHandlingData [164].fBrakeDeceleration = 14.000000f;
     m_OriginalHandlingData [164].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [164].bABS = false;
     m_OriginalHandlingData [164].fSteeringLock = 35.000000f;
@@ -6562,10 +6332,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [165].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [165].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [165].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [165].Transmission.fEngineAccelleration = 20.000000f;
+    m_OriginalHandlingData [165].Transmission.fEngineAcceleration = 20.000000f;
     m_OriginalHandlingData [165].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [165].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [165].fBrakeDecelleration = 15.000000f;
+    m_OriginalHandlingData [165].fBrakeDeceleration = 15.000000f;
     m_OriginalHandlingData [165].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [165].bABS = false;
     m_OriginalHandlingData [165].fSteeringLock = 35.000000f;
@@ -6598,10 +6368,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [166].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [166].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [166].Transmission.uiHandlingFlags = 2;
-    m_OriginalHandlingData [166].Transmission.fEngineAccelleration = 24.000000f;
+    m_OriginalHandlingData [166].Transmission.fEngineAcceleration = 24.000000f;
     m_OriginalHandlingData [166].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [166].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [166].fBrakeDecelleration = 15.000000f;
+    m_OriginalHandlingData [166].fBrakeDeceleration = 15.000000f;
     m_OriginalHandlingData [166].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [166].bABS = false;
     m_OriginalHandlingData [166].fSteeringLock = 35.000000f;
@@ -6634,10 +6404,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [167].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [167].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [167].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [167].Transmission.fEngineAccelleration = 20.000000f;
+    m_OriginalHandlingData [167].Transmission.fEngineAcceleration = 20.000000f;
     m_OriginalHandlingData [167].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [167].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [167].fBrakeDecelleration = 15.000000f;
+    m_OriginalHandlingData [167].fBrakeDeceleration = 15.000000f;
     m_OriginalHandlingData [167].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [167].bABS = false;
     m_OriginalHandlingData [167].fSteeringLock = 35.000000f;
@@ -6670,10 +6440,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [168].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [168].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [168].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [168].Transmission.fEngineAccelleration = 20.000000f;
+    m_OriginalHandlingData [168].Transmission.fEngineAcceleration = 20.000000f;
     m_OriginalHandlingData [168].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [168].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [168].fBrakeDecelleration = 15.000000f;
+    m_OriginalHandlingData [168].fBrakeDeceleration = 15.000000f;
     m_OriginalHandlingData [168].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [168].bABS = false;
     m_OriginalHandlingData [168].fSteeringLock = 35.000000f;
@@ -6706,10 +6476,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [169].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [169].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [169].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [169].Transmission.fEngineAccelleration = 16.000000f;
+    m_OriginalHandlingData [169].Transmission.fEngineAcceleration = 16.000000f;
     m_OriginalHandlingData [169].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [169].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [169].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [169].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [169].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [169].bABS = false;
     m_OriginalHandlingData [169].fSteeringLock = 35.000000f;
@@ -6742,10 +6512,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [170].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [170].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [170].Transmission.uiHandlingFlags = 517;
-    m_OriginalHandlingData [170].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [170].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [170].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [170].Transmission.fMaxVelocity = 160.000000f;
-    m_OriginalHandlingData [170].fBrakeDecelleration = 8.000000f;
+    m_OriginalHandlingData [170].fBrakeDeceleration = 8.000000f;
     m_OriginalHandlingData [170].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [170].bABS = false;
     m_OriginalHandlingData [170].fSteeringLock = 35.000000f;
@@ -6778,10 +6548,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [171].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [171].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [171].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [171].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [171].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [171].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [171].Transmission.fMaxVelocity = 120.000000f;
-    m_OriginalHandlingData [171].fBrakeDecelleration = 19.000000f;
+    m_OriginalHandlingData [171].fBrakeDeceleration = 19.000000f;
     m_OriginalHandlingData [171].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [171].bABS = false;
     m_OriginalHandlingData [171].fSteeringLock = 35.000000f;
@@ -6814,10 +6584,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [172].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [172].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [172].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [172].Transmission.fEngineAccelleration = 7.200000f;
+    m_OriginalHandlingData [172].Transmission.fEngineAcceleration = 7.200000f;
     m_OriginalHandlingData [172].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [172].Transmission.fMaxVelocity = 120.000000f;
-    m_OriginalHandlingData [172].fBrakeDecelleration = 19.000000f;
+    m_OriginalHandlingData [172].fBrakeDeceleration = 19.000000f;
     m_OriginalHandlingData [172].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [172].bABS = false;
     m_OriginalHandlingData [172].fSteeringLock = 35.000000f;
@@ -6850,10 +6620,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [173].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [173].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [173].Transmission.uiHandlingFlags = 2;
-    m_OriginalHandlingData [173].Transmission.fEngineAccelleration = 10.000000f;
+    m_OriginalHandlingData [173].Transmission.fEngineAcceleration = 10.000000f;
     m_OriginalHandlingData [173].Transmission.fEngineInertia = 15.000000f;
     m_OriginalHandlingData [173].Transmission.fMaxVelocity = 140.000000f;
-    m_OriginalHandlingData [173].fBrakeDecelleration = 19.000000f;
+    m_OriginalHandlingData [173].fBrakeDeceleration = 19.000000f;
     m_OriginalHandlingData [173].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [173].bABS = false;
     m_OriginalHandlingData [173].fSteeringLock = 35.000000f;
@@ -6886,10 +6656,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [174].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [174].Transmission.ucNumberOfGears = 4;
     m_OriginalHandlingData [174].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [174].Transmission.fEngineAccelleration = 16.000000f;
+    m_OriginalHandlingData [174].Transmission.fEngineAcceleration = 16.000000f;
     m_OriginalHandlingData [174].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [174].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [174].fBrakeDecelleration = 10.000000f;
+    m_OriginalHandlingData [174].fBrakeDeceleration = 10.000000f;
     m_OriginalHandlingData [174].fBrakeBias = 0.550000f;
     m_OriginalHandlingData [174].bABS = false;
     m_OriginalHandlingData [174].fSteeringLock = 35.000000f;
@@ -6922,10 +6692,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [175].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [175].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [175].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [175].Transmission.fEngineAccelleration = 0.680000f;
+    m_OriginalHandlingData [175].Transmission.fEngineAcceleration = 0.680000f;
     m_OriginalHandlingData [175].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [175].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [175].fBrakeDecelleration = 0.050000f;
+    m_OriginalHandlingData [175].fBrakeDeceleration = 0.050000f;
     m_OriginalHandlingData [175].fBrakeBias = 0.010000f;
     m_OriginalHandlingData [175].bABS = false;
     m_OriginalHandlingData [175].fSteeringLock = 24.000000f;
@@ -6958,10 +6728,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [176].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [176].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [176].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [176].Transmission.fEngineAccelleration = 1.000000f;
+    m_OriginalHandlingData [176].Transmission.fEngineAcceleration = 1.000000f;
     m_OriginalHandlingData [176].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [176].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [176].fBrakeDecelleration = 0.040000f;
+    m_OriginalHandlingData [176].fBrakeDeceleration = 0.040000f;
     m_OriginalHandlingData [176].fBrakeBias = 0.010000f;
     m_OriginalHandlingData [176].bABS = false;
     m_OriginalHandlingData [176].fSteeringLock = 20.000000f;
@@ -6994,10 +6764,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [177].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [177].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [177].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [177].Transmission.fEngineAccelleration = 0.280000f;
+    m_OriginalHandlingData [177].Transmission.fEngineAcceleration = 0.280000f;
     m_OriginalHandlingData [177].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [177].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [177].fBrakeDecelleration = 0.020000f;
+    m_OriginalHandlingData [177].fBrakeDeceleration = 0.020000f;
     m_OriginalHandlingData [177].fBrakeBias = 0.020000f;
     m_OriginalHandlingData [177].bABS = false;
     m_OriginalHandlingData [177].fSteeringLock = 25.000000f;
@@ -7030,10 +6800,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [178].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [178].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [178].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [178].Transmission.fEngineAccelleration = 0.200000f;
+    m_OriginalHandlingData [178].Transmission.fEngineAcceleration = 0.200000f;
     m_OriginalHandlingData [178].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [178].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [178].fBrakeDecelleration = 0.020000f;
+    m_OriginalHandlingData [178].fBrakeDeceleration = 0.020000f;
     m_OriginalHandlingData [178].fBrakeBias = 0.000000f;
     m_OriginalHandlingData [178].bABS = false;
     m_OriginalHandlingData [178].fSteeringLock = 20.000000f;
@@ -7066,10 +6836,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [179].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [179].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [179].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [179].Transmission.fEngineAccelleration = 1.200000f;
+    m_OriginalHandlingData [179].Transmission.fEngineAcceleration = 1.200000f;
     m_OriginalHandlingData [179].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [179].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [179].fBrakeDecelleration = 0.020000f;
+    m_OriginalHandlingData [179].fBrakeDeceleration = 0.020000f;
     m_OriginalHandlingData [179].fBrakeBias = 0.000000f;
     m_OriginalHandlingData [179].bABS = false;
     m_OriginalHandlingData [179].fSteeringLock = 24.000000f;
@@ -7102,10 +6872,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [180].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [180].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [180].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [180].Transmission.fEngineAccelleration = 0.560000f;
+    m_OriginalHandlingData [180].Transmission.fEngineAcceleration = 0.560000f;
     m_OriginalHandlingData [180].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [180].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [180].fBrakeDecelleration = 0.050000f;
+    m_OriginalHandlingData [180].fBrakeDeceleration = 0.050000f;
     m_OriginalHandlingData [180].fBrakeBias = 0.010000f;
     m_OriginalHandlingData [180].bABS = false;
     m_OriginalHandlingData [180].fSteeringLock = 24.000000f;
@@ -7138,10 +6908,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [181].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [181].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [181].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [181].Transmission.fEngineAccelleration = 0.640000f;
+    m_OriginalHandlingData [181].Transmission.fEngineAcceleration = 0.640000f;
     m_OriginalHandlingData [181].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [181].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [181].fBrakeDecelleration = 0.050000f;
+    m_OriginalHandlingData [181].fBrakeDeceleration = 0.050000f;
     m_OriginalHandlingData [181].fBrakeBias = 0.010000f;
     m_OriginalHandlingData [181].bABS = false;
     m_OriginalHandlingData [181].fSteeringLock = 24.000000f;
@@ -7174,10 +6944,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [182].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [182].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [182].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [182].Transmission.fEngineAccelleration = 0.480000f;
+    m_OriginalHandlingData [182].Transmission.fEngineAcceleration = 0.480000f;
     m_OriginalHandlingData [182].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [182].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [182].fBrakeDecelleration = 0.070000f;
+    m_OriginalHandlingData [182].fBrakeDeceleration = 0.070000f;
     m_OriginalHandlingData [182].fBrakeBias = 0.010000f;
     m_OriginalHandlingData [182].bABS = false;
     m_OriginalHandlingData [182].fSteeringLock = 30.000000f;
@@ -7210,10 +6980,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [183].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [183].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [183].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [183].Transmission.fEngineAccelleration = 0.200000f;
+    m_OriginalHandlingData [183].Transmission.fEngineAcceleration = 0.200000f;
     m_OriginalHandlingData [183].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [183].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [183].fBrakeDecelleration = 0.040000f;
+    m_OriginalHandlingData [183].fBrakeDeceleration = 0.040000f;
     m_OriginalHandlingData [183].fBrakeBias = 0.030000f;
     m_OriginalHandlingData [183].bABS = false;
     m_OriginalHandlingData [183].fSteeringLock = 38.000000f;
@@ -7246,10 +7016,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [184].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [184].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [184].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [184].Transmission.fEngineAccelleration = 1.200000f;
+    m_OriginalHandlingData [184].Transmission.fEngineAcceleration = 1.200000f;
     m_OriginalHandlingData [184].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [184].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [184].fBrakeDecelleration = 0.020000f;
+    m_OriginalHandlingData [184].fBrakeDeceleration = 0.020000f;
     m_OriginalHandlingData [184].fBrakeBias = 0.000000f;
     m_OriginalHandlingData [184].bABS = false;
     m_OriginalHandlingData [184].fSteeringLock = 24.000000f;
@@ -7282,10 +7052,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [185].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [185].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [185].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [185].Transmission.fEngineAccelleration = 0.600000f;
+    m_OriginalHandlingData [185].Transmission.fEngineAcceleration = 0.600000f;
     m_OriginalHandlingData [185].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [185].Transmission.fMaxVelocity = 190.000000f;
-    m_OriginalHandlingData [185].fBrakeDecelleration = 0.030000f;
+    m_OriginalHandlingData [185].fBrakeDeceleration = 0.030000f;
     m_OriginalHandlingData [185].fBrakeBias = 0.010000f;
     m_OriginalHandlingData [185].bABS = false;
     m_OriginalHandlingData [185].fSteeringLock = 24.000000f;
@@ -7318,10 +7088,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [186].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [186].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [186].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [186].Transmission.fEngineAccelleration = 0.680000f;
+    m_OriginalHandlingData [186].Transmission.fEngineAcceleration = 0.680000f;
     m_OriginalHandlingData [186].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [186].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [186].fBrakeDecelleration = 0.010000f;
+    m_OriginalHandlingData [186].fBrakeDeceleration = 0.010000f;
     m_OriginalHandlingData [186].fBrakeBias = 0.050000f;
     m_OriginalHandlingData [186].bABS = false;
     m_OriginalHandlingData [186].fSteeringLock = 24.000000f;
@@ -7354,10 +7124,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [187].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [187].Transmission.ucNumberOfGears = 5;
     m_OriginalHandlingData [187].Transmission.uiHandlingFlags = 4194368;
-    m_OriginalHandlingData [187].Transmission.fEngineAccelleration = 0.800000f;
+    m_OriginalHandlingData [187].Transmission.fEngineAcceleration = 0.800000f;
     m_OriginalHandlingData [187].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [187].Transmission.fMaxVelocity = 150.000000f;
-    m_OriginalHandlingData [187].fBrakeDecelleration = 1.000000f;
+    m_OriginalHandlingData [187].fBrakeDeceleration = 1.000000f;
     m_OriginalHandlingData [187].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [187].bABS = false;
     m_OriginalHandlingData [187].fSteeringLock = 30.000000f;
@@ -7390,10 +7160,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [188].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [188].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [188].Transmission.uiHandlingFlags = 4194336;
-    m_OriginalHandlingData [188].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [188].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [188].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [188].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [188].fBrakeDecelleration = 1.500000f;
+    m_OriginalHandlingData [188].fBrakeDeceleration = 1.500000f;
     m_OriginalHandlingData [188].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [188].bABS = false;
     m_OriginalHandlingData [188].fSteeringLock = 45.000000f;
@@ -7426,10 +7196,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [189].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [189].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [189].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [189].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [189].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [189].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [189].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [189].fBrakeDecelleration = 1.500000f;
+    m_OriginalHandlingData [189].fBrakeDeceleration = 1.500000f;
     m_OriginalHandlingData [189].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [189].bABS = false;
     m_OriginalHandlingData [189].fSteeringLock = 45.000000f;
@@ -7462,10 +7232,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [190].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [190].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [190].Transmission.uiHandlingFlags = 4194336;
-    m_OriginalHandlingData [190].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [190].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [190].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [190].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [190].fBrakeDecelleration = 1.500000f;
+    m_OriginalHandlingData [190].fBrakeDeceleration = 1.500000f;
     m_OriginalHandlingData [190].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [190].bABS = false;
     m_OriginalHandlingData [190].fSteeringLock = 45.000000f;
@@ -7498,10 +7268,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [191].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [191].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [191].Transmission.uiHandlingFlags = 4194336;
-    m_OriginalHandlingData [191].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [191].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [191].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [191].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [191].fBrakeDecelleration = 1.500000f;
+    m_OriginalHandlingData [191].fBrakeDeceleration = 1.500000f;
     m_OriginalHandlingData [191].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [191].bABS = false;
     m_OriginalHandlingData [191].fSteeringLock = 45.000000f;
@@ -7534,10 +7304,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [192].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [192].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [192].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [192].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [192].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [192].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [192].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [192].fBrakeDecelleration = 1.500000f;
+    m_OriginalHandlingData [192].fBrakeDeceleration = 1.500000f;
     m_OriginalHandlingData [192].fBrakeBias = 0.150000f;
     m_OriginalHandlingData [192].bABS = false;
     m_OriginalHandlingData [192].fSteeringLock = 45.000000f;
@@ -7570,10 +7340,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [193].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [193].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [193].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [193].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [193].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [193].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [193].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [193].fBrakeDecelleration = 1.500000f;
+    m_OriginalHandlingData [193].fBrakeDeceleration = 1.500000f;
     m_OriginalHandlingData [193].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [193].bABS = false;
     m_OriginalHandlingData [193].fSteeringLock = 45.000000f;
@@ -7606,10 +7376,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [194].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [194].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [194].Transmission.uiHandlingFlags = 4194336;
-    m_OriginalHandlingData [194].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [194].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [194].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [194].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [194].fBrakeDecelleration = 1.000000f;
+    m_OriginalHandlingData [194].fBrakeDeceleration = 1.000000f;
     m_OriginalHandlingData [194].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [194].bABS = false;
     m_OriginalHandlingData [194].fSteeringLock = 45.000000f;
@@ -7642,10 +7412,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [195].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [195].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [195].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [195].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [195].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [195].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [195].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [195].fBrakeDecelleration = 1.000000f;
+    m_OriginalHandlingData [195].fBrakeDeceleration = 1.000000f;
     m_OriginalHandlingData [195].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [195].bABS = false;
     m_OriginalHandlingData [195].fSteeringLock = 45.000000f;
@@ -7678,10 +7448,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [196].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [196].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [196].Transmission.uiHandlingFlags = 4456448;
-    m_OriginalHandlingData [196].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [196].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [196].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [196].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [196].fBrakeDecelleration = 1.000000f;
+    m_OriginalHandlingData [196].fBrakeDeceleration = 1.000000f;
     m_OriginalHandlingData [196].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [196].bABS = false;
     m_OriginalHandlingData [196].fSteeringLock = 45.000000f;
@@ -7714,10 +7484,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [197].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [197].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [197].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [197].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [197].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [197].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [197].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [197].fBrakeDecelleration = 1.500000f;
+    m_OriginalHandlingData [197].fBrakeDeceleration = 1.500000f;
     m_OriginalHandlingData [197].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [197].bABS = false;
     m_OriginalHandlingData [197].fSteeringLock = 45.000000f;
@@ -7750,10 +7520,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [198].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [198].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [198].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [198].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [198].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [198].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [198].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [198].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [198].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [198].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [198].bABS = false;
     m_OriginalHandlingData [198].fSteeringLock = 30.000000f;
@@ -7786,10 +7556,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [199].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [199].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [199].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [199].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [199].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [199].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [199].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [199].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [199].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [199].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [199].bABS = false;
     m_OriginalHandlingData [199].fSteeringLock = 30.000000f;
@@ -7822,10 +7592,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [200].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [200].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [200].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [200].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [200].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [200].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [200].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [200].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [200].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [200].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [200].bABS = false;
     m_OriginalHandlingData [200].fSteeringLock = 30.000000f;
@@ -7858,10 +7628,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [201].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [201].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [201].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [201].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [201].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [201].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [201].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [201].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [201].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [201].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [201].bABS = false;
     m_OriginalHandlingData [201].fSteeringLock = 30.000000f;
@@ -7894,10 +7664,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [202].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [202].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [202].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [202].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [202].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [202].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [202].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [202].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [202].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [202].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [202].bABS = false;
     m_OriginalHandlingData [202].fSteeringLock = 30.000000f;
@@ -7930,10 +7700,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [203].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [203].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [203].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [203].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [203].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [203].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [203].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [203].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [203].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [203].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [203].bABS = false;
     m_OriginalHandlingData [203].fSteeringLock = 30.000000f;
@@ -7966,10 +7736,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [204].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [204].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [204].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [204].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [204].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [204].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [204].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [204].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [204].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [204].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [204].bABS = false;
     m_OriginalHandlingData [204].fSteeringLock = 30.000000f;
@@ -8002,10 +7772,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [205].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [205].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [205].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [205].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [205].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [205].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [205].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [205].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [205].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [205].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [205].bABS = false;
     m_OriginalHandlingData [205].fSteeringLock = 30.000000f;
@@ -8038,10 +7808,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [206].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [206].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [206].Transmission.uiHandlingFlags = 4194304;
-    m_OriginalHandlingData [206].Transmission.fEngineAccelleration = 6.400000f;
+    m_OriginalHandlingData [206].Transmission.fEngineAcceleration = 6.400000f;
     m_OriginalHandlingData [206].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [206].Transmission.fMaxVelocity = 200.000000f;
-    m_OriginalHandlingData [206].fBrakeDecelleration = 5.000000f;
+    m_OriginalHandlingData [206].fBrakeDeceleration = 5.000000f;
     m_OriginalHandlingData [206].fBrakeBias = 0.450000f;
     m_OriginalHandlingData [206].bABS = false;
     m_OriginalHandlingData [206].fSteeringLock = 30.000000f;
@@ -8074,10 +7844,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [207].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [207].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [207].Transmission.uiHandlingFlags = 32;
-    m_OriginalHandlingData [207].Transmission.fEngineAccelleration = 0.400000f;
+    m_OriginalHandlingData [207].Transmission.fEngineAcceleration = 0.400000f;
     m_OriginalHandlingData [207].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [207].Transmission.fMaxVelocity = 75.000000f;
-    m_OriginalHandlingData [207].fBrakeDecelleration = 0.500000f;
+    m_OriginalHandlingData [207].fBrakeDeceleration = 0.500000f;
     m_OriginalHandlingData [207].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [207].bABS = false;
     m_OriginalHandlingData [207].fSteeringLock = 45.000000f;
@@ -8110,10 +7880,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [208].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [208].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [208].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [208].Transmission.fEngineAccelleration = 14.000000f;
+    m_OriginalHandlingData [208].Transmission.fEngineAcceleration = 14.000000f;
     m_OriginalHandlingData [208].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [208].Transmission.fMaxVelocity = 75.000000f;
-    m_OriginalHandlingData [208].fBrakeDecelleration = 5.500000f;
+    m_OriginalHandlingData [208].fBrakeDeceleration = 5.500000f;
     m_OriginalHandlingData [208].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [208].bABS = false;
     m_OriginalHandlingData [208].fSteeringLock = 25.000000f;
@@ -8146,10 +7916,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [209].Transmission.ucEngineType = 'P';
     m_OriginalHandlingData [209].Transmission.ucNumberOfGears = 1;
     m_OriginalHandlingData [209].Transmission.uiHandlingFlags = 0;
-    m_OriginalHandlingData [209].Transmission.fEngineAccelleration = 14.000000f;
+    m_OriginalHandlingData [209].Transmission.fEngineAcceleration = 14.000000f;
     m_OriginalHandlingData [209].Transmission.fEngineInertia = 5.000000f;
     m_OriginalHandlingData [209].Transmission.fMaxVelocity = 75.000000f;
-    m_OriginalHandlingData [209].fBrakeDecelleration = 5.500000f;
+    m_OriginalHandlingData [209].fBrakeDeceleration = 5.500000f;
     m_OriginalHandlingData [209].fBrakeBias = 0.500000f;
     m_OriginalHandlingData [209].bABS = false;
     m_OriginalHandlingData [209].fSteeringLock = 25.000000f;
@@ -8170,9 +7940,6 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [209].ucHeadLight = 0;
     m_OriginalHandlingData [209].ucTailLight = 1;
     m_OriginalHandlingData [209].ucAnimGroup = 0;
-#else
-
-#endif
 }
 
 

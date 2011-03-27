@@ -556,10 +556,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\rpc\CHandlingRPCs.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\rpc\CInputRPCs.cpp"
 						>
 					</File>
@@ -734,14 +730,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientGUIManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientHandling.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientHandlingManager.cpp"
 					>
 				</File>
 				<File
@@ -1454,10 +1442,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\rpc\CHandlingRPCs.h"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\rpc\CInputRPCs.h"
 						>
 					</File>
@@ -1668,14 +1652,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientGUIManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientHandling.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientHandlingManager.h"
 					>
 				</File>
 				<File

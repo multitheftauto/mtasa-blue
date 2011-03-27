@@ -627,7 +627,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCameraDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
-    CLuaHandlingDefs::LoadFunctions ();
     CLuaPickupDefs::LoadFunctions ();
     CLuaResourceDefs::LoadFunctions ();
     CLuaTextDefs::LoadFunctions ();

@@ -69,14 +69,14 @@ public:
     virtual BOOL            IsTrailer               () = 0;
     virtual BOOL            IsVehicle               () = 0;
 
-    virtual char            * GetNameIfVehicle      () = 0;
+    virtual char*           GetNameIfVehicle        () = 0;
 
     virtual VOID            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false, bool bHighPriority = false ) = 0;
     virtual VOID            Remove                  () = 0;
     virtual BYTE            GetLevelFromPosition    ( CVector * vecPosition ) = 0;
     virtual BOOL            IsLoaded                () = 0;
     virtual BYTE            GetFlags                () = 0;
-    virtual CBoundingBox    * GetBoundingBox        () = 0;
+    virtual CBoundingBox*   GetBoundingBox          () = 0;
     virtual bool            IsValid                 () = 0;
     virtual unsigned short  GetTextureDictionaryID  () = 0;
     virtual float           GetLODDistance          () = 0;
@@ -94,6 +94,8 @@ public:
     virtual bool            IsUpgradeAvailable      ( eVehicleUpgradePosn posn ) = 0;
     virtual void            SetCustomCarPlateText   ( const char * szText ) = 0;
     virtual unsigned int    GetNumRemaps            ( void ) = 0;
+    virtual void*           GetVehicleSuspensionData( void ) = 0;
+    virtual void*           SetVehicleSuspensionData( void* pSuspensionLines ) = 0;
 
     // ONLY use for upgrade models
     virtual void            RequestVehicleUpgrade   ( void ) = 0;

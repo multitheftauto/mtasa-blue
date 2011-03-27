@@ -218,7 +218,9 @@ public:
     virtual CColModel*           GetSpecialColModel                     ( void ) = 0;
     virtual bool                 UpdateMovingCollision                  ( float fAngle ) = 0;
 
-    virtual void                 UpdateHandlingStatus                   ( void ) = 0;
+    virtual void                 RecalculateHandling                    ( void ) = 0;
+
+    virtual void*                GetPrivateSuspensionLines              ( void ) = 0;
 };
 
 #endif

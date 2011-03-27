@@ -15,7 +15,6 @@
 
 CElementDeleter* CLuaDefs::m_pElementDeleter = NULL;
 CBlipManager* CLuaDefs::m_pBlipManager = NULL;
-CHandlingManager*  CLuaDefs::m_pHandlingManager = NULL;
 CLuaManager* CLuaDefs::m_pLuaManager = NULL;
 CMarkerManager* CLuaDefs::m_pMarkerManager = NULL;
 CObjectManager* CLuaDefs::m_pObjectManager = NULL;
@@ -36,7 +35,6 @@ CMainConfig* CLuaDefs::m_pMainConfig = NULL;
 void CLuaDefs::Initialize ( CElement* pRootElement,
                             CElementDeleter* pElementDeleter,
                             CBlipManager* pBlipManager,
-                            CHandlingManager* pHandlingManager,
                             CLuaManager* pLuaManager,
                             CMarkerManager* pMarkerManager,
                             CObjectManager* pObjectManager,
@@ -56,7 +54,6 @@ void CLuaDefs::Initialize ( CElement* pRootElement,
     m_pRootElement = pRootElement;
     m_pElementDeleter = pElementDeleter;
     m_pBlipManager = pBlipManager;
-    m_pHandlingManager = pHandlingManager;
     m_pLuaManager = pLuaManager;
     m_pMarkerManager = pMarkerManager;
     m_pObjectManager = pObjectManager;
@@ -70,7 +67,7 @@ void CLuaDefs::Initialize ( CElement* pRootElement,
     m_pAccountManager = pAccountManager;
     m_pColManager = pColManager;
     m_pResourceManager = pResourceManager;
-    m_pACLManager =pACLManager;
+    m_pACLManager = pACLManager;
     m_pMainConfig = pMainConfig;
 }
 

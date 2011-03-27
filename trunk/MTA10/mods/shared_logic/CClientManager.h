@@ -24,7 +24,6 @@ class CClientManager;
 #include "CClientDFFManager.h"
 #include "CClientEntity.h"
 #include "CClientGUIManager.h"
-#include "CClientHandlingManager.h"
 #include "CClientMarkerManager.h"
 #include "CClientModelRequestManager.h"
 #include "CClientObjectManager.h"
@@ -64,7 +63,6 @@ public:
     inline CClientColModelManager*      GetColModelManager          ( void )        { return m_pColModelManager; }
     inline CClientDFFManager*           GetDFFManager               ( void )        { return m_pDFFManager; }
     inline CClientGUIManager*           GetGUIManager               ( void )        { return m_pGUIManager; }
-    inline CClientHandlingManager*      GetHandlingManager          ( void )        { return m_pHandlingManager; }
     inline CClientMarkerManager*        GetMarkerManager            ( void )        { return m_pMarkerManager; }
     inline CClientStreamer*             GetMarkerStreamer           ( void )        { return m_pMarkerStreamer; }
     inline CClientModelRequestManager*  GetModelRequestManager      ( void )        { return m_pModelRequestManager; }
@@ -130,7 +128,6 @@ private:
     CClientVehicleManager*              m_pVehicleManager;
     CClientStreamer*                    m_pVehicleStreamer;
     CClientPedManager*                  m_pPedManager;
-    CClientHandlingManager*             m_pHandlingManager;
     CClientWaterManager*                m_pWaterManager;
     CResourceManager*                   m_pResourceManager;
     CClientColManager*                  m_pColManager;

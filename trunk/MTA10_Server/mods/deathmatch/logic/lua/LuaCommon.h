@@ -31,7 +31,6 @@ class CAccessControlListGroup*  lua_toaclgroup  ( lua_State* luaVM, int iArgumen
 class CBlip*            lua_toblip              ( lua_State* luaVM, int iArgument );
 class CColShape*        lua_tocolshape          ( lua_State* luaVM, int iArgument );
 class CScriptFile*      lua_tofile              ( lua_State* luaVM, int iArgument );
-class CHandling*        lua_tohandling          ( lua_State* luaVM, int iArgument );
 class CMarker*          lua_tomarker            ( lua_State* luaVM, int iArgument );
 class CObject*          lua_toobject            ( lua_State* luaVM, int iArgument );
 class CPed*             lua_toped               ( lua_State* luaVM, int iArgument );
