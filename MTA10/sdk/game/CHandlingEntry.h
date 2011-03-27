@@ -94,7 +94,7 @@ public:
     virtual                 ~CHandlingEntry                 ( void ) {};
 
     // Use this to copy data from an another handling class to this
-    virtual void            ApplyHandlingData               ( CHandlingEntry* pData ) = 0;
+    virtual void            Assign                          ( const CHandlingEntry* pData ) = 0;
 
     // Get functions
     virtual float           GetMass                         ( void ) const = 0;
@@ -109,11 +109,11 @@ public:
     virtual eEngineType     GetCarEngineType                ( void ) const = 0;
     virtual unsigned char   GetNumberOfGears                ( void ) const = 0;
 
-    virtual float           GetEngineAccelleration          ( void ) const = 0;
+    virtual float           GetEngineAcceleration           ( void ) const = 0;
     virtual float           GetEngineInertia                ( void ) const = 0;
     virtual float           GetMaxVelocity                  ( void ) const = 0;
 
-    virtual float           GetBrakeDecelleration           ( void ) const = 0;
+    virtual float           GetBrakeDeceleration            ( void ) const = 0;
     virtual float           GetBrakeBias                    ( void ) const = 0;
     virtual bool            GetABS                          ( void ) const = 0;
 
@@ -154,11 +154,11 @@ public:
     virtual void            SetCarEngineType                ( eEngineType Type ) = 0;
     virtual void            SetNumberOfGears                ( unsigned char ucNumber ) = 0;
 
-    virtual void            SetEngineAccelleration          ( float fAccelleration ) = 0;
+    virtual void            SetEngineAcceleration           ( float fAcceleration ) = 0;
     virtual void            SetEngineInertia                ( float fInertia ) = 0;
     virtual void            SetMaxVelocity                  ( float fVelocity ) = 0;
     
-    virtual void            SetBrakeDecelleration           ( float fDecelleration ) = 0;
+    virtual void            SetBrakeDeceleration            ( float fDeceleration ) = 0;
     virtual void            SetBrakeBias                    ( float fBias ) = 0;
     virtual void            SetABS                          ( bool bABS ) = 0;
 

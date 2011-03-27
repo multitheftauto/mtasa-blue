@@ -299,7 +299,7 @@ public:
     LUA_DECLARE ( GetVehicleHeadLightColor );
     LUA_DECLARE ( GetVehicleCurrentGear );
 #if WITH_VEHICLE_HANDLING
-    LUA_DECLARE ( GetVehicleHandlingData );
+    LUA_DECLARE ( GetVehicleHandling );
 #endif
     LUA_DECLARE ( GetVehicleDoorOpenRatio );
 
@@ -348,7 +348,7 @@ public:
     LUA_DECLARE ( SetVehicleHeadLightColor );
     LUA_DECLARE ( SetVehicleTurretPosition );
 #if WITH_VEHICLE_HANDLING
-    LUA_DECLARE ( SetVehicleHandlingData );
+    LUA_DECLARE ( SetVehicleHandling );
 #endif
     LUA_DECLARE ( SetVehicleDoorOpenRatio );
 

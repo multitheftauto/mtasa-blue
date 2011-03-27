@@ -258,15 +258,6 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
         }
     }
 
-    // Add the handlings to the packet
-    CHandlingManager* pHandlingManager = g_pGame->GetHandlingManager ();
-    list < CHandling* > ::const_iterator iterHandlings = pHandlingManager->IterBegin ();
-    for ( ; iterHandlings != pHandlingManager->IterEnd (); iterHandlings++ )
-    {
-        CHandling* pHandling = *iterHandlings;
-        EntityPacket.Add ( pHandling );
-    }
-
     // Add the water polys to the packet
     CWaterManager* pWaterManager = g_pGame->GetWaterManager ();
     list < CWater* > ::const_iterator iterWater = pWaterManager->IterBegin ();

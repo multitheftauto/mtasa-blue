@@ -205,27 +205,31 @@ DWORD RETURN_CrashFix_Misc8b =                              0x734871;
 DWORD RETURN_CrashFix_Misc9a =                              0x738B6A;
 DWORD RETURN_CrashFix_Misc9b =                              0x73983A;
 
-#define HOOKPOS_CrashFix_Misc10                              0x5334FE
-DWORD RETURN_CrashFix_Misc10a =                              0x533504;
+#define HOOKPOS_CrashFix_Misc10                             0x5334FE
+DWORD RETURN_CrashFix_Misc10a =                             0x533504;
 
-#define HOOKPOS_CrashFix_Misc11                              0x4D2C62
-DWORD RETURN_CrashFix_Misc11a =                              0x4D2C67;
-DWORD RETURN_CrashFix_Misc11b =                              0x4D2E03;
+#define HOOKPOS_CrashFix_Misc11                             0x4D2C62
+DWORD RETURN_CrashFix_Misc11a =                             0x4D2C67;
+DWORD RETURN_CrashFix_Misc11b =                             0x4D2E03;
 
-#define HOOKPOS_CrashFix_Misc12                              0x4D41C5
-DWORD RETURN_CrashFix_Misc12a =                              0x4D41CA;
-DWORD RETURN_CrashFix_Misc12b =                              0x4D4222;
+#define HOOKPOS_CrashFix_Misc12                             0x4D41C5
+DWORD RETURN_CrashFix_Misc12a =                             0x4D41CA;
+DWORD RETURN_CrashFix_Misc12b =                             0x4D4222;
 
-#define HOOKPOS_CrashFix_Misc13                              0x4D464E
-DWORD RETURN_CrashFix_Misc13a =                              0x4D4654;
-DWORD RETURN_CrashFix_Misc13b =                              0x4D4764;
+#define HOOKPOS_CrashFix_Misc13                             0x4D464E
+DWORD RETURN_CrashFix_Misc13a =                             0x4D4654;
+DWORD RETURN_CrashFix_Misc13b =                             0x4D4764;
 
-#define HOOKPOS_VehColCB                              0x04C838D
-DWORD RETURN_VehColCB =                              0x04C83AA;
+#define HOOKPOS_VehColCB                                    0x04C838D
+DWORD RETURN_VehColCB =                                     0x04C83AA;
 
-#define HOOKPOS_VehCol                              0x06D6603
-DWORD RETURN_VehCol =                              0x06D660C;
+#define HOOKPOS_VehCol                                      0x06D6603
+DWORD RETURN_VehCol =                                       0x06D660C;
 
+#define CALL_CAutomobile_ProcessEntityCollision             0x6AD053
+#define CALL_CBike_ProcessEntityCollision1                  0x6BDF82
+#define CALL_CBike_ProcessEntityCollision2                  0x6BE0D1
+#define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -366,6 +370,8 @@ void HOOK_CTrafficLights_GetSecondaryLightState ();
 
 void HOOK_CAutomobile__ProcessSwingingDoor ();
 
+void HOOK_ProcessVehicleCollision ();
+
 void vehicle_lights_init ();
 
 CMultiplayerSA::CMultiplayerSA()
@@ -504,6 +510,10 @@ void CMultiplayerSA::InitHooks()
 
     HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
     HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
+    HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
+    HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
+    HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
+    HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -5206,5 +5216,59 @@ void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor ()
             popad
             jmp     dwSwingingRet2
         }
+    }
+}
+
+void* SetModelSuspensionLinesToVehiclePrivate ( CVehicleSAInterface* pVehicleIntf )
+{
+    // Set the per-model suspension line data of the vehicle's model to the per-vehicle
+    // suspension line data so that collision processing will use that instead.
+    CVehicle* pVehicle = pVehicleIntf->m_pVehicle;
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicle->GetModelIndex () );
+    return pModelInfo->SetVehicleSuspensionData ( pVehicle->GetPrivateSuspensionLines () );
+}
+
+void SetModelSuspensionLines ( CVehicleSAInterface* pVehicleIntf, void* pSuspensionLines )
+{
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicleIntf->m_pVehicle->GetModelIndex () );
+    pModelInfo->SetVehicleSuspensionData ( pSuspensionLines );
+}
+
+void _declspec(naked) HOOK_ProcessVehicleCollision ()
+{
+    // When the vehicle's collision is about to be processed, set its per-vehicle
+    // suspension lines as the per-model suspension lines, and restore the per-model lines
+    // afterwards
+    _asm
+    {
+        push esi
+        call SetModelSuspensionLinesToVehiclePrivate
+        add esp, 4
+
+        push eax
+
+            push dword ptr [esp+4+0x20]
+            push dword ptr [esp+8+0x1C]
+            push dword ptr [esp+0xC+0x18]
+            push dword ptr [esp+0x10+0x14]
+            push dword ptr [esp+0x14+0x10]
+            push dword ptr [esp+0x18+0xC]
+            push dword ptr [esp+0x1C+8]
+            push dword ptr [esp+0x20+4]
+            mov eax, 0x4185C0       // CCollision::ProcessColModels
+            call eax
+            add esp, 0x20
+
+        pop edx
+
+        push eax
+        
+            push edx
+            push esi
+            call SetModelSuspensionLines
+            add esp, 8
+
+        pop eax
+        ret
     }
 }

@@ -178,7 +178,6 @@ void CColManager::DoHitDetectionOld ( const CVector& vecLastPosition, const CVec
         }
         if ( IS_COLSHAPE ( pEntity ) ||
              IS_FILE ( pEntity ) ||
-             IS_HANDLING ( pEntity ) ||
              IS_RADAR_AREA ( pEntity ) ||
              IS_CONSOLE ( pEntity ) ||
              IS_TEAM ( pEntity ) ||
@@ -324,7 +323,6 @@ void CColManager::DoHitDetectionForColShape ( CColShape* pShape )
         {
             case CElement::COLSHAPE:
             case CElement::SCRIPTFILE:
-            case CElement::HANDLING:
             case CElement::RADAR_AREA:
             case CElement::CONSOLE:
             case CElement::TEAM:

@@ -66,7 +66,6 @@ CGame::CGame ( void )
     m_pUnoccupiedVehicleSync = NULL;
     m_pConsole = NULL;
     m_pMapManager = NULL;
-    m_pHandlingManager = NULL;
     m_pLuaManager = NULL;
     m_pPacketTranslator = NULL;
     m_pMarkerManager = NULL;
@@ -215,7 +214,6 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pRadarAreaManager );
     SAFE_DELETE ( m_pPlayerManager );
     SAFE_DELETE ( m_pVehicleManager );
-    SAFE_DELETE ( m_pHandlingManager );
     SAFE_DELETE ( m_pPickupManager );
     SAFE_DELETE ( m_pObjectManager );
     SAFE_DELETE ( m_pColManager );
@@ -421,7 +419,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pPlayerManager = new CPlayerManager;
     m_pRadarAreaManager = new CRadarAreaManager;
     m_pMarkerManager = new CMarkerManager ( m_pColManager );
-    m_pHandlingManager = new CHandlingManager;
     m_pVehicleManager = new CVehicleManager;
     m_pPacketTranslator = new CPacketTranslator ( m_pPlayerManager );
     m_pBanManager = new CBanManager;
@@ -610,7 +607,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     CLuaDefs::Initialize ( m_pMapManager->GetRootElement (),
                            &m_ElementDeleter,
                            m_pBlipManager,
-                           m_pHandlingManager,
                            m_pLuaManager,
                            m_pMarkerManager,
                            m_pObjectManager,

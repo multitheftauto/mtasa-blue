@@ -50,7 +50,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 #if WITH_VEHICLE_HANDLING
     m_pOriginalHandlingEntry = g_pGame->GetHandlingManager ()->GetOriginalHandlingData ( static_cast < eVehicleTypes > ( usModel ) );
     m_pHandlingEntry = g_pGame->GetHandlingManager ()->CreateHandlingData ();
-    m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
+    m_pHandlingEntry->Assign ( m_pOriginalHandlingEntry );
 #endif
 
     SetTypeName ( "vehicle" );
@@ -935,7 +935,7 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
 #if WITH_VEHICLE_HANDLING
         // Reset handling to fit the vehicle
         m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData ( (eVehicleTypes)usModel );
-        m_pHandlingEntry->ApplyHandlingData ( (CHandlingEntry*)m_pOriginalHandlingEntry );
+        m_pHandlingEntry->Assign ( m_pOriginalHandlingEntry );
         m_pHandlingEntry->Recalculate ();
 #endif
 
@@ -3590,14 +3590,10 @@ void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed )
 }
 
 #if WITH_VEHICLE_HANDLING
-void CClientVehicle::ApplyHandling( void )
+void CClientVehicle::ApplyHandling ( void )
 {
     if ( m_pVehicle )
-    {
-        m_pVehicle->GetHandlingData()->Recalculate();
-        // Update vehicle settings
-        m_pVehicle->UpdateHandlingStatus ();
-    }
+        m_pVehicle->RecalculateHandling ();
 }
 
 
