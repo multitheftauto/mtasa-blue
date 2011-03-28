@@ -414,6 +414,7 @@ private:
     static void                         StaticProjectileInitiateHandler ( CClientProjectile * pProjectile );
     static void                         StaticRender3DStuffHandler      ( void );
     static bool                         StaticChokingHandler            ( unsigned char ucWeaponType );
+    static void                         StaticPreWorldProcessHandler    ( void );
     static void                         StaticPostWorldProcessHandler   ( void );
     static void                         StaticIdleHandler               ( void );
     static void                         StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
@@ -427,6 +428,7 @@ private:
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                Render3DStuffHandler            ( void );
     bool                                ChokingHandler                  ( unsigned char ucWeaponType );
+    void                                PreWorldProcessHandler          ( void );
     void                                PostWorldProcessHandler         ( void );
     void                                IdleHandler                     ( void );
     void                                AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
@@ -591,6 +593,8 @@ private:
     SString                             m_strLastDiagnosticStatus;
 
     bool                                m_bBeingDeleted;        // To enable speedy disconnect
+
+    uint                                m_uiNotPulsedCounter;
 
     // Cache for speeding up collision processing
 public:

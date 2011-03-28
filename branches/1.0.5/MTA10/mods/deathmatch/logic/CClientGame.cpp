@@ -122,6 +122,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_bCloudsEnabled = true;
 
+    m_uiNotPulsedCounter = 0;
+
     #ifdef MTA_VOICE
     m_pVoice = VoiceCreate();
     // Initialize the voice module for this mod.
@@ -237,6 +239,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
+    g_pMultiplayer->SetPreWorldProcessHandler ( CClientGame::StaticPreWorldProcessHandler );
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
     g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
@@ -369,6 +372,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetProjectileHandler ( NULL );
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
+    g_pMultiplayer->SetPreWorldProcessHandler (  NULL );
     g_pMultiplayer->SetPostWorldProcessHandler (  NULL );
     g_pMultiplayer->SetIdleHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
@@ -840,7 +844,11 @@ void CClientGame::DoPulsePostFrame ( void )
     // If we are not minimized we do the pulsing here
     if ( !g_pCore->IsWindowMinimized () )
     {
-        DoPulses ();
+        // ..if no one else is doing it
+        if ( m_uiNotPulsedCounter > 1 )
+            DoPulses ();
+        else
+            m_uiNotPulsedCounter++;
     }
 }
 
@@ -3277,6 +3285,11 @@ void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId a
     g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
 }
 
+void CClientGame::StaticPreWorldProcessHandler ( void )
+{
+    g_pClientGame->PreWorldProcessHandler ();
+}
+
 void CClientGame::StaticPostWorldProcessHandler ( void )
 {
     g_pClientGame->PostWorldProcessHandler ();
@@ -3366,6 +3379,16 @@ void CClientGame::Render3DStuffHandler ( void )
 
 }
 
+
+void CClientGame::PreWorldProcessHandler ( void )
+{
+    // If we are not minimized we do the pulsing here
+    if ( !g_pCore->IsWindowMinimized () )
+    {
+        m_uiNotPulsedCounter = 0;
+        DoPulses ();
+    }
+}
 
 void CClientGame::PostWorldProcessHandler ( void )
 {
