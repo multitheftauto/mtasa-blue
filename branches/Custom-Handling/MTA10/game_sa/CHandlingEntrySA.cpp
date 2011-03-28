@@ -45,10 +45,10 @@ CHandlingEntrySA::~CHandlingEntrySA ( void )
 
 
 // Apply the handlingdata from another data
-void CHandlingEntrySA::ApplyHandlingData ( CHandlingEntry* pData )
+void CHandlingEntrySA::Assign ( const CHandlingEntry* pData )
 {
     // Copy the data
-    CHandlingEntrySA* pEntrySA = static_cast < CHandlingEntrySA* > ( pData );
+    const CHandlingEntrySA* pEntrySA = static_cast < const CHandlingEntrySA* > ( pData );
     m_Handling = pEntrySA->m_Handling;
 }
 
@@ -62,12 +62,6 @@ void CHandlingEntrySA::Recalculate ( void )
         memcpy ( m_pHandlingSA, &m_Handling, sizeof ( m_Handling ) );
 
         // Call GTA's function that calculates the final values from the read values
-        DWORD dwFunc = FUNC_CAutomobile__Recalculate;
-        DWORD dwHandling = reinterpret_cast < DWORD > ( m_pHandlingSA );
-        _asm
-        {
-            push        dwHandling
-            call        dwFunc
-        }
+        ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );
     }
 }

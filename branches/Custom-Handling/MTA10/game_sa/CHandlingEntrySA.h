@@ -16,7 +16,7 @@
 
 #include <game/CHandlingEntry.h>
 #include "Common.h"
-#define FUNC_CAutomobile__Recalculate 0x6F5080
+#define FUNC_HandlingDataMgr_ConvertDataToGameUnits 0x6F5080
 // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
 // http://www.gtamodding.com/index.php?title=Memory_Addresses_%28SA%29#Handling
 
@@ -32,7 +32,7 @@ public:
 
     unsigned int    uiHandlingFlags;                // +116
 
-    float           fEngineAcceleration;           // +120     (value in handling.cfg * 0x86A950)
+    float           fEngineAcceleration;            // +120     (value in handling.cfg * 0x86A950)
     float           fEngineInertia;                 // +124
     float           fMaxVelocity;                   // +128
 
@@ -57,7 +57,7 @@ struct tHandlingDataSA
     float           fTractionMultiplier;            // +40
 
     CTransmissionSAInterface Transmission;          // +44
-    float           fBrakeDeceleration;            // +148
+    float           fBrakeDeceleration;             // +148
     float           fBrakeBias;                     // +152
     bool            bABS;                           // +156
     char            fUnknown[3];                    // +157
@@ -99,7 +99,7 @@ public:
     virtual         ~CHandlingEntrySA               ( void );
 
     // Use this to copy data from an another handling class to this
-    void            ApplyHandlingData               ( CHandlingEntry* pData );
+    void            Assign                          ( const CHandlingEntry* pData );
 
     // Get functions
     float           GetMass                         ( void ) const    { return m_Handling.fMass; };
@@ -114,11 +114,11 @@ public:
     eEngineType     GetCarEngineType                ( void ) const    { return static_cast < eEngineType > ( m_Handling.Transmission.ucEngineType ); };
     unsigned char   GetNumberOfGears                ( void ) const    { return m_Handling.Transmission.ucNumberOfGears; };
 
-    float           GetEngineAcceleration          ( void ) const    { return m_Handling.Transmission.fEngineAcceleration; };
+    float           GetEngineAcceleration           ( void ) const    { return m_Handling.Transmission.fEngineAcceleration; };
     float           GetEngineInertia                ( void ) const    { return m_Handling.Transmission.fEngineInertia; };
     float           GetMaxVelocity                  ( void ) const    { return m_Handling.Transmission.fMaxVelocity; };
 
-    float           GetBrakeDeceleration           ( void ) const    { return m_Handling.fBrakeDeceleration; };
+    float           GetBrakeDeceleration            ( void ) const    { return m_Handling.fBrakeDeceleration; };
     float           GetBrakeBias                    ( void ) const    { return m_Handling.fBrakeBias; };
     bool            GetABS                          ( void ) const    { return m_Handling.bABS; };
 
@@ -159,11 +159,11 @@ public:
     void            SetCarEngineType                ( eEngineType Type )            { m_Handling.Transmission.ucEngineType = Type; };
     void            SetNumberOfGears                ( unsigned char ucNumber )      { m_Handling.Transmission.ucNumberOfGears = ucNumber; };
 
-    void            SetEngineAcceleration          ( float fAcceleration )        { m_Handling.Transmission.fEngineAcceleration = fAcceleration; };
+    void            SetEngineAcceleration           ( float fAcceleration )         { m_Handling.Transmission.fEngineAcceleration = fAcceleration; };
     void            SetEngineInertia                ( float fInertia )              { m_Handling.Transmission.fEngineInertia = fInertia; };
     void            SetMaxVelocity                  ( float fVelocity )             { m_Handling.Transmission.fMaxVelocity = fVelocity; };
     
-    void            SetBrakeDeceleration           ( float fDeceleration )        { m_Handling.fBrakeDeceleration = fDeceleration; };
+    void            SetBrakeDeceleration            ( float fDeceleration )         { m_Handling.fBrakeDeceleration = fDeceleration; };
     void            SetBrakeBias                    ( float fBias )                 { m_Handling.fBrakeBias = fBias; };
     void            SetABS                          ( bool bABS )                   { m_Handling.bABS = bABS; };
 

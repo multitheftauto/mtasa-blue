@@ -547,7 +547,7 @@ protected:
     CVector                     m_vecGravity;
     SColor                      m_HeadLightColor;
 
-    bool                        m_bUpdateHandling;
+    bool                        m_bHasCustomHandling;
 
 public:
     CClientPlayer *             m_pLastSyncer;

@@ -706,6 +706,19 @@ unsigned int CModelInfoSA::GetNumRemaps ( void )
     return uiReturn;
 }
 
+void* CModelInfoSA::GetVehicleSuspensionData ( void )
+{
+    return GetInterface ()->pColModel->pColData->pSuspensionLines;
+}
+
+void* CModelInfoSA::SetVehicleSuspensionData ( void* pSuspensionLines )
+{
+    CColDataSA* pColData = GetInterface ()->pColModel->pColData;
+    void* pOrigSuspensionLines = pColData->pSuspensionLines;
+    pColData->pSuspensionLines = pSuspensionLines;
+    return pOrigSuspensionLines;
+}
+
 void CModelInfoSA::RequestVehicleUpgrade ( void )
 {
     DWORD dwFunc = FUNC_RequestVehicleUpgrade;

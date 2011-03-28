@@ -158,11 +158,6 @@ class CVehicleSA;
 #define FUNC_CAutomobile__GetDoorAngleOpenRatio 0x6A2270
 #define FUNC_CTrain__GetDoorAngleOpenRatio      0x6F59C0
 
-#define FUNC_CAutomobile__RecalculateSuspension 0x6A65D0
-#define FUNC_CBike__RecalculateSuspension 0x6B89B0
-#define FUNC_CTrailer__RecalculateSuspension 0x6F1A0
-#define FUNC_CMTruck__RecalculateSuspension 0x6C7FB0
-
 typedef struct
 {
     short sX;               // x coordinate times 8
@@ -505,8 +500,9 @@ class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
     friend class CPoolsSA;
 private:
-    CDamageManagerSA            * damageManager;
+    CDamageManagerSA*           m_pDamageManager;
     CHandlingEntrySA*           m_pHandlingData;
+    void*                       m_pSuspensionLines;
     bool                        m_bIsDerailable;
     unsigned char               m_ucAlpha;
     CVector                     m_vecGravity;
@@ -709,10 +705,15 @@ public:
     CColModel*                  GetSpecialColModel              ( void );
     bool                        UpdateMovingCollision           ( float fAngle );
 
-    void                        UpdateHandlingStatus            ( void );
-    void                        RecalculateSuspensionValues     ( void );
+    void                        RecalculateHandling             ( void );
+
+    void*                       GetPrivateSuspensionLines       ( void );
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
+
+private:
+    void                        RecalculateSuspensionLines          ( void );
+    void                        CopyGlobalSuspensionLinesToPrivate  ( void );
 };
 
 #endif

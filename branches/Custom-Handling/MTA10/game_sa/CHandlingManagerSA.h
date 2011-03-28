@@ -35,12 +35,8 @@ private:
 
     static DWORD                m_dwStore_LoadHandlingCfg;
 
-    static void                 Hook_LoadHandlingCfg            ( void );
-
     // Original handling data unaffected by handling.cfg changes
     static tHandlingDataSA      m_OriginalHandlingData [HT_MAX];
-
-    // Our wrapper classes for the classes GTA use and the original data
     static CHandlingEntrySA*    m_pOriginalEntries [HT_MAX];
 
     std::map < std::string, eHandlingProperty > m_HandlingNames;

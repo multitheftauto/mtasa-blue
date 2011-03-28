@@ -279,6 +279,8 @@ public:
     bool                            IsUpgradeAvailable      ( eVehicleUpgradePosn posn );
     void                            SetCustomCarPlateText   ( const char * szText );
     unsigned int                    GetNumRemaps            ( void );
+    void*                           GetVehicleSuspensionData( void );
+    void*                           SetVehicleSuspensionData( void* pSuspensionLines );
 
     // Upgrades only!
     void                            RequestVehicleUpgrade   ( void );

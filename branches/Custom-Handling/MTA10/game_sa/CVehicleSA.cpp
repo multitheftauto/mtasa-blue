@@ -36,6 +36,9 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
     // CCarCtrl::CreateCarForScript(int,class CVector,unsigned char)
     //                              ModelID, Position, IsMissionVehicle
 
+    m_pHandlingData = NULL;
+    m_pSuspensionLines = NULL;
+
     DWORD dwReturn = 0;
 
     // Is it a train?
@@ -92,9 +95,12 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
 #endif
 }
 
-CVehicleSA::CVehicleSA ( CVehicleSAInterface * vehicleInterface )
+CVehicleSA::CVehicleSA ( CVehicleSAInterface* pVehicleInterface )
 {
-    m_pInterface = vehicleInterface;
+    m_pInterface = pVehicleInterface;
+    m_pHandlingData = NULL;
+    m_pSuspensionLines = NULL;
+
 #if 0
     m_pInterface->bStreamingDontDelete = true;
     m_pInterface->bDontStream = true;
@@ -140,7 +146,7 @@ void CVehicleSA::Init ( void )
     }
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
-    this->damageManager = new CDamageManagerSA( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
+    this->m_pDamageManager = new CDamageManagerSA( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
 
     // Replace the handling interface with our own to prevent handlig.cfg cheats and allow custom handling stuff.
     // We don't use SA's array because we want one handling per vehicle type and also allow custom handlings
@@ -185,6 +191,8 @@ void CVehicleSA::Init ( void )
         }
     }
     m_bSwingingDoorsAllowed = false;
+
+    CopyGlobalSuspensionLinesToPrivate ();
 }
 
 // DESTRUCTOR
@@ -197,19 +205,29 @@ CVehicleSA::~CVehicleSA()
         {
             GetVehicleInterface ()->m_pVehicle = NULL;
 
-            if ( this->damageManager ) delete this->damageManager;
+            if ( m_pDamageManager )
+            {
+                delete m_pDamageManager;
+                m_pDamageManager = NULL;
+            }
+
+            if ( m_pSuspensionLines )
+            {
+                delete m_pSuspensionLines;
+                m_pSuspensionLines = NULL;
+            }
             
             DWORD dwThis = (DWORD) m_pInterface;
-            DWORD dwFunc = 0x6D2460;
+            DWORD dwFunc = 0x6D2460;        // CVehicle::ExtinguishCarFire
             _asm
             {
                 mov     ecx, dwThis
                 call    dwFunc
             }
 
-            CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-            world->Remove ( m_pInterface );
-            world->RemoveReferencesToDeletedObject ( m_pInterface );
+            CWorldSA* pWorld = (CWorldSA *)pGame->GetWorld();
+            pWorld->Remove ( m_pInterface );
+            pWorld->RemoveReferencesToDeletedObject ( m_pInterface );
 
             
             dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be vehicle type independent
@@ -1363,7 +1381,7 @@ void CVehicleSA::Fix ( void )
 CDamageManager * CVehicleSA::GetDamageManager()
 {
     DEBUG_TRACE("CDamageManager * CVehicleSA::GetDamageManager()");
-    return this->damageManager;
+    return this->m_pDamageManager;
 }
 
 void CVehicleSA::BlowUp ( CEntity* pCreator, unsigned long ulUnknown )
@@ -1642,36 +1660,25 @@ CHandlingEntry* CVehicleSA::GetHandlingData ( void )
 
 void CVehicleSA::SetHandlingData ( CHandlingEntry* pHandling )
 {
-    // Store the handling data we set for later retrival through Get
+    // Store the handling and recalculate it
     m_pHandlingData = static_cast < CHandlingEntrySA* > ( pHandling );
-
-    // Put it in our interface
-    CVehicleSAInterface* pInt = GetVehicleInterface ();
-    m_pHandlingData->Recalculate ( );
-    RecalculateSuspensionValues ( );
-    pInt->pHandlingData = m_pHandlingData->GetInterface ();
-    /*pInt->dwHandlingFlags = m_pHandlingData->GetInterface ()->uiHandlingFlags;
-    pInt->fMass = m_pHandlingData->GetInterface ()->fMass;
-    pInt->fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
-    pInt->vecCenterOfMass = &m_pHandlingData->GetInterface()->vecCenterOfMass;
-    pInt->fBuoyancyConstant = m_pHandlingData->GetInterface()->fUnknown2;*/
-    /*if (m_pHandlingData->GetInterface()->fDragCoeff >= pGame->GetHandlingManager()->GetBasicDragCoeff())
-        GetVehicleInterface ()->fDragCoeff = pGame->GetHandlingManager()->GetBasicDragCoeff();
-    else*/
-        //pInt->fDragCoeff = m_pHandlingData->GetInterface()->fDragCoeff / 1000 * pGame->GetHandlingManager()->GetDragMultiplier();
+    GetVehicleInterface ()->pHandlingData = m_pHandlingData->GetInterface ();
+    RecalculateHandling ();
 }
 
 
-// Updates internal vehicle settings
-void CVehicleSA::UpdateHandlingStatus ( void )
+void CVehicleSA::RecalculateHandling ( void )
 {
-    // Not supposed to happen
     if ( !m_pHandlingData )
         return;
 
+    m_pHandlingData->Recalculate ();
+    
+    // Recalculate the suspension lines
+    RecalculateSuspensionLines ();
+
     // Put it in our interface
     CVehicleSAInterface* pInt = GetVehicleInterface ();
-    RecalculateSuspensionValues ( );
     pInt->dwHandlingFlags = m_pHandlingData->GetInterface ()->uiHandlingFlags;
     pInt->fMass = m_pHandlingData->GetInterface ()->fMass;
     pInt->fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
@@ -1897,31 +1904,47 @@ bool CVehicleSA::UpdateMovingCollision ( float fAngle )
 
     // Restore our driver
     vehicle->pDriver = pDriver;
+
     return bReturn;
 }
 
-void CVehicleSA::RecalculateSuspensionValues ( void )
+void* CVehicleSA::GetPrivateSuspensionLines ( void )
 {
-    CVehicleSAInterface * pInt = GetVehicleInterface();
-    CModelInfo* pModelInfo = pGame->GetModelInfo ( this->GetModelIndex() );
-    DWORD dwModel = pModelInfo->GetModel();
+    if ( m_pSuspensionLines == NULL )
+    {
+        CModelInfo* pModelInfo = pGame->GetModelInfo ( GetModelIndex() );
+        CColDataSA* pColData = pModelInfo->GetInterface ()->pColModel->pColData;
+        m_pSuspensionLines = new BYTE[pColData->ucNumWheels * 0x20];
+    }
+
+    return m_pSuspensionLines;
+}
+
+void CVehicleSA::CopyGlobalSuspensionLinesToPrivate ( void )
+{
+    CModelInfo* pModelInfo = pGame->GetModelInfo ( GetModelIndex () );
+    CColDataSA* pColData = pModelInfo->GetInterface ()->pColModel->pColData;
+    if ( pColData->pSuspensionLines )
+        memcpy ( GetPrivateSuspensionLines (), pColData->pSuspensionLines, pColData->ucNumWheels * 0x20 );
+}
+
+void CVehicleSA::RecalculateSuspensionLines ( void )
+{
+    CVehicleSAInterface* pInt = GetVehicleInterface ();
+    DWORD dwModel = GetModelIndex ();
+    CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );
     // Trains (Their trailers do as well!) and boats crash obviously.
-    if ( pModelInfo->IsBoat() || pModelInfo->IsTrain() || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
+    if ( pModelInfo->IsBoat () || pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
         return;
 
-    // Trailers Work best using the CAutomobile version.
-    DWORD dwFunc = FUNC_CAutomobile__RecalculateSuspension;
-    DWORD dwVeh = reinterpret_cast < DWORD > ( pInt );
-    
-    if ( pModelInfo->IsMonsterTruck() )
-        dwFunc = FUNC_CMTruck__RecalculateSuspension;
-    
-    if ( pModelInfo->IsBike() || pModelInfo->IsBmx() )
-        dwFunc = FUNC_CBike__RecalculateSuspension;
-
-    _asm 
+    CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
+    DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
+    DWORD dwThis = (DWORD)pInt;
+    _asm
     {
-        mov ecx, dwVeh
-        call dwFunc
+        mov ecx, dwThis
+        call dwSetupSuspensionLines
     }
+
+    CopyGlobalSuspensionLinesToPrivate ();
 }

@@ -12,14 +12,9 @@
 
 #include "StdInc.h"
 
-#define USE_GTASA_HANDLING          FALSE
-
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 
-#define Func_PostLoadHandlingCfg    0x5BFA90
 #define Func_Calculate              0x6F5080
-#define Func_GetOriginalHandling    0x6F52D0
-#define Func_GetPreviousHandling    0x6F5300
 #define Var_fTurnMassMultiplier     0x858B8C
 #define Var_fBasicDragCoeff         0x858C58
 
@@ -106,7 +101,6 @@ __declspec(naked) void Hook_Calculate ( void )
     }
 }
 
-
 CHandlingManagerSA::CHandlingManagerSA ( void )
 {
     // Initialize all default handlings
@@ -115,17 +109,9 @@ CHandlingManagerSA::CHandlingManagerSA ( void )
     // Create a handling entry for every original handling data.
     for ( int i = 0; i < HT_MAX; i++ )
     {
-        m_pOriginalEntries [i] = new CHandlingEntrySA ( &m_OriginalHandlingData [i] );
+        m_pOriginalEntries[i] = new CHandlingEntrySA ( &m_OriginalHandlingData[i] );
     }
 
-    // Install load handling.cfg hook. We let GTA perform its normal loading, then we
-    // replace all the values by with our own default and let GTA calculate all the handling
-    // stuff again. We do it this way because GTA will crash later on if we don't, I think
-    // it does some additional initializing that GTA requires other than initing all the
-    // handlings.
-#if WITH_VEHICLE_HANDLING
-    HookInstall ( Func_PostLoadHandlingCfg, (DWORD) Hook_LoadHandlingCfg, 15 );
-#endif
     // Uncomment this to dump
     //HookInstall ( Func_Calculate, (DWORD) Hook_Calculate, 11 );
     m_HandlingNames["mass"] =                           HANDLING_MASS;                          // works (mass > 0)
@@ -167,10 +153,10 @@ CHandlingManagerSA::CHandlingManagerSA ( void )
 
 CHandlingManagerSA::~CHandlingManagerSA ( void )
 {
-    // // Destroy all original handling entries
+    // Destroy all original handling entries
     for ( int i = 0; i < HT_MAX; i++ )
     {
-        delete m_pOriginalEntries [i];
+        delete m_pOriginalEntries[i];
     }
 }
 
@@ -205,9 +191,9 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData ( eVehicleType
 }
 
 // Return the handling manager id
-eHandlingTypes  CHandlingManagerSA::GetHandlingID ( eVehicleTypes eModel )
+eHandlingTypes CHandlingManagerSA::GetHandlingID ( eVehicleTypes eModel )
 {
-    switch(eModel)
+    switch ( eModel )
     {
         case VT_LANDSTAL: return HT_LANDSTAL;
         case VT_BRAVURA: return HT_BRAVURA;
@@ -425,39 +411,8 @@ eHandlingTypes  CHandlingManagerSA::GetHandlingID ( eVehicleTypes eModel )
     return HT_LANDSTAL;
 }
 
-
-__declspec(naked) void CHandlingManagerSA::Hook_LoadHandlingCfg ( void )
-{
-    _asm
-    {
-        // Save all registers
-        pushad
-
-        // Replaced code
-        mov         eax, 0x5BA8C0
-        call        eax
-
-        mov         ecx, 0xC2B9C8
-        mov         eax, 0x5BD830
-        call        eax
-    };
-
-    _asm
-    {
-        // Restore registers
-        popad
-
-        // Go back in
-        mov         eax, Func_PostLoadHandlingCfg
-        add         eax, 15
-        jmp         eax
-    };
-}
-
-
 void CHandlingManagerSA::InitializeDefaultHandlings ( void )
 {
-#if (USE_GTASA_HANDLING == FALSE)
     // Reset
     MemSet ( m_OriginalHandlingData, 0, sizeof ( m_OriginalHandlingData ) );
 
@@ -8022,9 +7977,6 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [209].ucHeadLight = 0;
     m_OriginalHandlingData [209].ucTailLight = 1;
     m_OriginalHandlingData [209].ucAnimGroup = 0;
-#else
-
-#endif
 }
 
 

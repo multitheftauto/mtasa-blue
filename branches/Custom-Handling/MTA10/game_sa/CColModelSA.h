@@ -26,10 +26,22 @@ typedef struct
     char name[0x18];
 } ColModelFileHeader;
 
+typedef struct
+{
+    DWORD                           pad0;
+    WORD                            pad1;
+    BYTE                            ucNumWheels;
+    BYTE                            pad2;
+    DWORD                           pad3;
+    DWORD                           pad4;
+    void*                           pSuspensionLines;
+} CColDataSA;
+
 class CColModelSAInterface
 {
+public:
     BYTE                            pad [ 44 ];
-    void *                          pCollision;     // CCollision
+    CColDataSA*                     pColData;
 };
 
 class CColModelSA : public CColModel

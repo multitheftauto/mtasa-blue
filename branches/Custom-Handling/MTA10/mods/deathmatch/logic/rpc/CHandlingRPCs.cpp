@@ -84,8 +84,8 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
         if ( pSource && pSource->GetType () == CCLIENTVEHICLE )
         {
             // Grab the vehicle handling entry
-            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pSource );
-            CHandlingEntry* pHandlingEntry = Vehicle.GetHandlingData();
+            CClientVehicle& vehicle = static_cast < CClientVehicle& > ( *pSource );
+            CHandlingEntry* pHandlingEntry = vehicle.GetHandlingData();
 
             // Temporary storage for reading out data
             union
@@ -293,7 +293,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                     break;
             }
 
-            Vehicle.ApplyHandling();
+            vehicle.ApplyHandling();
         }
     }
 }
@@ -458,7 +458,7 @@ void CHandlingRPCs::RestoreVehicleHandling ( CClientEntity* pSource, NetBitStrea
     {
         // Grab the vehicle handling entry and restore all data
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( *pSource );
-        Vehicle.GetHandlingData()->ApplyHandlingData( (CHandlingEntry*)Vehicle.GetOriginalHandlingData () );
+        Vehicle.GetHandlingData()->Assign ( Vehicle.GetOriginalHandlingData () );
 
         Vehicle.ApplyHandling();
     }

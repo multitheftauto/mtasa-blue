@@ -123,14 +123,26 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                 }
                             case HANDLING_CENTEROFMASS:
                                 {
-                                    if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER && lua_type ( luaVM, 4 ) == LUA_TNUMBER && lua_type ( luaVM, 5 ) == LUA_TNUMBER )
+                                    if ( lua_type ( luaVM, 3 ) == LUA_TTABLE )
                                     {
-                                        float fX = (float)lua_tonumber ( luaVM, 3 );
-                                        float fY = (float)lua_tonumber ( luaVM, 4 );
-                                        float fZ = (float)lua_tonumber ( luaVM, 5 );
-                                        CVector tempVec ( fX, fY, fZ );
+                                        lua_pushnumber ( luaVM, 1 );
+                                        lua_gettable ( luaVM, 3 );
+                                        float fX = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
+                                        lua_pop ( luaVM, 1 );
 
-                                        if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, tempVec ) )
+                                        lua_pushnumber ( luaVM, 2 );
+                                        lua_gettable ( luaVM, 3 );
+                                        float fY = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
+                                        lua_pop ( luaVM, 1 );
+
+                                        lua_pushnumber ( luaVM, 3 );
+                                        lua_gettable ( luaVM, 3 );
+                                        float fZ = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
+                                        lua_pop ( luaVM, 1 );
+
+                                        CVector vecCenterOfMass ( fX, fY, fZ );
+
+                                        if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, vecCenterOfMass ) )
                                         {
                                             lua_pushboolean ( luaVM, true );
                                             return 1;
@@ -344,203 +356,152 @@ int CLuaHandlingDefs::GetVehicleHandling ( lua_State* luaVM )
         CVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle )
         {
-            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-            {
-                eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName ( lua_tostring ( luaVM, 2 ) );
-                if ( eProperty )
-                {
-                    switch ( eProperty )
-                    {
-                        case HANDLING_MASS:
-                        case HANDLING_TURNMASS:
-                        case HANDLING_DRAGCOEFF:
-                        case HANDLING_TRACTIONMULTIPLIER:
-                        case HANDLING_ENGINEACCELERATION:
-                        case HANDLING_ENGINEINERTIA:
-                        case HANDLING_MAXVELOCITY:
-                        case HANDLING_BRAKEDECELERATION:
-                        case HANDLING_BRAKEBIAS:
-                        case HANDLING_STEERINGLOCK:
-                        case HANDLING_TRACTIONLOSS:
-                        case HANDLING_TRACTIONBIAS:
-                        case HANDLING_SUSPENSION_FORCELEVEL:
-                        case HANDLING_SUSPENSION_DAMPING:
-                        case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
-                        case HANDLING_SUSPENSION_UPPER_LIMIT:
-                        case HANDLING_SUSPENSION_LOWER_LIMIT:
-                        case HANDLING_SUSPENSION_FRONTREARBIAS:
-                        case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
-                        case HANDLING_COLLISIONDAMAGEMULTIPLIER:
-                        case HANDLING_SEATOFFSETDISTANCE:
-                        case HANDLING_PERCENTSUBMERGED: // unsigned int
-                        case HANDLING_MONETARY:
-                        case HANDLING_HANDLINGFLAGS:
-                        case HANDLING_MODELFLAGS:
-                        case HANDLING_NUMOFGEARS:
-                        case HANDLING_ANIMGROUP:
-                            {
-                                float fValue;
-                                if ( CStaticFunctionDefinitions::GetVehicleHandling ( pVehicle, eProperty, fValue ) )
-                                {
-                                    lua_pushnumber ( luaVM, fValue );
-                                    break;
-                                }
-                            }
-                        case HANDLING_CENTEROFMASS:
-                            {
-                                CVector vecValue;
-                                if ( CStaticFunctionDefinitions::GetVehicleHandling ( pVehicle, eProperty, vecValue ) )
-                                {
-                                    lua_pushnumber ( luaVM, vecValue.fX );
-                                    lua_pushnumber ( luaVM, vecValue.fY );
-                                    lua_pushnumber ( luaVM, vecValue.fZ );
-                                    return 3;
-                                }
-                            }
-                        case HANDLING_DRIVETYPE:
-                        case HANDLING_ENGINETYPE:
-                        case HANDLING_HEADLIGHT:
-                        case HANDLING_TAILLIGHT:
-                            {
-                                std::string strValue;
-                                if ( CStaticFunctionDefinitions::GetVehicleHandling ( pVehicle, eProperty, strValue ) )
-                                {
-                                    lua_pushstring ( luaVM, strValue.c_str () );
-                                    break;
-                                }
-                            }
-                        case HANDLING_ABS:
-                            {
-                                float fValue;
-                                if ( CStaticFunctionDefinitions::GetVehicleHandling ( pVehicle, eProperty, fValue ) )
-                                {
-                                    lua_pushboolean ( luaVM, fValue ? true : false );
-                                    break;
-                                }
-                            }
-                        default:
-                            lua_pushboolean ( luaVM, false );
-                    }
+            CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
 
-                    return 1;
-                }
-                else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleHandling", "property", 2 );
-            }
-            else if ( lua_type ( luaVM, 2 ) == LUA_TNIL || lua_type ( luaVM, 2 ) == LUA_TNONE )
-            {
-                CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+            lua_newtable ( luaVM );
 
-                lua_newtable ( luaVM );
-                lua_pushnumber ( luaVM, pEntry->GetMass() );
-                lua_setfield ( luaVM, -2, "mass" );
-                lua_pushnumber ( luaVM, pEntry->GetTurnMass() );
-                lua_setfield ( luaVM, -2, "turnMass" );
-                lua_pushnumber ( luaVM, pEntry->GetDragCoeff() );
-                lua_setfield ( luaVM, -2, "dragCoeff" );
-                lua_newtable ( luaVM );
-                CVector vecCenter = pEntry->GetCenterOfMass ();
-                lua_pushnumber ( luaVM, vecCenter.fX );
-                lua_setfield ( luaVM, -2, "posX" );
-                lua_pushnumber ( luaVM, vecCenter.fY );
-                lua_setfield ( luaVM, -2, "posY" );
-                lua_pushnumber ( luaVM, vecCenter.fZ );
-                lua_setfield ( luaVM, -2, "posZ" );
-                lua_setfield ( luaVM, -2, "centerOfMass" );
-                lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged() );
-                lua_setfield ( luaVM, -2, "percentSubmerged" );
-                lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier() );
-                lua_setfield ( luaVM, -2, "tractionMultiplier" );
-                CHandlingEntry::eDriveType eDriveType=pEntry->GetCarDriveType();
-                if (eDriveType==CHandlingEntry::FWD)
-                    lua_pushstring(luaVM,"fwd");
-                else if (eDriveType==CHandlingEntry::RWD)
-                    lua_pushstring(luaVM,"rwd");
-                else if (eDriveType==CHandlingEntry::FOURWHEEL)
-                    lua_pushstring(luaVM,"awd");
-                else // What the ... (yeah, security)
-                    lua_pushnil ( luaVM );
-                lua_setfield ( luaVM, -2, "driveType" );
-                CHandlingEntry::eEngineType eEngineType=pEntry->GetCarEngineType();
-                if (eEngineType==CHandlingEntry::PETROL)
-                    lua_pushstring(luaVM,"petrol");
-                else if (eEngineType==CHandlingEntry::DIESEL)
-                    lua_pushstring(luaVM,"diesel");
-                else if (eEngineType==CHandlingEntry::ELECTRIC)
-                    lua_pushstring(luaVM,"electric");
-                else
-                    lua_pushnil ( luaVM );
-                lua_setfield ( luaVM, -2, "engineType" );
-                lua_pushnumber ( luaVM, pEntry->GetNumberOfGears() );
-                lua_setfield ( luaVM, -2, "numberOfGears" );
-                lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration() );
-                lua_setfield ( luaVM, -2, "engineAcceleration" );
-                lua_pushnumber ( luaVM, pEntry->GetEngineInertia() );
-                lua_setfield ( luaVM, -2, "engineInertia" );
-                lua_pushnumber ( luaVM, pEntry->GetMaxVelocity() );
-                lua_setfield ( luaVM, -2, "maxVelocity" );
-                lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration() );
-                lua_setfield ( luaVM, -2, "brakeDeceleration" );
-                lua_pushnumber ( luaVM, pEntry->GetBrakeBias() );
-                lua_setfield ( luaVM, -2, "brakeBias" );
-                lua_pushboolean ( luaVM, pEntry->GetABS() );
-                lua_setfield ( luaVM, -2, "ABS" );
-                lua_pushnumber ( luaVM, pEntry->GetSteeringLock() );
-                lua_setfield ( luaVM, -2, "steeringLock" );
-                lua_pushnumber ( luaVM, pEntry->GetTractionLoss() );
-                lua_setfield ( luaVM, -2, "tractionLoss" );
-                lua_pushnumber ( luaVM, pEntry->GetTractionBias() );
-                lua_setfield ( luaVM, -2, "tractionBias" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel() );
-                lua_setfield ( luaVM, -2, "suspensionForceLevel" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping() );
-                lua_setfield ( luaVM, -2, "suspensionDamping" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping() );
-                lua_setfield ( luaVM, -2, "suspensionHighSpeedDamping" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit() );
-                lua_setfield ( luaVM, -2, "suspensionUpperLimit" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit() );
-                lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias() );
-                lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidiveMultiplier() );
-                lua_setfield ( luaVM, -2, "suspensionAntidiveMultiplier" );
-                lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier() );
-                lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
-                lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance() );
-                lua_setfield ( luaVM, -2, "seatOffsetDistance" );
-                lua_pushnumber ( luaVM, pEntry->GetHandlingFlags() );
-                lua_setfield ( luaVM, -2, "handlingFlags" );
-                lua_pushnumber ( luaVM, pEntry->GetModelFlags() );
-                lua_setfield ( luaVM, -2, "modelFlags" );
-                lua_pushnumber ( luaVM, pEntry->GetMonetary() );
-                lua_setfield ( luaVM, -2, "monetary" );
-                CHandlingEntry::eLightType eHeadType=pEntry->GetHeadLight();
-                if (eHeadType==CHandlingEntry::LONG)
-                    lua_pushstring(luaVM,"long");
-                else if (eHeadType==CHandlingEntry::SMALL)
-                    lua_pushstring(luaVM,"small");
-                else if (eHeadType==CHandlingEntry::BIG)
-                    lua_pushstring(luaVM,"big");
-                else
-                    lua_pushnil( luaVM );
-                lua_setfield ( luaVM, -2, "headLight" );
-                CHandlingEntry::eLightType eTailType=pEntry->GetTailLight();
-                if (eTailType==CHandlingEntry::LONG)
-                    lua_pushstring(luaVM,"long");
-                else if (eTailType==CHandlingEntry::SMALL)
-                    lua_pushstring(luaVM,"small");
-                else if (eTailType==CHandlingEntry::BIG)
-                    lua_pushstring(luaVM,"big");
-                else
-                    lua_pushnil( luaVM );
-                lua_setfield ( luaVM, -2, "tailLight" );
-                lua_pushnumber ( luaVM, pEntry->GetAnimGroup() );
-                lua_setfield ( luaVM, -2, "animGroup" );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, pEntry->GetMass () );
+            lua_setfield ( luaVM, -2, "mass" );
+
+            lua_pushnumber ( luaVM, pEntry->GetTurnMass () );
+            lua_setfield ( luaVM, -2, "turnMass" );
+
+            lua_pushnumber ( luaVM, pEntry->GetDragCoeff () );
+            lua_setfield ( luaVM, -2, "dragCoeff" );
+
+            lua_createtable ( luaVM, 3, 0 );
+            CVector vecCenter = pEntry->GetCenterOfMass ();
+            lua_pushnumber ( luaVM, 1 );
+            lua_pushnumber ( luaVM, vecCenter.fX );
+            lua_settable ( luaVM, -3 );
+            lua_pushnumber ( luaVM, 2 );
+            lua_pushnumber ( luaVM, vecCenter.fY );
+            lua_settable ( luaVM, -3 );
+            lua_pushnumber ( luaVM, 3 );
+            lua_pushnumber ( luaVM, vecCenter.fZ );
+            lua_settable ( luaVM, -3 );
+            lua_setfield ( luaVM, -2, "centerOfMass" );
+
+            lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged () );
+            lua_setfield ( luaVM, -2, "percentSubmerged" );
+
+            lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier () );
+            lua_setfield ( luaVM, -2, "tractionMultiplier" );
+
+            CHandlingEntry::eDriveType eDriveType = pEntry->GetCarDriveType ();
+            if ( eDriveType == CHandlingEntry::FWD )
+                lua_pushstring( luaVM, "fwd" );
+            else if ( eDriveType == CHandlingEntry::RWD )
+                lua_pushstring ( luaVM, "rwd" );
+            else if ( eDriveType == CHandlingEntry::FOURWHEEL )
+                lua_pushstring ( luaVM, "awd" );
+            else // What the ... (yeah, security)
+                lua_pushnil ( luaVM );
+            lua_setfield ( luaVM, -2, "driveType" );
+
+            CHandlingEntry::eEngineType eEngineType = pEntry->GetCarEngineType ();
+            if ( eEngineType == CHandlingEntry::PETROL )
+                lua_pushstring ( luaVM, "petrol" );
+            else if ( eEngineType == CHandlingEntry::DIESEL )
+                lua_pushstring ( luaVM, "diesel" );
+            else if ( eEngineType == CHandlingEntry::ELECTRIC )
+                lua_pushstring ( luaVM, "electric" );
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleHandling", "property", 2 );
+                lua_pushnil ( luaVM );
+            lua_setfield ( luaVM, -2, "engineType" );
+
+            lua_pushnumber ( luaVM, pEntry->GetNumberOfGears () );
+            lua_setfield ( luaVM, -2, "numberOfGears" );
+
+            lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration () );
+            lua_setfield ( luaVM, -2, "engineAcceleration" );
+
+            lua_pushnumber ( luaVM, pEntry->GetEngineInertia () );
+            lua_setfield ( luaVM, -2, "engineInertia" );
+
+            lua_pushnumber ( luaVM, pEntry->GetMaxVelocity () );
+            lua_setfield ( luaVM, -2, "maxVelocity" );
+
+            lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration () );
+            lua_setfield ( luaVM, -2, "brakeDeceleration" );
+
+            lua_pushnumber ( luaVM, pEntry->GetBrakeBias () );
+            lua_setfield ( luaVM, -2, "brakeBias" );
+
+            lua_pushboolean ( luaVM, pEntry->GetABS () );
+            lua_setfield ( luaVM, -2, "ABS" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSteeringLock () );
+            lua_setfield ( luaVM, -2, "steeringLock" );
+
+            lua_pushnumber ( luaVM, pEntry->GetTractionLoss () );
+            lua_setfield ( luaVM, -2, "tractionLoss" );
+
+            lua_pushnumber ( luaVM, pEntry->GetTractionBias () );
+            lua_setfield ( luaVM, -2, "tractionBias" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel () );
+            lua_setfield ( luaVM, -2, "suspensionForceLevel" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping () );
+            lua_setfield ( luaVM, -2, "suspensionDamping" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping () );
+            lua_setfield ( luaVM, -2, "suspensionHighSpeedDamping" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit () );
+            lua_setfield ( luaVM, -2, "suspensionUpperLimit" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit () );
+            lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias () );
+            lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidiveMultiplier () );
+            lua_setfield ( luaVM, -2, "suspensionAntidiveMultiplier" );
+
+            lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier () );
+            lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance () );
+            lua_setfield ( luaVM, -2, "seatOffsetDistance" );
+
+            lua_pushnumber ( luaVM, pEntry->GetHandlingFlags () );
+            lua_setfield ( luaVM, -2, "handlingFlags" );
+
+            lua_pushnumber ( luaVM, pEntry->GetModelFlags () );
+            lua_setfield ( luaVM, -2, "modelFlags" );
+
+            lua_pushnumber ( luaVM, pEntry->GetMonetary () );
+            lua_setfield ( luaVM, -2, "monetary" );
+
+            CHandlingEntry::eLightType eHeadType = pEntry->GetHeadLight ();
+            if ( eHeadType == CHandlingEntry::LONG )
+                lua_pushstring ( luaVM, "long" );
+            else if ( eHeadType == CHandlingEntry::SMALL )
+                lua_pushstring ( luaVM, "small" );
+            else if ( eHeadType == CHandlingEntry::BIG )
+                lua_pushstring ( luaVM, "big" );
+            else
+                lua_pushnil ( luaVM );
+            lua_setfield ( luaVM, -2, "headLight" );
+
+            CHandlingEntry::eLightType eTailType = pEntry->GetTailLight ();
+            if ( eTailType == CHandlingEntry::LONG )
+                lua_pushstring ( luaVM, "long" );
+            else if ( eTailType == CHandlingEntry::SMALL )
+                lua_pushstring ( luaVM, "small" );
+            else if ( eTailType == CHandlingEntry::BIG )
+                lua_pushstring ( luaVM, "big" );
+            else
+                lua_pushnil ( luaVM );
+            lua_setfield ( luaVM, -2, "tailLight" );
+
+            lua_pushnumber ( luaVM, pEntry->GetAnimGroup () );
+            lua_setfield ( luaVM, -2, "animGroup" );
+
+            return 1;
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleHandling", "vehicle", 1 );
@@ -560,210 +521,152 @@ int CLuaHandlingDefs::GetModelHandling ( lua_State* luaVM )
         eVehicleTypes eModel = static_cast < eVehicleTypes > ( (int)lua_tonumber ( luaVM, 1 ) );
         if ( eModel )
         {
-            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-            {
-                eHandlingProperty eProperty = m_pHandlingManager->GetPropertyEnumFromName ( lua_tostring ( luaVM, 2 ) );
-                if ( eProperty )
-                {
-                    switch ( eProperty )
-                    {
-                        case HANDLING_MASS:
-                        case HANDLING_TURNMASS:
-                        case HANDLING_DRAGCOEFF:
-                        case HANDLING_TRACTIONMULTIPLIER:
-                        case HANDLING_ENGINEACCELERATION:
-                        case HANDLING_ENGINEINERTIA:
-                        case HANDLING_MAXVELOCITY:
-                        case HANDLING_BRAKEDECELERATION:
-                        case HANDLING_BRAKEBIAS:
-                        case HANDLING_STEERINGLOCK:
-                        case HANDLING_TRACTIONLOSS:
-                        case HANDLING_TRACTIONBIAS:
-                        case HANDLING_SUSPENSION_FORCELEVEL:
-                        case HANDLING_SUSPENSION_DAMPING:
-                        case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
-                        case HANDLING_SUSPENSION_UPPER_LIMIT:
-                        case HANDLING_SUSPENSION_LOWER_LIMIT:
-                        case HANDLING_SUSPENSION_FRONTREARBIAS:
-                        case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
-                        case HANDLING_COLLISIONDAMAGEMULTIPLIER:
-                        case HANDLING_SEATOFFSETDISTANCE:
-                        case HANDLING_PERCENTSUBMERGED: // unsigned int
-                        case HANDLING_MONETARY:
-                        case HANDLING_HANDLINGFLAGS:
-                        case HANDLING_MODELFLAGS:
-                        case HANDLING_NUMOFGEARS:
-                        case HANDLING_ANIMGROUP:
-                            {
-                                float fValue;
-                                if ( CStaticFunctionDefinitions::GetModelHandling ( eModel, eProperty, fValue ) )
-                                    lua_pushnumber ( luaVM, fValue );
-                                else
-                                    lua_pushboolean ( luaVM, false );
+            const CHandlingEntry* pEntry = g_pGame->GetHandlingManager ()->GetModelHandlingData ( eModel );
 
-                                break;
-                            }
-                        case HANDLING_CENTEROFMASS:
-                            {
-                                CVector vecValue;
-                                if ( CStaticFunctionDefinitions::GetModelHandling ( eModel, eProperty, vecValue ) )
-                                {
-                                    lua_pushnumber ( luaVM, vecValue.fX );
-                                    lua_pushnumber ( luaVM, vecValue.fY );
-                                    lua_pushnumber ( luaVM, vecValue.fZ );
-                                    return 3;
-                                }
-                                else
-                                    lua_pushboolean ( luaVM, false );
+            lua_newtable ( luaVM );
 
-                                break;
-                            }
-                        case HANDLING_DRIVETYPE:
-                        case HANDLING_ENGINETYPE:
-                        case HANDLING_HEADLIGHT:
-                        case HANDLING_TAILLIGHT:
-                            {
-                                std::string strValue;
-                                if ( CStaticFunctionDefinitions::GetModelHandling ( eModel, eProperty, strValue ) )
-                                    lua_pushstring ( luaVM, strValue.c_str () );
-                                else
-                                    lua_pushboolean ( luaVM, false );
+            lua_pushnumber ( luaVM, pEntry->GetMass () );
+            lua_setfield ( luaVM, -2, "mass" );
 
-                                break;
-                            }
-                        case HANDLING_ABS:
-                            {
-                                float fValue;
-                                if ( CStaticFunctionDefinitions::GetModelHandling ( eModel, eProperty, fValue ) )
-                                    lua_pushboolean ( luaVM, fValue ? true : false );
-                                else
-                                    lua_pushboolean ( luaVM, false );
+            lua_pushnumber ( luaVM, pEntry->GetTurnMass () );
+            lua_setfield ( luaVM, -2, "turnMass" );
 
-                                break;
-                            }
-                        default:
-                            lua_pushboolean ( luaVM, false );
-                    }
+            lua_pushnumber ( luaVM, pEntry->GetDragCoeff () );
+            lua_setfield ( luaVM, -2, "dragCoeff" );
 
-                    return 1;
-                }
-                else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "getModelHandling", "property", 2 );
-            }
-            else if ( lua_type ( luaVM, 2 ) == LUA_TNIL || lua_type ( luaVM, 2 ) == LUA_TNONE )
-            {
-                const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData( eModel );
+            lua_createtable ( luaVM, 3, 0 );
+            CVector vecCenter = pEntry->GetCenterOfMass ();
+            lua_pushnumber ( luaVM, 1 );
+            lua_pushnumber ( luaVM, vecCenter.fX );
+            lua_settable ( luaVM, -3 );
+            lua_pushnumber ( luaVM, 2 );
+            lua_pushnumber ( luaVM, vecCenter.fY );
+            lua_settable ( luaVM, -3 );
+            lua_pushnumber ( luaVM, 3 );
+            lua_pushnumber ( luaVM, vecCenter.fZ );
+            lua_settable ( luaVM, -3 );
+            lua_setfield ( luaVM, -2, "centerOfMass" );
 
-                lua_newtable ( luaVM );
-                lua_pushnumber ( luaVM, pEntry->GetMass() );
-                lua_setfield ( luaVM, -2, "mass" );
-                lua_pushnumber ( luaVM, pEntry->GetTurnMass() );
-                lua_setfield ( luaVM, -2, "turnMass" );
-                lua_pushnumber ( luaVM, pEntry->GetDragCoeff() );
-                lua_setfield ( luaVM, -2, "dragCoeff" );
-                lua_newtable ( luaVM );
-                CVector vecCenter = pEntry->GetCenterOfMass ();
-                lua_pushnumber ( luaVM, vecCenter.fX );
-                lua_setfield ( luaVM, -2, "posX" );
-                lua_pushnumber ( luaVM, vecCenter.fY );
-                lua_setfield ( luaVM, -2, "posY" );
-                lua_pushnumber ( luaVM, vecCenter.fZ );
-                lua_setfield ( luaVM, -2, "posZ" );
-                lua_setfield ( luaVM, -2, "centerOfMass" );
-                lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged() );
-                lua_setfield ( luaVM, -2, "percentSubmerged" );
-                lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier() );
-                lua_setfield ( luaVM, -2, "tractionMultiplier" );
-                CHandlingEntry::eDriveType eDriveType=pEntry->GetCarDriveType();
-                if (eDriveType==CHandlingEntry::FWD)
-                    lua_pushstring(luaVM,"fwd");
-                else if (eDriveType==CHandlingEntry::RWD)
-                    lua_pushstring(luaVM,"rwd");
-                else if (eDriveType==CHandlingEntry::FOURWHEEL)
-                    lua_pushstring(luaVM,"awd");
-                else // What the ... (yeah, security)
-                    lua_pushnil ( luaVM );
-                lua_setfield ( luaVM, -2, "driveType" );
-                CHandlingEntry::eEngineType eEngineType=pEntry->GetCarEngineType();
-                if (eEngineType==CHandlingEntry::PETROL)
-                    lua_pushstring(luaVM,"petrol");
-                else if (eEngineType==CHandlingEntry::DIESEL)
-                    lua_pushstring(luaVM,"diesel");
-                else if (eEngineType==CHandlingEntry::ELECTRIC)
-                    lua_pushstring(luaVM,"electric");
-                else
-                    lua_pushnil ( luaVM );
-                lua_setfield ( luaVM, -2, "engineType" );
-                lua_pushnumber ( luaVM, pEntry->GetNumberOfGears() );
-                lua_setfield ( luaVM, -2, "numberOfGears" );
-                lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration() );
-                lua_setfield ( luaVM, -2, "engineAcceleration" );
-                lua_pushnumber ( luaVM, pEntry->GetEngineInertia() );
-                lua_setfield ( luaVM, -2, "engineInertia" );
-                lua_pushnumber ( luaVM, pEntry->GetMaxVelocity() );
-                lua_setfield ( luaVM, -2, "maxVelocity" );
-                lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration() );
-                lua_setfield ( luaVM, -2, "brakeDeceleration" );
-                lua_pushnumber ( luaVM, pEntry->GetBrakeBias() );
-                lua_setfield ( luaVM, -2, "brakeBias" );
-                lua_pushboolean ( luaVM, pEntry->GetABS() );
-                lua_setfield ( luaVM, -2, "ABS" );
-                lua_pushnumber ( luaVM, pEntry->GetSteeringLock() );
-                lua_setfield ( luaVM, -2, "steeringLock" );
-                lua_pushnumber ( luaVM, pEntry->GetTractionLoss() );
-                lua_setfield ( luaVM, -2, "tractionLoss" );
-                lua_pushnumber ( luaVM, pEntry->GetTractionBias() );
-                lua_setfield ( luaVM, -2, "tractionBias" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel() );
-                lua_setfield ( luaVM, -2, "suspensionForceLevel" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping() );
-                lua_setfield ( luaVM, -2, "suspensionDamping" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping() );
-                lua_setfield ( luaVM, -2, "suspensionHighSpeedDamping" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit() );
-                lua_setfield ( luaVM, -2, "suspensionUpperLimit" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit() );
-                lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias() );
-                lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
-                lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidiveMultiplier() );
-                lua_setfield ( luaVM, -2, "suspensionAntidiveMultiplier" );
-                lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier() );
-                lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
-                lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance() );
-                lua_setfield ( luaVM, -2, "seatOffsetDistance" );
-                lua_pushnumber ( luaVM, pEntry->GetHandlingFlags() );
-                lua_setfield ( luaVM, -2, "handlingFlags" );
-                lua_pushnumber ( luaVM, pEntry->GetModelFlags() );
-                lua_setfield ( luaVM, -2, "modelFlags" );
-                lua_pushnumber ( luaVM, pEntry->GetMonetary() );
-                lua_setfield ( luaVM, -2, "monetary" );
-                CHandlingEntry::eLightType eHeadType=pEntry->GetHeadLight();
-                if (eHeadType==CHandlingEntry::LONG)
-                    lua_pushstring(luaVM,"long");
-                else if (eHeadType==CHandlingEntry::SMALL)
-                    lua_pushstring(luaVM,"small");
-                else if (eHeadType==CHandlingEntry::BIG)
-                    lua_pushstring(luaVM,"big");
-                else
-                    lua_pushnil( luaVM );
-                lua_setfield ( luaVM, -2, "headLight" );
-                CHandlingEntry::eLightType eTailType=pEntry->GetTailLight();
-                if (eTailType==CHandlingEntry::LONG)
-                    lua_pushstring(luaVM,"long");
-                else if (eTailType==CHandlingEntry::SMALL)
-                    lua_pushstring(luaVM,"small");
-                else if (eTailType==CHandlingEntry::BIG)
-                    lua_pushstring(luaVM,"big");
-                else
-                    lua_pushnil( luaVM );
-                lua_setfield ( luaVM, -2, "tailLight" );
-                lua_pushnumber ( luaVM, pEntry->GetAnimGroup() );
-                lua_setfield ( luaVM, -2, "animGroup" );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged () );
+            lua_setfield ( luaVM, -2, "percentSubmerged" );
+
+            lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier () );
+            lua_setfield ( luaVM, -2, "tractionMultiplier" );
+
+            CHandlingEntry::eDriveType eDriveType = pEntry->GetCarDriveType ();
+            if ( eDriveType == CHandlingEntry::FWD )
+                lua_pushstring ( luaVM, "fwd" );
+            else if ( eDriveType == CHandlingEntry::RWD )
+                lua_pushstring ( luaVM, "rwd" );
+            else if ( eDriveType == CHandlingEntry::FOURWHEEL )
+                lua_pushstring ( luaVM, "awd" );
+            else // What the ... (yeah, security)
+                lua_pushnil ( luaVM );
+            lua_setfield ( luaVM, -2, "driveType" );
+
+            CHandlingEntry::eEngineType eEngineType = pEntry->GetCarEngineType ();
+            if ( eEngineType == CHandlingEntry::PETROL )
+                lua_pushstring ( luaVM, "petrol" );
+            else if ( eEngineType == CHandlingEntry::DIESEL )
+                lua_pushstring ( luaVM, "diesel" );
+            else if ( eEngineType == CHandlingEntry::ELECTRIC )
+                lua_pushstring ( luaVM, "electric" );
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "getModelHandling", "property", 2 );
+                lua_pushnil ( luaVM );
+            lua_setfield ( luaVM, -2, "engineType" );
+
+            lua_pushnumber ( luaVM, pEntry->GetNumberOfGears () );
+            lua_setfield ( luaVM, -2, "numberOfGears" );
+
+            lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration () );
+            lua_setfield ( luaVM, -2, "engineAcceleration" );
+
+            lua_pushnumber ( luaVM, pEntry->GetEngineInertia () );
+            lua_setfield ( luaVM, -2, "engineInertia" );
+
+            lua_pushnumber ( luaVM, pEntry->GetMaxVelocity () );
+            lua_setfield ( luaVM, -2, "maxVelocity" );
+
+            lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration () );
+            lua_setfield ( luaVM, -2, "brakeDeceleration" );
+
+            lua_pushnumber ( luaVM, pEntry->GetBrakeBias () );
+            lua_setfield ( luaVM, -2, "brakeBias" );
+
+            lua_pushboolean ( luaVM, pEntry->GetABS () );
+            lua_setfield ( luaVM, -2, "ABS" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSteeringLock () );
+            lua_setfield ( luaVM, -2, "steeringLock" );
+
+            lua_pushnumber ( luaVM, pEntry->GetTractionLoss () );
+            lua_setfield ( luaVM, -2, "tractionLoss" );
+
+            lua_pushnumber ( luaVM, pEntry->GetTractionBias () );
+            lua_setfield ( luaVM, -2, "tractionBias" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel () );
+            lua_setfield ( luaVM, -2, "suspensionForceLevel" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping () );
+            lua_setfield ( luaVM, -2, "suspensionDamping" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping () );
+            lua_setfield ( luaVM, -2, "suspensionHighSpeedDamping" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit () );
+            lua_setfield ( luaVM, -2, "suspensionUpperLimit" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit () );
+            lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias () );
+            lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidiveMultiplier () );
+            lua_setfield ( luaVM, -2, "suspensionAntidiveMultiplier" );
+
+            lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier () );
+            lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
+
+            lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance () );
+            lua_setfield ( luaVM, -2, "seatOffsetDistance" );
+
+            lua_pushnumber ( luaVM, pEntry->GetHandlingFlags () );
+            lua_setfield ( luaVM, -2, "handlingFlags" );
+
+            lua_pushnumber ( luaVM, pEntry->GetModelFlags () );
+            lua_setfield ( luaVM, -2, "modelFlags" );
+
+            lua_pushnumber ( luaVM, pEntry->GetMonetary () );
+            lua_setfield ( luaVM, -2, "monetary" );
+
+            CHandlingEntry::eLightType eHeadType = pEntry->GetHeadLight ();
+            if ( eHeadType == CHandlingEntry::LONG )
+                lua_pushstring ( luaVM, "long" );
+            else if ( eHeadType == CHandlingEntry::SMALL )
+                lua_pushstring ( luaVM, "small" );
+            else if ( eHeadType == CHandlingEntry::BIG )
+                lua_pushstring ( luaVM, "big" );
+            else
+                lua_pushnil( luaVM );
+            lua_setfield ( luaVM, -2, "headLight" );
+
+            CHandlingEntry::eLightType eTailType = pEntry->GetTailLight ();
+            if (eTailType == CHandlingEntry::LONG )
+                lua_pushstring ( luaVM, "long" );
+            else if ( eTailType == CHandlingEntry::SMALL )
+                lua_pushstring ( luaVM, "small" );
+            else if ( eTailType == CHandlingEntry::BIG )
+                lua_pushstring ( luaVM, "big" );
+            else
+                lua_pushnil( luaVM );
+            lua_setfield ( luaVM, -2, "tailLight" );
+
+            lua_pushnumber ( luaVM, pEntry->GetAnimGroup () );
+            lua_setfield ( luaVM, -2, "animGroup" );
+
+            return 1;
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "getModelHandling", "model", 1 );
