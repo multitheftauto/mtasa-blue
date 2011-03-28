@@ -56,6 +56,7 @@ public:
                                         ~CClientManager             ( void );
 
     void                                DoPulse                     ( void );
+    void                                DoRender                    ( void );
     void                                UpdateStreamers             ( void );
 
     inline CAntiCheat&                  GetAntiCheat                ( void )        { return m_AntiCheat; }

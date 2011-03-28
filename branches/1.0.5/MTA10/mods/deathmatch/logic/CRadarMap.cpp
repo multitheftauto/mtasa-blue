@@ -190,6 +190,15 @@ void CRadarMap::DoPulse ( void )
                 MoveWest ();
             }
         }
+    }
+}
+
+
+void CRadarMap::DoRender ( void )
+{
+    // If our radar image exists
+    if ( IsRadarShowing () )
+    {
 
         g_pCore->GetGraphics()->DrawTexture ( m_pRadarImage, static_cast < float > ( m_iMapMinX ),
                                                              static_cast < float > ( m_iMapMinY ),

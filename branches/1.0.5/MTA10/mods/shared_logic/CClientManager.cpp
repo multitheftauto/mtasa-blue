@@ -190,7 +190,6 @@ void CClientManager::DoPulse ( void )
         m_pVehicleManager->DoPulse ();
         m_pPathManager->DoPulse ();
         m_pRadarMarkerManager->DoPulse ();
-        m_pDisplayManager->DoPulse ();
         m_pPedManager->DoPulse ();
         m_pObjectManager->DoPulse ();
         m_pProjectileManager->DoPulse ();
@@ -198,6 +197,15 @@ void CClientManager::DoPulse ( void )
         m_pPlayerManager->DoPulse ();
         m_pColManager->DoPulse ();
         m_pGUIManager->DoPulse ();
+    }
+}
+
+
+void CClientManager::DoRender ( void )
+{
+    if ( IsGameLoaded () )
+    {
+        m_pDisplayManager->DoPulse ();
     }
 }
 
