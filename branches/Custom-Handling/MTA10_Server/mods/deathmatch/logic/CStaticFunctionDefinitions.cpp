@@ -1459,7 +1459,7 @@ bool CStaticFunctionDefinitions::SetElementDoubleSided ( CElement* pElement, boo
 
     CBitStream BitStream;
     BitStream.pBitStream->WriteBit ( bDoubleSided );
-    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ), NULL, PACKET_ORDERING_GAME, 0x0c );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream ) );
 
     return true;
 }
@@ -1487,7 +1487,7 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
                 unsigned char ucHealth = static_cast < unsigned char > ( fHealth * 1.25f );
                 fHealth = static_cast < float > ( ucHealth ) / 1.25f;
                 pPed->SetHealth ( fHealth );
-                pPed->SetHealthChangeTime ( GetTickCount () );
+                pPed->SetHealthChangeTime ( GetTickCount32 () );
             }
             else
                 return false;
@@ -1497,7 +1497,7 @@ bool CStaticFunctionDefinitions::SetElementHealth ( CElement* pElement, float fH
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
             pVehicle->SetHealth ( fHealth );
-            pVehicle->SetHealthChangeTime ( GetTickCount () );
+            pVehicle->SetHealthChangeTime ( GetTickCount32 () );
             break;
         }
         case CElement::OBJECT:
@@ -2735,7 +2735,7 @@ bool CStaticFunctionDefinitions::SetPedArmor ( CElement* pElement, float fArmor 
                     fArmor = 100.0f;
 
                 pPed->SetArmor ( fArmor );
-                pPed->SetArmorChangeTime ( GetTickCount () );
+                pPed->SetArmorChangeTime ( GetTickCount32 () );
 
                 unsigned char ucArmor = static_cast < unsigned char > ( fArmor * 1.25 );
 
@@ -4159,10 +4159,10 @@ bool CStaticFunctionDefinitions::FixVehicle ( CElement* pElement )
 }
 
 
-bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode )
+bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement )
 {
     assert ( pElement );
-    RUN_CHILDREN BlowVehicle ( *iter, bExplode );
+    RUN_CHILDREN BlowVehicle ( *iter );
 
     if ( IS_VEHICLE ( pElement ) )
     {
@@ -4177,13 +4177,12 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
             pVehicle->CallEvent ( "onVehicleExplode", Arguments );
         }
         pVehicle->SetHealth ( 0.0f );
-        pVehicle->SetBlowTime ( ::GetTime () );
+        //pVehicle->SetBlowTime ( ::GetTime () ); //This would make it blow up silently
         pVehicle->GenerateSyncTimeContext ();
         //Update our engine State
         pVehicle->SetEngineOn( false );
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( ( unsigned char ) ( ( bExplode ) ? 1 : 0 ) );
         BitStream.pBitStream->Write ( pVehicle->GetSyncTimeContext () );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, BLOW_VEHICLE, *BitStream.pBitStream ) );
         return true;
@@ -4208,7 +4207,7 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor ( CVehicle * pVehicle,
 
 bool CStaticFunctionDefinitions::GetVehicleDoorOpenRatio ( CVehicle* pVehicle, unsigned char ucDoor, float& fRatio )
 {
-    if ( pVehicle != NULL )
+    if ( ucDoor <= 5 && pVehicle != NULL )
     {
         fRatio = pVehicle->GetDoorOpenRatio ( ucDoor );
         return true;
@@ -6077,23 +6076,26 @@ bool CStaticFunctionDefinitions::SetVehicleTurretPosition ( CVehicle* pVehicle, 
 
 bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( CElement* pElement, unsigned char ucDoor, float fRatio, unsigned long ulTime )
 {
-    RUN_CHILDREN SetVehicleDoorOpenRatio ( *iter, ucDoor, fRatio, ulTime );
-
-    if ( IS_VEHICLE(pElement) )
+    if ( ucDoor <= 5 )
     {
-        CVehicle& Vehicle = static_cast < CVehicle& > ( *pElement );
-        Vehicle.SetDoorOpenRatio ( ucDoor, fRatio );
+        RUN_CHILDREN SetVehicleDoorOpenRatio ( *iter, ucDoor, fRatio, ulTime );
 
-        CBitStream BitStream;
-        SIntegerSync < unsigned char, 3 > ucDoorSync ( ucDoor );
-        SDoorOpenRatioSync angle;
-        angle.data.fRatio = fRatio;
-        BitStream.pBitStream->Write ( &ucDoorSync );
-        BitStream.pBitStream->Write ( &angle );
-        BitStream.pBitStream->WriteCompressed ( static_cast < unsigned int > ( ulTime ) );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( &Vehicle, SET_VEHICLE_DOOR_OPEN_RATIO, *BitStream.pBitStream ) );
+        if ( IS_VEHICLE(pElement) )
+        {
+            CVehicle& Vehicle = static_cast < CVehicle& > ( *pElement );
+            Vehicle.SetDoorOpenRatio ( ucDoor, fRatio );
 
-        return true;
+            CBitStream BitStream;
+            SIntegerSync < unsigned char, 3 > ucDoorSync ( ucDoor );
+            SDoorOpenRatioSync angle;
+            angle.data.fRatio = fRatio;
+            BitStream.pBitStream->Write ( &ucDoorSync );
+            BitStream.pBitStream->Write ( &angle );
+            BitStream.pBitStream->WriteCompressed ( static_cast < unsigned int > ( ulTime ) );
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( &Vehicle, SET_VEHICLE_DOOR_OPEN_RATIO, *BitStream.pBitStream ) );
+
+            return true;
+        }
     }
 
     return false;
@@ -8188,6 +8190,79 @@ bool CStaticFunctionDefinitions::GetJetpackMaxHeight ( float& fMaxHeight )
     return true;
 }
 
+bool CStaticFunctionDefinitions::AreInteriorSoundsEnabled ( bool& bEnabled )
+{
+    bEnabled = g_pGame->AreInteriorSoundsEnabled ( );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetRainLevel ( float& fRainLevel )
+{
+    if ( g_pGame->HasRainLevel ( ) )
+    {
+        fRainLevel = g_pGame->GetRainLevel ( );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSunSize ( float& fSunSize )
+{
+    if ( g_pGame->HasSunSize ( ) )
+    {
+        fSunSize = g_pGame->GetSunSize ( );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSunColor ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB )
+{
+    if ( g_pGame->HasSunColor ( ) )
+    {
+        g_pGame->GetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetWindVelocity ( float& fVelX, float& fVelY, float& fVelZ )
+{
+    if ( g_pGame->HasWindVelocity ( ) )
+    {
+        g_pGame->GetWindVelocity ( fVelX, fVelY, fVelZ );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetFarClipDistance ( float& fFarClip )
+{
+    if ( g_pGame->HasFarClipDistance ( ) )
+    {
+        fFarClip = g_pGame->GetFarClipDistance ( );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetFogDistance ( float& fFogDist )
+{
+    if ( g_pGame->HasFogDistance ( ) )
+    {
+        fFogDist = g_pGame->GetFogDistance ( );
+        return true;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char ucMinute )
 {
     // Verify the range
@@ -8246,6 +8321,156 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fMaxHeight )
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetInteriorSoundsEnabled ( bool bEnable )
+{
+    g_pGame->SetInteriorSoundsEnabled ( bEnable );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit ( bEnable );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_INTERIOR_SOUNDS_ENABLED, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetRainLevel ( float fRainLevel )
+{
+    g_pGame->SetRainLevel ( fRainLevel );
+    g_pGame->SetHasRainLevel ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fRainLevel );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_RAIN_LEVEL, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetSunSize ( float fSunSize )
+{
+    g_pGame->SetSunSize ( fSunSize );
+    g_pGame->SetHasSunSize ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fSunSize );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_SUN_SIZE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetSunColor ( unsigned char ucCoreR, unsigned char ucCoreG, unsigned char ucCoreB, unsigned char ucCoronaR, unsigned char ucCoronaG, unsigned char ucCoronaB )
+{
+    g_pGame->SetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB );
+    g_pGame->SetHasSunColor ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( ucCoreR );
+    BitStream.pBitStream->Write ( ucCoreG );
+    BitStream.pBitStream->Write ( ucCoreB );
+    BitStream.pBitStream->Write ( ucCoronaR );
+    BitStream.pBitStream->Write ( ucCoronaG );
+    BitStream.pBitStream->Write ( ucCoronaB );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_SUN_COLOR, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetWindVelocity ( float fVelX, float fVelY, float fVelZ )
+{
+    g_pGame->SetWindVelocity ( fVelX, fVelY, fVelZ );
+    g_pGame->SetHasWindVelocity ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fVelX );
+    BitStream.pBitStream->Write ( fVelY );
+    BitStream.pBitStream->Write ( fVelZ );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_WIND_VELOCITY, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetFarClipDistance ( float fFarClip )
+{
+    g_pGame->SetFarClipDistance ( fFarClip );
+    g_pGame->SetHasFarClipDistance ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fFarClip );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_FAR_CLIP_DISTANCE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetFogDistance ( float fFogDist )
+{
+    g_pGame->SetFogDistance ( fFogDist );
+    g_pGame->SetHasFogDistance ( true );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fFogDist );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_FOG_DISTANCE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetRainLevel ( )
+{
+    g_pGame->SetHasRainLevel ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_RAIN_LEVEL, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetSunSize ( )
+{
+    g_pGame->SetHasSunSize ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_SUN_SIZE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetSunColor ( )
+{
+    g_pGame->SetHasSunColor ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_SUN_COLOR, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetWindVelocity ( )
+{
+    g_pGame->SetHasWindVelocity ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_WIND_VELOCITY, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetFarClipDistance ( )
+{
+    g_pGame->SetHasFarClipDistance ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_FAR_CLIP_DISTANCE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ResetFogDistance ( )
+{
+    g_pGame->SetHasFogDistance ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_FOG_DISTANCE, *BitStream.pBitStream ) );
+
+    return true;
 }
 
 
@@ -8443,6 +8668,40 @@ bool CStaticFunctionDefinitions::ResetSkyGradient ( void )
 
     CBitStream BitStream;
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_SKY_GRADIENT, *BitStream.pBitStream ) );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetHeatHaze ( SHeatHazeSettings& settings )
+{
+    if ( g_pGame->HasHeatHaze () )
+    {
+        g_pGame->GetHeatHaze ( settings );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetHeatHaze ( const SHeatHazeSettings& settings )
+{
+    g_pGame->SetHeatHaze ( settings );
+    g_pGame->SetHasHeatHaze ( true );
+
+    CBitStream BitStream;
+    SHeatHazeSync heatHaze ( settings );
+    BitStream.pBitStream->Write ( &heatHaze );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_HEAT_HAZE, *BitStream.pBitStream ) );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetHeatHaze ( void )
+{
+    g_pGame->SetHasHeatHaze ( false );
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESET_HEAT_HAZE, *BitStream.pBitStream ) );
     return true;
 }
 
@@ -8647,15 +8906,6 @@ bool CStaticFunctionDefinitions::SetPlayerAnnounceValue ( CElement* pElement, co
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetServerName( std::string strServerName )
-{
-    if ( strServerName != "" )
-    {
-        g_pGame->GetConfig()->SetServerName ( strServerName );
-        return true;
-    }
-    return false;
-}
 
 void CStaticFunctionDefinitions::ExecuteSQLCreateTable ( const std::string& strTable, const std::string& strDefinition )
 {
@@ -9176,9 +9426,8 @@ bool CStaticFunctionDefinitions::RemoveBan ( CBan* pBan, CPlayer* pResponsible )
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetBans ( CLuaMain* pLuaMain )
+bool CStaticFunctionDefinitions::GetBans ( lua_State* pLua )
 {
-    lua_State* pLua = pLuaMain->GetVM();
     list < CBan* > ::const_iterator iter = m_pBanManager->IterBegin();
     unsigned int uiIndex = 0;
 

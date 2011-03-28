@@ -168,7 +168,9 @@ public:
                                         usGamePort );
 
         m_Socket = INVALID_SOCKET;
-
+        strGameMode = "";
+        strMap = "";
+        vecPlayers.clear();
         uiTieBreakPosition = 1000;
         m_iDataQuality = SERVER_INFO_NONE;
         m_iTimeoutLength = SERVER_LIST_ITEM_TIMEOUT;
@@ -312,7 +314,7 @@ protected:
 };
 
 typedef std::list<CServerListItem*>::const_iterator CServerListIterator;
-
+typedef std::list<CServerListItem*>::const_reverse_iterator CServerListReverseIterator;
 
 // Address and port combo
 struct SAddressPort
@@ -350,6 +352,16 @@ public:
     std::list<CServerListItem*>::iterator end()
     {
         return m_List.end ();
+    }
+
+    std::list<CServerListItem*>::reverse_iterator rbegin()
+    {
+        return m_List.rbegin ();
+    }
+
+    std::list<CServerListItem*>::reverse_iterator rend()
+    {
+        return m_List.rend ();
     }
 
     size_t size() const
@@ -427,11 +439,13 @@ public:
 
     CServerListIterator                     IteratorBegin           ( void )                        { return m_Servers.begin (); };
     CServerListIterator                     IteratorEnd             ( void )                        { return m_Servers.end (); };
+    CServerListReverseIterator              ReverseIteratorBegin    ( void )                        { return m_Servers.rbegin (); };
+    CServerListReverseIterator              ReverseIteratorEnd      ( void )                        { return m_Servers.rend (); };
     unsigned int                            GetServerCount          ( void )                        { return m_Servers.size (); };
 
     bool                                    AddUnique               ( in_addr Address, ushort usQueryPort, bool addAtFront = false );
     void                                    Clear                   ( void );
-    void                                    Remove                  ( in_addr Address, ushort usQueryPort );
+    bool                                    Remove                  ( in_addr Address, ushort usQueryPort );
 
     std::string&                            GetStatus               ( void )                        { return m_strStatus; };
     bool                                    IsUpdated               ( void )                        { return m_bUpdated; };

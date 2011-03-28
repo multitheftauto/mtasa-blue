@@ -47,7 +47,7 @@ public:
     bool            Initialize                      ( unsigned int uiID );
 
     // Async related functions
-    void            FireEvent                       ( LPARAM lType );
+    void            FireEvent                       ( bool bIsResolveEvent, uint uiResolveId, LPARAM lType );
 
     // Callback functions
     void            SetEventClass                   ( void* pClass );

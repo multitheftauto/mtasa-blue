@@ -98,7 +98,7 @@ public:
     virtual void        DoPulse             ( void ) = 0;
     virtual void        OnLuaMainCreate     ( CLuaMain* pLuaMain ) = 0;
     virtual void        OnLuaMainDestroy    ( CLuaMain* pLuaMain ) = 0;
-    virtual void        GetStats            ( CPerfStatResult* pOutResult, const SString& strCatagory, const SString& strOptions, const SString& strFilter ) = 0;
+    virtual void        GetStats            ( CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter ) = 0;
     virtual void        UpdateLuaMemory     ( CLuaMain* pLuaMain, int iMemUsed ) = 0;
     virtual void        UpdateLuaTiming     ( CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs ) = 0;
     virtual void        UpdateLibMemory     ( const SString& strLibName, int iMemUsed, int iMemUsedMax ) = 0;

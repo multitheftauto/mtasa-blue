@@ -27,9 +27,7 @@ CGUIButton_Impl::CGUIButton_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
     m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIBUTTON_NAME, szUnique );
     m_pWindow->setDestroyedByParent ( false );
 
-    CEGUI::String strText;
-    strText.assign( (CEGUI::utf8*)szCaption ); // assign as UTF8 string
-    m_pWindow->setText ( strText );
+    m_pWindow->setText ( CGUI_Impl::GetUTFString(szCaption) );
 
     m_pWindow->setSize ( CEGUI::Absolute, CEGUI::Size ( 128.0f, 24.0f ) );
     m_pWindow->setVisible ( true );

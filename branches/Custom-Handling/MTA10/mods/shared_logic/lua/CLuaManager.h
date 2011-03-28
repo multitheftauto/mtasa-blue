@@ -50,6 +50,9 @@ public:
 
     void                            SetScriptDebugging      ( CScriptDebugging* pScriptDebugging );
 
+    void                            AddToPendingDeleteList   ( lua_State* m_luaVM )     { m_PendingDeleteList.push_back ( m_luaVM ); }
+    void                            ProcessPendingDeleteList ( void );
+
     CClientGUIManager*              m_pGUIManager;
 
 private:
@@ -59,6 +62,7 @@ private:
     CRegisteredCommands*            m_pRegisteredCommands;
 
     std::list < CLuaMain* >         m_virtualMachines;
+    std::list < lua_State* >        m_PendingDeleteList;
 };
 
 #endif

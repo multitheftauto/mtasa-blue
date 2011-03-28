@@ -84,9 +84,9 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
             strClumpedCommand = szCommandBufferPointer;
 
         // Convert to Unicode, and clamp it to a maximum command length
-        std::wstring strClumpedCommandUTF = SharedUtil::ConvertToUTF8(strClumpedCommand.c_str());
+        std::wstring strClumpedCommandUTF = ConvertToUTF8(strClumpedCommand.c_str());
         strClumpedCommandUTF.substr(0,MAX_COMMAND_LENGTH);
-        strClumpedCommand = SharedUtil::ConvertToANSI(strClumpedCommandUTF);
+        strClumpedCommand = ConvertToANSI(strClumpedCommandUTF);
 
         g_pClientGame->GetRegisteredCommands ()->ProcessCommand ( szCommandBufferPointer, szArguments );
 
@@ -674,7 +674,7 @@ void DumpPlayer ( CClientPlayer* pPlayer, FILE* pFile )
 void COMMAND_DumpPlayers ( const char* szCmdLine )
 {
     // Create a file to dump to
-    SString strBuffer ( "%s/dump_%i.txt", g_pClientGame->GetModRoot (), GetTickCount () );
+    SString strBuffer ( "%s/dump_%i.txt", g_pClientGame->GetModRoot (), GetTickCount32 () );
     FILE* pFile = fopen ( strBuffer, "w+" );
     if ( pFile )
     {

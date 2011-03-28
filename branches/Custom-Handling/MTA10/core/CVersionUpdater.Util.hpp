@@ -711,7 +711,9 @@ namespace
 
         static void ClearLogContents ( const SString& strIdFilter )
         {
-            if ( strIdFilter == "" && FileExists ( CalcMTASAPath ( "_keep_report_" ) ) )
+            if ( strIdFilter == "-all" && FileExists ( CalcMTASAPath ( "_keep_report_" ) ) )
+                return;
+            if ( FileExists ( CalcMTASAPath ( "_keep_report_all_" ) ) )
                 return;
             SetReportLogContents ( GetLogContents ( strIdFilter ) );
         }
@@ -728,26 +730,24 @@ namespace
             strContent.Split ( "\n", lines );
 
             // Filter each line
-            int size = 0;
+            int iSize = 0;
             std::vector < SString > filteredLines;
             for ( int i = lines.size () - 1 ; i  >= 0 ; i-- )
             {
-                SString strLeft, strRight;
-                lines[i].Split ( ",", &strLeft, NULL );
-                if ( !filterMap.IsFiltered ( atoi ( strLeft ) ) )
+                const SString& strLine = lines[i];
+                if ( !strLine.empty () && !filterMap.IsFiltered ( atoi ( strLine ) ) )
                 {
-                    size += lines[i].length ();
-                    if ( iMaxSize && size > iMaxSize )
+                    iSize += strLine.length ();
+                    if ( iMaxSize && iSize > iMaxSize )
                         break;
-                    filteredLines.push_back ( lines[i] );
+                    filteredLines.push_back ( strLine );
                 }
             }
 
             // Compose final output
             SString strResult;
             for ( int i = filteredLines.size () - 1 ; i  >= 0 ; i-- )
-                if ( filteredLines[i].length () > 0 )
-                    strResult += filteredLines[i] + "\n";
+                strResult += filteredLines[i] + "\n";
 
             return strResult;
         }

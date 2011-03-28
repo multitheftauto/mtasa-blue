@@ -232,15 +232,13 @@ void CGUIElement_Impl::GetMaximumSize ( CVector2D& vecSize )
 
 void CGUIElement_Impl::SetText ( const char *szText )
 {
-    CEGUI::String strText;
-    strText.assign((CEGUI::utf8*)szText);
-    m_pWindow->setText( strText );
+    m_pWindow->setText( CGUI_Impl::GetUTFString(szText) );
 }
 
 
 std::string CGUIElement_Impl::GetText ( void )
 {
-    return m_pWindow->getText ().c_str ();
+    return CGUI_Impl::GetUTFString(m_pWindow->getText ().c_str ()).c_str();
 }
 
 
@@ -412,7 +410,7 @@ std::string CGUIElement_Impl::GetFont ( void )
 void CGUIElement_Impl::SetProperty ( const char *szProperty, const char *szValue )
 {
     try {
-        m_pWindow->setProperty ( szProperty, szValue );
+        m_pWindow->setProperty ( CGUI_Impl::GetUTFString(szProperty), CGUI_Impl::GetUTFString(szValue) );
     } catch ( CEGUI::Exception e ) {}
 }
 
@@ -423,7 +421,7 @@ std::string CGUIElement_Impl::GetProperty ( const char *szProperty )
     try
     {
         // Return the string. std::string will copy it
-        strValue = m_pWindow->getProperty ( CEGUI::String ( szProperty ) );
+        strValue = CGUI_Impl::GetUTFString(m_pWindow->getProperty ( CGUI_Impl::GetUTFString ( szProperty ) ).c_str() );
     }
     catch ( CEGUI::Exception e )
     {}

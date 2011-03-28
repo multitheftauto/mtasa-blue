@@ -126,6 +126,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_bCloudsEnabled = true;
 
+    m_uiNotPulsedCounter = 0;
+
     #ifdef MTA_VOICE
     m_pVoice = VoiceCreate();
     // Initialize the voice module for this mod.
@@ -245,6 +247,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
+    g_pMultiplayer->SetPreWorldProcessHandler ( CClientGame::StaticPreWorldProcessHandler );
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
     g_pMultiplayer->SetIdleHandler ( CClientGame::StaticIdleHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
@@ -252,6 +255,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     m_pProjectileManager->SetInitiateHandler ( CClientGame::StaticProjectileInitiateHandler );
     g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
+    g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
+    g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( CClientGame::StaticCharacterKeyHandler );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
 
     m_pLuaManager = new CLuaManager ( this );
@@ -306,7 +311,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     CClientTextDisplay::SetGlobalScale ( fScale );
 
     // Reset async loading script settings to default
-    g_pGame->SetAsyncLoadingFromScript ( false, false );
+    g_pGame->SetAsyncLoadingFromScript ( true, false );
 }
 
 
@@ -377,6 +382,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetProjectileHandler ( NULL );
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
     g_pMultiplayer->SetChokingHandler ( NULL );
+    g_pMultiplayer->SetPreWorldProcessHandler (  NULL );
     g_pMultiplayer->SetPostWorldProcessHandler (  NULL );
     g_pMultiplayer->SetIdleHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
@@ -384,6 +390,8 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
     m_pProjectileManager->SetInitiateHandler ( NULL );
     g_pCore->SetMessageProcessor ( NULL );
+    g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
+    g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( NULL );
     g_pNet->StopNetwork ();
     g_pNet->RegisterPacketHandler ( NULL );
     CKeyBindsInterface * pKeyBinds = g_pCore->GetKeyBinds ();
@@ -781,6 +789,16 @@ void CClientGame::DoPulsePostFrame ( void )
             DrawFPS ();
         }
 
+        // Draw a little star in the corner if async is on
+        if ( g_pGame->IsASyncLoadingEnabled ( true ) )
+        {
+            CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+            unsigned int uiHeight = pGraphics->GetViewportHeight ();
+            unsigned int uiWidth = pGraphics->GetViewportWidth ();
+            unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled () ? uiHeight - 7 : uiHeight - 12;
+            pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
+        }
+
         // If we're in debug mode and are supposed to show task data, do it
         #ifdef MTA_DEBUG
         if ( m_pShowPlayerTasks )
@@ -823,12 +841,18 @@ void CClientGame::DoPulsePostFrame ( void )
             }
         }
         #endif
+
+        GetClientPerfStatManager ()->DoPulse ();
     }
 
     // If we are not minimized we do the pulsing here
     if ( !g_pCore->IsWindowMinimized () )
     {
-        DoPulses ();
+        // ..if no one else is doing it
+        if ( m_uiNotPulsedCounter > 1 )
+            DoPulses ();
+        else
+            m_uiNotPulsedCounter++;
     }
 }
 
@@ -864,7 +888,7 @@ void CClientGame::DoPulses ( void )
         {
             strMessage = g_pNet->GetNextBuffer ();
             if ( strMessage.length () )
-                uiLevel = 4;
+                uiLevel = atoi ( strMessage.SplitLeft ( ":", &strMessage ) );
         }
 
         // Send message to the server
@@ -873,27 +897,18 @@ void CClientGame::DoPulses ( void )
             SString strMessageCombo  = SString( "AC #%d %s", uiLevel, strMessage.c_str () ).TrimEnd ( " " );
             m_llLastTransgressionTime = GetTickCount64_ ();
             AddReportLog ( 3100, strMessageCombo );
-            if ( g_pNet->GetServerBitStreamVersion () >= 0x12 )
-            {
-                // Inform the server if we can
-                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-                pBitStream->Write ( uiLevel );
-                pBitStream->WriteString ( strMessage );
-                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
-                g_pNet->DeallocateNetBitStream ( pBitStream );
-            }
-            else
-            {
-                // Otherwise, disconnect here
-                g_pCore->ShowMessageBox ( "Error", SString ( strMessageCombo + ": You were kicked from the game" ), MB_BUTTON_OK | MB_ICON_ERROR );
-                g_pCore->GetModManager ()->RequestUnload ();
-                return;
-            }
+
+            // Inform the server
+            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+            pBitStream->Write ( uiLevel );
+            pBitStream->WriteString ( strMessage );
+            g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
+            g_pNet->DeallocateNetBitStream ( pBitStream );
         }
     }
 
     // Send diagnostic info
-    if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED && g_pNet->GetServerBitStreamVersion () >= 0x14 )
+    if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED )
     {
         // Retrieve data
         SString strMessage = g_pNet->GetDiagnosticStatus ();
@@ -1000,6 +1015,7 @@ void CClientGame::DoPulses ( void )
 
         // Get rid of our deleted elements
         m_ElementDeleter.DoDeleteAll ();
+        m_pLuaManager->ProcessPendingDeleteList ();
 
         // Get rid of deleted GUI elements
         g_pCore->GetGUI ()->CleanDeadPool ();
@@ -1774,7 +1790,7 @@ void CClientGame::UpdateTrailers ( void )
 {
     // This function is here to re-attach trailers if they fall off
     
-    unsigned long ulCurrentTime = GetTickCount ();
+    unsigned long ulCurrentTime = GetTickCount32 ();
 
     CClientVehicle * pVehicle = NULL, * pTrailer = NULL;
     CVehicle * pGameVehicle = NULL, * pGameTrailer = NULL;
@@ -2092,6 +2108,53 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
 }
 
 
+void CClientGame::StaticKeyStrokeHandler ( const SBindableKey * pKey, bool bState )
+{
+    g_pClientGame->KeyStrokeHandler ( pKey, bState );
+}
+
+
+void CClientGame::KeyStrokeHandler ( const SBindableKey * pKey, bool bState )
+{
+    // Do we have a root yet?
+    if ( m_pRootEntity )
+    {
+        // Call our key-stroke event
+        CLuaArguments Arguments;
+        Arguments.PushString ( pKey->szKey );
+        Arguments.PushBoolean ( bState );
+        m_pRootEntity->CallEvent ( "onClientKey", Arguments, false );
+    }
+}
+
+
+bool CClientGame::StaticCharacterKeyHandler ( WPARAM wChar )
+{
+    return g_pClientGame->CharacterKeyHandler ( wChar );
+}
+
+
+bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
+{
+    // Do we have a root yet?
+    if ( m_pRootEntity )
+    {
+        // Safe character?
+        if ( wChar >= 32 && wChar <= 126 )
+        {
+            char szCharacter [ 2 ] = { wChar, 0 };
+
+            // Call our character event
+            CLuaArguments Arguments;
+            Arguments.PushString ( szCharacter );
+            m_pRootEntity->CallEvent ( "onClientCharacter", Arguments, false );
+        }
+    }
+
+    return false;
+}
+
+
 void CClientGame::StaticProcessClientKeyBind ( CKeyFunctionBind* pBind )
 {
     g_pClientGame->ProcessClientKeyBind ( pBind );
@@ -2311,7 +2374,7 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                         {
                             CVector2D vecDelta = m_vecLastCursorPosition - vecCursorPosition;
 
-                            if (    ( GetTickCount() - m_ulLastClickTick ) < DOUBLECLICK_TIMEOUT &&
+                            if (    ( GetTickCount32() - m_ulLastClickTick ) < DOUBLECLICK_TIMEOUT &&
                                     vecDelta.Length() <= DOUBLECLICK_MOVE_THRESHOLD )
                             {
                                 // Call the event for the client
@@ -2329,7 +2392,7 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                                 m_pRootEntity->CallEvent ( "onClientDoubleClick", DoubleClickArguments, false );
                             }
 
-                            m_ulLastClickTick = GetTickCount();
+                            m_ulLastClickTick = GetTickCount32();
                             m_vecLastCursorPosition = vecCursorPosition;
                         }
 
@@ -2482,6 +2545,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientGUITabSwitched", "element", NULL, false );
     m_Events.AddEvent ( "onClientGUIComboBoxAccepted", "element", NULL, false );
 
+    // Input events
     m_Events.AddEvent ( "onClientDoubleClick", "button, screenX, screenY, worldX, worldY, worldZ, element", NULL, false );
     m_Events.AddEvent ( "onClientMouseMove", "screenX, screenY", NULL, false );
     m_Events.AddEvent ( "onClientMouseEnter", "screenX, screenY", NULL, false );
@@ -2491,6 +2555,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientGUISize", "", NULL, false );
     m_Events.AddEvent ( "onClientGUIFocus", "", NULL, false );
     m_Events.AddEvent ( "onClientGUIBlur", "", NULL, false );
+    m_Events.AddEvent ( "onClientKey", "key, state", NULL, false );
+    m_Events.AddEvent ( "onClientCharacter", "character", NULL, false );
 
     // Console events
     m_Events.AddEvent ( "onClientConsole", "text", NULL, false );
@@ -3288,6 +3354,11 @@ void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId a
     g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
 }
 
+void CClientGame::StaticPreWorldProcessHandler ( void )
+{
+    g_pClientGame->PreWorldProcessHandler ();
+}
+
 void CClientGame::StaticPostWorldProcessHandler ( void )
 {
     g_pClientGame->PostWorldProcessHandler ();
@@ -3322,7 +3393,7 @@ bool CClientGame::BreakTowLinkHandler ( CVehicle* pTowedVehicle )
         if ( !bLegal )
         {
             // Save the time it broke (used in UpdateTrailers)
-            pVehicle->SetIllegalTowBreakTime ( GetTickCount () );
+            pVehicle->SetIllegalTowBreakTime ( GetTickCount32 () );
         }
     }
 
@@ -3378,12 +3449,22 @@ void CClientGame::Render3DStuffHandler ( void )
 }
 
 
+void CClientGame::PreWorldProcessHandler ( void )
+{
+    // If we are not minimized we do the pulsing here
+    if ( !g_pCore->IsWindowMinimized () )
+    {
+        m_uiNotPulsedCounter = 0;
+        DoPulses ();
+    }
+}
+
 void CClientGame::PostWorldProcessHandler ( void )
 {
     m_pManager->GetMarkerManager ()->DoPulse ();
 
     // Update frame time slice
-    DWORD dwCurrentTick = GetTickCount ();
+    DWORD dwCurrentTick = GetTickCount32 ();
     if ( m_dwLastFrameTick )
     {
         m_dwFrameTimeSlice = dwCurrentTick - m_dwLastFrameTick;
@@ -3495,7 +3576,7 @@ void CClientGame::DownloadFiles ( void )
         {
             if ( m_dwTransferStarted == 0 || m_bTransferReset )
             {
-                m_dwTransferStarted = GetTickCount ();
+                m_dwTransferStarted = GetTickCount32 ();
 
                 m_bTransferReset = false;
             }
@@ -4446,15 +4527,33 @@ void CClientGame::ResetMapInfo ( void )
     m_pBlendedWeather->SetWeather ( 0 );
 
     // Wind
-    g_pGame->GetWorld ()->RestoreWindVelocity ( );
+    g_pMultiplayer->RestoreWindVelocity ( );
+
+    // Far clip distance
+    g_pMultiplayer->RestoreFarClipDistance ( );
+
+    // Fog distance
+    g_pMultiplayer->RestoreFogDistance ( );
+
+    // Sun color
+    g_pMultiplayer->ResetSunColor ( );
+
+    // Sun size
+    g_pMultiplayer->ResetSunSize ( );
 
     // Sky-gradient
-    g_pMultiplayer->ResetSky ();
+    g_pMultiplayer->ResetSky ( );
+
+    // Heat haze
+    g_pMultiplayer->ResetHeatHaze ( );
 
     // Water-colour
-    g_pMultiplayer->ResetWater ();
+    g_pMultiplayer->ResetWater ( );
 
-     // Sky-gradient
+    // Re-enable interior sounds
+    g_pMultiplayer->SetInteriorSoundsEnabled ( true );
+
+     // Clouds
     g_pMultiplayer->SetCloudsEnabled ( true );
     g_pClientGame->SetCloudsEnabled ( true );
 
@@ -5066,7 +5165,7 @@ bool CClientGame::GetCloudsEnabled ( void )
 #pragma code_seg(".text")
 bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
 {
-    int& iCheckStatus = *(int *)0x8A32A8;
+    int& iCheckStatus = g_pGame->GetCheckStatus ();
 
     if ( !g_pGame->VerifySADataFileNames () )
         iCheckStatus |= ( 1 << 11 );

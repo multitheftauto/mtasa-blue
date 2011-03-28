@@ -386,8 +386,10 @@ bool CAccountManager::LoadSetting ( CXMLNode* pNode )
     return true;
 }
 
-void CAccountManager::Save ( CAccount* pAccount )
+bool CAccountManager::Save ( CAccount* pAccount, SString* pStrError )
 {
+    bool bOk = true;
+
     SString strName = pAccount->GetName();
     SString strPassword = pAccount->GetPassword();
     SString strIP = pAccount->GetIP();
@@ -402,16 +404,20 @@ void CAccountManager::Save ( CAccount* pAccount )
     if ( result.nRows > 0 ) {
         //If we have a serial update that as well
         if ( strSerial != "" )
-            m_pSaveFile->Query ( "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+            bOk &= m_pSaveFile->Query ( "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
         else
             //If we don't have a serial then IP and password will suffice
-            m_pSaveFile->Query ( "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+            bOk &= m_pSaveFile->Query ( "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
     }
     else
         //No entries so it isn't in the database therefore Insert it
-        m_pSaveFile->Query ( "INSERT INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", SQLITE_TEXT, strName.c_str (), SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str () );
+        bOk &= m_pSaveFile->Query ( "INSERT INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", SQLITE_TEXT, strName.c_str (), SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str () );
     //Set changed since saved to false
     pAccount->SetChanged( false );
+
+    if ( !bOk && pStrError )
+        *pStrError = SString ( "%s (CAccountManager::Save)", m_pSaveFile->GetLastError ().c_str () );
+    return bOk;
 }
 
 bool CAccountManager::Save ( const char* szFileName )
@@ -426,7 +432,9 @@ bool CAccountManager::Save ( const char* szFileName )
         if ( (*iter)->IsRegistered () && (*iter)->HasChanged() )
         {
             CAccount * pAccount = (*iter);
-            Save ( pAccount );
+            SString strError;
+            if ( !Save ( pAccount, &strError ) )
+                CLogger::LogPrintf ( "ERROR: While saving account '%s': %s.\n", pAccount->GetName ().c_str (), *strError );
         }
     }
 
@@ -862,7 +870,9 @@ void CAccountManager::Register( CAccount* pAccount )
         //Give the Account an ID
         pAccount->SetID( ++m_iAccounts );
         //Force a save for this account
-        Save ( pAccount );
+        SString strError;
+        if ( !Save ( pAccount, &strError ) )
+            CLogger::LogPrintf ( "ERROR: While saving account '%s': %s.\n", pAccount->GetName ().c_str (), *strError );
     }
 }
 

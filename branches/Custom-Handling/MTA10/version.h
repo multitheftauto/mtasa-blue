@@ -25,7 +25,6 @@
     #define MTA_DM_VERSIONSTRING        QUOTE_DEFINE ( MTASA_VERSION_MAJOR ) "." QUOTE_DEFINE ( MTASA_VERSION_MINOR ) "." QUOTE_DEFINE ( MTASA_VERSION_MAINTENANCE )
 #endif
 #define MTA_DM_FULL_STRING          "MTA:SA Client"
-#define MTA_DM_BITSTREAM_VERSION    0x16
 
 
 // Compile types
@@ -73,8 +72,10 @@
 
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
-#define _NETCODE_VERSION                0x01CE      // Increment when net messages change
-#define _CLIENT_NET_MODULE_VERSION      0x0024      // Lvl9 wizards only
+#define _NETCODE_VERSION_BRANCH_ID      0x4         // Use 0x1 - 0xF to indicate an incompatible branch is being used (0x0 is reserved, 0x4 is trunk)
+#define _CLIENT_NET_MODULE_VERSION      0x028       // (0x000 - 0xfff) Lvl9 wizards only
+#define _NETCODE_VERSION                0x1A3       // (0x000 - 0xfff) Increment when net messages change (pre-release)
+#define MTA_DM_BITSTREAM_VERSION        0x017       // (0x000 - 0xfff) Increment when net messages change (post-release). (Changing will also require additional backward compatibility code).
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
 #if defined(MTA_DM_CONNECT_TO_PUBLIC)
@@ -82,7 +83,10 @@
     #define MTA_DM_NETCODE_VERSION              _NETCODE_VERSION
     #define MTA_DM_CLIENT_NET_MODULE_VERSION   _CLIENT_NET_MODULE_VERSION
 #else
+    #if _NETCODE_VERSION_BRANCH_ID < 1 || _NETCODE_VERSION_BRANCH_ID > 15
+        #error "_NETCODE_VERSION_BRANCH_ID wrong"
+    #endif
     #define MTA_DM_ASE_VERSION                  _ASE_VERSION "n"
-    #define MTA_DM_NETCODE_VERSION              ( _NETCODE_VERSION + 0x4000 )
-    #define MTA_DM_CLIENT_NET_MODULE_VERSION    ( _CLIENT_NET_MODULE_VERSION + 0x4000 )
+    #define MTA_DM_NETCODE_VERSION              ( _NETCODE_VERSION + ( _NETCODE_VERSION_BRANCH_ID << 12 ) )
+    #define MTA_DM_CLIENT_NET_MODULE_VERSION    ( _CLIENT_NET_MODULE_VERSION + ( _NETCODE_VERSION_BRANCH_ID << 12 ) )
 #endif

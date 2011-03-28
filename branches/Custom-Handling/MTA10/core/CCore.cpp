@@ -159,7 +159,6 @@ CCore::CCore ( void )
     m_bQuitOnPulse = false;
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
-    m_bFocused = true;
     m_bLastFocused = true;
 
     // Initialize time
@@ -195,6 +194,7 @@ CCore::CCore ( void )
 
     // No initial fps limit
     m_uiFrameRateLimit = 0;
+    m_uiServerFrameRateLimit = 0;
     m_dLastTimeMs = 0;
     m_dPrevOverrun = 0;
 }
@@ -221,7 +221,6 @@ CCore::~CCore ( void )
     // Store core variables to cvars
     CVARS_SET ( "console_pos",                  m_pLocalGUI->GetConsole ()->GetPosition () );
     CVARS_SET ( "console_size",                 m_pLocalGUI->GetConsole ()->GetSize () );
-    CVARS_SET ( "serverbrowser_size",           m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->GetSize () );
 
     // Delete interaction objects.
     delete m_pCommands;
@@ -533,7 +532,7 @@ void CCore::EnableChatInput ( char* szCommand, DWORD dwColor )
 {
     if ( m_pLocalGUI )
     {
-        if ( m_pGame->GetSystemState () == 9 /* GS_FRONTEND */ &&
+        if ( m_pGame->GetSystemState () == 9 /* GS_PLAYING_GAME */ &&
             m_pModManager->GetCurrentMod () != NULL &&
             !IsOfflineMod () &&
             !m_pGame->IsAtMenu () &&
@@ -605,15 +604,6 @@ void CCore::ApplyConsoleSettings ( void )
     pConsole->SetSize ( vec );
 }
 
-void CCore::ApplyServerBrowserSettings ( void )
-{
-    CVector2D vec;
-
-    CVARS_GET ( "serverbrowser_size", vec );
-    m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->SetSize ( vec );
-}
-
-
 void CCore::ApplyGameSettings ( void )
 {
     bool bval;
@@ -624,6 +614,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
     CVARS_GET ( "classic_controls", bval ); bval ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
     CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
+    CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
 }
 
 void CCore::ApplyCommunityState ( void )
@@ -657,9 +648,10 @@ void CCore::SetOfflineMod ( bool bOffline )
 }
 
 
-SString CCore::GetModInstallRoot ( char * szModName )
+const char* CCore::GetModInstallRoot ( const char* szModName )
 {
-    return SString ( "%s\\mods\\%s", GetInstallRoot(), szModName );
+    m_strModInstallRoot = SString ( "%s\\mods\\%s", GetInstallRoot(), szModName );
+    return m_strModInstallRoot;
 }
 
 
@@ -747,6 +739,12 @@ void CCore::HideMainMenu ( void )
 void CCore::HideQuickConnect ( void )
 {
     m_pLocalGUI->GetMainMenu ()->GetQuickConnectWindow()->SetVisible( false );
+}
+
+void CCore::ShowServerInfo ( unsigned int WindowType )
+{
+    RemoveMessageBox ();
+    CServerInfo::GetSingletonPtr()->Show( (CServerInfo::eWindowType)WindowType );
 }
 
 void CCore::ApplyHooks ( )
@@ -1075,7 +1073,6 @@ void CCore::DoPostFramePulse ( )
 
         // Apply all settings
         ApplyConsoleSettings ();
-        ApplyServerBrowserSettings ();
         ApplyGameSettings ();
 
         m_pGUI->SetMouseClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
@@ -1085,11 +1082,19 @@ void CCore::DoPostFramePulse ( )
         m_Community.Initialize ();
     }
 
+    if ( m_pGame->GetSystemState () == 5 ) // GS_INIT_ONCE
+        WatchDogCompletedSection ( "L2" );      // gta_sa.set seems ok
+
     // This is the first frame in the menu?
     if ( m_pGame->GetSystemState () == 7 ) // GS_FRONTEND
     {
         // Wait 250 frames more than the time it took to get status 7 (fade-out time)
         static short WaitForMenu = 0;
+
+        // Cope with early finish
+        if ( m_pGame->HasCreditScreenFadedOut () )
+            WaitForMenu = 250;
+
         if ( WaitForMenu >= 250 )
         {
             if ( m_bFirstFrame )
@@ -1136,7 +1141,8 @@ void CCore::DoPostFramePulse ( )
 
     if ( !IsFocused() && m_bLastFocused )
     {
-        m_pKeyBinds->CallAllGTAControlBinds( CONTROL_BOTH, false );
+        // Fix for #4948
+        m_pKeyBinds->CallAllGTAControlBinds ( CONTROL_BOTH, false );
         m_bLastFocused = false;
     }
     else if ( IsFocused() && !m_bLastFocused )
@@ -1193,6 +1199,10 @@ void CCore::OnModUnload ( )
     m_pGUI->SelectInputHandlers( INPUT_CORE );
     // remove unused events
     m_pGUI->ClearInputHandlers( INPUT_MOD );
+
+    // Ensure all these have been removed
+    m_pKeyBinds->RemoveAllFunctions ();
+    m_pKeyBinds->RemoveAllControlFunctions ();
 }
 
 
@@ -1211,10 +1221,10 @@ void CCore::RegisterCommands ( )
 #if 0
     m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
     m_pCommands->Add ( "window",            "enter/leave windowed mode",        CCommandFuncs::Window );
-#endif
-
     m_pCommands->Add ( "load",              "loads a mod (name args)",          CCommandFuncs::Load );
     m_pCommands->Add ( "unload",            "unloads a mod (name)",             CCommandFuncs::Unload );
+#endif
+
     m_pCommands->Add ( "connect",           "connects to a server (host port nick pass)",   CCommandFuncs::Connect );
     m_pCommands->Add ( "reconnect",         "connects to a previous server",    CCommandFuncs::Reconnect );
     m_pCommands->Add ( "bind",              "binds a key (key control)",        CCommandFuncs::Bind );
@@ -1418,6 +1428,25 @@ const char* CCore::GetCommandLineOption ( const char* szOption )
 
 SString CCore::GetConnectCommandFromURI ( const char* szURI )
 {
+    unsigned short usPort;
+    std::string strHost, strNick, strPassword;
+    GetConnectParametersFromURI ( szURI, strHost, usPort, strNick, strPassword );
+
+    // Generate a string with the arguments to send to the mod IF we got a host
+    SString strDest;
+    if ( strHost.size() > 0 )
+    {
+        if ( strPassword.size() > 0 )
+            strDest.Format ( "connect %s %u %s %s", strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str () );
+        else
+            strDest.Format ( "connect %s %u %s", strHost.c_str (), usPort, strNick.c_str () );
+    }
+
+    return strDest;
+}
+
+void CCore::GetConnectParametersFromURI ( const char* szURI, std::string &strHost, unsigned short &usPort, std::string &strNick, std::string &strPassword )
+{
     // Grab the length of the string
     size_t sizeURI = strlen ( szURI );
     
@@ -1531,14 +1560,13 @@ SString CCore::GetConnectCommandFromURI ( const char* szURI )
     }
 
     // If we got any port, convert it to an integral type
-    unsigned short usPort = 22003;
+    usPort = 22003;
     if ( strlen ( szPort ) > 0 )
     {
         usPort = static_cast < unsigned short > ( atoi ( szPort ) );
     }
 
     // Grab the nickname
-    std::string strNick;
     if ( strlen ( szNickname ) > 0 )
     {
         strNick = szNickname;
@@ -1547,18 +1575,8 @@ SString CCore::GetConnectCommandFromURI ( const char* szURI )
     {
         CVARS_GET ( "nick", strNick );
     }
-
-    // Generate a string with the arguments to send to the mod IF we got a host
-    SString strDest;
-    if ( strlen ( szHost ) > 0 )
-    {
-        if ( strlen ( szPassword ) > 0 )
-            strDest.Format ( "connect %s %u %s %s", szHost, usPort, strNick.c_str (), szPassword );
-        else
-            strDest.Format ( "connect %s %u %s", szHost, usPort, strNick.c_str () );
-    }
-
-    return strDest;
+    strHost = szHost;
+    strPassword = szPassword;
 }
 
 
@@ -1577,7 +1595,22 @@ void CCore::UpdateRecentlyPlayed()
         CServerList* pRecentList = pServerBrowser->GetRecentList ();
         pRecentList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
         pRecentList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET, true );
+
+        // Update our address history if need be
+        if (    pServerBrowser->m_bManualConnect 
+             && strHost == pServerBrowser->m_strManualHost  
+             && uiPort == pServerBrowser->m_usManualPort
+           )
+        {
+            CServerList* pHistoryList = pServerBrowser->GetHistoryList ();
+            pHistoryList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
+            pHistoryList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET ); 
+            pServerBrowser->CreateHistoryList();
+        }
+        
         pServerBrowser->SaveRecentlyPlayedList();
+        if ( !m_pConnectManager->m_strLastPassword.empty() )
+            pServerBrowser->SetServerPassword ( strHost + ":" + SString("%u",uiPort), m_pConnectManager->m_strLastPassword );
 
     }
     //Save our configuration file
@@ -1652,9 +1685,15 @@ void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bo
 //
 void CCore::ApplyLoadingCrashPatch ( void )
 {
-    uchar* pAddress = (uchar*)0x7468F9;
-    uchar ucOldValue = 183;
-    uchar ucNewValue = 57;
+    uchar* pAddress;
+
+    if ( *(WORD *)0x748ADD == 0x53FF )
+        pAddress = (uchar*)0x7468F9;    // US
+    else
+        pAddress = (uchar*)0x746949;    // EU
+
+    uchar ucOldValue = 0xB7;
+    uchar ucNewValue = 0x39;
 
     MEMORY_BASIC_INFORMATION info;
     VirtualQuery( pAddress, &info, sizeof(MEMORY_BASIC_INFORMATION) );
@@ -1675,6 +1714,30 @@ void CCore::ApplyLoadingCrashPatch ( void )
 
 
 //
+// Recalculate FPS limit to use
+//
+// Uses client rate from config
+// Uses server rate from argument, or last time if not supplied
+//
+void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit )
+{
+    // Save rate from server if valid
+    if ( uiServerFrameRateLimit != -1 )
+        m_uiServerFrameRateLimit = uiServerFrameRateLimit;
+
+    // Fetch client setting
+    uint uiClientRate;
+    g_pCore->GetCVars ()->Get ( "fps_limit", uiClientRate );
+
+    // Lowest wins (Although zero is highest)
+    if ( ( m_uiServerFrameRateLimit > 0 && uiClientRate > m_uiServerFrameRateLimit ) || uiClientRate == 0 )
+        m_uiFrameRateLimit = m_uiServerFrameRateLimit;
+    else
+        m_uiFrameRateLimit = uiClientRate;
+}
+
+
+//
 // Do FPS limiting
 //
 void CCore::ApplyFrameRateLimit ( void )
@@ -1685,30 +1748,35 @@ void CCore::ApplyFrameRateLimit ( void )
     // Calc required time in ms between frames
     const double dTargetTimeToUse = 1000.0 / m_uiFrameRateLimit;
 
-    // Get actual time in ms since last frame
-    double dTimeUsed = CClientTime::GetTimeNano() * 1000.0 - m_dLastTimeMs;
+    // Time now
+    double dTimeMs = CClientTime::GetTimeNano() * 1000.0;
+
+    // Get delta time in ms since last frame
+    double dTimeUsed = dTimeMs - m_dLastTimeMs;
+
+    // Apply any over/underrun carried over from the previous frame
+    dTimeUsed += m_dPrevOverrun;
 
     if ( dTimeUsed < dTargetTimeToUse )
     {
-        // Frame has spare time
+        // Have time spare - maybe eat some of that now
         double dSpare = dTargetTimeToUse - dTimeUsed;
 
-        // Take away any overrun from the previous frame
-        dSpare -= m_dPrevOverrun;
-        m_dPrevOverrun = 0;
+        double dUseUpNow = dSpare - dTargetTimeToUse * 0.75;
+        if ( dUseUpNow > 1 )
+            Sleep( static_cast < DWORD > ( floor ( dUseUpNow ) ) );
 
-        // Use up remaining spare time
-        if ( dSpare > 0 )
-        {
-            dSpare = Min < double > ( dSpare, 100 );
-            Sleep( (DWORD)dSpare );
-        }
-    }
-    else
-    {
-        // Frame has overrun
-        m_dPrevOverrun = Min < double > ( dTimeUsed - dTargetTimeToUse, dTargetTimeToUse / 2 );
+        // Redo timing calcs
+        dTimeMs = CClientTime::GetTimeNano() * 1000.0;
+        dTimeUsed = dTimeMs - m_dLastTimeMs;
+        dTimeUsed += m_dPrevOverrun;
     }
 
-    m_dLastTimeMs = CClientTime::GetTimeNano() * 1000.0;
+    // Update over/underrun for next frame
+    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
+
+    // Limit carry over
+    m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9, m_dPrevOverrun, dTargetTimeToUse * 0.9 );
+
+    m_dLastTimeMs = dTimeMs;
 }

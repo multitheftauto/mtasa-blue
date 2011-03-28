@@ -270,7 +270,7 @@ public:
 
     // Vehicle set functions
     static bool                 FixVehicle                          ( CElement* pElement );
-    static bool                 BlowVehicle                         ( CElement* pElement, bool bExplode );
+    static bool                 BlowVehicle                         ( CElement* pElement );
     static bool                 SetVehicleColor                     ( CElement* pElement, const CVehicleColor& color );
     static bool                 SetVehicleLandingGearDown           ( CElement* pElement, bool bLandingGearDown );
     static bool                 SetVehicleLocked                    ( CElement* pElement, bool bLocked );
@@ -496,6 +496,13 @@ public:
     static bool                 GetTrafficLightState                ( unsigned char& ucState );
     static bool                 GetTrafficLightsLocked              ( bool& bLocked );
     static bool                 GetJetpackMaxHeight                 ( float& fMaxHeight );
+    static bool                 AreInteriorSoundsEnabled            ( bool& bEnabled );
+    static bool                 GetRainLevel                        ( float& fRainLevel );
+    static bool                 GetSunSize                          ( float& fSunSize );
+    static bool                 GetSunColor                         ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB );
+    static bool                 GetWindVelocity                     ( float& fVelX, float& fVelY, float& fVelZ );
+    static bool                 GetFarClipDistance                  ( float& fFarClip );
+    static bool                 GetFogDistance                      ( float& fFogDist );
 
     // General world set funcs
     static bool                 SetTime                             ( unsigned char ucHour, unsigned char ucMinute );
@@ -507,6 +514,9 @@ public:
     static bool                 GetSkyGradient                      ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue );
     static bool                 SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );
     static bool                 ResetSkyGradient                    ( void );
+    static bool                 GetHeatHaze                         ( SHeatHazeSettings& heatHazeSettings );
+    static bool                 SetHeatHaze                         ( const SHeatHazeSettings& heatHazeSettings );
+    static bool                 ResetHeatHaze                       ( void );
     static bool                 SetFPSLimit                         ( unsigned short usLimit );
     static bool                 SetMinuteDuration                   ( unsigned long ulDuration );
     static bool                 SetGarageOpen                       ( unsigned char ucGarageID, bool bIsOpen );
@@ -517,6 +527,19 @@ public:
     static bool                 SetTrafficLightState                ( unsigned char ucState, bool bForced = false );
     static bool                 SetTrafficLightsLocked              ( bool bLocked );
     static bool                 SetJetpackMaxHeight                 ( float fMaxHeight );
+    static bool                 SetInteriorSoundsEnabled            ( bool bEnable );
+    static bool                 SetRainLevel                        ( float fRainLevel );
+    static bool                 SetSunSize                          ( float fSunSize );
+    static bool                 SetSunColor                         ( unsigned char ucCoreR, unsigned char ucCoreG, unsigned char ucCoreB, unsigned char ucCoronaR, unsigned char ucCoronaG, unsigned char ucCoronaB );
+    static bool                 SetWindVelocity                     ( float fVelX, float fVelY, float fVelZ );
+    static bool                 SetFarClipDistance                  ( float fFarClip );
+    static bool                 SetFogDistance                      ( float fFogDist );
+    static bool                 ResetRainLevel                      ( void );
+    static bool                 ResetSunSize                        ( void );
+    static bool                 ResetSunColor                       ( void );
+    static bool                 ResetWindVelocity                   ( void );
+    static bool                 ResetFarClipDistance                ( void );
+    static bool                 ResetFogDistance                    ( void );
 
     // Loaded Map Functions
     static CElement*            GetRootElement                      ( void );
@@ -531,7 +554,6 @@ public:
     static bool                 RemoveRuleValue                     ( const char* szKey );
     static bool                 GetPlayerAnnounceValue              ( CElement* pElement, const std::string& strKey, std::string& strOutValue );
     static bool                 SetPlayerAnnounceValue              ( CElement* pElement, const std::string& strKey, const std::string& strValue );
-    static bool                 SetServerName                       ( std::string strServerName );
 
     // Registry funcs
     static const std::string&   SQLGetLastError                     ( void );
@@ -568,7 +590,7 @@ public:
     static CBan*                AddBan                              ( SString strIP, SString strUsername, SString strSerial, CPlayer* pResponsible = NULL, SString strResponsible = "Console", SString strReason = "", time_t tUnban = 0 );
     static bool                 RemoveBan                           ( CBan* pBan, CPlayer* pResponsible = NULL );
 
-    static bool                 GetBans                             ( CLuaMain* pLuaMain );
+    static bool                 GetBans                             ( lua_State* luaVM );
 
     static bool                 GetBanIP                            ( CBan* pBan, char* szIP, size_t size );
     static bool                 GetBanSerial                        ( CBan* pBan, char* szSerial, size_t size );

@@ -91,6 +91,13 @@ void CNewsBrowser::InitNewsItemList ( void )
                 if ( pHeadline )
                     newsItem.strHeadline = pHeadline->GetTagContent ();
 
+                // Date text
+                CXMLNode* pDate = pRoot->FindSubNode ( "date", 0 );
+                if ( pDate )
+                    newsItem.strDate = pDate->GetTagContent ();
+                else
+                    newsItem.strHeadline.Split ( " - ", &newsItem.strHeadline, &newsItem.strDate, true );
+
                 // Layout filename
                 CXMLNode* pLayout = pRoot->FindSubNode ( "layout", 0 );
                 if ( pLayout )
@@ -128,11 +135,11 @@ void CNewsBrowser::CreateHeadlines ( void )
     uint i;
     // Process each news item
     for ( i = 0; i < m_NewsitemList.size () ; i++ )
-        CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->SetNewsHeadline ( i, m_NewsitemList[i].strHeadline, i < 1 && bNewsUpdated );
+        CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->SetNewsHeadline ( i, m_NewsitemList[i].strHeadline, m_NewsitemList[i].strDate, i < 1 && bNewsUpdated );
 
     // Clear unused slots
     for ( ; i < 3 ; i++ )
-        CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->SetNewsHeadline ( i, "", false );
+        CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->SetNewsHeadline ( i, "", "", false );
 }
 
 

@@ -87,8 +87,10 @@ public:
     virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword ) = 0;
 
     virtual const char *            GetInstallRoot                  ( void ) = 0;
-    virtual SString                 GetModInstallRoot               ( char * szModName )=0;
+    virtual const char *            GetModInstallRoot               ( const char * szModName )=0;
     virtual const char *            GetGTAInstallRoot               ( void ) = 0;
+
+    virtual void                    ShowServerInfo                  ( unsigned int WindowType ) = 0;
 
     virtual void                    ForceCursorVisible              ( bool bVisible, bool bToggleControls = true ) = 0;
     virtual void                    SetMessageProcessor             ( pfnProcessMessage pfnMessageProcessor ) = 0;
@@ -115,7 +117,7 @@ public:
     virtual void                    InitiateDataFilesFix            ( void ) = 0;
 
     virtual uint                    GetFrameRateLimit               ( void ) = 0;
-    virtual void                    SetFrameRateLimit               ( uint uiFrameRateLimit ) = 0;
+    virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 ) = 0;
     virtual void                    ApplyFrameRateLimit             ( void ) = 0;
 };
 

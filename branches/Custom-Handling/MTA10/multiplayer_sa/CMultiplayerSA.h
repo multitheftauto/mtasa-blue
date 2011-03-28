@@ -48,7 +48,6 @@ public:
     void                        SetCenterOfWorld            ( CEntity * entity, CVector * vecPosition, FLOAT fHeading );
     void                        DisablePadHandler           ( bool bDisabled );
     void                        DisableEnterExitVehicleKey  ( bool bDisabled );
-    void                        DisableHeatHazeEffect       ( bool bDisable );
     void                        DisableAllVehicleWeapons    ( bool bDisable );
     void                        DisableZoneNames            ( bool bDisabled );
     void                        DisableBirds                ( bool bDisabled );
@@ -64,6 +63,7 @@ public:
     void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler );
     void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler );
     void                        SetChokingHandler           ( ChokingHandler* pChokingHandler );
+    void                        SetPreWorldProcessHandler   ( PreWorldProcessHandler * pHandler );
     void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler );
     void                        SetIdleHandler              ( IdleHandler * pHandler );
     void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
@@ -75,6 +75,9 @@ public:
     bool                        HasSkyColor                 ();
     void                        GetSkyColor                 ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue );
     void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue );
+    void                        SetHeatHaze                 ( const SHeatHazeSettings& settings );
+    void                        GetHeatHaze                 ( SHeatHazeSettings& settings );
+    void                        ResetHeatHaze               ( void );
     void                        ResetSky                    ();
     bool                        HasWaterColor               ();
     void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );
@@ -84,6 +87,21 @@ public:
     void                        RebuildMultiplayerPlayer    ( CPed * player );
     bool                        AreInteriorSoundsEnabled    ();
     void                        SetInteriorSoundsEnabled    ( bool bEnabled );
+    void                        SetWindVelocity             ( float fX, float fY, float fZ );
+    void                        GetWindVelocity             ( float& fX, float& fY, float& fZ );
+    void                        RestoreWindVelocity         ( void );
+    float                       GetFarClipDistance          ( void );
+    void                        SetFarClipDistance          ( float fDistance );
+    void                        RestoreFarClipDistance      ( void );
+    float                       GetFogDistance              ( void );
+    void                        SetFogDistance              ( float fDistance );
+    void                        RestoreFogDistance          ( void );
+    void                        GetSunColor                 ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue );
+    void                        SetSunColor                 ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue );
+    void                        ResetSunColor               ( );
+    float                       GetSunSize                  ( );
+    void                        SetSunSize                  ( float fSize );
+    void                        ResetSunSize                ( );
 
     void                        SetNightVisionEnabled       ( bool bEnabled );
     void                        SetThermalVisionEnabled     ( bool bEnabled );

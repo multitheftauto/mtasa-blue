@@ -419,6 +419,11 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     unsigned char ucBottomRed, ucBottomGreen, ucBottomBlue;
     g_pGame->GetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue );
 
+    // Get the heathaze
+    bool bHasHeatHaze = g_pGame->HasHeatHaze ();
+    SHeatHazeSettings heatHazeSettings;
+    g_pGame->GetHeatHaze ( heatHazeSettings );
+
     // Grab the current weather and the weather we're blending to if any
     // Also grab the time the blending starts/started
     unsigned char ucCurrentWeather = m_pBlendedWeather->GetWeather ();
@@ -437,6 +442,36 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     unsigned char ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha;
     bOverrideWaterColor = g_pGame->HasWaterColor ( );
     g_pGame->GetWaterColor ( ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha );
+
+    // Interior sounds
+    bool bInteriorSoundsEnabled = g_pGame->AreInteriorSoundsEnabled ( );
+
+    // Rain level
+    bool bOverrideRainLevel = g_pGame->HasRainLevel ( );
+    float fRainLevel = g_pGame->GetRainLevel ( );
+
+    // Sun size
+    bool bOverrideSunSize = g_pGame->HasSunSize ( );
+    float fSunSize = g_pGame->GetSunSize ( );
+
+    // Sun color
+    bool bOverrideSunColor = g_pGame->HasSunColor ( );
+    unsigned char ucCoreR, ucCoreG, ucCoreB;
+    unsigned char ucCoronaR, ucCoronaG, ucCoronaB;
+    g_pGame->GetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB );
+
+    // Wind velocity
+    bool bOverrideWindVelocity = g_pGame->HasWindVelocity ( );
+    float fWindVelX, fWindVelY, fWindVelZ;
+    g_pGame->GetWindVelocity ( fWindVelX, fWindVelY, fWindVelZ );
+
+    // Far clip
+    bool bOverrideFarClipDistance = g_pGame->HasFarClipDistance ( );
+    float fFarClip = g_pGame->GetFarClipDistance ( );
+
+    // Fog distance
+    bool bOverrideFogDistance = g_pGame->HasFogDistance ( );
+    float fFogDistance = g_pGame->GetFogDistance ( );
 
     // Send the packet to the given player
     Player.Send ( CMapInfoPacket ( ucCurrentWeather,
@@ -459,6 +494,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucBottomRed,
                                    ucBottomGreen,
                                    ucBottomBlue,
+                                   bHasHeatHaze,
+                                   heatHazeSettings,
                                    usFPSLimit,
                                    bCloudsEnabled,
                                    fJetpackMaxHeight,
@@ -466,7 +503,21 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    ucWaterRed,
                                    ucWaterGreen,
                                    ucWaterBlue,
-                                   ucWaterAlpha) );
+                                   ucWaterAlpha,
+                                   bInteriorSoundsEnabled,
+                                   bOverrideRainLevel,
+                                   fRainLevel,
+                                   bOverrideSunSize,
+                                   fSunSize,
+                                   bOverrideSunColor,
+                                   ucCoreR, ucCoreG, ucCoreB,
+                                   ucCoronaR, ucCoronaG, ucCoronaB,
+                                   bOverrideWindVelocity,
+                                   fWindVelX, fWindVelY, fWindVelZ,
+                                   bOverrideFarClipDistance,
+                                   fFarClip,
+                                   bOverrideFogDistance,
+                                   fFogDistance ) );
 
     // Send him all the elements
     SendMapInformation ( Player );

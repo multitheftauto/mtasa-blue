@@ -19,10 +19,20 @@ unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetDrawDistance;
 
+#define HOOKPOS_GetFxQuality                0x49EA50
+void HOOK_GetFxQuality ();
+
+#define HOOKPOS_StoreShadowForVehicle       0x70BDA0
+DWORD RETURN_StoreShadowForVehicle =        0x70BDA9;
+void HOOK_StoreShadowForVehicle ();
+
 CSettingsSA::CSettingsSA ( void )
 {
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
     m_pInterface->bFrameLimiter = false;
+    m_bVolumetricShadowsEnabled = false;
+    HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
+    HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
 }
 
 bool CSettingsSA::IsWideScreenEnabled ( void )
@@ -110,45 +120,45 @@ void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
 unsigned int CSettingsSA::GetUsertrackMode ( void )
 {
     // 0 = radio, 1 = random, 2 = sequential
-    return *(BYTE *)VAR_bUsertrackMode;
+    return m_pInterface->ucUsertrackMode;
 }
 
 void CSettingsSA::SetUsertrackMode ( unsigned int uiMode )
 {
-    *(BYTE *)VAR_bUsertrackMode = uiMode;
+    m_pInterface->ucUsertrackMode = uiMode;
 }
 
 bool CSettingsSA::IsUsertrackAutoScan ( void )
 {
     // 1 = yes, 0 = no
-    return ( ( *(BYTE *)VAR_bUsertrackAutoScan == 1 ) ? true : false );
+    return m_pInterface->bUsertrackAutoScan;
 }
 
 void CSettingsSA::SetUsertrackAutoScan ( bool bEnable )
 {
-    *(BYTE *)VAR_bUsertrackAutoScan = ( ( bEnable ) ? 1 : 0 );
+    m_pInterface->bUsertrackAutoScan = bEnable;
 }
 
 bool CSettingsSA::IsRadioEqualizerEnabled ( void )
 {
     // 1 = on, 0 = off
-    return ( ( *(BYTE *)VAR_bRadioEqualizer == 1 ) ? true : false );
+    return m_pInterface->bRadioEqualizer;
 }
 
 void CSettingsSA::SetRadioEqualizerEnabled ( bool bEnable )
 {
-    *(BYTE *)VAR_bRadioEqualizer = ( ( bEnable ) ? 1 : 0 );
+    m_pInterface->bRadioEqualizer = bEnable;
 }
 
 bool CSettingsSA::IsRadioAutotuneEnabled ( void )
 {
     // 1 = on, 0 = off
-    return ( ( *(BYTE *)VAR_bRadioAutotune == 1 ) ? true : false );
+    return m_pInterface->bRadioAutotune;
 }
 
 void CSettingsSA::SetRadioAutotuneEnabled ( bool bEnable )
 {
-    *(BYTE *)VAR_bRadioAutotune = ( ( bEnable ) ? 1 : 0 );
+    m_pInterface->bRadioAutotune = bEnable;
 }
 
 // Minimum is 0.925 and maximum is 1.8
@@ -182,12 +192,12 @@ void CSettingsSA::SetBrightness ( unsigned int uiBrightness )
 unsigned int CSettingsSA::GetFXQuality ( )
 {
     // 0 = low, 1 = medium, 2 = high, 3 = very high
-    return *(BYTE *)VAR_bFxQuality;
+    return *(BYTE *)VAR_ucFxQuality;
 }
 
 void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 {
-    *(BYTE *)VAR_bFxQuality = fxQualityId;
+    MemPut < BYTE > ( VAR_ucFxQuality, fxQualityId );
 }
 
 float CSettingsSA::GetMouseSensitivity ( )
@@ -198,7 +208,7 @@ float CSettingsSA::GetMouseSensitivity ( )
 
 void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
 {
-    *(FLOAT *)VAR_fMouseSensitivity = fSensitivity;
+    MemPut < FLOAT > ( VAR_fMouseSensitivity, fSensitivity );  //     *(FLOAT *)VAR_fMouseSensitivity = fSensitivity;
 }
 
 unsigned int CSettingsSA::GetAntiAliasing ( )
@@ -224,6 +234,16 @@ void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing, bool bOnRestart
     m_pInterface->dwAntiAliasing = uiAntiAliasing;
 }
 
+bool CSettingsSA::IsMipMappingEnabled ( void )
+{
+	return m_pInterface->bMipMapping;
+}
+
+void CSettingsSA::SetMipMappingEnabled ( bool bEnable )
+{
+	m_pInterface->bMipMapping = bEnable;
+}
+
 void CSettingsSA::Save ()
 {
     _asm
@@ -231,5 +251,95 @@ void CSettingsSA::Save ()
         mov ecx, CLASS_CMenuManager
         mov eax, FUNC_CMenuManager_Save
         call eax
+    }
+}
+
+bool CSettingsSA::IsVolumetricShadowsEnabled ( void )
+{
+	return m_bVolumetricShadowsEnabled;
+}
+
+void CSettingsSA::SetVolumetricShadowsEnabled ( bool bEnable )
+{
+	m_bVolumetricShadowsEnabled = bEnable;
+}
+
+//
+// Volumetric shadow hooks
+//
+DWORD dwFxQualityValue = 0;
+WORD usCallingForVehicleModel = 0;
+
+void _cdecl MaybeAlterFxQualityValue ( DWORD dwAddrCalledFrom )
+{
+    // Handle all calls from CVolumetricShadowMgr
+    if ( dwAddrCalledFrom > 0x70F990 && dwAddrCalledFrom < 0x711EB0 )
+    {
+        // Force blob shadows if volumetric shadows are not enabled
+        if ( !pGame->GetSettings ()->IsVolumetricShadowsEnabled () )
+            dwFxQualityValue = 0;
+
+        // These vehicles seem to have problems with volumetric shadows, so force blob shadows
+        switch ( usCallingForVehicleModel )
+        {
+            case 460:   // Skimmer
+            case 511:   // Beagle
+            case 572:   // Mower
+            case 590:   // Box Freight
+            case 592:   // Andromada
+                dwFxQualityValue = 0;
+        }
+        usCallingForVehicleModel = 0;
+    }
+    else
+    // Handle all calls from CPed::PreRenderAfterTest
+    if ( dwAddrCalledFrom > 0x5E65A0 && dwAddrCalledFrom < 0x5E7680 )
+    {
+        // Always use blob shadows for peds as realtime shadows are disabled in MTA (context switching issues)
+        dwFxQualityValue = 0;
+    }
+}
+
+// Hooked from 0x49EA50
+void _declspec(naked) HOOK_GetFxQuality ()
+{
+    _asm
+    {
+        pushad
+        mov     eax, [ecx+054h]         // Current FxQuality setting
+        mov     dwFxQualityValue, eax
+
+        mov     eax, [esp+32]           // Address GetFxQuality was called from
+        push    eax                     
+        call    MaybeAlterFxQualityValue
+        add     esp, 4
+    }
+
+    _asm
+    {
+        popad
+    }
+
+    _asm
+    {
+        mov     eax, dwFxQualityValue
+        retn
+    }
+}
+
+// Hook to discover what vehicle will be calling GetFxQuality
+void _declspec(naked) HOOK_StoreShadowForVehicle ()
+{
+    _asm
+    {
+        // Hooked from 0x70BDA0  5 bytes
+        mov     eax, [esp+4]        // Get vehicle
+        mov     ax, [eax+34]       // pEntity->m_nModelIndex
+        mov     usCallingForVehicleModel, ax
+        sub     esp, 44h 
+        push    ebx
+        mov     eax, 0x70F9B0   // CVolumetricShadowMgr::IsAvailable
+        call    eax
+        jmp     RETURN_StoreShadowForVehicle
     }
 }

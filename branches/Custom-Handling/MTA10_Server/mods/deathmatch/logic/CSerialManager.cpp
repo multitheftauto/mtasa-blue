@@ -107,7 +107,7 @@ CSerialVerification::CSerialVerification ( CPlayer* pPlayer, SERIALVERIFICATIONC
 
     m_pCallBack = pCallBack;
     m_pPlayer = pPlayer;
-    m_ulStartTime = GetTickCount();
+    m_ulStartTime = GetTickCount32();
     m_bFinished = false;
 
     if ( pPlayer->GetSerialUser().length() > 0 && pPlayer->GetSerial().length() > 0 )
@@ -136,7 +136,7 @@ CSerialVerification::~CSerialVerification ( void )
 
 void CSerialVerification::DoPulse ( void )
 {
-    if ( GetTickCount() > m_ulStartTime + SERIAL_VERIFICATION_TIMEOUT && !m_bFinished )
+    if ( GetTickCount32() > m_ulStartTime + SERIAL_VERIFICATION_TIMEOUT && !m_bFinished )
     {
         m_pCallBack ( m_pPlayer, true, NULL );
 

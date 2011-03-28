@@ -100,6 +100,7 @@ void CGUI_Impl::SetSkin ( const char* szName )
 {
     if(m_HasSchemeLoaded)
     {
+        CEGUI::GlobalEventSet::getSingletonPtr ()->removeAllEvents();
         CEGUI::SchemeManager::getSingleton().unloadScheme(m_CurrentSchemeName);
     }
 
@@ -355,6 +356,17 @@ bool CGUI_Impl::GetStringFromInputMode ( eInputMode a_eMode, std::string& a_rstr
     default:                           
         return false;
     }
+}
+
+CEGUI::String CGUI_Impl::GetUTFString ( const std::string strInput )
+{
+    std::wstring strUTF = ConvertToUTF8(strInput); //Convert to a typical UTF8 string
+    return GetUTFString ( strUTF );
+}
+
+CEGUI::String CGUI_Impl::GetUTFString ( const std::wstring strLine )
+{
+    return CEGUI::String((CEGUI::utf8*)ConvertToANSI(GetBidiString(strLine)).c_str()); //Convert into a CEGUI String
 }
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
@@ -716,7 +728,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                 if ( strTemp.length () > 0 )
                 {
                     // Convert it to Unicode
-                    std::wstring strUTF = SharedUtil::ConvertToUTF8(strTemp.c_str());
+                    std::wstring strUTF = GetBidiString(ConvertToUTF8(strTemp.c_str()));
 
                     // Open and empty the clipboard
                     OpenClipboard ( NULL );
@@ -796,7 +808,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             bReplaceNewLines = false;
                         }
 
-                        std::wstring strClipboardText = ClipboardBuffer;
+                        std::wstring strClipboardText = GetBidiString(ClipboardBuffer);
                         size_t iNewlineIndex;
 
                         // Remove the newlines inserting spaces instead
@@ -824,7 +836,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                         }
 
                         // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
-                        std::wstring tmp = SharedUtil::ConvertToUTF8(strEditText.c_str());
+                        std::wstring tmp = ConvertToUTF8(strEditText.c_str());
                         if ( ( strClipboardText.length () + tmp.length () ) < iMaxLength )
                         {
                             // Are there characters selected?
@@ -844,7 +856,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             }
 
                             // Set the new text and move the carat at the end of what we pasted
-                            CEGUI::String strText((CEGUI::utf8*)SharedUtil::ConvertToANSI(tmp).c_str());
+                            CEGUI::String strText((CEGUI::utf8*)ConvertToANSI(tmp).c_str());
                             strEditText = strText;
                             iCaratIndex = sizeCaratIndex;
                         }
@@ -1479,6 +1491,10 @@ CGUITabPanel* CGUI_Impl::CreateTabPanel ( CGUITab* pParent )
     return _CreateTabPanel ( wnd );
 }
 
+CGUITabPanel* CGUI_Impl::CreateTabPanel ( void )
+{
+    return _CreateTabPanel ( NULL );
+}
 
 CGUIScrollPane* CGUI_Impl::CreateScrollPane ( CGUIElement* pParent )
 {

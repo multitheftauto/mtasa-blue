@@ -237,7 +237,7 @@ public:
     virtual void        DoPulse                 ( void );
     virtual void        OnLuaMainCreate         ( CLuaMain* pLuaMain );
     virtual void        OnLuaMainDestroy        ( CLuaMain* pLuaMain );
-    virtual void        GetStats                ( CPerfStatResult* pOutResult, const SString& strCatagory, const SString& strOptions, const SString& strFilter );
+    virtual void        GetStats                ( CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter );
     virtual void        UpdateLuaMemory         ( CLuaMain* pLuaMain, int iMemUsed );
     virtual void        UpdateLuaTiming         ( CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs );
     virtual void        UpdateLibMemory         ( const SString& strLibName, int iMemUsed, int iMemUsedMax );
@@ -457,11 +457,11 @@ void CPerfStatManagerImpl::DoPulse ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::GetStats ( CPerfStatResult* pResult, const SString& strCatagory, const SString& strOptions, const SString& strFilter )
+void CPerfStatManagerImpl::GetStats ( CPerfStatResult* pResult, const SString& strCategory, const SString& strOptions, const SString& strFilter )
 {
     pResult->Clear ();
 
-    if ( strCatagory == "" )
+    if ( strCategory == "" )
     {
         pResult->AddColumn ( "Categories" );
         pResult->AddRow ()[0] ="Lua timings";
@@ -471,11 +471,11 @@ void CPerfStatManagerImpl::GetStats ( CPerfStatResult* pResult, const SString& s
         return;
     }
 
-    if ( strCatagory == "Help" )
+    if ( strCategory == "Help" )
     {
         pResult->AddColumn ( "Help" );
         pResult->AddRow ()[0] ="Comma separate multiple options";
-        pResult->AddRow ()[0] ="Type h in options and select a catagory to see help for that catagory";
+        pResult->AddRow ()[0] ="Type h in options and select a category to see help for that category";
         return;
     }
 
@@ -488,13 +488,13 @@ void CPerfStatManagerImpl::GetStats ( CPerfStatResult* pResult, const SString& s
             MapSet ( strOptionMap, strParts[i], 1 );
     }
 
-    if ( strCatagory == "Lua timings" )
+    if ( strCategory == "Lua timings" )
         GetLuaTimingStats ( pResult, strOptionMap, strFilter );
     else
-    if ( strCatagory == "Lua memory" )
+    if ( strCategory == "Lua memory" )
         GetLuaMemoryStats ( pResult, strOptionMap, strFilter );
     else
-    if ( strCatagory == "Lib memory" )
+    if ( strCategory == "Lib memory" )
         GetLibMemoryStats ( pResult, strOptionMap, strFilter );
 }
 

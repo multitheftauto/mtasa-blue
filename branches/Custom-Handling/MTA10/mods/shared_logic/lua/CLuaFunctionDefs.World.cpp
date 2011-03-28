@@ -1019,38 +1019,29 @@ int CLuaFunctionDefs::GetSkyGradient ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetSkyGradient ( lua_State* luaVM )
 {
-    // Verify the argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
+    CScriptArgReader argStream ( luaVM );
 
-    unsigned char ucTopRed = 0;
-    unsigned char ucTopGreen = 0;
-    unsigned char ucTopBlue = 0;
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) )
-        ucTopRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
-    if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
-        ucTopGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-    if ( ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
-        ucTopBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-    unsigned char ucBottomRed = 0;
-    unsigned char ucBottomGreen = 0;
-    unsigned char ucBottomBlue = 0;
-    if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
-        ucBottomRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-    if ( ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
-        ucBottomGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
-    if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
-        ucBottomBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
     // Set the new sky gradient
-    if ( CStaticFunctionDefinitions::SetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue ) )
+    uchar ucTopRed, ucTopGreen, ucTopBlue;
+    uchar ucBottomRed, ucBottomGreen, ucBottomBlue;
+
+    argStream.ReadNumber ( ucTopRed, 0 );
+    argStream.ReadNumber ( ucTopGreen, 0 );
+    argStream.ReadNumber ( ucTopBlue, 0 );
+    argStream.ReadNumber ( ucBottomRed, 0 );
+    argStream.ReadNumber ( ucBottomGreen, 0 );
+    argStream.ReadNumber ( ucBottomBlue, 0 );
+
+    if ( !argStream.HasErrors () )
     {
-        lua_pushboolean ( luaVM, true );
-        return 1;
+        if ( CStaticFunctionDefinitions::SetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setSkyGradient" );
 
     // Return false
     lua_pushboolean ( luaVM, false );
@@ -1061,6 +1052,69 @@ int CLuaFunctionDefs::SetSkyGradient ( lua_State* luaVM )
 int CLuaFunctionDefs::ResetSkyGradient ( lua_State* luaVM )
 {
     if ( CStaticFunctionDefinitions::ResetSkyGradient () )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetHeatHaze ( lua_State* luaVM )
+{
+    SHeatHazeSettings settings;
+    CStaticFunctionDefinitions::GetHeatHaze ( settings );
+
+    lua_pushnumber ( luaVM, settings.ucIntensity );
+    lua_pushnumber ( luaVM, settings.ucRandomShift );
+    lua_pushnumber ( luaVM, settings.usSpeedMin );
+    lua_pushnumber ( luaVM, settings.usSpeedMax );
+    lua_pushnumber ( luaVM, settings.sScanSizeX );
+    lua_pushnumber ( luaVM, settings.sScanSizeY );
+    lua_pushnumber ( luaVM, settings.usRenderSizeX );
+    lua_pushnumber ( luaVM, settings.usRenderSizeY );
+    lua_pushboolean ( luaVM, settings.bInsideBuilding );
+    return 9;
+}
+
+
+int CLuaFunctionDefs::SetHeatHaze ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    // Set the new heat haze settings
+    SHeatHazeSettings heatHaze;
+    argStream.ReadNumber ( heatHaze.ucIntensity );
+    argStream.ReadNumber ( heatHaze.ucRandomShift, 0 );
+    argStream.ReadNumber ( heatHaze.usSpeedMin, 12 );
+    argStream.ReadNumber ( heatHaze.usSpeedMax, 18 );
+    argStream.ReadNumber ( heatHaze.sScanSizeX, 75 );
+    argStream.ReadNumber ( heatHaze.sScanSizeY, 80 );
+    argStream.ReadNumber ( heatHaze.usRenderSizeX, 80 );
+    argStream.ReadNumber ( heatHaze.usRenderSizeY, 85 );
+    argStream.ReadBool ( heatHaze.bInsideBuilding, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetHeatHaze ( heatHaze ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setHeatHaze" );
+
+    // Return false
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::ResetHeatHaze ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetHeatHaze () )
     {
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -1450,7 +1504,7 @@ int CLuaFunctionDefs::SetWindVelocity ( lua_State *luaVM )
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setWindSpeed" );
+        m_pScriptDebugging->LogBadType ( luaVM, "setWindVelocity" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1518,7 +1572,7 @@ int CLuaFunctionDefs::ResetRainLevel ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetFarClipDistance ( lua_State* luaVM )
 {
-    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetFarClipDistance());
+    lua_pushnumber ( luaVM, g_pMultiplayer->GetFarClipDistance ( ) );
     return 1;
 }
 
@@ -1526,7 +1580,7 @@ int CLuaFunctionDefs::SetFarClipDistance ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        g_pGame->GetWorld ()->SetFarClipDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
+        g_pMultiplayer->SetFarClipDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -1538,7 +1592,7 @@ int CLuaFunctionDefs::SetFarClipDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ResetFarClipDistance ( lua_State* luaVM )
 {
-    g_pGame->GetWorld ()->RestoreFarClipDistance ();
+    g_pMultiplayer->RestoreFarClipDistance ();
 
     lua_pushboolean ( luaVM, true );
     return 1;
@@ -1546,7 +1600,7 @@ int CLuaFunctionDefs::ResetFarClipDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetFogDistance ( lua_State* luaVM )
 {
-    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetFogDistance());
+    lua_pushnumber ( luaVM, g_pMultiplayer->GetFogDistance());
     return 1;
 }
 
@@ -1554,7 +1608,7 @@ int CLuaFunctionDefs::SetFogDistance ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        g_pGame->GetWorld ()->SetFogDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
+        g_pMultiplayer->SetFogDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -1566,7 +1620,7 @@ int CLuaFunctionDefs::SetFogDistance ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ResetFogDistance ( lua_State* luaVM )
 {
-    g_pGame->GetWorld ()->RestoreFogDistance ();
+    g_pMultiplayer->RestoreFogDistance ( );
 
     lua_pushboolean ( luaVM, true );
     return 1;
@@ -1576,7 +1630,7 @@ int CLuaFunctionDefs::GetSunColor ( lua_State* luaVM )
 {
     unsigned char ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue;
     
-    g_pGame->GetWorld ()->GetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
+    g_pMultiplayer->GetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
 
     lua_pushnumber ( luaVM, ucCoreRed );
     lua_pushnumber ( luaVM, ucCoreGreen );
@@ -1618,7 +1672,7 @@ int CLuaFunctionDefs::SetSunColor ( lua_State* luaVM )
     if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
         ucCoronaBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
 
-    g_pGame->GetWorld ()->SetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
+    g_pMultiplayer->SetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
 
     lua_pushboolean ( luaVM, true );
     return 1;
@@ -1626,7 +1680,7 @@ int CLuaFunctionDefs::SetSunColor ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ResetSunColor ( lua_State* luaVM )
 {
-    g_pGame->GetWorld ()->ResetSunColor ();
+    g_pMultiplayer->ResetSunColor ( );
 
     lua_pushboolean ( luaVM, true );
     return 1;
@@ -1634,7 +1688,7 @@ int CLuaFunctionDefs::ResetSunColor ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetSunSize ( lua_State* luaVM )
 {
-    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetSunSize () );
+    lua_pushnumber ( luaVM, g_pMultiplayer->GetSunSize ( ) );
     return 1;
 }
 
@@ -1642,7 +1696,7 @@ int CLuaFunctionDefs::SetSunSize ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        g_pGame->GetWorld ()->SetSunSize ( (float) lua_tonumber ( luaVM, 1 ) );
+        g_pMultiplayer->SetSunSize ( (float) lua_tonumber ( luaVM, 1 ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -1654,7 +1708,7 @@ int CLuaFunctionDefs::SetSunSize ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ResetSunSize ( lua_State* luaVM )
 {
-    g_pGame->GetWorld ()->ResetSunSize ();
+    g_pMultiplayer->ResetSunSize ();
 
     lua_pushboolean ( luaVM, true );
     return 1;

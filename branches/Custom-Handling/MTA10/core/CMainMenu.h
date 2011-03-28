@@ -20,7 +20,7 @@ class CMainMenu;
 #include "CQuickConnect.h"
 #include "CQuestionBox.h"
 #include "CServerBrowser.h"
-#include "CServerQueue.h"
+#include "CServerInfo.h"
 #include "CSettings.h"
 #include "CCredits.h"
 #include "CGraphics.h"
@@ -75,7 +75,7 @@ public:
     void                ChangeCommunityState            ( bool bIn, const std::string& strUsername );
     bool                HasStarted                      ( void ) { return m_bStarted; };
 
-    void                SetNewsHeadline                 ( int iIndex, const SString& strContent, bool bIsNew );
+    void                SetNewsHeadline                 ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew );
 
 private:
     sMenuItem*          CreateItem                      ( unsigned char menuType, const char* szFilePath, CVector2D vecRelPosition, CVector2D vecNativeSize );
@@ -95,8 +95,7 @@ private:
     bool                OnQuitButtonClick               ( CGUIElement* pElement );
     bool                OnNewsButtonClick               ( CGUIElement* pElement );
 
-    void                ShowServerQueue                 ( void );
-    void                HideServerQueue                 ( void );
+    void                HideServerInfo                  ( void );
 
     CGUI*               m_pManager;
 
@@ -121,7 +120,7 @@ private:
     CNewsBrowser*       m_pNewsBrowser;
     CCredits            m_Credits;
     CServerBrowser      m_ServerBrowser;
-    CServerQueue        m_ServerQueue;
+    CServerInfo         m_ServerInfo;
 
     // Properties
     bool                m_bIsIngame;

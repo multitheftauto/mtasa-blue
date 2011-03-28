@@ -101,6 +101,14 @@ CGame::CGame ( void )
     m_pWaterManager = NULL;
     m_pObjectSync = NULL;
 
+    m_bInteriorSoundsEnabled = true;
+    m_bOverrideRainLevel = false;
+    m_bOverrideSunSize = false;
+    m_bOverrideSunColor = false;
+    m_bOverrideWindVelocity = false;
+    m_bOverrideFarClip = false;
+    m_bOverrideFogDistance = false;
+
 #ifdef MTA_VOICE
     m_pVoiceServer = NULL;
 #endif
@@ -157,6 +165,8 @@ void CGame::ResetMapInfo ( void )
     m_ucSkyGradientTR = 0, m_ucSkyGradientTG = 0, m_ucSkyGradientTB = 0;
     m_ucSkyGradientBR = 0, m_ucSkyGradientBG = 0, m_ucSkyGradientBB = 0;
     m_bHasSkyGradient = false;
+    m_HeatHazeSettings = SHeatHazeSettings ();
+    m_bHasHeatHaze = false;
     m_bCloudsEnabled = true;
 
     m_bTrafficLightsLocked = false;
@@ -164,6 +174,13 @@ void CGame::ResetMapInfo ( void )
     m_ulLastTrafficUpdate = 0;
 
     g_pGame->SetHasWaterColor ( false );
+    g_pGame->SetInteriorSoundsEnabled ( true );
+    g_pGame->SetHasFarClipDistance ( false );
+    g_pGame->SetHasFogDistance ( false );
+    g_pGame->SetHasRainLevel ( false );
+    g_pGame->SetHasSunColor ( false );
+    g_pGame->SetHasSunSize ( false );
+    g_pGame->SetHasWindVelocity ( false );
 }
 
 CGame::~CGame ( void )
@@ -262,7 +279,7 @@ void CGame::DoPulse ( void )
     // Lock the critical section so http server won't interrupt in the middle of our pulse
     Lock ();
     // Calculate FPS
-    unsigned long ulCurrentTime = GetTickCount ();
+    unsigned long ulCurrentTime = GetTickCount32 ();
     unsigned long ulDiff = ulCurrentTime - m_ulLastFPSTime;
 
     // Update the progress rotator
@@ -839,7 +856,12 @@ void CGame::PulseMasterServerAnnounce ( void )
                     if ( !response )
                         CLogger::LogPrintfNoStamp ( "failed! (Not available)\n" );
                     else if ( response->GetErrorCode () != 200 )
-                        CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
+                    {
+                        if ( response->GetErrorCode () == 500 && strDesc.ContainsI ( "game-monitor" ) )
+                            CLogger::LogPrintfNoStamp ( "unavailable!\n" );
+                        else
+                            CLogger::LogPrintfNoStamp ( "failed! (%u: %s)\n", response->GetErrorCode (), response->GetErrorDescription () );
+                    }
                     else
                         CLogger::LogPrintfNoStamp ( "success!\n");
                 }
@@ -1351,7 +1373,7 @@ void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
         if ( ucNewState != 0xFF )
         {
             CStaticFunctionDefinitions::SetTrafficLightState (ucNewState);
-            m_ulLastTrafficUpdate = GetTickCount ();
+            m_ulLastTrafficUpdate = GetTickCount32 ();
         }
     }
 }
@@ -1568,11 +1590,30 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                         // Tell the console
                         CLogger::LogPrintf ( "CONNECT: %s failed to connect (Bad version) (%s)\n", szNick, strIPAndSerial.c_str () );
 
-                        // Tell the player that the problem
-                        char szReturn [128];
-                        _snprintf ( szReturn, 128, "Disconnected: Bad version (client: %X, server: %X)\n", Packet.GetNetVersion (), MTA_DM_NETCODE_VERSION );
-                        szReturn [127] = '\0';
-                        DisconnectPlayer ( this, *pPlayer, szReturn );
+                        // Tell the player the problem
+                        SString strMessage;
+                        ushort usClientNetVersion = Packet.GetNetVersion ();
+                        ushort usServerNetVersion = MTA_DM_NETCODE_VERSION;
+                        ushort usClientBranchId = usClientNetVersion >> 12;
+                        ushort usServerBranchId = usServerNetVersion >> 12;
+
+                        if ( usClientBranchId != usServerBranchId )
+                        {
+                            strMessage = SString ( "Disconnected: Server from different branch (client: %X, server: %X)\n", usClientBranchId, usServerBranchId );
+                        }
+                        else
+                        if ( MTASA_VERSION_BUILD == 0 )
+                        {
+                            strMessage = SString ( "Disconnected: Bad version (client: %X, server: %X)\n", usClientNetVersion, usServerNetVersion );
+                        }
+                        else
+                        {
+                            if ( usClientNetVersion < usServerNetVersion )
+                                strMessage = SString ( "Disconnected: Server is running a newer build (%d)\n", MTASA_VERSION_BUILD );
+                            else
+                                strMessage = SString ( "Disconnected: Server is running an older build (%d)\n", MTASA_VERSION_BUILD );
+                        }
+                        DisconnectPlayer ( this, *pPlayer, strMessage );
                     }
                 }
                 else

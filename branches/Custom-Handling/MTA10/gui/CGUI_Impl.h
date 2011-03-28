@@ -84,6 +84,8 @@ public:
     eInputMode                      GetGUIInputMode             ( void ); 
     eInputMode                      GetInputModeFromString      ( const std::string& a_rstrMode ) const;
     bool                            GetStringFromInputMode      ( eInputMode a_eMode, std::string& a_rstrResult ) const;
+    static CEGUI::String            GetUTFString                ( std::string strInput );
+    static CEGUI::String            GetUTFString                ( std::wstring strInput );
 
     //
     CGUIMessageBox*                 CreateMessageBox            ( const char* szTitle, const char* szMessage, unsigned int uiFlags );
@@ -118,8 +120,9 @@ public:
     CGUIStaticImage*                CreateStaticImage           ( CGUIGridList* pParent );
     CGUIStaticImage*                CreateStaticImage           ( void );
 
-    CGUITabPanel*                   CreateTabPanel              ( CGUIElement* pParent = NULL );
-    CGUITabPanel*                   CreateTabPanel              ( CGUITab* pParent = NULL );
+    CGUITabPanel*                   CreateTabPanel              ( CGUIElement* pParent );
+    CGUITabPanel*                   CreateTabPanel              ( CGUITab* pParent );
+    CGUITabPanel*                   CreateTabPanel              ( void );
 
     CGUIScrollPane*                 CreateScrollPane            ( CGUIElement* pParent = NULL );
     CGUIScrollPane*                 CreateScrollPane            ( CGUITab* pParent = NULL );

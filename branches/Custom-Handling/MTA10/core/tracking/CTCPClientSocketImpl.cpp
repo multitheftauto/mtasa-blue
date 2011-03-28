@@ -93,7 +93,7 @@ bool CTCPClientSocketImpl::Connect ( const char* szHost, unsigned short usPort )
     }
 
     // Start async resolving it
-    m_pAsyncHostResolving = WSAAsyncGetHostByName ( CCore::GetSingleton ().GetHookedWindow (), WM_ASYNCTRAP + m_uiID, szHost, m_pHostInfo, MAXGETHOSTSTRUCT );
+    m_pAsyncHostResolving = WSAAsyncGetHostByName ( CCore::GetSingleton ().GetHookedWindow (), WM_ASYNCTRAP + m_uiID + 256, szHost, m_pHostInfo, MAXGETHOSTSTRUCT );
     if ( !m_pAsyncHostResolving )
     {
         // Failed
@@ -222,16 +222,28 @@ bool CTCPClientSocketImpl::Initialize ( unsigned int uiID )
     }
 
     // So, make it asynchronous and enable some useful window messages
-    WSAAsyncSelect ( m_Socket, CCore::GetSingleton ().GetHookedWindow (), WM_ASYNCTRAP + uiID, FD_READ | FD_WRITE | FD_CONNECT | FD_CLOSE );
+    if ( SOCKET_ERROR == WSAAsyncSelect ( m_Socket, CCore::GetSingleton ().GetHookedWindow (), WM_ASYNCTRAP + uiID, FD_READ | FD_WRITE | FD_CONNECT | FD_CLOSE ) )
+    {
+        strcpy ( m_szLastError, "WSAAsyncSelect failed" );
+        return false;
+    }
 
     return true;
 }
 
-void CTCPClientSocketImpl::FireEvent ( LPARAM lType )
+void CTCPClientSocketImpl::FireEvent ( bool bIsResolveEvent, uint uiResolveId, LPARAM lType )
 {
+    // Check this is the correct thingmy #1
+    if ( bIsResolveEvent != m_bIsResolvingHost )
+        return;
+
     // Are we resolving host? If so, we got this event from WSAAsyncGetHostByName
     if ( m_bIsResolvingHost )
     {
+        // Check this is the correct thingmy #2
+        if ( uiResolveId != (uint)m_pAsyncHostResolving )
+            return;
+
         m_bIsResolvingHost = false;
 
         // Get error code

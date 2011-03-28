@@ -117,9 +117,6 @@ public:
     void                        GetPosition             ( CVector& vecPosition ) const;
     void                        SetPosition             ( const CVector& vecPosition )      { SetPosition ( vecPosition, true ); }
     void                        SetPosition             ( const CVector& vecPosition, bool bResetInterpolation );
-    void                        SetRoll                 ( const CVector& vecRoll );
-    void                        SetDirection            ( const CVector& vecDir );
-    void                        SetWas                  ( const CVector& vecWas );
 
     void                        GetRotationDegrees      ( CVector& vecRotation ) const;
     void                        GetRotationRadians      ( CVector& vecRotation ) const;
@@ -342,7 +339,7 @@ public:
 
     // Time dependent interpolation
     inline void                 GetTargetPosition       ( CVector& vecPosition )            { vecPosition = m_interp.pos.vecTarget; }
-    void                        SetTargetPosition       ( CVector& vecPosition, unsigned long ulDelay );
+    void                        SetTargetPosition       ( CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ = false, float fVelocityZ = 0.f );
     void                        RemoveTargetPosition    ( void );
     inline bool                 HasTargetPosition       ( void )                            { return ( m_interp.pos.ulFinishTime != 0 ); }
 

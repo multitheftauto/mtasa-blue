@@ -59,7 +59,6 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                 }
             }
 
-            m_ulLastSyncReturnTime = CClientTime::GetTime ();   // Network trouble fix test
             return true;
         }
 
@@ -120,7 +119,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
                     if ( pVehicle )
                     {
                         pVehicle->m_pLastSyncer = m_pPlayerManager->GetLocalPlayer ();
-                        pVehicle->m_ulLastSyncTime = GetTickCount ();
+                        pVehicle->m_ulLastSyncTime = GetTickCount32 ();
                         pVehicle->m_szLastSyncType = "pure";
                     }
                 }
@@ -656,6 +655,10 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
         {
             BitStream.WriteBit ( true );
 
+            // To confirm weapon type at the other end
+            unsigned char ucWeaponType = pPlayerWeapon->GetType ();
+            BitStream.Write ( ucWeaponType );
+
             // Write the type
             unsigned int uiSlot = pPlayerWeapon->GetSlot ();
             SWeaponSlotSync slot;
@@ -1085,7 +1088,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         if ( pVehicle )
         {
             pVehicle->m_pLastSyncer = pPlayer;
-            pVehicle->m_ulLastSyncTime = GetTickCount ();
+            pVehicle->m_ulLastSyncTime = GetTickCount32 ();
             pVehicle->m_szLastSyncType = "pure";
         }
 #endif
@@ -1111,7 +1114,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         pVehicle->SetHealth ( health.data.fValue );
 
         // Set the target position and rotation
-        pVehicle->SetTargetPosition ( position.data.vecPosition, TICK_RATE );
+        pVehicle->SetTargetPosition ( position.data.vecPosition, TICK_RATE, true, velocity.data.vecVelocity.fZ );
         pVehicle->SetTargetRotation ( rotation.data.vecRotation, TICK_RATE );
 
         // Apply the correct move and turnspeed

@@ -104,6 +104,17 @@ bool CLuaManager::RemoveVirtualMachine ( CLuaMain * vm )
 }
 
 
+void CLuaManager::ProcessPendingDeleteList ( void )
+{
+    while ( !m_PendingDeleteList.empty () )
+    {
+        lua_State* luaVM = m_PendingDeleteList.front ();
+        m_PendingDeleteList.pop_front ();
+        lua_close( luaVM );
+    }
+}
+
+
 void CLuaManager::DoPulse ( void )
 {
     list<CLuaMain *>::iterator iter = m_virtualMachines.begin ();
@@ -847,6 +858,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaFunctionDefs::GetSkyGradient );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaFunctionDefs::SetSkyGradient );
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaFunctionDefs::ResetSkyGradient );
+    CLuaCFunctions::AddFunction ( "getHeatHaze", CLuaFunctionDefs::GetHeatHaze );
+    CLuaCFunctions::AddFunction ( "setHeatHaze", CLuaFunctionDefs::SetHeatHaze );
+    CLuaCFunctions::AddFunction ( "resetHeatHaze", CLuaFunctionDefs::ResetHeatHaze );
     CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefs::GetWaterColor );
     CLuaCFunctions::AddFunction ( "setWaterColor", CLuaFunctionDefs::SetWaterColor );
     CLuaCFunctions::AddFunction ( "resetWaterColor", CLuaFunctionDefs::ResetWaterColor );
@@ -974,6 +988,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefs::Md5 );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData );
+    CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
 
 #ifdef MTA_VOICE
     // Voice funcs

@@ -110,7 +110,7 @@ bool CStaticFunctionDefinitions::AddEvent ( CLuaMain& LuaMain, const char* szNam
 }
 
 
-bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, int iLuaFunction, bool bPropagated )
+bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
 {
     assert ( szName );
     
@@ -130,7 +130,7 @@ bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, char* szNa
 }
 
 
-bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, int iLuaFunction )
+bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction )
 {
     assert ( szName );
 
@@ -1380,7 +1380,7 @@ bool CStaticFunctionDefinitions::GetPedTargetCollision ( CClientPed& Ped, CVecto
 }
 
 
-char* CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, int iIndex )
+bool CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, std::vector < SString >& outTaskHierarchy )
 {
     CTaskManager* pTaskManager = Ped.GetTaskManager ();
     if ( pTaskManager )
@@ -1391,20 +1391,16 @@ char* CStaticFunctionDefinitions::GetPedTask ( CClientPed& Ped, bool bPrimary, u
         else
             pTask = pTaskManager->GetTaskSecondary ( uiTaskType );
 
-        unsigned int uiTempIndex = 0;
         while ( pTask )
         {
-            if ( uiTempIndex == iIndex )
-                break;
+            outTaskHierarchy.push_back ( pTask->GetTaskName () );
             pTask = pTask->GetSubTask ();
         }
-        if ( pTask )
-        {
-            return pTask->GetTaskName ();
-        }
+
+        return !outTaskHierarchy.empty ();
     }
 
-    return NULL;
+    return false;
 }
 
 
@@ -2297,9 +2293,9 @@ bool CStaticFunctionDefinitions::FixVehicle ( CClientEntity& Entity )
 }
 
 
-bool CStaticFunctionDefinitions::BlowVehicle ( CClientEntity& Entity, bool bExplode )
+bool CStaticFunctionDefinitions::BlowVehicle ( CClientEntity& Entity )
 {
-    RUN_CHILDREN BlowVehicle ( **iter, bExplode );
+    RUN_CHILDREN BlowVehicle ( **iter );
 
     if ( IS_VEHICLE ( &Entity ) )
     {
@@ -2900,13 +2896,16 @@ bool CStaticFunctionDefinitions::GetVehicleEngineState ( CClientVehicle & Vehicl
 
 bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( CClientEntity& Entity, unsigned char ucDoor, float fRatio, unsigned long ulTime )
 {
-    RUN_CHILDREN SetVehicleDoorOpenRatio ( **iter, ucDoor, fRatio, ulTime );
-
-    if ( IS_VEHICLE(&Entity) )
+    if ( ucDoor <= 5 )
     {
-        CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-        Vehicle.SetDoorOpenRatio ( ucDoor, fRatio, ulTime, true );
-        return true;
+        RUN_CHILDREN SetVehicleDoorOpenRatio ( **iter, ucDoor, fRatio, ulTime );
+
+        if ( IS_VEHICLE(&Entity) )
+        {
+            CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+            Vehicle.SetDoorOpenRatio ( ucDoor, fRatio, ulTime, true );
+            return true;
+        }
     }
 
     return false;
@@ -5319,19 +5318,19 @@ bool CStaticFunctionDefinitions::SetTrafficLightsLocked ( bool bLocked )
 
 bool CStaticFunctionDefinitions::SetWindVelocity ( float fX, float fY, float fZ )
 {
-    g_pGame->GetWorld ()->SetWindVelocity ( fX, fY, fZ );
+    g_pMultiplayer->SetWindVelocity ( fX, fY, fZ );
     return true;
 }
 
 bool CStaticFunctionDefinitions::RestoreWindVelocity ( void )
 {
-    g_pGame->GetWorld ()->RestoreWindVelocity ( );
+    g_pMultiplayer->RestoreWindVelocity ( );
     return true;
 }
 
 bool CStaticFunctionDefinitions::GetWindVelocity ( float& fX, float& fY, float& fZ )
 {
-    g_pGame->GetWorld ()->GetWindVelocity ( fX, fY, fZ );
+    g_pMultiplayer->GetWindVelocity ( fX, fY, fZ );
     return true;
 }
 
@@ -5373,6 +5372,28 @@ bool CStaticFunctionDefinitions::ResetSkyGradient ( void )
     g_pMultiplayer->ResetSky ();
     return true;
 }
+
+
+bool CStaticFunctionDefinitions::GetHeatHaze ( SHeatHazeSettings& settings )
+{
+    g_pMultiplayer->GetHeatHaze ( settings );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetHeatHaze ( const SHeatHazeSettings& settings )
+{
+    g_pMultiplayer->SetHeatHaze ( settings );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetHeatHaze ( void )
+{
+    g_pMultiplayer->ResetHeatHaze ();
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::GetWaterColor ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha )
 {
@@ -5513,7 +5534,7 @@ bool CStaticFunctionDefinitions::GetCloudsEnabled ( )
 }
 
 
-bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments )
+bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments )
 {
     assert ( szKey );
     assert ( szHitState );
@@ -5601,7 +5622,7 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
     return bSuccess;
 }
 
-bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, CLuaMain* pLuaMain, const char* szHitState, int iLuaFunction )
+bool CStaticFunctionDefinitions::UnbindKey ( const char* szKey, CLuaMain* pLuaMain, const char* szHitState, const CLuaFunctionRef& iLuaFunction )
 {
     assert ( szKey );
     assert ( pLuaMain );

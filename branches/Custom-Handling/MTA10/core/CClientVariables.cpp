@@ -219,4 +219,5 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "browser_speed",              2 );                            // Browser speed
     DEFAULT ( "single_download",            0 );                            // Single connection for downloads
     DEFAULT ( "update_build_type",          0 );                            // 0-stable 1-test 2-nightly
+    DEFAULT ( "volumetric_shadows",         0 );                            // Enable volumetric shadows
 }

@@ -21,8 +21,8 @@ namespace SharedUtil
     void SetRegistryValue ( const SString& strPath, const SString& strKey, const SString& strValue );
     SString GetRegistryValue ( const SString& strPath, const SString& strKey );
 
-    int ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
-    int ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
+    bool ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
+    bool ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
 
     //
     // Get startup directory as saved in the registry by the launcher
@@ -110,6 +110,10 @@ namespace SharedUtil
     std::wstring ConvertToUTF8 (const std::string& s);
 
     std::string  ConvertToANSI (const std::wstring& ws);
+
+    std::wstring  TranslateToUTF8 (const std::string& s);
+
+    std::wstring GetBidiString (const std::wstring ws);
 
 
     //
@@ -696,7 +700,7 @@ namespace SharedUtil
     public:
         typedef CIntrusiveListNode < T > Node;
 
-        Node ( T* pOuterItem ) : m_pOuterItem ( pOuterItem ), m_pPrev ( NULL ), m_pNext ( NULL ) {}
+        CIntrusiveListNode ( T* pOuterItem ) : m_pOuterItem ( pOuterItem ), m_pPrev ( NULL ), m_pNext ( NULL ) {}
 
         T*      m_pOuterItem;         // Item this node is inside
         Node*   m_pPrev;
@@ -716,8 +720,9 @@ namespace SharedUtil
         void operator = ( const CIntrusiveList& other );        // Copy will probably not work as expected
         //CIntrusiveList ( const CIntrusiveList& other );       // Default copy constructor is required by dense_hash for some reason
  
-   protected:
+    public:
         class IteratorBase;
+    protected:
         typedef CIntrusiveListNode < T > Node;
 
         size_t                          m_Size;
@@ -750,11 +755,11 @@ namespace SharedUtil
         {
         public:
             Iterator ( CIntrusiveList < T >* pList, Node* pNode ) : IteratorBase ( pList, pNode ) {}
-            bool operator== ( const Iterator& other ) const         { return m_pNode == other.m_pNode; }
-            bool operator!= ( const Iterator& other ) const         { return m_pNode != other.m_pNode; }
-            void operator++ ( void )                                { m_pNode = m_pNode->m_pNext; }
-            void operator++ ( int )                                 { m_pNode = m_pNode->m_pNext; }
-            virtual void NotifyRemovingNode ( Node* pNode )         { if ( m_pNode == pNode ) m_pNode = m_pNode->m_pNext; }
+            bool operator== ( const Iterator& other ) const         { return IteratorBase::m_pNode == other.m_pNode; }
+            bool operator!= ( const Iterator& other ) const         { return IteratorBase::m_pNode != other.m_pNode; }
+            void operator++ ( void )                                { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
+            void operator++ ( int )                                 { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
+            virtual void NotifyRemovingNode ( Node* pNode )         { if ( IteratorBase::m_pNode == pNode ) IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
         };
 
         //
@@ -764,11 +769,11 @@ namespace SharedUtil
         {
         public:
             ReverseIterator ( CIntrusiveList < T >* pList, Node* pNode ) : IteratorBase ( pList, pNode ) {}
-            bool operator== ( const ReverseIterator& other ) const  { return m_pNode == other.m_pNode; }
-            bool operator!= ( const ReverseIterator& other ) const  { return m_pNode != other.m_pNode; }
-            void operator++ ( void )                                { m_pNode = m_pNode->m_pPrev; }
-            void operator++ ( int )                                 { m_pNode = m_pNode->m_pPrev; }
-            virtual void NotifyRemovingNode ( Node* pNode )         { if ( m_pNode == pNode ) m_pNode = m_pNode->m_pPrev; }
+            bool operator== ( const ReverseIterator& other ) const  { return IteratorBase::m_pNode == other.m_pNode; }
+            bool operator!= ( const ReverseIterator& other ) const  { return IteratorBase::m_pNode != other.m_pNode; }
+            void operator++ ( void )                                { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev; }
+            void operator++ ( int )                                 { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev; }
+            virtual void NotifyRemovingNode ( Node* pNode )         { if ( IteratorBase::m_pNode == pNode ) IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev; }
         };
 
         //
@@ -944,7 +949,7 @@ namespace SharedUtil
     class CIntrusiveListExt : public CIntrusiveList < T >
     {
     public:
-        CIntrusiveListExt ( void ) : CIntrusiveList ( member_ptr ) {}
+        CIntrusiveListExt ( void ) : CIntrusiveList < T > ( member_ptr ) {}
     };
 
 

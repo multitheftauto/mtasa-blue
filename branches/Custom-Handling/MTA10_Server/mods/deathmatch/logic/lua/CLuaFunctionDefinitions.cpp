@@ -43,7 +43,6 @@ static CResourceManager*                                m_pResourceManager = NUL
 static CAccessControlListManager*                       m_pACLManager = NULL;
 static CLuaModuleManager*                               m_pLuaModuleManager = NULL;
 #define type(number,type) (lua_type(luaVM,number) == type)
-#define VERIFY_FUNCTION(func) (func!=LUA_REFNIL)
 
 
 void CLuaFunctionDefinitions::SetBlipManager ( CBlipManager* pBlipManager )
@@ -3824,7 +3823,7 @@ int CLuaFunctionDefinitions::GetVehiclesOfType ( lua_State* luaVM )
             lua_newtable ( luaVM );
 
             // Add all the vehicles with a matching model
-            m_pVehicleManager->GetVehiclesOfType ( uiModel, pLuaMain );
+            m_pVehicleManager->GetVehiclesOfType ( uiModel, luaVM );
             return 1;
         }
         else
@@ -4491,21 +4490,6 @@ int CLuaFunctionDefinitions::FixVehicle ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::BlowVehicle ( lua_State* luaVM )
 {
-    // Read out whether to explode or not
-    bool bExplode = true;
-    int iArgument2 = lua_type ( luaVM, 2 );
-    if ( iArgument2 == LUA_TBOOLEAN )
-    {
-        bExplode = lua_toboolean ( luaVM, 2 ) ? true:false;
-    }
-    else if ( iArgument2 != LUA_TNONE )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM, "blowVehicle" );
-
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-
     // Verify the element pointer argument
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
@@ -4513,7 +4497,7 @@ int CLuaFunctionDefinitions::BlowVehicle ( lua_State* luaVM )
         CElement* pElement = lua_toelement ( luaVM, 1 );
         if ( pElement )
         {
-            if ( CStaticFunctionDefinitions::BlowVehicle ( pElement, bExplode ) )
+            if ( CStaticFunctionDefinitions::BlowVehicle ( pElement ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -7751,7 +7735,7 @@ int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
                                     if ( strcmp ( szKey, pBind->boundKey->szKey ) == 0 )
                                     {
                                         lua_pushnumber ( luaVM, ++uiIndex );
-                                        lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction );
+                                        lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt () );
                                         lua_settable ( luaVM, -3 );
                                     }
                                 }
@@ -7765,7 +7749,7 @@ int CLuaFunctionDefinitions::GetFunctionsBoundToKey ( lua_State* luaVM )
                                     if ( strcmp ( szKey, pBind->boundControl->szControl ) == 0 )
                                     {
                                         lua_pushnumber ( luaVM, ++uiIndex );
-                                        lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction );
+                                        lua_rawgeti ( luaVM, LUA_REGISTRYINDEX, pBind->m_iLuaFunction.ToInt () );
                                         lua_settable ( luaVM, -3 );
                                     }
                                 }
@@ -8159,7 +8143,7 @@ int CLuaFunctionDefinitions::GetPlayersInTeam ( lua_State* luaVM )
             {
                 lua_newtable ( luaVM );
 
-                pTeam->GetPlayers ( pLuaMain );
+                pTeam->GetPlayers ( luaVM );
                 return 1;
             }
             else
@@ -9412,7 +9396,7 @@ int CLuaFunctionDefinitions::OutputServerLog ( lua_State* luaVM )
         const char* szText = lua_tostring ( luaVM, 1 );
 
         // Print it
-        CLogger::LogPrintf ( "%s\n", szText );
+        CLogger::LogPrintf ( LOGLEVEL_LOW, "%s\n", szText );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -9865,7 +9849,7 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
         lua_newtable ( luaVM );
 
         // Add all the timers with less than ulTime left
-        pLuaMain->GetTimerManager ()->GetTimers ( ulTime, pLuaMain );
+        pLuaMain->GetTimerManager ()->GetTimers ( ulTime, luaVM );
         return 1;
     }
 
@@ -9956,7 +9940,7 @@ int CLuaFunctionDefinitions::UtfLen ( lua_State* luaVM )
         return 1;
     }
     std::string strInput = lua_tostring ( luaVM, 1 );
-    lua_pushnumber ( luaVM, SharedUtil::ConvertToUTF8(strInput).size() );
+    lua_pushnumber ( luaVM, ConvertToUTF8(strInput).size() );
 
     return 1;
 }
@@ -9971,11 +9955,11 @@ int CLuaFunctionDefinitions::UtfSeek ( lua_State* luaVM )
     }
     int iPos = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
     std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
+    std::wstring strUTF = ConvertToUTF8(strInput);
     if ( iPos <= static_cast < int >(strUTF.size()) && iPos >= 0 )
     {
         strUTF = strUTF.substr(0,iPos);
-        lua_pushnumber ( luaVM, SharedUtil::ConvertToANSI(strUTF).size() );
+        lua_pushnumber ( luaVM, ConvertToANSI(strUTF).size() );
         return 1;
     }
 
@@ -9994,7 +9978,7 @@ int CLuaFunctionDefinitions::UtfSub ( lua_State* L )
     //Ripped and modded Lua source.  It's pretty disgusting, i know.
 
     const char *s = lua_tostring(L, 1);
-    std::wstring strUTF = SharedUtil::ConvertToUTF8(s);
+    std::wstring strUTF = ConvertToUTF8(s);
     size_t l = static_cast < int > ( strUTF.size() );
 
     ptrdiff_t start = luaL_checkinteger(L, 2);
@@ -10012,7 +9996,7 @@ int CLuaFunctionDefinitions::UtfSub ( lua_State* L )
     if (start <= end)
     {
         strUTF = strUTF.substr(start-1, end-start+1);
-        lua_pushstring(L, SharedUtil::ConvertToANSI(strUTF).c_str());
+        lua_pushstring(L, ConvertToANSI(strUTF).c_str());
     }
     else lua_pushliteral(L, "");
     return 1;
@@ -10038,7 +10022,7 @@ int CLuaFunctionDefinitions::UtfChar ( lua_State* luaVM )
     wchar_t wUNICODE[2] = { iChar, '\0' };
 
     // Convert our UTF character into an ANSI string
-    std::string strANSI = SharedUtil::ConvertToANSI(wUNICODE);
+    std::string strANSI = ConvertToANSI(wUNICODE);
 
     lua_pushstring ( luaVM, strANSI.c_str() );
     return 1;
@@ -10053,7 +10037,7 @@ int CLuaFunctionDefinitions::UtfCode ( lua_State* luaVM )
         return 1;
     }
     std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
+    std::wstring strUTF = ConvertToUTF8(strInput);
     unsigned long ulCode = strUTF.c_str()[0];
 
     lua_pushnumber ( luaVM, ulCode );
@@ -10366,23 +10350,6 @@ int CLuaFunctionDefinitions::SetPlayerAnnounceValue ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefinitions::SetServerName ( lua_State* luaVM )
-{
-	if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        std::string strServerName = lua_tostring ( luaVM, 1 );
-        if ( CStaticFunctionDefinitions::SetServerName ( strServerName ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setServerName" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
 
 int CLuaFunctionDefinitions::ExecuteSQLCreateTable ( lua_State* luaVM )
 {
@@ -11279,7 +11246,7 @@ int CLuaFunctionDefinitions::GetBans ( lua_State* luaVM )
     {
         lua_newtable ( luaVM );
 
-        CStaticFunctionDefinitions::GetBans ( pLuaMain );
+        CStaticFunctionDefinitions::GetBans ( luaVM );
 
         return 1;
     }
@@ -11888,7 +11855,7 @@ int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
         CPerfStatResult Result;
-        SString strCatagory = lua_tostring ( luaVM, 1 );
+        SString strCategory = lua_tostring ( luaVM, 1 );
         SString strOptions;
         SString strFilter;
 
@@ -11898,7 +11865,7 @@ int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
         if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
             strFilter = lua_tostring ( luaVM, 3 );
 
-        GetPerfStatManager ()->GetStats ( &Result, strCatagory, strOptions, strFilter );
+        GetPerfStatManager ()->GetStats ( &Result, strCategory, strOptions, strFilter );
 
         lua_newtable ( luaVM );
         for ( int c = 0; c < Result.ColumnCount () ; c++ )

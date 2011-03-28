@@ -26,7 +26,7 @@ CPedSA::CPedSA (  ) :
 {
     DEBUG_TRACE("CPedSA::CPedSA(  )");
 
-    memset ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
+    MemSet ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
 }
 
 CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
@@ -36,7 +36,7 @@ CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
 {
     DEBUG_TRACE("CPedSA::CPedSA( CPedSAInterface * pedInterface )");
 
-    memset ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
+    MemSet ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
 }
 
 VOID CPedSA::SetInterface( CEntitySAInterface * intInterface )
@@ -243,7 +243,7 @@ void CPedSA::Respawn(CVector * position, bool bCameraCut)
     if ( !bCameraCut )
     {
          // DISABLE call to CCamera__RestoreWithJumpCut when respawning
-        memset( (void*)0x4422EA, 0x90, 20 );
+        MemSet ( (void*)0x4422EA, 0x90, 20 );
     }
 
     DEBUG_TRACE("void CPedSA::Respawn(CVector * position)");
@@ -286,7 +286,7 @@ void CPedSA::Respawn(CVector * position, bool bCameraCut)
         // B9 28 F0 B6 00 E8 4C 9A 0C 00 B9 28 F0 B6 00 E8 B2 97 0C 00
         unsigned char szCode[] = {0xB9, 0x28, 0xF0, 0xB6, 0x00, 0xE8, 0x4C, 0x9A, 0x0C, 0x00, 0xB9, 0x28, 0xF0, 0xB6, 0x00, 0xE8, 0xB2, 0x97, 0x0C, 0x00} ;
         // RE-ENABLE call to CCamera__RestoreWithJumpCut when respawning
-        memcpy( (void*)0x4422EA, szCode, 20 );
+        MemCpy ( (void*)0x4422EA, szCode, 20 );
     }
     //OutputDebugString ( "Respawn!!!!" );
 }
@@ -824,15 +824,15 @@ void CPedSA::SetFootBlood ( unsigned int uiFootBlood )
     if (uiFootBlood > 0)
     {
         // Make sure the foot blood flag is activated
-        *(unsigned short*)(dwThis + 0x46F) |= 16;
+        MemOr < unsigned short > ( dwThis + 0x46F, 16 );  //         *(unsigned short*)(dwThis + 0x46F) |= 16;
     }
     else if (*(unsigned short*)(dwThis + 0x46F) & 16)
     {
         // If the foot blood flag is activated, deactivate it
-        *(unsigned short*)(dwThis + 0x46F) -= 16;
+        MemSub < unsigned short > ( dwThis + 0x46F, 16 );  //         *(unsigned short*)(dwThis + 0x46F) -= 16;
     }
     // Set the amount of foot blood
-    *(unsigned int*)(dwThis + 0x750) = uiFootBlood;
+    MemPut < unsigned int > ( dwThis + 0x750, uiFootBlood );  //     *(unsigned int*)(dwThis + 0x750) = uiFootBlood;
 }
 
 unsigned int CPedSA::GetFootBlood ( void )
@@ -1378,7 +1378,7 @@ CEntity * CPedSA::GetObjectiveEntity (  )
 
 void CPedSA::GetObjectiveVector ( CVector * vector )
 {
-    memcpy(vector,&(((CPedSAInterface *)this->GetInterface())->ObjectiveVector),sizeof(CVector));
+    MemCpy (vector,&(((CPedSAInterface *)this->GetInterface())->ObjectiveVector),sizeof(CVector));
 }
 */
 /*  CPedSAInterface * pedInterface = ((CPedSAInterface *)this->GetInterface());
@@ -1567,7 +1567,7 @@ void CPedSA::WarpPedIntoCar ( CVehicle * vehicle )
     DWORD dwFunc = 0x6470E0; // CTaskSimpleCarSetPedInAsDriver
     DWORD dwVehicle = (DWORD)((CVehicleSA *)vehicle)->GetInterface();
     DWORD dwTask[50];
-    memset(dwTask, 0, 50);
+    MemSet (dwTask, 0, 50);
     _asm
     {
         pushad
@@ -1636,7 +1636,7 @@ bool CPedSA::IsInVehicle()
 /*
 void CPedSA::SetAsActivePed()
 {
-    *(DWORD *)VAR_LocalPlayer = (DWORD)this->GetInterface();
+    MemPut < DWORD > ( VAR_LocalPlayer, (DWORD)this->GetInterface() );  //     *(DWORD *)VAR_LocalPlayer = (DWORD)this->GetInterface();
 }
 
 void CPedSA::SetPedState(ePedState PedState)

@@ -19,6 +19,10 @@ extern CCore* g_pCore;
 
 template<> CMessageLoopHook * CSingleton< CMessageLoopHook >::m_pSingleton = NULL;
 
+WPARAM  CMessageLoopHook::m_LastVirtualKeyCode = NULL;
+UCHAR   CMessageLoopHook::m_LastScanCode = NULL;
+BYTE*   CMessageLoopHook::m_LastKeyboardState = new BYTE[256];
+
 CMessageLoopHook::CMessageLoopHook ( )
 {
     WriteDebugEvent ( "CMessageLoopHook::CMessageLoopHook" );
@@ -32,7 +36,6 @@ CMessageLoopHook::~CMessageLoopHook ( )
     WriteDebugEvent ( "CMessageLoopHook::~CMessageLoopHook" );
     m_HookedWindowProc      = NULL;
     m_HookedWindowHandle    = NULL;
-
 }
 
 
@@ -65,7 +68,6 @@ void CMessageLoopHook::RemoveHook ( )
     }
 }
 
-
 LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd, 
                                                     UINT uMsg, 
                                                     WPARAM wParam, 
@@ -79,12 +81,10 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
     // Log our state
     if ( uMsg == WM_KILLFOCUS || (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE) )
     {
-        g_pCore->SetFocused ( false );
         CSetCursorPosHook::GetSingleton ().DisableSetCursorPos ();
     }
     else if ( uMsg == WM_SETFOCUS || (uMsg == WM_ACTIVATE && LOWORD(wParam) != WA_INACTIVE) )
     {
-        g_pCore->SetFocused ( true );
         if ( !g_pCore->GetLocalGUI ()->InputGoesToGUI () )
             CSetCursorPosHook::GetSingleton ().EnableSetCursorPos ();
     }
@@ -131,11 +131,11 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
             return true;
 
         // See if this is message was caused by our asynchronous sockets
-        if ( uMsg >= WM_ASYNCTRAP && uMsg <= ( WM_ASYNCTRAP + 255 ))
+        if ( uMsg >= WM_ASYNCTRAP && uMsg <= ( WM_ASYNCTRAP + 511 ))
         {
             /* ACHTUNG: uMsg - 10? Windows seems to add 10 or there's a bug in the message code. Hack! */
             // Let the CTCPManager handle it
-            CTCPManager::GetSingletonPtr ()->HandleEvent ( ( uMsg - WM_ASYNCTRAP ), lParam );
+            CTCPManager::GetSingletonPtr ()->HandleEvent ( ( uMsg - WM_ASYNCTRAP ), wParam, lParam );
         }
 
         bool bWasCaptureKey = false;
@@ -217,12 +217,41 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                             }
                         }
                     }
+                    else if ( uMsg == WM_KEYDOWN && CLocalGUI::GetSingleton().GetMainMenu()->GetServerBrowser()->IsAddressBarAwaitingInput() )
+                    {
+                        if ( wParam == VK_DOWN )
+                        {
+                            CLocalGUI::GetSingleton().GetMainMenu()->GetServerBrowser()->SetNextHistoryText ( true );
+                        }
+
+                        if ( wParam == VK_UP )
+                        {
+                            CLocalGUI::GetSingleton().GetMainMenu()->GetServerBrowser()->SetNextHistoryText ( false );
+                        }
+
+                    }
                 }
             }
         }
 
         if ( !bWasCaptureKey )
         {
+            // Store our keydown for backup unicode translation
+            if ( uMsg == WM_KEYDOWN )
+            {
+                m_LastVirtualKeyCode = wParam;
+                m_LastScanCode = (BYTE)((lParam >> 16) & 0x000F);
+                GetKeyboardState( m_LastKeyboardState );
+            }
+            // If it was a question mark character, we may have an unprocessed unicode character
+            if ( uMsg == WM_CHAR && wParam == 0x3F )
+            {
+                wchar_t* wcsUnicode = new wchar_t[1];
+                ToUnicodeEx ( m_LastVirtualKeyCode, m_LastScanCode, m_LastKeyboardState, wcsUnicode, 1, 0, GetKeyboardLayout(0) );
+                wParam = (WPARAM)wcsUnicode[0];
+                delete wcsUnicode;
+            }
+
             // Lead the message through the keybinds message processor
             g_pCore->GetKeyBinds ()->ProcessMessage ( hwnd, uMsg, wParam, lParam );
 

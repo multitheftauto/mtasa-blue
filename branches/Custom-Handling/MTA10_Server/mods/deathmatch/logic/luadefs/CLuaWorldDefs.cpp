@@ -30,6 +30,17 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getTrafficLightState", CLuaWorldDefs::getTrafficLightState );
     CLuaCFunctions::AddFunction ( "areTrafficLightsLocked", CLuaWorldDefs::areTrafficLightsLocked );
     CLuaCFunctions::AddFunction ( "getJetpackMaxHeight", CLuaWorldDefs::getJetpackMaxHeight );
+    CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaWorldDefs::getSkyGradient );
+    CLuaCFunctions::AddFunction ( "getHeatHaze", CLuaWorldDefs::getHeatHaze );
+    CLuaCFunctions::AddFunction ( "isGlitchEnabled", CLuaWorldDefs::isGlitchEnabled );
+    CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaWorldDefs::getCloudsEnabled );
+    CLuaCFunctions::AddFunction ( "areInteriorSoundsEnabled", CLuaWorldDefs::areInteriorSoundsEnabled );
+    CLuaCFunctions::AddFunction ( "getRainLevel", CLuaWorldDefs::getRainLevel );
+    CLuaCFunctions::AddFunction ( "getSunSize", CLuaWorldDefs::getSunSize );
+    CLuaCFunctions::AddFunction ( "getSunColor", CLuaWorldDefs::getSunColor );
+    CLuaCFunctions::AddFunction ( "getWindVelocity", CLuaWorldDefs::getWindVelocity );
+    CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaWorldDefs::getFarClipDistance );
+    CLuaCFunctions::AddFunction ( "getFogDistance", CLuaWorldDefs::getFogDistance );
 
     // Set
     CLuaCFunctions::AddFunction ( "setTime", CLuaWorldDefs::setTime );
@@ -38,19 +49,33 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setGravity", CLuaWorldDefs::setGravity );
     CLuaCFunctions::AddFunction ( "setGameSpeed", CLuaWorldDefs::setGameSpeed );
     CLuaCFunctions::AddFunction ( "setWaveHeight", CLuaWorldDefs::setWaveHeight );
-    CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaWorldDefs::getSkyGradient );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaWorldDefs::setSkyGradient );
-    CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
+    CLuaCFunctions::AddFunction ( "setHeatHaze", CLuaWorldDefs::setHeatHaze );
     CLuaCFunctions::AddFunction ( "setFPSLimit", CLuaWorldDefs::setFPSLimit );
     CLuaCFunctions::AddFunction ( "setMinuteDuration", CLuaWorldDefs::setMinuteDuration );
     CLuaCFunctions::AddFunction ( "setGarageOpen", CLuaWorldDefs::setGarageOpen );
     CLuaCFunctions::AddFunction ( "setGlitchEnabled", CLuaWorldDefs::setGlitchEnabled );
-    CLuaCFunctions::AddFunction ( "isGlitchEnabled", CLuaWorldDefs::isGlitchEnabled );
     CLuaCFunctions::AddFunction ( "setCloudsEnabled", CLuaWorldDefs::setCloudsEnabled );
-    CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaWorldDefs::getCloudsEnabled );
     CLuaCFunctions::AddFunction ( "setTrafficLightState", CLuaWorldDefs::setTrafficLightState );
     CLuaCFunctions::AddFunction ( "setTrafficLightsLocked", CLuaWorldDefs::setTrafficLightsLocked );
     CLuaCFunctions::AddFunction ( "setJetpackMaxHeight", CLuaWorldDefs::setJetpackMaxHeight );
+    CLuaCFunctions::AddFunction ( "setInteriorSoundsEnabled", CLuaWorldDefs::setInteriorSoundsEnabled );
+    CLuaCFunctions::AddFunction ( "setRainLevel", CLuaWorldDefs::setRainLevel );
+    CLuaCFunctions::AddFunction ( "setSunSize", CLuaWorldDefs::setSunSize );
+    CLuaCFunctions::AddFunction ( "setSunColor", CLuaWorldDefs::setSunColor );
+    CLuaCFunctions::AddFunction ( "setWindVelocity", CLuaWorldDefs::setWindVelocity );
+    CLuaCFunctions::AddFunction ( "setFarClipDistance", CLuaWorldDefs::setFarClipDistance );
+    CLuaCFunctions::AddFunction ( "setFogDistance", CLuaWorldDefs::setFogDistance );
+
+    // Reset
+    CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
+    CLuaCFunctions::AddFunction ( "resetHeatHaze", CLuaWorldDefs::resetHeatHaze );
+    CLuaCFunctions::AddFunction ( "resetRainLevel", CLuaWorldDefs::resetRainLevel );
+    CLuaCFunctions::AddFunction ( "resetSunSize", CLuaWorldDefs::resetSunSize );
+    CLuaCFunctions::AddFunction ( "resetSunColor", CLuaWorldDefs::resetSunColor );
+    CLuaCFunctions::AddFunction ( "resetWindVelocity", CLuaWorldDefs::resetWindVelocity );
+    CLuaCFunctions::AddFunction ( "resetFarClipDistance", CLuaWorldDefs::resetFarClipDistance );
+    CLuaCFunctions::AddFunction ( "resetFogDistance", CLuaWorldDefs::resetFogDistance );
 }
 
 
@@ -490,38 +515,30 @@ int CLuaWorldDefs::getSkyGradient ( lua_State* luaVM )
 
 int CLuaWorldDefs::setSkyGradient ( lua_State* luaVM )
 {
-    // Verify the argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
+    CScriptArgReader argStream ( luaVM );
 
-    unsigned char ucTopRed = 0;
-    unsigned char ucTopGreen = 0;
-    unsigned char ucTopBlue = 0;
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) )
-        ucTopRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
-    if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
-        ucTopGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-    if ( ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
-        ucTopBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-    unsigned char ucBottomRed = 0;
-    unsigned char ucBottomGreen = 0;
-    unsigned char ucBottomBlue = 0;
-    if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
-        ucBottomRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-    if ( ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
-        ucBottomGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
-    if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
-        ucBottomBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
-        // Set the new sky gradient
-    if ( CStaticFunctionDefinitions::SetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue ) )
+    // Set the new sky gradient
+    uchar ucTopRed, ucTopGreen, ucTopBlue;
+    uchar ucBottomRed, ucBottomGreen, ucBottomBlue;
+
+    argStream.ReadNumber ( ucTopRed, 0 );
+    argStream.ReadNumber ( ucTopGreen, 0 );
+    argStream.ReadNumber ( ucTopBlue, 0 );
+    argStream.ReadNumber ( ucBottomRed, 0 );
+    argStream.ReadNumber ( ucBottomGreen, 0 );
+    argStream.ReadNumber ( ucBottomBlue, 0 );
+
+    if ( !argStream.HasErrors () )
     {
-        lua_pushboolean ( luaVM, true );
-        return 1;
+        // Set the new sky gradient
+        if ( CStaticFunctionDefinitions::SetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setSkyGradient" );
 
     // Return false
     lua_pushboolean ( luaVM, false );
@@ -540,6 +557,419 @@ int CLuaWorldDefs::resetSkyGradient ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaWorldDefs::getHeatHaze ( lua_State* luaVM )
+{
+    SHeatHazeSettings settings;
+    bool bSuccess = CStaticFunctionDefinitions::GetHeatHaze ( settings );
+
+    if ( bSuccess )
+    {
+        lua_pushnumber ( luaVM, settings.ucIntensity );
+        lua_pushnumber ( luaVM, settings.ucRandomShift );
+        lua_pushnumber ( luaVM, settings.usSpeedMin );
+        lua_pushnumber ( luaVM, settings.usSpeedMax );
+        lua_pushnumber ( luaVM, settings.sScanSizeX );
+        lua_pushnumber ( luaVM, settings.sScanSizeY );
+        lua_pushnumber ( luaVM, settings.usRenderSizeX );
+        lua_pushnumber ( luaVM, settings.usRenderSizeY );
+        lua_pushboolean ( luaVM, settings.bInsideBuilding );
+        return 9;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaWorldDefs::setHeatHaze ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    // Set the new heat haze settings
+    SHeatHazeSettings heatHaze;
+    argStream.ReadNumber ( heatHaze.ucIntensity );
+    argStream.ReadNumber ( heatHaze.ucRandomShift, 0 );
+    argStream.ReadNumber ( heatHaze.usSpeedMin, 12 );
+    argStream.ReadNumber ( heatHaze.usSpeedMax, 18 );
+    argStream.ReadNumber ( heatHaze.sScanSizeX, 75 );
+    argStream.ReadNumber ( heatHaze.sScanSizeY, 80 );
+    argStream.ReadNumber ( heatHaze.usRenderSizeX, 80 );
+    argStream.ReadNumber ( heatHaze.usRenderSizeY, 85 );
+    argStream.ReadBool ( heatHaze.bInsideBuilding, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetHeatHaze ( heatHaze ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setHeatHaze" );
+
+    // Return false
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaWorldDefs::resetHeatHaze ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetHeatHaze () )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::areInteriorSoundsEnabled ( lua_State* luaVM)
+{
+    bool bEnabled;
+    bool bSuccess = CStaticFunctionDefinitions::AreInteriorSoundsEnabled ( bEnabled );
+
+    if ( bSuccess )
+    {
+        lua_pushboolean ( luaVM, bEnabled );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getRainLevel ( lua_State* luaVM )
+{
+    float fRainLevel;
+    bool bSuccess = CStaticFunctionDefinitions::GetRainLevel ( fRainLevel );
+
+    if ( bSuccess )
+    {
+        lua_pushnumber ( luaVM, fRainLevel );
+
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getSunSize ( lua_State* luaVM )
+{
+    float fSunSize;
+    bool bSuccess = CStaticFunctionDefinitions::GetSunSize ( fSunSize );
+
+    if ( bSuccess )
+    {
+        lua_pushnumber ( luaVM, fSunSize );
+
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getSunColor ( lua_State* luaVM )
+{
+    unsigned char ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB;
+    bool bSuccess = CStaticFunctionDefinitions::GetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB );
+
+    if ( bSuccess )
+    {
+        lua_pushnumber ( luaVM, ucCoreR );
+        lua_pushnumber ( luaVM, ucCoreG );
+        lua_pushnumber ( luaVM, ucCoreB );
+        lua_pushnumber ( luaVM, ucCoronaR );
+        lua_pushnumber ( luaVM, ucCoronaG );
+        lua_pushnumber ( luaVM, ucCoronaB );
+
+        return 6;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getWindVelocity ( lua_State* luaVM )
+{
+    float fVelocityX, fVelocityY, fVelocityZ;
+    bool bSuccess = CStaticFunctionDefinitions::GetWindVelocity ( fVelocityX, fVelocityY, fVelocityZ );
+
+    if ( bSuccess )
+    {
+        lua_pushnumber ( luaVM, fVelocityX );
+        lua_pushnumber ( luaVM, fVelocityY );
+        lua_pushnumber ( luaVM, fVelocityZ );
+
+        return 3;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getFarClipDistance ( lua_State* luaVM )
+{
+    float fFarClip;
+    bool bSuccess = CStaticFunctionDefinitions::GetFarClipDistance ( fFarClip );
+
+    if ( bSuccess )
+    {
+        lua_pushnumber ( luaVM, fFarClip );
+
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getFogDistance ( lua_State* luaVM )
+{
+    float fFogDist;
+    bool bSuccess = CStaticFunctionDefinitions::GetFogDistance ( fFogDist );
+
+    if ( bSuccess )
+    {
+        lua_pushnumber ( luaVM, fFogDist );
+
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setInteriorSoundsEnabled ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    bool bEnable;
+    argStream.ReadBool ( bEnable );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::SetInteriorSoundsEnabled ( bEnable ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setInteriorSoundsEnabled" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setRainLevel ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    float fRainLevel;
+    argStream.ReadNumber ( fRainLevel );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::SetRainLevel ( fRainLevel ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setRainLevel" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setSunSize ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    float fSunSize;
+    argStream.ReadNumber ( fSunSize );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::SetSunSize ( fSunSize ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setSunSize" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setSunColor ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    unsigned char ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB;
+    argStream.ReadNumber ( ucCoreR, 0 );
+    argStream.ReadNumber ( ucCoreG, 0 );
+    argStream.ReadNumber ( ucCoreB, 0 );
+    argStream.ReadNumber ( ucCoronaR, ucCoreR );
+    argStream.ReadNumber ( ucCoronaG, ucCoreG );
+    argStream.ReadNumber ( ucCoronaB, ucCoreB );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::SetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setSunColor" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setWindVelocity ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    float fVelX, fVelY, fVelZ;
+    argStream.ReadNumber ( fVelX );
+    argStream.ReadNumber ( fVelY );
+    argStream.ReadNumber ( fVelZ );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::SetWindVelocity ( fVelX, fVelY, fVelZ ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setWindVelocity" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setFarClipDistance ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    float fFarClip;
+    argStream.ReadNumber ( fFarClip );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::SetFarClipDistance ( fFarClip ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setFarClipDistance" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::setFogDistance ( lua_State* luaVM )
+{
+    CScriptArgReader argStream ( luaVM );
+
+    float fFogDist;
+    argStream.ReadNumber ( fFogDist );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::SetFogDistance ( fFogDist ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setFogDistance" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::resetRainLevel ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetRainLevel ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::resetSunSize ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetSunSize ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::resetSunColor ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetSunColor ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::resetWindVelocity ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetWindVelocity ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::resetFarClipDistance ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetFarClipDistance ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::resetFogDistance ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetFogDistance ( ) )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaWorldDefs::setFPSLimit ( lua_State* luaVM )
 {

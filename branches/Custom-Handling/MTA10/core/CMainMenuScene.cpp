@@ -496,7 +496,7 @@ bool CMainMenuScene::Init3DScene ( IDirect3DTexture9 * pRenderTarget, CVector2D 
     m_pGFX = CLocalGUI::GetSingleton ().GetRenderingLibrary ();
 
     // Randomize the seed
-    srand ( GetTickCount () );
+    srand ( GetTickCount32 () );
 
     // Set the current directory to the MTA dir so we can load files using a relative path
     FileTranslator.SetCurrentWorkingDirectory ( "MTA" );

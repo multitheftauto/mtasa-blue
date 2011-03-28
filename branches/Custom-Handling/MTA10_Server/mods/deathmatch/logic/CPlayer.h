@@ -115,7 +115,7 @@ public:
     inline time_t                               GetNickChangeTime           ( void )                        { return m_tNickChange; };
     inline void                                 SetNickChangeTime           ( time_t tNickChange )          { m_tNickChange = tNickChange; };
 
-    void                                        Send                        ( const CPacket& Packet, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME );
+    void                                        Send                        ( const CPacket& Packet );
     void                                        SendEcho                    ( const char* szEcho );
     void                                        SendConsole                 ( const char* szEcho );
 
@@ -212,13 +212,15 @@ public:
     inline void                                 IncrementPuresync           ( void )                        { m_uiPuresyncPackets++; }
     inline unsigned int                         GetPuresyncCount            ( void ) const                  { return m_uiPuresyncPackets; }
 
-    void                                        NotifyReceivedSync        ( void )                        { m_ulLastReceivedSyncTime = GetTickCount (); }
-    unsigned long                               GetTicksSinceLastReceivedSync ( void ) const              { return GetTickCount () - m_ulLastReceivedSyncTime; }
+    void                                        NotifyReceivedSync        ( void )                        { m_ulLastReceivedSyncTime = GetTickCount32 (); }
+    unsigned long                               GetTicksSinceLastReceivedSync ( void ) const              { return GetTickCount32 () - m_ulLastReceivedSyncTime; }
 
     const std::string&                          GetAnnounceValue            ( const std::string& strKey ) const;
     void                                        SetAnnounceValue            ( const std::string& strKey, const std::string& strValue );
 
-    void                                        Kick                        ( CPlayer* pResponsible = NULL, const SString& strReason = "" );
+    // Checks
+    void                                        SetWeaponCorrect            ( bool bWeaponCorrect );
+    bool                                        GetWeaponCorrect            ( void );
 
 private:
     void                                        WriteCameraModePacket       ( void );
@@ -306,9 +308,7 @@ private:
 
     std::map < std::string, std::string >       m_AnnounceValues;
 
-    bool                                        m_bPendingKick;
-    ElementID                                   m_PendingKickResponsibleID;
-    SString                                     m_strPendingKickReason;
+    uint                                        m_uiWeaponIncorrectCount;
 };
 
 #endif

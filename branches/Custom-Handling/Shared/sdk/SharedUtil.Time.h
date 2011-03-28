@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        SharedUtil.AllocTracking.h
+*  FILE:        SharedUtil.Time.h
 *  PURPOSE:
 *  DEVELOPERS:  
 *
@@ -12,6 +12,16 @@
 
 namespace SharedUtil
 {
+    //
+    // Retrieves the number of milliseconds that have elapsed since the function was first called (plus a little bit to make it look good).
+    // This keeps the counter as low as possible to delay any precision or wrap around issues.
+    // Note: Return value is module dependent
+    //
+    uint        GetTickCount32 ( void );
+
+    // Forbid use of GetTickCount
+    #define GetTickCount GetTickCount_has_been_replaced_with_GetTickCount32
+
     //
     // Retrieves the number of milliseconds that have elapsed since some arbitrary point in time.
     //

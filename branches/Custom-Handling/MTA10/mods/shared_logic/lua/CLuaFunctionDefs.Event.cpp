@@ -72,7 +72,7 @@ int CLuaFunctionDefs::AddEventHandler ( lua_State* luaVM )
             // Grab the arguments
             const char* szName = lua_tostring ( luaVM, 1 );
             CClientEntity* pEntity = lua_toelement ( luaVM, 2 );
-            int iLuaFunction = luaM_toref ( luaVM, 3 );
+            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 3 );
 
             // Verify the element
             if ( pEntity )
@@ -125,7 +125,7 @@ int CLuaFunctionDefs::RemoveEventHandler ( lua_State* luaVM )
             // Grab the arguments
             const char* szName = lua_tostring ( luaVM, 1 );
             CClientEntity* pEntity = lua_toelement ( luaVM, 2 );
-            int iLuaFunction = luaM_toref ( luaVM, 3 );
+            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 3 );
 
             // Verify the element
             if ( pEntity )

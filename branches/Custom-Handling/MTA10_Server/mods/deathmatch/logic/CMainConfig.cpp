@@ -209,22 +209,6 @@ bool CMainConfig::Load ( const char* szFilename )
                 MapSet ( m_EnableDiagnosticMap, *it, 1 );
     }
 
-    // minclientversion - Minimum client version or kick
-    GetString ( m_pRootNode, "minclientversion", m_strMinClientVersion );
-    if ( m_strMinClientVersion != "" && !IsValidVersionString ( m_strMinClientVersion ) )
-    {
-        CLogger::LogPrint ( "WARNING: Invalid value specified in \"minclientversion\"\n" );
-        m_strMinClientVersion = "";
-    }
-
-    // recommendedclientversion - Minimum client version or spam
-    GetString ( m_pRootNode, "recommendedclientversion", m_strRecommendedClientVersion );
-    if ( m_strRecommendedClientVersion != "" && !IsValidVersionString ( m_strRecommendedClientVersion ) )
-    {
-        CLogger::LogPrint ( "WARNING: Invalid value specified in \"recommendedclientversion\"\n" );
-        m_strRecommendedClientVersion = "";
-    }
-
     // ASE
     iResult = GetBoolean ( m_pRootNode, "ase", m_bAseEnabled );
     if ( iResult == INVALID_VALUE )
@@ -312,6 +296,22 @@ bool CMainConfig::LoadExtended ( void )
     std::string strBuffer;
     int iTemp = 0, iResult = 0;
 
+    // minclientversion - Minimum client version or kick
+    GetString ( m_pRootNode, "minclientversion", m_strMinClientVersion );
+    if ( m_strMinClientVersion != "" && !IsValidVersionString ( m_strMinClientVersion ) )
+    {
+        CLogger::LogPrint ( "WARNING: Invalid value specified in \"minclientversion\"\n" );
+        m_strMinClientVersion = "";
+    }
+
+    // recommendedclientversion - Minimum client version or spam
+    GetString ( m_pRootNode, "recommendedclientversion", m_strRecommendedClientVersion );
+    if ( m_strRecommendedClientVersion != "" && !IsValidVersionString ( m_strRecommendedClientVersion ) )
+    {
+        CLogger::LogPrint ( "WARNING: Invalid value specified in \"recommendedclientversion\"\n" );
+        m_strRecommendedClientVersion = "";
+    }
+
     // Grab the script debuglog
     if ( GetString ( m_pRootNode, "scriptdebuglogfile", strBuffer, 1, 255 ) == IS_SUCCESS )
     {
@@ -381,8 +381,10 @@ bool CMainConfig::LoadExtended ( void )
     pNode = NULL;
     uiCurrentIndex = 0;
     bool bFoundDefault = false;
-    bool bFirst = true;
-    bool bNoProgress = false;
+
+    CLogger::SetMinLogLevel ( LOGLEVEL_MEDIUM );
+    CLogger::LogPrint ( "Starting resources..." );
+    CLogger::ProgressDotsBegin ();
 
     do
     {
@@ -400,9 +402,7 @@ bool CMainConfig::LoadExtended ( void )
                 CResource * loadedResource = g_pGame->GetResourceManager ()->GetResource ( strBuffer.c_str () );
                 if ( !loadedResource )
                 {
-                    CLogger::LogPrintNoStamp ( "\n" );
                     CLogger::ErrorPrintf ( "Couldn't find resource %s. Check it exists.\n", strBuffer.c_str () );
-                    bNoProgress = true;
                 }
                 else
                 {
@@ -416,26 +416,13 @@ bool CMainConfig::LoadExtended ( void )
                              strStartup.compare ( "yes" ) == 0 ||
                              strStartup.compare ( "1" ) == 0 )
                         {
-                            CLogger::SetOutputEnabled ( false );
                             if ( loadedResource->Start( NULL, true ) )
                             {
-                                CLogger::SetOutputEnabled ( true );
-                                if ( !bNoProgress )
-                                {
-                                    if ( bFirst )
-                                        CLogger::LogPrint ( "Starting resources..." );
-                                    else
-                                        CLogger::LogPrintNoStamp ( "." );
-
-                                    bFirst = false;
-                                }
+                                CLogger::ProgressDotsUpdate ();
                             }
                             else
                             {
-                                CLogger::SetOutputEnabled ( true );
-                                CLogger::LogPrintNoStamp ( "\n" );
                                 CLogger::ErrorPrintf ( "Unable to start resource %s; %s\n", strBuffer.c_str (), loadedResource->GetFailureReason ().c_str () );
-                                bNoProgress = true;
                             }
                         }
                     }
@@ -472,9 +459,7 @@ bool CMainConfig::LoadExtended ( void )
                         }
                         else
                         {
-                            CLogger::LogPrintNoStamp ( "\n" );
                             CLogger::ErrorPrintf ( "More than one default resource specified!\n" );
-                            bNoProgress = true;
                         }
                     }
                 }
@@ -483,7 +468,8 @@ bool CMainConfig::LoadExtended ( void )
     }
     while ( pNode );
 
-    if ( !bNoProgress ) CLogger::LogPrintNoStamp ( "\n" );
+    CLogger::ProgressDotsEnd ();
+    CLogger::SetMinLogLevel ( LOGLEVEL_LOW );
 
     // Register the commands
     RegisterCommand ( "update", CConsoleCommands::Update, false );
@@ -633,9 +619,4 @@ unsigned short CMainConfig::GetHTTPPort ( void )
     if ( m_pCommandLineParser && m_pCommandLineParser->GetHTTPPort ( usHTTPPort ) )
         return usHTTPPort;
     return m_usHTTPPort;
-}
-void CMainConfig::SetServerName ( std::string strServerName )
-{
-    m_strServerName = strServerName;
-    CLogger::LogPrintf ( "The Server Name has now been set to: %s\n", strServerName.c_str () );
 }

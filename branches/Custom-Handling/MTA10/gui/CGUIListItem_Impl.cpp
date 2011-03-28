@@ -22,13 +22,13 @@ CGUIListItem_Impl::CGUIListItem_Impl ( const char* szText, unsigned int uiType, 
     switch ( uiType )
     {
         case Type::TextItem:
-            m_pListItem = new CEGUI::ListboxTextItem ( CEGUI::String ( szText ) );
+            m_pListItem = new CEGUI::ListboxTextItem ( CGUI_Impl::GetUTFString( szText ) );
             break;
         case Type::ImageItem:
             m_pListItem = new CEGUI::ListboxImageItem ( pImage ? pImage->GetDirectImage () : NULL );
             break;
         case Type::NumberItem:
-            m_pListItem = new CEGUI::ListboxNumberItem ( CEGUI::String ( szText ) );
+            m_pListItem = new CEGUI::ListboxNumberItem ( CGUI_Impl::GetUTFString( szText ) );
             break;
     }
 
@@ -66,9 +66,7 @@ void CGUIListItem_Impl::SetFont ( const char *szFontName )
 
 void CGUIListItem_Impl::SetText ( const char *pszText, const char *pszSortText )
 {
-    CEGUI::String strText;
-    strText.assign ( (CEGUI::utf8*) pszText );
-    m_pListItem->setText( strText, pszSortText );
+    m_pListItem->setText( CGUI_Impl::GetUTFString(pszText), pszSortText );
 }
 
 
@@ -98,7 +96,7 @@ void CGUIListItem_Impl::SetImage ( CGUIStaticImage* pImage )
 
 std::string CGUIListItem_Impl::GetText ( void ) const
 {
-    return m_pListItem->getText ().c_str ();
+    return CGUI_Impl::GetUTFString(m_pListItem->getText ().c_str ()).c_str();
 }
 
 

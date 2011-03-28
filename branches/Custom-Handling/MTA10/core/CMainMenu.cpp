@@ -43,14 +43,14 @@
 #define CORE_MTA_VERSION            "cgui\\images\\version.png"
 #define CORE_MTA_LATEST_NEWS        "cgui\\images\\latest_news.png"
 
-static short WaitForMenu = 0;
+static int WaitForMenu = 0;
 static const SColor headlineColors [] = { SColorRGBA ( 233, 234, 106, 255 ), SColorRGBA ( 233/6*4, 234/6*4, 106/6*4, 255 ), SColorRGBA ( 233/7*3, 234/7*3, 106/7*3, 255 ) };
 
 CMainMenu::CMainMenu ( CGUI* pManager )
 {
     m_pNewsBrowser = new CNewsBrowser ();
 
-    ulPreviousTick = GetTickCount ();
+    ulPreviousTick = GetTickCount32 ();
     m_pHoveredItem = NULL;
     m_iMoveStartPos = 0;
 
@@ -60,6 +60,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_bIsFullyVisible = false;
     m_bIsIngame = true;
 //    m_bIsInSubWindow = false;
+    m_bStarted = false;
     m_fFader = 0;
     m_ucFade = FADE_INVISIBLE;
 
@@ -142,13 +143,12 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 
     // Create the menu items
     //Filepath, Relative position, absolute native size
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUICK_CONNECT,  "cgui\\images\\menu_quick_connect.png",    CVector2D ( 0.168f, 0.615f ),    CVector2D ( 358, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, 0.662f ),    CVector2D ( 390, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, 0.709f ),    CVector2D ( 251, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "cgui\\images\\menu_map_editor.png",       CVector2D ( 0.168f, 0.756f ),    CVector2D ( 261, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "cgui\\images\\menu_settings.png",         CVector2D ( 0.168f, 0.803f ),    CVector2D ( 207, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "cgui\\images\\menu_about.png",            CVector2D ( 0.168f, 0.850f ),    CVector2D ( 150, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, 0.897f ),    CVector2D ( 102, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, 0.615f ),    CVector2D ( 390, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, 0.662f ),    CVector2D ( 251, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "cgui\\images\\menu_map_editor.png",       CVector2D ( 0.168f, 0.709f ),    CVector2D ( 261, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "cgui\\images\\menu_settings.png",         CVector2D ( 0.168f, 0.756f ),    CVector2D ( 207, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "cgui\\images\\menu_about.png",            CVector2D ( 0.168f, 0.803f ),    CVector2D ( 150, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, 0.850f ),    CVector2D ( 102, 34 ) ) );
 
     // We store the position of the top item, and the second item.  These will be useful later
     m_iFirstItemTop  = (m_menuItems.front()->image)->GetPosition().fY;
@@ -236,7 +236,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     // Submenus
     m_QuickConnect.SetVisible ( false );
     m_ServerBrowser.SetVisible ( false );
-    m_ServerQueue.SetVisible ( false );
+    m_ServerInfo.Hide ( );
     m_Settings.SetVisible ( false );
     m_Credits.SetVisible ( false );
     m_pNewsBrowser->SetVisible ( false );
@@ -253,6 +253,8 @@ CMainMenu::CMainMenu ( CGUI* pManager )
         CONFIG_FAVOURITE_LIST_TAG, m_ServerBrowser.GetFavouritesList () );
     m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC ),
         CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList () );
+    m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_HISTORY ),
+        CONFIG_HISTORY_LIST_TAG, m_ServerBrowser.GetHistoryList () );
 
     // Remove unused node
     if ( CXMLNode* pOldNode = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ) )
@@ -347,7 +349,7 @@ void CMainMenu::Update ( void )
     m_Credits.Update ();
     m_Settings.Update ();
 
-    unsigned long ulCurrentTick = GetTickCount();
+    unsigned long ulCurrentTick = GetTickCount32();
     unsigned long ulTimePassed = ulCurrentTick - ulPreviousTick;
 
     if ( m_bHideGame )
@@ -520,16 +522,26 @@ void CMainMenu::Update ( void )
     // Force the mainmenu on if we're at GTA's mainmenu or not ingame
     if ( ( SystemState == 7 || SystemState == 9 ) && !m_bIsIngame )
     {
-        // it takes 250 frames for the menu to be shown, we seem to update this twice a frame
-        if ( WaitForMenu >= 250 ) {
-            if ( !m_bStarted )
-            {
-                m_pNewsBrowser->CreateHeadlines ();
-                GetVersionUpdater ()->EnableChecking ( true );
-            }
+        // Cope with early finish
+        if ( pGame->HasCreditScreenFadedOut () )
+            WaitForMenu = Max ( WaitForMenu, 250 );
+
+        // Fade up
+        if ( WaitForMenu >= 250 )
+        {
             m_bIsVisible = true;
             m_bStarted = true;
-        } else
+        }
+
+        // Create headlines while the screen is still black
+        if ( WaitForMenu == 250 )
+            m_pNewsBrowser->CreateHeadlines ();
+
+        // Start updater after fade up is complete
+        if ( WaitForMenu == 275 )
+            GetVersionUpdater ()->EnableChecking ( true );
+
+        if ( WaitForMenu < 300 )
             WaitForMenu++;
     }
 
@@ -538,7 +550,7 @@ void CMainMenu::Update ( void )
     {
         // If we're at the game's mainmenu, or ingame when m_bIsIngame is true show the background
         if ( SystemState == 7 ||                    // GS_FRONTEND
-             SystemState == 9 && !m_bIsIngame )     // GS_INGAME
+             SystemState == 9 && !m_bIsIngame )     // GS_PLAYING_GAME
         {
             if ( m_ucFade == FADE_INVISIBLE )
                 Show ( false );
@@ -556,11 +568,11 @@ void CMainMenu::Update ( void )
     }
 
 
-    ulPreviousTick = GetTickCount();
+    ulPreviousTick = GetTickCount32();
 
     // Call subdialog pulses
     m_ServerBrowser.Update ();
-    m_ServerQueue.DoPulse ();
+    m_ServerInfo.DoPulse ();
 }
 
 
@@ -627,7 +639,7 @@ void CMainMenu::SetIsIngame ( bool bIsIngame )
         m_bIsIngame = bIsIngame;
         m_Settings.SetIsModLoaded ( bIsIngame );
 
-        m_ulMoveStartTick = GetTickCount();
+        m_ulMoveStartTick = GetTickCount32();
         if ( bIsIngame )
         {
             m_pDisconnect->image->SetVisible(true);
@@ -725,14 +737,9 @@ bool CMainMenu::OnBrowseServersButtonClick ( CGUIElement* pElement )
     return true;
 }
 
-void CMainMenu::ShowServerQueue ( void )
+void CMainMenu::HideServerInfo ( void )
 {
-    m_ServerQueue.SetVisible ( true );
-}
-
-void CMainMenu::HideServerQueue ( void )
-{
-    m_ServerQueue.SetVisible ( false );
+    m_ServerInfo.Hide ( );
 }
 
 
@@ -915,7 +922,7 @@ void CMainMenu::ChangeCommunityState ( bool bIn, const std::string& strUsername 
 }
 
 
-void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bIsNew )
+void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew )
 {
     if ( iIndex < 0 || iIndex > 2 )
         return;
@@ -927,12 +934,12 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strContent, bool bI
     CGUILabel* pItemShadow = m_pNewsItemShadowLabels[ iIndex ];
     SColor color = headlineColors[ iIndex ];
     pItem->SetTextColor ( color.R, color.G, color.B );
-    pItem->SetText ( strContent );
-    pItemShadow->SetText ( strContent );
+    pItem->SetText ( strHeadline );
+    pItemShadow->SetText ( strHeadline );
 
     // Set our Date labels
     CGUILabel* pItemDate = m_pNewsItemDateLabels[ iIndex ];
-    pItemDate->SetText ( "2012-12-21" );
+    pItemDate->SetText ( strDate );
 
     // 'NEW' sticker
     CGUILabel* pNewLabel = m_pNewsItemNEWLabels[ iIndex ];

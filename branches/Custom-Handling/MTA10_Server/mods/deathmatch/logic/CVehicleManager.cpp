@@ -309,9 +309,9 @@ CVehicleColor CVehicleManager::GetRandomColor ( unsigned short usModel )
     return m_ColorManager.GetRandomColor ( usModel );
 }
 
-void CVehicleManager::GetVehiclesOfType ( unsigned int uiModel, CLuaMain* pLuaMain )
+void CVehicleManager::GetVehiclesOfType ( unsigned int uiModel, lua_State* luaVM )
 {
-    assert ( pLuaMain );
+    assert ( luaVM );
 
     // Add all the matching vehicles to the table
     unsigned int uiIndex = 0;
@@ -319,7 +319,6 @@ void CVehicleManager::GetVehiclesOfType ( unsigned int uiModel, CLuaMain* pLuaMa
     for ( ; iter != m_List.end () ; iter++ )
     {
         // Add it to the table
-        lua_State* luaVM = pLuaMain->GetVirtualMachine ();
         lua_pushnumber ( luaVM, ++uiIndex );
         lua_pushelement ( luaVM, *iter );
         lua_settable ( luaVM, -3 );

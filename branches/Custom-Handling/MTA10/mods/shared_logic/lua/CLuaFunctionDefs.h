@@ -647,6 +647,9 @@ public:
     LUA_DECLARE ( GetSkyGradient );
     LUA_DECLARE ( SetSkyGradient );
     LUA_DECLARE ( ResetSkyGradient );
+    LUA_DECLARE ( GetHeatHaze );
+    LUA_DECLARE ( SetHeatHaze );
+    LUA_DECLARE ( ResetHeatHaze );
     LUA_DECLARE ( GetWaterColor );
     LUA_DECLARE ( SetWaterColor );
     LUA_DECLARE ( ResetWaterColor );
@@ -774,6 +777,7 @@ public:
     // Utility
     LUA_DECLARE ( Md5 );
     LUA_DECLARE ( GetNetworkUsageData );
+    LUA_DECLARE ( GetPerformanceStats );
 
 #ifdef MTA_VOICE
     // Voice funcs

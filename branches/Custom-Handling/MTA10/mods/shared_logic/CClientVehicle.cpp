@@ -292,38 +292,6 @@ void CClientVehicle::GetPosition ( CVector& vecPosition ) const
 }
 
 
-void CClientVehicle::SetRoll ( const CVector &vecRoll )
-{
-    if ( m_pVehicle )
-    {
-        m_pVehicle->SetRoll ( const_cast < CVector* > ( &vecRoll ) );
-    }
-    m_Matrix.vRight = vecRoll;
-    m_matFrozen.vRight = vecRoll;
-}
-
-
-void CClientVehicle::SetDirection ( const CVector &vecDir )
-{
-    if ( m_pVehicle )
-    {
-        m_pVehicle->SetDirection ( const_cast < CVector* > ( &vecDir ) );
-    }
-    m_Matrix.vFront = vecDir;
-    m_matFrozen.vFront = vecDir;
-}
-
-void CClientVehicle::SetWas ( const CVector &vecWas )
-{
-    if ( m_pVehicle )
-    {
-        m_pVehicle->SetWas ( const_cast < CVector* > ( &vecWas ) );
-    }
-    m_Matrix.vUp = vecWas;
-    m_matFrozen.vUp = vecWas;
-}
-
-
 void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
 {
     // Is the local player in the vehicle
@@ -659,47 +627,54 @@ void CClientVehicle::SetDoorOpenRatio ( unsigned char ucDoor, float fRatio, unsi
     bool bAllow = true;
     unsigned char ucSeat;
 
-    // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
-    if ( bForced == false )
+    if ( ucDoor <= 5 )
     {
-        switch ( ucDoor )
+        // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
+        if ( bForced == false )
         {
-            case 2:
-                bAllow = m_pOccupyingDriver == 0;
-                break;
-            case 3:
-            case 4:
-            case 5:
-                ucSeat = ucDoor - 2;
-                bAllow = m_pOccupyingPassengers [ ucSeat ] == 0;
-                break;
-        }
-    }
-
-    if ( bAllow )
-    {
-        if ( ulDelay == 0UL )
-        {
-            if ( m_pVehicle )
+            switch ( ucDoor )
             {
-                m_pVehicle->OpenDoor ( ucDoor, fRatio, false );
+                case 2:
+                    bAllow = m_pOccupyingDriver == 0;
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    ucSeat = ucDoor - 2;
+                    bAllow = m_pOccupyingPassengers [ ucSeat ] == 0;
+                    break;
             }
-            m_fDoorOpenRatio [ ucDoor ] = fRatio;
         }
-        else
+
+        if ( bAllow )
         {
-            SetDoorOpenRatioInterpolated ( ucDoor, fRatio, ulDelay );
+            if ( ulDelay == 0UL )
+            {
+                if ( m_pVehicle )
+                {
+                    m_pVehicle->OpenDoor ( ucDoor, fRatio, false );
+                }
+                m_fDoorOpenRatio [ ucDoor ] = fRatio;
+            }
+            else
+            {
+                SetDoorOpenRatioInterpolated ( ucDoor, fRatio, ulDelay );
+            }
         }
     }
 }
 
 float CClientVehicle::GetDoorOpenRatio ( unsigned char ucDoor )
 {
-    if ( m_pVehicle )
+    if ( ucDoor <= 5 )
     {
-        return m_pVehicle->GetDoor ( ucDoor )->GetAngleOpenRatio ();
+        if ( m_pVehicle )
+        {
+            return m_pVehicle->GetDoor ( ucDoor )->GetAngleOpenRatio ();
+        }
+        return m_fDoorOpenRatio [ ucDoor ];
     }
-    return m_fDoorOpenRatio [ ucDoor ];
+    return 0.0f;
 }
 
 void CClientVehicle::SetSwingingDoorsAllowed ( bool bAllowed )
@@ -2024,6 +1999,36 @@ void CClientVehicle::StreamedInPulse ( void )
         }
         */
 
+        // Limit burnout turn speed to ensure smoothness
+        if ( m_pDriver )
+        {
+            CControllerState cs;
+            m_pDriver->GetControllerState ( cs );
+            bool bAcclerate = cs.ButtonCross > 128;
+            bool bBrake = cs.ButtonSquare > 128;
+
+            // Is doing burnout ?
+            if ( bAcclerate && bBrake )
+            {
+                CVector vecMoveSpeed;
+                m_pVehicle->GetMoveSpeed ( &vecMoveSpeed );
+                if ( fabsf ( vecMoveSpeed.fX ) < 0.06f * 2 && fabsf ( vecMoveSpeed.fY ) < 0.06f * 2 && fabsf ( vecMoveSpeed.fZ ) < 0.01f * 2 )
+                {
+                    CVector vecTurnSpeed;
+                    m_pVehicle->GetTurnSpeed ( &vecTurnSpeed );
+                    if ( fabsf ( vecTurnSpeed.fX ) < 0.006f * 2 && fabsf ( vecTurnSpeed.fY ) < 0.006f * 2 && fabsf ( vecTurnSpeed.fZ ) < 0.04f * 2 )
+                    {
+                        // Apply turn speed limit
+                        float fLength = vecTurnSpeed.Normalize ();
+                        fLength = Min ( fLength, 0.02f );
+                        vecTurnSpeed *= fLength;
+
+                        m_pVehicle->SetTurnSpeed ( &vecTurnSpeed );
+                    }
+                }
+            }
+        }
+
         Interpolate ();
         ProcessDoorInterpolation ();
 
@@ -2986,7 +2991,7 @@ void CClientVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
 }
 
 
-void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulDelay )
+void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ )
 {   
     // Are we streamed in?
     if ( m_pVehicle )
@@ -2996,6 +3001,21 @@ void CClientVehicle::SetTargetPosition ( CVector& vecPosition, unsigned long ulD
         unsigned long ulTime = CClientTime::GetTime ();
         CVector vecLocalPosition;
         GetPosition ( vecLocalPosition );
+
+        // Cars under road fix hack
+        if ( bValidVelocityZ && m_eVehicleType != CLIENTVEHICLE_HELI && m_eVehicleType != CLIENTVEHICLE_PLANE )
+        {
+            // If remote z higher by too much and remote not doing any z movement, warp local z coord
+            float fDeltaZ = vecPosition.fZ - vecLocalPosition.fZ;
+            if ( fDeltaZ > 0.4f && fDeltaZ < 10.0f )
+            {
+                if ( fabsf ( fVelocityZ ) < 0.01f )
+                {
+                    vecLocalPosition.fZ = vecPosition.fZ;
+                    SetPosition ( vecLocalPosition );
+                }
+            }
+        }
 
 #ifdef MTA_DEBUG
         m_interp.pos.vecStart = vecLocalPosition;

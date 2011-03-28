@@ -152,7 +152,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleStartSync ( NetBitStreamInt
             BitStream.Read ( fHealth );
 
             // Set data for interpolation
-            pVehicle->SetTargetPosition ( vecPosition, UNOCCUPIED_VEHICLE_SYNC_RATE );
+            pVehicle->SetTargetPosition ( vecPosition, UNOCCUPIED_VEHICLE_SYNC_RATE, true, vecMoveSpeed.fZ );
             pVehicle->SetTargetRotation ( vecRotationDegrees, UNOCCUPIED_VEHICLE_SYNC_RATE );
             pVehicle->SetMoveSpeed ( vecMoveSpeed );
             pVehicle->SetTurnSpeed ( vecTurnSpeed );
@@ -165,7 +165,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleStartSync ( NetBitStreamInt
 
 #ifdef MTA_DEBUG
             pVehicle->m_pLastSyncer = g_pClientGame->GetLocalPlayer ();
-            pVehicle->m_ulLastSyncTime = GetTickCount ();
+            pVehicle->m_ulLastSyncTime = GetTickCount32 ();
             pVehicle->m_szLastSyncType = "unoccupied-start";
 #endif
         }
@@ -201,7 +201,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
             CClientVehicle* pVehicle = m_pVehicleManager->Get ( vehicle.data.vehicleID );
             if ( pVehicle && pVehicle->CanUpdateSync ( vehicle.data.ucTimeContext ) )
             {
-                if ( vehicle.data.bSyncPosition )       pVehicle->SetTargetPosition ( vehicle.data.vecPosition, UNOCCUPIED_VEHICLE_SYNC_RATE );
+                if ( vehicle.data.bSyncPosition )       pVehicle->SetTargetPosition ( vehicle.data.vecPosition, UNOCCUPIED_VEHICLE_SYNC_RATE, vehicle.data.bSyncVelocity, vehicle.data.vecVelocity.fZ );
                 if ( vehicle.data.bSyncRotation )       pVehicle->SetTargetRotation ( vehicle.data.vecRotation, UNOCCUPIED_VEHICLE_SYNC_RATE );
                 if ( vehicle.data.bSyncVelocity )       pVehicle->SetMoveSpeed ( vehicle.data.vecVelocity );
                 if ( vehicle.data.bSyncTurnVelocity )   pVehicle->SetTurnSpeed ( vehicle.data.vecTurnVelocity );
@@ -211,7 +211,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( NetBitStreamInterfac
                                                         pVehicle->SetDerailed ( vehicle.data.bDerailed );
 #ifdef MTA_DEBUG
                 pVehicle->m_pLastSyncer = NULL;
-                pVehicle->m_ulLastSyncTime = GetTickCount ();
+                pVehicle->m_ulLastSyncTime = GetTickCount32 ();
                 pVehicle->m_szLastSyncType = "unoccupied";
 #endif
             }

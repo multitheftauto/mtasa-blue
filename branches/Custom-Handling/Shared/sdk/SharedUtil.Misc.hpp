@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include "UTF8.h"
+#include "minibidi.c"
 #ifdef WIN32
     #include <direct.h>
     #include <shellapi.h>
@@ -502,10 +503,10 @@ SString SharedUtil::ExpandEnvString ( const SString& strInput )
 //
 // MyShellExecute
 //
-//
+// Returns true if successful
 //
 ///////////////////////////////////////////////////////////////
-static int MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strInFile, const SString& strInParameters = "", const SString& strDirectory = "", int nShowCmd = SW_SHOWNORMAL )
+static bool MyShellExecute ( bool bBlocking, const SString& strAction, const SString& strInFile, const SString& strInParameters = "", const SString& strDirectory = "", int nShowCmd = SW_SHOWNORMAL )
 {
     SString strFile = strInFile;
     SString strParameters = strInParameters;
@@ -538,7 +539,7 @@ static int MyShellExecute ( bool bBlocking, const SString& strAction, const SStr
     else
     {
         int iResult = (int)ShellExecute ( NULL, strAction, strFile, strParameters, strDirectory, nShowCmd );
-        return iResult;
+        return iResult > 32;
     }
 }
 
@@ -550,7 +551,7 @@ static int MyShellExecute ( bool bBlocking, const SString& strAction, const SStr
 //
 //
 ///////////////////////////////////////////////////////////////
-int SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
+bool SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
 {
     return MyShellExecute ( true, strAction, strFile, strParameters, strDirectory );
 }
@@ -563,7 +564,7 @@ int SharedUtil::ShellExecuteBlocking ( const SString& strAction, const SString& 
 //
 //
 ///////////////////////////////////////////////////////////////
-int SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
+bool SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters, const SString& strDirectory, int nShowCmd )
 {
     return MyShellExecute ( false, strAction, strFile, strParameters, strDirectory );
 }
@@ -773,16 +774,41 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
 }
 
 
-// Convert a standard std::string into a UTF-8 std::wstring
+// Convert a standard ANSI junk std::string into a UTF-8 std::wstring
 std::wstring SharedUtil::ConvertToUTF8 (const std::string& input)
 {
     return utf8_mbstowcs (input);
 }
 
-// Convert a std::wstring into an ANSI encoded string
+// Reencode a UTF8 std::wstring into ANSI junk string
 std::string SharedUtil::ConvertToANSI (const std::wstring& input)
 {
     return utf8_wcstombs (input);
+}
+
+// Translate a true ANSI string to the UTF-8 equivalent (reencode+convert)
+std::wstring SharedUtil::TranslateToUTF8 ( const std::string& input )
+{
+    size_t len = mbstowcs ( NULL, input.c_str(), input.length() );
+    if ( len == (size_t)-1 )
+        return L"?";
+    wchar_t* wcsOutput = new wchar_t[len+1];
+    mbstowcs ( wcsOutput, input.c_str(), input.length() );
+    wcsOutput[len] = NULL; //Null terminate the string
+    std::wstring strOutput(wcsOutput);
+    delete wcsOutput;
+    return strOutput;
+}
+
+std::wstring SharedUtil::GetBidiString (const std::wstring input)
+{
+    int iCount = input.size();
+    wchar_t* wcsLineBidi = new wchar_t[iCount + 1];
+    memcpy ( wcsLineBidi, input.c_str(), ( iCount + 1 ) * sizeof ( wchar_t ) );
+    doBidi ( wcsLineBidi, iCount, 1, 1 );  //Process our UTF string through MiniBidi, for Bidirectionalism
+    std::wstring strLineBidi(wcsLineBidi);
+    delete wcsLineBidi;
+    return strLineBidi;
 }
 
 
@@ -805,19 +831,19 @@ void SharedUtil::OutputDebugLine ( const char* szMessage )
 
 
 //
-// Return true if supplied string adheres to the new version format
+// Return true if supplied version string will sort correctly
 //
 bool SharedUtil::IsValidVersionString ( const SString& strVersion )
 {
-    SString strCheck = "0.0.0-0-00000.0";
-    if ( strCheck.length () != strVersion.length () )
-        return false;
-    for ( unsigned int i = 0 ; i < strVersion.length () ; i++ )
+    const SString strCheck = "0.0.0-0.00000.0.000";
+    uint uiLength = Min ( strCheck.length (), strVersion.length () );
+    for ( unsigned int i = 0 ; i < uiLength ; i++ )
     {
         char c = strVersion[i];
         char d = strCheck[i];
-        if ( c != d && isdigit( c ) != isdigit( d ) )
-            return false;
+        if ( !isdigit( c ) || !isdigit( d ) )
+            if ( c != d )
+                return false;
     }
     return true;
 }

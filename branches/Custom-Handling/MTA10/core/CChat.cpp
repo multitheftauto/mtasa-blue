@@ -180,7 +180,7 @@ void CChat::Draw ( void )
 
     float fLineDifference = CChat::GetFontHeight ( m_vecScale.fY );
     CVector2D vecPosition ( m_vecBackgroundPosition.fX + ( 5.0f * m_vecScale.fX ), m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY - ( fLineDifference * 1.25f ) );
-    unsigned long ulTime = GetTickCount ();
+    unsigned long ulTime = GetTickCount32 ();
     float fRcpChatLineFadeOut = 1.0f / m_ulChatLineFadeOut;
     bool bShadow = ( m_Color.A * m_fBackgroundAlpha == 0.f );
     bool bInputShadow = ( m_InputColor.A * m_fInputBackgroundAlpha == 0.f );
@@ -451,9 +451,9 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 if ( m_strInputText.size () > 0 )
                 {
                     // Convert our string to UTF8 before resizing, then back to ANSI.
-                    std::wstring strText = SharedUtil::ConvertToUTF8(m_strInputText);
+                    std::wstring strText = ConvertToUTF8(m_strInputText);
                     strText.resize ( strText.size () - 1 );
-                    SetInputText ( SharedUtil::ConvertToANSI(strText).c_str() );
+                    SetInputText ( ConvertToANSI(strText).c_str() );
                 }
                 break;
             }
@@ -476,7 +476,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
             default:
             {
                 // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
-                if ( SharedUtil::ConvertToUTF8(m_strInputText).size () < CHAT_MAX_CHAT_LENGTH )
+                if ( ConvertToUTF8(m_strInputText).size () < CHAT_MAX_CHAT_LENGTH )
                 {                    
                     if ( KeyboardArgs.codepoint >= 32 )
                     {
@@ -493,7 +493,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                             wchar_t wUNICODE[2] = { uiCharacter, '\0' };
 
                             // Convert our UTF character into an ANSI string
-                            std::string strANSI = SharedUtil::ConvertToANSI(wUNICODE);
+                            std::string strANSI = ConvertToANSI(wUNICODE);
 
                             // Append the ANSI string, and update
                             m_strInputText.append(strANSI);
@@ -758,7 +758,7 @@ CChatLine::CChatLine ( void )
 
 void CChatLine::UpdateCreationTime ()
 {
-    m_ulCreationTime = GetTickCount ();
+    m_ulCreationTime = GetTickCount32 ();
 }
 
 bool CChatLine::IsColorCode ( const char* szColorCode )

@@ -25,6 +25,7 @@ class CClientEntity;
 #include <assert.h>
 #include <list>
 #include <google/dense_hash_map>
+class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
 //#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
@@ -178,11 +179,11 @@ public:
     virtual bool                                IsAttachToable          ( void );
     virtual void                                DoAttaching             ( void );
 
-    bool                                        AddEvent                ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction, bool bPropagated );
+    bool                                        AddEvent                ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
     bool                                        CallEvent               ( const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren );
     void                                        CallEventNoParent       ( const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource );
     void                                        CallParentEvent         ( const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource );
-    bool                                        DeleteEvent             ( CLuaMain* pLuaMain, const char* szName, int iLuaFunction );
+    bool                                        DeleteEvent             ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction );
     void                                        DeleteEvents            ( CLuaMain* pLuaMain, bool bRecursive );
     void                                        DeleteAllEvents         ( void );
 
@@ -193,12 +194,12 @@ public:
     CClientEntity*                              FindChildIndex          ( const char* szType, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive );
     CClientEntity*                              FindChildByType         ( const char* szType, unsigned int uiIndex, bool bRecursive );
     CClientEntity*                              FindChildByTypeIndex    ( unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive );
-    void                                        FindAllChildrenByType       ( const char* szType, CLuaMain* pLuaMain, bool bStreamedIn = false );
-    void                                        FindAllChildrenByTypeIndex  ( unsigned int uiTypeHash, CLuaMain* pLuaMain, unsigned int& uiIndex, bool bStreamedIn = false );
+    void                                        FindAllChildrenByType       ( const char* szType, struct lua_State* luaVM, bool bStreamedIn = false );
+    void                                        FindAllChildrenByTypeIndex  ( unsigned int uiTypeHash, lua_State* luaVM, unsigned int& uiIndex, bool bStreamedIn = false );
 
     inline unsigned int                         CountChildren           ( void )                        { return static_cast < unsigned int > ( m_Children.size () ); };
 
-    void                                        GetChildren             ( CLuaMain* pLuaMain );
+    void                                        GetChildren             ( lua_State* luaVM );
 
     void                                        AddCollision                ( CClientColShape* pShape )     { m_Collisions.push_back ( pShape ); }
     void                                        RemoveCollision             ( CClientColShape* pShape )     { if ( !m_Collisions.empty() ) m_Collisions.remove ( pShape ); }
@@ -303,7 +304,7 @@ private:
     static bool                     IsFromRoot              ( CClientEntity* pEntity );
     static void                     AddEntityFromRoot       ( unsigned int uiTypeHash, CClientEntity* pEntity, bool bDebugCheck = true );
     static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CClientEntity* pEntity );
-    static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, CLuaMain* pLuaMain, bool bStreamedIn );
+    static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn );
 
 #if CHECK_ENTITIES_FROM_ROOT
     static void                     _CheckEntitiesFromRoot      ( unsigned int uiTypeHash );

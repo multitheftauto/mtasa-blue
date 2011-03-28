@@ -177,9 +177,12 @@ void CSpatialDatabaseImpl::AllQuery ( CElementResult& outResult )
 ///////////////////////////////////////////////////////////////
 void CSpatialDatabaseImpl::FlushUpdateQueue ( void )
 {
+    int iTotalToUpdate = m_UpdateQueue.size ();
     int iTotalUpdated = 0;
 
-    for ( std::map < CElement*, int >::iterator it = m_UpdateQueue.begin (); it != m_UpdateQueue.end (); ++it )
+    std::map < CElement*, int > updateQueueCopy = m_UpdateQueue;
+    m_UpdateQueue.clear ();
+    for ( std::map < CElement*, int >::iterator it = updateQueueCopy.begin (); it != updateQueueCopy.end (); ++it )
     {
         CElement* pEntity = it->first;
 
@@ -214,19 +217,17 @@ void CSpatialDatabaseImpl::FlushUpdateQueue ( void )
         #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTA
             OutputDebugLine ( SString ( "SpatialDatabase::UpdateEntity %08x  %2.0f,%2.0f,%2.0f   %2.0f,%2.0f,%2.0f"
                                                 ,pEntity
-                                                ,info.box.vecMin.fX
-                                                ,info.box.vecMin.fY
-                                                ,info.box.vecMin.fZ
-                                                ,info.box.vecMax.fX
-                                                ,info.box.vecMax.fY
-                                                ,info.box.vecMax.fZ
+                                                ,newInfo.box.vecMin.fX
+                                                ,newInfo.box.vecMin.fY
+                                                ,newInfo.box.vecMin.fZ
+                                                ,newInfo.box.vecMax.fX
+                                                ,newInfo.box.vecMax.fY
+                                                ,newInfo.box.vecMax.fZ
                                                 ) );
         #endif
     }
-    m_UpdateQueue.clear ();
 
     #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTB
-        int iTotalToUpdate = m_UpdateQueue.size ();
         if ( iTotalToUpdate )
             OutputDebugLine ( SString ( "SpatialDatabase::FlushUpdateQueue  TotalToUpdate: %d   TotalUpdated: %d  m_InfoMap: %d    tree: %d  ", iTotalToUpdate, iTotalUpdated, m_InfoMap.size (), m_Tree.Count () ) );
     #endif

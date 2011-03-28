@@ -20,11 +20,17 @@
 //
 bool SharedUtil::FileExists ( const SString& strFilename )
 {
-    FILE* fh = fopen ( strFilename, "rb" );
-    if ( !fh )
+#ifdef WIN32
+    DWORD dwAtr = GetFileAttributes ( strFilename );
+    if ( dwAtr == INVALID_FILE_ATTRIBUTES )
         return false;
-    fclose ( fh );
-    return true;
+    return ( ( dwAtr & FILE_ATTRIBUTE_DIRECTORY) == 0 );     
+#else
+    struct stat Info;
+    if ( stat ( strFilename, &Info ) == -1 )
+        return false;
+    return !( S_ISDIR ( Info.st_mode ) );
+#endif
 }
 
 
@@ -78,6 +84,15 @@ bool SharedUtil::FileDelete ( const SString& strFilename, bool bForce )
         SetFileAttributes ( strFilename, FILE_ATTRIBUTE_NORMAL );
 #endif
     return unlink ( strFilename ) == 0;
+}
+
+bool SharedUtil::FileRename ( const SString& strFilenameOld, const SString& strFilenameNew )
+{
+#ifdef WIN32
+    return MoveFile ( strFilenameOld, strFilenameNew ) != 0;
+#else
+    return std::rename ( strFilenameOld, strFilenameNew ) == 0;
+#endif
 }
 
 //

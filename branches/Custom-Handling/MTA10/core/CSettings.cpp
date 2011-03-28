@@ -50,6 +50,7 @@ CSettings::CSettings ( void )
     m_bIsModLoaded = false;
     m_bCaptureKey = false;
     m_dwFrameCount = 0;
+    m_bShownVolumetricShadowsWarning = false;
     CVector2D vecTemp;
 
     // Create the window
@@ -142,7 +143,7 @@ CSettings::CSettings ( void )
     m_pMouseSensitivity = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pControlsPane ) );
     m_pMouseSensitivity->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY ) );
     m_pMouseSensitivity->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pMouseSensitivity->SetProperty ( "StepSize", "0.00004688" );
+    m_pMouseSensitivity->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelMouseSensitivityValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "0%") );
     m_pLabelMouseSensitivityValue->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY ) );
@@ -357,7 +358,7 @@ CSettings::CSettings ( void )
     m_pAudioRadioVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioRadioVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioRadioVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pAudioRadioVolume->SetProperty ( "StepSize", "0.015625" );
+    m_pAudioRadioVolume->SetProperty ( "StepSize", "0.01" );
 
     m_pLabelRadioVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
     m_pLabelRadioVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
@@ -375,7 +376,7 @@ CSettings::CSettings ( void )
     m_pAudioSFXVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
     m_pAudioSFXVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
     m_pAudioSFXVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pAudioSFXVolume->SetProperty ( "StepSize", "0.015625" );
+    m_pAudioSFXVolume->SetProperty ( "StepSize", "0.01" );
 
     m_pCheckBoxAudioEqualizer = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAudio, "Radio Equalizer", true ) );
     m_pCheckBoxAudioEqualizer->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
@@ -444,17 +445,39 @@ CSettings::CSettings ( void )
     m_pComboResolution->SetReadOnly ( true );
 
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
-    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY - 3.0f ) );
     m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pCheckBoxWideScreen = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Wide Screen", true ) );
-    m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 13.0f ) );
+    m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 13.0f ) );
     m_pCheckBoxWideScreen->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
+    float fPosY =  vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Full Screen Minimize", true ) );
-    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 29.0f ) );
+    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, fPosY + 29.0f ) );
     m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-    m_pCheckBoxMinimize->SetVisible ( GetVideoModeManager ()->IsMultiMonitor () );
+    if ( !GetVideoModeManager ()->IsMultiMonitor () )
+    {
+        m_pCheckBoxMinimize->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
+    m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Disable Aero Desktop", true ) );
+    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 45.0f ) );
+    m_pCheckBoxDisableAero->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
+    {
+        m_pCheckBoxDisableAero->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
+    m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Mip Mapping", true ) );
+    m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 61.0f ) );
+    m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+#ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
+    m_pCheckBoxMipMapping->SetVisible ( false );
+    fPosY -= 16.0f;
+#endif
 
     vecTemp.fY += 8;
     m_pDrawDistanceLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Draw Distance:" ) );
@@ -465,10 +488,12 @@ CSettings::CSettings ( void )
     m_pDrawDistance = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pDrawDistance->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
     m_pDrawDistance->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pDrawDistance->SetProperty ( "StepSize", "0.01" );
 
     m_pDrawDistanceValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
     m_pDrawDistanceValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
     m_pDrawDistanceValueLabel->AutoSize ( "100% " );
+
 
     m_pBrightnessLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Brightness:" ) );
     m_pBrightnessLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
@@ -478,10 +503,15 @@ CSettings::CSettings ( void )
     m_pBrightness = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pBrightness->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY ) );
     m_pBrightness->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pBrightness->SetProperty ( "StepSize", "0.01" );
 
     m_pBrightnessValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
     m_pBrightnessValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
     m_pBrightnessValueLabel->AutoSize ( "100% " );
+
+    m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Volumetric Shadows", true ) );
+    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 32.0f ) );
+    m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
     m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
@@ -816,6 +846,8 @@ CSettings::CSettings ( void )
     m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
     m_pMouseSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensitivityChanged, this ) );
+    m_pComboFxQuality->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnFxQualityChanged, this ) );
+    m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
     /*
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -1216,104 +1248,9 @@ void CSettings::ProcessKeyBinds ( void )
                 }
             }
         }
-        else if ( ucType == KEY_BIND_FUNCTION ) // keys bound to script functions
+        else
         {
-            /** Primary keybinds **/
-            CKeyFunctionBind* pBind = reinterpret_cast < CKeyFunctionBind* > ( m_pBindsList->GetItemData ( i, m_hPriKey ) );
-            CKeyFunctionBind* pSecondBind = NULL; // some binds have a "up" bind too, which we hide from the user
-            // If a keybind for this command already exists
-            if ( pBind )
-            {
-                list < CKeyBind* > ::const_iterator iterr = pKeyBinds->IterBegin ();
-                for ( unsigned int uiIndex = 0 ; iterr != pKeyBinds->IterEnd (); iterr++, uiIndex++ )
-                {
-                    eKeyBindType bindType = (*iterr)->GetType ();
-                    if ( (*iterr)->GetType () == KEY_BIND_FUNCTION )
-                    {
-                        CKeyFunctionBind* pBindItem = reinterpret_cast < CKeyFunctionBind* > ( (*iterr) );
-                        if ( pBindItem->boundKey == pBind->boundKey && pBindItem->bHitState == !pBind->bHitState )
-                        {
-                            pSecondBind = pBindItem;
-                            break;
-                        }
-                    }
-                }
-                // If the user specified a valid primary key
-                if ( pPriKey )
-                {
-                    // If the primary key is different than the original one
-                    if ( pPriKey != pBind->boundKey ) {
-                        pBind->boundKey = pPriKey;
-                        if ( pSecondBind )
-                            pSecondBind->boundKey = pPriKey;
-                    }
-                }
-                // If the primary key field was empty, we can remove the keybind
-                else {
-                    pKeyBinds->Remove ( pBind );
-                    pKeyBinds->Remove ( pSecondBind );
-                }
-            }
-            // If there was no keybind for this command, create it
-            else if ( pPriKey )
-            {
-                pKeyBinds->AddFunction ( pPriKey, pBind->Handler, pBind->bHitState, pBind->bIgnoreGUI );
-            }
-
-            CKeyFunctionBind* pPrimaryBind = pBind;
-            /** Secondary keybinds **/
-            for ( int k = 0 ; k < SecKeyNum ; k++ )
-            {
-                pBind = reinterpret_cast < CKeyFunctionBind* > ( m_pBindsList->GetItemData ( i, m_hSecKeys[k] ) );
-                // If this is a valid bind in the keybinds list
-                if ( pBind )
-                {
-                    CKeyFunctionBind* pSecondSecondaryBind = NULL;
-                    list < CKeyBind* > ::const_iterator iterr = pKeyBinds->IterBegin ();
-                    for ( unsigned int uiIndex = 0 ; iterr != pKeyBinds->IterEnd (); iterr++, uiIndex++ )
-                    {
-                        eKeyBindType bindType = (*iterr)->GetType ();
-                        if ( (*iterr)->GetType () == KEY_BIND_FUNCTION )
-                        {
-                            CKeyFunctionBind* pBindItem = reinterpret_cast < CKeyFunctionBind* > ( (*iterr) );
-                            if ( pBindItem->boundKey == pBind->boundKey && pBindItem->bHitState == !pBind->bHitState )
-                            {
-                                if ( pSecondBind != pBindItem ) // don't want to find the same bind we found for the primary one
-                                {
-                                    pSecondSecondaryBind = pBindItem;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    // And our secondary key field was not empty
-                    if ( pSecKeys[k] )
-                    {
-                        if ( pSecKeys[k] != pBind->boundKey )
-                        {
-                            pBind->boundKey = pSecKeys[k];
-                            if ( pSecondSecondaryBind )
-                                pSecondSecondaryBind->boundKey = pSecKeys[k];
-                        }
-                    }
-                    // If the secondary key field was empty, we should remove the keybind
-                    else
-                    {
-                        pKeyBinds->Remove ( pBind );
-                        pKeyBinds->Remove ( pSecondSecondaryBind );
-                    }
-                }
-                // If this key bind didn't exist, create it
-                else if ( pSecKeys[k] && pPrimaryBind )
-                {
-                    pKeyBinds->AddFunction ( pSecKeys[k], pPrimaryBind->Handler, pPrimaryBind->bHitState, pPrimaryBind->bIgnoreGUI );
-                    if ( pSecondBind ) // if the primary key bind had a second bind, we want one too!
-                    {
-                        pKeyBinds->AddFunction ( pSecKeys[k], pSecondBind->Handler, pSecondBind->bHitState, pSecondBind->bIgnoreGUI );
-                    }
-                }
-            }
+            assert ( 0 );
         }
     }
 }
@@ -1816,9 +1753,11 @@ void CSettings::LoadData ( void )
     bool bNextFSMinimize;
     GetVideoModeManager ()->GetNextVideoMode ( nextVideoMode, bNextWindowed, bNextFSMinimize );
 
+	m_pCheckBoxMipMapping->SetSelected ( gameSettings->IsMipMappingEnabled () );
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
     m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
     m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
+    m_pCheckBoxDisableAero->SetSelected ( GetApplicationSettingInt ( "aero-enabled" ) ? false : true );
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
 
@@ -1833,6 +1772,12 @@ void CSettings::LoadData ( void )
     else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( "1x" );
     else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( "2x" );
     else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( "3x" );
+
+    // Volumetric shadows
+    bool bVolumetricShadowsEnabled;
+    CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
+	m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
+	m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
 
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
@@ -2019,11 +1964,13 @@ void CSettings::SaveData ( void )
     bNextFSMinimize = m_pCheckBoxMinimize->GetSelected();
     if ( CGUIListItem* pSelected = m_pComboAntiAliasing->GetSelectedItem () )
         iAntiAliasing = ( int ) pSelected->GetData();
+    int iAeroEnabled = m_pCheckBoxDisableAero->GetSelected() ? 0 : 1;
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged )
+    bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) != iAeroEnabled;
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged )
     {
         SString strChangedOptions;
         if ( bIsVideoModeChanged )
@@ -2031,12 +1978,20 @@ void CSettings::SaveData ( void )
             strChangedOptions += "Resolution";
             if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
                 strChangedOptions += "/Full Screen Minimize";
-            if ( bIsAntiAliasingChanged )
-                strChangedOptions += " and Anti-aliasing";
         }
-        else
+
+        if ( bIsAntiAliasingChanged )
         {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += " and ";
             strChangedOptions += "Anti-aliasing";
+        }
+
+        if ( bIsAeroChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += " and ";
+            strChangedOptions += "Aero setting";
         }
 
         SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
@@ -2056,12 +2011,21 @@ void CSettings::SaveData ( void )
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
     gameSettings->SetMouseSensitivity ( ( m_pMouseSensitivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
+	gameSettings->SetMipMappingEnabled ( m_pCheckBoxMipMapping->GetSelected () );
+
+    // Update Aero override setting. This need to be a registry setting as it's done in the launcher
+    SetApplicationSettingInt ( "aero-enabled", m_pCheckBoxDisableAero->GetSelected() ? 0 : 1 );
 
     // Visual FX Quality
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
     {
         gameSettings->SetFXQuality ( ( int ) pQualitySelected->GetData() );
     }
+
+    // Volumetric shadows
+    bool bVolumetricShadowsEnabled = m_pCheckBoxVolumetricShadows->GetSelected ();
+    CVARS_SET ( "volumetric_shadows", bVolumetricShadowsEnabled );
+	gameSettings->SetVolumetricShadowsEnabled ( bVolumetricShadowsEnabled );
 
     // Async loading
     if ( CGUIListItem* pSelected = m_pAsyncCombo->GetSelectedItem () )
@@ -2640,5 +2604,48 @@ bool CSettings::OnUpdateButtonClick ( CGUIElement* pElement )
     }
 
     GetVersionUpdater ()->InitiateManualCheck ();
+    return true;
+}
+
+bool CSettings::OnFxQualityChanged ( CGUIElement* pElement )
+{
+    CGUIListItem* pItem = m_pComboFxQuality->GetSelectedItem ();
+    if ( !pItem )
+        return true;
+
+    if ( ( int ) pItem->GetData() == 0 )
+    {
+        m_pCheckBoxVolumetricShadows->SetSelected ( false );
+        m_pCheckBoxVolumetricShadows->SetEnabled ( false );
+    }
+    else
+        m_pCheckBoxVolumetricShadows->SetEnabled ( true );
+        
+    return true;
+}
+
+void VolumetricShadowsCallBack ( void* ptr, unsigned int uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+    if ( uiButton == 0 )
+        ((CGUICheckBox*)ptr)->SetSelected ( false );
+}
+
+bool CSettings::OnVolumetricShadowsClick ( CGUIElement* pElement )
+{
+    if ( m_pCheckBoxVolumetricShadows->GetSelected () && !m_bShownVolumetricShadowsWarning )
+    {
+        m_bShownVolumetricShadowsWarning = true;
+        SStringX strMessage ( "Volmetric shadows can cause some systems to slow down." );
+        strMessage += "\n\nAre you sure you want to enable them?";
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( "PERFORMANCE WARNING" );
+        pQuestionBox->SetMessage ( strMessage );
+        pQuestionBox->SetButton ( 0, "No" );
+        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetCallback ( VolumetricShadowsCallBack, m_pCheckBoxVolumetricShadows );
+        pQuestionBox->Show ();
+    }
     return true;
 }

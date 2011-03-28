@@ -127,12 +127,15 @@ protected:
     CGUILabel*          m_pVideoGeneralLabel;
     CGUILabel*          m_pVideoResolutionLabel;
     CGUIComboBox*       m_pComboResolution;
+	CGUICheckBox*       m_pCheckBoxMipMapping;
     CGUICheckBox*       m_pCheckBoxWindowed;
     CGUICheckBox*       m_pCheckBoxWideScreen;
     CGUICheckBox*       m_pCheckBoxMinimize;
+    CGUICheckBox*       m_pCheckBoxDisableAero;
     CGUILabel*          m_pMapRenderingLabel;
     CGUIComboBox*       m_pComboFxQuality;
     CGUILabel*          m_pFXQualityLabel;
+	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
     CGUILabel*          m_pDrawDistanceLabel;
     CGUIScrollBar*      m_pDrawDistance;
     CGUILabel*          m_pDrawDistanceValueLabel;
@@ -271,6 +274,9 @@ protected:
 
     bool                OnSkinChanged ( CGUIElement* pElement );
 
+    bool                OnFxQualityChanged      ( CGUIElement* pElement );
+    bool                OnVolumetricShadowsClick ( CGUIElement* pElement );
+
 private:
     void                ProcessKeyBinds         ( void );
     void                ProcessJoypad           ( void );
@@ -302,6 +308,7 @@ private:
     CGUIListItem*	    m_pSelectedBind;
 
     DWORD               m_dwFrameCount;
+    bool                m_bShownVolumetricShadowsWarning;
 
     std::list < SKeyBindSection *> m_pKeyBindSections;
 

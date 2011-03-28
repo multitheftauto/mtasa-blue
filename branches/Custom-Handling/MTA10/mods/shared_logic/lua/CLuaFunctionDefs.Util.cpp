@@ -726,7 +726,7 @@ int CLuaFunctionDefs::UtfLen ( lua_State* luaVM )
         return 1;
     }
     std::string strInput = lua_tostring ( luaVM, 1 );
-    lua_pushnumber ( luaVM, SharedUtil::ConvertToUTF8(strInput).size() );
+    lua_pushnumber ( luaVM, ConvertToUTF8(strInput).size() );
 
     return 1;
 }
@@ -741,11 +741,11 @@ int CLuaFunctionDefs::UtfSeek ( lua_State* luaVM )
     }
     int iPos = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
     std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
+    std::wstring strUTF = ConvertToUTF8(strInput);
     if ( iPos <= static_cast < int >(strUTF.size()) && iPos >= 0 )
     {
         strUTF = strUTF.substr(0,iPos);
-        lua_pushnumber ( luaVM, SharedUtil::ConvertToANSI(strUTF).size() );
+        lua_pushnumber ( luaVM, ConvertToANSI(strUTF).size() );
         return 1;
     }
 
@@ -764,7 +764,7 @@ int CLuaFunctionDefs::UtfSub ( lua_State* L )
     //Ripped and modded Lua source.  It's pretty disgusting, i know.
 
     const char *s = lua_tostring(L, 1);
-    std::wstring strUTF = SharedUtil::ConvertToUTF8(s);
+    std::wstring strUTF = ConvertToUTF8(s);
     size_t l = static_cast < int > ( strUTF.size() );
 
     ptrdiff_t start = luaL_checkinteger(L, 2);
@@ -782,7 +782,7 @@ int CLuaFunctionDefs::UtfSub ( lua_State* L )
     if (start <= end)
     {
         strUTF = strUTF.substr(start-1, end-start+1);
-        lua_pushstring(L, SharedUtil::ConvertToANSI(strUTF).c_str());
+        lua_pushstring(L, ConvertToANSI(strUTF).c_str());
     }
     else lua_pushliteral(L, "");
     return 1;
@@ -808,7 +808,7 @@ int CLuaFunctionDefs::UtfChar ( lua_State* luaVM )
     wchar_t wUNICODE[2] = { iChar, '\0' };
 
     // Convert our UTF character into an ANSI string
-    std::string strANSI = SharedUtil::ConvertToANSI(wUNICODE);
+    std::string strANSI = ConvertToANSI(wUNICODE);
 
     lua_pushstring ( luaVM, strANSI.c_str() );
     return 1;
@@ -823,9 +823,62 @@ int CLuaFunctionDefs::UtfCode ( lua_State* luaVM )
         return 1;
     }
     std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = SharedUtil::ConvertToUTF8(strInput);
+    std::wstring strUTF = ConvertToUTF8(strInput);
     unsigned long ulCode = strUTF.c_str()[0];
 
     lua_pushnumber ( luaVM, ulCode );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    {
+        CClientPerfStatResult Result;
+        SString strCategory = lua_tostring ( luaVM, 1 );
+        SString strOptions;
+        SString strFilter;
+
+        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            strOptions = lua_tostring ( luaVM, 2 );
+
+        if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+            strFilter = lua_tostring ( luaVM, 3 );
+
+        GetClientPerfStatManager ()->GetStats ( &Result, strCategory, strOptions, strFilter );
+
+        lua_newtable ( luaVM );
+        for ( int c = 0; c < Result.ColumnCount () ; c++ )
+        {
+            const SString& name = Result.ColumnName ( c );
+            lua_pushnumber ( luaVM, c+1 );                      // row index number (starting at 1, not 0)
+            lua_pushlstring ( luaVM, (char *)name.c_str (), name.length() );
+            lua_settable ( luaVM, -3 );
+        }
+
+        lua_newtable ( luaVM );
+        for ( int r = 0; r < Result.RowCount () ; r++ )
+        {
+            lua_newtable ( luaVM );                             // new table
+            lua_pushnumber ( luaVM, r+1 );                      // row index number (starting at 1, not 0)
+            lua_pushvalue ( luaVM, -2 );                        // value
+            lua_settable ( luaVM, -4 );                         // refer to the top level table
+
+            for ( int c = 0; c < Result.ColumnCount () ; c++ )
+            {
+                SString& cell = Result.Data ( c, r );
+                lua_pushnumber ( luaVM, c+1 );
+                lua_pushlstring ( luaVM, (char *)cell.c_str (), cell.length () );
+                lua_settable ( luaVM, -3 );
+            }
+            lua_pop ( luaVM, 1 );                               // pop the inner table
+        }
+        return 2;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "getPerformanceStats" );
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }

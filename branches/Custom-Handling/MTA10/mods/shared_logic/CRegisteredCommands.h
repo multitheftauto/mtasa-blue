@@ -25,7 +25,7 @@ class CRegisteredCommands
     {
         class CLuaMain* pLuaMain;
         char szKey [MAX_REGISTERED_COMMAND_LENGTH + 1];
-        int iLuaFunction;
+        CLuaFunctionRef iLuaFunction;
         bool bCaseSensitive;
     };
 
@@ -33,7 +33,7 @@ public:
                         CRegisteredCommands             ( void );
                         ~CRegisteredCommands            ( void );
 
-    bool                AddCommand                      ( class CLuaMain* pLuaMain, const char* szKey, int iLuaFunction, bool bCaseSensitive );
+    bool                AddCommand                      ( class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bCaseSensitive );
     bool                RemoveCommand                   ( class CLuaMain* pLuaMain, const char* szKey );
     void                ClearCommands                   ( void );
     void                CleanUpForVM                    ( class CLuaMain* pLuaMain );
@@ -44,7 +44,7 @@ public:
 
 private:
     SCommand*               GetCommand                  ( const char* szKey, class CLuaMain* pLuaMain = NULL );
-    void                    CallCommandHandler          ( class CLuaMain* pLuaMain, int iLuaFunction, const char* szKey, const char* szArguments );
+    void                    CallCommandHandler          ( class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments );
 
     void                    TakeOutTheTrash             ( void );
 

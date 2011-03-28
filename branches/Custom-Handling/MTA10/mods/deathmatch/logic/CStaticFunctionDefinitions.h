@@ -37,8 +37,8 @@ public:
                                         ~CStaticFunctionDefinitions         ( void );
 
     static bool                         AddEvent                            ( CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger );
-    static bool                         AddEventHandler                     ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, int iLuaFunction, bool bPropagated );
-    static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, int iLuaFunction );
+    static bool                         AddEventHandler                     ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
     static bool                         TriggerEvent                        ( const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled );
     static bool                         TriggerServerEvent                  ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments );
     static bool                         CancelEvent                         ( bool bCancel );
@@ -123,7 +123,7 @@ public:
 
     static CClientEntity*               GetPedTarget                        ( CClientPed& Ped );
     static bool                         GetPedTargetCollision               ( CClientPed& Ped, CVector& vecOrigin );
-    static char*                        GetPedTask                          ( CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, int iIndex );
+    static bool                         GetPedTask                          ( CClientPed& Ped, bool bPrimary, unsigned int uiTaskType, std::vector < SString >& outTaskHierarchy );
     static char*                        GetPedSimplestTask                  ( CClientPed& Ped );
     static bool                         IsPedDoingTask                      ( CClientPed& Ped, const char* szTaskName, bool& bIsDoingTask );
     static bool                         GetPedBonePosition                  ( CClientPed& Ped, eBone bone, CVector & vecPosition );
@@ -185,7 +185,7 @@ public:
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );
-    static bool                         BlowVehicle                         ( CClientEntity& Entity, bool bExplode );
+    static bool                         BlowVehicle                         ( CClientEntity& Entity );
     static bool                         SetVehicleColor                     ( CClientEntity& Entity, const CVehicleColor& color );
     static bool                         SetVehicleLandingGearDown           ( CClientEntity& Entity, bool bLandingGearDown );
     static bool                         SetVehicleLocked                    ( CClientEntity& Entity, bool bLocked );
@@ -435,6 +435,9 @@ public:
     static bool                         GetSkyGradient                      ( unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed, unsigned char& ucBottomGreen, unsigned char& ucBottomBlue );
     static bool                         SetSkyGradient                      ( unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed, unsigned char ucBottomGreen, unsigned char ucBottomBlue );
     static bool                         ResetSkyGradient                    ( void );
+    static bool                         GetHeatHaze                         ( SHeatHazeSettings& settings );
+    static bool                         SetHeatHaze                         ( const SHeatHazeSettings& settings );
+    static bool                         ResetHeatHaze                       ( void );
     static bool                         GetWaterColor                       ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );
     static bool                         SetWaterColor                       ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
     static bool                         ResetWaterColor                     ( void );
@@ -455,9 +458,9 @@ public:
     static bool                         GetWindVelocity                     ( float& fX, float& fY, float& fZ );
 
     // Input functions
-    static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments& Arguments );
+    static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, const char* szCommandName, const char* szArguments, const char* szResource );
-    static bool                         UnbindKey                           ( const char* szKey, CLuaMain* pLuaMain, const char* szHitState = 0, int iLuaFunction = LUA_REFNIL );
+    static bool                         UnbindKey                           ( const char* szKey, CLuaMain* pLuaMain, const char* szHitState = 0, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
     static bool                         UnbindKey                           ( const char* szKey, const char* szHitState, const char* szCommandName, const char* szResource );
     static bool                         GetKeyState                         ( const char* szKey, bool& bState );
     static bool                         GetControlState                     ( const char* szControl, bool& bState );

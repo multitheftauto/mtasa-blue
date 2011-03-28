@@ -43,6 +43,7 @@ CGameSA::CGameSA()
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
+    m_iCheckStatus = 0;
 
     // Unprotect all of the GTASA code at once and leave it that way
     DWORD oldProt;
@@ -271,8 +272,8 @@ VOID CGameSA::StartGame()
 //  InitScriptInterface();
     //*(BYTE *)VAR_StartGame = 1;
     this->SetSystemState(GS_INIT_PLAYING_GAME);
-    *(BYTE *)0xB7CB49 = 0; // game not paused
-    *(BYTE *)0xBA67A4 = 0; // menu not visible
+    MemPut < BYTE > ( 0xB7CB49, 0 );  //     *(BYTE *)0xB7CB49 = 0;
+    MemPut < BYTE > ( 0xBA67A4, 0 );  //     *(BYTE *)0xBA67A4 = 0;
 }
 
 /**
@@ -331,7 +332,7 @@ float CGameSA::GetGravity ( void )
 
 void CGameSA::SetGravity ( float fGravity )
 {
-    * ( float* ) ( 0x863984 ) = fGravity;
+    MemPut < float > ( 0x863984, fGravity );  //     * ( float* ) ( 0x863984 ) = fGravity;
 }
 
 float CGameSA::GetGameSpeed ( void )
@@ -341,7 +342,7 @@ float CGameSA::GetGameSpeed ( void )
 
 void CGameSA::SetGameSpeed ( float fSpeed )
 {
-    * ( float* ) ( 0xB7CB64 ) = fSpeed;
+    MemPut < float > ( 0xB7CB64, fSpeed );  //     * ( float* ) ( 0xB7CB64 ) = fSpeed;
 }
 
 // this prevents some crashes (respawning mainly)
@@ -354,11 +355,11 @@ VOID CGameSA::DisableRenderer( bool bDisabled )
 
     if ( bDisabled )
     {
-        *(BYTE *)0x53DF40 = 0xC3;
+        MemPut < BYTE > ( 0x53DF40, 0xC3 );  //         *(BYTE *)0x53DF40 = 0xC3;
     }
     else
     {
-        *(BYTE *)0x53DF40 = 0xD9;
+        MemPut < BYTE > ( 0x53DF40, 0xD9 );  //         *(BYTE *)0x53DF40 = 0xD9;
     }
 }
 
@@ -368,7 +369,7 @@ VOID CGameSA::SetRenderHook ( InRenderer* pInRenderer )
         HookInstall ( (DWORD)FUNC_CDebug_DebugDisplayTextBuffer, (DWORD)pInRenderer, 6 );
     else
     {
-        *(BYTE *)FUNC_CDebug_DebugDisplayTextBuffer = 0xC3;
+        MemPut < BYTE > ( FUNC_CDebug_DebugDisplayTextBuffer, 0xC3 );  //         *(BYTE *)FUNC_CDebug_DebugDisplayTextBuffer = 0xC3;
     }
 }
 
@@ -437,7 +438,7 @@ void CGameSA::Initialize ( void )
     SetupSpecialCharacters ();
 
     // *Sebas* Hide the GTA:SA Main menu.
-    *(BYTE *)(CLASS_CMenuManager+0x5C) = 0;
+    MemPut < BYTE > ( CLASS_CMenuManager+0x5C, 0 );  //     *(BYTE *)(CLASS_CMenuManager+0x5C) = 0;
 }
 
 eGameVersion CGameSA::GetGameVersion ( void )
@@ -503,7 +504,7 @@ unsigned char CGameSA::GetBlurLevel ( void )
 
 void CGameSA::SetBlurLevel ( unsigned char ucLevel )
 {
-    * ( unsigned char * ) 0x8D5104 = ucLevel;
+    MemPut < unsigned char > ( 0x8D5104, ucLevel );  //     * ( unsigned char * ) 0x8D5104 = ucLevel;
 }
 
 unsigned long CGameSA::GetMinuteDuration ( void )
@@ -514,7 +515,7 @@ unsigned long CGameSA::GetMinuteDuration ( void )
 
 void CGameSA::SetMinuteDuration ( unsigned long ulTime )
 {
-    * ( unsigned long * ) 0xB7015C = ulTime;
+    MemPut < unsigned long > ( 0xB7015C, ulTime );  //     * ( unsigned long * ) 0xB7015C = ulTime;
 }
 
 bool CGameSA::IsCheatEnabled ( const char* szCheatName )
@@ -532,7 +533,7 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
         return false;
     if ( !it->second->m_bCanBeSet )
         return false;
-    *(it->second->m_byAddress) = bEnable;
+    MemPut < BYTE > ( it->second->m_byAddress, bEnable );   // *(it->second->m_byAddress) = bEnable;
     it->second->m_bEnabled = bEnable;
     return true;
 }
@@ -541,7 +542,7 @@ void CGameSA::ResetCheats ()
 {
     std::map < std::string, SCheatSA* >::iterator it;
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
-        *(it->second->m_byAddress) = 0;
+        MemPut < BYTE > ( it->second->m_byAddress, 0 );   // *(it->second->m_byAddress) = 0;
         it->second->m_bEnabled = false;
     }
 }
@@ -644,4 +645,12 @@ void CGameSA::SetupSpecialCharacters ( void )
     ModelInfo[316].MakePedModel ( "COPGRL2" );
     ModelInfo[317].MakePedModel ( "NURGRL2" );
     */
+}
+
+// Well, has it?
+bool CGameSA::HasCreditScreenFadedOut ( void )
+{
+    BYTE ucAlpha = *(BYTE*)0xBAB320;
+    bool bCreditScreenFadedOut = ( GetSystemState() >= 7 ) && ( ucAlpha < 6 );
+    return bCreditScreenFadedOut;
 }

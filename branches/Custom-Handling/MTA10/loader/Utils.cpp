@@ -14,6 +14,7 @@
 #include <assert.h>
 #include <tchar.h>
 #include <strsafe.h>
+#include <Tlhelp32.h>
 #define BUFSIZE 512
 #include "../sdk/utils/CMD5Hasher.cpp"  // :O
 
@@ -26,6 +27,8 @@ static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
 SString GetWMIOSVersion ( void );
 static HWND hwndCrashedDialog = NULL;
+HANDLE g_hMutex = NULL;
+HMODULE hLibraryModule = NULL;
 
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
@@ -85,14 +88,13 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
         5 seconds which is way longer than this should take to prevent this application
         from deadlocking if something goes really wrong allowing us to kill the injected
         game executable and avoid user inconvenience.*/
-    WaitForSingleObject ( hThread, INFINITE );
+    WaitForObject ( hProcess, hThread, INFINITE, NULL );
+
 
     /* Get the handle of the remotely loaded DLL module */
     DWORD hLibModule = 0;
-    GetExitCodeThread ( hProcess, &hLibModule );
+    GetExitCodeThread ( hThread, &hLibModule );
 
-    // Wait for the LoadLibrary thread to finish
-    WaitForSingleObject( hThread, INFINITE );
 
     /* Clean up the resources we used to inject the DLL */
     VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
@@ -276,6 +278,38 @@ std::vector < DWORD > MyEnumProcesses ( void )
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// FindProcessId
+//
+// Find a process id by process name
+//
+///////////////////////////////////////////////////////////////////////////
+DWORD FindProcessId ( const SString& processName )
+{
+	PROCESSENTRY32 processInfo;
+	processInfo.dwSize = sizeof ( processInfo );
+
+	HANDLE processesSnapshot = CreateToolhelp32Snapshot ( TH32CS_SNAPPROCESS, NULL );
+	if ( processesSnapshot == INVALID_HANDLE_VALUE )
+		return 0;
+
+	Process32First ( processesSnapshot , &processInfo );
+    do
+	{
+		if ( processName.CompareI ( processInfo.szExeFile ) )
+		{
+			CloseHandle ( processesSnapshot );
+			return processInfo.th32ProcessID;
+		}
+	}
+	while ( Process32Next ( processesSnapshot, &processInfo ) );
+	
+	CloseHandle ( processesSnapshot );
+	return 0;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
 // GetGTAProcessList
 //
 // Get list of process id's with the image name ending in "gta_sa.exe"
@@ -285,7 +319,6 @@ std::vector < DWORD > GetGTAProcessList ( void )
 {
     std::vector < DWORD > result;
 
-    uint uiNumFound = 0;
     std::vector < DWORD > processIdList = MyEnumProcesses ();
     for ( uint i = 0; i < processIdList.size (); i++ )
     {
@@ -296,9 +329,13 @@ std::vector < DWORD > GetGTAProcessList ( void )
 
         std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
         for ( uint i = 0; i < filenameList.size (); i++ )
-            if ( filenameList[i].EndsWith ( "gta_sa.exe" ) )
+            if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) )
                 result.push_back ( processId );
     }
+
+    if ( DWORD processId = FindProcessId ( MTA_GTAEXE_NAME ) )
+        ListAddUnique ( result, processId );
+
     return result;
 }
 
@@ -369,13 +406,15 @@ int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 //
 void ShowSplash ( HINSTANCE hInstance )
 {
+#ifndef MTA_DEBUG
     if ( !hwndSplash )
     {
         hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
-        ulSplashStartTime = GetTickCount ();
+        ulSplashStartTime = GetTickCount32 ();
     }
     SetForegroundWindow ( hwndSplash );
     SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+#endif
 }
 
 
@@ -387,7 +426,7 @@ void HideSplash ( bool bOnlyDelay  )
     if ( hwndSplash )
     {
         // Show splash for at least two seconds
-        unsigned long ulTimeElapsed = GetTickCount () - ulSplashStartTime;
+        unsigned long ulTimeElapsed = GetTickCount32 () - ulSplashStartTime;
         if ( ulTimeElapsed < 2000 )
             Sleep ( 2000 - ulTimeElapsed );
 
@@ -484,7 +523,20 @@ SString GetMTASAPath ( void )
 
 int GetGamePath ( SString& strOutResult )
 {
+    // Note: "SOFTWARE\Multi Theft Auto: San Andreas" is the shared multi-version location for "GTA:SA Path"
+
+    // Try "SOFTWARE\Multi Theft Auto: San Andreas" first   ( "..\\1.0" resolves to "SOFTWARE\Multi Theft Auto: San Andreas" )
     SString strRegPath = GetRegistryValue ( "..\\1.0", "GTA:SA Path" );
+
+    // Update/restore from backup location
+    {
+        SString strRegPathBackup = GetRegistryValue ( "", "GTA:SA Path Backup" );
+        if ( strRegPath.empty () )
+            strRegPath = strRegPathBackup;
+        else
+        if ( strRegPath != strRegPathBackup )
+            SetRegistryValue ( "", "GTA:SA Path Backup", strRegPath );
+    }
 
     if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) == 0 )
     {
@@ -531,6 +583,7 @@ int GetGamePath ( SString& strOutResult )
         if ( FileExists( SString ( "%s\\%s", strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
         {
             SetRegistryValue ( "..\\1.0", "GTA:SA Path", strOutResult );
+            SetRegistryValue ( "", "GTA:SA Path Backup", strOutResult );
         }
         else
         {
@@ -569,7 +622,7 @@ void ShowProgressDialog( HINSTANCE hInstance, const SString& strTitle, bool bAll
         SetWindowText ( hwndProgressDialog, strTitle );
         HWND hwndButton = GetDlgItem( hwndProgressDialog, IDCANCEL );
         ShowWindow( hwndButton, bAllowCancel ? SW_SHOW : SW_HIDE );
-        ulProgressStartTime = GetTickCount ();
+        ulProgressStartTime = GetTickCount32 ();
     }
     SetForegroundWindow ( hwndProgressDialog );
     SetWindowPos ( hwndProgressDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
@@ -580,7 +633,7 @@ void HideProgressDialog ( void )
     if ( hwndProgressDialog )
     {
         // Show progress for at least two seconds
-        unsigned long ulTimeElapsed = GetTickCount () - ulProgressStartTime;
+        unsigned long ulTimeElapsed = GetTickCount32 () - ulProgressStartTime;
         if ( ulTimeElapsed < 2000 )
         {
             UpdateProgress( 100, 100 );
@@ -971,13 +1024,13 @@ static bool QueryWMI ( const SString& strQuery, const SString& strKeys, std::vec
                       
     // Error here can be non fatal
 
-    if (FAILED(hres))
-    {
-#if MTA_DEBUG
-        OutputDebugString ( SString ( "QueryWMI - Failed to initialize security. Error code = %x\n", hres ) );
-#endif
-        return "";
-    }
+//    if (FAILED(hres))
+//    {
+//#if MTA_DEBUG
+//        OutputDebugString ( SString ( "QueryWMI - Failed to initialize security. Error code = %x\n", hres ) );
+//#endif
+//        return "";
+//    }
     
     // Step 3: ---------------------------------------------------
     // Obtain the initial locator to WMI -------------------------
@@ -1169,6 +1222,52 @@ static SString HashBuffer ( char* pData, uint uiLength )
 
 /////////////////////////////////////////////////////////////////////
 //
+// GetLibraryHandle
+//
+//
+//
+/////////////////////////////////////////////////////////////////////
+HMODULE GetLibraryHandle ( const SString& strFilename )
+{
+    if ( !hLibraryModule )
+    {
+        // Get path to the relevant file
+        SString strLibPath = PathJoin ( GetLaunchPath (), "mta" );
+        SString strLibPathFilename = PathJoin ( strLibPath, strFilename );
+
+        SString strPrevCurDir = GetCurrentWorkingDirectory ();
+        SetCurrentDirectory ( strLibPath );
+        SetDllDirectory( strLibPath );
+
+        hLibraryModule = LoadLibrary ( strLibPathFilename );
+
+        SetCurrentDirectory ( strPrevCurDir );
+        SetDllDirectory( strPrevCurDir );
+    }
+
+    return hLibraryModule;
+}
+
+
+/////////////////////////////////////////////////////////////////////
+//
+// FreeLibraryHandle
+//
+//
+//
+/////////////////////////////////////////////////////////////////////
+void FreeLibraryHandle ( void )
+{
+    if ( hLibraryModule )
+    {
+        FreeLibrary ( hLibraryModule );
+        hLibraryModule = NULL;
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////
+//
 // UpdateMTAVersionApplicationSetting
 //
 // Make sure "mta-version-ext" is correct. eg "1.0.4-9.01234.2.000"
@@ -1187,7 +1286,6 @@ void UpdateMTAVersionApplicationSetting ( void )
     //
 
     // Get saved status
-    SString strOldHash = GetApplicationSetting ( "netc-hash" );
     unsigned short usNetRev = 65535;
     unsigned short usNetRel = 0;
     std::vector < SString > parts;
@@ -1198,47 +1296,16 @@ void UpdateMTAVersionApplicationSetting ( void )
         usNetRel = atoi ( parts[5] );
     }
 
-    // Get path to the relevant file
-    SString strNetLibPath = PathJoin ( GetLaunchPath (), "mta" );
-    SString strNetLibPathFilename = PathJoin ( strNetLibPath, strFilename );
-
-    // Hash the file
-    std::vector < char > buffer;
-    FileLoad ( strNetLibPathFilename, buffer );
-    SString strNewHash = "none";
-    if ( buffer.size () )
-        strNewHash = HashBuffer ( &buffer.at ( 0 ), buffer.size () );
-
-#ifdef MTA_DEBUG
-    // Force update
-    strNewHash = "x";
-#endif
-    // Only loadup the dll if the hash has changed, or we don't have a previous valid netrev value
-    if ( strNewHash != strOldHash || usNetRev == 65535 )
+    HMODULE hModule = GetLibraryHandle ( strFilename );
+    if ( hModule )
     {
-        SString strPrevCurDir = GetCurrentWorkingDirectory ();
-        SetCurrentDirectory ( strNetLibPath );
-        SetDllDirectory( strNetLibPath );
-
-        HMODULE hModule = LoadLibrary ( strNetLibPathFilename );
-
-        if ( hModule )
-        {
-            typedef unsigned short (*PFNGETNETREV) ( void );
-            PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
-            if ( pfnGetNetRev )
-                usNetRev = pfnGetNetRev ();
-            PFNGETNETREV pfnGetNetRel = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRel" ) ) );
-            if ( pfnGetNetRel )
-                usNetRel = pfnGetNetRel ();
-
-            FreeLibrary ( hModule );
-        }
-
-        SetCurrentDirectory ( strPrevCurDir );
-        SetDllDirectory( strPrevCurDir );
-
-        SetApplicationSetting ( "netc-hash", strNewHash );
+        typedef unsigned short (*PFNGETNETREV) ( void );
+        PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
+        if ( pfnGetNetRev )
+            usNetRev = pfnGetNetRev ();
+        PFNGETNETREV pfnGetNetRel = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRel" ) ) );
+        if ( pfnGetNetRel )
+            usNetRel = pfnGetNetRel ();
     }
 
     SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
@@ -1327,3 +1394,138 @@ bool Is32bitProcess ( DWORD processID )
     return false;   // Can't determine. Guess it's 64 bit
 }
 
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CreateSingleInstanceMutex
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+bool CreateSingleInstanceMutex ( void )
+{
+    HANDLE hMutex = CreateMutex ( NULL, FALSE, TEXT( MTA_GUID ) );
+
+    if ( GetLastError() == ERROR_ALREADY_EXISTS )
+    {
+        if ( hMutex )
+            CloseHandle ( hMutex );
+        return false;
+    }
+    assert ( !g_hMutex );
+    g_hMutex = hMutex;
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// ReleaseSingleInstanceMutex
+//
+//
+//
+///////////////////////////////////////////////////////////////////////////
+void ReleaseSingleInstanceMutex ( void )
+{
+    assert ( g_hMutex );
+    CloseHandle ( g_hMutex );
+    g_hMutex = NULL;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// WaitForObject
+//
+// Wait for object to finish
+// Returns non-zero if wait failed.
+//
+///////////////////////////////////////////////////////////////////////////
+uint WaitForObject ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex )
+{
+    uint uiResult = 0;
+
+    HMODULE hModule = GetLibraryHandle ( "kernel32.dll" );
+
+    if ( hModule )
+    {
+        typedef unsigned long (*PFNWaitForObject) ( HANDLE, ... );
+        PFNWaitForObject pfnWaitForObject = static_cast< PFNWaitForObject > ( static_cast < PVOID > ( GetProcAddress ( hModule, "WaitForObject" ) ) );
+
+        if ( !pfnWaitForObject || pfnWaitForObject ( hProcess, hThread, dwMilliseconds, hMutex ) )
+            uiResult = 1;
+    }
+
+    return uiResult;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetFileAge
+//
+// Returns time in seconds since a file/directory was created
+//
+///////////////////////////////////////////////////////////////////////////
+int GetFileAge ( const SString& strPathFilename )
+{
+    WIN32_FIND_DATA findFileData;
+    HANDLE hFind = FindFirstFile ( strPathFilename, &findFileData );
+    if ( hFind != INVALID_HANDLE_VALUE )
+    {
+        FindClose ( hFind );
+        FILETIME ftNow;
+        GetSystemTimeAsFileTime ( &ftNow );
+        LARGE_INTEGER creationTime = { findFileData.ftCreationTime.dwLowDateTime, findFileData.ftCreationTime.dwHighDateTime };
+        LARGE_INTEGER timeNow = { ftNow.dwLowDateTime, ftNow.dwHighDateTime };
+        return static_cast < int > ( ( timeNow.QuadPart - creationTime.QuadPart ) / ( LONGLONG ) 10000000 );
+    }
+    return 0;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CleanDownloadCache
+//
+// Remove old files from the download cache
+//
+///////////////////////////////////////////////////////////////////////////
+void CleanDownloadCache ( void )
+{
+    const uint uiMaxCleanTime = 5;                      // Limit clean time (seconds)
+    const uint uiCleanFileAge = 60 * 60 * 24 * 7;       // Delete files older than this
+
+    const time_t tMaxEndTime = time ( NULL ) + uiMaxCleanTime;
+
+    // Search possible cache locations
+    std::list < SString > cacheLocationList;
+    cacheLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache" ) );
+    cacheLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache" ) );
+    cacheLocationList.push_back ( GetMTATempPath () );
+
+    for ( ; !cacheLocationList.empty () ; cacheLocationList.pop_front () )
+    {
+        // Get list of files & directories in this cache location
+        const SString& strCacheLocation = cacheLocationList.front ();
+        const std::vector < SString > fileList = FindFiles ( PathJoin ( strCacheLocation, "\\*" ), true, true );
+
+        for ( uint i = 0 ; i < fileList.size () ; i++ )
+        {
+            const SString strPathFilename = PathJoin ( strCacheLocation, fileList[i] );
+            // Check if over 7 days old
+            if ( GetFileAge ( strPathFilename ) > uiCleanFileAge )
+            {
+                // Delete as directory or file
+                if ( DirectoryExists ( strPathFilename ) )
+                    DelTree ( strPathFilename, strCacheLocation );
+                else
+                    FileDelete ( strPathFilename );
+
+                // Check time spent
+                if ( time ( NULL ) > tMaxEndTime )
+                    break;
+            }
+        }
+    }
+}

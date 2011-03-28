@@ -10,6 +10,7 @@
 
 #include <shlobj.h>
 #include <Psapi.h>
+#include <time.h>
 
 #define MTA_CLIENT
 #include "SharedUtil.h"
@@ -17,3 +18,4 @@
 #include "Install.h"
 #include "Utils.h"
 #include "..\version.h"
+#include "CInstallManager.h"

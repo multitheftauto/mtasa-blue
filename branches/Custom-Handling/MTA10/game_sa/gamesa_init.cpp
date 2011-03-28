@@ -13,6 +13,7 @@
 #include "StdInc.h"
 
 CGameSA* pGame = NULL;
+CNet* g_pNet = NULL;
 
 //-----------------------------------------------------------
 // This function uses the initialized data sections of the executables
@@ -20,12 +21,27 @@ CGameSA* pGame = NULL;
 // in order for proper initialization to occur.
 
 extern "C" _declspec(dllexport)
-CGame * GetGameInterface()
+CGame * GetGameInterface( CCoreInterface* pCore )
 {
     DEBUG_TRACE("CGame * GetGameInterface()");
+
+    g_pNet = pCore->GetNetwork ();
+    assert ( g_pNet );
+
     pGame = new CGameSA;
 
     return (CGame *)pGame;
 }
 
 //-----------------------------------------------------------
+
+
+void MemSet ( void* dwDest, int cValue, uint uiAmount )
+{
+    g_pNet->ResetStub ( 1297311092, dwDest, cValue, uiAmount );
+}
+
+void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
+{
+    g_pNet->ResetStub ( 1296265337, dwDest, dwSrc, uiAmount );
+}

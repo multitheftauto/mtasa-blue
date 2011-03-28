@@ -110,6 +110,12 @@ public:
     virtual unsigned int    GetAntiAliasing         ( void ) = 0;
     virtual void            SetAntiAliasing         ( unsigned int uiAntiAliasing, bool bOnRestart ) = 0;
 
+	virtual bool            IsMipMappingEnabled     ( void ) = 0;
+	virtual void            SetMipMappingEnabled    ( bool bEnable ) = 0;
+
+	virtual bool            IsVolumetricShadowsEnabled     ( void ) = 0;
+	virtual void            SetVolumetricShadowsEnabled    ( bool bEnable ) = 0;
+
     virtual void            Save                    ( void ) = 0;
 };
 

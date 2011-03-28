@@ -124,7 +124,7 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
             m_pDXSprite->SetTransform ( &matrix );  
             
             // Convert to UTF8
-            std::wstring strText = SharedUtil::ConvertToUTF8(szText);
+            std::wstring strText = ConvertToUTF8(szText);
 
             pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ulColor );
         m_pDXSprite->End ();
@@ -390,7 +390,7 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
         HDC dc = pDXFont->GetDC ();
         SIZE size;
 
-        std::wstring strText = SharedUtil::ConvertToUTF8(szText);
+        std::wstring strText = ConvertToUTF8(szText);
 
         GetTextExtentPoint32W ( dc, strText.c_str(), strText.length(), &size );
 
@@ -610,7 +610,7 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
         Item.Text.pDXFont = pDXFont;
 
         // Convert to wstring        
-        Item.strText = SharedUtil::ConvertToUTF8(szText);
+        Item.strText = ConvertToUTF8(szText);
 
         // Add it to the queue
         AddQueueItem ( Item, bPostGUI );
@@ -1052,7 +1052,7 @@ SCachedTextureInfo& CGraphics::CacheTexture ( const string& strFilename )
     }
 
     SCachedTextureInfo& info = iter->second;
-    info.ulTimeLastUsed = GetTickCount();
+    info.ulTimeLastUsed = GetTickCount32();
 
     return info;
 }
@@ -1072,7 +1072,7 @@ void CGraphics::ExpireCachedTextures ( bool bExpireAll )
     while ( iter != m_CachedTextureInfoMap.end () )
     {
         SCachedTextureInfo& info    = iter->second;
-        unsigned long ulAge         = GetTickCount() - info.ulTimeLastUsed;
+        unsigned long ulAge         = GetTickCount32() - info.ulTimeLastUsed;
         if ( ulAge > ulMaxAgeSeconds * 1000 || bExpireAll )
         {
             SAFE_RELEASE ( info.d3dTexture );

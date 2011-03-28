@@ -53,7 +53,7 @@ class CCore;
 #include <dinput.h>
 
 #define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG "\n" \
-                                "Copyright (C) 2003 - 2010 Multi Theft Auto" \
+                                "Copyright (C) 2003 - 2011 Multi Theft Auto" \
 
 // Configuration file path (relative to Grand Theft Auto directory)
 #define MTA_CONFIG_PATH             "mta/coreconfig.xml"
@@ -68,9 +68,11 @@ class CCore;
 #define CONFIG_NODE_SERVER_REC      "recently_played_servers"   // recently played servers list node
 #define CONFIG_NODE_SERVER_OPTIONS  "serverbrowser_options"     // saved options for the server browser
 #define CONFIG_NODE_SERVER_SAVED    "server_passwords"    // This contains saved passwords (as appose to save_server_passwords which is a setting)
+#define CONFIG_NODE_SERVER_HISTORY  "connect_history"
 #define CONFIG_INTERNET_LIST_TAG    "internet_server"
 #define CONFIG_FAVOURITE_LIST_TAG   "favourite_server"
 #define CONFIG_RECENT_LIST_TAG      "recently_played_server"
+#define CONFIG_HISTORY_LIST_TAG     "connected_server"
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
@@ -129,9 +131,10 @@ public:
     void                    HideQuickConnect                ( void );
     void                    SetCenterCursor                 ( bool bEnabled );
 
+    void                    ShowServerInfo                  ( unsigned int WindowType );
+
     // Configuration
     void                    ApplyConsoleSettings            ( void );
-    void                    ApplyServerBrowserSettings      ( void );
     void                    ApplyGameSettings               ( void );
     void                    ApplyCommunityState             ( void );
     void                    UpdateRecentlyPlayed            ( void );
@@ -148,7 +151,7 @@ public:
     void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL );
     void                    RemoveMessageBox                ( bool bNextFrame = false );
     bool                    IsOfflineMod                    ( void ) { return m_bIsOfflineMod; }
-    SString                 GetModInstallRoot               ( char * szModName );
+    const char *            GetModInstallRoot               ( const char * szModName );
     const char *            GetInstallRoot                  ( void );
     const char *            GetGTAInstallRoot               ( void );
 
@@ -177,8 +180,7 @@ public:
     void                    ChangeResolution                ( long width, long height, long depth );
     void                    ApplyLoadingCrashPatch          ( void );
 
-    void                    SetFocused                      ( bool bFocused )               { m_bFocused = bFocused; };
-    bool                    IsFocused                       ( void )                        { return m_bFocused; };
+    bool                    IsFocused                       ( void )                        { return ( GetForegroundWindow ( ) == GetHookedWindow ( ) ); };
     bool                    IsWindowMinimized               ( void );
 
     // Pulse
@@ -199,10 +201,11 @@ public:
     void                    InitiateDataFilesFix            ( void )                                        { m_pLocalGUI->InitiateDataFilesFix (); }
 
     uint                    GetFrameRateLimit               ( void )                                        { return m_uiFrameRateLimit; }
-    void                    SetFrameRateLimit               ( uint uiFrameRateLimit )                       { m_uiFrameRateLimit = uiFrameRateLimit; }
+    void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 );
     void                    ApplyFrameRateLimit             ( void );
 
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
+    void                    GetConnectParametersFromURI     ( const char* szURI, std::string &strHost, unsigned short &usPort, std::string &strNick, std::string &strPassword );
     bool                    bScreenShot;
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
     const char *            GetCommandLineOption            ( const char* szOption );
@@ -235,7 +238,6 @@ private:
     CSetCursorPosHook *         m_pSetCursorPosHook;
     CTCPManager *               m_pTCPManager;
 
-    bool                        m_bFocused;
     bool                        m_bLastFocused;
 
     // Module loader objects.
@@ -273,12 +275,14 @@ private:
     CXfireServerInfo*           m_pCurrentServer;
     time_t                      m_tXfireUpdate;
 
+    SString                     m_strModInstallRoot;
     char                        m_szInstallRoot[MAX_PATH];
     char                        m_szGTAInstallRoot[MAX_PATH];
 
     bool                        m_bQuitOnPulse;
     bool                        m_bDestroyMessageBox;
 
+    uint                        m_uiServerFrameRateLimit;
     uint                        m_uiFrameRateLimit;
     double                      m_dLastTimeMs;
     double                      m_dPrevOverrun;

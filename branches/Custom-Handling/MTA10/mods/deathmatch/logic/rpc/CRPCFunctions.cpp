@@ -157,11 +157,15 @@ void CRPCFunctions::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterf
             {
                 pSource = CElementIDs::GetElement ( ID );
 #ifdef MTA_DEBUG
-                assert ( pSource != NULL );
-#else
+                if ( pSource == NULL )
+                {
+                    OutputDebugLine ( "CRPCFunctions::ProcessPacket - FIXME" );
+                    CLogger::ErrorPrintf ( "CRPCFunctions::ProcessPacket - FIXME" );
+                }
+                // assert ( pSource != NULL );
+#endif
                 if ( pSource == NULL )
                     return;
-#endif
             }
 
             (pElementHandler->Callback) ( pSource, bitStream );

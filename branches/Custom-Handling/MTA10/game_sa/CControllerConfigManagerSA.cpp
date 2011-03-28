@@ -81,7 +81,7 @@ unsigned char CControllerConfigManagerSA::GetInputType ( void )
 
 void CControllerConfigManagerSA::SetInputType ( unsigned char ucInputType )
 {
-    * ( unsigned char * ) ( 0xB6EC2E ) = ucInputType;
+    MemPut < unsigned char > ( 0xB6EC2E, ucInputType );  //     * ( unsigned char * ) ( 0xB6EC2E ) = ucInputType;
 }
 
 bool CControllerConfigManagerSA::IsMouseInverted ( void )
@@ -91,7 +91,7 @@ bool CControllerConfigManagerSA::IsMouseInverted ( void )
 
 void CControllerConfigManagerSA::SetMouseInverted ( bool bInverted )
 {
-    * ( BYTE * ) ( 0xBA6745 ) = ( bInverted ) ? 0 : 1;
+    MemPut < BYTE > ( 0xBA6745, ( bInverted ) ? 0 : 1 );  //     * ( BYTE * ) ( 0xBA6745 ) = ( bInverted ) ? 0 : 1;
 }
 
 bool CControllerConfigManagerSA::GetFlyWithMouse ( void )
@@ -101,7 +101,7 @@ bool CControllerConfigManagerSA::GetFlyWithMouse ( void )
 
 void CControllerConfigManagerSA::SetFlyWithMouse ( bool bFlyWithMouse )
 {
-    * ( BYTE * ) ( 0xC1CC03 ) = ( bFlyWithMouse ) ? 1 : 0;
+    MemPut < BYTE > ( 0xC1CC03, ( bFlyWithMouse ) ? 1 : 0 );  //     * ( BYTE * ) ( 0xC1CC03 ) = ( bFlyWithMouse ) ? 1 : 0;
 }
 
 bool CControllerConfigManagerSA::GetSteerWithMouse ( void )
@@ -111,5 +111,5 @@ bool CControllerConfigManagerSA::GetSteerWithMouse ( void )
 
 void CControllerConfigManagerSA::SetSteerWithMouse ( bool bSteerWithMouse )
 {
-    * ( BYTE * ) ( 0xC1CC02 ) = ( bSteerWithMouse ) ? 1 : 0;
+    MemPut < BYTE > ( 0xC1CC02, ( bSteerWithMouse ) ? 1 : 0 );  //     * ( BYTE * ) ( 0xC1CC02 ) = ( bSteerWithMouse ) ? 1 : 0;
 }

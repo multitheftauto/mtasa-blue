@@ -78,7 +78,7 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey,
         // Matching vm's and names?
         if ( (*iter)->pLuaMain == pLuaMain && iCompareResult == 0 )
         {
-            if ( iLuaFunction != LUA_REFNIL && (*iter)->iLuaFunction != iLuaFunction )
+            if ( VERIFY_FUNCTION ( iLuaFunction ) && (*iter)->iLuaFunction != iLuaFunction )
             {
                 iter++;
                 continue;

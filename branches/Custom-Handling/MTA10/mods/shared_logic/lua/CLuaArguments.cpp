@@ -182,16 +182,17 @@ void CLuaArguments::PushArguments ( CLuaArguments& Arguments )
     }
 }
 
-bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments * returnValues ) const
+bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments * returnValues ) const
 {
     assert ( pLuaMain );
+    TIMEUS startTime = GetTimeUs ();
 
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
     assert ( luaVM );
     LUA_CHECKSTACK ( luaVM, 1 );
     int luaStackPointer = lua_gettop ( luaVM );
-    lua_getref ( luaVM, iLuaFunction );
+    lua_getref ( luaVM, iLuaFunction.ToInt () );
 
     // Push our arguments onto the stack
     PushArguments ( luaVM );
@@ -244,6 +245,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, int iLuaFunction, CLuaArguments *
             lua_pop ( luaVM, 1 );
     }
         
+    GetClientPerfStatManager ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.ToInt () ), GetTimeUs() - startTime );
     return true;
 }
 
@@ -252,6 +254,7 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
 {
     assert ( pLuaMain );
     assert ( szFunction );
+    TIMEUS startTime = GetTimeUs ();
 
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine ();
@@ -296,6 +299,7 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
             lua_pop ( luaVM, 1 );
     }
         
+    GetClientPerfStatManager ()->UpdateLuaTiming ( pLuaMain, szFunction, GetTimeUs() - startTime );
     return true;
 }
 

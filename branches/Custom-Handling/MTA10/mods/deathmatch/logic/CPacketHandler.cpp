@@ -437,7 +437,10 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
         StripUnwantedCharacters ( szReason, ' ' );
 
         // Display the error
-        g_pCore->ShowMessageBox ( "Disconnected", szReason, MB_BUTTON_OK | MB_ICON_INFO );
+        if ( strcmp(szReason,"Disconnected: Incorrect password") == 0 ) // Slight hack - if invalid password reason show Info box instead.
+            g_pCore->ShowServerInfo ( 2 );
+        else
+            g_pCore->ShowMessageBox ( "Disconnected", szReason, MB_BUTTON_OK | MB_ICON_INFO );
     }
 
     // Terminate the mod (disconnect first in case there were more packets after this one)
@@ -1102,7 +1105,7 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
             char* szMessage = new char[iNumberOfBytesUsed + 1];
             bitStream.Read ( szMessage, iNumberOfBytesUsed );
             szMessage [iNumberOfBytesUsed] = 0;
-            if ( SharedUtil::ConvertToUTF8(szMessage).size() <= MAX_CHATECHO_LENGTH )
+            if ( ConvertToUTF8(szMessage).size() <= MAX_CHATECHO_LENGTH )
             {
                 // Strip it for bad characters
                 StripControlCodes ( szMessage, ' ' );
@@ -1904,6 +1907,20 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     else
         g_pMultiplayer->ResetSky ();
 
+    // Read out the heat haze
+    bool bHasHeatHaze;
+    if ( !bitStream.ReadBit ( bHasHeatHaze ) )
+        return;
+    if ( bHasHeatHaze )
+    {
+        SHeatHazeSync heatHaze;
+        bitStream.Read ( &heatHaze );
+        g_pMultiplayer->SetHeatHaze ( heatHaze );
+    }
+    else
+        g_pMultiplayer->ResetHeatHaze ();
+
+
     // Read out the map time
     unsigned char ucClockHour;
     unsigned char ucClockMinute;
@@ -1962,19 +1979,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     unsigned short usFPSLimit = 36;
     bitStream.ReadCompressed ( usFPSLimit );
-
-    unsigned int uiVal;
-    g_pCore->GetCVars ()->Get ( "fps_limit", uiVal );
-
-    if ( usFPSLimit > 0 && uiVal > usFPSLimit || uiVal == 0 )
-    {
-        g_pCore->SetFrameRateLimit ( usFPSLimit );
-    }
-    else
-    {
-        g_pCore->SetFrameRateLimit ( uiVal );
-    }
-
+    g_pCore->RecalculateFrameRateLimit ( usFPSLimit );
 
     // Read out the garage door states
     CGarages* pGarages = g_pCore->GetGame()->GetGarages();
@@ -1995,16 +2000,10 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     if ( !bitStream.Read ( &funBugs ) )
         return;
 
-    
-    bool bCrouchBug = false;
-    if ( bitStream.Version () >= 0x15 )
-        if ( !bitStream.ReadBit ( bCrouchBug ) )
-            return;
-
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_QUICKRELOAD, funBugs.data.bQuickReload );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTFIRE, funBugs.data.bFastFire );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTMOVE, funBugs.data.bFastMove );
-    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, bCrouchBug );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG, funBugs.data.bCrouchBug );
 
     float fJetpackMaxHeight = 100;
     if ( !bitStream.Read ( fJetpackMaxHeight ) )
@@ -2031,6 +2030,92 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
         }
 
         CStaticFunctionDefinitions::SetWaterColor ( ucRed, ucGreen, ucBlue, ucAlpha );
+    }
+
+    // Interior sounds
+    bool bInteriorSoundsEnabled = true;
+    if ( !bitStream.ReadBit ( bInteriorSoundsEnabled ) )
+        return;
+
+    g_pMultiplayer->SetInteriorSoundsEnabled ( bInteriorSoundsEnabled );
+
+    // Rain level
+    bool bOverrideRainLevel = false;
+    float fRainLevel;
+    if ( !bitStream.ReadBit ( bOverrideRainLevel ) )
+        return;
+    if ( bOverrideRainLevel )
+    {
+        if ( !bitStream.Read ( fRainLevel ) )
+            return;
+
+        g_pGame->GetWeather ( )->SetAmountOfRain ( fRainLevel );
+    }
+
+    // Sun size
+    bool bOverrideSunSize = false;
+    float fSunSize;
+    if ( !bitStream.ReadBit ( bOverrideSunSize ) )
+        return;
+    if ( bOverrideSunSize )
+    {
+        if ( !bitStream.Read ( fSunSize ) )
+            return;
+
+        g_pMultiplayer->SetSunSize ( fSunSize );
+    }
+
+    // Sun color
+    bool bOverrideSunColor = false;
+    unsigned char ucSunCoreR, ucSunCoreG, ucSunCoreB, ucSunCoronaR, ucSunCoronaG, ucSunCoronaB;
+    if ( !bitStream.ReadBit ( bOverrideSunColor ) )
+        return;
+    if ( bOverrideSunColor )
+    {
+        if ( !bitStream.Read ( ucSunCoreR ) || !bitStream.Read ( ucSunCoreG ) || !bitStream.Read ( ucSunCoreB ) ||
+            !bitStream.Read ( ucSunCoronaR ) || !bitStream.Read ( ucSunCoronaG ) || !bitStream.Read ( ucSunCoronaB ) )
+            return;
+
+        g_pMultiplayer->SetSunColor ( ucSunCoreR, ucSunCoreG, ucSunCoreB, ucSunCoronaR, ucSunCoronaG, ucSunCoronaB );
+    }
+
+    // Wind velocity
+    bool bOverrideWindVelocity = false;
+    float fWindVelX, fWindVelY, fWindVelZ;
+    if ( !bitStream.ReadBit ( bOverrideWindVelocity ) )
+        return;
+    if ( bOverrideWindVelocity )
+    {
+        if ( !bitStream.Read ( fWindVelX ) || !bitStream.Read ( fWindVelY ) || !bitStream.Read ( fWindVelZ ) )
+            return;
+
+        g_pMultiplayer->SetWindVelocity ( fWindVelX, fWindVelY, fWindVelZ );
+    }
+
+    // Far clip distance
+    bool bOverrideFarClipDistance = false;
+    float fFarClip;
+    if ( !bitStream.ReadBit ( bOverrideFarClipDistance ) )
+        return;
+    if ( bOverrideFarClipDistance )
+    {
+        if ( !bitStream.Read ( fFarClip ) )
+            return;
+
+        g_pMultiplayer->SetFarClipDistance ( fFarClip );
+    }
+
+    // Fog distance
+    bool bOverrideFogDistance = false;
+    float fFogDistance;
+    if ( !bitStream.ReadBit ( bOverrideFogDistance ) )
+        return;
+    if ( bOverrideFogDistance )
+    {
+        if ( !bitStream.Read ( fFogDistance ) )
+            return;
+
+        g_pMultiplayer->SetFogDistance ( fFogDistance );
     }
 }
 
