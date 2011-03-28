@@ -848,6 +848,9 @@ void CClientGame::DoPulsePostFrame ( void )
     // If we are not minimized we do the pulsing here
     if ( !g_pCore->IsWindowMinimized () )
     {
+        m_pRadarMap->DoRender ();
+        m_pManager->DoRender ();
+
         // ..if no one else is doing it
         if ( m_uiNotPulsedCounter > 1 )
             DoPulses ();
@@ -3483,6 +3486,8 @@ void CClientGame::IdleHandler ( void )
     // If we are minimized we do the pulsing here
     if ( g_pCore->IsWindowMinimized() )
     {
+        m_pRadarMap->DoRender ();
+        m_pManager->DoRender ();
         DoPulses ();
     }
 }
