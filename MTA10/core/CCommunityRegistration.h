@@ -17,12 +17,12 @@ class CCommunityRegistration;
 #define __CCOMMUNITYREGISTRATION_H
 
 #define REGISTRATION_DELAY              9000
-#define REGISTRATION_URL                "http://dp3.community.mtasa.com/core/1.1/register.php"
+#define REGISTRATION_URL                "http://community.mtasa.com/core/1.1/register.php"
 #define REGISTRATION_TEMP_FILE          "MTA\\temp.png"
 
 enum eRegistrationResult
 {
-    REGISTRATION_ERROR_UNEXPECTED,
+    REGISTRATION_ERROR_UNEXPECTED = 0,
     REGISTRATION_ERROR_SUCCESS,
     REGISTRATION_ERROR_REQUEST,
     REGISTRATION_ERROR_ERROR
