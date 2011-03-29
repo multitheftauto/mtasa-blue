@@ -2588,8 +2588,92 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 
                     CLuaArguments luaReturns;
 
+					CLuaArguments formData;
+					for ( FormValueMap::iterator iter = ipoHttpRequest->oFormValueMap.begin(); iter != ipoHttpRequest->oFormValueMap.end(); iter++ )
+					{
+						formData.PushString ( (*iter).first.c_str() );
+						formData.PushString ( ((FormValue)(*iter).second).sBody.c_str() );
+					}
+
+					CLuaArguments cookies;
+					for ( CookieMap::iterator iter = ipoHttpRequest->oCookieMap.begin(); iter != ipoHttpRequest->oCookieMap.end(); iter++ )
+					{
+						cookies.PushString ( (*iter).first.c_str() );
+						cookies.PushString ( (*iter).second.c_str() );
+					}
+
+					CLuaArguments headers;
+					for ( StringMap::iterator iter = ipoHttpRequest->oRequestHeaders.begin(); iter != ipoHttpRequest->oRequestHeaders.end(); iter++ )
+					{
+						headers.PushString ( (*iter).first.c_str() );
+						headers.PushString ( (*iter).second.c_str() );
+					}
+
+					// cache old data
+					lua_getglobal ( m_pVM->GetVM(), "form" );
+					CLuaArgument OldForm ( m_pVM->GetVM(), -1 );
+                    lua_pop( m_pVM->GetVM(), 1 );
+
+					lua_getglobal ( m_pVM->GetVM(), "cookies" );
+					CLuaArgument OldCookies ( m_pVM->GetVM(), -1 );
+                    lua_pop( m_pVM->GetVM(), 1 );
+
+					lua_getglobal ( m_pVM->GetVM(), "requestHeaders" );
+					CLuaArgument OldHeaders ( m_pVM->GetVM(), -1 );
+                    lua_pop( m_pVM->GetVM(), 1 );
+
+					lua_getglobal ( m_pVM->GetVM(), "hostname" );
+					CLuaArgument OldHostname ( m_pVM->GetVM(), -1 );
+                    lua_pop( m_pVM->GetVM(), 1 );
+
+					lua_getglobal ( m_pVM->GetVM(), "url" );
+					CLuaArgument OldURL ( m_pVM->GetVM(), -1 );
+                    lua_pop( m_pVM->GetVM(), 1 );
+
+					lua_getglobal ( m_pVM->GetVM(), "user" );
+					CLuaArgument OldUser ( m_pVM->GetVM(), -1 );
+                    lua_pop( m_pVM->GetVM(), 1 );
+
+					// push new data
+					formData.PushAsTable ( m_pVM->GetVM() );
+					lua_setglobal ( m_pVM->GetVM(), "form" );
+
+					cookies.PushAsTable ( m_pVM->GetVM() );
+					lua_setglobal ( m_pVM->GetVM(), "cookies" );
+
+					headers.PushAsTable ( m_pVM->GetVM() );
+					lua_setglobal ( m_pVM->GetVM(), "requestHeaders" );
+
+					lua_pushstring ( m_pVM->GetVM(), ipoHttpRequest->GetAddress().c_str() );
+					lua_setglobal ( m_pVM->GetVM(), "hostname" );
+
+					lua_pushstring ( m_pVM->GetVM(), ipoHttpRequest->sOriginalUri.c_str() );
+					lua_setglobal ( m_pVM->GetVM(), "url" );
+
+					lua_pushaccount ( m_pVM->GetVM(), account );
+					lua_setglobal ( m_pVM->GetVM(), "user" );
+
                     luaArgs.CallGlobal ( m_pVM, strFuncName.c_str (), &luaReturns );
                     //g_pGame->Unlock(); // release the mutex
+
+					// restore old data
+					OldForm.Push ( m_pVM->GetVM() );
+					lua_setglobal ( m_pVM->GetVM(), "form" );
+
+					OldCookies.Push ( m_pVM->GetVM() );
+					lua_setglobal ( m_pVM->GetVM(), "cookies" );
+
+					OldHeaders.Push ( m_pVM->GetVM() );
+					lua_setglobal ( m_pVM->GetVM(), "requestHeaders" );
+
+					OldHostname.Push ( m_pVM->GetVM() );
+					lua_setglobal ( m_pVM->GetVM(), "hostname" );
+
+					OldURL.Push ( m_pVM->GetVM() );
+					lua_setglobal ( m_pVM->GetVM(), "url" );
+
+					OldUser.Push ( m_pVM->GetVM() );
+					lua_setglobal ( m_pVM->GetVM(), "user" );
 
                     std::string strJSON;
                     luaReturns.WriteToJSONString ( strJSON, true );
