@@ -45,6 +45,7 @@ CSerialManager::~CSerialManager ( void )
 
 void CSerialManager::Verify ( CPlayer* pPlayer, SERIALVERIFICATIONCALLBACK pCallBack )
 {
+    // Verify player.
     m_calls.push_back ( new CSerialVerification ( pPlayer, pCallBack ) );
 }
 
@@ -76,7 +77,10 @@ void CSerialManager::DoPulse ( void )
 
 void CSerialManager::Remove ( CPlayer* pPlayer )
 {
+    assert ( pPlayer );
+
     list< CSerialVerification* >::iterator iter = m_calls.begin ();
+
     while ( iter != m_calls.end () )
     {
         if ( (*iter)->GetPlayer() == pPlayer )
@@ -98,17 +102,21 @@ void CSerialManager::Remove ( CSerialVerification * pCall )
     }
 }
 
-
+/******************************************************
+**
+** CSerialVerification
+**
+******************************************************/
 
 CSerialVerification::CSerialVerification ( CPlayer* pPlayer, SERIALVERIFICATIONCALLBACK pCallBack )
 {
     char buf[32] = {0};
     CLogger::LogPrintf ( "VERIFY: Querying %s\n", SERIAL_VERIFICATION_SERVER );
 
-    m_pCallBack = pCallBack;
-    m_pPlayer = pPlayer;
+    m_pCallBack   = pCallBack;
+    m_pPlayer     = pPlayer;
     m_ulStartTime = GetTickCount32();
-    m_bFinished = false;
+    m_bFinished   = false;
 
     if ( pPlayer->GetSerialUser().length() > 0 && pPlayer->GetSerial().length() > 0 )
     {
@@ -120,8 +128,11 @@ CSerialVerification::CSerialVerification ( CPlayer* pPlayer, SERIALVERIFICATIONC
         // Use CURL to perform the POST
         CNetHTTPDownloadManagerInterface * pHTTP = g_pNetServer->GetHTTPDownloadManager ();
         pHTTP->QueueFile ( SERIAL_VERIFICATION_URL, NULL, 0, strPostData.c_str (), this, ProgressCallback );
+
         if ( !pHTTP->IsDownloading () )
+        {
             pHTTP->StartDownloadingQueuedFiles ();
+        }
     }
     else
     {
@@ -139,7 +150,6 @@ void CSerialVerification::DoPulse ( void )
     if ( GetTickCount32() > m_ulStartTime + SERIAL_VERIFICATION_TIMEOUT && !m_bFinished )
     {
         m_pCallBack ( m_pPlayer, true, NULL );
-
         m_bFinished = true;
     }
 }
@@ -148,6 +158,7 @@ void CSerialVerification::ProgressCallback ( double nJustDownloaded, double nTot
 {
     #define HTTP_HEADER_SKIP    48
     CSerialVerification * pCall = (CSerialVerification*) pObject;
+
     if ( g_pGame->GetSerialManager ()->IsVerified ( pCall ) )
     {
         if ( bComplete )
@@ -155,31 +166,45 @@ void CSerialVerification::ProgressCallback ( double nJustDownloaded, double nTot
             if ( nDataLength > 0 )
             {
                 eSerialVerificationResult Result = static_cast < eSerialVerificationResult > ( szData[0] - HTTP_HEADER_SKIP );
+                
                 if ( Result >= 0 && Result < SERIAL_ERROR_LAST )
                 {
-                    if ( Result == SERIAL_ERROR_SUCCESS ) {
+                    if ( Result == SERIAL_ERROR_SUCCESS )
+                    {
                         CLogger::LogPrintf ( "VERIFY: Player was accepted by master server\n" );
+
                         // Store the community ID
                         pCall->GetPlayer ()->SetCommunityID ( &szData[2] );
+
                         // Complete the connect packet (allowed)
                         pCall->GetCallBack ()( pCall->GetPlayer (), true, NULL );
-                    } else {
+                    }
+                    else
+                    {
                         CLogger::LogPrintf ( "VERIFY: Player was rejected by master server (%s)\n",szSerialErrorMessages[Result]  );
+
                         // Complete the connect packet (rejected)
                         pCall->GetCallBack ()( pCall->GetPlayer (), false, szSerialErrorMessages[Result] );
                     }
+
                     // Delete ourselves and return
                     g_pGame->GetSerialManager ()->Remove ( pCall );
                     return;
                 }
             }
         }
+
+        /*
+         * TODO
+         */
         if ( bComplete || iError )
         {
             // An error occurred, let the player in
             CLogger::LogPrintf ( "VERIFY: Error with master server occurred, allowing player\n" );
+
             // Complete the connect packet (allowed)
             pCall->GetCallBack ()( pCall->GetPlayer (), true, NULL );
+
             // Delete ourselves
             g_pGame->GetSerialManager ()->Remove ( pCall );
         }

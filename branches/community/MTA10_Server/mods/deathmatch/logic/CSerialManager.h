@@ -19,13 +19,13 @@
 
 typedef void (*SERIALVERIFICATIONCALLBACK) ( CPlayer*, bool, const char* );
 
-#define SERIAL_VERIFICATION_TIMEOUT 3000
-#define SERIAL_VERIFICATION_SERVER  "dp3.community.mtasa.com"
-#define SERIAL_VERIFICATION_URL     "http://dp3.community.mtasa.com/core/1.0/server.php"
+#define SERIAL_VERIFICATION_TIMEOUT   3000
+#define SERIAL_VERIFICATION_SERVER    "178.21.18.232"
+#define SERIAL_VERIFICATION_URL       "http://178.21.18.232/test/verifyserial.php"
 
 enum eSerialVerificationResult
 {
-    SERIAL_ERROR_UNEXPECTED,
+    SERIAL_ERROR_UNEXPECTED = 0,
     SERIAL_ERROR_SUCCESS,
     SERIAL_ERROR_VERIFICATION_FAILED,
     SERIAL_ERROR_COMPUTER_USED,

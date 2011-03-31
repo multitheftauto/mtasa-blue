@@ -134,6 +134,9 @@ bool CCommunityLogin::OnButtonLoginClick ( CGUIElement* pElement )
 
 bool CCommunityLogin::OnButtonCancelClick ( CGUIElement* pElement )
 {
+    m_pEditUsername->SetText ( "" );
+    m_pEditPassword->SetText ( "" );
+
     SetVisible ( false );
     SetFrozen ( false );
 
@@ -143,6 +146,7 @@ bool CCommunityLogin::OnButtonCancelClick ( CGUIElement* pElement )
 void CCommunityLogin::OnLoginCallback ( bool bResult, char* szError, void *obj )
 {
     CCommunityLogin* pLogin = reinterpret_cast < CCommunityLogin* > ( obj );
+
     if ( !bResult )
     {
         pLogin->SetFrozen ( false );

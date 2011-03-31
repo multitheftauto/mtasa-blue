@@ -66,6 +66,11 @@ void CCommunity::Logout ( void )
     // Change GUI
     CLocalGUI::GetSingleton ().GetMainMenu()->ChangeCommunityState ( false, "" );
     CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->OnLoginStateChange ( false );
+
+    /*
+     * TODO: Client disconnect ?
+     *
+     */
 }
 
 
@@ -105,13 +110,13 @@ void CCommunity::DoPulse ( void )
 
         // Poll the HTTP client
         CHTTPBuffer buffer;
-        if ( m_HTTP.GetData ( buffer ) ) {
-
+        if ( m_HTTP.GetData ( buffer ) )
+        {
             char *szBuffer = buffer.GetData ();
             
             // Get the returned status
             Status = (eVerificationResult)(szBuffer[0] - 48);
-            m_bLoggedIn = Status == VERIFY_ERROR_SUCCESS;
+            m_bLoggedIn   = ( Status == VERIFY_ERROR_SUCCESS );
             m_ulStartTime = 0;
 
             // Change GUI
@@ -119,14 +124,24 @@ void CCommunity::DoPulse ( void )
             CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->OnLoginStateChange ( m_bLoggedIn );
 
             // Perform callback
-            if ( m_pCallback ) {
+            if ( m_pCallback )
+            {
                 m_pCallback ( m_bLoggedIn, szVerificationMessages[Status], m_pVerificationObject );
                 m_pCallback = NULL;
                 m_pVerificationObject = NULL;
             }
         }
         // Check for timeout
-        else if ( ( CClientTime::GetTime () - m_ulStartTime ) > VERIFICATION_DELAY ) {
+        else if ( ( CClientTime::GetTime () - m_ulStartTime ) > VERIFICATION_DELAY )
+        {
+            // Perform callback
+            if ( m_pCallback )
+            {
+                m_pCallback ( false, "Services currently unavaliable", m_pVerificationObject );
+                m_pCallback = NULL;
+                m_pVerificationObject = NULL;
+            }
+
             g_pCore->ShowMessageBox ( "Error", "Services currently unavaliable", MB_BUTTON_OK | MB_ICON_ERROR );
             Logout ();
         }
