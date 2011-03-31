@@ -22,10 +22,10 @@ class CCommunityLogin
 {
 public:
                             CCommunityLogin     ( void );
-    virtual                ~CCommunityLogin     ();
+    virtual                ~CCommunityLogin     ( void );
 
     void                    SetVisible          ( bool bVisible );
-    bool                    IsVisible           ( void );
+    bool                    IsVisible           ( void )              { return m_pWindow->IsVisible(); };
 
     void                    SetFrozen           ( bool bFrozen );
 

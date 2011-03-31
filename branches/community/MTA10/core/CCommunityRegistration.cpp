@@ -105,13 +105,13 @@ void CCommunityRegistration::CreateWindows ( void )
 
 CCommunityRegistration::~CCommunityRegistration ( void )
 {
-    delete m_pButtonRegister;
-    delete m_pButtonCancel;
-    delete m_pEditUsername;
-    delete m_pEditPassword;
-    delete m_pLabelUsername;
-    delete m_pLabelPassword;
-    delete m_pWindow;
+    SAFE_DELETE ( m_pButtonRegister );
+    SAFE_DELETE ( m_pButtonCancel );
+    SAFE_DELETE ( m_pEditUsername );
+    SAFE_DELETE ( m_pEditPassword );
+    SAFE_DELETE ( m_pLabelUsername );
+    SAFE_DELETE ( m_pLabelPassword );
+    SAFE_DELETE ( m_pWindow );
 }
 
 
@@ -167,8 +167,7 @@ void CCommunityRegistration::DoPulse ( void )
 
             if ( Result == REGISTRATION_ERROR_REQUEST )
             {
-                CGUI *pManager = g_pCore->GetGUI ();
-
+                // Validation code
                 // Sure we have it all right?
                 if ( uiBufferLength > 32 )
                 {
@@ -198,6 +197,7 @@ void CCommunityRegistration::DoPulse ( void )
             }
             else if ( Result == REGISTRATION_ERROR_SUCCESS )
             {
+                // Done
                 g_pCore->ShowMessageBox ( "Success", "Successfully registered!", MB_BUTTON_OK | MB_ICON_INFO );
 
                 m_pWindow->SetVisible ( false );
@@ -205,8 +205,9 @@ void CCommunityRegistration::DoPulse ( void )
                 m_strCommunityHash.clear ();
                 m_pImageCode->Clear ();
             }
-            else if ( Result == REGISTRATION_ERROR_ERROR )
+            else if ( Result == REGISTRATION_ERROR_ERROR || Result == REGISTRATION_ERROR_UNEXPECTED )
             {
+                // Error
                 if ( strlen ( &szBuffer[1] ) > 0 )
                     g_pCore->ShowMessageBox ( "Error", &szBuffer[1], MB_BUTTON_OK | MB_ICON_ERROR );
                 else
@@ -216,15 +217,16 @@ void CCommunityRegistration::DoPulse ( void )
             }
             else
             {
+                // Received weird stuff, maybe 404 ?
                 g_pCore->ShowMessageBox ( "Error", "Services currently unavaliable", MB_BUTTON_OK | MB_ICON_ERROR );
                 SetFrozen ( false );
             }
         }
         else if ( ( CClientTime::GetTime () - m_ulStartTime ) > REGISTRATION_DELAY )
         {
+            // Timed out
             g_pCore->ShowMessageBox ( "Error", "Services currently unavaliable", MB_BUTTON_OK | MB_ICON_ERROR );
             SetFrozen ( false );
-            // Timed out
             m_ulStartTime = 0;
         }
     }
@@ -234,15 +236,16 @@ void CCommunityRegistration::DoPulse ( void )
 bool CCommunityRegistration::OnButtonCancelClick ( CGUIElement* pElement )
 {
     m_pWindow->SetVisible ( false );
-
     SetFrozen ( false );
+
     m_strCommunityHash.clear ();
     m_pImageCode->Clear ();
-    m_pEditUsername->SetText("");
-    m_pEditEmail->SetText("");
-    m_pEditPassword->SetText("");
-    m_pEditConfirm->SetText("");
-    m_pEditCode->SetText("");
+    m_pEditUsername->SetText ( "" );
+    m_pEditEmail->SetText ( "" );
+    m_pEditPassword->SetText ( "" );
+    m_pEditConfirm->SetText ( "" );
+    m_pEditCode->SetText ( "" );
+
     return true;
 }
 
@@ -284,6 +287,7 @@ bool CCommunityRegistration::OnButtonRegisterClick ( CGUIElement* pElement )
             m_ulStartTime = CClientTime::GetTime ();
         }
     }
+
     return true;
 }
 
@@ -297,7 +301,9 @@ bool CCommunityRegistration::HashString ( const char* szString, std::string& str
         Hasher.Calculate ( szString, strlen ( szString ), HashedStr );
         Hasher.ConvertToHex ( HashedStr, szHashed );
         strHashString = szHashed;
+
         return true;
     }
+
     return false;
 }

@@ -70,14 +70,14 @@ CCommunityLogin::CCommunityLogin ( void )
 
 CCommunityLogin::~CCommunityLogin ( void )
 {
-    delete m_pButtonLogin;
-    delete m_pButtonCancel;
-    delete m_pEditUsername;
-    delete m_pEditPassword;
-    delete m_pLabelUsername;
-    delete m_pLabelPassword;
-    delete m_pLabelText;
-    delete m_pWindow;
+    SAFE_DELETE ( m_pButtonLogin );
+    SAFE_DELETE ( m_pButtonCancel );
+    SAFE_DELETE ( m_pEditUsername );
+    SAFE_DELETE ( m_pEditPassword );
+    SAFE_DELETE ( m_pLabelUsername );
+    SAFE_DELETE ( m_pLabelPassword );
+    SAFE_DELETE ( m_pLabelText );
+    SAFE_DELETE ( m_pWindow );
 }
 
 void CCommunityLogin::SetVisible ( bool bVisible )
@@ -88,11 +88,6 @@ void CCommunityLogin::SetVisible ( bool bVisible )
         SetFrozen ( false );
         m_pWindow->BringToFront ();
     }
-}
-
-bool CCommunityLogin::IsVisible ( void )
-{
-    return m_pWindow->IsVisible ();
 }
 
 void CCommunityLogin::SetFrozen ( bool bFrozen )
@@ -111,6 +106,7 @@ bool CCommunityLogin::OnButtonLoginClick ( CGUIElement* pElement )
         g_pCore->ShowMessageBox ( "Login Error", "Invalid username/password", MB_BUTTON_OK | MB_ICON_ERROR );
         return true;
     }
+
     SetFrozen ( true );
 
     // Hash password
@@ -129,6 +125,8 @@ bool CCommunityLogin::OnButtonLoginClick ( CGUIElement* pElement )
 
     CVARS_SET ( "community_username", m_pEditUsername->GetText () );
     CVARS_SET ( "community_password", strPassword );
+
+    // Call the community server
     pCommunity->Login ( OnLoginCallback, this );
 
     return true;
@@ -137,6 +135,8 @@ bool CCommunityLogin::OnButtonLoginClick ( CGUIElement* pElement )
 bool CCommunityLogin::OnButtonCancelClick ( CGUIElement* pElement )
 {
     SetVisible ( false );
+    SetFrozen ( false );
+
     return true;
 }
 

@@ -17,12 +17,12 @@ class CCommunityRegistration;
 #define __CCOMMUNITYREGISTRATION_H
 
 #define REGISTRATION_DELAY              9000
-#define REGISTRATION_URL                "http://dp3.community.mtasa.com/core/1.1/register.php"
+#define REGISTRATION_URL                "http://178.21.18.232/test/register.php"
 #define REGISTRATION_TEMP_FILE          "MTA\\temp.png"
 
 enum eRegistrationResult
 {
-    REGISTRATION_ERROR_UNEXPECTED,
+    REGISTRATION_ERROR_UNEXPECTED = 0,
     REGISTRATION_ERROR_SUCCESS,
     REGISTRATION_ERROR_REQUEST,
     REGISTRATION_ERROR_ERROR
@@ -36,25 +36,25 @@ public:
                             CCommunityRegistration  ( void );
     virtual                ~CCommunityRegistration  ( void );
 
-    void                    Open                ( void );
+    void                    Open                    ( void );
 
-    void                    SetVisible          ( bool bVisible );
-    bool                    IsVisible           ( void )                        { return m_pWindow->IsVisible(); };
+    void                    SetVisible              ( bool bVisible );
+    bool                    IsVisible               ( void )              { return m_pWindow->IsVisible(); };
 
-    void                    SetFrozen           ( bool bFrozen );
+    void                    SetFrozen               ( bool bFrozen );
 
-    void                    DoPulse             ( void );
+    void                    DoPulse                 ( void );
 
-    bool                    HashString          ( const char* szString, std::string &strHashString );
+    bool                    HashString              ( const char* szString, std::string &strHashString );
 
 protected:
-    void                    CreateWindows       ( void );
+    void                    CreateWindows           ( void );
 
 private:
 
     // GUI elements
-    bool                    OnButtonRegisterClick       ( CGUIElement* pElement );
-    bool                    OnButtonCancelClick         ( CGUIElement* pElement );
+    bool                    OnButtonRegisterClick   ( CGUIElement* pElement );
+    bool                    OnButtonCancelClick     ( CGUIElement* pElement );
 
     CGUIWindow*             m_pWindow;
 
