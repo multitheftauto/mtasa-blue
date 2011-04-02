@@ -89,7 +89,7 @@ void CGUIGridList_Impl::RemoveColumn ( unsigned int uiColumn )
 {
     try
     { 
-        reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> removeColumnWithID ( uiColumn );
+        reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> removeColumn ( GetColumnIndex ( uiColumn ) );
     }
     catch ( CEGUI::Exception ) {}
 }
@@ -107,14 +107,14 @@ unsigned int CGUIGridList_Impl::AddColumn ( const char* szTitle, float fWidth )
     reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getHeaderSegmentForColumn ( iColumnIndex ).setFont ( "default-small" );
 
     // Return the id (zero-based)
-    return ( hUniqueHandle );
+    return iColumnIndex + 1;
 }
 
 void CGUIGridList_Impl::SetColumnWidth ( int hColumn, float fWidth, bool bRelative )
 {
     try
     {
-        reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setColumnHeaderWidth ( hColumn, fWidth , bRelative );
+        reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setColumnHeaderWidth ( GetColumnIndex ( hColumn ), fWidth , bRelative );
     }
     catch ( CEGUI::Exception )
     {}
@@ -251,7 +251,7 @@ char* CGUIGridList_Impl::GetItemText ( int iRow, int hColumn )
             {
                 unsigned char ucSpacerSize = (unsigned char)(strlen ( CGUIGRIDLIST_SPACER ));
 
-                if ( hColumn == 1 ) {
+                if ( GetColumnIndex ( hColumn ) == 0 ) {
                     // Make sure there is a spacer to skip
                     if ( strncmp ( szRet, CGUIGRIDLIST_SPACER, strlen ( CGUIGRIDLIST_SPACER ) ) == 0 )
                         szRet += ucSpacerSize;
@@ -322,7 +322,7 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
                 pItem->SetFont ( "default-normal" );
                 pItem->SetDisabled ( false );
 
-                if ( hColumn == 1 )
+                if ( GetColumnIndex ( hColumn ) == 0 )
                 {
                     // Enable some spacing on regular items, if this is the first item
                     
@@ -368,7 +368,7 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
                 pItem->SetFont ( "default-bold-small" );
                 pItem->SetDisabled ( true );
             }
-            else if ( hColumn == 1 )
+            else if ( GetColumnIndex ( hColumn ) == 0 )
             {
                 // Enable some spacing on regular items, if this is the first item
                 char szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH];
@@ -452,7 +452,7 @@ bool CGUIGridList_Impl::IsColumnSegmentSizingEnabled ( int hColumn )
 {
     try
     {
-        return  reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> isUserColumnSegmentSizingEnabled ( hColumn );
+        return  reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> isUserColumnSegmentSizingEnabled ( GetColumnIndex ( hColumn ) );
     }
     catch ( CEGUI::Exception )
     {
@@ -485,6 +485,7 @@ void CGUIGridList_Impl::SetItemImage ( int iRow, int hColumn, CGUIStaticImage* p
 
 int CGUIGridList_Impl::GetColumnIndex ( int hColumn )
 {
+    /*
     try
     {
         // non zero-based
@@ -494,6 +495,8 @@ int CGUIGridList_Impl::GetColumnIndex ( int hColumn )
     {
         return -1;
     }
+    */
+    return hColumn - 1;
 }
 
 
@@ -624,7 +627,7 @@ void CGUIGridList_Impl::SetSelectedItem ( int iRow, int hColumn, bool bReset )
 
 void CGUIGridList_Impl::Sort ( unsigned int uiColumn, SortDirection direction )
 {
-    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortColumn( uiColumn );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortColumn( GetColumnIndex ( uiColumn ) );
 
     switch ( direction )
     {
@@ -642,7 +645,7 @@ void CGUIGridList_Impl::Sort ( unsigned int uiColumn, SortDirection direction )
 
 void CGUIGridList_Impl::GetSort ( unsigned int& uiColumn, SortDirection& direction )
 {
-    uiColumn = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getSortColumn();
+    uiColumn = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getSortColumn() + 1;
 
     switch ( reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getSortDirection() )
     {

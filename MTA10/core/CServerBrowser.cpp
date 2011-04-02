@@ -251,16 +251,16 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_hGame [ type ] = m_pServerList [ type ]->AddColumn ( "Gamemode", 0.2f );
 
     // NB. SetColumnWidth seems to start from 0
-    m_pServerList [ type ]->SetColumnWidth ( m_hVersion [ type ]-1, 25, false );
-    m_pServerList [ type ]->SetColumnWidth ( m_hLocked [ type ]-1, 16, false );
-    m_pServerList [ type ]->SetColumnWidth ( m_hPlayers [ type ]-1, 70, false );
-    m_pServerList [ type ]->SetColumnWidth ( m_hPing [ type ]-1, 35, false );
+    m_pServerList [ type ]->SetColumnWidth ( m_hVersion [ type ], 25, false );
+    m_pServerList [ type ]->SetColumnWidth ( m_hLocked [ type ], 16, false );
+    m_pServerList [ type ]->SetColumnWidth ( m_hPlayers [ type ], 70, false );
+    m_pServerList [ type ]->SetColumnWidth ( m_hPing [ type ], 35, false );
 
     // We give Name and Gamemode 65% and 35% of the remaining length respectively
     float fRemainingWidth = fWidth - 25 - 16 - 70 - 35 - 50; // All the fixed sizes plus 50 for the scrollbar
     
-    m_pServerList [ type ]->SetColumnWidth ( m_hGame [ type ]-1, fRemainingWidth*0.35, false );
-    m_pServerList [ type ]->SetColumnWidth ( m_hName [ type ]-1, fRemainingWidth*0.65, false );
+    m_pServerList [ type ]->SetColumnWidth ( m_hGame [ type ], fRemainingWidth*0.35, false );
+    m_pServerList [ type ]->SetColumnWidth ( m_hName [ type ], fRemainingWidth*0.65, false );
 
     // Server player list;
 	fX = fX + fWidth;
@@ -550,11 +550,11 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
 
     if ( bIncludeOtherVersions )
     {
-        m_pServerList [ type ]->SetColumnWidth ( 0, 34, false );
+        m_pServerList [ type ]->SetColumnWidth ( 1, 34, false );
     }
     else
     {
-        m_pServerList [ type ]->SetColumnWidth ( 0, 0.03f, true );
+        m_pServerList [ type ]->SetColumnWidth ( 1, 0.03f, true );
     }
 
     // Re-enable sorting
