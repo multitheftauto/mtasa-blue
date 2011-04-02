@@ -195,8 +195,10 @@ bool CMainConfig::Load ( const char* szFilename )
         std::vector < SString > tagACList;
         strDisbaleAC.Split ( ",", tagACList );
         for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
-            if ( (*it).length () )
+            if ( isdigit(***it) )
                 MapSet ( m_DisableACMap, *it, 1 );
+
+        g_pNetServer->ResetStub ( 'delt', &m_DisableACMap );
     }
 
     {

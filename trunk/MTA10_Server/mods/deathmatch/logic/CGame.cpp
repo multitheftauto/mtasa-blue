@@ -20,7 +20,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerfStatManager.h"
 #include "../utils/COpenPortsTester.h"
 
 #define MAX_KEYSYNC_DISTANCE 400.0f
@@ -386,7 +385,7 @@ void CGame::DoPulse ( void )
     // Delete all items requested
     m_ElementDeleter.DoDeleteAll ();
 
-    GetPerfStatManager ()->DoPulse ();
+    CPerfStatManager::GetSingleton ()->DoPulse ();
 
     PulseMasterServerAnnounce ();
 
@@ -2997,8 +2996,7 @@ void CGame::Packet_PlayerTransgression ( CPlayerTransgressionPacket & Packet )
         // If ac# not disabled on this server, do a kick
         if ( !g_pGame->GetConfig ()->IsDisableAC ( SString ( "%d", Packet.m_uiLevel ) ) )
         {
-            SString strMessageCombo ( "AC #%d %s", Packet.m_uiLevel, Packet.m_strMessage.c_str () );
-            CStaticFunctionDefinitions::KickPlayer ( pPlayer, NULL, strMessageCombo );
+            CStaticFunctionDefinitions::KickPlayer ( pPlayer, NULL, Packet.m_strMessage );
         }
     }
 }

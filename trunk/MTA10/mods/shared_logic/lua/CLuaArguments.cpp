@@ -16,6 +16,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define DECLARE_PROFILER_SECTION_CLuaArguments
+#include "profiler/SharedUtil.Profiler.h"
 
 using namespace std;
 
@@ -245,7 +247,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
             lua_pop ( luaVM, 1 );
     }
         
-    GetClientPerfStatManager ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.ToInt () ), GetTimeUs() - startTime );
+    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.m_iFunction ), GetTimeUs() - startTime );
     return true;
 }
 
@@ -299,7 +301,7 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
             lua_pop ( luaVM, 1 );
     }
         
-    GetClientPerfStatManager ()->UpdateLuaTiming ( pLuaMain, szFunction, GetTimeUs() - startTime );
+    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pLuaMain, szFunction, GetTimeUs() - startTime );
     return true;
 }
 

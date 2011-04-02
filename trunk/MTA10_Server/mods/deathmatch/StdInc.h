@@ -190,6 +190,7 @@
 #include "CPed.h"
 #include "CPedManager.h"
 #include "CPedSync.h"
+#include "CPerfStatManager.h"
 #include "CPerPlayerEntity.h"
 #include "CPickup.h"
 #include "CPickupManager.h"

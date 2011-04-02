@@ -14,6 +14,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define DECLARE_PROFILER_SECTION_CLuaMain
+#include "profiler/SharedUtil.Profiler.h"
 
 using std::list;
 
@@ -65,7 +67,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
     
     m_pResource = pResourceOwner;
 
-    GetClientPerfStatManager ()->OnLuaMainCreate ( this );
+    CClientPerfStatLuaMemory::GetSingleton ()->OnLuaMainCreate ( this );
+    CClientPerfStatLuaTiming::GetSingleton ()->OnLuaMainCreate ( this );
 }
 
 
@@ -78,7 +81,8 @@ CLuaMain::~CLuaMain ( void )
     // Delete the timer manager
     delete m_pLuaTimerManager;
 
-    GetClientPerfStatManager ()->OnLuaMainDestroy ( this );
+    CClientPerfStatLuaMemory::GetSingleton ()->OnLuaMainDestroy ( this );
+    CClientPerfStatLuaTiming::GetSingleton ()->OnLuaMainDestroy ( this );
 }
 
 bool CLuaMain::BeingDeleted ( void )

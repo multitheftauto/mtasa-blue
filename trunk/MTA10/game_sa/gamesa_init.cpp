@@ -11,6 +11,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define DECLARE_PROFILER_SECTION_gamesa_init
+#include "profiler/SharedUtil.Profiler.h"
 
 CGameSA* pGame = NULL;
 CNet* g_pNet = NULL;
@@ -38,10 +40,10 @@ CGame * GetGameInterface( CCoreInterface* pCore )
 
 void MemSet ( void* dwDest, int cValue, uint uiAmount )
 {
-    g_pNet->ResetStub ( 1297311092, dwDest, cValue, uiAmount );
+    memset ( dwDest, cValue, uiAmount );
 }
 
 void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
 {
-    g_pNet->ResetStub ( 1296265337, dwDest, dwSrc, uiAmount );
+    memcpy ( dwDest, dwSrc, uiAmount );
 }
