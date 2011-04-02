@@ -63,6 +63,7 @@ public:
     int                                 GetSelectedItemRow      ( void );
     int                                 GetSelectedItemColumn   ( void );
     int                                 GetRowCount             ( void );
+    int                                 GetColumnCount          ( void );
 
     bool                                IsColumnSegmentSizingEnabled     ( int hColumn );
     void                                SetColumnSegmentSizingEnabled    ( int hColumn, bool bEnabled );

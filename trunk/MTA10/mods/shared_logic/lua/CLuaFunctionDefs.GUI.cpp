@@ -2077,6 +2077,27 @@ int CLuaFunctionDefs::GUIGridListGetRowCount ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GUIGridListGetColumnCount ( lua_State* luaVM )
+{
+    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
+    {       
+        CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
+        if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
+        {
+            int iColumnCount = static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () ) -> GetColumnCount ();
+            lua_pushnumber ( luaVM, iColumnCount );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "guiGridListGetColumnCount", "gui-element", 1 );
+    }
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GUIEditSetReadOnly ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )

@@ -77,6 +77,7 @@ public:
     virtual int                     GetSelectedItemRow      ( void ) = 0;
     virtual int                     GetSelectedItemColumn   ( void ) = 0;
     virtual int                     GetRowCount             ( void ) = 0;
+    virtual int                     GetColumnCount          ( void ) = 0;
 
     virtual void                    Sort                    ( unsigned int uiColumn, SortDirection direction ) = 0;
     virtual void                    GetSort                 ( unsigned int& uiColumn, SortDirection& direction ) = 0;
