@@ -377,7 +377,7 @@ eHandlingTypes CHandlingManagerSA::GetHandlingID ( eVehicleTypes eModel )
 void CHandlingManagerSA::InitializeDefaultHandlings ( void )
 {
     // Reset
-    MemSet ( m_OriginalHandlingData, 0, sizeof ( m_OriginalHandlingData ) );
+    MemSetFast ( m_OriginalHandlingData, 0, sizeof ( m_OriginalHandlingData ) );
 
     // NB: Don't waste your time changing this manually. Use the dumping code
     //     commented out at the bottom :)

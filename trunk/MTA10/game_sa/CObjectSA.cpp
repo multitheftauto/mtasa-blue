@@ -52,7 +52,7 @@ CObjectSA::CObjectSA( DWORD dwModel )
 
     DWORD dwFunc = 0x538090; // CFileLoader__LoadObjectInstance
     CFileObjectInstance fileLoader;
-    MemSet (&fileLoader, 0, sizeof(CFileObjectInstance));
+    MemSetFast (&fileLoader, 0, sizeof(CFileObjectInstance));
     fileLoader.modelId = dwModel;
     fileLoader.rr = 1;
     fileLoader.areaNumber = 0;
@@ -70,8 +70,8 @@ CObjectSA::CObjectSA( DWORD dwModel )
 
     this->SetInterface((CEntitySAInterface*)dwThis);
     
-    MemPut < DWORD > ( 0xBCC0E0, dwThis );  //     *(DWORD *)(0xBCC0E0) = dwThis;
-    MemPut < DWORD > ( 0xBCC0D8, 1 );  //     *(DWORD *)0xBCC0D8 = 1;
+    MemPutFast < DWORD > ( 0xBCC0E0, dwThis );
+    MemPutFast < DWORD > ( 0xBCC0D8, 1 );
 
     dwFunc = 0x404DE0; // CIplStore__SetupRelatedIpls
     DWORD dwTemp = 0;
@@ -142,7 +142,7 @@ CObjectSA::CObjectSA( DWORD dwModel )
         // Setup some flags
         this->BeingDeleted = FALSE;
         this->DoNotRemoveFromGame = FALSE;
-        MemPut < BYTE > ( dwObjectPtr + 316, 6 );  //         *(BYTE *)(dwObjectPtr + 316) = 6;
+        MemPutFast < BYTE > ( dwObjectPtr + 316, 6 );
         m_pInterface->bStreamingDontDelete = true;
     }
     else
@@ -253,7 +253,7 @@ void CObjectSA::SetScale( float faScale )
 
 void CObjectSA::SetHealth ( float fHealth )
 {
-    MemPut < float > ( (DWORD)this->GetInterface () + 340, fHealth );  //     *(float *)( (DWORD)this->GetInterface () + 340 ) = fHealth;
+    MemPutFast < float > ( (DWORD)this->GetInterface () + 340, fHealth );
 }
 
 float CObjectSA::GetHealth ( void )

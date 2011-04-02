@@ -17,39 +17,39 @@
 CControllerState * CPadSA::GetCurrentControllerState(CControllerState * ControllerState)
 {
     DEBUG_TRACE("CControllerState * CPadSA::GetCurrentControllerState(CControllerState * ControllerState)");
-    MemCpy (ControllerState, &this->internalInterface->NewState, sizeof(CControllerState));
+    MemCpyFast (ControllerState, &this->internalInterface->NewState, sizeof(CControllerState));
     return ControllerState;
 }
 
 CControllerState * CPadSA::GetLastControllerState(CControllerState * ControllerState)
 {
     DEBUG_TRACE("CControllerState * CPadSA::GetLastControllerState(CControllerState * ControllerState)");
-    MemCpy (ControllerState, &this->internalInterface->OldState, sizeof(CControllerState));
+    MemCpyFast (ControllerState, &this->internalInterface->OldState, sizeof(CControllerState));
     return ControllerState;
 }
 
 VOID CPadSA::SetCurrentControllerState(CControllerState * ControllerState)
 {
     DEBUG_TRACE("VOID CPadSA::SetCurrentControllerState(CControllerState * ControllerState)");
-    MemCpy (&this->internalInterface->NewState, ControllerState, sizeof(CControllerState));
+    MemCpyFast (&this->internalInterface->NewState, ControllerState, sizeof(CControllerState));
 }
 
 VOID CPadSA::SetLastControllerState(CControllerState * ControllerState)
 {
     DEBUG_TRACE("VOID CPadSA::SetLastControllerState(CControllerState * ControllerState)");
-    MemCpy (&this->internalInterface->OldState, ControllerState, sizeof(CControllerState));
+    MemCpyFast (&this->internalInterface->OldState, ControllerState, sizeof(CControllerState));
 }
 
 VOID CPadSA::Store()
 {
     DEBUG_TRACE("VOID CPadSA::Store()");
-    MemCpy (&this->StoredPad, this->internalInterface, sizeof(CPadSAInterface));
+    MemCpyFast (&this->StoredPad, this->internalInterface, sizeof(CPadSAInterface));
 }
 
 VOID CPadSA::Restore()
 {
     DEBUG_TRACE("VOID CPadSA::Restore()");
-    MemCpy (this->internalInterface, &this->StoredPad, sizeof(CPadSAInterface));
+    MemCpyFast (this->internalInterface, &this->StoredPad, sizeof(CPadSAInterface));
 }
 
 bool CPadSA::IsEnabled ( void )
@@ -61,9 +61,9 @@ bool CPadSA::IsEnabled ( void )
 VOID CPadSA::Disable( bool bDisable )
 {
     if ( bDisable )
-        MemPut < BYTE > ( FUNC_CPad_UpdatePads, 0xC3 );  //         *(BYTE *)FUNC_CPad_UpdatePads = 0xC3;
+        MemPut < BYTE > ( FUNC_CPad_UpdatePads, 0xC3 );
     else
-        MemPut < BYTE > ( FUNC_CPad_UpdatePads, 0x56 );  //         *(BYTE *)FUNC_CPad_UpdatePads = 0x56;
+        MemPut < BYTE > ( FUNC_CPad_UpdatePads, 0x56 );
 
     //this->internalInterface->DisablePlayerControls = bDisable;
 }

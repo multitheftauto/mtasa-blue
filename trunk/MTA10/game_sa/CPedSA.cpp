@@ -26,7 +26,7 @@ CPedSA::CPedSA (  ) :
 {
     DEBUG_TRACE("CPedSA::CPedSA(  )");
 
-    MemSet ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
+    MemSetFast ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
 }
 
 CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
@@ -36,7 +36,7 @@ CPedSA::CPedSA( CPedSAInterface * pPedInterface ) :
 {
     DEBUG_TRACE("CPedSA::CPedSA( CPedSAInterface * pedInterface )");
 
-    MemSet ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
+    MemSetFast ( this->m_pWeapons, 0, sizeof ( CWeaponSA* ) * WEAPONSLOT_MAX );
 }
 
 VOID CPedSA::SetInterface( CEntitySAInterface * intInterface )
@@ -824,15 +824,15 @@ void CPedSA::SetFootBlood ( unsigned int uiFootBlood )
     if (uiFootBlood > 0)
     {
         // Make sure the foot blood flag is activated
-        MemOr < unsigned short > ( dwThis + 0x46F, 16 );  //         *(unsigned short*)(dwThis + 0x46F) |= 16;
+        MemOrFast < unsigned short > ( dwThis + 0x46F, 16 );
     }
     else if (*(unsigned short*)(dwThis + 0x46F) & 16)
     {
         // If the foot blood flag is activated, deactivate it
-        MemSub < unsigned short > ( dwThis + 0x46F, 16 );  //         *(unsigned short*)(dwThis + 0x46F) -= 16;
+        MemSubFast < unsigned short > ( dwThis + 0x46F, 16 );
     }
     // Set the amount of foot blood
-    MemPut < unsigned int > ( dwThis + 0x750, uiFootBlood );  //     *(unsigned int*)(dwThis + 0x750) = uiFootBlood;
+    MemPutFast < unsigned int > ( dwThis + 0x750, uiFootBlood );
 }
 
 unsigned int CPedSA::GetFootBlood ( void )
@@ -1378,7 +1378,7 @@ CEntity * CPedSA::GetObjectiveEntity (  )
 
 void CPedSA::GetObjectiveVector ( CVector * vector )
 {
-    MemCpy (vector,&(((CPedSAInterface *)this->GetInterface())->ObjectiveVector),sizeof(CVector));
+    MemCpyFast (vector,&(((CPedSAInterface *)this->GetInterface())->ObjectiveVector),sizeof(CVector));
 }
 */
 /*  CPedSAInterface * pedInterface = ((CPedSAInterface *)this->GetInterface());
@@ -1567,7 +1567,7 @@ void CPedSA::WarpPedIntoCar ( CVehicle * vehicle )
     DWORD dwFunc = 0x6470E0; // CTaskSimpleCarSetPedInAsDriver
     DWORD dwVehicle = (DWORD)((CVehicleSA *)vehicle)->GetInterface();
     DWORD dwTask[50];
-    MemSet (dwTask, 0, 50);
+    MemSetFast (dwTask, 0, 50);
     _asm
     {
         pushad
@@ -1636,7 +1636,7 @@ bool CPedSA::IsInVehicle()
 /*
 void CPedSA::SetAsActivePed()
 {
-    MemPut < DWORD > ( VAR_LocalPlayer, (DWORD)this->GetInterface() );  //     *(DWORD *)VAR_LocalPlayer = (DWORD)this->GetInterface();
+    MemPut < DWORD > ( VAR_LocalPlayer, (DWORD)this->GetInterface() );
 }
 
 void CPedSA::SetPedState(ePedState PedState)

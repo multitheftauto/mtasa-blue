@@ -135,7 +135,7 @@ CPickup * CPickupsSA::CreatePickup(CVector * position, DWORD ModelIndex, ePickup
     // All pickups get generated at the coordinates that we get in from the
     // script. This way the level designers can create them floating in mid-air
     pickup->SetPosition(position);
-    //MemCpy (&Pickups[FreeSlot]->GetInterface()->position,position, sizeof(CVector));
+    //MemCpyFast (&Pickups[FreeSlot]->GetInterface()->position,position, sizeof(CVector));
     // Pickups[FreeSlot]->GetInterface()->PUCoors = CVector(Coors.x, Coors.y, 0.7f + CWorld::FindGroundZFor3DCoord(Coors.x, Coors.y, Coors.z + 1.0f));
 
     pickup->GiveUsAPickUpObject();
@@ -152,11 +152,11 @@ void CPickupsSA::DisablePickupProcessing ( bool bDisabled )
     if ( bDisabled && !byteOriginal )
     {
         byteOriginal = *(BYTE *)FUNC_CPickups__Update;
-        MemPut < BYTE > ( FUNC_CPickups__Update, 0xC3 );  //         *(BYTE *)FUNC_CPickups__Update = 0xC3;
+        MemPut < BYTE > ( FUNC_CPickups__Update, 0xC3 );
     }
     else if ( !bDisabled && byteOriginal )
     {
-        MemPut < BYTE > ( FUNC_CPickups__Update, byteOriginal );  //         *(BYTE *)FUNC_CPickups__Update = byteOriginal;
+        MemPut < BYTE > ( FUNC_CPickups__Update, byteOriginal );
         byteOriginal = 0;
     }
 }

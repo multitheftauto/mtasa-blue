@@ -16,10 +16,10 @@
 
 CPedModelInfoSAInterface::CPedModelInfoSAInterface ( void )
 {
-    MemSet ( this, 0, sizeof ( CPedModelInfoSAInterface ) );
+    MemSetFast ( this, 0, sizeof ( CPedModelInfoSAInterface ) );
     VFTBL = ( CBaseModelInfo_SA_VTBL * ) VAR_CPedModelInfo_VTBL;
     pColModel = ( CColModelSAInterface * ) VAR_CTempColModels_ModelPed1;
-    MemPut < DWORD > ( &pad, 0xFFFFFFFF );  //     * ( DWORD * ) &pad = 0xFFFFFFFF;
+    MemPutFast < DWORD > ( &pad, 0xFFFFFFFF );
 }
 
 CPedModelInfoSA::CPedModelInfoSA ( void ) : CModelInfoSA ()

@@ -207,14 +207,14 @@ CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )
     CMatrix_Padded * pCamMatrix = &this->GetInterface()->m_cameraMatrix; // ->Placeable.matrix;
     if ( pCamMatrix )
     {
-        MemCpy (&matrix->vFront,     &pCamMatrix->vFront,    sizeof(CVector));
-        MemCpy (&matrix->vPos,           &pCamMatrix->vPos,          sizeof(CVector));
-        MemCpy (&matrix->vUp,            &pCamMatrix->vUp,           sizeof(CVector));
-        MemCpy (&matrix->vRight,         &pCamMatrix->vRight,            sizeof(CVector));   
+        MemCpyFast (&matrix->vFront,     &pCamMatrix->vFront,    sizeof(CVector));
+        MemCpyFast (&matrix->vPos,           &pCamMatrix->vPos,          sizeof(CVector));
+        MemCpyFast (&matrix->vUp,            &pCamMatrix->vUp,           sizeof(CVector));
+        MemCpyFast (&matrix->vRight,         &pCamMatrix->vRight,            sizeof(CVector));   
     }
     else
     {
-        MemSet (matrix, 0, sizeof(CMatrix));
+        MemSetFast (matrix, 0, sizeof(CMatrix));
     }
     return matrix;
 }
@@ -225,10 +225,10 @@ VOID CCameraSA::SetMatrix ( CMatrix * matrix )
     CMatrix_Padded * pCamMatrix = this->GetInterface()->Placeable.matrix;
     if ( pCamMatrix )
     {
-        MemCpy (&pCamMatrix->vFront,     &matrix->vFront,    sizeof(CVector));
-        MemCpy (&pCamMatrix->vPos,           &matrix->vPos,          sizeof(CVector));
-        MemCpy (&pCamMatrix->vUp,            &matrix->vUp,           sizeof(CVector));
-        MemCpy (&pCamMatrix->vRight,         &matrix->vRight,            sizeof(CVector));
+        MemCpyFast (&pCamMatrix->vFront,     &matrix->vFront,    sizeof(CVector));
+        MemCpyFast (&pCamMatrix->vPos,           &matrix->vPos,          sizeof(CVector));
+        MemCpyFast (&pCamMatrix->vUp,            &matrix->vUp,           sizeof(CVector));
+        MemCpyFast (&pCamMatrix->vRight,         &matrix->vRight,            sizeof(CVector));
     }   
 }
 
@@ -521,14 +521,14 @@ void _cdecl DoCameraCollisionDetectionPokes ()
 {
     if ( !bCameraClipObjects )
     {
-        MemPut < char > ( VAR_CameraClipDynamicObjects, 0 );  //         *(char*)VAR_CameraClipDynamicObjects = 0;
-        MemPut < char > ( VAR_CameraClipStaticObjects, 0 );  //         *(char*)VAR_CameraClipStaticObjects = 0;
+        MemPutFast < char > ( VAR_CameraClipDynamicObjects, 0 );
+        MemPutFast < char > ( VAR_CameraClipStaticObjects, 0 );
     }
     else
-        MemPut < char > ( VAR_CameraClipStaticObjects, 1 );  //         *(char*)VAR_CameraClipStaticObjects = 1;
+        MemPutFast < char > ( VAR_CameraClipStaticObjects, 1 );
 
     if ( !bCameraClipVehicles )
-        MemPut < char > ( VAR_CameraClipVehicles, 0 );  //         *(char*)VAR_CameraClipVehicles = 0;
+        MemPutFast < char > ( VAR_CameraClipVehicles, 0 );
 }
 
 void _declspec(naked) HOOK_Camera_CollisionDetection ()
@@ -553,5 +553,5 @@ BYTE CCameraSA::GetCameraView ( void )
 
 VOID CCameraSA::SetCameraView ( BYTE dwCamMode )
 {
-    MemPut < BYTE > ( VAR_VehicleCameraView, dwCamMode );  //     *(BYTE *)VAR_VehicleCameraView = dwCamMode;
+    MemPut < BYTE > ( VAR_VehicleCameraView, dwCamMode );
 }
