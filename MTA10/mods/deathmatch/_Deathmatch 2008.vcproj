@@ -377,6 +377,22 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CClientPerfStat.LibMemory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CClientPerfStat.LuaMemory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CClientPerfStat.LuaTiming.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CClientPerfStat.PacketUsage.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CClientPerfStatManager.cpp"
 					>
 				</File>
@@ -1292,6 +1308,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CClientPerfStatManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CClientPerfStatModule.h"
 					>
 				</File>
 				<File

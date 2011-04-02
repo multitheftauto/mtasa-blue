@@ -842,7 +842,7 @@ void CClientGame::DoPulsePostFrame ( void )
         }
         #endif
 
-        GetClientPerfStatManager ()->DoPulse ();
+        CClientPerfStatManager::GetSingleton ()->DoPulse ();
     }
 
     // If we are not minimized we do the pulsing here
@@ -880,33 +880,49 @@ void CClientGame::DoPulses ( void )
     if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED && GetTickCount64_ () - m_llLastTransgressionTime > 60000 )
     {
         uint uiLevel = 0;
+        uint uiInform = 0;
         SString strMessage;
 
         // Is the player a cheater?
         if ( !m_pManager->GetAntiCheat ().PerformChecks () )
         {
             uiLevel = 1;
+            uiInform = 2;
         }
         else
         {
             strMessage = g_pNet->GetNextBuffer ();
             if ( strMessage.length () )
+            {
                 uiLevel = atoi ( strMessage.SplitLeft ( ":", &strMessage ) );
+                uiInform = atoi ( strMessage.SplitLeft ( ":", &strMessage ) );
+            }
         }
 
         // Send message to the server
         if ( uiLevel )
         {
-            SString strMessageCombo  = SString( "AC #%d %s", uiLevel, strMessage.c_str () ).TrimEnd ( " " );
+            SString strPrefix = ( uiInform == 2 ) ? "AC" : ( uiInform == 1 ) ? "VF" : "SD";
+            SString strMessageCombo = SString( "%s #%d %s", *strPrefix, uiLevel, strMessage.c_str () ).TrimEnd ( " " );
             m_llLastTransgressionTime = GetTickCount64_ ();
-            AddReportLog ( 3100, strMessageCombo );
+            AddReportLog ( 3100, strMessageCombo + SString ( " (%d)", uiInform ) );
 
-            // Inform the server
-            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-            pBitStream->Write ( uiLevel );
-            pBitStream->WriteString ( strMessage );
-            g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
-            g_pNet->DeallocateNetBitStream ( pBitStream );
+            if ( uiInform > 0 )
+            {
+                // The server will use the whole message as supplied here
+                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                pBitStream->Write ( uiLevel );
+                pBitStream->WriteString ( strMessageCombo );
+                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
+                g_pNet->DeallocateNetBitStream ( pBitStream );
+            }
+            else
+            {
+                // Otherwise, disconnect here
+                g_pCore->ShowMessageBox ( "Error", SString ( "You were kicked from the game (" + strMessageCombo + ")" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->GetModManager ()->RequestUnload ();
+                return;
+            }
         }
     }
 
