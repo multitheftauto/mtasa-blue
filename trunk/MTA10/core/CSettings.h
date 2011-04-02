@@ -153,12 +153,15 @@ protected:
     CGUIComboBox*       m_pAsyncCombo;
     CGUILabel*          m_pAudioGeneralLabel;
     CGUILabel*          m_pUserTrackGeneralLabel;
-    CGUILabel*          m_pSingleDownloadLabelInfo;
-    CGUILabel*          m_pSingleDownloadLabel;
-    CGUIComboBox*       m_pSingleDownloadCombo;
     CGUILabel*          m_pBrowserSpeedLabelInfo;
     CGUILabel*          m_pBrowserSpeedLabel;
     CGUIComboBox*       m_pBrowserSpeedCombo;
+    CGUILabel*          m_pSingleDownloadLabelInfo;
+    CGUILabel*          m_pSingleDownloadLabel;
+    CGUIComboBox*       m_pSingleDownloadCombo;
+    CGUILabel*          m_pCodePathLabelInfo;
+    CGUILabel*          m_pCodePathLabel;
+    CGUIComboBox*       m_pCodePathCombo;
     CGUILabel*          m_pUpdateBuildTypeLabelInfo;
     CGUILabel*          m_pUpdateBuildTypeLabel;
     CGUIComboBox*       m_pUpdateBuildTypeCombo;

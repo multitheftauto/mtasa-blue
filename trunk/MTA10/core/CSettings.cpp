@@ -796,7 +796,25 @@ CSettings::CSettings ( void )
     m_pSingleDownloadLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
     m_pSingleDownloadLabelInfo->SetFont ( "default-bold-small" );
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 40;
+    vecTemp.fY += 40-4;
+
+    // Code path
+    m_pCodePathLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Code path:" ) );
+    m_pCodePathLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pCodePathLabel->AutoSize ( m_pCodePathLabel->GetText ().c_str () );
+
+    m_pCodePathCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pCodePathCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
+    m_pCodePathCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pCodePathCombo->AddItem ( "Default" )->SetData ( (void*)0 );
+    m_pCodePathCombo->AddItem ( "Alternate" )->SetData ( (void*)1 );
+    m_pCodePathCombo->SetReadOnly ( true );
+
+    m_pCodePathLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental crash reduction." ) );
+    m_pCodePathLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
+    m_pCodePathLabelInfo->SetFont ( "default-bold-small" );
+    m_pCodePathLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
+    vecTemp.fY += 35;
 
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Auto updater" ) );
@@ -1846,6 +1864,11 @@ void CSettings::LoadData ( void )
     if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( "Default" );
     else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( "On" );
 
+    // Code path
+    CVARS_GET ( "code_path", iVar );
+    if ( iVar == 0 ) m_pCodePathCombo->SetText ( "Default" );
+    else if ( iVar == 1 ) m_pCodePathCombo->SetText ( "Alternate" );
+
     // Update build type
     CVARS_GET ( "update_build_type", iVar );
     if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( "Default" );
@@ -2057,6 +2080,13 @@ void CSettings::SaveData ( void )
     {
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "single_download", iSelected );
+    }
+
+    // Code path
+    if ( CGUIListItem* pSelected = m_pCodePathCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "code_path", iSelected );
     }
 
     // Update build type
