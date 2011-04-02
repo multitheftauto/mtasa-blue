@@ -27,7 +27,14 @@ public:
 
     eCGUIType               GetType                 ( void ) { return CGUI_TAB; };
 
+#define SETVISIBLE_HACK
+#define SETENABLED_HACK
     #include "CGUIElement_Inc.h"
+#undef SETENABLED_HACK
+#undef SETVISIBLE_HACK
+
+    void                    SetVisible              ( bool bVisible );
+    void                    SetEnabled              ( bool bEnabled );
 };
 
 #endif
