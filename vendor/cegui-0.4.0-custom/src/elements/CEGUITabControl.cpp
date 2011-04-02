@@ -597,10 +597,14 @@ void TabControl::performChildWindowLayout()
         TabButtonIndexMap::iterator i, iend;
         iend = d_tabButtonIndexMap.end();
         uint x = 0;
-        for (i = d_tabButtonIndexMap.begin(); i != iend; ++i, ++x)
+        for (i = d_tabButtonIndexMap.begin(); i != iend; ++i)
         {
             TabButton* btn = i->second;
-            calculateTabButtonSizePosition(btn, x);
+            if ( btn->isVisible() )
+            {
+                calculateTabButtonSizePosition(btn, x);
+                ++x;
+            }
         }
     }
     if (d_tabContentPane)

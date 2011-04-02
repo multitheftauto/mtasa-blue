@@ -291,6 +291,10 @@ public:
     */
 	TabButton* getButtonForTabContents(Window* wnd) const;
 
+    /*!
+    lil_Toady: MTA STUFF! Requests layout recalculation
+    */
+    void requestChildWindowLayout () { performChildWindowLayout(); };
 
 protected:
 
