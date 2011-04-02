@@ -8154,7 +8154,14 @@ bool CStaticFunctionDefinitions::SetAccountData ( CAccount* pAccount, char* szKe
 
     SString strArgumentAsString;
     pArgument->GetAsString ( strArgumentAsString );
-    return m_pAccountManager->SetAccountData ( pAccount, szKey, strArgumentAsString.substr ( 0, 128 ), pArgument->GetType() );
+
+    CLuaArguments Arguments;
+    Arguments.PushAccount ( pAccount );
+    Arguments.PushString ( szKey );
+    Arguments.PushString ( strArgumentAsString );
+    if ( m_pMapManager->GetRootElement()->CallEvent ( "onAccountDataChange", Arguments ) )
+        return m_pAccountManager->SetAccountData ( pAccount, szKey, strArgumentAsString.substr ( 0, 128 ), pArgument->GetType() );
+    return false;
 }
 
 
