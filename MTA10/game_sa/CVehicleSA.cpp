@@ -71,7 +71,7 @@ CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )
     // Reset the car countss to 0 so that this vehicle doesn't affect the population vehicles
     for ( int i = 0; i < 5; i++ )
     {
-        MemPut < DWORD > ( VARS_CarCounts + i * sizeof(DWORD), 0 );  //         *(DWORD *)(VARS_CarCounts + i * sizeof(DWORD)) = 0;
+        MemPutFast < DWORD > ( VARS_CarCounts + i * sizeof(DWORD), 0 );
     }
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes or boats, but includes planes, helis etc)
@@ -112,7 +112,7 @@ CVehicleSA::CVehicleSA ( CVehicleSAInterface* pVehicleInterface )
     // Reset the car countss to 0 so that this vehicle doesn't affect the population vehicles
     for ( int i = 0; i < 5; i++ )
     {
-        MemPut < DWORD > ( VARS_CarCounts + i * sizeof(DWORD), 0 );  //         *(DWORD *)(VARS_CarCounts + i * sizeof(DWORD)) = 0;
+        MemPutFast < DWORD > ( VARS_CarCounts + i * sizeof(DWORD), 0 );
     }
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
@@ -142,7 +142,7 @@ void CVehicleSA::Init ( void )
     // Reset the car countss to 0 so that this vehicle doesn't affect the population vehicles
     for ( int i = 0; i < 5; i++ )
     {
-        MemPut < DWORD > ( VARS_CarCounts + i * sizeof(DWORD), 0 );  //         *(DWORD *)(VARS_CarCounts + i * sizeof(DWORD)) = 0;
+        MemPutFast < DWORD > ( VARS_CarCounts + i * sizeof(DWORD), 0 );
     }
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
@@ -254,7 +254,7 @@ VOID CVehicleSA::SetMoveSpeed ( CVector* vecMoveSpeed )
         call    dwFunc
         mov     dwReturn, eax
     }
-    MemCpy ((void *)dwReturn, vecMoveSpeed, sizeof(CVector));
+    MemCpyFast ((void *)dwReturn, vecMoveSpeed, sizeof(CVector));
 
     // INACCURATE. Use Get/SetTrainSpeed instead of Get/SetMoveSpeed. (Causes issue #4829).
 #if 0
@@ -314,14 +314,14 @@ void CVehicleSA::SetNextTrainCarriage ( CVehicle * next )
         CVehicleSA * pNextVehicle = dynamic_cast < CVehicleSA* > ( next );
         if ( pNextVehicle )
         {
-            MemPut < DWORD > ( (DWORD)this->GetInterface () + 1492, (DWORD)pNextVehicle->GetInterface() );  //             *(DWORD *)((DWORD)this->GetInterface () + 1492) = (DWORD)pNextVehicle->GetInterface();
+            MemPutFast < DWORD > ( (DWORD)this->GetInterface () + 1492, (DWORD)pNextVehicle->GetInterface() );
             if ( pNextVehicle->GetPreviousTrainCarriage () != this )
                 pNextVehicle->SetPreviousTrainCarriage ( this );
         }
     }
     else
     {
-        MemPut < DWORD > ( (DWORD)this->GetInterface() + 1492, NULL );  //         *(DWORD *)((DWORD)this->GetInterface() + 1492) = NULL;
+        MemPutFast < DWORD > ( (DWORD)this->GetInterface() + 1492, NULL );
     }
 }
 
@@ -338,14 +338,14 @@ void CVehicleSA::SetPreviousTrainCarriage ( CVehicle * previous )
         CVehicleSA * pPreviousVehicle = dynamic_cast < CVehicleSA* > ( previous );
         if ( pPreviousVehicle )
         {
-            MemPut < DWORD > ( (DWORD)this->GetInterface () + 1488, (DWORD)pPreviousVehicle->GetInterface() );  //             *(DWORD *)((DWORD)this->GetInterface () + 1488) = (DWORD)pPreviousVehicle->GetInterface();
+            MemPutFast < DWORD > ( (DWORD)this->GetInterface () + 1488, (DWORD)pPreviousVehicle->GetInterface() );
             if ( pPreviousVehicle->GetNextTrainCarriage () != this )
                 pPreviousVehicle->SetNextTrainCarriage ( this );
         }
     }
     else
     {
-        MemPut < DWORD > ( (DWORD)this->GetInterface() + 1488, NULL );  //         *(DWORD *)((DWORD)this->GetInterface() + 1488) = NULL;
+        MemPutFast < DWORD > ( (DWORD)this->GetInterface() + 1488, NULL );
     }
 }
 
@@ -378,12 +378,12 @@ void CVehicleSA::SetDerailed ( bool bDerailed )
         if ( bDerailed )
         {
             pInterface->trainFlags.bIsDerailed = true;
-            MemAnd < DWORD > ( dwThis + 64, ( DWORD ) 0xFFFDFFFB );  //             * ( DWORD * ) ( dwThis + 64 ) &= ( DWORD ) 0xFFFDFFFB;
+            MemAndFast < DWORD > ( dwThis + 64, ( DWORD ) 0xFFFDFFFB );
         }
         else
         {
             pInterface->trainFlags.bIsDerailed = false;
-            MemOr < DWORD > ( dwThis + 64, ( DWORD ) 0x20004 );  //             * ( DWORD * ) ( dwThis + 64 ) |= ( DWORD ) 0x20004;
+            MemOrFast < DWORD > ( dwThis + 64, ( DWORD ) 0x20004 );
 
             // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)
             DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
@@ -421,11 +421,11 @@ void CVehicleSA::SetTrainDirection ( bool bDirection )
 {
     if ( bDirection )
     {
-        MemOr < BYTE > ( (BYTE*)GetInterface () + 1464, 0x40 );  //         *( (BYTE *)GetInterface () + 1464 ) |= 0x40;
+        MemOrFast < BYTE > ( (BYTE*)GetInterface () + 1464, 0x40 );
     }
     else
     {
-        MemAnd < BYTE > ( (BYTE*)GetInterface () + 1464, ~0x40 );  //         *( (BYTE *)GetInterface () + 1464 ) &= ~0x40;
+        MemAndFast < BYTE > ( (BYTE*)GetInterface () + 1464, ~0x40 );
     }
 }
 
@@ -1315,7 +1315,7 @@ void CVehicleSA::SetLandingGearDown ( bool bLandingGearDown )
         // The following code toggles the landing gear direction
         if ( fPosition == 0.0f )
         {
-            MemPut < DWORD > ( dwThis + 0x5A5, 0x02020202 );  //             *(DWORD *)(dwThis + 0x5A5) = 0x02020202;
+            MemPutFast < DWORD > ( dwThis + 0x5A5, 0x02020202 );
             fPosition += ( fTimeStep * flt_871904 );
         }
         else
@@ -1337,7 +1337,7 @@ float CVehicleSA::GetLandingGearPosition ( )
 void CVehicleSA::SetLandingGearPosition ( float fPosition )
 {
     DWORD dwThis = (DWORD)this->GetInterface();
-    MemPut < float > ( dwThis + 2508, fPosition );  //     *(float *)(dwThis + 2508) = fPosition;
+    MemPutFast < float > ( dwThis + 2508, fPosition );
 }
 
 bool CVehicleSA::IsLandingGearDown ( )
@@ -1648,7 +1648,7 @@ bool CVehicleSA::IsSmokeTrailEnabled ( void )
 
 void CVehicleSA::SetSmokeTrailEnabled ( bool bEnabled )
 {
-    MemPut < unsigned char > ( (DWORD)this->GetInterface() + 2560, ( bEnabled ) ? 1 : 0 );  //     *(unsigned char*)((DWORD)this->GetInterface() + 2560) = ( bEnabled ) ? 1 : 0;
+    MemPutFast < unsigned char > ( (DWORD)this->GetInterface() + 2560, ( bEnabled ) ? 1 : 0 );
 }
 
 
@@ -1843,11 +1843,11 @@ void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
         RwObject * pObject = NULL;
 
         // Stop GetCurrentAtomicObjectCB from returning null for 'invisible' objects
-        MemPut < BYTE > ( 0x6A0758, 0x90 );  //         * ( BYTE * ) ( 0x6A0758 ) = 0x90;
-        MemPut < BYTE > ( 0x6A0759, 0x90 );  //         * ( BYTE * ) ( 0x6A0759 ) = 0x90;
+        MemPut < BYTE > ( 0x6A0758, 0x90 );
+        MemPut < BYTE > ( 0x6A0759, 0x90 );
         RwFrameForAllObjects ( pFrame, ( void * ) dw_GetCurrentAtomicObjectCB, &pObject );
-        MemPut < BYTE > ( 0x6A0758, 0x74 );  //         * ( BYTE * ) ( 0x6A0758 ) = 0x74;
-        MemPut < BYTE > ( 0x6A0759, 0x06 );  //         * ( BYTE * ) ( 0x6A0759 ) = 0x06;
+        MemPut < BYTE > ( 0x6A0758, 0x74 );
+        MemPut < BYTE > ( 0x6A0759, 0x06 );
 
         if ( pObject ) pObject->flags = ( bVisible ) ? 4 : 0;
     }
@@ -1866,7 +1866,7 @@ void CVehicleSA::SetHeliSearchLightVisible ( bool bVisible )
 {
     // See CHeli::PreRender
     DWORD dwThis = ( DWORD ) GetInterface ();
-    MemPut < bool > ( dwThis + 2577, bVisible );  //     * ( bool * ) ( dwThis + 2577 ) = bVisible;
+    MemPutFast < bool > ( dwThis + 2577, bVisible );
 }
 
 

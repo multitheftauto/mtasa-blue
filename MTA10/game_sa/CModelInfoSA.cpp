@@ -581,7 +581,7 @@ void CModelInfoSA::RestreamIPL ()
     for ( it = removedModels.begin (); it != removedModels.end (); it++ )
     {
         ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( *it );
-        MemPut < BYTE > ( ARRAY_ModelLoaded + 20*(*it), 0 );  //         *(BYTE *)(ARRAY_ModelLoaded + 20*(*it)) = 0;
+        MemPut < BYTE > ( ARRAY_ModelLoaded + 20*(*it), 0 );
     }
 }
 
@@ -786,7 +786,7 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
             m_pOriginalColModelInterface = m_pInterface->pColModel;
 
         // Apply some low-level hacks
-        MemPut < BYTE > ( (BYTE*) pInterface + 40, 0xA9 );  //         *( (BYTE *) pInterface + 40 ) = 0xA9;
+        MemPutFast < BYTE > ( (BYTE*) pInterface + 40, 0xA9 );
 
         // Extra flags (3064) -- needs to be tested
         m_pInterface->bDoWeOwnTheColModel = false;

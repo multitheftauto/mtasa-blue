@@ -89,13 +89,13 @@ float CWeatherSA::GetAmountOfRain ( void )
 void CWeatherSA::SetAmountOfRain ( float fAmount )
 {
     // Nop the functions which don't like us take care of the rain
-    MemPut < BYTE > ( 0x72C686, 0xDD );  //     *(BYTE *)0x72C686 = 0xDD;
-    MemPut < BYTE > ( 0x72C687, 0xD8 );  //     *(BYTE *)0x72C687 = 0xD8;
+    MemPut < BYTE > ( 0x72C686, 0xDD );
+    MemPut < BYTE > ( 0x72C687, 0xD8 );
 
     MemSet ( (void*)0x72C688, 0x90, 4 );
 
-    MemPut < BYTE > ( 0x72BC92, 0xDD );  //     *(BYTE *)0x72BC92 = 0xDD;
-    MemPut < BYTE > ( 0x72BC93, 0xD8 );  //     *(BYTE *)0x72BC93 = 0xD8;
+    MemPut < BYTE > ( 0x72BC92, 0xDD );
+    MemPut < BYTE > ( 0x72BC93, 0xD8 );
 
     MemSet ( (void*)0x72BC94, 0x90, 4 );
     

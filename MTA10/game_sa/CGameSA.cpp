@@ -272,8 +272,8 @@ VOID CGameSA::StartGame()
 //  InitScriptInterface();
     //*(BYTE *)VAR_StartGame = 1;
     this->SetSystemState(GS_INIT_PLAYING_GAME);
-    MemPut < BYTE > ( 0xB7CB49, 0 );  //     *(BYTE *)0xB7CB49 = 0;
-    MemPut < BYTE > ( 0xBA67A4, 0 );  //     *(BYTE *)0xBA67A4 = 0;
+    MemPutFast < BYTE > ( 0xB7CB49, 0 );
+    MemPutFast < BYTE > ( 0xBA67A4, 0 );
 }
 
 /**
@@ -332,7 +332,7 @@ float CGameSA::GetGravity ( void )
 
 void CGameSA::SetGravity ( float fGravity )
 {
-    MemPut < float > ( 0x863984, fGravity );  //     * ( float* ) ( 0x863984 ) = fGravity;
+    MemPut < float > ( 0x863984, fGravity );
 }
 
 float CGameSA::GetGameSpeed ( void )
@@ -342,7 +342,7 @@ float CGameSA::GetGameSpeed ( void )
 
 void CGameSA::SetGameSpeed ( float fSpeed )
 {
-    MemPut < float > ( 0xB7CB64, fSpeed );  //     * ( float* ) ( 0xB7CB64 ) = fSpeed;
+    MemPutFast < float > ( 0xB7CB64, fSpeed );
 }
 
 // this prevents some crashes (respawning mainly)
@@ -355,11 +355,11 @@ VOID CGameSA::DisableRenderer( bool bDisabled )
 
     if ( bDisabled )
     {
-        MemPut < BYTE > ( 0x53DF40, 0xC3 );  //         *(BYTE *)0x53DF40 = 0xC3;
+        MemPut < BYTE > ( 0x53DF40, 0xC3 );
     }
     else
     {
-        MemPut < BYTE > ( 0x53DF40, 0xD9 );  //         *(BYTE *)0x53DF40 = 0xD9;
+        MemPut < BYTE > ( 0x53DF40, 0xD9 );
     }
 }
 
@@ -369,7 +369,7 @@ VOID CGameSA::SetRenderHook ( InRenderer* pInRenderer )
         HookInstall ( (DWORD)FUNC_CDebug_DebugDisplayTextBuffer, (DWORD)pInRenderer, 6 );
     else
     {
-        MemPut < BYTE > ( FUNC_CDebug_DebugDisplayTextBuffer, 0xC3 );  //         *(BYTE *)FUNC_CDebug_DebugDisplayTextBuffer = 0xC3;
+        MemPut < BYTE > ( FUNC_CDebug_DebugDisplayTextBuffer, 0xC3 );
     }
 }
 
@@ -438,7 +438,7 @@ void CGameSA::Initialize ( void )
     SetupSpecialCharacters ();
 
     // *Sebas* Hide the GTA:SA Main menu.
-    MemPut < BYTE > ( CLASS_CMenuManager+0x5C, 0 );  //     *(BYTE *)(CLASS_CMenuManager+0x5C) = 0;
+    MemPutFast < BYTE > ( CLASS_CMenuManager+0x5C, 0 );
 }
 
 eGameVersion CGameSA::GetGameVersion ( void )
@@ -504,7 +504,7 @@ unsigned char CGameSA::GetBlurLevel ( void )
 
 void CGameSA::SetBlurLevel ( unsigned char ucLevel )
 {
-    MemPut < unsigned char > ( 0x8D5104, ucLevel );  //     * ( unsigned char * ) 0x8D5104 = ucLevel;
+    MemPutFast < unsigned char > ( 0x8D5104, ucLevel );
 }
 
 unsigned long CGameSA::GetMinuteDuration ( void )
@@ -515,7 +515,7 @@ unsigned long CGameSA::GetMinuteDuration ( void )
 
 void CGameSA::SetMinuteDuration ( unsigned long ulTime )
 {
-    MemPut < unsigned long > ( 0xB7015C, ulTime );  //     * ( unsigned long * ) 0xB7015C = ulTime;
+    MemPutFast < unsigned long > ( 0xB7015C, ulTime );
 }
 
 bool CGameSA::IsCheatEnabled ( const char* szCheatName )
@@ -533,7 +533,7 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
         return false;
     if ( !it->second->m_bCanBeSet )
         return false;
-    MemPut < BYTE > ( it->second->m_byAddress, bEnable );   // *(it->second->m_byAddress) = bEnable;
+    MemPutFast < BYTE > ( it->second->m_byAddress, bEnable );
     it->second->m_bEnabled = bEnable;
     return true;
 }
@@ -542,7 +542,10 @@ void CGameSA::ResetCheats ()
 {
     std::map < std::string, SCheatSA* >::iterator it;
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
-        MemPut < BYTE > ( it->second->m_byAddress, 0 );   // *(it->second->m_byAddress) = 0;
+        if ( it->second->m_byAddress > (BYTE*)0x8A4000 )
+            MemPutFast < BYTE > ( it->second->m_byAddress, 0 );
+        else
+            MemPut < BYTE > ( it->second->m_byAddress, 0 );
         it->second->m_bEnabled = false;
     }
 }
