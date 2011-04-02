@@ -20,7 +20,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerfStatManager.h"
 
 extern CGame* g_pGame;
 
@@ -11342,7 +11341,7 @@ int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
         if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
             strFilter = lua_tostring ( luaVM, 3 );
 
-        GetPerfStatManager ()->GetStats ( &Result, strCategory, strOptions, strFilter );
+        CPerfStatManager::GetSingleton ()->GetStats ( &Result, strCategory, strOptions, strFilter );
 
         lua_newtable ( luaVM );
         for ( int c = 0; c < Result.ColumnCount () ; c++ )

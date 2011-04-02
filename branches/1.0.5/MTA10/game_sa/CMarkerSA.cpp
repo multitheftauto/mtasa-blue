@@ -122,7 +122,7 @@ BOOL CMarkerSA::IsActive (  )
 VOID CMarkerSA::SetPosition ( CVector * vecPosition )
 {
     DEBUG_TRACE("VOID CMarkerSA::SetPosition ( CVector * vecPosition )");
-    MemCpy (&internalInterface->position,vecPosition, sizeof(CVector));
+    MemCpyFast (&internalInterface->position,vecPosition, sizeof(CVector));
 }
 
 

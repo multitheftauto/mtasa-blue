@@ -13,7 +13,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "SharedUtil.Misc.h"
+#define DECLARE_PROFILER_SECTION_CDirect3DEvents9
+#include "profiler/SharedUtil.Profiler.h"
 
 // Variables used for screen shot saving
 static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;

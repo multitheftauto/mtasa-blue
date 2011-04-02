@@ -16,6 +16,7 @@
 #define WITH_VEHICLE_HANDLING 0
 
 // Enable WITH_ALLOC_TRACKING to monitor server module memory usage. *Has a negative performance impact*
+// (Also only works for the server. Will give compile errors in the client projects.)
 #define WITH_ALLOC_TRACKING 0
 
 //

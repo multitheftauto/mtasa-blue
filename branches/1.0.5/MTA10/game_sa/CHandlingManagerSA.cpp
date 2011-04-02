@@ -607,7 +607,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
 {
 #if (USE_GTASA_HANDLING == FALSE)
     // Reset
-    MemSet ( m_OriginalHandlingData, 0, sizeof ( m_OriginalHandlingData ) );
+    MemSetFast ( m_OriginalHandlingData, 0, sizeof ( m_OriginalHandlingData ) );
 
     // NB: Don't waste your time changing this manually. Use the dumping code
     //     commented out at the bottom :)

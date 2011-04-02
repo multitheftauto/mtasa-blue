@@ -82,6 +82,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
 				OutputFile="C:\Program Files\MTA San Andreas\server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
@@ -186,6 +187,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="lua5.1d.lib wsock32.lib sqlite3d.lib zlibd_2008.lib ehsd_2008.lib pthreadVC2.lib pmed_2008.lib pcred_2008.lib jsonD2008.lib"
 				OutputFile="C:\Program Files\MTA San Andreas\server/mods/deathmatch/deathmatch_d.dll"
 				LinkIncremental="2"
@@ -288,6 +290,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="lua5.1.lib wsock32.lib sqlite3.lib zlib_2008.lib ehs_2008.lib pthreadVC2.lib pme_2008.lib pcre_2008.lib json2008.lib"
 				OutputFile="../../../output/MTA San Andreas/server/mods/deathmatch/deathmatch.dll"
 				LinkIncremental="1"
@@ -619,6 +622,22 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPedSync.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStat.LibMemory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStat.LuaMemory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStat.LuaTiming.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStat.PacketUsage.cpp"
 					>
 				</File>
 				<File
@@ -1656,6 +1675,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPerfStatManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStatModule.h"
 					>
 				</File>
 				<File
