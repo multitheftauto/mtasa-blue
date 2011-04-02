@@ -1341,6 +1341,9 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onBan", "ip", NULL, false );
     m_Events.AddEvent ( "onUnban", "ip", NULL, false );
 
+    // Account events
+    m_Events.AddEvent ( "onAccountDataChange", "account, key, value", NULL, false );
+
     // Other events
     m_Events.AddEvent ( "onSettingChange", "setting, oldValue, newValue", NULL, false );
 }
