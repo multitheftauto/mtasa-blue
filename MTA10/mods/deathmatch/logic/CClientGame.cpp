@@ -3473,8 +3473,14 @@ void CClientGame::PreWorldProcessHandler ( void )
     // If we are not minimized we do the pulsing here
     if ( !g_pCore->IsWindowMinimized () )
     {
-        m_uiNotPulsedCounter = 0;
-        DoPulses ();
+        int iVal;
+        g_pCore->GetCVars ()->Get ( "code_path", iVal );
+        if ( iVal )
+        {
+            // Pulse here instead to see if it reduces anim crashes
+            m_uiNotPulsedCounter = 0;
+            DoPulses ();
+        }
     }
 }
 
