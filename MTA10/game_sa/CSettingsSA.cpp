@@ -206,7 +206,7 @@ unsigned int CSettingsSA::GetFXQuality ( )
 
 void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 {
-    MemPut < BYTE > ( VAR_ucFxQuality, fxQualityId );
+    MemPutFast < BYTE > ( VAR_ucFxQuality, fxQualityId );
 }
 
 float CSettingsSA::GetMouseSensitivity ( )
@@ -217,7 +217,7 @@ float CSettingsSA::GetMouseSensitivity ( )
 
 void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
 {
-    MemPut < FLOAT > ( VAR_fMouseSensitivity, fSensitivity );  //     *(FLOAT *)VAR_fMouseSensitivity = fSensitivity;
+    MemPutFast < FLOAT > ( VAR_fMouseSensitivity, fSensitivity );
 }
 
 unsigned int CSettingsSA::GetAntiAliasing ( )

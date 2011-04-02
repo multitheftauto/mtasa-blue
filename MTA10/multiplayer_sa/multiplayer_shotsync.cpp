@@ -103,8 +103,8 @@ VOID InitShotsyncHooks()
     HookInstall ( HOOKPOS_CWeapon_DoBulletImpact, (DWORD)HOOK_CWeapon_DoBulletImpact, 7 );
 
     /*  
-    MemPut < BYTE > ( 0x73FDEC, 0x90 );  //     *(BYTE *)0x73FDEC = 0x90;
-    MemPut < BYTE > ( 0x73FDED, 0xE9 );  //     *(BYTE *)0x73FDED = 0xE9;
+    MemPut < BYTE > ( 0x73FDEC, 0x90 );
+    MemPut < BYTE > ( 0x73FDED, 0xE9 );
     */
 
     m_pools = pGameInterface->GetPools();
@@ -190,7 +190,7 @@ VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector
             if ( data->ProcessPlayerWeapon () )
             {
                 DWORD dwPointerToVector = (DWORD)&data->m_shotSyncData.m_vecShotTarget;
-                MemPut < DWORD > ( vecTargetPos, dwPointerToVector );  //                 *(DWORD *)vecTargetPos = dwPointerToVector;
+                MemPut < DWORD > ( vecTargetPos, dwPointerToVector );
                 if ( data->m_shotSyncData.m_bUseOrigin )
                     *origin = data->m_shotSyncData.m_vecShotOrigin;
             }
@@ -1006,7 +1006,7 @@ static void CheckInVehicleDamage()
 
 void _cdecl DoFireInstantHitPokes ( void )
 {
-    MemPut < unsigned char > ( VAR_CWorld_IncludeCarTyres, 1 );  //     * ( unsigned char * ) ( VAR_CWorld_IncludeCarTyres ) = 1;
+    MemPut < unsigned char > ( VAR_CWorld_IncludeCarTyres, 1 );
 }
 
 DWORD dwFunc_CWeapon_FireInstantHit_ret = 0x740B6E;

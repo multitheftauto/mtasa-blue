@@ -19,7 +19,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerfStatManager.h"
 #include "../utils/COpenPortsTester.h"
 
 #define MAX_KEYSYNC_DISTANCE 400.0f
@@ -347,7 +346,7 @@ void CGame::DoPulse ( void )
     // Delete all items requested
     m_ElementDeleter.DoDeleteAll ();
 
-    GetPerfStatManager ()->DoPulse ();
+    CPerfStatManager::GetSingleton ()->DoPulse ();
 
     PulseMasterServerAnnounce ();
 

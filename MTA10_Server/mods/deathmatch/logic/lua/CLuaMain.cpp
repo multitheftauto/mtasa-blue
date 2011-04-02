@@ -16,7 +16,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerfStatManager.h"
 
 static CLuaManager* m_pLuaManager;
 
@@ -78,7 +77,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     m_pBlipManager = pBlipManager;
     m_pMapManager = pMapManager;
 
-    GetPerfStatManager ()->OnLuaMainCreate ( this );
+    CPerfStatLuaMemory::GetSingleton ()->OnLuaMainCreate ( this );
+    CPerfStatLuaTiming::GetSingleton ()->OnLuaMainCreate ( this );
 }
 
 
@@ -115,7 +115,8 @@ CLuaMain::~CLuaMain ( void )
         delete *iterItems;
     }
 
-    GetPerfStatManager ()->OnLuaMainDestroy ( this );
+    CPerfStatLuaMemory::GetSingleton ()->OnLuaMainDestroy ( this );
+    CPerfStatLuaTiming::GetSingleton ()->OnLuaMainDestroy ( this );
 }
 
 bool CLuaMain::BeingDeleted ( void )

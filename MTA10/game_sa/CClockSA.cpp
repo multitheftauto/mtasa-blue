@@ -19,9 +19,9 @@ VOID CClockSA::Set ( BYTE bHour, BYTE bMinute )
     DEBUG_TRACE("VOID CClockSA::Set ( BYTE bHour, BYTE bMinute )");
     if(bMinute >= 0 && bMinute <= 60 && bHour >= 0 && bHour <= 23)
     {
-        MemPut < BYTE > ( VAR_TimeMinutes, bMinute );  //         *(BYTE *)VAR_TimeMinutes = bMinute;
-        MemPut < BYTE > ( VAR_TimeHours, bHour );  //         *(BYTE *)VAR_TimeHours = bHour;
-        MemPut < DWORD > ( VAR_TimeOfLastMinuteChange, pGame->GetSystemTime() );  //         *(DWORD *)VAR_TimeOfLastMinuteChange = pGame->GetSystemTime();
+        MemPutFast < BYTE > ( VAR_TimeMinutes, bMinute );
+        MemPutFast < BYTE > ( VAR_TimeHours, bHour );
+        MemPutFast < DWORD > ( VAR_TimeOfLastMinuteChange, pGame->GetSystemTime() );
     }
 }
 
