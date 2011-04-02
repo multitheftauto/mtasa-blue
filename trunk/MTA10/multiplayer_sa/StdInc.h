@@ -20,6 +20,7 @@
 #include <net/CNet.h>
 #include <game/CGame.h>
 #include <CMatrix_Pad.h>
+#include <../version.h>
 
 // Multiplayer includes
 #include "multiplayersa_init.h"
