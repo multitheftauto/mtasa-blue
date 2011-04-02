@@ -143,6 +143,17 @@ int CGUIGridList_Impl::GetRowCount ( void )
 }
 
 
+int CGUIGridList_Impl::GetColumnCount ( void )
+{
+    try {
+        return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getColumnCount ();
+    }
+    catch ( CEGUI::Exception ) {
+        return 0;
+    }
+}
+
+
 void CGUIGridList_Impl::ForceUpdate ( void )
 {
     reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> forceUpdate();
