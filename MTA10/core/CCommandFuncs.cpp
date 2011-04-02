@@ -141,6 +141,7 @@ void CCommandFuncs::Vid ( const char* szParameters )
 
             // Reload console, serverbrowser and chat settings (removed in DestroyWindows)
             g_pCore->ApplyConsoleSettings ();
+            g_pCore->ApplyServerBrowserSettings ();
             g_pCore->ApplyMenuSettings ();
             g_pCore->ApplyCommunityState();
         }
@@ -243,6 +244,28 @@ void CCommandFuncs::Unload ( const char* szParameters )
     }
 }
 
+
+void CCommandFuncs::ConnectionType ( const char *szParameters )
+{
+    unsigned short usMTUSize = 0;
+
+    if ( strcmpi ( szParameters, "lan" ) == 0 ) {
+        usMTUSize = NET_MTU_LAN;
+    } else if ( strcmpi ( szParameters, "dsl" ) == 0 ) {
+        usMTUSize = NET_MTU_DSL;
+    } else if ( strcmpi ( szParameters, "modem" ) == 0 ) {
+        usMTUSize = NET_MTU_MODEM;
+    } else {
+        CCore::GetSingleton ().GetConsole ()->Print ( "Please specify a correct connection type (lan, dsl or modem)" );
+    }
+
+    if ( usMTUSize <= 0 ) 
+        return;
+
+    CCore::GetSingleton ().GetConnectManager ()->SetMTUSize ( usMTUSize );
+    CVARS_SET ( "mtu_size", usMTUSize );
+    CCore::GetSingleton ().GetConsole ()->Printf ( "MTU size was set to %u", usMTUSize );
+}
 
 void CCommandFuncs::Connect ( const char* szParameters )
 {

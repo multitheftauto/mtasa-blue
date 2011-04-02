@@ -49,7 +49,6 @@ class CTask;
     class CTaskSimpleRunNamedAnim;
     class CTaskComplexDie;
     class CTaskSimpleStealthKill;
-    class CTaskSimpleDead;
     class CTaskComplexSunbathe;
 
     // IK

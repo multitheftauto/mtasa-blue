@@ -57,9 +57,7 @@ public:
                         CLocalGUI                        ( void );
                         ~CLocalGUI                       ( void );
 
-    void                SetSkin                     ( const char* szName );
-
-    void                CreateWindows               ( bool bGameIsAlreadyLoaded );
+    void                CreateWindows               ( void );
     void                DestroyWindows              ( void );
 
     void                CreateObjects               ( IUnknown* pDevice );
@@ -140,9 +138,6 @@ private:
     bool                    m_bChatboxVisible;
     bool                    m_pDebugViewVisible;
     bool                    m_bGUIHasInput;
-
-    int                     m_LastSettingsRevision; // the revision number the last time we saw the skin change
-    SString                 m_LastSkinName;
 };
 
 #endif

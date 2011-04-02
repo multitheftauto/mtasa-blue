@@ -7,7 +7,6 @@
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Christian Myhre Lundheim <>
 *               Jax <>
-*               Peter Beverloo <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -48,6 +47,7 @@ public:
     void                        SetCenterOfWorld            ( CEntity * entity, CVector * vecPosition, FLOAT fHeading );
     void                        DisablePadHandler           ( bool bDisabled );
     void                        DisableEnterExitVehicleKey  ( bool bDisabled );
+    void                        DisableHeatHazeEffect       ( bool bDisable );
     void                        DisableAllVehicleWeapons    ( bool bDisable );
     void                        DisableZoneNames            ( bool bDisabled );
     void                        DisableBirds                ( bool bDisabled );
@@ -63,7 +63,6 @@ public:
     void                        SetBreakTowLinkHandler      ( BreakTowLinkHandler * pBreakTowLinkHandler );
     void                        SetProcessCamHandler        ( ProcessCamHandler* pProcessCamHandler );
     void                        SetChokingHandler           ( ChokingHandler* pChokingHandler );
-    void                        SetPreWorldProcessHandler   ( PreWorldProcessHandler * pHandler );
     void                        SetPostWorldProcessHandler  ( PostWorldProcessHandler * pHandler );
     void                        SetIdleHandler              ( IdleHandler * pHandler );
     void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
@@ -72,41 +71,15 @@ public:
 
     void                        AllowMouseMovement          ( bool bAllow );
     void                        DoSoundHacksOnLostFocus     ( bool bLostFocus );
-    bool                        HasSkyColor                 ();
-    void                        GetSkyColor                 ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue );
     void                        SetSkyColor                 ( unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen, unsigned char BottomBlue );
-    void                        SetHeatHaze                 ( const SHeatHazeSettings& settings );
-    void                        GetHeatHaze                 ( SHeatHazeSettings& settings );
-    void                        ResetHeatHaze               ( void );
     void                        ResetSky                    ();
-    bool                        HasWaterColor               ();
-    void                        GetWaterColor               ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha );
     void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha );
     void                        ResetWater                  ();
     void                        SetCloudsEnabled            ( bool bDisabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
-    bool                        AreInteriorSoundsEnabled    ();
-    void                        SetInteriorSoundsEnabled    ( bool bEnabled );
-    void                        SetWindVelocity             ( float fX, float fY, float fZ );
-    void                        GetWindVelocity             ( float& fX, float& fY, float& fZ );
-    void                        RestoreWindVelocity         ( void );
-    float                       GetFarClipDistance          ( void );
-    void                        SetFarClipDistance          ( float fDistance );
-    void                        RestoreFarClipDistance      ( void );
-    float                       GetFogDistance              ( void );
-    void                        SetFogDistance              ( float fDistance );
-    void                        RestoreFogDistance          ( void );
-    void                        GetSunColor                 ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue );
-    void                        SetSunColor                 ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue );
-    void                        ResetSunColor               ( );
-    float                       GetSunSize                  ( );
-    void                        SetSunSize                  ( float fSize );
-    void                        ResetSunSize                ( );
 
     void                        SetNightVisionEnabled       ( bool bEnabled );
     void                        SetThermalVisionEnabled     ( bool bEnabled );
-    bool                        IsNightVisionEnabled        ( );
-    bool                        IsThermalVisionEnabled      ( );
 
     void                        AllowWindowsCursorShowing   ( bool bAllow );
 
@@ -133,12 +106,6 @@ public:
 
     float                       GetLocalPlayerGravity       ();
     void                        SetLocalPlayerGravity       ( float fGravity );
-
-    unsigned char               GetTrafficLightState        ();
-    void                        SetTrafficLightState        ( unsigned char ucState );
-
-    bool                        GetTrafficLightsLocked      ();
-    void                        SetTrafficLightsLocked      ( bool bLocked );
 
     void                        SetLocalStatValue           ( unsigned short usStat, float fValue );
     void                        SetLocalStatsStatic         ( bool bStatic );
@@ -193,7 +160,6 @@ private:
     static unsigned long        HOOKPOS_EndWorldColors;
     static unsigned long        HOOKPOS_CWorld_ProcessVerticalLineSectorList;
     static unsigned long        HOOKPOS_ComputeDamageResponse_StartChoking;
-    static unsigned long        HOOKPOS_CAutomobile__ProcessSwingingDoor;
 
     static unsigned long        FUNC_CStreaming_Update;
     static unsigned long        FUNC_CAudioEngine__DisplayRadioStationName;

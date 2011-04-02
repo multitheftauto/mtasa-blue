@@ -66,7 +66,7 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
     // Copy the local player data so we're defaulted to something good
     CPlayerPedSA* pLocalPlayerSA = dynamic_cast < CPlayerPedSA* > ( pools->GetPedFromRef ( (DWORD)1 ) );
     if ( pLocalPlayerSA )
-        MemCpyFast ( m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface ())->pPlayerData, sizeof ( CPlayerPedDataSAInterface ) );
+        MemCpy ( m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface ())->pPlayerData, sizeof ( CPlayerPedDataSAInterface ) );
 
     // Replace the player ped data in our ped interface with the one we just created
     GetPlayerPedInterface ()->pPlayerData = m_pData;
@@ -79,12 +79,7 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
     // Clothes pointers or we'll crash later (TODO: Wrap up with some cloth classes and make it unique per player)
     m_pData->m_pClothes = pLocalClothes;
 
-    // Not sure why was this here (svn blame reports that this line came from the old SVN),
-    // but it's causing a bug in what the just streamed-in players that are in the air are
-    // processed as if they would be standing on some surface, screwing velocity calculations
-    // for players floating in air (using superman script, for example) because GTA:SA will
-    // try to apply the floor friction to their velocity.
-    //SetIsStanding ( true );
+    SetIsStanding ( true );
 
     GetPlayerPedInterface ()->pedFlags.bCanBeShotInVehicle = true;
     GetPlayerPedInterface ()->pedFlags.bTestForShotInVehicle = true;

@@ -65,22 +65,11 @@ enum eInputChannel
     INPUT_MOD = 1,
     INPUT_CHANNEL_COUNT = 2,
 };
-
-enum eInputMode
-{
-    INPUTMODE_ALLOW_BINDS = 0,
-    INPUTMODE_NO_BINDS = 1,
-    INPUTMODE_NO_BINDS_ON_EDIT = 2,
-    INPUTMODE_INVALID = 0xFF,
-};
-
 #define CHECK_CHANNEL(channel) assert ( channel >= 0 && channel < INPUT_CHANNEL_COUNT )
 
 class CGUI
 {
 public:
-
-    virtual void                SetSkin                 ( const char* szName ) = 0;
 
     virtual void                Draw                    ( void ) = 0;
     virtual void                Invalidate              ( void ) = 0;
@@ -93,11 +82,8 @@ public:
     virtual void                ProcessCharacter        ( unsigned long ulCharacter ) = 0;
 
     //
+    virtual void                SetGUIInputEnabled      ( bool bEnabled ) = 0;
     virtual bool                GetGUIInputEnabled      ( void ) = 0;
-    virtual void                SetGUIInputMode         ( eInputMode a_eMode ) = 0;
-    virtual eInputMode          GetGUIInputMode         ( void ) = 0;
-    virtual eInputMode          GetInputModeFromString  ( const std::string& a_rstrMode ) const = 0;
-    virtual bool                GetStringFromInputMode  ( eInputMode a_eMode, std::string& a_rstrResult ) const = 0;
 
     //
     virtual CGUIMessageBox*     CreateMessageBox        ( const char* szTitle, const char* szMessage, unsigned int uiFlags ) = 0;
@@ -131,9 +117,8 @@ public:
     virtual CGUIStaticImage*    CreateStaticImage       ( CGUIGridList* pParent ) = 0;
     virtual CGUIStaticImage*    CreateStaticImage       ( void ) = 0;
 
-    virtual CGUITabPanel*       CreateTabPanel          ( CGUIElement* pParent ) = 0;
-    virtual CGUITabPanel*       CreateTabPanel          ( CGUITab* pParent ) = 0;
-    virtual CGUITabPanel*       CreateTabPanel          ( void ) = 0;
+    virtual CGUITabPanel*       CreateTabPanel          ( CGUIElement* pParent = NULL ) = 0;
+    virtual CGUITabPanel*       CreateTabPanel          ( CGUITab* pParent = NULL ) = 0;
 
     virtual CGUIScrollPane*     CreateScrollPane        ( CGUIElement* pParent = NULL ) = 0;
     virtual CGUIScrollPane*     CreateScrollPane        ( CGUITab* pParent = NULL ) = 0;
@@ -143,11 +128,10 @@ public:
 
     virtual CGUIComboBox*       CreateComboBox          ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
     virtual CGUIComboBox*       CreateComboBox          ( CGUIComboBox* pParent = NULL, const char* szCaption = "" ) = 0;
-
     //
 
     virtual CGUIWindow*         CreateWnd               ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
-    virtual CGUIFont*           CreateFnt               ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false ) = 0;
+    virtual CGUIFont*           CreateFnt               ( const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, unsigned int uExtraGlyphs[] = 0, bool bAutoScale = false ) = 0;
     virtual CGUITexture*        CreateTexture           ( void ) = 0;
 
     virtual void                SetCursorEnabled        ( bool bEnabled ) = 0;
@@ -161,7 +145,6 @@ public:
     virtual CGUIFont*           GetBoldFont             ( void ) = 0;
     virtual CGUIFont*           GetClearFont            ( void ) = 0;
     virtual CGUIFont*           GetSansFont             ( void ) = 0;
-    virtual bool                IsFontPresent           ( const char* szFont ) = 0;
 
     virtual void                SetWorkingDirectory     ( const char * szDir ) = 0;
 
@@ -177,8 +160,6 @@ public:
     virtual void                SetMouseWheelHandler        ( eInputChannel channel, const GUI_CALLBACK_MOUSE & Callback ) = 0;
     virtual void                SetMovedHandler             ( eInputChannel channel, const GUI_CALLBACK & Callback ) = 0;
     virtual void                SetSizedHandler             ( eInputChannel channel, const GUI_CALLBACK & Callback ) = 0;
-    virtual void                SetFocusGainedHandler       ( eInputChannel channel, const GUI_CALLBACK_FOCUS & Callback ) = 0;
-    virtual void                SetFocusLostHandler         ( eInputChannel channel, const GUI_CALLBACK_FOCUS & Callback ) = 0;
 
     virtual void                SelectInputHandlers         ( eInputChannel channel ) = 0;
     virtual void                ClearInputHandlers          ( eInputChannel channel ) = 0;

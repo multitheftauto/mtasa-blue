@@ -21,17 +21,19 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( void )
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_usHTTPDownloadPort = 0;
     m_iHTTPMaxConnectionsPerClient = 4;
+    m_bHTTPMaxConnectionsLegacy = true;
     m_iEnableClientChecks = 0;
 }
 
 
-CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsigned char ucNumberOfPlayers, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType, unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient, int iEnableClientChecks )
+CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsigned char ucNumberOfPlayers, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType, unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient, bool bHTTPMaxConnectionsLegacy, int iEnableClientChecks )
 {
     m_PlayerID = PlayerID;
     m_ucNumberOfPlayers = ucNumberOfPlayers;
     m_RootElementID = RootElementID;
     m_ucHTTPDownloadType = ucHTTPDownloadType;
     m_iHTTPMaxConnectionsPerClient = iHTTPMaxConnectionsPerClient;
+    m_bHTTPMaxConnectionsLegacy = bHTTPMaxConnectionsLegacy;
     m_iEnableClientChecks = iEnableClientChecks;
 
     switch ( m_ucHTTPDownloadType )
@@ -58,14 +60,30 @@ bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.WriteCompressed ( m_RootElementID );
 
     // Transmit server requirement for the client to check settings
-    BitStream.Write ( m_iEnableClientChecks );
+    if ( BitStream.Version () >= 0x05 )
+        BitStream.Write ( m_iEnableClientChecks );
 
-    // Tellclient about maybe throttling back http client requests
-    BitStream.Write ( m_iHTTPMaxConnectionsPerClient );
+    // Tell aware clients about maybe throttling back http client requests (doesn't work too well)
+    if ( BitStream.Version () >= 0x04 )
+        BitStream.Write ( Clamp ( 2, m_iHTTPMaxConnectionsPerClient, 32 ) );
 
-    BitStream.Write ( static_cast < unsigned char > ( m_ucHTTPDownloadType ) );
+    // Tell aware clients about maybe throttling back http client requests (works better)
+    if ( BitStream.Version () >= 0x10 )
+        BitStream.Write ( m_iHTTPMaxConnectionsPerClient );
 
-    switch ( m_ucHTTPDownloadType )
+    // Tell unaware clients to use the builtin web server if http flood protection is hinted
+    unsigned char ucHTTPDownloadType = m_ucHTTPDownloadType;
+    if ( ucHTTPDownloadType == HTTP_DOWNLOAD_ENABLED_URL )
+    {
+        if ( m_iHTTPMaxConnectionsPerClient < 4 && BitStream.Version () < 0x04 )
+            ucHTTPDownloadType = HTTP_DOWNLOAD_ENABLED_PORT;
+        if ( m_bHTTPMaxConnectionsLegacy && BitStream.Version () < 0x10 )
+            ucHTTPDownloadType = HTTP_DOWNLOAD_ENABLED_PORT;
+    }
+
+    BitStream.Write ( static_cast < unsigned char > ( ucHTTPDownloadType ) );
+
+    switch ( ucHTTPDownloadType )
     {
     case HTTP_DOWNLOAD_ENABLED_PORT:
         {

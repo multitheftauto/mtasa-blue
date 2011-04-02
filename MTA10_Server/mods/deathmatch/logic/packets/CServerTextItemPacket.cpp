@@ -45,7 +45,8 @@ bool CServerTextItemPacket::Write ( NetBitStreamInterface &BitStream  ) const
         BitStream.Write ( m_Color.B );
         BitStream.Write ( m_Color.A );
         BitStream.Write ( m_ucFormat );
-        BitStream.Write ( m_ucShadowAlpha );
+        if ( BitStream.Version() >= 0x03 )
+            BitStream.Write ( m_ucShadowAlpha );
 
         // Grab the text length
         size_t sizeText = Min < size_t > ( 1024, m_strText.length () );

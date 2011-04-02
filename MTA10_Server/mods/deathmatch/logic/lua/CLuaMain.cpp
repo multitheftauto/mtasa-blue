@@ -16,10 +16,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
-#ifndef WIN32
-#include <clocale>
-#endif
+#include "CPerfStatManager.h"
 
 static CLuaManager* m_pLuaManager;
 
@@ -81,8 +78,7 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
     m_pBlipManager = pBlipManager;
     m_pMapManager = pMapManager;
 
-    CPerfStatLuaMemory::GetSingleton ()->OnLuaMainCreate ( this );
-    CPerfStatLuaTiming::GetSingleton ()->OnLuaMainCreate ( this );
+    GetPerfStatManager ()->OnLuaMainCreate ( this );
 }
 
 
@@ -119,8 +115,7 @@ CLuaMain::~CLuaMain ( void )
         delete *iterItems;
     }
 
-    CPerfStatLuaMemory::GetSingleton ()->OnLuaMainDestroy ( this );
-    CPerfStatLuaTiming::GetSingleton ()->OnLuaMainDestroy ( this );
+    GetPerfStatManager ()->OnLuaMainDestroy ( this );
 }
 
 bool CLuaMain::BeingDeleted ( void )
@@ -232,98 +227,11 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
         else
         {
             ResetInstructionCount ();
-#ifndef WIN32
-            std::setlocale(LC_ALL, "C");
-#endif
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
-#ifndef WIN32
-            std::setlocale(LC_ALL, "");
-#endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
-                SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-        
-                vector <SString> vecSplit;
-                strRes.Split ( ":", vecSplit );
-                
-                if ( vecSplit.size ( ) >= 3 )
-                {
-                    SString strFile = vecSplit[0];
-                    int     iLine   = atoi ( vecSplit[1].c_str ( ) );
-                    SString strMsg  = vecSplit[2].substr ( 1 );
-                    
-                    g_pGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
-                }
-                else
-                    g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
-            }
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bUTF8 )
-{
-    if ( m_luaVM )
-    {
-        std::string strUTFScript;
-        if ( !bUTF8 ) //If it's not a marked UTF-8 script
-        {
-            std::string strBuffer = std::string(cpBuffer);
-            strBuffer.resize(uiSize); //Clamp to end size;
-            strUTFScript = ConvertToANSI(TranslateToUTF8( strBuffer ));
-            if ( uiSize != strUTFScript.size() )
-            {
-                uiSize = strUTFScript.size();
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script '%s' is not encoded in UTF-8.  Loading as ANSI...", ConformResourcePath(szFileName).c_str() );
-            }
-        }
-
-        // Run the script
-        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", szFileName ) ) )
-        {
-            // Print the error
-            std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-            if ( strRes.length () )
-            {
-                CLogger::LogPrintf ( "SCRIPT ERROR: %s\n", strRes.c_str () );
-                g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Loading script failed: %s", strRes.c_str () );
-            }
-            else
-            {
-                CLogger::LogPrint ( "SCRIPT ERROR: Unknown\n" );
-                g_pGame->GetScriptDebugging()->LogInformation ( m_luaVM, "Loading script failed for unknown reason" );
-            }
-        }
-        else
-        {
-            ResetInstructionCount ();
-#ifndef WIN32
-            std::setlocale(LC_ALL, "C");
-#endif
-            int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
-#ifndef WIN32
-            std::setlocale(LC_ALL, "");
-#endif
-            if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
-            {
-                SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
-        
-                std::vector <SString> vecSplit;
-                strRes.Split ( ":", vecSplit );
-                
-                if ( vecSplit.size ( ) >= 3 )
-                {
-                    SString strFile = vecSplit[0];
-                    int     iLine   = atoi ( vecSplit[1].c_str ( ) );
-                    SString strMsg  = vecSplit[2].substr ( 1 );
-                    
-                    g_pGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
-                }
-                else
-                    g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
+                std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
+                g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "%s", strRes.c_str () );
             }
             return true;
         }
@@ -340,13 +248,7 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
         if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
-#ifndef WIN32
-            std::setlocale(LC_ALL, "C");
-#endif
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
-#ifndef WIN32
-            std::setlocale(LC_ALL, "");
-#endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );

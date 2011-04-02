@@ -97,34 +97,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             }
             else
                 BitStream.WriteBit ( false );
-
-            // Entity collisions enabled
-            bool bCollisionsEnabled = true;
-
-            switch ( pElement->GetType() )
-            {
-                case CElement::VEHICLE:
-                {
-                    CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-                    bCollisionsEnabled = pVehicle->GetCollisionEnabled ( );
-                    break;
-                }
-                case CElement::OBJECT:
-                {
-                    CObject* pObject = static_cast < CObject* > ( pElement );
-                    bCollisionsEnabled = pObject->GetCollisionEnabled ( );
-                    break;
-                }
-                case CElement::PED:
-                case CElement::PLAYER:
-                {
-                    CPed* pPed = static_cast < CPed* > ( pElement );
-                    bCollisionsEnabled = pPed->GetCollisionEnabled ( );
-                    break;
-                }
-            }
-
-            BitStream.WriteBit ( bCollisionsEnabled );
             
             // Write custom data
             CCustomData* pCustomData = pElement->GetCustomDataPointer ();
@@ -140,9 +112,12 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                 if ( bSynchronized )
                 {
                     unsigned char ucNameLength = static_cast < unsigned char > ( strlen ( szName ) );
-                    BitStream.Write ( ucNameLength );
-                    BitStream.Write ( szName, ucNameLength );
-                    pArgument->WriteToBitStream ( BitStream );
+                    if ( ucNameLength > 0 && ucNameLength <= 32 )
+                    {
+                        BitStream.Write ( ucNameLength );
+                        BitStream.Write ( szName, ucNameLength );
+                        pArgument->WriteToBitStream ( BitStream );
+                    }
                 }
             }
 
@@ -188,34 +163,26 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     alpha.data.ucAlpha = pObject->GetAlpha ();
                     BitStream.Write ( &alpha );
 
-                    // Double sided
-                    bool bIsDoubleSided = pObject->IsDoubleSided ();
-                    BitStream.WriteBit ( bIsDoubleSided );
-
-                    // Moving
-                    const CPositionRotationAnimation* pMoveAnimation = pObject->GetMoveAnimation ();
-                    if ( pMoveAnimation )
+                    if ( BitStream.Version () >= 0x0c )
                     {
-                         BitStream.WriteBit ( true );
-                         pMoveAnimation->ToBitStream ( BitStream, true );
-                    }
-                    else
-                    {
-                        BitStream.WriteBit ( false );
+                        bool bIsDoubleSided = pObject->IsDoubleSided ();
+                        BitStream.WriteBit ( bIsDoubleSided );
                     }
 
-                    // Scale
-                    float fScale = pObject->GetScale ();
-                    BitStream.Write ( fScale );
+                    bool bIsMoving = pObject->IsMoving ();
+                    BitStream.WriteBit ( bIsMoving );
 
-                    // Static
-                    bool bStatic = pObject->IsStatic ();
-                    BitStream.WriteBit ( bStatic );
+                    if ( bIsMoving )
+                    {
+                        BitStream.WriteCompressed ( pObject->GetMoveTimeLeft () );
 
-                    // Health
-                    SObjectHealthSync health;
-                    health.data.fValue = pObject->GetHealth ();
-                    BitStream.Write ( &health );
+                        position.data.vecPosition = pObject->m_moveData.vecStopPosition;
+                        BitStream.Write ( &position );
+
+                        rotationRadians.data.vecRotation = pObject->m_moveData.vecStopRotation - rotationRadians.data.vecRotation;
+                        BitStream.Write ( &rotationRadians );
+                    }
+
 
                     break;
                 }
@@ -299,17 +266,11 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     health.data.fValue = pVehicle->GetHealth ();
                     BitStream.Write ( &health );
 
-                    // Color
-                    CVehicleColor& vehColor = pVehicle->GetColor ();
-                    uchar ucNumColors = vehColor.GetNumColorsUsed () - 1;
-                    BitStream.WriteBits ( &ucNumColors, 2 );
-                    for ( uint i = 0 ; i <= ucNumColors ; i++ )
-                    {
-                        SColor RGBColor = vehColor.GetRGBColor ( i );
-                        BitStream.Write ( RGBColor.R );
-                        BitStream.Write ( RGBColor.G );
-                        BitStream.Write ( RGBColor.B );
-                    }
+                    // Color as 4 unsigned chars
+                    BitStream.Write ( pVehicle->GetColor ().GetColor1 () );
+                    BitStream.Write ( pVehicle->GetColor ().GetColor2 () );
+                    BitStream.Write ( pVehicle->GetColor ().GetColor3 () );
+                    BitStream.Write ( pVehicle->GetColor ().GetColor4 () );
 
                     // Paintjob
                     SPaintjobSync paintjob;
@@ -328,7 +289,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     unsigned short usModel = pVehicle->GetModel ();
                     if ( CVehicleManager::HasTurret ( usModel ) )
                     {
-                        SVehicleTurretSync specific;
+                        SVehicleSpecific specific;
                         specific.data.fTurretX = pVehicle->GetTurretPositionX ();
                         specific.data.fTurretY = pVehicle->GetTurretPositionY ();
                         BitStream.Write ( &specific );
@@ -338,17 +299,6 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     if ( CVehicleManager::HasAdjustableProperty ( usModel ) )
                     {
                         BitStream.WriteCompressed ( pVehicle->GetAdjustableProperty () );
-                    }
-
-                    // If the vehicle has doors, sync their open angle ratios.
-                    if ( CVehicleManager::HasDoors ( usModel ) )
-                    {
-                        SDoorOpenRatioSync door;
-                        for ( unsigned char i = 0; i < 6; ++i )
-                        {
-                            door.data.fRatio = pVehicle->GetDoorOpenRatio ( i );
-                            BitStream.Write ( &door );
-                        }
                     }
 
                     // Write all the upgrades
@@ -474,17 +424,15 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.WriteCompressed ( pBlip->m_sOrdering );
 
                     // Write the visible distance
-                    SIntegerSync < unsigned short, 14 > visibleDistance ( pBlip->m_usVisibleDistance );
-                    BitStream.Write ( &visibleDistance );
+                    BitStream.Write ( pBlip->m_fVisibleDistance );
 
                     // Write the icon
-                    SIntegerSync < unsigned char, 6 > icon ( pBlip->m_ucIcon );
-                    BitStream.Write ( &icon );
-                    if ( pBlip->m_ucIcon == 0 )
+                    unsigned char ucIcon = pBlip->m_ucIcon;
+                    BitStream.Write ( ucIcon );
+                    if ( ucIcon == 0 )
                     {
                         // Write the size
-                        SIntegerSync < unsigned char, 5 > size ( pBlip->m_ucSize );
-                        BitStream.Write ( &size );
+                        BitStream.Write ( pBlip->m_ucSize );
 
                         // Write the color
                         SColorSync color;
@@ -620,6 +568,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     SEntityAlphaSync alpha;
                     alpha.data.ucAlpha = pPed->GetAlpha ();
                     BitStream.Write ( &alpha );
+
+                    if ( BitStream.Version () < 0x07 )
+                        break;
 
                     // clothes
                     unsigned char ucNumClothes = 0;
@@ -757,6 +708,208 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         }
                         default: break;
                     }
+                    break;
+                }
+
+                case CElement::HANDLING:
+                {
+                    // Cast to handling class
+                    CHandling* pHandling = static_cast < CHandling* > ( pElement );
+
+                    bool bMass, bTurnMass, bDragCoeff, bCenterOfMass, bPercentSubmerged;
+                    bool bTractionMultiplier, bDriveType, bEngineType, bNumberOfGears;
+                    bool bEngineAccelleration, bEngineInertia, bMaxVelocity, bBrakeDecelleration;
+                    bool bBrakeBias, bABS, bSteeringLock, bTractionLoss, bTractionBias;
+                    bool bSuspensionForceLevel, bSuspensionDamping, bSuspensionHighSpeedDamping;
+                    bool bSuspensionUpperLimit, bSuspensionLowerLimit, bSuspensionFrontRearBias;
+                    bool bSuspensionAntidiveMultiplier, bCollisionDamageMultiplier;
+                    bool bSeatOffsetDistance, bHandlingFlags, bModelFlags, bHeadLight;
+                    bool bTailLight, bAnimGroup;
+
+                    // Write all the details about the handling
+                    float fMass = pHandling->GetMass ( bMass );
+                    float fTurnMass = pHandling->GetTurnMass ( bTurnMass );
+                    float fDragCoeff = pHandling->GetDragCoeff ( bDragCoeff );
+                    const CVector& vecCenterOfMass = pHandling->GetCenterOfMass ( bCenterOfMass );
+                    unsigned int uiPercentSubmerged = pHandling->GetPercentSubmerged ( bPercentSubmerged );
+                    float fTractionMultiplier = pHandling->GetTractionMultiplier ( bTractionMultiplier );
+                    unsigned char ucDriveType = pHandling->GetDriveType ( bDriveType );
+                    unsigned char ucEngineType = pHandling->GetEngineType ( bEngineType );
+                    unsigned char ucNumberOfGears = pHandling->GetNumberOfGears ( bNumberOfGears );
+                    float fEngineAccelleration = pHandling->GetEngineAccelleration ( bEngineAccelleration );
+                    float fEngineInertia = pHandling->GetEngineInertia ( bEngineInertia );
+                    float fMaxVelocity = pHandling->GetMaxVelocity ( bMaxVelocity );
+                    float fBrakeDecelleration = pHandling->GetBrakeDecelleration ( bBrakeDecelleration );
+                    float fBrakeBias = pHandling->GetBrakeBias ( bBrakeBias );
+                    unsigned char ucABS = pHandling->GetABS ( bABS ) ? 1 : 0;
+                    float fSteeringLock = pHandling->GetSteeringLock ( bSteeringLock );
+                    float fTractionLoss = pHandling->GetTractionLoss ( bTractionLoss );
+                    float fTractionBias = pHandling->GetTractionBias ( bTractionBias );
+                    float fSuspensionForceLevel = pHandling->GetSuspensionForceLevel ( bSuspensionForceLevel );
+                    float fSuspensionDamping = pHandling->GetSuspensionDamping ( bSuspensionDamping );
+                    float fSuspensionHighSpeedDamping = pHandling->GetSuspensionHighSpeedDamping ( bSuspensionHighSpeedDamping );
+                    float fSuspensionUpperLimit = pHandling->GetSuspensionUpperLimit ( bSuspensionUpperLimit );
+                    float fSuspensionLowerLimit = pHandling->GetSuspensionLowerLimit ( bSuspensionLowerLimit );
+                    float fSuspensionFrontRearBias = pHandling->GetSuspensionFrontRearBias ( bSuspensionFrontRearBias );
+                    float fSuspensionAntidiveMultiplier = pHandling->GetSuspensionAntidiveMultiplier ( bSuspensionAntidiveMultiplier );
+                    float fCollisionDamageMultiplier = pHandling->GetCollisionDamageMultiplier ( bCollisionDamageMultiplier );
+                    float fSeatOffsetDistance = pHandling->GetSeatOffsetDistance ( bSeatOffsetDistance );
+                    unsigned int uiHandlingFlags = pHandling->GetHandlingFlags ( bHandlingFlags );
+                    unsigned int uiModelFlags = pHandling->GetModelFlags ( bModelFlags );
+                    unsigned char ucHeadLight = pHandling->GetHeadLight ( bHeadLight );
+                    unsigned char ucTailLight = pHandling->GetTailLight ( bTailLight );
+                    unsigned char ucAnimGroup = pHandling->GetAnimGroup ( bAnimGroup );
+
+                    // Put all the bools in a long so the client knows what it's going to
+                    // receive
+                    unsigned long ulChanged =   static_cast < unsigned long > ( bMass ) |
+                                                static_cast < unsigned long > ( bTurnMass ) << 1 |
+                                                static_cast < unsigned long > ( bDragCoeff ) << 2 |
+                                                static_cast < unsigned long > ( bCenterOfMass ) << 3 |
+                                                static_cast < unsigned long > ( bPercentSubmerged ) << 4 |
+                                                static_cast < unsigned long > ( bTractionMultiplier ) << 5 |
+                                                static_cast < unsigned long > ( bDriveType ) << 6 |
+                                                static_cast < unsigned long > ( bEngineType ) << 7 |
+                                                static_cast < unsigned long > ( bNumberOfGears ) << 8 |
+                                                static_cast < unsigned long > ( bEngineAccelleration ) << 9 |
+                                                static_cast < unsigned long > ( bEngineInertia ) << 10 |
+                                                static_cast < unsigned long > ( bMaxVelocity ) << 11 |
+                                                static_cast < unsigned long > ( bBrakeDecelleration ) << 12 |
+                                                static_cast < unsigned long > ( bBrakeBias ) << 13 |
+                                                static_cast < unsigned long > ( bABS ) << 14 |
+                                                static_cast < unsigned long > ( bSteeringLock ) << 15 |
+                                                static_cast < unsigned long > ( bTractionLoss ) << 16 |
+                                                static_cast < unsigned long > ( bTractionBias ) << 17 |
+                                                static_cast < unsigned long > ( bSuspensionForceLevel ) << 18 |
+                                                static_cast < unsigned long > ( bSuspensionDamping ) << 19 |
+                                                static_cast < unsigned long > ( bSuspensionHighSpeedDamping ) << 20 |
+                                                static_cast < unsigned long > ( bSuspensionUpperLimit ) << 21 |
+                                                static_cast < unsigned long > ( bSuspensionLowerLimit ) << 22 |
+                                                static_cast < unsigned long > ( bSuspensionFrontRearBias ) << 23 |
+                                                static_cast < unsigned long > ( bSuspensionAntidiveMultiplier ) << 24 |
+                                                static_cast < unsigned long > ( bCollisionDamageMultiplier ) << 25 |
+                                                static_cast < unsigned long > ( bSeatOffsetDistance ) << 26 |
+                                                static_cast < unsigned long > ( bHandlingFlags ) << 27 |
+                                                static_cast < unsigned long > ( bModelFlags ) << 28 |
+                                                static_cast < unsigned long > ( bHeadLight ) << 29 |
+                                                static_cast < unsigned long > ( bTailLight ) << 30 |
+                                                static_cast < unsigned long > ( bAnimGroup ) << 31;
+                    BitStream.Write ( ulChanged );
+
+                    if ( bMass )
+                        BitStream.Write ( fMass );
+
+                    if ( bTurnMass )
+                        BitStream.Write ( fTurnMass );
+
+                    if ( bDragCoeff )
+                        BitStream.Write ( fDragCoeff );
+
+                    if ( bCenterOfMass )
+                    {
+                        BitStream.Write ( vecCenterOfMass.fX );
+                        BitStream.Write ( vecCenterOfMass.fY );
+                        BitStream.Write ( vecCenterOfMass.fZ );
+                    }
+
+                    if ( bPercentSubmerged )
+                        BitStream.Write ( uiPercentSubmerged );
+
+                    if ( bTractionMultiplier )
+                        BitStream.Write ( fTractionMultiplier );
+
+                    if ( bDriveType )
+                        BitStream.Write ( ucDriveType );
+
+                    if ( bEngineType )
+                        BitStream.Write ( ucEngineType );
+
+                    if ( bNumberOfGears )
+                        BitStream.Write ( ucNumberOfGears );
+
+                    if ( bEngineAccelleration )
+                        BitStream.Write ( fEngineAccelleration );
+
+                    if ( bEngineInertia )
+                        BitStream.Write ( fEngineInertia );
+
+                    if ( bMaxVelocity )
+                        BitStream.Write ( fMaxVelocity );
+
+                    if ( bBrakeDecelleration )
+                        BitStream.Write ( fBrakeDecelleration );
+
+                    if ( bBrakeBias )
+                        BitStream.Write ( fBrakeBias );
+
+                    if ( bABS )
+                        BitStream.Write ( ucABS );
+
+                    if ( bSteeringLock )
+                        BitStream.Write ( fSteeringLock );
+
+                    if ( bTractionLoss )
+                        BitStream.Write ( fTractionLoss );
+
+                    if ( bTractionBias )
+                        BitStream.Write ( fTractionBias );
+
+                    if ( bSuspensionForceLevel )
+                        BitStream.Write ( fSuspensionForceLevel );
+
+                    if ( bSuspensionDamping )
+                        BitStream.Write ( fSuspensionDamping );
+
+                    if ( bSuspensionHighSpeedDamping )
+                        BitStream.Write ( fSuspensionHighSpeedDamping );
+
+                    if ( bSuspensionUpperLimit )
+                        BitStream.Write ( fSuspensionUpperLimit );
+                    
+                    if ( bSuspensionLowerLimit )
+                        BitStream.Write ( fSuspensionLowerLimit );
+
+                    if ( bSuspensionFrontRearBias )
+                        BitStream.Write ( fSuspensionFrontRearBias );
+
+                    if ( bSuspensionAntidiveMultiplier )
+                        BitStream.Write ( fSuspensionAntidiveMultiplier );
+
+                    if ( bCollisionDamageMultiplier )
+                        BitStream.Write ( fCollisionDamageMultiplier );
+
+                    if ( bSeatOffsetDistance )
+                        BitStream.Write ( fSeatOffsetDistance );
+
+                    if ( bHandlingFlags )
+                        BitStream.Write ( uiHandlingFlags );
+                    
+                    if ( bModelFlags )
+                        BitStream.Write ( uiModelFlags );
+
+                    if ( bHeadLight )
+                        BitStream.Write ( ucHeadLight );
+
+                    if ( bTailLight )
+                        BitStream.Write ( ucTailLight );
+
+                    if ( bAnimGroup )
+                        BitStream.Write ( ucAnimGroup );
+
+                    // Write number of vehicles that have this handling applied as default
+                    unsigned char ucCount = static_cast < unsigned char > ( pHandling->CountDefaultTo () );
+                    BitStream.Write ( ucCount );
+
+                    // Write their ID's as bytes (real id - 400)
+                    std::list < unsigned short > ::const_iterator iter = pHandling->IterDefaultToBegin ();
+                    for ( ; iter != pHandling->IterDefaultToEnd (); iter++ )
+                    {
+                        // Grab the ID
+                        unsigned char ucID = (*iter) - 400;
+                        BitStream.Write ( ucID );
+                    }
+
+                    // Done
                     break;
                 }
 

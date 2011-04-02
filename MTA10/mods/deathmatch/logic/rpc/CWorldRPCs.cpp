@@ -7,7 +7,6 @@
 *  DEVELOPERS:  Jax <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -27,8 +26,6 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_WAVE_HEIGHT, SetWaveHeight, "SetWaveHeight" );
     AddHandler ( SET_SKY_GRADIENT, SetSkyGradient, "SetSkyGradient" );
     AddHandler ( RESET_SKY_GRADIENT, ResetSkyGradient, "ResetSkyGradient" );
-    AddHandler ( SET_HEAT_HAZE, SetHeatHaze, "SetHeatHaze" );
-    AddHandler ( RESET_HEAT_HAZE, ResetHeatHaze, "ResetHeatHaze" );
     AddHandler ( SET_BLUR_LEVEL, SetBlurLevel, "SetBlurLevel" );
     AddHandler ( SET_WANTED_LEVEL, SetWantedLevel, "SetWantedLevel" );
     AddHandler ( RESET_MAP_INFO, ResetMapInfo, "ResetMapInfo" );
@@ -36,22 +33,6 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_GARAGE_OPEN, SetGarageOpen, "SetGarageOpen" );
     AddHandler ( SET_GLITCH_ENABLED, SetGlitchEnabled, "SetGlitchEnabled" );
     AddHandler ( SET_CLOUDS_ENABLED, SetCloudsEnabled, "SetCloudsEnabled" );
-    AddHandler ( SET_TRAFFIC_LIGHT_STATE, SetTrafficLightState, "SetTrafficLightState" );
-    AddHandler ( SET_JETPACK_MAXHEIGHT, SetJetpackMaxHeight, "SetJetpackMaxHeight" );
-
-    AddHandler ( SET_INTERIOR_SOUNDS_ENABLED, SetInteriorSoundsEnabled, "SetInteriorSoundsEnabled" );
-    AddHandler ( SET_RAIN_LEVEL, SetRainLevel, "SetRainLevel" );
-    AddHandler ( SET_SUN_SIZE, SetSunSize, "SetSunSize" );
-    AddHandler ( SET_SUN_COLOR, SetSunColor, "SetSunColor" );
-    AddHandler ( SET_WIND_VELOCITY, SetWindVelocity, "SetWindVelocity" );
-    AddHandler ( SET_FAR_CLIP_DISTANCE, SetFarClipDistance, "SetFarClipDistance" );
-    AddHandler ( SET_FOG_DISTANCE, SetFogDistance, "SetFogDistance" );
-    AddHandler ( RESET_RAIN_LEVEL, ResetRainLevel, "ResetRainLevel" );
-    AddHandler ( RESET_SUN_SIZE, ResetSunSize, "ResetSunSize" );
-    AddHandler ( RESET_SUN_COLOR, ResetSunColor, "ResetSunColor" );
-    AddHandler ( RESET_WIND_VELOCITY, ResetWindVelocity, "ResetWindVelocity" );
-    AddHandler ( RESET_FAR_CLIP_DISTANCE, ResetFarClipDistance, "ResetFarClipDistance" );
-    AddHandler ( RESET_FOG_DISTANCE, ResetFogDistance, "ResetFogDistance" );
 }
 
 
@@ -163,22 +144,6 @@ void CWorldRPCs::ResetSkyGradient ( NetBitStreamInterface& bitStream )
 }
 
 
-void CWorldRPCs::SetHeatHaze ( NetBitStreamInterface& bitStream )
-{
-    SHeatHazeSync heatHaze;
-    if ( bitStream.Read ( &heatHaze ) )
-    {
-        g_pMultiplayer->SetHeatHaze ( heatHaze );
-    }
-}
-
-
-void CWorldRPCs::ResetHeatHaze ( NetBitStreamInterface& bitStream )
-{
-    g_pMultiplayer->ResetHeatHaze ();
-}
-
-
 void CWorldRPCs::SetBlurLevel ( NetBitStreamInterface& bitStream )
 {
     unsigned char ucLevel;
@@ -210,7 +175,16 @@ void CWorldRPCs::SetFPSLimit ( NetBitStreamInterface& bitStream )
 {
     short sFPSLimit;
     bitStream.Read ( sFPSLimit );
-    g_pCore->RecalculateFrameRateLimit ( sFPSLimit );
+
+    int iVal;
+    g_pCore->GetCVars ()->Get ( "fps_limit", iVal );
+
+    if ( sFPSLimit > 0 && iVal > sFPSLimit || iVal == 0 )
+        // For some reason it needs that kind of hacky precision
+        g_pGame->SetFramelimiter ( (unsigned long) ( (float)sFPSLimit * 1.333f ) );
+    else
+        g_pGame->SetFramelimiter ( (unsigned long) ( (float)iVal * 1.3f ) );
+
 }
 
 void CWorldRPCs::SetGarageOpen ( NetBitStreamInterface& bitStream )
@@ -244,129 +218,4 @@ void CWorldRPCs::SetCloudsEnabled ( NetBitStreamInterface& bitStream )
     bool bEnabled = (ucIsEnabled == 1);
     g_pMultiplayer->SetCloudsEnabled ( bEnabled );
     g_pClientGame->SetCloudsEnabled( bEnabled );
-}
-
-void CWorldRPCs::SetTrafficLightState ( NetBitStreamInterface& bitStream )
-{
-    char ucTrafficLightState;
-
-    if ( bitStream.ReadBits ( &ucTrafficLightState, 4 ) )
-    {
-       bool bForced = bitStream.ReadBit();
-       // We ignore updating the serverside traffic light state if it's blocked, unless script forced it
-        if ( bForced || !g_pMultiplayer->GetTrafficLightsLocked() )
-            g_pMultiplayer->SetTrafficLightState ( (unsigned char)* &ucTrafficLightState );
-    }
-}
-
-void CWorldRPCs::SetJetpackMaxHeight ( NetBitStreamInterface& bitStream )
-{
-    float fJetpackMaxHeight;
-
-    if ( bitStream.Read ( fJetpackMaxHeight ) )
-    {
-        g_pGame->GetWorld ()->SetJetpackMaxHeight ( fJetpackMaxHeight );
-    }
-}
-
-void CWorldRPCs::SetInteriorSoundsEnabled ( NetBitStreamInterface& bitStream )
-{
-    bool bEnable;
-
-    if ( bitStream.ReadBit ( bEnable ) )
-    {
-        g_pMultiplayer->SetInteriorSoundsEnabled ( bEnable );
-    }
-}
-
-void CWorldRPCs::SetRainLevel ( NetBitStreamInterface& bitStream )
-{
-    float fRainLevel;
-
-    if ( bitStream.Read ( fRainLevel ) )
-    {
-        g_pGame->GetWeather ()->SetAmountOfRain ( fRainLevel );
-    }
-}
-
-void CWorldRPCs::SetSunSize ( NetBitStreamInterface& bitStream )
-{
-    float fSunSize;
-
-    if ( bitStream.Read ( fSunSize ) )
-    {
-        g_pMultiplayer->SetSunSize ( fSunSize );
-    }
-}
-
-void CWorldRPCs::SetSunColor ( NetBitStreamInterface& bitStream )
-{
-    unsigned char ucCoreR, ucCoreG, ucCoreB;
-    unsigned char ucCoronaR, ucCoronaG, ucCoronaB;
-
-    if ( bitStream.Read ( ucCoreR ) && bitStream.Read ( ucCoreG ) && bitStream.Read ( ucCoreB )
-        && bitStream.Read ( ucCoronaR ) && bitStream.Read ( ucCoronaG ) && bitStream.Read ( ucCoronaB ) )
-    {
-        g_pMultiplayer->SetSunColor ( ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB );
-    }
-}
-
-void CWorldRPCs::SetWindVelocity ( NetBitStreamInterface& bitStream )
-{
-    float fVelX, fVelY, fVelZ;
-
-    if ( bitStream.Read ( fVelX ) && bitStream.Read ( fVelY ) && bitStream.Read ( fVelZ ) )
-    {
-        g_pMultiplayer->SetWindVelocity ( fVelX, fVelY, fVelZ );
-    }
-}
-
-void CWorldRPCs::SetFarClipDistance ( NetBitStreamInterface& bitStream )
-{
-    float fFarClip;
-
-    if ( bitStream.Read ( fFarClip ) )
-    {
-        g_pMultiplayer->SetFarClipDistance ( fFarClip );
-    }
-}
-
-void CWorldRPCs::SetFogDistance ( NetBitStreamInterface& bitStream )
-{
-    float fFogDist;
-
-    if ( bitStream.Read ( fFogDist ) )
-    {
-        g_pMultiplayer->SetFogDistance ( fFogDist );
-    }
-}
-
-void CWorldRPCs::ResetRainLevel ( NetBitStreamInterface& bitStream )
-{
-    g_pGame->GetWeather ()->ResetAmountOfRain ( );
-}
-
-void CWorldRPCs::ResetSunSize ( NetBitStreamInterface& bitStream )
-{
-    g_pMultiplayer->ResetSunSize ( );
-}
-
-void CWorldRPCs::ResetSunColor ( NetBitStreamInterface& bitStream )
-{
-    g_pMultiplayer->ResetSunColor ( );
-}
-
-void CWorldRPCs::ResetWindVelocity ( NetBitStreamInterface& bitStream )
-{
-    g_pMultiplayer->RestoreWindVelocity ( );
-}
-
-void CWorldRPCs::ResetFarClipDistance ( NetBitStreamInterface& bitStream )
-{
-    g_pMultiplayer->RestoreFarClipDistance ( );
-}
-
-void CWorldRPCs::ResetFogDistance ( NetBitStreamInterface& bitStream )
-{
-    g_pMultiplayer->RestoreFogDistance ( );
 }

@@ -21,7 +21,7 @@
 #include <windows.h>
 #endif
 
-#include <bochs_internal/crc32.h>
+#include "../../shared_logic/utils/zip/crc32.h"
 #include "CChecksum.h"
 
 class CDownloadableResource

@@ -8,7 +8,6 @@
 *               Christian Myhre Lundheim <>
 *               Jax <>
 *               Cecill Etheredge <ijsf@gmx.net>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -207,14 +206,14 @@ CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )
     CMatrix_Padded * pCamMatrix = &this->GetInterface()->m_cameraMatrix; // ->Placeable.matrix;
     if ( pCamMatrix )
     {
-        MemCpyFast (&matrix->vFront,     &pCamMatrix->vFront,    sizeof(CVector));
-        MemCpyFast (&matrix->vPos,           &pCamMatrix->vPos,          sizeof(CVector));
-        MemCpyFast (&matrix->vUp,            &pCamMatrix->vUp,           sizeof(CVector));
-        MemCpyFast (&matrix->vRight,         &pCamMatrix->vRight,            sizeof(CVector));   
+        MemCpy (&matrix->vFront,     &pCamMatrix->vFront,    sizeof(CVector));
+        MemCpy (&matrix->vPos,           &pCamMatrix->vPos,          sizeof(CVector));
+        MemCpy (&matrix->vUp,            &pCamMatrix->vUp,           sizeof(CVector));
+        MemCpy (&matrix->vRight,         &pCamMatrix->vRight,            sizeof(CVector));   
     }
     else
     {
-        MemSetFast (matrix, 0, sizeof(CMatrix));
+        MemSet (matrix, 0, sizeof(CMatrix));
     }
     return matrix;
 }
@@ -225,10 +224,10 @@ VOID CCameraSA::SetMatrix ( CMatrix * matrix )
     CMatrix_Padded * pCamMatrix = this->GetInterface()->Placeable.matrix;
     if ( pCamMatrix )
     {
-        MemCpyFast (&pCamMatrix->vFront,     &matrix->vFront,    sizeof(CVector));
-        MemCpyFast (&pCamMatrix->vPos,           &matrix->vPos,          sizeof(CVector));
-        MemCpyFast (&pCamMatrix->vUp,            &matrix->vUp,           sizeof(CVector));
-        MemCpyFast (&pCamMatrix->vRight,         &matrix->vRight,            sizeof(CVector));
+        MemCpy (&pCamMatrix->vFront,     &matrix->vFront,    sizeof(CVector));
+        MemCpy (&pCamMatrix->vPos,           &matrix->vPos,          sizeof(CVector));
+        MemCpy (&pCamMatrix->vUp,            &matrix->vUp,           sizeof(CVector));
+        MemCpy (&pCamMatrix->vRight,         &matrix->vRight,            sizeof(CVector));
     }   
 }
 
@@ -521,14 +520,14 @@ void _cdecl DoCameraCollisionDetectionPokes ()
 {
     if ( !bCameraClipObjects )
     {
-        MemPutFast < char > ( VAR_CameraClipDynamicObjects, 0 );
-        MemPutFast < char > ( VAR_CameraClipStaticObjects, 0 );
+        MemPut < char > ( VAR_CameraClipDynamicObjects, 0 );  //         *(char*)VAR_CameraClipDynamicObjects = 0;
+        MemPut < char > ( VAR_CameraClipStaticObjects, 0 );  //         *(char*)VAR_CameraClipStaticObjects = 0;
     }
     else
-        MemPutFast < char > ( VAR_CameraClipStaticObjects, 1 );
+        MemPut < char > ( VAR_CameraClipStaticObjects, 1 );  //         *(char*)VAR_CameraClipStaticObjects = 1;
 
     if ( !bCameraClipVehicles )
-        MemPutFast < char > ( VAR_CameraClipVehicles, 0 );
+        MemPut < char > ( VAR_CameraClipVehicles, 0 );  //         *(char*)VAR_CameraClipVehicles = 0;
 }
 
 void _declspec(naked) HOOK_Camera_CollisionDetection ()
@@ -545,13 +544,3 @@ void _declspec(naked) HOOK_Camera_CollisionDetection ()
     }
 }
 
-BYTE CCameraSA::GetCameraView ( void )
-{
-    // TODO: Add support for ped camera view, this will only work on vehicles for now.
-    return *(BYTE *)VAR_VehicleCameraView;
-}
-
-VOID CCameraSA::SetCameraView ( BYTE dwCamMode )
-{
-    MemPut < BYTE > ( VAR_VehicleCameraView, dwCamMode );
-}

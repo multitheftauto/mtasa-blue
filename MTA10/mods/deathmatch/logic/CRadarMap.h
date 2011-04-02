@@ -31,7 +31,6 @@ public:
     virtual                             ~CRadarMap                          ( void );
 
     void                                DoPulse                             ( void );
-    void                                DoRender                            ( void );
 
     bool                                IsRadarShowing                      ( void );
 

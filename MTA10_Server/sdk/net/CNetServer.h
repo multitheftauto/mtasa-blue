@@ -20,14 +20,8 @@
 class CNetServer
 {
 public:
-    enum ENetworkUsageDirection
-    {
-        STATS_INCOMING_TRAFFIC = 0,
-        STATS_OUTGOING_TRAFFIC = 1
-    };
-
     // szIP can be NULL if autochoosing is wanted.
-    virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers ) = 0;
+    virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiMTUSize, unsigned int uiAllowedPlayers ) = 0;
     virtual void                            StopNetwork                     ( void ) = 0;
     virtual void                            ResetNetwork                    ( void ) = 0;
 
@@ -50,22 +44,23 @@ public:
     virtual void                            RemoveBan                       ( const char* szIP ) = 0;
     virtual bool                            IsBanned                        ( const char* szIP ) = 0;
 
-    virtual void                            GetNetworkUsageData             ( CNetServer::ENetworkUsageDirection, unsigned long ulBits[256], unsigned long ulCount[256] ) = 0;
+    virtual void                            GetPacketLogData                ( unsigned long* ulBits, unsigned long* ulCount ) = 0;
 
     virtual void                            Kick                            ( NetServerPlayerID &PlayerID ) = 0;
 
-    virtual void                            SetPassword                     ( const char* szPassword ) = 0;
+    virtual void                            SetPassword                     ( char* szPassword ) = 0;
 
     virtual void                            SetMaximumIncomingConnections   ( unsigned short numberAllowed ) = 0;
+
+    virtual bool                            AutoPatcherAddFile              ( char* szFile ) = 0;
+    virtual void                            SetAutoPatcherDirectory         ( char* szDirectory ) = 0;
+    virtual bool                            AutoPatcherRemoveFile           ( char* szFile ) = 0;
 
     virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager      ( void ) = 0;
 
     virtual void                            SetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID, unsigned short usBitStreamVersion ) = 0;
     virtual void                            ClearClientBitStreamVersion     ( const NetServerPlayerID &PlayerID ) = 0;
     virtual unsigned short                  GetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID ) = 0;
-
-    virtual void                            EnablePortForwarding            ( unsigned short usPort, const char* szProtocol, bool bEnable ) = 0;
-    virtual int                             GetPortForwardingStatus         ( unsigned short usPort, const char* szProtocol ) = 0;  // 0:closed  1:busy  2:open  -1:fail
 
     virtual void                            ResetStub                       ( uint dwType, ... ) = 0;
     virtual void                            ResetStub                       ( uint dwType, va_list ) = 0;

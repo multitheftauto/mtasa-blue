@@ -22,14 +22,14 @@ using std::vector;
 unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,              // 400->415
                                        3, 1, 3, 1, 3, 3, 1, 1, 1, 0, 3, 3, 3, 1, 0, 8,              // 416->431
                                        0, 1, 1, 255, 1, 8, 3, 1, 3, 0, 1, 1, 1, 3, 0, 1,            // 432->447
-                                       0, 1, 255, 1, 0, 0, 0, 1, 1, 1, 3, 3, 1, 1, 1,               // 448->462
+                                       0, 255, 255, 1, 0, 0, 0, 1, 1, 1, 3, 3, 1, 1, 1,             // 448->462
                                        1, 1, 1, 3, 3, 1, 1, 3, 1, 0, 0, 1, 1, 0, 1, 1,              // 463->478
                                        3, 1, 0, 3, 1, 0, 0, 0, 3, 1, 1, 3, 1, 3, 0, 1,              // 479->494
                                        1, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 0, 0,              // 495->510
                                        1, 0, 0, 1, 1, 3, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,              // 511->526
-                                       1, 1, 3, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 3, 1,                 // 527->541
+                                       1, 1, 3, 0, 0, 0, 1, 1, 1, 1, 255, 1, 0, 3, 1,               // 527->541
                                        1, 1, 1, 1, 3, 3, 1, 1, 3, 3, 1, 0, 1, 1, 1, 1,              // 542->557
-                                       1, 1, 3, 3, 1, 1, 0, 1, 3, 3, 0, 255, 1, 0, 0,               // 558->572
+                                       1, 1, 3, 3, 1, 1, 0, 1, 3, 3, 0, 255, 255, 0, 0,             // 558->572
                                        1, 0, 1, 1, 1, 1, 3, 3, 1, 3, 0, 255, 3, 1, 1, 1,            // 573->588
                                        1, 255, 255, 1, 1, 1, 0, 3, 3, 3, 1, 1, 1, 1, 1,             // 589->604
                                        3, 1, 255, 255, 255, 3, 255, 255 };                          // 605->611
@@ -42,16 +42,15 @@ unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3,
 #define VEHICLE_HAS_SMOKE_TRAIL         0x010UL //16
 #define VEHICLE_HAS_TAXI_LIGHTS         0x020UL //32
 #define VEHICLE_HAS_SEARCH_LIGHT        0x040UL //64
-
 unsigned long g_ulVehicleAttributes [] = {
   0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 32, 0, 0, 2, 0,    // 400-424
   0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,    // 425-449
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 450-474
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 450-474
   0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 64, 0, 0,    // 475-499
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 0, 0, 0, 0, 0, 4, 12, 0, 0, 2, 8,  // 500-524
-  8, 0, 0, 2, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,     // 525-549
-  0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 550-574
-  0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 2, 2, 2, 2,    // 575-599
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 0, 0, 0, 0, 0, 4, 12, 0, 0, 2, 8, // 500-524
+  8, 0, 0, 2, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,    // 525-549
+  0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 550-574
+  0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 2, 2, 2, 2,   // 575-599
   0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
@@ -59,7 +58,6 @@ CClientVehicleManager::CClientVehicleManager ( CClientManager* pManager )
 {
     assert ( NUMELMS ( g_ucMaxPassengers ) == 212 );
     assert ( NUMELMS ( g_ulVehicleAttributes ) == 212 );
-
     // Initialize members
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
@@ -187,7 +185,7 @@ bool CClientVehicleManager::IsTrainModel ( unsigned long ulModel )
 {
     return ( ulModel == 449 || ulModel == 537 || 
              ulModel == 538 || ulModel == 569 || 
-             ulModel == 590 || ulModel == 570 );
+             ulModel == 590 );
 }
 
 
@@ -227,8 +225,8 @@ eClientVehicleType CClientVehicleManager::GetVehicleType ( unsigned long ulModel
 
 unsigned char CClientVehicleManager::GetMaxPassengerCount ( unsigned long ulModel )
 {
-    // Valid model?
-    if ( IsValidModel( ulModel ) )
+    // Valid range?
+    if ( ulModel >= 400 && ulModel <= 611 )
     {
         return g_ucMaxPassengers [ulModel - 400];
     }
@@ -303,7 +301,7 @@ unsigned char CClientVehicleManager::ConvertIndexToGameSeat ( unsigned long ulMo
             return 0xFF;
         }
 
-        // Bus, train (570)?
+        // Bus?
         case 8:
         {
             if ( ucIndex == 0 )
@@ -380,49 +378,12 @@ bool CClientVehicleManager::HasDamageModel ( unsigned long ulModel )
 
 bool CClientVehicleManager::HasDamageModel ( eClientVehicleType Type )
 {
-    switch ( Type )
-    {
-        case CLIENTVEHICLE_TRAILER:
-        case CLIENTVEHICLE_MONSTERTRUCK:
-        case CLIENTVEHICLE_QUADBIKE:
-        case CLIENTVEHICLE_HELI:
-        case CLIENTVEHICLE_PLANE:
-        case CLIENTVEHICLE_CAR:
-            return true;
-        default:
-            return false;
-    }
-}
-
-bool CClientVehicleManager::HasDoors ( unsigned long ulModel )
-{
-    bool bHasDoors = false;
-
-    if ( HasDamageModel ( ulModel ) == true )
-    {
-        switch ( ulModel )
-        {
-            case VT_BFINJECT:
-            case VT_RCBANDIT:
-            case VT_CADDY:
-            case VT_RCRAIDER:
-            case VT_BAGGAGE:
-            case VT_DOZER:
-            case VT_FORKLIFT:
-            case VT_TRACTOR:
-            case VT_RCTIGER:
-            case VT_BANDITO:
-            case VT_KART:
-            case VT_MOWER:
-            case VT_RCCAM:
-            case VT_RCGOBLIN:
-                break;
-            default:
-                bHasDoors = true;
-        }
-    }
-
-    return bHasDoors;
+    return ( Type == CLIENTVEHICLE_TRAILER ||
+             Type == CLIENTVEHICLE_MONSTERTRUCK ||
+             Type == CLIENTVEHICLE_QUADBIKE ||
+             Type == CLIENTVEHICLE_HELI ||
+             Type == CLIENTVEHICLE_PLANE ||
+             Type == CLIENTVEHICLE_CAR );
 }
 
 

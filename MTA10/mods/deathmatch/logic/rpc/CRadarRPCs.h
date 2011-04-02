@@ -21,9 +21,9 @@ public:
     static void                 LoadFunctions           ( void );
 
     DECLARE_RPC ( DestroyAllRadarAreas );
-    DECLARE_ELEMENT_RPC ( SetRadarAreaSize );
-    DECLARE_ELEMENT_RPC ( SetRadarAreaColor );
-    DECLARE_ELEMENT_RPC ( SetRadarAreaFlashing );
+    DECLARE_RPC ( SetRadarAreaSize );
+    DECLARE_RPC ( SetRadarAreaColor );
+    DECLARE_RPC ( SetRadarAreaFlashing );
 };
 
 #endif

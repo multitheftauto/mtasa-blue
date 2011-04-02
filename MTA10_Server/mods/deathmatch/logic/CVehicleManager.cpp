@@ -14,20 +14,20 @@
 
 #include "StdInc.h"
 
-static unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,       // 400->415
-                                       3, 1, 3, 1, 3, 3, 1, 1, 1, 0, 3, 3, 3, 1, 0, 8,              // 416->431
-                                       0, 1, 1, 255, 1, 8, 3, 1, 3, 0, 1, 1, 1, 3, 0, 1,            // 432->447
-                                       0, 1, 255, 1, 0, 0, 0, 1, 1, 1, 3, 3, 1, 1, 1,               // 448->462
-                                       1, 1, 1, 3, 3, 1, 1, 3, 1, 0, 0, 1, 1, 0, 1, 1,              // 463->478
-                                       3, 1, 0, 3, 1, 0, 0, 0, 3, 1, 1, 3, 1, 3, 0, 1,              // 479->494
-                                       1, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 0, 0,              // 495->510
-                                       1, 0, 0, 1, 1, 3, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,              // 511->526
-                                       1, 1, 3, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 3, 1,                 // 527->541
-                                       1, 1, 1, 1, 3, 3, 1, 1, 3, 3, 1, 0, 1, 1, 1, 1,              // 542->557
-                                       1, 1, 3, 3, 1, 1, 0, 1, 3, 3, 0, 255, 1, 0, 0,               // 558->572
-                                       1, 0, 1, 1, 1, 1, 3, 3, 1, 3, 0, 255, 3, 1, 1, 1,            // 573->588
-                                       1, 255, 255, 1, 1, 1, 0, 3, 3, 3, 1, 1, 1, 1, 1,             // 589->604
-                                       3, 1, 255, 255, 255, 3, 255, 255 };                          // 605->611
+static unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,   // 400->415
+                                              3, 1, 3, 1, 3, 3, 1, 1, 1, 0, 3, 3, 3, 1, 0, 8,   // 416->431
+                                              0, 1, 1, 255, 1, 8, 3, 1, 3, 0, 1, 1, 1, 3, 0, 1, // 432->447
+                                              0, 255, 255, 1, 0, 0, 0, 1, 1, 1, 3, 3, 1, 1, 1,  // 448->462
+                                              1, 1, 1, 3, 3, 1, 1, 3, 1, 0, 0, 1, 1, 0, 1, 1,   // 463->478
+                                              3, 1, 0, 3, 1, 0, 0, 0, 3, 1, 1, 3, 1, 3, 0, 1,   // 479->494
+                                              1, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 0, 0,
+                                              1, 0, 0, 1, 1, 3, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,
+                                              1, 1, 3, 0, 0, 0, 1, 1, 1, 1, 255, 255, 0, 3, 1,
+                                              1, 1, 1, 1, 3, 3, 1, 1, 3, 3, 1, 0, 1, 1, 1, 1,
+                                              1, 1, 3, 3, 1, 1, 0, 1, 3, 3, 0, 255, 255, 0, 0,
+                                              1, 0, 1, 1, 1, 1, 3, 3, 1, 3, 0, 255, 3, 1, 1, 1,
+                                              1, 255, 255, 1, 1, 1, 0, 3, 3, 3, 1, 1, 1, 1, 1,
+                                              3, 1, 255, 255, 255, 3, 255, 255 };
 
 // List over all vehicles with their special attributes
 #define VEHICLE_HAS_TURRENT             0x001UL //1
@@ -36,7 +36,6 @@ static unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1
 #define VEHICLE_HAS_ADJUSTABLE_PROPERTY 0x008UL //8
 #define VEHICLE_HAS_SMOKE_TRAIL         0x010UL //16
 #define VEHICLE_HAS_TAXI_LIGHTS         0x020UL //32
-
 unsigned long g_ulVehicleAttributes [] = {
   0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 32, 0, 0, 2, 0,    // 400-424
   0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,    // 425-449
@@ -86,7 +85,6 @@ CVehicleManager::CVehicleManager ( void )
     assert ( NUMELMS ( g_ucMaxPassengers ) == 212 );
     assert ( NUMELMS ( g_ulVehicleAttributes ) == 212 );
     assert ( NUMELMS ( gs_vehicleTypes ) == 212 );
-
     // Init
     m_bDontRemoveFromList = false;
 }
@@ -197,7 +195,7 @@ bool CVehicleManager::IsValidUpgrade ( unsigned short usUpgrade )
 
 unsigned int CVehicleManager::GetMaxPassengers ( unsigned int uiVehicleModel )
 {
-    if ( IsValidModel ( uiVehicleModel ) )
+    if ( uiVehicleModel >= 400 && uiVehicleModel <= 611 )
     {
         return g_ucMaxPassengers [uiVehicleModel - 400];
     }
@@ -247,62 +245,17 @@ bool CVehicleManager::HasSmokeTrail ( unsigned int uiModel )
 
 bool CVehicleManager::IsTrailer ( unsigned int uiVehicleModel )
 {
-    return ( IsValidModel ( uiVehicleModel ) &&
-             ( gs_vehicleTypes [uiVehicleModel - 400] == VEHICLE_TRAILER ) );
+    return ( uiVehicleModel == VT_ARTICT1 ||
+             uiVehicleModel == VT_ARTICT2 ||
+             uiVehicleModel == VT_PETROTR ||
+             uiVehicleModel == VT_ARTICT3 ||
+             uiVehicleModel == VT_BAGBOXA ||
+             uiVehicleModel == VT_BAGBOXB ||
+             uiVehicleModel == VT_TUGSTAIR ||
+             uiVehicleModel == VT_FARMTR1 ||
+             uiVehicleModel == VT_UTILTR1 );
 }
 
-bool CVehicleManager::HasDamageModel ( unsigned short usModel )
-{
-    return HasDamageModel ( GetVehicleType ( usModel ) );
-}
-
-
-bool CVehicleManager::HasDamageModel ( eVehicleType Type )
-{
-    switch ( Type )
-    {
-        case VEHICLE_TRAILER:
-        case VEHICLE_MONSTERTRUCK:
-        case VEHICLE_QUADBIKE:
-        case VEHICLE_HELI:
-        case VEHICLE_PLANE:
-        case VEHICLE_CAR:
-            return true;
-        default:
-            return false;
-    }
-}
-
-bool CVehicleManager::HasDoors ( unsigned short usModel )
-{
-    bool bHasDoors = false;
-
-    if ( HasDamageModel ( usModel ) == true )
-    {
-        switch ( usModel )
-        {
-            case VT_BFINJECT:
-            case VT_RCBANDIT:
-            case VT_CADDY:
-            case VT_RCRAIDER:
-            case VT_BAGGAGE:
-            case VT_DOZER:
-            case VT_FORKLIFT:
-            case VT_TRACTOR:
-            case VT_RCTIGER:
-            case VT_BANDITO:
-            case VT_KART:
-            case VT_MOWER:
-            case VT_RCCAM:
-            case VT_RCGOBLIN:
-                break;
-            default:
-                bHasDoors = true;
-        }
-    }
-
-    return bHasDoors;
-}
 
 CVehicleColor CVehicleManager::GetRandomColor ( unsigned short usModel )
 {

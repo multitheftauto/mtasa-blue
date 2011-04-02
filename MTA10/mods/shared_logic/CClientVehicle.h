@@ -142,19 +142,9 @@ public:
     bool                        IsVisible               ( void );
     void                        SetVisible              ( bool bVisible );
 
-    void                        SetDoorOpenRatio        ( unsigned char ucDoor, float fRatio, unsigned long ulDelay = 0, bool bForced = false );
-    float                       GetDoorOpenRatio        ( unsigned char ucDoor );
-    void                        SetSwingingDoorsAllowed ( bool bAllowed );
-    bool                        AreSwingingDoorsAllowed () const;
     bool                        AreDoorsLocked          ( void );
     void                        SetDoorsLocked          ( bool bLocked );
 
-private:
-    void                        SetDoorOpenRatioInterpolated    ( unsigned char ucDoor, float fRatio, unsigned long ulDelay );
-    void                        ResetDoorInterpolation          ();
-    void                        ProcessDoorInterpolation        ();
-
-public:
     bool                        AreDoorsUndamageable    ( void );
     void                        SetDoorsUndamageable    ( bool bUndamageable );
 
@@ -164,8 +154,8 @@ public:
     void                        Blow                    ( bool bAllowMovement = false );
     inline bool                 IsVehicleBlown          ( void ) { return m_bBlown; };
 
-    CVehicleColor&              GetColor                ( void );
-    void                        SetColor                ( const CVehicleColor& color );
+    void                        GetColor                ( unsigned char& ucColor1, unsigned char& ucColor2, unsigned char& ucColor3, unsigned char& ucColor4 );
+    void                        SetColor                ( unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4 );
 
     void                        GetTurretRotation       ( float& fHorizontal, float& fVertical );
     void                        SetTurretRotation       ( float fHorizontal, float fVertical );
@@ -448,15 +438,6 @@ protected:
     bool                        m_bLandingGearDown;
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
-    float                       m_fDoorOpenRatio [ 6 ];
-    struct
-    {
-        float                   fStart  [ 6 ];
-        float                   fTarget [ 6 ];
-        unsigned long           ulStartTime [ 6 ];
-        unsigned long           ulTargetTime [ 6 ];
-    } m_doorInterp;
-    bool                        m_bSwingingDoorsAllowed;
     bool                        m_bDoorsLocked;
     bool                        m_bDoorsUndamageable;
     bool                        m_bCanShootPetrolTank;
@@ -472,7 +453,10 @@ protected:
     bool                        m_bJustBlewUp;
     eEntityStatus               m_NormalStatus;
     bool                        m_bColorSaved;
-    CVehicleColor               m_Color;
+    unsigned char               m_ucColor1;
+    unsigned char               m_ucColor2;
+    unsigned char               m_ucColor3;
+    unsigned char               m_ucColor4;
     bool                        m_bIsFrozen;
     bool                        m_bScriptFrozen;
     bool                        m_bFrozenWaitingForGroundToLoad;

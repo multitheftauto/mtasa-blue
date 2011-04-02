@@ -27,8 +27,6 @@ static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
 SString GetWMIOSVersion ( void );
 static HWND hwndCrashedDialog = NULL;
-HANDLE g_hMutex = NULL;
-HMODULE hLibraryModule = NULL;
 
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
@@ -88,13 +86,14 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
         5 seconds which is way longer than this should take to prevent this application
         from deadlocking if something goes really wrong allowing us to kill the injected
         game executable and avoid user inconvenience.*/
-    WaitForObject ( hProcess, hThread, INFINITE, NULL );
-
+    WaitForSingleObject ( hThread, INFINITE );
 
     /* Get the handle of the remotely loaded DLL module */
     DWORD hLibModule = 0;
-    GetExitCodeThread ( hThread, &hLibModule );
+    GetExitCodeThread ( hProcess, &hLibModule );
 
+    // Wait for the LoadLibrary thread to finish
+    WaitForSingleObject( hThread, INFINITE );
 
     /* Clean up the resources we used to inject the DLL */
     VirtualFreeEx (hProcess, pLibPathRemote, strlen ( szLibPath ) + 1, MEM_RELEASE );
@@ -406,7 +405,6 @@ int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 //
 void ShowSplash ( HINSTANCE hInstance )
 {
-#ifndef MTA_DEBUG
     if ( !hwndSplash )
     {
         hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
@@ -414,7 +412,6 @@ void ShowSplash ( HINSTANCE hInstance )
     }
     SetForegroundWindow ( hwndSplash );
     SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-#endif
 }
 
 
@@ -523,20 +520,7 @@ SString GetMTASAPath ( void )
 
 int GetGamePath ( SString& strOutResult )
 {
-    // Note: "SOFTWARE\Multi Theft Auto: San Andreas" is the shared multi-version location for "GTA:SA Path"
-
-    // Try "SOFTWARE\Multi Theft Auto: San Andreas" first   ( "..\\1.0" resolves to "SOFTWARE\Multi Theft Auto: San Andreas" )
-    SString strRegPath = GetRegistryValue ( "..\\1.0", "GTA:SA Path" );
-
-    // Update/restore from backup location
-    {
-        SString strRegPathBackup = GetRegistryValue ( "", "GTA:SA Path Backup" );
-        if ( strRegPath.empty () )
-            strRegPath = strRegPathBackup;
-        else
-        if ( strRegPath != strRegPathBackup )
-            SetRegistryValue ( "", "GTA:SA Path Backup", strRegPath );
-    }
+    SString strRegPath = GetRegistryValue ( "", "GTA:SA Path" );
 
     if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) == 0 )
     {
@@ -582,8 +566,7 @@ int GetGamePath ( SString& strOutResult )
     
         if ( FileExists( SString ( "%s\\%s", strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
         {
-            SetRegistryValue ( "..\\1.0", "GTA:SA Path", strOutResult );
-            SetRegistryValue ( "", "GTA:SA Path Backup", strOutResult );
+            SetRegistryValue ( "", "GTA:SA Path", strOutResult );
         }
         else
         {
@@ -1222,52 +1205,6 @@ static SString HashBuffer ( char* pData, uint uiLength )
 
 /////////////////////////////////////////////////////////////////////
 //
-// GetLibraryHandle
-//
-//
-//
-/////////////////////////////////////////////////////////////////////
-HMODULE GetLibraryHandle ( const SString& strFilename )
-{
-    if ( !hLibraryModule )
-    {
-        // Get path to the relevant file
-        SString strLibPath = PathJoin ( GetLaunchPath (), "mta" );
-        SString strLibPathFilename = PathJoin ( strLibPath, strFilename );
-
-        SString strPrevCurDir = GetCurrentWorkingDirectory ();
-        SetCurrentDirectory ( strLibPath );
-        SetDllDirectory( strLibPath );
-
-        hLibraryModule = LoadLibrary ( strLibPathFilename );
-
-        SetCurrentDirectory ( strPrevCurDir );
-        SetDllDirectory( strPrevCurDir );
-    }
-
-    return hLibraryModule;
-}
-
-
-/////////////////////////////////////////////////////////////////////
-//
-// FreeLibraryHandle
-//
-//
-//
-/////////////////////////////////////////////////////////////////////
-void FreeLibraryHandle ( void )
-{
-    if ( hLibraryModule )
-    {
-        FreeLibrary ( hLibraryModule );
-        hLibraryModule = NULL;
-    }
-}
-
-
-/////////////////////////////////////////////////////////////////////
-//
 // UpdateMTAVersionApplicationSetting
 //
 // Make sure "mta-version-ext" is correct. eg "1.0.4-9.01234.2.000"
@@ -1286,6 +1223,7 @@ void UpdateMTAVersionApplicationSetting ( void )
     //
 
     // Get saved status
+    SString strOldHash = GetApplicationSetting ( "netc-hash" );
     unsigned short usNetRev = 65535;
     unsigned short usNetRel = 0;
     std::vector < SString > parts;
@@ -1296,16 +1234,47 @@ void UpdateMTAVersionApplicationSetting ( void )
         usNetRel = atoi ( parts[5] );
     }
 
-    HMODULE hModule = GetLibraryHandle ( strFilename );
-    if ( hModule )
+    // Get path to the relevant file
+    SString strNetLibPath = PathJoin ( GetLaunchPath (), "mta" );
+    SString strNetLibPathFilename = PathJoin ( strNetLibPath, strFilename );
+
+    // Hash the file
+    std::vector < char > buffer;
+    FileLoad ( strNetLibPathFilename, buffer );
+    SString strNewHash = "none";
+    if ( buffer.size () )
+        strNewHash = HashBuffer ( &buffer.at ( 0 ), buffer.size () );
+
+#ifdef MTA_DEBUG
+    // Force update
+    strNewHash = GetTimeString ();
+#endif
+    // Only loadup the dll if the hash has changed, or we don't have a previous valid netrev value
+    if ( strNewHash != strOldHash || usNetRev == 65535 )
     {
-        typedef unsigned short (*PFNGETNETREV) ( void );
-        PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
-        if ( pfnGetNetRev )
-            usNetRev = pfnGetNetRev ();
-        PFNGETNETREV pfnGetNetRel = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRel" ) ) );
-        if ( pfnGetNetRel )
-            usNetRel = pfnGetNetRel ();
+        SString strPrevCurDir = GetCurrentWorkingDirectory ();
+        SetCurrentDirectory ( strNetLibPath );
+        SetDllDirectory( strNetLibPath );
+
+        HMODULE hModule = LoadLibrary ( strNetLibPathFilename );
+
+        if ( hModule )
+        {
+            typedef unsigned short (*PFNGETNETREV) ( void );
+            PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
+            if ( pfnGetNetRev )
+                usNetRev = pfnGetNetRev ();
+            PFNGETNETREV pfnGetNetRel = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRel" ) ) );
+            if ( pfnGetNetRel )
+                usNetRel = pfnGetNetRel ();
+
+            FreeLibrary ( hModule );
+        }
+
+        SetCurrentDirectory ( strPrevCurDir );
+        SetDllDirectory( strPrevCurDir );
+
+        SetApplicationSetting ( "netc-hash", strNewHash );
     }
 
     SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
@@ -1392,71 +1361,6 @@ bool Is32bitProcess ( DWORD processID )
     }
 
     return false;   // Can't determine. Guess it's 64 bit
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-//
-// CreateSingleInstanceMutex
-//
-//
-//
-///////////////////////////////////////////////////////////////////////////
-bool CreateSingleInstanceMutex ( void )
-{
-    HANDLE hMutex = CreateMutex ( NULL, FALSE, TEXT( MTA_GUID ) );
-
-    if ( GetLastError() == ERROR_ALREADY_EXISTS )
-    {
-        if ( hMutex )
-            CloseHandle ( hMutex );
-        return false;
-    }
-    assert ( !g_hMutex );
-    g_hMutex = hMutex;
-    return true;
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-//
-// ReleaseSingleInstanceMutex
-//
-//
-//
-///////////////////////////////////////////////////////////////////////////
-void ReleaseSingleInstanceMutex ( void )
-{
-    assert ( g_hMutex );
-    CloseHandle ( g_hMutex );
-    g_hMutex = NULL;
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-//
-// WaitForObject
-//
-// Wait for object to finish
-// Returns non-zero if wait failed.
-//
-///////////////////////////////////////////////////////////////////////////
-uint WaitForObject ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex )
-{
-    uint uiResult = 0;
-
-    HMODULE hModule = GetLibraryHandle ( "kernel32.dll" );
-
-    if ( hModule )
-    {
-        typedef unsigned long (*PFNWaitForObject) ( HANDLE, ... );
-        PFNWaitForObject pfnWaitForObject = static_cast< PFNWaitForObject > ( static_cast < PVOID > ( GetProcAddress ( hModule, "WaitForObject" ) ) );
-
-        if ( !pfnWaitForObject || pfnWaitForObject ( hProcess, hThread, dwMilliseconds, hMutex ) )
-            uiResult = 1;
-    }
-
-    return uiResult;
 }
 
 

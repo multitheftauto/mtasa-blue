@@ -36,7 +36,7 @@
 #include "commands.h"
 #include "configuration.h"
 #include "keys.h"
-#include <tinyxml.h>
+#include "tinyxml.h"
 
 // HTTP download buffer size
 #define HTTP_BUFFER_SIZE   1024
@@ -361,7 +361,6 @@ bool MantisBot::Run()
       }
 
       pthread_create(&mantisThread, 0, CheckForChanges_thread, this);
-	  pthread_detach(mantisThread);
       m_selector.SetTimeout(updatedelay * 1000);
     }
     else

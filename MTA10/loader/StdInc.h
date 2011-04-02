@@ -18,4 +18,3 @@
 #include "Install.h"
 #include "Utils.h"
 #include "..\version.h"
-#include "CInstallManager.h"

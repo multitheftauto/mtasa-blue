@@ -78,7 +78,8 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
                 BitStream.Write ( static_cast < unsigned char > ( ( *iter )->GetType() ) );
                 CChecksum checksum = ( *iter )->GetLastChecksum ();
                 BitStream.Write ( checksum.ulCRC );
-                BitStream.Write ( (const char*)checksum.mD5, sizeof ( checksum.mD5 ) );
+                if ( BitStream.Version () >= 0x08 )
+                    BitStream.Write ( (const char*)checksum.mD5, sizeof ( checksum.mD5 ) );
                 BitStream.Write ( ( *iter )->GetApproxSize () );
             }
         }

@@ -93,34 +93,20 @@ int CLuaFunctionDefs::GetVehicleColor ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
-        bool bRGB = false;
-        if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
-            bRGB = lua_toboolean ( luaVM, 2 ) ? true : false;
-
         CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
         if ( pVehicle ) 
         {
-            CVehicleColor& color = pVehicle->GetColor ();
+            unsigned char ucColor1;
+            unsigned char ucColor2;
+            unsigned char ucColor3;
+            unsigned char ucColor4;
+            pVehicle->GetColor ( ucColor1, ucColor2, ucColor3, ucColor4 );
 
-            if ( bRGB )
-            {
-                for ( uint i = 0 ; i < 4 ; i++ )
-                {
-                    SColor RGBColor = color.GetRGBColor ( i );
-                    lua_pushnumber ( luaVM, RGBColor.R );
-                    lua_pushnumber ( luaVM, RGBColor.G );
-                    lua_pushnumber ( luaVM, RGBColor.B );
-                }
-                return 12;
-            }
-            else
-            {
-                lua_pushnumber ( luaVM, color.GetPaletteColor ( 0 ) );
-                lua_pushnumber ( luaVM, color.GetPaletteColor ( 1 ) );
-                lua_pushnumber ( luaVM, color.GetPaletteColor ( 2 ) );
-                lua_pushnumber ( luaVM, color.GetPaletteColor ( 3 ) );
-                return 4;
-            }
+            lua_pushnumber ( luaVM, ucColor1 );
+            lua_pushnumber ( luaVM, ucColor2 );
+            lua_pushnumber ( luaVM, ucColor3 );
+            lua_pushnumber ( luaVM, ucColor4 );
+            return 4;
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleColor", "vehicle", 1 );
@@ -1239,6 +1225,21 @@ int CLuaFunctionDefs::FixVehicle ( lua_State* luaVM )
 
 int CLuaFunctionDefs::BlowVehicle ( lua_State* luaVM )
 {
+    // Read out whether to explode or not
+    bool bExplode = true;
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( iArgument2 == LUA_TBOOLEAN )
+    {
+        bExplode = lua_toboolean ( luaVM, 2 ) ? true:false;
+    }
+    else if ( iArgument2 != LUA_TNONE )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "blowVehicle" );
+
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
     // Verify the element pointer argument
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
@@ -1246,7 +1247,7 @@ int CLuaFunctionDefs::BlowVehicle ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::BlowVehicle ( *pEntity ) )
+            if ( CStaticFunctionDefinitions::BlowVehicle ( *pEntity, bExplode ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -1372,46 +1373,34 @@ int CLuaFunctionDefs::SetVehicleTurnVelocity ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetVehicleColor ( lua_State* luaVM )
 {
-    // Count up number of args after the first one
-    uchar ucParams[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    int i;
-    for ( i = 0 ; i < 12 ; i++ )
-    {
-        int iArgumentType = lua_type ( luaVM, i + 2 );
-        if ( iArgumentType == LUA_TNUMBER || iArgumentType == LUA_TSTRING )
-        {
-            ucParams[i] = static_cast < unsigned char > ( Clamp ( 0.0, lua_tonumber ( luaVM, i + 2 ), 255.0 ) );
-        }
-        else
-            break;
-    }
-
-    if  ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-          ( i == 3 || i == 4 || i == 6 || i == 9 || i == 12 ) )
+    int iArgumentType2 = lua_type ( luaVM, 2 );
+    int iArgumentType3 = lua_type ( luaVM, 3 );
+    int iArgumentType4 = lua_type ( luaVM, 4 );
+    int iArgumentType5 = lua_type ( luaVM, 5 );
+    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
+        ( iArgumentType2 == LUA_TNUMBER || iArgumentType2 == LUA_TSTRING ) &&
+        ( iArgumentType3 == LUA_TNUMBER || iArgumentType3 == LUA_TSTRING ) &&
+        ( iArgumentType4 == LUA_TNUMBER || iArgumentType4 == LUA_TSTRING ) &&
+        ( iArgumentType5 == LUA_TNUMBER || iArgumentType5 == LUA_TSTRING ) )
     {
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            CVehicleColor color;
+            double dColor1 = lua_tonumber ( luaVM, 2 );
+            double dColor2 = lua_tonumber ( luaVM, 3 );
+            double dColor3 = lua_tonumber ( luaVM, 4 );
+            double dColor4 = lua_tonumber ( luaVM, 5 );
 
-            if ( i == 4 )
+            if ( dColor1 >= 0 && dColor1 <= 255 &&
+                dColor2 >= 0 && dColor2 <= 255 &&
+                dColor3 >= 0 && dColor3 <= 255 &&
+                dColor4 >= 0 && dColor4 <= 255 )
             {
-                // 4 args mean palette colours
-                color.SetPaletteColors ( ucParams[0], ucParams[1], ucParams[2], ucParams[3] );
-            }
-            else
-            {
-                // 3,6,9 or 12 args mean rgb colours
-                color.SetRGBColors ( SColorRGBA ( ucParams[0], ucParams[1], ucParams[2], 0 ),
-                                     SColorRGBA ( ucParams[3], ucParams[4], ucParams[5], 0 ),
-                                     SColorRGBA ( ucParams[6], ucParams[7], ucParams[8], 0 ),
-                                     SColorRGBA ( ucParams[9], ucParams[10], ucParams[11], 0 ) );
-            }
-
-            if ( CStaticFunctionDefinitions::SetVehicleColor ( *pEntity, color ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                if ( CStaticFunctionDefinitions::SetVehicleColor ( *pEntity, static_cast < unsigned char > ( dColor1 ), static_cast < unsigned char > ( dColor2 ), static_cast < unsigned char > ( dColor3 ), static_cast < unsigned char > ( dColor4 ) ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
         }
         else
@@ -2301,8 +2290,8 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
          ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
          ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
     {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
+        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
+        if ( pVehicle )
         {
             SColor color;
             color.R = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
@@ -2310,7 +2299,7 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
             color.B = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
             color.A = 255;
 
-            if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( *pEntity, color ) )
+            if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( *pVehicle, color ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -2326,31 +2315,8 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::SetVehicleTurretPosition ( lua_State *luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA
-        && lua_type( luaVM, 2 ) == LUA_TNUMBER
-        && lua_type( luaVM, 3 ) == LUA_TNUMBER )
-    {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
-        {
-            float fHorizontal = ( float ) lua_tonumber ( luaVM, 2 );
-            float fVertical   = ( float ) lua_tonumber ( luaVM, 3 );
-
-            pVehicle->SetTurretRotation ( fHorizontal, fVertical );
-
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 #if WITH_VEHICLE_HANDLING
-int CLuaFunctionDefs::SetVehicleHandling ( lua_State* luaVM )
+int CLuaFunctionDefs::SetVehicleHandlingData ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
@@ -2358,292 +2324,775 @@ int CLuaFunctionDefs::SetVehicleHandling ( lua_State* luaVM )
         if ( pVehicle )
         {
             const CHandlingEntry* pOriginalEntry = pVehicle->GetOriginalHandlingData ();
-            CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            {
+                const char* szHandlingData = lua_tostring ( luaVM, 2 );
+                if ( szHandlingData )
+                {
+                    int iArgument3 = lua_type ( luaVM, 3 );
+                    CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+                    if ( pEntry )
+                    {
+                        bool bSuccess = false;
 
-            if ( lua_type ( luaVM, 2 ) == LUA_TTABLE )
+                        if (strcmp(szHandlingData,"mass")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                float mass = (float)lua_tonumber( luaVM, 3 );
+
+                                if ( mass > 1 )
+                                {
+                                    pEntry->SetMass ( mass );
+                                    bSuccess=true;
+                                }
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetMass ( pOriginalEntry->GetMass () );
+                                bSuccess=true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"turnMass")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetTurnMass ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetTurnMass ( pOriginalEntry->GetTurnMass () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"dragCoeff")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetDragCoeff ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetDragCoeff ( pOriginalEntry->GetDragCoeff () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"centerOfMass")==0)
+                        {
+                            CVector vecCenter=pEntry->GetCenterOfMass ();
+                            if ( iArgument3 == LUA_TTABLE )
+                            {
+                                lua_getfield ( luaVM, 3, "posX" );
+                                lua_getfield ( luaVM, 3, "posY" );
+                                lua_getfield ( luaVM, 3, "posZ" );
+                                if ( lua_type ( luaVM, -3 ) == LUA_TNUMBER )
+                                    vecCenter.fX = (float)lua_tonumber(luaVM, -3);
+                                if ( lua_type ( luaVM, -2 ) == LUA_TNUMBER )
+                                    vecCenter.fY = (float)lua_tonumber(luaVM, -2);
+                                if ( lua_type ( luaVM, -1 ) == LUA_TNUMBER )
+                                    vecCenter.fZ = (float)lua_tonumber(luaVM, -1);
+                                lua_pop ( luaVM, 3 );
+                                pEntry->SetCenterOfMass ( vecCenter );
+                                bSuccess=true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetCenterOfMass ( pOriginalEntry->GetCenterOfMass () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"percentSubmerged")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetPercentSubmerged ( static_cast < unsigned int > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetPercentSubmerged ( pOriginalEntry->GetPercentSubmerged () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"tractionMultiplier")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetTractionMultiplier ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetTractionMultiplier ( pOriginalEntry->GetTractionMultiplier () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"driveType")==0)
+                        {
+                            if ( iArgument3 == LUA_TSTRING )
+                            {
+                                const char* szType=lua_tostring(luaVM,3);
+                                if (strcmp(szType,"fwd")==0)
+                                    pEntry->SetCarDriveType(CHandlingEntry::eDriveType::FWD);
+                                else if (strcmp(szType,"rwd")==0)
+                                    pEntry->SetCarDriveType(CHandlingEntry::eDriveType::RWD);
+                                else if (strcmp(szType,"awd")==0)
+                                    pEntry->SetCarDriveType(CHandlingEntry::eDriveType::FOURWHEEL);
+                                else
+                                    _asm jmp _dtf
+                                bSuccess=true;
+                                __asm
+                                {
+_dtf:
+                                }
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetCarDriveType ( pOriginalEntry->GetCarDriveType () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"engineType")==0)
+                        {
+                            if ( iArgument3 == LUA_TSTRING )
+                            {
+                                const char* szType=lua_tostring(luaVM,3);
+                                if (strcmp(szType,"petrol")==0)
+                                    pEntry->SetCarEngineType(CHandlingEntry::eEngineType::PETROL);
+                                else if (strcmp(szType,"diesel")==0)
+                                    pEntry->SetCarEngineType(CHandlingEntry::eEngineType::DIESEL);
+                                else if (strcmp(szType,"electric")==0)
+                                    pEntry->SetCarEngineType(CHandlingEntry::eEngineType::ELECTRIC);
+                                else
+                                    __asm jmp _etf
+                                bSuccess=true;
+                                __asm
+                                {
+_etf:
+                                }
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetCarEngineType ( pOriginalEntry->GetCarEngineType () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"numberOfGears")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetNumberOfGears ( static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetNumberOfGears ( pOriginalEntry->GetNumberOfGears () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"engineAcceleration")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetEngineAccelleration ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetEngineAccelleration ( pOriginalEntry->GetEngineAccelleration () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"engineInertia")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetEngineInertia ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetEngineInertia ( pOriginalEntry->GetEngineInertia () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"maxVelocity")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetMaxVelocity ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetMaxVelocity ( pOriginalEntry->GetMaxVelocity () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"brakeDeceleration")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetBrakeDecelleration ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetBrakeDecelleration ( pOriginalEntry->GetBrakeDecelleration () ); 
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"brakeBias")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetBrakeBias ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetBrakeBias ( pOriginalEntry->GetBrakeBias () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"ABS")==0)
+                        {
+                            if ( iArgument3 == LUA_TBOOLEAN )
+                            {
+                                pEntry->SetABS ( lua_toboolean ( luaVM, 3 ) ? true : false );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetABS ( pOriginalEntry->GetABS () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"steeringLock")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetSteeringLock ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetSteeringLock ( pOriginalEntry->GetSteeringLock () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"tractionLoss")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetTractionLoss ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetTractionLoss ( pOriginalEntry->GetTractionLoss () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"tractionBias")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetTractionBias ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetTractionBias ( pOriginalEntry->GetTractionBias () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"suspensionForceLevel")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetSuspensionForceLevel ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetSuspensionForceLevel ( pOriginalEntry->GetSuspensionForceLevel () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"suspensionDamping")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetSuspensionDamping ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetSuspensionDamping ( pOriginalEntry->GetSuspensionDamping () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"suspensionHighSpeedDamping")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetSuspensionHighSpeedDamping ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetSuspensionHighSpeedDamping ( pOriginalEntry->GetSuspensionHighSpeedDamping () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"suspensionUpperLimit")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetSuspensionUpperLimit ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetSuspensionUpperLimit ( pOriginalEntry->GetSuspensionUpperLimit () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"suspensionLowerLimit")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetSuspensionLowerLimit ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetSuspensionLowerLimit ( pOriginalEntry->GetSuspensionLowerLimit () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"suspensionFrontRearBias")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetSuspensionFrontRearBias ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetSuspensionFrontRearBias ( pOriginalEntry->GetSuspensionFrontRearBias () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"suspensionAntidiveMultiplier")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetSuspensionAntidiveMultiplier ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetSuspensionAntidiveMultiplier ( pOriginalEntry->GetSuspensionAntidiveMultiplier () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"collisionDamageMultiplier")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetCollisionDamageMultiplier ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetCollisionDamageMultiplier ( pOriginalEntry->GetCollisionDamageMultiplier () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"seatOffsetDistance")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetSeatOffsetDistance ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetSeatOffsetDistance ( pOriginalEntry->GetSeatOffsetDistance () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"monetary")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetMonetary ( static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetMonetary ( pOriginalEntry->GetMonetary () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"headLight")==0)
+                        {
+                            if ( iArgument3 == LUA_TSTRING )
+                            {
+                                const char* szType=lua_tostring(luaVM,3);
+                                if (strcmp(szType,"long")==0)
+                                    pEntry->SetHeadLight(CHandlingEntry::eLightType::LONG);
+                                else if (strcmp(szType,"small")==0)
+                                    pEntry->SetHeadLight(CHandlingEntry::eLightType::SMALL);
+                                else if (strcmp(szType,"tall")==0)
+                                    pEntry->SetHeadLight(CHandlingEntry::eLightType::TALL);
+                                else if (strcmp(szType,"big")==0)
+                                    pEntry->SetHeadLight(CHandlingEntry::eLightType::BIG);
+                                else
+                                    __asm jmp _htf
+                                bSuccess=true;
+                                __asm
+                                {
+_htf:
+                                }
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetHeadLight ( pOriginalEntry->GetHeadLight () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"tailLight")==0)
+                        {
+                            if ( iArgument3 == LUA_TSTRING )
+                            {
+                                const char* szType=lua_tostring(luaVM,3);
+                                if (strcmp(szType,"long")==0)
+                                    pEntry->SetTailLight(CHandlingEntry::eLightType::LONG);
+                                else if (strcmp(szType,"small")==0)
+                                    pEntry->SetTailLight(CHandlingEntry::eLightType::SMALL);
+                                else if (strcmp(szType,"tall")==0)
+                                    pEntry->SetTailLight(CHandlingEntry::eLightType::TALL);
+                                else if (strcmp(szType,"big")==0)
+                                    pEntry->SetTailLight(CHandlingEntry::eLightType::BIG);
+                                else
+                                    __asm jmp _ttf
+                                bSuccess=true;
+                                __asm
+                                {
+_ttf:
+                                }
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetTailLight ( pOriginalEntry->GetTailLight () );
+                                bSuccess = true;
+                            }
+                        }
+                        else if (strcmp(szHandlingData,"animGroup")==0)
+                        {
+                            if ( iArgument3 == LUA_TNUMBER )
+                            {
+                                pEntry->SetAnimGroup ( static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) ) );
+                                bSuccess = true;
+                            }
+                            else if ( iArgument3 == LUA_TNIL )
+                            {
+                                pEntry->SetAnimGroup ( pOriginalEntry->GetAnimGroup () );
+                                bSuccess = true;
+                            }
+                        }
+
+                        if ( bSuccess )
+                        {
+                            pVehicle->ApplyHandling();
+                            lua_pushboolean ( luaVM, true );
+                            return 1;
+                        }
+                    }
+                }
+            }
+            else if ( lua_type ( luaVM, 2 ) == LUA_TTABLE )
             {
                 lua_pushnil ( luaVM );
                 while ( lua_next ( luaVM, 2 ) )
                 {
-                    if ( lua_type ( luaVM, -2 ) != LUA_TSTRING )
+                    if ( lua_type ( luaVM, -2 ) == LUA_TSTRING )
                     {
-                        lua_pop ( luaVM, 1 );
-                        continue;
-                    }
-
-                    const char* pszHandlingData = lua_tostring ( luaVM, -2 );
-                    if ( !pszHandlingData )
-                    {
-                        lua_pop ( luaVM, 1 );
-                        continue;
-                    }
-
-                    int iArgument3 = lua_type ( luaVM, -1 );
-                    if ( strcmp ( pszHandlingData, "mass" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
+                        const char* szHandlingData = lua_tostring ( luaVM, -2 );
+                        if ( szHandlingData )
                         {
-                            float fMass = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
-                            if ( fMass > 1.0f )
-                                pEntry->SetMass ( fMass );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "turnMass" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetTurnMass ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "dragCoeff" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetDragCoeff ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "centerOfMass" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TTABLE )
-                        {
-                            CVector vecCenter = pEntry->GetCenterOfMass ();
-
-                            lua_pushnumber ( luaVM, 1 );
-                            lua_gettable ( luaVM, -2 );
-                            if ( lua_type ( luaVM, -1 ) == LUA_TNUMBER )
-                                vecCenter.fX = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
-                            lua_pop ( luaVM, 1 );
-
-                            lua_pushnumber ( luaVM, 2 );
-                            lua_gettable ( luaVM, -2 );
-                            if ( lua_type ( luaVM, -1 ) == LUA_TNUMBER )
-                                vecCenter.fY = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
-                            lua_pop ( luaVM, 1 );
-
-                            lua_pushnumber ( luaVM, 3 );
-                            lua_gettable ( luaVM, -2 );
-                            if ( lua_type ( luaVM, -1 ) == LUA_TNUMBER )
-                                vecCenter.fZ = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
-                            lua_pop ( luaVM, 1 );
-
-                            pEntry->SetCenterOfMass ( vecCenter );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "percentSubmerged" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetPercentSubmerged ( static_cast < unsigned int > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "tractionMultiplier" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetTractionMultiplier ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "driveType" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TSTRING )
-                        {
-                            const char* pszType = lua_tostring ( luaVM, -1 );
-                            if ( strcmp ( pszType, "fwd" ) == 0 )
-                                pEntry->SetCarDriveType ( CHandlingEntry::eDriveType::FWD );
-                            else if ( strcmp ( pszType, "rwd" ) == 0 )
-                                pEntry->SetCarDriveType ( CHandlingEntry::eDriveType::RWD );
-                            else if ( strcmp ( pszType, "awd" ) ==0 )
-                                pEntry->SetCarDriveType ( CHandlingEntry::eDriveType::FOURWHEEL );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "engineType" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TSTRING )
-                        {
-                            const char* pszType = lua_tostring ( luaVM, -1 );
-                            if ( strcmp ( pszType, "petrol" ) == 0 )
-                                pEntry->SetCarEngineType ( CHandlingEntry::eEngineType::PETROL );
-                            else if ( strcmp( pszType, "diesel" ) == 0 )
-                                pEntry->SetCarEngineType ( CHandlingEntry::eEngineType::DIESEL );
-                            else if ( strcmp ( pszType, "electric" ) == 0 )
-                                pEntry->SetCarEngineType ( CHandlingEntry::eEngineType::ELECTRIC );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "numberOfGears" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetNumberOfGears ( static_cast < unsigned char > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "engineAcceleration" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetEngineAcceleration ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "engineInertia" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetEngineInertia ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "maxVelocity" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetMaxVelocity ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "brakeDeceleration" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetBrakeDeceleration ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "brakeBias" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetBrakeBias ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "ABS" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TBOOLEAN )
-                        {
-                            pEntry->SetABS ( lua_toboolean ( luaVM, -1 ) ? true : false );
-                        }
-                    }
-                    else if ( strcmp (pszHandlingData, "steeringLock" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetSteeringLock ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "tractionLoss" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetTractionLoss ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "tractionBias" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetTractionBias ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "suspensionForceLevel" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetSuspensionForceLevel ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "suspensionDamping" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetSuspensionDamping ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "suspensionHighSpeedDamping" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetSuspensionHighSpeedDamping ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "suspensionUpperLimit" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetSuspensionUpperLimit ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "suspensionLowerLimit" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetSuspensionLowerLimit ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "suspensionFrontRearBias" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetSuspensionFrontRearBias ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "suspensionAntidiveMultiplier" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetSuspensionAntidiveMultiplier ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "collisionDamageMultiplier" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetCollisionDamageMultiplier ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "seatOffsetDistance" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetSeatOffsetDistance ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "monetary" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetMonetary ( static_cast < unsigned char > ( lua_tonumber ( luaVM, -1 ) ) );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "headLight" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TSTRING )
-                        {
-                            const char* pszType = lua_tostring ( luaVM, -1 );
-                            if ( strcmp ( pszType, "long" ) == 0 )
-                                pEntry->SetHeadLight ( CHandlingEntry::eLightType::LONG );
-                            else if ( strcmp ( pszType, "small" ) == 0 )
-                                pEntry->SetHeadLight ( CHandlingEntry::eLightType::SMALL );
-                            else if ( strcmp ( pszType, "tall" ) == 0 )
-                                pEntry->SetHeadLight ( CHandlingEntry::eLightType::TALL );
-                            else if ( strcmp ( pszType, "big" ) == 0 )
-                                pEntry->SetHeadLight ( CHandlingEntry::eLightType::BIG );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "tailLight" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TSTRING )
-                        {
-                            const char* pszType = lua_tostring ( luaVM, -1 );
-                            if ( strcmp ( pszType, "long" ) == 0 )
-                                pEntry->SetTailLight ( CHandlingEntry::eLightType::LONG );
-                            else if ( strcmp ( pszType, "small" ) == 0 )
-                                pEntry->SetTailLight ( CHandlingEntry::eLightType::SMALL );
-                            else if ( strcmp ( pszType, "tall" ) == 0 )
-                                pEntry->SetTailLight ( CHandlingEntry::eLightType::TALL );
-                            else if ( strcmp ( pszType, "big" ) == 0 )
-                                pEntry->SetTailLight ( CHandlingEntry::eLightType::BIG );
-                        }
-                    }
-                    else if ( strcmp ( pszHandlingData, "animGroup" ) == 0 )
-                    {
-                        if ( iArgument3 == LUA_TNUMBER )
-                        {
-                            pEntry->SetAnimGroup ( static_cast < unsigned char > ( lua_tonumber ( luaVM, -1 ) ) );
+                            int iArgument3 = lua_type ( luaVM, -1 );
+                            CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+                            if ( pEntry )
+                            {
+                                if (strcmp(szHandlingData,"mass")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        float mass = (float)lua_tonumber(luaVM,-1);
+                                        if (mass > 1)
+                                            pEntry->SetMass ( mass );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"turnMass")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetTurnMass ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"dragCoeff")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetDragCoeff ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"centerOfMass")==0)
+                                {
+                                    CVector vecCenter=pEntry->GetCenterOfMass ();
+                                    if ( iArgument3 == LUA_TTABLE )
+                                    {
+                                        lua_getfield ( luaVM, -1, "posX" );
+                                        lua_getfield ( luaVM, -2, "posY" );
+                                        lua_getfield ( luaVM, -3, "posZ" );
+                                        if ( lua_type ( luaVM, -3 ) == LUA_TNUMBER )
+                                            vecCenter.fX = (float)lua_tonumber(luaVM, -3);
+                                        if ( lua_type ( luaVM, -2 ) == LUA_TNUMBER )
+                                            vecCenter.fY = (float)lua_tonumber(luaVM, -2);
+                                        if ( lua_type ( luaVM, -1 ) == LUA_TNUMBER )
+                                            vecCenter.fZ = (float)lua_tonumber(luaVM, -1);
+                                        lua_pop ( luaVM, 3 );
+                                        pEntry->SetCenterOfMass ( vecCenter );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"percentSubmerged")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetPercentSubmerged ( static_cast < unsigned int > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                    else if ( iArgument3 == LUA_TNIL )
+                                    {
+                                        pEntry->SetPercentSubmerged ( pOriginalEntry->GetPercentSubmerged () );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"tractionMultiplier")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetTractionMultiplier ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"driveType")==0)
+                                {
+                                    if ( iArgument3 == LUA_TSTRING )
+                                    {
+                                        const char* szType=lua_tostring(luaVM,-1);
+                                        if (strcmp(szType,"fwd")==0)
+                                            pEntry->SetCarDriveType(CHandlingEntry::eDriveType::FWD);
+                                        else if (strcmp(szType,"rwd")==0)
+                                            pEntry->SetCarDriveType(CHandlingEntry::eDriveType::RWD);
+                                        else if (strcmp(szType,"awd")==0)
+                                            pEntry->SetCarDriveType(CHandlingEntry::eDriveType::FOURWHEEL);
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"engineType")==0)
+                                {
+                                    if ( iArgument3 == LUA_TSTRING )
+                                    {
+                                        const char* szType=lua_tostring(luaVM,-1);
+                                        if (strcmp(szType,"petrol")==0)
+                                            pEntry->SetCarEngineType(CHandlingEntry::eEngineType::PETROL);
+                                        else if (strcmp(szType,"diesel")==0)
+                                            pEntry->SetCarEngineType(CHandlingEntry::eEngineType::DIESEL);
+                                        else if (strcmp(szType,"electric")==0)
+                                            pEntry->SetCarEngineType(CHandlingEntry::eEngineType::ELECTRIC);
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"numberOfGears")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetNumberOfGears ( static_cast < unsigned char > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"engineAcceleration")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetEngineAccelleration ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"engineInertia")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetEngineInertia ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"maxVelocity")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetMaxVelocity ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"brakeDeceleration")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetBrakeDecelleration ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"brakeBias")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetBrakeBias ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"ABS")==0)
+                                {
+                                    if ( iArgument3 == LUA_TBOOLEAN )
+                                    {
+                                        pEntry->SetABS ( lua_toboolean ( luaVM, -1 ) ? true : false );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"steeringLock")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetSteeringLock ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"tractionLoss")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetTractionLoss ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"tractionBias")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetTractionBias ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"suspensionForceLevel")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetSuspensionForceLevel ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"suspensionDamping")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetSuspensionDamping ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"suspensionHighSpeedDamping")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetSuspensionHighSpeedDamping ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"suspensionUpperLimit")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetSuspensionUpperLimit ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"suspensionLowerLimit")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetSuspensionLowerLimit ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"suspensionFrontRearBias")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetSuspensionFrontRearBias ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"suspensionAntidiveMultiplier")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetSuspensionAntidiveMultiplier ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"collisionDamageMultiplier")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetCollisionDamageMultiplier ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"seatOffsetDistance")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetSeatOffsetDistance ( static_cast < float > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"monetary")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetMonetary ( static_cast < unsigned char > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"headLight")==0)
+                                {
+                                    if ( iArgument3 == LUA_TSTRING )
+                                    {
+                                        const char* szType=lua_tostring(luaVM,-1);
+                                        if (strcmp(szType,"long")==0)
+                                            pEntry->SetHeadLight(CHandlingEntry::eLightType::LONG);
+                                        else if (strcmp(szType,"small")==0)
+                                            pEntry->SetHeadLight(CHandlingEntry::eLightType::SMALL);
+                                        else if (strcmp(szType,"tall")==0)
+                                            pEntry->SetHeadLight(CHandlingEntry::eLightType::TALL);
+                                        else if (strcmp(szType,"big")==0)
+                                            pEntry->SetHeadLight(CHandlingEntry::eLightType::BIG);
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"tailLight")==0)
+                                {
+                                    if ( iArgument3 == LUA_TSTRING )
+                                    {
+                                        const char* szType=lua_tostring(luaVM,-1);
+                                        if (strcmp(szType,"long")==0)
+                                            pEntry->SetTailLight(CHandlingEntry::eLightType::LONG);
+                                        else if (strcmp(szType,"small")==0)
+                                            pEntry->SetTailLight(CHandlingEntry::eLightType::SMALL);
+                                        else if (strcmp(szType,"tall")==0)
+                                            pEntry->SetTailLight(CHandlingEntry::eLightType::TALL);
+                                        else if (strcmp(szType,"big")==0)
+                                            pEntry->SetTailLight(CHandlingEntry::eLightType::BIG);
+                                    }
+                                }
+                                else if (strcmp(szHandlingData,"animGroup")==0)
+                                {
+                                    if ( iArgument3 == LUA_TNUMBER )
+                                    {
+                                        pEntry->SetAnimGroup ( static_cast < unsigned char > ( lua_tonumber ( luaVM, -1 ) ) );
+                                    }
+                                }
+                            }
                         }
                     }
                     lua_pop ( luaVM, 1 );
@@ -2654,9 +3103,9 @@ int CLuaFunctionDefs::SetVehicleHandling ( lua_State* luaVM )
             }
             else if ( lua_type ( luaVM, 2 ) == LUA_TNIL || lua_type ( luaVM, 2 ) == LUA_TNONE )
             {
-                CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
-                const CHandlingEntry* pOriginalEntry = pVehicle->GetOriginalHandlingData ();
-                pEntry->Assign ( pOriginalEntry );
+                CHandlingEntry *pEntry=pVehicle->GetHandlingData ();
+                const CHandlingEntry *pOriginalEntry=pVehicle->GetOriginalHandlingData ();
+                pEntry->ApplyHandlingData ( (CHandlingEntry*)pOriginalEntry );
                 pEntry->Recalculate ();
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -2664,15 +3113,13 @@ int CLuaFunctionDefs::SetVehicleHandling ( lua_State* luaVM )
         }
     }
     else
-    {
         m_pScriptDebugging->LogBadType ( luaVM, "setVehicleHandlingData" );
-    }
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
-int CLuaFunctionDefs::GetVehicleHandling ( lua_State* luaVM )
+int CLuaFunctionDefs::GetVehicleHandlingData ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA  )
     {
@@ -2680,145 +3127,354 @@ int CLuaFunctionDefs::GetVehicleHandling ( lua_State* luaVM )
         if ( pVehicle )
         {
             CHandlingEntry* pEntry = pVehicle->GetHandlingData();
-            
-            lua_newtable ( luaVM );
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            {
+                const char *szHandlingData = lua_tostring( luaVM, 2 );
 
-            lua_pushnumber ( luaVM, pEntry->GetMass () );
-            lua_setfield ( luaVM, -2, "mass" );
+                if (!szHandlingData || !pEntry)
+                {
+                    m_pScriptDebugging->LogBadType ( luaVM, "getVehicleHandlingData" );
+                    lua_pushboolean ( luaVM, false );
+                    return 1;
+                }
 
-            lua_pushnumber ( luaVM, pEntry->GetTurnMass () );
-            lua_setfield ( luaVM, -2, "turnMass" );
-
-            lua_pushnumber ( luaVM, pEntry->GetDragCoeff () );
-            lua_setfield ( luaVM, -2, "dragCoeff" );
-
-            lua_createtable ( luaVM, 3, 0 );
-            CVector vecCenter = pEntry->GetCenterOfMass ();
-            lua_pushnumber ( luaVM, 1 );
-            lua_pushnumber ( luaVM, vecCenter.fX );
-            lua_settable ( luaVM, -3 );
-            lua_pushnumber ( luaVM, 2 );
-            lua_pushnumber ( luaVM, vecCenter.fY );
-            lua_settable ( luaVM, -3 );
-            lua_pushnumber ( luaVM, 3 );
-            lua_pushnumber ( luaVM, vecCenter.fZ );
-            lua_settable ( luaVM, -3 );
-            lua_setfield ( luaVM, -2, "centerOfMass" );
-
-            lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged () );
-            lua_setfield ( luaVM, -2, "percentSubmerged" );
-
-            lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier () );
-            lua_setfield ( luaVM, -2, "tractionMultiplier" );
-
-            CHandlingEntry::eDriveType eDriveType = pEntry->GetCarDriveType ();
-            if ( eDriveType==CHandlingEntry::eDriveType::FWD )
-                lua_pushstring ( luaVM, "fwd" );
-            else if ( eDriveType == CHandlingEntry::eDriveType::RWD )
-                lua_pushstring ( luaVM, "rwd" );
-            else if ( eDriveType == CHandlingEntry::eDriveType::FOURWHEEL )
-                lua_pushstring ( luaVM, "awd" );
-            else // What the ... (yeah, security)
-                lua_pushnil ( luaVM );
-            lua_setfield ( luaVM, -2, "driveType" );
-
-            CHandlingEntry::eEngineType eEngineType = pEntry->GetCarEngineType ();
-            if ( eEngineType == CHandlingEntry::eEngineType::PETROL )
-                lua_pushstring ( luaVM, "petrol" );
-            else if ( eEngineType == CHandlingEntry::eEngineType::DIESEL )
-                lua_pushstring ( luaVM, "diesel" );
-            else if ( eEngineType == CHandlingEntry::eEngineType::ELECTRIC )
-                lua_pushstring ( luaVM, "electric" );
-            else
-                lua_pushnil ( luaVM );
-            lua_setfield ( luaVM, -2, "engineType" );
-
-            lua_pushnumber ( luaVM, pEntry->GetNumberOfGears () );
-            lua_setfield ( luaVM, -2, "numberOfGears" );
-
-            lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration () );
-            lua_setfield ( luaVM, -2, "engineAcceleration" );
-
-            lua_pushnumber ( luaVM, pEntry->GetEngineInertia () );
-            lua_setfield ( luaVM, -2, "engineInertia" );
-
-            lua_pushnumber ( luaVM, pEntry->GetMaxVelocity () );
-            lua_setfield ( luaVM, -2, "maxVelocity" );
-
-            lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration () );
-            lua_setfield ( luaVM, -2, "brakeDeceleration" );
-
-            lua_pushnumber ( luaVM, pEntry->GetBrakeBias () );
-            lua_setfield ( luaVM, -2, "brakeBias" );
-
-            lua_pushboolean ( luaVM, pEntry->GetABS () );
-            lua_setfield ( luaVM, -2, "ABS" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSteeringLock () );
-            lua_setfield ( luaVM, -2, "steeringLock" );
-
-            lua_pushnumber ( luaVM, pEntry->GetTractionLoss () );
-            lua_setfield ( luaVM, -2, "tractionLoss" );
-
-            lua_pushnumber ( luaVM, pEntry->GetTractionBias () );
-            lua_setfield ( luaVM, -2, "tractionBias" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel () );
-            lua_setfield ( luaVM, -2, "suspensionForceLevel" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping () );
-            lua_setfield ( luaVM, -2, "suspensionDamping" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping () );
-            lua_setfield ( luaVM, -2, "suspensionHighSpeedDamping" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit () );
-            lua_setfield ( luaVM, -2, "suspensionUpperLimit" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit () );
-            lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias () );
-            lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidiveMultiplier () );
-            lua_setfield ( luaVM, -2, "suspensionAntidiveMultiplier" );
-
-            lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier () );
-            lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance () );
-            lua_setfield ( luaVM, -2, "seatOffsetDistance" );
-
-            lua_pushnumber ( luaVM, pEntry->GetMonetary () );
-            lua_setfield ( luaVM, -2, "monetary" );
-
-            CHandlingEntry::eLightType eHeadType = pEntry->GetHeadLight ();
-            if ( eHeadType == CHandlingEntry::eLightType::LONG )
-                lua_pushstring ( luaVM, "long" );
-            else if ( eHeadType == CHandlingEntry::eLightType::SMALL )
-                lua_pushstring ( luaVM, "small" );
-            else if ( eHeadType == CHandlingEntry::eLightType::BIG )
-                lua_pushstring ( luaVM, "big" );
-            else
-                lua_pushnil ( luaVM );
-            lua_setfield ( luaVM, -2, "headLight" );
-
-            CHandlingEntry::eLightType eTailType = pEntry->GetHeadLight ();
-            if ( eTailType == CHandlingEntry::eLightType::LONG )
-                lua_pushstring ( luaVM, "long" );
-            else if ( eTailType == CHandlingEntry::eLightType::SMALL )
-                lua_pushstring ( luaVM, "small" );
-            else if ( eTailType == CHandlingEntry::eLightType::BIG )
-                lua_pushstring ( luaVM, "big" );
-            else
-                lua_pushnil ( luaVM );
-            lua_setfield ( luaVM, -2, "tailLight" );
-
-            lua_pushnumber ( luaVM, pEntry->GetAnimGroup () );
-            lua_setfield ( luaVM, -2, "animGroup" );
-
-            return 1;
+                if (strcmp(szHandlingData,"mass")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetMass () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"turnMass")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetTurnMass () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"dragCoeff")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetDragCoeff () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"centerOfMass")==0)
+                {
+                    CVector vecCenter = pEntry->GetCenterOfMass();
+                    lua_newtable ( luaVM );
+                    lua_pushnumber ( luaVM, vecCenter.fX );
+                    lua_setfield ( luaVM, -2, "posX" );
+                    lua_pushnumber ( luaVM, vecCenter.fY );
+                    lua_setfield ( luaVM, -2, "posY" );
+                    lua_pushnumber ( luaVM, vecCenter.fZ );
+                    lua_setfield ( luaVM, -2, "posZ" );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"percentSubmerged")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"tractionMultiplier")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"driveType")==0)
+                {
+                    CHandlingEntry::eDriveType eType=pEntry->GetCarDriveType();
+                    if (eType==CHandlingEntry::eDriveType::FWD)
+                    {
+                        lua_pushstring(luaVM,"fwd");
+                        return 1;
+                    }
+                    else if (eType==CHandlingEntry::eDriveType::RWD)
+                    {
+                        lua_pushstring(luaVM,"rwd");
+                        return 1;
+                    }
+                    else if (eType==CHandlingEntry::eDriveType::FOURWHEEL)
+                    {
+                        lua_pushstring(luaVM,"awd");
+                        return 1;
+                    }
+                }
+                else if (strcmp(szHandlingData,"engineType")==0)
+                {
+                    CHandlingEntry::eEngineType eType=pEntry->GetCarEngineType();
+                    if (eType==CHandlingEntry::eEngineType::PETROL)
+                    {
+                        lua_pushstring(luaVM,"petrol");
+                        return 1;
+                    }
+                    else if (eType==CHandlingEntry::eEngineType::DIESEL)
+                    {
+                        lua_pushstring(luaVM,"diesel");
+                        return 1;
+                    }
+                    else if (eType==CHandlingEntry::eEngineType::ELECTRIC)
+                    {
+                        lua_pushstring(luaVM,"electric");
+                        return 1;
+                    }
+                }
+                else if (strcmp(szHandlingData,"numberOfGears")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetNumberOfGears() );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"engineAcceleration")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetEngineAccelleration () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"engineInertia")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetEngineInertia () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"maxVelocity")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetMaxVelocity () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"brakeDeceleration")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetBrakeDecelleration () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"brakeBias")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetBrakeBias () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"ABS")==0)
+                {
+                    lua_pushboolean ( luaVM, pEntry->GetABS () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"steeringLock")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetSteeringLock () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"tractionLoss")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetTractionLoss () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"tractionBias")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetTractionBias () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"suspensionForceLevel")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"suspensionDamping")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"suspensionHighSpeedDamping")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"suspensionUpperLimit")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"suspensionLowerLimit")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"suspensionFrontRearBias")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"suspensionAntidiveMultiplier")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidiveMultiplier () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"collisionDamageMultiplier")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"seatOffsetDistance")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"monetary")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetMonetary () );
+                    return 1;
+                }
+                else if (strcmp(szHandlingData,"headLight")==0)
+                {
+                    CHandlingEntry::eLightType eType=pEntry->GetHeadLight();
+                    if (eType==CHandlingEntry::eLightType::LONG)
+                    {
+                        lua_pushstring(luaVM,"long");
+                        return 1;
+                    }
+                    else if (eType==CHandlingEntry::eLightType::SMALL)
+                    {
+                        lua_pushstring(luaVM,"small");
+                        return 1;
+                    }
+                    else if (eType==CHandlingEntry::eLightType::BIG)
+                    {
+                        lua_pushstring(luaVM,"big");
+                        return 1;
+                    }
+                    else if (eType==CHandlingEntry::eLightType::TALL)
+                    {
+                        lua_pushstring(luaVM,"tall");
+                        return 1;
+                    }
+                }
+                else if (strcmp(szHandlingData,"tailLight")==0)
+                {
+                    CHandlingEntry::eLightType eType=pEntry->GetTailLight();
+                    if (eType==CHandlingEntry::eLightType::LONG)
+                    {
+                        lua_pushstring(luaVM,"long");
+                        return 1;
+                    }
+                    else if (eType==CHandlingEntry::eLightType::SMALL)
+                    {
+                        lua_pushstring(luaVM,"small");
+                        return 1;
+                    }
+                    else if (eType==CHandlingEntry::eLightType::BIG)
+                    {
+                        lua_pushstring(luaVM,"big");
+                        return 1;
+                    }
+                    else if (eType==CHandlingEntry::eLightType::TALL)
+                    {
+                        lua_pushstring(luaVM,"tall");
+                        return 1;
+                    }
+                }
+                else if (strcmp(szHandlingData,"animGroup")==0)
+                {
+                    lua_pushnumber ( luaVM, pEntry->GetAnimGroup () );
+                    return 1;
+                }
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+            else if ( lua_type ( luaVM, 2 ) == LUA_TNIL || lua_type ( luaVM, 2 ) == LUA_TNONE ) 
+            {
+                lua_newtable ( luaVM );
+                lua_pushnumber ( luaVM, pEntry->GetMass() );
+                lua_setfield ( luaVM, -2, "mass" );
+                lua_pushnumber ( luaVM, pEntry->GetTurnMass() );
+                lua_setfield ( luaVM, -2, "turnMass" );
+                lua_pushnumber ( luaVM, pEntry->GetDragCoeff() );
+                lua_setfield ( luaVM, -2, "dragCoeff" );
+                lua_newtable ( luaVM );
+                CVector vecCenter = pEntry->GetCenterOfMass ();
+                lua_pushnumber ( luaVM, vecCenter.fX );
+                lua_setfield ( luaVM, -2, "posX" );
+                lua_pushnumber ( luaVM, vecCenter.fY );
+                lua_setfield ( luaVM, -2, "posY" );
+                lua_pushnumber ( luaVM, vecCenter.fZ );
+                lua_setfield ( luaVM, -2, "posZ" );
+                lua_setfield ( luaVM, -2, "centerOfMass" );
+                lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged() );
+                lua_setfield ( luaVM, -2, "percentSubmerged" );
+                lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier() );
+                lua_setfield ( luaVM, -2, "tractionMultiplier" );
+                CHandlingEntry::eDriveType eDriveType=pEntry->GetCarDriveType();
+                if (eDriveType==CHandlingEntry::eDriveType::FWD)
+                    lua_pushstring(luaVM,"fwd");
+                else if (eDriveType==CHandlingEntry::eDriveType::RWD)
+                    lua_pushstring(luaVM,"rwd");
+                else if (eDriveType==CHandlingEntry::eDriveType::FOURWHEEL)
+                    lua_pushstring(luaVM,"awd");
+                else // What the ... (yeah, security)
+                    lua_pushnil ( luaVM );
+                lua_setfield ( luaVM, -2, "driveType" );
+                CHandlingEntry::eEngineType eEngineType=pEntry->GetCarEngineType();
+                if (eEngineType==CHandlingEntry::eEngineType::PETROL)
+                    lua_pushstring(luaVM,"petrol");
+                else if (eEngineType==CHandlingEntry::eEngineType::DIESEL)
+                    lua_pushstring(luaVM,"diesel");
+                else if (eEngineType==CHandlingEntry::eEngineType::ELECTRIC)
+                    lua_pushstring(luaVM,"electric");
+                else
+                    lua_pushnil ( luaVM );
+                lua_setfield ( luaVM, -2, "engineType" );
+                lua_pushnumber ( luaVM, pEntry->GetNumberOfGears() );
+                lua_setfield ( luaVM, -2, "numberOfGears" );
+                lua_pushnumber ( luaVM, pEntry->GetEngineAccelleration() );
+                lua_setfield ( luaVM, -2, "engineAcceleration" );
+                lua_pushnumber ( luaVM, pEntry->GetEngineInertia() );
+                lua_setfield ( luaVM, -2, "engineInertia" );
+                lua_pushnumber ( luaVM, pEntry->GetMaxVelocity() );
+                lua_setfield ( luaVM, -2, "maxVelocity" );
+                lua_pushnumber ( luaVM, pEntry->GetBrakeDecelleration() );
+                lua_setfield ( luaVM, -2, "brakeDeceleration" );
+                lua_pushnumber ( luaVM, pEntry->GetBrakeBias() );
+                lua_setfield ( luaVM, -2, "brakeBias" );
+                lua_pushboolean ( luaVM, pEntry->GetABS() );
+                lua_setfield ( luaVM, -2, "ABS" );
+                lua_pushnumber ( luaVM, pEntry->GetSteeringLock() );
+                lua_setfield ( luaVM, -2, "steeringLock" );
+                lua_pushnumber ( luaVM, pEntry->GetTractionLoss() );
+                lua_setfield ( luaVM, -2, "tractionLoss" );
+                lua_pushnumber ( luaVM, pEntry->GetTractionBias() );
+                lua_setfield ( luaVM, -2, "tractionBias" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel() );
+                lua_setfield ( luaVM, -2, "suspensionForceLevel" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping() );
+                lua_setfield ( luaVM, -2, "suspensionDamping" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping() );
+                lua_setfield ( luaVM, -2, "suspensionHighSpeedDamping" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit() );
+                lua_setfield ( luaVM, -2, "suspensionUpperLimit" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit() );
+                lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias() );
+                lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
+                lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidiveMultiplier() );
+                lua_setfield ( luaVM, -2, "suspensionAntidiveMultiplier" );
+                lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier() );
+                lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
+                lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance() );
+                lua_setfield ( luaVM, -2, "seatOffsetDistance" );
+                lua_pushnumber ( luaVM, pEntry->GetMonetary() );
+                lua_setfield ( luaVM, -2, "monetary" );
+                CHandlingEntry::eLightType eHeadType=pEntry->GetHeadLight();
+                if (eHeadType==CHandlingEntry::eLightType::LONG)
+                    lua_pushstring(luaVM,"long");
+                else if (eHeadType==CHandlingEntry::eLightType::SMALL)
+                    lua_pushstring(luaVM,"small");
+                else if (eHeadType==CHandlingEntry::eLightType::BIG)
+                    lua_pushstring(luaVM,"big");
+                else
+                    lua_pushnil( luaVM );
+                lua_setfield ( luaVM, -2, "headLight" );
+                CHandlingEntry::eLightType eTailType=pEntry->GetHeadLight();
+                if (eTailType==CHandlingEntry::eLightType::LONG)
+                    lua_pushstring(luaVM,"long");
+                else if (eTailType==CHandlingEntry::eLightType::SMALL)
+                    lua_pushstring(luaVM,"small");
+                else if (eTailType==CHandlingEntry::eLightType::BIG)
+                    lua_pushstring(luaVM,"big");
+                else
+                    lua_pushnil( luaVM );
+                lua_setfield ( luaVM, -2, "tailLight" );
+                lua_pushnumber ( luaVM, pEntry->GetAnimGroup() );
+                lua_setfield ( luaVM, -2, "animGroup" );
+                return 1;
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleHandlingData", "vehicle", 1 );
@@ -2830,60 +3486,3 @@ int CLuaFunctionDefs::GetVehicleHandling ( lua_State* luaVM )
     return 1;
 }
 #endif      //  WITH_VEHICLE_HANDLING
-
-int CLuaFunctionDefs::SetVehicleDoorOpenRatio ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TNUMBER &&
-         lua_type ( luaVM, 3 ) == LUA_TNUMBER )
-    {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        if ( pEntity )
-        {
-            unsigned char ucDoor = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            float fRatio = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-            unsigned long ulTime = 0UL;
-
-            if ( lua_type ( luaVM, 4 ) == LUA_TNUMBER )
-                ulTime = static_cast < unsigned long > ( lua_tonumber ( luaVM, 4 ) );
-
-            if ( CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( *pEntity, ucDoor, fRatio, ulTime ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleDoorOpenRatio", "vehicle", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setVehicleDoorOpenRatio" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetVehicleDoorOpenRatio ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TNUMBER )
-    {
-        CClientVehicle* pVehicle = lua_tovehicle ( luaVM, 1 );
-        if ( pVehicle )
-        {
-            unsigned char ucDoor = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-            if ( ucDoor <= 5 )
-            {
-                lua_pushnumber ( luaVM, pVehicle->GetDoorOpenRatio ( ucDoor ) );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getVehicleDoorOpenRatio", "vehicle", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getVehicleDoorOpenRatio" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}

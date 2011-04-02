@@ -19,12 +19,12 @@
 
 #include "StdInc.h"
 
-int CLuaFunctionDefs::GetCameraView ( lua_State* luaVM )
+int CLuaFunctionDefs::GetCameraMode ( lua_State* luaVM )
 {
-    unsigned short ucMode;
-    if ( CStaticFunctionDefinitions::GetCameraView ( ucMode ) )
+    char szMode [ 256 ];
+    if ( CStaticFunctionDefinitions::GetCameraMode ( szMode, 256 ) )
     {
-        lua_pushnumber ( luaVM, ucMode );
+        lua_pushstring ( luaVM, szMode );
         return 1;
     }
 
@@ -79,21 +79,6 @@ int CLuaFunctionDefs::GetCameraInterior ( lua_State* luaVM )
     }
 
     lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetCameraGoggleEffect ( lua_State *luaVM )
-{
-    bool bNightVision   = g_pMultiplayer->IsNightVisionEnabled   ( );
-    bool bThermalVision = g_pMultiplayer->IsThermalVisionEnabled ( );
-
-    if ( bNightVision )
-        lua_pushstring ( luaVM, "nightvision" );
-    else if ( bThermalVision )
-        lua_pushstring ( luaVM, "thermalvision" );
-    else
-        lua_pushstring ( luaVM, "normal" );
-
     return 1;
 }
 
@@ -264,59 +249,5 @@ int CLuaFunctionDefs::SetCameraClip ( lua_State* luaVM )
     m_pManager->GetCamera ()->SetCameraClip ( bObjects, bVehicles );
 
     lua_pushboolean ( luaVM, true );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetCameraView ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
-    {
-        CStaticFunctionDefinitions::SetCameraView ( static_cast <unsigned short> ( lua_tonumber ( luaVM, 1 ) ) );
-
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetCameraGoggleEffect ( lua_State *luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        bool    bSuccess = false;
-        SString strMode  = lua_tostring ( luaVM, 1 );
-
-        if ( strMode.compare ( "nightvision" ) == 0 )
-        {
-            g_pMultiplayer->SetNightVisionEnabled   ( true );
-            g_pMultiplayer->SetThermalVisionEnabled ( false );
-            
-            bSuccess = true;
-        }
-        else if ( strMode.compare ( "thermalvision" ) == 0 )
-        {
-            g_pMultiplayer->SetNightVisionEnabled   ( false );
-            g_pMultiplayer->SetThermalVisionEnabled ( true );
-
-            bSuccess = true;
-        }
-        else if ( strMode.compare ( "normal" ) == 0 )
-        {
-            g_pMultiplayer->SetNightVisionEnabled   ( false );
-            g_pMultiplayer->SetThermalVisionEnabled ( false );
-
-            bSuccess = true;
-        }
-
-        if ( bSuccess )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-
-    lua_pushboolean ( luaVM, false );
     return 1;
 }

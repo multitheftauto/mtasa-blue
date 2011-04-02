@@ -36,7 +36,6 @@ public:
     void                            LogInformation                  ( lua_State* luaVM, const char* szFormat, ... );
     void                            LogWarning                      ( lua_State* luaVM, const char* szFormat, ... );
     void                            LogError                        ( lua_State* luaVM, const char* szFormat, ... );
-    void                            LogError                        ( SString strFile, int iLine, SString strMsg );
     void                            LogBadPointer                   ( lua_State* luaVM, const char* szFunction, const char* szArgumentType, unsigned int uiArgument );
     void                            LogBadType                      ( lua_State* luaVM, const char* szFunction );
     void                            LogBadLevel                     ( lua_State* luaVM, const char* szFunction, unsigned int uiRequiredLevel );
@@ -51,7 +50,6 @@ private:
     CLuaManager*                    m_pLuaManager;
     unsigned int                    m_uiLogFileLevel;
     FILE*                           m_pLogFile;
-    bool                            m_bTriggeringOnClientDebugMessage;
 };
 
 #endif

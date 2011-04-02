@@ -149,7 +149,6 @@ CGameSA::CGameSA()
 
     // Change pool sizes here
     m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );  // Default is 500
-    m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );  // Default is 350
 }
 
 CGameSA::~CGameSA ( void )
@@ -272,8 +271,8 @@ VOID CGameSA::StartGame()
 //  InitScriptInterface();
     //*(BYTE *)VAR_StartGame = 1;
     this->SetSystemState(GS_INIT_PLAYING_GAME);
-    MemPutFast < BYTE > ( 0xB7CB49, 0 );
-    MemPutFast < BYTE > ( 0xBA67A4, 0 );
+    MemPut < BYTE > ( 0xB7CB49, 0 );  //     *(BYTE *)0xB7CB49 = 0;
+    MemPut < BYTE > ( 0xBA67A4, 0 );  //     *(BYTE *)0xBA67A4 = 0;
 }
 
 /**
@@ -332,7 +331,7 @@ float CGameSA::GetGravity ( void )
 
 void CGameSA::SetGravity ( float fGravity )
 {
-    MemPut < float > ( 0x863984, fGravity );
+    MemPut < float > ( 0x863984, fGravity );  //     * ( float* ) ( 0x863984 ) = fGravity;
 }
 
 float CGameSA::GetGameSpeed ( void )
@@ -342,7 +341,7 @@ float CGameSA::GetGameSpeed ( void )
 
 void CGameSA::SetGameSpeed ( float fSpeed )
 {
-    MemPutFast < float > ( 0xB7CB64, fSpeed );
+    MemPut < float > ( 0xB7CB64, fSpeed );  //     * ( float* ) ( 0xB7CB64 ) = fSpeed;
 }
 
 // this prevents some crashes (respawning mainly)
@@ -355,11 +354,11 @@ VOID CGameSA::DisableRenderer( bool bDisabled )
 
     if ( bDisabled )
     {
-        MemPut < BYTE > ( 0x53DF40, 0xC3 );
+        MemPut < BYTE > ( 0x53DF40, 0xC3 );  //         *(BYTE *)0x53DF40 = 0xC3;
     }
     else
     {
-        MemPut < BYTE > ( 0x53DF40, 0xD9 );
+        MemPut < BYTE > ( 0x53DF40, 0xD9 );  //         *(BYTE *)0x53DF40 = 0xD9;
     }
 }
 
@@ -369,7 +368,7 @@ VOID CGameSA::SetRenderHook ( InRenderer* pInRenderer )
         HookInstall ( (DWORD)FUNC_CDebug_DebugDisplayTextBuffer, (DWORD)pInRenderer, 6 );
     else
     {
-        MemPut < BYTE > ( FUNC_CDebug_DebugDisplayTextBuffer, 0xC3 );
+        MemPut < BYTE > ( FUNC_CDebug_DebugDisplayTextBuffer, 0xC3 );  //         *(BYTE *)FUNC_CDebug_DebugDisplayTextBuffer = 0xC3;
     }
 }
 
@@ -435,10 +434,9 @@ void CGameSA::Initialize ( void )
 {
     // Initialize garages
     m_pGarages->Initialize();
-    SetupSpecialCharacters ();
 
     // *Sebas* Hide the GTA:SA Main menu.
-    MemPutFast < BYTE > ( CLASS_CMenuManager+0x5C, 0 );
+    MemPut < BYTE > ( CLASS_CMenuManager+0x5C, 0 );  //     *(BYTE *)(CLASS_CMenuManager+0x5C) = 0;
 }
 
 eGameVersion CGameSA::GetGameVersion ( void )
@@ -496,6 +494,26 @@ void CGameSA::SetTimeScale ( float fTimeScale )
 }
 
 
+unsigned long CGameSA::GetFramelimiter ( void )
+{
+    return *VAR_Framelimiter;
+}
+
+
+void CGameSA::SetFramelimiter ( unsigned long ulFramelimiter )
+{
+    if ( ulFramelimiter == 0 )
+    {
+        m_pSettings->SetFrameLimiterEnabled ( false );
+    }
+    else
+    {
+        m_pSettings->SetFrameLimiterEnabled ( true );
+        *VAR_Framelimiter = ulFramelimiter;
+    }
+}
+
+
 unsigned char CGameSA::GetBlurLevel ( void )
 {
     return * ( unsigned char * ) 0x8D5104;
@@ -504,7 +522,7 @@ unsigned char CGameSA::GetBlurLevel ( void )
 
 void CGameSA::SetBlurLevel ( unsigned char ucLevel )
 {
-    MemPutFast < unsigned char > ( 0x8D5104, ucLevel );
+    MemPut < unsigned char > ( 0x8D5104, ucLevel );  //     * ( unsigned char * ) 0x8D5104 = ucLevel;
 }
 
 unsigned long CGameSA::GetMinuteDuration ( void )
@@ -515,7 +533,7 @@ unsigned long CGameSA::GetMinuteDuration ( void )
 
 void CGameSA::SetMinuteDuration ( unsigned long ulTime )
 {
-    MemPutFast < unsigned long > ( 0xB7015C, ulTime );
+    MemPut < unsigned long > ( 0xB7015C, ulTime );  //     * ( unsigned long * ) 0xB7015C = ulTime;
 }
 
 bool CGameSA::IsCheatEnabled ( const char* szCheatName )
@@ -533,7 +551,7 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
         return false;
     if ( !it->second->m_bCanBeSet )
         return false;
-    MemPutFast < BYTE > ( it->second->m_byAddress, bEnable );
+    MemPut < BYTE > ( it->second->m_byAddress, bEnable );   // *(it->second->m_byAddress) = bEnable;
     it->second->m_bEnabled = bEnable;
     return true;
 }
@@ -542,10 +560,7 @@ void CGameSA::ResetCheats ()
 {
     std::map < std::string, SCheatSA* >::iterator it;
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
-        if ( it->second->m_byAddress > (BYTE*)0x8A4000 )
-            MemPutFast < BYTE > ( it->second->m_byAddress, 0 );
-        else
-            MemPut < BYTE > ( it->second->m_byAddress, 0 );
+        MemPut < BYTE > ( it->second->m_byAddress, 0 );   // *(it->second->m_byAddress) = 0;
         it->second->m_bEnabled = false;
     }
 }
@@ -598,56 +613,6 @@ bool CGameSA::IsASyncLoadingEnabled ( bool bIgnoreSuspend )
     if ( m_bAsyncScriptForced || m_bAsyncSettingsDontUse )
         return m_bAsyncScriptEnabled;
     return m_bAsyncSettingsEnabled;
-}
-
-void CGameSA::SetupSpecialCharacters ( void )
-{
-    ModelInfo[1].MakePedModel ( "TRUTH" );
-    ModelInfo[2].MakePedModel ( "MACCER" );
-    //ModelInfo[190].MakePedModel ( "BARBARA" );
-    //ModelInfo[191].MakePedModel ( "HELENA" );
-    //ModelInfo[192].MakePedModel ( "MICHELLE" );
-    //ModelInfo[193].MakePedModel ( "KATIE" );
-    //ModelInfo[194].MakePedModel ( "MILLIE" );
-    //ModelInfo[195].MakePedModel ( "DENISE" );
-    ModelInfo[265].MakePedModel ( "TENPEN" );   
-    ModelInfo[266].MakePedModel ( "PULASKI" );
-    ModelInfo[267].MakePedModel ( "HERN" );
-    ModelInfo[268].MakePedModel ( "DWAYNE" );
-    ModelInfo[269].MakePedModel ( "SMOKE" );
-    ModelInfo[270].MakePedModel ( "SWEET" );
-    ModelInfo[271].MakePedModel ( "RYDER" );
-    ModelInfo[272].MakePedModel ( "FORELLI" );
-    ModelInfo[290].MakePedModel ( "ROSE" );
-    ModelInfo[291].MakePedModel ( "PAUL" );
-    ModelInfo[292].MakePedModel ( "CESAR" );
-    ModelInfo[293].MakePedModel ( "OGLOC" );
-    ModelInfo[294].MakePedModel ( "WUZIMU" );
-    ModelInfo[295].MakePedModel ( "TORINO" );
-    ModelInfo[296].MakePedModel ( "JIZZY" );
-    ModelInfo[297].MakePedModel ( "MADDOGG" );
-    ModelInfo[298].MakePedModel ( "CAT" );
-    ModelInfo[299].MakePedModel ( "CLAUDE" );
-    ModelInfo[300].MakePedModel ( "RYDER2" );
-    ModelInfo[301].MakePedModel ( "RYDER3" );
-    ModelInfo[302].MakePedModel ( "EMMET" );
-    ModelInfo[303].MakePedModel ( "ANDRE" );
-    ModelInfo[304].MakePedModel ( "KENDL" );
-    ModelInfo[305].MakePedModel ( "JETHRO" );
-    ModelInfo[306].MakePedModel ( "ZERO" );
-    ModelInfo[307].MakePedModel ( "TBONE" );
-    ModelInfo[308].MakePedModel ( "SINDACO" );
-    ModelInfo[309].MakePedModel ( "JANITOR" );
-    ModelInfo[310].MakePedModel ( "BBTHIN" );
-    ModelInfo[311].MakePedModel ( "SMOKEV" );
-    ModelInfo[312].MakePedModel ( "PSYCHO" );
-    /* Hot-coffee only models
-    ModelInfo[313].MakePedModel ( "GANGRL2" );
-    ModelInfo[314].MakePedModel ( "MECGRL2" );
-    ModelInfo[315].MakePedModel ( "GUNGRL2" );
-    ModelInfo[316].MakePedModel ( "COPGRL2" );
-    ModelInfo[317].MakePedModel ( "NURGRL2" );
-    */
 }
 
 // Well, has it?

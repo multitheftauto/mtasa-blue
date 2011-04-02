@@ -258,8 +258,6 @@ CKeyBinds::CKeyBinds ( CCore* pCore )
     m_bInVehicle = false;
     m_pChatBoxBind = NULL;
     m_bProcessingKeyStroke = false;
-    m_KeyStrokeHandler = NULL;
-    m_CharacterKeyHandler = NULL;
 }
 
 
@@ -272,23 +270,12 @@ CKeyBinds::~CKeyBinds ( void )
 
 bool CKeyBinds::ProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-    // Don't process Shift keys here, we have a hack for that
-    if ( wParam == 0x10 &&
-        ( uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP ) )
-        return false;
-
     bool bState;
     const SBindableKey * pKey = GetBindableFromMessage ( uMsg, wParam, lParam, bState );
-    if ( pKey ) return ProcessKeyStroke ( pKey, bState );
-
-    if ( uMsg == WM_CHAR ) return ProcessCharacter ( wParam );
-    return false;
-}
-
-
-bool CKeyBinds::ProcessCharacter ( WPARAM wChar )
-{
-    if ( m_CharacterKeyHandler && m_CharacterKeyHandler ( wChar ) ) return true;
+    if ( pKey )
+    {
+        return ProcessKeyStroke ( pKey, bState );
+    }
     return false;
 }
 
@@ -331,9 +318,6 @@ bool CKeyBinds::ProcessKeyStroke ( const SBindableKey * pKey, bool bState )
 
     if ( pKey->iGTARelative == GTA_KEY_MSCROLLUP || pKey->iGTARelative == GTA_KEY_MSCROLLDOWN )
         m_bMouseWheel = true;
-
-    // Call the key-stroke handler if we have one
-    if ( m_KeyStrokeHandler ) m_KeyStrokeHandler ( pKey, bState );
 
     // Search through binds
     bool bFound = false;
@@ -1791,6 +1775,13 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage ( UINT uMsg, WPARAM wParam
     if ( IsFakeCtrl_L ( uMsg, wParam, lParam ) )
         return NULL;
 
+    /* lil_Toady: Not sure who added this and why, commented out for a test,
+                  as shift must be bindable
+    if ( wParam == 0x10 &&
+         ( uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP ) )
+        return NULL;
+    */
+
     bool bFirstHit = ( lParam & 0x40000000 ) ? false:true;
     if ( uMsg == WM_MBUTTONDOWN || uMsg == WM_MBUTTONUP || uMsg == WM_XBUTTONDOWN ||
          uMsg == WM_XBUTTONUP || uMsg == WM_MOUSEWHEEL )
@@ -2053,29 +2044,26 @@ void CKeyBinds::DoPreFramePulse ( void )
     }
 
     // HACK: shift keys
-    if ( m_pCore->IsFocused () )
+    bool bLeftShift = ( GetAsyncKeyState ( VK_LSHIFT ) & 0x8000 ) != 0;
+    bool bRightShift = ( GetAsyncKeyState ( VK_RSHIFT ) & 0x8000 ) != 0;
+
+    if ( bLeftShift != bPreLeftShift )
     {
-        bool bLeftShift = ( GetKeyState ( VK_LSHIFT ) & 0x8000 ) != 0;
-        bool bRightShift = ( GetKeyState ( VK_RSHIFT ) & 0x8000 ) != 0;
+        if ( bLeftShift )
+            ProcessKeyStroke ( &g_bkKeys [ 9 ], true );
+        else
+            ProcessKeyStroke ( &g_bkKeys [ 9 ], false );
 
-        if ( bLeftShift != bPreLeftShift )
-        {
-            if ( bLeftShift )
-                ProcessKeyStroke ( &g_bkKeys [ 9 ], true );
-            else
-                ProcessKeyStroke ( &g_bkKeys [ 9 ], false );
+        bPreLeftShift = bLeftShift;
+    }
+    if ( bRightShift != bPreRightShift )
+    {
+        if ( bRightShift )
+            ProcessKeyStroke ( &g_bkKeys [ 10 ], true );
+        else
+            ProcessKeyStroke ( &g_bkKeys [ 10 ], false );
 
-            bPreLeftShift = bLeftShift;
-        }
-        if ( bRightShift != bPreRightShift )
-        {
-            if ( bRightShift )
-                ProcessKeyStroke ( &g_bkKeys [ 10 ], true );
-            else
-                ProcessKeyStroke ( &g_bkKeys [ 10 ], false );
-
-            bPreRightShift = bRightShift;
-        }
+        bPreRightShift = bRightShift;
     }
 }
 

@@ -18,8 +18,6 @@
 #include <windows.h>
 #include "CSingleton.h"
 
-#define URI_CONNECT 1
-
 class CMessageLoopHook : public CSingleton < CMessageLoopHook >
 {
     public:
@@ -40,11 +38,6 @@ class CMessageLoopHook : public CSingleton < CMessageLoopHook >
 
     WNDPROC     m_HookedWindowProc;
     HWND        m_HookedWindowHandle;
-
-    static WPARAM      m_LastVirtualKeyCode;
-    static UCHAR       m_LastScanCode;
-    static BYTE*       m_LastKeyboardState;
-  
 };
 
 #endif

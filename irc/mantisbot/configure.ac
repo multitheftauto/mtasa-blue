@@ -12,9 +12,6 @@ AC_CONFIG_FILES([Makefile src/Makefile])
 AC_PROG_CC
 AC_PROG_CXX
 
-# Check for libtool
-AM_PROG_LIBTOOL
-
 # Checks for libraries.
 
 # Checks for header files.

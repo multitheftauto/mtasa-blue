@@ -102,7 +102,7 @@ CCore::CCore ( void )
 
     SString strInstallRoot = GetMTASABaseDir ();
 
-    SString strGTAInstallRoot = GetRegistryValue ( "..\\1.0", "GTA:SA Path" );
+    SString strGTAInstallRoot = GetRegistryValue ( "", "GTA:SA Path" );
     if ( strGTAInstallRoot.empty () )
     {
         MessageBox ( 0, "There is no GTA path specified in the registry, please reinstall.", "Error", MB_OK );
@@ -187,16 +187,6 @@ CCore::CCore ( void )
 
     // Reset the screenshot flag
     bScreenShot = false;
-
-    //Create our current server and set the update time to zero
-    m_pCurrentServer = new CXfireServerInfo();
-    m_tXfireUpdate = 0;
-
-    // No initial fps limit
-    m_uiFrameRateLimit = 0;
-    m_uiServerFrameRateLimit = 0;
-    m_dLastTimeMs = 0;
-    m_dPrevOverrun = 0;
 }
 
 CCore::~CCore ( void )
@@ -221,6 +211,7 @@ CCore::~CCore ( void )
     // Store core variables to cvars
     CVARS_SET ( "console_pos",                  m_pLocalGUI->GetConsole ()->GetPosition () );
     CVARS_SET ( "console_size",                 m_pLocalGUI->GetConsole ()->GetSize () );
+    CVARS_SET ( "serverbrowser_size",           m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->GetSize () );
 
     // Delete interaction objects.
     delete m_pCommands;
@@ -248,9 +239,6 @@ CCore::~CCore ( void )
 
     // Delete the logger
     delete m_pLogger;
-
-    //Delete the Current Server
-    delete m_pCurrentServer;
 }
 
 
@@ -604,6 +592,15 @@ void CCore::ApplyConsoleSettings ( void )
     pConsole->SetSize ( vec );
 }
 
+void CCore::ApplyServerBrowserSettings ( void )
+{
+    CVector2D vec;
+
+    CVARS_GET ( "serverbrowser_size", vec );
+    m_pLocalGUI->GetMainMenu ()->GetServerBrowser ()->SetSize ( vec );
+}
+
+
 void CCore::ApplyGameSettings ( void )
 {
     bool bval;
@@ -615,6 +612,11 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "classic_controls", bval ); bval ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
     CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
+}
+
+void CCore::ApplyMenuSettings ( void )
+{
+    m_pLocalGUI->GetMainMenu ()->LoadMenuOptions ();
 }
 
 void CCore::ApplyCommunityState ( void )
@@ -739,12 +741,6 @@ void CCore::HideMainMenu ( void )
 void CCore::HideQuickConnect ( void )
 {
     m_pLocalGUI->GetMainMenu ()->GetQuickConnectWindow()->SetVisible( false );
-}
-
-void CCore::ShowServerInfo ( unsigned int WindowType )
-{
-    RemoveMessageBox ();
-    CServerInfo::GetSingletonPtr()->Show( (CServerInfo::eWindowType)WindowType );
 }
 
 void CCore::ApplyHooks ( )
@@ -1073,7 +1069,9 @@ void CCore::DoPostFramePulse ( )
 
         // Apply all settings
         ApplyConsoleSettings ();
+        ApplyServerBrowserSettings ();
         ApplyGameSettings ();
+        ApplyMenuSettings ();
 
         m_pGUI->SetMouseClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseClick, this ) );
         m_pGUI->SetMouseDoubleClickHandler ( INPUT_CORE, GUI_CALLBACK_MOUSE ( &CCore::OnMouseDoubleClick, this ) );
@@ -1158,37 +1156,6 @@ void CCore::DoPostFramePulse ( )
     m_pConnectManager->DoPulse ();
 
     m_Community.DoPulse ();
-
-    //XFire polling
-    if ( IsConnected() )
-    {
-        time_t ttime;
-        ttime = time ( NULL );
-        if ( ttime >= m_tXfireUpdate + XFIRE_UPDATE_RATE )
-        {
-            if ( m_pCurrentServer->IsSocketClosed() )
-            {
-                //Init our socket
-                m_pCurrentServer->Init();
-            }
-            //Get our xfire query reply
-            SString strReply = UpdateXfire( );
-            //If we Parsed or if the reply failed wait another XFIRE_UPDATE_RATE until trying again
-            if ( strReply == "ParsedQuery" || strReply == "NoReply" ) 
-            {
-                m_tXfireUpdate = time ( NULL );
-                //Close the socket
-                m_pCurrentServer->SocketClose();
-            }
-        }
-    }
-    //Set our update time to zero to ensure that the first xfire update happens instantly when joining
-    else
-    {
-        XfireSetCustomGameData ( 0, NULL, NULL );
-        if ( m_tXfireUpdate != 0 )
-            m_tXfireUpdate = 0;
-    }
 }
 
 
@@ -1231,6 +1198,7 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "unbind",            "unbinds a key (key)",              CCommandFuncs::Unbind );
     m_pCommands->Add ( "copygtacontrols",   "copies the default gta controls",  CCommandFuncs::CopyGTAControls );
     m_pCommands->Add ( "screenshot",        "outputs a screenshot",             CCommandFuncs::ScreenShot );
+    m_pCommands->Add ( "connectiontype",    "sets the connection type (type)",  CCommandFuncs::ConnectionType );
     m_pCommands->Add ( "saveconfig",        "immediately saves the config",     CCommandFuncs::SaveConfig );
 
     m_pCommands->Add ( "cleardebug",        "clears the debug view",            CCommandFuncs::DebugClear );
@@ -1428,25 +1396,6 @@ const char* CCore::GetCommandLineOption ( const char* szOption )
 
 SString CCore::GetConnectCommandFromURI ( const char* szURI )
 {
-    unsigned short usPort;
-    std::string strHost, strNick, strPassword;
-    GetConnectParametersFromURI ( szURI, strHost, usPort, strNick, strPassword );
-
-    // Generate a string with the arguments to send to the mod IF we got a host
-    SString strDest;
-    if ( strHost.size() > 0 )
-    {
-        if ( strPassword.size() > 0 )
-            strDest.Format ( "connect %s %u %s %s", strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str () );
-        else
-            strDest.Format ( "connect %s %u %s", strHost.c_str (), usPort, strNick.c_str () );
-    }
-
-    return strDest;
-}
-
-void CCore::GetConnectParametersFromURI ( const char* szURI, std::string &strHost, unsigned short &usPort, std::string &strNick, std::string &strPassword )
-{
     // Grab the length of the string
     size_t sizeURI = strlen ( szURI );
     
@@ -1560,13 +1509,14 @@ void CCore::GetConnectParametersFromURI ( const char* szURI, std::string &strHos
     }
 
     // If we got any port, convert it to an integral type
-    usPort = 22003;
+    unsigned short usPort = 22003;
     if ( strlen ( szPort ) > 0 )
     {
         usPort = static_cast < unsigned short > ( atoi ( szPort ) );
     }
 
     // Grab the nickname
+    std::string strNick;
     if ( strlen ( szNickname ) > 0 )
     {
         strNick = szNickname;
@@ -1575,8 +1525,18 @@ void CCore::GetConnectParametersFromURI ( const char* szURI, std::string &strHos
     {
         CVARS_GET ( "nick", strNick );
     }
-    strHost = szHost;
-    strPassword = szPassword;
+
+    // Generate a string with the arguments to send to the mod IF we got a host
+    SString strDest;
+    if ( strlen ( szHost ) > 0 )
+    {
+        if ( strlen ( szPassword ) > 0 )
+            strDest.Format ( "connect %s %u %s %s", szHost, usPort, strNick.c_str (), szPassword );
+        else
+            strDest.Format ( "connect %s %u %s", szHost, usPort, strNick.c_str () );
+    }
+
+    return strDest;
 }
 
 
@@ -1595,87 +1555,25 @@ void CCore::UpdateRecentlyPlayed()
         CServerList* pRecentList = pServerBrowser->GetRecentList ();
         pRecentList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
         pRecentList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET, true );
-
-        // Update our address history if need be
-        if (    pServerBrowser->m_bManualConnect 
-             && strHost == pServerBrowser->m_strManualHost  
-             && uiPort == pServerBrowser->m_usManualPort
-           )
-        {
-            CServerList* pHistoryList = pServerBrowser->GetHistoryList ();
-            pHistoryList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
-            pHistoryList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET ); 
-            pServerBrowser->CreateHistoryList();
-        }
-        
         pServerBrowser->SaveRecentlyPlayedList();
-        if ( !m_pConnectManager->m_strLastPassword.empty() )
-            pServerBrowser->SetServerPassword ( strHost + ":" + SString("%u",uiPort), m_pConnectManager->m_strLastPassword );
 
+/* This won't work here
+        // Set as our current server for xfire
+        if ( XfireIsLoaded () )
+        {
+            const char *szKey[2], *szValue[2];
+            szKey[0] = "Gamemode";
+            szValue[0] = RecentServer.strType.c_str();
+
+            szKey[1] = "Map";
+            szValue[1] = RecentServer.strMap.c_str();
+
+            XfireSetCustomGameData ( 2, szKey, szValue ); 
+        }
+*/
     }
     //Save our configuration file
     CCore::GetSingleton ().SaveConfig ();
-}
-void CCore::SetCurrentServer( in_addr Addr, unsigned short usQueryPort )
-{
-    //Set the current server info so we can query it with ASE for xfire
-    m_pCurrentServer->Address = Addr;
-    m_pCurrentServer->usQueryPort = usQueryPort;
-
-}
-SString CCore::UpdateXfire( void )
-{
-    //Check if a current server exists
-    if ( m_pCurrentServer ) 
-    {
-        //Get the result from the Pulse method
-        std::string strResult = m_pCurrentServer->Pulse();
-        //Have we parsed the query this function call?
-        if ( strResult == "ParsedQuery" )
-        {
-            //Get our Nick from CVARS
-            std::string strNick;
-            CVARS_GET ( "nick", strNick );
-            //Format a player count
-            SString strPlayerCount("%i / %i", m_pCurrentServer->nPlayers, m_pCurrentServer->nMaxPlayers);
-            // Set as our custom date
-            SetXfireData( m_pCurrentServer->strName, m_pCurrentServer->strVersion, m_pCurrentServer->bPassworded, m_pCurrentServer->strGameMode, m_pCurrentServer->strMap, strNick, strPlayerCount );
-        }
-        //Return the result
-        return strResult;
-    }
-    return "";
-}
-
-void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount )
-{
-    if ( XfireIsLoaded () )
-    {
-        //Set our "custom data"
-        const char *szKey[7], *szValue[7];
-        szKey[0] = "Server Name";
-        szValue[0] = strServerName.c_str();
-
-        szKey[1] = "Server Version";
-        szValue[1] = strVersion.c_str();
-
-        szKey[2] = "Passworded";
-        szValue[2] = bPassworded ? "Yes" : "No";
-
-        szKey[3] = "Gamemode";
-        szValue[3] = strGamemode.c_str();
-
-        szKey[4] = "Map";
-        szValue[4] = strMap.c_str();
-
-        szKey[5] = "Player Name";
-        szValue[5] = strPlayerName.c_str();
-
-        szKey[6] = "Player Count";
-        szValue[6] = strPlayerCount.c_str();
-        
-        XfireSetCustomGameData ( 7, szKey, szValue );
-    }
 }
 
 
@@ -1710,73 +1608,4 @@ void CCore::ApplyLoadingCrashPatch ( void )
             }
         }
     }
-}
-
-
-//
-// Recalculate FPS limit to use
-//
-// Uses client rate from config
-// Uses server rate from argument, or last time if not supplied
-//
-void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit )
-{
-    // Save rate from server if valid
-    if ( uiServerFrameRateLimit != -1 )
-        m_uiServerFrameRateLimit = uiServerFrameRateLimit;
-
-    // Fetch client setting
-    uint uiClientRate;
-    g_pCore->GetCVars ()->Get ( "fps_limit", uiClientRate );
-
-    // Lowest wins (Although zero is highest)
-    if ( ( m_uiServerFrameRateLimit > 0 && uiClientRate > m_uiServerFrameRateLimit ) || uiClientRate == 0 )
-        m_uiFrameRateLimit = m_uiServerFrameRateLimit;
-    else
-        m_uiFrameRateLimit = uiClientRate;
-}
-
-
-//
-// Do FPS limiting
-//
-void CCore::ApplyFrameRateLimit ( void )
-{
-    if ( m_uiFrameRateLimit < 1 )
-        return;
-
-    // Calc required time in ms between frames
-    const double dTargetTimeToUse = 1000.0 / m_uiFrameRateLimit;
-
-    // Time now
-    double dTimeMs = CClientTime::GetTimeNano() * 1000.0;
-
-    // Get delta time in ms since last frame
-    double dTimeUsed = dTimeMs - m_dLastTimeMs;
-
-    // Apply any over/underrun carried over from the previous frame
-    dTimeUsed += m_dPrevOverrun;
-
-    if ( dTimeUsed < dTargetTimeToUse )
-    {
-        // Have time spare - maybe eat some of that now
-        double dSpare = dTargetTimeToUse - dTimeUsed;
-
-        double dUseUpNow = dSpare - dTargetTimeToUse * 0.75;
-        if ( dUseUpNow > 1 )
-            Sleep( static_cast < DWORD > ( floor ( dUseUpNow ) ) );
-
-        // Redo timing calcs
-        dTimeMs = CClientTime::GetTimeNano() * 1000.0;
-        dTimeUsed = dTimeMs - m_dLastTimeMs;
-        dTimeUsed += m_dPrevOverrun;
-    }
-
-    // Update over/underrun for next frame
-    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
-
-    // Limit carry over
-    m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9, m_dPrevOverrun, dTargetTimeToUse * 0.9 );
-
-    m_dLastTimeMs = dTimeMs;
 }

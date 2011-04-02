@@ -74,39 +74,6 @@ private:
     };
 };
 
-// Useful when we don't need all bits of integer type
-template < typename type, unsigned int bits >
-struct SIntegerSync : public ISyncStructure
-{
-    bool Read ( NetBitStreamInterface& bitStream )
-    {
-        return bitStream.ReadBits ( reinterpret_cast < char* > ( &data ), bits );
-    }
-    void Write ( NetBitStreamInterface& bitStream ) const
-    {
-        bitStream.WriteBits ( reinterpret_cast < const char* > ( &data ), bits );
-    }
-
-    SIntegerSync ( void )
-    {
-        assert ( bits <= sizeof ( type ) * 8 );
-    }
-    SIntegerSync ( type value )
-    {
-        SIntegerSync ();
-        data.value = value;
-    }
-
-    operator type ( void ) const
-    {
-        return data.value;
-    }
-
-    struct
-    {
-        type value : bits;
-    } data;
-};
 
 //////////////////////////////////////////
 //                                      //
@@ -180,11 +147,6 @@ struct SPlayerArmorSync : public SFloatAsBitsSync < 8 >
 struct SVehicleHealthSync : public SFloatAsBitsSync < 12 >
 {
     SVehicleHealthSync () : SFloatAsBitsSync<12> ( 0.f, 2000.0f, true ) {}
-};
-
-struct SObjectHealthSync : public SFloatAsBitsSync < 11 >
-{
-    SObjectHealthSync () : SFloatAsBitsSync<11> ( 0.f, 1000.0f, true ) {}
 };
 
 
@@ -623,7 +585,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
     {
         if ( bitStream.ReadCompressed ( data.vehicleID ) &&
              bitStream.Read ( data.ucTimeContext ) &&
-             bitStream.ReadBits ( (char *)&data, 9 ) )
+             bitStream.ReadBits ( (char *)&data, 8 ) )
         {
             if ( data.bSyncPosition )
             {
@@ -674,7 +636,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
     {
         bitStream.WriteCompressed ( data.vehicleID );
         bitStream.Write ( data.ucTimeContext );
-        bitStream.WriteBits ( (const char* )&data, 9 );
+        bitStream.WriteBits ( (const char* )&data, 8 );
 
         if ( data.bSyncPosition )
         {
@@ -727,7 +689,6 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
         bool bSyncTrailer : 1;
         bool bEngineOn : 1;
         bool bDerailed : 1;
-        bool bIsInWater : 1;
         CVector vecPosition;
         CVector vecRotation;
         CVector vecVelocity;
@@ -843,7 +804,7 @@ struct SSmallKeysyncSync : public ISyncStructure
     } data;
 };
 
-struct SVehicleTurretSync : public ISyncStructure
+struct SVehicleSpecific : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -874,56 +835,7 @@ struct SVehicleTurretSync : public ISyncStructure
     } data;
 };
 
-struct SDoorOpenRatioSync : public ISyncStructure
-{
-    bool Read ( NetBitStreamInterface& bitStream )
-    {
-        bool bUncompressed;
-        bool bNotZero;
 
-        if ( !bitStream.ReadBit ( bUncompressed ) ) 
-            return false;
-        if ( bUncompressed == false )
-        {
-            if ( !bitStream.ReadBit ( bNotZero ) )
-                return false;
-            if ( bNotZero )
-                data.fRatio = 1.0f;
-            else
-                data.fRatio = 0.0f;
-        }
-        else
-        {
-            SFloatAsBitsSync<10> fl ( 0.0f, 1.0f, true );
-            if ( !fl.Read ( bitStream ) )
-                return false;
-            data.fRatio = fl.data.fValue;
-        }
-
-        return true;
-    }
-
-    void Write ( NetBitStreamInterface& bitStream ) const
-    {
-        if ( data.fRatio == 0.0f || data.fRatio == 1.0f )
-        {
-            bitStream.WriteBit ( false );
-            bitStream.WriteBit ( data.fRatio == 1.0f );
-        }
-        else
-        {
-            bitStream.WriteBit ( true );
-            SFloatAsBitsSync<10> fl ( 0.0f, 1.0f, true );
-            fl.data.fValue = data.fRatio;
-            bitStream.Write ( &fl );
-        }
-    }
-
-    struct
-    {
-        float fRatio;
-    } data;
-};
 
 //////////////////////////////////////////
 //                                      //
@@ -1493,7 +1405,7 @@ struct SMapInfoFlagsSync : public ISyncStructure
 //////////////////////////////////////////
 struct SFunBugsStateSync : public ISyncStructure
 {
-    enum { BITCOUNT = 4 };
+    enum { BITCOUNT = 3 };
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -1509,7 +1421,6 @@ struct SFunBugsStateSync : public ISyncStructure
         bool bQuickReload : 1;
         bool bFastFire : 1;
         bool bFastMove : 1;
-        bool bCrouchBug : 1;
     } data;
 };
 
@@ -1818,73 +1729,5 @@ struct SMouseButtonSync : public ISyncStructure
     } data;
 };
 
-
-//////////////////////////////////////////
-//                                      //
-//              Heat haze               //
-//                                      //
-//////////////////////////////////////////
-struct SHeatHazeSync : public ISyncStructure
-{
-    SHeatHazeSync( void ) {}
-    SHeatHazeSync( const SHeatHazeSettings& settings )
-    {
-        data.settings = settings;
-    }
-
-    // To SHeatHazeSettings
-    operator SHeatHazeSettings( void ) const
-    {
-        return data.settings;
-    }
-
-    template < unsigned int bits, typename T >
-    bool ReadRange ( NetBitStreamInterface& bitStream, T& outvalue, const T low, const T hi )
-    {
-        T temp;
-        if ( !bitStream.ReadBits ( &temp, bits ) )
-            return false;
-        outvalue = Clamp < T > ( low, temp + low, hi );
-        return true;
-    }
-
-    template < unsigned int bits, typename T >
-    void WriteRange ( NetBitStreamInterface& bitStream, const T value, const T low, const T hi ) const
-    {
-        T temp = Clamp < T > ( low, value, hi ) - low;
-        bitStream.WriteBits ( &temp, bits );
-    }
-
-    bool Read ( NetBitStreamInterface& bitStream )
-    {
-        return  bitStream.Read ( data.settings.ucIntensity ) &&
-                bitStream.Read ( data.settings.ucRandomShift ) &&
-                ReadRange < 10, ushort > ( bitStream, data.settings.usSpeedMin, 0, 1000 ) &&
-                ReadRange < 10, ushort > ( bitStream, data.settings.usSpeedMax, 0, 1000 ) &&
-                ReadRange < 11, short > ( bitStream, data.settings.sScanSizeX, -1000, 1000 ) &&
-                ReadRange < 11, short > ( bitStream, data.settings.sScanSizeY, -1000, 1000 ) &&
-                ReadRange < 10, ushort > ( bitStream, data.settings.usRenderSizeX, 0, 1000 ) &&
-                ReadRange < 10, ushort > ( bitStream, data.settings.usRenderSizeY, 0, 1000 ) &&
-                bitStream.ReadBit ( data.settings.bInsideBuilding );
-    }
-
-    void Write ( NetBitStreamInterface& bitStream ) const
-    {
-        bitStream.Write ( data.settings.ucIntensity );
-        bitStream.Write ( data.settings.ucRandomShift );
-        WriteRange < 10, ushort > ( bitStream, data.settings.usSpeedMin, 0, 1000 );
-        WriteRange < 10, ushort > ( bitStream, data.settings.usSpeedMax, 0, 1000 );
-        WriteRange < 11, short > ( bitStream, data.settings.sScanSizeX, -1000, 1000 );
-        WriteRange < 11, short > ( bitStream, data.settings.sScanSizeY, -1000, 1000 );
-        WriteRange < 10, ushort > ( bitStream, data.settings.usRenderSizeX, 0, 1000 );
-        WriteRange < 10, ushort > ( bitStream, data.settings.usRenderSizeY, 0, 1000 );
-        bitStream.WriteBit ( data.settings.bInsideBuilding );
-    }
-
-    struct
-    {
-        SHeatHazeSettings settings;
-    } data;
-};
 
 #pragma pack(pop)

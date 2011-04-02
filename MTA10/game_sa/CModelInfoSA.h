@@ -53,7 +53,9 @@ class CPedModelInfoSAInterface;
 #define     FUNC_IsTrailerModel             0x4c5c50
 #define     FUNC_IsVehicleModelType         0x4c5c80
 
+#define     FUNC_RequestModel               0x4087e0
 #define     FUNC_RemoveModel                0x4089a0
+#define     FUNC_LoadAllRequestedModels     0x40ea10
 #define     FUNC_FlushRequestList           0x40E4E0
 
 #define     FUNC_HasVehicleUpgradeLoaded    0x407820
@@ -62,8 +64,6 @@ class CPedModelInfoSAInterface;
 #define     FUNC_CVehicleModelInfo__GetNumRemaps        0x4C86B0
 
 #define     FUNC_SetColModel                0x4C4BC0
-#define     FUNC_AddPedModel                0x4c67a0
-#define     VAR_CTempColModels_ModelPed1    0x968DF0
 /**
  * \todo Fill this class with info from R*
  */
@@ -235,7 +235,7 @@ public:
                                     CModelInfoSA            ( void );
                                     CModelInfoSA            ( DWORD dwModelID );
 
-    CBaseModelInfoSAInterface *     GetInterface             ( void );
+    CBaseModelInfoSAInterface *     GetInterface             ( void )              { return m_pInterface; }
     CPedModelInfoSAInterface *      GetPedModelInfoInterface ( void )              { return reinterpret_cast < CPedModelInfoSAInterface * > ( GetInterface () ); }
 
     DWORD                           GetModel                ( void )               { return m_dwModelID; }
@@ -258,6 +258,7 @@ public:
 
     VOID                            Request                 ( bool bAndLoad = false, bool bWaitForLoad = false, bool bHighPriority = false );
     VOID                            Remove                  ( void );
+    VOID                            LoadAllRequestedModels  ( void );
     BYTE                            GetLevelFromPosition    ( CVector * vecPosition );
     BOOL                            IsLoaded                ( void );
     BYTE                            GetFlags                ( void );
@@ -265,7 +266,6 @@ public:
     bool                            IsValid                 ( void );
     float                           GetDistanceFromCentreOfMassToBaseOfModel ( void );
     unsigned short                  GetTextureDictionaryID  ( void );
-    void                            SetTextureDictionaryID  ( unsigned short usID );
     float                           GetLODDistance          ( void );
     void                            SetLODDistance          ( float fDistance );
     void                            RestreamIPL             ( void );
@@ -279,8 +279,6 @@ public:
     bool                            IsUpgradeAvailable      ( eVehicleUpgradePosn posn );
     void                            SetCustomCarPlateText   ( const char * szText );
     unsigned int                    GetNumRemaps            ( void );
-    void*                           GetVehicleSuspensionData( void );
-    void*                           SetVehicleSuspensionData( void* pSuspensionLines );
 
     // Upgrades only!
     void                            RequestVehicleUpgrade   ( void );
@@ -301,8 +299,6 @@ public:
     inline void                     SetModelID              ( DWORD dwModelID ) { m_dwModelID = dwModelID; }
 
     inline RwObject*                GetRwObject             ( void ) { return m_pInterface ? m_pInterface->pRwObject : NULL; }
-
-    void                            MakePedModel            ( char * szTexture );
 };
 
 #endif

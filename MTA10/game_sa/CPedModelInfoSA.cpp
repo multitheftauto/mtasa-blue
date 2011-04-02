@@ -14,19 +14,6 @@
 
 #include "StdInc.h"
 
-CPedModelInfoSAInterface::CPedModelInfoSAInterface ( void )
-{
-    MemSetFast ( this, 0, sizeof ( CPedModelInfoSAInterface ) );
-    VFTBL = ( CBaseModelInfo_SA_VTBL * ) VAR_CPedModelInfo_VTBL;
-    pColModel = ( CColModelSAInterface * ) VAR_CTempColModels_ModelPed1;
-    MemPutFast < DWORD > ( &pad, 0xFFFFFFFF );
-}
-
-CPedModelInfoSA::CPedModelInfoSA ( void ) : CModelInfoSA ()
-{
-    m_pPedModelInterface = new CPedModelInfoSAInterface;
-}
-
 void CPedModelInfoSA::SetMotionAnimGroup ( AssocGroupId animGroup )
 {
     DWORD dwThis = (DWORD)m_pInterface;

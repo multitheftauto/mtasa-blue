@@ -13,7 +13,7 @@
 
 #include "StdInc.h"
 
-CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale )
+CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, unsigned int uExtraGlyphs[], bool bAutoScale )
 {
     // Store the fontmanager and create a font with the given attributes
     m_pFontManager = pGUI->GetFontManager ();
@@ -33,7 +33,10 @@ CGUIFont_Impl::CGUIFont_Impl ( CGUI_Impl* pGUI, const char* szFontName, const ch
     }
 
     // Define our glyphs
-    defineFontGlyphs( " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" );
+    if ( uExtraGlyphs ) {
+        m_pFont->defineFontGlyphs( m_pFont->getAvailableGlyphs() + (CEGUI::utf32)*uExtraGlyphs );
+    } else
+        m_pFont->defineFontGlyphs( (CEGUI::utf8*)" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" );
 
     // Set default attributes
     SetNativeResolution ( 1024, 768 );
@@ -112,33 +115,14 @@ float CGUIFont_Impl::GetFontHeight ( float fScale )
 
 float CGUIFont_Impl::GetTextExtent ( const char* szText, float fScale )
 {
-    return m_pFont->getTextExtent ( CGUI_Impl::GetUTFString(szText), fScale );
+    CEGUI::String strText;
+
+    if ( szText ) strText.assign ( szText );
+    return m_pFont->getTextExtent ( strText, fScale );
 }
 
 
 CEGUI::Font* CGUIFont_Impl::GetFont ( void )
 {
     return m_pFont;
-}
-
-void CGUIFont_Impl::defineFontGlyphs (unsigned int uExtraGlyphs[])
-{
-        CEGUI::String glyphSet; // (?) we needs temporary (CEGUI::String) string to define our glyphs correctly
-        
-        for ( unsigned int g = 0; uExtraGlyphs[g] >= 32; ++g ) // (?) adding extra glyphs codes to temp string
-	    {
-            glyphSet += (CEGUI::utf32) uExtraGlyphs[g];
-	    }
-        
-        m_pFont->defineFontGlyphs( glyphSet ); // (?) defining font's glyphs
-}
-
-void CGUIFont_Impl::defineFontGlyphs (const char *szExtraGlyphs)
-{
-    m_pFont->defineFontGlyphs( (CEGUI::utf8*)szExtraGlyphs );
-}
-
-bool CGUIFont_Impl::isGlyphBeingUsed (unsigned long ulGlyph)
-{
-    return m_pFont->isGlyphBeingUsed ( ulGlyph );
 }

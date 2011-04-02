@@ -19,7 +19,6 @@ void CObjectRPCs::LoadFunctions ( void )
     AddHandler ( SET_OBJECT_ROTATION, SetObjectRotation, "SetObjectRotation" );
     AddHandler ( MOVE_OBJECT, MoveObject, "MoveObject" );
     AddHandler ( STOP_OBJECT, StopObject, "StopObject" );
-    AddHandler ( SET_OBJECT_SCALE, SetObjectScale, "SetObjectScale" );
 }
 
 
@@ -29,76 +28,97 @@ void CObjectRPCs::DestroyAllObjects ( NetBitStreamInterface& bitStream )
 }
 
 
-void CObjectRPCs::SetObjectRotation ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CObjectRPCs::SetObjectRotation ( NetBitStreamInterface& bitStream )
 {
-    // Grab the object
-    CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( pSource->GetID () ) );
-    if ( pObject )
+    // Read out the object ID
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
     {
-        // Read out the new rotation
-        CVector vecRotation;
-        if ( bitStream.Read ( vecRotation.fX ) &&
-             bitStream.Read ( vecRotation.fY ) &&
-             bitStream.Read ( vecRotation.fZ ) )
+        // Grab the object
+        CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( ID ) );
+        if ( pObject )
         {
-            // Set the new rotation
-            pObject->SetRotationRadians ( vecRotation );
+            // Read out the new rotation
+            CVector vecRotation;
+            if ( bitStream.Read ( vecRotation.fX ) &&
+                 bitStream.Read ( vecRotation.fY ) &&
+                 bitStream.Read ( vecRotation.fZ ) )
+            {
+                // Set the new rotation
+                pObject->SetRotationRadians ( vecRotation );
 
-            // Kayl: removed update of target rotation, move uses delta and anyway setRotation is NOT possible when moving
+                // Update our target rotation
+                pObject->SetTargetRotation ( vecRotation );
+            }
         }
     }
 }
 
 
-void CObjectRPCs::MoveObject ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CObjectRPCs::MoveObject ( NetBitStreamInterface& bitStream )
 {
-    // Grab the object
-    CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( pSource->GetID () ) );
-    if ( pObject )
+    // Read out the object ID
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
     {
-        CPositionRotationAnimation* pAnimation = CPositionRotationAnimation::FromBitStream ( bitStream );
-
-        if ( pAnimation )
-        {            
-            pObject->StartMovement ( *pAnimation );
-            delete pAnimation;
-        }
-    }
-}
-
-void CObjectRPCs::StopObject ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
-{
-    // Grab the object
-    CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( pSource->GetID () ) );
-    if ( pObject )
-    {
-        // Read out the position and rotation
-        CVector vecSourcePosition;
-        CVector vecSourceRotation;
-        if ( bitStream.Read ( vecSourcePosition.fX ) &&
-             bitStream.Read ( vecSourcePosition.fY ) &&
-             bitStream.Read ( vecSourcePosition.fZ ) &&
-             bitStream.Read ( vecSourceRotation.fX ) &&
-             bitStream.Read ( vecSourceRotation.fY ) &&
-             bitStream.Read ( vecSourceRotation.fZ ) )
+        // Grab the object
+        CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( ID ) );
+        if ( pObject )
         {
-            // Stop the movement
-            pObject->StopMovement ();
-            // Set it to the source position and rotation
-            pObject->SetOrientation ( vecSourcePosition, vecSourceRotation );
+            // Read out the new time, position and rotation
+            unsigned long ulTime;
+            CVector vecSourcePosition;
+            CVector vecSourceRotation;
+            CVector vecTargetPosition;
+            CVector vecTargetRotation;
+            if ( bitStream.Read ( ulTime ) &&
+                 bitStream.Read ( vecSourcePosition.fX ) &&
+                 bitStream.Read ( vecSourcePosition.fY ) &&
+                 bitStream.Read ( vecSourcePosition.fZ ) &&
+                 bitStream.Read ( vecSourceRotation.fX ) &&
+                 bitStream.Read ( vecSourceRotation.fY ) &&
+                 bitStream.Read ( vecSourceRotation.fZ ) &&
+                 bitStream.Read ( vecTargetPosition.fX ) &&
+                 bitStream.Read ( vecTargetPosition.fY ) &&
+                 bitStream.Read ( vecTargetPosition.fZ ) &&
+                 bitStream.Read ( vecTargetRotation.fX ) &&
+                 bitStream.Read ( vecTargetRotation.fY ) &&
+                 bitStream.Read ( vecTargetRotation.fZ ) )
+            {
+                // Set it to the source position, then make it move towards that position
+                pObject->SetOrientation ( vecSourcePosition, vecSourceRotation );
+                pObject->StartMovement ( vecTargetPosition, vecTargetRotation, ulTime );
+            }
         }
     }
 }
 
 
-void CObjectRPCs::SetObjectScale ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CObjectRPCs::StopObject ( NetBitStreamInterface& bitStream )
 {
-    CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( pSource->GetID () ) );
-    if ( pObject )
+    // Read out the object ID
+    ElementID ID;
+    if ( bitStream.Read ( ID ) )
     {
-        float fScale;
-        
-        if ( bitStream.Read ( fScale ) )
-            pObject->SetScale ( fScale );
+        // Grab the object
+        CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( m_pObjectManager->Get ( ID ) );
+        if ( pObject )
+        {
+            // Read out the position and rotation
+            CVector vecSourcePosition;
+            CVector vecSourceRotation;
+            if ( bitStream.Read ( vecSourcePosition.fX ) &&
+                 bitStream.Read ( vecSourcePosition.fY ) &&
+                 bitStream.Read ( vecSourcePosition.fZ ) &&
+                 bitStream.Read ( vecSourceRotation.fX ) &&
+                 bitStream.Read ( vecSourceRotation.fY ) &&
+                 bitStream.Read ( vecSourceRotation.fZ ) )
+            {
+                // Stop the movement
+                pObject->StopMovement ();
+                // Set it to the source position and rotation
+                pObject->SetOrientation ( vecSourcePosition, vecSourceRotation );
+            }
+        }
     }
 }

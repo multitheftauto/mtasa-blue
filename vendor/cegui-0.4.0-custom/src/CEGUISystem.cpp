@@ -323,7 +323,7 @@ void System::constructor_impl(Renderer* renderer, ResourceProvider* resourceProv
 
 	// cause creation of other singleton objects
 	new ImagesetManager();
-	d_fontManager = new FontManager();
+	new FontManager();
 	new WindowFactoryManager();
 	new WindowManager();
 	new SchemeManager();
@@ -1024,17 +1024,6 @@ bool System::injectChar(utf32 code_point)
 		args.sysKeys = d_sysKeys;
 
 		Window* dest = getKeyboardTargetWindow();
-
-        // Make sure the glyph is loaded for this font
-        if ( dest != NULL )
-        {
-            const Font* destFont = dest->getFont(true);
-            String newGlyphCache = destFont->OnGlyphDrawn(code_point);
-            if ( newGlyphCache != "" )
-            {
-                destFont->extendFontGlyphs ( newGlyphCache );
-            }
-        }
 
 		// loop backwards until event is handled or we run out of windows.
 		while ((dest != NULL) && (!args.handled))

@@ -76,6 +76,8 @@ struct VideoMode //RwVideoMode
 class CGameSettings
 {
 public:
+    virtual bool            IsFrameLimiterEnabled   ( void ) = 0;
+    virtual void            SetFrameLimiterEnabled  ( bool bEnabled ) = 0;
     virtual bool            IsWideScreenEnabled     ( void ) = 0;
     virtual void            SetWideScreenEnabled    ( bool bEnabled ) = 0;
     virtual unsigned int    GetNumVideoModes        ( void ) = 0;
@@ -109,9 +111,6 @@ public:
 
     virtual unsigned int    GetAntiAliasing         ( void ) = 0;
     virtual void            SetAntiAliasing         ( unsigned int uiAntiAliasing, bool bOnRestart ) = 0;
-
-	virtual bool            IsMipMappingEnabled     ( void ) = 0;
-	virtual void            SetMipMappingEnabled    ( bool bEnable ) = 0;
 
 	virtual bool            IsVolumetricShadowsEnabled     ( void ) = 0;
 	virtual void            SetVolumetricShadowsEnabled    ( bool bEnable ) = 0;

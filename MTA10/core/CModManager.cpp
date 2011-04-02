@@ -13,8 +13,7 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 #include <shellapi.h>
-#define DECLARE_PROFILER_SECTION_CModManager
-#include "profiler/SharedUtil.Profiler.h"
+#include "SharedUtil.Misc.h"
 
 using SharedUtil::CalcMTASAPath;
 

@@ -39,7 +39,6 @@
 #include "rpc/CRPCFunctions.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CPedSync.h"
-#include "CObjectSync.h"
 #include "CRadarMap.h"
 #include "CClientTeamManager.h"
 #include "CClientPedManager.h"
@@ -49,7 +48,6 @@
 #include "CEvents.h"
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
-#include "CScriptFontLoader.h"
 #include "CElementDeleter.h"
 #include "CFoo.h"
 #include "../../shared_logic/CRegisteredCommands.h"
@@ -109,6 +107,7 @@ public:
         PED,
         COLSHAPE,
         SCRIPTFILE,
+        HANDLING,
         WATER,
         UNKNOWN,
     };
@@ -232,7 +231,6 @@ public:
     inline CResourceManager*            GetResourceManager              ( void )        { return m_pResourceManager; }
     inline CLuaManager*                 GetLuaManager                   ( void )        { return m_pLuaManager; }
     inline CScriptKeyBinds*             GetScriptKeyBinds               ( void )        { return m_pScriptKeyBinds; }
-    inline CScriptFontLoader*           GetScriptFontLoader             ( void )        { return m_pScriptFontLoader; }
     inline CScriptDebugging*            GetScriptDebugging              ( void )        { return m_pScriptDebugging; }
     inline CRegisteredCommands*         GetRegisteredCommands           ( void )        { return &m_RegisteredCommands; }
     inline CZoneNames*                  GetZoneNames                    ( void )        { return m_pZoneNames; };
@@ -251,7 +249,6 @@ public:
 
     inline CUnoccupiedVehicleSync*      GetUnoccupiedVehicleSync        ( void )        { return m_pUnoccupiedVehicleSync; }
     inline CPedSync*                    GetPedSync                      ( void )        { return m_pPedSync; }
-    inline CObjectSync*                 GetObjectSync                   ( void )        { return m_pObjectSync; }
 
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
 
@@ -296,11 +293,6 @@ public:
     void                                ResetVehicleInOut               ( void );
 
     void                                SetAllDimensions                ( unsigned short usDimension );
-
-    static void                         StaticKeyStrokeHandler          ( const SBindableKey * pKey, bool bState );
-    void                                KeyStrokeHandler                ( const SBindableKey * pKey, bool bState );
-    static bool                         StaticCharacterKeyHandler       ( WPARAM wChar );
-    bool                                CharacterKeyHandler             ( WPARAM wChar );
 
     static void                         StaticProcessClientKeyBind      ( CKeyFunctionBind* pBind );
     void                                ProcessClientKeyBind            ( CKeyFunctionBind* pBind );
@@ -377,8 +369,6 @@ private:
     bool                                OnMouseWheel                    ( CGUIMouseEventArgs Args );
     bool                                OnMove                          ( CGUIElement * pElement );
     bool                                OnSize                          ( CGUIElement * pElement );
-    bool                                OnFocusGain                     ( CGUIFocusEventArgs Args );
-    bool                                OnFocusLoss                     ( CGUIFocusEventArgs Args );
 
     float                               m_fMarkerBounce;
     // Network update functions
@@ -424,7 +414,6 @@ private:
     static void                         StaticProjectileInitiateHandler ( CClientProjectile * pProjectile );
     static void                         StaticRender3DStuffHandler      ( void );
     static bool                         StaticChokingHandler            ( unsigned char ucWeaponType );
-    static void                         StaticPreWorldProcessHandler    ( void );
     static void                         StaticPostWorldProcessHandler   ( void );
     static void                         StaticIdleHandler               ( void );
     static void                         StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
@@ -438,7 +427,6 @@ private:
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                Render3DStuffHandler            ( void );
     bool                                ChokingHandler                  ( unsigned char ucWeaponType );
-    void                                PreWorldProcessHandler          ( void );
     void                                PostWorldProcessHandler         ( void );
     void                                IdleHandler                     ( void );
     void                                AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
@@ -464,8 +452,6 @@ private:
     eStatus                             m_Status;
     unsigned long                       m_ulTimeStart;
     unsigned long                       m_ulVerifyTimeStart;
-    unsigned long                       m_ulLastClickTick;
-    CVector2D                           m_vecLastCursorPosition;
     bool                                m_bWaitingForLocalConnect;
     bool                                m_bErrorStartingLocal;
     int                                 m_iLocalConnectAttempts;
@@ -491,7 +477,6 @@ private:
     CRPCFunctions*                      m_pRPCFunctions;
     CUnoccupiedVehicleSync*             m_pUnoccupiedVehicleSync;
     CPedSync*                           m_pPedSync;
-    CObjectSync*                        m_pObjectSync;
     CMovingObjectsManager*              m_pMovingObjectsManager;
     CNametags*                          m_pNametags;
     CNetAPI*                            m_pNetAPI;
@@ -502,7 +487,6 @@ private:
     CTransferBox*                       m_pTransferBox;
     CResourceManager*                   m_pResourceManager;
     CScriptKeyBinds*                    m_pScriptKeyBinds;
-    CScriptFontLoader*                  m_pScriptFontLoader;
     CElementDeleter                     m_ElementDeleter;
     CZoneNames*                         m_pZoneNames;
     CPacketHandler*                     m_pPacketHandler;
@@ -607,8 +591,6 @@ private:
     SString                             m_strLastDiagnosticStatus;
 
     bool                                m_bBeingDeleted;        // To enable speedy disconnect
-
-    uint                                m_uiNotPulsedCounter;
 
     // Cache for speeding up collision processing
 public:

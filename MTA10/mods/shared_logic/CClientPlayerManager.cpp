@@ -184,8 +184,6 @@ bool CClientPlayerManager::IsPlayerLimitReached ( void )
 bool CClientPlayerManager::IsValidModel ( unsigned long ulModel )
 {
     return ( ulModel == 0 ||
-             ulModel == 1 ||
-             ulModel == 2 ||
              ulModel == 7 ||
              ulModel >= 9 &&
              ulModel != 208 &&
@@ -195,12 +193,11 @@ bool CClientPlayerManager::IsValidModel ( unsigned long ulModel )
              ulModel != 74 &&
              ulModel != 65 &&
              ulModel != 42 &&
-             ulModel <= 272 ||
+             ulModel <= 264 ||
              ulModel >= 274 &&
-             ulModel <= 288 ||
-             ulModel >= 290 &&
-             ulModel <= 312 );
+             ulModel <= 288 );
 }
+
 
 void CClientPlayerManager::ResetAll ( void )
 {

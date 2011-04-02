@@ -56,7 +56,6 @@ public:
     static bool                     HasSearchLight          ( unsigned long ulModel );
     static bool                     HasDamageModel          ( unsigned long ulModel );
     static bool                     HasDamageModel          ( enum eClientVehicleType Type );
-    static bool                     HasDoors                ( unsigned long ulModel );
 
     bool                            Exists                  ( CClientVehicle* pVehicle );
 

@@ -29,10 +29,19 @@ void HOOK_StoreShadowForVehicle ();
 CSettingsSA::CSettingsSA ( void )
 {
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
-    m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
     HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
     HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
+}
+
+bool CSettingsSA::IsFrameLimiterEnabled ( void )
+{
+    return m_pInterface->bFrameLimiter;
+}
+
+void CSettingsSA::SetFrameLimiterEnabled ( bool bEnabled )
+{
+    m_pInterface->bFrameLimiter = bEnabled;
 }
 
 bool CSettingsSA::IsWideScreenEnabled ( void )
@@ -197,7 +206,7 @@ unsigned int CSettingsSA::GetFXQuality ( )
 
 void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
 {
-    MemPutFast < BYTE > ( VAR_ucFxQuality, fxQualityId );
+    MemPut < BYTE > ( VAR_ucFxQuality, fxQualityId );
 }
 
 float CSettingsSA::GetMouseSensitivity ( )
@@ -208,7 +217,7 @@ float CSettingsSA::GetMouseSensitivity ( )
 
 void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
 {
-    MemPutFast < FLOAT > ( VAR_fMouseSensitivity, fSensitivity );
+    MemPut < FLOAT > ( VAR_fMouseSensitivity, fSensitivity );  //     *(FLOAT *)VAR_fMouseSensitivity = fSensitivity;
 }
 
 unsigned int CSettingsSA::GetAntiAliasing ( )
@@ -232,16 +241,6 @@ void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing, bool bOnRestart
     }
 
     m_pInterface->dwAntiAliasing = uiAntiAliasing;
-}
-
-bool CSettingsSA::IsMipMappingEnabled ( void )
-{
-	return m_pInterface->bMipMapping;
-}
-
-void CSettingsSA::SetMipMappingEnabled ( bool bEnable )
-{
-	m_pInterface->bMipMapping = bEnable;
 }
 
 void CSettingsSA::Save ()

@@ -33,7 +33,6 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isElementWithinColShape", CLuaElementDefs::isElementWithinColShape );
     CLuaCFunctions::AddFunction ( "isElementWithinMarker", CLuaElementDefs::isElementWithinMarker );
     CLuaCFunctions::AddFunction ( "isElementInWater", CLuaElementDefs::isElementInWater );
-    CLuaCFunctions::AddFunction ( "isElementFrozen", CLuaElementDefs::isElementFrozen );
 
     CLuaCFunctions::AddFunction ( "getElementByID", CLuaElementDefs::getElementByID );
     CLuaCFunctions::AddFunction ( "getElementByIndex", CLuaElementDefs::getElementByIndex );
@@ -58,7 +57,6 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementHealth", CLuaElementDefs::getElementHealth );
     CLuaCFunctions::AddFunction ( "getElementModel", CLuaElementDefs::getElementModel );
     CLuaCFunctions::AddFunction ( "getElementSyncer", CLuaElementDefs::getElementSyncer );
-    CLuaCFunctions::AddFunction ( "getElementCollisionsEnabled", CLuaElementDefs::getElementCollisionsEnabled );
 
     // Attachement
     CLuaCFunctions::AddFunction ( "attachElements", CLuaElementDefs::attachElements );
@@ -67,7 +65,6 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getAttachedElements", CLuaElementDefs::getAttachedElements );
     CLuaCFunctions::AddFunction ( "getElementAttachedTo", CLuaElementDefs::getElementAttachedTo );
     CLuaCFunctions::AddFunction ( "setElementAttachedOffsets", CLuaElementDefs::setElementAttachedOffsets );
-    CLuaCFunctions::AddFunction ( "getElementAttachedOffsets", CLuaElementDefs::getElementAttachedOffsets );
 
     // Element data
     CLuaCFunctions::AddFunction ( "getElementData", CLuaElementDefs::getElementData );
@@ -90,8 +87,6 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementHealth", CLuaElementDefs::setElementHealth );
     CLuaCFunctions::AddFunction ( "setElementModel", CLuaElementDefs::setElementModel );
     CLuaCFunctions::AddFunction ( "setElementSyncer", CLuaElementDefs::setElementSyncer );
-    CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", CLuaElementDefs::setElementCollisionsEnabled );
-    CLuaCFunctions::AddFunction ( "setElementFrozen", CLuaElementDefs::setElementFrozen );
 }
 
 
@@ -529,18 +524,11 @@ int CLuaElementDefs::getElementRotation ( lua_State* luaVM )
     {
         // Grab the element, verify it
         CElement* pElement = lua_toelement ( luaVM, 1 );
-
-        const char* szRotationOrder = "default";
-        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) 
-        {
-            szRotationOrder = lua_tostring ( luaVM, 2 );
-        }
-
         if ( pElement )
         {
             // Grab the rotation
             CVector vecRotation;
-            if ( CStaticFunctionDefinitions::GetElementRotation ( pElement, vecRotation, szRotationOrder ) )
+            if ( CStaticFunctionDefinitions::GetElementRotation ( pElement, vecRotation ) )
             {
                 // Return it
                 lua_pushnumber ( luaVM, vecRotation.fX );
@@ -1007,40 +995,6 @@ int CLuaElementDefs::setElementAttachedOffsets ( lua_State* luaVM )
 }
 
 
-int CLuaElementDefs::getElementAttachedOffsets ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        // Grab the attached element
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        CVector vecPosition, vecRotation;
-
-        // Valid element?
-        if ( pElement )
-        {
-            if ( CStaticFunctionDefinitions::GetElementAttachedOffsets ( pElement, vecPosition, vecRotation ) )
-            {
-                lua_pushnumber( luaVM, vecPosition.fX );
-                lua_pushnumber( luaVM, vecPosition.fY );
-                lua_pushnumber( luaVM, vecPosition.fZ );
-                lua_pushnumber( luaVM, vecRotation.fX );
-                lua_pushnumber( luaVM, vecRotation.fY );
-                lua_pushnumber( luaVM, vecRotation.fZ );
-                return 6;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementAttachedOffsets", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getElementAttachedOffsets" );
-
-    // Failed
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaElementDefs::getElementColShape ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -1185,50 +1139,6 @@ int CLuaElementDefs::getElementSyncer ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "getElementSyncer" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaElementDefs::getElementCollisionsEnabled ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-
-        if ( pElement )
-        {
-            lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetElementCollisionsEnabled ( pElement ) );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementCollisionsEnabled", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getElementCollisionsEnabled" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaElementDefs::isElementFrozen ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
-        {
-            bool bFrozen;
-            if ( CStaticFunctionDefinitions::IsElementFrozen ( pElement, bFrozen ) )
-            {
-                lua_pushboolean ( luaVM, bFrozen );
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "isElementFrozen" );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1518,15 +1428,8 @@ int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
                 CVector vecRotation = CVector ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
                                                 static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
                                                 static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
-
-                const char* szRotationOrder = "default";
-                if ( lua_type ( luaVM, 5 ) == LUA_TSTRING ) 
-                {
-                    szRotationOrder = lua_tostring ( luaVM, 5 );
-                }
-
                 // Set the rotation
-                if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, szRotationOrder ) )
+                if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation ) )
                 {
                     lua_pushboolean ( luaVM, true );
                     return 1;
@@ -1926,55 +1829,6 @@ int CLuaElementDefs::setElementSyncer ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setElementSyncer" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaElementDefs::setElementCollisionsEnabled ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        bool bEnable       = lua_toboolean ( luaVM, 2 ) ? true : false;
-
-        if ( pElement )
-        {
-            if ( CStaticFunctionDefinitions::SetElementCollisionsEnabled ( pElement, bEnable ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementCollisionsEnabled", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setElementCollisionsEnabled" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaElementDefs::setElementFrozen ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA && lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
-    {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
-        {
-            bool bFrozen = lua_toboolean ( luaVM, 2 ) ? true : false;
-            if ( CStaticFunctionDefinitions::SetElementFrozen ( pElement, bFrozen ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setElementFrozen", "element", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setElementFrozen" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

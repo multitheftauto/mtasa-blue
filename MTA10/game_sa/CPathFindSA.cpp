@@ -141,30 +141,30 @@ void CPathFindSA::SwitchPedRoadsOffInArea ( CVector * vecAreaCorner1, CVector * 
 
 void CPathFindSA::SetPedDensity ( float fPedDensity )
 {
-    MemPutFast < float > ( VAR_PedDensityMultiplier, fPedDensity );
+    MemPut < float > ( VAR_PedDensityMultiplier, fPedDensity );  //     *(float *)VAR_PedDensityMultiplier = fPedDensity;
 }
 
 void CPathFindSA::SetVehicleDensity ( float fVehicleDensity )
 {
-    MemPutFast < float > ( VAR_CarDensityMultiplier, fVehicleDensity );
+    MemPut < float > ( VAR_CarDensityMultiplier, fVehicleDensity );  //     *(float *)VAR_CarDensityMultiplier = fVehicleDensity;
 }
 
 void CPathFindSA::SetMaxPeds ( int iMaxPeds )
 {
-    MemPutFast < int > ( VAR_MaxNumberOfPedsInUse, iMaxPeds );
+    MemPut < int > ( VAR_MaxNumberOfPedsInUse, iMaxPeds );  //     *(int *)VAR_MaxNumberOfPedsInUse = iMaxPeds;
 }
 
 void CPathFindSA::SetMaxPedsInterior ( int iMaxPeds )
 {
-     MemPutFast < int > ( VAR_NumberOfPedsInUseInterior, iMaxPeds );
+     MemPut < int > ( VAR_NumberOfPedsInUseInterior, iMaxPeds );  //      *(int *)VAR_NumberOfPedsInUseInterior = iMaxPeds;
 }
 
 void CPathFindSA::SetMaxVehicles ( int iMaxVehicles )
 {
-    MemPutFast < int > ( VAR_MaxNumberOfCarsInUse, iMaxVehicles );
+    MemPut < int > ( VAR_MaxNumberOfCarsInUse, iMaxVehicles );  //     *(int *)VAR_MaxNumberOfCarsInUse = iMaxVehicles;
 }
 
 void CPathFindSA::SetAllRandomPedsThisType ( int iType )
 {
-    MemPutFast < int > ( VAR_m_AllRandomPedsThisType, iType );
+    MemPut < int > ( VAR_m_AllRandomPedsThisType, iType );  //     *(int *)VAR_m_AllRandomPedsThisType = iType;
 }

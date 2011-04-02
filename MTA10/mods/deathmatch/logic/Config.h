@@ -120,10 +120,6 @@ public:
 #define MIN_CHAT_LENGTH 1
 #define MAX_CHAT_LENGTH 96
 
-// Min and max number of characters in a console command
-#define MIN_COMMAND_LENGTH 1
-#define MAX_COMMAND_LENGTH 255
-
 // Min and max number of characters in chat echos
 #define MIN_CHATECHO_LENGTH 1
 #define MAX_CHATECHO_LENGTH 128
@@ -165,9 +161,9 @@ public:
 #define MAX_VALID_WEATHER 255
 
 // Upper player limit
-#define MAX_PLAYER_COUNT 65535
-#if MAX_PLAYER_COUNT > 65535
-    #error MAX_PLAYER_COUNT "macro can't exceed 65535"
+#define MAX_PLAYER_COUNT 128
+#if MAX_PLAYER_COUNT > 254
+    #error MAX_PLAYER_COUNT "macro can't exceed 254"
 #endif
 
 // Max mapname length

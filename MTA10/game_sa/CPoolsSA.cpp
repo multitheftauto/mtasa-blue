@@ -23,7 +23,7 @@ CPoolsSA::CPoolsSA()
     m_bGetVehicleEnabled = true;
     m_ulBuildingCount= 0;
 
-    MemSetFast (&Buildings,0,sizeof(CBuilding *) * MAX_BUILDINGS);
+    MemSet (&Buildings,0,sizeof(CBuilding *) * MAX_BUILDINGS);
 
     EntryInfoNodePool = new CEntryInfoNodePoolSA();
     PointerNodeDoubleLinkPool = new CPointerNodeDoubleLinkPoolSA();
@@ -951,7 +951,7 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
     DEBUG_TRACE("CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )");
 
     // clean the existing array
-    MemSetFast ( (void *)VAR_TrainModelArray, 0, 32 * sizeof(DWORD) );
+    MemSet ( (void *)VAR_TrainModelArray, 0, 32 * sizeof(DWORD) );
 
     // now load the models we're going to use and add them to the array
     for ( int i = 0; i < iSize; i++ )
@@ -960,7 +960,7 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
             dwModels[i] == 538 || dwModels[i] == 569 || 
             dwModels[i] == 590 )
         {
-            MemPutFast < DWORD > ( VAR_TrainModelArray + i * 4, dwModels[i] );
+            MemPut < DWORD > ( VAR_TrainModelArray + i * 4, dwModels[i] );  //             *(DWORD *)(VAR_TrainModelArray + i * 4) = dwModels[i];
         }
     }
 
@@ -1075,20 +1075,20 @@ int CPoolsSA::GetPoolDefaultCapacity ( ePools pool )
     {
         case BUILDING_POOL:             return 13000;
         case PED_POOL:                  return 140;
-        case OBJECT_POOL:               return 350;          // Modded to 700   @ CGameSA.cpp
+        case OBJECT_POOL:               return 350;
         case DUMMY_POOL:                return 2500;
         case VEHICLE_POOL:              return 110;
         case COL_MODEL_POOL:            return 10150;
-        case TASK_POOL:                 return 500;          // Modded to 5000   @ CGameSA.cpp
-        case EVENT_POOL:                return 200;          // Modded to 9001   @ CMultiplayerSA.cpp
+        case TASK_POOL:                 return 500;
+        case EVENT_POOL:                return 200;
         case TASK_ALLOCATOR_POOL:       return 16;
         case PED_INTELLIGENCE_POOL:     return 140;
         case PED_ATTRACTOR_POOL:        return 64;
-        case ENTRY_INFO_NODE_POOL:      return 500;          // Modded to 4096   @ CMultiplayerSA.cpp
+        case ENTRY_INFO_NODE_POOL:      return 500;
         case NODE_ROUTE_POOL:           return 64;
         case PATROL_ROUTE_POOL:         return 32;
         case POINT_ROUTE_POOL:          return 64;
-        case POINTER_DOUBLE_LINK_POOL:  return 3200;         // Modded to 4000   @ CMultiplayerSA.cpp
+        case POINTER_DOUBLE_LINK_POOL:  return 3200;
         case POINTER_SINGLE_LINK_POOL:  return 70000;
     }
     return 0;
@@ -1155,10 +1155,10 @@ void CPoolsSA::SetPoolCapacity ( ePools pool, int iValue )
         case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
     }
     if ( iPtr )
-        MemPut < int > ( iPtr, iValue );
+        MemPut < int > ( iPtr, iValue );  //         *(int*)iPtr = iValue;
 
     if ( cPtr )
-        MemPut < char > ( cPtr, iValue );
+        MemPut < char > ( cPtr, iValue );  //         *(char*)cPtr = iValue;
 }
 
 

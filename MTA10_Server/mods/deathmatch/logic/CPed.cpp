@@ -77,8 +77,6 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
 
     m_pSyncer = NULL;
 
-    m_bCollisionsEnabled = true;
-
     // Add us to the Ped manager
     if ( pPedManager )
     {
@@ -192,16 +190,6 @@ bool CPed::ReadSpecialData ( void )
 
     if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
-
-    if ( !GetCustomDataBool ( "collisions", m_bCollisionsEnabled, true ) )
-        m_bCollisionsEnabled = true;
-
-    if ( GetCustomDataInt ( "alpha", iTemp, true ) )
-        m_ucAlpha = static_cast < unsigned char > ( iTemp );
-
-    bool bFrozen;
-    if ( GetCustomDataBool ( "frozen", bFrozen, true ) )
-        m_bFrozen = bFrozen;
 
     return true;
 }

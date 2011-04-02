@@ -311,8 +311,7 @@ void CVehicleUpgrades::ForceAddUpgrade ( unsigned short usUpgrade )
                 {
                     // Request and load now
                     pModelInfo->RequestVehicleUpgrade ();
-
-                    g_pGame->GetStreaming()->LoadAllRequestedModels ();
+                    pModelInfo->LoadAllRequestedModels ();
                 }
                 // Add the upgrade
                 pVehicle->AddVehicleUpgrade ( usUpgrade );

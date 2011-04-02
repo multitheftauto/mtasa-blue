@@ -53,16 +53,11 @@ bool CVehicleSpawnPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( vecRotationDegrees.fZ );
 
              // Vehicle color
-            CVehicleColor& vehColor = pVehicle->GetColor ();
-            uchar ucNumColors = vehColor.GetNumColorsUsed () - 1;
-            BitStream.WriteBits ( &ucNumColors, 2 );
-            for ( uint i = 0 ; i <= ucNumColors ; i++ )
-            {
-                SColor RGBColor = vehColor.GetRGBColor ( i );
-                BitStream.Write ( RGBColor.R );
-                BitStream.Write ( RGBColor.G );
-                BitStream.Write ( RGBColor.B );
-            }
+             const CVehicleColor& Color = pVehicle->GetColor ();
+             BitStream.Write ( Color.GetColor1 () );
+             BitStream.Write ( Color.GetColor2 () );
+             BitStream.Write ( Color.GetColor3 () );
+             BitStream.Write ( Color.GetColor4 () );
         }
 
         return true;

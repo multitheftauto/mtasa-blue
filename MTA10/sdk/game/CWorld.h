@@ -34,7 +34,6 @@ public:
     virtual DWORD       GetCurrentArea              ( void ) = 0;
     virtual void        SetCurrentArea              ( DWORD dwArea ) = 0;
     virtual void        SetJetpackMaxHeight         ( float fHeight ) = 0;
-    virtual float       GetJetpackMaxHeight         ( void ) = 0;
 };
 
 #endif

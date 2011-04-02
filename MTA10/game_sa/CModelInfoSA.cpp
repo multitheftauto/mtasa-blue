@@ -41,12 +41,6 @@ CModelInfoSA::CModelInfoSA ( DWORD dwModelID )
 }
 
 
-CBaseModelInfoSAInterface * CModelInfoSA::GetInterface ( void )
-{
-    return m_pInterface = ppModelInfo [ m_dwModelID ];
-}
-
-
 BOOL CModelInfoSA::IsBoat ( )
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsBoat ( )");
@@ -300,18 +294,27 @@ VOID CModelInfoSA::Request( bool bAndLoad, bool bWaitForLoad, bool bHighPriority
         pGame->GetModelInfo ( 7 )->Request ( bAndLoad, false );
     }
 
+    DWORD dwFunction = FUNC_RequestModel;
+    DWORD ModelID = m_dwModelID;
+    //DWORD dwChannel = ( m_dwModelID < 400 ) ? 0 : 6;
     DWORD dwFlags;
     if ( bHighPriority )
         dwFlags = 0x16;
     else
         dwFlags = 6;
-    pGame->GetStreaming()->RequestModel(m_dwModelID, dwFlags);
+    _asm
+    {
+        push    dwFlags
+        push    ModelID
+        call    dwFunction
+        add     esp, 8
+    }
 
     int iTimeToWait = 50;
 
     if(bAndLoad)
     {
-        pGame->GetStreaming()->LoadAllRequestedModels();
+        LoadAllRequestedModels();
         
         if(bWaitForLoad)
         {
@@ -364,6 +367,22 @@ VOID CModelInfoSA::Remove ( )
     }
 }
 
+VOID CModelInfoSA::LoadAllRequestedModels ( )
+{
+    DEBUG_TRACE("VOID CModelInfoSA::LoadAllRequestedModels ( )");
+
+    DWORD dwFunction = FUNC_LoadAllRequestedModels;
+    DWORD dwOnlyPriorityModels = 0;
+    //if ( m_dwModelID >= 400 && m_dwModelID < 615 )
+        //dwSlot = 1;
+    _asm
+    {
+        push    dwOnlyPriorityModels
+        call    dwFunction
+        add     esp, 4
+    }
+}
+
 BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )
 {
     DEBUG_TRACE("BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )");
@@ -386,9 +405,21 @@ BOOL CModelInfoSA::IsLoaded ( )
         return pGame->GetStreaming ()->HasVehicleUpgradeLoaded ( m_dwModelID );
 
     //return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
-    BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
+    DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
+    DWORD ModelID = m_dwModelID;
+
+    BOOL bReturn = 0;
+    _asm
+    {
+        push    ModelID
+        call    dwFunc
+        movzx   eax, al
+        mov     bReturn, eax
+        pop     eax
+    }
+
     m_pInterface = ppModelInfo [ m_dwModelID ];
-    return bLoaded;
+    return bReturn;
 }
 
 BYTE CModelInfoSA::GetFlags ( )
@@ -454,13 +485,6 @@ unsigned short CModelInfoSA::GetTextureDictionaryID ()
         return m_pInterface->usTextureDictionary;
 
     return 0;
-}
-
-void CModelInfoSA::SetTextureDictionaryID ( unsigned short usID )
-{
-    m_pInterface = ppModelInfo [ m_dwModelID ];
-    if ( m_pInterface )
-        m_pInterface->usTextureDictionary = usID;
 }
 
 float CModelInfoSA::GetLODDistance ()
@@ -581,7 +605,7 @@ void CModelInfoSA::RestreamIPL ()
     for ( it = removedModels.begin (); it != removedModels.end (); it++ )
     {
         ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( *it );
-        MemPut < BYTE > ( ARRAY_ModelLoaded + 20*(*it), 0 );
+        MemPut < BYTE > ( ARRAY_ModelLoaded + 20*(*it), 0 );  //         *(BYTE *)(ARRAY_ModelLoaded + 20*(*it)) = 0;
     }
 }
 
@@ -706,19 +730,6 @@ unsigned int CModelInfoSA::GetNumRemaps ( void )
     return uiReturn;
 }
 
-void* CModelInfoSA::GetVehicleSuspensionData ( void )
-{
-    return GetInterface ()->pColModel->pColData->pSuspensionLines;
-}
-
-void* CModelInfoSA::SetVehicleSuspensionData ( void* pSuspensionLines )
-{
-    CColDataSA* pColData = GetInterface ()->pColModel->pColData;
-    void* pOrigSuspensionLines = pColData->pSuspensionLines;
-    pColData->pSuspensionLines = pSuspensionLines;
-    return pOrigSuspensionLines;
-}
-
 void CModelInfoSA::RequestVehicleUpgrade ( void )
 {
     DWORD dwFunc = FUNC_RequestVehicleUpgrade;
@@ -786,7 +797,7 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
             m_pOriginalColModelInterface = m_pInterface->pColModel;
 
         // Apply some low-level hacks
-        MemPutFast < BYTE > ( (BYTE*) pInterface + 40, 0xA9 );
+        MemPut < BYTE > ( (BYTE*) pInterface + 40, 0xA9 );  //         *( (BYTE *) pInterface + 40 ) = 0xA9;
 
         // Extra flags (3064) -- needs to be tested
         m_pInterface->bDoWeOwnTheColModel = false;
@@ -906,14 +917,4 @@ void CModelInfoSA::SetVoice ( const char* szVoiceType, const char* szVoice )
     if ( sVoiceID < 0 )
         return;
     SetVoice ( sVoiceType, sVoiceID );
-}
-
-void CModelInfoSA::MakePedModel ( char * szTexture )
-{
-    // Create a new CPedModelInfo
-    CPedModelInfoSA pedModelInfo;
-    ppModelInfo [ m_dwModelID ] = ( CBaseModelInfoSAInterface * ) pedModelInfo.GetPedModelInfoInterface ();
-
-    // Load our texture
-    pGame->GetStreaming ()->RequestSpecialModel ( m_dwModelID, szTexture, 0 );
 }

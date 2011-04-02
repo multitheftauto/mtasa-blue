@@ -32,9 +32,6 @@
 #include "CEGUIBase.h"
 #include "CEGUIRenderer.h"
 #include "CEGUITexture.h"
-#include "CEGUIFont.h"
-#include "CEGUIFontManager.h"
-#include "CEGUIImage.h"
 #include <d3d9.h>
 #include <list>
 #include <set>
@@ -89,7 +86,7 @@ public:
 	virtual ~DirectX9Renderer(void);
 
 	// add's a quad to the list to be rendered
-	virtual	void	addQuad(const Rect& dest_rect, float z, const Texture* tex, const Rect& texture_rect, const ColourRect& colours, QuadSplitMode quad_split_mode, const Image* image = NULL );
+	virtual	void	addQuad(const Rect& dest_rect, float z, const Texture* tex, const Rect& texture_rect, const ColourRect& colours, QuadSplitMode quad_split_mode);
 
 	// perform final rendering for all queued renderable quads.
 	virtual	void	doRender(void);
@@ -282,8 +279,7 @@ private:
 	*/
 	struct QuadInfo
 	{
-		DirectX9Texture*	texture;
-        const Image*        image;
+		DirectX9Texture*  	texture;
 		Rect				position;
 		float				z;
 		Rect				texPosition;
@@ -322,6 +318,7 @@ private:
 
 	// method to do work of constructor
 	void	constructor_impl(LPDIRECT3DDEVICE9 device, const Size& display_size);
+
 
 	/*************************************************************************
 	    Implementation Data

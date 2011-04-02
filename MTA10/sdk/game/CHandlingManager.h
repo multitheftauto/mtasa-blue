@@ -17,11 +17,14 @@
 class IHandlingManager
 {
 public:
-    virtual CHandlingEntry*         CreateHandlingData      ( void ) = 0;
+    virtual void                    LoadDefaultHandlings    ( void ) = 0;
 
-    virtual const CHandlingEntry*   GetOriginalHandlingData ( enum eVehicleTypes eModel ) = 0;
+    virtual CHandlingEntry*         CreateHandlingData      ( void ) = 0;
+    virtual bool                    ApplyHandlingData       ( enum eVehicleTypes eModel, CHandlingEntry* pEntry ) = 0;
+
     virtual float                   GetDragMultiplier       ( void ) = 0;
-    virtual float                   GetBasicDragCoeff       ( void ) = 0;
+    virtual CHandlingEntry*         GetHandlingData         ( enum eVehicleTypes eModel ) = 0;
+    virtual const CHandlingEntry*   GetOriginalHandlingData ( enum eVehicleTypes eModel ) = 0;
 };
 
 #endif

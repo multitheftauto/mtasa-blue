@@ -8,7 +8,6 @@
 *               Cecill Etheredge <ijsf@gmx.net>
 *               Christian Myhre Lundheim <>
 *               Jax <>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -223,9 +222,9 @@ void CWorldSA::IgnoreEntity(CEntity * pEntity)
     CEntitySA* pEntitySA = dynamic_cast < CEntitySA* > ( pEntity );
 
     if ( pEntitySA )
-        MemPutFast < DWORD > ( VAR_IgnoredEntity, (DWORD) pEntitySA->GetInterface () );
+        MemPut < DWORD > ( VAR_IgnoredEntity, (DWORD) pEntitySA->GetInterface () );  //         *(DWORD *)VAR_IgnoredEntity = (DWORD) pEntitySA->GetInterface ();
     else
-        MemPutFast < DWORD > ( VAR_IgnoredEntity, 0 );
+        MemPut < DWORD > ( VAR_IgnoredEntity, 0 );  //         *(DWORD *)VAR_IgnoredEntity = 0;
 }
 
 // technically this is in CTheZones
@@ -368,7 +367,7 @@ DWORD CWorldSA::GetCurrentArea ( void )
 
 void CWorldSA::SetCurrentArea ( DWORD dwArea )
 {
-    MemPutFast < DWORD > ( VAR_currArea, dwArea );
+    MemPut < DWORD > ( VAR_currArea, dwArea );  //     *(DWORD *)VAR_currArea = dwArea;
 
     DWORD dwFunc = FUNC_RemoveBuildingsNotInArea;
     _asm
@@ -381,10 +380,5 @@ void CWorldSA::SetCurrentArea ( DWORD dwArea )
 
 void CWorldSA::SetJetpackMaxHeight ( float fHeight )
 {
-    MemPut < float > ( VAR_fJetpackMaxHeight, fHeight );
-}
-
-float CWorldSA::GetJetpackMaxHeight ( void )
-{
-    return *(float *)(VAR_fJetpackMaxHeight);
+    MemPut < float > ( VAR_fJetpackMaxHeight, fHeight );  //     *(float *)(VAR_fJetpackMaxHeight) = fHeight;
 }

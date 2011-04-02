@@ -20,12 +20,6 @@
 class CNet
 {
 public:
-    enum ENetworkUsageDirection
-    {
-        STATS_INCOMING_TRAFFIC = 0,
-        STATS_OUTGOING_TRAFFIC = 1
-    };
-
     virtual void                        ResetNetwork                ( void ) = 0;
     virtual bool                        StartNetwork                ( const char* szServerHost, unsigned short usServerPort, const char* szServerPassword = NULL ) = 0;
     virtual void                        StopNetwork                 ( void ) = 0;
@@ -43,7 +37,7 @@ public:
     virtual bool                        SendPacket                  ( unsigned char ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority = PACKET_PRIORITY_HIGH, NetPacketReliability packetReliability = PACKET_RELIABILITY_RELIABLE, NetPacketOrdering packetOrdering = PACKET_ORDERING_GAME ) = 0;
 
     virtual void                        SetClientPort               ( unsigned short usClientPort ) = 0;
-    virtual const char *                GetConnectedServer          ( void )=0;
+    virtual const char*                 GetConnectedServer          ( void )=0;
 
     virtual unsigned int                GetMessagesInSendBuffer     ( void ) = 0;
     virtual unsigned int                GetMessagesSent             ( void ) = 0;
@@ -60,10 +54,13 @@ public:
     virtual unsigned int                GetBitsReceived             ( void ) = 0;
     virtual float                       GetCompressionRatio         ( void ) = 0;
     virtual float                       GetDecompressionRatio       ( void ) = 0;
-    virtual void                        GetNetworkUsageData         ( ENetworkUsageDirection dir, unsigned long ulTotalBits[256], unsigned long ulCount[256] ) = 0;
+    virtual void                        GetPacketLogData            ( unsigned long* ulBytes, unsigned long* ulCount ) = 0;
 
     virtual int                         GetPing                     ( void ) = 0;
     virtual unsigned long               GetTime                     ( void ) = 0;
+
+    virtual unsigned int                GetMTUSize                  ( void ) = 0;
+    virtual bool                        SetMTUSize                  ( unsigned int uiSize ) = 0;
 
     virtual const char *                GetLocalIP                  ( void ) = 0;
     virtual void                        GetSerial                   ( char* szSerial, size_t maxLength ) = 0;

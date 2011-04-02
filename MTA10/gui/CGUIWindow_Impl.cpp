@@ -37,9 +37,9 @@ CGUIWindow_Impl::CGUIWindow_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const 
         m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUIWINDOW_NAME, szUnique );
         m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect (0.10f, 0.10f, 0.60f, 0.90f) );
         m_pWindow->setAlpha ( 0.8f );
-
+    
         // Give the window a caption
-        m_pWindow->setText ( CGUI_Impl::GetUTFString(szCaption) );
+        m_pWindow->setText ( szCaption );
     }
 
     m_pWindow->setDestroyedByParent ( false );

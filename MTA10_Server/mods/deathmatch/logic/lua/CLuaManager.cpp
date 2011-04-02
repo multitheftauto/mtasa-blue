@@ -340,8 +340,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "giveWeapon", CLuaFunctionDefinitions::GiveWeapon );
     CLuaCFunctions::AddFunction ( "takeWeapon", CLuaFunctionDefinitions::TakeWeapon );
     CLuaCFunctions::AddFunction ( "takeAllWeapons", CLuaFunctionDefinitions::TakeAllWeapons );
-    CLuaCFunctions::AddFunction ( "giveWeaponAmmo", CLuaFunctionDefinitions::GiveWeapon );
-    CLuaCFunctions::AddFunction ( "takeWeaponAmmo", CLuaFunctionDefinitions::TakeWeapon );
+    CLuaCFunctions::AddFunction ( "giveWeaponAmmo", CLuaFunctionDefinitions::GiveWeaponAmmo );
+    CLuaCFunctions::AddFunction ( "takeWeaponAmmo", CLuaFunctionDefinitions::TakeWeaponAmmo );
     CLuaCFunctions::AddFunction ( "setWeaponAmmo", CLuaFunctionDefinitions::SetWeaponAmmo );
     CLuaCFunctions::AddFunction ( "getSlotFromWeapon", CLuaFunctionDefinitions::GetSlotFromWeapon );
 
@@ -386,7 +386,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getTrainSpeed", CLuaFunctionDefinitions::GetTrainSpeed );
     CLuaCFunctions::AddFunction ( "isVehicleBlown", CLuaFunctionDefinitions::IsVehicleBlown );
     CLuaCFunctions::AddFunction ( "getVehicleHeadLightColor", CLuaFunctionDefinitions::GetVehicleHeadLightColor );
-    CLuaCFunctions::AddFunction ( "getVehicleDoorOpenRatio", CLuaFunctionDefinitions::GetVehicleDoorOpenRatio );
 
     // Vehicle create/destroy funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefinitions::CreateVehicle );
@@ -431,8 +430,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setTrainDirection", CLuaFunctionDefinitions::SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", CLuaFunctionDefinitions::SetTrainSpeed );
     CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", CLuaFunctionDefinitions::SetVehicleHeadLightColor );
-    CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", CLuaFunctionDefinitions::SetVehicleTurretPosition );
-    CLuaCFunctions::AddFunction ( "setVehicleDoorOpenRatio", CLuaFunctionDefinitions::SetVehicleDoorOpenRatio );
 
     // Marker functions
     CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefinitions::CreateMarker );
@@ -461,25 +458,21 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getBlipSize", CLuaFunctionDefinitions::GetBlipSize );
     CLuaCFunctions::AddFunction ( "getBlipColor", CLuaFunctionDefinitions::GetBlipColor );
     CLuaCFunctions::AddFunction ( "getBlipOrdering", CLuaFunctionDefinitions::GetBlipOrdering );
-    CLuaCFunctions::AddFunction ( "getBlipVisibleDistance", CLuaFunctionDefinitions::GetBlipVisibleDistance );
 
     // Blip set funcs
     CLuaCFunctions::AddFunction ( "setBlipIcon", CLuaFunctionDefinitions::SetBlipIcon );
     CLuaCFunctions::AddFunction ( "setBlipSize", CLuaFunctionDefinitions::SetBlipSize );
     CLuaCFunctions::AddFunction ( "setBlipColor", CLuaFunctionDefinitions::SetBlipColor );
     CLuaCFunctions::AddFunction ( "setBlipOrdering", CLuaFunctionDefinitions::SetBlipOrdering );
-    CLuaCFunctions::AddFunction ( "setBlipVisibleDistance", CLuaFunctionDefinitions::SetBlipVisibleDistance );
     
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefinitions::CreateObject );
 
     // Object get funcs
     CLuaCFunctions::AddFunction ( "getObjectRotation", CLuaFunctionDefinitions::GetObjectRotation );
-    CLuaCFunctions::AddFunction ( "getObjectScale", CLuaFunctionDefinitions::GetObjectScale );
 
     // Object set funcs
     CLuaCFunctions::AddFunction ( "setObjectRotation", CLuaFunctionDefinitions::SetObjectRotation );
-    CLuaCFunctions::AddFunction ( "setObjectScale", CLuaFunctionDefinitions::SetObjectScale );
     CLuaCFunctions::AddFunction ( "moveObject", CLuaFunctionDefinitions::MoveObject );
     CLuaCFunctions::AddFunction ( "stopObject", CLuaFunctionDefinitions::StopObject );
 
@@ -558,9 +551,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWaterLevel", CLuaFunctionDefinitions::SetWaterLevel );
     CLuaCFunctions::AddFunction ( "getWaterVertexPosition", CLuaFunctionDefinitions::GetWaterVertexPosition );
     CLuaCFunctions::AddFunction ( "setWaterVertexPosition", CLuaFunctionDefinitions::SetWaterVertexPosition );
-    CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefinitions::GetWaterColor );
-    CLuaCFunctions::AddFunction ( "setWaterColor", CLuaFunctionDefinitions::SetWaterColor );
-    CLuaCFunctions::AddFunction ( "resetWaterColor", CLuaFunctionDefinitions::ResetWaterColor );
 
     // Weapon funcs
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefinitions::GetWeaponNameFromID );
@@ -591,8 +581,6 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility vector math functions
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints2D", CLuaFunctionDefinitions::GetDistanceBetweenPoints2D );
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints3D", CLuaFunctionDefinitions::GetDistanceBetweenPoints3D );
-    CLuaCFunctions::AddFunction ( "getEasingValue", CLuaFunctionDefinitions::GetEasingValue );
-    CLuaCFunctions::AddFunction ( "interpolateBetween", CLuaFunctionDefinitions::InterpolateBetween );
 
     // Util funcs
     CLuaCFunctions::AddFunction ( "getTickCount", CLuaFunctionDefinitions::GetTickCount_ );
@@ -608,13 +596,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getColorFromString", CLuaFunctionDefinitions::GetColorFromString );
     CLuaCFunctions::AddFunction ( "ref", CLuaFunctionDefinitions::Reference );
     CLuaCFunctions::AddFunction ( "deref", CLuaFunctionDefinitions::Dereference );
-    // UTF functions
-    CLuaCFunctions::AddFunction ( "utfLen", CLuaFunctionDefinitions::UtfLen );
-    CLuaCFunctions::AddFunction ( "utfSeek", CLuaFunctionDefinitions::UtfSeek );
-    CLuaCFunctions::AddFunction ( "utfSub", CLuaFunctionDefinitions::UtfSub );
-    CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefinitions::UtfChar );
-    CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefinitions::UtfCode );
-
     CLuaCFunctions::AddFunction ( "getValidPedModels", CLuaFunctionDefinitions::GetValidPedModels );
 
     // Loaded map funcs
@@ -627,6 +608,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCameraDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
+    CLuaHandlingDefs::LoadFunctions ();
     CLuaPickupDefs::LoadFunctions ();
     CLuaResourceDefs::LoadFunctions ();
     CLuaTextDefs::LoadFunctions ();
@@ -727,7 +709,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
-    CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefinitions::GetNetworkUsageData );
+    CLuaCFunctions::AddFunction ( "getPacketInfo", CLuaFunctionDefinitions::GetPacketInfo );
     CLuaCFunctions::AddFunction ( "getLoadedModules", CLuaFunctionDefinitions::GetModules );
     CLuaCFunctions::AddFunction ( "getModuleInfo", CLuaFunctionDefinitions::GetModuleInfo );
 }

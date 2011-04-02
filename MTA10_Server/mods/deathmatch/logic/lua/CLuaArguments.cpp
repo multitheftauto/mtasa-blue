@@ -15,10 +15,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
-#ifndef WIN32
-#include <clocale>
-#endif
+#include "CPerfStatManager.h"
 
 extern CGame* g_pGame;
 
@@ -114,7 +111,7 @@ void CLuaArguments::ReadTable ( lua_State* luaVM, int iIndexBegin, std::map < co
     // Delete the previous arguments if any
     DeleteArguments ();
 
-    LUA_CHECKSTACK ( luaVM, 2 );
+    LUA_CHECKSTACK ( luaVM, 1 );
     lua_pushnil(luaVM);  /* first key */
     if ( iIndexBegin < 0 )
         iIndexBegin--;
@@ -205,30 +202,11 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
     // Call the function with our arguments
     pLuaMain->ResetInstructionCount ();
 
-#ifndef WIN32
-    std::setlocale(LC_ALL, "C");
-#endif
     int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
-#ifndef WIN32
-    std::setlocale(LC_ALL, "");
-#endif
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
-        SString strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
-        
-        vector <SString> vecSplit;
-        strRes.Split ( ":", vecSplit );
-        
-        if ( vecSplit.size ( ) >= 3 )
-        {
-            SString strFile = vecSplit[0];
-            int     iLine   = atoi ( vecSplit[1].c_str ( ) );
-            SString strMsg  = vecSplit[2].substr ( 1 );
-            
-            g_pGame->GetScriptDebugging()->LogError ( strFile, iLine, strMsg );
-        }
-        else
-            g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
+        std::string strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
+        g_pGame->GetScriptDebugging()->LogError ( luaVM, "%s", strRes.c_str () );
 
         // cleanup the stack
         while ( lua_gettop ( luaVM ) - luaStackPointer > 0 )
@@ -253,7 +231,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
             lua_pop ( luaVM, 1 );
     }
 
-    CPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.m_iFunction ), GetTimeUs() - startTime );
+    GetPerfStatManager ()->UpdateLuaTiming ( pLuaMain, pLuaMain->GetFunctionTag ( iLuaFunction.m_iFunction ), GetTimeUs() - startTime );
     return true;
 }
 
@@ -279,13 +257,7 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
     pLuaMain->ResetInstructionCount ();
     int iret = 0;
     try {
-#ifndef WIN32
-        std::setlocale(LC_ALL, "C");
-#endif
         iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
-#ifndef WIN32
-        std::setlocale(LC_ALL, "");
-#endif
     }
     catch ( ... )
     {
@@ -319,7 +291,7 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
             lua_pop ( luaVM, 1 );
     }
         
-    CPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pLuaMain, szFunction, GetTimeUs() - startTime );
+    GetPerfStatManager ()->UpdateLuaTiming ( pLuaMain, szFunction, GetTimeUs() - startTime );
     return true;
 }
 
@@ -744,7 +716,7 @@ json_object * CLuaArguments::WriteTableToJSONObject ( bool bSerialize, std::map 
 
 bool CLuaArguments::ReadFromJSONString ( const char* szJSON )
 {
-    json_object* object = json_tokener_parse ( szJSON );
+    json_object* object = json_tokener_parse ( const_cast < char* > ( szJSON ) );
     if ( !is_error(object) )
     {
         if ( json_object_get_type ( object ) == json_type_array )

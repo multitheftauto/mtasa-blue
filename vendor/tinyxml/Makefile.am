@@ -1,7 +1,7 @@
 
-noinst_LTLIBRARIES = libtinyxml.la
+noinst_LIBRARIES = libtinyxml.a 
 
-libtinyxml_la_SOURCES = \
+libtinyxml_a_SOURCES = \
 	tinystr.cpp \
 	tinystr.h \
 	tinyxml.cpp \
@@ -9,6 +9,6 @@ libtinyxml_la_SOURCES = \
 	tinyxml.h \
 	tinyxmlparser.cpp
 
-libtinyxml_la_CXXFLAGS = \
+libtinyxml_a_CXXFLAGS = \
   -DTIXML_USE_STL
 

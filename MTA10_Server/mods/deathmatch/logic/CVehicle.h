@@ -20,6 +20,7 @@ class CVehicle;
 #include "packets/CPacket.h"
 #include "CElement.h"
 #include "CEvents.h"
+#include "CVehicleColor.h"
 #include "CVehicleUpgrades.h"
 
 #define MAX_VEHICLE_SEATS 9
@@ -133,7 +134,7 @@ public:
 
     eVehicleType                    GetVehicleType          ( void )                        { return m_eVehicleType; };
 
-    inline CVehicleColor&           GetColor                ( void )                        { return m_Color; };
+    inline const CVehicleColor&     GetColor                ( void )                        { return m_Color; };
     inline void                     SetColor                ( const CVehicleColor& Color )  { m_Color = Color; };
 
     inline bool                     IsFrozen                ( void )                        { return m_bIsFrozen; };
@@ -165,8 +166,6 @@ public:
 
     CVehicleColor&                  RandomizeColor          ( void );
 
-    float                           GetDoorOpenRatio        ( unsigned char ucDoor ) const;
-    void                            SetDoorOpenRatio        ( unsigned char ucDoor, float fRatio );
     inline bool                     IsLocked                ( void )                        { return m_bLocked; };
     inline void                     SetLocked               ( bool bLocked )                { m_bLocked = bLocked; };
 
@@ -264,9 +263,6 @@ public:
     inline bool                     IsHeliSearchLightVisible ( void )                       { return m_bHeliSearchLightVisible; }
     inline void                     SetHeliSearchLightVisible ( bool bVisible )             { m_bHeliSearchLightVisible = bVisible; }
 
-    inline bool                     GetCollisionEnabled     ( void )                        { return m_bCollisionsEnabled; }
-    inline void                     SetCollisionEnabled     ( bool bCollisionEnabled )      { m_bCollisionsEnabled = bCollisionEnabled; }
-
     // Functions used to remember where this vehicle spawns
     inline const CVector&           GetRespawnPosition      ( void )                        { return m_vecRespawnPosition; };
     inline void                     SetRespawnPosition      ( const CVector& vecPosition )  { m_vecRespawnPosition = vecPosition; };
@@ -320,7 +316,6 @@ private:
     char                            m_szRegPlate [9];
     unsigned char                   m_ucPaintjob;
 
-    float                           m_fDoorOpenRatio [ 6 ];
     bool                            m_bLocked;
     bool                            m_bDoorsUndamageable;
     bool                            m_bEngineOn;
@@ -353,7 +348,6 @@ private:
     bool                            m_bTaxiLightState;
     bool                            m_bLandingGearDown;
     unsigned short                  m_usAdjustableProperty;
-    bool                            m_bCollisionsEnabled;
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;

@@ -47,7 +47,6 @@ class CCore;
 #include "CCommunity.h"
 #include <xml/CXML.h>
 #include <ijsify.h>
-#include "CXfireQuery.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -68,11 +67,9 @@ class CCore;
 #define CONFIG_NODE_SERVER_REC      "recently_played_servers"   // recently played servers list node
 #define CONFIG_NODE_SERVER_OPTIONS  "serverbrowser_options"     // saved options for the server browser
 #define CONFIG_NODE_SERVER_SAVED    "server_passwords"    // This contains saved passwords (as appose to save_server_passwords which is a setting)
-#define CONFIG_NODE_SERVER_HISTORY  "connect_history"
 #define CONFIG_INTERNET_LIST_TAG    "internet_server"
 #define CONFIG_FAVOURITE_LIST_TAG   "favourite_server"
 #define CONFIG_RECENT_LIST_TAG      "recently_played_server"
-#define CONFIG_HISTORY_LIST_TAG     "connected_server"
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
@@ -131,11 +128,11 @@ public:
     void                    HideQuickConnect                ( void );
     void                    SetCenterCursor                 ( bool bEnabled );
 
-    void                    ShowServerInfo                  ( unsigned int WindowType );
-
     // Configuration
     void                    ApplyConsoleSettings            ( void );
+    void                    ApplyServerBrowserSettings      ( void );
     void                    ApplyGameSettings               ( void );
+    void                    ApplyMenuSettings               ( void );
     void                    ApplyCommunityState             ( void );
     void                    UpdateRecentlyPlayed            ( void );
 
@@ -200,21 +197,11 @@ public:
     bool                    IsOptionalUpdateInfoRequired    ( const char* szHost )                          { return m_pLocalGUI->IsOptionalUpdateInfoRequired ( szHost ); }
     void                    InitiateDataFilesFix            ( void )                                        { m_pLocalGUI->InitiateDataFilesFix (); }
 
-    uint                    GetFrameRateLimit               ( void )                                        { return m_uiFrameRateLimit; }
-    void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 );
-    void                    ApplyFrameRateLimit             ( void );
-
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
-    void                    GetConnectParametersFromURI     ( const char* szURI, std::string &strHost, unsigned short &usPort, std::string &strNick, std::string &strPassword );
     bool                    bScreenShot;
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
     const char *            GetCommandLineOption            ( const char* szOption );
     const char *            GetCommandLineArgs              ( void ) { return m_szCommandLineArgs; }
-
-    //XFire
-    SString                 UpdateXfire                     ( void );
-    void                    SetCurrentServer                ( in_addr Addr, unsigned short usQueryPort );
-    void                    SetXfireData                    ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount );
 
 private:
     // Core devices.
@@ -271,21 +258,12 @@ private:
     // screen res
     DEVMODE                     m_Current;
 
-    //Xfire Update
-    CXfireServerInfo*           m_pCurrentServer;
-    time_t                      m_tXfireUpdate;
-
     SString                     m_strModInstallRoot;
     char                        m_szInstallRoot[MAX_PATH];
     char                        m_szGTAInstallRoot[MAX_PATH];
 
     bool                        m_bQuitOnPulse;
     bool                        m_bDestroyMessageBox;
-
-    uint                        m_uiServerFrameRateLimit;
-    uint                        m_uiFrameRateLimit;
-    double                      m_dLastTimeMs;
-    double                      m_dPrevOverrun;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

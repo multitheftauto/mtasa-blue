@@ -5,7 +5,6 @@
 *  FILE:        core/CCommunityLogin.cpp
 *  PURPOSE:     Community login dialog class
 *  DEVELOPERS:  Stanislav Bobrov <lil_Toady@hotmail.com>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -84,10 +83,7 @@ void CCommunityLogin::SetVisible ( bool bVisible )
 {
     m_pWindow->SetVisible ( bVisible );
     if ( bVisible )
-    {
-        SetFrozen ( false );
         m_pWindow->BringToFront ();
-    }
 }
 
 bool CCommunityLogin::IsVisible ( void )
@@ -95,24 +91,14 @@ bool CCommunityLogin::IsVisible ( void )
     return m_pWindow->IsVisible ();
 }
 
-void CCommunityLogin::SetFrozen ( bool bFrozen )
-{
-    m_pEditUsername->SetEnabled ( !bFrozen );
-    m_pEditPassword->SetEnabled ( !bFrozen );
-    m_pButtonLogin->SetEnabled ( !bFrozen );
-    m_pButtonLogin->SetText ( ( bFrozen ) ? "Logging in..." : "Login" );
-}
-
 bool CCommunityLogin::OnButtonLoginClick ( CGUIElement* pElement )
 {
     if ( m_pEditUsername->GetText().empty() ||
         m_pEditPassword->GetText().empty() )
     {
-        g_pCore->ShowMessageBox ( "Login Error", "Invalid username/password", MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( "Serial Error", "Invalid username/password", MB_BUTTON_OK | MB_ICON_ERROR );
         return true;
     }
-    SetFrozen ( true );
-
     // Hash password
     char szPassword[33];
     std::string strPassword;
@@ -126,11 +112,9 @@ bool CCommunityLogin::OnButtonLoginClick ( CGUIElement* pElement )
     CCommunity *pCommunity = CCommunity::GetSingletonPtr ();
     pCommunity->SetUsername ( m_pEditUsername->GetText () );
     pCommunity->SetPassword ( strPassword );
-
     CVARS_SET ( "community_username", m_pEditUsername->GetText () );
     CVARS_SET ( "community_password", strPassword );
     pCommunity->Login ( OnLoginCallback, this );
-
     return true;
 }
 
@@ -142,14 +126,13 @@ bool CCommunityLogin::OnButtonCancelClick ( CGUIElement* pElement )
 
 void CCommunityLogin::OnLoginCallback ( bool bResult, char* szError, void *obj )
 {
-    CCommunityLogin* pLogin = reinterpret_cast < CCommunityLogin* > ( obj );
     if ( !bResult )
     {
-        pLogin->SetFrozen ( false );
-        g_pCore->ShowMessageBox ( "Login Error", szError, MB_BUTTON_OK | MB_ICON_ERROR );
+        g_pCore->ShowMessageBox ( "Serial Error", szError, MB_BUTTON_OK | MB_ICON_ERROR );
     }
     else
     {
+        CCommunityLogin* pLogin = reinterpret_cast < CCommunityLogin* > ( obj );
         // Succeed, connect
         pLogin->SetVisible ( false );
         pLogin->GetCallback()();

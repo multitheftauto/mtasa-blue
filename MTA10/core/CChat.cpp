@@ -450,10 +450,8 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
             {
                 if ( m_strInputText.size () > 0 )
                 {
-                    // Convert our string to UTF8 before resizing, then back to ANSI.
-                    std::wstring strText = ConvertToUTF8(m_strInputText);
-                    strText.resize ( strText.size () - 1 );
-                    SetInputText ( ConvertToANSI(strText).c_str() );
+                    m_strInputText.resize ( m_strInputText.size () - 1 );
+                    SetInputText ( m_strInputText.c_str () );
                 }
                 break;
             }
@@ -476,29 +474,12 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
             default:
             {
                 // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
-                if ( ConvertToUTF8(m_strInputText).size () < CHAT_MAX_CHAT_LENGTH )
+                if ( m_strInputText.size () < CHAT_MAX_CHAT_LENGTH )
                 {                    
                     if ( KeyboardArgs.codepoint >= 32 )
                     {
-                        unsigned int uiCharacter = KeyboardArgs.codepoint;
-                        if ( uiCharacter < 127 ) // we have any char from ASCII 
-                        {
-                            // injecting as is
-                            m_strInputText += static_cast < char > ( KeyboardArgs.codepoint );
-                            SetInputText ( m_strInputText.c_str () );
-                        }
-                        else // we have any char from Extended ASCII, any ANSI code page or UNICODE range
-                        {
-                            // Generate a null-terminating string for our character
-                            wchar_t wUNICODE[2] = { uiCharacter, '\0' };
-
-                            // Convert our UTF character into an ANSI string
-                            std::string strANSI = ConvertToANSI(wUNICODE);
-
-                            // Append the ANSI string, and update
-                            m_strInputText.append(strANSI);
-                            SetInputText ( m_strInputText.c_str () );
-                        }
+                        m_strInputText += static_cast < char > ( KeyboardArgs.codepoint );
+                        SetInputText ( m_strInputText.c_str () );
                     }
                 }
                 break;
@@ -800,13 +781,11 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
 
         szSectionStart = szSectionEnd;
         szLastWrapPoint = szSectionStart;
-        unsigned int uiSeekPos = 1;
 
         while ( true )      // find end of this section
         {
-            unsigned int uiCharWidth = CChat::GetTextExtent ( std::string(szString).substr(0,uiSeekPos).c_str(), g_pChat->m_vecScale.fX );
-
-            if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || uiCharWidth > fWidth )
+            float fCharWidth = CChat::GetCharacterWidth ( *szSectionEnd, g_pChat->m_vecScale.fX );
+            if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || fCurrentWidth + fCharWidth > fWidth )
             {
                 bLastSection = true;
                 break;
@@ -822,8 +801,8 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
             {
                 szLastWrapPoint = szSectionEnd;
             }
+            fCurrentWidth += fCharWidth;
             szSectionEnd++;
-            uiSeekPos++;
         }
         section.m_strText.assign ( szSectionStart, szSectionEnd - szSectionStart );
     }

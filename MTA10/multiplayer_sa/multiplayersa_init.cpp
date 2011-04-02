@@ -12,8 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#define DECLARE_PROFILER_SECTION_multiplayersa_init
-#include "profiler/SharedUtil.Profiler.h"
+#include "SharedUtil.Misc.h"
 
 CGame* pGameInterface = 0;
 CMultiplayerSA* pMultiplayer = 0;

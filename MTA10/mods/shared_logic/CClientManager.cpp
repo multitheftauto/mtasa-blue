@@ -57,6 +57,7 @@ CClientManager::CClientManager ( void )
     m_pProjectileManager = new CClientProjectileManager ( this );
     m_pDFFManager = new CClientDFFManager ( this );
     m_pColModelManager = new CClientColModelManager ( this );
+    m_pHandlingManager = new CClientHandlingManager ( this );
     m_pExplosionManager = new CClientExplosionManager ( this );
     m_pWaterManager = new CClientWaterManager ( this );
 
@@ -83,6 +84,9 @@ CClientManager::~CClientManager ( void )
 
     delete m_pExplosionManager;
     m_pExplosionManager = NULL;
+
+    delete m_pHandlingManager;
+    m_pHandlingManager = NULL;
 
     delete m_pColModelManager;
     m_pColModelManager = NULL;
@@ -186,6 +190,7 @@ void CClientManager::DoPulse ( void )
         m_pVehicleManager->DoPulse ();
         m_pPathManager->DoPulse ();
         m_pRadarMarkerManager->DoPulse ();
+        m_pDisplayManager->DoPulse ();
         m_pPedManager->DoPulse ();
         m_pObjectManager->DoPulse ();
         m_pProjectileManager->DoPulse ();
@@ -193,15 +198,6 @@ void CClientManager::DoPulse ( void )
         m_pPlayerManager->DoPulse ();
         m_pColManager->DoPulse ();
         m_pGUIManager->DoPulse ();
-    }
-}
-
-
-void CClientManager::DoRender ( void )
-{
-    if ( IsGameLoaded () )
-    {
-        m_pDisplayManager->DoPulse ();
     }
 }
 

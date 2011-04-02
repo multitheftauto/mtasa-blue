@@ -31,10 +31,6 @@ public:
                             CScriptFile             ( const char* szFilename, unsigned long ulMaxSize );
                             ~CScriptFile            ( void );
 
-    // Functions required for linking
-    void                    GetPosition             ( CVector& vecPosition ) const {};
-    void                    SetPosition             ( const CVector& vecPosition ) {};
-
     // Functions required by CClientEntity
     eClientEntityType       GetType                 ( void ) const  { return SCRIPTFILE; };
     void                    Unlink                  ( void ) {};

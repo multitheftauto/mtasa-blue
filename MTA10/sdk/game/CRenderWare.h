@@ -21,7 +21,6 @@ class CRenderWare {
     public:
     virtual void                ModelInfoTXDAddTextures     ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bMakeCopy = true, std::list < RwTexture* >* pReplacedTextures = NULL, std::list < RwTexture* >* pAddedTextures = NULL, bool bAddRef = true ) = 0;
     virtual void                ModelInfoTXDRemoveTextures  ( std::list < RwTexture* >& textures, unsigned short usModelID, bool bDestroy = true, bool bKeepRaster = false, bool bRemoveRef = true ) = 0;
-    virtual CAnimBlock *        ReadIFP                     ( const char *szIFP ) = 0;
     virtual RwTexDictionary *   ReadTXD                     ( const char *szTXD ) = 0;
     virtual RpClump *           ReadDFF                     ( const char *szDFF, unsigned short usModelID ) = 0;
     virtual CColModel *         ReadCOL                     ( const char * szCOLFile ) = 0;

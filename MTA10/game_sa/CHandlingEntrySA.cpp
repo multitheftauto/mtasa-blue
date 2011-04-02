@@ -13,13 +13,11 @@
 
 #include "StdInc.h"
 
-#define FUNC_HandlingDataMgr_ConvertDataToGameUnits 0x6F5080
-
 CHandlingEntrySA::CHandlingEntrySA ( void )
 {
     // Create a new interface and zero it
     m_pHandlingSA = new tHandlingDataSA;
-    MemSetFast ( m_pHandlingSA, 0, sizeof ( tHandlingDataSA ) );
+    MemSet ( m_pHandlingSA, 0, sizeof ( tHandlingDataSA ) );
     m_bDeleteInterface = true;
 
     // We have no original data
@@ -42,7 +40,7 @@ CHandlingEntrySA::CHandlingEntrySA ( tHandlingDataSA* pOriginal )
     m_pHandlingSA = NULL;
     m_pOriginalData = NULL;
     m_bDeleteInterface = false;
-    MemCpyFast ( &m_Handling, pOriginal, sizeof ( tHandlingDataSA ) );
+    MemCpy ( &m_Handling, pOriginal, sizeof ( tHandlingDataSA ) );
 }
 
 
@@ -76,10 +74,10 @@ void CHandlingEntrySA::AddVehicle ( CVehicle* pVeh )
 
 
 // Apply the handlingdata from another data
-void CHandlingEntrySA::Assign ( const CHandlingEntry* pData )
+void CHandlingEntrySA::ApplyHandlingData ( CHandlingEntry* pData )
 {
     // Copy the data
-    const CHandlingEntrySA* pEntrySA = static_cast < const CHandlingEntrySA* > ( pData );
+    CHandlingEntrySA* pEntrySA = static_cast < CHandlingEntrySA* > ( pData );
     m_Handling = pEntrySA->m_Handling;
 }
 
@@ -97,10 +95,16 @@ void CHandlingEntrySA::Recalculate ( void )
     if ( m_pHandlingSA )
     {
         // Copy our stored field to GTA's
-        MemCpyFast ( m_pHandlingSA, &m_Handling, sizeof ( m_Handling ) );
+        MemCpy ( m_pHandlingSA, &m_Handling, sizeof ( m_Handling ) );
 
         // Call GTA's function that calculates the final values from the read values
-        ( (void (_stdcall *)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits )( m_pHandlingSA );
+        DWORD dwFunc = 0x6F5080;
+        DWORD dwHandling = reinterpret_cast < DWORD > ( m_pHandlingSA );
+        _asm
+        {
+            push        dwHandling
+            call        dwFunc
+        }
     }
 }
 
@@ -111,7 +115,7 @@ void CHandlingEntrySA::Restore ( void )
     if ( m_pOriginalData )
     {
         // Copy default stuff over gta's data
-        MemCpyFast ( &m_Handling, m_pOriginalData, sizeof ( tHandlingDataSA ) );
+        MemCpy ( &m_Handling, m_pOriginalData, sizeof ( tHandlingDataSA ) );
 
         // Recalculate the fields
         Recalculate ();

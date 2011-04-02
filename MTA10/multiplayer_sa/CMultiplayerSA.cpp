@@ -48,7 +48,6 @@ unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
 unsigned long CMultiplayerSA::HOOKPOS_EndWorldColors;
 unsigned long CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList;
 unsigned long CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking;
-unsigned long CMultiplayerSA::HOOKPOS_CAutomobile__ProcessSwingingDoor;
 
 unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
 unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
@@ -84,9 +83,6 @@ DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
 #define FUNC_CRenderer_Render                               0x727140
 
 #define CALL_CBike_ProcessRiderAnims                        0x6BF425   // @ CBike::ProcessDrivingAnims
-
-#define CALL_CTrafficLights_GetPrimaryLightState 			0x49DB5F
-#define CALL_CTrafficLights_GetSecondaryLightState 			0x49DB6D
 
 #define HOOKPOS_CGame_Process                               0x53C095
 DWORD RETURN_CGame_Process =                                0x53C09F;
@@ -205,31 +201,21 @@ DWORD RETURN_CrashFix_Misc8b =                              0x734871;
 DWORD RETURN_CrashFix_Misc9a =                              0x738B6A;
 DWORD RETURN_CrashFix_Misc9b =                              0x73983A;
 
-#define HOOKPOS_CrashFix_Misc10                             0x5334FE
-DWORD RETURN_CrashFix_Misc10a =                             0x533504;
+#define HOOKPOS_CrashFix_Misc10                              0x5334FE
+DWORD RETURN_CrashFix_Misc10a =                              0x533504;
 
-#define HOOKPOS_CrashFix_Misc11                             0x4D2C62
-DWORD RETURN_CrashFix_Misc11a =                             0x4D2C67;
-DWORD RETURN_CrashFix_Misc11b =                             0x4D2E03;
+#define HOOKPOS_CrashFix_Misc11                              0x4D2C62
+DWORD RETURN_CrashFix_Misc11a =                              0x4D2C67;
+DWORD RETURN_CrashFix_Misc11b =                              0x4D2E03;
 
-#define HOOKPOS_CrashFix_Misc12                             0x4D41C5
-DWORD RETURN_CrashFix_Misc12a =                             0x4D41CA;
-DWORD RETURN_CrashFix_Misc12b =                             0x4D4222;
+#define HOOKPOS_CrashFix_Misc12                              0x4D41C5
+DWORD RETURN_CrashFix_Misc12a =                              0x4D41CA;
+DWORD RETURN_CrashFix_Misc12b =                              0x4D4222;
 
-#define HOOKPOS_CrashFix_Misc13                             0x4D464E
-DWORD RETURN_CrashFix_Misc13a =                             0x4D4654;
-DWORD RETURN_CrashFix_Misc13b =                             0x4D4764;
+#define HOOKPOS_CrashFix_Misc13                              0x4D464E
+DWORD RETURN_CrashFix_Misc13a =                              0x4D4654;
+DWORD RETURN_CrashFix_Misc13b =                              0x4D4764;
 
-#define HOOKPOS_VehColCB                                    0x04C838D
-DWORD RETURN_VehColCB =                                     0x04C83AA;
-
-#define HOOKPOS_VehCol                                      0x06D6603
-DWORD RETURN_VehCol =                                       0x06D660C;
-
-#define CALL_CAutomobile_ProcessEntityCollision             0x6AD053
-#define CALL_CBike_ProcessEntityCollision1                  0x6BDF82
-#define CALL_CBike_ProcessEntityCollision2                  0x6BE0D1
-#define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -247,9 +233,6 @@ float fGlobalGravity = 0.008f;
 float fLocalPlayerGravity = 0.008f;
 float fLocalPlayerCameraRotation = 0.0f;
 bool bCustomCameraRotation = false;
-unsigned char ucTrafficLightState = 0;
-bool bTrafficLightsBlocked = false;
-bool bInteriorSoundsEnabled = true;
 
 bool bUsingCustomSkyGradient = false;
 BYTE ucSkyGradientTopR = 0;
@@ -283,7 +266,6 @@ ExplosionHandler * m_pExplosionHandler = NULL;
 BreakTowLinkHandler * m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler * m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler * m_pRender3DStuffHandler = NULL;
-PreWorldProcessHandler * m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler * m_pPostWorldProcessHandler = NULL;
 IdleHandler * m_pIdleHandler = NULL;
 AddAnimationHandler* m_pAddAnimationHandler = NULL;
@@ -362,15 +344,7 @@ void HOOK_CrashFix_Misc10 ();
 void HOOK_CrashFix_Misc11 ();
 void HOOK_CrashFix_Misc12 ();
 void HOOK_CrashFix_Misc13 ();
-void HOOK_VehColCB ();
-void HOOK_VehCol ();
 
-void HOOK_CTrafficLights_GetPrimaryLightState ();
-void HOOK_CTrafficLights_GetSecondaryLightState ();
-
-void HOOK_CAutomobile__ProcessSwingingDoor ();
-
-void HOOK_ProcessVehicleCollision ();
 
 void vehicle_lights_init ();
 
@@ -403,7 +377,7 @@ CMultiplayerSA::CMultiplayerSA()
     m_pProjectileHandler = NULL;
     m_pProjectileStopHandler = NULL;
 
-    MemSetFast ( &localStatsData, 0, sizeof ( CStatsData ) );
+    MemSet ( &localStatsData, 0, sizeof ( CStatsData ) );
     localStatsData.StatTypesFloat [ 24 ] = 569.0f; // Max Health
 }
 
@@ -423,14 +397,14 @@ void CMultiplayerSA::InitHooks()
     //00442DC6     E9 32090000    JMP gta_sa_u.004436FD
 
     // increase the number of vehicles types (not actual vehicles) that can be loaded at once
-    MemPutFast < int > ( 0x8a5a84, 127 );
+    MemPut < int > ( 0x8a5a84, 127 );  //     *(int *)0x8a5a84 = 127;
 
     // DISABLE CGameLogic::Update
     MemSet ((void *)0x442AD0, 0xC3, 1);
 
     // STOP IT TRYING TO LOAD THE SCM
-    MemPut < BYTE > ( 0x468EB5, 0xEB );
-    MemPut < BYTE > ( 0x468EB6, 0x32 );
+    MemPut < BYTE > ( 0x468EB5, 0xEB );  //     *(BYTE *)0x468EB5 = 0xEB;
+    MemPut < BYTE > ( 0x468EB6, 0x32 );  //     *(BYTE *)0x468EB6 = 0x32;
 
     HookInstall(HOOKPOS_FindPlayerCoors, (DWORD)HOOK_FindPlayerCoors, 6);
     HookInstall(HOOKPOS_FindPlayerCentreOfWorld, (DWORD)HOOK_FindPlayerCentreOfWorld, 6);
@@ -497,9 +471,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc11, (DWORD)HOOK_CrashFix_Misc11, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
-    HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
-    HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
-    HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -508,70 +479,63 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( CALL_VehicleLookAsideUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_RenderScene_Plants, (DWORD)HOOK_RenderScene_Plants );
 
-    HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
-    HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
-    HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
-    HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
-    HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
-    HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
-
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
 
     // Increase double link limit from 3200 ro 4000
-    MemPut < int > ( 0x00550F82, 4000 );
+    MemPut < int > ( 0x00550F82, 4000 );  //     *(int*)0x00550F82 = 4000;
 
 
     // Disable GTA being able to call CAudio::StopRadio ()
     // Well this isn't really CAudio::StopRadio, it's some global class
     // func that StopRadio just jumps to.
-    MemPut < BYTE > ( 0x4E9820, 0xC2 );
-    MemPut < BYTE > ( 0x4E9821, 0x08 );
-    MemPut < BYTE > ( 0x4E9822, 0x00 );
+    MemPut < BYTE > ( 0x4E9820, 0xC2 );  //     *(BYTE *)0x4E9820 = 0xC2;
+    MemPut < BYTE > ( 0x4E9821, 0x08 );  //     *(BYTE *)0x4E9821 = 0x08;
+    MemPut < BYTE > ( 0x4E9822, 0x00 );  //     *(BYTE *)0x4E9822 = 0x00;
 
     // Disable GTA being able to call CAudio::StartRadio ()
-    MemPut < BYTE > ( 0x4DBEC0, 0xC2 );
-    MemPut < BYTE > ( 0x4DBEC1, 0x00 );
-    MemPut < BYTE > ( 0x4DBEC2, 0x00 );
+    MemPut < BYTE > ( 0x4DBEC0, 0xC2 );  //     *(BYTE *)0x4DBEC0 = 0xC2;
+    MemPut < BYTE > ( 0x4DBEC1, 0x00 );  //     *(BYTE *)0x4DBEC1 = 0x00;
+    MemPut < BYTE > ( 0x4DBEC2, 0x00 );  //     *(BYTE *)0x4DBEC2 = 0x00;
 
-    MemPut < BYTE > ( 0x4EB3C0, 0xC2 );
-    MemPut < BYTE > ( 0x4EB3C1, 0x10 );
-    MemPut < BYTE > ( 0x4EB3C2, 0x00 );
+    MemPut < BYTE > ( 0x4EB3C0, 0xC2 );  //     *(BYTE *)0x4EB3C0 = 0xC2;
+    MemPut < BYTE > ( 0x4EB3C1, 0x10 );  //     *(BYTE *)0x4EB3C1 = 0x10;
+    MemPut < BYTE > ( 0x4EB3C2, 0x00 );  //     *(BYTE *)0x4EB3C2 = 0x00;
     
     // DISABLE cinematic camera for trains
-    MemPut < BYTE > ( 0x52A535, 0 );
+    MemPut < BYTE > ( 0x52A535, 0 );  //     *(BYTE *)0x52A535 = 0;
 
     // DISABLE wanted levels for military zones
-    MemPut < BYTE > ( 0x72DF0D, 0xEB );
+    MemPut < BYTE > ( 0x72DF0D, 0xEB );  //     *(BYTE *)0x72DF0D = 0xEB;
 
     // THROWN projectiles throw more accurately
-    MemPut < BYTE > ( 0x742685, 0x90 );
-    MemPut < BYTE > ( 0x742686, 0xE9 );
+    MemPut < BYTE > ( 0x742685, 0x90 );  //     *(BYTE *)0x742685 = 0x90;
+    MemPut < BYTE > ( 0x742686, 0xE9 );  //     *(BYTE *)0x742686 = 0xE9;
 
     // DISABLE CProjectileInfo::RemoveAllProjectiles
-    MemPut < BYTE > ( 0x7399B0, 0xC3 );
+    MemPut < BYTE > ( 0x7399B0, 0xC3 );  //     *(BYTE *)0x7399B0 = 0xC3;
 
     // DISABLE CRoadBlocks::GenerateRoadblocks
-    MemPut < BYTE > ( 0x4629E0, 0xC3 );
+    MemPut < BYTE > ( 0x4629E0, 0xC3 );  //     *(BYTE *)0x4629E0 = 0xC3;
 
 
     // Temporary hack for disabling hand up
     /*
-    MemPut < BYTE > ( 0x62AEE7, 0x90 );
-    MemPut < BYTE > ( 0x62AEE8, 0x90 );
-    MemPut < BYTE > ( 0x62AEE9, 0x90 );
-    MemPut < BYTE > ( 0x62AEEA, 0x90 );
-    MemPut < BYTE > ( 0x62AEEB, 0x90 );
-    MemPut < BYTE > ( 0x62AEEC, 0x90 );
+    MemPut < BYTE > ( 0x62AEE7, 0x90 );  //     *(BYTE *)0x62AEE7 = 0x90;
+    MemPut < BYTE > ( 0x62AEE8, 0x90 );  //     *(BYTE *)0x62AEE8 = 0x90;
+    MemPut < BYTE > ( 0x62AEE9, 0x90 );  //     *(BYTE *)0x62AEE9 = 0x90;
+    MemPut < BYTE > ( 0x62AEEA, 0x90 );  //     *(BYTE *)0x62AEEA = 0x90;
+    MemPut < BYTE > ( 0x62AEEB, 0x90 );  //     *(BYTE *)0x62AEEB = 0x90;
+    MemPut < BYTE > ( 0x62AEEC, 0x90 );  //     *(BYTE *)0x62AEEC = 0x90;
     */
 
     // DISABLE CAERadioTrackManager::CheckForMissionStatsChanges(void) (special DJ banter)
-    MemPut < BYTE > ( 0x4E8410, 0xC3 );
+    MemPut < BYTE > ( 0x4E8410, 0xC3 );  //     *(BYTE *)0x4E8410 = 0xC3;
 
     // DISABLE CPopulation__AddToPopulation
-    MemPut < BYTE > ( 0x614720, 0x32 );
-    MemPut < BYTE > ( 0x614721, 0xC0 );
-    MemPut < BYTE > ( 0x614722, 0xC3 );
+    MemPut < BYTE > ( 0x614720, 0x32 );  //     *(BYTE *)0x614720 = 0x32;
+    MemPut < BYTE > ( 0x614721, 0xC0 );  //     *(BYTE *)0x614721 = 0xC0;
+    MemPut < BYTE > ( 0x614722, 0xC3 );  //     *(BYTE *)0x614722 = 0xC3;
 
     // Disables deletion of RenderWare objects during unloading of ModelInfo
     // This is used so we can circumvent the limit of ~21 different vehicles by managing the RwObject ourselves
@@ -581,25 +545,25 @@ void CMultiplayerSA::InitHooks()
 
     // Hack to make the choke task use 0 time left remaining when he starts t
     // just stand there looking. So he won't do that.
-    MemPut < unsigned char > ( 0x620607, 0x33 );
-    MemPut < unsigned char > ( 0x620608, 0xC0 );
+    MemPut < unsigned char > ( 0x620607, 0x33 );  //     *(unsigned char *)0x620607 = 0x33;
+    MemPut < unsigned char > ( 0x620608, 0xC0 );  //     *(unsigned char *)0x620608 = 0xC0;
 
-    MemPut < unsigned char > ( 0x620618, 0x33 );
-    MemPut < unsigned char > ( 0x620619, 0xC0 );
-    MemPut < unsigned char > ( 0x62061A, 0x90 );
-    MemPut < unsigned char > ( 0x62061B, 0x90 );
-    MemPut < unsigned char > ( 0x62061C, 0x90 );
+    MemPut < unsigned char > ( 0x620618, 0x33 );  //     *(unsigned char *)0x620618 = 0x33;
+    MemPut < unsigned char > ( 0x620619, 0xC0 );  //     *(unsigned char *)0x620619 = 0xC0;
+    MemPut < unsigned char > ( 0x62061A, 0x90 );  //     *(unsigned char *)0x62061A = 0x90;
+    MemPut < unsigned char > ( 0x62061B, 0x90 );  //     *(unsigned char *)0x62061B = 0x90;
+    MemPut < unsigned char > ( 0x62061C, 0x90 );  //     *(unsigned char *)0x62061C = 0x90;
 
     // Hack to make non-local players always update their aim on akimbo weapons using camera
     // so they don't freeze when local player doesn't aim.
-    MemPut < BYTE > ( 0x61EFFE, 0xEB );
+    MemPut < BYTE > ( 0x61EFFE, 0xEB );  //     *(BYTE *)0x61EFFE = 0xEB;
     
 
     // DISABLE CGameLogic__SetPlayerWantedLevelForForbiddenTerritories
-    MemPut < BYTE > ( 0x441770, 0xC3 );
+    MemPut < BYTE > ( 0x441770, 0xC3 );  //     *(BYTE *)0x441770 = 0xC3;
 
     // DISABLE CCrime__ReportCrime
-    MemPut < BYTE > ( 0x532010, 0xC3 );
+    MemPut < BYTE > ( 0x532010, 0xC3 );  //     *(BYTE *)0x532010 = 0xC3;
     
     // Disables deletion of RenderWare objects during unloading of ModelInfo
     // This is used so we can circumvent the limit of ~21 different vehicles by managing the RwObject ourselves
@@ -611,16 +575,16 @@ void CMultiplayerSA::InitHooks()
     004C0220   90               NOP
     004C0221   90               NOP
     */
-    MemPut < BYTE > ( 0x4C01F0, 0xB0 );
-    MemPut < BYTE > ( 0x4C01F1, 0x00 );
-    MemPut < BYTE > ( 0x4C01F2, 0x90 );
-    MemPut < BYTE > ( 0x4C01F3, 0x90 );
-    MemPut < BYTE > ( 0x4C01F4, 0x90 );
+    MemPut < BYTE > ( 0x4C01F0, 0xB0 );  //     *(BYTE *)0x4C01F0 = 0xB0;
+    MemPut < BYTE > ( 0x4C01F1, 0x00 );  //     *(BYTE *)0x4C01F1 = 0x00;
+    MemPut < BYTE > ( 0x4C01F2, 0x90 );  //     *(BYTE *)0x4C01F2 = 0x90;
+    MemPut < BYTE > ( 0x4C01F3, 0x90 );  //     *(BYTE *)0x4C01F3 = 0x90;
+    MemPut < BYTE > ( 0x4C01F4, 0x90 );  //     *(BYTE *)0x4C01F4 = 0x90;
 
     // Disable MakePlayerSafe
-    MemPut < BYTE > ( 0x56E870, 0xC2 );
-    MemPut < BYTE > ( 0x56E871, 0x08 );
-    MemPut < BYTE > ( 0x56E872, 0x00 );
+    MemPut < BYTE > ( 0x56E870, 0xC2 );  //     *(BYTE *)0x56E870 = 0xC2;
+    MemPut < BYTE > ( 0x56E871, 0x08 );  //     *(BYTE *)0x56E871 = 0x08;
+    MemPut < BYTE > ( 0x56E872, 0x00 );  //     *(BYTE *)0x56E872 = 0x00;
 
     // Disable call to FxSystem_c__GetCompositeMatrix in CAEFireAudioEntity::UpdateParameters 
     // that was causing a crash - spent ages debugging, the crash happens if you create 40 or 
@@ -629,42 +593,42 @@ void CMultiplayerSA::InitHooks()
     
     /*
     // DISABLE CPed__RemoveBodyPart
-    MemPut < BYTE > ( 0x5F0140, 0xC2 );
-    MemPut < BYTE > ( 0x5F0141, 0x08 );
-    MemPut < BYTE > ( 0x5F0142, 0x00 );
+    MemPut < BYTE > ( 0x5F0140, 0xC2 );  //     *(BYTE *)0x5F0140 = 0xC2;
+    MemPut < BYTE > ( 0x5F0141, 0x08 );  //     *(BYTE *)0x5F0141 = 0x08;
+    MemPut < BYTE > ( 0x5F0142, 0x00 );  //     *(BYTE *)0x5F0142 = 0x00;
     */
 
     // ALLOW picking up of all vehicles (GTA doesn't allow picking up of 'locked' script created vehicles)
-    MemPut < BYTE > ( 0x6A436C, 0x90 );
-    MemPut < BYTE > ( 0x6A436D, 0x90 );
+    MemPut < BYTE > ( 0x6A436C, 0x90 );  //     *(BYTE *)0x6A436C = 0x90;
+    MemPut < BYTE > ( 0x6A436D, 0x90 );  //     *(BYTE *)0x6A436D = 0x90;
 
     // MAKE CEntity::GetIsOnScreen always return true, experimental
    /*
-    MemPut < BYTE > ( 0x534540, 0xB0 );
-    MemPut < BYTE > ( 0x534541, 0x01 );
-    MemPut < BYTE > ( 0x534542, 0xC3 );
+    MemPut < BYTE > ( 0x534540, 0xB0 );  //     *(BYTE *)0x534540 = 0xB0;
+    MemPut < BYTE > ( 0x534541, 0x01 );  //     *(BYTE *)0x534541 = 0x01;
+    MemPut < BYTE > ( 0x534542, 0xC3 );  //     *(BYTE *)0x534542 = 0xC3;
     */
 
     //DISABLE CPad::ReconcileTwoControllersInput
     /*
-    MemPut < BYTE > ( 0x53F530, 0xC2 );
-    MemPut < BYTE > ( 0x53F531, 0x0C );
-    MemPut < BYTE > ( 0x53F532, 0x00 );
+    MemPut < BYTE > ( 0x53F530, 0xC2 );  //     *(BYTE *)0x53F530 = 0xC2;
+    MemPut < BYTE > ( 0x53F531, 0x0C );  //     *(BYTE *)0x53F531 = 0x0C;
+    MemPut < BYTE > ( 0x53F532, 0x00 );  //     *(BYTE *)0x53F532 = 0x00;
 
-    MemPut < BYTE > ( 0x53EF80, 0xC3 );
+    MemPut < BYTE > ( 0x53EF80, 0xC3 );  //     *(BYTE *)0x53EF80 = 0xC3;
 
-    MemPut < BYTE > ( 0x541DDC, 0xEB );
-    MemPut < BYTE > ( 0x541DDD, 0x60 );
+    MemPut < BYTE > ( 0x541DDC, 0xEB );  //     *(BYTE *)0x541DDC = 0xEB;
+    MemPut < BYTE > ( 0x541DDD, 0x60 );  //     *(BYTE *)0x541DDD = 0x60;
 */
     // DISABLE big buildings (test)
     /*
-    MemPut < char > ( 0x533150, 0xC3 );
+    MemPut < char > ( 0x533150, 0xC3 );  //     *(char*)0x533150 = 0xC3;
     */
     
     // PREVENT THE RADIO OR ENGINE STOPPING WHEN PLAYER LEAVES VEHICLE
     // THIS ON ITS OWN will cause sounds to be left behind and other artifacts
     /*
-    MemPut < char > ( 0x4FB8C0, 0xC3 );
+    MemPut < char > ( 0x4FB8C0, 0xC3 );  //     *(char *)0x4FB8C0 = 0xC3;
     */
 
 
@@ -689,7 +653,7 @@ void CMultiplayerSA::InitHooks()
     
     // Players always lean out whatever the camera mode
     // 00621983     EB 13          JMP SHORT hacked_g.00621998
-    MemPut < BYTE > ( 0x621983, 0xEB );
+    MemPut < BYTE > ( 0x621983, 0xEB );  //     *(BYTE *)0x621983 = 0xEB;
 
     
     // Players can fire drivebys whatever camera mode
@@ -708,7 +672,7 @@ void CMultiplayerSA::InitHooks()
     MemSet ( (LPVOID)0x6B5B17, 0x90, 6 );
 
     // Increase VehicleStruct pool size
-    MemPut < BYTE > ( 0x5B8FE4, 0x7F );
+    MemPut < BYTE > ( 0x5B8FE4, 0x7F );  //     *(BYTE *)0x5B8FE4 = 0x7F;
     
     /*
     // CTaskSimpleCarDrive: Swaps driveby for gang-driveby for drivers
@@ -733,47 +697,47 @@ void CMultiplayerSA::InitHooks()
 
 
     // DISABLE GARAGES
-    MemPut < BYTE > ( 0x44AA89 + 0, 0xE9 );
-    MemPut < BYTE > ( 0x44AA89 + 1, 0x28 );
-    MemPut < BYTE > ( 0x44AA89 + 2, 0x01 );
-    MemPut < BYTE > ( 0x44AA89 + 3, 0x00 );
-    MemPut < BYTE > ( 0x44AA89 + 4, 0x00 );
-    MemPut < BYTE > ( 0x44AA89 + 5, 0x90 );
+    MemPut < BYTE > ( 0x44AA89 + 0, 0xE9 );  //     *(BYTE *)(0x44AA89 + 0) = 0xE9;
+    MemPut < BYTE > ( 0x44AA89 + 1, 0x28 );  //     *(BYTE *)(0x44AA89 + 1) = 0x28;
+    MemPut < BYTE > ( 0x44AA89 + 2, 0x01 );  //     *(BYTE *)(0x44AA89 + 2) = 0x01;
+    MemPut < BYTE > ( 0x44AA89 + 3, 0x00 );  //     *(BYTE *)(0x44AA89 + 3) = 0x00;
+    MemPut < BYTE > ( 0x44AA89 + 4, 0x00 );  //     *(BYTE *)(0x44AA89 + 4) = 0x00;
+    MemPut < BYTE > ( 0x44AA89 + 5, 0x90 );  //     *(BYTE *)(0x44AA89 + 5) = 0x90;
 
-    MemPut < DWORD > ( 0x44C7E0, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C7E4, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C7F8, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C7FC, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C804, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C808, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C83C, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C840, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C850, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C854, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C864, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C868, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C874, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C878, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C88C, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C890, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C89C, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C8A0, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C8AC, 0x44C7C4 );
-    MemPut < DWORD > ( 0x44C8B0, 0x44C7C4 );
+    MemPut < DWORD > ( 0x44C7E0, 0x44C7C4 );  //     *(DWORD *)0x44C7E0 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C7E4, 0x44C7C4 );  //     *(DWORD *)0x44C7E4 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C7F8, 0x44C7C4 );  //     *(DWORD *)0x44C7F8 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C7FC, 0x44C7C4 );  //     *(DWORD *)0x44C7FC = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C804, 0x44C7C4 );  //     *(DWORD *)0x44C804 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C808, 0x44C7C4 );  //     *(DWORD *)0x44C808 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C83C, 0x44C7C4 );  //     *(DWORD *)0x44C83C = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C840, 0x44C7C4 );  //     *(DWORD *)0x44C840 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C850, 0x44C7C4 );  //     *(DWORD *)0x44C850 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C854, 0x44C7C4 );  //     *(DWORD *)0x44C854 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C864, 0x44C7C4 );  //     *(DWORD *)0x44C864 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C868, 0x44C7C4 );  //     *(DWORD *)0x44C868 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C874, 0x44C7C4 );  //     *(DWORD *)0x44C874 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C878, 0x44C7C4 );  //     *(DWORD *)0x44C878 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C88C, 0x44C7C4 );  //     *(DWORD *)0x44C88C = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C890, 0x44C7C4 );  //     *(DWORD *)0x44C890 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C89C, 0x44C7C4 );  //     *(DWORD *)0x44C89C = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C8A0, 0x44C7C4 );  //     *(DWORD *)0x44C8A0 = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C8AC, 0x44C7C4 );  //     *(DWORD *)0x44C8AC = 0x44C7C4;
+    MemPut < DWORD > ( 0x44C8B0, 0x44C7C4 );  //     *(DWORD *)0x44C8B0 = 0x44C7C4;
 
-    MemPut < BYTE > ( 0x44C39A + 0, 0x0F );
-    MemPut < BYTE > ( 0x44C39A + 1, 0x84 );
-    MemPut < BYTE > ( 0x44C39A + 2, 0x24 );
-    MemPut < BYTE > ( 0x44C39A + 3, 0x04 );
-    MemPut < BYTE > ( 0x44C39A + 4, 0x00 );
-    MemPut < BYTE > ( 0x44C39A + 5, 0x00 );
+    MemPut < BYTE > ( 0x44C39A + 0, 0x0F );  //     *(BYTE *)(0x44C39A + 0) = 0x0F;
+    MemPut < BYTE > ( 0x44C39A + 1, 0x84 );  //     *(BYTE *)(0x44C39A + 1) = 0x84;
+    MemPut < BYTE > ( 0x44C39A + 2, 0x24 );  //     *(BYTE *)(0x44C39A + 2) = 0x24;
+    MemPut < BYTE > ( 0x44C39A + 3, 0x04 );  //     *(BYTE *)(0x44C39A + 3) = 0x04;
+    MemPut < BYTE > ( 0x44C39A + 4, 0x00 );  //     *(BYTE *)(0x44C39A + 4) = 0x00;
+    MemPut < BYTE > ( 0x44C39A + 5, 0x00 );  //     *(BYTE *)(0x44C39A + 5) = 0x00;
 
     // Avoid garage doors closing when you change your model
     MemSet ((LPVOID)0x4486F7, 0x90, 4);
     
 
     // Disable CStats::IncrementStat (returns at start of function)
-    MemPut < BYTE > ( 0x55C180, 0xC3 );
+    MemPut < BYTE > ( 0x55C180, 0xC3 );  //     *(BYTE *)0x55C180 = 0xC3;
     /*
     MemSet ((void *)0x55C1A9, 0x90, 14 );
     MemSet ((void *)0x55C1DD, 0x90, 7 );
@@ -791,16 +755,16 @@ void CMultiplayerSA::InitHooks()
     // ALLOW more than 8 players (crash with more if this isn't done)
     //0060D64D   90               NOP
     //0060D64E   E9 9C000000      JMP gta_sa.0060D6EF
-    MemPut < BYTE > ( 0x60D64D, 0x90 );
-    MemPut < BYTE > ( 0x60D64E, 0xE9 );
+    MemPut < BYTE > ( 0x60D64D, 0x90 );  //     *(BYTE *)0x60D64D = 0x90;
+    MemPut < BYTE > ( 0x60D64E, 0xE9 );  //     *(BYTE *)0x60D64E = 0xE9;
 
     // PREVENT CJ smoking and drinking like an addict
     //005FBA26   EB 29            JMP SHORT gta_sa.005FBA51
-    MemPut < BYTE > ( 0x5FBA26, 0xEB );
+    MemPut < BYTE > ( 0x5FBA26, 0xEB );  //     *(BYTE *)0x5FBA26 = 0xEB;
 
     // PREVENT the camera from messing up for drivebys for vehicle drivers
-    MemPut < BYTE > ( 0x522423, 0x90 );
-    MemPut < BYTE > ( 0x522424, 0x90 );
+    MemPut < BYTE > ( 0x522423, 0x90 );  //     *(BYTE *)0x522423 = 0x90;
+    MemPut < BYTE > ( 0x522424, 0x90 );  //     *(BYTE *)0x522424 = 0x90;
     
     LPVOID patchAddress = NULL;
     // ALLOW ALT+TABBING WITHOUT PAUSING
@@ -815,45 +779,45 @@ void CMultiplayerSA::InitHooks()
     // CENTER VEHICLE NAME and ZONE NAME messages
     // 0058B0AD   6A 02            PUSH 2 // orientation
     // VEHICLE
-    MemPut < BYTE > ( 0x58B0AE, 0x00 );
+    MemPut < BYTE > ( 0x58B0AE, 0x00 );  //     *(BYTE *)0x58B0AE = 0x00;
 
     // ZONE
-    MemPut < BYTE > ( 0x58AD56, 0x00 );
+    MemPut < BYTE > ( 0x58AD56, 0x00 );  //     *(BYTE *)0x58AD56 = 0x00;
 
     // 85953C needs to equal 320.0 to center the text (640.0 being the base width)
-    MemPut < float > ( 0x85953C, 320.0f );
+    MemPut < float > ( 0x85953C, 320.0f );  //     *(float *)0x85953C = 320.0f;
 
     // 0058B147   D80D 0C958500    FMUL DWORD PTR DS:[85950C] // the text needs to be moved to the left
     //VEHICLE
-    MemPut < BYTE > ( 0x58B149, 0x3C );
+    MemPut < BYTE > ( 0x58B149, 0x3C );  //     *(BYTE *)0x58B149 = 0x3C;
 
     //ZONE
-    MemPut < BYTE > ( 0x58AE52, 0x3C );
+    MemPut < BYTE > ( 0x58AE52, 0x3C );  //     *(BYTE *)0x58AE52 = 0x3C;
 
     // DISABLE SAM SITES
-    MemPut < BYTE > ( 0x5A07D0, 0xC3 );
+    MemPut < BYTE > ( 0x5A07D0, 0xC3 );  //     *(BYTE *)0x5A07D0 = 0xC3;
 
     // DISABLE TRAINS (AUTO GENERATED ONES)
-    MemPut < BYTE > ( 0x6F7900, 0xC3 );
+    MemPut < BYTE > ( 0x6F7900, 0xC3 );  //     *(BYTE *)0x6F7900 = 0xC3;
     
     // Prevent TRAINS spawning with PEDs
-    MemPut < BYTE > ( 0x6F7865, 0xEB );
+    MemPut < BYTE > ( 0x6F7865, 0xEB );  //     *(BYTE *)0x6F7865 = 0xEB;
 
     // DISABLE PLANES
-    MemPut < BYTE > ( 0x6CD2F0, 0xC3 );
+    MemPut < BYTE > ( 0x6CD2F0, 0xC3 );  //     *(BYTE *)0x6CD2F0 = 0xC3;
     
     // DISABLE EMERGENCY VEHICLES
-    MemPut < BYTE > ( 0x42B7D0, 0xC3 );
+    MemPut < BYTE > ( 0x42B7D0, 0xC3 );  //     *(BYTE *)0x42B7D0 = 0xC3;
 
     // DISABLE CAR GENERATORS
-    MemPut < BYTE > ( 0x6F3F40, 0xC3 );
+    MemPut < BYTE > ( 0x6F3F40, 0xC3 );  //     *(BYTE *)0x6F3F40 = 0xC3;
 
     // DISABLE CEntryExitManager::Update (they crash when you enter anyway)
-    MemPut < BYTE > ( 0x440D10, 0xC3 );
+    MemPut < BYTE > ( 0x440D10, 0xC3 );  //     *(BYTE *)0x440D10 = 0xC3;
 
     // Disable MENU AFTER alt + tab
     //0053BC72   C605 7B67BA00 01 MOV BYTE PTR DS:[BA677B],1    
-    MemPut < BYTE > ( 0x53BC78, 0x00 );
+    MemPut < BYTE > ( 0x53BC78, 0x00 );  //     *(BYTE *)0x53BC78 = 0x00;
 
     // DISABLE HUNGER MESSAGES
     MemSet ( (LPVOID)0x56E740, 0x90, 5 );
@@ -863,31 +827,31 @@ void CMultiplayerSA::InitHooks()
 
     // DISABLE CPOPULATION::UPDATE - DOES NOT prevent vehicles - only on-foot peds
     /*  
-    MemPut < BYTE > ( 0x616650, 0xC3 );
-    MemPut < BYTE > ( 0xA43088, 1 );
+    MemPut < BYTE > ( 0x616650, 0xC3 );  //     *(BYTE *)0x616650 = 0xC3;
+    MemPut < BYTE > ( 0xA43088, 1 );  //     *(BYTE *)0xA43088 = 1;
     */
 
     // SORT OF HACK to make peds always walk around, even when in free-camera mode (in the editor)
-    MemPut < BYTE > ( 0x53C017, 0x90 );
-    MemPut < BYTE > ( 0x53C018, 0x90 );
+    MemPut < BYTE > ( 0x53C017, 0x90 );  //     *(BYTE *)0x53C017 = 0x90;
+    MemPut < BYTE > ( 0x53C018, 0x90 );  //     *(BYTE *)0x53C018 = 0x90;
 
     // DISABLE random cars
     //*(BYTE *)0x4341C0 = 0xC3;
     
     // DISABLE heat flashes
     /*
-    MemPut < BYTE > ( 0x6E3521, 0x90 );
-    MemPut < BYTE > ( 0x6E3522, 0xE9 );
+    MemPut < BYTE > ( 0x6E3521, 0x90 );  //     *(BYTE *)0x6E3521 = 0x90;
+    MemPut < BYTE > ( 0x6E3522, 0xE9 );  //     *(BYTE *)0x6E3522 = 0xE9;
     */
 
     // DECREASE ROF for missiles from hydra
     // 006D462C     81E1 E8030000  AND ECX,3E8
     // 006D4632     81C1 E8030000  ADD ECX,3E8
     /*  
-    MemPut < BYTE > ( 0x6D462E, 0xE8 );
-    MemPut < BYTE > ( 0x6D462F, 0x03 );
-    MemPut < BYTE > ( 0x6D4634, 0xE8 );
-    MemPut < BYTE > ( 0x6D4635, 0x03 );
+    MemPut < BYTE > ( 0x6D462E, 0xE8 );  //     *(BYTE *)0x6D462E = 0xE8;
+    MemPut < BYTE > ( 0x6D462F, 0x03 );  //     *(BYTE *)0x6D462F = 0x03;
+    MemPut < BYTE > ( 0x6D4634, 0xE8 );  //     *(BYTE *)0x6D4634 = 0xE8;
+    MemPut < BYTE > ( 0x6D4635, 0x03 );  //     *(BYTE *)0x6D4635 = 0x03;
     */
 
     // HACK to allow boats to be rotated
@@ -898,64 +862,64 @@ void CMultiplayerSA::InitHooks()
     006F208C   90               NOP
     006F208D   90               NOP
     */
-    MemPut < BYTE > ( 0x6F2089, 0x58 );
+    MemPut < BYTE > ( 0x6F2089, 0x58 );  //     *(BYTE *)0x6F2089 = 0x58;
     MemSet ((void *)0x6F208A,0x90,4);
 
     // Prevent the game deleting _any_ far away vehicles - will cause issues for population vehicles in the future
-    MemPut < BYTE > ( 0x42CD10, 0xC3 );
+    MemPut < BYTE > ( 0x42CD10, 0xC3 );  //     *(BYTE *)0x42CD10 = 0xC3;
 
     // DISABLE real-time shadows for peds
-    MemPut < BYTE > ( 0x5E68A0, 0xEB );
+    MemPut < BYTE > ( 0x5E68A0, 0xEB );  //     *(BYTE *)0x5E68A0 = 0xEB;
 
     // and some more, just to be safe
     //00542483   EB 0B            JMP SHORT gta_sa.00542490
-    MemPut < BYTE > ( 0x542483, 0xEB );
+    MemPut < BYTE > ( 0x542483, 0xEB );  //     *(BYTE *)0x542483 = 0xEB;
 
     // DISABLE weapon pickups
-    MemPut < BYTE > ( 0x5B47B0, 0xC3 );
+    MemPut < BYTE > ( 0x5B47B0, 0xC3 );  //     *(BYTE *)0x5B47B0 = 0xC3;
 
     // INCREASE CEntyInfoNode pool size
     //00550FB9   68 F4010000      PUSH 1F4
     /*
-    MemPut < BYTE > ( 0x550FBA, 0xE8 );
-    MemPut < BYTE > ( 0x550FBB, 0x03 );
+    MemPut < BYTE > ( 0x550FBA, 0xE8 );  //     *(BYTE *)0x550FBA = 0xE8;
+    MemPut < BYTE > ( 0x550FBB, 0x03 );  //     *(BYTE *)0x550FBB = 0x03;
     */
-    MemPut < BYTE > ( 0x550FBA, 0x00 );
-    MemPut < BYTE > ( 0x550FBB, 0x10 );
+    MemPut < BYTE > ( 0x550FBA, 0x00 );  //     *(BYTE *)0x550FBA = 0x00;
+    MemPut < BYTE > ( 0x550FBB, 0x10 );  //     *(BYTE *)0x550FBB = 0x10;
 
     
     /*
-    MemPut < BYTE > ( 0x469F00, 0xC3 );
+    MemPut < BYTE > ( 0x469F00, 0xC3 );  //     *(BYTE *)0x469F00 = 0xC3;
     */
 
     // CCAM::PROCESSFIXED remover
 /*
-    MemPut < BYTE > ( 0x51D470, 0xC2 );
-    MemPut < BYTE > ( 0x51D471, 0x10 );
-    MemPut < BYTE > ( 0x51D472, 0x00 );
+    MemPut < BYTE > ( 0x51D470, 0xC2 );  //     *(BYTE *)0x51D470 = 0xC2;
+    MemPut < BYTE > ( 0x51D471, 0x10 );  //     *(BYTE *)0x51D471 = 0x10;
+    MemPut < BYTE > ( 0x51D472, 0x00 );  //     *(BYTE *)0x51D472 = 0x00;
 */
 
     // HACK to prevent RealTimeShadowManager crash
     // 00542483     EB 0B          JMP SHORT gta_sa_u.00542490
     /*
-    MemPut < BYTE > ( 0x542483, 0xEB );
+    MemPut < BYTE > ( 0x542483, 0xEB );  //     *(BYTE *)0x542483 = 0xEB;
 */
     
     //InitShotsyncHooks();
 
     //DISABLE CPad::ReconcileTwoControllersInput
-    MemPut < BYTE > ( 0x53F530, 0xC2 );
-    MemPut < BYTE > ( 0x53F531, 0x0C );
-    MemPut < BYTE > ( 0x53F532, 0x00 );
+    MemPut < BYTE > ( 0x53F530, 0xC2 );  //     *(BYTE *)0x53F530 = 0xC2;
+    MemPut < BYTE > ( 0x53F531, 0x0C );  //     *(BYTE *)0x53F531 = 0x0C;
+    MemPut < BYTE > ( 0x53F532, 0x00 );  //     *(BYTE *)0x53F532 = 0x00;
 
-    MemPut < BYTE > ( 0x53EF80, 0xC3 );
+    MemPut < BYTE > ( 0x53EF80, 0xC3 );  //     *(BYTE *)0x53EF80 = 0xC3;
 
-    MemPut < BYTE > ( 0x541DDC, 0xEB );
-    MemPut < BYTE > ( 0x541DDD, 0x60 );
+    MemPut < BYTE > ( 0x541DDC, 0xEB );  //     *(BYTE *)0x541DDC = 0xEB;
+    MemPut < BYTE > ( 0x541DDD, 0x60 );  //     *(BYTE *)0x541DDD = 0x60;
 
     // DISABLE CWanted Helis (always return 0 from CWanted::NumOfHelisRequired)
-    MemPut < BYTE > ( 0x561FA4, 0x90 );
-    MemPut < BYTE > ( 0x561FA5, 0x90 );
+    MemPut < BYTE > ( 0x561FA4, 0x90 );  //     *(BYTE *)0x561FA4 = 0x90;
+    MemPut < BYTE > ( 0x561FA5, 0x90 );  //     *(BYTE *)0x561FA5 = 0x90;
 
     // DISABLE  CWanted__UpdateEachFrame
     MemSet ( (void*)0x53BFF6, 0x90, 5 );
@@ -964,25 +928,25 @@ void CMultiplayerSA::InitHooks()
     MemSet ( (void*)0x60EBCC, 0x90, 5 );
 
     // Disable armour-increase upon entering an enforcer
-    MemPut < BYTE > ( 0x6D189B, 0x06 );
+    MemPut < BYTE > ( 0x6D189B, 0x06 );  //     *(BYTE *)0x6D189B = 0x06;
 
     // Removes the last weapon pickups from interiors as well
-    MemPut < BYTE > ( 0x591F90, 0xC3 );
+    MemPut < BYTE > ( 0x591F90, 0xC3 );  //     *(BYTE *)0x591F90 = 0xC3;
 
     // Trains may infact go further than Los Santos
-    MemPut < BYTE > ( 0x4418E0, 0xC3 );
+    MemPut < BYTE > ( 0x4418E0, 0xC3 );  //     *(BYTE *)0x4418E0 = 0xC3;
 
     // EXPERIMENTAL - disable unloading of cols
    // MemSet ( (void*)0x4C4EDA, 0x90, 10 );
 
     // Make CTaskComplexSunbathe::CanSunbathe always return true
-    MemPut < BYTE > ( 0x632140, 0xB0 );
-    MemPut < BYTE > ( 0x632141, 0x01 );
-    MemPut < BYTE > ( 0x632142, 0xC3 );
+    MemPut < BYTE > ( 0x632140, 0xB0 );  //     *(BYTE *)0x632140 = 0xB0;
+    MemPut < BYTE > ( 0x632141, 0x01 );  //     *(BYTE *)0x632141 = 0x01;
+    MemPut < BYTE > ( 0x632142, 0xC3 );  //     *(BYTE *)0x632142 = 0xC3;
     
     // Stop CTaskSimpleCarDrive::ProcessPed from exiting passengers with CTaskComplexSequence (some timer check)
-    MemPut < BYTE > ( 0x644C18, 0x90 );
-    MemPut < BYTE > ( 0x644C19, 0xE9 );
+    MemPut < BYTE > ( 0x644C18, 0x90 );  //     *(BYTE *)0x644C18 = 0x90;
+    MemPut < BYTE > ( 0x644C19, 0xE9 );  //     *(BYTE *)0x644C19 = 0xE9;
 
     // Stop CPlayerPed::ProcessControl from calling CVisibilityPlugins::SetClumpAlpha
     MemSet ( (void*)0x5E8E84, 0x90, 5 );
@@ -992,12 +956,12 @@ void CMultiplayerSA::InitHooks()
 
     // Disable CVehicle::DoDriveByShootings
     MemSet ( (void*)0x741FD0, 0x90, 3 );
-    MemPut < BYTE > ( 0x741FD0, 0xC3 );
+    MemPut < BYTE > ( 0x741FD0, 0xC3 );  //     *(BYTE *)0x741FD0 = 0xC3;
 
     // Disable CTaskSimplePlayerOnFoot::PlayIdleAnimations (ret 4)
-    MemPut < BYTE > ( 0x6872C0, 0xC2 );
-    MemPut < BYTE > ( 0x6872C1, 0x04 );
-    MemPut < BYTE > ( 0x6872C2, 0x00 );
+    MemPut < BYTE > ( 0x6872C0, 0xC2 );  //     *(BYTE *)0x6872C0 = 0xC2;
+    MemPut < BYTE > ( 0x6872C1, 0x04 );  //     *(BYTE *)0x6872C1 = 0x04;
+    MemPut < BYTE > ( 0x6872C2, 0x00 );  //     *(BYTE *)0x6872C2 = 0x00;
 
     /*
     // Disable forcing of ped animations to the player one in CPlayerPed::ProcessAnimGroups
@@ -1005,48 +969,48 @@ void CMultiplayerSA::InitHooks()
     */
 
     // Let us sprint everywhere (always return 0 from CSurfaceData::isSprint)
-    MemPut < DWORD > ( 0x55E870, 0xC2C03366 );
-    MemPut < WORD > ( 0x55E874, 0x0004 );
+    MemPut < DWORD > ( 0x55E870, 0xC2C03366 );  //     *(DWORD *)0x55E870 = 0xC2C03366;
+    MemPut < WORD > ( 0x55E874, 0x0004 );  //     *(WORD *)0x55E874  = 0x0004;
 
     // Create pickup objects in interior 0 instead of 13
-    MemPut < BYTE > ( 0x59FAA3, 0x00 );
+    MemPut < BYTE > ( 0x59FAA3, 0x00 );  //     *(BYTE *)0x59FAA3 = 0x00;
 
     // Don't get shotguns from police cars
-    MemPut < BYTE > ( 0x6D19CD, 0xEB );
+    MemPut < BYTE > ( 0x6D19CD, 0xEB );  //     *(BYTE *)0x6D19CD = 0xEB;
 
     // Don't get golf clubs from caddies
-    MemPut < BYTE > ( 0x6D1A1A, 0xEB );
+    MemPut < BYTE > ( 0x6D1A1A, 0xEB );  //     *(BYTE *)0x6D1A1A = 0xEB;
 
     // Don't get 20 health from ambulances
-    MemPut < BYTE > ( 0x6D1762, 0x00 );
+    MemPut < BYTE > ( 0x6D1762, 0x00 );  //     *(BYTE *)0x6D1762 = 0x00;
 
     // Prevent CVehicle::RecalcTrainRailPosition from changing train speed
     MemSet ((void *)0x6F701D, 0x90, 6);
-    MemPut < BYTE > ( 0x6F7069, 0xEB );
+    MemPut < BYTE > ( 0x6F7069, 0xEB );  //     *(BYTE *)0x6F7069 = 0xEB;
 
     // The instanthit function for bullets ignores the first few bullets shot by
     // remote players after reloading because some flag isn't set (no bullet impact
     // graphics, no damage). Makes e.g. sawnoffs completely ineffective.
     // Remove this check so that no bullets are ignored.
-    MemPut < BYTE > ( 0x73FDF9, 0xEB );
+    MemPut < BYTE > ( 0x73FDF9, 0xEB );  //     *(BYTE *)0x73FDF9 = 0xEB;
 
     // Allow turning on vehicle lights even if the engine is off
     MemSet ( (void *)0x6E1DBC, 0x90, 8 );
 
     // Fix vehicle back lights both using light state 3 (SA bug)
-    MemPut < BYTE > ( 0x6E1D4F, 2 );
+    MemPut < BYTE > ( 0x6E1D4F, 2 );  //     *(BYTE *)0x6E1D4F = 2;
 
     // Fix for sliding over objects and vehicles (ice floor)
-    MemPut < BYTE > ( 0x5E1E72, 0xE9 );
-    MemPut < BYTE > ( 0x5E1E73, 0xB9 );
-    MemPut < BYTE > ( 0x5E1E74, 0x00 );
-    MemPut < BYTE > ( 0x5E1E77, 0x90 );
+    MemPut < BYTE > ( 0x5E1E72, 0xE9 );  //     *(BYTE *)0x5E1E72 = 0xE9;
+    MemPut < BYTE > ( 0x5E1E73, 0xB9 );  //     *(BYTE *)0x5E1E73 = 0xB9;
+    MemPut < BYTE > ( 0x5E1E74, 0x00 );  //     *(BYTE *)0x5E1E74 = 0x00;
+    MemPut < BYTE > ( 0x5E1E77, 0x90 );  //     *(BYTE *)0x5E1E77 = 0x90;
 
     // Avoid GTA setting vehicle first color to white after changing the paintjob
     MemSet ( (void *)0x6D65C5, 0x90, 11 );
 
     // Disable idle cam
-    MemPut < BYTE > ( 0x522C80, 0xC3 );
+    MemPut < BYTE > ( 0x522C80, 0xC3 );  //     *(BYTE *)0x522C80 = 0xC3;
 
     // Disable radar map hiding when pressing TAB (action key) while on foot
     MemSet ( (void *)0x58FC3E, 0x90, 14 );
@@ -1054,119 +1018,97 @@ void CMultiplayerSA::InitHooks()
     // No intro movies kthx
     if ( version == VERSION_US_10 )
     {
-        MemPut < DWORD > ( 0x748EF8, 0x748AE7 );
-        MemPut < DWORD > ( 0x748EFC, 0x748B08 );
-        MemPut < BYTE > ( 0x748B0E, 5 );
+        MemPut < DWORD > ( 0x748EF8, 0x748AE7 );  //         *(DWORD *)0x748EF8 = 0x748AE7;
+        MemPut < DWORD > ( 0x748EFC, 0x748B08 );  //         *(DWORD *)0x748EFC = 0x748B08;
+        MemPut < BYTE > ( 0x748B0E, 5 );  //         *(BYTE *)0x748B0E = 5;
     }
     else if ( version == VERSION_EU_10 )
     {
-        MemPut < DWORD > ( 0x748F48, 0x748B37 );
-        MemPut < DWORD > ( 0x748F4C, 0x748B58 );
-        MemPut < BYTE > ( 0x748B5E, 5 );
+        MemPut < DWORD > ( 0x748F48, 0x748B37 );  //         *(DWORD *)0x748F48 = 0x748B37;
+        MemPut < DWORD > ( 0x748F4C, 0x748B58 );  //         *(DWORD *)0x748F4C = 0x748B58;
+        MemPut < BYTE > ( 0x748B5E, 5 );  //         *(BYTE *)0x748B5E = 5;
     }
 
     // Force triggering of the damage event for players on fire
     MemSet ( (void *)0x633695, 0x90, 6 );
-    MemPut < BYTE > ( 0x633720, 0 );
+    MemPut < BYTE > ( 0x633720, 0 );  //     *(BYTE *)0x633720 = 0;
 
     // Make CCreepingFire::TryToStartFireAtCoors return the fire pointer rather than a bool
-    MemPut < BYTE > ( 0x53A459, 0x33 );
-    MemPut < BYTE > ( 0x53A568, 0x8B );
-    MemPut < BYTE > ( 0x53A4A9, 0x33 );
-    MemPut < WORD > ( 0x53A55F, 0x9090 );
-    MemPut < BYTE > ( 0x73EC06, 0x85 );
+    MemPut < BYTE > ( 0x53A459, 0x33 );  //     *(BYTE *)0x53A459 = 0x33;
+    MemPut < BYTE > ( 0x53A568, 0x8B );  //     *(BYTE *)0x53A568 = 0x8B;
+    MemPut < BYTE > ( 0x53A4A9, 0x33 );  //     *(BYTE *)0x53A4A9 = 0x33;
+    MemPut < WORD > ( 0x53A55F, 0x9090 );  //     *(WORD *)0x53A55F = 0x9090;
+    MemPut < BYTE > ( 0x73EC06, 0x85 );  //     *(BYTE *)0x73EC06 = 0x85;
 
     // Increase the events pool size (Fixes #4577).
-    MemPut < DWORD > ( 0x551177, 9001 );
+    MemPut < DWORD > ( 0x551177, 9001 );  //     *(DWORD *)0x551177 = 9001;
 
     // Do not fixate camera behind spectated player if local player is dead
-    MemPut < BYTE > ( 0x52A2BB, 0 );
-    MemPut < BYTE > ( 0x52A4F8, 0 );
+    MemPut < BYTE > ( 0x52A2BB, 0 );  //     *(BYTE *)0x52A2BB = 0;
+    MemPut < BYTE > ( 0x52A4F8, 0 );  //     *(BYTE *)0x52A4F8 = 0;
 
     // Always render water after other entities (otherwise underwater LODs and trees are rendered
     // in front of it)
-    MemPut < BYTE > ( 0x53DFF5, 0xEB );
-    MemPut < WORD > ( 0x53E133, 0x9090 );
+    MemPut < BYTE > ( 0x53DFF5, 0xEB );  //     *(BYTE *)0x53DFF5 = 0xEB;
+    MemPut < WORD > ( 0x53E133, 0x9090 );  //     *(WORD *)0x53E133 = 0x9090;
     // Disable some stack management instructions as we need ebx for a bit longer. We replicate
     // these in HOOK_RenderScene_end
-    MemPut < BYTE > ( 0x53E132, 0x90 );
+    MemPut < BYTE > ( 0x53E132, 0x90 );  //     *(BYTE *)0x53E132 = 0x90;
     MemSet ( (void *)0x53E156, 0x90, 3 );
     // Use 0.5 instead of 0.0 for underwater threshold
-    MemPut < DWORD > ( 0x53DF4B, 0x858B8C );
+    MemPut < DWORD > ( 0x53DF4B, 0x858B8C );  //     *(DWORD *)0x53DF4B = 0x858B8C;
 
     // Disable setting players on fire when they're riding burning bmx's (see #4573)
-    MemPut < BYTE > ( 0x53A982, 0xEB );
+    MemPut < BYTE > ( 0x53A982, 0xEB );  //     * ( BYTE * ) ( 0x53A982 ) = 0xEB;
 
     // Disable stealth-kill aiming (holding knife up)
     MemSet ( (void *)0x685DFB, 0x90, 5 );
-    MemPut < BYTE > ( 0x685DFB, 0x33 );
-    MemPut < BYTE > ( 0x685DFC, 0xC0 );
+    MemPut < BYTE > ( 0x685DFB, 0x33 );  //     * ( BYTE * ) ( 0x685DFB ) = 0x33;
+    MemPut < BYTE > ( 0x685DFC, 0xC0 );  //     * ( BYTE * ) ( 0x685DFC ) = 0xC0;
     MemSet ( (void *)0x685C3E, 0x90, 5 );
-    MemPut < BYTE > ( 0x685C3E, 0x33 );
-    MemPut < BYTE > ( 0x685C3F, 0xC0 );
+    MemPut < BYTE > ( 0x685C3E, 0x33 );  //     * ( BYTE * ) ( 0x685C3E ) = 0x33;
+    MemPut < BYTE > ( 0x685C3F, 0xC0 );  //     * ( BYTE * ) ( 0x685C3F ) = 0xC0;
     MemSet ( (void *)0x685DC4, 0x90, 5 );
-    MemPut < BYTE > ( 0x685DC4, 0x33 );
-    MemPut < BYTE > ( 0x685DC5, 0xC0 );
+    MemPut < BYTE > ( 0x685DC4, 0x33 );  //     * ( BYTE * ) ( 0x685DC4 ) = 0x33;
+    MemPut < BYTE > ( 0x685DC5, 0xC0 );  //     * ( BYTE * ) ( 0x685DC5 ) = 0xC0;
     MemSet ( (void *)0x685DE6, 0x90, 5 );
-    MemPut < BYTE > ( 0x685DE6, 0x33 );
-    MemPut < BYTE > ( 0x685DE7, 0xC0 );
+    MemPut < BYTE > ( 0x685DE6, 0x33 );  //     * ( BYTE * ) ( 0x685DE6 ) = 0x33;
+    MemPut < BYTE > ( 0x685DE7, 0xC0 );  //     * ( BYTE * ) ( 0x685DE7 ) = 0xC0;
 
     // #4937, Disable stealth-kill rotation in CTaskSimpleStealthKill::ProcessPed
     // Used to face the dying ped away from the killer.
     MemSet ( (void *)0x62E63F, 0x90, 6 );
-    MemPut < BYTE > ( 0x62E63F, 0xDD );
-    MemPut < BYTE > ( 0x62E640, 0xD8 );
+    MemPut < BYTE > ( 0x62E63F, 0xDD );  //     * ( BYTE * ) ( 0x62E63F ) = 0xDD;
+    MemPut < BYTE > ( 0x62E640, 0xD8 );  //     * ( BYTE * ) ( 0x62E640 ) = 0xD8;
     MemSet ( (void *)0x62E659, 0x90, 6 );
-    MemPut < BYTE > ( 0x62E659, 0xDD );
-    MemPut < BYTE > ( 0x62E65A, 0xD8 );
+    MemPut < BYTE > ( 0x62E659, 0xDD );  //     * ( BYTE * ) ( 0x62E659 ) = 0xDD;
+    MemPut < BYTE > ( 0x62E65A, 0xD8 );  //     * ( BYTE * ) ( 0x62E65A ) = 0xD8;
     MemSet ( (void *)0x62E692, 0x90, 6 );
-    MemPut < BYTE > ( 0x62E692, 0xDD );
-    MemPut < BYTE > ( 0x62E693, 0xD8 );
+    MemPut < BYTE > ( 0x62E692, 0xDD );  //     * ( BYTE * ) ( 0x62E692 ) = 0xDD;
+    MemPut < BYTE > ( 0x62E693, 0xD8 );  //     * ( BYTE * ) ( 0x62E693 ) = 0xD8;
 
     // Allow all screen aspect ratios
-    MemPut < WORD > ( 0x745BC9, 0x9090 );
+    MemPut < WORD > ( 0x745BC9, 0x9090 );  //     *(WORD *)0x745BC9 = 0x9090;
 
     // Allow all screen aspect ratios in multi-monitor dialog
-    MemPut < WORD > ( 0x7459E1, 0x9090 );
+    MemPut < WORD > ( 0x7459E1, 0x9090 );  //     *(WORD *)0x7459E1 = 0x9090;
 
     // Show the GTA:SA Main menu, this fixes some issues (#4374 and MAYBE #4000).
     // We are hiding the menu in "void CGameSA::Initialize ( void )".
     // 
     // - Sebas
-    MemPutFast < BYTE > ( (0xBA6748)+0x5C, 1 );
+    MemPut < BYTE > ( (0xBA6748)+0x5C, 1 );  //     *(BYTE *)((0xBA6748)+0x5C) = 1;
 
     // Force the MrWhoopee music to load even if we are not the driver.
-    MemPut < BYTE > ( 0x4F9CCE, 0xCE );
+    MemPut < BYTE > ( 0x4F9CCE, 0xCE );  //     *(BYTE *)(0x4F9CCE) = 0xCE;
 
     // Disable re-initialization of DirectInput mouse device by the game
-    MemPut < BYTE > ( 0x576CCC, 0xEB );
-    MemPut < BYTE > ( 0x576EBA, 0xEB );
-    MemPut < BYTE > ( 0x576F8A, 0xEB );
+    MemPut < BYTE > ( 0x576CCC, 0xEB );  //     *(BYTE *)0x576CCC = 0xEB;
+    MemPut < BYTE > ( 0x576EBA, 0xEB );  //     *(BYTE *)0x576EBA = 0xEB;
+    MemPut < BYTE > ( 0x576F8A, 0xEB );  //     *(BYTE *)0x576F8A = 0xEB;
 
     // Make sure DirectInput mouse device is set non-exclusive (may not be needed?)
-    MemPut < DWORD > ( 0x7469A0, 0x909000B0 );
-
-    // Disable the GTASA main menu.
-    MemSet ( (void *)0x57BA57, 0x90, 6 );
-
-    // Disable the loading screen tune.
-    if ( version == VERSION_US_10 )
-        MemSet ( (void *)0x748CF6, 0x90, 5 );
-    else if ( version == VERSION_EU_10 )
-        MemSet ( (void *)0x748D46, 0x90, 5 );
-
-    // Do not render the loading screen.
-    MemSet ( (void *)0x590D7C, 0x90, 5 );
-    MemSet ( (void *)0x590DB3, 0x90, 5 );
-    MemCpy ( (void *)0x590D9F, "\xC3\x90\x90\x90\x90", 5 );
-
-    // Disable ped to player conversations.
-    MemSet ( (void *)0x53C127, 0x90, 10 );
-
-#if 0
-    // Mute peds (would break setPedVoice).
-    MemCpy ( (void *)0x5EFFE0, "\xC2\x18\x00\x90", 4 );
-#endif
+    MemPut < DWORD > ( 0x7469A0, 0x909000B0 );  //     *(DWORD *)0x7469A0 = 0x909000B0;
 }
 
 
@@ -1254,83 +1196,22 @@ void CMultiplayerSA::DisablePadHandler ( bool bDisabled )
 {
     // DISABLE GAMEPADS (testing)
     if ( bDisabled )
-        MemPut < BYTE > ( 0x7449F0, 0xC3 );
+        MemPut < BYTE > ( 0x7449F0, 0xC3 );  //         *(BYTE *)0x7449F0 = 0xC3;
     else
-        MemPut < BYTE > ( 0x7449F0, 0x8B );
+        MemPut < BYTE > ( 0x7449F0, 0x8B );  //         *(BYTE *)0x7449F0 = 0x8B;
 }
 
-
-void CMultiplayerSA::GetHeatHaze ( SHeatHazeSettings& settings )
+void CMultiplayerSA::DisableHeatHazeEffect ( bool bDisable )
 {
-    settings.ucIntensity = *(int*)0x8D50E8;
-    settings.ucRandomShift = *(int*)0xC402C0;
-    settings.usSpeedMin = *(int*)0x8D50EC;
-    settings.usSpeedMax = *(int*)0x8D50F0;
-    settings.sScanSizeX = *(int*)0xC40304;
-    settings.sScanSizeY = *(int*)0xC40308;
-    settings.usRenderSizeX = *(int*)0xC4030C;
-    settings.usRenderSizeY = *(int*)0xC40310;
-    settings.bInsideBuilding = *(bool*)0xC402BA;
+    MemPut < bool > ( 0xC402BA, bDisable );  //     *(bool *)0xC402BA = bDisable;
 }
-
-
-void DoSetHeatHazePokes ( const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed, bool bAllowAutoTypeChange  )
-{
-    MemPutFast < int > ( 0x8D50D4, iHourStart );
-    MemPutFast < int > ( 0x8D50D8, iHourEnd );
-
-    MemPutFast < float > ( 0x8D50DC, fFadeSpeed );
-    MemPutFast < float > ( 0x8D50E0, fInsideBuildingFadeSpeed );
-
-    MemPutFast < int > ( 0x8D50E8, settings.ucIntensity );
-    MemPutFast < int > ( 0xC402C0, settings.ucRandomShift );
-    MemPutFast < int > ( 0x8D50EC, settings.usSpeedMin );
-    MemPutFast < int > ( 0x8D50F0, settings.usSpeedMax );
-    MemPutFast < int > ( 0xC40304, settings.sScanSizeX );
-    MemPutFast < int > ( 0xC40308, settings.sScanSizeY );
-    MemPutFast < int > ( 0xC4030C, settings.usRenderSizeX );
-    MemPutFast < int > ( 0xC40310, settings.usRenderSizeY );
-    MemPutFast < bool > ( 0xC402BA, settings.bInsideBuilding );
-
-    if ( bAllowAutoTypeChange )
-        MemPut < BYTE > ( 0x701455, 0x83 ); // sub
-    else
-        MemPut < BYTE > ( 0x701455, 0xC3 ); // retn
-}
-
-
-void CMultiplayerSA::SetHeatHaze ( const SHeatHazeSettings& settings )
-{
-    if ( settings.ucIntensity != 0 )
-        DoSetHeatHazePokes ( settings, 0, 24, 1.0f, 1.0f, false );    // 24 hrs
-    else
-        DoSetHeatHazePokes ( settings, 38, 39, 1.0f, 1.0f, false );   // 0 hrs
-}
-
-
-void CMultiplayerSA::ResetHeatHaze ( void )
-{
-    SHeatHazeSettings settings;
-    settings.ucIntensity = 0x50;
-    settings.ucRandomShift = 0x0;
-    settings.usSpeedMin = 0x0C;
-    settings.usSpeedMax = 0x12;
-    settings.sScanSizeX = 0x4B;
-    settings.sScanSizeY = 0x50;
-    settings.usRenderSizeX = 0x50;
-    settings.usRenderSizeY = 0x55;
-    settings.bInsideBuilding = false;
-
-    DoSetHeatHazePokes ( settings, 10, 19, 0.05f, 1.0f, true );   // defaults
-}
-
 
 void CMultiplayerSA::DisableAllVehicleWeapons ( bool bDisable )
 {
     if ( bDisable )
-        MemPut < BYTE > ( 0x6E3950, 0xC3 );
+        MemPut < BYTE > ( 0x6E3950, 0xC3 );  //         *(BYTE *)0x6E3950 = 0xC3;
     else
-        MemPut < BYTE > ( 0x6E3950, 0x83 );
+        MemPut < BYTE > ( 0x6E3950, 0x83 );  //         *(BYTE *)0x6E3950 = 0x83;
 }
 
 void CMultiplayerSA::DisableZoneNames ( bool bDisabled )
@@ -1342,274 +1223,47 @@ void CMultiplayerSA::DisableZoneNames ( bool bDisabled )
 void CMultiplayerSA::DisableBirds ( bool bDisabled )
 {
     if ( bDisabled )
-        MemPut < BYTE > ( 0x712330, 0xC3 );
+        MemPut < BYTE > ( 0x712330, 0xC3 );  //         *(BYTE *)0x712330 = 0xC3;
     else
-        MemPut < BYTE > ( 0x712330, 0xA1 );
+        MemPut < BYTE > ( 0x712330, 0xA1 );  //         *(BYTE *)0x712330 = 0xA1;
 }
 
 void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
 {
     if ( bDisabled )
-        MemPut < WORD > ( 0x60B4F6, 0x08EB );
+        MemPut < WORD > ( 0x60B4F6, 0x08EB );  //         *(WORD *)0x60B4F6 = 0x08EB;
     else
-        MemPut < WORD > ( 0x60B4F6, 0x027C );
-}
-
-bool CMultiplayerSA::AreInteriorSoundsEnabled ( )
-{
-    return bInteriorSoundsEnabled;
-}
-
-void CMultiplayerSA::SetInteriorSoundsEnabled ( bool bEnabled )
-{
-    // The function which should be restored when re-enabling interior sounds
-    BYTE originalCode[6] = {0x89, 0x2d, 0xbc, 0xdc, 0xb6, 0x00};
-
-    if ( bEnabled )
-    {
-        // Restore the function responsible for interior sounds
-        MemCpy ( (LPVOID)0x508450, &originalCode, 6 );
-        MemCpy ( (LPVOID)0x508817, &originalCode, 6 );
-    }
-    else
-    {
-        // Nop the function responsible for interior sounds
-        MemSet ( (LPVOID)0x508450, 0x90, 6 );
-        MemSet ( (LPVOID)0x508817, 0x90, 6 );
-    }
-
-    // Toggle the interior sound on/off, depending on what the scripter wants
-    MemPutFast < bool > ( 0xB6DCBC, bEnabled );
-
-    // If we just store it, we can always return the on/off state later on
-    bInteriorSoundsEnabled = bEnabled;
-}
-
-void CMultiplayerSA::SetWindVelocity ( float fX, float fY, float fZ )
-{
-    //Disable
-    MemPut < WORD > ( 0x72C616, 0xD8DD );
-    MemPut < DWORD > ( 0x72C616 + 2, 0x90909090 );
-    MemPut < WORD > ( 0x72C622, 0xD8DD );
-    MemPut < DWORD > ( 0x72C622 + 2, 0x90909090 );
-    MemPut < WORD > ( 0x72C636, 0xD8DD );
-    MemPut < DWORD > ( 0x72C636 + 2, 0x90909090 );
-
-    MemPut < WORD > ( 0x72C40C, 0xD8DD );
-    MemPut < DWORD > ( 0x72C40C + 2, 0x90909090 );
-    MemPut < WORD > ( 0x72C417, 0xD8DD );
-    MemPut < DWORD > ( 0x72C417 + 2, 0x90909090 );
-    MemPut < WORD > ( 0x72C4EF, 0xD8DD );
-    MemPut < DWORD > ( 0x72C4EF + 2, 0x90909090 );
-
-    //Set
-    MemPutFast < float > ( 0xC813E0, fX );
-    MemPutFast < float > ( 0xC813E4, fY );
-    MemPutFast < float > ( 0xC813E8, fZ );
-}
-
-void CMultiplayerSA::GetWindVelocity ( float& fX, float& fY, float& fZ )
-{
-    fX = *(float *) 0xC813E0;
-    fY = *(float *) 0xC813E4;
-    fZ = *(float *) 0xC813E8;
-}
-
-void CMultiplayerSA::RestoreWindVelocity ( void )
-{
-    MemPut < WORD > ( 0x72C616, 0x1DD9 );
-    MemPut < DWORD > ( 0x72C616 + 2, 0x00C813E0 );
-    MemPut < WORD > ( 0x72C622, 0x1DD9 );
-    MemPut < DWORD > ( 0x72C622 + 2, 0x00C813E4 );
-    MemPut < WORD > ( 0x72C636, 0x1DD9 );
-    MemPut < DWORD > ( 0x72C636 + 2, 0x00C813E8 );
-
-    MemPut < WORD > ( 0x72C40C, 0x15D9 );
-    MemPut < DWORD > ( 0x72C40C + 2, 0x00C813E0 );
-    MemPut < WORD > ( 0x72C417, 0x1DD9 );
-    MemPut < DWORD > ( 0x72C417 + 2, 0x00C813E4 );
-    MemPut < WORD > ( 0x72C4EF, 0x1DD9 );
-    MemPut < DWORD > ( 0x72C4EF + 2, 0x00C813E8 );
-}
-
-float CMultiplayerSA::GetFarClipDistance ( )
-{
-    return *(float *) 0xB7C4F0;
-}
-
-void CMultiplayerSA::SetFarClipDistance ( float fDistance )
-{
-    MemPut < BYTE > ( 0x55FCC8, 0xDD );
-    MemPut < BYTE > ( 0x55FCC9, 0xD8 );
-    MemPut < BYTE > ( 0x55FCCA, 0x90 );
-
-    MemPut < BYTE > ( 0x5613A3, 0xDD );
-    MemPut < BYTE > ( 0x5613A4, 0xD8 );
-    MemPut < BYTE > ( 0x5613A5, 0x90 );
-
-    MemPut < BYTE > ( 0x560A23, 0xDD );
-    MemPut < BYTE > ( 0x560A24, 0xD8 );
-    MemPut < BYTE > ( 0x560A25, 0x90 );
-
-    MemPutFast < float > ( 0xB7C4F0, fDistance );
-}
-
-void CMultiplayerSA::RestoreFarClipDistance ( )
-{
-    BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
-
-    MemCpy ( (LPVOID)0x55FCC8, &originalFstp, 3 );
-    MemCpy ( (LPVOID)0x5613A3, &originalFstp, 3 );
-    MemCpy ( (LPVOID)0x560A23, &originalFstp, 3 );
-}
-
-float CMultiplayerSA::GetFogDistance ( )
-{
-    return *(float *) 0xB7C4F4;
-}
-
-void CMultiplayerSA::SetFogDistance ( float fDistance )
-{
-    MemPut < BYTE > ( 0x55FCDB, 0xDD );
-    MemPut < BYTE > ( 0x55FCDC, 0xD8 );
-    MemPut < BYTE > ( 0x55FCDD, 0x90 );
-
-    MemPutFast < float > ( 0xB7C4F4, fDistance );
-}
-
-void CMultiplayerSA::RestoreFogDistance ( )
-{
-    BYTE originalFstp[3] = {0xD9, 0x5E, 0x54};
-
-    MemCpy ( (LPVOID)0x55FCDB, &originalFstp, 3 );
-}
-
-void CMultiplayerSA::GetSunColor ( unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
-{
-    ucCoreRed   = *(BYTE *) 0xB7C4D0;
-    ucCoreGreen = *(BYTE *) 0xB7C4D2;
-    ucCoreBlue  = *(BYTE *) 0xB7C4D4;
-
-    ucCoronaRed   = *(BYTE *) 0xB7C4D6;
-    ucCoronaGreen = *(BYTE *) 0xB7C4D8;
-    ucCoronaBlue  = *(BYTE *) 0xB7C4DA;
-}
-
-void CMultiplayerSA::SetSunColor ( unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen, unsigned char ucCoronaBlue )
-{
-    MemSet ( (LPVOID)0x55F9B2, 0x90, 4 );
-    MemSet ( (LPVOID)0x55F9DD, 0x90, 4 );
-    MemSet ( (LPVOID)0x55FA08, 0x90, 4 );
-    MemSet ( (LPVOID)0x55FA33, 0x90, 4 );
-    MemSet ( (LPVOID)0x55FA5E, 0x90, 4 );
-    MemSet ( (LPVOID)0x55FA8D, 0x90, 4 );
-
-    MemPutFast < BYTE > ( 0xB7C4D0, ucCoreRed );
-    MemPutFast < BYTE > ( 0xB7C4D2, ucCoreGreen );
-    MemPutFast < BYTE > ( 0xB7C4D4, ucCoreBlue );
-
-    MemPutFast < BYTE > ( 0xB7C4D6, ucCoronaRed );
-    MemPutFast < BYTE > ( 0xB7C4D8, ucCoronaGreen );
-    MemPutFast < BYTE > ( 0xB7C4DA, ucCoronaBlue );
-}
-
-void CMultiplayerSA::ResetSunColor ( )
-{
-    BYTE originalMov[3] = {0x66, 0x89, 0x46};
-
-    MemCpy ( (LPVOID)0x55F9B2, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55F9B5, 0x30 );
-    MemCpy ( (LPVOID)0x55F9DD, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55F9E0, 0x32 );
-    MemCpy ( (LPVOID)0x55FA08, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55FA0B, 0x34 );
-
-    MemCpy ( (LPVOID)0x55FA33, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55FA36, 0x36 );
-    MemCpy ( (LPVOID)0x55FA5E, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55FA61, 0x38 );
-    MemCpy ( (LPVOID)0x55FA8D, &originalMov, 3 );
-    MemPut < BYTE > ( 0x55FA90, 0x3A );
-}
-
-float CMultiplayerSA::GetSunSize ( )
-{
-    return *(float *)0xB7C4DC / 10;
-}
-
-void CMultiplayerSA::SetSunSize ( float fSize )
-{
-    MemPut < BYTE > ( 0x55FA9D, 0xDD );
-    MemPut < BYTE > ( 0x55FA9E, 0xD8 );
-    MemPut < BYTE > ( 0x55FA9F, 0x90 );
-
-    MemPutFast < float > ( 0xB7C4DC, fSize * 10 );
-}
-
-void CMultiplayerSA::ResetSunSize ( )
-{
-    MemPut < BYTE > ( 0x55FA9D, 0xD9 );
-    MemPut < BYTE > ( 0x55FA9E, 0x5E );
-    MemPut < BYTE > ( 0x55FA9F, 0x3C );
+        MemPut < WORD > ( 0x60B4F6, 0x027C );  //         *(WORD *)0x60B4F6 = 0x027C;
 }
 
 void CMultiplayerSA::SetCloudsEnabled ( bool bDisabled )
 {
     //volumetric clouds
     if ( bDisabled )
-        MemPut < BYTE > ( 0x716380, 0xA1 );
+        MemPut < BYTE > ( 0x716380, 0xA1 );  //         *(BYTE *)0x716380 = 0xA1;
     else
-        MemPut < BYTE > ( 0x716380, 0xC3 );
+        MemPut < BYTE > ( 0x716380, 0xC3 );  //         *(BYTE *)0x716380 = 0xC3;
 
     // normal clouds
     //0071395A     90             NOP
     if ( bDisabled )
-        MemPut < BYTE > ( 0x713950, 0x83 );
+        MemPut < BYTE > ( 0x713950, 0x83 );  //         *(BYTE *)0x713950 = 0x83;
     else
-        MemPut < BYTE > ( 0x713950, 0xC3 );
+        MemPut < BYTE > ( 0x713950, 0xC3 );  //         *(BYTE *)0x713950 = 0xC3;
 
     // plane trails (not really clouds, but they're sort of vapour)
 
     if ( bDisabled )
     {
-        MemPut < BYTE > ( 0x717180, 0x83 );
-        MemPut < BYTE > ( 0x717181, 0xEC );
-        MemPut < BYTE > ( 0x717182, 0x08 );
+        MemPut < BYTE > ( 0x717180, 0x83 );  //         *(BYTE *)0x717180 = 0x83;
+        MemPut < BYTE > ( 0x717181, 0xEC );  //         *(BYTE *)0x717181 = 0xEC;
+        MemPut < BYTE > ( 0x717182, 0x08 );  //         *(BYTE *)0x717182 = 0x08;
     }
     else
     {
-        MemPut < BYTE > ( 0x717180, 0xC2 );
-        MemPut < BYTE > ( 0x717181, 0x04 );
-        MemPut < BYTE > ( 0x717182, 0x00 );
-    }
-}
-
-bool CMultiplayerSA::HasSkyColor ( )
-{
-    return bUsingCustomSkyGradient;
-}
-
-void CMultiplayerSA::GetSkyColor ( unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen, unsigned char& BottomBlue )
-{
-    if ( HasSkyColor ( ) )
-    {
-        TopRed  = ucSkyGradientTopR;
-        TopGreen = ucSkyGradientTopG;
-        TopBlue  = ucSkyGradientTopB;
-
-        BottomRed   = ucSkyGradientBottomR;
-        BottomGreen = ucSkyGradientBottomG;
-        BottomBlue  = ucSkyGradientBottomB;
-    }
-    else
-    {
-        TopRed   = *(BYTE *)0xB7C4C4;
-        TopGreen = *(BYTE *)0xB7C4C6;
-        TopBlue  = *(BYTE *)0xB7C4C8;
-
-        BottomRed   = *(BYTE *)0xB7C4CA;
-        BottomGreen = *(BYTE *)0xB7C4CC;
-        BottomBlue  = *(BYTE *)0xB7C4CE;
+        MemPut < BYTE > ( 0x717180, 0xC2 );  //         *(BYTE *)0x717180 = 0xC2;
+        MemPut < BYTE > ( 0x717181, 0x04 );  //         *(BYTE *)0x717181 = 0x04;
+        MemPut < BYTE > ( 0x717182, 0x00 );  //         *(BYTE *)0x717182 = 0x00;
     }
 }
 
@@ -1629,29 +1283,6 @@ void CMultiplayerSA::ResetSky ( void )
     bUsingCustomSkyGradient = false;
 }
 
-bool CMultiplayerSA::HasWaterColor ( )
-{
-    return bUsingCustomWaterColor;
-}
-
-void CMultiplayerSA::GetWaterColor ( float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha )
-{
-    if ( HasWaterColor ( ) )
-    {
-        fWaterRed   = fWaterColorR;
-        fWaterGreen = fWaterColorG;
-        fWaterBlue  = fWaterColorB;
-        fWaterAlpha = fWaterColorA;
-    }
-    else
-    {
-        fWaterRed   = *(float *)0xB7C508;
-        fWaterGreen = *(float *)0xB7C50C;
-        fWaterBlue  = *(float *)0xB7C510;
-        fWaterAlpha = *(float *)0xB7C514;
-    }
-}
-
 void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha )
 {
     bUsingCustomWaterColor = true;
@@ -1661,22 +1292,22 @@ void CMultiplayerSA::SetWaterColor ( float fWaterRed, float fWaterGreen, float f
     fWaterColorB = fWaterBlue;
     fWaterColorA = fWaterAlpha;
     // Underwater
-    MemPutFast < BYTE > ( 0x8D5140, (BYTE)fWaterRed );
-    MemPutFast < BYTE > ( 0x8D5141, (BYTE)fWaterGreen );
-    MemPutFast < BYTE > ( 0x8D5142, (BYTE)fWaterBlue );
-    MemPutFast < BYTE > ( 0x8D5143, (BYTE)fWaterAlpha );
-    MemPut < BYTE > ( 0x7051A7, 255-(BYTE)fWaterAlpha );
-    MemPut < float > ( 0x872660, 255-fWaterAlpha );
-    MemPut < BYTE > ( 0x7051D7, 255-(BYTE)fWaterAlpha );
+    MemPut < BYTE > ( 0x8D5140, (BYTE)fWaterRed );  //     *(BYTE *)0x8D5140 = (BYTE)fWaterRed;
+    MemPut < BYTE > ( 0x8D5141, (BYTE)fWaterGreen );  //     *(BYTE *)0x8D5141 = (BYTE)fWaterGreen;
+    MemPut < BYTE > ( 0x8D5142, (BYTE)fWaterBlue );  //     *(BYTE *)0x8D5142 = (BYTE)fWaterBlue;
+    MemPut < BYTE > ( 0x8D5143, (BYTE)fWaterAlpha );  //     *(BYTE *)0x8D5143 = (BYTE)fWaterAlpha;
+    MemPut < BYTE > ( 0x7051A7, 255-(BYTE)fWaterAlpha );  //     *(BYTE *)0x7051A7 = 255-(BYTE)fWaterAlpha;
+    MemPut < float > ( 0x872660, 255-fWaterAlpha );  //     *(float *)0x872660 = 255-fWaterAlpha;
+    MemPut < BYTE > ( 0x7051D7, 255-(BYTE)fWaterAlpha );  //     *(BYTE *)0x7051D7 = 255-(BYTE)fWaterAlpha;
 }
 
 void CMultiplayerSA::ResetWater ( void )
 {
     bUsingCustomWaterColor = false;
-    MemPutFast < DWORD > ( 0x8D5140, 0x40404040 );
-    MemPut < BYTE > ( 0x7051A7, 184 );
-    MemPut < float > ( 0x872660, 184.0f );
-    MemPut < BYTE > ( 0x7051D7, 184 );
+    MemPut < DWORD > ( 0x8D5140, 0x40404040 );  //     *(DWORD *)0x8D5140 = 0x40404040;
+    MemPut < BYTE > ( 0x7051A7, 184 );  //     *(BYTE *)0x7051A7 = 184;
+    MemPut < float > ( 0x872660, 184.0f );  //     *(float *)0x872660 = 184.0f;
+    MemPut < BYTE > ( 0x7051D7, 184 );  //     *(BYTE *)0x7051D7 = 184;
 }
 
 bool CMultiplayerSA::GetExplosionsDisabled ( void )
@@ -1742,11 +1373,6 @@ void CMultiplayerSA::SetChokingHandler ( ChokingHandler* pChokingHandler )
     m_pChokingHandler = pChokingHandler;
 }
 
-void CMultiplayerSA::SetPreWorldProcessHandler ( PreWorldProcessHandler * pHandler )
-{
-    m_pPreWorldProcessHandler = pHandler;
-}
-
 void CMultiplayerSA::SetPostWorldProcessHandler ( PostWorldProcessHandler * pHandler )
 {
     m_pPostWorldProcessHandler = pHandler;
@@ -1780,9 +1406,9 @@ void CMultiplayerSA::HideRadar ( bool bHide )
 void CMultiplayerSA::AllowMouseMovement ( bool bAllow )
 {
     if ( bAllow )
-        MemPut < BYTE > ( 0x6194A0, 0xC3 );
+        MemPut < BYTE > ( 0x6194A0, 0xC3 );  //         *(BYTE *)0x6194A0 = 0xC3;
     else
-        MemPut < BYTE > ( 0x6194A0, 0xE9 );
+        MemPut < BYTE > ( 0x6194A0, 0xE9 );  //         *(BYTE *)0x6194A0 = 0xE9;
 }
 
 void CMultiplayerSA::DoSoundHacksOnLostFocus ( bool bLostFocus )
@@ -1792,11 +1418,11 @@ void CMultiplayerSA::DoSoundHacksOnLostFocus ( bool bLostFocus )
     else
     {
         //004D9888   . E8 03 F1 FF FF    CALL gta_sa_u.004D8990
-        MemPut < BYTE > ( 0x4D9888, 0xE8 );
-        MemPut < BYTE > ( 0x4D9889, 0x03 );
-        MemPut < BYTE > ( 0x4D988A, 0xF1 );
-        MemPut < BYTE > ( 0x4D988B, 0xFF );
-        MemPut < BYTE > ( 0x4D988C, 0xFF );
+        MemPut < BYTE > ( 0x4D9888, 0xE8 );  //         *(BYTE *)0x4D9888 = 0xE8;
+        MemPut < BYTE > ( 0x4D9889, 0x03 );  //         *(BYTE *)0x4D9889 = 0x03;
+        MemPut < BYTE > ( 0x4D988A, 0xF1 );  //         *(BYTE *)0x4D988A = 0xF1;
+        MemPut < BYTE > ( 0x4D988B, 0xFF );  //         *(BYTE *)0x4D988B = 0xFF;
+        MemPut < BYTE > ( 0x4D988C, 0xFF );  //         *(BYTE *)0x4D988C = 0xFF;
     }
 }
 
@@ -2448,7 +2074,7 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem ()
     {
         // Copy the matrix so we don't crash if the owner of this matrix is deleted
         pNewCreateFxSystem_Matrix = (DWORD*) malloc ( 64 );
-        MemCpyFast ( pNewCreateFxSystem_Matrix, pCreateFxSystem_Matrix, 64 );
+        MemCpy ( pNewCreateFxSystem_Matrix, pCreateFxSystem_Matrix, 64 );
 
         // Add it to the list over FxSystem matrices we've copied
         AddFxSystemPointer ( pNewCreateFxSystem_Matrix );
@@ -2520,7 +2146,7 @@ bool CCam_ProcessFixed ( class CCamSAInterface* pCamInterface )
 {
     CCam* pCam = static_cast < CCameraSA* > ( pGameInterface->GetCamera () )->GetCam ( pCamInterface );
 
-    if ( m_pProcessCamHandler && pCam )
+    if ( m_pProcessCamHandler )
     {
         return m_pProcessCamHandler ( pCam );
     }
@@ -2844,8 +2470,8 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
         // iterating all materials of a clump and its atoms, and
         // calling a given callback. We temporarily overwrite that
         // callback with our own callback and then restore it.
-        MemPut < DWORD > ( 0x5332A2, dwCallback );
-        MemPut < DWORD > ( 0x5332F3, dwCallback );
+        MemPut < DWORD > ( 0x5332A2, dwCallback );  //         *(DWORD *)(0x5332A2) = dwCallback;
+        MemPut < DWORD > ( 0x5332F3, dwCallback );  //         *(DWORD *)(0x5332F3) = dwCallback;
 
         // Call SetRwObjectAlpha
         DWORD dwFunc = FUNC_SetRwObjectAlpha;
@@ -2857,8 +2483,8 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
         }
 
         // Restore the GTA callbacks
-        MemPut < DWORD > ( 0x5332A2, (DWORD)(0x533280) );
-        MemPut < DWORD > ( 0x5332F3, (DWORD)(0x533280) );
+        MemPut < DWORD > ( 0x5332A2, (DWORD)(0x533280) );  //         *(DWORD *)(0x5332A2) = (DWORD)(0x533280);
+        MemPut < DWORD > ( 0x5332F3, (DWORD)(0x533280) );  //         *(DWORD *)(0x5332F3) = (DWORD)(0x533280);
     }
 }
 
@@ -2944,9 +2570,9 @@ static void SetVehicleAlpha ( )
         bEntityHasAlpha = true;
         pCurAlpha = ucCurrentAlpha;
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0 );
-        MemPut < DWORD > ( 0x5332D6, (DWORD)CVehicle_EAEG );
+        MemPut < DWORD > ( 0x5332D6, (DWORD)CVehicle_EAEG );  //         *(DWORD *)(0x5332D6) = (DWORD)CVehicle_EAEG;
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, 0 );
-        MemPut < DWORD > ( 0x5332D6, 0x533290 );
+        MemPut < DWORD > ( 0x5332D6, 0x533290 );  //         *(DWORD *)(0x5332D6) = 0x533290;
     }
     else
         bEntityHasAlpha = false;
@@ -3087,20 +2713,20 @@ void _cdecl DoEndWorldColorsPokes ()
 {
     if ( bUsingCustomSkyGradient )
     {
-        MemPutFast < BYTE > ( 0xB7C4C4, ucSkyGradientTopR );
-        MemPutFast < BYTE > ( 0xB7C4C6, ucSkyGradientTopG );
-        MemPutFast < BYTE > ( 0xB7C4C8, ucSkyGradientTopB );
+        MemPut < BYTE > ( 0xB7C4C4, ucSkyGradientTopR );  //         *(BYTE *)0xB7C4C4 = ucSkyGradientTopR;
+        MemPut < BYTE > ( 0xB7C4C6, ucSkyGradientTopG );  //         *(BYTE *)0xB7C4C6 = ucSkyGradientTopG;
+        MemPut < BYTE > ( 0xB7C4C8, ucSkyGradientTopB );  //         *(BYTE *)0xB7C4C8 = ucSkyGradientTopB;
 
-        MemPutFast < BYTE > ( 0xB7C4CA, ucSkyGradientBottomR );
-        MemPutFast < BYTE > ( 0xB7C4CC, ucSkyGradientBottomG );
-        MemPutFast < BYTE > ( 0xB7C4CE, ucSkyGradientBottomB );
+        MemPut < BYTE > ( 0xB7C4CA, ucSkyGradientBottomR );  //         *(BYTE *)0xB7C4CA = ucSkyGradientBottomR;
+        MemPut < BYTE > ( 0xB7C4CC, ucSkyGradientBottomG );  //         *(BYTE *)0xB7C4CC = ucSkyGradientBottomG;
+        MemPut < BYTE > ( 0xB7C4CE, ucSkyGradientBottomB );  //         *(BYTE *)0xB7C4CE = ucSkyGradientBottomB;
     }
     if ( bUsingCustomWaterColor )
     {
-        MemPutFast < float > ( 0xB7C508, fWaterColorR );
-        MemPutFast < float > ( 0xB7C50C, fWaterColorG );
-        MemPutFast < float > ( 0xB7C510, fWaterColorB );
-        MemPutFast < float > ( 0xB7C514, fWaterColorA );
+        MemPut < float > ( 0xB7C508, fWaterColorR );  //         *(float *)0xB7C508 = fWaterColorR;
+        MemPut < float > ( 0xB7C50C, fWaterColorG );  //         *(float *)0xB7C50C = fWaterColorG;
+        MemPut < float > ( 0xB7C510, fWaterColorB );  //         *(float *)0xB7C510 = fWaterColorB;
+        MemPut < float > ( 0xB7C514, fWaterColorA );  //         *(float *)0xB7C514 = fWaterColorA;
     }
 }
 
@@ -3190,62 +2816,62 @@ void CMultiplayerSA::DisableEnterExitVehicleKey( bool bDisabled )
     if ( !bDisabled )
     {
         // CPlayerInfo__Process
-        MemPut < BYTE > ( 0x5702FD, 0xE8 );
-        MemPut < BYTE > ( 0x5702FE, 0xCE );
-        MemPut < BYTE > ( 0x5702FF, 0xFD );
-        MemPut < BYTE > ( 0x570300, 0xFC );
-        MemPut < BYTE > ( 0x570301, 0xFF );
+        MemPut < BYTE > ( 0x5702FD, 0xE8 );  //         *(BYTE *)0x5702FD = 0xE8;
+        MemPut < BYTE > ( 0x5702FE, 0xCE );  //         *(BYTE *)0x5702FE = 0xCE;
+        MemPut < BYTE > ( 0x5702FF, 0xFD );  //         *(BYTE *)0x5702FF = 0xFD;
+        MemPut < BYTE > ( 0x570300, 0xFC );  //         *(BYTE *)0x570300 = 0xFC;
+        MemPut < BYTE > ( 0x570301, 0xFF );  //         *(BYTE *)0x570301 = 0xFF;
 
         // CAutomobile__ProcessControlInputs
-        MemPut < BYTE > ( 0x6AD75A, 0xE8 );
-        MemPut < BYTE > ( 0x6AD75B, 0x71 );
-        MemPut < BYTE > ( 0x6AD75C, 0x29 );
-        MemPut < BYTE > ( 0x6AD75D, 0xE9 );
-        MemPut < BYTE > ( 0x6AD75E, 0xFF );
+        MemPut < BYTE > ( 0x6AD75A, 0xE8 );  //         *(BYTE *)0x6AD75A = 0xE8;
+        MemPut < BYTE > ( 0x6AD75B, 0x71 );  //         *(BYTE *)0x6AD75B = 0x71;
+        MemPut < BYTE > ( 0x6AD75C, 0x29 );  //         *(BYTE *)0x6AD75C = 0x29;
+        MemPut < BYTE > ( 0x6AD75D, 0xE9 );  //         *(BYTE *)0x6AD75D = 0xE9;
+        MemPut < BYTE > ( 0x6AD75E, 0xFF );  //         *(BYTE *)0x6AD75E = 0xFF;
 
         // CBike__ProcessControlInputs
-        MemPut < BYTE > ( 0x6BE34B, 0xE8 );
-        MemPut < BYTE > ( 0x6BE34C, 0x80 );
-        MemPut < BYTE > ( 0x6BE34D, 0x1D );
-        MemPut < BYTE > ( 0x6BE34E, 0xE8 );
-        MemPut < BYTE > ( 0x6BE34F, 0xFF );
+        MemPut < BYTE > ( 0x6BE34B, 0xE8 );  //         *(BYTE *)0x6BE34B = 0xE8;
+        MemPut < BYTE > ( 0x6BE34C, 0x80 );  //         *(BYTE *)0x6BE34C = 0x80;
+        MemPut < BYTE > ( 0x6BE34D, 0x1D );  //         *(BYTE *)0x6BE34D = 0x1D;
+        MemPut < BYTE > ( 0x6BE34E, 0xE8 );  //         *(BYTE *)0x6BE34E = 0xE8;
+        MemPut < BYTE > ( 0x6BE34F, 0xFF );  //         *(BYTE *)0x6BE34F = 0xFF;
 
         // CTaskSimpleJetPack__ProcessControlInput
-        MemPut < BYTE > ( 0x67E834, 0xE8 );
-        MemPut < BYTE > ( 0x67E835, 0x97 );
-        MemPut < BYTE > ( 0x67E836, 0x18 );
-        MemPut < BYTE > ( 0x67E837, 0xEC );
-        MemPut < BYTE > ( 0x67E838, 0xFF );
+        MemPut < BYTE > ( 0x67E834, 0xE8 );  //         *(BYTE *)0x67E834 = 0xE8;
+        MemPut < BYTE > ( 0x67E835, 0x97 );  //         *(BYTE *)0x67E835 = 0x97;
+        MemPut < BYTE > ( 0x67E836, 0x18 );  //         *(BYTE *)0x67E836 = 0x18;
+        MemPut < BYTE > ( 0x67E837, 0xEC );  //         *(BYTE *)0x67E837 = 0xEC;
+        MemPut < BYTE > ( 0x67E838, 0xFF );  //         *(BYTE *)0x67E838 = 0xFF;
     }
     else
     {
         // CPlayerInfo__Process
-        MemPut < BYTE > ( 0x5702FD, 0x32 );
-        MemPut < BYTE > ( 0x5702FE, 0xC0 );
-        MemPut < BYTE > ( 0x5702FF, 0x90 );
-        MemPut < BYTE > ( 0x570300, 0x90 );
-        MemPut < BYTE > ( 0x570301, 0x90 );
+        MemPut < BYTE > ( 0x5702FD, 0x32 );  //         *(BYTE *)0x5702FD = 0x32;
+        MemPut < BYTE > ( 0x5702FE, 0xC0 );  //         *(BYTE *)0x5702FE = 0xC0;
+        MemPut < BYTE > ( 0x5702FF, 0x90 );  //         *(BYTE *)0x5702FF = 0x90;
+        MemPut < BYTE > ( 0x570300, 0x90 );  //         *(BYTE *)0x570300 = 0x90;
+        MemPut < BYTE > ( 0x570301, 0x90 );  //         *(BYTE *)0x570301 = 0x90;
 
         // CAutomobile__ProcessControlInputs
-        MemPut < BYTE > ( 0x6AD75A, 0x32 );
-        MemPut < BYTE > ( 0x6AD75B, 0xC0 );
-        MemPut < BYTE > ( 0x6AD75C, 0x90 );
-        MemPut < BYTE > ( 0x6AD75D, 0x90 );
-        MemPut < BYTE > ( 0x6AD75E, 0x90 );
+        MemPut < BYTE > ( 0x6AD75A, 0x32 );  //         *(BYTE *)0x6AD75A = 0x32;
+        MemPut < BYTE > ( 0x6AD75B, 0xC0 );  //         *(BYTE *)0x6AD75B = 0xC0;
+        MemPut < BYTE > ( 0x6AD75C, 0x90 );  //         *(BYTE *)0x6AD75C = 0x90;
+        MemPut < BYTE > ( 0x6AD75D, 0x90 );  //         *(BYTE *)0x6AD75D = 0x90;
+        MemPut < BYTE > ( 0x6AD75E, 0x90 );  //         *(BYTE *)0x6AD75E = 0x90;
 
         // CBike__ProcessControlInputs
-        MemPut < BYTE > ( 0x6BE34B, 0x32 );
-        MemPut < BYTE > ( 0x6BE34C, 0xC0 );
-        MemPut < BYTE > ( 0x6BE34D, 0x90 );
-        MemPut < BYTE > ( 0x6BE34E, 0x90 );
-        MemPut < BYTE > ( 0x6BE34F, 0x90 );
+        MemPut < BYTE > ( 0x6BE34B, 0x32 );  //         *(BYTE *)0x6BE34B = 0x32;
+        MemPut < BYTE > ( 0x6BE34C, 0xC0 );  //         *(BYTE *)0x6BE34C = 0xC0;
+        MemPut < BYTE > ( 0x6BE34D, 0x90 );  //         *(BYTE *)0x6BE34D = 0x90;
+        MemPut < BYTE > ( 0x6BE34E, 0x90 );  //         *(BYTE *)0x6BE34E = 0x90;
+        MemPut < BYTE > ( 0x6BE34F, 0x90 );  //         *(BYTE *)0x6BE34F = 0x90;
 
         // CTaskSimpleJetPack__ProcessControlInput
-        MemPut < BYTE > ( 0x67E834, 0x32 );
-        MemPut < BYTE > ( 0x67E835, 0xC0 );
-        MemPut < BYTE > ( 0x67E836, 0x90 );
-        MemPut < BYTE > ( 0x67E837, 0x90 );
-        MemPut < BYTE > ( 0x67E838, 0x90 );
+        MemPut < BYTE > ( 0x67E834, 0x32 );  //         *(BYTE *)0x67E834 = 0x32;
+        MemPut < BYTE > ( 0x67E835, 0xC0 );  //         *(BYTE *)0x67E835 = 0xC0;
+        MemPut < BYTE > ( 0x67E836, 0x90 );  //         *(BYTE *)0x67E836 = 0x90;
+        MemPut < BYTE > ( 0x67E837, 0x90 );  //         *(BYTE *)0x67E837 = 0x90;
+        MemPut < BYTE > ( 0x67E838, 0x90 );  //         *(BYTE *)0x67E838 = 0x90;
     }
     
     // CPad__ExitVehicleJustDown
@@ -3411,21 +3037,21 @@ void CMultiplayerSA::RebuildMultiplayerPlayer ( CPed * player )
         CStatsData localStats;
 
         // Store the local player stats
-        MemCpyFast ( &localStats.StatTypesFloat, (void *)0xb79380, sizeof(float) * MAX_FLOAT_STATS );
-        MemCpyFast ( &localStats.StatTypesInt, (void *)0xb79000, sizeof(int) * MAX_INT_STATS );
-        MemCpyFast ( &localStats.StatReactionValue, (void *)0xb78f10, sizeof(float) * MAX_REACTION_STATS );
+        MemCpy ( &localStats.StatTypesFloat, (void *)0xb79380, sizeof(float) * MAX_FLOAT_STATS );
+        MemCpy ( &localStats.StatTypesInt, (void *)0xb79000, sizeof(int) * MAX_INT_STATS );
+        MemCpy ( &localStats.StatReactionValue, (void *)0xb78f10, sizeof(float) * MAX_REACTION_STATS );
 
         // Change the local player's stats to the remote player's
-        MemCpyFast ( (void *)0xb79380, data->m_stats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
-        MemCpyFast ( (void *)0xb79000, data->m_stats.StatTypesInt, sizeof(int) * MAX_INT_STATS );
-        MemCpyFast ( (void *)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
+        MemCpy ( (void *)0xb79380, data->m_stats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
+        MemCpy ( (void *)0xb79000, data->m_stats.StatTypesInt, sizeof(int) * MAX_INT_STATS );
+        MemCpy ( (void *)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
 
         player->RebuildPlayer();
 
         // Restore the local player stats
-        MemCpyFast ( (void *)0xb79380, &localStats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
-        MemCpyFast ( (void *)0xb79000, &localStats.StatTypesInt, sizeof(int) * MAX_INT_STATS );
-        MemCpyFast ( (void *)0xb78f10, &localStats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
+        MemCpy ( (void *)0xb79380, &localStats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS );
+        MemCpy ( (void *)0xb79000, &localStats.StatTypesInt, sizeof(int) * MAX_INT_STATS );
+        MemCpy ( (void *)0xb78f10, &localStats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS );
     }
 }
 
@@ -3434,11 +3060,11 @@ void CMultiplayerSA::SetNightVisionEnabled ( bool bEnabled )
 {
     if ( bEnabled )
     {
-        MemPutFast < BYTE > ( 0xC402B8, 1 );
+        MemPut < BYTE > ( 0xC402B8, 1 );  //         *(BYTE *)0xC402B8 = 1;
     }
     else
     {
-        MemPutFast < BYTE > ( 0xC402B8, 0 );
+        MemPut < BYTE > ( 0xC402B8, 0 );  //         *(BYTE *)0xC402B8 = 0;
     }
 }
 
@@ -3447,22 +3073,12 @@ void CMultiplayerSA::SetThermalVisionEnabled ( bool bEnabled )
 {
     if ( bEnabled )
     {
-        MemPutFast < BYTE > ( 0xC402B9, 1 );
+        MemPut < BYTE > ( 0xC402B9, 1 );  //         *(BYTE *)0xC402B9 = 1;
     }
     else
     {
-        MemPutFast < BYTE > ( 0xC402B9, 0 );
+        MemPut < BYTE > ( 0xC402B9, 0 );  //         *(BYTE *)0xC402B9 = 0;
     }
-}
-
-bool CMultiplayerSA::IsNightVisionEnabled ( )
-{
-    return (*(BYTE *)0xC402B8 == 1 );
-}
-
-bool CMultiplayerSA::IsThermalVisionEnabled ( )
-{
-    return (*(BYTE *)0xC402B9 == 1 );
 }
 
 
@@ -3549,82 +3165,6 @@ void _declspec(naked) HOOK_CollisionStreamRead ()
     }
 }
 
-unsigned char ucDesignatedLightState = 0;
-void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
-{
-    _asm pushad
-
-    if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 )
-    {
-        ucDesignatedLightState = 0; //Green
-    }
-    else if ( ucTrafficLightState == 1 || ucTrafficLightState == 6 || ucTrafficLightState == 7 )
-    {
-        ucDesignatedLightState = 1; //Amber
-    }
-    else if ( ucTrafficLightState == 9 )
-    {
-        ucDesignatedLightState = 4;  //Off
-    }
-    else
-        ucDesignatedLightState = 2;  //Red
-
-    _asm
-    {
-        popad
-        mov al, ucDesignatedLightState
-        retn
-    }
-}
-
-void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
-{
-    _asm pushad
-
-    if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 )
-    {
-        ucDesignatedLightState = 0; //Green
-    }
-    else if ( ucTrafficLightState == 4 || ucTrafficLightState == 6 || ucTrafficLightState == 8 )
-    {
-        ucDesignatedLightState = 1; //Amber
-    }
-    else if ( ucTrafficLightState == 9 )
-    {
-        ucDesignatedLightState = 4; //Off
-    }
-    else
-        ucDesignatedLightState = 2; //Red
-
-    _asm
-    {
-        popad
-        mov al, ucDesignatedLightState
-        retn
-    }
-}
-
-
-unsigned char CMultiplayerSA::GetTrafficLightState ()
-{
-    return ucTrafficLightState;
-}
-
-void CMultiplayerSA::SetTrafficLightState ( unsigned char ucState )
-{
-    ucTrafficLightState = ucState;
-}
-
-bool CMultiplayerSA::GetTrafficLightsLocked ()
-{
-    return bTrafficLightsBlocked;
-}
-
-void CMultiplayerSA::SetTrafficLightsLocked ( bool bLocked )
-{
-    bTrafficLightsBlocked = bLocked;
-}
-
 // Allowing a created object into the vertical line test makes getGroundPosition, jetpacks and molotovs to work.
 // Not allowing a created object into the vertical line test makes the breakable animation work.
 void CMultiplayerSA::AllowCreatedObjectsInVerticalLineTest ( bool bOn )
@@ -3637,7 +3177,7 @@ void CMultiplayerSA::AllowCreatedObjectsInVerticalLineTest ( bool bOn )
     {
         // Done initialization?
         if ( bufOriginalData[0] == 0 )
-            MemCpyFast ( bufOriginalData, (void *)0x59FABC, 90 );
+            MemCpy ( bufOriginalData, (void *)0x59FABC, 90 );
 
         bState = bOn;
         if ( bOn )
@@ -3684,7 +3224,7 @@ void _cdecl CPhysical_ApplyGravity ( DWORD dwThis )
     else
     {
         // It's something else, apply regular downward gravity (+0x4C == m_vecMoveSpeed.fZ)
-        MemSubFast < float > ( dwThis + 0x4C, fTimeStep * fGravity );
+        MemSub < float > ( dwThis + 0x4C, fTimeStep * fGravity );  //         *(float *)(dwThis + 0x4C) -= fTimeStep * fGravity;
     }
 }
 
@@ -3858,9 +3398,9 @@ bool _cdecl VehicleCamLookDir2 ( DWORD dwCam )
     float fPhi   = *(float *)(dwCam + 0xBC);
     float fTheta = *(float *)(dwCam + 0xAC);
 
-    MemPutFast < CVector > ( dwCam + 0x190, -gravcam_matGravity.vRight*cos(fPhi)*cos(fTheta) - gravcam_matGravity.vFront*sin(fPhi)*cos(fTheta) + gravcam_matGravity.vUp*sin(fTheta) );
+    MemPut < CVector > ( dwCam + 0x190, -gravcam_matGravity.vRight*cos(fPhi)*cos(fTheta) - gravcam_matGravity.vFront*sin(fPhi)*cos(fTheta) + gravcam_matGravity.vUp*sin(fTheta) );  //     *(CVector *)(dwCam + 0x190) = -gravcam_matGravity.vRight*cos(fPhi)*cos(fTheta) - gravcam_matGravity.vFront*sin(fPhi)*cos(fTheta) + gravcam_matGravity.vUp*sin(fTheta);
 
-    MemPutFast < float > ( 0x8CCEA8, fPhi );
+    MemPut < float > ( 0x8CCEA8, fPhi );  //     *(float *)0x8CCEA8 = fPhi;
     return true;
 }
 
@@ -3978,7 +3518,7 @@ void _cdecl VehicleLookBehind ( DWORD dwCam, CVector* pvecEntityPos, float fDist
 {
     // Custom calculation of the camera position when looking behind while in
     // vehicle cam mode, taking in account custom gravity
-    MemPutFast < CVector > ( dwCam + 0x19C, *pvecEntityPos + (gravcam_matVehicleTransform.vFront + gravcam_matGravity.vUp*0.2f)*fDistance );
+    MemPut < CVector > ( dwCam + 0x19C, *pvecEntityPos + (gravcam_matVehicleTransform.vFront + gravcam_matGravity.vUp*0.2f)*fDistance );  //     *(CVector *)(dwCam + 0x19C) = *pvecEntityPos + (gravcam_matVehicleTransform.vFront + gravcam_matGravity.vUp*0.2f)*fDistance;
 }
 
 void _declspec(naked) HOOK_VehicleLookBehind ()
@@ -4013,7 +3553,7 @@ void _cdecl VehicleLookAside ( DWORD dwCam, CVector* pvecEntityPos, float fDirec
 {
     // Custom calculation of the camera position when looking left/right while in
     // vehicle cam mode, taking in account custom gravity
-    MemPutFast < CVector > ( dwCam + 0x19C, *pvecEntityPos + (-gravcam_matVehicleTransform.vRight*fDirectionFactor + gravcam_matGravity.vUp*0.2f)*fDistance );
+    MemPut < CVector > ( dwCam + 0x19C, *pvecEntityPos + (-gravcam_matVehicleTransform.vRight*fDirectionFactor + gravcam_matGravity.vUp*0.2f)*fDistance );  //     *(CVector *)(dwCam + 0x19C) = *pvecEntityPos + (-gravcam_matVehicleTransform.vRight*fDirectionFactor + gravcam_matGravity.vUp*0.2f)*fDistance;
 }
 
 void _declspec(naked) HOOK_VehicleLookAside ()
@@ -4119,14 +3659,6 @@ void _declspec(naked) HOOK_CGame_Process ()
 {
     _asm
     {
-        pushad
-    }
-
-    if ( m_pPreWorldProcessHandler ) m_pPreWorldProcessHandler ();
-
-    _asm
-    {
-        popad
         call    CALL_CWorld_Process
         mov     ecx, 0B72978h
         pushad
@@ -4219,7 +3751,7 @@ void vehicle_lights_init ( void )
     MemSet ( (void *)0x6E1DBC, 0x90, 8 );
 
     // Fix vehicle back lights both using light state 3 (SA bug)
-    MemPut < BYTE > ( 0x6E1D4F, 2 );
+    MemPut < BYTE > ( 0x6E1D4F, 2 );  //     *(BYTE *)0x6E1D4F = 2;
 }
 
 
@@ -4799,10 +4331,10 @@ void CMultiplayerSA::DeleteAndDisableGangTags ()
         // ret
         // to make it always return false
         MemSet ( (void *)0x49CCE0, 0x90, 74 );
-        MemPut < DWORD > ( 0x49CCE0, 0x90C3C033 );
+        MemPut < DWORD > ( 0x49CCE0, 0x90C3C033 );  //         *(DWORD *)(0x49CCE0) = 0x90C3C033;
         // Remove also some hardcoded and inlined checks for if it's a tag
         MemSet ( (void *)0x53374A, 0x90, 56 );
-        MemPut < BYTE > ( 0x4C4403, 0xEB );
+        MemPut < BYTE > ( 0x4C4403, 0xEB );  //         *(BYTE *)(0x4C4403) = 0xEB;
 
         // Force all tags to have zero tagged alpha
         //
@@ -4822,8 +4354,8 @@ void CMultiplayerSA::DeleteAndDisableGangTags ()
         // CVisibilityPlugins::GetUserValue is a cdecl.
         MemSet ( (void *)0x49CE58, 0x90, 5 );
         MemSet ( (void *)0x49CE5E, 0x90, 11 );
-        MemPut < unsigned short > ( 0x49CE5E, 0xC033 );
-        MemPut < unsigned short > ( 0x49CE60, 0xFF33 );
+        MemPut < unsigned short > ( 0x49CE5E, 0xC033 );  //         *(unsigned short *)0x49CE5E = 0xC033;
+        MemPut < unsigned short > ( 0x49CE60, 0xFF33 );  //         *(unsigned short *)0x49CE60 = 0xFF33;
     }
 }
 
@@ -5109,166 +4641,5 @@ void _declspec(naked) HOOK_CrashFix_Misc13 ()
         jmp     RETURN_CrashFix_Misc13a  // 4D4654
     cont:
         jmp     RETURN_CrashFix_Misc13b  // 4D478c
-    }
-}
-
-
-static SColor vehColors[4];
-
-void _cdecl SaveVehColors ( DWORD dwThis )
-{
-    CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwThis );
-    if ( pVehicle )
-    {
-        pVehicle->GetColor ( &vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], 0 );
-
-        // 0xFF00FF and 0x00FFFF both result in black for some reason
-        for ( uint i = 0 ; i < NUMELMS( vehColors ) ; i++ )
-        {
-            if ( vehColors[i] == 0xFF00FF )
-                vehColors[i] = 0xFF01FF;
-            if ( vehColors[i] == 0x00FFFF )
-                vehColors[i] = 0x01FFFF;
-        }
-    }
-}
-
-
-void _declspec(naked) HOOK_VehCol ()
-{
-    _asm
-    {
-        // Get vehColors for this vehicle
-        pushad
-        push esi
-        call SaveVehColors
-        add esp, 4
-        popad
-
-        // Hooked from 006D6603  9 bytes
-        mov         dl, 3
-        mov         al, 2
-        mov         cl, 1
-        push        edx  
-        xor         edx,edx 
-        mov         dl,byte ptr [esi+434h] 
-        mov         dl, 0
-
-        jmp     RETURN_VehCol  // 006D660C
-    }
-}
-
-
-void _declspec(naked) HOOK_VehColCB ()
-{
-    _asm
-    {
-        // Hooked from 004C838D  29 bytes
-
-        // Apply vehColors for this vehicle
-        mov         cl,byte ptr [esi*4+vehColors.R] 
-        mov         byte ptr [eax+4],cl
-
-        mov         cl,byte ptr [esi*4+vehColors.G] 
-        mov         byte ptr [eax+5],cl
-
-        mov         cl,byte ptr [esi*4+vehColors.B] 
-        mov         byte ptr [eax+6],cl
-
-        jmp     RETURN_VehColCB  // 004C83AA
-    }
-}
-
-// Check if this vehicle is allowed to process swinging doors.
-static DWORD dwSwingingDoorAutomobile;
-static const DWORD dwSwingingRet1 = 0x6A9DB6;
-static const DWORD dwSwingingRet2 = 0x6AA1DA;
-static bool AllowSwingingDoors ()
-{
-    CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD *)dwSwingingDoorAutomobile );
-    if ( pVehicle == 0 || pVehicle->AreSwingingDoorsAllowed() )
-        return true;
-    else
-        return false;
-}
-
-void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor ()
-{
-    _asm
-    {
-        mov     dwSwingingDoorAutomobile, esi
-        mov     ecx, [esi+eax*4+0x648]
-        pushad
-    }
-
-    if ( AllowSwingingDoors() )
-    {
-        _asm
-        {
-            popad
-            jmp     dwSwingingRet1
-        }
-    }
-    else
-    {
-        _asm
-        {
-            popad
-            jmp     dwSwingingRet2
-        }
-    }
-}
-
-void* SetModelSuspensionLinesToVehiclePrivate ( CVehicleSAInterface* pVehicleIntf )
-{
-    // Set the per-model suspension line data of the vehicle's model to the per-vehicle
-    // suspension line data so that collision processing will use that instead.
-    CVehicle* pVehicle = pVehicleIntf->m_pVehicle;
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicle->GetModelIndex () );
-    return pModelInfo->SetVehicleSuspensionData ( pVehicle->GetPrivateSuspensionLines () );
-}
-
-void SetModelSuspensionLines ( CVehicleSAInterface* pVehicleIntf, void* pSuspensionLines )
-{
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo ( pVehicleIntf->m_pVehicle->GetModelIndex () );
-    pModelInfo->SetVehicleSuspensionData ( pSuspensionLines );
-}
-
-void _declspec(naked) HOOK_ProcessVehicleCollision ()
-{
-    // When the vehicle's collision is about to be processed, set its per-vehicle
-    // suspension lines as the per-model suspension lines, and restore the per-model lines
-    // afterwards
-    _asm
-    {
-        push esi
-        call SetModelSuspensionLinesToVehiclePrivate
-        add esp, 4
-
-        push eax
-
-            push dword ptr [esp+4+0x20]
-            push dword ptr [esp+8+0x1C]
-            push dword ptr [esp+0xC+0x18]
-            push dword ptr [esp+0x10+0x14]
-            push dword ptr [esp+0x14+0x10]
-            push dword ptr [esp+0x18+0xC]
-            push dword ptr [esp+0x1C+8]
-            push dword ptr [esp+0x20+4]
-            mov eax, 0x4185C0       // CCollision::ProcessColModels
-            call eax
-            add esp, 0x20
-
-        pop edx
-
-        push eax
-        
-            push edx
-            push esi
-            call SetModelSuspensionLines
-            add esp, 8
-
-        pop eax
-        ret
     }
 }

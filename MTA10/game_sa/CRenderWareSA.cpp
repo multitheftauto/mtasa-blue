@@ -7,7 +7,6 @@
 *               and miscellaneous rendering functions
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               arc_
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *  RenderWare is © Criterion Software
@@ -402,8 +401,8 @@ void CRenderWareSA::ModelInfoTXDAddTextures ( std::list < RwTexture* >& textures
                 RwTexture* pNewTex = RwTextureCreate ( pTex->raster );
 
                 // Copy over additional properties
-                MemCpyFast ( &pNewTex->name, &pTex->name, RW_TEXTURE_NAME_LENGTH );
-                MemCpyFast ( &pNewTex->mask, &pTex->mask, RW_TEXTURE_NAME_LENGTH );
+                MemCpy ( &pNewTex->name, &pTex->name, RW_TEXTURE_NAME_LENGTH );
+                MemCpy ( &pNewTex->mask, &pTex->mask, RW_TEXTURE_NAME_LENGTH );
                 pNewTex->flags = pTex->flags;
                 
                 pTex = pNewTex;
@@ -452,73 +451,6 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures ( std::list < RwTexture* >& textu
     // Delete the reference we made in ModelInfoTXDAddTextures
     if ( bRemoveRef )
         CTxdStore_RemoveRef ( usTxdId );
-}
-
-struct SAnimHeader {
-    char    szVersion[4]; //ANPK or ANP3
-    int     iOffsetToEOF; //Offset to end of file
-    char    szBlockName[24]; //Block name to be used for the whole file
-    int     iNumberOfAnimations; //Number of animations inside the file
-};
-
-// Reads and parses an IFP file specified by a path (szIFP)
-CAnimBlock * CRenderWareSA::ReadIFP ( const char *szIFP )
-{
-
-    //Make sure we have a file path
-    if ( !szIFP )
-        return false;
-
-    // Read the file
-    FILE* pFile = fopen ( szIFP, "rb" );
-    //Make sure the file exists
-    if ( !pFile )
-        return NULL;
-
-    SAnimHeader SHeader;
-    //Read out the header information into SHeader
-    fread ( &SHeader, sizeof(SHeader), 1, pFile );
-    // Check the Header information ANP3 Is supported ANPK is not at the moment. 
-    if ( SHeader.szVersion[0] == 'A' && SHeader.szVersion[1] == 'N' && SHeader.szVersion[2] == 'P' && SHeader.szVersion[3] == '3' )
-    {
-        CAnimBlock * pAnim;
-        //Check it doesn't exist already
-        pAnim = pGame->GetAnimManager()->GetAnimationBlock( SHeader.szBlockName );
-        if ( pAnim )
-        {
-            //Return false before the loading
-            fclose ( pFile );
-            return NULL;
-        }
-    }
-    else
-    {
-        //Invalid file type close our file and return false
-        fclose ( pFile );
-        return NULL;
-    }
-
-    //close the file
-    fclose ( pFile );
-
-    // open the stream
-    RwStream * streamModel = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, szIFP );
-
-    // check for errors
-    if ( streamModel == NULL )
-        return NULL;
-
-    //Load the animation file from the stream
-    pGame->GetAnimManager()->LoadAnimFile( streamModel, true, "" );
-
-    //Register our animation block with SA
-    //int iBlockID = pGame->GetAnimManager()->RegisterAnimBlock( SHeader.szBlockName );
-
-    // close the stream
-    RwStreamClose ( streamModel, NULL );
-    CAnimBlock * pAnim = pGame->GetAnimManager()->GetAnimationBlock( SHeader.szBlockName );
-
-    return pAnim;
 }
 
 
@@ -732,7 +664,7 @@ void CRenderWareSA::ReplaceAllAtomicsInModel ( RpClump * pSrc, unsigned short us
     data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
     data.pClump = pCopy;
 
-    MemPutFast < DWORD > ( (DWORD*)DWORD_AtomicsReplacerModelID, usModelID );
+    MemPut < DWORD > ( (DWORD*)DWORD_AtomicsReplacerModelID, usModelID );  //     *((DWORD*)DWORD_AtomicsReplacerModelID) = usModelID;
     RpClumpForAllAtomics ( pCopy, AtomicsReplacer, &data );
 
     // Get rid of the now empty copied clump
@@ -813,8 +745,8 @@ void CRenderWareSA::ReplaceCollisions ( CColModel* pCol, unsigned short usModelI
     // Apply some low-level hacks (copies the old col area and sets a flag)
     DWORD pColModelInterface = (DWORD)pColModel->GetInterface ();
     DWORD pOldColModelInterface = *((DWORD *) pPool [ usModelID ] + 20);
-    MemOrFast < BYTE > ( pPool [usModelID ] + 0x13, 8 );
-    MemPutFast < BYTE > ( pColModelInterface + 40, *((BYTE *)( pOldColModelInterface + 40 )) );
+    MemOr < BYTE > ( pPool [usModelID ] + 0x13, 8 );  //     *((BYTE *)( pPool [usModelID ] + 0x13 )) |= 8;
+    MemPut < BYTE > ( pColModelInterface + 40, *((BYTE *)( pOldColModelInterface + 40 )) );  //     *((BYTE *)( pColModelInterface + 40 )) = *((BYTE *)( pOldColModelInterface + 40 ));
 
     // TODO: It seems that on entering the game, when this function is executed, the modelinfo array for this
     // model is still zero, leading to a crash!

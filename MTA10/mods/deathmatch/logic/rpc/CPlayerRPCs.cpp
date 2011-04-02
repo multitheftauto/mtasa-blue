@@ -6,7 +6,6 @@
 *  PURPOSE:     Player remote procedure calls
 *  DEVELOPERS:  Jax <>
 *               Stanislav Bobrov <lil_toady@hotmail.com>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -46,7 +45,7 @@ void CPlayerRPCs::ShowPlayerHudComponent ( NetBitStreamInterface& bitStream )
     {
         bool bDisabled = ( ucShow != 1 );
         enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_ALL };
+                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK };
         switch ( ucComponent )
         {
             case HUD_AMMO:
@@ -80,15 +79,6 @@ void CPlayerRPCs::ShowPlayerHudComponent ( NetBitStreamInterface& bitStream )
             case HUD_CLOCK:
                 g_pGame->GetHud ()->DisableClock ( bDisabled );
                 break;
-            case HUD_RADIO:
-                g_pGame->GetHud ()->DisableRadioName ( bDisabled );
-                break;
-            case HUD_WANTED:
-                g_pGame->GetHud ()->DisableWantedLevel ( bDisabled );
-                break;
-            case HUD_ALL:
-                g_pGame->GetHud ()->DisableAll ( bDisabled );
-                break;
         }
     }        
 }
@@ -105,12 +95,14 @@ void CPlayerRPCs::ForcePlayerMap ( NetBitStreamInterface& bitStream )
 }
 
 
-void CPlayerRPCs::SetPlayerNametagText ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPlayerRPCs::SetPlayerNametagText ( NetBitStreamInterface& bitStream )
 {
+    ElementID PlayerID;
     unsigned short usTextLength;
-    if ( bitStream.Read ( usTextLength ) )
+    if ( bitStream.Read ( PlayerID ) &&
+         bitStream.Read ( usTextLength ) )
     {
-        CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
+        CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
         if ( pPlayer )
         {
             char* szText = NULL;
@@ -131,34 +123,45 @@ void CPlayerRPCs::SetPlayerNametagText ( CClientEntity* pSource, NetBitStreamInt
 }
 
 
-void CPlayerRPCs::SetPlayerNametagColor ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPlayerRPCs::SetPlayerNametagColor ( NetBitStreamInterface& bitStream )
 {
+    ElementID PlayerID;
     unsigned char ucR, ucG, ucB;
-    if ( bitStream.Read ( ucR ) &&
+    if ( bitStream.Read ( PlayerID ) &&
+         bitStream.Read ( ucR ) &&
          bitStream.Read ( ucG ) &&
          bitStream.Read ( ucB ) )
     {
-        CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
+        CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
         if ( pPlayer )
+        {
             pPlayer->SetNametagOverrideColor ( ucR, ucG, ucB );
+        }
     }
 }
 
 
-void CPlayerRPCs::RemovePlayerNametagColor ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPlayerRPCs::RemovePlayerNametagColor ( NetBitStreamInterface& bitStream )
 {
-    CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
-    if ( pPlayer )
-        pPlayer->RemoveNametagOverrideColor ();
+    ElementID PlayerID;
+    if ( bitStream.Read ( PlayerID ) )
+    {
+        CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+        if ( pPlayer )
+        {
+            pPlayer->RemoveNametagOverrideColor ();
+        }
+    }
 }
 
 
-void CPlayerRPCs::SetPlayerNametagShowing ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CPlayerRPCs::SetPlayerNametagShowing ( NetBitStreamInterface& bitStream )
 {
+    ElementID PlayerID;
     unsigned char ucShowing;
-    if ( bitStream.Read ( ucShowing ) )
+    if ( bitStream.Read ( PlayerID ) && bitStream.Read ( ucShowing ) )
     {
-        CClientPlayer* pPlayer = m_pPlayerManager->Get ( pSource->GetID () );
+        CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
         if ( pPlayer )
         {
             pPlayer->SetNametagShowing ( ( ucShowing == 1 ) );

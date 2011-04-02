@@ -36,7 +36,7 @@
 #include "CMatrix.h"
 #include "CQuat.h"
 #include "SharedUtil.h"
-#include <bochs_internal/crc32.h>
+#include "utils/zip/crc32.h"
 #include "CMD5Hasher.h"
 #include "CChecksum.h"
 
@@ -56,11 +56,7 @@
 #include "packets/CKeysyncPacket.h"
 #include "packets/CLuaEventPacket.h"
 #include "packets/CLuaPacket.h"
-#include "packets/CElementRPCPacket.h"
 #include "packets/CMapInfoPacket.h"
-#include "packets/CObjectStartSyncPacket.h"
-#include "packets/CObjectStopSyncPacket.h"
-#include "packets/CObjectSyncPacket.h"
 #include "packets/CPacket.h"
 #include "packets/CPedStartSyncPacket.h"
 #include "packets/CPedStopSyncPacket.h"
@@ -106,6 +102,7 @@
 #include "luadefs/CLuaElementDefs.h"
 #include "luadefs/CLuaFileDefs.h"
 #include "luadefs/CLuaHTTPDefs.h"
+#include "luadefs/CLuaHandlingDefs.h"
 #include "luadefs/CLuaPickupDefs.h"
 #include "luadefs/CLuaResourceDefs.h"
 #include "luadefs/CLuaTextDefs.h"
@@ -123,11 +120,6 @@
 #include "lua/CLuaArgument.h"
 #include "lua/CLuaCFunctions.h"
 #include "lua/CLuaArguments.h"
-
-// Shared includes
-#include "CEasingCurve.h"
-#include "TInterpolation.h"
-#include "CPositionRotationAnimation.h"
 
 // Logic includes
 #include "ASE.h"
@@ -173,6 +165,8 @@
 #include "CGame.h"
 #include "CGroups.h"
 #include "CHTTPD.h"
+#include "CHandling.h"
+#include "CHandlingManager.h"
 #include "CKeyBinds.h"
 #include "CLanBroadcast.h"
 #include "CLogger.h"
@@ -184,13 +178,11 @@
 #include "CMarkerManager.h"
 #include "CObject.h"
 #include "CObjectManager.h"
-#include "CObjectSync.h"
 #include "CPacketTranslator.h"
 #include "CPad.h"
 #include "CPed.h"
 #include "CPedManager.h"
 #include "CPedSync.h"
-#include "CPerfStatManager.h"
 #include "CPerPlayerEntity.h"
 #include "CPickup.h"
 #include "CPickupManager.h"
@@ -231,6 +223,7 @@
 #include "CTextItem.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CVehicle.h"
+#include "CVehicleColor.h"
 #include "CVehicleColorManager.h"
 #include "CVehicleDefaultColors.h"
 #include "CVehicleManager.h"
@@ -247,10 +240,6 @@
 
 #include "CStaticFunctionDefinitions.h"
 
-// Shared includes
-#include "CEasingCurve.h"
-#include "CPositionRotationAnimation.h"
-
 // Utility includes
 #include "utils/CHTTPClient.h"
 #include "utils/CHTTPRequest.h"
@@ -263,10 +252,9 @@
 #include "utils/CTCPServerSocketImpl.h"
 #include "utils/CTCPSocket.h"
 #include "utils/CTCPSocketImpl.h"
-#include <base64.h>
+#include "utils/base64.h"
 
 // Module includes
 #include "CServer.h"
 #include "Config.h"
-#define SHOW_SELF_COMPILE_WARNING
 #include "../../version.h"

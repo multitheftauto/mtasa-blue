@@ -49,7 +49,6 @@
 				WarningLevel="3"
 				DebugInformationFormat="4"
 				DisableSpecificWarnings="4996"
-				AdditionalIncludeDirectories="shipped_for_mta_win32"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -114,7 +113,6 @@
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4996"
-				AdditionalIncludeDirectories="shipped_for_mta_win32"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -178,7 +176,6 @@
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4996"
-				AdditionalIncludeDirectories="shipped_for_mta_win32"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -261,7 +258,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\shipped_for_mta_win32\config.h"
+				RelativePath=".\config.h"
 				>
 			</File>
 			<File

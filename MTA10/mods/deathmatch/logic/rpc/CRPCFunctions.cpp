@@ -5,7 +5,6 @@
 *  FILE:        mods/deathmatch/logic/rpc/CRPCFunctions.cpp
 *  PURPOSE:     Remote procedure calls manager
 *  DEVELOPERS:  Jax <>
-*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -18,6 +17,7 @@
 #include "CBlipRPCs.h"
 #include "CCameraRPCs.h"
 #include "CElementRPCs.h"
+#include "CHandlingRPCs.h"
 #include "CInputRPCs.h"
 #include "CMarkerRPCs.h"
 #include "CObjectRPCs.h"
@@ -49,8 +49,7 @@ CBlendedWeather*            CRPCFunctions::m_pBlendedWeather;
 CClientGame*                CRPCFunctions::m_pClientGame;
 CClientWaterManager*        CRPCFunctions::m_pWaterManager;
 
-CRPCFunctions::SRPCHandler          CRPCFunctions::m_RPCHandlers[];
-CRPCFunctions::SElementRPCHandler   CRPCFunctions::m_ElementRPCHandlers[];
+CRPCFunctions::SRPCHandler  CRPCFunctions::m_RPCHandlers[];
 
 CRPCFunctions::CRPCFunctions ( CClientGame* pClientGame )
 {
@@ -88,6 +87,7 @@ void CRPCFunctions::AddHandlers ( void )
     CBlipRPCs::LoadFunctions ();
     CCameraRPCs::LoadFunctions ();
     CElementRPCs::LoadFunctions ();
+    CHandlingRPCs::LoadFunctions ();
     CInputRPCs::LoadFunctions ();
     CMarkerRPCs::LoadFunctions ();
     CObjectRPCs::LoadFunctions ();
@@ -104,69 +104,30 @@ void CRPCFunctions::AddHandlers ( void )
 }
 
 
-void CRPCFunctions::AddHandler ( unsigned char ucID, pfnRPCHandler Callback, const char * szName )
+void CRPCFunctions::AddHandler ( unsigned char ucID, pfnRPCHandler Callback, char * szName )
 {
     if ( ucID >= NUM_RPC_FUNCS )
         return;
 
     m_RPCHandlers [ ucID ].Callback = Callback;
-    strcpy ( m_RPCHandlers [ ucID ].szName, szName );
+    strncpy ( m_RPCHandlers [ ucID ].szName, szName, sizeof ( m_RPCHandlers [ ucID ].szName ) );
 }
 
-void CRPCFunctions::AddHandler ( unsigned  char ucID, pfnElementRPCHandler Callback, const char* szName )
-{
-    if ( ucID >= NUM_RPC_FUNCS )
-        return;
 
-    m_ElementRPCHandlers [ ucID ].Callback = Callback;
-    strcpy ( m_ElementRPCHandlers [ ucID ].szName, szName );
-}
-
-void CRPCFunctions::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& bitStream )
+void CRPCFunctions::ProcessPacket ( NetBitStreamInterface& bitStream )
 {
     unsigned char ucFunctionID = 255;
     if ( !bitStream.Read ( ucFunctionID ) ||
          ucFunctionID >= NUM_RPC_FUNCS )
         return;
 
-    if ( ucPacketID == PACKET_ID_LUA )
-    {
-        SRPCHandler* pHandler = &m_RPCHandlers [ ucFunctionID ];
-        if ( pHandler->Callback != NULL )
-        {
-            if ( m_bShowRPCs )
-                g_pCore->GetConsole ()->Printf ( "* rpc: %s", pHandler->szName );
-            (pHandler->Callback) ( bitStream );
-        }
-    }
-    else if ( ucPacketID == PACKET_ID_LUA_ELEMENT_RPC )
-    {
-        SElementRPCHandler* pElementHandler = &m_ElementRPCHandlers [ ucFunctionID ];
-        if ( pElementHandler->Callback != NULL )
-        {
-            if ( m_bShowRPCs )
-                g_pCore->GetConsole ()->Printf ( "* element-rpc: %s", pElementHandler->szName );
+    SRPCHandler* pHandler = &m_RPCHandlers [ ucFunctionID ];
+    if ( pHandler->Callback == NULL )
+        return;
 
-            // Grab the source entity.
-            ElementID ID;
-            bitStream.ReadCompressed ( ID );
-            CClientEntity* pSource = NULL;
-            if ( ID != INVALID_ELEMENT_ID )
-            {
-                pSource = CElementIDs::GetElement ( ID );
-#ifdef MTA_DEBUG
-                if ( pSource == NULL )
-                {
-                    OutputDebugLine ( "CRPCFunctions::ProcessPacket - FIXME" );
-                    CLogger::ErrorPrintf ( "CRPCFunctions::ProcessPacket - FIXME" );
-                }
-                // assert ( pSource != NULL );
-#endif
-                if ( pSource == NULL )
-                    return;
-            }
-
-            (pElementHandler->Callback) ( pSource, bitStream );
-        }
+    if ( m_bShowRPCs )
+    {
+        g_pCore->GetConsole ()->Printf ( "* rpc: %s", pHandler->szName );
     }
+    (pHandler->Callback) ( bitStream );
 }

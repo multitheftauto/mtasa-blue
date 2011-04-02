@@ -190,15 +190,6 @@ void CRadarMap::DoPulse ( void )
                 MoveWest ();
             }
         }
-    }
-}
-
-
-void CRadarMap::DoRender ( void )
-{
-    // If our radar image exists
-    if ( IsRadarShowing () )
-    {
 
         g_pCore->GetGraphics()->DrawTexture ( m_pRadarImage, static_cast < float > ( m_iMapMinX ),
                                                              static_cast < float > ( m_iMapMinY ),
@@ -449,6 +440,9 @@ void CRadarMap::InternalSetRadarEnabled ( bool bEnabled )
         g_pMultiplayer->HideRadar ( true );
         g_pCore->SetChatVisible ( false );
         g_pCore->SetDebugVisible ( false );
+
+        // Disable graphical effects
+        g_pMultiplayer->DisableHeatHazeEffect ( true );
     }
     else
     {
@@ -456,6 +450,9 @@ void CRadarMap::InternalSetRadarEnabled ( bool bEnabled )
         g_pMultiplayer->HideRadar ( false );
         g_pCore->SetChatVisible ( m_bChatVisible );
         g_pCore->SetDebugVisible ( m_bDebugVisible );
+
+        // Enable graphical effects
+        g_pMultiplayer->DisableHeatHazeEffect ( false );
     }
 }
 

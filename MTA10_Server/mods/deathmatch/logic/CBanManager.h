@@ -26,16 +26,16 @@ public:
 
     void                DoPulse                 ( void );
 
-    CBan*               AddBan                  ( CPlayer* pPlayer, const SString& strBanner = "Console", const SString& strReason = "", time_t tTimeOfUnban = 0 );
-    CBan*               AddBan                  ( const SString& strIP, const SString& strBanner = "Console", const SString& strReason = "", time_t tTimeOfUnban = 0 );
+    CBan*               AddBan                  ( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+    CBan*               AddBan                  ( const char* szIP, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
-    CBan*               AddSerialBan            ( CPlayer* pPlayer, CClient* pBanner = NULL, const SString& strReason = "", time_t tTimeOfUnban = 0 );
-    CBan*               AddSerialBan            ( const SString& strSerial, CClient* pBanner = NULL, const SString& strReason = "", time_t tTimeOfUnban = 0 );
+    CBan*               AddSerialBan            ( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+    CBan*               AddSerialBan            ( const char* szSerial, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
-    CBan*               AddAccountBan           ( CPlayer* pPlayer, CClient* pBanner = NULL, const SString& strReason = "", time_t tTimeOfUnban = 0 );
-    CBan*               AddAccountBan           ( const SString& szAccount, CClient* pBanner = NULL, const SString& strReason = "", time_t tTimeOfUnban = 0 );
+    CBan*               AddAccountBan           ( CPlayer* pPlayer, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
+    CBan*               AddAccountBan           ( const char* szAccount, CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
-    CBan*               AddBan                  ( const SString& strBanner = "Console", const SString& strReason = "", time_t tTimeOfUnban = 0 );
+    CBan*               AddBan                  ( CClient* pBanner = NULL, const char* szReason = NULL, time_t tTimeOfUnban = 0 );
 
     bool                Exists                  ( CBan* pBan );
 

@@ -13,13 +13,13 @@
 #ifndef CRESOURCECHECKER_H
 #define CRESOURCECHECKER_H
 
-#include <unzip.h>
+#include "../utils/zip/unzip.h"
 #ifdef WIN32
-#include <iowin32.h>
+#include "../utils/zip/iowin32.h"
 #else
-#include <ioapi.h>
+#include "../utils/zip/ioapi.h"
 #endif
-#include <zip.h>
+#include "../utils/zip/zip.h"
 
 
 class CResourceChecker

@@ -232,20 +232,10 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
         {    
             // Got a collision?
             CVector vecColPosition;
-            CVector vecColNormal;
-
-            int iMaterial = -1;
-            int iLighting = -1;
-            int iPiece = -1;
-
             if ( pColPoint )
             {
                 // Get the collision position
                 vecColPosition = *pColPoint->GetPosition ();
-                vecColNormal = *pColPoint->GetNormal();
-                iMaterial = pColPoint->GetSurfaceTypeB(); //From test, only B function return relevant data
-                iLighting = pColPoint->GetLightingB();
-                iPiece = pColPoint->GetPieceTypeB();
 
                 // Delete the colpoint
                 pColPoint->Destroy ();
@@ -257,21 +247,11 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
                 lua_pushnumber ( luaVM, vecColPosition.fX );
                 lua_pushnumber ( luaVM, vecColPosition.fY );
                 lua_pushnumber ( luaVM, vecColPosition.fZ );
-
                 if ( pColEntity )
                     lua_pushelement ( luaVM, pColEntity );
                 else
                     lua_pushnil ( luaVM );
-
-                lua_pushnumber ( luaVM, vecColNormal.fX );
-                lua_pushnumber ( luaVM, vecColNormal.fY );
-                lua_pushnumber ( luaVM, vecColNormal.fZ );
-
-                lua_pushinteger ( luaVM, iMaterial );
-                lua_pushinteger ( luaVM, iLighting );
-                lua_pushinteger ( luaVM, iPiece );
-
-                return 11;
+                return 5;
             }
             return 1;
         }
@@ -934,25 +914,6 @@ int CLuaFunctionDefs::GetGarageBoundingBox ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetTrafficLightState ( lua_State* luaVM )
-{
-    lua_pushnumber ( luaVM, g_pMultiplayer->GetTrafficLightState () );
-    return 1;
-}
-
-int CLuaFunctionDefs::AreTrafficLightsLocked ( lua_State* luaVM )
-{
-    lua_pushboolean ( luaVM, g_pMultiplayer->GetTrafficLightsLocked () );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetJetpackMaxHeight ( lua_State* luaVM )
-{
-    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetJetpackMaxHeight () );
-    return 1;
-}
-
-
 int CLuaFunctionDefs::GetBlurLevel ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pGame->GetBlurLevel () );
@@ -1002,46 +963,40 @@ int CLuaFunctionDefs::SetTime ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::GetSkyGradient ( lua_State* luaVM )
-{
-    unsigned char ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB;
-    CStaticFunctionDefinitions::GetSkyGradient ( ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB );
-
-    lua_pushnumber ( luaVM, ucTopR );
-    lua_pushnumber ( luaVM, ucTopG );
-    lua_pushnumber ( luaVM, ucTopB );
-    lua_pushnumber ( luaVM, ucBottomR );
-    lua_pushnumber ( luaVM, ucBottomG );
-    lua_pushnumber ( luaVM, ucBottomB );
-    return 6;
-}
-
-
 int CLuaFunctionDefs::SetSkyGradient ( lua_State* luaVM )
 {
-    CScriptArgReader argStream ( luaVM );
+    // Verify the argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    int iArgument2 = lua_type ( luaVM, 2 );
+    int iArgument3 = lua_type ( luaVM, 3 );
+    int iArgument4 = lua_type ( luaVM, 4 );
+    int iArgument5 = lua_type ( luaVM, 5 );
+    int iArgument6 = lua_type ( luaVM, 6 );
 
+    unsigned char ucTopRed = 0;
+    unsigned char ucTopGreen = 0;
+    unsigned char ucTopBlue = 0;
+    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) )
+        ucTopRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+    if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
+        ucTopGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
+    if ( ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
+        ucTopBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
+    unsigned char ucBottomRed = 0;
+    unsigned char ucBottomGreen = 0;
+    unsigned char ucBottomBlue = 0;
+    if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
+        ucBottomRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
+    if ( ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
+        ucBottomGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
+    if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
+        ucBottomBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
     // Set the new sky gradient
-    uchar ucTopRed, ucTopGreen, ucTopBlue;
-    uchar ucBottomRed, ucBottomGreen, ucBottomBlue;
-
-    argStream.ReadNumber ( ucTopRed, 0 );
-    argStream.ReadNumber ( ucTopGreen, 0 );
-    argStream.ReadNumber ( ucTopBlue, 0 );
-    argStream.ReadNumber ( ucBottomRed, 0 );
-    argStream.ReadNumber ( ucBottomGreen, 0 );
-    argStream.ReadNumber ( ucBottomBlue, 0 );
-
-    if ( !argStream.HasErrors () )
+    if ( CStaticFunctionDefinitions::SetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue ) )
     {
-        if ( CStaticFunctionDefinitions::SetSkyGradient ( ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setSkyGradient" );
 
     // Return false
     lua_pushboolean ( luaVM, false );
@@ -1058,83 +1013,6 @@ int CLuaFunctionDefs::ResetSkyGradient ( lua_State* luaVM )
     }
     lua_pushboolean ( luaVM, false );
     return 1;
-}
-
-
-int CLuaFunctionDefs::GetHeatHaze ( lua_State* luaVM )
-{
-    SHeatHazeSettings settings;
-    CStaticFunctionDefinitions::GetHeatHaze ( settings );
-
-    lua_pushnumber ( luaVM, settings.ucIntensity );
-    lua_pushnumber ( luaVM, settings.ucRandomShift );
-    lua_pushnumber ( luaVM, settings.usSpeedMin );
-    lua_pushnumber ( luaVM, settings.usSpeedMax );
-    lua_pushnumber ( luaVM, settings.sScanSizeX );
-    lua_pushnumber ( luaVM, settings.sScanSizeY );
-    lua_pushnumber ( luaVM, settings.usRenderSizeX );
-    lua_pushnumber ( luaVM, settings.usRenderSizeY );
-    lua_pushboolean ( luaVM, settings.bInsideBuilding );
-    return 9;
-}
-
-
-int CLuaFunctionDefs::SetHeatHaze ( lua_State* luaVM )
-{
-    CScriptArgReader argStream ( luaVM );
-
-    // Set the new heat haze settings
-    SHeatHazeSettings heatHaze;
-    argStream.ReadNumber ( heatHaze.ucIntensity );
-    argStream.ReadNumber ( heatHaze.ucRandomShift, 0 );
-    argStream.ReadNumber ( heatHaze.usSpeedMin, 12 );
-    argStream.ReadNumber ( heatHaze.usSpeedMax, 18 );
-    argStream.ReadNumber ( heatHaze.sScanSizeX, 75 );
-    argStream.ReadNumber ( heatHaze.sScanSizeY, 80 );
-    argStream.ReadNumber ( heatHaze.usRenderSizeX, 80 );
-    argStream.ReadNumber ( heatHaze.usRenderSizeY, 85 );
-    argStream.ReadBool ( heatHaze.bInsideBuilding, false );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::SetHeatHaze ( heatHaze ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setHeatHaze" );
-
-    // Return false
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::ResetHeatHaze ( lua_State* luaVM )
-{
-    if ( CStaticFunctionDefinitions::ResetHeatHaze () )
-    {
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::GetWaterColor ( lua_State* luaVM )
-{
-    float fRed, fGreen, fBlue, fAlpha;
-
-    CStaticFunctionDefinitions::GetWaterColor ( fRed, fGreen, fBlue, fAlpha );
-
-    lua_pushnumber ( luaVM, fRed );
-    lua_pushnumber ( luaVM, fGreen );
-    lua_pushnumber ( luaVM, fBlue );
-    lua_pushnumber ( luaVM, fAlpha );
-    return 4;
 }
 
 
@@ -1396,320 +1274,3 @@ int CLuaFunctionDefs::GetCloudsEnabled ( lua_State* luaVM )
       return 1;
 }
 
-int CLuaFunctionDefs::SetTrafficLightState ( lua_State *luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
-    {
-        unsigned char ucState = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
-        if ( CStaticFunctionDefinitions::SetTrafficLightState ( ucState ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
-    {
-        const char* szParam1 = lua_tostring ( luaVM, 1 );
-        if ( ! stricmp ( szParam1, "auto" ) )
-        {
-            bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( false ) &&
-                       CStaticFunctionDefinitions::SetTrafficLightState ( 0 );
-            lua_pushboolean ( luaVM, bOk );
-            return 1;
-        }
-        else if ( ! stricmp ( szParam1, "disabled" ) )
-        {
-            bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( true ) &&
-                       CStaticFunctionDefinitions::SetTrafficLightState ( 9 );
-            lua_pushboolean ( luaVM, bOk );
-            return 1;
-        }
-        else
-        {
-            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-            {
-                // Perform a conversion from two string parameters to a state number.
-                const char* szColorNS = szParam1;
-                const char* szColorEW = lua_tostring ( luaVM, 2 );
-
-                unsigned char ucState;
-                if ( SharedUtil::GetTrafficLightStateFromStrings ( szColorNS, szColorEW, ucState ) )
-                {
-                    // Change it.
-                    bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( true ) &&
-                               CStaticFunctionDefinitions::SetTrafficLightState ( ucState );
-                    lua_pushboolean ( luaVM, bOk );
-                    return 1;
-                }
-                else
-                    m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
-            }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetTrafficLightsLocked ( lua_State *luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
-    {
-        bool bLocked = lua_toboolean ( luaVM, 1 ) ? true : false;
-        if ( CStaticFunctionDefinitions::SetTrafficLightsLocked ( bLocked ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1 ;
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightsLocked" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetWindVelocity ( lua_State *luaVM )
-{
-    float fX, fY, fZ;
-
-    if ( CStaticFunctionDefinitions::GetWindVelocity ( fX, fY, fZ ) )
-    {
-        lua_pushnumber ( luaVM, fX );
-        lua_pushnumber ( luaVM, fY );
-        lua_pushnumber ( luaVM, fZ );
-        return 3;
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetWindVelocity ( lua_State *luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER && lua_type ( luaVM, 2 ) == LUA_TNUMBER && lua_type ( luaVM, 3 ) == LUA_TNUMBER )
-    {
-        float fX = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
-        float fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-        float fZ = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-
-        if ( CStaticFunctionDefinitions::SetWindVelocity ( fX, fY, fZ ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setWindVelocity" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::ResetWindVelocity ( lua_State *luaVM )
-{
-    if ( CStaticFunctionDefinitions::RestoreWindVelocity ( ) )
-    {
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::AreInteriorSoundsEnabled ( lua_State* luaVM)
-{
-    lua_pushboolean ( luaVM, g_pMultiplayer->AreInteriorSoundsEnabled ( ) );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetInteriorSoundsEnabled ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TBOOLEAN )
-    {
-        g_pMultiplayer->SetInteriorSoundsEnabled ( lua_toboolean ( luaVM, 1 ) ? true : false );
-
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetRainLevel ( lua_State* luaVM )
-{
-    lua_pushnumber ( luaVM, g_pGame->GetWeather ()->GetAmountOfRain ());
-    return 1;
-}
-
-int CLuaFunctionDefs::SetRainLevel ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
-    {
-        g_pGame->GetWeather ()->SetAmountOfRain ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
-
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::ResetRainLevel ( lua_State* luaVM )
-{
-    g_pGame->GetWeather ()->ResetAmountOfRain ( );
-
-    lua_pushboolean ( luaVM, true );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetFarClipDistance ( lua_State* luaVM )
-{
-    lua_pushnumber ( luaVM, g_pMultiplayer->GetFarClipDistance ( ) );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetFarClipDistance ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
-    {
-        g_pMultiplayer->SetFarClipDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
-
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::ResetFarClipDistance ( lua_State* luaVM )
-{
-    g_pMultiplayer->RestoreFarClipDistance ();
-
-    lua_pushboolean ( luaVM, true );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetFogDistance ( lua_State* luaVM )
-{
-    lua_pushnumber ( luaVM, g_pMultiplayer->GetFogDistance());
-    return 1;
-}
-
-int CLuaFunctionDefs::SetFogDistance ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
-    {
-        g_pMultiplayer->SetFogDistance ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ) );
-
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::ResetFogDistance ( lua_State* luaVM )
-{
-    g_pMultiplayer->RestoreFogDistance ( );
-
-    lua_pushboolean ( luaVM, true );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetSunColor ( lua_State* luaVM )
-{
-    unsigned char ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue;
-    
-    g_pMultiplayer->GetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
-
-    lua_pushnumber ( luaVM, ucCoreRed );
-    lua_pushnumber ( luaVM, ucCoreGreen );
-    lua_pushnumber ( luaVM, ucCoreBlue );
-    lua_pushnumber ( luaVM, ucCoronaRed );
-    lua_pushnumber ( luaVM, ucCoronaGreen );
-    lua_pushnumber ( luaVM, ucCoronaBlue );
-
-    return 6;
-}
-
-int CLuaFunctionDefs::SetSunColor ( lua_State* luaVM )
-{
-    // Verify the argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-
-    unsigned char ucCoreRed   = 0;
-    unsigned char ucCoreGreen = 0;
-    unsigned char ucCoreBlue  = 0;
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) )
-        ucCoreRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
-    if ( ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) )
-        ucCoreGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 2 ) );
-    if ( ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
-        ucCoreBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 3 ) );
-
-    unsigned char ucCoronaRed   = ucCoreRed;
-    unsigned char ucCoronaGreen = ucCoreGreen;
-    unsigned char ucCoronaBlue  = ucCoreBlue;
-    if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
-        ucCoronaRed = static_cast < unsigned char > ( lua_tonumber ( luaVM, 4 ) );
-    if ( ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
-        ucCoronaGreen = static_cast < unsigned char > ( lua_tonumber ( luaVM, 5 ) );
-    if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
-        ucCoronaBlue = static_cast < unsigned char > ( lua_tonumber ( luaVM, 6 ) );
-
-    g_pMultiplayer->SetSunColor ( ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue );
-
-    lua_pushboolean ( luaVM, true );
-    return 1;
-}
-
-int CLuaFunctionDefs::ResetSunColor ( lua_State* luaVM )
-{
-    g_pMultiplayer->ResetSunColor ( );
-
-    lua_pushboolean ( luaVM, true );
-    return 1;
-}
-
-int CLuaFunctionDefs::GetSunSize ( lua_State* luaVM )
-{
-    lua_pushnumber ( luaVM, g_pMultiplayer->GetSunSize ( ) );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetSunSize ( lua_State* luaVM )
-{
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
-    {
-        g_pMultiplayer->SetSunSize ( (float) lua_tonumber ( luaVM, 1 ) );
-
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::ResetSunSize ( lua_State* luaVM )
-{
-    g_pMultiplayer->ResetSunSize ();
-
-    lua_pushboolean ( luaVM, true );
-    return 1;
-}

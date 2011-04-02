@@ -35,6 +35,7 @@
 #define IS_COLSHAPE(element) ((element)->GetType()==CElement::COLSHAPE)
 #define IS_DUMMY(element)    ((element)->GetType()==CElement::DUMMY)
 #define IS_FILE(element)     ((element)->GetType()==CElement::SCRIPTFILE)
+#define IS_HANDLING(element) ((element)->GetType()==CElement::HANDLING)
 #define IS_MARKER(element)   ((element)->GetType()==CElement::MARKER)
 #define IS_OBJECT(element)   ((element)->GetType()==CElement::OBJECT)
 #define IS_PATHNODE(element) ((element)->GetType()==CElement::PATH_NODE)
@@ -77,6 +78,7 @@ public:
         PED,
         COLSHAPE,
         SCRIPTFILE,
+        HANDLING,
         WATER,
         UNKNOWN,
     };
@@ -268,7 +270,6 @@ protected:
     unsigned char                               m_ucInterior;
     bool                                        m_bDoubleSided;
     bool                                        m_bMapCreated;
-    bool                                        m_bUpdatingSpatialData;
 
     // Optimization for getElementsByType starting at root
 public:

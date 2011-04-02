@@ -6,18 +6,11 @@ AC_INIT(WikiBot, 0.1, rydencillo@gmail.com)
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_SRCDIR([include/wikibot.h])
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_FILES([Makefile src/Makefile data/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_LEX
-case $LEX in
-:) AC_MSG_ERROR([No lex program found]);;
-esac
-
-# Check for libtool
-AM_PROG_LIBTOOL
 
 # Checks for libraries.
 

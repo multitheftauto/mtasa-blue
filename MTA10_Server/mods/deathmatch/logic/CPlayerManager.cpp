@@ -260,7 +260,7 @@ void CPlayerManager::Broadcast ( const CPacket& Packet, list < CPlayer * > & pla
 }
 
 // TODO [28-Feb-2009] packetOrdering is currently always PACKET_ORDERING_GAME
-void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip )
+void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip, NetServerPacketOrdering packetOrdering, unsigned short usMinBitstreamVersion )
 {
     // Send the packet to each ingame player on the server except the skipped one
     list < CPlayer* > ::const_iterator iter = m_Players.begin ();
@@ -269,7 +269,8 @@ void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip
         CPlayer* pPlayer = *iter;
         if ( pPlayer != pSkip && pPlayer->IsJoined () )
         {
-            pPlayer->Send ( Packet );
+            if ( pPlayer->GetBitStreamVersion () >= usMinBitstreamVersion )
+                pPlayer->Send ( Packet, packetOrdering );
         }
     }
 }
@@ -278,8 +279,6 @@ void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip
 bool CPlayerManager::IsValidPlayerModel ( unsigned short usPlayerModel )
 {
     return ( usPlayerModel == 0 ||
-             usPlayerModel == 1 ||
-             usPlayerModel == 2 ||
              usPlayerModel == 7 ||
              (usPlayerModel >= 9 &&
              usPlayerModel != 208 &&
@@ -289,11 +288,9 @@ bool CPlayerManager::IsValidPlayerModel ( unsigned short usPlayerModel )
              usPlayerModel != 74 &&
              usPlayerModel != 65 &&
              usPlayerModel != 42 &&
-             usPlayerModel <= 272) ||
+             usPlayerModel <= 264) ||
              (usPlayerModel >= 274 &&
-             usPlayerModel <= 288) ||
-             (usPlayerModel >= 290 &&
-             usPlayerModel <= 312 ) );
+             usPlayerModel <= 288) );
 }
 
 

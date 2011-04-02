@@ -15,12 +15,6 @@
 #include <windows.h>
 #include "CVehicle.h"
 
-enum eAmbientSoundType
-{
-    AMBIENT_SOUND_GENERAL,
-    AMBIENT_SOUND_GUNFIRE,
-};
-
 class CAudio
 {
 public:
@@ -38,10 +32,6 @@ public:
     virtual VOID PauseAllSound ( bool bPaused )=0;
     virtual VOID StopRadio()=0;
     virtual VOID StartRadio( unsigned int station )=0;
-    virtual void PauseAmbientSounds ( bool bPaused )=0;
-    virtual VOID SetAmbientSoundEnabled ( eAmbientSoundType eType, bool bEnabled )=0;
-    virtual bool IsAmbientSoundEnabled ( eAmbientSoundType eType )=0;
-    virtual void ResetAmbientSounds ( void )=0;
 };
 
 #endif

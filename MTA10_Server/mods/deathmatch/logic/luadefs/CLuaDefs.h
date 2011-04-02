@@ -20,6 +20,7 @@
 #include "../CColManager.h"
 #include "../CElement.h"
 #include "../CElementDeleter.h"
+#include "../CHandlingManager.h"
 #include "../lua/CLuaManager.h"
 #include "../CMainConfig.h"
 #include "../CMarkerManager.h"
@@ -62,6 +63,7 @@ public:
     static void         Initialize      (   CElement* pRootElement,
                                             CElementDeleter* pElementDeleter,
                                             CBlipManager* pBlipManager,
+                                            CHandlingManager* pHandlingManager,
                                             CLuaManager* pLuaManager,
                                             CMarkerManager* pMarkers,
                                             CObjectManager* pObjectManager,
@@ -86,6 +88,7 @@ public:
 protected:
     static CElementDeleter*             m_pElementDeleter;
     static CBlipManager*                m_pBlipManager;
+    static CHandlingManager*            m_pHandlingManager;
     static CLuaManager*                 m_pLuaManager;
     static CMarkerManager*              m_pMarkerManager;
     static CObjectManager*              m_pObjectManager;

@@ -315,7 +315,7 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                         assert ( lua_gettop ( pState ) == luaStackPointer );
                     #endif
 
-                    CClientPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, GetTimeUs() - startTime );
+                    GetClientPerfStatManager ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, GetTimeUs() - startTime );
                 }
             }
         }

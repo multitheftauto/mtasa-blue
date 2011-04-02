@@ -15,7 +15,6 @@
 *               Stanislav Bobrov <lil_toady@hotmail.com>
 *               Alberto Alonso <rydencillo@gmail.com>
 *               Florian Busse <flobu@gmx.net>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *****************************************************************************/
 
@@ -32,43 +31,14 @@ int CLuaFunctionDefs::GUISetInputEnabled ( lua_State* luaVM )
 {
     bool bRet = false;
 
-    if ( lua_istype ( luaVM, 1, LUA_TBOOLEAN ) ) 
-    {
-        bRet = CStaticFunctionDefinitions::GUISetInputMode ( lua_toboolean ( luaVM, 1 ) ? "no_binds" : "allow_binds" ); 
-    }  
+    if ( lua_istype ( luaVM, 1, LUA_TBOOLEAN ) ) {
+        CStaticFunctionDefinitions::GUISetInputEnabled ( lua_toboolean ( luaVM, 1 ) ? true : false );
+        bRet = true;
+    }   // else: error, bad arguments
 
     lua_pushboolean ( luaVM, bRet );
     return 1;
 }
-
-int CLuaFunctionDefs::GUISetInputMode ( lua_State* luaVM )
-{
-    bool bRet = false;
-
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) ) 
-    {
-        bRet = CStaticFunctionDefinitions::GUISetInputMode ( lua_tostring ( luaVM, 1 ) );
-    }
-
-    lua_pushboolean ( luaVM, bRet );
-    return 1;
-}
-
-int CLuaFunctionDefs::GUIGetInputMode ( lua_State* luaVM )
-{
-    std::string strMode;
-    if ( CStaticFunctionDefinitions::GUIGetInputMode ( strMode ) )
-    {
-        lua_pushstring ( luaVM, strMode.c_str() );
-        return 1;
-    }
-    else
-    {
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-}
-
 
 
 int CLuaFunctionDefs::GUIIsChatBoxInputActive ( lua_State* luaVM )
@@ -94,17 +64,18 @@ int CLuaFunctionDefs::GUIIsDebugViewActive ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIIsMainMenuActive ( lua_State* luaVM )
 {
-    lua_pushboolean ( luaVM, g_pCore->IsMenuVisible () );
+    lua_pushboolean ( luaVM, g_pCore->IsSettingsVisible () || g_pCore->IsMenuVisible () );
     return 1;
 }
 
 
 int CLuaFunctionDefs::GUIIsMTAWindowActive ( lua_State* luaVM )
 {
-    bool bActive = ( g_pCore->IsChatInputEnabled () ||
+    bool bActive = g_pCore->IsChatInputEnabled () ||
+        g_pCore->IsSettingsVisible () ||
         g_pCore->IsMenuVisible () ||
         g_pCore->GetConsole ()->IsVisible () ||
-        g_pClientGame->GetTransferBox ()->IsVisible () );
+        g_pClientGame->GetTransferBox ()->IsVisible ();
 
     lua_pushboolean ( luaVM, bActive );
     return 1;
@@ -775,17 +746,11 @@ int CLuaFunctionDefs::GUISetFont ( lua_State* luaVM )
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
         lua_istype ( luaVM, 2, LUA_TSTRING ) )
     {
-        SString strFont = lua_tostring ( luaVM, 2 );
-        // If our font is a filepath, it's a custom font
-        CResource* pResource =  m_pLuaManager->GetVirtualMachine(luaVM)->GetResource();
-        std::string strPath, strMetaPath;
-        if ( CResourceManager::ParseResourcePathInput( strFont, pResource, strPath, strMetaPath ) && FileExists (strPath) )
-            strFont = SString("%s/%s", pResource->GetName(), strMetaPath.c_str());
-
+        const char *szFont = lua_tostring ( luaVM, 2 );
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            bResult = CStaticFunctionDefinitions::GUISetFont ( *pEntity, strFont );
+            bResult = CStaticFunctionDefinitions::GUISetFont ( *pEntity, szFont );
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "guiSetFont", "gui-element", 1 );
@@ -795,6 +760,7 @@ int CLuaFunctionDefs::GUISetFont ( lua_State* luaVM )
     lua_pushboolean ( luaVM, bResult );
     return 1;
 }
+
 
 int CLuaFunctionDefs::GUIBringToFront ( lua_State* luaVM )
 {
@@ -1870,14 +1836,14 @@ int CLuaFunctionDefs::GUIGridListGetItemData ( lua_State* luaVM )
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
         {
-            CLuaArgument* pVariable = reinterpret_cast < CLuaArgument* > (
+            const char* szData = reinterpret_cast < const char* > (
                 static_cast < CGUIGridList* > ( pGUIElement->GetCGUIElement () ) -> GetItemData (
                     static_cast < int > ( lua_tonumber ( luaVM, 2 ) ), 
                     static_cast < int > ( lua_tonumber ( luaVM, 3 ) )
                 )
             );
-            if ( pVariable )
-                pVariable->Push(luaVM);
+            if ( szData )
+                lua_pushstring ( luaVM, szData );
             else
                 lua_pushnil ( luaVM );
 
@@ -1958,18 +1924,17 @@ int CLuaFunctionDefs::GUIGridListSetItemData ( lua_State* luaVM )
 {
     if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
          lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
-         lua_istype ( luaVM, 3, LUA_TNUMBER ) )
+         lua_istype ( luaVM, 3, LUA_TNUMBER ) &&
+         lua_istype ( luaVM, 4, LUA_TSTRING ) )
     {
         CClientGUIElement *pGUIElement = lua_toguielement ( luaVM, 1 );
         if ( pGUIElement && IS_CGUIELEMENT_GRIDLIST ( pGUIElement ) )
         {
-            CLuaArgument* Variable = new CLuaArgument();
-            Variable->Read ( luaVM, 4 );
             CStaticFunctionDefinitions::GUIGridListSetItemData (
                 *pGUIElement,
                 static_cast < int > ( lua_tonumber ( luaVM, 2 ) ),
                 static_cast < int > ( lua_tonumber ( luaVM, 3 ) ),
-                Variable
+                lua_tostring ( luaVM, 4 )
             );
 
             lua_pushboolean ( luaVM, true );
@@ -2653,195 +2618,5 @@ int CLuaFunctionDefs::GUIGetChatboxLayout ( lua_State* luaVM )
         lua_settable( luaVM, -3 );
         lua_setfield ( luaVM, -2, "chat_scale" );
     }
-    return 1;
-}
-
-int CLuaFunctionDefs::GUICreateComboBox ( lua_State* luaVM )
-{
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        if ( lua_istype ( luaVM, 1, LUA_TNUMBER ) && lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
-            lua_istype ( luaVM, 3, LUA_TNUMBER ) && lua_istype ( luaVM, 4, LUA_TNUMBER ) &&
-            lua_istype ( luaVM, 5, LUA_TSTRING ) && lua_istype ( luaVM, 6, LUA_TBOOLEAN ) )
-        {
-            CClientGUIElement* pParent = lua_toguielement ( luaVM, 7 );
-
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateComboBox (
-                *pLuaMain,
-                static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
-                static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
-                static_cast < float > ( lua_tonumber ( luaVM, 3 ) ),
-                static_cast < float > ( lua_tonumber ( luaVM, 4 ) ),
-                lua_tostring ( luaVM, 5 ),
-                lua_toboolean ( luaVM, 6 ) ? true : false,
-                pParent
-                );
-
-            if ( pGUIElement ) {
-                lua_pushelement ( luaVM, pGUIElement );
-                return 1;
-            }
-        }
-    }
-
-    // error: bad arguments
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GUIComboBoxAddItem ( lua_State* luaVM )
-{
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TSTRING )
-        )
-    {
-        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
-        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
-        {
-            int newId = CStaticFunctionDefinitions::GUIComboBoxAddItem (
-                *pEntity,
-                lua_tostring ( luaVM, 2 )
-                );
-            lua_pushnumber( luaVM, newId );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxAddItem", "gui-element", 1 );
-    }
-
-    // error: bad arguments
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GUIComboBoxRemoveItem ( lua_State* luaVM )
-{
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) && lua_istype ( luaVM, 2, LUA_TNUMBER )
-        )
-    {
-        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
-        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
-        {
-            bool ret = CStaticFunctionDefinitions::GUIComboBoxRemoveItem (
-                *pEntity,
-                static_cast < int > ( lua_tonumber ( luaVM, 2 ) )
-                );
-            lua_pushboolean( luaVM, ret );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxRemoveItem", "gui-element", 1 );
-    }
-
-    // error: bad arguments
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GUIComboBoxClear ( lua_State* luaVM )
-{
-    bool returnVal = false;
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-    {
-        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
-        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
-        {
-            returnVal = CStaticFunctionDefinitions::GUIComboBoxClear (
-                *pEntity
-                );
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxClear", "gui-element", 1 );
-    }
-    lua_pushboolean ( luaVM, returnVal );
-    return 1;
-}
-
-int CLuaFunctionDefs::GUIComboBoxGetSelected ( lua_State* luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) )
-    {
-        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
-        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
-        {
-            int selected = CStaticFunctionDefinitions::GUIComboBoxGetSelected( *pEntity );
-            lua_pushnumber ( luaVM, selected );
-            return 1;
-        }
-        else m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxGetSelected", "gui-element", 1 );
-    }
-    lua_pushnil ( luaVM );
-    return 1;
-}
-
-int CLuaFunctionDefs::GUIComboBoxSetSelected ( lua_State* luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-         lua_istype ( luaVM, 2, LUA_TNUMBER )
-        )
-    {
-        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
-        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
-        {
-            bool ret = CStaticFunctionDefinitions::GUIComboBoxSetSelected( 
-                *pEntity,
-                static_cast < int > ( lua_tonumber ( luaVM, 2 ) )
-                );
-            lua_pushboolean ( luaVM, ret );
-            return 1;
-        }
-        else m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxSetSelected", "gui-element", 1 );
-    }
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GUIComboBoxGetItemText ( lua_State* luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-         lua_istype ( luaVM, 2, LUA_TNUMBER )
-        )
-    {
-        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
-        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
-        {
-            std::string ret = CStaticFunctionDefinitions::GUIComboBoxGetItemText( 
-                *pEntity,
-                static_cast < int > ( lua_tonumber ( luaVM, 2 ) )
-                );
-            lua_pushstring ( luaVM, ret.c_str( ) );
-            return 1;
-        }
-        else m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxGetItemText", "gui-element", 1 );
-    }
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::GUIComboBoxSetItemText ( lua_State* luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-         lua_istype ( luaVM, 2, LUA_TNUMBER ) &&
-         lua_istype ( luaVM, 3, LUA_TSTRING )
-        )
-    {
-        CClientGUIElement* pEntity = lua_toguielement ( luaVM, 1 );
-        if ( pEntity && IS_CGUIELEMENT_COMBOBOX ( pEntity ) )
-        {
-            bool ret = CStaticFunctionDefinitions::GUIComboBoxSetItemText( 
-                *pEntity,
-                static_cast < int > ( lua_tonumber ( luaVM, 2 ) ),
-                lua_tostring ( luaVM, 3 )
-                );
-            lua_pushboolean ( luaVM, ret );
-            return 1;
-        }
-        else m_pScriptDebugging->LogBadPointer ( luaVM, "guiComboBoxSetItemText", "gui-element", 1 );
-    }
-    lua_pushboolean ( luaVM, false );
     return 1;
 }

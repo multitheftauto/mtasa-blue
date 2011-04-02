@@ -59,8 +59,7 @@ public:
     void                        SetFocus                    ( CVector * vecTarget, bool bSmoothTransition );
     void                        SetFocusToLocalPlayer       ( void );
 
-    void                        SetCameraView               ( eVehicleCamMode eMode );
-    eVehicleCamMode             GetCameraView               ( void );
+    bool                        SetCameraMode               ( eCamMode eMode );               
     void                        SetCameraClip               ( bool bObjects, bool bVehicles );
 
     inline bool                 IsInFixedMode               ( void )                        { return m_bFixed; }

@@ -98,8 +98,6 @@ IUnknown * CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
         return NULL;
     }
 
-    GetServerCache ();
-
     // Create a proxy device.
     pNewProxy = new CProxyDirect3D9 ( static_cast < IDirect3D9 * > ( pThis->m_pDevice ) );
 

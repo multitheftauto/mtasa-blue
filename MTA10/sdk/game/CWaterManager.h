@@ -23,7 +23,7 @@ public:
     virtual bool                DeletePoly        ( CWaterPoly* pPoly ) = 0;
 
     virtual bool                GetWaterLevel     ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown ) = 0;
-    virtual bool                SetWaterLevel     ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL, bool bSkipCustom = false ) = 0;
+    virtual bool                SetWaterLevel     ( CVector* pvecPosition, float fLevel, void* pChangeSource = NULL ) = 0;
     virtual bool                SetWaterLevel     ( CWaterPoly* pPoly, float fLevel, void* pChangeSource = NULL ) = 0;
     virtual float               GetWaveLevel      () = 0;
     virtual void                SetWaveLevel      ( float fWaveLevel ) = 0;

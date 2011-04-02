@@ -16,7 +16,7 @@
 
 typedef unsigned long AssocGroupId;
 
-class CPedModelInfo
+class CPedModelInfo : public CModelInfo
 {
 public:
     virtual void                            SetMotionAnimGroup  ( AssocGroupId animGroup ) = 0;

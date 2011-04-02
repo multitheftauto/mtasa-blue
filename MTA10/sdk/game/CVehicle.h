@@ -17,7 +17,6 @@
 #include "CPhysical.h"
 #include "CDamageManager.h"
 #include "CHandlingManager.h"
-#include "CDoor.h"
 
 #include <CVector.h>
 
@@ -70,10 +69,6 @@ public:
     virtual bool                CanPedLeanOut               ( CPed* pPed ) = 0;
     virtual bool                CanPedStepOutCar            ( bool bUnknown ) = 0;
 
-    virtual CDoor*              GetDoor                     ( unsigned char ucDoor ) = 0;
-    virtual void                OpenDoor                    ( unsigned char ucDoor, float fRatio, bool bMakeNoise = false ) = 0;
-    virtual void                SetSwingingDoorsAllowed     ( bool bAllowed ) = 0;
-    virtual bool                AreSwingingDoorsAllowed     () const = 0;
     virtual bool                AreDoorsLocked              () = 0;
     virtual void                LockDoors                   ( bool bLocked ) = 0;
     virtual bool                AreDoorsUndamageable        () = 0;
@@ -106,8 +101,8 @@ public:
 
     virtual void                PlaceBikeOnRoadProperly     () = 0;
     virtual void                PlaceAutomobileOnRoadProperly() = 0;
-    virtual void                SetColor                    ( SColor color1, SColor color2, SColor color3, SColor color4, int ) = 0;
-    virtual void                GetColor                    ( SColor* color1, SColor* color2, SColor* color3, SColor* color4, int ) = 0;
+    virtual void                SetColor                    ( unsigned char color1, unsigned char color2, unsigned char color3, unsigned char color4 ) = 0;
+    virtual void                GetColor                    ( unsigned char* color1, unsigned char* color2, unsigned char* color3, unsigned char* color4 ) = 0;
     virtual void                Fix                         () = 0;
     virtual bool                IsSirenOrAlarmActive        () = 0;
     virtual void                SetSirenOrAlarmActive       ( bool bActive ) = 0;
@@ -218,9 +213,7 @@ public:
     virtual CColModel*           GetSpecialColModel                     ( void ) = 0;
     virtual bool                 UpdateMovingCollision                  ( float fAngle ) = 0;
 
-    virtual void                 RecalculateHandling                    ( void ) = 0;
-
-    virtual void*                GetPrivateSuspensionLines              ( void ) = 0;
+    virtual void                 UpdateHandlingStatus                   ( void ) = 0;
 };
 
 #endif
