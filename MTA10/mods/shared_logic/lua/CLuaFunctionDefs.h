@@ -87,6 +87,8 @@ public:
     LUA_DECLARE ( OutputChatBox );
     LUA_DECLARE ( ShowChat );
     LUA_DECLARE ( OutputClientDebugString );
+    LUA_DECLARE ( SetClipboard );
+    LUA_DECLARE ( GetClipboard );
 
     // Element get functions
     LUA_DECLARE ( GetRootElement );

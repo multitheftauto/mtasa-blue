@@ -91,6 +91,40 @@ int CLuaFunctionDefs::OutputChatBox ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetClipboard ( lua_State* luaVM )
+{
+    // Valid string argument?
+    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) || lua_istype ( luaVM, 1, LUA_TNUMBER ) )
+    {
+        // Grab the text
+        SString strText = lua_tostring ( luaVM, 1 );
+
+        // set to clip board
+        if ( CStaticFunctionDefinitions::SetClipboard ( strText ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setClipboard" );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GetClipboard ( lua_State *luaVM )
+{
+    SString strText;
+    if ( CStaticFunctionDefinitions::GetClipboard ( strText ) )
+        lua_pushstring ( luaVM, strText.c_str() );
+    else
+        lua_pushnil ( luaVM );
+    return 1;
+}
+
 int CLuaFunctionDefs::ShowChat ( lua_State* luaVM )
 {
     // Verify arguments

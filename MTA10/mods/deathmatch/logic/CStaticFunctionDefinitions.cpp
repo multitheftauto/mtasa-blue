@@ -230,6 +230,48 @@ bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, unsigned ch
 }
 
 
+bool CStaticFunctionDefinitions::SetClipboard ( SString& strText )
+{
+    std::wstring strUTF = GetBidiString ( ConvertToUTF8 ( strText.c_str() ) );
+
+    // Open and empty the clipboard
+    OpenClipboard ( NULL );
+    EmptyClipboard ();
+
+    // Allocate the clipboard buffer and copy the data
+    HGLOBAL hBuf = GlobalAlloc ( GMEM_DDESHARE, strUTF.length() * sizeof(wchar_t) + sizeof(wchar_t) );
+    wchar_t* buf = reinterpret_cast < wchar_t* > ( GlobalLock ( hBuf ) );
+    wcscpy ( buf , strUTF.c_str () );
+    GlobalUnlock ( hBuf );
+
+    // Copy the data into the clipboard
+    SetClipboardData ( CF_UNICODETEXT , hBuf );
+
+    // Close the clipboard
+    CloseClipboard ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetClipboard ( SString& strText )
+{
+    OpenClipboard( NULL );
+
+    // Get the clipboard's data and put it into a char array
+    const wchar_t * szBuffer = reinterpret_cast < const wchar_t* > ( GetClipboardData ( CF_UNICODETEXT ) );
+
+    CloseClipboard ();
+
+    if ( szBuffer )
+    {
+        strText = ConvertToANSI ( GetBidiString ( szBuffer ) ).c_str();
+        return true;
+    }
+
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::ShowChat ( bool bShow )
 {
     g_pCore->SetChatVisible ( bShow );
