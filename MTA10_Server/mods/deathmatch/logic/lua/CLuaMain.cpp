@@ -151,9 +151,6 @@ void CLuaMain::InitVM ( void )
     // Create a new VM
     m_luaVM = lua_open ();
 
-    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
-    InitSecurity ();
-
     // Set the instruction count hook
     lua_sethook ( m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT );
 
@@ -163,6 +160,9 @@ void CLuaMain::InitVM ( void )
     luaopen_string ( m_luaVM );
     luaopen_table ( m_luaVM );
     luaopen_debug ( m_luaVM );
+
+    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
+    InitSecurity ();
 
     // Registering C functions
     CLuaCFunctions::RegisterFunctionsWithVM ( m_luaVM );
