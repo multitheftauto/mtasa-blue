@@ -207,6 +207,7 @@ DWORD RETURN_CrashFix_Misc9b =                              0x73983A;
 
 #define HOOKPOS_CrashFix_Misc10                             0x5334FE
 DWORD RETURN_CrashFix_Misc10a =                             0x533504;
+DWORD RETURN_CrashFix_Misc10b =                             0x533539;
 
 #define HOOKPOS_CrashFix_Misc11                             0x4D2C62
 DWORD RETURN_CrashFix_Misc11a =                             0x4D2C67;
@@ -2844,8 +2845,8 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
         // iterating all materials of a clump and its atoms, and
         // calling a given callback. We temporarily overwrite that
         // callback with our own callback and then restore it.
-        MemPut < DWORD > ( 0x5332A2, dwCallback );
-        MemPut < DWORD > ( 0x5332F3, dwCallback );
+        MemPutFast < DWORD > ( 0x5332A2, dwCallback );
+        MemPutFast < DWORD > ( 0x5332F3, dwCallback );
 
         // Call SetRwObjectAlpha
         DWORD dwFunc = FUNC_SetRwObjectAlpha;
@@ -2857,8 +2858,8 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
         }
 
         // Restore the GTA callbacks
-        MemPut < DWORD > ( 0x5332A2, (DWORD)(0x533280) );
-        MemPut < DWORD > ( 0x5332F3, (DWORD)(0x533280) );
+        MemPutFast < DWORD > ( 0x5332A2, (DWORD)(0x533280) );
+        MemPutFast < DWORD > ( 0x5332F3, (DWORD)(0x533280) );
     }
 }
 
@@ -2944,9 +2945,9 @@ static void SetVehicleAlpha ( )
         bEntityHasAlpha = true;
         pCurAlpha = ucCurrentAlpha;
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0 );
-        MemPut < DWORD > ( 0x5332D6, (DWORD)CVehicle_EAEG );
+        MemPutFast < DWORD > ( 0x5332D6, (DWORD)CVehicle_EAEG );
         SetEntityAlphaHooked ( dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, 0 );
-        MemPut < DWORD > ( 0x5332D6, 0x533290 );
+        MemPutFast < DWORD > ( 0x5332D6, 0x533290 );
     }
     else
         bEntityHasAlpha = false;
@@ -5050,12 +5051,11 @@ void _declspec(naked) HOOK_CrashFix_Misc10 ()
         mov     dword ptr [esp], edx
         jmp     RETURN_CrashFix_Misc10a  // 533504
     cont:
-        mov     ecx, dword ptr [esp+1Ch] 
-        mov     dword ptr [ecx],0 
-        mov     dword ptr [ecx+4],0 
-        mov     dword ptr [ecx+8],0 
-        add     esp, 18h 
-        ret     8  
+        mov     ecx, dword ptr [esp+1Ch]
+        mov     dword ptr [ecx],0
+        mov     dword ptr [ecx+4],0
+        mov     dword ptr [ecx+8],0
+        jmp     RETURN_CrashFix_Misc10b  //533539
     }
 }
 
