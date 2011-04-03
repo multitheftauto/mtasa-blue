@@ -274,6 +274,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "outputChatBox", CLuaFunctionDefs::OutputChatBox );
     CLuaCFunctions::AddFunction ( "showChat", CLuaFunctionDefs::ShowChat );
     CLuaCFunctions::AddFunction ( "outputDebugString", CLuaFunctionDefs::OutputClientDebugString );
+    CLuaCFunctions::AddFunction ( "setClipboard", CLuaFunctionDefs::SetClipboard );
+    CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
 
     // Element get funcs
     CLuaCFunctions::AddFunction ( "getRootElement", CLuaFunctionDefs::GetRootElement );
@@ -718,7 +720,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiGridListSetColumnWidth", CLuaFunctionDefs::GUIGridListSetColumnWidth );
     CLuaCFunctions::AddFunction ( "guiGridListSetScrollBars", CLuaFunctionDefs::GUIGridListSetScrollBars );
     CLuaCFunctions::AddFunction ( "guiGridListGetRowCount", CLuaFunctionDefs::GUIGridListGetRowCount );
-    CLuaCFunctions::AddFunction ( "guiGridListGetColumnCount", CLuaFunctionDefs::GUIGridListGetRowCount );
+    CLuaCFunctions::AddFunction ( "guiGridListGetColumnCount", CLuaFunctionDefs::GUIGridListGetColumnCount );
     CLuaCFunctions::AddFunction ( "guiGridListAddRow", CLuaFunctionDefs::GUIGridListAddRow );
     CLuaCFunctions::AddFunction ( "guiGridListInsertRowAfter", CLuaFunctionDefs::GUIGridListInsertRowAfter );
     CLuaCFunctions::AddFunction ( "guiGridListRemoveRow", CLuaFunctionDefs::GUIGridListRemoveRow );
