@@ -87,8 +87,10 @@ bool CGUIStaticImage_Impl::LoadFromFile ( const char* szFilename, const char* sz
 bool CGUIStaticImage_Impl::LoadFromTexture ( CGUITexture* pTexture )
 {
 
-    if ( m_pImageset || m_pImage )
-        return false;
+    if ( m_pImageset && m_pImage )
+    {
+        m_pImageset->undefineImage ( m_pImage->getName() );
+    }
 
     if ( m_pTexture && pTexture != m_pTexture )
     {
@@ -106,7 +108,8 @@ bool CGUIStaticImage_Impl::LoadFromTexture ( CGUITexture* pTexture )
     m_pGUI->GetUniqueName ( szUnique );
 
     // Create an imageset
-    m_pImageset = m_pImagesetManager->createImageset ( szUnique, pCEGUITexture );
+    if ( !m_pImageset )
+        m_pImageset = m_pImagesetManager->createImageset ( szUnique, pCEGUITexture );
 
     // Get an unique identifier for CEGUI for the image
     m_pGUI->GetUniqueName ( szUnique );
