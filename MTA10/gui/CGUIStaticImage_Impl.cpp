@@ -89,7 +89,7 @@ bool CGUIStaticImage_Impl::LoadFromTexture ( CGUITexture* pTexture )
 
     if ( m_pImageset && m_pImage )
     {
-        m_pImageset->undefineImage ( m_pImage->getName() );
+        m_pImageset->undefineAllImages ();
     }
 
     if ( m_pTexture && pTexture != m_pTexture )
