@@ -53,7 +53,7 @@ bool CResourceConfigItem::Start ( void )
         }
 
         // Create the XML
-        m_pXMLFile = g_pCore->GetXML ()->CreateXML ( GetName () );
+        m_pXMLFile = g_pCore->GetXML ()->CreateXML ( GetName (), true );
         if ( m_pXMLFile )
         {
             // Parse the XML

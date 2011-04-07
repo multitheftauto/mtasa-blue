@@ -20,7 +20,7 @@ class CXMLAttribute;
 class CXML
 {
 public:
-    virtual CXMLFile*           CreateXML           ( const char* szFilename ) = 0;
+    virtual CXMLFile*           CreateXML           ( const char* szFilename, bool bUseIDs = false ) = 0;
     virtual void                DeleteXML           ( CXMLFile* pFile ) = 0;
     virtual CXMLNode*           CreateDummyNode     ( void ) = 0;
 

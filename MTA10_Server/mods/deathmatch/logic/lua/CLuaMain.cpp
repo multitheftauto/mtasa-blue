@@ -399,18 +399,9 @@ void CLuaMain::DoPulse ( void )
 }
 
 
-void CLuaMain::AddXML ( CXMLFile* pFile )
-{
-    if ( pFile )
-    {
-        m_XMLFiles.push_back ( pFile );
-    }
-}
-
-
 CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
 {
-    CXMLFile * pFile = g_pServerInterface->GetXML ()->CreateXML ( szFilename );
+    CXMLFile * pFile = g_pServerInterface->GetXML ()->CreateXML ( szFilename, true );
     if ( pFile )
         m_XMLFiles.push_back ( pFile );
     return pFile;

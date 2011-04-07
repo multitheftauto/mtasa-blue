@@ -354,7 +354,7 @@ void CLuaMain::DoPulse ( void )
 
 CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
 {
-    CXMLFile * pFile = g_pCore->GetXML ()->CreateXML ( szFilename );
+    CXMLFile * pFile = g_pCore->GetXML ()->CreateXML ( szFilename, true );
     if ( pFile )
         m_XMLFiles.push_back ( pFile );
     return pFile;

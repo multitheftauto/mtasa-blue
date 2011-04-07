@@ -15,6 +15,8 @@
 #define XML_ATTRIBUTE_VALUE_BUFFER  40
 
 CXMLAttributeImpl::CXMLAttributeImpl ( CXMLAttributesImpl& Attributes, TiXmlElement& Node, const std::string& strName ) :
+    m_ulID ( INVALID_XML_ID ),
+    m_bUsingIDs ( Attributes.IsUsingIDs () ),
     m_Attributes ( Attributes ),
     m_Node ( Node ),
     m_Attribute ( *new TiXmlAttribute ( strName.c_str (), "" ) )
@@ -27,10 +29,13 @@ CXMLAttributeImpl::CXMLAttributeImpl ( CXMLAttributesImpl& Attributes, TiXmlElem
     m_Attributes.AddToList ( this );
 
     // Add to array over XML stuff
-    m_ulID = CXMLArray::PopUniqueID ( this );
+    if ( m_bUsingIDs )
+        m_ulID = CXMLArray::PopUniqueID ( this );
 }
 
 CXMLAttributeImpl::CXMLAttributeImpl ( CXMLAttributesImpl& Attributes, TiXmlElement& Node, TiXmlAttribute& Attribute ) :
+    m_ulID ( INVALID_XML_ID ),
+    m_bUsingIDs ( Attributes.IsUsingIDs () ),
     m_Attributes ( Attributes ),
     m_Node ( Node ),
     m_Attribute ( Attribute )
@@ -42,14 +47,16 @@ CXMLAttributeImpl::CXMLAttributeImpl ( CXMLAttributesImpl& Attributes, TiXmlElem
     m_Attributes.AddToList ( this );
 
     // Add to array over XML stuff
-    m_ulID = CXMLArray::PopUniqueID ( this );
+    if ( m_bUsingIDs )
+        m_ulID = CXMLArray::PopUniqueID ( this );
 }
 
 
 CXMLAttributeImpl::~CXMLAttributeImpl ( void )
 {
     // Remove from array over XML stuff
-    CXMLArray::PushUniqueID ( this );
+    if ( m_bUsingIDs )
+        CXMLArray::PushUniqueID ( this );
 
     // Delete the attribute from the node aswell if we're supposed to
     if ( m_bDeleteAttribute )
