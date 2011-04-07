@@ -15,8 +15,10 @@
 using std::list;
 
 CXMLNodeImpl::CXMLNodeImpl ( CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node ) :
+    m_ulID ( INVALID_XML_ID ),
+    m_bUsingIDs ( pFile && pFile->IsUsingIDs () ),
     m_pNode ( &Node ),
-    m_Attributes ( Node )
+    m_Attributes ( Node, pFile && pFile->IsUsingIDs () )
 {
     // Init
     m_pFile = pFile;
@@ -35,14 +37,16 @@ CXMLNodeImpl::CXMLNodeImpl ( CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlEl
     }
 
     // Add to array over XML stuff
-    m_ulID = CXMLArray::PopUniqueID ( this );
+    if ( m_bUsingIDs )
+        m_ulID = CXMLArray::PopUniqueID ( this );
 }
 
 
 CXMLNodeImpl::~CXMLNodeImpl ( void )
 {
     // Remove from array over XML stuff
-    CXMLArray::PushUniqueID ( this );
+    if ( m_bUsingIDs )
+        CXMLArray::PushUniqueID ( this );
 
     // Delete our children
     DeleteAllSubNodes ();

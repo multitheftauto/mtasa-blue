@@ -23,7 +23,7 @@ class CXMLFileImpl : public CXMLFile
     friend class CXMLNodeImpl;
 
 public:
-                                    CXMLFileImpl        ( const char* szFilename );
+                                    CXMLFileImpl        ( const char* szFilename, bool bUseIDs );
                                     ~CXMLFileImpl       ( void );
 
     const char*                     GetFilename         ( void );
@@ -46,8 +46,9 @@ public:
     TiXmlDocument*                  GetDocument         ( void );
 
     eXMLClass                       GetClassType        ( void )    { return CXML_FILE; };
-    unsigned long                   GetID               ( void )    { return m_ulID; };
-    bool                            IsValid             ( void )    { return m_ulID != INVALID_XML_ID; };
+    unsigned long                   GetID               ( void )    { dassert ( m_bUsingIDs ); return m_ulID; };
+    bool                            IsValid             ( void )    { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
+    bool                            IsUsingIDs          ( void )    { return m_bUsingIDs; }
 
 private:
     bool                            BuildWrapperTree    ( void );
@@ -64,6 +65,7 @@ private:
 
     class CXMLNodeImpl*             m_pRootNode;
     unsigned long                   m_ulID;
+    const bool                      m_bUsingIDs;
 };
 
 #endif

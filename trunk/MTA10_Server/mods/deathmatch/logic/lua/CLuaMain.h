@@ -92,7 +92,6 @@ public:
     inline CVehicleManager*         GetVehicleManager       ( void ) const                  { return m_pVehicleManager; };
     inline CMapManager*             GetMapManager           ( void ) const                  { return m_pMapManager; };
     
-    void                            AddXML                  ( CXMLFile* pFile );
     CXMLFile *                      CreateXML               ( const char* szFilename );
     void                            DestroyXML              ( CXMLFile* pFile );
     void                            DestroyXML              ( CXMLNode* pRootNode );

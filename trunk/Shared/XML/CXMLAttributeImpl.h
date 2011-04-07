@@ -38,6 +38,8 @@ public:
 
     eXMLClass               GetClassType                ( void )    { return CXML_ATTR; };
     unsigned long           GetID                       ( void )    { return m_ulID; };
+    bool                    IsUsingIDs                  ( void )    { return m_bUsingIDs; };
+
 
     void                    DeleteWrapper               ( void );
 
@@ -48,6 +50,7 @@ private:
 
     unsigned long               m_ulID;
     bool                        m_bDeleteAttribute;
+    const bool                  m_bUsingIDs;
 };
 
 #endif
