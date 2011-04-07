@@ -204,7 +204,6 @@ DWORD RETURN_CrashFix_Misc9b =                              0x73983A;
 #define HOOKPOS_CrashFix_Misc10                              0x5334FE
 DWORD RETURN_CrashFix_Misc10a =                              0x533504;
 DWORD RETURN_CrashFix_Misc10b =                              0x533539;
-DWORD RETURN_CrashFix_Misc10b =                             0x533539;
 
 #define HOOKPOS_CrashFix_Misc11                              0x4D2C62
 DWORD RETURN_CrashFix_Misc11a =                              0x4D2C67;
