@@ -14,6 +14,7 @@
 
 #include "StdInc.h"
 #include "direct.h"
+#include "SharedUtil.Tests.hpp"
 int DoLaunchGame ( LPSTR lpCmdLine );
 int LaunchGame ( LPSTR lpCmdLine );
 
@@ -28,6 +29,10 @@ HINSTANCE g_hInstance = NULL;
 ///////////////////////////////////////////////////////////////
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+#if defined(_DEBUG) 
+    SharedUtil_Tests ();
+#endif
+
     g_hInstance = hInstance;
 
     //////////////////////////////////////////////////////////

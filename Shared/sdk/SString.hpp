@@ -238,34 +238,48 @@ SString SString::SplitRight ( const SString& strDelim, SString* pstrLeft, int iI
 //
 // Replace all occurrences of the string szOld with szNew
 //
-SString SString::Replace ( const char* szOld, const char* szNew ) const
+SString SString::Replace ( const char* szOld, const char* szNew, bool bSearchJustReplaced ) const
 {
+    // Check if anything to replace first
+    int idx = 0;
+    if( ( idx = this->find ( szOld, idx ) ) == npos )
+        return *this;
+
     int iOldLength = strlen ( szOld );
     int iNewLength = strlen ( szNew );
     SString strResult = *this;
-    int idx = 0;
-    while( ( idx = strResult.find ( szOld, idx ) ) >= 0 )
+    do
     {
         strResult.replace ( idx, iOldLength, szNew );
-        idx += iNewLength - iOldLength + 1;
+        if ( !bSearchJustReplaced )
+            idx += iNewLength;
     }
+    while( ( idx = strResult.find ( szOld, idx ) ) >= 0 );
     return strResult;
 }
 
 //
 // Case insensitive version of Replace()
 //
-SString SString::ReplaceI ( const char* szOld, const char* szNew ) const
+SString SString::ReplaceI ( const char* szOld, const char* szNew, bool bSearchJustReplaced ) const
 {
+    SString strOldUpper = SStringX ( szOld ).ToUpper ();
+
+    // Check if anything to replace first
+    int idx = 0;
+    if( ( idx = this->ToUpper ().find ( strOldUpper, idx ) ) == npos )
+        return *this;
+
     int iOldLength = strlen ( szOld );
     int iNewLength = strlen ( szNew );
     SString strResult = *this;
-    int idx = 0;
-    while( ( idx = strResult.ToUpper ().find ( SString ( szOld, 0 ).ToUpper (), idx ) ) >= 0 )
+    do
     {
         strResult.replace ( idx, iOldLength, szNew );
-        idx += iNewLength - iOldLength + 1;
+        if ( !bSearchJustReplaced )
+            idx += iNewLength;
     }
+    while( ( idx = strResult.ToUpper ().find ( strOldUpper, idx ) ) >= 0 );
     return strResult;
 }
 

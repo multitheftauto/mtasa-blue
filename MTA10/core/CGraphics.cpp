@@ -619,19 +619,23 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
 
 bool CGraphics::LoadFonts ( void )
 {
-    std::string strFontPath;
-
-    CFilePathTranslator FilePathTranslator;
-    FilePathTranslator.GetMTASARootDirectory ( strFontPath );
-    strFontPath += "\\MTA\\cgui\\";
-
     // Add our custom font resources
-    int iLoaded = 0;
-    iLoaded += AddFontResourceEx ( std::string ( strFontPath + "pricedown.ttf" ).c_str (), FR_PRIVATE, 0 );
-    iLoaded += AddFontResourceEx ( std::string ( strFontPath + "sabankgothic.ttf" ).c_str (), FR_PRIVATE, 0 );
-    iLoaded += AddFontResourceEx ( std::string ( strFontPath + "saheader.ttf" ).c_str (), FR_PRIVATE, 0 );
-    iLoaded += AddFontResourceEx ( std::string ( strFontPath + "sagothic.ttf" ).c_str (), FR_PRIVATE, 0 );
-    iLoaded += AddFontResourceEx ( std::string ( strFontPath + "unifont-5.1.20080907.ttf" ).c_str (), FR_PRIVATE, 0 );
+    if ( m_FontResourceNames.empty () )
+    {
+        m_FontResourceNames.push_back ( "pricedown.ttf" );
+        m_FontResourceNames.push_back ( "sabankgothic.ttf" );
+        m_FontResourceNames.push_back ( "saheader.ttf" );
+        m_FontResourceNames.push_back ( "sagothic.ttf" );
+        m_FontResourceNames.push_back ( "unifont-5.1.20080907.ttf" );
+    }
+
+    for ( uint i = 0 ; i < m_FontResourceNames.size () ; i++ )
+    {
+        if ( !AddFontResourceEx ( CalcMTASAPath ( "MTA\\cgui\\" + m_FontResourceNames[i] ), FR_PRIVATE, 0 ) )
+        {
+            BrowseToSolution ( "mta-datafiles-missing", true, true, true, "Error loading MTA font " + m_FontResourceNames[i] );
+        }
+    }
 
     // Create DirectX font and sprite objects
     static const sFontInfo fontInfos[] = {
@@ -647,31 +651,35 @@ bool CGraphics::LoadFonts ( void )
         { "unifont",              14, FW_NORMAL }
     };
 
-    bool bSuccess = true;
-    for ( int i = 0; bSuccess && i < NUM_FONTS; i++ )
+    for ( int i = 0; i < NUM_FONTS; i++ )
     {
         m_pDXFonts[i] = m_pBigDXFonts[i] = NULL;
 
         // Normal size
-        if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight, 0, fontInfos[i].uiWeight, 1,
+        if( SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight, 0, fontInfos[i].uiWeight, 1,
             FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
             &m_pDXFonts[i] ) ) )
         {
-            CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D font '%s'", fontInfos[i].szName );
-            bSuccess = false;
+            // Big size (4x)
+            if( SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight*4, 0, fontInfos[i].uiWeight, 1,
+                FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
+                &m_pBigDXFonts[i] ) ) )
+            {
+                continue;
+            }
         }
 
-        // Big size (4x)
-        if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight*4, 0, fontInfos[i].uiWeight, 1,
-            FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
-            &m_pBigDXFonts[i] ) ) )
-        {
-            CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D big font '%s'", fontInfos[i].szName );
-            bSuccess = false;
-        }
+        SString strMessage ( "Could not create Direct3D font '%s'", fontInfos[i].szName );
+        CLogger::GetSingleton ().ErrorPrintf( "%s", *strMessage );
+        BrowseToSolution ( "create-fonts", true, true, true, strMessage );
     }
 
-    return bSuccess && SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) && ( iLoaded == 5 );
+    if( !SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) )
+    {
+        BrowseToSolution ( "fonts-create-sprite-fail", true, true, true, "Error calling CGraphics::LoadFonts() D3DXCreateSprite" );
+    }
+
+    return true;
 }
 
 bool CGraphics::LoadFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont )
@@ -713,18 +721,11 @@ bool CGraphics::DestroyFont ( std::string strFontPath )
 
 bool CGraphics::DestroyFonts ( void )
 {
-    std::string strFontPath;
-
-    CFilePathTranslator FilePathTranslator;
-    FilePathTranslator.GetMTASARootDirectory ( strFontPath );
-    strFontPath += "\\MTA\\cgui\\";
-
     // Remove our custom font resources (needs to be identical to LoadFonts)
-    RemoveFontResourceEx ( std::string ( strFontPath + "pricedown.ttf" ).c_str (), FR_PRIVATE, 0 );
-    RemoveFontResourceEx ( std::string ( strFontPath + "sabankgothic.ttf" ).c_str (), FR_PRIVATE, 0 );
-    RemoveFontResourceEx ( std::string ( strFontPath + "saheader.ttf" ).c_str (), FR_PRIVATE, 0 );
-    RemoveFontResourceEx ( std::string ( strFontPath + "sagothic.ttf" ).c_str (), FR_PRIVATE, 0 );
-    RemoveFontResourceEx ( std::string ( strFontPath + "unifont-5.1.20080907.ttf" ).c_str (), FR_PRIVATE, 0 );
+    for ( uint i = 0 ; i < m_FontResourceNames.size () ; i++ )
+    {
+        RemoveFontResourceEx ( CalcMTASAPath ( "MTA\\cgui\\" + m_FontResourceNames[i] ), FR_PRIVATE, 0 );
+    }
 
     return true;
 }
@@ -794,9 +795,7 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
 {
     m_pDevice = pDevice;
 
-    if ( !LoadFonts () )
-        // Some of the above objects could not be created, but how do we print without a console!? Doh.
-        //CCore::GetSingleton ().GetConsole ()->Printf ( "WARNING: Some fonts could not be loaded! Your game will not be able to display any text." );
+    LoadFonts ();
 
     // Get the original render target
     assert ( !m_pOriginalTarget );

@@ -55,10 +55,7 @@ SString SharedUtil::GetMTASABaseDir ( void )
 //
 SString SharedUtil::CalcMTASAPath ( const SString& strPath )
 {
-    SString strNewPath = GetMTASABaseDir();
-    strNewPath += '\\';
-    strNewPath += strPath;
-    return strNewPath;
+    return PathJoin ( GetMTASABaseDir(), strPath );
 }
 
 

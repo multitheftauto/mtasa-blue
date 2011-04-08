@@ -321,7 +321,7 @@ bool CAccountManager::Load( const char* szFileName )
             // Try to repair name
             if ( strName.length () <= 256 )
             {
-                strName = strName.Replace ( "\"\"", "\"" ).substr ( 0, 64 );
+                strName = strName.Replace ( "\"\"", "\"", true ).substr ( 0, 64 );
                 bChanged = true;
             }
 
