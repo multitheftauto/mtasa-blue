@@ -228,27 +228,24 @@ void SharedUtil::MakeSureDirExists ( const SString& strPath )
 }
 
 
-SString SharedUtil::PathConform ( const SString& strInPath )
+SString SharedUtil::PathConform ( const SString& strPath )
 {
-    SString strPath = strInPath;
-    // '/' to '\'
+    // Make slashes the right way and remove duplicates
 #if WIN32
-    strPath = strPath.Replace ( "/", PATH_SEPERATOR );
+    return strPath.Replace ( "/", PATH_SEPERATOR ).Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
 #else
-    strPath = strPath.Replace ( "\\", PATH_SEPERATOR );
+    return strPath.Replace ( "\\", PATH_SEPERATOR ).Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
 #endif
-    // no '\\'
-    strPath = strPath.Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR );
-    return strPath;
+}
+
+SString SharedUtil::PathJoin ( const SString& str1, const SString& str2 )
+{
+    return PathConform ( str1 + PATH_SEPERATOR + str2 );
 }
 
 SString SharedUtil::PathJoin ( const SString& str1, const SString& str2, const SString& str3, const SString& str4, const SString& str5 )
 {
-    SString strResult = str1;
-    if ( str2.length () )
-       strResult += PATH_SEPERATOR + str2; 
-    if ( str3.length () )
-       strResult += PATH_SEPERATOR + str3; 
+    SString strResult = str1 + PATH_SEPERATOR + str2 + PATH_SEPERATOR + str3;
     if ( str4.length () )
        strResult += PATH_SEPERATOR + str4; 
     if ( str5.length () )
@@ -488,4 +485,3 @@ SString SharedUtil::MakeUniquePath ( const SString& strPathFilename )
     return strTest;
 }
 #endif
-
