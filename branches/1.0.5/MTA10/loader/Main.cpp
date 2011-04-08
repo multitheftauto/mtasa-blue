@@ -15,6 +15,7 @@
 #include "StdInc.h"
 #include "direct.h"
 #include <time.h>
+#include "SharedUtil.Tests.hpp"
 
 // Command line as map
 class CUPL : public CArgMap
@@ -48,6 +49,10 @@ public:
 ///////////////////////////////////////////////////////////////
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+#if defined(_DEBUG) 
+    SharedUtil_Tests ();
+#endif
+
     g_hInstance = hInstance;
     g_lpCmdLine = lpCmdLine;
 
