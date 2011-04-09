@@ -90,7 +90,7 @@
     #endif
     #define MTA_DM_ASE_VERSION                  _ASE_VERSION "n"
     #define MTA_DM_NETCODE_VERSION              ( _NETCODE_VERSION + ( _NETCODE_VERSION_BRANCH_ID << 12 ) )
-    #define MTA_DM_SERVER_NET_MODULE_VERSION    ( _SERVER_NET_MODULE_VERSION + ( _NETCODE_VERSION_BRANCH_ID << 12 ) )
+    #define MTA_DM_SERVER_NET_MODULE_VERSION    ( _SERVER_NET_MODULE_VERSION + ( 4 << 12 ) )
 #endif
 
 // Handy self compile message

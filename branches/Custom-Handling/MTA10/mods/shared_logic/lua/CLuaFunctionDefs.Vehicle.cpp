@@ -2349,8 +2349,6 @@ int CLuaFunctionDefs::SetVehicleTurretPosition ( lua_State *luaVM )
     return 1;
 }
 
-#if WITH_VEHICLE_HANDLING
-
 int CLuaFunctionDefs::GetVehicleHandling ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
@@ -2512,7 +2510,6 @@ int CLuaFunctionDefs::GetVehicleHandling ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-#endif      //  WITH_VEHICLE_HANDLING
 
 int CLuaFunctionDefs::SetVehicleDoorOpenRatio ( lua_State* luaVM )
 {

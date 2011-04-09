@@ -499,9 +499,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isVehicleTaxiLightOn", CLuaFunctionDefs::IsVehicleTaxiLightOn );
     CLuaCFunctions::AddFunction ( "getVehicleHeadLightColor", CLuaFunctionDefs::GetVehicleHeadLightColor );
     CLuaCFunctions::AddFunction ( "getVehicleCurrentGear", CLuaFunctionDefs::GetVehicleCurrentGear );
-#if WITH_VEHICLE_HANDLING
     CLuaCFunctions::AddFunction ( "getVehicleHandling", CLuaFunctionDefs::GetVehicleHandling );
-#endif
     CLuaCFunctions::AddFunction ( "getVehicleDoorOpenRatio", CLuaFunctionDefs::GetVehicleDoorOpenRatio );
 
     // Vehicle set funcs

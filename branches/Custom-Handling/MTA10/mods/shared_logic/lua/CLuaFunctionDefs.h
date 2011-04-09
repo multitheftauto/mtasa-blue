@@ -298,9 +298,7 @@ public:
     LUA_DECLARE ( IsVehicleBlown );
     LUA_DECLARE ( GetVehicleHeadLightColor );
     LUA_DECLARE ( GetVehicleCurrentGear );
-#if WITH_VEHICLE_HANDLING
     LUA_DECLARE ( GetVehicleHandling );
-#endif
     LUA_DECLARE ( GetVehicleDoorOpenRatio );
 
     // Vehicle set functions
