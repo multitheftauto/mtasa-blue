@@ -4630,8 +4630,13 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
         switch ( eProperty )
         {
             case HANDLING_PERCENTSUBMERGED:
-                pEntry->SetPercentSubmerged ( uiValue );
-                break;
+            {
+                if ( uiValue > 0 && uiValue <= 100 )
+                {
+                    pEntry->SetPercentSubmerged ( uiValue );
+                    break;
+                }
+            }
             /*case HANDLING_MONETARY:
                 pEntry->SetMonetary ( uiValue );
                 break;*/
@@ -4655,11 +4660,20 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
         switch ( eProperty )
         {
             case HANDLING_NUMOFGEARS:
-                pEntry->SetNumberOfGears ( ucValue );
-                break;
+            {
+                if ( ucValue > 0 && ucValue <= 5 )
+                {
+                    pEntry->SetNumberOfGears ( ucValue );
+                    break;
+                }
+            }
             case HANDLING_ANIMGROUP:
-                pEntry->SetAnimGroup ( ucValue );
-                break;
+                if ( ucValue >= 0 && ucValue <= 29 
+                    && ucValue != 3 && ucValue != 8 && ucValue != 17 && ucValue != 23 ) 
+                {
+                    pEntry->SetAnimGroup ( ucValue );
+                    break;
+                }
             default:
                 return false;
         }
@@ -4674,73 +4688,183 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
         switch ( eProperty )
         {
             case HANDLING_MASS:
-                pEntry->SetMass ( fValue );
-                break;
+            {
+                if ( fValue >= 0 && fValue <= 100000)
+                {
+                    pEntry->SetMass ( fValue );
+                    break;
+                }
+            }
             case HANDLING_TURNMASS:
-                pEntry->SetTurnMass ( fValue );
-                break;
+            {          
+                if ( fValue >= 0 && fValue <= 100000)
+                {  
+                    pEntry->SetTurnMass ( fValue );
+                    break;
+                }
+            }
             case HANDLING_DRAGCOEFF:
-                pEntry->SetDragCoeff ( fValue );
-                break;
+            {           
+                if ( fValue >= -100 && fValue <= 100)
+                { 
+                    pEntry->SetDragCoeff ( fValue );
+                    break;
+                }
+            }
             case HANDLING_TRACTIONMULTIPLIER:
-                pEntry->SetTractionMultiplier ( fValue );
-                break;
+            {            
+                if ( fValue >= 0 && fValue <= 100000)
+                {
+                    pEntry->SetTractionMultiplier ( fValue );
+                    break;
+                }
+            }
             case HANDLING_ENGINEACCELERATION:
-                pEntry->SetEngineAcceleration ( fValue );
-                break;
+            {            
+                if ( fValue >= 0 && fValue <= 100000)
+                {
+                    pEntry->SetEngineAcceleration ( fValue );
+                    break;
+                }
+            }
             case HANDLING_ENGINEINERTIA:
-                pEntry->SetEngineInertia ( fValue );
-                break;
+            {            
+                if ( fValue >= -1000 && fValue <= 1000)
+                {
+                    pEntry->SetEngineInertia ( fValue );
+                    break;
+                }
+            }
             case HANDLING_MAXVELOCITY:
-                pEntry->SetMaxVelocity ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 200000)
+                {
+                    pEntry->SetMaxVelocity ( fValue );
+                    break;
+                }
+            }
             case HANDLING_BRAKEDECELERATION:
-                pEntry->SetBrakeDeceleration ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 100000)
+                {
+                    pEntry->SetBrakeDeceleration ( fValue );
+                    break;
+                }
+            }
             case HANDLING_BRAKEBIAS:
-                pEntry->SetBrakeBias ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 1.0)
+                {
+                    pEntry->SetBrakeBias ( fValue );
+                    break;
+                }
+            }
             case HANDLING_STEERINGLOCK:
-                pEntry->SetSteeringLock ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 360)
+                {
+                    pEntry->SetSteeringLock ( fValue );
+                    break;
+                }
+            }
             case HANDLING_TRACTIONLOSS:
-                pEntry->SetTractionLoss ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 100)
+                {
+                    pEntry->SetTractionLoss ( fValue );
+                    break;
+                }
+            }
             case HANDLING_TRACTIONBIAS:
-                pEntry->SetTractionBias ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 1.0)
+                {
+                    pEntry->SetTractionBias ( fValue );
+                    break;
+                }
+            }
             case HANDLING_SUSPENSION_FORCELEVEL:
-                pEntry->SetSuspensionForceLevel ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 100)
+                {
+                    pEntry->SetSuspensionForceLevel ( fValue );
+                    break;
+                }
+            }
             case HANDLING_SUSPENSION_DAMPING:
-                pEntry->SetSuspensionDamping ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 100)
+                {
+                    pEntry->SetSuspensionDamping ( fValue );
+                    break;
+                }
+            }
             case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
-                pEntry->SetSuspensionHighSpeedDamping ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 600)
+                {
+                    pEntry->SetSuspensionHighSpeedDamping ( fValue );
+                    break;
+                }
+            }
             case HANDLING_SUSPENSION_UPPER_LIMIT:
-                pEntry->SetSuspensionUpperLimit ( fValue );
-                break;
+            {            
+                if ( fValue >= -50.0 && fValue <= 50)
+                {
+                    pEntry->SetSuspensionUpperLimit ( fValue );
+                    break;
+                }
+            }
             case HANDLING_SUSPENSION_LOWER_LIMIT:
-                pEntry->SetSuspensionLowerLimit ( fValue );
-                break;
+            {            
+                if ( fValue >= -50.0 && fValue <= 50)
+                {
+                    pEntry->SetSuspensionLowerLimit ( fValue );
+                    break;
+                }
+            }
             case HANDLING_SUSPENSION_FRONTREARBIAS:
-                pEntry->SetSuspensionFrontRearBias ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 1.0)
+                {
+                    pEntry->SetSuspensionFrontRearBias ( fValue );
+                    break;
+                }
+            }
             case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
-                pEntry->SetSuspensionAntidiveMultiplier ( fValue );
-                break;
+            {            
+                if ( fValue >= 0.0 && fValue <= 30)
+                {
+                    pEntry->SetSuspensionAntidiveMultiplier ( fValue );
+                    break;
+                }
+            }
             case HANDLING_COLLISIONDAMAGEMULTIPLIER:
-                pEntry->SetCollisionDamageMultiplier ( fValue );
-                break;
+            {
+                if ( fValue >= 0.0 && fValue <= 100)
+                {
+                    pEntry->SetCollisionDamageMultiplier ( fValue );
+                    break;
+                }
+            }
             case HANDLING_SEATOFFSETDISTANCE:
-                pEntry->SetSeatOffsetDistance ( fValue );
-                break;
+            {
+                if ( fValue >= -100 && fValue <= 100)
+                {
+                    pEntry->SetSeatOffsetDistance ( fValue );
+                    break;
+                }
+                return false;
+            }
             case HANDLING_ABS:
+            {
                 pEntry->SetABS ( ( fValue > 0.0f ) ? true : false );
                 break;
+            }
             default:
+            {
                 return false;
+            }
         }
     }
     return true;
@@ -4755,8 +4879,13 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
         {
             if ( pEntry->GetCenterOfMass () != vecValue )
             {
-                pEntry->SetCenterOfMass ( vecValue );
-                return true;
+                if ( vecValue.fX >= -10.0 && vecValue.fX <= -10.0 &&
+                    vecValue.fY >= -10.0 && vecValue.fY <= -10.0 &&
+                    vecValue.fZ >= -10.0 && vecValue.fZ <= -10.0 )
+                {
+                    pEntry->SetCenterOfMass ( vecValue );
+                    return true;
+                }
             }
         }
     }
