@@ -128,7 +128,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pCommunityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pFiller, "Not logged in" ) );
     m_pCommunityLabel->AutoSize ( "Not logged in" );
     m_pCommunityLabel->SetAlwaysOnTop ( true );
-    m_pCommunityLabel->SetAlpha ( 0.7f );
+    m_pCommunityLabel->SetAlpha ( 0 ); // disabled, previous alpha was 0.7f
     m_pCommunityLabel->SetVisible ( false );
     m_pCommunityLabel->SetPosition ( CVector2D ( 40.0f, ScreenSize.fY - 20.0f ) );
 
