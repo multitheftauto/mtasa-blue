@@ -15,13 +15,9 @@ class CClientCivilian;
 #ifndef __CCLIENTCIVILIAN_H
 #define __CCLIENTCIVILIAN_H
 
-#ifdef COMPILE_FOR_VC
-    #include <game/CCivilianPed.h>
-#else if COMPILE_FOR_SA
-    #include <game/CCivilianPed.h>
-    #include <game/TaskGoTo.h>
-    #include <game/TaskCarAccessories.h>
-#endif
+#include <game/CCivilianPed.h>
+#include <game/TaskGoTo.h>
+#include <game/TaskCarAccessories.h>
 
 #include "CClientCommon.h"
 #include "CClientEntity.h"

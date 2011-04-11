@@ -17,11 +17,7 @@ class CClientCivilianManager;
 
 #include "CClientCivilian.h"
 
-#ifdef COMPILE_FOR_VC
-    #include <game/CCivilianPed.h>
-#else if COMPILE_FOR_SA
-    #include <game/CCivilianPed.h>
-#endif
+#include <game/CCivilianPed.h>
 
 #include <list>
 

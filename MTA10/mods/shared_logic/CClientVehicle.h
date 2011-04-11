@@ -27,12 +27,8 @@ class CClientVehicle;
 #ifndef __CCLIENTVEHICLE_H
 #define __CCLIENTVEHICLE_H
 
-#ifdef COMPILE_FOR_VC
-    #include <game/CVehicle.h>
-#else if COMPILE_FOR_SA
-    #include <game/CPlane.h>
-    #include <game/CVehicle.h>
-#endif
+#include <game/CPlane.h>
+#include <game/CVehicle.h>
 
 #include "CClientCommon.h"
 #include "CClientCamera.h"

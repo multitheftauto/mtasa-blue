@@ -261,10 +261,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_pLuaManager = new CLuaManager ( this );
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
-
-    #if defined (MTA_SCRIPT_LOGGING)
     m_pScriptDebugging->SetLogfile ( CalcMTASAPath("mta\\clientscript.log"), 3 );
-    #endif
 
     m_pLuaManager->SetScriptDebugging ( m_pScriptDebugging );
     CStaticFunctionDefinitions::CStaticFunctionDefinitions ( m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager );
