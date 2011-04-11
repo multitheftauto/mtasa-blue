@@ -27,11 +27,7 @@ class CLocalGUI;
     #ifdef FORCE_GUI_DX9
         #include "d3d/include/CD3DMGE_D3D9.h"
     #else
-        #ifdef COMPILE_FOR_SA
-            #include "d3d/include/CD3DMGE_D3D9.h"
-        #else
-            #include "d3d/include/CD3DMGE.H"
-        #endif
+        #include "d3d/include/CD3DMGE_D3D9.h"
     #endif
 #endif
 

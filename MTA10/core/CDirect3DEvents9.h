@@ -15,16 +15,8 @@
 #ifndef __CDIRECT3DEVENTS9_H
 #define __CDIRECT3DEVENTS9_H
 
-// To avoid conflict with d3d8 included by CGUI if not COMPILE_FOR_SA
-#ifdef COMPILE_FOR_SA
 #include <d3d9.h>
 typedef IUnknown IDirect3DDevice8;
-#else
-#include <d3d8.h>
-typedef IUnknown IDirect3DDevice9;
-#endif
-
-//#include <d3d9.h>
 
 class CDirect3DEvents9
 {
