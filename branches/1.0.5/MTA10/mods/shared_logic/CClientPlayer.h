@@ -20,11 +20,7 @@ class CClientPlayer;
 #ifndef __CCLIENTPLAYER_H
 #define __CCLIENTPLAYER_H
 
-#ifdef COMPILE_FOR_VC
-    #include <game/CPlayerPed.h>
-#else if COMPILE_FOR_SA
-    #include <game/CPlayerPed.h>
-#endif
+#include <game/CPlayerPed.h>
 
 #include "CClientCommon.h"
 #include "CClientPed.h"
