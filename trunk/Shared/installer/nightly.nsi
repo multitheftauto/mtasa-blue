@@ -1,3 +1,5 @@
+!addincludedir "NSIS dirs\Include"
+!addplugindir "NSIS dirs\Plugins"
 !include nsDialogs.nsh
 !include LogicLib.nsh
 !include Sections.nsh
@@ -310,24 +312,12 @@ DontInstallRedist:
 
 			#############################################################
 			# Make the directory "$INSTDIR" read write accessible by all users
-            StrCpy $3 "update"
 
-			#!ifdef LIGHTBUILD
-			#	# For lightbuilds, if the install directory already exists, and there is no virtual store version,
-			#	# then skip updating permissions
-			#	IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
-			#		StrCpy $2 $INSTDIR "" 3
-			#		IfFileExists "$LOCALAPPDATA\VirtualStore\$2" skip1 0
-			#			StrCpy $3 "noupdate"
-			#	skip1:
-			#!endif
+            ${If} ${AtLeastWinVista}
+                DetailPrint "Updating permissions. This could take a few minutes..."
+                FastPerms::FullAccessPlox "$INSTDIR"
+            ${EndIf}
 
-			${If} $3 == "update"
-    			${If} ${AtLeastWinVista}
-    				DetailPrint "Updating permissions. This could take a few minutes..."
-    				AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
-    			${EndIf}
-			${EndIf}
 			#############################################################
 
             !ifndef LIGHTBUILD
