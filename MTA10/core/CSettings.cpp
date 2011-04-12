@@ -43,7 +43,7 @@ extern SBindableKey g_bkKeys[];
 
 CSettings::CSettings ( void )
 {
-    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls/*, *pTabCommunity*/, *pTabInterface, *pTabAdvanced;
+    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity, *pTabInterface, *pTabAdvanced;
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
@@ -77,7 +77,7 @@ CSettings::CSettings ( void )
     pTabAudio = m_pTabs->CreateTab ( "Audio" );
     pTabBinds = m_pTabs->CreateTab ( "Binds" );
     pTabControls = m_pTabs->CreateTab ( "Controls" );
-    //pTabCommunity = m_pTabs->CreateTab ( "Community" );
+    pTabCommunity = m_pTabs->CreateTab ( "Community" );
     pTabInterface = m_pTabs->CreateTab ( "Interface" );
     pTabAdvanced = m_pTabs->CreateTab ( "Advanced" );
 
@@ -282,7 +282,7 @@ CSettings::CSettings ( void )
      *  Community tab
      **/
 
-#if 0
+    m_pTabs->DeleteTab ( pTabCommunity );
 
     m_pLabelCommunity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, CORE_SETTINGS_COMMUNITY_TEXT ) );
     m_pLabelCommunity->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
@@ -321,8 +321,6 @@ CSettings::CSettings ( void )
     m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Register" ) );
     m_pButtonRegister->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
     m_pButtonRegister->SetSize ( CVector2D ( 168.0f, 24.0f ) );
-
-#endif
 
     /**
      *	Multiplayer tab
