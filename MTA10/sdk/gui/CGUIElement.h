@@ -116,6 +116,9 @@ public:
     virtual void                SetClickHandler             ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetMouseEnterHandler        ( GUI_CALLBACK Callback ) = 0;
     virtual void                SetMouseLeaveHandler        ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetMouseButtonDownHandler   ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetActivateHandler          ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetDeactivateHandler        ( GUI_CALLBACK Callback ) = 0;
 };
 
 #endif
