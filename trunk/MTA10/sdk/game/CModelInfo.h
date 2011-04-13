@@ -84,7 +84,7 @@ public:
     virtual void            RestreamIPL             () = 0;
 
     virtual void            AddRef                  ( bool bWaitForLoad, bool bHighPriority = false ) = 0;
-    virtual void            RemoveRef               () = 0;
+    virtual void            RemoveRef               ( bool bRemoveExtraGTARef = false ) = 0;
     virtual int             GetRefCount             () = 0;
 
     virtual float           GetDistanceFromCentreOfMassToBaseOfModel () = 0;
