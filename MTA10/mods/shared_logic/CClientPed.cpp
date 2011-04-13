@@ -3287,8 +3287,8 @@ void CClientPed::_ChangeModel ( void )
             // Rebuild the player after a skin change
             RebuildModel ();
 
-            // Remove reference to the old model we used
-            pLoadedModel->RemoveRef ();
+            // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
+            pLoadedModel->RemoveRef ( true );
             pLoadedModel = NULL;
 
             // Warp into it again
