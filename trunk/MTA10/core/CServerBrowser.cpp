@@ -76,7 +76,7 @@ CServerBrowser::CServerBrowser ( void )
     m_pLockedIcon->LoadFromFile ( "cgui\\images\\serverbrowser\\locked.png" );
 
     // Create search filter types icon
-    m_szSearchTypePath [ SearchType::ALL ]      =   "cgui\\images\\serverbrowser\\search-servers.png";
+    m_szSearchTypePath [ SearchType::SERVERS ]  =   "cgui\\images\\serverbrowser\\search-servers.png";
     m_szSearchTypePath [ SearchType::PLAYERS ]  =   "cgui\\images\\serverbrowser\\search-players.png";
 
     for ( unsigned int i=0; i != SearchType::MAX_SEARCH_TYPES; i++ )
@@ -102,6 +102,21 @@ CServerBrowser::CServerBrowser ( void )
 
     // Save the active tab, needs to be done after at least one tab exists
     m_pPanel->SetSelectionHandler ( GUI_CALLBACK( &CServerBrowser::OnTabChanged, this ) );
+
+    // Attach some editbox handlers, also must be done after full creation
+    for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+    {
+        m_pEditAddress [ i ]->SetActivateHandler ( GUI_CALLBACK ( &CServerBrowser::OnAddressFocused, this ) );
+        m_pEditAddress [ i ]->SetDeactivateHandler ( GUI_CALLBACK ( &CServerBrowser::OnAddressDefocused, this ) );
+        m_pEditSearch [ i ]->SetActivateHandler ( GUI_CALLBACK ( &CServerBrowser::OnSearchFocused, this ) );
+        m_pEditSearch [ i ]->SetDeactivateHandler ( GUI_CALLBACK ( &CServerBrowser::OnSearchDefocused, this ) );
+    }
+
+    // Simulate focusing to keep things tidy
+    OnSearchFocused ( m_pPanel );
+    OnAddressFocused ( m_pPanel );
+    OnSearchDefocused ( m_pPanel );
+    OnAddressDefocused ( m_pPanel );
 }
 
 
@@ -160,6 +175,14 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pEditAddress [ type ]->SetTextAcceptedHandler ( GUI_CALLBACK ( &CServerBrowser::OnConnectClick, this ) );
     m_pEditAddress [ type ]->SetTextChangedHandler ( GUI_CALLBACK ( &CServerBrowser::OnAddressChanged, this ) );
 
+    m_pLabelAddressDescription [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pEditAddress [ type ], "Enter an address [IP:Port]" ) );
+    m_pLabelAddressDescription [ type ]->SetPosition ( CVector2D ( 10, 5 ), false ); 
+    m_pLabelAddressDescription [ type ]->SetTextColor ( 0, 0, 0 );
+    m_pLabelAddressDescription [ type ]->AutoSize ( m_pLabelAddressDescription [ type ]->GetText ().c_str () );
+    m_pLabelAddressDescription [ type ]->SetAlpha(0.6f);
+    m_pLabelAddressDescription [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
+    m_pLabelAddressDescription [ type ]->SetProperty ( "DistributeCapturedInputs","True" );
+
         // Favourite icon
     m_pAddressFavoriteIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditAddress [ type ] ) );
     m_pAddressFavoriteIcon [ type ]->SetPosition ( CVector2D ( fWidth - 20 - 8, (SB_BUTTON_SIZE_Y-16)/2 ), false );
@@ -214,7 +237,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pSearchTypeIcon [ type ]->SetSize ( CVector2D(29,SB_SEARCHBAR_COMBOBOX_SIZE_Y -6), false );
     m_pSearchTypeIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
     m_pSearchTypeIcon [ type ]->SetAlwaysOnTop(true);
-    m_uiCurrentSearchType = SearchType::ALL;
+    m_uiCurrentSearchType = SearchType::SERVERS;
     m_pSearchTypeIcon [ type ]->LoadFromFile ( m_szSearchTypePath [ m_uiCurrentSearchType ] );
 
     fWidth = fSearchBarSizeX-SB_SEARCHBAR_COMBOBOX_SIZE_X;
@@ -222,6 +245,14 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pEditSearch [ type ]->SetPosition ( CVector2D ( fX+SB_SEARCHBAR_COMBOBOX_SIZE_X, fY + (SB_BUTTON_SIZE_Y-SB_SEARCHBAR_COMBOBOX_SIZE_Y)/2 ), false );
     m_pEditSearch [ type ]->SetSize ( CVector2D ( fWidth, SB_SEARCHBAR_COMBOBOX_SIZE_Y ), false );
     m_pEditSearch [ type ]->SetTextChangedHandler( GUI_CALLBACK( &CServerBrowser::OnFilterChanged, this ) );
+
+    m_pLabelSearchDescription [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pEditSearch [ type ], "Search servers..." ) );
+    m_pLabelSearchDescription [ type ]->SetPosition ( CVector2D ( 10, 3 ), false ); 
+    m_pLabelSearchDescription [ type ]->SetTextColor ( 0, 0, 0 );
+    m_pLabelSearchDescription [ type ]->AutoSize ( m_pLabelSearchDescription [ type ]->GetText ().c_str () );
+    m_pLabelSearchDescription [ type ]->SetAlpha(0.6f);
+    m_pLabelSearchDescription [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
+    m_pLabelSearchDescription [ type ]->SetProperty ( "DistributeCapturedInputs","True" );
 
     // Server search icon
     m_pServerSearchIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pEditSearch [ type ] ) );
@@ -467,14 +498,14 @@ void CServerBrowser::SetVisible ( bool bVisible )
             }
             CreateHistoryList();
 
-            // Set the first item as our starting address
-            if ( m_pComboAddressHistory [ ServerBrowserType::INTERNET ]->GetItemCount() > 0 )
-            {
-                std::string strHistoryText = (const char*)m_pComboAddressHistory [ ServerBrowserType::INTERNET ]->GetItemByIndex(0)->GetData();
-                SetAddressBarText ( "mtasa://" + strHistoryText );
-            }
-
             m_firstTimeBrowseServer = false;
+        }
+
+        // Set the first item as our starting address
+        if ( m_pComboAddressHistory [ ServerBrowserType::INTERNET ]->GetItemCount() > 0 )
+        {
+            std::string strHistoryText = (const char*)m_pComboAddressHistory [ ServerBrowserType::INTERNET ]->GetItemByIndex(0)->GetData();
+            SetAddressBarText ( "mtasa://" + strHistoryText );
         }
 
         // Focus the address bar for power users
@@ -572,18 +603,46 @@ void CServerBrowser::CreateHistoryList ( void )
         m_pComboAddressHistory [ i ]->Clear();
     }
 
+    bool bEmpty = true;
+
     // Populate our history
     for ( CServerListReverseIterator it = m_ServersHistory.ReverseIteratorBegin () ; it != m_ServersHistory.ReverseIteratorEnd (); it++ )
     {
         CServerListItem * pServer = *it;
         if ( pServer->strEndpoint )
         {
+            bEmpty = false;
             for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
             {
                 m_pComboAddressHistory [ i ]->AddItem ( ("mtasa://" + pServer->strEndpoint ).c_str() )->SetData(pServer->strEndpoint.c_str());
             }
         }
     }   
+
+    // If we had no history, import it from our old quick connect 
+    if ( bEmpty )
+    {
+        std::string strAddress;
+        CVARS_GET ( "qc_host", strAddress );
+        
+        if ( !strAddress.empty() )
+        {
+            std::string strPort;
+            CVARS_GET ( "qc_port", strPort );
+
+            if ( !strPort.empty() )
+            {
+                in_addr Address;
+                if ( CServerListItem::Parse ( strAddress.c_str(), Address ) )
+                {
+                    m_ServersHistory.AddUnique ( Address, atoi(strPort.c_str()) + SERVER_LIST_QUERY_PORT_OFFSET );
+                    CreateHistoryList (); // Restart with our new list.
+                    return;
+                }
+            }
+        }
+    }
+
     m_ServersHistory.Refresh();
 }
 
@@ -632,7 +691,7 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
 
     if ( !strServerSearchText.empty() )
     {
-        if ( m_uiCurrentSearchType == SearchType::ALL )
+        if ( m_uiCurrentSearchType == SearchType::SERVERS )
         {
             // Search for the search text in the servername
             SString strServerName = pServer->strName;
@@ -1107,6 +1166,8 @@ bool CServerBrowser::OnSearchTypeSelected ( CGUIElement* pElement )
 
     m_pSearchTypeIcon [ Type ]->LoadFromFile ( m_szSearchTypePath [ m_uiCurrentSearchType ] );
 
+    OnSearchDefocused(pElement);
+
     // Don't bother doing anything if the search bar is empty
     if ( m_pEditSearch [ Type ]->GetText().empty() )
         return true;
@@ -1199,6 +1260,49 @@ bool CServerBrowser::OnFilterChanged ( CGUIElement* pElement )
 bool CServerBrowser::OnTabChanged ( CGUIElement* pElement )
 {
     SaveOptions ( );
+
+    OnSearchFocused ( pElement );
+    OnAddressFocused ( pElement );
+    OnSearchDefocused ( pElement );
+    OnAddressDefocused ( pElement );
+    return true;
+}
+
+bool CServerBrowser::OnSearchFocused ( CGUIElement* pElement )
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType();
+    m_pLabelSearchDescription [ Type ]->SetVisible ( false );
+    return true;
+}
+
+bool CServerBrowser::OnAddressFocused ( CGUIElement* pElement )
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType();
+    m_pLabelAddressDescription [ Type ]->SetVisible ( false );
+    return true;
+}
+
+bool CServerBrowser::OnSearchDefocused ( CGUIElement* pElement )
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType();
+    std::string strSearchText = m_pEditSearch [ Type ]->GetText();
+    if ( strSearchText == "" )
+    {
+        m_pLabelSearchDescription [ Type ]->SetVisible ( true );
+        if ( m_uiCurrentSearchType == SearchType::SERVERS )
+            m_pLabelSearchDescription [ Type ]->SetText("Search servers...");
+        else if ( m_uiCurrentSearchType == SearchType::PLAYERS )
+            m_pLabelSearchDescription [ Type ]->SetText("Search players...");
+    }
+    return true;
+}
+
+bool CServerBrowser::OnAddressDefocused ( CGUIElement* pElement )
+{
+    ServerBrowserType Type = GetCurrentServerBrowserType();
+    std::string strAddressText = m_pEditAddress [ Type ]->GetText();
+    if ( strAddressText.empty() )
+        m_pLabelAddressDescription [ Type ]->SetVisible ( true );
 
     return true;
 }
@@ -1504,6 +1608,21 @@ std::string CServerBrowser::GetServerPassword ( const std::string& strHost )
         }
         
     }
+
+	// If the server is the one from old quick connect, try importing the password from that
+	std::string strQCEndpoint;
+	CVARS_GET ( "qc_host", strQCEndpoint );
+	
+	std::string strTemp;
+	CVARS_GET ( "qc_port", strTemp );
+
+	strQCEndpoint = strQCEndpoint + ":" + strTemp;
+	if ( strQCEndpoint == strHost )
+	{
+		CVARS_GET ( "qc_password", strTemp );
+		return strTemp;
+	}
+
     return "";
 }
 

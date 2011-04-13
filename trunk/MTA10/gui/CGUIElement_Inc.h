@@ -93,3 +93,6 @@ void SetMovedHandler ( GUI_CALLBACK Callback )              { CGUIElement_Impl::
 void SetSizedHandler ( GUI_CALLBACK Callback )              { CGUIElement_Impl::SetSizedHandler ( Callback ); };
 void SetMouseEnterHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::SetMouseEnterHandler ( Callback ); };
 void SetMouseLeaveHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::SetMouseLeaveHandler ( Callback ); };
+void SetMouseButtonDownHandler ( GUI_CALLBACK Callback )    { CGUIElement_Impl::SetMouseButtonDownHandler ( Callback ); };
+void SetActivateHandler ( GUI_CALLBACK Callback )           { CGUIElement_Impl::SetActivateHandler ( Callback ); };
+void SetDeactivateHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::SetDeactivateHandler ( Callback ); };

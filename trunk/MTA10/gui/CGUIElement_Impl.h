@@ -104,6 +104,9 @@ public:
     void                SetClickHandler             ( GUI_CALLBACK Callback );
     void                SetMouseEnterHandler        ( GUI_CALLBACK Callback );
     void                SetMouseLeaveHandler        ( GUI_CALLBACK Callback );
+    void                SetMouseButtonDownHandler   ( GUI_CALLBACK Callback );
+    void                SetActivateHandler          ( GUI_CALLBACK Callback );
+    void                SetDeactivateHandler        ( GUI_CALLBACK Callback );
 
 protected:
     void                DestroyElement              ( void );
@@ -119,6 +122,10 @@ protected:
     bool                Event_OnClick               ( const CEGUI::EventArgs& e );
     bool                Event_OnMouseEnter          ( const CEGUI::EventArgs& e );
     bool                Event_OnMouseLeave          ( const CEGUI::EventArgs& e );
+    bool                Event_OnMouseButtonDown     ( const CEGUI::EventArgs& e );
+    bool                Event_OnActivated           ( const CEGUI::EventArgs& e );
+    bool                Event_OnDeactivated         ( const CEGUI::EventArgs& e );
+
 
     CEGUI::Window*              m_pWindow;
     CGUIElement*                m_pParent;
@@ -134,6 +141,9 @@ protected:
     GUI_CALLBACK               m_OnSized;
     GUI_CALLBACK               m_OnMouseEnter;
     GUI_CALLBACK               m_OnMouseLeave;
+    GUI_CALLBACK               m_OnMouseDown;
+    GUI_CALLBACK               m_OnActivate;
+    GUI_CALLBACK               m_OnDeactivate;
 };
 
 #endif

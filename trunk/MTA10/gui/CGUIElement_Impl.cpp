@@ -528,6 +528,23 @@ void CGUIElement_Impl::SetMouseLeaveHandler ( GUI_CALLBACK Callback )
     m_OnMouseLeave = Callback;
 }
 
+void CGUIElement_Impl::SetMouseButtonDownHandler ( GUI_CALLBACK Callback )
+{
+    m_OnMouseDown = Callback;
+}
+
+void CGUIElement_Impl::SetActivateHandler ( GUI_CALLBACK Callback )
+{
+    m_OnActivate = Callback;
+}
+
+
+void CGUIElement_Impl::SetDeactivateHandler ( GUI_CALLBACK Callback )
+{
+    m_OnDeactivate = Callback;
+}
+
+
 
 void CGUIElement_Impl::AddEvents ( void )
 {
@@ -537,6 +554,9 @@ void CGUIElement_Impl::AddEvents ( void )
     m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseClick, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnClick, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseEnters, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseEnter, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseLeaves, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseLeave, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseButtonDown, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnMouseButtonDown, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventActivated, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnActivated, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventDeactivated, CEGUI::Event::Subscriber ( &CGUIElement_Impl::Event_OnDeactivated, this ) );
 }
 
 
@@ -579,6 +599,27 @@ bool CGUIElement_Impl::Event_OnMouseLeave ( const CEGUI::EventArgs& e )
     return true;
 }
 
+
+bool CGUIElement_Impl::Event_OnMouseButtonDown ( const CEGUI::EventArgs& e )
+{
+    if ( m_OnMouseDown )
+        m_OnMouseDown ( reinterpret_cast < CGUIElement* > ( this ) );
+    return true;
+}
+
+bool CGUIElement_Impl::Event_OnActivated ( const CEGUI::EventArgs& e )
+{
+    if ( m_OnActivate )
+        m_OnActivate ( reinterpret_cast < CGUIElement* > ( this ) );
+    return true;
+}
+
+bool CGUIElement_Impl::Event_OnDeactivated ( const CEGUI::EventArgs& e )
+{
+    if ( m_OnDeactivate )
+        m_OnDeactivate ( reinterpret_cast < CGUIElement* > ( this ) );
+    return true;
+}
 
 inline void CGUIElement_Impl::ForceRedraw ( void )
 {
