@@ -190,7 +190,7 @@ VOID WriteTargetDataForPed ( CPedSAInterface * pPed, DWORD vecTargetPos, CVector
             if ( data->ProcessPlayerWeapon () )
             {
                 DWORD dwPointerToVector = (DWORD)&data->m_shotSyncData.m_vecShotTarget;
-                MemPut < DWORD > ( vecTargetPos, dwPointerToVector );
+                MemPutFast < DWORD > ( vecTargetPos, dwPointerToVector );
                 if ( data->m_shotSyncData.m_bUseOrigin )
                     *origin = data->m_shotSyncData.m_vecShotOrigin;
             }
