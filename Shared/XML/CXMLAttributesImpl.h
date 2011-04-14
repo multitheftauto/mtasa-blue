@@ -48,11 +48,11 @@ private:
     void                            CreateAttributes            ( void );
     void                            DeleteAttributes            ( void );
 
+    const bool                      m_bUsingIDs;
+    bool                            m_bCanRemoveFromList;
     TiXmlElement&                   m_Node;
 
     std::list < CXMLAttribute* >    m_Attributes;
-    bool                            m_bCanRemoveFromList;
-    const bool                      m_bUsingIDs;
 };
 
 #endif

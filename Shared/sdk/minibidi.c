@@ -848,7 +848,6 @@ int doShape(BLOCKTYPE line, CHARTYPE* to, int from, int count)
 {
 	int i, j, ligFlag;
 	unsigned char prevTemp, nextTemp;
-	CHARTYPE tempChar;
 
 	ligFlag = 0;
 	prevTemp = SU;
@@ -898,6 +897,7 @@ int doShape(BLOCKTYPE line, CHARTYPE* to, int from, int count)
 			if(GETCHAR(line, i) == 0x644)
 			{
 				j=i;
+	            CHARTYPE tempChar = 0;
 				while(j++<count)
 				{
 					if(GetType(GETCHAR(line, j)) != NSM)
