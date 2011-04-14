@@ -3883,7 +3883,7 @@ void CStaticFunctionDefinitions::DrawText ( int iLeft, int iTop,
     SString strFile = szFont;
     SString strPath, strMetaPath;
     ID3DXFont *pFont = NULL;
-    if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath, strMetaPath ) && FileExists(strPath) )
+    if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath, strMetaPath ) )
     {
         if ( m_pScriptFontLoader->GetDXFont(&pFont, strPath, strMetaPath, pResource, fScaleX, fScaleY) )
         {
