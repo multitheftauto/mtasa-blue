@@ -3698,8 +3698,12 @@ bool CStaticFunctionDefinitions::TakeWeapon ( CElement* pElement, unsigned char 
                 if ( usAmmo < 9999 )
                 {
                     unsigned short usTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
-                    if ( usTotalAmmo - usAmmo < 0 )
+                    if ( usAmmo > usTotalAmmo )
+                    {
                         usTotalAmmo = 0;
+                        pPed->SetWeaponType ( 0, ucWeaponSlot );
+                        pPed->SetWeaponAmmoInClip ( 0, ucWeaponSlot );
+                    }
                     else
                         usTotalAmmo -= usAmmo;
                     pPed->SetWeaponTotalAmmo ( usTotalAmmo, ucWeaponSlot );
