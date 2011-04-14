@@ -1069,7 +1069,16 @@ bool CServerBrowser::OnInfoClick ( CGUIElement* pElement )
     unsigned short usPort;
     std::string strHost, strNick, strPassword;
     std::string strURI = m_pEditAddress [ GetCurrentServerBrowserType() ]->GetText();
+
+    // Ensure we have something entered
+    if ( strURI.size() == 0 || strURI == "mtasa://" )
+    {
+        CCore::GetSingleton ().ShowMessageBox ( "Error", "No address specified!", MB_BUTTON_OK | MB_ICON_INFO );
+        return true;
+    }
+
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword );
+
     CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str() );
     return true;
 }
