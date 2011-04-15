@@ -1147,6 +1147,9 @@ void CMultiplayerSA::InitHooks()
     // Make sure DirectInput mouse device is set non-exclusive (may not be needed?)
     MemPut < DWORD > ( 0x7469A0, 0x909000B0 );
 
+    // Remove 14ms wait (Was done every other frame for some reason)
+    MemPut < BYTE > ( 0x53E94C, 0x00 );
+
     // Disable the GTASA main menu.
     MemSet ( (void *)0x57BA57, 0x90, 6 );
 
