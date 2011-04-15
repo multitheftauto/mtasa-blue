@@ -197,6 +197,10 @@ public:
     bool                    IsOptionalUpdateInfoRequired    ( const char* szHost )                          { return m_pLocalGUI->IsOptionalUpdateInfoRequired ( szHost ); }
     void                    InitiateDataFilesFix            ( void )                                        { m_pLocalGUI->InitiateDataFilesFix (); }
 
+    uint                    GetFrameRateLimit               ( void )                                        { return m_uiFrameRateLimit; }
+    void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 );
+    void                    ApplyFrameRateLimit             ( void );
+
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
     bool                    bScreenShot;
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
@@ -264,6 +268,11 @@ private:
 
     bool                        m_bQuitOnPulse;
     bool                        m_bDestroyMessageBox;
+
+    uint                        m_uiServerFrameRateLimit;
+    uint                        m_uiFrameRateLimit;
+    double                      m_dLastTimeMs;
+    double                      m_dPrevOverrun;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

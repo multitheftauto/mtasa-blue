@@ -175,16 +175,7 @@ void CWorldRPCs::SetFPSLimit ( NetBitStreamInterface& bitStream )
 {
     short sFPSLimit;
     bitStream.Read ( sFPSLimit );
-
-    int iVal;
-    g_pCore->GetCVars ()->Get ( "fps_limit", iVal );
-
-    if ( sFPSLimit > 0 && iVal > sFPSLimit || iVal == 0 )
-        // For some reason it needs that kind of hacky precision
-        g_pGame->SetFramelimiter ( (unsigned long) ( (float)sFPSLimit * 1.333f ) );
-    else
-        g_pGame->SetFramelimiter ( (unsigned long) ( (float)iVal * 1.3f ) );
-
+    g_pCore->RecalculateFrameRateLimit ( sFPSLimit );
 }
 
 void CWorldRPCs::SetGarageOpen ( NetBitStreamInterface& bitStream )
