@@ -29,19 +29,11 @@ void HOOK_StoreShadowForVehicle ();
 CSettingsSA::CSettingsSA ( void )
 {
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
+    m_pInterface->bFrameLimiter = false;
+
     m_bVolumetricShadowsEnabled = false;
     HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
     HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
-}
-
-bool CSettingsSA::IsFrameLimiterEnabled ( void )
-{
-    return m_pInterface->bFrameLimiter;
-}
-
-void CSettingsSA::SetFrameLimiterEnabled ( bool bEnabled )
-{
-    m_pInterface->bFrameLimiter = bEnabled;
 }
 
 bool CSettingsSA::IsWideScreenEnabled ( void )

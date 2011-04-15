@@ -158,7 +158,13 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
 
     // Enable the auto depth stencil parameter
     pPresentationParameters->EnableAutoDepthStencil = true;
-    
+
+    // Check VBlank is off
+    if ( pPresentationParameters->PresentationInterval != D3DPRESENT_INTERVAL_IMMEDIATE )
+    {
+        AddReportLog ( 4710, SString ( "CProxyDirect3D9::CreateDevice  PresentationInterval: 0x%08x", pPresentationParameters->PresentationInterval ) );
+    }
+
     GetVideoModeManager ()->PreCreateDevice ( pPresentationParameters );
 
     // Create our object.

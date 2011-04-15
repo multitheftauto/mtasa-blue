@@ -151,9 +151,6 @@ public:
     virtual float               GetOldTimeStep ( void )=0;
     virtual float               GetTimeScale ( void )=0;
 
-    virtual unsigned long       GetFramelimiter         ( void ) = 0;
-    virtual void                SetFramelimiter         ( unsigned long ulFramelimiter ) = 0;
-
     virtual void                Initialize  ( void ) = 0;
     virtual void                Reset               ( void ) = 0;
     virtual void                Terminate ( void ) = 0;

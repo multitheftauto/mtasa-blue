@@ -187,6 +187,12 @@ CCore::CCore ( void )
 
     // Reset the screenshot flag
     bScreenShot = false;
+
+    // No initial fps limit
+    m_uiFrameRateLimit = 0;
+    m_uiServerFrameRateLimit = 0;
+    m_dLastTimeMs = 0;
+    m_dPrevOverrun = 0;
 }
 
 CCore::~CCore ( void )
@@ -1608,4 +1614,73 @@ void CCore::ApplyLoadingCrashPatch ( void )
             }
         }
     }
+}
+
+
+//
+// Recalculate FPS limit to use
+//
+// Uses client rate from config
+// Uses server rate from argument, or last time if not supplied
+//
+void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit )
+{
+    // Save rate from server if valid
+    if ( uiServerFrameRateLimit != -1 )
+        m_uiServerFrameRateLimit = uiServerFrameRateLimit;
+
+    // Fetch client setting
+    uint uiClientRate;
+    g_pCore->GetCVars ()->Get ( "fps_limit", uiClientRate );
+
+    // Lowest wins (Although zero is highest)
+    if ( ( m_uiServerFrameRateLimit > 0 && uiClientRate > m_uiServerFrameRateLimit ) || uiClientRate == 0 )
+        m_uiFrameRateLimit = m_uiServerFrameRateLimit;
+    else
+        m_uiFrameRateLimit = uiClientRate;
+}
+
+
+//
+// Do FPS limiting
+//
+void CCore::ApplyFrameRateLimit ( void )
+{
+    if ( m_uiFrameRateLimit < 1 )
+        return;
+
+    // Calc required time in ms between frames
+    const double dTargetTimeToUse = 1000.0 / m_uiFrameRateLimit;
+
+    // Time now
+    double dTimeMs = CClientTime::GetTimeNano() * 1000.0;
+
+    // Get delta time in ms since last frame
+    double dTimeUsed = dTimeMs - m_dLastTimeMs;
+
+    // Apply any over/underrun carried over from the previous frame
+    dTimeUsed += m_dPrevOverrun;
+
+    if ( dTimeUsed < dTargetTimeToUse )
+    {
+        // Have time spare - maybe eat some of that now
+        double dSpare = dTargetTimeToUse - dTimeUsed;
+
+        double dUseUpNow = dSpare - dTargetTimeToUse * 0.75;
+        if ( dUseUpNow > 1 )
+            Sleep( static_cast < DWORD > ( floor ( dUseUpNow ) ) );
+
+        // Redo timing calcs
+        dTimeMs = CClientTime::GetTimeNano() * 1000.0;
+        dTimeUsed = dTimeMs - m_dLastTimeMs;
+        dTimeUsed += m_dPrevOverrun;
+    }
+
+    // Update over/underrun for next frame
+    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
+
+    // Limit carry over
+    m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9, m_dPrevOverrun, dTargetTimeToUse * 0.9 );
+
+    m_dLastTimeMs = dTimeMs;
 }
