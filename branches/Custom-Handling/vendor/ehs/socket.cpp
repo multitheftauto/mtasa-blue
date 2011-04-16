@@ -47,7 +47,7 @@ Zac Hansen ( xaxxon@slackworks.com )
 #ifndef _WIN32
 #include <assert.h>
 #include <stdio.h>
-#include <fcntl.h>
+#include <sys/ioctl.h>
 #endif
 
 #ifndef MSG_NOSIGNAL

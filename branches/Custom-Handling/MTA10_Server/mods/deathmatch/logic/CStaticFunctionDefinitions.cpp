@@ -3751,6 +3751,7 @@ bool CStaticFunctionDefinitions::TakeAllWeapons ( CElement* pElement )
     return false;
 }
 
+
 bool CStaticFunctionDefinitions::SetWeaponAmmo ( CElement* pElement, unsigned char ucWeaponID, unsigned short usAmmo, unsigned short usAmmoInClip )
 {
     assert ( pElement );

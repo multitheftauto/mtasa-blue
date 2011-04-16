@@ -23,7 +23,6 @@
 
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"
-#include "CChecksum.h"
 
 class CDownloadableResource
 {

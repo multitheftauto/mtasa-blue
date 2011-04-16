@@ -311,7 +311,6 @@ void CObject::StopMoving ( void )
         m_pMoveAnimation = NULL;
        
         UpdateSpatialData ();
-        UpdateSpatialData ();
     }
 }
 

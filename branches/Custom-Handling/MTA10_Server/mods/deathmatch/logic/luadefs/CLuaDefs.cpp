@@ -70,7 +70,7 @@ void CLuaDefs::Initialize ( CElement* pRootElement,
     m_pAccountManager = pAccountManager;
     m_pColManager = pColManager;
     m_pResourceManager = pResourceManager;
-    m_pACLManager =pACLManager;
+    m_pACLManager = pACLManager;
     m_pMainConfig = pMainConfig;
 }
 

@@ -392,7 +392,8 @@
 		</Filter>
 		<Filter
 			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
 			<File
 				RelativePath=".\NEU\GDFImp.gdf.xml"
 				>
@@ -406,10 +407,12 @@
 				>
 			</File>
 			<File
-				RelativePath="loader.rc">
+				RelativePath=".\resource\mtaicon.ico"
+				>
 			</File>
 			<File
-				RelativePath=".\resource\mtaicon.ico">
+				RelativePath=".\resource\splash.bmp"
+				>
 			</File>
 		</Filter>
 	</Files>

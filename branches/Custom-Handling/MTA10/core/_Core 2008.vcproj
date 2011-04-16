@@ -946,10 +946,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CServerQueue.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CSettings.h"
 				>
 			</File>
