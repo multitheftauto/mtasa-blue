@@ -2445,6 +2445,7 @@ void CClientPed::StreamedInPulse ( void )
                     case 23:    // Silenced Pistol
                     case 24:    // Desert Eagle
                     case 25:    // Shotgun
+                    case 27:    // SPAZ-12 Combat Shotgun
                     case 29:    // MP5
                     case 30:    // AK-47
                     case 31:    // M4
@@ -2474,16 +2475,16 @@ void CClientPed::StreamedInPulse ( void )
                         short sFixX = 0;
 
                         if ( bInputRight && vecVelocity.fX >= 0.f )
-                            sFixY = UnlerpClamped ( 0.02f, vecVelocity.fX, 0.f ) * 64;
+                            sFixY = static_cast < short > ( UnlerpClamped ( 0.02f, vecVelocity.fX, 0.f ) * 64 );
                         else
                         if ( bInputLeft && vecVelocity.fX <= 0.f )
-                            sFixY = UnlerpClamped ( -0.02f, vecVelocity.fX, 0.f ) * -64;
+                            sFixY = static_cast < short > ( UnlerpClamped ( -0.02f, vecVelocity.fX, 0.f ) * -64 );
 
                         if ( bInputFwd && vecVelocity.fY >= 0.f )
-                            sFixX = UnlerpClamped ( 0.02f, vecVelocity.fY, 0.f ) * 64;
+                            sFixX = static_cast < short > ( UnlerpClamped ( 0.02f, vecVelocity.fY, 0.f ) * 64 );
                         else
                         if ( bInputBack && vecVelocity.fY <= 0.f )
-                            sFixX = UnlerpClamped ( -0.02f, vecVelocity.fY, 0.f ) * -64;
+                            sFixX = static_cast < short > ( UnlerpClamped ( -0.02f, vecVelocity.fY, 0.f ) * -64 );
 
                         // Apply pulse if bigger than existing input value
                         if ( abs ( sFixY ) > abs ( Current.LeftStickY ) )
