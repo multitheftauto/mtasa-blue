@@ -4689,7 +4689,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
         {
             case HANDLING_MASS:
             {
-                if ( fValue >= 0 && fValue <= 100000)
+                if ( fValue >= 0 && fValue <= 100000 )
                 {
                     pEntry->SetMass ( fValue );
                     break;
@@ -4697,7 +4697,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_TURNMASS:
             {          
-                if ( fValue >= 0 && fValue <= 100000)
+                if ( fValue >= 0 && fValue <= 100000 )
                 {  
                     pEntry->SetTurnMass ( fValue );
                     break;
@@ -4705,7 +4705,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_DRAGCOEFF:
             {           
-                if ( fValue >= -100 && fValue <= 100)
+                if ( fValue >= -100 && fValue <= 100 )
                 { 
                     pEntry->SetDragCoeff ( fValue );
                     break;
@@ -4713,7 +4713,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_TRACTIONMULTIPLIER:
             {            
-                if ( fValue >= 0 && fValue <= 100000)
+                if ( fValue >= 0 && fValue <= 100000 )
                 {
                     pEntry->SetTractionMultiplier ( fValue );
                     break;
@@ -4721,7 +4721,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_ENGINEACCELERATION:
             {            
-                if ( fValue >= 0 && fValue <= 100000)
+                if ( fValue >= 0 && fValue <= 100000 )
                 {
                     pEntry->SetEngineAcceleration ( fValue );
                     break;
@@ -4729,7 +4729,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_ENGINEINERTIA:
             {            
-                if ( fValue >= -1000 && fValue <= 1000)
+                if ( fValue >= -1000 && fValue <= 1000 )
                 {
                     pEntry->SetEngineInertia ( fValue );
                     break;
@@ -4737,7 +4737,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_MAXVELOCITY:
             {            
-                if ( fValue >= 0.0 && fValue <= 200000)
+                if ( fValue >= 0.0 && fValue <= 200000 )
                 {
                     pEntry->SetMaxVelocity ( fValue );
                     break;
@@ -4745,7 +4745,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_BRAKEDECELERATION:
             {            
-                if ( fValue >= 0.0 && fValue <= 100000)
+                if ( fValue >= 0.0 && fValue <= 100000 )
                 {
                     pEntry->SetBrakeDeceleration ( fValue );
                     break;
@@ -4753,7 +4753,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_BRAKEBIAS:
             {            
-                if ( fValue >= 0.0 && fValue <= 1.0)
+                if ( fValue >= 0.0 && fValue <= 1.0 )
                 {
                     pEntry->SetBrakeBias ( fValue );
                     break;
@@ -4761,7 +4761,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_STEERINGLOCK:
             {            
-                if ( fValue >= 0.0 && fValue <= 360)
+                if ( fValue >= 0.0 && fValue <= 360 )
                 {
                     pEntry->SetSteeringLock ( fValue );
                     break;
@@ -4769,7 +4769,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_TRACTIONLOSS:
             {            
-                if ( fValue >= 0.0 && fValue <= 100)
+                if ( fValue >= 0.0 && fValue <= 100 )
                 {
                     pEntry->SetTractionLoss ( fValue );
                     break;
@@ -4777,7 +4777,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_TRACTIONBIAS:
             {            
-                if ( fValue >= 0.0 && fValue <= 1.0)
+                if ( fValue >= 0.0 && fValue <= 1.0 )
                 {
                     pEntry->SetTractionBias ( fValue );
                     break;
@@ -4785,7 +4785,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_FORCELEVEL:
             {            
-                if ( fValue >= 0.0 && fValue <= 100)
+                if ( fValue >= 0.0 && fValue <= 100 )
                 {
                     pEntry->SetSuspensionForceLevel ( fValue );
                     break;
@@ -4793,7 +4793,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_DAMPING:
             {            
-                if ( fValue >= 0.0 && fValue <= 100)
+                if ( fValue >= 0.0 && fValue <= 100 )
                 {
                     pEntry->SetSuspensionDamping ( fValue );
                     break;
@@ -4801,7 +4801,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
             {            
-                if ( fValue >= 0.0 && fValue <= 600)
+                if ( fValue >= 0.0 && fValue <= 600 )
                 {
                     pEntry->SetSuspensionHighSpeedDamping ( fValue );
                     break;
@@ -4809,7 +4809,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_UPPER_LIMIT:
             {            
-                if ( fValue >= -50.0 && fValue <= 50)
+                if ( fValue >= -50.0 && fValue <= 50 )
                 {
                     pEntry->SetSuspensionUpperLimit ( fValue );
                     break;
@@ -4817,7 +4817,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_LOWER_LIMIT:
             {            
-                if ( fValue >= -50.0 && fValue <= 50)
+                if ( fValue >= -50.0 && fValue <= 50 )
                 {
                     pEntry->SetSuspensionLowerLimit ( fValue );
                     break;
@@ -4825,7 +4825,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_FRONTREARBIAS:
             {            
-                if ( fValue >= 0.0 && fValue <= 1.0)
+                if ( fValue >= 0.0 && fValue <= 1.0 )
                 {
                     pEntry->SetSuspensionFrontRearBias ( fValue );
                     break;
@@ -4833,7 +4833,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
             {            
-                if ( fValue >= 0.0 && fValue <= 30)
+                if ( fValue >= 0.0 && fValue <= 30 )
                 {
                     pEntry->SetSuspensionAntidiveMultiplier ( fValue );
                     break;
@@ -4841,7 +4841,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_COLLISIONDAMAGEMULTIPLIER:
             {
-                if ( fValue >= 0.0 && fValue <= 100)
+                if ( fValue >= 0.0 && fValue <= 100 )
                 {
                     pEntry->SetCollisionDamageMultiplier ( fValue );
                     break;
@@ -4849,7 +4849,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SEATOFFSETDISTANCE:
             {
-                if ( fValue >= -100 && fValue <= 100)
+                if ( fValue >= -100 && fValue <= 100 )
                 {
                     pEntry->SetSeatOffsetDistance ( fValue );
                     break;
@@ -4879,9 +4879,9 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
         {
             if ( pEntry->GetCenterOfMass () != vecValue )
             {
-                if ( vecValue.fX >= -10.0 && vecValue.fX <= -10.0 &&
-                    vecValue.fY >= -10.0 && vecValue.fY <= -10.0 &&
-                    vecValue.fZ >= -10.0 && vecValue.fZ <= -10.0 )
+                if ( vecValue.fX >= -10.0 && vecValue.fX <= 10.0 &&
+                    vecValue.fY >= -10.0 && vecValue.fY <= 10.0 &&
+                    vecValue.fZ >= -10.0 && vecValue.fZ <= 10.0 )
                 {
                     pEntry->SetCenterOfMass ( vecValue );
                     return true;
