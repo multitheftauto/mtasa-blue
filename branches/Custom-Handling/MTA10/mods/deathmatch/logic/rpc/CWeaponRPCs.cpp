@@ -141,7 +141,7 @@ void CWeaponRPCs::TakeWeapon ( CClientEntity* pSource, NetBitStreamInterface& bi
                     pPlayerWeapon->SetAmmoInClip ( 0 );
 
                     unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal ();
-                    if ( ulWeaponAmmo - usAmmo < 0 )
+                    if ( usAmmo > ulWeaponAmmo )
                         ulWeaponAmmo = 0;
                     else
                         ulWeaponAmmo -= usAmmo;

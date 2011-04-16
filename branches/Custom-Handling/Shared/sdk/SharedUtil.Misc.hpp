@@ -14,6 +14,7 @@
 
 #include "UTF8.h"
 #include "minibidi.c"
+#include "UTF8Detect.cpp"
 #ifdef WIN32
     #include <direct.h>
     #include <shellapi.h>
@@ -55,10 +56,7 @@ SString SharedUtil::GetMTASABaseDir ( void )
 //
 SString SharedUtil::CalcMTASAPath ( const SString& strPath )
 {
-    SString strNewPath = GetMTASABaseDir();
-    strNewPath += '\\';
-    strNewPath += strPath;
-    return strNewPath;
+    return PathJoin ( GetMTASABaseDir(), strPath );
 }
 
 
@@ -784,6 +782,12 @@ std::wstring SharedUtil::ConvertToUTF8 (const std::string& input)
 std::string SharedUtil::ConvertToANSI (const std::wstring& input)
 {
     return utf8_wcstombs (input);
+}
+
+// Get UTF8 confidence
+int SharedUtil::GetUTF8Confidence (unsigned char* input, int len)
+{
+    return icu_getUTF8Confidence (input, len);
 }
 
 // Translate a true ANSI string to the UTF-8 equivalent (reencode+convert)

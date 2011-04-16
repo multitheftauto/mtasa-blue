@@ -14,6 +14,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define DECLARE_PROFILER_SECTION_CLuaMain
+#include "profiler/SharedUtil.Profiler.h"
 
 using std::list;
 
@@ -65,7 +67,8 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner )
     
     m_pResource = pResourceOwner;
 
-    GetClientPerfStatManager ()->OnLuaMainCreate ( this );
+    CClientPerfStatLuaMemory::GetSingleton ()->OnLuaMainCreate ( this );
+    CClientPerfStatLuaTiming::GetSingleton ()->OnLuaMainCreate ( this );
 }
 
 
@@ -78,7 +81,8 @@ CLuaMain::~CLuaMain ( void )
     // Delete the timer manager
     delete m_pLuaTimerManager;
 
-    GetClientPerfStatManager ()->OnLuaMainDestroy ( this );
+    CClientPerfStatLuaMemory::GetSingleton ()->OnLuaMainDestroy ( this );
+    CClientPerfStatLuaTiming::GetSingleton ()->OnLuaMainDestroy ( this );
 }
 
 bool CLuaMain::BeingDeleted ( void )
@@ -109,8 +113,6 @@ void CLuaMain::InitVM ( void )
     // Create a new VM
     m_luaVM = lua_open ();
 
-    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
-    InitSecurity();
 
     // Set the instruction count hook
     lua_sethook ( m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT );
@@ -121,6 +123,9 @@ void CLuaMain::InitVM ( void )
     luaopen_string ( m_luaVM );
     luaopen_table ( m_luaVM );
     luaopen_debug ( m_luaVM );
+
+    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
+    InitSecurity();
 
     // Register module functions
     CLuaCFunctions::RegisterFunctionsWithVM ( m_luaVM );
@@ -220,11 +225,11 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
 {
     if ( m_luaVM )
     {
+        // Are we not marked as UTF-8 already, and not precompiled?
         std::string strUTFScript;
-        if ( !bUTF8 ) //If it's not a marked UTF-8 script
+        if ( !bUTF8 && ( uiSize < 5 || cpBuffer[0] != 27 || cpBuffer[1] != 'L' || cpBuffer[2] != 'u' || cpBuffer[3] != 'a' || cpBuffer[4] != 'Q' ) )
         {
-            std::string strBuffer = std::string(cpBuffer);
-            strBuffer.resize(uiSize); //Clamp to end size;
+            std::string strBuffer = std::string(cpBuffer, uiSize);
             strUTFScript = ConvertToANSI(TranslateToUTF8( strBuffer ));
             if ( uiSize != strUTFScript.size() )
             {
@@ -232,6 +237,8 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
                 g_pClientGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script '%s' is not encoded in UTF-8.  Loading as ANSI...", ConformResourcePath(szFileName).c_str() );
             }
         }
+        else
+            strUTFScript = std::string(cpBuffer, uiSize);
 
         // Run the script
         if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", szFileName ) ) )
@@ -349,7 +356,7 @@ void CLuaMain::DoPulse ( void )
 
 CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
 {
-    CXMLFile * pFile = g_pCore->GetXML ()->CreateXML ( szFilename );
+    CXMLFile * pFile = g_pCore->GetXML ()->CreateXML ( szFilename, true );
     if ( pFile )
         m_XMLFiles.push_back ( pFile );
     return pFile;

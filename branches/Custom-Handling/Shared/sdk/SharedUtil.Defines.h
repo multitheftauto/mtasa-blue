@@ -15,6 +15,7 @@
 //
 
 // Enable WITH_ALLOC_TRACKING to monitor server module memory usage. *Has a negative performance impact*
+// (Also only works for the server. Will give compile errors in the client projects.)
 #define WITH_ALLOC_TRACKING 0
 
 //
@@ -63,3 +64,12 @@
 #define ZERO_ON_NEW \
     void* operator new ( size_t size )              { void* ptr = ::operator new(size); memset(ptr,0,size); return ptr; } \
     void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }
+
+
+// As NDEBUG is not defined across most MTA projects, assert() will always be enabled
+// Use dassert for debug build only assertations
+#if defined(MTA_DEBUG) || defined(DEBUG) || defined(_DEBUG) 
+    #define dassert assert
+#else
+    #define dassert(_Expression)     ((void)0)
+#endif

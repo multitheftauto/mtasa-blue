@@ -12,7 +12,9 @@
 
 #include "StdInc.h"
 
-CXMLFileImpl::CXMLFileImpl ( const char* szFilename )
+CXMLFileImpl::CXMLFileImpl ( const char* szFilename, bool bUseIDs ) :
+    m_ulID ( INVALID_XML_ID ),
+    m_bUsingIDs ( bUseIDs )
 {
     // Init
     m_pDocument = NULL;
@@ -29,14 +31,16 @@ CXMLFileImpl::CXMLFileImpl ( const char* szFilename )
     }
 
     // Add to array over XML stuff
-    m_ulID = CXMLArray::PopUniqueID ( this );
+    if ( m_bUsingIDs )
+        m_ulID = CXMLArray::PopUniqueID ( this );
 }
 
 
 CXMLFileImpl::~CXMLFileImpl ( void )
 {
     // Remove from array over XML stuff
-    CXMLArray::PushUniqueID ( this );
+    if ( m_bUsingIDs )
+        CXMLArray::PushUniqueID ( this );
 
     // Delete our wrappers
     ClearWrapperTree ();

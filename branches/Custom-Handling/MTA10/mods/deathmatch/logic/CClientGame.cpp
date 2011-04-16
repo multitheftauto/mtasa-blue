@@ -261,10 +261,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_pLuaManager = new CLuaManager ( this );
     m_pScriptDebugging = new CScriptDebugging ( m_pLuaManager );
-
-    #if defined (MTA_SCRIPT_LOGGING)
     m_pScriptDebugging->SetLogfile ( CalcMTASAPath("mta\\clientscript.log"), 3 );
-    #endif
 
     m_pLuaManager->SetScriptDebugging ( m_pScriptDebugging );
     CStaticFunctionDefinitions::CStaticFunctionDefinitions ( m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager );
@@ -842,12 +839,15 @@ void CClientGame::DoPulsePostFrame ( void )
         }
         #endif
 
-        GetClientPerfStatManager ()->DoPulse ();
+        CClientPerfStatManager::GetSingleton ()->DoPulse ();
     }
 
     // If we are not minimized we do the pulsing here
     if ( !g_pCore->IsWindowMinimized () )
     {
+        m_pRadarMap->DoRender ();
+        m_pManager->DoRender ();
+
         // ..if no one else is doing it
         if ( m_uiNotPulsedCounter > 1 )
             DoPulses ();
@@ -877,33 +877,49 @@ void CClientGame::DoPulses ( void )
     if ( m_pManager->IsGameLoaded () && m_Status == CClientGame::STATUS_JOINED && GetTickCount64_ () - m_llLastTransgressionTime > 60000 )
     {
         uint uiLevel = 0;
+        uint uiInform = 0;
         SString strMessage;
 
         // Is the player a cheater?
         if ( !m_pManager->GetAntiCheat ().PerformChecks () )
         {
             uiLevel = 1;
+            uiInform = 2;
         }
         else
         {
             strMessage = g_pNet->GetNextBuffer ();
             if ( strMessage.length () )
+            {
                 uiLevel = atoi ( strMessage.SplitLeft ( ":", &strMessage ) );
+                uiInform = atoi ( strMessage.SplitLeft ( ":", &strMessage ) );
+            }
         }
 
         // Send message to the server
         if ( uiLevel )
         {
-            SString strMessageCombo  = SString( "AC #%d %s", uiLevel, strMessage.c_str () ).TrimEnd ( " " );
+            SString strPrefix = ( uiInform == 2 ) ? "AC" : ( uiInform == 1 ) ? "VF" : "SD";
+            SString strMessageCombo = SString( "%s #%d %s", *strPrefix, uiLevel, strMessage.c_str () ).TrimEnd ( " " );
             m_llLastTransgressionTime = GetTickCount64_ ();
-            AddReportLog ( 3100, strMessageCombo );
+            AddReportLog ( 3100, strMessageCombo + SString ( " (%d)", uiInform ) );
 
-            // Inform the server
-            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-            pBitStream->Write ( uiLevel );
-            pBitStream->WriteString ( strMessage );
-            g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
-            g_pNet->DeallocateNetBitStream ( pBitStream );
+            if ( uiInform > 0 )
+            {
+                // The server will use the whole message as supplied here
+                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                pBitStream->Write ( uiLevel );
+                pBitStream->WriteString ( strMessageCombo );
+                g_pNet->SendPacket ( PACKET_ID_PLAYER_TRANSGRESSION, pBitStream );
+                g_pNet->DeallocateNetBitStream ( pBitStream );
+            }
+            else
+            {
+                // Otherwise, disconnect here
+                g_pCore->ShowMessageBox ( "Error", SString ( "You were kicked from the game (" + strMessageCombo + ")" ), MB_BUTTON_OK | MB_ICON_ERROR );
+                g_pCore->GetModManager ()->RequestUnload ();
+                return;
+            }
         }
     }
 
@@ -3454,8 +3470,14 @@ void CClientGame::PreWorldProcessHandler ( void )
     // If we are not minimized we do the pulsing here
     if ( !g_pCore->IsWindowMinimized () )
     {
-        m_uiNotPulsedCounter = 0;
-        DoPulses ();
+        int iVal;
+        g_pCore->GetCVars ()->Get ( "code_path", iVal );
+        if ( iVal )
+        {
+            // Pulse here instead to see if it reduces anim crashes
+            m_uiNotPulsedCounter = 0;
+            DoPulses ();
+        }
     }
 }
 
@@ -3483,6 +3505,8 @@ void CClientGame::IdleHandler ( void )
     // If we are minimized we do the pulsing here
     if ( g_pCore->IsWindowMinimized() )
     {
+        m_pRadarMap->DoRender ();
+        m_pManager->DoRender ();
         DoPulses ();
     }
 }

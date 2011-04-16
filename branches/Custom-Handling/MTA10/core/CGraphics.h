@@ -164,6 +164,8 @@ private:
     ID3DXFont*          m_pDXFonts [ NUM_FONTS ];
     ID3DXFont*          m_pBigDXFonts [ NUM_FONTS ];
 
+    std::vector < SString > m_FontResourceNames;
+
     /*
     ID3DXFont *         m_pDXDefaultFont;
     ID3DXFont *         m_pDXDefaultBoldFont;

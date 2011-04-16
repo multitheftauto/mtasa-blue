@@ -73,14 +73,17 @@ CConnectHistoryItem& CConnectHistory::GetHistoryItem ( const string& strIP )
 
 #if MTA_DEBUG
     // Dump info
-    CConnectHistoryItem& historyItem = iter->second;
-    SString strInfo ( "IP:%s  ", strIP.c_str () );
-    for ( unsigned int i = 0 ; i < historyItem.joinTimes.size () ; i++ )
+    const CConnectHistoryItem& historyItem = iter->second;
+    if ( !historyItem.joinTimes.empty () )
     {
-        strInfo += SString ( "%u  ", GetTickCount64_ () - historyItem.joinTimes[i] );
+        SString strInfo ( "IP:%s  ", strIP.c_str () );
+        for ( unsigned int i = 0 ; i < historyItem.joinTimes.size () ; i++ )
+        {
+            strInfo += SString ( "%u  ", GetTickCount64_ () - historyItem.joinTimes[i] );
+        }
+        strInfo += "\n";
+        OutputDebugString ( strInfo );
     }
-    strInfo += "\n";
-    OutputDebugString ( strInfo );
 #endif
 
     return iter->second;

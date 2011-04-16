@@ -20,11 +20,11 @@
 typedef void (*VERIFICATIONCALLBACK) ( bool, char*, void* obj );
 
 #define VERIFICATION_DELAY              9000
-#define VERIFICATION_URL                "http://dp3.community.mtasa.com/core/1.1/client.php"
+#define VERIFICATION_URL                "http://community.mtasa.com/core/1.1/client.php"
 
 enum eVerificationResult
 {
-    VERIFY_ERROR_UNEXPECTED,
+    VERIFY_ERROR_UNEXPECTED = 0,
     VERIFY_ERROR_SUCCESS,
     VERIFY_ERROR_VERIFICATION_FAILED,
     VERIFY_ERROR_COMPUTER_USED,

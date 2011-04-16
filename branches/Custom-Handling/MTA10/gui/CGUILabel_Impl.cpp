@@ -36,7 +36,9 @@ CGUILabel_Impl::CGUILabel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const ch
     // Do some hardcore disabling on the labels
     //m_pWindow->moveToBack ( );
     //m_pWindow->disable ( );
-    m_pWindow->setZOrderingEnabled ( false );
+
+    // not sure what that was for, disabled
+    //m_pWindow->setZOrderingEnabled ( false );
     //m_pWindow->setAlwaysOnTop ( true );
 
     SetFrameEnabled ( false );

@@ -28,7 +28,7 @@ public:
     }
     void SetFromString ( const SString& strText )
     {
-        strText.Replace ( "\t", " " ).Replace ( "  ", " " ).TrimEnd ( " " ).TrimStart ( " " ).Split ( " ", m_TokenList );
+        strText.Replace ( "\t", " " ).Replace ( "  ", " ", true ).TrimEnd ( " " ).TrimStart ( " " ).Split ( " ", m_TokenList );
     }
     const SString& GetToken ( uint uiIndex ) const
     {
@@ -81,7 +81,7 @@ public:
         strSource.Split ( "\n", m_LineList );
         for ( int i = m_LineList.size () - 1 ; i >= 0 ; i-- )
         {
-            m_LineList[i] = m_LineList[i].Replace ( "\t", " " ).Replace ( "  ", " " ).TrimEnd ( " " ).TrimStart ( " " );
+            m_LineList[i] = m_LineList[i].Replace ( "\t", " " ).Replace ( "  ", " ", true ).TrimEnd ( " " ).TrimStart ( " " );
             if ( m_LineList[i].empty () )
                 ListRemoveIndex ( m_LineList, i );
         }

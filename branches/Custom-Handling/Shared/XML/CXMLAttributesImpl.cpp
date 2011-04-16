@@ -12,7 +12,8 @@
 
 #include "StdInc.h"
 
-CXMLAttributesImpl::CXMLAttributesImpl ( TiXmlElement& Node ) :
+CXMLAttributesImpl::CXMLAttributesImpl ( TiXmlElement& Node, bool bUseIDs ) :
+    m_bUsingIDs ( bUseIDs ),
     m_Node ( Node )
 {
     // Init

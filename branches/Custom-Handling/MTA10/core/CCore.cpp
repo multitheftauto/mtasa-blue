@@ -1734,6 +1734,12 @@ void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit )
         m_uiFrameRateLimit = m_uiServerFrameRateLimit;
     else
         m_uiFrameRateLimit = uiClientRate;
+
+    // Print new limits to the console
+    SString strStatus (  "Server FPS limit: %d", m_uiServerFrameRateLimit );
+    if ( m_uiFrameRateLimit != m_uiServerFrameRateLimit )
+        strStatus += SString (  " (Using %d)", m_uiFrameRateLimit );
+    CCore::GetSingleton ().GetConsole ()->Print( strStatus );
 }
 
 
@@ -1762,8 +1768,8 @@ void CCore::ApplyFrameRateLimit ( void )
         // Have time spare - maybe eat some of that now
         double dSpare = dTargetTimeToUse - dTimeUsed;
 
-        double dUseUpNow = dSpare - dTargetTimeToUse * 0.75;
-        if ( dUseUpNow > 1 )
+        double dUseUpNow = dSpare - dTargetTimeToUse * 0.2f;
+        if ( dUseUpNow >= 1 )
             Sleep( static_cast < DWORD > ( floor ( dUseUpNow ) ) );
 
         // Redo timing calcs
@@ -1776,7 +1782,7 @@ void CCore::ApplyFrameRateLimit ( void )
     m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
 
     // Limit carry over
-    m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9, m_dPrevOverrun, dTargetTimeToUse * 0.9 );
+    m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f );
 
     m_dLastTimeMs = dTimeMs;
 }

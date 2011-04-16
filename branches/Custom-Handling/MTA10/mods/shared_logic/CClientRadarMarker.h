@@ -25,11 +25,7 @@ class CClientRadarMarker;
 #include "CClientRadarMarkerManager.h"
 #include <gui/CGUI.h>
 
-#ifdef COMPILE_FOR_VC
-    #include <game/CMarker.h>
-#else if COMPILE_FOR_SA
-    #include <game/CMarker.h>
-#endif
+#include <game/CMarker.h>
 
 #define MAP_MARKER_WIDTH 19
 #define MAP_MARKER_HEIGHT 20

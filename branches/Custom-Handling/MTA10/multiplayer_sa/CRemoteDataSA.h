@@ -24,16 +24,14 @@
 #include "../game_sa/CPadSA.h"
 #include "../game_sa/common.h"
 
-void MemSet ( void* dwDest, int cValue, uint uiAmount );
-
 class CRemoteDataStorageSA : public CRemoteDataStorage
 {
 public:
     inline CRemoteDataStorageSA () 
     { 
-        MemSet ( &m_pad, 0, sizeof ( CPadSAInterface ) );
+        memset ( &m_pad, 0, sizeof ( CPadSAInterface ) );
         m_fCameraRotation = 0.0f;
-        MemSet ( &m_stats, 0, sizeof ( CStatsData ) );
+        memset ( &m_stats, 0, sizeof ( CStatsData ) );
         m_fGravity = 0.008f;
         m_bAkimboTargetUp = false;
         m_bProcessPlayerWeapon = false;

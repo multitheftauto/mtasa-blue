@@ -95,8 +95,8 @@ public:
     bool        Split               ( const SString& strDelim, SString* pstrLeft, SString* pstrRight, int iIndex = 1 ) const;
     SString     SplitLeft           ( const SString& strDelim, SString* pstrRight = NULL, int iIndex = 1 ) const;
     SString     SplitRight          ( const SString& strDelim, SString* pstrLeft = NULL, int iIndex = 1 ) const;
-    SString     Replace             ( const char* szOld, const char* szNew ) const;
-    SString     ReplaceI            ( const char* szOld, const char* szNew ) const;
+    SString     Replace             ( const char* szOld, const char* szNew, bool bSearchJustReplaced = false ) const;
+    SString     ReplaceI            ( const char* szOld, const char* szNew, bool bSearchJustReplaced = false ) const;
     SString     TrimStart           ( const char* szOld ) const;
     SString     TrimEnd             ( const char* szOld ) const;
     SString     ToLower             ( void ) const;

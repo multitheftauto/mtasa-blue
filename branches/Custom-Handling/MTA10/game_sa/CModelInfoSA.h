@@ -40,6 +40,7 @@ class CPedModelInfoSAInterface;
 #define     FUNC_GetModelFlags              0x4044E0
 #define     FUNC_GetBoundingBox             0x4082F0
 
+#define     FUNC_RemoveRef                  0x4C4BB0
 #define     FUNC_IsBoatModel                0x4c5a70
 #define     FUNC_IsCarModel                 0x4c5aa0
 #define     FUNC_IsTrainModel               0x4c5ad0
@@ -260,6 +261,7 @@ public:
     VOID                            Remove                  ( void );
     BYTE                            GetLevelFromPosition    ( CVector * vecPosition );
     BOOL                            IsLoaded                ( void );
+    void                            InternalRemoveGTARef    ( void );
     BYTE                            GetFlags                ( void );
     CBoundingBox *                  GetBoundingBox          ( void );
     bool                            IsValid                 ( void );
@@ -272,7 +274,9 @@ public:
 
     void                            AddRef                  ( bool bWaitForLoad, bool bHighPriority = false );
     int                             GetRefCount             ( void );
-    void                            RemoveRef               ( void );
+    void                            RemoveRef               ( bool bRemoveExtraGTARef = false );
+    void                            MaybeRemoveExtraGTARef  ( void );
+    void                            DoRemoveExtraGTARef     ( void );
 
     // CVehicleModelInfo specific
     short                           GetAvailableVehicleMod  ( unsigned short usSlot );

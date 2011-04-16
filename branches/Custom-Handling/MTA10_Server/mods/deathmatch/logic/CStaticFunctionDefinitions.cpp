@@ -3698,8 +3698,12 @@ bool CStaticFunctionDefinitions::TakeWeapon ( CElement* pElement, unsigned char 
                 if ( usAmmo < 9999 )
                 {
                     unsigned short usTotalAmmo = pPed->GetWeaponTotalAmmo ( ucWeaponSlot );
-                    if ( usTotalAmmo - usAmmo < 0 )
+                    if ( usAmmo > usTotalAmmo )
+                    {
                         usTotalAmmo = 0;
+                        pPed->SetWeaponType ( 0, ucWeaponSlot );
+                        pPed->SetWeaponAmmoInClip ( 0, ucWeaponSlot );
+                    }
                     else
                         usTotalAmmo -= usAmmo;
                     pPed->SetWeaponTotalAmmo ( usTotalAmmo, ucWeaponSlot );
@@ -9212,7 +9216,14 @@ bool CStaticFunctionDefinitions::SetAccountData ( CAccount* pAccount, char* szKe
 
     SString strArgumentAsString;
     pArgument->GetAsString ( strArgumentAsString );
-    return m_pAccountManager->SetAccountData ( pAccount, szKey, strArgumentAsString.substr ( 0, 128 ), pArgument->GetType() );
+
+    CLuaArguments Arguments;
+    Arguments.PushAccount ( pAccount );
+    Arguments.PushString ( szKey );
+    Arguments.PushString ( strArgumentAsString );
+    if ( m_pMapManager->GetRootElement()->CallEvent ( "onAccountDataChange", Arguments ) )
+        return m_pAccountManager->SetAccountData ( pAccount, szKey, strArgumentAsString.substr ( 0, 128 ), pArgument->GetType() );
+    return false;
 }
 
 

@@ -21,10 +21,14 @@ CGUIPropertyIter GetPropertiesEnd ( void )                  { return CGUIElement
 bool SetFont ( const char *szFontName )                     { return CGUIElement_Impl::SetFont ( szFontName ); };
 std::string GetFont ( void )                                { return CGUIElement_Impl::GetFont (); };
 
+#ifndef SETVISIBLE_HACK
 void SetVisible ( bool bVisible )                           { CGUIElement_Impl::SetVisible ( bVisible ); };
+#endif
 bool IsVisible ( void )                                     { return CGUIElement_Impl::IsVisible (); };
 
+#ifndef SETENABLED_HACK
 void SetEnabled ( bool bEnabled )                           { CGUIElement_Impl::SetEnabled ( bEnabled ); };
+#endif
 bool IsEnabled ( void )                                     { return CGUIElement_Impl::IsEnabled (); };
 void SetZOrderingEnabled ( bool bZOrderingEnabled )         { CGUIElement_Impl::SetZOrderingEnabled ( bZOrderingEnabled ); };
 bool IsZOrderingEnabled ( void )                            { return CGUIElement_Impl::IsZOrderingEnabled (); };
@@ -89,3 +93,6 @@ void SetMovedHandler ( GUI_CALLBACK Callback )              { CGUIElement_Impl::
 void SetSizedHandler ( GUI_CALLBACK Callback )              { CGUIElement_Impl::SetSizedHandler ( Callback ); };
 void SetMouseEnterHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::SetMouseEnterHandler ( Callback ); };
 void SetMouseLeaveHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::SetMouseLeaveHandler ( Callback ); };
+void SetMouseButtonDownHandler ( GUI_CALLBACK Callback )    { CGUIElement_Impl::SetMouseButtonDownHandler ( Callback ); };
+void SetActivateHandler ( GUI_CALLBACK Callback )           { CGUIElement_Impl::SetActivateHandler ( Callback ); };
+void SetDeactivateHandler ( GUI_CALLBACK Callback )         { CGUIElement_Impl::SetDeactivateHandler ( Callback ); };

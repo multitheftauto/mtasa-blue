@@ -846,7 +846,7 @@ int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
         if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
             strFilter = lua_tostring ( luaVM, 3 );
 
-        GetClientPerfStatManager ()->GetStats ( &Result, strCategory, strOptions, strFilter );
+        CClientPerfStatManager::GetSingleton ()->GetStats ( &Result, strCategory, strOptions, strFilter );
 
         lua_newtable ( luaVM );
         for ( int c = 0; c < Result.ColumnCount () ; c++ )

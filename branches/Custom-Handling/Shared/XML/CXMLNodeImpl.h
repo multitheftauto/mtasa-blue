@@ -61,7 +61,8 @@ public:
     void                    SetTagContentf      ( const char* szFormat, ... );
 
     eXMLClass               GetClassType        ( void )    { return CXML_NODE; };
-    unsigned long           GetID               ( void )    { return m_ulID; };
+    unsigned long           GetID               ( void )    { dassert ( m_pFile && m_pFile->IsUsingIDs () ); return m_ulID; };
+    bool                    IsUsingIDs          ( void )    { return m_bUsingIDs; };
 
     CXMLNode*               CopyNode            ( CXMLNode* pParent = NULL );
     bool                    CopyChildrenInto    ( CXMLNode* pDestination, bool bRecursive );
@@ -73,7 +74,7 @@ public:
     void                    RemoveFromList      ( CXMLNode* pNode );
     void                    RemoveAllFromList   ( void );
 
-    bool                    IsValid             ( void ) { return m_ulID != INVALID_XML_ID; };
+    bool                    IsValid             ( void ) { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
 
 private:
     bool                    StringToLong        ( const char* szString, long& lValue );
@@ -89,6 +90,7 @@ private:
     CXMLAttributesImpl          m_Attributes;
 
     unsigned long               m_ulID;
+    const bool                  m_bUsingIDs;
 };
 
 #endif

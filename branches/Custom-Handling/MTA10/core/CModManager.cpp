@@ -13,6 +13,8 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 #include <shellapi.h>
+#define DECLARE_PROFILER_SECTION_CModManager
+#include "profiler/SharedUtil.Profiler.h"
 
 using SharedUtil::CalcMTASAPath;
 
@@ -278,6 +280,10 @@ void CModManager::DoPulsePostFrame ( void )
     if ( m_pClientBase )
     {
         m_pClientBase->PostFrameExecutionHandler ();
+    }
+    else
+    {
+        CCore::GetSingleton ().GetNetwork ()->DoPulse ();
     }
 
     // Load/unload requested?

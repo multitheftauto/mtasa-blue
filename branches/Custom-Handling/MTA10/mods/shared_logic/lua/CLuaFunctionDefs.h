@@ -87,6 +87,8 @@ public:
     LUA_DECLARE ( OutputChatBox );
     LUA_DECLARE ( ShowChat );
     LUA_DECLARE ( OutputClientDebugString );
+    LUA_DECLARE ( SetClipboard );
+    LUA_DECLARE ( GetClipboard );
 
     // Element get functions
     LUA_DECLARE ( GetRootElement );
@@ -537,6 +539,7 @@ public:
     LUA_DECLARE ( GUIGridListSetColumnWidth );
     LUA_DECLARE ( GUIGridListSetScrollBars );
     LUA_DECLARE ( GUIGridListGetRowCount );
+    LUA_DECLARE ( GUIGridListGetColumnCount );
     LUA_DECLARE ( GUIGridListAddRow );
     LUA_DECLARE ( GUIGridListInsertRowAfter );
     LUA_DECLARE ( GUIGridListRemoveRow );

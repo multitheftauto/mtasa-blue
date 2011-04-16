@@ -238,34 +238,48 @@ SString SString::SplitRight ( const SString& strDelim, SString* pstrLeft, int iI
 //
 // Replace all occurrences of the string szOld with szNew
 //
-SString SString::Replace ( const char* szOld, const char* szNew ) const
+SString SString::Replace ( const char* szOld, const char* szNew, bool bSearchJustReplaced ) const
 {
-    int iOldLength = strlen ( szOld );
-    int iNewLength = strlen ( szNew );
+    // Check if anything to replace first
+    size_t idx = 0;
+    if( ( idx = this->find ( szOld, idx ) ) == npos )
+        return *this;
+
+    size_t iOldLength = strlen ( szOld );
+    size_t iNewLength = strlen ( szNew );
     SString strResult = *this;
-    int idx = 0;
-    while( ( idx = strResult.find ( szOld, idx ) ) >= 0 )
+    do
     {
         strResult.replace ( idx, iOldLength, szNew );
-        idx += iNewLength - iOldLength + 1;
+        if ( !bSearchJustReplaced )
+            idx += iNewLength;
     }
+    while( ( idx = strResult.find ( szOld, idx ) ) != npos );
     return strResult;
 }
 
 //
 // Case insensitive version of Replace()
 //
-SString SString::ReplaceI ( const char* szOld, const char* szNew ) const
+SString SString::ReplaceI ( const char* szOld, const char* szNew, bool bSearchJustReplaced ) const
 {
-    int iOldLength = strlen ( szOld );
-    int iNewLength = strlen ( szNew );
+    SString strOldUpper = SStringX ( szOld ).ToUpper ();
+
+    // Check if anything to replace first
+    size_t idx = 0;
+    if( ( idx = this->ToUpper ().find ( strOldUpper, idx ) ) == npos )
+        return *this;
+
+    size_t iOldLength = strlen ( szOld );
+    size_t iNewLength = strlen ( szNew );
     SString strResult = *this;
-    int idx = 0;
-    while( ( idx = strResult.ToUpper ().find ( SString ( szOld, 0 ).ToUpper (), idx ) ) >= 0 )
+    do
     {
         strResult.replace ( idx, iOldLength, szNew );
-        idx += iNewLength - iOldLength + 1;
+        if ( !bSearchJustReplaced )
+            idx += iNewLength;
     }
+    while( ( idx = strResult.ToUpper ().find ( strOldUpper, idx ) ) != npos );
     return strResult;
 }
 
@@ -275,7 +289,7 @@ SString SString::ReplaceI ( const char* szOld, const char* szNew ) const
 //
 SString SString::TrimStart ( const char* szOld ) const
 {
-    const uint uiOldLength = strlen ( szOld );
+    const size_t uiOldLength = strlen ( szOld );
     SString strResult = *this;
     while ( strResult.substr ( 0, uiOldLength ) == szOld )
         strResult = strResult.substr ( uiOldLength );
@@ -287,7 +301,7 @@ SString SString::TrimStart ( const char* szOld ) const
 //
 SString SString::TrimEnd ( const char* szOld ) const
 {
-    const uint uiOldLength = strlen ( szOld );
+    const size_t uiOldLength = strlen ( szOld );
     SString strResult = *this;
     while ( strResult.length () >= uiOldLength && strResult.substr ( strResult.length () - uiOldLength ) == szOld )
         strResult = strResult.substr ( 0, strResult.length () - uiOldLength );

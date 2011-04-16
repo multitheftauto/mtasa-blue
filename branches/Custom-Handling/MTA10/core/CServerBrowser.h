@@ -55,7 +55,7 @@ public:
 
     enum SearchType
     {
-        ALL = 0,
+        SERVERS = 0,
         PLAYERS,
         MAX_SEARCH_TYPES,
     };
@@ -156,12 +156,14 @@ protected:
     CGUIButton*         m_pButtonFavourites [ SERVER_BROWSER_TYPE_COUNT ];
 
     CGUIEdit*           m_pEditAddress [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUILabel*          m_pLabelAddressDescription [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIComboBox*       m_pComboAddressHistory  [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIStaticImage*    m_pSearchTypeIcon  [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIStaticImage*    m_pAddressFavoriteIcon [ SERVER_BROWSER_TYPE_COUNT ];
 
     CGUIComboBox*       m_pComboSearchType  [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIEdit*           m_pEditSearch  [ SERVER_BROWSER_TYPE_COUNT ];
+	CGUILabel*          m_pLabelSearchDescription  [ SERVER_BROWSER_TYPE_COUNT ];
 
 
     
@@ -210,6 +212,11 @@ private:
     bool                    OnTabChanged                    ( CGUIElement* pElement );
     bool                    OnHistorySelected               ( CGUIElement* pElement );
     bool                    OnSearchTypeSelected            ( CGUIElement* pElement );
+
+    bool					OnSearchFocused					( CGUIElement* pElement );
+    bool					OnSearchDefocused			    ( CGUIElement* pElement );
+    bool					OnAddressFocused				( CGUIElement* pElement );
+    bool					OnAddressDefocused				( CGUIElement* pElement );
 
     ServerBrowserType       GetCurrentServerBrowserType     ( void );
 

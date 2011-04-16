@@ -13,7 +13,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerfStatManager.h"
 
 extern CGame* g_pGame;
 
@@ -331,7 +330,7 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                         assert ( lua_gettop ( pState ) == luaStackPointer );
                     #endif
 
-                    GetPerfStatManager ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, GetTimeUs() - startTime );
+                    CPerfStatLuaTiming::GetSingleton ()->UpdateLuaTiming ( pMapEvent->GetVM (), szName, GetTimeUs() - startTime );
                 }
             }
         }
