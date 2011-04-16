@@ -115,6 +115,8 @@ namespace SharedUtil
 
     std::wstring GetBidiString (const std::wstring ws);
 
+    int  GetUTF8Confidence (unsigned char* input, int len);
+
 
     //
     // Some templates
