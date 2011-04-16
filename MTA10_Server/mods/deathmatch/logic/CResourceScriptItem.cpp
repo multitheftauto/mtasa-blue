@@ -41,7 +41,7 @@ bool CResourceScriptItem::Start ( void )
     {
         if ( iSize < 3 || buffer[0] != -0x11 || buffer[1] != -0x45 || buffer[2] != -0x41 )
             //Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
-            m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName (), GetUTF8Confidence ( (unsigned char*)&buffer.at ( 0 ), iSize ) >= 80 );
+            m_pVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, m_strResourceFileName.c_str(), GetUTF8Confidence ( (unsigned char*)&buffer.at ( 0 ), iSize ) >= 80 );
         else if ( iSize != 3 ) //If there's a BOM, but the script is not empty, load ignoring the first 3 bytes
             m_pVM->LoadScriptFromBuffer ( &buffer.at ( 3 ), iSize-3, m_strResourceFileName.c_str(), true );
     }
