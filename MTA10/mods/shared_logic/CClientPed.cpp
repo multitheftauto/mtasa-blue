@@ -2519,6 +2519,72 @@ void CClientPed::StreamedInPulse ( void )
             }
         }
 
+        // Fix for stuck aim+move when FPS is greater than 45. This hack will raise the limit to 70 FPS
+        // Fix works by applying a small input pulse on the other axis, at the start of movement
+        pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+        if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
+        {
+            // Make sure not crouching
+            pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_DUCK );
+            if ( !pTask || pTask->GetTaskType () != TASK_SIMPLE_DUCK )
+            {
+                // Apply fix for aimable weapons only
+                switch ( GetCurrentWeaponType () )
+                {
+                    case 23:    // Silenced Pistol
+                    case 24:    // Desert Eagle
+                    case 25:    // Shotgun
+                    case 27:    // SPAZ-12 Combat Shotgun
+                    case 29:    // MP5
+                    case 30:    // AK-47
+                    case 31:    // M4
+                    case 33:    // Country Rifle
+                    case 34:    // Sniper Rifle
+                    case 35:    // Rocket Launcher
+                    case 36:    // Heat-Seeking RPG
+                    case 37:    // Flamethrower
+                    case 38:    // Minigun
+                    case 41:    // Spraycan
+                    case 42:    // Fire Extinguisher
+                    case 43:    // Camera
+                        // See which way input wants to go
+                        const bool bInputRight = Current.LeftStickX >  6;
+                        const bool bInputLeft  = Current.LeftStickX < -6;
+                        const bool bInputFwd   = Current.LeftStickY < -6;
+                        const bool bInputBack  = Current.LeftStickY >  6;
+
+                        // See which way ped is currently going
+                        CVector vecVelocity, vecRotationRadians;
+                        GetMoveSpeed ( vecVelocity );
+                        GetRotationRadians ( vecRotationRadians );
+                        RotateVector ( vecVelocity, -vecRotationRadians );
+
+                        // Calc how much to pulse other axis
+                        short sFixY = 0;
+                        short sFixX = 0;
+
+                        if ( bInputRight && vecVelocity.fX >= 0.f )
+                            sFixY = static_cast < short > ( UnlerpClamped ( 0.02f, vecVelocity.fX, 0.f ) * 64 );
+                        else
+                        if ( bInputLeft && vecVelocity.fX <= 0.f )
+                            sFixY = static_cast < short > ( UnlerpClamped ( -0.02f, vecVelocity.fX, 0.f ) * -64 );
+
+                        if ( bInputFwd && vecVelocity.fY >= 0.f )
+                            sFixX = static_cast < short > ( UnlerpClamped ( 0.02f, vecVelocity.fY, 0.f ) * 64 );
+                        else
+                        if ( bInputBack && vecVelocity.fY <= 0.f )
+                            sFixX = static_cast < short > ( UnlerpClamped ( -0.02f, vecVelocity.fY, 0.f ) * -64 );
+
+                        // Apply pulse if bigger than existing input value
+                        if ( abs ( sFixY ) > abs ( Current.LeftStickY ) )
+                             Current.LeftStickY = sFixY;
+
+                        if ( abs ( sFixX ) > abs ( Current.LeftStickX ) )
+                             Current.LeftStickX = sFixX;
+                }
+            }
+        }
+
         // Set the controller state we might've changed something in
         // We can't use SetControllerState as it will update the previous
         // controller state aswell and that will screw up with impulse buttons
