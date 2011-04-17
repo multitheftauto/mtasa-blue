@@ -1215,7 +1215,7 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "quit",              "exits the application",            CCommandFuncs::Exit );
     m_pCommands->Add ( "ver",               "shows the version",                CCommandFuncs::Ver );
     m_pCommands->Add ( "time",              "shows the time",                   CCommandFuncs::Time );
-    m_pCommands->Add ( "hud",               "shows the hud",                    CCommandFuncs::HUD );
+    m_pCommands->Add ( "showhud",           "shows the hud",                    CCommandFuncs::HUD );
     m_pCommands->Add ( "binds",             "shows all the binds",              CCommandFuncs::Binds );
 
 #if 0
