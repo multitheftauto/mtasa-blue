@@ -2499,6 +2499,7 @@ void CClientPed::StreamedInPulse ( void )
                     {
                         // Make sure our fire key isn't pressed
                         Current.ButtonCircle = 0;
+                        Current.LeftShoulder1 = 0;
                     }
                 }
             }
