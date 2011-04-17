@@ -937,6 +937,23 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strHeadline, const 
     pItem->SetText ( strHeadline );
     pItemShadow->SetText ( strHeadline );
 
+    // Switch font if it's too big
+    if ( pItem->GetSize(false).fX < pItem->GetTextExtent() )
+    {
+        const char* szFontName = "default-bold-small";
+        for ( char i=0; i <= CORE_MTA_NEWS_ITEMS; i++ )
+        {
+            // Try default-bold-small first, if that's too big use default-small
+            m_pNewsItemLabels[ i ]->SetFont ( szFontName );
+            m_pNewsItemShadowLabels[ i ]->SetFont ( szFontName );
+            if ( strcmp(szFontName,"default-small") && ( m_pNewsItemLabels[ i ]->GetSize(false).fX < m_pNewsItemLabels[ i ]->GetTextExtent() ) )
+            {
+                szFontName = "default-small";
+                i = -1;
+            }
+        }
+    }
+
     // Set our Date labels
     CGUILabel* pItemDate = m_pNewsItemDateLabels[ iIndex ];
     pItemDate->SetText ( strDate );
