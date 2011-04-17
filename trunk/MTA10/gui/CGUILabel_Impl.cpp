@@ -18,7 +18,6 @@
 CGUILabel_Impl::CGUILabel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char* szText )
 {
     m_pManager = pGUI;
-    m_pFont = pGUI->GetDefaultFont ();
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique [CGUI_CHAR_SIZE];
@@ -155,7 +154,10 @@ float CGUILabel_Impl::GetCharacterWidth ( int iCharIndex )
 
 float CGUILabel_Impl::GetFontHeight ( void )
 {
-    return m_pFont->GetFontHeight ();
+    const CEGUI::Font* pFont = m_pWindow->getFont ();
+    if ( pFont )
+        return pFont->getFontHeight();
+    return 14.0f;
 }
 
 

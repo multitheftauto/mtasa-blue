@@ -51,8 +51,6 @@ public:
     #include "CGUIElement_Inc.h"
     #undef EXCLUDE_SET_TEXT
 
-private:
-    CGUIFont*               m_pFont;
 };
 
 #endif
