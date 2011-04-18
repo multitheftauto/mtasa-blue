@@ -1378,21 +1378,22 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
             ElementID ID = INVALID_ELEMENT_ID;
             bitStream.ReadCompressed ( ID );
             CClientVehicle* pVehicle = g_pClientGame->m_pVehicleManager->Get ( ID );
+            
+            // Read out the seat id
+            unsigned char ucSeat = 0xFF;
+            bitStream.ReadBits ( &ucSeat, 3 );
+            if ( ucSeat == 0xFF )
+            {
+                RaiseProtocolError ( 28 );
+                return;
+            }
+
+            // Read out the action
+            unsigned char ucAction = 0xFF;
+            bitStream.ReadBits ( &ucAction, 4 );
+
             if ( pVehicle )
             {
-                // Read out the seat id
-                unsigned char ucSeat = 0xFF;
-                bitStream.ReadBits ( &ucSeat, 3 );
-                if ( ucSeat == 0xFF )
-                {
-                    RaiseProtocolError ( 28 );
-                    return;
-                }
-
-                // Read out the action
-                unsigned char ucAction = 0xFF;
-                bitStream.ReadBits ( &ucAction, 4 );
-
 #ifdef MTA_DEBUG
                 if ( pPlayer->IsLocalPlayer () )
                 {
@@ -1778,6 +1779,29 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         RaiseProtocolError ( 33 );
                         break;
                     }
+                }
+            }
+            else
+            {
+                if ( ucAction == CClientGame::VEHICLE_ATTEMPT_FAILED )
+                {
+                    // Reset in/out stuff if it was the local player
+                    if ( pPlayer->IsLocalPlayer () )
+                    {
+                        g_pClientGame->ResetVehicleInOut ();
+                    }
+
+                    // Reset vehicle in out state
+                    pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+
+#if MTA_DEBUG
+                    // Read the reason as to why it failed
+                    unsigned char ucReason;
+                    bitStream.Read ( ucReason );
+
+                    // Print failure text. (Probably failed because vehicle was removed with onVehicleStartEnter)
+                    g_pCore->GetConsole ()->Printf ( "Failed to enter/exit vehicle - id: %u", ucReason );
+#endif
                 }
             }
         }
