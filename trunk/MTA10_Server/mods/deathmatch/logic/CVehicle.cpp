@@ -64,7 +64,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bOnGround = true;
     m_bSmokeTrail = false;
     m_ucAlpha = 255;
-    m_pJackingPlayer = NULL;
+    m_pEnteringPed = NULL;
     m_bInWater = false;
     m_bDerailed = false;
     m_bIsDerailable = true;
@@ -93,13 +93,16 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
 
 CVehicle::~CVehicle ( void )
 {
-    if ( m_pJackingPlayer && m_pJackingPlayer->GetJackingVehicle () == this )
+    CPed* pEnteringPed = GetEnteringPed ( );
+
+    if ( pEnteringPed && pEnteringPed->GetEnteringVehicle () == this )
     {
-        if ( m_pJackingPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_JACKING )
+        if ( pEnteringPed->GetVehicleAction () != CPlayer::VEHICLEACTION_NONE )
         {
-            m_pJackingPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+            pEnteringPed->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
         }
-        m_pJackingPlayer->SetJackingVehicle ( NULL );
+
+        pEnteringPed->SetEnteringVehicle ( NULL, 0 );
     }
 
     // Unset any tow links

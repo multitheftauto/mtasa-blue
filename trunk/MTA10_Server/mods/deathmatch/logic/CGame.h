@@ -160,6 +160,18 @@ public:
         GLITCH_FASTMOVE,
         GLITCH_CROUCHBUG,
     };
+    enum eVehicleInOutFailReasons
+    {
+        VEHICLE_INOUT_FAIL_INVALID = 0,
+        VEHICLE_INOUT_FAIL_SCRIPT,
+        VEHICLE_INOUT_FAIL_SCRIPT_2,
+        VEHICLE_INOUT_FAIL_JACKED_ACTION,
+        VEHICLE_INOUT_FAIL_SEAT,
+        VEHICLE_INOUT_FAIL_DISTANCE,
+        VEHICLE_INOUT_FAIL_IN_VEHICLE,
+        VEHICLE_INOUT_FAIL_ACTION,
+        VEHICLE_INOUT_FAIL_TRAILER,
+    };
 public:
                                 CGame                       ( void );
                                 ~CGame                      ( void );

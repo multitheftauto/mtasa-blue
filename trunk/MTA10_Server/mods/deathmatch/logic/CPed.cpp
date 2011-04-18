@@ -68,10 +68,12 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_bStealthAiming = false;
 
     m_pVehicle = NULL;
+/*    m_pOccupyingVehicle = NULL;
+    m_uiOccupyingVehicleSeat = 0;*/
     m_uiVehicleSeat = INVALID_VEHICLE_SEAT;
     m_uiVehicleAction = CPed::VEHICLEACTION_NONE;
     m_ulVehicleActionStartTime = 0;
-    m_pJackingVehicle = NULL;
+    m_pEnteringVehicle = NULL;
 
     m_vecVelocity.fX = m_vecVelocity.fY = m_vecVelocity.fZ = 0.0f;
 
@@ -89,20 +91,20 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
 
 CPed::~CPed ( void )
 {
-    if ( m_pJackingVehicle )
+    if ( m_pEnteringVehicle )
     {
         if ( m_uiVehicleAction == VEHICLEACTION_JACKING )
         {
-            CPed * pOccupant = m_pJackingVehicle->GetOccupant ( 0 );
+            CPed * pOccupant = m_pEnteringVehicle->GetOccupant ( 0 );
             if ( pOccupant )
             {
-                m_pJackingVehicle->SetOccupant ( NULL, 0 );
+                m_pEnteringVehicle->SetOccupant ( NULL, 0 );
                 pOccupant->SetOccupiedVehicle ( NULL, 0 );
                 pOccupant->SetVehicleAction ( VEHICLEACTION_NONE );
             }
         }
-        if ( m_pJackingVehicle->GetJackingPlayer () == this )
-            m_pJackingVehicle->SetJackingPlayer ( NULL );
+        if ( m_pEnteringVehicle->GetEnteringPed () == this )
+            m_pEnteringVehicle->SetEnteringPed ( NULL );
     }
 
     // Make sure we've no longer occupied any vehicle
@@ -378,6 +380,11 @@ void CPed::SetIsDead ( bool bDead )
     m_bIsDead = bDead;
 }
 
+/*void CPed::SetOccupyingVehicle ( CVehicle* pVehicle, unsigned int uiSeat )
+{
+    m_pOccupyingVehicle      = pVehicle;
+    m_uiOccupyingVehicleSeat = uiSeat;
+}*/
 
 CVehicle* CPed::SetOccupiedVehicle ( CVehicle* pVehicle, unsigned int uiSeat )
 {

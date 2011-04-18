@@ -554,10 +554,10 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
     }
 
     // If this guy was jacking someone, make sure its aborted
-    pVehicle = Player.GetJackingVehicle ();
+    pVehicle = Player.GetEnteringVehicle ();
     if ( pVehicle )
     {
-        if ( Player.GetVehicleAction () == CPlayer::VEHICLEACTION_JACKING )
+        if ( Player.GetVehicleAction () != CPlayer::VEHICLEACTION_NONE )
         {
             CPed * pOccupant = pVehicle->GetOccupant ( 0 );
             if ( pOccupant )
@@ -570,8 +570,8 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );
             }
         }
-        if ( pVehicle->GetJackingPlayer () == &Player )
-            pVehicle->SetJackingPlayer ( NULL );
+        if ( pVehicle->GetEnteringPed () == &Player )
+            pVehicle->SetEnteringPed ( NULL );
     }   
 
     // Update the player data

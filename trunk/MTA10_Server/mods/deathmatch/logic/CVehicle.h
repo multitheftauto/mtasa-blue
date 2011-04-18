@@ -242,8 +242,10 @@ public:
 
     void                            GetInitialDoorStates    ( unsigned char * pucDoorStates );
 
-    inline CPlayer *                GetJackingPlayer        ( void )                        { return m_pJackingPlayer; }
-    inline void                     SetJackingPlayer        ( CPlayer * pPlayer )           { m_pJackingPlayer = pPlayer; }
+//    inline CPlayer *                GetJackingPlayer        ( void )                        { return m_pJackingPlayer; }
+//    inline void                     SetJackingPlayer        ( CPlayer * pPlayer )           { m_pJackingPlayer = pPlayer; }
+    inline CPed *                   GetEnteringPed          ( void )                        { return m_pEnteringPed; }
+    inline void                     SetEnteringPed          ( CPed * pPed )                 { m_pEnteringPed = pPed; }
 
     inline bool                     IsInWater               ( void )                        { return m_bInWater; }
     inline void                     SetInWater              ( bool bInWater )               { m_bInWater = bInWater; }
@@ -333,7 +335,7 @@ private:
     bool                            m_bDerailed;
     bool                            m_bIsDerailable;
     bool                            m_bTrainDirection;
-    CPlayer *                       m_pJackingPlayer;
+    CPed *                          m_pEnteringPed;
     SColor                          m_HeadLightColor;
     bool                            m_bHeliSearchLightVisible;
 

@@ -189,15 +189,19 @@ public:
     inline float                                GetGravity                  ( void )                        { return m_fGravity; }
     inline void                                 SetGravity                  ( float fGravity )              { m_fGravity = fGravity; }
 
+//    inline CVehicle*                            GetOccupyingVehicle         ( void )                        { return m_pOccupyingVehicle; };
     inline CVehicle*                            GetOccupiedVehicle          ( void )                        { return m_pVehicle; };
+//    inline unsigned int                         GetOccupyingVehicleSeat     ( void )                        { return m_uiOccupyingVehicleSeat; };
     inline unsigned int                         GetOccupiedVehicleSeat      ( void )                        { return m_uiVehicleSeat; };
+//    void                                        SetOccupyingVehicle         ( CVehicle* pVehicle, unsigned int uiSeat );
     CVehicle*                                   SetOccupiedVehicle          ( CVehicle* pVehicle, unsigned int uiSeat );
     inline unsigned long                        GetVehicleActionStartTime   ( void )                        { return m_ulVehicleActionStartTime; };
 
     inline unsigned int                         GetVehicleAction            ( void )                        { return m_uiVehicleAction; };
     void                                        SetVehicleAction            ( unsigned int uiAction );
-    inline CVehicle *                           GetJackingVehicle           ( void )                        { return m_pJackingVehicle; }
-    inline void                                 SetJackingVehicle           ( CVehicle * pVehicle )         { m_pJackingVehicle = pVehicle; }
+    inline CVehicle *                           GetEnteringVehicle          ( void )                        { return m_pEnteringVehicle; }
+    inline unsigned int                         GetEnteringVehicleSeat      ( void )                        { return m_uiEnteringVehicleSeat; }
+    inline void                                 SetEnteringVehicle          ( CVehicle * pVehicle, unsigned int uiSeat ) { m_pEnteringVehicle = pVehicle; m_uiEnteringVehicleSeat = uiSeat; }
 
     bool                                        IsAttachToable              ( void );
 
@@ -265,10 +269,13 @@ protected:
     bool                                        m_bStealthAiming;
 
     CVehicle*                                   m_pVehicle;
+/*    CVehicle*                                   m_pOccupyingVehicle;
+    unsigned int                                m_uiOccupyingVehicleSeat;*/
     unsigned int                                m_uiVehicleSeat;
     unsigned int                                m_uiVehicleAction;
     unsigned long                               m_ulVehicleActionStartTime;
-    CVehicle*                                   m_pJackingVehicle;
+    CVehicle*                                   m_pEnteringVehicle;
+    unsigned int                                m_uiEnteringVehicleSeat;
 
     bool                                        m_bSyncable;
     bool                                        m_bCollisionsEnabled;
