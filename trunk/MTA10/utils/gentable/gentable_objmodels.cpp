@@ -58,10 +58,14 @@ int main()
   AllowRange(table, 910, 998, true);
   AllowRange(table, 1000, 1085, true);
   AllowRange(table, 1088, 1193, true);
-  AllowRange(table, 1207, 1384, true);
-  AllowRange(table, 1386, 1698, true);
+  AllowRange(table, 1207, 1372, true);
+  AllowRange(table, 1374, 1381, true);
+  AllowRange(table, 1383, 1384, true);
+  AllowRange(table, 1386, 1395, true);
+  AllowRange(table, 1407, 1698, true);
   AllowRange(table, 1700, 2882, true);
-  AllowRange(table, 2885, 3178, true);
+  AllowRange(table, 2885, 3117, true);
+  AllowRange(table, 3119, 3178, true);
   Allow(table, 3187, true);
   Allow(table, 3193, true);
   Allow(table, 3214, true);
@@ -74,7 +78,9 @@ int main()
   AllowRange(table, 3267, 3347, true);
   AllowRange(table, 3350, 3415, true);
   AllowRange(table, 3417, 3428, true);
-  AllowRange(table, 3430, 3609, true);
+  AllowRange(table, 3430, 3552, true);
+  AllowRange(table, 3554, 3558, true);
+  AllowRange(table, 3560, 3609, true);
   AllowRange(table, 3612, 3869, true);
   AllowRange(table, 3872, 3882, true);
   AllowRange(table, 3884, 3888, true);
@@ -114,7 +120,8 @@ int main()
   AllowRange(table, 14885, 14898, true);
   AllowRange(table, 14900, 14903, true);
   AllowRange(table, 15025, 15064, true);
-  AllowRange(table, 16000, 16790, true);
+  AllowRange(table, 16000, 16328, true);
+  AllowRange(table, 16332, 16790, true);
   AllowRange(table, 17000, 17474, true);
   AllowRange(table, 17500, 17974, true);
   Allow(table, 17976, true);
