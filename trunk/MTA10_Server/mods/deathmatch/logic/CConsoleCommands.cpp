@@ -422,7 +422,7 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
         if ( szArguments )
         {
             // Long/short enough?
-            size_t sizeArguments = ConvertToUTF8(szArguments).size();
+            size_t sizeArguments = MbUTF8ToUTF16(szArguments).size();
 
             if ( sizeArguments >= MIN_CHAT_LENGTH && sizeArguments <= MAX_CHAT_LENGTH )
             {
@@ -553,7 +553,7 @@ bool CConsoleCommands::TeamSay ( CConsole* pConsole, const char* szArguments, CC
                 if ( szArguments )
                 {
                     // Long/short enough?
-                    size_t sizeArguments = ConvertToUTF8(szArguments).size();
+                    size_t sizeArguments = MbUTF8ToUTF16(szArguments).size();
 
                     if ( sizeArguments >= MIN_CHAT_LENGTH && sizeArguments <= MAX_CHAT_LENGTH )
                     {
@@ -630,7 +630,7 @@ bool CConsoleCommands::ASay ( CConsole* pConsole, const char* szArguments, CClie
         if ( szArguments )
         {
             // Long/short enough?
-            size_t sizeArguments = ConvertToUTF8(szArguments).size();
+            size_t sizeArguments = MbUTF8ToUTF16(szArguments).size();
 
             if ( sizeArguments >= MIN_CHAT_LENGTH && sizeArguments <= MAX_CHAT_LENGTH )
             {
@@ -729,7 +729,7 @@ bool CConsoleCommands::Msg ( CConsole* pConsole, const char* szArguments, CClien
                     if ( szMessage )
                     {
                         // Long/short enough?
-                        size_t sizeMessage = ConvertToUTF8(szArguments).size();
+                        size_t sizeMessage = MbUTF8ToUTF16(szArguments).size();
 
                         if ( sizeMessage >= MIN_CHAT_LENGTH && sizeMessage <= MAX_CHAT_LENGTH )
                         {
@@ -958,7 +958,7 @@ bool CConsoleCommands::Me ( CConsole* pConsole, const char* szArguments, CClient
         if ( szArguments )
         {
             // Long/short enough?
-            size_t sizeArguments = ConvertToUTF8(szArguments).size();
+            size_t sizeArguments = MbUTF8ToUTF16(szArguments).size();
 
             if ( sizeArguments >= MIN_CHAT_LENGTH && sizeArguments <= MAX_CHAT_LENGTH )
             {

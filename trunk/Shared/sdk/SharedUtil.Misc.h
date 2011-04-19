@@ -107,11 +107,11 @@ namespace SharedUtil
     // string stuff
     //
 
-    std::wstring ConvertToUTF8 (const std::string& s);
+    std::wstring MbUTF8ToUTF16 (const std::string& s);
 
-    std::string  ConvertToANSI (const std::wstring& ws);
+    std::string  UTF16ToMbUTF8 (const std::wstring& ws);
 
-    std::wstring  TranslateToUTF8 (const std::string& s);
+    std::wstring  ANSIToUTF16 (const std::string& s);
 
     std::wstring GetBidiString (const std::wstring ws);
 

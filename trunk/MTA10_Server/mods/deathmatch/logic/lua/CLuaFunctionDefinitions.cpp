@@ -9939,7 +9939,7 @@ int CLuaFunctionDefinitions::UtfLen ( lua_State* luaVM )
         return 1;
     }
     std::string strInput = lua_tostring ( luaVM, 1 );
-    lua_pushnumber ( luaVM, ConvertToUTF8(strInput).size() );
+    lua_pushnumber ( luaVM, MbUTF8ToUTF16(strInput).size() );
 
     return 1;
 }
@@ -9954,11 +9954,11 @@ int CLuaFunctionDefinitions::UtfSeek ( lua_State* luaVM )
     }
     int iPos = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
     std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = ConvertToUTF8(strInput);
+    std::wstring strUTF = MbUTF8ToUTF16(strInput);
     if ( iPos <= static_cast < int >(strUTF.size()) && iPos >= 0 )
     {
         strUTF = strUTF.substr(0,iPos);
-        lua_pushnumber ( luaVM, ConvertToANSI(strUTF).size() );
+        lua_pushnumber ( luaVM, UTF16ToMbUTF8(strUTF).size() );
         return 1;
     }
 
@@ -9977,7 +9977,7 @@ int CLuaFunctionDefinitions::UtfSub ( lua_State* L )
     //Ripped and modded Lua source.  It's pretty disgusting, i know.
 
     const char *s = lua_tostring(L, 1);
-    std::wstring strUTF = ConvertToUTF8(s);
+    std::wstring strUTF = MbUTF8ToUTF16(s);
     size_t l = static_cast < int > ( strUTF.size() );
 
     ptrdiff_t start = luaL_checkinteger(L, 2);
@@ -9995,7 +9995,7 @@ int CLuaFunctionDefinitions::UtfSub ( lua_State* L )
     if (start <= end)
     {
         strUTF = strUTF.substr(start-1, end-start+1);
-        lua_pushstring(L, ConvertToANSI(strUTF).c_str());
+        lua_pushstring(L, UTF16ToMbUTF8(strUTF).c_str());
     }
     else lua_pushliteral(L, "");
     return 1;
@@ -10021,7 +10021,7 @@ int CLuaFunctionDefinitions::UtfChar ( lua_State* luaVM )
     wchar_t wUNICODE[2] = { iChar, '\0' };
 
     // Convert our UTF character into an ANSI string
-    std::string strANSI = ConvertToANSI(wUNICODE);
+    std::string strANSI = UTF16ToMbUTF8(wUNICODE);
 
     lua_pushstring ( luaVM, strANSI.c_str() );
     return 1;
@@ -10036,7 +10036,7 @@ int CLuaFunctionDefinitions::UtfCode ( lua_State* luaVM )
         return 1;
     }
     std::string strInput = lua_tostring ( luaVM, 1 );
-    std::wstring strUTF = ConvertToUTF8(strInput);
+    std::wstring strUTF = MbUTF8ToUTF16(strInput);
     unsigned long ulCode = strUTF.c_str()[0];
 
     lua_pushnumber ( luaVM, ulCode );

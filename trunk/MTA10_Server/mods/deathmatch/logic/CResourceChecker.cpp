@@ -308,7 +308,7 @@ void CResourceChecker::CheckLuaSourceForIssues ( string strLuaSource, const stri
     // If it's not a UTF8 script, does it contain foreign language characters that should be upgraded?
     if ( !bUTF8 )
     {
-        std::string strUTFScript = ConvertToANSI(TranslateToUTF8( strLuaSource ));
+        std::string strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strLuaSource ));
         if ( strLuaSource.length () != strUTFScript.size() )
         {
             // In-place upgrade...

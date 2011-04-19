@@ -451,9 +451,9 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 if ( m_strInputText.size () > 0 )
                 {
                     // Convert our string to UTF8 before resizing, then back to ANSI.
-                    std::wstring strText = ConvertToUTF8(m_strInputText);
+                    std::wstring strText = MbUTF8ToUTF16(m_strInputText);
                     strText.resize ( strText.size () - 1 );
-                    SetInputText ( ConvertToANSI(strText).c_str() );
+                    SetInputText ( UTF16ToMbUTF8(strText).c_str() );
                 }
                 break;
             }
@@ -476,7 +476,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
             default:
             {
                 // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
-                if ( ConvertToUTF8(m_strInputText).size () < CHAT_MAX_CHAT_LENGTH )
+                if ( MbUTF8ToUTF16(m_strInputText).size () < CHAT_MAX_CHAT_LENGTH )
                 {                    
                     if ( KeyboardArgs.codepoint >= 32 )
                     {
@@ -493,7 +493,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                             wchar_t wUNICODE[2] = { uiCharacter, '\0' };
 
                             // Convert our UTF character into an ANSI string
-                            std::string strANSI = ConvertToANSI(wUNICODE);
+                            std::string strANSI = UTF16ToMbUTF8(wUNICODE);
 
                             // Append the ANSI string, and update
                             m_strInputText.append(strANSI);
