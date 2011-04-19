@@ -273,7 +273,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
         if ( !bUTF8 && ( uiSize < 5 || cpBuffer[0] != 27 || cpBuffer[1] != 'L' || cpBuffer[2] != 'u' || cpBuffer[3] != 'a' || cpBuffer[4] != 'Q' ) )
         {
             std::string strBuffer = std::string(cpBuffer, uiSize);
-            strUTFScript = ConvertToANSI(TranslateToUTF8( strBuffer ));
+            strUTFScript = UTF16ToMbUTF8(ANSIToUTF16( strBuffer ));
             if ( uiSize != strUTFScript.size() )
             {
                 uiSize = strUTFScript.size();

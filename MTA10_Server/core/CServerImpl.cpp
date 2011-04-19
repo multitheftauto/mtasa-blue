@@ -567,7 +567,7 @@ void CServerImpl::HandleInput ( void )
             {
                 // Clear the input window
                 wclear ( m_wndInput );
-                printw ( "%s\n", ConvertToANSI(m_szInputBuffer).c_str() );
+                printw ( "%s\n", UTF16ToMbUTF8(m_szInputBuffer).c_str() );
             }
 #endif
 
@@ -575,17 +575,17 @@ void CServerImpl::HandleInput ( void )
             {
                 // Check for the most important command: quit
 #ifdef WIN32
-                if ( !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("quit").c_str() ) || !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("exit").c_str() ) )
+                if ( !_wcsicmp ( m_szInputBuffer, MbUTF8ToUTF16("quit").c_str() ) || !_wcsicmp ( m_szInputBuffer, MbUTF8ToUTF16("exit").c_str() ) )
 #else
-                if ( !wcscasecmp ( m_szInputBuffer, ConvertToUTF8("quit").c_str() ) || !wcscasecmp ( m_szInputBuffer, ConvertToUTF8("exit").c_str() ) )
+                if ( !wcscasecmp ( m_szInputBuffer, MbUTF8ToUTF16("quit").c_str() ) || !wcscasecmp ( m_szInputBuffer, MbUTF8ToUTF16("exit").c_str() ) )
 #endif
                 {
                     m_bRequestedQuit = true;
                 }
 #ifdef WIN32
-                else if ( !_wcsicmp ( m_szInputBuffer, ConvertToUTF8("reset").c_str() ) )
+                else if ( !_wcsicmp ( m_szInputBuffer, MbUTF8ToUTF16("reset").c_str() ) )
 #else
-                else if ( !wcscasecmp ( m_szInputBuffer, ConvertToUTF8("reset").c_str() ) )
+                else if ( !wcscasecmp ( m_szInputBuffer, MbUTF8ToUTF16("reset").c_str() ) )
 #endif
                 {
                     m_bRequestedReset = true;
@@ -594,7 +594,7 @@ void CServerImpl::HandleInput ( void )
                 else
                 {
                     // Otherwise, pass the command to the mod's input handler
-                    m_pModManager->HandleInput ( ConvertToANSI(m_szInputBuffer).c_str() );
+                    m_pModManager->HandleInput ( UTF16ToMbUTF8(m_szInputBuffer).c_str() );
                 }
             }
 
@@ -647,7 +647,7 @@ void CServerImpl::HandleInput ( void )
             wcsncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
             szBuffer[m_uiInputCount] = 0;
 
-            Printf ( "\r%s", ConvertToANSI(szBuffer).c_str() );
+            Printf ( "\r%s", UTF16ToMbUTF8(szBuffer).c_str() );
 #else
             if ( !g_bSilent )
                 wmove ( m_wndInput, 0, --m_uiInputCount );
@@ -670,7 +670,7 @@ void CServerImpl::HandleInput ( void )
             wcsncpy ( &szBuffer[0], &m_szInputBuffer[0], m_uiInputCount );
             szBuffer[m_uiInputCount] = 0;
 
-            Printf ( "\r%s", ConvertToANSI(szBuffer).c_str() );
+            Printf ( "\r%s", UTF16ToMbUTF8(szBuffer).c_str() );
 #else
             if ( !g_bSilent )
                 wmove ( m_wndInput, 0, ++m_uiInputCount );
@@ -707,11 +707,11 @@ void CServerImpl::HandleInput ( void )
 
             // Echo the input
             WCHAR wUNICODE[2] = { iStdIn, 0 };
-            Printf ( "%s", ConvertToANSI(wUNICODE).c_str() );
+            Printf ( "%s", UTF16ToMbUTF8(wUNICODE).c_str() );
 #else
             wchar_t wUNICODE[2] = { iStdIn, 0 };
             if ( !g_bSilent )
-                wprintw ( m_wndInput, "%s", ConvertToANSI(wUNICODE).c_str() );
+                wprintw ( m_wndInput, "%s", UTF16ToMbUTF8(wUNICODE).c_str() );
 #endif
 
             m_szInputBuffer[m_uiInputCount++] = iStdIn;

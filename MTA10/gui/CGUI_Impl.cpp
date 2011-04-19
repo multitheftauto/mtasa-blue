@@ -360,13 +360,13 @@ bool CGUI_Impl::GetStringFromInputMode ( eInputMode a_eMode, std::string& a_rstr
 
 CEGUI::String CGUI_Impl::GetUTFString ( const std::string strInput )
 {
-    std::wstring strUTF = ConvertToUTF8(strInput); //Convert to a typical UTF8 string
+    std::wstring strUTF = MbUTF8ToUTF16(strInput); //Convert to a typical wide string
     return GetUTFString ( strUTF );
 }
 
 CEGUI::String CGUI_Impl::GetUTFString ( const std::wstring strLine )
 {
-    return CEGUI::String((CEGUI::utf8*)ConvertToANSI(GetBidiString(strLine)).c_str()); //Convert into a CEGUI String
+    return CEGUI::String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(strLine)).c_str()); //Convert into a CEGUI String
 }
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
@@ -728,7 +728,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                 if ( strTemp.length () > 0 )
                 {
                     // Convert it to Unicode
-                    std::wstring strUTF = GetBidiString(ConvertToUTF8(strTemp.c_str()));
+                    std::wstring strUTF = GetBidiString(MbUTF8ToUTF16(strTemp.c_str()));
 
                     // Open and empty the clipboard
                     OpenClipboard ( NULL );
@@ -836,7 +836,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                         }
 
                         // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
-                        std::wstring tmp = ConvertToUTF8(strEditText.c_str());
+                        std::wstring tmp = MbUTF8ToUTF16(strEditText.c_str());
                         if ( ( strClipboardText.length () + tmp.length () ) < iMaxLength )
                         {
                             // Are there characters selected?
@@ -856,7 +856,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             }
 
                             // Set the new text and move the carat at the end of what we pasted
-                            CEGUI::String strText((CEGUI::utf8*)ConvertToANSI(tmp).c_str());
+                            CEGUI::String strText((CEGUI::utf8*)UTF16ToMbUTF8(tmp).c_str());
                             strEditText = strText;
                             iCaratIndex = sizeCaratIndex;
                         }

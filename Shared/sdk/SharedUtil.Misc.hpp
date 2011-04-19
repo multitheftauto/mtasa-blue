@@ -772,14 +772,14 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
 }
 
 
-// Convert a standard ANSI junk std::string into a UTF-8 std::wstring
-std::wstring SharedUtil::ConvertToUTF8 (const std::string& input)
+// Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring
+std::wstring SharedUtil::MbUTF8ToUTF16 (const std::string& input)
 {
     return utf8_mbstowcs (input);
 }
 
-// Reencode a UTF8 std::wstring into ANSI junk string
-std::string SharedUtil::ConvertToANSI (const std::wstring& input)
+// Convert a UTF-16 std::wstring into a multibyte UTF-8 string
+std::string SharedUtil::UTF16ToMbUTF8 (const std::wstring& input)
 {
     return utf8_wcstombs (input);
 }
@@ -790,8 +790,8 @@ int SharedUtil::GetUTF8Confidence (unsigned char* input, int len)
     return icu_getUTF8Confidence (input, len);
 }
 
-// Translate a true ANSI string to the UTF-8 equivalent (reencode+convert)
-std::wstring SharedUtil::TranslateToUTF8 ( const std::string& input )
+// Translate a true ANSI string to the UTF-16 equivalent (reencode+convert)
+std::wstring SharedUtil::ANSIToUTF16 ( const std::string& input )
 {
     size_t len = mbstowcs ( NULL, input.c_str(), input.length() );
     if ( len == (size_t)-1 )

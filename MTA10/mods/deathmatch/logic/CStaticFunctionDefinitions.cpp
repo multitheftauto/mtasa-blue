@@ -232,7 +232,7 @@ bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, unsigned ch
 
 bool CStaticFunctionDefinitions::SetClipboard ( SString& strText )
 {
-    std::wstring strUTF = GetBidiString ( ConvertToUTF8 ( strText.c_str() ) );
+    std::wstring strUTF = GetBidiString ( MbUTF8ToUTF16 ( strText.c_str() ) );
 
     // Open and empty the clipboard
     OpenClipboard ( NULL );
@@ -264,7 +264,7 @@ bool CStaticFunctionDefinitions::GetClipboard ( SString& strText )
 
     if ( szBuffer )
     {
-        strText = ConvertToANSI ( GetBidiString ( szBuffer ) ).c_str();
+        strText = UTF16ToMbUTF8 ( GetBidiString ( szBuffer ) ).c_str();
         return true;
     }
 
