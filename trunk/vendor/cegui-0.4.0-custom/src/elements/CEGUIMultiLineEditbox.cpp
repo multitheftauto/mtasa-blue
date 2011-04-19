@@ -887,7 +887,8 @@ void MultiLineEditbox::eraseSelectedText(bool modify_text)
 		// erase the selected characters (if required)
 		if (modify_text)
 		{
-			d_text.erase(getSelectionStartIndex(), getSelectionLength());
+			d_text_raw.erase(getSelectionStartIndex(), getSelectionLength());
+            d_text = String((CEGUI::utf8*)ConvertToANSI(GetBidiString(ConvertToUTF8(d_text_raw.c_str()))).c_str());
 
 			// trigger notification that text has changed.
 			WindowEventArgs args(this);
@@ -913,8 +914,9 @@ void MultiLineEditbox::handleBackspace(void)
 		}
 		else if (d_caratPos > 0)
 		{
-			d_text.erase(d_caratPos - 1, 1);
+			d_text_raw.erase(d_caratPos - 1, 1);
 			setCaratIndex(d_caratPos - 1);
+            d_text = String((CEGUI::utf8*)ConvertToANSI(GetBidiString(ConvertToUTF8(d_text_raw.c_str()))).c_str());
 
 			WindowEventArgs args(this);
 			onTextChanged(args);
@@ -937,8 +939,9 @@ void MultiLineEditbox::handleDelete(void)
 		}
 		else if (getCaratIndex() < d_text.length() - 1)
 		{
-			d_text.erase(d_caratPos, 1);
+			d_text_raw.erase(d_caratPos, 1);
 			ensureCaratIsVisible();
+            d_text = String((CEGUI::utf8*)ConvertToANSI(GetBidiString(ConvertToUTF8(d_text_raw.c_str()))).c_str());
 
 			WindowEventArgs args(this);
 			onTextChanged(args);
@@ -1377,14 +1380,17 @@ void MultiLineEditbox::onCharacter(KeyEventArgs& e)
 	// only need to take notice if we have focus
 	if (hasInputFocus() && !isReadOnly() && getFont()->isCodepointAvailable(e.codepoint))
 	{
-		// erase selected text
+        // erase selected text
 		eraseSelectedText();
 
 		// if there is room
-		if (d_text.length() - 1 < d_maxTextLen)
+		if ( d_text_raw.length() == 0 || ( d_text_raw.length() - 1 < d_maxTextLen ) )
 		{
-			d_text.insert(getCaratIndex(), 1, e.codepoint);
+			d_text_raw.insert(getCaratIndex(), 1, e.codepoint);
 			d_caratPos++;
+
+            // Trigger our text setting
+            d_text = String((CEGUI::utf8*)ConvertToANSI(GetBidiString(ConvertToUTF8(d_text_raw.c_str()))).c_str());
 
 			WindowEventArgs args(this);
 			onTextChanged(args);

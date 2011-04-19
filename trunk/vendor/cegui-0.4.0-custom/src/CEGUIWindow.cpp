@@ -896,11 +896,23 @@ void Window::setClippedByParent(bool setting)
 /*************************************************************************
 	Set the current text string for the Window.
 *************************************************************************/
-void Window::setText(const String& text)
+void Window::setText(const String& text, bool bidify)
 {
-    if ( text == d_text )
-        return;
-	d_text = text;
+    d_text_raw = text;
+    if ( !bidify )
+    {
+        if ( text == d_text )
+            return;
+	    d_text = text;
+    }
+    else
+    {
+        String bidiText = String((CEGUI::utf8*)ConvertToANSI(GetBidiString(ConvertToUTF8(text.c_str()))).c_str());  //Really ugly but CEGUI strings suck
+        if ( bidiText == d_text )
+            return;
+        d_text = bidiText;
+    }
+
     WindowEventArgs args(this);
 	onTextChanged(args);
 }
