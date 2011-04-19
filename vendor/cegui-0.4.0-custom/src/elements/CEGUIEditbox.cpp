@@ -402,7 +402,8 @@ void Editbox::eraseSelectedText(bool modify_text)
 		// erase the selected characters (if required)
 		if (modify_text)
 		{
-			d_text.erase(getSelectionStartIndex(), getSelectionLength());
+			d_text_raw.erase(getSelectionStartIndex(), getSelectionLength());
+            d_text = String((CEGUI::utf8*)ConvertToANSI(GetBidiString(ConvertToUTF8(d_text_raw.c_str()))).c_str());
 
 			// trigger notification that text has changed.
 			WindowEventArgs args(this);
@@ -585,7 +586,7 @@ void Editbox::onCharacter(KeyEventArgs& e)
 	if (hasInputFocus() && getFont()->isCodepointAvailable(e.codepoint) && !isReadOnly())
 	{
 		// backup current text
-		String tmp(d_text);
+		String tmp(d_text_raw);
 		tmp.erase(getSelectionStartIndex(), getSelectionLength());
 
 		// if there is room
@@ -602,7 +603,7 @@ void Editbox::onCharacter(KeyEventArgs& e)
                 d_caratPos++;
 
                 // set text to the newly modified string
-				setText(tmp);
+				setText(tmp,true);
 			}
 			else
 			{
@@ -709,7 +710,7 @@ void Editbox::handleBackspace(void)
 {
 	if (!isReadOnly())
 	{
-		String tmp(d_text);
+		String tmp(d_text_raw);
 
 		if (getSelectionLength() != 0)
 		{
@@ -721,7 +722,7 @@ void Editbox::handleBackspace(void)
 				eraseSelectedText(false);
 
 				// set text to the newly modified string
-				setText(tmp);
+				setText(tmp,true);
 			}
 			else
 			{
@@ -740,7 +741,7 @@ void Editbox::handleBackspace(void)
 				setCaratIndex(d_caratPos - 1);
 
 				// set text to the newly modified string
-				setText(tmp);
+				setText(tmp,true);
 			}
 			else
 			{
@@ -763,7 +764,7 @@ void Editbox::handleDelete(void)
 {
 	if (!isReadOnly())
 	{
-		String tmp(d_text);
+		String tmp(d_text_raw);
 
 		if (getSelectionLength() != 0)
 		{
@@ -775,7 +776,7 @@ void Editbox::handleDelete(void)
 				eraseSelectedText(false);
 
 				// set text to the newly modified string
-				setText(tmp);
+				setText(tmp,true);
 			}
 			else
 			{
@@ -792,7 +793,7 @@ void Editbox::handleDelete(void)
 			if (isStringValid(tmp))
 			{
 				// set text to the newly modified string
-				setText(tmp);
+				setText(tmp,true);
 			}
 			else
 			{
