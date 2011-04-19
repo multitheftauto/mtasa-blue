@@ -342,6 +342,10 @@ CSettings::CSettings ( void )
     m_pSavePasswords->GetPosition ( vecTemp, false );
     m_pSavePasswords->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
+    m_pAutoRefreshBrowser = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, "Auto-refresh server browser", true ) );
+    m_pAutoRefreshBrowser->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
+    m_pAutoRefreshBrowser->GetPosition ( vecTemp, false );
+    m_pAutoRefreshBrowser->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     /**
      *  Audio tab
@@ -1731,6 +1735,7 @@ void CSettings::LoadData ( void )
 
     // Save server password
     CVARS_GET ( "save_server_passwords", bVar ); m_pSavePasswords->SetSelected ( bVar );
+    CVARS_GET ( "auto_refresh_browser", bVar ); m_pAutoRefreshBrowser->SetSelected ( bVar );
 
     // Controls
     CVARS_GET ( "invert_mouse", bVar ); m_pInvertMouse->SetSelected ( bVar );
@@ -1960,6 +1965,8 @@ void CSettings::SaveData ( void )
     {
         g_pCore->GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ()->ClearServerPasswords ();
     }
+
+    CVARS_SET ( "auto_refresh_browser", m_pAutoRefreshBrowser->GetSelected () );
 
     // Very hacky
     CControllerConfigManager * pController = g_pCore->GetGame ()->GetControllerConfigManager ();   

@@ -123,6 +123,7 @@ protected:
     CGUILabel*          m_pLabelNick;
     CGUIEdit*           m_pEditNick;
     CGUICheckBox*       m_pSavePasswords;
+    CGUICheckBox*       m_pAutoRefreshBrowser;
 
     CGUILabel*          m_pVideoGeneralLabel;
     CGUILabel*          m_pVideoResolutionLabel;
