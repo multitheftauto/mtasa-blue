@@ -360,7 +360,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 	fX = 5;
 	fY = fY + fLineHeight;
 
-    m_pServerListStatus [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTab [ type ], "Loading..." ) );
+    m_pServerListStatus [ type ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTab [ type ], "" ) );
     m_pServerListStatus [ type ]->SetPosition ( CVector2D ( fX, fY ) );
     m_pServerListStatus [ type ]->SetSize ( CVector2D ( 100, fLineHeight ), true );
 
@@ -490,11 +490,16 @@ void CServerBrowser::SetVisible ( bool bVisible )
         if ( m_firstTimeBrowseServer )
         {
             // Start loading all servers
+            bool bAutoRefresh = true;
+            CVARS_GET ( "auto_refresh_browser", bAutoRefresh );
             for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
             {
-                //m_pEditPassword [ i ]->SetText( "" );
-                m_iSelectedServer [ i ] = -1;
-                GetServerList ( (ServerBrowserType)i )->Refresh ();
+                if ( i != ServerBrowserType::INTERNET || bAutoRefresh )  // Don't refresh Internet unless it's activated
+                {
+                    m_pServerListStatus [ i ]->SetText ( "Loading..." );
+                    m_iSelectedServer [ i ] = -1;
+                    GetServerList ( (ServerBrowserType)i )->Refresh ();
+                }
             }
             CreateHistoryList();
 
