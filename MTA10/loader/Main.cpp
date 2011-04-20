@@ -27,13 +27,11 @@ HINSTANCE g_hInstance = NULL;
 //
 //
 ///////////////////////////////////////////////////////////////
-int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
 #if defined(_DEBUG) 
     SharedUtil_Tests ();
 #endif
-
-    g_hInstance = hInstance;
 
     //////////////////////////////////////////////////////////
     //
@@ -451,4 +449,17 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     // Success, maybe
     return dwExitCode;
+}
+
+
+extern "C" _declspec(dllexport)
+int DoWinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+{
+    return WinMain ( hInstance, hPrevInstance, lpCmdLine, nCmdShow );
+}
+
+int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
+{
+    g_hInstance = hModule;
+    return TRUE;
 }
