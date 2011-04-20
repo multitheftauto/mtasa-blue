@@ -47,17 +47,16 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
 #if defined(_DEBUG) 
     SharedUtil_Tests ();
 #endif
 
-    g_hInstance = hInstance;
     g_lpCmdLine = lpCmdLine;
 
 #ifndef MTA_DEBUG
-    ShowSplash ( hInstance );
+    ShowSplash ( g_hInstance );
 #endif
     ClearPendingBrowseToSolution ();
 
@@ -757,8 +756,16 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 };
 
 // To avoid having to forward declare functions in this file
-int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+extern "C" _declspec(dllexport)
+int DoWinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
     CMainHack MainHack;
     return MainHack.WinMain ( hInstance, hPrevInstance, lpCmdLine, nCmdShow );
 }
+
+int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
+{
+    g_hInstance = hModule;
+    return TRUE;
+}
+

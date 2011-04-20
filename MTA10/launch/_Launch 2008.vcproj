@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="Client - Loader"
-	ProjectGUID="{AF2AF376-1ACD-4F3B-B399-2A30D8BE950E}"
+	Name="Client - Launch"
+	ProjectGUID="{65B00BB8-CA43-4A1C-95A4-1DDE75CF4B55}"
+	RootNamespace="Client - Launch"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -18,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory=".\Debug"
 			IntermediateDirectory=".\Debug"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -42,7 +43,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/Loader.tlb"
+				TypeLibraryName=".\Debug/Launch.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -52,7 +53,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
 				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
@@ -78,11 +79,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="C:/Program Files/MTA San Andreas/mta/loader_d.dll"
+				OutputFile="C:/Program Files/MTA San Andreas/Multi Theft Auto_d.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/Loader_d.pdb"
+				ProgramDatabaseFile=".\Debug/Launch_d.pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -114,7 +115,7 @@
 			Name="Release|Win32"
 			OutputDirectory=".\Release"
 			IntermediateDirectory=".\Release"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -139,7 +140,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/Loader.tlb"
+				TypeLibraryName=".\Release/Launch.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -152,7 +153,7 @@
 				AdditionalIncludeDirectories="../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
 				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
@@ -178,7 +179,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="c:\program files\MTA San Andreas\mta\loader.dll"
+				OutputFile="c:\program files\MTA San Andreas\Multi Theft Auto.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -217,9 +218,9 @@
 		</Configuration>
 		<Configuration
 			Name="Nightly|Win32"
-			OutputDirectory="..\..\obj\client\loader"
-			IntermediateDirectory="..\..\obj\client\loader"
-			ConfigurationType="2"
+			OutputDirectory="..\..\obj\client\launch"
+			IntermediateDirectory="..\..\obj\client\launch"
+			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -244,7 +245,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/Loader.tlb"
+				TypeLibraryName=".\Release/Launch.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -257,7 +258,7 @@
 				AdditionalIncludeDirectories="../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
 				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
@@ -283,7 +284,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="..\..\output\MTA San Andreas\mta\loader.dll"
+				OutputFile="..\..\output\MTA San Andreas\Multi Theft Auto.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -329,10 +330,6 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\Install.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Main.cpp"
 				>
 			</File>
@@ -364,23 +361,11 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\Utils.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
-			<File
-				RelativePath=".\Install.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Main.h"
-				>
-			</File>
 			<File
 				RelativePath="resource.h"
 				>
@@ -389,21 +374,25 @@
 				RelativePath=".\StdInc.h"
 				>
 			</File>
-			<File
-				RelativePath=".\Utils.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="loader.rc"
+				RelativePath=".\NEU\GDFImp.gdf.xml"
 				>
 			</File>
 			<File
-				RelativePath=".\resource\splash.bmp"
+				RelativePath=".\GDFImp.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\launch.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\resource\mtaicon.ico"
 				>
 			</File>
 		</Filter>
