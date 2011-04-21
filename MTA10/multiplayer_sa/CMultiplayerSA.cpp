@@ -221,6 +221,9 @@ DWORD RETURN_CrashFix_Misc12b =                             0x4D4222;
 DWORD RETURN_CrashFix_Misc13a =                             0x4D4654;
 DWORD RETURN_CrashFix_Misc13b =                             0x4D4764;
 
+#define HOOKPOS_CrashFix_Misc14                              0x4DD4B5
+DWORD RETURN_CrashFix_Misc14 =                               0x4DD4BB;
+
 #define HOOKPOS_VehColCB                                    0x04C838D
 DWORD RETURN_VehColCB =                                     0x04C83AA;
 
@@ -363,6 +366,7 @@ void HOOK_CrashFix_Misc10 ();
 void HOOK_CrashFix_Misc11 ();
 void HOOK_CrashFix_Misc12 ();
 void HOOK_CrashFix_Misc13 ();
+void HOOK_CrashFix_Misc14 ();
 void HOOK_VehColCB ();
 void HOOK_VehCol ();
 
@@ -498,6 +502,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc11, (DWORD)HOOK_CrashFix_Misc11, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
+    HookInstall(HOOKPOS_CrashFix_Misc14, (DWORD)HOOK_CrashFix_Misc14, 6 );
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
@@ -5112,6 +5117,24 @@ void _declspec(naked) HOOK_CrashFix_Misc13 ()
         jmp     RETURN_CrashFix_Misc13a  // 4D4654
     cont:
         jmp     RETURN_CrashFix_Misc13b  // 4D478c
+    }
+}
+
+
+// hooked at 4DD4B5
+void _declspec(naked) HOOK_CrashFix_Misc14 ()
+{
+    _asm
+    {
+        mov     eax, dword ptr ds:[0BD00F8h]
+        cmp     eax, 0
+        je      cont  // Skip much code if eax is zero ( Audio event volumes table not initialized )
+
+        sub     esp, 0D4h
+        jmp     RETURN_CrashFix_Misc14  // 4DD4BB
+    cont:
+        add     esp, 12
+        retn    12
     }
 }
 
