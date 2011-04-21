@@ -218,8 +218,11 @@ void CRadarMap::DoRender ( void )
         }
         else
         {
-            m_pManager->GetPlayerManager ()->GetLocalPlayer ()->GetPosition ( vecLocal );
-            m_pManager->GetPlayerManager ()->GetLocalPlayer ()->GetRotationDegrees ( vecLocalRot );
+            CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager ()->GetLocalPlayer ();
+            if ( !pLocalPlayer )
+                return;
+            pLocalPlayer->GetPosition ( vecLocal );
+            pLocalPlayer->GetRotationDegrees ( vecLocalRot );
         }
 
         CalculateEntityOnScreenPosition ( vecLocal, vecLocalPos );
@@ -536,7 +539,8 @@ void CRadarMap::SetupMapVariables ( void )
             // Get the local player position
             CVector vec;
             CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager ()->GetLocalPlayer ();
-            pLocalPlayer->GetPosition ( vec );
+            if ( pLocalPlayer )
+                pLocalPlayer->GetPosition ( vec );
 
             // Calculate the maps min and max vector positions putting the local player in the middle of the map
             m_iMapMinX = static_cast < int > ( iMiddleX - ( iMiddleY * m_ucZoom ) - ( ( vec.fX * m_fMapSize ) / 6000.0f ) );

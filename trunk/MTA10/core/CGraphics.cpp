@@ -778,6 +778,8 @@ IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile, unsigned int uiW
 extern CCore* g_pCore;
 void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, unsigned char ucAlpha )
 {
+    if ( !texture )
+        return;
     m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
     D3DSURFACE_DESC textureDesc;
     texture->GetLevelDesc( 0, &textureDesc );
