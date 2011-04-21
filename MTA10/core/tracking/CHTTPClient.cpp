@@ -91,7 +91,7 @@ bool CHTTPClient::Get ( const std::string& strURL )
 
     if ( !m_pHTTPSocket )
     {
-        m_strStatus = "error: " + std::string ( m_pHTTPSocket->GetLastError () );
+        m_strStatus = "error: could not create client socket";
         return false;
     }
 

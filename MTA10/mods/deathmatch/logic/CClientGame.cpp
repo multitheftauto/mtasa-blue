@@ -3673,7 +3673,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
 
     // Grab the inflictor
     CClientEntity* pInflictingEntity = NULL;
-    if ( pInflictor ) pInflictingEntity = m_pManager->FindEntity ( pInflictor );
+    if ( pInflictor ) pInflictingEntity = m_pManager->FindEntity ( pInflictor, true );
 
     // If the damage was caused by an explosion
     if ( weaponUsed == WEAPONTYPE_EXPLOSION )
