@@ -825,7 +825,7 @@ namespace SharedUtil
                 return; // Not in list
 
             // Keep active iterators valid
-            for ( int i = m_ActiveIterators.size () - 1 ; i > 0 ; i-- )
+            for ( int i = m_ActiveIterators.size () - 1 ; i >= 0 ; i-- )
                 if ( m_ActiveIterators [ i ]->m_pNode == pNode )
                     m_ActiveIterators [ i ]->NotifyRemovingNode ( pNode );
 
