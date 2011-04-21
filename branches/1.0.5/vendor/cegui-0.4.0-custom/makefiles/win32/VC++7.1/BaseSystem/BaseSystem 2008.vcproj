@@ -129,7 +129,7 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
 				WarningLevel="3"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				DisableSpecificWarnings="4251;4100"
 			/>
 			<Tool
@@ -203,7 +203,7 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
 				WarningLevel="3"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				DisableSpecificWarnings="4251;4100"
 			/>
 			<Tool
