@@ -160,6 +160,7 @@ CCore::CCore ( void )
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
+    m_bWaitToSetNick = false;
 
     // Initialize time
     CClientTime::InitializeTime ();
@@ -197,6 +198,7 @@ CCore::CCore ( void )
     m_uiServerFrameRateLimit = 0;
     m_dLastTimeMs = 0;
     m_dPrevOverrun = 0;
+    m_uiNewNickWaitFrames = 0;
 }
 
 CCore::~CCore ( void )
@@ -1136,6 +1138,18 @@ void CCore::DoPostFramePulse ( )
         else
         {
             WaitForMenu++;
+        }
+
+        if ( m_bWaitToSetNick && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading() )
+        {
+            if ( m_uiNewNickWaitFrames > 50 )
+            {
+                // Request a new nickname if we're waiting for one
+                GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
+                m_bWaitToSetNick = false;
+            }
+            else
+                m_uiNewNickWaitFrames++;
         }
     }
 

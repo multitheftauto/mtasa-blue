@@ -210,6 +210,7 @@ public:
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
     const char *            GetCommandLineOption            ( const char* szOption );
     const char *            GetCommandLineArgs              ( void ) { return m_szCommandLineArgs; }
+    void                    RequestNewNickOnStart           ( void ) { m_bWaitToSetNick = true; };
 
     //XFire
     SString                 UpdateXfire                     ( void );
@@ -286,6 +287,8 @@ private:
     uint                        m_uiFrameRateLimit;
     double                      m_dLastTimeMs;
     double                      m_dPrevOverrun;
+    bool                        m_bWaitToSetNick;
+    uint                        m_uiNewNickWaitFrames;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

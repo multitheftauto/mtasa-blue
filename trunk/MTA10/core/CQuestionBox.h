@@ -19,6 +19,7 @@ class CQuestionBox;
 #include "CMainMenu.h"
 
 typedef void (*pfnQuestionCallback)        ( void*, unsigned int );
+typedef void (*pfnQuestionEditCallback)        ( void*, unsigned int, std::string );
 
 
 class CQuestionBox
@@ -34,7 +35,9 @@ public:
     void                SetMessage                  ( const SString& strMsg );
     void                AppendMessage               ( const SString& strMsg );
     void                SetButton                   ( unsigned int uiButton, const SString& strText );
+    void                SetEditbox                  ( unsigned int uiEditbox, const SString& strText );
     void                SetCallback                 ( pfnQuestionCallback callback, void* ptr = NULL );
+    void                SetCallbackEdit             ( pfnQuestionEditCallback callback, void* ptr = NULL );
     unsigned int        PollButtons                 ( void );
     bool                IsVisible                   ( void );
 
@@ -44,9 +47,12 @@ private:
     CGUIWindow*                 m_pWindow;
     CGUILabel*                  m_pMessage;
     std::vector < CGUIButton* > m_ButtonList;
+    std::vector < CGUIEdit* >   m_EditList;
     unsigned int                m_uiLastButton;
     unsigned int                m_uiActiveButtons;
+    unsigned int                m_uiActiveEditboxes;
     pfnQuestionCallback         m_Callback;
+    pfnQuestionEditCallback     m_CallbackEdit;
     void*                       m_CallbackParameter;
     SString                     m_strMsg;
 };
