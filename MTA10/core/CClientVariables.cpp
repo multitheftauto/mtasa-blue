@@ -183,7 +183,12 @@ void CClientVariables::LoadDefaults ( void )
                                 Set(__x,__y)
     #define _S(__x)             std::string(__x)
 
-    DEFAULT ( "nick",                       _S("Player") );                 // nickname
+    if(!Exists("nick")) 
+    {
+        DEFAULT ( "nick",                       _S(GenerateNickname()) );       // nickname
+        CCore::GetSingleton ().RequestNewNickOnStart();  // Request the user to set a new nickname
+    }
+
     DEFAULT ( "host",                       _S("127.0.0.1") );              // hostname
     DEFAULT ( "port",                       22003 );                        // port
     DEFAULT ( "password",                   _S("") );                       // password

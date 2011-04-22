@@ -103,6 +103,8 @@ namespace SharedUtil
     //
     SString ConformResourcePath ( const char* szRes );
 
+    SString GenerateNickname ( void );
+
     //
     // string stuff
     //

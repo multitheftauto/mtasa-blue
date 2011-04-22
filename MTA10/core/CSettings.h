@@ -112,6 +112,8 @@ public:
     static void         OnLoginCallback         ( bool bResult, char* szError, void* obj );
     void                OnLoginStateChange      ( bool bResult );
 
+    void                RequestNewNickname      ( void );
+
 protected:
     const static int    SecKeyNum = 3;     // Number of secondary keys
 

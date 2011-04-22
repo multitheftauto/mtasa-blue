@@ -1730,7 +1730,7 @@ void CSettings::LoadData ( void )
     }
     else
     {
-        m_pEditNick->SetText ( "Player" );
+        m_pEditNick->SetText ( GenerateNickname() );
     }
 
     // Save server password
@@ -2688,3 +2688,36 @@ bool CSettings::OnVolumetricShadowsClick ( CGUIElement* pElement )
     }
     return true;
 }
+
+void NewNicknameCallback ( void* ptr, unsigned int uiButton, std::string strNick )
+{
+    if ( uiButton == 0 )  // We hit OK
+    {
+        if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
+            CCore::GetSingleton ().ShowMessageBox ( "Error", "Your nickname contains invalid characters!", MB_BUTTON_OK | MB_ICON_INFO );
+        else
+        {
+            CVARS_SET ( "nick", strNick ) ;
+            CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+        }
+    }
+    else
+        CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+}
+
+void CSettings::RequestNewNickname ( void )
+{
+        std::string strNick;
+        CVARS_GET ( "nick", strNick );
+
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( "Please enter a nickname" );
+        pQuestionBox->SetMessage ( "Please enter a nickname to be used ingame.  \nThis will be your name when you connect to and play in a server"  );
+        pQuestionBox->SetButton ( 0, "OK" );
+        pQuestionBox->SetButton ( 1, "Cancel" );
+        pQuestionBox->SetEditbox ( 0, strNick );
+        pQuestionBox->SetCallbackEdit ( NewNicknameCallback );
+        pQuestionBox->Show ();
+}
+
