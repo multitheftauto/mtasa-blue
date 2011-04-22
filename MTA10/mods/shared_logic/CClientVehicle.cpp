@@ -35,6 +35,8 @@ extern CClientGame* g_pClientGame;
 
 CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
 {
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientVehicle" ), &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, &m_pLastSyncer, NULL );
+
     // Initialize members
     m_pManager = pManager;
     m_pObjectManager = m_pManager->GetObjectManager ();
@@ -211,6 +213,7 @@ CClientVehicle::~CClientVehicle ( void )
 #if WITH_VEHICLE_HANDLING
     delete m_pHandlingEntry;
 #endif
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, &m_pLastSyncer, NULL );
 }
 
 

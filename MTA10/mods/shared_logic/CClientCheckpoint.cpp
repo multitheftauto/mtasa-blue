@@ -15,6 +15,8 @@
 
 CClientCheckpoint::CClientCheckpoint ( CClientMarker * pThis )
 {
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientCheckpoint" ), &m_pThis, NULL );
+
     // Init
     m_pThis = pThis;
     m_pCheckpoint = NULL;
@@ -33,6 +35,7 @@ CClientCheckpoint::~CClientCheckpoint ( void )
 {
     // Eventually destroy the checkpoint
     Destroy ();
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pThis, NULL );
 }
 
 
