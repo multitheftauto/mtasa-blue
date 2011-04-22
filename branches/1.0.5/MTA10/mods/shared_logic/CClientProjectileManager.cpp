@@ -21,6 +21,8 @@ CClientProjectileManager * g_pProjectileManager = NULL;
 */
 CClientProjectileManager::CClientProjectileManager ( CClientManager * pManager )
 {
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientProjectileManager" ), &m_pCreator, &m_pLastCreated, NULL );
+
     g_pProjectileManager = this;
     m_pManager = pManager;
 
@@ -36,6 +38,7 @@ CClientProjectileManager::~CClientProjectileManager ( void )
 {
     RemoveAll ();
     if ( g_pProjectileManager == this ) g_pProjectileManager = NULL;
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pCreator, &m_pLastCreated, NULL );
 }
 
 

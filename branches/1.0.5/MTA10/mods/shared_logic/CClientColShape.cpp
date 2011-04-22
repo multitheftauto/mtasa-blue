@@ -17,6 +17,8 @@ using std::list;
 
 CClientColShape::CClientColShape ( CClientManager* pManager, ElementID ID ) : CClientEntity ( ID )
 {
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientColShape" ), &m_pOwningMarker, &m_pOwningPickup, NULL );
+
     // Init
     m_pManager = pManager;
     m_bIsEnabled = true;
@@ -43,6 +45,7 @@ CClientColShape::~CClientColShape ( void )
 
     RemoveAllColliders ( true );
     Unlink ();
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pOwningMarker, &m_pOwningPickup, NULL );
 }
 
 

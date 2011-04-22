@@ -24,6 +24,8 @@
 
 CClientCamera::CClientCamera ( CClientManager* pManager ) : CClientEntity ( INVALID_ELEMENT_ID )
 {
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientCamera" ), &m_pFocusedPlayer, &m_pFocusedEntity, NULL );
+
     // Init
     m_pManager = pManager;
     m_pPlayerManager = m_pManager->GetPlayerManager ();
@@ -51,6 +53,7 @@ CClientCamera::~CClientCamera ( void )
         // Restore the camera to the local player
         SetFocusToLocalPlayerImpl ();
     }
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pFocusedPlayer, &m_pFocusedEntity, NULL );
 }
 
 
