@@ -199,7 +199,8 @@ public:
 
     uint                    GetFrameRateLimit               ( void )                                        { return m_uiFrameRateLimit; }
     void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 );
-    void                    ApplyFrameRateLimit             ( void );
+    void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 );
+    void                    EnsureFrameRateLimitApplied     ( void );
 
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
     bool                    bScreenShot;
@@ -269,6 +270,7 @@ private:
     bool                        m_bQuitOnPulse;
     bool                        m_bDestroyMessageBox;
 
+    bool                        m_bDoneFrameRateLimit;
     uint                        m_uiServerFrameRateLimit;
     uint                        m_uiFrameRateLimit;
     double                      m_dLastTimeMs;
