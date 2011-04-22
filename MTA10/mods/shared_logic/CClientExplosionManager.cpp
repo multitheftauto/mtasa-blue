@@ -17,6 +17,8 @@ CClientExplosionManager * g_pExplosionManager = NULL;
 
 CClientExplosionManager::CClientExplosionManager ( CClientManager * pManager )
 {
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientExplosionManager" ), &m_pLastCreator, NULL );
+
     g_pExplosionManager = this;
     m_pManager = pManager;
     m_LastWeaponType = WEAPONTYPE_UNARMED;
@@ -27,6 +29,8 @@ CClientExplosionManager::CClientExplosionManager ( CClientManager * pManager )
 CClientExplosionManager::~CClientExplosionManager ( void )
 {
     if ( g_pExplosionManager == this ) g_pExplosionManager = NULL;
+
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pLastCreator, NULL );
 }
 
 

@@ -14,6 +14,8 @@
 
 CClientCorona::CClientCorona ( CClientMarker * pThis )
 {
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientCorona" ), &m_pThis, NULL );
+
     // Init
     m_pThis = pThis;
     m_bStreamedIn = false;
@@ -36,6 +38,7 @@ CClientCorona::~CClientCorona ( void )
     {
         pCorona->Disable ();
     }
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pThis, NULL );
 }
 
 
