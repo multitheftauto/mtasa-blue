@@ -20,6 +20,8 @@
 */
 CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjectile* pProjectile, CProjectileInfo* pProjectileInfo, CClientEntity * pCreator, CClientEntity * pTarget, eWeaponType weaponType, CVector * pvecOrigin, CVector * pvecTarget, float fForce, bool bLocal ) : CClientEntity ( INVALID_ELEMENT_ID )
 {
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientProjectile" ), &m_pCreator, &m_pTarget, NULL );
+
     m_pManager = pManager;
     m_pProjectileManager = pManager->GetProjectileManager ();
     m_pProjectile = pProjectile;
@@ -88,6 +90,8 @@ CClientProjectile::~CClientProjectile ( void )
     if ( m_pInitiateData ) delete m_pInitiateData;
 
     Unlink ();
+
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pCreator, &m_pTarget, NULL );
 }
 
 

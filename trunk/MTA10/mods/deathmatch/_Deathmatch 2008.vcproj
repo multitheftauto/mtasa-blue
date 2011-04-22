@@ -373,6 +373,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CClientEntityRefManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CClientGame.cpp"
 					>
 				</File>
@@ -1300,6 +1304,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CBlendedWeather.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CClientEntityRefManager.h"
 					>
 				</File>
 				<File

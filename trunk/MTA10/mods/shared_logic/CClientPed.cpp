@@ -81,6 +81,8 @@ CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, Elem
 
 void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool bIsLocalPlayer )
 {
+    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientPed" ), &m_pOccupiedVehicle, &m_pOccupyingVehicle, &m_pTargetedEntity, &m_pCurrentContactEntity, &m_pBulletImpactEntity, &m_interp.pTargetOriginSource, NULL );
+
     // Init members
     m_pManager = pManager;
 
@@ -316,6 +318,8 @@ CClientPed::~CClientPed ( void )
     }
 
     g_pClientGame->GetPedSync()->RemovePed ( this );
+
+    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pOccupiedVehicle, &m_pOccupyingVehicle, &m_pTargetedEntity, &m_pCurrentContactEntity, &m_pBulletImpactEntity, &m_interp.pTargetOriginSource, NULL );
 }   
 
 void CClientPed::SetStat ( unsigned short usStat, float fValue )
