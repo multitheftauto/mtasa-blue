@@ -11,7 +11,7 @@
 #ifndef __CNICKGEN_H
 #define __CNICKGEN_H
 
-#define NICKGEN_NUM_ADJECTIVES      1049
+#define NICKGEN_NUM_ADJECTIVES      1048
 #define NICKGEN_NUM_NOUNS           818
 
 class CNickGen
