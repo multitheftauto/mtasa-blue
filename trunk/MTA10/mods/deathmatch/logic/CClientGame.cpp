@@ -859,6 +859,8 @@ void CClientGame::DoPulsePostFrame ( void )
 
 void CClientGame::DoPulses ( void )
 {
+    g_pCore->ApplyFrameRateLimit ();
+
     m_BuiltCollisionMapThisFrame = false;
 
     if ( m_bIsPlayingBack && m_bFirstPlaybackFrame && m_pManager->IsGameLoaded () )

@@ -118,7 +118,8 @@ public:
 
     virtual uint                    GetFrameRateLimit               ( void ) = 0;
     virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 ) = 0;
-    virtual void                    ApplyFrameRateLimit             ( void ) = 0;
+    virtual void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 ) = 0;
+    virtual void                    EnsureFrameRateLimitApplied     ( void ) = 0;
 };
 
 #endif

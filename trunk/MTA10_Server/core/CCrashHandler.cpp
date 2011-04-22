@@ -85,8 +85,8 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException )
             char szFilename [256];
             sprintf ( szFilename, "dumps/server_%s_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG,
                                                                                SystemTime.wYear,
-                                                                               SystemTime.wDay,
                                                                                SystemTime.wMonth,
+                                                                               SystemTime.wDay,
                                                                                SystemTime.wHour,
                                                                                SystemTime.wMinute );
 

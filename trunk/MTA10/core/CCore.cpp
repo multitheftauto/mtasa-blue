@@ -194,6 +194,7 @@ CCore::CCore ( void )
     m_tXfireUpdate = 0;
 
     // No initial fps limit
+    m_bDoneFrameRateLimit = false;
     m_uiFrameRateLimit = 0;
     m_uiServerFrameRateLimit = 0;
     m_dLastTimeMs = 0;
@@ -1758,15 +1759,32 @@ void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit )
 
 
 //
+// Make sure the frame rate limit has been applied since the last call
+//
+void CCore::EnsureFrameRateLimitApplied ( void )
+{
+    if ( !m_bDoneFrameRateLimit )
+    {
+        ApplyFrameRateLimit ();
+    }
+    m_bDoneFrameRateLimit = false;
+}
+
+
+//
 // Do FPS limiting
 //
-void CCore::ApplyFrameRateLimit ( void )
+void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 {
-    if ( m_uiFrameRateLimit < 1 )
+    m_bDoneFrameRateLimit = true;
+
+    uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
+
+    if ( uiUseRate < 1 )
         return;
 
     // Calc required time in ms between frames
-    const double dTargetTimeToUse = 1000.0 / m_uiFrameRateLimit;
+    const double dTargetTimeToUse = 1000.0 / uiUseRate;
 
     // Time now
     double dTimeMs = CClientTime::GetTimeNano() * 1000.0;
