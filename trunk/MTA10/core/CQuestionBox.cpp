@@ -121,7 +121,7 @@ void CQuestionBox::Reset ( void )
         m_ButtonList[ i ]->SetVisible ( false );
 
     for ( unsigned int i = 0 ; i < m_EditList.size () ; i++ )
-        m_ButtonList[ i ]->SetVisible ( false );
+        m_EditList[ i ]->SetVisible ( false );
 }
 
 
@@ -159,7 +159,7 @@ void CQuestionBox::SetButton ( unsigned int uiButton, const SString& strText )
     m_ButtonList[ uiButton ]->SetVisible ( true );
 }
 
-void CQuestionBox::SetEditbox ( unsigned int uiEditbox, const SString& strText )
+CGUIEdit* CQuestionBox::SetEditbox ( unsigned int uiEditbox, const SString& strText )
 {
     m_uiActiveEditboxes = Max ( m_uiActiveEditboxes, uiEditbox + 1 );
     while ( m_EditList.size () < m_uiActiveEditboxes )
@@ -173,6 +173,7 @@ void CQuestionBox::SetEditbox ( unsigned int uiEditbox, const SString& strText )
 
     m_EditList[ uiEditbox ]->SetText ( strText );
     m_EditList[ uiEditbox ]->SetVisible ( true );
+    return m_EditList [ uiEditbox ];
 }
 
 

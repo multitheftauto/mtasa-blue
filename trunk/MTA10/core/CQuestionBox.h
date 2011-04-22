@@ -35,7 +35,7 @@ public:
     void                SetMessage                  ( const SString& strMsg );
     void                AppendMessage               ( const SString& strMsg );
     void                SetButton                   ( unsigned int uiButton, const SString& strText );
-    void                SetEditbox                  ( unsigned int uiEditbox, const SString& strText );
+    CGUIEdit*           SetEditbox                  ( unsigned int uiEditbox, const SString& strText );
     void                SetCallback                 ( pfnQuestionCallback callback, void* ptr = NULL );
     void                SetCallbackEdit             ( pfnQuestionEditCallback callback, void* ptr = NULL );
     unsigned int        PollButtons                 ( void );

@@ -2691,7 +2691,7 @@ bool CSettings::OnVolumetricShadowsClick ( CGUIElement* pElement )
 
 void NewNicknameCallback ( void* ptr, unsigned int uiButton, std::string strNick )
 {
-    if ( uiButton == 0 )  // We hit OK
+    if ( uiButton == 1 )  // We hit OK
     {
         if ( !CCore::GetSingleton ().IsValidNick ( strNick.c_str () ) )
             CCore::GetSingleton ().ShowMessageBox ( "Error", "Your nickname contains invalid characters!", MB_BUTTON_OK | MB_ICON_INFO );
@@ -2714,9 +2714,9 @@ void CSettings::RequestNewNickname ( void )
         pQuestionBox->Reset ();
         pQuestionBox->SetTitle ( "Please enter a nickname" );
         pQuestionBox->SetMessage ( "Please enter a nickname to be used ingame.  \nThis will be your name when you connect to and play in a server"  );
-        pQuestionBox->SetButton ( 0, "OK" );
-        pQuestionBox->SetButton ( 1, "Cancel" );
-        pQuestionBox->SetEditbox ( 0, strNick );
+        pQuestionBox->SetButton ( 0, "Cancel" );
+        pQuestionBox->SetButton ( 1, "OK" );
+        pQuestionBox->SetEditbox ( 0, strNick )->SetMaxLength ( MAX_PLAYER_NICK_LENGTH );
         pQuestionBox->SetCallbackEdit ( NewNicknameCallback );
         pQuestionBox->Show ();
 }

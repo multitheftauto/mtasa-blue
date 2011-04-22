@@ -1142,7 +1142,7 @@ void CCore::DoPostFramePulse ( )
 
         if ( m_bWaitToSetNick && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading() )
         {
-            if ( m_uiNewNickWaitFrames > 50 )
+            if ( m_uiNewNickWaitFrames > 75 )
             {
                 // Request a new nickname if we're waiting for one
                 GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
