@@ -657,3 +657,9 @@ bool CGameSA::HasCreditScreenFadedOut ( void )
     bool bCreditScreenFadedOut = ( GetSystemState() >= 7 ) && ( ucAlpha < 6 );
     return bCreditScreenFadedOut;
 }
+
+// Ensure replaced/restored textures for models in the GTA map are correct
+void CGameSA::FlushPendingRestreamIPL ( void )
+{
+    CModelInfoSA::StaticFlushPendingRestreamIPL ();
+}

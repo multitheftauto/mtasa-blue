@@ -231,6 +231,7 @@ protected:
     CColModel*                      m_pCustomColModel;
     CColModelSAInterface*           m_pOriginalColModelInterface;
     RpClump*                        m_pCustomClump;
+    static std::map < unsigned short, int > ms_RestreamTxdIDMap;
 
 public:
                                     CModelInfoSA            ( void );
@@ -271,6 +272,7 @@ public:
     float                           GetLODDistance          ( void );
     void                            SetLODDistance          ( float fDistance );
     void                            RestreamIPL             ( void );
+    static void                     StaticFlushPendingRestreamIPL ( void );
 
     void                            AddRef                  ( bool bWaitForLoad, bool bHighPriority = false );
     int                             GetRefCount             ( void );

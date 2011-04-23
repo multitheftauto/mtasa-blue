@@ -194,36 +194,29 @@ uint SharedUtil::FileSize ( const SString& strFilename  )
 //
 void SharedUtil::MakeSureDirExists ( const SString& strPath )
 {
-    // Copy the path
-    char szCopy [MAX_PATH];
-    strncpy ( szCopy, strPath, MAX_PATH );
+    std::vector < SString > parts;
+    PathConform ( strPath ).Split ( PATH_SEPERATOR, parts );
 
-    // Begin from the start
-    char cChar = 0;
-    char* szIter = szCopy;
-    while ( *szIter != 0 )
+    // Find first dir that already exists
+    int idx = parts.size () - 1;
+    for ( ; idx >= 0 ; idx-- )
     {
-        // Met a slash?
-        cChar = *szIter;
-        if ( cChar == '\\' ||
-             cChar == '/' )
-        {
-            // Replace it temprarily with 0
-            *szIter = 0;
+        SString strTemp = SString::Join ( PATH_SEPERATOR, parts, 0, idx );
+        if ( DirectoryExists ( strTemp ) )
+            break;        
+    }
 
-            // Call mkdir on this path
-            #ifdef WIN32
-                mkdir ( szCopy );
-            #else
-                mkdir ( szCopy ,0775 );
-            #endif
-
-            // Make it a slash again
-            *szIter = cChar;
-        }
-
-        // Increment iterator
-        ++szIter;
+    // Make non existing dirs only
+    idx++;
+    for ( ; idx < (int)parts.size () ; idx++ )
+    {
+        SString strTemp = SString::Join ( PATH_SEPERATOR, parts, 0, idx );
+        // Call mkdir on this path
+        #ifdef WIN32
+            mkdir ( strTemp );
+        #else
+            mkdir ( strTemp ,0775 );
+        #endif
     }
 }
 
