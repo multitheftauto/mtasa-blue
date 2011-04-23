@@ -32,8 +32,6 @@ CClientEntity::CClientEntity ( ElementID ID )
         , m_ChildrenNode ( this )
         , m_Children ( &CClientEntity::m_ChildrenNode )
 {
-    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientEntity" ), &m_pAttachedToEntity, &m_pParent, NULL );
-
     #ifdef MTA_DEBUG
         ++iCount;
     #endif
@@ -188,8 +186,8 @@ CClientEntity::~CClientEntity ( void )
     assert ( m_FromRootNode.m_pOuterItem == this && !m_FromRootNode.m_pPrev && !m_FromRootNode.m_pNext );
     assert ( m_ChildrenNode.m_pOuterItem == this && !m_ChildrenNode.m_pPrev && !m_ChildrenNode.m_pNext );
 
-    CClientEntityRefManager::OnEntityDelete ( this );
-    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pAttachedToEntity, &m_pParent, NULL );
+    if ( !g_pClientGame->IsBeingDeleted () )
+        CClientEntityRefManager::OnEntityDelete ( this );
 }
 
 

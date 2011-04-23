@@ -339,15 +339,24 @@ void SharedUtil::WatchDogClearCounter ( const SString& str )
     SetApplicationSettingInt ( "watchdog", str, 0 );
 }
 
+static bool bWatchDogWasUncleanStopCached = false;
+static bool bWatchDogWasUncleanStopValue = false;
 
 bool SharedUtil::WatchDogWasUncleanStop ( void )
 {
-    return GetApplicationSettingInt ( "watchdog", "uncleanstop" ) != 0;
+    if ( !bWatchDogWasUncleanStopCached )
+    {
+        bWatchDogWasUncleanStopCached = true;
+        bWatchDogWasUncleanStopValue = GetApplicationSettingInt ( "watchdog", "uncleanstop" ) != 0;
+    }
+    return bWatchDogWasUncleanStopValue;
 }
 
 void SharedUtil::WatchDogSetUncleanStop ( bool bOn )
 {
     SetApplicationSettingInt ( "watchdog", "uncleanstop", bOn );
+    bWatchDogWasUncleanStopCached = true;
+    bWatchDogWasUncleanStopValue = bOn;
 }
 
 

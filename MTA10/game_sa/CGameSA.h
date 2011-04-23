@@ -214,6 +214,8 @@ public:
 
     void                    SetupSpecialCharacters  ( void );
 
+    void                    FlushPendingRestreamIPL         ( void );
+
 private:
     CPools                  * m_pPools;
     CPlayerInfo             * m_pPlayerInfo;

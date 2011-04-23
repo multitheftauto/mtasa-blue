@@ -19,6 +19,8 @@ extern CGameSA * pGame;
 
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**) ARRAY_ModelInfo;
 
+std::map < unsigned short, int > CModelInfoSA::ms_RestreamTxdIDMap;
+
 CModelInfoSA::CModelInfoSA ( void )
 {
     m_pInterface = NULL;
@@ -519,13 +521,19 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
 
 void CModelInfoSA::RestreamIPL ()
 {
+    MapSet ( ms_RestreamTxdIDMap, GetTextureDictionaryID (), 0 );
+}
+
+void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
+{
+    if ( ms_RestreamTxdIDMap.empty () )
+        return;
     // This function restreams all instances of the model *that are from the default SA world (ipl)*.
     // In other words, it does not affect elements created by MTA.
     // It's mostly a reimplementation of SA's DeleteAllRwObjects, except that it filters by model ID.
 
     ( (void (*)())FUNC_FlushRequestList )();
 
-    unsigned short usTxdID = GetTextureDictionaryID ();
     std::set < unsigned short > removedModels;
     
     for ( int i = 0; i < 2*NUM_StreamSectorRows*NUM_StreamSectorCols; i++ )
@@ -548,7 +556,7 @@ void CModelInfoSA::RestreamIPL ()
                 continue;
             }
 
-            if ( pGame->GetModelInfo ( pEntity->m_nModelIndex )->GetTextureDictionaryID () == usTxdID )
+            if ( MapContains ( ms_RestreamTxdIDMap, pGame->GetModelInfo ( pEntity->m_nModelIndex )->GetTextureDictionaryID () ) )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
                 {
@@ -572,7 +580,7 @@ void CModelInfoSA::RestreamIPL ()
         while ( pSectorEntry )
         {
             CEntitySAInterface* pEntity = (CEntitySAInterface *)pSectorEntry [ 0 ];
-            if (  pGame->GetModelInfo ( pEntity->m_nModelIndex )->GetTextureDictionaryID () == usTxdID )
+            if ( MapContains ( ms_RestreamTxdIDMap, pGame->GetModelInfo ( pEntity->m_nModelIndex )->GetTextureDictionaryID () ) )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
                 {
@@ -588,6 +596,8 @@ void CModelInfoSA::RestreamIPL ()
             pSectorEntry = (DWORD *)pSectorEntry [ 1 ];
         }
     }
+
+    ms_RestreamTxdIDMap.clear ();
 
     std::set < unsigned short >::iterator it;
     for ( it = removedModels.begin (); it != removedModels.end (); it++ )

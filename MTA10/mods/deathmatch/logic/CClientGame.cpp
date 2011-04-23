@@ -1041,6 +1041,9 @@ void CClientGame::DoPulses ( void )
         // Call onClientRender LUA event
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
+
+        // Ensure replaced/restored textures for models in the GTA map are correct
+        g_pGame->FlushPendingRestreamIPL ();
     }
 
     // Are we connecting?

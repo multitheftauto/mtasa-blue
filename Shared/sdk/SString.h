@@ -91,27 +91,28 @@ public:
     }
 
     // Functions
-    void        Split               ( const SString& strDelim, std::vector < SString >& outResult, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0 ) const;
-    bool        Split               ( const SString& strDelim, SString* pstrLeft, SString* pstrRight, int iIndex = 1 ) const;
-    SString     SplitLeft           ( const SString& strDelim, SString* pstrRight = NULL, int iIndex = 1 ) const;
-    SString     SplitRight          ( const SString& strDelim, SString* pstrLeft = NULL, int iIndex = 1 ) const;
-    SString     Replace             ( const char* szOld, const char* szNew, bool bSearchJustReplaced = false ) const;
-    SString     ReplaceI            ( const char* szOld, const char* szNew, bool bSearchJustReplaced = false ) const;
-    SString     TrimStart           ( const char* szOld ) const;
-    SString     TrimEnd             ( const char* szOld ) const;
-    SString     ToLower             ( void ) const;
-    SString     ToUpper             ( void ) const;
-    SString     ConformLineEndings  ( void ) const;
-    bool        Contains            ( const SString& strOther ) const;
-    bool        ContainsI           ( const SString& strOther ) const;
-    bool        CompareI            ( const SString& strOther ) const;
-    SString     SubStr              ( int iPos, int iCount = 0x3fffffff ) const;
-    SString     Left                ( int iCount ) const;
-    SString     Right               ( int iCount ) const;
-    bool        EndsWith            ( const SString& strOther ) const;
-    bool        EndsWithI           ( const SString& strOther ) const;
-    bool        BeginsWith          ( const SString& strOther ) const;
-    bool        BeginsWithI         ( const SString& strOther ) const;
+    void            Split               ( const SString& strDelim, std::vector < SString >& outResult, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0 ) const;
+    bool            Split               ( const SString& strDelim, SString* pstrLeft, SString* pstrRight, int iIndex = 1 ) const;
+    SString         SplitLeft           ( const SString& strDelim, SString* pstrRight = NULL, int iIndex = 1 ) const;
+    SString         SplitRight          ( const SString& strDelim, SString* pstrLeft = NULL, int iIndex = 1 ) const;
+    SString         Replace             ( const char* szOld, const char* szNew, bool bSearchJustReplaced = false ) const;
+    SString         ReplaceI            ( const char* szOld, const char* szNew, bool bSearchJustReplaced = false ) const;
+    SString         TrimStart           ( const char* szOld ) const;
+    SString         TrimEnd             ( const char* szOld ) const;
+    SString         ToLower             ( void ) const;
+    SString         ToUpper             ( void ) const;
+    SString         ConformLineEndings  ( void ) const;
+    bool            Contains            ( const SString& strOther ) const;
+    bool            ContainsI           ( const SString& strOther ) const;
+    bool            CompareI            ( const SString& strOther ) const;
+    SString         SubStr              ( int iPos, int iCount = 0x3fffffff ) const;
+    SString         Left                ( int iCount ) const;
+    SString         Right               ( int iCount ) const;
+    bool            EndsWith            ( const SString& strOther ) const;
+    bool            EndsWithI           ( const SString& strOther ) const;
+    bool            BeginsWith          ( const SString& strOther ) const;
+    bool            BeginsWithI         ( const SString& strOther ) const;
+    static SString  Join                ( const SString& strDelim, const std::vector < SString >& parts, int iFirst = 0, int iCount = 0x3fffffff );
 };
 
 
