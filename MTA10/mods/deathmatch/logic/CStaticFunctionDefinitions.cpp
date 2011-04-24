@@ -4521,8 +4521,8 @@ void CStaticFunctionDefinitions::GUISetProperty ( CClientEntity& Entity, const c
         GUIElement.GetCGUIElement ()->SetProperty ( szProperty, szValue );
 
         // HACK: If the property being set is AlwaysOnTop, move it to the back so it's not in front of the main menu
-        if (  ( _stricmp ( szProperty, "AlwaysOnTop" ) == 0 ) && 
-              ( _stricmp ( szValue, "True" ) == 0 ) )
+        if (  ( stricmp ( szProperty, "AlwaysOnTop" ) == 0 ) && 
+              ( stricmp ( szValue, "True" ) == 0 ) )
         {
             GUIElement.GetCGUIElement ()->MoveToBack();
         }

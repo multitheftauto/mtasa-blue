@@ -42,7 +42,6 @@
 
 #ifndef WIN32
     #define _isnan isnan
-    #define stricmp strcasecmp
 #endif
 
 //

@@ -90,8 +90,9 @@ extern "C" bool g_bNoTopBar;
     #ifndef stricmp
     #define stricmp strcasecmp
     #endif
-    #ifndef strcmpi
-    #define strcmpi strcasecmp
+
+    #ifndef strnicmp
+    #define strnicmp strncasecmp
     #endif
 
     #define _copysign copysign
