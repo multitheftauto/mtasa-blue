@@ -40,7 +40,7 @@
         }
 #endif
 
-#ifndef WIN32
+#ifndef _MSC_VER
     #define _isnan isnan
 #endif
 
