@@ -21,6 +21,7 @@
 #include "CClientEntity.h"
 #include <gui/CGUI.h>
 
+class CClientRadarAreaManager;
 
 class CClientRadarArea : public CClientEntity
 {
