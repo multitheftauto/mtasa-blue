@@ -4920,7 +4920,7 @@ void CStaticFunctionDefinitions::GUIGridListSetSelectionMode ( CClientEntity& En
         if ( IS_CGUIELEMENT_GRIDLIST ( &GUIElement ) )
         {
             // Set the selection mode
-            static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectionMode ( (CGUIGridList::SelectionMode) uiMode );
+            static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectionMode ( (SelectionMode) uiMode );
         }
     }
 }

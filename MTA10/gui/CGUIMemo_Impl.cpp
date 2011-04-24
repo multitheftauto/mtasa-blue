@@ -176,7 +176,7 @@ bool CGUIMemo_Impl::Event_TextChanged ( const CEGUI::EventArgs& e )
 bool CGUIMemo_Impl::Event_OnKeyDown ( const CEGUI::EventArgs& e )
 {
     const CEGUI::KeyEventArgs& KeyboardArgs = reinterpret_cast < const CEGUI::KeyEventArgs& > ( e );
-    if( KeyboardArgs.scancode == CGUIKeys::Scan::Tab )
+    if( KeyboardArgs.scancode == CGUIKeys::Tab )
     {
         // tab pressed, if we are in a window with tab enabled, just switch to the next element
         if ( GetParent () == NULL )

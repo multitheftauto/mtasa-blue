@@ -89,7 +89,7 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pResourcesCur->SetPosition ( CVector2D ( 0.03f, 0.06f ), true );
     m_pResourcesCur->SetSize ( CVector2D ( 0.45f, 0.5f ), true );
     m_pResourcesCur->SetSorting ( false );
-    m_pResourcesCur->SetSelectionMode ( CGUIGridList::SelectionMode::CellSingle );
+    m_pResourcesCur->SetSelectionMode ( SelectionModes::CellSingle );
     m_hResourcesCur = m_pResourcesCur->AddColumn ( "Selected", 0.80f );
 
     m_pResourceDel = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pTabResources, ">" ) );
@@ -104,7 +104,7 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pResourcesAll->SetPosition ( CVector2D ( 0.52f, 0.06f ), true );
     m_pResourcesAll->SetSize ( CVector2D ( 0.45f, 0.9f ), true );
     m_pResourcesAll->SetSorting ( false );
-    m_pResourcesAll->SetSelectionMode ( CGUIGridList::SelectionMode::CellSingle );
+    m_pResourcesAll->SetSelectionMode ( SelectionModes::CellSingle );
     m_hResourcesAll = m_pResourcesAll->AddColumn ( "All", 0.80f );
 
     m_pButtonStart = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pWindow, "Start" ) );

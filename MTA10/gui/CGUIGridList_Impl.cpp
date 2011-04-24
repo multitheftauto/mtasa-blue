@@ -49,7 +49,7 @@ CGUIGridList_Impl::CGUIGridList_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, bo
 
     reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setUserColumnDraggingEnabled ( false );
     reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setShowHorzScrollbar ( false );
-    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSelectionMode ( CEGUI::MultiColumnList::SelectionMode::RowSingle );
+    reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSelectionMode ( CEGUI::MultiColumnList::RowSingle );
     reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::None );
 
     // Store the pointer to this CGUI element in the CEGUI element
@@ -398,7 +398,7 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
 
         // If the list is sorted and we just changed an item in the sorting column,
         // re-sort the list.
-        if ( win->getSortDirection () != CEGUI::ListHeaderSegment::SortDirection::None &&
+        if ( win->getSortDirection () != SortDirections::None &&
              win->getSortColumn () == GetColumnIndex ( hColumn ) )
         {
             win->setSortColumn ( win->getSortColumn () );
@@ -482,7 +482,7 @@ void CGUIGridList_Impl::SetItemImage ( int iRow, int hColumn, CGUIStaticImage* p
     //if ( pImage )
     {
         // If it doesn't, create it and set it in the gridlist
-        CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl*) pImage );
+        CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::ImageItem, (CGUIStaticImage_Impl*) pImage );
         CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
         reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setItem ( pListboxItem, CEGUI::MCLGridRef ( iRow, GetColumnIndex ( hColumn ) ), true );
 
@@ -640,10 +640,10 @@ void CGUIGridList_Impl::Sort ( unsigned int uiColumn, SortDirection direction )
 
     switch ( direction )
     {
-    case SortDirection::Ascending:
+    case SortDirections::Ascending:
         reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::Ascending );
         break;
-    case SortDirection::Descending:
+    case SortDirections::Descending:
         reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setSortDirection( CEGUI::ListHeaderSegment::Descending );
         break;
     default:
@@ -659,15 +659,15 @@ void CGUIGridList_Impl::GetSort ( unsigned int& uiColumn, SortDirection& directi
     switch ( reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getSortDirection() )
     {
     case CEGUI::ListHeaderSegment::Ascending:
-        direction = SortDirection::Ascending;
+        direction = SortDirections::Ascending;
         break;
 
     case CEGUI::ListHeaderSegment::Descending:
-        direction = SortDirection::Descending;
+        direction = SortDirections::Descending;
         break;
 
     default:
-        direction = SortDirection::None;
+        direction = SortDirections::None;
         break;
     }
 }

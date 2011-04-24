@@ -21,14 +21,14 @@ CGUIListItem_Impl::CGUIListItem_Impl ( const char* szText, unsigned int uiType, 
     // Create the requested list item type
     switch ( uiType )
     {
-        case Type::TextItem:
-            m_pListItem = new CEGUI::ListboxTextItem ( CGUI_Impl::GetUTFString( szText ) );
+        case TextItem:
+            m_pListItem = new CEGUI::ListboxTextItem ( CGUI_Impl::GetUTFString ( szText ) );
             break;
-        case Type::ImageItem:
+        case ImageItem:
             m_pListItem = new CEGUI::ListboxImageItem ( pImage ? pImage->GetDirectImage () : NULL );
             break;
-        case Type::NumberItem:
-            m_pListItem = new CEGUI::ListboxNumberItem ( CGUI_Impl::GetUTFString( szText ) );
+        case NumberItem:
+            m_pListItem = new CEGUI::ListboxNumberItem ( CGUI_Impl::GetUTFString ( szText ) );
             break;
     }
 
@@ -86,7 +86,7 @@ void CGUIListItem_Impl::SetData ( const char* pszData )
 
 void CGUIListItem_Impl::SetImage ( CGUIStaticImage* pImage )
 {
-    if ( ItemType == Type::ImageItem )
+    if ( ItemType == ImageItem )
     {
         CGUIStaticImage_Impl* pImageImpl = (CGUIStaticImage_Impl*) pImage;
         reinterpret_cast < CEGUI::ListboxImageItem* > ( m_pListItem ) -> setImage ( pImageImpl ? pImageImpl->GetDirectImage () : NULL );
@@ -117,11 +117,11 @@ void CGUIListItem_Impl::SetSelectedState ( bool bState )
 
 void CGUIListItem_Impl::SetColor ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha )
 {
-    if ( ItemType == Type::TextItem )
+    if ( ItemType == TextItem )
     {
         reinterpret_cast < CEGUI::ListboxTextItem* > ( m_pListItem )->setTextColours( CEGUI::colour( ( float ) ucRed / 255.0f, ( float ) ucGreen / 255.0f, ( float ) ucBlue / 255.0f, ( float ) ucAlpha / 255.0f ) );
     }
-    else if ( ItemType == Type::NumberItem )
+    else if ( ItemType == NumberItem )
     {
         reinterpret_cast < CEGUI::ListboxNumberItem* > ( m_pListItem )->setTextColours( CEGUI::colour( ( float ) ucRed / 255.0f, ( float ) ucGreen / 255.0f, ( float ) ucBlue / 255.0f, ( float ) ucAlpha / 255.0f ) );
     }
@@ -129,7 +129,7 @@ void CGUIListItem_Impl::SetColor ( unsigned char ucRed, unsigned char ucGreen, u
 
 bool CGUIListItem_Impl::GetColor ( unsigned char & ucRed, unsigned char & ucGreen, unsigned char & ucBlue, unsigned char & ucAlpha )
 {
-    if ( ItemType == Type::TextItem )
+    if ( ItemType == TextItem )
     {
         CEGUI::colour color = reinterpret_cast < CEGUI::ListboxTextItem* > ( m_pListItem )->getTextColours ().d_top_left;
         ucRed = static_cast < unsigned char > ( color.getRed () * 255 );
@@ -138,7 +138,7 @@ bool CGUIListItem_Impl::GetColor ( unsigned char & ucRed, unsigned char & ucGree
         ucAlpha = static_cast < unsigned char > ( color.getAlpha () * 255 );
         return true;
     }
-    else if ( ItemType == Type::NumberItem )
+    else if ( ItemType == NumberItem )
     {
         CEGUI::colour color = reinterpret_cast < CEGUI::ListboxNumberItem* > ( m_pListItem )->getTextColours ().d_top_left;
         ucRed = static_cast < unsigned char > ( color.getRed () * 255 );

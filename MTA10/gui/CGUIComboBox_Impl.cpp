@@ -70,7 +70,7 @@ CGUIComboBox_Impl::~CGUIComboBox_Impl ( void )
 
 CGUIListItem* CGUIComboBox_Impl::AddItem ( const char* szText )
 {
-    CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( szText, CGUIListItem_Impl::Type::TextItem, NULL );
+    CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( szText, CGUIListItem_Impl::TextItem, NULL );
     CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
     reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> addItem ( pListboxItem );
     m_Items [ pNewItem->GetListItem () ] = pNewItem;
@@ -79,7 +79,7 @@ CGUIListItem* CGUIComboBox_Impl::AddItem ( const char* szText )
 
 CGUIListItem* CGUIComboBox_Impl::AddItem ( CGUIStaticImage* pImage )
 {
-    CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::Type::ImageItem, (CGUIStaticImage_Impl *)pImage );
+    CGUIListItem_Impl* pNewItem = new CGUIListItem_Impl ( "", CGUIListItem_Impl::ImageItem, (CGUIStaticImage_Impl *)pImage );
     CEGUI::ListboxItem* pListboxItem = pNewItem->GetListItem ();
     reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> addItem ( pListboxItem );
     m_Items [ pNewItem->GetListItem () ] = pNewItem;

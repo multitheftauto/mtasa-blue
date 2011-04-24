@@ -17,9 +17,8 @@
 #include "CGUIListItem.h"
 #include "CGUICallback.h"
 
-class CGUIGridList : public CGUIElement
+namespace SelectionModes
 {
-public:
     enum SelectionMode {
         RowSingle,
         RowMultiple,
@@ -32,13 +31,24 @@ public:
         NominatedRowSingle,
         NominatedRowMultiple
     };
+}
 
+using SelectionModes::SelectionMode;
+
+namespace SortDirections
+{
     enum SortDirection {
         None,
         Ascending,
         Descending
     };
+}
 
+using SortDirections::SortDirection;
+
+class CGUIGridList : public CGUIElement
+{
+public:
     virtual                         ~CGUIGridList           ( void ) {};
 
     virtual unsigned int            AddColumn               ( const char* szTitle, float fWidth ) = 0;

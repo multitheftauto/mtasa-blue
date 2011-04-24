@@ -32,6 +32,18 @@ class CServerInfo;
 #include "CServerList.h"
 #include "CSingleton.h"
 
+namespace eWindowTypes
+{
+    enum eWindowType
+    {
+        SERVER_INFO_RAW = 0,
+        SERVER_INFO_QUEUE,
+        SERVER_INFO_PASSWORD,
+    };
+}
+
+using eWindowTypes::eWindowType;
+
 class CServerInfo : public CSingleton < CServerInfo >
 {
     friend class CCore;
@@ -39,12 +51,6 @@ class CServerInfo : public CSingleton < CServerInfo >
 public:
     explicit            CServerInfo                ( void );
                         ~CServerInfo               ( void );
-
-    enum eWindowType {
-            SERVER_INFO_RAW = 0,
-            SERVER_INFO_QUEUE,
-            SERVER_INFO_PASSWORD,
-        };
 
     bool			    IsVisible                   ( void );
     void                Hide                        ( void );
