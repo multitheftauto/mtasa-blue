@@ -21,7 +21,7 @@ class CClientPacketRecorder;
 
 class CClientPacketRecorder
 {
-    friend CClientManager;
+    friend class CClientManager;
 
 public:
                         CClientPacketRecorder       ( CClientManager* pManager );

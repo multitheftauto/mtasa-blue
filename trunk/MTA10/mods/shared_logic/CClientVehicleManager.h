@@ -27,8 +27,8 @@ extern unsigned char g_ucMaxPassengers [];
 
 class CClientVehicleManager
 {
-    friend CClientManager;
-    friend CClientVehicle;
+    friend class CClientManager;
+    friend class CClientVehicle;
 
 public:
     void                            DeleteAll               ( void );

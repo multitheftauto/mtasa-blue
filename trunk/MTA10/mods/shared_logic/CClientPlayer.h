@@ -32,7 +32,7 @@ class CClientTeam;
 
 class CClientPlayer : public CClientPed
 {
-    friend CClientPlayerManager;
+    friend class CClientPlayerManager;
 
 public:
                                     CClientPlayer           ( CClientManager* pManager, ElementID ID, bool bIsLocalPlayer = false );

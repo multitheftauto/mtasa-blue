@@ -32,8 +32,8 @@ enum eColShapeType
 
 class CClientColShape : public CClientEntity
 {
-    friend CClientMarker;
-    friend CClientPickup;
+    friend class CClientMarker;
+    friend class CClientPickup;
 public:
                                         CClientColShape                 ( class CClientManager* pManager, ElementID ID );
                                         ~CClientColShape                ( void );

@@ -30,7 +30,7 @@ enum eClientCameraAttachMode
 
 class CClientCamera : public CClientEntity
 {
-    friend CClientManager;
+    friend class CClientManager;
 
 public:
     inline void                 Unlink                      ( void )                        { };

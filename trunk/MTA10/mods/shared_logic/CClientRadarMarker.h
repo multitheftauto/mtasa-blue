@@ -34,7 +34,7 @@ class CClientRadarMarker;
 
 class CClientRadarMarker : public CClientEntity
 {
-    friend CClientRadarMarkerManager;
+    friend class CClientRadarMarkerManager;
 
 public:
     enum EMapMarkerState

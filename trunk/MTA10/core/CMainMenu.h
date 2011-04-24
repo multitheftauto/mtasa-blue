@@ -42,10 +42,10 @@ struct sMenuItem
 
 class CMainMenu
 {
-    friend CQuickConnect;
-    friend CServerBrowser;
-    friend CSettings;
-    friend CCredits;
+    friend class CQuickConnect;
+    friend class CServerBrowser;
+    friend class CSettings;
+    friend class CCredits;
 
 public:
                         CMainMenu                       ( CGUI* pManager );

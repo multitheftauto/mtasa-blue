@@ -133,9 +133,9 @@ public:
 
 class CChat
 {
-    friend CChatLine;
-    friend CChatInputLine;
-    friend CChatLineSection;
+    friend class CChatLine;
+    friend class CChatInputLine;
+    friend class CChatLineSection;
 
 public:
     inline                      CChat                   ( void ) {};

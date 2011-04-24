@@ -49,9 +49,9 @@ public:
 
 class CClientProjectile : public CClientEntity
 {
-    friend CClientProjectileManager;
-    friend CClientPed;
-    friend CClientVehicle;
+    friend class CClientProjectileManager;
+    friend class CClientPed;
+    friend class CClientVehicle;
 public:
                                         CClientProjectile       ( class CClientManager* pManager,
                                                                   CProjectile* pProjectile,

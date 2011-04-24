@@ -20,7 +20,7 @@ class CClientEntity;
 
 class CClientExplosionManager
 {
-    friend CClientVehicle;
+    friend class CClientVehicle;
 public:
                             CClientExplosionManager         ( CClientManager * pManager );
                             ~CClientExplosionManager        ( void );

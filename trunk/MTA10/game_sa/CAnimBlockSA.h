@@ -32,7 +32,7 @@ public:
 
 class CAnimBlockSA : public CAnimBlock
 {
-    friend CAnimBlendAssocGroupSA;
+    friend class CAnimBlendAssocGroupSA;
 public:
                                         CAnimBlockSA            ( CAnimBlockSAInterface * pInterface )     { m_pInterface = pInterface; }
 

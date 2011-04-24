@@ -27,8 +27,8 @@ class CObject;
 
 class CClientObjectManager
 {
-    friend CClientManager;
-    friend CClientObject;
+    friend class CClientManager;
+    friend class CClientObject;
 
 public:
     void                                    DoPulse                     ( void );
