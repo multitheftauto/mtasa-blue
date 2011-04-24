@@ -969,8 +969,8 @@ void CSettings::UpdateJoypadTab ()
     // Update DeadZone and Saturation edit boxes
     char szDeadzone[32] = "";
     char szSaturation[32] = "";
-    itoa ( JoyMan->GetDeadZone (), szDeadzone, 10 );
-    itoa ( JoyMan->GetSaturation (), szSaturation, 10 );
+    snprintf ( szDeadzone, 10, "%d", JoyMan->GetDeadZone () );
+    snprintf ( szSaturation, 10, "%d", JoyMan->GetSaturation () );
 
     m_pEditDeadzone->SetText ( szDeadzone );
     m_pEditSaturation->SetText ( szSaturation );
