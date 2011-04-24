@@ -415,3 +415,17 @@ bool SString::BeginsWithI ( const SString& strOther ) const
     return stricmp ( Left ( strOther.length () ), strOther ) == 0;
 }
 
+// Static function
+SString SString::Join ( const SString& strDelim, const std::vector < SString >& parts, int iFirst, int iCount )
+{
+    SString strResult;
+    int iLast = Min < int > ( iFirst + iCount, parts.size () ) - 1;
+    iFirst = Max < int > ( iFirst, 0 );
+    for ( int i = iFirst ; i <= iLast ; i++ )
+    {
+        if ( i != iFirst )
+            strResult += strDelim;
+        strResult += parts[i];
+    }
+    return strResult;
+}
