@@ -88,9 +88,9 @@ class CClientProjectile;
 
 class CClientVehicle : public CClientStreamElement
 {
-    friend CClientCamera;
-    friend CClientPed;
-    friend CClientVehicleManager;
+    friend class CClientCamera;
+    friend class CClientPed;
+    friend class CClientVehicleManager;
     friend class CClientGame; // TEMP HACK
 
 protected: // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is

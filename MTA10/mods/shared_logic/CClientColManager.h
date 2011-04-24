@@ -21,7 +21,7 @@ class CClientEntity;
 
 class CClientColManager
 {
-    friend CClientColShape;
+    friend class CClientColShape;
 public:
                                     ~CClientColManager          ( void );
 

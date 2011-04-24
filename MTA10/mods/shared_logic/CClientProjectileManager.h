@@ -21,7 +21,7 @@ class CClientManager;
 
 class CClientProjectileManager
 {
-    friend CClientProjectile;
+    friend class CClientProjectile;
 public:
                                     CClientProjectileManager            ( CClientManager * pManager );
                                     ~CClientProjectileManager           ( void );

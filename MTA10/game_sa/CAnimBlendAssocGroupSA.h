@@ -40,7 +40,7 @@ public:
 
 class CAnimBlendAssocGroupSA : public CAnimBlendAssocGroup
 {
-    friend CAnimManagerSA;
+    friend class CAnimManagerSA;
 public:
                                         CAnimBlendAssocGroupSA  ( CAnimBlendAssocGroupSAInterface * pInterface );
 

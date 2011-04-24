@@ -174,7 +174,7 @@ public:
 
 class CEntitySA : public virtual CEntity
 {
-    friend COffsets;
+    friend class COffsets;
 public:
                                 CEntitySA           ( void ) { m_pStoredPointer = NULL; m_ulArrayID = 0; };
 

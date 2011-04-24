@@ -29,7 +29,7 @@ struct SLastSyncedObjectData
 class CClientObject : public CClientStreamElement
 {
     friend class CClientObjectManager;
-    friend CClientPed;
+    friend class CClientPed;
 
 public:
                                     CClientObject           ( class CClientManager* pManager, ElementID ID, unsigned short usModel );
