@@ -33,7 +33,16 @@ class CNetAPI;
 #define TICK_RATE 100
 #define CAM_SYNC_RATE 500
 
-enum eServerRPCFunctions;
+enum eServerRPCFunctions
+{
+    PLAYER_INGAME_NOTICE,
+    INITIAL_DATA_STREAM,
+    PLAYER_TARGET,
+    PLAYER_WEAPON,
+    KEY_BIND,
+    CURSOR_EVENT,
+    REQUEST_STEALTH_KILL,
+};
 
 class CNetAPI
 {
@@ -101,17 +110,6 @@ private:
     CVector                 m_vecLastSentCameraLookAt;
 
     CInterpolator<CVector>  m_Interpolator;
-};
-
-enum eServerRPCFunctions
-{
-    PLAYER_INGAME_NOTICE,
-    INITIAL_DATA_STREAM,
-    PLAYER_TARGET,
-    PLAYER_WEAPON,
-    KEY_BIND,
-    CURSOR_EVENT,
-    REQUEST_STEALTH_KILL,
 };
 
 #endif

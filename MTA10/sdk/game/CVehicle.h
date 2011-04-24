@@ -18,6 +18,7 @@
 #include "CDamageManager.h"
 #include "CHandlingManager.h"
 #include "CDoor.h"
+#include "CWeaponInfo.h"
 
 #include <CVector.h>
 
@@ -33,7 +34,6 @@ enum eWinchType
 // forward declaration, avoid compile error
 class CPed;
 class CObject;
-enum eWeaponType;
 class CColModel;
 
 class CVehicle : public virtual CPhysical
