@@ -51,9 +51,9 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
             g_pGame->GetResourceDownloader()->FindUpdates ( szResourceName, 0, 0, 0, 0, &resourcelist );
             char szText[512];
             if ( resourcelist.size() == 1 )
-                _snprintf ( szText, 511, "    %s (1 version)", (*iter)->GetName().c_str () );
+                snprintf ( szText, 511, "    %s (1 version)", (*iter)->GetName().c_str () );
             else
-                _snprintf ( szText, 511, "    %s (%d versions)", (*iter)->GetName().c_str (), resourcelist.size() );
+                snprintf ( szText, 511, "    %s (%d versions)", (*iter)->GetName().c_str (), resourcelist.size() );
             szText[511] = '\0';
             pEchoClient->SendConsole ( szText );
         }
@@ -76,7 +76,7 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
         {
             list < CUpdateResourceVersion* > ::iterator iter = resourcelist.begin ();
             char szText[512];
-            _snprintf ( szText, 511, "Updates for %s", szResourceName );
+            snprintf ( szText, 511, "Updates for %s", szResourceName );
             szText[511] = '\0';
             pEchoClient->SendConsole ( szText );
             for ( ; iter != resourcelist.end (); iter++ )
@@ -91,7 +91,7 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
                 std::string strDomain = (*iter)->GetUpdateResource()->GetUpdateSite()->GetDomain ();
 
                 char szVersion[20];
-                _snprintf ( szVersion, 19, "%d.%d.%d", (*iter)->GetMajor(), (*iter)->GetMinor(), (*iter)->GetRevision() );
+                snprintf ( szVersion, 19, "%d.%d.%d", (*iter)->GetMajor(), (*iter)->GetMinor(), (*iter)->GetRevision() );
 
                 char szIsCurrent[2] = " ";
                 if ( existingResource && currentVersionMajor == (*iter)->GetMajor() && currentVersionMinor == (*iter)->GetMinor() &&
@@ -103,12 +103,12 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
                         szIsCurrent[0] = '?';
                 }
 
-                _snprintf ( szText, 511, "%s  %-10.10s  %-10.10s %-30.30s", szIsCurrent, szVersion, szStateName, strDomain.c_str () );
+                snprintf ( szText, 511, "%s  %-10.10s  %-10.10s %-30.30s", szIsCurrent, szVersion, szStateName, strDomain.c_str () );
 
                 szText[511] = '\0';
                 pEchoClient->SendConsole ( szText );
             }
-            _snprintf ( szText, 511, "To install, run: update %s X.Y.Z [release state]", szResourceName );
+            snprintf ( szText, 511, "To install, run: update %s X.Y.Z [release state]", szResourceName );
 
             szText[511] = '\0';
             pEchoClient->SendConsole ( szText );
@@ -116,7 +116,7 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
         else
         {
             char szText[512];
-            _snprintf ( szText, 511, "No updates available for %s", szResourceName );
+            snprintf ( szText, 511, "No updates available for %s", szResourceName );
             szText[511] = '\0';
             pEchoClient->SendConsole ( szText );
         }
@@ -150,14 +150,14 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
                 if ( update->Download ( true ) )
                 {
                     char szText[512];
-                    _snprintf ( szText, 511, "Downloading resource '%s'", szResourceName );
+                    snprintf ( szText, 511, "Downloading resource '%s'", szResourceName );
                     szText[511] = '\0';
                     pEchoClient->SendConsole ( szText );
                 }
                 else
                 {
                     char szText[512];
-                    _snprintf ( szText, 511, "Download of resource '%s' is already in progress", szResourceName );
+                    snprintf ( szText, 511, "Download of resource '%s' is already in progress", szResourceName );
                     szText[511] = '\0';
                     pEchoClient->SendConsole ( szText );
                 }
@@ -165,7 +165,7 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
             else
             {
                 char szText[512];
-                _snprintf ( szText, 511, "Could not find update site for requested version of '%s'", szResourceName );
+                snprintf ( szText, 511, "Could not find update site for requested version of '%s'", szResourceName );
                 szText[511] = '\0';
                 pEchoClient->SendConsole ( szText );
             }
@@ -173,7 +173,7 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
         else
         {
             char szText[512];
-            _snprintf ( szText, 511, "Syntax: update <resource> <major version>.<minor version>.<revision version> [state]" );
+            snprintf ( szText, 511, "Syntax: update <resource> <major version>.<minor version>.<revision version> [state]" );
             szText[511] = '\0';
             pEchoClient->SendConsole ( szText );
         }
@@ -200,24 +200,24 @@ bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArgumen
                 {
                     if ( g_pGame->GetResourceManager()->StartResource ( resource, NULL, true ) )
                     {
-                        _snprintf ( szResponse, 256, "start: Resource '%s' started", szArguments );
+                        snprintf ( szResponse, 256, "start: Resource '%s' started", szArguments );
                     }
                     else
                     {
-                        _snprintf ( szResponse, 256, "start: Resource '%s' start was requested", szArguments );
+                        snprintf ( szResponse, 256, "start: Resource '%s' start was requested", szArguments );
                     }
                 }
                 else
-                    _snprintf ( szResponse, 256, "start: Resource is already running" );
+                    snprintf ( szResponse, 256, "start: Resource is already running" );
             }
             else
-                _snprintf ( szResponse, 256, "start: Resource is loaded, but has errors" );
+                snprintf ( szResponse, 256, "start: Resource is loaded, but has errors" );
         }
         else
-            _snprintf ( szResponse, 256, "start: Resource could not be found" );
+            snprintf ( szResponse, 256, "start: Resource could not be found" );
     }
     else
-        _snprintf ( szResponse, 256, "* Syntax: start <resource-name>" );
+        snprintf ( szResponse, 256, "* Syntax: start <resource-name>" );
 
     szResponse[255] = '\0';
     pEchoClient->SendConsole ( szResponse );
@@ -378,7 +378,7 @@ bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArgum
                 if ( g_pGame->GetResourceManager()->Install ( szURL, szName ) )
                 {
                     char szOutput[512];
-                    _snprintf ( szOutput, 511, "Resource %s from %s installed succesfully.", szName, szURL );
+                    snprintf ( szOutput, 511, "Resource %s from %s installed succesfully.", szName, szURL );
                     pEchoClient->SendConsole ( szOutput );
                     g_pGame->GetResourceManager()->Refresh();
                 }
@@ -388,11 +388,11 @@ bool CConsoleCommands::InstallResource ( CConsole* pConsole, const char* szArgum
         {
             char szNewURL[250];
             szNewURL[249] = '\0';
-            _snprintf ( szNewURL, 249, "http://development.mtasa.com/%s.zip", szURL );
+            snprintf ( szNewURL, 249, "http://development.mtasa.com/%s.zip", szURL );
             if ( g_pGame->GetResourceManager()->Install ( szNewURL, szURL ) )
             {
                 char szOutput[512];
-                _snprintf ( szOutput, 511, "Resource %s installed succesfully.", szURL );
+                snprintf ( szOutput, 511, "Resource %s installed succesfully.", szURL );
                 pEchoClient->SendConsole ( szOutput );
                 g_pGame->GetResourceManager()->Refresh();
             }
@@ -468,7 +468,7 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
                         case CClient::CLIENT_REMOTECLIENT:
                         {
                             // Populate a chat message
-                            _snprintf ( szEcho, MAX_CHATECHO_LENGTH, "%s: %s", szNick, szArguments );
+                            snprintf ( szEcho, MAX_CHATECHO_LENGTH, "%s: %s", szNick, szArguments );
                             szEcho [MAX_CHATECHO_LENGTH-1] = '\0';
 
                             // Log it in the console
@@ -481,7 +481,7 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
                         case CClient::CLIENT_CONSOLE:
                         {
                             // Populate a chat message
-                            _snprintf ( szEcho, MAX_CHATECHO_LENGTH, "%s: %s", szNick, szArguments );
+                            snprintf ( szEcho, MAX_CHATECHO_LENGTH, "%s: %s", szNick, szArguments );
                             szEcho[MAX_CHATECHO_LENGTH-1] = '\0';
 
                             // Log it in the console
@@ -494,7 +494,7 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szArguments, CClien
                         case CClient::CLIENT_SCRIPT:
                         {
                             // Populate a chat message
-                            _snprintf ( szEcho, MAX_CHATECHO_LENGTH, "%s: %s", szNick, szArguments );
+                            snprintf ( szEcho, MAX_CHATECHO_LENGTH, "%s: %s", szNick, szArguments );
                             szEcho[MAX_CHATECHO_LENGTH-1] = '\0';
 
                             // Log it in the console
@@ -1070,7 +1070,7 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
                             char szBuffer [128];
                             szBuffer[0] = '\0';
 
-                            _snprintf ( szBuffer, 128, "nick: Nickname is already %s", szNick );
+                            snprintf ( szBuffer, 128, "nick: Nickname is already %s", szNick );
                             szBuffer[127] = '\0';
 
                             pEchoClient->SendEcho ( szBuffer );
@@ -1082,7 +1082,7 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
                         char szBuffer [64];
                         szBuffer[0] = '\0';
 
-                        _snprintf ( szBuffer, 64, "nick: Nick must be between %u and %u characters", MIN_NICK_LENGTH, MAX_NICK_LENGTH );
+                        snprintf ( szBuffer, 64, "nick: Nick must be between %u and %u characters", MIN_NICK_LENGTH, MAX_NICK_LENGTH );
                         szBuffer[63] = '\0';
 
                         pEchoClient->SendEcho ( szBuffer );
@@ -1213,7 +1213,7 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
 
                             // Tell the client
                             char szMessage [128];
-                            _snprintf ( szMessage, 128, "chgmypass: Your password was changed to '%s'", szNewPassword );
+                            snprintf ( szMessage, 128, "chgmypass: Your password was changed to '%s'", szNewPassword );
                             szMessage[127] = '\0';
 
                             pEchoClient->SendEcho ( szMessage );
@@ -1290,7 +1290,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                     char szMessage [128];
                     szMessage[0] = '\0';
 
-                    _snprintf ( szMessage, 128, "addaccount: Added account '%s' with password '%s'", szNick, szPassword );
+                    snprintf ( szMessage, 128, "addaccount: Added account '%s' with password '%s'", szNick, szPassword );
                     szMessage[127] = '\0';
 
                     pClient->SendEcho ( szMessage );
@@ -1345,7 +1345,7 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
                 char szClientMessage [128];
                 szClientMessage[0] = '\0';
 
-                _snprintf ( szClientMessage, 128, "logout: You were logged out of account '%s' due to it being deleted", szArguments );
+                snprintf ( szClientMessage, 128, "logout: You were logged out of account '%s' due to it being deleted", szArguments );
                 szClientMessage[127] = '\0';
 
                 pAccountClient->SendEcho ( szClientMessage );
@@ -1355,7 +1355,7 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
             char szMessage [128];
             szMessage[0] = '\0';
 
-            _snprintf ( szMessage, 128, "delaccount: Account '%s' deleted", szArguments );
+            snprintf ( szMessage, 128, "delaccount: Account '%s' deleted", szArguments );
             szMessage[127] = '\0';
 
             pEchoClient->SendEcho ( szMessage );
@@ -1412,7 +1412,7 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
                 char szMessage [128];
                 szMessage[0] = '\0';
 
-                _snprintf ( szMessage, 128, "chgpass: %s's password changed to '%s'", szNick, szPassword );
+                snprintf ( szMessage, 128, "chgpass: %s's password changed to '%s'", szNick, szPassword );
                 szMessage[127] = '\0';
 
                 pEchoClient->SendEcho ( szMessage );
@@ -1553,7 +1553,7 @@ bool CConsoleCommands::WhoIs ( CConsole* pConsole, const char* szArguments, CCli
                     char szBuffer [256];
                     szBuffer[0] = '\0';
 
-                    _snprintf ( szBuffer, 256, "%s - %s:%u", pPlayer->GetNick (), szIP, pPlayer->GetSourcePort () );
+                    snprintf ( szBuffer, 256, "%s - %s:%u", pPlayer->GetNick (), szIP, pPlayer->GetSourcePort () );
                     szBuffer[255] = '\0';
                     pClient->SendEcho ( szBuffer );
 
@@ -1581,7 +1581,7 @@ bool CConsoleCommands::WhoIs ( CConsole* pConsole, const char* szArguments, CCli
                 // Populate a line about him and send it
                 char szBuffer [256];
                 szBuffer[0] = '\0';
-                _snprintf ( szBuffer, 256, "%s - %s:%u", pPlayer->GetNick (), szIP, pPlayer->GetSourcePort () );
+                snprintf ( szBuffer, 256, "%s - %s:%u", pPlayer->GetNick (), szIP, pPlayer->GetSourcePort () );
                 szBuffer[255] = '\0';
                 pClient->SendEcho ( szBuffer );
             }

@@ -340,11 +340,11 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
                     char szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH];
                     if ( m_bIgnoreTextSpacer )
                     {
-                        _snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s", szText );
+                        snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s", szText );
                     }
                     else
                     {
-                        _snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s%s", CGUIGRIDLIST_SPACER, szText );
+                        snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH - 1, "%s%s", CGUIGRIDLIST_SPACER, szText );
                     }
 
                     szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH-1] = NULL;
@@ -384,11 +384,11 @@ int CGUIGridList_Impl::SetItemText ( int iRow, int hColumn, const char* szText, 
 
                 if ( m_bIgnoreTextSpacer )
                 {
-                    _snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH-1, "%s", szText );
+                    snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH-1, "%s", szText );
                 }
                 else
                 {
-                    _snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH-1, "%s%s", CGUIGRIDLIST_SPACER, szText );
+                    snprintf ( szBuf, CGUIGRIDLIST_MAX_TEXT_LENGTH-1, "%s%s", CGUIGRIDLIST_SPACER, szText );
                 }
 
                 szBuf[CGUIGRIDLIST_MAX_TEXT_LENGTH-1] = NULL;               

@@ -502,20 +502,20 @@ void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionN
         if ( strWhat == "Replaced" )
         {
             m_ulDeprecatedWarningCount++;
-            _snprintf ( szTemp, sizeof(szTemp), "%s is deprecated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount32()/60000)%7 ? "" : " before Tuesday" );
+            snprintf ( szTemp, sizeof(szTemp), "%s is deprecated and may not work in future versions. Please replace with %s%s.", strFunctionName.c_str (), strHow.c_str (), (GetTickCount32()/60000)%7 ? "" : " before Tuesday" );
         }
         else
         if ( strWhat == "Removed" )
         {
-            _snprintf ( szTemp, sizeof(szTemp), "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );
+            snprintf ( szTemp, sizeof(szTemp), "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );
         }
         else
         {
-            _snprintf ( szTemp, sizeof(szTemp), "%s - %s", strFunctionName.c_str (), strHow.c_str () );
+            snprintf ( szTemp, sizeof(szTemp), "%s - %s", strFunctionName.c_str (), strHow.c_str () );
         }
 
         char szResult [ 512 ];
-        _snprintf ( szResult, sizeof(szResult), "WARNING: %s(Line %lu) [%s] %s\n", strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", szTemp );
+        snprintf ( szResult, sizeof(szResult), "WARNING: %s(Line %lu) [%s] %s\n", strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", szTemp );
 
         CLogger::LogPrint ( szResult );
     }
@@ -762,7 +762,7 @@ bool CResourceChecker::RenameBackupFile( const string& strOrigFilename, const st
             return false;
         }
         char buffer[32];
-        _snprintf( buffer, 32, "%d", i + 1 );
+        snprintf( buffer, 32, "%d", i + 1 );
         strBakFilename = strOrigFilename + strBakAppend + "_" + buffer;
     }
     return true;

@@ -334,7 +334,7 @@ void CXMLNodeImpl::SetTagContentf ( const char* szFormat, ... )
     char szBuffer [1024];
     va_list va;
     va_start ( va, szFormat );
-    _VSNPRINTF ( szBuffer, 1024, szFormat, va );
+    VSNPRINTF ( szBuffer, 1024, szFormat, va );
     va_end ( va );
     SetTagContent ( szBuffer );
 }

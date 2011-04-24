@@ -17,7 +17,7 @@
 CAccessControlList::CAccessControlList ( const char* szACLName, CAccessControlListManager* pACLManager )
 {
     m_szACLName[0] = '\0';
-    _snprintf ( m_szACLName, MAX_ACL_NAME_LENGTH, "%s", szACLName );
+    snprintf ( m_szACLName, MAX_ACL_NAME_LENGTH, "%s", szACLName );
     m_szACLName[MAX_ACL_NAME_LENGTH-1] = '\0';
 
     m_pACLManager = pACLManager;

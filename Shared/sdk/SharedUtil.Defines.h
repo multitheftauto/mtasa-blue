@@ -20,11 +20,11 @@
 #define WITH_ALLOC_TRACKING 0
 
 //
-// _vsnprintf with buffer full check
+// vsnprintf with buffer full check
 //
-#define _VSNPRINTF( buffer, count, format, argptr ) \
+#define VSNPRINTF( buffer, count, format, argptr ) \
     { \
-        int iResult = _vsnprintf ( buffer, count, format, argptr ); \
+        int iResult = vsnprintf ( buffer, count, format, argptr ); \
         if( iResult == -1 || iResult == (count) ) \
             (buffer)[(count)-1] = 0; \
     }
@@ -41,7 +41,6 @@
 #endif
 
 #ifndef WIN32
-    #define _vsnprintf vsnprintf
     #define _isnan isnan
     #define stricmp strcasecmp
 #endif

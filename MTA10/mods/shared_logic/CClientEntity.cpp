@@ -21,8 +21,6 @@ using std::list;
 
 extern CClientGame* g_pClientGame;
 
-#define snprintf _snprintf
-
 #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
 
 int CClientEntity::iCount = 0;

@@ -15,7 +15,7 @@
 CAccessControlListRight::CAccessControlListRight ( const char* szRightName, ERightType eRightType, bool bAccess, CAccessControlListManager* pACLManager )
 {
     m_szRightName[0] = '\0';
-    _snprintf ( m_szRightName, MAX_ACL_RIGHT_NAME_LENGTH, "%s", szRightName );
+    snprintf ( m_szRightName, MAX_ACL_RIGHT_NAME_LENGTH, "%s", szRightName );
     m_szRightName[MAX_ACL_RIGHT_NAME_LENGTH-1] = '\0';
     m_uiNameHash = HashString ( m_szRightName );
 

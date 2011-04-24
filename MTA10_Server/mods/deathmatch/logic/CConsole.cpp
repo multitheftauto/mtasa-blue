@@ -80,7 +80,7 @@ bool CConsole::HandleInput ( const char* szCommand, CClient* pClient, CClient* p
 
             // Tell the client
             char szBuffer [128];
-            _snprintf ( szBuffer, sizeof(szBuffer), "ACL: Access denied for '%s'", szKey );
+            snprintf ( szBuffer, sizeof(szBuffer), "ACL: Access denied for '%s'", szKey );
             szBuffer[sizeof(szBuffer)-1] = '\0';
 
             pClient->SendEcho ( szBuffer );

@@ -112,7 +112,7 @@ CXML* CServerImpl::GetXML ( void )
 const char* CServerImpl::GetAbsolutePath ( const char* szRelative, char* szBuffer, unsigned int uiBufferSize )
 {
     szBuffer [uiBufferSize-1] = 0;
-    _snprintf ( szBuffer, uiBufferSize - 1, "%s/%s", m_strServerPath.c_str (), szRelative );
+    snprintf ( szBuffer, uiBufferSize - 1, "%s/%s", m_strServerPath.c_str (), szRelative );
     return szBuffer;
 }
 
@@ -137,7 +137,7 @@ void CServerImpl::Printf ( const char* szFormat, ... )
     {
         char szOutput [512];
         szOutput [511] = 0;
-        _VSNPRINTF ( szOutput, 511, szFormat, ap );
+        VSNPRINTF ( szOutput, 511, szFormat, ap );
         m_fClientFeedback ( szOutput );
     }
     #endif

@@ -13,10 +13,6 @@
 
 #include <StdInc.h>
 
-#ifndef snprintf
-#define snprintf _snprintf
-#endif
-
 static volatile bool g_bIsStarted = false;
 extern CCoreInterface* g_pCore;
 CCriticalSection CServer::m_OutputCC;

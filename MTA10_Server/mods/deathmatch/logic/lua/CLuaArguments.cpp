@@ -362,7 +362,7 @@ vector < char * > * CLuaArguments::WriteToCharVector ( vector < char * > * value
                 CElement* pElement = (*iter)->GetElement ();
                 if ( VERIFY_ELEMENT(pElement) )
                 {
-                    _snprintf ( szValue, 9, "E#%d", (int)pElement->GetID() );
+                    snprintf ( szValue, 9, "E#%d", (int)pElement->GetID() );
                 }
                 else
                 {

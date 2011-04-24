@@ -266,7 +266,7 @@ std::string ASE::QueryFull ( void )
             reply << ( unsigned char ) ( strScore.length () + 1 );
             reply << strScore.c_str ();
             // ping
-            _snprintf ( szTemp, 255, "%u", pPlayer->GetPing () );
+            snprintf ( szTemp, 255, "%u", pPlayer->GetPing () );
             reply << ( unsigned char ) ( strlen ( szTemp ) + 1 );
             reply << szTemp;
             // time (skip)

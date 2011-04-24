@@ -568,7 +568,7 @@ CEGUI::WindowManager* CGUI_Impl::GetWindowManager ( void )
 
 void CGUI_Impl::GetUniqueName ( char* pBuf )
 {
-    _snprintf ( pBuf, CGUI_CHAR_SIZE, "%x", m_ulPreviousUnique );
+    snprintf ( pBuf, CGUI_CHAR_SIZE, "%x", m_ulPreviousUnique );
     m_ulPreviousUnique++;
 }
 

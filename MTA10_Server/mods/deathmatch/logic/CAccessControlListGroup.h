@@ -37,7 +37,7 @@ public:
                                     {
                                         m_uiHashId = GenerateHashId ( szName, eObjectType );
 
-                                        _snprintf ( m_szName, 256, "%s", szName );
+                                        snprintf ( m_szName, 256, "%s", szName );
                                         m_szName [ 255 ] = 0;
 
                                         m_eObjectType = eObjectType;
@@ -48,7 +48,7 @@ public:
     static inline unsigned int      GenerateHashId                      ( const char* szName, EObjectType eObjectType )
                                     {
                                         char szID [ 256 ];
-                                        _snprintf ( szID, 256, "%s_%d", szName, (unsigned int) eObjectType );
+                                        snprintf ( szID, 256, "%s_%d", szName, (unsigned int) eObjectType );
                                         szID [ 255 ] = 0;
                                         return ( HashString( szID ) & (unsigned int)0x7FFFFFFF );
                                     }

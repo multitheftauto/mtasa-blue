@@ -2870,12 +2870,12 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
             int yoffset;
 
             yoffset = 0;
-            _snprintf ( str, sizeof( str ), "Ammo in clip: %d", pWeapon->GetAmmoInClip () );
+            snprintf ( str, sizeof( str ), "Ammo in clip: %d", pWeapon->GetAmmoInClip () );
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
 
             yoffset = 15;
-            _snprintf ( str, sizeof( str ), "State: %d", pWeapon->GetState() );
+            snprintf ( str, sizeof( str ), "State: %d", pWeapon->GetState() );
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
         }

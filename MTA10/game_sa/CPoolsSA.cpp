@@ -1057,11 +1057,11 @@ void CPoolsSA::DumpPoolsStatus ()
     int poolSizes[] = {13000,140,350,2500,110,10150,500,200,16,140,64,500,64,32,64,3200,70000};
     int iPosition = 0;
     char percent = '%';
-    iPosition += _snprintf ( szOutput, 1024, "-----------------\n" );
+    iPosition += snprintf ( szOutput, 1024, "-----------------\n" );
     for ( int i = 0; i < MAX_POOLS; i++ )
     {
         int usedSpaces = GetNumberOfUsedSpaces ( (ePools)i );
-        iPosition += _snprintf ( szOutput + iPosition, 1024 - iPosition, "%s: %d (%d) (%.2f%c)\n", poolNames[i], usedSpaces, poolSizes[i], ((float)usedSpaces / (float)poolSizes[i] * 100), percent  );
+        iPosition += snprintf ( szOutput + iPosition, 1024 - iPosition, "%s: %d (%d) (%.2f%c)\n", poolNames[i], usedSpaces, poolSizes[i], ((float)usedSpaces / (float)poolSizes[i] * 100), percent  );
     }
     #ifdef MTA_DEBUG
     OutputDebugString ( szOutput );
