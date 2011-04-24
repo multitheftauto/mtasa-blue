@@ -747,7 +747,7 @@ void CCore::HideQuickConnect ( void )
 void CCore::ShowServerInfo ( unsigned int WindowType )
 {
     RemoveMessageBox ();
-    CServerInfo::GetSingletonPtr()->Show( (CServerInfo::eWindowType)WindowType );
+    CServerInfo::GetSingletonPtr()->Show( (eWindowType)WindowType );
 }
 
 void CCore::ApplyHooks ( )

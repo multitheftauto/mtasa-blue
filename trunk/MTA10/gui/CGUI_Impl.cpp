@@ -661,8 +661,8 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
     switch ( KeyboardArgs.scancode )
     {
         // Cut/Copy keys
-        case CEGUI::Key::Scan::X:
-        case CEGUI::Key::Scan::C:
+        case CEGUI::Key::X:
+        case CEGUI::Key::C:
         {
             if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {
@@ -685,7 +685,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                         strTemp = WndEdit->getText ().substr ( sizeSelectionStart, sizeSelectionLength );
 
                         // If the user cut, remove the text too
-                        if ( KeyboardArgs.scancode == CEGUI::Key::Scan::X )
+                        if ( KeyboardArgs.scancode == CEGUI::Key::X )
                         {
                             // Read only?
                             if ( !WndEdit->isReadOnly () )
@@ -711,7 +711,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                     strTemp = WndEdit->getText ().substr ( sizeSelectionStart, sizeSelectionLength );
 
                     // If the user cut, remove the text too
-                    if ( KeyboardArgs.scancode == CEGUI::Key::Scan::X )
+                    if ( KeyboardArgs.scancode == CEGUI::Key::X )
                     {
                         // Read only?
                         if ( !WndEdit->isReadOnly () )
@@ -752,7 +752,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
         }
 
         // Paste keys
-        case CEGUI::Key::Scan::V:
+        case CEGUI::Key::V:
         {
             if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {
@@ -904,7 +904,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
         }
 
         // Select all key
-        case CEGUI::Key::Scan::A:
+        case CEGUI::Key::A:
         {
             if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {

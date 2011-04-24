@@ -238,7 +238,7 @@ void CConnectManager::DoPulse ( void )
                         strError = "Disconnected: you are banned from this server";
                         break;
                     case ID_NO_FREE_INCOMING_CONNECTIONS:
-                        CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_QUEUE, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
+                        CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_QUEUE, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     case ID_DISCONNECTION_NOTIFICATION:
                         strError = "Disconnected: disconnected";
@@ -247,7 +247,7 @@ void CConnectManager::DoPulse ( void )
                         strError = "Disconnected: connection lost";
                         break;
                     case ID_INVALID_PASSWORD:
-                        CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_PASSWORD, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
+                        CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_PASSWORD, m_strHost.c_str(), m_usPort, m_strPassword.c_str() );
                         break;
                     default:
                         strError = "Disconnected: connection refused";

@@ -188,7 +188,7 @@ bool CGUIEdit_Impl::Event_OnTextChanged ( const CEGUI::EventArgs& e )
 bool CGUIEdit_Impl::Event_OnKeyDown( const CEGUI::EventArgs& e )
 {
     const CEGUI::KeyEventArgs& KeyboardArgs = reinterpret_cast < const CEGUI::KeyEventArgs& > ( e );
-    if( KeyboardArgs.scancode == CGUIKeys::Scan::Tab )
+    if( KeyboardArgs.scancode == CGUIKeys::Tab )
     {
         // tab pressed, if we are in a window with tab enabled, just switch to the next element
         if ( GetParent () == NULL )
@@ -200,7 +200,7 @@ bool CGUIEdit_Impl::Event_OnKeyDown( const CEGUI::EventArgs& e )
             pTabList->SelectNext ( this );
         }
     }
-    else if( KeyboardArgs.scancode == CGUIKeys::Scan::Return || KeyboardArgs.scancode == CGUIKeys::Scan::NumpadEnter )
+    else if( KeyboardArgs.scancode == CGUIKeys::Return || KeyboardArgs.scancode == CGUIKeys::NumpadEnter )
     {
         // Enter/Return event is split from Tab now, since we use that for Console, Quick Connect, etc. as enter-only
         if ( m_OnTextAccepted )

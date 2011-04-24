@@ -546,19 +546,19 @@ void CChat::SetChatFont ( eChatFont Font )
     ID3DXFont* pDXFont = g_pCore->GetGraphics ()->GetFont ();
     switch ( Font )
     {
-        case CHAT_FONT_DEFAULT:
+        case ChatFonts::CHAT_FONT_DEFAULT:
             pFont = g_pCore->GetGUI ()->GetDefaultFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT );
             break;
-        case CHAT_FONT_CLEAR:
+        case ChatFonts::CHAT_FONT_CLEAR:
             pFont = g_pCore->GetGUI ()->GetClearFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_CLEAR );
             break;
-        case CHAT_FONT_BOLD:
+        case ChatFonts::CHAT_FONT_BOLD:
             pFont = g_pCore->GetGUI ()->GetBoldFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT_BOLD );
             break;
-        case CHAT_FONT_ARIAL:
+        case ChatFonts::CHAT_FONT_ARIAL:
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_ARIAL );
             break;                
     }

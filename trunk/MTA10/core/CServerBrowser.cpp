@@ -50,7 +50,7 @@ CServerBrowser::CServerBrowser ( void )
     m_ulLastUpdateTime = 0;
     m_firstTimeBrowseServer = true;
     m_bOptionsLoaded = false;
-    m_PrevServerBrowserType = INTERNET;
+    m_PrevServerBrowserType = ServerBrowserTypes::INTERNET;
 
     // Do some initial math
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
@@ -76,10 +76,10 @@ CServerBrowser::CServerBrowser ( void )
     m_pLockedIcon->LoadFromFile ( "cgui\\images\\serverbrowser\\locked.png" );
 
     // Create search filter types icon
-    m_szSearchTypePath [ SearchType::SERVERS ]  =   "cgui\\images\\serverbrowser\\search-servers.png";
-    m_szSearchTypePath [ SearchType::PLAYERS ]  =   "cgui\\images\\serverbrowser\\search-players.png";
+    m_szSearchTypePath [ SearchTypes::SERVERS ]  =   "cgui\\images\\serverbrowser\\search-servers.png";
+    m_szSearchTypePath [ SearchTypes::PLAYERS ]  =   "cgui\\images\\serverbrowser\\search-players.png";
 
-    for ( unsigned int i=0; i != SearchType::MAX_SEARCH_TYPES; i++ )
+    for ( unsigned int i=0; i != SearchTypes::MAX_SEARCH_TYPES; i++ )
     {
         m_pSearchIcons[ i ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
         m_pSearchIcons[ i ]->SetVisible ( false );
@@ -88,10 +88,10 @@ CServerBrowser::CServerBrowser ( void )
     }
 
     // Create the tabs
-    CreateTab ( ServerBrowserType::INTERNET, "Internet" );
-    CreateTab ( ServerBrowserType::LAN, "Local" );
-    CreateTab ( ServerBrowserType::FAVOURITES, "Favourites" );
-    CreateTab ( ServerBrowserType::RECENTLY_PLAYED, "Recent" );
+    CreateTab ( ServerBrowserTypes::INTERNET, "Internet" );
+    CreateTab ( ServerBrowserTypes::LAN, "Local" );
+    CreateTab ( ServerBrowserTypes::FAVOURITES, "Favourites" );
+    CreateTab ( ServerBrowserTypes::RECENTLY_PLAYED, "Recent" );
 
     // Login dialog
     m_pCommunityLogin.SetVisible ( false );
@@ -123,14 +123,14 @@ CServerBrowser::CServerBrowser ( void )
 CServerBrowser::~CServerBrowser ( void )
 {
     // Delete the Tabs
-    DeleteTab ( ServerBrowserType::INTERNET );
-    DeleteTab ( ServerBrowserType::LAN );
-    DeleteTab ( ServerBrowserType::FAVOURITES );
-    DeleteTab ( ServerBrowserType::RECENTLY_PLAYED );
+    DeleteTab ( ServerBrowserTypes::INTERNET );
+    DeleteTab ( ServerBrowserTypes::LAN );
+    DeleteTab ( ServerBrowserTypes::FAVOURITES );
+    DeleteTab ( ServerBrowserTypes::RECENTLY_PLAYED );
 
     // Unload the icon
     m_pLockedIcon->Clear();
-    for ( unsigned int i=0; i != SearchType::MAX_SEARCH_TYPES; i++ )
+    for ( unsigned int i=0; i != SearchTypes::MAX_SEARCH_TYPES; i++ )
         m_pSearchIcons[ i ]->Clear();
 
     // Delete the GUI items
@@ -227,7 +227,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pComboSearchType [ type ]->SetPosition ( CVector2D ( fX, fY + (SB_BUTTON_SIZE_Y-SB_SEARCHBAR_COMBOBOX_SIZE_Y)/2 ), false );
     m_pComboSearchType [ type ]->SetSize ( CVector2D ( SB_SEARCHBAR_COMBOBOX_SIZE_X, 80 ), false );
 
-    for ( unsigned int i=0; i != SearchType::MAX_SEARCH_TYPES; i++ )
+    for ( unsigned int i=0; i != SearchTypes::MAX_SEARCH_TYPES; i++ )
         m_pComboSearchType [ type ]->AddItem ( m_pSearchIcons[ i ] );
 
     m_pComboSearchType [ type ]->SetReadOnly ( true );
@@ -237,7 +237,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pSearchTypeIcon [ type ]->SetSize ( CVector2D(29,SB_SEARCHBAR_COMBOBOX_SIZE_Y -6), false );
     m_pSearchTypeIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
     m_pSearchTypeIcon [ type ]->SetAlwaysOnTop(true);
-    m_uiCurrentSearchType = SearchType::SERVERS;
+    m_uiCurrentSearchType = SearchTypes::SERVERS;
     m_pSearchTypeIcon [ type ]->LoadFromFile ( m_szSearchTypePath [ m_uiCurrentSearchType ] );
 
     fWidth = fSearchBarSizeX-SB_SEARCHBAR_COMBOBOX_SIZE_X;
@@ -333,9 +333,9 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pIncludeLocked [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
 
 #if MTA_DEBUG
-    if ( type != ServerBrowserType::LAN )
+    if ( type != ServerBrowserTypes::LAN )
 #else
-    if ( type != ServerBrowserType::INTERNET && type != ServerBrowserType::LAN )
+    if ( type != ServerBrowserTypes::INTERNET && type != ServerBrowserTypes::LAN )
 #endif
     {
         fX = fX + 57 + SB_SPACER;
@@ -419,25 +419,25 @@ void CServerBrowser::DeleteTab ( ServerBrowserType type )
     delete m_pTab [ type ];
 }
 
-CServerBrowser::ServerBrowserType CServerBrowser::GetCurrentServerBrowserType ( void )
+ServerBrowserType CServerBrowser::GetCurrentServerBrowserType ( void )
 { 
     ServerBrowserType currentServerBrowserType;
 
-    if ( m_pPanel->IsTabSelected ( m_pTab [ ServerBrowserType::FAVOURITES ] ) )
+    if ( m_pPanel->IsTabSelected ( m_pTab [ ServerBrowserTypes::FAVOURITES ] ) )
     {
-        currentServerBrowserType = ServerBrowserType::FAVOURITES;
+        currentServerBrowserType = ServerBrowserTypes::FAVOURITES;
     }
-    else if ( m_pPanel->IsTabSelected ( m_pTab [ ServerBrowserType::RECENTLY_PLAYED ] ) )
+    else if ( m_pPanel->IsTabSelected ( m_pTab [ ServerBrowserTypes::RECENTLY_PLAYED ] ) )
     {
-        currentServerBrowserType = ServerBrowserType::RECENTLY_PLAYED;
+        currentServerBrowserType = ServerBrowserTypes::RECENTLY_PLAYED;
     }
-    else if ( m_pPanel->IsTabSelected ( m_pTab [ ServerBrowserType::LAN ] ) )
+    else if ( m_pPanel->IsTabSelected ( m_pTab [ ServerBrowserTypes::LAN ] ) )
     {
-        currentServerBrowserType = ServerBrowserType::LAN;
+        currentServerBrowserType = ServerBrowserTypes::LAN;
     }
     else
     {
-        currentServerBrowserType = ServerBrowserType::INTERNET;
+        currentServerBrowserType = ServerBrowserTypes::INTERNET;
     }
 
     return currentServerBrowserType;
@@ -459,7 +459,7 @@ void CServerBrowser::Update ( void )
     if ( ( pList->IsUpdated () || m_PrevServerBrowserType != Type ) && m_ulLastUpdateTime < CClientTime::GetTime () - SERVER_BROWSER_UPDATE_INTERVAL )
     {
         // Update the GUI
-        UpdateServerList ( Type , Type == RECENTLY_PLAYED );
+        UpdateServerList ( Type , Type == ServerBrowserTypes::RECENTLY_PLAYED );
 
         UpdateHistoryList ();
 
@@ -494,7 +494,7 @@ void CServerBrowser::SetVisible ( bool bVisible )
             CVARS_GET ( "auto_refresh_browser", bAutoRefresh );
             for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
             {
-                if ( i != ServerBrowserType::INTERNET || bAutoRefresh )  // Don't refresh Internet unless it's activated
+                if ( i != ServerBrowserTypes::INTERNET || bAutoRefresh )  // Don't refresh Internet unless it's activated
                 {
                     m_pServerListStatus [ i ]->SetText ( "Loading..." );
                     m_iSelectedServer [ i ] = -1;
@@ -507,9 +507,9 @@ void CServerBrowser::SetVisible ( bool bVisible )
         }
 
         // Set the first item as our starting address
-        if ( m_pComboAddressHistory [ ServerBrowserType::INTERNET ]->GetItemCount() > 0 )
+        if ( m_pComboAddressHistory [ ServerBrowserTypes::INTERNET ]->GetItemCount() > 0 )
         {
-            std::string strHistoryText = (const char*)m_pComboAddressHistory [ ServerBrowserType::INTERNET ]->GetItemByIndex(0)->GetData();
+            std::string strHistoryText = (const char*)m_pComboAddressHistory [ ServerBrowserTypes::INTERNET ]->GetItemByIndex(0)->GetData();
             SetAddressBarText ( "mtasa://" + strHistoryText );
         }
 
@@ -547,11 +547,11 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
 
     // Save sort info
     uint uiSortColumn;
-    CGUIGridList::SortDirection sortDirection;
+    SortDirection sortDirection;
     m_pServerList [ Type ]->GetSort( uiSortColumn, sortDirection );
 
     // Disable sorting
-    m_pServerList [ Type ]->Sort( uiSortColumn, CGUIGridList::SortDirection::None );
+    m_pServerList [ Type ]->Sort( uiSortColumn, SortDirections::None );
 
     // Get the appropriate server list
     CServerList* pList = GetServerList ( Type );
@@ -696,13 +696,13 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
 
     if ( !strServerSearchText.empty() )
     {
-        if ( m_uiCurrentSearchType == SearchType::SERVERS )
+        if ( m_uiCurrentSearchType == SearchTypes::SERVERS )
         {
             // Search for the search text in the servername
             SString strServerName = pServer->strName;
             bServerSearchFound = strServerName.ContainsI ( strServerSearchText );
         }
-        else if ( m_uiCurrentSearchType == SearchType::PLAYERS )
+        else if ( m_uiCurrentSearchType == SearchTypes::PLAYERS )
         {
             bServerSearchFound = false;
 
@@ -840,13 +840,13 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
 
 CServerList * CServerBrowser::GetServerList ( ServerBrowserType Type )
 {
-    if ( Type == ServerBrowserType::FAVOURITES )
+    if ( Type == ServerBrowserTypes::FAVOURITES )
         return &m_ServersFavourites;
-    else if ( Type == ServerBrowserType::INTERNET )
+    else if ( Type == ServerBrowserTypes::INTERNET )
         return &m_ServersInternet;
-    else if ( Type == ServerBrowserType::LAN )
+    else if ( Type == ServerBrowserTypes::LAN )
         return &m_ServersLAN;
-    else if ( Type == ServerBrowserType::RECENTLY_PLAYED)
+    else if ( Type == ServerBrowserTypes::RECENTLY_PLAYED)
         return &m_ServersRecent;
 
     assert ( false );
@@ -1043,7 +1043,7 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
 
             if ( strPassword.empty() ) // No password could be found, popup password entry.
             {
-                CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_PASSWORD, pServer->strHost.c_str (), pServer->usGamePort, "", pServer );
+                CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_PASSWORD, pServer->strHost.c_str (), pServer->usGamePort, "", pServer );
                 return true;
             }
         }
@@ -1084,7 +1084,7 @@ bool CServerBrowser::OnInfoClick ( CGUIElement* pElement )
 
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword );
 
-    CServerInfo::GetSingletonPtr()->Show ( CServerInfo::eWindowType::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str() );
+    CServerInfo::GetSingletonPtr()->Show ( eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str() );
     return true;
 }
 
@@ -1108,7 +1108,7 @@ bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
         if ( m_ServersFavourites.Remove ( Address, usPort ) )
         {
             SaveFavouritesList();
-            UpdateServerList ( ServerBrowserType::FAVOURITES, true );
+            UpdateServerList ( ServerBrowserTypes::FAVOURITES, true );
             for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
             {
                 m_pAddressFavoriteIcon[i]->SetAlpha ( 0.3f );
@@ -1119,7 +1119,7 @@ bool CServerBrowser::OnFavouritesClick ( CGUIElement* pElement )
         if ( m_ServersFavourites.AddUnique ( Address, usPort ) )
         {
             SaveFavouritesList();
-            UpdateServerList ( ServerBrowserType::FAVOURITES, true );
+            UpdateServerList ( ServerBrowserTypes::FAVOURITES, true );
             for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
             {
                 m_pAddressFavoriteIcon[i]->SetAlpha ( 1.0f );
@@ -1207,27 +1207,27 @@ bool CServerBrowser::OnMouseClick ( CGUIMouseEventArgs Args )
 {
     ServerBrowserType Type = GetCurrentServerBrowserType ();
 
-    if ( Args.pWindow == m_pServerList [ ServerBrowserType::INTERNET ] )
+    if ( Args.pWindow == m_pServerList [ ServerBrowserTypes::INTERNET ] )
     {
-        OnClick ( m_pServerList [ ServerBrowserType::INTERNET ] );
+        OnClick ( m_pServerList [ ServerBrowserTypes::INTERNET ] );
         return true;
     }
-    else if ( Args.pWindow == m_pServerList [ ServerBrowserType::LAN ] )
+    else if ( Args.pWindow == m_pServerList [ ServerBrowserTypes::LAN ] )
     {
-        OnClick ( m_pServerList [ ServerBrowserType::LAN ] );
+        OnClick ( m_pServerList [ ServerBrowserTypes::LAN ] );
         return true;
     }
-    else if ( Args.pWindow == m_pServerList [ ServerBrowserType::FAVOURITES ] )
+    else if ( Args.pWindow == m_pServerList [ ServerBrowserTypes::FAVOURITES ] )
     {
-        OnClick ( m_pServerList [ ServerBrowserType::FAVOURITES ] );
+        OnClick ( m_pServerList [ ServerBrowserTypes::FAVOURITES ] );
         return true;
     }
-    else if ( Args.pWindow == m_pServerList [ ServerBrowserType::RECENTLY_PLAYED ] )
+    else if ( Args.pWindow == m_pServerList [ ServerBrowserTypes::RECENTLY_PLAYED ] )
     {
-        OnClick ( m_pServerList [ ServerBrowserType::RECENTLY_PLAYED ] );
+        OnClick ( m_pServerList [ ServerBrowserTypes::RECENTLY_PLAYED ] );
         return true;
     }
-    else if ( Args.pWindow == m_pServerPlayerList [ Type ] && m_uiCurrentSearchType == SearchType::PLAYERS && !m_pEditSearch [ Type ]->GetText ().empty() )
+    else if ( Args.pWindow == m_pServerPlayerList [ Type ] && m_uiCurrentSearchType == SearchTypes::PLAYERS && !m_pEditSearch [ Type ]->GetText ().empty() )
     {
         OnClick ( m_pServerPlayerList [ Type ] );
         return true;
@@ -1239,24 +1239,24 @@ bool CServerBrowser::OnMouseClick ( CGUIMouseEventArgs Args )
 
 bool CServerBrowser::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 {
-    if ( Args.pWindow == m_pServerList [ ServerBrowserType::INTERNET ] )
+    if ( Args.pWindow == m_pServerList [ ServerBrowserTypes::INTERNET ] )
     {
-        OnDoubleClick ( m_pServerList [ ServerBrowserType::INTERNET ] );
+        OnDoubleClick ( m_pServerList [ ServerBrowserTypes::INTERNET ] );
         return true;
     }
-    if ( Args.pWindow == m_pServerList [ ServerBrowserType::LAN ] )
+    if ( Args.pWindow == m_pServerList [ ServerBrowserTypes::LAN ] )
     {
-        OnDoubleClick ( m_pServerList [ ServerBrowserType::LAN ] );
+        OnDoubleClick ( m_pServerList [ ServerBrowserTypes::LAN ] );
         return true;
     }
-    else if ( Args.pWindow == m_pServerList [ ServerBrowserType::FAVOURITES ] )
+    else if ( Args.pWindow == m_pServerList [ ServerBrowserTypes::FAVOURITES ] )
     {
-        OnDoubleClick ( m_pServerList [ ServerBrowserType::FAVOURITES ] );
+        OnDoubleClick ( m_pServerList [ ServerBrowserTypes::FAVOURITES ] );
         return true;
     }
-    else if ( Args.pWindow == m_pServerList [ ServerBrowserType::RECENTLY_PLAYED ] )
+    else if ( Args.pWindow == m_pServerList [ ServerBrowserTypes::RECENTLY_PLAYED ] )
     {
-        OnDoubleClick ( m_pServerList [ ServerBrowserType::RECENTLY_PLAYED ] );
+        OnDoubleClick ( m_pServerList [ ServerBrowserTypes::RECENTLY_PLAYED ] );
         return true;
     }
 
@@ -1303,9 +1303,9 @@ bool CServerBrowser::OnSearchDefocused ( CGUIElement* pElement )
     if ( strSearchText == "" )
     {
         m_pLabelSearchDescription [ Type ]->SetVisible ( true );
-        if ( m_uiCurrentSearchType == SearchType::SERVERS )
+        if ( m_uiCurrentSearchType == SearchTypes::SERVERS )
             m_pLabelSearchDescription [ Type ]->SetText("Search servers...");
-        else if ( m_uiCurrentSearchType == SearchType::PLAYERS )
+        else if ( m_uiCurrentSearchType == SearchTypes::PLAYERS )
             m_pLabelSearchDescription [ Type ]->SetText("Search players...");
     }
     return true;
