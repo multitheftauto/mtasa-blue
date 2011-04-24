@@ -19,7 +19,7 @@ class CLuaTimerManager;
 
 #include "LuaCommon.h"
 #include "CLuaTimer.h"
-#include < list >
+#include <list>
 
 class CLuaTimerManager
 {
