@@ -26,7 +26,7 @@ class CBikeSAInterface : public CVehicleSAInterface
 class CBikeSA : public virtual CBike, public virtual CVehicleSA
 {
 public:
-    CBikeSA::CBikeSA (  ){};
+    CBikeSA (  ){};
 
     CBikeSA( CBikeSAInterface * bike );
     CBikeSA( eVehicleTypes dwModelID );

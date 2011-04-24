@@ -21,7 +21,7 @@ public:
     short sRegion;
     short sIndex;
 
-    CNodeAddress::CNodeAddress()
+    CNodeAddress()
     {
         sRegion = -1;
     }
