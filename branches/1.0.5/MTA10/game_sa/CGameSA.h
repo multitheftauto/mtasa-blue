@@ -212,6 +212,8 @@ public:
 
     bool                    HasCreditScreenFadedOut         ( void );
 
+    void                    FlushPendingRestreamIPL         ( void );
+
 private:
     CPools                  * m_pPools;
     CPlayerInfo             * m_pPlayerInfo;

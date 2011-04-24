@@ -202,6 +202,47 @@ void SString_Tests ( void )
     // EndsWithI
     // BeginsWith
     // BeginsWithI
+
+    // Join
+    {
+        TEST_FUNCTION
+            std::vector < SString > parts;
+            source.Split ( ",", parts );
+            assert ( SString::Join ( delim, parts, first, count ) == result );
+        TEST_VARS
+            SString source;
+            SString delim;
+            int first;
+            int count;
+            SString result;
+        TEST_DATA
+            "",             "/",    0, 999, "",
+            "A",            "/",    0, 999, "A",
+            "A,B",          "/",    0, 999, "A/B",
+            "A,B,C,D,E",    "/",    0, 999, "A/B/C/D/E",
+            "A,B,C,D,E",    "/",   -5, 7,   "A/B",
+            "",             "/",    0, 0,   "",
+            "A",            "/",    0, 0,   "",
+            "A,B",          "/",    0, 0,   "",
+            "A,B,C,D,E",    "/",    0, 0,   "",
+            "",             "/",    0, 1,   "",
+            "A",            "/",    0, 1,   "A",
+            "A,B",          "/",    0, 1,   "A",
+            "A,B,C,D,E",    "/",    0, 1,   "A",
+            "",             "/",    0, 2,   "",
+            "A",            "/",    0, 2,   "A",
+            "A,B",          "/",    0, 2,   "A/B",
+            "A,B,C,D,E",    "/",    0, 2,   "A/B",
+            "",             "/",    1, 2,   "",
+            "A",            "/",    1, 2,   "",
+            "A,B",          "/",    1, 2,   "B",
+            "A,B,C,D,E",    "/",    1, 2,   "B/C",
+            "A,B,C,D,E",    "/",    1, 4,   "B/C/D/E",
+            "A,B,C,D,E",    "/",    1, 5,   "B/C/D/E",
+        TEST_END
+    }
+
+
 }
 
 
