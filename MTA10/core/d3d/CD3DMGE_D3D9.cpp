@@ -14,6 +14,7 @@
 
 #include "StdInc.h"
 #include "include/cd3dmge_d3d9.h"
+#include <stdexcept>
 
 inline D3DSPRITEVERTEX2D InitFont2DVertex( float x, float y, float z, float rhw, DWORD dwColor, float tu, float tv )
 {
@@ -79,7 +80,7 @@ void CD3DMGEng::OnInvalidateDevice ( void )
     {
         if ( FAILED ( m_pVB->Release () ) )
         {
-            throw std::exception("CD3DMGEng::OnInvalidateDevice - Failed to release the VertexBuffer.");
+            throw std::runtime_error("CD3DMGEng::OnInvalidateDevice - Failed to release the VertexBuffer.");
         }
         m_pVB = NULL;
     }
@@ -88,7 +89,7 @@ void CD3DMGEng::OnInvalidateDevice ( void )
     {
         if ( FAILED ( m_pLastFont->Release () ) )   //release font
         {
-            throw std::exception("CD3DMGEng::OnInvalidateDevice - Failed to release the Font.");
+            throw std::runtime_error("CD3DMGEng::OnInvalidateDevice - Failed to release the Font.");
         }
         m_pLastFont = NULL;
     }

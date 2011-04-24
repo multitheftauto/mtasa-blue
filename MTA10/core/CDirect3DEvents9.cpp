@@ -16,6 +16,8 @@
 #define DECLARE_PROFILER_SECTION_CDirect3DEvents9
 #include "profiler/SharedUtil.Profiler.h"
 
+#include <stdexcept>
+
 // Variables used for screen shot saving
 static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;
 static int                 ms_bSaveStarted      = 0;
@@ -190,7 +192,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
         if ( pSurface )
         {
             if ( FAILED ( pSurface->Release () ) )
-                std::exception ( "Failed to release the ScreenShot rendertaget surface" );
+                std::runtime_error ( "Failed to release the ScreenShot rendertaget surface" );
             pSurface = NULL;
         }
     }
