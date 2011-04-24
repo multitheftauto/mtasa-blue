@@ -386,7 +386,7 @@ void DisconnectConnectionDesync ( CGame* pGame, CPlayer& Player, unsigned int ui
 {
     // Populate a disconnection message
     char szBuffer [128];
-    _snprintf ( szBuffer, sizeof ( szBuffer ), "Disconnected: Connection desync (%u)", uiCode );
+    snprintf ( szBuffer, sizeof ( szBuffer ), "Disconnected: Connection desync (%u)", uiCode );
     szBuffer [127] = 0;
 
     // Send it to the disconnected player

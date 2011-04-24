@@ -90,7 +90,7 @@ CRemoteCall::CRemoteCall ( char * szServerHost, char * szResourceName, char * sz
 
     arguments->WriteToJSONString ( m_strData, true );
    
-    _snprintf ( m_szURL, 511, "http://%s/%s/call/%s", m_szServerHost, m_szResourceName, m_szFunctionName );
+    snprintf ( m_szURL, 511, "http://%s/%s/call/%s", m_szServerHost, m_szResourceName, m_szFunctionName );
     m_szURL[511] = '\0';
 
     MakeCall();

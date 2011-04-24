@@ -249,7 +249,7 @@ CGame::~CGame ( void )
 void CGame::GetTag ( char *szInfoTag, int iInfoTag )
 {
     // Construct the info tag
-    _snprintf ( szInfoTag, iInfoTag, "%c[%c%c%c] MTA: San Andreas %c:%c: %d/%d players %c:%c: %u resources %c:%c: %u fps",
+    snprintf ( szInfoTag, iInfoTag, "%c[%c%c%c] MTA: San Andreas %c:%c: %d/%d players %c:%c: %u resources %c:%c: %u fps",
                132, 135, szProgress[ucProgress], 132,
                130, 130, m_pPlayerManager->Count (), m_pMainConfig->GetMaxPlayers (),
                130, 130, m_pResourceManager->GetResourceLoadedCount (),

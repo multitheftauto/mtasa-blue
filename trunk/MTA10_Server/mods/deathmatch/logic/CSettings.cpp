@@ -292,14 +292,14 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
             if ( !HasResourceName ( szSetting ) ) {
                 // If we have a prefix, move it from szSetting and put it at the beginning
                 if ( bPrefix )
-                    _snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%c%s.%s", szSetting[0], szLocalResource, szSetting + 1 );
+                    snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%c%s.%s", szSetting[0], szLocalResource, szSetting + 1 );
                 else
-                    _snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%s.%s", szLocalResource, szSetting );
+                    snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%s.%s", szLocalResource, szSetting );
 
             } else {
                 // If we have a prefix, move it from szSetting and put it at the beginning
                 if ( bPrefix )
-                    _snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%c%s", szSetting[0], szSetting + 1 );
+                    snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%c%s", szSetting[0], szSetting + 1 );
                 else
                     strncpy ( szBuffer, szSetting, MAX_SETTINGS_LENGTH - 1 );
             }

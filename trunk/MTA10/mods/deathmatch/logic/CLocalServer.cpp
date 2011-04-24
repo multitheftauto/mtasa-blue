@@ -14,10 +14,6 @@
 
 using std::list;
 
-#ifndef snprintf
-#define snprintf _snprintf
-#endif
-
 extern CCoreInterface* g_pCore;
 extern CClientGame* g_pClientGame;
 

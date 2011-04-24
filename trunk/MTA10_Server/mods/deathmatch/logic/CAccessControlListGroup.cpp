@@ -17,7 +17,7 @@
 CAccessControlListGroup::CAccessControlListGroup ( const char* szGroupName )
 : m_ObjectsById ( 512 )
 {
-    _snprintf ( m_szGroupName, 256, "%s", szGroupName );
+    snprintf ( m_szGroupName, 256, "%s", szGroupName );
     m_szGroupName[255] = '\0';
 
     m_ObjectsById.set_empty_key ( (unsigned int)0xFB170551 );

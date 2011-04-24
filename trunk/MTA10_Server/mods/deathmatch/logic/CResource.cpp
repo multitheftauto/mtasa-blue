@@ -135,11 +135,11 @@ bool CResource::Load ( void )
         const char* szServerModPath = g_pServerInterface->GetServerModPath ();
 
         char szBuffer[MAX_PATH];
-        _snprintf ( szBuffer, MAX_PATH - 1, "%s/resources/%s/", szServerModPath, m_strResourceName.c_str () );
+        snprintf ( szBuffer, MAX_PATH - 1, "%s/resources/%s/", szServerModPath, m_strResourceName.c_str () );
         m_strResourceDirectoryPath = szBuffer;
-        _snprintf ( szBuffer, MAX_PATH - 1, "%s/resource-cache/unzipped/%s/", szServerModPath, m_strResourceName.c_str () );
+        snprintf ( szBuffer, MAX_PATH - 1, "%s/resource-cache/unzipped/%s/", szServerModPath, m_strResourceName.c_str () );
         m_strResourceCachePath = szBuffer;
-        _snprintf ( szBuffer, MAX_PATH - 1, "%s/resources/%s.zip", szServerModPath, m_strResourceName.c_str () );
+        snprintf ( szBuffer, MAX_PATH - 1, "%s/resources/%s.zip", szServerModPath, m_strResourceName.c_str () );
         m_strResourceZip = szBuffer;
 
         // Check for our resource directory
@@ -157,7 +157,7 @@ bool CResource::Load ( void )
                 g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
                 // Show error
-                _snprintf ( szBuffer, MAX_PATH - 1, "Couldn't find resource archive or directory (%s) for resource '%s'.\n", m_strResourceDirectoryPath.c_str (), m_strResourceName.c_str () );
+                snprintf ( szBuffer, MAX_PATH - 1, "Couldn't find resource archive or directory (%s) for resource '%s'.\n", m_strResourceDirectoryPath.c_str (), m_strResourceName.c_str () );
                 m_strFailureReason = szBuffer;
                 CLogger::ErrorPrintf ( szBuffer );
                 return false;
@@ -183,7 +183,7 @@ bool CResource::Load ( void )
                     g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
                     // Show error
-                    _snprintf ( szBuffer, MAX_PATH - 1, "Couldn't create directory '%s' for resource '%s', check that the server has write access to the resources folder.\n", m_strResourceCachePath.c_str (), m_strResourceName.c_str () );
+                    snprintf ( szBuffer, MAX_PATH - 1, "Couldn't create directory '%s' for resource '%s', check that the server has write access to the resources folder.\n", m_strResourceCachePath.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
                     CLogger::ErrorPrintf ( szBuffer );
                     return false;
@@ -199,7 +199,7 @@ bool CResource::Load ( void )
             g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
             // Show error
-            _snprintf ( szBuffer, MAX_PATH - 1, "Couldn't find meta.xml file for resource '%s'\n", m_strResourceName.c_str () );
+            snprintf ( szBuffer, MAX_PATH - 1, "Couldn't find meta.xml file for resource '%s'\n", m_strResourceName.c_str () );
             m_strFailureReason = szBuffer;
             CLogger::ErrorPrintf ( szBuffer );
             return false;
@@ -310,7 +310,7 @@ bool CResource::Load ( void )
         else
         {
             char szBuffer[255] = {0};
-            _snprintf ( szBuffer, 254, "Couldn't parse meta file for resource '%s'\n", m_strResourceName.c_str () );
+            snprintf ( szBuffer, 254, "Couldn't parse meta file for resource '%s'\n", m_strResourceName.c_str () );
             m_strFailureReason = szBuffer;
             CLogger::ErrorPrintf ( szBuffer );
 
@@ -697,7 +697,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
                     // Log it
                     char szBuffer[255] = {0};
                     CLogger::LogPrintf ( "Failed to start resource item %s in %s\n", (*iterf)->GetName(), m_strResourceName.c_str () );
-                    _snprintf ( szBuffer, 254, "Failed to start resource item %s which is required\n", (*iterf)->GetName() );
+                    snprintf ( szBuffer, 254, "Failed to start resource item %s which is required\n", (*iterf)->GetName() );
                     m_strFailureReason = szBuffer;
 
                     // Stop all the resource items without any warnings
@@ -797,7 +797,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
             // We're no longer active. stop the resource
             char szBuffer[255] = {0};
             CLogger::LogPrintf ( "Start up of resource %s cancelled by script\n", m_strResourceName.c_str () );
-            _snprintf ( szBuffer, 254, "Start up of resource cancelled by script\n" );
+            snprintf ( szBuffer, 254, "Start up of resource cancelled by script\n" );
             m_strFailureReason = szBuffer;
             Stop ( true );
             m_bActive = false;
@@ -1065,10 +1065,10 @@ void CResource::DisplayInfo ( void ) // duplicated for HTML
 
 char * CResource::DisplayInfoHTML ( char * info, size_t length )
 {
-    #define LAZYNESS counter += _snprintf ( info + counter, length - counter,
+    #define LAZYNESS counter += snprintf ( info + counter, length - counter,
 
     size_t counter = 0;
-    counter = _snprintf ( info, length, "<font face='tahoma,arial' size=-1><h2>Details for resource '%s'</h2><br>\n", m_strResourceName.c_str () );
+    counter = snprintf ( info, length, "<font face='tahoma,arial' size=-1><h2>Details for resource '%s'</h2><br>\n", m_strResourceName.c_str () );
     if ( m_bActive )
     {
         // count the number of elements
@@ -1393,7 +1393,7 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                 else
                 {
                     char szBuffer[512];
-                    _snprintf ( szBuffer, 511, "Couldn't find html %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    snprintf ( szBuffer, 511, "Couldn't find html %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
                     CLogger::ErrorPrintf ( "Couldn't find html %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     return false;
@@ -1459,7 +1459,7 @@ bool CResource::ReadIncludedConfigs ( CXMLNode * root )
                 else
                 {
                     char szBuffer[512];
-                    _snprintf ( szBuffer, 511, "Couldn't find config %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    snprintf ( szBuffer, 511, "Couldn't find config %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
                     CLogger::ErrorPrintf ( "Couldn't find config %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     return false;
@@ -1502,7 +1502,7 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
                 else
                 {
                     char szBuffer[512];
-                    _snprintf ( szBuffer, 511, "Couldn't find file %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    snprintf ( szBuffer, 511, "Couldn't find file %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
                     CLogger::ErrorPrintf ( "Couldn't find file %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     return false;
@@ -1597,7 +1597,7 @@ bool CResource::ReadIncludedExports ( CXMLNode * root )
                    /* if ( bHTTP && ucType == CExportedFunction::EXPORTED_FUNCTION_TYPE_SERVER )
                     {
                         char szExportCall[512];
-                        __snprintf ( szExportCall, 511, "call/%s", szFunction );
+                        snprintf ( szExportCall, 511, "call/%s", szFunction );
                         szExportCall[511] = '\0';
                         this->RegisterEHS ( this, szExportCall );
                     }*/
@@ -1667,7 +1667,7 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                 else
                 {
                     char szBuffer[512];
-                    _snprintf ( szBuffer, 511, "Couldn't find script %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    snprintf ( szBuffer, 511, "Couldn't find script %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
                     CLogger::ErrorPrintf ( "Couldn't find script %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     return false;
@@ -1720,7 +1720,7 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
                 else
                 {
                     char szBuffer[512];
-                    _snprintf ( szBuffer, 511, "Couldn't find map %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
+                    snprintf ( szBuffer, 511, "Couldn't find map %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     m_strFailureReason = szBuffer;
                     CLogger::ErrorPrintf ( "Couldn't find map %s for resource %s\n", strFilename.c_str (), m_strResourceName.c_str () );
                     return false;
@@ -1782,7 +1782,7 @@ bool CResource::AddMapFile ( const char* szName, const char* szFullFilename, int
     {
         // Find the meta file path
         char szMetaPath [MAX_PATH + 1];
-        _snprintf ( szMetaPath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str (), "meta.xml" );
+        snprintf ( szMetaPath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str (), "meta.xml" );
 
         // Load the meta file
         CXMLFile* metaFile = g_pServerInterface->GetXML ()->CreateXML ( szMetaPath );
@@ -1830,7 +1830,7 @@ bool CResource::AddConfigFile ( const char* szName, const char* szFullFilepath, 
     {
         // Find the meta file path
         char szMetaPath [MAX_PATH + 1];
-        _snprintf (szMetaPath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str (), "meta.xml" );
+        snprintf (szMetaPath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str (), "meta.xml" );
 
         // Load the meta file
         CXMLFile* metaFile = g_pServerInterface->GetXML ()->CreateXML ( szMetaPath );
@@ -1905,7 +1905,7 @@ bool CResource::RemoveFile ( const char* szName )
     {
         // Find the meta file path
         char szMetaPath [MAX_PATH + 1];
-        _snprintf ( szMetaPath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str (), "meta.xml" );
+        snprintf ( szMetaPath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str (), "meta.xml" );
 
         // Load the meta file
         CXMLFile* metaFile = g_pServerInterface->GetXML ()->CreateXML ( szMetaPath );
@@ -1977,7 +1977,7 @@ bool CResource::RemoveFile ( const char* szName )
 
                     // Delete the file
                     char szFullFilepath [MAX_PATH + 1];
-                    _snprintf ( szFullFilepath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str (), szName );
+                    snprintf ( szFullFilepath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str (), szName );
                     if ( unlink ( szFullFilepath ) != 0 )
                         CLogger::LogPrintf ( "WARNING: Problems deleting the actual file, but was removed from resource" );
 
@@ -2155,15 +2155,15 @@ bool CResource::CheckIfStartable ( void )
             if ( resc )
             {
                 strcpy ( szOldString, szTrail );
-                _snprintf ( szTrail, 510, "-> %s %s", resc->GetName ().c_str (), szOldString );
+                snprintf ( szTrail, 510, "-> %s %s", resc->GetName ().c_str (), szOldString );
             }
         }
 
         // Remember why we failed and return false
         char szBuffer[512] = {0};
-        _snprintf ( szBuffer, 511, "%s %s", m_strResourceName.c_str (), szTrail );
+        snprintf ( szBuffer, 511, "%s %s", m_strResourceName.c_str (), szTrail );
         m_strCircularInclude = szBuffer;
-        _snprintf ( szBuffer, 511, "Circular include error: %s", m_strCircularInclude.c_str () );
+        snprintf ( szBuffer, 511, "Circular include error: %s", m_strCircularInclude.c_str () );
         m_strFailureReason = szBuffer;
         //CLogger::LogPrintf ( "%s\n", m_szCircularInclude );
         m_bLoaded = false;
@@ -2865,7 +2865,7 @@ bool CResource::CallExportedFunction ( char * szFunctionName, CLuaArguments& arg
             if ( strcmp ( (*iter)->GetFunctionName ().c_str (), szFunctionName ) == 0 )
             {
                 char szFunctionRightName[512];
-                _snprintf ( szFunctionRightName, 512, "%s.function.%s", m_strResourceName.c_str (), szFunctionName );
+                snprintf ( szFunctionRightName, 512, "%s.function.%s", m_strResourceName.c_str (), szFunctionName );
                 CAccessControlListManager * pACLManager = g_pGame->GetACLManager();
                 if ( pACLManager->CanObjectUseRight ( caller.GetName().c_str (),
                                                       CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
@@ -3087,11 +3087,11 @@ int do_extract_currentfile(unzFile uf,const int* popt_extract_without_path,int*p
         if ( szFilePath [ lenFilePath - 1 ] == '\\' ||
              szFilePath [ lenFilePath - 1 ] == '/' )
         {
-            _snprintf ( szOutFile, MAX_PATH, "%s%s", szFilePath, write_filename );
+            snprintf ( szOutFile, MAX_PATH, "%s%s", szFilePath, write_filename );
         }
         else
         {
-            _snprintf ( szOutFile, MAX_PATH, "%s/%s", szFilePath, write_filename );
+            snprintf ( szOutFile, MAX_PATH, "%s/%s", szFilePath, write_filename );
         }
 
         if ((skip==0) && (err==UNZ_OK))

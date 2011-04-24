@@ -9659,7 +9659,7 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
 
     char szDelimiter [32];
     szDelimiter [31] = 0;
-    _snprintf ( szDelimiter, 31, "%c", iDelimiter );
+    snprintf ( szDelimiter, 31, "%c", iDelimiter );
 
     unsigned int uiCount = 0;
     char* szToken = strtok ( strText, szDelimiter );
@@ -9710,7 +9710,7 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
 
         char szDelimiter [32];
         szDelimiter [31] = 0;
-        _snprintf ( szDelimiter, 31, "%c", iDelimiter );
+        snprintf ( szDelimiter, 31, "%c", iDelimiter );
 
         int iCount = 1;
         char* szToken = strtok ( strText, szDelimiter );

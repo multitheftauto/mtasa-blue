@@ -8119,7 +8119,7 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
             char szMessage [128];
             szMessage[0] = '\0';
 
-            _snprintf ( szMessage, 128, "You were logged out of your account due to it being deleted" );
+            snprintf ( szMessage, 128, "You were logged out of your account due to it being deleted" );
             szMessage[127] = '\0';
 
             pClient->SendEcho ( szMessage );
@@ -8527,7 +8527,7 @@ bool CStaticFunctionDefinitions::GetBanIP ( CBan* pBan, char* szIP, size_t size 
 {
     if ( !pBan->GetIP ().empty () )
     {
-        _snprintf ( szIP, size, pBan->GetIP ().c_str() );
+        snprintf ( szIP, size, pBan->GetIP ().c_str() );
         return true;
     }
     return false;
@@ -8538,7 +8538,7 @@ bool CStaticFunctionDefinitions::GetBanSerial ( CBan* pBan, char* szSerial, size
 {
     if ( !pBan->GetSerial ().empty () )
     {
-        _snprintf ( szSerial, size, pBan->GetSerial ().c_str() );
+        snprintf ( szSerial, size, pBan->GetSerial ().c_str() );
         return true;
     }
     return false;
@@ -8549,7 +8549,7 @@ bool CStaticFunctionDefinitions::GetBanUsername ( CBan* pBan, char* szUsername, 
 {
     if ( !pBan->GetAccount ().empty () )
     {
-        _snprintf ( szUsername, size, pBan->GetAccount ().c_str() );
+        snprintf ( szUsername, size, pBan->GetAccount ().c_str() );
         return true;
     }
     return false;
@@ -8560,7 +8560,7 @@ bool CStaticFunctionDefinitions::GetBanNick ( CBan* pBan, char* szNick, size_t s
 {
     if ( !pBan->GetNick ().empty () )
     {
-        _snprintf ( szNick, size, pBan->GetNick ().c_str() );
+        snprintf ( szNick, size, pBan->GetNick ().c_str() );
         return true;
     }
     return false;
@@ -8585,7 +8585,7 @@ bool CStaticFunctionDefinitions::GetBanReason ( CBan* pBan, char* szReason, size
 {
     if ( !pBan->GetReason ().empty () )
     {
-        _snprintf ( szReason, size, pBan->GetReason ().c_str() );
+        snprintf ( szReason, size, pBan->GetReason ().c_str() );
         return true;
     }
     return false;
@@ -8596,7 +8596,7 @@ bool CStaticFunctionDefinitions::GetBanAdmin ( CBan* pBan, char* szAdmin, size_t
 {
     if ( !pBan->GetBanner ().empty () )
     {
-        _snprintf ( szAdmin, size, pBan->GetBanner ().c_str() );
+        snprintf ( szAdmin, size, pBan->GetBanner ().c_str() );
         return true;
     }
     return false;

@@ -257,7 +257,7 @@ bool CRegistry::Query ( const std::string& strQuery, CLuaArguments *pArgs, CRegi
                 if ( type == LUA_TBOOLEAN ) {
                     szContent = ( pArgument->GetBoolean() ) ? "true" : "false";
                 } else if ( type == LUA_TNUMBER ) {
-                    _snprintf ( szBuffer, 31, "%f", pArgument->GetNumber () );
+                    snprintf ( szBuffer, 31, "%f", pArgument->GetNumber () );
                     szContent = szBuffer;
                 } else if ( type == LUA_TSTRING ) {
                     szContent = pArgument->GetString ().c_str ();

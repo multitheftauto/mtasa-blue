@@ -111,7 +111,7 @@ void CLogger::ErrorPrintf ( const char* szFormat, ... )
     // Convert it to a string
     va_list marker;
     va_start ( marker, szFormat );
-    _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
+    VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
     va_end ( marker );
 
     // Print it to the console

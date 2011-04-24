@@ -36,9 +36,9 @@ static RwObject* ReplacePartsCB ( RwObject * object, SReplaceParts * data )
     for ( unsigned int i = 0; i < data->uiReplacements; i++ ) {
         // get the correct atomic name based on the object # in our parent frame
         if ( data->ucIndex == 0 )
-            _snprintf ( &szAtomicName[0], 16, "%s_ok", data->szName );
+            snprintf ( &szAtomicName[0], 16, "%s_ok", data->szName );
         else
-            _snprintf ( &szAtomicName[0], 16, "%s_dam", data->szName );
+            snprintf ( &szAtomicName[0], 16, "%s_dam", data->szName );
 
         // see if we have such an atomic in our replacement atomics array
         if ( strncmp ( &data->pReplacements[i].szName[0], &szAtomicName[0], 16 ) == 0 ) {
@@ -783,7 +783,7 @@ bool CRenderWareSA::ReplacePartModels ( RpClump * pClump, RpAtomicContainer * pA
 {
     // get the part's dummy name
     char szDummyName[16] = {0};
-    _snprintf ( &szDummyName[0], 16, "%s_dummy", szName );
+    snprintf ( &szDummyName[0], 16, "%s_dummy", szName );
 
     // get the clump's frame
     RwFrame * pFrame = RpGetFrame ( pClump );
