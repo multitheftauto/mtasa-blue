@@ -21,8 +21,6 @@ class CRPCFunctions;
 
 class CRPCFunctions
 {
-protected:
-    enum eRPCFunctions;
 private:
 
     typedef void (*pfnRPCHandler) ( class NetBitStreamInterface& bitStream );

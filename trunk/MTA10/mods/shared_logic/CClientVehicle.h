@@ -19,8 +19,6 @@
 *
 *****************************************************************************/
 
-enum eClientVehicleUpgrade;
-enum eClientVehicleType;
 struct CClientVehicleProperties;
 class CClientVehicle;
 

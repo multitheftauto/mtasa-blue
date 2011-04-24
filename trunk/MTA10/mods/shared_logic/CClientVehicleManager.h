@@ -17,11 +17,11 @@
 #define __CCLIENTVEHICLEMANAGER_H
 
 #include "CClientCommon.h"
+#include "CClientVehicle.h"
 #include <list>
 
 class CClientManager;
 class CClientVehicle;
-enum eClientVehicleType;
 
 extern unsigned char g_ucMaxPassengers [];
 
