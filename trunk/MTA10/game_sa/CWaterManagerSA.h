@@ -85,15 +85,15 @@ public:
     public:
                                      iterator          ();
                                      iterator          ( CWaterZoneSA* pZone );
-                                     iterator          ( iterator& other );
-        iterator&                    operator=         ( iterator& other );
+                                     iterator          ( const iterator& other );
+        iterator&                    operator=         ( const iterator& other );
         void                         operator++        ();
         void                         operator--        ();
         iterator                     operator+         ( int n );
         iterator                     operator-         ( int n );
         int                          operator-         ( iterator& other );
-        bool                         operator==        ( iterator& other );
-        bool                         operator!=        ( iterator& other );
+        bool                         operator==        ( const iterator& other );
+        bool                         operator!=        ( const iterator& other );
         CWaterPolySA*                operator*         ();
                                      operator CWaterPolyEntrySAInterface* ();
         

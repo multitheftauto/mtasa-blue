@@ -124,7 +124,7 @@ void CGUIElement_Impl::GetPosition ( CVector2D& vecPosition, bool bRelative )
     if ( bRelative )
         type = CEGUI::Relative;
 
-    CEGUI::Point& Temp = m_pWindow->getPosition ( type );
+    CEGUI::Point Temp = m_pWindow->getPosition ( type );
 
     vecPosition.fX = Temp.d_x;
     vecPosition.fY = Temp.d_y;

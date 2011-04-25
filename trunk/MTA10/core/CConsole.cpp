@@ -73,7 +73,7 @@ void CConsole::Echo ( const char* szText )
     float fMaxScroll = m_pHistory->GetScrollbarDocumentSize () - m_pHistory->GetScrollbarPageSize ();
 
     // Grab the previous text and append this text
-    std::string& strBuffer = m_pHistory->GetText ();
+    std::string strBuffer = m_pHistory->GetText ();
     strBuffer += szText;
 
     // Is it too long? Shrink it

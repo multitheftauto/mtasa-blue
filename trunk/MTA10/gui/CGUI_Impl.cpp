@@ -870,12 +870,14 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             if ( Wnd->getType ( ) == "CGUI/Editbox" )
                             {
                                 CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );  
-                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                                CEGUI::WindowEventArgs args( WndEdit );
+                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , args );
                             }
                             else
                             {
                                 CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );  
-                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                                CEGUI::WindowEventArgs args( WndEdit );
+                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , args );
                             }
                         }
                         else
