@@ -445,7 +445,7 @@ void HideSplash ( bool bOnlyDelay  )
 long DisplayErrorMessageBox ( const SString& strMessage, const SString& strTroubleType )
 {
     HideSplash ();
-    MessageBox( 0, strMessage, "Error!", MB_ICONEXCLAMATION|MB_OK );
+    MessageBox( 0, strMessage, "Error! (CTRL+C to copy)", MB_ICONEXCLAMATION|MB_OK );
 
     if ( strTroubleType != "" )
         BrowseToSolution ( strTroubleType, true );

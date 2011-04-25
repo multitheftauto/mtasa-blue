@@ -369,7 +369,7 @@ void SharedUtil::BrowseToSolution ( const SString& strType, bool bAskQuestion, b
 
     // Put args into a string and save in the registry
     CArgMap argMap;
-    argMap.Set ( "type", strType );
+    argMap.Set ( "type", strType.SplitLeft ( ";" ) );
     argMap.Set ( "bAskQuestion", bAskQuestion );
     argMap.Set ( "message", strMessageBoxMessage );
     SetApplicationSetting ( "pending-browse-to-solution", argMap.ToString () );
@@ -485,6 +485,39 @@ SString SharedUtil::GetReportLogContents ( void )
     buffer.push_back ( 0 );
     return &buffer[0];
 }
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// SharedUtil::GetSystemErrorMessage
+//
+// Get Windows error message text from a last error code.
+//
+///////////////////////////////////////////////////////////////////////////
+SString SharedUtil::GetSystemErrorMessage ( uint uiError, bool bRemoveNewlines, bool bPrependCode )
+{
+    SString strResult;
+
+    LPSTR szErrorText = NULL;
+    FormatMessageA ( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
+                    NULL, uiError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&szErrorText, 0, NULL );
+
+    if ( szErrorText )
+    {
+        strResult = szErrorText;
+        LocalFree ( szErrorText );
+        szErrorText = NULL;
+    }
+
+    if ( bRemoveNewlines )
+        strResult = strResult.Replace ( "\n", "" ).Replace ( "\r", "" );
+
+    if ( bPrependCode )
+        strResult = SString ( "Error %u: %s", uiError, *strResult );
+
+    return strResult;
+}
+
 #endif
 
 
