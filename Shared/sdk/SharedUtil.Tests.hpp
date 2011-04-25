@@ -267,7 +267,7 @@ void SharedUtil_File_Tests ( void )
             const char* b;
             const char* result;
         TEST_DATA
-            "///\\\\\\/\\/\\/\\/blah/\\/\\/\\", "////\\\\/////\\/fleeb///\\\\///\\/\\",    "\\blah\\fleeb\\",
+            "///\\\\\\/\\/\\/\\/blah/\\/\\/\\", "////\\\\/////\\/fleeb///\\\\///\\/\\",    "\\\\blah\\fleeb\\",
             "blah/\\/\\/\\",                    "////\\\\/////\\/fleeb",                   "blah\\fleeb",
             "blah",                             "fleeb",                                    "blah\\fleeb",
         TEST_END
@@ -286,6 +286,26 @@ void SharedUtil_File_Tests ( void )
             "/blah/",   "/\\fl\\eeb/",  "//fleeeb/",    "\\blah\\fl\\eeb\\fleeeb\\",
             "blah/",    "/fl//eeb",     "\\fleeeb",     "blah\\fl\\eeb\\fleeeb",
             "blah",     "fleeb",        "fleeb",        "blah\\fleeb\\fleeb",
+        TEST_END
+    }
+
+    // UNC type tests
+    {
+        TEST_FUNCTION
+            assert ( PathJoin ( a, b ) == result );
+        TEST_VARS
+            const char* a;
+            const char* b;
+            const char* result;
+        TEST_DATA
+            "//blah/",          "//fleeeb/",    "\\\\blah\\fleeeb\\",
+            "//?/blah/",        "//fleeeb/",    "\\\\?\\blah\\fleeeb\\",
+            "//?/C:\blah/",     "//fleeeb/",    "\\\\?\\C:\blah\\fleeeb\\",
+            "///?/C:\blah/",    "//fleeeb/",    "\\\\?\\C:\blah\\fleeeb\\",
+            "file://blah/",     "//fleeeb/",    "file:\\\\blah\\fleeeb\\",
+            "file:///blah\\/",  "//fleeeb/",    "file:\\\\blah\\fleeeb\\",
+            "fil:e///blah\\/",  "//fleeeb/",    "fil:e\\blah\\fleeeb\\",
+            "fi/le:///blah\\/",  "//fleeeb/",    "fi\\le:\\blah\\fleeeb\\",
         TEST_END
     }
 

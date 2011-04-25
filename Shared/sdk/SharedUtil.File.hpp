@@ -223,12 +223,30 @@ void SharedUtil::MakeSureDirExists ( const SString& strPath )
 
 SString SharedUtil::PathConform ( const SString& strPath )
 {
-    // Make slashes the right way and remove duplicates
+    // Make slashes the right way and remove duplicates, except for UNC type indicators
 #if WIN32
-    return strPath.Replace ( "/", PATH_SEPERATOR ).Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
+    SString strTemp = strPath.Replace ( "/", PATH_SEPERATOR );
 #else
-    return strPath.Replace ( "\\", PATH_SEPERATOR ).Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
+    SString strTemp = strPath.Replace ( "\\", PATH_SEPERATOR );
 #endif
+    // Remove slash duplicates
+    size_t iFirstDoubleSlash = strTemp.find ( PATH_SEPERATOR PATH_SEPERATOR );
+    if ( iFirstDoubleSlash == std::string::npos )
+        return strTemp;     // No duplicates present
+
+    // If first double slash is not at the start, then treat as a normal duplicate if:
+    //      1. It is not preceeded by a colon, or
+    //      2. Another single slash is before it
+    if ( iFirstDoubleSlash > 0 )
+    {
+        if ( strTemp.SubStr ( iFirstDoubleSlash - 1, 1 ) != ":" || strTemp.find ( PATH_SEPERATOR ) < iFirstDoubleSlash  )
+        {
+            // Replace all duplicate slashes
+            return strTemp.Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
+        }
+    }
+
+    return strTemp.Left ( iFirstDoubleSlash + 1 ) + strTemp.SubStr ( iFirstDoubleSlash + 1 ).Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
 }
 
 SString SharedUtil::PathJoin ( const SString& str1, const SString& str2 )
