@@ -31,6 +31,7 @@ void CLuaFileDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fileFlush", CLuaFileDefs::fileFlush );
     CLuaCFunctions::AddFunction ( "fileClose", CLuaFileDefs::fileClose );
     CLuaCFunctions::AddFunction ( "fileDelete", CLuaFileDefs::fileDelete );
+    CLuaCFunctions::AddFunction ( "fileRename", CLuaFileDefs::fileRename );
 }
 
 
@@ -529,6 +530,68 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
             m_pScriptDebugging->LogBadType ( luaVM, "fileDelete" );
     }
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFileDefs::fileRename ( lua_State* luaVM )
+{
+    // Grab our lua VM
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        // Check arguments types
+        if ( argtype ( 1, LUA_TSTRING ) && argtype ( 2, LUA_TSTRING ) )
+        {
+            // Grab the filenames
+            std::string strCurFile = lua_tostring ( luaVM, 1 );
+            std::string strNewFile = lua_tostring ( luaVM, 2 );
+            std::string strCurAbsPath;
+            std::string strNewAbsPath;
+
+            // We have a resource arguments?
+            CResource* pThisResource = pLuaMain->GetResource ();
+            CResource* pCurResource = pThisResource;
+            CResource* pNewResource = pThisResource;
+            if ( CResourceManager::ParseResourcePathInput ( strCurFile, pCurResource, strCurAbsPath ) &&
+                 CResourceManager::ParseResourcePathInput ( strNewFile, pNewResource, strNewAbsPath ) )
+            {
+                 // Does source file exist?
+                if ( FileExists ( strCurAbsPath.c_str() ) )
+                {
+                    // Does destination file exist?
+                    if ( FileExists ( strNewAbsPath.c_str() ) )
+                    {
+                        m_pScriptDebugging->LogWarning ( luaVM, "fileRename failed; destination file already exists" );
+                    }
+                    else
+                    {
+                        // Make sure the destination folder exist so we can move the file
+                        MakeSureDirExists ( strNewAbsPath.c_str () );
+
+                        if ( FileRename ( strCurAbsPath.c_str (), strNewAbsPath.c_str () ) )
+                        {
+                            // If file renamed/moved return success
+                            lua_pushboolean ( luaVM, true );
+                            return 1;
+                        }
+                        else
+                        {
+                            m_pScriptDebugging->LogWarning ( luaVM, "fileRename; unable to rename/move file" );
+                        }
+                    }
+                }
+                else
+                {
+                    m_pScriptDebugging->LogWarning ( luaVM, "fileRename failed; source file doesn't exist" );
+                }
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "fileRename" );
+    }
+
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
