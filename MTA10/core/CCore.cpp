@@ -351,7 +351,8 @@ void CCore::ChatEcho ( const char* szText, bool bColorCoded )
     CChat* pChat = m_pLocalGUI->GetChat ();
     if ( pChat )
     {
-        pChat->SetTextColor ( CColor ( 255, 255, 255, 255 ) );
+        CColor color ( 255, 255, 255, 255 );
+        pChat->SetTextColor ( color );
     }
 
     // Echo it to the console and chat
@@ -372,7 +373,8 @@ void CCore::DebugEcho ( const char* szText )
     CDebugView * pDebugView = m_pLocalGUI->GetDebugView ();
     if ( pDebugView )
     {
-        pDebugView->SetTextColor ( CColor ( 255, 255, 255, 255 ) );
+        CColor color ( 255, 255, 255, 255 );
+        pDebugView->SetTextColor ( color );
     }
 
     m_pLocalGUI->EchoDebug ( szText );
@@ -414,7 +416,8 @@ void CCore::DebugEchoColor ( const char* szText, unsigned char R, unsigned char 
     CDebugView * pDebugView = m_pLocalGUI->GetDebugView ();
     if ( pDebugView )
     {
-        pDebugView->SetTextColor ( CColor ( R, G, B, 255 ) );
+        CColor color ( R, G, B, 255 );
+        pDebugView->SetTextColor ( color );
     }
 
     m_pLocalGUI->EchoDebug ( szText );
@@ -455,7 +458,8 @@ void CCore::ChatEchoColor ( const char* szText, unsigned char R, unsigned char G
     CChat* pChat = m_pLocalGUI->GetChat ();
     if ( pChat )
     {
-        pChat->SetTextColor ( CColor ( R, G, B, 255 ) );
+        CColor color ( R, G, B, 255 );
+        pChat->SetTextColor ( color );
     }
 
     // Echo it to the console and chat

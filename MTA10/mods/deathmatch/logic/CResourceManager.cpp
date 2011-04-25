@@ -122,6 +122,12 @@ void CResourceManager::StopAll ( void )
     }
 }
 
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath )
+{
+	std::string dummy;
+	return ParseResourcePathInput ( strInput, pResource, strPath, dummy );
+}
+
 // pResource may be changed on return, and it could be NULL if the function returns false.
 bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath )
 {

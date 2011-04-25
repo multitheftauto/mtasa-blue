@@ -593,7 +593,7 @@ void CChat::UpdateGUI ( void )
 }
 
 
-void CChat::SetColor ( CColor& Color )
+void CChat::SetColor ( const CColor& Color )
 {
     unsigned long ulBackgroundColor = COLOR_ARGB ( Color.A, Color.R, Color.G, Color.B );
 
@@ -602,7 +602,7 @@ void CChat::SetColor ( CColor& Color )
 }
 
 
-void CChat::SetInputColor ( CColor& Color )
+void CChat::SetInputColor ( const CColor& Color )
 {
     unsigned long ulInputColor = COLOR_ARGB ( Color.A, Color.R, Color.G, Color.B );
 
