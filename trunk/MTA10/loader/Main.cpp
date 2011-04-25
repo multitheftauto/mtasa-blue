@@ -190,12 +190,15 @@ int LaunchGame ( LPSTR lpCmdLine )
 
     // Check for possible gta_sa.set problems
     if ( WatchDogIsSectionOpen ( "L2" ) )
+    {
         WatchDogIncCounter ( "CR2" );       // Did not reach loading screen last time
+        WatchDogCompletedSection ( "L2" );
+    }
     else
         WatchDogClearCounter ( "CR2" );
 
-    // If didn't reach loading screen 3 times in a row, do something
-    if ( WatchDogGetCounter ( "CR2" ) >= 3 )
+    // If didn't reach loading screen 5 times in a row, do something
+    if ( WatchDogGetCounter ( "CR2" ) >= 5 )
     {
         WatchDogClearCounter ( "CR2" );
         HandleResetSettings ();
@@ -260,6 +263,14 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     const SString strMTASAPath = GetMTASAPath ();
 
+    if ( strGTAPath.Contains ( ";" ) || strMTASAPath.Contains ( ";" ) )
+    {
+        DisplayErrorMessageBox ( "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+                                 "contains a ';' (semicolon).\n\n"
+                                 " If you experience problems when running MTA:SA,\n"
+                                 " move your installation(s) to a path that does not contain a semicolon." );
+    }
+
     SetCurrentDirectory ( strMTASAPath );
     SetDllDirectory( strMTASAPath );
 
@@ -312,6 +323,10 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         }    
     }
 
+    // Strip out flag from command line
+    SString strCmdLine = lpCmdLine;
+    bool bDoneAdmin = strCmdLine.Contains ( "/done-admin" );
+    strCmdLine = strCmdLine.Replace ( " /done-admin", "" );
 
     //////////////////////////////////////////////////////////
     //
@@ -324,9 +339,11 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     memset( &siLoadee, 0, sizeof ( STARTUPINFO ) );
     siLoadee.cb = sizeof ( STARTUPINFO );
 
+    WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
+
     // Start GTA
     if ( 0 == CreateProcess ( strGTAEXEPath,
-                              lpCmdLine,
+                              (LPSTR)*strCmdLine,
                               NULL,
                               NULL,
                               FALSE,
@@ -336,10 +353,24 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                               &siLoadee,
                               &piLoadee ) )
     {
-        DisplayErrorMessageBox ( "Could not start Grand Theft Auto: San Andreas.  "
-                            "Please try restarting, or if the problem persists,"
-                            "contact MTA at www.multitheftauto.com.", "createprocess-fail" );
-        return 2;
+        DWORD dwError = GetLastError ();
+
+        if ( dwError == ERROR_ELEVATION_REQUIRED && !bDoneAdmin )
+        {
+            // Try to relaunch as admin if not done so already
+            ReleaseSingleInstanceMutex ();
+            ShellExecuteNonBlocking( "runas", PathJoin ( strMTASAPath, MTA_EXE_NAME ), strCmdLine + " /done-admin" );            
+            return 5;
+        }
+        else
+        {
+            // Otherwise, show error message
+            SString strError = GetSystemErrorMessage ( dwError );            
+            DisplayErrorMessageBox ( "Could not start Grand Theft Auto: San Andreas.  "
+                                "Please try restarting, or if the problem persists,"
+                                "contact MTA at www.multitheftauto.com. \n\n[" + strError + "]", "createprocess-fail;" + strError );
+            return 5;
+        }
     }
 
     SString strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;

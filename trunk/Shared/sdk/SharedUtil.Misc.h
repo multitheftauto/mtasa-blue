@@ -77,6 +77,8 @@ namespace SharedUtil
     void            ProcessPendingBrowseToSolution  ( void );
     void            ClearPendingBrowseToSolution    ( void );
 
+    SString         GetSystemErrorMessage           ( uint uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true );
+
 #endif
 
     SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
