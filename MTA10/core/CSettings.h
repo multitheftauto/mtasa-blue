@@ -127,7 +127,6 @@ protected:
     CGUILabel*          m_pVideoResolutionLabel;
     CGUIComboBox*       m_pComboResolution;
     CGUICheckBox*       m_pCheckBoxWindowed;
-    CGUICheckBox*       m_pCheckBoxWideScreen;
     CGUICheckBox*       m_pCheckBoxMinimize;
     CGUILabel*          m_pVideoRenderingLabel;
     CGUICheckBox*       m_pCheckBoxMenuDynamic;
@@ -136,6 +135,8 @@ protected:
     CGUILabel*          m_pMapRenderingLabel;
     CGUIComboBox*       m_pComboFxQuality;
     CGUILabel*          m_pFXQualityLabel;
+    CGUIComboBox*       m_pComboAspectRatio;
+    CGUILabel*          m_pAspectRatioLabel;
 	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
     CGUILabel*          m_pDrawDistanceLabel;
     CGUIScrollBar*      m_pDrawDistance;

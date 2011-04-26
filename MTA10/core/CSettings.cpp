@@ -449,31 +449,27 @@ CSettings::CSettings ( void )
     m_pVideoGeneralLabel->SetFont ( "default-bold-small" );
 
     m_pVideoResolutionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Resolution:" ) );
-    m_pVideoResolutionLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pVideoResolutionLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
     m_pVideoResolutionLabel->GetPosition ( vecTemp, false );
     m_pVideoResolutionLabel->AutoSize ( "Resolution: " );
 
     m_pComboResolution = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-    m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY - 1.0f ) );
+    m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 5.0f ) );
     m_pComboResolution->SetSize ( CVector2D ( 200.0f, 160.0f ) );
     m_pComboResolution->SetReadOnly ( true );
 
     m_pCheckBoxWindowed = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Windowed", true ) );
-    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY - 3.0f ) );
+    m_pCheckBoxWindowed->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY - 3.0f ) );
     m_pCheckBoxWindowed->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
-    m_pCheckBoxWideScreen = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Wide Screen", true ) );
-    m_pCheckBoxWideScreen->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 13.0f ) );
-    m_pCheckBoxWideScreen->SetSize ( CVector2D ( 224.0f, 16.0f ) );
-
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Full Screen Minimize", true ) );
-    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY + 29.0f ) );
+    m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 13.0f ) );
     m_pCheckBoxMinimize->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     m_pCheckBoxMinimize->SetVisible ( GetVideoModeManager ()->IsMultiMonitor () );
 
-    vecTemp.fY += 8;
+    vecTemp.fY -= 5;
     m_pDrawDistanceLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Draw Distance:" ) );
-    m_pDrawDistanceLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pDrawDistanceLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pDrawDistanceLabel->GetPosition ( vecTemp, false );
     m_pDrawDistanceLabel->AutoSize ( "Draw Distance: " );
 
@@ -486,7 +482,7 @@ CSettings::CSettings ( void )
     m_pDrawDistanceValueLabel->AutoSize ( "100% " );
 
     m_pBrightnessLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Brightness:" ) );
-    m_pBrightnessLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pBrightnessLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pBrightnessLabel->GetPosition ( vecTemp, false );
     m_pBrightnessLabel->AutoSize ( "Brightness: " );
 
@@ -497,10 +493,6 @@ CSettings::CSettings ( void )
     m_pBrightnessValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
     m_pBrightnessValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 256.0f, vecTemp.fY ) );
     m_pBrightnessValueLabel->AutoSize ( "100% " );
-
-    m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Volumetric Shadows", true ) );
-    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 32.0f ) );
-    m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
     m_pVideoRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Menu rendering options" ) );
     m_pVideoRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
@@ -529,7 +521,7 @@ CSettings::CSettings ( void )
     m_pCheckBoxMenuPostEffects->SetVisible ( false );
 
     m_pFXQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "FX Quality:" ) );
-    m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pFXQualityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pFXQualityLabel->GetPosition ( vecTemp, false );
     m_pFXQualityLabel->AutoSize ( "FX Quality: " );
 
@@ -542,8 +534,12 @@ CSettings::CSettings ( void )
     m_pComboFxQuality->AddItem ( "Very high" )->SetData ( (void*)3 );
     m_pComboFxQuality->SetReadOnly ( true );
 
+    m_pCheckBoxVolumetricShadows = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, "Volumetric Shadows", true ) );
+    m_pCheckBoxVolumetricShadows->SetPosition ( CVector2D ( vecTemp.fX + 330.0f, vecTemp.fY + 2.0f ) );
+    m_pCheckBoxVolumetricShadows->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+
     m_pAntiAliasingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Anti-aliasing:" ) );
-    m_pAntiAliasingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pAntiAliasingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pAntiAliasingLabel->GetPosition ( vecTemp, false );
     m_pAntiAliasingLabel->AutoSize ( "Anti-aliasing: " );
 
@@ -556,8 +552,24 @@ CSettings::CSettings ( void )
     m_pComboAntiAliasing->AddItem ( "3x" )->SetData ( (void*)4 );
     m_pComboAntiAliasing->SetReadOnly ( true );
 
+
+    m_pAspectRatioLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Aspect Ratio:" ) );
+    m_pAspectRatioLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+    m_pAspectRatioLabel->GetPosition ( vecTemp, false );
+    m_pAspectRatioLabel->AutoSize ( "Aspect Ratio: " );
+
+    m_pComboAspectRatio = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
+    m_pComboAspectRatio->SetPosition ( CVector2D ( vecTemp.fX + 86.0f, vecTemp.fY - 1.0f ) );
+    m_pComboAspectRatio->SetSize ( CVector2D ( 200.0f, 95.0f ) );
+    m_pComboAspectRatio->AddItem ( "Auto" )->SetData ( (void*)ASPECT_RATIO_AUTO );
+    m_pComboAspectRatio->AddItem ( "4:3" )->SetData ( (void*)ASPECT_RATIO_4_3 );
+    m_pComboAspectRatio->AddItem ( "16:10" )->SetData ( (void*)ASPECT_RATIO_16_10 );
+    m_pComboAspectRatio->AddItem ( "16:9" )->SetData ( (void*)ASPECT_RATIO_16_9 );
+    m_pComboAspectRatio->SetReadOnly ( true );
+
+
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
-    m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 42.0f ) );
+    m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 38.0f ) );
     m_pMapRenderingLabel->GetPosition ( vecTemp, false );
     m_pMapRenderingLabel->AutoSize ( "Map rendering options " );
     m_pMapRenderingLabel->SetFont ( "default-bold-small" );
@@ -1795,7 +1807,6 @@ void CSettings::LoadData ( void )
     GetVideoModeManager ()->GetNextVideoMode ( nextVideoMode, bNextWindowed, bNextFSMinimize );
 
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
-    m_pCheckBoxWideScreen->SetSelected ( gameSettings->IsWideScreenEnabled () );
     m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
@@ -1811,6 +1822,14 @@ void CSettings::LoadData ( void )
     else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( "1x" );
     else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( "2x" );
     else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( "3x" );
+
+    // Aspect ratio
+    int aspectRatio;
+    CVARS_GET("aspect_ratio", aspectRatio);
+    if ( aspectRatio == ASPECT_RATIO_AUTO ) m_pComboAspectRatio->SetText ( "Auto" );
+    else if ( aspectRatio == ASPECT_RATIO_4_3 ) m_pComboAspectRatio->SetText ( "4:3" );
+    else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( "16:10" );
+    else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( "16:9" );
 
     // Volumetric shadows
     bool bVolumetricShadowsEnabled;
@@ -2033,7 +2052,6 @@ void CSettings::SaveData ( void )
     }
 
     gameSettings->SetAntiAliasing ( iAntiAliasing, true );
-    gameSettings->SetWideScreenEnabled ( m_pCheckBoxWideScreen->GetSelected() );
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
     gameSettings->SetMouseSensitivity ( ( m_pMouseSensitivity->GetScrollPosition () * 0.004688f ) + 0.000312f );
@@ -2042,6 +2060,14 @@ void CSettings::SaveData ( void )
     if ( CGUIListItem* pQualitySelected = m_pComboFxQuality->GetSelectedItem () )
     {
         gameSettings->SetFXQuality ( ( int ) pQualitySelected->GetData() );
+    }
+
+    // Aspect ratio
+    if ( CGUIListItem* pRatioSelected = m_pComboAspectRatio->GetSelectedItem () )
+    {
+        eAspectRatio aspectRatio = ( eAspectRatio ) ( int ) pRatioSelected->GetData();
+        CVARS_SET("aspect_ratio", aspectRatio);
+	    gameSettings->SetAspectRatio ( aspectRatio );
     }
 
     // Volumetric shadows
