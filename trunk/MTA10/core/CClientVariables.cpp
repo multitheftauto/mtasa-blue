@@ -226,4 +226,5 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "code_path",                  0 );                            // Code path
     DEFAULT ( "update_build_type",          0 );                            // 0-stable 1-test 2-nightly
     DEFAULT ( "volumetric_shadows",         0 );                            // Enable volumetric shadows
+    DEFAULT ( "aspect_ratio",               0 );                            // Display aspect ratio
 }

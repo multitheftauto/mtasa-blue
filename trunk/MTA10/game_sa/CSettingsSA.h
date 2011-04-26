@@ -80,6 +80,7 @@ class CSettingsSA : public CGameSettings
 private:
     CSettingsSAInterface*   m_pInterface;
     bool                    m_bVolumetricShadowsEnabled;
+    eAspectRatio            m_AspectRatio;
 
 public:
                             CSettingsSA                 ( void );
@@ -124,6 +125,9 @@ public:
 
 	bool                    IsVolumetricShadowsEnabled     ( void );
 	void                    SetVolumetricShadowsEnabled    ( bool bEnable );
+
+	eAspectRatio            GetAspectRatio              ( void );
+	void                    SetAspectRatio              ( eAspectRatio aspectRatio );
 
     void                    Save                        ( void );
 

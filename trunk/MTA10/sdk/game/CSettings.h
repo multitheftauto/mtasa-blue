@@ -73,6 +73,14 @@ struct VideoMode //RwVideoMode
                                 */
 };
 
+enum eAspectRatio
+{
+    ASPECT_RATIO_AUTO,
+    ASPECT_RATIO_4_3,
+    ASPECT_RATIO_16_10,
+    ASPECT_RATIO_16_9,
+};
+
 class CGameSettings
 {
 public:
@@ -115,6 +123,9 @@ public:
 
 	virtual bool            IsVolumetricShadowsEnabled     ( void ) = 0;
 	virtual void            SetVolumetricShadowsEnabled    ( bool bEnable ) = 0;
+
+	virtual eAspectRatio    GetAspectRatio          ( void ) = 0;
+	virtual void            SetAspectRatio          ( eAspectRatio aspectRatio ) = 0;
 
     virtual void            Save                    ( void ) = 0;
 };

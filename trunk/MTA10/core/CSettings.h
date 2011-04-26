@@ -137,12 +137,13 @@ protected:
     CGUIComboBox*       m_pComboResolution;
 	CGUICheckBox*       m_pCheckBoxMipMapping;
     CGUICheckBox*       m_pCheckBoxWindowed;
-    CGUICheckBox*       m_pCheckBoxWideScreen;
     CGUICheckBox*       m_pCheckBoxMinimize;
     CGUICheckBox*       m_pCheckBoxDisableAero;
     CGUILabel*          m_pMapRenderingLabel;
     CGUIComboBox*       m_pComboFxQuality;
     CGUILabel*          m_pFXQualityLabel;
+    CGUIComboBox*       m_pComboAspectRatio;
+    CGUILabel*          m_pAspectRatioLabel;
 	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
     CGUILabel*          m_pDrawDistanceLabel;
     CGUIScrollBar*      m_pDrawDistance;
