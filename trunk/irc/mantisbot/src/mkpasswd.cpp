@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
   len = n * sizeof(uint32_t);
   pass = new char[len];
   memset(pass, 0, len);
-  memcpy(pass, confirm, strlen(confirm));
+  strcpy(pass, confirm);
   reslen = n * 6 + 1;
   result = new char[reslen];
   memset(confirm, 0, strlen(confirm));

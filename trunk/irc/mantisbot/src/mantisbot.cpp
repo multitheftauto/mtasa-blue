@@ -529,7 +529,7 @@ bool MantisBot::CheckForMantisChanges()
 
   if (http.ResponseStatus() != 200)
   {
-    printf("Unable to connect to the web page: %d %s\n", http.ResponseStatus(), http.StatusText());
+    printf("Unable to connect to the web page (%s/%s): %d %s\n", m_config.data.mantis.address, m_config.data.mantis.path, http.ResponseStatus(), http.StatusText());
     return false;
   }
 
