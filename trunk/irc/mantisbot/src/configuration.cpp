@@ -119,6 +119,12 @@ bool Config::Create(const char* fileName)
   this->data.mantis.ssl = (!strcasecmp(v, "true") ? true : false);
   SAFE_LOAD(mantis, path, this->data.mantis.path);
 
+
+  /* autofix */
+  SAFE_LOAD(autofix, enabled, v);
+  this->data.autofix.enabled = (!strcasecmp(v, "true") ? true : false);
+  SAFE_LOAD(autofix, version, this->data.autofix.version);
+
 #undef SAFE_LOAD
   return true;
 }

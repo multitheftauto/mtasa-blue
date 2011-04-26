@@ -41,6 +41,8 @@
 // HTTP download buffer size
 #define HTTP_BUFFER_SIZE   1024
 
+extern void CheckForAutofixIssue ( const std::string& author, const std::string& msg, const std::string& googlecodeUrl );
+
 using namespace Rsl::Net::IRC;
 using namespace Rsl::Net::Socket;
 using namespace Rsl::Net::HTTP;
@@ -494,7 +496,7 @@ bool MantisBot::CheckForGoogleCodeChanges()
             if (!m_lastGoogleCodeId)
                 m_lastGoogleCodeId = newestId;
         }
-            
+
         // If this entry is newer than the last stored id
         if (currentId > m_lastGoogleCodeId)
         {   // This is a new entry
@@ -506,6 +508,7 @@ bool MantisBot::CheckForGoogleCodeChanges()
                     strLink.c_str ()
                 )
             );
+            CheckForAutofixIssue ( strAuthor, strDescription, strLink );
         }
         // Advance to next sibling
         node = node->NextSiblingElement ();

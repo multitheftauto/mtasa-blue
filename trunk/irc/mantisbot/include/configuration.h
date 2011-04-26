@@ -43,6 +43,7 @@ public:
   ~Config();
 
   bool Create(const char* fileName);
+  const Rsl::File::Ini::IniParser& GetParser () const { return m_parser; }
 
   bool Ok() const;
   int Errno() const;
@@ -86,6 +87,12 @@ public:
       bool ssl;
       const char* path;
     } mantis;
+
+    struct
+    {
+        bool enabled;
+        const char* version;
+    } autofix;
   } data;
 private:
   int m_errno;

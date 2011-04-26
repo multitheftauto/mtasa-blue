@@ -68,7 +68,8 @@ bool MantisLogin(const IRCUser& source, const char* channel)
 
     if (!login.Ok() || !login.GetStream().Ok())
     {
-      bot->SendChannel(IRCText("%s: Error logging in mantis", source.GetName().c_str()), channel);
+      if ( channel )
+        bot->SendChannel(IRCText("%s: Error logging in mantis", source.GetName().c_str()), channel);
       puts("Unable to connect to the login page!");
       return false;
     }
@@ -84,7 +85,8 @@ bool MantisLogin(const IRCUser& source, const char* channel)
         const char* p = strchr(header->value.c_str() + 21, ';');
         if (!p)
         {
-          bot->SendChannel(IRCText("%s: Error parsing the login response", source.GetName().c_str()), channel);
+          if ( channel )
+            bot->SendChannel(IRCText("%s: Error parsing the login response", source.GetName().c_str()), channel);
           puts("Unable to parse the login response");
           return false;
         }
@@ -95,7 +97,8 @@ bool MantisLogin(const IRCUser& source, const char* channel)
 
     if (mantis_cookie == "")
     {
-      bot->SendChannel(IRCText("%s: Error retreiving the login cookie in mantis", source.GetName().c_str()), channel);
+      if ( channel )
+        bot->SendChannel(IRCText("%s: Error retreiving the login cookie in mantis", source.GetName().c_str()), channel);
       puts("Unable to retreive the login cookie");
       return false;
     }
@@ -107,8 +110,9 @@ bool MantisLogin(const IRCUser& source, const char* channel)
 
     if (cookieTest.ResponseStatus() != 200 && cookieTest.ResponseStatus() != 302)
     {
-      bot->SendChannel(IRCText("%s: Error verifying the mantis login cookie (%d - %s)",
-                               source.GetName().c_str(), cookieTest.ResponseStatus(), cookieTest.StatusText()), channel);
+      if ( channel )
+        bot->SendChannel(IRCText("%s: Error verifying the mantis login cookie (%d - %s)",
+                                 source.GetName().c_str(), cookieTest.ResponseStatus(), cookieTest.StatusText()), channel);
       mantis_cookie = "";
       puts("Unable to verify the login cookie");
       return false;
