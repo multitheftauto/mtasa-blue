@@ -31,8 +31,12 @@ CSettingsSA::CSettingsSA ( void )
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
+    SetAspectRatio ( ASPECT_RATIO_4_3 );
     HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
     HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
+
+    // Truncate CalculateAspectRatio
+    MemPut < BYTE > ( 0x6FF420, 0xC3 );
 }
 
 bool CSettingsSA::IsWideScreenEnabled ( void )
@@ -342,4 +346,50 @@ void _declspec(naked) HOOK_StoreShadowForVehicle ()
         call    eax
         jmp     RETURN_StoreShadowForVehicle
     }
+}
+
+
+////////////////////////////////////////////////
+//
+// AspectRatio
+//
+////////////////////////////////////////////////
+eAspectRatio CSettingsSA::GetAspectRatio ( void )
+{
+	return m_AspectRatio;
+}
+
+void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio )
+{
+    // Validate range
+    if ( aspectRatio < ASPECT_RATIO_AUTO || aspectRatio > ASPECT_RATIO_16_9 )
+        aspectRatio = aspectRatio;
+
+    // Process change
+	m_AspectRatio = aspectRatio;
+
+    float fValue = 1;
+    if ( m_AspectRatio == ASPECT_RATIO_AUTO )
+    {
+        VideoMode modeInfo;
+        pGame->GetSettings ()->GetVideoModeInfo ( &modeInfo, pGame->GetSettings ()->GetCurrentVideoMode () );
+        fValue = modeInfo.width / (float)modeInfo.height;
+    }
+    else
+    if ( m_AspectRatio == ASPECT_RATIO_4_3 )
+    {
+        fValue = 4 / 3.f;
+    }
+    else
+    if ( m_AspectRatio == ASPECT_RATIO_16_10 )
+    {
+        fValue = 16 / 10.f;
+    }
+    else
+    if ( m_AspectRatio == ASPECT_RATIO_16_9 )
+    {
+        fValue = 16 / 9.f;
+    }
+
+    MemPutFast < float > ( 0xC3EFA4, fValue );
 }
