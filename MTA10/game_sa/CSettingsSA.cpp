@@ -35,8 +35,7 @@ CSettingsSA::CSettingsSA ( void )
     HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
     HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
 
-    // Truncate CalculateAspectRatio
-    MemPut < BYTE > ( 0x6FF420, 0xC3 );
+    MemPut < BYTE > ( 0x6FF420, 0xC3 );     // Truncate CalculateAspectRatio
 }
 
 bool CSettingsSA::IsWideScreenEnabled ( void )
@@ -240,12 +239,12 @@ void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing, bool bOnRestart
 
 bool CSettingsSA::IsMipMappingEnabled ( void )
 {
-	return m_pInterface->bMipMapping;
+    return m_pInterface->bMipMapping;
 }
 
 void CSettingsSA::SetMipMappingEnabled ( bool bEnable )
 {
-	m_pInterface->bMipMapping = bEnable;
+    m_pInterface->bMipMapping = bEnable;
 }
 
 void CSettingsSA::Save ()
@@ -260,12 +259,12 @@ void CSettingsSA::Save ()
 
 bool CSettingsSA::IsVolumetricShadowsEnabled ( void )
 {
-	return m_bVolumetricShadowsEnabled;
+    return m_bVolumetricShadowsEnabled;
 }
 
 void CSettingsSA::SetVolumetricShadowsEnabled ( bool bEnable )
 {
-	m_bVolumetricShadowsEnabled = bEnable;
+    m_bVolumetricShadowsEnabled = bEnable;
 }
 
 //
@@ -317,15 +316,8 @@ void _declspec(naked) HOOK_GetFxQuality ()
         push    eax                     
         call    MaybeAlterFxQualityValue
         add     esp, 4
-    }
 
-    _asm
-    {
         popad
-    }
-
-    _asm
-    {
         mov     eax, dwFxQualityValue
         retn
     }
@@ -338,11 +330,11 @@ void _declspec(naked) HOOK_StoreShadowForVehicle ()
     {
         // Hooked from 0x70BDA0  5 bytes
         mov     eax, [esp+4]        // Get vehicle
-        mov     ax, [eax+34]       // pEntity->m_nModelIndex
+        mov     ax, [eax+34]        // pEntity->m_nModelIndex
         mov     usCallingForVehicleModel, ax
         sub     esp, 44h 
         push    ebx
-        mov     eax, 0x70F9B0   // CVolumetricShadowMgr::IsAvailable
+        mov     eax, 0x70F9B0       // CVolumetricShadowMgr::IsAvailable
         call    eax
         jmp     RETURN_StoreShadowForVehicle
     }
@@ -356,19 +348,15 @@ void _declspec(naked) HOOK_StoreShadowForVehicle ()
 ////////////////////////////////////////////////
 eAspectRatio CSettingsSA::GetAspectRatio ( void )
 {
-	return m_AspectRatio;
+    return m_AspectRatio;
 }
 
 void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio )
 {
-    // Validate range
-    if ( aspectRatio < ASPECT_RATIO_AUTO || aspectRatio > ASPECT_RATIO_16_9 )
-        aspectRatio = aspectRatio;
-
     // Process change
-	m_AspectRatio = aspectRatio;
+    m_AspectRatio = aspectRatio;
 
-    float fValue = 1;
+    float fValue;
     if ( m_AspectRatio == ASPECT_RATIO_AUTO )
     {
         VideoMode modeInfo;
@@ -385,8 +373,7 @@ void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio )
     {
         fValue = 16 / 10.f;
     }
-    else
-    if ( m_AspectRatio == ASPECT_RATIO_16_9 )
+    else    // ASPECT_RATIO_16_9
     {
         fValue = 16 / 9.f;
     }
