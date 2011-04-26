@@ -121,13 +121,13 @@ public:
     void                    SetAntiAliasing             ( unsigned int uiAntiAliasing, bool bOnRestart );
 
     bool                    IsMipMappingEnabled         ( void );
-	void                    SetMipMappingEnabled        ( bool bEnable );
+    void                    SetMipMappingEnabled        ( bool bEnable );
 
-	bool                    IsVolumetricShadowsEnabled     ( void );
-	void                    SetVolumetricShadowsEnabled    ( bool bEnable );
+    bool                    IsVolumetricShadowsEnabled     ( void );
+    void                    SetVolumetricShadowsEnabled    ( bool bEnable );
 
-	eAspectRatio            GetAspectRatio              ( void );
-	void                    SetAspectRatio              ( eAspectRatio aspectRatio );
+    eAspectRatio            GetAspectRatio              ( void );
+    void                    SetAspectRatio              ( eAspectRatio aspectRatio );
 
     void                    Save                        ( void );
 
