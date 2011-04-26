@@ -157,11 +157,11 @@ bool IniParser::SetFilename(const char* filename)
   return true;
 }
 
-const char* IniParser::GetValue(const char* section_name, const char* entry_name)
+const char* IniParser::GetValue(const char* section_name, const char* entry_name) const
 {
   size_t len = 0;
-  __IniSection *section;
-  __IniEntry *entry;
+  const __IniSection *section;
+  const __IniEntry *entry;
 
   for (section = m_sections; section; section = section->next)
   {
