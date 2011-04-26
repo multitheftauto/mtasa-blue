@@ -16,50 +16,58 @@
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hMutex;
 
+enum ePathResult
+{
+    GAME_PATH_STEAM,
+    GAME_PATH_UNICODE_CHARS,
+    GAME_PATH_MISSING,
+    GAME_PATH_OK,
+};
+
 // Loads the given dll into hProcess. Returns 0 on failure or the handle to the
 // remote dll module on success.
-HMODULE RemoteLoadLibrary           ( HANDLE hProcess, const char* szLibPath );
+HMODULE         RemoteLoadLibrary                   ( HANDLE hProcess, const char* szLibPath );
 
-bool    TerminateGTAIfRunning       ( void );
+bool            TerminateGTAIfRunning               ( bool bSilent = false );
 
-void    ShowSplash                  ( HINSTANCE hInstance );
-void    HideSplash                  ( bool bOnlyDelay = false );
+void            ShowSplash                          ( HINSTANCE hInstance );
+void            HideSplash                          ( bool bOnlyDelay = false );
 
-long    DisplayErrorMessageBox      ( const SString& strMessage, const SString& strTroubleType = "" );
+long            DisplayErrorMessageBox              ( const SString& strMessage, const SString& strTroubleType = "" );
 
-void    SetMTASAPathSource          ( bool bReadFromRegistry );
-SString GetMTASAPath                ( void );
-int     GetGamePath                 ( SString& strOutResult );
-SString GetMTASAModuleFileName      ( void );
+void            SetMTASAPathSource                  ( bool bReadFromRegistry );
+SString         GetMTASAPath                        ( void );
+ePathResult     GetGamePath                         ( SString& strOutResult, bool bFindIfMissing = false );
+SString         GetMTASAModuleFileName              ( void );
 
-void    ShowProgressDialog          ( HINSTANCE hInstance, const SString& strTitle, bool bAllowCancel = false );
-void    HideProgressDialog          ( void );
-bool    UpdateProgress              ( int iPos, int iMax, const SString& strMsg = "" );
+void            ShowProgressDialog                  ( HINSTANCE hInstance, const SString& strTitle, bool bAllowCancel = false );
+void            HideProgressDialog                  ( void );
+bool            UpdateProgress                      ( int iPos, int iMax, const SString& strMsg = "" );
 
-void    FindFilesRecursive          ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth = 99 );
-SString GetOSVersion                ( void );
-SString GetRealOSVersion            ( void );
-bool    IsVistaOrHigher             ( void );
-BOOL    IsUserAdmin                 ( void );
+void            FindFilesRecursive                  ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth = 99 );
+SString         GetOSVersion                        ( void );
+SString         GetRealOSVersion                    ( void );
+bool            IsVistaOrHigher                     ( void );
+BOOL            IsUserAdmin                         ( void );
 
-void    StartPseudoProgress         ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
-void    StopPseudoProgress          ( void );
+void            StartPseudoProgress                 ( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg );
+void            StopPseudoProgress                  ( void );
 
-SString ShowCrashedDialog           ( HINSTANCE hInstance, const SString& strMessage );
-void    HideCrashedDialog           ( void );
+SString         ShowCrashedDialog                   ( HINSTANCE hInstance, const SString& strMessage );
+void            HideCrashedDialog                   ( void );
 
-void    UpdateMTAVersionApplicationSetting    ( void );
-bool    Is32bitProcess              ( DWORD processID );
+void            UpdateMTAVersionApplicationSetting  ( void );
+bool            Is32bitProcess                      ( DWORD processID );
 
-bool    CreateSingleInstanceMutex   ( void );
-void    ReleaseSingleInstanceMutex  ( void );
+bool            CreateSingleInstanceMutex           ( void );
+void            ReleaseSingleInstanceMutex          ( void );
 
-SString CheckOnRestartCommand       ( void );
-void    CleanDownloadCache          ( void );
+SString         CheckOnRestartCommand               ( void );
+void            CleanDownloadCache                  ( void );
 
-HMODULE GetLibraryHandle            ( const SString& strFilename );
-void    FreeLibraryHandle           ( void );
-uint    WaitForObject               ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex );
+HMODULE         GetLibraryHandle                    ( const SString& strFilename );
+void            FreeLibraryHandle                   ( void );
+uint            WaitForObject                       ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex );
 
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5

@@ -347,14 +347,15 @@ std::vector < DWORD > GetGTAProcessList ( void )
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool TerminateGTAIfRunning ( void )
+bool TerminateGTAIfRunning ( bool bSilent )
 {
     std::vector < DWORD > processIdList = GetGTAProcessList ();
 
     if ( processIdList.size () )
     {
-        if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION ) == IDNO )
-            return false;
+        if ( !bSilent )
+            if ( MessageBox ( 0, "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?", "Information", MB_YESNO | MB_ICONQUESTION ) == IDNO )
+                return false;
 
         // Try to stop all GTA process id's
         for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
@@ -374,7 +375,8 @@ bool TerminateGTAIfRunning ( void )
 
         if ( processIdList.size () )
         {
-            MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_OK | MB_ICONQUESTION );
+            if ( !bSilent )
+                MessageBox ( 0, "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer.", "Information", MB_OK | MB_ICONQUESTION );
             return false;
         }
     }
@@ -521,7 +523,74 @@ SString GetMTASAPath ( void )
 }
 
 
-int GetGamePath ( SString& strOutResult )
+///////////////////////////////////////////////////////////////
+//
+// LookForGtaProcess
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool LookForGtaProcess ( SString& strOutPathFilename )
+{
+    std::vector < DWORD > processIdList = GetGTAProcessList ();
+    for ( uint i = 0 ; i < processIdList.size () ; i++ )
+    {
+        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processIdList[i] );
+        for ( uint i = 0 ; i < filenameList.size () ; i++ )
+        {
+            if ( FileExists ( filenameList[i] ) )
+            {
+                strOutPathFilename = filenameList[i];
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// DoUserAssistedSearch
+//
+//
+//
+///////////////////////////////////////////////////////////////
+SString DoUserAssistedSearch ( void )
+{
+    SString strResult;
+
+    ShowProgressDialog( g_hInstance, "Searching for Grand Theft Auto San Andreas", true );
+
+    while ( !UpdateProgress ( 0, 100, "Please start Grand Theft Auto San Andreas" ) )
+    {
+        SString strPathFilename;
+        // Check if user has started GTA
+        if ( LookForGtaProcess ( strPathFilename ) )
+        {
+            // If so, get the exe path
+            ExtractFilename ( strPathFilename, &strResult, NULL );
+            // And then stop it
+            TerminateGTAIfRunning ( true );
+            break;
+        }
+
+        Sleep ( 200 );
+    }
+
+    HideProgressDialog ();
+    return strResult;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// GetGamePath
+//
+//
+//
+///////////////////////////////////////////////////////////////
+ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 {
     // Note: "SOFTWARE\Multi Theft Auto: San Andreas" is the shared multi-version location for "GTA:SA Path"
 
@@ -538,27 +607,34 @@ int GetGamePath ( SString& strOutResult )
             SetRegistryValue ( "", "GTA:SA Path Backup", strRegPath );
     }
 
+    // Manual skip if CTRL is held
     if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) == 0 )
     {
         if ( strlen( strRegPath.c_str () ) )
         {
             // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
             if ( strchr ( strRegPath.c_str (), '?' ) > 0 )
-                return -1;
+                return GAME_PATH_UNICODE_CHARS;
 
             SString strExePath ( "%s\\%s", strRegPath.c_str (), MTA_GTAEXE_NAME );
             if ( FileExists( strExePath  ) )
             {
                 strOutResult = strRegPath;
-                return 1;
+                return GAME_PATH_OK;
             }
             strExePath = SString( "%s\\%s", strRegPath.c_str (), MTA_GTASTEAMEXE_NAME );
             if ( FileExists( strExePath  ) )
             {
-                return -2;
+                return GAME_PATH_STEAM;
             }
         }
     }
+
+    // Try to find?
+    if ( !bFindIfMissing )
+        return GAME_PATH_MISSING;
+
+    // Ask user to browse for GTA
     BROWSEINFO bi = { 0 };
     bi.lpszTitle = "Select your Grand Theft Auto: San Andreas Installation Directory";
     LPITEMIDLIST pidl = SHBrowseForFolder ( &bi );
@@ -579,29 +655,26 @@ int GetGamePath ( SString& strOutResult )
             imalloc->Free ( pidl );
             imalloc->Release ( );
         }
-    
-        if ( FileExists( SString ( "%s\\%s", strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
-        {
-            SetRegistryValue ( "..\\1.0", "GTA:SA Path", strOutResult );
-            SetRegistryValue ( "", "GTA:SA Path Backup", strOutResult );
-        }
-        else
-        {
-            if ( MessageBox ( NULL, "Could not find gta_sa.exe at the path you have selected. Choose another folder?", "Error", MB_OKCANCEL ) == IDOK )
-            {
-                return GetGamePath ( strOutResult );
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        return 1;
     }
-    else
+
+    // Check browse result
+    if ( !FileExists( PathJoin ( strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
     {
-        return 0;
+        // If browse didn't help, try another method
+        strOutResult = DoUserAssistedSearch ();
+
+        if ( !FileExists( PathJoin ( strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
+        {
+            // If still not found, give up
+            return GAME_PATH_MISSING;
+        }
     }
+
+    // File found. Update registry.
+    SetRegistryValue ( "..\\1.0", "GTA:SA Path", strOutResult );
+    SetRegistryValue ( "", "GTA:SA Path Backup", strOutResult );
+
+    return GAME_PATH_OK;
 }
 
 

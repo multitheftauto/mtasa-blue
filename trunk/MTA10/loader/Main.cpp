@@ -206,7 +206,6 @@ int LaunchGame ( LPSTR lpCmdLine )
 
     WatchDogBeginSection ( "L0" );      // Gets closed if MTA exits with a return code of 0
     WatchDogBeginSection ( "L1" );      // Gets closed when online game has started
-    WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
 
     int iReturnCode = DoLaunchGame ( lpCmdLine );
 
@@ -246,16 +245,16 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     // Get path to GTASA
     //
     SString strGTAPath;
-    int iResult = GetGamePath ( strGTAPath );
-    if ( iResult == 0 ) {
+    ePathResult iResult = GetGamePath ( strGTAPath, true );
+    if ( iResult == GAME_PATH_MISSING ) {
         DisplayErrorMessageBox ( "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas.", "reg-entries-missing" );
         return 5;
     }
-    else if ( iResult == -1 ) {
+    else if ( iResult == GAME_PATH_UNICODE_CHARS ) {
         DisplayErrorMessageBox ( "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas." );
         return 5;
     }
-    else if ( iResult == -2 ) {
+    else if ( iResult == GAME_PATH_STEAM ) {
         DisplayErrorMessageBox ( "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue." );
         BrowseToSolution ( "downgrade-steam" );
         return 5;
