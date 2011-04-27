@@ -45,7 +45,6 @@ void FixIssue ( const std::string& author, int issueNumber, const std::string& l
 {
     const Config& config = MantisBot::Instance()->GetConfig();
     const char* authorId = MantisBot::Instance()->GetConfig().GetParser().GetValue("autofix.userids", author.c_str());
-    if ( !authorId ) authorId = "";
 
     IPV4Addr addr(config.data.mantis.address, config.data.mantis.service);
     IPV4Addr bindAddr("0.0.0.0", "0");
@@ -69,6 +68,7 @@ void FixIssue ( const std::string& author, int issueNumber, const std::string& l
         contents.append ( tmp, s );
     }
 
+    // Look for the security token
     const char* p = strstr ( contents.c_str(), "name=\"bug_update_token\" value=\"" );
     if ( !p )
         return;
@@ -78,6 +78,36 @@ void FixIssue ( const std::string& author, int issueNumber, const std::string& l
     if ( !p2 )
         return;
 
+    std::string token;
+    token.assign ( p, p2-p );
+
+
+    // Look for the mantis author id
+    char mantisAuthorId [ 128 ];
+    mantisAuthorId[0] = '\0';
+
+    if ( authorId )
+    {
+        p = strstr ( contents.c_str(), "name=\"handler_id\">" );
+        if ( !p )
+            authorId = 0;
+        else
+        {
+            p = strstr ( p, authorId );
+            if ( !p )
+                authorId = 0;
+            else
+            {
+                while ( p > contents.c_str() && *p != '"' ) --p;
+                --p;
+                while ( p > contents.c_str() && *p != '"' ) --p;
+                ++p;
+                int nAuthorId = atoi(p);
+                snprintf(mantisAuthorId, sizeof(mantisAuthorId), "%d", nAuthorId);
+            }
+        }
+    }
+
     std::string phpsession;
 
     const std::vector<HTTPHeader>& headers = httpToken.GetResponseHeaders();
@@ -86,7 +116,7 @@ void FixIssue ( const std::string& author, int issueNumber, const std::string& l
          i++)
     {
         const HTTPHeader* header = &(*i);
-        if (header->name == "Set-Cookie" && !strncmp(header->value.c_str(), "PHPSESSID=", 10))
+        if (!strcasecmp(header->name.c_str(), "Set-Cookie") && !strncmp(header->value.c_str(), "PHPSESSID=", 10))
         {
           const char* p = strchr(header->value.c_str() + 10, ';');
           if (!p)
@@ -98,20 +128,18 @@ void FixIssue ( const std::string& author, int issueNumber, const std::string& l
 
     if ( phpsession == "" ) return;
 
-    std::string token;
-    token.assign ( p, p2-p );
-
     char poststr [ 512 ];
     snprintf ( poststr, sizeof(poststr), "bug_update_token=%s"
                                          "&bug_id=%d"
                                          "&update_mode=1"
-                                         "&handler_id=%s"
+                                         "%s%s"
                                          "&resolution=20"
                                          "&status=80"
-                                         "&fixed_in_Version=%s"
+                                         "&fixed_in_version=%s"
                                          , token.c_str()
                                          , issueNumber
-                                         , authorId
+                                         , authorId ? "&handler_id=" : ""
+                                         , authorId ? mantisAuthorId : ""
                                          , config.data.autofix.version );
     HTTPClient httpUpdate(config.data.mantis.address, addr, bindAddr, config.data.mantis.ssl);
     httpToken.SendHeader("Content-Type", "application/x-www-form-urlencoded");
