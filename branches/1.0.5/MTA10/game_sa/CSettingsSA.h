@@ -120,11 +120,11 @@ public:
     unsigned int            GetAntiAliasing             ( void );
     void                    SetAntiAliasing             ( unsigned int uiAntiAliasing, bool bOnRestart );
 
-	bool                    IsVolumetricShadowsEnabled     ( void );
-	void                    SetVolumetricShadowsEnabled    ( bool bEnable );
+    bool                    IsVolumetricShadowsEnabled     ( void );
+    void                    SetVolumetricShadowsEnabled    ( bool bEnable );
 
-	eAspectRatio            GetAspectRatio              ( void );
-	void                    SetAspectRatio              ( eAspectRatio aspectRatio );
+    eAspectRatio            GetAspectRatio              ( void );
+    void                    SetAspectRatio              ( eAspectRatio aspectRatio );
 
     void                    Save                        ( void );
 
