@@ -118,11 +118,11 @@ public:
     virtual unsigned int    GetAntiAliasing         ( void ) = 0;
     virtual void            SetAntiAliasing         ( unsigned int uiAntiAliasing, bool bOnRestart ) = 0;
 
-	virtual bool            IsVolumetricShadowsEnabled     ( void ) = 0;
-	virtual void            SetVolumetricShadowsEnabled    ( bool bEnable ) = 0;
+    virtual bool            IsVolumetricShadowsEnabled     ( void ) = 0;
+    virtual void            SetVolumetricShadowsEnabled    ( bool bEnable ) = 0;
 
-	virtual eAspectRatio    GetAspectRatio          ( void ) = 0;
-	virtual void            SetAspectRatio          ( eAspectRatio aspectRatio ) = 0;
+    virtual eAspectRatio    GetAspectRatio          ( void ) = 0;
+    virtual void            SetAspectRatio          ( eAspectRatio aspectRatio ) = 0;
 
     virtual void            Save                    ( void ) = 0;
 };
