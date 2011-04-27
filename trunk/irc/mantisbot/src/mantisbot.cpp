@@ -136,7 +136,7 @@ MantisBot* MantisBot::Instance()
 }
 
 MantisBot::MantisBot()
-  : m_error(""), m_errno(0), m_selector(2), m_initialized(false), m_lastMantisId(0), m_lastGoogleCodeId(0)
+  : m_error(""), m_errno(0), m_selector(2), m_initialized(false), m_lastMantisId(0)
 {
 }
 
@@ -321,7 +321,7 @@ bool MantisBot::Run()
   if (updatedelay < 10)
     updatedelay = 10;
   currentTime = time(0);
-  nextWebCheck = currentTime + updatedelay;
+  nextWebCheck = currentTime;
 
   m_selector.Add(&socket, RSL_SELECT_EVENT_IN);
   m_selector.SetTimeout(updatedelay * 1000);
@@ -405,23 +405,23 @@ void MantisBot::SendChannel(const IRCText& msg, const char* channel)
   m_client.Send(IRCMessagePrivmsg(channel, msg));
 }
 
-bool MantisBot::CheckForGoogleCodeChanges()
+bool MantisBot::CheckForGoogleCodeChanges(const __ConfigProject& conf)
 {
     char tmp[HTTP_BUFFER_SIZE];
     std::string buffer;
     size_t len;
-    
+
     // Download the feed from the specified Google Code URL
     HTTPClient http(m_config.data.googlecode.address, m_httpGoogleCodeAddr, m_httpGoogleCodeBindAddr, false);
-    http.Connect(m_config.data.googlecode.path);
+    http.Connect(conf.path);
     http.Send();
-    
+
     if (!http.Ok()) return false;
 
     if (http.ResponseStatus() != 200)
     {
         printf("Unable to connect to the web page (%s%s): %d %s\n",
-                m_config.data.googlecode.address, m_config.data.googlecode.path,
+                m_config.data.googlecode.address, conf.path,
                 http.ResponseStatus(), http.StatusText());
         return false;
     }
@@ -447,7 +447,7 @@ bool MantisBot::CheckForGoogleCodeChanges()
     feed = xml.FirstChild("feed");
     if (!feed) return false;
     node = feed->FirstChild("entry");
-    
+
     // Loop through the entry nodes
     size_t index;
     int currentId, newestId = -1;
@@ -493,27 +493,28 @@ bool MantisBot::CheckForGoogleCodeChanges()
         if (newestId == -1) {
             newestId = currentId;
             // If this is our first run, store the newest entry id
-            if (!m_lastGoogleCodeId)
-                m_lastGoogleCodeId = newestId;
+            if ( m_lastGoogleCodeId.find(conf.alias) == m_lastGoogleCodeId.end() )
+                m_lastGoogleCodeId[conf.alias] = newestId;
         }
 
         // If this entry is newer than the last stored id
-        if (currentId > m_lastGoogleCodeId)
+        if (currentId > m_lastGoogleCodeId[conf.alias])
         {   // This is a new entry
             SendTextToChannels(
                 IRCText(
-                    "%C02%Br%d%B%C %C12(%s)%C %C10%s%C %C03-%C "
+                    "[%U%s%U] %C02%Br%d%B%C %C12(%s)%C %C10%s%C %C03-%C "
                     "%C14%s%C",
-                    currentId, strAuthor.c_str (), strDescription.c_str (),
+                    conf.alias, currentId, strAuthor.c_str (), strDescription.c_str (),
                     strLink.c_str ()
                 )
             );
-            CheckForAutofixIssue ( strAuthor, strDescription, strLink );
+            if ( conf.autofix )
+              CheckForAutofixIssue ( strAuthor, strDescription, strLink );
         }
         // Advance to next sibling
         node = node->NextSiblingElement ();
     }
-    m_lastGoogleCodeId = newestId;
+    m_lastGoogleCodeId[conf.alias] = newestId;
     
     return true;
 }
@@ -650,10 +651,15 @@ void* CheckForChanges_thread(void *_bot)
     debugok();
   else
     debugerror();
-    
-  debugentry("Checking for Google Code changes");
-  if (bot->CheckForGoogleCodeChanges())
-    debugok();
-  else
-    debugerror();
+
+  const std::vector<__ConfigProject>& projects = bot->GetConfig().data.googlecode.projects;
+  for ( std::vector<__ConfigProject>::const_iterator i = projects.begin(); i != projects.end(); ++i )
+  {
+    debugentry("Checking for Google Code changes (%s)", (*i).alias);
+    if (bot->CheckForGoogleCodeChanges(*i))
+      debugok();
+    else
+      debugerror();
+  }
 }
+

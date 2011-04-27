@@ -36,6 +36,13 @@ struct __ConfigChannel
   bool notifyChanges;
 };
 
+struct __ConfigProject
+{
+    const char* alias;
+    const char* path;
+    bool autofix;
+};
+
 class Config
 {
 public:
@@ -74,8 +81,8 @@ public:
     struct
     {
       const char* address;
-      const char* path;
       const char* service;
+      std::vector<__ConfigProject> projects;
     } googlecode;
 
     struct
