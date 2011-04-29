@@ -34,7 +34,7 @@ public:
                             CLuaArgument        ( void );
                             CLuaArgument        ( bool bBool );
                             CLuaArgument        ( double dNumber );
-                            CLuaArgument        ( const char* szString );
+                            CLuaArgument        ( const std::string& strString );
                             CLuaArgument        ( void* pUserData );
                             CLuaArgument        ( CClientEntity* pElement );
                             CLuaArgument        ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
@@ -49,7 +49,7 @@ public:
     void                    Read                ( lua_State* luaVM, int iArgument, std::map < const void*, CLuaArguments* > * pKnownTables = NULL );
     void                    Read                ( bool bBool );
     void                    Read                ( double dNumber );
-    void                    Read                ( const char* szString );
+    void                    Read                ( const std::string& strString );
     void                    Read                ( void* pUserData );
     void                    Read                ( CClientEntity* pElement );
     void                    ReadElementID       ( ElementID ID );

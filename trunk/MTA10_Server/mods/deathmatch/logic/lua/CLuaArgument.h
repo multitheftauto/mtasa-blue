@@ -35,7 +35,7 @@ public:
                             CLuaArgument        ( void );
                             CLuaArgument        ( bool bBool );
                             CLuaArgument        ( double dNumber );
-                            CLuaArgument        ( const char* szString );
+                            CLuaArgument        ( const std::string& strString );
                             CLuaArgument        ( CElement* pElement );
                             CLuaArgument        ( const CLuaArgument& Argument, std::map < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
                             CLuaArgument        ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
@@ -51,7 +51,7 @@ public:
     
     void                    Read                ( bool bBool );
     void                    Read                ( double dNumber );
-    void                    Read                ( const char* szString );
+    void                    Read                ( const std::string& strString );
     void                    Read                ( CElement* pElement );
 
     void                    ReadUserData        ( void* pUserData );
