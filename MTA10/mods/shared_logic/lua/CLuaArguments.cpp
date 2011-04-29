@@ -330,9 +330,9 @@ CLuaArgument* CLuaArguments::PushNumber ( double dNumber )
 }
 
 
-CLuaArgument* CLuaArguments::PushString ( const char* szString )
+CLuaArgument* CLuaArguments::PushString ( const std::string& strString )
 {
-    CLuaArgument* pArgument = new CLuaArgument ( szString );
+    CLuaArgument* pArgument = new CLuaArgument ( strString );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }

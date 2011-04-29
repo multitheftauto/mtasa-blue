@@ -50,10 +50,10 @@ CLuaArgument::CLuaArgument ( double dNumber )
 }
 
 
-CLuaArgument::CLuaArgument ( const char* szString )
+CLuaArgument::CLuaArgument ( const std::string& strString )
 {
     m_pTableData = NULL;
-    Read ( szString );
+    Read ( strString );
 }
 
 
@@ -415,13 +415,11 @@ void CLuaArgument::Read ( double dNumber )
 }
 
 
-void CLuaArgument::Read ( const char* szString )
+void CLuaArgument::Read ( const std::string& strString )
 {
-    assert ( szString );
-
     m_iType = LUA_TSTRING;
     DeleteTableData ();
-    m_strString = szString;
+    m_strString = strString;
 }
 
 
@@ -568,8 +566,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                     if ( bitStream.Read ( szValue, usLength ) )
                     {
                         // Put it into us
-                        szValue [ usLength ] = 0;
-                        Read ( szValue );
+                        Read ( std::string ( szValue, usLength ) );
                     }
 
                     // Delete the buffer
@@ -673,7 +670,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
         {           
             // Grab the string and its length. Is it short enough to be sendable?
             const char* szTemp = m_strString.c_str ();
-            size_t sizeTemp = strlen ( szTemp );
+            size_t sizeTemp = m_strString.length ();
             unsigned short usLength = static_cast < unsigned short > ( sizeTemp );
             if ( sizeTemp == usLength )
             {

@@ -64,7 +64,7 @@ public:
     CLuaArgument*                                       PushNil             ( void );
     CLuaArgument*                                       PushBoolean         ( bool bBool );
     CLuaArgument*                                       PushNumber          ( double dNumber );
-    CLuaArgument*                                       PushString          ( const char* szString );
+    CLuaArgument*                                       PushString          ( const std::string& strString );
     CLuaArgument*                                       PushUserData        ( void* pUserData );
     CLuaArgument*                                       PushElement         ( CClientEntity* pElement );
     CLuaArgument*                                       PushArgument        ( const CLuaArgument& argument );
