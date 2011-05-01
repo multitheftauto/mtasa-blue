@@ -226,7 +226,7 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const
     // Set option flags
     //
     bool bHelp = MapContains ( strOptionMap, "h" );
-    bool bAcurate = MapContains ( strOptionMap, "a" );
+    bool bAccurate = MapContains ( strOptionMap, "a" );
 
     //
     // Process help
@@ -247,7 +247,7 @@ void CPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CPerfStatResult* pResult, const
             CLuaMain* pLuaMain = iter->first;
             if ( pLuaMain->GetVM() )
             {
-                if ( bAcurate )
+                if ( bAccurate )
                     lua_gc(pLuaMain->GetVM(), LUA_GCCOLLECT, 0);
 
                 int iMemUsed = lua_getgccount( pLuaMain->GetVM() );
