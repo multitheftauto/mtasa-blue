@@ -146,7 +146,6 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
     // Set option flags
     //
     bool bHelp = MapContains ( strOptionMap, "h" );
-    bool bAcurate = MapContains ( strOptionMap, "a" );
 
     //
     // Process help

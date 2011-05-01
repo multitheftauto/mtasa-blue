@@ -241,12 +241,12 @@ SString SString::SplitRight ( const SString& strDelim, SString* pstrLeft, int iI
 SString SString::Replace ( const char* szOld, const char* szNew, bool bSearchJustReplaced ) const
 {
     // Check if anything to replace first
-    int idx = 0;
+    size_t idx = 0;
     if( ( idx = this->find ( szOld, idx ) ) == npos )
         return *this;
 
-    int iOldLength = strlen ( szOld );
-    int iNewLength = strlen ( szNew );
+    size_t iOldLength = strlen ( szOld );
+    size_t iNewLength = strlen ( szNew );
     SString strResult = *this;
     do
     {
@@ -254,7 +254,7 @@ SString SString::Replace ( const char* szOld, const char* szNew, bool bSearchJus
         if ( !bSearchJustReplaced )
             idx += iNewLength;
     }
-    while( ( idx = strResult.find ( szOld, idx ) ) >= 0 );
+    while( ( idx = strResult.find ( szOld, idx ) ) != npos );
     return strResult;
 }
 
@@ -266,12 +266,12 @@ SString SString::ReplaceI ( const char* szOld, const char* szNew, bool bSearchJu
     SString strOldUpper = SStringX ( szOld ).ToUpper ();
 
     // Check if anything to replace first
-    int idx = 0;
+    size_t idx = 0;
     if( ( idx = this->ToUpper ().find ( strOldUpper, idx ) ) == npos )
         return *this;
 
-    int iOldLength = strlen ( szOld );
-    int iNewLength = strlen ( szNew );
+    size_t iOldLength = strlen ( szOld );
+    size_t iNewLength = strlen ( szNew );
     SString strResult = *this;
     do
     {
@@ -279,7 +279,7 @@ SString SString::ReplaceI ( const char* szOld, const char* szNew, bool bSearchJu
         if ( !bSearchJustReplaced )
             idx += iNewLength;
     }
-    while( ( idx = strResult.ToUpper ().find ( strOldUpper, idx ) ) >= 0 );
+    while( ( idx = strResult.ToUpper ().find ( strOldUpper, idx ) ) != npos );
     return strResult;
 }
 
@@ -289,7 +289,7 @@ SString SString::ReplaceI ( const char* szOld, const char* szNew, bool bSearchJu
 //
 SString SString::TrimStart ( const char* szOld ) const
 {
-    const uint uiOldLength = strlen ( szOld );
+    const size_t uiOldLength = strlen ( szOld );
     SString strResult = *this;
     while ( strResult.substr ( 0, uiOldLength ) == szOld )
         strResult = strResult.substr ( uiOldLength );
@@ -301,7 +301,7 @@ SString SString::TrimStart ( const char* szOld ) const
 //
 SString SString::TrimEnd ( const char* szOld ) const
 {
-    const uint uiOldLength = strlen ( szOld );
+    const size_t uiOldLength = strlen ( szOld );
     SString strResult = *this;
     while ( strResult.length () >= uiOldLength && strResult.substr ( strResult.length () - uiOldLength ) == szOld )
         strResult = strResult.substr ( 0, strResult.length () - uiOldLength );

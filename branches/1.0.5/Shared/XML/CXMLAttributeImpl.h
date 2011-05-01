@@ -42,12 +42,12 @@ public:
     void                    DeleteWrapper               ( void );
 
 private:
+    unsigned long               m_ulID;
+    bool                        m_bDeleteAttribute;
+
     CXMLAttributesImpl&         m_Attributes;
     TiXmlElement&               m_Node;
     TiXmlAttribute&             m_Attribute;
-
-    unsigned long               m_ulID;
-    bool                        m_bDeleteAttribute;
 };
 
 #endif

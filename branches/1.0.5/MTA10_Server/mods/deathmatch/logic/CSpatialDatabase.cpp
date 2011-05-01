@@ -177,8 +177,10 @@ void CSpatialDatabaseImpl::AllQuery ( CElementResult& outResult )
 ///////////////////////////////////////////////////////////////
 void CSpatialDatabaseImpl::FlushUpdateQueue ( void )
 {
-    int iTotalToUpdate = m_UpdateQueue.size ();
-    int iTotalUpdated = 0;
+    #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTA
+        int iTotalToUpdate = m_UpdateQueue.size ();
+        int iTotalUpdated = 0;
+    #endif
 
     std::map < CElement*, int > updateQueueCopy = m_UpdateQueue;
     m_UpdateQueue.clear ();
@@ -213,8 +215,8 @@ void CSpatialDatabaseImpl::FlushUpdateQueue ( void )
 
         // Update info map
         MapSet ( m_InfoMap, pEntity, newInfo );
-        iTotalUpdated++;
         #ifdef SPATIAL_DATABASE_DEBUG_OUTPUTA
+            iTotalUpdated++;
             OutputDebugLine ( SString ( "SpatialDatabase::UpdateEntity %08x  %2.0f,%2.0f,%2.0f   %2.0f,%2.0f,%2.0f"
                                                 ,pEntity
                                                 ,newInfo.box.vecMin.fX

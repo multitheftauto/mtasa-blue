@@ -46,10 +46,10 @@ private:
     void                            CreateAttributes            ( void );
     void                            DeleteAttributes            ( void );
 
+    bool                            m_bCanRemoveFromList;
     TiXmlElement&                   m_Node;
 
     std::list < CXMLAttribute* >    m_Attributes;
-    bool                            m_bCanRemoveFromList;
 };
 
 #endif
