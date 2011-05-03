@@ -17,9 +17,22 @@
 #include "ns_playerid.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
+struct SPacketStat
+{
+    int iCount;
+    int iTotalBytes;
+    TIMEUS totalTime;
+};
+
 class CNetServer
 {
 public:
+    enum ENetworkUsageDirection
+    {
+        STATS_INCOMING_TRAFFIC = 0,
+        STATS_OUTGOING_TRAFFIC = 1
+    };
+
     // szIP can be NULL if autochoosing is wanted.
     virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiMTUSize, unsigned int uiAllowedPlayers ) = 0;
     virtual void                            StopNetwork                     ( void ) = 0;
@@ -64,6 +77,9 @@ public:
 
     virtual void                            ResetStub                       ( uint dwType, ... ) = 0;
     virtual void                            ResetStub                       ( uint dwType, va_list ) = 0;
+
+    virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
+    virtual void                            ClearPacketStats                ( void ) = 0;
 };
 
 #endif

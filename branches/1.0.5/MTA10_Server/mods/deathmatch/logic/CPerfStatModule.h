@@ -10,9 +10,6 @@
 *
 *****************************************************************************/
 
-typedef unsigned long TIMEUS;
-TIMEUS GetTimeUs ( void );
-
 //
 // CPerfStatResult
 //
