@@ -12,38 +12,6 @@
 
 #include "StdInc.h"
 
-namespace
-{
-    //
-    // CLuaMainMemory
-    //
-    class CLuaMainMemory
-    {
-    public:
-        CLuaMainMemory( void  )
-        {
-            memset ( this, 0, sizeof ( *this ) );
-        }
-
-        int Delta;
-        int Current;
-        int Max;
-        int OpenXMLFiles;
-        int Refs;
-        int TimerCount;
-        int ElementCount;
-        int TextDisplayCount;
-        int TextItemCount;
-    };
-
-    typedef std::map < CLuaMain*, CLuaMainMemory > CLuaMainMemoryMap;
-    class CAllLuaMemory
-    {
-    public:
-        CLuaMainMemoryMap LuaMainMemoryMap;
-    };
-}
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -55,6 +23,8 @@ namespace
 class CPerfStatPacketUsageImpl : public CPerfStatPacketUsage
 {
 public:
+    ZERO_ON_NEW
+
                                 CPerfStatPacketUsageImpl  ( void );
     virtual                     ~CPerfStatPacketUsageImpl ( void );
 
@@ -63,7 +33,12 @@ public:
     virtual void                DoPulse                 ( void );
     virtual void                GetStats                ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter );
 
-    SString                         m_strCategoryName;
+    // CPerfStatPacketUsageImpl
+    void                        RecordStats             ( void );
+
+    long long                   m_llNextRecordTime;
+    SString                     m_strCategoryName;
+    SPacketStat                 m_PacketStats [ 2 ] [ 256 ];
 };
 
 
@@ -130,6 +105,28 @@ const SString& CPerfStatPacketUsageImpl::GetCategoryName ( void )
 ///////////////////////////////////////////////////////////////
 void CPerfStatPacketUsageImpl::DoPulse ( void )
 {
+    // Copy and clear once every 5 seconds
+    long long llTime = GetTickCount64_ ();
+
+    if ( llTime >= m_llNextRecordTime )
+    {
+        m_llNextRecordTime = Max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
+        RecordStats ();
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPerfStatPacketUsageImpl::RecordStats
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CPerfStatPacketUsageImpl::RecordStats ( void )
+{
+    memcpy ( m_PacketStats, g_pNetServer->GetPacketStats (), sizeof ( m_PacketStats ) );
+    g_pNetServer->ClearPacketStats ();
 }
 
 
@@ -157,34 +154,24 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
         return;
     }
 
-    // Fetch stats
-    unsigned long ulTotalBitsIn[256];
-    unsigned long ulCountIn[256];
-    unsigned long ulTotalBitsOut[256];
-    unsigned long ulCountOut[256];
-    memset ( ulTotalBitsIn, 0, sizeof(ulTotalBitsIn) );
-    memset ( ulCountIn, 0, sizeof(ulCountIn) );
-    memset ( ulTotalBitsOut, 0, sizeof(ulTotalBitsOut) );
-    memset ( ulCountOut, 0, sizeof(ulCountOut) );
-    //g_pNetServer->GetNetworkUsageData ( CNetServer::STATS_INCOMING_TRAFFIC, ulTotalBitsIn, ulCountIn );
-    //g_pNetServer->GetNetworkUsageData ( CNetServer::STATS_OUTGOING_TRAFFIC, ulTotalBitsOut, ulCountOut );
-
     // Add columns
     pResult->AddColumn ( "Packet type" );
-    pResult->AddColumn ( "In bytes" );
-    pResult->AddColumn ( "Out bytes" );
-    pResult->AddColumn ( "In packets" );
-    pResult->AddColumn ( "Out packets" );
+    pResult->AddColumn ( "Incoming" );
+    pResult->AddColumn ( "pkt/sec" );
+    pResult->AddColumn ( "bytes/sec" );
+    pResult->AddColumn ( "cpu" );
+    pResult->AddColumn ( "Outgoing" );
+    pResult->AddColumn ( "pkt/sec" );
+    pResult->AddColumn ( "bytes/sec" );
+    pResult->AddColumn ( "cpu" );
 
     // Fill rows
-    for ( uint i = 0 ; i < NUMELMS( ulTotalBitsIn ) ; i++ )
+    for ( uint i = 0 ; i < 256 ; i++ )
     {
-        unsigned long ulBytesIn  = ulTotalBitsIn[i] / 8;
-        unsigned long ulIn       = ulCountIn[i];
-        unsigned long ulBytesOut = ulTotalBitsOut[i] / 8;
-        unsigned long ulOut      = ulCountOut[i];
+        const SPacketStat& statIn = m_PacketStats [ CNetServer::STATS_INCOMING_TRAFFIC ] [ i ];
+        const SPacketStat& statOut = m_PacketStats [ CNetServer::STATS_OUTGOING_TRAFFIC ] [ i ];
 
-        if ( !ulIn && !ulOut )
+        if ( !statIn.iCount && !statOut.iCount )
             continue;
 
         // Add row
@@ -192,9 +179,33 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
 
         int c = 0;
         row[c++] = SString ( "%d", i );
-        row[c++] = SString ( "%d", ulBytesIn );
-        row[c++] = SString ( "%d", ulBytesOut );
-        row[c++] = SString ( "%d", ulIn );
-        row[c++] = SString ( "%d", ulOut );
+        row[c++] = "|";
+        if ( statIn.iCount )
+        {
+            row[c++] = SString ( "%d", statIn.iCount / 5 );
+            row[c++] = SString ( "%d", statIn.iTotalBytes / 5 );
+            row[c++] = SString ( "%2.2f%%", statIn.totalTime / 50000.f );   // Number of microseconds in sample period ( 5sec * 1000000 ) into percent ( * 100 )
+        }
+        else
+        {
+            row[c++] = "-";
+            row[c++] = "-";
+            row[c++] = "-";
+        }
+
+        row[c++] = "|";
+        if ( statOut.iCount )
+        {
+            row[c++] = SString ( "%d", statOut.iCount / 5 );
+            row[c++] = SString ( "%d", statOut.iTotalBytes / 5 );
+            //row[c++] = SString ( "%2.2f%%", statIn.totalTime / 50000.f );
+            row[c++] = "n/a";
+        }
+        else
+        {
+            row[c++] = "-";
+            row[c++] = "-";
+            row[c++] = "-";
+        }
     }
 }
