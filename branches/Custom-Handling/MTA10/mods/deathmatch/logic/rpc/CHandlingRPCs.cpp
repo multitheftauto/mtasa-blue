@@ -59,7 +59,7 @@ void CHandlingRPCs::SetVehicleHandling ( CClientEntity* pSource, NetBitStreamInt
         pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
         pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
         pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
-        pEntry->SetSuspensionAntidiveMultiplier ( handling.data.fSuspensionAntidiveMultiplier );
+        pEntry->SetSuspensionAntidriveMultiplier ( handling.data.fSuspensionAntidriveMultiplier );
         pEntry->SetCollisionDamageMultiplier ( handling.data.fCollisionDamageMultiplier );
         pEntry->SetModelFlags ( handling.data.uiModelFlags );
         pEntry->SetHandlingFlags ( handling.data.uiHandlingFlags );
@@ -241,9 +241,9 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                     pHandlingEntry->SetSuspensionFrontRearBias ( fFloat );
                     break;
 
-                case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                case HANDLING_SUSPENSION_ANTIDRIVEMULTIPLIER:
                     bitStream.Read ( fFloat );
-                    pHandlingEntry->SetSuspensionAntidiveMultiplier ( fFloat );
+                    pHandlingEntry->SetSuspensionAntidriveMultiplier ( fFloat );
                     break;
 
                 case HANDLING_COLLISIONDAMAGEMULTIPLIER:
@@ -412,8 +412,8 @@ void CHandlingRPCs::RestoreVehicleHandlingProperty ( CClientEntity* pSource, Net
                     pHandlingEntry->SetSuspensionFrontRearBias ( pOriginalEntry->GetSuspensionFrontRearBias () );
                     break;
 
-                case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
-                    pHandlingEntry->SetSuspensionAntidiveMultiplier ( pOriginalEntry->GetSuspensionAntidiveMultiplier () );
+                case HANDLING_SUSPENSION_ANTIDRIVEMULTIPLIER:
+                    pHandlingEntry->SetSuspensionAntidriveMultiplier ( pOriginalEntry->GetSuspensionAntidriveMultiplier () );
                     break;
 
                 case HANDLING_COLLISIONDAMAGEMULTIPLIER:

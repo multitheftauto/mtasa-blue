@@ -127,7 +127,7 @@ public:
     virtual float           GetSuspensionUpperLimit         ( void ) const = 0;
     virtual float           GetSuspensionLowerLimit         ( void ) const = 0;
     virtual float           GetSuspensionFrontRearBias      ( void ) const = 0;
-    virtual float           GetSuspensionAntidiveMultiplier ( void ) const = 0;
+    virtual float           GetSuspensionAntidriveMultiplier ( void ) const = 0;
 
     virtual float           GetCollisionDamageMultiplier    ( void ) const = 0;
 
@@ -172,7 +172,7 @@ public:
     virtual void            SetSuspensionUpperLimit         ( float fUpperLimit ) = 0;
     virtual void            SetSuspensionLowerLimit         ( float fLowerLimit ) = 0;
     virtual void            SetSuspensionFrontRearBias      ( float fBias ) = 0;
-    virtual void            SetSuspensionAntidiveMultiplier ( float fAntidive ) = 0;
+    virtual void            SetSuspensionAntidriveMultiplier ( float fAntidive ) = 0;
 
     virtual void            SetCollisionDamageMultiplier    ( float fMultiplier ) = 0;
 

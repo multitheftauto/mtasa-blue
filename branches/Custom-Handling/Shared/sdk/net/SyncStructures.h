@@ -1470,7 +1470,7 @@ struct SVehicleHandlingSync : public ISyncStructure
             bitStream.Read ( data.fSuspensionUpperLimit ) &&
             bitStream.Read ( data.fSuspensionLowerLimit ) &&
             bitStream.Read ( data.fSuspensionFrontRearBias ) &&
-            bitStream.Read ( data.fSuspensionAntidiveMultiplier ) &&
+            bitStream.Read ( data.fSuspensionAntidriveMultiplier ) &&
             bitStream.Read ( data.fCollisionDamageMultiplier ) &&
             bitStream.Read ( data.uiModelFlags ) &&
             bitStream.Read ( data.uiHandlingFlags ) &&
@@ -1513,7 +1513,7 @@ struct SVehicleHandlingSync : public ISyncStructure
         bitStream.Write ( data.fSuspensionUpperLimit );
         bitStream.Write ( data.fSuspensionLowerLimit );
         bitStream.Write ( data.fSuspensionFrontRearBias );
-        bitStream.Write ( data.fSuspensionAntidiveMultiplier );
+        bitStream.Write ( data.fSuspensionAntidriveMultiplier );
         bitStream.Write ( data.fCollisionDamageMultiplier );
         bitStream.Write ( data.uiModelFlags );
         bitStream.Write ( data.uiHandlingFlags );
@@ -1557,7 +1557,7 @@ struct SVehicleHandlingSync : public ISyncStructure
         float           fSuspensionUpperLimit;          // +184
         float           fSuspensionLowerLimit;          // +188
         float           fSuspensionFrontRearBias;       // +192
-        float           fSuspensionAntidiveMultiplier;  // +196
+        float           fSuspensionAntidriveMultiplier;  // +196
 
         float           fCollisionDamageMultiplier;     // +200
 

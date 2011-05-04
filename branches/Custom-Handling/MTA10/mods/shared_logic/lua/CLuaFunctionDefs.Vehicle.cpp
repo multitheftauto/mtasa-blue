@@ -2457,8 +2457,8 @@ int CLuaFunctionDefs::GetVehicleHandling ( lua_State* luaVM )
             lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias () );
             lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
 
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidiveMultiplier () );
-            lua_setfield ( luaVM, -2, "suspensionAntidiveMultiplier" );
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidriveMultiplier () );
+            lua_setfield ( luaVM, -2, "suspensionAntidriveMultiplier" );
 
             lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier () );
             lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );

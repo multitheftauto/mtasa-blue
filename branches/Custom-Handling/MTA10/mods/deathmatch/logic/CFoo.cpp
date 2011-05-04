@@ -348,7 +348,7 @@ void CFoo::Test ( const char* szString )
                 fprintf ( poo, "fSuspensionUpperLimit = %f\n", pHandling->fSuspensionUpperLimit );
                 fprintf ( poo, "fSuspensionLowerLimit = %f\n", pHandling->fSuspensionLowerLimit );
                 fprintf ( poo, "fSuspensionFrontRearBias = %f\n", pHandling->fSuspensionFrontRearBias );
-                fprintf ( poo, "fSuspensionAntidiveMultiplier = %f\n", pHandling->fSuspensionAntidiveMultiplier );
+                fprintf ( poo, "fSuspensionAntidriveMultiplier = %f\n", pHandling->fSuspensionAntidriveMultiplier );
 
                 fprintf ( poo, "fCollisionDamageMultiplier = %f\n", pHandling->fCollisionDamageMultiplier );
 

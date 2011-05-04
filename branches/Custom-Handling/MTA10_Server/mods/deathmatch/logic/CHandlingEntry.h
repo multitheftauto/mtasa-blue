@@ -63,7 +63,7 @@ struct tHandlingData
     float           fSuspensionUpperLimit;          // +184
     float           fSuspensionLowerLimit;          // +188
     float           fSuspensionFrontRearBias;       // +192
-    float           fSuspensionAntidiveMultiplier;  // +196
+    float           fSuspensionAntidriveMultiplier;  // +196
 
     float           fCollisionDamageMultiplier;     // +200
 
@@ -146,7 +146,7 @@ public:
     float           GetSuspensionUpperLimit         ( void ) const    { return m_Handling.fSuspensionUpperLimit; };
     float           GetSuspensionLowerLimit         ( void ) const    { return m_Handling.fSuspensionLowerLimit; };
     float           GetSuspensionFrontRearBias      ( void ) const    { return m_Handling.fSuspensionFrontRearBias; };
-    float           GetSuspensionAntidiveMultiplier ( void ) const    { return m_Handling.fSuspensionAntidiveMultiplier; };
+    float           GetSuspensionAntidriveMultiplier ( void ) const   { return m_Handling.fSuspensionAntidriveMultiplier; };
 
     float           GetCollisionDamageMultiplier    ( void ) const    { return m_Handling.fCollisionDamageMultiplier; };
 
@@ -191,7 +191,7 @@ public:
     void            SetSuspensionUpperLimit         ( float fUpperLimit )           { m_Handling.fSuspensionUpperLimit = fUpperLimit; };
     void            SetSuspensionLowerLimit         ( float fLowerLimit )           { m_Handling.fSuspensionLowerLimit = fLowerLimit; };
     void            SetSuspensionFrontRearBias      ( float fBias )                 { m_Handling.fSuspensionFrontRearBias = fBias; };
-    void            SetSuspensionAntidiveMultiplier ( float fAntidive )             { m_Handling.fSuspensionAntidiveMultiplier = fAntidive; };
+    void            SetSuspensionAntidriveMultiplier ( float fAntidrive )             { m_Handling.fSuspensionAntidriveMultiplier = fAntidrive; };
 
     void            SetCollisionDamageMultiplier    ( float fMultiplier )           { m_Handling.fCollisionDamageMultiplier = fMultiplier; };
 
