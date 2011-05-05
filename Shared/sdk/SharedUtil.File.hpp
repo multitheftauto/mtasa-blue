@@ -91,7 +91,7 @@ bool SharedUtil::FileRename ( const SString& strFilenameOld, const SString& strF
 #ifdef WIN32
     return MoveFile ( strFilenameOld, strFilenameNew ) != 0;
 #else
-    return std::rename ( strFilenameOld, strFilenameNew ) == 0;
+    return rename ( strFilenameOld, strFilenameNew ) == 0;
 #endif
 }
 
