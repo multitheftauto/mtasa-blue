@@ -6503,8 +6503,8 @@ bool CStaticFunctionDefinitions::GetEntryHandling ( CHandlingEntry* pEntry, eHan
             case HANDLING_SUSPENSION_FRONTREARBIAS:
                 fValue = pEntry->GetSuspensionFrontRearBias ();
                 break;
-            case HANDLING_SUSPENSION_ANTIDRIVEMULTIPLIER:
-                fValue = pEntry->GetSuspensionAntidriveMultiplier ();
+            case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                fValue = pEntry->GetSuspensionAntiDiveMultiplier ();
                 break;
             case HANDLING_COLLISIONDAMAGEMULTIPLIER:
                 fValue = pEntry->GetCollisionDamageMultiplier ();

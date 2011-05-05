@@ -66,7 +66,7 @@ public:
     static int      handlingGetSuspensionUpperLimit         ( lua_State* luaVM );
     static int      handlingGetSuspensionLowerLimit         ( lua_State* luaVM );
     static int      handlingGetSuspensionFrontRearBias      ( lua_State* luaVM );
-    static int      handlingGetSuspensionAntidriveMultiplier ( lua_State* luaVM );
+    static int      handlingGetSuspensionAntiDiveMultiplier ( lua_State* luaVM );
 
     static int      handlingGetCollisionDamageMultiplier    ( lua_State* luaVM );
 
@@ -109,7 +109,7 @@ public:
     static int      handlingSetSuspensionUpperLimit         ( lua_State* luaVM );
     static int      handlingSetSuspensionLowerLimit         ( lua_State* luaVM );
     static int      handlingSetSuspensionFrontRearBias      ( lua_State* luaVM );
-    static int      handlingSetSuspensionAntidriveMultiplier ( lua_State* luaVM );
+    static int      handlingSetSuspensionAntiDiveMultiplier ( lua_State* luaVM );
 
     static int      handlingSetCollisionDamageMultiplier    ( lua_State* luaVM );
 

@@ -73,7 +73,7 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                             case HANDLING_SUSPENSION_UPPER_LIMIT:
                             case HANDLING_SUSPENSION_LOWER_LIMIT:
                             case HANDLING_SUSPENSION_FRONTREARBIAS:
-                            case HANDLING_SUSPENSION_ANTIDRIVEMULTIPLIER:
+                            case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
                             case HANDLING_COLLISIONDAMAGEMULTIPLIER:
                             case HANDLING_SEATOFFSETDISTANCE:
                                 {
@@ -255,7 +255,7 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                             case HANDLING_SUSPENSION_UPPER_LIMIT:
                             case HANDLING_SUSPENSION_LOWER_LIMIT:
                             case HANDLING_SUSPENSION_FRONTREARBIAS:
-                            case HANDLING_SUSPENSION_ANTIDRIVEMULTIPLIER:
+                            case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
                             case HANDLING_COLLISIONDAMAGEMULTIPLIER:
                             case HANDLING_SEATOFFSETDISTANCE:
                             case HANDLING_PERCENTSUBMERGED: // unsigned int
@@ -458,8 +458,8 @@ int CLuaHandlingDefs::GetVehicleHandling ( lua_State* luaVM )
             lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias () );
             lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
 
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidriveMultiplier () );
-            lua_setfield ( luaVM, -2, "suspensionAntidriveMultiplier" );
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntiDiveMultiplier () );
+            lua_setfield ( luaVM, -2, "suspensionAntiDiveMultiplier" );
 
             lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier () );
             lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
@@ -623,8 +623,8 @@ int CLuaHandlingDefs::GetModelHandling ( lua_State* luaVM )
             lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias () );
             lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
 
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidriveMultiplier () );
-            lua_setfield ( luaVM, -2, "suspensionAntidriveMultiplier" );
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntiDiveMultiplier () );
+            lua_setfield ( luaVM, -2, "suspensionAntiDiveMultiplier" );
 
             lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier () );
             lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
@@ -763,8 +763,8 @@ int CLuaHandlingDefs::GetOriginalHandling ( lua_State* luaVM )
             lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
             lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias() );
             lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntidriveMultiplier() );
-            lua_setfield ( luaVM, -2, "suspensionAntidriveMultiplier" );
+            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntiDiveMultiplier() );
+            lua_setfield ( luaVM, -2, "suspensionAntiDiveMultiplier" );
             lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier() );
             lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
             lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance() );

@@ -2781,7 +2781,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
                         pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
                         pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
-                        pEntry->SetSuspensionAntidriveMultiplier ( handling.data.fSuspensionAntidriveMultiplier );
+                        pEntry->SetSuspensionAntiDiveMultiplier ( handling.data.fSuspensionAntiDiveMultiplier );
                         pEntry->SetCollisionDamageMultiplier ( handling.data.fCollisionDamageMultiplier );
                         pEntry->SetModelFlags ( handling.data.uiModelFlags );
                         pEntry->SetHandlingFlags ( handling.data.uiHandlingFlags );

@@ -451,7 +451,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         handling.data.fSuspensionUpperLimit         = pEntry->GetSuspensionUpperLimit ();
                         handling.data.fSuspensionLowerLimit         = pEntry->GetSuspensionLowerLimit ();
                         handling.data.fSuspensionFrontRearBias      = pEntry->GetSuspensionFrontRearBias ();
-                        handling.data.fSuspensionAntidriveMultiplier = pEntry->GetSuspensionAntidriveMultiplier ();
+                        handling.data.fSuspensionAntiDiveMultiplier = pEntry->GetSuspensionAntiDiveMultiplier ();
                         handling.data.fCollisionDamageMultiplier    = pEntry->GetCollisionDamageMultiplier ();
                         handling.data.uiModelFlags                  = pEntry->GetModelFlags ();
                         handling.data.uiHandlingFlags               = pEntry->GetHandlingFlags ();
