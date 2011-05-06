@@ -251,6 +251,7 @@ public:
 
 private:
     void                        AddBuiltInEvents            ( void );
+    void                        RelayPlayerPuresync         ( class CPacket& Packet );
 
     void                        Packet_PlayerJoin           ( NetServerPlayerID& Source );
     void                        Packet_PlayerJoinData       ( class CPlayerJoinDataPacket& Packet );

@@ -122,11 +122,6 @@ CPlayer* CPlayerManager::Get ( const char* szNick, bool bCaseSensitive )
 
 void CPlayerManager::DeleteAll ( void )
 {
-    // Do this first to save some cycles and avoid a crash
-    // if there are synctimes in the list. As the unreferencing
-    // can't be done inside the deleteloop.
-    ClearSyncTimes ();
-
     // Delete all the items in the list (without letting them remove themselves)
     m_bCanRemoveFromList = false;
     list < CPlayer* > ::const_iterator iter = m_Players.begin ();
@@ -300,40 +295,6 @@ void CPlayerManager::ResetAll ( void )
     for ( ; iter != m_Players.end (); iter++ )
     {
         (*iter)->Reset ();
-    }
-}
-
-
-void CPlayerManager::ClearSyncTime ( CPlayer& Player )
-{
-    // Only do this if we're not working on deleting all the players. Otherwize
-    // we get a crash.
-    if ( m_bCanRemoveFromList )
-    {
-        // Call ClearSyncTime on every player. This makes sure this
-        // player no longer references it in its synctime stuff.
-        list < CPlayer* > ::const_iterator iter = m_Players.begin ();
-        for ( ; iter != m_Players.end (); iter++ )
-        {
-            (*iter)->ClearSyncTime ( Player );
-        }
-    }
-}
-
-
-void CPlayerManager::ClearSyncTimes ( void )
-{
-    // Only do this if we're not working on deleting all the players. Otherwize
-    // we get a crash.
-    if ( m_bCanRemoveFromList )
-    {
-        // Call ClearSyncTimes on every player. This clears
-        // all synctimes on the server.
-        list < CPlayer* > ::const_iterator iter = m_Players.begin ();
-        for ( ; iter != m_Players.end (); iter++ )
-        {
-            (*iter)->ClearSyncTimes ();
-        }
     }
 }
 

@@ -83,6 +83,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_ucBlurLevel = 36; // Default
 
+    m_llNextFarSyncTime = 0;
+
     // Sync stuff
     m_bSyncingVelocity = false;
     m_uiPuresyncPackets = 0;
@@ -98,10 +100,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
 CPlayer::~CPlayer ( void )
 {
-    // Clear our sync time list and make sure no other player references us.
-    ClearSyncTimes ();
-    m_pPlayerManager->ClearSyncTime ( *this );
-
     // Make sure the script debugger doesn't reference us
     SetScriptDebugLevel ( 0 );    
 
@@ -494,102 +492,17 @@ void CPlayer::RemoveNametagOverrideColor ( void )
 }
 
 
-bool CPlayer::IsTimeToSendSyncFrom ( CPlayer& Player, unsigned long ulTimeNow )
+// Is it time to send a pure sync to every other player ?
+bool CPlayer::IsTimeForFarSync ( void )
 {
-    #define SLOW_SYNCRATE 1000
-    #define DISTANCE_FOR_SLOW_SYNCRATE 320.0f
-
-    // Loop through the sync stuff
-    sPlayerSyncData* pData;
-    list < sPlayerSyncData* > ::iterator iter = m_SyncTimes.begin ();
-    for ( ; iter != m_SyncTimes.end (); iter++ )
+    long long llTime = GetTickCount64_ ();
+    if ( llTime > m_llNextFarSyncTime )
     {
-        pData = *iter;
-
-        // Matching player?
-        if ( &Player == pData->pPlayer )
-        {
-            // Is a slow sync rate required?
-            bool bReqSlowSync = false;
-            CVector vecCameraPosition;
-            m_pCamera->GetPosition ( vecCameraPosition );
-            const CVector& vecRemotePlayerPos = Player.GetPosition ();
-            const CVector& vecLocalPlayerPos = GetPosition ();
-
-            if ( ( DistanceBetweenPoints3D ( vecLocalPlayerPos, vecRemotePlayerPos ) >= DISTANCE_FOR_SLOW_SYNCRATE ) &&
-                 ( DistanceBetweenPoints3D ( vecCameraPosition, vecRemotePlayerPos ) >= DISTANCE_FOR_SLOW_SYNCRATE ) )
-            {
-                // Allow 5 fast syncs when switching from fast to slow sync rate to ensure big moves away from the viewer are updated in a timely manner
-                if ( pData->ulSwitchingToSlowSyncRate < 5 )
-                    pData->ulSwitchingToSlowSyncRate++;
-                else
-                    bReqSlowSync = true;
-            }
-            else
-            {
-                pData->ulSwitchingToSlowSyncRate = 0;
-            }
-
-            // Skip if slow syncing and previous sync was less than SLOW_SYNCRATE ticks ago
-            if ( bReqSlowSync && ulTimeNow - pData->ulLastSent < SLOW_SYNCRATE )
-            {
-                // Don't send
-                return false;
-            }
-
-            // Send a sync now since we're close to him or it's time to do so
-            // Remember now as the time we've done that.
-            pData->ulLastSent = ulTimeNow;
-            return true;
-        }
+        m_llNextFarSyncTime = llTime + SLOW_SYNCRATE;
+        m_llNextFarSyncTime += rand () % ( 1 + SLOW_SYNCRATE / 10 );   // Extra bit to help distribute the load
+        return true;
     }
-
-    // There are no matching entries for this player. This means we need to create one for it.
-    pData = new sPlayerSyncData;
-    pData->pPlayer = &Player;
-    pData->ulLastSent = ulTimeNow;
-    pData->ulSwitchingToSlowSyncRate = 0;
-    m_SyncTimes.push_back ( pData );
-
-    // And do the sync
-    return true;
-}
-
-
-void CPlayer::ClearSyncTime ( CPlayer& Player )
-{
-    // Loop through our list of synctime entries
-    sPlayerSyncData* pData;
-    list < sPlayerSyncData* > ::iterator iter = m_SyncTimes.begin ();
-    for ( ; iter != m_SyncTimes.end (); iter++ )
-    {
-        pData = *iter;
-
-        // Is this our player?
-        if ( pData->pPlayer == &Player )
-        {
-            // Delete the data in it
-            delete pData;
-
-            // Delete this entry and we're done. We won't exist twice in this list.
-            m_SyncTimes.erase ( iter );
-            return;
-        }
-    }
-}
-
-
-void CPlayer::ClearSyncTimes ( void )
-{
-    // Delete all our data
-    list < sPlayerSyncData* > ::iterator iter = m_SyncTimes.begin ();
-    for ( ; iter != m_SyncTimes.end (); iter++ )
-    {
-        delete *iter;
-    }
-
-    // Clear the list so we won't try accessing bad data later
-    m_SyncTimes.clear ();
+    return false;
 }
 
 

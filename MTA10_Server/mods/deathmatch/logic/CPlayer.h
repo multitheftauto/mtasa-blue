@@ -27,6 +27,9 @@ class CPlayer;
 #include "CPad.h"
 #include "packets/CPacket.h"
 
+#define SLOW_SYNCRATE               1000
+#define DISTANCE_FOR_SLOW_SYNCRATE  320
+
 class CKeyBinds;
 class CPlayerCamera;
 
@@ -41,13 +44,6 @@ class CPlayer : public CPed, public CClient
 {
     friend class CElement;
     friend class CScriptDebugging;
-
-    struct sPlayerSyncData
-    {
-        CPlayer*        pPlayer;
-        unsigned long   ulLastSent;
-        unsigned long   ulSwitchingToSlowSyncRate;
-    };
 
 public:
                                                 CPlayer                     ( class CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket );
@@ -193,9 +189,7 @@ public:
     inline unsigned char                        GetBlurLevel                ( void )                        { return m_ucBlurLevel; }
     inline void                                 SetBlurLevel                ( unsigned char ucBlurLevel )   { m_ucBlurLevel = ucBlurLevel; }
 
-    bool                                        IsTimeToSendSyncFrom        ( CPlayer& Player, unsigned long ulTimeNow );
-    void                                        ClearSyncTime               ( CPlayer& Player );
-    void                                        ClearSyncTimes              ( void );    
+    bool                                        IsTimeForFarSync            ( void );
 
     // Sync stuff
     inline void                                 SetSyncingVelocity          ( bool bSyncing )               { m_bSyncingVelocity = bSyncing; }
@@ -288,7 +282,7 @@ private:
 
     unsigned char                               m_ucBlurLevel;
 
-    std::list < sPlayerSyncData* >              m_SyncTimes;
+    long long                                   m_llNextFarSyncTime;       
 
     // Sync stuff
     bool                                        m_bSyncingVelocity;

@@ -60,9 +60,6 @@ public:
 
     void                                        ResetAll                        ( void );
 
-    void                                        ClearSyncTime                   ( CPlayer& Player );
-    void                                        ClearSyncTimes                  ( void );
-
 private:
     inline void                                 AddToList                       ( CPlayer* pPlayer )                                { m_Players.push_back ( pPlayer ); };
     void                                        RemoveFromList                  ( CPlayer* pPlayer );

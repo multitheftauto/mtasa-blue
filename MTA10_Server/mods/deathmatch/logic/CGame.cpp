@@ -1680,6 +1680,67 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 }
 
 
+// Relay this (pure sync) packet to all the other players using distance rules
+void CGame::RelayPlayerPuresync ( CPacket& Packet )
+{
+
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer->IsTimeForFarSync () )
+    {
+        // All players get sync if it's time for a far sync
+        for ( std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin (); iter != m_pPlayerManager->IterEnd (); iter++ )
+        {
+            CPlayer* pSendPlayer = *iter;
+            if ( pSendPlayer != pPlayer )
+                pSendPlayer->Send ( Packet );
+        }
+    }
+    else
+    {
+        // Only near players get sync if it's not time for a far sync
+
+        // Get the two positions to check
+        const CVector& vecLocalPlayerPos = pPlayer->GetPosition ();
+        CVector vecCameraPosition;
+        pPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
+
+        // Perform queries on spatial database
+        CElementResult resultNearCamera;
+        GetSpatialDatabase()->SphereQuery ( resultNearCamera, CSphere ( vecCameraPosition, DISTANCE_FOR_SLOW_SYNCRATE ) );
+
+        CElementResult resultNearPlayer;
+        GetSpatialDatabase()->SphereQuery ( resultNearPlayer, CSphere ( vecLocalPlayerPos, DISTANCE_FOR_SLOW_SYNCRATE ) );
+
+        // Merge lists
+        std::set < CPlayer* > nearList;
+        for ( CElementResult::const_iterator it = resultNearCamera.begin () ; it != resultNearCamera.end (); ++it )
+            if ( (*it)->GetType () == CElement::PLAYER )
+                nearList.insert ( (CPlayer*)*it );
+
+        for ( CElementResult::const_iterator it = resultNearPlayer.begin () ; it != resultNearPlayer.end (); ++it )
+            if ( (*it)->GetType () == CElement::PLAYER )
+                nearList.insert ( (CPlayer*)*it );
+
+        // Send packet to other players who are near
+        for ( std::set < CPlayer* > ::const_iterator iter = nearList.begin (); iter != nearList.end (); iter++ )
+        {
+            CPlayer* pSendPlayer = *iter;
+            if ( pSendPlayer != pPlayer )
+            {
+                const CVector& vecRemotePlayerPos = pSendPlayer->GetPosition ();
+
+                // Check distance is accurate
+                if ( ( vecLocalPlayerPos - vecRemotePlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE ||
+                     ( vecCameraPosition - vecRemotePlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE )
+                {
+                    pSendPlayer->Send ( Packet );
+                }
+            }
+        }
+    }
+}
+
+
 void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
 {
     // Grab the source player
@@ -1697,28 +1758,8 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
             if ( ( pPlayer->GetPuresyncCount () % 4 ) == 0 )
                 pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
 
-            // Grab current time
-            unsigned long ulTimeNow = GetTime ();
-
-            // Loop through all our players
-            CPlayer* pSendPlayer;
-            list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-            for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-            {
-                // Not the local player?
-                pSendPlayer = *iter;
-                if ( pSendPlayer != pPlayer )
-                {
-                    // Should we send it to this player? This returns false if the
-                    // distance between the players is so great that the sync is not
-                    // neccessary that often.
-                    if ( pSendPlayer->IsTimeToSendSyncFrom ( *pPlayer, ulTimeNow ) )
-                    {
-                        // Send it.
-                        pSendPlayer->Send ( Packet );
-                    }
-                }
-            }
+            // Relay to other players
+            RelayPlayerPuresync ( Packet );
 
             // Run colpoint checks
             m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
@@ -1799,28 +1840,8 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
             // Send a returnsync packet to the player that sent it
             pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
 
-            // Grab current time
-            unsigned long ulTimeNow = GetTime ();
-
-            // Loop through all our players
-            CPlayer* pSendPlayer;
-            list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-            for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-            {
-                // Not the local player?
-                pSendPlayer = *iter;
-                if ( pSendPlayer != pPlayer )
-                {
-                    // Should we send it to this player? This returns false if the
-                    // distance between the players is so great that the sync is not
-                    // neccessary that often.
-                    if ( pSendPlayer->IsTimeToSendSyncFrom ( *pPlayer, ulTimeNow ) )
-                    {
-                        // Send it.
-                        pSendPlayer->Send ( Packet );
-                    }
-                }
-            }
+            // Relay to other players
+            RelayPlayerPuresync ( Packet );
 
             // Run colpoint checks
             m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
