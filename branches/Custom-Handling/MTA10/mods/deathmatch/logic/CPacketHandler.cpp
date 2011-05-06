@@ -2785,7 +2785,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntry->SetTurnMass ( handling.data.fTurnMass );
                         pEntry->SetDragCoeff ( handling.data.fDragCoeff );
                         pEntry->SetCenterOfMass ( handling.data.vecCenterOfMass );
-                        pEntry->SetPercentSubmerged ( handling.data.uiPercentSubmerged );
+                        pEntry->SetPercentSubmerged ( handling.data.ucPercentSubmerged );
                         pEntry->SetTractionMultiplier ( handling.data.fTractionMultiplier );
                         pEntry->SetCarDriveType ( (CHandlingEntry::eDriveType)handling.data.ucDriveType );
                         pEntry->SetCarEngineType ( (CHandlingEntry::eEngineType)handling.data.ucEngineType );
@@ -2795,7 +2795,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntry->SetMaxVelocity ( handling.data.fMaxVelocity );
                         pEntry->SetBrakeDeceleration ( handling.data.fBrakeDeceleration );
                         pEntry->SetBrakeBias ( handling.data.fBrakeBias );
-                        pEntry->SetABS ( handling.data.ucABS ? true : false );
+                        pEntry->SetABS ( handling.data.bABS );
                         pEntry->SetSteeringLock ( handling.data.fSteeringLock );
                         pEntry->SetTractionLoss ( handling.data.fTractionLoss );
                         pEntry->SetTractionBias ( handling.data.fTractionBias );
