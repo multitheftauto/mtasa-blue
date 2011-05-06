@@ -156,14 +156,12 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
 
     // Add columns
     pResult->AddColumn ( "Packet type" );
-    pResult->AddColumn ( "Incoming" );
-    pResult->AddColumn ( "pkt/sec" );
-    pResult->AddColumn ( "bytes/sec" );
-    pResult->AddColumn ( "cpu" );
-    pResult->AddColumn ( "Outgoing" );
-    pResult->AddColumn ( "pkt/sec" );
-    pResult->AddColumn ( "bytes/sec" );
-    pResult->AddColumn ( "cpu" );
+    pResult->AddColumn ( "Incoming.pkt/sec" );
+    pResult->AddColumn ( "Incoming.bytes/sec" );
+    pResult->AddColumn ( "Incoming.cpu" );
+    pResult->AddColumn ( "Outgoing.pkt/sec" );
+    pResult->AddColumn ( "Outgoing.bytes/sec" );
+    pResult->AddColumn ( "Outgoing.cpu" );
 
     // Fill rows
     for ( uint i = 0 ; i < 256 ; i++ )
@@ -179,7 +177,6 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
 
         int c = 0;
         row[c++] = SString ( "%d", i );
-        row[c++] = "|";
         if ( statIn.iCount )
         {
             row[c++] = SString ( "%d", statIn.iCount / 5 );
@@ -193,7 +190,6 @@ void CPerfStatPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::m
             row[c++] = "-";
         }
 
-        row[c++] = "|";
         if ( statOut.iCount )
         {
             row[c++] = SString ( "%d", statOut.iCount / 5 );
