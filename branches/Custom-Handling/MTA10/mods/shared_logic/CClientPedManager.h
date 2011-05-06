@@ -22,8 +22,8 @@ class CEntity;
 
 class CClientPedManager
 {
-    friend CClientManager;
-    friend CClientPed;
+    friend class CClientManager;
+    friend class CClientPed;
 
 public:
     void                            DeleteAll                       ( void );

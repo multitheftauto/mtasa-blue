@@ -451,9 +451,9 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 if ( m_strInputText.size () > 0 )
                 {
                     // Convert our string to UTF8 before resizing, then back to ANSI.
-                    std::wstring strText = ConvertToUTF8(m_strInputText);
+                    std::wstring strText = MbUTF8ToUTF16(m_strInputText);
                     strText.resize ( strText.size () - 1 );
-                    SetInputText ( ConvertToANSI(strText).c_str() );
+                    SetInputText ( UTF16ToMbUTF8(strText).c_str() );
                 }
                 break;
             }
@@ -476,7 +476,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
             default:
             {
                 // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
-                if ( ConvertToUTF8(m_strInputText).size () < CHAT_MAX_CHAT_LENGTH )
+                if ( MbUTF8ToUTF16(m_strInputText).size () < CHAT_MAX_CHAT_LENGTH )
                 {                    
                     if ( KeyboardArgs.codepoint >= 32 )
                     {
@@ -493,7 +493,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                             wchar_t wUNICODE[2] = { uiCharacter, '\0' };
 
                             // Convert our UTF character into an ANSI string
-                            std::string strANSI = ConvertToANSI(wUNICODE);
+                            std::string strANSI = UTF16ToMbUTF8(wUNICODE);
 
                             // Append the ANSI string, and update
                             m_strInputText.append(strANSI);
@@ -546,19 +546,19 @@ void CChat::SetChatFont ( eChatFont Font )
     ID3DXFont* pDXFont = g_pCore->GetGraphics ()->GetFont ();
     switch ( Font )
     {
-        case CHAT_FONT_DEFAULT:
+        case ChatFonts::CHAT_FONT_DEFAULT:
             pFont = g_pCore->GetGUI ()->GetDefaultFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT );
             break;
-        case CHAT_FONT_CLEAR:
+        case ChatFonts::CHAT_FONT_CLEAR:
             pFont = g_pCore->GetGUI ()->GetClearFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_CLEAR );
             break;
-        case CHAT_FONT_BOLD:
+        case ChatFonts::CHAT_FONT_BOLD:
             pFont = g_pCore->GetGUI ()->GetBoldFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT_BOLD );
             break;
-        case CHAT_FONT_ARIAL:
+        case ChatFonts::CHAT_FONT_ARIAL:
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_ARIAL );
             break;                
     }
@@ -593,7 +593,7 @@ void CChat::UpdateGUI ( void )
 }
 
 
-void CChat::SetColor ( CColor& Color )
+void CChat::SetColor ( const CColor& Color )
 {
     unsigned long ulBackgroundColor = COLOR_ARGB ( Color.A, Color.R, Color.G, Color.B );
 
@@ -602,7 +602,7 @@ void CChat::SetColor ( CColor& Color )
 }
 
 
-void CChat::SetInputColor ( CColor& Color )
+void CChat::SetInputColor ( const CColor& Color )
 {
     unsigned long ulInputColor = COLOR_ARGB ( Color.A, Color.R, Color.G, Color.B );
 

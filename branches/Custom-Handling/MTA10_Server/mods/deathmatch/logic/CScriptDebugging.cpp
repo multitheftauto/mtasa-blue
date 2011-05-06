@@ -93,8 +93,8 @@ void CScriptDebugging::OutputDebugInfo ( lua_State* luaVM, int iLevel, unsigned 
         lua_getinfo ( luaVM, "nlS", &debugInfo );
         
         // first version includes script path - makes much longer though
-    //  _snprintf ( szDebugDump, 255, "Line: %d (%s + %d) %s", debugInfo.currentline, debugInfo.name, debugInfo.currentline - debugInfo.linedefined, debugInfo.short_src );
-        _snprintf ( szDebugDump, 255, "Line: %d (%s + %d)", debugInfo.currentline, debugInfo.name, debugInfo.currentline - debugInfo.linedefined );
+    //  snprintf ( szDebugDump, 255, "Line: %d (%s + %d) %s", debugInfo.currentline, debugInfo.name, debugInfo.currentline - debugInfo.linedefined, debugInfo.short_src );
+        snprintf ( szDebugDump, 255, "Line: %d (%s + %d)", debugInfo.currentline, debugInfo.name, debugInfo.currentline - debugInfo.linedefined );
         szDebugDump[255-1] = '\0';
 
         LogString ( luaVM, szDebugDump, iLevel, ucRed, ucGreen, ucBlue );
@@ -110,7 +110,7 @@ void CScriptDebugging::LogCustom ( lua_State* luaVM, unsigned char ucRed, unsign
     char szBuffer [MAX_STRING_LENGTH];
     va_list marker;
     va_start ( marker, szFormat );
-    _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
+    VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
     va_end ( marker );
 
     LogString ( "", luaVM, szBuffer, 0, ucRed, ucGreen, ucBlue );
@@ -124,7 +124,7 @@ void CScriptDebugging::LogInformation ( lua_State* luaVM, const char* szFormat, 
     char szBuffer [MAX_STRING_LENGTH];
     va_list marker;
     va_start ( marker, szFormat );
-    _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
+    VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
     va_end ( marker );
 
     // Log it
@@ -140,7 +140,7 @@ void CScriptDebugging::LogWarning ( lua_State* luaVM, const char* szFormat, ... 
     char szBuffer [MAX_STRING_LENGTH];
     va_list marker;
     va_start ( marker, szFormat );
-    _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
+    VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
     va_end ( marker );
 
     // Log it
@@ -156,7 +156,7 @@ void CScriptDebugging::LogError ( lua_State* luaVM, const char* szFormat, ... )
     char szBuffer [MAX_STRING_LENGTH];
     va_list marker;
     va_start ( marker, szFormat );
-    _VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
+    VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
     va_end ( marker );
 
     // Log it

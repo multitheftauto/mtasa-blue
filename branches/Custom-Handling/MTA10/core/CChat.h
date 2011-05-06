@@ -87,7 +87,7 @@ public:
     inline const char*          GetText                 ( void )            { return m_strText.c_str (); }
     void                        SetText                 ( const char* szText )  { m_strText = szText; }
     inline void                 GetColor                ( CColor& color )   { color = m_Color; }
-    inline void                 SetColor                ( CColor& color )   { m_Color = color; }
+    inline void                 SetColor                ( const CColor& color )   { m_Color = color; }
 
 protected:
     std::string                 m_strText;
@@ -133,9 +133,9 @@ public:
 
 class CChat
 {
-    friend CChatLine;
-    friend CChatInputLine;
-    friend CChatLineSection;
+    friend class CChatLine;
+    friend class CChatInputLine;
+    friend class CChatLineSection;
 
 public:
     inline                      CChat                   ( void ) {};
@@ -166,9 +166,9 @@ public:
     static float                GetTextExtent           ( const char * szText, float fScale = 1.0f );
     static void                 DrawTextString          ( const char * szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY, const CRect2D& RenderBounds );
 
-    void                        SetColor                ( CColor& Color );
-    void                        SetInputColor           ( CColor& Color );
-    void                        SetTextColor            ( CColor& Color )   { m_TextColor = Color; };
+    void                        SetColor                ( const CColor& Color );
+    void                        SetInputColor           ( const CColor& Color );
+    void                        SetTextColor            ( const CColor& Color )   { m_TextColor = Color; };
     void                        SetNumLines             ( unsigned int uiNumLines );
 
     void                        Scroll                  ( int iState )  { m_iScrollState = iState; };

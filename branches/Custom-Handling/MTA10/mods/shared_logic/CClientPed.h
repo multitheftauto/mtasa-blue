@@ -112,11 +112,11 @@ class CClientObject;
 
 class CClientPed : public CClientStreamElement, public CAntiCheatModule
 {
-    friend CClientCamera;
-    friend CClientPlayer;
-    friend CClientVehicle;
-    friend CClientPed;
-    friend CClientPedManager;
+    friend class CClientCamera;
+    friend class CClientPlayer;
+    friend class CClientVehicle;
+    friend class CClientPed;
+    friend class CClientPedManager;
 
 public:
                                 CClientPed                  ( CClientManager* pManager, unsigned long ulModelID, ElementID ID );

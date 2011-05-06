@@ -158,7 +158,7 @@ void HTTPClient::Send(const std::string& vars)
     stream.WriteString("\r\n");
   }
 
-  char tmp[512];
+  char tmp[4096];
   std::string buffer("");
   ssize_t contentLength = -1;
   int p;
@@ -183,7 +183,7 @@ void HTTPClient::Send(const std::string& vars)
           break;
         }
 
-        if (!strncmp(line.c_str(), "HTTP/1.0 ", 9))
+        if (!strncmp(line.c_str(), "HTTP/1.", 7))
         {
           /* Response status */
           if (m_responseStatus != -1)

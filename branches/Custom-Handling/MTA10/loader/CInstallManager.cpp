@@ -472,7 +472,7 @@ SString CInstallManager::_ProcessAeroChecks ( void )
     if ( GetApplicationSetting ( "os-version" ) >= "6.1" )
     {
         SString strGTAPath;
-        if ( GetGamePath ( strGTAPath ) == 1 )
+        if ( GetGamePath ( strGTAPath ) == GAME_PATH_OK )
         {
             SString strGTAEXEPath = PathJoin ( strGTAPath , MTA_GTAEXE_NAME );
             // Get the top byte of the file link timestamp

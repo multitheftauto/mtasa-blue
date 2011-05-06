@@ -1,6 +1,6 @@
 bin_PROGRAMS=mantisbot mantisbot_mkpasswd
 
-mantisbot_SOURCES=commands.cpp mantisbot.cpp keys.cpp configuration.cpp main.cpp
+mantisbot_SOURCES=commands.cpp mantisbot.cpp keys.cpp configuration.cpp main.cpp autofix.cpp
 mantisbot_LDADD=$(top_builddir)/../rsl/librsl.la -lpthread
 mantisbot_mkpasswd_SOURCES=mkpasswd.cpp keys.cpp
 

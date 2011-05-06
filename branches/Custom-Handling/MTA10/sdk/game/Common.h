@@ -1004,7 +1004,7 @@ enum ePanelsSA
 
 };
 
-enum eEventEntity;
+typedef int eEventEntity;
 
 enum eEventType
 {

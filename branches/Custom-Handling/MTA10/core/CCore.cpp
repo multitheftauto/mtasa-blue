@@ -160,6 +160,7 @@ CCore::CCore ( void )
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
+    m_bWaitToSetNick = false;
 
     // Initialize time
     CClientTime::InitializeTime ();
@@ -193,10 +194,12 @@ CCore::CCore ( void )
     m_tXfireUpdate = 0;
 
     // No initial fps limit
+    m_bDoneFrameRateLimit = false;
     m_uiFrameRateLimit = 0;
     m_uiServerFrameRateLimit = 0;
     m_dLastTimeMs = 0;
     m_dPrevOverrun = 0;
+    m_uiNewNickWaitFrames = 0;
 }
 
 CCore::~CCore ( void )
@@ -348,7 +351,8 @@ void CCore::ChatEcho ( const char* szText, bool bColorCoded )
     CChat* pChat = m_pLocalGUI->GetChat ();
     if ( pChat )
     {
-        pChat->SetTextColor ( CColor ( 255, 255, 255, 255 ) );
+        CColor color ( 255, 255, 255, 255 );
+        pChat->SetTextColor ( color );
     }
 
     // Echo it to the console and chat
@@ -369,7 +373,8 @@ void CCore::DebugEcho ( const char* szText )
     CDebugView * pDebugView = m_pLocalGUI->GetDebugView ();
     if ( pDebugView )
     {
-        pDebugView->SetTextColor ( CColor ( 255, 255, 255, 255 ) );
+        CColor color ( 255, 255, 255, 255 );
+        pDebugView->SetTextColor ( color );
     }
 
     m_pLocalGUI->EchoDebug ( szText );
@@ -381,7 +386,7 @@ void CCore::DebugPrintf ( const char* szFormat, ... )
     char szBuffer [1024];
     va_list ap;
     va_start ( ap, szFormat );
-    _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
+    VSNPRINTF ( szBuffer, 1024, szFormat, ap );
     va_end ( ap );
 
     DebugEcho ( szBuffer );
@@ -411,7 +416,8 @@ void CCore::DebugEchoColor ( const char* szText, unsigned char R, unsigned char 
     CDebugView * pDebugView = m_pLocalGUI->GetDebugView ();
     if ( pDebugView )
     {
-        pDebugView->SetTextColor ( CColor ( R, G, B, 255 ) );
+        CColor color ( R, G, B, 255 );
+        pDebugView->SetTextColor ( color );
     }
 
     m_pLocalGUI->EchoDebug ( szText );
@@ -427,7 +433,7 @@ void CCore::DebugPrintfColor ( const char* szFormat, unsigned char R, unsigned c
         char szBuffer [1024];
         va_list ap;
         va_start ( ap, B );
-        _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
+        VSNPRINTF ( szBuffer, 1024, szFormat, ap );
         va_end ( ap );
 
         // Echo it to the console and chat
@@ -452,7 +458,8 @@ void CCore::ChatEchoColor ( const char* szText, unsigned char R, unsigned char G
     CChat* pChat = m_pLocalGUI->GetChat ();
     if ( pChat )
     {
-        pChat->SetTextColor ( CColor ( R, G, B, 255 ) );
+        CColor color ( R, G, B, 255 );
+        pChat->SetTextColor ( color );
     }
 
     // Echo it to the console and chat
@@ -474,7 +481,7 @@ void CCore::ChatPrintf ( const char* szFormat, bool bColorCoded, ... )
     char szBuffer [1024];
     va_list ap;
     va_start ( ap, bColorCoded );
-    _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
+    VSNPRINTF ( szBuffer, 1024, szFormat, ap );
     va_end ( ap );
 
     // Echo it to the console and chat
@@ -493,7 +500,7 @@ void CCore::ChatPrintfColor ( const char* szFormat, bool bColorCoded, unsigned c
             char szBuffer [1024];
             va_list ap;
             va_start ( ap, B );
-            _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
+            VSNPRINTF ( szBuffer, 1024, szFormat, ap );
             va_end ( ap );
 
             // Echo it to the console and chat
@@ -615,6 +622,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "classic_controls", bval ); bval ? pController->SetInputType ( NULL ) : pController->SetInputType ( 1 );
     CVARS_GET ( "async_loading",    iVal ); m_pGame->SetAsyncLoadingFromSettings ( iVal == 1, iVal == 2 );
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
+    CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal );
 }
 
 void CCore::ApplyCommunityState ( void )
@@ -744,7 +752,7 @@ void CCore::HideQuickConnect ( void )
 void CCore::ShowServerInfo ( unsigned int WindowType )
 {
     RemoveMessageBox ();
-    CServerInfo::GetSingletonPtr()->Show( (CServerInfo::eWindowType)WindowType );
+    CServerInfo::GetSingletonPtr()->Show( (eWindowType)WindowType );
 }
 
 void CCore::ApplyHooks ( )
@@ -1137,6 +1145,18 @@ void CCore::DoPostFramePulse ( )
         {
             WaitForMenu++;
         }
+
+        if ( m_bWaitToSetNick && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading() )
+        {
+            if ( m_uiNewNickWaitFrames > 75 )
+            {
+                // Request a new nickname if we're waiting for one
+                GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
+                m_bWaitToSetNick = false;
+            }
+            else
+                m_uiNewNickWaitFrames++;
+        }
     }
 
     if ( !IsFocused() && m_bLastFocused )
@@ -1215,7 +1235,7 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "quit",              "exits the application",            CCommandFuncs::Exit );
     m_pCommands->Add ( "ver",               "shows the version",                CCommandFuncs::Ver );
     m_pCommands->Add ( "time",              "shows the time",                   CCommandFuncs::Time );
-    m_pCommands->Add ( "hud",               "shows the hud",                    CCommandFuncs::HUD );
+    m_pCommands->Add ( "showhud",           "shows the hud",                    CCommandFuncs::HUD );
     m_pCommands->Add ( "binds",             "shows all the binds",              CCommandFuncs::Binds );
 
 #if 0
@@ -1744,15 +1764,32 @@ void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit )
 
 
 //
+// Make sure the frame rate limit has been applied since the last call
+//
+void CCore::EnsureFrameRateLimitApplied ( void )
+{
+    if ( !m_bDoneFrameRateLimit )
+    {
+        ApplyFrameRateLimit ();
+    }
+    m_bDoneFrameRateLimit = false;
+}
+
+
+//
 // Do FPS limiting
 //
-void CCore::ApplyFrameRateLimit ( void )
+void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 {
-    if ( m_uiFrameRateLimit < 1 )
+    m_bDoneFrameRateLimit = true;
+
+    uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
+
+    if ( uiUseRate < 1 )
         return;
 
     // Calc required time in ms between frames
-    const double dTargetTimeToUse = 1000.0 / m_uiFrameRateLimit;
+    const double dTargetTimeToUse = 1000.0 / uiUseRate;
 
     // Time now
     double dTimeMs = CClientTime::GetTimeNano() * 1000.0;

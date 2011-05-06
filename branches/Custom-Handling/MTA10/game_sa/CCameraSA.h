@@ -389,7 +389,7 @@ public:
 
 class CCameraSA : public CCamera
 {
-    friend COffsets;
+    friend class COffsets;
 private:
     CCameraSAInterface          * internalInterface;
     CCamSA                      * Cams[MAX_CAMS];

@@ -67,7 +67,7 @@ private:
   void SendTextToChannels(const Rsl::Net::IRC::IRCText text);
   void Daemonize();
   bool CheckForMantisChanges();
-  bool CheckForGoogleCodeChanges();
+  bool CheckForGoogleCodeChanges(const __ConfigProject&);
 
 private:
   Rsl::Net::IRC::IRCClient m_client;
@@ -77,7 +77,8 @@ private:
   int m_errno;
   bool m_daemonize;
   bool m_initialized;
-  unsigned int m_lastMantisId, m_lastGoogleCodeId;
+  unsigned int m_lastMantisId;
+  std::map<const char*, unsigned int> m_lastGoogleCodeId;
   Rsl::Net::Socket::IPV4Addr m_httpMantisAddr, m_httpGoogleCodeAddr;
   Rsl::Net::Socket::IPV4Addr m_httpMantisBindAddr, m_httpGoogleCodeBindAddr;
   std::string m_mantisCookie;

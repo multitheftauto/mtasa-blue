@@ -185,6 +185,7 @@ public:
     virtual bool                IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false ) = 0;
 
     virtual bool                HasCreditScreenFadedOut         ( void ) = 0;
+    virtual void                FlushPendingRestreamIPL         ( void ) = 0;
 };
 
 #endif

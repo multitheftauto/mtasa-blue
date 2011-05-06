@@ -87,14 +87,12 @@ extern "C" bool g_bNoTopBar;
     #define MAX_PATH 255
     #define Print printw
 
-    #define _vsnprintf vsnprintf
-    #define _snprintf snprintf
-
     #ifndef stricmp
     #define stricmp strcasecmp
     #endif
-    #ifndef strcmpi
-    #define strcmpi strcasecmp
+
+    #ifndef strnicmp
+    #define strnicmp strncasecmp
     #endif
 
     #define _copysign copysign

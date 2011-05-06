@@ -82,7 +82,7 @@ bool CClientTXD::LoadTXD ( const char* szFile, bool bFilteringEnabled )
 bool CClientTXD::Import ( unsigned short usModelID )
 {
     // Have we got textures and haven't already imported into this model?
-    if ( !m_Textures.empty () && !IsImported ( usModelID ) )
+    if ( !m_Textures.empty () && !IsImported ( usModelID ) && g_pGame->GetModelInfo ( usModelID ) )
     {
         // Grab the lists of replaced and added textures for the model's TXD
         unsigned short usTxdID = g_pGame->GetModelInfo ( usModelID )->GetTextureDictionaryID ();

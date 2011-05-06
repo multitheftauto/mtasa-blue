@@ -21,7 +21,7 @@ class CClientStreamSectorRow;
 
 class CClientStreamElement : public CClientEntity
 {
-    friend CClientStreamer;
+    friend class CClientStreamer;
 public:
                                 CClientStreamElement        ( CClientStreamer * pStreamer, ElementID ID );
                                 ~CClientStreamElement       ( void );

@@ -202,7 +202,8 @@ public:
 
     uint                    GetFrameRateLimit               ( void )                                        { return m_uiFrameRateLimit; }
     void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 );
-    void                    ApplyFrameRateLimit             ( void );
+    void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 );
+    void                    EnsureFrameRateLimitApplied     ( void );
 
     SString                 GetConnectCommandFromURI        ( const char* szURI );  
     void                    GetConnectParametersFromURI     ( const char* szURI, std::string &strHost, unsigned short &usPort, std::string &strNick, std::string &strPassword );
@@ -210,6 +211,7 @@ public:
     std::map < std::string, std::string > & GetCommandLineOptions ( void ) { return m_CommandLineOptions; }
     const char *            GetCommandLineOption            ( const char* szOption );
     const char *            GetCommandLineArgs              ( void ) { return m_szCommandLineArgs; }
+    void                    RequestNewNickOnStart           ( void ) { m_bWaitToSetNick = true; };
 
     //XFire
     SString                 UpdateXfire                     ( void );
@@ -282,10 +284,13 @@ private:
     bool                        m_bQuitOnPulse;
     bool                        m_bDestroyMessageBox;
 
+    bool                        m_bDoneFrameRateLimit;
     uint                        m_uiServerFrameRateLimit;
     uint                        m_uiFrameRateLimit;
     double                      m_dLastTimeMs;
     double                      m_dPrevOverrun;
+    bool                        m_bWaitToSetNick;
+    uint                        m_uiNewNickWaitFrames;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

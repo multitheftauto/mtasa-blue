@@ -79,6 +79,9 @@ public:
 private:
     bool                    StringToLong        ( const char* szString, long& lValue );
 
+    unsigned long               m_ulID;
+    const bool                  m_bUsingIDs;
+
     class CXMLFileImpl*         m_pFile;
     CXMLNodeImpl*               m_pParent;
     TiXmlElement*               m_pNode;
@@ -88,9 +91,6 @@ private:
     bool                        m_bCanRemoveFromList;
 
     CXMLAttributesImpl          m_Attributes;
-
-    unsigned long               m_ulID;
-    const bool                  m_bUsingIDs;
 };
 
 #endif

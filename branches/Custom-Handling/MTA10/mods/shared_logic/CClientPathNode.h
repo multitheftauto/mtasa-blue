@@ -19,7 +19,7 @@ class CClientPathNode;
 
 class CClientPathNode: public CClientEntity
 {
-    friend CClientPathManager;
+    friend class CClientPathManager;
 
 public:
     enum ePathNodeStyle

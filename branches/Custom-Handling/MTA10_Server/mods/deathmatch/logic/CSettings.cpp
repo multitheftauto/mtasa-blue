@@ -135,8 +135,8 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
             if ( bDeleteNode ) {
                 // If we're walking through all resources (no resource nor setting name was specified) - ...
                 // Or if we're walking through a specific resource - ...
-                if ( ( uiResourceNameLength == 0 && ( strcmpi ( szResource, szLocalResource ) == 0 || eAccess != CSettings::Private ) )
-                    || ( uiResourceNameLength > 0 && ( ( strcmpi ( szResource, szQueryResource ) == 0 && ( eAccess != CSettings::Private || strcmpi ( szResource, szLocalResource ) == 0 ) )
+                if ( ( uiResourceNameLength == 0 && ( stricmp ( szResource, szLocalResource ) == 0 || eAccess != CSettings::Private ) )
+                    || ( uiResourceNameLength > 0 && ( ( stricmp ( szResource, szQueryResource ) == 0 && ( eAccess != CSettings::Private || stricmp ( szResource, szLocalResource ) == 0 ) )
                     ) ) ) {
                     if ( pMultiresultParentNode == NULL ) {
                         // Create a new temporary node (in which we can put all nodes we have access to), and add it as temporary subnode of pSource
@@ -148,9 +148,9 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
                     eStatus = Found;
                     CreateSetting ( pMultiresultParentNode, strContent.c_str (), pValue->GetValue ().c_str () );
                 }
-            } else if ( strcmpi ( szName, szQueryName ) == 0 &&
-                        strcmpi ( szResource, szQueryResource ) == 0 ) {            // If the query name/resource and found node name/resource combinations are equal
-                eStatus = (strcmpi ( szResource, szLocalResource ) == 0 || eAccess != CSettings::Private) ? Found : NoAccess;
+            } else if ( stricmp ( szName, szQueryName ) == 0 &&
+                        stricmp ( szResource, szQueryResource ) == 0 ) {            // If the query name/resource and found node name/resource combinations are equal
+                eStatus = (stricmp ( szResource, szLocalResource ) == 0 || eAccess != CSettings::Private) ? Found : NoAccess;
                 return pNode;
             }
         }
@@ -292,14 +292,14 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
             if ( !HasResourceName ( szSetting ) ) {
                 // If we have a prefix, move it from szSetting and put it at the beginning
                 if ( bPrefix )
-                    _snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%c%s.%s", szSetting[0], szLocalResource, szSetting + 1 );
+                    snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%c%s.%s", szSetting[0], szLocalResource, szSetting + 1 );
                 else
-                    _snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%s.%s", szLocalResource, szSetting );
+                    snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%s.%s", szLocalResource, szSetting );
 
             } else {
                 // If we have a prefix, move it from szSetting and put it at the beginning
                 if ( bPrefix )
-                    _snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%c%s", szSetting[0], szSetting + 1 );
+                    snprintf ( szBuffer, MAX_SETTINGS_LENGTH - 1, "%c%s", szSetting[0], szSetting + 1 );
                 else
                     strncpy ( szBuffer, szSetting, MAX_SETTINGS_LENGTH - 1 );
             }
@@ -313,7 +313,7 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
                 // Abort if this value isnt public (but protected or private), and if the local resource
                 // (doing the query) doesn't equal the setting's resource name
                 if ( GetAccessType ( pAttributes->Find ( "name" )->GetValue()[0] ) != CSettings::Public &&
-                     strcmpi ( pResource->GetName ().c_str (), szLocalResource ) != 0 )
+                     stricmp ( pResource->GetName ().c_str (), szLocalResource ) != 0 )
                     return false;
 
                 // Get the node's current value

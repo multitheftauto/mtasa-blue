@@ -24,8 +24,8 @@ class CPlayerPed;
 
 class CClientPlayerManager
 {
-    friend CClientManager;
-    friend CClientPlayer;
+    friend class CClientManager;
+    friend class CClientPlayer;
 
 public:
     inline CClientPlayer*       GetLocalPlayer                  ( void )                                                { return m_pLocalPlayer; };

@@ -232,7 +232,7 @@ bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, unsigned ch
 
 bool CStaticFunctionDefinitions::SetClipboard ( SString& strText )
 {
-    std::wstring strUTF = GetBidiString ( ConvertToUTF8 ( strText.c_str() ) );
+    std::wstring strUTF = GetBidiString ( MbUTF8ToUTF16 ( strText.c_str() ) );
 
     // Open and empty the clipboard
     OpenClipboard ( NULL );
@@ -264,7 +264,7 @@ bool CStaticFunctionDefinitions::GetClipboard ( SString& strText )
 
     if ( szBuffer )
     {
-        strText = ConvertToANSI ( GetBidiString ( szBuffer ) ).c_str();
+        strText = UTF16ToMbUTF8 ( GetBidiString ( szBuffer ) ).c_str();
         return true;
     }
 
@@ -4521,8 +4521,8 @@ void CStaticFunctionDefinitions::GUISetProperty ( CClientEntity& Entity, const c
         GUIElement.GetCGUIElement ()->SetProperty ( szProperty, szValue );
 
         // HACK: If the property being set is AlwaysOnTop, move it to the back so it's not in front of the main menu
-        if (  ( _stricmp ( szProperty, "AlwaysOnTop" ) == 0 ) && 
-              ( _stricmp ( szValue, "True" ) == 0 ) )
+        if (  ( stricmp ( szProperty, "AlwaysOnTop" ) == 0 ) && 
+              ( stricmp ( szValue, "True" ) == 0 ) )
         {
             GUIElement.GetCGUIElement ()->MoveToBack();
         }
@@ -4920,7 +4920,7 @@ void CStaticFunctionDefinitions::GUIGridListSetSelectionMode ( CClientEntity& En
         if ( IS_CGUIELEMENT_GRIDLIST ( &GUIElement ) )
         {
             // Set the selection mode
-            static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectionMode ( (CGUIGridList::SelectionMode) uiMode );
+            static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetSelectionMode ( (SelectionMode) uiMode );
         }
     }
 }

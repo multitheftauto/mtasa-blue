@@ -51,7 +51,7 @@ namespace Rsl { namespace File { namespace Ini {
     virtual ~IniParser();
 
     bool SetFilename(const char* filename);
-    const char* GetValue(const char* section, const char* entry);
+    const char* GetValue(const char* section, const char* entry) const;
 
     bool Ok() const;
     int Errno() const;

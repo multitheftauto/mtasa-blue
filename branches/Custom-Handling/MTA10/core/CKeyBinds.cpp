@@ -260,6 +260,7 @@ CKeyBinds::CKeyBinds ( CCore* pCore )
     m_bProcessingKeyStroke = false;
     m_KeyStrokeHandler = NULL;
     m_CharacterKeyHandler = NULL;
+    m_bWaitingToLoadDefaults = false;
 }
 
 
@@ -2082,7 +2083,15 @@ void CKeyBinds::DoPreFramePulse ( void )
 
 void CKeyBinds::DoPostFramePulse ( void )
 {
-    if ( m_pCore->GetGame ()->GetSystemState () != 9 /* GS_PLAYING_GAME */ ) return;
+    eSystemState SystemState = CCore::GetSingleton ().GetGame ()->GetSystemState ();
+
+    if ( m_bWaitingToLoadDefaults && ( SystemState == 7 || SystemState == 9 ) ) // Are GTA controls actually initialized?
+    {
+        LoadDefaultBinds ();
+        m_bWaitingToLoadDefaults = false; 
+    }
+
+    if ( SystemState != 9 /* GS_PLAYING_GAME */ ) return;
 
     bool bInVehicle = false, bHasDetonator = false, bIsDead = false, bEnteringVehicle = false;
     CPed* pPed = m_pCore->GetGame ()->GetPools ()->GetPedFromRef ( (DWORD)1 );
@@ -2323,9 +2332,13 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
     else
         bLoadDefaults = true;
 
+    eSystemState SystemState = CCore::GetSingleton ().GetGame ()->GetSystemState ();
     if ( bLoadDefaults )
     {
-        LoadDefaultBinds ();
+        if ( SystemState == 7 || SystemState == 9 ) // Are GTA controls actually initialized?
+            LoadDefaultBinds ();
+        else
+            m_bWaitingToLoadDefaults = true;
     }
 
     return bSuccess;

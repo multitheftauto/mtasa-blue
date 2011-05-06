@@ -50,9 +50,9 @@ int main(int argc, char *argv[])
   /* Calculate number of blocks to encode and allocate memory */
   n = strlen(confirm) / sizeof(uint32_t) + !!(strlen(confirm) % sizeof(uint32_t));
   len = n * sizeof(uint32_t);
-  pass = new char[len];
-  memset(pass, 0, len);
-  memcpy(pass, confirm, strlen(confirm));
+  pass = new char[len+1];
+  memset(pass, 0, len+1);
+  strcpy(pass, confirm);
   reslen = n * 6 + 1;
   result = new char[reslen];
   memset(confirm, 0, strlen(confirm));

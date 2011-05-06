@@ -26,7 +26,7 @@ typedef bool ( StreamerLimitReachedFunction ) ( void );
 
 class CClientStreamer
 {
-    friend CClientStreamElement;
+    friend class CClientStreamElement;
 public:
                                             CClientStreamer             ( StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance );
                                             ~CClientStreamer            ( void );

@@ -21,8 +21,6 @@ using std::list;
 
 extern CClientGame* g_pClientGame;
 
-#define snprintf _snprintf
-
 #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
 
 int CClientEntity::iCount = 0;
@@ -185,6 +183,9 @@ CClientEntity::~CClientEntity ( void )
     // Ensure intrusive list nodes have been isolated
     assert ( m_FromRootNode.m_pOuterItem == this && !m_FromRootNode.m_pPrev && !m_FromRootNode.m_pNext );
     assert ( m_ChildrenNode.m_pOuterItem == this && !m_ChildrenNode.m_pPrev && !m_ChildrenNode.m_pNext );
+
+    if ( !g_pClientGame->IsBeingDeleted () )
+        CClientEntityRefManager::OnEntityDelete ( this );
 }
 
 

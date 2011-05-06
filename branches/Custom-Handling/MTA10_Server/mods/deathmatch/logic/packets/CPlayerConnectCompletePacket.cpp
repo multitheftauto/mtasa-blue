@@ -15,7 +15,7 @@
 
 CPlayerConnectCompletePacket::CPlayerConnectCompletePacket()
 {
-    _snprintf(m_szConnText, MAX_CONN_TEXT_LEN, "%s %s [%s]", MTA_DM_FULL_STRING, MTA_DM_VERSIONSTRING, MTA_OS_STRING);
+    snprintf(m_szConnText, MAX_CONN_TEXT_LEN, "%s %s [%s]", MTA_DM_FULL_STRING, MTA_DM_VERSIONSTRING, MTA_OS_STRING);
 }
 
 IO_DECLARE_FUNCTION(CPlayerConnectCompletePacket,

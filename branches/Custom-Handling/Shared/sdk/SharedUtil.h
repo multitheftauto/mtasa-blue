@@ -63,3 +63,23 @@ typedef unsigned long       DWORD;      //  32      32      64
 #include "SharedUtil.Time.h"
 #include "SharedUtil.Buffer.h"
 #include "SharedUtil.Game.h"
+
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
+
+#ifndef stricmp
+#ifdef _MSC_VER
+#define stricmp _stricmp
+#else
+#define stricmp strcasecmp
+#endif
+#endif
+
+#ifndef strnicmp
+#ifdef _MSC_VER
+#define strnicmp _strnicmp
+#else
+#define strnicmp strncasecmp
+#endif
+#endif

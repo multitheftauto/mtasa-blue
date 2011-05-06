@@ -183,7 +183,12 @@ void CClientVariables::LoadDefaults ( void )
                                 Set(__x,__y)
     #define _S(__x)             std::string(__x)
 
-    DEFAULT ( "nick",                       _S("Player") );                 // nickname
+    if(!Exists("nick")) 
+    {
+        DEFAULT ( "nick",                       _S(GenerateNickname()) );       // nickname
+        CCore::GetSingleton ().RequestNewNickOnStart();  // Request the user to set a new nickname
+    }
+
     DEFAULT ( "host",                       _S("127.0.0.1") );              // hostname
     DEFAULT ( "port",                       22003 );                        // port
     DEFAULT ( "password",                   _S("") );                       // password
@@ -221,4 +226,5 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "code_path",                  0 );                            // Code path
     DEFAULT ( "update_build_type",          0 );                            // 0-stable 1-test 2-nightly
     DEFAULT ( "volumetric_shadows",         0 );                            // Enable volumetric shadows
+    DEFAULT ( "aspect_ratio",               0 );                            // Display aspect ratio
 }

@@ -36,6 +36,13 @@ struct __ConfigChannel
   bool notifyChanges;
 };
 
+struct __ConfigProject
+{
+    const char* alias;
+    const char* path;
+    bool autofix;
+};
+
 class Config
 {
 public:
@@ -43,6 +50,7 @@ public:
   ~Config();
 
   bool Create(const char* fileName);
+  const Rsl::File::Ini::IniParser& GetParser () const { return m_parser; }
 
   bool Ok() const;
   int Errno() const;
@@ -73,8 +81,8 @@ public:
     struct
     {
       const char* address;
-      const char* path;
       const char* service;
+      std::vector<__ConfigProject> projects;
     } googlecode;
 
     struct
@@ -86,6 +94,12 @@ public:
       bool ssl;
       const char* path;
     } mantis;
+
+    struct
+    {
+        bool enabled;
+        const char* version;
+    } autofix;
   } data;
 private:
   int m_errno;

@@ -13,7 +13,7 @@
 
 #include "stdinc.h"
 #include "CScriptDebugging.h"
-#include < assert.h >
+#include <assert.h>
 #include "Config.h"
 //#include "CPlayer.h"
 //#include "packets/CDebugEchoPacket.h"

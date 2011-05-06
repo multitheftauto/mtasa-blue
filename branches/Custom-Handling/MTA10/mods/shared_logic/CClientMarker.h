@@ -23,10 +23,12 @@
 #include "CClientColShape.h"
 #include "CClientColCallback.h"
 
+class CClientMarkerManager;
+
 class CClientMarker: public CClientStreamElement, private CClientColCallback
 {
     friend class CClientMarkerManager;
-    friend CClientColShape;
+    friend class CClientColShape;
 
 public:
     enum eMarkerType

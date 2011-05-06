@@ -28,7 +28,12 @@ class CMultiplayer;
 class CNet;
 class CGame;
 
-enum eChatFont { CHAT_FONT_DEFAULT,CHAT_FONT_CLEAR,CHAT_FONT_BOLD,CHAT_FONT_ARIAL,CHAT_FONT_MAX };
+namespace ChatFonts
+{
+    enum eChatFont { CHAT_FONT_DEFAULT,CHAT_FONT_CLEAR,CHAT_FONT_BOLD,CHAT_FONT_ARIAL,CHAT_FONT_MAX };
+}
+
+using ChatFonts::eChatFont;
 
 enum eCoreVersion
 {
@@ -118,7 +123,8 @@ public:
 
     virtual uint                    GetFrameRateLimit               ( void ) = 0;
     virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 ) = 0;
-    virtual void                    ApplyFrameRateLimit             ( void ) = 0;
+    virtual void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 ) = 0;
+    virtual void                    EnsureFrameRateLimitApplied     ( void ) = 0;
 };
 
 #endif

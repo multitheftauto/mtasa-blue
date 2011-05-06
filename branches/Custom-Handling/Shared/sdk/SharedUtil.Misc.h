@@ -77,6 +77,8 @@ namespace SharedUtil
     void            ProcessPendingBrowseToSolution  ( void );
     void            ClearPendingBrowseToSolution    ( void );
 
+    SString         GetSystemErrorMessage           ( uint uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true );
+
 #endif
 
     SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
@@ -103,15 +105,17 @@ namespace SharedUtil
     //
     SString ConformResourcePath ( const char* szRes );
 
+    SString GenerateNickname ( void );
+
     //
     // string stuff
     //
 
-    std::wstring ConvertToUTF8 (const std::string& s);
+    std::wstring MbUTF8ToUTF16 (const std::string& s);
 
-    std::string  ConvertToANSI (const std::wstring& ws);
+    std::string  UTF16ToMbUTF8 (const std::wstring& ws);
 
-    std::wstring  TranslateToUTF8 (const std::string& s);
+    std::wstring  ANSIToUTF16 (const std::string& s);
 
     std::wstring GetBidiString (const std::wstring ws);
 
@@ -825,7 +829,7 @@ namespace SharedUtil
                 return; // Not in list
 
             // Keep active iterators valid
-            for ( int i = m_ActiveIterators.size () - 1 ; i > 0 ; i-- )
+            for ( int i = m_ActiveIterators.size () - 1 ; i >= 0 ; i-- )
                 if ( m_ActiveIterators [ i ]->m_pNode == pNode )
                     m_ActiveIterators [ i ]->NotifyRemovingNode ( pNode );
 

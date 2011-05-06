@@ -72,11 +72,9 @@ struct SKeyBindSection
 
 class CColor;
 
-class CSettings
+namespace ChatColorTypes
 {
-    friend class CCore;
-
-    typedef enum ChatColorType
+    enum ChatColorType
     {
         CHAT_COLOR_BG = 0,
         CHAT_COLOR_TEXT,
@@ -84,6 +82,13 @@ class CSettings
         CHAT_COLOR_INPUT_TEXT,
         CHAT_COLOR_MAX
     };
+}
+
+using ChatColorTypes::ChatColorType;
+
+class CSettings
+{
+    friend class CCore;
 
 public:
                         CSettings               ( void );
@@ -112,6 +117,8 @@ public:
     static void         OnLoginCallback         ( bool bResult, char* szError, void* obj );
     void                OnLoginStateChange      ( bool bResult );
 
+    void                RequestNewNickname      ( void );
+
 protected:
     const static int    SecKeyNum = 3;     // Number of secondary keys
 
@@ -123,18 +130,20 @@ protected:
     CGUILabel*          m_pLabelNick;
     CGUIEdit*           m_pEditNick;
     CGUICheckBox*       m_pSavePasswords;
+    CGUICheckBox*       m_pAutoRefreshBrowser;
 
     CGUILabel*          m_pVideoGeneralLabel;
     CGUILabel*          m_pVideoResolutionLabel;
     CGUIComboBox*       m_pComboResolution;
 	CGUICheckBox*       m_pCheckBoxMipMapping;
     CGUICheckBox*       m_pCheckBoxWindowed;
-    CGUICheckBox*       m_pCheckBoxWideScreen;
     CGUICheckBox*       m_pCheckBoxMinimize;
     CGUICheckBox*       m_pCheckBoxDisableAero;
     CGUILabel*          m_pMapRenderingLabel;
     CGUIComboBox*       m_pComboFxQuality;
     CGUILabel*          m_pFXQualityLabel;
+    CGUIComboBox*       m_pComboAspectRatio;
+    CGUILabel*          m_pAspectRatioLabel;
 	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
     CGUILabel*          m_pDrawDistanceLabel;
     CGUIScrollBar*      m_pDrawDistance;
@@ -224,20 +233,20 @@ protected:
     CGUIComboBox*       m_pChatPresets;
     CGUIButton*         m_pChatLoadPreset;
 
-    CGUIScrollBar*      m_pChatRed          [ ChatColorType::CHAT_COLOR_MAX ];
-    CGUIScrollBar*      m_pChatGreen        [ ChatColorType::CHAT_COLOR_MAX ];
-    CGUIScrollBar*      m_pChatBlue         [ ChatColorType::CHAT_COLOR_MAX ];
-    CGUIScrollBar*      m_pChatAlpha        [ ChatColorType::CHAT_COLOR_MAX ];
+    CGUIScrollBar*      m_pChatRed          [ ChatColorTypes::CHAT_COLOR_MAX ];
+    CGUIScrollBar*      m_pChatGreen        [ ChatColorTypes::CHAT_COLOR_MAX ];
+    CGUIScrollBar*      m_pChatBlue         [ ChatColorTypes::CHAT_COLOR_MAX ];
+    CGUIScrollBar*      m_pChatAlpha        [ ChatColorTypes::CHAT_COLOR_MAX ];
 
-    CGUILabel*          m_pChatRedValue     [ ChatColorType::CHAT_COLOR_MAX ];
-    CGUILabel*          m_pChatGreenValue   [ ChatColorType::CHAT_COLOR_MAX ];
-    CGUILabel*          m_pChatBlueValue    [ ChatColorType::CHAT_COLOR_MAX ];
-    CGUILabel*          m_pChatAlphaValue   [ ChatColorType::CHAT_COLOR_MAX ];
+    CGUILabel*          m_pChatRedValue     [ ChatColorTypes::CHAT_COLOR_MAX ];
+    CGUILabel*          m_pChatGreenValue   [ ChatColorTypes::CHAT_COLOR_MAX ];
+    CGUILabel*          m_pChatBlueValue    [ ChatColorTypes::CHAT_COLOR_MAX ];
+    CGUILabel*          m_pChatAlphaValue   [ ChatColorTypes::CHAT_COLOR_MAX ];
 
     CGUIScrollPane*     m_pInterfacePaneScroller;
 
     CGUIScrollPane*     m_pPaneChatFont;
-    CGUIRadioButton*    m_pRadioChatFont    [ eChatFont::CHAT_FONT_MAX ];
+    CGUIRadioButton*    m_pRadioChatFont    [ ChatFonts::CHAT_FONT_MAX ];
 
     CGUIEdit*           m_pChatLines;
     CGUIEdit*           m_pChatScaleX;

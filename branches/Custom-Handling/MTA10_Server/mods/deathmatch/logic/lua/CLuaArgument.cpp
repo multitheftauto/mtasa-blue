@@ -50,10 +50,10 @@ CLuaArgument::CLuaArgument ( double dNumber )
 }
 
 
-CLuaArgument::CLuaArgument ( const char* szString )
+CLuaArgument::CLuaArgument ( const std::string& strString )
 {
     m_pTableData = NULL;
-    Read ( szString );
+    Read ( strString );
 }
 
 
@@ -415,13 +415,11 @@ void CLuaArgument::Read ( double dNumber )
 }
 
 
-void CLuaArgument::Read ( const char* szString )
+void CLuaArgument::Read ( const std::string& strString )
 {
-    assert ( szString );
-
     m_iType = LUA_TSTRING;
     DeleteTableData ();
-    m_strString = szString;
+    m_strString = strString;
 }
 
 
@@ -568,8 +566,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                     if ( bitStream.Read ( szValue, usLength ) )
                     {
                         // Put it into us
-                        szValue [ usLength ] = 0;
-                        Read ( szValue );
+                        Read ( std::string ( szValue, usLength ) );
                     }
 
                     // Delete the buffer
@@ -673,7 +670,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
         {           
             // Grab the string and its length. Is it short enough to be sendable?
             const char* szTemp = m_strString.c_str ();
-            size_t sizeTemp = strlen ( szTemp );
+            size_t sizeTemp = m_strString.length ();
             unsigned short usLength = static_cast < unsigned short > ( sizeTemp );
             if ( sizeTemp == usLength )
             {
@@ -763,7 +760,7 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
             if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
             {
                 char szTableID[10];
-                _snprintf ( szTableID, sizeof(szTableID), "^T^%lu", pKnownTables->find ( m_pTableData )->second );
+                snprintf ( szTableID, sizeof(szTableID), "^T^%lu", pKnownTables->find ( m_pTableData )->second );
                 return json_object_new_string ( szTableID );
             }
             else
@@ -808,13 +805,13 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
             if ( pElement && bSerialize )
             {
                 char szElementID[10] = {0};
-                _snprintf ( szElementID, 9, "^E^%d", (int)pElement->GetID() );
+                snprintf ( szElementID, 9, "^E^%d", (int)pElement->GetID() );
                 return json_object_new_string ( szElementID );
             }
             else if ( VERIFY_RESOURCE(pResource) )
             {
                 char szElementID[MAX_RESOURCE_NAME_LENGTH+4] = {0};
-                _snprintf ( szElementID, MAX_RESOURCE_NAME_LENGTH+3, "^R^%s", pResource->GetName().c_str () );
+                snprintf ( szElementID, MAX_RESOURCE_NAME_LENGTH+3, "^R^%s", pResource->GetName().c_str () );
                 return json_object_new_string ( szElementID );
             }
             else
@@ -839,15 +836,15 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
     {
         case LUA_TNIL:
         {
-            _snprintf ( szBuffer, length, "0" );
+            snprintf ( szBuffer, length, "0" );
             return szBuffer;
         }
         case LUA_TBOOLEAN:
         {
             if ( GetBoolean () )
-                _snprintf ( szBuffer, length, "true" );
+                snprintf ( szBuffer, length, "true" );
             else
-                _snprintf ( szBuffer, length, "false" );
+                snprintf ( szBuffer, length, "false" );
             return szBuffer;
         }
         case LUA_TTABLE:
@@ -861,12 +858,12 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
             int iNum = static_cast < int > ( GetNumber () );
             if ( iNum == fNum )
             {
-                _snprintf ( szBuffer, length, "%d", iNum );
+                snprintf ( szBuffer, length, "%d", iNum );
                 return szBuffer;
             }
             else
             {
-                _snprintf ( szBuffer, length, "%f", fNum );
+                snprintf ( szBuffer, length, "%f", fNum );
                 return szBuffer;
             }
             break;
@@ -877,7 +874,7 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
             unsigned short usLength = static_cast < unsigned short > ( strlen ( szTemp ) );
             if ( strlen ( szTemp ) == usLength )
             {
-                _snprintf ( szBuffer, length, "%s", szTemp );
+                snprintf ( szBuffer, length, "%s", szTemp );
                 return szBuffer;
             }
             else
@@ -892,12 +889,12 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
             CResource* pResource = reinterpret_cast < CResource* > ( GetLightUserData() );
             if ( pElement )
             {
-                _snprintf ( szBuffer, length, "#E#%d", (int)pElement->GetID() );
+                snprintf ( szBuffer, length, "#E#%d", (int)pElement->GetID() );
                 return szBuffer;
             }
             else if ( VERIFY_RESOURCE(pResource) )
             {
-                _snprintf ( szBuffer, length, "#R#%s", pResource->GetName().c_str () );
+                snprintf ( szBuffer, length, "#R#%s", pResource->GetName().c_str () );
                 return szBuffer;
             }
             else

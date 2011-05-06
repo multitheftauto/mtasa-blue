@@ -89,12 +89,12 @@ CWaterZoneSA::iterator::iterator ( CWaterZoneSA* pZone )
     m_pFirst = m_pCurrent;
 }
 
-CWaterZoneSA::iterator::iterator ( CWaterZoneSA::iterator& other )
+CWaterZoneSA::iterator::iterator ( const CWaterZoneSA::iterator& other )
 {
     operator= ( other );
 }
 
-CWaterZoneSA::iterator& CWaterZoneSA::iterator::operator= ( CWaterZoneSA::iterator& other )
+CWaterZoneSA::iterator& CWaterZoneSA::iterator::operator= ( const CWaterZoneSA::iterator& other )
 {
     m_pCurrent = other.m_pCurrent;
     m_pFirst = other.m_pFirst;
@@ -131,12 +131,12 @@ int CWaterZoneSA::iterator::operator- ( CWaterZoneSA::iterator& other )
     return other.m_pCurrent - m_pCurrent;
 }
 
-bool CWaterZoneSA::iterator::operator== ( CWaterZoneSA::iterator& other )
+bool CWaterZoneSA::iterator::operator== ( const CWaterZoneSA::iterator& other )
 {
     return m_pCurrent == other.m_pCurrent;
 }
 
-bool CWaterZoneSA::iterator::operator!= ( CWaterZoneSA::iterator& other )
+bool CWaterZoneSA::iterator::operator!= ( const CWaterZoneSA::iterator& other )
 {
     return m_pCurrent != other.m_pCurrent;
 }

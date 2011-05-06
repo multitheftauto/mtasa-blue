@@ -14,6 +14,7 @@
 
 #include "UTF8.h"
 #include "minibidi.c"
+#include "CNickGen.h"
 #include "UTF8Detect.cpp"
 #ifdef WIN32
     #include <direct.h>
@@ -338,15 +339,24 @@ void SharedUtil::WatchDogClearCounter ( const SString& str )
     SetApplicationSettingInt ( "watchdog", str, 0 );
 }
 
+static bool bWatchDogWasUncleanStopCached = false;
+static bool bWatchDogWasUncleanStopValue = false;
 
 bool SharedUtil::WatchDogWasUncleanStop ( void )
 {
-    return GetApplicationSettingInt ( "watchdog", "uncleanstop" ) != 0;
+    if ( !bWatchDogWasUncleanStopCached )
+    {
+        bWatchDogWasUncleanStopCached = true;
+        bWatchDogWasUncleanStopValue = GetApplicationSettingInt ( "watchdog", "uncleanstop" ) != 0;
+    }
+    return bWatchDogWasUncleanStopValue;
 }
 
 void SharedUtil::WatchDogSetUncleanStop ( bool bOn )
 {
     SetApplicationSettingInt ( "watchdog", "uncleanstop", bOn );
+    bWatchDogWasUncleanStopCached = true;
+    bWatchDogWasUncleanStopValue = bOn;
 }
 
 
@@ -359,7 +369,7 @@ void SharedUtil::BrowseToSolution ( const SString& strType, bool bAskQuestion, b
 
     // Put args into a string and save in the registry
     CArgMap argMap;
-    argMap.Set ( "type", strType );
+    argMap.Set ( "type", strType.SplitLeft ( ";" ) );
     argMap.Set ( "bAskQuestion", bAskQuestion );
     argMap.Set ( "message", strMessageBoxMessage );
     SetApplicationSetting ( "pending-browse-to-solution", argMap.ToString () );
@@ -475,6 +485,39 @@ SString SharedUtil::GetReportLogContents ( void )
     buffer.push_back ( 0 );
     return &buffer[0];
 }
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// SharedUtil::GetSystemErrorMessage
+//
+// Get Windows error message text from a last error code.
+//
+///////////////////////////////////////////////////////////////////////////
+SString SharedUtil::GetSystemErrorMessage ( uint uiError, bool bRemoveNewlines, bool bPrependCode )
+{
+    SString strResult;
+
+    LPSTR szErrorText = NULL;
+    FormatMessageA ( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
+                    NULL, uiError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&szErrorText, 0, NULL );
+
+    if ( szErrorText )
+    {
+        strResult = szErrorText;
+        LocalFree ( szErrorText );
+        szErrorText = NULL;
+    }
+
+    if ( bRemoveNewlines )
+        strResult = strResult.Replace ( "\n", "" ).Replace ( "\r", "" );
+
+    if ( bPrependCode )
+        strResult = SString ( "Error %u: %s", uiError, *strResult );
+
+    return strResult;
+}
+
 #endif
 
 
@@ -772,14 +815,14 @@ std::string SharedUtil::RemoveColorCode ( const char* szString )
 }
 
 
-// Convert a standard ANSI junk std::string into a UTF-8 std::wstring
-std::wstring SharedUtil::ConvertToUTF8 (const std::string& input)
+// Convert a standard multibyte UTF-8 std::string into a UTF-16 std::wstring
+std::wstring SharedUtil::MbUTF8ToUTF16 (const std::string& input)
 {
     return utf8_mbstowcs (input);
 }
 
-// Reencode a UTF8 std::wstring into ANSI junk string
-std::string SharedUtil::ConvertToANSI (const std::wstring& input)
+// Convert a UTF-16 std::wstring into a multibyte UTF-8 string
+std::string SharedUtil::UTF16ToMbUTF8 (const std::wstring& input)
 {
     return utf8_wcstombs (input);
 }
@@ -790,8 +833,8 @@ int SharedUtil::GetUTF8Confidence (unsigned char* input, int len)
     return icu_getUTF8Confidence (input, len);
 }
 
-// Translate a true ANSI string to the UTF-8 equivalent (reencode+convert)
-std::wstring SharedUtil::TranslateToUTF8 ( const std::string& input )
+// Translate a true ANSI string to the UTF-16 equivalent (reencode+convert)
+std::wstring SharedUtil::ANSIToUTF16 ( const std::string& input )
 {
     size_t len = mbstowcs ( NULL, input.c_str(), input.length() );
     if ( len == (size_t)-1 )
@@ -898,6 +941,11 @@ SString SharedUtil::ConformResourcePath ( const char* szRes )
     }
 
     return strText;
+}
+
+SString SharedUtil::GenerateNickname ( void )
+{
+    return CNickGen::GetRandomNickname();
 }
 
 

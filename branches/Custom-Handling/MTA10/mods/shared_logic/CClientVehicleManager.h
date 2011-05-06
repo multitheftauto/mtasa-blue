@@ -17,18 +17,18 @@
 #define __CCLIENTVEHICLEMANAGER_H
 
 #include "CClientCommon.h"
+#include "CClientVehicle.h"
 #include <list>
 
 class CClientManager;
 class CClientVehicle;
-enum eClientVehicleType;
 
 extern unsigned char g_ucMaxPassengers [];
 
 class CClientVehicleManager
 {
-    friend CClientManager;
-    friend CClientVehicle;
+    friend class CClientManager;
+    friend class CClientVehicle;
 
 public:
     void                            DeleteAll               ( void );

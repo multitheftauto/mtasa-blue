@@ -84,9 +84,9 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
             strClumpedCommand = szCommandBufferPointer;
 
         // Convert to Unicode, and clamp it to a maximum command length
-        std::wstring strClumpedCommandUTF = ConvertToUTF8(strClumpedCommand.c_str());
+        std::wstring strClumpedCommandUTF = MbUTF8ToUTF16(strClumpedCommand.c_str());
         strClumpedCommandUTF.substr(0,MAX_COMMAND_LENGTH);
-        strClumpedCommand = ConvertToANSI(strClumpedCommandUTF);
+        strClumpedCommand = UTF16ToMbUTF8(strClumpedCommandUTF);
 
         g_pClientGame->GetRegisteredCommands ()->ProcessCommand ( szCommandBufferPointer, szArguments );
 
@@ -891,7 +891,7 @@ void COMMAND_Watch ( const char *szCmdLine )
                     char szModuleName[500];
                     if ( GetModuleFileNameEx( hProcess, pModule, szModuleName, 500 ) )
                     {
-                        if ( strcmpi ( szModuleName + strlen(szModuleName) - strlen(szCmdLine), szCmdLine ) == 0 )
+                        if ( stricmp ( szModuleName + strlen(szModuleName) - strlen(szCmdLine), szCmdLine ) == 0 )
                         {
                             g_pCore->GetConsole()->Printf ( "Attaching to %s with process id %d...", szModuleName, hProcess );
                             RemoteLoadLibrary ( hProcess, "C:/Program Files/Rockstar Games/GTA San Andreas/mta/wpmhookdll.dll" );

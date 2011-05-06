@@ -264,7 +264,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pScriptDebugging->SetLogfile ( CalcMTASAPath("mta\\clientscript.log"), 3 );
 
     m_pLuaManager->SetScriptDebugging ( m_pScriptDebugging );
-    CStaticFunctionDefinitions::CStaticFunctionDefinitions ( m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager );
+    CStaticFunctionDefinitions ( m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager );
     CLuaFunctionDefs::Initialize ( m_pLuaManager, m_pScriptDebugging, this );
     CLuaDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
 
@@ -859,6 +859,8 @@ void CClientGame::DoPulsePostFrame ( void )
 
 void CClientGame::DoPulses ( void )
 {
+    g_pCore->ApplyFrameRateLimit ();
+
     m_BuiltCollisionMapThisFrame = false;
 
     if ( m_bIsPlayingBack && m_bFirstPlaybackFrame && m_pManager->IsGameLoaded () )
@@ -1039,6 +1041,9 @@ void CClientGame::DoPulses ( void )
         // Call onClientRender LUA event
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
+
+        // Ensure replaced/restored textures for models in the GTA map are correct
+        g_pGame->FlushPendingRestreamIPL ();
     }
 
     // Are we connecting?
@@ -2865,12 +2870,12 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
             int yoffset;
 
             yoffset = 0;
-            _snprintf ( str, sizeof( str ), "Ammo in clip: %d", pWeapon->GetAmmoInClip () );
+            snprintf ( str, sizeof( str ), "Ammo in clip: %d", pWeapon->GetAmmoInClip () );
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
 
             yoffset = 15;
-            _snprintf ( str, sizeof( str ), "State: %d", pWeapon->GetState() );
+            snprintf ( str, sizeof( str ), "State: %d", pWeapon->GetState() );
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
             g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), str, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
         }
@@ -3673,7 +3678,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
 
     // Grab the inflictor
     CClientEntity* pInflictingEntity = NULL;
-    if ( pInflictor ) pInflictingEntity = m_pManager->FindEntity ( pInflictor );
+    if ( pInflictor ) pInflictingEntity = m_pManager->FindEntity ( pInflictor, true );
 
     // If the damage was caused by an explosion
     if ( weaponUsed == WEAPONTYPE_EXPLOSION )

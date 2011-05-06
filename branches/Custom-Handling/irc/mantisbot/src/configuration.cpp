@@ -108,7 +108,30 @@ bool Config::Create(const char* fileName)
   /* googlecode */
   SAFE_LOAD(googlecode, address, this->data.googlecode.address);
   SAFE_LOAD(googlecode, service, this->data.googlecode.service);
-  SAFE_LOAD(googlecode, path, this->data.googlecode.path);
+
+  const char* projectAlias;
+  const char* projectPath;
+  const char* projectAutofix;
+  for ( int i = 1; true; ++i )
+  {
+      snprintf(sectionName, sizeof(sectionName), "googlecode.project%d", i);
+      projectAlias = m_parser.GetValue(sectionName, "alias");
+      projectPath = m_parser.GetValue(sectionName, "path");
+      projectAutofix = m_parser.GetValue(sectionName, "autofix");
+
+      if ( projectAlias && projectPath )
+      {
+          bool autofixEnabled = projectAutofix && !strcasecmp(projectAutofix, "true" );
+          __ConfigProject conf;
+          conf.autofix = autofixEnabled;
+          conf.alias = projectAlias;
+          conf.path = projectPath;
+          this->data.googlecode.projects.push_back(conf);
+      }
+      else
+          break;
+  }
+      
 
   /* mantis */
   SAFE_LOAD(mantis, username, this->data.mantis.username);
@@ -118,6 +141,12 @@ bool Config::Create(const char* fileName)
   SAFE_LOAD(mantis, ssl, v);
   this->data.mantis.ssl = (!strcasecmp(v, "true") ? true : false);
   SAFE_LOAD(mantis, path, this->data.mantis.path);
+
+
+  /* autofix */
+  SAFE_LOAD(autofix, enabled, v);
+  this->data.autofix.enabled = (!strcasecmp(v, "true") ? true : false);
+  SAFE_LOAD(autofix, version, this->data.autofix.version);
 
 #undef SAFE_LOAD
   return true;

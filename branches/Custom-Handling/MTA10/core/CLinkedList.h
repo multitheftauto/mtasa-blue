@@ -39,7 +39,7 @@ private:
     public:
         CNode ()
         {
-            pNext = pPrev = NULL;
+            m_pNext = m_pPrev = NULL;
         };
 
         CNode (TN data, CNode<TN>* pNextNode = NULL, CNode<TN>* pPrevNode = NULL)

@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+#include <stdexcept>
+
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
 {
@@ -167,7 +169,7 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
 
     if ( FAILED ( hResult ) )
     {
-        throw std::exception("Direct3DDevice::Reset - Failed to reset the device. Check all device dependent resources have been released.");
+        throw std::runtime_error("Direct3DDevice::Reset - Failed to reset the device. Check all device dependent resources have been released.");
     }
 
     GetVideoModeManager ()->PostReset ( pPresentationParameters );
@@ -193,10 +195,7 @@ HRESULT CProxyDirect3DDevice9::Present                        ( CONST RECT* pSou
     m_pData->GetTransform ( D3DTS_PROJECTION, &projMatrix );
     m_pDevice->SetTransform ( D3DTS_PROJECTION, &projMatrix );
 
-    HRESULT hr = m_pDevice->Present ( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
-
-    CCore::GetSingleton ().ApplyFrameRateLimit ();
-    return hr;
+    return m_pDevice->Present ( pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion );
 }
 
 HRESULT CProxyDirect3DDevice9::GetBackBuffer                  ( UINT iSwapChain,UINT iBackBuffer,D3DBACKBUFFER_TYPE Type,IDirect3DSurface9** ppBackBuffer )

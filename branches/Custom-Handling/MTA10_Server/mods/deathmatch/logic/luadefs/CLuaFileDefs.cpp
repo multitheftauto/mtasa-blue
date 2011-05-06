@@ -31,6 +31,7 @@ void CLuaFileDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fileFlush", CLuaFileDefs::fileFlush );
     CLuaCFunctions::AddFunction ( "fileClose", CLuaFileDefs::fileClose );
     CLuaCFunctions::AddFunction ( "fileDelete", CLuaFileDefs::fileDelete );
+    CLuaCFunctions::AddFunction ( "fileRename", CLuaFileDefs::fileRename );
 }
 
 
@@ -583,6 +584,86 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
         }
         else
             m_pScriptDebugging->LogBadType ( luaVM, "fileDelete" );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFileDefs::fileRename ( lua_State* luaVM )
+{
+    // Grab our lua VM
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        // Check arguments types
+        if ( argtype ( 1, LUA_TSTRING ) && argtype ( 2, LUA_TSTRING ) )
+        {
+            // Grab the filenames
+            std::string strCurFile = lua_tostring ( luaVM, 1 );
+            std::string strNewFile = lua_tostring ( luaVM, 2 );
+            std::string strCurPath;
+            std::string strNewPath;
+            std::string strCurSubPath;
+            std::string strNewSubPath;
+
+            // We have a resource arguments?
+            CResource* pThisResource = pLuaMain->GetResource ();
+            CResource* pCurResource = pThisResource;
+            CResource* pNewResource = pThisResource;
+            if ( CResourceManager::ParseResourcePathInput ( strCurFile, pCurResource, &strCurPath, &strCurSubPath ) &&
+                 CResourceManager::ParseResourcePathInput ( strNewFile, pNewResource, &strNewPath, &strNewSubPath ) )
+            {
+                // Do we have permissions?
+                if ( ( pCurResource == pThisResource && 
+                       pNewResource == pThisResource ) ||
+                     m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
+                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                        "ModifyOtherObjects",
+                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
+                                                        false ) )
+                {
+                    string strCurFilePath;
+                    string strNewFilePath;
+
+                    // Does `current` file path exist and `new` file path doesn't exist?
+                    if ( pCurResource->GetFilePath ( strCurSubPath.c_str(), strCurFilePath ) &&
+                        !pNewResource->GetFilePath ( strNewSubPath.c_str(), strNewFilePath ) )
+                    {
+                        // Make sure the destination folder exist so we can move the file
+                        MakeSureDirExists ( strNewPath.c_str () );
+
+                        if ( FileRename ( strCurPath.c_str (), strNewPath.c_str () ) )
+                        {
+                            // If file renamed/moved return success
+                            lua_pushboolean ( luaVM, true );
+                            return 1;
+                        }
+                        else
+                        {
+                            // Output error
+                            m_pScriptDebugging->LogWarning ( luaVM, "fileRename; unable to rename/move file" );
+                        }
+                    }
+                    else
+                    {
+                        // Output error
+                        m_pScriptDebugging->LogWarning ( luaVM, "fileRename failed; source file doesn't exist or destination file already exists" );
+                    }
+                }
+                // Do we have not permissions to both - `current` and `new` resources?
+                else if ( pThisResource != pCurResource && pThisResource != pNewResource )
+                    m_pScriptDebugging->LogError ( luaVM, "fileRename failed; ModifyOtherObjects in ACL denied resource %s to access %s and %s", pThisResource->GetName ().c_str (), pCurResource->GetName ().c_str (), pNewResource->GetName ().c_str () );
+                // Do we have not permissions to `current` resource?
+                else if ( pThisResource != pCurResource && pThisResource == pNewResource )
+                    m_pScriptDebugging->LogError ( luaVM, "fileRename failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pCurResource->GetName ().c_str () );
+                // Do we have not permissions to `new` resource?
+                else
+                    m_pScriptDebugging->LogError ( luaVM, "fileRename failed; ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName ().c_str (), pNewResource->GetName ().c_str () );
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadType ( luaVM, "fileRename" );
     }
 
     lua_pushboolean ( luaVM, false );

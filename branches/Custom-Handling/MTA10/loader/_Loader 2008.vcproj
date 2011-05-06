@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="Client - Loader"
 	ProjectGUID="{AF2AF376-1ACD-4F3B-B399-2A30D8BE950E}"
+	RootNamespace="Client - Loader"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -18,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory=".\Debug"
 			IntermediateDirectory=".\Debug"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -52,10 +53,11 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdInc.h"
+				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
@@ -78,7 +80,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="C:/Program Files/MTA San Andreas 1.1/Multi Theft Auto_d.exe"
+				OutputFile="C:/Program Files/MTA San Andreas 1.1/mta/loader_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -114,7 +116,7 @@
 			Name="Release|Win32"
 			OutputDirectory=".\Release"
 			IntermediateDirectory=".\Release"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -152,10 +154,11 @@
 				AdditionalIncludeDirectories="../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=""
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="StdInc.h"
+				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -178,7 +181,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="c:\program files\MTA San Andreas 1.1\Multi Theft Auto.exe"
+				OutputFile="c:\program files\MTA San Andreas 1.1\mta\loader.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -219,7 +222,7 @@
 			Name="Nightly|Win32"
 			OutputDirectory="..\..\obj\client\loader"
 			IntermediateDirectory="..\..\obj\client\loader"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -257,10 +260,11 @@
 				AdditionalIncludeDirectories="../../Shared/sdk"
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=""
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="StdInc.h"
+				PrecompiledHeaderFile="$(IntDir)\$(TargetName).pch"
 				AssemblerListingLocation=""
 				ObjectFile="$(IntDir)/"
 				ProgramDataBaseFileName="$(IntDir)/vc70.pdb"
@@ -283,7 +287,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib psapi.lib"
-				OutputFile="..\..\output\MTA San Andreas\Multi Theft Auto.exe"
+				OutputFile="..\..\output\MTA San Andreas\mta\loader.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -351,6 +355,22 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Utils.cpp"
@@ -395,19 +415,7 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath=".\NEU\GDFImp.gdf.xml"
-				>
-			</File>
-			<File
-				RelativePath=".\GDFImp.rc"
-				>
-			</File>
-			<File
 				RelativePath="loader.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\resource\mtaicon.ico"
 				>
 			</File>
 			<File

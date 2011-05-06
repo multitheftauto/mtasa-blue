@@ -32,7 +32,7 @@ DWORD CPEHookUtils::GetIATAddress   ( const string& ModuleName,
     {
         if (pImportDesc->Name == NULL) break;
 
-        if (!strcmpi((char*)((DWORD)pImportDesc->Name + (DWORD)hImgBase),ModuleName.c_str())) 
+        if (!stricmp((char*)((DWORD)pImportDesc->Name + (DWORD)hImgBase),ModuleName.c_str())) 
         {
             if ((pImportDesc->OriginalFirstThunk) != 0) {
                 for (int c=0; ; c++) 
@@ -41,7 +41,7 @@ DWORD CPEHookUtils::GetIATAddress   ( const string& ModuleName,
                     
                     if (pThunkData->u1.AddressOfData == NULL) break;
 
-                    if (!strcmpi((char*)(((PIMAGE_IMPORT_BY_NAME)((DWORD)pThunkData->u1.AddressOfData + (DWORD)hImgBase))->Name),FunctionName.c_str())) 
+                    if (!stricmp((char*)(((PIMAGE_IMPORT_BY_NAME)((DWORD)pThunkData->u1.AddressOfData + (DWORD)hImgBase))->Name),FunctionName.c_str())) 
                     {
                         return (DWORD)(((PIMAGE_THUNK_DATA)((DWORD)pImportDesc->FirstThunk + c*sizeof(IMAGE_THUNK_DATA) + (DWORD)hImgBase))->u1.Function);
                     }
@@ -73,7 +73,7 @@ DWORD CPEHookUtils::WriteIATAddress ( const string& ModuleName,
     {
         if (pImportDesc->Name == NULL) break;
 
-        if (!strcmpi((char*)((DWORD)pImportDesc->Name + (DWORD)hImgBase),ModuleName.c_str())) 
+        if (!stricmp((char*)((DWORD)pImportDesc->Name + (DWORD)hImgBase),ModuleName.c_str())) 
         {
             if ((pImportDesc->OriginalFirstThunk) != 0) 
             {
@@ -83,7 +83,7 @@ DWORD CPEHookUtils::WriteIATAddress ( const string& ModuleName,
 
                     if (pThunkData->u1.AddressOfData == NULL) break;
 
-                    if (!strcmpi((char*)(((PIMAGE_IMPORT_BY_NAME)((DWORD)pThunkData->u1.AddressOfData + (DWORD)hImgBase))->Name),FunctionName.c_str())) 
+                    if (!stricmp((char*)(((PIMAGE_IMPORT_BY_NAME)((DWORD)pThunkData->u1.AddressOfData + (DWORD)hImgBase))->Name),FunctionName.c_str())) 
                     {
                          oldvalue = (DWORD)(((PIMAGE_THUNK_DATA)((DWORD)pImportDesc->FirstThunk + c*sizeof(IMAGE_THUNK_DATA) + (DWORD)hImgBase))->u1.Function);
                         ((PIMAGE_THUNK_DATA)((DWORD)pImportDesc->FirstThunk + c*sizeof(IMAGE_THUNK_DATA) + (DWORD)hImgBase))->u1.Function = (DWORD)pvNewProc;

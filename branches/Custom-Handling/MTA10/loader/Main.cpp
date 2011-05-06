@@ -27,13 +27,11 @@ HINSTANCE g_hInstance = NULL;
 //
 //
 ///////////////////////////////////////////////////////////////
-int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
 #if defined(_DEBUG) 
     SharedUtil_Tests ();
 #endif
-
-    g_hInstance = hInstance;
 
     //////////////////////////////////////////////////////////
     //
@@ -192,12 +190,15 @@ int LaunchGame ( LPSTR lpCmdLine )
 
     // Check for possible gta_sa.set problems
     if ( WatchDogIsSectionOpen ( "L2" ) )
+    {
         WatchDogIncCounter ( "CR2" );       // Did not reach loading screen last time
+        WatchDogCompletedSection ( "L2" );
+    }
     else
         WatchDogClearCounter ( "CR2" );
 
-    // If didn't reach loading screen 3 times in a row, do something
-    if ( WatchDogGetCounter ( "CR2" ) >= 3 )
+    // If didn't reach loading screen 5 times in a row, do something
+    if ( WatchDogGetCounter ( "CR2" ) >= 5 )
     {
         WatchDogClearCounter ( "CR2" );
         HandleResetSettings ();
@@ -205,7 +206,6 @@ int LaunchGame ( LPSTR lpCmdLine )
 
     WatchDogBeginSection ( "L0" );      // Gets closed if MTA exits with a return code of 0
     WatchDogBeginSection ( "L1" );      // Gets closed when online game has started
-    WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
 
     int iReturnCode = DoLaunchGame ( lpCmdLine );
 
@@ -245,22 +245,30 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     // Get path to GTASA
     //
     SString strGTAPath;
-    int iResult = GetGamePath ( strGTAPath );
-    if ( iResult == 0 ) {
+    ePathResult iResult = GetGamePath ( strGTAPath, true );
+    if ( iResult == GAME_PATH_MISSING ) {
         DisplayErrorMessageBox ( "Registry entries are is missing. Please reinstall Multi Theft Auto: San Andreas.", "reg-entries-missing" );
         return 5;
     }
-    else if ( iResult == -1 ) {
+    else if ( iResult == GAME_PATH_UNICODE_CHARS ) {
         DisplayErrorMessageBox ( "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas." );
         return 5;
     }
-    else if ( iResult == -2 ) {
+    else if ( iResult == GAME_PATH_STEAM ) {
         DisplayErrorMessageBox ( "It appears you have a Steam version of GTA:SA, which is currently incompatible with MTASA.  You are now being redirected to a page where you can find information to resolve this issue." );
         BrowseToSolution ( "downgrade-steam" );
         return 5;
     }
 
     const SString strMTASAPath = GetMTASAPath ();
+
+    if ( strGTAPath.Contains ( ";" ) || strMTASAPath.Contains ( ";" ) )
+    {
+        DisplayErrorMessageBox ( "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+                                 "contains a ';' (semicolon).\n\n"
+                                 " If you experience problems when running MTA:SA,\n"
+                                 " move your installation(s) to a path that does not contain a semicolon." );
+    }
 
     SetCurrentDirectory ( strMTASAPath );
     SetDllDirectory( strMTASAPath );
@@ -314,6 +322,10 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         }    
     }
 
+    // Strip out flag from command line
+    SString strCmdLine = lpCmdLine;
+    bool bDoneAdmin = strCmdLine.Contains ( "/done-admin" );
+    strCmdLine = strCmdLine.Replace ( " /done-admin", "" );
 
     //////////////////////////////////////////////////////////
     //
@@ -326,9 +338,11 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     memset( &siLoadee, 0, sizeof ( STARTUPINFO ) );
     siLoadee.cb = sizeof ( STARTUPINFO );
 
+    WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
+
     // Start GTA
     if ( 0 == CreateProcess ( strGTAEXEPath,
-                              lpCmdLine,
+                              (LPSTR)*strCmdLine,
                               NULL,
                               NULL,
                               FALSE,
@@ -338,10 +352,24 @@ int DoLaunchGame ( LPSTR lpCmdLine )
                               &siLoadee,
                               &piLoadee ) )
     {
-        DisplayErrorMessageBox ( "Could not start Grand Theft Auto: San Andreas.  "
-                            "Please try restarting, or if the problem persists,"
-                            "contact MTA at www.multitheftauto.com.", "createprocess-fail" );
-        return 2;
+        DWORD dwError = GetLastError ();
+
+        if ( dwError == ERROR_ELEVATION_REQUIRED && !bDoneAdmin )
+        {
+            // Try to relaunch as admin if not done so already
+            ReleaseSingleInstanceMutex ();
+            ShellExecuteNonBlocking( "runas", PathJoin ( strMTASAPath, MTA_EXE_NAME ), strCmdLine + " /done-admin" );            
+            return 5;
+        }
+        else
+        {
+            // Otherwise, show error message
+            SString strError = GetSystemErrorMessage ( dwError );            
+            DisplayErrorMessageBox ( "Could not start Grand Theft Auto: San Andreas.  "
+                                "Please try restarting, or if the problem persists,"
+                                "contact MTA at www.multitheftauto.com. \n\n[" + strError + "]", "createprocess-fail;" + strError );
+            return 5;
+        }
     }
 
     SString strCoreDLL = strMTASAPath + "\\mta\\" + MTA_DLL_NAME;
@@ -451,4 +479,17 @@ int DoLaunchGame ( LPSTR lpCmdLine )
 
     // Success, maybe
     return dwExitCode;
+}
+
+
+extern "C" _declspec(dllexport)
+int DoWinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+{
+    return WinMain ( hInstance, hPrevInstance, lpCmdLine, nCmdShow );
+}
+
+int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
+{
+    g_hInstance = hModule;
+    return TRUE;
 }

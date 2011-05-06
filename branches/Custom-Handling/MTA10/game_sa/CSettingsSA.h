@@ -80,6 +80,7 @@ class CSettingsSA : public CGameSettings
 private:
     CSettingsSAInterface*   m_pInterface;
     bool                    m_bVolumetricShadowsEnabled;
+    eAspectRatio            m_AspectRatio;
 
 public:
                             CSettingsSA                 ( void );
@@ -120,10 +121,13 @@ public:
     void                    SetAntiAliasing             ( unsigned int uiAntiAliasing, bool bOnRestart );
 
     bool                    IsMipMappingEnabled         ( void );
-	void                    SetMipMappingEnabled        ( bool bEnable );
+    void                    SetMipMappingEnabled        ( bool bEnable );
 
-	bool                    IsVolumetricShadowsEnabled     ( void );
-	void                    SetVolumetricShadowsEnabled    ( bool bEnable );
+    bool                    IsVolumetricShadowsEnabled     ( void );
+    void                    SetVolumetricShadowsEnabled    ( bool bEnable );
+
+    eAspectRatio            GetAspectRatio              ( void );
+    void                    SetAspectRatio              ( eAspectRatio aspectRatio );
 
     void                    Save                        ( void );
 

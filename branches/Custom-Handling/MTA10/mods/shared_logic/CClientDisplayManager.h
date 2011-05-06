@@ -22,8 +22,8 @@ class CClientDisplayGroup;
 
 class CClientDisplayManager
 {
-    friend CClientManager;
-    friend CClientDisplay;
+    friend class CClientManager;
+    friend class CClientDisplay;
 
 public:
                                     CClientDisplayManager           ( void );

@@ -12,10 +12,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#ifndef snprintf
-#define snprintf _snprintf
-#endif
-
 // SDK includes
 
 #include "Common.h"

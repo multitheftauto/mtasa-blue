@@ -166,6 +166,7 @@ private:
     bool                        m_bProcessingKeyStroke;
     KeyStrokeHandler            m_KeyStrokeHandler;
     CharacterKeyHandler         m_CharacterKeyHandler;
+    bool                        m_bWaitingToLoadDefaults;
 };
 
 #endif

@@ -362,7 +362,7 @@ vector < char * > * CLuaArguments::WriteToCharVector ( vector < char * > * value
                 CElement* pElement = (*iter)->GetElement ();
                 if ( VERIFY_ELEMENT(pElement) )
                 {
-                    _snprintf ( szValue, 9, "E#%d", (int)pElement->GetID() );
+                    snprintf ( szValue, 9, "E#%d", (int)pElement->GetID() );
                 }
                 else
                 {
@@ -421,9 +421,9 @@ CLuaArgument* CLuaArguments::PushArgument ( const CLuaArgument & argument )
     return pArgument;
 }
 
-CLuaArgument* CLuaArguments::PushString ( const char* szString )
+CLuaArgument* CLuaArguments::PushString ( const std::string& strString )
 {
-    CLuaArgument* pArgument = new CLuaArgument ( szString );
+    CLuaArgument* pArgument = new CLuaArgument ( strString );
     m_Arguments.push_back ( pArgument );
     return pArgument;
 }

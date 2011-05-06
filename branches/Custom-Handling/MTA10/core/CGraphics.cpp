@@ -123,8 +123,8 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
             D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, NULL );
             m_pDXSprite->SetTransform ( &matrix );  
             
-            // Convert to UTF8
-            std::wstring strText = ConvertToUTF8(szText);
+            // Convert to UTF16
+            std::wstring strText = MbUTF8ToUTF16(szText);
 
             pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ulColor );
         m_pDXSprite->End ();
@@ -137,7 +137,7 @@ void CGraphics::DrawText ( int iX, int iY, unsigned long dwColor, float fScale, 
     char szBuffer [ 1024 ];
     va_list ap;
     va_start ( ap, szText );
-    _VSNPRINTF ( szBuffer, 1024, szText, ap );
+    VSNPRINTF ( szBuffer, 1024, szText, ap );
     va_end ( ap );
 
     DrawText ( iX, iY, iX, iY, dwColor, szBuffer, fScale, fScale, DT_NOCLIP );
@@ -149,7 +149,7 @@ void CGraphics::DrawText2DA ( int uiX, int uiY, unsigned long ulColor, float fSc
     char szBuffer [ 1024 ];
     va_list ap;
     va_start ( ap, szDisplayText );
-    _VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
+    VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
     va_end ( ap );
 
     // Start drawing
@@ -168,7 +168,7 @@ void CGraphics::DrawText3DA ( float fX, float fY, float fZ, unsigned long ulColo
     char szBuffer [ 1024 ];
     va_list ap;
     va_start ( ap, szDisplayText );
-    _VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
+    VSNPRINTF ( szBuffer, 1024, szDisplayText, ap );
     va_end ( ap );
 
     // Initialize ViewMatrix
@@ -390,7 +390,7 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
         HDC dc = pDXFont->GetDC ();
         SIZE size;
 
-        std::wstring strText = ConvertToUTF8(szText);
+        std::wstring strText = MbUTF8ToUTF16(szText);
 
         GetTextExtentPoint32W ( dc, strText.c_str(), strText.length(), &size );
 
@@ -610,7 +610,7 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
         Item.Text.pDXFont = pDXFont;
 
         // Convert to wstring        
-        Item.strText = ConvertToUTF8(szText);
+        Item.strText = MbUTF8ToUTF16(szText);
 
         // Add it to the queue
         AddQueueItem ( Item, bPostGUI );
@@ -778,6 +778,8 @@ IDirect3DTexture9* CGraphics::LoadTexture ( const char* szFile, unsigned int uiW
 extern CCore* g_pCore;
 void CGraphics::DrawTexture ( IDirect3DTexture9* texture, float fX, float fY, float fScaleX, float fScaleY, float fRotation, float fCenterX, float fCenterY, unsigned char ucAlpha )
 {
+    if ( !texture )
+        return;
     m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
     D3DSURFACE_DESC textureDesc;
     texture->GetLevelDesc( 0, &textureDesc );

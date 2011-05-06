@@ -460,9 +460,9 @@ bool CResourceManager::Exists ( CResource* pResource )
         CResource * res = (*iter);
         char szLink[256];
         if ( res->IsActive() )
-            _snprintf ( szLink, 256, "<a href='/resources/%s/' style='color:black'>%s</a> <sup><font size=-2><a href='/resource-info/%s/' style='color:black;'>Info</a></font></sup>", res->GetName(), res->GetName(), res->GetName() );
+            snprintf ( szLink, 256, "<a href='/resources/%s/' style='color:black'>%s</a> <sup><font size=-2><a href='/resource-info/%s/' style='color:black;'>Info</a></font></sup>", res->GetName(), res->GetName(), res->GetName() );
         else
-            _snprintf ( szLink, 256, "%s <sup><font size=-2><a href='/resource-info/%s/' style='color:black;'>Info</a></font></sup>", res->GetName(), res->GetName() );
+            snprintf ( szLink, 256, "%s <sup><font size=-2><a href='/resource-info/%s/' style='color:black;'>Info</a></font></sup>", res->GetName(), res->GetName() );
 
         if ( res->IsLoaded() )
         {
@@ -844,7 +844,7 @@ CResource* CResourceManager::CreateResource ( char* szResourceName )
 
     // Make a string with the full path to the resource directory
     char szResourceDirectoryPath [ MAX_PATH + 1 ];
-    _snprintf ( szResourceDirectoryPath, MAX_PATH, "%s/resources/%s/", g_pServerInterface->GetServerModPath (), szResourceName );
+    snprintf ( szResourceDirectoryPath, MAX_PATH, "%s/resources/%s/", g_pServerInterface->GetServerModPath (), szResourceName );
 
     // Create that folder. Return if we failed
     if ( mymkdir ( szResourceDirectoryPath ) != 0 )
@@ -852,7 +852,7 @@ CResource* CResourceManager::CreateResource ( char* szResourceName )
 
     // Create an empty meta file for that resource
     char szMetaPath [MAX_PATH + 1];
-    _snprintf ( szMetaPath, MAX_PATH, "%s%s", szResourceDirectoryPath, "meta.xml" );
+    snprintf ( szMetaPath, MAX_PATH, "%s%s", szResourceDirectoryPath, "meta.xml" );
     CXMLFile* pXML = g_pServerInterface->GetXML ()->CreateXML ( szMetaPath );
     if ( pXML )
     {

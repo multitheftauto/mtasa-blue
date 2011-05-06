@@ -30,14 +30,6 @@
     // Type, function and normal defines
     #define socklen_t int
 
-    #ifndef snprintf
-    #define snprintf _snprintf
-    #endif
-
-    #ifndef vsnprintf
-    #define vsnprintf _vsnprintf
-    #endif
-
     #define MTA_OS_STRING "Windows"
 #else
     /* POSIX-compatible */

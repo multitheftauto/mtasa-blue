@@ -39,26 +39,34 @@ class CServerBrowser;
 #include "CServerInfo.h"
 #include <ctime>
 
-
-class CServerBrowser : public CSingleton < CServerBrowser >
+namespace ServerBrowserTypes
 {
-    friend class CCore;
-
-public:
-    typedef enum ServerBrowserType
+    enum ServerBrowserType
     {
         INTERNET = 0,
         LAN,
         FAVOURITES,
         RECENTLY_PLAYED
     };
+}
 
+using ServerBrowserTypes::ServerBrowserType;
+
+namespace SearchTypes
+{
     enum SearchType
     {
         SERVERS = 0,
         PLAYERS,
         MAX_SEARCH_TYPES,
     };
+}
+
+using SearchTypes::SearchType;
+
+class CServerBrowser : public CSingleton < CServerBrowser >
+{
+    friend class CCore;
 
 public:
     explicit            CServerBrowser          ( void );
@@ -112,8 +120,8 @@ protected:
 
     int                 m_iSelectedServer[ SERVER_BROWSER_TYPE_COUNT ];
 
-    const char*         m_szSearchTypePath[ SearchType::MAX_SEARCH_TYPES ];
-    CGUIStaticImage*    m_pSearchIcons[ SearchType::MAX_SEARCH_TYPES ];
+    const char*         m_szSearchTypePath[ SearchTypes::MAX_SEARCH_TYPES ];
+    CGUIStaticImage*    m_pSearchIcons[ SearchTypes::MAX_SEARCH_TYPES ];
 
     bool                m_bManualConnect;
     std::string         m_strManualHost;

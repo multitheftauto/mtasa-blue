@@ -23,7 +23,7 @@ class CClientStreamer;
 
 class CClientStreamSectorRow
 {
-    friend CClientStreamer;
+    friend class CClientStreamer;
 public:
                                                     CClientStreamSectorRow      ( float fBottom, float fTop );
                                                     ~CClientStreamSectorRow     ( void );

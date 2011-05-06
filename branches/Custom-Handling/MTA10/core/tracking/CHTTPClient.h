@@ -19,10 +19,6 @@
 #include "CTCPClientSocket.h"
 #include <cstdio>
 
-#ifndef snprintf
-#define snprintf _snprintf
-#endif
-
 // HTTP buffer size (for OnRead)
 #define HTTP_BUFFER_LENGTH      4096
 

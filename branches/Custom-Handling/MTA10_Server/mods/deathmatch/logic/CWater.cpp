@@ -86,7 +86,7 @@ bool CWater::ReadSpecialData ()
     m_WaterType = QUAD;
     for ( int i = 0; i < 4; i++ )
     {
-        _snprintf ( szPropName, sizeof(szPropName), "posX%d", i + 1 );
+        snprintf ( szPropName, sizeof(szPropName), "posX%d", i + 1 );
         if ( !GetCustomDataFloat ( szPropName, m_Vertices[i].fX, true ) )
         {
             if ( i == 3 )
@@ -100,7 +100,7 @@ bool CWater::ReadSpecialData ()
                 return false;
             }
         }
-        _snprintf ( szPropName, sizeof(szPropName), "posY%d", i + 1 );
+        snprintf ( szPropName, sizeof(szPropName), "posY%d", i + 1 );
         if ( !GetCustomDataFloat ( szPropName, m_Vertices[i].fY, true ) )
         {
             if ( i == 3 )
@@ -114,7 +114,7 @@ bool CWater::ReadSpecialData ()
                 return false;
             }
         }
-        _snprintf ( szPropName, sizeof(szPropName), "posZ%d", i + 1 );
+        snprintf ( szPropName, sizeof(szPropName), "posZ%d", i + 1 );
         if ( !GetCustomDataFloat ( szPropName, m_Vertices[i].fZ, true ) )
         {
             if ( i == 3 )

@@ -73,7 +73,7 @@ void CConsole::Echo ( const char* szText )
     float fMaxScroll = m_pHistory->GetScrollbarDocumentSize () - m_pHistory->GetScrollbarPageSize ();
 
     // Grab the previous text and append this text
-    std::string& strBuffer = m_pHistory->GetText ();
+    std::string strBuffer = m_pHistory->GetText ();
     strBuffer += szText;
 
     // Is it too long? Shrink it
@@ -105,7 +105,7 @@ void CConsole::Printf ( const char* szFormat, ... )
     char szBuffer [1024];
     va_list ap;
     va_start ( ap, szFormat );
-    _VSNPRINTF ( szBuffer, 1024, szFormat, ap );
+    VSNPRINTF ( szBuffer, 1024, szFormat, ap );
     va_end ( ap );
 
     // Echo it

@@ -502,11 +502,11 @@ bool CElement::GetCustomDataString ( const char* szName, char* pOut, size_t size
         }
         else if ( iType == LUA_TNUMBER )
         {
-            _snprintf ( pOut, sizeBuffer, "%f", pData->GetNumber () );
+            snprintf ( pOut, sizeBuffer, "%f", pData->GetNumber () );
         }
         else if ( iType == LUA_TBOOLEAN )
         {
-            _snprintf ( pOut, sizeBuffer, "%u", pData->GetBoolean () );
+            snprintf ( pOut, sizeBuffer, "%u", pData->GetBoolean () );
         }
         else if ( iType == LUA_TNIL )
         {

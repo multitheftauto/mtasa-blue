@@ -40,7 +40,7 @@ bool TerminateProcessFromPathFilename ( const SString& strPathFilename )
                     char szModuleName[500];
                     if ( GetModuleFileNameEx( hProcess, pModule, szModuleName, 500 ) )
                     {
-                        if ( strcmpi ( szModuleName, strPathFilename ) == 0 )
+                        if ( stricmp ( szModuleName, strPathFilename ) == 0 )
                         {
                             TerminateProcess ( hProcess, 0 );
                             CloseHandle ( hProcess );

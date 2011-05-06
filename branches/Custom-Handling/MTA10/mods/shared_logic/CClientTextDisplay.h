@@ -23,7 +23,7 @@ class CClientTextDisplay;
 
 class CClientTextDisplay: public CClientDisplay
 {
-    friend CClientDisplayManager;
+    friend class CClientDisplayManager;
 
 public:
                                 CClientTextDisplay      ( CClientDisplayManager* pDisplayManager, int ID, bool bIs3DTex );

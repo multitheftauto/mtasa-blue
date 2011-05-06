@@ -12,10 +12,6 @@
 
 #include <StdInc.h>
 
-#ifndef snprintf
-#define snprintf _snprintf
-#endif
-
 // Debug mode only interface
 #ifdef MTA_DEBUG
 

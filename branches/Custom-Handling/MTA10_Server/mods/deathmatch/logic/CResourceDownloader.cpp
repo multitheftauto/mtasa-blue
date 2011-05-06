@@ -78,10 +78,10 @@ CResourceDownload::CResourceDownload ( const char * szName, const char * szURL, 
 void CResourceDownload::DownloadMeta (  )
 {
     char szMetaDownloadPath[260];
-    _snprintf ( szMetaDownloadPath, 259, "%s/%s/meta.xml", g_pGame->GetResourceManager()->GetResourceDirectory(), m_strName.c_str () );
+    snprintf ( szMetaDownloadPath, 259, "%s/%s/meta.xml", g_pGame->GetResourceManager()->GetResourceDirectory(), m_strName.c_str () );
 
     char szMetaURL[512];
-    _snprintf ( szMetaURL, 511, "%s/meta.xml", m_strURL.c_str () );
+    snprintf ( szMetaURL, 511, "%s/meta.xml", m_strURL.c_str () );
     szMetaURL[511] = '\0';
 
 
@@ -229,7 +229,7 @@ unsigned int CResourceDownload::GetFilesRemainingToDownload()
 void CResourceDownload::ParseMeta()
 {
     char szMetaDownloadPath[260];
-    _snprintf ( szMetaDownloadPath, 259, "%s/%s/meta.xml", g_pGame->GetResourceManager()->GetResourceDirectory(), m_strName.c_str () );
+    snprintf ( szMetaDownloadPath, 259, "%s/%s/meta.xml", g_pGame->GetResourceManager()->GetResourceDirectory(), m_strName.c_str () );
 
     // Create the XML
     CXMLFile * xmlfile = m_XML->CreateXML ( szMetaDownloadPath );
@@ -253,11 +253,11 @@ void CResourceDownload::ParseMeta()
                             std::string strFileName = attrSrc->GetValue ().c_str ();
 
                             char szURL[512];
-                            _snprintf ( szURL, 511, "%s//%s", m_strURL.c_str (), strFileName.c_str () );
+                            snprintf ( szURL, 511, "%s//%s", m_strURL.c_str (), strFileName.c_str () );
                             szURL[511] = '\0';
 
                             char szPath[260];
-                            _snprintf ( szPath, 259, "%s/%s/%s", g_pGame->GetResourceManager()->GetResourceDirectory(), m_strName.c_str (), strFileName.c_str () );
+                            snprintf ( szPath, 259, "%s/%s/%s", g_pGame->GetResourceManager()->GetResourceDirectory(), m_strName.c_str (), strFileName.c_str () );
                             szPath[259] = '\0';
 
                             CResourceDownloadFile * file = new CResourceDownloadFile ( szURL, szPath, this );
@@ -593,11 +593,11 @@ CUpdateSite::~CUpdateSite()
 void CUpdateSite::DownloadUpdateManifest()
 {
     char szManifestURL[512], szDownload[512];
-    _snprintf ( szManifestURL, 511, "%s", m_strURL.c_str () ); // pointless currently
+    snprintf ( szManifestURL, 511, "%s", m_strURL.c_str () ); // pointless currently
     szManifestURL[511] = '\0';
 
     srand(GetTickCount32());
-    _snprintf ( szDownload, 511, "temp%d.xml", rand() );
+    snprintf ( szDownload, 511, "temp%d.xml", rand() );
     szDownload[511] = '\0';
     m_strManifestDownloadFileName = szDownload;
 

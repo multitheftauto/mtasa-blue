@@ -14,6 +14,7 @@
 
 #include "StdInc.h"
 #include "include/cd3dmge_d3d9.h"
+#include <stdexcept>
 
 inline D3DSPRITEVERTEX2D InitFont2DVertex( float x, float y, float z, float rhw, DWORD dwColor, float tu, float tv )
 {
@@ -79,7 +80,7 @@ void CD3DMGEng::OnInvalidateDevice ( void )
     {
         if ( FAILED ( m_pVB->Release () ) )
         {
-            throw std::exception("CD3DMGEng::OnInvalidateDevice - Failed to release the VertexBuffer.");
+            throw std::runtime_error("CD3DMGEng::OnInvalidateDevice - Failed to release the VertexBuffer.");
         }
         m_pVB = NULL;
     }
@@ -88,7 +89,7 @@ void CD3DMGEng::OnInvalidateDevice ( void )
     {
         if ( FAILED ( m_pLastFont->Release () ) )   //release font
         {
-            throw std::exception("CD3DMGEng::OnInvalidateDevice - Failed to release the Font.");
+            throw std::runtime_error("CD3DMGEng::OnInvalidateDevice - Failed to release the Font.");
         }
         m_pLastFont = NULL;
     }
@@ -148,13 +149,12 @@ bool CD3DMGEng::Render2DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pSc
     // Setup the rendering.
     m_pDevice->SetFVF( D3DFVF_SPRITEVERTEX2DTEX );
     m_pDevice->SetStreamSource( 0, m_pVB, 0, sizeof(D3DSPRITEVERTEX2D) );
-    if ( pTexture )
-        m_pDevice->SetTexture( 0, pTexture );
 
 
     //////////////////////////////////////////////////
     // Lock the vertex buffer and copy in the verts.
-    m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
+    if ( m_pVB->Lock( 0, 0, (void**)&pVertices, 0 ) != D3D_OK )
+        return false;
     {
         pVertices[0].fX =       x;
         pVertices[0].fY =       y;
@@ -190,6 +190,8 @@ bool CD3DMGEng::Render2DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, D3DXVECTOR2 *pSc
     }
     m_pVB->Unlock();
 
+    if ( pTexture )
+        m_pDevice->SetTexture( 0, pTexture );
 
     ////////////////////////////////////////////////////
     // Draw!
@@ -228,7 +230,8 @@ bool CD3DMGEng::DrawLine ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, DWORD dwC
 
     //////////////////////////////////////////////////
     // Lock the vertex buffer and copy in the verts.
-    m_pVB->Lock( 0, 0, (void**)&lineList, 0 );
+    if ( m_pVB->Lock( 0, 0, (void**)&lineList, 0 ) != D3D_OK )
+        return false;
     {
         lineList[0].x = a.x;
         lineList[0].y = a.y;
@@ -368,7 +371,8 @@ bool CD3DMGEng::DrawText3D ( float x, float y, float z, D3DMATRIX * pMatView, DW
         
     
     fStartX = x;
-    m_pVB->Lock( 0, 0, (void**)&pVertices, D3DLOCK_DISCARD );
+    if ( m_pVB->Lock( 0, 0, (void**)&pVertices, D3DLOCK_DISCARD ) != D3D_OK )
+        return false;
     while ( *wszText )
     {
         TCHAR c = *wszText++;
@@ -417,7 +421,8 @@ bool CD3DMGEng::DrawText3D ( float x, float y, float z, D3DMATRIX * pMatView, DW
         {
             m_pVB->Unlock();
             m_pDevice->DrawPrimitive( D3DPT_TRIANGLELIST, 0, dwTriangleCount );
-            m_pVB->Lock( 0, 0, (void**)&(pVertices=NULL), D3DLOCK_DISCARD );
+            if ( m_pVB->Lock( 0, 0, (void**)&(pVertices=NULL), D3DLOCK_DISCARD ) != D3D_OK )
+                return false;
             dwTriangleCount = 0L;
         }
     }
@@ -468,11 +473,11 @@ bool CD3DMGEng::Render3DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, float fScale, D3
     // Setup the rendering.
     m_pDevice->SetFVF ( D3DFVF_SPRITEVERTEX3DTEX );
     m_pDevice->SetStreamSource( 0, m_pVB, 0, sizeof(D3DSPRITEVERTEX3D) );
-    m_pDevice->SetTexture( 0, pTexture );
 
     //////////////////////////////////////////////////
     // Lock the vertex buffer and copy in the verts.
-    m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
+    if ( m_pVB->Lock( 0, 0, (void**)&pVertices, 0 ) != D3D_OK )
+        return false;
     {
         pVertices[0].fX =       x-rightVect.x+upVect.x;
         pVertices[0].fY =       y-rightVect.y+upVect.y;
@@ -504,6 +509,7 @@ bool CD3DMGEng::Render3DSpriteEx ( LPDIRECT3DTEXTURE9 pTexture, float fScale, D3
     }
     m_pVB->Unlock();
 
+    m_pDevice->SetTexture( 0, pTexture );
     ////////////////////////////////////////////////////
     // Draw!
     m_pDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2 );
@@ -548,11 +554,11 @@ bool CD3DMGEng::Render3DTriangle ( LPDIRECT3DTEXTURE9 pTexture, float fScale, D3
     // Setup the rendering.
     m_pDevice->SetFVF ( D3DFVF_SPRITEVERTEX3DTEX );
     m_pDevice->SetStreamSource( 0, m_pVB, 0, sizeof(D3DSPRITEVERTEX3D) );
-    m_pDevice->SetTexture( 0, pTexture );
 
     //////////////////////////////////////////////////
     // Lock the vertex buffer and copy in the verts.
-    m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
+    if ( m_pVB->Lock( 0, 0, (void**)&pVertices, 0 ) != D3D_OK )
+        return false;
     {
         pVertices[0].fX =       x-rightVect.x+upVect.x;
         pVertices[0].fY =       y-rightVect.y+upVect.y;
@@ -577,6 +583,7 @@ bool CD3DMGEng::Render3DTriangle ( LPDIRECT3DTEXTURE9 pTexture, float fScale, D3
     }
     m_pVB->Unlock();
 
+    m_pDevice->SetTexture( 0, pTexture );
     ////////////////////////////////////////////////////
     // Draw!
     m_pDevice->DrawPrimitive( D3DPT_TRIANGLELIST, 0, 2 );
@@ -613,7 +620,8 @@ bool CD3DMGEng::Render2DBoxEx ( float x, float y, float fWidth, float fHeight, D
 
     //////////////////////////////////////////////////
     // Lock the vertex buffer and copy in the verts.
-    m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
+    if ( m_pVB->Lock( 0, 0, (void**)&pVertices, 0 ) != D3D_OK )
+        return false;
     {
         pVertices[0].fX =       x;
         pVertices[0].fY =       y;
@@ -672,11 +680,11 @@ bool CD3DMGEng::DrawPlane3D ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, LPDIRE
     // Setup the rendering.
     m_pDevice->SetFVF ( D3DFVF_SPRITEVERTEX3DTEX );
     m_pDevice->SetStreamSource( 0, m_pVB, 0, sizeof(D3DSPRITEVERTEX3D) );
-    m_pDevice->SetTexture( 0, pTexture );
 
     //////////////////////////////////////////////////
     // Lock the vertex buffer and copy in the verts.
-    m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
+    if ( m_pVB->Lock( 0, 0, (void**)&pVertices, 0 ) != D3D_OK )
+        return false;
     {
         pVertices[0].fX =       a.x;
         pVertices[0].fY =       a.y;
@@ -717,6 +725,7 @@ bool CD3DMGEng::DrawPlane3D ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, LPDIRE
     m_pDevice->SetRenderState ( D3DRS_DESTBLEND, D3DBLEND_ZERO );
     */
 
+    m_pDevice->SetTexture( 0, pTexture );
 
     ////////////////////////////////////////////////////
     // Draw!
@@ -743,7 +752,6 @@ bool CD3DMGEng::DrawLine3D ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, float f
     // Setup the rendering.
     m_pDevice->SetFVF ( D3DFVF_SPRITEVERTEX3DTEX );
     m_pDevice->SetStreamSource ( 0, m_pVB, 0, sizeof(D3DSPRITEVERTEX3D) );
-    m_pDevice->SetTexture ( 0, pTexture );
 
     CVector vecA ( a.x, a.y, a.z );
     CVector vecB ( b.x, b.y, b.z );
@@ -773,7 +781,8 @@ bool CD3DMGEng::DrawLine3D ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, float f
 
     //////////////////////////////////////////////////
     // Lock the vertex buffer and copy in the verts.
-    m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
+    if ( m_pVB->Lock( 0, 0, (void**)&pVertices, 0 ) != D3D_OK )
+        return false;
     {
         pVertices[0].fX =       vecA.fX;
         pVertices[0].fY =       vecA.fY;
@@ -814,6 +823,7 @@ bool CD3DMGEng::DrawLine3D ( const D3DXVECTOR3& a, const D3DXVECTOR3& b, float f
     m_pDevice->SetRenderState ( D3DRS_DESTBLEND, D3DBLEND_ZERO );
     */
 
+    m_pDevice->SetTexture ( 0, pTexture );
 
     ////////////////////////////////////////////////////
     // Draw!
@@ -853,7 +863,8 @@ bool CD3DMGEng::Render3DBox ( float x, float y, float z, float fL, float fW, flo
     float d = fL/2;
     //////////////////////////////////////////////////
     // Lock the vertex buffer and copy in the verts.
-    m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
+    if ( m_pVB->Lock( 0, 0, (void**)&pVertices, 0 ) != D3D_OK )
+        return false;
     {
         ////////////////////////////////////////////////
         // Do floating point arithmetic once only.
@@ -1213,7 +1224,8 @@ bool CD3DMGEng::DrawText2D ( float x, float y, DWORD dwColor, const TCHAR *wszTe
     
     DWORD dwTriangleCount = 0;
     const float fStartX = x;
-    m_pVB->Lock( 0, 0, (void**)&pVertices, D3DLOCK_DISCARD );
+    if ( m_pVB->Lock( 0, 0, (void**)&pVertices, D3DLOCK_DISCARD ) != D3D_OK )
+        return false;
     while ( *wszText )
     {
         TCHAR c = *wszText++;
@@ -1264,7 +1276,8 @@ bool CD3DMGEng::DrawText2D ( float x, float y, DWORD dwColor, const TCHAR *wszTe
         {
             m_pVB->Unlock();
             m_pDevice->DrawPrimitive( D3DPT_TRIANGLELIST, 0, dwTriangleCount );
-            m_pVB->Lock( 0, 0, (void**)&(pVertices=NULL), D3DLOCK_DISCARD );
+            if ( m_pVB->Lock( 0, 0, (void**)&(pVertices=NULL), D3DLOCK_DISCARD ) != D3D_OK )
+                return false;
             dwTriangleCount = 0L;
         }
 

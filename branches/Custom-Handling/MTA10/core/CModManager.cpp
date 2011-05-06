@@ -286,6 +286,12 @@ void CModManager::DoPulsePostFrame ( void )
         CCore::GetSingleton ().GetNetwork ()->DoPulse ();
     }
 
+    // Make sure frame rate limit gets applied
+    if ( m_pClientBase )
+        CCore::GetSingleton ().EnsureFrameRateLimitApplied ();  // Catch missed frames
+    else
+        CCore::GetSingleton ().ApplyFrameRateLimit ( 60 );      // Limit when not connected
+
     // Load/unload requested?
     if ( m_bUnloadRequested )
     {
@@ -496,15 +502,39 @@ void CModManager::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInfo
                 SString strMTAVersionFull = SString ( "%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting ( "mta-version-ext" ).SplitRight ( ".", NULL, -2 ) );
                 SString strSerialPart = GetApplicationSetting ( "serial" ).substr ( 0, 8 );
 
-                SString strFilename ( "mta\\dumps\\client_%s_%s_%08x_%x_%s_%04d%02d%02d_%02d%02d.dmp",
+                // Get path to mta dir
+                SString strPathCode;
+                {
+                    std::vector < SString > parts;
+                    PathConform ( CalcMTASAPath ( "" ) ).Split ( PATH_SEPERATOR, parts );
+                    for ( uint i = 0 ; i < parts.size () ; i++ )
+                    {
+                        if ( parts[i].CompareI ( "Program Files" ) )
+                            strPathCode += "Pr";
+                        else
+                        if ( parts[i].CompareI ( "Program Files (x86)" ) )
+                            strPathCode += "Px";
+                        else
+                        if ( parts[i].CompareI ( "MTA San Andreas" ) )
+                            strPathCode += "Mt";
+                        else
+                        if ( parts[i].BeginsWithI ( "MTA San Andreas" ) )
+                            strPathCode += "Mb";
+                        else
+                            strPathCode += parts[i].Left ( 1 ).ToUpper ();
+                    }
+                }
+
+                SString strFilename ( "mta\\dumps\\client_%s_%s_%08x_%x_%s_%s_%04d%02d%02d_%02d%02d.dmp",
                                              strMTAVersionFull.c_str (),
                                              strModuleName.c_str (),
                                              pExceptionInformation->GetAddressModuleOffset (),
                                              pExceptionInformation->GetCode () & 0xffff,
+                                             strPathCode.c_str (),
                                              strSerialPart.c_str (),
                                              SystemTime.wYear,
-                                             SystemTime.wDay,
                                              SystemTime.wMonth,
+                                             SystemTime.wDay,
                                              SystemTime.wHour,
                                              SystemTime.wMinute
                                            );

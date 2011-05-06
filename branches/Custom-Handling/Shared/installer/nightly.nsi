@@ -341,6 +341,7 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
 
 			!ifndef LIGHTBUILD
 				File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"

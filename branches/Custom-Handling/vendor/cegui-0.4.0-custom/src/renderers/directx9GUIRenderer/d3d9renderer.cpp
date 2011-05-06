@@ -84,7 +84,7 @@ void DirectX9Renderer::constructor_impl(LPDIRECT3DDEVICE9 device, const Size& di
 	{
 		// Ideally, this would have been a RendererException, but we can't use that until the System object is created
 		// and that requires a Renderer passed to the constructor, so we throw this instead.
-		throw std::exception("Creation of VertexBuffer for Renderer object failed");
+		throw std::runtime_error("Creation of VertexBuffer for Renderer object failed");
 	}
 
 	// get the maximum available texture size.
@@ -93,7 +93,7 @@ void DirectX9Renderer::constructor_impl(LPDIRECT3DDEVICE9 device, const Size& di
 	{
 		// release vertex buffer
 		d_buffer->Release();
-		throw std::exception("Unable to retrieve device capabilities from Direct3DDevice9.");
+		throw std::runtime_error("Unable to retrieve device capabilities from Direct3DDevice9.");
 	}
 
 	// set max texture size the the smaller of max width and max height.
@@ -674,7 +674,7 @@ Size DirectX9Renderer::getViewportSize(void)
 
 	if (FAILED(d_device->GetViewport(&vp)))
 	{
-		throw std::exception("Unable to access required view port information from Direct3DDevice9.");
+		throw std::runtime_error("Unable to access required view port information from Direct3DDevice9.");
 	}
 	else
 	{

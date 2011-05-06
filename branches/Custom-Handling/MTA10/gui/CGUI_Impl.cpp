@@ -360,13 +360,13 @@ bool CGUI_Impl::GetStringFromInputMode ( eInputMode a_eMode, std::string& a_rstr
 
 CEGUI::String CGUI_Impl::GetUTFString ( const std::string strInput )
 {
-    std::wstring strUTF = ConvertToUTF8(strInput); //Convert to a typical UTF8 string
+    std::wstring strUTF = MbUTF8ToUTF16(strInput); //Convert to a typical wide string
     return GetUTFString ( strUTF );
 }
 
 CEGUI::String CGUI_Impl::GetUTFString ( const std::wstring strLine )
 {
-    return CEGUI::String((CEGUI::utf8*)ConvertToANSI(GetBidiString(strLine)).c_str()); //Convert into a CEGUI String
+    return CEGUI::String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(strLine)).c_str()); //Convert into a CEGUI String
 }
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
@@ -568,7 +568,7 @@ CEGUI::WindowManager* CGUI_Impl::GetWindowManager ( void )
 
 void CGUI_Impl::GetUniqueName ( char* pBuf )
 {
-    _snprintf ( pBuf, CGUI_CHAR_SIZE, "%x", m_ulPreviousUnique );
+    snprintf ( pBuf, CGUI_CHAR_SIZE, "%x", m_ulPreviousUnique );
     m_ulPreviousUnique++;
 }
 
@@ -661,8 +661,8 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
     switch ( KeyboardArgs.scancode )
     {
         // Cut/Copy keys
-        case CEGUI::Key::Scan::X:
-        case CEGUI::Key::Scan::C:
+        case CEGUI::Key::X:
+        case CEGUI::Key::C:
         {
             if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {
@@ -685,7 +685,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                         strTemp = WndEdit->getText ().substr ( sizeSelectionStart, sizeSelectionLength );
 
                         // If the user cut, remove the text too
-                        if ( KeyboardArgs.scancode == CEGUI::Key::Scan::X )
+                        if ( KeyboardArgs.scancode == CEGUI::Key::X )
                         {
                             // Read only?
                             if ( !WndEdit->isReadOnly () )
@@ -711,7 +711,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                     strTemp = WndEdit->getText ().substr ( sizeSelectionStart, sizeSelectionLength );
 
                     // If the user cut, remove the text too
-                    if ( KeyboardArgs.scancode == CEGUI::Key::Scan::X )
+                    if ( KeyboardArgs.scancode == CEGUI::Key::X )
                     {
                         // Read only?
                         if ( !WndEdit->isReadOnly () )
@@ -728,7 +728,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                 if ( strTemp.length () > 0 )
                 {
                     // Convert it to Unicode
-                    std::wstring strUTF = GetBidiString(ConvertToUTF8(strTemp.c_str()));
+                    std::wstring strUTF = GetBidiString(MbUTF8ToUTF16(strTemp.c_str()));
 
                     // Open and empty the clipboard
                     OpenClipboard ( NULL );
@@ -752,7 +752,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
         }
 
         // Paste keys
-        case CEGUI::Key::Scan::V:
+        case CEGUI::Key::V:
         {
             if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {
@@ -836,7 +836,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                         }
 
                         // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
-                        std::wstring tmp = ConvertToUTF8(strEditText.c_str());
+                        std::wstring tmp = MbUTF8ToUTF16(strEditText.c_str());
                         if ( ( strClipboardText.length () + tmp.length () ) < iMaxLength )
                         {
                             // Are there characters selected?
@@ -856,7 +856,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             }
 
                             // Set the new text and move the carat at the end of what we pasted
-                            CEGUI::String strText((CEGUI::utf8*)ConvertToANSI(tmp).c_str());
+                            CEGUI::String strText((CEGUI::utf8*)UTF16ToMbUTF8(tmp).c_str());
                             strEditText = strText;
                             iCaratIndex = sizeCaratIndex;
                         }
@@ -870,12 +870,14 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             if ( Wnd->getType ( ) == "CGUI/Editbox" )
                             {
                                 CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );  
-                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                                CEGUI::WindowEventArgs args( WndEdit );
+                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , args );
                             }
                             else
                             {
                                 CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );  
-                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , CEGUI::WindowEventArgs ( WndEdit ) );
+                                CEGUI::WindowEventArgs args( WndEdit );
+                                WndEdit->fireEvent ( CEGUI::Editbox::EventEditboxFull , args );
                             }
                         }
                         else
@@ -904,7 +906,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
         }
 
         // Select all key
-        case CEGUI::Key::Scan::A:
+        case CEGUI::Key::A:
         {
             if ( KeyboardArgs.sysKeys & CEGUI::Control )
             {

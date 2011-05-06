@@ -91,7 +91,7 @@ bool SharedUtil::FileRename ( const SString& strFilenameOld, const SString& strF
 #ifdef WIN32
     return MoveFile ( strFilenameOld, strFilenameNew ) != 0;
 #else
-    return std::rename ( strFilenameOld, strFilenameNew ) == 0;
+    return rename ( strFilenameOld, strFilenameNew ) == 0;
 #endif
 }
 
@@ -194,48 +194,59 @@ uint SharedUtil::FileSize ( const SString& strFilename  )
 //
 void SharedUtil::MakeSureDirExists ( const SString& strPath )
 {
-    // Copy the path
-    char szCopy [MAX_PATH];
-    strncpy ( szCopy, strPath, MAX_PATH );
+    std::vector < SString > parts;
+    PathConform ( strPath ).Split ( PATH_SEPERATOR, parts );
 
-    // Begin from the start
-    char cChar = 0;
-    char* szIter = szCopy;
-    while ( *szIter != 0 )
+    // Find first dir that already exists
+    int idx = parts.size () - 1;
+    for ( ; idx >= 0 ; idx-- )
     {
-        // Met a slash?
-        cChar = *szIter;
-        if ( cChar == '\\' ||
-             cChar == '/' )
-        {
-            // Replace it temprarily with 0
-            *szIter = 0;
+        SString strTemp = SString::Join ( PATH_SEPERATOR, parts, 0, idx );
+        if ( DirectoryExists ( strTemp ) )
+            break;        
+    }
 
-            // Call mkdir on this path
-            #ifdef WIN32
-                mkdir ( szCopy );
-            #else
-                mkdir ( szCopy ,0775 );
-            #endif
-
-            // Make it a slash again
-            *szIter = cChar;
-        }
-
-        // Increment iterator
-        ++szIter;
+    // Make non existing dirs only
+    idx++;
+    for ( ; idx < (int)parts.size () ; idx++ )
+    {
+        SString strTemp = SString::Join ( PATH_SEPERATOR, parts, 0, idx );
+        // Call mkdir on this path
+        #ifdef WIN32
+            mkdir ( strTemp );
+        #else
+            mkdir ( strTemp ,0775 );
+        #endif
     }
 }
 
 
 SString SharedUtil::PathConform ( const SString& strPath )
 {
-    // Make slashes the right way and remove duplicates
+    // Make slashes the right way and remove duplicates, except for UNC type indicators
 #if WIN32
-    return strPath.Replace ( "/", PATH_SEPERATOR ).Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
+    SString strTemp = strPath.Replace ( "/", PATH_SEPERATOR );
 #else
-    return strPath.Replace ( "\\", PATH_SEPERATOR ).Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
+    SString strTemp = strPath.Replace ( "\\", PATH_SEPERATOR );
 #endif
+    // Remove slash duplicates
+    size_t iFirstDoubleSlash = strTemp.find ( PATH_SEPERATOR PATH_SEPERATOR );
+    if ( iFirstDoubleSlash == std::string::npos )
+        return strTemp;     // No duplicates present
+
+    // If first double slash is not at the start, then treat as a normal duplicate if:
+    //      1. It is not preceeded by a colon, or
+    //      2. Another single slash is before it
+    if ( iFirstDoubleSlash > 0 )
+    {
+        if ( strTemp.SubStr ( iFirstDoubleSlash - 1, 1 ) != ":" || strTemp.find ( PATH_SEPERATOR ) < iFirstDoubleSlash  )
+        {
+            // Replace all duplicate slashes
+            return strTemp.Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
+        }
+    }
+
+    return strTemp.Left ( iFirstDoubleSlash + 1 ) + strTemp.SubStr ( iFirstDoubleSlash + 1 ).Replace ( PATH_SEPERATOR PATH_SEPERATOR, PATH_SEPERATOR, true );
 }
 
 SString SharedUtil::PathJoin ( const SString& str1, const SString& str2 )
