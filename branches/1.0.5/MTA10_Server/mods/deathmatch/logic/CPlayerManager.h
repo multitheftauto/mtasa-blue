@@ -44,15 +44,11 @@ public:
     CPlayer*                                    Get                             ( NetServerPlayerID& PlayerSocket );
     CPlayer*                                    Get                             ( const char* szNick, bool bCaseSensitive = false );
 
-    CPlayer*                                    GetBefore                       ( ElementID PlayerID );
-    CPlayer*                                    GetAfter                        ( ElementID PlayerID );
-
     inline std::list < CPlayer* > ::const_iterator  IterBegin                   ( void )                                            { return m_Players.begin (); };
     inline std::list < CPlayer* > ::const_iterator  IterEnd                     ( void )                                            { return m_Players.end (); };
     inline std::list < CPlayer* > ::const_iterator  IterGet                     ( CPlayer* pPlayer );
     inline std::list < CPlayer* > ::const_iterator  IterGet                     ( ElementID PlayerID );
 
-    void                                        Broadcast                       ( const CPacket& Packet, CPlayer* pSkip = NULL );
     void                                        Broadcast                       ( const CPacket& Packet, std::list < CPlayer * > & playersList );
     void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL, NetServerPacketOrdering packetOrdering = PACKET_ORDERING_GAME, unsigned short usMinBitstreamVersion = 0 );
 

@@ -1687,7 +1687,9 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer->IsTimeForFarSync () )
     {
+        //
         // All players get sync if it's time for a far sync
+        //
         for ( std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin (); iter != m_pPlayerManager->IterEnd (); iter++ )
         {
             CPlayer* pSendPlayer = *iter;
@@ -1697,44 +1699,96 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
     }
     else
     {
+        //
         // Only near players get sync if it's not time for a far sync
+        //
 
         // Get the two positions to check
         const CVector& vecLocalPlayerPos = pPlayer->GetPosition ();
         CVector vecCameraPosition;
         pPlayer->GetCamera ()->GetPosition ( vecCameraPosition );
 
-        // Perform queries on spatial database
-        CElementResult resultNearCamera;
-        GetSpatialDatabase()->SphereQuery ( resultNearCamera, CSphere ( vecCameraPosition, DISTANCE_FOR_SLOW_SYNCRATE ) );
-
-        CElementResult resultNearPlayer;
-        GetSpatialDatabase()->SphereQuery ( resultNearPlayer, CSphere ( vecLocalPlayerPos, DISTANCE_FOR_SLOW_SYNCRATE ) );
-
-        // Merge lists
-        std::set < CPlayer* > nearList;
-        for ( CElementResult::const_iterator it = resultNearCamera.begin () ; it != resultNearCamera.end (); ++it )
-            if ( (*it)->GetType () == CElement::PLAYER )
-                nearList.insert ( (CPlayer*)*it );
-
-        for ( CElementResult::const_iterator it = resultNearPlayer.begin () ; it != resultNearPlayer.end (); ++it )
-            if ( (*it)->GetType () == CElement::PLAYER )
-                nearList.insert ( (CPlayer*)*it );
-
-        // Send packet to other players who are near
-        for ( std::set < CPlayer* > ::const_iterator iter = nearList.begin (); iter != nearList.end (); iter++ )
+        // Fill resultNearBoth with rough list of nearby players
+        CElementResult resultNearBoth;
         {
-            CPlayer* pSendPlayer = *iter;
-            if ( pSendPlayer != pPlayer )
+            // Calculate distance from player to his camera. (Note as spatial database is 2D, we can use the 2D distance here)
+            const float fCameraDistance = DistanceBetweenPoints2D ( vecCameraPosition, vecLocalPlayerPos );
+            if ( fCameraDistance < 40.f )
             {
-                const CVector& vecRemotePlayerPos = pSendPlayer->GetPosition ();
+                //
+                // If player near his camera (which is the usual case), we can do optimized things
+                //
 
-                // Check distance is accurate
-                if ( ( vecLocalPlayerPos - vecRemotePlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE ||
-                     ( vecCameraPosition - vecRemotePlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE )
+                // Do one query with a slightly bigger sphere
+                const CVector vecAvgPos = ( vecCameraPosition + vecLocalPlayerPos ) * 0.5f;
+                GetSpatialDatabase()->SphereQuery ( resultNearBoth, CSphere ( vecAvgPos, DISTANCE_FOR_SLOW_SYNCRATE + fCameraDistance * 0.5f ) );
+            }
+            else
+            {
+                //
+                // Bit more complicated if camera is not near player
+                //
+
+                // Perform queries on spatial database
+                CElementResult resultNearCamera;
+                GetSpatialDatabase()->SphereQuery ( resultNearCamera, CSphere ( vecCameraPosition, DISTANCE_FOR_SLOW_SYNCRATE ) );
+
+                CElementResult resultNearPlayer;
+                GetSpatialDatabase()->SphereQuery ( resultNearPlayer, CSphere ( vecLocalPlayerPos, DISTANCE_FOR_SLOW_SYNCRATE ) );
+
+                std::set < CPlayer* > mergedList;
+
+                // Merge
+                for ( CElementResult::const_iterator it = resultNearCamera.begin () ; it != resultNearCamera.end (); ++it )
+                    if ( (*it)->GetType () == CElement::PLAYER )
+                        mergedList.insert ( (CPlayer*)*it );
+
+                for ( CElementResult::const_iterator it = resultNearPlayer.begin () ; it != resultNearPlayer.end (); ++it )
+                    if ( (*it)->GetType () == CElement::PLAYER )
+                        mergedList.insert ( (CPlayer*)*it );
+
+                // Copy to resultNearBoth
+                for ( std::set < CPlayer* > ::iterator it = mergedList.begin (); it != mergedList.end (); ++it )
+                    resultNearBoth.push_back ( *it );
+            }
+        }
+
+        std::map < CPlayer*, int >& nearList = pPlayer->GetNearPlayerList ();
+
+        // Refresh nearList with (accurate) nearby players
+        for ( CElementResult::const_iterator it = resultNearBoth.begin () ; it != resultNearBoth.end (); ++it )
+        {
+            if ( (*it)->GetType () == CElement::PLAYER )
+            {
+                CPlayer* pOtherPlayer = (CPlayer*)*it;
+                if ( pOtherPlayer != pPlayer )
                 {
-                    pSendPlayer->Send ( Packet );
+                    const CVector& vecRemotePlayerPos = pOtherPlayer->GetPosition ();
+
+                    // Check distance is accurate
+                    if ( ( vecLocalPlayerPos - vecRemotePlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE ||
+                         ( vecCameraPosition - vecRemotePlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE )
+                    {
+                        nearList[ pOtherPlayer ] = 5;
+                    }
                 }
+            }
+        }
+
+        // Send packet to players in nearList
+        for ( std::map < CPlayer*, int > ::iterator it = nearList.begin (); it != nearList.end (); )
+        {
+            CPlayer* pSendPlayer = it->first;
+            int& iCount = it->second;
+            if ( --iCount < 1 )
+            {
+                // Remove player from near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far away))
+                it = nearList.erase ( it );
+            }
+            else
+            {
+                pSendPlayer->Send ( Packet );
+                it++;
             }
         }
     }
