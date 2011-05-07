@@ -375,8 +375,7 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
         else
         {
             void* ptype = va_arg( vl, void* );
-            int iType   = static_cast<int> ( ptype );
-            switch ( iType )
+            switch ( (long)ptype )
             {
                 case SQLITE_INTEGER:
                 {
