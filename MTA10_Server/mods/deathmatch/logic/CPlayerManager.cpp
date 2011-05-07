@@ -137,65 +137,6 @@ void CPlayerManager::DeleteAll ( void )
 }
 
 
-CPlayer* CPlayerManager::GetBefore ( ElementID PlayerID )
-{
-    return NULL;
-}
-
-
-CPlayer* CPlayerManager::GetAfter ( ElementID PlayerID )
-{
-    // Got any items?
-    if ( m_Players.size () > 0 )
-    {
-        // If the list only contains one player, the next item has to be the requested one
-        // (we'd get the correct result anyway, but do this to save time)
-        if ( m_Players.size () == 1 )
-        {
-            return m_Players.front ();
-        }
-
-        // Find the player with an ID just above usPlayerID
-        // TODO: 31 bit limitation here on element id's
-        CPlayer* pPlayer = NULL;
-        int iLast = -1;
-        list < CPlayer* > ::const_iterator iter = m_Players.begin ();
-        for ( ; iter != m_Players.end (); iter++ )
-        {
-            ElementID ThisID = (*iter)->GetID ();
-            if ( ( ThisID > PlayerID && iLast == -1 ) || ( ThisID > PlayerID && ThisID < static_cast < ElementID > ( iLast ) ) )
-            {
-                pPlayer = *iter;
-                iLast = ThisID;
-            }
-        }
-
-        // If we found any, return it
-        if ( pPlayer )
-        {
-            return pPlayer;
-        }
-
-        // If not, grab the player with the lowest ID
-        iLast = MAX_SERVER_ELEMENTS;
-        for ( iter = m_Players.begin (); iter != m_Players.end (); iter++ )
-        {
-            if ( (*iter)->GetID () < static_cast < ElementID > ( iLast ) )
-            {
-                pPlayer = *iter;
-                iLast = pPlayer->GetID ();
-            }
-        }
-
-        // Return the player we found
-        return pPlayer;
-    }
-
-    // Nothing
-    return NULL;
-}
-
-
 list < CPlayer* > ::const_iterator CPlayerManager::IterGet ( CPlayer* pPlayer )
 {
     // Find the player in the list
@@ -230,23 +171,9 @@ list < CPlayer* > ::const_iterator CPlayerManager::IterGet ( ElementID PlayerID 
 }
 
 
-void CPlayerManager::Broadcast ( const CPacket& Packet, CPlayer* pSkip )
-{
-    // Send the packet to each player on the server except the skipped one
-    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
-    {
-        if ( *iter != pSkip )
-        {
-            (*iter)->Send ( Packet );
-        }
-    }
-}
-
-
 void CPlayerManager::Broadcast ( const CPacket& Packet, list < CPlayer * > & playersList )
 {
-    // Send the packet to each player on the server except the skipped one
+    // Send the packet to each player in the supplied list
     list < CPlayer* > ::iterator iter = playersList.begin ();
     for ( ; iter != playersList.end (); iter++ )
     {
@@ -301,9 +228,13 @@ void CPlayerManager::ResetAll ( void )
 
 void CPlayerManager::RemoveFromList ( CPlayer* pPlayer )
 {
-    if ( m_bCanRemoveFromList && !m_Players.empty() )
+    if ( m_bCanRemoveFromList )
     {
         m_Players.remove ( pPlayer );
     }
+
+    // Remove from other players near player list
+    for ( std::list < CPlayer* > ::const_iterator iter = m_Players.begin () ; iter != m_Players.end (); iter++ )
+        MapRemove ( (*iter)->GetNearPlayerList (), pPlayer );
 }
 

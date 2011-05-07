@@ -207,6 +207,8 @@ public:
     void                                        SetWeaponCorrect            ( bool bWeaponCorrect );
     bool                                        GetWeaponCorrect            ( void );
 
+    std::map < CPlayer*, int >&                 GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
+
 private:
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
@@ -293,6 +295,8 @@ private:
     std::map < std::string, std::string >       m_AnnounceValues;
 
     uint                                        m_uiWeaponIncorrectCount;
+
+    std::map < CPlayer*, int >                  m_NearPlayerList;
 };
 
 #endif
