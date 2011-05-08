@@ -198,7 +198,7 @@ bool CMainConfig::Load ( const char* szFilename )
             if ( isdigit(***it) )
                 MapSet ( m_DisableACMap, *it, 1 );
 
-        g_pNetServer->ResetStub ( 'delt', &m_DisableACMap );
+        g_pNetServer->ResetStub ( 'delu', *strDisbaleAC );
     }
 
     {
