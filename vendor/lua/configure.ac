@@ -63,7 +63,7 @@ AC_CONFIG_FILES([Makefile
                  src/luaconf.h.template])
 
 # keep in sync with topdir configure.ac
-outputdir=`pwd`/MTA10_Server/output
+outputdir=`pwd`/../../MTA10_Server/output
 
 AC_SUBST(outputdir)
 
