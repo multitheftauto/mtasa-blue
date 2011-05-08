@@ -1025,7 +1025,7 @@ void CGame::JoinPlayer ( CPlayer& Player )
 
     // Let him join
     Player.Send ( CPlayerJoinCompletePacket ( Player.GetID (),
-                                              m_pPlayerManager->Count (),
+                                              SharedUtil::Min<unsigned int>(128, m_pPlayerManager->Count ()),
                                               m_pMapManager->GetRootElement ()->GetID (),
                                               m_pMainConfig->GetHTTPDownloadType (),
                                               m_pMainConfig->GetHTTPPort (),
