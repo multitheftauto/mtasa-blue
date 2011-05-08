@@ -12,7 +12,6 @@ if test x$prefix = xNONE; then
 fi
 
 # Output directory
-# keep in sync with vendor/lua/configure.ac
 outputdir=`pwd`/MTA10_Server/output
 
 AC_SUBST(outputdir)
