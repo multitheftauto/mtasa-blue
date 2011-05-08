@@ -64,6 +64,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     
     // Key commands (registered as 'mod commands', can be disabled)
     g_pCore->GetCommands ()->Add ( "chatbox",                   "defines the chatbox color (r g b)",                    COMMAND_ChatBox, true );
+    g_pCore->GetCommands ()->Add ( "voiceptt",                  "transmits voice to other players",                     COMMAND_VoicePushToTalk, true );
     g_pCore->GetCommands ()->Add ( "enter_passenger",           "enters a car as passenger",                            COMMAND_EnterPassenger, true );
     g_pCore->GetCommands ()->Add ( "radio_next",                "next radio channel",                                   COMMAND_RadioNext, true );
     g_pCore->GetCommands ()->Add ( "radio_previous",            "previous radio channel",                               COMMAND_RadioPrevious, true );

@@ -231,7 +231,8 @@ SDefaultCommandBind g_dcbDefaultCommands[] =
     { "num_6",   true,  "radar_move_east",  NULL },
     { "num_4",   true,  "radar_move_west",  NULL },
     { "num_0",   true,  "radar_attach",     NULL },
-    
+    { "z",       true,  "voiceptt",         "1" },
+    { "z",       false, "voiceptt",         "0" },
     { "pgup",    true,  "chatscrollup",     "1" },
     { "pgup",    false, "chatscrollup",     "0" },
     { "pgdn",    true,  "chatscrolldown",   "-1" },

@@ -38,6 +38,13 @@ enum
     STATUS_JOINED,
 };
 
+enum eVoiceState
+{
+    VOICESTATE_IDLE = 0,
+    VOICESTATE_TRANSMITTING,
+};
+
+
 class CPlayer : public CPed, public CClient
 {
     friend class CElement;
@@ -222,6 +229,25 @@ public:
     void                                        SetWeaponCorrect            ( bool bWeaponCorrect );
     bool                                        GetWeaponCorrect            ( void );
 
+    eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
+    void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
+
+    bool                                        IsUsingBroadcastList        ( void )                      { return !m_lstBroadcastList.empty(); }
+    inline std::list < CElement* > ::const_iterator IterBroadcastListBegin  ( void )                      { return m_lstBroadcastList.begin (); };
+    inline std::list < CElement* > ::const_iterator IterBroadcastListEnd    ( void )                      { return m_lstBroadcastList.end (); };
+    CElement*                                   GetBroadcastElement         ( void )                      { return m_pBroadcastElement; }
+    bool                                        IsVoiceMuted                ( void )                      { return m_pBroadcastElement == NULL && !IsUsingBroadcastList(); }
+    void                                        SetVoiceBroadcastTo         ( CElement* pElement );
+    void                                        SetVoiceBroadcastTo         ( std::list < CElement* > lstElements );
+
+    void                                        SetVoiceIgnoredElement      ( CElement* pElement );
+    void                                        SetVoiceIgnoredList         ( std::list < CElement* > lstElements );
+    inline std::list < CElement* > ::const_iterator IterIgnoredListBegin    ( void )                      { return m_lstIgnoredList.begin (); };
+    inline std::list < CElement* > ::const_iterator IterIgnoredListEnd      ( void )                      { return m_lstIgnoredList.end (); };
+    CElement*                                   GetIgnoredElement           ( void )                      { return m_pIgnoredElement; }
+    bool                                        IsPlayerIgnoringElement     ( CElement* pElement );
+    bool                                        IsUsingIgnoredList          ( void )                      { return !m_lstIgnoredList.empty(); }
+
 private:
     void                                        WriteCameraModePacket       ( void );
     void                                        WriteCameraPositionPacket   ( void );
@@ -297,6 +323,13 @@ private:
     std::string                                 m_strCommunityID;
 
     unsigned char                               m_ucBlurLevel;
+
+    // Voice
+    eVoiceState                                 m_VoiceState;
+    CElement*                                   m_pBroadcastElement;
+    std::list < CElement* >                     m_lstBroadcastList;
+    CElement*                                   m_pIgnoredElement;
+    std::list < CElement* >                     m_lstIgnoredList;
 
     std::list < sPlayerSyncData* >              m_SyncTimes;
 

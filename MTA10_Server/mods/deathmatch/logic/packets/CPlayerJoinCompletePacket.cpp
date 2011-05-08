@@ -22,10 +22,12 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( void )
     m_usHTTPDownloadPort = 0;
     m_iHTTPMaxConnectionsPerClient = 4;
     m_iEnableClientChecks = 0;
+    m_bVoiceEnabled = true;
+    m_uiSampleRate = 1;
 }
 
 
-CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsigned char ucNumberOfPlayers, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType, unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient, int iEnableClientChecks )
+CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsigned char ucNumberOfPlayers, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType, unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient, int iEnableClientChecks, bool bVoiceEnabled, unsigned int uiSampleRate )
 {
     m_PlayerID = PlayerID;
     m_ucNumberOfPlayers = ucNumberOfPlayers;
@@ -33,6 +35,8 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsig
     m_ucHTTPDownloadType = ucHTTPDownloadType;
     m_iHTTPMaxConnectionsPerClient = iHTTPMaxConnectionsPerClient;
     m_iEnableClientChecks = iEnableClientChecks;
+    m_bVoiceEnabled = bVoiceEnabled;
+    m_uiSampleRate = uiSampleRate;
 
     switch ( m_ucHTTPDownloadType )
     {
@@ -59,6 +63,12 @@ bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
 
     // Transmit server requirement for the client to check settings
     BitStream.Write ( m_iEnableClientChecks );
+
+    // Transmit whether or not the Voice is enabled
+    BitStream.WriteBit ( m_bVoiceEnabled );
+
+    // Transmit the sample rate for voice
+    BitStream.Write ( m_uiSampleRate );
 
     // Tellclient about maybe throttling back http client requests
     BitStream.Write ( m_iHTTPMaxConnectionsPerClient );

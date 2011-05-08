@@ -24,6 +24,7 @@ class CClientPlayer;
 
 #include "CClientCommon.h"
 #include "CClientPed.h"
+#include "CClientPlayerVoice.h"
 
 #define NUM_PLAYER_STATS 343
 
@@ -87,6 +88,8 @@ public:
     void                            SetTeam                 ( CClientTeam* pTeam, bool bChangeTeam = false);
     bool                            IsOnMyTeam              ( CClientPlayer* pPlayer );
 
+    CClientPlayerVoice*             GetVoice                ( void )                                { return m_voice; }
+
     inline float                    GetNametagDistance      ( void )                                { return m_fNametagDistance; }
     inline void                     SetNametagDistance      ( float fDistance )                     { m_fNametagDistance = fDistance; }
 
@@ -142,6 +145,8 @@ private:
     float                           m_fNametagDistance;
 
     bool                            m_bNetworkDead;
+
+    CClientPlayerVoice*             m_voice;
 
 #ifdef MTA_DEBUG
 private:

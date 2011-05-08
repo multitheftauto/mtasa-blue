@@ -26,6 +26,8 @@
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
+#define RUN_CHILDREN CChildListType::const_iterator iter=pElement->IterBegin();for(;iter!=pElement->IterEnd();iter++)
+
 CGame* g_pGame = NULL;
 
 char szProgress[4] = {'-','\\','|','/'};
@@ -106,10 +108,6 @@ CGame::CGame ( void )
     m_bOverrideWindVelocity = false;
     m_bOverrideFarClip = false;
     m_bOverrideFogDistance = false;
-
-#ifdef MTA_VOICE
-    m_pVoiceServer = NULL;
-#endif
 
     m_pASE = NULL;
     ResetMapInfo();
@@ -298,31 +296,6 @@ void CGame::DoPulse ( void )
     m_usFrames++;
 
 
-#ifdef MTA_VOICE
-    // Do voice processing
-    if ( m_pVoiceServer )
-    {
-        list < CPlayer * >::const_iterator vplayer = m_pPlayerManager->IterBegin ( );
-        unsigned char Data [ 1024 ];
-        unsigned short usLen = 0;
-        CVoiceDataPacket Packet;
-
-        for (; vplayer != m_pPlayerManager->IterEnd ( ); vplayer++ )
-        {
-            usLen = m_pVoiceServer->GetMixedBufForClient ( (*vplayer)->GetID ( ), Data, 1024 );
-            if ( usLen > 0 )
-            {
-                Packet.SetData ( Data, usLen );
-
-                (*vplayer)->Send ( Packet );
-            }
-            memset ( Data, 0, sizeof ( Data ) );
-        }
-
-        m_pVoiceServer->FreePerFrameBuffers ( );
-    }
-#endif
-
     //_asm int 3
     g_pNetServer->GetHTTPDownloadManager()->ProcessQueuedFiles();
 
@@ -401,10 +374,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 {
     // Init
     m_pASE = NULL;
-
-#ifdef MTA_VOICE
-    m_pVoiceServer = NULL;
-#endif
 
     // Startup the getElementsByType from root optimizations
     CElement::StartupEntitiesFromRoot ();
@@ -726,26 +695,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
 
-#ifdef MTA_VOICE
-    // Grab our voice server instance
-    m_pVoiceServer = GetVoiceServerInterface ( );
-    if ( m_pVoiceServer )
-    {
-        if ( m_pVoiceServer->Initialize ( ) == false )
-        {
-            CLogger::LogPrint ( "WARNING: Error initializing voice interface.  Voice won't be enabled this session.\n" );
-        }
-
-        m_pVoiceServer->Enable ( );
-
-        CLogger::LogPrint( "Server voice module loaded.\n" );
-    }
-    else
-    {
-        CLogger::LogPrint ( "WARNING: Error trying to retrieve voice server interface.\n" );
-    }
-#endif
-
     // Run startup commands
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "autoexec.conf"  );
     CCommandFile Autoexec ( strBuffer, *m_pConsole, *m_pConsoleClient );
@@ -781,13 +730,6 @@ void CGame::Stop ( void )
     // Unregister our packethandler
     g_pNetServer->RegisterPacketHandler ( NULL, TRUE );
 
-#ifdef MTA_VOICE
-    // Stop voice.
-    if ( m_pVoiceServer )
-    {
-        m_pVoiceServer->Shutdown();
-    }
-#endif
 }
 
 
@@ -1008,6 +950,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_VOICE_END:
+        {
+            Packet_Voice_End ( static_cast < CVoiceEndPacket& > ( Packet ) );
+            return true;
+        }
+
         case PACKET_ID_CAMERA_SYNC:
         {
             Packet_CameraSync ( static_cast < CCameraSyncPacket& > ( Packet ) );
@@ -1064,7 +1012,9 @@ void CGame::JoinPlayer ( CPlayer& Player )
                                               m_pMainConfig->GetHTTPPort (),
                                               m_pMainConfig->GetHTTPDownloadURL ().c_str (),
                                               m_pMainConfig->GetHTTPMaxConnectionsPerClient (),
-                                              m_pMainConfig->GetEnableClientChecks () ) );
+                                              m_pMainConfig->GetEnableClientChecks (),
+                                              m_pMainConfig->GetVoiceEnabled(),
+                                              m_pMainConfig->GetSampleRate() ) );
 }
 
 void CGame::InitialDataStream ( CPlayer& Player )
@@ -1082,14 +1032,6 @@ void CGame::InitialDataStream ( CPlayer& Player )
     PlayerNotice.AddPlayer ( &Player );
     PlayerNotice.SetShowInChat ( true );
     m_pPlayerManager->BroadcastOnlyJoined ( PlayerNotice, &Player );
-
-    // Add this player to the voice list.
-#ifdef MTA_VOICE
-    if ( m_pVoiceServer )
-    {
-        m_pVoiceServer->AddClient ( Player.GetID ( ) );
-    }
-#endif
 
     // Tell the map manager
     m_pMapManager->OnPlayerJoin ( Player ); // This sends the elements that are needed before the resources start
@@ -1234,14 +1176,6 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
         Packet.SetPlayer ( Player.GetID () );
         Packet.SetQuitReason ( static_cast < unsigned char > ( Reason ) );
         m_pPlayerManager->BroadcastOnlyJoined ( Packet, &Player );
-
-        #ifdef MTA_VOICE
-            // Remove from voice system.
-            if ( m_pVoiceServer )
-            {
-                m_pVoiceServer->DeleteClient ( Player.GetID ( ) );
-            }
-        #endif
     }
 
     // Tell net module connection version info will no longer be required
@@ -1264,6 +1198,11 @@ void CGame::AddBuiltInEvents ( void )
     // Marker events
     m_Events.AddEvent ( "onMarkerHit", "player, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onMarkerLeave", "player, matchingDimension", NULL, false );
+
+    // Voice events
+    m_Events.AddEvent ( "onPlayerVoiceStart", "", NULL, false );
+    m_Events.AddEvent ( "onPlayerVoiceStop", "", NULL, false );
+
 
     // Object events
 
@@ -2793,34 +2732,128 @@ void CGame::Packet_VehicleTrailer ( CVehicleTrailerPacket& Packet )
 
 void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
 {
-#ifdef MTA_VOICE
     unsigned short usDataLength = 0;
-    char szNick [ 256 ];
 
-    if ( m_pVoiceServer )
+    if ( m_pMainConfig->GetVoiceEnabled() ) // Shouldn't really be receiving voice packets at all if voice is disabled
     {
-        usDataLength = Packet.GetDataLength ( );
+        usDataLength = Packet.GetDataLength();
 
         if ( usDataLength > 0 )
         {
-            CPlayer* pPlayer = Packet.GetSourcePlayer ();
+            CPlayer* pPlayer = Packet.GetSourcePlayer();
+
             if ( pPlayer )
             {
-                pPlayer->GetNick ( szNick, 256 );
-                szNick[255] = '\0';
+                if ( pPlayer->IsVoiceMuted() ) // Shouldn't be receiving voice packets, player should be muted client side
+                    return;
 
-                // Pass the packet to the voice server.
-                if (!m_pVoiceServer->DecodeAndQueuePacket ( pPlayer->GetID(),
-                                                    Packet.GetData ( ),
-                                                    usDataLength ))
+                // Is it the start of the voice stream?
+                if ( pPlayer->GetVoiceState () == VOICESTATE_IDLE )
                 {
-                    CLogger::LogPrint("Couldn't decode vox packet");
+                    // Trigger the related event
+                    CLuaArguments Arguments;
+                    bool bEventTriggered = pPlayer->CallEvent( "onPlayerVoiceStart", Arguments, pPlayer);
+
+                    if ( !bEventTriggered ) // Was the event cancelled?
+                    {
+                        return;
+                    }
+
+                    // Our voice state has changed
+                    pPlayer->SetVoiceState ( VOICESTATE_TRANSMITTING );
+                }
+
+                if ( pPlayer->GetVoiceState () == VOICESTATE_TRANSMITTING ) // If we reach here, and we're still in idle state, then the event was cancelled
+                {
+                    const unsigned char* pBuffer = Packet.GetData();
+                    CVoiceDataPacket VoicePacket(pPlayer, pBuffer, usDataLength);
+
+                    // Send the packet to those who are on the players broadcast list
+                    if ( pPlayer->IsUsingBroadcastList() ) // We have a list instead of a single element to broadcast to
+                    {
+                        list < CElement* > ::const_iterator iter = pPlayer->IterBroadcastListBegin() ;
+                        for ( ; iter != pPlayer->IterBroadcastListEnd(); iter++ )
+                        {
+                            if ( IS_TEAM(*iter) )
+                            {
+                                CTeam* pTeam = static_cast < CTeam* > ( *iter );
+                                list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
+                                for ( ; iter != pTeam->PlayersEnd (); iter++ )
+                                {
+                                    if ( *iter != pPlayer && !(*iter)->IsPlayerIgnoringElement(pPlayer) ) // Don't send to ourselves, and only send if the target doesn't have this player on ignore
+                                        (*iter)->Send ( VoicePacket );
+                                }
+                            }
+                            else if ( IS_PLAYER(*iter) )
+                            {
+                                CPlayer* pTargetPlayer = static_cast < CPlayer* > ( *iter );
+
+                                if ( pTargetPlayer != pPlayer && !pTargetPlayer->IsPlayerIgnoringElement( pPlayer ) ) // only send if the target player isn't ignoring the sender
+                                {
+                                    pTargetPlayer->Send( VoicePacket );
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        CElement* pBroadcastElement = pPlayer->GetBroadcastElement();
+
+                        if ( IS_TEAM(pBroadcastElement) )
+                        {
+                            CTeam* pTeam = static_cast < CTeam* > ( pBroadcastElement );
+                            list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
+                            for ( ; iter != pTeam->PlayersEnd (); iter++ )
+                            {
+                                if ( *iter != pPlayer && !(*iter)->IsPlayerIgnoringElement(pPlayer) ) // Don't send to ourselves, and only send if the target doesn't have this player on ignore
+                                    (*iter)->Send ( VoicePacket );
+                            }
+                        }
+                        else 
+                        {
+                            VoiceBroadcastToPlayer ( pBroadcastElement, pPlayer, VoicePacket );
+                        }
+                    }
                 }
             }
         }
     }
-#endif
 }
+
+void CGame::VoiceBroadcastToPlayer ( CElement* pElement, CPlayer* pSourcePlayer, CVoiceDataPacket& pPacket )
+{
+    RUN_CHILDREN VoiceBroadcastToPlayer ( *iter, pSourcePlayer, pPacket );
+
+    if ( IS_PLAYER(pElement) )
+    {
+        CPlayer* pTargetPlayer = static_cast < CPlayer* > ( pElement );
+
+        if ( pTargetPlayer != pSourcePlayer && !pTargetPlayer->IsPlayerIgnoringElement( pSourcePlayer ) ) // only send if the target player isn't ignoring the sender
+        {
+            pTargetPlayer->Send( pPacket );
+        }
+    }
+}
+
+void CGame::Packet_Voice_End ( CVoiceEndPacket& Packet )
+{
+    unsigned short usDataLength = 0;
+
+    if ( m_pMainConfig->GetVoiceEnabled() ) // Shouldn't really be receiving voice packets at all if voice is disabled
+    {
+        CPlayer* pPlayer = Packet.GetSourcePlayer();
+
+        if ( pPlayer )
+        {
+            CLuaArguments Arguments;
+            pPlayer->CallEvent( "onPlayerVoiceStop", Arguments, pPlayer);
+
+            // Reset our voice state
+            pPlayer->SetVoiceState ( VOICESTATE_IDLE );
+        }
+    }
+}
+
 
 
 void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )

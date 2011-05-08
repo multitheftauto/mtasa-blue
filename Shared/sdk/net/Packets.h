@@ -89,6 +89,7 @@ enum ePacketID
 
     // Voice
     PACKET_ID_VOICE_DATA,
+    PACKET_ID_VOICE_END,
 
     // Anticheat memory challenges
     PACKET_ID_CHEAT_CHALLENGEMEMORY,

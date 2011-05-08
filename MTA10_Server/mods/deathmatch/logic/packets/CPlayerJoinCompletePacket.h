@@ -29,7 +29,9 @@ public:
                                                               unsigned short usHTTPDownloadPort,
                                                               const char* szHTTPDownloadURL,
                                                               int iHTTPMaxConnectionsPerClient,
-                                                              int iEnableClientChecks );
+                                                              int iEnableClientChecks, 
+                                                              bool bVoiceEnabled, 
+                                                              unsigned int uiSampleRate );
 
     inline ePacketID        GetPacketID             ( void ) const      { return PACKET_ID_SERVER_JOINEDGAME; };
     inline unsigned long    GetFlags                ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED | PACKET_HIGH_PRIORITY; };
@@ -45,6 +47,8 @@ private:
     char                    m_szHTTPDownloadURL [MAX_HTTP_DOWNLOAD_URL + 1];
     int                     m_iHTTPMaxConnectionsPerClient;
     int                     m_iEnableClientChecks;
+    bool                    m_bVoiceEnabled;
+    unsigned int            m_uiSampleRate;
 };
 
 #endif

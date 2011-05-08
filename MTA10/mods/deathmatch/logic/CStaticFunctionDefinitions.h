@@ -534,12 +534,6 @@ public:
     static bool                         GetSoundMetaTags                    ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags );
     static bool                         SetSoundEffectEnabled               ( CClientSound& Sound, const SString& strEffectName, bool bEnable );
 
-#ifdef MTA_VOICE
-    // Voice funcs
-    static bool                         SetVoiceInputEnabled                ( bool bEnabled );
-    static bool                         SetVoiceMuteAllEnabled              ( bool bEnabled );
-#endif
-
     // Version funcs
     static unsigned long                GetVersion                          ( );
     static const char*                  GetVersionString                    ( );

@@ -50,6 +50,9 @@ public:
     inline const std::string&       GetPassword                     ( void )        { return m_strPassword; };
     void                            SetPassword                     ( const char* szPassword );
 
+    bool                            GetVoiceEnabled                 ( void )        { return m_bVoiceEnabled; };
+    unsigned int                    GetSampleRate                   ( void )        { return m_uiSampleRate; };
+
     inline bool                     GetASEEnabled                   ( void )        { return m_bAseEnabled; };
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
@@ -90,6 +93,8 @@ private:
     CXMLNode*                       m_pRootNode;
     CCommandLineParser*             m_pCommandLineParser;
 
+    unsigned int                    m_uiSampleRate;
+    bool                            m_bVoiceEnabled;
     std::string                     m_strServerIP;
     std::string                     m_strServerName;
     unsigned short                  m_usServerPort;
