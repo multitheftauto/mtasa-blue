@@ -35,7 +35,8 @@ deathmatch_la_SOURCES = \
 
 deathmatch_la_LIBADD = \
 	-lplatform \
-	-lsqlite3
+	-lsqlite3 \
+	$(top_builddir)/vendor/lua/src/liblua.la
 
 deathmatch_la_LDFLAGS = \
 	-module -avoid-version \
@@ -43,6 +44,5 @@ deathmatch_la_LDFLAGS = \
 	$(top_builddir)/vendor/ehs/.libs/libehs.a \
 	$(top_builddir)/vendor/pme/.libs/libpme.a \
 	$(top_builddir)/vendor/pcre/.libs/libpcre.a \
-	$(top_builddir)/vendor/lua/src/.libs/liblua.a \
 	$(top_builddir)/vendor/json-c/.libs/libjson.a
 

@@ -1,7 +1,8 @@
 AM_CFLAGS = -Wall
 
-noinst_LTLIBRARIES = liblua.la
-liblua_la_LDFLAGS = -release 5.1
+libdir = $(outputdir)/mods/deathmatch
+lib_LTLIBRARIES = liblua.la
+liblua_la_LDFLAGS = -release 5.1 -shared
 liblua_la_SOURCES = \
 	lapi.c lcode.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c \
 	lobject.c lopcodes.c lparser.c lstate.c lstring.c ltable.c ltm.c  \
