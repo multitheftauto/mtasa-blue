@@ -211,7 +211,7 @@ public:
     
     void                                StartPlayback                   ( void );
     void                                EnablePacketRecorder            ( const char* szFilename );
-    void                                InitVoice                       ( bool bEnabled, unsigned int uiServerSampleRate );
+    void                                InitVoice                       ( bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality );
 
     // Accessors
 

@@ -31,7 +31,8 @@ public:
                                                               int iHTTPMaxConnectionsPerClient,
                                                               int iEnableClientChecks, 
                                                               bool bVoiceEnabled, 
-                                                              unsigned int uiSampleRate );
+                                                              unsigned char ucSampleRate,
+                                                              unsigned char ucVoiceQuality );
 
     inline ePacketID        GetPacketID             ( void ) const      { return PACKET_ID_SERVER_JOINEDGAME; };
     inline unsigned long    GetFlags                ( void ) const      { return PACKET_RELIABLE | PACKET_SEQUENCED | PACKET_HIGH_PRIORITY; };
@@ -48,7 +49,8 @@ private:
     int                     m_iHTTPMaxConnectionsPerClient;
     int                     m_iEnableClientChecks;
     bool                    m_bVoiceEnabled;
-    unsigned int            m_uiSampleRate;
+    unsigned char           m_ucSampleRate;
+    unsigned char           m_ucQuality;
 };
 
 #endif

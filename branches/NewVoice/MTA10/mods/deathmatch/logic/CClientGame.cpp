@@ -5169,10 +5169,10 @@ bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
     return true;
 }
 
-void CClientGame::InitVoice( bool bEnabled, unsigned int uiServerSampleRate )
+void CClientGame::InitVoice( bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality )
 {
     if ( m_pVoiceRecorder )
     {
-        m_pVoiceRecorder -> Init ( bEnabled, uiServerSampleRate );
+        m_pVoiceRecorder -> Init ( bEnabled, uiServerSampleRate, ucQuality );
     }
 }

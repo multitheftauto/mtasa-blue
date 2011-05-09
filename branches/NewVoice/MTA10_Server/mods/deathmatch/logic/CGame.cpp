@@ -1014,7 +1014,8 @@ void CGame::JoinPlayer ( CPlayer& Player )
                                               m_pMainConfig->GetHTTPMaxConnectionsPerClient (),
                                               m_pMainConfig->GetEnableClientChecks (),
                                               m_pMainConfig->GetVoiceEnabled(),
-                                              m_pMainConfig->GetSampleRate() ) );
+                                              m_pMainConfig->GetSampleRate(),
+                                              m_pMainConfig->GetVoiceQuality() ) );
 }
 
 void CGame::InitialDataStream ( CPlayer& Player )

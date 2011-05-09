@@ -54,7 +54,7 @@ public:
                                         CVoiceRecorder                  ( void );
                                         ~CVoiceRecorder                 ( void );
 
-    void                                Init                        ( bool bEnabled, unsigned int uiServerSampleRate );
+    void                                Init                        ( bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality );
     void                                DeInit                      ( void );
 
     void                                SendFrame                   ( const void* inputBuffer );
@@ -66,6 +66,7 @@ public:
     void                                UpdatePTTState              ( unsigned int uiState );
 
     unsigned int                        GetSampleRate               ( void )                        { return m_SampleRate; }
+    unsigned char                       GetSampleQuality            ( void )                        { return m_ucQuality; }
 
     const SpeexMode*                    getSpeexModeFromSampleRate  ( void );
 
@@ -91,5 +92,6 @@ private:
     eSampleRate                         convertServerSampleRate         ( unsigned int uiServerSampleRate );
 
     eSampleRate                         m_SampleRate;
+    unsigned char                       m_ucQuality;
 };
 #endif

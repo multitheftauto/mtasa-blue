@@ -347,10 +347,14 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     bitStream.ReadBit ( bVoiceEnabled );
 
     // Get the current sample rate for the voice module
-    unsigned int uiSampleRate = 1;
-    bitStream.Read ( uiSampleRate );
+    SIntegerSync < unsigned char, 2 > sampleRate;
+    bitStream.Read ( &sampleRate );
 
-    g_pClientGame->InitVoice ( bVoiceEnabled, uiSampleRate );
+    // Get the current voice for the voice module
+    SIntegerSync < unsigned char, 4 > quality;
+    bitStream.Read ( &quality );
+
+    g_pClientGame->InitVoice ( bVoiceEnabled, (unsigned int)sampleRate, quality );
 
     // Limit number of http request if required by the server
     int iHTTPMaxConnectionsPerClient = 4;
