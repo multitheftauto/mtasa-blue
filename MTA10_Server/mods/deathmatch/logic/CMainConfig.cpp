@@ -49,6 +49,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_usFPSLimit = 36;
     m_bAutoLogin = false;
     m_uiSampleRate = 1;
+    m_ucQuality = 6;
     m_bVoiceEnabled = false;
 }
 
@@ -276,6 +277,19 @@ bool CMainConfig::Load ( const char* szFilename )
         if ( iResult != DOESNT_EXIST )
             CLogger::ErrorPrintf ( "Sample rate must be between 0 and 2, defaulting to %u\n", m_uiSampleRate );
     }
+
+    // Grab the Quality for Voice
+    iResult = GetInteger ( m_pRootNode, "quality", iTemp, 0, 10 );
+    if ( iResult == IS_SUCCESS )
+    {
+        m_ucQuality = iTemp;
+    }
+    else
+    {
+        if ( iResult != DOESNT_EXIST )
+            CLogger::ErrorPrintf ( "Sample rate must be between 0 and 10, defaulting to %u\n", m_ucQuality );
+    }
+
 
 
     // Grab the serial verification

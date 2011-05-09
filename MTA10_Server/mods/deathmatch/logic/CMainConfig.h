@@ -52,6 +52,7 @@ public:
 
     bool                            GetVoiceEnabled                 ( void )        { return m_bVoiceEnabled; };
     unsigned int                    GetSampleRate                   ( void )        { return m_uiSampleRate; };
+    unsigned int                    GetVoiceQuality                 ( void )        { return m_ucQuality; };
 
     inline bool                     GetASEEnabled                   ( void )        { return m_bAseEnabled; };
     unsigned short                  GetHTTPPort                     ( void );
@@ -94,6 +95,7 @@ private:
     CCommandLineParser*             m_pCommandLineParser;
 
     unsigned int                    m_uiSampleRate;
+    unsigned char                   m_ucQuality;
     bool                            m_bVoiceEnabled;
     std::string                     m_strServerIP;
     std::string                     m_strServerName;

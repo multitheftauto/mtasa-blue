@@ -80,8 +80,9 @@ int CClientPlayerVoice::PAPlaybackCallback( const void *inputBuffer, void *outpu
 
 void CClientPlayerVoice::Init( void )
 {
-    // Grab our sample rate
+    // Grab our sample rate and quality
     m_SampleRate = m_pVoiceRecorder->GetSampleRate();
+    unsigned char ucQuality = m_pVoiceRecorder->GetSampleQuality();
 
     // Calculate how many frames we are storing and then the buffer size in bytes
     unsigned int iFramesPerBuffer = ( 2048 / ( 32000 / m_SampleRate ));
@@ -124,6 +125,7 @@ void CClientPlayerVoice::Init( void )
 
     // Iniitalize our incoming buffer
     speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexIncomingFrameSampleCount);
+    speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_SET_QUALITY, &ucQuality );
     m_pIncomingBuffer = (char*) malloc(m_uiBufferSizeBytes * FRAME_INCOMING_BUFFER_COUNT);
     m_uiIncomingReadIndex=0;
     m_uiIncomingWriteIndex=0;

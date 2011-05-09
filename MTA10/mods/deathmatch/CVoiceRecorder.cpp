@@ -52,7 +52,7 @@ int CVoiceRecorder::PACallback( const void *inputBuffer, void *outputBuffer, uns
     return 0;
 }
 
-void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate )
+void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality )
 {
     m_bEnabled = bEnabled;
 
@@ -61,6 +61,7 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate )
 
     // Convert the sample rate we received from the server (0-2) into an actual sample rate
     m_SampleRate = convertServerSampleRate( uiServerSampleRate );
+    m_ucQuality = ucQuality;
 
     // State is awaiting input
     m_VoiceState = VOICESTATE_AWAITING_INPUT;
@@ -102,6 +103,7 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate )
 
     // Initialize our outgoing buffer
     speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexOutgoingFrameSampleCount);
+    speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_QUALITY, &m_ucQuality);
     m_pOutgoingBuffer = (char*) malloc(m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT);
     m_uiOutgoingReadIndex = 0;
     m_uiOutgoingWriteIndex = 0;
