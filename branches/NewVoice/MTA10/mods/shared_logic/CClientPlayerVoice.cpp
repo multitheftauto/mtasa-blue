@@ -175,6 +175,10 @@ void CClientPlayerVoice::ReceiveFrame( void* outputBuffer )
     // Cast our output buffer to short
     short *pOutBuffer = (short*)outputBuffer;
 
+    float fVolume = 0.0f;
+    if ( !g_pCore->GetCVars ()->Get ( "voicevolume", fVolume ) )
+        fVolume = 1.0f;
+
     // Clamp floats to short
     for (unsigned int i = 0; i < m_uiBufferSizeBytes / VOICE_SAMPLE_SIZE; i++)
     {
@@ -233,6 +237,8 @@ void CClientPlayerVoice::ReceiveFrame( void* outputBuffer )
         {
             // Write clamped to buffered output
             m_pBufferedOutput[j] += pBufInput[ j % (uiTotalBufferSize/VOICE_SAMPLE_SIZE) ];
+            // Adjust the volume
+            m_pBufferedOutput[j] = (short)((float)m_pBufferedOutput[j]*fVolume);
         }
 
         // Align our read index
