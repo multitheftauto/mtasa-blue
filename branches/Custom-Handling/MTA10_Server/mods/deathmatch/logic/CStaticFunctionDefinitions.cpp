@@ -4726,7 +4726,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_TURNMASS:
             {          
-                if ( fValue >= 0 && fValue <= 100000 )
+                if ( fValue >= 0 && fValue <= 10000000 )
                 {  
                     pEntry->SetTurnMass ( fValue );
                     return true;
@@ -4735,7 +4735,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_DRAGCOEFF:
             {           
-                if ( fValue >= -100 && fValue <= 100 )
+                if ( fValue >= -200 && fValue <= 200 )
                 { 
                     pEntry->SetDragCoeff ( fValue );
                     return true;
@@ -4744,7 +4744,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_TRACTIONMULTIPLIER:
             {            
-                if ( fValue >= 0 && fValue <= 100000 )
+                if ( fValue >= -100000 && fValue <= 100000 )
                 {
                     pEntry->SetTractionMultiplier ( fValue );
                     return true;
@@ -4870,7 +4870,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_FRONTREARBIAS:
             {            
-                if ( fValue >= 0.0 && fValue <= 1.0 )
+                if ( fValue >= 0.0 && fValue <= 3.0 )
                 {
                     pEntry->SetSuspensionFrontRearBias ( fValue );
                     return true;
