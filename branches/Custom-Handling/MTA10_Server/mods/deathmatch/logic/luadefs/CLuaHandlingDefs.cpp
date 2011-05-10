@@ -91,8 +91,6 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                 }
                             case HANDLING_PERCENTSUBMERGED: // unsigned int
                             //case HANDLING_MONETARY:
-                            case HANDLING_HANDLINGFLAGS:
-                            case HANDLING_MODELFLAGS:
                                 {
                                     if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
                                     {
@@ -179,6 +177,21 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                     }
                                     m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "value", 3 );
                                     break;
+                                }
+                            case HANDLING_MODELFLAGS:
+                            case HANDLING_HANDLINGFLAGS:
+                                {
+                                    
+                                    if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+                                    {
+                                        std::string strValue = lua_tostring ( luaVM, 3 );
+                                        unsigned int uiValue = atoi( strValue.c_str() );
+                                        if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, uiValue ) )
+                                        {
+                                            lua_pushboolean ( luaVM, true );
+                                            return 1;
+                                        }
+                                    }
                                 }
                             case HANDLING_MAX:
                                 {
@@ -273,8 +286,6 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                 }
                             case HANDLING_PERCENTSUBMERGED: // unsigned int
                             //case HANDLING_MONETARY:
-                            case HANDLING_HANDLINGFLAGS:
-                            case HANDLING_MODELFLAGS:
                                 {
                                     if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
                                     {
@@ -335,8 +346,8 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                 }
                             case HANDLING_DRIVETYPE:
                             case HANDLING_ENGINETYPE:
-                            case HANDLING_HEADLIGHT:
-                            case HANDLING_TAILLIGHT:
+                            //case HANDLING_HEADLIGHT:
+                            //case HANDLING_TAILLIGHT:
                                 {
                                     if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
                                     {
@@ -359,6 +370,21 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                     }
                                     m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
                                     break;
+                                }
+                            case HANDLING_MODELFLAGS:
+                            case HANDLING_HANDLINGFLAGS:
+                                {
+                                    
+                                    if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
+                                    {
+                                        std::string strValue = lua_tostring ( luaVM, 3 );
+                                        unsigned int uiValue = atoi( strValue.c_str() );
+                                        if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, uiValue ) )
+                                        {
+                                            lua_pushboolean ( luaVM, true );
+                                            return 1;
+                                        }
+                                    }
                                 }
                             case HANDLING_MAX:
                                 {
@@ -504,11 +530,15 @@ int CLuaHandlingDefs::GetVehicleHandling ( lua_State* luaVM )
 
             lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance () );
             lua_setfield ( luaVM, -2, "seatOffsetDistance" );
-
-            lua_pushnumber ( luaVM, pEntry->GetHandlingFlags () );
+        
+            char szHandlingFlags[20];
+            sprintf(szHandlingFlags, "0x%X", pEntry->GetHandlingFlags ());
+            lua_pushstring ( luaVM, szHandlingFlags );
             lua_setfield ( luaVM, -2, "handlingFlags" );
-
-            lua_pushnumber ( luaVM, pEntry->GetModelFlags () );
+        
+            char szModelFlags[20];
+            sprintf(szModelFlags, "0x%X", pEntry->GetModelFlags ());
+            lua_pushstring ( luaVM, szModelFlags );
             lua_setfield ( luaVM, -2, "modelFlags" );
 
             lua_pushnumber ( luaVM, pEntry->GetMonetary () );
@@ -669,11 +699,15 @@ int CLuaHandlingDefs::GetModelHandling ( lua_State* luaVM )
 
             lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance () );
             lua_setfield ( luaVM, -2, "seatOffsetDistance" );
-
-            lua_pushnumber ( luaVM, pEntry->GetHandlingFlags () );
+        
+            char szHandlingFlags[20];
+            sprintf(szHandlingFlags, "%X", pEntry->GetHandlingFlags ());
+            lua_pushstring ( luaVM, szHandlingFlags );
             lua_setfield ( luaVM, -2, "handlingFlags" );
-
-            lua_pushnumber ( luaVM, pEntry->GetModelFlags () );
+        
+            char szModelFlags[20];
+            sprintf(szModelFlags, "%X", pEntry->GetModelFlags ());
+            lua_pushstring ( luaVM, szModelFlags );
             lua_setfield ( luaVM, -2, "modelFlags" );
 
             lua_pushnumber ( luaVM, pEntry->GetMonetary () );
