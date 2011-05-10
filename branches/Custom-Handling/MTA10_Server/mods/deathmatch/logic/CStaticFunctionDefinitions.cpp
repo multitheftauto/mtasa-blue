@@ -4645,7 +4645,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
         {
             case HANDLING_PERCENTSUBMERGED:
             {
-                if ( uiValue > 0 && uiValue <= 100 )
+                if ( uiValue > 0 && uiValue <= 200 )
                 {
                     pEntry->SetPercentSubmerged ( uiValue );
                     return true;
