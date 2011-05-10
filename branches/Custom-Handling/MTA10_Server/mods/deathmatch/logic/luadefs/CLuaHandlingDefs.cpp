@@ -258,12 +258,6 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                             case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
                             case HANDLING_COLLISIONDAMAGEMULTIPLIER:
                             case HANDLING_SEATOFFSETDISTANCE:
-                            case HANDLING_PERCENTSUBMERGED: // unsigned int
-                            case HANDLING_MONETARY:
-                            case HANDLING_HANDLINGFLAGS:
-                            case HANDLING_MODELFLAGS:
-                            case HANDLING_NUMOFGEARS:
-                            case HANDLING_ANIMGROUP:
                                 {
                                     if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
                                     {
@@ -277,16 +271,60 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                     m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
                                     break;
                                 }
+                            case HANDLING_PERCENTSUBMERGED: // unsigned int
+                            //case HANDLING_MONETARY:
+                            case HANDLING_HANDLINGFLAGS:
+                            case HANDLING_MODELFLAGS:
+                                {
+                                    if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+                                    {
+                                        unsigned int uiValue = (unsigned int)lua_tonumber ( luaVM, 3 );
+                                        if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, uiValue ) )
+                                        {
+                                            lua_pushboolean ( luaVM, true );
+                                            return 1;
+                                        }
+                                    }
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                    break;
+                                }
+                            case HANDLING_NUMOFGEARS:
+                            case HANDLING_ANIMGROUP:
+                                {
+                                    if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+                                    {
+                                        unsigned char ucValue = (unsigned char)lua_tonumber ( luaVM, 3 );
+                                        if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, ucValue ) )
+                                        {
+                                            lua_pushboolean ( luaVM, true );
+                                            return 1;
+                                        }
+                                    }
+                                    m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                    break;
+                                }
                             case HANDLING_CENTEROFMASS:
                                 {
-                                    if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER && lua_type ( luaVM, 4 ) == LUA_TNUMBER && lua_type ( luaVM, 5 ) == LUA_TNUMBER )
+                                    if ( lua_type ( luaVM, 3 ) == LUA_TTABLE )
                                     {
-                                        float fX = (float)lua_tonumber ( luaVM, 3 );
-                                        float fY = (float)lua_tonumber ( luaVM, 4 );
-                                        float fZ = (float)lua_tonumber ( luaVM, 5 );
-                                        CVector tempVec ( fX, fY, fZ );
+                                        lua_pushnumber ( luaVM, 1 );
+                                        lua_gettable ( luaVM, 3 );
+                                        float fX = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
+                                        lua_pop ( luaVM, 1 );
 
-                                        if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, tempVec ) )
+                                        lua_pushnumber ( luaVM, 2 );
+                                        lua_gettable ( luaVM, 3 );
+                                        float fY = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
+                                        lua_pop ( luaVM, 1 );
+
+                                        lua_pushnumber ( luaVM, 3 );
+                                        lua_gettable ( luaVM, 3 );
+                                        float fZ = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
+                                        lua_pop ( luaVM, 1 );
+
+                                        CVector vecCenterOfMass ( fX, fY, fZ );
+
+                                        if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, vecCenterOfMass ) )
                                         {
                                             lua_pushboolean ( luaVM, true );
                                             return 1;
