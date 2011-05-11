@@ -1753,8 +1753,6 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
             }
         }
 
-        std::map < CPlayer*, int >& nearList = pPlayer->GetNearPlayerList ();
-
         // Refresh nearList with (accurate) nearby players
         for ( CElementResult::const_iterator it = resultNearBoth.begin () ; it != resultNearBoth.end (); ++it )
         {
@@ -1769,11 +1767,13 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
                     if ( ( vecLocalPlayerPos - vecRemotePlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE ||
                          ( vecCameraPosition - vecRemotePlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE )
                     {
-                        nearList[ pOtherPlayer ] = 5;
+                        pOtherPlayer->GetNearPlayerList () [ pPlayer ] = 5;
                     }
                 }
             }
         }
+
+        std::map < CPlayer*, int >& nearList = pPlayer->GetNearPlayerList ();
 
         // Send packet to players in nearList
         for ( std::map < CPlayer*, int > ::iterator it = nearList.begin (); it != nearList.end (); )
