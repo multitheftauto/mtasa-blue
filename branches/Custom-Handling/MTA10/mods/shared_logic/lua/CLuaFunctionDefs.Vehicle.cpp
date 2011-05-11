@@ -2465,15 +2465,11 @@ int CLuaFunctionDefs::GetVehicleHandling ( lua_State* luaVM )
 
             lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance () );
             lua_setfield ( luaVM, -2, "seatOffsetDistance" );
-        
-            char szHandlingFlags[20];
-            sprintf(szHandlingFlags, "0x%X", pEntry->GetHandlingFlags ());
-            lua_pushstring ( luaVM, szHandlingFlags );
+
+            lua_pushnumber ( luaVM, pEntry->GetHandlingFlags () );
             lua_setfield ( luaVM, -2, "handlingFlags" );
-        
-            char szModelFlags[20];
-            sprintf(szModelFlags, "0x%X", pEntry->GetModelFlags ());
-            lua_pushstring ( luaVM, szModelFlags );
+
+            lua_pushnumber ( luaVM, pEntry->GetModelFlags () );
             lua_setfield ( luaVM, -2, "modelFlags" );
 
             lua_pushnumber ( luaVM, pEntry->GetMonetary () );
