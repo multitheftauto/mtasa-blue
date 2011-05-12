@@ -4925,15 +4925,12 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
     {
         if ( eProperty == HANDLING_CENTEROFMASS )
         {
-            if ( pEntry->GetCenterOfMass () != vecValue )
+            if ( vecValue.fX >= -10.0 && vecValue.fX <= 10.0 &&
+                vecValue.fY >= -10.0 && vecValue.fY <= 10.0 &&
+                vecValue.fZ >= -10.0 && vecValue.fZ <= 10.0 )
             {
-                if ( vecValue.fX >= -10.0 && vecValue.fX <= 10.0 &&
-                    vecValue.fY >= -10.0 && vecValue.fY <= 10.0 &&
-                    vecValue.fZ >= -10.0 && vecValue.fZ <= 10.0 )
-                {
-                    pEntry->SetCenterOfMass ( vecValue );
-                    return true;
-                }
+                pEntry->SetCenterOfMass ( vecValue );
+                return true;
             }
         }
     }

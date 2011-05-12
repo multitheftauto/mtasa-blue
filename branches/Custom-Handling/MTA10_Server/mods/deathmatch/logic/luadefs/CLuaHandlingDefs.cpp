@@ -96,7 +96,7 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                 {
                                     if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
                                     {
-                                        unsigned int uiValue = (unsigned int)lua_tonumber ( luaVM, 3 );
+                                        unsigned int uiValue = (unsigned int)lua_tointeger ( luaVM, 3 );
                                         if ( CStaticFunctionDefinitions::SetVehicleHandling ( pVehicle, eProperty, uiValue ) )
                                         {
                                             lua_pushboolean ( luaVM, true );
@@ -279,6 +279,12 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                     if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
                                     {
                                         unsigned int uiValue = (unsigned int)lua_tonumber ( luaVM, 3 );
+                                        if ( uiValue == 0xffffffff && eProperty == eHandlingProperty::HANDLING_MODELFLAGS )
+                                        {
+                                            lua_pushboolean ( luaVM, false );
+                                            m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
+                                            return 1;
+                                        }
                                         if ( CStaticFunctionDefinitions::SetModelHandling ( eModel, eProperty, uiValue ) )
                                         {
                                             lua_pushboolean ( luaVM, true );
