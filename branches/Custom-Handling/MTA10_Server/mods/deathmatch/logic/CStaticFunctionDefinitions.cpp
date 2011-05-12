@@ -4825,7 +4825,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_FORCELEVEL:
             {            
-                if ( fValue > 0.0 && fValue <= 100 )
+                if ( fValue >= 0.0 && fValue <= 100 )
                 {
                     pEntry->SetSuspensionForceLevel ( fValue );
                     return true;
@@ -4834,7 +4834,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_DAMPING:
             {            
-                if ( fValue > 0.0 && fValue <= 100 )
+                if ( fValue >= 0.0 && fValue <= 100 )
                 {
                     pEntry->SetSuspensionDamping ( fValue );
                     return true;
@@ -4843,7 +4843,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
             {            
-                if ( fValue > 0.0 && fValue <= 600 )
+                if ( fValue >= 0.0 && fValue <= 600 )
                 {
                     pEntry->SetSuspensionHighSpeedDamping ( fValue );
                     return true;
@@ -4852,7 +4852,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_UPPER_LIMIT:
             {            
-                if ( fValue >= -50.0 && fValue <= 50 && fValue != 0.0 )
+                if ( fValue >= -50.0 && fValue <= 50 )
                 {
                     pEntry->SetSuspensionUpperLimit ( fValue );
                     return true;
@@ -4861,7 +4861,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_LOWER_LIMIT:
             {            
-                if ( fValue >= -50.0 && fValue <= 50 && fValue != 0.0 )
+                if ( fValue >= -50.0 && fValue <= 50 )
                 {
                     pEntry->SetSuspensionLowerLimit ( fValue );
                     return true;
@@ -4870,7 +4870,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_FRONTREARBIAS:
             {            
-                if ( fValue > 0.0 && fValue <= 3.0 )
+                if ( fValue >= 0.0 && fValue <= 3.0 )
                 {
                     pEntry->SetSuspensionFrontRearBias ( fValue );
                     return true;
@@ -4879,7 +4879,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
             {            
-                if ( fValue > 0.0 && fValue <= 30 )
+                if ( fValue >= 0.0 && fValue <= 30 )
                 {
                     pEntry->SetSuspensionAntiDiveMultiplier ( fValue );
                     return true;
