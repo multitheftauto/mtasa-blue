@@ -200,6 +200,13 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
 
 void CHTTPD::HttpPulse ( void )
 {
+    // Prevent more than one thread running this at once
+    static int iBusy = 0;
+    if ( ++iBusy > 1 )
+    {
+        iBusy--;
+        return;
+    }
 
     long long llExpireTime = GetTickCount64_ () - 1000 * 60 * 5;    // 5 minute timeout
 
@@ -218,6 +225,7 @@ void CHTTPD::HttpPulse ( void )
             iter++;
     }
 
+    iBusy--;
 }
 
 //
