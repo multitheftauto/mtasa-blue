@@ -4717,7 +4717,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
         {
             case HANDLING_MASS:
             {
-                if ( fValue >= 0 && fValue <= 100000 )
+                if ( fValue > 0 && fValue <= 100000 )
                 {
                     pEntry->SetMass ( fValue );
                     return true;
@@ -4726,7 +4726,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_TURNMASS:
             {          
-                if ( fValue >= 0 && fValue <= 10000000 )
+                if ( fValue > 0 && fValue <= 10000000 )
                 {  
                     pEntry->SetTurnMass ( fValue );
                     return true;
@@ -4825,7 +4825,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_FORCELEVEL:
             {            
-                if ( fValue >= 0.0 && fValue <= 100 )
+                if ( fValue > 0.0 && fValue <= 100 )
                 {
                     pEntry->SetSuspensionForceLevel ( fValue );
                     return true;
@@ -4834,7 +4834,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_DAMPING:
             {            
-                if ( fValue >= 0.0 && fValue <= 100 )
+                if ( fValue > 0.0 && fValue <= 100 )
                 {
                     pEntry->SetSuspensionDamping ( fValue );
                     return true;
@@ -4843,7 +4843,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
             {            
-                if ( fValue >= 0.0 && fValue <= 600 )
+                if ( fValue > 0.0 && fValue <= 600 )
                 {
                     pEntry->SetSuspensionHighSpeedDamping ( fValue );
                     return true;
@@ -4852,7 +4852,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_UPPER_LIMIT:
             {            
-                if ( fValue >= -50.0 && fValue <= 50 )
+                if ( fValue >= -50.0 && fValue <= 50 && fValue != 0.0 )
                 {
                     pEntry->SetSuspensionUpperLimit ( fValue );
                     return true;
@@ -4861,7 +4861,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_LOWER_LIMIT:
             {            
-                if ( fValue >= -50.0 && fValue <= 50 )
+                if ( fValue >= -50.0 && fValue <= 50 && fValue != 0.0 )
                 {
                     pEntry->SetSuspensionLowerLimit ( fValue );
                     return true;
@@ -4870,7 +4870,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_FRONTREARBIAS:
             {            
-                if ( fValue >= 0.0 && fValue <= 3.0 )
+                if ( fValue > 0.0 && fValue <= 3.0 )
                 {
                     pEntry->SetSuspensionFrontRearBias ( fValue );
                     return true;
@@ -4879,7 +4879,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
             {            
-                if ( fValue >= 0.0 && fValue <= 30 )
+                if ( fValue > 0.0 && fValue <= 30 )
                 {
                     pEntry->SetSuspensionAntiDiveMultiplier ( fValue );
                     return true;
@@ -4897,7 +4897,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SEATOFFSETDISTANCE:
             {
-                if ( fValue >= -100 && fValue <= 100 )
+                if ( fValue >= -20 && fValue <= 20 )
                 {
                     pEntry->SetSeatOffsetDistance ( fValue );
                     return true;

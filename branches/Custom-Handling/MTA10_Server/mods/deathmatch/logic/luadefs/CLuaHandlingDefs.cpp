@@ -279,7 +279,7 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                     if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
                                     {
                                         unsigned int uiValue = (unsigned int)lua_tonumber ( luaVM, 3 );
-                                        if ( uiValue == 0xffffffff && eProperty == eHandlingProperty::HANDLING_MODELFLAGS )
+                                        if ( uiValue == 0xffffffff && eProperty == HANDLING_MODELFLAGS )
                                         {
                                             lua_pushboolean ( luaVM, false );
                                             m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "value", 3 );
