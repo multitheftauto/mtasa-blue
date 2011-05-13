@@ -20,6 +20,8 @@ void CheckForAutofixIssue ( const std::string& author, const std::string& msg, c
     if ( !MantisLogin(IRCUser(), 0 ) )
         return;
 
+    if ( strcasestr ( p, "Backported ") != 0 ) return;
+
     do
     {
         p2 = strcasestr ( p, "Fixed #" );
