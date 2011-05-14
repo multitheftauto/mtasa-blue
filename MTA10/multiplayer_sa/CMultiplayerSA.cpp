@@ -1134,6 +1134,9 @@ void CMultiplayerSA::InitHooks()
 
     // Remove 14ms wait (Was done every other frame for some reason)
     MemPut < BYTE > ( 0x53E94C, 0x00 );
+
+    // Clip camera also outside the world bounds.
+    MemSet ( (void *)0x41AD12, 0x90, 2 );
 }
 
 
