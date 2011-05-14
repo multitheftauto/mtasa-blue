@@ -1176,6 +1176,9 @@ void CMultiplayerSA::InitHooks()
     // Mute peds (would break setPedVoice).
     MemCpy ( (void *)0x5EFFE0, "\xC2\x18\x00\x90", 4 );
 #endif
+
+    // Clip camera also outside the world bounds.
+    MemSet ( (void *)0x41AD12, 0x90, 2 );
 }
 
 
