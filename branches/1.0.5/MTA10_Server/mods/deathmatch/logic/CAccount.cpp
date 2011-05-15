@@ -18,6 +18,9 @@ CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, const std::str
 {
     m_pClient = NULL;
 
+    m_iUserID = 0;
+    m_bChanged = false;
+
     m_pManager = pManager;
 
     m_bRegistered = bRegistered;
