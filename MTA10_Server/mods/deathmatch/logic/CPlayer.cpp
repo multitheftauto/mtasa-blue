@@ -93,6 +93,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_uiWeaponIncorrectCount = 0;
 
+    m_llNearListUpdateTime = 0;
+
     // Add us to the manager
     pPlayerManager->AddToList ( this );
 }
@@ -146,6 +148,9 @@ void CPlayer::DoPulse ( void )
     if ( GetStatus () == STATUS_JOINED )
     {
         m_pPlayerTextManager->Process ();
+
+        if ( GetTickCount64_ () > m_llNearListUpdateTime + 300 )
+            UpdateOthersNearList ();
     }
 }
 
@@ -535,4 +540,81 @@ void CPlayer::SetWeaponCorrect ( bool bWeaponCorrect )
 bool CPlayer::GetWeaponCorrect ( void )
 {
     return m_uiWeaponIncorrectCount == 0;
+}
+
+// Put this player in other players nearlist, if errm... the player is near, enough
+void CPlayer::UpdateOthersNearList ( void )
+{
+    m_llNearListUpdateTime = GetTickCount64_ ();
+
+    // Get the two positions to check
+    const CVector& vecPlayerPosition = GetPosition ();
+    CVector vecCameraPosition;
+    GetCamera ()->GetPosition ( vecCameraPosition );
+
+    // Fill resultNearBoth with rough list of nearby players
+    CElementResult resultNearBoth;
+    {
+        // Calculate distance from player to his camera. (Note as spatial database is 2D, we can use the 2D distance here)
+        const float fCameraDistance = DistanceBetweenPoints2D ( vecCameraPosition, vecPlayerPosition );
+        if ( fCameraDistance < 40.f )
+        {
+            //
+            // If player near his camera (which is the usual case), we can do optimized things
+            //
+
+            // Do one query with a slightly bigger sphere
+            const CVector vecAvgPos = ( vecCameraPosition + vecPlayerPosition ) * 0.5f;
+            GetSpatialDatabase()->SphereQuery ( resultNearBoth, CSphere ( vecAvgPos, DISTANCE_FOR_SLOW_SYNCRATE + fCameraDistance * 0.5f ) );
+
+        }
+        else
+        {
+            //
+            // Bit more complicated if camera is not near player
+            //
+
+            // Perform queries on spatial database
+            CElementResult resultNearCamera;
+            GetSpatialDatabase()->SphereQuery ( resultNearCamera, CSphere ( vecCameraPosition, DISTANCE_FOR_SLOW_SYNCRATE ) );
+
+            CElementResult resultNearPlayer;
+            GetSpatialDatabase()->SphereQuery ( resultNearPlayer, CSphere ( vecPlayerPosition, DISTANCE_FOR_SLOW_SYNCRATE ) );
+
+            std::set < CPlayer* > mergedList;
+
+            // Merge
+            for ( CElementResult::const_iterator it = resultNearCamera.begin () ; it != resultNearCamera.end (); ++it )
+                if ( (*it)->GetType () == CElement::PLAYER )
+                    mergedList.insert ( (CPlayer*)*it );
+
+            for ( CElementResult::const_iterator it = resultNearPlayer.begin () ; it != resultNearPlayer.end (); ++it )
+                if ( (*it)->GetType () == CElement::PLAYER )
+                    mergedList.insert ( (CPlayer*)*it );
+
+            // Copy to resultNearBoth
+            for ( std::set < CPlayer* > ::iterator it = mergedList.begin (); it != mergedList.end (); ++it )
+                resultNearBoth.push_back ( *it );
+        }
+    }
+
+    // Accurately check distance to other players, and put this player in their near list
+    for ( CElementResult::const_iterator it = resultNearBoth.begin () ; it != resultNearBoth.end (); ++it )
+    {
+        if ( (*it)->GetType () == CElement::PLAYER )
+        {
+            CPlayer* pOtherPlayer = (CPlayer*)*it;
+            if ( pOtherPlayer != this )
+            {
+                const CVector& vecOtherPlayerPos = pOtherPlayer->GetPosition ();
+
+                // Check distance is accurate
+                if ( ( vecPlayerPosition - vecOtherPlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE ||
+                     ( vecCameraPosition - vecOtherPlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE )
+                {
+                    pOtherPlayer->AddNearPlayer ( this );
+                }
+            }
+        }
+    }
 }
