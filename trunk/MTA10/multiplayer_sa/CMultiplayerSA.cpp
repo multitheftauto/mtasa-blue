@@ -1179,6 +1179,8 @@ void CMultiplayerSA::InitHooks()
 
     // Clip camera also outside the world bounds.
     MemSet ( (void *)0x41AD12, 0x90, 2 );
+    MemSet ( (void *)0x41ADA7, 0x90, 2 );
+    MemSet ( (void *)0x41ADF3, 0x90, 2 );
 }
 
 
