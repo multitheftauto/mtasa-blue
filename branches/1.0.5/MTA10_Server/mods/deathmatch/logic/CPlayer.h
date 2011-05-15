@@ -207,6 +207,8 @@ public:
     void                                        SetWeaponCorrect            ( bool bWeaponCorrect );
     bool                                        GetWeaponCorrect            ( void );
 
+    void                                        UpdateOthersNearList        ( void );
+    void                                        AddNearPlayer               ( CPlayer* other )              { m_NearPlayerList [ other ] = 5; }
     std::map < CPlayer*, int >&                 GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
 
 private:
@@ -297,6 +299,7 @@ private:
     uint                                        m_uiWeaponIncorrectCount;
 
     std::map < CPlayer*, int >                  m_NearPlayerList;
+    long long                                   m_llNearListUpdateTime;
 };
 
 #endif
