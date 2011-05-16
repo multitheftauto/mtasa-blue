@@ -353,11 +353,11 @@ void CCommandFuncs::Reconnect ( const char* szParameters )
         // Start the connect
         if ( CCore::GetSingleton ().GetConnectManager ()->Reconnect ( strHost.c_str(), usPort, strPassword.c_str(), false ) )
         {
-            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: Connecting to %s:%u...", strHost, usPort );
+            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: Connecting to %s:%u...", strHost.c_str(), usPort );
         }
         else
         {
-            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: could not connect to %s:%u!", strHost, usPort );
+            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: could not connect to %s:%u!", strHost.c_str(), usPort );
         }
     }
     else
