@@ -576,6 +576,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\rpc\CHandlingRPCs.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\rpc\CInputRPCs.cpp"
 						>
 					</File>
@@ -1459,6 +1463,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\rpc\CElementRPCs.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\rpc\CHandlingRPCs.h"
 						>
 					</File>
 					<File

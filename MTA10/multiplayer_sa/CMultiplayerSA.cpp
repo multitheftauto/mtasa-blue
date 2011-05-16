@@ -230,6 +230,12 @@ DWORD RETURN_VehColCB =                                     0x04C83AA;
 #define HOOKPOS_VehCol                                      0x06D6603
 DWORD RETURN_VehCol =                                       0x06D660C;
 
+// Handling fix - driveType is per model
+#define HOOKPOS_CHandlingData_isNotRWD              0x6A048C
+DWORD RETURN_CHandlingData_isNotRWD =               0x6A0493;
+#define HOOKPOS_CHandlingData_isNotFWD              0x6A04BC
+DWORD RETURN_CHandlingData_isNotFWD =               0x6A04C3;
+// end of handling fix
 #define CALL_CAutomobile_ProcessEntityCollision             0x6AD053
 #define CALL_CBike_ProcessEntityCollision1                  0x6BDF82
 #define CALL_CBike_ProcessEntityCollision2                  0x6BE0D1
@@ -369,6 +375,8 @@ void HOOK_CrashFix_Misc13 ();
 void HOOK_CrashFix_Misc14 ();
 void HOOK_VehColCB ();
 void HOOK_VehCol ();
+void HOOK_isVehDriveTypeNotRWD ();
+void HOOK_isVehDriveTypeNotFWD ();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
@@ -506,6 +514,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
+
+    HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7 );
+    HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -3618,6 +3629,49 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
     }
 }
 
+static CVehicleSAInterface* pHandlingDriveTypeVeh = NULL;
+unsigned char ucDriveType = '4';
+void GetVehicleDriveType()
+{
+    //Get the car drive type from the Vehicle interface
+    ucDriveType = static_cast<unsigned char> ( pHandlingDriveTypeVeh->m_pVehicle->GetHandlingData()->GetCarDriveType() );
+}
+
+void _declspec(naked) HOOK_isVehDriveTypeNotRWD ()
+{
+    // Get the Vehicle interface from esi
+    _asm
+    {
+         mov pHandlingDriveTypeVeh, esi
+    }
+
+    GetVehicleDriveType();
+
+    // push our drive type into bl :)
+    _asm
+    {
+        mov bl, ucDriveType
+        jmp RETURN_CHandlingData_isNotRWD
+    }
+}
+
+void _declspec(naked) HOOK_isVehDriveTypeNotFWD ()
+{
+    // Get the Vehicle SA interface from esi
+    _asm
+    {
+         mov pHandlingDriveTypeVeh, esi
+    }
+
+    GetVehicleDriveType();
+
+    // push our drive type into bl :)
+    _asm
+    {
+        mov bl, ucDriveType
+        jmp RETURN_CHandlingData_isNotFWD
+    }
+}
 
 unsigned char CMultiplayerSA::GetTrafficLightState ()
 {

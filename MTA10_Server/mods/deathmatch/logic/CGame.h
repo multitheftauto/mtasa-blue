@@ -75,6 +75,7 @@ class CConsole;
 class CConsoleClient;
 class CElementDeleter;
 class CGroups;
+class CHandlingManager;
 class CHTTPD;
 class CMainConfig;
 class CMapManager;
@@ -191,6 +192,7 @@ public:
     inline bool                 IsFinished                  ( void )            { return m_bIsFinished; };
 
     inline CMainConfig*             GetConfig                   ( void )        { return m_pMainConfig; }
+    inline CHandlingManager*        GetHandlingManager          ( void )        { return m_pHandlingManager; }
     inline CMapManager*             GetMapManager               ( void )        { return m_pMapManager; }
     inline CPlayerManager*          GetPlayerManager            ( void )        { return m_pPlayerManager; }
     inline CObjectManager*          GetObjectManager            ( void )        { return m_pObjectManager; }
@@ -395,6 +397,7 @@ private:
     CSettings*                      m_pSettings;
     CZoneNames*                     m_pZoneNames;
     ASE*                            m_pASE;
+    CHandlingManager*               m_pHandlingManager;
     CRPCFunctions*                  m_pRPCFunctions;
     CLanBroadcast*                  m_pLanBroadcast;
     CWaterManager*                  m_pWaterManager;

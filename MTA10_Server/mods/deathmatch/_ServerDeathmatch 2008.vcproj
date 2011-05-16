@@ -545,6 +545,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CHandlingEntry.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CHandlingManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CHTTPD.cpp"
 					>
 				</File>
@@ -1144,6 +1152,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\luadefs\CLuaHandlingDefs.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\luadefs\CLuaHTTPDefs.cpp"
 						>
 					</File>
@@ -1599,6 +1611,14 @@
 				</File>
 				<File
 					RelativePath=".\logic\CGroups.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CHandlingEntry.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CHandlingManager.h"
 					>
 				</File>
 				<File
@@ -2234,6 +2254,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaFileDefs.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaHandlingDefs.h"
 						>
 					</File>
 					<File

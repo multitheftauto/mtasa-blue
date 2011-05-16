@@ -253,6 +253,21 @@ public:
     static bool                 GetVehicleHeadLightColor            ( CVehicle* pVehicle, SColor& outColor );
     static bool                 GetVehicleDoorOpenRatio             ( CVehicle* pVehicle, unsigned char ucDoor, float& fRatio );
 
+    static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, float& fValue );
+    static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue );
+    static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue );
+    static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue );
+    static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue );
+    static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, float& fValue, bool origin = false );
+    static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, CVector& vecValue, bool origin = false );
+    static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, std::string& strValue, bool origin = false );
+    static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned int& uiValue, bool origin = false );
+    static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char& ucValue, bool origin = false );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue );
+
     // Vehicle set functions
     static bool                 FixVehicle                          ( CElement* pElement );
     static bool                 BlowVehicle                         ( CElement* pElement );
@@ -295,6 +310,27 @@ public:
     static bool                 SetVehicleHeadLightColor            ( CVehicle* pVehicle, const SColor color );
     static bool                 SetVehicleTurretPosition            ( CVehicle* pVehicle, float fHorizontal, float fVertical );
     static bool                 SetVehicleDoorOpenRatio             ( CElement* pElement, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0 );
+
+    //static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, bool bValue );
+    static bool                 ResetVehicleHandling                ( CVehicle* pVehicle, bool bUseOriginal );
+    static bool                 ResetVehicleHandlingProperty        ( CVehicle* pVehicle, eHandlingProperty eProperty, bool bUseOriginal );
+    static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, float fValue );
+    static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, CVector vecValue );
+    static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, std::string strValue );
+    static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned int uiValue );
+    static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned char ucValue );
+    static bool                 ResetModelHandling                  ( eVehicleTypes eModel );
+    static bool                 ResetModelHandlingProperty          ( eVehicleTypes eModel, eHandlingProperty eProperty );
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, float fValue );
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, CVector vecValue );
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, std::string strValue);
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned int uiValue);
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char ucValue);
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float fValue );
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector vecValue );
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string strValue, unsigned char& ucChar );
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int uiValue );
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char ucValue );
 
     // Marker create/destroy functions
     static CMarker*             CreateMarker                        ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo );

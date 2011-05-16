@@ -1675,15 +1675,7 @@ void CVehicleSA::RecalculateHandling ( void )
     m_pHandlingData->Recalculate ();
     
     // Recalculate the suspension lines
-    CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( GetVehicleInterface ()->vtbl );
-    DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
-    DWORD dwThis = (DWORD)GetVehicleInterface ();
-    _asm
-    {
-        mov ecx, dwThis
-        call dwSetupSuspensionLines
-    }
-    CopyGlobalSuspensionLinesToPrivate ();
+    RecalculateSuspensionLines ();
 
     // Put it in our interface
     CVehicleSAInterface* pInt = GetVehicleInterface ();
@@ -1934,4 +1926,25 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate ( void )
     CColDataSA* pColData = pModelInfo->GetInterface ()->pColModel->pColData;
     if ( pColData->pSuspensionLines )
         memcpy ( GetPrivateSuspensionLines (), pColData->pSuspensionLines, pColData->ucNumWheels * 0x20 );
+}
+
+void CVehicleSA::RecalculateSuspensionLines ( void )
+{
+    CVehicleSAInterface* pInt = GetVehicleInterface ();
+    DWORD dwModel = GetModelIndex ();
+    CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );
+    // Trains (Their trailers do as well!) and boats crash obviously.
+    if ( pModelInfo->IsBoat () || pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 )
+        return;
+
+    CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
+    DWORD dwSetupSuspensionLines = pVtbl->SetupSuspensionLines;
+    DWORD dwThis = (DWORD)pInt;
+    _asm
+    {
+        mov ecx, dwThis
+        call dwSetupSuspensionLines
+    }
+
+    CopyGlobalSuspensionLinesToPrivate ();
 }

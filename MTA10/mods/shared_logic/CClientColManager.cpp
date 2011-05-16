@@ -327,7 +327,6 @@ void CClientColManager::DoHitDetectionForColShape ( CClientColShape* pShape )
             case CCLIENTCOL:
             case CCLIENTTXD:
             case CCLIENTSOUND:
-            case CCLIENTHANDLING:
                 break;
             default:
                 if ( pEntity->GetParent () )

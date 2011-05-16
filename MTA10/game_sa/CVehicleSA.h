@@ -376,7 +376,7 @@ public:
 
     unsigned short CarAlarmState; //1116
     unsigned short ForcedRandomSeed; // if this is non-zero the random wander gets deterministic
-
+    
     CPedSAInterface *pDriver;
     CPedSAInterface *pPassengers[MAX_PASSENGERS];
     unsigned char m_nNumPassengers;
@@ -712,6 +712,7 @@ public:
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 
 private:
+    void                        RecalculateSuspensionLines          ( void );
     void                        CopyGlobalSuspensionLinesToPrivate  ( void );
 };
 

@@ -140,7 +140,7 @@ public:
     inline CCarEnterExit            * GetCarEnterExit()         { DEBUG_TRACE("CCarEnterExit           * GetCarEnterExit()");return m_pCarEnterExit; };
     inline CControllerConfigManager * GetControllerConfigManager()  { DEBUG_TRACE("CControllerConfigManager* GetControllerConfigManager()");return m_pControllerConfigManager; };
     inline CRenderWare              * GetRenderWare()           { DEBUG_TRACE("CRenderWare * GetRenderWare()");return m_pRenderWare; };
-    inline IHandlingManager         * GetHandlingManager ()      { return m_pHandlingManager; };
+    inline CHandlingManager         * GetHandlingManager ()      { return m_pHandlingManager; };
     inline CAnimManager             * GetAnimManager ()          { return m_pAnimManager; }
     inline CStreaming               * GetStreaming ()            { return m_pStreaming; }
     inline CVisibilityPlugins       * GetVisibilityPlugins ()    { return m_pVisibilityPlugins; }
@@ -239,7 +239,7 @@ private:
     CExplosionManager       * m_pExplosionManager;
     C3DMarkers              * m_p3DMarkers;
     CRenderWare             * m_pRenderWare;
-    IHandlingManager        * m_pHandlingManager;
+    CHandlingManager        * m_pHandlingManager;
     CAnimManager            * m_pAnimManager;
     CStreaming              * m_pStreaming;
     CVisibilityPlugins      * m_pVisibilityPlugins;
