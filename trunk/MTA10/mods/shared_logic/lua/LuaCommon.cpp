@@ -247,17 +247,6 @@ CClientWater* lua_towater ( lua_State* luaVM, int iArgument )
     return NULL;
 }
 
-CClientIFP* lua_toifp ( lua_State* luaVM, int iArgument )
-{
-    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
-    if ( pElement && pElement->GetType () == CCLIENTIFP  )
-    {
-        return static_cast < CClientIFP* > ( pElement );
-    }
-
-    return NULL;
-}
-
 CXMLNode* lua_toxmlnode ( lua_State* luaVM, int iArgument )
 {
     return g_pCore->GetXML ()->GetNodeFromID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );

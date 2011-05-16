@@ -68,7 +68,6 @@
 #include <CClientTask.h>
 #include <CClientTXD.h>
 #include <CClientWater.h>
-#include <CClientIFP.h>
 #include <CCustomData.h>
 #include <CConfig.h>
 #include <CDOMConfig.h>
