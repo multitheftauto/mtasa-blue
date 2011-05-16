@@ -7,7 +7,6 @@
 *               and miscellaneous rendering functions
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               arc_
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *  RenderWare is © Criterion Software
@@ -452,73 +451,6 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures ( std::list < RwTexture* >& textu
     // Delete the reference we made in ModelInfoTXDAddTextures
     if ( bRemoveRef )
         CTxdStore_RemoveRef ( usTxdId );
-}
-
-struct SAnimHeader {
-    char    szVersion[4]; //ANPK or ANP3
-    int     iOffsetToEOF; //Offset to end of file
-    char    szBlockName[24]; //Block name to be used for the whole file
-    int     iNumberOfAnimations; //Number of animations inside the file
-};
-
-// Reads and parses an IFP file specified by a path (szIFP)
-CAnimBlock * CRenderWareSA::ReadIFP ( const char *szIFP )
-{
-
-    //Make sure we have a file path
-    if ( !szIFP )
-        return false;
-
-    // Read the file
-    FILE* pFile = fopen ( szIFP, "rb" );
-    //Make sure the file exists
-    if ( !pFile )
-        return NULL;
-
-    SAnimHeader SHeader;
-    //Read out the header information into SHeader
-    fread ( &SHeader, sizeof(SHeader), 1, pFile );
-    // Check the Header information ANP3 Is supported ANPK is not at the moment. 
-    if ( SHeader.szVersion[0] == 'A' && SHeader.szVersion[1] == 'N' && SHeader.szVersion[2] == 'P' && SHeader.szVersion[3] == '3' )
-    {
-        CAnimBlock * pAnim;
-        //Check it doesn't exist already
-        pAnim = pGame->GetAnimManager()->GetAnimationBlock( SHeader.szBlockName );
-        if ( pAnim )
-        {
-            //Return false before the loading
-            fclose ( pFile );
-            return NULL;
-        }
-    }
-    else
-    {
-        //Invalid file type close our file and return false
-        fclose ( pFile );
-        return NULL;
-    }
-
-    //close the file
-    fclose ( pFile );
-
-    // open the stream
-    RwStream * streamModel = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, szIFP );
-
-    // check for errors
-    if ( streamModel == NULL )
-        return NULL;
-
-    //Load the animation file from the stream
-    pGame->GetAnimManager()->LoadAnimFile( streamModel, true, "" );
-
-    //Register our animation block with SA
-    //int iBlockID = pGame->GetAnimManager()->RegisterAnimBlock( SHeader.szBlockName );
-
-    // close the stream
-    RwStreamClose ( streamModel, NULL );
-    CAnimBlock * pAnim = pGame->GetAnimManager()->GetAnimationBlock( SHeader.szBlockName );
-
-    return pAnim;
 }
 
 
