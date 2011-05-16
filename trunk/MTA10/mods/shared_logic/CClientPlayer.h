@@ -41,6 +41,7 @@ public:
     void                            Unlink                  ( void );
 
     eClientEntityType               GetType                 ( void ) const                          { return CCLIENTPLAYER; }
+    eClientEntityType               GetBaseType             ( void ) const                          { return CCLIENTPED; }
 
     const char*                     GetNick                 ( void ) const                          { return m_szNick; }
     void                            SetNick                 ( const char* szNick );

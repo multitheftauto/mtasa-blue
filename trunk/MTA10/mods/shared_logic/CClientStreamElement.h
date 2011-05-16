@@ -28,8 +28,6 @@ public:
 
     void                        UpdateStreamPosition        ( const CVector & vecPosition );
     CVector                     GetStreamPosition           ( void )                            { return m_vecStreamPosition; }
-    CClientStreamSectorRow *    GetStreamRow                ( void )                            { return m_pStreamRow; }
-    CClientStreamSector *       GetStreamSector             ( void )                            { return m_pStreamSector; }
     bool                        IsStreamedIn                ( void )                            { return m_bStreamedIn; }
     void                        InternalStreamIn            ( bool bInstantly );
     void                        InternalStreamOut           ( void );
@@ -43,22 +41,15 @@ public:
     unsigned long               GetTotalStreamReferences    ( void )                            { return m_usStreamReferences + m_usStreamReferencesScript; }
     void                        StreamOutForABit            ( void );
     void                        SetDimension                ( unsigned short usDimension );
-    float                       GetExpDistance              ( void )                            { return m_fExpDistance; }
     virtual CSphere             GetWorldBoundingSphere      ( void );
     float                       GetDistanceToBoundingBoxSquared ( const CVector& vecPosition );
 
     bool                        IsStreamingCompatibleClass  ( void )                            { return true; };
 
 private:
-    void                        SetStreamRow                ( CClientStreamSectorRow * pRow )   { m_pStreamRow = pRow; }
-    void                        SetStreamSector             ( CClientStreamSector * pSector )   { m_pStreamSector = pSector; }
-    void                        SetExpDistance              ( float fDistance )                 { m_fExpDistance = fDistance; }
     
     CClientStreamer *           m_pStreamer;
-    CClientStreamSectorRow *    m_pStreamRow;
-    CClientStreamSector *       m_pStreamSector;
     CVector                     m_vecStreamPosition;    
-    float                       m_fExpDistance;
     bool                        m_bAttemptingToStreamIn;
     bool                        m_bStreamedIn;
     unsigned short              m_usStreamReferences, m_usStreamReferencesScript;
