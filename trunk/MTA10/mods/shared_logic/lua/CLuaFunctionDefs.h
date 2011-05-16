@@ -301,6 +301,7 @@ public:
     LUA_DECLARE ( GetVehicleHeadLightColor );
     LUA_DECLARE ( GetVehicleCurrentGear );
     LUA_DECLARE ( GetVehicleHandling );
+    LUA_DECLARE ( GetOriginalHandling )
     LUA_DECLARE ( GetVehicleDoorOpenRatio );
 
     // Vehicle set functions
