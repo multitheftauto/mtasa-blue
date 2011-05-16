@@ -534,6 +534,20 @@ public:
     static bool                         GetSoundMetaTags                    ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags );
     static bool                         SetSoundEffectEnabled               ( CClientSound& Sound, const SString& strEffectName, bool bEnable );
 
+
+    // Handling funcs 
+    static eHandlingProperty    GetVehicleHandlingEnum              ( std::string strProperty );
+    static bool                 GetVehicleHandling                  ( CClientVehicle* pVehicle, eHandlingProperty eProperty, float& fValue );
+    static bool                 GetVehicleHandling                  ( CClientVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue );
+    static bool                 GetVehicleHandling                  ( CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue );
+    static bool                 GetVehicleHandling                  ( CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue );
+    static bool                 GetVehicleHandling                  ( CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue );
+
+
 #ifdef MTA_VOICE
     // Voice funcs
     static bool                         SetVoiceInputEnabled                ( bool bEnabled );

@@ -326,7 +326,7 @@ void CFoo::Test ( const char* szString )
 
                 fprintf ( poo, "Transmission.uiHandlingFlags = 0x%X\n", pHandling->Transmission.uiHandlingFlags );
 
-                fprintf ( poo, "Transmission.fEngineAccelleration = %f\n", pHandling->Transmission.fEngineAccelleration );
+                fprintf ( poo, "Transmission.fEngineAcceleration = %f\n", pHandling->Transmission.fEngineAcceleration );
                 fprintf ( poo, "Transmission.fEngineInertia = %f\n", pHandling->Transmission.fEngineInertia );
                 fprintf ( poo, "Transmission.fMaxVelocity = %f\n", pHandling->Transmission.fMaxVelocity );
 
@@ -334,7 +334,7 @@ void CFoo::Test ( const char* szString )
                 fprintf ( poo, "Transmission.fUnknown2 [1] = %f\n", pHandling->Transmission.fUnknown2 [1]  );
                 fprintf ( poo, "Transmission.fUnknown2 [2] = %f\n", pHandling->Transmission.fUnknown2 [2]  );
 
-                fprintf ( poo, "fBrakeDecelleration = %f\n", pHandling->fBrakeDecelleration );
+                fprintf ( poo, "fBrakeDeceleration = %f\n", pHandling->fBrakeDeceleration );
                 fprintf ( poo, "fBrakeBias = %f\n", pHandling->fBrakeBias );
                 fprintf ( poo, "bABS = %u\n", pHandling->bABS );
 
@@ -348,7 +348,7 @@ void CFoo::Test ( const char* szString )
                 fprintf ( poo, "fSuspensionUpperLimit = %f\n", pHandling->fSuspensionUpperLimit );
                 fprintf ( poo, "fSuspensionLowerLimit = %f\n", pHandling->fSuspensionLowerLimit );
                 fprintf ( poo, "fSuspensionFrontRearBias = %f\n", pHandling->fSuspensionFrontRearBias );
-                fprintf ( poo, "fSuspensionAntidiveMultiplier = %f\n", pHandling->fSuspensionAntidiveMultiplier );
+                fprintf ( poo, "fSuspensionAntiDiveMultiplier = %f\n", pHandling->fSuspensionAntiDiveMultiplier );
 
                 fprintf ( poo, "fCollisionDamageMultiplier = %f\n", pHandling->fCollisionDamageMultiplier );
 

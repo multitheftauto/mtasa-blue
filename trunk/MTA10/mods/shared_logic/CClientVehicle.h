@@ -386,11 +386,9 @@ public:
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed );
     
-#if WITH_VEHICLE_HANDLING
     void                        ApplyHandling           ( void );
     CHandlingEntry*             GetHandlingData         ( void );
     const CHandlingEntry*       GetOriginalHandlingData ( void )    { return m_pOriginalHandlingEntry; }
-#endif
 
 protected:
     void                        StreamIn                ( bool bInstantly );
@@ -490,10 +488,8 @@ protected:
     bool                        m_bIsOnGround;
     bool                        m_bHeliSearchLightVisible;
     float                       m_fHeliRotorSpeed;
-#if WITH_VEHICLE_HANDLING
     const CHandlingEntry*       m_pOriginalHandlingEntry;
     CHandlingEntry*             m_pHandlingEntry;
-#endif
 
     bool                        m_bIsDerailed;
     bool                        m_bIsDerailable;
@@ -540,6 +536,8 @@ protected:
 
     CVector                     m_vecGravity;
     SColor                      m_HeadLightColor;
+
+    bool                        m_bHasCustomHandling;
 
 public:
     CClientPlayer *             m_pLastSyncer;

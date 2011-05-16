@@ -2775,6 +2775,48 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
                     pVehicle->SetHeadLightColor ( color );
 
+                    // Read out and set handling
+                    if ( bitStream.ReadBit () == true )
+                    {
+                        SVehicleHandlingSync handling;
+                        bitStream.Read ( &handling );
+                        CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+                        pEntry->SetMass ( handling.data.fMass );
+                        pEntry->SetTurnMass ( handling.data.fTurnMass );
+                        pEntry->SetDragCoeff ( handling.data.fDragCoeff );
+                        pEntry->SetCenterOfMass ( handling.data.vecCenterOfMass );
+                        pEntry->SetPercentSubmerged ( handling.data.ucPercentSubmerged );
+                        pEntry->SetTractionMultiplier ( handling.data.fTractionMultiplier );
+                        pEntry->SetCarDriveType ( (CHandlingEntry::eDriveType)handling.data.ucDriveType );
+                        pEntry->SetCarEngineType ( (CHandlingEntry::eEngineType)handling.data.ucEngineType );
+                        pEntry->SetNumberOfGears ( handling.data.ucNumberOfGears );
+                        pEntry->SetEngineAcceleration ( handling.data.fEngineAcceleration );
+                        pEntry->SetEngineInertia ( handling.data.fEngineInertia );
+                        pEntry->SetMaxVelocity ( handling.data.fMaxVelocity );
+                        pEntry->SetBrakeDeceleration ( handling.data.fBrakeDeceleration );
+                        pEntry->SetBrakeBias ( handling.data.fBrakeBias );
+                        pEntry->SetABS ( handling.data.bABS );
+                        pEntry->SetSteeringLock ( handling.data.fSteeringLock );
+                        pEntry->SetTractionLoss ( handling.data.fTractionLoss );
+                        pEntry->SetTractionBias ( handling.data.fTractionBias );
+                        pEntry->SetSuspensionForceLevel ( handling.data.fSuspensionForceLevel );
+                        pEntry->SetSuspensionDamping ( handling.data.fSuspensionDamping );
+                        pEntry->SetSuspensionHighSpeedDamping ( handling.data.fSuspensionHighSpdDamping );
+                        pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
+                        pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
+                        pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
+                        pEntry->SetSuspensionAntiDiveMultiplier ( handling.data.fSuspensionAntiDiveMultiplier );
+                        pEntry->SetCollisionDamageMultiplier ( handling.data.fCollisionDamageMultiplier );
+                        pEntry->SetModelFlags ( handling.data.uiModelFlags );
+                        pEntry->SetHandlingFlags ( handling.data.uiHandlingFlags );
+                        pEntry->SetSeatOffsetDistance ( handling.data.fSeatOffsetDistance );
+                        //pEntry->SetMonetary ( handling.data.uiMonetary );
+                        //pEntry->SetHeadLight ( (CHandlingEntry::eLightType)handling.data.ucHeadLight );
+                        //pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
+                        pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
+                        pVehicle->ApplyHandling();
+                    }
+
                     // Set the matrix
                     pVehicle->SetPosition ( position.data.vecPosition );
                     pVehicle->SetRotationDegrees ( rotationDegrees.data.vecRotation );

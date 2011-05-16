@@ -49,11 +49,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_pVehicle = NULL;
     m_pUpgrades = new CVehicleUpgrades ( this );
     m_pClump = NULL;
-#if WITH_VEHICLE_HANDLING
     m_pOriginalHandlingEntry = g_pGame->GetHandlingManager ()->GetOriginalHandlingData ( static_cast < eVehicleTypes > ( usModel ) );
     m_pHandlingEntry = g_pGame->GetHandlingManager ()->CreateHandlingData ();
     m_pHandlingEntry->Assign ( m_pOriginalHandlingEntry );
-#endif
 
     SetTypeName ( "vehicle" );
 
@@ -136,6 +134,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
     m_fHeliRotorSpeed = 0.0f;
+    m_bHasCustomHandling = false;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -220,9 +219,7 @@ CClientVehicle::~CClientVehicle ( void )
     Unlink ();
 
     delete m_pUpgrades;
-#if WITH_VEHICLE_HANDLING
     delete m_pHandlingEntry;
-#endif
     CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, &m_pLastSyncer, NULL );
 }
 
@@ -935,12 +932,10 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         m_pModelInfo = g_pGame->GetModelInfo ( usModel );
         m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( usModel );
 
-#if WITH_VEHICLE_HANDLING
         // Reset handling to fit the vehicle
         m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData ( (eVehicleTypes)usModel );
         m_pHandlingEntry->Assign ( m_pOriginalHandlingEntry );
-        m_pHandlingEntry->Recalculate ();
-#endif
+        ApplyHandling ();
 
         // Create the vehicle if we're streamed in
         if ( IsStreamedIn () )
@@ -2347,13 +2342,14 @@ void CClientVehicle::Create ( void )
             SetDoorOpenRatio ( i, m_fDoorOpenRatio [ i ], 0, true );
 
 
-#if WITH_VEHICLE_HANDLING
         // Re-apply handling entry
         if ( m_pHandlingEntry )
         {
             m_pVehicle->SetHandlingData ( m_pHandlingEntry );
+            
+            if ( m_bHasCustomHandling )
+                ApplyHandling ();
         }
-#endif
         // Tell the streamer we've created this object
         NotifyCreate ();
     }
@@ -2385,9 +2381,7 @@ void CClientVehicle::Destroy ( void )
         m_bIsDerailed = IsDerailed ();
         m_fHeliRotorSpeed = GetHeliRotorSpeed ();
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible ();
-#if WITH_VEHICLE_HANDLING
         m_pHandlingEntry = m_pVehicle->GetHandlingData();
-#endif
         if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
             m_eVehicleType == CLIENTVEHICLE_QUADBIKE )
@@ -3592,19 +3586,20 @@ void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed )
     }
 }
 
-#if WITH_VEHICLE_HANDLING
 void CClientVehicle::ApplyHandling ( void )
 {
     if ( m_pVehicle )
         m_pVehicle->RecalculateHandling ();
+
+    m_bHasCustomHandling = true;
 }
 
 
-CHandlingEntry* CClientVehicle::GetHandlingData( void )
+CHandlingEntry* CClientVehicle::GetHandlingData ( void )
 {
     if ( m_pVehicle )
     {
-        return m_pVehicle->GetHandlingData();
+        return m_pVehicle->GetHandlingData ();
     }
     else if ( m_pHandlingEntry )
     {
@@ -3612,7 +3607,6 @@ CHandlingEntry* CClientVehicle::GetHandlingData( void )
     }
     return NULL;
 }
-#endif
 
 
 CSphere CClientVehicle::GetWorldBoundingSphere ( void )

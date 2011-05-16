@@ -18,6 +18,7 @@
 #include "CBlipRPCs.h"
 #include "CCameraRPCs.h"
 #include "CElementRPCs.h"
+#include "CHandlingRPCs.h"
 #include "CInputRPCs.h"
 #include "CMarkerRPCs.h"
 #include "CObjectRPCs.h"
@@ -88,6 +89,7 @@ void CRPCFunctions::AddHandlers ( void )
     CBlipRPCs::LoadFunctions ();
     CCameraRPCs::LoadFunctions ();
     CElementRPCs::LoadFunctions ();
+    CHandlingRPCs::LoadFunctions ();
     CInputRPCs::LoadFunctions ();
     CMarkerRPCs::LoadFunctions ();
     CObjectRPCs::LoadFunctions ();
