@@ -4852,7 +4852,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_UPPER_LIMIT:
             {            
-                if ( fValue >= -50.0 && fValue <= 50 )
+                if ( fValue >= -50.0 && fValue <= 50 && fValue != pEntry->GetSuspensionLowerLimit() ) // Lower and Upper limits cannot match or LSOD
                 {
                     pEntry->SetSuspensionUpperLimit ( fValue );
                     return true;
@@ -4861,7 +4861,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_LOWER_LIMIT:
             {            
-                if ( fValue >= -50.0 && fValue <= 50 )
+                if ( fValue >= -50.0 && fValue <= 50 && fValue != pEntry->GetSuspensionUpperLimit() ) // Lower and Upper limits cannot match or LSOD
                 {
                     pEntry->SetSuspensionLowerLimit ( fValue );
                     return true;
