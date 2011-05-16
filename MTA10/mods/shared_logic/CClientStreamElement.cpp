@@ -18,9 +18,6 @@ using std::list;
 CClientStreamElement::CClientStreamElement ( CClientStreamer * pStreamer, ElementID ID ) : CClientEntity ( ID )
 {
     m_pStreamer = pStreamer;    
-    m_pStreamRow = NULL;
-    m_pStreamSector = NULL;
-    m_fExpDistance = 0.0f;
     m_bStreamedIn = false;
     m_bAttemptingToStreamIn = false;
     m_usStreamReferences = 0; m_usStreamReferencesScript = 0;
@@ -86,6 +83,8 @@ void CClientStreamElement::InternalStreamOut ( void )
             }
         }
 
+        m_pStreamer->NotifyElementStreamedOut ( this );
+
         CLuaArguments Arguments;
         CallEvent ( "onClientElementStreamOut", Arguments, true );
     }
@@ -101,6 +100,8 @@ void CClientStreamElement::NotifyCreate ( void )
 
     m_bStreamedIn = true;
     m_bAttemptingToStreamIn = false;
+
+    m_pStreamer->NotifyElementStreamedIn ( this );
 
     CLuaArguments Arguments;
     CallEvent ( "onClientElementStreamIn", Arguments, true );
@@ -137,7 +138,7 @@ void CClientStreamElement::RemoveStreamReference ( bool bScript )
     // Have we removed the last reference?
     if ( ( m_usStreamReferences + m_usStreamReferencesScript ) == 0 )
     {
-        m_pStreamer->OnElementForceStreamOut ( this );
+        m_pStreamer->OnElementUnforceStreamIn ( this );
     }
 }
 

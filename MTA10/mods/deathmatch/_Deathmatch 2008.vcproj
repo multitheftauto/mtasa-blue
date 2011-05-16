@@ -873,14 +873,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientStreamSector.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientStreamSectorRow.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientTask.cpp"
 					>
 				</File>
@@ -1804,14 +1796,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientStreamer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientStreamSector.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientStreamSectorRow.h"
 					>
 				</File>
 				<File

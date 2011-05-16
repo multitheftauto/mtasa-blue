@@ -29,11 +29,11 @@ CClientManager::CClientManager ( void )
     m_pConnectionTroubleTexture = g_pCore->GetGUI ()->CreateTexture ();
     m_pConnectionTroubleTexture->LoadFromFile ( CalcMTASAPath( CGUI_ICON_NETWORK_TROUBLE ) );
 
-    m_pMarkerStreamer = new CClientStreamer ( CClientMarker::IsLimitReached, 600.0f );
-    m_pObjectStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 500.0f );
-    m_pPickupStreamer = new CClientStreamer ( CClientPickupManager::IsPickupLimitReached, 100.0f );
-    m_pPlayerStreamer = new CClientStreamer ( CClientPlayerManager::IsPlayerLimitReached, 250.0f );
-    m_pVehicleStreamer = new CClientStreamer ( CClientVehicleManager::IsVehicleLimitReached, 250.0f );
+    m_pMarkerStreamer = new CClientStreamer ( CClientMarker::IsLimitReached, 600.0f, CCLIENTMARKER, 32 );
+    m_pObjectStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 500.0f, CCLIENTOBJECT, 500 );
+    m_pPickupStreamer = new CClientStreamer ( CClientPickupManager::IsPickupLimitReached, 100.0f, CCLIENTPICKUP, 64 );
+    m_pPlayerStreamer = new CClientStreamer ( CClientPlayerManager::IsPlayerLimitReached, 250.0f, CCLIENTPED, 110 );
+    m_pVehicleStreamer = new CClientStreamer ( CClientVehicleManager::IsVehicleLimitReached, 250.0f, CCLIENTVEHICLE, 64 );
     m_pModelRequestManager = new CClientModelRequestManager;
 
     m_pGUIManager = new CClientGUIManager;
