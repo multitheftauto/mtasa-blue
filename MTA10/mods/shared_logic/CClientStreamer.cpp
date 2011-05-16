@@ -10,86 +10,9 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-using std::list;
-
-void* CClientStreamer::pAddingElement = NULL;
 
 namespace
 {
-
-    float GetBoxDistanceSq ( const CVector& vecPosition, const CVector& vecBoxCenter, const float* fExtentMin, const float* fExtentMax, const CVector** vecBoxAxes )
-    {
-        CVector vecOffset = vecPosition - vecBoxCenter;
-        float fDistSq = 0.f;
-
-        // For each axis
-        for ( int i = 0 ; i < 3 ; i++ )
-        {
-            // Project vecOffset on the axis
-            float fDot = vecOffset.DotProduct ( vecBoxAxes[i] );
-
-            // Add any distance outside the box on that axis
-            if ( fDot < fExtentMin[i] )
-                fDistSq += ( fDot - fExtentMin[i] ) * ( fDot - fExtentMin[i] );
-            else
-            if ( fDot > fExtentMax[i] )
-                fDistSq += ( fDot - fExtentMax[i] ) * ( fDot - fExtentMax[i] );
-        }
-
-        return fDistSq;
-    }
-
-    // First draft. Works, but is not optimized.
-    float GetElementStreamDistanceSquared ( CClientStreamElement* pElement, const CVector& vecPosition )
-    {
-        // Update cached radius if required
-        if ( --pElement->m_iCachedRadiusCounter < 0 )
-        {
-            CStaticFunctionDefinitions::GetElementRadius ( *pElement, pElement->m_fCachedRadius );
-            pElement->m_iCachedRadiusCounter = 20 + rand() % 50;
-        }
-
-        // Do a simple calculation if the element has a small radius (Using a big radius for now)
-        if ( pElement->m_fCachedRadius < 20000 )
-        {
-            CVector vecDif = pElement->GetStreamPosition () - vecPosition;
-            float fDist = sqrtf ( vecDif.fX * vecDif.fX + vecDif.fY * vecDif.fY + vecDif.fZ * vecDif.fZ );
-            fDist = Max ( 0.0f, fDist - pElement->m_fCachedRadius );
-            return fDist * fDist;
-        }
-
-        // Update cached bounding box if required
-        if ( --pElement->m_iCachedBoundingBoxCounter < 0 )
-        {
-            // Get bounding box extents
-            CVector vecMin;
-            CVector vecMax;
-            CStaticFunctionDefinitions::GetElementBoundingBox ( *pElement, vecMin, vecMax );
-
-            // Adjust for non-centered bounding box
-            CVector vecHalfCenter = ( vecMin + vecMax ) * 0.25f;
-            vecMin -= vecHalfCenter;
-            vecMax -= vecHalfCenter;
-
-            pElement->m_vecCachedBoundingBox[0] = vecMin;
-            pElement->m_vecCachedBoundingBox[1] = vecMax;
-
-            pElement->m_iCachedBoundingBoxCounter = 20 + rand() % 50;
-        }
-
-        const CVector& vecMin = pElement->m_vecCachedBoundingBox[0];
-        const CVector& vecMax = pElement->m_vecCachedBoundingBox[1];
-
-        // Get bounding box axes
-        CMatrix gtaMatrix;
-        pElement->GetMatrix ( gtaMatrix );
-
-        const CVector* vecBoxAxes[3] = { &gtaMatrix.vRight, &gtaMatrix.vFront, &gtaMatrix.vUp };
-
-        return GetBoxDistanceSq ( vecPosition, pElement->GetStreamPosition (), &vecMin.fX, &vecMax.fX, vecBoxAxes );
-   }
-
-
     // Used for sorting elements by distance
     struct SElementSortItem
     {
@@ -192,15 +115,19 @@ void CClientStreamer::DoPulse ( const CVector& vecPosition )
     //
     // Validate m_StreamedInMap items are still relevant
     //
-    for ( std::map < CClientStreamElement*, int >::iterator it = m_StreamedInMap.begin (); it != m_StreamedInMap.end (); )
     {
-        if ( it->first->GetDimension () != m_usDimension )
+        std::vector < CClientStreamElement* > wrongList;
+
+        // Make list of streamed in elements that are now in the wrong dimension
+        for ( std::map < CClientStreamElement*, int >::iterator it = m_StreamedInMap.begin (); it != m_StreamedInMap.end (); ++it )
         {
-            m_StreamedInMap.erase ( it++ );
-            DoStreamOut ( it->first );
+            if ( it->first->GetDimension () != m_usDimension )
+                wrongList.push_back ( it->first );
         }
-        else
-            ++it;
+
+        // And then stream them out
+        for ( std::vector < CClientStreamElement* >::iterator it = wrongList.begin (); it != wrongList.end (); ++it )
+            DoStreamOut ( *it );
     }
 
     //
@@ -246,7 +173,7 @@ void CClientStreamer::DoPulse ( const CVector& vecPosition )
             if ( MapContains ( m_ForcedInMap, pElement ) )
                 fDistSq = 1;        // Make forced items really close so sorting will give them top priority
             else
-                fDistSq = GetElementStreamDistanceSquared ( pElement, vecPosition );
+                fDistSq = pElement->GetDistanceToBoundingBoxSquared ( vecPosition );
             sortList.push_back ( SElementSortItem ( pElement, fDistSq ) );
         }
 

@@ -53,8 +53,6 @@ private:
     std::map < CClientStreamElement*, int > m_ForcedInMap;
 
     std::vector < CClientStreamElement* >   elementList;
-
-    static void*                            pAddingElement;
 };
 
 

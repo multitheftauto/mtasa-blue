@@ -203,12 +203,6 @@ static float GetBoxDistanceSq ( const CVector& vecPosition, const CVector& vecBo
 
 float CClientStreamElement::GetDistanceToBoundingBoxSquared ( const CVector& vecPosition )
 {
-    // Do a simple calculation if the element is newly added ( hack/fix for CClientSteamer::AddElement being called in the CClientStreamElement constructor )
-    if ( this == CClientStreamer::pAddingElement )
-    {
-        return ( GetStreamPosition () - vecPosition ).LengthSquared ();
-    }
-
     // More hax to increase performance
 
     // Update cached radius if required
