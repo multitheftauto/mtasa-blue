@@ -26,7 +26,7 @@ public:
                     ~CConnectManager    ( void );
 
     bool            Connect             ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword );
-    bool            Reconnect           ( const char* szHost, unsigned short usPort, const char* szPassword );
+    bool            Reconnect           ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true );
 
     bool            Abort               ( void );
 
@@ -47,6 +47,7 @@ private:
     bool            m_bIsDetectingVersion;
     bool            m_bIsConnecting;
     bool            m_bReconnect;
+    bool            m_bSave;
     time_t          m_tConnectStarted;
 
     GUI_CALLBACK*   m_pOnCancelClick;

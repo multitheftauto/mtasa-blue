@@ -329,9 +329,41 @@ void CCommandFuncs::Reconnect ( const char* szParameters )
     CVARS_GET ( "port",         uiPort );
 
     // Restart the connection.
-    SString strTemp ( "%s %u %s %s", strHost.c_str (), uiPort, strNick.c_str (), strPassword.c_str () );
+    CModManager::GetSingleton ().Unload ();
 
-    Connect ( strTemp );
+    // Any mod loaded?
+    if ( !CModManager::GetSingleton ().GetCurrentMod () )
+    {
+        
+        // Verify and convert the port number
+        if ( uiPort <= 0 || uiPort > 0xFFFF )
+        {
+            CCore::GetSingleton ().GetConsole ()->Print ( "connect: Bad port number" );
+            return;
+        }
+
+        unsigned short usPort = static_cast < unsigned short > ( uiPort );
+
+        // Got a password?
+        if ( !strPassword.c_str() )
+        {
+            strPassword = '\0';
+        }
+
+        // Start the connect
+        if ( CCore::GetSingleton ().GetConnectManager ()->Reconnect ( strHost.c_str(), usPort, strPassword.c_str(), false ) )
+        {
+            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: Connecting to %s:%u...", strHost, usPort );
+        }
+        else
+        {
+            CCore::GetSingleton ().GetConsole ()->Printf ( "connect: could not connect to %s:%u!", strHost, usPort );
+        }
+    }
+    else
+    {
+        CCore::GetSingleton ().GetConsole ()->Print ( "connect: Failed to unload current mod" );
+    }
 }
 
 void CCommandFuncs::Bind ( const char* szParameters )

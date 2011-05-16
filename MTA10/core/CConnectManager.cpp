@@ -27,6 +27,7 @@ CConnectManager::CConnectManager ( void )
     m_bReconnect = false;
     m_bIsDetectingVersion = false;
     m_bIsConnecting = false;
+    m_bSave = true;
     m_tConnectStarted = 0;
 
     m_pOnCancelClick = new GUI_CALLBACK ( &CConnectManager::Event_OnCancelClick, this );
@@ -128,7 +129,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 }
 
 
-bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword )
+bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave )
 {
     // Allocate a new host and nick buffer and store the strings in them
     if ( szHost )
@@ -144,6 +145,8 @@ bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, con
     {
         m_usPort = usPort;
     }
+
+    m_bSave = bSave;
 
     m_bReconnect = true;
 
@@ -316,11 +319,15 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                     pQuickConnect->SetVisible ( false );
 
                 // Save the connection details into the config
-                CVARS_SET ( "host",     g_pConnectManager->m_strHost );
-                CVARS_SET ( "port",     g_pConnectManager->m_usPort );
-                CVARS_SET ( "password", g_pConnectManager->m_strPassword );
+                if ( g_pConnectManager->m_bSave )
+                {
+                    CVARS_SET ( "host",     g_pConnectManager->m_strHost );
+                    CVARS_SET ( "port",     g_pConnectManager->m_usPort );
+                    CVARS_SET ( "password", g_pConnectManager->m_strPassword );
 
-                //Conver the Address to an unsigned long
+                }
+
+                //Convert the Address to an unsigned long
                 unsigned long ulAddr = inet_addr( g_pConnectManager->m_strHost.c_str() );
 
                 //Create an instance of the in_addr structure to store the address

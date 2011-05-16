@@ -644,9 +644,9 @@ bool CCore::IsConnected ( void )
 }
 
 
-bool CCore::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword )
+bool CCore::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave )
 {
-    return m_pConnectManager->Reconnect ( szHost, usPort, szPassword );
+    return m_pConnectManager->Reconnect ( szHost, usPort, szPassword, bSave );
 }
 
 
