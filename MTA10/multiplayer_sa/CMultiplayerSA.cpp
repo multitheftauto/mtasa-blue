@@ -1192,6 +1192,9 @@ void CMultiplayerSA::InitHooks()
     MemSet ( (void *)0x41AD12, 0x90, 2 );
     MemSet ( (void *)0x41ADA7, 0x90, 2 );
     MemSet ( (void *)0x41ADF3, 0x90, 2 );
+
+    // Allow Player Garages to shut with players inside.
+    MemSet ( (void *)0x44C6FA, 0x90, 4 );
 }
 
 
