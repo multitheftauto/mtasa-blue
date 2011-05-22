@@ -556,7 +556,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                     delete [] szValue;
                 }
                 else
-                    Read ( "" );
+                    Read ( std::string ( "" ) );
 
                 break;
             }
