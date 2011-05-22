@@ -2196,11 +2196,11 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     bool bWarpIn = false;
                                     // Jax: is he in water and trying to get in a floating vehicle
                                     // Cazomino05: changed to check if the vehicle is in water not player
-                                    if ( (pPlayer->IsInWater() || Packet.GetOnWater()) && ( usVehicleModel == VT_SKIMMER ||
+                                    if ( usVehicleModel == VT_RCBARON || ( pPlayer->IsInWater() || Packet.GetOnWater() ) &&
+                                                                    ( usVehicleModel == VT_SKIMMER ||
                                                                     usVehicleModel == VT_SEASPAR ||
                                                                     usVehicleModel == VT_LEVIATHN ||
-                                                                    usVehicleModel == VT_VORTEX ) ||
-                                                                    usVehicleModel == VT_RCBARON )
+                                                                    usVehicleModel == VT_VORTEX ) )
                                     {
                                         fCutoffDistance = 10.0f;
                                         bWarpIn = true;
@@ -2685,6 +2685,13 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                 Reply.SetSourceElement ( pPlayer );
                 pPlayer->Send ( Reply );
             }
+        }
+        else if ( pPlayer->IsJoined ( ) )
+        {
+            ElementID ID = Packet.GetID ();
+            CVehicleInOutPacket Reply ( ID, 0, VEHICLE_ATTEMPT_FAILED );
+            Reply.SetSourceElement ( pPlayer );
+            pPlayer->Send ( Reply );
         }
         else
         {

@@ -1616,7 +1616,7 @@ void CClientGame::UpdateVehicleInOut ( void )
     else
     {
         // If we aren't getting jacked
-        if ( !m_bIsGettingJacked )
+        if ( !m_bIsGettingJacked && !m_pLocalPlayer->IsDead ( ) && !m_pLocalPlayer->IsDying ( ) )
         {
             CClientVehicle* pVehicle = m_pLocalPlayer->GetRealOccupiedVehicle ();
             CClientVehicle* pOccupiedVehicle = m_pLocalPlayer->GetOccupiedVehicle ();
@@ -4691,6 +4691,8 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
             else Arguments.PushBoolean ( false );
             Arguments.PushBoolean ( false );
             m_pLocalPlayer->CallEvent ( "onClientPlayerWasted", Arguments, true );
+
+            CClientVehicle::UnpairPedAndVehicle ( m_pLocalPlayer );
 
             // Write some death info
             pBitStream->WriteCompressed ( animGroup );
