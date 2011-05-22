@@ -4056,9 +4056,24 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
             {
                 // We're going to enter a vehicle
 
+                // If the Jump task is playing and we are in water - I know right 
+                // Kill it.
+                // 
+                CTask * pTask = m_pLocalPlayer->GetCurrentPrimaryTask ();
+                if ( pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP ) // Kill jump task - breaks warp in entry and doesn't really matter
+                {
+                    unsigned int uiDoor = 0; // Meh GetClosestVehicleInRange needs to dump the door somewhere.
+                    CClientVehicle* pVehicle = m_pLocalPlayer->GetClosestVehicleInRange ( true, !bPassenger, bPassenger, false, &uiDoor, NULL, 20.0f );
+                    if ( pVehicle->IsInWater() || m_pLocalPlayer->IsInWater() ) // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
+                    {
+                        m_pLocalPlayer->KillTask(3, true ); // Kill jump task if we are about to warp in
+                    }
+                }
+
                 // Make sure we don't have any other primary tasks running, otherwise our 'enter-vehicle'
                 // task will replace it and fuck it up!
-                if ( !m_pLocalPlayer->GetCurrentPrimaryTask () )
+                // 
+                if ( !m_pLocalPlayer->GetCurrentPrimaryTask ( ) )
                 {
                     // Are we not holding the aim_weapon key?
                     SBindableGTAControl* pBind = g_pCore->GetKeyBinds ()->GetBindableFromControl ( "aim_weapon" );
