@@ -573,7 +573,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                     delete [] szValue;
                 }
                 else
-                    Read ( "" );
+                    Read ( std::string ( "" ) );
 
                 break;
             }
@@ -1010,7 +1010,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                     }
                 }
                 else
-                    Read(szString);
+                    Read(std::string ( szString ));
                 break;
                 }
             default:

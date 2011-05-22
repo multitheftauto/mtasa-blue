@@ -762,7 +762,7 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, char* szKey )
         if ( iType == LUA_TNUMBER )
             return new CLuaArgument ( strtod ( (char *)result.Data[0][0].pVal, NULL ) );
         else
-            return new CLuaArgument ( (char *)result.Data[0][0].pVal );
+            return new CLuaArgument ( std::string ( (char *)result.Data[0][0].pVal ) );
     }
 
     //No results
