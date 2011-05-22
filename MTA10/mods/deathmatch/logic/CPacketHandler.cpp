@@ -962,6 +962,8 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
                 pPed->CallEvent ( "onClientPlayerWasted", Arguments, true );
             else
                 pPed->CallEvent ( "onClientPedWasted", Arguments, true );
+
+            CClientVehicle::UnpairPedAndVehicle ( pPed );
         }
     }
     else
