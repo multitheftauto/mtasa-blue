@@ -29,6 +29,7 @@ public:
                                                 CAccessControlListManager   ( void );
     virtual                                     ~CAccessControlListManager  ( void );
 
+    void                                        DoPulse                     ( void );
     bool                                        Load                        ( const char* szFilename );
     bool                                        Save                        ( const char* szFilename );
 
@@ -64,6 +65,8 @@ public:
                                                                               CAccessControlListRight::ERightType& eType );
 
 private:
+    void                                        ClearCache                  ( void );
+    bool                                        InternalCanObjectUseRight   ( const char* szObjectName, CAccessControlListGroupObject::EObjectType, const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bDefaultAccessRight );
     void                                        RemoveACLDependencies       ( class CAccessControlList* pACL );
 
     list < class CAccessControlListGroup* >     m_Groups;
@@ -74,6 +77,8 @@ private:
     CXMLFile*                                   m_pXML;
     CXMLNode*                                   m_pRootNode;
 
+    long long                                   m_llLastTimeCacheCleared;
+    std::map < SString, bool >                  m_ACLCacheMap;
 };
 
 #endif
