@@ -63,7 +63,6 @@ private:
     class CScriptDebugging*                     m_pScriptDebugging;
 
     CMappedList < CPlayer* >                    m_Players;
-    bool                                        m_bCanRemoveFromList;
 };
 
 #endif

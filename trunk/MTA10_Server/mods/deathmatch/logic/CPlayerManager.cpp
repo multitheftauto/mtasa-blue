@@ -17,7 +17,6 @@ CPlayerManager::CPlayerManager ( void )
 {
     // Init
     m_pScriptDebugging = NULL;
-    m_bCanRemoveFromList = true;
 }
 
 
@@ -122,18 +121,9 @@ CPlayer* CPlayerManager::Get ( const char* szNick, bool bCaseSensitive )
 
 void CPlayerManager::DeleteAll ( void )
 {
-    // Delete all the items in the list (without letting them remove themselves)
-    m_bCanRemoveFromList = false;
-    list < CPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
-    {
-        delete *iter;
-    }
-
-    m_bCanRemoveFromList = true;
-
-    // Clear the list
-    m_Players.clear ();
+    // Delete all the items in the list
+    while ( !m_Players.empty () )
+        delete *m_Players.begin ();
 }
 
 
@@ -231,10 +221,7 @@ void CPlayerManager::ResetAll ( void )
 
 void CPlayerManager::RemoveFromList ( CPlayer* pPlayer )
 {
-    if ( m_bCanRemoveFromList )
-    {
-        m_Players.remove ( pPlayer );
-    }
+    m_Players.remove ( pPlayer );
 
     // Remove from other players near player list
     for ( std::list < CPlayer* > ::const_iterator iter = m_Players.begin () ; iter != m_Players.end (); iter++ )
