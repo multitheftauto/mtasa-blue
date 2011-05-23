@@ -35,6 +35,7 @@ CAccessControlListGroup::~CAccessControlListGroup ( void )
 
     m_Objects.clear ();
     m_ObjectsById.clear ();
+    OnACLChange ();
 }
 
 
@@ -52,6 +53,7 @@ CAccessControlListGroupObject* CAccessControlListGroup::AddObject ( const char* 
     m_Objects.push_back ( pObject );
     m_ObjectsById.insert ( ObjectMap::value_type ( pObject->GetObjectHashId(), pObject ) );
 
+    OnACLChange ();
     return pObject;
 }
 
@@ -113,6 +115,7 @@ bool CAccessControlListGroup::RemoveObject ( const char* szObjectName, CAccessCo
         m_Objects.remove ( iter->second );
         m_ObjectsById.erase( iter );
 
+        OnACLChange ();
         return true;
     }
 
@@ -125,6 +128,7 @@ bool CAccessControlListGroup::AddACL ( CAccessControlList* pACL )
     if ( !IsACLPresent ( pACL ) )
     {
         m_ACLs.push_back ( pACL );
+        OnACLChange ();
         return true;
     }
 
@@ -165,6 +169,7 @@ CAccessControlList* CAccessControlListGroup::GetACL ( const char* szACLName )
 void CAccessControlListGroup::RemoveACL ( class CAccessControlList* pACL )
 {
     m_ACLs.remove ( pACL );
+    OnACLChange ();
 }
 
 
