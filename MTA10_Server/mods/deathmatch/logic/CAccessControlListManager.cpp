@@ -14,10 +14,20 @@
 
 #include "StdInc.h"
 
+// Used to flag the ACL cache will be wrong
+static bool bACLCacheDirty = false;
+
+void OnACLChange ( void )
+{
+    bACLCacheDirty = true;
+}
+
+
 CAccessControlListManager::CAccessControlListManager ( void ) : CXMLConfig ( NULL )
 {
     m_pXML = NULL;
     m_pRootNode = NULL;
+    m_llLastTimeCacheCleared = 0;
 }
 
 
@@ -269,7 +279,54 @@ CAccessControlList* CAccessControlListManager::GetACL ( const char* szACLName )
 }
 
 
+void CAccessControlListManager::DoPulse ( void )
+{
+    // Clear cache every 12 hours or if dirty
+    if ( bACLCacheDirty || GetTickCount64_ () - m_llLastTimeCacheCleared > 1000 * 60 * 60 * 12 )
+        ClearCache ();
+}
+
+
+void CAccessControlListManager::ClearCache ( void )
+{
+    bACLCacheDirty = false;
+    m_llLastTimeCacheCleared = GetTickCount64_ ();
+    m_ACLCacheMap.clear ();      
+}
+
+
 bool CAccessControlListManager::CanObjectUseRight ( const char* szObjectName,
+                                                    CAccessControlListGroupObject::EObjectType eObjectType,
+                                                    const char* szRightName,
+                                                    CAccessControlListRight::ERightType eRightType,
+                                                    bool bDefaultAccessRight )
+{
+    // Clear cache if required
+    if ( bACLCacheDirty )
+        ClearCache ();
+
+    // If object is resource, try cache
+    if ( eObjectType == CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE )
+    {
+        // Make unique key for this query
+        SString strKey ( "%s %s %d %d", szObjectName, szRightName, eRightType, bDefaultAccessRight );
+        // Check if this query has been done before
+        bool* pResult = MapFind( m_ACLCacheMap, strKey );
+        if ( !pResult )
+        {
+            // If not, do query now and add result to the cache
+            bool bResult = InternalCanObjectUseRight ( szObjectName, eObjectType, szRightName, eRightType, bDefaultAccessRight );
+            MapSet ( m_ACLCacheMap, strKey, bResult );
+            pResult = MapFind( m_ACLCacheMap, strKey );
+        }
+        // Return cached result
+        return *pResult;
+    }
+    return InternalCanObjectUseRight ( szObjectName, eObjectType, szRightName, eRightType, bDefaultAccessRight );
+}
+
+
+bool CAccessControlListManager::InternalCanObjectUseRight ( const char* szObjectName,
                                                     CAccessControlListGroupObject::EObjectType eObjectType,
                                                     const char* szRightName,
                                                     CAccessControlListRight::ERightType eRightType,
@@ -326,6 +383,7 @@ CAccessControlListGroup* CAccessControlListManager::AddGroup ( const char* szGro
         // Create it and put it back in our list
         pGroup = new CAccessControlListGroup ( szGroupName );
         m_Groups.push_back ( pGroup );
+        OnACLChange ();
     }
 
     return pGroup;
@@ -341,6 +399,7 @@ CAccessControlList* CAccessControlListManager::AddACL ( const char* szACLName )
         // Create it and put it back in our list
         pACL = new CAccessControlList ( szACLName, this );
         m_ACLs.push_back ( pACL );
+        OnACLChange ();
     }
 
     return pACL;
@@ -354,6 +413,7 @@ void CAccessControlListManager::DeleteGroup ( class CAccessControlListGroup* pGr
     // Delete the class and remove it from the list
     delete pGroup;
     m_Groups.remove ( pGroup );
+    OnACLChange ();
 }
 
 
@@ -367,6 +427,7 @@ void CAccessControlListManager::DeleteACL ( class CAccessControlList* pACL )
     // Delete the class and remove it from the list
     delete pACL;
     m_ACLs.remove ( pACL );
+    OnACLChange ();
 }
 
 
@@ -381,6 +442,7 @@ void CAccessControlListManager::ClearACLs ( void )
 
     // Clear the list
     m_ACLs.clear ();
+    OnACLChange ();
 }
 
 
@@ -395,6 +457,7 @@ void CAccessControlListManager::ClearGroups ( void )
 
     // Clear the list
     m_Groups.clear ();
+    OnACLChange ();
 }
 
 
@@ -434,6 +497,7 @@ void CAccessControlListManager::RemoveACLDependencies ( class CAccessControlList
     {
         (*iter)->RemoveACL ( pACL );
     }
+    OnACLChange ();
 }
 
 
