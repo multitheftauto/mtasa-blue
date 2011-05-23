@@ -327,7 +327,7 @@ void CGame::DoPulse ( void )
     m_pBanManager->DoPulse ();
     m_pAccountManager->DoPulse ();
     m_pRegistryManager->DoPulse ();
-
+    m_pACLManager->DoPulse ();
     // Pulse ASE
     if ( m_pASE )
     {

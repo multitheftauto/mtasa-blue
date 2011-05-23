@@ -2120,6 +2120,9 @@ bool CResource::LinkToIncludedResources ( void )
         if ( !(*iterr)->CreateLink() )
         {
             m_bLinked = false;
+
+            if ( m_strFailureReason.empty () )
+                m_strFailureReason = SString ( "Failed to link to %s", (*iterr)->GetName ().c_str () );
 #ifdef RESOURCE_DEBUG_MESSAGES
             CLogger::LogPrintf ( "  Links to %s .. FAILED\n", (*iterr)->GetName().c_str () );
 #endif
