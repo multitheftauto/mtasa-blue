@@ -11701,21 +11701,20 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
 {
-    unsigned long ulBits [ 256 ];
-    unsigned long ulCount [ 256 ];
+    SPacketStat m_PacketStats [ 2 ] [ 256 ];
+    memcpy ( m_PacketStats, g_pNetServer->GetPacketStats (), sizeof ( m_PacketStats ) );
 
     lua_createtable ( luaVM, 0, 2 );
 
     lua_pushstring ( luaVM, "in" );
     lua_createtable ( luaVM, 0, 2 );
     {
-        g_pNetServer->GetNetworkUsageData ( CNetServer::STATS_INCOMING_TRAFFIC, ulBits, ulCount );
-        
         lua_pushstring ( luaVM, "bits" );
         lua_createtable ( luaVM, 255, 1 );
         for ( unsigned int i = 0; i < 256; ++i )
         {
-            lua_pushnumber ( luaVM, ulBits[i] );
+            const SPacketStat& statIn = m_PacketStats [ CNetServer::STATS_INCOMING_TRAFFIC ] [ i ];
+            lua_pushnumber ( luaVM, statIn.iTotalBytes * 8 );
             lua_rawseti ( luaVM, -2, i );
         }
         lua_rawset ( luaVM, -3 );
@@ -11724,7 +11723,8 @@ int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
         lua_createtable ( luaVM, 255, 1 );
         for ( unsigned int i = 0; i < 256; ++i )
         {
-            lua_pushnumber ( luaVM, ulCount[i] );
+            const SPacketStat& statIn = m_PacketStats [ CNetServer::STATS_INCOMING_TRAFFIC ] [ i ];
+            lua_pushnumber ( luaVM, statIn.iCount );
             lua_rawseti ( luaVM, -2, i );
         }
         lua_rawset ( luaVM, -3 );
@@ -11734,13 +11734,12 @@ int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
     lua_pushstring ( luaVM, "out" );
     lua_createtable ( luaVM, 0, 2 );
     {
-        g_pNetServer->GetNetworkUsageData ( CNetServer::STATS_OUTGOING_TRAFFIC, ulBits, ulCount );
-
         lua_pushstring ( luaVM, "bits" );
         lua_createtable ( luaVM, 255, 1 );
         for ( unsigned int i = 0; i < 256; ++i )
         {
-            lua_pushnumber ( luaVM, ulBits[i] );
+            const SPacketStat& statOut = m_PacketStats [ CNetServer::STATS_OUTGOING_TRAFFIC ] [ i ];
+            lua_pushnumber ( luaVM, statOut.iTotalBytes * 8 );
             lua_rawseti ( luaVM, -2, i );
         }
         lua_rawset ( luaVM, -3 );
@@ -11749,7 +11748,8 @@ int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
         lua_createtable ( luaVM, 255, 1 );
         for ( unsigned int i = 0; i < 256; ++i )
         {
-            lua_pushnumber ( luaVM, ulCount[i] );
+            const SPacketStat& statOut = m_PacketStats [ CNetServer::STATS_OUTGOING_TRAFFIC ] [ i ];
+            lua_pushnumber ( luaVM, statOut.iCount );
             lua_rawseti ( luaVM, -2, i );
         }
         lua_rawset ( luaVM, -3 );

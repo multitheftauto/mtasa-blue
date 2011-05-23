@@ -45,6 +45,9 @@ namespace SharedUtil
     // Get the local time as a sortable string.
     SString     GetLocalTimeString ( bool bDate = false, bool bMilliseconds = false );
 
+    // Get time in microseconds
+    typedef ulong TIMEUS;
+    TIMEUS      GetTimeUs ( void );
 
     //
     // Simple class to measure time passing
