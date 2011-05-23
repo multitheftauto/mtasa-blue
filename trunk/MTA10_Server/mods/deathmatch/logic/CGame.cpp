@@ -1754,6 +1754,50 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 }
 
 
+// Relay this (pure sync) packet to all the other players using distance rules
+void CGame::RelayPlayerPuresync ( CPacket& Packet )
+{
+
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer->IsTimeForFarSync () )
+    {
+        //
+        // All players get sync if it's time for a far sync
+        //
+        for ( std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin (); iter != m_pPlayerManager->IterEnd (); iter++ )
+        {
+            CPlayer* pSendPlayer = *iter;
+            if ( pSendPlayer != pPlayer )
+                pSendPlayer->Send ( Packet );
+        }
+    }
+    else
+    {
+        // Insert into other players near list if appropriate
+        pPlayer->UpdateOthersNearList ();
+
+        // Use this players near list for sending packets
+        std::map < CPlayer*, int >& nearList = pPlayer->GetNearPlayerList ();
+
+        for ( std::map < CPlayer*, int > ::iterator it = nearList.begin (); it != nearList.end (); )
+        {
+            CPlayer* pSendPlayer = it->first;
+            int& iCount = it->second;
+            if ( --iCount < 1 )
+            {
+                // Remove player from near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far away))
+                it = nearList.erase ( it );
+            }
+            else
+            {
+                pSendPlayer->Send ( Packet );
+                it++;
+            }
+        }
+    }
+}
+
+
 void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
 {
     // Grab the source player
@@ -1771,28 +1815,8 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
             if ( ( pPlayer->GetPuresyncCount () % 4 ) == 0 )
                 pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
 
-            // Grab current time
-            unsigned long ulTimeNow = GetTime ();
-
-            // Loop through all our players
-            CPlayer* pSendPlayer;
-            list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-            for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-            {
-                // Not the local player?
-                pSendPlayer = *iter;
-                if ( pSendPlayer != pPlayer )
-                {
-                    // Should we send it to this player? This returns false if the
-                    // distance between the players is so great that the sync is not
-                    // neccessary that often.
-                    if ( pSendPlayer->IsTimeToSendSyncFrom ( *pPlayer, ulTimeNow ) )
-                    {
-                        // Send it.
-                        pSendPlayer->Send ( Packet );
-                    }
-                }
-            }
+            // Relay to other players
+            RelayPlayerPuresync ( Packet );
 
             // Run colpoint checks
             m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
@@ -1873,28 +1897,8 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
             // Send a returnsync packet to the player that sent it
             pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
 
-            // Grab current time
-            unsigned long ulTimeNow = GetTime ();
-
-            // Loop through all our players
-            CPlayer* pSendPlayer;
-            list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-            for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-            {
-                // Not the local player?
-                pSendPlayer = *iter;
-                if ( pSendPlayer != pPlayer )
-                {
-                    // Should we send it to this player? This returns false if the
-                    // distance between the players is so great that the sync is not
-                    // neccessary that often.
-                    if ( pSendPlayer->IsTimeToSendSyncFrom ( *pPlayer, ulTimeNow ) )
-                    {
-                        // Send it.
-                        pSendPlayer->Send ( Packet );
-                    }
-                }
-            }
+            // Relay to other players
+            RelayPlayerPuresync ( Packet );
 
             // Run colpoint checks
             m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
