@@ -403,6 +403,7 @@ void CLuaArgument::Read ( CLuaArguments * table )
     m_strString = "";
     DeleteTableData ();
     m_pTableData = new CLuaArguments ( *table );
+    m_bWeakTableRef = false;
     m_iType = LUA_TTABLE;
 }
 
