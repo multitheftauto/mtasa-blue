@@ -322,18 +322,16 @@ void CResourceManager::UnloadRemovedResources ( void )
     iter = resourcesToDelete.begin ();
     for ( ; iter != resourcesToDelete.end (); iter++ )
     {
-        if ( !m_resources.empty() ) m_resources.remove ( *iter );
+        RemoveResourceFromLists ( *iter );
         RemoveFromQueue ( *iter );
         m_resourcesToStartAfterRefresh.remove ( *iter );
         delete *iter;
     }
-
-
 }
 
 void CResourceManager::Unload ( CResource * resource )
 {
-    m_resources.remove ( resource );
+    RemoveResourceFromLists ( resource );
     m_resourcesToStartAfterRefresh.remove ( resource );
     RemoveFromQueue ( resource );
     delete resource;
@@ -380,7 +378,7 @@ CResource * CResourceManager::Load ( const char * szResourceName )
         // the pointer wouldn't work in resource LUA functions.
         (*iter)->Stop ( true );
 
-        if ( !m_resources.empty() ) m_resources.remove ( *iter );
+        RemoveResourceFromLists ( *iter );
         m_resourcesToStartAfterRefresh.remove ( *iter );
         RemoveFromQueue ( *iter );
         delete *iter;
@@ -405,7 +403,7 @@ CResource * CResourceManager::Load ( const char * szResourceName )
             CLogger::LogPrintf("New resource '%s' loaded\n", loadedResource->GetName().c_str () );
         unsigned short usID = GenerateID ();
         loadedResource->SetID ( usID );
-        m_resources.push_back ( loadedResource );
+        AddResourceToLists ( loadedResource );
         m_bResourceListChanged = true;
     }
 
@@ -414,30 +412,11 @@ CResource * CResourceManager::Load ( const char * szResourceName )
 
 CResource * CResourceManager::GetResource ( const char * szResourceName )
 {
-    list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
-    {
-        if ( stricmp ( (*iter)->GetName().c_str (), szResourceName ) == 0 )
-        {
-            return *iter;
-        }
-    }
+    CResource** ppResource = MapFind ( m_NameResourceMap, szResourceName );
+    if ( ppResource )
+        return *ppResource;
     return NULL;
 }
-
-CResource * CResourceManager::GetResource ( unsigned short usID )
-{
-    list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
-    {
-        if ( (*iter)->GetID() == usID )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
-}
-
 
 
 bool CResourceManager::Exists ( CResource* pResource )
@@ -445,49 +424,6 @@ bool CResourceManager::Exists ( CResource* pResource )
     return m_resources.Contains ( pResource );
 }
 
-
-/*ResponseCode CResourceManager::HandleRequest ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
-{
-    char szListBuffer[2048] = "<font face='tahoma,arial' size=-1><h2>Resource list</h2><br><table width=100%>";
-    char szTemp[2048];
-    list<CResource *>* resources = g_pGame->GetResourceManager()->GetLoadedResources();
-    unsigned int uiCount = 0;
-    unsigned int uiFailedCount = 0;
-    unsigned int uiRunningCount = 0;
-    list < CResource* > ::iterator iter = resources->begin ();
-    for ( ; iter != resources->end (); iter++ )
-    {
-        CResource * res = (*iter);
-        char szLink[256];
-        if ( res->IsActive() )
-            snprintf ( szLink, 256, "<a href='/resources/%s/' style='color:black'>%s</a> <sup><font size=-2><a href='/resource-info/%s/' style='color:black;'>Info</a></font></sup>", res->GetName(), res->GetName(), res->GetName() );
-        else
-            snprintf ( szLink, 256, "%s <sup><font size=-2><a href='/resource-info/%s/' style='color:black;'>Info</a></font></sup>", res->GetName(), res->GetName() );
-
-        if ( res->IsLoaded() )
-        {
-            if ( res->IsActive() )
-            {
-                sprintf ( szTemp, "<tr><td>%s</td><td>RUNNING</td><td>%d dependents</td></tr>", szLink, res->GetDependentCount() );
-
-                uiRunningCount++;
-            }
-            else
-                sprintf ( szTemp, "<tr><td>%s</td><td>STOPPED</td><td>%d files</td></tr>", szLink, res->GetFileCount() );
-            uiCount ++;
-        }
-        else
-        {
-            sprintf ( szTemp, "<tr><td>%s</td><td>FAILED</td><td>see info command for reason</td></tr>", szLink );
-            uiFailedCount ++;
-        }
-        strcat ( szListBuffer, szTemp );
-    }
-    sprintf ( szTemp, "</table>Resources: %d loaded, %d failed, %d running\n", uiCount, uiFailedCount, uiRunningCount );
-    strcat ( szListBuffer, szTemp );
-    ipoHttpResponse->SetBody ( szListBuffer, strlen(szListBuffer) );
-    return HTTPRESPONSECODE_200_OK;
-}*/
 
 unsigned short CResourceManager::GenerateID ( void )
 {
@@ -519,10 +455,72 @@ void CResourceManager::OnPlayerJoin ( CPlayer& Player )
     }
 }
 
+//
+// Add resource to the internal lists
+//
+void CResourceManager::AddResourceToLists ( CResource* pResource )
+{
+    assert ( !m_resources.Contains ( pResource ) );
+    assert ( !MapContains ( m_NameResourceMap, pResource->GetName () ) );
+    assert ( !MapContains ( m_ResourceLuaStateMap, pResource ) );
+
+    m_resources.push_back ( pResource );
+
+    CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
+    if ( pLuaMain )
+    {
+        lua_State* luaVM = pLuaMain->GetVirtualMachine ();
+        if ( luaVM )
+        {
+            assert ( !MapContains ( m_LuaStateResourceMap, luaVM ) );
+            MapSet ( m_ResourceLuaStateMap, pResource, luaVM );
+            MapSet ( m_LuaStateResourceMap, luaVM, pResource );
+        }
+    }
+    MapSet ( m_NameResourceMap, pResource->GetName (), pResource );
+}
+
+//
+// Remove resource from the internal lists
+//
+void CResourceManager::RemoveResourceFromLists ( CResource* pResource )
+{
+    assert ( m_resources.Contains ( pResource ) );
+    m_resources.remove ( pResource );
+
+    CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
+    lua_State* luaVM = pLuaMain ? pLuaMain->GetVirtualMachine () : NULL;
+
+    lua_State** ppluaVM = MapFind ( m_ResourceLuaStateMap, pResource );
+    if ( ppluaVM )
+    {
+        assert ( luaVM == *ppluaVM );
+        MapRemove ( m_ResourceLuaStateMap, pResource );
+        MapRemove ( m_LuaStateResourceMap, luaVM );
+    }
+    MapRemove ( m_NameResourceMap, pResource->GetName () );
+    assert ( !MapContains ( m_ResourceLuaStateMap, pResource ) );
+}
+
 
 CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
 {
     luaVM = lua_getmainstate ( luaVM );
+
+    // Try to use map first
+    CResource** ppResource = MapFind ( m_LuaStateResourceMap, luaVM );
+    if ( ppResource )
+    {
+        CResource* pResource = *ppResource;
+        CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
+        if ( pLuaMain )
+        {
+            assert ( luaVM == pLuaMain->GetVirtualMachine () );
+            return pResource;
+        }
+    }
+
+    // Otherwise search the list
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
@@ -530,6 +528,10 @@ CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
         {
             if ( luaVM == (*iter)->GetVirtualMachine ()->GetVirtualMachine () )
             {
+                assert ( !MapContains ( m_ResourceLuaStateMap, *iter ) );
+                assert ( !MapContains ( m_LuaStateResourceMap, luaVM ) );
+                MapSet ( m_ResourceLuaStateMap, *iter, luaVM );
+                MapSet ( m_LuaStateResourceMap, luaVM, *iter );
                 return *iter;
             }
         }
@@ -873,7 +875,7 @@ CResource* CResourceManager::CreateResource ( char* szResourceName )
     CResource* pResource = new CResource ( this, szResourceName, true );
     if ( pResource )
     {
-        m_resources.push_back ( pResource );
+        AddResourceToLists ( pResource );
         return pResource;
     }
 
