@@ -19,6 +19,7 @@ CRegistry::CRegistry ( const std::string& strFileName )
     m_db = NULL;
     m_bOpened = false;
     m_bInAutomaticTransaction = false;
+    m_llSuspendBatchingEndTime = 0;
 
     Load ( strFileName );
 }
@@ -27,11 +28,19 @@ CRegistry::CRegistry ( const std::string& strFileName )
 CRegistry::~CRegistry ( void )
 {
     EndAutomaticTransaction ();
+    CPerfStatSqliteTiming::GetSingleton ()->OnSqliteClose ( this );
     CLogger::LogPrint ( "Closing SQLite3 database\n" );
     if ( m_bOpened )
         sqlite3_close ( m_db );
 }
 
+// Disable automatic transactions for a length of time
+void CRegistry::SuspendBatching ( uint uiTicks )
+{
+    m_llSuspendBatchingEndTime = GetTickCount64_ () + uiTicks;
+    if ( uiTicks )
+        EndAutomaticTransaction ();
+}
 
 void CRegistry::Load ( const std::string& strFileName )
 {
@@ -43,6 +52,7 @@ void CRegistry::Load ( const std::string& strFileName )
             CLogger::ErrorPrintf ( "Could not open SQLite3 database! (%s)\n", sqlite3_errmsg ( m_db ) );
         } else {
             m_bOpened = true;
+            CPerfStatSqliteTiming::GetSingleton ()->OnSqliteOpen ( this, strFileName );
         }
     }
 }
@@ -50,114 +60,82 @@ void CRegistry::Load ( const std::string& strFileName )
 
 bool CRegistry::Update ( const std::string& strTable, const std::string& strSet, const std::string& strWhere )
 {
-    char *szErrorMsg = NULL;
-    std::string strQuery;
-
-    if ( m_bOpened == false ) {
-        m_strLastError = "SQLite3 was not opened, cannot get value!";
-        return false;
-    }
-
-    if ( strSet.empty () || strTable.empty () ) {
-        m_strLastError = "Invalid arguments!";
-        return false;
-    }
-
-    strQuery = "UPDATE " + strTable + " SET " + strSet;
+    std::string strQuery = "UPDATE " + strTable + " SET " + strSet;
     if ( !strWhere.empty () )
         strQuery += " WHERE " + strWhere;
 
-    // Execute SQL
-    BeginAutomaticTransaction ();
-    if ( sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, &szErrorMsg ) != SQLITE_OK )
-    {
-        m_strLastError = std::string ( szErrorMsg );
-        sqlite3_free ( szErrorMsg );
-        return false;
-    }
-    return true;
+    return Exec ( strQuery );
 }
 
 
 void CRegistry::CreateTable ( const std::string& strTable, const std::string& strDefinition, bool bSilent )
 {
-    if ( m_bOpened == false ) {
-        m_strLastError = "SQLite3 was not opened, cannot create table!";
-        return;
-    }
-
-    std::string strQuery = "CREATE TABLE IF NOT EXISTS " + strTable + " ( " + strDefinition + " )";
     if ( !bSilent )
         CLogger::LogPrintf ( "Creating new DB table %s\n", strTable.c_str () );
-
-    BeginAutomaticTransaction ();
-    sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, NULL );
+    Exec ( "CREATE TABLE IF NOT EXISTS " + strTable + " ( " + strDefinition + " )" );
 }
 
 
 void CRegistry::DropTable ( const std::string& strTable )
 {
-    if ( m_bOpened == false ) {
-        m_strLastError = "SQLite3 was not opened, cannot drop table!";
-        return;
-    }
-
-    std::string strQuery = "DROP TABLE " + strTable;
-
     CLogger::LogPrintf ( "Dropping DB table %s\n", strTable.c_str () );
-    BeginAutomaticTransaction ();
-    sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, NULL );
+    Exec ( "DROP TABLE " + strTable );
 }
 
 
 bool CRegistry::Insert ( const std::string& strTable, const std::string& strValues, const std::string& strColumns )
 {
-    char *szErrorMsg = NULL;
     std::string strQuery;
 
-    if ( m_bOpened == false ) {
-        m_strLastError = "SQLite3 was not opened, cannot add value!";
-        return false;
-    }
-
-    if ( strColumns.empty () ) {
+    if ( strColumns.empty () )
         strQuery = "INSERT INTO " + strTable + " VALUES ( " + strValues + " )";
-    } else {
+    else
         strQuery = "INSERT INTO " + strTable + " ( " + strColumns + " ) VALUES ( " + strValues + " )";
-    }
 
-    BeginAutomaticTransaction ();
-    if ( sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, &szErrorMsg ) != SQLITE_OK ) {
-        m_strLastError = std::string ( szErrorMsg );
-        sqlite3_free ( szErrorMsg );
-        return false;
-    }
-    return true;
+    return Exec ( strQuery );
 }
 
 
 bool CRegistry::Delete ( const std::string& strTable, const std::string& strWhere )
 {
-    char *szErrorMsg = NULL;
+    return Exec ( "DELETE FROM " + strTable + " WHERE " + strWhere );
+}
 
-    if ( m_bOpened == false ) {
-        m_strLastError = "SQLite3 was not opened, cannot delete table!";
+
+bool CRegistry::Exec ( const std::string& strQuery )
+{
+    if ( m_bOpened == false )
+    {
+        m_strLastError = "SQLite3 was not opened, cannot perform query!";
         return false;
     }
 
-    std::string strQuery = "DELETE FROM " + strTable + " WHERE " + strWhere;
-
     BeginAutomaticTransaction ();
-    if ( sqlite3_exec ( m_db, strQuery.c_str (), NULL, NULL, &szErrorMsg ) != SQLITE_OK ) {
-        m_strLastError = std::string ( szErrorMsg );
+    return ExecInternal ( strQuery.c_str () );
+}
+
+
+bool CRegistry::ExecInternal ( const char* szQuery )
+{
+    TIMEUS startTime = GetTimeUs();
+    char *szErrorMsg = NULL;
+
+    if ( sqlite3_exec ( m_db, szQuery, NULL, NULL, &szErrorMsg ) != SQLITE_OK )
+    {
+        m_strLastError = szErrorMsg;
         sqlite3_free ( szErrorMsg );
         return false;
     }
+
+    CPerfStatSqliteTiming::GetSingleton ()->UpdateSqliteTiming ( this, szQuery, GetTimeUs() - startTime );
     return true;
 }
 
+
 bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
 {
+    TIMEUS startTime = GetTimeUs();
+
     // Prepare the query
     sqlite3_stmt* pStmt;
     if ( sqlite3_prepare ( m_db, szQuery, strlen ( szQuery ) + 1, &pStmt, NULL ) != SQLITE_OK )
@@ -228,8 +206,11 @@ bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
 
     // All done
     sqlite3_finalize ( pStmt );
+
+    CPerfStatSqliteTiming::GetSingleton ()->UpdateSqliteTiming ( this, szQuery, GetTimeUs() - startTime );
     return true;
 }
+
 
 bool CRegistry::Query ( const std::string& strQuery, CLuaArguments *pArgs, CRegistryResult* pResult )
 {
@@ -326,6 +307,13 @@ void CRegistry::BeginAutomaticTransaction ( void )
 {
     if ( !m_bInAutomaticTransaction )
     {
+        if ( m_llSuspendBatchingEndTime )
+        {
+            if ( m_llSuspendBatchingEndTime > GetTickCount64_ () )
+                return;
+            m_llSuspendBatchingEndTime = 0;
+        }
+
         m_bInAutomaticTransaction = true;
         CRegistryResult dummy;
         QueryInternal ( "BEGIN TRANSACTION", &dummy );

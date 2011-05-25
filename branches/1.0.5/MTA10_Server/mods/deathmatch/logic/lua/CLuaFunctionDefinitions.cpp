@@ -9892,6 +9892,7 @@ int CLuaFunctionDefinitions::ExecuteSQLCreateTable ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )
     {
+        CPerfStatSqliteTiming::GetSingleton ()->SetCurrentResource ( luaVM );
         CStaticFunctionDefinitions::ExecuteSQLCreateTable ( std::string ( lua_tostring ( luaVM, 1 ) ), std::string ( lua_tostring ( luaVM, 2 ) ) );
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -9908,6 +9909,7 @@ int CLuaFunctionDefinitions::ExecuteSQLDropTable ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
     {
+        CPerfStatSqliteTiming::GetSingleton ()->SetCurrentResource ( luaVM );
         CStaticFunctionDefinitions::ExecuteSQLDropTable ( lua_tostring ( luaVM, 1 ) );
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -9927,6 +9929,7 @@ int CLuaFunctionDefinitions::ExecuteSQLDelete ( lua_State* luaVM )
 
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING && lua_type ( luaVM, 2 ) == LUA_TSTRING )
     {
+        CPerfStatSqliteTiming::GetSingleton ()->SetCurrentResource ( luaVM );
         bSuccess = CStaticFunctionDefinitions::ExecuteSQLDelete ( std::string ( lua_tostring ( luaVM, 1 ) ), std::string ( lua_tostring ( luaVM, 2 ) ) );
         if ( !bSuccess ) {
             strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
@@ -9957,6 +9960,7 @@ int CLuaFunctionDefinitions::ExecuteSQLInsert ( lua_State* luaVM )
         if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
             strColumns = std::string ( lua_tostring ( luaVM, 3 ) );
 
+        CPerfStatSqliteTiming::GetSingleton ()->SetCurrentResource ( luaVM );
         bSuccess = CStaticFunctionDefinitions::ExecuteSQLInsert ( std::string ( lua_tostring ( luaVM, 1 ) ), std::string ( lua_tostring ( luaVM, 2 ) ), strColumns );
         if ( !bSuccess ) {
             strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
@@ -9986,6 +9990,7 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
 
         Args.ReadArguments ( luaVM, 2 );
 
+        CPerfStatSqliteTiming::GetSingleton ()->SetCurrentResource ( luaVM );
         if ( CStaticFunctionDefinitions::ExecuteSQLQuery ( strQuery, &Args, &Result ) ) {
             lua_newtable ( luaVM );
             for ( int i = 0; i < Result.nRows; i++ ) {
@@ -10054,6 +10059,7 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
         if ( lua_type ( luaVM, 4 ) == LUA_TNUMBER )
             uiLimit = static_cast < unsigned int > ( lua_tonumber ( luaVM, 4 ) );
 
+        CPerfStatSqliteTiming::GetSingleton ()->SetCurrentResource ( luaVM );
         if ( CStaticFunctionDefinitions::ExecuteSQLSelect ( strTable, strColumns, strWhere, uiLimit, &Result ) )
         {
             lua_newtable ( luaVM );
@@ -10118,6 +10124,7 @@ int CLuaFunctionDefinitions::ExecuteSQLUpdate ( lua_State* luaVM )
         std::string strSet      = std::string ( lua_tostring ( luaVM, 2 ) );
         std::string strWhere    = std::string ( lua_tostring ( luaVM, 3 ) );
 
+        CPerfStatSqliteTiming::GetSingleton ()->SetCurrentResource ( luaVM );
         if ( CStaticFunctionDefinitions::ExecuteSQLUpdate ( strTable, strSet, strWhere ) )
         {
             lua_pushboolean ( luaVM, true );
