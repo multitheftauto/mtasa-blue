@@ -30,6 +30,7 @@ class CRegistry
                                 ~CRegistry              ( void );
 public:
 
+    void                        SuspendBatching         ( uint uiTicks );
     void                        Load                    ( const std::string& strFileName );
 
     void                        CreateTable             ( const std::string& strTable, const std::string& strDefinition, bool bSilent = false );
@@ -48,6 +49,8 @@ public:
 
 protected:
 
+    bool                        Exec                    ( const std::string& strQuery );
+    bool                        ExecInternal            ( const char* szQuery  );
     bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, va_list vl );
     bool                        QueryInternal           ( const char* szQuery, CRegistryResult* pResult );
     void                        BeginAutomaticTransaction ( void );
@@ -56,6 +59,7 @@ protected:
     sqlite3                     *m_db;
     bool                        m_bOpened;
     bool                        m_bInAutomaticTransaction;
+    long long                   m_llSuspendBatchingEndTime;
 
 private:
     bool                        Query                   ( const char* szQuery, CRegistryResult* pResult );  // Not defined to catch incorrect usage
