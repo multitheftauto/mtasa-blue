@@ -101,6 +101,9 @@ public:
 
     static bool                 ParseResourcePathInput          ( std::string strInput, CResource*& pResource, std::string* pstrPath, std::string* pstrMetaPath );
 
+    void                        NotifyResourceVMOpen            ( CResource* pResource, CLuaMain* pVM );
+    void                        NotifyResourceVMClose           ( CResource* pResource, CLuaMain* pVM );
+
     void                        AddResourceToLists              ( CResource* pResource );
     void                        RemoveResourceFromLists         ( CResource* pResource );
 
