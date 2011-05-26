@@ -1786,7 +1786,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
             if ( --iCount < 1 )
             {
                 // Remove player from near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far away))
-                it = nearList.erase ( it );
+                nearList.erase ( it++ );
             }
             else
             {
