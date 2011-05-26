@@ -456,6 +456,32 @@ void CResourceManager::OnPlayerJoin ( CPlayer& Player )
 }
 
 //
+// Add resource <-> luaVM lookup mapping
+//
+void CResourceManager::NotifyResourceVMOpen ( CResource* pResource, CLuaMain* pVM )
+{
+    lua_State* luaVM = pVM->GetVirtualMachine ();
+    assert ( luaVM );
+    assert ( !MapContains ( m_ResourceLuaStateMap, pResource ) );
+    assert ( !MapContains ( m_LuaStateResourceMap, luaVM ) );
+    MapSet ( m_ResourceLuaStateMap, pResource, luaVM );
+    MapSet ( m_LuaStateResourceMap, luaVM, pResource );
+}
+
+//
+// Remove resource <-> luaVM lookup mapping
+//
+void CResourceManager::NotifyResourceVMClose ( CResource* pResource, CLuaMain* pVM )
+{
+    lua_State* luaVM = pVM->GetVirtualMachine ();
+    assert ( luaVM );
+    assert ( MapContains ( m_ResourceLuaStateMap, pResource ) );
+    assert ( MapContains ( m_LuaStateResourceMap, luaVM ) );
+    MapRemove ( m_ResourceLuaStateMap, pResource );
+    MapRemove ( m_LuaStateResourceMap, luaVM );
+}
+
+//
 // Add resource to the internal lists
 //
 void CResourceManager::AddResourceToLists ( CResource* pResource )
@@ -467,16 +493,7 @@ void CResourceManager::AddResourceToLists ( CResource* pResource )
     m_resources.push_back ( pResource );
 
     CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
-    if ( pLuaMain )
-    {
-        lua_State* luaVM = pLuaMain->GetVirtualMachine ();
-        if ( luaVM )
-        {
-            assert ( !MapContains ( m_LuaStateResourceMap, luaVM ) );
-            MapSet ( m_ResourceLuaStateMap, pResource, luaVM );
-            MapSet ( m_LuaStateResourceMap, luaVM, pResource );
-        }
-    }
+    assert ( !pLuaMain );
     MapSet ( m_NameResourceMap, pResource->GetName (), pResource );
 }
 
@@ -486,20 +503,9 @@ void CResourceManager::AddResourceToLists ( CResource* pResource )
 void CResourceManager::RemoveResourceFromLists ( CResource* pResource )
 {
     assert ( m_resources.Contains ( pResource ) );
+    assert ( MapContains ( m_NameResourceMap, pResource->GetName () ) );
     m_resources.remove ( pResource );
-
-    CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
-    lua_State* luaVM = pLuaMain ? pLuaMain->GetVirtualMachine () : NULL;
-
-    lua_State** ppluaVM = MapFind ( m_ResourceLuaStateMap, pResource );
-    if ( ppluaVM )
-    {
-        assert ( luaVM == *ppluaVM );
-        MapRemove ( m_ResourceLuaStateMap, pResource );
-        MapRemove ( m_LuaStateResourceMap, luaVM );
-    }
     MapRemove ( m_NameResourceMap, pResource->GetName () );
-    assert ( !MapContains ( m_ResourceLuaStateMap, pResource ) );
 }
 
 
@@ -507,7 +513,7 @@ CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
 {
     luaVM = lua_getmainstate ( luaVM );
 
-    // Try to use map first
+    // Use lookup map
     CResource** ppResource = MapFind ( m_LuaStateResourceMap, luaVM );
     if ( ppResource )
     {
@@ -519,24 +525,6 @@ CResource* CResourceManager::GetResourceFromLuaState ( lua_State* luaVM )
             return pResource;
         }
     }
-
-    // Otherwise search the list
-    list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
-    {
-        if ( (*iter)->GetVirtualMachine () != NULL )
-        {
-            if ( luaVM == (*iter)->GetVirtualMachine ()->GetVirtualMachine () )
-            {
-                assert ( !MapContains ( m_ResourceLuaStateMap, *iter ) );
-                assert ( !MapContains ( m_LuaStateResourceMap, luaVM ) );
-                MapSet ( m_ResourceLuaStateMap, *iter, luaVM );
-                MapSet ( m_LuaStateResourceMap, luaVM, *iter );
-                return *iter;
-            }
-        }
-    }
-
     return NULL;
 }
 

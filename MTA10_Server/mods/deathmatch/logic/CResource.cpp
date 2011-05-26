@@ -953,7 +953,10 @@ bool CResource::CreateVM ( void )
 {
     // Create the virtual machine
     if ( m_pVM == NULL )
+    {
         m_pVM = g_pGame->GetLuaManager ()->CreateVirtualMachine ( this );
+        m_resourceManager->NotifyResourceVMOpen ( this, m_pVM );
+    }
 
     if ( m_pVM )
     {
@@ -979,6 +982,7 @@ bool CResource::DestroyVM ( void )
     m_pRootElement->DeleteEvents ( m_pVM, true );
 
     // Delete the virtual machine
+    m_resourceManager->NotifyResourceVMClose ( this, m_pVM );
     g_pGame->GetLuaManager ()->RemoveVirtualMachine ( m_pVM );
     m_pVM = NULL;
     return true;
