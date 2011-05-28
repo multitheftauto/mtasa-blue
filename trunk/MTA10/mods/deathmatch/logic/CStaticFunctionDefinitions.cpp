@@ -3880,21 +3880,7 @@ void CStaticFunctionDefinitions::DrawText ( int iLeft, int iTop,
                                  const char* szFont,
                                  bool bPostGUI, CResource* pResource )
 {
-    SString strFile = szFont;
-    SString strPath, strMetaPath;
-    ID3DXFont *pFont = NULL;
-    if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath, strMetaPath ) )
-    {
-        if ( m_pScriptFontLoader->GetDXFont(&pFont, strPath, strMetaPath, pResource, fScaleX, fScaleY) )
-        {
-            g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pFont, bPostGUI );
-            return;
-        }
-    }
-
-               
-    eFontType fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFont ) );
-    pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
+    ID3DXFont* pFont = ResolveFont ( szFont, pResource, fScaleX, fScaleY );
     g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pFont, bPostGUI );
 }
 
@@ -3906,6 +3892,21 @@ bool CStaticFunctionDefinitions::LoadFont ( std::string strFullFilePath, bool bB
 bool CStaticFunctionDefinitions::UnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
 {
     return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
+}
+
+// Find standard or custom font from a resource path
+ID3DXFont* CStaticFunctionDefinitions::ResolveFont ( const char* szFontName, CResource* pResource, float fScaleX, float fScaleY )
+{
+    SString strPath, strMetaPath;
+    if ( CResourceManager::ParseResourcePathInput ( szFontName, pResource, strPath, strMetaPath ) )
+    {
+        ID3DXFont* pFont = NULL;
+        if ( m_pScriptFontLoader->GetDXFont ( &pFont, strPath, strMetaPath, pResource, fScaleX, fScaleY ) )
+            return pFont;
+    }
+    CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+    eFontType fontType = pGraphics->GetFontType ( szFontName );
+    return pGraphics->GetFont ( fontType );
 }
 
 bool CStaticFunctionDefinitions::IsCursorShowing ( bool& bShowing )
