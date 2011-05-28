@@ -225,7 +225,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         }
         if ( !bClip ) ulFormat |= DT_NOCLIP;
 
-        CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, szText, fScale, fScale, ulFormat, szFontName, bPostGUI, pResource );
+            CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, szText, fScale, fScale, ulFormat, szFontName, bPostGUI, pResource );
 
         // Success
         lua_pushboolean ( luaVM, true );
@@ -488,7 +488,6 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
     {
         const char * szText = lua_tostring ( luaVM, 1 );
         float fScale = 1.0f;
-        eFontType fontType = FONT_DEFAULT;
         ID3DXFont * pFont = NULL;
 
         int iArgument2 = lua_type ( luaVM, 2 );
@@ -498,18 +497,10 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 
             if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
             {
-                CResource* pResource =  m_pLuaManager->GetVirtualMachine(luaVM)->GetResource();
-                // sanitize the input
+                // Get font from name
                 const char * szFontName = lua_tostring ( luaVM, 3 );
-                SString strPath, strMetaPath;
-                if ( CResourceManager::ParseResourcePathInput( szFontName, pResource, strPath, strMetaPath ) && FileExists(strPath) && 
-                     g_pClientGame->GetScriptFontLoader()->GetDXFont(&pFont,strPath,strMetaPath,pResource,fScale,fScale) )
-                {}
-                else
-                {
-                    fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFontName ) );
-                    pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
-                }
+                CResource* pResource =  m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource ();
+                pFont = CStaticFunctionDefinitions::ResolveFont ( szFontName, pResource, fScale, fScale );
             }
         }
 
@@ -542,7 +533,6 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
     // dxGetFontHeight ( [float scale=1,string font="default"] )
 
     float fScale = 1.0f;
-    eFontType fontType = FONT_DEFAULT;
     ID3DXFont * pFont = NULL;
 
     int iArgument1 = lua_type ( luaVM, 1 );
@@ -552,18 +542,10 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 
         if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
         {
+            // Get font from name
             const char * szFontName = lua_tostring ( luaVM, 2 );
-            CResource* pResource =  m_pLuaManager->GetVirtualMachine(luaVM)->GetResource();
-            // sanitize the input
-            SString strPath, strMetaPath;
-            if ( CResourceManager::ParseResourcePathInput( szFontName, pResource, strPath, strMetaPath ) && FileExists(strPath) && 
-                 g_pClientGame->GetScriptFontLoader()->GetDXFont(&pFont,strPath,strMetaPath,pResource,fScale,fScale) )
-            {}
-            else
-            {
-                fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFontName ) );
-                pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
-            }
+            CResource* pResource =  m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource ();
+            pFont = CStaticFunctionDefinitions::ResolveFont ( szFontName, pResource, fScale, fScale );
         }
     }
     float fHeight = g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, pFont );

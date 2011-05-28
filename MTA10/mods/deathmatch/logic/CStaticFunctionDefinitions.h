@@ -304,6 +304,7 @@ public:
     static void                         DrawText                            ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, const char* szFont, bool bPostGUI, CResource* pResource );
     static bool                         LoadFont                            ( std::string strFullFilePath, bool bBold,  unsigned int uiSize, std::string strMetaPath, CResource* pResource );
     static bool                         UnloadFont                          ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource );
+    static ID3DXFont*                   ResolveFont                         ( const char* szFontName, CResource* pResource, float fScaleX, float fScaleY );
 
     // GUI funcs
     static bool                         GUIGetInputEnabled                  ( void );
