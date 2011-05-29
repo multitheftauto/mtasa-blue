@@ -595,8 +595,6 @@ public:
     LUA_DECLARE ( GUIMemoSetCaratIndex );
     LUA_DECLARE ( GUIWindowSetMovable );
     LUA_DECLARE ( GUIWindowSetSizable );
-    LUA_DECLARE ( GUIWindowSetCloseButtonEnabled );
-    LUA_DECLARE ( GUIWindowSetTitleBarEnabled );
     LUA_DECLARE ( GUIWindowGetMovable );
     LUA_DECLARE ( GUIWindowGetSizable );
     LUA_DECLARE ( GUIWindowGetCloseButtonEnabled );

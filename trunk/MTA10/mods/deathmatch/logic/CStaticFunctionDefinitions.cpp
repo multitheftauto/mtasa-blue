@@ -3921,23 +3921,14 @@ bool CStaticFunctionDefinitions::GUIGetInputEnabled ( void )
     return m_pGUI->GetGUIInputEnabled ();
 }
 
-bool CStaticFunctionDefinitions::GUISetInputMode ( const std::string& a_rstrInputMode )
+void CStaticFunctionDefinitions::GUISetInputMode ( eInputMode inputMode )
 {
-    eInputMode inputMode = m_pGUI->GetInputModeFromString ( a_rstrInputMode );
-    if ( inputMode == INPUTMODE_INVALID )
-    {
-        return false;
-    }
-    else
-    {
-        m_pGUI->SetGUIInputMode ( inputMode );
-        return true;
-    }
+    m_pGUI->SetGUIInputMode ( inputMode );
 }
 
-bool CStaticFunctionDefinitions::GUIGetInputMode ( std::string& a_rstrResult )
+eInputMode CStaticFunctionDefinitions::GUIGetInputMode ( void )
 {
-    return m_pGUI->GetStringFromInputMode ( m_pGUI->GetGUIInputMode(), a_rstrResult );
+    return m_pGUI->GetGUIInputMode();
 }
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative )
@@ -4960,44 +4951,6 @@ void CStaticFunctionDefinitions::GUIWindowSetSizable ( CClientEntity& Entity, bo
         {
             // Set the windows sizability
             static_cast < CGUIWindow* > ( GUIElement.GetCGUIElement () ) -> SetSizingEnabled ( bFlag );
-        }
-    }
-}
-
-
-void CStaticFunctionDefinitions::GUIWindowSetCloseButtonEnabled ( CClientEntity& Entity, bool bFlag )
-{
-    RUN_CHILDREN GUIWindowSetCloseButtonEnabled ( **iter, bFlag );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a CGUI window?
-        if ( IS_CGUIELEMENT_WINDOW ( &GUIElement ) )
-        {
-            // Set the closebutton enabled
-            static_cast < CGUIWindow* > ( GUIElement.GetCGUIElement () ) -> SetCloseButtonEnabled ( bFlag );
-        }
-    }
-}
-
-
-void CStaticFunctionDefinitions::GUIWindowSetTitleBarEnabled ( CClientEntity& Entity, bool bFlag )
-{
-    RUN_CHILDREN GUIWindowSetTitleBarEnabled ( **iter, bFlag );
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        // Are we a CGUI window?
-        if ( IS_CGUIELEMENT_WINDOW ( &GUIElement ) )
-        {
-            // Set the titlebar enabled
-            static_cast < CGUIWindow* > ( GUIElement.GetCGUIElement () ) -> SetTitlebarEnabled ( bFlag );
         }
     }
 }

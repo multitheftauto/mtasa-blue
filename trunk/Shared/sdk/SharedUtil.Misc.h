@@ -1041,6 +1041,87 @@ namespace SharedUtil
     {
         return static_cast < T > ( ms_ucToupperTab [ static_cast < unsigned char > ( c ) ] );
     }
+
+
+    //
+    // enum reflection shenanigans
+    //
+    enum eDummy;
+
+    struct CEnumInfo
+    {
+        struct SEnumItem
+        {
+            int iValue;
+            const char* szName;
+        };
+
+        CEnumInfo( const SString& strTypeName, const SEnumItem* pItemList, uint uiAmount, eDummy defaultValue, const SString& strDefaultName )
+        {
+            m_strTypeName = strTypeName;
+            m_strDefaultName = strDefaultName;
+            m_DefaultValue = defaultValue;
+            for ( uint i = 0 ; i < uiAmount ; i++ )
+            {
+                const SEnumItem& item = pItemList[i];
+                m_ValueMap[ item.szName ] = (eDummy)item.iValue;
+                m_NameMap[ (eDummy)item.iValue ] = item.szName;
+            }
+        }
+
+        const SString& FindName ( eDummy value ) const
+        {
+            if ( const SString* pName = MapFind ( m_NameMap, value ) )
+                return *pName;
+            return m_strDefaultName;
+        }
+
+        bool FindValue ( const SString& strName, eDummy& outResult ) const
+        {
+            if ( const eDummy* pValue = MapFind ( m_ValueMap, strName ) )
+            {
+                outResult = *pValue;
+                return true;
+            }
+            outResult = m_DefaultValue;
+            return false;
+        }
+
+        const SString& GetTypeName( void ) const
+        {
+            return m_strTypeName;
+        }
+
+        SString m_strTypeName;
+        SString m_strDefaultName;
+        eDummy m_DefaultValue;
+        std::map < SString, eDummy > m_ValueMap;
+        std::map < eDummy, SString > m_NameMap;
+    };
+
+
+    #define DECLARE_ENUM( T ) \
+        CEnumInfo*             GetEnumInfo     ( T& ); \
+        inline const SString&  EnumToString    ( T& value )                             { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
+        inline bool            StringToEnum    ( const SString& strName, T& outResult ) { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
+        inline const SString&  GetEnumTypeName ( T& )                                   { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
+
+    #define IMPLEMENT_ENUM_BEGIN(cls) \
+        CEnumInfo* GetEnumInfo( cls& ) \
+        { \
+            static const CEnumInfo::SEnumItem items[] = {
+
+    #define IMPLEMENT_ENUM_END(name) \
+        IMPLEMENT_ENUM_END_DEFAULTS(name,0,"")
+
+    #define IMPLEMENT_ENUM_END_DEFAULTS(name,defvalue,defname) \
+                            }; \
+            static CEnumInfo info( name, items, NUMELMS(items),(eDummy)(defvalue),defname ); \
+            return &info; \
+        }
+
+    #define ADD_ENUM(value,name) {value, name},
+    #define ADD_ENUM1(value)     {value, #value},
 };
 
 using namespace SharedUtil;

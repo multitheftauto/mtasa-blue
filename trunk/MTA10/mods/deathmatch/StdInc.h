@@ -81,6 +81,8 @@
 #include <lua/CLuaCFunctions.h>
 #include <lua/CLuaArguments.h>
 #include <lua/CLuaMain.h>
+#include <lua/CLuaFunctionParseHelpers.h>
+#include <CScriptArgReader.h>
 #include <luadefs/CLuaDefs.h>
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaFxDefs.h>
