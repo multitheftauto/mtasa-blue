@@ -1589,6 +1589,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\CScriptArgReader.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\CSphere.h"
 					>
 				</File>

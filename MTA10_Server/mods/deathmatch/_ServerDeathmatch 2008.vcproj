@@ -1104,6 +1104,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\lua\CLuaFunctionParseHelpers.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\lua\CLuaFunctionRef.cpp"
 						>
 					</File>
@@ -2198,6 +2202,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\lua\CLuaFunctionDefinitions.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionParseHelpers.h"
 						>
 					</File>
 					<File

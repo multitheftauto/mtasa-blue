@@ -71,7 +71,6 @@ enum eInputMode
     INPUTMODE_ALLOW_BINDS = 0,
     INPUTMODE_NO_BINDS = 1,
     INPUTMODE_NO_BINDS_ON_EDIT = 2,
-    INPUTMODE_INVALID = 0xFF,
 };
 
 #define CHECK_CHANNEL(channel) assert ( channel >= 0 && channel < INPUT_CHANNEL_COUNT )
@@ -96,8 +95,6 @@ public:
     virtual bool                GetGUIInputEnabled      ( void ) = 0;
     virtual void                SetGUIInputMode         ( eInputMode a_eMode ) = 0;
     virtual eInputMode          GetGUIInputMode         ( void ) = 0;
-    virtual eInputMode          GetInputModeFromString  ( const std::string& a_rstrMode ) const = 0;
-    virtual bool                GetStringFromInputMode  ( eInputMode a_eMode, std::string& a_rstrResult ) const = 0;
 
     //
     virtual CGUIMessageBox*     CreateMessageBox        ( const char* szTitle, const char* szMessage, unsigned int uiFlags ) = 0;

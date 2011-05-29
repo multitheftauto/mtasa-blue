@@ -116,6 +116,8 @@
 // Lua includes
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include "CScriptArgReader.h"
 #include "lua/CLuaManager.h"
 #include "lua/CLuaTimerManager.h"
 #include "lua/CLuaTimer.h"

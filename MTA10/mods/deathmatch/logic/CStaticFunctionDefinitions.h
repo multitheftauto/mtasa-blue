@@ -308,8 +308,8 @@ public:
 
     // GUI funcs
     static bool                         GUIGetInputEnabled                  ( void );
-    static bool                         GUIGetInputMode                     ( std::string& a_rstrResult );
-    static bool                         GUISetInputMode                     ( const std::string& a_rstrInputMode );
+    static eInputMode                   GUIGetInputMode                     ( void );
+    static void                         GUISetInputMode                     ( eInputMode inputMode );
 
     static CClientGUIElement*           GUICreateWindow                     ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative );
     static CClientGUIElement*           GUICreateLabel                      ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
@@ -388,8 +388,6 @@ public:
 
     static void                         GUIWindowSetMovable                 ( CClientEntity& Element, bool bFlag );
     static void                         GUIWindowSetSizable                 ( CClientEntity& Element, bool bFlag );
-    static void                         GUIWindowSetCloseButtonEnabled      ( CClientEntity& Element, bool bFlag );
-    static void                         GUIWindowSetTitleBarEnabled         ( CClientEntity& Element, bool bFlag );
 
     static void                         GUILabelSetColor                    ( CClientEntity& Element, int iR, int iG, int iB );
     static void                         GUILabelSetVerticalAlign            ( CClientEntity& Element, CGUIVerticalAlign eAlign );

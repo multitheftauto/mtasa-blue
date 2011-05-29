@@ -312,52 +312,6 @@ eInputMode CGUI_Impl::GetGUIInputMode( void )
     return m_eInputMode;
 }
 
-eInputMode CGUI_Impl::GetInputModeFromString ( const std::string& a_rstrMode ) const
-{
-    const char* szMode = a_rstrMode.c_str();
-    if ( stricmp(szMode, "allow_binds") == 0 )
-    {
-        return INPUTMODE_ALLOW_BINDS;
-    }
-    else if ( stricmp(szMode, "no_binds") == 0 )
-    {
-        return INPUTMODE_NO_BINDS;
-    }
-    else if ( stricmp(szMode, "no_binds_when_editing") == 0 )
-    {
-        return INPUTMODE_NO_BINDS_ON_EDIT;
-    }
-    else
-    {
-        return INPUTMODE_INVALID;
-    }
-}
-
- 
-bool CGUI_Impl::GetStringFromInputMode ( eInputMode a_eMode, std::string& a_rstrResult ) const
-{
-    switch (a_eMode)
-    {
-    case INPUTMODE_ALLOW_BINDS:
-        {
-            a_rstrResult = "allow_binds";
-            return true;
-        }
-    case INPUTMODE_NO_BINDS:            
-        {
-            a_rstrResult = "no_binds";
-            return true;
-        }
-    case INPUTMODE_NO_BINDS_ON_EDIT:    
-        {
-            a_rstrResult = "no_binds_when_editing";
-            return true;
-        }
-    default:                           
-        return false;
-    }
-}
-
 CEGUI::String CGUI_Impl::GetUTFString ( const std::string strInput )
 {
     std::wstring strUTF = MbUTF8ToUTF16(strInput); //Convert to a typical wide string
