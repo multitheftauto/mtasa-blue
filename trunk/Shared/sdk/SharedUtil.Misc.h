@@ -12,6 +12,8 @@
 *****************************************************************************/
 
 
+#include <cmath>
+
 namespace SharedUtil
 {
     class CArgMap;
@@ -169,7 +171,7 @@ namespace SharedUtil
     template < class T >
     int Round ( T value )
     {
-        return static_cast < int > ( floor ( value + 0.5f ) );
+        return static_cast < int > ( std::floor ( value + 0.5f ) );
     }
 
 
