@@ -184,6 +184,9 @@ namespace SharedUtil
     // std:: container helpers
     //
 
+    template < class TL, class T >
+    bool ListContains ( const TL& itemList, const T& item );
+
     // Add item if it does not aleady exist in itemList
     template < class TL, class T >
     void ListAddUnique ( TL& itemList, const T& item )
