@@ -1959,7 +1959,8 @@ void CClientVehicle::StreamedInPulse ( void )
             {
                 // Force the position to the last remembered matrix (..and make sure gravity doesn't pull it down)
                 m_pVehicle->SetMatrix ( &m_matFrozen );
-                m_pVehicle->SetMoveSpeed ( &CVector ( 0.0f, 0.0f, 0.0f ) );
+                CVector vec(0.0f, 0.0f, 0.0f);
+                m_pVehicle->SetMoveSpeed ( &vec );
 
                 // Added by ChrML 27. Nov: Shouldn't cause any problems
                 m_pVehicle->SetUsesCollision ( false );
