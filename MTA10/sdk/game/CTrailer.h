@@ -16,6 +16,7 @@
 
 class CTrailer : public virtual CVehicle
 {
+public:
     virtual                 ~CTrailer ( void ) {};
 };
 
