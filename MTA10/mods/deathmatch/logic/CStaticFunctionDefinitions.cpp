@@ -6336,7 +6336,7 @@ eHandlingProperty CStaticFunctionDefinitions::GetVehicleHandlingEnum ( std::stri
     {
         return eProperty;
     }
-    return eHandlingProperty::HANDLING_MAX;
+    return HANDLING_MAX;
 }
 
 bool CStaticFunctionDefinitions::GetVehicleHandling ( CClientVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue )
