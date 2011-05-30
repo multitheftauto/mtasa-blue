@@ -322,7 +322,8 @@ void CNetAPI::DoPulse ( void )
                 if ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 )
                 {
                     // Disable our controls (swap with a blank controller state)
-                    g_pCore->GetGame ()->GetPad ()->SetCurrentControllerState ( &CControllerState () );
+                    CControllerState state;
+                    g_pCore->GetGame ()->GetPad ()->SetCurrentControllerState ( &state );
 
                     // Grab our vehicle
                     CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();

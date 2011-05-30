@@ -311,7 +311,8 @@ void CGraphics::Render3DSprite ( float fX, float fY, float fZ, float fScale, uns
     BeginSingleDrawing ();
 
     // Render it
-    m_pGUI->GetRenderingLibrary ()->Render3DSprite ( NULL, 1.0f, &D3DXVECTOR3 ( fX, fY, fZ ), &ViewMatrix, ulColor );
+    D3DXVECTOR3 vec(fX, fY, fZ);
+    m_pGUI->GetRenderingLibrary ()->Render3DSprite ( NULL, 1.0f, &vec, &ViewMatrix, ulColor );
 
     // End drawing
     EndSingleDrawing ();
