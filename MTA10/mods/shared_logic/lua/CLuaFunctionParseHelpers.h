@@ -10,6 +10,8 @@
 *****************************************************************************/
 
 // Forward declare enum reflection stuff
+#include <gui/CGUI.h>
+enum eLuaType { };
 DECLARE_ENUM( enum eLuaType );
 DECLARE_ENUM( enum CGUIVerticalAlign );
 DECLARE_ENUM( enum CGUIHorizontalAlign );

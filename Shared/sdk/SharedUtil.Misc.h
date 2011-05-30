@@ -1046,7 +1046,7 @@ namespace SharedUtil
     //
     // enum reflection shenanigans
     //
-    enum eDummy;
+    enum eDummy { };
 
     struct CEnumInfo
     {
