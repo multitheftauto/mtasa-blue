@@ -29,7 +29,7 @@ CZoneNames::~CZoneNames ( void )
 }
 
 
-void CZoneNames::AddZone ( const char* szName, CVector& vecBottomLeft, CVector& vecTopRight )
+void CZoneNames::AddZone ( const char* szName, const CVector& vecBottomLeft, const CVector& vecTopRight )
 {
     SZone* pZone = new SZone;
     strncpy ( pZone->szName, szName, MAX_ZONE_NAME );
@@ -40,7 +40,7 @@ void CZoneNames::AddZone ( const char* szName, CVector& vecBottomLeft, CVector& 
 }
 
 
-SZone* CZoneNames::GetZone ( CVector& vecPosition )
+SZone* CZoneNames::GetZone ( const CVector& vecPosition )
 {
     SZone* pSmallestZone = NULL;
     float fSmallestZoneSize = 0.0f;
@@ -76,7 +76,7 @@ SZone* CZoneNames::GetZone ( CVector& vecPosition )
 }
 
 
-const char* CZoneNames::GetZoneName ( CVector& vecPosition )
+const char* CZoneNames::GetZoneName ( const CVector& vecPosition )
 {
     SZone* pZone = GetZone ( vecPosition );
     if ( pZone )
@@ -87,7 +87,7 @@ const char* CZoneNames::GetZoneName ( CVector& vecPosition )
 }
 
 
-void CZoneNames::AddCity ( const char* szName, CVector& vecBottomLeft, CVector& vecTopRight )
+void CZoneNames::AddCity ( const char* szName, const CVector& vecBottomLeft, const CVector& vecTopRight )
 {
     SZone* pZone = new SZone;
     strncpy ( pZone->szName, szName, MAX_ZONE_NAME );
@@ -98,7 +98,7 @@ void CZoneNames::AddCity ( const char* szName, CVector& vecBottomLeft, CVector& 
 }
 
 
-SZone* CZoneNames::GetCity ( CVector& vecPosition )
+SZone* CZoneNames::GetCity ( const CVector& vecPosition )
 {
     SZone* pSmallestZone = NULL;
     float fSmallestZoneSize = 0.0f;
@@ -133,7 +133,7 @@ SZone* CZoneNames::GetCity ( CVector& vecPosition )
 }
 
 
-const char* CZoneNames::GetCityName ( CVector& vecPosition )
+const char* CZoneNames::GetCityName ( const CVector& vecPosition )
 {
     SZone* pZone = GetCity ( vecPosition );
     if ( pZone )
