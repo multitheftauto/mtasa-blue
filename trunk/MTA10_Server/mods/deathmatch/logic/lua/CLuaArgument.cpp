@@ -84,18 +84,6 @@ CLuaArgument::CLuaArgument ( lua_State* luaVM, int iArgument, std::map < const v
     // Read the argument out of the lua VM
     m_pTableData = NULL;
     Read ( luaVM, iArgument, pKnownTables );
-
-    // Store debug data for later retrieval
-    m_iLine = 0;
-    m_strFilename = "";
-    lua_Debug debugInfo;
-    if ( lua_getstack ( luaVM, 1, &debugInfo ) )
-    {
-        lua_getinfo ( luaVM, "nlS", &debugInfo );
-
-        m_strFilename = debugInfo.source;
-        m_iLine = debugInfo.currentline;
-    }
 }
 
 

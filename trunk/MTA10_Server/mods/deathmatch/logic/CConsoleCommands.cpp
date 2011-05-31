@@ -19,7 +19,7 @@
 
 extern CGame* g_pGame;
 
-// Helper function
+// Helper functions
 static string GetAdminNameForLog ( CClient* pClient )
 {
     string strName = pClient->GetNick ();
@@ -29,8 +29,35 @@ static string GetAdminNameForLog ( CClient* pClient )
     return SString ( "%s(%s)", strName.c_str (), strAccountName.c_str () );
 }
 
+static void BeginConsoleOutputCapture ( CClient* pClient )
+{
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        CLogger::BeginConsoleOutputCapture ();
+}
+
+static void EndConsoleOutputCapture ( CClient* pClient, const SString& strIfNoOutput = "" )
+{
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+    {
+        std::vector < SString > lines;
+        CLogger::EndConsoleOutputCapture ().Split ( "\n", lines );
+
+        if ( lines.empty () )
+            lines.push_back ( strIfNoOutput );
+
+        for ( uint i = 0 ; i < lines.size () ; i++ )
+            if ( lines[i].length () )
+                pClient->SendConsole ( lines[i] );
+    }
+}
+
+
 bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CClient* pClient, CClient* pEchoClient )
 {
+    // To work on remote clients, 'update' needs ACL entry
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        return false;
+
     char szBuffer[256];
     szBuffer[0] = '\0';
     if ( szarguments )
@@ -183,8 +210,7 @@ bool CConsoleCommands::Update ( CConsole* pConsole, const char* szarguments, CCl
 
 bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    char szResponse [ 256 ];
-    szResponse[0] = '\0';
+    SString strResponse;
 
     if ( szArguments && szArguments[0] )
     {
@@ -200,27 +226,26 @@ bool CConsoleCommands::StartResource ( CConsole* pConsole, const char* szArgumen
                 {
                     if ( g_pGame->GetResourceManager()->StartResource ( resource, NULL, true ) )
                     {
-                        snprintf ( szResponse, 256, "start: Resource '%s' started", szArguments );
+                        strResponse = SString ( "start: Resource '%s' started", szArguments );
                     }
                     else
                     {
-                        snprintf ( szResponse, 256, "start: Resource '%s' start was requested", szArguments );
+                        strResponse = SString ( "start: Resource '%s' start was requested", szArguments );
                     }
                 }
                 else
-                    snprintf ( szResponse, 256, "start: Resource is already running" );
+                    strResponse = "start: Resource is already running";
             }
             else
-                snprintf ( szResponse, 256, "start: Resource is loaded, but has errors" );
+                strResponse = SString ( "start: Resource is loaded, but has errors (%s)", resource->GetFailureReason ().c_str () );
         }
         else
-            snprintf ( szResponse, 256, "start: Resource could not be found" );
+            strResponse = "start: Resource could not be found";
     }
     else
-        snprintf ( szResponse, 256, "* Syntax: start <resource-name>" );
+        strResponse = "* Syntax: start <resource-name>";
 
-    szResponse[255] = '\0';
-    pEchoClient->SendConsole ( szResponse );
+    pEchoClient->SendConsole ( strResponse );
     return true;
 }
 
@@ -254,7 +279,7 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
                     pEchoClient->SendConsole ( "restart: Resource is not running" );
             }
             else
-                pEchoClient->SendConsole ( "restart: Resource is loaded, but has errors" );
+                pEchoClient->SendConsole ( SString ( "restart: Resource is loaded, but has errors (%s)", resource->GetFailureReason ().c_str () ) );
         }
         else
             pEchoClient->SendConsole ( "restart: Resource could not be found" );
@@ -267,24 +292,36 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
 
 bool CConsoleCommands::RefreshResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    g_pGame->GetResourceManager()->Refresh();
+    BeginConsoleOutputCapture ( pEchoClient );
+    g_pGame->GetResourceManager ()->Refresh ( false );
+    EndConsoleOutputCapture ( pEchoClient, "refresh completed" );
     return true;
 }
 
 bool CConsoleCommands::RefreshAllResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    g_pGame->GetResourceManager()->Refresh(true);
+    BeginConsoleOutputCapture ( pEchoClient );
+    g_pGame->GetResourceManager ()->Refresh ( true );
+    EndConsoleOutputCapture ( pEchoClient, "refreshall completed" );
     return true;
 }
 
 bool CConsoleCommands::ListResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
+    // To work on remote clients, 'list' needs ACL entry + console capture
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        return false;
+
     g_pGame->GetResourceManager()->ListResourcesLoaded();
     return true;
 }
 
 bool CConsoleCommands::ResourceInfo ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
+    // To work on remote clients, 'info' needs ACL entry + console capture
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
+        return false;
+
     if ( szArguments && szArguments[0] )
     {
         CResource * resource = g_pGame->GetResourceManager()->GetResource ( (char *)szArguments );
@@ -329,7 +366,7 @@ bool CConsoleCommands::StopResource ( CConsole* pConsole, const char* szArgument
                     pEchoClient->SendConsole ( "stop: Resource is not running" );
             }
             else
-                pEchoClient->SendConsole( "stop: Resource is loaded, but has errors" );
+                pEchoClient->SendConsole ( SString ( "stop: Resource is loaded, but has errors (%s)", resource->GetFailureReason ().c_str () ) );
         }
         else
             pEchoClient->SendConsole ( "stop: Resource could not be found" );
