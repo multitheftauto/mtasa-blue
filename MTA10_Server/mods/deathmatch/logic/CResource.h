@@ -173,10 +173,11 @@ private:
     bool                    m_bHandlingHTTPRequest;
     bool                    m_bResourceIsZip;
     std::string             m_strResourceName;
-    std::string             m_strResourceZip; // stores the path to /mods/deathmatch/resources/resource_name.zip
-    std::string             m_strResourceDirectoryPath; // stores the path to /mods/deathmatch/resources/resource_name
-    std::string             m_strResourceCachePath; // stores the path to /mods/deathmatch/resources/cache/resource_name
-    
+    SString                 m_strAbsPath;               // Absolute path to containing directory        i.e. /server/mods/deathmatch/resources
+    std::string             m_strResourceZip;           // Absolute path to zip file (if a zip)         i.e. m_strAbsPath/resource_name.zip
+    std::string             m_strResourceDirectoryPath; // Absolute path to resource files (if a dir)   i.e. m_strAbsPath/resource_name
+    std::string             m_strResourceCachePath;     // Absolute path to unzipped cache (if a zip)   i.e. /server/mods/deathmatch/resources/cache/resource_name 
+
     unsigned int            m_uiVersionMajor;
     unsigned int            m_uiVersionMinor;
     unsigned int            m_uiVersionRevision;
@@ -207,7 +208,7 @@ private:
     bool                    m_bIsPersistent; // if true, the resource will remain even if it has no Dependents, mainly if started by the user or the startup
     bool                    m_bLinked; // if true, the included resources are already linked to this resource
     unzFile                 m_zipfile;
-    std::string             m_strFailureReason;
+    SString                 m_strFailureReason;
 
     bool                    m_bClientConfigs;
     bool                    m_bClientScripts;
@@ -256,7 +257,7 @@ private:
         pthread_mutex_unlock ( &m_mutex );
     }
 public:
-                            CResource ( CResourceManager * resourceManager, const char * szResourceName, bool bLoad = true );
+                            CResource ( CResourceManager * resourceManager, bool bIsZipped, const char * szAbsPath, const char * szResourceName );
                             ~CResource ( );
 
     /* Load this resource if it's not already loaded. It needs to be loaded before it can be started. */ 
@@ -377,7 +378,6 @@ public:
     inline list < CExportedFunction* >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }
 
     static list < CResource* > m_StartedResources;
-
 
 };
 

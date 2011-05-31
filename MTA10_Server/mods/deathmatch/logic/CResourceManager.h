@@ -63,7 +63,7 @@ public:
                                 CResourceManager                ( void );
                                 ~CResourceManager               ( void );
 
-    CResource *                 Load                            ( const char * szResourceName );
+    CResource *                 Load                            ( bool bIsZipped, const char * szAbsPath, const char * szResourceName );
     void                        Unload                          ( CResource * resource );
     CResource *                 GetResource                     ( const char * szResourceName );
     bool                        Exists                          ( CResource* pResource );

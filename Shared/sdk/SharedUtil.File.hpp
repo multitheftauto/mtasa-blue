@@ -433,9 +433,13 @@ SString SharedUtil::GetWindowsDirectory ( void )
 // Find all files or directories at a path
 //
 ///////////////////////////////////////////////////////////////
-std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bFiles, bool bDirectories )
+std::vector < SString > SharedUtil::FindFiles ( const SString& strInMatch, bool bFiles, bool bDirectories )
 {
     std::vector < SString > strResult;
+
+    SString strMatch = PathConform ( strInMatch );
+    if ( strMatch.Right ( 1 ) == PATH_SEPERATOR )
+        strMatch += "*";
 
     WIN32_FIND_DATA findData;
     HANDLE hFind = FindFirstFile ( strMatch, &findData );
@@ -452,7 +456,42 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
     }
     return strResult;
 }
+
+#else
+
+std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bFiles, bool bDirectories )
+{
+    std::vector < SString > strResult;
+
+    DIR *Dir;
+    struct dirent *DirEntry;
+
+    if ( ( Dir = opendir ( strMatch ) ) )
+    {
+        while ( ( DirEntry = readdir ( Dir ) ) != NULL )
+        {
+            // Skip dotted entries
+            if ( strcmp ( DirEntry->d_name, "." ) && strcmp ( DirEntry->d_name, ".." ) )
+            {
+                struct stat Info;
+                bool bIsDir = false;
+
+                SString strPath = PathJoin ( strMatch, DirEntry->d_name );
+
+                // Determine the file stats
+                if ( lstat ( strPath, &Info ) != -1 )
+                    bIsDir = S_ISDIR ( Info.st_mode );
+                else
+                    CLogger::ErrorPrintf ( "Unable to stat %s\n", *strPath );
+
+                if ( bIsDir ? bDirectories : bFiles )
+                    strResult.push_back ( DirEntry->d_name );
+            }
+        }
+    }
+}
 #endif
+
 
 void SharedUtil::ExtractFilename ( const SString& strPathFilename, SString* strPath, SString* strFilename )
 {
