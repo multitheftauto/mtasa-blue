@@ -142,8 +142,8 @@ bool CResource::Load ( void )
         snprintf ( szBuffer, MAX_PATH - 1, "%s/resources/%s.zip", szServerModPath, m_strResourceName.c_str () );
         m_strResourceZip = szBuffer;
 
-        // Check for our resource directory
-        if ( DoesDirectoryExist ( m_strResourceDirectoryPath.c_str () ) )
+        // Resource is not zipped if:  Zip file does not exist OR dir/meta.xml does exist
+        if ( !FileExists ( m_strResourceZip ) || DirectoryExists ( PathJoin ( m_strResourceDirectoryPath, "meta.xml" ) ) )
         {
             m_bResourceIsZip = false;
         }
@@ -1259,6 +1259,10 @@ bool CResource::GetFilePath ( const char * szFilename, string& strPath )
 #endif
         return true;
     }
+
+    // Don't check zip file if resource was not identified as zipped
+    if ( !IsResourceZip () )
+        return false;
 
     if ( !m_zipfile )
         m_zipfile = unzOpen(m_strResourceZip.c_str ());
