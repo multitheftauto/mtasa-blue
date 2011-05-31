@@ -143,7 +143,7 @@ bool CResource::Load ( void )
         m_strResourceZip = szBuffer;
 
         // Resource is not zipped if:  Zip file does not exist OR dir/meta.xml does exist
-        if ( !FileExists ( m_strResourceZip ) || DirectoryExists ( PathJoin ( m_strResourceDirectoryPath, "meta.xml" ) ) )
+        if ( !FileExists ( m_strResourceZip ) || FileExists ( PathJoin ( m_strResourceDirectoryPath, "meta.xml" ) ) )
         {
             m_bResourceIsZip = false;
         }
