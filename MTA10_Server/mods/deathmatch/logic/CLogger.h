@@ -47,6 +47,9 @@ public:
     static void         ProgressDotsUpdate  ( void );
     static void         ProgressDotsEnd     ( void );
 
+    static void         BeginConsoleOutputCapture  ( void );
+    static SString      EndConsoleOutputCapture    ( void );
+
 private:
     static void         HandleLogPrint     ( bool bTimeStamp, const char* szPrePend, const char* szMessage, bool bToConsole, bool bToLogFile, bool bToAuthFile, eLogLevel logLevel = LOGLEVEL_MEDIUM );
 
@@ -54,7 +57,9 @@ private:
     static FILE*        m_pAuthFile;
     static eLogLevel    m_MinLogLevel;
     static bool         m_bPrintingDots;
-
+    static SString      m_strCaptureBuffer;
+    static bool         m_bCaptureConsole;
+    static CCriticalSection m_CaptureBufferMutex;
 };
 
 #endif

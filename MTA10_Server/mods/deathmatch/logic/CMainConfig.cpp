@@ -474,7 +474,7 @@ bool CMainConfig::LoadExtended ( void )
     CLogger::SetMinLogLevel ( LOGLEVEL_LOW );
 
     // Register the commands
-    RegisterCommand ( "update", CConsoleCommands::Update, false );
+    RegisterCommand ( "update", CConsoleCommands::Update, false );          // Nearly working - Part of (unmaintained) resource download system
     RegisterCommand ( "start", CConsoleCommands::StartResource, false );
     RegisterCommand ( "stop", CConsoleCommands::StopResource, false );
     RegisterCommand ( "stopall", CConsoleCommands::StopAllResources, false );
@@ -488,9 +488,9 @@ bool CMainConfig::LoadExtended ( void )
 
     RegisterCommand ( "say", CConsoleCommands::Say, false );
     RegisterCommand ( "teamsay", CConsoleCommands::TeamSay, false );
-    RegisterCommand ( "asay", CConsoleCommands::ASay, false );
+    //RegisterCommand ( "asay", CConsoleCommands::ASay, false );    // Not working
     RegisterCommand ( "msg", CConsoleCommands::Msg, false );
-    RegisterCommand ( "amsg", CConsoleCommands::AMsg, false );
+    //RegisterCommand ( "amsg", CConsoleCommands::AMsg, false );    // Not working
     RegisterCommand ( "me", CConsoleCommands::Me, false );
     RegisterCommand ( "nick", CConsoleCommands::Nick, false );
 
@@ -510,7 +510,7 @@ bool CMainConfig::LoadExtended ( void )
 
     RegisterCommand ( "debugscript", CConsoleCommands::DebugScript, false );
 
-    RegisterCommand ( "sudo", CConsoleCommands::Sudo, false );
+    //RegisterCommand ( "sudo", CConsoleCommands::Sudo, false );    // Not working
 
     RegisterCommand ( "help", CConsoleCommands::Help, false );
 
