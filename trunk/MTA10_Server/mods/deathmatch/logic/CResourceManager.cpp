@@ -57,180 +57,156 @@ CResourceManager::~CResourceManager ( void )
 // Talidan: yes it did, noob.  Not as of r897 - use bRefreshAll to do already loaded resources.
 bool CResourceManager::Refresh ( bool bRefreshAll )
 {
-
-    unsigned int uiCount = 0;
-
     UnloadRemovedResources();
 
-    #ifdef WIN32
+    // Make list of potential active resources
+    struct SResInfo
+    {
+        SString strAbsPath;
+        SString strName;
+        bool bIsDir;
+        bool bPathIssue;
+    };
+    std::map < SString, SResInfo > resInfoMap;
 
-        // Find all the resources
-        WIN32_FIND_DATA FindData;
-        HANDLE hFind = FindFirstFile ( g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/*" ), &FindData );
-        if ( hFind != INVALID_HANDLE_VALUE )
+    // Initial search dir
+    std::vector < SString > resourcesPathList;
+    resourcesPathList.push_back ( "resources" );
+
+    SString strModPath = g_pServerInterface->GetModManager ()->GetModPath ();
+    for ( uint i = 0 ; i < resourcesPathList.size () ; i++ )
+    {
+        // Enumerate all files and directories
+        SString strResourcesRelPath = resourcesPathList[i];
+        SString strResourcesAbsPath = PathJoin ( strModPath, strResourcesRelPath, "/" );
+        std::vector < SString > itemList = FindFiles ( strResourcesAbsPath, true, true );
+
+        // Check each item
+        for ( uint i = 0 ; i < itemList.size () ; i++ )
         {
-            // Add each resource
-            do
+            SString strName = itemList[i];
+
+            // Ignore items that start with a dot
+            if ( strName[0] == '.' )
+                continue;
+
+            bool bIsDir = DirectoryExists ( PathJoin ( strResourcesAbsPath, strName ) );
+
+            // Recurse into directories that start with #
+            if ( bIsDir && strName.BeginsWith( "#" ) )
             {
-                // Skip dotted entries
-                if ( FindData.cFileName[0] != '.' )
+                resourcesPathList.push_back ( PathJoin ( strResourcesRelPath, strName ) );
+                continue;
+            }
+
+            // Extract file extention
+            SString strExt;
+            if ( !bIsDir )
+                ExtractExtention ( strName, &strName, &strExt );
+
+            // Ignore files that are not .zip
+            if ( !bIsDir && strExt != "zip" )
+                continue;
+
+            // Ignore items that have dot or space in the name
+            if ( strName.Contains ( "." ) || strName.Contains ( " " ) )
+            {
+                CLogger::LogPrintf ( "WARNING: Not loading resource '%s' as it contains illegal characters\n", *strName );
+                continue;
+            }
+
+            // Ignore dir items with no meta.xml (assume it's the result of saved files from a zipped resource)
+            if ( bIsDir && !FileExists ( PathJoin ( strResourcesAbsPath, strName, "meta.xml" ) ) )
+                continue;
+
+            // Add potential resource to list
+            SResInfo newInfo;
+            newInfo.strAbsPath = strResourcesAbsPath;
+            newInfo.strName = strName;
+            newInfo.bIsDir = bIsDir;
+            newInfo.bPathIssue = false;
+
+            // Check for duplicate
+            if ( SResInfo* pDup = MapFind ( resInfoMap, strName ) )
+            {
+                // Is path the same?
+                if ( newInfo.strAbsPath == pDup->strAbsPath )
                 {
-                    char * extn = NULL;
-                    if ( ( FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) != FILE_ATTRIBUTE_DIRECTORY )
+                    if ( newInfo.bIsDir )
                     {
-                        if ( strlen ( FindData.cFileName ) > 3 )
-                        {
-                            extn = &FindData.cFileName [ strlen ( FindData.cFileName ) - 3 ];
-                            FindData.cFileName [ strlen ( FindData.cFileName ) - 4 ] = 0;
-                        }
-                    }
-
-                    CResource* pResource = GetResource ( FindData.cFileName );
-
-                    if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-                         ( bRefreshAll ||
-                           !pResource ||
-                           !pResource->CheckIfStartable()
-                          )
-                        )
-                    {
-                        if ( !strchr ( FindData.cFileName, '.' ) )
-                        {
-                            // Add the resource
-                            Load ( FindData.cFileName );
-
-                            // Increment the counter
-                            uiCount++;
-                        }
-                        else
-                        {
-                            CLogger::LogPrintf ( "WARNING: Not loading resource %s as it has dots in the name\n", FindData.cFileName );
-                        }
+                        // If non-zipped item, replace already existing zipped item on the same path
+                        assert ( !pDup->bIsDir );
+                        *pDup = newInfo;
                     }
                 }
-            } while ( FindNextFile ( hFind, &FindData ) );
-
-            // Close the search
-            FindClose ( hFind );
-
-            CheckResourceDependencies();
-
-            if ( m_bResourceListChanged )
-            {
-                m_bResourceListChanged = false;
-                CLogger::LogPrintf ( "Resources: %d loaded, %d failed\n", m_uiResourceLoadedCount, m_uiResourceFailedCount );
-            }
-
-            list < CResource* > ::iterator iter = m_resourcesToStartAfterRefresh.begin ();
-            for ( ; iter != m_resourcesToStartAfterRefresh.end (); iter++ )
-            {
-                (*iter)->Start();
-            }
-            m_resourcesToStartAfterRefresh.clear();
-
-            s_bNotFirstTime = true;
-
-            return true;
-        }
-    #else
-        DIR *Dir;
-        struct dirent *DirEntry;
-        char szPath[MAX_PATH] = {0};
-
-        SString strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "resources/" );
-
-        if ( ( Dir = opendir ( strBuffer ) ) )
-        {
-            while ( ( DirEntry = readdir ( Dir ) ) != NULL )
-            {
-                // Skip dotted entries
-                if ( DirEntry->d_name[0] != '.' )
+                else
                 {
-                    struct stat Info;
-                    bool bDir = false;
-
-                    // Get the path
-                    if ( strlen(strBuffer) + strlen(DirEntry->d_name) < MAX_PATH )
-                    {
-                        strcpy ( szPath, strBuffer );
-                        unsigned long ulPathLength = strlen ( szPath );
-
-                        if ( szPath [ ulPathLength-1 ] != '/') strcat ( szPath, "/" );
-
-                        strcat ( szPath, DirEntry->d_name );
-
-                        // Determine the file stats
-                        if ( lstat ( szPath, &Info ) != -1 )
-                            bDir = S_ISDIR ( Info.st_mode );
-                        else
-                            CLogger::ErrorPrintf ( "Unable to stat %s\n", szPath );
-
-                        // Chop off the extension if it's not a dir
-                        char * extn = NULL;
-                        if ( !bDir )
-                        {
-                            if ( strlen ( DirEntry->d_name ) > 3 )
-                            {
-                                extn = &(DirEntry->d_name [ strlen ( DirEntry->d_name ) - 3 ]);
-                                DirEntry->d_name [ strlen ( DirEntry->d_name ) - 4 ] = 0;
-                            }
-                        }
-
-                        CResource* pResource = GetResource ( DirEntry->d_name );
-
-                        if ( ( extn == NULL || strcmp ( extn, "zip" ) == 0 ) &&
-                             ( bRefreshAll ||
-                               !pResource ||
-                               !pResource->CheckIfStartable()
-                              )
-                            )
-                        {
-                            if ( !strchr ( DirEntry->d_name, '.' ) )
-                            {
-                                // Add the resource
-                                Load ( DirEntry->d_name );
-
-                                // Increment the counter
-                                uiCount++;
-                            }
-                            else
-                            {
-                                CLogger::LogPrintf ( "WARNING: Not loading resource %s as it has dots in the name\n", DirEntry->d_name );
-                            }
-                        }
-
-                    }
+                    // Don't load resource if there are duplicates on different paths
+                    pDup->bPathIssue = true;
                 }
-
-
             }
-
-            CheckResourceDependencies();
-
-            if ( m_bResourceListChanged )
+            else
             {
-                m_bResourceListChanged = false;
-                CLogger::LogPrintf ( "Resources: %d loaded, %d failed\n", m_uiResourceLoadedCount, m_uiResourceFailedCount );
+                // No duplicate found
+                MapSet ( resInfoMap, strName, newInfo );
             }
-
-            list < CResource* > ::iterator iter = m_resourcesToStartAfterRefresh.begin ();
-            for ( ; iter != m_resourcesToStartAfterRefresh.end (); iter++ )
-            {
-                (*iter)->Start();
-            }
-            m_resourcesToStartAfterRefresh.clear();
-
-            s_bNotFirstTime = true;
-
-            // Close the directory handle
-            closedir ( Dir );
-
-            return true;
         }
-    #endif
+    }
 
-    // The list hasn't changed
-    return false;
+    // Process potential resource list
+    for ( std::map < SString, SResInfo >::const_iterator iter = resInfoMap.begin () ; iter != resInfoMap.end () ; ++iter )
+    {
+        const SResInfo& info = iter->second;
+        if ( !info.bPathIssue )
+        {
+            CResource* pResource = GetResource ( info.strName );
+
+            if ( bRefreshAll || !pResource || !pResource->CheckIfStartable() )
+            {
+                // Add the resource
+                Load ( !info.bIsDir, info.strAbsPath, info.strName );
+            }
+        }
+    }
+
+
+    CheckResourceDependencies();
+
+    // Print important errors
+    for ( std::map < SString, SResInfo >::const_iterator iter = resInfoMap.begin () ; iter != resInfoMap.end () ; ++iter )
+    {
+        const SResInfo& info = iter->second;
+        if ( info.bPathIssue )
+        {
+            CLogger::ErrorPrintf ( "Not processing resource '%s' as it has duplicates on different paths\n", *info.strName );
+        }
+        else
+        {
+            CResource* pResource = GetResource ( info.strName );
+            if ( pResource && !pResource->CheckIfStartable() )
+            {
+                CLogger::ErrorPrintf ( "Problem with resource: %s; %s\n", *info.strName, pResource->GetFailureReason ().c_str () ); 
+            }
+        }
+    }
+
+
+    if ( m_bResourceListChanged )
+    {
+        m_bResourceListChanged = false;
+        CLogger::LogPrintf ( "Resources: %d loaded, %d failed\n", m_uiResourceLoadedCount, m_uiResourceFailedCount );
+    }
+
+    list < CResource* > ::iterator iter = m_resourcesToStartAfterRefresh.begin ();
+    for ( ; iter != m_resourcesToStartAfterRefresh.end (); iter++ )
+    {
+        (*iter)->Start();
+    }
+    m_resourcesToStartAfterRefresh.clear();
+
+    s_bNotFirstTime = true;
+
+    return true;
 }
 
 void CResourceManager::Upgrade ( void )
@@ -337,7 +313,7 @@ void CResourceManager::Unload ( CResource * resource )
     delete resource;
 }
 
-CResource * CResourceManager::Load ( const char * szResourceName )
+CResource * CResourceManager::Load ( bool bIsZipped, const char * szAbsPath, const char * szResourceName )
 {
     CResource * loadedResource = NULL;
     bool bStartAfterLoading = false;
@@ -386,7 +362,7 @@ CResource * CResourceManager::Load ( const char * szResourceName )
         m_bResourceListChanged = true;
     }
 
-    loadedResource = new CResource ( this, szResourceName );
+    loadedResource = new CResource ( this, bIsZipped, szAbsPath, szResourceName );
     if ( !loadedResource->IsLoaded() )
     {
         CLogger::LogPrintf("Loading of resource '%s' failed\n", szResourceName );
@@ -833,17 +809,16 @@ CResource* CResourceManager::CreateResource ( char* szResourceName )
         return NULL;
 
     // Make a string with the full path to the resource directory
-    char szResourceDirectoryPath [ MAX_PATH + 1 ];
-    snprintf ( szResourceDirectoryPath, MAX_PATH, "%s/resources/%s/", g_pServerInterface->GetServerModPath (), szResourceName );
+    SString strAbsPath = PathJoin ( g_pServerInterface->GetServerModPath (), "resources" );
+    SString strResourceDirectoryPath = PathJoin ( strAbsPath, szResourceName );
 
     // Create that folder. Return if we failed
-    if ( mymkdir ( szResourceDirectoryPath ) != 0 )
+    if ( mymkdir ( strResourceDirectoryPath ) != 0 )
         return NULL;
 
     // Create an empty meta file for that resource
-    char szMetaPath [MAX_PATH + 1];
-    snprintf ( szMetaPath, MAX_PATH, "%s%s", szResourceDirectoryPath, "meta.xml" );
-    CXMLFile* pXML = g_pServerInterface->GetXML ()->CreateXML ( szMetaPath );
+    SString strMetaPath = PathJoin ( strResourceDirectoryPath, "meta.xml" );
+    CXMLFile* pXML = g_pServerInterface->GetXML ()->CreateXML ( strMetaPath );
     if ( pXML )
     {
         // If we got the rootnode created, write the XML
@@ -860,7 +835,7 @@ CResource* CResourceManager::CreateResource ( char* szResourceName )
     }
 
     // Add the resource and load it
-    CResource* pResource = new CResource ( this, szResourceName, true );
+    CResource* pResource = new CResource ( this, false, strAbsPath, szResourceName );
     if ( pResource )
     {
         AddResourceToLists ( pResource );
