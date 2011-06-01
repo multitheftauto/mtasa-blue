@@ -487,6 +487,13 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         }
     }
 
+    // Setup server id
+    if ( !g_pNetServer->InitServerId ( m_pMainConfig->GetIdFile () ) )
+    {
+        CLogger::ErrorPrintf ( "Could not read or create server-id keys file at '%s'\n", *m_pMainConfig->GetIdFile () );
+        return false;
+    }
+
     // Eventually set the logfiles
     bool bLogFile = CLogger::SetLogFile ( m_pMainConfig->GetLogFile ().c_str () );
     CLogger::SetAuthFile ( m_pMainConfig->GetAuthFile ().c_str () );

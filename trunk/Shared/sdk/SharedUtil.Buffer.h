@@ -44,6 +44,17 @@ namespace SharedUtil
             return empty ();
         }
 
+        // Comparison
+        bool operator== ( const CBuffer& other ) const
+        {
+            return std::equal( begin(), end(), other.begin() );
+        }
+
+        bool operator!= ( const CBuffer& other ) const
+        {
+            return !operator== ( other );
+        }
+
         // Status
         void SetSize ( uint uiSize, bool bZeroPad = false )
         {

@@ -122,14 +122,14 @@ void CResourceManager::StopAll ( void )
     }
 }
 
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath )
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, eAccessType accessType )
 {
 	std::string dummy;
-	return ParseResourcePathInput ( strInput, pResource, strPath, dummy );
+	return ParseResourcePathInput ( strInput, pResource, strPath, dummy, accessType );
 }
 
 // pResource may be changed on return, and it could be NULL if the function returns false.
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath )
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath, eAccessType accessType )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
     if ( strInput[0] == ':' )
@@ -144,7 +144,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
                 strMetaPath = strInput.substr(iEnd+1);
                 if ( IsValidFilePath ( strMetaPath.c_str() ) )
                 {
-                    strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strMetaPath;
+                    strPath = PathJoin ( pResource->GetResourceDirectoryPath ( accessType ), strMetaPath );
                     return true;
                 }
             }
@@ -152,7 +152,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
     }
     else if ( pResource && IsValidFilePath ( strInput.c_str() ) )
     {
-        strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strInput;
+        strPath = PathJoin ( pResource->GetResourceDirectoryPath ( accessType ), strInput );
         strMetaPath = strInput;
         return true;
     }

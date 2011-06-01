@@ -48,3 +48,9 @@ IMPLEMENT_ENUM_BEGIN( eInputMode )
     ADD_ENUM ( INPUTMODE_NO_BINDS,          "no_binds" )
     ADD_ENUM ( INPUTMODE_NO_BINDS_ON_EDIT,  "no_binds_when_editing" )
 IMPLEMENT_ENUM_END( "input-mode" )
+
+
+IMPLEMENT_ENUM_BEGIN( eAccessType )
+    ADD_ENUM ( ACCESS_PUBLIC,               "public" )
+    ADD_ENUM ( ACCESS_PRIVATE,              "private" )
+IMPLEMENT_ENUM_END( "access-type" )

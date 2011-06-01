@@ -77,6 +77,8 @@ public:
 
     virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
     virtual void                            ClearPacketStats                ( void ) = 0;
+
+    virtual bool                            InitServerId                    ( const char* szPath ) = 0;
 };
 
 #endif
