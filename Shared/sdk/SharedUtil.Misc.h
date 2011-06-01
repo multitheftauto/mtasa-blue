@@ -1106,13 +1106,13 @@ namespace SharedUtil
 
 
     #define DECLARE_ENUM( T ) \
-        CEnumInfo*             GetEnumInfo     ( T& ); \
-        inline const SString&  EnumToString    ( T& value )                             { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
-        inline bool            StringToEnum    ( const SString& strName, T& outResult ) { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
-        inline const SString&  GetEnumTypeName ( T& )                                   { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
+        CEnumInfo*             GetEnumInfo     ( const T& ); \
+        inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
+        inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
+        inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
 
     #define IMPLEMENT_ENUM_BEGIN(cls) \
-        CEnumInfo* GetEnumInfo( cls& ) \
+        CEnumInfo* GetEnumInfo( const cls& ) \
         { \
             static const CEnumInfo::SEnumItem items[] = {
 

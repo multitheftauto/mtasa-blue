@@ -172,7 +172,7 @@ int CLuaFunctionDefs::GUICreateLabel ( lua_State* luaVM )
     argStream.ReadNumber ( height );
     argStream.ReadString ( text );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -206,7 +206,7 @@ int CLuaFunctionDefs::GUICreateStaticImage ( lua_State* luaVM )
     argStream.ReadNumber ( height );
     argStream.ReadString ( path );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -247,7 +247,7 @@ int CLuaFunctionDefs::GUICreateButton ( lua_State* luaVM )
     argStream.ReadNumber ( height );
     argStream.ReadString ( text );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -280,7 +280,7 @@ int CLuaFunctionDefs::GUICreateProgressBar ( lua_State* luaVM )
     argStream.ReadNumber ( width );
     argStream.ReadNumber ( height );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -315,7 +315,7 @@ int CLuaFunctionDefs::GUICreateCheckBox ( lua_State* luaVM )
     argStream.ReadString ( text );
     argStream.ReadBool ( selected );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -349,7 +349,7 @@ int CLuaFunctionDefs::GUICreateRadioButton ( lua_State* luaVM )
     argStream.ReadNumber ( height );
     argStream.ReadString ( text );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -383,7 +383,7 @@ int CLuaFunctionDefs::GUICreateEdit ( lua_State* luaVM )
     argStream.ReadNumber ( height );
     argStream.ReadString ( text );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -417,7 +417,7 @@ int CLuaFunctionDefs::GUICreateMemo ( lua_State* luaVM )
     argStream.ReadNumber ( height );
     argStream.ReadString ( text );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -450,7 +450,7 @@ int CLuaFunctionDefs::GUICreateGridList ( lua_State* luaVM )
     argStream.ReadNumber ( width );
     argStream.ReadNumber ( height );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -483,7 +483,7 @@ int CLuaFunctionDefs::GUICreateScrollPane ( lua_State* luaVM )
     argStream.ReadNumber ( width );
     argStream.ReadNumber ( height );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -517,7 +517,7 @@ int CLuaFunctionDefs::GUICreateScrollBar ( lua_State* luaVM )
     argStream.ReadNumber ( height );
     argStream.ReadBool ( horizontal );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -550,7 +550,7 @@ int CLuaFunctionDefs::GUICreateTabPanel ( lua_State* luaVM )
     argStream.ReadNumber ( width );
     argStream.ReadNumber ( height );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -578,7 +578,7 @@ int CLuaFunctionDefs::GUIStaticImageLoadImage ( lua_State* luaVM )
     CClientGUIElement* theElement; SString filename;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( theElement );
+    argStream.ReadUserData ( theElement );
     argStream.ReadString ( filename );
 
     if ( !argStream.HasErrors () )
@@ -619,7 +619,7 @@ int CLuaFunctionDefs::GUICreateTab ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( text );
-    argStream.ReadElement ( parent );
+    argStream.ReadUserData ( parent );
 
     if ( !argStream.HasErrors () )
     {
@@ -646,7 +646,7 @@ int CLuaFunctionDefs::GUIGetSelectedTab ( lua_State* luaVM )
     CClientGUIElement* tabPanel;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUITabPanel > ( tabPanel );
+    argStream.ReadUserData < CGUITabPanel > ( tabPanel );
 
     if ( !argStream.HasErrors () )
     {
@@ -668,8 +668,8 @@ int CLuaFunctionDefs::GUISetSelectedTab ( lua_State* luaVM )
     CClientGUIElement* tabPanel; CClientGUIElement* theTab;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUITabPanel > ( tabPanel );
-    argStream.ReadElement < CGUITab > ( theTab );
+    argStream.ReadUserData < CGUITabPanel > ( tabPanel );
+    argStream.ReadUserData < CGUITab > ( theTab );
 
     if ( !argStream.HasErrors () )
     {
@@ -694,8 +694,8 @@ int CLuaFunctionDefs::GUIDeleteTab ( lua_State* luaVM )
     CClientGUIElement* tabToDelete; CClientGUIElement* tabPanel;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUITab > ( tabToDelete );
-    argStream.ReadElement < CGUITabPanel > ( tabPanel );
+    argStream.ReadUserData < CGUITab > ( tabToDelete );
+    argStream.ReadUserData < CGUITabPanel > ( tabPanel );
 
     if ( !argStream.HasErrors () )
     {
@@ -724,7 +724,7 @@ int CLuaFunctionDefs::GUISetText ( lua_State* luaVM )
     CClientGUIElement* guiElement; SString text;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
     argStream.ReadString ( text );
 
     if ( !argStream.HasErrors () )
@@ -748,7 +748,7 @@ int CLuaFunctionDefs::GUISetFont ( lua_State* luaVM )
     CClientGUIElement* guiElement; SString font;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
     argStream.ReadString ( font );
 
     if ( !argStream.HasErrors () )
@@ -780,7 +780,7 @@ int CLuaFunctionDefs::GUIBringToFront ( lua_State* luaVM )
     CClientGUIElement* guiElement;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
 
     if ( !argStream.HasErrors () )
     {
@@ -805,7 +805,7 @@ int CLuaFunctionDefs::GUIMoveToBack ( lua_State* luaVM )
     CClientGUIElement* guiElement;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
 
     if ( !argStream.HasErrors () )
     {
@@ -828,7 +828,7 @@ int CLuaFunctionDefs::GUIRadioButtonSetSelected ( lua_State* luaVM )
     CClientGUIElement* guiRadioButton; bool state;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIRadioButton > ( guiRadioButton );
+    argStream.ReadUserData < CGUIRadioButton > ( guiRadioButton );
     argStream.ReadBool ( state );
 
     if ( !argStream.HasErrors () )
@@ -852,7 +852,7 @@ int CLuaFunctionDefs::GUICheckBoxSetSelected ( lua_State* luaVM )
     CClientGUIElement* theCheckbox; bool state;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUICheckBox > ( theCheckbox );
+    argStream.ReadUserData < CGUICheckBox > ( theCheckbox );
     argStream.ReadBool ( state );
 
     if ( !argStream.HasErrors () )
@@ -875,7 +875,7 @@ int CLuaFunctionDefs::GUIRadioButtonGetSelected ( lua_State* luaVM )
     CClientGUIElement* guiRadioButton;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIRadioButton > ( guiRadioButton );
+    argStream.ReadUserData < CGUIRadioButton > ( guiRadioButton );
 
     if ( !argStream.HasErrors () )
     {
@@ -898,7 +898,7 @@ int CLuaFunctionDefs::GUICheckBoxGetSelected ( lua_State* luaVM )
     CClientGUIElement* theCheckbox;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUICheckBox > ( theCheckbox );
+    argStream.ReadUserData < CGUICheckBox > ( theCheckbox );
 
     if ( !argStream.HasErrors () )
     {
@@ -921,7 +921,7 @@ int CLuaFunctionDefs::GUIProgressBarSetProgress ( lua_State* luaVM )
     CClientGUIElement* theProgressbar; float progress;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIProgressBar > ( theProgressbar );
+    argStream.ReadUserData < CGUIProgressBar > ( theProgressbar );
     argStream.ReadNumber ( progress );
 
     if ( !argStream.HasErrors () )
@@ -945,7 +945,7 @@ int CLuaFunctionDefs::GUIScrollBarSetScrollPosition ( lua_State* luaVM )
     CClientGUIElement* theScrollBar; float amount;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIScrollBar > ( theScrollBar );
+    argStream.ReadUserData < CGUIScrollBar > ( theScrollBar );
     argStream.ReadNumber ( amount );
 
     if ( !argStream.HasErrors () )
@@ -969,7 +969,7 @@ int CLuaFunctionDefs::GUIScrollPaneSetHorizontalScrollPosition ( lua_State* luaV
     CClientGUIElement* theScrollPane; float amount;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIScrollPane > ( theScrollPane );
+    argStream.ReadUserData < CGUIScrollPane > ( theScrollPane );
     argStream.ReadNumber ( amount );
 
     if ( !argStream.HasErrors () )
@@ -993,7 +993,7 @@ int CLuaFunctionDefs::GUIScrollPaneSetVerticalScrollPosition ( lua_State* luaVM 
     CClientGUIElement* theScrollPane; float amount;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIScrollPane > ( theScrollPane );
+    argStream.ReadUserData < CGUIScrollPane > ( theScrollPane );
     argStream.ReadNumber ( amount );
 
     if ( !argStream.HasErrors () )
@@ -1017,7 +1017,7 @@ int CLuaFunctionDefs::GUIProgressBarGetProgress ( lua_State* luaVM )
     CClientGUIElement* theProgressbar;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIProgressBar > ( theProgressbar );
+    argStream.ReadUserData < CGUIProgressBar > ( theProgressbar );
 
     if ( !argStream.HasErrors () )
     {
@@ -1040,7 +1040,7 @@ int CLuaFunctionDefs::GUIScrollPaneGetHorizontalScrollPosition ( lua_State* luaV
     CClientGUIElement* theScrollPane;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIScrollPane > ( theScrollPane );
+    argStream.ReadUserData < CGUIScrollPane > ( theScrollPane );
 
     if ( !argStream.HasErrors () )
     {
@@ -1063,7 +1063,7 @@ int CLuaFunctionDefs::GUIScrollPaneGetVerticalScrollPosition ( lua_State* luaVM 
     CClientGUIElement* theScrollPane;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIScrollPane > ( theScrollPane );
+    argStream.ReadUserData < CGUIScrollPane > ( theScrollPane );
 
     if ( !argStream.HasErrors () )
     {
@@ -1086,7 +1086,7 @@ int CLuaFunctionDefs::GUIScrollBarGetScrollPosition ( lua_State* luaVM )
     CClientGUIElement* theScrollBar;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIScrollBar > ( theScrollBar );
+    argStream.ReadUserData < CGUIScrollBar > ( theScrollBar );
 
     if ( !argStream.HasErrors () )
     {
@@ -1109,7 +1109,7 @@ int CLuaFunctionDefs::GUIGetText ( lua_State* luaVM )
     CClientGUIElement* guiElement;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
 
     if ( !argStream.HasErrors () )
     {
@@ -1132,7 +1132,7 @@ int CLuaFunctionDefs::GUIGetFont ( lua_State* luaVM )
     CClientGUIElement* guiElement;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
 
     if ( !argStream.HasErrors () )
     {
@@ -1159,7 +1159,7 @@ int CLuaFunctionDefs::GUIGetSize ( lua_State* luaVM )
     CClientGUIElement* theElement; bool relative;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( theElement );
+    argStream.ReadUserData ( theElement );
     argStream.ReadBool ( relative );
 
     if ( !argStream.HasErrors () )
@@ -1196,7 +1196,7 @@ int CLuaFunctionDefs::GUIGetPosition ( lua_State* luaVM )
     CClientGUIElement* guiElement; bool relative;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
     argStream.ReadBool ( relative );
 
     if ( !argStream.HasErrors () )
@@ -1223,7 +1223,7 @@ int CLuaFunctionDefs::GUISetAlpha ( lua_State* luaVM )
     CClientGUIElement* guiElement; float alpha;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
     argStream.ReadNumber ( alpha );
 
     if ( !argStream.HasErrors () )
@@ -1246,7 +1246,7 @@ int CLuaFunctionDefs::GUIGetAlpha ( lua_State* luaVM )
     CClientGUIElement* guiElement;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
 
     if ( !argStream.HasErrors () )
     {
@@ -1268,7 +1268,7 @@ int CLuaFunctionDefs::GUISetVisible ( lua_State* luaVM )
     CClientGUIElement* guiElement; bool state;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
     argStream.ReadBool ( state );
 
     if ( !argStream.HasErrors () )
@@ -1291,7 +1291,7 @@ int CLuaFunctionDefs::GUISetEnabled ( lua_State* luaVM )
     CClientGUIElement* guiElement; bool enabled;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
     argStream.ReadBool ( enabled );
 
     if ( !argStream.HasErrors () )
@@ -1314,7 +1314,7 @@ int CLuaFunctionDefs::GUISetProperty ( lua_State* luaVM )
     CClientGUIElement* guiElement; SString property; SString value;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
     argStream.ReadString ( property );
     argStream.ReadString ( value );
 
@@ -1338,7 +1338,7 @@ int CLuaFunctionDefs::GUIGetVisible ( lua_State* luaVM )
     CClientGUIElement* guiElement;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
 
     if ( !argStream.HasErrors () )
     {
@@ -1360,7 +1360,7 @@ int CLuaFunctionDefs::GUIGetEnabled ( lua_State* luaVM )
     CClientGUIElement* guiElement;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
 
     if ( !argStream.HasErrors () )
     {
@@ -1382,7 +1382,7 @@ int CLuaFunctionDefs::GUIGetProperty ( lua_State* luaVM )
     CClientGUIElement* guiElement; SString property;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
     argStream.ReadString ( property );
 
     if ( !argStream.HasErrors () )
@@ -1405,7 +1405,7 @@ int CLuaFunctionDefs::GUIGetProperties ( lua_State* luaVM )
     CClientGUIElement* guiElement;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
 
     if ( !argStream.HasErrors () )
     {
@@ -1443,7 +1443,7 @@ int CLuaFunctionDefs::GUISetSize ( lua_State* luaVM )
     CClientGUIElement* guiElement; float width; float height; bool relative;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
     argStream.ReadNumber ( width );
     argStream.ReadNumber ( height );
     argStream.ReadBool ( relative );
@@ -1469,7 +1469,7 @@ int CLuaFunctionDefs::GUISetPosition ( lua_State* luaVM )
     CClientGUIElement* guiElement; float x; float y; bool relative;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement ( guiElement );
+    argStream.ReadUserData ( guiElement );
     argStream.ReadNumber ( x );
     argStream.ReadNumber ( y );
     argStream.ReadBool ( relative );
@@ -1495,7 +1495,7 @@ int CLuaFunctionDefs::GUIGridListSetSortingEnabled ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; bool enabled;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadBool ( enabled );
 
     if ( !argStream.HasErrors () )
@@ -1519,7 +1519,7 @@ int CLuaFunctionDefs::GUIGridListAddColumn ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; SString title; float width;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadString ( title );
     argStream.ReadNumber ( width );
 
@@ -1544,7 +1544,7 @@ int CLuaFunctionDefs::GUIGridListRemoveColumn ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int columnIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( columnIndex );
 
     if ( !argStream.HasErrors () )
@@ -1568,7 +1568,7 @@ int CLuaFunctionDefs::GUIGridListSetColumnWidth ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int columnIndex; float width; bool relative;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( columnIndex );
     argStream.ReadNumber ( width );
     argStream.ReadBool ( relative );
@@ -1594,7 +1594,7 @@ int CLuaFunctionDefs::GUIGridListAddRow ( lua_State* luaVM )
     CClientGUIElement* guiGridlist;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
 
     if ( !argStream.HasErrors () )
     {
@@ -1621,7 +1621,7 @@ int CLuaFunctionDefs::GUIGridListInsertRowAfter ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int rowIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
 
     if ( !argStream.HasErrors () )
@@ -1648,7 +1648,7 @@ int CLuaFunctionDefs::GUIGridListAutoSizeColumn ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int columnIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( columnIndex );
 
     if ( !argStream.HasErrors () )
@@ -1672,7 +1672,7 @@ int CLuaFunctionDefs::GUIGridListClear ( lua_State* luaVM )
     CClientGUIElement* guiGridlist;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
 
     if ( !argStream.HasErrors () )
     {
@@ -1695,7 +1695,7 @@ int CLuaFunctionDefs::GUIGridListSetSelectionMode ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int mode;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( mode );
 
     if ( !argStream.HasErrors () )
@@ -1719,7 +1719,7 @@ int CLuaFunctionDefs::GUIGridListGetSelectedItem ( lua_State* luaVM )
     CClientGUIElement* guiGridlist;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
 
     if ( !argStream.HasErrors () )
     {
@@ -1744,7 +1744,7 @@ int CLuaFunctionDefs::GUIGridListGetSelectedItems ( lua_State* luaVM )
     CClientGUIElement* guiGridlist;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
 
     if ( !argStream.HasErrors () )
     {
@@ -1792,7 +1792,7 @@ int CLuaFunctionDefs::GUIGridListGetSelectedCount ( lua_State* luaVM )
     CClientGUIElement* guiGridlist;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
 
     if ( !argStream.HasErrors () )
     {
@@ -1814,7 +1814,7 @@ int CLuaFunctionDefs::GUIGridListSetSelectedItem ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int rowIndex; int columnIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
     argStream.ReadNumber ( columnIndex );
 
@@ -1839,7 +1839,7 @@ int CLuaFunctionDefs::GUIGridListRemoveRow ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int rowIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
 
     if ( !argStream.HasErrors () )
@@ -1863,7 +1863,7 @@ int CLuaFunctionDefs::GUIGridListGetItemText ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int rowIndex; int columnIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
     argStream.ReadNumber ( columnIndex );
 
@@ -1891,7 +1891,7 @@ int CLuaFunctionDefs::GUIGridListGetItemData ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int rowIndex; int columnIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
     argStream.ReadNumber ( columnIndex );
 
@@ -1920,7 +1920,7 @@ int CLuaFunctionDefs::GUIGridListGetItemColor ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int rowIndex; int columnIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
     argStream.ReadNumber ( columnIndex );
 
@@ -1950,7 +1950,7 @@ int CLuaFunctionDefs::GUIGridListSetItemText ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int rowIndex; int columnIndex; SString text; bool section; bool number;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
     argStream.ReadNumber ( columnIndex );
     argStream.ReadString ( text );
@@ -1979,7 +1979,7 @@ int CLuaFunctionDefs::GUIGridListSetItemData ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int rowIndex; int columnIndex; CLuaArgument* data;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
     argStream.ReadNumber ( columnIndex );
     argStream.ReadLuaArgument ( data );
@@ -2009,7 +2009,7 @@ int CLuaFunctionDefs::GUIGridListSetItemColor ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; int rowIndex; int columnIndex; int red; int green; int blue; int alpha;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
     argStream.ReadNumber ( columnIndex );
     argStream.ReadNumber ( red );
@@ -2038,7 +2038,7 @@ int CLuaFunctionDefs::GUIGridListSetScrollBars ( lua_State* luaVM )
     CClientGUIElement* guiGridlist; bool horizontalBar; bool verticalBar;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadBool ( horizontalBar );
     argStream.ReadBool ( verticalBar );
 
@@ -2063,7 +2063,7 @@ int CLuaFunctionDefs::GUIScrollPaneSetScrollBars ( lua_State* luaVM )
     CClientGUIElement* scrollPane; bool horizontalBar; bool verticalBar;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIScrollPane > ( scrollPane );
+    argStream.ReadUserData < CGUIScrollPane > ( scrollPane );
     argStream.ReadBool ( horizontalBar );
     argStream.ReadBool ( verticalBar );
 
@@ -2088,7 +2088,7 @@ int CLuaFunctionDefs::GUIGridListGetRowCount ( lua_State* luaVM )
     CClientGUIElement* guiGridlist;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
 
     if ( !argStream.HasErrors () )
     {
@@ -2111,7 +2111,7 @@ int CLuaFunctionDefs::GUIGridListGetColumnCount ( lua_State* luaVM )
     CClientGUIElement* guiGridlist;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIGridList > ( guiGridlist );
+    argStream.ReadUserData < CGUIGridList > ( guiGridlist );
 
     if ( !argStream.HasErrors () )
     {
@@ -2134,7 +2134,7 @@ int CLuaFunctionDefs::GUIEditSetReadOnly ( lua_State* luaVM )
     CClientGUIElement* editField; bool status;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIEdit > ( editField );
+    argStream.ReadUserData < CGUIEdit > ( editField );
     argStream.ReadBool ( status );
 
     if ( !argStream.HasErrors () )
@@ -2158,7 +2158,7 @@ int CLuaFunctionDefs::GUIMemoSetReadOnly ( lua_State* luaVM )
     CClientGUIElement* theMemo; bool status;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIMemo > ( theMemo );
+    argStream.ReadUserData < CGUIMemo > ( theMemo );
     argStream.ReadBool ( status );
 
     if ( !argStream.HasErrors () )
@@ -2182,7 +2182,7 @@ int CLuaFunctionDefs::GUIEditSetMasked ( lua_State* luaVM )
     CClientGUIElement* theElement; bool status;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIEdit > ( theElement );
+    argStream.ReadUserData < CGUIEdit > ( theElement );
     argStream.ReadBool ( status );
 
     if ( !argStream.HasErrors () )
@@ -2206,7 +2206,7 @@ int CLuaFunctionDefs::GUIEditSetMaxLength ( lua_State* luaVM )
     CClientGUIElement* theElement; int length;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIEdit > ( theElement );
+    argStream.ReadUserData < CGUIEdit > ( theElement );
     argStream.ReadNumber ( length );
 
     if ( !argStream.HasErrors () )
@@ -2230,7 +2230,7 @@ int CLuaFunctionDefs::GUIEditSetCaratIndex ( lua_State* luaVM )
     CClientGUIElement* theElement; int index;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIEdit > ( theElement );
+    argStream.ReadUserData < CGUIEdit > ( theElement );
     argStream.ReadNumber ( index );
 
     if ( !argStream.HasErrors () )
@@ -2254,7 +2254,7 @@ int CLuaFunctionDefs::GUIMemoSetCaratIndex ( lua_State* luaVM )
     CClientGUIElement* theMemo; int index;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIMemo > ( theMemo );
+    argStream.ReadUserData < CGUIMemo > ( theMemo );
     argStream.ReadNumber ( index );
 
     if ( !argStream.HasErrors () )
@@ -2278,7 +2278,7 @@ int CLuaFunctionDefs::GUIWindowSetMovable ( lua_State* luaVM )
     CClientGUIElement* theElement; bool status;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIWindow > ( theElement );
+    argStream.ReadUserData < CGUIWindow > ( theElement );
     argStream.ReadBool ( status );
 
     if ( !argStream.HasErrors () )
@@ -2302,7 +2302,7 @@ int CLuaFunctionDefs::GUIWindowSetSizable ( lua_State* luaVM )
     CClientGUIElement* theElement; bool status;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIWindow > ( theElement );
+    argStream.ReadUserData < CGUIWindow > ( theElement );
     argStream.ReadBool ( status );
 
     if ( !argStream.HasErrors () )
@@ -2326,7 +2326,7 @@ int CLuaFunctionDefs::GUILabelGetTextExtent ( lua_State* luaVM )
     CClientGUIElement* theLabel;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUILabel > ( theLabel );
+    argStream.ReadUserData < CGUILabel > ( theLabel );
 
     if ( !argStream.HasErrors () )
     {
@@ -2349,7 +2349,7 @@ int CLuaFunctionDefs::GUILabelGetFontHeight ( lua_State* luaVM )
     CClientGUIElement* theLabel;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUILabel > ( theLabel );
+    argStream.ReadUserData < CGUILabel > ( theLabel );
 
     if ( !argStream.HasErrors () )
     {
@@ -2372,7 +2372,7 @@ int CLuaFunctionDefs::GUILabelSetColor ( lua_State* luaVM )
     CClientGUIElement* theElement; int red; int green; int blue;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUILabel > ( theElement );
+    argStream.ReadUserData < CGUILabel > ( theElement );
     argStream.ReadNumber ( red );
     argStream.ReadNumber ( green );
     argStream.ReadNumber ( blue );
@@ -2399,7 +2399,7 @@ int CLuaFunctionDefs::GUILabelSetVerticalAlign ( lua_State* luaVM )
     CClientGUIElement* theLabel; CGUIVerticalAlign align;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUILabel > ( theLabel );
+    argStream.ReadUserData < CGUILabel > ( theLabel );
     argStream.ReadEnumString ( align );
 
     if ( !argStream.HasErrors () )
@@ -2424,7 +2424,7 @@ int CLuaFunctionDefs::GUILabelSetHorizontalAlign ( lua_State* luaVM )
     CClientGUIElement* theLabel; CGUIHorizontalAlign align; bool wordwrap;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUILabel > ( theLabel );
+    argStream.ReadUserData < CGUILabel > ( theLabel );
     argStream.ReadEnumString ( align );
     argStream.ReadBool ( wordwrap, false );
 
@@ -2631,7 +2631,7 @@ int CLuaFunctionDefs::GUICreateComboBox ( lua_State* luaVM )
     argStream.ReadNumber ( height );
     argStream.ReadString ( caption );
     argStream.ReadBool ( relative );
-    argStream.ReadElement ( parent, NULL );
+    argStream.ReadUserData ( parent, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -2657,7 +2657,7 @@ int CLuaFunctionDefs::GUIComboBoxAddItem ( lua_State* luaVM )
     CClientGUIElement* comboBox; SString value;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIComboBox > ( comboBox );
+    argStream.ReadUserData < CGUIComboBox > ( comboBox );
     argStream.ReadString ( value );
 
     if ( !argStream.HasErrors () )
@@ -2680,7 +2680,7 @@ int CLuaFunctionDefs::GUIComboBoxRemoveItem ( lua_State* luaVM )
     CClientGUIElement* comboBox; int itemId;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIComboBox > ( comboBox );
+    argStream.ReadUserData < CGUIComboBox > ( comboBox );
     argStream.ReadNumber ( itemId );
 
     if ( !argStream.HasErrors () )
@@ -2703,7 +2703,7 @@ int CLuaFunctionDefs::GUIComboBoxClear ( lua_State* luaVM )
     CClientGUIElement* comboBox;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIComboBox > ( comboBox );
+    argStream.ReadUserData < CGUIComboBox > ( comboBox );
 
     if ( !argStream.HasErrors () )
     {
@@ -2724,7 +2724,7 @@ int CLuaFunctionDefs::GUIComboBoxGetSelected ( lua_State* luaVM )
     CClientGUIElement* comboBox;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIComboBox > ( comboBox );
+    argStream.ReadUserData < CGUIComboBox > ( comboBox );
 
     if ( !argStream.HasErrors () )
     {
@@ -2745,7 +2745,7 @@ int CLuaFunctionDefs::GUIComboBoxSetSelected ( lua_State* luaVM )
     CClientGUIElement* comboBox; int itemIndex;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIComboBox > ( comboBox );
+    argStream.ReadUserData < CGUIComboBox > ( comboBox );
     argStream.ReadNumber ( itemIndex );
 
     if ( !argStream.HasErrors () )
@@ -2767,7 +2767,7 @@ int CLuaFunctionDefs::GUIComboBoxGetItemText ( lua_State* luaVM )
     CClientGUIElement* comboBox; int itemId;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIComboBox > ( comboBox );
+    argStream.ReadUserData < CGUIComboBox > ( comboBox );
     argStream.ReadNumber ( itemId );
 
     if ( !argStream.HasErrors () )
@@ -2789,7 +2789,7 @@ int CLuaFunctionDefs::GUIComboBoxSetItemText ( lua_State* luaVM )
     CClientGUIElement* comboBox; int itemId; SString text;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadElement < CGUIComboBox > ( comboBox );
+    argStream.ReadUserData < CGUIComboBox > ( comboBox );
     argStream.ReadNumber ( itemId );
     argStream.ReadString ( text );
 
