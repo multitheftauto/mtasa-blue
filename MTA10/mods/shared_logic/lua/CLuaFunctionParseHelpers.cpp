@@ -31,15 +31,15 @@ IMPLEMENT_ENUM_END( "lua-type" )
 
 IMPLEMENT_ENUM_BEGIN( CGUIVerticalAlign )
     ADD_ENUM ( CGUI_ALIGN_TOP,              "top" )
-    ADD_ENUM ( CGUI_ALIGN_BOTTOM,           "center" )
-    ADD_ENUM ( CGUI_ALIGN_VERTICALCENTER,   "bottom" )
+    ADD_ENUM ( CGUI_ALIGN_BOTTOM,           "bottom" )
+    ADD_ENUM ( CGUI_ALIGN_VERTICALCENTER,   "center" )
 IMPLEMENT_ENUM_END( "vertical-align" )
 
 
 IMPLEMENT_ENUM_BEGIN( CGUIHorizontalAlign )
     ADD_ENUM ( CGUI_ALIGN_LEFT,             "left" )
-    ADD_ENUM ( CGUI_ALIGN_RIGHT,            "center" )
-    ADD_ENUM ( CGUI_ALIGN_HORIZONTALCENTER, "right" )
+    ADD_ENUM ( CGUI_ALIGN_RIGHT,            "right" )
+    ADD_ENUM ( CGUI_ALIGN_HORIZONTALCENTER, "center" )
 IMPLEMENT_ENUM_END( "horizontal-align" )
 
 
