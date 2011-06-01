@@ -12,10 +12,10 @@
 // Forward declare enum reflection stuff
 #include <gui/CGUI.h>
 enum eLuaType { };
-DECLARE_ENUM( enum eLuaType );
-DECLARE_ENUM( enum CGUIVerticalAlign );
-DECLARE_ENUM( enum CGUIHorizontalAlign );
-DECLARE_ENUM( enum eInputMode );
+DECLARE_ENUM( eLuaType );
+DECLARE_ENUM( CGUIVerticalAlign );
+DECLARE_ENUM( CGUIHorizontalAlign );
+DECLARE_ENUM( eInputMode );
 
 
 // class -> class type
