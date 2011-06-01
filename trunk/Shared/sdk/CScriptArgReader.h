@@ -174,16 +174,16 @@ public:
 
 
     //
-    // Read next element, using default if needed
+    // Read next userdata, using default if needed
     //
     template < class T >
-    bool ReadElement ( T*& outValue, T* defaultValue, bool bArgCanBeNil = false, bool bDefaultCanBeNil = false )
+    bool ReadUserData ( T*& outValue, T* defaultValue, bool bArgCanBeNil = false, bool bDefaultCanBeNil = false )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
 
         if ( iArgument == LUA_TLIGHTUSERDATA )
         {
-            outValue = ElementCast < T > ( lua_toelement ( m_luaVM, m_iIndex++ ) );
+            outValue = (T*)UserDataCast < T > ( (T*)0, lua_touserdata ( m_luaVM, m_iIndex++ ) );
             if ( outValue || bArgCanBeNil )
                 return true;
 
@@ -207,39 +207,39 @@ public:
 
 
     //
-    // Read next element, using NULL default or no default
+    // Read next userdata, using NULL default or no default
     //
     template < class T >
-    bool ReadElement ( T*& outValue, int defaultValue = -1 )
+    bool ReadUserData ( T*& outValue, int defaultValue = -1 )
     {
-        return ReadElement ( outValue, (T*)defaultValue, defaultValue == NULL, true );
+        return ReadUserData ( outValue, (T*)defaultValue, defaultValue == NULL, true );
     }
 
 
     //
-    // Read next wrapped element, using default if needed
+    // Read next wrapped userdata, using default if needed
     //
     template < class T, class U >
-    bool ReadElement ( U*& outValue, U* defaultValue, bool bArgCanBeNil = false, bool bDefaultCanBeNil = false )
+    bool ReadUserData ( U*& outValue, U* defaultValue, bool bArgCanBeNil = false, bool bDefaultCanBeNil = false )
     {
-        if ( ReadElement ( outValue ) )
+        if ( ReadUserData ( outValue ) )
         {
-            SString strExpectedType;
-            if ( CheckWrappedElementType < T > ( outValue, strExpectedType ) )
+            SString strErrorExpectedType;
+            if ( CheckWrappedUserDataType < T > ( outValue, strErrorExpectedType ) )
                 return true;
-            SetTypeError ( strExpectedType, m_iIndex - 1 );
+            SetTypeError ( strErrorExpectedType, m_iIndex - 1 );
         }
         return false;
     }
 
 
     //
-    // Read next wrapped element, using NULL default or no default
+    // Read next wrapped userdata, using NULL default or no default
     //
     template < class T, class U >
-    bool ReadElement ( U*& outValue, int defaultValue = -1 )
+    bool ReadUserData ( U*& outValue, int defaultValue = -1 )
     {
-        return ReadElement < T > ( outValue, (U*)defaultValue, defaultValue == NULL, true );
+        return ReadUserData < T > ( outValue, (U*)defaultValue, defaultValue == NULL, true );
     }
 
 

@@ -97,22 +97,42 @@ inline SString GetClassTypeName ( CGUIScrollPane* )  { return "gui-scrollpane"; 
 inline SString GetClassTypeName ( CGUIScrollBar* )   { return "gui-scrollbar"; }
 inline SString GetClassTypeName ( CGUIComboBox* )    { return "gui-combobox"; }
 
+inline SString GetClassTypeName ( CXMLNode* )               { return "xml-node"; }
 
-// Dynamic cast - Returns NULL if it can't be done
+
+//
+// CXMLNode from userdata
+//
 template < class T >
-T* ElementCast ( CClientEntity* pElement )
+CXMLNode* UserDataCast ( CXMLNode*, void* ptr )
 {
-    if ( pElement && pElement->GetType () == GetClassType ( (T*)0 ) )
-        return static_cast < T* > ( pElement );
-    return NULL;
+    return g_pCore->GetXML ()->GetNodeFromID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
+
+//
+// CClientEntity from userdata
+//
+template < class T >
+CClientEntity* UserDataCast ( CClientEntity*, void* ptr )
+{
+    ElementID ID = TO_ELEMENTID ( ptr );
+    CClientEntity* pEntity = CElementIDs::GetElement ( ID );
+    if ( !pEntity || pEntity->IsBeingDeleted () || pEntity->GetType () != GetClassType ( (T*)0 ) )
+        return NULL;
+    return pEntity;
+}
+
+
+//
+// CClientGUIElement ( CGUIElement )
+//
 // Returns true if T is the same class as the one wrapped by pGuiElement
 template < class T >
-bool CheckWrappedElementType ( CClientGUIElement*& pGuiElement, SString& strExpectedType )
+bool CheckWrappedUserDataType ( CClientGUIElement*& pGuiElement, SString& strErrorExpectedType )
 {
     if ( pGuiElement->GetCGUIElement ()->GetType () == GetClassType ( (T*)0 ) )
         return true;
-    strExpectedType = GetClassTypeName ( (T*)0 );
+    strErrorExpectedType = GetClassTypeName ( (T*)0 );
     return false;
 }
