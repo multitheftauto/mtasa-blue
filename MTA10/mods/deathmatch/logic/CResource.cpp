@@ -15,6 +15,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CServerIdManager.h"
 
 using namespace std;
 
@@ -65,6 +66,7 @@ CResource::CResource ( unsigned short usID, char* szResourceName, CClientEntity*
     m_pResourceTXDRoot->MakeSystemEntity ();
 
     m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetModRoot (), m_szResourceName );
+    m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ()->GetConnectionPrivateDirectory (), m_szResourceName );
 
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this );
     if ( m_pLuaVM )
@@ -373,4 +375,12 @@ void CResource::ShowCursor ( bool bShow, bool bToggleControls )
         g_pCore->ForceCursorVisible ( m_iShowingCursor > 0, bToggleControls );
         g_pClientGame->SetCursorEventsEnabled ( m_iShowingCursor > 0 );
     }
+}
+
+
+SString CResource::GetResourceDirectoryPath ( eAccessType accessType )
+{
+    if ( accessType == ACCESS_PRIVATE )
+        return m_strResourcePrivateDirectoryPath;
+    return m_strResourceDirectoryPath;
 }

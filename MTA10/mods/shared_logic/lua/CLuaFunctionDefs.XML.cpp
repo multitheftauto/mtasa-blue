@@ -379,22 +379,21 @@ int CLuaFunctionDefs::XMLNodeGetParent ( lua_State* luaVM )
 
 int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
 {
-    // Filename
-    if ( lua_type ( luaVM, 1 ) != LUA_TSTRING )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM, "xmlLoadFile" );
+//  xmlnode xmlLoadFile ( string filePath [,string accessType = "public"] )
+    SString filePath; eAccessType accessType;
 
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-    else
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( filePath );
+    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
+
+    if ( !argStream.HasErrors () )
     {
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
             CResource* pResource = luaMain->GetResource();
             SString strFilename;
-            if ( CResourceManager::ParseResourcePathInput( lua_tostring ( luaVM, 1 ), pResource, strFilename ) )
+            if ( CResourceManager::ParseResourcePathInput( filePath, pResource, strFilename, accessType ) )
             {
                 // Create the XML
                 CXMLFile * xmlFile = luaMain->CreateXML ( strFilename );
@@ -422,18 +421,35 @@ int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
             }
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "xmlLoadFile", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
+
 int CLuaFunctionDefs::XMLCreateFile ( lua_State* luaVM )
 {
-    // Filename
-    if ( lua_type ( luaVM, 1 ) != LUA_TSTRING ||  lua_type ( luaVM, 2 ) != LUA_TSTRING )
-    {
-        m_pScriptDebugging->LogBadType ( luaVM, "xmlCreateFile" );
+//  xmlnode xmlCreateFile ( string filePath, string rootNodeName [,string accessType = "public"] )
+    SString filePath; SString rootNodeName; eAccessType accessType;
 
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( filePath );
+    argStream.ReadString ( rootNodeName );
+    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
+
+    // Safety check: Don't allow the rootNodeName "private" incase user forget to declare a node name
+    if ( rootNodeName == EnumToString ( ACCESS_PRIVATE ) )
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "xmlCreateFile", "Expected string at argument 2, got access-type" ) );
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
+    if ( argStream.HasErrors () )
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "xmlCreateFile", *argStream.GetErrorMessage () ) );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -444,11 +460,8 @@ int CLuaFunctionDefs::XMLCreateFile ( lua_State* luaVM )
         {
             CResource* pResource = pLuaMain->GetResource();
             SString strFile;
-            if ( CResourceManager::ParseResourcePathInput( lua_tostring ( luaVM, 1 ), pResource, strFile ) )
+            if ( CResourceManager::ParseResourcePathInput( filePath, pResource, strFile, accessType ) )
             {
-                char szRootName [ MAX_STRING_LENGTH ];
-                strncpy ( szRootName,  lua_tostring ( luaVM, 2 ), MAX_STRING_LENGTH - 1 );
-
                 // Make sure the directory exists
                 MakeSureDirExists ( strFile.c_str () );
 
@@ -457,7 +470,7 @@ int CLuaFunctionDefs::XMLCreateFile ( lua_State* luaVM )
                 if ( xmlFile )
                 {
                     // Create its root node
-                    CXMLNode* pRootNode = xmlFile->CreateRootNode ( szRootName );
+                    CXMLNode* pRootNode = xmlFile->CreateRootNode ( rootNodeName );
                     if ( pRootNode )
                     {
                         lua_pushxmlnode ( luaVM, pRootNode );
@@ -599,17 +612,23 @@ int CLuaFunctionDefs::XMLDestroyNode ( lua_State* luaVM )
 
 int CLuaFunctionDefs::XMLCopyFile ( lua_State* luaVM )
 {
-    // Grab the virtual machine for this luastate
-    CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLUA )
+//  xmlnode xmlCopyFile ( xmlnode nodeToCopy, string newFilePath [,string accessType = "public"] )
+    CXMLNode* pSourceNode; SString newFilePath; eAccessType accessType;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pSourceNode );
+    argStream.ReadString ( newFilePath );
+    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
+
+    if ( !argStream.HasErrors () )
     {
-        // Verify the argument types passed
-        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA  &&
-            lua_type ( luaVM, 2 ) == LUA_TSTRING )
+        // Grab the virtual machine for this luastate
+        CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLUA )
         {
             CResource* pResource = pLUA->GetResource();
             SString strFilename;
-            if ( CResourceManager::ParseResourcePathInput( lua_tostring ( luaVM, 2 ), pResource, strFilename ) )
+            if ( CResourceManager::ParseResourcePathInput( newFilePath, pResource, strFilename, accessType ) )
             {
                 // Grab the source node
                 CXMLNode* pSourceNode = lua_toxmlnode ( luaVM, 1 );
@@ -657,9 +676,9 @@ int CLuaFunctionDefs::XMLCopyFile ( lua_State* luaVM )
             else
                 CLogger::ErrorPrintf ( "Unable to copy xml file; bad filepath" );
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "xmlCopyFile" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "xmlCopyFile", *argStream.GetErrorMessage () ) );
 
     // Error
     lua_pushboolean ( luaVM, false );

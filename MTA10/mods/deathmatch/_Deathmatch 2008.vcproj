@@ -537,6 +537,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CServerIdManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CStaticFunctionDefinitions.cpp"
 					>
 				</File>
@@ -1416,6 +1420,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CServer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CServerIdManager.h"
 					>
 				</File>
 				<File

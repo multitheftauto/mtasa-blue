@@ -269,6 +269,11 @@ bool CMainConfig::Load ( const char* szFilename )
         m_bVerifySerials = false;
     }
 
+    // Grab the server-id filename
+    SString strIdFile = "server-id.keys";
+    GetString ( m_pRootNode, "idfile", strIdFile, 1 );
+    m_strIdFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strIdFile );
+
     // Grab the server logfiles
     std::string strBuffer;
     if ( GetString ( m_pRootNode, "logfile", strBuffer, 1 ) == IS_SUCCESS )

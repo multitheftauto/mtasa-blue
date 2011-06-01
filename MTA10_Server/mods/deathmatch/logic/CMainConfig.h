@@ -76,6 +76,7 @@ public:
     const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
+    const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     void                            SetFPSLimit                     ( unsigned short usFPS );
@@ -121,6 +122,7 @@ private:
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
     bool                            m_bAutoLogin;
+    SString                         m_strIdFile;
 };
 
 #endif

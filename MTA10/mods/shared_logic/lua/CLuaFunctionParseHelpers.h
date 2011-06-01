@@ -16,6 +16,7 @@ DECLARE_ENUM( eLuaType );
 DECLARE_ENUM( CGUIVerticalAlign );
 DECLARE_ENUM( CGUIHorizontalAlign );
 DECLARE_ENUM( eInputMode );
+DECLARE_ENUM( eAccessType );
 
 
 // class -> class type

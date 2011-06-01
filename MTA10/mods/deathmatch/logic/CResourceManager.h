@@ -25,6 +25,12 @@ class CResourceManager;
 class CClientEntity;
 class CResource;
 
+enum eAccessType
+{
+    ACCESS_PUBLIC,
+    ACCESS_PRIVATE,
+};
+
 class CResourceManager
 {  
 
@@ -42,8 +48,8 @@ public:
 
     void                        LoadUnavailableResources    ( CClientEntity* pRootEntity );
 
-    static bool                 ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath );
-    static bool                 ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath );
+    static bool                 ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath, eAccessType accessType = ACCESS_PUBLIC );
+    static bool                 ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath, eAccessType accessType = ACCESS_PUBLIC );
 
 private:
 

@@ -92,6 +92,8 @@ public:
 
     virtual void                        ResetStub                   ( DWORD dwType, ... ) = 0;
     virtual void                        ResetStub                   ( DWORD dwType, va_list ) = 0;
+
+    virtual const char*                 GetCurrentServerId          ( void ) = 0;
 };
 
 #endif
