@@ -15,8 +15,6 @@
 
 extern CGame* g_pGame;
 
-#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
-
 // Lua push/pop macros for our datatypes
 CElement* lua_toelement ( lua_State* luaVM, int iArgument )
 {

@@ -23,6 +23,8 @@ extern "C"
 
 CLuaFunctionRef         luaM_toref              ( lua_State *luaVM, int iArgument );
 
+#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
+
 // Lua pop macros for our datatypes
 class CElement*         lua_toelement           ( lua_State* luaVM, int iArgument );
 class CAccount*         lua_toaccount           ( lua_State* luaVM, int iArgument );

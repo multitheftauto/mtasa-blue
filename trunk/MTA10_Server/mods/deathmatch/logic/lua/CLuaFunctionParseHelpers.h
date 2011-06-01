@@ -10,7 +10,8 @@
 *****************************************************************************/
 
 // Forward declare enum reflection stuff
-DECLARE_ENUM( enum eLuaType );
+enum eLuaType { };
+DECLARE_ENUM( eLuaType );
 
 
 // class -> class type
@@ -45,12 +46,28 @@ inline SString GetClassTypeName ( CDummy* )         { return "dummy"; }
 inline SString GetClassTypeName ( CScriptFile* )    { return "scriptfile"; }
 inline SString GetClassTypeName ( CWater* )         { return "water"; }
 
+inline SString GetClassTypeName ( CXMLNode* )       { return "xml-node"; }
 
-// Dynamic cast - Returns NULL if it can't be done
+
+//
+// CXMLNode from userdata
+//
 template < class T >
-T* ElementCast ( CElement* pElement )
+CXMLNode* UserDataCast ( CXMLNode*, void* ptr )
 {
-    if ( pElement && pElement->GetType () == GetClassType ( (T*)0 ) )
-        return static_cast < T* > ( pElement );
-    return NULL;
+    return g_pServerInterface->GetXML ()->GetNodeFromID ( reinterpret_cast < unsigned long > ( ptr ) );
+}
+
+
+//
+// CElement from userdata
+//
+template < class T >
+CElement* UserDataCast ( CElement*, void* ptr )
+{
+    ElementID ID = TO_ELEMENTID ( ptr );
+    CElement* pElement = CElementIDs::GetElement ( ID );
+    if ( !pElement || pElement->IsBeingDeleted () || pElement->GetType () != GetClassType ( (T*)0 ) )
+        return NULL;
+    return pElement;
 }

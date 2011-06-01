@@ -24,8 +24,6 @@ extern CGame* g_pGame;
 #define VERIFY_RESOURCE(resource) (g_pGame->GetResourceManager()->Exists(resource))
 #endif
 
-#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
-
 using namespace std;
 
 CLuaArgument::CLuaArgument ( void )
