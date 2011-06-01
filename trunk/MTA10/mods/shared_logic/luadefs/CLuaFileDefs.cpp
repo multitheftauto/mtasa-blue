@@ -54,12 +54,12 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath, accessType ) )
             {
+                // Make sure the destination folder exist so we can create the file
+                MakeSureDirExists ( strAbsPath.c_str () );
+
                 // Create the file to create
                 CScriptFile* pFile = new CScriptFile ( strAbsPath.c_str (), DEFAULT_MAX_FILESIZE );
                 assert ( pFile );
-
-                // Make sure the directory exists
-                MakeSureDirExists ( strAbsPath.c_str () );
 
                 // Try to load it
                 if ( pFile->Load ( CScriptFile::MODE_CREATE ) )
