@@ -4071,7 +4071,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                 {
                     unsigned int uiDoor = 0; // Meh GetClosestVehicleInRange needs to dump the door somewhere.
                     CClientVehicle* pVehicle = m_pLocalPlayer->GetClosestVehicleInRange ( true, !bPassenger, bPassenger, false, &uiDoor, NULL, 20.0f );
-                    if ( pVehicle->IsInWater() || m_pLocalPlayer->IsInWater() ) // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
+                    if ( pVehicle && ( pVehicle->IsInWater() || m_pLocalPlayer->IsInWater() ) ) // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
                     {
                         m_pLocalPlayer->KillTask(3, true ); // Kill jump task if we are about to warp in
                     }
