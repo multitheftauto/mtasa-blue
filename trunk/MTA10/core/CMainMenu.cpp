@@ -436,8 +436,7 @@ void CMainMenu::Update ( void )
 		    fProgress = fProgress - ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA);
             if ( SetItemHoverProgress ( (*it), fProgress, false ) )
             {
-                std::set<sMenuItem*>::iterator itToErase = it;
-                it--;
+                std::set<sMenuItem*>::iterator itToErase = it++;
                 m_unhoveredItems.erase(itToErase);
             }
             else
