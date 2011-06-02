@@ -301,10 +301,7 @@ void CResourceManager::UnloadRemovedResources ( void )
     iter = resourcesToDelete.begin ();
     for ( ; iter != resourcesToDelete.end (); iter++ )
     {
-        RemoveResourceFromLists ( *iter );
-        RemoveFromQueue ( *iter );
-        m_resourcesToStartAfterRefresh.remove ( *iter );
-        delete *iter;
+        Unload ( *iter );
     }
 }
 
