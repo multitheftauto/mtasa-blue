@@ -185,6 +185,8 @@ int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
                                     m_pScriptDebugging->LogBadPointer ( luaVM, "setVehicleHandling", "property", 2 );
                                     break;
                                 }
+                            default:
+                                break;
                         }
                     }
                 }
@@ -370,6 +372,8 @@ int CLuaHandlingDefs::SetModelHandling ( lua_State* luaVM )
                                 {
                                     m_pScriptDebugging->LogBadPointer ( luaVM, "setModelHandling", "property", 2 );
                                 }
+                            default:
+                                break;
                         }
                     }
                 }

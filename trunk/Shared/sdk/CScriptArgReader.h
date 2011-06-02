@@ -311,7 +311,7 @@ public:
             return "No error";
 
         int             iGotArgumentType    = lua_type ( m_luaVM, m_iErrorIndex );
-        const SString&  strGotArgumentType  = EnumToString ( (eLuaType&)iGotArgumentType );
+        const SString&  strGotArgumentType  = EnumToString ( (eLuaType)iGotArgumentType );
         const char *    szGotArgumentValue  = lua_tostring ( m_luaVM, m_iErrorIndex );
 
         // Compose error message

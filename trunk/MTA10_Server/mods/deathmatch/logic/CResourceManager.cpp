@@ -26,6 +26,16 @@ extern CServerInterface* g_pServerInterface;
 static bool s_bNotFirstTime = false; // if true, outputs "new resource loaded" messages, doesn't do it
                                      // first time to prevent console spam on startup
 
+// SResInfo - Item in list of potential resources - Used in Refresh()
+struct SResInfo
+{
+    SString strAbsPath;
+    SString strName;
+    bool bIsDir;
+    bool bPathIssue;
+};
+
+
 CResourceManager::CResourceManager ( void )
 {
     m_bResourceListChanged = false;
@@ -60,13 +70,6 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
     UnloadRemovedResources();
 
     // Make list of potential active resources
-    struct SResInfo
-    {
-        SString strAbsPath;
-        SString strName;
-        bool bIsDir;
-        bool bPathIssue;
-    };
     std::map < SString, SResInfo > resInfoMap;
 
     // Initial search dir

@@ -13,6 +13,8 @@
 #ifdef WIN32
     #include "shellapi.h"
     #include "shlobj.h"
+#else
+    #include <dirent.h>
 #endif
 
 //
@@ -481,14 +483,13 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
                 // Determine the file stats
                 if ( lstat ( strPath, &Info ) != -1 )
                     bIsDir = S_ISDIR ( Info.st_mode );
-                else
-                    CLogger::ErrorPrintf ( "Unable to stat %s\n", *strPath );
 
                 if ( bIsDir ? bDirectories : bFiles )
                     strResult.push_back ( DirEntry->d_name );
             }
         }
     }
+    return strResult;
 }
 #endif
 

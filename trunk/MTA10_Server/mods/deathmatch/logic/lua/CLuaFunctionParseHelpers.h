@@ -9,6 +9,8 @@
 *
 *****************************************************************************/
 
+#include "CElementIDs.h"
+
 // Forward declare enum reflection stuff
 enum eLuaType { };
 DECLARE_ENUM( eLuaType );
@@ -70,4 +72,17 @@ CElement* UserDataCast ( CElement*, void* ptr )
     if ( !pElement || pElement->IsBeingDeleted () || pElement->GetType () != GetClassType ( (T*)0 ) )
         return NULL;
     return pElement;
+}
+
+
+//
+// CElement ( something )
+//
+// Returns true if T is the same class as the one wrapped by pElement
+template < class T >
+bool CheckWrappedUserDataType ( CElement*& pElement, SString& strErrorExpectedType )
+{
+    // Not used server side (yet)
+    strErrorExpectedType = GetClassTypeName ( (T*)0 );
+    return false;
 }
