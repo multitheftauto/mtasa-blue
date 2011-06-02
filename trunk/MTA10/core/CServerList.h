@@ -409,7 +409,7 @@ public:
         SAddressPort key ( Address, usQueryPort );
         if ( MapRemove ( m_Map, key ) )
         {
-            for ( CServerListIterator iter = m_List.begin (); iter != m_List.end (); iter++ )
+            for ( std::list<CServerListItem *>::iterator iter = m_List.begin (); iter != m_List.end (); iter++ )
             {
                 CServerListItem* pItem = *iter;
                 if ( pItem->Address.s_addr == Address.s_addr && pItem->usQueryPort == usQueryPort )
