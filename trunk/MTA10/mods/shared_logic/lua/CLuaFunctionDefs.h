@@ -640,6 +640,7 @@ public:
     LUA_DECLARE ( GetTrafficLightState );
     LUA_DECLARE ( AreTrafficLightsLocked );
     LUA_DECLARE ( GetJetpackMaxHeight );
+    LUA_DECLARE ( GetAircraftMaxHeight );
 
     LUA_DECLARE ( SetTime );
     LUA_DECLARE ( GetSkyGradient );
@@ -687,6 +688,7 @@ public:
     LUA_DECLARE ( GetSunSize );
     LUA_DECLARE ( SetSunSize );
     LUA_DECLARE ( ResetSunSize );
+    LUA_DECLARE ( SetAircraftMaxHeight );
 
     // Input functions
     LUA_DECLARE ( BindKey );

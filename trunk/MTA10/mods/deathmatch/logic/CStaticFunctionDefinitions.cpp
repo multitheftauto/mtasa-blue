@@ -5295,6 +5295,17 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetAircraftMaxHeight ( float fHeight )
+{
+    if ( fHeight >= 0 && fHeight <= 9001 )
+    {
+        g_pGame->GetWorld ()->SetAircraftMaxHeight ( fHeight );
+        return true;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetTrafficLightState ( unsigned char ucState )
 {
     if ( ucState >= 0 && ucState < 10 )

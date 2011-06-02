@@ -457,6 +457,7 @@ public:
     static bool                         SetWindVelocity                     ( float fX, float fY, float fZ );
     static bool                         RestoreWindVelocity                 ( void );
     static bool                         GetWindVelocity                     ( float& fX, float& fY, float& fZ );
+    static bool                         SetAircraftMaxHeight                ( float fHeight );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
