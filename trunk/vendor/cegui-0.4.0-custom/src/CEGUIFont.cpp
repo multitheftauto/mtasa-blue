@@ -503,7 +503,7 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 		drawGlyphToBuffer((void*)glyph,dest_buff, size);
 
 		// define Image on Imageset for this glyph to save re-rendering glyph later
-        char* b    =  new char[];
+        char* b    =  new char[std::numeric_limits<uint>::digits + 1];
         sprintf(b,"%u",i);
         imageName		= ("glyph_" + d_name + "_" + String(b));
 		rect.d_left		= (float)cur_x;
