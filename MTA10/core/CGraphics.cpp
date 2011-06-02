@@ -1078,7 +1078,7 @@ void CGraphics::ExpireCachedTextures ( bool bExpireAll )
         if ( ulAge > ulMaxAgeSeconds * 1000 || bExpireAll )
         {
             SAFE_RELEASE ( info.d3dTexture );
-            iter = m_CachedTextureInfoMap.erase ( iter );
+            m_CachedTextureInfoMap.erase ( iter++ );
         }
         else
             ++iter;
