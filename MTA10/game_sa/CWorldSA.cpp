@@ -388,3 +388,13 @@ float CWorldSA::GetJetpackMaxHeight ( void )
 {
     return *(float *)(VAR_fJetpackMaxHeight);
 }
+
+void CWorldSA::SetAircraftMaxHeight ( float fHeight )
+{
+    MemPut < float > ( VAR_fAircraftMaxHeight, fHeight );
+}
+
+float CWorldSA::GetAircraftMaxHeight ( void )
+{
+    return *(float *)( VAR_fAircraftMaxHeight );
+}

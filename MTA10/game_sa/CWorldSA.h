@@ -41,6 +41,7 @@
 #define NUM_StreamRepeatSectorRows                          16
 #define NUM_StreamRepeatSectorCols                          16
 #define VAR_fJetpackMaxHeight                               0x8703D8
+#define VAR_fAircraftMaxHeight                              0x8594DC
 
 
 #include <game/CWorld.h>
@@ -68,6 +69,8 @@ public:
     void        SetCurrentArea            ( DWORD dwArea );
     void        SetJetpackMaxHeight       ( float fHeight );
     float       GetJetpackMaxHeight       ( void );
+    void        SetAircraftMaxHeight      ( float fHeight );
+    float       GetAircraftMaxHeight      ( void );
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)

@@ -42,12 +42,13 @@ CRITICAL_SECTION CClientGame::m_crVoice;
 #endif
 
 bool g_bBoundsChecker = true;
-#define DEFAULT_GRAVITY 0.008f
-#define DEFAULT_GAME_SPEED 1.0f
-#define DEFAULT_BLUR_LEVEL 36
-#define DEFAULT_JETPACK_MAXHEIGHT 100
-#define DEFAULT_MINUTE_DURATION 1000
-#define DOUBLECLICK_TIMEOUT 330
+#define DEFAULT_GRAVITY            0.008f
+#define DEFAULT_GAME_SPEED         1.0f
+#define DEFAULT_BLUR_LEVEL         36
+#define DEFAULT_JETPACK_MAXHEIGHT  100
+#define DEFAULT_AIRCRAFT_MAXHEIGHT 800
+#define DEFAULT_MINUTE_DURATION    1000
+#define DOUBLECLICK_TIMEOUT        330
 #define DOUBLECLICK_MOVE_THRESHOLD 10.0f
 
 CClientGame::CClientGame ( bool bLocalPlay )
@@ -4616,6 +4617,9 @@ void CClientGame::ResetMapInfo ( void )
 
     // Jetpack max height
     g_pGame->GetWorld ()->SetJetpackMaxHeight ( DEFAULT_JETPACK_MAXHEIGHT );
+
+    // Aircraft max height
+    g_pGame->GetWorld ()->SetAircraftMaxHeight ( DEFAULT_AIRCRAFT_MAXHEIGHT );
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic ( true );

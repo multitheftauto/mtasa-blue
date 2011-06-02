@@ -946,13 +946,6 @@ int CLuaFunctionDefs::AreTrafficLightsLocked ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetJetpackMaxHeight ( lua_State* luaVM )
-{
-    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetJetpackMaxHeight () );
-    return 1;
-}
-
-
 int CLuaFunctionDefs::GetBlurLevel ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pGame->GetBlurLevel () );
@@ -1346,6 +1339,24 @@ int CLuaFunctionDefs::SetJetpackMaxHeight ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetAircraftMaxHeight ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        float fHeight = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
+        if ( CStaticFunctionDefinitions::SetAircraftMaxHeight ( fHeight ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setAircraftMaxHeight" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::IsWorldSpecialPropertyEnabled ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
@@ -1390,10 +1401,22 @@ int CLuaFunctionDefs::SetCloudsEnabled ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetJetpackMaxHeight ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetJetpackMaxHeight ( ) );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetAircraftMaxHeight ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pGame->GetWorld ()->GetAircraftMaxHeight ( ) );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetCloudsEnabled ( lua_State* luaVM )
 {
-      lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetCloudsEnabled () );
-      return 1;
+    lua_pushboolean ( luaVM, CStaticFunctionDefinitions::GetCloudsEnabled () );
+    return 1;
 }
 
 int CLuaFunctionDefs::SetTrafficLightState ( lua_State *luaVM )
