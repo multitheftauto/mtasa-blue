@@ -15,6 +15,7 @@
 #include <CMatrix.h>
 #include <CVector.h>
 
+#include <game/CExplosion.h>
 #include <game/CStats.h>
 #include "CPopulationMP.h"
 

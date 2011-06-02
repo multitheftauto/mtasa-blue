@@ -12,6 +12,8 @@
 #ifndef __CGAME_STATS
 #define __CGAME_STATS
 
+#include "CWeaponInfo.h"
+
 #define STATS_OFFSET        120
 #define STATS_BLANK_OFFSET  320
 
