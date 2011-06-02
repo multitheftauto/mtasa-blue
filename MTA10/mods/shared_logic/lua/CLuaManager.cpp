@@ -846,19 +846,29 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getBlurLevel", CLuaFunctionDefs::GetBlurLevel );
     CLuaCFunctions::AddFunction ( "getTrafficLightState", CLuaFunctionDefs::GetTrafficLightState );
     CLuaCFunctions::AddFunction ( "areTrafficLightsLocked", CLuaFunctionDefs::AreTrafficLightsLocked );
+    CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaFunctionDefs::GetSkyGradient );
+    CLuaCFunctions::AddFunction ( "getHeatHaze", CLuaFunctionDefs::GetHeatHaze );
+    CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefs::GetWaterColor );
+    CLuaCFunctions::AddFunction ( "getJetpackMaxHeight", CLuaFunctionDefs::GetJetpackMaxHeight );
+    CLuaCFunctions::AddFunction ( "getWindVelocity", CLuaFunctionDefs::GetWindVelocity );
+    CLuaCFunctions::AddFunction ( "areInteriorSoundsEnabled", CLuaFunctionDefs::AreInteriorSoundsEnabled );
+    CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance );
+    CLuaCFunctions::AddFunction ( "getFogDistance", CLuaFunctionDefs::GetFogDistance );
+    CLuaCFunctions::AddFunction ( "getSunColor", CLuaFunctionDefs::GetSunColor );
+    CLuaCFunctions::AddFunction ( "getSunSize", CLuaFunctionDefs::GetSunSize );
+    CLuaCFunctions::AddFunction ( "getAircraftMaxHeight", CLuaFunctionDefs::GetAircraftMaxHeight );
+    CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled );
+    CLuaCFunctions::AddFunction ( "getRainLevel", CLuaFunctionDefs::GetRainLevel );
 
     // World set funcs
     CLuaCFunctions::AddFunction ( "setTime", CLuaFunctionDefs::SetTime );
     CLuaCFunctions::AddFunction ( "createWater", CLuaFunctionDefs::CreateWater );
     CLuaCFunctions::AddFunction ( "setWaterLevel", CLuaFunctionDefs::SetWaterLevel );
     CLuaCFunctions::AddFunction ( "setWaterVertexPosition", CLuaFunctionDefs::SetWaterVertexPosition );
-    CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaFunctionDefs::GetSkyGradient );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaFunctionDefs::SetSkyGradient );
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaFunctionDefs::ResetSkyGradient );
-    CLuaCFunctions::AddFunction ( "getHeatHaze", CLuaFunctionDefs::GetHeatHaze );
     CLuaCFunctions::AddFunction ( "setHeatHaze", CLuaFunctionDefs::SetHeatHaze );
     CLuaCFunctions::AddFunction ( "resetHeatHaze", CLuaFunctionDefs::ResetHeatHaze );
-    CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefs::GetWaterColor );
     CLuaCFunctions::AddFunction ( "setWaterColor", CLuaFunctionDefs::SetWaterColor );
     CLuaCFunctions::AddFunction ( "resetWaterColor", CLuaFunctionDefs::ResetWaterColor );
     CLuaCFunctions::AddFunction ( "setWeather", CLuaFunctionDefs::SetWeather );
@@ -871,33 +881,23 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWorldSpecialPropertyEnabled", CLuaFunctionDefs::SetWorldSpecialPropertyEnabled );
     CLuaCFunctions::AddFunction ( "setBlurLevel", CLuaFunctionDefs::SetBlurLevel );
     CLuaCFunctions::AddFunction ( "setJetpackMaxHeight", CLuaFunctionDefs::SetJetpackMaxHeight );
-    CLuaCFunctions::AddFunction ( "getJetpackMaxHeight", CLuaFunctionDefs::GetJetpackMaxHeight );
     CLuaCFunctions::AddFunction ( "setCloudsEnabled", CLuaFunctionDefs::SetCloudsEnabled );
-    CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled );
     CLuaCFunctions::AddFunction ( "setTrafficLightState", CLuaFunctionDefs::SetTrafficLightState );
     CLuaCFunctions::AddFunction ( "setTrafficLightsLocked", CLuaFunctionDefs::SetTrafficLightsLocked );
     CLuaCFunctions::AddFunction ( "setWindVelocity", CLuaFunctionDefs::SetWindVelocity );
-    CLuaCFunctions::AddFunction ( "getWindVelocity", CLuaFunctionDefs::GetWindVelocity );
     CLuaCFunctions::AddFunction ( "resetWindVelocity", CLuaFunctionDefs::ResetWindVelocity );
-    CLuaCFunctions::AddFunction ( "areInteriorSoundsEnabled", CLuaFunctionDefs::AreInteriorSoundsEnabled );
     CLuaCFunctions::AddFunction ( "setInteriorSoundsEnabled", CLuaFunctionDefs::SetInteriorSoundsEnabled );
-    CLuaCFunctions::AddFunction ( "getRainLevel", CLuaFunctionDefs::GetRainLevel );
     CLuaCFunctions::AddFunction ( "setRainLevel", CLuaFunctionDefs::SetRainLevel );
     CLuaCFunctions::AddFunction ( "resetRainLevel", CLuaFunctionDefs::ResetRainLevel );
-    CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance );
     CLuaCFunctions::AddFunction ( "setFarClipDistance", CLuaFunctionDefs::SetFarClipDistance );
     CLuaCFunctions::AddFunction ( "resetFarClipDistance", CLuaFunctionDefs::ResetFarClipDistance );
-    CLuaCFunctions::AddFunction ( "getFogDistance", CLuaFunctionDefs::GetFogDistance );
     CLuaCFunctions::AddFunction ( "setFogDistance", CLuaFunctionDefs::SetFogDistance );
     CLuaCFunctions::AddFunction ( "resetFogDistance", CLuaFunctionDefs::ResetFogDistance );
-    CLuaCFunctions::AddFunction ( "getSunColor", CLuaFunctionDefs::GetSunColor );
     CLuaCFunctions::AddFunction ( "setSunColor", CLuaFunctionDefs::SetSunColor );
     CLuaCFunctions::AddFunction ( "resetSunColor", CLuaFunctionDefs::ResetSunColor );
-    CLuaCFunctions::AddFunction ( "getSunSize", CLuaFunctionDefs::GetSunSize );
     CLuaCFunctions::AddFunction ( "setSunSize", CLuaFunctionDefs::SetSunSize );
     CLuaCFunctions::AddFunction ( "resetSunSize", CLuaFunctionDefs::ResetSunSize );
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaFunctionDefs::SetAircraftMaxHeight );
-    CLuaCFunctions::AddFunction ( "getAircraftMaxHeight", CLuaFunctionDefs::GetAircraftMaxHeight );
 
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );
