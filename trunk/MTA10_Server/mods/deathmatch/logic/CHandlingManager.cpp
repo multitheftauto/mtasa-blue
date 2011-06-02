@@ -384,6 +384,7 @@ eHandlingTypes  CHandlingManager::GetHandlingID ( eVehicleTypes eModel )
     case VT_BOXBURG: return HT_BOXBURG;
     case VT_FARMTR1: return HT_FARM_TR1;
     case VT_UTILTR1: return HT_UTIL_TR1;
+    default: break;
     }
     return HT_LANDSTAL;
 }

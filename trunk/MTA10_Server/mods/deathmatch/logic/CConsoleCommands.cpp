@@ -42,11 +42,11 @@ static void EndConsoleOutputCapture ( CClient* pClient, const SString& strIfNoOu
         std::vector < SString > lines;
         CLogger::EndConsoleOutputCapture ().Split ( "\n", lines );
 
-        if ( lines.empty () )
-            lines.push_back ( strIfNoOutput );
+        if ( lines.size () == 1 && lines[0].empty () )
+            lines[0] = strIfNoOutput;
 
         for ( uint i = 0 ; i < lines.size () ; i++ )
-            if ( lines[i].length () )
+            if ( !lines[i].empty () )
                 pClient->SendConsole ( lines[i] );
     }
 }
