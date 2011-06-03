@@ -1,0 +1,69 @@
+Crazy Eddie's GUI System Mk-2
+http://www.cegui.org.uk
+
+Copyright ©2004 - 2005 CEGUI Team & Contributing Authors
+
+This sofware contains an embedded version of PCRE by Philip Hazel.
+PCRE is Copyright (c) 1997-2004 University of Cambridge, All rights reserved.
+Please see PCRE-LICENSE for additional licensing information.
+
+This sofware can be compiled to optionally contain an embedded version of
+TinyXML.  Please the file TinyXML-License for additional licensing information.
+
+This software uses the Freetype2 library to provide most of the font loading and
+rendering support.  Freetype2 is a free, high-quality, and portable font engine;
+see http://www.freetype.org for more information.
+
+This software can be compiled to optionally contain embedded copies of Lua and
+tolua++.  Please see the files luaCOPYRIGHT and tolua++README in the directory
+./ScriptingModules/CEGUILua/lua_and_tolua++/ for additional licensing that may
+apply to the use of these libraries.
+
+This is Crazy Eddie's GUI System Mk-2; a free library providing windowing and
+widgets for graphics APIs and engines where such functionality is not natively
+available or is severely lacking. The library is written in C++, is object
+orientated, and is primarily targeted at games developers who should be spending
+their time creating great games, not building GUI sub-systems...
+
+Note: In various documentation and online, the system is additionally referred
+to as both CEGUI (which is the main namespace name), and cegui_mk2 (which is the
+CVS module name of the Mk2 version of the system).
+
+
+Documentation
+=============
+See also the following files:
+COPYING   - Contains the license terms for using the library.
+AUTHORS   - Contains a list of authors and contributors.
+
+The main start point for system documentation is the Readme.html file (still
+TODO).  API documentation built from the source by Doxygen
+(http://www.doxygen.org) is available, and can be found online at
+http://www.cegui.org.uk/api_reference/.  For the very latest
+information and help, visit the project home page at
+http://www.cegui.org.uk.
+
+
+Supported Systems
+=================
+Crazy Eddie's GUI System Mk-2 is currently known to compile and run on the
+following systems:
+
+Various flavors of Linux using gcc.
+Microsoft Windows running VC++6 (sp6), VC++7.0, or VC++7.1.
+Apple Mac OS X running Xcode.
+
+It is very possible that the system will compile and run on other systems and
+compilers, though the above systems have been tested.
+
+
+Requirements
+============
+As well as one of the above supported systems, Crazy Eddie's GUI System Mk-2
+also requires the use of some third party external libraries.  These libraries
+are as follows:
+
+Freetype2 (http://www.freetype.org)
+Optionally: Xerces-C++ XML parser (http://xml.apache.org/xerces-c)
+
+Have Fun!
