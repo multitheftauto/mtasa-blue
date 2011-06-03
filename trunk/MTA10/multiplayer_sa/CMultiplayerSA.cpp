@@ -1093,9 +1093,6 @@ void CMultiplayerSA::InitHooks()
     MemPut < WORD > ( 0x53A55F, 0x9090 );
     MemPut < BYTE > ( 0x73EC06, 0x85 );
 
-    // Increase the events pool size (Fixes #4577).
-    MemPut < DWORD > ( 0x551177, 9001 );
-
     // Do not fixate camera behind spectated player if local player is dead
     MemPut < BYTE > ( 0x52A2BB, 0 );
     MemPut < BYTE > ( 0x52A4F8, 0 );

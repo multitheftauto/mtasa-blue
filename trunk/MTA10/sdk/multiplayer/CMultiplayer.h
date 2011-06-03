@@ -18,6 +18,7 @@
 #include <game/CExplosion.h>
 #include <game/CStats.h>
 #include "CPopulationMP.h"
+#include "CLimits.h"
 
 #define DEFAULT_WAVES -1.0f
 
@@ -218,6 +219,8 @@ public:
 
     virtual void                        AllowCreatedObjectsInVerticalLineTest ( bool bOn ) = 0;
     virtual void                        DeleteAndDisableGangTags    () = 0;
+
+    virtual CLimits*                    GetLimits                   () = 0;
 };
 
 #endif
