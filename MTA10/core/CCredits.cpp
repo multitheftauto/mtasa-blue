@@ -78,7 +78,23 @@ const char* g_szCredits = "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_S
                           "Chris \"Cray\" McArthur\n"
                           "Hans \"Blokker\" Roes\n"
                           "Kent \"Kent747\" Simon\n"
-                          "\n";
+                          "\n"
+                          
+                          "\n"
+                          "This software makes use of the following libraries and software:\n"
+                          "RakNet (http://www.jenkinssoftware.com)\n"
+                          "SA Limit adjuster source code (Credits to Sacky)\n"
+                          "CEGUI (http://www.cegui.org.uk/wiki/index.php/Main_Page)\n"
+                          "cURL (http://curl.haxx.se/)\n"
+                          "libpcre (http://www.pcre.org/)\n"
+                          "Lua (http://www.lua.org/)\n"
+                          "SQLite (http://www.sqlite.org/)\n"
+                          "libpng (http://www.libpng.org/)\n"
+                          "Embedded HTTP Server (http://ehs.fritz-elfert.de/)\n"
+                          "zlib (http://zlib.net/)\n"
+                          "bzip2 (http://bzip.org/)\n"
+                          ;
+
 
 namespace CCreditsGUI
 {
