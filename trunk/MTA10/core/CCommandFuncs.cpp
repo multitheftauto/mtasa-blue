@@ -434,3 +434,10 @@ void CCommandFuncs::DebugClear ( const char* szParameters )
 {
     CCore::GetSingleton ().GetLocalGUI ()->GetDebugView ()->Clear ();
 }
+
+void CCommandFuncs::Test ( const char* szParameters )
+{
+    char szBuffer[2048] = "";
+    CCore::GetSingleton ().GetNetwork ()->ResetStub ( 'test', szParameters, szBuffer );
+    CCore::GetSingleton ().GetConsole ()->Print ( szBuffer );
+}
