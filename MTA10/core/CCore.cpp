@@ -1259,6 +1259,8 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "debugscrollup",     "scrolls the debug view upwards",   CCommandFuncs::DebugScrollUp );
     m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
 
+    m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
+
 #ifdef MTA_DEBUG
     //m_pCommands->Add ( "pools",               "read out the pool values",         CCommandFuncs::PoolRelocations );
 #endif
