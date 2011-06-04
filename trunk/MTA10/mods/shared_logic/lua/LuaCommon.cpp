@@ -259,7 +259,7 @@ void lua_pushelement ( lua_State* luaVM, CClientEntity* pElement )
         ElementID ID = pElement->GetID ();
         if ( ID != INVALID_ELEMENT_ID )
         {
-            lua_pushlightuserdata ( luaVM, (void*) ID );
+            lua_pushlightuserdata ( luaVM, (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
             return;
         }
     }

@@ -14,7 +14,7 @@
 
 using namespace std;
 
-CStack <ElementID, MAX_SERVER_ELEMENTS, INVALID_ELEMENT_ID > CElementIDs::m_UniqueIDs;
+CStack <ElementID, MAX_SERVER_ELEMENTS > CElementIDs::m_UniqueIDs;
 CElement* CElementIDs::m_Elements [MAX_SERVER_ELEMENTS];
 
 void CElementIDs::Initialize ( void )
@@ -26,10 +26,10 @@ void CElementIDs::Initialize ( void )
 ElementID CElementIDs::PopUniqueID ( CElement* pElement )
 {
     // Grab the ID and check that we had more left
-    ElementID ID = m_UniqueIDs.Pop ();
-    if ( ID != INVALID_ELEMENT_ID )
+    ElementID ID;
+    if ( m_UniqueIDs.Pop (ID) && ID != INVALID_ELEMENT_ID )
     {
-        m_Elements [ID] = pElement;
+        m_Elements [ID.Value()] = pElement;
     }
 
     return ID;
@@ -42,7 +42,7 @@ void CElementIDs::PushUniqueID ( ElementID ID )
     if ( ID != INVALID_ELEMENT_ID )
     {
         m_UniqueIDs.Push ( ID );
-        m_Elements [ID] = NULL;
+        m_Elements [ID.Value()] = NULL;
     }
 }
 
@@ -57,7 +57,7 @@ CElement* CElementIDs::GetElement ( ElementID ID )
 {
     // Return the element with the given ID
     if ( ID != INVALID_ELEMENT_ID && ID < MAX_SERVER_ELEMENTS )
-        return m_Elements [ID];
+        return m_Elements [ID.Value()];
 
     return NULL;
 }

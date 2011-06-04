@@ -14,7 +14,7 @@
 
 using namespace std;
 
-CStack < unsigned long, 1, INVALID_XML_ID > CXMLArray::m_IDStack;
+CStack < unsigned long, 1 > CXMLArray::m_IDStack;
 std::vector < CXMLCommon* >                 CXMLArray::m_Elements;
 unsigned long                               CXMLArray::m_ulCapacity = 0;
 
@@ -39,7 +39,8 @@ unsigned long CXMLArray::PopUniqueID ( CXMLCommon* pEntry )
     }
 
     // Grab the next unused ID
-    unsigned long ulPhysicalIndex = m_IDStack.Pop ();
+    unsigned long ulPhysicalIndex;
+    assert ( m_IDStack.Pop ( ulPhysicalIndex ) == true );
 
     // Checks
     assert ( ulPhysicalIndex != INVALID_XML_ID );

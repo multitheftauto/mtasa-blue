@@ -278,7 +278,7 @@ bool CClientTask::WriteElements ( lua_State* luaVM, int iTableIndex )
     {
         // Add the entries to it
         lua_pushnumber ( luaVM, uiIndex );
-        lua_pushnumber ( luaVM, *iterElements );
+        lua_pushnumber ( luaVM, (*iterElements).Value() );
         lua_settable ( luaVM, iNewTableIndex );
 
         // Increment index

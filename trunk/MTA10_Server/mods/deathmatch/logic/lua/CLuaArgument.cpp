@@ -417,7 +417,7 @@ void CLuaArgument::Read ( CElement* pElement )
     if ( pElement )
     {
         m_iType = LUA_TLIGHTUSERDATA;
-        m_pLightUserData = (void*) pElement->GetID ();
+        m_pLightUserData = (void*) reinterpret_cast<unsigned int *>(pElement->GetID ().Value());
     }
     else
         m_iType = LUA_TNIL;
@@ -792,7 +792,7 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
             if ( pElement && bSerialize )
             {
                 char szElementID[10] = {0};
-                snprintf ( szElementID, 9, "^E^%d", (int)pElement->GetID() );
+                snprintf ( szElementID, 9, "^E^%d", (int)pElement->GetID().Value() );
                 return json_object_new_string ( szElementID );
             }
             else if ( VERIFY_RESOURCE(pResource) )
@@ -876,7 +876,7 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
             CResource* pResource = reinterpret_cast < CResource* > ( GetLightUserData() );
             if ( pElement )
             {
-                snprintf ( szBuffer, length, "#E#%d", (int)pElement->GetID() );
+                snprintf ( szBuffer, length, "#E#%d", (int)pElement->GetID().Value() );
                 return szBuffer;
             }
             else if ( VERIFY_RESOURCE(pResource) )

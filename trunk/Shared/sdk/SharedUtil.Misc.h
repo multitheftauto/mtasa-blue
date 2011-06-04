@@ -452,7 +452,7 @@ namespace SharedUtil
     //
     // Note: IDs run from 1 to Capacity
     //
-    template < typename T, unsigned long INITIAL_MAX_STACK_SIZE, T INVALID_STACK_ID >
+    template < typename T, unsigned long INITIAL_MAX_STACK_SIZE >
     class CStack
     {
     public:
@@ -485,26 +485,26 @@ namespace SharedUtil
             m_ulCapacity = ulNewSize;
         }
 
-        T Pop ( void )
+        bool Pop ( T& dest )
         {
             // Got any items? Pop from the back
             if ( m_Queue.size () > 0 )
             {
                 T ID = m_Queue.back();
                 m_Queue.pop_back ();
-                return ID;
+                dest = ID;
+                return true;
             }
 
             // No IDs left
-            return INVALID_STACK_ID;
+            return false;
         }
 
         void Push ( T ID )
         {
             assert ( m_Queue.size () < m_ulCapacity );
-            assert ( ID != INVALID_STACK_ID );
             // Push to the front
-            return m_Queue.push_front ( ID );
+            m_Queue.push_front ( ID );
         }
 
     private:
