@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/VideoCard.cpp
+*  FILE:        sdk/core/VideoCard.cpp
 *  PURPOSE:     Shared stuff which is videocard oriented
 *  DEVELOPERS:  Alberto Alonso <rydencillo@gmail.com>
 *
@@ -10,7 +10,7 @@
 *
 *****************************************************************************/
 
-#include <core/VideoCard.h>
+#include "VideoCard.h"
 
 int GetTotalVideoMemory ( IDirect3DDevice9* pDevice )
 {
