@@ -1222,6 +1222,38 @@
 				</Filter>
 			</Filter>
 			<Filter
+				Name="core"
+				>
+				<File
+					RelativePath="..\..\sdk\core\VideoCard.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Nightly|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
+			</Filter>
+			<Filter
 				Name="utils"
 				>
 				<File
@@ -1538,6 +1570,14 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="core"
+				>
+				<File
+					RelativePath="..\..\sdk\core\VideoCard.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="utils"
