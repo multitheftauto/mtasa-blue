@@ -1109,6 +1109,9 @@ void CCore::DoPostFramePulse ( )
             {
                 m_bFirstFrame = false;
 
+                // Disable vsync while it's all dark
+                m_pGame->DisableVSync ();
+
                 // Parse the command line
                 // Does it begin with mtasa://?
                 if ( m_szCommandLineArgs && strnicmp ( m_szCommandLineArgs, "mtasa://", 8 ) == 0 )

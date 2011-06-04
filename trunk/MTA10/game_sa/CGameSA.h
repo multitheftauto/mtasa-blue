@@ -215,6 +215,7 @@ public:
     void                    SetupSpecialCharacters  ( void );
 
     void                    FlushPendingRestreamIPL         ( void );
+    void                    DisableVSync                    ( void );
 
 private:
     CPools                  * m_pPools;
