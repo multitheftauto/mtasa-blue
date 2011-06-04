@@ -23,6 +23,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/VideoCard.h>
 #include <net/SyncStructures.h>
 
 using SharedUtil::CalcMTASAPath;
@@ -313,7 +314,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Give a default value for the streaming memory
     if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
-        g_pCore->GetCVars()->Set ( "streaming_memory", SharedUtil::GetMaxStreamingMemory(g_pCore->GetGraphics()->GetDevice()) );
+        g_pCore->GetCVars()->Set ( "streaming_memory", GetMaxStreamingMemory(g_pCore->GetGraphics()->GetDevice()) );
 }
 
 
@@ -805,9 +806,9 @@ void CClientGame::DoPulsePostFrame ( void )
         // Adjust the streaming memory limit.
         unsigned int uiStreamingMemory;
         g_pCore->GetCVars()->Get ( "streaming_memory", uiStreamingMemory );
-        uiStreamingMemory = SharedUtil::Clamp ( SharedUtil::GetMinStreamingMemory(g_pCore->GetGraphics()->GetDevice()),
+        uiStreamingMemory = SharedUtil::Clamp ( GetMinStreamingMemory(g_pCore->GetGraphics()->GetDevice()),
                                                 uiStreamingMemory,
-                                                SharedUtil::GetMaxStreamingMemory(g_pCore->GetGraphics()->GetDevice()) );
+                                                GetMaxStreamingMemory(g_pCore->GetGraphics()->GetDevice()) );
         g_pCore->GetCVars()->Set ( "streaming_memory", uiStreamingMemory );
 
         int iStreamingMemoryBytes = static_cast<int>(uiStreamingMemory) * 1024 * 1024;
