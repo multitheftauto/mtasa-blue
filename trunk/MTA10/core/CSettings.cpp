@@ -18,6 +18,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/VideoCard.h>
 #include <game/CGame.h>
 #include <utils/CMD5Hasher.h>
 
@@ -564,8 +565,8 @@ CSettings::CSettings ( void )
     m_pStreamingMemoryLabel->AutoSize ( "Usable video memory:" );
 
     IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice();
-    unsigned int uiMinMemory = SharedUtil::GetMinStreamingMemory ( pDevice );
-    unsigned int uiMaxMemory = SharedUtil::GetMaxStreamingMemory ( pDevice );
+    unsigned int uiMinMemory = GetMinStreamingMemory ( pDevice );
+    unsigned int uiMaxMemory = GetMaxStreamingMemory ( pDevice );
 
     m_pStreamingMemory = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + 130.0f, vecTemp.fY ) );
@@ -1970,8 +1971,8 @@ void CSettings::LoadData ( void )
     IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice ();
     unsigned int uiStreamingMemory;
     CVARS_GET ( "streaming_memory", uiStreamingMemory );
-    uiStreamingMemory = SharedUtil::Clamp ( SharedUtil::GetMinStreamingMemory(pDevice), uiStreamingMemory, SharedUtil::GetMaxStreamingMemory(pDevice) );
-    float fPos = SharedUtil::Unlerp ( SharedUtil::GetMinStreamingMemory(pDevice), uiStreamingMemory, SharedUtil::GetMaxStreamingMemory(pDevice) );
+    uiStreamingMemory = SharedUtil::Clamp ( GetMinStreamingMemory(pDevice), uiStreamingMemory, GetMaxStreamingMemory(pDevice) );
+    float fPos = SharedUtil::Unlerp ( GetMinStreamingMemory(pDevice), uiStreamingMemory, GetMaxStreamingMemory(pDevice) );
     m_pStreamingMemory->SetScrollPosition ( fPos );
     m_pStreamingMemoryValueLabel->SetText ( SString ( "%u MB", uiStreamingMemory ) );
 }
@@ -2200,8 +2201,8 @@ void CSettings::SaveData ( void )
     // Streaming memory
     float fPos = m_pStreamingMemory->GetScrollPosition ();
     IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice ();
-    int min = SharedUtil::GetMinStreamingMemory ( pDevice );
-    int max = SharedUtil::GetMaxStreamingMemory ( pDevice );
+    int min = GetMinStreamingMemory ( pDevice );
+    int max = GetMaxStreamingMemory ( pDevice );
     unsigned int value = SharedUtil::Lerp ( min, fPos, max );
     CVARS_SET ( "streaming_memory", value );
 
@@ -2582,8 +2583,8 @@ bool CSettings::OnStreamingMemoryChanged ( CGUIElement* pElement )
 {
     float fPos = m_pStreamingMemory->GetScrollPosition ();
     IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice ();
-    int min = SharedUtil::GetMinStreamingMemory ( pDevice );
-    int max = SharedUtil::GetMaxStreamingMemory ( pDevice );
+    int min = GetMinStreamingMemory ( pDevice );
+    int max = GetMaxStreamingMemory ( pDevice );
     int value = SharedUtil::Lerp ( min, fPos, max );
     m_pStreamingMemoryValueLabel->SetText ( SString("%i MB", value) );
 

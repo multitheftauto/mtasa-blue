@@ -641,6 +641,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\VideoCard.cpp"
+			>
+			</File>
+			<File
 				RelativePath=".\xfire.cpp"
 				>
 			</File>
@@ -1069,6 +1073,10 @@
 					</File>
 					<File
 						RelativePath="..\sdk\core\CSetCursorPosHookInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\VideoCard.h"
 						>
 					</File>
 				</Filter>
@@ -1666,14 +1674,6 @@
 				</File>
 				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Time.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Shared\sdk\SharedUtil.Videocard.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Shared\sdk\SharedUtil.Videocard.hpp"
 					>
 				</File>
 				<File
