@@ -1429,7 +1429,7 @@ void CClientGame::UpdateVehicleInOut ( void )
                     if ( pBitStream )
                     {
                         // Write the car id and the action id (enter complete)
-                        pBitStream->WriteCompressed ( m_VehicleInOutID );
+                        pBitStream->Write ( m_VehicleInOutID );
                         unsigned char ucAction = VEHICLE_NOTIFY_OUT;
                         pBitStream->WriteBits ( &ucAction, 4 );
 
@@ -1495,7 +1495,7 @@ void CClientGame::UpdateVehicleInOut ( void )
                     if ( pBitStream )
                     {
                         // Write the car id and the action id (enter complete)
-                        pBitStream->WriteCompressed ( m_VehicleInOutID );
+                        pBitStream->Write ( m_VehicleInOutID );
                         unsigned char ucAction;
 
                         if ( m_bIsJackingVehicle )
@@ -1544,7 +1544,7 @@ void CClientGame::UpdateVehicleInOut ( void )
                     if ( pBitStream )
                     {
                         // Write the car id and the action id (enter complete)
-                        pBitStream->WriteCompressed ( m_VehicleInOutID );
+                        pBitStream->Write ( m_VehicleInOutID );
                         unsigned char ucAction;
                         if ( m_bIsJackingVehicle )
                         {
@@ -1660,7 +1660,7 @@ void CClientGame::UpdateVehicleInOut ( void )
                 if ( pBitStream )
                 {
                     // Vehicle id
-                    pBitStream->WriteCompressed ( pOccupiedVehicle->GetID () );
+                    pBitStream->Write ( pOccupiedVehicle->GetID () );
                     unsigned char ucAction = static_cast < unsigned char > ( VEHICLE_NOTIFY_FELL_OFF );
                     pBitStream->WriteBits ( &ucAction, 4 );
 
@@ -1751,7 +1751,7 @@ void CClientGame::UpdatePlayerTarget ( void )
         }
 
         CBitStream bitStream;
-        bitStream.pBitStream->WriteCompressed ( TargetID );
+        bitStream.pBitStream->Write ( TargetID );
         m_pNetAPI->RPC ( PLAYER_TARGET, bitStream.pBitStream );
 
         // Call our onClientPlayerTarget event
@@ -1964,7 +1964,7 @@ void CClientGame::UpdateFireKey ( void )
                                 {
                                     // Lets request a stealth kill
                                     CBitStream bitStream;
-                                    bitStream.pBitStream->WriteCompressed ( pTargetPed->GetID () );
+                                    bitStream.pBitStream->Write ( pTargetPed->GetID () );
                                     m_pNetAPI->RPC ( REQUEST_STEALTH_KILL, bitStream.pBitStream );
                                 }
                                 else
@@ -2404,7 +2404,7 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                         if ( CollisionEntityID != INVALID_ELEMENT_ID )
                         {
                             bitStream.pBitStream->WriteBit ( true );
-                            bitStream.pBitStream->WriteCompressed ( CollisionEntityID );
+                            bitStream.pBitStream->Write ( CollisionEntityID );
                         }
                         else
                             bitStream.pBitStream->WriteBit ( false );
@@ -4061,7 +4061,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                     if ( pBitStream )
                     {
                         // Write the vehicle id to it and that we're requesting to get out of it
-                        pBitStream->WriteCompressed ( pOccupiedVehicle->GetID () );
+                        pBitStream->Write ( pOccupiedVehicle->GetID () );
                         unsigned char ucAction = static_cast < unsigned char > ( VEHICLE_REQUEST_OUT );
                         pBitStream->WriteBits ( &ucAction, 4 );
 
@@ -4137,7 +4137,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                                 if ( pBitStream )
                                                 {
                                                     // Write the vehicle id to it and that we're requesting to get into it
-                                                    pBitStream->WriteCompressed ( pVehicle->GetID () );
+                                                    pBitStream->Write ( pVehicle->GetID () );
                                                     unsigned char ucAction = static_cast < unsigned char > ( VEHICLE_REQUEST_IN );
                                                     unsigned char ucSeat = static_cast < unsigned char > ( uiSeat );
                                                     bool bIsOnWater = pVehicle->IsOnWater ();
@@ -4425,7 +4425,7 @@ void CClientGame::SendExplosionSync ( const CVector& vecPosition, eExplosionType
         if ( pOrigin )
         {
             pBitStream->WriteBit ( true );
-            pBitStream->WriteCompressed ( pOrigin->GetID () );
+            pBitStream->Write ( pOrigin->GetID () );
 
             // Convert position
             CVector vecTemp;
@@ -4485,7 +4485,7 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
             origin.data.vecPosition -= vecTemp;
 
             pBitStream->WriteBit ( true );
-            pBitStream->WriteCompressed ( pOriginSource->GetID () );
+            pBitStream->Write ( pOriginSource->GetID () );
         }
         else
             pBitStream->WriteBit ( false );
@@ -4521,7 +4521,7 @@ void CClientGame::SendProjectileSync ( CClientProjectile * pProjectile )
                 if ( pTarget )
                 {
                     pBitStream->WriteBit ( true );
-                    pBitStream->WriteCompressed ( pTarget->GetID () );
+                    pBitStream->Write ( pTarget->GetID () );
                 }
                 else
                     pBitStream->WriteBit ( false );
@@ -4743,7 +4743,7 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
             pBitStream->WriteCompressed ( animGroup );
             pBitStream->WriteCompressed ( animID );
 
-            pBitStream->WriteCompressed ( damagerID );
+            pBitStream->Write ( damagerID );
 
             SWeaponTypeSync weapon;
             weapon.data.ucWeaponType = ucWeapon;

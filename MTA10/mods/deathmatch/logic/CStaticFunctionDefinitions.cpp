@@ -178,9 +178,9 @@ bool CStaticFunctionDefinitions::TriggerServerEvent ( const char* szName, CClien
     if ( pBitStream )
     {
         unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
-        pBitStream->WriteCompressed ( usNameLength );
+        pBitStream->Write ( usNameLength );
         pBitStream->Write ( const_cast < char* > ( szName ), usNameLength );
-        pBitStream->WriteCompressed ( CallWithEntity.GetID () );
+        pBitStream->Write ( CallWithEntity.GetID () );
         if ( !Arguments.WriteToBitStream ( *pBitStream ) )
         {
             g_pNet->DeallocateNetBitStream ( pBitStream );
@@ -908,7 +908,7 @@ bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const c
             if ( pBitStream )
             {
                 // Write element ID, name length and the name. Also write the variable.
-                pBitStream->WriteCompressed ( Entity.GetID () );
+                pBitStream->Write ( Entity.GetID () );
                 unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
                 pBitStream->WriteCompressed ( usNameLength );
                 pBitStream->Write ( const_cast < char* > ( szName ), usNameLength );    

@@ -665,7 +665,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        if ( bitStream.ReadCompressed ( data.vehicleID ) &&
+        if ( bitStream.Read ( data.vehicleID ) &&
              bitStream.Read ( data.ucTimeContext ) &&
              bitStream.ReadBits ( (char *)&data, 9 ) )
         {
@@ -706,7 +706,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 
             if ( data.bSyncTrailer )
             {
-                bitStream.ReadCompressed ( data.trailer );
+                bitStream.Read ( data.trailer );
             }
 
             return true;
@@ -716,7 +716,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        bitStream.WriteCompressed ( data.vehicleID );
+        bitStream.Write ( data.vehicleID );
         bitStream.Write ( data.ucTimeContext );
         bitStream.WriteBits ( (const char* )&data, 9 );
 
@@ -757,7 +757,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
 
         if ( data.bSyncTrailer )
         {
-            bitStream.WriteCompressed ( data.trailer );
+            bitStream.Write ( data.trailer );
         }
     }
 

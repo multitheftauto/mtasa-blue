@@ -48,7 +48,7 @@ bool CPlayerWastedPacket::Read ( NetBitStreamInterface& BitStream )
 
     if ( BitStream.ReadCompressed ( m_AnimGroup ) &&
          BitStream.ReadCompressed ( m_AnimID ) &&
-         BitStream.ReadCompressed ( m_Killer ) &&
+         BitStream.Read ( m_Killer ) &&
          BitStream.Read ( &weapon ) &&
          BitStream.Read ( &bodyPart ) &&
          BitStream.Read ( &pos ) )
@@ -75,8 +75,8 @@ bool CPlayerWastedPacket::Write ( NetBitStreamInterface& BitStream ) const
     weapon.data.ucWeaponType = m_ucKillerWeapon;
     bodyPart.data.uiBodypart = m_ucBodyPart;
 
-    BitStream.WriteCompressed ( m_PlayerID );
-    BitStream.WriteCompressed ( m_Killer );
+    BitStream.Write ( m_PlayerID );
+    BitStream.Write ( m_Killer );
     BitStream.Write ( &weapon );
     BitStream.Write ( &bodyPart );
     BitStream.WriteBit ( m_bStealth );    

@@ -554,7 +554,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             {
                 // Read out the elemnt ID
                 ElementID ElementID;
-                if ( bitStream.ReadCompressed ( ElementID ) )
+                if ( bitStream.Read ( ElementID ) )
                 {
                     ReadElementID ( ElementID );
                 }
@@ -682,7 +682,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
                 {
                     type.data.ucType = LUA_TLIGHTUSERDATA;
                     bitStream.Write ( &type );
-                    bitStream.WriteCompressed ( static_cast < ElementID > ( pElement->GetID () ) );
+                    bitStream.Write ( pElement->GetID () );
                 }
                 else
                 {

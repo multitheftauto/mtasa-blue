@@ -151,7 +151,7 @@ void CRPCFunctions::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterf
 
             // Grab the source entity.
             ElementID ID;
-            bitStream.ReadCompressed ( ID );
+            bitStream.Read ( ID );
             CClientEntity* pSource = NULL;
             if ( ID != INVALID_ELEMENT_ID )
             {
