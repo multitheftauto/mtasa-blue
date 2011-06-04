@@ -19,7 +19,6 @@
 class CVehicleResyncPacket : public CPacket
 {
 public:
-    inline                      CVehicleResyncPacket        ( void )                        {};
     inline explicit             CVehicleResyncPacket        ( CVehicle* pVehicle )          { m_pSourceElement = pVehicle; };
 
     inline ePacketID            GetPacketID                 ( void ) const                  { return PACKET_ID_VEHICLE_RESYNC; };

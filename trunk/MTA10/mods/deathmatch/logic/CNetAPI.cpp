@@ -1801,6 +1801,38 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
     pPlayer->IncrementPlayerSync ();
 }
 
-void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStram )
+void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream )
 {
+    // Read out vehicle position and rotation
+    SPositionSync position ( false );
+    if ( !BitStream.Read ( &position ) )
+        return;
+
+    SRotationDegreesSync rotation;
+    if ( !BitStream.Read ( &rotation ) )
+        return;
+
+    // Read out the movespeed
+    SVelocitySync velocity;
+    if ( !BitStream.Read ( &velocity ) )
+        return;
+
+    // Read out the turnspeed
+    SVelocitySync turnSpeed;
+    if ( !BitStream.Read ( &turnSpeed ) )
+        return;
+
+    // Read out the vehicle health
+    SVehicleHealthSync health;
+    if ( !BitStream.Read ( &health ) )
+        return;
+    pVehicle->SetHealth ( health.data.fValue );
+
+    // Set the target position and rotation
+    pVehicle->SetPosition ( position.data.vecPosition );
+    pVehicle->SetRotationDegrees ( rotation.data.vecRotation );
+
+    // Apply the correct move and turnspeed
+    pVehicle->SetMoveSpeed ( velocity.data.vecVelocity );
+    pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
 }
