@@ -134,7 +134,7 @@ bool CVehicleInOutPacket::Read ( NetBitStreamInterface& BitStream )
 
 bool CVehicleInOutPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
-    if ( m_pSourceElement && m_ID )
+    if ( m_pSourceElement && m_ID != INVALID_ELEMENT_ID )
     {
         ElementID ID = m_pSourceElement->GetID ();
         BitStream.WriteCompressed ( ID );

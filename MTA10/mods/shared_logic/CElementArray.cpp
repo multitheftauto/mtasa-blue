@@ -15,7 +15,7 @@
 using namespace std;
 
 CClientEntity* CElementIDs::m_Elements [MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS];
-CStack < ElementID, MAX_CLIENT_ELEMENTS, INVALID_ELEMENT_ID > CElementIDs::m_ClientStack;
+CStack < ElementID, MAX_CLIENT_ELEMENTS > CElementIDs::m_ClientStack;
 
 void CElementIDs::Initialize ( void )
 {
@@ -27,7 +27,7 @@ CClientEntity* CElementIDs::GetElement ( ElementID ID )
 {
     if ( ID < MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS )
     {
-        return m_Elements [ID];
+        return m_Elements [ID.Value()];
     }
 
 /*
@@ -42,7 +42,7 @@ CClientEntity* CElementIDs::GetElement ( ElementID ID )
 void CElementIDs::SetElement ( ElementID ID, CClientEntity* pEntity )
 {
     if ( ID < MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS )
-        m_Elements [ID] = pEntity;
+        m_Elements [ID.Value()] = pEntity;
 #ifdef MTA_DEBUG
     else
         assert ( 0 );
@@ -53,11 +53,12 @@ void CElementIDs::SetElement ( ElementID ID, CClientEntity* pEntity )
 ElementID CElementIDs::PopClientID ( void )
 {
     // Pop an unique ID
-    ElementID ID = m_ClientStack.Pop ();
-    if ( ID != INVALID_ELEMENT_ID )
+    ElementID ID;
+    
+    if ( m_ClientStack.Pop (ID) && ID != INVALID_ELEMENT_ID )
     {
         // Make it at the beginning after server range ends
-        return ID + MAX_SERVER_ELEMENTS;
+        return ID.Value() + MAX_SERVER_ELEMENTS;
     }
 
     // Return it
@@ -71,7 +72,7 @@ void CElementIDs::PushClientID ( ElementID ID )
     if ( ID != INVALID_ELEMENT_ID )
     {
         // It's in the server element ID range, put it down to client
-        ID -= MAX_SERVER_ELEMENTS;
+        ID = ID.Value () - MAX_SERVER_ELEMENTS;
         m_ClientStack.Push ( ID );
     }
 }

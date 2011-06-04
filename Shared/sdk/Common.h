@@ -9,6 +9,8 @@
 *
 *****************************************************************************/
 
+#pragma once
+
 // Min and max number of characters in player serial
 #define MIN_SERIAL_LENGTH 1
 #define MAX_SERIAL_LENGTH 32
@@ -27,7 +29,28 @@
 // Allow 100k server elements and 100k client elements
 #define MAX_SERVER_ELEMENTS 100000
 #define MAX_CLIENT_ELEMENTS 100000
-typedef unsigned int ElementID;
+struct ElementID
+{
+public:
+    ElementID ( const unsigned int& value = INVALID_ELEMENT_ID ) : m_value(value) {}
+    ElementID& operator= ( const unsigned int& value ) { m_value = value; return *this; }
+    bool operator== ( const ElementID& ID ) const { return m_value == ID.m_value; }
+    bool operator!= ( const ElementID& ID ) const { return m_value != ID.m_value; }
+    bool operator> ( const ElementID& ID ) const { return m_value > ID.m_value; }
+    bool operator>= ( const ElementID& ID ) const { return m_value >= ID.m_value; }
+    bool operator< ( const ElementID& ID ) const { return m_value < ID.m_value; }
+    bool operator<= ( const ElementID& ID ) const { return m_value <= ID.m_value; }
+    ElementID& operator+= ( const ElementID& ID ) { m_value += ID.m_value; return *this; }
+    ElementID& operator-= ( const ElementID& ID ) { m_value += ID.m_value; return *this; }
+    ElementID operator+ ( const ElementID& ID ) const { return m_value + ID.m_value; }
+    ElementID operator- ( const ElementID& ID ) const { return m_value - ID.m_value; }
+    ElementID operator++ ( int ) { ElementID ret ( m_value ); ++m_value; return ret; }
+    ElementID& operator++ () { ++m_value; return *this; }
+    unsigned int& Value () { return m_value; }
+    const unsigned int& Value () const { return m_value; }
+private:
+    unsigned int m_value;
+};
 
 // Event name characteristics
 #define MAX_EVENT_NAME_LENGTH 512

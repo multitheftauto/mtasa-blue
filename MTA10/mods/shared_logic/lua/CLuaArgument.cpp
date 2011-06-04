@@ -372,7 +372,7 @@ void CLuaArgument::Read ( CClientEntity* pElement )
     if ( pElement )
     {   
         m_iType = LUA_TLIGHTUSERDATA;
-        m_pLightUserData = (void*) pElement->GetID ();
+        m_pLightUserData = (void*) reinterpret_cast<unsigned int *>(pElement->GetID ().Value());
     }
     else
         m_iType = LUA_TNIL;
@@ -384,7 +384,7 @@ void CLuaArgument::ReadElementID ( ElementID ID )
     m_strString = "";
     DeleteTableData ();
     m_iType = LUA_TLIGHTUSERDATA;
-    m_pLightUserData = (void*) ID;
+    m_pLightUserData = (void*) reinterpret_cast<unsigned int *>(ID.Value());
 }
 
 
