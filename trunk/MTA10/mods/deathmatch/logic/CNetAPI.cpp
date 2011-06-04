@@ -1768,6 +1768,20 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
         if ( pVehicle )
         {
             pVehicle->SetPosition ( pos.data.vecPosition );
+            // Update all the vehicle passengers
+            for ( unsigned int i = 0; i < 8; ++i )
+            {
+                CClientPed* pPassenger = pVehicle->GetOccupant ( i );
+                if ( pPassenger && pPassenger != pPlayer )
+                {
+                    pPassenger->SetPosition ( pos.data.vecPosition );
+                    if ( IS_PLAYER(pPassenger) )
+                    {
+                        CClientPlayer* pPassengerPlayer = static_cast < CClientPlayer* > ( pPassenger );
+                        pPassengerPlayer->SetLastPuresyncPosition ( pos.data.vecPosition );
+                    }
+                }
+            }
 
             // Check if we must read the vehicle health
             bool bReadVehicleHealth;
