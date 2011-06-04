@@ -53,9 +53,9 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket ( ElementID PlayerID, unsig
 
 bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
 {
-    BitStream.WriteCompressed ( m_PlayerID );
+    BitStream.Write ( m_PlayerID );
     BitStream.Write ( m_ucNumberOfPlayers );
-    BitStream.WriteCompressed ( m_RootElementID );
+    BitStream.Write ( m_RootElementID );
 
     // Transmit server requirement for the client to check settings
     BitStream.Write ( m_iEnableClientChecks );

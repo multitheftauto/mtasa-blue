@@ -33,7 +33,7 @@ bool CObjectSyncPacket::Read ( NetBitStreamInterface& BitStream )
         pData->bSend = false;
 
         // Read out the ID
-        if ( !BitStream.ReadCompressed ( pData->ID ) )
+        if ( !BitStream.Read ( pData->ID ) )
             return false;
 
         // Read the sync time context
@@ -93,7 +93,7 @@ bool CObjectSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         if ( pData->bSend )
         {
             // Write the ID
-            BitStream.WriteCompressed ( pData->ID );
+            BitStream.Write ( pData->ID );
 
             // Write the sync time context
             BitStream.Write ( pData->ucSyncTimeContext );

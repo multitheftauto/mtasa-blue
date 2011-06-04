@@ -123,7 +123,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
                 while ( bHasTrailer )
                 {
-                    BitStream.ReadCompressed ( TrailerID );
+                    BitStream.Read ( TrailerID );
                     CElement* pElement = CElementIDs::GetElement ( TrailerID );
                     if ( pElement )
                         pTrailer = static_cast < CVehicle* > ( pElement );

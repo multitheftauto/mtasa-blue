@@ -1012,7 +1012,7 @@ bool CStaticFunctionDefinitions::SetElementParent ( CElement* pElement, CElement
         pElement->SetParentObject ( pParent );
 
         CBitStream BitStream;
-        BitStream.pBitStream->WriteCompressed ( pParent->GetID () );
+        BitStream.pBitStream->Write ( pParent->GetID () );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_PARENT, *BitStream.pBitStream ) );
         return true;
     }
@@ -3198,7 +3198,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle ( CPed* pPed, CVehicle* pVeh
 
                 // Tell all the players
                 CBitStream BitStream;
-                BitStream.pBitStream->WriteCompressed ( pVehicle->GetID () );
+                BitStream.pBitStream->Write ( pVehicle->GetID () );
                 BitStream.pBitStream->Write ( static_cast < unsigned char > ( uiSeat ) );
                 BitStream.pBitStream->Write ( pPed->GenerateSyncTimeContext () );
                 m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream ) );
@@ -7815,7 +7815,7 @@ bool CStaticFunctionDefinitions::SetPlayerTeam ( CPlayer* pPlayer, CTeam* pTeam 
 
         // Tell everyone his new team
         CBitStream BitStream;
-        BitStream.pBitStream->WriteCompressed ( pPlayer->GetID () );
+        BitStream.pBitStream->Write ( pPlayer->GetID () );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pTeam, SET_PLAYER_TEAM, *BitStream.pBitStream ) );
 
         return true;

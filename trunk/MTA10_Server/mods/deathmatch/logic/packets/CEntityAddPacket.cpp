@@ -52,7 +52,8 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_Entities.size () > 0 )
     {
         // Write the number of entities
-        BitStream.WriteCompressed ( ( ElementID ) m_Entities.size () );
+        unsigned int NumElements = m_Entities.size ();
+        BitStream.WriteCompressed ( NumElements );
 
         // For each entity ...
         CVector vecTemp;
@@ -61,7 +62,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
         {
             // Entity id
             CElement* pElement = *iter;
-            BitStream.WriteCompressed ( pElement->GetID () );
+            BitStream.Write ( pElement->GetID () );
 
             // Entity type id
             unsigned char ucEntityTypeID = static_cast < unsigned char > ( pElement->GetType () );
@@ -72,7 +73,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             ElementID ParentID = INVALID_ELEMENT_ID;
             if ( pParent )
                 ParentID = pParent->GetID ();
-            BitStream.WriteCompressed ( ParentID );
+            BitStream.Write ( ParentID );
 
             // Entity interior
             BitStream.Write ( pElement->GetInterior () );
@@ -85,7 +86,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( pElementAttachedTo )
             {
                 BitStream.WriteBit ( true );
-                BitStream.WriteCompressed ( pElementAttachedTo->GetID () );
+                BitStream.Write ( pElementAttachedTo->GetID () );
 
                 // Attached position and rotation
                 SPositionSync attachedPosition ( false );
@@ -647,7 +648,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     if ( pVehicle )
                     {
                         BitStream.WriteBit ( true );
-                        BitStream.WriteCompressed ( pVehicle->GetID () );
+                        BitStream.Write ( pVehicle->GetID () );
 
                         SOccupiedSeatSync seat;
                         seat.data.ucSeat = pPed->GetOccupiedVehicleSeat ();

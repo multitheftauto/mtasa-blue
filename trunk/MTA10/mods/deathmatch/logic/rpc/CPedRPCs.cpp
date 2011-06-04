@@ -189,7 +189,7 @@ void CPedRPCs::WarpPedIntoVehicle ( CClientEntity* pSource, NetBitStreamInterfac
     ElementID VehicleID;
     unsigned char ucSeat;
     unsigned char ucTimeContext;
-    if ( bitStream.ReadCompressed ( VehicleID ) &&
+    if ( bitStream.Read ( VehicleID ) &&
          bitStream.Read ( ucSeat ) &&
          bitStream.Read ( ucTimeContext ) )
     {

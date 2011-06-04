@@ -81,7 +81,7 @@ bool CLightsyncPacket::Read ( NetBitStreamInterface& BitStream )
 bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const 
 {
     CPlayer* pPlayer = static_cast < CPlayer * > ( m_pSourceElement );
-    BitStream.WriteCompressed ( pPlayer->GetID () );
+    BitStream.Write ( pPlayer->GetID () );
     BitStream.Write ( (unsigned char)pPlayer->GetSyncTimeContext () );
 
     unsigned short usLatency = pPlayer->GetPing ();

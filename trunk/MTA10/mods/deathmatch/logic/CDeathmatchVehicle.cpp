@@ -111,7 +111,7 @@ bool CDeathmatchVehicle::SyncDamageModel ( void )
         if ( pBitStream )
         {
             // Write the vehicle id and the damage model data
-            pBitStream->WriteCompressed ( m_ID );
+            pBitStream->Write ( m_ID );
             pBitStream->Write ( &damage );
 
             // Send and delete it

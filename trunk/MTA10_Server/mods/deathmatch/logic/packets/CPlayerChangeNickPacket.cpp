@@ -26,7 +26,7 @@ bool CPlayerChangeNickPacket::Write ( NetBitStreamInterface& BitStream ) const
     {
         // Write the source player id
         ElementID ID = m_pSourceElement->GetID ();
-        BitStream.WriteCompressed ( ID );
+        BitStream.Write ( ID );
 
         // Write the nick
         BitStream.Write ( const_cast < char* > ( m_szNewNick ), strlen ( m_szNewNick ) );
