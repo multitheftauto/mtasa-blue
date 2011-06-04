@@ -97,6 +97,10 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     // Add us to the manager
     pPlayerManager->AddToList ( this );
+
+    m_lightweightSyncData.uiNumHealthSyncs = 0U;
+    m_lightweightSyncData.lastSyncedVehicle = 0;
+    m_lightweightSyncData.uiNumVehicleHealthSyncs = 0U;
 }
 
 

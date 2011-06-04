@@ -43,6 +43,8 @@ class CGame;
 #include "packets/CPlayerTimeoutPacket.h"
 #include "packets/CPlayerPuresyncPacket.h"
 #include "packets/CVehiclePuresyncPacket.h"
+#include "packets/CLightsyncPacket.h"
+#include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"

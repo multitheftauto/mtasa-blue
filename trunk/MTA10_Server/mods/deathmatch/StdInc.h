@@ -94,6 +94,8 @@
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehiclePuresyncPacket.h"
+#include "packets/CLightsyncPacket.h"
+#include "packets/CVehicleResyncPacket.h"
 #include "packets/CVehicleSpawnPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
