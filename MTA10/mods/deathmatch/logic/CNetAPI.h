@@ -85,6 +85,9 @@ private:
     void                    ReadFullVehicleSpecific         ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
     void                    WriteFullVehicleSpecific        ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
 
+    void                    ReadLightweightSync             ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
+    void                    ReadVehicleResync               ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
+
 public:
     bool                    IsCameraSyncNeeded              ( void );
     void                    WriteCameraSync                 ( NetBitStreamInterface& BitStream );

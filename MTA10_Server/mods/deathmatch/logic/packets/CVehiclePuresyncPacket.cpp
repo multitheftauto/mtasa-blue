@@ -52,10 +52,10 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->SetPosition ( position.data.vecPosition );
 
             // Jax: don't allow any outdated packets through
-            unsigned char ucSeat;
-            if ( !BitStream.Read ( ucSeat ) )
+            SOccupiedSeatSync seat;
+            if ( !BitStream.Read ( &seat ) )
                 return false;
-            if ( ucSeat != pSourcePlayer->GetOccupiedVehicleSeat () )
+            if ( seat.data.ucSeat != pSourcePlayer->GetOccupiedVehicleSeat () )
             {
                 // Mis-matching seats can happen when we warp into a different one,
                 // which will screw up the whole packet

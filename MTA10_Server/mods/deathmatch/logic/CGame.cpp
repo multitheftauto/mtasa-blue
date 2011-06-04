@@ -1771,11 +1771,24 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
         //
         // All players get sync if it's time for a far sync
         //
+        CLightsyncPacket light ( pPlayer );
+        CVector vecPlayerPosition = pPlayer->GetPosition ();
+        CVector vecCameraPosition;
+        pPlayer->GetCamera()->GetPosition ( vecCameraPosition );
+
         for ( std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin (); iter != m_pPlayerManager->IterEnd (); iter++ )
         {
             CPlayer* pSendPlayer = *iter;
+           
             if ( pSendPlayer != pPlayer )
-                pSendPlayer->Send ( Packet );
+            {
+                // Check if we must send a lightweight packet
+                if ( ( vecPlayerPosition - pSendPlayer->GetPosition() ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE ||
+                     ( vecCameraPosition - pSendPlayer->GetPosition() ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE )
+                    pSendPlayer->Send ( Packet );
+                else
+                    pSendPlayer->Send ( light );
+            }
         }
     }
     else

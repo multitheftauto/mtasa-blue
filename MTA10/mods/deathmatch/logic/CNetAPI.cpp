@@ -44,6 +44,42 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
 {
     switch ( bytePacketID )
     { 
+        case PACKET_ID_LIGHTSYNC:
+        {
+            // Read out the player ID
+            ElementID PlayerID;
+            if ( BitStream.ReadCompressed ( PlayerID ) )
+            {
+                // Grab the player
+                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+                if ( pPlayer )
+                {
+                    // Read out and apply the lightsync data
+                    ReadLightweightSync ( pPlayer, BitStream );
+                }
+            }
+
+            return true;
+        }
+
+        case PACKET_ID_VEHICLE_RESYNC:
+        {
+            // Read out the vehicle ID
+            ElementID VehicleID;
+            if ( BitStream.Read ( VehicleID ) )
+            {
+                // Grab the vehicle
+                CClientVehicle* pVehicle = m_pVehicleManager->Get ( VehicleID );
+                if ( pVehicle )
+                {
+                    // Read out and apply the resync data
+                    ReadVehicleResync ( pVehicle, BitStream );
+                }
+            }
+
+            return true;
+        }
+
         case PACKET_ID_PLAYER_PURESYNC:
         {
             // Read out the player ID
@@ -1291,9 +1327,11 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     position.data.vecPosition = vecPosition;
     BitStream.Write ( &position );
 
-    // Grab the occupied vehicle seat. Send this only if we're driver.
+    // Grab the occupied vehicle seat. Send this only if we're driver
+    SOccupiedSeatSync seat;
     unsigned int uiSeat = pPlayerModel->GetOccupiedVehicleSeat ();
-    BitStream.Write ( ( unsigned char ) uiSeat );
+    seat.data.ucSeat = uiSeat;
+    BitStream.Write ( &seat );
     if ( uiSeat == 0 )
     {
         // Write the rotation in degrees
@@ -1670,4 +1708,85 @@ void CNetAPI::RPC ( eServerRPCFunctions ID, NetBitStreamInterface * pBitStream, 
         g_pNet->SendPacket ( PACKET_ID_RPC, pRPCBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED, packetOrdering );
         g_pNet->DeallocateNetBitStream ( pRPCBitStream );
     }
+}
+
+void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
+{
+    // Read out the sync time context. See CClientEntity for documentation on that.
+    unsigned char ucSyncTimeContext = 0;
+    if ( !BitStream.Read ( ucSyncTimeContext ) )
+        return;
+
+    // Only update the sync if this packet is from the same context.
+    if ( !pPlayer->CanUpdateSync ( ucSyncTimeContext ) )
+    {
+#ifdef MTA_DEBUG
+        g_pCore->GetConsole ()->Printf ( "ignoring lightweight sync: %u", ucSyncTimeContext );
+#endif
+        return;
+    }
+
+    // Read out the time it took for the packet to go from the remote client to the server and to us
+    unsigned short usLatency;
+    if ( !BitStream.ReadCompressed ( usLatency ) )
+        return;
+    pPlayer->SetLatency ( usLatency + g_pNet->GetPing () );
+    pPlayer->SetPing ( usLatency );
+
+    // Check if we must read health
+    bool bReadHealth;
+    if ( !BitStream.ReadBit ( bReadHealth ) )
+        return;
+    if ( bReadHealth )
+    {
+        SPlayerHealthSync health;
+        if ( !BitStream.Read ( &health ) )
+            return;
+        pPlayer->SetHealth ( health.data.fValue );
+        pPlayer->LockHealth ( health.data.fValue );
+
+        SPlayerArmorSync armor;
+        if ( !BitStream.Read ( &armor ) )
+            return;
+        pPlayer->SetArmor ( armor.data.fValue );
+        pPlayer->LockArmor ( armor.data.fValue );
+    }
+
+    // Check if we must read position
+    bool bReadPosition;
+    if ( !BitStream.ReadBit ( bReadPosition ) )
+        return;
+    if ( bReadPosition )
+    {
+        SLowPrecisionPositionSync pos;
+        if ( !BitStream.Read ( &pos ) )
+            return;
+        pPlayer->SetPosition ( pos.data.vecPosition );
+        pPlayer->SetLastPuresyncPosition ( pos.data.vecPosition );
+
+        CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
+        if ( pVehicle )
+        {
+            pVehicle->SetPosition ( pos.data.vecPosition );
+
+            // Check if we must read the vehicle health
+            bool bReadVehicleHealth;
+            if ( !BitStream.ReadBit ( bReadVehicleHealth ) )
+                return;
+            if ( bReadVehicleHealth )
+            {
+                SLowPrecisionVehicleHealthSync health;
+                if ( !BitStream.Read ( &health ) )
+                    return;
+                pVehicle->SetHealth ( health.data.fValue );
+            }
+        }
+    }
+
+    pPlayer->SetLastPuresyncTime ( CClientTime::GetTime () );
+    pPlayer->IncrementPlayerSync ();
+}
+
+void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStram )
+{
 }

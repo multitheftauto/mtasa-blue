@@ -28,7 +28,7 @@ class CPlayer;
 #include "CObject.h"
 #include "packets/CPacket.h"
 
-#define SLOW_SYNCRATE               1000
+#define SLOW_SYNCRATE               1500
 #define DISTANCE_FOR_SLOW_SYNCRATE  320
 
 class CKeyBinds;
@@ -219,6 +219,20 @@ public:
     void                                        UpdateOthersNearList        ( void );
     void                                        AddNearPlayer               ( CPlayer* other )              { m_NearPlayerList [ other ] = 5; }
     std::map < CPlayer*, int >&                 GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
+
+public:
+    struct SLightweightSyncData
+    {
+        unsigned int    uiNumHealthSyncs;
+        float           fLastHealthSynced;
+        float           fLastArmorSynced;
+        CVehicle*       lastSyncedVehicle;
+        unsigned int    uiNumVehicleHealthSyncs;
+        float           fLastVehicleHealthSynced;
+    };
+    SLightweightSyncData&                       GetLightweightSyncData      ( void ) { return m_lightweightSyncData; }
+private:
+    SLightweightSyncData                        m_lightweightSyncData;
 
 private:
     void                                        WriteCameraModePacket       ( void );
