@@ -63,7 +63,7 @@ CSettings::CSettings ( void )
     m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - 560.0f / 2, resolution.fY / 2 - 360.0f / 2 + yoff  ), false );
 
     //m_pWindow->SetPosition ( CVector2D ( 0.15f, 0.20f ), true );
-    m_pWindow->SetSize ( CVector2D ( 560.0f, 360.0f ) );
+    m_pWindow->SetSize ( CVector2D ( 560.0f, 410.0f ) );
     m_pWindow->SetSizingEnabled ( false );
     m_pWindow->SetAlwaysOnTop ( true );
     m_pWindow->BringToFront ();
@@ -71,7 +71,7 @@ CSettings::CSettings ( void )
     // Create the tab panel and necessary tabs
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
     m_pTabs->SetPosition ( CVector2D ( 0, 20.0f ) );
-    m_pTabs->SetSize ( CVector2D ( 560.0f, 300.0f ) );
+    m_pTabs->SetSize ( CVector2D ( 560.0f, 350.0f ) );
     pTabMultiplayer = m_pTabs->CreateTab ( "Multiplayer" );
     pTabVideo = m_pTabs->CreateTab ( "Video" );
     pTabAudio = m_pTabs->CreateTab ( "Audio" );
@@ -558,6 +558,23 @@ CSettings::CSettings ( void )
     m_pComboAspectRatio->AddItem ( "16:9" )->SetData ( (void*)ASPECT_RATIO_16_9 );
     m_pComboAspectRatio->SetReadOnly ( true );
 
+    m_pStreamingMemoryLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Usable video memory:" ) );
+    m_pStreamingMemoryLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+    m_pStreamingMemoryLabel->GetPosition ( vecTemp, false );
+    m_pStreamingMemoryLabel->AutoSize ( "Usable video memory:" );
+
+    IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice();
+    unsigned int uiMinMemory = SharedUtil::GetMinStreamingMemory ( pDevice );
+    unsigned int uiMaxMemory = SharedUtil::GetMaxStreamingMemory ( pDevice );
+
+    m_pStreamingMemory = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
+    m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + 130.0f, vecTemp.fY ) );
+    m_pStreamingMemory->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pStreamingMemory->SetProperty ( "StepSize", SString("%.07lf", 1.0 / (uiMaxMemory - uiMinMemory)) );
+
+    m_pStreamingMemoryValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0 MB") );
+    m_pStreamingMemoryValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 300.0f, vecTemp.fY ) );
+    m_pStreamingMemoryValueLabel->AutoSize ( "9999 MB " );
 
     m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "Map rendering options" ) );
     m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 38.0f ) );
@@ -884,6 +901,7 @@ CSettings::CSettings ( void )
     m_pMouseSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensitivityChanged, this ) );
     m_pComboFxQuality->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnFxQualityChanged, this ) );
     m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
+    m_pStreamingMemory->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnStreamingMemoryChanged, this ) );
     /*
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, "Multi Theft Auto: Community settings", MB_ICON_WARNING );
@@ -1947,6 +1965,15 @@ void CSettings::LoadData ( void )
         CVARS_GET ( "chat_line_fade_out", iVar ); 
         SetMilliseconds ( m_pChatLineFadeout, iVar );
     }
+
+    // Streaming memory
+    IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice ();
+    unsigned int uiStreamingMemory;
+    CVARS_GET ( "streaming_memory", uiStreamingMemory );
+    uiStreamingMemory = SharedUtil::Clamp ( SharedUtil::GetMinStreamingMemory(pDevice), uiStreamingMemory, SharedUtil::GetMaxStreamingMemory(pDevice) );
+    float fPos = SharedUtil::Unlerp ( SharedUtil::GetMinStreamingMemory(pDevice), uiStreamingMemory, SharedUtil::GetMaxStreamingMemory(pDevice) );
+    m_pStreamingMemory->SetScrollPosition ( fPos );
+    m_pStreamingMemoryValueLabel->SetText ( SString ( "%u MB", uiStreamingMemory ) );
 }
 
 void RestartCallBack ( void* ptr, unsigned int uiButton )
@@ -2169,6 +2196,14 @@ void CSettings::SaveData ( void )
     CGUIListItem* pItem = m_pInterfaceSkinSelector->GetSelectedItem ();
     if ( pItem )
         CVARS_SET("current_skin", pItem->GetText());
+
+    // Streaming memory
+    float fPos = m_pStreamingMemory->GetScrollPosition ();
+    IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice ();
+    int min = SharedUtil::GetMinStreamingMemory ( pDevice );
+    int max = SharedUtil::GetMaxStreamingMemory ( pDevice );
+    unsigned int value = SharedUtil::Lerp ( min, fPos, max );
+    CVARS_SET ( "streaming_memory", value );
 
     // Save the config here
     CCore::GetSingleton ().SaveConfig ();
@@ -2540,6 +2575,18 @@ bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
     int iBrightness = ( m_pBrightness->GetScrollPosition () ) * 100;
 
     m_pBrightnessValueLabel->SetText ( SString("%i%%", iBrightness).c_str() );
+    return true;
+}
+
+bool CSettings::OnStreamingMemoryChanged ( CGUIElement* pElement )
+{
+    float fPos = m_pStreamingMemory->GetScrollPosition ();
+    IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice ();
+    int min = SharedUtil::GetMinStreamingMemory ( pDevice );
+    int max = SharedUtil::GetMaxStreamingMemory ( pDevice );
+    int value = SharedUtil::Lerp ( min, fPos, max );
+    m_pStreamingMemoryValueLabel->SetText ( SString("%i MB", value) );
+
     return true;
 }
 

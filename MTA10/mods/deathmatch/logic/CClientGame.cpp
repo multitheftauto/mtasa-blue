@@ -310,6 +310,10 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Reset async loading script settings to default
     g_pGame->SetAsyncLoadingFromScript ( true, false );
+
+    // Give a default value for the streaming memory
+    if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
+        g_pCore->GetCVars()->Set ( "streaming_memory", SharedUtil::GetMaxStreamingMemory(g_pCore->GetGraphics()->GetDevice()) );
 }
 
 
@@ -796,6 +800,20 @@ void CClientGame::DoPulsePostFrame ( void )
             unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled () ? uiHeight - 7 : uiHeight - 12;
             pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
         }
+
+
+        // Adjust the streaming memory limit.
+        unsigned int uiStreamingMemory;
+        g_pCore->GetCVars()->Get ( "streaming_memory", uiStreamingMemory );
+        uiStreamingMemory = SharedUtil::Clamp ( SharedUtil::GetMinStreamingMemory(g_pCore->GetGraphics()->GetDevice()),
+                                                uiStreamingMemory,
+                                                SharedUtil::GetMaxStreamingMemory(g_pCore->GetGraphics()->GetDevice()) );
+        g_pCore->GetCVars()->Set ( "streaming_memory", uiStreamingMemory );
+
+        int iStreamingMemoryBytes = static_cast<int>(uiStreamingMemory) * 1024 * 1024;
+        if ( g_pMultiplayer->GetLimits()->GetStreamingMemory() != iStreamingMemoryBytes )
+            g_pMultiplayer->GetLimits()->SetStreamingMemory ( iStreamingMemoryBytes );
+
 
         // If we're in debug mode and are supposed to show task data, do it
         #ifdef MTA_DEBUG
