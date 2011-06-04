@@ -100,8 +100,8 @@
 #    define ceguimin	std::_cpp_min
 #    define ceguimax	std::_cpp_max
 #else
-#    define ceguimin	std::min
-#    define ceguimax	std::max
+template<class T> static inline T ceguimin ( const T& a, const T& b ) { return std::min(a,b); }
+template<class T> static inline T ceguimax ( const T& a, const T& b ) { return std::max(a,b); }
 #endif
 
 

@@ -227,4 +227,9 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "update_build_type",          0 );                            // 0-stable 1-test 2-nightly
     DEFAULT ( "volumetric_shadows",         0 );                            // Enable volumetric shadows
     DEFAULT ( "aspect_ratio",               0 );                            // Display aspect ratio
+
+    // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.
+#if 0
+    DEFAULT ( "streaming_memory",           50 );                           // Streaming memory
+#endif
 }

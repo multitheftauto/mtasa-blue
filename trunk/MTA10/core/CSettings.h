@@ -156,6 +156,9 @@ protected:
     CGUILabel*          m_pMapAlphaLabel;
     CGUIScrollBar*      m_pMapAlpha;
     CGUILabel*          m_pMapAlphaValueLabel;
+    CGUILabel*          m_pStreamingMemoryLabel;
+    CGUIScrollBar*      m_pStreamingMemory;
+    CGUILabel*          m_pStreamingMemoryValueLabel;
 
     CGUILabel*          m_pAsyncLabelInfo;
     CGUILabel*          m_pAsyncLabel;
@@ -269,6 +272,7 @@ protected:
     bool                OnRegisterButtonClick   ( CGUIElement* pElement );
     bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
     bool                OnBrightnessChanged     ( CGUIElement* pElement );
+    bool                OnStreamingMemoryChanged( CGUIElement* pElement );
     bool                OnMapAlphaChanged       ( CGUIElement* pElement );
     bool                OnRadioVolumeChanged    ( CGUIElement* pElement );
     bool                OnSFXVolumeChanged      ( CGUIElement* pElement );
