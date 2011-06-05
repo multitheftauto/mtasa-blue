@@ -357,7 +357,7 @@ public:
 
 	\exception AlreadyExistsException	thrown if an Image named \a name is already defined for this Imageset
 	*/
-	void	defineImage(const String& name, const Rect& image_rect, const Point& render_offset, const unsigned long ulCodepoint = 0 );
+	void	defineImage(const String& name, const Rect& image_rect, const Point& render_offset, unsigned long ulCodepoint = 0, Font* pFont = NULL );
 
 
 	/*!

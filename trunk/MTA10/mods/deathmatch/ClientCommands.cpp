@@ -85,7 +85,7 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
 
         // Convert to Unicode, and clamp it to a maximum command length
         std::wstring strClumpedCommandUTF = MbUTF8ToUTF16(strClumpedCommand.c_str());
-        strClumpedCommandUTF.substr(0,MAX_COMMAND_LENGTH);
+        strClumpedCommandUTF = strClumpedCommandUTF.substr(0,MAX_COMMAND_LENGTH);
         strClumpedCommand = UTF16ToMbUTF8(strClumpedCommandUTF);
 
         g_pClientGame->GetRegisteredCommands ()->ProcessCommand ( szCommandBufferPointer, szArguments );

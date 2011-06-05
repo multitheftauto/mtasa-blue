@@ -40,12 +40,13 @@ namespace CEGUI
 /*************************************************************************
 	Constructor
 *************************************************************************/
-Image::Image(const Imageset* owner, const String& name, const Rect& area, const Point& render_offset, float horzScaling, float vertScaling, unsigned long ulCodepoint) :
+Image::Image(const Imageset* owner, const String& name, const Rect& area, const Point& render_offset, float horzScaling, float vertScaling, unsigned long ulCodepoint, Font* pFont ) :
 	d_owner(owner),
 	d_area(area),
 	d_offset(render_offset),
 	d_name(name),
-    d_codepoint(ulCodepoint)
+    d_codepoint(ulCodepoint),
+    d_font(pFont)
 {
 	if (d_owner == NULL)
 	{
@@ -69,7 +70,8 @@ Image::Image(const Image& image) :
 	d_scaledHeight(image.d_scaledHeight),
 	d_scaledOffset(image.d_scaledOffset),
 	d_name(image.d_name),
-    d_codepoint(image.d_codepoint)
+    d_codepoint(image.d_codepoint),
+    d_font(image.d_font)
 {
 }
 
