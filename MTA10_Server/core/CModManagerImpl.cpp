@@ -157,6 +157,16 @@ bool CModManagerImpl::IsFinished ( void )
     return true;
 }
 
+bool CModManagerImpl::PendingWorkToDo ( void )
+{
+    if ( m_pBase )
+    {
+        return m_pBase->PendingWorkToDo ();
+    }
+
+    return false;
+}
+
 
 void CModManagerImpl::GetTag ( char *szInfoTag, int iInfoTag )
 {

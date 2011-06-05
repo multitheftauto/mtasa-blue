@@ -31,6 +31,7 @@ public:
     void                HandleInput         ( char* szCommand );
 
     bool                IsFinished          ( void );
+    bool                PendingWorkToDo     ( void );
 
 private:
     CServerInterface*   m_pServerInterface;

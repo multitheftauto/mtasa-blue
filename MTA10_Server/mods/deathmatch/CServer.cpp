@@ -95,3 +95,8 @@ bool CServer::IsFinished ()
 
     return false;
 }
+
+bool CServer::PendingWorkToDo ()
+{
+    return g_pNetServer->GetPendingPacketCount () > 0;
+}
