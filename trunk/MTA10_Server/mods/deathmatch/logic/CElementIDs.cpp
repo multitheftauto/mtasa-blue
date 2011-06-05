@@ -14,7 +14,7 @@
 
 using namespace std;
 
-CStack <ElementID, MAX_SERVER_ELEMENTS > CElementIDs::m_UniqueIDs;
+CStack <ElementID, MAX_SERVER_ELEMENTS - MAX_PLAYER_COUNT, MAX_PLAYER_COUNT > CElementIDs::m_UniqueIDs;
 CElement* CElementIDs::m_Elements [MAX_SERVER_ELEMENTS];
 
 void CElementIDs::Initialize ( void )
@@ -30,6 +30,17 @@ ElementID CElementIDs::PopUniqueID ( CElement* pElement )
     if ( m_UniqueIDs.Pop (ID) && ID != INVALID_ELEMENT_ID )
     {
         m_Elements [ID.Value()] = pElement;
+    }
+
+    return ID;
+}
+
+ElementID CElementIDs::PopPlayerID ( CPlayer* pPlayer )
+{
+    ElementID ID;
+    if ( m_UniqueIDs.PopReserved (ID) && ID != INVALID_ELEMENT_ID )
+    {
+        m_Elements [ID.Value()] = pPlayer;
     }
 
     return ID;
