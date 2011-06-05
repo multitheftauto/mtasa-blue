@@ -32,7 +32,8 @@ enum NetPacketPriority
 {
     PACKET_PRIORITY_HIGH = 0,
     PACKET_PRIORITY_MEDIUM,
-    PACKET_PRIORITY_LOW
+    PACKET_PRIORITY_LOW,
+    PACKET_PRIORITY_COUNT
 };
 
 enum NetPacketReliability
@@ -49,6 +50,43 @@ enum NetPacketOrdering
     PACKET_ORDERING_GAME = 0,
     PACKET_ORDERING_CHAT,
     PACKET_ORDERING_FILETRANSFER
+};
+
+enum NSPerSecondMetrics
+{
+	NS_USER_MESSAGE_BYTES_PUSHED,
+	NS_USER_MESSAGE_BYTES_SENT,
+	NS_USER_MESSAGE_BYTES_RESENT,
+	NS_USER_MESSAGE_BYTES_RECEIVED_PROCESSED,
+	NS_USER_MESSAGE_BYTES_RECEIVED_IGNORED,
+	NS_ACTUAL_BYTES_SENT,
+	NS_ACTUAL_BYTES_RECEIVED,
+	NS_PERSECOND_METRICS_COUNT
+};
+
+struct NetStatistics
+{
+	unsigned long long valueOverLastSecond[NS_PERSECOND_METRICS_COUNT];
+	unsigned long long runningTotal[NS_PERSECOND_METRICS_COUNT];
+	
+	time_t connectionStartTime;
+
+    unsigned int packetsSent, packetsReceived;
+
+	unsigned long long BPSLimitByCongestionControl;
+	bool isLimitedByCongestionControl;
+
+	unsigned long long BPSLimitByOutgoingBandwidthLimit;
+	bool isLimitedByOutgoingBandwidthLimit;
+
+	unsigned int messageInSendBuffer[PACKET_PRIORITY_COUNT];
+	double bytesInSendBuffer[PACKET_PRIORITY_COUNT];
+
+	unsigned int messagesInResendBuffer;
+	unsigned long long bytesInResendBuffer;
+
+	float packetlossLastSecond, packetlossTotal;
+    float compressionRatio, decompressionRatio;
 };
 
 #endif
