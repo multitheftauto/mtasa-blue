@@ -26,6 +26,7 @@ public:
     virtual void        GetTag                      ( char* szInfoTag, int iInfoTag ) = 0;
 
     virtual bool        IsFinished                  ( void ) = 0;
+    virtual bool        PendingWorkToDo             ( void ) = 0;
 };
 
 #endif

@@ -419,7 +419,8 @@ void CServerImpl::MainLoop ( void )
         }
 
         // Limit the pulses to avoid heavy CPU usage
-        Sleep ( 10 );
+        if ( m_pModManager->PendingWorkToDo () == false )
+            Sleep ( 10 );
     }
 
 #ifdef WIN32
