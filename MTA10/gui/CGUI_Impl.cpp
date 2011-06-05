@@ -312,15 +312,21 @@ eInputMode CGUI_Impl::GetGUIInputMode( void )
     return m_eInputMode;
 }
 
-CEGUI::String CGUI_Impl::GetUTFString ( const std::string strInput )
+CEGUI::String CGUI_Impl::GetUTFString ( const char* szInput )
 {
-    std::wstring strUTF = MbUTF8ToUTF16(strInput); //Convert to a typical wide string
+    CEGUI::String strUTF = (CEGUI::utf8*)szInput; //Convert into a CEGUI String
     return GetUTFString ( strUTF );
 }
 
-CEGUI::String CGUI_Impl::GetUTFString ( const std::wstring strLine )
+CEGUI::String CGUI_Impl::GetUTFString ( const std::string strInput )
 {
-    return CEGUI::String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(strLine)).c_str()); //Convert into a CEGUI String
+    CEGUI::String strUTF = (CEGUI::utf8*)strInput.c_str(); //Convert into a CEGUI String
+    return GetUTFString ( strUTF );
+}
+
+CEGUI::String CGUI_Impl::GetUTFString ( const CEGUI::String strInput )
+{
+    return strInput.bidify();  // Bidify the string
 }
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
@@ -682,7 +688,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                 if ( strTemp.length () > 0 )
                 {
                     // Convert it to Unicode
-                    std::wstring strUTF = GetBidiString(MbUTF8ToUTF16(strTemp.c_str()));
+                    std::wstring strUTF = MbUTF8ToUTF16(strTemp.bidify().c_str());
 
                     // Open and empty the clipboard
                     OpenClipboard ( NULL );
@@ -737,12 +743,11 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                                 CloseClipboard();
                                 return true;
                             }
-                            strEditText = WndEdit->getText ();
+                            strEditText = WndEdit->getText ().bidify();
                             iSelectionStart = WndEdit->getSelectionStartIndex ();
                             iSelectionLength = WndEdit->getSelectionLength();
                             iMaxLength = WndEdit->getMaxTextLength();
                             iCaratIndex = WndEdit->getCaratIndex();
-                            strEditText = WndEdit->getText();
                         }
                         else
                         {
@@ -753,16 +758,15 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                                 CloseClipboard();
                                 return true;
                             }
-                            strEditText = WndEdit->getText ();
+                            strEditText = WndEdit->getText ().bidify();
                             iSelectionStart = WndEdit->getSelectionStartIndex ();
                             iSelectionLength = WndEdit->getSelectionLength();
                             iMaxLength = WndEdit->getMaxTextLength();
                             iCaratIndex = WndEdit->getCaratIndex();
-                            strEditText = WndEdit->getText();
                             bReplaceNewLines = false;
                         }
 
-                        std::wstring strClipboardText = GetBidiString(ClipboardBuffer);
+                        std::wstring strClipboardText = ClipboardBuffer;
                         size_t iNewlineIndex;
 
                         // Remove the newlines inserting spaces instead
@@ -839,13 +843,13 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             if ( Wnd->getType ( ) == "CGUI/Editbox" )
                             {
                                 CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );  
-                                WndEdit->setText ( strEditText );
+                                WndEdit->setText ( strEditText, true );
                                 WndEdit->setCaratIndex ( iCaratIndex );
                             }
                             else
                             {
                                 CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );  
-                                WndEdit->setText ( strEditText );
+                                WndEdit->setText ( strEditText, true );
                                 WndEdit->setCaratIndex ( iCaratIndex );
                             }
                         }

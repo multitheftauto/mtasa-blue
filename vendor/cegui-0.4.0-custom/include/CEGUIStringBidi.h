@@ -24,6 +24,8 @@
  ************************************************************************/
 #ifndef _MINIBIDI_h_
 #define _MINIBIDI_h_
+
+#include "CEGUIBase.h"
  
 #include <malloc.h>		/* malloc() and free() definition */
 #ifdef _LINUX
@@ -33,8 +35,8 @@
 /*
  * Datatype Extension Macros
  */
-#define BLOCKTYPE wchar_t*
-#define CHARTYPE wchar_t
+#define BLOCKTYPE CEGUI::utf32 *
+#define CHARTYPE CEGUI::utf32
 #define GETCHAR(from,x) from[x]
 
 #define GetType(x) getType(x)
@@ -168,7 +170,7 @@ shape_node shapetypes[] = {
  * max: the maximum level found in this line (should be unsigned char)
  * count: line size in wchar_t
  */
-void flipThisRun(BLOCKTYPE from, unsigned char* level, int max, int count)
+void flipThisRun(BLOCKTYPE &from, unsigned char* level, int max, int count)
 {
    int i, j, rcount, tlevel;
    CHARTYPE temp;
@@ -210,7 +212,7 @@ int findIndexOfRun(unsigned char* level , int start, int count, int tlevel)
    return count;
 }
 
-unsigned char GetParagraphLevel(BLOCKTYPE line, int count)
+unsigned char GetParagraphLevel(BLOCKTYPE &line, int count)
 {
 	int i;
 	for( i=0; i<count ; i++)
@@ -1104,7 +1106,7 @@ void doALtoR(unsigned char* types, int count)
  * line: a buffer of size count containing text to apply
  * the Bidirectional algorithm to.
  */
-int doBidi(BLOCKTYPE line, int count, int applyShape, int reorderCombining)
+int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
 {
    unsigned char* types;
    unsigned char* levels;

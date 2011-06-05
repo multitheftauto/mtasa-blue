@@ -119,8 +119,6 @@ namespace SharedUtil
 
     std::wstring  ANSIToUTF16 (const std::string& s);
 
-    std::wstring GetBidiString (const std::wstring ws);
-
     int  GetUTF8Confidence (unsigned char* input, int len);
 
 

@@ -13,7 +13,6 @@
 *****************************************************************************/
 
 #include "UTF8.h"
-#include "minibidi.c"
 #include "CNickGen.h"
 #include "UTF8Detect.cpp"
 #ifdef WIN32
@@ -846,18 +845,6 @@ std::wstring SharedUtil::ANSIToUTF16 ( const std::string& input )
     delete wcsOutput;
     return strOutput;
 }
-
-std::wstring SharedUtil::GetBidiString (const std::wstring input)
-{
-    int iCount = input.size();
-    wchar_t* wcsLineBidi = new wchar_t[iCount + 1];
-    memcpy ( wcsLineBidi, input.c_str(), ( iCount + 1 ) * sizeof ( wchar_t ) );
-    doBidi ( wcsLineBidi, iCount, 1, 1 );  //Process our UTF string through MiniBidi, for Bidirectionalism
-    std::wstring strLineBidi(wcsLineBidi);
-    delete wcsLineBidi;
-    return strLineBidi;
-}
-
 
 #ifdef MTA_DEBUG
 //
