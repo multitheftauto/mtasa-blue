@@ -174,7 +174,7 @@ const Image& Imageset::getImage(const String& name) const
 /*************************************************************************
 	defines a new Image.
 *************************************************************************/
-void Imageset::defineImage(const String& name, const Rect& image_rect, const Point& render_offset, const unsigned long ulCodepoint)
+void Imageset::defineImage(const String& name, const Rect& image_rect, const Point& render_offset, unsigned long ulCodepoint, Font* pFont )
 {
 	if (isImageDefined(name))
 	{
@@ -186,7 +186,7 @@ void Imageset::defineImage(const String& name, const Rect& image_rect, const Poi
 	float vscale = d_autoScale ? d_vertScaling : 1.0f;
 
 	// add the Image definition
-	d_images[name] = Image(this, name, image_rect, render_offset, hscale, vscale, ulCodepoint );
+	d_images[name] = Image(this, name, image_rect, render_offset, hscale, vscale, ulCodepoint, pFont );
 
 	CEGUI_LOGINSANE("Image '" + name + "' has been defined for Imageset '" + d_name + "'.")
 }

@@ -211,24 +211,11 @@ void DirectX9Renderer::doRender(void)
         {
             unsigned long ulCodepoint = quad.image->getCodepoint();
             // Is it a glyph?
-            if ( ulCodepoint != 0 && ulCodepoint < 65534 && ulCodepoint > 127 )
+            if ( ulCodepoint != 0 && ulCodepoint > 127 && ulCodepoint < 65534 )
             {
-                String strImgName = quad.image->getName();
-                if ( strImgName.substr(0,6) == "glyph_" )
-                {
-                    CEGUI::String::size_type pos = strImgName.find_last_of(95);
-                    // Is the last character a '_'? Account for this specially as it ruins the algorithm
-                    CEGUI::String::size_type size = strImgName.length();
-                    if ( strImgName.substr(size-1) == "_" )
-                        pos = size-2;
-
-
-                    // Grab the font this belongs to from the name
-                    CEGUI::String strFontName = strImgName.substr(6,pos-6);
-
-                    CEGUI::Font* pFont = System::getSingleton().getFontManager()->getFont(strFontName);
+                CEGUI::Font* pFont = quad.image->getFont();
+                if ( pFont )
                     pFont->OnGlyphDrawn(ulCodepoint);
-                }
             }
         }
 
