@@ -38,8 +38,9 @@
 #include <CSphere.h>
 #include <CBox.h>
 #include <ijsify.h>
+#include <Config.h>
+//#include "net/SyncStructures.h"
 #include <Common.h>
-#include "net/SyncStructures.h"
 
 // Shared logic includes
 #include <Utils.h>
