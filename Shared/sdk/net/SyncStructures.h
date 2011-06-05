@@ -2092,6 +2092,11 @@ struct SPlayerIDSync : public ISyncStructure
         BITCOUNT = NumberOfSignificantBits<(MAX_PLAYER_COUNT - 1)>::COUNT
     };
 
+    SPlayerIDSync ()
+    {
+        data.ID = 0U;
+    }
+
     bool Read ( NetBitStreamInterface& bitStream )
     {
         return bitStream.ReadBits ( reinterpret_cast<char *>(&( data.ID.Value() )), BITCOUNT );
