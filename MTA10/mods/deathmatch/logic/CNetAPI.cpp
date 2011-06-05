@@ -47,11 +47,11 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
         case PACKET_ID_LIGHTSYNC:
         {
             // Read out the player ID
-            ElementID PlayerID;
-            if ( BitStream.Read ( PlayerID ) )
+            SPlayerIDSync PlayerID;
+            if ( BitStream.Read ( &PlayerID ) )
             {
                 // Grab the player
-                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID.data.ID );
                 if ( pPlayer )
                 {
                     // Read out and apply the lightsync data
@@ -83,11 +83,11 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
         case PACKET_ID_PLAYER_PURESYNC:
         {
             // Read out the player ID
-            ElementID PlayerID;
-            if ( BitStream.Read ( PlayerID ) )
+            SPlayerIDSync PlayerID;
+            if ( BitStream.Read ( &PlayerID ) )
             {
                 // Grab the player
-                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID.data.ID );
                 if ( pPlayer )
                 {
                     // Read out and apply the puresync data
@@ -101,11 +101,11 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
         case PACKET_ID_PLAYER_VEHICLE_PURESYNC:
         {
             // Read out the player ID
-            ElementID PlayerID;
-            if ( BitStream.Read ( PlayerID ) )
+            SPlayerIDSync PlayerID;
+            if ( BitStream.Read ( &PlayerID ) )
             {
                 // Grab the player
-                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID.data.ID );
                 if ( pPlayer )
                 {
                     // Grab the player vehicle
@@ -124,11 +124,11 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
         case PACKET_ID_PLAYER_KEYSYNC:
         {
             // Read out the player ID
-            ElementID PlayerID;
-            if ( BitStream.Read ( PlayerID ) )
+            SPlayerIDSync PlayerID;
+            if ( BitStream.Read ( &PlayerID ) )
             {
                 // Grab the player
-                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID.data.ID );
                 if ( pPlayer )
                 {
                     // Read out the keysync data

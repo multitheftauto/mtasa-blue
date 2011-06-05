@@ -162,8 +162,9 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         CVehicle* pVehicle = pSourcePlayer->GetOccupiedVehicle ();
 
         // Write the source player id
-        ElementID PlayerID = pSourcePlayer->GetID ();
-        BitStream.Write ( PlayerID );
+        SPlayerIDSync PlayerID;
+        PlayerID.data.ID = pSourcePlayer->GetID ();
+        BitStream.Write ( &PlayerID );
 
         // Write the keysync data
         const CControllerState& ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
