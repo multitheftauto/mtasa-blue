@@ -45,21 +45,7 @@ public:
     virtual void                        SetClientPort               ( unsigned short usClientPort ) = 0;
     virtual const char *                GetConnectedServer          ( void )=0;
 
-    virtual unsigned int                GetMessagesInSendBuffer     ( void ) = 0;
-    virtual unsigned int                GetMessagesSent             ( void ) = 0;
-    virtual unsigned int                GetMessagesWaitingAck       ( void ) = 0;
-    virtual unsigned int                GetMessagesResent           ( void ) = 0;
-    virtual unsigned int                GetAcknowledgesSent         ( void ) = 0;
-    virtual unsigned int                GetAcknowledgesPending      ( void ) = 0;
-    virtual unsigned int                GetAcknowledgesReceived     ( void ) = 0;
-    virtual unsigned int                GetPacketsSent              ( void ) = 0;
-    virtual float                       GetPacketLoss               ( void ) = 0;
-    virtual unsigned int                GetGoodPacketsReceived      ( void ) = 0;
-    virtual unsigned int                GetBadPacketsReceived       ( void ) = 0;
-    virtual unsigned int                GetBitsSent                 ( void ) = 0;
-    virtual unsigned int                GetBitsReceived             ( void ) = 0;
-    virtual float                       GetCompressionRatio         ( void ) = 0;
-    virtual float                       GetDecompressionRatio       ( void ) = 0;
+    virtual bool                        GetNetworkStatistics        ( NetStatistics* pDest ) = 0;
     virtual void                        GetNetworkUsageData         ( ENetworkUsageDirection dir, unsigned long ulTotalBits[256], unsigned long ulCount[256] ) = 0;
 
     virtual int                         GetPing                     ( void ) = 0;
