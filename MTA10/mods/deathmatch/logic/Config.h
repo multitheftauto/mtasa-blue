@@ -157,9 +157,12 @@ public:
 #define MAX_VALID_WEATHER 255
 
 // Upper player limit
-#define MAX_PLAYER_COUNT 65535
+#define MAX_PLAYER_COUNT 1024
 #if MAX_PLAYER_COUNT > 65535
     #error MAX_PLAYER_COUNT "macro can't exceed 65535"
+#endif
+#if (MAX_PLAYER_COUNT&(MAX_PLAYER_COUNT-1)) != 0
+    #error MAX_PLAYER_COUNT "macro has to be power of 2"
 #endif
 
 // Max mapname length

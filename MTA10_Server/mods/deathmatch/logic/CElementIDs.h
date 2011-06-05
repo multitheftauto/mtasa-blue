@@ -21,13 +21,14 @@ public:
     static void                 Initialize          ( void );
 
     static ElementID            PopUniqueID         ( CElement* pElement );
+    static ElementID            PopPlayerID         ( CPlayer* pPlayer );
     static void                 PushUniqueID        ( ElementID ID );
     static void                 PushUniqueID        ( CElement* pElement );
 
     static CElement*            GetElement          ( ElementID ID );
 
 private:
-    static CStack < ElementID, MAX_SERVER_ELEMENTS > m_UniqueIDs;
+    static CStack < ElementID, MAX_SERVER_ELEMENTS - MAX_PLAYER_COUNT, MAX_PLAYER_COUNT > m_UniqueIDs;
     static CElement*            m_Elements [MAX_SERVER_ELEMENTS];
 };
 
