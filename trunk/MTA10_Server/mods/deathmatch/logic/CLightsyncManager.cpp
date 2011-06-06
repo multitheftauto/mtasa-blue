@@ -90,7 +90,7 @@ void CLightsyncManager::DoPulse ()
                     if ( pCurrent != pPlayer )
                     {
                         // TODO: Optimise this with ccw's magic.
-                        if ( pCurrent->GetDimension() == pPlayer->GetDimension() &&
+                        if ( pCurrent->GetDimension() != pPlayer->GetDimension() ||
                              ( ( pCurrent->GetPosition() - vecPosition ).LengthSquared () > DISTANCE_FOR_SLOW_SYNCRATE*DISTANCE_FOR_SLOW_SYNCRATE &&
                                ( pCurrent->GetPosition() - vecCameraPosition).LengthSquared () > DISTANCE_FOR_SLOW_SYNCRATE*DISTANCE_FOR_SLOW_SYNCRATE ) )
                         {
