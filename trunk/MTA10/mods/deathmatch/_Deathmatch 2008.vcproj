@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Client - Deathmatch"
 	ProjectGUID="{F661CA1A-A296-4505-9583-3BEC58FB79C5}"
 	RootNamespace="Client - Deathmatch"
@@ -877,6 +877,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientStreamSector.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientStreamSectorRow.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientTask.cpp"
 					>
 				</File>
@@ -1224,34 +1232,34 @@
 			<Filter
 				Name="core"
 				>
-				<File
-					RelativePath="..\..\sdk\core\VideoCard.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Nightly|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
+				<File
+					RelativePath="..\..\sdk\core\VideoCard.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Nightly|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
 			</Filter>
 			<Filter
 				Name="utils"
@@ -1848,6 +1856,14 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientStreamer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientStreamSector.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientStreamSectorRow.h"
 					>
 				</File>
 				<File

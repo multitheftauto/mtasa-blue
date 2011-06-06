@@ -97,7 +97,6 @@ public:
     static inline int                           GetInstanceCount        ( void )                    { return iCount; };
 
     virtual eClientEntityType                   GetType                 ( void ) const = 0;
-    virtual eClientEntityType                   GetBaseType             ( void ) const              { return GetType (); };
     inline bool                                 IsLocalEntity           ( void )                    { return m_ID >= MAX_SERVER_ELEMENTS; };
 
     // System entity? A system entity means it can't be removed by the server

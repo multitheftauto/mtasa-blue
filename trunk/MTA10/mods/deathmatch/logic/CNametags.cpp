@@ -203,13 +203,12 @@ void CNametags::DrawFromAim ( void )
             // Draw the nametags we need to
             CClientPlayer* pPlayer;
             CClientStreamElement * pElement;
-            CClientEntityResult result;
-            GetClientSpatialDatabase ()->SphereQuery ( result, CSphere ( vecStart, DEFAULT_VIEW_RANGE ) );
-            for ( CClientEntityResult ::const_iterator iter = result.begin () ; iter != result.end (); iter++ )
+            list < CClientStreamElement* > ::const_iterator iter = m_pPlayerStreamer->ActiveElementsBegin ();
+            for ( ; iter != m_pPlayerStreamer->ActiveElementsEnd (); iter++ )
             {
-                if ( (*iter)->GetType () != CCLIENTPLAYER ) continue;
-                pElement = (CClientStreamElement*)*iter;
+                pElement = *iter;
                 if ( !pElement->IsStreamedIn () ) continue;
+                if ( pElement->GetType () != CCLIENTPLAYER ) continue;
                 pPlayer = static_cast < CClientPlayer * > ( pElement );
                 if ( pPlayer->IsLocalPlayer () ) continue;
 
@@ -333,14 +332,12 @@ void CNametags::DrawDefault ( void )
     CClientEntity * pEntity = NULL;
     CClientPlayer* pPlayer;
     CClientStreamElement * pElement;
-
-    CClientEntityResult result;
-    GetClientSpatialDatabase ()->SphereQuery ( result, CSphere ( CameraMatrix.vPos, DEFAULT_VIEW_RANGE ) );
-    for ( CClientEntityResult ::const_iterator iter = result.begin () ; iter != result.end (); iter++ )
+    list < CClientStreamElement* > ::const_iterator iter = m_pPlayerStreamer->ActiveElementsBegin ();
+    for ( ; iter != m_pPlayerStreamer->ActiveElementsEnd (); iter++ )
     {
-        if ( (*iter)->GetType () != CCLIENTPLAYER ) continue;
-        pElement = (CClientStreamElement *)*iter;
+        pElement = *iter;
         if ( !pElement->IsStreamedIn () ) continue;
+        if ( pElement->GetType () != CCLIENTPLAYER ) continue;
         pPlayer = static_cast < CClientPlayer * > ( pElement );
         if ( pPlayer->IsLocalPlayer () ) continue;
 
@@ -349,7 +346,7 @@ void CNametags::DrawDefault ( void )
 
         // Get the distance from the camera
         pPlayer->GetPosition ( vecPlayerPosition );
-        fDistanceExp = ( CameraMatrix.vPos - vecPlayerPosition ).LengthSquared ();
+        fDistanceExp = pPlayer->GetExpDistance ();
         pPlayerVehicle = pPlayer->GetOccupiedVehicle ();
        
         // Is he in the same vehicle as the local player?

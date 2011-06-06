@@ -14,15 +14,6 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-// Upper player limit. We also have a lower limit if you wish.
-#define MAX_PLAYER_COUNT 1024
-#if MAX_PLAYER_COUNT > 65535
-    #error MAX_PLAYER_COUNT "macro can't exceed 65535"
-#endif
-#if (MAX_PLAYER_COUNT&(MAX_PLAYER_COUNT-1)) != 0
-    #error MAX_PLAYER_COUNT "macro has to be power of 2"
-#endif
-
 #include <MTAPlatform.h>
 #include <Common.h>
 
@@ -107,6 +98,12 @@ public:
 
 // Max valid weather id
 #define MAX_VALID_WEATHER 255
+
+// Upper player limit
+#define MAX_PLAYER_COUNT 65535
+#if MAX_PLAYER_COUNT > 65535
+    #error MAX_PLAYER_COUNT "macro can't exceed 65535"
+#endif
 
 // Game Type
 #define GAME_TYPE_STRING "MTA:SA"

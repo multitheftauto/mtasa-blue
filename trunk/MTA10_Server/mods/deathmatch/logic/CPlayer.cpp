@@ -101,13 +101,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_lightweightSyncData.uiNumHealthSyncs = 0U;
     m_lightweightSyncData.lastSyncedVehicle = 0;
     m_lightweightSyncData.uiNumVehicleHealthSyncs = 0U;
-
-    // Get a player ID
-    if ( CElement::GetID() != INVALID_ELEMENT_ID )
-    {
-        CElementIDs::PushUniqueID ( CElement::GetID() );
-        CElement::SetID ( CElementIDs::PopPlayerID ( this ) );
-    }
 }
 
 

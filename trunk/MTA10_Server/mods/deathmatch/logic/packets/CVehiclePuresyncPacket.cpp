@@ -356,9 +356,8 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         if ( pVehicle )
         {
             // Player ID
-            SPlayerIDSync PlayerID;
-            PlayerID.data.ID = pSourcePlayer->GetID ();
-            BitStream.Write ( &PlayerID );
+            ElementID PlayerID = pSourcePlayer->GetID ();
+            BitStream.Write ( PlayerID );
 
             // Write the time context of that player
             BitStream.Write ( pSourcePlayer->GetSyncTimeContext () );

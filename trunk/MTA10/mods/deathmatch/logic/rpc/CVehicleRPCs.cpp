@@ -12,7 +12,6 @@
 
 #include <StdInc.h>
 #include "CVehicleRPCs.h"
-#include "net/SyncStructures.h"
 
 void CVehicleRPCs::LoadFunctions ( void )
 {
