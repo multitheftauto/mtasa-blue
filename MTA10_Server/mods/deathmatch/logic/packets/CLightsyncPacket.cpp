@@ -13,65 +13,6 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
-CLightsyncPacket::CLightsyncPacket ( CPlayer* pPlayer )
-{
-    m_pSourceElement = pPlayer;
-    CPlayer::SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
-    if ( ( data.uiNumHealthSyncs % 2 ) == 0 )
-    {
-        if ( fabs(data.fLastHealthSynced - pPlayer->GetHealth()) > LIGHTSYNC_HEALTH_THRESHOLD ||
-             fabs(data.fLastArmorSynced - pPlayer->GetArmor()) > LIGHTSYNC_HEALTH_THRESHOLD )
-        {
-            m_bSyncHealth = true;
-            data.fLastHealthSynced = pPlayer->GetHealth ();
-            data.fLastArmorSynced = pPlayer->GetArmor ();
-            ++data.uiNumHealthSyncs;
-        }
-        else
-            m_bSyncHealth = false;
-    }
-    else
-    {
-        m_bSyncHealth = false;
-        ++data.uiNumHealthSyncs;
-    }
-
-    CVehicle* pOccupiedVehicle = pPlayer->GetOccupiedVehicle ();
-    m_bSyncVehicleHealth = false;
-    if ( !pOccupiedVehicle )
-    {
-        m_bSyncPosition = true;
-        data.lastSyncedVehicle = 0;
-    }
-    else
-    {
-        if ( pPlayer->GetOccupiedVehicleSeat () == 0 )
-        {
-            m_bSyncPosition = true;
-            if ( data.lastSyncedVehicle != pOccupiedVehicle )
-            {
-                data.lastSyncedVehicle = pOccupiedVehicle;
-                data.uiNumHealthSyncs = 1;
-                m_bSyncVehicleHealth = true;
-                data.fLastVehicleHealthSynced = pOccupiedVehicle->GetHealth ();
-            }
-            else if ( ( data.uiNumVehicleHealthSyncs % 2 ) == 0 )
-            {
-                if ( fabs(data.fLastHealthSynced - pOccupiedVehicle->GetHealth()) > LIGHTSYNC_VEHICLE_HEALTH_THRESHOLD )
-                {
-                    m_bSyncVehicleHealth = true;
-                    data.fLastVehicleHealthSynced = pOccupiedVehicle->GetHealth ();
-                    data.uiNumVehicleHealthSyncs++;
-                }
-            }
-            else
-                data.uiNumVehicleHealthSyncs++;
-        }
-        else
-            m_bSyncPosition = false;
-    }
-}
-
 bool CLightsyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // Only the server sends these.
@@ -80,41 +21,54 @@ bool CLightsyncPacket::Read ( NetBitStreamInterface& BitStream )
 
 bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const 
 {
-    CPlayer* pPlayer = static_cast < CPlayer * > ( m_pSourceElement );
-    BitStream.Write ( pPlayer->GetID () );
-    BitStream.Write ( (unsigned char)pPlayer->GetSyncTimeContext () );
+    bool bSyncPosition;
+    unsigned char ucNumPlayers = m_players.size ();
+    static const unsigned int bitcount = SharedUtil::NumberOfSignificantBits<(LIGHTSYNC_MAX_PLAYERS-1)>::COUNT;
+    BitStream.WriteBits ( &ucNumPlayers, bitcount );
 
-    unsigned short usLatency = pPlayer->GetPing ();
-    BitStream.WriteCompressed ( usLatency );
-
-    BitStream.WriteBit ( m_bSyncHealth );
-    if ( m_bSyncHealth )
+    for ( std::vector<CPlayer *>::const_iterator iter = m_players.begin ();
+          iter != m_players.end();
+          ++iter )
     {
-        SPlayerHealthSync health;
-        health.data.fValue = pPlayer->GetHealth ();
-        BitStream.Write ( &health );
+        CPlayer* pPlayer = *iter;
+        CPlayer::SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
 
-        SPlayerArmorSync armor;
-        armor.data.fValue = pPlayer->GetArmor ();
-        BitStream.Write ( &armor );
-    }
+        CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
+        bSyncPosition = !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0;
 
-    BitStream.WriteBit ( m_bSyncPosition );
-    if ( m_bSyncPosition )
-    {
-        SLowPrecisionPositionSync pos;
-        pos.data.vecPosition = pPlayer->GetPosition ();
-        BitStream.Write ( &pos );
-    }
+        BitStream.Write ( pPlayer->GetID () );
+        BitStream.Write ( (unsigned char)pPlayer->GetSyncTimeContext () );
 
-    if ( m_bSyncPosition )
-    {
-        BitStream.WriteBit ( m_bSyncVehicleHealth );
-        if ( m_bSyncVehicleHealth )
+        unsigned short usLatency = pPlayer->GetPing ();
+        BitStream.WriteCompressed ( usLatency );
+
+        BitStream.WriteBit ( data.health.bSync );
+        if ( data.health.bSync )
         {
-            SLowPrecisionVehicleHealthSync health;
-            health.data.fValue = pPlayer->GetOccupiedVehicle()->GetHealth ();
+            SPlayerHealthSync health;
+            health.data.fValue = pPlayer->GetHealth ();
             BitStream.Write ( &health );
+
+            SPlayerArmorSync armor;
+            armor.data.fValue = pPlayer->GetArmor ();
+            BitStream.Write ( &armor );
+        }
+
+        BitStream.WriteBit ( bSyncPosition );
+        if ( bSyncPosition )
+        {
+            SLowPrecisionPositionSync pos;
+            pos.data.vecPosition = pPlayer->GetPosition ();
+            BitStream.Write ( &pos );
+
+            bool bSyncVehicleHealth = data.vehicleHealth.bSync && pVehicle;
+            BitStream.WriteBit ( bSyncVehicleHealth );
+            if ( bSyncVehicleHealth )
+            {
+                SLowPrecisionVehicleHealthSync health;
+                health.data.fValue = pVehicle->GetHealth ();
+                BitStream.Write ( &health );
+            }
         }
     }
 

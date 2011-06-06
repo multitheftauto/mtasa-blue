@@ -61,6 +61,8 @@ class CGame;
 
 #include "lua/CLuaManager.h"
 
+#include "CLightsyncManager.h"
+
 #ifdef MTA_VOICE
 #include "../../../Voice/VoiceServerAPI.h"
 #endif
@@ -472,6 +474,8 @@ private:
 
     long long                   m_llLastAnnouceTime;
     class COpenPortsTester*     m_pOpenPortsTester;
+
+    CLightsyncManager           m_lightsyncManager;
 };
 
 #endif

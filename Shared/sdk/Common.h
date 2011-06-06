@@ -82,3 +82,8 @@ private:
 #else
 #define _DECLSPEC_EX extern "C" 
 #endif
+
+#define LIGHTSYNC_MAX_PLAYERS               32
+#if (LIGHTSYNC_MAX_PLAYERS&(LIGHTSYNC_MAX_PLAYERS-1)) != 0
+    #error LIGHTSYNC_MAX_PLAYERS "Macro must be power of 2"
+#endif
