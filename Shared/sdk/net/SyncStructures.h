@@ -15,15 +15,6 @@
 
 #include <CVector.h>
 #include <net/bitstream.h>
-#include "Config.h"
-
-// Bitwise constant operations
-template < unsigned int N >
-struct NumberOfSignificantBits
-{
-    enum { COUNT = 1 + NumberOfSignificantBits<(N >> 1)>::COUNT };
-};
-template <> struct NumberOfSignificantBits<0> { enum { COUNT = 0 }; };
 
 // Used to make sure that any position values we receive are at least half sane
 #define SYNC_POSITION_LIMIT 100000.0f
@@ -2077,39 +2068,6 @@ struct SHeatHazeSync : public ISyncStructure
     struct
     {
         SHeatHazeSettings settings;
-    } data;
-};
-
-//////////////////////////////////////////
-//                                      //
-//          Element ID stuff            //
-//                                      //
-//////////////////////////////////////////
-struct SPlayerIDSync : public ISyncStructure
-{
-    enum
-    {
-        BITCOUNT = NumberOfSignificantBits<(MAX_PLAYER_COUNT - 1)>::COUNT
-    };
-
-    SPlayerIDSync ()
-    {
-        data.ID = 0U;
-    }
-
-    bool Read ( NetBitStreamInterface& bitStream )
-    {
-        return bitStream.ReadBits ( reinterpret_cast<char *>(&( data.ID.Value() )), BITCOUNT );
-    }
-
-    void Write ( NetBitStreamInterface& bitStream ) const
-    {
-        bitStream.WriteBits ( reinterpret_cast<const char *>(&( data.ID.Value() )), BITCOUNT );
-    }
-
-    struct
-    {
-        ElementID ID;
     } data;
 };
 

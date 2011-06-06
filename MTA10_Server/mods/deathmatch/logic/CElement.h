@@ -90,9 +90,6 @@ public:
     virtual void                                Unlink                      ( void ) = 0;
 
     inline ElementID                            GetID                       ( void )                        { return m_ID; };
-protected:
-    void                                        SetID                       ( const ElementID& ID )         { m_ID = ID; }
-public:
 
     virtual const CVector&                      GetPosition                 ( void );
     virtual const CVector&                      GetLastPosition             ( void )                        { return m_vecLastPosition; };

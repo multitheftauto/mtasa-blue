@@ -280,8 +280,7 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     {
         CPlayer * pSourcePlayer = static_cast < CPlayer * > ( m_pSourceElement );
 
-        SPlayerIDSync PlayerID;
-        PlayerID.data.ID = pSourcePlayer->GetID ();
+        ElementID PlayerID = pSourcePlayer->GetID ();
         unsigned short usLatency = pSourcePlayer->GetPing ();
         const CControllerState& ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
         CElement* pContactElement = pSourcePlayer->GetContactElement ();
@@ -309,7 +308,7 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             pSourcePlayer->GetContactPosition ( vecPosition );
         float fCameraRotation = pSourcePlayer->GetCameraRotation ();
 
-        BitStream.Write ( &PlayerID );
+        BitStream.Write ( PlayerID );
 
         // Write the time context
         BitStream.Write ( pSourcePlayer->GetSyncTimeContext () );

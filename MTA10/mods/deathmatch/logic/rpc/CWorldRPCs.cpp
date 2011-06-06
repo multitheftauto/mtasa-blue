@@ -15,7 +15,6 @@
 
 #include <StdInc.h>
 #include "CWorldRPCs.h"
-#include "net/SyncStructures.h"
 
 void CWorldRPCs::LoadFunctions ( void )
 {

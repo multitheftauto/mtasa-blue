@@ -38,9 +38,8 @@
 #include <CSphere.h>
 #include <CBox.h>
 #include <ijsify.h>
-#include <Config.h>
-//#include "net/SyncStructures.h"
 #include <Common.h>
+#include "net/SyncStructures.h"
 
 // Shared logic includes
 #include <Utils.h>
@@ -66,6 +65,8 @@
 #include <CClientPed.h>
 #include <CClientPlayerClothes.h>
 #include <CClientProjectileManager.h>
+#include <CClientStreamSector.h>
+#include <CClientStreamSectorRow.h>
 #include <CClientTask.h>
 #include <CClientTXD.h>
 #include <CClientWater.h>

@@ -450,14 +450,13 @@ namespace SharedUtil
     //
     // Note: IDs run from 1 to Capacity
     //
-    template < typename T, unsigned long INITIAL_MAX_STACK_SIZE, unsigned int numReservedSlots = 0 >
+    template < typename T, unsigned long INITIAL_MAX_STACK_SIZE >
     class CStack
     {
     public:
         CStack ( void )
         {
             m_ulCapacity = 0;
-            CreateReservedQueue ();
             ExpandBy ( INITIAL_MAX_STACK_SIZE - 1 );
         }
 
@@ -479,20 +478,10 @@ namespace SharedUtil
             // Add ID's for new items
             for ( T ID = ulOldSize + 1; ID <= ulNewSize; ++ID )
             {
-                m_Queue.push_front( ID + numReservedSlots );
+                m_Queue.push_front( ID );
             }
             m_ulCapacity = ulNewSize;
         }
-
-    private:
-        void CreateReservedQueue ()
-        {
-            for ( unsigned int i = 0; i < numReservedSlots; ++i )
-            {
-                m_ReservedQueue.push_front(T(i));
-            }
-        }
-    public:
 
         bool Pop ( T& dest )
         {
@@ -509,34 +498,16 @@ namespace SharedUtil
             return false;
         }
 
-        bool PopReserved ( T& dest )
-        {
-            if ( m_ReservedQueue.size () > 0 )
-            {
-                T ID = m_ReservedQueue.back();
-                m_ReservedQueue.pop_back ();
-                dest = ID;
-                return true;
-            }
-
-            return Pop ( dest );
-        }
-
         void Push ( T ID )
         {
             assert ( m_Queue.size () < m_ulCapacity );
-
             // Push to the front
-            if ( ID < numReservedSlots )
-                m_ReservedQueue.push_front ( ID );
-            else
-                m_Queue.push_front ( ID );
+            m_Queue.push_front ( ID );
         }
 
     private:
         unsigned long       m_ulCapacity;
         std::deque < T >    m_Queue;
-        std::deque < T >    m_ReservedQueue;
     };
 
 
