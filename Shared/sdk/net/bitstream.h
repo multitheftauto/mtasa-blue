@@ -55,7 +55,6 @@ public:
     virtual void        WriteCompressed             ( const int& input ) = 0;
     virtual void        WriteCompressed             ( const unsigned long& input ) = 0;
     virtual void        WriteCompressed             ( const long& input ) = 0;
-    virtual void        WriteCompressed             ( const ElementID& ID ) = 0;
 private:    // Float functions not used because they only cover -1 to +1 and are lossy
     virtual void        WriteCompressed             ( const float& input ) = 0;
     virtual void        WriteCompressed             ( const double& input ) = 0;
@@ -103,7 +102,6 @@ public:
     virtual bool        ReadCompressed              ( int& output ) = 0;
     virtual bool        ReadCompressed              ( unsigned long& output ) = 0;
     virtual bool        ReadCompressed              ( long& output ) = 0;
-    virtual bool        ReadCompressed              ( ElementID& ID ) = 0;
 private:    // Float functions not used because they only cover -1 to +1 and are lossy
     virtual bool        ReadCompressed              ( float& output ) = 0;
     virtual bool        ReadCompressed              ( double& output ) = 0;
