@@ -1772,7 +1772,6 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 // Relay this (pure sync) packet to all the other players using distance rules
 void CGame::RelayPlayerPuresync ( CPacket& Packet )
 {
-
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     // Insert into other players near list if appropriate
     pPlayer->UpdateOthersNearList ();
@@ -1791,7 +1790,8 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
         }
         else
         {
-            pSendPlayer->Send ( Packet );
+            if ( pSendPlayer->GetDimension() == pPlayer->GetDimension() )
+                pSendPlayer->Send ( Packet );
             it++;
         }
     }
