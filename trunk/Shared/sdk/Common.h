@@ -26,9 +26,15 @@
 #define MAX_TYPENAME_LENGTH 32
 #define MAX_ELEMENT_NAME_LENGTH 64
 
-// Allow 100k server elements and 100k client elements
-#define MAX_SERVER_ELEMENTS 100000
-#define MAX_CLIENT_ELEMENTS 100000
+// Allow 2^17 server elements and 2^17 client elements
+#define MAX_SERVER_ELEMENTS 131072
+#define MAX_CLIENT_ELEMENTS 131072
+
+#if (MAX_SERVER_ELEMENTS&(MAX_SERVER_ELEMENTS-1)) != 0
+    #error MAX_SERVER_ELEMENTS "Macro must be power of 2"
+#endif
+
+// ElementID structure
 struct ElementID
 {
 public:
