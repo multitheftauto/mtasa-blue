@@ -38,7 +38,7 @@ void CLightsyncManager::UnregisterPlayer ( CPlayer* pPlayer )
     {
         SEntry& entry = *iter;
         if ( entry.pPlayer == pPlayer )
-            iter = m_Queue.erase ( iter );
+            m_Queue.erase ( iter++ );
         else
             ++iter;
     }
@@ -90,8 +90,9 @@ void CLightsyncManager::DoPulse ()
                     if ( pCurrent != pPlayer )
                     {
                         // TODO: Optimise this with ccw's magic.
-                        if ( ( pCurrent->GetPosition() - vecPosition ).LengthSquared () > DISTANCE_FOR_SLOW_SYNCRATE*DISTANCE_FOR_SLOW_SYNCRATE &&
-                             ( pCurrent->GetPosition() - vecCameraPosition).LengthSquared () > DISTANCE_FOR_SLOW_SYNCRATE*DISTANCE_FOR_SLOW_SYNCRATE )
+                        if ( pCurrent->GetDimension() == pPlayer->GetDimension() &&
+                             ( ( pCurrent->GetPosition() - vecPosition ).LengthSquared () > DISTANCE_FOR_SLOW_SYNCRATE*DISTANCE_FOR_SLOW_SYNCRATE &&
+                               ( pCurrent->GetPosition() - vecCameraPosition).LengthSquared () > DISTANCE_FOR_SLOW_SYNCRATE*DISTANCE_FOR_SLOW_SYNCRATE ) )
                         {
                             CPlayer::SLightweightSyncData& currentData = pCurrent->GetLightweightSyncData ();
                             packet.AddPlayer ( pCurrent );
