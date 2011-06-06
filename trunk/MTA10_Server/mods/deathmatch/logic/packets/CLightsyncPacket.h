@@ -15,24 +15,25 @@
 #include "CCommon.h"
 #include "CPacket.h"
 #include "CPlayer.h"
-
-#define LIGHTSYNC_HEALTH_THRESHOLD          2.0f
-#define LIGHTSYNC_VEHICLE_HEALTH_THRESHOLD  50.0f
+#include "Common.h"
+#include <vector>
 
 class CLightsyncPacket : public CPacket
 {
 public:
-                                CLightsyncPacket            ( CPlayer* pPlayer );
+                                CLightsyncPacket            () {}
 
     inline ePacketID            GetPacketID                 ( void ) const                  { return PACKET_ID_LIGHTSYNC; };
     inline unsigned long        GetFlags                    ( void ) const                  { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
+
+    void                        AddPlayer                   ( CPlayer* pPlayer ) { m_players.push_back(pPlayer); }
+    unsigned int                Count                       () const { return m_players.size(); }
+    void                        Reset                       () { m_players.clear(); }
 
     bool                        Read                        ( NetBitStreamInterface& BitStream );
     bool                        Write                       ( NetBitStreamInterface& BitStream ) const;
 
 private:
-    bool    m_bSyncHealth;
-    bool    m_bSyncPosition;
-    bool    m_bSyncVehicleHealth;
+    std::vector < CPlayer* >    m_players;
 };
 

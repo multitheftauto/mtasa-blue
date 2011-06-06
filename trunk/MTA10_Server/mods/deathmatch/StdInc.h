@@ -182,6 +182,7 @@
 #include "CHandlingManager.h"
 #include "CKeyBinds.h"
 #include "CLanBroadcast.h"
+#include "CLightsyncManager.h"
 #include "CLogger.h"
 #include "CMainConfig.h"
 #include "CMapEvent.h"

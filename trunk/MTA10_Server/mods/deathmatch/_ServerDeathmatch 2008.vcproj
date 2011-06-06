@@ -565,6 +565,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CLightsyncManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CLogger.cpp"
 					>
 				</File>
@@ -1434,6 +1438,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\logic\CLightsyncManager.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Config.h"
 				>
