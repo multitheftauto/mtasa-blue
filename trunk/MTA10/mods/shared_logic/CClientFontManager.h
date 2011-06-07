@@ -40,6 +40,9 @@ public:
     CClientFont*            CreateFont                  ( const SString& strFullFilePath, uint uiSize, bool bBold, const SString& strMetaPath, class CResource* pResource );
     void                    Remove                      ( CClientFont* pFont );
 
+    uint                    GetGUIFontCount             ( void )                { return m_GUIFontInfoMap.size (); }
+    uint                    GetDXFontCount              ( void )                { return m_DXFontInfoMap.size (); }
+
 protected:
     SGUIFontInfo*           GetGUIFontInfo              ( const SString& strFontName, const SString& strFullFilePath, uint uiSize );
     SDXFontInfo*            GetDXFontInfo               ( const SString& strFontName, const SString& strFullFilePath, uint uiSize, bool bBold );

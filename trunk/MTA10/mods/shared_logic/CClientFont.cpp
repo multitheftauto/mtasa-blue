@@ -26,6 +26,8 @@ CClientFont::CClientFont ( CClientManager* pManager, ElementID ID, const SString
     m_strGUIFontName = strGUIFontName;
     m_pDXFontNormal = pDXFontNormal;
     m_pDXFontBig = pDXFontBig;
+
+    SetTypeName ( "font" );
 }
 
 

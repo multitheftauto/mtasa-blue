@@ -32,8 +32,6 @@ namespace
         int Refs;
         int TimerCount;
         int ElementCount;
-        int TextDisplayCount;
-        int TextItemCount;
     };
 
     typedef std::map < CLuaMain*, CLuaMainMemory > CLuaMainMemoryMap;
@@ -182,8 +180,6 @@ void CClientPerfStatLuaMemoryImpl::UpdateLuaMemory ( CLuaMain* pLuaMain, int iMe
     pLuaMainMemory->Refs = pLuaMain->m_CallbackTable.size ();
     pLuaMainMemory->TimerCount = pLuaMain->GetTimerCount ();
     pLuaMainMemory->ElementCount = pLuaMain->GetElementCount ();
-    //pLuaMainMemory->TextDisplayCount = pLuaMain->GetTextDisplayCount ();
-    //pLuaMainMemory->TextItemCount = pLuaMain->GetTextItemCount ();
 }
 
 
@@ -264,8 +260,9 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
     pResult->AddColumn ( "refs" );
     pResult->AddColumn ( "Timers" );
     pResult->AddColumn ( "Elements" );
-    pResult->AddColumn ( "TextDisplays" );
     pResult->AddColumn ( "TextItems" );
+    pResult->AddColumn ( "GUI Fonts" );
+    pResult->AddColumn ( "DX Fonts" );
 
     // Calc totals
     if ( strFilter == "" )
@@ -296,6 +293,16 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
 
         row[c++] = SString ( "%d KB", calcedCurrent );
         row[c++] = SString ( "%d KB", calcedMax );
+
+        // Some extra 'all VM' things
+        c += 4;
+        int TextItemCount = g_pClientGame->GetManager ()->GetDisplayManager ()->Count ();
+        int GUIFontCount = g_pClientGame->GetManager ()->GetFontManager ()->GetGUIFontCount ();
+        int DXFontCount = g_pClientGame->GetManager ()->GetFontManager ()->GetDXFontCount ();
+        TextItemCount = Max ( TextItemCount - 4, 0 );   // Remove count for radar items
+        row[c++] = !TextItemCount ? "-" : SString ( "%d", TextItemCount );
+        row[c++] = !GUIFontCount ? "-" : SString ( "%d", GUIFontCount );
+        row[c++] = !DXFontCount ? "-" : SString ( "%d", DXFontCount );
     }
 
     // For each VM
@@ -327,7 +334,5 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
         row[c++] = !LuaMainMemory.Refs ? "-" : SString ( "%d", LuaMainMemory.Refs );
         row[c++] = !LuaMainMemory.TimerCount ? "-" : SString ( "%d", LuaMainMemory.TimerCount );
         row[c++] = !LuaMainMemory.ElementCount ? "-" : SString ( "%d", LuaMainMemory.ElementCount );
-        row[c++] = !LuaMainMemory.TextDisplayCount ? "-" : SString ( "%d", LuaMainMemory.TextDisplayCount );
-        row[c++] = !LuaMainMemory.TextItemCount ? "-" : SString ( "%d", LuaMainMemory.TextItemCount );
     }
 }

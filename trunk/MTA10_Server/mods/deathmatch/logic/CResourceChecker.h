@@ -33,7 +33,7 @@ protected:
     void        CheckFileForIssues              ( const string& strPath, const string& strFileName, const string& strResourceName, bool bClientScript );
     void        CheckPngFileForIssues           ( const string& strPath, const string& strFileName, const string& strResourceName );
     void        CheckRwFileForIssues            ( const string& strPath, const string& strFileName, const string& strResourceName );
-    void        CheckLuaFileForIssues           ( const string& strPath, const string& strFileName, bool bClientScript );
+    void        CheckLuaFileForIssues           ( const string& strPath, const string& strFileName, const string& strResourceName, bool bClientScript );
     void        CheckLuaSourceForIssues         ( string strLuaSource, const string& strFileName, bool bClientScript, const string& strMode, string* pstrOutResult=NULL );
     long        FindLuaIdentifier               ( const char* szLuaSource, long* plOutLength, long* plLineNumber );
     bool        UpgradeLuaFunctionName          ( const string& strFunctionName, bool bClientScript, string& strOutUpgraded );
