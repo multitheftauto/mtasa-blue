@@ -45,7 +45,7 @@ CGraphics::~CGraphics ( void )
     if ( m_pLineInterface )
         m_pLineInterface->Release ();
 
-    DestroyFonts ();
+    DestroyStandardDXFonts ();
     ExpireCachedTextures ( true );
 }
 
@@ -618,7 +618,7 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
     }
 }
 
-bool CGraphics::LoadFonts ( void )
+bool CGraphics::LoadStandardDXFonts ( void )
 {
     // Add our custom font resources
     if ( m_FontResourceNames.empty () )
@@ -683,7 +683,7 @@ bool CGraphics::LoadFonts ( void )
     return true;
 }
 
-bool CGraphics::LoadFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont )
+bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont )
 {
     int iLoaded = AddFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 );
 
@@ -715,12 +715,15 @@ bool CGraphics::LoadFont ( std::string strFontPath, std::string strFontName, uns
     return bSuccess && SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) && ( iLoaded == 1 );
 }
 
-bool CGraphics::DestroyFont ( std::string strFontPath )
+bool CGraphics::DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont *pDXSmallFont, ID3DXFont *pDXBigFont )
 {
-    return RemoveFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 ) ? true : false; 
+    bool bResult = RemoveFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 );
+    SAFE_RELEASE( pDXSmallFont );
+    SAFE_RELEASE( pDXBigFont );
+    return bResult;
 }
 
-bool CGraphics::DestroyFonts ( void )
+bool CGraphics::DestroyStandardDXFonts ( void )
 {
     // Remove our custom font resources (needs to be identical to LoadFonts)
     for ( uint i = 0 ; i < m_FontResourceNames.size () ; i++ )
@@ -728,6 +731,13 @@ bool CGraphics::DestroyFonts ( void )
         RemoveFontResourceEx ( CalcMTASAPath ( "MTA\\cgui\\" + m_FontResourceNames[i] ), FR_PRIVATE, 0 );
     }
 
+    for ( int i = 0; i < NUM_FONTS; i++ )
+    {
+        SAFE_RELEASE( m_pDXFonts[i] );
+        SAFE_RELEASE( m_pBigDXFonts[i] );
+    }
+
+    // Release 
     return true;
 }
 
@@ -798,7 +808,7 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
 {
     m_pDevice = pDevice;
 
-    LoadFonts ();
+    LoadStandardDXFonts ();
 
     // Get the original render target
     assert ( !m_pOriginalTarget );

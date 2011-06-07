@@ -223,7 +223,7 @@ int CLuaFunctionDefs::GUICreateStaticImage ( lua_State* luaVM )
                 return 1;
             }
             else
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "AAAAAAAA Bad argument @ '%s' [%s]", "guiStaticImage", "path all wrong" ) );
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad file path @ '%s' [%s]", "guiStaticImage", *strPath ) );
         }
     }
     else
@@ -597,10 +597,10 @@ int CLuaFunctionDefs::GUIStaticImageLoadImage ( lua_State* luaVM )
                     return 1;
                 }
                 else
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "AAAAAA Bad argument @ '%s' [%s]", "guiStaticImageLoadImage", "problem with loading image" ) );
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad news @ '%s' [%s '%s']", "guiStaticImageLoadImage", "Problem loading image", *strPath ) );
             }
             else
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "AAAAAAAA Bad argument @ '%s' [%s]", "guiStaticImageLoadImage", "problem with path" ) );
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad file path @ '%s' [%s]", "guiStaticImageLoadImage", *strPath ) );
         }
     }
     else
@@ -744,23 +744,17 @@ int CLuaFunctionDefs::GUISetText ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUISetFont ( lua_State* luaVM )
 {
-//  bool guiSetFont ( element guiElement, string font )
-    CClientGUIElement* guiElement; SString font;
+//  bool guiSetFont ( element guiElement, mixed font )
+    CClientGUIElement* guiElement; SString strFontName; CClientFont* pFontElement;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( guiElement );
-    argStream.ReadString ( font );
+    argStream.ReadString ( strFontName, "default-normal" );
+    argStream.ReadUserData ( pFontElement, NULL );
 
     if ( !argStream.HasErrors () )
     {
-        // If our font is a filepath, it's a custom font
-        CResource* pResource =  m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource ();
-        std::string strPath, strMetaPath;
-        // FileExists should be removed somehow, as it's quite slow
-        if ( CResourceManager::ParseResourcePathInput( font, pResource, strPath, strMetaPath ) && FileExists (strPath) )
-            font = SString("%s/%s", pResource->GetName(), strMetaPath.c_str());
-
-        if ( CStaticFunctionDefinitions::GUISetFont ( *guiElement, font ) )
+        if ( guiElement->SetFont ( strFontName, pFontElement ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -1128,7 +1122,7 @@ int CLuaFunctionDefs::GUIGetText ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIGetFont ( lua_State* luaVM )
 {
-//  string guiGetFont ( element guiElement )
+//  string,font guiGetFont ( element guiElement )
     CClientGUIElement* guiElement;
 
     CScriptArgReader argStream ( luaVM );
@@ -1136,13 +1130,15 @@ int CLuaFunctionDefs::GUIGetFont ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        SString strFont = guiElement->GetCGUIElement ()->GetFont ();
+        CClientFont* pFontElement;
+        SString strFontName = guiElement->GetFont ( &pFontElement );
 
-        if ( strFont != "" )
-            lua_pushstring ( luaVM, strFont );
+        if ( strFontName != "" )
+            lua_pushstring ( luaVM, strFontName );
         else
             lua_pushnil ( luaVM );
-        return 1;
+        lua_pushelement ( luaVM, pFontElement );
+        return 2;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "guiGetFont", *argStream.GetErrorMessage () ) );

@@ -23,6 +23,7 @@ CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLua
     m_pGUIManager = pManager->GetGUIManager ();
     m_pCGUIElement = pCGUIElement;
     m_pLuaMain = pLuaMain;
+    m_pFontElement = NULL;
 
     memset ( &_szCallbackFunc1[0], NULL, sizeof ( _szCallbackFunc1 ) );
     memset ( &_szCallbackFunc2[0], NULL, sizeof ( _szCallbackFunc2 ) );
@@ -99,6 +100,10 @@ CClientGUIElement::~CClientGUIElement ( void )
 
 void CClientGUIElement::Unlink ( void )
 {
+    // Detach from any custom font
+    if ( m_pFontElement )
+        SetFont( "", NULL );
+
     m_pGUIManager->Remove ( this );
 }
 
@@ -145,3 +150,37 @@ bool CClientGUIElement::_CallbackEvent2 ( CGUIElement* pCGUIElement )
     }
     return false;
 }
+
+
+//
+// Get which font name and font element we are using now
+//
+SString CClientGUIElement::GetFont ( CClientFont** ppFontElement )
+{
+    *ppFontElement = m_pFontElement;
+    return GetCGUIElement ()->GetFont ();
+}
+
+//
+// Change font
+//
+bool CClientGUIElement::SetFont ( const SString& strInFontName, CClientFont* pFontElement )
+{
+    SString strFontName = strInFontName;
+
+    if ( pFontElement )
+        strFontName = pFontElement->GetGUIFontName ();
+    else
+    if ( strFontName.empty () )
+        strFontName = "default-normal";
+
+    if ( GetCGUIElement ()->SetFont ( strFontName ) )
+    {
+        if ( m_pFontElement )   m_pFontElement->NotifyGUIElementDetach ( this );
+        m_pFontElement = pFontElement;
+        if ( m_pFontElement )   m_pFontElement->NotifyGUIElementAttach ( this );
+        return true;
+    }
+    return false;
+}
+

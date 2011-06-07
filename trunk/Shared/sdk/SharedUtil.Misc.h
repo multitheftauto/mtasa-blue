@@ -334,6 +334,36 @@ namespace SharedUtil
 
 
 
+    //
+    // std::set helpers
+    //
+
+    // Update or add an item
+    template < class T, class TR, class T2 >
+    void MapInsert ( std::set < T, TR >& collection, const T2& item )
+    {
+        collection.insert ( item );
+    }
+
+    // Returns true if the item is in the collection
+    template < class T, class TR, class T2 >
+    bool MapContains ( const std::set < T, TR >& collection, const T2& item )
+    {
+        return collection.find ( item ) != collection.end ();
+    }
+
+    // Remove item from collection
+    template < class T, class TR, class T2 >
+    bool MapRemove ( std::set < T, TR >& collection, const T2& item )
+    {
+        typename std::set < T, TR > ::iterator it = collection.find ( item );
+        if ( it == collection.end () )
+            return false;
+        collection.erase ( it );
+        return true;
+    }
+
+
 
     //
     // SColor

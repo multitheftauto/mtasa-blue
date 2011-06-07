@@ -525,10 +525,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CScriptFontLoader.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CScriptKeyBinds.cpp"
 					>
 				</File>
@@ -746,6 +742,14 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientExplosionManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFont.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFontManager.cpp"
 					>
 				</File>
 				<File
@@ -1232,34 +1236,34 @@
 			<Filter
 				Name="core"
 				>
-				<File
-					RelativePath="..\..\sdk\core\VideoCard.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Nightly|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
+				<File
+					RelativePath="..\..\sdk\core\VideoCard.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Nightly|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
 			</Filter>
 			<Filter
 				Name="utils"
@@ -1448,10 +1452,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CResourceManager.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CScriptFontLoader.h"
 					>
 				</File>
 				<File
@@ -1724,6 +1724,14 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientExplosionManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFont.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientFontManager.h"
 					>
 				</File>
 				<File
