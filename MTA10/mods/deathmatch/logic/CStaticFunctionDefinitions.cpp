@@ -38,7 +38,6 @@ static CClientTeamManager*                          m_pTeamManager;
 static CGUI*                                        m_pGUI;
 static CClientGUIManager*                           m_pGUIManager;
 static CScriptKeyBinds*                             m_pScriptKeyBinds;
-//static CScriptFontLoader*                           m_pScriptFontLoader;
 static CClientMarkerManager*                        m_pMarkerManager;
 static CClientPickupManager*                        m_pPickupManager;
 static CMovingObjectsManager*                       m_pMovingObjectsManager;
@@ -78,7 +77,6 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     m_pGUI = pCore->GetGUI ();
     m_pGUIManager = pManager->GetGUIManager ();
     m_pScriptKeyBinds = m_pClientGame->GetScriptKeyBinds ();
-//    m_pScriptFontLoader = m_pClientGame->GetScriptFontLoader();
     m_pMarkerManager = pManager->GetMarkerManager ();
     m_pPickupManager = pManager->GetPickupManager ();
     m_pMovingObjectsManager = m_pClientGame->GetMovingObjectsManager ();
@@ -4418,31 +4416,6 @@ void CStaticFunctionDefinitions::GUISetText ( CClientEntity& Entity, const char*
         GUIElement.GetCGUIElement ()->SetText ( szText );
     }
 }
-
-/*
-bool CStaticFunctionDefinitions::GUISetFont ( CClientEntity& Entity, const char* szFont, CClientFont* pFontElement )
-{
-    bool bResult = false;
-
-    // Are we a CGUI element?
-    if ( IS_GUI ( &Entity ) )
-    {
-        CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
-
-        bResult = GUIElement.SetFont ( szFont, pFontElement );
-
-        // Set the font
-        //bResult = GUIElement.GetCGUIElement ()->SetFont ( szFont );
-    }
-    return bResult;
-}
-*/
-//bool CStaticFunctionDefinitions::GUIUnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
-//{
-//    return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
-//}
-
-
 
 void CStaticFunctionDefinitions::GUISetSize ( CClientEntity& Entity, const CVector2D& vecSize, bool bRelative )
 {

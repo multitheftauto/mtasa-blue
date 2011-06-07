@@ -33,9 +33,19 @@ CClientFontManager::CClientFontManager ( CClientManager* pClientManager )
 ////////////////////////////////////////////////////////////////
 CClientFontManager::~CClientFontManager ( void )
 {
-    // These should be empty by now
-    assert ( m_GUIFontInfoMap.empty () );
-    assert ( m_DXFontInfoMap.empty () );
+    // Remove any existing GUI font data
+    for ( std::map < SString, SGUIFontInfo >::iterator iter = m_GUIFontInfoMap.begin () ; iter != m_GUIFontInfoMap.end () ; ++iter )
+    {
+        SGUIFontInfo& info = iter->second;
+        delete info.pFntCEGUI;
+    }
+
+    // Remove any existing DX font data
+    for ( std::map < SString, SDXFontInfo >::iterator iter = m_DXFontInfoMap.begin () ; iter != m_DXFontInfoMap.end () ; ++iter )
+    {
+        SDXFontInfo& info = iter->second;
+        g_pCore->GetGraphics()->DestroyAdditionalDXFont ( info.strFullFilePath, info.pFntBig, info.pFntNormal );
+    }
 }
 
 
@@ -58,7 +68,7 @@ CClientFont* CClientFontManager::CreateFont ( const SString& strFullFilePath, ui
     SGUIFontInfo* pGUIFontInfo = GetGUIFontInfo ( strFontName, strFullFilePath, uiSize );
     if ( !pGUIFontInfo )
         return NULL;
-    SDXFontInfo* pDXFontInfo = GetDXFontInfo ( strFontName, strFullFilePath, uiSize, bBold );
+    SDXFontInfo* pDXFontInfo = GetDXFontInfo ( strFontName, strFullFilePath, Round < uint > ( uiSize * 1.75f ), bBold );
 
     // Create the element
     CClientFont* pFontElement = new CClientFont ( m_pClientManager, INVALID_ELEMENT_ID, pGUIFontInfo->strCEGUIFontName, pDXFontInfo->pFntNormal, pDXFontInfo->pFntBig );
