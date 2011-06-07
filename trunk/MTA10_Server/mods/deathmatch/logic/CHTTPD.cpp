@@ -32,13 +32,23 @@ CHTTPD::CHTTPD ( void )
 
 CHTTPD::~CHTTPD ()
 {
+    StopHTTPD ();
+}
+
+
+bool CHTTPD::StopHTTPD ( void )
+{
     // Stop the server if we started it
     if ( m_bStartedServer )
     {
         // Stop the server
         StopServer ();
+        m_bStartedServer = false;
+        return true;
     }
+    return false;
 }
+
 
 bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
 {
