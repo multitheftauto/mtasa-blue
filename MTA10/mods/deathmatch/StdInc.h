@@ -55,9 +55,7 @@
 #include <CClientColPolygon.h>
 #include <CClientColTube.h>
 #include <CClientCorona.h>
-#include <CClientCRC32Hasher.h>
 #include <CClientDFF.h>
-#include <CClientDisplayGroup.h>
 #include <CClientDummy.h>
 #include <CClientEntity.h>
 #include <CClientSpatialDatabase.h>

@@ -369,10 +369,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientCRC32Hasher.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CClientEntityRefManager.cpp"
 					>
 				</File>
@@ -542,10 +538,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CSyncDebug.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CTrainerMonitoringHistory.cpp"
 					>
 				</File>
 				<File
@@ -722,10 +714,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientDisplay.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientDisplayGroup.cpp"
 					>
 				</File>
 				<File
@@ -1475,10 +1463,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CTrainerMonitoringHistory.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CTransferBox.h"
 					>
 				</File>
@@ -1691,10 +1675,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientCRC32Hasher.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientDFF.h"
 					>
 				</File>
@@ -1704,10 +1684,6 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientDisplay.h"
-					>
-				</File>
-				<File
-					RelativePath="..\shared_logic\CClientDisplayGroup.h"
 					>
 				</File>
 				<File
