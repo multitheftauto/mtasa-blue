@@ -1302,6 +1302,20 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
         }
     }
 
+    if ( pElement->GetType () == CElement::VEHICLE )
+    {
+        CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
+        CPed* pOccupant;
+        // Loop all seats of the vehicle
+        for ( unsigned int i = 0 ; i < MAX_VEHICLE_SEATS ; i++ )
+        {
+            pOccupant = GetVehicleOccupant ( pVehicle, i );
+            if ( pOccupant )
+                // If the seat is occupied, set the occupants dimension
+                SetElementDimension ( pOccupant, usDimension );
+        }
+    }
+
     switch ( pElement->GetType () )
     {
         case CElement::PED:
