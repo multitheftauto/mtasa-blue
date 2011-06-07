@@ -21,7 +21,6 @@ using std::vector;
 #include <Tlhelp32.h>
 #include <Psapi.h>
 #include <shlwapi.h>
-#include <CClientCRC32Hasher.h>
 #include <Utils.h>
 #endif
 
@@ -905,119 +904,6 @@ void COMMAND_Watch ( const char *szCmdLine )
                 CloseHandle ( hProcess );
             }
         }
-    }
-}
-
-
-void COMMAND_Hash ( const char *szCmdLine )
-{
-    // Copy the cmd line
-    char* szTemp = new char [ strlen ( szCmdLine ) + 1 ];
-    strcpy ( szTemp, szCmdLine );
-
-    // Split up the arguments
-    char* szOffset = strtok ( szTemp, " " );
-    char* szLength = strtok ( NULL, " " );
-    if ( !szOffset || !szLength )
-    {
-        delete [] szTemp;
-        return;
-    }
-
-    // Convert to integer
-    unsigned long ulOffset = atol ( szOffset );
-    unsigned int uiLength = atoi ( szLength );
-
-    // Delete the temp buffer
-    delete [] szTemp;
-
-    // Create a hasher
-    CClientCRC32Hasher Hasher;
-    CRC32 Result;
-
-    // Try hashing the specified area
-    try
-    {
-        if ( Hasher.Calculate ( reinterpret_cast < const char* > ( ulOffset ), uiLength, Result ) )
-        {
-            // Print it
-            g_pCore->GetConsole ()->Printf ( "Hash at 0x%08X, size %u:\n0x%08X", ulOffset, uiLength, Result );
-            return;
-        }
-    }
-    catch ( ... )
-    {}
-
-    // Failed
-    g_pCore->GetConsole ()->Printf ( "Hashing 0x%08X, size %u failed!", ulOffset, uiLength );
-}
-
-
-void COMMAND_HashArray ( const char *szCmdLine )
-{
-    // Copy the cmd line
-    char* szTemp = new char [ strlen ( szCmdLine ) + 1 ];
-    strcpy ( szTemp, szCmdLine );
-
-    // Split up the arguments
-    char* szOffset = strtok ( szTemp, " " );
-    char* szSize = strtok ( NULL, " " );
-    char* szArrayLength = strtok ( NULL, " " );
-    char* szArrayPad = strtok ( NULL, " " );
-    if ( !szOffset || !szSize || !szArrayLength )
-    {
-        delete [] szTemp;
-        return;
-    }
-
-    // Convert to integer
-    unsigned long ulOffset = atol ( szOffset );
-    unsigned int uiSize = atoi ( szSize );
-    unsigned int uiArrayLength = atoi ( szArrayLength );
-
-    unsigned int uiArrayPad = 0;
-    if ( szArrayPad )
-    {
-        uiArrayPad = atoi ( szArrayPad );
-    }
-
-    // Delete the temp buffer
-    delete [] szTemp;
-
-    // Create a hasher
-    CClientCRC32Hasher Hasher;
-    Hasher.Start ();
-
-    // Try hashing the specified area
-    bool bSuccess = false;
-    try
-    {
-        // Hash each segment in the array
-        for ( unsigned int i = 0; i < uiArrayLength; i++ )
-        {
-            Hasher.Append ( reinterpret_cast < const char* > ( ulOffset + ( ( uiSize + uiArrayPad ) * i ) ), uiSize );
-        }
-
-        // Success
-        bSuccess = true;
-    }
-    catch ( ... )
-    {}
-
-    // Success?
-    if ( bSuccess )
-    {
-        // Finish the hashing and grab the hash
-        CRC32 crcResult;
-        Hasher.Finish ( crcResult );
-
-        // Print the hash in the console
-        g_pCore->GetConsole ()->Printf ( "Hashing array at 0x%08X [length: %u, size: %u, pad: %u]:\n0x%08X", ulOffset, uiArrayLength, uiSize, uiArrayPad, crcResult );
-    }
-    else
-    {
-        // Failed
-        g_pCore->GetConsole ()->Printf ( "Hashing array at 0x%08X [length: %u, size: %u, pad: %u]: failed!", ulOffset, uiArrayLength, uiSize, uiArrayPad );
     }
 }
 

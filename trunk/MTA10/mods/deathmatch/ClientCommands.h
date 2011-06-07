@@ -75,8 +75,6 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
     void COMMAND_ShowInterpolation  ( const char* szCmdLine );
 
     void COMMAND_Watch              ( const char* szCmdLine );
-    void COMMAND_Hash               ( const char* szCmdLine );
-    void COMMAND_HashArray          ( const char* szCmdLine );
     void COMMAND_Modules            ( const char* szCmdLine );
 
     void COMMAND_Debug              ( const char* szCmdLine );

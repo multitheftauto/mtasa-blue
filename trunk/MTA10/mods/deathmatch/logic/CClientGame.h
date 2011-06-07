@@ -34,7 +34,6 @@
 #include "CNetworkStats.h"
 #include "CSyncDebug.h"
 #include "CServer.h"
-#include "CTrainerMonitoringHistory.h"
 #include "CTransferBox.h"
 #include "rpc/CRPCFunctions.h"
 #include "CUnoccupiedVehicleSync.h"
@@ -58,14 +57,6 @@
 
 #ifdef MTA_VOICE
     #include "CVoice.h"
-#endif
-
-#ifdef MTA_DEBUG
-    struct AddressInfo 
-    {
-        unsigned long   ulOffset;
-        unsigned int    uiType;
-    };
 #endif
 
 class CClientGame
@@ -630,18 +621,6 @@ private:
     CVector                             m_vecLastMimicRot;
     bool                                m_bDoPaintballs;
     bool                                m_bShowInterpolation;
-    #endif
-
-    // Trainer monitoring
-    #ifdef MTA_DEBUG
-        #define MTA_OFFSET_BASE     0
-        #define MTA_OFFSET_PLAYER   1
-        #define MTA_OFFSET_VEHICLE  2
-
-        CTrainerMonitoringHistory   m_RPMHistory;
-        CTrainerMonitoringHistory   m_WPMHistory;
-
-        AddressInfo *               GetAddressInfo ( unsigned long ulOffset, AddressInfo * pAddressInfo );
     #endif
 
     // Debug class. Empty in release.
