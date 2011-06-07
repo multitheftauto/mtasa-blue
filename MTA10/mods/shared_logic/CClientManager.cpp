@@ -45,6 +45,7 @@ CClientManager::CClientManager ( void )
     m_pRadarAreaManager = new CClientRadarAreaManager ( this );
     m_pRadarMarkerManager = new CClientRadarMarkerManager ( this );
     m_pSoundManager = new CClientSoundManager ( this );
+    m_pFontManager = new CClientFontManager ( this );
     m_pTeamManager = new CClientTeamManager;
     m_pDisplayManager = new CClientDisplayManager;
     m_pVehicleManager = new CClientVehicleManager ( this );
@@ -122,6 +123,9 @@ CClientManager::~CClientManager ( void )
 
     delete m_pSoundManager;
     m_pSoundManager = NULL;
+
+    delete m_pFontManager;
+    m_pFontManager = NULL;
 
     delete m_pRadarMarkerManager;
     m_pRadarMarkerManager = NULL;

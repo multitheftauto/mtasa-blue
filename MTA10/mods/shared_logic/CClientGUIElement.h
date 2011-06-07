@@ -75,6 +75,10 @@ public:
     // cgui element access
     inline CGUIElement*         GetCGUIElement              ( void )                        { return m_pCGUIElement; };
     inline void                 SetCGUIElement              ( CGUIElement *pCGUIElement )   { m_pCGUIElement = pCGUIElement; };
+
+    SString                     GetFont                     ( class CClientFont** ppFontElement );
+    bool                        SetFont                     ( const SString& strFontName, CClientFont* pFontElement );
+
 private:
     bool                        _CallbackEvent1             ( CGUIElement *pCGUIElement );
     bool                        _CallbackEvent2             ( CGUIElement *pCGUIElement );
@@ -85,6 +89,7 @@ private:
     const char*                 m_szCGUITypeName;
     CClientGUIManager*          m_pGUIManager;
     CGUIElement*                m_pCGUIElement;
+    CClientFont*                m_pFontElement;
     CLuaMain*                   m_pLuaMain;
 };
 

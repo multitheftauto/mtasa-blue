@@ -38,7 +38,7 @@ static CClientTeamManager*                          m_pTeamManager;
 static CGUI*                                        m_pGUI;
 static CClientGUIManager*                           m_pGUIManager;
 static CScriptKeyBinds*                             m_pScriptKeyBinds;
-static CScriptFontLoader*                           m_pScriptFontLoader;
+//static CScriptFontLoader*                           m_pScriptFontLoader;
 static CClientMarkerManager*                        m_pMarkerManager;
 static CClientPickupManager*                        m_pPickupManager;
 static CMovingObjectsManager*                       m_pMovingObjectsManager;
@@ -48,6 +48,7 @@ static CClientCamera*                               m_pCamera;
 static CClientExplosionManager*                     m_pExplosionManager;
 static CClientProjectileManager*                    m_pProjectileManager;
 static CClientSoundManager*                         m_pSoundManager;
+static CClientFontManager*                          m_pFontManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN CChildListType::const_iterator iter=Entity.IterBegin();for(;iter!=Entity.IterEnd();iter++)
@@ -77,7 +78,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     m_pGUI = pCore->GetGUI ();
     m_pGUIManager = pManager->GetGUIManager ();
     m_pScriptKeyBinds = m_pClientGame->GetScriptKeyBinds ();
-    m_pScriptFontLoader = m_pClientGame->GetScriptFontLoader();
+//    m_pScriptFontLoader = m_pClientGame->GetScriptFontLoader();
     m_pMarkerManager = pManager->GetMarkerManager ();
     m_pPickupManager = pManager->GetPickupManager ();
     m_pMovingObjectsManager = m_pClientGame->GetMovingObjectsManager ();
@@ -87,6 +88,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     m_pExplosionManager = pManager->GetExplosionManager ();
     m_pProjectileManager = pManager->GetProjectileManager ();
     m_pSoundManager = pManager->GetSoundManager ();
+    m_pFontManager = pManager->GetFontManager ();
 }
 
 
@@ -3877,35 +3879,25 @@ void CStaticFunctionDefinitions::DrawText ( int iLeft, int iTop,
                                  float fScaleX,
                                  float fScaleY,
                                  unsigned long ulFormat,
-                                 const char* szFont,
-                                 bool bPostGUI, CResource* pResource )
+                                 ID3DXFont* pDXFont,
+                                 bool bPostGUI )
 {
-    ID3DXFont* pFont = ResolveFont ( szFont, pResource, fScaleX, fScaleY );
-    g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pFont, bPostGUI );
+    g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI );
 }
 
-bool CStaticFunctionDefinitions::LoadFont ( std::string strFullFilePath, bool bBold, unsigned int uiSize, std::string strMetaPath, CResource* pResource )
+CClientFont* CStaticFunctionDefinitions::CreateFont ( const SString& strFullFilePath, uint uiSize, bool bBold, const SString& strMetaPath, CResource* pResource  )
 {
-    return m_pScriptFontLoader->LoadFont(strFullFilePath, bBold, uiSize, strMetaPath, pResource );
+    return m_pFontManager->CreateFont( strFullFilePath, uiSize, bBold, strMetaPath, pResource );
 }
 
-bool CStaticFunctionDefinitions::UnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
+// Find custom font from an element, or a standard font from a name
+ID3DXFont* CStaticFunctionDefinitions::ResolveDXFont ( const SString& strFontName, CClientFont* pFontElement, float fScaleX, float fScaleY )
 {
-    return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
-}
+    if ( pFontElement )
+        return pFontElement->GetDXFont ( fScaleX, fScaleY );
 
-// Find standard or custom font from a resource path
-ID3DXFont* CStaticFunctionDefinitions::ResolveFont ( const char* szFontName, CResource* pResource, float fScaleX, float fScaleY )
-{
-    SString strPath, strMetaPath;
-    if ( CResourceManager::ParseResourcePathInput ( szFontName, pResource, strPath, strMetaPath ) )
-    {
-        ID3DXFont* pFont = NULL;
-        if ( m_pScriptFontLoader->GetDXFont ( &pFont, strPath, strMetaPath, pResource, fScaleX, fScaleY ) )
-            return pFont;
-    }
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
-    eFontType fontType = pGraphics->GetFontType ( szFontName );
+    eFontType fontType = pGraphics->GetFontType ( strFontName );
     return pGraphics->GetFont ( fontType );
 }
 
@@ -4427,8 +4419,8 @@ void CStaticFunctionDefinitions::GUISetText ( CClientEntity& Entity, const char*
     }
 }
 
-
-bool CStaticFunctionDefinitions::GUISetFont ( CClientEntity& Entity, const char* szFont )
+/*
+bool CStaticFunctionDefinitions::GUISetFont ( CClientEntity& Entity, const char* szFont, CClientFont* pFontElement )
 {
     bool bResult = false;
 
@@ -4437,16 +4429,18 @@ bool CStaticFunctionDefinitions::GUISetFont ( CClientEntity& Entity, const char*
     {
         CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
 
+        bResult = GUIElement.SetFont ( szFont, pFontElement );
+
         // Set the font
-        bResult = GUIElement.GetCGUIElement ()->SetFont ( szFont );
+        //bResult = GUIElement.GetCGUIElement ()->SetFont ( szFont );
     }
     return bResult;
 }
-
-bool CStaticFunctionDefinitions::GUIUnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
-{
-    return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
-}
+*/
+//bool CStaticFunctionDefinitions::GUIUnloadFont ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource )
+//{
+//    return m_pScriptFontLoader->UnloadFont(strFullFilePath, strMetaPath, pResource );
+//}
 
 
 

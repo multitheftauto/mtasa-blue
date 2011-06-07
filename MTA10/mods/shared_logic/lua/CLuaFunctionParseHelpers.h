@@ -18,6 +18,22 @@ DECLARE_ENUM( CGUIHorizontalAlign );
 DECLARE_ENUM( eInputMode );
 DECLARE_ENUM( eAccessType );
 
+enum eDXHorizontalAlign
+{
+    DX_ALIGN_LEFT = DT_LEFT,
+    DX_ALIGN_HCENTER = DT_CENTER,
+    DX_ALIGN_RIGHT = DT_RIGHT,
+};
+DECLARE_ENUM( eDXHorizontalAlign );
+
+enum eDXVerticalAlign
+{
+    DX_ALIGN_TOP = DT_TOP,
+    DX_ALIGN_VCENTER = DT_VCENTER,
+    DX_ALIGN_BOTTOM = DT_BOTTOM,
+};
+DECLARE_ENUM( eDXVerticalAlign );
+
 
 // class -> class type
 inline eClientEntityType GetClassType ( CClientCamera* )        { return CCLIENTCAMERA; }
@@ -41,6 +57,7 @@ inline eClientEntityType GetClassType ( CClientColModel* )      { return CCLIENT
 inline eClientEntityType GetClassType ( CClientTXD* )           { return CCLIENTTXD; }
 inline eClientEntityType GetClassType ( CClientSound* )         { return CCLIENTSOUND; }
 inline eClientEntityType GetClassType ( CClientWater* )         { return CCLIENTWATER; }
+inline eClientEntityType GetClassType ( CClientFont* )          { return CCLIENTFONT; }
 
 inline eCGUIType GetClassType ( CGUIButton* )      { return CGUI_BUTTON; }
 inline eCGUIType GetClassType ( CGUICheckBox* )    { return CGUI_CHECKBOX; }
@@ -81,6 +98,7 @@ inline SString GetClassTypeName ( CClientColModel* )        { return "col-model"
 inline SString GetClassTypeName ( CClientTXD* )             { return "txd"; }
 inline SString GetClassTypeName ( CClientSound* )           { return "sound"; }
 inline SString GetClassTypeName ( CClientWater* )           { return "water"; }
+inline SString GetClassTypeName ( CClientFont* )            { return "font"; }
 
 inline SString GetClassTypeName ( CGUIButton* )      { return "gui-button"; }
 inline SString GetClassTypeName ( CGUICheckBox* )    { return "gui-checkbox"; }

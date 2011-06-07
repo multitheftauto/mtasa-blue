@@ -77,11 +77,11 @@ public:
     ID3DXFont *         GetFont                 ( eFontType fontType = FONT_DEFAULT );
     eFontType           GetFontType             ( const char* szFontName );
 
-    bool                LoadFonts               ( void );
-    bool                DestroyFonts            ( void );
+    bool                LoadStandardDXFonts     ( void );
+    bool                DestroyStandardDXFonts  ( void );
 
-    bool                LoadFont                ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont );
-    bool                DestroyFont             ( std::string strFontPath );
+    bool                LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont );
+    bool                DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pDXSmallFont, ID3DXFont* pDXBigFont );
 
     float               GetDXFontHeight         ( float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXCharacterWidth     ( char c, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );

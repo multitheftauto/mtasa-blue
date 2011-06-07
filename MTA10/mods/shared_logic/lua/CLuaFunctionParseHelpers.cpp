@@ -54,3 +54,17 @@ IMPLEMENT_ENUM_BEGIN( eAccessType )
     ADD_ENUM ( ACCESS_PUBLIC,               "public" )
     ADD_ENUM ( ACCESS_PRIVATE,              "private" )
 IMPLEMENT_ENUM_END( "access-type" )
+
+
+IMPLEMENT_ENUM_BEGIN( eDXHorizontalAlign )
+    ADD_ENUM ( DX_ALIGN_LEFT,           "left" )
+    ADD_ENUM ( DX_ALIGN_HCENTER,        "center" )
+    ADD_ENUM ( DX_ALIGN_RIGHT,          "right" )
+IMPLEMENT_ENUM_END( "horizontal-align" )
+
+
+IMPLEMENT_ENUM_BEGIN( eDXVerticalAlign )
+    ADD_ENUM ( DX_ALIGN_TOP,            "top" )
+    ADD_ENUM ( DX_ALIGN_VCENTER,        "center" )
+    ADD_ENUM ( DX_ALIGN_BOTTOM,         "bottom" )
+IMPLEMENT_ENUM_END( "vertical-align" )

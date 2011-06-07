@@ -49,7 +49,6 @@
 #include "CEvents.h"
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
-#include "CScriptFontLoader.h"
 #include "CElementDeleter.h"
 #include "CFoo.h"
 #include "../../shared_logic/CRegisteredCommands.h"
@@ -232,7 +231,6 @@ public:
     inline CResourceManager*            GetResourceManager              ( void )        { return m_pResourceManager; }
     inline CLuaManager*                 GetLuaManager                   ( void )        { return m_pLuaManager; }
     inline CScriptKeyBinds*             GetScriptKeyBinds               ( void )        { return m_pScriptKeyBinds; }
-    inline CScriptFontLoader*           GetScriptFontLoader             ( void )        { return m_pScriptFontLoader; }
     inline CScriptDebugging*            GetScriptDebugging              ( void )        { return m_pScriptDebugging; }
     inline CRegisteredCommands*         GetRegisteredCommands           ( void )        { return &m_RegisteredCommands; }
     inline CZoneNames*                  GetZoneNames                    ( void )        { return m_pZoneNames; };
@@ -502,7 +500,6 @@ private:
     CTransferBox*                       m_pTransferBox;
     CResourceManager*                   m_pResourceManager;
     CScriptKeyBinds*                    m_pScriptKeyBinds;
-    CScriptFontLoader*                  m_pScriptFontLoader;
     CElementDeleter                     m_ElementDeleter;
     CZoneNames*                         m_pZoneNames;
     CPacketHandler*                     m_pPacketHandler;

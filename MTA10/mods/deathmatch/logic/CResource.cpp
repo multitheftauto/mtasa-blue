@@ -101,9 +101,6 @@ CResource::~CResource ( void )
     g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceCOLRoot );
     m_pResourceCOLRoot = NULL;
 
-    // Destroy script fonts created by the resourece
-    g_pClientGame->GetScriptFontLoader()->UnloadFonts ( this );
-
     // Destroy the gui root so all gui elements are deleted except those moved out
     g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceGUIEntity );
     m_pResourceGUIEntity = NULL;
