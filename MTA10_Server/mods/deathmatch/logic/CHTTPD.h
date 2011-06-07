@@ -35,6 +35,7 @@ public:
     bool         ShouldAllowConnection ( const char * szAddress );
     
     bool                        StartHTTPD ( const char* szIP, unsigned int port );
+    bool                        StopHTTPD ( void );
     inline void                 SetResource ( CResource * resource ) { m_resource = resource; }
     inline CResource *          GetResource ( void ) { return m_resource; }
     class CAccount *            CheckAuthentication ( HttpRequest * ipoHttpRequest );
