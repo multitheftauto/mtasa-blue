@@ -2051,6 +2051,17 @@ void CClientVehicle::StreamedInPulse ( void )
             // Update our streaming position
             UpdateStreamPosition ( vecPosition );
         }
+
+        // Update doors
+        if ( CClientVehicleManager::HasDoors ( GetModel() ) )
+        {
+            for ( unsigned char i = 0; i < 6; ++i )
+            {
+                CDoor* pDoor = m_pVehicle->GetDoor ( i );
+                if ( pDoor )
+                    m_fDoorOpenRatio [ i ] = pDoor->GetAngleOpenRatio ();
+            }
+        }
     }
 }
 
