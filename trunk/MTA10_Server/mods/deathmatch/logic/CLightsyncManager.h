@@ -15,7 +15,7 @@
 #include <list>
 
 #define SLOW_SYNCRATE                       1500
-#define DISTANCE_FOR_SLOW_SYNCRATE          320
+#define DISTANCE_FOR_SLOW_SYNCRATE          301
 #define LIGHTSYNC_HEALTH_THRESHOLD          2.0f
 #define LIGHTSYNC_VEHICLE_HEALTH_THRESHOLD  50.0f
 #define PLAYERS_PER_LIGHTSYNC_PACKET
