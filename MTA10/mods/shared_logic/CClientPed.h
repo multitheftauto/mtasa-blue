@@ -202,7 +202,7 @@ public:
     bool                        GetClosestDoor              ( CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor, CVector* pClosestDoorPosition = NULL );
 
     void                        GetIntoVehicle              ( CClientVehicle* pVehicle, unsigned int uiSeat = 0, unsigned char ucDoor = 0 );
-    void                        GetOutOfVehicle             ( void );
+    void                        GetOutOfVehicle             ( unsigned char ucDoor );
 
     void                        WarpIntoVehicle             ( CClientVehicle* pVehicle, unsigned int uiSeat = 0 );
     CClientVehicle*             RemoveFromVehicle           ( bool bIgnoreIfGettingOut = false );
@@ -456,7 +456,7 @@ protected:
     bool                        m_bDontChangeRadio;
 
 public:
-    void                        _GetIntoVehicle             ( CClientVehicle* pVehicle, unsigned int uiSeat );
+    void                        _GetIntoVehicle             ( CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor );
 
     void                        Respawn                     ( CVector * pvecPosition = NULL, bool bRestoreState = false, bool bCameraCut = false );
 
@@ -569,6 +569,7 @@ public:
     bool                        m_bStealthAiming;
     float                       m_fLighting;
     unsigned char               m_ucEnteringDoor;
+    unsigned char               m_ucLeavingDoor;
 
     bool                        m_bBulletImpactData;
     CClientEntity*              m_pBulletImpactEntity;

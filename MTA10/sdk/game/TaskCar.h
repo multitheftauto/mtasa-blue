@@ -54,6 +54,8 @@ class CTaskComplexLeaveCar : public virtual CTaskComplex
 {
 public:
     virtual         ~CTaskComplexLeaveCar ( void ) {};
+
+    virtual int     GetTargetDoor()=0;
 };
 
 #endif

@@ -140,12 +140,14 @@ public:
     float                       GetDoorOpenRatio        ( unsigned char ucDoor );
     void                        SetSwingingDoorsAllowed ( bool bAllowed );
     bool                        AreSwingingDoorsAllowed () const;
+    void                        AllowDoorRatioSetting   ( unsigned char ucDoor, bool bAllow );
     bool                        AreDoorsLocked          ( void );
     void                        SetDoorsLocked          ( bool bLocked );
 
 private:
     void                        SetDoorOpenRatioInterpolated    ( unsigned char ucDoor, float fRatio, unsigned long ulDelay );
     void                        ResetDoorInterpolation          ();
+    void                        CancelDoorInterpolation         ( unsigned char ucDoor );
     void                        ProcessDoorInterpolation        ();
 
 public:
@@ -380,8 +382,8 @@ public:
 
     void                        RemoveAllProjectiles    ( void );
 
-    static void                 SetPedOccupiedVehicle   ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat );
-    static void                 SetPedOccupyingVehicle  ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat );
+    static void                 SetPedOccupiedVehicle   ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor );
+    static void                 SetPedOccupyingVehicle  ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor );
     static void                 ValidatePedAndVehiclePair ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed );
@@ -440,6 +442,7 @@ protected:
     bool                        m_bLandingGearDown;
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
+    bool                        m_bAllowDoorRatioSetting [ 6 ];
     float                       m_fDoorOpenRatio [ 6 ];
     struct
     {

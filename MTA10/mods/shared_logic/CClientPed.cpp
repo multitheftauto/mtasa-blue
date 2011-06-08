@@ -126,6 +126,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_ulEndTarget = 0;
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
+    m_ucLeavingDoor = 0xFF;
     m_bDucked = false;
     m_bWearingGoggles = false;
     m_bVisible = true;
@@ -174,6 +175,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_fLighting = 0.0f;
     m_bBulletImpactData = false;
     m_ucEnteringDoor = 0xFF;
+    m_ucLeavingDoor = 0xFF;
 
     // Time based interpolation
     m_interp.pTargetOriginSource = NULL;
@@ -1177,21 +1179,26 @@ bool CClientPed::GetClosestDoor ( CClientVehicle* pVehicle, bool bCheckDriverDoo
 }
 
 
-void CClientPed::GetOutOfVehicle ( void )
+void CClientPed::GetOutOfVehicle ( unsigned char ucDoor )
 {
+    if ( ucDoor != 0xFF )
+        m_ucLeavingDoor = ucDoor + 2;
+    else
+        m_ucLeavingDoor = 0xFF;
+    m_bForceGettingOut = true;
+
     // Get the current vehicle you're in
     CClientVehicle* pVehicle = GetRealOccupiedVehicle ();
     if ( pVehicle )
     {
         //m_pOccupyingVehicle = pVehicle;
-
         if ( m_pPlayerPed )
         {
             CVehicle* pGameVehicle = pVehicle->m_pVehicle;
             
             if ( pGameVehicle )
             {
-                CTaskComplexLeaveCar * pOutTask = g_pGame->GetTasks ()->CreateTaskComplexLeaveCar ( pGameVehicle );
+                CTaskComplexLeaveCar * pOutTask = g_pGame->GetTasks ()->CreateTaskComplexLeaveCar ( pGameVehicle, m_ucLeavingDoor );
                 if ( pOutTask )
                 {
                     pOutTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY, true );
@@ -1203,10 +1210,11 @@ void CClientPed::GetOutOfVehicle ( void )
                     }
                 }
             }
+
+            if ( m_ucLeavingDoor != 0xFF )
+                pVehicle->AllowDoorRatioSetting ( m_ucLeavingDoor, false );
         }
     }
-
-    m_bForceGettingOut = true;
 
     ResetInterpolation ();
     ResetToOutOfVehicleWeapon();
@@ -1220,7 +1228,7 @@ void CClientPed::GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat,
     RemoveFromVehicle ();
 
     // Do it
-    _GetIntoVehicle ( pVehicle, uiSeat );
+    _GetIntoVehicle ( pVehicle, uiSeat, ucDoor );
     m_uiOccupiedVehicleSeat = uiSeat;
     m_ucEnteringDoor = ucDoor;
     m_bForceGettingIn = true;
@@ -1270,6 +1278,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     //m_uiOccupyingSeat = uiSeat;
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
+    m_ucLeavingDoor = 0xFF;
 
     // Store our current seat
     if ( m_pPlayerPed ) m_pPlayerPed->SetOccupiedSeat ( ( unsigned char ) uiSeat );
@@ -1295,7 +1304,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         }
 
         // Update the vehicle and us so we know we've occupied it
-        CClientVehicle::SetPedOccupiedVehicle( this, pVehicle, 0 );
+        CClientVehicle::SetPedOccupiedVehicle( this, pVehicle, 0, 0xFF );
     }
     else
     {
@@ -1332,7 +1341,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
             }
 
             // Update us so we know we've occupied it
-            CClientVehicle::SetPedOccupiedVehicle( this, pVehicle, uiSeat );
+            CClientVehicle::SetPedOccupiedVehicle( this, pVehicle, uiSeat, 0xFF );
         }
         else
             return;
@@ -1431,6 +1440,7 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
 
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
+    m_ucLeavingDoor = 0xFF;
 
     return pVehicle;
 }
@@ -2658,12 +2668,12 @@ void CClientPed::StreamedInPulse ( void )
                             if ( iTaskType != TASK_COMPLEX_ENTER_CAR_AS_DRIVER &&
                                 iTaskType != TASK_COMPLEX_ENTER_CAR_AS_PASSENGER )
                             {
-                                _GetIntoVehicle ( m_pOccupyingVehicle, m_uiOccupiedVehicleSeat );
+                                _GetIntoVehicle ( m_pOccupyingVehicle, m_uiOccupiedVehicleSeat, m_ucEnteringDoor );
                             }
                         }
                         else
                         {
-                            _GetIntoVehicle ( m_pOccupyingVehicle, m_uiOccupiedVehicleSeat );
+                            _GetIntoVehicle ( m_pOccupyingVehicle, m_uiOccupiedVehicleSeat, m_ucEnteringDoor );
                         }
                     }
                 }
@@ -2678,12 +2688,13 @@ void CClientPed::StreamedInPulse ( void )
                         CTask* pTask = GetCurrentPrimaryTask ();
                         if ( !pTask || pTask->GetTaskType () != TASK_COMPLEX_LEAVE_CAR )
                         {
-                            GetOutOfVehicle ();
+                            GetOutOfVehicle ( m_ucLeavingDoor );
                         }
                     }
                     else
                     {
                         m_bForceGettingOut = false;
+                        m_ucLeavingDoor = 0xFF;
                     }
                 }
 
@@ -3791,7 +3802,7 @@ bool CClientPed::IsMovingGoggles ( bool & bPuttingOn )
 }
 
 
-void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat )
+void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor )
 {
     assert ( m_pOccupiedVehicle == NULL );
     assert ( m_pOccupyingVehicle == NULL || m_pOccupyingVehicle == pVehicle );
@@ -3828,13 +3839,14 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
                 CTaskComplexEnterCarAsDriver* pInTask = g_pGame->GetTasks ()->CreateTaskComplexEnterCarAsDriver ( pGameVehicle );
                 if ( pInTask )
                 {
+                    pInTask->SetTargetDoor ( ucDoor );
                     pInTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY, true );
                 }
             }
         }
 
         // Tell the vehicle that we're occupying it
-        CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat );
+        CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat, ucDoor );
     }
     else
     {
@@ -3861,14 +3873,15 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
                     // Create the task for walking him in
                     CTaskComplexEnterCarAsPassenger* pInTask = g_pGame->GetTasks ()->CreateTaskComplexEnterCarAsPassenger ( pGameVehicle, ucSeat, false );
                     if ( pInTask )
-                    {                        
+                    {
+                        pInTask->SetTargetDoor ( ucDoor );
                         pInTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY, true );
                     }
                 }
             }
 
             // Tell the vehicle we're occupying it
-            CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat );
+            CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat, ucDoor );
         }
     }
 }

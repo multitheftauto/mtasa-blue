@@ -1429,7 +1429,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         }
 
                         // Start animating him in
-                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor );
+                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor + 2 );
 
                         // Remember that this player is working on entering a vehicle
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_GETTING_IN );
@@ -1507,6 +1507,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         }
 
                         // Set the door angle.
+                        pVehicle->AllowDoorRatioSetting ( ucDoor + 2, true );
                         pVehicle->SetDoorOpenRatio ( ucDoor + 2, door.data.fRatio, 0, true );
 
 
@@ -1520,6 +1521,11 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                     case CClientGame::VEHICLE_REQUEST_OUT_CONFIRMED:
                     {
+                        unsigned char ucDoor = 0;
+
+                        if ( !bitStream.ReadBits ( &ucDoor, 2 ) )
+                            ucDoor = 0xFF;
+
                         // If it's the local player, set some stuff
                         if ( pPlayer->IsLocalPlayer () )
                         {
@@ -1528,14 +1534,15 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                             g_pClientGame->m_ucVehicleInOutSeat = ucSeat;
                         }
 
-                        pPlayer->GetOutOfVehicle ();
+                        pPlayer->GetOutOfVehicle ( ucDoor );
 
                         // Remember that this player is working on leaving a vehicle
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_GETTING_OUT );
 
                         CLuaArguments Arguments;
                         Arguments.PushElement ( pPlayer );         // player
-                        Arguments.PushNumber ( ucSeat );            // seat
+                        Arguments.PushNumber ( ucSeat );           // seat
+                        Arguments.PushNumber ( ucDoor );           // door being used
                         pVehicle->CallEvent ( "onClientVehicleStartExit", Arguments, true );
                         break;
                     }
@@ -1653,14 +1660,15 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                         // Call the onClientVehicleStartEnter event
                         CLuaArguments Arguments;
-                        Arguments.PushElement ( pPlayer );     // player
+                        Arguments.PushElement ( pPlayer );      // player
                         Arguments.PushNumber ( ucSeat );        // seat
                         Arguments.PushNumber ( ucDoor );        // Door
                         pVehicle->CallEvent ( "onClientVehicleStartEnter", Arguments, true );
 
                         CLuaArguments Arguments2;
                         Arguments2.PushElement ( pJacked );         // player
-                        Arguments2.PushNumber ( ucSeat );            // seat
+                        Arguments2.PushNumber ( ucSeat );           // seat
+                        Arguments2.PushNumber ( ucDoor );           // door
                         pVehicle->CallEvent ( "onClientVehicleStartExit", Arguments2, true );
                         break;
                     }

@@ -185,6 +185,12 @@ class CTaskComplexLeaveCarSA : public virtual CTaskComplexSA, public virtual CTa
 public:
     CTaskComplexLeaveCarSA ( void ) {};
     CTaskComplexLeaveCarSA ( CVehicle* pTargetVehicle, const int iTargetDoor=0, const int iDelayTime=0, const bool bSensibleLeaveCar=true, const bool bForceGetOut=false );
+
+    int     GetTargetDoor() 
+    { 
+        CTaskComplexLeaveCarSAInterface * thisInterface = (CTaskComplexLeaveCarSAInterface*)this->GetInterface();
+        return thisInterface->m_iTargetDoor;
+    }
 };
 
 
