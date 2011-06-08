@@ -84,6 +84,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_usAdjustablePropertyValue = 0;
     for ( unsigned int i = 0; i < 6; ++i )
     {
+        m_bAllowDoorRatioSetting [ i ] = true;
         m_fDoorOpenRatio [ i ] = 0.0f;
         m_doorInterp.fStart [ i ] = 0.0f;
         m_doorInterp.fTarget [ i ] = 0.0f;
@@ -585,7 +586,7 @@ void CClientVehicle::SetDoorOpenRatioInterpolated ( unsigned char ucDoor, float 
     m_doorInterp.ulTargetTime [ ucDoor ] = ulTime + ulDelay;
 }
 
-void CClientVehicle::ResetDoorInterpolation ()
+void CClientVehicle::ResetDoorInterpolation ( )
 {
     for ( unsigned char i = 0; i < 6; ++i )
     {
@@ -594,6 +595,12 @@ void CClientVehicle::ResetDoorInterpolation ()
         m_doorInterp.ulTargetTime [ i ] = 0;
     }
 }
+
+void CClientVehicle::CancelDoorInterpolation ( unsigned char ucDoor )
+{
+    m_doorInterp.ulTargetTime [ ucDoor ] = 0;
+}
+
 
 void CClientVehicle::ProcessDoorInterpolation ()
 {
@@ -623,13 +630,14 @@ void CClientVehicle::ProcessDoorInterpolation ()
 
 void CClientVehicle::SetDoorOpenRatio ( unsigned char ucDoor, float fRatio, unsigned long ulDelay, bool bForced )
 {
-    bool bAllow = true;
     unsigned char ucSeat;
 
     if ( ucDoor <= 5 )
     {
+        bool bAllow = m_bAllowDoorRatioSetting [ ucDoor ];
+
         // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
-        if ( bForced == false )
+        if ( bAllow && bForced == false )
         {
             switch ( ucDoor )
             {
@@ -692,6 +700,12 @@ bool CClientVehicle::AreSwingingDoorsAllowed () const
         return m_pVehicle->AreSwingingDoorsAllowed ();
     }
     return m_bSwingingDoorsAllowed;
+}
+
+void CClientVehicle::AllowDoorRatioSetting ( unsigned char ucDoor, bool bAllow )
+{
+    m_bAllowDoorRatioSetting [ucDoor] = bAllow;
+    CancelDoorInterpolation ( ucDoor );
 }
 
 bool CClientVehicle::AreDoorsLocked ( void )
@@ -3355,9 +3369,9 @@ std::string GetPlayerName ( CClientPed* pClientPed )
 // Make a ped become an occupied driver/passenger
 // Static function
 //
-void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat )
+void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor )
 {
-    INFO (( "SetPedOccupiedVehicle:%s in vehicle:0x%08x  seat:%d", GetPlayerName( pClientPed ).c_str (), pVehicle, uiSeat ));
+    INFO (( "SetPedOccupiedVehicle:%s in vehicle:0x%08x  seat:%d  door:%u", GetPlayerName( pClientPed ).c_str (), pVehicle, uiSeat, ucDoor ));
 
     if ( !pClientPed || !pVehicle )
         return;
@@ -3398,6 +3412,9 @@ void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehi
     pClientPed->m_pOccupiedVehicle = pVehicle;
     pClientPed->m_uiOccupiedVehicleSeat = uiSeat;
 
+    if ( ucDoor != 0xFF )
+        pVehicle->AllowDoorRatioSetting ( ucDoor, true );
+
     // Checks
     ValidatePedAndVehiclePair ( pClientPed, pVehicle );
 }
@@ -3407,9 +3424,9 @@ void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehi
 // Make a ped become an occupying driver/passenger
 // Static function
 //
-void CClientVehicle::SetPedOccupyingVehicle ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat )
+void CClientVehicle::SetPedOccupyingVehicle ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor )
 {
-    INFO (( "SetPedOccupyingVehicle:%s in vehicle:0x%08x  seat:%d", GetPlayerName( pClientPed ).c_str (), pVehicle, uiSeat ));
+    INFO (( "SetPedOccupyingVehicle:%s in vehicle:0x%08x  seat:%d  door:%u", GetPlayerName( pClientPed ).c_str (), pVehicle, uiSeat, ucDoor ));
 
     if ( !pClientPed || !pVehicle )
         return;
@@ -3450,6 +3467,9 @@ void CClientVehicle::SetPedOccupyingVehicle ( CClientPed* pClientPed, CClientVeh
     pClientPed->m_pOccupyingVehicle = pVehicle;
 //  if ( uiSeat >= 0 && uiSeat < 8 )
 //      pClientPed->m_uiOccupyingSeat = uiSeat;
+
+    if ( ucDoor != 0xFF )
+        pVehicle->AllowDoorRatioSetting ( ucDoor, false );
 
     // Checks
     ValidatePedAndVehiclePair ( pClientPed, pVehicle );
@@ -3546,6 +3566,11 @@ void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed, CClientVehicle
     if ( pClientPed->m_pOccupiedVehicle == pVehicle )
     {
         INFO (( "UnpairPedAndVehicle: pClientPed:%s from m_pOccupiedVehicle:0x%08x", GetPlayerName( pClientPed ).c_str (), pVehicle ));
+        if ( pClientPed->m_ucLeavingDoor != 0xFF )
+        {
+            pVehicle->AllowDoorRatioSetting ( pClientPed->m_ucLeavingDoor, true );
+            pClientPed->m_ucLeavingDoor = 0xFF;
+        }
         pClientPed->m_pOccupiedVehicle = NULL;
         pClientPed->m_uiOccupiedVehicleSeat = 0xFF;
     }

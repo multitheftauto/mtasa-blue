@@ -2422,13 +2422,14 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 Arguments.PushElement ( pPlayer );         // player
                                 Arguments.PushNumber ( ucOccupiedSeat );    // seat
                                 Arguments.PushBoolean ( false );            // jacked
+                                Arguments.PushNumber ( Packet.GetDoor() );  // door being used
                                 if ( pVehicle->CallEvent ( "onVehicleStartExit", Arguments ) )
                                 {
                                     // Mark him as exiting the vehicle
                                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_EXITING );
 
                                     // Tell everyone he can start exiting the vehicle
-                                    CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_REQUEST_OUT_CONFIRMED );
+                                    CVehicleInOutPacket Reply ( ID, ucOccupiedSeat, VEHICLE_REQUEST_OUT_CONFIRMED, Packet.GetDoor() );
                                     Reply.SetSourceElement ( pPlayer );
                                     m_pPlayerManager->BroadcastOnlyJoined ( Reply );
                                 }

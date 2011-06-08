@@ -1518,6 +1518,7 @@ void CClientGame::UpdateVehicleInOut ( void )
                     }
 
                     // Warp ourself in (so we're sure the records are correct)
+                    pVehicle->AllowDoorRatioSetting ( m_pLocalPlayer->m_ucEnteringDoor, true );
                     m_pLocalPlayer->WarpIntoVehicle ( pVehicle, m_ucVehicleInOutSeat );
 
                     /*
@@ -3955,6 +3956,13 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                         pBitStream->Write ( pOccupiedVehicle->GetID () );
                         unsigned char ucAction = static_cast < unsigned char > ( VEHICLE_REQUEST_OUT );
                         pBitStream->WriteBits ( &ucAction, 4 );
+
+                        unsigned char ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit ( m_pLocalPlayer->GetGamePlayer(), pOccupiedVehicle->GetGameVehicle() );
+                        if ( ucDoor >= 2 && ucDoor <= 5 )
+                        {
+                            ucDoor -= 2;
+                            pBitStream->WriteBits ( &ucDoor, 2 );
+                        }
 
                         // Send and destroy it
                         g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );

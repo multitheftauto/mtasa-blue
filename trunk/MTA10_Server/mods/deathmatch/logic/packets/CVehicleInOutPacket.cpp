@@ -128,6 +128,12 @@ bool CVehicleInOutPacket::Read ( NetBitStreamInterface& BitStream )
         else
             return false;
     }
+    else if ( m_ucAction == CGame::VEHICLE_REQUEST_OUT )
+    {
+        m_ucDoor = 0;
+        if ( !BitStream.ReadBits ( &m_ucDoor, 2 ) )
+            m_ucDoor = 0xFF;
+    }
     return true;
 }
 
@@ -171,6 +177,12 @@ bool CVehicleInOutPacket::Write ( NetBitStreamInterface& BitStream ) const
             SDoorOpenRatioSync door;
             door.data.fRatio = m_fDoorAngle;
             BitStream.Write ( &door );
+        }
+
+        if ( m_ucAction == CGame::VEHICLE_REQUEST_OUT_CONFIRMED )
+        {
+            if ( m_ucDoor < 4 )
+                BitStream.WriteBits ( &m_ucDoor, 2 );
         }
 
         return true;
