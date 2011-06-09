@@ -22,14 +22,9 @@ bool CLightsyncPacket::Read ( NetBitStreamInterface& BitStream )
 bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const 
 {
     bool bSyncPosition;
-    unsigned char ucNumPlayers = Count();
 
-    if ( ucNumPlayers == 0 )
+    if ( Count() == 0 )
         return false;
-
-    ucNumPlayers -= 1;
-    static const unsigned int bitcount = SharedUtil::NumberOfSignificantBits<(LIGHTSYNC_MAX_PLAYERS-1)>::COUNT;
-    BitStream.WriteBits ( &ucNumPlayers, bitcount );
 
     for ( std::vector<CPlayer *>::const_iterator iter = m_players.begin ();
           iter != m_players.end();
