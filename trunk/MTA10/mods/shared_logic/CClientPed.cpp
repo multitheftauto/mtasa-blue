@@ -4709,6 +4709,8 @@ void CClientPed::UpdateTargetPosition ( void )
         CVector vecVelocity;
         GetMoveSpeed ( vecVelocity );
         float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
+
+        // There is a reason to have this condition this way: To prevent NaNs generating new NaNs after interpolating (Comparing with NaNs always results to false).
         if ( ! ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () <= fThreshold ) )
         {
             // Abort all interpolation

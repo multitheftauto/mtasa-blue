@@ -51,7 +51,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
             static const unsigned int bitcount = SharedUtil::NumberOfSignificantBits<(LIGHTSYNC_MAX_PLAYERS-1)>::COUNT;
             if ( BitStream.ReadBits ( reinterpret_cast<char *>(&ucCount), bitcount ) )
             {
-                for ( unsigned int i = 0; i < ucCount; ++i )
+                for ( unsigned int i = 0; i <= ucCount; ++i )
                 {
                     // Read out the player ID
                     ElementID PlayerID;
