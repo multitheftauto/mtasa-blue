@@ -46,30 +46,17 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
     { 
         case PACKET_ID_LIGHTSYNC:
         {
-            // Read the number of players in this packet
-            unsigned char ucCount = 0;
-            static const unsigned int bitcount = SharedUtil::NumberOfSignificantBits<(LIGHTSYNC_MAX_PLAYERS-1)>::COUNT;
-            if ( BitStream.ReadBits ( reinterpret_cast<char *>(&ucCount), bitcount ) )
+            ElementID PlayerID;
+            while ( BitStream.Read ( PlayerID ) == true )
             {
-                for ( unsigned int i = 0; i <= ucCount; ++i )
+                // Grab the player
+                CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
+                if ( pPlayer )
                 {
-                    // Read out the player ID
-                    ElementID PlayerID;
-                    if ( BitStream.Read ( PlayerID ) )
-                    {
-                        // Grab the player
-                        CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
-                        if ( pPlayer )
-                        {
-                            // Read out and apply the lightsync data
-                            ReadLightweightSync ( pPlayer, BitStream );
-                        }
-                    }
-                    else
-                        break;
+                    // Read out and apply the lightsync data
+                    ReadLightweightSync ( pPlayer, BitStream );
                 }
             }
-
             return true;
         }
 
