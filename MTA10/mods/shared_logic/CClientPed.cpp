@@ -4709,7 +4709,7 @@ void CClientPed::UpdateTargetPosition ( void )
         CVector vecVelocity;
         GetMoveSpeed ( vecVelocity );
         float fThreshold = ( PED_INTERPOLATION_WARP_THRESHOLD + PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
-        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > fThreshold )
+        if ( ! ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () <= fThreshold ) )
         {
             // Abort all interpolation
             m_interp.pos.ulFinishTime = 0;
