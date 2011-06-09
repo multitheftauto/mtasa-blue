@@ -138,12 +138,12 @@ SGUIFontInfo* CClientFontManager::GetGUIFontInfo ( const SString& strFontName, c
     if ( !pGUIFontInfo )
     {
         // Try to create if required
-        if ( CGUIFont* fntCEGUI = g_pCore->GetGUI ()->CreateFnt ( strFontName, strFullFilePath, uiSize ) )
+        if ( CGUIFont* fntCEGUI = g_pCore->GetGUI ()->CreateFnt ( strKey, strFullFilePath, uiSize ) )
         {
             // Add new info
             SGUIFontInfo newInfo;
             newInfo.pFntCEGUI = fntCEGUI;
-            newInfo.strCEGUIFontName = strFontName;
+            newInfo.strCEGUIFontName = strKey;
             MapSet ( m_GUIFontInfoMap, strKey, newInfo );
 
             pGUIFontInfo = MapFind ( m_GUIFontInfoMap, strKey );
