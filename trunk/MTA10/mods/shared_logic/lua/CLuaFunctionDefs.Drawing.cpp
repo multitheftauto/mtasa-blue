@@ -151,8 +151,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     argStream.ReadNumber ( iBottom, iTop );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     argStream.ReadNumber ( fScale, 1 );
-    argStream.ReadString ( strFontName, "default" );
-    argStream.ReadUserData ( pFontElement, NULL );
+    ScriptArgReadFont ( argStream, strFontName, "default", pFontElement );
     argStream.ReadEnumString ( alignX, DX_ALIGN_LEFT );
     argStream.ReadEnumString ( alignY, DX_ALIGN_TOP );
     argStream.ReadBool ( bClip, false );
@@ -432,8 +431,7 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
     argStream.ReadNumber ( fScale, 1 );
-    argStream.ReadString ( strFontName, "default" );
-    argStream.ReadUserData ( pFontElement, NULL );
+    ScriptArgReadFont ( argStream, strFontName, "default", pFontElement );
 
     if ( !argStream.HasErrors () )
     {
@@ -471,8 +469,7 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( fScale, 1 );
-    argStream.ReadString ( strFontName, "default" );
-    argStream.ReadUserData ( pFontElement, NULL );
+    ScriptArgReadFont ( argStream, strFontName, "default", pFontElement );
 
     if ( !argStream.HasErrors () )
     {

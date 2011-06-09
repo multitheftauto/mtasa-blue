@@ -155,3 +155,9 @@ bool CheckWrappedUserDataType ( CClientGUIElement*& pGuiElement, SString& strErr
     strErrorExpectedType = GetClassTypeName ( (T*)0 );
     return false;
 }
+
+
+//
+// Reading mixed types
+//
+bool ScriptArgReadFont ( class CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientFont*& pFontElement );

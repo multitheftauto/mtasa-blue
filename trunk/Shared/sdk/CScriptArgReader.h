@@ -10,8 +10,6 @@
 *
 *****************************************************************************/
 
-namespace SharedUtil
-{
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -30,6 +28,7 @@ public:
         m_iIndex = 1;
         m_iErrorIndex = 0;
         m_bError = false;
+        m_bIgnoreMismatchMatch = false;
     }
 
     //
@@ -63,10 +62,20 @@ public:
             outValue = static_cast < T > ( lua_tonumber ( m_luaVM, m_iIndex++ ) );
             return true;
         }
+        else
+        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
+        {
+            outValue = static_cast < T > ( defaultValue );
+            return true;
+        }
 
-        outValue = static_cast < T > ( defaultValue );
-        return true;
+        outValue = 0;
+        SetTypeError ( "number" );
+        m_iIndex++;
+        return false;
     }
+
+
 
     //
     // Read next bool
@@ -89,7 +98,7 @@ public:
     //
     // Read next bool, using default if needed
     //
-    bool ReadBool ( bool& bOutValue, const bool bDefault )
+    bool ReadBool ( bool& bOutValue, const bool bDefaultValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TBOOLEAN )
@@ -97,10 +106,19 @@ public:
             bOutValue = lua_toboolean ( m_luaVM, m_iIndex++ ) ? true : false;
             return true;
         }
+        else
+        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
+        {
+            bOutValue = bDefaultValue;
+            return true;
+        }
 
-        bOutValue = bDefault;
-        return true;
+        bOutValue = false;
+        SetTypeError ( "bool" );
+        m_iIndex++;
+        return false;
     }
+
 
     //
     // Read next string, using default if needed
@@ -114,10 +132,13 @@ public:
             return true;
         }
         else
-        if ( defaultValue )
+        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
         {
-            outValue = defaultValue;
-            return true;
+            if ( defaultValue )
+            {
+                outValue = defaultValue;              
+                return true;
+            }
         }
 
         outValue = "";
@@ -167,9 +188,17 @@ public:
                 return true;
             }
         }
+        else
+        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
+        {
+            outValue = defaultValue;
+            return true;
+        }
 
-        outValue = defaultValue;
-        return true;
+        outValue = (T)0;
+        SetTypeError ( GetEnumTypeName ( outValue ) );
+        m_iIndex++;
+        return false;
     }
 
 
@@ -192,11 +221,14 @@ public:
             return false;
         }
         else
-        if ( defaultValue != (T*)-1 )
+        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
         {
-            outValue = defaultValue;
-            if ( outValue || bDefaultCanBeNil )
-                return true;
+            if ( defaultValue != (T*)-1 )
+            {
+                outValue = defaultValue;
+                if ( outValue || bDefaultCanBeNil )
+                    return true;
+            }
         }
 
         outValue = NULL;
@@ -278,6 +310,22 @@ public:
 
 
     //
+    // Peek at next type
+    //
+    bool NextIs ( int iArgument ) const  { return iArgument == lua_type ( m_luaVM, m_iIndex ); }
+    bool NextIsNone         ( void ) const  { return NextIs ( LUA_TNONE ); }
+    bool NextIsNil          ( void ) const  { return NextIs ( LUA_TNIL ); }
+    bool NextIsBool         ( void ) const  { return NextIs ( LUA_TBOOLEAN ); }
+    bool NextIsUserData     ( void ) const  { return NextIs ( LUA_TLIGHTUSERDATA ); }
+    bool NextIsNumber       ( void ) const  { return NextIs ( LUA_TNUMBER ); }
+    bool NextIsString       ( void ) const  { return NextIs ( LUA_TSTRING ); }
+    bool NextIsTable        ( void ) const  { return NextIs ( LUA_TTABLE ); }
+    bool NextIsFunction     ( void ) const  { return NextIs ( LUA_TFUNCTION ); }
+    bool NextCouldBeNumber  ( void ) const  { return NextIsNumber () || NextIsString (); }
+    bool NextCouldBeString  ( void ) const  { return NextIsNumber () || NextIsString (); }
+
+
+    //
     // SetTypeError
     //
     void SetTypeError ( const SString& strExpectedType, int iIndex = -1 )
@@ -324,17 +372,25 @@ public:
 
             // Append value if available
             if ( szGotArgumentValue && szGotArgumentValue[0] )
-                strMessage += SString ( " (%s)", szGotArgumentValue );
+                strMessage += SString ( " '%s'", szGotArgumentValue );
         }
 
         return strMessage;
     }
 
+    //
+    // Strict off means mismatches are ignored if they have a default value
+    //
+    void SetStrict ( bool bStrictMode )
+    {
+        m_bIgnoreMismatchMatch = !bStrictMode;
+    }
+
+
+    bool                    m_bIgnoreMismatchMatch;
     bool                    m_bError;
     int                     m_iErrorIndex;
     SString                 m_strErrorExpectedType;
     int                     m_iIndex;
     lua_State*              m_luaVM;
 };
-
-}
