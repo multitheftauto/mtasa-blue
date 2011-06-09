@@ -68,3 +68,21 @@ IMPLEMENT_ENUM_BEGIN( eDXVerticalAlign )
     ADD_ENUM ( DX_ALIGN_VCENTER,        "center" )
     ADD_ENUM ( DX_ALIGN_BOTTOM,         "bottom" )
 IMPLEMENT_ENUM_END( "vertical-align" )
+
+
+
+//
+// Reading mixed types
+//
+
+//
+// Font/string
+//
+bool ScriptArgReadFont ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientFont*& pFontElement )
+{
+    pFontElement = NULL;
+    if ( argStream.NextIsString () || argStream.NextIsNone () )
+        return argStream.ReadString ( strFontName, szDefaultFontName );
+    else
+        return argStream.ReadUserData ( pFontElement );
+}
