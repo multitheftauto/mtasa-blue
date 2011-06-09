@@ -3140,7 +3140,9 @@ void CClientVehicle::UpdateTargetPosition ( void )
         CVector vecVelocity;
         GetMoveSpeed ( vecVelocity );
         float fThreshold = ( VEHICLE_INTERPOLATION_WARP_THRESHOLD + VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
-        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > fThreshold )
+
+        // There is a reason to have this condition this way: To prevent NaNs generating new NaNs after interpolating (Comparing with NaNs always results to false).
+        if ( ! ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () <= fThreshold ) )
         {
             // Abort all interpolation
             m_interp.pos.ulFinishTime = 0;
