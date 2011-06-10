@@ -17,7 +17,7 @@ using std::list;
 
 extern CClientGame* g_pClientGame;
 
-CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) : CClientEntity ( ID )
+CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
 {
     m_pManager = pManager;
     m_pGUIManager = pManager->GetGUIManager ();

@@ -26,7 +26,8 @@ extern CClientGame* g_pClientGame;
 int CClientEntity::iCount = 0;
 
 CClientEntity::CClientEntity ( ElementID ID )
-        : m_FromRootNode ( this )
+        : ClassInit ( this )
+        , m_FromRootNode ( this )
         , m_ChildrenNode ( this )
         , m_Children ( &CClientEntity::m_ChildrenNode )
 {

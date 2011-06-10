@@ -32,6 +32,7 @@ class CClientTeam;
 
 class CClientPlayer : public CClientPed
 {
+    DECLARE_CLASS( CClientPlayer, CClientPed )
     friend class CClientPlayerManager;
 
 public:

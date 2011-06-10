@@ -112,6 +112,7 @@ class CClientObject;
 
 class CClientPed : public CClientStreamElement, public CAntiCheatModule
 {
+    DECLARE_CLASS( CClientPed, CClientStreamElement )
     friend class CClientCamera;
     friend class CClientPlayer;
     friend class CClientVehicle;

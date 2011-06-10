@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CClientDFF::CClientDFF ( CClientManager* pManager, ElementID ID ) : CClientEntity ( ID )
+CClientDFF::CClientDFF ( CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
 {
     // Init
     m_pManager = pManager;

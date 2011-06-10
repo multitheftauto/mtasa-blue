@@ -32,6 +32,7 @@ enum eColShapeType
 
 class CClientColShape : public CClientEntity
 {
+    DECLARE_CLASS( CClientColShape, CClientEntity )
     friend class CClientMarker;
     friend class CClientPickup;
 public:

@@ -49,6 +49,7 @@ class CClientGUIElement;
 
 class CClientGUIElement : public CClientEntity
 {
+    DECLARE_CLASS( CClientGUIElement, CClientEntity )
     friend class CClientGUIManager;
 
 public:

@@ -18,6 +18,7 @@
 
 class CDeathmatchObject : public CClientObject
 {
+    DECLARE_CLASS( CDeathmatchObject, CClientObject )
 public:
                                         CDeathmatchObject               ( CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, class CObjectSync* pObjectSync, ElementID ID, unsigned short usModel );
                                         ~CDeathmatchObject              ( void );

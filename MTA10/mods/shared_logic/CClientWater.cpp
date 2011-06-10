@@ -13,7 +13,7 @@
 
 extern CGame* g_pGame;
 
-CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow ) : CClientEntity ( ID )
+CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& vecBL, CVector& vecBR, CVector& vecTL, CVector& vecTR, bool bShallow ) : ClassInit ( this ), CClientEntity ( ID )
 {
     m_pManager = pManager;
     m_pWaterManager = pManager->GetWaterManager ();
@@ -23,7 +23,7 @@ CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& ve
     m_pWaterManager->AddToList ( this );
 }
 
-CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow ) : CClientEntity ( ID )
+CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow ) : ClassInit ( this ), CClientEntity ( ID )
 {
     m_pManager = pManager;
     m_pWaterManager = pManager->GetWaterManager ();

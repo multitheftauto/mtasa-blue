@@ -19,7 +19,7 @@
 
 using SharedUtil::CalcMTASAPath;
 
-CClientRadarMarker::CClientRadarMarker ( CClientManager* pManager, ElementID ID, short sOrdering, unsigned short usVisibleDistance ) : CClientEntity ( ID )
+CClientRadarMarker::CClientRadarMarker ( CClientManager* pManager, ElementID ID, short sOrdering, unsigned short usVisibleDistance ) : ClassInit ( this ), CClientEntity ( ID )
 {
     // Init
     m_pManager = pManager;

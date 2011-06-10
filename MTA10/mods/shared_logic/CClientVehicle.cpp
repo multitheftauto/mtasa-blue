@@ -34,7 +34,7 @@ extern CClientGame* g_pClientGame;
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  1.8f
 
-CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
+CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : ClassInit ( this ), CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
 {
     CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientVehicle" ), &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, &m_pLastSyncer, NULL );
 

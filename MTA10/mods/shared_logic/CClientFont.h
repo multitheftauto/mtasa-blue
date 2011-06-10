@@ -12,6 +12,7 @@
 
 class CClientFont : public CClientEntity
 {
+    DECLARE_CLASS( CClientFont, CClientEntity )
     friend CClientFontManager;
 
 public:

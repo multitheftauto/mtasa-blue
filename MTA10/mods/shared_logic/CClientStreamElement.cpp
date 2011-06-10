@@ -15,7 +15,7 @@
 
 using std::list;
 
-CClientStreamElement::CClientStreamElement ( CClientStreamer * pStreamer, ElementID ID ) : CClientEntity ( ID )
+CClientStreamElement::CClientStreamElement ( CClientStreamer * pStreamer, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
 {
     m_pStreamer = pStreamer;    
     m_pStreamRow = NULL;

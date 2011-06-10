@@ -12,7 +12,7 @@
 
 #include <StdInc.h>
 
-CClientColRectangle::CClientColRectangle ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, const CVector2D& vecSize ) : CClientColShape ( pManager, ID )
+CClientColRectangle::CClientColRectangle ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, const CVector2D& vecSize ) : ClassInit ( this ), CClientColShape ( pManager, ID )
 {
     m_pManager = pManager;
     m_vecPosition = vecPosition;

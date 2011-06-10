@@ -30,6 +30,7 @@ typedef struct
 
 class CClientSound : public CClientEntity
 {
+    DECLARE_CLASS( CClientSound, CClientEntity )
     friend class CClientSoundManager;
 
 public:
