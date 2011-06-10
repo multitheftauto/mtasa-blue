@@ -137,7 +137,7 @@ CClientEntity* UserDataCast ( CClientEntity*, void* ptr )
 {
     ElementID ID = TO_ELEMENTID ( ptr );
     CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-    if ( !pEntity || pEntity->IsBeingDeleted () || pEntity->GetType () != GetClassType ( (T*)0 ) )
+    if ( !pEntity || pEntity->IsBeingDeleted () || !pEntity->IsA ( T::GetClassId () ) )
         return NULL;
     return pEntity;
 }

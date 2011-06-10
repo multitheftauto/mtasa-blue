@@ -13,7 +13,7 @@
 
 using std::list;
 
-CClientTeam::CClientTeam ( CClientManager* pManager, ElementID ID, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue ): CClientEntity ( ID )
+CClientTeam::CClientTeam ( CClientManager* pManager, ElementID ID, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue ) : ClassInit ( this ), CClientEntity ( ID )
 {
     m_pManager = pManager;
     m_pTeamManager = pManager->GetTeamManager ();

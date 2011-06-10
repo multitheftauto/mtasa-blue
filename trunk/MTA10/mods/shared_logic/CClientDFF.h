@@ -18,8 +18,9 @@ class CClientDFF;
 #include "CClientEntity.h"
 //#include "CClientDFFManager.h"
 
-class CClientDFF: public CClientEntity
+class CClientDFF : public CClientEntity
 {
+    DECLARE_CLASS( CClientDFF, CClientEntity )
     friend class CClientDFFManager;
 
 public:

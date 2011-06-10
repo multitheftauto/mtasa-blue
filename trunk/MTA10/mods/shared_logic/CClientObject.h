@@ -28,6 +28,7 @@ struct SLastSyncedObjectData
 
 class CClientObject : public CClientStreamElement
 {
+    DECLARE_CLASS( CClientObject, CClientStreamElement )
     friend class CClientObjectManager;
     friend class CClientPed;
 

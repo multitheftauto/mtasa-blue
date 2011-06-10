@@ -19,7 +19,7 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientFont::CClientFont ( CClientManager* pManager, ElementID ID, const SString& strGUIFontName, ID3DXFont* pDXFontNormal, ID3DXFont* pDXFontBig ) : CClientEntity ( ID )
+CClientFont::CClientFont ( CClientManager* pManager, ElementID ID, const SString& strGUIFontName, ID3DXFont* pDXFontNormal, ID3DXFont* pDXFontBig ) : ClassInit ( this ), CClientEntity ( ID )
 {
     m_pManager = pManager;
     m_pFontManager = pManager->GetFontManager();

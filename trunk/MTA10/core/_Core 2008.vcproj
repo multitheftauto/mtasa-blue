@@ -1657,6 +1657,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.ClassIdent.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Defines.h"
 					>
 				</File>

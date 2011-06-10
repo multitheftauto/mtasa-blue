@@ -18,7 +18,7 @@
    destroys itself when GTA is finished with the projectile, this could/should eventually be
    used as a server created element and streamed.
 */
-CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjectile* pProjectile, CProjectileInfo* pProjectileInfo, CClientEntity * pCreator, CClientEntity * pTarget, eWeaponType weaponType, CVector * pvecOrigin, CVector * pvecTarget, float fForce, bool bLocal ) : CClientEntity ( INVALID_ELEMENT_ID )
+CClientProjectile::CClientProjectile ( class CClientManager* pManager, CProjectile* pProjectile, CProjectileInfo* pProjectileInfo, CClientEntity * pCreator, CClientEntity * pTarget, eWeaponType weaponType, CVector * pvecOrigin, CVector * pvecTarget, float fForce, bool bLocal ) : ClassInit ( this ), CClientEntity ( INVALID_ELEMENT_ID )
 {
     CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientProjectile" ), &m_pCreator, &m_pTarget, NULL );
 

@@ -19,7 +19,7 @@
 
 extern CClientGame* g_pClientGame;
 
-CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : CClientEntity ( ID )
+CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
 {
     m_pManager = pManager;
     m_pSoundManager = pManager->GetSoundManager();

@@ -30,6 +30,7 @@ enum eClientCameraAttachMode
 
 class CClientCamera : public CClientEntity
 {
+    DECLARE_CLASS( CClientCamera, CClientEntity )
     friend class CClientManager;
 
 public:

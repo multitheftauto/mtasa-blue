@@ -21,6 +21,7 @@ class CClientStreamSectorRow;
 
 class CClientStreamElement : public CClientEntity
 {
+    DECLARE_CLASS( CClientStreamElement, CClientEntity )
     friend class CClientStreamer;
 public:
                                 CClientStreamElement        ( CClientStreamer * pStreamer, ElementID ID );

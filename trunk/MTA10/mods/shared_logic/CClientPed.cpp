@@ -57,7 +57,7 @@ SBodyPartName BodyPartNames [10] =
 // HACK: saves unneccesary loading of clothes textures
 CClientPed* g_pLastRebuilt = NULL;
 
-CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
+CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID ) : ClassInit ( this ), CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
 {
     SetTypeName ( "ped" );
 
@@ -69,7 +69,7 @@ CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, Elem
 }
 
 
-CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer ) : CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
+CClientPed::CClientPed ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer ) : ClassInit ( this ), CClientStreamElement ( pManager->GetPlayerStreamer (), ID ), CAntiCheatModule ( pManager->GetAntiCheat () )
 {
     // Init
     Init ( pManager, ulModelID, bIsLocalPlayer );

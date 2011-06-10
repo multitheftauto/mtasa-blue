@@ -18,6 +18,7 @@
 // Fwd decl
 void    SString_Tests               ( void );
 void    SharedUtil_File_Tests       ( void );
+void    SharedUtil_ClassIdent_Tests ( void );
 
 
 ///////////////////////////////////////////////////////////////
@@ -31,6 +32,7 @@ void SharedUtil_Tests ( void )
 {
     SString_Tests ();
     SharedUtil_File_Tests ();
+    SharedUtil_ClassIdent_Tests ();
 }
 
 
@@ -312,5 +314,139 @@ void SharedUtil_File_Tests ( void )
 #endif  // WIN32
 
 }
+
+
+///////////////////////////////////////////////////////////////
+//
+// SharedUtil_ClassIdent_Tests
+//
+// Tests for macros in SharedUtil.ClassIdent.h
+//
+///////////////////////////////////////////////////////////////
+void SharedUtil_ClassIdent_Tests ( void )
+{
+    // Setup
+    enum eTestClassTypes
+    {
+        CLASS_SPlant,
+        CLASS_STree,
+        CLASS_SFlower,
+        CLASS_SBlueBell,
+        CLASS_SDaffodil,
+    };
+
+    struct SPlant
+    {
+        DECLARE_BASE_CLASS( SPlant )
+        SPlant ( void ) : ClassInit ( this ) {}
+    };
+
+    struct STree : SPlant
+    {
+        DECLARE_CLASS( STree, SPlant )
+        STree ( void ) : ClassInit ( this ) {}
+    };
+
+    struct SFlower : SPlant
+    {
+        DECLARE_CLASS( SFlower, SPlant )
+        SFlower ( void ) : ClassInit ( this ) {}
+    };
+
+    struct SBlueBell : SFlower
+    {
+        DECLARE_CLASS( SBlueBell, SFlower )
+        SBlueBell ( void ) : ClassInit ( this ) {}
+    };
+
+    struct SDaffodil : SFlower
+    {
+        DECLARE_CLASS( SDaffodil, SFlower )
+        SDaffodil ( void ) : ClassInit ( this ) {}
+    };
+
+    // Create test data
+    SPlant* pPlant = new SPlant ();
+    STree* pTree = new STree ();
+    SFlower* pFlower = new SFlower ();
+    SBlueBell* pBlueBell = new SBlueBell ();
+    SDaffodil* pDaffodil = new SDaffodil ();
+
+    // Tests
+    assert ( DynamicCast < SPlant > ( pPlant ) );
+    assert ( DynamicCast < SPlant > ( pTree ) );
+    assert ( DynamicCast < SPlant > ( pFlower ) );
+    assert ( DynamicCast < SPlant > ( pBlueBell ) );
+    assert ( DynamicCast < SPlant > ( pDaffodil ) );
+
+    assert ( !DynamicCast < STree > ( pPlant ) );
+    assert ( DynamicCast < STree > ( pTree ) );
+
+    assert ( !DynamicCast < SFlower > ( pPlant ) );
+    assert ( DynamicCast < SFlower > ( pFlower ) );
+    assert ( DynamicCast < SFlower > ( pBlueBell ) );
+    assert ( DynamicCast < SFlower > ( pDaffodil ) );
+
+    assert ( !DynamicCast < SBlueBell > ( pPlant ) );
+    assert ( !DynamicCast < SBlueBell > ( pFlower ) );
+    assert ( DynamicCast < SBlueBell > ( pBlueBell ) );
+
+    assert ( !DynamicCast < SDaffodil > ( pPlant ) );
+    assert ( !DynamicCast < SDaffodil > ( pFlower ) );
+    assert ( DynamicCast < SDaffodil > ( pDaffodil ) );
+
+    // Create test data
+    SPlant* pPlantTree = pTree;
+    SPlant* pPlantFlower = pFlower;
+    SPlant* pPlantBlueBell = pBlueBell;
+    SPlant* pPlantDaffodil = pDaffodil;
+    SFlower* pFlowerBlueBell = pBlueBell;
+    SFlower* pFlowerDaffodil = pDaffodil;
+
+    // Tests
+    assert ( DynamicCast < SPlant > ( pPlantTree ) );
+    assert ( DynamicCast < SPlant > ( pPlantFlower ) );
+    assert ( DynamicCast < SPlant > ( pPlantBlueBell ) );
+    assert ( DynamicCast < SPlant > ( pPlantDaffodil ) );
+    assert ( DynamicCast < SPlant > ( pFlowerBlueBell ) );
+    assert ( DynamicCast < SPlant > ( pFlowerDaffodil ) );
+
+    assert ( DynamicCast < STree > ( pPlantTree ) );
+    assert ( !DynamicCast < STree > ( pPlantFlower ) );
+    assert ( !DynamicCast < STree > ( pPlantBlueBell ) );
+    assert ( !DynamicCast < STree > ( pPlantDaffodil ) );
+
+    assert ( !DynamicCast < SFlower > ( pPlantTree ) );
+    assert ( DynamicCast < SFlower > ( pPlantFlower ) );
+    assert ( DynamicCast < SFlower > ( pPlantBlueBell ) );
+    assert ( DynamicCast < SFlower > ( pPlantDaffodil ) );
+    assert ( DynamicCast < SFlower > ( pFlowerBlueBell ) );
+    assert ( DynamicCast < SFlower > ( pFlowerDaffodil ) );
+
+    assert ( !DynamicCast < SBlueBell > ( pPlantTree ) );
+    assert ( !DynamicCast < SBlueBell > ( pPlantFlower ) );
+    assert ( DynamicCast < SBlueBell > ( pPlantBlueBell ) );
+    assert ( !DynamicCast < SBlueBell > ( pPlantDaffodil ) );
+    assert ( DynamicCast < SBlueBell > ( pFlowerBlueBell ) );
+    assert ( !DynamicCast < SBlueBell > ( pFlowerDaffodil ) );
+
+    assert ( !DynamicCast < SDaffodil > ( pPlantTree ) );
+    assert ( !DynamicCast < SDaffodil > ( pPlantFlower ) );
+    assert ( !DynamicCast < SDaffodil > ( pPlantBlueBell ) );
+    assert ( DynamicCast < SDaffodil > ( pPlantDaffodil ) );
+    assert ( !DynamicCast < SDaffodil > ( pFlowerBlueBell ) );
+    assert ( DynamicCast < SDaffodil > ( pFlowerDaffodil ) );
+
+    // Check ClassBits type is at least 64 bits
+    assert ( sizeof ( ClassBits ) * 8 >= 64 );
+
+    // Cleanup
+    delete pPlant;
+    delete pTree;
+    delete pFlower;
+    delete pBlueBell;
+    delete pDaffodil;
+}
+
 
 #endif  // MTA_DEBUG

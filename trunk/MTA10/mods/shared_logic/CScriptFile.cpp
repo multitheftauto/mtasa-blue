@@ -13,7 +13,7 @@
 
 #include <StdInc.h>
 
-CScriptFile::CScriptFile ( const char* szFilename, unsigned long ulMaxSize ) : CClientEntity ( INVALID_ELEMENT_ID )
+CScriptFile::CScriptFile ( const char* szFilename, unsigned long ulMaxSize ) : ClassInit ( this ), CClientEntity ( INVALID_ELEMENT_ID )
 {
     // Init
     SetTypeName ( "file" );

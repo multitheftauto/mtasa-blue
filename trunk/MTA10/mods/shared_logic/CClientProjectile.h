@@ -49,6 +49,7 @@ public:
 
 class CClientProjectile : public CClientEntity
 {
+    DECLARE_CLASS( CClientProjectile, CClientEntity )
     friend class CClientProjectileManager;
     friend class CClientPed;
     friend class CClientVehicle;

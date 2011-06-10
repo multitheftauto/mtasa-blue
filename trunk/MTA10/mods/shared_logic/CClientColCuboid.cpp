@@ -12,7 +12,7 @@
 
 #include <StdInc.h>
 
-CClientColCuboid::CClientColCuboid ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, const CVector& vecSize ) : CClientColShape ( pManager, ID )
+CClientColCuboid::CClientColCuboid ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, const CVector& vecSize ) : ClassInit ( this ), CClientColShape ( pManager, ID )
 {
     m_pManager = pManager;
     m_vecPosition = vecPosition;

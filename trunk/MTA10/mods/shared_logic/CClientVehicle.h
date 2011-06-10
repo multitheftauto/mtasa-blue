@@ -88,6 +88,7 @@ class CClientProjectile;
 
 class CClientVehicle : public CClientStreamElement
 {
+    DECLARE_CLASS( CClientVehicle, CClientStreamElement )
     friend class CClientCamera;
     friend class CClientPed;
     friend class CClientVehicleManager;

@@ -22,7 +22,7 @@
 #define PI 3.1415926535897932384626433832795f
 #endif
 
-CClientCamera::CClientCamera ( CClientManager* pManager ) : CClientEntity ( INVALID_ELEMENT_ID )
+CClientCamera::CClientCamera ( CClientManager* pManager ) : ClassInit ( this ), CClientEntity ( INVALID_ELEMENT_ID )
 {
     CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientCamera" ), &m_pFocusedPlayer, &m_pFocusedEntity, NULL );
 

@@ -24,6 +24,7 @@ class CClientPickup;
 
 class CClientPickup : public CClientStreamElement, private CClientColCallback
 {
+    DECLARE_CLASS( CClientPickup, CClientStreamElement )
     friend class CClientColShape;
 
 public:
