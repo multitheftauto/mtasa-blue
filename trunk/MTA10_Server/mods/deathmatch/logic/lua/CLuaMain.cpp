@@ -31,24 +31,32 @@ extern CGame* g_pGame;
 // This script is loaded into all VM's created.
 const char szPreloadedScript [] = ""\
 
-    // Code for allowing this syntax:  call.resource:exportedFunction (...)
-    // Aswell as the old:              call ( getResourceFromName ( "resource" ), ... )
+    // Code for allowing this syntax:   exports.resourceName:exportedFunctionName (...)
+    //                                  exports["resourceName"]:exportedFunctionName (...)
+    // Aswell as the old:               call ( getResourceFromName ( "resourceName" ), "exportedFunctionName", ... )
     "local rescallMT = {}\n" \
     "function rescallMT:__index(k)\n" \
-    "        self[k] = function(res, ...) return call(self.res, k, ...) end\n" \
+    "        if type(k) ~= 'string' then k = tostring(k) end\n" \
+    "        self[k] = function(resExportTable, ...)\n" \
+    "                if type(self.res) == 'userdata' and getResourceRootElement(self.res) then\n" \
+    "                        return call(self.res, k, ...)\n" \
+    "                else\n" \
+    "                        return nil\n" \
+    "                end\n" \
+    "        end\n" \
     "        return self[k]\n" \
     "end\n" \
     "local exportsMT = {}\n" \
     "function exportsMT:__index(k)\n" \
+    "        if type(k) ~= 'string' then k = tostring(k) end\n" \
     "        local res = getResourceFromName(k)\n" \
-    "        if res then\n" \
-    "                self[k] = setmetatable({ res = res }, rescallMT)\n" \
-    "                return self[k]\n" \
+    "        if res and getResourceRootElement(res) then\n" \
+    "                return setmetatable({ res = res }, rescallMT)\n" \
     "        else\n" \
-    "                outputDebugString(\"exports: Call to non-existing resource (\" .. k .. \")\", 1)\n" \
+    "                outputDebugString('exports: Call to not running server resource (' .. k .. ')', 1)\n" \
+    "                return setmetatable({}, rescallMT)\n" \
     "        end\n" \
     "end\n" \
-    "addEventHandler(\"onResourceStop\", root, function(res) exports[res] = nil end)\n" \
     "exports = setmetatable({}, exportsMT)\n";
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
