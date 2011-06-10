@@ -33,6 +33,13 @@ private:
     unsigned long                   m_ulLastUpdateTime;
     unsigned int                    m_uiLastPacketsReceived;
     unsigned int                    m_uiLastPacketsSent;
+    unsigned int                    m_uiLastBytesSent;
+    unsigned int                    m_uiLastBytesReceived;
+
+    float                           m_fPacketSendRate;
+    float                           m_fPacketReceiveRate;
+    float                           m_fByteSendRate;
+    float                           m_fByteReceiveRate;
 };
 
 #endif
