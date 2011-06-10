@@ -37,6 +37,9 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pOriginalTarget = NULL;
 
     m_bIsDrawing = false;
+    m_iDebugQueueRefs = 0;
+
+    m_pRenderItemManager = new CRenderItemManager ();
 }
 
 
@@ -46,7 +49,8 @@ CGraphics::~CGraphics ( void )
         m_pLineInterface->Release ();
 
     DestroyStandardDXFonts ();
-    ExpireCachedTextures ( true );
+
+    SAFE_DELETE ( m_pRenderItemManager );
 }
 
 
@@ -532,7 +536,7 @@ bool CGraphics::DrawTextureQueued ( float fX, float fY,
                                  float fU, float fV,
                                  float fSizeU, float fSizeV,
                                  bool bRelativeUV,
-                                 const string& strFilename,
+                                 SMaterialItem* pMaterial,
                                  float fRotation,
                                  float fRotCenOffX,
                                  float fRotCenOffY,
@@ -551,14 +555,14 @@ bool CGraphics::DrawTextureQueued ( float fX, float fY,
     Item.Texture.fSizeU = fSizeU;
     Item.Texture.fSizeV = fSizeV;
     Item.Texture.bRelativeUV = bRelativeUV;
-    Item.Texture.info = CacheTexture( strFilename );
+    Item.Texture.pMaterial = pMaterial;
     Item.Texture.fRotation = fRotation;
     Item.Texture.fRotCenOffX = fRotCenOffX;
     Item.Texture.fRotCenOffY = fRotCenOffY;
     Item.Texture.ulColor = ulColor;
 
-    if ( !Item.Texture.info.d3dTexture )
-        return false;
+    // Keep material valid while in the queue
+    AddQueueRef ( pMaterial );
 
     // Add it to the queue
     AddQueueItem ( Item, bPostGUI );
@@ -717,7 +721,7 @@ bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strF
 
 bool CGraphics::DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont *pDXSmallFont, ID3DXFont *pDXBigFont )
 {
-    bool bResult = RemoveFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 );
+    bool bResult = RemoveFontResourceExA ( strFontPath.c_str (), FR_PRIVATE, 0 ) != 0;
     SAFE_RELEASE( pDXSmallFont );
     SAFE_RELEASE( pDXBigFont );
     return bResult;
@@ -817,6 +821,8 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     // Create drawing devices
     D3DXCreateLine ( pDevice, &m_pLineInterface );
     D3DXCreateTextureFromFileInMemory ( pDevice, g_szPixel, sizeof ( g_szPixel ), &m_pDXPixelTexture );
+
+    m_pRenderItemManager->OnDeviceCreate ( pDevice );
 }
 
 
@@ -869,8 +875,8 @@ void CGraphics::DrawPostGUIQueue ( void )
 {
     DrawQueue ( m_PostGUIQueue );
 
-    // Clean out unused textures here
-    ExpireCachedTextures ();
+    // Both queues should be empty now, and there should be no outstanding refs
+    assert ( m_PreGUIQueue.empty () && m_iDebugQueueRefs == 0 );
 }
 
 bool CGraphics::IsDrawQueueItemSprite ( const sDrawQueueItem& Item )
@@ -919,19 +925,20 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
 
 void CGraphics::AddQueueItem ( const sDrawQueueItem& Item, bool bPostGUI )
 {
-    // Prevent queuing when minimized
-    if ( g_pCore->IsWindowMinimized () )
-    {
-        m_PostGUIQueue.clear ();
-        m_PreGUIQueue.clear ();
-        return;
-    }
-
     // Add it to the correct queue
     if ( bPostGUI && !CCore::GetSingleton ().IsMenuVisible() ) //Don't draw over the main menu.  Ever.
         m_PostGUIQueue.push_back ( Item );
     else
         m_PreGUIQueue.push_back ( Item );
+
+    // Prevent queuing when minimized
+    if ( g_pCore->IsWindowMinimized () )
+    {
+        ClearDrawQueue ( m_PreGUIQueue );
+        ClearDrawQueue ( m_PostGUIQueue );
+        assert ( m_iDebugQueueRefs == 0 );
+        return;
+    }
 }
 
 
@@ -998,10 +1005,11 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
         case QUEUE_TEXTURE:
         {
             RECT cutImagePos;
-            const float fSurfaceWidth  = Item.Texture.info.uiSurfaceWidth;
-            const float fSurfaceHeight = Item.Texture.info.uiSurfaceHeight;
-            const float fFileWidth     = Item.Texture.info.uiFileWidth;
-            const float fFileHeight    = Item.Texture.info.uiFileHeight;
+            STextureItem* pTextureItem = DynamicCast < STextureItem > ( Item.Texture.pMaterial );
+            const float fSurfaceWidth  = pTextureItem->uiSurfaceWidth;
+            const float fSurfaceHeight = pTextureItem->uiSurfaceHeight;
+            const float fFileWidth     = pTextureItem->uiFileWidth;
+            const float fFileHeight    = pTextureItem->uiFileHeight;
             cutImagePos.left    = ( Item.Texture.fU )                       * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
             cutImagePos.top     = ( Item.Texture.fV )                       * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
             cutImagePos.right   = ( Item.Texture.fU + Item.Texture.fSizeU ) * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
@@ -1015,7 +1023,8 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             D3DXMATRIX matrix;
             D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
             m_pDXSprite->SetTransform ( &matrix );
-            m_pDXSprite->Draw ( Item.Texture.info.d3dTexture, &cutImagePos, NULL, NULL, Item.Texture.ulColor );
+            m_pDXSprite->Draw ( pTextureItem->pD3DTexture, &cutImagePos, NULL, NULL, Item.Texture.ulColor );
+            RemoveQueueRef ( Item.Texture.pMaterial );
             break;
         }
         // Circle type?
@@ -1027,74 +1036,6 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 }
 
 
-// Cache a texture for current and future use.
-SCachedTextureInfo& CGraphics::CacheTexture ( const string& strFilename )
-{
-    // Find exisiting
-    map < string, SCachedTextureInfo >::iterator iter = m_CachedTextureInfoMap.find ( strFilename );
-
-    if ( iter == m_CachedTextureInfoMap.end () )
-    {
-        // Add if not found
-        m_CachedTextureInfoMap[strFilename] = SCachedTextureInfo();
-        iter = m_CachedTextureInfoMap.find ( strFilename );
-
-        SCachedTextureInfo& info = iter->second;
-        info.d3dTexture = LoadTexture( strFilename.c_str () );
-        info.uiFileWidth = 1;
-        info.uiFileHeight = 1;
-        info.uiSurfaceWidth = 1;
-        info.uiSurfaceHeight = 1;
-
-        if ( info.d3dTexture )
-        {
-            D3DXIMAGE_INFO imageInfo;
-            if ( SUCCEEDED ( D3DXGetImageInfoFromFile( strFilename.c_str (), &imageInfo ) ) )
-            {
-                info.uiFileWidth = imageInfo.Width;
-                info.uiFileHeight = imageInfo.Height;
-            }
-            D3DSURFACE_DESC surfaceDesc;
-            if ( SUCCEEDED ( info.d3dTexture->GetLevelDesc( 0, &surfaceDesc ) ) )
-            {
-                info.uiSurfaceWidth = surfaceDesc.Width;
-                info.uiSurfaceHeight = surfaceDesc.Height;
-            }
-        }
-    }
-
-    SCachedTextureInfo& info = iter->second;
-    info.ulTimeLastUsed = GetTickCount32();
-
-    return info;
-}
-
-
-// Remove any cached texures that have not been used for a little while.
-void CGraphics::ExpireCachedTextures ( bool bExpireAll )
-{
-    // Expire unused cached textures
-    // 1 cached texture     = 15 seconds till expire
-    // 50 cached textures   = 8 seconds till expire
-    // 100 cached textures  = 1 second till expire
-    long ulNumTextures              = m_CachedTextureInfoMap.size ();
-    unsigned long ulMaxAgeSeconds   = Max < long > ( 1, 15 - (ulNumTextures * 15 / 100) );
-
-    map < string, SCachedTextureInfo > ::iterator iter = m_CachedTextureInfoMap.begin ();
-    while ( iter != m_CachedTextureInfoMap.end () )
-    {
-        SCachedTextureInfo& info    = iter->second;
-        unsigned long ulAge         = GetTickCount32() - info.ulTimeLastUsed;
-        if ( ulAge > ulMaxAgeSeconds * 1000 || bExpireAll )
-        {
-            SAFE_RELEASE ( info.d3dTexture );
-            m_CachedTextureInfoMap.erase ( iter++ );
-        }
-        else
-            ++iter;
-    }
-}
-
 ID3DXFont* CGraphics::GetBigFont ( ID3DXFont* pDXFont )
 {
     for ( int i = 0; i < NUM_FONTS; i++ )
@@ -1104,3 +1045,35 @@ ID3DXFont* CGraphics::GetBigFont ( ID3DXFont* pDXFont )
     }
     return pDXFont;
 }
+
+
+//
+// Clear queue, releasing render items where necessary
+//
+void CGraphics::ClearDrawQueue ( std::vector < sDrawQueueItem >& Queue )
+{
+    for ( std::vector < sDrawQueueItem >::const_iterator iter = Queue.begin () ; iter != Queue.end (); iter++ )
+    {
+        const sDrawQueueItem& item = *iter;
+        if ( item.eType == QUEUE_TEXTURE )
+            RemoveQueueRef ( item.Texture.pMaterial );
+    }
+    Queue.clear ();
+}
+
+
+//
+// Use ref counting to prevent render items from being deleted while in the queue
+//
+void CGraphics::AddQueueRef ( SRenderItem* pRenderItem )
+{
+    pRenderItem->AddRef ();
+    m_iDebugQueueRefs++;    // For debugging
+}
+
+void CGraphics::RemoveQueueRef ( SRenderItem* pRenderItem )
+{
+    pRenderItem->Release ();
+    m_iDebugQueueRefs--;    // For debugging
+}
+

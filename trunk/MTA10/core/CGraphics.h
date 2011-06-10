@@ -22,19 +22,10 @@ class CGraphics;
 #include <gui/CGUI.h>
 #include "CGUI.h"
 #include "CSingleton.h"
+#include <CRenderItemManager.h>
 
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
-
-struct SCachedTextureInfo
-{
-    IDirect3DTexture9*  d3dTexture;
-    unsigned long       ulTimeLastUsed;
-    unsigned int        uiSurfaceWidth;
-    unsigned int        uiSurfaceHeight;
-    unsigned int        uiFileWidth;
-    unsigned int        uiFileHeight;
-};
 
 class CGraphics : public CGraphicsInterface, public CSingleton < CGraphics >
 {
@@ -119,7 +110,7 @@ public:
                                                   float fU, float fV,
                                                   float fSizeU, float fSizeV, 
                                                   bool bRelativeUV,
-                                                  const std::string& strFilename,
+                                                  SMaterialItem* pMaterial,
                                                   float fRotation,
                                                   float fRotCenOffX,
                                                   float fRotCenOffY,
@@ -136,6 +127,9 @@ public:
                                                   ID3DXFont * pDXFont = NULL,
                                                   bool bPostGUI = false );
 
+    // Subsystems
+    CRenderItemManagerInterface* GetRenderItemManager   ( void )        { return m_pRenderItemManager; }
+
     // To draw queued up drawings
     void                DrawPreGUIQueue         ( void );
     void                DrawPostGUIQueue        ( void );
@@ -144,13 +138,12 @@ private:
     void                OnDeviceCreate          ( IDirect3DDevice9 * pDevice );
     void                OnDeviceInvalidate      ( IDirect3DDevice9 * pDevice );
     void                OnDeviceRestore         ( IDirect3DDevice9 * pDevice );
-    SCachedTextureInfo& CacheTexture            ( const std::string& strFilename );
-    void                ExpireCachedTextures    ( bool bExpireAll = false );
     ID3DXFont*          GetBigFont              ( ID3DXFont* pDXFont );
 
     CLocalGUI*          m_pGUI;
 
     bool                m_bIsDrawing;
+    int                 m_iDebugQueueRefs;
 
     LPD3DXSPRITE        m_pDXSprite;
     IDirect3DTexture9 * m_pDXPixelTexture;
@@ -159,6 +152,8 @@ private:
     IDirect3DSurface9 * m_pOriginalTarget;
 
     IDirect3DDevice9 *  m_pDevice;
+
+    CRenderItemManager* m_pRenderItemManager;
 
     // Fonts
     ID3DXFont*          m_pDXFonts [ NUM_FONTS ];
@@ -248,7 +243,7 @@ private:
 
     struct sDrawQueueTexture
     {
-        SCachedTextureInfo info;
+        SMaterialItem*  pMaterial;
         float           fX;
         float           fY;
         float           fWidth;
@@ -297,11 +292,12 @@ private:
     void                                AddQueueItem            ( const sDrawQueueItem& Item, bool bPostGUI );
     void                                DrawQueueItem           ( const sDrawQueueItem& Item );
     void                                DrawQueue               ( std::vector < sDrawQueueItem >& Queue );
+    void                                ClearDrawQueue          ( std::vector < sDrawQueueItem >& Queue );
+    void                                AddQueueRef             ( SRenderItem* pRenderItem );
+    void                                RemoveQueueRef          ( SRenderItem* pRenderItem );
 
     // Drawing types
     struct ID3DXLine*                   m_pLineInterface;
-
-    std::map < std::string, SCachedTextureInfo > m_CachedTextureInfoMap;
 };
 
 #endif

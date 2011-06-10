@@ -36,29 +36,6 @@ DECLARE_ENUM( eDXVerticalAlign );
 
 
 // class -> class type
-inline eClientEntityType GetClassType ( CClientCamera* )        { return CCLIENTCAMERA; }
-inline eClientEntityType GetClassType ( CClientPlayer* )        { return CCLIENTPLAYER; }
-inline eClientEntityType GetClassType ( CClientVehicle* )       { return CCLIENTVEHICLE; }
-inline eClientEntityType GetClassType ( CClientRadarMarker* )   { return CCLIENTRADARMARKER; }
-inline eClientEntityType GetClassType ( CClientObject* )        { return CCLIENTOBJECT; }
-inline eClientEntityType GetClassType ( CClientCivilian* )      { return CCLIENTCIVILIAN; }
-inline eClientEntityType GetClassType ( CClientPickup* )        { return CCLIENTPICKUP; }
-inline eClientEntityType GetClassType ( CClientRadarArea* )     { return CCLIENTRADARAREA; }
-inline eClientEntityType GetClassType ( CClientMarker* )        { return CCLIENTMARKER; }
-inline eClientEntityType GetClassType ( CClientTeam* )          { return CCLIENTTEAM; }
-inline eClientEntityType GetClassType ( CClientPed* )           { return CCLIENTPED; }
-inline eClientEntityType GetClassType ( CClientProjectile* )    { return CCLIENTPROJECTILE; }
-inline eClientEntityType GetClassType ( CClientGUIElement* )    { return CCLIENTGUI; }
-inline eClientEntityType GetClassType ( CClientColShape* )      { return CCLIENTCOLSHAPE; }
-inline eClientEntityType GetClassType ( CClientDummy* )         { return CCLIENTDUMMY; }
-inline eClientEntityType GetClassType ( CScriptFile* )          { return SCRIPTFILE; }
-inline eClientEntityType GetClassType ( CClientDFF* )           { return CCLIENTDFF; }
-inline eClientEntityType GetClassType ( CClientColModel* )      { return CCLIENTCOL; }
-inline eClientEntityType GetClassType ( CClientTXD* )           { return CCLIENTTXD; }
-inline eClientEntityType GetClassType ( CClientSound* )         { return CCLIENTSOUND; }
-inline eClientEntityType GetClassType ( CClientWater* )         { return CCLIENTWATER; }
-inline eClientEntityType GetClassType ( CClientFont* )          { return CCLIENTFONT; }
-
 inline eCGUIType GetClassType ( CGUIButton* )      { return CGUI_BUTTON; }
 inline eCGUIType GetClassType ( CGUICheckBox* )    { return CGUI_CHECKBOX; }
 inline eCGUIType GetClassType ( CGUIEdit* )        { return CGUI_EDIT; }
@@ -99,6 +76,8 @@ inline SString GetClassTypeName ( CClientTXD* )             { return "txd"; }
 inline SString GetClassTypeName ( CClientSound* )           { return "sound"; }
 inline SString GetClassTypeName ( CClientWater* )           { return "water"; }
 inline SString GetClassTypeName ( CClientFont* )            { return "font"; }
+inline SString GetClassTypeName ( CClientMaterial* )        { return "material"; }
+inline SString GetClassTypeName ( CClientTexture* )         { return "texture"; }
 
 inline SString GetClassTypeName ( CGUIButton* )      { return "gui-button"; }
 inline SString GetClassTypeName ( CGUICheckBox* )    { return "gui-checkbox"; }
@@ -160,4 +139,6 @@ bool CheckWrappedUserDataType ( CClientGUIElement*& pGuiElement, SString& strErr
 //
 // Reading mixed types
 //
-bool ScriptArgReadFont ( class CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientFont*& pFontElement );
+class CScriptArgReader;
+bool MixedReadFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientFont*& pFontElement );
+bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement );

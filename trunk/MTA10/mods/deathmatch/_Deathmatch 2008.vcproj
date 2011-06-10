@@ -737,10 +737,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientFontManager.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientGroups.cpp"
 					>
 				</File>
@@ -766,6 +762,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientMarkerManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientMaterial.cpp"
 					>
 				</File>
 				<File
@@ -849,6 +849,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientRenderElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientRenderElementManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientSound.cpp"
 					>
 				</File>
@@ -890,6 +898,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientTextDisplay.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTexture.cpp"
 					>
 				</File>
 				<File
@@ -1707,10 +1719,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientFontManager.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientGroups.h"
 					>
 				</File>
@@ -1736,6 +1744,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientMarkerManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientMaterial.h"
 					>
 				</File>
 				<File
@@ -1823,6 +1835,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientRenderElement.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientRenderElementManager.h"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientSound.h"
 					>
 				</File>
@@ -1864,6 +1884,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientTextDisplay.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTexture.h"
 					>
 				</File>
 				<File

@@ -97,7 +97,7 @@ public:
                                                           float fU, float fV,
                                                           float fSizeU, float fSizeV, 
                                                           bool bRelativeUV,
-                                                          const std::string& strFilename,
+                                                          SMaterialItem* pMaterial,
                                                           float fRotation,
                                                           float fRotCenOffX,
                                                           float fRotCenOffY,
@@ -113,6 +113,9 @@ public:
                                                           unsigned long ulFormat,
                                                           ID3DXFont * pDXFont,
                                                           bool bPostGUI ) = 0;
+
+    // Subsystems
+    virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;
 };
 
 #endif

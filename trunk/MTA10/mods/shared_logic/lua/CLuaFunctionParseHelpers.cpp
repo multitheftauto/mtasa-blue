@@ -78,11 +78,49 @@ IMPLEMENT_ENUM_END( "vertical-align" )
 //
 // Font/string
 //
-bool ScriptArgReadFont ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientFont*& pFontElement )
+bool MixedReadFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientFont*& pFontElement )
 {
     pFontElement = NULL;
     if ( argStream.NextIsString () || argStream.NextIsNone () )
         return argStream.ReadString ( strFontName, szDefaultFontName );
     else
         return argStream.ReadUserData ( pFontElement );
+}
+
+
+//
+// Material/string
+//
+bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement )
+{
+    pMaterialElement = NULL;
+    if ( !argStream.NextIsString () )
+        return argStream.ReadUserData ( pMaterialElement );
+    else
+    {
+        SString strFilePath;
+        argStream.ReadString ( strFilePath );
+
+        // If no element, auto find/create one
+        CLuaMain* pLuaMain = g_pClientGame->GetLuaManager ()->GetVirtualMachine ( argStream.m_luaVM );
+        CResource* pParentResource = pLuaMain ? pLuaMain->GetResource () : NULL;
+        if ( pParentResource )
+        {
+            CResource* pFileResource = pParentResource;
+            SString strPath, strMetaPath;
+            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
+            {
+                SString strUniqueName = SString ( "%s*%s*%s", pParentResource->GetName (), pFileResource->GetName (), strMetaPath.c_str () ).Replace ( "\\", "/" );
+                pMaterialElement = g_pClientGame->GetManager ()->GetRenderElementManager ()->FindAutoTexture ( strPath, strUniqueName );
+
+                // Check if brand new
+                if ( pMaterialElement && !pMaterialElement->GetParent () )
+                {
+                    // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                    pMaterialElement->SetParent ( pParentResource->GetResourceDynamicEntity() );
+                }
+            }
+        }
+        return pMaterialElement != NULL;
+    }
 }

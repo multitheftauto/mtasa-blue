@@ -74,6 +74,7 @@ enum eClientEntityType
     CCLIENTSOUND,
     CCLIENTWATER,
     CCLIENTFONT,
+    CCLIENTTEXTURE,
     CCLIENTUNKNOWN,
 };
 
@@ -121,7 +122,10 @@ enum eCClientEntityClassTypes
     CLASS_CClientObject,
     CLASS_CDeathmatchObject,
     CLASS_CDeathmatchVehicle,
+    CLASS_CClientRenderElement,
     CLASS_CClientFont,
+    CLASS_CClientMaterial,
+    CLASS_CClientTexture,
 };
 
 
