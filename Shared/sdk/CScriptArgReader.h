@@ -221,7 +221,7 @@ public:
             return false;
         }
         else
-        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
+        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch || ( iArgument == LUA_TNIL && bArgCanBeNil ) )
         {
             if ( defaultValue != (T*)-1 )
             {
@@ -249,10 +249,10 @@ public:
 
 
     //
-    // Read next wrapped userdata, using default if needed
+    // Read next wrapped userdata
     //
     template < class T, class U >
-    bool ReadUserData ( U*& outValue, U* defaultValue, bool bArgCanBeNil = false, bool bDefaultCanBeNil = false )
+    bool ReadUserData ( U*& outValue )
     {
         if ( ReadUserData ( outValue ) )
         {
@@ -262,16 +262,6 @@ public:
             SetTypeError ( strErrorExpectedType, m_iIndex - 1 );
         }
         return false;
-    }
-
-
-    //
-    // Read next wrapped userdata, using NULL default or no default
-    //
-    template < class T, class U >
-    bool ReadUserData ( U*& outValue, int defaultValue = -1 )
-    {
-        return ReadUserData < T > ( outValue, (U*)defaultValue, defaultValue == NULL, true );
     }
 
 
