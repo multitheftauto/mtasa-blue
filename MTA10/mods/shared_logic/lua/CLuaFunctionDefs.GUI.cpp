@@ -749,7 +749,7 @@ int CLuaFunctionDefs::GUISetFont ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( guiElement );
-    ScriptArgReadFont ( argStream, strFontName, "default-normal", pFontElement );
+    MixedReadFontString ( argStream, strFontName, "default-normal", pFontElement );
 
     if ( !argStream.HasErrors () )
     {

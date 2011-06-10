@@ -261,8 +261,8 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
     pResult->AddColumn ( "Timers" );
     pResult->AddColumn ( "Elements" );
     pResult->AddColumn ( "TextItems" );
-    pResult->AddColumn ( "GUI Fonts" );
-    pResult->AddColumn ( "DX Fonts" );
+    pResult->AddColumn ( "Fonts" );
+    pResult->AddColumn ( "Textures" );
 
     // Calc totals
     if ( strFilter == "" )
@@ -297,12 +297,12 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
         // Some extra 'all VM' things
         c += 4;
         int TextItemCount = g_pClientGame->GetManager ()->GetDisplayManager ()->Count ();
-        int GUIFontCount = g_pClientGame->GetManager ()->GetFontManager ()->GetGUIFontCount ();
-        int DXFontCount = g_pClientGame->GetManager ()->GetFontManager ()->GetDXFontCount ();
+        int FontCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetFontCount ();
+        int TextureCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetTextureCount ();
         TextItemCount = Max ( TextItemCount - 4, 0 );   // Remove count for radar items
         row[c++] = !TextItemCount ? "-" : SString ( "%d", TextItemCount );
-        row[c++] = !GUIFontCount ? "-" : SString ( "%d", GUIFontCount );
-        row[c++] = !DXFontCount ? "-" : SString ( "%d", DXFontCount );
+        row[c++] = !FontCount ? "-" : SString ( "%d", FontCount );
+        row[c++] = !TextureCount ? "-" : SString ( "%d", TextureCount );
     }
 
     // For each VM

@@ -590,6 +590,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxGetTextWidth", CLuaFunctionDefs::dxGetTextWidth );
     CLuaCFunctions::AddFunction ( "dxGetFontHeight", CLuaFunctionDefs::dxGetFontHeight );
     CLuaCFunctions::AddFunction ( "createFont", CLuaFunctionDefs::CreateFont );
+    CLuaCFunctions::AddFunction ( "createTexture", CLuaFunctionDefs::CreateTexture );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );

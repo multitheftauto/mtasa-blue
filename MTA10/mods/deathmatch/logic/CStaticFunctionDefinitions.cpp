@@ -47,7 +47,6 @@ static CClientCamera*                               m_pCamera;
 static CClientExplosionManager*                     m_pExplosionManager;
 static CClientProjectileManager*                    m_pProjectileManager;
 static CClientSoundManager*                         m_pSoundManager;
-static CClientFontManager*                          m_pFontManager;
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN CChildListType::const_iterator iter=Entity.IterBegin();for(;iter!=Entity.IterEnd();iter++)
@@ -86,7 +85,6 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions (
     m_pExplosionManager = pManager->GetExplosionManager ();
     m_pProjectileManager = pManager->GetProjectileManager ();
     m_pSoundManager = pManager->GetSoundManager ();
-    m_pFontManager = pManager->GetFontManager ();
 }
 
 
@@ -3883,10 +3881,6 @@ void CStaticFunctionDefinitions::DrawText ( int iLeft, int iTop,
     g_pCore->GetGraphics ()->DrawTextQueued ( iLeft, iTop, iRight, iBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI );
 }
 
-CClientFont* CStaticFunctionDefinitions::CreateFont ( const SString& strFullFilePath, uint uiSize, bool bBold, const SString& strMetaPath, CResource* pResource  )
-{
-    return m_pFontManager->CreateFont( strFullFilePath, uiSize, bBold, strMetaPath, pResource );
-}
 
 // Find custom font from an element, or a standard font from a name
 ID3DXFont* CStaticFunctionDefinitions::ResolveDXFont ( const SString& strFontName, CClientFont* pFontElement, float fScaleX, float fScaleY )
@@ -3898,6 +3892,7 @@ ID3DXFont* CStaticFunctionDefinitions::ResolveDXFont ( const SString& strFontNam
     eFontType fontType = pGraphics->GetFontType ( strFontName );
     return pGraphics->GetFont ( fontType );
 }
+
 
 bool CStaticFunctionDefinitions::IsCursorShowing ( bool& bShowing )
 {

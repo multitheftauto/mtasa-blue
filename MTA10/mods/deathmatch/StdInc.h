@@ -68,6 +68,10 @@
 #include <CClientTask.h>
 #include <CClientTXD.h>
 #include <CClientWater.h>
+#include <CClientRenderElement.h>
+#include <CClientFont.h>
+#include <CClientMaterial.h>
+#include <CClientTexture.h>
 #include <CCustomData.h>
 #include <CConfig.h>
 #include <CDOMConfig.h>
