@@ -25,6 +25,13 @@ bool CPlayerDeltasyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         delta.vehicle.lastWasVehicleSync = false;
 
+        // Read out the delta context
+        unsigned char ucDeltaContext = 0;
+        if ( !BitStream.ReadBits ( reinterpret_cast<char *>(&ucDeltaContext), SPlayerDeltaSyncData::DELTA_CONTEXT_BITCOUNT ) )
+            return false;
+        if ( ! delta.IsValidDelta ( ucDeltaContext ) )
+            return false;
+
         // Read out the time context
         unsigned char ucTimeContext = 0;
         if ( !BitStream.Read ( ucTimeContext ) )
@@ -361,6 +368,9 @@ bool CPlayerDeltasyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         float fCameraRotation = pSourcePlayer->GetCameraRotation ();
 
         BitStream.Write ( PlayerID );
+
+        // Write the delta context
+        BitStream.WriteBits ( reinterpret_cast<const char*>(&delta.deltaSyncContext), SPlayerDeltaSyncData::DELTA_CONTEXT_BITCOUNT );
 
         // Write the time context
         BitStream.Write ( pSourcePlayer->GetSyncTimeContext () );

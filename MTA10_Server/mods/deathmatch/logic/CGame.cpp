@@ -1831,6 +1831,7 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
                 pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
 
             // Relay to other players
+            pPlayer->GetSentDeltaSyncData ().deltaSyncContext++;
             RelayPlayerPuresync ( Packet );
 
             // Run colpoint checks
