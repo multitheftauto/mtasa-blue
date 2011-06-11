@@ -1118,6 +1118,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     // Player position
     SPositionSync position ( false );
     BitStream.Read ( &position );
+    delta.lastPosition = position.data.vecPosition;
 
     // If the players in contact with an object/vehicle, make that the origin
     if ( pContactEntity )
@@ -1126,7 +1127,6 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
         pContactEntity->GetPosition ( vecTempPos );
         position.data.vecPosition += vecTempPos;
     }
-    delta.lastPosition = position.data.vecPosition;
 
     // Player rotation
     SPedRotationSync rotation;
@@ -1341,7 +1341,18 @@ void CNetAPI::WritePlayerDeltasync ( CClientPlayer* pPlayerModel, NetBitStreamIn
         vecPosition -= vecOrigin;
     }
     else
-        delta.lastContact = INVALID_ELEMENT_ID;
+    {
+        if ( delta.lastContact != INVALID_ELEMENT_ID )
+        {
+            BitStream.WriteBit ( true );
+            BitStream.Write ( ElementID ( INVALID_ELEMENT_ID ) );
+        }
+        else
+        {
+            BitStream.WriteBit ( false );
+            delta.lastContact = INVALID_ELEMENT_ID;
+        }
+    }
 
     SDeltaPositionSync position ( delta.lastPosition );
     position.data.vecPosition = vecPosition;

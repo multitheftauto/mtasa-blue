@@ -98,6 +98,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         SPositionSync position ( false );
         if ( !BitStream.Read ( &position ) )
             return false;
+        delta.lastPosition = position.data.vecPosition;
 
         if ( pContactElement )
         {
@@ -108,7 +109,6 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             position.data.vecPosition += vecTempPos;
         }
         pSourcePlayer->SetPosition ( position.data.vecPosition );
-        delta.lastPosition = position.data.vecPosition;
 
         // Player rotation
         SPedRotationSync rotation;

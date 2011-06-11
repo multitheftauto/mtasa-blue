@@ -76,23 +76,19 @@ bool CPlayerDeltasyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         // Contact element
         CElement* pContactElement = NULL;
-        if ( flags.data.bHasContact )
+        ElementID Temp = delta.lastContact;
+        if ( !BitStream.ReadBit ( bChanged ) )
+            return false;
+        if ( bChanged )
         {
-            ElementID Temp;
-            if ( !BitStream.ReadBit ( bChanged ) )
+            if ( !BitStream.Read ( Temp ) )
                 return false;
-            if ( bChanged )
-            {
-                if ( !BitStream.Read ( Temp ) )
-                    return false;
-                delta.lastContact = Temp;
-            }
-            else
-                Temp = delta.lastContact;
-            pContactElement = CElementIDs::GetElement ( Temp );
+            delta.lastContact = Temp;
         }
-        else
-            delta.lastContact = INVALID_ELEMENT_ID;
+
+        if ( Temp != INVALID_ELEMENT_ID )
+            pContactElement = CElementIDs::GetElement ( Temp );
+
         CElement * pPreviousContactElement = pSourcePlayer->GetContactElement ();
         pSourcePlayer->SetContactElement ( pContactElement );
 
@@ -413,11 +409,13 @@ bool CPlayerDeltasyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( delta.lastContact != INVALID_ELEMENT_ID )
             {
                 BitStream.WriteBit ( true );
+                BitStream.Write ( ElementID ( INVALID_ELEMENT_ID ) );
                 newDelta.lastContact = INVALID_ELEMENT_ID;
             }
             else
                 BitStream.WriteBit ( false );
         }
+            
 
         SDeltaPositionSync position ( delta.lastPosition );
         position.data.vecPosition = vecPosition;
