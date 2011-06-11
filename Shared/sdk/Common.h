@@ -18,14 +18,6 @@
 // Network disconnection reason (message) size
 #define NET_DISCONNECT_REASON_SIZE  256
 
-// Element IDs
-#define RESERVED_ELEMENT_ID 0xFFFFFFFE
-#define INVALID_ELEMENT_ID 0xFFFFFFFF
-
-// Element name characteristics
-#define MAX_TYPENAME_LENGTH 32
-#define MAX_ELEMENT_NAME_LENGTH 64
-
 // Allow 2^17 server elements and 2^17 client elements
 #define MAX_SERVER_ELEMENTS 131072
 #define MAX_CLIENT_ELEMENTS 131072
@@ -33,6 +25,14 @@
 #if (MAX_SERVER_ELEMENTS&(MAX_SERVER_ELEMENTS-1)) != 0
     #error MAX_SERVER_ELEMENTS "Macro must be power of 2"
 #endif
+
+// Element IDs
+#define RESERVED_ELEMENT_ID 0x0001FFFE // 2^17-2
+#define INVALID_ELEMENT_ID 0x0001FFFF // 2^17-1
+
+// Element name characteristics
+#define MAX_TYPENAME_LENGTH 32
+#define MAX_ELEMENT_NAME_LENGTH 64
 
 // ElementID structure
 struct ElementID
