@@ -12,8 +12,7 @@
 
 class CClientFont : public CClientRenderElement
 {
-    DECLARE_CLASS( CClientFont, CClientEntity )
-
+    DECLARE_CLASS( CClientFont, CClientRenderElement )
 public:
                             CClientFont             ( CClientManager* pManager, ElementID ID, SFontItem* pFontItem );
                             ~CClientFont            ( void );

@@ -13,6 +13,8 @@ class CResource;
 class CClientRenderElement;
 class CClientFont;
 class CClientTexture;
+class CClientShader;
+
 
 class CClientRenderElementManager
 {
@@ -22,11 +24,13 @@ public:
 
     CClientFont*            CreateFont                  ( const SString& strFullFilePath, const SString& strUniqueName, uint uiSize, bool bBold );
     CClientTexture*         CreateTexture               ( const SString& strFullFilePath );
+    CClientShader*          CreateShader                ( const SString& strFullFilePath, SString& strOutStatus );
     CClientTexture*         FindAutoTexture             ( const SString& strFullFilePath, const SString& strUniqueName );
     void                    Remove                      ( CClientRenderElement* pElement );
 
     uint                    GetFontCount                ( void )    { return m_uiStatsFontCount; }
     uint                    GetTextureCount             ( void )    { return m_uiStatsTextureCount; }
+    uint                    GetShaderCount              ( void )    { return m_uiStatsShaderCount; }
 protected:
     CClientManager*                                     m_pClientManager;
     CRenderItemManagerInterface*                        m_pRenderItemManager;
@@ -34,4 +38,5 @@ protected:
     std::map < SRenderItem*, CClientRenderElement* >    m_ItemElementMap;
     uint                                                m_uiStatsFontCount;
     uint                                                m_uiStatsTextureCount;
+    uint                                                m_uiStatsShaderCount;
 };

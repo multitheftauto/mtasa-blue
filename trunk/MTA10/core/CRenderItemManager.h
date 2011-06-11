@@ -24,14 +24,19 @@ public:
     // CRenderItemManagerInterface
     virtual SFontItem*          CreateFont                  ( const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold );
     virtual STextureItem*       CreateTexture               ( const SString& strFullFilePath );
+    virtual SShaderItem*        CreateShader                ( const SString& strFullFilePath, SString& strOutStatus );
     virtual void                ReleaseRenderItem           ( SRenderItem* pItem );
+    virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, STextureItem* pTextureItem );
+    virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, bool bValue );
+    virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount );
 
     // CRenderItemManager
-    void                        OnDeviceCreate              ( IDirect3DDevice9* pDirect3DDevice9 );
+    void                        OnDeviceCreate              ( IDirect3DDevice9* pDevice );
     void                        DestroyFont                 ( SFontItem* pFontItem );
     void                        DestroyTexture              ( STextureItem* pTextureItem );
+    void                        DestroyShader               ( SShaderItem* pTextureItem );
 
 protected:
-    IDirect3DDevice9*           m_pD3DDevice;
+    IDirect3DDevice9*           m_pDevice;
     std::set < SRenderItem* >   m_CreatedItemList;
 };

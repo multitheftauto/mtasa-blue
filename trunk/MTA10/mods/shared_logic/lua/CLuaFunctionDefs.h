@@ -482,6 +482,8 @@ public:
     LUA_DECLARE ( dxGetFontHeight );
     LUA_DECLARE ( CreateFont );
     LUA_DECLARE ( CreateTexture );
+    LUA_DECLARE ( CreateShader );
+    LUA_DECLARE ( ShaderSetValue );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them

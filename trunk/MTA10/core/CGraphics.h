@@ -24,6 +24,7 @@ class CGraphics;
 #include "CSingleton.h"
 #include <CRenderItemManager.h>
 
+class CTileBatcher;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
@@ -154,6 +155,7 @@ private:
     IDirect3DDevice9 *  m_pDevice;
 
     CRenderItemManager* m_pRenderItemManager;
+    CTileBatcher*       m_pTileBatcher;
 
     // Fonts
     ID3DXFont*          m_pDXFonts [ NUM_FONTS ];
@@ -288,7 +290,7 @@ private:
     std::vector < sDrawQueueItem >      m_PreGUIQueue;
     std::vector < sDrawQueueItem >      m_PostGUIQueue;
 
-    bool                                IsDrawQueueItemSprite   ( const sDrawQueueItem& Item );
+    void                                HandleDrawQueueModeChange ( uint curMode, uint newMode );
     void                                AddQueueItem            ( const sDrawQueueItem& Item, bool bPostGUI );
     void                                DrawQueueItem           ( const sDrawQueueItem& Item );
     void                                DrawQueue               ( std::vector < sDrawQueueItem >& Queue );

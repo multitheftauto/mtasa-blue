@@ -105,7 +105,7 @@ namespace SharedUtil
     //
     // Try to make a path relative to the 'resources/' directory
     //
-    SString ConformResourcePath ( const char* szRes );
+    SString ConformResourcePath ( const char* szRes, bool bConvertToUnixPathSep = false );
 
     SString GenerateNickname ( void );
 

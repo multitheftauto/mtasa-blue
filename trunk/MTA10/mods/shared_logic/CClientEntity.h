@@ -75,6 +75,7 @@ enum eClientEntityType
     CCLIENTWATER,
     CCLIENTFONT,
     CCLIENTTEXTURE,
+    CCLIENTSHADER,
     CCLIENTUNKNOWN,
 };
 
@@ -126,6 +127,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientFont,
     CLASS_CClientMaterial,
     CLASS_CClientTexture,
+    CLASS_CClientShader,
 };
 
 

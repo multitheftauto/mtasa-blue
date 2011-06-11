@@ -857,6 +857,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientShader.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientSound.cpp"
 					>
 				</File>
@@ -1844,6 +1848,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientRenderElementManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientShader.h"
 					>
 				</File>
 				<File

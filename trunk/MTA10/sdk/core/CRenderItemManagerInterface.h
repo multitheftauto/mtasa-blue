@@ -12,10 +12,13 @@
 
 struct ID3DXFont;
 struct IDirect3DTexture9;
+struct ID3DXEffect;
+typedef LPCSTR D3DXHANDLE;
 class CGUIFont;
 struct SRenderItem;
 struct SFontItem;
 struct STextureItem;
+struct SShaderItem;
 
 
 //
@@ -31,7 +34,11 @@ public:
     // CRenderItemManagerInterface
     virtual SFontItem*          CreateFont                  ( const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold ) = 0;
     virtual STextureItem*       CreateTexture               ( const SString& strFullFilePath ) = 0;
+    virtual SShaderItem*        CreateShader                ( const SString& strFullFilePath, SString& strOutStatus ) = 0;
     virtual void                ReleaseRenderItem           ( SRenderItem* pItem ) = 0;
+    virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, STextureItem* pTextureItem ) = 0;
+    virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, bool bValue ) = 0;
+    virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount ) = 0;
 };
 
 
@@ -47,6 +54,7 @@ enum eRenderItemClassTypes
     CLASS_SFontItem,
     CLASS_SMaterialItem,
     CLASS_STextureItem,
+    CLASS_SShaderItem,
 };
 
 struct SRenderItem
@@ -88,4 +96,14 @@ struct STextureItem : public SMaterialItem
     uint uiFileHeight;
     uint uiSurfaceWidth;
     uint uiSurfaceHeight;
+};
+
+struct SShaderItem : public SMaterialItem
+{
+    DECLARE_CLASS( SShaderItem, SMaterialItem )
+    SShaderItem ( void ) : ClassInit ( this ) {}
+
+    ID3DXEffect* pD3DEffect;
+    std::map < SString, D3DXHANDLE > parameterMap;
+    D3DXHANDLE hWorld, hView, hProjection, hAll, hTime;
 };

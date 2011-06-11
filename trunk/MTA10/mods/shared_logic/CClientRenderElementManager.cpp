@@ -24,6 +24,7 @@ CClientRenderElementManager::CClientRenderElementManager ( CClientManager* pClie
     m_pRenderItemManager = g_pCore->GetGraphics ()->GetRenderItemManager ();
     m_uiStatsFontCount = 0;
     m_uiStatsTextureCount = 0;
+    m_uiStatsShaderCount = 0;
 }
 
 
@@ -101,6 +102,35 @@ CClientTexture* CClientRenderElementManager::CreateTexture ( const SString& strF
 
 ////////////////////////////////////////////////////////////////
 //
+// CClientRenderElementManager::CreateShader
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CClientShader* CClientRenderElementManager::CreateShader ( const SString& strFullFilePath, SString& strOutStatus )
+{
+    // Create the item
+    SShaderItem* pShaderItem = m_pRenderItemManager->CreateShader ( strFullFilePath, strOutStatus );
+
+    // Check create worked
+    if ( !pShaderItem )
+        return NULL;
+
+    // Create the element
+    CClientShader* pShaderElement = new CClientShader ( m_pClientManager, INVALID_ELEMENT_ID, pShaderItem );
+
+    // Add to this manager's list
+    MapSet ( m_ItemElementMap, pShaderItem, pShaderElement );
+
+    // Update stats
+    m_uiStatsShaderCount++;
+
+    return pShaderElement;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CClientRenderElementManager::FindAutoTexture
 //
 // Find texture by unique name. Create if not found.
@@ -161,6 +191,9 @@ void CClientRenderElementManager::Remove ( CClientRenderElement* pElement )
     else
     if ( pElement->IsA ( CClientTexture::GetClassId () ) )
         m_uiStatsTextureCount--;
+    else
+    if ( pElement->IsA ( CClientShader::GetClassId () ) )
+        m_uiStatsShaderCount--;
 
     // Release render item
     m_pRenderItemManager->ReleaseRenderItem ( pElement->GetRenderItem () );

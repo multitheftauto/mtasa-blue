@@ -591,6 +591,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxGetFontHeight", CLuaFunctionDefs::dxGetFontHeight );
     CLuaCFunctions::AddFunction ( "createFont", CLuaFunctionDefs::CreateFont );
     CLuaCFunctions::AddFunction ( "createTexture", CLuaFunctionDefs::CreateTexture );
+    CLuaCFunctions::AddFunction ( "createShader", CLuaFunctionDefs::CreateShader );
+    CLuaCFunctions::AddFunction ( "shaderSetValue", CLuaFunctionDefs::ShaderSetValue );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );

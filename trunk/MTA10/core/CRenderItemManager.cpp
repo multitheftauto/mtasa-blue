@@ -43,9 +43,9 @@ CRenderItemManager::~CRenderItemManager ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDirect3DDevice9 )
+void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice )
 {
-    m_pD3DDevice = pDirect3DDevice9;
+    m_pDevice = pDevice;
 }
 
 
@@ -60,7 +60,7 @@ STextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath
 {
     // Create the DX texture
     IDirect3DTexture9* pD3DTexture = NULL;
-    if ( FAILED( D3DXCreateTextureFromFile ( m_pD3DDevice, strFullFilePath, &pD3DTexture ) ) )
+    if ( FAILED( D3DXCreateTextureFromFile ( m_pDevice, strFullFilePath, &pD3DTexture ) ) )
         return NULL;
 
     // Get some info
@@ -87,6 +87,148 @@ STextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath
     MapInsert ( m_CreatedItemList, pTextureItem );
 
     return pTextureItem;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CreateShader
+//
+// Create a D3DX effect from .fx file
+//
+////////////////////////////////////////////////////////////////
+SShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, SString& strOutStatus )
+{
+    // Compile effect
+    DWORD dwFlags = 0;
+    dwFlags |= D3DXSHADER_DEBUG;
+    dwFlags |= D3DXSHADER_PARTIALPRECISION;
+
+    ID3DXInclude* pIncludeManager = NULL;   // TODO
+    ID3DXEffect* pD3DEffect = NULL;
+    LPD3DXBUFFER pBufferErrors = NULL;
+    HRESULT Result = D3DXCreateEffectFromFile( m_pDevice, strFullFilePath, NULL, pIncludeManager, dwFlags, NULL, &pD3DEffect, &pBufferErrors );            
+
+    // Handle compile errors
+    strOutStatus = "";
+    if( pBufferErrors != NULL )
+        strOutStatus = SStringX ( (CHAR*)pBufferErrors->GetBufferPointer() ).TrimEnd ( "\n" );
+    SAFE_RELEASE( pBufferErrors );
+
+    if( !pD3DEffect )
+        return NULL;
+
+    // Find first valid technique
+    D3DXHANDLE hTechnique = NULL;
+    pD3DEffect->FindNextValidTechnique( NULL, &hTechnique );
+
+    // Error if can't find a valid technique
+    if ( !hTechnique )
+    {
+        strOutStatus = "No valid technique";
+        SAFE_RELEASE ( pD3DEffect );
+        return NULL;
+    }
+
+    // Set technique
+    pD3DEffect->SetTechnique( hTechnique );
+
+    // Inform user of technique name
+    D3DXTECHNIQUE_DESC Desc;
+    pD3DEffect->GetTechniqueDesc( hTechnique, &Desc );
+    strOutStatus = Desc.Name;
+
+    // Create the item
+    SShaderItem* pShaderItem = new SShaderItem ();
+    pShaderItem->pManager = this;
+    pShaderItem->iRefCount = 1;
+    pShaderItem->pD3DEffect = pD3DEffect;
+
+    // Add parameter handles
+    D3DXEFFECT_DESC EffectDesc;
+    pD3DEffect->GetDesc( &EffectDesc );
+    for ( uint i = 0 ; i < EffectDesc.Parameters ; i++ )
+    {
+        D3DXHANDLE hParameter = pD3DEffect->GetParameter ( NULL, i );
+        if ( !hParameter )
+            break;
+        D3DXPARAMETER_DESC Desc;
+        pD3DEffect->GetParameterDesc( hParameter, &Desc );
+        // Use semantic if it exists
+        SString strName = Desc.Semantic ? Desc.Semantic : Desc.Name;
+        // Add to lookup map
+        MapSet ( pShaderItem->parameterMap, strName.ToLower (), hParameter );
+    }
+
+    // Cache known parameters
+    D3DXHANDLE* phWorld = MapFind ( pShaderItem->parameterMap, "world" );
+    pShaderItem->hWorld = phWorld ? *phWorld : NULL;
+
+    D3DXHANDLE* phView = MapFind ( pShaderItem->parameterMap, "view" );
+    pShaderItem->hView = phView ? *phView : NULL;
+
+    D3DXHANDLE* phProjection = MapFind ( pShaderItem->parameterMap, "projection" );
+    pShaderItem->hProjection = phProjection ? *phProjection : NULL;
+
+    D3DXHANDLE* phAll = MapFind ( pShaderItem->parameterMap, "worldviewprojection" );
+    pShaderItem->hAll = phAll ? *phAll : NULL;
+
+    D3DXHANDLE* phTime = MapFind ( pShaderItem->parameterMap, "time" );
+    pShaderItem->hTime = phTime ? *phTime : NULL;
+
+
+    // Update list of created items
+    MapInsert ( m_CreatedItemList, pShaderItem );
+
+    return pShaderItem;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::SetShaderValue
+//
+// Set one texture
+//
+////////////////////////////////////////////////////////////////
+bool CRenderItemManager::SetShaderValue ( SShaderItem* pShaderItem, const SString& strName, STextureItem* pTextureItem )
+{
+    if ( D3DXHANDLE* phParameter = MapFind ( pShaderItem->parameterMap, strName.ToLower () ) )
+        if ( SUCCEEDED( pShaderItem->pD3DEffect->SetTexture( *phParameter, pTextureItem->pD3DTexture ) ) )
+            return true;
+    return false;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::SetShaderValue
+//
+// Set one bool
+//
+////////////////////////////////////////////////////////////////
+bool CRenderItemManager::SetShaderValue ( SShaderItem* pShaderItem, const SString& strName, bool bValue )
+{
+    if ( D3DXHANDLE* phParameter = MapFind ( pShaderItem->parameterMap, strName.ToLower () ) )
+        if ( SUCCEEDED( pShaderItem->pD3DEffect->SetBool( *phParameter, bValue ) ) )
+            return true;
+    return false;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::SetShaderValue
+//
+// Set up to 16 floats
+//
+////////////////////////////////////////////////////////////////
+bool CRenderItemManager::SetShaderValue ( SShaderItem* pShaderItem, const SString& strName, const float* pfValues, uint uiCount )
+{
+    if ( D3DXHANDLE* phParameter = MapFind ( pShaderItem->parameterMap, strName.ToLower () ) )
+        if ( SUCCEEDED( pShaderItem->pD3DEffect->SetFloatArray( *phParameter, pfValues, uiCount ) ) )
+            return true;
+    return false;
 }
 
 
@@ -158,6 +300,9 @@ void CRenderItemManager::ReleaseRenderItem ( SRenderItem* pItem )
     if ( STextureItem* pTextureItem = DynamicCast < STextureItem > ( pItem ) )
         DestroyTexture ( pTextureItem );
     else
+    if ( SShaderItem* pShaderItem = DynamicCast < SShaderItem > ( pItem ) )
+        DestroyShader ( pShaderItem );
+    else
     if ( SFontItem* pFontItem = DynamicCast < SFontItem > ( pItem ) )
         DestroyFont ( pFontItem );
 }
@@ -184,6 +329,25 @@ void CRenderItemManager::DestroyTexture ( STextureItem* pTextureItem )
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::DestroyShader
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::DestroyShader ( SShaderItem* pShaderItem )
+{
+    // Release D3D resource
+    SAFE_RELEASE ( pShaderItem->pD3DEffect );
+
+    // Remove item from manager list
+    assert ( MapContains ( m_CreatedItemList, pShaderItem ) );
+    MapRemove ( m_CreatedItemList, pShaderItem );
+    delete pShaderItem;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::DestroyFont
 //
 //
@@ -191,9 +355,6 @@ void CRenderItemManager::DestroyTexture ( STextureItem* pTextureItem )
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::DestroyFont ( SFontItem* pFontItem )
 {
-    if ( --pFontItem->iRefCount > 0 )
-        return;
-
     // Destroy the CEGUI font data
     SAFE_DELETE( pFontItem->pFntCEGUI );
 
