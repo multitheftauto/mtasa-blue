@@ -21,34 +21,33 @@ bool CVehicleResyncPacket::Read ( NetBitStreamInterface& BitStream )
 
 bool CVehicleResyncPacket::Write ( NetBitStreamInterface& BitStream ) const 
 {
-    if ( !IS_VEHICLE(m_pSourceElement) )
+    if ( !m_pVehicle )
         return false;
 
-    CVehicle* pVehicle = static_cast < CVehicle* > ( m_pSourceElement );
-    BitStream.Write ( pVehicle->GetID() );
+    BitStream.Write ( m_pVehicle->GetID() );
 
     // Write vehicle position and rotation
     SPositionSync position ( false );
-    position.data.vecPosition = pVehicle->GetPosition();
+    position.data.vecPosition = m_pVehicle->GetPosition();
     BitStream.Write ( &position );
 
     SRotationDegreesSync rotation;
-    pVehicle->GetRotationDegrees ( rotation.data.vecRotation );
+    m_pVehicle->GetRotationDegrees ( rotation.data.vecRotation );
     BitStream.Write ( &rotation );
 
     // Read out the movespeed
     SVelocitySync velocity;
-    velocity.data.vecVelocity = pVehicle->GetVelocity ();
+    velocity.data.vecVelocity = m_pVehicle->GetVelocity ();
     BitStream.Write ( &velocity );
 
     // Read out the turnspeed
     SVelocitySync turnSpeed;
-    turnSpeed.data.vecVelocity = pVehicle->GetTurnSpeed ();
+    turnSpeed.data.vecVelocity = m_pVehicle->GetTurnSpeed ();
     BitStream.Write ( &turnSpeed );
 
     // Read out the vehicle health
     SVehicleHealthSync health;
-    health.data.fValue = pVehicle->GetHealth ();
+    health.data.fValue = m_pVehicle->GetHealth ();
     BitStream.Write ( &health );
 
     return true;
