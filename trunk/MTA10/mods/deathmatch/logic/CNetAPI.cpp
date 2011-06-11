@@ -833,6 +833,13 @@ void CNetAPI::ReadPlayerDeltasync ( CClientPlayer* pPlayer, NetBitStreamInterfac
 
     delta.vehicle.lastWasVehicleSync = false;
 
+    // Read out the delta context.
+    unsigned char ucDeltaContext = 0;
+    if ( !BitStream.ReadBits ( reinterpret_cast<char*>(&ucDeltaContext), SPlayerDeltaSyncData::DELTA_CONTEXT_BITCOUNT ) )
+        return;
+    if ( ! delta.IsValidDelta ( ucDeltaContext ) )
+        return;
+
     // Read out the sync time context. See CClientEntity for documentation on that.
     unsigned char ucSyncTimeContext = 0;
     BitStream.Read ( ucSyncTimeContext );
@@ -1071,6 +1078,12 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     // Get the delta sync data
     SPlayerDeltaSyncData& delta = pPlayer->GetDeltaSyncData ();
 
+    // Read out the delta context.
+    unsigned char ucDeltaContext = 0;
+    if ( !BitStream.ReadBits ( reinterpret_cast<char*> ( &ucDeltaContext ), SPlayerDeltaSyncData::DELTA_CONTEXT_BITCOUNT ) )
+        return;
+    delta.deltaSyncContext = ucDeltaContext;
+
     // Read out the sync time context. See CClientEntity for documentation on that.
     unsigned char ucSyncTimeContext = 0;
     BitStream.Read ( ucSyncTimeContext );
@@ -1270,6 +1283,9 @@ void CNetAPI::WritePlayerDeltasync ( CClientPlayer* pPlayerModel, NetBitStreamIn
 {
     // Get the delta sync data
     SPlayerDeltaSyncData& delta = pPlayerModel->GetDeltaSyncData ();
+
+    // Write the delta sync context.
+    BitStream.WriteBits ( reinterpret_cast<const char*>(&delta.deltaSyncContext), SPlayerDeltaSyncData::DELTA_CONTEXT_BITCOUNT );
 
     // Write our sync context.
     delta.lastSyncTimeContext = pPlayerModel->GetSyncTimeContext ();
@@ -1484,6 +1500,10 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
 {
     // Get the delta sync data
     SPlayerDeltaSyncData& delta = pPlayerModel->GetDeltaSyncData ();
+
+    // Write the delta sync context.
+    delta.deltaSyncContext++;
+    BitStream.WriteBits ( reinterpret_cast<const char*>(&delta.deltaSyncContext), SPlayerDeltaSyncData::DELTA_CONTEXT_BITCOUNT );
 
     // Write our sync context.
     delta.lastSyncTimeContext = pPlayerModel->GetSyncTimeContext ();
