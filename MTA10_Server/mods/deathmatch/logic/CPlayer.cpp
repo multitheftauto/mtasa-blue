@@ -647,3 +647,4 @@ void CPlayer::UpdateOthersNearList ( void )
         }
     }
 }
+

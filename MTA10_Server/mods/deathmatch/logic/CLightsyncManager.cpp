@@ -66,7 +66,7 @@ void CLightsyncManager::DoPulse ()
     {
         SEntry entry = m_Queue.front ();
         CPlayer* pPlayer = entry.pPlayer;
-        CPlayer::SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
+        SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
 
         m_Queue.pop_front ();
 
@@ -94,7 +94,7 @@ void CLightsyncManager::DoPulse ()
                              ( ( pCurrent->GetPosition() - vecPosition ).LengthSquared () > DISTANCE_FOR_SLOW_SYNCRATE*DISTANCE_FOR_SLOW_SYNCRATE &&
                                ( pCurrent->GetPosition() - vecCameraPosition).LengthSquared () > DISTANCE_FOR_SLOW_SYNCRATE*DISTANCE_FOR_SLOW_SYNCRATE ) )
                         {
-                            CPlayer::SLightweightSyncData& currentData = pCurrent->GetLightweightSyncData ();
+                            SLightweightSyncData& currentData = pCurrent->GetLightweightSyncData ();
                             packet.AddPlayer ( pCurrent );
 
                             // Calculate the delta sync

@@ -52,6 +52,16 @@ public:
     CControllerState() { 
         memset(this, 0, sizeof(CControllerState));
     }
+
+    bool operator== ( const CControllerState& Right ) const
+    {
+        return memcmp ( this, &Right, sizeof(CControllerState) ) == 0;
+    }
+
+    bool operator!= ( const CControllerState& Right ) const
+    {
+        return !operator== ( Right );
+    }
 };
 
 class CPad
