@@ -475,3 +475,135 @@ int CLuaFunctionDefs::CreateTexture ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::CreateShader ( lua_State* luaVM )
+{
+//  element createShader( string filepath )
+    SString strFilePath;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strFilePath );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pParentResource = pLuaMain->GetResource ();
+            CResource* pFileResource = pParentResource;
+            SString strPath, strMetaPath;
+            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
+            {
+                if ( FileExists ( strPath ) )
+                {
+                    SString strStatus;
+                    CClientShader* pShader = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateShader ( strPath, strStatus );
+                    if ( pShader )
+                    {
+                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                        pShader->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                        lua_pushelement ( luaVM, pShader );
+                        lua_pushstring ( luaVM, strStatus );    // String containing name of technique being used.
+                        return 2;
+                    }
+                    else
+                    {
+                        // Replace any path in the error message with out own one
+                        SString strFilename;
+                        ExtractFilename ( strPath, NULL, &strFilename );
+                        SString strRight;
+                        if ( strStatus.Split ( strFilename, NULL, &strRight ) )
+                            strStatus = ConformResourcePath ( strPath, true ) + strRight;
+                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Problem @ '%s' [%s]", "createShader", *strStatus ) );
+                    }
+                }
+                else
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Missing file @ '%s' [%s]", "createShader", *ConformResourcePath ( strPath, true ) ) );
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad file-path @ '%s' [%s]", "createShader", *strFilePath ) );
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createShader", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::ShaderSetValue ( lua_State* luaVM )
+{
+//  bool shaderSetValue( element shader, string name, mixed value )
+    CClientShader* pShader; SString strName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pShader );
+    argStream.ReadString ( strName );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Try each mixed type in turn
+        int iArgument = lua_type ( argStream.m_luaVM, argStream.m_iIndex );
+
+        if ( iArgument == LUA_TLIGHTUSERDATA )
+        {
+            // Texture
+            CClientTexture* pTexture;
+            if ( argStream.ReadUserData ( pTexture ) )
+            {
+                bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, pTexture->GetTextureItem () );
+                lua_pushboolean ( luaVM, bResult );
+                return 1;
+            }
+        }
+        else
+        if ( iArgument == LUA_TBOOLEAN )
+        {
+            // bool
+            bool bValue;
+            if ( argStream.ReadBool ( bValue ) )
+            {
+                bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, bValue );
+                lua_pushboolean ( luaVM, bResult );
+                return 1;
+            }
+        }
+        else
+        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
+        {
+            // float(s)
+            float fBuffer[16];
+            uint i;
+            for ( i = 0 ; i < NUMELMS(fBuffer); i++ )
+            {
+                fBuffer[i] = lua_tonumber ( argStream.m_luaVM, argStream.m_iIndex++ );
+                iArgument = lua_type ( argStream.m_luaVM, argStream.m_iIndex );
+                if ( iArgument != LUA_TNUMBER && iArgument != LUA_TSTRING )
+                    break;
+            }
+            bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, fBuffer, i );
+            lua_pushboolean ( luaVM, bResult );
+            return 1;
+        }
+        else
+        if ( iArgument == LUA_TTABLE )
+        {
+            // table (of floats)
+            float fBuffer[16];
+            for ( uint i = 0 ; i < NUMELMS(fBuffer); i++ )
+            {
+                // TODO
+            }
+        }
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "shaderSetValue", "Expected number, bool, table or texture at argument 3" ) );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "shaderSetValue", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

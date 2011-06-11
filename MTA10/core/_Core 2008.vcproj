@@ -605,6 +605,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CTileBatcher.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CVersionUpdater.cpp"
 				>
 			</File>
@@ -987,6 +991,10 @@
 			</File>
 			<File
 				RelativePath=".\CSettings.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CTileBatcher.h"
 				>
 			</File>
 			<File

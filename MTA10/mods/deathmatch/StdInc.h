@@ -72,6 +72,7 @@
 #include <CClientFont.h>
 #include <CClientMaterial.h>
 #include <CClientTexture.h>
+#include <CClientShader.h>
 #include <CCustomData.h>
 #include <CConfig.h>
 #include <CDOMConfig.h>
