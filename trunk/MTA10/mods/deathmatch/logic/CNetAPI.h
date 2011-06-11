@@ -29,10 +29,6 @@ class CNetAPI;
 #include "CBitStream.h"
 #include <ctime>
 
-// SYNC SETTINGS
-#define TICK_RATE 100
-#define CAM_SYNC_RATE 500
-
 enum eServerRPCFunctions
 {
     PLAYER_INGAME_NOTICE,
@@ -63,15 +59,20 @@ public:
 private:
     bool                    IsSmallKeySyncNeeded            ( CClientPed* pPed );
     bool                    IsPureSyncNeeded                ( void );
+    bool                    IsFullPureSyncNeeded            ( CClientPlayer* pPlayer ) const;
 
     void                    ReadKeysync                     ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    WriteKeysync                    ( CClientPed* pPed, NetBitStreamInterface& BitStream );
 
+    void                    ReadPlayerDeltasync             ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    ReadPlayerPuresync              ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
+    void                    WritePlayerDeltasync            ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );
     void                    WritePlayerPuresync             ( CClientPlayer* pPed, NetBitStreamInterface& BitStream );
 
     void                    ReadVehiclePuresync             ( CClientPlayer* pPlayer, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
-    void                    WriteVehiclePuresync            ( CClientPed* pPed, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
+    void                    ReadVehicleDeltasync            ( CClientPlayer* pPlayer, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
+    void                    WriteVehiclePuresync            ( CClientPlayer* pPed, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
+    void                    WriteVehicleDeltasync           ( CClientPlayer* pPlayer, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
 
     bool                    ReadSmallKeysync                ( CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
     void                    WriteSmallKeysync               ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );

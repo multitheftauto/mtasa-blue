@@ -2,12 +2,9 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/packets/CPlayerPuresyncPacket.cpp
-*  PURPOSE:     Player pure synchronization packet class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               Cecill Etheredge <>
-*               Alberto Alonso <rydencillo@gmail.com>
+*  FILE:        mods/deathmatch/logic/packets/CPlayerDeltasyncPacket.cpp
+*  PURPOSE:     Player delta synchronization packet class
+*  DEVELOPERS:  Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -18,12 +15,13 @@
 
 extern CGame* g_pGame;
 
-bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
+bool CPlayerDeltasyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     if ( m_pSourceElement )
     {
         CPlayer * pSourcePlayer = static_cast < CPlayer * > ( m_pSourceElement );
         SPlayerDeltaSyncData& delta = pSourcePlayer->GetReceivedDeltaSyncData ();
+        bool bChanged;
 
         delta.vehicle.lastWasVehicleSync = false;
 
@@ -41,40 +39,60 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         }
 
         // Read out keys
-        CControllerState ControllerState;
-        ReadFullKeysync ( ControllerState, BitStream );
-        pSourcePlayer->GetPad ()->NewControllerState ( ControllerState );
-        delta.lastControllerState = ControllerState;
+        if ( !BitStream.ReadBit ( bChanged ) )
+            return false;
+
+        CControllerState ControllerState = delta.lastControllerState;
+        if ( bChanged )
+        {
+            ReadFullKeysync ( ControllerState, BitStream );
+            pSourcePlayer->GetPad ()->NewControllerState ( ControllerState );
+            delta.lastControllerState = ControllerState;
+        }
 
         // Read the flags
         SPlayerPuresyncFlags flags;
-        if ( !BitStream.Read ( &flags ) )
+        if ( !BitStream.ReadBit ( bChanged ) )
             return false;
-        delta.lastFlags = flags;
+        if ( bChanged )
+        {
+            if ( !BitStream.Read ( &flags ) )
+                return false;
 
-        pSourcePlayer->SetInWater ( flags.data.bIsInWater );
-        pSourcePlayer->SetOnGround ( flags.data.bIsOnGround );
-        pSourcePlayer->SetHasJetPack ( flags.data.bHasJetPack );
-        pSourcePlayer->SetDucked ( flags.data.bIsDucked );
-        pSourcePlayer->SetWearingGoggles ( flags.data.bWearsGoogles );
-        pSourcePlayer->SetChoking ( flags.data.bIsChoking );
-        pSourcePlayer->SetAkimboArmUp ( flags.data.bAkimboTargetUp );
-        pSourcePlayer->SetOnFire ( flags.data.bIsOnFire );
-        pSourcePlayer->SetStealthAiming ( flags.data.bStealthAiming );
+            pSourcePlayer->SetInWater ( flags.data.bIsInWater );
+            pSourcePlayer->SetOnGround ( flags.data.bIsOnGround );
+            pSourcePlayer->SetHasJetPack ( flags.data.bHasJetPack );
+            pSourcePlayer->SetDucked ( flags.data.bIsDucked );
+            pSourcePlayer->SetWearingGoggles ( flags.data.bWearsGoogles );
+            pSourcePlayer->SetChoking ( flags.data.bIsChoking );
+            pSourcePlayer->SetAkimboArmUp ( flags.data.bAkimboTargetUp );
+            pSourcePlayer->SetOnFire ( flags.data.bIsOnFire );
+            pSourcePlayer->SetStealthAiming ( flags.data.bStealthAiming );
+
+            delta.lastFlags = flags;
+        }
+        else
+            flags = delta.lastFlags;
 
         // Contact element
         CElement* pContactElement = NULL;
         if ( flags.data.bHasContact )
         {
             ElementID Temp;
-            if ( !BitStream.Read ( Temp ) )
+            if ( !BitStream.ReadBit ( bChanged ) )
                 return false;
+            if ( bChanged )
+            {
+                if ( !BitStream.Read ( Temp ) )
+                    return false;
+                delta.lastContact = Temp;
+            }
+            else
+                Temp = delta.lastContact;
             pContactElement = CElementIDs::GetElement ( Temp );
-            delta.lastContact = Temp;
         }
         else
             delta.lastContact = INVALID_ELEMENT_ID;
-
         CElement * pPreviousContactElement = pSourcePlayer->GetContactElement ();
         pSourcePlayer->SetContactElement ( pContactElement );
 
@@ -95,9 +113,10 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         }
 
         // Player position
-        SPositionSync position ( false );
+        SDeltaPositionSync position ( delta.lastPosition );
         if ( !BitStream.Read ( &position ) )
             return false;
+        delta.lastPosition = position.data.vecPosition;
 
         if ( pContactElement )
         {
@@ -108,7 +127,6 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             position.data.vecPosition += vecTempPos;
         }
         pSourcePlayer->SetPosition ( position.data.vecPosition );
-        delta.lastPosition = position.data.vecPosition;
 
         // Player rotation
         SPedRotationSync rotation;
@@ -125,24 +143,33 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             pSourcePlayer->SetVelocity ( velocity.data.vecVelocity );
         }
 
-        // Health ( stored with damage )
-        SPlayerHealthSync health;
-        if ( !BitStream.Read ( &health ) )
-            return false;
-        float fHealth = health.data.fValue;
-        delta.lastHealth = fHealth;
-
-        // Armor
-        SPlayerArmorSync armor;
-        if ( !BitStream.Read ( &armor ) )
+        if ( !BitStream.ReadBit ( bChanged ) )
             return false;
 
-        float fArmor = armor.data.fValue;
-        float fOldArmor = pSourcePlayer->GetArmor ();
-        float fArmorLoss = fOldArmor - fArmor;
+        float fHealth = delta.lastHealth;
+        float fArmorLoss = 0.0f;
+        if ( bChanged )
+        {
+            // Health ( stored with damage )
+            SPlayerHealthSync health;
+            if ( !BitStream.Read ( &health ) )
+                return false;
+            fHealth = health.data.fValue;
 
-        pSourcePlayer->SetArmor ( fArmor );
-        delta.lastArmor = fArmor;
+            // Armor
+            SPlayerArmorSync armor;
+            if ( !BitStream.Read ( &armor ) )
+                return false;
+
+            float fArmor = armor.data.fValue;
+            float fOldArmor = pSourcePlayer->GetArmor ();
+            fArmorLoss = fOldArmor - fArmor;
+
+            pSourcePlayer->SetArmor ( fArmor );
+
+            delta.lastHealth = fHealth;
+            delta.lastArmor = fArmor;
+        }
 
         // Read out and set the camera rotation
         float fCameraRotation;
@@ -152,45 +179,62 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 
         if ( flags.data.bHasAWeapon )
         {
+            if ( !BitStream.ReadBit ( bChanged ) )
+                return false;
+
+            bool bWeaponCorrect = true;
+            unsigned int uiSlot = delta.weapon.lastSlot;
             // Read client weapon data, but only apply it if the weapon matches with the server
             uchar ucUseWeaponType = pSourcePlayer->GetWeaponType ();
-            bool bWeaponCorrect = true;
 
-           // Check client has the weapon we think he has
-            unsigned char ucClientWeaponType;
-            if ( !BitStream.Read ( ucClientWeaponType ) )
-                return false;
-
-            if ( pSourcePlayer->GetWeaponType () != ucClientWeaponType )
+            if ( bChanged )
             {
-                bWeaponCorrect = false;                 // Possibly old weapon data.
-                ucUseWeaponType = ucClientWeaponType;   // Use the packet supplied weapon type to skip over the correct amount of data
+                // Check client has the weapon we think he has
+                unsigned char ucClientWeaponType;
+                if ( !BitStream.Read ( ucClientWeaponType ) )
+                    return false;
+
+                if ( pSourcePlayer->GetWeaponType () != ucClientWeaponType )
+                {
+                    bWeaponCorrect = false;                 // Possibly old weapon data.
+                    ucUseWeaponType = ucClientWeaponType;   // Use the packet supplied weapon type to skip over the correct amount of data
+                }
+
+                // Update check counts
+                pSourcePlayer->SetWeaponCorrect ( bWeaponCorrect );
+
+                // Current weapon slot
+                SWeaponSlotSync slot;
+                if ( !BitStream.Read ( &slot ) )
+                    return false;
+                uiSlot = slot.data.uiSlot;
+
+                // Set weapon slot
+                if ( bWeaponCorrect )
+                    pSourcePlayer->SetWeaponSlot ( uiSlot );
+                
+                delta.weapon.lastWeaponType = ucUseWeaponType;
+                delta.weapon.lastSlot = uiSlot;
             }
-
-            // Update check counts
-            pSourcePlayer->SetWeaponCorrect ( bWeaponCorrect );
-
-            // Current weapon slot
-            SWeaponSlotSync slot;
-            if ( !BitStream.Read ( &slot ) )
-                return false;
-            unsigned int uiSlot = slot.data.uiSlot;
-
-            delta.weapon.lastWeaponType = ucUseWeaponType;
-            delta.weapon.lastSlot = uiSlot;
-
-            // Set weapon slot
-            if ( bWeaponCorrect )
-                pSourcePlayer->SetWeaponSlot ( uiSlot );
 
             if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
             {
-                // Read out the ammo states
-                SWeaponAmmoSync ammo ( ucUseWeaponType, true, true );
-                if ( !BitStream.Read ( &ammo ) )
+                if ( !BitStream.ReadBit ( bChanged ) )
                     return false;
-                delta.weapon.lastAmmoInClip = ammo.data.usAmmoInClip;
-                delta.weapon.lastAmmoTotal = ammo.data.usTotalAmmo;
+
+                unsigned short usAmmoInClip = delta.weapon.lastAmmoInClip;
+                unsigned short usTotalAmmo = delta.weapon.lastAmmoTotal;
+                if ( bChanged )
+                {
+                    // Read out the ammo states
+                    SWeaponAmmoSync ammo ( ucUseWeaponType, true, true );
+                    if ( !BitStream.Read ( &ammo ) )
+                        return false;
+                    usAmmoInClip = ammo.data.usAmmoInClip;
+                    usTotalAmmo = ammo.data.usTotalAmmo;
+                    delta.weapon.lastAmmoInClip = usAmmoInClip;
+                    delta.weapon.lastAmmoTotal = usTotalAmmo;
+                }
 
                 // Read out the aim data
                 SWeaponAimSync sync ( CWeaponNames::GetWeaponRange ( ucUseWeaponType ), ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle ) );
@@ -200,8 +244,8 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 if ( bWeaponCorrect )
                 {
                     // Set the ammo states
-                    pSourcePlayer->SetWeaponAmmoInClip ( ammo.data.usAmmoInClip );
-                    pSourcePlayer->SetWeaponTotalAmmo ( ammo.data.usTotalAmmo );
+                    pSourcePlayer->SetWeaponAmmoInClip ( usAmmoInClip );
+                    pSourcePlayer->SetWeaponTotalAmmo ( usTotalAmmo );
 
                     // Set the arm directions and whether or not arms are up
                     pSourcePlayer->SetAimDirection ( sync.data.fArm );
@@ -282,24 +326,15 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
     return false;
 }
 
-/*
-template < class T >
-bool CompareAndSet ( const T& current, T& previous )
-{
-    bool bChanged = current != previous;
-    previous = current;
-    return bChanged;
-}
-*/
-
-bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
+bool CPlayerDeltasyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     if ( m_pSourceElement )
     {
         CPlayer * pSourcePlayer = static_cast < CPlayer * > ( m_pSourceElement );
-        SPlayerDeltaSyncData& delta = pSourcePlayer->GetSentDeltaSyncData ();
+        const SPlayerDeltaSyncData& delta = m_delta;
+        SPlayerDeltaSyncData& newDelta = pSourcePlayer->GetSentDeltaSyncData ();
 
-        delta.vehicle.lastWasVehicleSync = false;
+        newDelta.vehicle.lastWasVehicleSync = false;
 
         ElementID PlayerID = pSourcePlayer->GetID ();
         unsigned short usLatency = pSourcePlayer->GetPing ();
@@ -333,29 +368,61 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
         // Write the time context
         BitStream.Write ( pSourcePlayer->GetSyncTimeContext () );
-        delta.lastSyncTimeContext = pSourcePlayer->GetSyncTimeContext ();
+        newDelta.lastSyncTimeContext = pSourcePlayer->GetSyncTimeContext ();
 
-        BitStream.WriteCompressed ( usLatency );
-        delta.lastLatency = usLatency;
-
-        WriteFullKeysync ( ControllerState, BitStream );
-        delta.lastControllerState = ControllerState;
-
-        BitStream.Write ( &flags );
-        delta.lastFlags = flags;
-
-        if ( pContactElement )
+        if ( usLatency != delta.lastLatency )
         {
-            BitStream.Write ( pContactElement->GetID () );
-            delta.lastContact = pContactElement->GetID ();
+            BitStream.WriteBit ( true );
+            BitStream.WriteCompressed ( usLatency );
         }
         else
-            delta.lastContact = INVALID_ELEMENT_ID;
+            BitStream.WriteBit ( false );
+        newDelta.lastLatency = usLatency;
 
-        SPositionSync position ( false );
+        if ( ControllerState != delta.lastControllerState )
+        {
+            BitStream.WriteBit ( true );
+            WriteFullKeysync ( ControllerState, BitStream );
+        }
+        else
+            BitStream.WriteBit ( false );
+        newDelta.lastControllerState = ControllerState;
+
+        if ( flags != delta.lastFlags )
+        {
+            BitStream.WriteBit ( true );
+            BitStream.Write ( &flags );
+        }
+        else
+            BitStream.WriteBit ( false );
+        newDelta.lastFlags = flags;
+
+        if ( flags.data.bHasContact )
+        {
+            if ( delta.lastContact != pContactElement->GetID() )
+            {
+                BitStream.WriteBit ( true );
+                BitStream.Write ( pContactElement->GetID () );
+                newDelta.lastContact = pContactElement->GetID ();
+            }
+            else
+                BitStream.WriteBit ( false );
+        }
+        else
+        {
+            if ( delta.lastContact != INVALID_ELEMENT_ID )
+            {
+                BitStream.WriteBit ( true );
+                newDelta.lastContact = INVALID_ELEMENT_ID;
+            }
+            else
+                BitStream.WriteBit ( false );
+        }
+
+        SDeltaPositionSync position ( delta.lastPosition );
         position.data.vecPosition = vecPosition;
         BitStream.Write ( &position );
-        delta.lastPosition = vecPosition;
+        newDelta.lastPosition = vecPosition;
 
         SPedRotationSync rotation;
         rotation.data.fRotation = pSourcePlayer->GetRotation ();
@@ -369,34 +436,58 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         }
 
         // Player health and armor
-        SPlayerHealthSync health;
-        health.data.fValue = pSourcePlayer->GetHealth ();
-        BitStream.Write ( &health );
-        delta.lastHealth = pSourcePlayer->GetHealth ();
+        if ( fabs ( delta.lastHealth - pSourcePlayer->GetHealth() ) > 0.01 ||
+             fabs ( delta.lastArmor - pSourcePlayer->GetArmor() ) > 0.01 )
+        {
+            BitStream.WriteBit ( true );
 
-        SPlayerArmorSync armor;
-        armor.data.fValue = pSourcePlayer->GetArmor ();
-        BitStream.Write ( &armor );
-        delta.lastArmor = pSourcePlayer->GetArmor ();
+            SPlayerHealthSync health;
+            health.data.fValue = pSourcePlayer->GetHealth ();
+            BitStream.Write ( &health );
+            newDelta.lastHealth = pSourcePlayer->GetHealth ();
+
+            SPlayerArmorSync armor;
+            armor.data.fValue = pSourcePlayer->GetArmor ();
+            BitStream.Write ( &armor );
+            newDelta.lastArmor = pSourcePlayer->GetArmor ();
+        }
+        else
+            BitStream.WriteBit ( false );
 
         BitStream.Write ( fCameraRotation );
 
         if ( flags.data.bHasAWeapon )
         {
             unsigned int uiSlot = ucWeaponSlot;
-            SWeaponSlotSync slot;
-            slot.data.uiSlot = uiSlot;
-            BitStream.Write ( &slot );
-            delta.weapon.lastSlot = ucWeaponSlot;
+            if ( uiSlot != delta.weapon.lastSlot )
+            {
+                BitStream.WriteBit ( true );
+
+                SWeaponSlotSync slot;
+                slot.data.uiSlot = uiSlot;
+                BitStream.Write ( &slot );
+
+                newDelta.weapon.lastSlot = ucWeaponSlot;
+            }
+            else
+                BitStream.WriteBit ( false );
 
             if ( CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
             {
                 unsigned short usWeaponAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip ();
 
-                SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
-                ammo.data.usAmmoInClip = usWeaponAmmoInClip;
-                BitStream.Write ( &ammo );
-                delta.weapon.lastAmmoInClip = usWeaponAmmoInClip;
+                if ( delta.weapon.lastAmmoInClip != usWeaponAmmoInClip )
+                {
+                    BitStream.WriteBit ( true );
+
+                    SWeaponAmmoSync ammo ( pSourcePlayer->GetWeaponType (), false, true );
+                    ammo.data.usAmmoInClip = usWeaponAmmoInClip;
+                    BitStream.Write ( &ammo );
+
+                    newDelta.weapon.lastAmmoInClip = usWeaponAmmoInClip;
+                }
+                else
+                    BitStream.WriteBit ( false );
 
                 SWeaponAimSync aim ( 0.0f, ( ControllerState.RightShoulder1 || ControllerState.ButtonCircle ) );
                 aim.data.fArm = pSourcePlayer->GetAimDirection ();
@@ -416,4 +507,13 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     }
 
     return false;
+}
+
+void CPlayerDeltasyncPacket::PrepareToSendDeltaSync ()
+{
+    if ( m_pSourceElement )
+    {
+        CPlayer * pSourcePlayer = static_cast < CPlayer * > ( m_pSourceElement );
+        m_delta = pSourcePlayer->GetSentDeltaSyncData ();
+    }
 }

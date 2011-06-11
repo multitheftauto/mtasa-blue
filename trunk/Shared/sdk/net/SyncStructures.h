@@ -350,6 +350,98 @@ struct SLowPrecisionPositionSync : public ISyncStructure
     } data;
 };
 
+struct SDeltaPositionSync : public ISyncStructure
+{
+    SDeltaPositionSync ( const CVector& lastPosition )
+    : m_vecLastPosition ( lastPosition )
+    {
+    }
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        bool bAvoidDelta;
+        if ( !bitStream.ReadBit ( bAvoidDelta ) )
+            return false;
+
+        if ( bAvoidDelta )
+        {
+            SPositionSync pos ( false );
+            if ( !bitStream.Read ( &pos ) )
+                return false;
+            data.vecPosition = pos.data.vecPosition;
+        }
+        else
+        {
+            // Read the values as sign-magnitude.
+            CVector vecDiff;
+            bool bNegativeX, bNegativeY, bNegativeZ;
+
+            SFloatAsBitsSync<7> deltaX ( 0.0f, 15.0f * TICK_RATE / 1000, false );
+            SFloatAsBitsSync<7> deltaY ( 0.0f, 15.0f * TICK_RATE / 1000, false );
+            SFloatAsBitsSync<6> deltaZ ( 0.0f, 5.0f * TICK_RATE / 1000, false );
+
+            if ( !bitStream.ReadBit ( bNegativeX ) || !bitStream.Read ( &deltaX ) ||
+                 !bitStream.ReadBit ( bNegativeY ) || !bitStream.Read ( &deltaY ) ||
+                 !bitStream.ReadBit ( bNegativeZ ) || !bitStream.Read ( &deltaZ ) )
+                return false;
+            vecDiff.fX = deltaX.data.fValue;
+            if ( bNegativeX )
+                vecDiff.fX *= -1.0f;
+            vecDiff.fY = deltaY.data.fValue;
+            if ( bNegativeY )
+                vecDiff.fY *= -1.0f;
+            vecDiff.fZ = deltaZ.data.fValue;
+            if ( bNegativeZ )
+                vecDiff.fZ *= -1.0f;
+            data.vecPosition = m_vecLastPosition + vecDiff;
+        }
+
+        return true;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        CVector vecDiff = data.vecPosition - m_vecLastPosition;
+        if ( fabs(vecDiff.fX) >= 15.0f * TICK_RATE / 1000 ||
+             fabs(vecDiff.fY) >= 15.0f * TICK_RATE / 1000 ||
+             fabs(vecDiff.fZ) >= 5.0f * TICK_RATE / 1000 )
+        {
+            bitStream.WriteBit ( true );
+            SPositionSync pos ( false );
+            pos.data.vecPosition = data.vecPosition;
+            bitStream.Write ( &pos );
+        }
+        else
+        {
+            // Write the values as sign-magnitude as we are syncing delta values,
+            // and it's expected that zero will be a common value, so it's desirable
+            // to have an exact representation for it.
+            bitStream.WriteBit ( false );
+            SFloatAsBitsSync<7> deltaX ( 0.0f, 15.0f * TICK_RATE / 1000, false );
+            SFloatAsBitsSync<7> deltaY ( 0.0f, 15.0f * TICK_RATE / 1000, false );
+            SFloatAsBitsSync<6> deltaZ ( 0.0f, 5.0f * TICK_RATE / 1000, false );
+            deltaX.data.fValue = fabs(vecDiff.fX);
+            deltaY.data.fValue = fabs(vecDiff.fY);
+            deltaZ.data.fValue = fabs(vecDiff.fZ);
+            bitStream.WriteBit ( vecDiff.fX < 0.0f );
+            bitStream.Write ( &deltaX );
+            bitStream.WriteBit ( vecDiff.fY < 0.0f );
+            bitStream.Write ( &deltaY );
+            bitStream.WriteBit ( vecDiff.fZ < 0.0f );
+            bitStream.Write ( &deltaZ );
+        }
+    }
+
+    struct
+    {
+        CVector vecPosition;
+    } data;
+
+private:
+    CVector m_vecLastPosition;
+};
+
+
 //////////////////////////////////////////
 //                                      //
 //        Rotation Degrees and radians  //
@@ -544,6 +636,26 @@ struct SPlayerPuresyncFlags : public ISyncStructure
     void Write ( NetBitStreamInterface& bitStream ) const
     {
         bitStream.WriteBits ( (const char* )&data, BITCOUNT );
+    }
+
+    bool operator== ( const SPlayerPuresyncFlags& Right ) const
+    {
+        return data.bIsInWater == Right.data.bIsInWater &&
+               data.bIsOnGround == Right.data.bIsOnGround &&
+               data.bHasJetPack == Right.data.bHasJetPack &&
+               data.bIsDucked == Right.data.bIsDucked &&
+               data.bWearsGoogles == Right.data.bWearsGoogles &&
+               data.bHasContact == Right.data.bHasContact &&
+               data.bIsChoking == Right.data.bIsChoking &&
+               data.bAkimboTargetUp == Right.data.bAkimboTargetUp &&
+               data.bIsOnFire == Right.data.bIsOnFire &&
+               data.bHasAWeapon == Right.data.bHasAWeapon &&
+               data.bSyncingVelocity == Right.data.bSyncingVelocity &&
+               data.bStealthAiming == Right.data.bStealthAiming;
+    }
+    bool operator!= ( const SPlayerPuresyncFlags& Right ) const
+    {
+        return !operator==(Right);
     }
 
     struct

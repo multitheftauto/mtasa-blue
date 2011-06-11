@@ -984,6 +984,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerDeltasyncPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerDiagnosticPacket.cpp"
 						>
 					</File>
@@ -1069,6 +1073,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CVehicleDamageSyncPacket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CVehicleDeltasyncPacket.cpp"
 						>
 					</File>
 					<File
@@ -1942,6 +1950,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\Shared\sdk\net\DeltaSync.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\Element.h"
 					>
 				</File>
@@ -2085,6 +2097,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerDeltasyncPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerDiagnosticPacket.h"
 						>
 					</File>
@@ -2174,6 +2190,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CVehicleDamageSyncPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CVehicleDeltasyncPacket.h"
 						>
 					</File>
 					<File

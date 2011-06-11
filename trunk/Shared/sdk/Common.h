@@ -83,5 +83,9 @@ private:
 #define _DECLSPEC_EX extern "C" 
 #endif
 
-// Maximum number of players that can be packed in a single lightweight puresync packet
-#define LIGHTSYNC_MAX_PLAYERS               32
+
+// SYNC SETTINGS
+#define TICK_RATE               100
+#define CAM_SYNC_RATE           500
+#define FULL_PACKET_RATE        500 // Time between full puresync packets (avoiding delta sync)
+#define LIGHTSYNC_MAX_PLAYERS   32  // Maximum number of players that can be packed in a single lightweight puresync packet
