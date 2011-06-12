@@ -611,12 +611,13 @@ bool CKeyBinds::AddCommand ( const SBindableKey* pKey, const char* szCommand, co
 }
 
 
-bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool bCheckState, bool bState, const char* szResource )
+bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool bCheckState, bool bState )
 {
     if ( szKey == NULL || szCommand == NULL ) return false;
 
+    bool bFound = false;
     list < CKeyBind* > ::iterator iter = m_pList->begin ();
-    for ( ; iter != m_pList->end (); iter++ )
+    for ( ; iter != m_pList->end (); )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == KEY_BIND_COMMAND )
         {
@@ -627,15 +628,9 @@ bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool b
                 {
                     if ( !bCheckState || pBind->bHitState == bState )
                     {
-#if 1   // crash fix
-                        // szResource is always NULL here
-                        assert ( szResource == NULL );
-
-                        Remove ( *iter );
-                        return true;
-#else
                         if ( !pBind->szResource )
                         {
+                            bFound = true;
                             if ( m_bProcessingKeyStroke )
                             {
                                 pBind->beingDeleted = true;
@@ -643,22 +638,18 @@ bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool b
                             else
                             {
                                 delete pBind;
-                                m_pList->erase ( iter );
+                                iter = m_pList->erase ( iter );
+                                continue;
                             }
-                            return true;
                         }
-                        else if ( strcmp ( szResource, pBind->szResource ) == 0 )
-                        {
-                            pBind->bActive = false;
-                        }
-#endif
                     }
                 }
             }
         }
+        iter++;
     }
 
-    return false;
+    return bFound;
 }
 
 
@@ -2643,16 +2634,18 @@ void CKeyBinds::BindCommand ( const char* szCmdLine )
                 if ( szCommand )
                 {
                     char* szArguments = strtok ( NULL, "\0" );
+                    SString strKeyState ( "%s", bState? "down" : "up" );
+                    SString strCommandAndArguments ( "%s%s%s", szCommand, szArguments ? " " : "", szArguments ? szArguments : "" );
 
-                    if ( !CommandExists ( szKey, szCommand, true, bState ) )
+                    if ( !CommandExists ( szKey, szCommand, true, bState, szArguments ) )
                     {
                         if ( AddCommand ( szKey, szCommand, szArguments, bState ) )
-                            pConsole->Printf ( "* Bound key '%s' '%s' to command '%s'", szKey, ( bState ) ? "down" : "up", szCommand );
+                            pConsole->Printf ( "* Bound key '%s' '%s' to command '%s'", szKey, *strKeyState, *strCommandAndArguments );
                         else
-                            pConsole->Printf ( "* Failed to bind '%s' to command '%s'", szKey, szCommand );
+                            pConsole->Printf ( "* Failed to bind '%s' '%s' to command '%s'", szKey, *strKeyState, *strCommandAndArguments );
                     }
                     else
-                        pConsole->Printf ( "* '%s' key already bound to command '%s'", szKey, szCommand );
+                        pConsole->Printf ( "* '%s' '%s' key already bound to command '%s'", szKey, *strKeyState, *strCommandAndArguments );
                 }
                 else
                     pConsole->Print ( szError );
