@@ -58,7 +58,7 @@ public:
     // Command-bind funcs
     bool                    AddCommand                  ( const char* szKey, const char* szCommand, const char* szArguments = NULL, bool bState = true, const char* szResource = NULL, bool bAltKey = false );
     bool                    AddCommand                  ( const SBindableKey* pKey, const char* szCommand, const char* szArguments = NULL, bool bState = true );
-    bool                    RemoveCommand               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szResource = NULL );
+    bool                    RemoveCommand               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true );
     bool                    RemoveAllCommands           ( const char* szKey, bool bCheckState = false, bool bState = true );
     bool                    RemoveAllCommands           ( void );
     bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL, const char* szResource = NULL );
