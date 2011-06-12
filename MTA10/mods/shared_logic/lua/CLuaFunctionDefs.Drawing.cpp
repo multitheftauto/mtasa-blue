@@ -534,9 +534,9 @@ int CLuaFunctionDefs::CreateShader ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::ShaderSetValue ( lua_State* luaVM )
+int CLuaFunctionDefs::SetShaderValue ( lua_State* luaVM )
 {
-//  bool shaderSetValue( element shader, string name, mixed value )
+//  bool setShaderValue( element shader, string name, mixed value )
     CClientShader* pShader; SString strName;
 
     CScriptArgReader argStream ( luaVM );
@@ -598,10 +598,10 @@ int CLuaFunctionDefs::ShaderSetValue ( lua_State* luaVM )
                 // TODO
             }
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "shaderSetValue", "Expected number, bool, table or texture at argument 3" ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setShaderValue", "Expected number, bool, table or texture at argument 3" ) );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "shaderSetValue", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setShaderValue", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );
