@@ -384,57 +384,9 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::CreateFont ( lua_State* luaVM )
+int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
 {
-//  element createFont( string filepath [, int size=9, bool bold=false ] )
-    SString strFilePath; int iSize; bool bBold;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strFilePath );
-    argStream.ReadNumber ( iSize, 9 );
-    argStream.ReadBool ( bBold, false );
-
-    if ( !argStream.HasErrors () )
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
-        {
-            CResource* pParentResource = pLuaMain->GetResource ();
-            CResource* pFileResource = pParentResource;
-            SString strPath, strMetaPath;
-            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
-            {
-                if ( FileExists ( strPath ) )
-                {
-                    SString strUniqueName = SString ( "%s*%s*%s", pParentResource->GetName (), pFileResource->GetName (), strMetaPath.c_str () ).Replace ( "\\", "/" );
-                    CClientFont* pFont = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateFont ( strPath, strUniqueName, iSize, bBold );
-                    if ( pFont )
-                    {
-                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                        pFont->SetParent ( pParentResource->GetResourceDynamicEntity () );
-                    }
-                    lua_pushelement ( luaVM, pFont );
-                    return 1;
-                }
-                else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "createFont", "file-path", 1 );
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "createFont", "file-path", 1 );
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createFont", *argStream.GetErrorMessage () ) );
-
-    // error: bad arguments
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaFunctionDefs::CreateTexture ( lua_State* luaVM )
-{
-//  element createTexture( string filepath )
+//  element dxCreateTexture( string filepath )
     SString strFilePath;
 
     CScriptArgReader argStream ( luaVM );
@@ -462,14 +414,14 @@ int CLuaFunctionDefs::CreateTexture ( lua_State* luaVM )
                     return 1;
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "createTexture", "file-path", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateTexture", "file-path", 1 );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "createTexture", "file-path", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateTexture", "file-path", 1 );
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createTexture", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateTexture", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );
@@ -477,9 +429,9 @@ int CLuaFunctionDefs::CreateTexture ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::CreateShader ( lua_State* luaVM )
+int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
 {
-//  element createShader( string filepath )
+//  element dxCreateShader( string filepath )
     SString strFilePath;
 
     CScriptArgReader argStream ( luaVM );
@@ -515,18 +467,18 @@ int CLuaFunctionDefs::CreateShader ( lua_State* luaVM )
                         SString strRight;
                         if ( strStatus.Split ( strFilename, NULL, &strRight ) )
                             strStatus = ConformResourcePath ( strPath, true ) + strRight;
-                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Problem @ '%s' [%s]", "createShader", *strStatus ) );
+                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Problem @ '%s' [%s]", "dxCreateShader", *strStatus ) );
                     }
                 }
                 else
-                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Missing file @ '%s' [%s]", "createShader", *ConformResourcePath ( strPath, true ) ) );
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Missing file @ '%s' [%s]", "dxCreateShader", *ConformResourcePath ( strPath, true ) ) );
             }
             else
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad file-path @ '%s' [%s]", "createShader", *strFilePath ) );
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad file-path @ '%s' [%s]", "dxCreateShader", *strFilePath ) );
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createShader", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateShader", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );
@@ -534,9 +486,9 @@ int CLuaFunctionDefs::CreateShader ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::SetShaderValue ( lua_State* luaVM )
+int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
 {
-//  bool setShaderValue( element shader, string name, mixed value )
+//  bool dxSetShaderValue( element shader, string name, mixed value )
     CClientShader* pShader; SString strName;
 
     CScriptArgReader argStream ( luaVM );
@@ -598,10 +550,58 @@ int CLuaFunctionDefs::SetShaderValue ( lua_State* luaVM )
                 // TODO
             }
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setShaderValue", "Expected number, bool, table or texture at argument 3" ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetShaderValue", "Expected number, bool, table or texture at argument 3" ) );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setShaderValue", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetShaderValue", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::CreateFont ( lua_State* luaVM )
+{
+//  element createFont( string filepath [, int size=9, bool bold=false ] )
+    SString strFilePath; int iSize; bool bBold;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strFilePath );
+    argStream.ReadNumber ( iSize, 9 );
+    argStream.ReadBool ( bBold, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pParentResource = pLuaMain->GetResource ();
+            CResource* pFileResource = pParentResource;
+            SString strPath, strMetaPath;
+            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
+            {
+                if ( FileExists ( strPath ) )
+                {
+                    SString strUniqueName = SString ( "%s*%s*%s", pParentResource->GetName (), pFileResource->GetName (), strMetaPath.c_str () ).Replace ( "\\", "/" );
+                    CClientFont* pFont = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateFont ( strPath, strUniqueName, iSize, bBold );
+                    if ( pFont )
+                    {
+                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                        pFont->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                    }
+                    lua_pushelement ( luaVM, pFont );
+                    return 1;
+                }
+                else
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "createFont", "file-path", 1 );
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "createFont", "file-path", 1 );
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createFont", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );
