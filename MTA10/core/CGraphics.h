@@ -128,6 +128,9 @@ public:
                                                   ID3DXFont * pDXFont = NULL,
                                                   bool bPostGUI = false );
 
+    void                EnableSetRenderTarget   ( bool bEnable );
+    void                OnChangingRenderTarget  ( uint uiNewViewportSizeX, uint uiNewViewportSizeY );
+
     // Subsystems
     CRenderItemManagerInterface* GetRenderItemManager   ( void )        { return m_pRenderItemManager; }
 

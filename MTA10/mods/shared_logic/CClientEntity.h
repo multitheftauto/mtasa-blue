@@ -128,6 +128,8 @@ enum eCClientEntityClassTypes
     CLASS_CClientMaterial,
     CLASS_CClientTexture,
     CLASS_CClientShader,
+    CLASS_CClientRenderTarget,
+    CLASS_CClientScreenSource,
 };
 
 

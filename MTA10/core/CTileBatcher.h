@@ -51,6 +51,7 @@ public:
                                       unsigned long ulColor );
 
         void    SetCurrentMaterial ( SMaterialItem* pMaterial );
+        void    OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewViewportSizeY );
 
 protected:
     IDirect3DDevice9*           m_pDevice;

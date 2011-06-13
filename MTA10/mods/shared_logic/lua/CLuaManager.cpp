@@ -591,7 +591,12 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxGetFontHeight", CLuaFunctionDefs::dxGetFontHeight );
     CLuaCFunctions::AddFunction ( "dxCreateTexture", CLuaFunctionDefs::dxCreateTexture );
     CLuaCFunctions::AddFunction ( "dxCreateShader", CLuaFunctionDefs::dxCreateShader );
+    CLuaCFunctions::AddFunction ( "dxCreateRenderTarget", CLuaFunctionDefs::dxCreateRenderTarget );
+    CLuaCFunctions::AddFunction ( "dxCreateScreenSource", CLuaFunctionDefs::dxCreateScreenSource );
+    CLuaCFunctions::AddFunction ( "dxGetMaterialSize", CLuaFunctionDefs::dxGetMaterialSize );
     CLuaCFunctions::AddFunction ( "dxSetShaderValue", CLuaFunctionDefs::dxSetShaderValue );
+    CLuaCFunctions::AddFunction ( "dxSetRenderTarget", CLuaFunctionDefs::dxSetRenderTarget );
+    CLuaCFunctions::AddFunction ( "dxUpdateScreenSource", CLuaFunctionDefs::dxUpdateScreenSource );
 
     CLuaCFunctions::AddFunction ( "createFont", CLuaFunctionDefs::CreateFont );
 

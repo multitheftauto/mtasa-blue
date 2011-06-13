@@ -97,12 +97,14 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // before present, but that caused graphical issues randomly with the sky.
     pDevice->BeginScene ();
 
-    // Notify core
-    CCore::GetSingleton ().DoPostFramePulse ();
-
     // Create a state block.
     IDirect3DStateBlock9 * pDeviceState = NULL;
     pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
+
+    CGraphics::GetSingleton ().GetRenderItemManager ()->UpdateBackBufferCopy ();
+
+    // Notify core
+    CCore::GetSingleton ().DoPostFramePulse ();
 
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();

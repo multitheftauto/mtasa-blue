@@ -264,6 +264,8 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
     pResult->AddColumn ( "Fonts" );
     pResult->AddColumn ( "Textures" );
     pResult->AddColumn ( "Shaders" );
+    pResult->AddColumn ( "RenderTargets" );
+    pResult->AddColumn ( "ScreenSources" );
 
     // Calc totals
     if ( strFilter == "" )
@@ -301,11 +303,15 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
         int FontCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetFontCount ();
         int TextureCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetTextureCount ();
         int ShaderCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetShaderCount ();
+        int RenderTargetCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetRenderTargetCount ();
+        int ScreenSourceCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetScreenSourceCount ();
         TextItemCount = Max ( TextItemCount - 4, 0 );   // Remove count for radar items
         row[c++] = !TextItemCount ? "-" : SString ( "%d", TextItemCount );
         row[c++] = !FontCount ? "-" : SString ( "%d", FontCount );
         row[c++] = !TextureCount ? "-" : SString ( "%d", TextureCount );
         row[c++] = !ShaderCount ? "-" : SString ( "%d", ShaderCount );
+        row[c++] = !RenderTargetCount ? "-" : SString ( "%d", RenderTargetCount );
+        row[c++] = !ScreenSourceCount ? "-" : SString ( "%d", ScreenSourceCount );
     }
 
     // For each VM

@@ -21,6 +21,13 @@
 ////////////////////////////////////////////////////////////////
 CRenderItemManager::CRenderItemManager ( void )
 {
+    m_pDevice = NULL;
+    m_pDefaultD3DRenderTarget = NULL;
+    m_pDefaultD3DZStencilSurface = NULL;
+    m_uiDefaultViewportSizeX = 0;
+    m_uiDefaultViewportSizeY = 0;
+    m_pBackBufferCopy = NULL;
+    m_bBackBufferCopyMaybeChanged = false;
 }
 
 
@@ -43,9 +50,11 @@ CRenderItemManager::~CRenderItemManager ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice )
+void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY )
 {
     m_pDevice = pDevice;
+    m_uiDefaultViewportSizeX = fViewportSizeX;
+    m_uiDefaultViewportSizeY = fViewportSizeY;
 }
 
 
@@ -78,15 +87,147 @@ STextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath
     pTextureItem->pManager = this;
     pTextureItem->iRefCount = 1;
     pTextureItem->pD3DTexture = pD3DTexture;
-    pTextureItem->uiFileWidth = imageInfo.Width;
-    pTextureItem->uiFileHeight = imageInfo.Height;
-    pTextureItem->uiSurfaceWidth = surfaceDesc.Width;
-    pTextureItem->uiSurfaceHeight = surfaceDesc.Height;
+    pTextureItem->uiSizeX = imageInfo.Width;
+    pTextureItem->uiSizeY = imageInfo.Height;
 
     // Update list of created items
     MapInsert ( m_CreatedItemList, pTextureItem );
 
     return pTextureItem;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CreateRenderTarget
+//
+//
+//
+////////////////////////////////////////////////////////////////
+SRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY )
+{
+    IDirect3DTexture9* pD3DRenderTargetTexture = NULL;
+    for ( uint i = 0 ; i < 4 ; i++ )
+    {
+        // 1st try -  i == 0  - 32 bit target
+        // 2nd try -  i == 1  - 16 bit target
+        //            i == 1  - EvictManagedResources
+        // 3rd try -  i == 2  - 32 bit target
+        // 4th try -  i == 3  - 16 bit target
+	    D3DFORMAT Format = i & 1 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
+        if( SUCCEEDED( m_pDevice->CreateTexture( uiSizeX, uiSizeY, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &pD3DRenderTargetTexture, NULL ) ) )
+            break;
+
+        // c'mon
+        if ( i == 1 )
+            m_pDevice->EvictManagedResources ();
+    }
+
+    // Check texture created
+    if ( !pD3DRenderTargetTexture )
+        return NULL;
+
+
+    IDirect3DSurface9* pD3DZStencilSurface = NULL;
+    for ( uint i = 0 ; i < 4 ; i++ )
+    {
+        // 1st try -  i == 0  - 32 bit target
+        // 2nd try -  i == 1  - 16 bit target
+        //            i == 1  - EvictManagedResources
+        // 3rd try -  i == 2  - 32 bit target
+        // 4th try -  i == 3  - 16 bit target
+	    D3DFORMAT Format = i & 1 ? D3DFMT_D16 : D3DFMT_D24X8;
+        if( SUCCEEDED( m_pDevice->CreateDepthStencilSurface( uiSizeX, uiSizeY, Format, D3DMULTISAMPLE_NONE, 0, TRUE, &pD3DZStencilSurface, NULL ) ) )
+            break;
+
+        // c'mon c'mon
+        if ( i == 1 )
+            m_pDevice->EvictManagedResources ();
+    }
+
+    // Check depth buffer created created
+    if ( !pD3DZStencilSurface )
+    {
+        pD3DRenderTargetTexture->Release ();
+        return NULL;
+    }
+
+    // Get the render target surface here for convenience
+    IDirect3DSurface9* pD3DRenderTargetSurface;
+    pD3DRenderTargetTexture->GetSurfaceLevel ( 0, &pD3DRenderTargetSurface );
+
+    // Clear incase it gets used before first copy
+    m_pDevice->ColorFill( pD3DRenderTargetSurface, NULL, 0x00000000 );
+
+    // Create the item
+    SRenderTargetItem* pRenderTargetItem = new SRenderTargetItem ();
+    pRenderTargetItem->pManager = this;
+    pRenderTargetItem->iRefCount = 1;
+    pRenderTargetItem->pD3DTexture = pD3DRenderTargetTexture;
+    pRenderTargetItem->pD3DRenderTargetSurface = pD3DRenderTargetSurface;
+    pRenderTargetItem->pD3DZStencilSurface = pD3DZStencilSurface;
+    pRenderTargetItem->uiSizeX = uiSizeX;
+    pRenderTargetItem->uiSizeY = uiSizeY;
+
+    // Update list of created items
+    MapInsert ( m_CreatedItemList, pRenderTargetItem );
+
+    return pRenderTargetItem;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CreateScreenSource
+//
+//
+//
+////////////////////////////////////////////////////////////////
+SScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint uiSizeY )
+{
+    IDirect3DTexture9* pD3DRenderTargetTexture = NULL;
+    for ( uint i = 0 ; i < 4 ; i++ )
+    {
+        // 1st try -  i == 0  - 32 bit target
+        // 2nd try -  i == 1  - 16 bit target
+        //            i == 1  - EvictManagedResources
+        // 3rd try -  i == 2  - 32 bit target
+        // 4th try -  i == 3  - 16 bit target
+	    D3DFORMAT Format = i & 1 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
+        if( SUCCEEDED( m_pDevice->CreateTexture( uiSizeX, uiSizeY, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &pD3DRenderTargetTexture, NULL ) ) )
+            break;
+
+        // c'mon
+        if ( i == 1 )
+            m_pDevice->EvictManagedResources ();
+    }
+
+    // Check texture created
+    if ( !pD3DRenderTargetTexture )
+        return NULL;
+
+    // Get the render target surface here for convenience
+    IDirect3DSurface9* pD3DRenderTargetSurface;
+    pD3DRenderTargetTexture->GetSurfaceLevel ( 0, &pD3DRenderTargetSurface );
+
+    // Clear incase it gets used before first copy
+    m_pDevice->ColorFill( pD3DRenderTargetSurface, NULL, 0x00000000 );
+
+    // Create the item
+    SScreenSourceItem* pScreenSourceItem = new SScreenSourceItem ();
+    pScreenSourceItem->pManager = this;
+    pScreenSourceItem->iRefCount = 1;
+    pScreenSourceItem->pD3DTexture = pD3DRenderTargetTexture;
+    pScreenSourceItem->pD3DRenderTargetSurface = pD3DRenderTargetSurface;
+    pScreenSourceItem->uiSizeX = uiSizeX;
+    pScreenSourceItem->uiSizeY = uiSizeY;
+
+    // Update list of created items
+    MapInsert ( m_CreatedItemList, pScreenSourceItem );
+
+    m_bBackBufferCopyMaybeChanged = true;
+
+    return pScreenSourceItem;
 }
 
 
@@ -142,7 +283,10 @@ SShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
     SShaderItem* pShaderItem = new SShaderItem ();
     pShaderItem->pManager = this;
     pShaderItem->iRefCount = 1;
+    pShaderItem->uiSizeX = 256;
+    pShaderItem->uiSizeY = 256;
     pShaderItem->pD3DEffect = pD3DEffect;
+    pShaderItem->hFirstTexture = NULL;
 
     // Add parameter handles
     D3DXEFFECT_DESC EffectDesc;
@@ -154,6 +298,9 @@ SShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
             break;
         D3DXPARAMETER_DESC Desc;
         pD3DEffect->GetParameterDesc( hParameter, &Desc );
+        // Save handle to the first texture, as we'll be using it to work out the shader dimensions
+        if ( Desc.Type == D3DXPT_TEXTURE && !pShaderItem->hFirstTexture )
+            pShaderItem->hFirstTexture = hParameter;    
         // Use semantic if it exists
         SString strName = Desc.Semantic ? Desc.Semantic : Desc.Name;
         // Add to lookup map
@@ -194,8 +341,16 @@ SShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
 bool CRenderItemManager::SetShaderValue ( SShaderItem* pShaderItem, const SString& strName, STextureItem* pTextureItem )
 {
     if ( D3DXHANDLE* phParameter = MapFind ( pShaderItem->parameterMap, strName.ToLower () ) )
+    {
+        if ( *phParameter == pShaderItem->hFirstTexture )
+        {
+            // Mirror size of first texture declared in effect file
+            pShaderItem->uiSizeX = pTextureItem->uiSizeX;
+            pShaderItem->uiSizeY = pTextureItem->uiSizeY;
+        }
         if ( SUCCEEDED( pShaderItem->pD3DEffect->SetTexture( *phParameter, pTextureItem->pD3DTexture ) ) )
             return true;
+    }
     return false;
 }
 
@@ -296,73 +451,281 @@ void CRenderItemManager::ReleaseRenderItem ( SRenderItem* pItem )
     if ( --pItem->iRefCount > 0 )
         return;
 
-    // Which type to delete?
-    if ( STextureItem* pTextureItem = DynamicCast < STextureItem > ( pItem ) )
-        DestroyTexture ( pTextureItem );
+    // Release underlying data
+    if ( SRenderTargetItem* pRenderTargetItem = DynamicCast < SRenderTargetItem > ( pItem ) )
+        ReleaseRenderTargetData ( pRenderTargetItem );
+    else
+    if ( SScreenSourceItem* pScreenSourceItem = DynamicCast < SScreenSourceItem > ( pItem ) )
+        ReleaseScreenSourceData ( pScreenSourceItem );
     else
     if ( SShaderItem* pShaderItem = DynamicCast < SShaderItem > ( pItem ) )
-        DestroyShader ( pShaderItem );
+        ReleaseShaderData ( pShaderItem );
     else
     if ( SFontItem* pFontItem = DynamicCast < SFontItem > ( pItem ) )
-        DestroyFont ( pFontItem );
+        ReleaseFontData ( pFontItem );
+    else
+    if ( STextureItem* pTextureItem = DynamicCast < STextureItem > ( pItem ) )
+        ReleaseTextureData ( pTextureItem );
+
+    // Remove item from manager list
+    assert ( MapContains ( m_CreatedItemList, pItem ) );
+    MapRemove ( m_CreatedItemList, pItem );
+
+    // Finally delete the render item
+    delete pItem;
 }
 
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderItemManager::DestroyTexture
+// CRenderItemManager::ReleaseTextureData
 //
-//
+// Release underlying texture data
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::DestroyTexture ( STextureItem* pTextureItem )
+void CRenderItemManager::ReleaseTextureData ( STextureItem* pTextureItem )
 {
     // Release D3D resource
     SAFE_RELEASE ( pTextureItem->pD3DTexture );
-
-    // Remove item from manager list
-    assert ( MapContains ( m_CreatedItemList, pTextureItem ) );
-    MapRemove ( m_CreatedItemList, pTextureItem );
-    delete pTextureItem;
 }
 
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderItemManager::DestroyShader
+// CRenderItemManager::ReleaseRenderTargetData
 //
-//
+// Release underlying render target data
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::DestroyShader ( SShaderItem* pShaderItem )
+void CRenderItemManager::ReleaseRenderTargetData ( SRenderTargetItem* pRenderTargetItem )
+{
+    // If this is the current render target, restore default
+    // Release D3D resources
+    SAFE_RELEASE ( pRenderTargetItem->pD3DRenderTargetSurface );
+    SAFE_RELEASE ( pRenderTargetItem->pD3DZStencilSurface );
+    SAFE_RELEASE ( pRenderTargetItem->pD3DTexture );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::ReleaseScreenSourceData
+//
+// Release underlying data
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::ReleaseScreenSourceData ( SScreenSourceItem* pScreenSourceItem )
+{
+    // Flag to re-assess back buffer copy settings
+    m_bBackBufferCopyMaybeChanged = true;
+
+    // Release D3D resources
+    SAFE_RELEASE ( pScreenSourceItem->pD3DRenderTargetSurface );
+    SAFE_RELEASE ( pScreenSourceItem->pD3DTexture );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::ReleaseShaderData
+//
+// Release underlying shader data
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::ReleaseShaderData ( SShaderItem* pShaderItem )
 {
     // Release D3D resource
     SAFE_RELEASE ( pShaderItem->pD3DEffect );
-
-    // Remove item from manager list
-    assert ( MapContains ( m_CreatedItemList, pShaderItem ) );
-    MapRemove ( m_CreatedItemList, pShaderItem );
-    delete pShaderItem;
 }
 
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderItemManager::DestroyFont
+// CRenderItemManager::ReleaseFontData
 //
-//
+// Release underlying font data
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::DestroyFont ( SFontItem* pFontItem )
+void CRenderItemManager::ReleaseFontData ( SFontItem* pFontItem )
 {
-    // Destroy the CEGUI font data
+    // Release the CEGUI font data
     SAFE_DELETE( pFontItem->pFntCEGUI );
 
-    // Destroy the DX font data
+    // Release the DX font data
     CCore::GetSingleton ().GetGraphics()->DestroyAdditionalDXFont ( pFontItem->strFullFilePath, pFontItem->pFntBig, pFontItem->pFntNormal );
+}
 
-    // Remove item from manager list
-    assert ( MapContains ( m_CreatedItemList, pFontItem ) );
-    MapRemove ( m_CreatedItemList, pFontItem );
-    delete pFontItem;
+
+//
+//
+// Render targets and back buffers
+//
+//
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::UpdateBackBufferCopy
+//
+// Save back buffer pixels in our special place
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::UpdateBackBufferCopy ( void )
+{
+    if ( m_bBackBufferCopyMaybeChanged )
+        UpdateBackBufferCopySettings ();
+
+    // Don't bother doing this unless at least one screen stream in active
+    if ( !m_pBackBufferCopy )
+        return;
+
+    // Try to get the back buffer
+	IDirect3DSurface9* pD3DBackBufferSurface = NULL;
+    m_pDevice->GetBackBuffer ( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DBackBufferSurface );
+    if ( !pD3DBackBufferSurface )
+        return;
+
+    // Copy back buffer into our private render target
+    D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
+    HRESULT hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, m_pBackBufferCopy->pD3DRenderTargetSurface, NULL, FilterType );
+
+    // Clean up
+	SAFE_RELEASE( pD3DBackBufferSurface );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::UpdateScreenSource
+//
+// Copy from back buffer store to screen source
+// TODO - Optimize the case where the screen source is the same size as the back buffer copy (i.e. Use back buffer copy resources instead)
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::UpdateScreenSource ( SScreenSourceItem* pScreenSourceItem )
+{
+    HRESULT hr;
+    if ( m_pBackBufferCopy )
+    {
+        D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
+        hr = m_pDevice->StretchRect( m_pBackBufferCopy->pD3DRenderTargetSurface, NULL, pScreenSourceItem->pD3DRenderTargetSurface, NULL, FilterType );
+        hr = hr;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::UpdateBackBufferCopySettings
+//
+// Create/resize/destroy back buffer copy depending on what is required
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::UpdateBackBufferCopySettings ( void )
+{
+    m_bBackBufferCopyMaybeChanged = false;
+
+    // Set what the max size requirement is for the back buffer copy
+    uint uiSizeX = 0;
+    uint uiSizeY = 0;
+    for ( std::set < SRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
+    {
+        if ( SScreenSourceItem* pScreenSourceItem = DynamicCast < SScreenSourceItem > ( *iter ) )
+        {
+            uiSizeX = Max ( uiSizeX, pScreenSourceItem->uiSizeX );
+            uiSizeY = Max ( uiSizeY, pScreenSourceItem->uiSizeY );
+        }
+    }
+
+    // Update?
+    if ( !m_pBackBufferCopy || m_pBackBufferCopy->uiSizeX != uiSizeX || m_pBackBufferCopy->uiSizeY != uiSizeY )
+    {
+        // Delete old one if it exists
+        if ( m_pBackBufferCopy )
+        {
+            ReleaseRenderItem ( m_pBackBufferCopy );
+            m_pBackBufferCopy = NULL;
+        }
+
+        // Try to create new one if needed
+        if ( uiSizeX > 0 )
+            m_pBackBufferCopy = CreateRenderTarget ( uiSizeX, uiSizeY );
+    }
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::SetRenderTarget
+//
+// Set current render target to a custom one
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::SetRenderTarget ( SRenderTargetItem* pItem )
+{
+    // Save info on the default if not done yet
+    if ( !m_pDefaultD3DRenderTarget )
+    {
+        m_pDevice->GetRenderTarget ( 0, &m_pDefaultD3DRenderTarget );
+        m_pDevice->GetDepthStencilSurface ( &m_pDefaultD3DZStencilSurface );
+    }
+
+    ChangeRenderTarget ( pItem->uiSizeX, pItem->uiSizeY, pItem->pD3DRenderTargetSurface, pItem->pD3DZStencilSurface );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::RestoreDefaultRenderTarget
+//
+// Set render target back to the default one
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::RestoreDefaultRenderTarget ( void )
+{
+    // Only if we have info
+    if ( !m_pDefaultD3DRenderTarget )
+        return;
+
+    ChangeRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, m_pDefaultD3DRenderTarget, m_pDefaultD3DZStencilSurface );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::ChangeRenderTarget
+//
+// Worker function to change the D3D render target
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::ChangeRenderTarget ( uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface )
+{
+    // Check if we need to change
+    IDirect3DSurface9* pCurrentRenderTarget;
+    IDirect3DSurface9* pCurrentZStencilSurface;
+    m_pDevice->GetRenderTarget ( 0, &pCurrentRenderTarget );
+    m_pDevice->GetDepthStencilSurface ( &pCurrentZStencilSurface );
+
+    bool bAlreadySet = ( pD3DRenderTarget == pCurrentRenderTarget && pD3DZStencilSurface == pCurrentZStencilSurface );
+
+    SAFE_RELEASE ( pCurrentRenderTarget );
+    SAFE_RELEASE ( pCurrentZStencilSurface );
+
+    // Already set?
+    if ( bAlreadySet )
+        return;
+
+    // Tell graphics things are about to change
+    CCore::GetSingleton().GetGraphics ()->OnChangingRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY );
+
+    // Do change
+    m_pDevice->SetRenderTarget ( 0, pD3DRenderTarget );
+    m_pDevice->SetDepthStencilSurface ( pD3DZStencilSurface );
+
+    D3DVIEWPORT9 viewport;
+    viewport.X = 0;
+    viewport.Y = 0;
+    viewport.Width = uiSizeX;
+    viewport.Height = uiSizeY;
+    viewport.MinZ = 0.0f;
+    viewport.MaxZ = 1.0f;
+    m_pDevice->SetViewport ( &viewport );
 }
