@@ -589,10 +589,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxDrawImageSection", CLuaFunctionDefs::dxDrawImageSection );
     CLuaCFunctions::AddFunction ( "dxGetTextWidth", CLuaFunctionDefs::dxGetTextWidth );
     CLuaCFunctions::AddFunction ( "dxGetFontHeight", CLuaFunctionDefs::dxGetFontHeight );
+    CLuaCFunctions::AddFunction ( "dxCreateTexture", CLuaFunctionDefs::dxCreateTexture );
+    CLuaCFunctions::AddFunction ( "dxCreateShader", CLuaFunctionDefs::dxCreateShader );
+    CLuaCFunctions::AddFunction ( "dxSetShaderValue", CLuaFunctionDefs::dxSetShaderValue );
+
     CLuaCFunctions::AddFunction ( "createFont", CLuaFunctionDefs::CreateFont );
-    CLuaCFunctions::AddFunction ( "createTexture", CLuaFunctionDefs::CreateTexture );
-    CLuaCFunctions::AddFunction ( "createShader", CLuaFunctionDefs::CreateShader );
-    CLuaCFunctions::AddFunction ( "setShaderValue", CLuaFunctionDefs::SetShaderValue );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );
