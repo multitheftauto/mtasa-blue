@@ -22,3 +22,25 @@ public:
     STextureItem*           GetTextureItem          ( void )                            { return (STextureItem*)m_pRenderItem; }
 
 };
+
+
+class CClientRenderTarget : public CClientTexture
+{
+    DECLARE_CLASS( CClientRenderTarget, CClientTexture )
+public:
+                            CClientRenderTarget         ( CClientManager* pManager, ElementID ID, SRenderTargetItem* pRenderTargetItem ) : ClassInit ( this ), CClientTexture ( pManager, ID, pRenderTargetItem ) {}
+
+    // CClientRenderTarget methods
+    SRenderTargetItem*      GetRenderTargetItem          ( void )                       { return (SRenderTargetItem*)m_pRenderItem; }
+};
+
+
+class CClientScreenSource : public CClientTexture
+{
+    DECLARE_CLASS( CClientScreenSource, CClientTexture )
+public:
+                            CClientScreenSource         ( CClientManager* pManager, ElementID ID, SScreenSourceItem* pScreenSourceItem ) : ClassInit ( this ), CClientTexture ( pManager, ID, pScreenSourceItem ) {}
+
+    // CClientScreenSource methods
+    SScreenSourceItem*      GetScreenSourceItem          ( void )                       { return (SScreenSourceItem*)m_pRenderItem; }
+};

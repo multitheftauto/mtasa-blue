@@ -12,13 +12,17 @@
 
 struct ID3DXFont;
 struct IDirect3DTexture9;
+struct IDirect3DSurface9;
 struct ID3DXEffect;
 typedef LPCSTR D3DXHANDLE;
 class CGUIFont;
 struct SRenderItem;
+struct SMaterialItem;
 struct SFontItem;
 struct STextureItem;
 struct SShaderItem;
+struct SRenderTargetItem;
+struct SScreenSourceItem;
 
 
 //
@@ -35,10 +39,16 @@ public:
     virtual SFontItem*          CreateFont                  ( const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold ) = 0;
     virtual STextureItem*       CreateTexture               ( const SString& strFullFilePath ) = 0;
     virtual SShaderItem*        CreateShader                ( const SString& strFullFilePath, SString& strOutStatus ) = 0;
+    virtual SRenderTargetItem*  CreateRenderTarget          ( uint uiSizeX, uint uiSizeY ) = 0;
+    virtual SScreenSourceItem*  CreateScreenSource          ( uint uiSizeX, uint uiSizeY ) = 0;
     virtual void                ReleaseRenderItem           ( SRenderItem* pItem ) = 0;
     virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, STextureItem* pTextureItem ) = 0;
     virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, bool bValue ) = 0;
     virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount ) = 0;
+    virtual void                SetRenderTarget             ( SRenderTargetItem* pItem ) = 0;
+    virtual void                RestoreDefaultRenderTarget  ( void ) = 0;
+    virtual void                UpdateBackBufferCopy        ( void ) = 0;
+    virtual void                UpdateScreenSource          ( SScreenSourceItem* pScreenSourceItem ) = 0;
 };
 
 
@@ -55,12 +65,15 @@ enum eRenderItemClassTypes
     CLASS_SMaterialItem,
     CLASS_STextureItem,
     CLASS_SShaderItem,
+    CLASS_SRenderTargetItem,
+    CLASS_SScreenSourceItem,
 };
 
 struct SRenderItem
 {
     DECLARE_BASE_CLASS( SRenderItem )
     SRenderItem  ( void ) : ClassInit ( this ) {}
+    virtual ~SRenderItem ( void ) {}
     void Release ( void ) { pManager->ReleaseRenderItem ( this ); }
     void AddRef  ( void ) { ++iRefCount; }
 
@@ -84,19 +97,11 @@ struct SMaterialItem : public SRenderItem
 {
     DECLARE_CLASS( SMaterialItem, SRenderItem )
     SMaterialItem ( void ) : ClassInit ( this ) {}
+
+    uint uiSizeX;
+    uint uiSizeY;
 };
 
-struct STextureItem : public SMaterialItem
-{
-    DECLARE_CLASS( STextureItem, SMaterialItem )
-    STextureItem ( void ) : ClassInit ( this ) {}
-
-    IDirect3DTexture9* pD3DTexture;
-    uint uiFileWidth;
-    uint uiFileHeight;
-    uint uiSurfaceWidth;
-    uint uiSurfaceHeight;
-};
 
 struct SShaderItem : public SMaterialItem
 {
@@ -106,4 +111,31 @@ struct SShaderItem : public SMaterialItem
     ID3DXEffect* pD3DEffect;
     std::map < SString, D3DXHANDLE > parameterMap;
     D3DXHANDLE hWorld, hView, hProjection, hAll, hTime;
+    D3DXHANDLE hFirstTexture;
+};
+
+
+struct STextureItem : public SMaterialItem
+{
+    DECLARE_CLASS( STextureItem, SMaterialItem )
+    STextureItem ( void ) : ClassInit ( this ) {}
+
+    IDirect3DTexture9* pD3DTexture;
+};
+
+struct SRenderTargetItem : public STextureItem
+{
+    DECLARE_CLASS( SRenderTargetItem, STextureItem )
+    SRenderTargetItem ( void ) : ClassInit ( this ) {}
+
+    IDirect3DSurface9* pD3DRenderTargetSurface;
+    IDirect3DSurface9* pD3DZStencilSurface;
+};
+
+struct SScreenSourceItem : public STextureItem
+{
+    DECLARE_CLASS( SScreenSourceItem, STextureItem )
+    SScreenSourceItem ( void ) : ClassInit ( this ) {}
+
+    IDirect3DSurface9* pD3DRenderTargetSurface;
 };

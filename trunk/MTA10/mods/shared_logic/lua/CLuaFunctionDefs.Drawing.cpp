@@ -486,6 +486,97 @@ int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::dxCreateRenderTarget ( lua_State* luaVM )
+{
+//  element dxCreateRenderTarget( int sizeX, int sizeY )
+    uint uiSizeX; uint uiSizeY;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( uiSizeX );
+    argStream.ReadNumber ( uiSizeY );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CResource* pParentResource = pLuaMain ? pLuaMain->GetResource () : NULL;
+        if ( pParentResource )
+        {
+            CClientRenderTarget* pRenderTarget = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateRenderTarget ( uiSizeX, uiSizeY );
+            if ( pRenderTarget )
+            {
+                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                pRenderTarget->SetParent ( pParentResource->GetResourceDynamicEntity () );
+            }
+            lua_pushelement ( luaVM, pRenderTarget );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateRenderTarget", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxCreateScreenSource ( lua_State* luaVM )
+{
+//  element dxCreateScreenSource( int sizeX, int sizeY )
+    uint uiSizeX; uint uiSizeY;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( uiSizeX );
+    argStream.ReadNumber ( uiSizeY );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CResource* pParentResource = pLuaMain ? pLuaMain->GetResource () : NULL;
+        if ( pParentResource )
+        {
+            CClientScreenSource* pScreenSource = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateScreenSource ( uiSizeX, uiSizeY );
+            if ( pScreenSource )
+            {
+                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                pScreenSource->SetParent ( pParentResource->GetResourceDynamicEntity () );
+            }
+            lua_pushelement ( luaVM, pScreenSource );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateScreenSource", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetMaterialSize ( lua_State* luaVM )
+{
+//  int, int dxGetMaterialSize( element material )
+    CClientMaterial* pMaterial; SString strName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMaterial );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->uiSizeX );
+        lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->uiSizeY );
+        return 2;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetMaterialSize", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
 {
 //  bool dxSetShaderValue( element shader, string name, mixed value )
@@ -554,6 +645,61 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetShaderValue", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
+{
+//  bool setRenderTaget( element renderTarget )
+    CClientRenderTarget* pRenderTarget;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pRenderTarget, NULL );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( pRenderTarget)
+        {
+            g_pCore->GetGraphics ()->GetRenderItemManager ()->SetRenderTarget ( pRenderTarget->GetRenderTargetItem () );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+        {
+            g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetRenderTarget", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxUpdateScreenSource ( lua_State* luaVM )
+{
+//  bool dxUpdateScreenSource( element screenSource )
+    CClientScreenSource* pScreenSource;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pScreenSource );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->UpdateScreenSource ( pScreenSource->GetScreenSourceItem () );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxUpdateScreenSource", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );

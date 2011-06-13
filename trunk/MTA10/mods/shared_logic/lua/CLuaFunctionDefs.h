@@ -482,7 +482,12 @@ public:
     LUA_DECLARE ( dxGetFontHeight );
     LUA_DECLARE ( dxCreateTexture );
     LUA_DECLARE ( dxCreateShader );
+    LUA_DECLARE ( dxCreateRenderTarget );
+    LUA_DECLARE ( dxCreateScreenSource );
+    LUA_DECLARE ( dxGetMaterialSize );
     LUA_DECLARE ( dxSetShaderValue );
+    LUA_DECLARE ( dxSetRenderTarget );
+    LUA_DECLARE ( dxUpdateScreenSource );
 
     LUA_DECLARE ( CreateFont );
 

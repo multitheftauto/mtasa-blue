@@ -60,6 +60,28 @@ void CTileBatcher::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fViewportSi
 
 ////////////////////////////////////////////////////////////////
 //
+// CTileBatcher::OnRenderTargetChange
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CTileBatcher::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewViewportSizeY )
+{
+    // Flush dx draws
+    Flush ();
+
+    // Make new projection transform
+    float fViewportSizeX = uiNewViewportSizeX;
+    float fViewportSizeY = uiNewViewportSizeY;
+    D3DXMATRIX Mat1, Mat2;
+    D3DXMatrixTranslation ( &Mat1, -fViewportSizeX / 2.0f - 0.5f, -fViewportSizeY / 2.0f - 0.5f, 0.0f );
+    D3DXMatrixScaling ( &Mat2, 2.0f / fViewportSizeX, -2.0f / fViewportSizeY, 1.0f );
+    D3DXMatrixMultiply ( &m_MatProjection, &Mat1, &Mat2 );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CTileBatcher::Flush
 //
 // Send all buffered vertices to D3D
@@ -85,7 +107,7 @@ void CTileBatcher::Flush ( void )
         m_pDevice->SetRenderState( D3DRS_SRCBLEND,   D3DBLEND_SRCALPHA );
         m_pDevice->SetRenderState( D3DRS_DESTBLEND,  D3DBLEND_INVSRCALPHA );
         m_pDevice->SetRenderState( D3DRS_ALPHATESTENABLE,  TRUE );
-        m_pDevice->SetRenderState( D3DRS_ALPHAREF,         0x08 );
+        m_pDevice->SetRenderState( D3DRS_ALPHAREF,         0x01 );
         m_pDevice->SetRenderState( D3DRS_ALPHAFUNC,  D3DCMP_GREATEREQUAL );
         m_pDevice->SetRenderState( D3DRS_LIGHTING, FALSE);
         m_pDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );

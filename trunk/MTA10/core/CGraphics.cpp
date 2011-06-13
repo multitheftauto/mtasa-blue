@@ -724,7 +724,7 @@ bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strF
 
 bool CGraphics::DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont *pDXSmallFont, ID3DXFont *pDXBigFont )
 {
-    bool bResult = RemoveFontResourceExA ( strFontPath.c_str (), FR_PRIVATE, 0 ) != 0;
+    bool bResult = RemoveFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 ) != 0;
     SAFE_RELEASE( pDXSmallFont );
     SAFE_RELEASE( pDXBigFont );
     return bResult;
@@ -826,7 +826,7 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     D3DXCreateTextureFromFileInMemory ( pDevice, g_szPixel, sizeof ( g_szPixel ), &m_pDXPixelTexture );
 
     m_pTileBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
-    m_pRenderItemManager->OnDeviceCreate ( pDevice );
+    m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
 }
 
 
@@ -1041,21 +1041,8 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             if ( !t.bRelativeUV )
             {
                 // If UV's are absolute pixels, then scale the range to 0.0f - 1.0f.
-                float fUScale = 1 / 256.f;
-                float fVScale = 1 / 256.f;
-                if ( STextureItem* pTextureItem = DynamicCast < STextureItem > ( t.pMaterial ) )
-                {
-                    // Scale using the size of the texture file 
-                    fUScale = 1.0f / (float)pTextureItem->uiFileWidth;
-                    fVScale = 1.0f / (float)pTextureItem->uiFileHeight;
-                }
-                else
-                if ( SShaderItem* pShaderItem = DynamicCast < SShaderItem > ( t.pMaterial ) )
-                {
-                    // TODO
-                    fUScale = 1 / 256.f;
-                    fVScale = 1 / 256.f;
-                }
+                float fUScale = 1.0f / (float)t.pMaterial->uiSizeX;
+                float fVScale = 1.0f / (float)t.pMaterial->uiSizeY;
                 fU1 *= fUScale;
                 fV1 *= fVScale;
                 fU2 *= fUScale;
@@ -1115,3 +1102,18 @@ void CGraphics::RemoveQueueRef ( SRenderItem* pRenderItem )
     m_iDebugQueueRefs--;    // For debugging
 }
 
+// Entering or leaving a section where the rendertarget can be changed from script
+void CGraphics::EnableSetRenderTarget ( bool bEnable )
+{
+    if ( !bEnable )
+        m_pRenderItemManager->RestoreDefaultRenderTarget ();
+}
+
+// Notification that the render target will be changing
+void CGraphics::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewViewportSizeY )
+{
+    // Flush dx draws
+    DrawPreGUIQueue ();
+    // Inform tile batcher
+    m_pTileBatcher->OnChangingRenderTarget ( uiNewViewportSizeX, uiNewViewportSizeY );
+}

@@ -25,6 +25,8 @@ CClientRenderElementManager::CClientRenderElementManager ( CClientManager* pClie
     m_uiStatsFontCount = 0;
     m_uiStatsTextureCount = 0;
     m_uiStatsShaderCount = 0;
+    m_uiStatsRenderTargetCount = 0;
+    m_uiStatsScreenSourceCount = 0;
 }
 
 
@@ -131,6 +133,64 @@ CClientShader* CClientRenderElementManager::CreateShader ( const SString& strFul
 
 ////////////////////////////////////////////////////////////////
 //
+// CClientRenderElementManager::CreateRenderTarget
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CClientRenderTarget* CClientRenderElementManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY )
+{
+    // Create the item
+    SRenderTargetItem* pRenderTargetItem = m_pRenderItemManager->CreateRenderTarget ( uiSizeX, uiSizeY );
+
+    // Check create worked
+    if ( !pRenderTargetItem )
+        return NULL;
+
+    // Create the element
+    CClientRenderTarget* pRenderTargetElement = new CClientRenderTarget ( m_pClientManager, INVALID_ELEMENT_ID, pRenderTargetItem );
+
+    // Add to this manager's list
+    MapSet ( m_ItemElementMap, pRenderTargetItem, pRenderTargetElement );
+
+    // Update stats
+    m_uiStatsRenderTargetCount++;
+
+    return pRenderTargetElement;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CClientRenderElementManager::CreateScreenSource
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CClientScreenSource* CClientRenderElementManager::CreateScreenSource ( uint uiSizeX, uint uiSizeY )
+{
+    // Create the item
+    SScreenSourceItem* pScreenSourceItem = m_pRenderItemManager->CreateScreenSource ( uiSizeX, uiSizeY );
+
+    // Check create worked
+    if ( !pScreenSourceItem )
+        return NULL;
+
+    // Create the element
+    CClientScreenSource* pScreenSourceElement = new CClientScreenSource ( m_pClientManager, INVALID_ELEMENT_ID, pScreenSourceItem );
+
+    // Add to this manager's list
+    MapSet ( m_ItemElementMap, pScreenSourceItem, pScreenSourceElement );
+
+    // Update stats
+    m_uiStatsScreenSourceCount++;
+
+    return pScreenSourceElement;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CClientRenderElementManager::FindAutoTexture
 //
 // Find texture by unique name. Create if not found.
@@ -189,11 +249,17 @@ void CClientRenderElementManager::Remove ( CClientRenderElement* pElement )
     if ( pElement->IsA ( CClientFont::GetClassId () ) )
         m_uiStatsFontCount--;
     else
-    if ( pElement->IsA ( CClientTexture::GetClassId () ) )
-        m_uiStatsTextureCount--;
-    else
     if ( pElement->IsA ( CClientShader::GetClassId () ) )
         m_uiStatsShaderCount--;
+    else
+    if ( pElement->IsA ( CClientRenderTarget::GetClassId () ) )
+        m_uiStatsRenderTargetCount--;
+    else
+    if ( pElement->IsA ( CClientScreenSource::GetClassId () ) )
+        m_uiStatsScreenSourceCount--;
+    else
+    if ( pElement->IsA ( CClientTexture::GetClassId () ) )
+        m_uiStatsTextureCount--;
 
     // Release render item
     m_pRenderItemManager->ReleaseRenderItem ( pElement->GetRenderItem () );
