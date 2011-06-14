@@ -128,6 +128,7 @@ public:
                                                   ID3DXFont * pDXFont = NULL,
                                                   bool bPostGUI = false );
 
+    bool                CanSetRenderTarget      ( void )                { return m_bSetRenderTargetEnabled; }
     void                EnableSetRenderTarget   ( bool bEnable );
     void                OnChangingRenderTarget  ( uint uiNewViewportSizeX, uint uiNewViewportSizeY );
 
@@ -159,6 +160,7 @@ private:
 
     CRenderItemManager* m_pRenderItemManager;
     CTileBatcher*       m_pTileBatcher;
+    bool                m_bSetRenderTargetEnabled;
 
     // Fonts
     ID3DXFont*          m_pDXFonts [ NUM_FONTS ];

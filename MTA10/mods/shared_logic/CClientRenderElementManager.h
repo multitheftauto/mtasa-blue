@@ -27,7 +27,7 @@ public:
     CClientFont*            CreateFont                  ( const SString& strFullFilePath, const SString& strUniqueName, uint uiSize, bool bBold );
     CClientTexture*         CreateTexture               ( const SString& strFullFilePath );
     CClientShader*          CreateShader                ( const SString& strFullFilePath, SString& strOutStatus );
-    CClientRenderTarget*    CreateRenderTarget          ( uint uiSizeX, uint uiSizeY );
+    CClientRenderTarget*    CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
     CClientScreenSource*    CreateScreenSource          ( uint uiSizeX, uint uiSizeY );
     CClientTexture*         FindAutoTexture             ( const SString& strFullFilePath, const SString& strUniqueName );
     void                    Remove                      ( CClientRenderElement* pElement );

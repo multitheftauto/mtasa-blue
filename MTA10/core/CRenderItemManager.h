@@ -25,20 +25,20 @@ public:
     virtual SFontItem*          CreateFont                  ( const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold );
     virtual STextureItem*       CreateTexture               ( const SString& strFullFilePath );
     virtual SShaderItem*        CreateShader                ( const SString& strFullFilePath, SString& strOutStatus );
-    virtual SRenderTargetItem*  CreateRenderTarget          ( uint uiSizeX, uint uiSizeY );
+    virtual SRenderTargetItem*  CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
     virtual SScreenSourceItem*  CreateScreenSource          ( uint uiSizeX, uint uiSizeY );
     virtual void                ReleaseRenderItem           ( SRenderItem* pItem );
     virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, STextureItem* pTextureItem );
     virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, bool bValue );
     virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount );
-    virtual void                SetRenderTarget             ( SRenderTargetItem* pItem );
-    virtual void                RestoreDefaultRenderTarget  ( void );
+    virtual bool                SetRenderTarget             ( SRenderTargetItem* pItem, bool bClear );
+    virtual bool                RestoreDefaultRenderTarget  ( void );
     virtual void                UpdateBackBufferCopy        ( void );
     virtual void                UpdateScreenSource          ( SScreenSourceItem* pScreenSourceItem );
 
     // CRenderItemManager
     void                        OnDeviceCreate              ( IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY );
-    void                        UpdateBackBufferCopySettings ( void );
+    void                        UpdateBackBufferCopySize    ( void );
     void                        ReleaseFontData             ( SFontItem* pFontItem );
     void                        ReleaseTextureData          ( STextureItem* pTextureItem );
     void                        ReleaseShaderData           ( SShaderItem* pTextureItem );
@@ -54,5 +54,6 @@ protected:
     uint                        m_uiDefaultViewportSizeX;
     uint                        m_uiDefaultViewportSizeY;
     SRenderTargetItem*          m_pBackBufferCopy;
-    bool                        m_bBackBufferCopyMaybeChanged;
+    bool                        m_bBackBufferCopyMaybeNeedsResize;
+    uint                        m_uiBackBufferCopyRevision;
 };

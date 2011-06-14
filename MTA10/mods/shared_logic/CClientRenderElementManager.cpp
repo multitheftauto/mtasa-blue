@@ -138,10 +138,10 @@ CClientShader* CClientRenderElementManager::CreateShader ( const SString& strFul
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientRenderTarget* CClientRenderElementManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY )
+CClientRenderTarget* CClientRenderElementManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel )
 {
     // Create the item
-    SRenderTargetItem* pRenderTargetItem = m_pRenderItemManager->CreateRenderTarget ( uiSizeX, uiSizeY );
+    SRenderTargetItem* pRenderTargetItem = m_pRenderItemManager->CreateRenderTarget ( uiSizeX, uiSizeY, bWithAlphaChannel );
 
     // Check create worked
     if ( !pRenderTargetItem )

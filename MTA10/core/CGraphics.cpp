@@ -42,6 +42,7 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
 
     m_pRenderItemManager = new CRenderItemManager ();
     m_pTileBatcher = new CTileBatcher ();
+    m_bSetRenderTargetEnabled = false;
 }
 
 
@@ -546,6 +547,10 @@ bool CGraphics::DrawTextureQueued ( float fX, float fY,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
+    // Shaders can't be drawn postGUI or outside onClientRender
+    if ( ( bPostGUI || !m_bSetRenderTargetEnabled ) && pMaterial->IsA ( SShaderItem::GetClassId () ) )
+        return false;
+
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_TEXTURE;
@@ -591,9 +596,14 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
     // We're using a big font to keep it looking nice, so get the actual scale
     if ( fScaleX > 1.1f || fScaleY > 1.1f )
     {
-        pDXFont = GetBigFont ( pDXFont );
-        fScaleX /= 4.0f;
-        fScaleY /= 4.0f;
+        ID3DXFont* pDXBigFont = GetBigFont ( pDXFont );
+        if ( pDXBigFont != pDXFont )
+        {
+            pDXFont = pDXBigFont;
+            // Only rescale if big font exists
+            fScaleX /= 4.0f;
+            fScaleY /= 4.0f;
+        }
     }
 
 
@@ -1093,12 +1103,14 @@ void CGraphics::ClearDrawQueue ( std::vector < sDrawQueueItem >& Queue )
 void CGraphics::AddQueueRef ( SRenderItem* pRenderItem )
 {
     pRenderItem->AddRef ();
+    pRenderItem->bInQueue = true;
     m_iDebugQueueRefs++;    // For debugging
 }
 
 void CGraphics::RemoveQueueRef ( SRenderItem* pRenderItem )
 {
     pRenderItem->Release ();
+    pRenderItem->bInQueue = false;
     m_iDebugQueueRefs--;    // For debugging
 }
 
@@ -1107,6 +1119,7 @@ void CGraphics::EnableSetRenderTarget ( bool bEnable )
 {
     if ( !bEnable )
         m_pRenderItemManager->RestoreDefaultRenderTarget ();
+    m_bSetRenderTargetEnabled = bEnable;
 }
 
 // Notification that the render target will be changing
