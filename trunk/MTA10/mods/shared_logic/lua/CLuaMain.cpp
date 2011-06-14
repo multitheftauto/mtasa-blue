@@ -32,6 +32,7 @@ const char szPreloadedScript [] = ""\
 
     // Code for allowing this syntax:   exports.resourceName:exportedFunctionName (...)
     //                                  exports["resourceName"]:exportedFunctionName (...)
+    //                                  exports[resourcePointer]:exportedFunctionName (...)
     // Aswell as the old:               call ( getResourceFromName ( "resourceName" ), "exportedFunctionName", ... )
     "local rescallMT = {}\n" \
     "function rescallMT:__index(k)\n" \
@@ -47,12 +48,16 @@ const char szPreloadedScript [] = ""\
     "end\n" \
     "local exportsMT = {}\n" \
     "function exportsMT:__index(k)\n" \
-    "        if type(k) ~= 'string' then k = tostring(k) end\n" \
+    "        if type(k) == 'userdata' and getResourceRootElement(k) then\n" \
+    "                return setmetatable({ res = k }, rescallMT)\n" \
+    "        elseif type(k) ~= 'string' then\n" \
+    "                k = tostring(k)\n" \
+    "        end\n" \
     "        local res = getResourceFromName(k)\n" \
     "        if res then\n" \
     "                return setmetatable({ res = res }, rescallMT)\n" \
     "        else\n" \
-    "                outputDebugString('exports: Call to not running client resource (' .. k .. ')', 1)\n" \
+    "                outputDebugString('exports: Call to non-running client resource (' .. k .. ')', 1)\n" \
     "                return setmetatable({}, rescallMT)\n" \
     "        end\n" \
     "end\n" \
