@@ -39,14 +39,14 @@ public:
     virtual SFontItem*          CreateFont                  ( const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold ) = 0;
     virtual STextureItem*       CreateTexture               ( const SString& strFullFilePath ) = 0;
     virtual SShaderItem*        CreateShader                ( const SString& strFullFilePath, SString& strOutStatus ) = 0;
-    virtual SRenderTargetItem*  CreateRenderTarget          ( uint uiSizeX, uint uiSizeY ) = 0;
+    virtual SRenderTargetItem*  CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel ) = 0;
     virtual SScreenSourceItem*  CreateScreenSource          ( uint uiSizeX, uint uiSizeY ) = 0;
     virtual void                ReleaseRenderItem           ( SRenderItem* pItem ) = 0;
     virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, STextureItem* pTextureItem ) = 0;
     virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, bool bValue ) = 0;
     virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount ) = 0;
-    virtual void                SetRenderTarget             ( SRenderTargetItem* pItem ) = 0;
-    virtual void                RestoreDefaultRenderTarget  ( void ) = 0;
+    virtual bool                SetRenderTarget             ( SRenderTargetItem* pItem, bool bClear ) = 0;
+    virtual bool                RestoreDefaultRenderTarget  ( void ) = 0;
     virtual void                UpdateBackBufferCopy        ( void ) = 0;
     virtual void                UpdateScreenSource          ( SScreenSourceItem* pScreenSourceItem ) = 0;
 };
@@ -79,6 +79,7 @@ struct SRenderItem
 
     CRenderItemManagerInterface* pManager;
     int             iRefCount;
+    bool            bInQueue;
 };
 
 struct SFontItem : public SRenderItem
@@ -138,4 +139,5 @@ struct SScreenSourceItem : public STextureItem
     SScreenSourceItem ( void ) : ClassInit ( this ) {}
 
     IDirect3DSurface9* pD3DRenderTargetSurface;
+    uint uiRevision;
 };

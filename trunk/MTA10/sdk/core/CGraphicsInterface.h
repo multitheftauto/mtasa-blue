@@ -114,9 +114,6 @@ public:
                                                           ID3DXFont * pDXFont,
                                                           bool bPostGUI ) = 0;
 
-    virtual void                    EnableSetRenderTarget ( bool bEnable ) = 0;
-    virtual void                    OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewViewportSizeY ) = 0;
-
     // Subsystems
     virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;
 };

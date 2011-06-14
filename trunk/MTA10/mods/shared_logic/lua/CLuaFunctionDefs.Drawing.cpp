@@ -259,9 +259,13 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
     {
         if ( pMaterialElement )
         {
-            g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, 0, 0, 1, 1, true, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI );
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, 0, 0, 1, 1, true, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", "dxDrawImage", "Shaders cannot be drawn post-GUI or outside onClientRender" ) );
         }
         else
             m_pScriptDebugging->LogError ( luaVM, "dxDrawImage can't load file" );
@@ -302,15 +306,19 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
     {
         if ( pMaterialElement )
         {
-            g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, fU, fV, fSizeU, fSizeV, false, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI );
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, fU, fV, fSizeU, fSizeV, false, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", "dxDrawImageSection", "Shaders cannot be drawn post-GUI or outside onClientRender" ) );
         }
         else
-            m_pScriptDebugging->LogError ( luaVM, "dxDrawImage can't load file" );
+            m_pScriptDebugging->LogError ( luaVM, "dxDrawImageSection can't load file" );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawImage", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawImageSection", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -488,12 +496,13 @@ int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxCreateRenderTarget ( lua_State* luaVM )
 {
-//  element dxCreateRenderTarget( int sizeX, int sizeY )
-    uint uiSizeX; uint uiSizeY;
+//  element dxCreateRenderTarget( int sizeX, int sizeY [, int withAlphaChannel = false ] )
+    uint uiSizeX; uint uiSizeY; bool bWithAlphaChannel;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( uiSizeX );
     argStream.ReadNumber ( uiSizeY );
+    argStream.ReadBool ( bWithAlphaChannel, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -501,7 +510,7 @@ int CLuaFunctionDefs::dxCreateRenderTarget ( lua_State* luaVM )
         CResource* pParentResource = pLuaMain ? pLuaMain->GetResource () : NULL;
         if ( pParentResource )
         {
-            CClientRenderTarget* pRenderTarget = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateRenderTarget ( uiSizeX, uiSizeY );
+            CClientRenderTarget* pRenderTarget = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateRenderTarget ( uiSizeX, uiSizeY, bWithAlphaChannel );
             if ( pRenderTarget )
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
@@ -627,7 +636,7 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
                 if ( iArgument != LUA_TNUMBER && iArgument != LUA_TSTRING )
                     break;
             }
-            bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, fBuffer, i );
+            bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, fBuffer, i + 1 );
             lua_pushboolean ( luaVM, bResult );
             return 1;
         }
@@ -654,26 +663,28 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
 {
-//  bool setRenderTaget( element renderTarget )
-    CClientRenderTarget* pRenderTarget;
+//  bool setRenderTaget( element renderTarget [, bool clear = false ] )
+    CClientRenderTarget* pRenderTarget; bool bClear;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pRenderTarget, NULL );
+    argStream.ReadBool ( bClear, false );
 
     if ( !argStream.HasErrors () )
     {
+        bool bResult;
         if ( pRenderTarget)
+            bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetRenderTarget ( pRenderTarget->GetRenderTargetItem (), bClear );
+        else
+            bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
+
+        if ( bResult )
         {
-            g_pCore->GetGraphics ()->GetRenderItemManager ()->SetRenderTarget ( pRenderTarget->GetRenderTargetItem () );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
         else
-        {
-            g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", "dxSetRenderTarget", "dxSetRenderTarget can only be used inside onClientRender" ) );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetRenderTarget", *argStream.GetErrorMessage () ) );

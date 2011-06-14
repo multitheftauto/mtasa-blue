@@ -1056,14 +1056,9 @@ void CClientGame::DoPulses ( void )
         // Get rid of deleted GUI elements
         g_pCore->GetGUI ()->CleanDeadPool ();
 
-        // Only allow scripted render target changes during onClientRender
-        g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
-
         // Call onClientRender LUA event
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
-
-        g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
 
         // Ensure replaced/restored textures for models in the GTA map are correct
         g_pGame->FlushPendingRestreamIPL ();

@@ -27,7 +27,8 @@ CRenderItemManager::CRenderItemManager ( void )
     m_uiDefaultViewportSizeX = 0;
     m_uiDefaultViewportSizeY = 0;
     m_pBackBufferCopy = NULL;
-    m_bBackBufferCopyMaybeChanged = false;
+    m_uiBackBufferCopyRevision = 0;
+    m_bBackBufferCopyMaybeNeedsResize = false;
 }
 
 
@@ -104,7 +105,7 @@ STextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath
 //
 //
 ////////////////////////////////////////////////////////////////
-SRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY )
+SRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel )
 {
     IDirect3DTexture9* pD3DRenderTargetTexture = NULL;
     for ( uint i = 0 ; i < 4 ; i++ )
@@ -115,6 +116,8 @@ SRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint u
         // 3rd try -  i == 2  - 32 bit target
         // 4th try -  i == 3  - 16 bit target
 	    D3DFORMAT Format = i & 1 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
+        if ( bWithAlphaChannel )
+            Format = D3DFMT_A8R8G8B8;
         if( SUCCEEDED( m_pDevice->CreateTexture( uiSizeX, uiSizeY, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &pD3DRenderTargetTexture, NULL ) ) )
             break;
 
@@ -221,11 +224,12 @@ SScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
     pScreenSourceItem->pD3DRenderTargetSurface = pD3DRenderTargetSurface;
     pScreenSourceItem->uiSizeX = uiSizeX;
     pScreenSourceItem->uiSizeY = uiSizeY;
+    pScreenSourceItem->uiRevision = 0;
 
     // Update list of created items
     MapInsert ( m_CreatedItemList, pScreenSourceItem );
 
-    m_bBackBufferCopyMaybeChanged = true;
+    m_bBackBufferCopyMaybeNeedsResize = true;
 
     return pScreenSourceItem;
 }
@@ -340,6 +344,10 @@ SShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::SetShaderValue ( SShaderItem* pShaderItem, const SString& strName, STextureItem* pTextureItem )
 {
+    // Ensure that any pending draws using this shader are done first
+    if ( pShaderItem->bInQueue )
+        CGraphics::GetSingleton ().DrawPreGUIQueue ();
+
     if ( D3DXHANDLE* phParameter = MapFind ( pShaderItem->parameterMap, strName.ToLower () ) )
     {
         if ( *phParameter == pShaderItem->hFirstTexture )
@@ -364,6 +372,10 @@ bool CRenderItemManager::SetShaderValue ( SShaderItem* pShaderItem, const SStrin
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::SetShaderValue ( SShaderItem* pShaderItem, const SString& strName, bool bValue )
 {
+    // Ensure that any pending draws using this shader are done first
+    if ( pShaderItem->bInQueue )
+        CGraphics::GetSingleton ().DrawPreGUIQueue ();
+
     if ( D3DXHANDLE* phParameter = MapFind ( pShaderItem->parameterMap, strName.ToLower () ) )
         if ( SUCCEEDED( pShaderItem->pD3DEffect->SetBool( *phParameter, bValue ) ) )
             return true;
@@ -380,6 +392,10 @@ bool CRenderItemManager::SetShaderValue ( SShaderItem* pShaderItem, const SStrin
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::SetShaderValue ( SShaderItem* pShaderItem, const SString& strName, const float* pfValues, uint uiCount )
 {
+    // Ensure that any pending draws using this shader are done first
+    if ( pShaderItem->bInQueue )
+        CGraphics::GetSingleton ().DrawPreGUIQueue ();
+
     if ( D3DXHANDLE* phParameter = MapFind ( pShaderItem->parameterMap, strName.ToLower () ) )
         if ( SUCCEEDED( pShaderItem->pD3DEffect->SetFloatArray( *phParameter, pfValues, uiCount ) ) )
             return true;
@@ -517,7 +533,7 @@ void CRenderItemManager::ReleaseRenderTargetData ( SRenderTargetItem* pRenderTar
 void CRenderItemManager::ReleaseScreenSourceData ( SScreenSourceItem* pScreenSourceItem )
 {
     // Flag to re-assess back buffer copy settings
-    m_bBackBufferCopyMaybeChanged = true;
+    m_bBackBufferCopyMaybeNeedsResize = true;
 
     // Release D3D resources
     SAFE_RELEASE ( pScreenSourceItem->pD3DRenderTargetSurface );
@@ -571,8 +587,8 @@ void CRenderItemManager::ReleaseFontData ( SFontItem* pFontItem )
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::UpdateBackBufferCopy ( void )
 {
-    if ( m_bBackBufferCopyMaybeChanged )
-        UpdateBackBufferCopySettings ();
+    if ( m_bBackBufferCopyMaybeNeedsResize )
+        UpdateBackBufferCopySize ();
 
     // Don't bother doing this unless at least one screen stream in active
     if ( !m_pBackBufferCopy )
@@ -587,6 +603,8 @@ void CRenderItemManager::UpdateBackBufferCopy ( void )
     // Copy back buffer into our private render target
     D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
     HRESULT hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, m_pBackBufferCopy->pD3DRenderTargetSurface, NULL, FilterType );
+
+    m_uiBackBufferCopyRevision++;
 
     // Clean up
 	SAFE_RELEASE( pD3DBackBufferSurface );
@@ -603,26 +621,30 @@ void CRenderItemManager::UpdateBackBufferCopy ( void )
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::UpdateScreenSource ( SScreenSourceItem* pScreenSourceItem )
 {
-    HRESULT hr;
+    // Only do update if back buffer copy has changed
+    if ( pScreenSourceItem->uiRevision == m_uiBackBufferCopyRevision )
+        return;
+
+    pScreenSourceItem->uiRevision = m_uiBackBufferCopyRevision;
+
     if ( m_pBackBufferCopy )
     {
         D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
-        hr = m_pDevice->StretchRect( m_pBackBufferCopy->pD3DRenderTargetSurface, NULL, pScreenSourceItem->pD3DRenderTargetSurface, NULL, FilterType );
-        hr = hr;
+        m_pDevice->StretchRect( m_pBackBufferCopy->pD3DRenderTargetSurface, NULL, pScreenSourceItem->pD3DRenderTargetSurface, NULL, FilterType );
     }
 }
 
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderItemManager::UpdateBackBufferCopySettings
+// CRenderItemManager::UpdateBackBufferCopySize
 //
 // Create/resize/destroy back buffer copy depending on what is required
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateBackBufferCopySettings ( void )
+void CRenderItemManager::UpdateBackBufferCopySize ( void )
 {
-    m_bBackBufferCopyMaybeChanged = false;
+    m_bBackBufferCopyMaybeNeedsResize = false;
 
     // Set what the max size requirement is for the back buffer copy
     uint uiSizeX = 0;
@@ -648,7 +670,7 @@ void CRenderItemManager::UpdateBackBufferCopySettings ( void )
 
         // Try to create new one if needed
         if ( uiSizeX > 0 )
-            m_pBackBufferCopy = CreateRenderTarget ( uiSizeX, uiSizeY );
+            m_pBackBufferCopy = CreateRenderTarget ( uiSizeX, uiSizeY, false );
     }
 }
 
@@ -659,8 +681,11 @@ void CRenderItemManager::UpdateBackBufferCopySettings ( void )
 // Set current render target to a custom one
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::SetRenderTarget ( SRenderTargetItem* pItem )
+bool CRenderItemManager::SetRenderTarget ( SRenderTargetItem* pItem, bool bClear )
 {
+    if ( !CGraphics::GetSingleton().CanSetRenderTarget () )
+        return false;
+
     // Save info on the default if not done yet
     if ( !m_pDefaultD3DRenderTarget )
     {
@@ -669,6 +694,11 @@ void CRenderItemManager::SetRenderTarget ( SRenderTargetItem* pItem )
     }
 
     ChangeRenderTarget ( pItem->uiSizeX, pItem->uiSizeY, pItem->pD3DRenderTargetSurface, pItem->pD3DZStencilSurface );
+
+    if ( bClear )
+        m_pDevice->Clear ( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
+
+    return true;
 }
 
 
@@ -679,13 +709,16 @@ void CRenderItemManager::SetRenderTarget ( SRenderTargetItem* pItem )
 // Set render target back to the default one
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::RestoreDefaultRenderTarget ( void )
+bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
 {
-    // Only if we have info
-    if ( !m_pDefaultD3DRenderTarget )
-        return;
+    if ( !CGraphics::GetSingleton().CanSetRenderTarget () )
+        return false;
 
-    ChangeRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, m_pDefaultD3DRenderTarget, m_pDefaultD3DZStencilSurface );
+    // Only need to change if we have info
+    if ( m_pDefaultD3DRenderTarget )
+        ChangeRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, m_pDefaultD3DRenderTarget, m_pDefaultD3DZStencilSurface );
+
+    return true;
 }
 
 
@@ -714,7 +747,7 @@ void CRenderItemManager::ChangeRenderTarget ( uint uiSizeX, uint uiSizeY, IDirec
         return;
 
     // Tell graphics things are about to change
-    CCore::GetSingleton().GetGraphics ()->OnChangingRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY );
+    CGraphics::GetSingleton().OnChangingRenderTarget ( uiSizeX, uiSizeY );
 
     // Do change
     m_pDevice->SetRenderTarget ( 0, pD3DRenderTarget );
