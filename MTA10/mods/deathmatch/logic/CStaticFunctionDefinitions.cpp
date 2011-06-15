@@ -1733,6 +1733,7 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucCompon
             g_pGame->GetHud ()->DisableWantedLevel ( !bShow );
             return true;
         case HUD_ALL:
+            g_pClientGame->SetHudAreaNameDisabled ( !bShow );
             g_pGame->GetHud ()->DisableAll ( !bShow );
             return true;
     }
