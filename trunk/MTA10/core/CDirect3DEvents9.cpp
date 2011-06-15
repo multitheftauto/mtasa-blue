@@ -101,6 +101,11 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     IDirect3DStateBlock9 * pDeviceState = NULL;
     pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
 
+    // Make sure linear sampling is enabled
+    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+
     // Maybe capture screen
     CGraphics::GetSingleton ().GetRenderItemManager ()->UpdateBackBufferCopy ();
 
