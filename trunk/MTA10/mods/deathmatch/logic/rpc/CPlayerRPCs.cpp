@@ -87,6 +87,7 @@ void CPlayerRPCs::ShowPlayerHudComponent ( NetBitStreamInterface& bitStream )
                 g_pGame->GetHud ()->DisableWantedLevel ( bDisabled );
                 break;
             case HUD_ALL:
+                g_pClientGame->SetHudAreaNameDisabled ( bDisabled );
                 g_pGame->GetHud ()->DisableAll ( bDisabled );
                 break;
         }
