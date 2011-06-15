@@ -1095,8 +1095,8 @@ void CClientVehicle::CalcAndUpdateTyresCanBurstFlag ( void )
         bTyresCanBurst = true;
 
     // Script override
-//    if ( !m_bScriptCanBeDamaged )
-//        bTyresCanBurst = false;
+    if ( !m_bScriptCanBeDamaged )
+        bTyresCanBurst = false;
 
     if ( m_pVehicle )
     {
