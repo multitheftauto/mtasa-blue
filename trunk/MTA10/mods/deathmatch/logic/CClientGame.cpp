@@ -99,6 +99,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_bHudAreaNameDisabled = false;
     m_fGameSpeed = 1.0f;
     m_lMoney = 0;
+    m_dwWanted = 0;
     m_lastWeaponSlot = WEAPONSLOT_MAX;      // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
 
@@ -1216,6 +1217,12 @@ void CClientGame::DoPulses ( void )
     g_pGame->SetGameSpeed ( m_fGameSpeed );
     // money changes on death/getting into taxis
     g_pGame->GetPlayerInfo ()->SetPlayerMoney ( m_lMoney );
+    // wanted to stop it changing on skin change etc
+    if ( m_pLocalPlayer )
+    {
+        if ( m_dwWanted != g_pGame->GetPlayerInfo ()->GetWanted()->GetWantedLevel () )
+            g_pGame->GetPlayerInfo ()->GetWanted()->SetWantedLevelNoFlash ( m_dwWanted );
+    }
     // stop players dying from starvation
     g_pGame->GetPlayerInfo()->SetLastTimeEaten ( 0 );
     // reset weapon logs (for preventing quickreload)
@@ -2521,6 +2528,13 @@ void CClientGame::SetMoney ( long lMoney )
 {
     g_pGame->GetPlayerInfo ()->SetPlayerMoney ( lMoney );
     m_lMoney = lMoney;
+}
+
+
+void CClientGame::SetWanted ( DWORD dwWanted )
+{
+    g_pGame->GetPlayerInfo ()->GetWanted()->SetWantedLevel( dwWanted );
+    m_dwWanted = dwWanted;
 }
 
 
@@ -4484,7 +4498,7 @@ void CClientGame::ResetMapInfo ( void )
     SetMinuteDuration ( DEFAULT_MINUTE_DURATION );
 
     // Wanted-level
-    g_pGame->GetPlayerInfo()->GetWanted()->SetWantedLevel ( 0 ); 
+    SetWanted ( 0 ); 
 
     // Money
     SetMoney ( 0 );

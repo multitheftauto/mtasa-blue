@@ -195,7 +195,7 @@ void CWorldRPCs::SetWantedLevel ( NetBitStreamInterface& bitStream )
 
     if ( bitStream.Read ( ucWantedLevel ) )
     {
-        g_pGame->GetPlayerInfo()->GetWanted()->SetWantedLevel ( ucWantedLevel );
+        m_pClientGame->SetWanted ( ucWantedLevel );
     }
 }
 

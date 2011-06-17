@@ -316,6 +316,7 @@ public:
     void                                SetMinuteDuration               ( unsigned long ulDelay );
     inline long                         GetMoney                        ( void )                        { return m_lMoney; }
     void                                SetMoney                        ( long lMoney );
+    void                                SetWanted                       ( DWORD dwWanted );
 
     void                                ResetAmmoInClip                 ( void ) { memset(m_wasWeaponAmmoInClip,0,sizeof(m_wasWeaponAmmoInClip)); }
 
@@ -569,6 +570,7 @@ private:
 
     float                               m_fGameSpeed;
     long                                m_lMoney;
+    DWORD                               m_dwWanted;
 
     bool                                m_Glitches[NUM_GLITCHES];
 
