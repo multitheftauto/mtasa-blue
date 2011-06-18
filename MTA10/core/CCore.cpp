@@ -21,6 +21,7 @@
 #include <Aclapi.h>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #include "SharedUtil.hpp"
+#include <clocale>
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -95,6 +96,10 @@ CCore::CCore ( void )
     #endif
     
     m_pConfigFile = NULL;
+
+    // Set our locale to the C locale, except for character handling which is the system's default
+    std::setlocale(LC_ALL,"C");
+    std::setlocale(LC_CTYPE,"");
 
     // NULL the path buffers
     memset ( m_szInstallRoot, 0, MAX_PATH );

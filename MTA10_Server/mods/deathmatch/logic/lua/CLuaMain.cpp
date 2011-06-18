@@ -245,13 +245,7 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
         else
         {
             ResetInstructionCount ();
-#ifndef WIN32
-            std::setlocale(LC_ALL, "C");
-#endif
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
-#ifndef WIN32
-            std::setlocale(LC_ALL, "");
-#endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -315,13 +309,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
         else
         {
             ResetInstructionCount ();
-#ifndef WIN32
-            std::setlocale(LC_ALL, "C");
-#endif
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
-#ifndef WIN32
-            std::setlocale(LC_ALL, "");
-#endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -355,13 +343,7 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
         if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
-#ifndef WIN32
-            std::setlocale(LC_ALL, "C");
-#endif
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
-#ifndef WIN32
-            std::setlocale(LC_ALL, "");
-#endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
