@@ -573,8 +573,8 @@ int CLuaFunctionDefs::dxGetMaterialSize ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->uiSizeX );
-        lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->uiSizeY );
+        lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->m_uiSizeX );
+        lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->m_uiSizeY );
         return 2;
     }
     else

@@ -54,7 +54,7 @@ CClientRenderElementManager::~CClientRenderElementManager ( void )
 CClientFont* CClientRenderElementManager::CreateFont ( const SString& strFullFilePath, const SString& strUniqueName, uint uiSize, bool bBold )
 {
     // Create the item
-    SFontItem* pFontItem = m_pRenderItemManager->CreateFont ( strFullFilePath, strUniqueName, uiSize, bBold );
+    CFontItem* pFontItem = m_pRenderItemManager->CreateFont ( strFullFilePath, strUniqueName, uiSize, bBold );
 
     // Check create worked
     if ( !pFontItem )
@@ -83,7 +83,7 @@ CClientFont* CClientRenderElementManager::CreateFont ( const SString& strFullFil
 CClientTexture* CClientRenderElementManager::CreateTexture ( const SString& strFullFilePath )
 {
     // Create the item
-    STextureItem* pTextureItem = m_pRenderItemManager->CreateTexture ( strFullFilePath );
+    CTextureItem* pTextureItem = m_pRenderItemManager->CreateTexture ( strFullFilePath );
 
     // Check create worked
     if ( !pTextureItem )
@@ -112,7 +112,7 @@ CClientTexture* CClientRenderElementManager::CreateTexture ( const SString& strF
 CClientShader* CClientRenderElementManager::CreateShader ( const SString& strFullFilePath, SString& strOutStatus )
 {
     // Create the item
-    SShaderItem* pShaderItem = m_pRenderItemManager->CreateShader ( strFullFilePath, strOutStatus );
+    CShaderItem* pShaderItem = m_pRenderItemManager->CreateShader ( strFullFilePath, strOutStatus );
 
     // Check create worked
     if ( !pShaderItem )
@@ -141,7 +141,7 @@ CClientShader* CClientRenderElementManager::CreateShader ( const SString& strFul
 CClientRenderTarget* CClientRenderElementManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel )
 {
     // Create the item
-    SRenderTargetItem* pRenderTargetItem = m_pRenderItemManager->CreateRenderTarget ( uiSizeX, uiSizeY, bWithAlphaChannel );
+    CRenderTargetItem* pRenderTargetItem = m_pRenderItemManager->CreateRenderTarget ( uiSizeX, uiSizeY, bWithAlphaChannel );
 
     // Check create worked
     if ( !pRenderTargetItem )
@@ -170,7 +170,7 @@ CClientRenderTarget* CClientRenderElementManager::CreateRenderTarget ( uint uiSi
 CClientScreenSource* CClientRenderElementManager::CreateScreenSource ( uint uiSizeX, uint uiSizeY )
 {
     // Create the item
-    SScreenSourceItem* pScreenSourceItem = m_pRenderItemManager->CreateScreenSource ( uiSizeX, uiSizeY );
+    CScreenSourceItem* pScreenSourceItem = m_pRenderItemManager->CreateScreenSource ( uiSizeX, uiSizeY );
 
     // Check create worked
     if ( !pScreenSourceItem )

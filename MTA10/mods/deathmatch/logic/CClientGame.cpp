@@ -1057,9 +1057,15 @@ void CClientGame::DoPulses ( void )
         // Get rid of deleted GUI elements
         g_pCore->GetGUI ()->CleanDeadPool ();
 
+        // Allow scripted setRenderTarget
+        g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
+
         // Call onClientRender LUA event
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
+
+        // Disallow scripted setRenderTarget
+        g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
 
         // Ensure replaced/restored textures for models in the GTA map are correct
         g_pGame->FlushPendingRestreamIPL ();
@@ -3512,6 +3518,7 @@ void CClientGame::Render3DStuffHandler ( void )
 
 void CClientGame::PreWorldProcessHandler ( void )
 {
+#if 0
     // If we are not minimized we do the pulsing here
     if ( !g_pCore->IsWindowMinimized () )
     {
@@ -3524,6 +3531,7 @@ void CClientGame::PreWorldProcessHandler ( void )
             DoPulses ();
         }
     }
+#endif
 }
 
 void CClientGame::PostWorldProcessHandler ( void )

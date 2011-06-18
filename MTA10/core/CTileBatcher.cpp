@@ -150,54 +150,52 @@ void CTileBatcher::Flush ( void )
         m_pDevice->SetFVF ( SPDTVertex::FVF );
 
         // Draw
-        if ( STextureItem* pTextureItem = DynamicCast < STextureItem > ( m_pCurrentMaterial ) )
+        if ( CTextureItem* pTextureItem = DynamicCast < CTextureItem > ( m_pCurrentMaterial ) )
         {
             // Draw using texture
-            m_pDevice->SetTexture( 0, pTextureItem->pD3DTexture );
+            m_pDevice->SetTexture( 0, pTextureItem->m_pD3DTexture );
             m_pDevice->DrawPrimitiveUP ( D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride );
         }
         else
-        if ( SShaderItem* pShaderItem = DynamicCast < SShaderItem > ( m_pCurrentMaterial ) )
+        if ( CShaderInstance* pShaderInstance = DynamicCast < CShaderInstance > ( m_pCurrentMaterial ) )
         {
             // Draw using shader
+            ID3DXEffect* pD3DEffect = pShaderInstance->m_pD3DEffect;
+
+            // Apply user set parameters
+            pShaderInstance->ApplyShaderParameters ();
 
             // Set matrices and time
-            if ( pShaderItem->hWorld )
-                pShaderItem->pD3DEffect->SetMatrix ( pShaderItem->hWorld, &matWorld );
+            if ( pShaderInstance->m_hWorld )
+                pD3DEffect->SetMatrix ( pShaderInstance->m_hWorld, &matWorld );
 
-            if ( pShaderItem->hView )
-                pShaderItem->pD3DEffect->SetMatrix ( pShaderItem->hView, &m_MatView );
+            if ( pShaderInstance->m_hView )
+                pD3DEffect->SetMatrix ( pShaderInstance->m_hView, &m_MatView );
 
-            if ( pShaderItem->hProjection )
-                pShaderItem->pD3DEffect->SetMatrix ( pShaderItem->hProjection, &m_MatProjection );
+            if ( pShaderInstance->m_hProjection )
+                pD3DEffect->SetMatrix ( pShaderInstance->m_hProjection, &m_MatProjection );
 
-            if ( pShaderItem->hAll )
+            if ( pShaderInstance->m_hAll )
             {
                 D3DXMATRIX matAll = matWorld * m_MatProjection;     // m_MatView is always identity
-                pShaderItem->pD3DEffect->SetMatrix ( pShaderItem->hAll, &matAll );
+                pD3DEffect->SetMatrix ( pShaderInstance->m_hAll, &matAll );
             }
 
-            if ( pShaderItem->hTime )
-                pShaderItem->pD3DEffect->SetFloat ( pShaderItem->hTime, GetTickCount64_ () / 1000.f );
+            if ( pShaderInstance->m_hTime )
+                pD3DEffect->SetFloat ( pShaderInstance->m_hTime, GetTickCount64_ () * 0.001f );
 
             // Do shader passes
             DWORD dwFlags = 0;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
             uint uiNumPasses = 0;
-            HRESULT hr = pShaderItem->pD3DEffect->Begin ( &uiNumPasses, dwFlags );
-            assert ( SUCCEEDED( hr ) );
+            pD3DEffect->Begin ( &uiNumPasses, dwFlags );
 
             for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
             {
-                hr = pShaderItem->pD3DEffect->BeginPass ( uiPass );
-                assert ( SUCCEEDED( hr ) );
-
+                pD3DEffect->BeginPass ( uiPass );
                 m_pDevice->DrawPrimitiveUP ( D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride );
-
-                hr = pShaderItem->pD3DEffect->EndPass ();
-                assert ( SUCCEEDED( hr ) );
+                pD3DEffect->EndPass ();
             }
-            hr = pShaderItem->pD3DEffect->End ();
-            assert ( SUCCEEDED( hr ) );
+            pD3DEffect->End ();
         }
 
         // Clean up
@@ -225,7 +223,7 @@ void CTileBatcher::Flush ( void )
 // Safely change the current rendering material
 //
 ////////////////////////////////////////////////////////////////
-void CTileBatcher::SetCurrentMaterial ( SMaterialItem* pMaterial )
+void CTileBatcher::SetCurrentMaterial ( CMaterialItem* pMaterial )
 {
     if ( m_pCurrentMaterial )
         m_pCurrentMaterial->Release ();
@@ -249,7 +247,7 @@ void CTileBatcher::AddTile ( float fX1, float fY1,
                               float fX2, float fY2,
                               float fU1, float fV1,
                               float fU2, float fV2, 
-                              SMaterialItem* pMaterial,
+                              CMaterialItem* pMaterial,
                               float fRotation,
                               float fRotCenOffX,
                               float fRotCenOffY,

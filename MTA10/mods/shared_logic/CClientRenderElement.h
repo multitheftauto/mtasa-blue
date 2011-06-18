@@ -22,10 +22,10 @@ public:
     void                    SetPosition             ( const CVector& vecPosition )      {}
 
     // CClientRenderElement methods
-    SRenderItem*            GetRenderItem           ( void )                            { return m_pRenderItem; }
+    CRenderItem*            GetRenderItem           ( void )                            { return m_pRenderItem; }
 
 protected:
     bool                            bDoneUnlink;
-    SRenderItem*                    m_pRenderItem;
+    CRenderItem*                    m_pRenderItem;
     CClientRenderElementManager*    m_pRenderElementManager;
 };

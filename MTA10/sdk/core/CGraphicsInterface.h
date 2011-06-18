@@ -97,7 +97,7 @@ public:
                                                           float fU, float fV,
                                                           float fSizeU, float fSizeV, 
                                                           bool bRelativeUV,
-                                                          SMaterialItem* pMaterial,
+                                                          CMaterialItem* pMaterial,
                                                           float fRotation,
                                                           float fRotCenOffX,
                                                           float fRotCenOffY,
@@ -114,6 +114,7 @@ public:
                                                           ID3DXFont * pDXFont,
                                                           bool bPostGUI ) = 0;
 
+    virtual void                    EnableSetRenderTarget       ( bool bEnable ) = 0;
     // Subsystems
     virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;
 };

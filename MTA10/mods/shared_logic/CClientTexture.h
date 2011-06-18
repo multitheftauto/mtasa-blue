@@ -14,12 +14,12 @@ class CClientTexture : public CClientMaterial
 {
     DECLARE_CLASS( CClientTexture, CClientMaterial )
 public:
-                            CClientTexture         ( CClientManager* pManager, ElementID ID, STextureItem* pTextureItem );
+                            CClientTexture         ( CClientManager* pManager, ElementID ID, CTextureItem* pTextureItem );
 
     eClientEntityType       GetType                 ( void ) const                      { return CCLIENTTEXTURE; }
 
     // CClientTexture methods
-    STextureItem*           GetTextureItem          ( void )                            { return (STextureItem*)m_pRenderItem; }
+    CTextureItem*           GetTextureItem          ( void )                            { return (CTextureItem*)m_pRenderItem; }
 
 };
 
@@ -28,10 +28,10 @@ class CClientRenderTarget : public CClientTexture
 {
     DECLARE_CLASS( CClientRenderTarget, CClientTexture )
 public:
-                            CClientRenderTarget         ( CClientManager* pManager, ElementID ID, SRenderTargetItem* pRenderTargetItem ) : ClassInit ( this ), CClientTexture ( pManager, ID, pRenderTargetItem ) {}
+                            CClientRenderTarget         ( CClientManager* pManager, ElementID ID, CRenderTargetItem* pRenderTargetItem ) : ClassInit ( this ), CClientTexture ( pManager, ID, pRenderTargetItem ) {}
 
     // CClientRenderTarget methods
-    SRenderTargetItem*      GetRenderTargetItem          ( void )                       { return (SRenderTargetItem*)m_pRenderItem; }
+    CRenderTargetItem*      GetRenderTargetItem          ( void )                       { return (CRenderTargetItem*)m_pRenderItem; }
 };
 
 
@@ -39,8 +39,8 @@ class CClientScreenSource : public CClientTexture
 {
     DECLARE_CLASS( CClientScreenSource, CClientTexture )
 public:
-                            CClientScreenSource         ( CClientManager* pManager, ElementID ID, SScreenSourceItem* pScreenSourceItem ) : ClassInit ( this ), CClientTexture ( pManager, ID, pScreenSourceItem ) {}
+                            CClientScreenSource         ( CClientManager* pManager, ElementID ID, CScreenSourceItem* pScreenSourceItem ) : ClassInit ( this ), CClientTexture ( pManager, ID, pScreenSourceItem ) {}
 
     // CClientScreenSource methods
-    SScreenSourceItem*      GetScreenSourceItem          ( void )                       { return (SScreenSourceItem*)m_pRenderItem; }
+    CScreenSourceItem*      GetScreenSourceItem          ( void )                       { return (CScreenSourceItem*)m_pRenderItem; }
 };

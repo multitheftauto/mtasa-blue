@@ -18,42 +18,42 @@
 class CRenderItemManager : public CRenderItemManagerInterface
 {
 public:
+    ZERO_ON_NEW
                                 CRenderItemManager          ( void );
                                 ~CRenderItemManager         ( void );
 
     // CRenderItemManagerInterface
-    virtual SFontItem*          CreateFont                  ( const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold );
-    virtual STextureItem*       CreateTexture               ( const SString& strFullFilePath );
-    virtual SShaderItem*        CreateShader                ( const SString& strFullFilePath, SString& strOutStatus );
-    virtual SRenderTargetItem*  CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
-    virtual SScreenSourceItem*  CreateScreenSource          ( uint uiSizeX, uint uiSizeY );
-    virtual void                ReleaseRenderItem           ( SRenderItem* pItem );
-    virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, STextureItem* pTextureItem );
-    virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, bool bValue );
-    virtual bool                SetShaderValue              ( SShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount );
-    virtual bool                SetRenderTarget             ( SRenderTargetItem* pItem, bool bClear );
+    virtual CFontItem*          CreateFont                  ( const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold );
+    virtual CTextureItem*       CreateTexture               ( const SString& strFullFilePath );
+    virtual CShaderItem*        CreateShader                ( const SString& strFullFilePath, SString& strOutStatus );
+    virtual CRenderTargetItem*  CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
+    virtual CScreenSourceItem*  CreateScreenSource          ( uint uiSizeX, uint uiSizeY );
+    virtual void                ReleaseRenderItem           ( CRenderItem* pItem );
+    virtual bool                SetShaderValue              ( CShaderItem* pItem, const SString& strName, CTextureItem* pTextureItem );
+    virtual bool                SetShaderValue              ( CShaderItem* pItem, const SString& strName, bool bValue );
+    virtual bool                SetShaderValue              ( CShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount );
+    virtual bool                SetRenderTarget             ( CRenderTargetItem* pItem, bool bClear );
     virtual bool                RestoreDefaultRenderTarget  ( void );
     virtual void                UpdateBackBufferCopy        ( void );
-    virtual void                UpdateScreenSource          ( SScreenSourceItem* pScreenSourceItem );
+    virtual void                UpdateScreenSource          ( CScreenSourceItem* pScreenSourceItem );
 
     // CRenderItemManager
+    void                        NotifyContructRenderItem    ( CRenderItem* pItem );
+    void                        NotifyDestructRenderItem    ( CRenderItem* pItem );
     void                        OnDeviceCreate              ( IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY );
+    void                        OnLostDevice                ( void );
+    void                        OnResetDevice               ( void );
     void                        UpdateBackBufferCopySize    ( void );
-    void                        ReleaseFontData             ( SFontItem* pFontItem );
-    void                        ReleaseTextureData          ( STextureItem* pTextureItem );
-    void                        ReleaseShaderData           ( SShaderItem* pTextureItem );
-    void                        ReleaseRenderTargetData     ( SRenderTargetItem* pRenderTargetItem );
-    void                        ReleaseScreenSourceData     ( SScreenSourceItem* pScreenSourceItem );
     void                        ChangeRenderTarget          ( uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface );
 
-protected:
     IDirect3DDevice9*           m_pDevice;
-    std::set < SRenderItem* >   m_CreatedItemList;
+protected:
+    std::set < CRenderItem* >   m_CreatedItemList;
     IDirect3DSurface9*          m_pDefaultD3DRenderTarget;
     IDirect3DSurface9*          m_pDefaultD3DZStencilSurface;
     uint                        m_uiDefaultViewportSizeX;
     uint                        m_uiDefaultViewportSizeY;
-    SRenderTargetItem*          m_pBackBufferCopy;
+    CRenderTargetItem*          m_pBackBufferCopy;
     bool                        m_bBackBufferCopyMaybeNeedsResize;
     uint                        m_uiBackBufferCopyRevision;
 };

@@ -19,7 +19,7 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientFont::CClientFont ( CClientManager* pManager, ElementID ID, SFontItem* pFontItem ) : ClassInit ( this ), CClientRenderElement ( pManager, ID )
+CClientFont::CClientFont ( CClientManager* pManager, ElementID ID, CFontItem* pFontItem ) : ClassInit ( this ), CClientRenderElement ( pManager, ID )
 {
     SetTypeName ( "font" );
     m_pRenderItem = pFontItem;
@@ -65,7 +65,7 @@ void CClientFont::Unlink ( void )
 ////////////////////////////////////////////////////////////////
 const SString& CClientFont::GetGUIFontName ( void )
 {
-    return GetFontItem ()->strCEGUIFontName;
+    return GetFontItem ()->m_strCEGUIFontName;
 }
 
 
@@ -79,8 +79,8 @@ const SString& CClientFont::GetGUIFontName ( void )
 ID3DXFont* CClientFont::GetDXFont ( float fScaleX, float fScaleY )
 {
     if ( fScaleX > 1.1f || fScaleY > 1.1f )
-        return GetFontItem ()->pFntBig;
-    return GetFontItem ()->pFntNormal;
+        return GetFontItem ()->m_pFntBig;
+    return GetFontItem ()->m_pFntNormal;
 }
 
 
