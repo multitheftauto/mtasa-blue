@@ -4676,11 +4676,11 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_MODELFLAGS:
             {
-                unsigned int oldflags = pEntry->GetModelFlags();
+                /*unsigned int oldflags = pEntry->GetModelFlags();
                 if ((uiValue & 7) != (oldflags & 7))
                 {
                     return false;
-                }
+                }*/
                 pEntry->SetModelFlags ( uiValue );
                 return true;
             }
