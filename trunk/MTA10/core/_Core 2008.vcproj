@@ -561,6 +561,34 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderItem.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.FileTexture.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.Font.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.RenderTarget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.ScreenSource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.Shader.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.ShaderInstance.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderItemManager.cpp"
 				>
 			</File>
@@ -582,10 +610,6 @@
 			</File>
 			<File
 				RelativePath=".\CServerCache.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CServerCache.h"
 				>
 			</File>
 			<File
@@ -975,6 +999,10 @@
 			</File>
 			<File
 				RelativePath=".\CServerBrowser.RemoteMasterServer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CServerCache.h"
 				>
 			</File>
 			<File

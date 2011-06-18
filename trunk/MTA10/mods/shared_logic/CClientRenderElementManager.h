@@ -41,7 +41,7 @@ protected:
     CClientManager*                                     m_pClientManager;
     CRenderItemManagerInterface*                        m_pRenderItemManager;
     std::map < SString, CClientTexture* >               m_AutoTextureMap;
-    std::map < SRenderItem*, CClientRenderElement* >    m_ItemElementMap;
+    std::map < CRenderItem*, CClientRenderElement* >    m_ItemElementMap;
     uint                                                m_uiStatsFontCount;
     uint                                                m_uiStatsTextureCount;
     uint                                                m_uiStatsShaderCount;

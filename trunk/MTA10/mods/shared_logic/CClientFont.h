@@ -14,14 +14,14 @@ class CClientFont : public CClientRenderElement
 {
     DECLARE_CLASS( CClientFont, CClientRenderElement )
 public:
-                            CClientFont             ( CClientManager* pManager, ElementID ID, SFontItem* pFontItem );
+                            CClientFont             ( CClientManager* pManager, ElementID ID, CFontItem* pFontItem );
                             ~CClientFont            ( void );
 
     eClientEntityType       GetType                 ( void ) const                      { return CCLIENTFONT; }
     void                    Unlink                  ( void );
 
     // CClientFont methods
-    SFontItem*              GetFontItem             ( void )                            { return (SFontItem*)m_pRenderItem; }
+    CFontItem*              GetFontItem             ( void )                            { return (CFontItem*)m_pRenderItem; }
     const SString&          GetGUIFontName          ( void );
     ID3DXFont*              GetDXFont               ( float fScaleX, float fScaleY );
     void                    NotifyGUIElementAttach  ( CClientGUIElement* pGUIElement );

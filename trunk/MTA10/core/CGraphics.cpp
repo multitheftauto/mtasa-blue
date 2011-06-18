@@ -540,16 +540,18 @@ bool CGraphics::DrawTextureQueued ( float fX, float fY,
                                  float fU, float fV,
                                  float fSizeU, float fSizeV,
                                  bool bRelativeUV,
-                                 SMaterialItem* pMaterial,
+                                 CMaterialItem* pMaterial,
                                  float fRotation,
                                  float fRotCenOffX,
                                  float fRotCenOffY,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
-    // Shaders can't be drawn postGUI or outside onClientRender
-    if ( ( bPostGUI || !m_bSetRenderTargetEnabled ) && pMaterial->IsA ( SShaderItem::GetClassId () ) )
-        return false;
+    // If material is a shader, use its current instance
+    if ( CShaderItem* pShaderItem = DynamicCast < CShaderItem >( pMaterial ) )
+    {
+        pMaterial = pShaderItem->m_pShaderInstance;
+    }
 
     // Set up a queue item
     sDrawQueueItem Item;
@@ -729,7 +731,7 @@ bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strF
     *pDXSmallFont = pNewDXSmallFont;
     *pDXBigFont = pNewDXBigFont;
 
-    return bSuccess && SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) && ( iLoaded == 1 );
+    return bSuccess && ( iLoaded == 1 );
 }
 
 bool CGraphics::DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont *pDXSmallFont, ID3DXFont *pDXBigFont )
@@ -856,6 +858,8 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 
     if ( m_pLineInterface )
         m_pLineInterface->OnLostDevice ();
+
+    m_pRenderItemManager->OnLostDevice ();
 }
 
 
@@ -876,6 +880,8 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 
     if ( m_pLineInterface )
         m_pLineInterface->OnResetDevice ();
+
+    m_pRenderItemManager->OnResetDevice ();
 }
 
 
@@ -1051,8 +1057,8 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
             if ( !t.bRelativeUV )
             {
                 // If UV's are absolute pixels, then scale the range to 0.0f - 1.0f.
-                float fUScale = 1.0f / (float)t.pMaterial->uiSizeX;
-                float fVScale = 1.0f / (float)t.pMaterial->uiSizeY;
+                float fUScale = 1.0f / (float)t.pMaterial->m_uiSizeX;
+                float fVScale = 1.0f / (float)t.pMaterial->m_uiSizeY;
                 fU1 *= fUScale;
                 fV1 *= fVScale;
                 fU2 *= fUScale;
@@ -1100,17 +1106,15 @@ void CGraphics::ClearDrawQueue ( std::vector < sDrawQueueItem >& Queue )
 //
 // Use ref counting to prevent render items from being deleted while in the queue
 //
-void CGraphics::AddQueueRef ( SRenderItem* pRenderItem )
+void CGraphics::AddQueueRef ( CRenderItem* pRenderItem )
 {
     pRenderItem->AddRef ();
-    pRenderItem->bInQueue = true;
     m_iDebugQueueRefs++;    // For debugging
 }
 
-void CGraphics::RemoveQueueRef ( SRenderItem* pRenderItem )
+void CGraphics::RemoveQueueRef ( CRenderItem* pRenderItem )
 {
     pRenderItem->Release ();
-    pRenderItem->bInQueue = false;
     m_iDebugQueueRefs--;    // For debugging
 }
 

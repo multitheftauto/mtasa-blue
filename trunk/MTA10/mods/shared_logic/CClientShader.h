@@ -14,11 +14,11 @@ class CClientShader : public CClientMaterial
 {
     DECLARE_CLASS( CClientShader, CClientMaterial )
 public:
-                            CClientShader           ( CClientManager* pManager, ElementID ID, SShaderItem* pShaderItem );
+                            CClientShader           ( CClientManager* pManager, ElementID ID, CShaderItem* pShaderItem );
 
     eClientEntityType       GetType                 ( void ) const                      { return CCLIENTSHADER; }
 
     // CClientShader methods
-    SShaderItem*            GetShaderItem           ( void )                            { return (SShaderItem*)m_pRenderItem; }
+    CShaderItem*            GetShaderItem           ( void )                            { return (CShaderItem*)m_pRenderItem; }
 
 };

@@ -19,7 +19,7 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientShader::CClientShader ( CClientManager* pManager, ElementID ID, SShaderItem* pShaderItem ) : ClassInit ( this ), CClientMaterial ( pManager, ID )
+CClientShader::CClientShader ( CClientManager* pManager, ElementID ID, CShaderItem* pShaderItem ) : ClassInit ( this ), CClientMaterial ( pManager, ID )
 {
     SetTypeName ( "shader" );
     m_pRenderItem = pShaderItem;

@@ -44,18 +44,18 @@ public:
                                       float fWidth, float fHeight,
                                       float fU, float fV,
                                       float fSizeU, float fSizeV, 
-                                      SMaterialItem* pMaterial,
+                                      CMaterialItem* pMaterial,
                                       float fRotation,
                                       float fRotCenOffX,
                                       float fRotCenOffY,
                                       unsigned long ulColor );
 
-        void    SetCurrentMaterial ( SMaterialItem* pMaterial );
+        void    SetCurrentMaterial ( CMaterialItem* pMaterial );
         void    OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewViewportSizeY );
 
 protected:
     IDirect3DDevice9*           m_pDevice;
-    SMaterialItem*              m_pCurrentMaterial;
+    CMaterialItem*              m_pCurrentMaterial;
     float                       m_fCurrentRotation;
     float                       m_fCurrentRotCenX;
     float                       m_fCurrentRotCenY;

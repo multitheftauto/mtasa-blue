@@ -31,15 +31,26 @@ namespace SharedUtil
             { \
                 return ( ClassHierarchyBits & ( 1ULL << classId ) ) ? true : false; \
             } \
+            const char* GetClassName ( void ) \
+            { \
+                return ClassName; \
+            } \
         protected: \
+            static const char* StaticGetClassName ( void ) \
+            { \
+                return #cls; \
+            } \
             static ClassBits CalcClassHierarchyBits ( void ) \
             { \
                 return ( 1ULL << GetClassId () ); \
             } \
+            const char* ClassName; \
             ClassBits ClassHierarchyBits; \
             friend CAutoClassInit < cls >; \
             CAutoClassInit < cls > ClassInit; \
-        public:
+        public: \
+            void* operator new ( size_t size )              { void* ptr = ::operator new(size); memset(ptr,0,size); return ptr; } \
+            void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }
 
 
 
@@ -50,13 +61,20 @@ namespace SharedUtil
                 return CLASS_##cls; \
             } \
         protected: \
+            static const char* StaticGetClassName ( void ) \
+            { \
+                return #cls; \
+            } \
             static ClassBits CalcClassHierarchyBits ( void ) \
             { \
                 return ( 1ULL << GetClassId () ) | super::CalcClassHierarchyBits (); \
             } \
             friend CAutoClassInit < cls >; \
             CAutoClassInit < cls > ClassInit; \
-        public:
+        public: \
+            typedef super Super; \
+            void* operator new ( size_t size )              { void* ptr = ::operator new(size); memset(ptr,0,size); return ptr; } \
+            void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }
 
 
     //
@@ -70,6 +88,7 @@ namespace SharedUtil
         {
             assert ( ptr->GetClassId () < sizeof ( ClassBits ) * 8 );
             ptr->ClassHierarchyBits = ptr->CalcClassHierarchyBits();
+            ptr->ClassName = ptr->StaticGetClassName();
         }
     };
 

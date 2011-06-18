@@ -109,14 +109,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Maybe capture screen
     CGraphics::GetSingleton ().GetRenderItemManager ()->UpdateBackBufferCopy ();
 
-    // Allow scripted setRenderTarget
-    CGraphics::GetSingleton ().EnableSetRenderTarget ( true );
-
     // Notify core
     CCore::GetSingleton ().DoPostFramePulse ();
-
-    // Disallow scripted setRenderTarget
-    CGraphics::GetSingleton ().EnableSetRenderTarget ( false );
 
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();

@@ -18,7 +18,7 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientTexture::CClientTexture ( CClientManager* pManager, ElementID ID, STextureItem* pTextureItem ) : ClassInit ( this ), CClientMaterial ( pManager, ID )
+CClientTexture::CClientTexture ( CClientManager* pManager, ElementID ID, CTextureItem* pTextureItem ) : ClassInit ( this ), CClientMaterial ( pManager, ID )
 {
     SetTypeName ( "texture" );
     m_pRenderItem = pTextureItem;

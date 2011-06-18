@@ -111,7 +111,7 @@ public:
                                                   float fU, float fV,
                                                   float fSizeU, float fSizeV, 
                                                   bool bRelativeUV,
-                                                  SMaterialItem* pMaterial,
+                                                  CMaterialItem* pMaterial,
                                                   float fRotation,
                                                   float fRotCenOffX,
                                                   float fRotCenOffY,
@@ -250,7 +250,7 @@ private:
 
     struct sDrawQueueTexture
     {
-        SMaterialItem*  pMaterial;
+        CMaterialItem*  pMaterial;
         float           fX;
         float           fY;
         float           fWidth;
@@ -300,8 +300,8 @@ private:
     void                                DrawQueueItem           ( const sDrawQueueItem& Item );
     void                                DrawQueue               ( std::vector < sDrawQueueItem >& Queue );
     void                                ClearDrawQueue          ( std::vector < sDrawQueueItem >& Queue );
-    void                                AddQueueRef             ( SRenderItem* pRenderItem );
-    void                                RemoveQueueRef          ( SRenderItem* pRenderItem );
+    void                                AddQueueRef             ( CRenderItem* pRenderItem );
+    void                                RemoveQueueRef          ( CRenderItem* pRenderItem );
 
     // Drawing types
     struct ID3DXLine*                   m_pLineInterface;
