@@ -102,16 +102,23 @@ void CFontItem::CreateUnderlyingData ( const SString& strFontName, uint uiSize, 
     // Find unused font name
     int iCounter = 0;
     do
-        m_strCEGUIFontName = SString ( "%s*%d*%d_%d", *strFontName, uiSize, bBold, iCounter );
+        m_strCEGUIFontName = SString ( "%s*%d*%d_%d", *strFontName, uiSize, bBold, iCounter++ );
     while ( CCore::GetSingleton ().GetGUI ()->IsFontPresent ( m_strCEGUIFontName ) );
 
     // Create the CEGUI font
-    m_pFntCEGUI = CCore::GetSingleton ().GetGUI ()->CreateFnt ( m_strCEGUIFontName, m_strFullFilePath, uiSize );
+    try
+    {
+        m_pFntCEGUI = CCore::GetSingleton ().GetGUI ()->CreateFnt ( m_strCEGUIFontName, m_strFullFilePath, uiSize );
+    }
+    catch (...)
+    {
+        // Catch any font creation problems
+    }
+
     if ( !m_pFntCEGUI )
         return;
 
     // Create ths DX fonts
-    //ID3DXFont *pFntNormal = NULL,*pFntBig = NULL;
     FONT_PROPERTIES sFontProps;
     if ( GetFontProperties ( LPCTSTR ( m_strFullFilePath.c_str () ), &sFontProps ) )
         CCore::GetSingleton ().GetGraphics()->LoadAdditionalDXFont ( m_strFullFilePath, sFontProps.csName, uiSize, bBold, &m_pFntNormal, &m_pFntBig );
