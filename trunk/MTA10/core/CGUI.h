@@ -41,6 +41,7 @@ class CLocalGUI;
 #include "CSingleton.h"
 #include "CCommunityRegistration.h"
 #include "CVersionUpdater.h"
+#include "CNewsBrowser.h"
 
 #include <windows.h>
 

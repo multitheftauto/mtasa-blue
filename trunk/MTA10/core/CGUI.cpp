@@ -147,6 +147,10 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
 
     // Return the old current dir.
     SetCurrentDirectory ( szCurDir );
+
+    // Create our news headlines if we're already ingame
+    if ( bGameIsAlreadyLoaded )
+        m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
 }
 
 
