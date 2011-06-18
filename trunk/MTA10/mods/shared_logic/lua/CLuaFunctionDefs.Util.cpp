@@ -21,7 +21,7 @@
 
 int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) || ( lua_type ( luaVM, 3 ) != LUA_TNUMBER ) )
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) || ( lua_type ( luaVM, 3 ) != LUA_TNUMBER ) && ( lua_type ( luaVM, 3 ) != LUA_TSTRING ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "gettok" );
 
@@ -29,10 +29,18 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
         return 1;
     }
 
+    SString strDelimiter;
+    if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER )
+    {
+        unsigned int uiCharacter = static_cast < unsigned int > ( lua_tonumber ( luaVM, 3 ) );
+        wchar_t wUNICODE[2] = { uiCharacter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        strDelimiter = lua_tostring ( luaVM, 3 );
+
     const char* szText = lua_tostring ( luaVM, 1 );
     int iToken = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-    int iDelimiter = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
-
     unsigned int uiCount = 0;
 
     if ( iToken > 0 && iToken < 1024 )
@@ -40,8 +48,6 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
         // Copy the string
         char* strText = new char [ strlen ( szText ) + 1 ];
         strcpy ( strText, szText );
-
-        SString strDelimiter ( "%c", iDelimiter );
 
         unsigned int uiCount = 1;
         char* szToken = strtok ( strText, strDelimiter );
@@ -80,7 +86,7 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
 
 int CLuaFunctionDefs::Split ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) )
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER && ( lua_type ( luaVM, 2 ) != LUA_TSTRING ) ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "split" );
 
@@ -88,14 +94,21 @@ int CLuaFunctionDefs::Split ( lua_State* luaVM )
         return 1;
     }
 
+    SString strDelimiter;
+    if ( lua_type ( luaVM, 2 ) == LUA_TNUMBER )
+    {
+        unsigned int uiCharacter = static_cast < unsigned int > ( lua_tonumber ( luaVM, 2 ) );
+        wchar_t wUNICODE[2] = { uiCharacter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else  // It's already a string
+        strDelimiter = lua_tostring ( luaVM, 2 );
+
     const char* szText = lua_tostring ( luaVM, 1 );
-    int iDelimiter = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
 
     // Copy the string
     char* strText = new char [ strlen ( szText ) + 1 ];
     strcpy ( strText, szText );
-
-    SString strDelimiter ( "%c", iDelimiter );
 
     unsigned int uiCount = 0;
     char* szToken = strtok ( strText, strDelimiter );

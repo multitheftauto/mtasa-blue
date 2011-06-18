@@ -170,6 +170,10 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         return 1;
     }
 
+    // Set our locale to the C locale, except for character handling which is the system's default
+    std::setlocale(LC_ALL,"C");
+    std::setlocale(LC_CTYPE,"");
+
 #ifndef WIN32
     // Daemonize?
     if ( g_bDaemonized )
@@ -198,9 +202,6 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         SetConsoleScreenBufferSize( m_hConsole, ScrnBufferInfo.dwSize );
         SetConsoleOutputCP(CP_UTF8);
 #else
-        // support user locales
-        std::setlocale(LC_ALL, "");
-
         // Initialize the window and any necessary curses options
         initscr ( );
         keypad ( stdscr, TRUE );
