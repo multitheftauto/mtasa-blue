@@ -600,7 +600,7 @@ void TabControl::performChildWindowLayout()
         for (i = d_tabButtonIndexMap.begin(); i != iend; ++i)
         {
             TabButton* btn = i->second;
-            if ( btn->isVisible() )
+            if ( btn->isVisible ( true ) )
             {
                 calculateTabButtonSizePosition(btn, x);
                 ++x;
