@@ -21,9 +21,10 @@ public:
     virtual VOID                SetHelpMessage( char * szMessage )=0;
     virtual VOID                SetBigMessage ( char * szBigMessage )=0;
     virtual VOID                Disable ( bool bDisabled )=0;
-    virtual VOID                DrawBarChart ( float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor )=0;
+    //virtual VOID                DrawBarChart ( float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor )=0;
     virtual bool                CalcScreenCoors ( CVector * vecPosition1, CVector * vecPosition2, float * fX, float * fY, bool bSetting1, bool bSetting2 )=0;
-    virtual void                Draw2DPolygon ( float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor )=0;
+    // Do not use - Seems to changes render/internal states
+    //virtual void                Draw2DPolygon ( float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor )=0;
 //  virtual VOID                SetVehicleName( char * szName )=0;
     //virtual VOID              SetZoneName( char * szName )=0;
 

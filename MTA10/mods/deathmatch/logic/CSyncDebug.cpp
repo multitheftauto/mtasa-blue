@@ -134,10 +134,9 @@ void CSyncDebug::OnDraw ( void )
     // Draw the background for global stats
     float fResWidth = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportWidth () );
     float fResHeight = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportHeight () );
-    g_pGame->GetHud ()->Draw2DPolygon ( 0.75f * fResWidth, 0.30f * fResHeight,
-                                        1.0f * fResWidth, 0.30f * fResHeight,
-                                        0.75f * fResWidth, 0.80f * fResHeight,
-                                        1.0f * fResWidth, 0.80f * fResHeight,
+    g_pCore->GetGraphics ()->DrawRectangle ( 
+                                        0.75f * fResWidth, 0.30f * fResHeight,
+                                        0.25f * fResWidth, 0.50f * fResHeight,
                                         0x78000000 );
 
     // Populate a string to print
