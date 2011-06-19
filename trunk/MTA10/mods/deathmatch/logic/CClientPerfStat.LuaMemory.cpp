@@ -261,7 +261,8 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
     pResult->AddColumn ( "Timers" );
     pResult->AddColumn ( "Elements" );
     pResult->AddColumn ( "TextItems" );
-    pResult->AddColumn ( "Fonts" );
+    pResult->AddColumn ( "DxFonts" );
+    pResult->AddColumn ( "GuiFonts" );
     pResult->AddColumn ( "Textures" );
     pResult->AddColumn ( "Shaders" );
     pResult->AddColumn ( "RenderTargets" );
@@ -300,14 +301,16 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
         // Some extra 'all VM' things
         c += 4;
         int TextItemCount = g_pClientGame->GetManager ()->GetDisplayManager ()->Count ();
-        int FontCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetFontCount ();
+        int DxFontCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetDxFontCount ();
+        int GuiFontCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetGuiFontCount ();
         int TextureCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetTextureCount ();
         int ShaderCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetShaderCount ();
         int RenderTargetCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetRenderTargetCount ();
         int ScreenSourceCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetScreenSourceCount ();
         TextItemCount = Max ( TextItemCount - 4, 0 );   // Remove count for radar items
         row[c++] = !TextItemCount ? "-" : SString ( "%d", TextItemCount );
-        row[c++] = !FontCount ? "-" : SString ( "%d", FontCount );
+        row[c++] = !DxFontCount ? "-" : SString ( "%d", DxFontCount );
+        row[c++] = !GuiFontCount ? "-" : SString ( "%d", GuiFontCount );
         row[c++] = !TextureCount ? "-" : SString ( "%d", TextureCount );
         row[c++] = !ShaderCount ? "-" : SString ( "%d", ShaderCount );
         row[c++] = !RenderTargetCount ? "-" : SString ( "%d", RenderTargetCount );

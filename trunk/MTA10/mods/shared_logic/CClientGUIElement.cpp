@@ -155,7 +155,7 @@ bool CClientGUIElement::_CallbackEvent2 ( CGUIElement* pCGUIElement )
 //
 // Get which font name and font element we are using now
 //
-SString CClientGUIElement::GetFont ( CClientFont** ppFontElement )
+SString CClientGUIElement::GetFont ( CClientGuiFont** ppFontElement )
 {
     *ppFontElement = m_pFontElement;
     return GetCGUIElement ()->GetFont ();
@@ -164,12 +164,12 @@ SString CClientGUIElement::GetFont ( CClientFont** ppFontElement )
 //
 // Change font
 //
-bool CClientGUIElement::SetFont ( const SString& strInFontName, CClientFont* pFontElement )
+bool CClientGUIElement::SetFont ( const SString& strInFontName, CClientGuiFont* pFontElement )
 {
     SString strFontName = strInFontName;
 
     if ( pFontElement )
-        strFontName = pFontElement->GetGUIFontName ();
+        strFontName = pFontElement->GetCEGUIFontName ();
     else
     if ( strFontName.empty () )
         strFontName = "default-normal";

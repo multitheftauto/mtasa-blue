@@ -18,6 +18,7 @@ DECLARE_ENUM( eLuaType );
 
 // class -> class type
 typedef int eEntityType;
+inline eEntityType GetClassType ( CElement* )       { return -1; }
 inline eEntityType GetClassType ( CPlayer* )        { return CElement::PLAYER; }
 inline eEntityType GetClassType ( CVehicle* )       { return CElement::VEHICLE; }
 inline eEntityType GetClassType ( CBlip* )          { return CElement::BLIP; }
@@ -34,6 +35,7 @@ inline eEntityType GetClassType ( CWater* )         { return CElement::WATER; }
 
 
 // class -> class name
+inline SString GetClassTypeName ( CElement* )       { return "element"; }
 inline SString GetClassTypeName ( CPlayer* )        { return "player"; }
 inline SString GetClassTypeName ( CVehicle* )       { return "vehicle"; }
 inline SString GetClassTypeName ( CBlip* )          { return "blip"; }
@@ -69,7 +71,7 @@ CElement* UserDataCast ( CElement*, void* ptr )
 {
     ElementID ID = TO_ELEMENTID ( ptr );
     CElement* pElement = CElementIDs::GetElement ( ID );
-    if ( !pElement || pElement->IsBeingDeleted () || pElement->GetType () != GetClassType ( (T*)0 ) )
+    if ( !pElement || pElement->IsBeingDeleted () || ( pElement->GetType () != GetClassType ( (T*)0 ) && GetClassType ( (T*)0 ) != -1 ) )
         return NULL;
     return pElement;
 }

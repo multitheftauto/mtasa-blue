@@ -104,12 +104,7 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
     pDXFont = GetFont ();
 
     // We're using a big font to keep it looking nice, so get the actual scale
-    if ( fScaleX > 1.1f || fScaleY > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScaleX /= 4.0f;
-        fScaleY /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScaleX, fScaleY );
 
     // Check for a valid font
     if ( pDXFont )
@@ -344,11 +339,7 @@ float CGraphics::GetDXFontHeight ( float fScale, LPD3DXFONT pDXFont )
     if ( !pDXFont )
         pDXFont = GetFont ();
 
-    if ( fScale > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScale /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
 
     if ( pDXFont )
     {
@@ -365,11 +356,7 @@ float CGraphics::GetDXCharacterWidth ( char c, float fScale, LPD3DXFONT pDXFont 
     if ( !pDXFont )
         pDXFont = GetFont ();
 
-    if ( fScale > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScale /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
 
     if ( pDXFont )
     {
@@ -388,11 +375,7 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
     if ( !pDXFont )
         pDXFont = GetFont ();
 
-    if ( fScale > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScale /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
 
     if ( pDXFont )
     {
@@ -596,18 +579,7 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
     if ( !pDXFont ) pDXFont = GetFont ();
 
     // We're using a big font to keep it looking nice, so get the actual scale
-    if ( fScaleX > 1.1f || fScaleY > 1.1f )
-    {
-        ID3DXFont* pDXBigFont = GetBigFont ( pDXFont );
-        if ( pDXBigFont != pDXFont )
-        {
-            pDXFont = pDXBigFont;
-            // Only rescale if big font exists
-            fScaleX /= 4.0f;
-            fScaleY /= 4.0f;
-        }
-    }
-
+    pDXFont = MaybeGetBigFont ( pDXFont, fScaleX, fScaleY );
 
     if ( pDXFont )
     {
@@ -1077,12 +1049,24 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 }
 
 
-ID3DXFont* CGraphics::GetBigFont ( ID3DXFont* pDXFont )
+//
+// Maybe change to a higher resolution font
+//
+ID3DXFont* CGraphics::MaybeGetBigFont ( ID3DXFont* pDXFont, float& fScaleX, float& fScaleY )
 {
-    for ( int i = 0; i < NUM_FONTS; i++ )
+    if ( fScaleX > 1.1f || fScaleY > 1.1f )
     {
-        if ( m_pDXFonts [ i ] == pDXFont )
-            return m_pBigDXFonts [ i ];
+        for ( int i = 0; i < NUM_FONTS; i++ )
+        {
+            if ( m_pDXFonts [ i ] == pDXFont )
+            {
+                // Adjust scale to compensate for higher res font
+                fScaleX *= 0.25f;
+                if ( &fScaleX != &fScaleY )     // Check fScaleY is not the same variable
+                    fScaleY *= 0.25f;
+                return m_pBigDXFonts [ i ];
+            }
+        }
     }
     return pDXFont;
 }

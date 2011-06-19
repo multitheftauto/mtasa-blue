@@ -23,7 +23,8 @@ public:
                                 ~CRenderItemManager         ( void );
 
     // CRenderItemManagerInterface
-    virtual CFontItem*          CreateFont                  ( const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold );
+    virtual CDxFontItem*        CreateDxFont                ( const SString& strFullFilePath, uint uiSize, bool bBold );
+    virtual CGuiFontItem*       CreateGuiFont               ( const SString& strFullFilePath, const SString& strFontName, uint uiSize );
     virtual CTextureItem*       CreateTexture               ( const SString& strFullFilePath );
     virtual CShaderItem*        CreateShader                ( const SString& strFullFilePath, SString& strOutStatus );
     virtual CRenderTargetItem*  CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );

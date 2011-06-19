@@ -69,7 +69,8 @@
 #include <CClientTXD.h>
 #include <CClientWater.h>
 #include <CClientRenderElement.h>
-#include <CClientFont.h>
+#include <CClientDxFont.h>
+#include <CClientGuiFont.h>
 #include <CClientMaterial.h>
 #include <CClientTexture.h>
 #include <CClientShader.h>

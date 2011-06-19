@@ -54,6 +54,7 @@ inline eCGUIType GetClassType ( CGUIComboBox* )    { return CGUI_COMBOBOX; }
 
 
 // class -> class name
+inline SString GetClassTypeName ( CClientEntity* )          { return "element"; }
 inline SString GetClassTypeName ( CClientCamera* )          { return "camera"; }
 inline SString GetClassTypeName ( CClientPlayer* )          { return "player"; }
 inline SString GetClassTypeName ( CClientVehicle* )         { return "vehicle"; }
@@ -75,7 +76,8 @@ inline SString GetClassTypeName ( CClientColModel* )        { return "col-model"
 inline SString GetClassTypeName ( CClientTXD* )             { return "txd"; }
 inline SString GetClassTypeName ( CClientSound* )           { return "sound"; }
 inline SString GetClassTypeName ( CClientWater* )           { return "water"; }
-inline SString GetClassTypeName ( CClientFont* )            { return "font"; }
+inline SString GetClassTypeName ( CClientDxFont* )          { return "dx-font"; }
+inline SString GetClassTypeName ( CClientGuiFont* )         { return "gui-font"; }
 inline SString GetClassTypeName ( CClientMaterial* )        { return "material"; }
 inline SString GetClassTypeName ( CClientTexture* )         { return "texture"; }
 
@@ -140,5 +142,6 @@ bool CheckWrappedUserDataType ( CClientGUIElement*& pGuiElement, SString& strErr
 // Reading mixed types
 //
 class CScriptArgReader;
-bool MixedReadFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientFont*& pFontElement );
+bool MixedReadDxFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientDxFont*& pFontElement );
+bool MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& pFontElement );
 bool MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement );

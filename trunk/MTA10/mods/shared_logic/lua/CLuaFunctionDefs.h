@@ -480,6 +480,7 @@ public:
     LUA_DECLARE ( dxDrawImageSection );
     LUA_DECLARE ( dxGetTextWidth );
     LUA_DECLARE ( dxGetFontHeight );
+    LUA_DECLARE ( dxCreateFont );
     LUA_DECLARE ( dxCreateTexture );
     LUA_DECLARE ( dxCreateShader );
     LUA_DECLARE ( dxCreateRenderTarget );
@@ -488,8 +489,6 @@ public:
     LUA_DECLARE ( dxSetShaderValue );
     LUA_DECLARE ( dxSetRenderTarget );
     LUA_DECLARE ( dxUpdateScreenSource );
-
-    LUA_DECLARE ( CreateFont );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
@@ -534,6 +533,7 @@ public:
     LUA_DECLARE ( GUICreateCheckBox );
     LUA_DECLARE ( GUICreateRadioButton );
     LUA_DECLARE ( GUICreateStaticImage );
+    LUA_DECLARE ( GUICreateFont );
     LUA_DECLARE ( GUIStaticImageLoadImage );
     LUA_DECLARE ( GUIGetSelectedTab );
     LUA_DECLARE ( GUISetSelectedTab );

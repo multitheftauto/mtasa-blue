@@ -3,7 +3,7 @@
 *  PROJECT:     Multi Theft Auto v1.0
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientFont.cpp
+*  FILE:        mods/shared_logic/CClientGuiFont.cpp
 *  PURPOSE:     Custom font bucket
 *  DEVELOPERS:  qwerty
 *
@@ -14,26 +14,26 @@
 
 ////////////////////////////////////////////////////////////////
 //
-// CClientFont::CClientFont
+// CClientGuiFont::CClientGuiFont
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientFont::CClientFont ( CClientManager* pManager, ElementID ID, CFontItem* pFontItem ) : ClassInit ( this ), CClientRenderElement ( pManager, ID )
+CClientGuiFont::CClientGuiFont ( CClientManager* pManager, ElementID ID, CGuiFontItem* pFontItem ) : ClassInit ( this ), CClientRenderElement ( pManager, ID )
 {
-    SetTypeName ( "font" );
+    SetTypeName ( "gui-font" );
     m_pRenderItem = pFontItem;
 }
 
 
 ////////////////////////////////////////////////////////////////
 //
-// CClientFont::~CClientFont
+// CClientGuiFont::~CClientGuiFont
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientFont::~CClientFont ( void )
+CClientGuiFont::~CClientGuiFont ( void )
 {
     Unlink ();
 }
@@ -41,12 +41,12 @@ CClientFont::~CClientFont ( void )
 
 ////////////////////////////////////////////////////////////////
 //
-// CClientFont::Unlink
+// CClientGuiFont::Unlink
 //
 // Remove from manager lists
 //
 ////////////////////////////////////////////////////////////////
-void CClientFont::Unlink ( void )
+void CClientGuiFont::Unlink ( void )
 {
     // Make sure GUI elements are not using us
     while ( m_GUIElementUserList.size () )
@@ -58,40 +58,25 @@ void CClientFont::Unlink ( void )
 
 ////////////////////////////////////////////////////////////////
 //
-// CClientFont::GetGUIFontName
+// CClientGuiFont::GetGUIFontName
 //
 // Get name CEGUI uses for this custom font
 //
 ////////////////////////////////////////////////////////////////
-const SString& CClientFont::GetGUIFontName ( void )
+const SString& CClientGuiFont::GetCEGUIFontName ( void )
 {
-    return GetFontItem ()->m_strCEGUIFontName;
+    return GetGuiFontItem ()->m_strCEGUIFontName;
 }
 
 
 ////////////////////////////////////////////////////////////////
 //
-// CClientFont::GetDXFont
-//
-// Get DXFont for this custom font
-//
-////////////////////////////////////////////////////////////////
-ID3DXFont* CClientFont::GetDXFont ( float fScaleX, float fScaleY )
-{
-    if ( fScaleX > 1.1f || fScaleY > 1.1f )
-        return GetFontItem ()->m_pFntBig;
-    return GetFontItem ()->m_pFntNormal;
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CClientFont::NotifyGUIElementAttach
+// CClientGuiFont::NotifyGUIElementAttach
 //
 // Keep track of GUI elements using this font
 //
 ////////////////////////////////////////////////////////////////
-void CClientFont::NotifyGUIElementAttach ( CClientGUIElement* pGUIElement )
+void CClientGuiFont::NotifyGUIElementAttach ( CClientGUIElement* pGUIElement )
 {
     assert ( !MapContains ( m_GUIElementUserList, pGUIElement ) );
     MapInsert ( m_GUIElementUserList, pGUIElement );
@@ -100,12 +85,12 @@ void CClientFont::NotifyGUIElementAttach ( CClientGUIElement* pGUIElement )
 
 ////////////////////////////////////////////////////////////////
 //
-// CClientFont::NotifyGUIElementDetach
+// CClientGuiFont::NotifyGUIElementDetach
 //
 // Keep track of GUI elements using this font
 //
 ////////////////////////////////////////////////////////////////
-void CClientFont::NotifyGUIElementDetach ( CClientGUIElement* pGUIElement )
+void CClientGuiFont::NotifyGUIElementDetach ( CClientGUIElement* pGUIElement )
 {
     assert ( MapContains ( m_GUIElementUserList, pGUIElement ) );
     MapRemove ( m_GUIElementUserList, pGUIElement );

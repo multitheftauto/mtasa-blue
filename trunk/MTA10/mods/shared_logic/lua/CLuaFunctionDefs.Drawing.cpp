@@ -140,7 +140,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 {
 //  bool dxDrawText ( string text, int left, int top [, int right=left, int bottom=top, int color=white, float scale=1, mixed font="default", 
 //      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI] )
-    SString strText; int iLeft; int iTop; int iRight; int iBottom; ulong ulColor; float fScale; SString strFontName; CClientFont* pFontElement;
+    SString strText; int iLeft; int iTop; int iRight; int iBottom; ulong ulColor; float fScale; SString strFontName; CClientDxFont* pDxFontElement;
     eDXHorizontalAlign alignX; eDXVerticalAlign alignY; bool bClip; bool bWordBreak; bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
@@ -151,7 +151,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     argStream.ReadNumber ( iBottom, iTop );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     argStream.ReadNumber ( fScale, 1 );
-    MixedReadFontString ( argStream, strFontName, "default", pFontElement );
+    MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
     argStream.ReadEnumString ( alignX, DX_ALIGN_LEFT );
     argStream.ReadEnumString ( alignY, DX_ALIGN_TOP );
     argStream.ReadBool ( bClip, false );
@@ -161,7 +161,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         // Get DX font
-        ID3DXFont* pDXFont = CStaticFunctionDefinitions::ResolveDXFont ( strFontName, pFontElement, fScale, fScale );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement, fScale, fScale );
 
         // Make format flag
         ulong ulFormat = alignX | alignY;
@@ -169,7 +169,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         if ( bWordBreak )           ulFormat |= DT_WORDBREAK;
         if ( !bClip )               ulFormat |= DT_NOCLIP;
 
-        CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, strText, fScale, fScale, ulFormat, pDXFont, bPostGUI );
+        CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, strText, fScale, fScale, ulFormat, pD3DXFont, bPostGUI );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -329,16 +329,16 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
 int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 {
 //  float dxGetTextWidth ( string text, [float scale=1, mixed font="default"] )
-    SString strText; float fScale; SString strFontName; CClientFont* pFontElement;
+    SString strText; float fScale; SString strFontName; CClientDxFont* pDxFontElement;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
     argStream.ReadNumber ( fScale, 1 );
-    MixedReadFontString ( argStream, strFontName, "default", pFontElement );
+    MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
 
     if ( !argStream.HasErrors () )
     {
-        ID3DXFont* pDXFont = CStaticFunctionDefinitions::ResolveDXFont ( strFontName, pFontElement, fScale, fScale );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement, fScale, fScale );
 
         // Retrieve the longest line's extent
         std::stringstream ssText ( strText );
@@ -347,7 +347,7 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 
         while( std::getline ( ssText, sLineText ) )
         {
-            fLineExtent = g_pCore->GetGraphics ()->GetDXTextExtent ( sLineText.c_str ( ), fScale, pDXFont );
+            fLineExtent = g_pCore->GetGraphics ()->GetDXTextExtent ( sLineText.c_str ( ), fScale, pD3DXFont );
             if ( fLineExtent > fWidth )
                 fWidth = fLineExtent;
         }
@@ -368,17 +368,17 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 {
 //  int dxGetFontHeight ( [float scale=1, mixed font="default"] )
-    float fScale; SString strFontName; CClientFont* pFontElement;
+    float fScale; SString strFontName; CClientDxFont* pDxFontElement;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( fScale, 1 );
-    MixedReadFontString ( argStream, strFontName, "default", pFontElement );
+    MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
 
     if ( !argStream.HasErrors () )
     {
-        ID3DXFont* pDXFont = CStaticFunctionDefinitions::ResolveDXFont ( strFontName, pFontElement, fScale, fScale );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement, fScale, fScale );
 
-        float fHeight = g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, pDXFont );
+        float fHeight = g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, pD3DXFont );
         // Success
         lua_pushnumber ( luaVM, fHeight );
         return 1;
@@ -718,9 +718,9 @@ int CLuaFunctionDefs::dxUpdateScreenSource ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::CreateFont ( lua_State* luaVM )
+int CLuaFunctionDefs::dxCreateFont ( lua_State* luaVM )
 {
-//  element createFont( string filepath [, int size=9, bool bold=false ] )
+//  element dxCreateFont( string filepath [, int size=9, bool bold=false ] )
     SString strFilePath; int iSize; bool bBold;
 
     CScriptArgReader argStream ( luaVM );
@@ -735,30 +735,29 @@ int CLuaFunctionDefs::CreateFont ( lua_State* luaVM )
         {
             CResource* pParentResource = pLuaMain->GetResource ();
             CResource* pFileResource = pParentResource;
-            SString strPath, strMetaPath;
-            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
+            SString strPath;
+            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath ) )
             {
                 if ( FileExists ( strPath ) )
                 {
-                    SString strUniqueName = SString ( "%s*%s*%s", pParentResource->GetName (), pFileResource->GetName (), strMetaPath.c_str () ).Replace ( "\\", "/" );
-                    CClientFont* pFont = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateFont ( strPath, strUniqueName, iSize, bBold );
-                    if ( pFont )
+                    CClientDxFont* pDxFont = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateDxFont ( strPath, iSize, bBold );
+                    if ( pDxFont )
                     {
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                        pFont->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                        pDxFont->SetParent ( pParentResource->GetResourceDynamicEntity () );
                     }
-                    lua_pushelement ( luaVM, pFont );
+                    lua_pushelement ( luaVM, pDxFont );
                     return 1;
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "createFont", "file-path", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateFont", "file-path", 1 );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "createFont", "file-path", 1 );
+                m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateFont", "file-path", 1 );
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createFont", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateFont", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );

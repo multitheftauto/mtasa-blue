@@ -282,17 +282,15 @@ public:
     //
     // Read one CLuaArgument
     //
-    bool ReadLuaArgument ( CLuaArgument*& outValue )
+    bool ReadLuaArgument ( CLuaArgument& outValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument != LUA_TNONE )
         {
-            outValue = new CLuaArgument();
-            outValue->Read ( m_luaVM, m_iIndex++ );
+            outValue.Read ( m_luaVM, m_iIndex++ );
             return true;
         }
 
-        outValue = NULL;
         SetTypeError ( "argument" );
         m_iIndex++;
         return false;

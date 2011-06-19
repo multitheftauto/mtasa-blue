@@ -76,15 +76,28 @@ IMPLEMENT_ENUM_END( "vertical-align" )
 //
 
 //
-// Font/string
+// DxFont/string
 //
-bool MixedReadFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientFont*& pFontElement )
+bool MixedReadDxFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientDxFont*& pDxFontElement )
 {
-    pFontElement = NULL;
+    pDxFontElement = NULL;
     if ( argStream.NextIsString () || argStream.NextIsNone () )
         return argStream.ReadString ( strFontName, szDefaultFontName );
     else
-        return argStream.ReadUserData ( pFontElement );
+        return argStream.ReadUserData ( pDxFontElement );
+}
+
+
+//
+// GuiFont/string
+//
+bool MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& pGuiFontElement )
+{
+    pGuiFontElement = NULL;
+    if ( argStream.NextIsString () || argStream.NextIsNone () )
+        return argStream.ReadString ( strFontName, szDefaultFontName );
+    else
+        return argStream.ReadUserData ( pGuiFontElement );
 }
 
 

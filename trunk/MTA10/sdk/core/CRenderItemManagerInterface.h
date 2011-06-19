@@ -19,7 +19,8 @@ typedef LPCSTR D3DXHANDLE;
 class CGUIFont;
 class CRenderItem;
 class CMaterialItem;
-class CFontItem;
+class CDxFontItem;
+class CGuiFontItem;
 class CTextureItem;
 class CShaderItem;
 class CShaderInstance;
@@ -41,7 +42,8 @@ public:
     virtual                     ~CRenderItemManagerInterface    ( void ) {}
 
     // CRenderItemManagerInterface
-    virtual CFontItem*          CreateFont                  ( const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold ) = 0;
+    virtual CDxFontItem*        CreateDxFont                ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
+    virtual CGuiFontItem*       CreateGuiFont               ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
     virtual CTextureItem*       CreateTexture               ( const SString& strFullFilePath ) = 0;
     virtual CShaderItem*        CreateShader                ( const SString& strFullFilePath, SString& strOutStatus ) = 0;
     virtual CRenderTargetItem*  CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel ) = 0;
@@ -84,7 +86,8 @@ struct SShaderValue
 enum eRenderItemClassTypes
 {
     CLASS_CRenderItem,
-    CLASS_CFontItem,
+    CLASS_CDxFontItem,
+    CLASS_CGuiFontItem,
     CLASS_CMaterialItem,
     CLASS_CShaderItem,
     CLASS_CShaderInstance,
@@ -122,25 +125,45 @@ class CRenderItem
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 //
-// CFontItem
+// CDxFontItem
 //
-class CFontItem : public CRenderItem
+class CDxFontItem : public CRenderItem
 {
-    DECLARE_CLASS( CFontItem, CRenderItem )
-                    CFontItem               ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold );
+    DECLARE_CLASS( CDxFontItem, CRenderItem )
+                    CDxFontItem             ( void ) : ClassInit ( this ) {}
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFullFilePath, uint uiSize, bool bBold );
     virtual void    PreDestruct             ( void );
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );
     virtual void    OnResetDevice           ( void );
-    void            CreateUnderlyingData    ( const SString& strFontName, uint uiSize, bool bBold );
+    void            CreateUnderlyingData    ( uint uiSize, bool bBold );
+    void            ReleaseUnderlyingData   ( void );
+
+    SString             m_strFullFilePath;
+    ID3DXFont*          m_pFntNormal;
+    ID3DXFont*          m_pFntBig;
+};
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// CGuiFontItem
+//
+class CGuiFontItem : public CRenderItem
+{
+    DECLARE_CLASS( CGuiFontItem, CRenderItem )
+                    CGuiFontItem            ( void ) : ClassInit ( this ) {}
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFullFilePath, const SString& strFontName, uint uiSize );
+    virtual void    PreDestruct             ( void );
+    virtual bool    IsValid                 ( void );
+    virtual void    OnLostDevice            ( void );
+    virtual void    OnResetDevice           ( void );
+    void            CreateUnderlyingData    ( const SString& strFullFilePath, const SString& strFontName, uint uiSize );
     void            ReleaseUnderlyingData   ( void );
 
     SString             m_strCEGUIFontName;
     CGUIFont*           m_pFntCEGUI;
-    SString             m_strFullFilePath;
-    ID3DXFont*          m_pFntNormal;
-    ID3DXFont*          m_pFntBig;
 };
 
 

@@ -565,11 +565,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderItem.DxFont.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderItem.FileTexture.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\CRenderItem.Font.cpp"
+				RelativePath=".\CRenderItem.GuiFont.cpp"
 				>
 			</File>
 			<File
