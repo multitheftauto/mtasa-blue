@@ -101,11 +101,14 @@ private:
 
     // Images
     CGUIStaticImage*    m_pBackground;
+    CGUIStaticImage*    m_pLogo;
     CGUIStaticImage*    m_pLatestNews;
     CGUIStaticImage*    m_pFiller;
     CGUIStaticImage*    m_pFiller2;
     CGUIStaticImage*    m_pVersion;
     CGUIStaticImage*    m_pMenuArea;
+
+    CGUIScrollPane*     m_pCanvas;
 
     std::deque < sMenuItem* >    m_menuItems;
     std::set < sMenuItem* >      m_unhoveredItems;

@@ -132,8 +132,9 @@ public:
     virtual CGUITabPanel*       CreateTabPanel          ( CGUITab* pParent ) = 0;
     virtual CGUITabPanel*       CreateTabPanel          ( void ) = 0;
 
-    virtual CGUIScrollPane*     CreateScrollPane        ( CGUIElement* pParent = NULL ) = 0;
-    virtual CGUIScrollPane*     CreateScrollPane        ( CGUITab* pParent = NULL ) = 0;
+    virtual CGUIScrollPane*     CreateScrollPane        ( CGUIElement* pParent ) = 0;
+    virtual CGUIScrollPane*     CreateScrollPane        ( CGUITab* pParent ) = 0;
+    virtual CGUIScrollPane*     CreateScrollPane        ( void ) = 0;
 
     virtual CGUIScrollBar*      CreateScrollBar         ( bool bHorizontal, CGUIElement* pParent = NULL ) = 0;
     virtual CGUIScrollBar*      CreateScrollBar         ( bool bHorizontal, CGUITab* pParent = NULL ) = 0;
