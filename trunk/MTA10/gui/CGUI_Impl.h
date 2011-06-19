@@ -123,8 +123,9 @@ public:
     CGUITabPanel*                   CreateTabPanel              ( CGUITab* pParent );
     CGUITabPanel*                   CreateTabPanel              ( void );
 
-    CGUIScrollPane*                 CreateScrollPane            ( CGUIElement* pParent = NULL );
-    CGUIScrollPane*                 CreateScrollPane            ( CGUITab* pParent = NULL );
+    CGUIScrollPane*                 CreateScrollPane            ( CGUIElement* pParent );
+    CGUIScrollPane*                 CreateScrollPane            ( CGUITab* pParent );
+    CGUIScrollPane*                 CreateScrollPane            ( void );
 
     CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUIElement* pParent = NULL );
     CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUITab* pParent = NULL );

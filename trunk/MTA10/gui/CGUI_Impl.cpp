@@ -1456,6 +1456,11 @@ CGUITabPanel* CGUI_Impl::CreateTabPanel ( void )
     return _CreateTabPanel ( NULL );
 }
 
+CGUIScrollPane* CGUI_Impl::CreateScrollPane ( void )
+{
+    return _CreateScrollPane ( NULL );
+}
+
 CGUIScrollPane* CGUI_Impl::CreateScrollPane ( CGUIElement* pParent )
 {
     CGUIWindow_Impl* wnd = reinterpret_cast < CGUIWindow_Impl* > ( pParent );
