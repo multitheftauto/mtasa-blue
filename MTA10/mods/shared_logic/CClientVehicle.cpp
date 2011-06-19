@@ -2234,10 +2234,6 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
         }
 
-        // Re-add all the upgrades
-        if ( m_pUpgrades )
-            m_pUpgrades->ReAddAll ();
-
         m_pVehicle->SetOverrideLights ( m_ucOverrideLights );
         m_pVehicle->SetRemap ( static_cast < unsigned int > ( m_ucPaintjob ) );
         m_pVehicle->SetBodyDirtLevel ( m_fDirtLevel );
@@ -2376,6 +2372,10 @@ void CClientVehicle::Create ( void )
             if ( m_bHasCustomHandling )
                 ApplyHandling ();
         }
+        // Re-add all the upgrades - Has to be applied after handling *shrugs*
+        if ( m_pUpgrades )
+            m_pUpgrades->ReAddAll ();
+
         // Tell the streamer we've created this object
         NotifyCreate ();
     }
