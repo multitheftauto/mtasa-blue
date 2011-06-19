@@ -22,7 +22,8 @@ CClientRenderElementManager::CClientRenderElementManager ( CClientManager* pClie
 {
     m_pClientManager = pClientManager;
     m_pRenderItemManager = g_pCore->GetGraphics ()->GetRenderItemManager ();
-    m_uiStatsFontCount = 0;
+    m_uiStatsDxFontCount = 0;
+    m_uiStatsGuiFontCount = 0;
     m_uiStatsTextureCount = 0;
     m_uiStatsShaderCount = 0;
     m_uiStatsRenderTargetCount = 0;
@@ -46,30 +47,59 @@ CClientRenderElementManager::~CClientRenderElementManager ( void )
 
 ////////////////////////////////////////////////////////////////
 //
-// CClientRenderElementManager::CreateFont
+// CClientRenderElementManager::CreateDxFont
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientFont* CClientRenderElementManager::CreateFont ( const SString& strFullFilePath, const SString& strUniqueName, uint uiSize, bool bBold )
+CClientDxFont* CClientRenderElementManager::CreateDxFont ( const SString& strFullFilePath, uint uiSize, bool bBold )
 {
     // Create the item
-    CFontItem* pFontItem = m_pRenderItemManager->CreateFont ( strFullFilePath, strUniqueName, uiSize, bBold );
+    CDxFontItem* pDxFontItem = m_pRenderItemManager->CreateDxFont ( strFullFilePath, uiSize, bBold );
 
     // Check create worked
-    if ( !pFontItem )
+    if ( !pDxFontItem )
         return NULL;
 
     // Create the element
-    CClientFont* pFontElement = new CClientFont ( m_pClientManager, INVALID_ELEMENT_ID, pFontItem );
+    CClientDxFont* pDxFontElement = new CClientDxFont ( m_pClientManager, INVALID_ELEMENT_ID, pDxFontItem );
 
     // Add to this manager's list
-    MapSet ( m_ItemElementMap, pFontItem, pFontElement );
+    MapSet ( m_ItemElementMap, pDxFontItem, pDxFontElement );
 
     // Update stats
-    m_uiStatsFontCount++;
+    m_uiStatsDxFontCount++;
 
-    return pFontElement;
+    return pDxFontElement;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CClientRenderElementManager::CreateGuiFont
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CClientGuiFont* CClientRenderElementManager::CreateGuiFont ( const SString& strFullFilePath, const SString& strUniqueName, uint uiSize )
+{
+    // Create the item
+    CGuiFontItem* pGuiFontItem = m_pRenderItemManager->CreateGuiFont ( strFullFilePath, strUniqueName, uiSize );
+
+    // Check create worked
+    if ( !pGuiFontItem )
+        return NULL;
+
+    // Create the element
+    CClientGuiFont* pGuiFontElement = new CClientGuiFont ( m_pClientManager, INVALID_ELEMENT_ID, pGuiFontItem );
+
+    // Add to this manager's list
+    MapSet ( m_ItemElementMap, pGuiFontItem, pGuiFontElement );
+
+    // Update stats
+    m_uiStatsGuiFontCount++;
+
+    return pGuiFontElement;
 }
 
 
@@ -246,8 +276,11 @@ void CClientRenderElementManager::Remove ( CClientRenderElement* pElement )
     }
 
     // Update stats
-    if ( pElement->IsA ( CClientFont::GetClassId () ) )
-        m_uiStatsFontCount--;
+    if ( pElement->IsA ( CClientDxFont::GetClassId () ) )
+        m_uiStatsDxFontCount--;
+    else
+    if ( pElement->IsA ( CClientGuiFont::GetClassId () ) )
+        m_uiStatsGuiFontCount--;
     else
     if ( pElement->IsA ( CClientShader::GetClassId () ) )
         m_uiStatsShaderCount--;

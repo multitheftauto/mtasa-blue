@@ -170,23 +170,45 @@ CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderItemManager::CreateFont
+// CRenderItemManager::CreateDxFont
 //
 // TODO: Make underlying data for fonts shared
 //
 ////////////////////////////////////////////////////////////////
-CFontItem* CRenderItemManager::CreateFont ( const SString& strFullFilePath, const SString& strFontName, uint uiSize, bool bBold )
+CDxFontItem* CRenderItemManager::CreateDxFont ( const SString& strFullFilePath, uint uiSize, bool bBold )
 {
-    CFontItem* pFontItem = new CFontItem ();
-    pFontItem->PostConstruct ( this, strFullFilePath, strFontName, uiSize, bBold );
+    CDxFontItem* pDxFontItem = new CDxFontItem ();
+    pDxFontItem->PostConstruct ( this, strFullFilePath, uiSize, bBold );
 
-    if ( !pFontItem->IsValid () )
+    if ( !pDxFontItem->IsValid () )
     {
-        SAFE_RELEASE ( pFontItem );
+        SAFE_RELEASE ( pDxFontItem );
         return NULL;
     }
 
-    return pFontItem;
+    return pDxFontItem;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CreateGuiFont
+//
+// TODO: Make underlying data for fonts shared
+//
+////////////////////////////////////////////////////////////////
+CGuiFontItem* CRenderItemManager::CreateGuiFont ( const SString& strFullFilePath, const SString& strFontName, uint uiSize )
+{
+    CGuiFontItem* pGuiFontItem = new CGuiFontItem ();
+    pGuiFontItem->PostConstruct ( this, strFullFilePath, strFontName, uiSize );
+
+    if ( !pGuiFontItem->IsValid () )
+    {
+        SAFE_RELEASE ( pGuiFontItem );
+        return NULL;
+    }
+
+    return pGuiFontItem;
 }
 
 
@@ -312,7 +334,7 @@ void CRenderItemManager::UpdateBackBufferCopy ( void )
         m_pDefaultD3DZStencilSurface = pActiveD3DZStencilSurface;
     }
 
-    // Don't hold any refs because it otherwise it goes all funny during fullscreen minimize/maximize, even if they are released at onLostDevice
+    // Don't hold any refs because it goes all funny during fullscreen minimize/maximize, even if they are released at onLostDevice
     SAFE_RELEASE ( pActiveD3DRenderTarget )
     SAFE_RELEASE ( pActiveD3DZStencilSurface )
 

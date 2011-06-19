@@ -3883,11 +3883,11 @@ void CStaticFunctionDefinitions::DrawText ( int iLeft, int iTop,
 }
 
 
-// Find custom font from an element, or a standard font from a name
-ID3DXFont* CStaticFunctionDefinitions::ResolveDXFont ( const SString& strFontName, CClientFont* pFontElement, float fScaleX, float fScaleY )
+// Find custom font from an element, or a standard font from a name. *May alter scale*
+ID3DXFont* CStaticFunctionDefinitions::ResolveD3DXFont ( const SString& strFontName, CClientDxFont* pDxFontElement, float& fScaleX, float& fScaleY )
 {
-    if ( pFontElement )
-        return pFontElement->GetDXFont ( fScaleX, fScaleY );
+    if ( pDxFontElement )
+        return pDxFontElement->GetD3DXFont ( fScaleX, fScaleY );
 
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
     eFontType fontType = pGraphics->GetFontType ( strFontName );

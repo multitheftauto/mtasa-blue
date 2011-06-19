@@ -589,6 +589,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxDrawImageSection", CLuaFunctionDefs::dxDrawImageSection );
     CLuaCFunctions::AddFunction ( "dxGetTextWidth", CLuaFunctionDefs::dxGetTextWidth );
     CLuaCFunctions::AddFunction ( "dxGetFontHeight", CLuaFunctionDefs::dxGetFontHeight );
+    CLuaCFunctions::AddFunction ( "dxCreateFont", CLuaFunctionDefs::dxCreateFont );
     CLuaCFunctions::AddFunction ( "dxCreateTexture", CLuaFunctionDefs::dxCreateTexture );
     CLuaCFunctions::AddFunction ( "dxCreateShader", CLuaFunctionDefs::dxCreateShader );
     CLuaCFunctions::AddFunction ( "dxCreateRenderTarget", CLuaFunctionDefs::dxCreateRenderTarget );
@@ -598,7 +599,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxSetRenderTarget", CLuaFunctionDefs::dxSetRenderTarget );
     CLuaCFunctions::AddFunction ( "dxUpdateScreenSource", CLuaFunctionDefs::dxUpdateScreenSource );
 
-    CLuaCFunctions::AddFunction ( "createFont", CLuaFunctionDefs::CreateFont );
 
     // Audio funcs
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );
@@ -710,6 +710,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiCreateRadioButton", CLuaFunctionDefs::GUICreateRadioButton );
     CLuaCFunctions::AddFunction ( "guiCreateStaticImage", CLuaFunctionDefs::GUICreateStaticImage );
     CLuaCFunctions::AddFunction ( "guiCreateComboBox", CLuaFunctionDefs::GUICreateComboBox );
+    CLuaCFunctions::AddFunction ( "guiCreateFont", CLuaFunctionDefs::GUICreateFont );
 
     CLuaCFunctions::AddFunction ( "guiStaticImageLoadImage", CLuaFunctionDefs::GUIStaticImageLoadImage );
     CLuaCFunctions::AddFunction ( "guiGetSelectedTab", CLuaFunctionDefs::GUIGetSelectedTab );

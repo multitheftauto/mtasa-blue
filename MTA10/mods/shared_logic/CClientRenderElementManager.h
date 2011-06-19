@@ -11,7 +11,8 @@
 
 class CResource;
 class CClientRenderElement;
-class CClientFont;
+class CClientDxFont;
+class CClientGuiFont;
 class CClientTexture;
 class CClientShader;
 class CClientRenderTarget;
@@ -24,7 +25,8 @@ public:
                             CClientRenderElementManager          ( CClientManager* pClientManager );
                             ~CClientRenderElementManager         ( void );
 
-    CClientFont*            CreateFont                  ( const SString& strFullFilePath, const SString& strUniqueName, uint uiSize, bool bBold );
+    CClientDxFont*          CreateDxFont                ( const SString& strFullFilePath, uint uiSize, bool bBold );
+    CClientGuiFont*         CreateGuiFont               ( const SString& strFullFilePath, const SString& strUniqueName, uint uiSize );
     CClientTexture*         CreateTexture               ( const SString& strFullFilePath );
     CClientShader*          CreateShader                ( const SString& strFullFilePath, SString& strOutStatus );
     CClientRenderTarget*    CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
@@ -32,7 +34,8 @@ public:
     CClientTexture*         FindAutoTexture             ( const SString& strFullFilePath, const SString& strUniqueName );
     void                    Remove                      ( CClientRenderElement* pElement );
 
-    uint                    GetFontCount                ( void )    { return m_uiStatsFontCount; }
+    uint                    GetDxFontCount              ( void )    { return m_uiStatsDxFontCount; }
+    uint                    GetGuiFontCount             ( void )    { return m_uiStatsGuiFontCount; }
     uint                    GetTextureCount             ( void )    { return m_uiStatsTextureCount; }
     uint                    GetShaderCount              ( void )    { return m_uiStatsShaderCount; }
     uint                    GetRenderTargetCount        ( void )    { return m_uiStatsRenderTargetCount; }
@@ -42,7 +45,8 @@ protected:
     CRenderItemManagerInterface*                        m_pRenderItemManager;
     std::map < SString, CClientTexture* >               m_AutoTextureMap;
     std::map < CRenderItem*, CClientRenderElement* >    m_ItemElementMap;
-    uint                                                m_uiStatsFontCount;
+    uint                                                m_uiStatsGuiFontCount;
+    uint                                                m_uiStatsDxFontCount;
     uint                                                m_uiStatsTextureCount;
     uint                                                m_uiStatsShaderCount;
     uint                                                m_uiStatsRenderTargetCount;

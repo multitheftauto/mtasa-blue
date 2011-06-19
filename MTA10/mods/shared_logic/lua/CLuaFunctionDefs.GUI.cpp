@@ -745,15 +745,15 @@ int CLuaFunctionDefs::GUISetText ( lua_State* luaVM )
 int CLuaFunctionDefs::GUISetFont ( lua_State* luaVM )
 {
 //  bool guiSetFont ( element guiElement, mixed font )
-    CClientGUIElement* guiElement; SString strFontName; CClientFont* pFontElement;
+    CClientGUIElement* guiElement; SString strFontName; CClientGuiFont* pGuiFontElement;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( guiElement );
-    MixedReadFontString ( argStream, strFontName, "default-normal", pFontElement );
+    MixedReadGuiFontString ( argStream, strFontName, "default-normal", pGuiFontElement );
 
     if ( !argStream.HasErrors () )
     {
-        if ( guiElement->SetFont ( strFontName, pFontElement ) )
+        if ( guiElement->SetFont ( strFontName, pGuiFontElement ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -1129,14 +1129,14 @@ int CLuaFunctionDefs::GUIGetFont ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CClientFont* pFontElement;
-        SString strFontName = guiElement->GetFont ( &pFontElement );
+        CClientGuiFont* pGuiFontElement;
+        SString strFontName = guiElement->GetFont ( &pGuiFontElement );
 
         if ( strFontName != "" )
             lua_pushstring ( luaVM, strFontName );
         else
             lua_pushnil ( luaVM );
-        lua_pushelement ( luaVM, pFontElement );
+        lua_pushelement ( luaVM, pGuiFontElement );
         return 2;
     }
     else
@@ -1971,7 +1971,7 @@ int CLuaFunctionDefs::GUIGridListSetItemText ( lua_State* luaVM )
 int CLuaFunctionDefs::GUIGridListSetItemData ( lua_State* luaVM )
 {
 //  bool guiGridListSetItemData ( element gridList, int rowIndex, int columnIndex, string data )
-    CClientGUIElement* guiGridlist; int rowIndex; int columnIndex; CLuaArgument* data;
+    CClientGUIElement* guiGridlist; int rowIndex; int columnIndex; CLuaArgument data;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData < CGUIGridList > ( guiGridlist );
@@ -1981,16 +1981,13 @@ int CLuaFunctionDefs::GUIGridListSetItemData ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CStaticFunctionDefinitions::GUIGridListSetItemData ( *guiGridlist, rowIndex, columnIndex, data );
+        CLuaArgument* pData = new CLuaArgument ( data );
+        CStaticFunctionDefinitions::GUIGridListSetItemData ( *guiGridlist, rowIndex, columnIndex, pData );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "guiGridListSetItemData", *argStream.GetErrorMessage () ) );
-
-    // Tidy up
-    if ( data )
-        delete data;
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );
@@ -2797,6 +2794,53 @@ int CLuaFunctionDefs::GUIComboBoxSetItemText ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "guiComboBoxSetItemText", *argStream.GetErrorMessage () ) );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GUICreateFont ( lua_State* luaVM )
+{
+//  element guiCreateFont( string filepath [, int size=9 ] )
+    SString strFilePath; int iSize; bool bBold;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strFilePath );
+    argStream.ReadNumber ( iSize, 9 );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pParentResource = pLuaMain->GetResource ();
+            CResource* pFileResource = pParentResource;
+            SString strPath, strMetaPath;
+            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
+            {
+                if ( FileExists ( strPath ) )
+                {
+                    SString strUniqueName = SString ( "%s*%s*%s", pParentResource->GetName (), pFileResource->GetName (), strMetaPath.c_str () ).Replace ( "\\", "/" );
+                    CClientGuiFont* pGuiFont = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateGuiFont ( strPath, strUniqueName, iSize );
+                    if ( pGuiFont )
+                    {
+                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                        pGuiFont->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                    }
+                    lua_pushelement ( luaVM, pGuiFont );
+                    return 1;
+                }
+                else
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "guiCreateFont", "file-path", 1 );
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "guiCreateFont", "file-path", 1 );
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "guiCreateFont", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
     lua_pushboolean ( luaVM, false );
     return 1;
 }
