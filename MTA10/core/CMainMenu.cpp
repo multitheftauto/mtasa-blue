@@ -303,7 +303,7 @@ CMainMenu::~CMainMenu ( void )
     delete m_pCanvas;  
     delete m_pFiller;
     delete m_pFiller2;
-    delete m_pLogo
+    delete m_pLogo;
     delete m_pLatestNews;
     delete m_pVersion;
     delete m_pMenuArea;
