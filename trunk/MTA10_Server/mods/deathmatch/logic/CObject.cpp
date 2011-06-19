@@ -34,6 +34,7 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
     m_bBreakable = true;
     m_bSyncable = true;
     m_pSyncer = NULL;
+    m_bIsStatic = false;
 
     m_bCollisionsEnabled = true;
 
