@@ -159,6 +159,7 @@ LOGIC = \
 ./logic/lua/CLuaArguments.cpp \
 ./logic/lua/CLuaCFunctions.cpp \
 ./logic/lua/CLuaFunctionDefinitions.cpp \
+./logic/lua/CLuaFunctionParseHelpers.cpp \
 ./logic/lua/CLuaFunctionRef.cpp \
 ./logic/lua/CLuaMain.cpp \
 ./logic/lua/CLuaManager.cpp \
