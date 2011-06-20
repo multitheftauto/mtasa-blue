@@ -926,13 +926,11 @@ bool CStaticFunctionDefinitions::SetElementID ( CElement* pElement, const char* 
 }
 
 
-bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronize )
+bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronize )
 {
     assert ( pElement );
     assert ( szName );
-
-    if ( strlen ( szName ) > MAX_CUSTOMDATA_NAME_LENGTH )
-        szName [ MAX_CUSTOMDATA_NAME_LENGTH ] = 0;
+    assert ( strlen ( szName ) <= MAX_CUSTOMDATA_NAME_LENGTH );
 
     bool bIsSynced;
     CLuaArgument * pCurrentVariable = pElement->GetCustomData ( szName, false, &bIsSynced );
@@ -961,20 +959,16 @@ bool CStaticFunctionDefinitions::RemoveElementData ( CElement* pElement, const c
 {
     assert ( pElement );
     assert ( szName );
-
-    // Make sure the name isn't too long
-    char szShortName [MAX_CUSTOMDATA_NAME_LENGTH + 1];
-    szShortName [MAX_CUSTOMDATA_NAME_LENGTH] = 0;
-    strncpy ( szShortName, szName, MAX_CUSTOMDATA_NAME_LENGTH );
+    assert ( strlen ( szName ) <= MAX_CUSTOMDATA_NAME_LENGTH );
 
     // Set its custom data
     if ( pElement->DeleteCustomData ( szName, false ) )
     {
         // Tell our clients to update their data
-        unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szShortName ) );
+        unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
         CBitStream BitStream;
         BitStream.pBitStream->WriteCompressed ( usNameLength );
-        BitStream.pBitStream->Write ( szShortName, usNameLength );
+        BitStream.pBitStream->Write ( szName, usNameLength );
         BitStream.pBitStream->WriteBit ( false ); // Not recursive
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, REMOVE_ELEMENT_DATA, *BitStream.pBitStream ) );
         return true;

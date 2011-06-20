@@ -150,29 +150,21 @@ public:
         return false;
     }
 
-    // Write a string
-    void WriteString(const std::string& value)
+
+    // Write characters from a std::string
+    void WriteStringCharacters ( const std::string& value, unsigned short usLength )
     {
-        // Send the length
-        unsigned short usLength = value.length ();
-        Write ( usLength );
         // Send the data
         if ( usLength )
             Write ( &value.at ( 0 ), usLength );
     }
 
-    // Read a string
-    bool ReadString(std::string& result)
+    // Read characters into a std::string
+    bool ReadStringCharacters ( std::string& result, unsigned short usLength )
     {
         result = "";
-
-        // Get the length
-        unsigned short usLength = 0;
-        if ( !Read ( usLength ) )
-            return false;
-
         if ( usLength )
-            {
+        {
             // Read the data
             char* buffer = static_cast < char* > ( alloca ( usLength ) );
             if ( !Read ( buffer, usLength ) )
@@ -181,6 +173,32 @@ public:
             result = std::string ( buffer, usLength );
         }
         return true;
+    }
+
+
+    // Write a string (incl. ushort size header)
+    void WriteString ( const std::string& value )
+    {
+        // Write the length
+        unsigned short usLength = value.length ();
+        Write ( usLength );
+
+        // Write the characters
+        return WriteStringCharacters ( value, usLength );
+    }
+
+    // Read a string (incl. ushort size header)
+    bool ReadString ( std::string& result )
+    {
+        result = "";
+
+        // Read the length
+        unsigned short usLength = 0;
+        if ( !Read ( usLength ) )
+            return false;
+
+        // Read the characters
+        return ReadStringCharacters ( result, usLength );
     }
 
     virtual unsigned short Version                  ( void ) const = 0;

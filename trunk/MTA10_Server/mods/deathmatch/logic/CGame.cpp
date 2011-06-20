@@ -2053,6 +2053,13 @@ void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
             // Change the data
             const char* szName = Packet.GetName ();
             CLuaArgument& Value = Packet.GetValue ();
+
+            // Ignore if the wrong length
+            if ( strlen ( szName ) > MAX_CUSTOMDATA_NAME_LENGTH )
+            {
+                CLogger::ErrorPrintf( "Received oversized custom data name from %s (%s)", Packet.GetSourcePlayer ()->GetNick (), *SStringX ( szName ).Left ( MAX_CUSTOMDATA_NAME_LENGTH + 1 ) );
+                return;
+            }
             pElement->SetCustomData ( szName, Value, NULL, true, pSourcePlayer );
 
             // Tell our clients to update their data. Send to everyone but the one we got this packet from.

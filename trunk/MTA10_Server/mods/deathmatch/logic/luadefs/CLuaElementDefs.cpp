@@ -409,57 +409,61 @@ int CLuaElementDefs::getElementByIndex ( lua_State* luaVM )
 
 int CLuaElementDefs::getElementData ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TSTRING )
+//  var getElementData ( element theElement, string key [, inherit = true] )
+    CElement* pElement; SString strKey; bool bInherit;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strKey );
+    argStream.ReadBool ( bInherit, true );
+
+    if ( !argStream.HasErrors () )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        const char* szName = lua_tostring ( luaVM, 2 );
-        bool bInherit = true;
-
-        if ( lua_type ( luaVM, 3) == LUA_TBOOLEAN )
-            bInherit = ( lua_toboolean ( luaVM, 3 ) ) ? true:false;
-
-        if ( pElement )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData ( pElement, szName, bInherit );
+            if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
+            {
+                // Warn and truncate if key is too long
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "getElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
+            }
+
+            CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData ( pElement, strKey, bInherit );
             if ( pVariable )
             {
                 pVariable->Push ( luaVM );
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementData", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getElementData" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getElementData", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
+
 int CLuaElementDefs::getAllElementData ( lua_State* luaVM )
 {
-    // element
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+//  table getAllElementData ( element theElement )
+    CElement* pElement;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+
+    if ( !argStream.HasErrors () )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
+        CLuaArguments Args;
+        if ( CStaticFunctionDefinitions::GetAllElementData ( pElement, &Args ) )
         {
-//          _asm int 3
-//          CLuaArguments * pTable = new CLuaArguments();
-            CLuaArguments Args;
-            if ( CStaticFunctionDefinitions::GetAllElementData ( pElement, &Args ) )
-            {
-                Args.PushAsTable ( luaVM );
-                return 1;
-            }
+            Args.PushAsTable ( luaVM );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getAllElementData", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getAllElementData" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getAllElementData", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1353,36 +1357,36 @@ int CLuaElementDefs::setElementID ( lua_State* luaVM )
 
 int CLuaElementDefs::setElementData ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
+    CElement* pElement; SString strKey; CLuaArgument value; bool bSynchronize;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strKey );
+    argStream.ReadLuaArgument ( value );
+    argStream.ReadBool ( bSynchronize, true );
+
+    if ( !argStream.HasErrors () )
     {
-        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-             lua_type ( luaVM, 2 ) == LUA_TSTRING &&
-             lua_type ( luaVM, 3 ) != LUA_TNONE )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            CElement* pElement = lua_toelement ( luaVM, 1 );
-            const char* szName = lua_tostring ( luaVM, 2 );
-            bool bSynchronize = true;
-            CLuaArgument Variable;
-            Variable.Read ( luaVM, 3 );
-
-            if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
-                bSynchronize = ( lua_toboolean ( luaVM, 4 ) ) ? true:false;
-
-            if ( pElement )
+            if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
-                if ( CStaticFunctionDefinitions::SetElementData ( pElement, const_cast < char* > ( szName ), Variable, pLuaMain, bSynchronize ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                // Warn and truncate if key is too long
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "setElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "setElementData", "element", 1 );
+
+            if ( CStaticFunctionDefinitions::SetElementData ( pElement, strKey, value, pLuaMain, bSynchronize ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "setElementData" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setElementData", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -1391,29 +1395,34 @@ int CLuaElementDefs::setElementData ( lua_State* luaVM )
 
 int CLuaElementDefs::removeElementData ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-             lua_type ( luaVM, 2 ) == LUA_TSTRING )
-        {
-            CElement* pElement = lua_toelement ( luaVM, 1 );
-            const char* szName = lua_tostring ( luaVM, 2 );
+//  bool removeElementData ( element theElement, string key )
+    CElement* pElement; SString strKey;
 
-            if ( pElement )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strKey );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
-                if ( CStaticFunctionDefinitions::RemoveElementData ( pElement, szName ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                // Warn and truncate if key is too long
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "removeElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "removeElementData", "element", 1 );
+
+            if ( CStaticFunctionDefinitions::RemoveElementData ( pElement, strKey ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "removeElementData" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "removeElementData", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
