@@ -895,6 +895,7 @@ bool CStaticFunctionDefinitions::SetElementID ( CClientEntity& Entity, const cha
 bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const char* szName, CLuaArgument& Variable, CLuaMain& LuaMain, bool bSynchronize )
 {
     assert ( szName );
+    assert ( strlen ( szName ) <= MAX_CUSTOMDATA_NAME_LENGTH );
 
     CLuaArgument * pCurrentVariable = Entity.GetCustomData ( szName, false );
     if ( !pCurrentVariable || Variable != *pCurrentVariable )
@@ -909,7 +910,7 @@ bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const c
                 pBitStream->Write ( Entity.GetID () );
                 unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
                 pBitStream->WriteCompressed ( usNameLength );
-                pBitStream->Write ( const_cast < char* > ( szName ), usNameLength );    
+                pBitStream->Write ( szName, usNameLength );
                 Variable.WriteToBitStream ( *pBitStream );
 
                 // Send the packet and deallocate

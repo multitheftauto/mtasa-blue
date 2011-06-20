@@ -144,34 +144,36 @@ int CLuaFunctionDefs::GetElementByIndex ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetElementData ( lua_State* luaVM )
 {
-    // Correct arguments?
-    if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-        lua_istype ( luaVM, 2, LUA_TSTRING ) )
+//  var getElementData ( element theElement, string key [, inherit = true] )
+    CClientEntity* pEntity; SString strKey; bool bInherit;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strKey );
+    argStream.ReadBool ( bInherit, true );
+
+    if ( !argStream.HasErrors () )
     {
-        // Grab the element
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        const char* szName = lua_tostring ( luaVM, 2 );
-        bool bInherit = true;
-
-        if ( lua_istype ( luaVM, 3, LUA_TBOOLEAN ) )
-            bInherit = ( lua_toboolean ( luaVM, 3 ) ) ? true:false;
-
-        //  Valid?
-        if ( pEntity )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Grab that element data and push it back in return
-            CLuaArgument* pVariable = pEntity->GetCustomData ( szName, bInherit );
+            if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
+            {
+                // Warn and truncate if key is too long
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "getElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
+            }
+
+            CLuaArgument* pVariable = pEntity->GetCustomData ( strKey, bInherit );
             if ( pVariable )
             {
                 pVariable->Push ( luaVM );
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getElementData", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getElementData" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getElementData", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1482,47 +1484,36 @@ int CLuaFunctionDefs::SetElementID ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
 {
-    // Grab the vm
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
+    CClientEntity* pEntity; SString strKey; CLuaArgument value; bool bSynchronize;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strKey );
+    argStream.ReadLuaArgument ( value );
+    argStream.ReadBool ( bSynchronize, true );
+
+    if ( !argStream.HasErrors () )
     {
-        // Check that we have the 3 correct args
-        if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-            lua_type ( luaVM, 2 ) == LUA_TSTRING &&
-            lua_type ( luaVM, 3 ) != LUA_TNONE )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Grab the element, the element data name and the data to set
-            CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-            const char* szName = lua_tostring ( luaVM, 2 );
-
-            // Give a warning in case the old syntax is used (elem, name, synchronize, data)
-            if ( lua_type ( luaVM, 3 ) == LUA_TBOOLEAN &&
-                 lua_type ( luaVM, 4 ) != LUA_TNONE && lua_type ( luaVM, 4 ) != LUA_TBOOLEAN )
-                m_pScriptDebugging->LogCustom ( luaVM, "Using outdated setElementData syntax. Consult the wiki" );
-
-            CLuaArgument Variable;
-            Variable.Read ( luaVM, 3 );
-
-            bool bSynchronize = true;
-            if ( lua_type ( luaVM, 4 ) == LUA_TBOOLEAN )
-                bSynchronize = lua_toboolean ( luaVM, 4 ) ? true:false;
-
-            // Valid element?
-            if ( pEntity )
+            if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
-                // Try to change the data
-                if ( CStaticFunctionDefinitions::SetElementData ( *pEntity, szName, Variable, *pLuaMain, bSynchronize ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                // Warn and truncate if key is too long
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "setElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "setElementData", "element", 1 );
+
+            if ( CStaticFunctionDefinitions::SetElementData ( *pEntity, strKey, value, *pLuaMain, bSynchronize ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "setElementData" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setElementData", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -1532,34 +1523,34 @@ int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
 
 int CLuaFunctionDefs::RemoveElementData ( lua_State* luaVM )
 {
-    // Grab our VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        // Correct args?
-        if ( lua_istype ( luaVM, 1, LUA_TLIGHTUSERDATA ) &&
-            lua_istype ( luaVM, 2, LUA_TSTRING ) )
-        {
-            // Grab the element and the name
-            CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-            const char* szName = lua_tostring ( luaVM, 2 );
+//  bool removeElementData ( element theElement, string key )
+    CClientEntity* pEntity; SString strKey;;
 
-            // Valid?
-            if ( pEntity )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strKey );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
-                // Try to remove the elementdata
-                if ( CStaticFunctionDefinitions::RemoveElementData ( *pEntity, szName ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                // Warn and truncate if key is too long
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Truncated argument @ '%s' [%s]", "removeElementData", *SString ( "string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH ) ) );
+                strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "removeElementData", "element", 1 );
+
+            if ( CStaticFunctionDefinitions::RemoveElementData ( *pEntity, strKey ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "removeElementData" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "removeElementData", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );

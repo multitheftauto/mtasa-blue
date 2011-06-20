@@ -82,7 +82,7 @@ public:
     // Element set funcs
     static bool                 ClearElementVisibleTo               ( CElement* pElement );
     static bool                 SetElementID                        ( CElement* pElement, const char* szID );
-    static bool                 SetElementData                      ( CElement* pElement, char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronize );
+    static bool                 SetElementData                      ( CElement* pElement, const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronize );
     static bool                 RemoveElementData                   ( CElement* pElement, const char* szName );
     static bool                 SetElementParent                    ( CElement* pElement, CElement* pParent );
     static bool                 SetElementPosition                  ( CElement* pElement, const CVector& vecPosition, bool bWarp = true );

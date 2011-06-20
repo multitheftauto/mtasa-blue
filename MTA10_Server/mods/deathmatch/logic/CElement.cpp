@@ -652,6 +652,12 @@ bool CElement::GetCustomDataBool ( const char* szName, bool& bOut, bool bInherit
 void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient )
 {
     assert ( szName );
+    if ( strlen ( szName ) > MAX_CUSTOMDATA_NAME_LENGTH )
+    {
+        // Don't allow it to be set if the name is too long
+        CLogger::ErrorPrintf ( "Custom data name too long (%s)", *SStringX ( szName ).Left ( MAX_CUSTOMDATA_NAME_LENGTH + 1 ) );
+        return;
+    }
 
     // Grab the old variable
     CLuaArgument oldVariable;
