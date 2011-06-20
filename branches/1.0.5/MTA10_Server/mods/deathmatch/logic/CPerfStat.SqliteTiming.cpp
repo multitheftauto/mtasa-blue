@@ -55,8 +55,8 @@ public:
     void                        GetSqliteTimingStats    ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter );
 
     SString                             m_strCategoryName;
-    long long                           m_llSuspendBatchingStartTime;
-    long long                           m_llSuspendBatchingEndTime;
+    long long                           m_llRecordStatsEndTime;
+    bool                                m_bDisableBatching;
     std::map < CRegistry*, SString >    m_RegistryMap;
     std::list < CTimingInfo >           m_TimingList;
     lua_State*                          m_currentluaVM;
@@ -153,9 +153,8 @@ void CPerfStatSqliteTimingImpl::OnSqliteClose ( CRegistry* pRegistry )
 ///////////////////////////////////////////////////////////////
 void CPerfStatSqliteTimingImpl::UpdateSqliteTiming ( CRegistry* pRegistry, const char* szQuery, TIMEUS timeUs )
 {
-    // Only record stats if batching is on
-    long long llTime =  GetTickCount64_ ();
-    if ( llTime < m_llSuspendBatchingStartTime || llTime > m_llSuspendBatchingEndTime )
+    // Only record stats if requested
+    if ( GetTickCount64_ () > m_llRecordStatsEndTime )
         return;
 
     CTimingInfo info;
@@ -228,16 +227,18 @@ void CPerfStatSqliteTimingImpl::GetStats ( CPerfStatResult* pResult, const std::
     GetSqliteTimingStats ( pResult, optionMap, strFilter );
 
     uint uiTicks = 1000 * 10;   // 10 seconds
-    // Suspend batching
+    long long llTime =  GetTickCount64_ ();
+
+    m_llRecordStatsEndTime = llTime + uiTicks;
+
+    // Update batching setting
     for ( std::map < CRegistry*, SString >::iterator iter = m_RegistryMap.begin () ; iter != m_RegistryMap.end () ; ++iter )
     {
-        iter->first->SuspendBatching ( uiTicks );
+        if ( m_bDisableBatching )
+            iter->first->SuspendBatching ( uiTicks );   // Suspend batching
+        else
+            iter->first->SuspendBatching ( 0 );         // Unsuspend batching
     }
-
-    long long llTime =  GetTickCount64_ ();
-    if ( !m_llSuspendBatchingStartTime || llTime > m_llSuspendBatchingEndTime )
-        m_llSuspendBatchingStartTime = llTime + uiTicks / 10;
-    m_llSuspendBatchingEndTime = llTime + uiTicks / 10 * 9;
 }
 
 
@@ -254,6 +255,7 @@ void CPerfStatSqliteTimingImpl::GetSqliteTimingStats ( CPerfStatResult* pResult,
     // Set option flags
     //
     bool bHelp = MapContains ( strOptionMap, "h" );
+    m_bDisableBatching = MapContains ( strOptionMap, "b" );
     float fIgnoreCpuMs = 0;
     if ( MapContains ( strOptionMap, "i1" ) )        fIgnoreCpuMs = 0.001f;
     if ( MapContains ( strOptionMap, "i10" ) )       fIgnoreCpuMs = 0.010f;
@@ -274,6 +276,7 @@ void CPerfStatSqliteTimingImpl::GetSqliteTimingStats ( CPerfStatResult* pResult,
     {
         pResult->AddColumn ( "Sqlite timings help" );
         pResult->AddRow ()[0] ="Option h - This help";
+        pResult->AddRow ()[0] ="Option b - Disable batching (to measure single queries - May slow server a little)";
         pResult->AddRow ()[0] ="Option i1 - Ignore cpu < 1ms";
         pResult->AddRow ()[0] ="Option i10 - Ignore cpu < 10ms";
         pResult->AddRow ()[0] ="Option i100 - Ignore cpu < 100ms";
@@ -283,7 +286,6 @@ void CPerfStatSqliteTimingImpl::GetSqliteTimingStats ( CPerfStatResult* pResult,
         pResult->AddRow ()[0] ="Option m10 - Max 10 results";
         pResult->AddRow ()[0] ="Option m100 - Max 100 results";
         pResult->AddRow ()[0] ="Option m1000 - Max 1000 results";
-        pResult->AddRow ()[0] ="*Note - Database query batching is disabled when viewing 'Sqlite timing' and may slow server a little";
         return;
     }
 
@@ -292,24 +294,19 @@ void CPerfStatSqliteTimingImpl::GetSqliteTimingStats ( CPerfStatResult* pResult,
     //
 
     pResult->AddColumn ( "age" );
-    pResult->AddColumn ( "" );
+    pResult->AddColumn ( "resource name" );
     pResult->AddColumn ( "cpu seconds" );
-    pResult->AddColumn ( "query . . *Note: Viewing this page may slow server" );
+    pResult->AddColumn ( m_bDisableBatching ? "query . . *Note: Viewing this page may slow server" : "query" );
 
-/*
-    {
-        // Add row
-        SString* row = pResult->AddRow ();
-
-        int c = 3;
-        row[c++] = "*Note - Viewing this page may slow server";
-    }
-*/
     long long llTime = GetTickCount64_ ();
     // Output
     for ( std::list < CTimingInfo >::reverse_iterator iter = m_TimingList.rbegin () ; iter != m_TimingList.rend () ; ++iter )
     {
         const CTimingInfo& info = *iter;
+
+        // Apply filter
+        if ( strFilter != "" && info.resourceName.find ( strFilter ) == SString::npos )
+            continue;
 
         float fCpuMs = info.timeUs * ( 1/1000000.f );
         float fAgeSeconds = ( llTime - info.timeStamp ) * ( 1/1000.f );
