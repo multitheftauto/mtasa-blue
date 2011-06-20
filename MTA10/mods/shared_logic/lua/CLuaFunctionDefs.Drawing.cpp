@@ -165,7 +165,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 
         // Make format flag
         ulong ulFormat = alignX | alignY;
-        if ( ulFormat & DT_BOTTOM ) ulFormat |= DT_SINGLELINE;
+        //if ( ulFormat & DT_BOTTOM ) ulFormat |= DT_SINGLELINE;        MS says we should do this. Nobody tells me what to do.
         if ( bWordBreak )           ulFormat |= DT_WORDBREAK;
         if ( !bClip )               ulFormat |= DT_NOCLIP;
 
