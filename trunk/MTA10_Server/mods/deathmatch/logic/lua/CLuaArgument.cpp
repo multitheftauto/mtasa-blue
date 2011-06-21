@@ -357,7 +357,10 @@ void CLuaArgument::Push ( lua_State* luaVM, std::map < CLuaArguments*, int > * p
             {
                 if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
                 {
-                    lua_pushvalue ( luaVM, pKnownTables->find ( m_pTableData )->second );
+					lua_getfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
+					lua_pushnumber ( luaVM, pKnownTables->find ( m_pTableData )->second );
+					lua_gettable ( luaVM, -2 );
+					lua_remove ( luaVM, -2 );
                 }
                 else
                 {
