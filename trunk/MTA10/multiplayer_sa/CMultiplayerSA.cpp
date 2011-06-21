@@ -1192,8 +1192,6 @@ void CMultiplayerSA::InitHooks()
 
     // Allow Player Garages to shut with players inside.
     MemSet ( (void *)0x44C6FA, 0x90, 4 );
-
-    MemSetFast((void *)0x8D3698, 0x00, 306 );
 }
 
 

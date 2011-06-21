@@ -4051,6 +4051,11 @@ bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
             Arguments.PushNumber ( ucChannel );
             if ( !CallEvent ( "onClientPlayerRadioSwitch", Arguments, true ) )
             {
+                // if we cancel the radio channel setting at 12 then when they go through previous it will get to 0, then the next time it is used set to 13 in preperation to set to 12 but if it is cancelled it stays at 13.
+                // Issue 6113 - Caz
+                if ( m_ucRadioChannel == 13 )
+                    m_ucRadioChannel = 0;
+
                 return false;
             }
         }
