@@ -43,6 +43,7 @@ class CCore;
 #include "tracking/CTCPManager.h"
 #include "CClientVariables.h"
 #include "CKeyBinds.h"
+#include "CMouseControl.h"
 #include "CScreenShot.h"
 #include "CCommunity.h"
 #include <xml/CXML.h>
@@ -95,6 +96,7 @@ public:
     CXMLNode*               GetConfig                       ( void );
     CClientVariables*       GetCVars                        ( void )                { return &m_ClientVariables; };
     CKeyBindsInterface*     GetKeyBinds                     ( void );
+    CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
     CLocalGUI*              GetLocalGUI                     ( void );
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
 
@@ -262,6 +264,7 @@ private:
     CLogger *                   m_pLogger;
 
     CKeyBinds*                  m_pKeyBinds;
+    CMouseControl*              m_pMouseControl;
 
     bool                        m_bFirstFrame;
     bool                        m_bIsOfflineMod;
