@@ -495,7 +495,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
 
             unsigned char ucArmorAlpha = ( unsigned char ) ( 255.0f * fArmorAlpha );
 
-            #define ARMOR_BORDER_COLOR COLOR_ARGB(ucArmorAlpha,167,177,179)
+            #define ARMOR_BORDER_COLOR COLOR_ABGR(ucArmorAlpha,167,177,179)
 
             // Base rectangle
             CVector vecTopLeftBase  ( vecScreenPosition.fX - fWidth * 0.5f, vecScreenPosition.fY + fTopOffset,           0 );
@@ -507,7 +507,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             pGraphics->DrawRectangle ( 
                             vecTopLeft.fX,  vecTopLeft.fY,
                             vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                            COLOR_ARGB ( ucAlpha, 0, 0, 0 ) );
+                            COLOR_ABGR ( ucAlpha, 0, 0, 0 ) );
 
             if ( fArmor > 0.0f )
             {
@@ -550,7 +550,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             pGraphics->DrawRectangle ( 
                             vecTopLeft.fX,  vecTopLeft.fY,
                             vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                            COLOR_ARGB ( ucAlpha, 0, static_cast < unsigned char > ( lGreen ), static_cast < unsigned char > ( lRed ) ) );
+                            COLOR_ABGR ( ucAlpha, 0, static_cast < unsigned char > ( lGreen ), static_cast < unsigned char > ( lRed ) ) );
 
             // the black bit
             vecTopLeft  = vecTopLeftBase  + CVector ( +fWidth - fRemovedWidth,  +0, 0 );
@@ -558,7 +558,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             pGraphics->DrawRectangle ( 
                             vecTopLeft.fX,  vecTopLeft.fY,
                             vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                            COLOR_ARGB ( ucAlpha, 0, static_cast < unsigned char > ( lGreenBlack ), static_cast < unsigned char > ( lRedBlack ) ) );
+                            COLOR_ABGR ( ucAlpha, 0, static_cast < unsigned char > ( lGreenBlack ), static_cast < unsigned char > ( lRedBlack ) ) );
         }
     }
 }
