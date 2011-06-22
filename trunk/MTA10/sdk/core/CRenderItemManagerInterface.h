@@ -39,23 +39,26 @@ class CRenderItemManager;
 class CRenderItemManagerInterface
 {
 public:
-    virtual                     ~CRenderItemManagerInterface    ( void ) {}
+    virtual                     ~CRenderItemManagerInterface        ( void ) {}
 
     // CRenderItemManagerInterface
-    virtual CDxFontItem*        CreateDxFont                ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
-    virtual CGuiFontItem*       CreateGuiFont               ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
-    virtual CTextureItem*       CreateTexture               ( const SString& strFullFilePath ) = 0;
-    virtual CShaderItem*        CreateShader                ( const SString& strFullFilePath, SString& strOutStatus ) = 0;
-    virtual CRenderTargetItem*  CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel ) = 0;
-    virtual CScreenSourceItem*  CreateScreenSource          ( uint uiSizeX, uint uiSizeY ) = 0;
-    virtual void                ReleaseRenderItem           ( CRenderItem* pItem ) = 0;
-    virtual bool                SetShaderValue              ( CShaderItem* pItem, const SString& strName, CTextureItem* pTextureItem ) = 0;
-    virtual bool                SetShaderValue              ( CShaderItem* pItem, const SString& strName, bool bValue ) = 0;
-    virtual bool                SetShaderValue              ( CShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount ) = 0;
-    virtual bool                SetRenderTarget             ( CRenderTargetItem* pItem, bool bClear ) = 0;
-    virtual bool                RestoreDefaultRenderTarget  ( void ) = 0;
-    virtual void                UpdateBackBufferCopy        ( void ) = 0;
-    virtual void                UpdateScreenSource          ( CScreenSourceItem* pScreenSourceItem ) = 0;
+    virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
+    virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
+    virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath ) = 0;
+    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, SString& strOutStatus ) = 0;
+    virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel ) = 0;
+    virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
+    virtual void                ReleaseRenderItem                   ( CRenderItem* pItem ) = 0;
+    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, CTextureItem* pTextureItem ) = 0;
+    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, bool bValue ) = 0;
+    virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount ) = 0;
+    virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear ) = 0;
+    virtual bool                RestoreDefaultRenderTarget          ( void ) = 0;
+    virtual void                UpdateBackBufferCopy                ( void ) = 0;
+    virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem ) = 0;
+    virtual CShaderItem*        GetAppliedShaderForD3DData          ( void* pD3DData ) = 0;
+    virtual bool                ApplyShaderItemToModelTexture       ( CShaderItem* pShaderItem, ushort usModelID, const SString& strTextureName ) = 0;
+    virtual bool                RemoveShaderItemFromModelTexture    ( CShaderItem* pShaderItem, ushort usModelID, const SString& strTextureName ) = 0;
 };
 
 

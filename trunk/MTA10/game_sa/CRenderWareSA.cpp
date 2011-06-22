@@ -166,6 +166,8 @@ static RpAtomic* LoadAtomicsCB (RpAtomic * atomic, SLoadAtomics * data)
 
 CRenderWareSA::CRenderWareSA ( eGameVersion version )
 {
+    m_pfnWatchCallback = NULL;
+
     // Version dependant addresses
     switch ( version )
     {
@@ -798,4 +800,144 @@ bool CRenderWareSA::ListContainsNamedTexture ( std::list < RwTexture* >& list, c
             return true;
     }
     return false;
+}
+
+
+//
+// Get D3D resource associated with the game texture 
+//
+void* CRenderWareSA::GetD3DDataForTxdTexture ( ushort usModelID, const char* szTextureName )
+{
+    // Ensure valid
+    if ( !szTextureName || usModelID > 20000 || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID] )
+        return NULL;
+
+    // Get the CModelInfo's TXD ID
+    unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+
+    // Get the TXD corresponding to this ID
+    SetTextureDict ( usTxdId );
+
+    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
+
+    if ( pTXD )
+    {
+        RwTexture* pResultTexture = RwTexDictionaryFindNamedTexture ( pTXD, szTextureName );
+        if ( pResultTexture )
+        {
+            RwRaster* raster = pResultTexture->raster;
+            if ( raster )
+            {
+                return raster->renderResource;
+            }
+        }
+    }
+    return NULL;
+}
+
+
+//
+// Setup texture watch callback
+//
+void CRenderWareSA::InitModelTextureWatch ( PFN_WATCH_CALLBACK pfnWatchCallback )
+{
+    m_pfnWatchCallback = pfnWatchCallback;
+}
+
+
+//
+// Begin watching for changes to the d3d resource associated with this model_texture  
+//
+void CRenderWareSA::BeginModelTextureWatch ( ushort usModelID, const char* szTextureName )
+{
+    // Get info block for this model ID
+    SWatchedModelInfo* pInfo = MapFind ( m_watchedModelInfoMap, usModelID );
+    if ( !pInfo )
+    {
+        MapSet ( m_watchedModelInfoMap, usModelID, SWatchedModelInfo () );
+        pInfo = MapFind ( m_watchedModelInfoMap, usModelID );
+    }
+
+    // Get usage for the texture
+    void** ppD3DData = MapFind ( pInfo->nameDataMap, szTextureName );
+    if ( !ppD3DData )
+    {
+        MapSet ( pInfo->nameDataMap, szTextureName, (void*)NULL );
+        ppD3DData = MapFind ( pInfo->nameDataMap, szTextureName );
+    }
+    else
+    {
+        // This should not be possible at the moment
+        assert ( 0 );
+
+        void* pD3DDataNew = *ppD3DData;
+
+        // Refresh
+        if ( m_pfnWatchCallback )
+            m_pfnWatchCallback ( usModelID, szTextureName, pD3DDataNew, pD3DDataNew );
+    }
+}
+
+
+//
+// End watching for changes to the d3d resource associated with this model_texture 
+//
+void CRenderWareSA::EndModelTextureWatch ( ushort usModelID, const char* szTextureName )
+{
+    // Get info block for this model ID
+    SWatchedModelInfo* pInfo = MapFind ( m_watchedModelInfoMap, usModelID );
+    if ( !pInfo )
+        return;
+
+    // Get usage for the texture
+    void** ppD3DData = MapFind ( pInfo->nameDataMap, szTextureName );
+    if ( ppD3DData )
+    {
+        void* pD3DDataOld = *ppD3DData;
+
+        // Notify that this is being stopped
+        if ( m_pfnWatchCallback )
+            m_pfnWatchCallback ( usModelID, szTextureName, NULL, pD3DDataOld );
+
+        // Remove usage for the texture
+        MapRemove ( pInfo->nameDataMap, szTextureName );
+
+        // If no textures left, remove model watch as well
+        if ( pInfo->nameDataMap.empty () )
+            MapRemove ( m_watchedModelInfoMap, usModelID );
+    }
+}
+
+
+//
+// Update watched textures status
+//
+void CRenderWareSA::PulseModelTextureWatch ( void )
+{
+    // TODO - Add hooks to detect changes rather than doing a scan
+
+    // for each model
+    for ( std::map < ushort, SWatchedModelInfo >::iterator modelIter = m_watchedModelInfoMap.begin () ; modelIter != m_watchedModelInfoMap.end () ; ++modelIter )
+    {
+        ushort usModelId = modelIter->first;
+        SWatchedModelInfo& info = modelIter->second;
+
+        // for each model_texture
+        for ( std::map < SString, void* >::iterator texIter = info.nameDataMap.begin () ; texIter != info.nameDataMap.end () ; ++texIter )
+        {
+            const SString& strTextureName = texIter->first;
+            void*& pD3DDataOld = texIter->second;
+
+            // Get current d3d data for this texture
+            void* pD3DDataNew = GetD3DDataForTxdTexture ( usModelId, strTextureName );
+
+            // If changed, do callback notification
+            if ( pD3DDataOld != pD3DDataNew )
+            {
+                if ( m_pfnWatchCallback )
+                    m_pfnWatchCallback ( usModelId, strTextureName, pD3DDataNew, pD3DDataOld );
+                pD3DDataOld = pD3DDataNew;
+            }
+        }
+    }
 }

@@ -215,6 +215,7 @@ struct RwRaster
     unsigned char   format;
     unsigned char   *origPixels;
     int             origWidth, origHeight, origDepth;
+    void*           renderResource;
 };
 struct RwColorFloat
 {
