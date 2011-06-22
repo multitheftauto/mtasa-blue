@@ -471,7 +471,7 @@ HRESULT CProxyDirect3DDevice9::GetTexture                     ( DWORD Stage,IDir
 
 HRESULT CProxyDirect3DDevice9::SetTexture                     ( DWORD Stage,IDirect3DBaseTexture9* pTexture )
 {
-    return m_pDevice->SetTexture ( Stage, pTexture );
+    return CDirect3DEvents9::OnSetTexture ( m_pDevice, Stage, pTexture );
 }
 
 HRESULT CProxyDirect3DDevice9::GetTextureStageState           ( DWORD Stage,D3DTEXTURESTAGESTATETYPE Type,DWORD* pValue )
@@ -556,7 +556,7 @@ HRESULT CProxyDirect3DDevice9::DrawPrimitive                  ( D3DPRIMITIVETYPE
 
 HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitive           ( D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
-    return m_pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    return CDirect3DEvents9::OnDrawIndexedPrimitive ( m_pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
 }
 
 HRESULT CProxyDirect3DDevice9::DrawPrimitiveUP                ( D3DPRIMITIVETYPE PrimitiveType,UINT PrimitiveCount,CONST void* pVertexStreamZeroData,UINT VertexStreamZeroStride )

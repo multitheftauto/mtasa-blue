@@ -22,6 +22,7 @@
 static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;
 static int                 ms_bSaveStarted      = 0;
 static long long           ms_LastSaveTime      = 0;
+static void*               ms_LastSetTextures[4] = { NULL, NULL, NULL, NULL };
 
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
@@ -203,5 +204,48 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
                 std::runtime_error ( "Failed to release the ScreenShot rendertaget surface" );
             pSurface = NULL;
         }
+    }
+}
+
+
+HRESULT CDirect3DEvents9::OnSetTexture ( IDirect3DDevice9 *pDevice, DWORD Stage, IDirect3DBaseTexture9* pTexture )
+{
+    // Save texture pointer for later
+    if ( Stage < NUMELMS( ms_LastSetTextures ) )
+        ms_LastSetTextures [ Stage ] = pTexture;
+
+    return pDevice->SetTexture ( Stage, pTexture );
+}
+
+
+HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
+{
+    // Any shader for this texture ?
+    CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( ms_LastSetTextures[0] );
+
+    if ( !pShaderItem )
+    {
+        // No shader for this texture
+        return pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+    }
+    else
+    {
+        // Yes shader for this texture
+        HRESULT hr = D3D_OK;
+        ID3DXEffect* pD3DEffect = pShaderItem->m_pD3DEffect;
+
+        // Do shader passes
+        DWORD dwFlags = 0;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+        uint uiNumPasses = 0;
+        pD3DEffect->Begin ( &uiNumPasses, dwFlags );
+
+        for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
+        {
+            pD3DEffect->BeginPass ( uiPass );
+            hr = pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+            pD3DEffect->EndPass ();
+        }
+        pD3DEffect->End ();
+        return hr;
     }
 }

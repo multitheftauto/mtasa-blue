@@ -470,6 +470,8 @@ public:
     LUA_DECLARE ( EngineReplaceVehiclePart );
     LUA_DECLARE ( EngineSetModelLODDistance );
     LUA_DECLARE ( EngineSetAsynchronousLoading );
+    LUA_DECLARE ( EngineApplyShaderToModel );
+    LUA_DECLARE ( EngineRemoveShaderFromModel );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
