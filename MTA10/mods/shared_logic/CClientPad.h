@@ -31,13 +31,28 @@ public:
     bool                            GetControlState         ( const char * szName, bool & bState );
     bool                            SetControlState         ( const char * szName, bool bState );
 
+    bool                            GetControlState         ( const char * szName, float & fState );
+    bool                            SetControlState         ( const char * szName, float fState );
+
     void                            DoPulse                 ( CClientPed * pPed );
 
-    static bool                     GetAnalogControlState   ( const char * szName, CControllerState & cs, bool bOnFoot, float & fState );
-    static bool                     GetControlState         ( const char * szName, CControllerState & State, bool bOnFoot );
+    static bool                     GetAnalogControlState       ( const char * szName, CControllerState & cs, bool bOnFoot, float & fState );
+    static bool                     SetAnalogControlState       ( const char * szName, float fState );
+    static void                     RemoveSetAnalogControlState ( const char * szName );
+
+    static void                     ProcessSetAnalogControlState ( CControllerState & cs, bool bOnFoot );    
+    static void                     ProcessControl               ( short & usControlValue, unsigned int uiIndex, bool bResetCmp );  
+
+    static void                     ProcessAllToggledControls   ( CControllerState & cs, bool bOnFoot );
+    static bool                     ProcessToggledControl       ( const char * szName, CControllerState & cs, bool bOnFoot, bool bEnabled );
+    static bool                     GetControlState             ( const char * szName, CControllerState & State, bool bOnFoot );
+
+    // Static Pad states intended for the local player
+    static short*                   m_sScriptedStates;
+    static bool*                    m_bScriptedReadyToReset;
 
 protected:
-    bool                            m_bStates [ MAX_GTA_CONTROLS ];
+    float                           m_fStates [ MAX_GTA_CONTROLS ];
 };
 
 #endif

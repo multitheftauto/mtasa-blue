@@ -2187,6 +2187,7 @@ void CKeyBinds::DoPostFramePulse ( void )
         cs.Select = ( g_bcControls [ 10 ].bState ) ? 255 : 0; // Change View   
 
         GetJoystickManager ()->ApplyAxes ( cs, bInVehicle );
+        //m_pCore->GetMouseControl()->ApplyAxes ( cs );
     }
         
     m_pCore->GetGame ()->GetPad ()->SetCurrentControllerState ( &cs );
