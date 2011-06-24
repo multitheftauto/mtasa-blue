@@ -51,6 +51,10 @@ namespace SharedUtil
     SString         PathJoin                        ( const SString& str1, const SString& str2, const SString& str3, const SString& str4 = "", const SString& str5 = "" );
     void            ExtractFilename                 ( const SString& strPathFilename, SString* strPath, SString* strFilename );
     bool            ExtractExtention                ( const SString& strFilename, SString* strRest, SString* strExt );
+    SString         ExtractPath                     ( const SString& strPathFilename );
+    SString         ExtractFilename                 ( const SString& strPathFilename );
+    SString         ExtractExtention                ( const SString& strPathFilename );
+    SString         ExtractBeforeExtention          ( const SString& strPathFilename );
 
     bool            FileDelete                      ( const SString& strFilename, bool bForce = true );
     bool            FileRename                      ( const SString& strFilenameOld, const SString& strFilenameNew );

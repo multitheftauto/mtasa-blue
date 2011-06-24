@@ -160,29 +160,12 @@ void CTileBatcher::Flush ( void )
         if ( CShaderInstance* pShaderInstance = DynamicCast < CShaderInstance > ( m_pCurrentMaterial ) )
         {
             // Draw using shader
-            ID3DXEffect* pD3DEffect = pShaderInstance->m_pD3DEffect;
+            ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
-            // Apply user set parameters
+            // Apply custom parameters
             pShaderInstance->ApplyShaderParameters ();
-
-            // Set matrices and time
-            if ( pShaderInstance->m_hWorld )
-                pD3DEffect->SetMatrix ( pShaderInstance->m_hWorld, &matWorld );
-
-            if ( pShaderInstance->m_hView )
-                pD3DEffect->SetMatrix ( pShaderInstance->m_hView, &m_MatView );
-
-            if ( pShaderInstance->m_hProjection )
-                pD3DEffect->SetMatrix ( pShaderInstance->m_hProjection, &m_MatProjection );
-
-            if ( pShaderInstance->m_hAll )
-            {
-                D3DXMATRIX matAll = matWorld * m_MatProjection;     // m_MatView is always identity
-                pD3DEffect->SetMatrix ( pShaderInstance->m_hAll, &matAll );
-            }
-
-            if ( pShaderInstance->m_hTime )
-                pD3DEffect->SetFloat ( pShaderInstance->m_hTime, GetTickCount64_ () * 0.001f );
+            // Apply common parameters
+            pShaderInstance->m_pEffectWrap->ApplyCommonHandles ();
 
             // Do shader passes
             DWORD dwFlags = 0;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE

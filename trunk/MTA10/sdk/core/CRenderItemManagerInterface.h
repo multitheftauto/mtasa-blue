@@ -45,7 +45,7 @@ public:
     virtual CDxFontItem*        CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold ) = 0;
     virtual CGuiFontItem*       CreateGuiFont                       ( const SString& strFullFilePath, const SString& strFontName, uint uiSize ) = 0;
     virtual CTextureItem*       CreateTexture                       ( const SString& strFullFilePath ) = 0;
-    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, SString& strOutStatus ) = 0;
+    virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, bool bDebug ) = 0;
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
     virtual void                ReleaseRenderItem                   ( CRenderItem* pItem ) = 0;
@@ -92,6 +92,7 @@ enum eRenderItemClassTypes
     CLASS_CDxFontItem,
     CLASS_CGuiFontItem,
     CLASS_CMaterialItem,
+    CLASS_CEffectWrap,
     CLASS_CShaderItem,
     CLASS_CShaderInstance,
     CLASS_CTextureItem,
@@ -173,6 +174,36 @@ class CGuiFontItem : public CRenderItem
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 //
+// CEffectWrap - ID3DXEffect* wrapped with common handles
+//
+class CEffectWrap : public CRenderItem
+{
+    DECLARE_CLASS( CEffectWrap, CRenderItem )
+                    CEffectWrap             ( void ) : ClassInit ( this ) {}
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
+    virtual void    PreDestruct             ( void );
+    virtual bool    IsValid                 ( void );
+    virtual void    OnLostDevice            ( void );
+    virtual void    OnResetDevice           ( void );
+    void            CreateUnderlyingData    ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
+    void            ReleaseUnderlyingData   ( void );
+    void            ApplyCommonHandles      ( void );
+
+    ID3DXEffect*    m_pD3DEffect;
+    D3DXHANDLE      hWorld, hView, hProjection, hWorldView, hWorldViewProj;
+    D3DXHANDLE      hViewProj, hViewInv, hWorldInvTr, hViewInvTr;
+    D3DXHANDLE      hCamPos, hCamDir;
+    D3DXHANDLE      hTime;
+    D3DXHANDLE      hMaterialAmbient, hMaterialDiffuse, hMaterialEmissive, hMaterialSpecular, hMaterialSpecPower;
+    D3DXHANDLE      hGlobalAmbient;
+    D3DXHANDLE      hLightAmbient, hLightDiffuse, hLightSpecular, hLightDirection;
+    D3DXHANDLE      hTexture0, hTexture1;
+};
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
 // CMaterialItem
 //
 class CMaterialItem : public CRenderItem
@@ -194,12 +225,12 @@ class CShaderItem : public CMaterialItem
 {
     DECLARE_CLASS( CShaderItem, CMaterialItem )
                     CShaderItem             ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, SString& strOutStatus );
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
     virtual void    PreDestruct             ( void );
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );
     virtual void    OnResetDevice           ( void );
-    void            CreateUnderlyingData    ( const SString& strFilename, SString& strOutStatus );
+    void            CreateUnderlyingData    ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
     void            ReleaseUnderlyingData   ( void );
     bool            SetValue                ( const SString& strName, CTextureItem* pTextureItem );
     bool            SetValue                ( const SString& strName, bool bValue );
@@ -207,10 +238,9 @@ class CShaderItem : public CMaterialItem
     void            MaybeRenewShaderInstance ( void );
     void            RenewShaderInstance     ( void );
 
-    ID3DXEffect*        m_pD3DEffect;
+    CEffectWrap*        m_pEffectWrap;
     std::map < SString, D3DXHANDLE > m_texureHandleMap;
     std::map < SString, D3DXHANDLE > m_valueHandleMap;
-    D3DXHANDLE          m_hWorld, m_hView, m_hProjection, m_hAll, m_hTime;
     D3DXHANDLE          m_hFirstTexture;
 
     // This is used as the current render material
@@ -245,8 +275,7 @@ class CShaderInstance : public CMaterialItem
     SShaderValue*   GetParam                ( D3DXHANDLE hHandle );
     void            ApplyShaderParameters   ( void );
 
-    ID3DXEffect*        m_pD3DEffect;
-    D3DXHANDLE          m_hWorld, m_hView, m_hProjection, m_hAll, m_hTime;
+    CEffectWrap*        m_pEffectWrap;
     std::map < D3DXHANDLE, SShaderValue > m_currentSetValues;
 };
 

@@ -18,12 +18,12 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, SString& strOutStatus )
+void CShaderItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug )
 {
     Super::PostConstruct ( pManager );
 
     // Initial creation of d3d data
-    CreateUnderlyingData ( strFilename, strOutStatus );
+    CreateUnderlyingData ( strFilename, strRootPath, strOutStatus, bDebug );
 }
 
 
@@ -50,7 +50,7 @@ void CShaderItem::PreDestruct ( void )
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::IsValid ( void )
 {
-    return m_pD3DEffect != NULL;
+    return m_pEffectWrap && m_pEffectWrap->m_pD3DEffect;
 }
 
 
@@ -63,7 +63,7 @@ bool CShaderItem::IsValid ( void )
 ////////////////////////////////////////////////////////////////
 void CShaderItem::OnLostDevice ( void )
 {
-    m_pD3DEffect->OnLostDevice ();
+    // Nothing required for CShaderItem
 }
 
 
@@ -76,7 +76,7 @@ void CShaderItem::OnLostDevice ( void )
 ////////////////////////////////////////////////////////////////
 void CShaderItem::OnResetDevice ( void )
 {
-    m_pD3DEffect->OnResetDevice ();
+    // Nothing required for CShaderItem
 }
 
 
@@ -87,59 +87,32 @@ void CShaderItem::OnResetDevice ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::CreateUnderlyingData ( const SString& strFilename, SString& strOutStatus )
+void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug )
 {
-    assert ( !m_pD3DEffect );
+    assert ( !m_pEffectWrap );
+    assert ( !m_pShaderInstance );
 
-    // Compile effect
-    DWORD dwFlags = 0;
-    dwFlags |= D3DXSHADER_DEBUG;
-    dwFlags |= D3DXSHADER_PARTIALPRECISION;
 
-    ID3DXInclude* pIncludeManager = NULL;   // TODO
-    ID3DXEffect* pD3DEffect = NULL;
-    LPD3DXBUFFER pBufferErrors = NULL;
-    HRESULT Result = D3DXCreateEffectFromFile( m_pDevice, strFilename, NULL, pIncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
+    m_pEffectWrap = new CEffectWrap ();
+    m_pEffectWrap->PostConstruct ( m_pManager, strFilename, strRootPath, strOutStatus, bDebug );
 
-    // Handle compile errors
-    strOutStatus = "";
-    if( pBufferErrors != NULL )
-        strOutStatus = SStringX ( (CHAR*)pBufferErrors->GetBufferPointer() ).TrimEnd ( "\n" );
-    SAFE_RELEASE( pBufferErrors );
-
-    if( !m_pD3DEffect )
-        return;
-
-    // Find first valid technique
-    D3DXHANDLE hTechnique = NULL;
-    m_pD3DEffect->FindNextValidTechnique( NULL, &hTechnique );
-
-    // Error if can't find a valid technique
-    if ( !hTechnique )
+    if ( !m_pEffectWrap->IsValid () )
     {
-        strOutStatus = "No valid technique";
-        SAFE_RELEASE ( m_pD3DEffect );
+        SAFE_RELEASE( m_pEffectWrap );
         return;
     }
 
-    // Set technique
-    m_pD3DEffect->SetTechnique( hTechnique );
-
-    // Inform user of technique name
-    D3DXTECHNIQUE_DESC Desc;
-    m_pD3DEffect->GetTechniqueDesc( hTechnique, &Desc );
-    strOutStatus = Desc.Name;
 
     // Add parameter handles
     D3DXEFFECT_DESC EffectDesc;
-    m_pD3DEffect->GetDesc( &EffectDesc );
+    m_pEffectWrap->m_pD3DEffect->GetDesc( &EffectDesc );
     for ( uint i = 0 ; i < EffectDesc.Parameters ; i++ )
     {
-        D3DXHANDLE hParameter = m_pD3DEffect->GetParameter ( NULL, i );
+        D3DXHANDLE hParameter = m_pEffectWrap->m_pD3DEffect->GetParameter ( NULL, i );
         if ( !hParameter )
             break;
         D3DXPARAMETER_DESC Desc;
-        m_pD3DEffect->GetParameterDesc( hParameter, &Desc );
+        m_pEffectWrap->m_pD3DEffect->GetParameterDesc( hParameter, &Desc );
         // Use semantic if it exists
         SString strName = Desc.Semantic ? Desc.Semantic : Desc.Name;
         // Add to correct lookup map
@@ -148,27 +121,57 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, SString& st
             // Keep handle to first texture to get size of shader
             if ( !m_hFirstTexture )
                 m_hFirstTexture = hParameter;
-            MapSet ( m_texureHandleMap, strName.ToLower (), hParameter );
+            MapSet ( m_texureHandleMap, strName.ToUpper (), hParameter );
         }
         else
-            MapSet ( m_valueHandleMap, strName.ToLower (), hParameter );
+            MapSet ( m_valueHandleMap, strName.ToUpper (), hParameter );
     }
 
-    // Cache known parameters
-    D3DXHANDLE* phWorld = MapFind ( m_valueHandleMap, "world" );
-    m_hWorld = phWorld ? *phWorld : NULL;
 
-    D3DXHANDLE* phView = MapFind ( m_valueHandleMap, "view" );
-    m_hView = phView ? *phView : NULL;
+    struct
+    {
+        D3DXHANDLE& hHandle;
+        SString strNames;
+    } handleNames [] = {
+        m_pEffectWrap->hWorld, "WORLD",
+        m_pEffectWrap->hView, "VIEW",
+        m_pEffectWrap->hProjection, "PROJECTION",
+        m_pEffectWrap->hWorldView, "WORLDVIEW",
+        m_pEffectWrap->hWorldViewProj, "WORLDVIEWPROJECTION",
+        m_pEffectWrap->hViewProj, "VIEWPROJECTION",
+        m_pEffectWrap->hViewInv, "VIEWINV",
+        m_pEffectWrap->hWorldInvTr, "WORLDINVTRANSPOSE",
+        m_pEffectWrap->hViewInvTr, "VIEWINVTRANSPOSE",
+        m_pEffectWrap->hCamPos, "CAMERAPOSITION",
+        m_pEffectWrap->hCamDir, "CAMERADIRECTION",
+        m_pEffectWrap->hTime, "TIME",
+        m_pEffectWrap->hMaterialAmbient, "MATERIALAMBIENT",
+        m_pEffectWrap->hMaterialDiffuse, "MATERIALDIFFUSE",
+        m_pEffectWrap->hMaterialEmissive, "MATERIALEMISSIVE",
+        m_pEffectWrap->hMaterialSpecular, "MATERIALSPECULAR",
+        m_pEffectWrap->hMaterialSpecPower, "MATERIALSPECULARPOWER",
+        m_pEffectWrap->hGlobalAmbient, "GLOBALAMBIENT",
+        m_pEffectWrap->hLightAmbient, "LIGHTAMBIENT",
+        m_pEffectWrap->hLightDiffuse, "LIGHTDIFFUSE",
+        m_pEffectWrap->hLightSpecular, "LIGHTSPECULAR",
+        m_pEffectWrap->hLightDirection, "LIGHTDIRECTION",
+        m_pEffectWrap->hTexture0, "TEXTURE0",
+        m_pEffectWrap->hTexture1, "TEXTURE1",
+    };
 
-    D3DXHANDLE* phProjection = MapFind ( m_valueHandleMap, "projection" );
-    m_hProjection = phProjection ? *phProjection : NULL;
-
-    D3DXHANDLE* phAll = MapFind ( m_valueHandleMap, "worldviewprojection" );
-    m_hAll = phAll ? *phAll : NULL;
-
-    D3DXHANDLE* phTime = MapFind ( m_valueHandleMap, "time" );
-    m_hTime = phTime ? *phTime : NULL;
+    for ( uint h = 0 ; h < NUMELMS( handleNames ) ; h++ )
+    {
+        std::vector < SString > parts;
+        handleNames[h].strNames.Split( ",", parts );
+        D3DXHANDLE* phHandle = NULL;
+        for ( uint n = 0 ; n < parts.size () && phHandle == NULL ; n++ )
+        {
+            phHandle = MapFind ( m_valueHandleMap, parts[n] );
+            if ( !phHandle )
+                phHandle = MapFind ( m_texureHandleMap, parts[n] );
+        }
+        handleNames[h].hHandle = phHandle ? *phHandle : NULL;
+    }
 
     // Create instance to store param values
     RenewShaderInstance ();
@@ -184,7 +187,7 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, SString& st
 ////////////////////////////////////////////////////////////////
 void CShaderItem::ReleaseUnderlyingData ( void )
 {
-    SAFE_RELEASE( m_pD3DEffect )
+    SAFE_RELEASE( m_pEffectWrap )
     SAFE_RELEASE( m_pShaderInstance );
 }
 
@@ -198,7 +201,7 @@ void CShaderItem::ReleaseUnderlyingData ( void )
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::SetValue ( const SString& strName, CTextureItem* pTextureItem )
 {
-    if ( D3DXHANDLE* phParameter = MapFind ( m_texureHandleMap, strName.ToLower () ) )
+    if ( D3DXHANDLE* phParameter = MapFind ( m_texureHandleMap, strName.ToUpper () ) )
     {
         // Check if value is changing
         if ( !m_pShaderInstance->CmpTextureValue( *phParameter, pTextureItem ) )
@@ -232,7 +235,7 @@ bool CShaderItem::SetValue ( const SString& strName, CTextureItem* pTextureItem 
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::SetValue ( const SString& strName, bool bValue )
 {
-    if ( D3DXHANDLE* phParameter = MapFind ( m_valueHandleMap, strName.ToLower () ) )
+    if ( D3DXHANDLE* phParameter = MapFind ( m_valueHandleMap, strName.ToUpper () ) )
     {
         // Check if value is changing
         if ( !m_pShaderInstance->CmpBoolValue( *phParameter, bValue ) )
@@ -256,7 +259,7 @@ bool CShaderItem::SetValue ( const SString& strName, bool bValue )
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::SetValue ( const SString& strName, const float* pfValues, uint uiCount )
 {
-    if ( D3DXHANDLE* phParameter = MapFind ( m_valueHandleMap, strName.ToLower () ) )
+    if ( D3DXHANDLE* phParameter = MapFind ( m_valueHandleMap, strName.ToUpper () ) )
     {
         // Check if value is changing
         if ( !m_pShaderInstance->CmpFloatsValue( *phParameter, pfValues, uiCount ) )

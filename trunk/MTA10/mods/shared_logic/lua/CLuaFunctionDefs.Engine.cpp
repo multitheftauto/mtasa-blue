@@ -481,16 +481,19 @@ int CLuaFunctionDefs::EngineReplaceVehiclePart ( lua_State* luaVM )
 
 int CLuaFunctionDefs::EngineApplyShaderToModel ( lua_State* luaVM )
 {
-//  bool engineApplyShaderToModel ( element shader, int modelID, string textureName )
-    CClientShader* pShader; int iModelID; SString strTextureName;
+//  bool engineApplyShaderToModel ( element shader, int modelID, string textureName, bool bGlobalTXD )
+    CClientShader* pShader; int iModelID; SString strTextureName; bool bGlobalTXD;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pShader );
     argStream.ReadNumber ( iModelID );
     argStream.ReadString ( strTextureName );
+    argStream.ReadBool ( bGlobalTXD, false );
 
     if ( !argStream.HasErrors () )
     {
+        if ( bGlobalTXD )
+            iModelID += 30000;  // ModelID's over 30000 mean use global TXD instead
         bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->ApplyShaderItemToModelTexture ( pShader->GetShaderItem (), iModelID, strTextureName );
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -507,15 +510,18 @@ int CLuaFunctionDefs::EngineApplyShaderToModel ( lua_State* luaVM )
 int CLuaFunctionDefs::EngineRemoveShaderFromModel ( lua_State* luaVM )
 {
 //  bool engineRemoveShaderFromModel ( element shader, int modelID, string textureName )
-    CClientShader* pShader; int iModelID; SString strTextureName;
+    CClientShader* pShader; int iModelID; SString strTextureName; bool bGlobalTXD;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pShader );
     argStream.ReadNumber ( iModelID );
     argStream.ReadString ( strTextureName );
+    argStream.ReadBool ( bGlobalTXD, false );
 
     if ( !argStream.HasErrors () )
     {
+        if ( bGlobalTXD )
+            iModelID += 30000;  // ModelID's over 30000 mean use global TXD instead
         bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveShaderItemFromModelTexture ( pShader->GetShaderItem (), iModelID, strTextureName );
         lua_pushboolean ( luaVM, true );
         return 1;
