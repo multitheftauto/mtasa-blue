@@ -140,7 +140,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 {
 //  bool dxDrawText ( string text, int left, int top [, int right=left, int bottom=top, int color=white, float scale=1, mixed font="default", 
 //      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI] )
-    SString strText; int iLeft; int iTop; int iRight; int iBottom; ulong ulColor; float fScale; SString strFontName; CClientDxFont* pDxFontElement;
+    SString strText; int iLeft; int iTop; int iRight; int iBottom; ulong ulColor; float fScaleX; float fScaleY; SString strFontName; CClientDxFont* pDxFontElement;
     eDXHorizontalAlign alignX; eDXVerticalAlign alignY; bool bClip; bool bWordBreak; bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
@@ -150,7 +150,11 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     argStream.ReadNumber ( iRight, iLeft );
     argStream.ReadNumber ( iBottom, iTop );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
-    argStream.ReadNumber ( fScale, 1 );
+    argStream.ReadNumber ( fScaleX, 1 );
+    if ( argStream.NextIsNumber () )
+        argStream.ReadNumber ( fScaleY );
+    else
+        fScaleY = fScaleX;
     MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
     argStream.ReadEnumString ( alignX, DX_ALIGN_LEFT );
     argStream.ReadEnumString ( alignY, DX_ALIGN_TOP );
@@ -161,7 +165,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         // Get DX font
-        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement, fScale, fScale );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement, fScaleX, fScaleY );
 
         // Make format flag
         ulong ulFormat = alignX | alignY;
@@ -169,7 +173,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         if ( bWordBreak )           ulFormat |= DT_WORDBREAK;
         if ( !bClip )               ulFormat |= DT_NOCLIP;
 
-        CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, strText, fScale, fScale, ulFormat, pD3DXFont, bPostGUI );
+        CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI );
 
         lua_pushboolean ( luaVM, true );
         return 1;
