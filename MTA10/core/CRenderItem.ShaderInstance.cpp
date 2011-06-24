@@ -49,7 +49,7 @@ void CShaderInstance::PreDestruct ( void )
 ////////////////////////////////////////////////////////////////
 bool CShaderInstance::IsValid ( void )
 {
-    return m_pD3DEffect != NULL;
+    return m_pEffectWrap && m_pEffectWrap->m_pD3DEffect;
 }
 
 
@@ -91,13 +91,8 @@ void CShaderInstance::CreateUnderlyingData ( CShaderItem* pShaderItem )
     // Clone data from shader
     m_uiSizeX = pShaderItem->m_uiSizeX;
     m_uiSizeY = pShaderItem->m_uiSizeY;
-    m_pD3DEffect = pShaderItem->m_pD3DEffect;
-    m_pD3DEffect->AddRef ();
-    m_hWorld = pShaderItem->m_hWorld;
-    m_hView = pShaderItem->m_hView;
-    m_hProjection = pShaderItem->m_hProjection;
-    m_hAll = pShaderItem->m_hAll;
-    m_hTime = pShaderItem->m_hTime;
+    m_pEffectWrap = pShaderItem->m_pEffectWrap;
+    m_pEffectWrap->AddRef ();
 
     // If shader had a previous instance, clone parameter values then release it
     if ( pShaderItem->m_pShaderInstance )
@@ -128,7 +123,7 @@ void CShaderInstance::CreateUnderlyingData ( CShaderItem* pShaderItem )
 ////////////////////////////////////////////////////////////////
 void CShaderInstance::ReleaseUnderlyingData ( void )
 {
-    SAFE_RELEASE ( m_pD3DEffect );
+    SAFE_RELEASE ( m_pEffectWrap );
 
     // Decrement refs on all textures
     for ( std::map < D3DXHANDLE, SShaderValue >::iterator iter = m_currentSetValues.begin () ; iter != m_currentSetValues.end () ; ++iter )
@@ -269,20 +264,21 @@ SShaderValue* CShaderInstance::GetParam ( D3DXHANDLE hHandle )
 ////////////////////////////////////////////////////////////////
 void CShaderInstance::ApplyShaderParameters ( void )
 {
+    ID3DXEffect* pD3DEffect = m_pEffectWrap->m_pD3DEffect;
     for ( std::map < D3DXHANDLE, SShaderValue >::iterator iter = m_currentSetValues.begin () ; iter != m_currentSetValues.end () ; ++iter )
     {
         switch ( iter->second.cType )
         {
             case 't':
-                m_pD3DEffect->SetTexture ( iter->first, iter->second.pTextureItem->m_pD3DTexture );
+                pD3DEffect->SetTexture ( iter->first, iter->second.pTextureItem->m_pD3DTexture );
                 break;
 
             case 'b':
-                m_pD3DEffect->SetBool ( iter->first, iter->second.bValue );
+                pD3DEffect->SetBool ( iter->first, iter->second.bValue );
                 break;
 
             case 'f':
-                m_pD3DEffect->SetFloatArray( iter->first, iter->second.floatList, iter->second.cCount );
+                pD3DEffect->SetFloatArray( iter->first, iter->second.floatList, iter->second.cCount );
                 break;
         }
     }

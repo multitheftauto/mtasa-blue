@@ -569,6 +569,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderItem.EffectWrap.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderItem.FileTexture.cpp"
 				>
 			</File>

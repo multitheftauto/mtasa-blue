@@ -134,7 +134,7 @@ void CRenderTargetItem::CreateUnderlyingData ( void )
             m_pDevice->EvictManagedResources ();
     }
 
-    // Check depth buffer created created
+    // Check depth buffer created
     if ( !m_pD3DZStencilSurface )
     {
         SAFE_RELEASE( m_pD3DTexture );

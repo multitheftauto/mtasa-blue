@@ -231,10 +231,16 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     else
     {
         // Yes shader for this texture
-        HRESULT hr = D3D_OK;
-        ID3DXEffect* pD3DEffect = pShaderItem->m_pD3DEffect;
+        CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
+
+        // Apply custom parameters
+        pShaderInstance->ApplyShaderParameters ();
+        // Apply common parameters
+        pShaderInstance->m_pEffectWrap->ApplyCommonHandles ();
 
         // Do shader passes
+        ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+
         DWORD dwFlags = 0;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint uiNumPasses = 0;
         pD3DEffect->Begin ( &uiNumPasses, dwFlags );
@@ -242,10 +248,10 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
             pD3DEffect->BeginPass ( uiPass );
-            hr = pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+            pDevice->DrawIndexedPrimitive ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
             pD3DEffect->EndPass ();
         }
         pD3DEffect->End ();
-        return hr;
+        return D3D_OK;
     }
 }

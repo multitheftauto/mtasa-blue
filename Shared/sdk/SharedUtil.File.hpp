@@ -501,9 +501,42 @@ void SharedUtil::ExtractFilename ( const SString& strPathFilename, SString* strP
             *strFilename = strPathFilename;
 }
 
+
 bool SharedUtil::ExtractExtention ( const SString& strFilename, SString* strMain, SString* strExt )
 {
     return strFilename.Split ( ".", strMain, strExt, -1 );
+}
+
+
+SString SharedUtil::ExtractPath ( const SString& strPathFilename )
+{
+    SString strPath;
+    ExtractFilename ( strPathFilename, &strPath, NULL );
+    return strPath;
+}
+
+
+SString SharedUtil::ExtractFilename ( const SString& strPathFilename )
+{
+    SString strFilename;
+    ExtractFilename ( strPathFilename, NULL, &strFilename );
+    return strFilename;
+}
+
+
+SString SharedUtil::ExtractExtention ( const SString& strPathFilename )
+{
+    SString strExt;
+    ExtractExtention ( strPathFilename, NULL, &strExt );
+    return strExt;
+}
+
+
+SString SharedUtil::ExtractBeforeExtention ( const SString& strPathFilename )
+{
+    SString strMain;
+    ExtractExtention ( strPathFilename, &strMain, NULL );
+    return strMain;
 }
 
 

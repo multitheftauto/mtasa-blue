@@ -808,12 +808,22 @@ bool CRenderWareSA::ListContainsNamedTexture ( std::list < RwTexture* >& list, c
 //
 void* CRenderWareSA::GetD3DDataForTxdTexture ( ushort usModelID, const char* szTextureName )
 {
-    // Ensure valid
-    if ( !szTextureName || usModelID > 20000 || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID] )
-        return NULL;
-
     // Get the CModelInfo's TXD ID
-    unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+    unsigned short usTxdId = 0;
+
+    if ( usModelID > 30000 && usModelID < 31000 )
+    {
+        // Use txd id instead
+        usTxdId = usModelID - 30000;
+    }
+    else
+    {
+        // Ensure valid
+        if ( usModelID > 20000 || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID] )
+            return NULL;
+
+        usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+    }
 
     // Get the TXD corresponding to this ID
     SetTextureDict ( usTxdId );
