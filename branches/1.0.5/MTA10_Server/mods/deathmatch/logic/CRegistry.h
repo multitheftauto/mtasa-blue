@@ -32,6 +32,7 @@ public:
 
     void                        SuspendBatching         ( uint uiTicks );
     void                        Load                    ( const std::string& strFileName );
+    bool                        IntegrityCheck          ( void );
 
     void                        CreateTable             ( const std::string& strTable, const std::string& strDefinition, bool bSilent = false );
     void                        DropTable               ( const std::string& strTable );
@@ -60,11 +61,11 @@ protected:
     bool                        m_bOpened;
     bool                        m_bInAutomaticTransaction;
     long long                   m_llSuspendBatchingEndTime;
+    std::string                 m_strLastError;
+    SString                     m_strFileName;
 
 private:
     bool                        Query                   ( const char* szQuery, CRegistryResult* pResult );  // Not defined to catch incorrect usage
-    std::string                 m_strLastError;
-
 };
 
 struct CRegistryResultCell
