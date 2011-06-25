@@ -195,7 +195,8 @@ CGame::~CGame ( void )
     Stop ();
 
     // Stop the web server
-    m_pHTTPD->StopHTTPD ();
+    if ( m_pHTTPD )
+        m_pHTTPD->StopHTTPD ();
 
      // Destroy our stuff
     if ( m_pResourceManager )
@@ -539,6 +540,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     if ( !bLogFile )
         CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );
 
+    // Check accounts database and print message if there is a problem
+    m_pAccountManager->IntegrityCheck ();
 
     // Setup resource-cache directory
     {
@@ -673,6 +676,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Load the registry
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "registry.db" );
     m_pRegistry->Load ( strBuffer );
+    // Check accounts database and print a message if there is a problem
+    m_pRegistry->IntegrityCheck ();
 
     // Load the accounts
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "accounts.xml" );

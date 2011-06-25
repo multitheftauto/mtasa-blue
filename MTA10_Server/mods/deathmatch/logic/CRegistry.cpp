@@ -47,6 +47,7 @@ void CRegistry::Load ( const std::string& strFileName )
     m_bOpened = false;
 
     if ( !strFileName.empty () ) {
+        m_strFileName = strFileName;
         if ( sqlite3_open ( strFileName.c_str (), &m_db ) )
         {
             CLogger::ErrorPrintf ( "Could not open SQLite3 database! (%s)\n", sqlite3_errmsg ( m_db ) );
@@ -55,6 +56,36 @@ void CRegistry::Load ( const std::string& strFileName )
             CPerfStatSqliteTiming::GetSingleton ()->OnSqliteOpen ( this, strFileName );
         }
     }
+}
+
+
+bool CRegistry::IntegrityCheck ( void )
+{
+    // Do check
+    CRegistryResult result;
+    bool bOk = Query( &result, "PRAGMA integrity_check(3)" );
+
+    // Get result as a string
+    SString strResult;
+    if ( result.nRows && result.nColumns )
+    {
+        CRegistryResultCell& cell = result.Data[0][0];
+        if ( cell.nType == SQLITE_TEXT )
+            strResult = std::string ( (const char *)cell.pVal, cell.nLength - 1 );
+    }
+
+    // Process result
+    if ( !bOk || !strResult.BeginsWithI ( "ok" ) )
+    {
+        CLogger::ErrorPrintf ( "%s", *strResult );
+        CLogger::ErrorPrintf ( "%s\n", GetLastError ().c_str() );
+        CLogger::ErrorPrintf ( "Errors were encountered loading '%s' database\n", *ExtractFilename ( PathConform ( m_strFileName ) ) );
+        CLogger::ErrorPrintf ( "Maybe now is the perfect time to panic.\n" );
+        CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
+        CLogger::ErrorPrintf ( "************************\n" );
+        return false;
+    }
+    return true;
 }
 
 

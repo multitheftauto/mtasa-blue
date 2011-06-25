@@ -459,6 +459,12 @@ bool CAccountManager::SaveSettings ()
 }
 
 
+bool CAccountManager::IntegrityCheck ()
+{
+    return m_pSaveFile->IntegrityCheck ();
+}
+
+
 CAccount* CAccountManager::Get ( const char* szName, bool bRegistered )
 {
     if ( szName && szName [ 0 ] )
