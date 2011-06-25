@@ -162,10 +162,6 @@ CGame::~CGame ( void )
     // Eventually stop our game
     Stop ();
 
-    // Stop the web server
-    if ( m_pHTTPD )
-        m_pHTTPD->StopHTTPD ();
-
      // Destroy our stuff
     if ( m_pResourceManager )
     {
