@@ -39,6 +39,7 @@ public:
     bool                        Save                        ( CXMLNode* pParent );
     bool                        Save                        ( CAccount* pParent, SString* pStrError = NULL );
     bool                        SaveSettings                ( void );
+    bool                        IntegrityCheck              ( void );
 
     CAccount*                   Get                         ( const char* szName, bool bRegistered = true );
     CAccount*                   Get                         ( const char* szName, const char* szIP );
