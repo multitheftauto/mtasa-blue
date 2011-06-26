@@ -2299,9 +2299,8 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     if ( IsPointNearPoint3D ( pPlayer->GetPosition (), pVehicle->GetPosition (), fCutoffDistance ) )
                                     {
                                         // Mark him as entering the vehicle
-                                        pPlayer->SetEnteringVehicle ( pVehicle, ucSeat );
                                         pPlayer->SetVehicleAction   ( CPlayer::VEHICLEACTION_ENTERING );
-                                        pVehicle->SetEnteringPed ( pPlayer );
+                                        SetPedEnteringVehicle ( pPlayer, pVehicle, ucSeat );
 
                                         // Jacking?
                                         if ( pOccupant )
@@ -2332,8 +2331,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                     CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPlayer, pVehicle, ucSeat );
 
                                                     // Unset the occupying variables, because he's now officially in the vehicle
-                                                    pPlayer->SetEnteringVehicle ( NULL, 0 );
-                                                    pVehicle->SetEnteringPed ( NULL );
+                                                    ClearPedEnteringVehicle ( pPlayer, pVehicle );
                                                 }
                                                 else if ( pOccupant )
                                                 {
@@ -2356,8 +2354,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                         {
                                             // Event cancelled, reset all stuff
                                             pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                            pPlayer->SetEnteringVehicle ( NULL, 0 );
-                                            pVehicle->SetEnteringPed ( NULL );
+                                            ClearPedEnteringVehicle ( pPlayer, pVehicle );
 
                                             if ( pOccupant )
                                                 pOccupant->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
@@ -2416,7 +2413,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 pVehicle->SetEngineOn( true );
 
                                 // Unset the "occupying" data
-                                pPlayer->SetEnteringVehicle ( NULL, 0 );
+                                ClearPedEnteringVehicle ( pPlayer, pVehicle );
 
                                 // Set the player's current vehicle
                                 pPlayer->SetOccupiedVehicle ( pVehicle, ucOccupiedSeat );
@@ -2462,7 +2459,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
 
                                 // Mark that he's in no vehicle
                                 pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                pPlayer->SetEnteringVehicle ( NULL, 0 );
+                                ClearPedEnteringVehicle ( pPlayer, pVehicle );
 
                                 // Update the door angle.
                                 pVehicle->SetDoorOpenRatio ( ucDoor + 2, fDoorAngle );
@@ -2641,8 +2638,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                             // Put the jacking player into it
                             pPlayer->SetOccupiedVehicle ( pVehicle, 0 );
                             pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                            pPlayer->SetEnteringVehicle ( NULL, 0 );
-                            pVehicle->SetEnteringPed ( NULL );
+                            ClearPedEnteringVehicle ( pPlayer, pVehicle );
 
                             // Check whether there's a player to be jacked
                             if ( pJacked )
@@ -2716,8 +2712,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                             // Mark that the jacker is in no vehicle
                             pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
                             pPlayer->SetOccupiedVehicle ( NULL, 0 );
-                            pPlayer->SetEnteringVehicle ( NULL, 0 );
-                            pVehicle->SetEnteringPed ( NULL );
+                            ClearPedEnteringVehicle ( pPlayer, pVehicle );
 
                             // Set the door angle.
                             pVehicle->SetDoorOpenRatio ( ucDoor, fAngle );
@@ -3068,4 +3063,67 @@ void CGame::SetCloudsEnabled ( bool bEnabled )
 bool CGame::GetCloudsEnabled ( void )
 {
     return m_bCloudsEnabled;
+}
+
+
+//
+// Set both CPed* and CVehicle* pointers in one function
+//
+void CGame::SetPedEnteringVehicle ( CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat )
+{
+    assert ( pPed && pVehicle );
+    CVehicle* pOldVehicle = pPed->GetEnteringVehicle ();
+    CPed* pOldPed = pVehicle->GetEnteringPed ();
+
+    // Ensure everything is tickity-boo
+    if ( pOldVehicle == NULL && pOldPed == NULL )
+    {
+        // This is what we expect
+    }
+    else
+    if ( pVehicle == pOldVehicle && pPed == pOldPed )
+    {
+        // This is not so bad, but could point to a problem
+        CLogger::DebugPrintf ( "SetPedEnteringVehicle possible problem: pPed:%08x  pVehicle:%08x  pOldPed:%08x  pOldVehicle:%08x\n", pPed, pVehicle, pOldPed, pOldVehicle );
+    }
+    else
+    {
+        // This is a problem
+        CLogger::ErrorPrintf ( "SetPedEnteringVehicle big problem: pPed:%08x  pVehicle:%08x  pOldPed:%08x  pOldVehicle:%08x\n", pPed, pVehicle, pOldPed, pOldVehicle );
+    }
+
+    pPed->SetEnteringVehicle ( pVehicle, uiSeat );
+    pVehicle->SetEnteringPed ( pPed );
+}
+
+
+//
+// Clear both CPed* and CVehicle* pointers in one function
+//
+void CGame::ClearPedEnteringVehicle ( CPed* pPed, CVehicle* pVehicle )
+{
+    assert ( pPed && pVehicle );
+    // Get current settings
+    CVehicle* pOldVehicle = pPed->GetEnteringVehicle ();
+    CPed* pOldPed = pVehicle->GetEnteringPed ();
+
+    // Ensure everything is tickity-boo
+    if ( pVehicle == pOldVehicle && pPed == pOldPed )
+    {
+        // This is what we expect
+    }
+    else
+    if ( pOldVehicle == NULL && pOldPed == NULL )
+    {
+        // This is not so bad, but could point to a problem
+        CLogger::DebugPrintf ( "ClearPedEnteringVehicle possible problem: pPed:%08x  pVehicle:%08x  pOldPed:%08x  pOldVehicle:%08x\n", pPed, pVehicle, pOldPed, pOldVehicle );
+    }
+    else
+    {
+        // This is a problem
+        CLogger::ErrorPrintf ( "ClearPedEnteringVehicle big problem: pPed:%08x  pVehicle:%08x  pOldPed:%08x  pOldVehicle:%08x\n", pPed, pVehicle, pOldPed, pOldVehicle );
+    }
+
+    pPed->SetEnteringVehicle ( NULL, 0 );
+    pVehicle->SetEnteringPed ( NULL );
 }

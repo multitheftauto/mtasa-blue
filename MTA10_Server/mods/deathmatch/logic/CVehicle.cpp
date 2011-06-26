@@ -107,7 +107,7 @@ CVehicle::~CVehicle ( void )
             pEnteringPed->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
         }
 
-        pEnteringPed->SetEnteringVehicle ( NULL, 0 );
+        CGame::ClearPedEnteringVehicle ( pEnteringPed, this );
     }
 
     // Unset any tow links
