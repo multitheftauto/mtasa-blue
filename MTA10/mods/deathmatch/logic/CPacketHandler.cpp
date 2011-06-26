@@ -904,7 +904,6 @@ void CPacketHandler::Packet_PlayerSpawn ( NetBitStreamInterface& bitStream )
     }
 }
 
-
 void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;

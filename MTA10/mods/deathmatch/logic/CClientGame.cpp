@@ -4610,27 +4610,33 @@ void CClientGame::SendPedWastedPacket( CClientPed* Ped, ElementID damagerID, uns
         if ( pBitStream )
         {
             // Write some death info
-            pBitStream->Write ( animGroup );
-            pBitStream->Write ( animID );
+            pBitStream->WriteCompressed ( animGroup );
+            pBitStream->WriteCompressed ( animID );
 
             pBitStream->Write ( damagerID );
-            pBitStream->Write ( ucWeapon );
-            pBitStream->Write ( ucBodyPiece );
+
+            SWeaponTypeSync weapon;
+            weapon.data.ucWeaponType = ucWeapon;
+            pBitStream->Write ( &weapon );
+
+            SBodypartSync bodyPart;
+            bodyPart.data.uiBodypart = ucBodyPiece;
+            pBitStream->Write ( &bodyPart );
 
             // Write the position we died in
-            CVector vecPosition;
-            Ped->GetPosition ( vecPosition );
-            pBitStream->Write ( vecPosition.fX );
-            pBitStream->Write ( vecPosition.fY );
-            pBitStream->Write ( vecPosition.fZ );
+            SPositionSync pos ( false );
+            Ped->GetPosition ( pos.data.vecPosition );
+            pBitStream->Write ( &pos );
+
+            pBitStream->Write ( Ped->GetID() );
 
             // The ammo in our weapon and write the ammo total
             CWeapon* pPlayerWeapon = Ped->GetWeapon();
-            unsigned short usAmmo = 0;
-            if ( pPlayerWeapon ) usAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
-            pBitStream->Write ( usAmmo );
+            SWeaponAmmoSync ammo ( ucWeapon, true, false );
+            ammo.data.usTotalAmmo = 0;
+            if ( pPlayerWeapon ) ammo.data.usTotalAmmo = static_cast < unsigned short > ( pPlayerWeapon->GetAmmoTotal () );
+            pBitStream->Write ( &ammo );
 
-            pBitStream->Write ( Ped->GetID() );
             // Send the packet
             g_pNet->SendPacket ( PACKET_ID_PED_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
             g_pNet->DeallocateNetBitStream ( pBitStream );
