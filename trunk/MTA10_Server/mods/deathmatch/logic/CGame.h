@@ -331,6 +331,9 @@ public:
     void                        PulseMasterServerAnnounce   ( void );
     void                        StartOpenPortsTest          ( void );
 
+    static void                 SetPedEnteringVehicle       ( CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat );
+    static void                 ClearPedEnteringVehicle     ( CPed* pPed, CVehicle* pVehicle );
+
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );

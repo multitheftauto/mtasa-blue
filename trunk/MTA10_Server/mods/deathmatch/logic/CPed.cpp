@@ -104,7 +104,7 @@ CPed::~CPed ( void )
             }
         }
         if ( m_pEnteringVehicle->GetEnteringPed () == this )
-            m_pEnteringVehicle->SetEnteringPed ( NULL );
+            CGame::ClearPedEnteringVehicle ( this, m_pEnteringVehicle );
     }
 
     // Make sure we've no longer occupied any vehicle

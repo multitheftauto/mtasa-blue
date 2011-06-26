@@ -571,7 +571,7 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
             }
         }
         if ( pVehicle->GetEnteringPed () == &Player )
-            pVehicle->SetEnteringPed ( NULL );
+            CGame::ClearPedEnteringVehicle ( &Player, pVehicle );
     }   
 
     // Update the player data
