@@ -224,6 +224,12 @@ DWORD RETURN_CrashFix_Misc13b =                             0x4D4764;
 #define HOOKPOS_CrashFix_Misc14                              0x4DD4B5
 DWORD RETURN_CrashFix_Misc14 =                               0x4DD4BB;
 
+#define HOOKPOS_FreezeFix_Misc15_US                         0x156CDAE
+#define HOOKPOS_FreezeFix_Misc15_EU                         0x156CDEE
+DWORD RETURN_FreezeFix_Misc15_US =                          0x156CDB4;
+DWORD RETURN_FreezeFix_Misc15_EU =                          0x156CDF4;
+DWORD RETURN_FreezeFix_Misc15_BOTH =                        0;
+
 #define HOOKPOS_VehColCB                                    0x04C838D
 DWORD RETURN_VehColCB =                                     0x04C83AA;
 
@@ -373,6 +379,7 @@ void HOOK_CrashFix_Misc11 ();
 void HOOK_CrashFix_Misc12 ();
 void HOOK_CrashFix_Misc13 ();
 void HOOK_CrashFix_Misc14 ();
+void HOOK_FreezeFix_Misc15 ();
 void HOOK_VehColCB ();
 void HOOK_VehCol ();
 void HOOK_isVehDriveTypeNotRWD ();
@@ -511,6 +518,16 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc14, (DWORD)HOOK_CrashFix_Misc14, 6 );
+    if ( version == VERSION_US_10 )
+    {
+        HookInstall(HOOKPOS_FreezeFix_Misc15_US, (DWORD)HOOK_FreezeFix_Misc15, 6 );
+        RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_US;
+    }
+    if ( version == VERSION_EU_10 )
+    {
+        HookInstall(HOOKPOS_FreezeFix_Misc15_EU, (DWORD)HOOK_FreezeFix_Misc15, 6 );
+        RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_EU;
+    }
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
@@ -5194,6 +5211,43 @@ void _declspec(naked) HOOK_CrashFix_Misc14 ()
     cont:
         add     esp, 12
         retn    12
+    }
+}
+
+
+void _cdecl DoWait ( HANDLE hHandle )
+{
+    DWORD dwWait = 4000;
+    DWORD dwResult = WaitForSingleObject ( hHandle, dwWait );
+    if ( dwResult == WAIT_TIMEOUT )
+    {
+        AddReportLog ( 6211, SString ( "WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait ) );
+        _wassert ( _CRT_WIDE("\
+            Press IGNORE  ('I' Key) \n\
+            Press IGNORE  ('I' Key) \n\
+            Press IGNORE  ('I' Key) \n\
+            Press IGNORE  ('I' Key) \n\
+            ")
+         , _CRT_WIDE(__FILE__), __LINE__);
+        dwResult = WaitForSingleObject ( hHandle, 1000 );
+    }
+}
+
+// hooked at 0156CDAE - 6 bytes
+void _declspec(naked) HOOK_FreezeFix_Misc15 ()
+{
+    _asm
+    {
+        pop eax
+        pop edx
+        pushad
+
+        push eax
+        call DoWait
+        add esp, 4
+
+        popad
+        jmp     RETURN_FreezeFix_Misc15_BOTH  // 156CDB4
     }
 }
 
