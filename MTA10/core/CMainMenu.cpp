@@ -150,6 +150,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pLogo->SetProperty("InheritsAlpha", "False" );
     m_pLogo->SetSize ( logoSize, false);
     m_pLogo->SetPosition ( CVector2D( 0.5f*m_iMenuSizeX - logoSize.fX/2, 0.365f*m_iMenuSizeY - logoSize.fY/2 ), false );
+    m_pLogo->SetZOrderingEnabled ( false );
 
     // Create the image showing the version number
     m_pVersion = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
@@ -185,12 +186,15 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, 0.850f ),    CVector2D ( 102, 34 ) ) );
 
     // We store the position of the top item, and the second item.  These will be useful later
-    m_iFirstItemTop  = (m_menuItems.front()->image)->GetPosition().fY;
-    m_iSecondItemTop = (m_menuItems[1]->image)->GetPosition().fY;
-    
+    float fFirstItemSize = m_menuItems.front()->image->GetSize(false).fY;
+    float fSecondItemSize = m_menuItems[1]->image->GetSize(false).fY;
+
+    m_iFirstItemCentre  = (m_menuItems.front()->image)->GetPosition().fY + fFirstItemSize*0.5f;
+    m_iSecondItemCentre = (m_menuItems[1]->image)->GetPosition().fY + fSecondItemSize*0.5f;
+
     // Store some mouse over bounding box positions
     m_menuAX = (0.168f*m_iMenuSizeX) + m_iXOff;             //Left side of the items
-    m_menuAY = m_iFirstItemTop;                             //Top side of the items
+    m_menuAY = m_iFirstItemCentre - fFirstItemSize*(CORE_MTA_HOVER_SCALE/CORE_MTA_NORMAL_SCALE)*0.5f;     //Top side of the items
 	m_menuBX =  m_menuAX + ((390/NATIVE_RES_X)*m_iMenuSizeX); //Right side of the items. We add the longest picture (browse_servers)
 
     m_pMenuArea = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage(m_pCanvas) );
@@ -267,6 +271,8 @@ CMainMenu::CMainMenu ( CGUI* pManager )
         pLabel->SetVisible ( false );
     }
 
+    m_pLogo->MoveToBack ();
+
     // Submenus
     m_QuickConnect.SetVisible ( false );
     m_ServerBrowser.SetVisible ( false );
@@ -337,7 +343,8 @@ void CMainMenu::SetMenuVerticalPosition ( int iPosY )
         m_pHoveredItem = NULL;
     }
 
-    int iMoveY = iPosY - m_menuAY;
+    float fFirstItemSize = m_menuItems.front()->image->GetSize(false).fY;
+    int iMoveY = iPosY - m_menuItems.front()->image->GetPosition(false).fY - fFirstItemSize*0.5f;
     
     std::deque<sMenuItem*>::iterator it = m_menuItems.begin();
     for ( it; it != m_menuItems.end(); it++ )
@@ -347,7 +354,7 @@ void CMainMenu::SetMenuVerticalPosition ( int iPosY )
         (*it)->image->SetPosition( CVector2D(vOrigPos.fX,vOrigPos.fY + iMoveY), false);
     }
 	
-    m_menuAY = iPosY;
+    m_menuAY = m_menuAY + iMoveY;
 	m_menuBY = m_menuBY + iMoveY;
     m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
     m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
@@ -499,7 +506,13 @@ void CMainMenu::Update ( void )
             else
             {
                 m_menuItems.push_front(m_pDisconnect);
-                m_menuAY =  m_pDisconnect->image->GetPosition(false).fY;
+
+                m_pDisconnect->image->SetVisible(true);
+
+                float fTopItemSize = m_pDisconnect->image->GetSize(false).fY;
+                float fTopItemCentre = m_pDisconnect->image->GetPosition(false).fY + fTopItemSize*0.5f;
+                m_menuAY = fTopItemCentre - fTopItemSize*(CORE_MTA_HOVER_SCALE/CORE_MTA_NORMAL_SCALE)*0.5f;     //Top side of the items
+
                 m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
                 m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
             }
@@ -681,18 +694,20 @@ void CMainMenu::SetIsIngame ( bool bIsIngame )
         m_ulMoveStartTick = GetTickCount32();
         if ( bIsIngame )
         {
-            m_pDisconnect->image->SetVisible(true);
-            m_iMoveTargetPos = m_iSecondItemTop;
+            m_iMoveTargetPos = m_iSecondItemCentre;
         }
         else
         {
             if ( m_menuItems.front() == m_pDisconnect )
                 m_menuItems.pop_front();
             
-            m_menuAY = m_menuItems.front()->image->GetPosition().fY;
+            float fTopItemSize = m_menuItems.front()->image->GetSize(false).fY;
+            float fTopItemCentre = m_menuItems.front()->image->GetPosition(false).fY + fTopItemSize*0.5f;
+            m_menuAY = fTopItemCentre - fTopItemSize*(CORE_MTA_HOVER_SCALE/CORE_MTA_NORMAL_SCALE)*0.5f; 
+
             m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
             m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
-            m_iMoveTargetPos = m_iFirstItemTop;
+            m_iMoveTargetPos = m_iFirstItemCentre;
         }
         m_iMoveStartPos = m_menuAY;
     }

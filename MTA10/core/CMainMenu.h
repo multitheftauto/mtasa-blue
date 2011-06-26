@@ -137,8 +137,8 @@ private:
     int                 m_iYOff;
     int                 m_iMenuSizeX;
     int                 m_iMenuSizeY;
-    int                 m_iFirstItemTop;
-    int                 m_iSecondItemTop;
+    int                 m_iFirstItemCentre;
+    int                 m_iSecondItemCentre;
     //Define our bounding box for menu items
     int                 m_menuAX;
     int                 m_menuAY;
