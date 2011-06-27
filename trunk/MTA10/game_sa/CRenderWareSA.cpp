@@ -806,7 +806,7 @@ bool CRenderWareSA::ListContainsNamedTexture ( std::list < RwTexture* >& list, c
 //
 // Get a TXD ID associated with the model ID
 //
-ushort CRenderWareSA::GetTxdIdForModelID ( ushort usModelID )
+ushort CRenderWareSA::GetTXDIDForModelID ( ushort usModelID )
 {
     if ( usModelID > 30000 && usModelID < 31000 )
     {
@@ -831,7 +831,7 @@ ushort CRenderWareSA::GetTxdIdForModelID ( ushort usModelID )
 //
 void* CRenderWareSA::GetD3DDataForTxdTexture ( ushort usModelID, const char* szTextureName )
 {
-    ushort usTxdId = GetTxdIdForModelID ( usModelID );
+    ushort usTxdId = GetTXDIDForModelID ( usModelID );
 
     if ( usTxdId == 0 )
         return NULL;
@@ -971,7 +971,7 @@ void CRenderWareSA::GetModelTextureNames ( std::vector < SString >& outNameList,
 {
     outNameList.empty ();
 
-    ushort usTxdId = GetTxdIdForModelID ( usModelID );
+    ushort usTxdId = GetTXDIDForModelID ( usModelID );
 
     if ( usTxdId == 0 )
         return;

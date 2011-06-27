@@ -5033,7 +5033,7 @@ bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char u
 }
 
 
-bool CStaticFunctionDefinitions::ProcessLineOfSight ( CVector& vecStart, CVector& vecEnd, bool& bCollision, CColPoint** pColPoint, CClientEntity** pColEntity, bool bCheckBuildings, bool bCheckVehicles, bool bCheckPeds, bool bCheckObjects, bool bCheckDummies, bool bSeeThroughStuff, bool bIgnoreSomeObjectsForCamera, bool bShootThroughStuff, CEntity* pIgnoredEntity )
+bool CStaticFunctionDefinitions::ProcessLineOfSight ( const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint, CClientEntity** pColEntity, const SLineOfSightFlags& flags, CEntity* pIgnoredEntity, SLineOfSightBuildingResult* pBuildingResult )
 {
     assert ( pColPoint );
     assert ( pColEntity );
@@ -5042,7 +5042,7 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight ( CVector& vecStart, CVector
         g_pGame->GetWorld ()->IgnoreEntity ( pIgnoredEntity );
 
     CEntity* pColGameEntity = 0;
-    bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecStart, &vecEnd, pColPoint, &pColGameEntity, bCheckBuildings, bCheckVehicles, bCheckPeds, bCheckObjects, bCheckDummies, bSeeThroughStuff, bIgnoreSomeObjectsForCamera, bShootThroughStuff );
+    bCollision = g_pGame->GetWorld ()->ProcessLineOfSight ( &vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult );
     
     if ( pIgnoredEntity )
         g_pGame->GetWorld ()->IgnoreEntity ( NULL );
@@ -5053,12 +5053,12 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight ( CVector& vecStart, CVector
 }
 
 
-bool CStaticFunctionDefinitions::IsLineOfSightClear ( CVector& vecStart, CVector& vecEnd, bool& bIsClear, bool bCheckBuildings, bool bCheckVehicles, bool bCheckPeds, bool bCheckObjects, bool bCheckDummies, bool bSeeThroughStuff, bool bIgnoreSomeObjectsForCamera, CEntity* pIgnoredEntity )
+bool CStaticFunctionDefinitions::IsLineOfSightClear ( const CVector& vecStart, const CVector& vecEnd, bool& bIsClear, const SLineOfSightFlags& flags, CEntity* pIgnoredEntity )
 {
     if ( pIgnoredEntity )
         g_pGame->GetWorld ()->IgnoreEntity ( pIgnoredEntity );
 
-    bIsClear = g_pGame->GetWorld ()->IsLineOfSightClear ( &vecStart, &vecEnd, bCheckBuildings, bCheckVehicles, bCheckPeds, bCheckObjects, bCheckDummies, bSeeThroughStuff, bIgnoreSomeObjectsForCamera );
+    bIsClear = g_pGame->GetWorld ()->IsLineOfSightClear ( &vecStart, &vecEnd, flags );
     
     if ( pIgnoredEntity )
         g_pGame->GetWorld ()->IgnoreEntity ( NULL );

@@ -148,87 +148,37 @@ int CLuaFunctionDefs::GetGroundPosition ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-        ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) &&
-        ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
-    {
-        CVector vecStart ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
-        CVector vecEnd (   static_cast < float > ( lua_tonumber ( luaVM, 4 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 5 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 6 ) ) );
+//  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY, float endZ,
+//      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
+//        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool returnBuildingInfo = false ] )
+    CVector vecStart; CVector vecEnd;
+    SLineOfSightFlags flags; CEntity* pIgnoredEntity; bool bIncludeBuildingInfo;
 
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecStart.fX );
+    argStream.ReadNumber ( vecStart.fY );
+    argStream.ReadNumber ( vecStart.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
+    argStream.ReadBool ( flags.bCheckBuildings, true );
+    argStream.ReadBool ( flags.bCheckVehicles, true );
+    argStream.ReadBool ( flags.bCheckPeds, true );
+    argStream.ReadBool ( flags.bCheckObjects, true );
+    argStream.ReadBool ( flags.bCheckDummies, true );
+    argStream.ReadBool ( flags.bSeeThroughStuff, false );
+    argStream.ReadBool ( flags.bIgnoreSomeObjectsForCamera, false );
+    argStream.ReadBool ( flags.bShootThroughStuff, false );
+    argStream.ReadUserData ( pIgnoredEntity, NULL );
+    argStream.ReadBool ( bIncludeBuildingInfo, false );
+
+    if ( !argStream.HasErrors () )
+    {
         CColPoint* pColPoint = NULL;
         CClientEntity* pColEntity = NULL;
-        bool bCheckBuildings = true, bCheckVehicles = true, bCheckPeds = true, bCheckObjects = true, bCheckDummies = true, bSeeThroughStuff = false, bIgnoreSomeObjectsForCamera = false, bShootThroughStuff = false;
-        CEntity* pIgnoredEntity = NULL;
-
-        if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )
-        {
-            bCheckBuildings = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
-            if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )
-            {
-                bCheckVehicles = ( lua_toboolean ( luaVM, 8 ) ) ? true:false;
-                if ( lua_type ( luaVM, 9 ) == LUA_TBOOLEAN )
-                {
-                    bCheckPeds = ( lua_toboolean ( luaVM, 9 ) ) ? true:false;
-                    if ( lua_type ( luaVM, 10 ) == LUA_TBOOLEAN )
-                    {
-                        bCheckObjects = ( lua_toboolean ( luaVM, 10 ) ) ? true:false;
-                        if ( lua_type ( luaVM, 11 ) == LUA_TBOOLEAN )
-                        {
-                            bCheckDummies = ( lua_toboolean ( luaVM, 11 ) ) ? true:false;
-                            if ( lua_type ( luaVM, 12 ) == LUA_TBOOLEAN )
-                            {
-                                bSeeThroughStuff = ( lua_toboolean ( luaVM, 12 ) ) ? true:false;
-                                if ( lua_type ( luaVM, 13 ) == LUA_TBOOLEAN )
-                                {
-                                    bIgnoreSomeObjectsForCamera = ( lua_toboolean ( luaVM, 13 ) ) ? true:false;
-                                    if ( lua_type ( luaVM, 14 ) == LUA_TBOOLEAN )
-                                    {
-                                        bShootThroughStuff = ( lua_toboolean ( luaVM, 14 ) ) ? true:false;
-
-                                        if ( lua_type ( luaVM, 15 ) == LUA_TLIGHTUSERDATA )
-                                        {
-                                            CClientEntity* pEntity = lua_toelement ( luaVM, 15 );
-                                            if ( pEntity )
-                                            {
-                                                switch ( pEntity->GetType () )
-                                                {
-                                                case CCLIENTPED:
-                                                case CCLIENTPLAYER:
-                                                    pIgnoredEntity = static_cast < CClientPed* > ( pEntity )->GetGamePlayer ();
-                                                    break;
-                                                case CCLIENTVEHICLE:
-                                                    pIgnoredEntity = static_cast < CClientVehicle* > ( pEntity )->GetGameVehicle ();
-                                                    break;
-                                                case CCLIENTOBJECT:
-                                                    pIgnoredEntity = static_cast < CClientObject* > ( pEntity )->GetGameObject ();
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         bool bCollision;
-        if ( CStaticFunctionDefinitions::ProcessLineOfSight ( vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, bCheckBuildings, bCheckVehicles, bCheckPeds, bCheckObjects, bCheckDummies, bSeeThroughStuff, bIgnoreSomeObjectsForCamera, bShootThroughStuff, pIgnoredEntity ) )
+        SLineOfSightBuildingResult buildingResult;
+        if ( CStaticFunctionDefinitions::ProcessLineOfSight ( vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, flags, pIgnoredEntity, bIncludeBuildingInfo ? &buildingResult : NULL ) )
         {    
             // Got a collision?
             CVector vecColPosition;
@@ -271,13 +221,26 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
                 lua_pushinteger ( luaVM, iLighting );
                 lua_pushinteger ( luaVM, iPiece );
 
+                if ( bIncludeBuildingInfo && buildingResult.bValid )
+                {
+                    lua_pushnumber ( luaVM, buildingResult.usModelID );
+
+                    lua_pushnumber ( luaVM, buildingResult.vecPosition.fX );
+                    lua_pushnumber ( luaVM, buildingResult.vecPosition.fY );
+                    lua_pushnumber ( luaVM, buildingResult.vecPosition.fZ );
+
+                    lua_pushnumber ( luaVM, ConvertRadiansToDegrees ( buildingResult.vecRotation.fX ) );
+                    lua_pushnumber ( luaVM, ConvertRadiansToDegrees ( buildingResult.vecRotation.fY ) );
+                    lua_pushnumber ( luaVM, ConvertRadiansToDegrees ( buildingResult.vecRotation.fZ ) );
+                    return 18;
+                }
                 return 11;
             }
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "processLineOfSight" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "processLineOfSight", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -286,87 +249,50 @@ int CLuaFunctionDefs::ProcessLineOfSight ( lua_State * luaVM )
 
 int CLuaFunctionDefs::IsLineOfSightClear ( lua_State * luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-        ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) &&
-        ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
+    //bool isLineOfSightClear ( float startX, 
+    //    float startY, 
+    //    float startZ, 
+    //    float endX, 
+    //    float endY, 
+    //    float endZ, 
+    //    [ bool checkBuildings = true, 
+    //    bool checkVehicles = true, 
+    //    bool checkPeds = true, 
+    //    bool checkObjects = true, 
+    //    bool checkDummies = true, 
+    //    bool seeThroughStuff = false, 
+    //    bool ignoreSomeObjectsForCamera = false, 
+    //    element ignoredElement = nil ] )
+    CVector vecStart; CVector vecEnd;
+    SLineOfSightFlags flags; CEntity* pIgnoredEntity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecStart.fX );
+    argStream.ReadNumber ( vecStart.fY );
+    argStream.ReadNumber ( vecStart.fZ );
+    argStream.ReadNumber ( vecEnd.fX );
+    argStream.ReadNumber ( vecEnd.fY );
+    argStream.ReadNumber ( vecEnd.fZ );
+    argStream.ReadBool ( flags.bCheckBuildings, true );
+    argStream.ReadBool ( flags.bCheckVehicles, true );
+    argStream.ReadBool ( flags.bCheckPeds, true );
+    argStream.ReadBool ( flags.bCheckObjects, true );
+    argStream.ReadBool ( flags.bCheckDummies, true );
+    argStream.ReadBool ( flags.bSeeThroughStuff, false );
+    argStream.ReadBool ( flags.bIgnoreSomeObjectsForCamera, false );
+    argStream.ReadUserData ( pIgnoredEntity, NULL );
+
+    if ( !argStream.HasErrors () )
     {
-        CVector vecStart ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
-        CVector vecEnd (   static_cast < float > ( lua_tonumber ( luaVM, 4 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 5 ) ),
-            static_cast < float > ( lua_tonumber ( luaVM, 6 ) ) );
-
-        bool bCheckBuildings = true, bCheckVehicles = true, bCheckPeds = true, bCheckObjects = true, bCheckDummies = true, bSeeThroughStuff = false, bIgnoreSomeObjectsForCamera = false;
-        CEntity* pIgnoredEntity = NULL;
-
-        if ( lua_type ( luaVM, 7 ) == LUA_TBOOLEAN )
-        {
-            bCheckBuildings = ( lua_toboolean ( luaVM, 7 ) ) ? true:false;
-            if ( lua_type ( luaVM, 8 ) == LUA_TBOOLEAN )
-            {
-                bCheckVehicles = ( lua_toboolean ( luaVM, 8 ) ) ? true:false;
-                if ( lua_type ( luaVM, 9 ) == LUA_TBOOLEAN )
-                {
-                    bCheckPeds = ( lua_toboolean ( luaVM, 9 ) ) ? true:false;
-                    if ( lua_type ( luaVM, 10 ) == LUA_TBOOLEAN )
-                    {
-                        bCheckObjects = ( lua_toboolean ( luaVM, 10 ) ) ? true:false;
-                        if ( lua_type ( luaVM, 11 ) == LUA_TBOOLEAN )
-                        {
-                            bCheckDummies = ( lua_toboolean ( luaVM, 11 ) ) ? true:false;
-                            if ( lua_type ( luaVM, 12 ) == LUA_TBOOLEAN )
-                            {
-                                bSeeThroughStuff = ( lua_toboolean ( luaVM, 12 ) ) ? true:false;
-                                if ( lua_type ( luaVM, 13 ) == LUA_TBOOLEAN )
-                                {
-                                    bIgnoreSomeObjectsForCamera = ( lua_toboolean ( luaVM, 13 ) ) ? true:false;
-                                    if ( lua_type ( luaVM, 14 ) == LUA_TLIGHTUSERDATA )
-                                    {
-                                        CClientEntity* pEntity = lua_toelement ( luaVM, 14 );
-                                        if ( pEntity )
-                                        {
-                                            switch ( pEntity->GetType () )
-                                            {
-                                            case CCLIENTPED:
-                                            case CCLIENTPLAYER:
-                                                pIgnoredEntity = static_cast < CClientPed* > ( pEntity )->GetGamePlayer ();
-                                                break;
-                                            case CCLIENTVEHICLE:
-                                                pIgnoredEntity = static_cast < CClientVehicle* > ( pEntity )->GetGameVehicle ();
-                                                break;
-                                            case CCLIENTOBJECT:
-                                                pIgnoredEntity = static_cast < CClientObject* > ( pEntity )->GetGameObject ();
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         bool bIsClear;
-        if ( CStaticFunctionDefinitions::IsLineOfSightClear ( vecStart, vecEnd, bIsClear, bCheckBuildings, bCheckVehicles, bCheckPeds, bCheckObjects, bCheckDummies, bSeeThroughStuff, bIgnoreSomeObjectsForCamera, pIgnoredEntity ) )
+        if ( CStaticFunctionDefinitions::IsLineOfSightClear ( vecStart, vecEnd, bIsClear, flags, pIgnoredEntity ) )
         {        
             lua_pushboolean ( luaVM, bIsClear );
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isLineOfSightClear" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isLineOfSightClear", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

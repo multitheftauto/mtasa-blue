@@ -99,6 +99,8 @@ inline SString GetClassTypeName ( CGUIComboBox* )    { return "gui-combobox"; }
 
 inline SString GetClassTypeName ( CXMLNode* )               { return "xml-node"; }
 
+inline SString GetClassTypeName ( CEntity* )                { return "entity"; }
+
 
 //
 // CXMLNode from userdata
@@ -135,6 +137,37 @@ bool CheckWrappedUserDataType ( CClientGUIElement*& pGuiElement, SString& strErr
         return true;
     strErrorExpectedType = GetClassTypeName ( (T*)0 );
     return false;
+}
+
+
+//
+// CEntity from userdata
+//
+template < class T >
+CEntity* UserDataCast ( CEntity*, void* ptr )
+{
+    // Get the client element
+    CClientEntity* pClientElement = UserDataCast < CClientEntity > ( (CClientEntity*)NULL, ptr );
+
+    // Get its game entity
+    CEntity* pEntity = NULL;
+    if ( pClientElement )
+    {
+        switch ( pClientElement->GetType () )
+        {
+            case CCLIENTPED:
+            case CCLIENTPLAYER:
+                pEntity = static_cast < CClientPed* > ( pClientElement )->GetGamePlayer ();
+                break;
+            case CCLIENTVEHICLE:
+                pEntity = static_cast < CClientVehicle* > ( pClientElement )->GetGameVehicle ();
+                break;
+            case CCLIENTOBJECT:
+                pEntity = static_cast < CClientObject* > ( pClientElement )->GetGameObject ();
+                break;
+        }
+    }
+    return pEntity;
 }
 
 

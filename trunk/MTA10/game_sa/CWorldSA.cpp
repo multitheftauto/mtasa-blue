@@ -125,12 +125,36 @@ bool CWorldSA::TestLineSphere(CVector * vecStart, CVector * vecEnd, CVector * ve
     }
 }
 
+
+void ConvertMatrixToEulerAngles ( const CMatrix_Padded& matrixPadded, float& fX, float& fY, float& fZ )
+{
+    // Convert the given matrix to a padded matrix
+    //CMatrix_Padded matrixPadded ( Matrix );
+
+    // Grab its pointer and call gta's func
+    const CMatrix_Padded* pMatrixPadded = &matrixPadded;
+    DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
+
+    float* pfX = &fX;
+    float* pfY = &fY;
+    float* pfZ = &fZ;
+    int iUnknown = 21;
+    _asm
+    {
+        push    iUnknown
+            push    pfZ
+            push    pfY
+            push    pfX
+            mov     ecx, pMatrixPadded
+            call    dwFunc
+    }
+}
+
+
 bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, 
-                                  CEntity ** CollisionEntity, bool bCheckBuildings, 
-                                  bool bCheckVehicles, bool bCheckPeds, 
-                                  bool bCheckObjects, bool bCheckDummies , 
-                                  bool bSeeThroughStuff, bool bIgnoreSomeObjectsForCamera, 
-                                  bool bShootThroughStuff )
+                                  CEntity ** CollisionEntity,
+                                  const SLineOfSightFlags flags,
+                                  SLineOfSightBuildingResult* pBuildingResult )
 {
     DEBUG_TRACE("VOID CWorldSA::ProcessLineOfSight(CVector * vecStart, CVector * vecEnd, CColPoint * colCollision, CEntity * CollisionEntity)");
     DWORD dwPadding[100]; // stops the function missbehaving and overwriting the return address
@@ -150,14 +174,14 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
 
     _asm
     {
-        push    bShootThroughStuff
-        push    bIgnoreSomeObjectsForCamera
-        push    bSeeThroughStuff
-        push    bCheckDummies
-        push    bCheckObjects
-        push    bCheckPeds
-        push    bCheckVehicles
-        push    bCheckBuildings
+        push    flags.bShootThroughStuff
+        push    flags.bIgnoreSomeObjectsForCamera
+        push    flags.bSeeThroughStuff
+        push    flags.bCheckDummies
+        push    flags.bCheckObjects
+        push    flags.bCheckPeds
+        push    flags.bCheckVehicles
+        push    flags.bCheckBuildings
         lea     eax, targetEntity
         push    eax
         push    pColPointSAInterface    
@@ -167,6 +191,28 @@ bool CWorldSA::ProcessLineOfSight(const CVector * vecStart, const CVector * vecE
         mov     bReturn, al
         add     esp, 0x30
     }
+
+    // Building info needed?
+    if ( pBuildingResult )
+    {
+        CPoolsSA * pPools = ((CPoolsSA *)pGame->GetPools());
+        if ( pPools )
+        {
+            if ( targetEntity && targetEntity->nType == ENTITY_TYPE_BUILDING )
+            {
+                pBuildingResult->bValid = true;
+                pBuildingResult->usModelID = targetEntity->m_nModelIndex;
+                pBuildingResult->vecPosition = targetEntity->Placeable.m_transform.m_translate;
+                if ( targetEntity->Placeable.matrix )
+                {
+                    CVector& vecRotation = pBuildingResult->vecRotation;
+                    ConvertMatrixToEulerAngles ( *targetEntity->Placeable.matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+                    vecRotation = -vecRotation;
+                }
+            }
+        }
+    }
+
 
     if ( CollisionEntity )
     {
@@ -318,9 +364,8 @@ void CWorldSA::LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius)
 
 }
 
-bool CWorldSA::IsLineOfSightClear ( CVector * vecStart, CVector * vecEnd, bool bCheckBuildings,
-                                   bool bCheckVehicles, bool bCheckPeds, bool bCheckObjects,
-                                   bool bCheckDummies, bool bSeeThroughStuff, bool bIgnoreSomeObjectsForCamera )
+
+bool CWorldSA::IsLineOfSightClear ( const CVector * vecStart, const CVector * vecEnd, const SLineOfSightFlags flags )
 {
     DWORD dwFunc = FUNC_IsLineOfSightClear;
     bool bReturn = false;
@@ -330,13 +375,13 @@ bool CWorldSA::IsLineOfSightClear ( CVector * vecStart, CVector * vecEnd, bool b
 
     _asm
     {
-        push    bIgnoreSomeObjectsForCamera
-        push    bSeeThroughStuff
-        push    bCheckDummies
-        push    bCheckObjects
-        push    bCheckPeds
-        push    bCheckVehicles
-        push    bCheckBuildings
+        push    flags.bIgnoreSomeObjectsForCamera
+        push    flags.bSeeThroughStuff
+        push    flags.bCheckDummies
+        push    flags.bCheckObjects
+        push    flags.bCheckPeds
+        push    flags.bCheckVehicles
+        push    flags.bCheckBuildings
         push    vecEnd
         push    vecStart    
         call    dwFunc
