@@ -518,7 +518,7 @@ void CGraphics::DrawRectQueued ( float fX, float fY,
 }
 
 
-bool CGraphics::DrawTextureQueued ( float fX, float fY,
+void CGraphics::DrawTextureQueued ( float fX, float fY,
                                  float fWidth, float fHeight,
                                  float fU, float fV,
                                  float fSizeU, float fSizeV,
@@ -559,7 +559,6 @@ bool CGraphics::DrawTextureQueued ( float fX, float fY,
 
     // Add it to the queue
     AddQueueItem ( Item, bPostGUI );
-    return true;
 }
 
 

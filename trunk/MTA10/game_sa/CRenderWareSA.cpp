@@ -804,26 +804,37 @@ bool CRenderWareSA::ListContainsNamedTexture ( std::list < RwTexture* >& list, c
 
 
 //
+// Get a TXD ID associated with the model ID
+//
+ushort CRenderWareSA::GetTxdIdForModelID ( ushort usModelID )
+{
+    if ( usModelID > 30000 && usModelID < 31000 )
+    {
+        // Get global TXD ID instead
+        return usModelID - 30000;
+    }
+    else
+    {
+        // Get the CModelInfo's TXD ID
+
+        // Ensure valid
+        if ( usModelID > 20000 || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID] )
+            return 0;
+
+        return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+    }
+}
+
+
+//
 // Get D3D resource associated with the game texture 
 //
 void* CRenderWareSA::GetD3DDataForTxdTexture ( ushort usModelID, const char* szTextureName )
 {
-    // Get the CModelInfo's TXD ID
-    unsigned short usTxdId = 0;
+    ushort usTxdId = GetTxdIdForModelID ( usModelID );
 
-    if ( usModelID > 30000 && usModelID < 31000 )
-    {
-        // Use txd id instead
-        usTxdId = usModelID - 30000;
-    }
-    else
-    {
-        // Ensure valid
-        if ( usModelID > 20000 || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID] )
-            return NULL;
-
-        usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-    }
+    if ( usTxdId == 0 )
+        return NULL;
 
     // Get the TXD corresponding to this ID
     SetTextureDict ( usTxdId );
@@ -950,4 +961,40 @@ void CRenderWareSA::PulseModelTextureWatch ( void )
             }
         }
     }
+}
+
+
+//
+// Get list of texture names associated with the model
+//
+void CRenderWareSA::GetModelTextureNames ( std::vector < SString >& outNameList, ushort usModelID )
+{
+    outNameList.empty ();
+
+    ushort usTxdId = GetTxdIdForModelID ( usModelID );
+
+    if ( usTxdId == 0 )
+        return;
+
+    // Get the TXD corresponding to this ID
+    SetTextureDict ( usTxdId );
+
+    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
+
+    if ( pTXD )
+    {
+        RwTexDictionaryForAllTextures ( pTXD, StaticGetTextureCB, &outNameList );
+    }
+}
+
+
+//
+// Callback used in GetModelTextureNames
+//
+bool CRenderWareSA::StaticGetTextureCB ( RwTexture* texture, std::vector < SString >* pNameList )
+{
+    const char* szName = texture->name;
+    assert ( strlen ( szName ) < 32 );
+    pNameList->push_back ( szName );
+    return true;
 }

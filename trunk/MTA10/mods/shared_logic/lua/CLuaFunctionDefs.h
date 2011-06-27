@@ -474,6 +474,9 @@ public:
     LUA_DECLARE ( EngineSetAsynchronousLoading );
     LUA_DECLARE ( EngineApplyShaderToModel );
     LUA_DECLARE ( EngineRemoveShaderFromModel );
+    LUA_DECLARE ( EngineGetModelNameFromID );
+    LUA_DECLARE ( EngineGetModelIDFromName );
+    LUA_DECLARE ( EngineGetModelTextureNames );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
