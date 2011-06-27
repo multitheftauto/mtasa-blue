@@ -140,6 +140,23 @@ bool CClientPad::SetControlState ( const char * szName, float fState )
     if ( GetAnalogControlIndex ( szName, uiIndex ) && GetControlIndex ( szName, uiIndex ) )
     {
         m_fStates [ uiIndex ] = fState;
+        // Clear out any opposing states
+        switch ( uiIndex )
+        {
+            case 3: m_fStates [ 4 ] = 0; break;
+            case 4: m_fStates [ 3 ] = 0; break;
+            case 5: m_fStates [ 6 ] = 0; break;
+            case 6: m_fStates [ 5 ] = 0; break;
+            case 19: m_fStates [ 20 ] = 0; break;
+            case 20: m_fStates [ 19 ] = 0; break;
+            case 21: m_fStates [ 22 ] = 0; break;
+            case 22: m_fStates [ 21 ] = 0; break;
+            case 35: m_fStates [ 36 ] = 0; break;
+            case 36: m_fStates [ 35 ] = 0; break;
+            case 37: m_fStates [ 38 ] = 0; break;
+            case 38: m_fStates [ 37 ] = 0; break;
+            default: break;
+        }
         return true;
     }
     return false;
@@ -355,23 +372,23 @@ bool CClientPad::SetAnalogControlState ( const char * szName, float fState )
     fState = Clamp < float > ( 0, fState, 1 );
     unsigned int uiIndex;
     if ( GetAnalogControlIndex ( szName, uiIndex ) )
-    {       
+    {    
         switch ( uiIndex )
         {
-            case 0: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true; //Left
-            case 1: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Right
-            case 2: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true;  //Up
-            case 3: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Down
-            case 4: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true;  //Left
-            case 5: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Right 
-            case 6: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true;  //Up
-            case 7: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Down
+            case 0: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 1 ] = 0 ; return true; //Left
+            case 1: m_sScriptedStates [ uiIndex ] = fState * 128.0f; m_sScriptedStates [ 0 ] = 0 ; return true;  //Right
+            case 2: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 3 ] = 0 ; return true;  //Up
+            case 3: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; m_sScriptedStates [ 2 ] = 0 ; return true;  //Down
+            case 4: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 5 ] = 0 ; return true;  //Vehicle Left
+            case 5: m_sScriptedStates [ uiIndex ] = fState * 128.0f; m_sScriptedStates [ 4 ] = 0 ; return true;  //Vehicle Right 
+            case 6: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 7 ] = 0 ;  ; return true;  //Up
+            case 7: m_sScriptedStates [ uiIndex ] = fState * 128.0f; m_sScriptedStates [ 6 ] = 0 ;  ; return true;  //Down
             case 8: m_sScriptedStates [ uiIndex ] = fState * 255.0f ; return true;  //Accel
             case 9: m_sScriptedStates [ uiIndex ] = fState * 255.0f ; return true;  //Reverse
-            case 10: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true;  //Special Left
-            case 11: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Special Right
-            case 12: m_sScriptedStates [ uiIndex ] = fState * -128.0f ; return true;  //Special Up
-            case 13: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; return true;  //Special Down
+            case 10: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 11 ] = 0 ;  ; return true;  //Special Left
+            case 11: m_sScriptedStates [ uiIndex ] = fState * 128.0f; m_sScriptedStates [ 10 ] = 0 ;  ; return true;  //Special Right
+            case 12: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 13 ] = 0 ;  ; return true;  //Special Up
+            case 13: m_sScriptedStates [ uiIndex ] = fState * 128.0f; m_sScriptedStates [ 12 ] = 0 ;  ; return true;  //Special Down
             default: return false;
         }
     }
@@ -395,37 +412,41 @@ void CClientPad::ProcessSetAnalogControlState ( CControllerState & cs, bool bOnF
     {
         unsigned int uiIndex = 0;
         
-        ProcessControl ( cs.LeftStickX, uiIndex, cs.LeftStickX < 0 ); uiIndex++; //Left
-        ProcessControl ( cs.LeftStickX, uiIndex, cs.LeftStickX > 0 ); uiIndex++; //Right
-        ProcessControl ( cs.LeftStickY, uiIndex, cs.LeftStickY < 0 ); uiIndex++;; //Up
-        ProcessControl ( cs.LeftStickY, uiIndex, cs.LeftStickY > 0 ); uiIndex++; //Down
+        ProcessControl ( cs.LeftStickX, uiIndex, false ); uiIndex++; //Left
+        ProcessControl ( cs.LeftStickX, uiIndex, true ); uiIndex++; //Right
+        ProcessControl ( cs.LeftStickY, uiIndex, false ); uiIndex++;; //Up
+        ProcessControl ( cs.LeftStickY, uiIndex, true ); uiIndex++; //Down
     }
     else
     {
         unsigned int uiIndex = 4;
 
-        ProcessControl ( cs.LeftStickX, uiIndex, cs.LeftStickX < 0 ); uiIndex++; //Left
-        ProcessControl ( cs.LeftStickX, uiIndex, cs.LeftStickX > 0 ); uiIndex++; //Right
-        ProcessControl ( cs.LeftStickY, uiIndex, cs.LeftStickY < 0 ); uiIndex++;; //Up
-        ProcessControl ( cs.LeftStickY, uiIndex, cs.LeftStickY > 0 ); uiIndex++; //Down
-        ProcessControl ( cs.ButtonCross, uiIndex, cs.ButtonCross > 0 ); uiIndex++; //Accel
-        ProcessControl ( cs.ButtonSquare, uiIndex, cs.ButtonSquare > 0 ); uiIndex++; //Brake
-        ProcessControl ( cs.RightStickX, uiIndex, cs.RightStickX < 0 ); uiIndex++; //Special Left
-        ProcessControl ( cs.RightStickX, uiIndex, cs.RightStickX > 0 ); uiIndex++; //Special Right
-        ProcessControl ( cs.RightStickY, uiIndex, cs.RightStickY < 0 ); uiIndex++; //Special Up
-        ProcessControl ( cs.RightStickY, uiIndex, cs.RightStickY > 0 ); uiIndex++; //Special Down
+        ProcessControl ( cs.LeftStickX, uiIndex, false ); uiIndex++; //Left
+        ProcessControl ( cs.LeftStickX, uiIndex, true ); uiIndex++; //Right
+        ProcessControl ( cs.LeftStickY, uiIndex, false ); uiIndex++;; //Up
+        ProcessControl ( cs.LeftStickY, uiIndex, true ); uiIndex++; //Down
+        ProcessControl ( cs.ButtonCross, uiIndex, true ); uiIndex++; //Accel
+        ProcessControl ( cs.ButtonSquare, uiIndex, true ); uiIndex++; //Brake
+        ProcessControl ( cs.RightStickX, uiIndex, false ); uiIndex++; //Special Left
+        ProcessControl ( cs.RightStickX, uiIndex, true ); uiIndex++; //Special Right
+        ProcessControl ( cs.RightStickY, uiIndex, false ); uiIndex++; //Special Up
+        ProcessControl ( cs.RightStickY, uiIndex, true ); uiIndex++; //Special Down
     }
 }
 
-void CClientPad::ProcessControl ( short & usControlValue, unsigned int uiIndex, bool bResetCmp )
+void CClientPad::ProcessControl ( short & usControlValue, unsigned int uiIndex, bool bPositive )
 {
+    bool bResetCmp = bPositive ? ( usControlValue > 0 ) : ( usControlValue < 0 );
     if ( !m_bScriptedReadyToReset [ uiIndex ] ) // If we havent marked as ready to reset the control, find out if we are
         m_bScriptedReadyToReset [ uiIndex ] = ( ( m_sScriptedStates [ uiIndex ] != CS_NAN ) && ( usControlValue == 0 ) );
 
     if ( m_bScriptedReadyToReset [ uiIndex ] && bResetCmp ) //If we're ready to reset, and our reset comparision is passed
         m_sScriptedStates [ uiIndex ] = CS_NAN; // Remove our scripted control state 
     else
-        usControlValue = ( m_sScriptedStates [ uiIndex ] != CS_NAN ) ? m_sScriptedStates [ uiIndex ] : usControlValue;  //Otherwise force the scripted control state
+        // Only apply the control state of we're actually a number, and that we're positive when we want it to be and vice versa
+        if ( m_sScriptedStates [ uiIndex ] != CS_NAN  )
+            if ( ( bPositive && m_sScriptedStates [ uiIndex ] > 0 ) || ( !bPositive && m_sScriptedStates [ uiIndex ] < 0 )  )
+                usControlValue = m_sScriptedStates [ uiIndex ];  //Otherwise force the scripted control state
 }
 
 // Process toggled controls and apply them directly to the pad state.  Used for players when keyboard input blocking is insufficient.
