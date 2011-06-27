@@ -236,8 +236,7 @@ private:
 
     unsigned long           m_ulLastUpdateTime;
     bool                    m_firstTimeBrowseServer;
-    bool                    m_bOptionsLoaded;
-    unsigned int            m_uiCurrentSearchType;          
+    bool                    m_bOptionsLoaded;        
     ServerBrowserType       m_PrevServerBrowserType;
 
     std::map < SString, int > m_blockedVersionMap;
