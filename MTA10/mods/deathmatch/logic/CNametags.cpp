@@ -152,7 +152,16 @@ void CNametags::DrawFromAim ( void )
             // Do the raycast
             CColPoint* pColPoint = NULL;
             CEntity* pEntity = NULL;
-            g_pGame->GetWorld ()->ProcessLineOfSight ( &vecStart, &vecTarget, &pColPoint, &pEntity, true, true, true, true, true, true, false, true );
+            SLineOfSightFlags flags;
+            flags.bCheckBuildings = true;
+            flags.bCheckVehicles = true;
+            flags.bCheckPeds = true;
+            flags.bCheckObjects = true;
+            flags.bCheckDummies = true;
+            flags.bSeeThroughStuff = true;
+            flags.bIgnoreSomeObjectsForCamera = false;
+            flags.bShootThroughStuff = true;
+            g_pGame->GetWorld ()->ProcessLineOfSight ( &vecStart, &vecTarget, &pColPoint, &pEntity, flags );
             if ( pColPoint ) pColPoint->Destroy (); 
 
             // Un-ignore the local player
@@ -277,7 +286,16 @@ void CNametags::DrawDefault ( void )
         // Do the raycast
         CColPoint* pColPoint = NULL;
         CEntity* pEntity = NULL;
-        g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pEntity, true, true, true, true, true, true, false, true );
+        SLineOfSightFlags flags;
+        flags.bCheckBuildings = true;
+        flags.bCheckVehicles = true;
+        flags.bCheckPeds = true;
+        flags.bCheckObjects = true;
+        flags.bCheckDummies = true;
+        flags.bSeeThroughStuff = true;
+        flags.bIgnoreSomeObjectsForCamera = false;
+        flags.bShootThroughStuff = true;
+        g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pEntity, flags );
         if ( pColPoint ) pColPoint->Destroy ();
 
         // Un-ignore the local player
@@ -355,7 +373,12 @@ void CNametags::DrawDefault ( void )
                 ( pLocalVehicle && pLocalVehicle == pPlayerVehicle ) ||
                 ( fDistanceExp < DEFAULT_VIEW_RANGE_EXP && pPlayer->IsOnScreen () ) )
         {                
-            bCollision = g_pCore->GetGame ()->GetWorld ()->ProcessLineOfSight ( &CameraMatrix.vPos, &vecPlayerPosition, &pColPoint, &pGameEntity, true, true, false, true );
+            SLineOfSightFlags flags;
+            flags.bCheckBuildings = true;
+            flags.bCheckVehicles = true;
+            flags.bCheckPeds = false;
+            flags.bCheckObjects = true;
+            bCollision = g_pCore->GetGame ()->GetWorld ()->ProcessLineOfSight ( &CameraMatrix.vPos, &vecPlayerPosition, &pColPoint, &pGameEntity, flags );
             if ( !bCollision || ( pGameEntity && pPlayerVehicle && pGameEntity == pPlayerVehicle->GetGameEntity() ) )
             {
                 pPlayer->SetNametagDistance ( sqrt ( fDistanceExp ) );

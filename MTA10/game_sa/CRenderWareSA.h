@@ -86,7 +86,7 @@ class CRenderWareSA : public CRenderWare
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
     bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName );
 
-    ushort              GetTxdIdForModelID          ( ushort usModelID );
+    ushort              GetTXDIDForModelID          ( ushort usModelID );
     void*               GetD3DDataForTxdTexture     ( ushort usModelID, const char* szTextureName );
     void                InitModelTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback );
     void                BeginModelTextureWatch      ( ushort usModelID, const char* szTextureName );

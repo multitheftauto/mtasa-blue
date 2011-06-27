@@ -55,7 +55,7 @@ public:
     void        Remove                    ( CEntity * entity );
     void        Remove                    ( CEntitySAInterface * entityInterface );
     void        RemoveReferencesToDeletedObject ( CEntitySAInterface * entity );
-    bool        ProcessLineOfSight        ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity = NULL, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false, bool bShootThroughStuff = false );
+    bool        ProcessLineOfSight        ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult );
     bool        TestLineSphere            ( CVector * vecStart, CVector * vecEnd, CVector * vecSphereCenter, float fSphereRadius, CColPoint ** colCollision );
     //bool      ProcessLineOfSight        ( CVector * vecStart, CVector * vecEnd, CColPoint * colCollision, CEntity * CollisionEntity );
     void        IgnoreEntity              ( CEntity * entity );
@@ -63,7 +63,7 @@ public:
     float       FindGroundZForPosition    ( float fX, float fY );
     float       FindGroundZFor3DPosition  ( CVector * vecPosition );
     void        LoadMapAroundPoint        ( CVector * vecPosition, float fRadius );
-    bool        IsLineOfSightClear        ( CVector * vecStart, CVector * vecEnd, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false );
+    bool        IsLineOfSightClear        ( const CVector * vecStart, const CVector * vecEnd, const SLineOfSightFlags flags );
     bool        HasCollisionBeenLoaded    ( CVector * vecPosition );
     DWORD       GetCurrentArea            ( void );
     void        SetCurrentArea            ( DWORD dwArea );
