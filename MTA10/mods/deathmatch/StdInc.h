@@ -80,6 +80,7 @@
 #include <CElementArray.h>
 #include <CLogger.h>
 #include <CMapEventManager.h>
+#include <CModelNames.h>
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>

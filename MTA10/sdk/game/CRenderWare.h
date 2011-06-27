@@ -43,6 +43,7 @@ class CRenderWare {
     virtual void                BeginModelTextureWatch      ( ushort usModelID, const char* szTextureName ) = 0;
     virtual void                EndModelTextureWatch        ( ushort usModelID, const char* szTextureName ) = 0;
     virtual void                PulseModelTextureWatch      ( void ) = 0;
+    virtual void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID ) = 0;
 };
 
 #endif

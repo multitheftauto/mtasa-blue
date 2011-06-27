@@ -86,16 +86,19 @@ class CRenderWareSA : public CRenderWare
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
     bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName );
 
+    ushort              GetTxdIdForModelID          ( ushort usModelID );
     void*               GetD3DDataForTxdTexture     ( ushort usModelID, const char* szTextureName );
     void                InitModelTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback );
     void                BeginModelTextureWatch      ( ushort usModelID, const char* szTextureName );
     void                EndModelTextureWatch        ( ushort usModelID, const char* szTextureName );
     void                PulseModelTextureWatch      ( void );
+    void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID );
 
 private:
     static void         RwTexDictionaryRemoveTexture( RwTexDictionary* pTXD, RwTexture* pTex );
     static short        CTxdStore_GetTxdRefcount    ( unsigned short usTxdID );
     static bool         ListContainsNamedTexture    ( std::list < RwTexture* >& list, const char* szTexName );
+    static bool         StaticGetTextureCB          ( RwTexture* texture, std::vector < SString >* pNameList );
 
     // Watched model textures
     struct SWatchedModelInfo

@@ -969,6 +969,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CModelNames.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CRegisteredCommands.cpp"
 					>
 				</File>
@@ -1964,6 +1968,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CMapEventManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CModelNames.h"
 					>
 				</File>
 				<File

@@ -92,7 +92,7 @@ public:
                                                           unsigned long ulColor,
                                                           bool bPostGUI ) = 0;
 
-    virtual bool                    DrawTextureQueued   ( float fX, float fY,
+    virtual void                    DrawTextureQueued   ( float fX, float fY,
                                                           float fWidth, float fHeight,
                                                           float fU, float fV,
                                                           float fSizeU, float fSizeV, 

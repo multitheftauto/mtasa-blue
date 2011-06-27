@@ -263,13 +263,9 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
     {
         if ( pMaterialElement )
         {
-            if ( g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, 0, 0, 1, 1, true, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", "dxDrawImage", "Shaders cannot be drawn post-GUI or outside onClientRender" ) );
+            g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, 0, 0, 1, 1, true, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
         else
             m_pScriptDebugging->LogError ( luaVM, "dxDrawImage can't load file" );
@@ -310,13 +306,9 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
     {
         if ( pMaterialElement )
         {
-            if ( g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, fU, fV, fSizeU, fSizeV, false, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", "dxDrawImageSection", "Shaders cannot be drawn post-GUI or outside onClientRender" ) );
+            g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, fU, fV, fSizeU, fSizeV, false, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
         else
             m_pScriptDebugging->LogError ( luaVM, "dxDrawImageSection can't load file" );
