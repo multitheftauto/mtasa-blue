@@ -28,6 +28,7 @@ template<> CServerBrowser * CSingleton < CServerBrowser >::m_pSingleton = NULL;
 #define SB_NAVBAR_SIZE_Y    40 // Navbar button size
 #define SB_BUTTON_SIZE_X    26
 #define SB_BUTTON_SIZE_Y    26
+#define SB_CONNECT_SIZE_X   80
 #define SB_SPACER           10 //Spacer between searchbar and navbar
 #define SB_SMALL_SPACER     5
 #define SB_SEARCHBAR_COMBOBOX_SIZE_X   45  // Mow much the search type combobox occupies of searchbar
@@ -168,7 +169,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     // Address Bar + History Combo
 	fX = fX + SB_BUTTON_SIZE_X + SB_SMALL_SPACER;
 	    // Work out our size by calculating from the end - minus the searchbox, combobox, spacing, info button, play button
-	float fWidth = m_WidgetSize.fX - SB_SMALL_SPACER - fSearchBarSizeX - SB_SPACER - SB_BUTTON_SIZE_X - SB_SMALL_SPACER - SB_BUTTON_SIZE_X - SB_SMALL_SPACER - COMBOBOX_ARROW_SIZE_X - fX;
+	float fWidth = m_WidgetSize.fX - SB_SMALL_SPACER - fSearchBarSizeX - SB_SPACER - SB_BUTTON_SIZE_X - SB_SMALL_SPACER - SB_CONNECT_SIZE_X - SB_SMALL_SPACER - COMBOBOX_ARROW_SIZE_X - fX;
     m_pEditAddress [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
     m_pEditAddress [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pEditAddress [ type ]->SetSize ( CVector2D ( fWidth, SB_BUTTON_SIZE_Y ), false);
@@ -201,17 +202,18 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 
     // Connect button + icon
 	fX = fX + fWidth + SB_SMALL_SPACER;
-    m_pButtonConnect [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "" ) );
+    m_pButtonConnect [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "     Connect" ) );
     m_pButtonConnect [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
-    m_pButtonConnect [ type ]->SetSize ( CVector2D ( SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y ), false );
+    m_pButtonConnect [ type ]->SetSize ( CVector2D ( SB_CONNECT_SIZE_X, SB_BUTTON_SIZE_Y ), false );
     m_pButtonConnect [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnConnectClick, this ) );
+    m_pButtonConnect [ type ]->SetFont ( "default-bold-small" );
     m_pButtonConnectIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pButtonConnect [ type ] ) );
-    m_pButtonConnectIcon [ type ]->SetSize ( CVector2D(1,1), true );
+    m_pButtonConnectIcon [ type ]->SetSize ( CVector2D(SB_BUTTON_SIZE_Y,SB_BUTTON_SIZE_Y), false );
     m_pButtonConnectIcon [ type ]->LoadFromFile ( "cgui\\images\\serverbrowser\\connect.png" );
     m_pButtonConnectIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
 
     // Info button + icon
-    fX = fX + SB_BUTTON_SIZE_X + SB_SMALL_SPACER;
+    fX = fX + SB_CONNECT_SIZE_X + SB_SMALL_SPACER;
     m_pButtonInfo [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "" ) );
     m_pButtonInfo [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pButtonInfo [ type ]->SetSize ( CVector2D ( SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y ), false );
@@ -237,8 +239,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pSearchTypeIcon [ type ]->SetSize ( CVector2D(29,SB_SEARCHBAR_COMBOBOX_SIZE_Y -6), false );
     m_pSearchTypeIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
     m_pSearchTypeIcon [ type ]->SetAlwaysOnTop(true);
-    m_uiCurrentSearchType = SearchTypes::SERVERS;
-    m_pSearchTypeIcon [ type ]->LoadFromFile ( m_szSearchTypePath [ m_uiCurrentSearchType ] );
+    m_pSearchTypeIcon [ type ]->LoadFromFile ( m_szSearchTypePath [ SearchTypes::SERVERS ] );
 
     fWidth = fSearchBarSizeX-SB_SEARCHBAR_COMBOBOX_SIZE_X;
     m_pEditSearch [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
@@ -693,16 +694,16 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
     bool bServerSearchFound = true;
 
     std::string strServerSearchText = m_pEditSearch [ Type ]->GetText ();
-
+    int iCurrentSearchType = m_pComboSearchType[ Type ]->GetSelectedItemIndex();
     if ( !strServerSearchText.empty() )
     {
-        if ( m_uiCurrentSearchType == SearchTypes::SERVERS )
+        if ( iCurrentSearchType == SearchTypes::SERVERS )
         {
             // Search for the search text in the servername
             SString strServerName = pServer->strName;
             bServerSearchFound = strServerName.ContainsI ( strServerSearchText );
         }
-        else if ( m_uiCurrentSearchType == SearchTypes::PLAYERS )
+        else if ( iCurrentSearchType == SearchTypes::PLAYERS )
         {
             bServerSearchFound = false;
 
@@ -1176,9 +1177,9 @@ bool CServerBrowser::OnHistorySelected ( CGUIElement* pElement )
 bool CServerBrowser::OnSearchTypeSelected ( CGUIElement* pElement )
 {
     ServerBrowserType Type = GetCurrentServerBrowserType();
-    m_uiCurrentSearchType = m_pComboSearchType[ Type ]->GetSelectedItemIndex();
+    int iCurrentSearchType = m_pComboSearchType[ Type ]->GetSelectedItemIndex();
 
-    m_pSearchTypeIcon [ Type ]->LoadFromFile ( m_szSearchTypePath [ m_uiCurrentSearchType ] );
+    m_pSearchTypeIcon [ Type ]->LoadFromFile ( m_szSearchTypePath [ iCurrentSearchType ] );
 
     OnSearchDefocused(pElement);
 
@@ -1227,7 +1228,7 @@ bool CServerBrowser::OnMouseClick ( CGUIMouseEventArgs Args )
         OnClick ( m_pServerList [ ServerBrowserTypes::RECENTLY_PLAYED ] );
         return true;
     }
-    else if ( Args.pWindow == m_pServerPlayerList [ Type ] && m_uiCurrentSearchType == SearchTypes::PLAYERS && !m_pEditSearch [ Type ]->GetText ().empty() )
+    else if ( Args.pWindow == m_pServerPlayerList [ Type ] && m_pComboSearchType[ Type ]->GetSelectedItemIndex() == SearchTypes::PLAYERS && !m_pEditSearch [ Type ]->GetText ().empty() )
     {
         OnClick ( m_pServerPlayerList [ Type ] );
         return true;
@@ -1303,9 +1304,9 @@ bool CServerBrowser::OnSearchDefocused ( CGUIElement* pElement )
     if ( strSearchText == "" )
     {
         m_pLabelSearchDescription [ Type ]->SetVisible ( true );
-        if ( m_uiCurrentSearchType == SearchTypes::SERVERS )
+        if ( m_pComboSearchType[ Type ]->GetSelectedItemIndex() == SearchTypes::SERVERS )
             m_pLabelSearchDescription [ Type ]->SetText("Search servers...");
-        else if ( m_uiCurrentSearchType == SearchTypes::PLAYERS )
+        else if ( m_pComboSearchType[ Type ]->GetSelectedItemIndex() == SearchTypes::PLAYERS )
             m_pLabelSearchDescription [ Type ]->SetText("Search players...");
     }
     return true;
