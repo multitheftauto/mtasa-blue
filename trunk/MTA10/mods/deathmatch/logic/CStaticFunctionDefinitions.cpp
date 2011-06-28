@@ -5300,7 +5300,7 @@ bool CStaticFunctionDefinitions::SetJetpackMaxHeight ( float fHeight )
 
 bool CStaticFunctionDefinitions::SetAircraftMaxHeight ( float fHeight )
 {
-    if ( fHeight >= 0 && fHeight <= 9001 )
+    if ( fHeight >= 0 /*&& fHeight <= 9001*/ )
     {
         g_pGame->GetWorld ()->SetAircraftMaxHeight ( fHeight );
         return true;
