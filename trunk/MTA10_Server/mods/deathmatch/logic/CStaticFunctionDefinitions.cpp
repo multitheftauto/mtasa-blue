@@ -6831,9 +6831,9 @@ bool CStaticFunctionDefinitions::SetObjectScale ( CElement* pElement, float fSca
 }
 
 
-bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot )
+bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation, CEasingCurve::eType a_easingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot )
 {
-    RUN_CHILDREN MoveObject ( pResource, *iter, ulTime, vecPosition, vecRotation, a_szEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
+    RUN_CHILDREN MoveObject ( pResource, *iter, ulTime, vecPosition, vecRotation, a_easingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
 
     if ( IS_OBJECT ( pElement ) )
     {
@@ -6848,8 +6848,7 @@ bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* p
         CVector vecDeltaRadians = vecRotation;
         ConvertDegreesToRadiansNoWrap ( vecDeltaRadians );
 
-        CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( a_szEasingType );
-        if (easingType == CEasingCurve::EASING_INVALID )
+        if ( a_easingType == CEasingCurve::EASING_INVALID )
         {
             return false;
         }
@@ -6857,7 +6856,7 @@ bool CStaticFunctionDefinitions::MoveObject ( CResource * pResource, CElement* p
         CPositionRotationAnimation moveAnimation;
         moveAnimation.SetSourceValue ( SPositionRotation ( vecSourcePosition, vecSourceRotation ) );
         moveAnimation.SetTargetValue ( SPositionRotation ( vecPosition, vecDeltaRadians ), true );
-        moveAnimation.SetEasing ( easingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
+        moveAnimation.SetEasing ( a_easingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
         moveAnimation.SetDuration ( ulTime );
 
         // Start moving it here so we can keep track of the position/rotation
@@ -8384,9 +8383,9 @@ bool CStaticFunctionDefinitions::GetJetpackMaxHeight ( float& fMaxHeight )
     return true;
 }
 
-bool CStaticFunctionDefinitions::AreInteriorSoundsEnabled ( bool& bEnabled )
+bool CStaticFunctionDefinitions::GetInteriorSoundsEnabled ( bool& bEnabled )
 {
-    bEnabled = g_pGame->AreInteriorSoundsEnabled ( );
+    bEnabled = g_pGame->GetInteriorSoundsEnabled ( );
 
     return true;
 }

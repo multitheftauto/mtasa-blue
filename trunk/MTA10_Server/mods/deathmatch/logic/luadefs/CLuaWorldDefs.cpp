@@ -34,7 +34,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getHeatHaze", CLuaWorldDefs::getHeatHaze );
     CLuaCFunctions::AddFunction ( "isGlitchEnabled", CLuaWorldDefs::isGlitchEnabled );
     CLuaCFunctions::AddFunction ( "getCloudsEnabled", CLuaWorldDefs::getCloudsEnabled );
-    CLuaCFunctions::AddFunction ( "areInteriorSoundsEnabled", CLuaWorldDefs::areInteriorSoundsEnabled );
+    CLuaCFunctions::AddFunction ( "getInteriorSoundsEnabled", CLuaWorldDefs::getInteriorSoundsEnabled );
     CLuaCFunctions::AddFunction ( "getRainLevel", CLuaWorldDefs::getRainLevel );
     CLuaCFunctions::AddFunction ( "getSunSize", CLuaWorldDefs::getSunSize );
     CLuaCFunctions::AddFunction ( "getSunColor", CLuaWorldDefs::getSunColor );
@@ -291,59 +291,75 @@ int CLuaWorldDefs::setTime ( lua_State* luaVM )
 
 int CLuaWorldDefs::setTrafficLightState ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
-    {
-        unsigned char ucTrafficLightState = static_cast < unsigned char > ( lua_tonumber ( luaVM, 1 ) );
+//  bool setTrafficLightState ( int state )
+//  bool setTrafficLightState ( string state )
+//  bool setTrafficLightState ( string colorNS, string colorEW )
 
-        if ( CStaticFunctionDefinitions::SetTrafficLightState ( ucTrafficLightState, true ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    CScriptArgReader argStream ( luaVM );
+
+    // Determine which version to parse
+    if ( argStream.NextIsNumber () )
     {
-        const char* szParam1 = lua_tostring ( luaVM, 1 );
-        if ( ! stricmp ( szParam1, "auto" ) )
+    //  bool setTrafficLightState ( int state )
+        int iState;
+        argStream.ReadNumber ( iState );
+
+        if ( !argStream.HasErrors () )
         {
-            bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( false ) &&
-                       CStaticFunctionDefinitions::SetTrafficLightState ( 0 );
-            lua_pushboolean ( luaVM, bOk );
-            return 1;
-        }
-        else if ( ! stricmp ( szParam1, "disabled" ) )
-        {
-            bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( true ) &&
-                       CStaticFunctionDefinitions::SetTrafficLightState ( 9 );
-            lua_pushboolean ( luaVM, bOk );
-            return 1;
-        }
-        else
-        {
-            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
+            if ( CStaticFunctionDefinitions::SetTrafficLightState ( iState ) )
             {
-                // Perform a conversion from two string parameters to a state number.
-                const char* szColorNS = szParam1;
-                const char* szColorEW = lua_tostring ( luaVM, 2 );
-
-                unsigned char ucState;
-                if ( SharedUtil::GetTrafficLightStateFromStrings ( szColorNS, szColorEW, ucState ) )
-                {
-                    // Change it.
-                    bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( true ) &&
-                               CStaticFunctionDefinitions::SetTrafficLightState ( ucState );
-                    lua_pushboolean ( luaVM, bOk );
-                    return 1;
-                }
-                else
-                    m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
-            else
-                m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
         }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setTrafficLightState" );
+    if ( !argStream.NextIsString ( 1 ) )
+    {
+    //  bool setTrafficLightState ( string state )
+        TrafficLight::EState eState;
+        argStream.ReadEnumString ( eState );
+
+        if ( !argStream.HasErrors () )
+        {
+            if ( eState == TrafficLight::AUTO )
+            {
+                bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( false ) &&
+                           CStaticFunctionDefinitions::SetTrafficLightState ( 0 );
+                lua_pushboolean ( luaVM, bOk );
+                return 1;
+            }
+            else
+            {
+                bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( true ) &&
+                           CStaticFunctionDefinitions::SetTrafficLightState ( 9 );
+                lua_pushboolean ( luaVM, bOk );
+                return 1;
+            }
+        }
+    }
+    else
+    {
+    //  bool setTrafficLightState ( string colorNS, string colorEW )
+        TrafficLight::EColor eColorNS;
+        TrafficLight::EColor eColorEW;
+        argStream.ReadEnumString ( eColorNS );
+        argStream.ReadEnumString ( eColorEW );
+
+        if ( !argStream.HasErrors () )
+        {
+            unsigned char ucState = SharedUtil::GetTrafficLightStateFromColors ( eColorNS, eColorEW );
+
+            // Change it.
+            bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked ( true ) &&
+                       CStaticFunctionDefinitions::SetTrafficLightState ( ucState );
+            lua_pushboolean ( luaVM, bOk );
+            return 1;
+        }
+    }
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setTrafficLightState", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -626,10 +642,10 @@ int CLuaWorldDefs::resetHeatHaze ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaWorldDefs::areInteriorSoundsEnabled ( lua_State* luaVM)
+int CLuaWorldDefs::getInteriorSoundsEnabled ( lua_State* luaVM)
 {
     bool bEnabled;
-    bool bSuccess = CStaticFunctionDefinitions::AreInteriorSoundsEnabled ( bEnabled );
+    bool bSuccess = CStaticFunctionDefinitions::GetInteriorSoundsEnabled ( bEnabled );
 
     if ( bSuccess )
     {

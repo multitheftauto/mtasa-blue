@@ -66,7 +66,7 @@ public:
         if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
         {
             outValue = static_cast < T > ( defaultValue );
-            return true;
+            return false;
         }
 
         outValue = 0;
@@ -110,7 +110,7 @@ public:
         if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
         {
             bOutValue = bDefaultValue;
-            return true;
+            return false;
         }
 
         bOutValue = false;
@@ -137,7 +137,7 @@ public:
             if ( defaultValue )
             {
                 outValue = defaultValue;              
-                return true;
+                return false;
             }
         }
 
@@ -192,7 +192,7 @@ public:
         if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
         {
             outValue = defaultValue;
-            return true;
+            return false;
         }
 
         outValue = (T)0;
@@ -212,7 +212,7 @@ public:
 
         if ( iArgument == LUA_TLIGHTUSERDATA )
         {
-            outValue = (T*)UserDataCast < T > ( (T*)0, lua_touserdata ( m_luaVM, m_iIndex++ ) );
+            outValue = (T*)UserDataCast < T > ( (T*)0, lua_touserdata ( m_luaVM, m_iIndex++ ), m_luaVM );
             if ( outValue || bArgCanBeNil )
                 return true;
 
@@ -227,7 +227,7 @@ public:
             {
                 outValue = defaultValue;
                 if ( outValue || bDefaultCanBeNil )
-                    return true;
+                    return false;
             }
         }
 
@@ -300,18 +300,30 @@ public:
     //
     // Peek at next type
     //
-    bool NextIs ( int iArgument ) const  { return iArgument == lua_type ( m_luaVM, m_iIndex ); }
-    bool NextIsNone         ( void ) const  { return NextIs ( LUA_TNONE ); }
-    bool NextIsNil          ( void ) const  { return NextIs ( LUA_TNIL ); }
-    bool NextIsBool         ( void ) const  { return NextIs ( LUA_TBOOLEAN ); }
-    bool NextIsUserData     ( void ) const  { return NextIs ( LUA_TLIGHTUSERDATA ); }
-    bool NextIsNumber       ( void ) const  { return NextIs ( LUA_TNUMBER ); }
-    bool NextIsString       ( void ) const  { return NextIs ( LUA_TSTRING ); }
-    bool NextIsTable        ( void ) const  { return NextIs ( LUA_TTABLE ); }
-    bool NextIsFunction     ( void ) const  { return NextIs ( LUA_TFUNCTION ); }
-    bool NextCouldBeNumber  ( void ) const  { return NextIsNumber () || NextIsString (); }
-    bool NextCouldBeString  ( void ) const  { return NextIsNumber () || NextIsString (); }
+    bool NextIs ( int iArgument, int iOffset = 0 ) const  { return iArgument == lua_type ( m_luaVM, m_iIndex + iOffset ); }
+    bool NextIsNone         ( int iOffset = 0 ) const  { return NextIs ( LUA_TNONE, iOffset ); }
+    bool NextIsNil          ( int iOffset = 0 ) const  { return NextIs ( LUA_TNIL, iOffset ); }
+    bool NextIsBool         ( int iOffset = 0 ) const  { return NextIs ( LUA_TBOOLEAN, iOffset ); }
+    bool NextIsUserData     ( int iOffset = 0 ) const  { return NextIs ( LUA_TLIGHTUSERDATA, iOffset ); }
+    bool NextIsNumber       ( int iOffset = 0 ) const  { return NextIs ( LUA_TNUMBER, iOffset ); }
+    bool NextIsString       ( int iOffset = 0 ) const  { return NextIs ( LUA_TSTRING, iOffset ); }
+    bool NextIsTable        ( int iOffset = 0 ) const  { return NextIs ( LUA_TTABLE, iOffset ); }
+    bool NextIsFunction     ( int iOffset = 0 ) const  { return NextIs ( LUA_TFUNCTION, iOffset ); }
+    bool NextCouldBeNumber  ( int iOffset = 0 ) const  { return NextIsNumber ( iOffset ) || NextIsString ( iOffset ); }
+    bool NextCouldBeString  ( int iOffset = 0 ) const  { return NextIsNumber ( iOffset ) || NextIsString ( iOffset ); }
 
+    template < class T >
+    bool NextIsEnumString ( T&, int iOffset = 0 )
+    {
+        int iArgument = lua_type ( m_luaVM, m_iIndex + iOffset );
+        if ( iArgument == LUA_TSTRING )
+        {
+            T eDummyResult;
+            SString strValue = lua_tostring ( m_luaVM, m_iIndex + iOffset );
+            return StringToEnum ( strValue, eDummyResult );
+        }
+        return false;
+    }
 
     //
     // SetTypeError

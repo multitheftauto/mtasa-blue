@@ -229,7 +229,7 @@ public:
 
     // Object set funcs
     static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );
-    static bool                         MoveObject                          ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
+    static bool                         MoveObject                          ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
     static bool                         StopObject                          ( CClientEntity& Entity );
     static bool                         SetObjectScale                      ( CClientEntity& Entity, float fScale );
     static bool                         SetObjectStatic                     ( CClientEntity& Entity, bool bStatic );
@@ -286,7 +286,7 @@ public:
     static bool                         SetMarkerIcon                       ( CClientEntity& Entity, const char* szIcon );
 
     // Camera get funcs
-    static bool                         GetCameraView                       ( unsigned short& ucMode );
+    static bool                         GetCameraViewMode                       ( unsigned short& ucMode );
     static bool                         GetCameraMatrix                     ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV );
     static CClientEntity *              GetCameraTarget                     ( void );
     static bool                         GetCameraInterior                   ( unsigned char & ucInterior );
@@ -296,7 +296,7 @@ public:
     static bool                         SetCameraTarget                     ( CClientEntity * pEntity);
     static bool                         SetCameraInterior                   ( unsigned char ucInterior );
     static bool                         FadeCamera                          ( bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
-    static bool                         SetCameraView                       ( unsigned short ucMode );
+    static bool                         SetCameraViewMode                       ( unsigned short ucMode );
 
     // Cursor funcs
     static bool                         GetCursorPosition                   ( CVector2D& vecCursor, CVector& vecWorld );

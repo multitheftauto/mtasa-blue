@@ -444,7 +444,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     g_pGame->GetWaterColor ( ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha );
 
     // Interior sounds
-    bool bInteriorSoundsEnabled = g_pGame->AreInteriorSoundsEnabled ( );
+    bool bInteriorSoundsEnabled = g_pGame->GetInteriorSoundsEnabled ( );
 
     // Rain level
     bool bOverrideRainLevel = g_pGame->HasRainLevel ( );

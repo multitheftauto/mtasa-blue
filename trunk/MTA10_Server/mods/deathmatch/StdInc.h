@@ -120,6 +120,7 @@
 // Lua includes
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
+#include "CEasingCurve.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "CScriptArgReader.h"
 #include "lua/CLuaManager.h"
@@ -132,7 +133,6 @@
 #include "lua/CLuaArguments.h"
 
 // Shared includes
-#include "CEasingCurve.h"
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
 
@@ -258,8 +258,8 @@
 #include "CStaticFunctionDefinitions.h"
 
 // Shared includes
-#include "CEasingCurve.h"
-#include "CPositionRotationAnimation.h"
+//#include "CEasingCurve.h"
+//#include "CPositionRotationAnimation.h"
 
 // Utility includes
 #include "utils/CHTTPClient.h"

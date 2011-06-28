@@ -28,13 +28,36 @@ class CEasingCurve
 {
 public:
 
-#define DECLARE_EASING(x) x,
     enum eType
     {
-#include "EasingDeclarations.hpp"
+        Linear,
+
+        InQuad,
+        OutQuad,
+        InOutQuad,
+        OutInQuad,
+
+        InElastic,
+        OutElastic,
+        InOutElastic,
+        OutInElastic,
+
+        InBack,
+        OutBack,
+        InOutBack,
+        OutInBack,
+
+        InBounce,
+        OutBounce,
+
+        InOutBounce,
+        OutInBounce,
+
+        SineCurve,
+        CosineCurve,
+
         EASING_INVALID = 0xFF
     };
-#undef DECLARE_EASING
 
     typedef double (*SimpleEasingFunction)(double progress);
     

@@ -378,7 +378,7 @@ public:
     // Object set functions
     static bool                 SetObjectRotation                   ( CElement* pElement, const CVector& vecRotation );
     static bool                 SetObjectScale                      ( CElement* pElement, float fScale );
-    static bool                 MoveObject                          ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
+    static bool                 MoveObject                          ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation, CEasingCurve::eType a_easingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
     static bool                 StopObject                          ( CElement* pElement );
 
     // Radar area create/destroy funcs
@@ -496,7 +496,7 @@ public:
     static bool                 GetTrafficLightState                ( unsigned char& ucState );
     static bool                 GetTrafficLightsLocked              ( bool& bLocked );
     static bool                 GetJetpackMaxHeight                 ( float& fMaxHeight );
-    static bool                 AreInteriorSoundsEnabled            ( bool& bEnabled );
+    static bool                 GetInteriorSoundsEnabled            ( bool& bEnabled );
     static bool                 GetRainLevel                        ( float& fRainLevel );
     static bool                 GetSunSize                          ( float& fSunSize );
     static bool                 GetSunColor                         ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB );

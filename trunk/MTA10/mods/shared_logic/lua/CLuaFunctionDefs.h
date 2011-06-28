@@ -433,7 +433,7 @@ public:
     LUA_DECLARE ( SetPickupType );
 
     // Cam get funcs
-    LUA_DECLARE ( GetCameraView );
+    LUA_DECLARE ( GetCameraViewMode );
     LUA_DECLARE ( GetCameraMatrix );
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
@@ -445,7 +445,7 @@ public:
     LUA_DECLARE ( SetCameraInterior );
     LUA_DECLARE ( FadeCamera );
     LUA_DECLARE ( SetCameraClip );
-    LUA_DECLARE ( SetCameraView );
+    LUA_DECLARE ( SetCameraViewMode );
     LUA_DECLARE ( SetCameraGoggleEffect );
 
     // Cursor funcs
@@ -686,7 +686,7 @@ public:
     LUA_DECLARE ( GetWindVelocity );
     LUA_DECLARE ( SetWindVelocity );
     LUA_DECLARE ( ResetWindVelocity );
-    LUA_DECLARE ( AreInteriorSoundsEnabled );
+    LUA_DECLARE ( GetInteriorSoundsEnabled );
     LUA_DECLARE ( SetInteriorSoundsEnabled );
     LUA_DECLARE ( GetRainLevel );
     LUA_DECLARE ( SetRainLevel );

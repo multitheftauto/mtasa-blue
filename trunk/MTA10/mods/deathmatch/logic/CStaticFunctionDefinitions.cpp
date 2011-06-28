@@ -3134,9 +3134,9 @@ bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, cons
 }
 
 
-bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot )
+bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot )
 {
-    RUN_CHILDREN MoveObject ( **iter, ulTime, vecPosition, vecDeltaRotation, a_szEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
+    RUN_CHILDREN MoveObject ( **iter, ulTime, vecPosition, vecDeltaRotation, a_eEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
 
     if ( IS_OBJECT ( &Entity ) )
     {
@@ -3151,8 +3151,7 @@ bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned lo
         CVector vecDeltaRadians = vecDeltaRotation;
         ConvertDegreesToRadiansNoWrap ( vecDeltaRadians );
 
-        CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( a_szEasingType );
-        if (easingType == CEasingCurve::EASING_INVALID )
+        if ( a_eEasingType == CEasingCurve::EASING_INVALID )
         {
             return false;
         }
@@ -3160,7 +3159,7 @@ bool CStaticFunctionDefinitions::MoveObject ( CClientEntity& Entity, unsigned lo
         CPositionRotationAnimation animation;
         animation.SetSourceValue ( SPositionRotation ( vecSourcePosition, vecSourceRotation ) );
         animation.SetTargetValue ( SPositionRotation ( vecPosition, vecDeltaRadians ), true );
-        animation.SetEasing ( easingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
+        animation.SetEasing ( a_eEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot );
         animation.SetDuration ( ulTime );
 
         Object.StartMovement ( animation );
@@ -3862,15 +3861,15 @@ bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, uns
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetCameraView ( unsigned short ucMode )
+bool CStaticFunctionDefinitions::SetCameraViewMode ( unsigned short ucMode )
 {
-    m_pCamera->SetCameraView ( (eVehicleCamMode) ucMode );
+    m_pCamera->SetCameraViewMode ( (eVehicleCamMode) ucMode );
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetCameraView ( unsigned short& ucMode )
+bool CStaticFunctionDefinitions::GetCameraViewMode ( unsigned short& ucMode )
 {
-    ucMode = m_pCamera->GetCameraView();
+    ucMode = m_pCamera->GetCameraViewMode();
     return true;
 }
 

@@ -17,6 +17,9 @@ DECLARE_ENUM( CGUIVerticalAlign );
 DECLARE_ENUM( CGUIHorizontalAlign );
 DECLARE_ENUM( eInputMode );
 DECLARE_ENUM( eAccessType );
+DECLARE_ENUM( TrafficLight::EColor );
+DECLARE_ENUM( TrafficLight::EState );
+DECLARE_ENUM( CEasingCurve::eType );
 
 enum eDXHorizontalAlign
 {
@@ -98,7 +101,7 @@ inline SString GetClassTypeName ( CGUIScrollBar* )   { return "gui-scrollbar"; }
 inline SString GetClassTypeName ( CGUIComboBox* )    { return "gui-combobox"; }
 
 inline SString GetClassTypeName ( CXMLNode* )               { return "xml-node"; }
-
+inline SString GetClassTypeName ( CLuaTimer* )              { return "lua-timer"; }
 inline SString GetClassTypeName ( CEntity* )                { return "entity"; }
 
 
@@ -106,9 +109,27 @@ inline SString GetClassTypeName ( CEntity* )                { return "entity"; }
 // CXMLNode from userdata
 //
 template < class T >
-CXMLNode* UserDataCast ( CXMLNode*, void* ptr )
+CXMLNode* UserDataCast ( CXMLNode*, void* ptr, lua_State* )
 {
     return g_pCore->GetXML ()->GetNodeFromID ( reinterpret_cast < unsigned long > ( ptr ) );
+}
+
+
+
+//
+// CLuaTimer from userdata
+//
+template < class T >
+CLuaTimer* UserDataCast ( CLuaTimer*, void* ptr, lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        CLuaTimer* pLuaTimer = reinterpret_cast < CLuaTimer* > ( ptr );
+        if ( pLuaMain->GetTimerManager ()->Exists ( pLuaTimer ) )
+            return pLuaTimer;
+    }
+    return NULL;
 }
 
 
@@ -116,7 +137,7 @@ CXMLNode* UserDataCast ( CXMLNode*, void* ptr )
 // CClientEntity from userdata
 //
 template < class T >
-CClientEntity* UserDataCast ( CClientEntity*, void* ptr )
+CClientEntity* UserDataCast ( CClientEntity*, void* ptr, lua_State* )
 {
     ElementID ID = TO_ELEMENTID ( ptr );
     CClientEntity* pEntity = CElementIDs::GetElement ( ID );
@@ -144,10 +165,10 @@ bool CheckWrappedUserDataType ( CClientGUIElement*& pGuiElement, SString& strErr
 // CEntity from userdata
 //
 template < class T >
-CEntity* UserDataCast ( CEntity*, void* ptr )
+CEntity* UserDataCast ( CEntity*, void* ptr, lua_State* )
 {
     // Get the client element
-    CClientEntity* pClientElement = UserDataCast < CClientEntity > ( (CClientEntity*)NULL, ptr );
+    CClientEntity* pClientElement = UserDataCast < CClientEntity > ( (CClientEntity*)NULL, ptr, NULL );
 
     // Get its game entity
     CEntity* pEntity = NULL;

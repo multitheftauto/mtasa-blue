@@ -14,6 +14,9 @@
 // Forward declare enum reflection stuff
 enum eLuaType { };
 DECLARE_ENUM( eLuaType );
+DECLARE_ENUM( TrafficLight::EColor );
+DECLARE_ENUM( TrafficLight::EState );
+DECLARE_ENUM( CEasingCurve::eType );
 
 
 // class -> class type
@@ -51,15 +54,33 @@ inline SString GetClassTypeName ( CScriptFile* )    { return "scriptfile"; }
 inline SString GetClassTypeName ( CWater* )         { return "water"; }
 
 inline SString GetClassTypeName ( CXMLNode* )       { return "xml-node"; }
+inline SString GetClassTypeName ( CLuaTimer* )      { return "lua-timer"; }
 
 
 //
 // CXMLNode from userdata
 //
 template < class T >
-CXMLNode* UserDataCast ( CXMLNode*, void* ptr )
+CXMLNode* UserDataCast ( CXMLNode*, void* ptr, lua_State* )
 {
     return g_pServerInterface->GetXML ()->GetNodeFromID ( reinterpret_cast < unsigned long > ( ptr ) );
+}
+
+
+//
+// CLuaTimer from userdata
+//
+template < class T >
+CLuaTimer* UserDataCast ( CLuaTimer*, void* ptr, lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        CLuaTimer* pLuaTimer = reinterpret_cast < CLuaTimer* > ( ptr );
+        if ( pLuaMain->GetTimerManager ()->Exists ( pLuaTimer ) )
+            return pLuaTimer;
+    }
+    return NULL;
 }
 
 
@@ -67,7 +88,7 @@ CXMLNode* UserDataCast ( CXMLNode*, void* ptr )
 // CElement from userdata
 //
 template < class T >
-CElement* UserDataCast ( CElement*, void* ptr )
+CElement* UserDataCast ( CElement*, void* ptr, lua_State* )
 {
     ElementID ID = TO_ELEMENTID ( ptr );
     CElement* pElement = CElementIDs::GetElement ( ID );

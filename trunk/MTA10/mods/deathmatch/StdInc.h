@@ -88,6 +88,7 @@
 #include <lua/CLuaCFunctions.h>
 #include <lua/CLuaArguments.h>
 #include <lua/CLuaMain.h>
+#include "CEasingCurve.h"
 #include <lua/CLuaFunctionParseHelpers.h>
 #include <CScriptArgReader.h>
 #include <luadefs/CLuaDefs.h>
@@ -96,7 +97,6 @@
 #include <luadefs/CLuaFileDefs.h>
 
 // Shared includes
-#include "CEasingCurve.h"
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
 
