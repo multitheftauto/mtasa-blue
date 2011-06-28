@@ -6931,93 +6931,45 @@ int CLuaFunctionDefinitions::SetObjectScale ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::MoveObject ( lua_State* luaVM )
 {
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
+//  bool moveObject ( object theObject, int time,
+//      float targetx, float targety, float targetz, 
+//      [ float moverx, float movery, float moverz,
+//      string strEasingType, float fEasingPeriod, float fEasingAmplitude, float fEasingOvershoot ] )
+    CElement* pElement; int iTime; CVector vecTargetPosition; CVector vecTargetRotation;
+    CEasingCurve::eType easingType; float fEasingPeriod; float fEasingAmplitude; float fEasingOvershoot;
 
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-         ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadNumber ( iTime );
+    argStream.ReadNumber ( vecTargetPosition.fX );
+    argStream.ReadNumber ( vecTargetPosition.fY );
+    argStream.ReadNumber ( vecTargetPosition.fZ );
+    argStream.ReadNumber ( vecTargetRotation.fX, 0 );
+    argStream.ReadNumber ( vecTargetRotation.fY, 0 );
+    argStream.ReadNumber ( vecTargetRotation.fZ, 0 );
+    argStream.ReadEnumString ( easingType, CEasingCurve::Linear );
+    argStream.ReadNumber ( fEasingPeriod, 0.3f );
+    argStream.ReadNumber ( fEasingAmplitude, 1.0f );
+    argStream.ReadNumber ( fEasingOvershoot, 1.70158f );
+
+    if ( !argStream.HasErrors () )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
+        CLuaMain * pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            CVector vecTargetPosition;
-            CVector vecTargetRotation;
-            unsigned long ulTime = static_cast < unsigned long > ( lua_tonumber ( luaVM, 2 ) );
-            vecTargetPosition.fX = static_cast < float > ( atof ( lua_tostring ( luaVM, 3 ) ) );
-            vecTargetPosition.fY = static_cast < float > ( atof ( lua_tostring ( luaVM, 4 ) ) );
-            vecTargetPosition.fZ = static_cast < float > ( atof ( lua_tostring ( luaVM, 5 ) ) );
-            
-            const char* szEasingType = "Linear";
-            double fEasingPeriod = 0.3f;
-            double fEasingAmplitude = 1.0f;
-            double fEasingOvershoot = 1.70158f;
-
-            int iArgument6 = lua_type ( luaVM, 6 );
-            if ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING )
+            CResource * pResource = pLuaMain->GetResource();
+            if ( pResource )
             {
-                vecTargetRotation.fX = static_cast < float > ( atof ( lua_tostring ( luaVM, 6 ) ) );
-
-                int iArgument7 = lua_type ( luaVM, 7 );
-                if ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING )
+                if ( CStaticFunctionDefinitions::MoveObject ( pResource, pElement, iTime, vecTargetPosition, vecTargetRotation, easingType, fEasingPeriod, fEasingAmplitude, fEasingOvershoot ) )
                 {
-                    vecTargetRotation.fY = static_cast < float > ( atof ( lua_tostring ( luaVM, 7 ) ) );
-
-                    int iArgument8 = lua_type ( luaVM, 8 );
-                    if ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING )
-                    {
-                        vecTargetRotation.fZ = static_cast < float > ( atof ( lua_tostring ( luaVM, 8 ) ) );
-
-                        int iArgument9 = lua_type ( luaVM, 9 );
-                        if ( iArgument9 == LUA_TSTRING )
-                        {
-                            szEasingType = lua_tostring ( luaVM, 9 );
-
-                            int iArgument10 = lua_type ( luaVM, 10 );
-                            if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
-                            {
-                                fEasingPeriod = atof ( lua_tostring ( luaVM, 10 ) ); 
-
-                                int iArgument11 = lua_type ( luaVM, 11 );
-                                if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
-                                {
-                                    fEasingAmplitude = atof ( lua_tostring ( luaVM, 11 ) ); 
-
-                                    int iArgument12 = lua_type ( luaVM, 12 );
-                                    if ( iArgument12 == LUA_TNUMBER || iArgument12 == LUA_TSTRING )
-                                    {
-                                        fEasingOvershoot = atof ( lua_tostring ( luaVM, 12 ) ); 
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            CLuaMain * pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
-            if ( pLuaMain )
-            {
-                CResource * pResource = pLuaMain->GetResource();
-                if ( pResource )
-                {
-                    if ( CStaticFunctionDefinitions::MoveObject ( pResource, pElement, ulTime, vecTargetPosition, vecTargetRotation, szEasingType, fEasingPeriod, fEasingAmplitude, fEasingOvershoot ) )
-                    {
-                        lua_pushboolean ( luaVM, true );
-                        return 1;
-                    }
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
                 }
             }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "moveObject", "object", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "moveObject" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "moveObject", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -9468,47 +9420,19 @@ int CLuaFunctionDefinitions::GetDistanceBetweenPoints3D ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetEasingValue ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
+//  float getEasingValue( float fProgress, string strEasingType [, float fEasingPeriod, float fEasingAmplitude, float fEasingOvershoot] )
+    float fProgress; CEasingCurve::eType easingType; float fEasingPeriod; float fEasingAmplitude; float fEasingOvershoot;
 
-    if ( ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) || iArgument2 != LUA_TSTRING )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fProgress );
+    argStream.ReadEnumString ( easingType );
+    argStream.ReadNumber ( fEasingPeriod, 0.3f );
+    argStream.ReadNumber ( fEasingAmplitude, 1.0f );
+    argStream.ReadNumber ( fEasingOvershoot, 1.70158f );
+
+    if ( argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "getEasingValue" );
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-    
-    float fProgress = static_cast < float > ( atof ( lua_tostring ( luaVM, 1 ) ) );
-
-    const char* szEasingType = "Linear";
-    double fEasingPeriod = 0.3f;
-    double fEasingAmplitude = 1.0f;
-    double fEasingOvershoot = 1.70158f;
-
-    szEasingType = lua_tostring ( luaVM, 2 );
-
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING )
-    {
-        fEasingPeriod = atof ( lua_tostring ( luaVM, 3 ) ); 
-
-        int iArgument4 = lua_type ( luaVM, 4 );
-        if ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING )
-        {
-            fEasingAmplitude = atof ( lua_tostring ( luaVM, 4 ) ); 
-
-            int iArgument5 = lua_type ( luaVM, 5 );
-            if ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING )
-            {
-                fEasingOvershoot = atof ( lua_tostring ( luaVM, 5 ) ); 
-            }
-        }
-    }
-
-    CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( szEasingType );
-    if ( easingType == CEasingCurve::EASING_INVALID )
-    {
-        m_pScriptDebugging->LogError ( luaVM, "getEasingValue - Unknown easing type '%s'", szEasingType);
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getEasingValue", *argStream.GetErrorMessage () ) );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -9521,63 +9445,30 @@ int CLuaFunctionDefinitions::GetEasingValue ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::InterpolateBetween ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    int iArgument7 = lua_type ( luaVM, 7 );
-    int iArgument8 = lua_type ( luaVM, 8 );
+//  float float float interpolateBetween ( float x1, float y1, float z1, 
+//      float x2, float y2, float z2, 
+//      float fProgress, string strEasingType, 
+//      [ float fEasingPeriod, float fEasingAmplitude, float fEasingOvershoot ] )
+    CVector vecPointA; CVector vecPointB;
+    float fProgress; CEasingCurve::eType easingType;
+    float fEasingPeriod; float fEasingAmplitude; float fEasingOvershoot;
 
-    if (    ( iArgument1 != LUA_TNUMBER && iArgument1 != LUA_TSTRING ) &&
-        ( iArgument2 != LUA_TNUMBER && iArgument2 != LUA_TSTRING ) &&
-        ( iArgument3 != LUA_TNUMBER && iArgument3 != LUA_TSTRING ) &&
-        ( iArgument4 != LUA_TNUMBER && iArgument4 != LUA_TSTRING ) &&
-        ( iArgument5 != LUA_TNUMBER && iArgument5 != LUA_TSTRING ) &&
-        ( iArgument6 != LUA_TNUMBER && iArgument6 != LUA_TSTRING ) &&
-        ( iArgument7 != LUA_TNUMBER && iArgument7 != LUA_TSTRING ) &&
-        ( iArgument8 != LUA_TSTRING ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecPointA.fX );
+    argStream.ReadNumber ( vecPointA.fY );
+    argStream.ReadNumber ( vecPointA.fZ );
+    argStream.ReadNumber ( vecPointB.fX );
+    argStream.ReadNumber ( vecPointB.fY );
+    argStream.ReadNumber ( vecPointB.fZ );
+    argStream.ReadNumber ( fProgress );
+    argStream.ReadEnumString ( easingType );
+    argStream.ReadNumber ( fEasingPeriod, 0.3f );
+    argStream.ReadNumber ( fEasingAmplitude, 1.0f );
+    argStream.ReadNumber ( fEasingOvershoot, 1.70158f );
+
+    if ( argStream.HasErrors () )
     {
-        m_pScriptDebugging->LogBadType ( luaVM, "interpolateBetween" );
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
-
-    CVector vecPointA ( static_cast < float > ( atof ( lua_tostring ( luaVM, 1 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 2 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 3 ) ) ) );
-    CVector vecPointB ( static_cast < float > ( atof ( lua_tostring ( luaVM, 4 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 5 ) ) ), static_cast < float > ( atof ( lua_tostring ( luaVM, 6 ) ) ) );
-
-    float fProgress = static_cast < float > ( atof ( lua_tostring ( luaVM, 7 ) ) );
-
-    const char* szEasingType = "Linear";
-    double fEasingPeriod = 0.3f;
-    double fEasingAmplitude = 1.0f;
-    double fEasingOvershoot = 1.70158f;
-
-    szEasingType = lua_tostring ( luaVM, 8 );
-
-    int iArgument9 = lua_type ( luaVM, 9 );
-    if ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING )
-    {
-        fEasingPeriod = atof ( lua_tostring ( luaVM, 9 ) ); 
-
-        int iArgument10 = lua_type ( luaVM, 10 );
-        if ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING )
-        {
-            fEasingAmplitude = atof ( lua_tostring ( luaVM, 10 ) ); 
-
-            int iArgument11 = lua_type ( luaVM, 11 );
-            if ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING )
-            {
-                fEasingOvershoot = atof ( lua_tostring ( luaVM, 11 ) ); 
-            }
-        }
-    }
-
-    CEasingCurve::eType easingType = CEasingCurve::GetEasingTypeFromString ( szEasingType );
-    if ( easingType == CEasingCurve::EASING_INVALID )
-    {
-        m_pScriptDebugging->LogError ( luaVM, "interpolateBetween - Unknown easing type '%s'", szEasingType);
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "interpolateBetween", *argStream.GetErrorMessage () ) );
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -9783,20 +9674,25 @@ int CLuaFunctionDefinitions::SetTimer ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::KillTimer ( lua_State* luaVM )
 {
-    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( luaMain )
+//  bool killTimer ( timer theTimer )
+    CLuaTimer* pLuaTimer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pLuaTimer );
+
+    if ( !argStream.HasErrors () )
     {
-        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
-        if ( pLuaTimer )
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
         {
             luaMain->GetTimerManager ()->RemoveTimer ( pLuaTimer );
 
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "killTimer" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "killTimer", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -9805,20 +9701,25 @@ int CLuaFunctionDefinitions::KillTimer ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::ResetTimer ( lua_State* luaVM )
 {
-    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( luaMain )
+//  bool resetTimer ( timer theTimer )
+    CLuaTimer* pLuaTimer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pLuaTimer );
+
+    if ( !argStream.HasErrors () )
     {
-        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
-        if ( pLuaTimer )
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
         {
             luaMain->GetTimerManager ()->ResetTimer ( pLuaTimer );
 
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "resetTimer" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "resetTimer", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -9827,15 +9728,16 @@ int CLuaFunctionDefinitions::ResetTimer ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::IsTimer ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  bool isTimer ( timer theTimer )
+    CLuaTimer* pLuaTimer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pLuaTimer );
+
+    if ( !argStream.HasErrors () )
     {
-        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
-        if ( pLuaTimer )
-        {
-            lua_pushboolean ( luaVM, pLuaMain->GetTimerManager ()->Exists ( pLuaTimer ) );
-            return 1;
-        }
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
 
     lua_pushboolean ( luaVM, false );
@@ -9845,23 +9747,28 @@ int CLuaFunctionDefinitions::IsTimer ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
 {
-    // Find our VM
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        unsigned long ulTime = 0;
-        int iArgument1 = lua_type ( luaVM, 1 );
-        if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
-        {
-            ulTime = static_cast < unsigned long > ( lua_tonumber ( luaVM, 1 ) );
-        }
-        // Create a new table
-        lua_newtable ( luaVM );
+//  table getTimers ( [ time ] )
+    int iTime;
 
-        // Add all the timers with less than ulTime left
-        pLuaMain->GetTimerManager ()->GetTimers ( ulTime, luaVM );
-        return 1;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( iTime, 0 );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Find our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            // Create a new table
+            lua_newtable ( luaVM );
+
+            // Add all the timers with less than ulTime left
+            pLuaMain->GetTimerManager ()->GetTimers ( iTime, luaVM );
+            return 1;
+        }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getTimers", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -9870,20 +9777,21 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetTimerDetails ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  int, int, int getTimerDetails ( timer theTimer )
+    CLuaTimer* pLuaTimer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pLuaTimer );
+
+    if ( !argStream.HasErrors () )
     {
-        CLuaTimer* pLuaTimer = lua_totimer ( luaVM, 1 );
-        if ( pLuaTimer )
-        {
-            lua_pushnumber( luaVM, pLuaTimer->GetTimeLeft () );
-            lua_pushnumber( luaVM, pLuaTimer->GetRepeats () );
-            lua_pushnumber( luaVM, pLuaTimer->GetDelay () );
-            return 3;
-        }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "getTimerDetails" );
+        lua_pushnumber( luaVM, pLuaTimer->GetTimeLeft () );
+        lua_pushnumber( luaVM, pLuaTimer->GetRepeats () );
+        lua_pushnumber( luaVM, pLuaTimer->GetDelay () );
+        return 3;
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getTimerDetails", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

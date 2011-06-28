@@ -87,7 +87,7 @@ public:
     void                        ResetWater                  ();
     void                        SetCloudsEnabled            ( bool bDisabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
-    bool                        AreInteriorSoundsEnabled    ();
+    bool                        GetInteriorSoundsEnabled    ();
     void                        SetInteriorSoundsEnabled    ( bool bEnabled );
     void                        SetWindVelocity             ( float fX, float fY, float fZ );
     void                        GetWindVelocity             ( float& fX, float& fY, float& fZ );

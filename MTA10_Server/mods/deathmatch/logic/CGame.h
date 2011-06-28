@@ -266,7 +266,7 @@ public:
     inline void                 GetHeatHaze                 ( SHeatHazeSettings& heatHazeSettings )         { heatHazeSettings = m_HeatHazeSettings; }
     inline void                 SetHeatHaze                 ( const SHeatHazeSettings& heatHazeSettings )   { m_HeatHazeSettings = heatHazeSettings; }
 
-    inline bool                 AreInteriorSoundsEnabled    ( void )        { return m_bInteriorSoundsEnabled; }
+    inline bool                 GetInteriorSoundsEnabled    ( void )        { return m_bInteriorSoundsEnabled; }
     inline void                 SetInteriorSoundsEnabled    ( bool bEnable )    { m_bInteriorSoundsEnabled = bEnable; }
 
     inline bool                 HasWaterColor               ( void )        { return m_bOverrideWaterColor; }

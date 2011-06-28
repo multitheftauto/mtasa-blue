@@ -1397,7 +1397,7 @@ void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
         MemPut < WORD > ( 0x60B4F6, 0x027C );
 }
 
-bool CMultiplayerSA::AreInteriorSoundsEnabled ( )
+bool CMultiplayerSA::GetInteriorSoundsEnabled ( )
 {
     return bInteriorSoundsEnabled;
 }

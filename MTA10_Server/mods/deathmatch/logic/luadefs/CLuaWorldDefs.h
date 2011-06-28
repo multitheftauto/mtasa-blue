@@ -40,7 +40,7 @@ public:
     static int      getJetpackMaxHeight                 ( lua_State* luaVM );
     static int      getHeatHaze                         ( lua_State* luaVM );
     static int      getSkyGradient                      ( lua_State* luaVM );
-    static int      areInteriorSoundsEnabled            ( lua_State* luaVM );
+    static int      getInteriorSoundsEnabled            ( lua_State* luaVM );
     static int      getRainLevel                        ( lua_State* luaVM );
     static int      getSunSize                          ( lua_State* luaVM );
     static int      getSunColor                         ( lua_State* luaVM );

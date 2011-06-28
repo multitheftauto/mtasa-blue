@@ -668,7 +668,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPickupType", CLuaFunctionDefs::SetPickupType );
 
     // Cam get funcs
-    CLuaCFunctions::AddFunction ( "getCameraView", CLuaFunctionDefs::GetCameraView );
+    CLuaCFunctions::AddFunction ( "getCameraViewMode", CLuaFunctionDefs::GetCameraViewMode );
     CLuaCFunctions::AddFunction ( "getCameraMatrix", CLuaFunctionDefs::GetCameraMatrix );
     CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaFunctionDefs::GetCameraTarget );
     CLuaCFunctions::AddFunction ( "getCameraInterior", CLuaFunctionDefs::GetCameraInterior );
@@ -680,7 +680,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setCameraInterior", CLuaFunctionDefs::SetCameraInterior );
     CLuaCFunctions::AddFunction ( "fadeCamera", CLuaFunctionDefs::FadeCamera );
     CLuaCFunctions::AddFunction ( "setCameraClip", CLuaFunctionDefs::SetCameraClip );
-    CLuaCFunctions::AddFunction ( "setCameraView", CLuaFunctionDefs::SetCameraView );
+    CLuaCFunctions::AddFunction ( "setCameraViewMode", CLuaFunctionDefs::SetCameraViewMode );
     CLuaCFunctions::AddFunction ( "setCameraGoggleEffect", CLuaFunctionDefs::SetCameraGoggleEffect );
 
     // Cursor funcs
@@ -867,7 +867,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefs::GetWaterColor );
     CLuaCFunctions::AddFunction ( "getJetpackMaxHeight", CLuaFunctionDefs::GetJetpackMaxHeight );
     CLuaCFunctions::AddFunction ( "getWindVelocity", CLuaFunctionDefs::GetWindVelocity );
-    CLuaCFunctions::AddFunction ( "areInteriorSoundsEnabled", CLuaFunctionDefs::AreInteriorSoundsEnabled );
+    CLuaCFunctions::AddFunction ( "getInteriorSoundsEnabled", CLuaFunctionDefs::GetInteriorSoundsEnabled );
     CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance );
     CLuaCFunctions::AddFunction ( "getFogDistance", CLuaFunctionDefs::GetFogDistance );
     CLuaCFunctions::AddFunction ( "getSunColor", CLuaFunctionDefs::GetSunColor );
