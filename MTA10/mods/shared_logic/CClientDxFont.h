@@ -20,5 +20,5 @@ public:
 
     // CClientDxFont methods
     CDxFontItem*            GetDxFontItem           ( void )                            { return (CDxFontItem*)m_pRenderItem; }
-    ID3DXFont*              GetD3DXFont             ( float& fScaleX, float& fScaleY );
+    ID3DXFont*              GetD3DXFont             ( void );
 };

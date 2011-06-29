@@ -31,18 +31,9 @@ CClientDxFont::CClientDxFont ( CClientManager* pManager, ElementID ID, CDxFontIt
 // CClientDxFont::GetD3DXFont
 //
 // Get D3DXFont for this custom font
-// May change the scale
 //
 ////////////////////////////////////////////////////////////////
-ID3DXFont* CClientDxFont::GetD3DXFont ( float& fScaleX, float& fScaleY )
+ID3DXFont* CClientDxFont::GetD3DXFont ( void )
 {
-    if ( fScaleX > 1.1f || fScaleY > 1.1f )
-    {
-        // Adjust scale to compensate for higher res font
-        fScaleX *= 0.25f;
-        if ( &fScaleX != &fScaleY )     // Check fScaleY is not the same variable
-            fScaleY *= 0.25f;
-        return GetDxFontItem ()->m_pFntBig;
-    }
     return GetDxFontItem ()->m_pFntNormal;
 }

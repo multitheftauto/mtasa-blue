@@ -888,9 +888,6 @@ void CRenderWareSA::BeginModelTextureWatch ( ushort usModelID, const char* szTex
     }
     else
     {
-        // This should not be possible at the moment
-        assert ( 0 );
-
         void* pD3DDataNew = *ppD3DData;
 
         // Refresh

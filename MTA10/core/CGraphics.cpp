@@ -101,7 +101,7 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
 
     // If no font was specified, use the default font
     if ( !pDXFont )
-    pDXFont = GetFont ();
+        pDXFont = GetFont ();
 
     // We're using a big font to keep it looking nice, so get the actual scale
     pDXFont = MaybeGetBigFont ( pDXFont, fScaleX, fScaleY );
@@ -673,43 +673,30 @@ bool CGraphics::LoadStandardDXFonts ( void )
     return true;
 }
 
-bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont )
+bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont )
 {
     int iLoaded = AddFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 );
 
     int iWeight = bBold ? FW_BOLD : FW_NORMAL;
-    ID3DXFont *pNewDXSmallFont = NULL;
-    ID3DXFont *pNewDXBigFont = NULL;
+    *ppD3DXFont = NULL;
 
     bool bSuccess = true;
     // Normal size
     if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight, 0, iWeight, 1,
         FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
-        &pNewDXSmallFont ) ) )
+        ppD3DXFont ) ) )
     {
         CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D font '%s'", strFontName.c_str() );
         bSuccess = false;
     }
 
-    // Big size (4x)
-    if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight*4, 0, iWeight, 1,
-        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
-        &pNewDXBigFont ) ) )
-    {
-        CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D big font '%s'", strFontName.c_str() );
-        bSuccess = false;
-    }
-    *pDXSmallFont = pNewDXSmallFont;
-    *pDXBigFont = pNewDXBigFont;
-
     return bSuccess && ( iLoaded == 1 );
 }
 
-bool CGraphics::DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont *pDXSmallFont, ID3DXFont *pDXBigFont )
+bool CGraphics::DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont *pD3DXFont )
 {
     bool bResult = RemoveFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 ) != 0;
-    SAFE_RELEASE( pDXSmallFont );
-    SAFE_RELEASE( pDXBigFont );
+    SAFE_RELEASE( pD3DXFont );
     return bResult;
 }
 

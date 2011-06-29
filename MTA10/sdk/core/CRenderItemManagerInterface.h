@@ -145,7 +145,6 @@ class CDxFontItem : public CRenderItem
 
     SString             m_strFullFilePath;
     ID3DXFont*          m_pFntNormal;
-    ID3DXFont*          m_pFntBig;
 };
 
 

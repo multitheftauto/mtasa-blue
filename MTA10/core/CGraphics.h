@@ -72,8 +72,8 @@ public:
     bool                LoadStandardDXFonts     ( void );
     bool                DestroyStandardDXFonts  ( void );
 
-    bool                LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont );
-    bool                DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pDXSmallFont, ID3DXFont* pDXBigFont );
+    bool                LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont );
+    bool                DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pD3DXFont );
 
     float               GetDXFontHeight         ( float fScale = 1.0f, ID3DXFont * pDXFont = NULL );
     float               GetDXCharacterWidth     ( char c, float fScale = 1.0f, ID3DXFont * pDXFont = NULL );

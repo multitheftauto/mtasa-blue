@@ -340,7 +340,7 @@ void CEffectWrap::ApplyCommonHandles ( void )
     {
         IDirect3DBaseTexture9* pD3DTexture;
         pDevice->GetTexture ( 1, &pD3DTexture );
-        pD3DEffect->SetTexture ( m_CommonHandles.hTexture0, pD3DTexture );
+        pD3DEffect->SetTexture ( m_CommonHandles.hTexture1, pD3DTexture );
     }
 
     // Set material
