@@ -477,7 +477,7 @@ bool CGUI_Impl::LoadImageset ( const SString& strFilename )
 {
     try
     {
-        return GetImageSetManager()->createImageset ( strFilename ) != NULL;
+        return GetImageSetManager()->createImageset ( strFilename, "", true ) != NULL;
     }
 	catch (CEGUI::AlreadyExistsException exc)
     {

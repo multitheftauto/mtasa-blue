@@ -105,7 +105,7 @@ public:
 
 	\exception AlreadyExistsException	Thrown if an Imageset named \a name is already present in the system.
 	*/
-	Imageset*	createImageset(const String& name, Texture* texture);
+	Imageset*	createImageset(const String& name, Texture* texture, bool bDestroyTextureManagedExternally = false);
 
 	/*!
 	\brief
@@ -124,7 +124,7 @@ public:
 	\exception	AlreadyExistsException	Thrown if an Imageset named \a name is already present in the system.
 	\exception	FileIOException			Thrown if something goes wrong while processing the file \a filename.
 	*/
-	Imageset*	createImageset(const String& filename, const String& resourceGroup = "");
+	Imageset*	createImageset(const String& filename, const String& resourceGroup = "", bool bDestroyTextureManagedExternally = false);
 
 
     /*!
@@ -147,7 +147,7 @@ public:
     \exception	AlreadyExistsException	Thrown if an Imageset named \a name is already present in the system.
     \exception	FileIOException			Thrown if something goes wrong while reading the image file \a filename.
     */
-    Imageset* createImagesetFromImageFile(const String& name, const String& filename, const String& resourceGroup = "");
+    Imageset* createImagesetFromImageFile(const String& name, const String& filename, const String& resourceGroup = "", bool bDestroyTextureManagedExternally = false);
 
 
 	/*!

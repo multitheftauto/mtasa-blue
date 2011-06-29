@@ -64,9 +64,9 @@ private:
 	/*************************************************************************
 		Friends to allow access to constructors and destructors
 	*************************************************************************/
-	friend Imageset*	ImagesetManager::createImageset(const String& name, Texture* texture);
-	friend Imageset*	ImagesetManager::createImageset(const String& filename, const String& resourceGroup);
-	friend Imageset*	ImagesetManager::createImagesetFromImageFile(const String& name, const String& filename, const String& resourceGroup);
+	friend Imageset*	ImagesetManager::createImageset(const String& name, Texture* texture, bool bDestroyTextureManagedExternally);
+	friend Imageset*	ImagesetManager::createImageset(const String& filename, const String& resourceGroup, bool bDestroyTextureManagedExternally);
+	friend Imageset*	ImagesetManager::createImagesetFromImageFile(const String& name, const String& filename, const String& resourceGroup, bool bDestroyTextureManagedExternally);
 	friend void			ImagesetManager::destroyImageset(const String& name);
 
 
@@ -81,7 +81,7 @@ private:
 	\param texture
 		Texture object that holds the imagery for the Imageset being created.
 	*/
-	Imageset(const String& name, Texture* texture);
+	Imageset(const String& name, Texture* texture, bool bDestroyTextureManagedExternally);
 
 
 	/*!
@@ -97,7 +97,7 @@ private:
 
 	\exception	FileIOException		thrown if something goes wrong while processing the file \a filename.
 	*/
-	Imageset(const String& filename, const String& resourceGroup);
+	Imageset(const String& filename, const String& resourceGroup, bool bDestroyTextureManagedExternally);
 
 
     /*!
@@ -125,7 +125,7 @@ private:
 
     \exception FileIOException thrown if something goes wrong while loading the image.
     */
-    Imageset(const String& name, const String& filename, const String& resourceGroup);
+    Imageset(const String& name, const String& filename, const String& resourceGroup, bool bDestroyTextureManagedExternally);
 
 
 public:	// For luabind support
@@ -581,6 +581,7 @@ protected:
 	float	d_vertScaling;			//!< current vertical scaling factor.
 	float	d_nativeHorzRes;		//!< native horizontal resolution for this Imageset.
 	float	d_nativeVertRes;		//!< native vertical resolution for this Imageset.
+    bool    d_bDestroyTextureManagedExternally; // MTA gui static images are destroyed by MTA. This is the flag for that.
 };
 
 } // End of  CEGUI namespace section

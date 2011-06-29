@@ -50,9 +50,10 @@ const char	Imageset::ImagesetSchemaName[]			= "Imageset.xsd";
 /*************************************************************************
 	constructor
 *************************************************************************/
-Imageset::Imageset(const String& name, Texture* texture) :
-	d_name(name),
-	d_texture(texture)
+Imageset::Imageset(const String& name, Texture* texture, bool bDestroyTextureManagedExternally) :
+    d_name(name),
+    d_texture(texture),
+    d_bDestroyTextureManagedExternally(bDestroyTextureManagedExternally)
 {
 	if (d_texture == NULL)
 	{
@@ -68,7 +69,8 @@ Imageset::Imageset(const String& name, Texture* texture) :
 /*************************************************************************
 	construct and initialise Imageset from the specified file.
 *************************************************************************/
-Imageset::Imageset(const String& filename, const String& resourceGroup)
+Imageset::Imageset(const String& filename, const String& resourceGroup, bool bDestroyTextureManagedExternally) :
+    d_bDestroyTextureManagedExternally(bDestroyTextureManagedExternally)
 {
 	// defaults for scaling options
 	d_autoScale = false;
@@ -79,8 +81,9 @@ Imageset::Imageset(const String& filename, const String& resourceGroup)
 }
 
 
-Imageset::Imageset(const String& name, const String& filename, const String& resourceGroup) :
-    d_name(name)
+Imageset::Imageset(const String& name, const String& filename, const String& resourceGroup, bool bDestroyTextureManagedExternally) :
+    d_name(name),
+    d_bDestroyTextureManagedExternally(bDestroyTextureManagedExternally)
 {
     // try to load the image file using the renderer
     d_texture =
@@ -236,7 +239,8 @@ void Imageset::unload(void)
 
 	// cleanup texture
     // MTA destroys textures manually
-	//System::getSingleton().getRenderer()->destroyTexture(d_texture);
+    if ( !d_bDestroyTextureManagedExternally )
+    	System::getSingleton().getRenderer()->destroyTexture(d_texture);
 	d_texture = NULL;
 }
 
