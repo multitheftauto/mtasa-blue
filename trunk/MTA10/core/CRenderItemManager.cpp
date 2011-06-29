@@ -555,6 +555,12 @@ bool CRenderItemManager::ApplyShaderItemToModelTexture ( CShaderItem* pShaderIte
     // Get current usage for the model/texture
     CShaderItem** ppCurrentUsage = GetShaderizedModelTextureUsage ( usModelID, strTextureName, true );
 
+    // Is it not changing?
+    if ( *ppCurrentUsage && pShaderItem == *ppCurrentUsage )
+    {
+        return true;
+    }
+
     // Is it changing?
     if ( *ppCurrentUsage && pShaderItem != *ppCurrentUsage )
     {

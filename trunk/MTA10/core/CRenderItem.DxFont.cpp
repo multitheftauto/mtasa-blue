@@ -52,7 +52,7 @@ void CDxFontItem::PreDestruct ( void )
 ////////////////////////////////////////////////////////////////
 bool CDxFontItem::IsValid ( void )
 {
-    return m_pFntNormal && m_pFntBig;
+    return m_pFntNormal != NULL;
 }
 
 
@@ -66,7 +66,6 @@ bool CDxFontItem::IsValid ( void )
 void CDxFontItem::OnLostDevice ( void )
 {
     m_pFntNormal->OnLostDevice ();
-    m_pFntBig->OnLostDevice ();
 }
 
 
@@ -80,7 +79,6 @@ void CDxFontItem::OnLostDevice ( void )
 void CDxFontItem::OnResetDevice ( void )
 {
     m_pFntNormal->OnResetDevice ();
-    m_pFntBig->OnResetDevice ();
 }
 
 
@@ -94,14 +92,13 @@ void CDxFontItem::OnResetDevice ( void )
 void CDxFontItem::CreateUnderlyingData ( uint uiSize, bool bBold )
 {
     assert ( !m_pFntNormal );
-    assert ( !m_pFntBig );
 
     uiSize = ( uiSize < 5 ) ? 5 : ( ( uiSize > 150 ) ? 150 : uiSize );
 
     // Create the D3DX fonts
     FONT_PROPERTIES sFontProps;
     if ( GetFontProperties ( LPCTSTR ( m_strFullFilePath.c_str () ), &sFontProps ) )
-        CCore::GetSingleton ().GetGraphics()->LoadAdditionalDXFont ( m_strFullFilePath, sFontProps.csName, static_cast < int > ( std::floor ( uiSize * 1.75f ) ), bBold, &m_pFntNormal, &m_pFntBig );
+        CCore::GetSingleton ().GetGraphics()->LoadAdditionalDXFont ( m_strFullFilePath, sFontProps.csName, static_cast < int > ( std::floor ( uiSize * 1.75f ) ), bBold, &m_pFntNormal );
 }
 
 
@@ -115,5 +112,5 @@ void CDxFontItem::CreateUnderlyingData ( uint uiSize, bool bBold )
 void CDxFontItem::ReleaseUnderlyingData ( void )
 {
     // Release the D3DX font data
-    CCore::GetSingleton ().GetGraphics()->DestroyAdditionalDXFont ( m_strFullFilePath, m_pFntBig, m_pFntNormal );
+    CCore::GetSingleton ().GetGraphics()->DestroyAdditionalDXFont ( m_strFullFilePath, m_pFntNormal );
 }

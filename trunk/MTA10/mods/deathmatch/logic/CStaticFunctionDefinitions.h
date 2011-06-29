@@ -306,7 +306,7 @@ public:
     static void                         DrawText                            ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI );
     static CClientDxFont*               CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold, const SString& strMetaPath, CResource* pResource );
     static CClientGuiFont*              CreateGuiFont                       ( const SString& strFullFilePath, uint uiSize, const SString& strMetaPath, CResource* pResource );
-    static ID3DXFont*                   ResolveD3DXFont                     ( const SString& strFontName, CClientDxFont* pDxFontElement, float& fScaleX, float& fScaleY );
+    static ID3DXFont*                   ResolveD3DXFont                     ( const SString& strFontName, CClientDxFont* pDxFontElement );
 
     // GUI funcs
     static bool                         GUIGetInputEnabled                  ( void );

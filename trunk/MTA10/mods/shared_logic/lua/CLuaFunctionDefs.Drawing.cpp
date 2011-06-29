@@ -165,7 +165,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         // Get DX font
-        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement, fScaleX, fScaleY );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement );
 
         // Make format flag
         ulong ulFormat = alignX | alignY;
@@ -334,7 +334,7 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement, fScale, fScale );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement );
 
         // Retrieve the longest line's extent
         std::stringstream ssText ( strText );
@@ -372,7 +372,7 @@ int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement, fScale, fScale );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement );
 
         float fHeight = g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, pD3DXFont );
         // Success
