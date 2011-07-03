@@ -1380,6 +1380,12 @@ void UpdateMTAVersionApplicationSetting ( void )
         if ( pfnGetNetRel )
             usNetRel = pfnGetNetRel ();
     }
+    else
+    {
+        SString strError = GetSystemErrorMessage ( GetLastError () );            
+        MessageBox ( 0, SString ( "Error loading %s module! (%s)", *strFilename.ToLower (), *strError ), "Error", MB_OK|MB_ICONEXCLAMATION );
+        BrowseToSolution ( strFilename + "-not-loadable", true, true );
+    }
 
     SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
                                 ,MTASA_VERSION_MAJOR
