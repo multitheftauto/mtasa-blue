@@ -179,26 +179,24 @@ class CEffectWrap : public CRenderItem
 {
     DECLARE_CLASS( CEffectWrap, CRenderItem )
                     CEffectWrap             ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
-    virtual void    PreDestruct             ( void );
-    virtual bool    IsValid                 ( void );
-    virtual void    OnLostDevice            ( void );
-    virtual void    OnResetDevice           ( void );
-    void            CreateUnderlyingData    ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
-    void            ReleaseUnderlyingData   ( void );
-    void            ApplyCommonHandles      ( void );
+    virtual void    ApplyCommonHandles      ( void ) = 0;
+    virtual void    ApplyMappedHandles      ( void ) = 0;
+    virtual void    ReadParameterHandles    ( void ) = 0;
 
     ID3DXEffect*    m_pD3DEffect;
     D3DXHANDLE      hWorld, hView, hProjection, hWorldView, hWorldViewProj;
     D3DXHANDLE      hViewProj, hViewInv, hWorldInvTr, hViewInvTr;
     D3DXHANDLE      hCamPos, hCamDir;
     D3DXHANDLE      hTime;
-    D3DXHANDLE      hMaterialAmbient, hMaterialDiffuse, hMaterialEmissive, hMaterialSpecular, hMaterialSpecPower;
-    D3DXHANDLE      hGlobalAmbient;
     D3DXHANDLE      hLightAmbient, hLightDiffuse, hLightSpecular, hLightDirection;
-    D3DXHANDLE      hTexture0, hTexture1;
+
+    std::map < SString, D3DXHANDLE > m_texureHandleMap;
+    std::map < SString, D3DXHANDLE > m_valueHandleMap;
+    D3DXHANDLE      m_hFirstTexture;
+    bool            m_bRequiresNormals;
 };
 
+CEffectWrap* NewEffectWrap ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -238,9 +236,6 @@ class CShaderItem : public CMaterialItem
     void            RenewShaderInstance     ( void );
 
     CEffectWrap*        m_pEffectWrap;
-    std::map < SString, D3DXHANDLE > m_texureHandleMap;
-    std::map < SString, D3DXHANDLE > m_valueHandleMap;
-    D3DXHANDLE          m_hFirstTexture;
 
     // This is used as the current render material
     // If the shader wants to change a parameter, and the instance is refed by something else, then the shader must clone a new instance for itself

@@ -337,6 +337,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\CAdditionalVertexStreamManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CChat.cpp"
 				>
 			</File>
@@ -542,6 +546,10 @@
 			</File>
 			<File
 				RelativePath="CProxyDirect3DDevice9.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DVertexBuffer.cpp"
 				>
 			</File>
 			<File
@@ -786,6 +794,10 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
+				RelativePath=".\CAdditionalVertexStreamManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CChat.h"
 				>
 			</File>
@@ -979,6 +991,10 @@
 			</File>
 			<File
 				RelativePath=".\CProxyDirect3DDevice9.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CProxyDirect3DVertexBuffer.h"
 				>
 			</File>
 			<File

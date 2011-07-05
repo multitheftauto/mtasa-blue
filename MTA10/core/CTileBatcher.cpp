@@ -166,6 +166,8 @@ void CTileBatcher::Flush ( void )
             pShaderInstance->ApplyShaderParameters ();
             // Apply common parameters
             pShaderInstance->m_pEffectWrap->ApplyCommonHandles ();
+            // Apply mapped parameters
+            pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
             // Do shader passes
             DWORD dwFlags = 0;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
