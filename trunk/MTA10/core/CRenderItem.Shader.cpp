@@ -93,8 +93,7 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SStri
     assert ( !m_pShaderInstance );
 
 
-    m_pEffectWrap = new CEffectWrap ();
-    m_pEffectWrap->PostConstruct ( m_pManager, strFilename, strRootPath, strOutStatus, bDebug );
+    m_pEffectWrap = NewEffectWrap ( m_pManager, strFilename, strRootPath, strOutStatus, bDebug );
 
     if ( !m_pEffectWrap->IsValid () )
     {
@@ -102,31 +101,7 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SStri
         return;
     }
 
-
-    // Add parameter handles
-    D3DXEFFECT_DESC EffectDesc;
-    m_pEffectWrap->m_pD3DEffect->GetDesc( &EffectDesc );
-    for ( uint i = 0 ; i < EffectDesc.Parameters ; i++ )
-    {
-        D3DXHANDLE hParameter = m_pEffectWrap->m_pD3DEffect->GetParameter ( NULL, i );
-        if ( !hParameter )
-            break;
-        D3DXPARAMETER_DESC Desc;
-        m_pEffectWrap->m_pD3DEffect->GetParameterDesc( hParameter, &Desc );
-        // Use semantic if it exists
-        SString strName = Desc.Semantic ? Desc.Semantic : Desc.Name;
-        // Add to correct lookup map
-        if ( Desc.Type == D3DXPT_TEXTURE )
-        {
-            // Keep handle to first texture to get size of shader
-            if ( !m_hFirstTexture )
-                m_hFirstTexture = hParameter;
-            MapSet ( m_texureHandleMap, strName.ToUpper (), hParameter );
-        }
-        else
-            MapSet ( m_valueHandleMap, strName.ToUpper (), hParameter );
-    }
-
+    m_pEffectWrap->ReadParameterHandles ();
 
     struct
     {
@@ -145,18 +120,10 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SStri
         m_pEffectWrap->hCamPos, "CAMERAPOSITION",
         m_pEffectWrap->hCamDir, "CAMERADIRECTION",
         m_pEffectWrap->hTime, "TIME",
-        m_pEffectWrap->hMaterialAmbient, "MATERIALAMBIENT",
-        m_pEffectWrap->hMaterialDiffuse, "MATERIALDIFFUSE",
-        m_pEffectWrap->hMaterialEmissive, "MATERIALEMISSIVE",
-        m_pEffectWrap->hMaterialSpecular, "MATERIALSPECULAR",
-        m_pEffectWrap->hMaterialSpecPower, "MATERIALSPECULARPOWER",
-        m_pEffectWrap->hGlobalAmbient, "GLOBALAMBIENT",
         m_pEffectWrap->hLightAmbient, "LIGHTAMBIENT",
         m_pEffectWrap->hLightDiffuse, "LIGHTDIFFUSE",
         m_pEffectWrap->hLightSpecular, "LIGHTSPECULAR",
         m_pEffectWrap->hLightDirection, "LIGHTDIRECTION",
-        m_pEffectWrap->hTexture0, "TEXTURE0",
-        m_pEffectWrap->hTexture1, "TEXTURE1",
     };
 
     for ( uint h = 0 ; h < NUMELMS( handleNames ) ; h++ )
@@ -166,9 +133,9 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SStri
         D3DXHANDLE* phHandle = NULL;
         for ( uint n = 0 ; n < parts.size () && phHandle == NULL ; n++ )
         {
-            phHandle = MapFind ( m_valueHandleMap, parts[n] );
+            phHandle = MapFind ( m_pEffectWrap->m_valueHandleMap, parts[n] );
             if ( !phHandle )
-                phHandle = MapFind ( m_texureHandleMap, parts[n] );
+                phHandle = MapFind ( m_pEffectWrap->m_texureHandleMap, parts[n] );
         }
         handleNames[h].hHandle = phHandle ? *phHandle : NULL;
     }
@@ -201,7 +168,7 @@ void CShaderItem::ReleaseUnderlyingData ( void )
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::SetValue ( const SString& strName, CTextureItem* pTextureItem )
 {
-    if ( D3DXHANDLE* phParameter = MapFind ( m_texureHandleMap, strName.ToUpper () ) )
+    if ( D3DXHANDLE* phParameter = MapFind ( m_pEffectWrap->m_texureHandleMap, strName.ToUpper () ) )
     {
         // Check if value is changing
         if ( !m_pShaderInstance->CmpTextureValue( *phParameter, pTextureItem ) )
@@ -209,7 +176,7 @@ bool CShaderItem::SetValue ( const SString& strName, CTextureItem* pTextureItem 
             // Check if we need a new shader instance
             MaybeRenewShaderInstance ();
     
-            if ( *phParameter == m_hFirstTexture )
+            if ( *phParameter == m_pEffectWrap->m_hFirstTexture )
             {
                 // Mirror size of first texture declared in effect file
                 m_uiSizeX = pTextureItem->m_uiSizeX;
@@ -235,7 +202,7 @@ bool CShaderItem::SetValue ( const SString& strName, CTextureItem* pTextureItem 
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::SetValue ( const SString& strName, bool bValue )
 {
-    if ( D3DXHANDLE* phParameter = MapFind ( m_valueHandleMap, strName.ToUpper () ) )
+    if ( D3DXHANDLE* phParameter = MapFind ( m_pEffectWrap->m_valueHandleMap, strName.ToUpper () ) )
     {
         // Check if value is changing
         if ( !m_pShaderInstance->CmpBoolValue( *phParameter, bValue ) )
@@ -259,7 +226,7 @@ bool CShaderItem::SetValue ( const SString& strName, bool bValue )
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::SetValue ( const SString& strName, const float* pfValues, uint uiCount )
 {
-    if ( D3DXHANDLE* phParameter = MapFind ( m_valueHandleMap, strName.ToUpper () ) )
+    if ( D3DXHANDLE* phParameter = MapFind ( m_pEffectWrap->m_valueHandleMap, strName.ToUpper () ) )
     {
         // Check if value is changing
         if ( !m_pShaderInstance->CmpFloatsValue( *phParameter, pfValues, uiCount ) )

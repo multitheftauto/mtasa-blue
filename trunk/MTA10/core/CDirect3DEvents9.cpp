@@ -15,6 +15,8 @@
 #include "StdInc.h"
 #define DECLARE_PROFILER_SECTION_CDirect3DEvents9
 #include "profiler/SharedUtil.Profiler.h"
+#include "CProxyDirect3DVertexBuffer.h"
+#include "CAdditionalVertexStreamManager.h"
 
 #include <stdexcept>
 
@@ -22,7 +24,6 @@
 static IDirect3DSurface9*  ms_pSaveLockSurface  = NULL;
 static int                 ms_bSaveStarted      = 0;
 static long long           ms_LastSaveTime      = 0;
-static void*               ms_LastSetTextures[4] = { NULL, NULL, NULL, NULL };
 
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
@@ -31,6 +32,8 @@ void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
 
     // Create the GUI manager
     CCore::GetSingleton ( ).InitGUI ( pDevice );
+
+    CAdditionalVertexStreamManager::GetSingleton ()->OnDeviceCreate ( pDevice );
 
     // Create all our fonts n stuff
     CGraphics::GetSingleton ().OnDeviceCreate ( pDevice );
@@ -208,20 +211,17 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 }
 
 
-HRESULT CDirect3DEvents9::OnSetTexture ( IDirect3DDevice9 *pDevice, DWORD Stage, IDirect3DBaseTexture9* pTexture )
-{
-    // Save texture pointer for later
-    if ( Stage < NUMELMS( ms_LastSetTextures ) )
-        ms_LastSetTextures [ Stage ] = pTexture;
-
-    return pDevice->SetTexture ( Stage, pTexture );
-}
-
-
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::OnDrawIndexedPrimitive
+//
+// May change render states for custom renderings
+//
+/////////////////////////////////////////////////////////////
 HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
     // Any shader for this texture ?
-    CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( ms_LastSetTextures[0] );
+    CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( g_pDeviceState->TextureState[0].Texture );
 
     if ( !pShaderItem )
     {
@@ -233,10 +233,19 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         // Yes shader for this texture
         CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
 
+        // Add normal stream if shader wants it
+        if ( pShaderInstance->m_pEffectWrap->m_bRequiresNormals )
+        {
+            // Find/create/set additional vertex stream
+            CAdditionalVertexStreamManager::GetSingleton ()->MaybeSetAdditionalVertexStream ( PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+        }
+
         // Apply custom parameters
         pShaderInstance->ApplyShaderParameters ();
         // Apply common parameters
         pShaderInstance->m_pEffectWrap->ApplyCommonHandles ();
+        // Apply mapped parameters
+        pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
@@ -252,6 +261,59 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
             pD3DEffect->EndPass ();
         }
         pD3DEffect->End ();
+
+        // Unset additional vertex stream
+        CAdditionalVertexStreamManager::GetSingleton ()->MaybeUnsetAdditionalVertexStream ();
+
         return D3D_OK;
     }
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::CreateVertexBuffer
+//
+// Creates a proxy object for the new vertex buffer
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::CreateVertexBuffer ( IDirect3DDevice9 *pDevice, UINT Length,DWORD Usage,DWORD FVF,D3DPOOL Pool,IDirect3DVertexBuffer9** ppVertexBuffer,HANDLE* pSharedHandle )
+{
+    HRESULT hr;
+
+    // We may have to look at the contents to generate normals (Not needed for dynamic buffers)
+    if ( ( Usage & D3DUSAGE_DYNAMIC ) == 0 )
+        Usage &= -1 - D3DUSAGE_WRITEONLY;
+
+    hr = pDevice->CreateVertexBuffer ( Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle );
+    if ( FAILED(hr) )
+        return hr;
+
+    // Create proxy
+	*ppVertexBuffer = new CProxyDirect3DVertexBuffer ( pDevice, *ppVertexBuffer, Length, Usage, FVF, Pool );
+    return hr;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::SetStreamSource
+//
+// Ensures the correct object gets sent to D3D
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::SetStreamSource(IDirect3DDevice9 *pDevice, UINT StreamNumber,IDirect3DVertexBuffer9* pStreamData,UINT OffsetInBytes,UINT Stride)
+{
+	if( pStreamData )
+	{
+        // See if it's a proxy
+	    CProxyDirect3DVertexBuffer* pProxy = NULL;
+        pStreamData->QueryInterface ( CProxyDirect3DVertexBuffer_GUID, (void**)&pProxy );
+
+        // If so, use the original vertex buffer
+        if ( pProxy )
+            pStreamData = pProxy->GetOriginal ();
+    }
+
+	return pDevice->SetStreamSource( StreamNumber, pStreamData, OffsetInBytes, Stride );
 }
