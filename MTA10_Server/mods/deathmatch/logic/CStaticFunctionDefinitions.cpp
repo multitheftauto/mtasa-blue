@@ -1853,16 +1853,20 @@ bool CStaticFunctionDefinitions::SetPlayerName ( CElement* pElement, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::DetonatePlayerSatchels ( CPlayer* pPlayer )
+bool CStaticFunctionDefinitions::DetonateSatchels ( CElement* pElement )
 {
+    RUN_CHILDREN DetonateSatchels ( *iter );
+
     // Tell everyone
+    CPlayer* pPlayer = static_cast<CPlayer *>( pElement );
     CDetonateSatchelsPacket Packet;
     if ( pPlayer && pPlayer->IsJoined () )
     {
         Packet.SetSourceElement ( pPlayer );
         m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+        return true;
     }
-    return true;
+    return false;
 }
 
 
