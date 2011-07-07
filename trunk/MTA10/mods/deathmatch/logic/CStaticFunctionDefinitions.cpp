@@ -1346,6 +1346,14 @@ bool CStaticFunctionDefinitions::SetElementModel ( CClientEntity& Entity, unsign
             Object.SetModel ( usModel );
             break;
         }
+        case CCLIENTPROJECTILE:
+        {
+                CClientProjectile& Projectile = static_cast < CClientProjectile& > ( Entity );
+                if ( Projectile.GetModelInfo()->GetModel() == usModel ) return false;
+                if ( !CClientObjectManager::IsValidModel ( usModel ) ) return false;
+                Projectile.SetModel ( usModel );
+                break;
+        }
         default: return false;
     }
     return true;
