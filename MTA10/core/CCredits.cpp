@@ -172,6 +172,7 @@ CCredits::CCredits ( void )
     m_pButtonOK->SetPosition ( CVector2D ( 0.77f, 0.90f ), true );
     m_pButtonOK->SetSize ( CVector2D ( 112.0f, 21.0f ) );       // relative 0.20, 0.07
     m_pButtonOK->SetVisible ( true );
+    m_pButtonOK->SetAlwaysOnTop ( true );
 
     // Set up the event handlers
     m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CCredits::OnOKButtonClick, this ) );
