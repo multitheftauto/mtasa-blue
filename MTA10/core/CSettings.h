@@ -110,6 +110,10 @@ public:
     void                UpdateCaptureAxis       ();
     void                UpdateJoypadTab         ();
 
+    void                UpdateAudioTab          ();
+
+    void                UpdateVideoTab          ( bool bIsVideoModeChanged = false );
+
     void                AddKeyBindSection       ( char * szSectionName );
     void                RemoveKeyBindSection    ( char * szSectionName );
     void                RemoveAllKeyBindSections ( void );
@@ -159,6 +163,7 @@ protected:
     CGUILabel*          m_pStreamingMemoryLabel;
     CGUIScrollBar*      m_pStreamingMemory;
     CGUILabel*          m_pStreamingMemoryValueLabel;
+    CGUIButton*         m_pVideoDefButton;
 
     CGUILabel*          m_pAsyncLabelInfo;
     CGUILabel*          m_pAsyncLabel;
@@ -196,6 +201,7 @@ protected:
     CGUICheckBox*       m_pCheckBoxUserAutoscan;
     CGUILabel*          m_pLabelUserTrackMode;
     CGUIComboBox*       m_pComboUsertrackMode;
+    CGUIButton*         m_pAudioDefButton;
 
     CGUIGridList*       m_pBindsList;
     CGUIButton*         m_pBindsDefButton;
@@ -263,8 +269,10 @@ protected:
 
     bool                OnJoypadTextChanged     ( CGUIElement* pElement );
     bool                OnAxisSelectClick       ( CGUIElement* pElement );
+    bool                OnAudioDefaultClick     ( CGUIElement* pElement );
     bool                OnJoypadDefaultClick    ( CGUIElement* pElement );
     bool                OnBindsDefaultClick     ( CGUIElement* pElement );
+    bool                OnVideoDefaultClick     ( CGUIElement* pElement );
     bool                OnBindsListClick        ( CGUIElement* pElement );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
