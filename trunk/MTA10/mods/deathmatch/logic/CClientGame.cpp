@@ -4613,6 +4613,8 @@ void CClientGame::ResetMapInfo ( void )
         short sVoiceType, sVoiceID;
         m_pLocalPlayer->GetModelInfo ()->GetVoice ( &sVoiceType, &sVoiceID );
         m_pLocalPlayer->SetVoice ( sVoiceType, sVoiceID );
+
+        m_pLocalPlayer->DestroySatchelCharges( false, true );
     }
 }
 
