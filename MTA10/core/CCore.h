@@ -220,6 +220,8 @@ public:
     void                    SetCurrentServer                ( in_addr Addr, unsigned short usQueryPort );
     void                    SetXfireData                    ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount );
 
+    void                    OnPreHUDRender                  ( void );
+
 private:
     // Core devices.
     CXML*                       m_pXML;

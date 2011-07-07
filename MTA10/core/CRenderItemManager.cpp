@@ -330,27 +330,10 @@ void CRenderItemManager::UpdateBackBufferCopy ( void )
     // Do this here for now
     CCore::GetSingleton ().GetGame ()->GetRenderWare ()->PulseModelTextureWatch ();
 
-    // Update our info about what rendertarget is active
-    IDirect3DSurface9* pActiveD3DRenderTarget;
-    IDirect3DSurface9* pActiveD3DZStencilSurface;
-    m_pDevice->GetRenderTarget ( 0, &pActiveD3DRenderTarget );
-    m_pDevice->GetDepthStencilSurface ( &pActiveD3DZStencilSurface );
-
-    if ( pActiveD3DRenderTarget != m_pDefaultD3DRenderTarget
-        || pActiveD3DZStencilSurface != m_pDefaultD3DZStencilSurface )
-    {
-        m_pDefaultD3DRenderTarget = pActiveD3DRenderTarget;
-        m_pDefaultD3DZStencilSurface = pActiveD3DZStencilSurface;
-    }
-
-    // Don't hold any refs because it goes all funny during fullscreen minimize/maximize, even if they are released at onLostDevice
-    SAFE_RELEASE ( pActiveD3DRenderTarget )
-    SAFE_RELEASE ( pActiveD3DZStencilSurface )
-
     if ( m_bBackBufferCopyMaybeNeedsResize )
         UpdateBackBufferCopySize ();
 
-    // Don't bother doing this unless at least one screen stream in active
+    // Don't bother doing this unless at least one screen source in active
     if ( !m_pBackBufferCopy )
         return;
 
@@ -451,6 +434,32 @@ bool CRenderItemManager::SetRenderTarget ( CRenderTargetItem* pItem, bool bClear
 
     if ( bClear )
         m_pDevice->Clear ( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
+
+    return true;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::SaveDefaultRenderTarget
+//
+// Save current render target as the default one
+//
+////////////////////////////////////////////////////////////////
+bool CRenderItemManager::SaveDefaultRenderTarget ( void )
+{
+    // Update our info about what rendertarget is active
+    IDirect3DSurface9* pActiveD3DRenderTarget;
+    IDirect3DSurface9* pActiveD3DZStencilSurface;
+    m_pDevice->GetRenderTarget ( 0, &pActiveD3DRenderTarget );
+    m_pDevice->GetDepthStencilSurface ( &pActiveD3DZStencilSurface );
+
+    m_pDefaultD3DRenderTarget = pActiveD3DRenderTarget;
+    m_pDefaultD3DZStencilSurface = pActiveD3DZStencilSurface;
+
+    // Don't hold any refs because it goes all funny during fullscreen minimize/maximize, even if they are released at onLostDevice
+    SAFE_RELEASE ( pActiveD3DRenderTarget )
+    SAFE_RELEASE ( pActiveD3DZStencilSurface )
 
     return true;
 }

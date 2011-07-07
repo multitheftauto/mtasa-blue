@@ -223,6 +223,15 @@ void CClient::PreFrameExecutionHandler ( void )
 }
 
 
+void CClient::PreHUDRenderExecutionHandler ( void )
+{
+    if ( g_pClientGame )
+    {
+        g_pClientGame->DoPulsePreHUDRender ();
+    }
+}
+
+
 void CClient::PostFrameExecutionHandler ( void )
 {
     // If the client modification is loaded, pulse it

@@ -126,6 +126,8 @@ public:
     virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 ) = 0;
     virtual void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 ) = 0;
     virtual void                    EnsureFrameRateLimitApplied     ( void ) = 0;
+
+    virtual void                    OnPreHUDRender                  ( void ) = 0;
 };
 
 #endif

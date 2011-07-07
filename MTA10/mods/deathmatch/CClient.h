@@ -27,6 +27,7 @@ public:
     void        ClientShutdown                  ( void );  
 
     void        PreFrameExecutionHandler        ( void );
+    void        PreHUDRenderExecutionHandler    ( void );
     void        PostFrameExecutionHandler       ( void );
 
     bool        ProcessCommand                  ( const char* szCommandLine );
