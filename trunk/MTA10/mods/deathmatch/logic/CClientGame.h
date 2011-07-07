@@ -186,6 +186,7 @@ public:
     inline bool                         IsLocalGame                     ( ) const { return m_bLocalPlay; }
 
     void                                DoPulsePreFrame                 ( void );
+    void                                DoPulsePreHUDRender             ( void );
     void                                DoPulsePostFrame                ( void );
     void                                DoPulses                        ( void );
 

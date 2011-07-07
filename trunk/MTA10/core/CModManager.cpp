@@ -258,6 +258,15 @@ void CModManager::DoPulsePreFrame ( void )
 }
 
 
+void CModManager::DoPulsePreHUDRender ( void )
+{
+    if ( m_pClientBase )
+    {
+        m_pClientBase->PreHUDRenderExecutionHandler ();
+    }
+}
+
+
 void CModManager::DoPulsePostFrame ( void )
 {
     // Load/unload requested?

@@ -110,9 +110,6 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
     pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
 
-    // Maybe capture screen
-    CGraphics::GetSingleton ().GetRenderItemManager ()->UpdateBackBufferCopy ();
-
     // Notify core
     CCore::GetSingleton ().DoPostFramePulse ();
 

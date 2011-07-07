@@ -34,6 +34,7 @@ public:
     virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, bool bValue );
     virtual bool                SetShaderValue                      ( CShaderItem* pItem, const SString& strName, const float* pfValues, uint uiCount );
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear );
+    virtual bool                SaveDefaultRenderTarget             ( void );
     virtual bool                RestoreDefaultRenderTarget          ( void );
     virtual void                UpdateBackBufferCopy                ( void );
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem );

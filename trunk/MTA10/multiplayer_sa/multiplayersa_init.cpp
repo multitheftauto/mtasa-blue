@@ -18,6 +18,7 @@
 CGame* pGameInterface = 0;
 CMultiplayerSA* pMultiplayer = 0;
 CNet* g_pNet = NULL;
+CCoreInterface* g_pCore = NULL;
 
 //-----------------------------------------------------------
 // This function uses the initialized data sections of the executables
@@ -30,6 +31,7 @@ CMultiplayer* InitMultiplayerInterface(CCoreInterface* pCore)
     // set the internal pointer to the game class
     pGameInterface = pCore->GetGame ();
     g_pNet = pCore->GetNetwork ();
+    g_pCore = pCore;
     assert ( pGameInterface );
     assert ( g_pNet );
 
@@ -52,4 +54,9 @@ void MemSet ( void* dwDest, int cValue, uint uiAmount )
 void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount )
 {
     memcpy ( dwDest, dwSrc, uiAmount );
+}
+
+void OnPreHUDRender ( void )
+{
+    g_pCore->OnPreHUDRender ();  
 }

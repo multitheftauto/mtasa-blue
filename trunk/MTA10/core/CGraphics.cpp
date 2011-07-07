@@ -1091,8 +1091,14 @@ void CGraphics::RemoveQueueRef ( CRenderItem* pRenderItem )
 // Entering or leaving a section where the rendertarget can be changed from script
 void CGraphics::EnableSetRenderTarget ( bool bEnable )
 {
+    // Must be changing
+    assert ( m_bSetRenderTargetEnabled != bEnable );
+
     if ( !bEnable )
         m_pRenderItemManager->RestoreDefaultRenderTarget ();
+    else
+        m_pRenderItemManager->SaveDefaultRenderTarget ();
+
     m_bSetRenderTargetEnabled = bEnable;
 }
 

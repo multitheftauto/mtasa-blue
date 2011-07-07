@@ -247,6 +247,9 @@ DWORD RETURN_CHandlingData_isNotFWD =               0x6A04C3;
 #define CALL_CBike_ProcessEntityCollision2                  0x6BE0D1
 #define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
 
+#define HOOKPOS_PreHUDRender                                      0x053EAD8
+DWORD RETURN_PreHUDRender =                                       0x053EADD;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -384,6 +387,7 @@ void HOOK_VehColCB ();
 void HOOK_VehCol ();
 void HOOK_isVehDriveTypeNotRWD ();
 void HOOK_isVehDriveTypeNotFWD ();
+void HOOK_PreHUDRender();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
@@ -530,6 +534,7 @@ void CMultiplayerSA::InitHooks()
     }
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
+    HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
 
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7 );
@@ -5409,5 +5414,28 @@ void _declspec(naked) HOOK_ProcessVehicleCollision ()
 
         pop eax
         ret
+    }
+}
+
+
+void OnPreHUDRender ( void );
+
+void _declspec(naked) HOOK_PreHUDRender ()
+{
+    _asm
+    {
+        pushad
+    }
+        //call PreHUDRender
+    OnPreHUDRender ();
+
+    _asm
+    {
+        popad
+
+        // Hooked from 0053EAD8  5 bytes
+        mov     eax, ds:0B6F0B8h
+
+        jmp     RETURN_PreHUDRender  // 0053EADD
     }
 }

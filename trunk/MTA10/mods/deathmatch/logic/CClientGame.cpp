@@ -712,6 +712,19 @@ void CClientGame::SendVoiceData ( const unsigned char * pData, int len )
 #endif
 
 
+void CClientGame::DoPulsePreHUDRender ( void )
+{
+    // Allow scripted dxSetRenderTarget
+    g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
+
+    // Call onClientHUDRender LUA event
+    CLuaArguments Arguments;
+    m_pRootEntity->CallEvent ( "onClientHUDRender", Arguments, false );
+
+    // Disallow scripted dxSetRenderTarget
+    g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
+}
+
 void CClientGame::DoPulsePostFrame ( void )
 {
     #ifdef DEBUG_KEYSTATES
@@ -1061,14 +1074,14 @@ void CClientGame::DoPulses ( void )
         // Get rid of deleted GUI elements
         g_pCore->GetGUI ()->CleanDeadPool ();
 
-        // Allow scripted setRenderTarget
+        // Allow scripted dxSetRenderTarget
         g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
 
         // Call onClientRender LUA event
         CLuaArguments Arguments;
         m_pRootEntity->CallEvent ( "onClientRender", Arguments, false );
 
-        // Disallow scripted setRenderTarget
+        // Disallow scripted dxSetRenderTarget
         g_pCore->GetGraphics ()->EnableSetRenderTarget ( false );
 
         // Ensure replaced/restored textures for models in the GTA map are correct
@@ -2633,6 +2646,7 @@ void CClientGame::AddBuiltInEvents ( void )
 
     // Game events
     m_Events.AddEvent ( "onClientPreRender", "", NULL, false );
+    m_Events.AddEvent ( "onClientHUDRender", "", NULL, false );
     m_Events.AddEvent ( "onClientRender", "", NULL, false );
 
     // Cursor events
