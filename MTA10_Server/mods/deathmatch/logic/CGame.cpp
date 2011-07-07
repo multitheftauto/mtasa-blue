@@ -2083,15 +2083,12 @@ void CGame::Packet_DetonateSatchels ( CDetonateSatchelsPacket& Packet )
 {
     // Grab the source player
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
-    if ( pPlayer && pPlayer->IsJoined () && pPlayer->GetWeaponType( 12 ) == 40 )
+    if ( pPlayer && pPlayer->IsJoined () )
     {
-        if ( pPlayer->IsSpawned () && !pPlayer->IsDead () )
-        {
-            // Tell everyone to blow up this guy's satchels
-            m_pPlayerManager->BroadcastOnlyJoined ( Packet );
-            //Take away their detonator
-            CStaticFunctionDefinitions::TakeWeapon( pPlayer, 40 );
-        }
+        // Tell everyone to blow up this guy's satchels
+        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+        //Take away their detonator
+        CStaticFunctionDefinitions::TakeWeapon( pPlayer, 40 );
     }
 }
 

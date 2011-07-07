@@ -189,6 +189,8 @@ public:
     // Ped funcs
     LUA_DECLARE ( CreatePed );
 
+    LUA_DECLARE ( DetonateSatchels );
+
     LUA_DECLARE ( GetPedVoice );
     LUA_DECLARE ( SetPedVoice );
     LUA_DECLARE ( GetPedTarget );

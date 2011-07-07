@@ -3457,6 +3457,24 @@ bool CStaticFunctionDefinitions::CreateExplosion ( CVector& vecPosition, unsigne
     return true;
 }
 
+bool CStaticFunctionDefinitions::DetonateSatchels ( void )
+{
+    CClientPlayer *pLocalPlayer = GetLocalPlayer ();
+    // does the local player exist and if so does he have any projectiles to destroy?
+    if ( pLocalPlayer && pLocalPlayer->CountProjectiles ( WEAPONTYPE_REMOTE_SATCHEL_CHARGE ) > 0 )
+    {
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+        if ( pBitStream )
+        {
+            g_pNet->SendPacket ( PACKET_ID_DETONATE_SATCHELS, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+            g_pNet->DeallocateNetBitStream ( pBitStream );
+            return true;
+        }
+    }
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::CreateFire ( CVector& vecPosition, float fSize )
 {
     return g_pGame->GetFireManager ()->StartFire ( vecPosition, fSize ) != NULL;
