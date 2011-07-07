@@ -1853,6 +1853,18 @@ bool CStaticFunctionDefinitions::SetPlayerName ( CElement* pElement, const char*
     return false;
 }
 
+bool CStaticFunctionDefinitions::DetonatePlayerSatchels ( CPlayer* pPlayer )
+{
+    // Tell everyone
+    CDetonateSatchelsPacket Packet;
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        Packet.SetSourceElement ( pPlayer );
+        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+    }
+    return true;
+}
+
 
 CPed* CStaticFunctionDefinitions::CreatePed ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation, bool bSynced )
 {
@@ -7291,7 +7303,6 @@ bool CStaticFunctionDefinitions::CreateExplosion ( const CVector& vecPosition, u
     m_pPlayerManager->BroadcastOnlyJoined ( Packet );
     return true;
 }
-
 
 bool CStaticFunctionDefinitions::CreateFire ( const CVector& vecPosition, float fSize, CElement* pElement )
 {

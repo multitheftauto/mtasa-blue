@@ -1730,3 +1730,16 @@ int CLuaFunctionDefs::CreatePed ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::DetonateSatchels ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::DetonateSatchels() )
+    {
+        lua_pushboolean( luaVM, true );
+        return 1;
+    }
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+

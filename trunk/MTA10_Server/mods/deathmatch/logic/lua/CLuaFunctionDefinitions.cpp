@@ -655,6 +655,27 @@ int CLuaFunctionDefinitions::SetPlayerName ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::DetonatePlayerSatchels ( lua_State* luaVM )
+{
+    // Verify the argument types
+    int iArgument1 = lua_type ( luaVM, 1 );
+    if ( iArgument1 == LUA_TLIGHTUSERDATA )
+    {
+        CPlayer* pPlayer = lua_toplayer ( luaVM, 1 );
+
+        if ( CStaticFunctionDefinitions::DetonatePlayerSatchels ( pPlayer ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "detonatePlayerSatchels" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefinitions::CreatePed ( lua_State* luaVM )
 {

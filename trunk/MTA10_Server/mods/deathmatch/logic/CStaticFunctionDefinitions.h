@@ -149,6 +149,7 @@ public:
     static bool                 SetPlayerBlurLevel                  ( CElement* pElement, unsigned char ucLevel );
     static bool                 RedirectPlayer                      ( CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword );
     static bool                 SetPlayerName                       ( CElement* pElement, const char* szName );
+    static bool                 DetonatePlayerSatchels              ( CPlayer* pPlayer );
 
     // Ped get funcs
     static CPed*                CreatePed                           ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true );
