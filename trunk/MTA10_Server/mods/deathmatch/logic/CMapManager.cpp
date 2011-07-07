@@ -625,6 +625,7 @@ void CMapManager::DoPickupRespawning ( void )
 
     // Loop through each pickup looking for respawnable ones
     unsigned long ulLastUsedTime;
+    unsigned long ulCreationTime;
     CPickup* pPickup;
     list < CPickup* > ::const_iterator iterPickups = m_pPickupManager->IterBegin ();
     for ( ; iterPickups != m_pPickupManager->IterEnd (); iterPickups++ )
@@ -633,6 +634,18 @@ void CMapManager::DoPickupRespawning ( void )
 
         // Do we have to respawn this one and is it time to?
         ulLastUsedTime = pPickup->GetLastUsedTime ();
+        ulCreationTime = pPickup->GetCreationTime ();
+        
+
+        if ( pPickup->IsEnabled () == false )
+        {
+            // Allow time for the element to be at least sent client side before allowing collisions otherwise it's possible to get a collision before the pickup is created. DO NOT WANT! - Caz
+            if ( ulCurrentTime >= ( ulCreationTime + 100 ) )
+            {
+                pPickup->SetEnabled( true );
+            }
+        }
+
         if ( !pPickup->IsSpawned () && ulLastUsedTime != 0 && ulCurrentTime >= ( ulLastUsedTime + pPickup->GetRespawnIntervals () ) )
         {            
             // Set it as spawned
