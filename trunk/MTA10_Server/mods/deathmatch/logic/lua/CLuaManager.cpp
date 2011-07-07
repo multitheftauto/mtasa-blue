@@ -283,7 +283,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPlayerBlurLevel", CLuaFunctionDefinitions::SetPlayerBlurLevel );
     CLuaCFunctions::AddFunction ( "redirectPlayer", CLuaFunctionDefinitions::RedirectPlayer );
     CLuaCFunctions::AddFunction ( "setPlayerName", CLuaFunctionDefinitions::SetPlayerName );
-    CLuaCFunctions::AddFunction ( "detonatePlayerSatchels", CLuaFunctionDefinitions::DetonatePlayerSatchels );
+    CLuaCFunctions::AddFunction ( "detonateSatchels", CLuaFunctionDefinitions::DetonateSatchels );
 
     // Ped get functions
     CLuaCFunctions::AddFunction ( "getPedWeaponSlot", CLuaFunctionDefinitions::GetPedWeaponSlot );

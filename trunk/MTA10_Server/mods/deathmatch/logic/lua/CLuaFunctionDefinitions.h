@@ -112,7 +112,7 @@ public:
     static int      SetPlayerBlurLevel                  ( lua_State* luaVM );
     static int      RedirectPlayer                      ( lua_State* luaVM );
     static int      SetPlayerName                       ( lua_State* luaVM );
-    static int      DetonatePlayerSatchels              ( lua_State* luaVM );
+    static int      DetonateSatchels                    ( lua_State* luaVM );
 
     // Ped get functions
     static int      CreatePed                           ( lua_State* luaVM );
