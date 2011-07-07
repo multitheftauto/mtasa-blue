@@ -431,6 +431,10 @@ CSettings::CSettings ( void )
     m_pCheckBoxUserAutoscan->SetSize ( CVector2D ( 224.0f, 16.0f ) );
     m_pCheckBoxUserAutoscan->GetPosition ( vecTemp, false );
 
+    m_pAudioDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAudio, "Load defaults" ) );
+    m_pAudioDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAudioDefaultClick, this ) );
+    m_pAudioDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
+
     /**
      *  Video tab
      **/
@@ -598,6 +602,10 @@ CSettings::CSettings ( void )
     m_pMapAlphaValueLabel->SetPosition ( CVector2D ( vecTemp.fX + 170.0f, vecTemp.fY ) );
     m_pMapAlphaValueLabel->GetPosition ( vecTemp, false );
     m_pMapAlphaValueLabel->AutoSize ( "100% " );
+
+    m_pVideoDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabVideo, "Load defaults" ) );
+    m_pVideoDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnVideoDefaultClick, this ) );
+    m_pVideoDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
 
     /**
      * Interface/chat Tab
@@ -925,6 +933,18 @@ CSettings::~CSettings ( void )
 }
 
 
+void RestartCallBack ( void* ptr, unsigned int uiButton )
+{
+    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+
+    if ( uiButton == 1 )
+    {
+        SetOnQuitCommand ( "restart" );
+        CCore::GetSingleton ().Quit ();
+    }
+}
+
+
 bool CSettings::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 {
     if ( Args.pWindow == m_pBindsList ) {
@@ -951,6 +971,163 @@ void CSettings::Update ( void )
 }
 
 
+void CSettings::UpdateAudioTab ()
+{
+    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
+
+    float fMTAVolume = 0, fRadioVolume = (float)(gameSettings->GetRadioVolume()) / 64.0f, fSFXVolume = (float)(gameSettings->GetSFXVolume()) / 64.0f;
+
+    CVARS_GET ( "mtavolume", fMTAVolume );
+
+    m_pAudioMTAVolume->SetScrollPosition( fMTAVolume );
+    m_pAudioRadioVolume->SetScrollPosition( fRadioVolume );
+    m_pAudioSFXVolume->SetScrollPosition( fSFXVolume );
+
+    m_pCheckBoxAudioEqualizer->SetSelected( gameSettings->IsRadioEqualizerEnabled() );
+    m_pCheckBoxAudioAutotune->SetSelected( gameSettings->IsRadioAutotuneEnabled() );
+    m_pCheckBoxUserAutoscan->SetSelected( gameSettings->IsUsertrackAutoScan() );
+
+
+    m_pComboUsertrackMode->SetSelectedItemByIndex( gameSettings->GetUsertrackMode() );
+
+}
+
+void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
+{
+    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
+    
+
+    bool bNextWindowed;
+    bool bNextFSMinimize;
+    int iNextVidMode;
+    GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize );
+
+    bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != m_pComboAntiAliasing->GetSelectedItemIndex ();
+    bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) ? false : true != m_pCheckBoxDisableAero->GetSelected ();
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged )
+    {
+        SString strChangedOptions;
+        if ( bIsVideoModeChanged )
+        {
+            strChangedOptions += "Resolution";
+            if ( bNextFSMinimize != GetVideoModeManager ()->IsMinimizeEnabled () )
+                strChangedOptions += "/Full Screen Minimize";
+        }
+
+        if ( bIsAntiAliasingChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += " and ";
+            strChangedOptions += "Anti-aliasing";
+        }
+
+        if ( bIsAeroChanged )
+        {
+            if ( !strChangedOptions.empty () )
+                strChangedOptions += " and ";
+            strChangedOptions += "Aero setting";
+        }
+
+        SString strMessage ( "%s will be changed when you next start MTA", strChangedOptions.c_str () );
+        strMessage += "\n\nDo you want to restart now?";
+        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
+        pQuestionBox->Reset ();
+        pQuestionBox->SetTitle ( "RESTART REQUIRED" );
+        pQuestionBox->SetMessage ( strMessage );
+        pQuestionBox->SetButton ( 0, "No" );
+        pQuestionBox->SetButton ( 1, "Yes" );
+        pQuestionBox->SetCallback ( RestartCallBack );
+        pQuestionBox->Show ();
+    }
+    m_pCheckBoxMipMapping->SetSelected ( gameSettings->IsMipMappingEnabled () );
+    m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
+    m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
+    m_pCheckBoxDisableAero->SetSelected ( GetApplicationSettingInt ( "aero-enabled" ) ? false : true );
+    m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
+    m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
+
+    int FxQuality = gameSettings->GetFXQuality();
+    if ( FxQuality == 0 ) m_pComboFxQuality->SetText ( "Low" );
+    else if ( FxQuality == 1 ) m_pComboFxQuality->SetText ( "Medium" );
+    else if ( FxQuality == 2 ) m_pComboFxQuality->SetText ( "High" );
+    else if ( FxQuality == 3 ) m_pComboFxQuality->SetText ( "Very high" );
+
+    char AntiAliasing = gameSettings->GetAntiAliasing();
+    if ( AntiAliasing == 1 ) m_pComboAntiAliasing->SetText ( "Off" );
+    else if ( AntiAliasing == 2 ) m_pComboAntiAliasing->SetText ( "1x" );
+    else if ( AntiAliasing == 3 ) m_pComboAntiAliasing->SetText ( "2x" );
+    else if ( AntiAliasing == 4 ) m_pComboAntiAliasing->SetText ( "3x" );
+
+    // Aspect ratio
+    int aspectRatio;
+    CVARS_GET("aspect_ratio", aspectRatio);
+    if ( aspectRatio == ASPECT_RATIO_AUTO ) m_pComboAspectRatio->SetText ( "Auto" );
+    else if ( aspectRatio == ASPECT_RATIO_4_3 ) m_pComboAspectRatio->SetText ( "4:3" );
+    else if ( aspectRatio == ASPECT_RATIO_16_10 ) m_pComboAspectRatio->SetText ( "16:10" );
+    else if ( aspectRatio == ASPECT_RATIO_16_9 ) m_pComboAspectRatio->SetText ( "16:9" );
+
+    // Volumetric shadows
+    bool bVolumetricShadowsEnabled;
+    CVARS_GET("volumetric_shadows", bVolumetricShadowsEnabled);
+    m_pCheckBoxVolumetricShadows->SetSelected ( bVolumetricShadowsEnabled );
+    m_pCheckBoxVolumetricShadows->SetEnabled ( FxQuality != 0 );
+
+    VideoMode           vidModemInfo;
+    int                 vidMode, numVidModes;
+
+    m_pComboResolution->Clear ();
+    numVidModes = gameSettings->GetNumVideoModes();
+
+    for (vidMode = 0; vidMode < numVidModes; vidMode++)
+    {
+        gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode);
+
+        // Remove resolutions that will make the gui unusable
+        if ( vidModemInfo.width < 640 || vidModemInfo.height < 480 )
+            continue;
+
+        // Check resolution hasn't already been added
+        bool bDuplicate = false;
+        for ( int i = 1; i < vidMode ; i++ )
+        {
+            VideoMode info;
+            gameSettings->GetVideoModeInfo(&info, i);
+            if ( info.width == vidModemInfo.width && info.height == vidModemInfo.height && info.depth == vidModemInfo.depth )
+                bDuplicate = true;
+        }
+        if ( bDuplicate )
+            continue;
+
+        SString strMode ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
+
+        if ( vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE )
+            m_pComboResolution->AddItem ( strMode )->SetData ( (void*)vidMode );
+
+        VideoMode currentInfo;
+        gameSettings->GetVideoModeInfo ( &currentInfo, iNextVidMode );
+
+        if ( currentInfo.width == vidModemInfo.width && currentInfo.height == vidModemInfo.height && currentInfo.depth == vidModemInfo.depth )
+            m_pComboResolution->SetText ( strMode );
+    }    
+    
+    // Streaming memory
+    IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice ();
+    unsigned int uiStreamingMemory = 0;
+    CVARS_GET ( "streaming_memory", uiStreamingMemory );
+    uiStreamingMemory = SharedUtil::Clamp ( GetMinStreamingMemory(pDevice), uiStreamingMemory, GetMaxStreamingMemory (pDevice) );
+    float fPos = SharedUtil::Unlerp ( GetMinStreamingMemory(pDevice), uiStreamingMemory, GetMaxStreamingMemory (pDevice) );
+    m_pStreamingMemory->SetScrollPosition ( fPos );
+    m_pStreamingMemoryValueLabel->SetText ( SString ( "%u MB", uiStreamingMemory ) );
+
+    int iVar = 0;
+    CVARS_GET ( "mapalpha", iVar );
+    int iAlphaPercent = ceil( ( (float)Clamp ( 0, iVar, 255 ) / 255 ) * 100 );
+    m_pMapAlphaValueLabel->SetText ( SString("%i%%", iAlphaPercent).c_str() );
+    float sbPos = (float)iAlphaPercent / 100.0f;
+    m_pMapAlpha->SetScrollPosition ( sbPos );
+
+}
+
 //
 // Saves the Joypad settings
 //
@@ -967,6 +1144,7 @@ void CSettings::ProcessJoypad( void )
 //
 // Update GUI elements for the Joypad Tab
 //
+
 void CSettings::UpdateJoypadTab ()
 {
     CJoystickManagerInterface* JoyMan = GetJoystickManager ();
@@ -1061,6 +1239,57 @@ void CSettings::UpdateCaptureAxis ()
     }
 }
 
+//
+// Called when the user clicks on the video 'Load Defaults' button.
+//
+bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
+{
+    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
+
+
+    //gameSettings->SetMipMappingEnabled (); // Doesn't appear to even be enabled
+    gameSettings->SetDrawDistance( 1.19625f ); // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
+    gameSettings->SetBrightness ( 253 );
+    gameSettings->SetFXQuality ( 2 );
+    gameSettings->SetAntiAliasing ( 1, true );
+    CVARS_SET ("aspect_ratio", ASPECT_RATIO_AUTO );
+    CVARS_SET ("volumetric_shadows", false );
+    // change
+    bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 2, false, false );
+
+    IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice ();
+    CVARS_SET ( "streaming_memory", GetMaxStreamingMemory(pDevice) );
+
+    CVARS_SET ( "mapalpha", 140.25f);
+
+    // Update the GUI
+    UpdateVideoTab ( bIsVideoModeChanged );
+
+    return true;
+}
+
+//
+// Called when the user clicks on the audio 'Load Defaults' button.
+//
+bool CSettings::OnAudioDefaultClick ( CGUIElement* pElement )
+{   
+    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
+    gameSettings->SetRadioVolume ( 100 );
+    gameSettings->SetSFXVolume ( 100 );
+    CVARS_SET ( "mtavolume", 100 );
+
+    gameSettings->SetRadioAutotuneEnabled ( true );
+    gameSettings->SetRadioEqualizerEnabled ( true );
+
+    gameSettings->SetUsertrackAutoScan ( false );
+
+    gameSettings->SetUsertrackMode ( 0 );
+    // Update the GUI
+    UpdateAudioTab ();
+
+    return true;
+}
+
 
 //
 // Called when the user clicks on an map axis button. Starts the capture axis process.
@@ -1098,7 +1327,9 @@ bool CSettings::OnJoypadDefaultClick ( CGUIElement* pElement )
     return true;
 }
 
-
+//
+// Called when the user clicks on the bind 'Load Defaults' button.
+//
 bool CSettings::OnBindsDefaultClick ( CGUIElement* pElement )
 {
     // Load the default binds
@@ -1973,17 +2204,6 @@ void CSettings::LoadData ( void )
     float fPos = SharedUtil::Unlerp ( GetMinStreamingMemory(pDevice), uiStreamingMemory, GetMaxStreamingMemory(pDevice) );
     m_pStreamingMemory->SetScrollPosition ( fPos );
     m_pStreamingMemoryValueLabel->SetText ( SString ( "%u MB", uiStreamingMemory ) );
-}
-
-void RestartCallBack ( void* ptr, unsigned int uiButton )
-{
-    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
-    
-    if ( uiButton == 1 )
-    {
-        SetOnQuitCommand ( "restart" );
-        CCore::GetSingleton ().Quit ();
-    }
 }
 
 void CSettings::SaveData ( void )
