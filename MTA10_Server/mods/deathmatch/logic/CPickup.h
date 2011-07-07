@@ -121,6 +121,7 @@ public:
     inline void                     SetRespawnIntervals         ( unsigned long ulRespawnIntervals )    { m_ulRespawnIntervals = ulRespawnIntervals; };
 
     inline unsigned long            GetLastUsedTime             ( void )                                { return m_ulLastUsedTime; }
+    inline unsigned long            GetCreationTime             ( void )                                { return m_ulCreationTime; }
 
     inline unsigned short           GetModel                    ( void )                                { return m_usModel; };
     inline void                     SetModel                    ( unsigned short usModel )              { m_usModel = usModel; };
@@ -137,6 +138,8 @@ public:
     inline void                     SetSpawned                  ( bool bSpawned )                       { m_bSpawned = bSpawned; }
 
     inline CColShape*               GetColShape                 ( void )                                { return m_pCollision; }
+    inline void                     SetEnabled                  ( bool bEnabled )                       { return m_pCollision->SetEnabled( bEnabled ); }
+    inline bool                     IsEnabled                   ( void )                                { return m_pCollision->IsEnabled(); }
 
 private:
     void                            Callback_OnCollision        ( CColShape& Shape, CElement& Element );
@@ -151,6 +154,7 @@ private:
     float                           m_fAmount;
     unsigned long                   m_ulRespawnIntervals;
     unsigned long                   m_ulLastUsedTime;
+    unsigned long                   m_ulCreationTime;
     unsigned short                  m_usModel;
     bool                            m_bVisible;
 
