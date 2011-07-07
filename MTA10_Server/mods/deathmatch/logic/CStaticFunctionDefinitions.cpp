@@ -7108,10 +7108,11 @@ CPickup* CStaticFunctionDefinitions::CreatePickup ( CResource* pResource, const 
     // Got a pickup?
     if ( pPickup )
     {
+        // Set the type and respawn intervals first!
         // Apply the position, type too and send it
-        pPickup->SetPosition ( vecPosition );
         pPickup->SetPickupType ( ucType );
         pPickup->SetRespawnIntervals ( ulRespawnInterval );
+        pPickup->SetPosition ( vecPosition );
 
         if ( pResource->HasStarted() )
         {
