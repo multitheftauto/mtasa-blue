@@ -1255,7 +1255,7 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     CVARS_SET ("aspect_ratio", ASPECT_RATIO_AUTO );
     CVARS_SET ("volumetric_shadows", false );
     // change
-    bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 2, false, false );
+    bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false );
 
     IDirect3DDevice9* pDevice = CCore::GetSingleton().GetGraphics()->GetDevice ();
     CVARS_SET ( "streaming_memory", GetMaxStreamingMemory(pDevice) );
