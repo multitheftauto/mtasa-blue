@@ -247,7 +247,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
-        DWORD dwFlags = 0;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+        DWORD dwFlags = pShaderInstance->m_pEffectWrap->m_uiSaveStateFlags;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint uiNumPasses = 0;
         pD3DEffect->Begin ( &uiNumPasses, dwFlags );
 
@@ -258,6 +258,13 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
             pD3DEffect->EndPass ();
         }
         pD3DEffect->End ();
+
+        // If we didn't get the effect to save the shader state, clear some things here
+        if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )
+        {
+            pDevice->SetVertexShader( NULL );
+            pDevice->SetPixelShader( NULL );
+        }
 
         // Unset additional vertex stream
         CAdditionalVertexStreamManager::GetSingleton ()->MaybeUnsetAdditionalVertexStream ();

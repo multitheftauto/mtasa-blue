@@ -350,8 +350,6 @@ class CEffectWrapImpl : public CEffectWrap
 {
 public:
     ZERO_ON_NEW
-    //DECLARE_CLASS( CEffectWrap, CRenderItem )
-    //                CEffectWrap             ( void ) : ClassInit ( this ) {}
 
     virtual void    PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
     virtual void    PreDestruct             ( void );
@@ -407,6 +405,7 @@ namespace
         SString m_strRootPath;
         SString m_strCurrentPath;
     public:
+        SString m_strReport;
 
         CIncludeManager::CIncludeManager( const SString& strRootPath, const SString& strCurrentPath )
         {
@@ -427,7 +426,9 @@ namespace
             // Check for illegal characters
             if ( strPathFilename.Contains ( ".." ) )
             {
-                OutputDebugLine ( SString ( "CIncludeManager: Illegal path %s", *strPathFilename ) );
+                SString strMsg ( "CIncludeManager: Illegal path %s", *strPathFilename );
+                m_strReport += strMsg;
+                OutputDebugLine ( strMsg );
                 return E_FAIL;
             }
 
@@ -435,7 +436,9 @@ namespace
             std::vector < char > buffer;
             if ( !FileLoad ( strPathFilename, buffer ) )
             {
-                OutputDebugLine ( SString ( "CIncludeManager: Can't find %s", *strPathFilename ) );
+                SString strMsg ( "CIncludeManager: Can't find %s", *strPathFilename );
+                m_strReport += strMsg;
+                OutputDebugLine ( strMsg );
                 return E_FAIL;
             }
 
@@ -447,6 +450,9 @@ namespace
             // Set result
             *ppData = pData;
             *pBytes = uiSize;
+
+            if ( !m_strReport.ContainsI ( strPathFilename ) )
+                m_strReport += SString ( "[Loaded '%s' (%d bytes)]", *strPathFilename, uiSize );
 
             return S_OK;
         }
@@ -545,11 +551,9 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
     assert ( !m_pD3DEffect );
 
     // Compile effect
-    DWORD dwFlags = D3DXSHADER_PARTIALPRECISION;
+    DWORD dwFlags = 0;      // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
     if ( bDebug )
         dwFlags |= D3DXSHADER_DEBUG;
-    else
-        dwFlags |= D3DXFX_NOT_CLONEABLE;
 
     SString strMetaPath = strFilename.Right ( strFilename.length () - strRootPath.length () );
     CIncludeManager IncludeManager ( strRootPath, ExtractPath ( strMetaPath ) );
@@ -559,7 +563,14 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
     // Handle compile errors
     strOutStatus = "";
     if( pBufferErrors != NULL )
+    {
         strOutStatus = SStringX ( (CHAR*)pBufferErrors->GetBufferPointer() ).TrimEnd ( "\n" );
+
+        // Error messages sometimes contain the current directory. Remove that here.
+        SString strCurrentDirectory = SharedUtil::GetCurrentDirectory ();
+        strOutStatus = strOutStatus.ReplaceI ( strCurrentDirectory + "\\", "" );
+        strOutStatus = strOutStatus.ReplaceI ( strCurrentDirectory, "" );
+    }
     SAFE_RELEASE( pBufferErrors );
 
     if( !m_pD3DEffect )
@@ -567,12 +578,30 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
 
     // Find first valid technique
     D3DXHANDLE hTechnique = NULL;
-    m_pD3DEffect->FindNextValidTechnique( NULL, &hTechnique );
+    D3DXEFFECT_DESC EffectDesc;
+    m_pD3DEffect->GetDesc ( &EffectDesc );
+
+    SString strProblemInfo = "";
+    for ( uint i = 0 ; i < EffectDesc.Techniques ; i++ )
+    {
+        D3DXHANDLE hTemp = m_pD3DEffect->GetTechnique ( i );
+        HRESULT hr = m_pD3DEffect->ValidateTechnique ( hTemp );
+        if ( SUCCEEDED( hr ) )
+        {
+            hTechnique = hTemp;
+            break;
+        }
+
+        // Update problem string
+        D3DXTECHNIQUE_DESC TechniqueDesc;
+        m_pD3DEffect->GetTechniqueDesc( hTemp, &TechniqueDesc );
+        strProblemInfo += SString ( "['%s' (%d/%d) failed (%08x)]", TechniqueDesc.Name, i, EffectDesc.Techniques, hr );
+    }
 
     // Error if can't find a valid technique
     if ( !hTechnique )
     {
-        strOutStatus = "No valid technique";
+        strOutStatus = SString ( "No valid technique; [Techniques:%d %s]%s", EffectDesc.Techniques, *strProblemInfo, *IncludeManager.m_strReport );
         SAFE_RELEASE ( m_pD3DEffect );
         return;
     }
@@ -581,9 +610,9 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
     m_pD3DEffect->SetTechnique( hTechnique );
 
     // Inform user of technique name
-    D3DXTECHNIQUE_DESC Desc;
-    m_pD3DEffect->GetTechniqueDesc( hTechnique, &Desc );
-    strOutStatus = Desc.Name;
+    D3DXTECHNIQUE_DESC TechniqueDesc;
+    m_pD3DEffect->GetTechniqueDesc( hTechnique, &TechniqueDesc );
+    strOutStatus = TechniqueDesc.Name;
 
     if ( bDebug )
     {
@@ -604,6 +633,9 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
             SAFE_RELEASE( pDisassembly );
         }
     }
+
+    // Optimization
+    m_uiSaveStateFlags = D3DXFX_DONOTSAVESHADERSTATE;     // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
 }
 
 

@@ -170,7 +170,7 @@ void CTileBatcher::Flush ( void )
             pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
 
             // Do shader passes
-            DWORD dwFlags = 0;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+            DWORD dwFlags = pShaderInstance->m_pEffectWrap->m_uiSaveStateFlags;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
             uint uiNumPasses = 0;
             pD3DEffect->Begin ( &uiNumPasses, dwFlags );
 
@@ -181,6 +181,13 @@ void CTileBatcher::Flush ( void )
                 pD3DEffect->EndPass ();
             }
             pD3DEffect->End ();
+
+            // If we didn't get the effect to save the shader state, clear some things here
+            if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )
+            {
+                m_pDevice->SetVertexShader( NULL );
+                m_pDevice->SetPixelShader( NULL );
+            }
         }
 
         // Clean up

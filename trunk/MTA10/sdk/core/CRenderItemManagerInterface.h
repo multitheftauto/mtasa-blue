@@ -195,6 +195,7 @@ class CEffectWrap : public CRenderItem
     std::map < SString, D3DXHANDLE > m_valueHandleMap;
     D3DXHANDLE      m_hFirstTexture;
     bool            m_bRequiresNormals;
+    uint            m_uiSaveStateFlags;
 };
 
 CEffectWrap* NewEffectWrap ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
