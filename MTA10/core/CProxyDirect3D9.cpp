@@ -134,7 +134,8 @@ HRESULT    CProxyDirect3D9::GetDeviceCaps               ( UINT Adapter, D3DDEVTY
     HRESULT hResult;
 
     hResult = m_pDevice->GetDeviceCaps ( Adapter, DeviceType, pCaps );
-
+	pCaps->VertexShaderVersion = 0;
+	pCaps->PixelShaderVersion = 0;
     return hResult;
 }
 

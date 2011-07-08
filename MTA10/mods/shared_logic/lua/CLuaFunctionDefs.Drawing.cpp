@@ -467,12 +467,9 @@ int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
                     }
                     else
                     {
-                        // Replace any path in the error message with out own one
-                        SString strFilename;
-                        ExtractFilename ( strPath, NULL, &strFilename );
-                        SString strRight;
-                        if ( strStatus.Split ( strFilename, NULL, &strRight ) )
-                            strStatus = ConformResourcePath ( strPath, true ) + strRight;
+                        // Replace any path in the error message with our own one
+                        SString strRootPathWithoutResource = strRootPath.Left ( strRootPath.TrimEnd ( "\\" ).length () - SStringX ( pFileResource->GetName () ).length () ) ;
+                        strStatus = strStatus.ReplaceI ( strRootPathWithoutResource, "" );
                         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Problem @ '%s' [%s]", "dxCreateShader", *strStatus ) );
                     }
                 }
