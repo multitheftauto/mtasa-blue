@@ -11,7 +11,7 @@
 *****************************************************************************/
 
 struct ID3DXFont;
-struct IDirect3DTexture9;
+struct IDirect3DBaseTexture9;
 struct IDirect3DSurface9;
 struct IDirect3DDevice9;
 struct ID3DXEffect;
@@ -286,7 +286,7 @@ class CTextureItem : public CMaterialItem
     DECLARE_CLASS( CTextureItem, CMaterialItem )
                     CTextureItem            ( void ) : ClassInit ( this ) {}
 
-    IDirect3DTexture9*  m_pD3DTexture;
+    IDirect3DBaseTexture9*  m_pD3DTexture;
 };
 
 

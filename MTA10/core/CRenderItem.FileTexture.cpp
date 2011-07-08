@@ -91,18 +91,28 @@ void CFileTextureItem::CreateUnderlyingData ( const SString& strFilename )
 {
     assert ( !m_pD3DTexture );
 
-    // Create the DX texture
-    if ( FAILED( D3DXCreateTextureFromFile ( m_pDevice, strFilename, &m_pD3DTexture ) ) )
+    D3DXIMAGE_INFO imageInfo;
+    if ( FAILED ( D3DXGetImageInfoFromFile( strFilename, &imageInfo ) ) )
         return;
 
-    // Get some info
-    D3DXIMAGE_INFO imageInfo;
-    D3DSURFACE_DESC surfaceDesc;
-    if ( FAILED ( D3DXGetImageInfoFromFile( strFilename, &imageInfo ) )
-        || FAILED ( m_pD3DTexture->GetLevelDesc( 0, &surfaceDesc ) ) )
+    if ( imageInfo.ResourceType == D3DRTYPE_VOLUMETEXTURE )
     {
-        SAFE_RELEASE ( m_pD3DTexture );
-        return;
+        // It's a volume texture!
+        if ( FAILED( D3DXCreateVolumeTextureFromFile ( m_pDevice, strFilename, (IDirect3DVolumeTexture9**)&m_pD3DTexture ) ) )
+            return;
+    }
+    else
+    if ( imageInfo.ResourceType == D3DRTYPE_CUBETEXTURE )
+    {
+        // It's a cubemap texture!
+        if ( FAILED( D3DXCreateCubeTextureFromFile ( m_pDevice, strFilename, (IDirect3DCubeTexture9**)&m_pD3DTexture ) ) )
+            return;
+    }
+    else
+    {
+        // It's none of the above!
+        if ( FAILED( D3DXCreateTextureFromFile ( m_pDevice, strFilename, (IDirect3DTexture9**)&m_pD3DTexture ) ) )
+            return;
     }
 
     m_uiSizeX = imageInfo.Width;

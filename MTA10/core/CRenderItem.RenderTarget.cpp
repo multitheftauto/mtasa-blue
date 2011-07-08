@@ -105,7 +105,7 @@ void CRenderTargetItem::CreateUnderlyingData ( void )
 	    D3DFORMAT Format = i & 1 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
         if ( m_bWithAlphaChannel )
             Format = D3DFMT_A8R8G8B8;
-        if( SUCCEEDED( m_pDevice->CreateTexture( m_uiSizeX, m_uiSizeY, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pD3DTexture, NULL ) ) )
+        if( SUCCEEDED( m_pDevice->CreateTexture( m_uiSizeX, m_uiSizeY, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, (IDirect3DTexture9**)&m_pD3DTexture, NULL ) ) )
             break;
 
         // c'mon
@@ -142,7 +142,7 @@ void CRenderTargetItem::CreateUnderlyingData ( void )
     }
 
     // Get the render target surface here for convenience
-    m_pD3DTexture->GetSurfaceLevel ( 0, &m_pD3DRenderTargetSurface );
+    ((IDirect3DTexture9*)m_pD3DTexture)->GetSurfaceLevel ( 0, &m_pD3DRenderTargetSurface );
 
     // Clear incase it gets used before first copy
     m_pDevice->ColorFill( m_pD3DRenderTargetSurface, NULL, 0x00000000 );
