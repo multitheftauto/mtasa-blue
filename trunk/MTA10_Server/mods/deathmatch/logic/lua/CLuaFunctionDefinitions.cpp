@@ -10610,7 +10610,7 @@ int CLuaFunctionDefinitions::GetAccount ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CAccount* pAccount = CStaticFunctionDefinitions::GetAccount ( strName, strPassword.empty () ? NULL : strPassword );
+        CAccount* pAccount = CStaticFunctionDefinitions::GetAccount ( strName, strPassword.empty () ? NULL : *strPassword );
         if ( pAccount )
         {
             lua_pushaccount ( luaVM, pAccount );
