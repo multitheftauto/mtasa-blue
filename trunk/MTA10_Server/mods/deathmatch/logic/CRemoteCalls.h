@@ -21,17 +21,14 @@ class CRemoteCall
 {
 private:
     class CResource *   m_resource;
-    char *              m_szResourceName;
-    char *              m_szFunctionName;
-    char *              m_szServerHost;
     std::string         m_strData;
     class CLuaMain *    m_VM;
     CLuaFunctionRef     m_iFunction;
-    char                m_szURL[512];
+    SString             m_strURL;
 
 public:
-                        CRemoteCall ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
-                        CRemoteCall ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+                        CRemoteCall ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+                        CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
                         ~CRemoteCall ();
     void                MakeCall();
     static void         ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error);
@@ -51,8 +48,8 @@ public:
                         CRemoteCalls();
                         ~CRemoteCalls();
 
-    void                Call ( char * szServerHost, char * szResourceName, char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
-    void                Call ( char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+    void                Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
+    void                Call ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction );
     void                Remove ( CLuaMain * luaMain );
     void                Remove ( CRemoteCall * call );
     bool                CallExists ( CRemoteCall * call );

@@ -21,8 +21,8 @@ namespace SharedUtil
     //
     // Load from a file
     //
-    bool            FileLoad                        ( const SString& strFilename, std::vector < char >& buffer );
-    bool            FileLoad                        ( const SString& strFilename, SString& strBuffer );
+    bool            FileLoad                        ( const SString& strFilename, std::vector < char >& buffer, int iMaxSize = 0x7FFFFFFF );
+    bool            FileLoad                        ( const SString& strFilename, SString& strBuffer, int iMaxSize = 0x7FFFFFFF );
 
     //
     // Save to a file

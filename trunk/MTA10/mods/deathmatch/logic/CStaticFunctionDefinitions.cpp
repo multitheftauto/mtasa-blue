@@ -108,13 +108,9 @@ bool CStaticFunctionDefinitions::AddEvent ( CLuaMain& LuaMain, const char* szNam
 }
 
 
-bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
+bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated )
 {
     assert ( szName );
-    
-    // Is this an old event name? get its new one (added this for backwards compatibility)
-    char szUpdatedName [ 64 ];
-    if ( m_pEvents->IsExtinctEvent ( szName, szUpdatedName, 64 ) ) szName = szUpdatedName;
 
     // We got an event with that name?
     if ( m_pEvents->Exists ( szName ) )
@@ -128,13 +124,9 @@ bool CStaticFunctionDefinitions::AddEventHandler ( CLuaMain& LuaMain, char* szNa
 }
 
 
-bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction )
+bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction )
 {
     assert ( szName );
-
-    // Is this an old event name? get its new one (added this for backwards compatibility)
-    char szUpdatedName [ 64 ];
-    if ( m_pEvents->IsExtinctEvent ( szName, szUpdatedName, 64 ) ) szName = szUpdatedName;
 
     // We got an event and handler with that name?
     if ( m_pEvents->Exists ( szName ) )
@@ -1724,11 +1716,11 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
 }
 
 
-bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( unsigned char ucComponent, bool bShow )
+bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( eHudComponent component, bool bShow )
 {
-    enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-                             HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_ALL };
-    switch ( ucComponent )
+    //enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
+    //                         HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_ALL };
+    switch ( component )
     {
         case HUD_AMMO:
             g_pGame->GetHud ()->DisableAmmo ( !bShow );
@@ -1797,7 +1789,7 @@ bool CStaticFunctionDefinitions::TakePlayerMoney ( long lMoney )
 }
 
 
-bool CStaticFunctionDefinitions::SetPlayerNametagText ( CClientEntity& Entity, char * szText )
+bool CStaticFunctionDefinitions::SetPlayerNametagText ( CClientEntity& Entity, const char * szText )
 {
     assert ( szText );
     RUN_CHILDREN SetPlayerNametagText ( **iter, szText );
@@ -1813,15 +1805,18 @@ bool CStaticFunctionDefinitions::SetPlayerNametagText ( CClientEntity& Entity, c
 }
 
 
-bool CStaticFunctionDefinitions::SetPlayerNametagColor ( CClientEntity& Entity, unsigned char ucR, unsigned char ucG, unsigned char ucB )
+bool CStaticFunctionDefinitions::SetPlayerNametagColor ( CClientEntity& Entity, bool bRemoveOverride, unsigned char ucR, unsigned char ucG, unsigned char ucB )
 {
-    RUN_CHILDREN SetPlayerNametagColor ( **iter, ucR, ucG, ucB );
+    RUN_CHILDREN SetPlayerNametagColor ( **iter, bRemoveOverride, ucR, ucG, ucB );
 
     if ( IS_PLAYER ( &Entity ) )
     {
         CClientPlayer& Player = static_cast < CClientPlayer& > ( Entity );
 
-        Player.SetNametagOverrideColor ( ucR, ucG, ucB );
+        if ( bRemoveOverride )
+            Player.RemoveNametagOverrideColor ();
+        else
+            Player.SetNametagOverrideColor ( ucR, ucG, ucB );
         return true;
     }
     return false;

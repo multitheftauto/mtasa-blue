@@ -355,17 +355,11 @@ int CLuaFunctionDefs::CreateWater ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetWaterLevel ( lua_State* luaVM )
 {
-// 1) float getWaterLevel ( float posX, float posY, float posZ [ , bool bCheckWaves = false ] )
-// 2) float getWaterLevel ( water theWater )
-
     CScriptArgReader argStream ( luaVM );
-
-    // Determine which function type is being called
-    bool bVariant1 = !argStream.NextIsUserData ();
-
-    if ( bVariant1 )
+    if ( !argStream.NextIsUserData () )
     {
-// 1) float getWaterLevel ( float posX, float posY, float posZ [ , bool bCheckWaves = false ] )
+        // Call type 1
+        //  float getWaterLevel ( float posX, float posY, float posZ [ , bool bCheckWaves = false ] )
         CVector vecPosition; bool bCheckWaves;
 
         argStream.ReadNumber ( vecPosition.fX );
@@ -386,7 +380,8 @@ int CLuaFunctionDefs::GetWaterLevel ( lua_State* luaVM )
     }
     else
     {
-// 2) float getWaterLevel ( water theWater )
+        // Call type 2
+        //  float getWaterLevel ( water theWater )
         CClientWater* pWater;
 
         argStream.ReadUserData ( pWater );
@@ -435,8 +430,6 @@ int CLuaFunctionDefs::GetWaterVertexPosition ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
-#define INVALID_NUMBER (-12345.67f)
 
 int CLuaFunctionDefs::SetWaterLevel ( lua_State* luaVM )
 {

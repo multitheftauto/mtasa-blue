@@ -55,11 +55,11 @@ bool SharedUtil::DirectoryExists ( const SString& strPath )
 }
 
 
-bool SharedUtil::FileLoad ( const SString& strFilename, SString& strBuffer )
+bool SharedUtil::FileLoad ( const SString& strFilename, SString& strBuffer, int iMaxSize )
 {
     strBuffer = "";
     std::vector < char > buffer;
-    if ( !FileLoad ( strFilename, buffer ) )
+    if ( !FileLoad ( strFilename, buffer, iMaxSize ) )
         return false;
     if ( buffer.size () )
     {
@@ -100,7 +100,7 @@ bool SharedUtil::FileRename ( const SString& strFilenameOld, const SString& strF
 //
 // Load binary data from a file into an array
 //
-bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& buffer )
+bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& buffer, int iMaxSize )
 {
     buffer.clear ();
     // Open
@@ -115,6 +115,7 @@ bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& bu
     int bytesRead = 0;
     if ( size > 0 && size < 1e9 )
     {
+        size = Min ( size, iMaxSize );
         // Allocate space
         buffer.assign ( size, 0 );
         // Read into buffer

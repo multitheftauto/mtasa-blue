@@ -37,6 +37,25 @@ enum eDXVerticalAlign
 };
 DECLARE_ENUM( eDXVerticalAlign );
 
+enum eHudComponent
+{
+    HUD_AMMO,
+    HUD_WEAPON,
+    HUD_HEALTH,
+    HUD_BREATH,
+    HUD_ARMOUR,
+    HUD_MONEY,
+    HUD_VEHICLE_NAME,
+    HUD_AREA_NAME,
+    HUD_RADAR,
+    HUD_CLOCK,
+    HUD_RADIO,
+    HUD_WANTED,
+    HUD_ALL,
+};
+DECLARE_ENUM( eHudComponent );
+
+
 
 // class -> class type
 inline eCGUIType GetClassType ( CGUIButton* )      { return CGUI_BUTTON; }
