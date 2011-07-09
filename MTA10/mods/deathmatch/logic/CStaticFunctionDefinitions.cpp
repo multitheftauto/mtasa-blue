@@ -1221,6 +1221,7 @@ bool CStaticFunctionDefinitions::SetElementAttachedOffsets ( CClientEntity & Ent
 {
     RUN_CHILDREN SetElementAttachedOffsets ( **iter, vecPosition, vecRotation );
 
+    ConvertDegreesToRadians ( vecRotation );
     Entity.SetAttachedOffsets ( vecPosition, vecRotation );
     return true;
 }

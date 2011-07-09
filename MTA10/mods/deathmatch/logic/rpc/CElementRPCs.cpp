@@ -431,7 +431,7 @@ void CElementRPCs::SetElementModel ( CClientEntity* pSource, NetBitStreamInterfa
 void CElementRPCs::SetElementAttachedOffsets ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     SPositionSync position ( true );
-    SRotationDegreesSync rotation ( true );
+    SRotationRadiansSync rotation ( true );
     if ( position.Read ( bitStream ) && rotation.Read ( bitStream ) )
     {
         pSource->SetAttachedOffsets ( position.data.vecPosition, rotation.data.vecRotation );
