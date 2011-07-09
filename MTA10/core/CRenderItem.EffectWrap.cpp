@@ -581,30 +581,48 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
     D3DXEFFECT_DESC EffectDesc;
     m_pD3DEffect->GetDesc ( &EffectDesc );
 
-    SString strProblemInfo = "";
-    for ( uint i = 0 ; i < EffectDesc.Techniques ; i++ )
+    for ( uint uiAttempt = 0 ; true ; uiAttempt++ )
     {
-        D3DXHANDLE hTemp = m_pD3DEffect->GetTechnique ( i );
-        HRESULT hr = m_pD3DEffect->ValidateTechnique ( hTemp );
-        if ( SUCCEEDED( hr ) )
+        SString strProblemInfo = "";
+        for ( uint i = 0 ; i < EffectDesc.Techniques ; i++ )
         {
-            hTechnique = hTemp;
-            break;
+            D3DXHANDLE hTemp = m_pD3DEffect->GetTechnique ( i );
+            HRESULT hr = m_pD3DEffect->ValidateTechnique ( hTemp );
+            if ( SUCCEEDED( hr ) )
+            {
+                hTechnique = hTemp;
+                break;
+            }
+
+            // Update problem string
+            D3DXTECHNIQUE_DESC TechniqueDesc;
+            m_pD3DEffect->GetTechniqueDesc( hTemp, &TechniqueDesc );
+            strProblemInfo += SString ( "['%s' (%d/%d) failed (%08x)]", TechniqueDesc.Name, i, EffectDesc.Techniques, hr );
         }
 
-        // Update problem string
-        D3DXTECHNIQUE_DESC TechniqueDesc;
-        m_pD3DEffect->GetTechniqueDesc( hTemp, &TechniqueDesc );
-        strProblemInfo += SString ( "['%s' (%d/%d) failed (%08x)]", TechniqueDesc.Name, i, EffectDesc.Techniques, hr );
+        // Found valid technique
+        if ( hTechnique )
+            break;
+
+        // Error if can't find a valid technique after 2nd attempt
+        if ( uiAttempt > 0 )
+        {
+            strOutStatus = SString ( "No valid technique; [Techniques:%d %s]%s", EffectDesc.Techniques, *strProblemInfo, *IncludeManager.m_strReport );
+            SAFE_RELEASE ( m_pD3DEffect );
+            return;
+        }
+
+        // Try resetting samplers if 1st attempt failed
+        LPDIRECT3DDEVICE9 pDevice;
+        m_pD3DEffect->GetDevice ( &pDevice );
+        for ( uint i = 0 ; i < 16 ; i++ )
+        {
+            pDevice->SetSamplerState ( i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+            pDevice->SetSamplerState ( i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+            pDevice->SetSamplerState ( i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+        }
     }
 
-    // Error if can't find a valid technique
-    if ( !hTechnique )
-    {
-        strOutStatus = SString ( "No valid technique; [Techniques:%d %s]%s", EffectDesc.Techniques, *strProblemInfo, *IncludeManager.m_strReport );
-        SAFE_RELEASE ( m_pD3DEffect );
-        return;
-    }
 
     // Set technique
     m_pD3DEffect->SetTechnique( hTechnique );
