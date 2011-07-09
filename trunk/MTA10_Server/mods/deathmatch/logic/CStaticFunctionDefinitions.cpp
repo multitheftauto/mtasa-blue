@@ -1588,12 +1588,13 @@ bool CStaticFunctionDefinitions::SetElementAttachedOffsets ( CElement* pElement,
     pElement->GetAttachedOffsets ( vecCurrentPos, vecCurrentRot );
     if ( vecPosition != vecCurrentPos || vecRotation != vecCurrentRot )
     {
+        ConvertDegreesToRadians ( vecRotation );
         pElement->SetAttachedOffsets ( vecPosition, vecRotation );
         
         SPositionSync position ( true );
         position.data.vecPosition = vecPosition;
 
-        SRotationDegreesSync rotation ( true );
+        SRotationRadiansSync rotation ( true );
         rotation.data.vecRotation = vecRotation;
 
         CBitStream BitStream;
