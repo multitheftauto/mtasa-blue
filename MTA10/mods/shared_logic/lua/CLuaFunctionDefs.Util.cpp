@@ -139,21 +139,39 @@ int CLuaFunctionDefs::Split ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetTimer ( lua_State* luaVM )
 {
-    CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( luaMain )
+//  timer setTimer ( function theFunction, int timeInterval, int timesToExecute, [ var arguments... ] )
+    CLuaFunctionRef iLuaFunction; ulong ulTimeInterval; uint uiTimesToExecute; CLuaArguments Arguments;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadFunction ( iLuaFunction );
+    argStream.ReadNumber ( ulTimeInterval );
+    argStream.ReadNumber ( uiTimesToExecute );
+    argStream.ReadLuaArguments ( Arguments );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors () )
     {
-        if ( lua_type ( luaVM, 1 ) == LUA_TFUNCTION )
+        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( luaMain )
         {
-            CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( luaVM );
+            // Check for the minimum interval
+            if ( ulTimeInterval < LUA_TIMER_MIN_INTERVAL )
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setTimer", "Interval is below 50" ) );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+
+            CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, ulTimeInterval, uiTimesToExecute, Arguments );
             if ( pLuaTimer )
             {
                 lua_pushtimer ( luaVM, pLuaTimer );
                 return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "setTimer" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setTimer", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

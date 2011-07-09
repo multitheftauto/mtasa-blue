@@ -108,42 +108,27 @@ bool CLuaTimerManager::Exists ( CLuaTimer* pLuaTimer )
 }
 
 
-CLuaTimer* CLuaTimerManager::AddTimer ( lua_State* luaVM )
+
+CLuaTimer* CLuaTimerManager::AddTimer ( const CLuaFunctionRef& iLuaFunction, unsigned long ulTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments )
 {
-    if ( luaVM )
+    // Check for the minimum interval
+    if ( ulTimeDelay < LUA_TIMER_MIN_INTERVAL )
+        return NULL;
+
+    if ( VERIFY_FUNCTION ( iLuaFunction ) )
     {
-        int iArgument2 = lua_type ( luaVM, 2 );
-        int iArgument3 = lua_type ( luaVM, 3 );
-        if ( lua_type ( luaVM, 1 ) &&
-             ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) ||
-             ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
-        {
-            // Grab the string argument, start-time, delay and repeats
-            unsigned long ulTimeDelay = static_cast < unsigned long > ( lua_tonumber ( luaVM, 2 ) );
-            unsigned int uiRepeats = static_cast < unsigned int > ( lua_tonumber ( luaVM, 3 ) );
-
-            // Check for the minimum interval
-            if ( ulTimeDelay < LUA_TIMER_MIN_INTERVAL ) return NULL;
-
-            // Grab the arguments from argument 4 and up
-            CLuaArguments Arguments;
-            Arguments.ReadArguments ( luaVM, 4 );
-
-            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 1 );
-            if ( VERIFY_FUNCTION ( iLuaFunction ) )
-            {
-                // Add the timer
-                CLuaTimer* pLuaTimer = new CLuaTimer ( iLuaFunction, Arguments );
-                pLuaTimer->SetStartTime ( timeGetTime () );
-                pLuaTimer->SetDelay ( ulTimeDelay );
-                pLuaTimer->SetRepeats ( uiRepeats );
-                m_TimerList.push_back ( pLuaTimer );
-                return pLuaTimer;
-            }
-        }
+        // Add the timer
+        CLuaTimer* pLuaTimer = new CLuaTimer ( iLuaFunction, Arguments );
+        pLuaTimer->SetStartTime ( timeGetTime () );
+        pLuaTimer->SetDelay ( ulTimeDelay );
+        pLuaTimer->SetRepeats ( uiRepeats );
+        m_TimerList.push_back ( pLuaTimer );
+        return pLuaTimer;
     }
+
     return false;
 }
+
 
 void CLuaTimerManager::GetTimers ( unsigned long ulTime, CLuaMain* pLuaMain )
 {

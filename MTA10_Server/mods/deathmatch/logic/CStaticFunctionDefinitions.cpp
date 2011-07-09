@@ -168,13 +168,7 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const 
 
 bool CStaticFunctionDefinitions::CancelEvent ( bool bCancel, const char* szReason )
 {
-    if ( szReason )
-    {
-        m_pEvents->CancelEvent ( bCancel, (char*)szReason );
-    }
-    else
-        m_pEvents->CancelEvent ( bCancel );
-
+    m_pEvents->CancelEvent ( bCancel, szReason );
     return true;
 }
 
@@ -2284,18 +2278,18 @@ bool CStaticFunctionDefinitions::SpawnPlayer ( CPlayer* pPlayer, const CVector& 
 }
 
 
-bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( CElement* pElement, unsigned char ucComponent, bool bShow )
+bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( CElement* pElement, eHudComponent component, bool bShow )
 {
     assert ( pElement );
 
-    RUN_CHILDREN ShowPlayerHudComponent ( *iter, ucComponent, bShow );
+    RUN_CHILDREN ShowPlayerHudComponent ( *iter, component, bShow );
 
     if ( IS_PLAYER ( pElement ) )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( ucComponent );
+        BitStream.pBitStream->Write ( static_cast < unsigned char > ( component ) );
         BitStream.pBitStream->Write ( static_cast < unsigned char > ( ( bShow ) ? 1 : 0 ) );
         pPlayer->Send ( CLuaPacket ( SHOW_PLAYER_HUD_COMPONENT, *BitStream.pBitStream ) );
 
@@ -2427,6 +2421,8 @@ bool CStaticFunctionDefinitions::SetPlayerNametagColor ( CElement* pElement, boo
             // Was it even overridden?
             if ( pPlayer->IsNametagColorOverridden () )
             {
+                pPlayer->RemoveNametagOverrideColor ();
+
                 // Send a packet
                 CBitStream BitStream;
                 m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPlayer, REMOVE_PLAYER_NAMETAG_COLOR, *BitStream.pBitStream ) );
@@ -9178,7 +9174,7 @@ bool CStaticFunctionDefinitions::IsGuestAccount ( CAccount* pAccount, bool& bGue
 }
 
 
-CLuaArgument* CStaticFunctionDefinitions::GetAccountData ( CAccount* pAccount, char* szKey )
+CLuaArgument* CStaticFunctionDefinitions::GetAccountData ( CAccount* pAccount, const char* szKey )
 {
     assert ( pAccount );
     assert ( szKey );
@@ -9285,7 +9281,7 @@ bool CStaticFunctionDefinitions::SetAccountPassword ( CAccount* pAccount, const 
 }
 
 
-bool CStaticFunctionDefinitions::SetAccountData ( CAccount* pAccount, char* szKey, CLuaArgument * pArgument )
+bool CStaticFunctionDefinitions::SetAccountData ( CAccount* pAccount, const char* szKey, CLuaArgument * pArgument )
 {
     assert ( pAccount );
     assert ( szKey );

@@ -21,31 +21,29 @@
 
 int CLuaFunctionDefs::AddEvent ( lua_State* luaVM )
 {
-    // Grab our virtual machine
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  bool addEvent ( string eventName [, bool allowRemoteTrigger = false ] )
+    SString strName; bool bAllowRemoteTrigger;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strName );
+    argStream.ReadBool ( bAllowRemoteTrigger, false );
+
+    if ( !argStream.HasErrors () )
     {
-        // Verify the arguments
-        if ( lua_istype ( luaVM, 1, LUA_TSTRING )  )
+        // Grab our virtual machine
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Grab the arguments
-            const char* szName = lua_tostring ( luaVM, 1 );
-
-            // Remote trigger?
-            bool bAllowRemoteTrigger = false;
-            if ( lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
-            {
-                bAllowRemoteTrigger = lua_toboolean ( luaVM, 2 ) ? true:false;
-            }
-
             // Do it
-            if ( CStaticFunctionDefinitions::AddEvent ( *pLuaMain, szName, bAllowRemoteTrigger ) )
+            if ( CStaticFunctionDefinitions::AddEvent ( *pLuaMain, strName, bAllowRemoteTrigger ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "addEvent", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -55,55 +53,40 @@ int CLuaFunctionDefs::AddEvent ( lua_State* luaVM )
 
 int CLuaFunctionDefs::AddEventHandler ( lua_State* luaVM )
 {
-    // Grab our virtual machine
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+//  bool addEventHandler ( string eventName, element attachedTo, function handlerFunction, [bool getPropagated = true] )
+    SString strName; CClientEntity* pEntity; CLuaFunctionRef iLuaFunction; bool bPropagated;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strName );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadFunction ( iLuaFunction );
+    argStream.ReadBool ( bPropagated, true );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors () )
     {
-        // Verify the arguments
-        if ( lua_istype ( luaVM, 1, LUA_TSTRING ) &&
-            lua_istype ( luaVM, 2, LUA_TLIGHTUSERDATA ) &&
-            lua_istype ( luaVM, 3, LUA_TFUNCTION ) )
+        // Grab our virtual machine
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            // Grab propagated flag if any
-            bool bPropagated = true;
-            if ( lua_istype ( luaVM, 4, LUA_TBOOLEAN ) )
-                bPropagated = ( lua_toboolean ( luaVM, 4 ) ) ? true:false;
-
-            // Grab the arguments
-            const char* szName = lua_tostring ( luaVM, 1 );
-            CClientEntity* pEntity = lua_toelement ( luaVM, 2 );
-            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 3 );
-
-            // Verify the element
-            if ( pEntity )
+            // Check if the handle is in use
+            if ( pEntity->GetEventManager()->HandleExists ( pLuaMain, strName, iLuaFunction ) )
             {
-                // Verify the function
-                if ( VERIFY_FUNCTION ( iLuaFunction ) )
-                {
-                    // Check if the handle is in use
-                    if ( pEntity->GetEventManager()->HandleExists ( pLuaMain, szName, iLuaFunction ) )
-                    {
-                        m_pScriptDebugging->LogCustom ( luaVM, 255, 0, 0, "addEventHandler: %s is already handled", szName );
-                        lua_pushboolean ( luaVM, false );
-                        return 1;
-                    }
-
-                    // Do it
-                    if ( CStaticFunctionDefinitions::AddEventHandler ( *pLuaMain, const_cast < char * > ( szName ), *pEntity, iLuaFunction, bPropagated ) )
-                    {
-                        lua_pushboolean ( luaVM, true );
-                        return 1;
-                    }
-                }
-                else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "addEventHandler", "function", 3 );
+                m_pScriptDebugging->LogCustom ( luaVM, 255, 0, 0, "addEventHandler: '%s' with this function is already handled", *strName );
+                lua_pushboolean ( luaVM, false );
+                return 1;
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "addEventHandler", "element", 2 );
+
+            // Do it
+            if ( CStaticFunctionDefinitions::AddEventHandler ( *pLuaMain, strName, *pEntity, iLuaFunction, bPropagated ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "addEventHandler" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "addEventHandler", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -113,42 +96,31 @@ int CLuaFunctionDefs::AddEventHandler ( lua_State* luaVM )
 
 int CLuaFunctionDefs::RemoveEventHandler ( lua_State* luaVM )
 {
-    // Grab our virtual machine
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        // Verify the arguments
-        if ( lua_istype ( luaVM, 1, LUA_TSTRING ) &&
-            lua_istype ( luaVM, 2, LUA_TLIGHTUSERDATA ) &&
-            lua_istype ( luaVM, 3, LUA_TFUNCTION ) )
-        {
-            // Grab the arguments
-            const char* szName = lua_tostring ( luaVM, 1 );
-            CClientEntity* pEntity = lua_toelement ( luaVM, 2 );
-            CLuaFunctionRef iLuaFunction = luaM_toref ( luaVM, 3 );
+//  bool removeEventHandler ( string eventName, element attachedTo, function functionVar )
+    SString strName; CClientEntity* pEntity; CLuaFunctionRef iLuaFunction;
 
-            // Verify the element
-            if ( pEntity )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strName );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadFunction ( iLuaFunction );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors () )
+    {
+        // Grab our virtual machine
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            // Do it
+            if ( CStaticFunctionDefinitions::RemoveEventHandler ( *pLuaMain, strName, *pEntity, iLuaFunction ) )
             {
-                // Verify the function
-                if ( VERIFY_FUNCTION ( iLuaFunction ) )
-                {
-                    // Do it
-                    if ( CStaticFunctionDefinitions::RemoveEventHandler ( *pLuaMain, const_cast < char * > ( szName ), *pEntity, iLuaFunction ) )
-                    {
-                        lua_pushboolean ( luaVM, true );
-                        return 1;
-                    }
-                }
-                else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "removeEventHandler", "function", 3 );
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "removeEventHandler", "element", 2 );
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "removeEventHandler" );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "removeEventHandler", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -158,32 +130,26 @@ int CLuaFunctionDefs::RemoveEventHandler ( lua_State* luaVM )
 
 int CLuaFunctionDefs::TriggerEvent ( lua_State* luaVM )
 {
-    // Verify the arguments
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) &&
-        lua_istype ( luaVM, 2, LUA_TLIGHTUSERDATA ) )
+//  bool triggerEvent ( string eventName, element baseElement, [ var argument1, ... ] )
+    SString strName; CClientEntity* pEntity; CLuaArguments Arguments;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strName );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadLuaArguments ( Arguments );
+
+    if ( !argStream.HasErrors () )
     {
-        // Grab the name and the element
-        const char* szName = lua_tostring ( luaVM, 1 );
-        CClientEntity* pEntity = lua_toelement ( luaVM, 2 );
-
-        // Read out the additional arguments to pass to the event
-        CLuaArguments Arguments;
-        Arguments.ReadArguments ( luaVM, 3 );
-
-        // Verify the element
-        if ( pEntity )
+        // Trigger it
+        bool bWasCancelled;
+        if ( CStaticFunctionDefinitions::TriggerEvent ( strName, *pEntity, Arguments, bWasCancelled ) )
         {
-            // Trigger it
-            bool bWasCancelled;
-            if ( CStaticFunctionDefinitions::TriggerEvent ( szName, *pEntity, Arguments, bWasCancelled ) )
-            {
-                lua_pushboolean ( luaVM, !bWasCancelled );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, !bWasCancelled );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "triggerEvent", "element", 2 );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "triggerEvent", *argStream.GetErrorMessage () ) );
 
     // Error
     lua_pushnil ( luaVM );
@@ -193,31 +159,25 @@ int CLuaFunctionDefs::TriggerEvent ( lua_State* luaVM )
 
 int CLuaFunctionDefs::TriggerServerEvent ( lua_State* luaVM )
 {
-    // Verify argument types
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) &&
-        lua_istype ( luaVM, 2, LUA_TLIGHTUSERDATA ) )
-    {
-        // Grab arguments
-        const char* szName = lua_tostring ( luaVM, 1 );
-        CClientEntity* pCallWithEntity = lua_toelement ( luaVM, 2 );
-        CLuaArguments Arguments;
-        Arguments.ReadArguments ( luaVM, 3 );
+//  bool triggerServerEvent ( string event, element theElement, [arguments...] )
+    SString strName; CClientEntity* pCallWithEntity; CLuaArguments Arguments;
 
-        // Check entity
-        if ( pCallWithEntity )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strName );
+    argStream.ReadUserData ( pCallWithEntity );
+    argStream.ReadLuaArguments ( Arguments );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Trigger it
+        if ( CStaticFunctionDefinitions::TriggerServerEvent ( strName, *pCallWithEntity, Arguments ) )
         {
-            // Trigger it
-            if ( CStaticFunctionDefinitions::TriggerServerEvent ( szName, *pCallWithEntity, Arguments ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "triggerServerEvent", "element", 2 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "triggerServerEvent" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "triggerServerEvent", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );

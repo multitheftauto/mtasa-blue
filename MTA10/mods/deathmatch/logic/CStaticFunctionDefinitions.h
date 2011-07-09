@@ -37,8 +37,8 @@ public:
                                         ~CStaticFunctionDefinitions         ( void );
 
     static bool                         AddEvent                            ( CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger );
-    static bool                         AddEventHandler                     ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
-    static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
+    static bool                         AddEventHandler                     ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
     static bool                         TriggerEvent                        ( const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled );
     static bool                         TriggerServerEvent                  ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments );
     static bool                         CancelEvent                         ( bool bCancel );
@@ -112,12 +112,12 @@ public:
     static bool                         GetPlayerNametagColor               ( CClientPlayer & Player, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB );
 
     // Player set funcs
-    static bool                         ShowPlayerHudComponent              ( unsigned char ucComponent, bool bShow );
+    static bool                         ShowPlayerHudComponent              ( eHudComponent component, bool bShow );
     static bool                         SetPlayerMoney                      ( long lMoney );
     static bool                         GivePlayerMoney                     ( long lMoney );
     static bool                         TakePlayerMoney                     ( long lMoney );
-    static bool                         SetPlayerNametagText                ( CClientEntity& Entity, char *  szText );
-    static bool                         SetPlayerNametagColor               ( CClientEntity& Entity, unsigned char ucR, unsigned char ucG, unsigned char ucB );
+    static bool                         SetPlayerNametagText                ( CClientEntity& Entity, const char* szText );
+    static bool                         SetPlayerNametagColor               ( CClientEntity& Entity, bool bRemoveOverride, unsigned char ucR, unsigned char ucG, unsigned char ucB );
     static bool                         SetPlayerNametagShowing             ( CClientEntity& Entity, bool bShowing );
 
     // Ped funcs

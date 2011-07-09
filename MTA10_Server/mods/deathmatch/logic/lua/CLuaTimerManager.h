@@ -33,7 +33,7 @@ public:
     bool                        Exists                          ( CLuaTimer* pLuaTimer );
     CLuaTimer*                  GetTimer                        ( unsigned int uiID );
 
-    CLuaTimer*                  AddTimer                        ( lua_State* luaVM );
+    CLuaTimer*                  AddTimer                        ( const CLuaFunctionRef& iLuaFunction, unsigned long ulTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments );
     void                        RemoveTimer                     ( CLuaTimer* pLuaTimer );
     void                        RemoveAllTimers                 ( void );
     unsigned long               GetTimerCount                   ( void ) const              { return m_TimerList.size (); }

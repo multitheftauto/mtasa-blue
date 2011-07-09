@@ -18,6 +18,24 @@ DECLARE_ENUM( TrafficLight::EColor );
 DECLARE_ENUM( TrafficLight::EState );
 DECLARE_ENUM( CEasingCurve::eType );
 
+enum eHudComponent
+{
+    HUD_AMMO,
+    HUD_WEAPON,
+    HUD_HEALTH,
+    HUD_BREATH,
+    HUD_ARMOUR,
+    HUD_MONEY,
+    HUD_VEHICLE_NAME,
+    HUD_AREA_NAME,
+    HUD_RADAR,
+    HUD_CLOCK,
+    HUD_RADIO,
+    HUD_WANTED,
+    HUD_ALL,
+};
+DECLARE_ENUM( eHudComponent );
+
 
 // class -> class type
 typedef int eEntityType;
@@ -55,6 +73,7 @@ inline SString GetClassTypeName ( CWater* )         { return "water"; }
 
 inline SString GetClassTypeName ( CXMLNode* )       { return "xml-node"; }
 inline SString GetClassTypeName ( CLuaTimer* )      { return "lua-timer"; }
+inline SString GetClassTypeName ( CAccount* )       { return "account"; }
 
 
 //
@@ -80,6 +99,19 @@ CLuaTimer* UserDataCast ( CLuaTimer*, void* ptr, lua_State* luaVM )
         if ( pLuaMain->GetTimerManager ()->Exists ( pLuaTimer ) )
             return pLuaTimer;
     }
+    return NULL;
+}
+
+
+//
+// CAccount from userdata
+//
+template < class T >
+CAccount* UserDataCast ( CAccount*, void* ptr, lua_State* luaVM )
+{
+    CAccount* pAccount = reinterpret_cast < CAccount* > ( ptr );
+    if ( g_pGame->GetAccountManager ()->Exists ( pAccount ) )
+        return pAccount;
     return NULL;
 }
 

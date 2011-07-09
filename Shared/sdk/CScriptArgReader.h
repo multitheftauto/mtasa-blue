@@ -29,6 +29,13 @@ public:
         m_iErrorIndex = 0;
         m_bError = false;
         m_bIgnoreMismatchMatch = false;
+        m_pPendingFunctionOutValue = NULL;
+        m_pPendingFunctionIndex = -1;
+    }
+
+    CScriptArgReader ( void )
+    {
+        assert ( !IsReadFunctionPending () );
     }
 
     //
@@ -298,6 +305,60 @@ public:
 
 
     //
+    // Read a function, but don't do it yet due to Lua statck issues
+    //
+    bool ReadFunction ( CLuaFunctionRef& outValue, int defaultValue = -2 )
+    {
+        assert ( !m_pPendingFunctionOutValue );
+
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        if ( iArgument == LUA_TFUNCTION )
+        {
+            m_pPendingFunctionOutValue = &outValue;
+            m_pPendingFunctionIndex = m_iIndex++;
+            return true;
+        }
+        else
+        if ( defaultValue == LUA_REFNIL )
+        {
+            outValue = CLuaFunctionRef ();
+            return true;
+        }
+
+        SetTypeError ( "function", m_iIndex );
+        m_iIndex++;
+        return false;
+    }
+
+    //
+    // Call after other arguments have been read
+    //
+    bool ReadFunctionComplete ( void )
+    {
+        if ( !m_pPendingFunctionOutValue )
+            return true;
+
+        assert ( m_pPendingFunctionIndex != -1 );
+        *m_pPendingFunctionOutValue = luaM_toref ( m_luaVM, m_pPendingFunctionIndex );
+        if ( VERIFY_FUNCTION( *m_pPendingFunctionOutValue ) )
+        {
+            m_pPendingFunctionIndex = -1;
+            return true;
+        }
+
+        SetTypeError ( "function", m_pPendingFunctionIndex );
+        m_pPendingFunctionIndex = -1;
+        return false;
+    }
+
+    // Debug check
+    bool IsReadFunctionPending ( void ) const
+    {
+        return m_pPendingFunctionOutValue && m_pPendingFunctionIndex != -1;
+    }
+
+
+    //
     // Peek at next type
     //
     bool NextIs ( int iArgument, int iOffset = 0 ) const  { return iArgument == lua_type ( m_luaVM, m_iIndex + iOffset ); }
@@ -345,6 +406,7 @@ public:
     //
     bool HasErrors ( bool bCheckUnusedArgs = false ) const
     {
+        assert ( !IsReadFunctionPending () );
         if ( bCheckUnusedArgs && lua_type ( m_luaVM, m_iIndex ) != LUA_TNONE )
             return true;
         return m_bError;
@@ -393,4 +455,6 @@ public:
     SString                 m_strErrorExpectedType;
     int                     m_iIndex;
     lua_State*              m_luaVM;
+    CLuaFunctionRef*        m_pPendingFunctionOutValue;
+    int                     m_pPendingFunctionIndex;
 };

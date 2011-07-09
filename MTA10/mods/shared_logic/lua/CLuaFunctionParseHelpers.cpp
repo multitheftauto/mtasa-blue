@@ -105,6 +105,22 @@ IMPLEMENT_ENUM_BEGIN( CEasingCurve::eType )
     ADD_ENUM ( CEasingCurve::CosineCurve,      "CosineCurve" )
 IMPLEMENT_ENUM_END_DEFAULTS( "easing-type", CEasingCurve::EASING_INVALID, "Invalid" )
 
+IMPLEMENT_ENUM_BEGIN( eHudComponent )
+    ADD_ENUM ( HUD_AMMO,            "ammo" )
+    ADD_ENUM ( HUD_WEAPON,          "weapon" )
+    ADD_ENUM ( HUD_HEALTH,          "health" )
+    ADD_ENUM ( HUD_BREATH,          "breath" )
+    ADD_ENUM ( HUD_ARMOUR,          "armour" )
+    ADD_ENUM ( HUD_MONEY,           "money" )
+    ADD_ENUM ( HUD_VEHICLE_NAME,    "vehicle_name" )
+    ADD_ENUM ( HUD_AREA_NAME,       "area_name" )
+    ADD_ENUM ( HUD_RADAR,           "radar" )
+    ADD_ENUM ( HUD_CLOCK,           "clock" )
+    ADD_ENUM ( HUD_RADIO,           "radio" )
+    ADD_ENUM ( HUD_WANTED,          "wanted" )
+    ADD_ENUM ( HUD_ALL,             "all" )
+IMPLEMENT_ENUM_END( "hud-component" )
+
 
 //
 // Reading mixed types

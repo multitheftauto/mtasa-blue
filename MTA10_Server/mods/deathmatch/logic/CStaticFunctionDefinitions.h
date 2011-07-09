@@ -137,7 +137,7 @@ public:
     static bool                 SetPlayerAmmo                       ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo, unsigned short usAmmoInClip );
     static bool                 GivePlayerMoney                     ( CElement* pElement, long lMoney );
     static bool                 TakePlayerMoney                     ( CElement* pElement, long lMoney );
-    static bool                 ShowPlayerHudComponent              ( CElement* pElement, unsigned char ucComponent, bool bShow );
+    static bool                 ShowPlayerHudComponent              ( CElement* pElement, eHudComponent component, bool bShow );
     static bool                 SetPlayerDebuggerVisible            ( CElement* pElement, bool bVisible );
     static bool                 SetPlayerWantedLevel                ( CElement* pElement, unsigned int iLevel );
     static bool                 ForcePlayerMap                      ( CElement* pElement, bool bVisible );
@@ -571,13 +571,13 @@ public:
     static bool                 GetAccounts                         ( CLuaMain* pLuaMain );
     static CClient*             GetAccountPlayer                    ( CAccount* pAccount );
     static bool                 IsGuestAccount                      ( CAccount* pAccount, bool& bGuest );
-    static CLuaArgument*        GetAccountData                      ( CAccount* pAccount, char* szKey );
+    static CLuaArgument*        GetAccountData                      ( CAccount* pAccount, const char* szKey );
 
     // Account set funcs
     static CAccount*            AddAccount                          ( const char* szName, const char* szPassword );
     static bool                 RemoveAccount                       ( CAccount* pAccount );
     static bool                 SetAccountPassword                  ( CAccount* pAccount, const char* szPassword );
-    static bool                 SetAccountData                      ( CAccount* pAccount, char* szKey, CLuaArgument * pArgument );
+    static bool                 SetAccountData                      ( CAccount* pAccount, const char* szKey, CLuaArgument * pArgument );
     static bool                 CopyAccountData                     ( CAccount* pAccount, CAccount* pFromAccount );
 
     // Log in/out funcs
