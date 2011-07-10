@@ -426,7 +426,7 @@ namespace
             // Check for illegal characters
             if ( strPathFilename.Contains ( ".." ) )
             {
-                SString strMsg ( "CIncludeManager: Illegal path %s", *strPathFilename );
+                SString strMsg ( "[CIncludeManager: Illegal path %s]", *strPathFilename );
                 m_strReport += strMsg;
                 OutputDebugLine ( strMsg );
                 return E_FAIL;
@@ -436,7 +436,7 @@ namespace
             std::vector < char > buffer;
             if ( !FileLoad ( strPathFilename, buffer ) )
             {
-                SString strMsg ( "CIncludeManager: Can't find %s", *strPathFilename );
+                SString strMsg ( "[CIncludeManager: Can't find %s]", *strPathFilename );
                 m_strReport += strMsg;
                 OutputDebugLine ( strMsg );
                 return E_FAIL;
@@ -558,7 +558,7 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
     SString strMetaPath = strFilename.Right ( strFilename.length () - strRootPath.length () );
     CIncludeManager IncludeManager ( strRootPath, ExtractPath ( strMetaPath ) );
     LPD3DXBUFFER pBufferErrors = NULL;
-    D3DXCreateEffectFromFile( m_pDevice, ExtractFilename ( strMetaPath ), NULL, &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
+    HRESULT hr = D3DXCreateEffectFromFile( m_pDevice, ExtractFilename ( strMetaPath ), NULL, &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
 
     // Handle compile errors
     strOutStatus = "";
@@ -574,7 +574,10 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
     SAFE_RELEASE( pBufferErrors );
 
     if( !m_pD3DEffect )
+    {
+        strOutStatus = SString ( "D3DXCreateEffectFromFile failed (%08x)%s", hr, *IncludeManager.m_strReport );
         return;
+    }
 
     // Find first valid technique
     D3DXHANDLE hTechnique = NULL;
