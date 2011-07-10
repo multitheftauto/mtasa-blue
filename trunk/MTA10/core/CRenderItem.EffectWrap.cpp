@@ -575,7 +575,8 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
 
     if( !m_pD3DEffect )
     {
-        strOutStatus = SString ( "D3DXCreateEffectFromFile failed (%08x)%s", hr, *IncludeManager.m_strReport );
+        if ( strOutStatus.empty () )
+            strOutStatus = SString ( "[D3DXCreateEffectFromFile failed (%08x)%s]", hr, *IncludeManager.m_strReport );
         return;
     }
 
