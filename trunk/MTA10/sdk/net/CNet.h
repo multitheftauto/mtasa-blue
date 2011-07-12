@@ -17,6 +17,13 @@
 #include "net/bitstream.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
+struct SPacketStat
+{
+    int iCount;
+    int iTotalBytes;
+    TIMEUS totalTime;
+};
+
 class CNet
 {
 public:
@@ -46,7 +53,7 @@ public:
     virtual const char *                GetConnectedServer          ( void )=0;
 
     virtual bool                        GetNetworkStatistics        ( NetStatistics* pDest ) = 0;
-    virtual void                        GetNetworkUsageData         ( ENetworkUsageDirection dir, unsigned long ulTotalBits[256], unsigned long ulCount[256] ) = 0;
+    virtual const SPacketStat*          GetPacketStats              ( void ) = 0;
 
     virtual int                         GetPing                     ( void ) = 0;
     virtual unsigned long               GetTime                     ( void ) = 0;
