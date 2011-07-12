@@ -29,7 +29,8 @@ int CLimitsSA::GetIPLFiles () const
 }
 bool CLimitsSA::SetIPLFiles ( int value )
 {
-    MemPutFast<int>(0x405F25, value);
+    MemPutFast<unsigned char>(0x405F25, 0x68);
+    MemPutFast<int>(0x405F26, value);
     return true;
 }
 
@@ -39,7 +40,8 @@ int CLimitsSA::GetCollisionFiles () const
 }
 bool CLimitsSA::SetCollisionFiles ( int value )
 {
-    MemPutFast<int>(0x411457, value);
+    MemPutFast<unsigned char>(0x411457, 0x68);
+    MemPutFast<int>(0x411458, value);
     return true;
 }
 
@@ -49,7 +51,8 @@ int CLimitsSA::GetQuadtreeNodes () const
 }
 bool CLimitsSA::SetQuadtreeNodes ( int value )
 {
-    MemPutFast<int>(0x552C3E, value);
+    MemPutFast<unsigned char>(0x552C3E, 0x68);
+    MemPutFast<int>(0x552C3F, value);
     return true;
 }
 
@@ -59,7 +62,8 @@ int CLimitsSA::GetVehicleStructs () const
 }
 bool CLimitsSA::SetVehicleStructs ( int value )
 {
-    MemPutFast<int>(0x5B8FE3, value);
+    MemPutFast<unsigned char>(0x5B8FE3, 0x6A);
+    MemPutFast<unsigned char>(0x5B8FE4, static_cast<unsigned char>(value));
     return true;
 }
 
@@ -69,7 +73,8 @@ int CLimitsSA::GetPolygons () const
 }
 bool CLimitsSA::SetPolygons ( int value )
 {
-    MemPutFast<int>(0x731F5F, value);
+    MemPutFast<unsigned char>(0x731F5F, 0x68);
+    MemPutFast<int>(0x731F60, value);
     return true;
 }
 
