@@ -572,6 +572,7 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
 bool CStaticFunctionDefinitions::GetElementAttachedOffsets ( CClientEntity & Entity, CVector & vecPosition, CVector & vecRotation )
 {
     Entity.GetAttachedOffsets ( vecPosition, vecRotation );
+    ConvertRadiansToDegrees ( vecRotation );
     return true;
 }
 
