@@ -1354,8 +1354,8 @@ bool CStaticFunctionDefinitions::AttachElements ( CElement* pElement, CElement* 
         {
             if ( pElement->IsAttachToable () && pAttachedToElement->IsAttachable () && pElement->GetDimension() == pAttachedToElement->GetDimension() )
             {
-                ConvertDegreesToRadians ( vecRotation );
                 pElement->SetAttachedOffsets ( vecPosition, vecRotation );
+                ConvertDegreesToRadians ( vecRotation );
                 pElement->AttachTo ( pAttachedToElement );
 
                 CBitStream BitStream;
@@ -1588,8 +1588,8 @@ bool CStaticFunctionDefinitions::SetElementAttachedOffsets ( CElement* pElement,
     pElement->GetAttachedOffsets ( vecCurrentPos, vecCurrentRot );
     if ( vecPosition != vecCurrentPos || vecRotation != vecCurrentRot )
     {
-        ConvertDegreesToRadians ( vecRotation );
         pElement->SetAttachedOffsets ( vecPosition, vecRotation );
+        ConvertDegreesToRadians ( vecRotation );
         
         SPositionSync position ( true );
         position.data.vecPosition = vecPosition;
