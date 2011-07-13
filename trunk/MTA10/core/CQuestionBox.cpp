@@ -64,7 +64,7 @@ void CQuestionBox::Show ( void )
     float fEditSpacer = 10.0f;
 
     float fMsgWidth = Max ( 400.f, m_pMessage->GetTextExtent () + 50.f );
-    float fMsgHeight = Max < float > ( 3, uiNumLines ) * m_pMessage->GetFontHeight ();
+    float fMsgHeight = Max < float > ( 3, uiNumLines ) * ( m_pMessage->GetFontHeight () + 1 );
     float fWinWidth = Max ( fMsgWidth, m_uiActiveButtons * ( 112 + 10.f ) );
     float fWinHeight = 50 + fMsgHeight + 50 + 30 + ( m_uiActiveEditboxes * ( fEditHeight + 2*fEditSpacer ) ) ;
 
