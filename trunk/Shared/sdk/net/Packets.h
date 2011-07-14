@@ -132,16 +132,9 @@ enum ePacketID
     PACKET_ID_OBJECT_STOPSYNC,
     PACKET_ID_OBJECT_SYNC,
 
-    // Bitstream 0x0e
     PACKET_ID_UPDATE_INFO,
-
-    // Bitstream 0x11
     PACKET_ID_DISCONNECT_MESSAGE,
-
-    // Bitstream 0x12
     PACKET_ID_PLAYER_TRANSGRESSION,
-
-    // Bitstream 0x14
     PACKET_ID_PLAYER_DIAGNOSTIC,
-
+    PACKET_ID_PLAYER_MODINFO,
 };

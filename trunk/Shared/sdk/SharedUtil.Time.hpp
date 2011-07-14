@@ -117,6 +117,22 @@ SString SharedUtil::GetLocalTimeString ( bool bDate, bool bMilliseconds )
     return GetTimeString ( bDate, bMilliseconds, true );
 }
 
+namespace SharedUtil
+{
+    long long gCurrentTickCount64 = 0;
+}
+
+long long SharedUtil::GetModuleTickCount64 ( void )
+{
+    if ( !gCurrentTickCount64 )
+        UpdateModuleTickCount64 ();
+    return gCurrentTickCount64;
+}
+
+void SharedUtil::UpdateModuleTickCount64 ( void )
+{
+    gCurrentTickCount64 = GetTickCount64_ ();
+}
 
 
 //

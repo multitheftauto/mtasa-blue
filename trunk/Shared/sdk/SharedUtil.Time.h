@@ -49,6 +49,10 @@ namespace SharedUtil
     typedef ulong TIMEUS;
     TIMEUS      GetTimeUs ( void );
 
+    // Get tick count cached per module
+    long long   GetModuleTickCount64 ( void );
+    void        UpdateModuleTickCount64 ( void );
+
     //
     // Simple class to measure time passing
     // Main feature is the limit on how much time is allowed to pass between each Get()
@@ -58,26 +62,34 @@ namespace SharedUtil
         long long   m_llUpdateTime;
         long        m_lElapsedTime;
         long        m_lMaxIncrement;
+        bool        m_bUseModuleTickCount;
     public:
 
-        CElapsedTime ( long lMaxIncrement = 500 )
+        CElapsedTime ( long lMaxIncrement = 500, bool bUseModuleTickCount = false )
             : m_lMaxIncrement ( lMaxIncrement )
+            , m_bUseModuleTickCount ( bUseModuleTickCount )
         {
             Reset ();
         }
 
         void Reset ( void )
         {
-            m_llUpdateTime = GetTickCount64_ ();
+            m_llUpdateTime = DoGetTickCount ();
             m_lElapsedTime = 0;
         }
 
         long Get ( void )
         {
-            long long llTime = GetTickCount64_ ();
+            long long llTime = DoGetTickCount ();
             m_lElapsedTime += Min ( m_lMaxIncrement, static_cast < long > ( llTime - m_llUpdateTime ) );
             m_llUpdateTime = llTime;
             return m_lElapsedTime;
+        }
+
+    protected:
+        long long DoGetTickCount ( void )
+        {
+            return m_bUseModuleTickCount ? GetModuleTickCount64 () : GetTickCount64_ ();
         }
     };
 
