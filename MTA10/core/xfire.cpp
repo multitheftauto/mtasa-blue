@@ -4,6 +4,7 @@
 #include <tlhelp32.h>
 
 static HMODULE g_toucan_dll = NULL;
+static CElapsedTime g_NextToucanDLLSearchTime;
 static void HelperInit();
 static HMODULE HelperGetToucanDLL();
 
@@ -85,6 +86,12 @@ static HMODULE HelperGetToucanDLL()
 {
     if (g_toucan_dll)
         return g_toucan_dll;
+
+    // Only scan once every five seconds
+    if ( g_NextToucanDLLSearchTime.Get () < 5000 )
+        return NULL;
+
+    g_NextToucanDLLSearchTime.Reset ();
 
     /*
     ** We need to enumerate the DLLs loaded to find toucan dll.
