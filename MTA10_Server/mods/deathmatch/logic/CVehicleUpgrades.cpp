@@ -51,17 +51,18 @@ bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
     // No upgrades for trains
     if ( usModel == 537 ||
          usModel == 538 ||
-         usModel == 449 )
+         usModel == 449 ||
+         usModel == 569 ||
+         usModel == 570 ||
+         usModel == 590  )
     {
         return false;
     }
 
-    /* TODO: add this
-    eClientVehicleType vehicleType = m_pVehicle->GetVehicleType ();
-    if ( vehicleType == CLIENTVEHICLE_BOAT || vehicleType == CLIENTVEHICLE_PLANE ||
-         vehicleType == CLIENTVEHICLE_BIKE )
+    eVehicleType vehicleType = m_pVehicle->GetVehicleType ();
+    if ( vehicleType == VEHICLE_BOAT || vehicleType == VEHICLE_PLANE ||
+         vehicleType == VEHICLE_BIKE || vehicleType == VEHICLE_BMX )
          return false;
-         */
 
     unsigned short us = usUpgrade;
     if ( us == VEHICLEUPGRADE_NITRO_5X || us == VEHICLEUPGRADE_NITRO_2X ||
