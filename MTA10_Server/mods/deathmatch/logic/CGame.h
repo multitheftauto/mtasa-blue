@@ -58,6 +58,7 @@ class CGame;
 #include "packets/CCameraSyncPacket.h"
 #include "packets/CPlayerTransgressionPacket.h"
 #include "packets/CPlayerDiagnosticPacket.h"
+#include "packets/CPlayerModInfoPacket.h"
 
 #include "CRPCFunctions.h"
 
@@ -364,6 +365,7 @@ private:
     void                        Packet_CameraSync           ( class CCameraSyncPacket& Packet );
     void                        Packet_PlayerTransgression  ( class CPlayerTransgressionPacket& Packet );
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
+    void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 

@@ -1059,6 +1059,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_MODINFO:
+        {
+            Packet_PlayerModInfo ( static_cast < CPlayerModInfoPacket& > ( Packet ) );
+            return true;
+        }
+
         default:
             break;
     }
@@ -1338,6 +1344,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerMute", "", NULL, false );
     m_Events.AddEvent ( "onPlayerUnmute", "", NULL, false );
     m_Events.AddEvent ( "onPlayerCommand", "command", NULL, false );
+    m_Events.AddEvent ( "onPlayerModInfo", "type, ids, names", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onPedWasted", "ammo, killer, weapon, bodypart", NULL, false );
@@ -2970,6 +2977,36 @@ void CGame::Packet_PlayerDiagnostic ( CPlayerDiagnosticPacket & Packet )
             SString strMessageCombo ( "DIAGNOSTIC: %s #%d %s\n", pPlayer->GetNick (), Packet.m_uiLevel, Packet.m_strMessage.c_str () );
             CLogger::LogPrint ( strMessageCombo );
         }
+    }
+}
+
+
+void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer && pPlayer->IsJoined () )
+    {
+        // Make ids table
+        CLuaArguments ids;
+        for ( std::vector < ushort >::iterator iter = Packet.m_IdList.begin(); iter != Packet.m_IdList.end(); ++iter )
+        {
+            ids.PushNumber ( ids.Count () / 2 + 1 );
+            ids.PushNumber ( *iter );
+        }
+
+        // Make names table
+        CLuaArguments names;
+        for ( std::vector < SString >::iterator iter = Packet.m_NameList.begin(); iter != Packet.m_NameList.end(); ++iter )
+        {
+            names.PushNumber ( names.Count () / 2 + 1 );
+            names.PushString ( *iter );
+        }
+
+        CLuaArguments Arguments;
+        Arguments.PushString ( Packet.m_strInfoType );
+        Arguments.PushTable ( &ids );
+        Arguments.PushTable ( &names );
+        g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onPlayerModInfo", Arguments );
     }
 }
 
