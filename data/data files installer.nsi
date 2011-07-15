@@ -18,7 +18,7 @@ Var Install_Dir
 ; Don't forget to update the BUILD_NUMBER
 ; ###########################################################################################################
 !define FILES_ROOT "."
-!define BUILD_NUMBER "2850"
+!define BUILD_NUMBER "2883"
 !define PRODUCT_VERSION "Data-r${BUILD_NUMBER}"
 !define INSTALL_OUTPUT "mtasa-1.1-data-r${BUILD_NUMBER}.exe"
 ; ###########################################################################################################
@@ -109,6 +109,7 @@ Section "Data files" SEC01
 
 	SetOutPath "$INSTDIR\MTA"
 	File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\D3DCompiler_42.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bass.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\basswma.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassmidi.dll"
