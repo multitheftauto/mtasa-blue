@@ -95,8 +95,8 @@ bool CResourceManager::Refresh ( bool bRefreshAll )
 
             bool bIsDir = DirectoryExists ( PathJoin ( strResourcesAbsPath, strName ) );
 
-            // Recurse into directories that start with #
-            if ( bIsDir && strName.BeginsWith( "#" ) )
+            // Recurse into [directories]
+            if ( bIsDir && ( strName.BeginsWith( "#" ) || ( strName.BeginsWith( "[" ) && strName.EndsWith( "]" ) ) ) )
             {
                 resourcesPathList.push_back ( PathJoin ( strResourcesRelPath, strName ) );
                 continue;
