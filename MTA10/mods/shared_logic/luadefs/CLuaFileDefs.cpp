@@ -37,12 +37,11 @@ void CLuaFileDefs::LoadFunctions ( void )
 
 int CLuaFileDefs::fileCreate ( lua_State* luaVM )
 {
-//  file fileCreate ( [string accessType = "public",] string filePath )
-    SString filePath; eAccessType accessType;
+//  file fileCreate ( string filePath )
+    SString filePath;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( filePath );
-    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
 
     if ( !argStream.HasErrors () )
     {
@@ -52,7 +51,7 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
         {
             std::string strAbsPath;
             CResource* pResource = pLuaMain->GetResource ();
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath, accessType ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath ) )
             {
                 // Make sure the destination folder exist so we can create the file
                 MakeSureDirExists ( strAbsPath.c_str () );
@@ -105,12 +104,11 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
 
 int CLuaFileDefs::fileExists ( lua_State* luaVM )
 {
-//  bool fileExists ( string filePath [,string accessType = "public"] )
-    SString filePath; eAccessType accessType;
+//  bool fileExists ( string filePath )
+    SString filePath;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( filePath );
-    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
 
     if ( !argStream.HasErrors () )
     {
@@ -120,7 +118,7 @@ int CLuaFileDefs::fileExists ( lua_State* luaVM )
         {
             std::string strAbsPath;
             CResource* pResource = pLuaMain->GetResource ();
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath, accessType ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath ) )
             {
                 bool bResult = FileExists ( strAbsPath );
                 lua_pushboolean ( luaVM, bResult );
@@ -140,13 +138,12 @@ int CLuaFileDefs::fileExists ( lua_State* luaVM )
 
 int CLuaFileDefs::fileOpen ( lua_State* luaVM )
 {
-//  file fileOpen ( string filePath [, bool readOnly = false, string accessType = "public"] )
-    SString filePath; bool readOnly; eAccessType accessType;
+//  file fileOpen ( string filePath [, bool readOnly = false ] )
+    SString filePath; bool readOnly;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( filePath );
     argStream.ReadBool ( readOnly, false );
-    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
 
     if ( !argStream.HasErrors () )
     {
@@ -156,7 +153,7 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
         {
             std::string strAbsPath;
             CResource* pResource = pLuaMain->GetResource ();
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath, accessType ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath ) )
             {
                 // Create the file to create
                 CScriptFile* pFile = new CScriptFile ( strAbsPath.c_str (), DEFAULT_MAX_FILESIZE );
@@ -483,12 +480,11 @@ int CLuaFileDefs::fileClose ( lua_State* luaVM )
 
 int CLuaFileDefs::fileDelete ( lua_State* luaVM )
 {
-//  bool fileDelete ( string filePath [,string accessType = "public"] )
-    SString filePath; eAccessType accessType;
+//  bool fileDelete ( string filePath )
+    SString filePath;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( filePath );
-    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
 
     if ( !argStream.HasErrors () )
     {
@@ -498,7 +494,7 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
         {
             std::string strPath;
             CResource* pResource = pLuaMain->GetResource ();
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strPath, accessType ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strPath ) )
             {
                 if ( FileDelete ( strPath.c_str () ) )
                 {
@@ -523,13 +519,12 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
 
 int CLuaFileDefs::fileRename ( lua_State* luaVM )
 {
-//  bool fileRename ( string filePath, string newFilePath [,string accessType = "public"] )
-    SString filePath; SString newFilePath; eAccessType accessType;
+//  bool fileRename ( string filePath, string newFilePath )
+    SString filePath; SString newFilePath;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( filePath );
     argStream.ReadString ( newFilePath );
-    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
 
     if ( !argStream.HasErrors () )
     {
@@ -544,8 +539,8 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
             CResource* pThisResource = pLuaMain->GetResource ();
             CResource* pCurResource = pThisResource;
             CResource* pNewResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pCurResource, strCurAbsPath, accessType ) &&
-                 CResourceManager::ParseResourcePathInput ( newFilePath, pNewResource, strNewAbsPath, accessType ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pCurResource, strCurAbsPath ) &&
+                 CResourceManager::ParseResourcePathInput ( newFilePath, pNewResource, strNewAbsPath ) )
             {
                  // Does source file exist?
                 if ( FileExists ( strCurAbsPath.c_str() ) )

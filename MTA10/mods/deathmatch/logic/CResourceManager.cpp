@@ -122,16 +122,24 @@ void CResourceManager::StopAll ( void )
     }
 }
 
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, eAccessType accessType )
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath )
 {
 	std::string dummy;
-	return ParseResourcePathInput ( strInput, pResource, strPath, dummy, accessType );
+	return ParseResourcePathInput ( strInput, pResource, strPath, dummy );
 }
 
 // pResource may be changed on return, and it could be NULL if the function returns false.
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath, eAccessType accessType )
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
+    eAccessType accessType = ACCESS_PUBLIC;
+
+    if ( strInput[0] == '@' )
+    {
+        accessType = ACCESS_PRIVATE;
+        strInput = strInput.substr ( 1 );
+    }
+
     if ( strInput[0] == ':' )
     {
         unsigned int iEnd = strInput.find_first_of("/");

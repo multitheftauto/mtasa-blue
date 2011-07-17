@@ -379,12 +379,11 @@ int CLuaFunctionDefs::XMLNodeGetParent ( lua_State* luaVM )
 
 int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
 {
-//  xmlnode xmlLoadFile ( string filePath [,string accessType = "public"] )
-    SString filePath; eAccessType accessType;
+//  xmlnode xmlLoadFile ( string filePath )
+    SString filePath;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( filePath );
-    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
 
     if ( !argStream.HasErrors () )
     {
@@ -393,7 +392,7 @@ int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
         {
             CResource* pResource = luaMain->GetResource();
             SString strFilename;
-            if ( CResourceManager::ParseResourcePathInput( filePath, pResource, strFilename, accessType ) )
+            if ( CResourceManager::ParseResourcePathInput( filePath, pResource, strFilename ) )
             {
                 // Create the XML
                 CXMLFile * xmlFile = luaMain->CreateXML ( strFilename );
@@ -431,13 +430,12 @@ int CLuaFunctionDefs::XMLLoadFile ( lua_State* luaVM )
 
 int CLuaFunctionDefs::XMLCreateFile ( lua_State* luaVM )
 {
-//  xmlnode xmlCreateFile ( string filePath, string rootNodeName [,string accessType = "public"] )
-    SString filePath; SString rootNodeName; eAccessType accessType;
+//  xmlnode xmlCreateFile ( string filePath, string rootNodeName )
+    SString filePath; SString rootNodeName;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( filePath );
     argStream.ReadString ( rootNodeName );
-    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
 
     // Safety check: Don't allow the rootNodeName "private" incase user forget to declare a node name
     if ( rootNodeName == EnumToString ( ACCESS_PRIVATE ) )
@@ -460,7 +458,7 @@ int CLuaFunctionDefs::XMLCreateFile ( lua_State* luaVM )
         {
             CResource* pResource = pLuaMain->GetResource();
             SString strFile;
-            if ( CResourceManager::ParseResourcePathInput( filePath, pResource, strFile, accessType ) )
+            if ( CResourceManager::ParseResourcePathInput( filePath, pResource, strFile ) )
             {
                 // Make sure the directory exists
                 MakeSureDirExists ( strFile.c_str () );
@@ -612,13 +610,12 @@ int CLuaFunctionDefs::XMLDestroyNode ( lua_State* luaVM )
 
 int CLuaFunctionDefs::XMLCopyFile ( lua_State* luaVM )
 {
-//  xmlnode xmlCopyFile ( xmlnode nodeToCopy, string newFilePath [,string accessType = "public"] )
-    CXMLNode* pSourceNode; SString newFilePath; eAccessType accessType;
+//  xmlnode xmlCopyFile ( xmlnode nodeToCopy, string newFilePath )
+    CXMLNode* pSourceNode; SString newFilePath;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pSourceNode );
     argStream.ReadString ( newFilePath );
-    argStream.ReadEnumString ( accessType, ACCESS_PUBLIC );
 
     if ( !argStream.HasErrors () )
     {
@@ -628,7 +625,7 @@ int CLuaFunctionDefs::XMLCopyFile ( lua_State* luaVM )
         {
             CResource* pResource = pLUA->GetResource();
             SString strFilename;
-            if ( CResourceManager::ParseResourcePathInput( newFilePath, pResource, strFilename, accessType ) )
+            if ( CResourceManager::ParseResourcePathInput( newFilePath, pResource, strFilename ) )
             {
                 // Grab the source node
                 CXMLNode* pSourceNode = lua_toxmlnode ( luaVM, 1 );

@@ -857,6 +857,14 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
     std::string strMetaPath;
+
+    if ( strInput[0] == '@' )
+    {
+        // This isn't relevant on the server because all files are private
+        // But let's skip the symbol anyway
+        strInput = strInput.substr ( 1 );
+    }
+
     if ( strInput[0] == ':' )
     {
         unsigned int iEnd = strInput.find_first_of ( "/" );
