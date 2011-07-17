@@ -1214,6 +1214,10 @@ void CMultiplayerSA::InitHooks()
 
     // Allow Player Garages to shut with players inside.
     MemSet ( (void *)0x44C6FA, 0x90, 4 );
+
+    // Stop the loading of ambient traffic models and textures
+    // by skipping CStreaming::StreamVehiclesAndPeds() and CStreaming::StreamZoneModels()
+    MemPut < BYTE > ( 0x40E7DF, 0xEB );
 }
 
 
