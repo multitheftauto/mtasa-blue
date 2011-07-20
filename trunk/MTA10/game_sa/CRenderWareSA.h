@@ -23,6 +23,39 @@
 #include <windows.h>
 #include <stdio.h>
 
+
+//
+// STexInfo and SShadInfo are used for mapping GTA world textures to shaders
+//
+struct STexInfo;
+struct SShadInfo
+{
+    SShadInfo ( const SString& strMatch, CSHADERDUMMY* pShaderData )
+        : strMatch ( strMatch.ToLower () )
+        , pShaderData ( pShaderData )
+    {
+    }
+    const SString           strMatch;           // Always lower case
+    CSHADERDUMMY* const     pShaderData;
+    std::set < STexInfo* >  associatedTexInfoMap;
+};
+
+struct STexInfo
+{
+    STexInfo ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData )
+        : usTxdId ( usTxdId )
+        , strTextureName ( strTextureName.ToLower () )
+        , pD3DData ( pD3DData )
+        , pAssociatedShadInfo ( NULL )
+    {
+    }
+    const ushort            usTxdId;
+    const SString           strTextureName;     // Always lower case
+    CD3DDUMMY* const        pD3DData;
+    SShadInfo*              pAssociatedShadInfo;
+};
+
+
 class CRenderWareSA : public CRenderWare
 {
     public:
@@ -87,25 +120,38 @@ class CRenderWareSA : public CRenderWare
     bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName );
 
     ushort              GetTXDIDForModelID          ( ushort usModelID );
-    void*               GetD3DDataForTxdTexture     ( ushort usModelID, const char* szTextureName );
-    void                InitModelTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback );
-    void                BeginModelTextureWatch      ( ushort usModelID, const char* szTextureName );
-    void                EndModelTextureWatch        ( ushort usModelID, const char* szTextureName );
-    void                PulseModelTextureWatch      ( void );
+    void                InitWorldTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback );
+    bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* szMatch );
+    void                RemoveWorldTextureWatch     ( CSHADERDUMMY* pShaderData, const char* szMatch );
+    void                RemoveWorldTextureWatchByContext ( CSHADERDUMMY* pShaderData );
+    void                PulseWorldTextureWatch      ( void );
     void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID );
+    void                GetTxdTextures              ( std::vector < RwTexture* >& outTextureList, ushort usTxdId );
+    SString             GetTextureName              ( CD3DDUMMY* pD3DData );
 
 private:
     static void         RwTexDictionaryRemoveTexture( RwTexDictionary* pTXD, RwTexture* pTex );
     static short        CTxdStore_GetTxdRefcount    ( unsigned short usTxdID );
     static bool         ListContainsNamedTexture    ( std::list < RwTexture* >& list, const char* szTexName );
-    static bool         StaticGetTextureCB          ( RwTexture* texture, std::vector < SString >* pNameList );
+    static bool         StaticGetTextureCB          ( RwTexture* texture, std::vector < RwTexture* >* pTextureList );
+    void                AddActiveTexture            ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData );
+    void                RemoveTxdActiveTextures     ( ushort usTxdId );
+    void                FindNewAssociationForTexInfo( STexInfo* pTexInfo );
+    STexInfo*           CreateTexInfo               ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData );
+    void                OnDestroyTexInfo            ( STexInfo* pTexInfo );
+    SShadInfo*          CreateShadInfo              ( CSHADERDUMMY* pShaderData, const SString& strTextureName );
+    void                OnDestroyShadInfo           ( SShadInfo* pShadInfo );
+    void                MakeAssociation             ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
+    void                BreakAssociation            ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
 
-    // Watched model textures
-    struct SWatchedModelInfo
-    {
-        std::map < SString, void* > nameDataMap;  
-    };
-    std::map < ushort, SWatchedModelInfo >  m_watchedModelInfoMap;
+    // Watched world textures
+    std::list < SShadInfo >                 m_ShadInfoList;
+    std::list < STexInfo >                  m_TexInfoList;
+
+    std::map < SString, STexInfo* >         m_UniqueTexInfoMap;
+    std::map < CD3DDUMMY*, STexInfo* >      m_D3DDataTexInfoMap;
+    std::map < SString, SShadInfo* >        m_UniqueShadInfoMap;
+
     PFN_WATCH_CALLBACK                      m_pfnWatchCallback;
 };
 

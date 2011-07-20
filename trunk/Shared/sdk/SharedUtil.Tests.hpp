@@ -16,9 +16,10 @@
 #ifdef MTA_DEBUG
 
 // Fwd decl
-void    SString_Tests               ( void );
-void    SharedUtil_File_Tests       ( void );
-void    SharedUtil_ClassIdent_Tests ( void );
+void    SString_Tests                   ( void );
+void    SharedUtil_File_Tests           ( void );
+void    SharedUtil_ClassIdent_Tests     ( void );
+void 	SharedUtil_WildcardMatch_Tests  ( void );
 
 
 ///////////////////////////////////////////////////////////////
@@ -33,6 +34,7 @@ void SharedUtil_Tests ( void )
     SString_Tests ();
     SharedUtil_File_Tests ();
     SharedUtil_ClassIdent_Tests ();
+    SharedUtil_WildcardMatch_Tests ();
 }
 
 
@@ -448,5 +450,68 @@ void SharedUtil_ClassIdent_Tests ( void )
     delete pDaffodil;
 }
 
+
+///////////////////////////////////////////////////////////////
+//
+// SharedUtil_WildcardMatch_Tests
+//
+// Tests for WildcardMatch
+//
+///////////////////////////////////////////////////////////////
+void SharedUtil_WildcardMatch_Tests ( void )
+{
+    // WildcardMatch
+    {
+        TEST_FUNCTION
+            assert ( WildcardMatch ( a, b ) == result );
+        TEST_VARS
+            const char* a;
+            const char* b;
+            bool result;
+        TEST_DATA
+            "*bd*",         "abcbde",               true,
+            "*bd?f*",       "abcbdef_bdgh",         true,
+            "*bd?h*",       "abcbdef_bdgh",         true,
+            "*bd?g*",       "abcbdef_bdgh",         false,
+            "scr*w?d",      "screeeewywxd",         true,
+            "A*B",          "A_B_B",                true,
+            "",             "",                     true,
+            "*",            "",                     true,
+            "*",            "A",                    true,
+            "",             "A",                    false,
+            "A*",           "",                     false,
+            "A*",           "AAB",                  true,
+            "A*",           "BAA",                  false,
+            "A*",           "A",                    true,
+            "A*B",          "",                     false,
+            "A*B",          "AAB",                  true,
+            "A*B",          "AB",                   true,
+            "A*B",          "AABA",                 false,
+            "A*B",          "ABAB",                 true,
+            "A*B",          "ABBBB",                true,
+            "A*B*C",        "",                     false,
+            "A*B*C",        "ABC",                  true,
+            "A*B*C",        "ABCC",                 true,
+            "A*B*C",        "ABBBC",                true,
+            "A*B*C",        "ABBBBCCCC",            true,
+            "A*B*C",        "ABCBBBCBCCCBCBCCCC",   true,
+            "A*B*",         "AB",                   true,
+            "A*B*",         "AABA",                 true,
+            "A*B*",         "ABAB",                 true,
+            "A*B*",         "ABBBB",                true,
+            "A*B*C*",       "",                     false,
+            "A*B*C*",       "ABC",                  true,
+            "A*B*C*",       "ABCC",                 true,
+            "A*B*C*",       "ABBBC",                true,
+            "A*B*C*",       "ABBBBCCCC",            true,
+            "A*B*C*",       "ABCBBBCBCCCBCBCCCC",   true,
+            "A?",           "AAB",                  false,
+            "A?B",          "AAB",                  true,
+            "A?*",          "A",                    false,
+            "A?*",          "ABBCC",                true,
+            "A?*",          "BAA",                  false,
+        TEST_END
+    }
+}
 
 #endif  // MTA_DEBUG

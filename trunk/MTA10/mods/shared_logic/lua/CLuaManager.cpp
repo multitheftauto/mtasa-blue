@@ -575,8 +575,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineRestoreModel", CLuaFunctionDefs::EngineRestoreModel );
     CLuaCFunctions::AddFunction ( "engineSetModelLODDistance", CLuaFunctionDefs::EngineSetModelLODDistance );
     CLuaCFunctions::AddFunction ( "engineSetAsynchronousLoading", CLuaFunctionDefs::EngineSetAsynchronousLoading );
-    CLuaCFunctions::AddFunction ( "engineApplyShaderToModel", CLuaFunctionDefs::EngineApplyShaderToModel );
-    CLuaCFunctions::AddFunction ( "engineRemoveShaderFromModel", CLuaFunctionDefs::EngineRemoveShaderFromModel );
+    CLuaCFunctions::AddFunction ( "engineApplyShaderToWorldTexture", CLuaFunctionDefs::EngineApplyShaderToWorldTexture );
+    CLuaCFunctions::AddFunction ( "engineRemoveShaderFromWorldTexture", CLuaFunctionDefs::EngineRemoveShaderFromWorldTexture );
     CLuaCFunctions::AddFunction ( "engineGetModelNameFromID", CLuaFunctionDefs::EngineGetModelNameFromID );
     CLuaCFunctions::AddFunction ( "engineGetModelIDFromName", CLuaFunctionDefs::EngineGetModelIDFromName );
     CLuaCFunctions::AddFunction ( "engineGetModelTextureNames", CLuaFunctionDefs::EngineGetModelTextureNames );

@@ -29,6 +29,7 @@ class CDirect3DEvents9
     static bool __stdcall   OnEndScene              ( IDirect3DDevice9 *pDevice );
     static void __stdcall   OnInvalidate            ( IDirect3DDevice9 *pDevice );
     static void __stdcall   OnRestore               ( IDirect3DDevice9 *pDevice );
+    static HRESULT __stdcall OnDrawPrimitive        ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount );
     static HRESULT __stdcall OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount );
     static HRESULT __stdcall CreateVertexBuffer     ( IDirect3DDevice9 *pDevice, UINT Length,DWORD Usage,DWORD FVF,D3DPOOL Pool,IDirect3DVertexBuffer9** ppVertexBuffer,HANDLE* pSharedHandle );
     static HRESULT __stdcall SetStreamSource        ( IDirect3DDevice9 *pDevice, UINT StreamNumber,IDirect3DVertexBuffer9* pStreamData,UINT OffsetInBytes,UINT Stride );

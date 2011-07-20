@@ -35,6 +35,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
 
     m_bCaptureState = true;
     g_pDeviceState = &DeviceState;
+    pDevice->GetDeviceCaps ( &g_pDeviceState->DeviceCaps );
 }
 
 CProxyDirect3DDevice9::~CProxyDirect3DDevice9 ( )
@@ -581,7 +582,7 @@ FLOAT   CProxyDirect3DDevice9::GetNPatchMode                  ( VOID )
 
 HRESULT CProxyDirect3DDevice9::DrawPrimitive                  ( D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
 {
-    return m_pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+    return CDirect3DEvents9::OnDrawPrimitive ( m_pDevice, PrimitiveType, StartVertex, PrimitiveCount );
 }
 
 HRESULT CProxyDirect3DDevice9::DrawIndexedPrimitive           ( D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )

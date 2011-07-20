@@ -223,6 +223,62 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 
 /////////////////////////////////////////////////////////////
 //
+// CDirect3DEvents9::OnDrawPrimitive
+//
+// May change render states for custom renderings
+//
+/////////////////////////////////////////////////////////////
+HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,UINT StartVertex,UINT PrimitiveCount )
+{
+    // Any shader for this texture ?
+    CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
+
+    if ( !pShaderItem )
+    {
+        // No shader for this texture
+        return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+    }
+    else
+    {
+        // Yes shader for this texture
+        CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
+
+        // Apply custom parameters
+        pShaderInstance->ApplyShaderParameters ();
+        // Apply common parameters
+        pShaderInstance->m_pEffectWrap->ApplyCommonHandles ();
+        // Apply mapped parameters
+        pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
+
+        // Do shader passes
+        ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+
+        DWORD dwFlags = pShaderInstance->m_pEffectWrap->m_uiSaveStateFlags;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+        uint uiNumPasses = 0;
+        pD3DEffect->Begin ( &uiNumPasses, dwFlags );
+
+        for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
+        {
+            pD3DEffect->BeginPass ( uiPass );
+            pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
+            pD3DEffect->EndPass ();
+        }
+        pD3DEffect->End ();
+
+        // If we didn't get the effect to save the shader state, clear some things here
+        if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )
+        {
+            pDevice->SetVertexShader( NULL );
+            pDevice->SetPixelShader( NULL );
+        }
+
+        return D3D_OK;
+    }
+}
+
+
+/////////////////////////////////////////////////////////////
+//
 // CDirect3DEvents9::OnDrawIndexedPrimitive
 //
 // May change render states for custom renderings
@@ -231,7 +287,7 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
 HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount )
 {
     // Any shader for this texture ?
-    CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( g_pDeviceState->TextureState[0].Texture );
+    CShaderItem* pShaderItem = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
     if ( !pShaderItem )
     {

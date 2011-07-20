@@ -1740,7 +1740,7 @@ ushort CModelNames::ResolveModelID ( const SString& strModelName )
     {
         ushort usModelID = atoi ( strModelName.SubStr ( 3 ) );
         if ( usModelID )
-            return 30000 + usModelID;    // Encode global txd as model id 30000+
+            return 20000 + usModelID;    // Encode global txd as model id 20000+
     }
 
     // Now search for the name
