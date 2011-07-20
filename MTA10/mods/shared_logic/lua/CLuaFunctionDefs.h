@@ -474,8 +474,8 @@ public:
     LUA_DECLARE ( EngineReplaceVehiclePart );
     LUA_DECLARE ( EngineSetModelLODDistance );
     LUA_DECLARE ( EngineSetAsynchronousLoading );
-    LUA_DECLARE ( EngineApplyShaderToModel );
-    LUA_DECLARE ( EngineRemoveShaderFromModel );
+    LUA_DECLARE ( EngineApplyShaderToWorldTexture );
+    LUA_DECLARE ( EngineRemoveShaderFromWorldTexture );
     LUA_DECLARE ( EngineGetModelNameFromID );
     LUA_DECLARE ( EngineGetModelIDFromName );
     LUA_DECLARE ( EngineGetModelTextureNames );

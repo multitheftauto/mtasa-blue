@@ -49,7 +49,8 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
     m_uiDefaultViewportSizeX = fViewportSizeX;
     m_uiDefaultViewportSizeY = fViewportSizeY;
 
-    CCore::GetSingleton ().GetGame ()->GetRenderWare ()->InitModelTextureWatch ( StaticWatchCallback );
+    m_pRenderWare = CCore::GetSingleton ().GetGame ()->GetRenderWare ();
+    m_pRenderWare->InitWorldTextureWatch ( StaticWatchCallback );
 }
 
 
@@ -328,7 +329,7 @@ bool CRenderItemManager::SetShaderValue ( CShaderItem* pShaderItem, const SStrin
 void CRenderItemManager::UpdateBackBufferCopy ( void )
 {
     // Do this here for now
-    CCore::GetSingleton ().GetGame ()->GetRenderWare ()->PulseModelTextureWatch ();
+    m_pRenderWare->PulseWorldTextureWatch ();
 
     if ( m_bBackBufferCopyMaybeNeedsResize )
         UpdateBackBufferCopySize ();
@@ -541,9 +542,9 @@ void CRenderItemManager::ChangeRenderTarget ( uint uiSizeX, uint uiSizeY, IDirec
 // Find which shader item is being used to render this D3DData
 //
 ////////////////////////////////////////////////////////////////
-CShaderItem* CRenderItemManager::GetAppliedShaderForD3DData ( void* pD3DData )
+CShaderItem* CRenderItemManager::GetAppliedShaderForD3DData ( CD3DDUMMY* pD3DData )
 {
-    CShaderItem** ppShaderItem = MapFind ( m_D3DDataShaderMap, pD3DData );
+    CShaderItem** ppShaderItem = (CShaderItem**)MapFind ( m_D3DDataShaderMap, pD3DData );
     if ( ppShaderItem )
         return *ppShaderItem;
     return NULL;
@@ -552,125 +553,36 @@ CShaderItem* CRenderItemManager::GetAppliedShaderForD3DData ( void* pD3DData )
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderItemManager::ApplyShaderItemToModelTexture
+// CRenderItemManager::ApplyShaderItemToWorldTexture
 //
-// Add an association between the shader item and the model_texture
+// Add an association between the shader item and a world texture match
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::ApplyShaderItemToModelTexture ( CShaderItem* pShaderItem, ushort usModelID, const SString& strTextureName )
+bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch )
 {
     assert ( pShaderItem );
 
-    // Get current usage for the model/texture
-    CShaderItem** ppCurrentUsage = GetShaderizedModelTextureUsage ( usModelID, strTextureName, true );
+    // Remove any existing match
+    RemoveShaderItemFromWorldTexture ( pShaderItem, strTextureNameMatch );
 
-    // Is it not changing?
-    if ( *ppCurrentUsage && pShaderItem == *ppCurrentUsage )
-    {
-        return true;
-    }
-
-    // Is it changing?
-    if ( *ppCurrentUsage && pShaderItem != *ppCurrentUsage )
-    {
-        // Stop previous watch on model_texture
-        CCore::GetSingleton ().GetGame ()->GetRenderWare ()->EndModelTextureWatch ( usModelID, strTextureName );
-    }
-
-    // Update current usage
-    *ppCurrentUsage = pShaderItem;
-
-    // Start new watch on model_texture
-    CCore::GetSingleton ().GetGame ()->GetRenderWare ()->BeginModelTextureWatch ( usModelID, strTextureName );
-
-    return true;
+    // Add new match at the end
+    return m_pRenderWare->AddWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch );
 }
 
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderItemManager::RemoveShaderItemFromModelTexture
+// CRenderItemManager::RemoveShaderItemFromWorldTexture
 //
-// Remove an association between the shader item and the model_texture
+// Remove an association between the shader item and the world texture
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::RemoveShaderItemFromModelTexture ( CShaderItem* pShaderItem, ushort usModelID, const SString& strTextureName )
+bool CRenderItemManager::RemoveShaderItemFromWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch )
 {
     assert ( pShaderItem );
 
-    // Get current usage for the model/texture
-    CShaderItem** ppCurrentUsage = GetShaderizedModelTextureUsage ( usModelID, strTextureName, false );
-
-    // Can't unset unless shader matches
-    if ( !ppCurrentUsage || pShaderItem != *ppCurrentUsage )
-        return false;
-
-    // Remove usage here
-    RemoveShaderizedModelTextureUsage ( usModelID, strTextureName );
-
-    // End watch on this model_texture
-    CCore::GetSingleton ().GetGame ()->GetRenderWare ()->EndModelTextureWatch ( usModelID, strTextureName );
+    m_pRenderWare->RemoveWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch );
     return true;
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::GetShaderizedModelTextureUsage
-//
-//
-//
-////////////////////////////////////////////////////////////////
-CShaderItem** CRenderItemManager::GetShaderizedModelTextureUsage ( ushort usModelID, const SString& strTextureName, bool bCreateIfRequired )
-{
-    // Get info block for this model ID
-    SShaderizedModelInfo* pInfo = MapFind ( m_shaderizedModelInfoMap, usModelID );
-    if ( !pInfo )
-    {
-        if ( !bCreateIfRequired )
-            return NULL;
-
-        // Add new
-        MapSet ( m_shaderizedModelInfoMap, usModelID, SShaderizedModelInfo () );
-        pInfo = MapFind ( m_shaderizedModelInfoMap, usModelID );
-    }
-
-    // Get usage for the texture
-    CShaderItem** ppShaderItem = MapFind ( pInfo->textureNameShaderItemMap, strTextureName );
-    if ( !ppShaderItem )
-    {
-        if ( !bCreateIfRequired )
-            return NULL;
-
-        // Add new
-        MapSet ( pInfo->textureNameShaderItemMap, strTextureName, (CShaderItem*)NULL );
-        ppShaderItem = MapFind ( pInfo->textureNameShaderItemMap, strTextureName );
-    }
-
-    return ppShaderItem;
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::RemoveShaderizedModelTextureUsage
-//
-//
-//
-////////////////////////////////////////////////////////////////
-void CRenderItemManager::RemoveShaderizedModelTextureUsage ( ushort usModelID, const SString& strTextureName )
-{
-    // Get info block for this model ID
-    SShaderizedModelInfo* pInfo = MapFind ( m_shaderizedModelInfoMap, usModelID );
-    if ( !pInfo )
-        return;
-
-    // Remove usage for the texture
-    MapRemove ( pInfo->textureNameShaderItemMap, strTextureName );
-
-    // If model_texture map is now empty, remove model info
-    if ( pInfo->textureNameShaderItemMap.empty () )
-        MapRemove ( m_shaderizedModelInfoMap, usModelID );
 }
 
 
@@ -684,41 +596,16 @@ void CRenderItemManager::RemoveShaderizedModelTextureUsage ( ushort usModelID, c
 void CRenderItemManager::RemoveShaderItemFromWatchLists ( CShaderItem* pShaderItem )
 {
     //
-    // Remove shader item from all model_textures
+    // Remove shader item from all world textures
     //
-
-    // for each model
-    for ( std::map < ushort, SShaderizedModelInfo >::iterator modIter = m_shaderizedModelInfoMap.begin () ; modIter != m_shaderizedModelInfoMap.end () ; )
-    {
-        ushort usModelId = modIter->first;
-        SShaderizedModelInfo& info = modIter->second;
-
-        // for each model_texture
-        for ( std::map < SString, CShaderItem* >::iterator texIter = info.textureNameShaderItemMap.begin () ; texIter != info.textureNameShaderItemMap.end () ; )
-        {
-            if ( pShaderItem == texIter->second )
-            {
-                // Remove shader item from this model_texture
-                CCore::GetSingleton ().GetGame ()->GetRenderWare ()->EndModelTextureWatch ( usModelId, texIter->first );
-                info.textureNameShaderItemMap.erase ( texIter++ );
-            }
-            else
-                ++texIter;
-        }
-
-        // If model_texture map is now empty, remove model info
-        if ( info.textureNameShaderItemMap.empty () )
-            m_shaderizedModelInfoMap.erase ( modIter++ );
-        else
-            ++modIter;
-    }
+    m_pRenderWare->RemoveWorldTextureWatchByContext ( (CSHADERDUMMY*)pShaderItem );
 
     //
     // Remove shader item from D3DData map
     //
-    for ( std::map < void*, CShaderItem* >::iterator dataIter = m_D3DDataShaderMap.begin () ; dataIter != m_D3DDataShaderMap.end () ; )
+    for ( std::map < CD3DDUMMY*, CSHADERDUMMY* >::iterator dataIter = m_D3DDataShaderMap.begin () ; dataIter != m_D3DDataShaderMap.end () ; )
     {
-        if ( pShaderItem == dataIter->second )
+        if ( pShaderItem == (CShaderItem*)dataIter->second )
             m_D3DDataShaderMap.erase ( dataIter++ );
         else
             ++dataIter;
@@ -730,10 +617,10 @@ void CRenderItemManager::RemoveShaderItemFromWatchLists ( CShaderItem* pShaderIt
 //
 // CRenderItemManager::WatchCallback
 //
-// Notification that the pD3DData is being changed for this model/texture
+// Notification that the pD3DData is being changed for this context
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::WatchCallback ( ushort usModelID, const char* szTextureName, void* pD3DDataNew, void* pD3DDataOld )
+void CRenderItemManager::WatchCallback ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld )
 {
     // Remove old pointer
     if ( pD3DDataOld )
@@ -741,13 +628,7 @@ void CRenderItemManager::WatchCallback ( ushort usModelID, const char* szTexture
 
     // Add new pointer
     if ( pD3DDataNew )
-    {
-        // Get current usage for the model/texture
-        CShaderItem** ppCurrentUsage = GetShaderizedModelTextureUsage ( usModelID, szTextureName, false );
-
-        if ( ppCurrentUsage && *ppCurrentUsage )
-            MapSet ( m_D3DDataShaderMap, pD3DDataNew, *ppCurrentUsage );
-    }
+        MapSet ( m_D3DDataShaderMap, pD3DDataNew, pShaderItem );
 }
 
 
@@ -758,7 +639,7 @@ void CRenderItemManager::WatchCallback ( ushort usModelID, const char* szTexture
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::StaticWatchCallback ( ushort usModelID, const char* szTextureName, void* pD3DDataNew, void* pD3DDataOld )
+void CRenderItemManager::StaticWatchCallback ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld )
 {
-    ( ( CRenderItemManager* ) CGraphics::GetSingleton ().GetRenderItemManager () )->WatchCallback ( usModelID, szTextureName, pD3DDataNew, pD3DDataOld );
+    ( ( CRenderItemManager* ) CGraphics::GetSingleton ().GetRenderItemManager () )->WatchCallback ( pShaderItem, pD3DDataNew, pD3DDataOld );
 }

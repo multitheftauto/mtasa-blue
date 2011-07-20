@@ -582,10 +582,13 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
 
     if ( pDXFont )
     {
-        iLeft = unsigned int ( ( float ) iLeft * ( 1.0f / fScaleX ) );
-        iTop = unsigned int ( ( float ) iTop * ( 1.0f / fScaleY ) );
-        iRight = unsigned int ( ( float ) iRight * ( 1.0f / fScaleX ) );
-        iBottom = unsigned int ( ( float ) iBottom * ( 1.0f / fScaleY ) );
+        if ( fScaleX != 1.0f || fScaleY != 1.0f )
+        {
+	        iLeft = unsigned int ( ( float ) iLeft * ( 1.0f / fScaleX ) );
+	        iTop = unsigned int ( ( float ) iTop * ( 1.0f / fScaleY ) );
+	        iRight = unsigned int ( ( float ) iRight * ( 1.0f / fScaleX ) );
+	        iBottom = unsigned int ( ( float ) iBottom * ( 1.0f / fScaleY ) );
+        }
 
         sDrawQueueItem Item;
         Item.eType = QUEUE_TEXT;

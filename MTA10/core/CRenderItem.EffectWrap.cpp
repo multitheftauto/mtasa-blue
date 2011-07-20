@@ -21,6 +21,8 @@ enum EStateGroup
     STATE_GROUP_TEXTURE,
     STATE_GROUP_LIGHT,
     STATE_GROUP_LIGHT_ENABLED,
+    STATE_GROUP_DEVICE_CAPS,
+    STATE_GROUP_VERTEX_DECL,
 };
 DECLARE_ENUM( EStateGroup )
 
@@ -33,6 +35,8 @@ IMPLEMENT_ENUM_BEGIN( EStateGroup )
     ADD_ENUM( STATE_GROUP_TEXTURE,      "textureState" )
     ADD_ENUM( STATE_GROUP_LIGHT,        "lightState" )
     ADD_ENUM( STATE_GROUP_LIGHT_ENABLED,"lightEnabledState" )
+    ADD_ENUM( STATE_GROUP_DEVICE_CAPS,  "deviceCaps" )
+    ADD_ENUM( STATE_GROUP_VERTEX_DECL,  "vertexDeclState" )
 IMPLEMENT_ENUM_END( "state-group" )
 
 
@@ -338,6 +342,99 @@ struct SRegisterInfo
 #undef  USING_STRUCT
 #undef  USING_LIST
 
+#define USING_STRUCT D3DCAPS9
+#define USING_LIST "DeviceCaps"
+                ADD_REGISTER( TYPE_INT, DeviceType ) 
+                ADD_REGISTER( TYPE_INT, AdapterOrdinal ) 
+                ADD_REGISTER( TYPE_INT, Caps )                        /* Caps from DX7 Draw */
+                ADD_REGISTER( TYPE_INT, Caps2 ) 
+                ADD_REGISTER( TYPE_INT, Caps3 ) 
+                ADD_REGISTER( TYPE_INT, PresentationIntervals ) 
+                ADD_REGISTER( TYPE_INT, CursorCaps )                  /* Cursor Caps */
+                ADD_REGISTER( TYPE_INT, DevCaps )                     /* 3D Device Caps */
+                ADD_REGISTER( TYPE_INT, PrimitiveMiscCaps ) 
+                ADD_REGISTER( TYPE_INT, RasterCaps ) 
+                ADD_REGISTER( TYPE_INT, ZCmpCaps ) 
+                ADD_REGISTER( TYPE_INT, SrcBlendCaps ) 
+                ADD_REGISTER( TYPE_INT, DestBlendCaps ) 
+                ADD_REGISTER( TYPE_INT, AlphaCmpCaps ) 
+                ADD_REGISTER( TYPE_INT, ShadeCaps ) 
+                ADD_REGISTER( TYPE_INT, TextureCaps ) 
+                ADD_REGISTER( TYPE_INT, TextureFilterCaps )           // D3DPTFILTERCAPS for IDirect3DTexture9's
+                ADD_REGISTER( TYPE_INT, CubeTextureFilterCaps )       // D3DPTFILTERCAPS for IDirect3DCubeTexture9's
+                ADD_REGISTER( TYPE_INT, VolumeTextureFilterCaps )     // D3DPTFILTERCAPS for IDirect3DVolumeTexture9's
+                ADD_REGISTER( TYPE_INT, TextureAddressCaps )          // D3DPTADDRESSCAPS for IDirect3DTexture9's
+                ADD_REGISTER( TYPE_INT, VolumeTextureAddressCaps )    // D3DPTADDRESSCAPS for IDirect3DVolumeTexture9's
+                ADD_REGISTER( TYPE_INT, LineCaps )                    // D3DLINECAPS
+                ADD_REGISTER( TYPE_INT, MaxTextureWidth ) 
+                ADD_REGISTER( TYPE_INT, MaxTextureHeight ) 
+                ADD_REGISTER( TYPE_INT, MaxVolumeExtent ) 
+                ADD_REGISTER( TYPE_INT, MaxTextureRepeat ) 
+                ADD_REGISTER( TYPE_INT, MaxTextureAspectRatio ) 
+                ADD_REGISTER( TYPE_INT, MaxAnisotropy ) 
+                ADD_REGISTER( TYPE_FLOAT, MaxVertexW ) 
+                ADD_REGISTER( TYPE_FLOAT, GuardBandLeft ) 
+                ADD_REGISTER( TYPE_FLOAT, GuardBandTop ) 
+                ADD_REGISTER( TYPE_FLOAT, GuardBandRight ) 
+                ADD_REGISTER( TYPE_FLOAT, GuardBandBottom ) 
+                ADD_REGISTER( TYPE_FLOAT, ExtentsAdjust ) 
+                ADD_REGISTER( TYPE_INT, StencilCaps ) 
+                ADD_REGISTER( TYPE_INT, FVFCaps ) 
+                ADD_REGISTER( TYPE_INT, TextureOpCaps ) 
+                ADD_REGISTER( TYPE_INT, MaxTextureBlendStages ) 
+                ADD_REGISTER( TYPE_INT, MaxSimultaneousTextures ) 
+                ADD_REGISTER( TYPE_INT, VertexProcessingCaps ) 
+                ADD_REGISTER( TYPE_INT, MaxActiveLights ) 
+                ADD_REGISTER( TYPE_INT, MaxUserClipPlanes ) 
+                ADD_REGISTER( TYPE_INT, MaxVertexBlendMatrices ) 
+                ADD_REGISTER( TYPE_INT, MaxVertexBlendMatrixIndex ) 
+                ADD_REGISTER( TYPE_FLOAT, MaxPointSize ) 
+                ADD_REGISTER( TYPE_INT, MaxPrimitiveCount )           // max number of primitives per DrawPrimitive call
+                ADD_REGISTER( TYPE_INT, MaxVertexIndex ) 
+                ADD_REGISTER( TYPE_INT, MaxStreams ) 
+                ADD_REGISTER( TYPE_INT, MaxStreamStride )             // max stride for SetStreamSource
+                ADD_REGISTER( TYPE_INT, VertexShaderVersion ) 
+                ADD_REGISTER( TYPE_INT, MaxVertexShaderConst )        // number of vertex shader constant registers
+                ADD_REGISTER( TYPE_INT, PixelShaderVersion ) 
+                ADD_REGISTER( TYPE_FLOAT, PixelShader1xMaxValue )       // max value storable in registers of ps.1.x shaders
+                ADD_REGISTER( TYPE_INT, DevCaps2 )                    // Here are the DX9 specific ones
+                ADD_REGISTER( TYPE_FLOAT, MaxNpatchTessellationLevel ) 
+                ADD_REGISTER( TYPE_INT, Reserved5 ) 
+                ADD_REGISTER( TYPE_INT, MasterAdapterOrdinal )         // ordinal of master adaptor for adapter group
+                ADD_REGISTER( TYPE_INT, AdapterOrdinalInGroup )        // ordinal inside the adapter group
+                ADD_REGISTER( TYPE_INT, NumberOfAdaptersInGroup )      // number of adapters in this adapter group (only if master)
+                ADD_REGISTER( TYPE_INT, DeclTypes)                    // Data types, supported in vertex declarations
+                ADD_REGISTER( TYPE_INT, NumSimultaneousRTs )          // Will be at least 1
+                ADD_REGISTER( TYPE_INT, StretchRectFilterCaps )       // Filter caps supported by StretchRect
+                ADD_REGISTER( TYPE_INT, VS20Caps.Caps )
+                ADD_REGISTER( TYPE_INT, VS20Caps.DynamicFlowControlDepth )
+                ADD_REGISTER( TYPE_INT, VS20Caps.NumTemps )
+                ADD_REGISTER( TYPE_INT, VS20Caps.StaticFlowControlDepth )
+                ADD_REGISTER( TYPE_INT, PS20Caps.Caps )
+                ADD_REGISTER( TYPE_INT, PS20Caps.DynamicFlowControlDepth )
+                ADD_REGISTER( TYPE_INT, PS20Caps.NumTemps )
+                ADD_REGISTER( TYPE_INT, PS20Caps.StaticFlowControlDepth )
+                ADD_REGISTER( TYPE_INT, PS20Caps.NumInstructionSlots )
+                ADD_REGISTER( TYPE_INT, VertexTextureFilterCaps )     // D3DPTFILTERCAPS for IDirect3DTexture9's for texture, used in vertex shaders
+                ADD_REGISTER( TYPE_INT, MaxVShaderInstructionsExecuted )  // maximum number of vertex shader instructions that can be executed
+                ADD_REGISTER( TYPE_INT, MaxPShaderInstructionsExecuted )  // maximum number of pixel shader instructions that can be executed
+                ADD_REGISTER( TYPE_INT, MaxVertexShader30InstructionSlots )  
+                ADD_REGISTER( TYPE_INT, MaxPixelShader30InstructionSlots ) 
+#undef  USING_STRUCT
+#undef  USING_LIST
+
+#define USING_STRUCT CProxyDirect3DDevice9::SD3DVertexDeclState
+#define USING_LIST "VertexDeclState"
+                ADD_REGISTER( TYPE_INT, Position )                  // Does each vertex have these components ?
+                ADD_REGISTER( TYPE_INT, PositionT )
+                ADD_REGISTER( TYPE_INT, Normal )
+                ADD_REGISTER( TYPE_INT, Color0 )
+                ADD_REGISTER( TYPE_INT, Color1 )
+                ADD_REGISTER( TYPE_INT, TexCoord0 )
+                ADD_REGISTER( TYPE_INT, TexCoord1 )
+#undef  USING_STRUCT
+#undef  USING_LIST
+
             };
 
 
@@ -372,8 +469,8 @@ public:
 
     static std::map < SString, SRegisterInfo > ms_RegisterInfoMap;
 
-    SString strWarnings;
-    bool bDebug;
+    SString                 m_strWarnings;
+    bool                    m_bVerboseWarnings;
 
     std::vector < SStateVar > renderStateVarList;
     std::vector < SStateVar > stageStateVarList;
@@ -383,6 +480,8 @@ public:
     std::vector < SStateVar > textureStateVarList;
     std::vector < SStateVar > lightStateVarList;
     std::vector < SStateVar > lightEnabledStateVarList;
+    std::vector < SStateVar > deviceCapsVarList;
+    std::vector < SStateVar > vertexDeclStateVarList;
 };
 
 std::map < SString, SRegisterInfo > CEffectWrapImpl::ms_RegisterInfoMap;
@@ -554,6 +653,8 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
     DWORD dwFlags = 0;      // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
     if ( bDebug )
         dwFlags |= D3DXSHADER_DEBUG;
+    else
+        dwFlags |= D3DXFX_NOT_CLONEABLE;
 
     SString strMetaPath = strFilename.Right ( strFilename.length () - strRootPath.length () );
     CIncludeManager IncludeManager ( strRootPath, ExtractPath ( strMetaPath ) );
@@ -865,6 +966,10 @@ void BOUNDS_CHECK ( const void* ptr, int ptrsize, const void* bufstart, int bufs
 ////////////////////////////////////////////////////////////////
 void CEffectWrapImpl::ApplyMappedHandles ( void )
 {
+	//////////////////////////////////////////
+    //
+    // RenderState
+    //
     for ( uint i = 0 ; i < renderStateVarList.size () ; i++ )
     {
         const SStateVar& var = renderStateVarList[i];
@@ -891,7 +996,10 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
         BOUNDS_CHECK( pdwValue, sizeof ( *pdwValue ), &g_pDeviceState->RenderState, sizeof ( g_pDeviceState->RenderState ) );
     }
 
-//////////////////////////////////////////
+	//////////////////////////////////////////
+    //
+    // StageState
+    //
     for ( uint i = 0 ; i < stageStateVarList.size () ; i++ )
     {
         const SStateVar& var = stageStateVarList[i];
@@ -906,8 +1014,10 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
         BOUNDS_CHECK( pdwValue, sizeof ( *pdwValue ), &g_pDeviceState->StageState, sizeof ( g_pDeviceState->StageState ) );
     }
 
-//////////////////////////////////////////
-
+	//////////////////////////////////////////
+    //
+    // SamplerState
+    //
     for ( uint i = 0 ; i < samplerStateVarList.size () ; i++ )
     {
         const SStateVar& var = samplerStateVarList[i];
@@ -929,9 +1039,10 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
         BOUNDS_CHECK( pdwValue, sizeof ( *pdwValue ), &g_pDeviceState->SamplerState, sizeof ( g_pDeviceState->SamplerState ) );
     }
 
-
-//////////////////////////////////////////
-
+	//////////////////////////////////////////
+    //
+    // Material
+    //
     for ( uint i = 0 ; i < materialStateVarList.size () ; i++ )
     {
         const SStateVar& var = materialStateVarList[i];
@@ -953,8 +1064,10 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
         BOUNDS_CHECK( pfValue, sizeof ( *pfValue ), &g_pDeviceState->Material, sizeof ( g_pDeviceState->Material ) );
     }
 
-//////////////////////////////////////////
-
+	//////////////////////////////////////////
+    //
+    // TransformState
+    //
     for ( uint i = 0 ; i < transformStateVarList.size () ; i++ )
     {
         const SStateVar& var = transformStateVarList[i];
@@ -969,9 +1082,10 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
         BOUNDS_CHECK( pMatrix, sizeof ( *pMatrix ), &g_pDeviceState->TransformState, sizeof ( g_pDeviceState->TransformState ) );
     }
 
-//////////////////////////////////////////
-
-    // TYPE_WRITE_T
+	//////////////////////////////////////////
+    //
+    // TextureState
+    //
     for ( uint i = 0 ; i < textureStateVarList.size () ; i++ )
     {
         const SStateVar& var = textureStateVarList[i];
@@ -987,13 +1101,10 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
         BOUNDS_CHECK( ppTexture, sizeof ( *ppTexture ), &g_pDeviceState->TextureState, sizeof ( g_pDeviceState->TextureState ) );
     }
 
-//////////////////////////////////////////
-
-    // TYPE_WRITE_I
-    // TYPE_WRITE_F
-    // TYPE_WRITE_F3
-    // TYPE_WRITE_F4
-
+	//////////////////////////////////////////
+    //
+    // Lights
+    //
     for ( uint i = 0 ; i < lightStateVarList.size () ; i++ )
     {
         const SStateVar& var = lightStateVarList[i];
@@ -1028,9 +1139,10 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
         BOUNDS_CHECK( pfValue, sizeof ( *pfValue ), &g_pDeviceState->Lights, sizeof ( g_pDeviceState->Lights ) );
    }
 
-//////////////////////////////////////////
-    // TYPE_WRITE_I
-
+	//////////////////////////////////////////
+    //
+    // LightEnableState
+    //
     for ( uint i = 0 ; i < lightEnabledStateVarList.size () ; i++ )
     {
         const SStateVar& var = lightEnabledStateVarList[i];
@@ -1044,6 +1156,79 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
             assert ( 0 );
 
         BOUNDS_CHECK( pdwValue, sizeof ( *pdwValue ), &g_pDeviceState->LightEnableState, sizeof ( g_pDeviceState->LightEnableState ) );
+    }
+
+	//////////////////////////////////////////
+    //
+    // DeviceCaps
+    //
+    for ( uint i = 0 ; i < deviceCapsVarList.size () ; i++ )
+    {
+        const SStateVar& var = deviceCapsVarList[i];
+        const DWORD* pdwValue = &((const DWORD*)&g_pDeviceState->DeviceCaps)[ var.iRegister ];
+        if ( var.iType == RegMap::Int2Int )
+        {
+            assert ( var.iSize == 1 );
+            m_pD3DEffect->SetInt ( var.hHandle, *pdwValue );
+        }
+        else
+        if ( var.iType == RegMap::Float2Float )
+        {
+            assert ( var.iSize == 1 );
+            m_pD3DEffect->SetFloatArray ( var.hHandle, (float*)pdwValue, var.iSize );
+        }
+        else
+            assert ( 0 );
+
+        BOUNDS_CHECK( pdwValue, sizeof ( *pdwValue ), &g_pDeviceState->DeviceCaps, sizeof ( g_pDeviceState->DeviceCaps ) );
+    }
+
+    //////////////////////////////////////////
+    //
+    // VertexDeclState
+    //
+    if ( !vertexDeclStateVarList.empty () )
+    {
+        // Hackily update the state here
+        CProxyDirect3DDevice9::SD3DVertexDeclState& vertexDeclState = g_pDeviceState->VertexDeclState;
+        memset ( &vertexDeclState, 0, sizeof ( vertexDeclState ) );
+        IDirect3DVertexDeclaration9* pVertexDeclaration = NULL;
+        if ( SUCCEEDED( m_pDevice->GetVertexDeclaration ( &pVertexDeclaration ) ) )
+        {
+            D3DVERTEXELEMENT9               elements[MAXD3DDECLLENGTH];
+            UINT                            numElements;
+            if ( SUCCEEDED( pVertexDeclaration->GetDeclaration ( elements, &numElements ) ) )
+            {
+                for ( uint i = 0 ; i < numElements - 1 ; i++ )
+                {
+                    switch ( elements [ i ].Usage + elements [ i ].UsageIndex * 16 )
+                    {
+                        case D3DDECLUSAGE_POSITION:         vertexDeclState.Position = 1;   break;
+                        case D3DDECLUSAGE_POSITIONT:        vertexDeclState.PositionT = 1;  break;
+                        case D3DDECLUSAGE_NORMAL:           vertexDeclState.Normal = 1;     break;
+                        case D3DDECLUSAGE_COLOR:            vertexDeclState.Color0 = 1;     break;
+                        case D3DDECLUSAGE_COLOR + 16:       vertexDeclState.Color1 = 1;     break;
+                        case D3DDECLUSAGE_TEXCOORD:         vertexDeclState.TexCoord0 = 1;  break;
+                        case D3DDECLUSAGE_TEXCOORD + 16:    vertexDeclState.TexCoord1 = 1;  break;
+                    }
+                }
+            }
+        }
+    }
+
+    for ( uint i = 0 ; i < vertexDeclStateVarList.size () ; i++ )
+    {
+        const SStateVar& var = vertexDeclStateVarList[i];
+        const DWORD* pdwValue = &((const DWORD*)&g_pDeviceState->VertexDeclState)[ var.iRegister ];
+        if ( var.iType == RegMap::Int2Int )
+        {
+            assert ( var.iSize == 1 );
+            m_pD3DEffect->SetInt ( var.hHandle, *pdwValue );
+        }
+        else
+            assert ( 0 );
+
+        BOUNDS_CHECK( pdwValue, sizeof ( *pdwValue ), &g_pDeviceState->VertexDeclState, sizeof ( g_pDeviceState->VertexDeclState ) );
     }
 }
 
@@ -1118,11 +1303,11 @@ bool CEffectWrapImpl::TryParseSpecialParameter ( D3DXHANDLE hParameter, const D3
                 if ( strAnnotValue == "no" )
                     m_bRequiresNormals = false;
                 else
-                    strWarnings += SString ( "Unknown value for createNormals '%s'\n", *strAnnotValue );
+                    m_strWarnings += SString ( "Unknown value for createNormals '%s'\n", *strAnnotValue );
             }
             else
             {
-                strWarnings += SString ( "Unknown custom flag '%s'\n", *strAnnotName );
+                m_strWarnings += SString ( "Unknown custom flag '%s'\n", *strAnnotName );
             }
         }
         return true;
@@ -1182,8 +1367,8 @@ bool CEffectWrapImpl::TryMappingParameterToRegister ( D3DXHANDLE hParameter, con
         EStateGroup stateGroup;
         if ( !StringToEnum ( strAnnotName, stateGroup ) )
         {
-            if ( bDebug )
-                strWarnings += SString ( "Unknown annotation '%s' for parameter '%s'\n", *strAnnotName, ParameterDesc.Name );
+            if ( m_bVerboseWarnings )
+                m_strWarnings += SString ( "Unknown annotation '%s' for parameter '%s'\n", *strAnnotName, ParameterDesc.Name );
             continue;
         }
 
@@ -1195,7 +1380,7 @@ bool CEffectWrapImpl::TryMappingParameterToRegister ( D3DXHANDLE hParameter, con
         const SRegisterInfo* pRegsiterInfo = GetRegisterInfo ( stateGroup, strName );
         if ( !pRegsiterInfo )
         {
-            strWarnings += SString ( "No match for annotation '%s' '%s' on parameter '%s'\n", *strAnnotName, szAnnotValue, ParameterDesc.Name );
+            m_strWarnings += SString ( "No match for annotation '%s' '%s' on parameter '%s'\n", *strAnnotName, szAnnotValue, ParameterDesc.Name );
             continue;
         }
 
@@ -1204,7 +1389,7 @@ bool CEffectWrapImpl::TryMappingParameterToRegister ( D3DXHANDLE hParameter, con
 
         if ( !pTypeMapping )
         {
-            strWarnings += SString ( "Type mismatch for annotation '%s' '%s' on parameter '%s'\n", *strAnnotName, szAnnotValue, ParameterDesc.Name );
+            m_strWarnings += SString ( "Type mismatch for annotation '%s' '%s' on parameter '%s'\n", *strAnnotName, szAnnotValue, ParameterDesc.Name );
             continue;
         }
 
@@ -1285,5 +1470,7 @@ void CEffectWrapImpl::AddStateMappedParameter ( EStateGroup stateGroup, const SS
         case STATE_GROUP_TEXTURE:       textureStateVarList.push_back ( var ); break;
         case STATE_GROUP_LIGHT:         lightStateVarList.push_back ( var ); break;
         case STATE_GROUP_LIGHT_ENABLED: lightEnabledStateVarList.push_back ( var ); break;
+        case STATE_GROUP_DEVICE_CAPS:   deviceCapsVarList.push_back ( var ); break;
+        case STATE_GROUP_VERTEX_DECL:   vertexDeclStateVarList.push_back ( var ); break;
     }
 }

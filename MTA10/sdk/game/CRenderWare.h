@@ -15,7 +15,10 @@
 #include "RenderWare.h"
 #include <list>
 
-typedef void (*PFN_WATCH_CALLBACK) ( ushort usModelID, const char* szTextureName, void* pD3DDataNew, void* pD3DDataOld );
+class CD3DDUMMY;
+class CSHADERDUMMY;
+
+typedef void (*PFN_WATCH_CALLBACK) ( CSHADERDUMMY* pContext, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
 
 #define MAX_ATOMICS_PER_CLUMP   128
 
@@ -39,11 +42,13 @@ class CRenderWare {
     virtual void                AddAllAtomics               ( RpClump * pDst, RpClump * pSrc ) = 0;
     virtual void                ReplaceVehicleModel         ( RpClump * pNew, unsigned short usModelID ) = 0;
     virtual bool                ReplacePartModels           ( RpClump * pClump, RpAtomicContainer * pAtomics, unsigned int uiAtomics, const char * szName ) = 0;
-    virtual void                InitModelTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback ) = 0;
-    virtual void                BeginModelTextureWatch      ( ushort usModelID, const char* szTextureName ) = 0;
-    virtual void                EndModelTextureWatch        ( ushort usModelID, const char* szTextureName ) = 0;
-    virtual void                PulseModelTextureWatch      ( void ) = 0;
+    virtual void                InitWorldTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback ) = 0;
+    virtual bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* strMatch ) = 0;
+    virtual void                RemoveWorldTextureWatch     ( CSHADERDUMMY* pShaderData, const char* strMatch ) = 0;
+    virtual void                RemoveWorldTextureWatchByContext ( CSHADERDUMMY* pShaderData ) = 0;
+    virtual void                PulseWorldTextureWatch      ( void ) = 0;
     virtual void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID ) = 0;
+    virtual SString             GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;
 };
 
 #endif

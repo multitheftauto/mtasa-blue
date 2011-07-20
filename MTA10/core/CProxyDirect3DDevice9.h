@@ -387,6 +387,17 @@ public:
         DWORD Enable;
     };
 
+    struct SD3DVertexDeclState
+    {
+        DWORD Position;
+        DWORD PositionT;
+        DWORD Normal;
+        DWORD Color0;
+        DWORD Color1;
+        DWORD TexCoord0;
+        DWORD TexCoord1;
+    };
+
     struct SD3DDeviceState
     {
         SD3DDeviceState ()
@@ -405,6 +416,8 @@ public:
         IDirect3DIndexBuffer9*          IndexBufferData;
         D3DLIGHT9                       Lights[8];
         D3DMATERIAL9                    Material;
+        D3DCAPS9                        DeviceCaps;
+        SD3DVertexDeclState             VertexDeclState;
         
         struct
         {

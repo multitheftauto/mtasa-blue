@@ -27,7 +27,8 @@ class CShaderInstance;
 class CRenderTargetItem;
 class CScreenSourceItem;
 class CRenderItemManager;
-
+class CD3DDUMMY;
+class CSHADERDUMMY;
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -57,9 +58,9 @@ public:
     virtual bool                RestoreDefaultRenderTarget          ( void ) = 0;
     virtual void                UpdateBackBufferCopy                ( void ) = 0;
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem ) = 0;
-    virtual CShaderItem*        GetAppliedShaderForD3DData          ( void* pD3DData ) = 0;
-    virtual bool                ApplyShaderItemToModelTexture       ( CShaderItem* pShaderItem, ushort usModelID, const SString& strTextureName ) = 0;
-    virtual bool                RemoveShaderItemFromModelTexture    ( CShaderItem* pShaderItem, ushort usModelID, const SString& strTextureName ) = 0;
+    virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData ) = 0;
+    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch ) = 0;
+    virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch ) = 0;
 };
 
 

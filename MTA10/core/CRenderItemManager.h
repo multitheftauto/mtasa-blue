@@ -38,9 +38,9 @@ public:
     virtual bool                RestoreDefaultRenderTarget          ( void );
     virtual void                UpdateBackBufferCopy                ( void );
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem );
-    virtual CShaderItem*        GetAppliedShaderForD3DData          ( void* pD3DData );
-    virtual bool                ApplyShaderItemToModelTexture       ( CShaderItem* pShaderItem, ushort usModelID, const SString& strTextureName );
-    virtual bool                RemoveShaderItemFromModelTexture    ( CShaderItem* pShaderItem, ushort usModelID, const SString& strTextureName );
+    virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData );
+    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );
+    virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );
 
     // CRenderItemManager
     void                        NotifyContructRenderItem            ( CRenderItem* pItem );
@@ -50,11 +50,9 @@ public:
     void                        OnResetDevice                       ( void );
     void                        UpdateBackBufferCopySize            ( void );
     void                        ChangeRenderTarget                  ( uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface );
-    CShaderItem**               GetShaderizedModelTextureUsage      ( ushort usModelID, const SString& strTextureName, bool bCreateIfRequired );
-    void                        RemoveShaderizedModelTextureUsage   ( ushort usModelID, const SString& strTextureName );
     void                        RemoveShaderItemFromWatchLists      ( CShaderItem* pShaderItem );
-    void                        WatchCallback                       ( ushort usModelID, const char* szTextureName, void* pD3DDataNew, void* pD3DDataOld );
-    static void                 StaticWatchCallback                 ( ushort usModelID, const char* szTextureName, void* pD3DDataNew, void* pD3DDataOld );
+    void                        WatchCallback                       ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
+    static void                 StaticWatchCallback                 ( CSHADERDUMMY* pShaderItem, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld );
 
     IDirect3DDevice9*                           m_pDevice;
 protected:
@@ -67,11 +65,7 @@ protected:
     bool                                        m_bBackBufferCopyMaybeNeedsResize;
     uint                                        m_uiBackBufferCopyRevision;
 
-    // Shaders applied to model textures
-    struct SShaderizedModelInfo
-    {
-        std::map < SString, CShaderItem* > textureNameShaderItemMap;  
-    }; 
-    std::map < ushort, SShaderizedModelInfo >   m_shaderizedModelInfoMap;
-    std::map < void*, CShaderItem* >            m_D3DDataShaderMap;
+    // Shaders applied to world textures
+    std::map < CD3DDUMMY*, CSHADERDUMMY* >      m_D3DDataShaderMap;
+    class CRenderWare*                          m_pRenderWare;
 };
