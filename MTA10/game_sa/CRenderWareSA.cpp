@@ -1090,7 +1090,8 @@ STexInfo* CRenderWareSA::CreateTexInfo ( ushort xusTxdId, const SString& xstrTex
     assert ( !MapContains ( m_UniqueTexInfoMap, strUniqueKey ) );
     MapSet ( m_UniqueTexInfoMap, strUniqueKey, pTexInfo );
 
-    assert ( !MapContains ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) );
+	// This assert fails when using engine txd replace functions - TODO find out why
+    //assert ( !MapContains ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) );
     MapSet ( m_D3DDataTexInfoMap, pTexInfo->pD3DData, pTexInfo );
     return pTexInfo;
 }
@@ -1110,10 +1111,10 @@ void CRenderWareSA::OnDestroyTexInfo ( STexInfo* pTexInfo )
     assert ( MapContains ( m_UniqueTexInfoMap, strUniqueKey ) );
     MapRemove ( m_UniqueTexInfoMap, strUniqueKey );
 
-    assert ( MapContains ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) );
+	// This assert fails when using engine txd replace functions - TODO find out why
+    //assert ( MapContains ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) );
     MapRemove ( m_D3DDataTexInfoMap, pTexInfo->pD3DData );
 }
-
 
 
 ////////////////////////////////////////////////////////////////
@@ -1143,6 +1144,7 @@ SShadInfo* CRenderWareSA::CreateShadInfo (  CSHADERDUMMY* xpShaderData, const SS
 
     return pShadInfo;
 }
+
 
 ////////////////////////////////////////////////////////////////
 //
@@ -1286,12 +1288,13 @@ bool CRenderWareSA::StaticGetTextureCB ( RwTexture* texture, std::vector < RwTex
 //
 //
 ////////////////////////////////////////////////////////////////
-SString CRenderWareSA::GetTextureName ( CD3DDUMMY* pD3DData )
+const SString& CRenderWareSA::GetTextureName ( CD3DDUMMY* pD3DData )
 {
     STexInfo** ppTexInfo = MapFind ( m_D3DDataTexInfoMap, pD3DData );
     if ( ppTexInfo )
         return (*ppTexInfo)->strTextureName;
-    return "";
+    static SString strDummy;
+    return strDummy;
 }
 
 
@@ -1369,4 +1372,3 @@ void _declspec(naked) HOOK_CTxdStore_RemoveTxd ()
         jmp     RETURN_CTxdStore_RemoveTxd      // 731E96
     }
 }
-

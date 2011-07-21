@@ -48,7 +48,7 @@ class CRenderWare {
     virtual void                RemoveWorldTextureWatchByContext ( CSHADERDUMMY* pShaderData ) = 0;
     virtual void                PulseWorldTextureWatch      ( void ) = 0;
     virtual void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID ) = 0;
-    virtual SString             GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;
+    virtual const SString&      GetTextureName              ( CD3DDUMMY* pD3DData ) = 0;
 };
 
 #endif
