@@ -332,6 +332,19 @@ namespace SharedUtil
         collection.insert ( std::pair < T2, V > ( key, value ) );
     }
 
+    // Remove first pair
+    template < class T, class V, class TR, class T2, class V2 >
+    void MapRemovePair ( std::multimap < T, V, TR >& collection, const T2& key, const V2& value )
+    {
+        typedef typename std::multimap < T, V, TR > ::iterator iter_t;
+        std::pair < iter_t, iter_t > itp = collection.equal_range ( key );
+        for ( iter_t it = itp.first ; it != itp.second ; ++it )
+            if ( it->second == value )
+            { 
+                collection.erase ( it );
+                break;
+            }
+    }
 
 
     //

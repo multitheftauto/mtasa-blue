@@ -1749,15 +1749,6 @@ ushort CModelNames::ResolveModelID ( const SString& strModelName )
 
 
 //
-// Get the names of all the textures used by a model
-//
-void CModelNames::GetModelTextureNames ( std::vector < SString >& outNameList, ushort usModelID )
-{
-    g_pCore->GetGame ()->GetRenderWare ()->GetModelTextureNames ( outNameList, usModelID );
-}
-
-
-//
 // Initialize id <-> name maps
 //
 void CModelNames::InitializeMaps ( void )

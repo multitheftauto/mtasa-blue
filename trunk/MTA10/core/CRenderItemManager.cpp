@@ -623,7 +623,7 @@ void CRenderItemManager::GetVisibleTextureNames ( std::vector < SString >& outNa
 // Add an association between the shader item and a world texture match
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch )
+bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, float fOrderPriority )
 {
     assert ( pShaderItem );
 
@@ -631,7 +631,7 @@ bool CRenderItemManager::ApplyShaderItemToWorldTexture ( CShaderItem* pShaderIte
     RemoveShaderItemFromWorldTexture ( pShaderItem, strTextureNameMatch );
 
     // Add new match at the end
-    return m_pRenderWare->AddWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch );
+    return m_pRenderWare->AddWorldTextureWatch ( (CSHADERDUMMY*)pShaderItem, strTextureNameMatch, fOrderPriority );
 }
 
 
