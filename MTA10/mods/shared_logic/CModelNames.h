@@ -14,7 +14,6 @@ class CModelNames
 public:
     static ushort           GetModelID              ( const SString& strName );
     static const char*      GetModelName            ( ushort usModelID );
-    static void             GetModelTextureNames    ( std::vector < SString >& outNameList, ushort usModelID );
     static ushort           ResolveModelID          ( const SString& strModelName );
 
 protected:

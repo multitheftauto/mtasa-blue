@@ -875,27 +875,29 @@ void CRenderWareSA::InitWorldTextureWatch ( PFN_WATCH_CALLBACK pfnWatchCallback 
 //
 // Begin watching for changes to the d3d resource associated with this texture name 
 //
-// When shadinfo applied:
-//      Step through texinfo list and match any
-//
 // Returns false if shader/match already exists
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char* szMatch )
+bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char* szMatch, float fOrderPriority )
 {
-    SShadInfo* pNewShadInfo = CreateShadInfo ( pShaderData, szMatch );
+    SShadInfo* pNewShadInfo = CreateShadInfo ( pShaderData, szMatch, fOrderPriority );
     if ( !pNewShadInfo )
         return false;
 
-    // Step backwards through texinfo list looking for all matches
-    for ( std::list < STexInfo > ::iterator iter1 = m_TexInfoList.begin () ; iter1 != m_TexInfoList.end () ; ++iter1 )
+    // Step through texinfo list looking for all matches
+    for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; ++iter )
     {
-        STexInfo* pTexInfo = &*iter1;
+        STexInfo* pTexInfo = &*iter;
         if ( WildcardMatch ( pNewShadInfo->strMatch, pTexInfo->strTextureName ) )
         {
-            // Remove previous association
+            // Check previous association
             if ( SShadInfo* pPrevShadInfo = pTexInfo->pAssociatedShadInfo )
             {
+				// Check priority
+                if ( pPrevShadInfo->fOrderPriority > pNewShadInfo->fOrderPriority )
+                    continue;
+
+                // Remove previous association
                 BreakAssociation ( pPrevShadInfo, pTexInfo );
             }
 
@@ -911,7 +913,7 @@ bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char
 //
 // CRenderWareSA::MakeAssociation
 //
-//
+// Make the texture use the shader
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::MakeAssociation ( SShadInfo* pShadInfo, STexInfo* pTexInfo )
@@ -930,7 +932,7 @@ void CRenderWareSA::MakeAssociation ( SShadInfo* pShadInfo, STexInfo* pTexInfo )
 //
 // CRenderWareSA::BreakAssociation
 //
-//
+// Stop the texture using the shader
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::BreakAssociation ( SShadInfo* pShadInfo, STexInfo* pTexInfo )
@@ -960,9 +962,9 @@ void CRenderWareSA::RemoveWorldTextureWatch ( CSHADERDUMMY* pShaderData, const c
 {
     SString strMatch = SStringX ( szMatch ).ToLower ();
     // Find shadInfo
-    for ( std::list < SShadInfo > ::iterator iter1 = m_ShadInfoList.begin () ; iter1 != m_ShadInfoList.end () ; )
+    for ( std::list < SShadInfo > ::iterator iter = m_ShadInfoList.begin () ; iter != m_ShadInfoList.end () ; )
     {
-        SShadInfo* pShadInfo = &*iter1;
+        SShadInfo* pShadInfo = &*iter;
         if ( pShadInfo->pShaderData == pShaderData && ( !szMatch || pShadInfo->strMatch == strMatch ) )
         {
             std::vector < STexInfo* > reassociateList;
@@ -978,7 +980,7 @@ void CRenderWareSA::RemoveWorldTextureWatch ( CSHADERDUMMY* pShaderData, const c
             }
 
             OnDestroyShadInfo ( pShadInfo );
-            iter1 = m_ShadInfoList.erase ( iter1 );
+            iter = m_ShadInfoList.erase ( iter );
 
             // Allow unassociated texinfos to find new associations
             for ( uint i = 0 ; i < reassociateList.size () ; i++ )
@@ -992,7 +994,7 @@ void CRenderWareSA::RemoveWorldTextureWatch ( CSHADERDUMMY* pShaderData, const c
                 break;
         }
         else
-            ++iter1;
+            ++iter;
     }
 }
 
@@ -1029,7 +1031,7 @@ void CRenderWareSA::PulseWorldTextureWatch ( void )
             // New txd has been loaded
             //
 
-            // Get list of texture names with d3d data's to add
+            // Get list of texture names and data to add
 
             // Note: If txd has been unloaded since, textureList will be empty
             std::vector < RwTexture* > textureList;
@@ -1061,8 +1063,7 @@ void CRenderWareSA::PulseWorldTextureWatch ( void )
 //
 // CRenderWareSA::AddActiveTexture
 //
-// When texinfo loaded:
-//      Step backwards through shadinfo list looking for a match
+// Create a texinfo for the texture and find a best match shader for it
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::AddActiveTexture ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData )
@@ -1079,10 +1080,10 @@ void CRenderWareSA::AddActiveTexture ( ushort usTxdId, const SString& strTexture
 //
 //
 ////////////////////////////////////////////////////////////////
-STexInfo* CRenderWareSA::CreateTexInfo ( ushort xusTxdId, const SString& xstrTextureName, CD3DDUMMY* xpD3DData )
+STexInfo* CRenderWareSA::CreateTexInfo ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData )
 {
     // Create texinfo
-    m_TexInfoList.push_back ( STexInfo ( xusTxdId, xstrTextureName, xpD3DData ) );
+    m_TexInfoList.push_back ( STexInfo ( usTxdId, strTextureName, pD3DData ) );
     STexInfo* pTexInfo = &m_TexInfoList.back ();
 
     // Add to lookup maps
@@ -1124,10 +1125,10 @@ void CRenderWareSA::OnDestroyTexInfo ( STexInfo* pTexInfo )
 //
 //
 ////////////////////////////////////////////////////////////////
-SShadInfo* CRenderWareSA::CreateShadInfo (  CSHADERDUMMY* xpShaderData, const SString& xstrMatch )
+SShadInfo* CRenderWareSA::CreateShadInfo (  CSHADERDUMMY* pShaderData, const SString& strMatch, float fOrderPriority )
 {
     // Create shadinfo
-    m_ShadInfoList.push_back ( SShadInfo ( xstrMatch, xpShaderData ) );
+    m_ShadInfoList.push_back ( SShadInfo ( strMatch, pShaderData, fOrderPriority ) );
     SShadInfo* pShadInfo = &m_ShadInfoList.back ();
 
     // Check for uniqueness
@@ -1141,6 +1142,9 @@ SShadInfo* CRenderWareSA::CreateShadInfo (  CSHADERDUMMY* xpShaderData, const SS
 
     // Set unique map
     MapSet ( m_UniqueShadInfoMap, strUniqueKey, pShadInfo );
+
+    // Add to order map
+    MapInsert ( m_orderMap, pShadInfo->fOrderPriority, pShadInfo );
 
     return pShadInfo;
 }
@@ -1159,6 +1163,9 @@ void CRenderWareSA::OnDestroyShadInfo ( SShadInfo* pShadInfo )
     SString strUniqueKey ( "%08x_%s", pShadInfo->pShaderData, *pShadInfo->strMatch );
     assert ( MapContains ( m_UniqueShadInfoMap, strUniqueKey ) );
     MapRemove ( m_UniqueShadInfoMap, strUniqueKey );
+
+    //  Remove from order map
+    MapRemovePair ( m_orderMap, pShadInfo->fOrderPriority, pShadInfo );
 }
 
 
@@ -1166,16 +1173,16 @@ void CRenderWareSA::OnDestroyShadInfo ( SShadInfo* pShadInfo )
 //
 // CRenderWareSA::FindNewAssociationForTexInfo
 //
-// When texinfo loaded:
-//      Step backwards through shadinfo list looking for a match
+// Find best match for this texinfo
+// Called when a texture is loaded or a shader is removed from a texture
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::FindNewAssociationForTexInfo ( STexInfo* pTexInfo )
 {
-    // Step backwards through shadinfo list looking for one match
-    for ( std::list < SShadInfo > ::reverse_iterator iter1 = m_ShadInfoList.rbegin () ; iter1 != m_ShadInfoList.rend () ; ++iter1 )
+    // Stepping backwards will bias high priority, and if the priorty is the same, bias the latest additions
+    for ( std::multimap < float, SShadInfo* > ::reverse_iterator iter = m_orderMap.rbegin () ; iter != m_orderMap.rend () ; ++iter )
     {
-        SShadInfo* pShadInfo = &*iter1;
+        SShadInfo* pShadInfo = iter->second;
         if ( WildcardMatch ( pShadInfo->strMatch, pTexInfo->strTextureName ) )
         {
             // Found one
@@ -1190,16 +1197,16 @@ void CRenderWareSA::FindNewAssociationForTexInfo ( STexInfo* pTexInfo )
 //
 // CRenderWareSA::RemoveTxdActiveTextures
 //
-// When texinfo unloaded:
-//      If texinfo has a shadinfo, unassociate
+// Called when a TXD is being unloaded.
+// Delete texinfos which came from that TXD
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::RemoveTxdActiveTextures ( ushort usTxdId )
 {
     // Find all TexInfo's for this txd
-    for ( std::list < STexInfo > ::iterator iter1 = m_TexInfoList.begin () ; iter1 != m_TexInfoList.end () ; )
+    for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; )
     {
-        STexInfo* pTexInfo = &*iter1;
+        STexInfo* pTexInfo = &*iter;
         if ( pTexInfo->usTxdId == usTxdId )
         {
             // If texinfo has a shadinfo, unassociate
@@ -1209,10 +1216,10 @@ void CRenderWareSA::RemoveTxdActiveTextures ( ushort usTxdId )
             }
 
             OnDestroyTexInfo ( pTexInfo );
-            iter1 = m_TexInfoList.erase ( iter1 );
+            iter = m_TexInfoList.erase ( iter );
         }
         else
-            ++iter1;
+            ++iter;
     }
 }
 

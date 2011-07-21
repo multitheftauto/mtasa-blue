@@ -30,13 +30,15 @@
 struct STexInfo;
 struct SShadInfo
 {
-    SShadInfo ( const SString& strMatch, CSHADERDUMMY* pShaderData )
+    SShadInfo ( const SString& strMatch, CSHADERDUMMY* pShaderData, float fOrderPriority )
         : strMatch ( strMatch.ToLower () )
         , pShaderData ( pShaderData )
+        , fOrderPriority ( fOrderPriority )
     {
     }
     const SString           strMatch;           // Always lower case
     CSHADERDUMMY* const     pShaderData;
+    const float             fOrderPriority;
     std::set < STexInfo* >  associatedTexInfoMap;
 };
 
@@ -121,7 +123,7 @@ class CRenderWareSA : public CRenderWare
 
     ushort              GetTXDIDForModelID          ( ushort usModelID );
     void                InitWorldTextureWatch       ( PFN_WATCH_CALLBACK pfnWatchCallback );
-    bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* szMatch );
+    bool                AddWorldTextureWatch        ( CSHADERDUMMY* pShaderData, const char* szMatch, float fOrderPriority );
     void                RemoveWorldTextureWatch     ( CSHADERDUMMY* pShaderData, const char* szMatch );
     void                RemoveWorldTextureWatchByContext ( CSHADERDUMMY* pShaderData );
     void                PulseWorldTextureWatch      ( void );
@@ -139,7 +141,7 @@ private:
     void                FindNewAssociationForTexInfo( STexInfo* pTexInfo );
     STexInfo*           CreateTexInfo               ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData );
     void                OnDestroyTexInfo            ( STexInfo* pTexInfo );
-    SShadInfo*          CreateShadInfo              ( CSHADERDUMMY* pShaderData, const SString& strTextureName );
+    SShadInfo*          CreateShadInfo              ( CSHADERDUMMY* pShaderData, const SString& strTextureName, float fOrderPriority );
     void                OnDestroyShadInfo           ( SShadInfo* pShadInfo );
     void                MakeAssociation             ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
     void                BreakAssociation            ( SShadInfo* pShadInfo, STexInfo* pTexInfo );
@@ -151,6 +153,7 @@ private:
     std::map < SString, STexInfo* >         m_UniqueTexInfoMap;
     std::map < CD3DDUMMY*, STexInfo* >      m_D3DDataTexInfoMap;
     std::map < SString, SShadInfo* >        m_UniqueShadInfoMap;
+    std::multimap < float, SShadInfo* >     m_orderMap;
 
     PFN_WATCH_CALLBACK                      m_pfnWatchCallback;
 };

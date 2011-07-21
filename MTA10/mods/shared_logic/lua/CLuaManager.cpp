@@ -579,6 +579,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineRemoveShaderFromWorldTexture", CLuaFunctionDefs::EngineRemoveShaderFromWorldTexture );
     CLuaCFunctions::AddFunction ( "engineGetModelNameFromID", CLuaFunctionDefs::EngineGetModelNameFromID );
     CLuaCFunctions::AddFunction ( "engineGetModelIDFromName", CLuaFunctionDefs::EngineGetModelIDFromName );
+    CLuaCFunctions::AddFunction ( "engineGetModelTextureNames", CLuaFunctionDefs::EngineGetModelTextureNames );
     CLuaCFunctions::AddFunction ( "engineGetVisibleTextureNames", CLuaFunctionDefs::EngineGetVisibleTextureNames );
 
     //CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", CLuaFunctionDefs::EngineReplaceMatchingAtomics );

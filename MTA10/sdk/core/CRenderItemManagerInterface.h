@@ -59,7 +59,7 @@ public:
     virtual void                UpdateBackBufferCopy                ( void ) = 0;
     virtual void                UpdateScreenSource                  ( CScreenSourceItem* pScreenSourceItem ) = 0;
     virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData ) = 0;
-    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch ) = 0;
+    virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch, float fOrderPriority ) = 0;
     virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch ) = 0;
     virtual void                GetVisibleTextureNames              ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID ) = 0;
 };
