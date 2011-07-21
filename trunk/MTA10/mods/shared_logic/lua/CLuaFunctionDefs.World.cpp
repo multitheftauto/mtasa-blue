@@ -433,60 +433,73 @@ int CLuaFunctionDefs::GetWaterVertexPosition ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetWaterLevel ( lua_State* luaVM )
 {
-//  bool setWaterLevel ( [float x, float y, float z,] float level )
-//  bool setWaterLevel ( [water theWater,] float level )
-    CClientWater* pWater; CVector vecPosition; float fLevel;
-    bool bHasVector = false;
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    CResource* pResource = pLuaMain ? pLuaMain->GetResource () : NULL;
+    if ( !pResource )
+    {
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
 
     CScriptArgReader argStream ( luaVM );
     if ( argStream.NextIsUserData () )
+    {
+        // Call type 1
+        //  bool setWaterLevel ( [water theWater,] float level )
+        CClientWater* pWater; float fLevel;
+
         argStream.ReadUserData ( pWater );
-    else
-    {
-        argStream.ReadNumber ( vecPosition.fX );
-        argStream.ReadNumber ( vecPosition.fY, 0 );
-        argStream.ReadNumber ( vecPosition.fZ, 0 );
-        bHasVector = ( argStream.NextIsNumber () || argStream.NextIsString () );
-        if ( !bHasVector )
-            argStream = CScriptArgReader ( luaVM ); // Restart to read fLevel
-    }
-    argStream.ReadNumber ( fLevel );
+        argStream.ReadNumber ( fLevel );
 
-
-    if ( !argStream.HasErrors () )
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource () : NULL;
-        if ( pResource )
+        if ( !argStream.HasErrors () )
         {
-            if ( pWater )
+            if ( CStaticFunctionDefinitions::SetWaterLevel ( pWater, fLevel, pResource ) )
             {
-                if ( CStaticFunctionDefinitions::SetWaterLevel ( pWater, fLevel, pResource ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-            }
-            else
-            if ( bHasVector )
-            {
-                if ( CStaticFunctionDefinitions::SetWaterLevel ( &vecPosition, fLevel, pResource ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-            }
-            else
-            {
-                if ( CStaticFunctionDefinitions::SetWaterLevel ( (CVector *)NULL, fLevel, pResource ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
         }
     }
     else
+    if ( argStream.NextCouldBeNumber ( 1 ) )
+    {
+        // Call type 2
+        //  bool setWaterLevel ( [float x, float y, float z,] float level )
+        CVector vecPosition; float fLevel;
+
+        argStream.ReadNumber ( vecPosition.fX );
+        argStream.ReadNumber ( vecPosition.fY );
+        argStream.ReadNumber ( vecPosition.fZ );
+        argStream.ReadNumber ( fLevel );
+
+        if ( !argStream.HasErrors () )
+        {
+            if ( CStaticFunctionDefinitions::SetWaterLevel ( &vecPosition, fLevel, pResource ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+    else
+    {
+        // Call type 3
+        //  bool setWaterLevel ( float level )
+        float fLevel;
+
+        argStream.ReadNumber ( fLevel );
+
+        if ( !argStream.HasErrors () )
+        {
+            if ( CStaticFunctionDefinitions::SetWaterLevel ( (CVector *)NULL, fLevel, pResource ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+    }
+
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setWaterLevel", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
