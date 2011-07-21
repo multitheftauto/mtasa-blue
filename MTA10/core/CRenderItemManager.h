@@ -41,6 +41,7 @@ public:
     virtual CShaderItem*        GetAppliedShaderForD3DData          ( CD3DDUMMY* pD3DData );
     virtual bool                ApplyShaderItemToWorldTexture       ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );
     virtual bool                RemoveShaderItemFromWorldTexture    ( CShaderItem* pShaderItem, const SString& strTextureNameMatch );
+    virtual void                GetVisibleTextureNames              ( std::vector < SString >& outNameList, const SString& strTextureNameMatch, ushort usModelID );
 
     // CRenderItemManager
     void                        NotifyContructRenderItem            ( CRenderItem* pItem );
@@ -64,6 +65,8 @@ protected:
     CRenderTargetItem*                          m_pBackBufferCopy;
     bool                                        m_bBackBufferCopyMaybeNeedsResize;
     uint                                        m_uiBackBufferCopyRevision;
+    std::set < CD3DDUMMY* >                     m_FrameTextureUsage;
+    std::set < CD3DDUMMY* >                     m_PrevFrameTextureUsage;
 
     // Shaders applied to world textures
     std::map < CD3DDUMMY*, CSHADERDUMMY* >      m_D3DDataShaderMap;

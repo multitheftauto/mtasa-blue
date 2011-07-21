@@ -478,7 +478,7 @@ public:
     LUA_DECLARE ( EngineRemoveShaderFromWorldTexture );
     LUA_DECLARE ( EngineGetModelNameFromID );
     LUA_DECLARE ( EngineGetModelIDFromName );
-    LUA_DECLARE ( EngineGetModelTextureNames );
+    LUA_DECLARE ( EngineGetVisibleTextureNames );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );

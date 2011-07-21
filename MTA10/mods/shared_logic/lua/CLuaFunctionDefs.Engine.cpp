@@ -581,21 +581,22 @@ int CLuaFunctionDefs::EngineGetModelIDFromName ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::EngineGetModelTextureNames ( lua_State* luaVM )
+int CLuaFunctionDefs::EngineGetVisibleTextureNames ( lua_State* luaVM )
 {
-//  table engineGetModelTextureNames ( int/string modelID/modelName )
-    SString strModelName;
+//  table engineGetVisibleTextureNames ( string wildcardMatch = "*" [, int/string modelID/modelName ] )
+    SString strTextureNameMatch; SString strModelName;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strModelName );
+    argStream.ReadString ( strTextureNameMatch, "*" );
+    argStream.ReadString ( strModelName, "" );
 
     if ( !argStream.HasErrors () )
     {
         ushort usModelID = CModelNames::ResolveModelID ( strModelName );
-        if ( usModelID )
+        if ( usModelID || strModelName == "" )
         {
             std::vector < SString > nameList;
-            CModelNames::GetModelTextureNames ( nameList, usModelID );
+            g_pCore->GetGraphics ()->GetRenderItemManager ()->GetVisibleTextureNames ( nameList, strTextureNameMatch, usModelID );
 
             lua_newtable ( luaVM );
             for ( uint i = 0 ; i < nameList.size () ; i++ )
@@ -606,10 +607,10 @@ int CLuaFunctionDefs::EngineGetModelTextureNames ( lua_State* luaVM )
             }
             return 1;
         }
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelTextureNames", "Expected valid model ID or name at argument 1" ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetVisibleTextureNames", "Expected valid model ID or name at argument 1" ) );
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetModelTextureNames", *argStream.GetErrorMessage () ) );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "engineGetVisibleTextureNames", *argStream.GetErrorMessage () ) );
 
     // We failed
     lua_pushboolean ( luaVM, false );
