@@ -127,7 +127,7 @@ class CRenderWareSA : public CRenderWare
     void                PulseWorldTextureWatch      ( void );
     void                GetModelTextureNames        ( std::vector < SString >& outNameList, ushort usModelID );
     void                GetTxdTextures              ( std::vector < RwTexture* >& outTextureList, ushort usTxdId );
-    SString             GetTextureName              ( CD3DDUMMY* pD3DData );
+    const SString&      GetTextureName              ( CD3DDUMMY* pD3DData );
 
 private:
     static void         RwTexDictionaryRemoveTexture( RwTexDictionary* pTXD, RwTexture* pTex );
