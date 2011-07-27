@@ -1938,7 +1938,7 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
     if ( strNotifyMasterRevision.length () && strNotifyMasterRevision > m_MasterConfig.master.strRevision )
     {
         // Only do next bit when 'notify revision' increases (prevents superfluous downloads when notify revision is (incorrectly) higher than actual revision)
-        if ( strNotifyMasterRevision < m_VarConfig.master_highestNotifyRevision )
+        if ( m_VarConfig.master_highestNotifyRevision.empty () || strNotifyMasterRevision < m_VarConfig.master_highestNotifyRevision )
         {
             m_VarConfig.master_highestNotifyRevision = strNotifyMasterRevision;
 
