@@ -3006,7 +3006,7 @@ void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
         Arguments.PushString ( Packet.m_strInfoType );
         Arguments.PushTable ( &ids );
         Arguments.PushTable ( &names );
-        g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onPlayerModInfo", Arguments );
+        pPlayer->CallEvent ( "onPlayerModInfo", Arguments );
     }
 }
 
