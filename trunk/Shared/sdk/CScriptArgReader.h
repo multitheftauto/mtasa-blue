@@ -70,7 +70,7 @@ public:
             return true;
         }
         else
-        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
         {
             outValue = static_cast < T > ( defaultValue );
             return false;
@@ -114,7 +114,7 @@ public:
             return true;
         }
         else
-        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
         {
             bOutValue = bDefaultValue;
             return false;
@@ -139,7 +139,7 @@ public:
             return true;
         }
         else
-        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
         {
             if ( defaultValue )
             {
@@ -196,7 +196,7 @@ public:
             }
         }
         else
-        if ( iArgument == LUA_TNONE || m_bIgnoreMismatchMatch )
+        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL || m_bIgnoreMismatchMatch )
         {
             outValue = defaultValue;
             return false;
