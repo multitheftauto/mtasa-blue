@@ -19,23 +19,39 @@ bool CPlayerModInfoPacket::Read ( NetBitStreamInterface& BitStream )
         return false;
 
     // Read amount of items
-    ushort usCount;
-    if ( !BitStream.Read ( usCount ) )
+    uint uiCount;
+    if ( !BitStream.Read ( uiCount ) )
         return false;
 
     // Read each item
-    for ( uint i = 0 ; i < usCount ; i++ )
+    for ( uint i = 0 ; i < uiCount ; i++ )
     {
-        ushort usId;
-        if ( !BitStream.Read ( usId ) )
+        SModInfoItem item;
+
+        if ( !BitStream.Read ( item.usId ) )
             return false;
 
-        SString strName;
-        if ( !BitStream.ReadString ( strName ) )
+        if ( !BitStream.Read ( item.uiHash ) )
             return false;
 
-        m_IdList.push_back ( usId );
-        m_NameList.push_back ( strName );
+        if ( !BitStream.ReadString ( item.strName ) )
+            return false;
+
+        int iHasSize;
+        if ( !BitStream.Read ( iHasSize ) )
+            return false;
+        item.bHasSize = iHasSize != 0;
+
+        if ( !BitStream.Read ( item.vecSize.fX ) )
+            return false;
+
+        if ( !BitStream.Read ( item.vecSize.fY ) )
+            return false;
+
+        if ( !BitStream.Read ( item.vecSize.fZ ) )
+            return false;
+
+        m_ModInfoItemList.push_back ( item );
     }
 
     return true;

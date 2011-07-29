@@ -10,6 +10,15 @@
 *
 *****************************************************************************/
 
+struct SModInfoItem
+{
+    ushort      usId;
+    uint        uiHash;
+    SString     strName;
+    bool        bHasSize;
+    CVector     vecSize;
+};
+
 class CPlayerModInfoPacket : public CPacket
 {
 public:
@@ -20,6 +29,5 @@ public:
     bool                                    Read                        ( NetBitStreamInterface& BitStream );
 
     SString                                 m_strInfoType;
-    std::vector < ushort >                  m_IdList;
-    std::vector < SString >                 m_NameList;
+    std::vector < SModInfoItem >            m_ModInfoItemList;
 };

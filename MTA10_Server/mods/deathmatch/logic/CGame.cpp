@@ -2986,26 +2986,43 @@ void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
-        // Make ids table
-        CLuaArguments ids;
-        for ( std::vector < ushort >::iterator iter = Packet.m_IdList.begin(); iter != Packet.m_IdList.end(); ++iter )
+        // Make itemList table
+        CLuaArguments resultItemList;
+        for ( std::vector < SModInfoItem >::iterator iter = Packet.m_ModInfoItemList.begin(); iter != Packet.m_ModInfoItemList.end(); ++iter )
         {
-            ids.PushNumber ( ids.Count () / 2 + 1 );
-            ids.PushNumber ( *iter );
-        }
+            const SModInfoItem& in = *iter;
 
-        // Make names table
-        CLuaArguments names;
-        for ( std::vector < SString >::iterator iter = Packet.m_NameList.begin(); iter != Packet.m_NameList.end(); ++iter )
-        {
-            names.PushNumber ( names.Count () / 2 + 1 );
-            names.PushString ( *iter );
+            // Make item table
+            CLuaArguments resultItem;
+
+            resultItem.PushString ( "id" );
+            resultItem.PushNumber ( in.usId );
+
+            resultItem.PushString ( "name" );
+            resultItem.PushString ( in.strName );
+
+            resultItem.PushString ( "hash" );
+            resultItem.PushNumber ( in.uiHash );
+
+            if ( in.bHasSize )
+            {
+                resultItem.PushString ( "sizeX" );
+                resultItem.PushNumber ( in.vecSize.fX - fmod ( (double)in.vecSize.fX, 0.01 ) );
+
+                resultItem.PushString ( "sizeY" );
+                resultItem.PushNumber ( in.vecSize.fY - fmod ( (double)in.vecSize.fY, 0.01 ) );
+
+                resultItem.PushString ( "sizeZ" );
+                resultItem.PushNumber ( in.vecSize.fZ - fmod ( (double)in.vecSize.fZ, 0.01 ) );
+            }
+
+            resultItemList.PushNumber ( resultItemList.Count () / 2 + 1 );
+            resultItemList.PushTable ( &resultItem );
         }
 
         CLuaArguments Arguments;
         Arguments.PushString ( Packet.m_strInfoType );
-        Arguments.PushTable ( &ids );
-        Arguments.PushTable ( &names );
+        Arguments.PushTable ( &resultItemList );
         pPlayer->CallEvent ( "onPlayerModInfo", Arguments );
     }
 }
