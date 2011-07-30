@@ -633,6 +633,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CPerfStat.BandwidthUsage.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPerfStat.LibMemory.cpp"
 					>
 				</File>

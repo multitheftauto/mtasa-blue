@@ -2354,6 +2354,13 @@ void CResource::RemoveDependent ( CResource * resource )
 
 ResponseCode CResource::HandleRequest ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
+    if ( !g_pGame->IsServerFullyUp () )
+    {
+        SStringX strWait ( "The server is not ready. Please try again in a minute." );
+        ipoHttpResponse->SetBody ( strWait.c_str (), strWait.size () );
+        return HTTPRESPONSECODE_200_OK;
+    }
+
     // if the mutex is already locked (i.e. the resource is being deleted), we return from this asap
     // otherwise, we get the mutex and can handle the request
 

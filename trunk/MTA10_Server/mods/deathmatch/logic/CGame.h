@@ -135,6 +135,7 @@ class CWeaponDamageCheckPacket;
 class CGame
 {
 public:
+    ZERO_ON_NEW         // To be sure everything is cleared
     enum
     {
         VEHICLE_REQUEST_IN,
@@ -335,6 +336,8 @@ public:
     static void                 SetPedEnteringVehicle       ( CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat );
     static void                 ClearPedEnteringVehicle     ( CPed* pPed, CVehicle* pVehicle );
 
+    bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
+
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
@@ -485,6 +488,8 @@ private:
     class COpenPortsTester*     m_pOpenPortsTester;
 
     CLightsyncManager           m_lightsyncManager;
+
+    bool                        m_bServerFullyUp;       // No http operations should be allowed unless this is true
 };
 
 #endif

@@ -57,6 +57,8 @@ CGame::CGame ( void )
     // Set our global pointer
     g_pGame = this;
 
+    m_bServerFullyUp = false;
+
     // Initialize random number generator and time
     srand ( (unsigned int) time ( NULL ) );
     InitializeTime ();
@@ -787,12 +789,15 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Add help hint
     CLogger::LogPrint ( "Type 'help' for a list of commands.\n" );
 
+    m_bServerFullyUp = true;
     return true;
 }
 
 
 void CGame::Stop ( void )
 {
+    m_bServerFullyUp = false;
+
     // Tell the log
     CLogger::LogPrint ( "Server stopped!\n" );
 

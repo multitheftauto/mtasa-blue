@@ -15,7 +15,6 @@
 
 CRegistry::CRegistry ( const std::string& strFileName )
 {
-    m_strLastError = "";
     m_db = NULL;
     m_bOpened = false;
     m_bInAutomaticTransaction = false;
@@ -32,6 +31,14 @@ CRegistry::~CRegistry ( void )
     CLogger::LogPrint ( "Closing SQLite3 database\n" );
     if ( m_bOpened )
         sqlite3_close ( m_db );
+}
+
+bool CRegistry::SetLastErrorMessage ( const std::string& strLastErrorMessage, const std::string& strQuery )
+{
+    m_strLastErrorMessage = strLastErrorMessage;
+    m_strLastErrorQuery = strQuery;
+    OutputDebugLine ( SString ( "%s [Query was:%s]", *m_strLastErrorMessage, *m_strLastErrorQuery ) );
+    return false;
 }
 
 // Disable automatic transactions for a length of time
@@ -137,7 +144,7 @@ bool CRegistry::Exec ( const std::string& strQuery )
 {
     if ( m_bOpened == false )
     {
-        m_strLastError = "SQLite3 was not opened, cannot perform query!";
+        SetLastErrorMessage ( "SQLite3 was not opened, cannot perform query!", strQuery );
         return false;
     }
 
@@ -153,7 +160,7 @@ bool CRegistry::ExecInternal ( const char* szQuery )
 
     if ( sqlite3_exec ( m_db, szQuery, NULL, NULL, &szErrorMsg ) != SQLITE_OK )
     {
-        m_strLastError = szErrorMsg;
+        SetLastErrorMessage ( szErrorMsg, szQuery );
         sqlite3_free ( szErrorMsg );
         return false;
     }
@@ -171,7 +178,7 @@ bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
     sqlite3_stmt* pStmt;
     if ( sqlite3_prepare ( m_db, szQuery, strlen ( szQuery ) + 1, &pStmt, NULL ) != SQLITE_OK )
     {
-        m_strLastError = sqlite3_errmsg ( m_db );
+        SetLastErrorMessage ( sqlite3_errmsg ( m_db ), szQuery );
         return false;
     }
 
@@ -230,7 +237,7 @@ bool CRegistry::QueryInternal ( const char* szQuery, CRegistryResult* pResult )
     // Did we leave the fetching loop because of an error?
     if ( status != SQLITE_DONE )
     {
-        m_strLastError = sqlite3_errmsg ( m_db );
+        SetLastErrorMessage ( sqlite3_errmsg ( m_db ), szQuery );
         sqlite3_finalize ( pStmt );
         return false;
     }
@@ -247,8 +254,9 @@ bool CRegistry::Query ( const std::string& strQuery, CLuaArguments *pArgs, CRegi
 {
     std::string strParsedQuery = "";
 
-    if ( m_bOpened == false ) {
-        m_strLastError = "SQLite3 was not opened, cannot perform query!";
+    if ( m_bOpened == false )
+	{
+        SetLastErrorMessage ( "SQLite3 was not opened, cannot perform query!", strQuery );
         return false;
     }
 
@@ -319,16 +327,17 @@ bool CRegistry::Select ( const std::string& strColumns, const std::string& strTa
 {
     char szBuffer[32] = {0};
 
-    if ( m_bOpened == false ) {
-        m_strLastError = "SQLite3 was not opened, cannot get value!";
-        return false;
-    }
-
     std::string strQuery = "SELECT " + strColumns + " FROM " + strTable;
     if ( !strWhere.empty () )
         strQuery += " WHERE " + strWhere;
     if ( uiLimit > 0 )
         strQuery += " LIMIT " + std::string ( itoa ( uiLimit, szBuffer, 10 ) );
+
+    if ( m_bOpened == false )
+	{
+        SetLastErrorMessage ( "SQLite3 was not opened, cannot get value!", strQuery );
+        return false;
+    }
 
     // Execute the query
     return QueryInternal ( strQuery.c_str (), pResult );
@@ -379,8 +388,9 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, ... )
 
 bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list vl )
 {
-    if ( m_bOpened == false ) {
-        m_strLastError = "SQLite3 was not opened, cannot perform query!";
+    if ( m_bOpened == false )
+	{
+        SetLastErrorMessage ( "SQLite3 was not opened, cannot perform query!", szQuery );
         return false;
     }
 
