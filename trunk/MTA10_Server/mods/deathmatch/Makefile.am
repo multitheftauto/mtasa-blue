@@ -95,6 +95,7 @@ LOGIC = \
 ./logic/CPed.cpp \
 ./logic/CPedManager.cpp \
 ./logic/CPedSync.cpp \
+./logic/CPerfStat.BandwidthUsage.cpp \
 ./logic/CPerfStat.LibMemory.cpp \
 ./logic/CPerfStat.LuaMemory.cpp \
 ./logic/CPerfStat.LuaTiming.cpp \
@@ -207,7 +208,6 @@ LOGIC = \
 ./logic/packets/CPlayerChangeNickPacket.cpp \
 ./logic/packets/CPlayerClothesPacket.cpp \
 ./logic/packets/CPlayerConnectCompletePacket.cpp \
-./logic/packets/CPlayerDeltasyncPacket.cpp \
 ./logic/packets/CPlayerDiagnosticPacket.cpp \
 ./logic/packets/CPlayerDisconnectedPacket.cpp \
 ./logic/packets/CPlayerJoinCompletePacket.cpp \
@@ -231,7 +231,6 @@ LOGIC = \
 ./logic/packets/CUnoccupiedVehicleStartSyncPacket.cpp \
 ./logic/packets/CUnoccupiedVehicleSyncPacket.cpp \
 ./logic/packets/CVehicleDamageSyncPacket.cpp \
-./logic/packets/CVehicleDeltasyncPacket.cpp \
 ./logic/packets/CVehicleInOutPacket.cpp \
 ./logic/packets/CVehiclePuresyncPacket.cpp \
 ./logic/packets/CVehicleResyncPacket.cpp \
