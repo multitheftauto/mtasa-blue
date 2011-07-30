@@ -1178,24 +1178,28 @@ bool CStaticFunctionDefinitions::AttachElements ( CClientEntity& Entity, CClient
 {
     RUN_CHILDREN AttachElements ( **iter, AttachedToEntity, vecPosition, vecRotation );
 
-    // Are they the same element?
-    if ( &Entity != &AttachedToEntity )
+    // Check the elements we are attaching are not already connected
+    std::set < CClientEntity* > history;
+    for ( CClientEntity* pCurrent = &AttachedToEntity ; pCurrent ; pCurrent = pCurrent->GetAttachedTo () )
     {
-        // Make sure they aren't already attached to eachother in reverse
-        if ( AttachedToEntity.GetAttachedTo () != &Entity )
-        {
-            // Can these elements be attached?
-            if ( Entity.IsAttachToable () && AttachedToEntity.IsAttachable () && Entity.GetDimension() == AttachedToEntity.GetDimension() )
-            {
-                ConvertDegreesToRadians ( vecRotation );
-
-                Entity.SetAttachedOffsets ( vecPosition, vecRotation );
-                Entity.AttachTo ( &AttachedToEntity );
-
-                return true;
-            }
-        }
+        if ( pCurrent == &Entity )
+            return false;
+        if ( MapContains ( history, pCurrent ) )
+            break;  // This should not be possible, but you never know
+        MapInsert ( history, pCurrent );
     }
+
+    // Can these elements be attached?
+    if ( Entity.IsAttachToable () && AttachedToEntity.IsAttachable () && Entity.GetDimension() == AttachedToEntity.GetDimension() )
+    {
+        ConvertDegreesToRadians ( vecRotation );
+
+        Entity.SetAttachedOffsets ( vecPosition, vecRotation );
+        Entity.AttachTo ( &AttachedToEntity );
+
+        return true;
+    }
+
     return false;
 }
 
