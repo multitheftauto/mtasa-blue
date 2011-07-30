@@ -378,6 +378,9 @@ public:
     LUA_DECLARE ( PlayMissionAudio );
     LUA_DECLARE ( PlaySoundFrontEnd );
     LUA_DECLARE ( PreloadMissionAudio );
+    LUA_DECLARE ( SetAmbientSoundEnabled );
+    LUA_DECLARE ( IsAmbientSoundEnabled );
+    LUA_DECLARE ( ResetAmbientSounds );
 
     // Blip funcs
     LUA_DECLARE ( CreateBlip );

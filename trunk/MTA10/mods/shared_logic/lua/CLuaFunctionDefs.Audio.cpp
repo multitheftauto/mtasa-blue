@@ -633,4 +633,64 @@ int CLuaFunctionDefs::PreloadMissionAudio ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetAmbientSoundEnabled ( lua_State* luaVM )
+{
+    eAmbientSoundType eType; bool bEnabled;
 
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( eType, AMBIENT_SOUND_GENERAL );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetAmbientSoundEnabled ( eType, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setAmbientSoundEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::IsAmbientSoundEnabled ( lua_State* luaVM )
+{
+    eAmbientSoundType eType;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( eType );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bResultEnabled;
+        if ( CStaticFunctionDefinitions::IsAmbientSoundEnabled ( eType, bResultEnabled ) )
+        {
+            lua_pushboolean ( luaVM, bResultEnabled );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isAmbientSoundEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::ResetAmbientSounds ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetAmbientSounds () )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "resetAmbientSounds" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

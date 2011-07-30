@@ -4566,6 +4566,9 @@ void CClientGame::ResetMapInfo ( void )
     g_pMultiplayer->SetCloudsEnabled ( true );
     g_pClientGame->SetCloudsEnabled ( true );
 
+    // Ambient sounds
+    g_pGame->GetAudio ()->ResetAmbientSounds ();
+
     // Cheats
     g_pGame->ResetCheats ();
 

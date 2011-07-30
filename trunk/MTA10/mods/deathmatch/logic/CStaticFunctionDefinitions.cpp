@@ -3519,6 +3519,27 @@ bool CStaticFunctionDefinitions::PreloadMissionAudio ( unsigned short usSound, u
 }
 
 
+bool CStaticFunctionDefinitions::SetAmbientSoundEnabled ( eAmbientSoundType eType, bool bMute )
+{
+    g_pGame->GetAudio ()->SetAmbientSoundEnabled ( eType, bMute );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::IsAmbientSoundEnabled ( eAmbientSoundType eType, bool& bOutMute )
+{
+    bOutMute = g_pGame->GetAudio ()->IsAmbientSoundEnabled ( eType );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ResetAmbientSounds ( void )
+{
+    g_pGame->GetAudio ()->ResetAmbientSounds ();
+    return true;
+}
+
+
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance )
 {
     CClientRadarMarker* pBlip = new CClientRadarMarker ( m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance );
