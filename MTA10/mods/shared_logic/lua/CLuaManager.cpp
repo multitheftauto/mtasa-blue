@@ -613,6 +613,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );
     //CLuaCFunctions::AddFunction ( "preloadMissionAudio", CLuaFunctionDefs::PreloadMissionAudio );
     //CLuaCFunctions::AddFunction ( "playMissionAudio", CLuaFunctionDefs::PlayMissionAudio );
+    CLuaCFunctions::AddFunction ( "setAmbientSoundEnabled", CLuaFunctionDefs::SetAmbientSoundEnabled );
+    CLuaCFunctions::AddFunction ( "isAmbientSoundEnabled", CLuaFunctionDefs::IsAmbientSoundEnabled );
+    CLuaCFunctions::AddFunction ( "resetAmbientSounds", CLuaFunctionDefs::ResetAmbientSounds );
 
     // Blip funcs
     CLuaCFunctions::AddFunction ( "createBlip", CLuaFunctionDefs::CreateBlip );

@@ -121,6 +121,10 @@ IMPLEMENT_ENUM_BEGIN( eHudComponent )
     ADD_ENUM ( HUD_ALL,             "all" )
 IMPLEMENT_ENUM_END( "hud-component" )
 
+IMPLEMENT_ENUM_BEGIN( eAmbientSoundType )
+    ADD_ENUM ( AMBIENT_SOUND_GENERAL,           "general" )
+    ADD_ENUM ( AMBIENT_SOUND_GUNFIRE,           "gunfire" )
+IMPLEMENT_ENUM_END( "ambient-sound-type" )
 
 //
 // Reading mixed types

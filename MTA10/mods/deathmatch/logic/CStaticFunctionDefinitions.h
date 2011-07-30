@@ -262,6 +262,9 @@ public:
     static bool                         PlayMissionAudio                    ( const CVector& vecPosition, unsigned short usSound );
     static bool                         PlaySoundFrontEnd                   ( unsigned char ucSound );
     static bool                         PreloadMissionAudio                 ( unsigned short usSound, unsigned short usSlot );
+    static bool                         SetAmbientSoundEnabled              ( eAmbientSoundType eType, bool bMute );
+    static bool                         IsAmbientSoundEnabled               ( eAmbientSoundType eType, bool& bOutMute );
+    static bool                         ResetAmbientSounds                  ( void );
 
     // Blip funcs
     static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance );
