@@ -168,6 +168,23 @@ public:
 
 
 //
+// CPerfStatBandwidthUsage
+//
+class CPerfStatBandwidthUsage : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatBandwidthUsage
+
+    static CPerfStatBandwidthUsage*  GetSingleton      ( void );
+};
+
+
+//
 // CPerfStatSqliteTiming
 //
 class CPerfStatSqliteTiming : public CPerfStatModule

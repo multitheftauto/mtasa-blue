@@ -42,6 +42,7 @@ public:
 
     virtual void                            RegisterPacketHandler           ( PPACKETHANDLER pfnPacketHandler, bool bIsPrimaryPacketHandler = true ) = 0;
 
+    virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest ) = 0;
     virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
 
     virtual int                             GetPing                         ( NetServerPlayerID& playerID ) = 0;

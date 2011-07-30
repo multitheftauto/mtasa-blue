@@ -46,10 +46,10 @@ public:
     bool                        Query                   ( const char* szQuery, ... );
     bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, ... );
 
-    const std::string&          GetLastError            ( void ) { return m_strLastError; }
+    const SString&              GetLastError            ( void ) { return m_strLastErrorMessage; }
 
 protected:
-
+    bool                        SetLastErrorMessage     ( const std::string& strLastErrorMessage, const std::string& strQuery );
     bool                        Exec                    ( const std::string& strQuery );
     bool                        ExecInternal            ( const char* szQuery  );
     bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, va_list vl );
@@ -61,7 +61,8 @@ protected:
     bool                        m_bOpened;
     bool                        m_bInAutomaticTransaction;
     long long                   m_llSuspendBatchingEndTime;
-    std::string                 m_strLastError;
+    SString                     m_strLastErrorMessage;
+    SString                     m_strLastErrorQuery;
     SString                     m_strFileName;
 
 private:

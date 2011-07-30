@@ -91,6 +91,13 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
 ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
                                          HttpResponse * ipoHttpResponse )
 {
+    if ( !g_pGame->IsServerFullyUp () )
+    {
+        SStringX strWait ( "The server is not ready. Please try again in a minute." );
+        ipoHttpResponse->SetBody ( strWait.c_str (), strWait.size () );
+        return HTTPRESPONSECODE_200_OK;
+    }
+
     CAccount * account = CheckAuthentication ( ipoHttpRequest );
 
     if ( account )
