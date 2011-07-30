@@ -24,7 +24,6 @@ class CClientPlayer;
 
 #include "CClientCommon.h"
 #include "CClientPed.h"
-#include "net/DeltaSync.h"
 
 #define NUM_PLAYER_STATS 343
 
@@ -99,9 +98,6 @@ public:
 
     inline CClientManager*          GetManager              ( void )                                { return m_pManager; }
 
-    SPlayerDeltaSyncData&           GetDeltaSyncData        ( void ) { return m_deltaSyncData; }
-
-
 private:
     bool                            m_bIsLocalPlayer;
     char                            m_szNick [ MAX_PLAYER_NICK_LENGTH + 1 ];
@@ -147,8 +143,6 @@ private:
     float                           m_fNametagDistance;
 
     bool                            m_bNetworkDead;
-
-    SPlayerDeltaSyncData            m_deltaSyncData;
 
 #ifdef MTA_DEBUG
 private:

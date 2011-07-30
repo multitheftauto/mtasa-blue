@@ -72,16 +72,6 @@ public:
     {
         memcpy ( this, &State, sizeof ( CControllerState ) );
     }
-
-    bool operator== ( const CControllerState& Right ) const
-    {
-        return memcmp ( this, &Right, sizeof(CControllerState) ) == 0;
-    }
-
-    bool operator!= ( const CControllerState& Right ) const
-    {
-        return !operator== ( Right );
-    }
 };
 
 enum eControllerAction

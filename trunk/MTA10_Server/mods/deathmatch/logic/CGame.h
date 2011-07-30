@@ -42,9 +42,7 @@ class CGame;
 #include "packets/CPlayerQuitPacket.h"
 #include "packets/CPlayerTimeoutPacket.h"
 #include "packets/CPlayerPuresyncPacket.h"
-#include "packets/CPlayerDeltasyncPacket.h"
 #include "packets/CVehiclePuresyncPacket.h"
-#include "packets/CVehicleDeltasyncPacket.h"
 #include "packets/CLightsyncPacket.h"
 #include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
@@ -351,14 +349,12 @@ private:
     void                        Packet_PlayerQuit           ( class CPlayerQuitPacket& Packet );
     void                        Packet_PlayerTimeout        ( class CPlayerTimeoutPacket& Packet );
     void                        Packet_PlayerPuresync       ( class CPlayerPuresyncPacket& Packet );
-    void                        Packet_PlayerDeltasync      ( class CPlayerDeltasyncPacket& Packet );
     void                        Packet_DetonateSatchels     ( class CDetonateSatchelsPacket& Packet );
     void                        Packet_ExplosionSync        ( class CExplosionSyncPacket& Packet );
     void                        Packet_ProjectileSync       ( class CProjectileSyncPacket& Packet );
     void                        Packet_Command              ( class CCommandPacket& Packet );
     void                        Packet_VehicleDamageSync    ( class CVehicleDamageSyncPacket& Packet );
     void                        Packet_VehiclePuresync      ( class CVehiclePuresyncPacket& Packet );
-    void                        Packet_VehicleDeltasync     ( class CVehicleDeltasyncPacket& Packet );
     void                        Packet_Keysync              ( class CKeysyncPacket& Packet );
     void                        Packet_Vehicle_InOut        ( class CVehicleInOutPacket& Packet );
     void                        Packet_VehicleTrailer       ( class CVehicleTrailerPacket& Packet );
