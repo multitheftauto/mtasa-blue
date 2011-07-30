@@ -22,9 +22,9 @@ namespace
     struct SNetStatHistoryItem
     {
         bool bDirty;
-        long long InGame;
-        long long OutGame;
-        long long OutHttp;
+        long long llGameRecv;
+        long long llGameSent;
+        long long llHttpSent;
     };
 
     struct SNetStatHistoryType
@@ -113,7 +113,7 @@ public:
 
     // CPerfStatBandwidthUsageImpl
     void                        RecordStats             ( void );
-    void                        AddSampleAtTime         ( time_t tTime, long long InGame, long long OutGame, long long OutHttp );
+    void                        AddSampleAtTime         ( time_t tTime, long long llGameRecv, long long llGameSent, long long llHttpSent );
     void                        LoadStats               ( void );
     void                        SaveStats               ( void );
 
@@ -122,7 +122,6 @@ public:
     SString                     m_strCategoryName;
     NetStatistics               m_PrevLiveStats;
     long long                   m_llPrevHttpTotalBytesSent;
-    time_t                      m_tBaseTime;
     std::vector < SNetStatHistoryType > m_History;
 };
 
@@ -212,9 +211,9 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
         for ( uint r = 0 ; r < type.itemList.size () ; r++ )
         {
             assert ( type.itemList [ r ].bDirty == false );
-            assert ( type.itemList [ r ].InGame == 0 );
-            assert ( type.itemList [ r ].OutGame == 0 );
-            assert ( type.itemList [ r ].OutHttp == 0 );
+            assert ( type.itemList [ r ].llGameRecv == 0 );
+            assert ( type.itemList [ r ].llGameSent == 0 );
+            assert ( type.itemList [ r ].llHttpSent == 0 );
         }
     }
 
@@ -224,7 +223,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
     CRegistry* pRegistry = g_pGame->GetRegistry ();
 
     CRegistryResult result;
-    pRegistry->Query ( &result, "SELECT `type`,`idx`,`InGame`,`OutGame`,`OutHttp` from " BW_STATS_TABLE_NAME );
+    pRegistry->Query ( &result, "SELECT `type`,`idx`,`GameRecv`,`GameSent`,`HttpSent` from " BW_STATS_TABLE_NAME );
 
     if ( result.nRows > 0 && result.nColumns >= 5 )
     {
@@ -232,9 +231,9 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
         {
             SString strType = (char*)result.Data[r][0].pVal;
             uint uiIndex = result.Data[r][1].nVal;
-            float InGame = result.Data[r][2].fVal;
-            float OutGame = result.Data[r][3].fVal;
-            float OutHttp = result.Data[r][4].fVal;
+            float GameRecv = result.Data[r][2].fVal;
+            float GameSent = result.Data[r][3].fVal;
+            float HttpSent = result.Data[r][4].fVal;
 
             uint uiType = BWStatNameToIndex ( strType );
 
@@ -244,9 +243,9 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
 
                 if ( uiIndex < type.itemList.size () )
                 {
-                    type.itemList [ uiIndex ].InGame = (long long)InGame;
-                    type.itemList [ uiIndex ].OutGame = (long long)OutGame;
-                    type.itemList [ uiIndex ].OutHttp = (long long)OutHttp;
+                    type.itemList [ uiIndex ].llGameRecv = (long long)GameRecv;
+                    type.itemList [ uiIndex ].llGameSent = (long long)GameSent;
+                    type.itemList [ uiIndex ].llHttpSent = (long long)HttpSent;
                 }
             }
         }
@@ -260,7 +259,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
 
         // Special item
         const SNetStatHistoryType& type = m_History[ BWSTAT_INDEX_SPECIAL ];
-        uint uiStatsHoursThen = (uint)type.itemList[0].InGame;          // Hours since 1/1/2011
+        uint uiStatsHoursThen = (uint)type.itemList[0].llGameSent;          // Hours since 1/1/2011
         uint uiStatsHoursNow = UnixTimeToStatsHours ( tTime );          // Hours since 1/1/2011
         int iHoursElpased = uiStatsHoursNow - uiStatsHoursThen;
 
@@ -279,7 +278,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
     // (Re)create table to ensure it's in sync with what we have
     //
     pRegistry->Query ( "DROP TABLE " BW_STATS_TABLE_NAME );
-    pRegistry->Query ( "CREATE TABLE IF NOT EXISTS " BW_STATS_TABLE_NAME " (`type` TEXT,`idx` INT, `InGame` REAL, `OutGame` REAL, `OutHttp` REAL)" );
+    pRegistry->Query ( "CREATE TABLE IF NOT EXISTS " BW_STATS_TABLE_NAME " (`type` TEXT,`idx` INT, `GameRecv` REAL, `GameSent` REAL, `HttpSent` REAL)" );
     pRegistry->Query ( "CREATE INDEX IF NOT EXISTS IDX_BW_STATS_TYPE_IDX on " BW_STATS_TABLE_NAME "(`type`,`idx`)" );
 
     for ( uint t = 0 ; t < m_History.size () ; t++ )
@@ -288,12 +287,12 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
 
         for ( uint r = 0 ; r < type.itemList.size () ; r++ )
         {
-            pRegistry->Query ( "INSERT INTO " BW_STATS_TABLE_NAME " (`type`,`idx`,`InGame`,`OutGame`,`OutHttp`) VALUES (?,?,?,?,?)"
+            pRegistry->Query ( "INSERT INTO " BW_STATS_TABLE_NAME " (`type`,`idx`,`GameRecv`,`GameSent`,`HttpSent`) VALUES (?,?,?,?,?)"
                                                 , SQLITE_TEXT, *BWStatIndexToName ( t )
                                                 , SQLITE_INTEGER, r
-                                                , SQLITE_FLOAT, (float)type.itemList [ r ].InGame
-                                                , SQLITE_FLOAT, (float)type.itemList [ r ].OutGame
-                                                , SQLITE_FLOAT, (float)type.itemList [ r ].OutHttp
+                                                , SQLITE_FLOAT, (float)type.itemList [ r ].llGameRecv
+                                                , SQLITE_FLOAT, (float)type.itemList [ r ].llGameSent
+                                                , SQLITE_FLOAT, (float)type.itemList [ r ].llHttpSent
                                                 );
         }
     }
@@ -321,10 +320,10 @@ void CPerfStatBandwidthUsageImpl::SaveStats ( void )
             if ( type.itemList [ r ].bDirty )
             {
                 type.itemList [ r ].bDirty = false;
-                pRegistry->Query ( "UPDATE " BW_STATS_TABLE_NAME " SET `InGame`=?,`OutGame`=?,`OutHttp`=? WHERE `type`=? AND `idx`=?"
-                                                        , SQLITE_FLOAT, (float)type.itemList [ r ].InGame
-                                                        , SQLITE_FLOAT, (float)type.itemList [ r ].OutGame
-                                                        , SQLITE_FLOAT, (float)type.itemList [ r ].OutHttp
+                pRegistry->Query ( "UPDATE " BW_STATS_TABLE_NAME " SET `GameRecv`=?,`GameSent`=?,`HttpSent`=? WHERE `type`=? AND `idx`=?"
+                                                        , SQLITE_FLOAT, (float)type.itemList [ r ].llGameRecv
+                                                        , SQLITE_FLOAT, (float)type.itemList [ r ].llGameSent
+                                                        , SQLITE_FLOAT, (float)type.itemList [ r ].llHttpSent
                                                         , SQLITE_TEXT, *BWStatIndexToName ( t )
                                                         , SQLITE_INTEGER, r
                                                         );
@@ -389,7 +388,7 @@ void CPerfStatBandwidthUsageImpl::RecordStats ( void )
 
     // Add to the history arrays
     time_t tTime = UnixTimeNow ();
-    AddSampleAtTime ( tTime, llDeltaGameBytesSent, llDeltaGameBytesRecv, llDeltaHttpBytesSent );
+    AddSampleAtTime ( tTime, llDeltaGameBytesRecv, llDeltaGameBytesSent, llDeltaHttpBytesSent );
 }
 
 
@@ -400,7 +399,7 @@ void CPerfStatBandwidthUsageImpl::RecordStats ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatBandwidthUsageImpl::AddSampleAtTime ( time_t tTime, long long InGame, long long OutGame, long long OutHttp )
+void CPerfStatBandwidthUsageImpl::AddSampleAtTime ( time_t tTime, long long llGameRecv, long long llGameSent, long long llHttpSent )
 {
     tm* tmp = localtime ( &tTime );
 
@@ -423,26 +422,26 @@ void CPerfStatBandwidthUsageImpl::AddSampleAtTime ( time_t tTime, long long InGa
             {
                 if ( type.nowIndex != -1 )
                 {
-                    type.itemList [ nowIndex ].InGame = 0;
-                    type.itemList [ nowIndex ].OutGame = 0;
-                    type.itemList [ nowIndex ].OutHttp = 0;
+                    type.itemList [ nowIndex ].llGameRecv = 0;
+                    type.itemList [ nowIndex ].llGameSent = 0;
+                    type.itemList [ nowIndex ].llHttpSent = 0;
                 }
                 type.nowIndex = nowIndex;
             }
             type.itemList [ type.nowIndex ].bDirty = true;
-            type.itemList [ type.nowIndex ].InGame += InGame;
-            type.itemList [ type.nowIndex ].OutGame += OutGame;
-            type.itemList [ type.nowIndex ].OutHttp += OutHttp;
+            type.itemList [ type.nowIndex ].llGameRecv += llGameRecv;
+            type.itemList [ type.nowIndex ].llGameSent += llGameSent;
+            type.itemList [ type.nowIndex ].llHttpSent += llHttpSent;
         }
         else
         if ( i == BWSTAT_INDEX_SPECIAL )
         {
             // Calculate special value
             uint uiStatsHours = UnixTimeToStatsHours ( tTime );       // Hours since 1/1/2011
-            if ( uiStatsHours != (uint)type.itemList[0].InGame )
+            if ( uiStatsHours != (uint)type.itemList[0].llGameSent )
             {
                 type.itemList[0].bDirty = true;
-                type.itemList[0].InGame = uiStatsHours;
+                type.itemList[0].llGameSent = uiStatsHours;
             }
         }
     }
@@ -500,19 +499,19 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
 
     // Add columns
     pResult->AddColumn ( "Last 24 hours.Hour" );
-    pResult->AddColumn ( "Last 24 hours.In game" );
-    pResult->AddColumn ( "Last 24 hours.Out game" );
-    pResult->AddColumn ( "Last 24 hours.Out http" );
+    pResult->AddColumn ( "Last 24 hours.Recv game" );
+    pResult->AddColumn ( "Last 24 hours.Sent game" );
+    pResult->AddColumn ( "Last 24 hours.Sent http" );
 
     pResult->AddColumn ( "Last 31 days.Day" );
-    pResult->AddColumn ( "Last 31 days.In game" );
-    pResult->AddColumn ( "Last 31 days.Out game" );
-    pResult->AddColumn ( "Last 31 days.Out http" );
+    pResult->AddColumn ( "Last 31 days.Recv game" );
+    pResult->AddColumn ( "Last 31 days.Sent game" );
+    pResult->AddColumn ( "Last 31 days.Sent http" );
 
     pResult->AddColumn ( "Last 12 months.Month" );
-    pResult->AddColumn ( "Last 12 months.In game" );
-    pResult->AddColumn ( "Last 12 months.Out game" );
-    pResult->AddColumn ( "Last 12 months.Out http" );
+    pResult->AddColumn ( "Last 12 months.Recv game" );
+    pResult->AddColumn ( "Last 12 months.Sent game" );
+    pResult->AddColumn ( "Last 12 months.Sent http" );
 
     uint showTypeList[] = {
                             BWSTAT_INDEX_HOURS,
@@ -554,9 +553,9 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
                 else
                     c++;
 
-                row[c++] = GetScaledBandwidthString ( item.InGame );
-                row[c++] = GetScaledBandwidthString ( item.OutGame );
-                row[c++] = GetScaledBandwidthString ( item.OutHttp );
+                row[c++] = GetScaledBandwidthString ( item.llGameRecv );
+                row[c++] = GetScaledBandwidthString ( item.llGameSent );
+                row[c++] = GetScaledBandwidthString ( item.llHttpSent );
             }
             else
             {
