@@ -31,7 +31,7 @@ bool CLightsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
           ++iter )
     {
         CPlayer* pPlayer = *iter;
-        SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
+        CPlayer::SLightweightSyncData& data = pPlayer->GetLightweightSyncData ();
 
         CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
         bSyncPosition = !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0;

@@ -1495,10 +1495,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\Shared\sdk\net\DeltaSync.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\..\Shared\sdk\net\Packets.h"
 					>
 				</File>

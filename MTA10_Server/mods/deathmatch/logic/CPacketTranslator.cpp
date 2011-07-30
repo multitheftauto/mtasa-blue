@@ -61,20 +61,8 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
             pTemp = new CPlayerPuresyncPacket;
             break;
 
-        case PACKET_ID_PLAYER_DELTASYNC:
-            pTemp = new CPlayerDeltasyncPacket;
-            break;
-
         case PACKET_ID_PLAYER_VEHICLE_PURESYNC:
             pTemp = new CVehiclePuresyncPacket;
-            break;
-
-        case PACKET_ID_PLAYER_VEHICLE_DELTASYNC:
-            pTemp = new CVehicleDeltasyncPacket;
-            break;
-
-        case PACKET_ID_LIGHTSYNC:
-            pTemp = new CLightsyncPacket;
             break;
 
         case PACKET_ID_PLAYER_KEYSYNC:

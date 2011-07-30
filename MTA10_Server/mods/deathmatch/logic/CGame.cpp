@@ -972,21 +972,9 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
-        case PACKET_ID_PLAYER_DELTASYNC:
-        {
-            Packet_PlayerDeltasync ( static_cast < CPlayerDeltasyncPacket& > ( Packet ) );
-            return true;
-        }
-
         case PACKET_ID_PLAYER_VEHICLE_PURESYNC:
         {
             Packet_VehiclePuresync ( static_cast < CVehiclePuresyncPacket& > ( Packet ) );
-            return true;
-        }
-
-        case PACKET_ID_PLAYER_VEHICLE_DELTASYNC:
-        {
-            Packet_VehicleDeltasync ( static_cast < CVehicleDeltasyncPacket& > ( Packet ) );
             return true;
         }
 
@@ -1848,34 +1836,6 @@ void CGame::Packet_PlayerPuresync ( CPlayerPuresyncPacket& Packet )
                 pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
 
             // Relay to other players
-            pPlayer->GetSentDeltaSyncData ().deltaSyncContext++;
-            RelayPlayerPuresync ( Packet );
-
-            // Run colpoint checks
-            m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
-        }
-    }
-}
-
-void CGame::Packet_PlayerDeltasync ( CPlayerDeltasyncPacket& Packet )
-{
-    // Grab the source player
-    CPlayer* pPlayer = Packet.GetSourcePlayer ();
-    if ( pPlayer && pPlayer->IsJoined () )
-    {
-        pPlayer->NotifyReceivedSync ();
-        pPlayer->IncrementPuresync ();
-
-        // Ignore this packet if he should be in a vehicle
-        if ( !pPlayer->GetOccupiedVehicle () )
-        {
-            // Send a returnsync packet to the player that sent it
-            // Only every 4 packets.
-            if ( ( pPlayer->GetPuresyncCount () % 4 ) == 0 )
-                pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
-
-            // Relay to other players
-            Packet.PrepareToSendDeltaSync ();
             RelayPlayerPuresync ( Packet );
 
             // Run colpoint checks
@@ -1967,31 +1927,6 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
     }
 }
 
-void CGame::Packet_VehicleDeltasync ( CVehicleDeltasyncPacket& Packet )
-{
-    // Grab the source player
-    CPlayer* pPlayer = Packet.GetSourcePlayer ();
-    if ( pPlayer && pPlayer->IsJoined () )
-    {
-        pPlayer->NotifyReceivedSync ();
-
-        // Grab the vehicle
-        CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
-        if ( pVehicle )
-        {
-            // Send a returnsync packet to the player that sent it
-            pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
-
-            // Relay to other players
-            Packet.PrepareToSendDeltaSync ();
-            RelayPlayerPuresync ( Packet );
-
-            // Run colpoint checks
-            m_pColManager->DoHitDetection ( pPlayer->GetLastPosition (), pPlayer->GetPosition (), 0.0f, pPlayer );
-            m_pColManager->DoHitDetection ( pVehicle->GetLastPosition (), pVehicle->GetPosition (), 0.0f, pVehicle );
-        }
-    }
-}
 
 void CGame::Packet_Keysync ( CKeysyncPacket& Packet )
 {

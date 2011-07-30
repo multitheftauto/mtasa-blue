@@ -27,7 +27,6 @@ class CPlayer;
 #include "CPad.h"
 #include "CObject.h"
 #include "packets/CPacket.h"
-#include "net/DeltaSync.h"
 
 class CKeyBinds;
 class CPlayerCamera;
@@ -216,11 +215,36 @@ public:
     void                                        AddNearPlayer               ( CPlayer* other )              { m_NearPlayerList [ other ] = 5; }
     std::map < CPlayer*, int >&                 GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
 
-    SPlayerDeltaSyncData&                       GetReceivedDeltaSyncData    ( void ) { return m_receivedDeltaSyncData; }
-    SPlayerDeltaSyncData&                       GetSentDeltaSyncData        ( void ) { return m_sentDeltaSyncData; }
-    void                                        UpdatePlayerSentDeltaSync   ( void );
-    SLightweightSyncData&                       GetLightweightSyncData      ( void ) { return m_lightweightSyncData; }
+public:
+    struct SLightweightSyncData
+    {
+        SLightweightSyncData ()
+        {
+            health.uiContext = 0;
+            health.bSync = false;
+            vehicleHealth.uiContext = 0;
+            vehicleHealth.bSync = false;
+        }
 
+        struct
+        {
+            float           fLastHealth;
+            float           fLastArmor;
+            bool            bSync;
+            unsigned int    uiContext;
+        } health;
+
+        struct
+        {
+            CVehicle*       lastVehicle;
+            float           fLastHealth;
+            bool            bSync;
+            unsigned int    uiContext;
+        } vehicleHealth;
+    };
+    SLightweightSyncData&                       GetLightweightSyncData      ( void ) { return m_lightweightSyncData; }
+private:
+    SLightweightSyncData                        m_lightweightSyncData;
 
 private:
     void                                        WriteCameraModePacket       ( void );
@@ -310,10 +334,6 @@ private:
 
     std::map < CPlayer*, int >                  m_NearPlayerList;
     long long                                   m_llNearListUpdateTime;
-
-    SLightweightSyncData                        m_lightweightSyncData;
-    SPlayerDeltaSyncData                        m_receivedDeltaSyncData;
-    SPlayerDeltaSyncData                        m_sentDeltaSyncData;
 };
 
 #endif
