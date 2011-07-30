@@ -26,6 +26,8 @@ This can be found in the 'COPYING' file.
 #include "ehs.h"
 #include <fstream>
 
+long long ms_HttpTotalBytesSent = 0;
+
 // Returns true if lock succeeded
 static bool MUTEX_TRY_LOCK( MUTEX_TYPE& x )
 {
@@ -1573,3 +1575,8 @@ SslError * SecureSocket::poSslError = NULL;
 SSL_CTX * SecureSocket::poCtx;
 
 #endif // COMPILE_WITH_SSL
+
+long long EHS::StaticGetTotalBytesSent ( void )
+{
+    return ms_HttpTotalBytesSent;
+}
