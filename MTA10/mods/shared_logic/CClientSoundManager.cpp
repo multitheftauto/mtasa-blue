@@ -23,7 +23,7 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
     m_pClientManager = pClientManager;
 
     // Initialize BASS audio library
-    if (!BASS_Init ( -1,44100,BASS_DEVICE_3D,NULL,NULL ))
+    if (!BASS_Init ( -1,44100,NULL,NULL,NULL ))
         g_pCore->GetConsole()->Printf ( "BASS ERROR %d in Init", BASS_ErrorGetCode() );
 
     // Load the Plugins
@@ -122,7 +122,7 @@ CClientSound* CClientSoundManager::PlaySound2D ( const SString& strSound, bool b
 
 CClientSound* CClientSoundManager::PlaySound3D ( const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop )
 {
-    CClientSound* pSound = new CClientSound ( m_pClientManager, INVALID_ELEMENT_ID );
+    /*CClientSound* pSound = new CClientSound ( m_pClientManager, INVALID_ELEMENT_ID );
 
     if ( bIsURL )
     {
@@ -133,7 +133,7 @@ CClientSound* CClientSoundManager::PlaySound3D ( const SString& strSound, bool b
         if ( pSound->Play3D ( strSound, vecPosition, bLoop ) )
             return pSound;
 
-    delete pSound;
+    delete pSound;*/
     return NULL;
 }
 
