@@ -80,6 +80,8 @@ public:
 
     virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
     virtual void                            ClearPacketStats                ( void ) = 0;
+
+    virtual void                            GetStatsTotals                  ( long long& llBytesSent, long long& llBytesReceived ) = 0;
 };
 
 #endif

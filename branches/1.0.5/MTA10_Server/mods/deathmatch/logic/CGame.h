@@ -125,6 +125,7 @@ class CWeaponDamageCheckPacket;
 class CGame
 {
 public:
+    ZERO_ON_NEW         // To be sure everything is cleared
     enum
     {
         VEHICLE_REQUEST_IN,
@@ -249,6 +250,8 @@ public:
     void                        PulseMasterServerAnnounce   ( void );
     void                        StartOpenPortsTest          ( void );
 
+    bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
+
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
@@ -360,6 +363,8 @@ private:
 
     long long                   m_llLastAnnouceTime;
     class COpenPortsTester*     m_pOpenPortsTester;
+
+    bool                        m_bServerFullyUp;       // No http operations should be allowed unless this is true
 };
 
 #endif

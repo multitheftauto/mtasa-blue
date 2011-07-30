@@ -336,6 +336,7 @@ class EHS {
 	/// This looks for incoming connections in EHSServer.
 	void HandleData ( int inTimeoutMilliseconds = 0 );
 
+    static long long StaticGetTotalBytesSent ( void );    // For stats
 };
 
 
