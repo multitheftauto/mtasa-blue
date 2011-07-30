@@ -1346,32 +1346,36 @@ bool CStaticFunctionDefinitions::AttachElements ( CElement* pElement, CElement* 
     assert ( pAttachedToElement );
     RUN_CHILDREN AttachElements ( *iter, pAttachedToElement, vecPosition, vecRotation );
 
-    // Are they the same element?
-    if ( pElement != pAttachedToElement )
+    // Check the elements we are attaching are not already connected
+    std::set < CElement* > history;
+    for ( CElement* pCurrent = pAttachedToElement ; pCurrent ; pCurrent = pCurrent->GetAttachedToElement () )
     {
-        // Make sure they aren't already attached to eachother in reverse
-        if ( pAttachedToElement->GetAttachedToElement () != pElement )
-        {
-            if ( pElement->IsAttachToable () && pAttachedToElement->IsAttachable () && pElement->GetDimension() == pAttachedToElement->GetDimension() )
-            {
-                pElement->SetAttachedOffsets ( vecPosition, vecRotation );
-                ConvertDegreesToRadians ( vecRotation );
-                pElement->AttachTo ( pAttachedToElement );
-
-                CBitStream BitStream;
-                BitStream.pBitStream->Write ( pAttachedToElement->GetID () );
-                BitStream.pBitStream->Write ( vecPosition.fX );
-                BitStream.pBitStream->Write ( vecPosition.fY );
-                BitStream.pBitStream->Write ( vecPosition.fZ );
-                BitStream.pBitStream->Write ( vecRotation.fX );
-                BitStream.pBitStream->Write ( vecRotation.fY );
-                BitStream.pBitStream->Write ( vecRotation.fZ );
-                m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, ATTACH_ELEMENTS, *BitStream.pBitStream ) );
-
-                return true;
-            }
-        }
+        if ( pCurrent == pElement )
+            return false;
+        if ( MapContains ( history, pCurrent ) )
+            break;  // This should not be possible, but you never know
+        MapInsert ( history, pCurrent );
     }
+
+    if ( pElement->IsAttachToable () && pAttachedToElement->IsAttachable () && pElement->GetDimension() == pAttachedToElement->GetDimension() )
+    {
+        pElement->SetAttachedOffsets ( vecPosition, vecRotation );
+        ConvertDegreesToRadians ( vecRotation );
+        pElement->AttachTo ( pAttachedToElement );
+
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( pAttachedToElement->GetID () );
+        BitStream.pBitStream->Write ( vecPosition.fX );
+        BitStream.pBitStream->Write ( vecPosition.fY );
+        BitStream.pBitStream->Write ( vecPosition.fZ );
+        BitStream.pBitStream->Write ( vecRotation.fX );
+        BitStream.pBitStream->Write ( vecRotation.fY );
+        BitStream.pBitStream->Write ( vecRotation.fZ );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, ATTACH_ELEMENTS, *BitStream.pBitStream ) );
+
+        return true;
+    }
+
     return false;
 }
 
