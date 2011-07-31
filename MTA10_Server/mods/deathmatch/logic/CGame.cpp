@@ -2242,79 +2242,94 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     }
 
                                     CPed* pOccupant = pVehicle->GetOccupant ( ucSeat );
-                                    // If he's going to be jacking this vehicle, lets make sure he's very close to it
+                                    // If he's going to be jacking the driver, lets make sure he's very close to it
+                                    // Otherwise, point him to a free passenger seat, if his favorite seat is taken
                                     if ( pOccupant )
-                                        fCutoffDistance = 10.0f;
-
-                                    // Is he close enough to the vehicle?
-                                    if ( IsPointNearPoint3D ( pPlayer->GetPosition (), pVehicle->GetPosition (), fCutoffDistance ) )
                                     {
-                                        // Mark him as entering the vehicle
-                                        pPlayer->SetVehicleAction   ( CPlayer::VEHICLEACTION_ENTERING );
-                                        SetPedEnteringVehicle ( pPlayer, pVehicle, ucSeat );
-
-                                        // Jacking?
-                                        if ( pOccupant )
+                                        if ( ucSeat == 0 )
+                                            fCutoffDistance = 10.0f;
+                                        else
                                         {
-                                            pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_JACKING );
-                                            pOccupant->SetVehicleAction ( CPlayer::VEHICLEACTION_JACKED );
+                                            ucSeat = pVehicle->GetFreePassengerSeat ( );
+                                            pOccupant = NULL;
                                         }
+                                    }
 
-                                        // Call the entering vehicle event
-                                        CLuaArguments Arguments;
-                                        Arguments.PushElement ( pPlayer );     // player
-                                        Arguments.PushNumber ( ucSeat );       // seat
-                                        Arguments.PushBoolean ( false );       // jacked
-                                        Arguments.PushNumber ( ucDoor );       // Door
-                                        if ( pVehicle->CallEvent ( "onVehicleStartEnter", Arguments ) && !pVehicle->IsBeingDeleted ( ) )
+                                    // Make sure we actually have a valid seat, due to the check above
+                                    if ( ucSeat <= 8 )
+                                    {
+                                        // Is he close enough to the vehicle?
+                                        if ( IsPointNearPoint3D ( pPlayer->GetPosition (), pVehicle->GetPosition (), fCutoffDistance ) )
                                         {
-                                            unsigned int uiPlayerVehicleAction = pPlayer->GetVehicleAction ();
-                                            // HACK?: check the player's vehicle-action is still the same (not warped in?)
-                                            if ( uiPlayerVehicleAction == CPlayer::VEHICLEACTION_ENTERING || uiPlayerVehicleAction == CPlayer::VEHICLEACTION_JACKING )
+                                            // Mark him as entering the vehicle
+                                            pPlayer->SetVehicleAction   ( CPlayer::VEHICLEACTION_ENTERING );
+                                            SetPedEnteringVehicle ( pPlayer, pVehicle, ucSeat );
+
+                                            // Jacking?
+                                            if ( pOccupant )
                                             {
-                                                // Make sure the entering player will become the syncer, unless there already is a driver inside it
-                                                if ( !pOccupant )
-                                                    m_pUnoccupiedVehicleSync->OverrideSyncer ( pVehicle, pPlayer );
+                                                pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_JACKING );
+                                                pOccupant->SetVehicleAction ( CPlayer::VEHICLEACTION_JACKED );
+                                            }
 
-                                                if ( bWarpIn )
+                                            // Call the entering vehicle event
+                                            CLuaArguments Arguments;
+                                            Arguments.PushElement ( pPlayer );     // player
+                                            Arguments.PushNumber ( ucSeat );       // seat
+                                            Arguments.PushBoolean ( false );       // jacked
+                                            Arguments.PushNumber ( ucDoor );       // Door
+                                            if ( pVehicle->CallEvent ( "onVehicleStartEnter", Arguments ) && !pVehicle->IsBeingDeleted ( ) )
+                                            {
+                                                unsigned int uiPlayerVehicleAction = pPlayer->GetVehicleAction ();
+                                                // HACK?: check the player's vehicle-action is still the same (not warped in?)
+                                                if ( uiPlayerVehicleAction == CPlayer::VEHICLEACTION_ENTERING || uiPlayerVehicleAction == CPlayer::VEHICLEACTION_JACKING )
                                                 {
-                                                    // Warp the player into the vehicle, no double code required
-                                                    CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPlayer, pVehicle, ucSeat );
+                                                    // Make sure the entering player will become the syncer, unless there already is a driver inside it
+                                                    if ( !pOccupant )
+                                                        m_pUnoccupiedVehicleSync->OverrideSyncer ( pVehicle, pPlayer );
 
-                                                    // Unset the occupying variables, because he's now officially in the vehicle
-                                                    ClearPedEnteringVehicle ( pPlayer, pVehicle );
+                                                    if ( bWarpIn )
+                                                    {
+                                                        // Warp the player into the vehicle, no double code required
+                                                        CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPlayer, pVehicle, ucSeat );
+
+                                                        // Unset the occupying variables, because he's now officially in the vehicle
+                                                        ClearPedEnteringVehicle ( pPlayer, pVehicle );
+                                                    }
+                                                    else if ( pOccupant )
+                                                    {
+                                                        // Tell the player he'll have to jack
+                                                        CVehicleInOutPacket Reply ( ID, ucSeat, VEHICLE_REQUEST_JACK_CONFIRMED, ucDoor );
+                                                        Reply.SetSourceElement ( pPlayer );
+                                                        m_pPlayerManager->BroadcastOnlyJoined ( Reply );
+                                                    }
+                                                    else
+                                                    {
+                                                        // Tell everyone he can start entering the vehicle from his current position
+                                                        CVehicleInOutPacket Reply ( ID, ucSeat, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor );
+                                                        Reply.SetSourceElement ( pPlayer );
+                                                        m_pPlayerManager->BroadcastOnlyJoined ( Reply );
+                                                    }
+                                                    bFailed = false;
                                                 }
-                                                else if ( pOccupant )
-                                                {
-                                                    // Tell the player he'll have to jack
-                                                    CVehicleInOutPacket Reply ( ID, ucSeat, VEHICLE_REQUEST_JACK_CONFIRMED, ucDoor );
-                                                    Reply.SetSourceElement ( pPlayer );
-                                                    m_pPlayerManager->BroadcastOnlyJoined ( Reply );
-                                                }
-                                                else
-                                                {
-                                                    // Tell everyone he can start entering the vehicle from his current position
-                                                    CVehicleInOutPacket Reply ( ID, ucSeat, VEHICLE_REQUEST_IN_CONFIRMED, ucDoor );
-                                                    Reply.SetSourceElement ( pPlayer );
-                                                    m_pPlayerManager->BroadcastOnlyJoined ( Reply );
-                                                }
-                                                bFailed = false;
+                                            }
+                                            else
+                                            {
+                                                // Event cancelled, reset all stuff
+                                                pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+                                                ClearPedEnteringVehicle ( pPlayer, pVehicle );
+
+                                                if ( pOccupant )
+                                                    pOccupant->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+
+                                                failReason = VEHICLE_INOUT_FAIL_SCRIPT;
                                             }
                                         }
                                         else
-                                        {
-                                            // Event cancelled, reset all stuff
-                                            pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-                                            ClearPedEnteringVehicle ( pPlayer, pVehicle );
-
-                                            if ( pOccupant )
-                                                pOccupant->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
-
-                                            failReason = VEHICLE_INOUT_FAIL_SCRIPT;
-                                        }
+                                            failReason = VEHICLE_INOUT_FAIL_DISTANCE;
                                     }
                                     else
-                                        failReason = VEHICLE_INOUT_FAIL_DISTANCE;
+                                        failReason = VEHICLE_INOUT_FAIL_SEAT;
                                 }
                                 else
                                     failReason = VEHICLE_INOUT_FAIL_IN_VEHICLE;
