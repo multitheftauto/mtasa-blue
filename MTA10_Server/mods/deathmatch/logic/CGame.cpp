@@ -400,8 +400,6 @@ void CGame::DoPulse ( void )
     if ( m_pOpenPortsTester )
         m_pOpenPortsTester->Poll ();
 
-    m_lightsyncManager.DoPulse ();
-
     // Unlock the critical section again
     Unlock();
 }
@@ -1206,9 +1204,6 @@ void CGame::InitialDataStream ( CPlayer& Player )
             m_pAccountManager->LogIn ( &Player, &Player, pAccount, true );
         }
     }
-
-    // Register them on the lightweight sync manager.
-    m_lightsyncManager.RegisterPlayer ( &Player );
 }
 
 void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer )
@@ -1284,9 +1279,6 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
 
     // Delete it, don't unlink yet, we could be inside the player-manager's iteration
     m_ElementDeleter.Delete ( &Player, false );
-
-    // Unregister them from the lightweight sync manager
-    m_lightsyncManager.UnregisterPlayer ( &Player );
 }
 
 
@@ -1792,27 +1784,42 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 // Relay this (pure sync) packet to all the other players using distance rules
 void CGame::RelayPlayerPuresync ( CPacket& Packet )
 {
+
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
-    // Insert into other players near list if appropriate
-    pPlayer->UpdateOthersNearList ();
-
-    // Use this players near list for sending packets
-    std::map < CPlayer*, int >& nearList = pPlayer->GetNearPlayerList ();
-
-    for ( std::map < CPlayer*, int > ::iterator it = nearList.begin (); it != nearList.end (); )
+    if ( pPlayer->IsTimeForFarSync () )
     {
-        CPlayer* pSendPlayer = it->first;
-        int& iCount = it->second;
-        if ( --iCount < 1 )
+        //
+        // All players get sync if it's time for a far sync
+        //
+        for ( std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin (); iter != m_pPlayerManager->IterEnd (); iter++ )
         {
-            // Remove player from near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far away))
-            nearList.erase ( it++ );
-        }
-        else
-        {
-            if ( pSendPlayer->GetDimension() == pPlayer->GetDimension() )
+            CPlayer* pSendPlayer = *iter;
+            if ( pSendPlayer != pPlayer )
                 pSendPlayer->Send ( Packet );
-            it++;
+        }
+    }
+    else
+    {
+        // Insert into other players near list if appropriate
+        pPlayer->UpdateOthersNearList ();
+
+        // Use this players near list for sending packets
+        std::map < CPlayer*, int >& nearList = pPlayer->GetNearPlayerList ();
+
+        for ( std::map < CPlayer*, int > ::iterator it = nearList.begin (); it != nearList.end (); )
+        {
+            CPlayer* pSendPlayer = it->first;
+            int& iCount = it->second;
+            if ( --iCount < 1 )
+            {
+                // Remove player from near list (Has to be not near for 5 calls to get removed (The delay ensures timely updates of players moving far away))
+                nearList.erase ( it++ );
+            }
+            else
+            {
+                pSendPlayer->Send ( Packet );
+                it++;
+            }
         }
     }
 }

@@ -28,6 +28,9 @@ class CPlayer;
 #include "CObject.h"
 #include "packets/CPacket.h"
 
+#define SLOW_SYNCRATE               1000
+#define DISTANCE_FOR_SLOW_SYNCRATE  320
+
 class CKeyBinds;
 class CPlayerCamera;
 
@@ -195,6 +198,8 @@ public:
     inline unsigned char                        GetBlurLevel                ( void )                        { return m_ucBlurLevel; }
     inline void                                 SetBlurLevel                ( unsigned char ucBlurLevel )   { m_ucBlurLevel = ucBlurLevel; }
 
+    bool                                        IsTimeForFarSync            ( void );
+
     // Sync stuff
     inline void                                 SetSyncingVelocity          ( bool bSyncing )               { m_bSyncingVelocity = bSyncing; }
     inline bool                                 IsSyncingVelocity           ( void ) const                  { return m_bSyncingVelocity; }
@@ -214,37 +219,6 @@ public:
     void                                        UpdateOthersNearList        ( void );
     void                                        AddNearPlayer               ( CPlayer* other )              { m_NearPlayerList [ other ] = 5; }
     std::map < CPlayer*, int >&                 GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
-
-public:
-    struct SLightweightSyncData
-    {
-        SLightweightSyncData ()
-        {
-            health.uiContext = 0;
-            health.bSync = false;
-            vehicleHealth.uiContext = 0;
-            vehicleHealth.bSync = false;
-        }
-
-        struct
-        {
-            float           fLastHealth;
-            float           fLastArmor;
-            bool            bSync;
-            unsigned int    uiContext;
-        } health;
-
-        struct
-        {
-            CVehicle*       lastVehicle;
-            float           fLastHealth;
-            bool            bSync;
-            unsigned int    uiContext;
-        } vehicleHealth;
-    };
-    SLightweightSyncData&                       GetLightweightSyncData      ( void ) { return m_lightweightSyncData; }
-private:
-    SLightweightSyncData                        m_lightweightSyncData;
 
 private:
     void                                        WriteCameraModePacket       ( void );
@@ -321,6 +295,8 @@ private:
     std::string                                 m_strCommunityID;
 
     unsigned char                               m_ucBlurLevel;
+
+    long long                                   m_llNextFarSyncTime;       
 
     // Sync stuff
     bool                                        m_bSyncingVelocity;

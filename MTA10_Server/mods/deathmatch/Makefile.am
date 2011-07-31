@@ -78,7 +78,6 @@ LOGIC = \
 ./logic/CHTTPD.cpp \
 ./logic/CKeyBinds.cpp \
 ./logic/CLanBroadcast.cpp \
-./logic/CLightsyncManager.cpp \
 ./logic/CLogger.cpp \
 ./logic/CMD5Hasher.cpp \
 ./logic/CMainConfig.cpp \
@@ -193,7 +192,6 @@ LOGIC = \
 ./logic/packets/CFireSyncPacket.cpp \
 ./logic/packets/CElementRPCPacket.cpp \
 ./logic/packets/CKeysyncPacket.cpp \
-./logic/packets/CLightsyncPacket.cpp \
 ./logic/packets/CLuaEventPacket.cpp \
 ./logic/packets/CLuaPacket.cpp \
 ./logic/packets/CMapInfoPacket.cpp \
@@ -233,7 +231,6 @@ LOGIC = \
 ./logic/packets/CVehicleDamageSyncPacket.cpp \
 ./logic/packets/CVehicleInOutPacket.cpp \
 ./logic/packets/CVehiclePuresyncPacket.cpp \
-./logic/packets/CVehicleResyncPacket.cpp \
 ./logic/packets/CVehicleSpawnPacket.cpp \
 ./logic/packets/CVehicleTrailerPacket.cpp \
 ./logic/packets/CVoiceDataPacket.cpp
