@@ -23,7 +23,7 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
     m_pClientManager = pClientManager;
 
     // Initialize BASS audio library
-    if (!BASS_Init ( -1,44100,BASS_DEVICE_3D,NULL,NULL ))
+    if (!BASS_Init ( -1,44100,NULL,NULL,NULL ))
         g_pCore->GetConsole()->Printf ( "BASS ERROR %d in Init", BASS_ErrorGetCode() );
     
     // Load the Plugins
@@ -38,7 +38,6 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
     if (!BASS_PluginLoad ( "bass_ac3.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
         g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad AC3", BASS_ErrorGetCode() );
 
-    BASS_SetEAXParameters ( -1,0,-1,-1 );
     BASS_SetConfig ( BASS_CONFIG_NET_PREBUF, 0 );
     BASS_SetConfig ( BASS_CONFIG_NET_PLAYLIST, 1 ); // Allow playlists
     

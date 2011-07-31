@@ -104,7 +104,8 @@ HSTREAM CClientSound::ConvertFileToMono(const SString& strPath)
 
 bool CClientSound::Play3D ( const SString& strPath, const CVector& vecPosition, bool bLoop )
 {
-    long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
+    //long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
+    long lFlags = BASS_STREAM_AUTOFREE;
 
     // Try to load the sound file
     if (
@@ -121,10 +122,10 @@ bool CClientSound::Play3D ( const SString& strPath, const CVector& vecPosition, 
         m_vecPosition = vecPosition;
         m_vecVelocity = CVector( 0, 0, 0 );
 
-        BASS_3DVECTOR pos ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
-        BASS_3DVECTOR vel ( m_vecVelocity.fX, m_vecVelocity.fY, m_vecVelocity.fZ );
-        BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, &vel );
-        BASS_ChannelSet3DAttributes ( m_pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
+        //BASS_3DVECTOR pos ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
+        //BASS_3DVECTOR vel ( m_vecVelocity.fX, m_vecVelocity.fY, m_vecVelocity.fZ );
+        //BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, &vel );
+        //BASS_ChannelSet3DAttributes ( m_pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
         BASS_ChannelPlay ( m_pSound, false );
         BASS_ChannelGetAttribute ( m_pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency );
         return true;
@@ -144,7 +145,7 @@ void CClientSound::PlayStream ( const SString& strURL, bool bLoop, bool b3D, con
     {
         m_b3D = true;
         m_vecPosition = vecPosition;
-        lFlags |= BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
+        //lFlags |= BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
     }
     if ( bLoop )
         lFlags |= BASS_SAMPLE_LOOP;
@@ -249,10 +250,10 @@ void CClientSound::ThreadCallback ( HSTREAM pSound )
 
         if ( m_b3D )
         {
-            BASS_3DVECTOR pos ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
+            /*BASS_3DVECTOR pos ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
             BASS_3DVECTOR vel ( m_vecVelocity.fX, m_vecVelocity.fY, m_vecVelocity.fZ );
             BASS_ChannelSet3DPosition ( pSound, &pos, NULL, &vel );
-            BASS_ChannelSet3DAttributes ( pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );
+            BASS_ChannelSet3DAttributes ( pSound, BASS_3DMODE_NORMAL, 1.0f, 0.5f, 360, 360, 1.0f );*/
         }
         
         BASS_ChannelSetAttribute( pSound, BASS_ATTRIB_VOL, m_fVolume );
@@ -441,8 +442,8 @@ void CClientSound::SetPosition ( const CVector& vecPosition )
 
     if ( m_pSound )
     {
-        BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
-        BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, NULL);
+        /*BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
+        BASS_ChannelSet3DPosition ( m_pSound, &pos, NULL, NULL);*/
     }
 }
 
@@ -457,8 +458,8 @@ void CClientSound::SetVelocity ( const CVector& vecVelocity )
 
     if ( m_pSound )
     {
-        BASS_3DVECTOR vel ( vecVelocity.fX, vecVelocity.fY, vecVelocity.fZ );
-        BASS_ChannelSet3DPosition ( m_pSound, NULL, NULL, &vel);
+        /*BASS_3DVECTOR vel ( vecVelocity.fX, vecVelocity.fY, vecVelocity.fZ );
+        BASS_ChannelSet3DPosition ( m_pSound, NULL, NULL, &vel);*/
     }
 }
 
