@@ -474,7 +474,7 @@ SAdditionalStreamInfo* CAdditionalVertexStreamManager::CreateAdditionalStreamInf
         // Create new stream
         info.Stride = sizeof ( float ) * 3;
         UINT Size2 = ConvertPTSize ( state.decl.VertexBufferDesc1.Size );
-        if ( FAILED( m_pDevice->CreateVertexBuffer( Size2, D3DUSAGE_WRITEONLY, 0, D3DPOOL_DEFAULT, &info.pStreamData, NULL ) ) )
+        if ( FAILED( m_pDevice->CreateVertexBuffer( Size2, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &info.pStreamData, NULL ) ) )
             return false;
 
         // Save info
