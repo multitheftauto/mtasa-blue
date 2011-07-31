@@ -2592,19 +2592,19 @@ int CLuaFunctionDefs::GUIGetChatboxLayout ( lua_State* luaVM )
         lua_settable( luaVM, -3 );
         lua_setfield ( luaVM, -2, "chat_input_text_color" );
     }
-    int iX, iY;
     pCVars->Get("chat_scale", strCVar);
     if ( !strCVar.empty() )
     {
+        float fX, fY;
         ss.clear();
         ss.str ( strCVar );
-        ss >> iX >> iY;
+        ss >> fX >> fY;
         lua_newtable ( luaVM );
         lua_pushnumber ( luaVM, 1 );
-        lua_pushnumber ( luaVM, iX );
+        lua_pushnumber ( luaVM, fX );
         lua_settable( luaVM, -3 );
         lua_pushnumber ( luaVM, 2 );
-        lua_pushnumber ( luaVM, iY );
+        lua_pushnumber ( luaVM, fY );
         lua_settable( luaVM, -3 );
         lua_setfield ( luaVM, -2, "chat_scale" );
     }
