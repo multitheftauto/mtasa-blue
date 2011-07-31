@@ -83,6 +83,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_ucBlurLevel = 36; // Default
 
+    m_llNextFarSyncTime = 0;
+
     // Sync stuff
     m_bSyncingVelocity = false;
     m_uiPuresyncPackets = 0;
@@ -539,6 +541,21 @@ void CPlayer::RemoveNametagOverrideColor ( void )
     m_ucNametagB = 255;
     m_bNametagColorOverridden = false;
 }
+
+
+// Is it time to send a pure sync to every other player ?
+bool CPlayer::IsTimeForFarSync ( void )
+{
+    long long llTime = GetTickCount64_ ();
+    if ( llTime > m_llNextFarSyncTime )
+    {
+        m_llNextFarSyncTime = llTime + SLOW_SYNCRATE;
+        m_llNextFarSyncTime += rand () % ( 1 + SLOW_SYNCRATE / 10 );   // Extra bit to help distribute the load
+        return true;
+    }
+    return false;
+}
+
 
 // Note: The return value must be consumed before m_AnnounceValues is next modified
 const std::string& CPlayer::GetAnnounceValue ( const string& strKey ) const

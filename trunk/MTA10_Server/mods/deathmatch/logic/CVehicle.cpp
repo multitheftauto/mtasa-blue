@@ -491,12 +491,7 @@ bool CVehicle::SetOccupant ( CPed* pPed, unsigned int uiSeat )
     if ( !bAlreadySetting )
     {
         // Set the Player
-        if ( m_pOccupants [uiSeat] != pPed )
-        {
-            if ( uiSeat == 0 && m_pOccupants[0] && IS_PLAYER(m_pOccupants[0]) )
-                g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( CVehicleResyncPacket(this) );
-            m_pOccupants [uiSeat] = pPed;
-        }
+        m_pOccupants [uiSeat] = pPed;
 
         // Make sure the Player record is up to date
         if ( pPed )

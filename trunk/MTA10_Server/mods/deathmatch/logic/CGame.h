@@ -43,8 +43,6 @@ class CGame;
 #include "packets/CPlayerTimeoutPacket.h"
 #include "packets/CPlayerPuresyncPacket.h"
 #include "packets/CVehiclePuresyncPacket.h"
-#include "packets/CLightsyncPacket.h"
-#include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
@@ -61,8 +59,6 @@ class CGame;
 #include "CRPCFunctions.h"
 
 #include "lua/CLuaManager.h"
-
-#include "CLightsyncManager.h"
 
 #ifdef MTA_VOICE
 #include "../../../Voice/VoiceServerAPI.h"
@@ -482,8 +478,6 @@ private:
 
     long long                   m_llLastAnnouceTime;
     class COpenPortsTester*     m_pOpenPortsTester;
-
-    CLightsyncManager           m_lightsyncManager;
 
     bool                        m_bServerFullyUp;       // No http operations should be allowed unless this is true
 };
