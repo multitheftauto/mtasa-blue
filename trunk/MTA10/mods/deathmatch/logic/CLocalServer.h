@@ -22,6 +22,7 @@ public:
                                 CLocalServer        ( const char* szConfig );
                                 ~CLocalServer       ( void );
 
+protected:
     bool                        OnStartButtonClick  ( CGUIElement* pElement );
     bool                        OnCancelButtonClick ( CGUIElement* pElement );
     bool                        OnAddButtonClick    ( CGUIElement* pElement );
@@ -33,7 +34,8 @@ public:
 
     void                        StoreConfigValue    ( const char* szNode, const char* szValue );
 
-    void                        HandleResource      ( char* szResource );
+    void                        HandleResource      ( const char* szResource );
+    void                        GetResourceNameList ( std::vector < SString >& outResourceNameList, const SString& strResourceDirectoryPath );
 
 private:
 
