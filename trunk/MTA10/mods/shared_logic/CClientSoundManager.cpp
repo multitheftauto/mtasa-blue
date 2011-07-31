@@ -87,7 +87,7 @@ void CClientSoundManager::DoPulse ( void )
     list < CClientSound* > ::iterator iter = m_Sounds.begin ();
     for ( ; iter != m_Sounds.end () ; ++iter )
     {
-        (*iter)->Process3D ( vecPosition );
+        (*iter)->Process3D ( vecPosition, vecLookAt );
     }
 
     // Apply the 3D changes

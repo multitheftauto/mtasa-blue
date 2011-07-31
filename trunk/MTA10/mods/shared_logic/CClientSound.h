@@ -19,6 +19,7 @@ class CClientSound;
 #include "CClientEntity.h"
 
 //#define MAX_SOUND_DISTANCE 100
+#define SOUND_PAN_THRESHOLD 0.85f
 #define CUT_OFF 5.0f //Cut off point at which volume is regarded as 0 in the function e^-x
 
 typedef struct
@@ -97,7 +98,7 @@ public:
 protected:
 
     DWORD                   GetSound                ( void )                            { return m_pSound; };
-    void                    Process3D               ( CVector vecPosition );
+    void                    Process3D               ( CVector vecPosition, CVector vecLookAt );
 
 private:
 

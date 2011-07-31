@@ -105,7 +105,7 @@ HSTREAM CClientSound::ConvertFileToMono(const SString& strPath)
 bool CClientSound::Play3D ( const SString& strPath, const CVector& vecPosition, bool bLoop )
 {
     //long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
-    long lFlags = BASS_STREAM_AUTOFREE;
+    long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_MONO;
 
     // Try to load the sound file
     if (
@@ -146,6 +146,7 @@ void CClientSound::PlayStream ( const SString& strURL, bool bLoop, bool b3D, con
         m_b3D = true;
         m_vecPosition = vecPosition;
         //lFlags |= BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
+        lFlags |= BASS_SAMPLE_MONO;
     }
     if ( bLoop )
         lFlags |= BASS_SAMPLE_LOOP;
@@ -554,7 +555,7 @@ bool CClientSound::IsFxEffectEnabled ( int iFxEffect )
     return m_FxEffects[iFxEffect] ? true : false;
 }
 
-void CClientSound::Process3D ( CVector vecPosition )
+void CClientSound::Process3D ( CVector vecPosition, CVector vecLookAt )
 {
     // If the sound isn't 3D, we don't need to process it
     if ( !m_b3D )
@@ -582,6 +583,24 @@ void CClientSound::Process3D ( CVector vecPosition )
         fVolume = 0.0f;
     else
     {
+        // Pan
+        CVector vecLook = vecLookAt - vecPosition;
+        CVector vecSound = m_vecPosition - vecPosition;
+        vecLook.fZ = vecSound.fZ = 0.0f;
+        vecLook.Normalize ();
+        vecSound.Normalize ();
+
+        vecLook.CrossProduct ( &vecSound );
+        // The length of the cross product (which is simply fZ in this case)
+        // is equal to the sine of the angle between the vectors
+        float fPan = vecLook.fZ;
+        if ( fPan < -1.0f + SOUND_PAN_THRESHOLD )
+            fPan = -1.0f + SOUND_PAN_THRESHOLD;
+        else if ( fPan > 1.0f - SOUND_PAN_THRESHOLD )
+            fPan = 1.0f - SOUND_PAN_THRESHOLD;
+        
+        BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, fPan );
+
         // Volume
         float fDistance = DistanceBetweenPoints3D ( vecPosition, m_vecPosition );
         float fDistDiff = m_fMaxDistance - m_fMinDistance;
