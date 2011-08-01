@@ -550,8 +550,8 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( CALL_CTrafficLights_GetPrimaryLightState, (DWORD)HOOK_CTrafficLights_GetPrimaryLightState);
     HookInstallCall ( CALL_CTrafficLights_GetSecondaryLightState, (DWORD)HOOK_CTrafficLights_GetSecondaryLightState);
     HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
-    //HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
-    //HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
+    HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
+    HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
     //HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
