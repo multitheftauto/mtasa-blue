@@ -101,10 +101,12 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pResourceDel = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pTabResources, ">" ) );
     m_pResourceDel->SetPosition ( CVector2D ( 0.03f, 0.65f ), true );
     m_pResourceDel->SetSize ( CVector2D ( 0.45f, 0.05f ), true );
+    m_pResourceDel->SetZOrderingEnabled ( false );
 
     m_pResourceAdd = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pTabResources, "<" ) );
     m_pResourceAdd->SetPosition ( CVector2D ( 0.03f, 0.58f ), true );
     m_pResourceAdd->SetSize ( CVector2D ( 0.45f, 0.05f ), true );
+    m_pResourceAdd->SetZOrderingEnabled ( false );
 
     m_pResourcesAll = reinterpret_cast < CGUIGridList* > ( m_pGUI->CreateGridList ( m_pTabResources, false ) );
     m_pResourcesAll->SetPosition ( CVector2D ( 0.52f, 0.06f ), true );
@@ -116,10 +118,12 @@ CLocalServer::CLocalServer ( const char* szConfig )
     m_pButtonStart = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pWindow, "Start" ) );
     m_pButtonStart->SetPosition ( CVector2D ( 0.33f, 0.93f ), true );
     m_pButtonStart->SetSize ( CVector2D ( 0.3f, 0.05f ), true );
+    m_pButtonStart->SetZOrderingEnabled ( false );
 
     m_pButtonCancel = reinterpret_cast < CGUIButton* > ( m_pGUI->CreateButton ( m_pWindow, "Cancel" ) );
     m_pButtonCancel->SetPosition ( CVector2D ( 0.65f, 0.93f ), true );
     m_pButtonCancel->SetSize ( CVector2D ( 0.3f, 0.05f ), true );
+    m_pButtonCancel->SetZOrderingEnabled ( false );
 
     m_pResourceAdd->SetClickHandler ( GUI_CALLBACK ( &CLocalServer::OnAddButtonClick, this ) );
     m_pResourceDel->SetClickHandler ( GUI_CALLBACK ( &CLocalServer::OnDelButtonClick, this ) );

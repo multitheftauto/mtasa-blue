@@ -59,10 +59,12 @@ CCommunityLogin::CCommunityLogin ( void )
     m_pButtonLogin = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Login" ) );
     m_pButtonLogin->SetPosition ( CVector2D ( 120.0f, 120.0f ), false );
     m_pButtonLogin->SetSize ( CVector2D ( 70.0f, 20.0f ), false );
+    m_pButtonLogin->SetZOrderingEnabled( false );
 
     m_pButtonCancel = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Cancel" ) );
     m_pButtonCancel->SetPosition ( CVector2D ( 200.0f, 120.0f ), false );
     m_pButtonCancel->SetSize ( CVector2D ( 70.0f, 20.0f ), false );
+    m_pButtonCancel->SetZOrderingEnabled( false );
 
     m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonLoginClick, this ) );
     m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CCommunityLogin::OnButtonCancelClick, this ) );

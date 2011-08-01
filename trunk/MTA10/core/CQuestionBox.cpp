@@ -152,6 +152,7 @@ void CQuestionBox::SetButton ( unsigned int uiButton, const SString& strText )
         pButton->SetClickHandler ( GUI_CALLBACK ( &CQuestionBox::OnButtonClick, this ) );
         pButton->SetUserData ( reinterpret_cast < void* > ( m_ButtonList.size () ) );
         pButton->SetVisible ( false );
+        pButton->SetZOrderingEnabled ( false );
         m_ButtonList.push_back ( pButton );
     }
 

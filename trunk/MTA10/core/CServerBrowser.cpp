@@ -160,6 +160,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonRefresh [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pButtonRefresh [ type ]->SetSize ( CVector2D ( SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y ), false );
     m_pButtonRefresh [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnRefreshClick, this ) );
+    m_pButtonRefresh [ type ]->SetZOrderingEnabled ( false );
     m_pButtonRefreshIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pButtonRefresh [ type ] ) );
     m_pButtonRefreshIcon [ type ]->SetSize ( CVector2D(1,1), true );
     m_pButtonRefreshIcon [ type ]->LoadFromFile ( "cgui\\images\\serverbrowser\\refresh.png" );
@@ -207,6 +208,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonConnect [ type ]->SetSize ( CVector2D ( SB_CONNECT_SIZE_X, SB_BUTTON_SIZE_Y ), false );
     m_pButtonConnect [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnConnectClick, this ) );
     m_pButtonConnect [ type ]->SetFont ( "default-bold-small" );
+    m_pButtonConnect [ type ]->SetZOrderingEnabled ( false );
     m_pButtonConnectIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pButtonConnect [ type ] ) );
     m_pButtonConnectIcon [ type ]->SetSize ( CVector2D(SB_BUTTON_SIZE_Y,SB_BUTTON_SIZE_Y), false );
     m_pButtonConnectIcon [ type ]->LoadFromFile ( "cgui\\images\\serverbrowser\\connect.png" );
@@ -218,6 +220,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonInfo [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pButtonInfo [ type ]->SetSize ( CVector2D ( SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y ), false );
     m_pButtonInfo [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnInfoClick, this ) );
+    m_pButtonInfo [ type ]->SetZOrderingEnabled ( false );
     m_pButtonInfoIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pButtonInfo [ type ] ) );
     m_pButtonInfoIcon [ type ]->SetSize ( CVector2D(1,1), true );
     m_pButtonInfoIcon [ type ]->LoadFromFile ( "cgui\\images\\serverbrowser\\info.png" );
@@ -372,6 +375,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonBack [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pButtonBack [ type ]->SetSize ( CVector2D ( fPlayerListSizeX, SB_BACK_BUTTON_SIZE_Y ), false );
     m_pButtonBack [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnBackClick, this ) );
+    m_pButtonBack [ type ]->SetZOrderingEnabled ( false );
 
     // Disable resizing of the first and second columns (Version & Locked)
     m_pServerList [ type ]->SetColumnSegmentSizingEnabled(0, false);

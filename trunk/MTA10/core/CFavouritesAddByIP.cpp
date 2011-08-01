@@ -63,11 +63,13 @@ CFavouritesAddByIP::CFavouritesAddByIP ( void )
     m_pButtonAdd = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Add" ) );
     m_pButtonAdd->SetPosition ( CVector2D ( 12.0f, 60.0f ), false );
     m_pButtonAdd->SetSize ( CVector2D ( fButtonWidth, 20.0f ), false );
+    m_pButtonAdd->SetZOrderingEnabled ( false );
 
     //  Cancel button
     m_pButtonBack = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Back" ) );
     m_pButtonBack->SetPosition ( CVector2D ( 12.0f + fButtonWidth + 6.0f, 60.0f ), false );
     m_pButtonBack->SetSize ( CVector2D ( fButtonWidth, 20.0f ), false );
+    m_pButtonBack->SetZOrderingEnabled ( false );
 
     // Register button events
     m_pButtonBack->SetClickHandler ( GUI_CALLBACK ( &CFavouritesAddByIP::OnButtonBackClick, this ) );

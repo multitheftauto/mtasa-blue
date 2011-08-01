@@ -86,10 +86,12 @@ CSettings::CSettings ( void )
     //  OK button
     m_pButtonOK = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "OK" ) );
     m_pButtonOK->SetPosition ( CVector2D ( 0.5f, 0.92f ), true );
+    m_pButtonOK->SetZOrderingEnabled ( false );
 
     //  Cancel button
     m_pButtonCancel = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Cancel" ) );
     m_pButtonCancel->SetPosition ( CVector2D ( 0.78f, 0.92f ), true );
+    m_pButtonCancel->SetZOrderingEnabled ( false );
 
     /**
      *  Binds tab
@@ -103,6 +105,7 @@ CSettings::CSettings ( void )
     m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, "Load defaults" ) );
     m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
     m_pBindsDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
+    m_pBindsDefButton->SetZOrderingEnabled ( false );
 
     /**
      *  Controls tab
@@ -215,6 +218,7 @@ CSettings::CSettings ( void )
         CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pControlsPane, "Load defaults" ) );
         pJoyDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
         pJoyDefButton->SetPosition ( CVector2D ( 0.015f, 0.830f ), true );
+        pJoyDefButton->SetZOrderingEnabled ( false );
 
         CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Use the 'Binds' tab for joypad buttons." ) );
         pLabelHelp->SetPosition ( CVector2D ( 0.02f, 0.91f ), true );
@@ -246,6 +250,7 @@ CSettings::CSettings ( void )
             pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
             pButton->SetUserData ( (void*) i );
             pButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAxisSelectClick, this ) );
+            pButton->SetZOrderingEnabled ( false );
 
             CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane ) );
             pLabel->SetPosition ( vecPos + CVector2D ( 0, -0.085f ), true );
@@ -318,10 +323,12 @@ CSettings::CSettings ( void )
     m_pButtonLogin->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
     m_pButtonLogin->GetPosition ( vecTemp, false );
     m_pButtonLogin->SetSize ( CVector2D ( 168.0f, 24.0f ) );
+    m_pButtonLogin->SetZOrderingEnabled ( false );
 
     m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, "Register" ) );
     m_pButtonRegister->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
     m_pButtonRegister->SetSize ( CVector2D ( 168.0f, 24.0f ) );
+    m_pButtonRegister->SetZOrderingEnabled ( false );
 
     /**
      *	Multiplayer tab
@@ -434,6 +441,7 @@ CSettings::CSettings ( void )
     m_pAudioDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAudio, "Load defaults" ) );
     m_pAudioDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAudioDefaultClick, this ) );
     m_pAudioDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
+    m_pAudioDefButton->SetZOrderingEnabled ( false );
 
     /**
      *  Video tab
@@ -606,6 +614,7 @@ CSettings::CSettings ( void )
     m_pVideoDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabVideo, "Load defaults" ) );
     m_pVideoDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnVideoDefaultClick, this ) );
     m_pVideoDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
+    m_pVideoDefButton->SetZOrderingEnabled ( false );
 
     /**
      * Interface/chat Tab
@@ -660,6 +669,7 @@ CSettings::CSettings ( void )
     m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pInterfacePaneScroller, "Load" ) );
     m_pChatLoadPreset->SetPosition ( CVector2D ( 410.0f, 110.0f ) );
     m_pChatLoadPreset->SetSize ( CVector2D ( 100.0f, 24.0f ) );
+    m_pChatLoadPreset->SetZOrderingEnabled ( false );
 
     // Color selection
     CGUITabPanel* pColorTabPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pInterfacePaneScroller ) );
@@ -891,6 +901,7 @@ CSettings::CSettings ( void )
     m_pButtonUpdate->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pButtonUpdate->SetSize ( CVector2D ( 168.0f, 24.0f ) );
     m_pButtonUpdate->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnUpdateButtonClick, this ) );
+    m_pButtonUpdate->SetZOrderingEnabled ( false );
     vecTemp.fY += 30;
 
     // Set up the events
