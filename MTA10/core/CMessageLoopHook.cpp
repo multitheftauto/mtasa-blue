@@ -316,10 +316,8 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 */
 
 
-                // If we handled mouse steering, don't let GTA.
-                //if ( !CCore::GetSingleton ().GetMouseControl()->ProcessMouseMove ( uMsg, wParam, lParam ) )
-                    // Call GTA's window procedure.
-                    return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
+                // Call GTA's window procedure.
+                return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
             }
         }
     }

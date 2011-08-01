@@ -177,8 +177,6 @@ CCore::CCore ( void )
 
     m_pKeyBinds = new CKeyBinds ( this );
 
-    m_pMouseControl = new CMouseControl();
-
     // Create our hook objects.
     //m_pFileSystemHook           = new CFileSystemHook ( );
     m_pDirect3DHookManager      = new CDirect3DHookManager ( );
@@ -255,8 +253,6 @@ CCore::~CCore ( void )
 
     // Delete keybinds
     delete m_pKeyBinds;
-
-    delete m_pMouseControl;
 
     // Delete the logger
     delete m_pLogger;

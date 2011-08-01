@@ -935,32 +935,6 @@ int CLuaFunctionDefs::GetPedControlState ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GetPedAnalogControlState ( lua_State* luaVM )
-{
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-        ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) )
-    {
-        CClientPed * pPed = lua_toped ( luaVM, 1 );
-        const char * szControl = lua_tostring ( luaVM, 2 );
-        if ( pPed )
-        {
-            float fState;
-            if ( CStaticFunctionDefinitions::GetPedAnalogControlState ( *pPed, szControl, fState ) )
-            {
-                lua_pushnumber ( luaVM, fState );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getPedAnalogControlState", "ped", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getPedAnalogControlState" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 
 int CLuaFunctionDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
 {
@@ -1292,33 +1266,6 @@ int CLuaFunctionDefs::SetPedControlState ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM, "setPedControlState" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::SetPedAnalogControlState ( lua_State* luaVM )
-{
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-        ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) &&
-        ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) )
-    {
-        CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
-        const char * szControl = lua_tostring ( luaVM, 2 );
-        float fState = ( lua_tonumber ( luaVM, 3 ) );
-        if ( pEntity )
-        {
-            if ( CStaticFunctionDefinitions::SetPedAnalogControlState ( *pEntity, szControl, fState ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnalogControlState", "ped", 1 );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnalogControlState" );
 
     lua_pushboolean ( luaVM, false );
     return 1;

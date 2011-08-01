@@ -15,11 +15,6 @@
 
 #include <StdInc.h>
 
-#define CS_NAN -32768
-
-short* CClientPad::m_sScriptedStates = new short [ MAX_GTA_ANALOG_CONTROLS ];
-bool*  CClientPad::m_bScriptedReadyToReset = new bool [ MAX_GTA_ANALOG_CONTROLS ];
-
 const char * g_GTAControls [ MAX_GTA_CONTROLS ] =
 {
     "fire", "next_weapon", "previous_weapon", "forwards", "backwards",
@@ -81,88 +76,34 @@ const char * CClientPad::GetControlName ( unsigned int uiIndex )
 
 CClientPad::CClientPad ( void )
 {
-    memset ( m_fStates, 0, sizeof ( m_fStates ) );
-
-    for ( unsigned int i = 0 ; i < MAX_GTA_CONTROLS ; i++ )
-    {
-        m_fStates [ i ] = 0.0f;
-    }
-
-    // Initialise our analog control states
-    for ( unsigned int i = 0 ; i < MAX_GTA_ANALOG_CONTROLS ; i++ )
-    {
-        m_sScriptedStates [ i ] = CS_NAN;
-        m_bScriptedReadyToReset [ i ] = false;
-    }
+    memset ( m_bStates, 0, sizeof ( m_bStates ) );
 }
 
-// Gets the control state according to custom pad state.  Use for peds.
+
 bool CClientPad::GetControlState ( const char * szName, bool & bState )
 {
     unsigned int uiIndex;
     if ( GetControlIndex ( szName, uiIndex ) )
     {
-        bState = m_fStates [ uiIndex ] ? true : false;
+        bState = m_bStates [ uiIndex ];
         return true;
     }
     return false;
 }
 
-// Sets the control state according to the custom ped state.  Use for peds.
+
 bool CClientPad::SetControlState ( const char * szName, bool bState )
 {
     unsigned int uiIndex;
     if ( GetControlIndex ( szName, uiIndex ) )
     {
-        m_fStates [ uiIndex ] = bState ? 1.0f : 0.0f;
+        m_bStates [ uiIndex ] = bState;
         return true;
     }
     return false;
 }
 
-// Gets the analog control state according to custom pad state.  Use for peds.
-bool CClientPad::GetControlState ( const char * szName, float & fState )
-{
-    unsigned int uiIndex;
-    if ( GetControlIndex ( szName, uiIndex ) )
-    {
-        fState = m_fStates [ uiIndex ];
-        return true;
-    }
-    return false;
-}
 
-// Sets the control state according to the custom ped state.  Use for peds.
-bool CClientPad::SetControlState ( const char * szName, float fState )
-{
-    fState = Clamp < float > ( 0, fState, 1 );
-    unsigned int uiIndex;
-    if ( GetAnalogControlIndex ( szName, uiIndex ) && GetControlIndex ( szName, uiIndex ) )
-    {
-        m_fStates [ uiIndex ] = fState;
-        // Clear out any opposing states
-        switch ( uiIndex )
-        {
-            case 3: m_fStates [ 4 ] = 0; break;
-            case 4: m_fStates [ 3 ] = 0; break;
-            case 5: m_fStates [ 6 ] = 0; break;
-            case 6: m_fStates [ 5 ] = 0; break;
-            case 19: m_fStates [ 20 ] = 0; break;
-            case 20: m_fStates [ 19 ] = 0; break;
-            case 21: m_fStates [ 22 ] = 0; break;
-            case 22: m_fStates [ 21 ] = 0; break;
-            case 35: m_fStates [ 36 ] = 0; break;
-            case 36: m_fStates [ 35 ] = 0; break;
-            case 37: m_fStates [ 38 ] = 0; break;
-            case 38: m_fStates [ 37 ] = 0; break;
-            default: break;
-        }
-        return true;
-    }
-    return false;
-}
-
-// Process Ped control states.
 void CClientPad::DoPulse ( CClientPed * pPed )
 {
     CPlayerPed * pGamePlayer = pPed->GetGamePlayer ();
@@ -179,43 +120,43 @@ void CClientPad::DoPulse ( CClientPed * pPed )
         {
             if ( !bInVehicle )
             {
-                cs.ButtonCircle = ( m_fStates [ 0 ] ) ? 255 : 0; // Fire
-                cs.LeftStickY = ( ( m_fStates [ 3 ] && m_fStates [ 4 ] ) ||
-                                ( !m_fStates [ 3 ] && !m_fStates [ 4 ] ) ) ? 0 :
-                                ( m_fStates [ 3 ] ) ? m_fStates [ 3 ]*-128 : m_fStates [ 4 ]*128;
-                cs.LeftStickX = ( ( m_fStates [ 5 ] && m_fStates [ 6 ] ) ||
-                                ( !m_fStates [ 5 ] && !m_fStates [ 6 ] ) ) ? 0 :
-                                ( m_fStates [ 5 ] ) ? m_fStates [ 5 ]*-128 : m_fStates [ 6 ]*128;
-                cs.ButtonSquare = ( m_fStates [ 11 ] ) ? 255 : 0; // Jump
-                cs.ButtonCross = ( m_fStates [ 12 ] ) ? 255 : 0; // Sprint
-                cs.ShockButtonR = ( m_fStates [ 13 ] ) ? 255 : 0; // Look Behind
-                cs.ShockButtonL = ( m_fStates [ 14 ] ) ? 255 : 0; // Crouch
-                cs.LeftShoulder1 = ( m_fStates [ 15 ] ) ? 255 : 0; // Action
-                cs.m_bPedWalk = ( m_fStates [ 16 ] ) ? 255 : 0; // Walk
-                cs.RightShoulder1 = ( m_fStates [ 39 ] ) ? 255 : 0; // Aim Weapon
+                cs.ButtonCircle = ( m_bStates [ 0 ] ) ? 255 : 0; // Fire
+                cs.LeftStickY = ( ( m_bStates [ 3 ] && m_bStates [ 4 ] ) ||
+                                ( !m_bStates [ 3 ] && !m_bStates [ 4 ] ) ) ? 0 :
+                                ( m_bStates [ 3 ] ) ? -128 : 128;
+                cs.LeftStickX = ( ( m_bStates [ 5 ] && m_bStates [ 6 ] ) ||
+                                ( !m_bStates [ 5 ] && !m_bStates [ 6 ] ) ) ? 0 :
+                                ( m_bStates [ 5 ] ) ? -128 : 128;
+                cs.ButtonSquare = ( m_bStates [ 11 ] ) ? 255 : 0; // Jump
+                cs.ButtonCross = ( m_bStates [ 12 ] ) ? 255 : 0; // Sprint
+                cs.ShockButtonR = ( m_bStates [ 13 ] ) ? 255 : 0; // Look Behind
+                cs.ShockButtonL = ( m_bStates [ 14 ] ) ? 255 : 0; // Crouch
+                cs.LeftShoulder1 = ( m_bStates [ 15 ] ) ? 255 : 0; // Action
+                cs.m_bPedWalk = ( m_bStates [ 16 ] ) ? 255 : 0; // Walk
+                cs.RightShoulder1 = ( m_bStates [ 39 ] ) ? 255 : 0; // Aim Weapon
             }
             else
             {
-                cs.ButtonCircle = ( m_fStates [ 17 ] ) ? 255 : 0; // Fire
-                cs.LeftShoulder1 = ( m_fStates [ 18 ] ) ? 255 : 0; // Secondary Fire
-                cs.LeftStickX = ( ( m_fStates [ 19 ] && m_fStates [ 20 ] ) ||
-                                ( !m_fStates [ 19 ] && !m_fStates [ 20 ] ) ) ? 0 :
-                                ( m_fStates [ 19 ] ) ? m_fStates [ 19 ]*-128 : m_fStates [ 20 ]*128;
-                cs.LeftStickY = ( ( m_fStates [ 21 ] && m_fStates [ 22 ] ) ||
-                                ( !m_fStates [ 21 ] && !m_fStates [ 22 ] ) ) ? 0 :
-                                ( m_fStates [ 21 ] ) ? m_fStates [ 21 ]*-128 : m_fStates [ 22 ]*128;
-                cs.ButtonCross = ( m_fStates [ 23 ] * 255 ); // Accelerate
-                cs.ButtonSquare = ( m_fStates [ 24 ] * 255 ); // Reverse
-                cs.ShockButtonL = ( m_fStates [ 28 ] ) ? 255 : 0; // Horn
-                cs.RightShoulder1 = ( m_fStates [ 30 ] ) ? 255 : 0; // Handbrake
-                cs.LeftShoulder2 = ( m_fStates [ 31 ] || m_fStates [ 33 ] ) ? 255 : 0; // Look Left
-                cs.RightShoulder2 = ( m_fStates [ 32 ] || m_fStates [ 33 ] ) ? 255 : 0; // Look Right                
-                cs.RightStickX = ( ( m_fStates [ 35 ] && m_fStates [ 36 ] ) ||
-                                ( !m_fStates [ 35 ] && !m_fStates [ 36 ] ) ) ? 0 :
-                                ( m_fStates [ 35 ] ) ? m_fStates [ 35 ]*128 : m_fStates [ 36 ]*-128;
-                cs.RightStickY = ( ( m_fStates [ 37 ] && m_fStates [ 38 ] ) ||
-                                ( !m_fStates [ 37 ] && !m_fStates [ 38 ] ) ) ? 0 :
-                                ( m_fStates [ 37 ] ) ? m_fStates [ 37 ]*128 : m_fStates [ 38 ]*-128;
+                cs.ButtonCircle = ( m_bStates [ 17 ] ) ? 255 : 0; // Fire
+                cs.LeftShoulder1 = ( m_bStates [ 18 ] ) ? 255 : 0; // Secondary Fire
+                cs.LeftStickX = ( ( m_bStates [ 19 ] && m_bStates [ 20 ] ) ||
+                                ( !m_bStates [ 19 ] && !m_bStates [ 20 ] ) ) ? 0 :
+                                ( m_bStates [ 19 ] ) ? -128 : 128;
+                cs.LeftStickY = ( ( m_bStates [ 21 ] && m_bStates [ 22 ] ) ||
+                                ( !m_bStates [ 21 ] && !m_bStates [ 22 ] ) ) ? 0 :
+                                ( m_bStates [ 21 ] ) ? -128 : 128;
+                cs.ButtonCross = ( m_bStates [ 23 ] ) ? 255 : 0; // Accelerate
+                cs.ButtonSquare = ( m_bStates [ 24 ] ) ? 255 : 0; // Reverse
+                cs.ShockButtonL = ( m_bStates [ 28 ] ) ? 255 : 0; // Horn
+                cs.RightShoulder1 = ( m_bStates [ 30 ] ) ? 255 : 0; // Handbrake
+                cs.LeftShoulder2 = ( m_bStates [ 31 ] || m_bStates [ 33 ] ) ? 255 : 0; // Look Left
+                cs.RightShoulder2 = ( m_bStates [ 32 ] || m_bStates [ 33 ] ) ? 255 : 0; // Look Right                
+                cs.RightStickX = ( ( m_bStates [ 35 ] && m_bStates [ 36 ] ) ||
+                                ( !m_bStates [ 35 ] && !m_bStates [ 36 ] ) ) ? 0 :
+                                ( m_bStates [ 35 ] ) ? 128 : -128;
+                cs.RightStickY = ( ( m_bStates [ 37 ] && m_bStates [ 38 ] ) ||
+                                ( !m_bStates [ 37 ] && !m_bStates [ 38 ] ) ) ? 0 :
+                                ( m_bStates [ 37 ] ) ? 128 : -128;
             }
         }
         pPed->SetControllerState ( cs );
@@ -223,7 +164,7 @@ void CClientPad::DoPulse ( CClientPed * pPed )
 }
 
 
-// Get the control state directly from a pad state.  Use for players.
+
 bool CClientPad::GetControlState ( const char * szName, CControllerState & State, bool bOnFoot )
 {
     unsigned int uiIndex;
@@ -305,33 +246,12 @@ bool CClientPad::GetAnalogControlIndex ( const char * szName, unsigned int & uiI
     return false;
 }
 
-// Get the analog control state directly from a pad state.  Use for players.
+
 bool CClientPad::GetAnalogControlState ( const char * szName, CControllerState & cs, bool bOnFoot, float & fState )
 {
     unsigned int uiIndex;
     if ( GetAnalogControlIndex ( szName, uiIndex ) )
-    {
-        // Do we have a script override?
-        if ( m_sScriptedStates [ uiIndex ] != CS_NAN )
-            switch ( uiIndex )
-            {
-                case 0: fState = m_sScriptedStates [ uiIndex ] / -128.0f ; return true; //Left
-                case 1: fState = m_sScriptedStates [ uiIndex ] / 128.0f ; return true;  //Right
-                case 2: fState = m_sScriptedStates [ uiIndex ] / -128.0f ; return true;  //Up
-                case 3: fState = m_sScriptedStates [ uiIndex ] / 128.0f ; return true;  //Down
-                case 4: fState = m_sScriptedStates [ uiIndex ] / -128.0f ; return true;  //Left
-                case 5: fState = m_sScriptedStates [ uiIndex ] / 128.0f ; return true;  //Right 
-                case 6: fState = m_sScriptedStates [ uiIndex ] / -128.0f ; return true;  //Up
-                case 7: fState = m_sScriptedStates [ uiIndex ] / 128.0f ; return true;  //Down
-                case 8: fState = m_sScriptedStates [ uiIndex ] / 255.0f ; return true;  //Accel
-                case 9: fState = m_sScriptedStates [ uiIndex ] / 255.0f ; return true;  //Reverse
-                case 10: fState = m_sScriptedStates [ uiIndex ] / -128.0f ; return true;  //Special Left
-                case 11: fState = m_sScriptedStates [ uiIndex ] / 128.0f ; return true;  //Special Right
-                case 12: fState = m_sScriptedStates [ uiIndex ] / -128.0f ; return true;  //Special Up
-                case 13: fState = m_sScriptedStates [ uiIndex ] / 128.0f ; return true;  //Special Down
-                default: return false;
-            }
-
+    {       
         if ( bOnFoot )
         {
             switch ( uiIndex )
@@ -359,150 +279,6 @@ bool CClientPad::GetAnalogControlState ( const char * szName, CControllerState &
                 case 12: fState = cs.RightStickY < 0 ? cs.RightStickY/-128.0f : 0 ; return true;  //Special Up
                 case 13: fState = cs.RightStickY > 0 ? cs.RightStickY/128.0f : 0 ; return true;  //Special Down
                 default: fState = 0; return true;
-            }
-        }
-    }
-    return false;
-}
-
-// Set the analog control state and store them temporarilly before they are actually applied.  Used for players.
-bool CClientPad::SetAnalogControlState ( const char * szName, float fState )
-{
-    // Ensure values are between 0 and 1
-    fState = Clamp < float > ( 0, fState, 1 );
-    unsigned int uiIndex;
-    if ( GetAnalogControlIndex ( szName, uiIndex ) )
-    {    
-        switch ( uiIndex )
-        {
-            case 0: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 1 ] = 0 ; return true; //Left
-            case 1: m_sScriptedStates [ uiIndex ] = fState * 128.0f; m_sScriptedStates [ 0 ] = 0 ; return true;  //Right
-            case 2: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 3 ] = 0 ; return true;  //Up
-            case 3: m_sScriptedStates [ uiIndex ] = fState * 128.0f ; m_sScriptedStates [ 2 ] = 0 ; return true;  //Down
-            case 4: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 5 ] = 0 ; return true;  //Vehicle Left
-            case 5: m_sScriptedStates [ uiIndex ] = fState * 128.0f; m_sScriptedStates [ 4 ] = 0 ; return true;  //Vehicle Right 
-            case 6: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 7 ] = 0 ;  ; return true;  //Up
-            case 7: m_sScriptedStates [ uiIndex ] = fState * 128.0f; m_sScriptedStates [ 6 ] = 0 ;  ; return true;  //Down
-            case 8: m_sScriptedStates [ uiIndex ] = fState * 255.0f ; return true;  //Accel
-            case 9: m_sScriptedStates [ uiIndex ] = fState * 255.0f ; return true;  //Reverse
-            case 10: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 11 ] = 0 ;  ; return true;  //Special Left
-            case 11: m_sScriptedStates [ uiIndex ] = fState * 128.0f; m_sScriptedStates [ 10 ] = 0 ;  ; return true;  //Special Right
-            case 12: m_sScriptedStates [ uiIndex ] = fState * -128.0f; m_sScriptedStates [ 13 ] = 0 ;  ; return true;  //Special Up
-            case 13: m_sScriptedStates [ uiIndex ] = fState * 128.0f; m_sScriptedStates [ 12 ] = 0 ;  ; return true;  //Special Down
-            default: return false;
-        }
-    }
-    return false;
-}
-
-
-void CClientPad::RemoveSetAnalogControlState ( const char * szName )
-{
-    unsigned int uiIndex;
-    if ( GetAnalogControlIndex ( szName, uiIndex ) )
-        m_sScriptedStates [ uiIndex ] = CS_NAN;
-}
-
-
-void CClientPad::ProcessSetAnalogControlState ( CControllerState & cs, bool bOnFoot )
-{
-    // We forcefully apply the control state until we find that the user isnt pressing that button anymore.
-    // When that happens, we wait for new input and then stop setting the control state and remove it.
-    if ( bOnFoot )
-    {
-        unsigned int uiIndex = 0;
-        
-        ProcessControl ( cs.LeftStickX, uiIndex, false ); uiIndex++; //Left
-        ProcessControl ( cs.LeftStickX, uiIndex, true ); uiIndex++; //Right
-        ProcessControl ( cs.LeftStickY, uiIndex, false ); uiIndex++;; //Up
-        ProcessControl ( cs.LeftStickY, uiIndex, true ); uiIndex++; //Down
-    }
-    else
-    {
-        unsigned int uiIndex = 4;
-
-        ProcessControl ( cs.LeftStickX, uiIndex, false ); uiIndex++; //Left
-        ProcessControl ( cs.LeftStickX, uiIndex, true ); uiIndex++; //Right
-        ProcessControl ( cs.LeftStickY, uiIndex, false ); uiIndex++;; //Up
-        ProcessControl ( cs.LeftStickY, uiIndex, true ); uiIndex++; //Down
-        ProcessControl ( cs.ButtonCross, uiIndex, true ); uiIndex++; //Accel
-        ProcessControl ( cs.ButtonSquare, uiIndex, true ); uiIndex++; //Brake
-        ProcessControl ( cs.RightStickX, uiIndex, false ); uiIndex++; //Special Left
-        ProcessControl ( cs.RightStickX, uiIndex, true ); uiIndex++; //Special Right
-        ProcessControl ( cs.RightStickY, uiIndex, false ); uiIndex++; //Special Up
-        ProcessControl ( cs.RightStickY, uiIndex, true ); uiIndex++; //Special Down
-    }
-}
-
-void CClientPad::ProcessControl ( short & usControlValue, unsigned int uiIndex, bool bPositive )
-{
-    bool bResetCmp = bPositive ? ( usControlValue > 0 ) : ( usControlValue < 0 );
-    if ( !m_bScriptedReadyToReset [ uiIndex ] ) // If we havent marked as ready to reset the control, find out if we are
-        m_bScriptedReadyToReset [ uiIndex ] = ( ( m_sScriptedStates [ uiIndex ] != CS_NAN ) && ( usControlValue == 0 ) );
-
-    if ( m_bScriptedReadyToReset [ uiIndex ] && bResetCmp ) //If we're ready to reset, and our reset comparision is passed
-        m_sScriptedStates [ uiIndex ] = CS_NAN; // Remove our scripted control state 
-    else
-        // Only apply the control state of we're actually a number, and that we're positive when we want it to be and vice versa
-        if ( m_sScriptedStates [ uiIndex ] != CS_NAN  )
-            if ( ( bPositive && m_sScriptedStates [ uiIndex ] > 0 ) || ( !bPositive && m_sScriptedStates [ uiIndex ] < 0 )  )
-                usControlValue = m_sScriptedStates [ uiIndex ];  //Otherwise force the scripted control state
-}
-
-// Process toggled controls and apply them directly to the pad state.  Used for players when keyboard input blocking is insufficient.
-void CClientPad::ProcessAllToggledControls ( CControllerState & cs, bool bOnFoot )
-{
-    ProcessToggledControl ( "left",                     cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "left" ) );
-    ProcessToggledControl ( "right",                    cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "right" ) );
-    ProcessToggledControl ( "forwards",                 cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "forwards" ) );
-    ProcessToggledControl ( "backwards",                cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "backwards" ) );
-    ProcessToggledControl ( "vehicle_left",             cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "vehicle_left" ) );
-    ProcessToggledControl ( "vehicle_right",            cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "vehicle_right" ) );
-    ProcessToggledControl ( "steer_forward",            cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "steer_forward" ) );
-    ProcessToggledControl ( "steer_back",               cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "steer_back" ) );
-    ProcessToggledControl ( "accelerate",               cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "accelerate" ) );
-    ProcessToggledControl ( "brake_reverse",            cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "brake_reverse" ) );
-    ProcessToggledControl ( "special_control_left",     cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_left" ) );
-    ProcessToggledControl ( "special_control_right",    cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_right" ) );
-    ProcessToggledControl ( "special_control_up",       cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_up" ) );
-    ProcessToggledControl ( "special_control_down",     cs, bOnFoot, g_pCore->GetKeyBinds()->IsControlEnabled( "special_control_down" ) );   
-}
-
-bool CClientPad::ProcessToggledControl ( const char * szName, CControllerState & cs, bool bOnFoot, bool bEnabled )
-{
-    if ( bEnabled )  // We don't need to disable anything if it the control is enabled.
-        return true;
-
-    unsigned int uiIndex;
-    if ( GetAnalogControlIndex ( szName, uiIndex ) )
-    {       
-        if ( bOnFoot )
-        {
-            switch ( uiIndex )
-            {
-                case 0: cs.LeftStickX = ( cs.LeftStickX < 0 ) ? 0 : cs.LeftStickX ; return true;  //Left
-                case 1: cs.LeftStickX = ( cs.LeftStickX > 0 ) ? 0 : cs.LeftStickX ; return true;  //Right
-                case 2: cs.LeftStickY = ( cs.LeftStickY < 0 ) ? 0 : cs.LeftStickY ; return true;  //Up
-                case 3: cs.LeftStickY = ( cs.LeftStickY > 0 ) ? 0 : cs.LeftStickY ; return true;  //Down
-                default: return false;
-            }
-            
-        }
-        else
-        {
-            switch ( uiIndex )
-            { 
-                case 4: cs.LeftStickX = ( cs.LeftStickX < 0 ) ? 0 : cs.LeftStickX ; return true;  //Left
-                case 5: cs.LeftStickX = ( cs.LeftStickX > 0 ) ? 0 : cs.LeftStickX ; return true;  //Right
-                case 6: cs.LeftStickY = ( cs.LeftStickY < 0 ) ? 0 : cs.LeftStickY ; return true;  //Up
-                case 7: cs.LeftStickY = ( cs.LeftStickY > 0 ) ? 0 : cs.LeftStickY ; return true;  //Down
-                case 8: cs.ButtonCross = 0 ; return true;  //Accel
-                case 9: cs.ButtonSquare = 0 ; return true;  //Reverse
-                case 10: cs.RightStickX = ( cs.RightStickX < 0 ) ? 0 : cs.RightStickX ; return true;  //Special Left
-                case 11: cs.RightStickX = ( cs.RightStickX > 0 ) ? 0 : cs.RightStickX ; return true;  //Special Right
-                case 12: cs.RightStickY = ( cs.RightStickY < 0 ) ? 0 : cs.RightStickY ; return true;  //Special Up
-                case 13: cs.RightStickY = ( cs.RightStickY > 0 ) ? 0 : cs.RightStickY ; return true;  //Special Down
-                default: return false;
             }
         }
     }
