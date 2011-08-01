@@ -220,7 +220,6 @@ public:
     LUA_DECLARE ( GetPedBonePosition );
     LUA_DECLARE ( GetPedClothes );
     LUA_DECLARE ( GetPedControlState );
-    LUA_DECLARE ( GetPedAnalogControlState );
     LUA_DECLARE ( IsPedSunbathing );
     LUA_DECLARE ( IsPedDoingGangDriveby );
     LUA_DECLARE ( GetPedAnimation );
@@ -240,7 +239,6 @@ public:
     LUA_DECLARE ( AddPedClothes );
     LUA_DECLARE ( RemovePedClothes );
     LUA_DECLARE ( SetPedControlState );
-    LUA_DECLARE ( SetPedAnalogControlState );
     LUA_DECLARE ( SetPedSunbathing );
     LUA_DECLARE ( SetPedDoingGangDriveby );
     LUA_DECLARE ( SetPedLookAt );
@@ -717,7 +715,6 @@ public:
     LUA_DECLARE ( GetKeyState );
     LUA_DECLARE ( GetControlState );
     LUA_DECLARE ( GetAnalogControlState );
-    LUA_DECLARE ( SetAnalogControlState );
     LUA_DECLARE ( IsControlEnabled );
     LUA_DECLARE ( GetBoundKeys );
     LUA_DECLARE ( GetFunctionsBoundToKey );

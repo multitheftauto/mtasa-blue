@@ -290,36 +290,6 @@ int CLuaFunctionDefs::GetAnalogControlState ( lua_State * luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::SetAnalogControlState ( lua_State * luaVM )
-{
-    if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
-    {
-        const char* szControl = lua_tostring ( luaVM, 1 );
-        if ( lua_istype ( luaVM, 2, LUA_TNUMBER ) )
-        {
-            float fState = lua_tonumber ( luaVM, 2 );
-            if ( CClientPad::SetAnalogControlState ( szControl , fState ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else if ( lua_istype ( luaVM, 2, LUA_TNIL ) )
-        {
-            CClientPad::RemoveSetAnalogControlState ( szControl );
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM, "getAnalogControlState" );
-    }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM, "getAnalogControlState" );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 
 
 int CLuaFunctionDefs::IsControlEnabled ( lua_State * luaVM )

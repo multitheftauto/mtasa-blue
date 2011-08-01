@@ -497,10 +497,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CMouseControl.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CNewsBrowser.cpp"
 				>
 			</File>
@@ -963,10 +959,6 @@
 			</File>
 			<File
 				RelativePath=".\CModuleLoader.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CMouseControl.h"
 				>
 			</File>
 			<File
