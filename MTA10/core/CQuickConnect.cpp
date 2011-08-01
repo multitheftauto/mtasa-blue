@@ -77,11 +77,13 @@ CQuickConnect::CQuickConnect ( void )
     m_pButtonConnect = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Connect" ) );
     m_pButtonConnect->SetPosition ( CVector2D ( 0.04f, 0.71f ), true );
     m_pButtonConnect->SetSize ( CVector2D ( 112.0f, 24.0f ) );
+    m_pButtonConnect->SetZOrderingEnabled ( false );
 
     //  Cancel button
     m_pButtonBack = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Back" ) );
     m_pButtonBack->SetPosition ( CVector2D ( 0.56f, 0.71f ), true );
     m_pButtonBack->SetSize ( CVector2D ( 112.0f, 24.0f ) );
+    m_pButtonBack->SetZOrderingEnabled ( false );
 
     // Set up event handlers
     m_pButtonConnect->SetClickHandler ( GUI_CALLBACK ( &CQuickConnect::OnConnectButtonClick, this ) );

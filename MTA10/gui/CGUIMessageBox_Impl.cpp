@@ -69,6 +69,7 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
     if ( m_pButton ) {
         m_pButton->SetPosition ( CVector2D ( ( MESSAGEBOX_WIDTH - 84 ) / 2, MESSAGEBOX_HEIGHT * 0.76f ) );
         m_pButton->SetSize ( CVector2D ( 84.0f, 24.0f ) );
+        m_pButton->SetZOrderingEnabled ( false );
 
         SetClickHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnResponseHandler, this ) );
     }
