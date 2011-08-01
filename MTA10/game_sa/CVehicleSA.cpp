@@ -1934,7 +1934,7 @@ void CVehicleSA::RecalculateSuspensionLines ( void )
     DWORD dwModel = GetModelIndex ();
     CModelInfo* pModelInfo = pGame->GetModelInfo ( dwModel );
     // Trains (Their trailers do as well!) and boats crash obviously.
-    if ( pModelInfo->IsBoat () || pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 || dwModel == 557 || dwModel == 444 || dwModel == 556 || dwModel == 573 )
+    if ( pModelInfo->IsBoat () || pModelInfo->IsTrain () || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590 || dwModel == 557 || dwModel == 444 || dwModel == 556 || dwModel == 573 || dwModel == 581 || dwModel == 509 || dwModel == 481 || dwModel == 462 || dwModel == 521 || dwModel == 463 || dwModel == 510 || dwModel == 522 || dwModel == 461 || dwModel == 448 || dwModel == 468 || dwModel == 586)
         return;
 
     CVehicleSAInterfaceVTBL* pVtbl = reinterpret_cast < CVehicleSAInterfaceVTBL* > ( pInt->vtbl );
