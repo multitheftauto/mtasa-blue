@@ -49,8 +49,6 @@ public:
 
     static void             PlayStreamIntern        ( void* arguments );
 
-    void                    GetMeta                  ( void );
-
     void                    ThreadCallback          ( HSTREAM pSound );
 
     void                    Stop                    ( void );
@@ -94,6 +92,21 @@ public:
 
     void                    Unlink                  ( void ) {};
 
+    void                    ServiceVars             ( void );
+
+    // Thread safe variables
+    struct
+    {
+        HANDLE                  pThread;
+        DWORD                   pSound;
+        bool                    bStreamCreateResult;
+        std::list < uint >      onClientSoundFinishedDownloadQueue;
+        std::list < SString >   onClientSoundChangedMetaQueue;
+    } m_Vars;
+
+    // Thread safe variables locker
+    CCriticalSection            m_VarsCriticalSection;
+
 protected:
 
     DWORD                   GetSound                ( void )                            { return m_pSound; };
@@ -118,12 +131,12 @@ private:
 
     HFX                     m_FxEffects[9];
 
-    HANDLE                  m_pThread;
-
     SString                 m_strPath;
 
     SString                 m_strStreamName;
     SString                 m_strStreamTitle;
+
+    bool                    m_bUsingVars;
 };
 
 #endif
