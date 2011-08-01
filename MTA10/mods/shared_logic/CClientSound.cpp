@@ -593,11 +593,7 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecLookAt )
         vecLook.CrossProduct ( &vecSound );
         // The length of the cross product (which is simply fZ in this case)
         // is equal to the sine of the angle between the vectors
-        float fPan = vecLook.fZ;
-        if ( fPan < -1.0f + SOUND_PAN_THRESHOLD )
-            fPan = -1.0f + SOUND_PAN_THRESHOLD;
-        else if ( fPan > 1.0f - SOUND_PAN_THRESHOLD )
-            fPan = 1.0f - SOUND_PAN_THRESHOLD;
+        float fPan = Clamp ( -1.0f, -vecLook.fZ , 1.0f );
         
         BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, fPan );
 
