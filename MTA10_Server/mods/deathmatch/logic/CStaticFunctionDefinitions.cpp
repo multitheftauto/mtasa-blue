@@ -4787,7 +4787,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_ENGINEINERTIA:
             {            
-                if ( fValue >= -1000 && fValue <= 1000 )
+                if ( fValue >= -1000 && fValue <= 1000 && fValue != 0.0 )
                 {
                     pEntry->SetEngineInertia ( fValue );
                     return true;
@@ -4850,7 +4850,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_FORCELEVEL:
             {            
-                if ( fValue >= 0.0 && fValue <= 100 )
+                if ( fValue > 0.0 && fValue <= 100 )
                 {
                     pEntry->SetSuspensionForceLevel ( fValue );
                     return true;
@@ -4859,7 +4859,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_DAMPING:
             {            
-                if ( fValue >= 0.0 && fValue <= 100 )
+                if ( fValue > 0.0 && fValue <= 100 )
                 {
                     pEntry->SetSuspensionDamping ( fValue );
                     return true;
@@ -4877,7 +4877,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_UPPER_LIMIT:
             {            
-                if ( fValue >= -50.0 && fValue <= 50 && fValue != pEntry->GetSuspensionLowerLimit() ) // Lower and Upper limits cannot match or LSOD
+                if ( fValue >= -50.0 && fValue <= 50 && ( fValue <= pEntry->GetSuspensionLowerLimit() - 0.1 || fValue >= pEntry->GetSuspensionLowerLimit() + 0.1 ) ) // Lower and Upper limits cannot match or LSOD
                 {
                     pEntry->SetSuspensionUpperLimit ( fValue );
                     return true;
@@ -4886,7 +4886,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_LOWER_LIMIT:
             {            
-                if ( fValue >= -50.0 && fValue <= 50 && fValue != pEntry->GetSuspensionUpperLimit() ) // Lower and Upper limits cannot match or LSOD
+                if ( fValue >= -50.0 && fValue <= 50 && ( fValue <= pEntry->GetSuspensionUpperLimit() - 0.1 || fValue >= pEntry->GetSuspensionUpperLimit() ) ) // Lower and Upper limits cannot match or LSOD
                 {
                     pEntry->SetSuspensionLowerLimit ( fValue );
                     return true;
