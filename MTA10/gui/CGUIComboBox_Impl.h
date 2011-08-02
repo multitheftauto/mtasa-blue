@@ -43,6 +43,9 @@ public:
 
     void                        SetSelectionHandler         ( GUI_CALLBACK Callback );
 
+    void                        ShowDropList                ( void );
+    void                        HideDropList                ( void );
+
     #include "CGUIElement_Inc.h"
 
 protected:

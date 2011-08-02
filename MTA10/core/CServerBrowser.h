@@ -112,6 +112,8 @@ public:
     bool                IsAddressBarAwaitingInput  ( void );
     void                SetNextHistoryText      ( bool bDown );
 
+    void                OnQuickConnectButtonClick ( void );
+
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
@@ -130,6 +132,8 @@ protected:
     CVector2D           m_WidgetSize;
 
     // Window widgets
+    CGUIWindow*         m_pFrame;
+    CGUIElement*        m_pTopWindow;
     CGUITabPanel*       m_pPanel;
     CGUIStaticImage*    m_pLockedIcon;
 

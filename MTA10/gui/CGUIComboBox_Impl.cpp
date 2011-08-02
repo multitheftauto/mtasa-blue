@@ -274,3 +274,15 @@ bool CGUIComboBox_Impl::Event_OnSelectionAccepted ( const CEGUI::EventArgs& e )
     return true;
 }
 
+
+void CGUIComboBox_Impl::ShowDropList ( void )
+{
+    reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> showDropList ();
+}
+
+
+void CGUIComboBox_Impl::HideDropList ( void )
+{
+    reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> hideDropList ();
+}
+

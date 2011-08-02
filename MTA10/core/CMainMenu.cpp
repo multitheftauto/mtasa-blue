@@ -53,6 +53,15 @@
 static int WaitForMenu = 0;
 static const SColor headlineColors [] = { SColorRGBA ( 233, 234, 106, 255 ), SColorRGBA ( 233/6*4, 234/6*4, 106/6*4, 255 ), SColorRGBA ( 233/7*3, 234/7*3, 106/7*3, 255 ) };
 
+// Improve alignment with magical mystery values!
+static const int BODGE_FACTOR_1 = -5;
+static const int BODGE_FACTOR_2 = 5;
+static const int BODGE_FACTOR_3 = -5;
+static const int BODGE_FACTOR_4 = 5;
+static const CVector2D BODGE_FACTOR_5 ( 0,-50 );
+static const CVector2D BODGE_FACTOR_6 ( 0,100 );
+
+
 CMainMenu::CMainMenu ( CGUI* pManager )
 {
     m_pNewsBrowser = new CNewsBrowser ();
@@ -172,18 +181,22 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     if ( CCore::GetSingleton().GetCommunity()->IsLoggedIn() && !strUsername.empty() )
         ChangeCommunityState ( true, strUsername );
 
+    float fBase = 0.613f;
+    float fGap = 0.043f;
     // Our disconnect item is shown/hidden dynamically, so we store it seperately
-    m_pDisconnect = CreateItem ( MENU_ITEM_DISCONNECT, "cgui\\images\\menu_disconnect.png",    CVector2D ( 0.168f, 0.615f ),    CVector2D ( 278, 34 ) );
+    m_pDisconnect = CreateItem ( MENU_ITEM_DISCONNECT, "cgui\\images\\menu_disconnect.png",    CVector2D ( 0.168f, fBase + fGap * 0 ),    CVector2D ( 278, 34 ) );
     m_pDisconnect->image->SetVisible(false);
 
     // Create the menu items
     //Filepath, Relative position, absolute native size
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, 0.615f ),    CVector2D ( 390, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, 0.662f ),    CVector2D ( 251, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "cgui\\images\\menu_map_editor.png",       CVector2D ( 0.168f, 0.709f ),    CVector2D ( 261, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "cgui\\images\\menu_settings.png",         CVector2D ( 0.168f, 0.756f ),    CVector2D ( 207, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "cgui\\images\\menu_about.png",            CVector2D ( 0.168f, 0.803f ),    CVector2D ( 150, 34 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, 0.850f ),    CVector2D ( 102, 34 ) ) );
+    // And the font for the graphics is ?
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUICK_CONNECT,  "cgui\\images\\menu_quick_connect.png",    CVector2D ( 0.168f, fBase + fGap * 0 ),    CVector2D ( 358, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "cgui\\images\\menu_browse_servers.png",   CVector2D ( 0.168f, fBase + fGap * 1 ),    CVector2D ( 390, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "cgui\\images\\menu_host_game.png",        CVector2D ( 0.168f, fBase + fGap * 2 ),    CVector2D ( 251, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "cgui\\images\\menu_map_editor.png",       CVector2D ( 0.168f, fBase + fGap * 3 ),    CVector2D ( 261, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "cgui\\images\\menu_settings.png",         CVector2D ( 0.168f, fBase + fGap * 4 ),    CVector2D ( 207, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "cgui\\images\\menu_about.png",            CVector2D ( 0.168f, fBase + fGap * 5 ),    CVector2D ( 150, 34 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "cgui\\images\\menu_quit.png",             CVector2D ( 0.168f, fBase + fGap * 6 ),    CVector2D ( 102, 34 ) ) );
 
     // We store the position of the top item, and the second item.  These will be useful later
     float fFirstItemSize = m_menuItems.front()->image->GetSize(false).fY;
@@ -196,11 +209,12 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_menuAX = (0.168f*m_iMenuSizeX) + m_iXOff;             //Left side of the items
     m_menuAY = m_iFirstItemCentre - fFirstItemSize*(CORE_MTA_HOVER_SCALE/CORE_MTA_NORMAL_SCALE)*0.5f;     //Top side of the items
 	m_menuBX =  m_menuAX + ((390/NATIVE_RES_X)*m_iMenuSizeX); //Right side of the items. We add the longest picture (browse_servers)
+	m_menuAY += BODGE_FACTOR_1;
 
     m_pMenuArea = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage(m_pCanvas) );
     m_pMenuArea->LoadFromFile ( CORE_MTA_FILLER );
-    m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
-    m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
+    m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff) + BODGE_FACTOR_5 , false);
+    m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY) + BODGE_FACTOR_6, false);
     m_pMenuArea->SetAlpha(0);
     m_pMenuArea->SetZOrderingEnabled(false);
     m_pMenuArea->SetClickHandler ( GUI_CALLBACK ( &CMainMenu::OnMenuClick, this ) );
@@ -356,8 +370,8 @@ void CMainMenu::SetMenuVerticalPosition ( int iPosY )
 	
     m_menuAY = m_menuAY + iMoveY;
 	m_menuBY = m_menuBY + iMoveY;
-    m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
-    m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
+    m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff) + BODGE_FACTOR_5 , false);
+    m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY) + BODGE_FACTOR_6, false);
 }
 
 void CMainMenu::SetMenuUnhovered () //Dehighlight all our items
@@ -429,7 +443,7 @@ void CMainMenu::Update ( void )
             cursor.y = ( long ) vecResolution.fY;
 
         // If we're within our highlight bounding box
-        if ( m_bMouseOverMenu && ( cursor.x > m_menuAX ) && ( cursor.y > m_menuAY ) && ( cursor.x < m_menuBX ) && ( cursor.y < m_menuBY ) )
+        if ( m_bMouseOverMenu && ( cursor.x > m_menuAX ) && ( cursor.y > m_menuAY + BODGE_FACTOR_3 ) && ( cursor.x < m_menuBX ) && ( cursor.y < m_menuBY + BODGE_FACTOR_4 ) )
         {
             float fHoveredIndex = ((cursor.y-m_menuAY) / (float)(m_menuBY-m_menuAY) * m_menuItems.size());
             fHoveredIndex = Clamp <float> ( 0, fHoveredIndex, m_menuItems.size()-1 );
@@ -512,9 +526,10 @@ void CMainMenu::Update ( void )
                 float fTopItemSize = m_pDisconnect->image->GetSize(false).fY;
                 float fTopItemCentre = m_pDisconnect->image->GetPosition(false).fY + fTopItemSize*0.5f;
                 m_menuAY = fTopItemCentre - fTopItemSize*(CORE_MTA_HOVER_SCALE/CORE_MTA_NORMAL_SCALE)*0.5f;     //Top side of the items
+        		m_menuAY += BODGE_FACTOR_1;
 
-                m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
-                m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
+                m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff) + BODGE_FACTOR_5 , false);
+                m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY) + BODGE_FACTOR_6, false);
             }
         }
     }
@@ -638,6 +653,13 @@ void CMainMenu::Hide ( void )
     SetVisible ( false );
 }
 
+// When escape key pressed and not connected, hide these windows
+void CMainMenu::OnEscapePressedOffLine ( void )
+{
+    m_ServerBrowser.SetVisible ( false );
+    m_Credits.SetVisible ( false );
+    m_pNewsBrowser->SetVisible ( false );
+}
 
 void CMainMenu::SetVisible ( bool bVisible, bool bOverlay, bool bFrameDelay )
 {
@@ -704,9 +726,10 @@ void CMainMenu::SetIsIngame ( bool bIsIngame )
             float fTopItemSize = m_menuItems.front()->image->GetSize(false).fY;
             float fTopItemCentre = m_menuItems.front()->image->GetPosition(false).fY + fTopItemSize*0.5f;
             m_menuAY = fTopItemCentre - fTopItemSize*(CORE_MTA_HOVER_SCALE/CORE_MTA_NORMAL_SCALE)*0.5f; 
+        	m_menuAY += BODGE_FACTOR_1;
 
-            m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff), false);
-            m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY), false);
+            m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff) + BODGE_FACTOR_5 , false);
+            m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY) + BODGE_FACTOR_6, false);
             m_iMoveTargetPos = m_iFirstItemCentre;
         }
         m_iMoveStartPos = m_menuAY;
@@ -757,12 +780,15 @@ bool CMainMenu::OnQuickConnectButtonClick ( CGUIElement* pElement )
     // Return if we haven't faded in yet
     if ( m_ucFade != FADE_VISIBLE ) return false;
 
+    m_ServerBrowser.SetVisible ( true );
+    m_ServerBrowser.OnQuickConnectButtonClick ();
+/*
 //    if ( !m_bIsInSubWindow )
     {
         m_QuickConnect.SetVisible ( true );
 //        m_bIsInSubWindow = true;
     }
-
+*/
     return true;
 }
 
@@ -909,7 +935,8 @@ sMenuItem* CMainMenu::CreateItem ( unsigned char menuType, const char* szFilePat
 	
     // Mark our bounding box's bottom value.
 	m_menuBY = (iPosY + (iSizeY*CORE_MTA_HOVER_SCALE)/2) + m_iYOff;
-	
+	m_menuBY += BODGE_FACTOR_2;
+
     // Reduced their size down to unhovered size.
 	iSizeX = iSizeX*CORE_MTA_NORMAL_SCALE;
     iSizeY = iSizeY*CORE_MTA_NORMAL_SCALE;

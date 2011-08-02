@@ -76,6 +76,7 @@ public:
     bool                HasStarted                      ( void ) { return m_bStarted; };
 
     void                SetNewsHeadline                 ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew );
+    void                OnEscapePressedOffLine          ( void );
 
 private:
     sMenuItem*          CreateItem                      ( unsigned char menuType, const char* szFilePath, CVector2D vecRelPosition, CVector2D vecNativeSize );
