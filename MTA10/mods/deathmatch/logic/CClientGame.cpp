@@ -1661,7 +1661,7 @@ void CClientGame::UpdateVehicleInOut ( void )
     else
     {
         // If we aren't getting jacked
-        if ( !m_bIsGettingJacked && !m_pLocalPlayer->IsDead ( ) && !m_pLocalPlayer->IsDying ( ) )
+        if ( !m_bIsGettingJacked )
         {
             CClientVehicle* pVehicle = m_pLocalPlayer->GetRealOccupiedVehicle ();
             CClientVehicle* pOccupiedVehicle = m_pLocalPlayer->GetOccupiedVehicle ();
@@ -4025,7 +4025,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                 {
                     unsigned int uiDoor = 0; // Meh GetClosestVehicleInRange needs to dump the door somewhere.
                     CClientVehicle* pVehicle = m_pLocalPlayer->GetClosestVehicleInRange ( true, !bPassenger, bPassenger, false, &uiDoor, NULL, 20.0f );
-                    if ( pVehicle && ( pVehicle->IsInWater() || m_pLocalPlayer->IsInWater() ) ) // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
+                    if ( pVehicle->IsInWater() || m_pLocalPlayer->IsInWater() ) // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
                     {
                         m_pLocalPlayer->KillTask(3, true ); // Kill jump task if we are about to warp in
                     }
@@ -4681,8 +4681,6 @@ void CClientGame::DoWastedCheck ( ElementID damagerID, unsigned char ucWeapon, u
             else Arguments.PushBoolean ( false );
             Arguments.PushBoolean ( false );
             m_pLocalPlayer->CallEvent ( "onClientPlayerWasted", Arguments, true );
-
-            CClientVehicle::UnpairPedAndVehicle ( m_pLocalPlayer );
 
             // Write some death info
             pBitStream->WriteCompressed ( animGroup );
