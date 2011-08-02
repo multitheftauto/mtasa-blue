@@ -176,9 +176,6 @@ protected:
     CGUILabel*          m_pSingleDownloadLabelInfo;
     CGUILabel*          m_pSingleDownloadLabel;
     CGUIComboBox*       m_pSingleDownloadCombo;
-    CGUILabel*          m_pCodePathLabelInfo;
-    CGUILabel*          m_pCodePathLabel;
-    CGUIComboBox*       m_pCodePathCombo;
     CGUILabel*          m_pUpdateBuildTypeLabelInfo;
     CGUILabel*          m_pUpdateBuildTypeLabel;
     CGUIComboBox*       m_pUpdateBuildTypeCombo;
@@ -251,8 +248,6 @@ protected:
     CGUILabel*          m_pChatGreenValue   [ ChatColorTypes::CHAT_COLOR_MAX ];
     CGUILabel*          m_pChatBlueValue    [ ChatColorTypes::CHAT_COLOR_MAX ];
     CGUILabel*          m_pChatAlphaValue   [ ChatColorTypes::CHAT_COLOR_MAX ];
-
-    CGUIScrollPane*     m_pInterfacePaneScroller;
 
     CGUIScrollPane*     m_pPaneChatFont;
     CGUIRadioButton*    m_pRadioChatFont    [ ChatFonts::CHAT_FONT_MAX ];
