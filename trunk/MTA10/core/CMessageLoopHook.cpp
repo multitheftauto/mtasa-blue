@@ -178,6 +178,12 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                             return true;
                         }
                     }
+                    else
+                    if ( uMsg == WM_KEYDOWN && wParam == VK_ESCAPE && !g_pCore->IsConnected () )
+                    {
+                        // If Escape is pressed and we're not playing ingame, hide certain windows
+                        CLocalGUI::GetSingleton ().GetMainMenu ()->OnEscapePressedOffLine ();
+                    }
 
                     // If F8 is pressed, we show/hide the console
                     if ( ( uMsg == WM_KEYDOWN && wParam == VK_F8 ) || ( uMsg == WM_CHAR && wParam == '`' ) )

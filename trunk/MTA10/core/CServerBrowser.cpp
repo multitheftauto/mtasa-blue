@@ -55,20 +55,49 @@ CServerBrowser::CServerBrowser ( void )
 
     // Do some initial math
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    bool bCreateFrame = true;
 
-	if ( resolution.fX <= 800 )  //Make our window bigger at small resolutions
+	if ( resolution.fX <= 800 )  // Make our window bigger at small resolutions
     {
-        m_WidgetSize = CVector2D( resolution.fX, resolution.fY );
+        m_WidgetSize = CVector2D ( resolution.fX, resolution.fY );
+        bCreateFrame = false;
     }
     else
-        m_WidgetSize = CVector2D( resolution.fX*SB_SPAN, resolution.fY*SB_SPAN );
+        m_WidgetSize = CVector2D ( resolution.fX*SB_SPAN, resolution.fY*SB_SPAN );
 
-    // Create the serverlist tab panel and some tabs
-    m_pPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel() );
-    m_pPanel->SetPosition ( CVector2D ( (resolution.fX - m_WidgetSize.fX)/2, (resolution.fY - m_WidgetSize.fY)/2 ) );
-    m_pPanel->SetSize ( m_WidgetSize );
-    m_pPanel->SetAlwaysOnTop ( true );
-    m_pPanel->SetZOrderingEnabled(false);
+    CVector2D widgetPosition ( ( resolution.fX - m_WidgetSize.fX ) / 2, ( resolution.fY - m_WidgetSize.fY ) / 2 );
+
+    if ( bCreateFrame )
+    {
+        // Create the window
+        m_pFrame = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "SERVER BROWSER" ) );
+        m_pTopWindow = m_pFrame;
+        m_pFrame->SetCloseButtonEnabled ( true );
+        m_pFrame->SetMovable ( true );
+        m_pFrame->SetPosition ( widgetPosition - CVector2D ( 10, 20 ) );
+        m_pFrame->SetSize ( m_WidgetSize + CVector2D ( 20, 30 ) );
+        m_pFrame->SetSizingEnabled ( false );
+        m_pFrame->SetAlwaysOnTop ( true );
+        m_pFrame->SetZOrderingEnabled ( false );
+
+        // Create the serverlist tab panel and some tabs
+        m_pPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pFrame ) );
+        m_pPanel->SetPosition (  CVector2D ( 10, 20 ) );
+        m_pPanel->SetSize ( m_WidgetSize );
+    }
+    else
+    {
+		// No frame
+		m_pFrame = NULL;
+
+        // Create the serverlist tab panel and some tabs
+        m_pPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel () );
+        m_pTopWindow = m_pPanel;
+        m_pPanel->SetPosition ( widgetPosition );
+        m_pPanel->SetSize ( m_WidgetSize );
+        m_pPanel->SetAlwaysOnTop ( true );
+        m_pPanel->SetZOrderingEnabled ( false );
+    }
 
     // Create locked icon
     m_pLockedIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
@@ -114,10 +143,10 @@ CServerBrowser::CServerBrowser ( void )
     }
 
     // Simulate focusing to keep things tidy
-    OnSearchFocused ( m_pPanel );
-    OnAddressFocused ( m_pPanel );
-    OnSearchDefocused ( m_pPanel );
-    OnAddressDefocused ( m_pPanel );
+    OnSearchFocused ( m_pTopWindow );
+    OnAddressFocused ( m_pTopWindow );
+    OnSearchDefocused ( m_pTopWindow );
+    OnAddressDefocused ( m_pTopWindow );
 }
 
 
@@ -135,7 +164,7 @@ CServerBrowser::~CServerBrowser ( void )
         m_pSearchIcons[ i ]->Clear();
 
     // Delete the GUI items
-    delete m_pPanel;
+    delete m_pTopWindow;
 }
 
 void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
@@ -484,10 +513,10 @@ void CServerBrowser::Update ( void )
 
 void CServerBrowser::SetVisible ( bool bVisible )
 {
-    m_pPanel->SetZOrderingEnabled(true);
-    m_pPanel->SetVisible ( bVisible );
-    m_pPanel->BringToFront ();
-    m_pPanel->SetZOrderingEnabled(false);
+    m_pTopWindow->SetZOrderingEnabled(true);
+    m_pTopWindow->SetVisible ( bVisible );
+    m_pTopWindow->BringToFront ();
+    m_pTopWindow->SetZOrderingEnabled(false);
 
     // Are we making this window visible?
     if ( bVisible )
@@ -528,7 +557,7 @@ void CServerBrowser::SetVisible ( bool bVisible )
 
 bool CServerBrowser::IsVisible ( void )
 {
-    return m_pPanel->IsVisible ();
+    return m_pTopWindow->IsVisible ();
 }
 
 
@@ -1199,7 +1228,7 @@ bool CServerBrowser::OnBackClick ( CGUIElement* pElement )
 {
     CMainMenu *pMainMenu = CLocalGUI::GetSingleton ().GetMainMenu ();
 
-    m_pPanel->SetVisible ( false );
+    m_pTopWindow->SetVisible ( false );
     pMainMenu->m_bIsInSubWindow = false;
 
     SaveOptions ( );
@@ -1863,4 +1892,15 @@ void CServerBrowser::SetNextHistoryText ( bool bDown )
     {
         SetAddressBarText ( std::string("mtasa://") + (const char*)pServerList->GetItemByIndex(0)->GetData() );
     }
+}
+
+
+void CServerBrowser::OnQuickConnectButtonClick ( void )
+{
+    // Switch to LAN tab
+    m_pPanel->SetSelectedTab ( m_pTab [ ServerBrowserTypes::LAN ] );
+
+    // Focus the text edit
+    m_pEditAddress [ ServerBrowserTypes::LAN ]->Activate ();
+    m_pEditAddress [ ServerBrowserTypes::LAN ]->SetCaratAtEnd ();
 }
