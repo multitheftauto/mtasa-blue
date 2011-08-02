@@ -253,29 +253,32 @@ void CPedRPCs::RemovePedFromVehicle ( CClientEntity* pSource, NetBitStreamInterf
             CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
             unsigned int    uiSeat   = pPed->GetOccupiedVehicleSeat();
 
-            pPed->SetSyncTimeContext ( ucTimeContext );
-
-            // Remove the player from his vehicle
-            pPed->RemoveFromVehicle ();
-            pPed->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
-            if ( pPed->m_bIsLocalPlayer )
+            if ( pVehicle )
             {
-                // Reset expectation of vehicle enter completion, in case we were removed while entering
-                g_pClientGame->ResetVehicleInOut ();
+                pPed->SetSyncTimeContext ( ucTimeContext );
+
+                // Remove the player from his vehicle
+                pPed->RemoveFromVehicle ();
+                pPed->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+                if ( pPed->m_bIsLocalPlayer )
+                {
+                    // Reset expectation of vehicle enter completion, in case we were removed while entering
+                    g_pClientGame->ResetVehicleInOut ();
+                }
+
+                // Call onClientPlayerVehicleExit
+                CLuaArguments Arguments;
+                Arguments.PushElement ( pVehicle ); // vehicle
+                Arguments.PushNumber ( uiSeat );    // seat
+                Arguments.PushBoolean ( false );    // jacker
+                pPed->CallEvent ( "onClientPlayerVehicleExit", Arguments, true );
+
+                // Call onClientVehicleExit
+                CLuaArguments Arguments2;
+                Arguments2.PushElement ( pPed );   // player
+                Arguments2.PushNumber ( uiSeat );  // seat
+                pVehicle->CallEvent ( "onClientVehicleExit", Arguments2, true );
             }
-
-            // Call onClientPlayerVehicleExit
-            CLuaArguments Arguments;
-            Arguments.PushElement ( pVehicle ); // vehicle
-            Arguments.PushNumber ( uiSeat );    // seat
-            Arguments.PushBoolean ( false );    // jacker
-            pPed->CallEvent ( "onClientPlayerVehicleExit", Arguments, true );
-
-            // Call onClientVehicleExit
-            CLuaArguments Arguments2;
-            Arguments2.PushElement ( pPed );   // player
-            Arguments2.PushNumber ( uiSeat );  // seat
-            pVehicle->CallEvent ( "onClientVehicleExit", Arguments2, true );
         }
     }
 }

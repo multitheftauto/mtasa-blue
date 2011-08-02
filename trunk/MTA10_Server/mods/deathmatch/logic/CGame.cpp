@@ -2289,6 +2289,9 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
 
                                                             if ( bWarpIn )
                                                             {
+                                                                if ( pOccupant == pPlayer )
+                                                                    pVehicle->SetOccupant ( NULL, 0 );
+
                                                                 CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPlayer, pVehicle, 0 );
                                                             }
                                                             else
