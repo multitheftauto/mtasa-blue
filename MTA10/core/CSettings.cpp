@@ -61,10 +61,10 @@ CSettings::CSettings ( void )
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
     float yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
-    m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - 560.0f / 2, resolution.fY / 2 - 360.0f / 2 + yoff  ), false );
+    m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - 560.0f / 2, resolution.fY / 2 - 480.0f / 2 + yoff  ), false );
 
     //m_pWindow->SetPosition ( CVector2D ( 0.15f, 0.20f ), true );
-    m_pWindow->SetSize ( CVector2D ( 560.0f, 410.0f ) );
+    m_pWindow->SetSize ( CVector2D ( 560.0f, 480.0f ) );
     m_pWindow->SetSizingEnabled ( false );
     m_pWindow->SetAlwaysOnTop ( true );
     m_pWindow->BringToFront ();
@@ -72,7 +72,7 @@ CSettings::CSettings ( void )
     // Create the tab panel and necessary tabs
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
     m_pTabs->SetPosition ( CVector2D ( 0, 20.0f ) );
-    m_pTabs->SetSize ( CVector2D ( 560.0f, 350.0f ) );
+    m_pTabs->SetSize ( CVector2D ( 560.0f, 420.0f ) );
     pTabMultiplayer = m_pTabs->CreateTab ( "Multiplayer" );
     pTabVideo = m_pTabs->CreateTab ( "Video" );
     pTabAudio = m_pTabs->CreateTab ( "Audio" );
@@ -85,26 +85,26 @@ CSettings::CSettings ( void )
     // Create buttons
     //  OK button
     m_pButtonOK = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "OK" ) );
-    m_pButtonOK->SetPosition ( CVector2D ( 0.5f, 0.92f ), true );
+    m_pButtonOK->SetPosition ( CVector2D ( 0.5f, 0.94f ), true );
     m_pButtonOK->SetZOrderingEnabled ( false );
 
     //  Cancel button
     m_pButtonCancel = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Cancel" ) );
-    m_pButtonCancel->SetPosition ( CVector2D ( 0.78f, 0.92f ), true );
+    m_pButtonCancel->SetPosition ( CVector2D ( 0.78f, 0.94f ), true );
     m_pButtonCancel->SetZOrderingEnabled ( false );
 
     /**
      *  Binds tab
      **/
     m_pBindsList = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( pTabBinds, false ) );
-    m_pBindsList->SetPosition ( CVector2D ( 0.02f, 0.05f ), true );
-    m_pBindsList->SetSize ( CVector2D ( 520.0f, 225.0f ) );
+    m_pBindsList->SetPosition ( CVector2D ( 10, 15 ) );
+    m_pBindsList->SetSize ( CVector2D ( 520.0f, 335.0f ) );
     m_pBindsList->SetSorting ( false );
     m_pBindsList->SetSelectionMode ( SelectionModes::CellSingle );
 
     m_pBindsDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBinds, "Load defaults" ) );
     m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
-    m_pBindsDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
+    m_pBindsDefButton->SetPosition ( CVector2D ( 402, 365 ) );
     m_pBindsDefButton->SetZOrderingEnabled ( false );
 
     /**
@@ -127,12 +127,12 @@ CSettings::CSettings ( void )
 
     //Mouse Options
     m_pControlsMouseLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Mouse options" ) );
-    m_pControlsMouseLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pControlsMouseLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pControlsMouseLabel->AutoSize ( "Mouse options  " );
     m_pControlsMouseLabel->SetFont ( "default-bold-small" );
 
     m_pInvertMouse = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pControlsPane, "Invert mouse vertically", true ) );
-    m_pInvertMouse->SetPosition ( CVector2D ( 0.022f, 0.1f ), true );
+    m_pInvertMouse->SetPosition ( CVector2D ( 11, 31 ) );
     m_pInvertMouse->GetPosition ( vecTemp, false );
     m_pInvertMouse->SetSize ( CVector2D ( 224.0f, 16.0f ) );
 
@@ -159,23 +159,23 @@ CSettings::CSettings ( void )
 
     //Joypad options
     m_pControlsJoypadLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Joypad options" ) );
-    m_pControlsJoypadLabel->SetPosition ( CVector2D ( 0.022f, 0.27f ), true );
+    m_pControlsJoypadLabel->SetPosition ( CVector2D ( 11, 83 ) );
     m_pControlsJoypadLabel->AutoSize ( "Joypad options  " );
     m_pControlsJoypadLabel->SetFont ( "default-bold-small" );
 
     //Create a mini-scrollpane for the radio buttons (only way to group them together)
     m_pControlsInputTypePane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pControlsPane ) ); 
     m_pControlsInputTypePane->SetProperty ( "ContentPaneAutoSized", "False" );
-    m_pControlsInputTypePane->SetPosition ( CVector2D ( 0.0f, 0.327f ), true );
+    m_pControlsInputTypePane->SetPosition ( CVector2D ( 0, 101 ) );
     m_pControlsInputTypePane->SetSize ( CVector2D ( 1.0f, 0.27f ), true );
 
     m_pStandardControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Standard controls (Mouse + Keyboard)" ) ); 
     m_pStandardControls->SetSelected ( true );
-    m_pStandardControls->SetPosition ( CVector2D ( 0.022f, 0.0f ), true );
+    m_pStandardControls->SetPosition ( CVector2D ( 11, 0 ) );
     m_pStandardControls->SetSize ( CVector2D ( 240.0f, 15.0f ), false );
 
     m_pClassicControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Classic controls (Joypad)" ) ); 
-    m_pClassicControls->SetPosition ( CVector2D ( 0.5f, 0.0f ), true );
+    m_pClassicControls->SetPosition ( CVector2D ( 270, 0 ) );
     m_pClassicControls->SetSize ( CVector2D ( 270.0f, 15.0f ), false );
 
 
@@ -194,13 +194,13 @@ CSettings::CSettings ( void )
         m_pJoypadUnderline->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
         m_pEditDeadzone = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pControlsPane ) );
-        m_pEditDeadzone->SetPosition ( CVector2D ( 0.02f, 0.567f ), true );
+        m_pEditDeadzone->SetPosition ( CVector2D ( 10, 175 ) );
         m_pEditDeadzone->SetSize ( CVector2D ( 45.0f, 24.0f ) );
         m_pEditDeadzone->SetMaxLength ( 3 );
         m_pEditDeadzone->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
 
         m_pEditSaturation = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pControlsPane ) );
-        m_pEditSaturation->SetPosition ( CVector2D ( 0.02f, 0.667f ), true );
+        m_pEditSaturation->SetPosition ( CVector2D ( 10, 206 ) );
         m_pEditSaturation->SetSize ( CVector2D ( 45.0f, 24.0f ) );
         m_pEditSaturation->SetMaxLength ( 3 );
         m_pEditSaturation->SetTextChangedHandler ( GUI_CALLBACK ( &CSettings::OnJoypadTextChanged, this ) );
@@ -217,35 +217,35 @@ CSettings::CSettings ( void )
 
         CGUIButton*  pJoyDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pControlsPane, "Load defaults" ) );
         pJoyDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnJoypadDefaultClick, this ) );
-        pJoyDefButton->SetPosition ( CVector2D ( 0.015f, 0.830f ), true );
+        pJoyDefButton->SetPosition ( CVector2D ( 402, 365 ) );
+
         pJoyDefButton->SetZOrderingEnabled ( false );
 
         CGUILabel* pLabelHelp = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Use the 'Binds' tab for joypad buttons." ) );
-        pLabelHelp->SetPosition ( CVector2D ( 0.02f, 0.91f ), true );
+        pLabelHelp->SetPosition ( CVector2D ( 10, 282 ) );
         pLabelHelp->SetSize ( CVector2D ( 250.0f, 24.0f ) );
         pLabelHelp->SetVerticalAlign( CGUI_ALIGN_VERTICALCENTER );
 
         // Layout the mapping buttons like a dual axis joypad
-        CVector2D vecPosList[] = {  CVector2D ( 0.30f,  0.617f ),     // Left Stick
-                                    CVector2D ( 0.52f,  0.617f ),
-                                    CVector2D ( 0.41f,  0.516f ),
-                                    CVector2D ( 0.41f,  0.718f ),
+        CVector2D vecPosList[] = {  CVector2D ( 162,  191 ),     // Left Stick
+                                    CVector2D ( 280,  191 ),
+                                    CVector2D ( 221,  159 ),
+                                    CVector2D ( 221,  222 ),
 
-                                    CVector2D ( 0.65f,  0.617f ),     // Right Stick
-                                    CVector2D ( 0.87f,  0.617f ),
-                                    CVector2D ( 0.76f,  0.516f ),
-                                    CVector2D ( 0.76f,  0.718f ),
+                                    CVector2D ( 351,  191 ),     // Right Stick
+                                    CVector2D ( 469,  191 ),
+                                    CVector2D ( 410,  159 ),
+                                    CVector2D ( 410,  222 ),
 
-                                    CVector2D ( 0.716f, 0.892f ),     // Acceleration/Brake
-                                    CVector2D ( 0.455f, 0.892f )     };
-
+                                    CVector2D ( 386,  276 ),     // Acceleration/Brake
+                                    CVector2D ( 245,  276 )     };
 
         for ( int i = 0 ; i < JoyMan->GetOutputCount () && i < 10 ; i++ )
         {
             CVector2D vecPos = vecPosList[i];
 
             CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pControlsPane ) );
-            pButton->SetPosition ( vecPos + CVector2D ( 0, 0 ), true );
+            pButton->SetPosition ( vecPos );
             pButton->SetPosition ( pButton->GetPosition() + CVector2D ( 10, 0 ) );
             pButton->SetSize ( CVector2D ( 48.0f, 24.0f ) );
             pButton->SetUserData ( (void*) i );
@@ -253,7 +253,7 @@ CSettings::CSettings ( void )
             pButton->SetZOrderingEnabled ( false );
 
             CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane ) );
-            pLabel->SetPosition ( vecPos + CVector2D ( 0, -0.085f ), true );
+            pLabel->SetPosition ( vecPos + CVector2D ( 0, -26 ) );
             pLabel->SetPosition ( pLabel->GetPosition() - CVector2D ( 10, 0 ));
             pLabel->SetSize ( CVector2D ( 88.0f, 24.0f ) );
             pLabel->SetHorizontalAlign( CGUI_ALIGN_HORIZONTALCENTER );
@@ -265,13 +265,13 @@ CSettings::CSettings ( void )
         }
 
         CGUILabel* pLabelLeft = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Left Stick" ) );
-        pLabelLeft->SetPosition ( CVector2D ( 0.41f, 0.611f ), true );
+        pLabelLeft->SetPosition ( CVector2D ( 221, 189 ) );
         pLabelLeft->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelLeft->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         pLabelLeft->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
 
         CGUILabel* pLabelRight = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pControlsPane, "Right Stick" ) );
-        pLabelRight->SetPosition ( CVector2D ( 0.76f, 0.611f ), true );
+        pLabelRight->SetPosition ( CVector2D ( 410, 189 ) );
         pLabelRight->SetSize ( CVector2D ( 68.0f, 24.0f ) );
         pLabelRight->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
         pLabelRight->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
@@ -334,7 +334,7 @@ CSettings::CSettings ( void )
      *	Multiplayer tab
      **/
     m_pLabelNick = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "Nick:" ) );
-    m_pLabelNick->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pLabelNick->SetPosition ( CVector2D ( 11, 13 ) );
     m_pLabelNick->GetPosition ( vecTemp, false );
     m_pLabelNick->AutoSize ( "Nick:" );
 
@@ -359,7 +359,7 @@ CSettings::CSettings ( void )
      *  Audio tab
      **/
     m_pAudioGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "General" ) );
-    m_pAudioGeneralLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pAudioGeneralLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pAudioGeneralLabel->GetPosition ( vecTemp, false );
     m_pAudioGeneralLabel->AutoSize ( "General  " );
     m_pAudioGeneralLabel->SetFont ( "default-bold-small" );
@@ -440,7 +440,7 @@ CSettings::CSettings ( void )
 
     m_pAudioDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAudio, "Load defaults" ) );
     m_pAudioDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAudioDefaultClick, this ) );
-    m_pAudioDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
+    m_pAudioDefButton->SetPosition ( CVector2D ( 402, 365 ) );
     m_pAudioDefButton->SetZOrderingEnabled ( false );
 
     /**
@@ -448,7 +448,7 @@ CSettings::CSettings ( void )
      **/
 
     m_pVideoGeneralLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "General" ) );
-    m_pVideoGeneralLabel->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
+    m_pVideoGeneralLabel->SetPosition ( CVector2D ( 11, 13 ) );
     m_pVideoGeneralLabel->GetPosition ( vecTemp, false );
     m_pVideoGeneralLabel->AutoSize ( "General  " );
     m_pVideoGeneralLabel->SetFont ( "default-bold-small" );
@@ -613,40 +613,32 @@ CSettings::CSettings ( void )
 
     m_pVideoDefButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabVideo, "Load defaults" ) );
     m_pVideoDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnVideoDefaultClick, this ) );
-    m_pVideoDefButton->SetPosition ( CVector2D ( 402.0f, 245.0f ) );
+    m_pVideoDefButton->SetPosition ( CVector2D ( 402, 365 ) );
     m_pVideoDefButton->SetZOrderingEnabled ( false );
 
     /**
      * Interface/chat Tab
      **/
-    m_pInterfacePaneScroller = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabInterface ) ); 
-    m_pInterfacePaneScroller->SetProperty ( "ContentPaneAutoSized", "False" );
-    m_pInterfacePaneScroller->SetPosition ( CVector2D ( 0, 1 ) );
-    m_pInterfacePaneScroller->SetSize ( CVector2D ( 539.0f, 292.0f ) );
-    m_pInterfacePaneScroller->SetVerticalScrollStepSize ( 0.15f );
-    m_pInterfacePaneScroller->SetProperty( "ContentArea", "l:0.000000 t:0.000000 r:0.000000 b:400.000000" ); //Defines the height of the content
-    m_pInterfacePaneScroller->SetVerticalScrollBar ( true );
-
     {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "General" ) );
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "General" ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 12.0f ) );
         pLabel->AutoSize ( "General  " );
         pLabel->SetFont ( "default-bold-small" );
     }
 
     {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "Skin:" ) );
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Skin:" ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 42.0f ) );
         pLabel->AutoSize ( "Skin:" );
     }
 
-    m_pInterfaceSkinSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( m_pInterfacePaneScroller ) );
+    m_pInterfaceSkinSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
     m_pInterfaceSkinSelector->SetPosition ( CVector2D ( 60.0f, 40.0f ) );
     m_pInterfaceSkinSelector->SetSize ( CVector2D ( 340.0f, 200.0f ) );
     m_pInterfaceSkinSelector->SetReadOnly ( true );
 
     {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "Chat" ) );
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Chat" ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 80.0f ) );
         pLabel->AutoSize ( "Chat  " );
         pLabel->SetFont ( "default-bold-small" );
@@ -656,23 +648,23 @@ CSettings::CSettings ( void )
     // Presets
 
     {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "Presets:" ) );
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Presets:" ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 112.0f ) );
         pLabel->AutoSize ( "Presets:" );
     }
 
-    m_pChatPresets = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( m_pInterfacePaneScroller ) );
+    m_pChatPresets = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
     m_pChatPresets->SetPosition ( CVector2D ( 60.0f, 110.0f ) );
     m_pChatPresets->SetSize ( CVector2D ( 340.0f, 200.0f ) );
     m_pChatPresets->SetReadOnly ( true );
 
-    m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pInterfacePaneScroller, "Load" ) );
+    m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabInterface, "Load" ) );
     m_pChatLoadPreset->SetPosition ( CVector2D ( 410.0f, 110.0f ) );
     m_pChatLoadPreset->SetSize ( CVector2D ( 100.0f, 24.0f ) );
     m_pChatLoadPreset->SetZOrderingEnabled ( false );
 
     // Color selection
-    CGUITabPanel* pColorTabPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pInterfacePaneScroller ) );
+    CGUITabPanel* pColorTabPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( pTabInterface ) );
     pColorTabPanel->SetPosition ( CVector2D ( 10.0f, 150.0f ) );
     pColorTabPanel->SetSize ( CVector2D ( 320.0f, 150.0f ) );
 
@@ -682,7 +674,7 @@ CSettings::CSettings ( void )
     CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, "Input Text", pColorTabPanel );
 
     // Font Selection
-    m_pPaneChatFont = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( m_pInterfacePaneScroller ) ); 
+    m_pPaneChatFont = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabInterface ) ); 
     m_pPaneChatFont->SetProperty ( "ContentPaneAutoSized", "False" );
     m_pPaneChatFont->SetPosition ( CVector2D ( 50.0f, 320.0f ) );
     m_pPaneChatFont->SetSize ( CVector2D ( 250.0f, 33.0f ) );
@@ -712,74 +704,74 @@ CSettings::CSettings ( void )
     {
         CGUILabel* pLabel;
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "Lines:" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Lines:" ) );
         pLabel->SetPosition ( CVector2D ( 360.0f, 160.0f ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( "Lines:" );
 
-        m_pChatLines = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pInterfacePaneScroller, "" ) );
+        m_pChatLines = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLines->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
         m_pChatLines->SetSize ( CVector2D ( 110.0f, 24.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "Scale:" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Scale:" ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( "Scale:" );
 
-        m_pChatScaleX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pInterfacePaneScroller, "" ) );
+        m_pChatScaleX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatScaleX->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
         m_pChatScaleX->SetSize ( CVector2D ( 50.0f, 24.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "x" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "x" ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + 92.5f, vecTemp.fY + 2.0f ) );
         pLabel->AutoSize ( "x" );
 
-        m_pChatScaleY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pInterfacePaneScroller, "" ) );
+        m_pChatScaleY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + 100.0f, vecTemp.fY - 2.0f ) );
         m_pChatScaleY->SetSize ( CVector2D ( 50.0f, 24.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "Width:" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "Width:" ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( "Width:" );
 
-        m_pChatWidth = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pInterfacePaneScroller, "" ) );
+        m_pChatWidth = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
         m_pChatWidth->SetSize ( CVector2D ( 110.0f, 24.0f ) );
 
-        m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( m_pInterfacePaneScroller, "Hide background when\nnot typing" ) );
+        m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, "Hide background when\nnot typing" ) );
         m_pChatCssBackground->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         m_pChatCssBackground->GetPosition ( vecTemp );
         m_pChatCssBackground->SetSize ( CVector2D ( 160.0f, 32.0f ) );
 
-        m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( m_pInterfacePaneScroller, "Fade out old lines" ) );
+        m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, "Fade out old lines" ) );
         m_pChatCssText->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 34.0f ) );
         m_pChatCssText->GetPosition ( vecTemp );
         m_pChatCssText->SetSize ( CVector2D ( 160.0f, 16.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "after" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "after" ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + 17.0f, vecTemp.fY + 22.0f ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( "after " );
 
-        m_pChatLineLife = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pInterfacePaneScroller, "" ) );
+        m_pChatLineLife = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLineLife->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
         m_pChatLineLife->SetSize ( CVector2D ( 70.0f, 24.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "sec" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "sec" ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + 115.0f, vecTemp.fY ) );
         pLabel->AutoSize ( "sec" );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "for" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "for" ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( "for" );
 
-        m_pChatLineFadeout = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pInterfacePaneScroller, "" ) );
+        m_pChatLineFadeout = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLineFadeout->SetPosition ( CVector2D ( vecTemp.fX + 40.0f, vecTemp.fY - 2.0f ) );
         m_pChatLineFadeout->SetSize ( CVector2D ( 70.0f, 24.0f ) );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pInterfacePaneScroller, "sec" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "sec" ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + 115.0f, vecTemp.fY ) );
         pLabel->AutoSize ( "sec" );
     }
@@ -852,23 +844,6 @@ CSettings::CSettings ( void )
     m_pSingleDownloadLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
     vecTemp.fY += 40-4;
 
-    // Code path
-    m_pCodePathLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Code path:" ) );
-    m_pCodePathLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
-    m_pCodePathLabel->AutoSize ( m_pCodePathLabel->GetText ().c_str () );
-
-    m_pCodePathCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pCodePathCombo->SetPosition ( CVector2D ( vecTemp.fX + 156.0f, vecTemp.fY - 1.0f ) );
-    m_pCodePathCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
-    m_pCodePathCombo->AddItem ( "Default" )->SetData ( (void*)0 );
-    m_pCodePathCombo->AddItem ( "Alternate" )->SetData ( (void*)1 );
-    m_pCodePathCombo->SetReadOnly ( true );
-
-    m_pCodePathLabelInfo = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Experimental crash reduction." ) );
-    m_pCodePathLabelInfo->SetPosition ( CVector2D ( vecTemp.fX + 342.f, vecTemp.fY - 4.f ) );
-    m_pCodePathLabelInfo->SetFont ( "default-bold-small" );
-    m_pCodePathLabelInfo->SetSize ( CVector2D ( 168.0f, 95.0f ) );
-    vecTemp.fY += 35;
 
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Auto updater" ) );
@@ -1167,7 +1142,7 @@ void CSettings::UpdateJoypadTab ()
     // Update the joystick name
     string strJoystickName = JoyMan->IsJoypadConnected () ? JoyMan->GetControllerName () : "Joypad not detected  -  Check connections and restart game";
 
-    m_pJoypadName->SetPosition ( CVector2D ( 0.5f, 0.405f ), true );
+    m_pJoypadName->SetPosition ( CVector2D ( 270, 125 ) );
     m_pJoypadName->SetText ( strJoystickName.c_str () );
     m_pJoypadName->AutoSize ( strJoystickName.c_str () );
     m_pJoypadName->SetPosition ( m_pJoypadName->GetPosition () - CVector2D ( m_pJoypadName->GetSize ().fX * 0.5, 0.0f ) );
@@ -1179,7 +1154,7 @@ void CSettings::UpdateJoypadTab ()
     for ( int i = 0 ; i < inumChars ; i++ )
         strUnderline = strUnderline + "_";
 
-    m_pJoypadUnderline->SetPosition ( CVector2D ( 0.5f, 0.405f ), true );
+    m_pJoypadUnderline->SetPosition ( CVector2D ( 270, 125 ) );
     m_pJoypadUnderline->SetText ( strUnderline.c_str () );
     m_pJoypadUnderline->AutoSize ( strUnderline.c_str () );
     m_pJoypadUnderline->SetPosition ( m_pJoypadUnderline->GetPosition () - CVector2D ( m_pJoypadUnderline->GetSize ().fX * 0.5, -2.0f ) );
@@ -2151,11 +2126,6 @@ void CSettings::LoadData ( void )
     if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( "Default" );
     else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( "On" );
 
-    // Code path
-    CVARS_GET ( "code_path", iVar );
-    if ( iVar == 0 ) m_pCodePathCombo->SetText ( "Default" );
-    else if ( iVar == 1 ) m_pCodePathCombo->SetText ( "Alternate" );
-
     // Update build type
     CVARS_GET ( "update_build_type", iVar );
     if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( "Default" );
@@ -2374,13 +2344,6 @@ void CSettings::SaveData ( void )
     {
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "single_download", iSelected );
-    }
-
-    // Code path
-    if ( CGUIListItem* pSelected = m_pCodePathCombo->GetSelectedItem () )
-    {
-        int iSelected = ( int ) pSelected->GetData();
-        CVARS_SET ( "code_path", iSelected );
     }
 
     // Update build type
