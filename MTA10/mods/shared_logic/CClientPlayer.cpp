@@ -102,6 +102,8 @@ CClientPlayer::~CClientPlayer ( void )
     // Remove the icon
     if ( m_pStatusIcon )
     {
+        m_pStatusIcon->SetVisible ( false );
+
         delete m_pStatusIcon;
         m_pStatusIcon = NULL;
     }
@@ -249,6 +251,11 @@ void CClientPlayer::Reset ( void )
     m_bNametagColorOverridden = false;
 
     SetAlpha ( 255 );
+
+    if ( m_pStatusIcon )
+    {
+        m_pStatusIcon->SetVisible ( false );
+    }
 }
 
 
