@@ -724,8 +724,9 @@ void CServerBrowser::SetVisible ( bool bVisible )
     }
     else
     {
-        // Hide quick connect information box.
-        m_pHelpWindow->SetVisible ( false );
+        // Hide information windows.
+        m_pGeneralHelpWindow->SetVisible ( false );
+        m_pQuickConnectHelpWindow->SetVisible ( false );
     }
 }
 
