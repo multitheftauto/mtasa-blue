@@ -595,6 +595,11 @@ void CServerBrowser::SetVisible ( bool bVisible )
         m_pEditAddress [ Type ]->Activate();
         m_pEditAddress [ Type ]->SetCaratAtEnd();
     }
+    else
+    {
+        // Hide quick connect information box.
+        m_pHelpWindow->SetVisible ( false );
+    }
 }
 
 
