@@ -156,10 +156,24 @@ void CLuaArguments::PushAsTable ( lua_State* luaVM, std::map < CLuaArguments*, i
     {
         pKnownTables = new std::map < CLuaArguments*, int > ();
         bKnownTablesCreated = true;
+
+		lua_newtable ( luaVM );
+		// using registry to make it fail safe, else we'd have to carry
+		// either lua top or current depth variable between calls
+		lua_setfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
     }
 
     lua_newtable ( luaVM );
-    pKnownTables->insert ( std::make_pair ( (CLuaArguments *)this, lua_gettop(luaVM) ) );
+
+	// push it onto the known tables
+	int size = pKnownTables->size();
+	lua_getfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
+	lua_pushnumber ( luaVM, ++size );
+	lua_pushvalue ( luaVM, -3 );
+	lua_settable ( luaVM, -3 );
+	lua_pop ( luaVM, 1 );
+    pKnownTables->insert ( std::make_pair ( (CLuaArguments *)this, size ) );
+
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
     for ( ; iter != m_Arguments.end () && (iter+1) != m_Arguments.end (); iter ++ )
     {
@@ -170,7 +184,12 @@ void CLuaArguments::PushAsTable ( lua_State* luaVM, std::map < CLuaArguments*, i
     }
 
     if ( bKnownTablesCreated )
+	{
+		// clear the cache
+		lua_pushnil ( luaVM );
+		lua_setfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
         delete pKnownTables;
+	}
 }
 
 
