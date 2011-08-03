@@ -43,6 +43,18 @@ template<> CServerBrowser * CSingleton < CServerBrowser >::m_pSingleton = NULL;
 
 #define PLAYER_LIST_PENDING_TEXT "  ..loading.."
 
+//
+// Local helper
+//
+static CVector2D CalcScreenPosition ( CGUIElement* pElement )
+{
+    CVector2D pos;
+    for ( ; pElement ; pElement = pElement->GetParent () )
+        pos += pElement->GetPosition ();
+    return pos;
+}
+
+
 CServerBrowser::CServerBrowser ( void )
 {
     CGUI *pManager = g_pCore->GetGUI ();
@@ -52,6 +64,12 @@ CServerBrowser::CServerBrowser ( void )
     m_firstTimeBrowseServer = true;
     m_bOptionsLoaded = false;
     m_PrevServerBrowserType = ServerBrowserTypes::INTERNET;
+
+    m_bFocusTextEdit = false;
+    m_uiShownQuickConnectHelpCount = 0;
+    m_uiIsUsingTempTab = 0;
+    m_BeforeTempServerBrowserType = ServerBrowserTypes::INTERNET;
+    m_llLastGeneralHelpTime = 0;
 
     // Do some initial math
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
@@ -148,39 +166,126 @@ CServerBrowser::CServerBrowser ( void )
     OnSearchDefocused ( m_pTopWindow );
     OnAddressDefocused ( m_pTopWindow );
 
-    // HelpWindow
-	m_bFocusTextEdit = false;
+    // Quick connect help
     CVector2D helpPos;
     helpPos.fX = resolution.fX * ( 512 / 1024.f );
     helpPos.fY = widgetPosition.fY + ( 115 - 58 );
 
-    m_pHelpWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "" ) );
-    m_pHelpWindow->SetMovable ( false );
-    m_pHelpWindow->SetPosition ( helpPos );
-    m_pHelpWindow->SetSize ( CVector2D ( 300, 150 ) );
-    m_pHelpWindow->SetAlwaysOnTop ( true );
-    m_pHelpWindow->SetFrameEnabled ( false );
-    m_pHelpWindow->SetTitlebarEnabled ( false );
-    m_pHelpWindow->SetCloseButtonEnabled ( false );
-    m_pHelpWindow->SetVisible ( false );
+    m_pQuickConnectHelpWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "" ) );
+    m_pQuickConnectHelpWindow->SetMovable ( false );
+    m_pQuickConnectHelpWindow->SetPosition ( helpPos );
+    m_pQuickConnectHelpWindow->SetSize ( CVector2D ( 300, 150 ) );
+    m_pQuickConnectHelpWindow->SetAlwaysOnTop ( true );
+    m_pQuickConnectHelpWindow->SetFrameEnabled ( false );
+    m_pQuickConnectHelpWindow->SetTitlebarEnabled ( false );
+    m_pQuickConnectHelpWindow->SetCloseButtonEnabled ( false );
+    m_pQuickConnectHelpWindow->SetVisible ( false );
 
-    // HelpWindow Label
-    m_pHelpLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pHelpWindow, "" ) );
-    m_pHelpLabel->SetPosition ( CVector2D ( 0, 0 ) );
-    m_pHelpLabel->SetSize ( CVector2D ( 300, 150 ) );
-    m_pHelpLabel->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
-    m_pHelpLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
-    m_pHelpLabel->SetProperty( "BackgroundEnabled", "True" );
-    m_pHelpLabel->SetProperty( "BackgroundColours", "tl:FFFF00FF tr:FFFF0000 bl:00FF0000 br:FF00FF00" );
+    // Quick connect help label
+    {
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pQuickConnectHelpWindow, "" ) );
+        pLabel->SetPosition ( CVector2D ( 0, 0 ) );
+        pLabel->SetSize ( CVector2D ( 300, 150 ) );
+        pLabel->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+        pLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        pLabel->SetProperty( "BackgroundEnabled", "True" );
 
-    SString strHelpMessage =
-                        "FOR QUICK CONNECT:\n"
-                        "\n"
-                        "Type the address and port into the address bar\n"
-                        "Or select a server from the history list\n"
-                        "and press 'Connect'";
+        SString strHelpMessage =
+                            "FOR QUICK CONNECT:\n"
+                            "\n"
+                            "Type the address and port into the address bar\n"
+                            "Or select a server from the history list\n"
+                            "and press 'Connect'";
 
-    m_pHelpLabel->SetText ( strHelpMessage );
+        pLabel->SetText ( strHelpMessage );
+    }
+
+
+    // General help
+    CVector2D helpButtonSize = m_pButtonGeneralHelp [ 0 ]->GetSize ();
+    CVector2D helpButtonPos = CalcScreenPosition ( m_pButtonGeneralHelp [ 0 ] ) + CVector2D ( 0, 24 );
+
+    CVector2D generalHelpSize ( 350, 160 );
+    CVector2D generalHelpPos = helpButtonPos - generalHelpSize + CVector2D ( helpButtonSize.fX, 0 );
+
+    m_pGeneralHelpWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "HELP" ) );
+    m_pGeneralHelpWindow->SetMovable ( false );
+    m_pGeneralHelpWindow->SetPosition ( generalHelpPos );
+    m_pGeneralHelpWindow->SetSize ( generalHelpSize );
+    m_pGeneralHelpWindow->SetAlwaysOnTop ( true );
+    m_pGeneralHelpWindow->SetFrameEnabled ( false );
+    m_pGeneralHelpWindow->SetTitlebarEnabled ( false );
+    m_pGeneralHelpWindow->SetCloseButtonEnabled ( false );
+    m_pGeneralHelpWindow->SetVisible ( false );
+    m_pGeneralHelpWindow->SetDeactivateHandler ( GUI_CALLBACK ( &CServerBrowser::OnGeneralHelpDeactivate, this ) );
+
+    // m_pGeneralHelpWindow Label 0 ( grey background )
+    {
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
+        pLabel->SetPosition ( CVector2D ( 0, 0 ) );
+        pLabel->SetSize ( CVector2D ( generalHelpSize ) );
+        pLabel->SetProperty( "BackgroundEnabled", "True" );
+    }
+
+
+    // m_pGeneralHelpWindow Label 1
+    {
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
+        pLabel->SetPosition ( CVector2D ( 40, 28 ) );
+        pLabel->SetSize ( CVector2D ( 130, 100 ) );
+
+        SString strHelpMessage =
+                            "  -  Refresh\n\n"
+                            "  -  Add Favorite\n\n"
+                            "  -  Connect\n\n"
+                            "  -  Server information\n\n"
+                            ;
+
+        pLabel->SetText ( strHelpMessage );
+    }
+
+    // m_pGeneralHelpWindow Label 2
+    {
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
+        pLabel->SetPosition ( CVector2D ( 210, 28 ) );
+        pLabel->SetSize ( CVector2D ( 130, 100 ) );
+
+        SString strHelpMessage =
+                            "  -  Search servers\n\n"
+                            "  -  Search players\n\n"
+                            "  -  Start search\n\n"
+                            ;
+
+        pLabel->SetText ( strHelpMessage );
+    }
+
+    // m_pGeneralHelpWindow icons
+    {
+        const int iBase = 23;
+        const int iGap = 29;
+
+        struct {
+            int x, y, w, h;
+            const char* szName;
+        } iconInfoList [] = {
+                             {  20, iBase + iGap * 0,      26, 26, "cgui\\images\\serverbrowser\\refresh.png", },
+                             {  25, iBase + iGap * 1 + 5,  16, 16, "cgui\\images\\serverbrowser\\favorite.png", },
+                             {  20, iBase + iGap * 2,      26, 26, "cgui\\images\\serverbrowser\\connect.png", },
+                             {  20, iBase + iGap * 3,      26, 26, "cgui\\images\\serverbrowser\\info.png", },
+                             { 195, iBase + iGap * 0 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-servers.png", },
+                             { 195, iBase + iGap * 1 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-players.png", },
+                             { 194, iBase + iGap * 2 + 4,  18, 18, "cgui\\images\\radarset\\01.png", },
+                             { 195, iBase + iGap * 2 + 5,  16, 16, "cgui\\images\\serverbrowser\\search.png", },
+                        };
+
+        for ( uint i = 0 ; i < NUMELMS( iconInfoList ) ; i++ )
+        {
+            CGUIStaticImage* pIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pGeneralHelpWindow ) );
+            pIcon->SetPosition ( CVector2D ( iconInfoList[i].x, iconInfoList[i].y ) );
+            pIcon->SetSize ( CVector2D ( iconInfoList[i].w, iconInfoList[i].h ) );
+            pIcon->LoadFromFile ( iconInfoList[i].szName );
+        }
+    }
 }
 
 
@@ -441,6 +546,12 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonBack [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnBackClick, this ) );
     m_pButtonBack [ type ]->SetZOrderingEnabled ( false );
 
+    m_pButtonGeneralHelp [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "Help" ) );
+    m_pButtonGeneralHelp [ type ]->SetPosition ( CVector2D ( fX - fPlayerListSizeX - 10, fY ), false );
+    m_pButtonGeneralHelp [ type ]->SetSize ( CVector2D ( fPlayerListSizeX, SB_BACK_BUTTON_SIZE_Y ), false );
+    m_pButtonGeneralHelp [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnGeneralHelpClick, this ) );
+    m_pButtonGeneralHelp [ type ]->SetZOrderingEnabled ( false );
+
     // Disable resizing of the first and second columns (Version & Locked)
     m_pServerList [ type ]->SetColumnSegmentSizingEnabled(0, false);
     m_pServerList [ type ]->SetColumnSegmentSizingEnabled(1, false);
@@ -486,6 +597,15 @@ void CServerBrowser::DeleteTab ( ServerBrowserType type )
 
     delete m_pServerList [ type ];
     delete m_pTab [ type ];
+}
+
+ServerBrowserType CServerBrowser::GetCurrentServerBrowserTypeForSave ( void )
+{
+	// If current tab is temporary, then save the one used befor it
+    if ( m_uiIsUsingTempTab )
+        return m_BeforeTempServerBrowserType;
+
+    return GetCurrentServerBrowserType ();
 }
 
 ServerBrowserType CServerBrowser::GetCurrentServerBrowserType ( void )
@@ -556,6 +676,13 @@ void CServerBrowser::Update ( void )
 
 void CServerBrowser::SetVisible ( bool bVisible )
 {
+    if ( m_uiIsUsingTempTab )
+    {
+		// Stop using temp tab now
+        m_pPanel->SetSelectedTab ( m_pTab [ GetCurrentServerBrowserTypeForSave () ] );
+        m_uiIsUsingTempTab = 0;
+    }
+
     m_pTopWindow->SetZOrderingEnabled(true);
     m_pTopWindow->SetVisible ( bVisible );
     m_pTopWindow->BringToFront ();
@@ -1254,7 +1381,8 @@ bool CServerBrowser::OnHistorySelected ( CGUIElement* pElement )
 
 bool CServerBrowser::OnHistoryDropListRemove ( CGUIElement* pElementx )
 {
-    m_pHelpWindow->SetVisible ( false );
+    // Hide quick connect help if visible
+    m_pQuickConnectHelpWindow->SetVisible ( false );
 
     // Grab our cursor position
     tagPOINT cursor;
@@ -1269,19 +1397,11 @@ bool CServerBrowser::OnHistoryDropListRemove ( CGUIElement* pElementx )
     cursor.x -= windowPos.x;
     cursor.y -= windowPos.y;
 
-    // Calc screen position of edit control
+    // Get size and screen position of edit control
     CGUIEdit* pEdit = m_pEditAddress [ 0 ];
-    CVector2D pos;
-    CVector2D size;
-    pEdit->GetPosition ( pos );
-    pEdit->GetSize ( size );
+    CVector2D size = pEdit->GetSize ();
+    CVector2D pos = CalcScreenPosition ( pEdit );
 
-    for ( CGUIElement* pElement = pEdit->GetParent () ; pElement ; pElement = pElement->GetParent () )
-    {
-        CVector2D parpos;
-        pElement->GetPosition ( parpos );
-        pos += parpos;
-    }
     pos.fY += 24;
 
     // See if cursor is over edit control
@@ -1321,6 +1441,23 @@ bool CServerBrowser::OnBackClick ( CGUIElement* pElement )
 
     SaveOptions ( );
 
+    return true;
+}
+
+bool CServerBrowser::OnGeneralHelpClick ( CGUIElement* pElement )
+{
+    if ( !m_pGeneralHelpWindow->IsVisible () )
+    {
+        if ( GetTickCount64_ () - m_llLastGeneralHelpTime > 500 )
+        {
+            m_pGeneralHelpWindow->SetVisible ( true );
+            m_pGeneralHelpWindow->BringToFront ();
+        }
+    }
+    else
+    {
+        m_pGeneralHelpWindow->SetVisible ( false );
+    }
     return true;
 }
 
@@ -1395,6 +1532,10 @@ bool CServerBrowser::OnFilterChanged ( CGUIElement* pElement )
 
 bool CServerBrowser::OnTabChanged ( CGUIElement* pElement )
 {
+	// Decrement is temp tab counter
+    if ( m_uiIsUsingTempTab )
+        m_uiIsUsingTempTab--;
+
     SaveOptions ( );
 
     OnSearchFocused ( pElement );
@@ -1440,6 +1581,13 @@ bool CServerBrowser::OnAddressDefocused ( CGUIElement* pElement )
     if ( strAddressText.empty() )
         m_pLabelAddressDescription [ Type ]->SetVisible ( true );
 
+    return true;
+}
+
+bool CServerBrowser::OnGeneralHelpDeactivate ( CGUIElement* pElement )
+{
+    m_pGeneralHelpWindow->SetVisible ( false );
+    m_llLastGeneralHelpTime = GetTickCount64_ ();
     return true;
 }
 
@@ -1620,7 +1768,7 @@ void CServerBrowser::SaveOptions ( )
         pOptions->DeleteAllSubNodes ( );
     }
 
-    int iCurrentType = GetCurrentServerBrowserType ( );
+    int iCurrentType = GetCurrentServerBrowserTypeForSave ( );
 
     // Save the options for all four lists
     for ( unsigned int ui = 0; ui < SERVER_BROWSER_TYPE_COUNT; ui++ )
@@ -1985,13 +2133,20 @@ void CServerBrowser::SetNextHistoryText ( bool bDown )
 
 void CServerBrowser::OnQuickConnectButtonClick ( void )
 {
-    // Switch to LAN tab, TODO: don't save it as selected
+    // Show help text
+    if ( m_uiShownQuickConnectHelpCount < 1 )
+    {
+        m_pQuickConnectHelpWindow->SetVisible ( true );
+        m_pQuickConnectHelpWindow->BringToFront ();
+        m_uiShownQuickConnectHelpCount++;
+    }
+
+    // Switch to LAN tab, but don't save it as selected
+    if ( !m_uiIsUsingTempTab )
+        m_BeforeTempServerBrowserType = GetCurrentServerBrowserType ();
+    m_uiIsUsingTempTab = 2;
     m_pPanel->SetSelectedTab ( m_pTab [ ServerBrowserTypes::LAN ] );
 
     // Show history
     m_pComboAddressHistory [ ServerBrowserTypes::LAN ]->ShowDropList ();
-
-    // Show help text
-    m_pHelpWindow->SetVisible ( true );
-    m_pHelpWindow->BringToFront ();
 }

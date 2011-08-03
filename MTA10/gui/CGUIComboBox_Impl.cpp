@@ -292,6 +292,7 @@ bool CGUIComboBox_Impl::Event_OnDropListRemoved ( const CEGUI::EventArgs& e )
 void CGUIComboBox_Impl::ShowDropList ( void )
 {
     reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> showDropList ();
+    reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) -> setSingleClickEnabled ( true );
 }
 
 
