@@ -37,7 +37,8 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     //
     // Handle duplicate launching, or running from mtasa:// URI ?
     //
-    if ( ! CreateSingleInstanceMutex () )
+    int iRecheckTimeLimit = 2000;
+    while ( ! CreateSingleInstanceMutex () )
     {
         if ( strcmp ( lpCmdLine, "" ) != 0 )
         {
@@ -61,6 +62,13 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
             }
             else
             {
+                if ( iRecheckTimeLimit > 0 )
+                {
+                    // Sleep a little bit and check the mutex again
+                    Sleep ( 500 );
+                    iRecheckTimeLimit -= 500;
+                    continue;
+                }
                 MessageBox( 0, "Can't send WM_COPYDATA", "Error", MB_ICONERROR );
                 return 0;
             }
