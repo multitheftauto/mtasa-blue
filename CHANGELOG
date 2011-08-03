@@ -1,5 +1,167 @@
 Changelog for Multi Theft Auto
 
+Multi Theft Auto : San Andreas - 1.0.5
+======================================
+Goal: Interim bugfix release
+
+Targets:
+* Publish all previously made updates for 1.0.4 into a single, convenient release
+* Improve anti-cheat system
+
+List of SVN changes:
+
+(r1767) [1.0.4] Fixed accounts database growing very big indeed
+(r1768) [1.0.4] Auto-shrink repaired database
+(r1777) [1.0.4] Fixed admin commands missing from local editor
+(r1782) [1.0.4] Fixed sqlite slowing the server when scripts do lots of table updates
+(r1793) [1.0.4] Backported r1790 (Fixed 'CRC mismatch' occurring too often.)
+(r1853) [1.0.4] Added a warning for dots in resource names
+(r1857) [1.0.4] Backported r1855 (Fixed keybinds crash) 1856 (Fixed misc crash #5)
+(r1865) [1.0.4] Backported r1860 (Sped up screenshot saving)
+(r1883) [1.0.4] Backported r1881 (Fixed server crash on resource stop (From customer .dmp file))
+(r1885) [1.0.4] Added getPerformanceStats()
+(r1963) [1.0.4] Backported r1962 (Limit client HTTP connections)
+(r1966) [1.0.4] Backported r1876 (resetTimer is server-side only).
+(r1967) [1.0.4] Backported r1828 & r1831 (Server queue)
+(r1968) [1.0.4] Backported r1776 (Secondary command binds don't function properly)
+(r1971) [1.0.4] Backported r1970 (Fixed crash on resource restart. Improved server 'Network module not compatible' message.)
+(r1973) [1.0.4] Fixed crash when copying unicode strings from CEGUI. (Patch from rafalhPL)
+(r1983) [1.0.4] Backported r1981 (Added file permission fixer. Expanded autoupdater.) r1891 (Fixed a problem when downloading from some http servers)
+(r1985) [1.0.4] Backported r1984 (Disabled permissions fixer for XP)
+(r1987) [1.0.4] Backported r1986 (Added Linux GetLocalTimeString. Unified SStringReplace and ReplaceSubString. Improved updater in some fashion.)
+(r1989) [1.0.4] Backported r1988 (Added better support for Linux nohup)
+(r1992) [1.0.4] Backported r1991 (Fixed crash on mtaserver.conf error)
+(r2000) [1.0.4] Backported r1999 (Fixed 'serverip' setting.)
+(r2001) [1.0.4] Backported r1993 (Fixed getVehicleOccupants freezing when used on certain vehicles (now returns false for those vehicles))
+(r2002) [1.0.4] Updated updater. Sped up install. 
+(r2010) [1.0.4] Added manual update check button. Changed the way the 'Player' default name can be changed by servers.
+(r2013) [1.0.4] Made ban messages more helpful
+(r2020) [1.0.4] Enabled and refactored error reporter.
+(r2033) [1.0.4] Improved on-line help
+(r2034) [1.0.4] Split the fastmove and crouchbug glitch
+(r2035) [1.0.4] Lua sdk and updater update
+(r2040) [1.0.4] Added cache to server browser to decrease scanning time.
+(r2043) [1.0.4] Sped up server browser some more. Backported r2038 (Removed a stupid check.)
+(r2045) [1.0.4] Fixed HTTP server freezing
+(r2046) [1.0.4] Test for possible fix of invalid model crashes.
+(r2047) [1.0.4] Added signing for updates
+(r2048) [1.0.4] Added crash fix 
+(r2049) [1.0.4] Sped up accounts access when there are many accounts
+(r2050) [1.0.4] Added HTTP DoS protection
+(r2051) [1.0.4] Fixed water incongruities
+(r2056) [1.0.4] Sped up disconnect
+(r2057) [1.0.4] Added list speed ups
+(r2058) [1.0.4] List speed ups fix from ryden
+(r2060) [1.0.4] Loading crash fix
+(r2062) [1.0.4] Fixed crash on explosion
+(r2071) [1.0.4] Backported r2065 (Added support to daemonize the Linux server.)
+(r2073) [1.0.4] Added backup master server support
+(r2074) [1.0.4] Added open ports tester for the server
+(r2085) [1.0.4] Backported: r1796 (Added CSettingsSA::Set/Get MouseSensivity.)
+(r2101) [1.0.4] Added server browser improvements: GUI visible servers queried first. IP sort works. Server name sort ignores case and punctuation. Browser can see other versions and launch them. Also: GUI speed ups. MOTY 'advice' dialog.
+(r2102) [1.0.4] Fixed open URL bug. Tweaked server browser settings.
+(r2142) [1.0.4] Backported r2136 (Removed dependency on libpcre for Linux)
+(r2144) [1.0.4] Fixed crash with unbind command
+(r2147) [1.0.4] Fixed crash. Fixed textures missing with some motherboards. Fixed FPS bug.
+(r2156) [1.0.4] Fixed older clients overloading external web server
+(r2161) [1.0.4] Backported r2160 (Fixed delay when connecting to a local server)
+(r2166) [1.0.4] Backported r2163 (Added option to block servers) r2164 (Added news headlines) r2165 (Addendum to r2164)
+(r2172) [1.0.4] Backported r2167 (Fixed incorrect AC kick with onClientPlayerDamage)
+(r2173) [1.0.4] Backported r2174 (Modified main menu layout) r2197 (Fixed news window being open at the wrong time)
+(r2200) [1.0.4] Backported r2162 (Implemented SharedUtil::tolower and SharedUtil::toupper so it can be inlined.)
+(r2228) [1.0.4] Backported r2226 (Sped up joining servers with huge element counts) | r2227 (Modified updater in mysterious ways)
+(r2321) [1.0.4] Backported r2318 (Removed unused drawing code) r2320 (Added more error checking at launch)
+(r2345) [1.0.4] Backported r2328 (Sped up getElementsByType and others) r2338 (Huge commit of doom) r2340 (Renamed MemCpy8) r2344 (Fixed some crashes)
+(r2348) [1.0.4] Backported r2346 (Reverted r2344 (Fixed some crashes)) r2347 (Fixed some crashes #2)
+(r2356) [1.0.4] Backported r2353 (Removed a direct memory access from the data files checker. Fixed a crash patch for Euro exe's. Fixed a compiler warning.)
+(r2357) [1.0.4] Backported r2355 (Fixed 'cane' weapon slot. Fixed a cause of network trouble.)
+(r2367) [1.0.4] Backported r2360 (Fixed installer not removing the gta_sa.exe from the installation directory)
+(r2376) [1.0.4] Backported r2371 (Incremented net module version). Added non automatic Aero fix (Requires manual copying of gta_sa.exe). Tweaked report filter
+(r2382) [1.0.4] Backported r2379 (Conformed some settings). r2380 (Fixed FileExists() not working properly on some PCs).
+(r2383) [1.0.4] Modified non automatic Aero fix to use gta_sa_aero.exe
+(r2395) [1.0.4] Backported r2384 (Fixed chat scroller smoothness, and possible some other things.)
+(r2397) [1.0.4] Backported r2386 (Fixed low server fps if GTA not running) Backported r2387 (Added error check to account saving)
+(r2410) [1.0.4] Backported r2407 (Fixed a crash when resolving host names.)
+(r2418) [1.0.4] Backported r2414 (Fixed upgrader skipping files) r2415 (Fixed resource sometimes using zip file when it shouldn't) r2416(partial) (Fixed a crash in upgrader)
+(r2420) [1.0.4] Backported r2417 (Added Lua client performance stats. Uses updated performancebrowser resource.) r2419 (Updated Lua client performance stats.)
+(r2423) [1.0.4] Backported r2421 (Added option for volumetric shadows)
+(r2436) [1.0.4] Backported r2430 partial (Added updater cache cleaner.) r2435 (Fixed a logging problem)
+(r2459) [1.0.4] Disabled /load and /unload
+(r2465) [1.0.4] Backported r2460 (Fixed minclientversion fussiness) r2462 (Added cache reuse for the updater) r2463 (Fixed jerky burnout donuts) r2464 (Fixed #5871 (Cars goes inside the ground when streamingout/in)))
+(r2479) [1.0.4] Backported r2478 (Possible fix to crash on server join)
+(r2482) [1.0.4] Backported r2481 (Fixed not finding already running gta_sa.exe)
+(r2484) [1.0.4] Backported r2483 (Fixed message spam at new server startup)
+
+---
+
+Updates made on 3. April:
+
+(r2488) [1.0.5] Backported r2487 (Changed default async loading setting to on. Moved async status star code to a more logic place.)
+(r2492) [1.0.5] Backported r2466 (Moved something important to see if it helps with animation crashes.)
+(r2494) [1.0.5] Backported r2493 (Fixed invisible radar map and display text introduced in r2492)
+(r2509) [1.0.5] Backported r2505 (Made performance stats more modular) r2507 (Added advanced option for code added in r2492 (Moved something important to see if it helps with animation crashes.)) r2508 (Possible fix for recent low FPS)
+(r2519) [1.0.5] Backported r2518 (Re-blocked some unwanted Lua functions. Added more fix for low FPS.)
+
+List of resolved Mantis issues:
+
+- 0005942: [Client] ASI aka Cleo cheats in MTA 1.0.4 and 1.1 (ccw) - resolved.
+- 0005941: [Client] Auto-aim for MTA 1.0.4 (ccw) - resolved.
+- 0005952: [Client] Wallhack for MTA 1.0.4 and 1.1 (ccw) - resolved.
+- 0005577: [Scripting] Some functions break coroutines (ccw) - resolved.
+- 0004829: [Vehicles] Trains slow down in curves (ryden) - resolved.
+- 0005396: [GUI / Menus / Console] F11 Map has no texture (ccw) - resolved.
+- 0005390: [Weapons] Infrared and Nightvision mode turns off when a player respawns (Talidan) - resolved.
+- 0005871: [Vehicles] Cars goes inside the ground when streamingout/in. (ccw) - resolved.
+- 0005960: [GUI / Menus / Console] Dates do not behave properly for news items (ccw) - resolved.
+- 0004948: [General] Keys stuck after alt-tabbing out of the game (x86) - resolved.
+- 0005920: [Scripting] Crash when attachElements on the resource start event (ccw) - resolved.
+- 0005738: [Multi Theft Auto : San Andreas] Client hangs up on update check (inc. news update) if DNS server is not available (izstas) - resolved.
+- 0005727: [GUI / Menus / Console] Antialiasing option in Video tab (izstas) - resolved.
+- 0005734: [General] Pressing ALT+SPACEBAR lets you pause the game (ryden) - resolved.
+- 0005712: [General] Protocol 38 Error. (ccw) - resolved.
+- 0005674: [Scripting] Creation and destruction of peds seem to crash the client (ccw) - resolved.
+- 0005669: [Scripting] onPlayerWeaponSwitch does not always work (Gamesnert) - resolved.
+- 0005650: [General] Sound problems after r2087 update (x86) - resolved.
+- 0005562: [GUI / Menus / Console] More options in Audio tab (Radio and Usertrack options) (x86) - resolved.
+- 0005504: [GUI / Menus / Console] Mouse settings aren't loading on "Load defaults" click (x86) - resolved.
+- 0005359: [GUI / Menus / Console] [Request] Mouse sensitivity isn't added. (x86) - resolved.
+- 0005617: [Scripting] MTA:SA 1.0.4 has bug with Race Pick-Ups (ccw) - resolved.
+- 0005421: [Scripting] guiStaticImageLoadImage prone to crash? (ccw) - resolved.
+- 0005626: [GUI / Menus / Console] Players list isn't updated on some servers (ccw) - resolved.
+- 0005587: [Server] Server crashes x2 (ccw) - resolved.
+- 0005530: [General] Crash when I was playing (ccw) - resolved.
+- 0005574: [Scripting] Useless debug messages (ccw) - resolved.
+- 0005576: [General] CTD when hitting air with vibrator (ccw) - resolved.
+- 0005468: [Client] Crash dumps (ccw) - resolved.
+- 0005466: [General] MTA Crash (ccw) - resolved.
+- 0005465: [General] Crashes - the next one part (ccw) - resolved.
+- 0005487: [Server] Server sometimes quits without warning (ccw) - resolved.
+- 0005476: [Server] Server consumes memory over time (ccw) - resolved.
+- 0005455: [General] MTA crash dumps (ccw) - resolved.
+- 0005445: [General] MTA is crashing every 30-60 minutes (ccw) - resolved.
+- 0005162: [Server] Download timeouts caused by temporary internal web server failure (ccw) - resolved.
+- 0005388: [Scripting] projectiles can exist forever (ccw) - resolved.
+- 0005395: [GUI / Menus / Console] bind configurations are discarded on exit (Flobu) - resolved.
+- 0005392: [Server] Banlist gets reset after "ERROR: Could not start HTTP server on interface" message (ccw) - resolved.
+- 0005994: [Security] small sync anomalies bug (ccw) - resolved.
+
+Resources:
+
+- 0005954: [Resources] admin: lags server (ccw) - resolved.
+- 0005795: [Required] Admin: Temporary hang on switch to "Resources" tab if you've got a lot of resources (arranTuna) - resolved.
+- 0005692: [Required] [spawnmanager] Invalid code in spawn.lua (izstas) - resolved.
+- 0005880: [Optional] Wrong parameter in stealth (arranTuna) - resolved.
+- 0005691: [Required] [killmessages] Warnings in killmessages_server.lua (lines 53 and 90) (ccw) - resolved.
+- 0005422: [Optional] [race] Checkpoint colshapes aren't created after player dies (ccw) - resolved.
+- 0005943: [Optional] [patch] freeroam: Players can avoid "disallowed" weapon/vehicle check by typing in commands - float values (arranTuna) - resolved.
+- 0005974: [Optional] mapmanager: "is not a valid map" output is misleading (arranTuna) - resolved.
+- 0005946: [Required] play: Some crucial gameplay elements are not defaulted (arranTuna) - resolved.
+- 0005969: [Optional] freeroam: add optional rotation argument to setpos (aka sp) (arranTuna) - resolved.
+- 0005917: [Required] resourcebrowser: popup spam when server shuts down unexpectedly (ccw) - resolved.
+- 0005915: [Required] resourcebrowser: Get rid of popup when using restart button (arranTuna) - resolved.
+- 0005894: [Optional] Freeroam getpos and setpos are different formats (arranTuna) - resolved.
+
+
 Multi Theft Auto : San Andreas - 1.0.4
 ======================================
 Goal: Gameplay bugfix release
@@ -8,25 +170,25 @@ Targets:
 * Fixes for issues and crashes that are present in 1.0.3 and are degrading the stability of the software
 * High priority gameplay and UI fixes
 
-- 0005466: [Client] MTA Crash (ccw) - resolved.
-- 0005468: [Client] Crash dumps (ccw) - resolved.
-- 0005465: [Client] Crashes - the next one part (ccw) - resolved.
-- 0005487: [Server] Server sometimes quits without warning (ccw) - resolved.
-- 0005476: [Server] Server consumes memory over time (ccw) - resolved.
+- 0005612: [Client] guiStaticImageLoadImage causes crash. (ccw) - resolved.
+- 0005088: [Client] Download error when downloading files (ccw) - resolved.
+- 0005041: [Client] Cursor is showing while loading the game. (x86) - resolved.
+- 0005176: [Client] MTA does not always save the favourites list. (x86) - resolved.
+- 0004282: [Scripting] GUI overlays MTA menu (Talidan) - resolved.
+- 0005640: [Server] Mention the help command when starting a server (ccw) - resolved.
+- 0005424: [Server] [Request] Additional resource monitoring functions (ccw) - resolved.
+- 0005391: [General] Secondary command binds don't function properly (Flobu) - resolved.
+- 0004368: [GUI / Menus / Console] server is added to recently played list when not being fully connected (Cazomino05) - resolved.
+- 0005444: [Server] getVehicleOccupants crashes the side it's called on when used on a truck trailer or any train (Gamesnert) - resolved.
+- 0005437: [Server] Several Network problems - resolved.
+- 0005559: [Client] Weird Network Trouble Behavior - resolved.
+- 0005084: [Client] Connecting to server using the server browser doesn't work. (ccw) - resolved.
 - 0005435: [Server] Download Error still occurs (ccw) - resolved.
 - 0005197: [Server] Dots in resource file names can cause issues (ccw) - resolved.
-- 0005455: [Client] MTA crash dumps (ccw) - resolved.
-- 0005162: [Server] Download timeouts caused by temporary internal web server failure (ccw) - resolved.
-- 0005445: [Client] MTA is crashing every 30-60 minutes (ccw) - resolved.
 - 0005372: [Client] MTA Nightlys stopped working with Wine (ccw) - resolved.
 - 0005394: [Server] Many accounts delays server to be ready (ccw) - resolved.
-- 0005392: [Server] Banlist gets reset after "ERROR: Could not start HTTP server on interface" message (ccw) - resolved.
-- 0005388: [Scripting] projectiles can exist forever (ccw) - resolved.
 - 0005389: [Server] Download Resources not allocatable (ccw) - resolved.
-- 0005084: [Client] Connecting to server using the server browser doesn't work. (ccw) - resolved.
 - 0005026: [Client] Improve serial algorithm to reduce duplicates (ccw) - resolved.
-- 0005396: [Client] F11 Map has no texture (ccw) - resolved.
-- 0005372: [Client] MTA Nightlys stopped working with Wine (ccw) - resolved.
 - 0005371: [Client] guiGridListSetItemText doesn't remove the section row type (Flobu) - resolved.
 - 0005368: [General] Opening a local server after disconnection causes a net.dll VS Runtime Error (ccw) - resolved.
 - 0005370: [Scripting] Script error output does not always return the valid filename. (Flobu) - resolved.
@@ -51,10 +213,9 @@ Targets:
 - 0005168: [General] Optimize colshapes (ccw) - resolved.
 - 0005167: [General] Make model loading asynchronous (ccw) - resolved.
 - 0005297: [GUI / Menus / Console] Saving browse servers filters does still not work. (Cazomino05) - resolved.
-- 0004374: [Client] singleplayer is started when minimizing mta on loading screen (sebassje) - resolved.
+- 0004374: [Client] singleplayer is started when minimizing mta on loading screen (x86) - resolved.
 - 0004458: [Scripting] isPedInVehicle delay (IJs) - resolved.
 - 0005302: [Scripting] Not working correctly function getCancelReason (Cazomino05) - resolved.
-- 0004368: [GUI / Menus / Console] server is added to recently played list when not being fully connected (Cazomino05) - resolved.
 - 0005307: [Server] the "onElementClicked" event seems to be broken (mabako) - resolved.
 - 0005304: [Scripting] [Request] client- and serverside isVehicleDamageProof ( vehicle ) (Flobu) - resolved.
 - 0005298: [Scripting] [Request] clientside getCommandsBoundToKey, getKeyBoundToCommand (Flobu) - resolved.
@@ -68,11 +229,10 @@ Targets:
 - 0005284: [Client] Crash on click on a button... (ccw) - resolved.
 - 0005258: [Client] Drawing part of an image using dxDrawImage (ccw) - resolved.
 - 0005093: [GUI / Menus / Console] chatbox/debugview scrolling keys should be bindable (Flobu) - resolved.
-- 0005164: [Server] TEAMCHAT log line on cancelled onPlayerChat event. (sebassje) - resolved.
+- 0005164: [Server] TEAMCHAT log line on cancelled onPlayerChat event. (x86) - resolved.
 - 0004525: [Scripting] Request: getVehiclePassengers() (Flobu) - resolved.
 - 0005275: [Server] [Request] a function to set the ASE player score (ccw) - resolved.
 - 0005269: [Client] 1.0.4 Custom - Flobu's Build: Default Handling Is Incorrect. (Flobu) - resolved.
-- 0005197: [Server] Dots in resource file names can cause issues (mabako) - resolved.
 - 0005259: [GUI / Menus / Console] dxGetTextWidth returns text width if it was one line, not the longest line's width (mabako) - resolved.
 - 0005264: [Scripting] [Request and Patch] a function to set the sound speed (Flobu) - resolved.
 - 0005265: [GUI / Menus / Console] [request and patch] remember dynamic hosts (Flobu) - resolved.
@@ -96,7 +256,7 @@ Targets:
 - 0005206: [Server] ml_base doesn't compile (mabako) - resolved.
 - 0003957: [Scripting] XML functions sometimes return bad root node (mabako) - resolved.
 - 0005134: [GUI / Menus / Console] Sorting in server browser is not done properly when sorting by 'host' (mabako) - resolved.
-- 0004080: [GUI / Menus / Console] More settings in the Video tab (sebassje) - resolved.
+- 0004080: [GUI / Menus / Console] More settings in the Video tab (x86) - resolved.
 - 0005244: [Vehicles] vehicle change pickup loads default vehicle models instead of custom models randomly (Flobu) - resolved.
 - 0005248: [GUI] Make the recently played servers in chronological order (Flobu) - resolved.
 - 0005166: [Server] scriptdebuglogfile and acl settings in mtaserver.conf are ignored (ccw) - resolved.
@@ -106,22 +266,23 @@ Targets:
 - 0004480: [Client] Add color argument to guiGridListSetItemText() (mabako) - resolved.
 - 0005180: [Server] Would it be more logical to have the server compile to the same place as the client? (ccw) - resolved.
 - 0005086: [Client] Functions to get an idea of the chatbox layout. (Flobu) - resolved.
-- 0005194: [Client] Disable Auto-Refreshing When Clicked On "Browse Servers" (sebassje) - resolved.
-- 0005220: [Server] isPedDoingGangDriveby returns 1 and 0 in server-side instead of 'true' and 'false' (sebassje) - resolved.
+- 0005194: [Client] Disable Auto-Refreshing When Clicked On "Browse Servers" (x86) - resolved.
+- 0005220: [Server] isPedDoingGangDriveby returns 1 and 0 in server-side instead of 'true' and 'false' (x86) - resolved.
 - 0005178: [Client] Dual Monitors Delivers Dialog For Resolutions (ccw) - resolved.
 - 0005209: [Client] GUI buttons stop to work (onClientGUIClick event dont work AT ALL) (ccw) - resolved.
 - 0005193: [Vehicles] Fatal Error (6) caused by vehicle ID 611 (ccw) - resolved.
 - 0005202: [GUI / Menus / Console] GUI grid list construction in Lua is slow (ccw) - resolved.
-- 0004282: [Scripting] GUI overlays MTA menu (Talidan) - resolved.
 - 0004927: [Client] unbindKey with command binds not unbinding correctly (multiple keys, same command with different params) (mabako) - resolved.
 - 0005185: [Server] nick command can set invalid (too long) nicks (ccw) - resolved.
 - 0005081: [General] 1920x1080 resultion not available (Arc) - resolved.
 - 0005145: [Server] createMarker crashes the server if called within a collision event handler (ccw) - resolved.
 - 0004937: [Client] Stealth kill victims turn to south (IJs) - resolved.
 - 0005031: [Server] 1.0.1 Linux build fails during json-c compilation (IJs) - resolved.
+- 0005082: [General] Reenable the vid command (ccw) - closed.
 
 Resources:
 
+- 0004880: [Map Editor] Race gamemode checkpoints not working in Map editor's test mode - resolved.
 - 0005315: [Resources] Race: ghostmode if spectate was started during kill (Flobu) - resolved.
 - 0005339: [Optional] freeroam: add setJetpackMaxHeight 9001 (Flobu) - resolved.
 - 0005153: [Required] Admin: 'Add Object' button in acl editor does not work (Flobu) - resolved.
@@ -162,7 +323,7 @@ Resources:
 
 Multi Theft Auto : San Andreas - 1.0.2
 ======================================
-Goal: Stability bugfix releas
+Goal: Stability bugfix release
 
 Targets:
 * Fixes for major, high-priority issues and crashes that are present in version 1.0.1 and are degrading the stability of the software
