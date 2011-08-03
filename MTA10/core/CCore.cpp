@@ -1625,19 +1625,7 @@ void CCore::UpdateRecentlyPlayed()
         CServerList* pRecentList = pServerBrowser->GetRecentList ();
         pRecentList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
         pRecentList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET, true );
-
-        // Update our address history if need be
-        if (    pServerBrowser->m_bManualConnect 
-             && strHost == pServerBrowser->m_strManualHost  
-             && uiPort == pServerBrowser->m_usManualPort
-           )
-        {
-            CServerList* pHistoryList = pServerBrowser->GetHistoryList ();
-            pHistoryList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
-            pHistoryList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET ); 
-            pServerBrowser->CreateHistoryList();
-        }
-        
+       
         pServerBrowser->SaveRecentlyPlayedList();
         if ( !m_pConnectManager->m_strLastPassword.empty() )
             pServerBrowser->SetServerPassword ( strHost + ":" + SString("%u",uiPort), m_pConnectManager->m_strLastPassword );

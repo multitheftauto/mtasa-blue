@@ -37,6 +37,7 @@ public:
     virtual int                 GetItemIndex                 ( CGUIListItem* pItem ) = 0;
     virtual void                Clear                        ( void ) = 0;
     virtual void                SetSelectionHandler          ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetDropListRemoveHandler     ( GUI_CALLBACK Callback ) = 0;
     virtual void                ShowDropList                 ( void ) = 0;
     virtual void                HideDropList                 ( void ) = 0;
 };
