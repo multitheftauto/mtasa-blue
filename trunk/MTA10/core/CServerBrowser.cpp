@@ -147,6 +147,40 @@ CServerBrowser::CServerBrowser ( void )
     OnAddressFocused ( m_pTopWindow );
     OnSearchDefocused ( m_pTopWindow );
     OnAddressDefocused ( m_pTopWindow );
+
+    // HelpWindow
+	m_bFocusTextEdit = false;
+    CVector2D helpPos;
+    helpPos.fX = resolution.fX * ( 512 / 1024.f );
+    helpPos.fY = widgetPosition.fY + ( 115 - 58 );
+
+    m_pHelpWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "" ) );
+    m_pHelpWindow->SetMovable ( false );
+    m_pHelpWindow->SetPosition ( helpPos );
+    m_pHelpWindow->SetSize ( CVector2D ( 300, 150 ) );
+    m_pHelpWindow->SetAlwaysOnTop ( true );
+    m_pHelpWindow->SetFrameEnabled ( false );
+    m_pHelpWindow->SetTitlebarEnabled ( false );
+    m_pHelpWindow->SetCloseButtonEnabled ( false );
+    m_pHelpWindow->SetVisible ( false );
+
+    // HelpWindow Label
+    m_pHelpLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pHelpWindow, "" ) );
+    m_pHelpLabel->SetPosition ( CVector2D ( 0, 0 ) );
+    m_pHelpLabel->SetSize ( CVector2D ( 300, 150 ) );
+    m_pHelpLabel->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+    m_pHelpLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+    m_pHelpLabel->SetProperty( "BackgroundEnabled", "True" );
+    m_pHelpLabel->SetProperty( "BackgroundColours", "tl:FFFF00FF tr:FFFF0000 bl:00FF0000 br:FF00FF00" );
+
+    SString strHelpMessage =
+                        "FOR QUICK CONNECT:\n"
+                        "\n"
+                        "Type the address and port into the address bar\n"
+                        "Or select a server from the history list\n"
+                        "and press 'Connect'";
+
+    m_pHelpLabel->SetText ( strHelpMessage );
 }
 
 
@@ -229,6 +263,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pComboAddressHistory [ type ]->SetSize ( CVector2D ( fWidth, 200 ), false );
     m_pComboAddressHistory [ type ]->SetReadOnly ( true );
     m_pComboAddressHistory [ type ]->SetSelectionHandler ( GUI_CALLBACK ( &CServerBrowser::OnHistorySelected, this ) );
+    m_pComboAddressHistory [ type ]->SetDropListRemoveHandler ( GUI_CALLBACK ( &CServerBrowser::OnHistoryDropListRemove, this ) );
 
     // Connect button + icon
 	fX = fX + fWidth + SB_SMALL_SPACER;
@@ -481,6 +516,14 @@ void CServerBrowser::Update ( void )
 {
     ServerBrowserType Type = GetCurrentServerBrowserType ();
     CServerList *pList = GetServerList ( Type );
+
+    if ( m_bFocusTextEdit )
+    {
+        m_bFocusTextEdit = false;
+        // Focus the text edit
+        m_pEditAddress [ Type ]->Activate ();
+        m_pEditAddress [ Type ]->SetCaratAtEnd ();
+    }
 
     // Update the current server list class
     if ( IsVisible () )
@@ -1015,26 +1058,22 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     // Start the connect
     if ( CCore::GetSingleton ().GetConnectManager ()->Connect ( strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str() ) )
     {
-        // If we connected to a server that wasn't selected in the server list, it was manually entered
-        for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
-        {
-            int iSelectedItem = m_pServerList[i]->GetSelectedItemRow();
-            if ( iSelectedItem != -1 )
-            {
-                CServerListItem* pServer = (CServerListItem*)m_pServerList[i]->GetItemData(iSelectedItem,DATA_PSERVER);
-                if ( pServer->strHost == strHost && pServer->usGamePort == usPort )
-                {
-                    m_bManualConnect = false;
-                    return true;
-                }
-            }
-        }
+        // If the connect button was pressed, at the server to the history
 
-        // It was manually entered, so let's store some info for it.
-        // This info is then used after successful connection to put it into history
-        m_bManualConnect = true;
-        m_strManualHost = strHost;
-        m_usManualPort = usPort;
+        in_addr Address;
+        if ( CServerListItem::Parse ( strHost.c_str(), Address ) )
+        {
+            CServerList* pHistoryList = this->GetHistoryList ();
+            pHistoryList->Remove ( Address, usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+            pHistoryList->AddUnique ( Address, usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+            while ( pHistoryList->GetServerCount () > 11 )
+            {
+                CServerListItem* pLast = *pHistoryList->IteratorBegin ();
+                pHistoryList->Remove ( pLast->Address, pLast->usQueryPort );
+            }
+            this->CreateHistoryList();
+        	this->SaveRecentlyPlayedList();
+        }
     }
     return true;
 }
@@ -1206,6 +1245,50 @@ bool CServerBrowser::OnHistorySelected ( CGUIElement* pElement )
     SetAddressBarText ( "mtasa://" + strHistoryText );
     return true;
 }
+
+
+bool CServerBrowser::OnHistoryDropListRemove ( CGUIElement* pElementx )
+{
+    m_pHelpWindow->SetVisible ( false );
+
+    // Grab our cursor position
+    tagPOINT cursor;
+    GetCursorPos ( &cursor );
+    
+    HWND hookedWindow = CCore::GetSingleton().GetHookedWindow();
+
+    tagPOINT windowPos = { 0 };
+    ClientToScreen( hookedWindow, &windowPos );
+
+    CVector2D vecResolution = CCore::GetSingleton ().GetGUI ()->GetResolution ();
+    cursor.x -= windowPos.x;
+    cursor.y -= windowPos.y;
+
+    // Calc screen position of edit control
+    CGUIEdit* pEdit = m_pEditAddress [ 0 ];
+    CVector2D pos;
+    CVector2D size;
+    pEdit->GetPosition ( pos );
+    pEdit->GetSize ( size );
+
+    for ( CGUIElement* pElement = pEdit->GetParent () ; pElement ; pElement = pElement->GetParent () )
+    {
+        CVector2D parpos;
+        pElement->GetPosition ( parpos );
+        pos += parpos;
+    }
+    pos.fY += 24;
+
+    // See if cursor is over edit control
+    if ( cursor.x > pos.fX)
+        if ( cursor.x < pos.fX + size.fX )
+            if ( cursor.y > pos.fY)
+                if ( cursor.y < pos.fY + size.fY )
+                    m_bFocusTextEdit = true;    // Focus the text edit next frame
+
+    return true;
+}
+
 
 bool CServerBrowser::OnSearchTypeSelected ( CGUIElement* pElement )
 {
@@ -1897,10 +1980,13 @@ void CServerBrowser::SetNextHistoryText ( bool bDown )
 
 void CServerBrowser::OnQuickConnectButtonClick ( void )
 {
-    // Switch to LAN tab
+    // Switch to LAN tab, TODO: don't save it as selected
     m_pPanel->SetSelectedTab ( m_pTab [ ServerBrowserTypes::LAN ] );
 
-    // Focus the text edit
-    m_pEditAddress [ ServerBrowserTypes::LAN ]->Activate ();
-    m_pEditAddress [ ServerBrowserTypes::LAN ]->SetCaratAtEnd ();
+    // Show history
+    m_pComboAddressHistory [ ServerBrowserTypes::LAN ]->ShowDropList ();
+
+    // Show help text
+    m_pHelpWindow->SetVisible ( true );
+    m_pHelpWindow->BringToFront ();
 }

@@ -125,10 +125,6 @@ protected:
     const char*         m_szSearchTypePath[ SearchTypes::MAX_SEARCH_TYPES ];
     CGUIStaticImage*    m_pSearchIcons[ SearchTypes::MAX_SEARCH_TYPES ];
 
-    bool                m_bManualConnect;
-    std::string         m_strManualHost;
-    unsigned int        m_usManualPort;
-
     CVector2D           m_WidgetSize;
 
     // Window widgets
@@ -223,6 +219,8 @@ private:
     bool                    OnFilterChanged                 ( CGUIElement* pElement );
     bool                    OnTabChanged                    ( CGUIElement* pElement );
     bool                    OnHistorySelected               ( CGUIElement* pElement );
+    bool                    OnHistoryDropListRemove         ( CGUIElement* pElement );
+
     bool                    OnSearchTypeSelected            ( CGUIElement* pElement );
 
     bool					OnSearchFocused					( CGUIElement* pElement );
@@ -244,6 +242,10 @@ private:
     ServerBrowserType       m_PrevServerBrowserType;
 
     std::map < SString, int > m_blockedVersionMap;
+
+	CGUIWindow* 			m_pHelpWindow;
+	CGUILabel* 				m_pHelpLabel;
+	bool 					m_bFocusTextEdit;
 };
 
 #endif
