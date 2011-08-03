@@ -180,6 +180,7 @@ protected:
 
     CGUILabel*          m_pServerListStatus [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIButton*         m_pButtonBack [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIButton*         m_pButtonGeneralHelp [ SERVER_BROWSER_TYPE_COUNT ];
 
     // Server list columns
     CGUIHandle          m_hVersion [ SERVER_BROWSER_TYPE_COUNT ];
@@ -215,6 +216,8 @@ private:
     bool                    OnInfoClick                     ( CGUIElement* pElement );
     bool                    OnFavouritesClick               ( CGUIElement* pElement );
     bool                    OnBackClick                     ( CGUIElement* pElement );
+    bool                    OnGeneralHelpClick              ( CGUIElement* pElement );
+    bool                    OnGeneralHelpDeactivate         ( CGUIElement* pElement );
     bool                    OnAddressChanged                ( CGUIElement* pElement );
     bool                    OnFilterChanged                 ( CGUIElement* pElement );
     bool                    OnTabChanged                    ( CGUIElement* pElement );
@@ -229,6 +232,7 @@ private:
     bool					OnAddressDefocused				( CGUIElement* pElement );
 
     ServerBrowserType       GetCurrentServerBrowserType     ( void );
+    ServerBrowserType       GetCurrentServerBrowserTypeForSave ( void );
 
     CServerListInternet     m_ServersInternet;
     CServerListLAN          m_ServersLAN;
@@ -243,9 +247,14 @@ private:
 
     std::map < SString, int > m_blockedVersionMap;
 
-	CGUIWindow* 			m_pHelpWindow;
-	CGUILabel* 				m_pHelpLabel;
+	CGUIWindow* 			m_pQuickConnectHelpWindow;
 	bool 					m_bFocusTextEdit;
+
+    uint                    m_uiShownQuickConnectHelpCount;
+    uint                    m_uiIsUsingTempTab;
+    ServerBrowserType       m_BeforeTempServerBrowserType;
+    CGUIWindow*             m_pGeneralHelpWindow;
+    long long               m_llLastGeneralHelpTime;
 };
 
 #endif
