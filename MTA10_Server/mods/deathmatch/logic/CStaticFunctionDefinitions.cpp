@@ -8261,6 +8261,13 @@ unsigned int CStaticFunctionDefinitions::GetMaxPlayers ( void )
     return m_pMainConfig->GetMaxPlayers ();
 }
 
+bool CStaticFunctionDefinitions::SetMaxPlayers ( unsigned int uiMax )
+{
+    if ( uiMax > m_pMainConfig->GetHardMaxPlayers() )
+        return false;
+    m_pMainConfig->SetSoftMaxPlayers ( uiMax );
+    return true;
+}
 
 bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded )
 {

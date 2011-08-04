@@ -9099,6 +9099,22 @@ int CLuaFunctionDefinitions::GetMaxPlayers ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetMaxPlayers ( lua_State* luaVM )
+{
+    if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
+    {
+        int value = static_cast < int > ( lua_tonumber ( luaVM, 1 ) );
+        if ( value > 0 )
+        {
+            lua_pushboolean ( luaVM, CStaticFunctionDefinitions::SetMaxPlayers ( static_cast < unsigned int > ( value ) ) );
+            return 1;
+        }
+    }
+
+    m_pScriptDebugging->LogBadType ( luaVM, "outputChatBox" );
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
 {

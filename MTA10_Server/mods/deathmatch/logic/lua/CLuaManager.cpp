@@ -578,6 +578,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Server standard funcs
     CLuaCFunctions::AddFunction ( "getMaxPlayers", CLuaFunctionDefinitions::GetMaxPlayers );
+    CLuaCFunctions::AddFunction ( "setMaxPlayers", CLuaFunctionDefinitions::SetMaxPlayers );
     CLuaCFunctions::AddFunction ( "outputChatBox", CLuaFunctionDefinitions::OutputChatBox );
     CLuaCFunctions::AddFunction ( "outputConsole", CLuaFunctionDefinitions::OutputConsole );
     CLuaCFunctions::AddFunction ( "outputDebugString", CLuaFunctionDefinitions::OutputDebugString );

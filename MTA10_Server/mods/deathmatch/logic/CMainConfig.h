@@ -43,6 +43,8 @@ public:
     std::string                     GetServerIP                     ( void );
     unsigned short                  GetServerPort                   ( void );
     unsigned int                    GetMaxPlayers                   ( void );
+    unsigned int                    GetHardMaxPlayers               ( void );
+    void                            SetSoftMaxPlayers               ( unsigned int v ) { m_uiSoftMaxPlayers = v; }
     inline bool                     IsHTTPEnabled                   ( void )        { return m_bHTTPEnabled; };
 
     bool                            IsValidPassword                 ( const char* szPassword, unsigned int& cUnsupportedIndex );
@@ -95,6 +97,7 @@ private:
     std::string                     m_strServerName;
     unsigned short                  m_usServerPort;
     unsigned int                    m_uiMaxPlayers;
+    unsigned int                    m_uiSoftMaxPlayers;
     bool                            m_bHTTPEnabled;
     std::string                     m_strPassword;
     bool                            m_bAseEnabled;

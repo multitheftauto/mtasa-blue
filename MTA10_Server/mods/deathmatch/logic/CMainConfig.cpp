@@ -123,6 +123,7 @@ bool CMainConfig::Load ( const char* szFilename )
     if ( iResult == IS_SUCCESS )
     {
         m_uiMaxPlayers = iTemp;
+        m_uiSoftMaxPlayers = m_uiMaxPlayers;
     }
     else
     {
@@ -612,12 +613,17 @@ unsigned short CMainConfig::GetServerPort ( void )
     return m_usServerPort;
 }
 
-unsigned int CMainConfig::GetMaxPlayers ( void )
+unsigned int CMainConfig::GetHardMaxPlayers ( void )
 {
     unsigned int uiMaxPlayers;
     if ( m_pCommandLineParser && m_pCommandLineParser->GetMaxPlayers ( uiMaxPlayers ) )
         return uiMaxPlayers;
     return m_uiMaxPlayers;
+}
+
+unsigned int CMainConfig::GetMaxPlayers ( void )
+{
+    return SharedUtil::Min ( GetHardMaxPlayers(), m_uiSoftMaxPlayers );
 }
 
 unsigned short CMainConfig::GetHTTPPort ( void )
