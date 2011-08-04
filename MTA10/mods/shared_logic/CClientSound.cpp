@@ -174,9 +174,7 @@ void CClientSound::PlayStream ( const SString& strURL, bool bLoop, bool b3D, con
     // Stream the file in a seperate thread to don't interupt the game
     assert ( !m_bUsingVars );
     m_bUsingVars = true;
-    m_VarsCriticalSection.Lock ();
     m_Vars.pThread = CreateThread ( NULL, 0, reinterpret_cast <LPTHREAD_START_ROUTINE> ( &CClientSound::PlayStreamIntern ), pArguments, 0, NULL );
-    m_VarsCriticalSection.Unlock ();
 }
 
 void CClientSound::PlayStreamIntern ( void* arguments )
