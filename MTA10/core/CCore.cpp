@@ -1824,6 +1824,14 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 
 
 //
+// OnDeviceRestore
+//
+void CCore::OnDeviceRestore ( void )
+{
+    m_bDidRestore = true;
+}
+
+//
 // OnPreHUDRender
 //
 void CCore::OnPreHUDRender ( void )
@@ -1845,7 +1853,8 @@ void CCore::OnPreHUDRender ( void )
     CGraphics::GetSingleton ().GetRenderItemManager ()->UpdateBackBufferCopy ();
 
     // Handle script stuffs
-    m_pModManager->DoPulsePreHUDRender ();  
+    m_pModManager->DoPulsePreHUDRender ( m_bDidRestore );
+    m_bDidRestore = false;
 
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();

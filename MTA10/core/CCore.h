@@ -219,6 +219,7 @@ public:
     void                    SetXfireData                    ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount );
 
     void                    OnPreHUDRender                  ( void );
+    void                    OnDeviceRestore                 ( void );
 
 private:
     // Core devices.
@@ -243,6 +244,7 @@ private:
     CTCPManager *               m_pTCPManager;
 
     bool                        m_bLastFocused;
+    bool                        m_bDidRestore;
 
     // Module loader objects.
     CModuleLoader               m_GameModule;

@@ -186,7 +186,7 @@ public:
     inline bool                         IsLocalGame                     ( ) const { return m_bLocalPlay; }
 
     void                                DoPulsePreFrame                 ( void );
-    void                                DoPulsePreHUDRender             ( void );
+    void                                DoPulsePreHUDRender             ( bool bDidRestore );
     void                                DoPulsePostFrame                ( void );
     void                                DoPulses                        ( void );
 
@@ -599,7 +599,7 @@ private:
 
     bool                                m_bBeingDeleted;        // To enable speedy disconnect
 
-    uint                                m_uiNotPulsedCounter;
+    bool                                m_bWasMinimized;
 
     // Cache for speeding up collision processing
 public:

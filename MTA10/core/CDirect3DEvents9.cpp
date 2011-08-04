@@ -92,6 +92,8 @@ void CDirect3DEvents9::OnRestore ( IDirect3DDevice9 *pDevice )
 
     // Restore the graphics manager
     CGraphics::GetSingleton ().OnDeviceRestore ( pDevice );
+
+    CCore::GetSingleton ().OnDeviceRestore ();
 }
 
 void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
