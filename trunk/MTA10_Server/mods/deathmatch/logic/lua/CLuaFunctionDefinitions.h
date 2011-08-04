@@ -402,6 +402,7 @@ public:
 
     // Standard server functions
     static int      GetMaxPlayers                       ( lua_State* luaVM );
+    static int      SetMaxPlayers                       ( lua_State* luaVM );
     static int      OutputChatBox                       ( lua_State* luaVM );
     static int      OutputConsole                       ( lua_State* luaVM );
     static int      OutputDebugString                   ( lua_State* luaVM );
