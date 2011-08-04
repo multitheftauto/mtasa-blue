@@ -161,8 +161,15 @@ const char* CGUIComboBox_Impl::GetItemText ( int index )
 {
     try
     {
-        CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
-        return pItem->getText( ).c_str( );
+        if( index == -1 )
+        {
+            return m_pWindow->getText( ).c_str( );
+        }
+        else
+        {
+            CEGUI::ListboxItem* pItem = reinterpret_cast < CEGUI::Combobox* > ( m_pWindow ) ->getListboxItemFromIndex ( index );
+            return pItem->getText( ).c_str( );
+        }
     }
     catch(...)
     {
