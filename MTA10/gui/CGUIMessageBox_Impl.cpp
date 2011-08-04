@@ -56,6 +56,8 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
     m_pLabelCaption->SetSize ( CVector2D ( MESSAGEBOX_WIDTH - MESSAGEBOX_ICON_SIZE - MESSAGEBOX_SPACER * 3, MESSAGEBOX_HEIGHT - MESSAGEBOX_SPACER * 2 ) );
     m_pLabelCaption->SetHorizontalAlign ( CGUI_ALIGN_LEFT_WORDWRAP );
     m_pLabelCaption->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+    m_pLabelCaption->MoveToBack();
+    m_pLabelCaption->SetZOrderingEnabled( false );
 
     // Create buttons
     if ( uiFlags & MB_BUTTON_OK ) {
