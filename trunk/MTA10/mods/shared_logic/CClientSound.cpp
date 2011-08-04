@@ -35,7 +35,7 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : ClassIni
     m_fVolume = 1.0f;
     m_fDefaultFrequency = 44100.0f;
     m_fMinDistance = 5.0f;
-    m_fMaxDistance = 200.0f;
+    m_fMaxDistance = 20.0f;
     m_fPlaybackSpeed = 1.0f;
     m_usDimension = 0;
     m_b3D = false;
@@ -578,7 +578,7 @@ bool CClientSound::IsFxEffectEnabled ( int iFxEffect )
     return m_FxEffects[iFxEffect] ? true : false;
 }
 
-void CClientSound::Process3D ( CVector vecPosition, CVector vecLookAt )
+void CClientSound::Process3D ( CVector vecPosition, CVector vecCameraPosition, CVector vecLookAt )
 {
     // Handle results from other threads
     if ( m_bUsingVars )
@@ -611,8 +611,8 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecLookAt )
     else
     {
         // Pan
-        CVector vecLook = vecLookAt - vecPosition;
-        CVector vecSound = m_vecPosition - vecPosition;
+        CVector vecLook = vecLookAt - vecCameraPosition;
+        CVector vecSound = m_vecPosition - vecCameraPosition;
         vecLook.fZ = vecSound.fZ = 0.0f;
         vecLook.Normalize ();
         vecSound.Normalize ();
@@ -632,9 +632,16 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecLookAt )
         if ( fDistance <= m_fMinDistance )
             fVolume = 1.0f;
         else if ( fDistance >= m_fMaxDistance )
+        {
             fVolume = 0.0f;
+            SetPaused( true ); // Actually pause it here ( hopefully BASS stops streaming radio streams! )
+            return;
+        }
         else
             fVolume = exp ( - ( fDistance - m_fMinDistance ) * ( CUT_OFF / fDistDiff ) );
+
+        if ( IsPaused() )
+            SetPaused( false );
     }
 
     BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_VOL, fVolume * m_fVolume );

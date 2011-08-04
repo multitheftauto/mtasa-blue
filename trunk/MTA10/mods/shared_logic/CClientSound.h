@@ -110,7 +110,7 @@ public:
 protected:
 
     DWORD                   GetSound                ( void )                            { return m_pSound; };
-    void                    Process3D               ( CVector vecPosition, CVector vecLookAt );
+    void                    Process3D               ( CVector vecPosition, CVector vecCameraPosition, CVector vecLookAt );
 
 private:
 
