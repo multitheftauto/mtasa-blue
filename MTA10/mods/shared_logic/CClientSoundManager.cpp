@@ -66,16 +66,29 @@ void CClientSoundManager::DoPulse ( void )
 
     CClientCamera* pCamera = m_pClientManager->GetCamera();
 
-    CVector vecPosition, vecLookAt, vecFront, vecVelocity;
-    pCamera->GetPosition ( vecPosition );
+    CVector vecCameraPosition, vecPosition, vecLookAt, vecFront, vecVelocity;
+    pCamera->GetPosition ( vecCameraPosition );
     pCamera->GetTarget ( vecLookAt );
-    vecFront = vecLookAt - vecPosition;
+    vecFront = vecLookAt - vecCameraPosition;
 
     CClientPlayer* p_LocalPlayer = m_pClientManager->GetPlayerManager()->GetLocalPlayer();
     if ( p_LocalPlayer )
+    {
         p_LocalPlayer->GetMoveSpeed( vecVelocity );
 
-    BASS_3DVECTOR pos ( vecPosition.fX, vecPosition.fY, vecPosition.fZ );
+        if ( pCamera->IsInFixedMode() )
+            vecPosition = vecCameraPosition;
+        else
+            p_LocalPlayer->GetPosition( vecPosition );
+
+    }
+    else
+    {
+        // Make sure the players position at least has something (I'd be surprised if we get here though)
+        vecPosition = vecCameraPosition;
+    }
+
+    BASS_3DVECTOR pos ( vecCameraPosition.fX, vecCameraPosition.fY, vecCameraPosition.fZ );
     BASS_3DVECTOR vel ( vecVelocity.fX, vecVelocity.fY, vecVelocity.fZ );
     BASS_3DVECTOR front ( vecFront.fX, vecFront.fY, vecFront.fZ );
     BASS_3DVECTOR top ( 0, 0, -1 );
@@ -87,7 +100,7 @@ void CClientSoundManager::DoPulse ( void )
     list < CClientSound* > ::iterator iter = m_Sounds.begin ();
     for ( ; iter != m_Sounds.end () ; ++iter )
     {
-        (*iter)->Process3D ( vecPosition, vecLookAt );
+        (*iter)->Process3D ( vecPosition, vecCameraPosition, vecLookAt );
     }
 
     // Apply the 3D changes
