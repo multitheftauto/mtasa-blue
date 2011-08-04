@@ -258,11 +258,11 @@ void CModManager::DoPulsePreFrame ( void )
 }
 
 
-void CModManager::DoPulsePreHUDRender ( void )
+void CModManager::DoPulsePreHUDRender ( bool bDidRestore )
 {
     if ( m_pClientBase )
     {
-        m_pClientBase->PreHUDRenderExecutionHandler ();
+        m_pClientBase->PreHUDRenderExecutionHandler ( bDidRestore );
     }
 }
 

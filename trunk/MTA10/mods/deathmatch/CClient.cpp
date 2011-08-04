@@ -223,11 +223,11 @@ void CClient::PreFrameExecutionHandler ( void )
 }
 
 
-void CClient::PreHUDRenderExecutionHandler ( void )
+void CClient::PreHUDRenderExecutionHandler ( bool bDidRestore )
 {
     if ( g_pClientGame )
     {
-        g_pClientGame->DoPulsePreHUDRender ();
+        g_pClientGame->DoPulsePreHUDRender ( bDidRestore );
     }
 }
 

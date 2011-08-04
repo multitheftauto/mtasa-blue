@@ -129,7 +129,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_bCloudsEnabled = true;
 
-    m_uiNotPulsedCounter = 0;
+    m_bWasMinimized = false;
 
     #ifdef MTA_VOICE
     m_pVoice = VoiceCreate();
@@ -708,10 +708,17 @@ void CClientGame::SendVoiceData ( const unsigned char * pData, int len )
 #endif
 
 
-void CClientGame::DoPulsePreHUDRender ( void )
+void CClientGame::DoPulsePreHUDRender ( bool bDidRestore )
 {
     // Allow scripted dxSetRenderTarget
     g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
+
+    // If appropriate, call onClientRestore
+    if ( bDidRestore )
+    {
+        CLuaArguments Arguments;
+        m_pRootEntity->CallEvent ( "onClientRestore", Arguments, false );
+    }
 
     // Call onClientHUDRender LUA event
     CLuaArguments Arguments;
@@ -879,12 +886,7 @@ void CClientGame::DoPulsePostFrame ( void )
     {
         m_pRadarMap->DoRender ();
         m_pManager->DoRender ();
-
-        // ..if no one else is doing it
-        if ( m_uiNotPulsedCounter > 1 )
-            DoPulses ();
-        else
-            m_uiNotPulsedCounter++;
+        DoPulses ();
     }
 }
 
@@ -2644,6 +2646,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPreRender", "", NULL, false );
     m_Events.AddEvent ( "onClientHUDRender", "", NULL, false );
     m_Events.AddEvent ( "onClientRender", "", NULL, false );
+    m_Events.AddEvent ( "onClientMinimize", "", NULL, false );
+    m_Events.AddEvent ( "onClientRestore", "", NULL, false );
 
     // Cursor events
     m_Events.AddEvent ( "onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false );
@@ -3531,20 +3535,6 @@ void CClientGame::Render3DStuffHandler ( void )
 
 void CClientGame::PreWorldProcessHandler ( void )
 {
-#if 0
-    // If we are not minimized we do the pulsing here
-    if ( !g_pCore->IsWindowMinimized () )
-    {
-        int iVal;
-        g_pCore->GetCVars ()->Get ( "code_path", iVal );
-        if ( iVal )
-        {
-            // Pulse here instead to see if it reduces anim crashes
-            m_uiNotPulsedCounter = 0;
-            DoPulses ();
-        }
-    }
-#endif
 }
 
 void CClientGame::PostWorldProcessHandler ( void )
@@ -3571,10 +3561,19 @@ void CClientGame::IdleHandler ( void )
     // If we are minimized we do the pulsing here
     if ( g_pCore->IsWindowMinimized() )
     {
+        if ( !m_bWasMinimized )
+        {
+            m_bWasMinimized = true;
+            // Call onClientMinimize LUA event
+            CLuaArguments Arguments;
+            m_pRootEntity->CallEvent ( "onClientMinimize", Arguments, false );
+        }
         m_pRadarMap->DoRender ();
         m_pManager->DoRender ();
         DoPulses ();
     }
+    else
+        m_bWasMinimized = false;
 }
 
 
