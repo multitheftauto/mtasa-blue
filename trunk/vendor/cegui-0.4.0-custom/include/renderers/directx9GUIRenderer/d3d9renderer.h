@@ -253,6 +253,7 @@ public:
 	*/
 	void	setDisplaySize(const Size& sz);
 
+    virtual void NotifyImageInvalid ( Image* const image );
 
 private:
 	/************************************************************************
