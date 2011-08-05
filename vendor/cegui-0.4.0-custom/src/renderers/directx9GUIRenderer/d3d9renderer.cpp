@@ -161,6 +161,24 @@ void DirectX9Renderer::addQuad(const Rect& dest_rect, float z, const Texture* te
 }
 
 
+//
+//	Check quadlist has valid image items
+//
+void DirectX9Renderer::NotifyImageInvalid ( Image* const image )
+{
+	for (QuadList::iterator i = d_quadlist.begin(); i != d_quadlist.end(); )
+	{
+		const QuadInfo& quad = (*i);
+        if ( quad.image == image )
+        {
+            d_quadlist.erase ( i++ );
+        }
+        else
+            ++i;
+    }
+}
+
+
 /*************************************************************************
 	perform final rendering for all queued renderable quads.
 *************************************************************************/

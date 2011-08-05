@@ -367,6 +367,9 @@ public:
 
     virtual ResourceProvider* createResourceProvider(void);
 
+    // MTA extras
+    virtual void NotifyImageInvalid ( Image* const image ) = 0;
+
 protected:
 	/*************************************************************************
 		Construction and Destruction

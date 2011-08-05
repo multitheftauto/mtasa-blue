@@ -80,6 +80,7 @@ Image::Image(const Image& image) :
 *************************************************************************/
 Image::~Image(void)
 {
+    System::getSingleton().getRenderer ()->NotifyImageInvalid ( this );
 }
 
 
