@@ -205,6 +205,8 @@ CCore::CCore ( void )
     m_dLastTimeMs = 0;
     m_dPrevOverrun = 0;
     m_uiNewNickWaitFrames = 0;
+    m_iUnminimizeFrameCounter = 0;
+    m_bDidRecreateRenderTargets = false;
 }
 
 CCore::~CCore ( void )
@@ -1777,8 +1779,16 @@ void CCore::EnsureFrameRateLimitApplied ( void )
 //
 // Do FPS limiting
 //
+// This is called once a frame even if minimized
+//
 void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 {
+    // Non frame rate limit stuff
+    if ( IsWindowMinimized () )
+        m_iUnminimizeFrameCounter = 4;     // Tell script we have unminimized after a short delay
+
+
+    // Frame rate limit stuff starts here
     m_bDoneFrameRateLimit = true;
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
@@ -1828,8 +1838,10 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 //
 void CCore::OnDeviceRestore ( void )
 {
-    m_bDidRestore = true;
+    m_iUnminimizeFrameCounter = 4;     // Tell script we have restored after 4 frames to avoid double sends
+    m_bDidRecreateRenderTargets = true;
 }
+
 
 //
 // OnPreHUDRender
@@ -1853,8 +1865,13 @@ void CCore::OnPreHUDRender ( void )
     CGraphics::GetSingleton ().GetRenderItemManager ()->UpdateBackBufferCopy ();
 
     // Handle script stuffs
-    m_pModManager->DoPulsePreHUDRender ( m_bDidRestore );
-    m_bDidRestore = false;
+    if ( m_iUnminimizeFrameCounter-- && !m_iUnminimizeFrameCounter )
+    {
+        m_pModManager->DoPulsePreHUDRender ( true, m_bDidRecreateRenderTargets );
+        m_bDidRecreateRenderTargets = false;
+    }
+    else
+        m_pModManager->DoPulsePreHUDRender ( false, false );
 
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();

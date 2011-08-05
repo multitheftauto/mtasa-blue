@@ -244,7 +244,8 @@ private:
     CTCPManager *               m_pTCPManager;
 
     bool                        m_bLastFocused;
-    bool                        m_bDidRestore;
+    int                         m_iUnminimizeFrameCounter;
+    bool                        m_bDidRecreateRenderTargets;
 
     // Module loader objects.
     CModuleLoader               m_GameModule;

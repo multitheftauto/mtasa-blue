@@ -708,16 +708,18 @@ void CClientGame::SendVoiceData ( const unsigned char * pData, int len )
 #endif
 
 
-void CClientGame::DoPulsePreHUDRender ( bool bDidRestore )
+void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRenderTargets )
 {
     // Allow scripted dxSetRenderTarget
     g_pCore->GetGraphics ()->EnableSetRenderTarget ( true );
 
     // If appropriate, call onClientRestore
-    if ( bDidRestore )
+    if ( bDidUnminimize )
     {
         CLuaArguments Arguments;
+        Arguments.PushBoolean ( bDidRecreateRenderTargets );
         m_pRootEntity->CallEvent ( "onClientRestore", Arguments, false );
+        m_bWasMinimized = false;
     }
 
     // Call onClientHUDRender LUA event
@@ -3572,8 +3574,6 @@ void CClientGame::IdleHandler ( void )
         m_pManager->DoRender ();
         DoPulses ();
     }
-    else
-        m_bWasMinimized = false;
 }
 
 

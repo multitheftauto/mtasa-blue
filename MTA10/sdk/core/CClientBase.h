@@ -22,7 +22,7 @@ public:
     virtual void    ClientShutdown              ( void ) = 0;  
 
     virtual void    PreFrameExecutionHandler    ( void ) = 0;
-    virtual void    PreHUDRenderExecutionHandler ( bool bDidRestore ) = 0;
+    virtual void    PreHUDRenderExecutionHandler ( bool bDidUnminimize, bool bDidRecreateRenderTargets ) = 0;
     virtual void    PostFrameExecutionHandler   ( void ) = 0;
 
     virtual bool    ProcessCommand              ( const char* szCommandLine ) = 0;
