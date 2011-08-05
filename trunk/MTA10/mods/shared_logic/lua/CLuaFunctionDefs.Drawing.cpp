@@ -679,7 +679,7 @@ int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
             return 1;
         }
         else
-            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", "dxSetRenderTarget", "dxSetRenderTarget can only be used inside onClientRender" ) );
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", "dxSetRenderTarget", "dxSetRenderTarget can only be used inside certain events" ) );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetRenderTarget", *argStream.GetErrorMessage () ) );
