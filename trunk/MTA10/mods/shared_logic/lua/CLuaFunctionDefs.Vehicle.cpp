@@ -1239,6 +1239,21 @@ int CLuaFunctionDefs::FixVehicle ( lua_State* luaVM )
 
 int CLuaFunctionDefs::BlowVehicle ( lua_State* luaVM )
 {
+    // Read out whether to explode or not
+    bool bExplode = true;
+    int iArgument2 = lua_type ( luaVM, 2 );
+    if ( iArgument2 == LUA_TBOOLEAN )
+    {
+        bExplode = lua_toboolean ( luaVM, 2 ) ? true:false;
+    }
+    else if ( iArgument2 != LUA_TNONE )
+    {
+        m_pScriptDebugging->LogBadType ( luaVM, "blowVehicle" );
+
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
     // Verify the element pointer argument
     if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
     {
@@ -1246,7 +1261,7 @@ int CLuaFunctionDefs::BlowVehicle ( lua_State* luaVM )
         CClientEntity* pEntity = lua_toelement ( luaVM, 1 );
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::BlowVehicle ( *pEntity ) )
+            if ( CStaticFunctionDefinitions::BlowVehicle ( *pEntity, bExplode ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

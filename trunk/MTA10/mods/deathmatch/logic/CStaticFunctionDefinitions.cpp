@@ -2344,9 +2344,9 @@ bool CStaticFunctionDefinitions::FixVehicle ( CClientEntity& Entity )
 }
 
 
-bool CStaticFunctionDefinitions::BlowVehicle ( CClientEntity& Entity )
+bool CStaticFunctionDefinitions::BlowVehicle ( CClientEntity& Entity, bool bExplode )
 {
-    RUN_CHILDREN BlowVehicle ( **iter );
+    RUN_CHILDREN BlowVehicle ( **iter, bExplode );
 
     if ( IS_VEHICLE ( &Entity ) )
     {
