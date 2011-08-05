@@ -9111,7 +9111,7 @@ int CLuaFunctionDefinitions::SetMaxPlayers ( lua_State* luaVM )
         }
     }
 
-    m_pScriptDebugging->LogBadType ( luaVM, "outputChatBox" );
+    m_pScriptDebugging->LogBadType ( luaVM, "setMaxPlayers" );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
