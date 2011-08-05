@@ -27,7 +27,7 @@ public:
     void        ClientShutdown                  ( void );  
 
     void        PreFrameExecutionHandler        ( void );
-    void        PreHUDRenderExecutionHandler    ( bool bDidRestore );
+    void        PreHUDRenderExecutionHandler    ( bool bDidUnminimize, bool bDidRecreateRenderTargets );
     void        PostFrameExecutionHandler       ( void );
 
     bool        ProcessCommand                  ( const char* szCommandLine );
