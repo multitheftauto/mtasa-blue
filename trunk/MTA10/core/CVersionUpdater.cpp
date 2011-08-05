@@ -745,9 +745,47 @@ std::vector < SString > CVersionUpdater::MakeServerList ( const CDataInfoSet& da
             }
         }
 
+        // If servers have the same priority, keep one and put the other(s) at the back of the list
+        CDataInfoSet keepList;
+        CDataInfoSet tailList;
+        for ( int iFirst = 0 ; iFirst < iSize ; iFirst++ )
+        {
+            // First item in range
+            const SDataInfoItem& a = dataInfoSet[iFirst];
+            int iPriorityA = MapFind ( a.attributeMap, "priority" ) ? atoi ( *MapFind ( a.attributeMap, "priority" ) ) : 5;
+
+            // Find last item in range
+            int iLast;
+            for ( iLast = iFirst ; iLast < iSize - 1 ; iLast++ )
+            {
+                const SDataInfoItem& b = dataInfoSet[ iLast + 1 ];
+                int iPriorityB = MapFind ( b.attributeMap, "priority" ) ? atoi ( *MapFind ( b.attributeMap, "priority" ) ) : 5;
+                if ( iPriorityA != iPriorityB )
+                    break;
+            }
+
+            // Choose random server to keep in range, put the others at the back
+            int iRangeSize = iLast - iFirst + 1;
+            int iKeepIdx = rand () % ( iRangeSize );
+
+            for ( int i = 0 ; i < iRangeSize ; i++ )
+            {
+                if ( i == iKeepIdx )
+                    keepList.push_back ( dataInfoSet[ iFirst + i ] );
+                else
+                    tailList.push_back ( dataInfoSet[ iFirst + i ] );
+            }
+
+            // continue with first item in the next priority range
+            iFirst = iLast;
+        }
+
         // Output values into the result list
-        for ( int i = 0 ; i < iSize ; i++ )
-            serverList.push_back ( dataInfoSet[i].strValue );
+        for ( uint i = 0 ; i < keepList.size () ; i++ )
+            serverList.push_back ( keepList[i].strValue );
+
+        for ( uint i = 0 ; i < tailList.size () ; i++ )
+            serverList.push_back ( tailList[i].strValue );
     }
 
     return serverList;
