@@ -1,6 +1,6 @@
 /*
 	BASSmix 2.4 C/C++ header file
-	Copyright (c) 2005-2008 Un4seen Developments Ltd.
+	Copyright (c) 2005-2010 Un4seen Developments Ltd.
 
 	See the BASSMIX.CHM file for more detailed documentation
 */
@@ -25,12 +25,14 @@ extern "C" {
 // additional BASS_SetConfig option
 #define BASS_CONFIG_MIXER_FILTER	0x10600
 #define BASS_CONFIG_MIXER_BUFFER	0x10601
+#define BASS_CONFIG_MIXER_POSEX		0x10602
 #define BASS_CONFIG_SPLIT_BUFFER	0x10610
 
 // BASS_Mixer_StreamCreate flags
 #define BASS_MIXER_END			0x10000	// end the stream when there are no sources
 #define BASS_MIXER_NONSTOP		0x20000	// don't stall when there are no sources
 #define BASS_MIXER_RESUME		0x1000	// resume stalled immediately upon new/unpaused source
+#define BASS_MIXER_POSEX		0x2000	// enable BASS_Mixer_ChannelGetPositionEx support
 
 // source flags
 #define BASS_MIXER_FILTER		0x1000	// resampling filter
@@ -71,6 +73,7 @@ DWORD BASSMIXDEF(BASS_Mixer_ChannelFlags)(DWORD handle, DWORD flags, DWORD mask)
 BOOL BASSMIXDEF(BASS_Mixer_ChannelRemove)(DWORD handle);
 BOOL BASSMIXDEF(BASS_Mixer_ChannelSetPosition)(DWORD handle, QWORD pos, DWORD mode);
 QWORD BASSMIXDEF(BASS_Mixer_ChannelGetPosition)(DWORD handle, DWORD mode);
+QWORD BASSMIXDEF(BASS_Mixer_ChannelGetPositionEx)(DWORD channel, DWORD mode, DWORD delay);
 DWORD BASSMIXDEF(BASS_Mixer_ChannelGetLevel)(DWORD handle);
 DWORD BASSMIXDEF(BASS_Mixer_ChannelGetData)(DWORD handle, void *buffer, DWORD length);
 HSYNC BASSMIXDEF(BASS_Mixer_ChannelSetSync)(DWORD handle, DWORD type, QWORD param, SYNCPROC *proc, void *user);
@@ -84,6 +87,8 @@ QWORD BASSMIXDEF(BASS_Mixer_ChannelGetEnvelopePos)(DWORD handle, DWORD type, flo
 HSTREAM BASSMIXDEF(BASS_Split_StreamCreate)(DWORD channel, DWORD flags, int *chanmap);
 DWORD BASSMIXDEF(BASS_Split_StreamGetSource)(HSTREAM handle);
 BOOL BASSMIXDEF(BASS_Split_StreamReset)(DWORD handle);
+BOOL BASSMIXDEF(BASS_Split_StreamResetEx)(DWORD handle, DWORD offset);
+DWORD BASSMIXDEF(BASS_Split_StreamGetAvailable)(DWORD handle);
 
 #ifdef __cplusplus
 }

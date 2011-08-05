@@ -293,7 +293,8 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     //
     const char* dataFilesFiles [] = { "\\MTA\\cgui\\images\\background_logo.png"
                                      ,"\\MTA\\D3DX9_42.dll"
-                                     ,"\\MTA\\D3DCompiler_42.dll" };
+                                     ,"\\MTA\\D3DCompiler_42.dll"
+                                     ,"\\MTA\\bass.dll"};
 
     for ( uint i = 0 ; i < NUMELMS( dataFilesFiles ) ; i++ )
     {
@@ -301,6 +302,11 @@ int DoLaunchGame ( LPSTR lpCmdLine )
         {
             return DisplayErrorMessageBox ( "Load failed. Please ensure that the latest data files have been installed correctly.", "mta-datafiles-missing" );
         }
+    }
+
+    if ( FileSize ( strMTASAPath + "\\MTA\\bass.dll" ) != 0x00018838 )
+    {
+        return DisplayErrorMessageBox ( "Load failed. Please ensure that the latest data files have been installed correctly.", "mta-datafiles-missing" );
     }
 
     // Check for client file

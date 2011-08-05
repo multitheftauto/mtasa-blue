@@ -1,6 +1,6 @@
 /*
 	BASSWMA 2.4 C/C++ header file
-	Copyright (c) 2002-2009 Un4seen Developments Ltd.
+	Copyright (c) 2002-2010 Un4seen Developments Ltd.
 
 	See the BASSWMA.CHM file for more detailed documentation
 */
@@ -50,6 +50,7 @@ typedef DWORD HWMENCODE;	// WMA encoding handle
 #define BASS_WMA_ENCODE_STANDARD	0x2000	// standard WMA
 #define BASS_WMA_ENCODE_PRO			0x4000	// WMA Pro
 #define BASS_WMA_ENCODE_24BIT		0x8000	// 24-bit
+#define BASS_WMA_ENCODE_PCM			0x10000	// uncompressed PCM
 #define BASS_WMA_ENCODE_SCRIPT		0x20000	// set script (mid-stream tags) in the WMA encoding
 
 // Additional flag for use with BASS_WMA_EncodeGetRates
@@ -88,6 +89,7 @@ user   : The 'user' parameter value given when calling BASS_WMA_EncodeOpen */
 // Additional BASS_ChannelGetTags types
 #define BASS_TAG_WMA		8	// WMA header tags : series of null-terminated UTF-8 strings
 #define BASS_TAG_WMA_META	11	// WMA mid-stream tag : UTF-8 string
+#define BASS_TAG_WMA_CODEC	12	// WMA codec
 
 HSTREAM BASSWMADEF(BASS_WMA_StreamCreateFile)(BOOL mem, const void *file, QWORD offset, QWORD length, DWORD flags);
 HSTREAM BASSWMADEF(BASS_WMA_StreamCreateFileAuth)(BOOL mem, const void *file, QWORD offset, QWORD length, DWORD flags, const char *user, const char *pass);
