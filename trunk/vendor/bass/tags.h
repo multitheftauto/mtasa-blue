@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 // Current version. Just increments each release.
-#define TAGS_VERSION 15
+#define TAGS_VERSION 16
 
 // returns description of the last error.
 const char*  _stdcall TAGS_GetLastErrorDesc();
