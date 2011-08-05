@@ -344,6 +344,11 @@ class CServerListItemList
     std::map < SAddressPort, CServerListItem* >     m_Map;
 public:
 
+    std::list < CServerListItem* >& GetList ( void )
+    {
+        return m_List;
+    }
+
     std::list<CServerListItem*>::iterator begin()
     {
         return m_List.begin ();
@@ -451,6 +456,8 @@ public:
     bool                                    IsUpdated               ( void )                        { return m_bUpdated; };
     void                                    SetUpdated              ( bool bUpdated )               { m_bUpdated = bUpdated; };
     int                                     GetRevision             ( void )                        { return m_iRevision; }
+    void                                    SortByASEVersion        ( void );
+
 protected:
     bool                                    m_bUpdated;
     int                                     m_iPass;
