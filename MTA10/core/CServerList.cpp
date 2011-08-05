@@ -211,6 +211,21 @@ void CServerListInternet::Refresh ( void )
 }
 
 
+
+static bool SortByASEVersionCallback ( const CServerListItem* const d1, const CServerListItem* const d2 )
+{
+    return d1->strVersionSortKey < d2->strVersionSortKey;
+};
+
+//
+// Ensure serverlist is sorted by MTA ASE version
+//
+void CServerList::SortByASEVersion ( void )
+{
+    m_Servers.GetList ().sort ( SortByASEVersionCallback );
+}
+
+
 void CServerListInternet::Pulse ( void )
 {   // We also need to take care of the master server list here
     unsigned long ulTime = m_ElapsedTime.Get ();
@@ -230,6 +245,7 @@ void CServerListInternet::Pulse ( void )
             {
                 m_iPass++;
                 GetServerCache ()->GetServerListCachedInfo ( this );
+                SortByASEVersion ();
             } else {
                 // Abort
                 m_strStatus = "Master server list could not be parsed.";
@@ -248,6 +264,7 @@ void CServerListInternet::Pulse ( void )
             // If query failed, load from backup
             GetServerCache ()->GenerateServerList ( this );
             GetServerCache ()->GetServerListCachedInfo ( this );
+            SortByASEVersion ();
             m_strStatus2 = string ( "  (Backup server list)" );
             m_iPass = 2;
         }
