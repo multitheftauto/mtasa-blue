@@ -61,7 +61,7 @@ CServerBrowser::CServerBrowser ( void )
 
     // Initialize
     m_ulLastUpdateTime = 0;
-    m_firstTimeBrowseServer = true;
+    m_bFirstTimeBrowseServer = true;
     m_bOptionsLoaded = false;
     m_PrevServerBrowserType = ServerBrowserTypes::INTERNET;
 
@@ -691,14 +691,15 @@ void CServerBrowser::SetVisible ( bool bVisible )
     // Are we making this window visible?
     if ( bVisible )
     {
-        if ( m_firstTimeBrowseServer )
+        bool bAutoRefresh = false;
+        CVARS_GET ( "auto_refresh_browser", bAutoRefresh );
+
+        if ( m_bFirstTimeBrowseServer || bAutoRefresh )
         {
             // Start loading all servers
-            bool bAutoRefresh = true;
-            CVARS_GET ( "auto_refresh_browser", bAutoRefresh );
             for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
             {
-                if ( i != ServerBrowserTypes::INTERNET || bAutoRefresh )  // Don't refresh Internet unless it's activated
+                if ( i != ServerBrowserTypes::INTERNET )
                 {
                     m_pServerListStatus [ i ]->SetText ( "Loading..." );
                     m_iSelectedServer [ i ] = -1;
@@ -707,7 +708,7 @@ void CServerBrowser::SetVisible ( bool bVisible )
             }
             CreateHistoryList();
 
-            m_firstTimeBrowseServer = false;
+            m_bFirstTimeBrowseServer = false;
         }
 
         // Set the first item as our starting address
