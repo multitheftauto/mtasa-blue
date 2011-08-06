@@ -153,6 +153,9 @@ void CLuaArguments::PushArguments ( lua_State* luaVM ) const
 
 void CLuaArguments::PushAsTable ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables )
 {
+    // Ensure there is enough space on the Lua stack
+    LUA_CHECKSTACK ( luaVM, 4 );
+
     bool bKnownTablesCreated = false;
     if ( !pKnownTables )
     {
