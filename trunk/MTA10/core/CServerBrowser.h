@@ -241,7 +241,7 @@ private:
     CServerList             m_ServersHistory;
 
     unsigned long           m_ulLastUpdateTime;
-    bool                    m_firstTimeBrowseServer;
+    bool                    m_bFirstTimeBrowseServer;
     bool                    m_bOptionsLoaded;        
     ServerBrowserType       m_PrevServerBrowserType;
 
