@@ -694,22 +694,21 @@ void CServerBrowser::SetVisible ( bool bVisible )
         bool bAutoRefresh = false;
         CVARS_GET ( "auto_refresh_browser", bAutoRefresh );
 
-        if ( m_bFirstTimeBrowseServer || bAutoRefresh )
+        // Start loading all servers (if needed).
+        for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
         {
-            // Start loading all servers
-            for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+            // Don't refresh Internet unless it's activated or needed.
+            if ( i != ServerBrowserTypes::INTERNET || m_bFirstTimeBrowseServer || bAutoRefresh )
             {
-                if ( i != ServerBrowserTypes::INTERNET )
-                {
-                    m_pServerListStatus [ i ]->SetText ( "Loading..." );
-                    m_iSelectedServer [ i ] = -1;
-                    GetServerList ( (ServerBrowserType)i )->Refresh ();
-                }
+                m_pServerListStatus [ i ]->SetText ( "Loading..." );
+                m_iSelectedServer [ i ] = -1;
+                GetServerList ( (ServerBrowserType)i )->Refresh ();
             }
-            CreateHistoryList();
-
-            m_bFirstTimeBrowseServer = false;
         }
+
+        CreateHistoryList();
+
+        if ( m_bFirstTimeBrowseServer ) m_bFirstTimeBrowseServer = false;
 
         // Set the first item as our starting address
         if ( m_pComboAddressHistory [ ServerBrowserTypes::INTERNET ]->GetItemCount() > 0 )
