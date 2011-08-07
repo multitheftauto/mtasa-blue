@@ -4207,14 +4207,14 @@ bool CStaticFunctionDefinitions::BlowVehicle ( CElement* pElement, bool bExplode
             pVehicle->CallEvent ( "onVehicleExplode", Arguments );
         }
         pVehicle->SetHealth ( 0.0f );
-        pVehicle->SetBlowTime ( ::GetTime () );
-        pVehicle->GenerateSyncTimeContext ();
+        if ( !bExplode )
+            pVehicle->SetBlowTime ( ::GetTime () );
+
         //Update our engine State
         pVehicle->SetEngineOn( false );
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( ( unsigned char ) ( ( bExplode ) ? 1 : 0 ) );
-        BitStream.pBitStream->Write ( pVehicle->GetSyncTimeContext () );
+        BitStream.pBitStream->Write ( pVehicle->GenerateSyncTimeContext() );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, BLOW_VEHICLE, *BitStream.pBitStream ) );
         return true;
     }
