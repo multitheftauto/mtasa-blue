@@ -405,6 +405,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
         m_pComboSearchType [ type ]->AddItem ( m_pSearchIcons[ i ] );
 
     m_pComboSearchType [ type ]->SetReadOnly ( true );
+    m_pComboSearchType [ type ]->SetSelectedItemByIndex(0);
     m_pComboSearchType [ type ]->SetSelectionHandler ( GUI_CALLBACK ( &CServerBrowser::OnSearchTypeSelected, this ) );
     m_pSearchTypeIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pComboSearchType [ type ] ) );
     m_pSearchTypeIcon [ type ]->SetPosition ( CVector2D(2,4), false );
