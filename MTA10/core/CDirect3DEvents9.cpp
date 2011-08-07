@@ -125,6 +125,9 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
     pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
 
+    // Make sure stencil is off to avoid problems with flame effects
+    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+
     // Notify core
     CCore::GetSingleton ().DoPostFramePulse ();
 
