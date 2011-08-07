@@ -226,6 +226,9 @@ DWORD RETURN_FreezeFix_Misc15_US =                          0x156CDB4;
 DWORD RETURN_FreezeFix_Misc15_EU =                          0x156CDF4;
 DWORD RETURN_FreezeFix_Misc15_BOTH =                        0;
 
+#define HOOKPOS_CrashFix_Misc16                              0x5E5815
+DWORD RETURN_CrashFix_Misc16 =                               0x5E581B;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -356,6 +359,7 @@ void HOOK_CrashFix_Misc12 ();
 void HOOK_CrashFix_Misc13 ();
 void HOOK_CrashFix_Misc14 ();
 void HOOK_FreezeFix_Misc15 ();
+void HOOK_CrashFix_Misc16 ();
 
 void vehicle_lights_init ();
 
@@ -493,6 +497,7 @@ void CMultiplayerSA::InitHooks()
         HookInstall(HOOKPOS_FreezeFix_Misc15_EU, (DWORD)HOOK_FreezeFix_Misc15, 6 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_EU;
     }
+    HookInstall(HOOKPOS_CrashFix_Misc16, (DWORD)HOOK_CrashFix_Misc16, 6 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -4451,6 +4456,29 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList ()
     }
 }
 
+//
+// Test macros for CrashFixes
+//
+#ifdef MTA_DEBUG
+
+#define SIMULATE_ERROR_BEGIN( chance ) \
+{ \
+    _asm { pushad } \
+    if ( rand() % 100 < (chance) ) \
+    { \
+        _asm popad
+
+
+#define SIMULATE_ERROR_END \
+        _asm pushad \
+    } \
+    _asm popad \
+}
+
+#endif
+
+#define TEST_CRASH_FIXES 0
+
 
 void _declspec(naked) HOOK_CrashFix_Misc1 ()
 {
@@ -4738,5 +4766,35 @@ void _declspec(naked) HOOK_FreezeFix_Misc15 ()
 
         popad
         jmp     RETURN_FreezeFix_Misc15_BOTH  // 156CDB4
+    }
+}
+
+
+// Handle RpAnimBlendClumpGetFirstAssociation returning NULL
+// hooked at 5E5815 6 bytes
+void _declspec(naked) HOOK_CrashFix_Misc16 ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     eax, 0
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        cmp     eax, 0
+        je      cont  // Skip much code if eax is zero ( RpAnimBlendClumpGetFirstAssociation returns NULL )
+
+        // continue standard path
+        movsx   ecx, word ptr [eax+2Ch]
+        xor     edi, edi
+        jmp     RETURN_CrashFix_Misc16  // 5E581B
+
+    cont:
+        add     esp, 96
+        retn
     }
 }
