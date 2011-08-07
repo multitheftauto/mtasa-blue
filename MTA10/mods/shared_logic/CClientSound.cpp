@@ -604,8 +604,11 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecCameraPosition, C
     float fVolume = 1.0;
 
     if ( !m_bInSameDimension )
+    {
         // We don't need any fancy calculations if the sound is not in our dimension - just mute it already
         fVolume = 0.0f;
+        SetPaused( true );
+    }
     else
     {
         // Pan
