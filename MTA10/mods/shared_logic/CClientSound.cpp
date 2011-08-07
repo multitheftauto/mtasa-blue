@@ -58,19 +58,14 @@ CClientSound::~CClientSound ( void )
     // Stream threads:
     //  BASS has been told to stop at this point, so it is assumed that it will not initiate any new threaded callbacks.
     //  However m_pThread could still be active and may still create a sound handle.
-    //   So, we terminate m_pThread (could be bad, but worry about that later)
-    //   and if a sound handle has been made, we tell BASS to stop that also
-    m_VarsCriticalSection.Lock ();
-    HANDLE pThread = m_Vars.pThread;
-    m_VarsCriticalSection.Unlock ();
-
-    if ( pThread )
-        TerminateThread ( pThread, 0 );
-
-    // m_VarsCriticalSection could be in any state now, so we don't use it
-    if ( m_Vars.bStreamCreateResult )
-        if ( m_Vars.pSound )
-            BASS_ChannelStop ( m_Vars.pSound );
+    //   So, we decrement the ref count on the shared variables
+    //   If BASS_StreamCreateURL still holds a ref to the shared variables, any sound handle it may create will
+    //   get cleaned up when it releases its ref.
+    if ( m_pVars )
+    {
+        m_pVars->Release ();  // Ref for main thread can now be released
+        m_pVars = NULL;
+    }
 }
 
 bool CClientSound::Play ( const SString& strPath, bool bLoop )
@@ -166,39 +161,36 @@ void CClientSound::PlayStream ( const SString& strURL, bool bLoop, bool b3D, con
     if ( bLoop )
         lFlags |= BASS_SAMPLE_LOOP;
 
-    thestruct* pArguments = new thestruct;
-    pArguments->pClientSound = this;
-    pArguments->strURL = strURL;
-    pArguments->lFlags = lFlags;
-
     // Stream the file in a seperate thread to don't interupt the game
-    assert ( !m_bUsingVars );
-    m_bUsingVars = true;
-    m_Vars.pThread = CreateThread ( NULL, 0, reinterpret_cast <LPTHREAD_START_ROUTINE> ( &CClientSound::PlayStreamIntern ), pArguments, 0, NULL );
+    assert ( !m_pVars );
+    m_pVars = new SSoundThreadVariables ();
+    m_pVars->iRefCount = 2;     // One for here, one for BASS_StreamCreateURL
+    m_pVars->strURL = strURL;
+    m_pVars->lFlags = lFlags;
+    CreateThread ( NULL, 0, reinterpret_cast <LPTHREAD_START_ROUTINE> ( &CClientSound::PlayStreamIntern ), m_pVars, 0, NULL );
 }
 
 void CClientSound::PlayStreamIntern ( void* arguments )
 {
-    thestruct* pArgs = static_cast <thestruct*> ( arguments );
+    SSoundThreadVariables* pArgs = static_cast <SSoundThreadVariables*> ( arguments );
 
     // Try to load the sound file
     HSTREAM pSound = BASS_StreamCreateURL ( pArgs->strURL, 0, pArgs->lFlags, NULL, NULL );
 
-    pArgs->pClientSound->m_VarsCriticalSection.Lock ();
-    pArgs->pClientSound->m_Vars.bStreamCreateResult = true;
-    pArgs->pClientSound->m_Vars.pSound = pSound;
-    pArgs->pClientSound->m_Vars.pThread = NULL;
-    pArgs->pClientSound->m_VarsCriticalSection.Unlock ();
-    delete arguments;
+    pArgs->criticalSection.Lock ();
+    pArgs->bStreamCreateResult = true;
+    pArgs->pSound = pSound;
+    pArgs->criticalSection.Unlock ();
+    pArgs->Release ();  // Ref for BASS_StreamCreateURL can now be released
 }
 
 void CALLBACK DownloadSync ( HSYNC handle, DWORD channel, DWORD data, void* user )
 {
     CClientSound* pClientSound = static_cast <CClientSound*> ( user );
 
-    pClientSound->m_VarsCriticalSection.Lock ();
-    pClientSound->m_Vars.onClientSoundFinishedDownloadQueue.push_back ( pClientSound->GetLength () );
-    pClientSound->m_VarsCriticalSection.Unlock ();
+    pClientSound->m_pVars->criticalSection.Lock ();
+    pClientSound->m_pVars->onClientSoundFinishedDownloadQueue.push_back ( pClientSound->GetLength () );
+    pClientSound->m_pVars->criticalSection.Unlock ();
 }
 
 // get stream title from metadata and send it as event
@@ -207,9 +199,9 @@ void CALLBACK MetaSync( HSYNC handle, DWORD channel, DWORD data, void *user )
     //g_pCore->GetConsole()->Printf ( "BASS STREAM META" );
     CClientSound* pClientSound = static_cast <CClientSound*> ( user );
 
-    pClientSound->m_VarsCriticalSection.Lock ();
-    DWORD pSound = pClientSound->m_Vars.pSound;
-    pClientSound->m_VarsCriticalSection.Unlock ();
+    pClientSound->m_pVars->criticalSection.Lock ();
+    DWORD pSound = pClientSound->m_pVars->pSound;
+    pClientSound->m_pVars->criticalSection.Unlock ();
 
     SString strMeta = BASS_ChannelGetTags( pSound, BASS_TAG_META );
     SString strStreamTitle;
@@ -242,9 +234,9 @@ void CALLBACK MetaSync( HSYNC handle, DWORD channel, DWORD data, void *user )
 
     if ( !strStreamTitle.empty () )
     {
-    	pClientSound->m_VarsCriticalSection.Lock ();
-    	pClientSound->m_Vars.onClientSoundChangedMetaQueue.push_back ( strStreamTitle );
-    	pClientSound->m_VarsCriticalSection.Unlock ();
+    	pClientSound->m_pVars->criticalSection.Lock ();
+    	pClientSound->m_pVars->onClientSoundChangedMetaQueue.push_back ( strStreamTitle );
+    	pClientSound->m_pVars->criticalSection.Unlock ();
 	}
 }
 
@@ -579,7 +571,7 @@ bool CClientSound::IsFxEffectEnabled ( int iFxEffect )
 void CClientSound::Process3D ( CVector vecPosition, CVector vecCameraPosition, CVector vecLookAt )
 {
     // Handle results from other threads
-    if ( m_bUsingVars )
+    if ( m_pVars )
         ServiceVars ();
 
     // If the sound isn't 3D, we don't need to process it
@@ -661,21 +653,21 @@ void CClientSound::ServiceVars ( void )
     std::list < SString > onClientSoundChangedMetaQueue;
 
     // Lock vars
-    m_VarsCriticalSection.Lock ();
+    m_pVars->criticalSection.Lock ();
 
     // Copy vars to temp
-    pSound = m_Vars.pSound;
-    bStreamCreateResult = m_Vars.bStreamCreateResult;
-    onClientSoundFinishedDownloadQueue = m_Vars.onClientSoundFinishedDownloadQueue;
-    onClientSoundChangedMetaQueue = m_Vars.onClientSoundChangedMetaQueue;
+    pSound = m_pVars->pSound;
+    bStreamCreateResult = m_pVars->bStreamCreateResult;
+    onClientSoundFinishedDownloadQueue = m_pVars->onClientSoundFinishedDownloadQueue;
+    onClientSoundChangedMetaQueue = m_pVars->onClientSoundChangedMetaQueue;
 
     // Clear vars
-    m_Vars.bStreamCreateResult = false;
-    m_Vars.onClientSoundFinishedDownloadQueue.clear ();
-    m_Vars.onClientSoundChangedMetaQueue.clear ();
+    m_pVars->bStreamCreateResult = false;
+    m_pVars->onClientSoundFinishedDownloadQueue.clear ();
+    m_pVars->onClientSoundChangedMetaQueue.clear ();
 
     // Unlock vars
-    m_VarsCriticalSection.Unlock ();
+    m_pVars->criticalSection.Unlock ();
 
     // Process temp
     if ( bStreamCreateResult )
@@ -698,4 +690,30 @@ void CClientSound::ServiceVars ( void )
         onClientSoundChangedMetaQueue.pop_front ();
         CallEvent ( "onClientSoundChangedMeta", Arguments, true );
     }
+}
+
+
+///////////////////////////////////////////////////////
+//
+// SSoundThreadVariables::Release
+//
+// This gets called when BASS_StreamCreateURL has completed or when CClientSound is destroyed
+//
+///////////////////////////////////////////////////////
+void SSoundThreadVariables::Release ( void )
+{
+    criticalSection.Lock ();
+    assert ( iRefCount > 0 );
+    bool bLastRef = --iRefCount == 0;
+    criticalSection.Unlock ();
+
+    if ( !bLastRef )
+        return;
+
+    // Cleanup any pSound created by BASS_StreamCreateURL that has not been handled
+    if ( bStreamCreateResult )
+        if ( pSound )
+            BASS_ChannelStop ( pSound );
+
+    delete this;
 }
