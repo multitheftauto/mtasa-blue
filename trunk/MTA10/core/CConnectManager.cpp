@@ -23,6 +23,7 @@ CConnectManager::CConnectManager ( void )
 {
     g_pConnectManager = this;
 
+    m_Address.s_addr = 0;
     m_usPort = 0;
     m_bReconnect = false;
     m_bIsDetectingVersion = false;
@@ -33,6 +34,7 @@ CConnectManager::CConnectManager ( void )
     m_pOnCancelClick = new GUI_CALLBACK ( &CConnectManager::Event_OnCancelClick, this );
 
     m_pServerItem = NULL;
+    m_bNotifyServerBrowser = false;
 }
 
 
@@ -49,11 +51,13 @@ CConnectManager::~CConnectManager ( void )
 }
 
 
-bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword )
+bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser )
 {
     assert ( szHost );
     assert ( szNick );
     assert ( szPassword );
+
+    m_bNotifyServerBrowser = bNotifyServerBrowser;
 
     // Hide the server queue
     CServerInfo::GetSingletonPtr()->Hide( );
@@ -87,6 +91,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_strHost = szHost;
     m_strNick = szNick;
     m_strPassword = szPassword;
+    m_Address.s_addr = 0;
     m_usPort = usPort;
 
     m_strLastHost = m_strHost;
@@ -94,8 +99,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_strLastPassword = m_strPassword;
 
     // Parse host into a server item
-    in_addr Address;
-    if ( !CServerListItem::Parse ( m_strHost.c_str(), Address ) )
+    if ( !CServerListItem::Parse ( m_strHost.c_str(), m_Address ) )
     {
         SString strBuffer = "Connecting failed. Invalid host provided!";
         CCore::GetSingleton ().ShowMessageBox ( "Error", strBuffer, MB_BUTTON_OK | MB_ICON_ERROR );
@@ -118,7 +122,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     // Start server version detection
     SAFE_DELETE ( m_pServerItem );
-    m_pServerItem = new CServerListItem ( Address, m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+    m_pServerItem = new CServerListItem ( m_Address, m_usPort + SERVER_LIST_QUERY_PORT_OFFSET );
     m_pServerItem->m_iTimeoutLength = 2000;
     m_bIsDetectingVersion = true;
 
@@ -177,6 +181,7 @@ bool CConnectManager::Abort ( void )
     m_strNick = "";
     m_strPassword = "";
 
+    m_Address.s_addr = 0;
     m_usPort = 0;
     m_bIsConnecting = false;
     m_bIsDetectingVersion = false;
@@ -200,6 +205,8 @@ void CConnectManager::DoPulse ( void )
             // Got some sort of result?
             if ( m_pServerItem->bSkipped || m_pServerItem->bScanned )
             {
+                OnServerExists ();
+
                 m_bIsDetectingVersion = false;
                 // Is different version?
                 if ( m_pServerItem->bScanned && m_pServerItem->strVersion != MTA_DM_ASE_VERSION )
@@ -292,6 +299,8 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
     // We're working on connecting?
     if ( g_pConnectManager->m_bIsConnecting )
     {
+        g_pConnectManager->OnServerExists ();
+
         // The packet we're expecting?
         if ( ucPacketID == PACKET_ID_MOD_NAME )
         {
@@ -327,15 +336,8 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
 
                 }
 
-                //Convert the Address to an unsigned long
-                unsigned long ulAddr = inet_addr( g_pConnectManager->m_strHost.c_str() );
-
-                //Create an instance of the in_addr structure to store the address
-                in_addr Address;
-                //Set the address to the unsigned long we just created
-                Address.S_un.S_addr = ulAddr;
                 //Set the current server info and Add the ASE Offset to the Query port)
-                CCore::GetSingleton().SetCurrentServer ( Address, g_pConnectManager->m_usPort + 123 );
+                CCore::GetSingleton().SetCurrentServer ( g_pConnectManager->m_Address, g_pConnectManager->m_usPort + 123 );
 
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
                 CCore::GetSingleton ().SaveConfig ();
@@ -345,6 +347,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
                 g_pConnectManager->m_strHost = "";
                 g_pConnectManager->m_strPassword = "";
 
+                g_pConnectManager->m_Address.s_addr = 0;
                 g_pConnectManager->m_usPort = 0;
                 g_pConnectManager->m_bIsConnecting = false;
                 g_pConnectManager->m_bIsDetectingVersion = false;
@@ -393,4 +396,16 @@ bool CConnectManager::CheckNickProvided ( const char* szNick )
     if ( stricmp ( szNick, "server" ) == 0 )
         return false;
     return true;
+}
+
+//
+// Called at least once (maybe more) if a MTA server exists at the current address/port
+//
+void CConnectManager::OnServerExists ( void )
+{
+    if ( m_bNotifyServerBrowser )
+    {
+        m_bNotifyServerBrowser = false;
+        CServerBrowser::GetSingletonPtr()->NotifyServerExists ( m_Address, m_usPort );
+    }
 }
