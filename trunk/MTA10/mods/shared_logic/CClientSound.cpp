@@ -362,11 +362,13 @@ void CClientSound::Stop ( void )
     g_pClientGame->GetElementDeleter()->Delete ( this );
 }
 
-void CClientSound::SetPaused ( bool bPaused )
+void CClientSound::SetPaused ( bool bPaused, bool bSave )
 {
-    m_bPaused = bPaused;
+    if ( bSave )
+        m_bPaused = bPaused;
 
-    if ( m_pSound )
+
+    if ( m_pSound ) 
     {
         if ( bPaused )
             BASS_ChannelPause ( m_pSound );
@@ -599,7 +601,11 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecCameraPosition, C
     {
         // We don't need any fancy calculations if the sound is not in our dimension - just mute it already
         fVolume = 0.0f;
-        SetPaused( true );
+        if ( m_bPaused == false ) // Don't do anything if the client has paused us
+        {
+            SetPaused( true, false );
+            return;
+        }
     }
     else
     {
@@ -627,14 +633,22 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecCameraPosition, C
         else if ( fDistance >= m_fMaxDistance )
         {
             fVolume = 0.0f;
-            SetPaused( true ); // Actually pause it here ( hopefully BASS stops streaming radio streams! )
+            if ( m_bPaused == false ) // Don't do anything if the client has paused us
+                SetPaused( true, false ); // Actually pause it here ( hopefully BASS stops streaming radio streams! )
+            
             return;
         }
         else
             fVolume = exp ( - ( fDistance - m_fMinDistance ) * ( CUT_OFF / fDistDiff ) );
 
         if ( IsPaused() )
-            SetPaused( false );
+        {
+            if ( m_bPaused == false ) // Don't do anything if the client has paused us
+            {
+                SetPaused( false, false );
+                return;
+            }
+        }
     }
 
     BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_VOL, fVolume * m_fVolume );
