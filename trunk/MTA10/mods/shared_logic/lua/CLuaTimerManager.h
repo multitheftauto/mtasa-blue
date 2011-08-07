@@ -32,7 +32,7 @@ public:
     bool                        Exists                          ( CLuaTimer* pLuaTimer );
     CLuaTimer*                  GetTimer                        ( unsigned int uiID );
 
-    CLuaTimer*                  AddTimer                        ( const CLuaFunctionRef& iLuaFunction, unsigned long ulTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments );
+    CLuaTimer*                  AddTimer                        ( const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments );
 
     void                        RemoveTimer                     ( CLuaTimer* pLuaTimer );
     void                        RemoveAllTimers                 ( void );
@@ -40,7 +40,7 @@ public:
 
     void                        ResetTimer                      ( CLuaTimer* pLuaTimer );
 
-    void                        GetTimers                       ( unsigned long ulTime, CLuaMain* pLuaMain );
+    void                        GetTimers                       ( CTickCount llTime, CLuaMain* pLuaMain );
 
     void                        TakeOutTheTrash                 ( void );
 private:

@@ -20,18 +20,18 @@ using std::list;
 
 void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
 {
-    unsigned long ulCurrentTime = timeGetTime ();
+    CTickCount llCurrentTime = CTickCount::Now ();
     m_bIteratingList = true;
     list < CLuaTimer* > ::iterator iter = m_TimerList.begin ();
     for ( ; iter != m_TimerList.end (); )
     {
         CLuaTimer* pLuaTimer = *iter;
-        unsigned long ulStartTime = pLuaTimer->GetStartTime ();
-        unsigned long ulDelay = pLuaTimer->GetDelay ();
+        CTickCount llStartTime = pLuaTimer->GetStartTime ();
+        CTickCount llDelay = pLuaTimer->GetDelay ();
         unsigned int uiRepeats = pLuaTimer->GetRepeats ();
 
         // Is the time up and is not being deleted
-        if ( !pLuaTimer->IsBeingDeleted() && ulCurrentTime >= ( ulStartTime + ulDelay ) )
+        if ( !pLuaTimer->IsBeingDeleted() && llCurrentTime >= ( llStartTime + llDelay ) )
         {
             pLuaTimer->ExecuteTimer ( pLuaMain );
 
@@ -47,7 +47,7 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
                 if ( uiRepeats != 0 )
                     (*iter)->SetRepeats ( uiRepeats - 1 );
 
-                pLuaTimer->SetStartTime ( ulCurrentTime );
+                pLuaTimer->SetStartTime ( llCurrentTime );
 
                 iter++;
             }
@@ -97,8 +97,8 @@ void CLuaTimerManager::ResetTimer ( CLuaTimer* pLuaTimer )
 {
     assert ( pLuaTimer );
 
-    unsigned long ulCurrentTime = timeGetTime ();
-    pLuaTimer->SetStartTime ( ulCurrentTime );
+    CTickCount llCurrentTime = CTickCount::Now ();
+    pLuaTimer->SetStartTime ( llCurrentTime );
 }
 
 
@@ -109,18 +109,18 @@ bool CLuaTimerManager::Exists ( CLuaTimer* pLuaTimer )
 
 
 
-CLuaTimer* CLuaTimerManager::AddTimer ( const CLuaFunctionRef& iLuaFunction, unsigned long ulTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments )
+CLuaTimer* CLuaTimerManager::AddTimer ( const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments )
 {
     // Check for the minimum interval
-    if ( ulTimeDelay < LUA_TIMER_MIN_INTERVAL )
+    if ( llTimeDelay.ToLongLong () < LUA_TIMER_MIN_INTERVAL )
         return NULL;
 
     if ( VERIFY_FUNCTION ( iLuaFunction ) )
     {
         // Add the timer
         CLuaTimer* pLuaTimer = new CLuaTimer ( iLuaFunction, Arguments );
-        pLuaTimer->SetStartTime ( timeGetTime () );
-        pLuaTimer->SetDelay ( ulTimeDelay );
+        pLuaTimer->SetStartTime ( CTickCount::Now () );
+        pLuaTimer->SetDelay ( llTimeDelay );
         pLuaTimer->SetRepeats ( uiRepeats );
         m_TimerList.push_back ( pLuaTimer );
         return pLuaTimer;
@@ -130,19 +130,19 @@ CLuaTimer* CLuaTimerManager::AddTimer ( const CLuaFunctionRef& iLuaFunction, uns
 }
 
 
-void CLuaTimerManager::GetTimers ( unsigned long ulTime, CLuaMain* pLuaMain )
+void CLuaTimerManager::GetTimers ( CTickCount llTime, CLuaMain* pLuaMain )
 {
     assert ( pLuaMain );
 
-    unsigned long ulCurrentTime = timeGetTime();
+    CTickCount llCurrentTime = CTickCount::Now ();
     // Add all the timers to the table
     unsigned int uiIndex = 0;
     list < CLuaTimer* > ::const_iterator iter = m_TimerList.begin ();
     for ( ; iter != m_TimerList.end () ; iter++ )
     {
         // If the time left is less than the time specified, or the time specifed is 0
-        unsigned long ulTimeLeft = ( (*iter)->GetStartTime () + (*iter)->GetDelay () ) - ulCurrentTime;
-        if ( ulTime == 0 || ulTimeLeft <= ulTime )
+        CTickCount llTimeLeft = ( (*iter)->GetStartTime () + (*iter)->GetDelay () ) - llCurrentTime;
+        if ( llTime.ToLongLong () == 0 || llTimeLeft <= llTime )
         {
             // Add it to the table
             lua_State* luaVM = pLuaMain->GetVirtualMachine ();

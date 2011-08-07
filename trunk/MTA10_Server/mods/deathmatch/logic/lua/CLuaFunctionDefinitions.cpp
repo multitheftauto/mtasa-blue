@@ -9637,11 +9637,11 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
 int CLuaFunctionDefinitions::SetTimer ( lua_State* luaVM )
 {
 //  timer setTimer ( function theFunction, int timeInterval, int timesToExecute, [ var arguments... ] )
-    CLuaFunctionRef iLuaFunction; ulong ulTimeInterval; uint uiTimesToExecute; CLuaArguments Arguments;
+    CLuaFunctionRef iLuaFunction; double dTimeInterval; uint uiTimesToExecute; CLuaArguments Arguments;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadFunction ( iLuaFunction );
-    argStream.ReadNumber ( ulTimeInterval );
+    argStream.ReadNumber ( dTimeInterval );
     argStream.ReadNumber ( uiTimesToExecute );
     argStream.ReadLuaArguments ( Arguments );
     argStream.ReadFunctionComplete ();
@@ -9652,14 +9652,14 @@ int CLuaFunctionDefinitions::SetTimer ( lua_State* luaVM )
         if ( luaMain )
         {
             // Check for the minimum interval
-            if ( ulTimeInterval < LUA_TIMER_MIN_INTERVAL )
+            if ( dTimeInterval < LUA_TIMER_MIN_INTERVAL )
             {
                 m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setTimer", "Interval is below 50" ) );
                 lua_pushboolean ( luaVM, false );
                 return 1;
             }
 
-            CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, ulTimeInterval, uiTimesToExecute, Arguments );
+            CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, CTickCount ( dTimeInterval ), uiTimesToExecute, Arguments );
             if ( pLuaTimer )
             {
                 lua_pushtimer ( luaVM, pLuaTimer );
@@ -9751,10 +9751,10 @@ int CLuaFunctionDefinitions::IsTimer ( lua_State* luaVM )
 int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
 {
 //  table getTimers ( [ time ] )
-    int iTime;
+    double dTime;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( iTime, 0 );
+    argStream.ReadNumber ( dTime, 0 );
 
     if ( !argStream.HasErrors () )
     {
@@ -9766,7 +9766,7 @@ int CLuaFunctionDefinitions::GetTimers ( lua_State* luaVM )
             lua_newtable ( luaVM );
 
             // Add all the timers with less than ulTime left
-            pLuaMain->GetTimerManager ()->GetTimers ( iTime, luaVM );
+            pLuaMain->GetTimerManager ()->GetTimers ( CTickCount ( dTime ), luaVM );
             return 1;
         }
     }
@@ -9788,9 +9788,9 @@ int CLuaFunctionDefinitions::GetTimerDetails ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushnumber( luaVM, pLuaTimer->GetTimeLeft () );
+        lua_pushnumber( luaVM, pLuaTimer->GetTimeLeft ().ToDouble () );
         lua_pushnumber( luaVM, pLuaTimer->GetRepeats () );
-        lua_pushnumber( luaVM, pLuaTimer->GetDelay () );
+        lua_pushnumber( luaVM, pLuaTimer->GetDelay ().ToDouble () );
         return 3;
     }
     else
