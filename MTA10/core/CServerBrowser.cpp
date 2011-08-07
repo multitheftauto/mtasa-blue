@@ -1190,27 +1190,26 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     }
 
     // Start the connect
-    if ( CCore::GetSingleton ().GetConnectManager ()->Connect ( strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str() ) )
-    {
-        // If the connect button was pressed, at the server to the history
+    CCore::GetSingleton ().GetConnectManager ()->Connect ( strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str(), true );
 
-        in_addr Address;
-        if ( CServerListItem::Parse ( strHost.c_str(), Address ) )
-        {
-            CServerList* pHistoryList = this->GetHistoryList ();
-            pHistoryList->Remove ( Address, usPort + SERVER_LIST_QUERY_PORT_OFFSET );
-            pHistoryList->AddUnique ( Address, usPort + SERVER_LIST_QUERY_PORT_OFFSET );
-            while ( pHistoryList->GetServerCount () > 11 )
-            {
-                CServerListItem* pLast = *pHistoryList->IteratorBegin ();
-                pHistoryList->Remove ( pLast->Address, pLast->usQueryPort );
-            }
-            this->CreateHistoryList();
-        	this->SaveRecentlyPlayedList();
-        }
-    }
     return true;
 }
+
+void CServerBrowser::NotifyServerExists ( in_addr Address, ushort usPort )
+{
+    // If the connect button was pressed, and the server exists, add it to the history
+    CServerList* pHistoryList = GetHistoryList ();
+    pHistoryList->Remove ( Address, usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+    pHistoryList->AddUnique ( Address, usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+    while ( pHistoryList->GetServerCount () > 11 )
+    {
+        CServerListItem* pLast = *pHistoryList->IteratorBegin ();
+        pHistoryList->Remove ( pLast->Address, pLast->usQueryPort );
+    }
+    CreateHistoryList ();
+    SaveRecentlyPlayedList ();
+}
+
 
 void CServerBrowser::CompleteConnect ( void )
 {

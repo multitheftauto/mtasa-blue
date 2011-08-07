@@ -113,6 +113,7 @@ public:
     void                SetNextHistoryText      ( bool bDown );
 
     void                OnQuickConnectButtonClick ( void );
+    void                NotifyServerExists      ( in_addr Address, ushort usPort );
 
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
