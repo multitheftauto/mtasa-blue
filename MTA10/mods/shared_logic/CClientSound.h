@@ -62,7 +62,7 @@ public:
 
     void                    Stop                    ( void );
 
-    void                    SetPaused               ( bool bPaused );
+    void                    SetPaused               ( bool bPaused, bool bSave = true );
     bool                    IsPaused                ( void );
 
     bool                    IsFinished              ( void );
