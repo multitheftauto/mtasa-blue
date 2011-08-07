@@ -38,8 +38,10 @@ CClientSound::CClientSound ( CClientManager* pManager, ElementID ID ) : ClassIni
     m_fMaxDistance = 20.0f;
     m_fPlaybackSpeed = 1.0f;
     m_usDimension = 0;
+    m_llPauseTimeTicks = 0;
     m_b3D = false;
     m_bPaused = false;
+    m_bStream = false;
 
     m_strStreamName = "";
     m_strStreamTitle = "";
@@ -148,6 +150,7 @@ void CClientSound::PlayStream ( const SString& strURL, bool bLoop, bool b3D, con
 {
     m_strPath = strURL;
     m_b3D = b3D;
+    m_bStream = true;
     m_vecPosition = vecPosition;
 
     long lFlags = BASS_STREAM_AUTOFREE;
@@ -603,6 +606,9 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecCameraPosition, C
         fVolume = 0.0f;
         if ( m_bPaused == false ) // Don't do anything if the client has paused us
         {
+            if ( m_llPauseTimeTicks == 0 ) // Tick count needs to be stored to "resume" at the time it would have been without a pause
+                m_llPauseTimeTicks = GetTickCount64_();
+
             SetPaused( true, false );
             return;
         }
@@ -634,8 +640,12 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecCameraPosition, C
         {
             fVolume = 0.0f;
             if ( m_bPaused == false ) // Don't do anything if the client has paused us
+            {
+                if ( m_llPauseTimeTicks == 0 ) // Tick count needs to be stored to "resume" at the time it would have been without a pause
+                    m_llPauseTimeTicks = GetTickCount64_();
+
                 SetPaused( true, false ); // Actually pause it here ( hopefully BASS stops streaming radio streams! )
-            
+            }
             return;
         }
         else
@@ -646,6 +656,8 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecCameraPosition, C
             if ( m_bPaused == false ) // Don't do anything if the client has paused us
             {
                 SetPaused( false, false );
+                // Sound position calculation
+                SmartSeek();
                 return;
             }
         }
@@ -653,8 +665,78 @@ void CClientSound::Process3D ( CVector vecPosition, CVector vecCameraPosition, C
 
     BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_VOL, fVolume * m_fVolume );
 }
+void CClientSound::SmartSeek ( )
+{
+    // Don't think this'l happen but might as well be safe
+    if ( m_llPauseTimeTicks == 0 )
+        return;
 
+    if ( m_bStream )
+    {
+        // STREAMS DO NOT WORK THAT WAY!
+        // GOODNIGHT.
+        return;
+    }
+    // Variables for return values, length, current play position, seek position, difference, tick count and a temporary storage for length
+    bool bReturn = true;
+    double dLength, dCurrentPos, dSeek, dChange;
+    long long llTicks = GetTickCount64_();
+    QWORD qLen;
 
+    // Get the sounds length (this is in seconds as a double so 2 minutes = 120 seconds
+    qLen=BASS_ChannelGetLength(m_pSound, BASS_POS_BYTE);
+    dLength=BASS_ChannelBytes2Seconds(m_pSound, qLen);
+
+    // Get the position in the sound file (same as above)
+    qLen = BASS_ChannelGetPosition( m_pSound, BASS_POS_BYTE);
+    dCurrentPos=BASS_ChannelBytes2Seconds(m_pSound, qLen);
+
+    // new ticks minus Previous = difference in time
+    dChange = static_cast < double > (llTicks - m_llPauseTimeTicks);
+    // Divide by 1000 to get seconds
+    dChange /= 1000;
+
+    // Seek is the current position + the change in time
+    dSeek = dCurrentPos + dChange;
+
+    // Have we tried to seek longer than the track?
+    if ( dSeek >= dLength )
+    {
+        // Get the BASS info ( we need to check if looping is enabled here as we don't want to accidentally loop unlooped sounds by skipping backwards! )
+        BASS_CHANNELINFO tInfo;
+        BASS_ChannelGetInfo ( m_pSound, &tInfo );
+        if ( tInfo.flags & BASS_SAMPLE_LOOP )
+        {
+            // new seek time is the seek time mod the length so we get a value within the length
+            dSeek = fmod(dSeek, dLength);
+            // Convert this to "bytes"
+            QWORD qSeek = BASS_ChannelSeconds2Bytes( m_pSound, dSeek );
+            // Set position
+            bReturn = BASS_ChannelSetPosition( m_pSound, qSeek, BASS_POS_BYTE );
+        }
+        else
+        {
+            // Convert this to "bytes"
+            QWORD qSeek = BASS_ChannelSeconds2Bytes( m_pSound, dLength );
+            // Set position
+            bReturn = BASS_ChannelSetPosition( m_pSound, qSeek, BASS_POS_BYTE );
+        }
+    }
+    else
+    {
+        // Time is within the length of the song we can just seek now
+        // Convert this to "bytes"
+        QWORD qSeek = BASS_ChannelSeconds2Bytes( m_pSound, dSeek );
+        // Set position
+        bReturn = BASS_ChannelSetPosition( m_pSound, qSeek, BASS_POS_BYTE );
+    }
+    // Oh dear. what happened here then!
+    if ( bReturn == false )
+        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in SmartSeek path = %s", BASS_ErrorGetCode(), m_strPath.c_str() );
+
+    // Reset ticks
+    m_llPauseTimeTicks = 0;
+}
 //
 // Handle stored data from other threads
 //

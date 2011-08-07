@@ -109,6 +109,7 @@ protected:
 
     DWORD                   GetSound                ( void )                            { return m_pSound; };
     void                    Process3D               ( CVector vecPosition, CVector vecCameraPosition, CVector vecLookAt );
+    void                    SmartSeek               ( void );
 
 private:
 
@@ -119,6 +120,7 @@ private:
     bool                    m_b3D;
     bool                    m_bInSameDimension;
     bool                    m_bPaused;
+    bool                    m_bStream;
     float                   m_fDefaultFrequency;
     float                   m_fVolume;
     float                   m_fMinDistance;
@@ -133,6 +135,8 @@ private:
 
     SString                 m_strStreamName;
     SString                 m_strStreamTitle;
+    long long               m_llPauseTimeTicks;
+
 };
 
 #endif
