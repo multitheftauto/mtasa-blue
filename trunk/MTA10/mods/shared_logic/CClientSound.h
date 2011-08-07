@@ -21,12 +21,21 @@ class CClientSound;
 //#define MAX_SOUND_DISTANCE 100
 #define CUT_OFF 5.0f //Cut off point at which volume is regarded as 0 in the function e^-x
 
-typedef struct
+struct SSoundThreadVariables
 {
-    CClientSound* pClientSound;
-    SString strURL;
-    long lFlags;
-} thestruct;
+    ZERO_ON_NEW
+    int                     iRefCount;
+    SString                 strURL;
+    long                    lFlags;
+    DWORD                   pSound;
+    bool                    bStreamCreateResult;
+    std::list < uint >      onClientSoundFinishedDownloadQueue;
+    std::list < SString >   onClientSoundChangedMetaQueue;
+    CCriticalSection        criticalSection;
+
+    void Release ( void );
+};
+
 
 class CClientSound : public CClientEntity
 {
@@ -94,18 +103,7 @@ public:
 
     void                    ServiceVars             ( void );
 
-    // Thread safe variables
-    struct
-    {
-        HANDLE                  pThread;
-        DWORD                   pSound;
-        bool                    bStreamCreateResult;
-        std::list < uint >      onClientSoundFinishedDownloadQueue;
-        std::list < SString >   onClientSoundChangedMetaQueue;
-    } m_Vars;
-
-    // Thread safe variables locker
-    CCriticalSection            m_VarsCriticalSection;
+    SSoundThreadVariables*  m_pVars;
 
 protected:
 
@@ -135,8 +133,6 @@ private:
 
     SString                 m_strStreamName;
     SString                 m_strStreamTitle;
-
-    bool                    m_bUsingVars;
 };
 
 #endif
