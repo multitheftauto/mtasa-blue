@@ -702,8 +702,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     {
         // Check it for validity
         const char* szPassword = m_pMainConfig->GetPassword ().c_str ();
-        unsigned int uiUnsupportedIndex;
-        if ( m_pMainConfig->IsValidPassword ( szPassword, uiUnsupportedIndex ) )
+        if ( m_pMainConfig->IsValidPassword ( szPassword ) )
         {
             // Store the server password
             CLogger::LogPrintf ( "Server password set to '%s'\n", szPassword );
