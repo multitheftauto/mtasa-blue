@@ -504,6 +504,7 @@ const TiXmlDocument* TiXmlNode::GetDocument() const
 TiXmlElement::TiXmlElement (const char * _value)
 	: TiXmlNode( TiXmlNode::ELEMENT )
 {
+    m_bWasEmptyTag = false;
 	firstChild = lastChild = 0;
 	value = _value;
 }
@@ -513,6 +514,7 @@ TiXmlElement::TiXmlElement (const char * _value)
 TiXmlElement::TiXmlElement( const std::string& _value ) 
 	: TiXmlNode( TiXmlNode::ELEMENT )
 {
+    m_bWasEmptyTag = false;
 	firstChild = lastChild = 0;
 	value = _value;
 }
@@ -522,6 +524,7 @@ TiXmlElement::TiXmlElement( const std::string& _value )
 TiXmlElement::TiXmlElement( const TiXmlElement& copy)
 	: TiXmlNode( TiXmlNode::ELEMENT )
 {
+    m_bWasEmptyTag = false;
 	firstChild = lastChild = 0;
 	copy.CopyTo( this );	
 }
@@ -792,7 +795,10 @@ void TiXmlElement::Print( FILE* cfile, int depth ) const
 	TiXmlNode* node;
 	if ( !firstChild )
 	{
-		fprintf( cfile, " />" );
+        if ( m_bWasEmptyTag )
+		    fprintf( cfile, " />" );
+        else
+		    fprintf( cfile, "></%s>", value.c_str() );
 	}
 	else if ( firstChild == lastChild && firstChild->ToText() )
 	{
@@ -825,6 +831,8 @@ void TiXmlElement::CopyTo( TiXmlElement* target ) const
 {
 	// superclass:
 	TiXmlNode::CopyTo( target );
+
+    target->m_bWasEmptyTag = m_bWasEmptyTag;
 
 	// Element class: 
 	// Clone the attributes, then clone the children.
@@ -1020,6 +1028,7 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 		data += buf;
 	}
 	*/
+    #define BLANK_LINE_COMMENT_MAGIC "##BLANK-LINE##"
 
 	char* buf = new char[ length+1 ];
 	buf[0] = 0;
@@ -1033,9 +1042,20 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 	const char* lastPos = buf;
 	const char* p = buf;
 
+    bool bInComment = false;
+    bool bEmptyLine = false;
+
 	buf[length] = 0;
 	while( *p ) {
 		assert( p < (buf+length) );
+
+ 		if ( *p == 0xa || *p == 0xd )
+        {
+           if ( bEmptyLine && !bInComment )
+                data.append( "<!--" BLANK_LINE_COMMENT_MAGIC "-->" );
+            bEmptyLine = true;
+        }
+
 		if ( *p == 0xa ) {
 			// Newline character. No special rules for this. Append all the characters
 			// since the last string, and include the newline.
@@ -1065,7 +1085,19 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 				assert( p <= (buf+length) );
 			}
 		}
+        else
+        if ( *p == ' ' ||  *p == '\t' )
+        {
+            // White space
+			++p;
+        }
 		else {
+            if ( strncmp ( p, "<!--", 4 ) == 0 )
+                bInComment = true;     // Entering comment
+            if ( strncmp ( p, "-->", 3 ) == 0 )
+                bInComment = false;     // Leaving comment
+
+            bEmptyLine = false;
 			++p;
 		}
 	}
@@ -1304,7 +1336,8 @@ void TiXmlComment::Print( FILE* cfile, int depth ) const
 	{
 		fprintf( cfile,  "    " );
 	}
-	fprintf( cfile, "<!--%s-->", value.c_str() );
+    if ( value != BLANK_LINE_COMMENT_MAGIC )
+    	fprintf( cfile, "<!--%s-->", value.c_str() );
 }
 
 
