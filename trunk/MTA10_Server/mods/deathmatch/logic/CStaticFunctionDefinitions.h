@@ -484,6 +484,7 @@ public:
     static bool                 SetMaxPlayers                       ( unsigned int uiMax );
     static bool                 OutputChatBox                       ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded );
     static bool                 OutputConsole                       ( const char* szText, CElement* pElement );
+    static bool                 SetServerPassword                   ( const SString& strPassword, bool bSave );
 
     // General world get funcs
     static bool                 GetTime                             ( unsigned char& ucHour, unsigned char& ucMinute );
@@ -519,7 +520,7 @@ public:
     static bool                 GetHeatHaze                         ( SHeatHazeSettings& heatHazeSettings );
     static bool                 SetHeatHaze                         ( const SHeatHazeSettings& heatHazeSettings );
     static bool                 ResetHeatHaze                       ( void );
-    static bool                 SetFPSLimit                         ( unsigned short usLimit );
+    static bool                 SetFPSLimit                         ( unsigned short usLimit, bool bSave );
     static bool                 SetMinuteDuration                   ( unsigned long ulDuration );
     static bool                 SetGarageOpen                       ( unsigned char ucGarageID, bool bIsOpen );
     static bool                 SetGlitchEnabled                    ( const std::string& strGlitchName, bool bEnabled );

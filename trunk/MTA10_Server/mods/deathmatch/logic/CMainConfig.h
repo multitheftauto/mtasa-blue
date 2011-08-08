@@ -47,10 +47,10 @@ public:
     void                            SetSoftMaxPlayers               ( unsigned int v ) { m_uiSoftMaxPlayers = v; }
     inline bool                     IsHTTPEnabled                   ( void )        { return m_bHTTPEnabled; };
 
-    bool                            IsValidPassword                 ( const char* szPassword, unsigned int& cUnsupportedIndex );
+    bool                            IsValidPassword                 ( const char* szPassword );
     inline bool                     HasPassword                     ( void )        { return !m_strPassword.empty (); };
     inline const std::string&       GetPassword                     ( void )        { return m_strPassword; };
-    void                            SetPassword                     ( const char* szPassword );
+    bool                            SetPassword                     ( const char* szPassword, bool bSave );
 
     inline bool                     GetASEEnabled                   ( void )        { return m_bAseEnabled; };
     unsigned short                  GetHTTPPort                     ( void );
@@ -81,7 +81,10 @@ public:
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
-    void                            SetFPSLimit                     ( unsigned short usFPS );
+    bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
+
+    bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
+    bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
 

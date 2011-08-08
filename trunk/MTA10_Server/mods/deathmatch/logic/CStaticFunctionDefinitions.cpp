@@ -8303,6 +8303,21 @@ bool CStaticFunctionDefinitions::OutputConsole ( const char* szText, CElement* p
 }
 
 
+bool CStaticFunctionDefinitions::SetServerPassword ( const SString& strPassword, bool bSave )
+{
+    if ( g_pGame->GetConfig()->SetPassword ( strPassword, bSave ) )
+    {
+        if ( !strPassword.empty () )
+            CLogger::LogPrintf ( "Server password set to '%s'\n", *strPassword );
+        else
+            CLogger::LogPrintf ( "Server password cleared\n" );
+        return true;
+    }
+
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::GetTime ( unsigned char& ucHour, unsigned char& ucMinute )
 {
     m_pClock->Get ( ucHour, ucMinute );
@@ -8798,12 +8813,10 @@ bool CStaticFunctionDefinitions::SetWaveHeight ( float fHeight )
 }
 
 
-bool CStaticFunctionDefinitions::SetFPSLimit ( unsigned short usLimit )
+bool CStaticFunctionDefinitions::SetFPSLimit ( unsigned short usLimit, bool bSave )
 {
-    if ( usLimit == 0 || ( usLimit >= 25 && usLimit <= 100 ) )
+    if ( g_pGame->GetConfig()->SetFPSLimit ( usLimit, bSave ) )
     {
-        g_pGame->GetConfig()->SetFPSLimit ( usLimit );
-
         CBitStream BitStream;
         BitStream.pBitStream->Write ( (short)usLimit );
         m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_FPS_LIMIT, *BitStream.pBitStream ) );

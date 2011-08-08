@@ -412,6 +412,8 @@ public:
     static int      GetServerIP                         ( lua_State* luaVM );
     static int      GetServerPassword                   ( lua_State* luaVM );
     static int      SetServerPassword                   ( lua_State* luaVM );
+    static int      GetServerConfigSetting              ( lua_State* luaVM );
+    static int      SetServerConfigSetting              ( lua_State* luaVM );
 
     static int      shutdown                            ( lua_State* luaVM );
 

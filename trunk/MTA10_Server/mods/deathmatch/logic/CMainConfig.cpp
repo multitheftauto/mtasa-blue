@@ -547,10 +547,13 @@ bool CMainConfig::Save ( const char* szFilename )
 }
 
 
-bool CMainConfig::IsValidPassword ( const char* szPassword, unsigned int& uiUnsupportedIndex )
+bool CMainConfig::IsValidPassword ( const char* szPassword )
 {
+    if ( !szPassword )
+        return false;
+
     // Test all characters for visibilty
-    uiUnsupportedIndex = 0;
+    uint uiUnsupportedIndex = 0;
     const char* szPtr = szPassword;
     while ( *szPtr != 0 )
     {
@@ -568,20 +571,34 @@ bool CMainConfig::IsValidPassword ( const char* szPassword, unsigned int& uiUnsu
 }
 
 
-void CMainConfig::SetPassword ( const char* szPassword ) 
+bool CMainConfig::SetPassword ( const char* szPassword, bool bSave ) 
 {
-    m_strPassword = szPassword ? szPassword : "";
-    SetString ( m_pRootNode, "password", szPassword );
+    if ( IsValidPassword ( szPassword ) )
+    {
+        m_strPassword = szPassword;
+        if ( bSave )
+        {
+            SetString ( m_pRootNode, "password", szPassword );
+            Save ();
+        }
+    }
+    return true;
 }
 
 
-void CMainConfig::SetFPSLimit ( unsigned short usFPS )
+bool CMainConfig::SetFPSLimit ( unsigned short usFPS, bool bSave )
 {
     if ( usFPS == 0 || ( usFPS >= 25 && usFPS <= 100 ) )
     {
         m_usFPSLimit = usFPS;
-        SetInteger ( m_pRootNode, "fpslimit", usFPS );
+        if ( bSave )
+        {
+            SetInteger ( m_pRootNode, "fpslimit", usFPS );
+            Save ();
+        }
+        return true;
     }
+    return false;
 }
 
 
@@ -632,4 +649,98 @@ unsigned short CMainConfig::GetHTTPPort ( void )
     if ( m_pCommandLineParser && m_pCommandLineParser->GetHTTPPort ( usHTTPPort ) )
         return usHTTPPort;
     return m_usHTTPPort;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Fetch any single setting from the server config
+//
+//////////////////////////////////////////////////////////////////////
+bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
+{
+    //
+    // Fetch settings that may differ from the XML data
+    //
+    if ( strName == "minclientversion" )
+    {
+        strValue = m_strMinClientVersion;
+        return true;
+    }
+    else
+    if ( strName == "recommendedclientversion" )
+    {
+        strValue = m_strRecommendedClientVersion;
+        return true;
+    }
+    else
+    if ( strName == "password" )
+    {
+        strValue = GetPassword ();
+        return true;
+    }
+    else
+    if ( strName == "fpslimit" )
+    {
+        strValue = SString ( "%d", GetFPSLimit () );
+        return true;
+    }
+    else
+
+    //
+    // Everything else is read only, so can be fetched directly from the XML data
+    //
+    if ( GetString ( m_pRootNode, strName, strValue ) )
+        return true;
+
+    return false;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Put certain settings to the server config
+//
+//////////////////////////////////////////////////////////////////////
+bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, bool bSave )
+{
+    if ( strName == "minclientversion" )
+    {
+        if ( strValue == "" || IsValidVersionString ( strValue ) )
+        {
+            m_strMinClientVersion = strValue;
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "minclientversion", m_strMinClientVersion );
+                Save ();
+            }
+            return true;
+        }
+    }
+    else
+    if ( strName == "recommendedclientversion" )
+    {
+        if ( strValue == "" || IsValidVersionString ( strValue ) )
+        {
+            m_strRecommendedClientVersion = strValue;
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "recommendedclientversion", m_strRecommendedClientVersion );
+                Save ();
+            }
+            return true;
+        }
+    }
+    else
+    if ( strName == "password" )
+    {
+        return CStaticFunctionDefinitions::SetServerPassword ( strValue, bSave );
+    }
+    else
+    if ( strName == "fpslimit" )
+    {
+        return CStaticFunctionDefinitions::SetFPSLimit ( atoi ( strValue ), bSave );
+    }
+
+    return false;
 }

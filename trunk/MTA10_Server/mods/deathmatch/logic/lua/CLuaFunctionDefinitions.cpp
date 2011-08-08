@@ -247,43 +247,76 @@ int CLuaFunctionDefinitions::GetServerPassword ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetServerPassword ( lua_State* luaVM )
 {
-    // Check types
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+//  bool setServerPassword ( [ string password ] )
+    SString strPassword;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strPassword, "" );
+
+    if ( !argStream.HasErrors () )
     {
-        // Grab the password string
-        const char* szPassword = lua_tostring ( luaVM, 1 );
-
-        // Is it valid?
-        unsigned int uiUnsupportedIndex;
-        if ( szPassword && g_pGame->GetConfig ()->IsValidPassword ( szPassword, uiUnsupportedIndex ) )
+        if ( CStaticFunctionDefinitions::SetServerPassword ( strPassword, true ) )
         {
-            // Set it
-            g_pGame->GetConfig ()->SetPassword ( szPassword );
-            g_pGame->GetConfig ()->Save ();
-            CLogger::LogPrintf ( "Server password set to '%s'\n", szPassword );
-
-            // Success
             lua_pushboolean ( luaVM, true );
             return 1;
         }
         else
             m_pScriptDebugging->LogError ( luaVM, "setServerPassword; password must be shorter than 32 chars and just contain visible characters" );
     }
-    else if ( lua_type ( luaVM, 1 ) == LUA_TNIL )
-    {
-        // Remove the password
-        g_pGame->GetConfig ()->SetPassword ( "" );
-        g_pGame->GetConfig ()->Save ();
-        CLogger::LogPrintf ( "Server password cleared\n" );
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setServerPassword", *argStream.GetErrorMessage () ) );
 
-        // Success
-        lua_pushboolean ( luaVM, true );
-        return 1;
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::GetServerConfigSetting ( lua_State* luaVM )
+{
+//  string getServerConfigSetting ( string name )
+    SString strName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strName );
+
+    if ( !argStream.HasErrors () )
+    {
+        SString strValue;
+        if ( g_pGame->GetConfig ()->GetSetting ( strName, strValue ) )
+        {
+            lua_pushstring ( luaVM, strValue );
+            return 1;
+        }
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setServerPassword" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getServerConfigSetting", *argStream.GetErrorMessage () ) );
 
-    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefinitions::SetServerConfigSetting ( lua_State* luaVM )
+{
+//  bool setServerConfigSetting ( string name, string value [, bool save = false ] )
+    SString strName; SString strValue; bool bSave;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strName );
+    argStream.ReadString ( strValue );
+    argStream.ReadBool ( bSave, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( g_pGame->GetConfig ()->SetSetting ( strName, strValue, bSave ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setServerConfigSetting", *argStream.GetErrorMessage () ) );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }

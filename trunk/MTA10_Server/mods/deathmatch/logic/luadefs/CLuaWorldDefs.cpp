@@ -993,7 +993,7 @@ int CLuaWorldDefs::setFPSLimit ( lua_State* luaVM )
     if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING || iArgument1 == LUA_TBOOLEAN )
     {
         unsigned short usLimit = static_cast < unsigned short > ( lua_tonumber ( luaVM, 1 ) );
-        if ( CStaticFunctionDefinitions::SetFPSLimit ( usLimit ) )
+        if ( CStaticFunctionDefinitions::SetFPSLimit ( usLimit, false ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
