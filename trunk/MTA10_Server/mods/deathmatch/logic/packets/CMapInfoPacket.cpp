@@ -65,7 +65,8 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
                                  bool bOverrideFarClipDistance,
                                  float fFarClip,
                                  bool bOverrideFogDistance,
-                                 float fFogDistance)
+                                 float fFogDistance,
+                                 float fAircraftMaxHeight )
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -117,6 +118,7 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_fFarClip = fFarClip;
     m_bOverrideFogDistance = bOverrideFogDistance;
     m_fFogDistance = fFogDistance;
+    m_fAircraftMaxHeight = fAircraftMaxHeight;
 }
 
 
@@ -249,6 +251,8 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     {
         BitStream.Write ( m_fFogDistance );
     }
+
+    BitStream.Write ( m_fAircraftMaxHeight );
 
     return true;
 }

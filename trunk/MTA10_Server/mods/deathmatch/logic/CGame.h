@@ -295,6 +295,9 @@ public:
     inline float                GetFogDistance              ( void )        { return m_fFogDistance; }
     inline void                 SetFogDistance              ( float& fFogDistance ) { m_fFogDistance = fFogDistance; }
 
+    inline float                GetAircraftMaxHeight        ( void ) { return m_fAircraftMaxHeight; }
+    inline void                 SetAircraftMaxHeight        ( float fMaxHeight ) { m_fAircraftMaxHeight = fMaxHeight; }
+
     inline bool*                GetGarageStates             ( void )        { return m_bGarageStates; }
 
     void                        Lock                        ( void );
@@ -410,6 +413,7 @@ private:
     float                       m_fGravity;
     float                       m_fGameSpeed;
     float                       m_fJetpackMaxHeight;
+    float                       m_fAircraftMaxHeight;
 
     unsigned char               m_ucTrafficLightState;
     bool                        m_bTrafficLightsLocked;

@@ -38,6 +38,7 @@ void CWorldRPCs::LoadFunctions ( void )
     AddHandler ( SET_CLOUDS_ENABLED, SetCloudsEnabled, "SetCloudsEnabled" );
     AddHandler ( SET_TRAFFIC_LIGHT_STATE, SetTrafficLightState, "SetTrafficLightState" );
     AddHandler ( SET_JETPACK_MAXHEIGHT, SetJetpackMaxHeight, "SetJetpackMaxHeight" );
+    AddHandler ( SET_AIRCRAFT_MAXHEIGHT, SetAircraftMaxHeight, "SetAircraftMaxHeight" );
 
     AddHandler ( SET_INTERIOR_SOUNDS_ENABLED, SetInteriorSoundsEnabled, "SetInteriorSoundsEnabled" );
     AddHandler ( SET_RAIN_LEVEL, SetRainLevel, "SetRainLevel" );
@@ -338,6 +339,16 @@ void CWorldRPCs::SetFogDistance ( NetBitStreamInterface& bitStream )
     if ( bitStream.Read ( fFogDist ) )
     {
         g_pMultiplayer->SetFogDistance ( fFogDist );
+    }
+}
+
+void CWorldRPCs::SetAircraftMaxHeight ( NetBitStreamInterface& bitStream )
+{
+    float fMaxHeight;
+
+    if ( bitStream.Read ( fMaxHeight ) )
+    {
+        g_pGame->GetWorld ()->SetAircraftMaxHeight ( fMaxHeight );
     }
 }
 

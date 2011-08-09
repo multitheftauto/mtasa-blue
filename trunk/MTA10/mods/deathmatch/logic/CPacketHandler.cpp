@@ -2124,6 +2124,13 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
         g_pMultiplayer->SetFogDistance ( fFogDistance );
     }
+
+    // Aircraft max height
+    float fAircraftMaxHeight = 800;
+    if ( !bitStream.Read ( fAircraftMaxHeight ) )
+        return;
+    
+    g_pGame->GetWorld ()->SetAircraftMaxHeight ( fAircraftMaxHeight );
 }
 
 
