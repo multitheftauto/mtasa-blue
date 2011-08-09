@@ -225,6 +225,7 @@ CServerBrowser::CServerBrowser ( void )
         pLabel->SetPosition ( CVector2D ( 0, 0 ) );
         pLabel->SetSize ( CVector2D ( generalHelpSize ) );
         pLabel->SetProperty( "BackgroundEnabled", "True" );
+        pLabel->SetZOrderingEnabled ( false );
     }
 
 

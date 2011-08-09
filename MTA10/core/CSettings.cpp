@@ -168,6 +168,7 @@ CSettings::CSettings ( void )
     m_pControlsInputTypePane->SetProperty ( "ContentPaneAutoSized", "False" );
     m_pControlsInputTypePane->SetPosition ( CVector2D ( 0, 101 ) );
     m_pControlsInputTypePane->SetSize ( CVector2D ( 1.0f, 0.27f ), true );
+    m_pControlsInputTypePane->SetZOrderingEnabled ( false );
 
     m_pStandardControls = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pControlsInputTypePane, "Standard controls (Mouse + Keyboard)" ) ); 
     m_pStandardControls->SetSelected ( true );
