@@ -110,6 +110,23 @@ BEGIN
     EDITTEXT        IDC_CRASH_INFO_EDIT,39,22,304,83,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
 END
 
+IDD_D3DDLL_DIALOG DIALOGEX 0, 0, 373, 236
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "MTA: San Andreas - Warning"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Play MTA:SA",IDOK,153,209,67,14
+    PUSHBUTTON      "Quit",IDCANCEL,245,209,67,14
+    CTEXT           "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll file:",IDC_STATIC,31,26,310,17
+    EDITTEXT        IDC_EDIT_D3DDLL_PATH,31,46,310,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
+    CTEXT           "The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\nIt is recommended that you remove or rename d3d9.dll",IDC_STATIC,31,81,310,30
+    GROUPBOX        "",IDC_STATIC,7,7,359,122
+    GROUPBOX        "",IDC_STATIC,25,142,324,43
+    CONTROL         " Do not tell me about this d3d9.dll again",IDC_CHECK_NOT_AGAIN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,161,143,10
+    PUSHBUTTON      "Show me the file",IDC_BUTTON_SHOW_DIR,61,209,67,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -133,6 +150,14 @@ BEGIN
         RIGHTMARGIN, 378
         TOPMARGIN, 7
         BOTTOMMARGIN, 223
+    END
+
+    IDD_D3DDLL_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 366
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 229
     END
 END
 #endif    // APSTUDIO_INVOKED
