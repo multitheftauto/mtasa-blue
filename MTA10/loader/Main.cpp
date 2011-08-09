@@ -69,7 +69,16 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
                     iRecheckTimeLimit -= 500;
                     continue;
                 }
-                MessageBox( 0, "Can't send WM_COPYDATA", "Error", MB_ICONERROR );
+                SString strMessage;
+                strMessage += "Trouble restarting MTA:SA\n\n";
+                strMessage += "If the problem persists, open Task Manager and\n";
+                strMessage += "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n";
+                strMessage += "Try to launch MTA:SA again?";
+                if ( MessageBox( 0, strMessage, "Error", MB_ICONERROR | MB_YESNO ) == IDYES )
+                {
+                    SetMTASAPathSource ( false );
+                    ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath (), MTA_EXE_NAME ), lpCmdLine );            
+                }
                 return 0;
             }
         }
@@ -341,6 +350,13 @@ int DoLaunchGame ( LPSTR lpCmdLine )
             return DisplayErrorMessageBox ( SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ), "file-clash" );
         }    
     }
+
+    // Warning if d3d9.dll exists in the GTA install directory
+    if ( FileExists( PathJoin ( strGTAPath, "d3d9.dll" ) ) )
+    {
+        ShowD3dDllDialog ( g_hInstance, PathJoin ( strGTAPath, "d3d9.dll" ) );
+        HideD3dDllDialog ();
+    }    
 
     // Strip out flag from command line
     SString strCmdLine = lpCmdLine;

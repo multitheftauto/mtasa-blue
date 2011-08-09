@@ -718,6 +718,8 @@ std::vector < SString > CVersionUpdater::MakeServerList ( const CDataInfoSet& da
 {
     std::vector < SString > serverList;
 
+    srand( GetTickCount64_ () );
+
     //
     // Sort out server order
     //

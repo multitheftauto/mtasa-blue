@@ -20,6 +20,8 @@
 
 static bool bCancelPressed = false;
 static bool bOkPressed = false;
+static bool bOtherPressed = false;
+static int iOtherCode = 0;
 static HWND hwndSplash = NULL;
 static unsigned long ulSplashStartTime = 0;
 static HWND hwndProgressDialog = NULL;
@@ -27,6 +29,7 @@ static unsigned long ulProgressStartTime = 0;
 static SString g_strMTASAPath;
 SString GetWMIOSVersion ( void );
 static HWND hwndCrashedDialog = NULL;
+static HWND hwndD3dDllDialog = NULL;
 HANDLE g_hMutex = NULL;
 HMODULE hLibraryModule = NULL;
 
@@ -397,6 +400,12 @@ int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
                 case IDOK:
                     bOkPressed = true;
                     return TRUE; 
+                default:
+                    if ( iOtherCode && iOtherCode == LOWORD(wParam) )
+                    {
+                        bOtherPressed = true;
+                        return TRUE; 
+                    }
             } 
     } 
     return FALSE; 
@@ -790,6 +799,8 @@ SString ShowCrashedDialog( HINSTANCE hInstance, const SString& strMessage )
         HideSplash ();
         bCancelPressed = false;
         bOkPressed = false;
+        bOtherPressed = false;
+        iOtherCode = 0;
         hwndCrashedDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_CRASHED_DIALOG), 0, DialogProc );
         SetWindowText ( GetDlgItem( hwndCrashedDialog, IDC_CRASH_INFO_EDIT ), strMessage );
         SendDlgItemMessage( hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK, GetApplicationSetting ( "diagnostics", "send-dumps" ) != "no" ? BST_CHECKED : BST_UNCHECKED, 0 );
@@ -830,6 +841,95 @@ void HideCrashedDialog ( void )
     }
 }
 
+
+///////////////////////////////////////////////////////////////
+//
+// d3d dll dialog
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void ShowD3dDllDialog( HINSTANCE hInstance, const SString& strPath )
+{
+    // Calc hash of target file
+    SString strFileHash;
+    MD5 md5;
+    CMD5Hasher Hasher;
+    if ( Hasher.Calculate ( strPath, md5 ) )
+    {
+        char szHashResult[33];
+        Hasher.ConvertToHex ( md5, szHashResult );
+        strFileHash = szHashResult;
+    }
+
+	// Maybe skip dialog
+    if ( GetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash" ) == strFileHash )
+    {
+        if ( GetApplicationSetting ( "diagnostics", "d3d9-dll-not-again" ) == "yes" )
+            return;
+    }
+
+	// Create and show dialog
+    if ( !hwndD3dDllDialog )
+    {
+        HideSplash ();
+        bCancelPressed = false;
+        bOkPressed = false;
+        bOtherPressed = false;
+        iOtherCode = IDC_BUTTON_SHOW_DIR;
+        hwndD3dDllDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_D3DDLL_DIALOG), 0, DialogProc );
+        SetWindowText ( GetDlgItem( hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH ), strPath );
+    }
+    SetForegroundWindow ( hwndD3dDllDialog );
+    SetWindowPos ( hwndD3dDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+
+	// Wait for input
+    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
+    {
+        MSG msg;
+        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        {
+            if( GetMessage( &msg, NULL, 0, 0 ) )
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        Sleep( 10 );
+    }
+
+	// Process input
+    LRESULT res = SendMessageA( GetDlgItem( hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN ), BM_GETCHECK, 0, 0 );
+    SetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash", strFileHash );
+    SetApplicationSetting ( "diagnostics", "d3d9-dll-not-again", res ? "yes" : "no" );
+
+    if ( bCancelPressed )
+    {
+        ExitProcess(0);
+    }
+    if ( bOtherPressed )
+    {
+        if ( ITEMIDLIST *pidl = ILCreateFromPath ( strPath ) )
+        {
+            SHOpenFolderAndSelectItems ( pidl, 0, 0, 0 );
+            ILFree ( pidl );
+        }
+        else
+            ShellExecuteNonBlocking ( "open", ExtractPath ( strPath ) );
+
+        ExitProcess(0);
+    }
+}
+
+
+void HideD3dDllDialog ( void )
+{
+    if ( hwndD3dDllDialog )
+    {
+        DestroyWindow ( hwndD3dDllDialog );
+        hwndD3dDllDialog = NULL;
+    }
+}
 
 
 

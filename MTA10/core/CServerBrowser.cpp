@@ -83,6 +83,10 @@ CServerBrowser::CServerBrowser ( void )
     else
         m_WidgetSize = CVector2D ( resolution.fX*SB_SPAN, resolution.fY*SB_SPAN );
 
+    // Limit size
+    m_WidgetSize.fX = Min ( m_WidgetSize.fX, 1200.f );
+    m_WidgetSize.fY = Min ( m_WidgetSize.fY, 1000.f );
+
     CVector2D widgetPosition ( ( resolution.fX - m_WidgetSize.fX ) / 2, ( resolution.fY - m_WidgetSize.fY ) / 2 );
 
     if ( bCreateFrame )
