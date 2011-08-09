@@ -42,6 +42,7 @@ public:
     virtual void                DisableClock ( bool bDisabled )=0;
     virtual void                DisableRadioName ( bool bDisabled )=0;
     virtual void                DisableWantedLevel ( bool bDisabled )=0;
+    virtual void                DisableCrosshair ( bool bDisabled )=0;
     virtual void                DisableAll ( bool bDisabled )=0;
 };
 
