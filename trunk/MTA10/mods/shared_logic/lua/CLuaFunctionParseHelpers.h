@@ -52,6 +52,7 @@ enum eHudComponent
     HUD_CLOCK,
     HUD_RADIO,
     HUD_WANTED,
+    HUD_CROSSHAIR,
     HUD_ALL,
 };
 DECLARE_ENUM( eHudComponent );

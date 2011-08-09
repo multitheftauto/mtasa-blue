@@ -1699,7 +1699,7 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
 bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( eHudComponent component, bool bShow )
 {
     //enum eHudComponent { HUD_AMMO = 0, HUD_WEAPON, HUD_HEALTH, HUD_BREATH,
-    //                         HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_ALL };
+    //                         HUD_ARMOUR, HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME, HUD_RADAR, HUD_CLOCK, HUD_RADIO, HUD_WANTED, HUD_CROSSHAIR, HUD_ALL };
     switch ( component )
     {
         case HUD_AMMO:
@@ -1738,6 +1738,9 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( eHudComponent componen
             return true;
         case HUD_WANTED:
             g_pGame->GetHud ()->DisableWantedLevel ( !bShow );
+            return true;
+        case HUD_CROSSHAIR:
+            g_pGame->GetHud ()->DisableCrosshair ( !bShow );
             return true;
         case HUD_ALL:
             g_pClientGame->SetHudAreaNameDisabled ( !bShow );
