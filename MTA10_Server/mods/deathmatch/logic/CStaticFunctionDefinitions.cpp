@@ -8497,6 +8497,12 @@ bool CStaticFunctionDefinitions::GetFogDistance ( float& fFogDist )
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetAircraftMaxHeight ( float& fMaxHeight )
+{
+    fMaxHeight = g_pGame->GetAircraftMaxHeight ( );
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetTime ( unsigned char ucHour, unsigned char ucMinute )
 {
     // Verify the range
@@ -8643,6 +8649,17 @@ bool CStaticFunctionDefinitions::SetFogDistance ( float fFogDist )
     CBitStream BitStream;
     BitStream.pBitStream->Write ( fFogDist );
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_FOG_DISTANCE, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetAircraftMaxHeight ( float fMaxHeight )
+{
+    g_pGame->SetAircraftMaxHeight ( fMaxHeight );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fMaxHeight );
+    m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( SET_AIRCRAFT_MAXHEIGHT, *BitStream.pBitStream ) );
 
     return true;
 }

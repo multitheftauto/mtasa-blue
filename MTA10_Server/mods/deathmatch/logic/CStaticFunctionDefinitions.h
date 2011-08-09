@@ -506,6 +506,7 @@ public:
     static bool                 GetWindVelocity                     ( float& fVelX, float& fVelY, float& fVelZ );
     static bool                 GetFarClipDistance                  ( float& fFarClip );
     static bool                 GetFogDistance                      ( float& fFogDist );
+    static bool                 GetAircraftMaxHeight                ( float& fMaxHeight );
 
     // General world set funcs
     static bool                 SetTime                             ( unsigned char ucHour, unsigned char ucMinute );
@@ -537,6 +538,7 @@ public:
     static bool                 SetWindVelocity                     ( float fVelX, float fVelY, float fVelZ );
     static bool                 SetFarClipDistance                  ( float fFarClip );
     static bool                 SetFogDistance                      ( float fFogDist );
+    static bool                 SetAircraftMaxHeight                ( float fMaxHeight );
     static bool                 ResetRainLevel                      ( void );
     static bool                 ResetSunSize                        ( void );
     static bool                 ResetSunColor                       ( void );

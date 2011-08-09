@@ -412,6 +412,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     float fWaveHeight = g_pGame->GetWaterManager ()->GetGlobalWaveHeight ();
     float fWaterLevel = g_pGame->GetWaterManager ()->GetGlobalWaterLevel ();
     float fJetpackMaxHeight = g_pGame->GetJetpackMaxHeight ();
+    float fAircraftMaxHeight = g_pGame->GetAircraftMaxHeight ();
 
     // Get the sky gradient
     bool bHasSkyGradient = g_pGame->HasSkyGradient ();
@@ -517,7 +518,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    bOverrideFarClipDistance,
                                    fFarClip,
                                    bOverrideFogDistance,
-                                   fFogDistance ) );
+                                   fFogDistance,
+                                   fAircraftMaxHeight ) );
 
     // Send him all the elements
     SendMapInformation ( Player );

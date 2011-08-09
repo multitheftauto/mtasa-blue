@@ -41,6 +41,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getWindVelocity", CLuaWorldDefs::getWindVelocity );
     CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaWorldDefs::getFarClipDistance );
     CLuaCFunctions::AddFunction ( "getFogDistance", CLuaWorldDefs::getFogDistance );
+    CLuaCFunctions::AddFunction ( "getAircraftMaxHeight", CLuaWorldDefs::getAircraftMaxHeight );
 
     // Set
     CLuaCFunctions::AddFunction ( "setTime", CLuaWorldDefs::setTime );
@@ -66,6 +67,7 @@ void CLuaWorldDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWindVelocity", CLuaWorldDefs::setWindVelocity );
     CLuaCFunctions::AddFunction ( "setFarClipDistance", CLuaWorldDefs::setFarClipDistance );
     CLuaCFunctions::AddFunction ( "setFogDistance", CLuaWorldDefs::setFogDistance );
+    CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaWorldDefs::setAircraftMaxHeight );
 
     // Reset
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaWorldDefs::resetSkyGradient );
@@ -1130,3 +1132,36 @@ int CLuaWorldDefs::getJetpackMaxHeight ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaWorldDefs::setAircraftMaxHeight ( lua_State* luaVM )
+{
+    int iArgument1 = lua_type ( luaVM, 1 );
+    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
+    {
+        float fMaxHeight = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
+        if ( CStaticFunctionDefinitions::SetAircraftMaxHeight ( fMaxHeight ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setAircraftMaxHeight" );
+        
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWorldDefs::getAircraftMaxHeight ( lua_State* luaVM )
+{
+    float fMaxHeight;
+    if ( CStaticFunctionDefinitions::GetAircraftMaxHeight ( fMaxHeight ) )
+    {
+        lua_pushnumber ( luaVM, fMaxHeight );
+        return 1;
+    }
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
