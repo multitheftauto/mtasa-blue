@@ -68,7 +68,7 @@ CResource* CResourceManager::GetResource ( const char* szResourceName )
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
-        if ( strcmp ( ( *iter )->GetName(), szResourceName ) == 0 )
+        if ( stricmp ( ( *iter )->GetName(), szResourceName ) == 0 )
             return ( *iter );
     }
     return NULL;
