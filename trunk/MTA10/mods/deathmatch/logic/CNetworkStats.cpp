@@ -107,6 +107,7 @@ void CNetworkStats::Draw ( void )
                 stats.compressionRatio * 100.0f,
                 stats.decompressionRatio * 100.0f,
                 
+                // Note: BPSLimitByCongestionControl is always 1
                 stats.isLimitedByCongestionControl ? stats.BPSLimitByCongestionControl : 0ULL,
                 stats.isLimitedByOutgoingBandwidthLimit ? stats.BPSLimitByOutgoingBandwidthLimit : 0ULL,
 

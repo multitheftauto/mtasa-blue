@@ -11609,7 +11609,6 @@ int CLuaFunctionDefinitions::Md5 ( lua_State* luaVM )
     return 1;
 }
 
-
 int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
 {
     SPacketStat m_PacketStats [ 2 ] [ 256 ];
@@ -11671,10 +11670,84 @@ int CLuaFunctionDefinitions::GetNetworkUsageData ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefinitions::GetNetworkStats ( lua_State* luaVM )
+{
+//  table getNetworkStats ( [element player] )
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPlayer, NULL );
+
+    if ( !argStream.HasErrors () )
+    {
+        NetServerPlayerID* pPlayerID = pPlayer ? &pPlayer->GetSocket () : NULL;
+        NetStatistics stats;
+        if ( g_pNetServer->GetNetworkStatistics ( &stats, pPlayerID ) )
+        {
+            uint uiNumMessagesInSendBuffer = 0;
+            for ( int i = 0; i < PACKET_PRIORITY_COUNT; ++i )
+                uiNumMessagesInSendBuffer += stats.messageInSendBuffer[i];
+
+            lua_createtable ( luaVM, 0, 11 );
+
+            lua_pushstring ( luaVM, "bytesReceived" );
+            lua_pushnumber ( luaVM, stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
+            lua_settable   ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "bytesSent" );
+            lua_pushnumber ( luaVM, stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
+            lua_settable   ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "packetsReceived" );
+            lua_pushnumber ( luaVM, stats.packetsReceived );
+            lua_settable   ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "packetsSent" );
+            lua_pushnumber ( luaVM, stats.packetsSent );
+            lua_settable   ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "packetlossTotal" );
+            lua_pushnumber ( luaVM, stats.packetlossTotal );
+            lua_settable   ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "packetlossLastSecond" );
+            lua_pushnumber ( luaVM, stats.packetlossLastSecond );
+            lua_settable   ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "messagesInSendBuffer" );
+            lua_pushnumber ( luaVM, uiNumMessagesInSendBuffer );
+            lua_settable   ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "messagesInResendBuffer" );
+            lua_pushnumber ( luaVM, stats.messagesInResendBuffer );
+            lua_settable   ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "isLimitedByCongestionControl" );
+            lua_pushnumber ( luaVM, stats.isLimitedByCongestionControl ? 1ULL : 0ULL );
+            lua_settable   ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "isLimitedByOutgoingBandwidthLimit" );
+            lua_pushnumber ( luaVM, stats.isLimitedByOutgoingBandwidthLimit ? 1ULL : 0ULL );
+            lua_settable   ( luaVM, -3 );
+
+            lua_pushstring ( luaVM, "encryptionStatus" );
+            lua_pushnumber ( luaVM, stats.encryptionStatus );
+            lua_settable   ( luaVM, -3 );
+
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getNetworkStats", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefinitions::GetVersion ( lua_State* luaVM )
 {
-    lua_createtable ( luaVM, 0, 6 );
+    lua_createtable ( luaVM, 0, 8 );
 
     lua_pushstring ( luaVM, "number" );
     lua_pushnumber ( luaVM, CStaticFunctionDefinitions::GetVersion () );

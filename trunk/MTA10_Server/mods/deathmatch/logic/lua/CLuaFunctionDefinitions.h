@@ -531,6 +531,7 @@ public:
     // Utility
     static int      Md5                                 ( lua_State* luaVM );
     static int      GetNetworkUsageData                 ( lua_State* luaVM );
+    static int      GetNetworkStats                     ( lua_State* luaVM );
     static int      GetVersion                          ( lua_State* luaVM );
     static int      GetModules                          ( lua_State* luaVM );
     static int      GetModuleInfo                       ( lua_State* luaVM );
