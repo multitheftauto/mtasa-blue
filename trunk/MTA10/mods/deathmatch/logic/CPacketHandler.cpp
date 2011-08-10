@@ -485,23 +485,26 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
     SString strACInfo;
     bitStream.ReadString ( strACInfo );
 
-    SString strVerifyFiles = "Undisclosed";
-    SString strDisabledAC = "Undisclosed";
-    if ( !strACInfo.empty () )
-    {
-        strVerifyFiles = strACInfo.SplitLeft ( "," );
-        strDisabledAC = strACInfo.SplitRight ( "," );
-        strVerifyFiles = strVerifyFiles == "-1" ? "All" : strVerifyFiles;
-        strDisabledAC = strDisabledAC == "" ? "None" : strDisabledAC;
-    }
-    g_pCore->GetConsole ()->Print ( SString ( "Server AC info: Verify client files: %s  Disabled AC: %s", *strVerifyFiles, *strDisabledAC ) );
-
     // Grab the flags
     bool bJustJoined;
     if ( !bitStream.ReadBit ( bJustJoined ) )
     {
         RaiseProtocolError ( 8 );
         return;
+    }
+
+    if ( !bJustJoined )
+    {
+        SString strVerifyFiles = "Undisclosed";
+        SString strDisabledAC = "Undisclosed";
+        if ( !strACInfo.empty () )
+        {
+            strVerifyFiles = strACInfo.SplitLeft ( "," );
+            strDisabledAC = strACInfo.SplitRight ( "," );
+            strVerifyFiles = strVerifyFiles == "-1" ? "All" : strVerifyFiles;
+            strDisabledAC = strDisabledAC == "" ? "None" : strDisabledAC;
+        }
+        g_pCore->GetConsole ()->Print ( SString ( "Server AC info: Verify client files: %s  Disabled AC: %s", *strVerifyFiles, *strDisabledAC ) );
     }
 
     // While there are bytes left, parse player list items
