@@ -190,6 +190,10 @@ bool CMainConfig::Load ( const char* szFilename )
     // verifyclientsettings
     GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );
 
+    // hideac
+    int iHideAC = 0;
+    GetInteger ( m_pRootNode, "hideac", iHideAC );
+
     {
         SString strDisbaleAC;
         GetString ( m_pRootNode, "disableac", strDisbaleAC );
@@ -199,7 +203,7 @@ bool CMainConfig::Load ( const char* szFilename )
             if ( isdigit(***it) )
                 MapSet ( m_DisableACMap, *it, 1 );
 
-        g_pNetServer->ResetStub ( 'delu', *strDisbaleAC );
+        g_pNetServer->ResetStub ( 'delu', *strDisbaleAC, m_iEnableClientChecks, iHideAC );
     }
 
     {
@@ -294,6 +298,10 @@ bool CMainConfig::Load ( const char* szFilename )
     }
 
     GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
+
+    // networkencryption - Encryption for Server <-> client communications
+    m_bNetworkEncryptionEnabled = true;
+    GetBoolean ( m_pRootNode, "networkencryption", m_bNetworkEncryptionEnabled );
 
     return true;
 }
@@ -686,12 +694,19 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         return true;
     }
     else
-
-    //
-    // Everything else is read only, so can be fetched directly from the XML data
-    //
-    if ( GetString ( m_pRootNode, strName, strValue ) )
+    if ( strName == "networkencryption" )
+    {
+        strValue = SString ( "%d", m_bNetworkEncryptionEnabled ? 1 : 0 );
         return true;
+    }
+    else
+    {
+        //
+        // Everything else is read only, so can be fetched directly from the XML data
+        //
+        if ( GetString ( m_pRootNode, strName, strValue ) )
+            return true;
+    }
 
     return false;
 }
@@ -741,6 +756,24 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
     {
         return CStaticFunctionDefinitions::SetFPSLimit ( atoi ( strValue ), bSave );
     }
+    else
+    if ( strName == "networkencryption" )
+    {
+        if ( strValue == "0" || strValue == "1"  )
+        {
+            m_bNetworkEncryptionEnabled = atoi ( strValue ) ? true : false;
+            if ( bSave )
+            {
+                SetBoolean ( m_pRootNode, "networkencryption", m_bNetworkEncryptionEnabled );
+                Save ();
+            }
+            g_pNetServer->SetEncryptionEnabled ( m_bNetworkEncryptionEnabled );
+            return true;
+        }
+    }
 
+    //
+    // Everything else is read only, so can't be set
+    //
     return false;
 }

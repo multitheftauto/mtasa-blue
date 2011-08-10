@@ -83,7 +83,8 @@ void CNetworkStats::Draw ( void )
                 "Compression ratio: %.3f%%\n"
                 "Decompression ratio: %.3f%%\n"
                 "BPS limit by CC: %llu\n"
-                "BPS limit by OB: %llu\n",
+                "BPS limit by OB: %llu\n"
+                "Encryption: %s\n",
 
                 g_pNet->GetPing (),
 
@@ -107,7 +108,9 @@ void CNetworkStats::Draw ( void )
                 stats.decompressionRatio * 100.0f,
                 
                 stats.isLimitedByCongestionControl ? stats.BPSLimitByCongestionControl : 0ULL,
-                stats.isLimitedByOutgoingBandwidthLimit ? stats.BPSLimitByOutgoingBandwidthLimit : 0ULL
+                stats.isLimitedByOutgoingBandwidthLimit ? stats.BPSLimitByOutgoingBandwidthLimit : 0ULL,
+
+                stats.encryptionStatus ? stats.encryptionStatus == 1 ? "On" : "Unknown" : "Off"
                 );
 
     // Print it
