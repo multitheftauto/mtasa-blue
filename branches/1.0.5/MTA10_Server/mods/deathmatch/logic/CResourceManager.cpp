@@ -409,7 +409,7 @@ CResource * CResourceManager::Load ( const char * szResourceName )
 
 CResource * CResourceManager::GetResource ( const char * szResourceName )
 {
-    CResource** ppResource = MapFind ( m_NameResourceMap, szResourceName );
+    CResource** ppResource = MapFind ( m_NameResourceMap, SStringX ( szResourceName ).ToUpper () );
     if ( ppResource )
         return *ppResource;
     return NULL;
@@ -483,15 +483,17 @@ void CResourceManager::NotifyResourceVMClose ( CResource* pResource, CLuaMain* p
 //
 void CResourceManager::AddResourceToLists ( CResource* pResource )
 {
+    SString strResourceNameKey = SString ( pResource->GetName () ).ToUpper ();
+
     assert ( !m_resources.Contains ( pResource ) );
-    assert ( !MapContains ( m_NameResourceMap, pResource->GetName () ) );
+    assert ( !MapContains ( m_NameResourceMap, strResourceNameKey ) );
     assert ( !MapContains ( m_ResourceLuaStateMap, pResource ) );
 
     m_resources.push_back ( pResource );
 
     CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
     assert ( !pLuaMain );
-    MapSet ( m_NameResourceMap, pResource->GetName (), pResource );
+    MapSet ( m_NameResourceMap, strResourceNameKey, pResource );
 }
 
 //
@@ -499,10 +501,12 @@ void CResourceManager::AddResourceToLists ( CResource* pResource )
 //
 void CResourceManager::RemoveResourceFromLists ( CResource* pResource )
 {
+    SString strResourceNameKey = SString ( pResource->GetName () ).ToUpper ();
+
     assert ( m_resources.Contains ( pResource ) );
-    assert ( MapContains ( m_NameResourceMap, pResource->GetName () ) );
+    assert ( MapContains ( m_NameResourceMap, strResourceNameKey ) );
     m_resources.remove ( pResource );
-    MapRemove ( m_NameResourceMap, pResource->GetName () );
+    MapRemove ( m_NameResourceMap, strResourceNameKey );
 }
 
 
