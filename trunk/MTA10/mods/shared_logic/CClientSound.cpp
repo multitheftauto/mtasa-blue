@@ -72,9 +72,9 @@ CClientSound::~CClientSound ( void )
 
 bool CClientSound::Play ( const SString& strPath, bool bLoop )
 {
-    long lFlags = BASS_STREAM_AUTOFREE;
+    long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_SOFTWARE;
     if ( bLoop )
-        lFlags = BASS_SAMPLE_LOOP;
+        lFlags |= BASS_SAMPLE_LOOP;
 
     // Try to load the sound file
     if (
@@ -117,7 +117,7 @@ HSTREAM CClientSound::ConvertFileToMono(const SString& strPath)
 bool CClientSound::Play3D ( const SString& strPath, const CVector& vecPosition, bool bLoop )
 {
     //long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_3D | BASS_SAMPLE_MONO;
-    long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_MONO;
+    long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_SOFTWARE | BASS_SAMPLE_MONO;
 
     // Try to load the sound file
     if (
@@ -153,7 +153,7 @@ void CClientSound::PlayStream ( const SString& strURL, bool bLoop, bool b3D, con
     m_bStream = true;
     m_vecPosition = vecPosition;
 
-    long lFlags = BASS_STREAM_AUTOFREE;
+    long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_SOFTWARE; 
     if ( b3D )
     {
         m_b3D = true;
