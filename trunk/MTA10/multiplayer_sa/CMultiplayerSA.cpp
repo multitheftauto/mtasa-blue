@@ -5260,6 +5260,9 @@ void _cdecl DoWait ( HANDLE hHandle )
     if ( dwResult == WAIT_TIMEOUT )
     {
         AddReportLog ( 6211, SString ( "WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait ) );
+        // This thread lock bug in GTA will have to be fixed one day.
+        // Until then, a 5 second freeze should be long enough for the loading thread to have finished it's job.
+#if 0
         _wassert ( _CRT_WIDE("\
             Press IGNORE  ('I' Key) \n\
             Press IGNORE  ('I' Key) \n\
@@ -5267,6 +5270,7 @@ void _cdecl DoWait ( HANDLE hHandle )
             Press IGNORE  ('I' Key) \n\
             ")
          , _CRT_WIDE(__FILE__), __LINE__);
+#endif
         dwResult = WaitForSingleObject ( hHandle, 1000 );
     }
 }
