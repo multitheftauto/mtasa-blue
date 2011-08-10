@@ -648,9 +648,72 @@ int CLuaFunctionDefs::GetNetworkUsageData ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GetNetworkStats ( lua_State* luaVM )
+{
+    NetStatistics stats;
+    if ( g_pNet->GetNetworkStatistics ( &stats ) )
+    {
+        uint uiNumMessagesInSendBuffer = 0;
+        for ( int i = 0; i < PACKET_PRIORITY_COUNT; ++i )
+            uiNumMessagesInSendBuffer += stats.messageInSendBuffer[i];
+
+        lua_createtable ( luaVM, 0, 11 );
+
+        lua_pushstring ( luaVM, "bytesReceived" );
+        lua_pushnumber ( luaVM, stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "bytesSent" );
+        lua_pushnumber ( luaVM, stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "packetsReceived" );
+        lua_pushnumber ( luaVM, stats.packetsReceived );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "packetsSent" );
+        lua_pushnumber ( luaVM, stats.packetsSent );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "packetlossTotal" );
+        lua_pushnumber ( luaVM, stats.packetlossTotal );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "packetlossLastSecond" );
+        lua_pushnumber ( luaVM, stats.packetlossLastSecond );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "messagesInSendBuffer" );
+        lua_pushnumber ( luaVM, uiNumMessagesInSendBuffer );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "messagesInResendBuffer" );
+        lua_pushnumber ( luaVM, stats.messagesInResendBuffer );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "isLimitedByCongestionControl" );
+        lua_pushnumber ( luaVM, stats.isLimitedByCongestionControl ? 1ULL : 0ULL );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "isLimitedByOutgoingBandwidthLimit" );
+        lua_pushnumber ( luaVM, stats.isLimitedByOutgoingBandwidthLimit ? 1ULL : 0ULL );
+        lua_settable   ( luaVM, -3 );
+
+        lua_pushstring ( luaVM, "encryptionStatus" );
+        lua_pushnumber ( luaVM, stats.encryptionStatus );
+        lua_settable   ( luaVM, -3 );
+
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetVersion ( lua_State* luaVM )
 {
-    lua_createtable ( luaVM, 0, 6 );
+    lua_createtable ( luaVM, 0, 8 );
 
     lua_pushstring ( luaVM, "number" );
     lua_pushnumber ( luaVM, CStaticFunctionDefinitions::GetVersion () );

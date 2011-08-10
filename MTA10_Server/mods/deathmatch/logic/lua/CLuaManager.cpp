@@ -733,6 +733,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefinitions::GetNetworkUsageData );
+    CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefinitions::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getLoadedModules", CLuaFunctionDefinitions::GetModules );
     CLuaCFunctions::AddFunction ( "getModuleInfo", CLuaFunctionDefinitions::GetModuleInfo );
 }

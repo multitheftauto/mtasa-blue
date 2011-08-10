@@ -1007,6 +1007,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefs::Md5 );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData );
+    CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefs::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
 
 #ifdef MTA_VOICE
