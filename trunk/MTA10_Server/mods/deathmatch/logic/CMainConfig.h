@@ -79,6 +79,7 @@ public:
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
+    bool                            GetNetworkEncryptionEnabled     ( void )                    { return m_bNetworkEncryptionEnabled; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
@@ -129,6 +130,7 @@ private:
     SString                         m_strRecommendedClientVersion;
     bool                            m_bAutoLogin;
     SString                         m_strIdFile;
+    bool                            m_bNetworkEncryptionEnabled;
 };
 
 #endif

@@ -87,6 +87,8 @@ struct NetStatistics
 
 	float packetlossLastSecond, packetlossTotal;
     float compressionRatio, decompressionRatio;
+
+    int encryptionStatus;
 };
 
 #endif

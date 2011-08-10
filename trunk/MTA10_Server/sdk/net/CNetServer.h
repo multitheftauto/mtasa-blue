@@ -42,7 +42,7 @@ public:
 
     virtual void                            RegisterPacketHandler           ( PPACKETHANDLER pfnPacketHandler, bool bIsPrimaryPacketHandler = true ) = 0;
 
-    virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest ) = 0;
+    virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, NetServerPlayerID* pPlayerID = NULL ) = 0;
     virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
 
     virtual int                             GetPing                         ( NetServerPlayerID& playerID ) = 0;
@@ -78,6 +78,7 @@ public:
     virtual unsigned int                    GetPendingPacketCount           ( void ) = 0;
 
     virtual bool                            InitServerId                    ( const char* szPath ) = 0;
+    virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled ) = 0;
 };
 
 #endif
