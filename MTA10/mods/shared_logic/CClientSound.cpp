@@ -62,6 +62,10 @@ void CClientSound::DistanceStreamIn ( void )
     {
         Create ();
         m_pSoundManager->OnDistanceStreamIn ( this );
+
+        // Call Stream In event
+        CLuaArguments Arguments;
+        CallEvent ( "onClientElementStreamIn", Arguments, true );
     }
 }
 
@@ -79,6 +83,10 @@ void CClientSound::DistanceStreamOut ( void )
     {
         m_pSoundManager->OnDistanceStreamOut ( this );
         Destroy ();
+
+        // Call Stream Out event
+        CLuaArguments Arguments;
+        CallEvent ( "onClientElementStreamOut", Arguments, true );
     }
 }
 
