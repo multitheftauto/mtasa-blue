@@ -137,7 +137,7 @@ HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
     }
     length = BASS_ChannelGetData ( decoder, data, length ); // decode data
     BASS_StreamFree ( decoder ); // free the decoder/mixer
-    HSTREAM stream = BASS_StreamCreate ( ci.freq, 1, BASS_STREAM_AUTOFREE | BASS_SAMPLE_3D, STREAMPROC_PUSH, NULL ); // create stream
+    HSTREAM stream = BASS_StreamCreate ( ci.freq, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL ); // create stream
     BASS_StreamPutData ( stream, data, length ); // set the stream data
     free ( data ); // free the buffer
     return stream;
