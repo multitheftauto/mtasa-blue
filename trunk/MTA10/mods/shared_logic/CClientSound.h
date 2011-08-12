@@ -71,6 +71,8 @@ public:
 
     void                    Unlink                  ( void ) {};
 
+    bool                    IsSoundStopped          ( void )                            { return m_pAudio == NULL; }                                          
+
 protected:
     void                    Process3D               ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt );
     void                    BeginSimulationOfPlayPosition       ( void );
