@@ -641,6 +641,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CBassAudio.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClient3DMarker.cpp"
 					>
 				</File>
@@ -1623,6 +1627,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CBassAudio.h"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CCallback.h"
 					>
 				</File>
@@ -1980,6 +1988,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CScriptFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CSimulatedPlayPosition.h"
 					>
 				</File>
 				<File

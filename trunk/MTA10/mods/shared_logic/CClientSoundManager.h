@@ -29,22 +29,24 @@ public:
 
     void                    DoPulse                     ( void );
 
-    inline unsigned short   GetDimension                ( void )                    { return m_usDimension; }
     void                    SetDimension                ( unsigned short usDimension );
 
     CClientSound*           PlaySound2D                 ( const SString& strSound, bool bIsURL, bool bLoop );
     CClientSound*           PlaySound3D                 ( const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop );
 
-    void                    AddToList                   ( CClientSound* pSound )    { m_Sounds.push_back ( pSound ); }
-    void                    RemoveFromList              ( CClientSound* pSound )    { m_Sounds.remove ( pSound ); }
-    bool                    Exists                      ( CClientSound* pSound );
-    CClientSound*           Get                         ( DWORD pSound );
+    void                    AddToList                   ( CClientSound* pSound );
+    void                    RemoveFromList              ( CClientSound* pSound );
 
     int                     GetFxEffectFromName         ( const std::string& strEffectName );
 
     std::map < std::string, int >  GetFxEffects         ( void )                    { return m_FxEffectNames; }
 
     void                    UpdateVolume                ( void );
+
+    void                    UpdateDistanceStreaming     ( const CVector& vecListenerPosition );
+
+    void                    OnDistanceStreamIn          ( CClientSound* pSound );
+    void                    OnDistanceStreamOut         ( CClientSound* pSound );
 
 private:
 
@@ -53,6 +55,7 @@ private:
     unsigned short                  m_usDimension;
 
     std::list < CClientSound* >     m_Sounds;
+    std::set < CClientSound* >      m_DistanceStreamedInMap;
 
     std::map < std::string, int >   m_FxEffectNames;
 };

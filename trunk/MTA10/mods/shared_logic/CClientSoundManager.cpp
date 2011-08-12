@@ -88,6 +88,8 @@ void CClientSoundManager::DoPulse ( void )
         vecPosition = vecCameraPosition;
     }
 
+    UpdateDistanceStreaming ( vecPosition );
+
     BASS_3DVECTOR pos ( vecCameraPosition.fX, vecCameraPosition.fY, vecCameraPosition.fZ );
     BASS_3DVECTOR vel ( vecVelocity.fX, vecVelocity.fY, vecVelocity.fZ );
     BASS_3DVECTOR front ( vecFront.fX, vecFront.fY, vecFront.fZ );
@@ -110,11 +112,6 @@ void CClientSoundManager::DoPulse ( void )
 void CClientSoundManager::SetDimension ( unsigned short usDimension )
 {
     m_usDimension = usDimension;
-    list < CClientSound* > ::iterator iter = m_Sounds.begin ();
-    for ( ; iter != m_Sounds.end () ; iter++ )
-    {
-        (*iter)->RelateDimension ( usDimension );
-    }
 }
 
 CClientSound* CClientSoundManager::PlaySound2D ( const SString& strSound, bool bIsURL, bool bLoop )
@@ -139,40 +136,18 @@ CClientSound* CClientSoundManager::PlaySound3D ( const SString& strSound, bool b
 
     if ( bIsURL )
     {
-        pSound->PlayStream ( strSound, bLoop, true, vecPosition );
+        pSound->PlayStream ( strSound, bLoop, true );
+        pSound->SetPosition ( vecPosition );
         return pSound;
     }
     else
-        if ( pSound->Play3D ( strSound, vecPosition, bLoop ) )
+        if ( pSound->Play3D ( strSound, bLoop ) )
+        {
+            pSound->SetPosition ( vecPosition );
             return pSound;
+        }
 
     delete pSound;
-    return NULL;
-}
-
-bool CClientSoundManager::Exists ( CClientSound* pSound )
-{
-    list < CClientSound* > ::iterator iter = m_Sounds.begin ();
-    for ( ; iter != m_Sounds.end () ; iter++ )
-    {
-        if ( *iter == pSound )
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-CClientSound* CClientSoundManager::Get ( DWORD pSound )
-{
-    list < CClientSound* > ::iterator iter = m_Sounds.begin ();
-    for ( ; iter != m_Sounds.end () ; iter++ )
-    {
-        if ( (*iter)->GetSound() == pSound )
-        {
-            return *iter;
-        }
-    }
     return NULL;
 }
 
@@ -206,4 +181,86 @@ void CClientSoundManager::UpdateVolume ()
 
     BASS_SetConfig( BASS_CONFIG_GVOL_STREAM, static_cast <DWORD> ( fValue * 10000 ) );
     BASS_SetConfig( BASS_CONFIG_GVOL_MUSIC, static_cast <DWORD> ( fValue * 10000 ) );
+}
+
+
+//
+// Lists
+//
+void CClientSoundManager::AddToList ( CClientSound* pSound )
+{
+    m_Sounds.push_back ( pSound );
+}
+
+void CClientSoundManager::RemoveFromList ( CClientSound* pSound )
+{
+    m_Sounds.remove ( pSound );
+    MapRemove ( m_DistanceStreamedInMap, pSound );
+}
+
+
+//
+// Distance streaming
+//
+void CClientSoundManager::OnDistanceStreamIn ( CClientSound* pSound )
+{
+    assert ( !MapContains ( m_DistanceStreamedInMap, pSound ) );
+    m_DistanceStreamedInMap.insert( pSound );
+}
+
+void CClientSoundManager::OnDistanceStreamOut ( CClientSound* pSound )
+{
+    assert ( MapContains ( m_DistanceStreamedInMap, pSound ) );
+    MapRemove ( m_DistanceStreamedInMap, pSound );
+}
+
+
+//
+// Distance streaming like what is done with visible objects
+//
+void CClientSoundManager::UpdateDistanceStreaming ( const CVector& vecListenerPosition )
+{
+    //
+    // Make a copy of the current list of sounds that are active
+    //
+    std::set < CClientSound* > considerMap = m_DistanceStreamedInMap;
+
+    //
+    // Mix in all sounds near enough to the listener to be heard
+    //
+    {
+        // Find all entities overlapping the listener position
+        CClientEntityResult result;
+        GetClientSpatialDatabase()->SphereQuery ( result, CSphere( vecListenerPosition, 0 ) );
+
+        // Extract relevant types
+        for ( CClientEntityResult::const_iterator iter = result.begin () ; iter != result.end (); ++iter )
+        {
+            if ( CClientSound* pSound = DynamicCast < CClientSound > ( *iter ) )
+            {
+                // Add to consider map
+                considerMap.insert ( pSound );
+            }
+        }
+    }
+
+    //
+    // Step through each sound
+    //  If the sound is more than 40 units away (or in another dimension), make sure it is deactivated
+    //  If the sound is less than 20 units away, make sure it is activated
+    //
+    for ( std::set < CClientSound* >::iterator iter = considerMap.begin () ; iter != considerMap.end () ; ++iter )
+    {
+        CClientSound* pSound = *iter;
+
+        // Calculate distance to the edge of the sphere
+        CSphere sphere = pSound->GetWorldBoundingSphere ();
+        float fDistance = ( vecListenerPosition - sphere.vecPosition ).Length () - sphere.fRadius;
+
+        if ( fDistance > 40 || m_usDimension != pSound->GetDimension () )
+            pSound->DistanceStreamOut ();
+        else
+        if ( fDistance < 20 )
+            pSound->DistanceStreamIn ();
+    }
 }

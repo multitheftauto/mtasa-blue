@@ -11,31 +11,14 @@
 *****************************************************************************/
 
 class CClientSound;
+class CBassAudio;
 
 #ifndef __CCLIENTSOUND_H
 #define __CCLIENTSOUND_H
 
 #include "CClientSoundManager.h"
 #include "CClientEntity.h"
-
-//#define MAX_SOUND_DISTANCE 100
-#define CUT_OFF 5.0f //Cut off point at which volume is regarded as 0 in the function e^-x
-
-struct SSoundThreadVariables
-{
-    ZERO_ON_NEW
-    int                     iRefCount;
-    SString                 strURL;
-    long                    lFlags;
-    DWORD                   pSound;
-    bool                    bStreamCreateResult;
-    std::list < uint >      onClientSoundFinishedDownloadQueue;
-    std::list < SString >   onClientSoundChangedMetaQueue;
-    CCriticalSection        criticalSection;
-
-    void Release ( void );
-};
-
+#include "CSimulatedPlayPosition.h"
 
 class CClientSound : public CClientEntity
 {
@@ -47,30 +30,21 @@ public:
                             CClientSound            ( CClientManager* pManager, ElementID ID );
                             ~CClientSound           ( void );
 
+    virtual CSphere         GetWorldBoundingSphere  ( void );
+
     eClientEntityType       GetType                 ( void ) const                      { return CCLIENTSOUND; }
 
     bool                    Play                    ( const SString& strPath, bool bLoop );
-    bool                    Play3D                  ( const SString& strPath, const CVector& vecPosition, bool bLoop );
+    bool                    Play3D                  ( const SString& strPath, bool bLoop );
+    void                    PlayStream              ( const SString& strURL, bool bLoop, bool b3D = false );
 
-    HSTREAM                 ConvertFileToMono       ( const SString& strPath );
-
-    void                    PlayStream              ( const SString& strURL, bool bLoop, bool b3D = false, const CVector& vecPosition = CVector () );
-
-    static void             PlayStreamIntern        ( void* arguments );
-
-    void                    ThreadCallback          ( HSTREAM pSound );
-
-    void                    Stop                    ( void );
-
-    void                    SetPaused               ( bool bPaused, bool bSave = true );
+    void                    SetPaused               ( bool bPaused  );
     bool                    IsPaused                ( void );
 
-    bool                    IsFinished              ( void );
+    void                    SetPlayPosition         ( double dPosition );
+    double                  GetPlayPosition         ( void );
 
-    void                    SetPlayPosition         ( unsigned int uiPosition );
-    unsigned int            GetPlayPosition         ( void );
-
-    unsigned int            GetLength               ( void );
+    double                  GetLength               ( void );
 
     void                    SetVolume               ( float fVolume, bool bStore = true );
     float                   GetVolume               ( void );
@@ -84,59 +58,55 @@ public:
     void                    GetVelocity             ( CVector& vecVelocity );
     void                    SetVelocity             ( const CVector& vecVelocity );
 
-    void                    SetDimension            ( unsigned short usDimension );
-    void                    RelateDimension         ( unsigned short usDimension );
-
     void                    SetMinDistance          ( float fDistance );
     float                   GetMinDistance          ( void );
 
     void                    SetMaxDistance          ( float fDistance );
     float                   GetMaxDistance          ( void );
 
-    void                    ShowShoutcastMetaTags   ( void );
     SString                 GetMetaTags             ( const SString& strFormat );
 
-    bool                    SetFxEffect             ( int iFxEffect, bool bEnable );
-    bool                    IsFxEffectEnabled       ( int iFxEffect );
+    bool                    SetFxEffect             ( uint uiFxEffect, bool bEnable );
+    bool                    IsFxEffectEnabled       ( uint uiFxEffect );
 
     void                    Unlink                  ( void ) {};
 
-    void                    ServiceVars             ( void );
-
-    SSoundThreadVariables*  m_pVars;
-
 protected:
-
-    DWORD                   GetSound                ( void )                            { return m_pSound; };
-    void                    Process3D               ( CVector vecPosition, CVector vecCameraPosition, CVector vecLookAt );
-    void                    SmartSeek               ( void );
+    void                    Process3D               ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt );
+    void                    BeginSimulationOfPlayPosition       ( void );
+    void                    EndSimulationOfPlayPositionAndApply ( void );
+    void                    DistanceStreamIn        ( void );
+    void                    DistanceStreamOut       ( void );
+    bool                    Create                  ( void );
+    void                    Destroy                 ( void );
 
 private:
 
     CClientSoundManager*    m_pSoundManager;
+    CSimulatedPlayPosition  m_SimulatedPlayPosition;
+    CBassAudio*             m_pAudio;
 
-    DWORD                   m_pSound;
+    // Initial state
+    bool        m_bStream;
+    bool        m_b3D;
+    SString     m_strPath;
+    bool        m_bLoop;
 
-    bool                    m_b3D;
-    bool                    m_bInSameDimension;
-    bool                    m_bPaused;
-    bool                    m_bStream;
-    float                   m_fDefaultFrequency;
-    float                   m_fVolume;
-    float                   m_fMinDistance;
-    float                   m_fMaxDistance;
-    float                   m_fPlaybackSpeed;
-    CVector                 m_vecPosition;
-    CVector                 m_vecVelocity;
+    // Info
+    double      m_dLength;
+    SString     m_strStreamName;
+    SString     m_strStreamTitle;
+    std::map < SString, SString >  m_SavedTags;
 
-    HFX                     m_FxEffects[9];
-
-    SString                 m_strPath;
-
-    SString                 m_strStreamName;
-    SString                 m_strStreamTitle;
-    long long               m_llPauseTimeTicks;
-
+    // Saved state
+    bool        m_bPaused;
+    float       m_fVolume;
+    float       m_fPlaybackSpeed;
+    CVector     m_vecPosition;
+    CVector     m_vecVelocity;
+    float       m_fMinDistance;
+    float       m_fMaxDistance;
+    int         m_EnabledEffects[9];
 };
 
 #endif
