@@ -50,10 +50,12 @@ CBassAudio::~CBassAudio ( void )
         m_pVars = NULL;
     }
 
+#ifdef MTA_DEBUG // OutputDebugLine only works in debug mode!
     if ( m_bStream )
         OutputDebugLine ( "       stream destroyed" );
     else
         OutputDebugLine ( "sound destroyed" );
+#endif
 }
 
 
