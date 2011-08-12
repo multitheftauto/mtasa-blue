@@ -50,7 +50,7 @@ void CMessageLoopHook::ApplyHook ( HWND hFocusWindow )
         m_HookedWindowProc = SubclassWindow ( hFocusWindow, ProcessMessage );
 
         // Enable Unicode (UTF-16) characters in WM_CHAR messages
-        SetWindowLongW ( hFocusWindow, GWL_WNDPROC, GetWindowLong ( hFocusWindow, GWL_WNDPROC ) );
+        SetWindowLongW ( hFocusWindow, GWL_WNDPROC, GetWindowLongW ( hFocusWindow, GWL_WNDPROC ) );
     }
 }
 
