@@ -398,7 +398,6 @@ int CLuaFunctionDefs::GetSoundMetaTags ( lua_State* luaVM )
         CClientSound* pSound = lua_tosound ( luaVM, 1 );
         if ( pSound )
         {
-            //pSound->ShowShoutcastMetaTags ();
             SString strMetaTags = "";
             if ( lua_istype ( luaVM, 2, LUA_TSTRING ) )
             {
