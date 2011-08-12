@@ -1283,6 +1283,12 @@ int CLuaFunctionDefs::IsElementStreamedIn ( lua_State* luaVM )
                 lua_pushboolean ( luaVM, pStreamElement->IsStreamedIn () );
                 return 1;
             }
+            else if ( pEntity->GetType() == CCLIENTSOUND )
+            {
+                CClientSound* pSound = static_cast < CClientSound* > ( pEntity );
+                lua_pushboolean ( luaVM, pSound->IsSoundStopped() ? false : true );
+                return 1;
+            }
             else
                 m_pScriptDebugging->LogWarning ( luaVM, "isElementStreamedIn; element is not streaming compatible\n" );
         }
