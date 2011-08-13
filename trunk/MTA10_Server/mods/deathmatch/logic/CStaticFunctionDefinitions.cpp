@@ -9458,30 +9458,20 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
         if ( bUsername ) pBan->SetAccount ( pPlayer->GetSerialUser () );
         if ( bSerial ) pBan->SetSerial ( pPlayer->GetSerial () );
 
-        // Initialize a variable to check whether the event was cancelled or not
-        bool bEventCancelled = false;
-
         // Check if we passed a responsible player
         if ( pResponsible )
         {
             // Call the event with the responsible player as the source
             CLuaArguments Arguments;
             Arguments.PushUserData ( pBan );
-            bEventCancelled = !pResponsible->CallEvent ( "onBan", Arguments );
+            pResponsible->CallEvent ( "onBan", Arguments );
         }
         else
         {
             // Call the event with the root element as the source
             CLuaArguments Arguments;
             Arguments.PushUserData ( pBan );
-            bEventCancelled = !m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
-        }
-
-        // If the event was cancelled, remove the ban and abort the function
-        if ( bEventCancelled )
-        {
-            m_pBanManager->RemoveBan ( pBan );
-            return NULL;
+            m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
         }
 
         // Save the ban list
@@ -9567,30 +9557,20 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
         if ( bUsernameSpecified ) pBan->SetAccount ( strUsername );
         if ( bSerialSpecified )   pBan->SetSerial  ( strSerial );
 
-        // Initialize a variable to check whether the event was cancelled or not
-        bool bEventCancelled = false;
-
         // Check if we passed a responsible player
         if ( pResponsible )
         {
             // Call the event with the responsible player as the source
             CLuaArguments Arguments;
             Arguments.PushUserData ( pBan );
-            bEventCancelled = !pResponsible->CallEvent ( "onBan", Arguments );
+            pResponsible->CallEvent ( "onBan", Arguments );
         }
         else
         {
             // Call the event with the root element as the source
             CLuaArguments Arguments;
             Arguments.PushUserData ( pBan );
-            bEventCancelled = !m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
-        }
-
-        // If the event was cancelled, remove the ban and abort the function
-        if ( bEventCancelled )
-        {
-            m_pBanManager->RemoveBan ( pBan );
-            return NULL;
+            m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
         }
 
         // Log
