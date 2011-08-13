@@ -1018,7 +1018,7 @@ int CLuaFunctionDefs::GetWaterColor ( lua_State* luaVM )
 int CLuaFunctionDefs::SetWaterColor ( lua_State* luaVM )
 {
 //  bool setWaterColor ( int red, int green, int blue, [ int alpha = 200 ] )
-    int r; int g; int b; int alpha;
+    float r; float g; float b; float alpha;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( r );

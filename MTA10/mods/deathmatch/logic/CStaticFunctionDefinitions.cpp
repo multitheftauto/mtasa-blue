@@ -6149,23 +6149,23 @@ bool CStaticFunctionDefinitions::StopSound ( CClientSound& Sound )
 }
 
 
-bool CStaticFunctionDefinitions::SetSoundPosition ( CClientSound& Sound, unsigned int uiPosition )
+bool CStaticFunctionDefinitions::SetSoundPosition ( CClientSound& Sound, double dPosition )
 {
-    Sound.SetPlayPosition ( uiPosition );
+    Sound.SetPlayPosition ( dPosition );
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::GetSoundPosition ( CClientSound& Sound, unsigned int& uiPosition )
+bool CStaticFunctionDefinitions::GetSoundPosition ( CClientSound& Sound, double& dPosition )
 {
-    uiPosition = Sound.GetPlayPosition ();
+    dPosition = Sound.GetPlayPosition ();
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::GetSoundLength ( CClientSound& Sound, unsigned int& uiLength )
+bool CStaticFunctionDefinitions::GetSoundLength ( CClientSound& Sound, double& dLength )
 {
-    uiLength = Sound.GetLength ();
+    dLength = Sound.GetLength ();
     return true;
 }
 

@@ -35,7 +35,7 @@ struct SSoundThreadVariables
     long                    lFlags;
     DWORD                   pSound;
     bool                    bStreamCreateResult;
-    std::list < uint >      onClientSoundFinishedDownloadQueue;
+    std::list < double >    onClientSoundFinishedDownloadQueue;
     std::list < SString >   onClientSoundChangedMetaQueue;
     CCriticalSection        criticalSection;
 

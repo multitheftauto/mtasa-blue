@@ -106,7 +106,7 @@ bool CClientTask::ReadElements ( lua_State* luaVM, int iTableIndex, bool bClear 
     {
         // Get the index and the element ID
         unsigned int uiIndex = static_cast < unsigned int > ( lua_tonumber ( luaVM, -2 ) );
-        ElementID ID = static_cast < ElementID > ( lua_tonumber ( luaVM, -1 ) );
+        ElementID ID = static_cast < ElementID > ( static_cast < unsigned int > ( lua_tonumber ( luaVM, -1 ) ) );
 
         // Grab the element and check he's a player/ped
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );

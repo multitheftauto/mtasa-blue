@@ -477,7 +477,7 @@ void CBassAudio::ServiceVars ( void )
     // Temp
     DWORD pSound = 0;
     bool bStreamCreateResult = false;
-    std::list < uint > onClientSoundFinishedDownloadQueue;
+    std::list < double > onClientSoundFinishedDownloadQueue;
     std::list < SString > onClientSoundChangedMetaQueue;
 
     // Lock vars
