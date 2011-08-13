@@ -373,10 +373,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientCRC32Hasher.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CClientEntityRefManager.cpp"
 					>
 				</File>
@@ -529,10 +525,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CScriptFontLoader.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CScriptKeyBinds.cpp"
 					>
 				</File>
@@ -541,15 +533,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CServerIdManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CStaticFunctionDefinitions.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\logic\CSyncDebug.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CTrainerMonitoringHistory.cpp"
 					>
 				</File>
 				<File
@@ -577,6 +569,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\rpc\CElementRPCs.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\rpc\CHandlingRPCs.cpp"
 						>
 					</File>
 					<File
@@ -646,6 +642,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CAntiCheatModule.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CBassAudio.cpp"
 					>
 				</File>
 				<File
@@ -725,15 +725,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientDisplayGroup.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientDisplayManager.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientDummy.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientDxFont.cpp"
 					>
 				</File>
 				<File
@@ -753,11 +753,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientGUIManager.cpp"
+					RelativePath="..\shared_logic\CClientGuiFont.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientIFP.cpp"
+					RelativePath="..\shared_logic\CClientGUIManager.cpp"
 					>
 				</File>
 				<File
@@ -774,6 +774,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientMarkerManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientMaterial.cpp"
 					>
 				</File>
 				<File
@@ -861,6 +865,18 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientRenderElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientRenderElementManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientShader.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientSound.cpp"
 					>
 				</File>
@@ -902,6 +918,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientTextDisplay.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTexture.cpp"
 					>
 				</File>
 				<File
@@ -958,6 +978,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CMapEventManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CModelNames.cpp"
 					>
 				</File>
 				<File
@@ -1148,6 +1172,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionParseHelpers.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\shared_logic\lua\CLuaFunctionRef.cpp"
 						>
 					</File>
@@ -1224,6 +1252,38 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="core"
+				>
+				<File
+					RelativePath="..\..\sdk\core\VideoCard.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Nightly|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
 			</Filter>
 			<Filter
 				Name="utils"
@@ -1899,10 +1959,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CScriptFontLoader.h"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CScriptKeyBinds.h"
 					>
 				</File>
@@ -1911,15 +1967,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CServerIdManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CStaticFunctionDefinitions.h"
 					>
 				</File>
 				<File
 					RelativePath=".\logic\CSyncDebug.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CTrainerMonitoringHistory.h"
 					>
 				</File>
 				<File
@@ -1955,6 +2011,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\rpc\CElementRPCs.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\rpc\CHandlingRPCs.h"
 						>
 					</File>
 					<File
@@ -2018,6 +2078,14 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="core"
+				>
+				<File
+					RelativePath="..\..\sdk\core\VideoCard.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="utils"
@@ -2155,6 +2223,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CBassAudio.h"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CCallback.h"
 					>
 				</File>
@@ -2231,10 +2303,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientCRC32Hasher.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientDFF.h"
 					>
 				</File>
@@ -2247,15 +2315,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientDisplayGroup.h"
-					>
-				</File>
-				<File
 					RelativePath="..\shared_logic\CClientDisplayManager.h"
 					>
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientDummy.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientDxFont.h"
 					>
 				</File>
 				<File
@@ -2275,11 +2343,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientGUIManager.h"
+					RelativePath="..\shared_logic\CClientGuiFont.h"
 					>
 				</File>
 				<File
-					RelativePath="..\shared_logic\CClientIFP.h"
+					RelativePath="..\shared_logic\CClientGUIManager.h"
 					>
 				</File>
 				<File
@@ -2296,6 +2364,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientMarkerManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientMaterial.h"
 					>
 				</File>
 				<File
@@ -2387,6 +2459,18 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientRenderElement.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientRenderElementManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientShader.h"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientSound.h"
 					>
 				</File>
@@ -2428,6 +2512,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientTextDisplay.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientTexture.h"
 					>
 				</File>
 				<File
@@ -2487,6 +2575,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CModelNames.h"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CRegisteredCommands.h"
 					>
 				</File>
@@ -2496,6 +2588,10 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CScriptFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CSimulatedPlayPosition.h"
 					>
 				</File>
 				<File
@@ -2543,6 +2639,10 @@
 					</File>
 					<File
 						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.h"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionParseHelpers.h"
 						>
 					</File>
 					<File

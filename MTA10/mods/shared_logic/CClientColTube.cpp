@@ -12,7 +12,7 @@
 
 #include <StdInc.h>
 
-CClientColTube::CClientColTube ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius, float fHeight ) : CClientColShape ( pManager, ID )
+CClientColTube::CClientColTube ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius, float fHeight ) : ClassInit ( this ), CClientColShape ( pManager, ID )
 {
     m_vecPosition = vecPosition;
     m_fRadius = fRadius;

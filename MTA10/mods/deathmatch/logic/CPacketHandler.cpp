@@ -300,7 +300,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     }
 
     // Read out our local id
-    bitStream.ReadCompressed ( g_pClientGame->m_LocalID );
+    bitStream.Read ( g_pClientGame->m_LocalID );
     if ( g_pClientGame->m_LocalID == INVALID_ELEMENT_ID )
     {
         RaiseProtocolError ( 4 );
@@ -330,7 +330,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
 
     // Read out the root element id
     ElementID RootElementID;
-    bitStream.ReadCompressed ( RootElementID );
+    bitStream.Read ( RootElementID );
     if ( RootElementID == INVALID_ELEMENT_ID )
     {
         // Raise an error
@@ -494,6 +494,9 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         return;
     }
 
+    SString strACInfo;
+    bitStream.ReadString ( strACInfo );
+
     // Grab the flags
     bool bJustJoined;
     if ( !bitStream.ReadBit ( bJustJoined ) )
@@ -502,13 +505,27 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         return;
     }
 
+    if ( !bJustJoined )
+    {
+        SString strVerifyFiles = "Undisclosed";
+        SString strDisabledAC = "Undisclosed";
+        if ( !strACInfo.empty () )
+        {
+            strVerifyFiles = strACInfo.SplitLeft ( "," );
+            strDisabledAC = strACInfo.SplitRight ( "," );
+            strVerifyFiles = strVerifyFiles == "-1" ? "All" : strVerifyFiles;
+            strDisabledAC = strDisabledAC == "" ? "None" : strDisabledAC;
+        }
+        g_pCore->GetConsole ()->Print ( SString ( "Server AC info: Verify client files: %s  Disabled AC: %s", *strVerifyFiles, *strDisabledAC ) );
+    }
+
     // While there are bytes left, parse player list items
     char szNickBuffer [MAX_PLAYER_NICK_LENGTH + 1];
     while ( bitStream.GetNumberOfUnreadBits () >= 8 )
     {
         // Read out the assigned player id
         ElementID PlayerID;
-        if ( !bitStream.ReadCompressed ( PlayerID ) )
+        if ( !bitStream.Read ( PlayerID ) )
         {
             RaiseProtocolError ( 8 );
             return;
@@ -599,13 +616,13 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                 return;
             }
             if ( bHasTeam )
-                bitStream.ReadCompressed ( TeamID );
+                bitStream.Read ( TeamID );
 
             // In vehicle?
             if ( bInVehicle )
             {
                 // Read out the vehicle id
-                bitStream.ReadCompressed ( ID );
+                bitStream.Read ( ID );
 
                 SOccupiedSeatSync seat;
                 if ( !bitStream.Read ( &seat ) )
@@ -744,7 +761,7 @@ void CPacketHandler::Packet_PlayerQuit ( NetBitStreamInterface& bitStream )
     ElementID PlayerID;
     SQuitReasonSync quitReason;
 
-    if ( bitStream.ReadCompressed ( PlayerID ) &&
+    if ( bitStream.Read ( PlayerID ) &&
          bitStream.Read ( &quitReason ) )
     {
         // Look up the player in the playermanager
@@ -916,7 +933,6 @@ void CPacketHandler::Packet_PlayerSpawn ( NetBitStreamInterface& bitStream )
     }
 }
 
-
 void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
 {
     ElementID ID;
@@ -928,8 +944,8 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
     AssocGroupId animGroup;
     AnimationId animID;
 
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.ReadCompressed ( KillerID ) &&
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( KillerID ) &&
          bitStream.Read ( &weapon ) &&
          bitStream.Read ( &bodyPart ) &&
          bitStream.ReadBit ( bStealth ) &&
@@ -998,7 +1014,7 @@ void CPacketHandler::Packet_PlayerChangeNick ( NetBitStreamInterface& bitStream 
 
     // Read out the player ID
     ElementID PlayerID;
-    if ( !bitStream.ReadCompressed ( PlayerID ) )
+    if ( !bitStream.Read ( PlayerID ) )
     {
         RaiseProtocolError ( 23 );
         return;
@@ -1336,7 +1352,7 @@ void CPacketHandler::Packet_VehicleDamageSync ( NetBitStreamInterface& bitStream
     ElementID ID;
     SVehicleDamageSync damage ( true, true, true, true, true );
 
-    if ( bitStream.ReadCompressed ( ID ) &&
+    if ( bitStream.Read ( ID ) &&
          bitStream.Read ( &damage ) )
     {
         // Grab the vehicle
@@ -1378,7 +1394,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
     // Read out the player id
     ElementID PlayerID;
-    if ( bitStream.ReadCompressed ( PlayerID ) )
+    if ( bitStream.Read ( PlayerID ) )
     {
         CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerID );
         if ( pPlayer )
@@ -1388,24 +1404,23 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
             // Read out the vehicle id
             ElementID ID = INVALID_ELEMENT_ID;
-            bitStream.ReadCompressed ( ID );
+            bitStream.Read ( ID );
             CClientVehicle* pVehicle = g_pClientGame->m_pVehicleManager->Get ( ID );
-            
-            // Read out the seat id
-            unsigned char ucSeat = 0xFF;
-            bitStream.ReadBits ( &ucSeat, 3 );
-            if ( ucSeat == 0xFF )
-            {
-                RaiseProtocolError ( 28 );
-                return;
-            }
-
-            // Read out the action
-            unsigned char ucAction = 0xFF;
-            bitStream.ReadBits ( &ucAction, 4 );
-
             if ( pVehicle )
             {
+                // Read out the seat id
+                unsigned char ucSeat = 0xFF;
+                bitStream.ReadBits ( &ucSeat, 3 );
+                if ( ucSeat == 0xFF )
+                {
+                    RaiseProtocolError ( 28 );
+                    return;
+                }
+
+                // Read out the action
+                unsigned char ucAction = 0xFF;
+                bitStream.ReadBits ( &ucAction, 4 );
+
 #ifdef MTA_DEBUG
                 if ( pPlayer->IsLocalPlayer () )
                 {
@@ -1439,7 +1454,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         }
 
                         // Start animating him in
-                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor );
+                        pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor + 2 );
 
                         // Remember that this player is working on entering a vehicle
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_GETTING_IN );
@@ -1517,6 +1532,7 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         }
 
                         // Set the door angle.
+                        pVehicle->AllowDoorRatioSetting ( ucDoor + 2, true );
                         pVehicle->SetDoorOpenRatio ( ucDoor + 2, door.data.fRatio, 0, true );
 
 
@@ -1530,6 +1546,11 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                     case CClientGame::VEHICLE_REQUEST_OUT_CONFIRMED:
                     {
+                        unsigned char ucDoor = 0;
+
+                        if ( !bitStream.ReadBits ( &ucDoor, 2 ) )
+                            ucDoor = 0xFF;
+
                         // If it's the local player, set some stuff
                         if ( pPlayer->IsLocalPlayer () )
                         {
@@ -1538,14 +1559,15 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                             g_pClientGame->m_ucVehicleInOutSeat = ucSeat;
                         }
 
-                        pPlayer->GetOutOfVehicle ();
+                        pPlayer->GetOutOfVehicle ( ucDoor );
 
                         // Remember that this player is working on leaving a vehicle
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_GETTING_OUT );
 
                         CLuaArguments Arguments;
                         Arguments.PushElement ( pPlayer );         // player
-                        Arguments.PushNumber ( ucSeat );            // seat
+                        Arguments.PushNumber ( ucSeat );           // seat
+                        Arguments.PushNumber ( ucDoor );           // door being used
                         pVehicle->CallEvent ( "onClientVehicleStartExit", Arguments, true );
                         break;
                     }
@@ -1663,14 +1685,15 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                         // Call the onClientVehicleStartEnter event
                         CLuaArguments Arguments;
-                        Arguments.PushElement ( pPlayer );     // player
+                        Arguments.PushElement ( pPlayer );      // player
                         Arguments.PushNumber ( ucSeat );        // seat
                         Arguments.PushNumber ( ucDoor );        // Door
                         pVehicle->CallEvent ( "onClientVehicleStartEnter", Arguments, true );
 
                         CLuaArguments Arguments2;
                         Arguments2.PushElement ( pJacked );         // player
-                        Arguments2.PushNumber ( ucSeat );            // seat
+                        Arguments2.PushNumber ( ucSeat );           // seat
+                        Arguments2.PushNumber ( ucDoor );           // door
                         pVehicle->CallEvent ( "onClientVehicleStartExit", Arguments2, true );
                         break;
                     }
@@ -1679,13 +1702,13 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                     {
                         // Read out the player that's going into the vehicle
                         ElementID PlayerInside = INVALID_ELEMENT_ID;
-                        bitStream.ReadCompressed ( PlayerInside );
+                        bitStream.Read ( PlayerInside );
                         CClientPlayer* pInsidePlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerInside );
                         if ( pInsidePlayer )
                         {
                             // And the one dumping out on the outside
                             ElementID PlayerOutside = INVALID_ELEMENT_ID;
-                            bitStream.ReadCompressed ( PlayerOutside );
+                            bitStream.Read ( PlayerOutside );
                             CClientPlayer* pOutsidePlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerOutside );
                             if ( pOutsidePlayer )
                             {
@@ -1793,29 +1816,6 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                     }
                 }
             }
-            else
-            {
-                if ( ucAction == CClientGame::VEHICLE_ATTEMPT_FAILED )
-                {
-                    // Reset in/out stuff if it was the local player
-                    if ( pPlayer->IsLocalPlayer () )
-                    {
-                        g_pClientGame->ResetVehicleInOut ();
-                    }
-
-                    // Reset vehicle in out state
-                    pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
-
-#if MTA_DEBUG
-                    // Read the reason as to why it failed
-                    unsigned char ucReason;
-                    bitStream.Read ( ucReason );
-
-                    // Print failure text. (Probably failed because vehicle was removed with onVehicleStartEnter)
-                    g_pCore->GetConsole ()->Printf ( "Failed to enter/exit vehicle - id: %u", ucReason );
-#endif
-                }
-            }
         }
     }
     else
@@ -1841,8 +1841,8 @@ void CPacketHandler::Packet_VehicleTrailer ( NetBitStreamInterface& bitStream )
     SRotationDegreesSync rotation ( false );
     SVelocitySync turn;
 
-    if ( bitStream.ReadCompressed ( ID ) &&
-         bitStream.ReadCompressed ( TrailerID ) &&
+    if ( bitStream.Read ( ID ) &&
+         bitStream.Read ( TrailerID ) &&
          bitStream.ReadBit ( bAttached ) &&
          ( !bAttached || ( bitStream.Read ( &position ) &&
                            bitStream.Read ( &rotation ) &&
@@ -2153,6 +2153,13 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
         g_pMultiplayer->SetFogDistance ( fFogDistance );
     }
+
+    // Aircraft max height
+    float fAircraftMaxHeight = 800;
+    if ( !bitStream.Read ( fAircraftMaxHeight ) )
+        return;
+    
+    g_pGame->GetWorld ()->SetAircraftMaxHeight ( fAircraftMaxHeight );
 }
 
 
@@ -2298,7 +2305,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     // HACK: store new entities and link up anything depending on other entities after
     list < SEntityDependantStuff* > newEntitiesStuff;
 
-    ElementID NumEntities = 0;
+    unsigned int NumEntities = 0;
     if ( !bitStream.ReadCompressed ( NumEntities ) || NumEntities == 0 )
     {
         return;
@@ -2314,9 +2321,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         unsigned short usDimension;
         bool bCollisonsEnabled;
 
-        if ( bitStream.ReadCompressed ( EntityID ) &&
+        if ( bitStream.Read ( EntityID ) &&
              bitStream.Read ( ucEntityTypeID ) &&
-             bitStream.ReadCompressed ( ParentID ) &&
+             bitStream.Read ( ParentID ) &&
              bitStream.Read ( ucInterior ) &&
              bitStream.ReadCompressed ( usDimension ) &&
              bitStream.ReadBit ( bIsAttached ) )
@@ -2324,7 +2331,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
             if ( bIsAttached )
             {
-                bitStream.ReadCompressed ( EntityAttachedToID );
+                bitStream.Read ( EntityAttachedToID );
                 bitStream.Read ( &attachedPosition );
                 bitStream.Read ( &attachedRotation );
             }
@@ -2344,20 +2351,18 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 if ( bitStream.Read ( ucNameLength ) )
                 {
                     // Was a valid custom data name length found?
-                    if ( ucNameLength <= 32 )
+                    if ( ucNameLength <= MAX_CUSTOMDATA_NAME_LENGTH )
                     {
                         // Add it only if the name is longer than 0
                         if ( ucNameLength > 0 )
                         {
-                            char szName [ 33 ] = { '\0' };
+                            SString strName;
+                            bitStream.ReadStringCharacters ( strName, ucNameLength );
+
                             CLuaArgument Argument;
-
-                            bitStream.Read ( szName, ucNameLength );
-                            szName[32] = '\0';
-
                             Argument.ReadFromBitStream ( bitStream );
 
-                            pCustomData->Set ( szName, Argument, NULL );
+                            pCustomData->Set ( strName, Argument, NULL );
                         }
                     }
                     else
@@ -2787,6 +2792,48 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
                     pVehicle->SetHeadLightColor ( color );
 
+                    // Read out and set handling
+                    if ( bitStream.ReadBit () == true )
+                    {
+                        SVehicleHandlingSync handling;
+                        bitStream.Read ( &handling );
+                        CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+                        pEntry->SetMass ( handling.data.fMass );
+                        pEntry->SetTurnMass ( handling.data.fTurnMass );
+                        pEntry->SetDragCoeff ( handling.data.fDragCoeff );
+                        pEntry->SetCenterOfMass ( handling.data.vecCenterOfMass );
+                        pEntry->SetPercentSubmerged ( handling.data.ucPercentSubmerged );
+                        pEntry->SetTractionMultiplier ( handling.data.fTractionMultiplier );
+                        pEntry->SetCarDriveType ( (CHandlingEntry::eDriveType)handling.data.ucDriveType );
+                        pEntry->SetCarEngineType ( (CHandlingEntry::eEngineType)handling.data.ucEngineType );
+                        pEntry->SetNumberOfGears ( handling.data.ucNumberOfGears );
+                        pEntry->SetEngineAcceleration ( handling.data.fEngineAcceleration );
+                        pEntry->SetEngineInertia ( handling.data.fEngineInertia );
+                        pEntry->SetMaxVelocity ( handling.data.fMaxVelocity );
+                        pEntry->SetBrakeDeceleration ( handling.data.fBrakeDeceleration );
+                        pEntry->SetBrakeBias ( handling.data.fBrakeBias );
+                        pEntry->SetABS ( handling.data.bABS );
+                        pEntry->SetSteeringLock ( handling.data.fSteeringLock );
+                        pEntry->SetTractionLoss ( handling.data.fTractionLoss );
+                        pEntry->SetTractionBias ( handling.data.fTractionBias );
+                        pEntry->SetSuspensionForceLevel ( handling.data.fSuspensionForceLevel );
+                        pEntry->SetSuspensionDamping ( handling.data.fSuspensionDamping );
+                        pEntry->SetSuspensionHighSpeedDamping ( handling.data.fSuspensionHighSpdDamping );
+                        pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
+                        pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
+                        pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
+                        pEntry->SetSuspensionAntiDiveMultiplier ( handling.data.fSuspensionAntiDiveMultiplier );
+                        pEntry->SetCollisionDamageMultiplier ( handling.data.fCollisionDamageMultiplier );
+                        pEntry->SetModelFlags ( handling.data.uiModelFlags );
+                        pEntry->SetHandlingFlags ( handling.data.uiHandlingFlags );
+                        pEntry->SetSeatOffsetDistance ( handling.data.fSeatOffsetDistance );
+                        //pEntry->SetMonetary ( handling.data.uiMonetary );
+                        //pEntry->SetHeadLight ( (CHandlingEntry::eLightType)handling.data.ucHeadLight );
+                        //pEntry->SetTailLight ( (CHandlingEntry::eLightType)handling.data.ucTailLight );
+                        pEntry->SetAnimGroup ( handling.data.ucAnimGroup );
+                        pVehicle->ApplyHandling();
+                    }
+
                     // Set the matrix
                     pVehicle->SetPosition ( position.data.vecPosition );
                     pVehicle->SetRotationDegrees ( rotationDegrees.data.vecRotation );
@@ -3025,7 +3072,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
                     if ( bitStream.ReadBit () == true )
                     {
-                        bitStream.ReadCompressed ( VehicleID );
+                        bitStream.Read ( VehicleID );
                         pVehicle = g_pClientGame->m_pVehicleManager->Get ( VehicleID );
 
                         SOccupiedSeatSync seat;
@@ -3336,7 +3383,7 @@ void CPacketHandler::Packet_EntityRemove ( NetBitStreamInterface& bitStream )
     // ElementID   (2)     - entity id
 
     ElementID ID;
-    while ( bitStream.ReadCompressed ( ID ) )
+    while ( bitStream.Read ( ID ) )
     {
         CClientEntity* pEntity = CElementIDs::GetElement ( ID );
         if ( pEntity )
@@ -3390,7 +3437,7 @@ void CPacketHandler::Packet_PickupHideShow ( NetBitStreamInterface& bitStream )
         // Pickup id and model
         ElementID PickupID;
         unsigned short usPickupModel;
-        if ( bitStream.ReadCompressed ( PickupID ) && bitStream.ReadCompressed ( usPickupModel ) )
+        if ( bitStream.Read ( PickupID ) && bitStream.ReadCompressed ( usPickupModel ) )
         {
             // Try to grab the pickup
             CClientPickup* pPickup = g_pClientGame->m_pPickupManager->Get ( PickupID );
@@ -3423,7 +3470,7 @@ void CPacketHandler::Packet_PickupHitConfirm ( NetBitStreamInterface& bitStream 
     bool bHide;
     bool bPlaySound;
 
-    if ( bitStream.ReadCompressed ( PickupID ) &&
+    if ( bitStream.Read ( PickupID ) &&
          bitStream.ReadBit ( bHide ) &&
          bitStream.ReadBit ( bPlaySound ) )
     {
@@ -3567,7 +3614,7 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
 
     ElementID CreatorID = INVALID_ELEMENT_ID;
     unsigned short usLatency = 0;
-    if ( bHasCreator && ( !bitStream.ReadCompressed ( CreatorID ) || !bitStream.ReadCompressed ( usLatency ) ) )
+    if ( bHasCreator && ( !bitStream.Read ( CreatorID ) || !bitStream.ReadCompressed ( usLatency ) ) )
         return;
 
     // Read out the origin
@@ -3576,7 +3623,7 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
         return;
 
     ElementID OriginID = INVALID_ELEMENT_ID;
-    if ( bHasOrigin && !bitStream.ReadCompressed ( OriginID ) )
+    if ( bHasOrigin && !bitStream.Read ( OriginID ) )
         return;
 
     // Read out the position
@@ -3749,7 +3796,7 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
 
     ElementID CreatorID = INVALID_ELEMENT_ID;
     unsigned short usLatency = 0;
-    if ( bHasCreator && ( !bitStream.ReadCompressed ( CreatorID ) || !bitStream.ReadCompressed ( usLatency ) ) )
+    if ( bHasCreator && ( !bitStream.Read ( CreatorID ) || !bitStream.ReadCompressed ( usLatency ) ) )
         return;
 
     // Read out the origin element
@@ -3758,7 +3805,7 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
         return;
 
     ElementID OriginID = INVALID_ELEMENT_ID;
-    if ( bHasOrigin && !bitStream.ReadCompressed ( OriginID ) )
+    if ( bHasOrigin && !bitStream.Read ( OriginID ) )
         return;
 
     // Read out the origin position
@@ -3827,7 +3874,7 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
                 return;
 
             ElementID TargetID = INVALID_ELEMENT_ID;
-            if ( bHasTarget && !bitStream.ReadCompressed ( TargetID ) )
+            if ( bHasTarget && !bitStream.Read ( TargetID ) )
                 return;
 
             // Read out the velocity
@@ -3883,7 +3930,7 @@ void CPacketHandler::Packet_PlayerStats ( NetBitStreamInterface& bitStream )
     // Read out the player and stats
     ElementID ID;
     unsigned short usNumStats;
-    if ( bitStream.ReadCompressed ( ID ) &&
+    if ( bitStream.Read ( ID ) &&
          bitStream.ReadCompressed ( usNumStats ) )
     {
         CClientPed* pPed = g_pClientGame->GetPedManager ()->Get ( ID, true );
@@ -3962,7 +4009,7 @@ void CPacketHandler::Packet_LuaEvent ( NetBitStreamInterface& bitStream )
         // Read out the name and the entity id
         char* szName = new char [ usNameLength + 1 ];
         ElementID EntityID;
-        if ( bitStream.Read ( szName, usNameLength ) && bitStream.ReadCompressed ( EntityID ) )
+        if ( bitStream.Read ( szName, usNameLength ) && bitStream.Read ( EntityID ) )
         {
             // Null-terminate it
             szName [ usNameLength ] = 0;
@@ -4226,7 +4273,7 @@ void CPacketHandler::Packet_DetonateSatchels ( NetBitStreamInterface& bitStream 
     ElementID Player;
     unsigned short usLatency;
 
-    if ( bitStream.ReadCompressed ( Player ) &&
+    if ( bitStream.Read ( Player ) &&
          bitStream.ReadCompressed ( usLatency ) )
     {
         // Grab the player
@@ -4248,7 +4295,7 @@ void CPacketHandler::Packet_VoiceData ( NetBitStreamInterface& bitStream )
 {
     unsigned short usPacketSize;
     ElementID PlayerID;
-    if ( bitStream.ReadCompressed ( PlayerID ) )
+    if ( bitStream.Read ( PlayerID ) )
     {       
         CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerID );
         if ( pPlayer && bitStream.Read ( usPacketSize ) )

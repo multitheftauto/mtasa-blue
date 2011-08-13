@@ -45,7 +45,7 @@ bool CPickupHideShowPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( usPickupModelID != 0 )
             {
                 // Write the pickup model id and id
-                BitStream.WriteCompressed ( pPickup->GetID () );
+                BitStream.Write ( pPickup->GetID () );
                 BitStream.WriteCompressed ( usPickupModelID );
             }
         }

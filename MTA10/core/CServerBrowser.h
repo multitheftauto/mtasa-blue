@@ -112,6 +112,9 @@ public:
     bool                IsAddressBarAwaitingInput  ( void );
     void                SetNextHistoryText      ( bool bDown );
 
+    void                OnQuickConnectButtonClick ( void );
+    void                NotifyServerExists      ( in_addr Address, ushort usPort );
+
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
@@ -123,13 +126,11 @@ protected:
     const char*         m_szSearchTypePath[ SearchTypes::MAX_SEARCH_TYPES ];
     CGUIStaticImage*    m_pSearchIcons[ SearchTypes::MAX_SEARCH_TYPES ];
 
-    bool                m_bManualConnect;
-    std::string         m_strManualHost;
-    unsigned int        m_usManualPort;
-
     CVector2D           m_WidgetSize;
 
     // Window widgets
+    CGUIWindow*         m_pFrame;
+    CGUIElement*        m_pTopWindow;
     CGUITabPanel*       m_pPanel;
     CGUIStaticImage*    m_pLockedIcon;
 
@@ -180,6 +181,7 @@ protected:
 
     CGUILabel*          m_pServerListStatus [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIButton*         m_pButtonBack [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIButton*         m_pButtonGeneralHelp [ SERVER_BROWSER_TYPE_COUNT ];
 
     // Server list columns
     CGUIHandle          m_hVersion [ SERVER_BROWSER_TYPE_COUNT ];
@@ -215,10 +217,14 @@ private:
     bool                    OnInfoClick                     ( CGUIElement* pElement );
     bool                    OnFavouritesClick               ( CGUIElement* pElement );
     bool                    OnBackClick                     ( CGUIElement* pElement );
+    bool                    OnGeneralHelpClick              ( CGUIElement* pElement );
+    bool                    OnGeneralHelpDeactivate         ( CGUIElement* pElement );
     bool                    OnAddressChanged                ( CGUIElement* pElement );
     bool                    OnFilterChanged                 ( CGUIElement* pElement );
     bool                    OnTabChanged                    ( CGUIElement* pElement );
     bool                    OnHistorySelected               ( CGUIElement* pElement );
+    bool                    OnHistoryDropListRemove         ( CGUIElement* pElement );
+
     bool                    OnSearchTypeSelected            ( CGUIElement* pElement );
 
     bool					OnSearchFocused					( CGUIElement* pElement );
@@ -227,6 +233,7 @@ private:
     bool					OnAddressDefocused				( CGUIElement* pElement );
 
     ServerBrowserType       GetCurrentServerBrowserType     ( void );
+    ServerBrowserType       GetCurrentServerBrowserTypeForSave ( void );
 
     CServerListInternet     m_ServersInternet;
     CServerListLAN          m_ServersLAN;
@@ -235,12 +242,20 @@ private:
     CServerList             m_ServersHistory;
 
     unsigned long           m_ulLastUpdateTime;
-    bool                    m_firstTimeBrowseServer;
-    bool                    m_bOptionsLoaded;
-    unsigned int            m_uiCurrentSearchType;          
+    bool                    m_bFirstTimeBrowseServer;
+    bool                    m_bOptionsLoaded;        
     ServerBrowserType       m_PrevServerBrowserType;
 
     std::map < SString, int > m_blockedVersionMap;
+
+	CGUIWindow* 			m_pQuickConnectHelpWindow;
+	bool 					m_bFocusTextEdit;
+
+    uint                    m_uiShownQuickConnectHelpCount;
+    uint                    m_uiIsUsingTempTab;
+    ServerBrowserType       m_BeforeTempServerBrowserType;
+    CGUIWindow*             m_pGeneralHelpWindow;
+    long long               m_llLastGeneralHelpTime;
 };
 
 #endif

@@ -54,6 +54,7 @@ class CGame;
 #include "packets/CCameraSyncPacket.h"
 #include "packets/CPlayerTransgressionPacket.h"
 #include "packets/CPlayerDiagnosticPacket.h"
+#include "packets/CPlayerModInfoPacket.h"
 
 #include "CRPCFunctions.h"
 
@@ -71,6 +72,7 @@ class CConsole;
 class CConsoleClient;
 class CElementDeleter;
 class CGroups;
+class CHandlingManager;
 class CHTTPD;
 class CMainConfig;
 class CMapManager;
@@ -123,6 +125,7 @@ class CWeaponDamageCheckPacket;
 class CGame
 {
 public:
+    ZERO_ON_NEW         // To be sure everything is cleared
     enum
     {
         VEHICLE_REQUEST_IN,
@@ -156,18 +159,6 @@ public:
         GLITCH_FASTMOVE,
         GLITCH_CROUCHBUG,
     };
-    enum eVehicleInOutFailReasons
-    {
-        VEHICLE_INOUT_FAIL_INVALID = 0,
-        VEHICLE_INOUT_FAIL_SCRIPT,
-        VEHICLE_INOUT_FAIL_SCRIPT_2,
-        VEHICLE_INOUT_FAIL_JACKED_ACTION,
-        VEHICLE_INOUT_FAIL_SEAT,
-        VEHICLE_INOUT_FAIL_DISTANCE,
-        VEHICLE_INOUT_FAIL_IN_VEHICLE,
-        VEHICLE_INOUT_FAIL_ACTION,
-        VEHICLE_INOUT_FAIL_TRAILER,
-    };
 public:
                                 CGame                       ( void );
                                 ~CGame                      ( void );
@@ -187,6 +178,7 @@ public:
     inline bool                 IsFinished                  ( void )            { return m_bIsFinished; };
 
     inline CMainConfig*             GetConfig                   ( void )        { return m_pMainConfig; }
+    inline CHandlingManager*        GetHandlingManager          ( void )        { return m_pHandlingManager; }
     inline CMapManager*             GetMapManager               ( void )        { return m_pMapManager; }
     inline CPlayerManager*          GetPlayerManager            ( void )        { return m_pPlayerManager; }
     inline CObjectManager*          GetObjectManager            ( void )        { return m_pObjectManager; }
@@ -254,7 +246,7 @@ public:
     inline void                 GetHeatHaze                 ( SHeatHazeSettings& heatHazeSettings )         { heatHazeSettings = m_HeatHazeSettings; }
     inline void                 SetHeatHaze                 ( const SHeatHazeSettings& heatHazeSettings )   { m_HeatHazeSettings = heatHazeSettings; }
 
-    inline bool                 AreInteriorSoundsEnabled    ( void )        { return m_bInteriorSoundsEnabled; }
+    inline bool                 GetInteriorSoundsEnabled    ( void )        { return m_bInteriorSoundsEnabled; }
     inline void                 SetInteriorSoundsEnabled    ( bool bEnable )    { m_bInteriorSoundsEnabled = bEnable; }
 
     inline bool                 HasWaterColor               ( void )        { return m_bOverrideWaterColor; }
@@ -299,6 +291,9 @@ public:
     inline float                GetFogDistance              ( void )        { return m_fFogDistance; }
     inline void                 SetFogDistance              ( float& fFogDistance ) { m_fFogDistance = fFogDistance; }
 
+    inline float                GetAircraftMaxHeight        ( void ) { return m_fAircraftMaxHeight; }
+    inline void                 SetAircraftMaxHeight        ( float fMaxHeight ) { m_fAircraftMaxHeight = fMaxHeight; }
+
     inline bool*                GetGarageStates             ( void )        { return m_bGarageStates; }
 
     void                        Lock                        ( void );
@@ -319,8 +314,11 @@ public:
     void                        PulseMasterServerAnnounce   ( void );
     void                        StartOpenPortsTest          ( void );
 
+    bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
+
 private:
     void                        AddBuiltInEvents            ( void );
+    void                        RelayPlayerPuresync         ( class CPacket& Packet );
 
     void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
 
@@ -347,6 +345,7 @@ private:
     void                        Packet_CameraSync           ( class CCameraSyncPacket& Packet );
     void                        Packet_PlayerTransgression  ( class CPlayerTransgressionPacket& Packet );
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
+    void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
 
     void                        VoiceBroadcastToPlayer      ( CElement* pElement, CPlayer* pSourcePlayer, CVoiceDataPacket& pPacket );
 
@@ -394,6 +393,7 @@ private:
     CSettings*                      m_pSettings;
     CZoneNames*                     m_pZoneNames;
     ASE*                            m_pASE;
+    CHandlingManager*               m_pHandlingManager;
     CRPCFunctions*                  m_pRPCFunctions;
     CLanBroadcast*                  m_pLanBroadcast;
     CWaterManager*                  m_pWaterManager;
@@ -408,6 +408,7 @@ private:
     float                       m_fGravity;
     float                       m_fGameSpeed;
     float                       m_fJetpackMaxHeight;
+    float                       m_fAircraftMaxHeight;
 
     unsigned char               m_ucTrafficLightState;
     bool                        m_bTrafficLightsLocked;
@@ -461,6 +462,8 @@ private:
 
     long long                   m_llLastAnnouceTime;
     class COpenPortsTester*     m_pOpenPortsTester;
+
+    bool                        m_bServerFullyUp;       // No http operations should be allowed unless this is true
 };
 
 #endif

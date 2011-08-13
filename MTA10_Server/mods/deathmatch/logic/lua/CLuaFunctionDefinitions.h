@@ -112,6 +112,7 @@ public:
     static int      SetPlayerBlurLevel                  ( lua_State* luaVM );
     static int      RedirectPlayer                      ( lua_State* luaVM );
     static int      SetPlayerName                       ( lua_State* luaVM );
+    static int      DetonateSatchels                    ( lua_State* luaVM );
 
     // Ped get functions
     static int      CreatePed                           ( lua_State* luaVM );
@@ -401,6 +402,7 @@ public:
 
     // Standard server functions
     static int      GetMaxPlayers                       ( lua_State* luaVM );
+    static int      SetMaxPlayers                       ( lua_State* luaVM );
     static int      OutputChatBox                       ( lua_State* luaVM );
     static int      OutputConsole                       ( lua_State* luaVM );
     static int      OutputDebugString                   ( lua_State* luaVM );
@@ -410,6 +412,8 @@ public:
     static int      GetServerIP                         ( lua_State* luaVM );
     static int      GetServerPassword                   ( lua_State* luaVM );
     static int      SetServerPassword                   ( lua_State* luaVM );
+    static int      GetServerConfigSetting              ( lua_State* luaVM );
+    static int      SetServerConfigSetting              ( lua_State* luaVM );
 
     static int      shutdown                            ( lua_State* luaVM );
 
@@ -527,6 +531,7 @@ public:
     // Utility
     static int      Md5                                 ( lua_State* luaVM );
     static int      GetNetworkUsageData                 ( lua_State* luaVM );
+    static int      GetNetworkStats                     ( lua_State* luaVM );
     static int      GetVersion                          ( lua_State* luaVM );
     static int      GetModules                          ( lua_State* luaVM );
     static int      GetModuleInfo                       ( lua_State* luaVM );

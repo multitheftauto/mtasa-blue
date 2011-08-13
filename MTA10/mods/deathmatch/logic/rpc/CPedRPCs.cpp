@@ -189,7 +189,7 @@ void CPedRPCs::WarpPedIntoVehicle ( CClientEntity* pSource, NetBitStreamInterfac
     ElementID VehicleID;
     unsigned char ucSeat;
     unsigned char ucTimeContext;
-    if ( bitStream.ReadCompressed ( VehicleID ) &&
+    if ( bitStream.Read ( VehicleID ) &&
          bitStream.Read ( ucSeat ) &&
          bitStream.Read ( ucTimeContext ) )
     {
@@ -251,12 +251,10 @@ void CPedRPCs::RemovePedFromVehicle ( CClientEntity* pSource, NetBitStreamInterf
         {
             // Get the ped / player's occupied vehicle data before pulling it out
             CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
+            unsigned int    uiSeat   = pPed->GetOccupiedVehicleSeat();
 
-            // Make sure the vehicle exists (otherwise warping into specific vehicles will crash)
             if ( pVehicle )
             {
-                unsigned int uiSeat = pPed->GetOccupiedVehicleSeat();
-
                 pPed->SetSyncTimeContext ( ucTimeContext );
 
                 // Remove the player from his vehicle

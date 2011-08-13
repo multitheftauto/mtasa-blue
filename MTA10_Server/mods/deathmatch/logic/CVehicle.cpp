@@ -6,6 +6,7 @@
 *  PURPOSE:     Vehicle entity class
 *  DEVELOPERS:  Christian Myhre Lundheim <>
 *               Jax <>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -64,7 +65,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bOnGround = true;
     m_bSmokeTrail = false;
     m_ucAlpha = 255;
-    m_pEnteringPed = NULL;
+    m_pJackingPlayer = NULL;
     m_bInWater = false;
     m_bDerailed = false;
     m_bIsDerailable = true;
@@ -73,6 +74,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
     m_bCollisionsEnabled = true;
+    m_bHandlingChanged = false;
 
     // Initialize the occupied Players
     for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )
@@ -88,21 +90,21 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
 
     // Generate a random reg plate
     GenerateRegPlate ();
+
+    // Generate the handling data
+    GenerateHandlingData ();
 }
 
 
 CVehicle::~CVehicle ( void )
 {
-    CPed* pEnteringPed = GetEnteringPed ( );
-
-    if ( pEnteringPed && pEnteringPed->GetEnteringVehicle () == this )
+    if ( m_pJackingPlayer && m_pJackingPlayer->GetJackingVehicle () == this )
     {
-        if ( pEnteringPed->GetVehicleAction () != CPlayer::VEHICLEACTION_NONE )
+        if ( m_pJackingPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_JACKING )
         {
-            pEnteringPed->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+            m_pJackingPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
         }
-
-        pEnteringPed->SetEnteringVehicle ( NULL, 0 );
+        m_pJackingPlayer->SetJackingVehicle ( NULL );
     }
 
     // Unset any tow links
@@ -125,6 +127,7 @@ CVehicle::~CVehicle ( void )
         }
     }
     delete m_pUpgrades;
+    delete m_pHandlingEntry;
 
     // Remove us from the vehicle manager
     Unlink ();
@@ -183,9 +186,7 @@ bool CVehicle::ReadSpecialData ( void )
         if ( CVehicleManager::IsValidModel ( iTemp ) )
         {
             // Remember it and generate a new random color
-            m_usModel = static_cast < unsigned short > ( iTemp );
-            m_Color = RandomizeColor ();
-            GetInitialDoorStates ( m_ucDoorStates );
+            SetModel ( static_cast < unsigned short > ( iTemp ) );
 
             m_usAdjustableProperty = 0;
         }
@@ -384,6 +385,9 @@ void CVehicle::SetModel ( unsigned short usModel )
         m_usModel = usModel;
         RandomizeColor ();
         GetInitialDoorStates ( m_ucDoorStates );
+
+        // Generate new handling data to fit the vehicle
+        GenerateHandlingData ();
     }
 }
 
@@ -710,8 +714,19 @@ void CVehicle::GetInitialDoorStates ( unsigned char * pucDoorStates )
 
             // Keep the bonet and boot intact
             pucDoorStates [ 0 ] = pucDoorStates [ 1 ] = DT_DOOR_INTACT;
-            break;        
+            break;
         default:
             memset ( pucDoorStates, DT_DOOR_INTACT, 6 );
     }
+}
+
+
+void CVehicle::GenerateHandlingData ()
+{
+    // Make a new CHandlingEntry
+    m_pHandlingEntry = new CHandlingEntry( );
+    // Apply the model handling info
+    m_pHandlingEntry->ApplyHandlingData( g_pGame->GetHandlingManager ()->GetModelHandlingData ( static_cast < eVehicleTypes > ( m_usModel ) ) );
+
+    m_bHandlingChanged = false;
 }

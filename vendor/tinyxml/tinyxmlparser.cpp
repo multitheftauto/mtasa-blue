@@ -1105,6 +1105,7 @@ const char* TiXmlElement::Parse( const char* p, TiXmlParsingData* data, TiXmlEnc
 				if ( document ) document->SetError( TIXML_ERROR_PARSING_EMPTY, p, data, encoding );		
 				return 0;
 			}
+            m_bWasEmptyTag = true;
 			return (p+1);
 		}
 		else if ( *p == '>' )
@@ -1125,6 +1126,7 @@ const char* TiXmlElement::Parse( const char* p, TiXmlParsingData* data, TiXmlEnc
 			if ( StringEqual( p, endTag.c_str(), false, encoding ) )
 			{
 				p += endTag.length();
+                m_bWasEmptyTag = false;
 				return p;
 			}
 			else

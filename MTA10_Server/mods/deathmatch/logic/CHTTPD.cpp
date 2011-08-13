@@ -32,13 +32,23 @@ CHTTPD::CHTTPD ( void )
 
 CHTTPD::~CHTTPD ()
 {
+    StopHTTPD ();
+}
+
+
+bool CHTTPD::StopHTTPD ( void )
+{
     // Stop the server if we started it
     if ( m_bStartedServer )
     {
         // Stop the server
         StopServer ();
+        m_bStartedServer = false;
+        return true;
     }
+    return false;
 }
+
 
 bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
 {
@@ -81,6 +91,13 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
 ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
                                          HttpResponse * ipoHttpResponse )
 {
+    if ( !g_pGame->IsServerFullyUp () )
+    {
+        SStringX strWait ( "The server is not ready. Please try again in a minute." );
+        ipoHttpResponse->SetBody ( strWait.c_str (), strWait.size () );
+        return HTTPRESPONSECODE_200_OK;
+    }
+
     CAccount * account = CheckAuthentication ( ipoHttpRequest );
 
     if ( account )
@@ -200,6 +217,13 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
 
 void CHTTPD::HttpPulse ( void )
 {
+    // Prevent more than one thread running this at once
+    static int iBusy = 0;
+    if ( ++iBusy > 1 )
+    {
+        iBusy--;
+        return;
+    }
 
     long long llExpireTime = GetTickCount64_ () - 1000 * 60 * 5;    // 5 minute timeout
 
@@ -218,6 +242,7 @@ void CHTTPD::HttpPulse ( void )
             iter++;
     }
 
+    iBusy--;
 }
 
 //

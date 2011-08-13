@@ -21,7 +21,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : CClientStreamElement ( pManager->GetObjectStreamer (), ID )
+CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : ClassInit ( this ), CClientStreamElement ( pManager->GetObjectStreamer (), ID )
 {
     // Init
     m_pManager = pManager;

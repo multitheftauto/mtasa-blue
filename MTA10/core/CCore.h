@@ -142,7 +142,7 @@ public:
     // Net
     void                    SetConnected                    ( bool bConnected );
     bool                    IsConnected                     ( void );
-    bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword );
+    bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true );
 
     // Mod
     void                    SetOfflineMod                   ( bool bOffline );
@@ -218,6 +218,9 @@ public:
     void                    SetCurrentServer                ( in_addr Addr, unsigned short usQueryPort );
     void                    SetXfireData                    ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount );
 
+    void                    OnPreHUDRender                  ( void );
+    void                    OnDeviceRestore                 ( void );
+
 private:
     // Core devices.
     CXML*                       m_pXML;
@@ -241,6 +244,8 @@ private:
     CTCPManager *               m_pTCPManager;
 
     bool                        m_bLastFocused;
+    int                         m_iUnminimizeFrameCounter;
+    bool                        m_bDidRecreateRenderTargets;
 
     // Module loader objects.
     CModuleLoader               m_GameModule;

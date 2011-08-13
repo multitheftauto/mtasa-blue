@@ -82,7 +82,7 @@ public:
     // Element set funcs
     static bool                 ClearElementVisibleTo               ( CElement* pElement );
     static bool                 SetElementID                        ( CElement* pElement, const char* szID );
-    static bool                 SetElementData                      ( CElement* pElement, char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronize );
+    static bool                 SetElementData                      ( CElement* pElement, const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronize );
     static bool                 RemoveElementData                   ( CElement* pElement, const char* szName );
     static bool                 SetElementParent                    ( CElement* pElement, CElement* pParent );
     static bool                 SetElementPosition                  ( CElement* pElement, const CVector& vecPosition, bool bWarp = true );
@@ -137,7 +137,7 @@ public:
     static bool                 SetPlayerAmmo                       ( CElement* pElement, unsigned char ucSlot, unsigned short usAmmo, unsigned short usAmmoInClip );
     static bool                 GivePlayerMoney                     ( CElement* pElement, long lMoney );
     static bool                 TakePlayerMoney                     ( CElement* pElement, long lMoney );
-    static bool                 ShowPlayerHudComponent              ( CElement* pElement, unsigned char ucComponent, bool bShow );
+    static bool                 ShowPlayerHudComponent              ( CElement* pElement, eHudComponent component, bool bShow );
     static bool                 SetPlayerDebuggerVisible            ( CElement* pElement, bool bVisible );
     static bool                 SetPlayerWantedLevel                ( CElement* pElement, unsigned int iLevel );
     static bool                 ForcePlayerMap                      ( CElement* pElement, bool bVisible );
@@ -149,6 +149,7 @@ public:
     static bool                 SetPlayerBlurLevel                  ( CElement* pElement, unsigned char ucLevel );
     static bool                 RedirectPlayer                      ( CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword );
     static bool                 SetPlayerName                       ( CElement* pElement, const char* szName );
+    static bool                 DetonateSatchels                    ( CElement* pElement );
 
     // Ped get funcs
     static CPed*                CreatePed                           ( CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation = 0.0f, bool bSynced = true );
@@ -253,9 +254,24 @@ public:
     static bool                 GetVehicleHeadLightColor            ( CVehicle* pVehicle, SColor& outColor );
     static bool                 GetVehicleDoorOpenRatio             ( CVehicle* pVehicle, unsigned char ucDoor, float& fRatio );
 
+    static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, float& fValue );
+    static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue );
+    static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue );
+    static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue );
+    static bool                 GetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue );
+    static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, float& fValue, bool origin = false );
+    static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, CVector& vecValue, bool origin = false );
+    static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, std::string& strValue, bool origin = false );
+    static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned int& uiValue, bool origin = false );
+    static bool                 GetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char& ucValue, bool origin = false );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue );
+
     // Vehicle set functions
     static bool                 FixVehicle                          ( CElement* pElement );
-    static bool                 BlowVehicle                         ( CElement* pElement );
+    static bool                 BlowVehicle                         ( CElement* pElement, bool bExplode );
     static bool                 SetVehicleColor                     ( CElement* pElement, const CVehicleColor& color );
     static bool                 SetVehicleLandingGearDown           ( CElement* pElement, bool bLandingGearDown );
     static bool                 SetVehicleLocked                    ( CElement* pElement, bool bLocked );
@@ -295,6 +311,27 @@ public:
     static bool                 SetVehicleHeadLightColor            ( CVehicle* pVehicle, const SColor color );
     static bool                 SetVehicleTurretPosition            ( CVehicle* pVehicle, float fHorizontal, float fVertical );
     static bool                 SetVehicleDoorOpenRatio             ( CElement* pElement, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0 );
+
+    //static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, bool bValue );
+    static bool                 ResetVehicleHandling                ( CVehicle* pVehicle, bool bUseOriginal );
+    static bool                 ResetVehicleHandlingProperty        ( CVehicle* pVehicle, eHandlingProperty eProperty, bool bUseOriginal );
+    static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, float fValue );
+    static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, CVector vecValue );
+    static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, std::string strValue );
+    static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned int uiValue );
+    static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, eHandlingProperty eProperty, unsigned char ucValue );
+    static bool                 ResetModelHandling                  ( eVehicleTypes eModel );
+    static bool                 ResetModelHandlingProperty          ( eVehicleTypes eModel, eHandlingProperty eProperty );
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, float fValue );
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, CVector vecValue );
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, std::string strValue);
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned int uiValue);
+    static bool                 SetModelHandling                    ( eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char ucValue);
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float fValue );
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector vecValue );
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string strValue, unsigned char& ucChar );
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int uiValue );
+    static bool                 SetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char ucValue );
 
     // Marker create/destroy functions
     static CMarker*             CreateMarker                        ( CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo );
@@ -342,7 +379,7 @@ public:
     // Object set functions
     static bool                 SetObjectRotation                   ( CElement* pElement, const CVector& vecRotation );
     static bool                 SetObjectScale                      ( CElement* pElement, float fScale );
-    static bool                 MoveObject                          ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
+    static bool                 MoveObject                          ( CResource * pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation, CEasingCurve::eType a_easingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
     static bool                 StopObject                          ( CElement* pElement );
 
     // Radar area create/destroy funcs
@@ -444,8 +481,10 @@ public:
 
     // Standard server functions
     static unsigned int         GetMaxPlayers                       ( void );
+    static bool                 SetMaxPlayers                       ( unsigned int uiMax );
     static bool                 OutputChatBox                       ( const char* szText, CElement* pElement, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded );
     static bool                 OutputConsole                       ( const char* szText, CElement* pElement );
+    static bool                 SetServerPassword                   ( const SString& strPassword, bool bSave );
 
     // General world get funcs
     static bool                 GetTime                             ( unsigned char& ucHour, unsigned char& ucMinute );
@@ -460,13 +499,14 @@ public:
     static bool                 GetTrafficLightState                ( unsigned char& ucState );
     static bool                 GetTrafficLightsLocked              ( bool& bLocked );
     static bool                 GetJetpackMaxHeight                 ( float& fMaxHeight );
-    static bool                 AreInteriorSoundsEnabled            ( bool& bEnabled );
+    static bool                 GetInteriorSoundsEnabled            ( bool& bEnabled );
     static bool                 GetRainLevel                        ( float& fRainLevel );
     static bool                 GetSunSize                          ( float& fSunSize );
     static bool                 GetSunColor                         ( unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG, unsigned char& ucCoronaB );
     static bool                 GetWindVelocity                     ( float& fVelX, float& fVelY, float& fVelZ );
     static bool                 GetFarClipDistance                  ( float& fFarClip );
     static bool                 GetFogDistance                      ( float& fFogDist );
+    static bool                 GetAircraftMaxHeight                ( float& fMaxHeight );
 
     // General world set funcs
     static bool                 SetTime                             ( unsigned char ucHour, unsigned char ucMinute );
@@ -481,7 +521,7 @@ public:
     static bool                 GetHeatHaze                         ( SHeatHazeSettings& heatHazeSettings );
     static bool                 SetHeatHaze                         ( const SHeatHazeSettings& heatHazeSettings );
     static bool                 ResetHeatHaze                       ( void );
-    static bool                 SetFPSLimit                         ( unsigned short usLimit );
+    static bool                 SetFPSLimit                         ( unsigned short usLimit, bool bSave );
     static bool                 SetMinuteDuration                   ( unsigned long ulDuration );
     static bool                 SetGarageOpen                       ( unsigned char ucGarageID, bool bIsOpen );
     static bool                 SetGlitchEnabled                    ( const std::string& strGlitchName, bool bEnabled );
@@ -498,6 +538,7 @@ public:
     static bool                 SetWindVelocity                     ( float fVelX, float fVelY, float fVelZ );
     static bool                 SetFarClipDistance                  ( float fFarClip );
     static bool                 SetFogDistance                      ( float fFogDist );
+    static bool                 SetAircraftMaxHeight                ( float fMaxHeight );
     static bool                 ResetRainLevel                      ( void );
     static bool                 ResetSunSize                        ( void );
     static bool                 ResetSunColor                       ( void );
@@ -534,13 +575,13 @@ public:
     static bool                 GetAccounts                         ( CLuaMain* pLuaMain );
     static CClient*             GetAccountPlayer                    ( CAccount* pAccount );
     static bool                 IsGuestAccount                      ( CAccount* pAccount, bool& bGuest );
-    static CLuaArgument*        GetAccountData                      ( CAccount* pAccount, char* szKey );
+    static CLuaArgument*        GetAccountData                      ( CAccount* pAccount, const char* szKey );
 
     // Account set funcs
     static CAccount*            AddAccount                          ( const char* szName, const char* szPassword );
     static bool                 RemoveAccount                       ( CAccount* pAccount );
     static bool                 SetAccountPassword                  ( CAccount* pAccount, const char* szPassword );
-    static bool                 SetAccountData                      ( CAccount* pAccount, char* szKey, CLuaArgument * pArgument );
+    static bool                 SetAccountData                      ( CAccount* pAccount, const char* szKey, CLuaArgument * pArgument );
     static bool                 CopyAccountData                     ( CAccount* pAccount, CAccount* pFromAccount );
 
     // Log in/out funcs

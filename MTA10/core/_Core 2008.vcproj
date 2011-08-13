@@ -337,6 +337,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\CAdditionalVertexStreamManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CChat.cpp"
 				>
 			</File>
@@ -541,6 +545,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CProxyDirect3DVertexBuffer.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CProxyDirectInput8.cpp"
 				>
 			</File>
@@ -558,6 +566,46 @@
 			</File>
 			<File
 				RelativePath=".\CrashHandler.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.DxFont.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.EffectWrap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.FileTexture.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.GuiFont.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.RenderTarget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.ScreenSource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.Shader.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItem.ShaderInstance.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItemManager.cpp"
 				>
 			</File>
 			<File
@@ -581,10 +629,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CServerCache.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CServerInfo.cpp"
 				>
 			</File>
@@ -598,6 +642,10 @@
 			</File>
 			<File
 				RelativePath=".\CSettings.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CTileBatcher.cpp"
 				>
 			</File>
 			<File
@@ -673,6 +721,38 @@
 				</File>
 			</Filter>
 			<Filter
+				Name="core"
+				>
+				<File
+					RelativePath="..\sdk\core\VideoCard.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Nightly|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
+			</Filter>
+			<Filter
 				Name="utils"
 				>
 				<File
@@ -709,6 +789,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\CAdditionalVertexStreamManager.h"
+				>
+			</File>
 			<File
 				RelativePath=".\CChat.h"
 				>
@@ -902,6 +986,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CProxyDirect3DVertexBuffer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CProxyDirectInput8.h"
 				>
 			</File>
@@ -915,6 +1003,10 @@
 			</File>
 			<File
 				RelativePath=".\CQuickConnect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRenderItemManager.h"
 				>
 			</File>
 			<File
@@ -934,6 +1026,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CServerCache.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CServerInfo.h"
 				>
 			</File>
@@ -947,6 +1043,10 @@
 			</File>
 			<File
 				RelativePath=".\CSettings.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CTileBatcher.h"
 				>
 			</File>
 			<File
@@ -1068,7 +1168,15 @@
 						>
 					</File>
 					<File
+						RelativePath="..\sdk\core\CRenderItemManagerInterface.h"
+						>
+					</File>
+					<File
 						RelativePath="..\sdk\core\CSetCursorPosHookInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\VideoCard.h"
 						>
 					</File>
 				</Filter>
@@ -1589,6 +1697,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\CScriptArgReader.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\CSphere.h"
 					>
 				</File>
@@ -1614,6 +1726,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Shared\sdk\SharedUtil.Buffer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\SharedUtil.ClassIdent.h"
 					>
 				</File>
 				<File

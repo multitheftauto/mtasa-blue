@@ -53,6 +53,7 @@ public:
 
     inline void             SetID                       ( ElementID ID )                { m_ID = ID; };
     inline void             SetSeat                     ( unsigned char ucSeat )        { m_ucSeat = ucSeat; };
+    inline void             SetDoor                     ( unsigned char ucDoor )        { m_ucDoor = ucDoor; }
     inline void             SetDoorAngle                ( float fDoorAngle )            { m_fDoorAngle = fDoorAngle; }
     inline void             SetAction                   ( unsigned char ucAction )      { m_ucAction = ucAction; };
     inline void             SetPlayerIn                 ( ElementID PlayerIn )          { m_PlayerIn = PlayerIn; };

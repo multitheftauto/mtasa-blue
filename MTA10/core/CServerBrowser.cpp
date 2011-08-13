@@ -28,6 +28,7 @@ template<> CServerBrowser * CSingleton < CServerBrowser >::m_pSingleton = NULL;
 #define SB_NAVBAR_SIZE_Y    40 // Navbar button size
 #define SB_BUTTON_SIZE_X    26
 #define SB_BUTTON_SIZE_Y    26
+#define SB_CONNECT_SIZE_X   80
 #define SB_SPACER           10 //Spacer between searchbar and navbar
 #define SB_SMALL_SPACER     5
 #define SB_SEARCHBAR_COMBOBOX_SIZE_X   45  // Mow much the search type combobox occupies of searchbar
@@ -42,32 +43,83 @@ template<> CServerBrowser * CSingleton < CServerBrowser >::m_pSingleton = NULL;
 
 #define PLAYER_LIST_PENDING_TEXT "  ..loading.."
 
+//
+// Local helper
+//
+static CVector2D CalcScreenPosition ( CGUIElement* pElement )
+{
+    CVector2D pos;
+    for ( ; pElement ; pElement = pElement->GetParent () )
+        pos += pElement->GetPosition ();
+    return pos;
+}
+
+
 CServerBrowser::CServerBrowser ( void )
 {
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Initialize
     m_ulLastUpdateTime = 0;
-    m_firstTimeBrowseServer = true;
+    m_bFirstTimeBrowseServer = true;
     m_bOptionsLoaded = false;
     m_PrevServerBrowserType = ServerBrowserTypes::INTERNET;
 
+    m_bFocusTextEdit = false;
+    m_uiShownQuickConnectHelpCount = 0;
+    m_uiIsUsingTempTab = 0;
+    m_BeforeTempServerBrowserType = ServerBrowserTypes::INTERNET;
+    m_llLastGeneralHelpTime = 0;
+
     // Do some initial math
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    bool bCreateFrame = true;
 
-	if ( resolution.fX <= 800 )  //Make our window bigger at small resolutions
+	if ( resolution.fX <= 800 )  // Make our window bigger at small resolutions
     {
-        m_WidgetSize = CVector2D( resolution.fX, resolution.fY );
+        m_WidgetSize = CVector2D ( resolution.fX, resolution.fY );
+        bCreateFrame = false;
     }
     else
-        m_WidgetSize = CVector2D( resolution.fX*SB_SPAN, resolution.fY*SB_SPAN );
+        m_WidgetSize = CVector2D ( resolution.fX*SB_SPAN, resolution.fY*SB_SPAN );
 
-    // Create the serverlist tab panel and some tabs
-    m_pPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel() );
-    m_pPanel->SetPosition ( CVector2D ( (resolution.fX - m_WidgetSize.fX)/2, (resolution.fY - m_WidgetSize.fY)/2 ) );
-    m_pPanel->SetSize ( m_WidgetSize );
-    m_pPanel->SetAlwaysOnTop ( true );
-    m_pPanel->SetZOrderingEnabled(false);
+    // Limit size
+    m_WidgetSize.fX = Min ( m_WidgetSize.fX, 1200.f );
+    m_WidgetSize.fY = Min ( m_WidgetSize.fY, 1000.f );
+
+    CVector2D widgetPosition ( ( resolution.fX - m_WidgetSize.fX ) / 2, ( resolution.fY - m_WidgetSize.fY ) / 2 );
+
+    if ( bCreateFrame )
+    {
+        // Create the window
+        m_pFrame = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "SERVER BROWSER" ) );
+        m_pTopWindow = m_pFrame;
+        m_pFrame->SetCloseButtonEnabled ( true );
+        m_pFrame->SetMovable ( true );
+        m_pFrame->SetPosition ( widgetPosition - CVector2D ( 10, 20 ) );
+        m_pFrame->SetSize ( m_WidgetSize + CVector2D ( 20, 30 ) );
+        m_pFrame->SetSizingEnabled ( false );
+        m_pFrame->SetAlwaysOnTop ( true );
+        m_pFrame->SetZOrderingEnabled ( false );
+
+        // Create the serverlist tab panel and some tabs
+        m_pPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pFrame ) );
+        m_pPanel->SetPosition (  CVector2D ( 10, 20 ) );
+        m_pPanel->SetSize ( m_WidgetSize );
+    }
+    else
+    {
+		// No frame
+		m_pFrame = NULL;
+
+        // Create the serverlist tab panel and some tabs
+        m_pPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel () );
+        m_pTopWindow = m_pPanel;
+        m_pPanel->SetPosition ( widgetPosition );
+        m_pPanel->SetSize ( m_WidgetSize );
+        m_pPanel->SetAlwaysOnTop ( true );
+        m_pPanel->SetZOrderingEnabled ( false );
+    }
 
     // Create locked icon
     m_pLockedIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
@@ -113,10 +165,132 @@ CServerBrowser::CServerBrowser ( void )
     }
 
     // Simulate focusing to keep things tidy
-    OnSearchFocused ( m_pPanel );
-    OnAddressFocused ( m_pPanel );
-    OnSearchDefocused ( m_pPanel );
-    OnAddressDefocused ( m_pPanel );
+    OnSearchFocused ( m_pTopWindow );
+    OnAddressFocused ( m_pTopWindow );
+    OnSearchDefocused ( m_pTopWindow );
+    OnAddressDefocused ( m_pTopWindow );
+
+    // Quick connect help
+    CVector2D helpPos;
+    helpPos.fX = resolution.fX * ( 512 / 1024.f );
+    helpPos.fY = widgetPosition.fY + ( 115 - 58 );
+
+    m_pQuickConnectHelpWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "" ) );
+    m_pQuickConnectHelpWindow->SetMovable ( false );
+    m_pQuickConnectHelpWindow->SetPosition ( helpPos );
+    m_pQuickConnectHelpWindow->SetSize ( CVector2D ( 300, 150 ) );
+    m_pQuickConnectHelpWindow->SetAlwaysOnTop ( true );
+    m_pQuickConnectHelpWindow->SetFrameEnabled ( false );
+    m_pQuickConnectHelpWindow->SetTitlebarEnabled ( false );
+    m_pQuickConnectHelpWindow->SetCloseButtonEnabled ( false );
+    m_pQuickConnectHelpWindow->SetVisible ( false );
+
+    // Quick connect help label
+    {
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pQuickConnectHelpWindow, "" ) );
+        pLabel->SetPosition ( CVector2D ( 0, 0 ) );
+        pLabel->SetSize ( CVector2D ( 300, 150 ) );
+        pLabel->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+        pLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
+        pLabel->SetProperty( "BackgroundEnabled", "True" );
+
+        SString strHelpMessage =
+                            "FOR QUICK CONNECT:\n"
+                            "\n"
+                            "Type the address and port into the address bar\n"
+                            "Or select a server from the history list\n"
+                            "and press 'Connect'";
+
+        pLabel->SetText ( strHelpMessage );
+    }
+
+
+    // General help
+    CVector2D helpButtonSize = m_pButtonGeneralHelp [ 0 ]->GetSize ();
+    CVector2D helpButtonPos = CalcScreenPosition ( m_pButtonGeneralHelp [ 0 ] ) + CVector2D ( 0, 24 );
+
+    CVector2D generalHelpSize ( 350, 160 );
+    CVector2D generalHelpPos = helpButtonPos - generalHelpSize + CVector2D ( helpButtonSize.fX, 0 );
+
+    m_pGeneralHelpWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "HELP" ) );
+    m_pGeneralHelpWindow->SetMovable ( false );
+    m_pGeneralHelpWindow->SetPosition ( generalHelpPos );
+    m_pGeneralHelpWindow->SetSize ( generalHelpSize );
+    m_pGeneralHelpWindow->SetAlwaysOnTop ( true );
+    m_pGeneralHelpWindow->SetFrameEnabled ( false );
+    m_pGeneralHelpWindow->SetTitlebarEnabled ( false );
+    m_pGeneralHelpWindow->SetCloseButtonEnabled ( false );
+    m_pGeneralHelpWindow->SetVisible ( false );
+    m_pGeneralHelpWindow->SetDeactivateHandler ( GUI_CALLBACK ( &CServerBrowser::OnGeneralHelpDeactivate, this ) );
+
+    // m_pGeneralHelpWindow Label 0 ( grey background )
+    {
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
+        pLabel->SetPosition ( CVector2D ( 0, 0 ) );
+        pLabel->SetSize ( CVector2D ( generalHelpSize ) );
+        pLabel->SetProperty( "BackgroundEnabled", "True" );
+        pLabel->SetZOrderingEnabled ( false );
+    }
+
+
+    // m_pGeneralHelpWindow Label 1
+    {
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
+        pLabel->SetPosition ( CVector2D ( 40, 28 ) );
+        pLabel->SetSize ( CVector2D ( 130, 100 ) );
+
+        SString strHelpMessage =
+                            "  -  Refresh\n\n"
+                            "  -  Add Favorite\n\n"
+                            "  -  Connect\n\n"
+                            "  -  Server information\n\n"
+                            ;
+
+        pLabel->SetText ( strHelpMessage );
+    }
+
+    // m_pGeneralHelpWindow Label 2
+    {
+        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pGeneralHelpWindow, "" ) );
+        pLabel->SetPosition ( CVector2D ( 210, 28 ) );
+        pLabel->SetSize ( CVector2D ( 130, 100 ) );
+
+        SString strHelpMessage =
+                            "  -  Search servers\n\n"
+                            "  -  Search players\n\n"
+                            "  -  Start search\n\n"
+                            ;
+
+        pLabel->SetText ( strHelpMessage );
+    }
+
+    // m_pGeneralHelpWindow icons
+    {
+        const int iBase = 23;
+        const int iGap = 29;
+
+        struct {
+            int x, y, w, h;
+            const char* szName;
+        } iconInfoList [] = {
+                             {  20, iBase + iGap * 0,      26, 26, "cgui\\images\\serverbrowser\\refresh.png", },
+                             {  25, iBase + iGap * 1 + 5,  16, 16, "cgui\\images\\serverbrowser\\favorite.png", },
+                             {  20, iBase + iGap * 2,      26, 26, "cgui\\images\\serverbrowser\\connect.png", },
+                             {  20, iBase + iGap * 3,      26, 26, "cgui\\images\\serverbrowser\\info.png", },
+                             { 195, iBase + iGap * 0 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-servers.png", },
+                             { 195, iBase + iGap * 1 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-players.png", },
+                             { 194, iBase + iGap * 2 + 4,  18, 18, "cgui\\images\\radarset\\01.png", },
+                             { 195, iBase + iGap * 2 + 5,  16, 16, "cgui\\images\\serverbrowser\\search.png", },
+                        };
+
+        for ( uint i = 0 ; i < NUMELMS( iconInfoList ) ; i++ )
+        {
+            CGUIStaticImage* pIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pGeneralHelpWindow ) );
+            pIcon->SetPosition ( CVector2D ( iconInfoList[i].x, iconInfoList[i].y ) );
+            pIcon->SetSize ( CVector2D ( iconInfoList[i].w, iconInfoList[i].h ) );
+            pIcon->LoadFromFile ( iconInfoList[i].szName );
+        }
+    }
 }
 
 
@@ -134,7 +308,7 @@ CServerBrowser::~CServerBrowser ( void )
         m_pSearchIcons[ i ]->Clear();
 
     // Delete the GUI items
-    delete m_pPanel;
+    delete m_pTopWindow;
 }
 
 void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
@@ -159,6 +333,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonRefresh [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pButtonRefresh [ type ]->SetSize ( CVector2D ( SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y ), false );
     m_pButtonRefresh [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnRefreshClick, this ) );
+    m_pButtonRefresh [ type ]->SetZOrderingEnabled ( false );
     m_pButtonRefreshIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pButtonRefresh [ type ] ) );
     m_pButtonRefreshIcon [ type ]->SetSize ( CVector2D(1,1), true );
     m_pButtonRefreshIcon [ type ]->LoadFromFile ( "cgui\\images\\serverbrowser\\refresh.png" );
@@ -168,7 +343,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     // Address Bar + History Combo
 	fX = fX + SB_BUTTON_SIZE_X + SB_SMALL_SPACER;
 	    // Work out our size by calculating from the end - minus the searchbox, combobox, spacing, info button, play button
-	float fWidth = m_WidgetSize.fX - SB_SMALL_SPACER - fSearchBarSizeX - SB_SPACER - SB_BUTTON_SIZE_X - SB_SMALL_SPACER - SB_BUTTON_SIZE_X - SB_SMALL_SPACER - COMBOBOX_ARROW_SIZE_X - fX;
+	float fWidth = m_WidgetSize.fX - SB_SMALL_SPACER - fSearchBarSizeX - SB_SPACER - SB_BUTTON_SIZE_X - SB_SMALL_SPACER - SB_CONNECT_SIZE_X - SB_SMALL_SPACER - COMBOBOX_ARROW_SIZE_X - fX;
     m_pEditAddress [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
     m_pEditAddress [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pEditAddress [ type ]->SetSize ( CVector2D ( fWidth, SB_BUTTON_SIZE_Y ), false);
@@ -198,24 +373,28 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pComboAddressHistory [ type ]->SetSize ( CVector2D ( fWidth, 200 ), false );
     m_pComboAddressHistory [ type ]->SetReadOnly ( true );
     m_pComboAddressHistory [ type ]->SetSelectionHandler ( GUI_CALLBACK ( &CServerBrowser::OnHistorySelected, this ) );
+    m_pComboAddressHistory [ type ]->SetDropListRemoveHandler ( GUI_CALLBACK ( &CServerBrowser::OnHistoryDropListRemove, this ) );
 
     // Connect button + icon
 	fX = fX + fWidth + SB_SMALL_SPACER;
-    m_pButtonConnect [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "" ) );
+    m_pButtonConnect [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "     Connect" ) );
     m_pButtonConnect [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
-    m_pButtonConnect [ type ]->SetSize ( CVector2D ( SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y ), false );
+    m_pButtonConnect [ type ]->SetSize ( CVector2D ( SB_CONNECT_SIZE_X, SB_BUTTON_SIZE_Y ), false );
     m_pButtonConnect [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnConnectClick, this ) );
+    m_pButtonConnect [ type ]->SetFont ( "default-bold-small" );
+    m_pButtonConnect [ type ]->SetZOrderingEnabled ( false );
     m_pButtonConnectIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pButtonConnect [ type ] ) );
-    m_pButtonConnectIcon [ type ]->SetSize ( CVector2D(1,1), true );
+    m_pButtonConnectIcon [ type ]->SetSize ( CVector2D(SB_BUTTON_SIZE_Y,SB_BUTTON_SIZE_Y), false );
     m_pButtonConnectIcon [ type ]->LoadFromFile ( "cgui\\images\\serverbrowser\\connect.png" );
     m_pButtonConnectIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
 
     // Info button + icon
-    fX = fX + SB_BUTTON_SIZE_X + SB_SMALL_SPACER;
+    fX = fX + SB_CONNECT_SIZE_X + SB_SMALL_SPACER;
     m_pButtonInfo [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "" ) );
     m_pButtonInfo [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pButtonInfo [ type ]->SetSize ( CVector2D ( SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y ), false );
     m_pButtonInfo [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnInfoClick, this ) );
+    m_pButtonInfo [ type ]->SetZOrderingEnabled ( false );
     m_pButtonInfoIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pButtonInfo [ type ] ) );
     m_pButtonInfoIcon [ type ]->SetSize ( CVector2D(1,1), true );
     m_pButtonInfoIcon [ type ]->LoadFromFile ( "cgui\\images\\serverbrowser\\info.png" );
@@ -231,14 +410,14 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
         m_pComboSearchType [ type ]->AddItem ( m_pSearchIcons[ i ] );
 
     m_pComboSearchType [ type ]->SetReadOnly ( true );
+    m_pComboSearchType [ type ]->SetSelectedItemByIndex(0);
     m_pComboSearchType [ type ]->SetSelectionHandler ( GUI_CALLBACK ( &CServerBrowser::OnSearchTypeSelected, this ) );
     m_pSearchTypeIcon [ type ] = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pComboSearchType [ type ] ) );
     m_pSearchTypeIcon [ type ]->SetPosition ( CVector2D(2,4), false );
     m_pSearchTypeIcon [ type ]->SetSize ( CVector2D(29,SB_SEARCHBAR_COMBOBOX_SIZE_Y -6), false );
     m_pSearchTypeIcon [ type ]->SetProperty ( "MousePassThroughEnabled","True" );
     m_pSearchTypeIcon [ type ]->SetAlwaysOnTop(true);
-    m_uiCurrentSearchType = SearchTypes::SERVERS;
-    m_pSearchTypeIcon [ type ]->LoadFromFile ( m_szSearchTypePath [ m_uiCurrentSearchType ] );
+    m_pSearchTypeIcon [ type ]->LoadFromFile ( m_szSearchTypePath [ SearchTypes::SERVERS ] );
 
     fWidth = fSearchBarSizeX-SB_SEARCHBAR_COMBOBOX_SIZE_X;
     m_pEditSearch [ type ] = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTab [ type ], "" ) );
@@ -371,6 +550,13 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pButtonBack [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pButtonBack [ type ]->SetSize ( CVector2D ( fPlayerListSizeX, SB_BACK_BUTTON_SIZE_Y ), false );
     m_pButtonBack [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnBackClick, this ) );
+    m_pButtonBack [ type ]->SetZOrderingEnabled ( false );
+
+    m_pButtonGeneralHelp [ type ] = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTab [ type ], "Help" ) );
+    m_pButtonGeneralHelp [ type ]->SetPosition ( CVector2D ( fX - fPlayerListSizeX - 10, fY ), false );
+    m_pButtonGeneralHelp [ type ]->SetSize ( CVector2D ( fPlayerListSizeX, SB_BACK_BUTTON_SIZE_Y ), false );
+    m_pButtonGeneralHelp [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnGeneralHelpClick, this ) );
+    m_pButtonGeneralHelp [ type ]->SetZOrderingEnabled ( false );
 
     // Disable resizing of the first and second columns (Version & Locked)
     m_pServerList [ type ]->SetColumnSegmentSizingEnabled(0, false);
@@ -419,6 +605,15 @@ void CServerBrowser::DeleteTab ( ServerBrowserType type )
     delete m_pTab [ type ];
 }
 
+ServerBrowserType CServerBrowser::GetCurrentServerBrowserTypeForSave ( void )
+{
+	// If current tab is temporary, then save the one used befor it
+    if ( m_uiIsUsingTempTab )
+        return m_BeforeTempServerBrowserType;
+
+    return GetCurrentServerBrowserType ();
+}
+
 ServerBrowserType CServerBrowser::GetCurrentServerBrowserType ( void )
 { 
     ServerBrowserType currentServerBrowserType;
@@ -447,6 +642,14 @@ void CServerBrowser::Update ( void )
 {
     ServerBrowserType Type = GetCurrentServerBrowserType ();
     CServerList *pList = GetServerList ( Type );
+
+    if ( m_bFocusTextEdit )
+    {
+        m_bFocusTextEdit = false;
+        // Focus the text edit
+        m_pEditAddress [ Type ]->Activate ();
+        m_pEditAddress [ Type ]->SetCaratAtEnd ();
+    }
 
     // Update the current server list class
     if ( IsVisible () )
@@ -479,32 +682,39 @@ void CServerBrowser::Update ( void )
 
 void CServerBrowser::SetVisible ( bool bVisible )
 {
-    m_pPanel->SetZOrderingEnabled(true);
-    m_pPanel->SetVisible ( bVisible );
-    m_pPanel->BringToFront ();
-    m_pPanel->SetZOrderingEnabled(false);
+    if ( m_uiIsUsingTempTab )
+    {
+		// Stop using temp tab now
+        m_pPanel->SetSelectedTab ( m_pTab [ GetCurrentServerBrowserTypeForSave () ] );
+        m_uiIsUsingTempTab = 0;
+    }
+
+    m_pTopWindow->SetZOrderingEnabled(true);
+    m_pTopWindow->SetVisible ( bVisible );
+    m_pTopWindow->BringToFront ();
+    m_pTopWindow->SetZOrderingEnabled(false);
 
     // Are we making this window visible?
     if ( bVisible )
     {
-        if ( m_firstTimeBrowseServer )
-        {
-            // Start loading all servers
-            bool bAutoRefresh = true;
-            CVARS_GET ( "auto_refresh_browser", bAutoRefresh );
-            for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
-            {
-                if ( i != ServerBrowserTypes::INTERNET || bAutoRefresh )  // Don't refresh Internet unless it's activated
-                {
-                    m_pServerListStatus [ i ]->SetText ( "Loading..." );
-                    m_iSelectedServer [ i ] = -1;
-                    GetServerList ( (ServerBrowserType)i )->Refresh ();
-                }
-            }
-            CreateHistoryList();
+        bool bAutoRefresh = false;
+        CVARS_GET ( "auto_refresh_browser", bAutoRefresh );
 
-            m_firstTimeBrowseServer = false;
+        // Start loading all servers (if needed).
+        for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
+        {
+            // Don't refresh Internet unless it's activated or needed.
+            if ( i != ServerBrowserTypes::INTERNET || m_bFirstTimeBrowseServer || bAutoRefresh )
+            {
+                m_pServerListStatus [ i ]->SetText ( "Loading..." );
+                m_iSelectedServer [ i ] = -1;
+                GetServerList ( (ServerBrowserType)i )->Refresh ();
+            }
         }
+
+        CreateHistoryList();
+
+        if ( m_bFirstTimeBrowseServer ) m_bFirstTimeBrowseServer = false;
 
         // Set the first item as our starting address
         if ( m_pComboAddressHistory [ ServerBrowserTypes::INTERNET ]->GetItemCount() > 0 )
@@ -518,12 +728,18 @@ void CServerBrowser::SetVisible ( bool bVisible )
         m_pEditAddress [ Type ]->Activate();
         m_pEditAddress [ Type ]->SetCaratAtEnd();
     }
+    else
+    {
+        // Hide information windows.
+        m_pGeneralHelpWindow->SetVisible ( false );
+        m_pQuickConnectHelpWindow->SetVisible ( false );
+    }
 }
 
 
 bool CServerBrowser::IsVisible ( void )
 {
-    return m_pPanel->IsVisible ();
+    return m_pTopWindow->IsVisible ();
 }
 
 
@@ -693,16 +909,16 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
     bool bServerSearchFound = true;
 
     std::string strServerSearchText = m_pEditSearch [ Type ]->GetText ();
-
+    int iCurrentSearchType = m_pComboSearchType[ Type ]->GetSelectedItemIndex();
     if ( !strServerSearchText.empty() )
     {
-        if ( m_uiCurrentSearchType == SearchTypes::SERVERS )
+        if ( iCurrentSearchType == SearchTypes::SERVERS )
         {
             // Search for the search text in the servername
             SString strServerName = pServer->strName;
             bServerSearchFound = strServerName.ContainsI ( strServerSearchText );
         }
-        else if ( m_uiCurrentSearchType == SearchTypes::PLAYERS )
+        else if ( iCurrentSearchType == SearchTypes::PLAYERS )
         {
             bServerSearchFound = false;
 
@@ -979,31 +1195,26 @@ bool CServerBrowser::OnConnectClick ( CGUIElement* pElement )
     }
 
     // Start the connect
-    if ( CCore::GetSingleton ().GetConnectManager ()->Connect ( strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str() ) )
-    {
-        // If we connected to a server that wasn't selected in the server list, it was manually entered
-        for ( unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++ )
-        {
-            int iSelectedItem = m_pServerList[i]->GetSelectedItemRow();
-            if ( iSelectedItem != -1 )
-            {
-                CServerListItem* pServer = (CServerListItem*)m_pServerList[i]->GetItemData(iSelectedItem,DATA_PSERVER);
-                if ( pServer->strHost == strHost && pServer->usGamePort == usPort )
-                {
-                    m_bManualConnect = false;
-                    return true;
-                }
-            }
-        }
+    CCore::GetSingleton ().GetConnectManager ()->Connect ( strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str(), true );
 
-        // It was manually entered, so let's store some info for it.
-        // This info is then used after successful connection to put it into history
-        m_bManualConnect = true;
-        m_strManualHost = strHost;
-        m_usManualPort = usPort;
-    }
     return true;
 }
+
+void CServerBrowser::NotifyServerExists ( in_addr Address, ushort usPort )
+{
+    // If the connect button was pressed, and the server exists, add it to the history
+    CServerList* pHistoryList = GetHistoryList ();
+    pHistoryList->Remove ( Address, usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+    pHistoryList->AddUnique ( Address, usPort + SERVER_LIST_QUERY_PORT_OFFSET );
+    while ( pHistoryList->GetServerCount () > 11 )
+    {
+        CServerListItem* pLast = *pHistoryList->IteratorBegin ();
+        pHistoryList->Remove ( pLast->Address, pLast->usQueryPort );
+    }
+    CreateHistoryList ();
+    SaveRecentlyPlayedList ();
+}
+
 
 void CServerBrowser::CompleteConnect ( void )
 {
@@ -1173,12 +1384,49 @@ bool CServerBrowser::OnHistorySelected ( CGUIElement* pElement )
     return true;
 }
 
+
+bool CServerBrowser::OnHistoryDropListRemove ( CGUIElement* pElementx )
+{
+    // Hide quick connect help if visible
+    m_pQuickConnectHelpWindow->SetVisible ( false );
+
+    // Grab our cursor position
+    tagPOINT cursor;
+    GetCursorPos ( &cursor );
+    
+    HWND hookedWindow = CCore::GetSingleton().GetHookedWindow();
+
+    tagPOINT windowPos = { 0 };
+    ClientToScreen( hookedWindow, &windowPos );
+
+    CVector2D vecResolution = CCore::GetSingleton ().GetGUI ()->GetResolution ();
+    cursor.x -= windowPos.x;
+    cursor.y -= windowPos.y;
+
+    // Get size and screen position of edit control
+    CGUIEdit* pEdit = m_pEditAddress [ 0 ];
+    CVector2D size = pEdit->GetSize ();
+    CVector2D pos = CalcScreenPosition ( pEdit );
+
+    pos.fY += 24;
+
+    // See if cursor is over edit control
+    if ( cursor.x > pos.fX)
+        if ( cursor.x < pos.fX + size.fX )
+            if ( cursor.y > pos.fY)
+                if ( cursor.y < pos.fY + size.fY )
+                    m_bFocusTextEdit = true;    // Focus the text edit next frame
+
+    return true;
+}
+
+
 bool CServerBrowser::OnSearchTypeSelected ( CGUIElement* pElement )
 {
     ServerBrowserType Type = GetCurrentServerBrowserType();
-    m_uiCurrentSearchType = m_pComboSearchType[ Type ]->GetSelectedItemIndex();
+    int iCurrentSearchType = m_pComboSearchType[ Type ]->GetSelectedItemIndex();
 
-    m_pSearchTypeIcon [ Type ]->LoadFromFile ( m_szSearchTypePath [ m_uiCurrentSearchType ] );
+    m_pSearchTypeIcon [ Type ]->LoadFromFile ( m_szSearchTypePath [ iCurrentSearchType ] );
 
     OnSearchDefocused(pElement);
 
@@ -1194,11 +1442,28 @@ bool CServerBrowser::OnBackClick ( CGUIElement* pElement )
 {
     CMainMenu *pMainMenu = CLocalGUI::GetSingleton ().GetMainMenu ();
 
-    m_pPanel->SetVisible ( false );
+    m_pTopWindow->SetVisible ( false );
     pMainMenu->m_bIsInSubWindow = false;
 
     SaveOptions ( );
 
+    return true;
+}
+
+bool CServerBrowser::OnGeneralHelpClick ( CGUIElement* pElement )
+{
+    if ( !m_pGeneralHelpWindow->IsVisible () )
+    {
+        if ( GetTickCount64_ () - m_llLastGeneralHelpTime > 500 )
+        {
+            m_pGeneralHelpWindow->SetVisible ( true );
+            m_pGeneralHelpWindow->BringToFront ();
+        }
+    }
+    else
+    {
+        m_pGeneralHelpWindow->SetVisible ( false );
+    }
     return true;
 }
 
@@ -1227,7 +1492,7 @@ bool CServerBrowser::OnMouseClick ( CGUIMouseEventArgs Args )
         OnClick ( m_pServerList [ ServerBrowserTypes::RECENTLY_PLAYED ] );
         return true;
     }
-    else if ( Args.pWindow == m_pServerPlayerList [ Type ] && m_uiCurrentSearchType == SearchTypes::PLAYERS && !m_pEditSearch [ Type ]->GetText ().empty() )
+    else if ( Args.pWindow == m_pServerPlayerList [ Type ] && m_pComboSearchType[ Type ]->GetSelectedItemIndex() == SearchTypes::PLAYERS && !m_pEditSearch [ Type ]->GetText ().empty() )
     {
         OnClick ( m_pServerPlayerList [ Type ] );
         return true;
@@ -1273,6 +1538,10 @@ bool CServerBrowser::OnFilterChanged ( CGUIElement* pElement )
 
 bool CServerBrowser::OnTabChanged ( CGUIElement* pElement )
 {
+	// Decrement is temp tab counter
+    if ( m_uiIsUsingTempTab )
+        m_uiIsUsingTempTab--;
+
     SaveOptions ( );
 
     OnSearchFocused ( pElement );
@@ -1303,9 +1572,9 @@ bool CServerBrowser::OnSearchDefocused ( CGUIElement* pElement )
     if ( strSearchText == "" )
     {
         m_pLabelSearchDescription [ Type ]->SetVisible ( true );
-        if ( m_uiCurrentSearchType == SearchTypes::SERVERS )
+        if ( m_pComboSearchType[ Type ]->GetSelectedItemIndex() == SearchTypes::SERVERS )
             m_pLabelSearchDescription [ Type ]->SetText("Search servers...");
-        else if ( m_uiCurrentSearchType == SearchTypes::PLAYERS )
+        else if ( m_pComboSearchType[ Type ]->GetSelectedItemIndex() == SearchTypes::PLAYERS )
             m_pLabelSearchDescription [ Type ]->SetText("Search players...");
     }
     return true;
@@ -1318,6 +1587,13 @@ bool CServerBrowser::OnAddressDefocused ( CGUIElement* pElement )
     if ( strAddressText.empty() )
         m_pLabelAddressDescription [ Type ]->SetVisible ( true );
 
+    return true;
+}
+
+bool CServerBrowser::OnGeneralHelpDeactivate ( CGUIElement* pElement )
+{
+    m_pGeneralHelpWindow->SetVisible ( false );
+    m_llLastGeneralHelpTime = GetTickCount64_ ();
     return true;
 }
 
@@ -1498,7 +1774,7 @@ void CServerBrowser::SaveOptions ( )
         pOptions->DeleteAllSubNodes ( );
     }
 
-    int iCurrentType = GetCurrentServerBrowserType ( );
+    int iCurrentType = GetCurrentServerBrowserTypeForSave ( );
 
     // Save the options for all four lists
     for ( unsigned int ui = 0; ui < SERVER_BROWSER_TYPE_COUNT; ui++ )
@@ -1858,4 +2134,25 @@ void CServerBrowser::SetNextHistoryText ( bool bDown )
     {
         SetAddressBarText ( std::string("mtasa://") + (const char*)pServerList->GetItemByIndex(0)->GetData() );
     }
+}
+
+
+void CServerBrowser::OnQuickConnectButtonClick ( void )
+{
+    // Show help text
+    if ( m_uiShownQuickConnectHelpCount < 1 )
+    {
+        m_pQuickConnectHelpWindow->SetVisible ( true );
+        m_pQuickConnectHelpWindow->BringToFront ();
+        m_uiShownQuickConnectHelpCount++;
+    }
+
+    // Switch to LAN tab, but don't save it as selected
+    if ( !m_uiIsUsingTempTab )
+        m_BeforeTempServerBrowserType = GetCurrentServerBrowserType ();
+    m_uiIsUsingTempTab = 2;
+    m_pPanel->SetSelectedTab ( m_pTab [ ServerBrowserTypes::LAN ] );
+
+    // Show history
+    m_pComboAddressHistory [ ServerBrowserTypes::LAN ]->ShowDropList ();
 }

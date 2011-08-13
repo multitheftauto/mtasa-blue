@@ -247,17 +247,6 @@ CClientWater* lua_towater ( lua_State* luaVM, int iArgument )
     return NULL;
 }
 
-CClientIFP* lua_toifp ( lua_State* luaVM, int iArgument )
-{
-    CClientEntity* pElement = lua_toelement ( luaVM, iArgument );
-    if ( pElement && pElement->GetType () == CCLIENTIFP  )
-    {
-        return static_cast < CClientIFP* > ( pElement );
-    }
-
-    return NULL;
-}
-
 CXMLNode* lua_toxmlnode ( lua_State* luaVM, int iArgument )
 {
     return g_pCore->GetXML ()->GetNodeFromID ( reinterpret_cast < unsigned long > ( lua_touserdata ( luaVM, iArgument ) ) );
@@ -270,7 +259,7 @@ void lua_pushelement ( lua_State* luaVM, CClientEntity* pElement )
         ElementID ID = pElement->GetID ();
         if ( ID != INVALID_ELEMENT_ID )
         {
-            lua_pushlightuserdata ( luaVM, (void*) ID );
+            lua_pushlightuserdata ( luaVM, (void*) reinterpret_cast<unsigned int *>(ID.Value()) );
             return;
         }
     }

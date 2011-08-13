@@ -37,7 +37,8 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     //
     // Handle duplicate launching, or running from mtasa:// URI ?
     //
-    if ( ! CreateSingleInstanceMutex () )
+    int iRecheckTimeLimit = 2000;
+    while ( ! CreateSingleInstanceMutex () )
     {
         if ( strcmp ( lpCmdLine, "" ) != 0 )
         {
@@ -61,7 +62,23 @@ int WINAPI WinMain ( HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
             }
             else
             {
-                MessageBox( 0, "Can't send WM_COPYDATA", "Error", MB_ICONERROR );
+                if ( iRecheckTimeLimit > 0 )
+                {
+                    // Sleep a little bit and check the mutex again
+                    Sleep ( 500 );
+                    iRecheckTimeLimit -= 500;
+                    continue;
+                }
+                SString strMessage;
+                strMessage += "Trouble restarting MTA:SA\n\n";
+                strMessage += "If the problem persists, open Task Manager and\n";
+                strMessage += "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n";
+                strMessage += "Try to launch MTA:SA again?";
+                if ( MessageBox( 0, strMessage, "Error", MB_ICONERROR | MB_YESNO ) == IDYES )
+                {
+                    SetMTASAPathSource ( false );
+                    ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath (), MTA_EXE_NAME ), lpCmdLine );            
+                }
                 return 0;
             }
         }
@@ -283,10 +300,22 @@ int DoLaunchGame ( LPSTR lpCmdLine )
     //
     // Basic check for some essential files
     //
-    if ( !FileExists ( strMTASAPath + "\\MTA\\cgui\\images\\serverbrowser\\connect.png" ) )
+    const char* dataFilesFiles [] = { "\\MTA\\cgui\\images\\background_logo.png"
+                                     ,"\\MTA\\D3DX9_42.dll"
+                                     ,"\\MTA\\D3DCompiler_42.dll"
+                                     ,"\\MTA\\bass.dll"};
+
+    for ( uint i = 0 ; i < NUMELMS( dataFilesFiles ) ; i++ )
     {
-        // Check if CGUI.png exists
-        return DisplayErrorMessageBox ( "Load failed. Please ensure that the data files have been installed correctly.", "mta-datafiles-missing" );
+        if ( !FileExists ( strMTASAPath + dataFilesFiles [ i ] ) )
+        {
+            return DisplayErrorMessageBox ( "Load failed. Please ensure that the latest data files have been installed correctly.", "mta-datafiles-missing" );
+        }
+    }
+
+    if ( FileSize ( strMTASAPath + "\\MTA\\bass.dll" ) != 0x00018838 )
+    {
+        return DisplayErrorMessageBox ( "Load failed. Please ensure that the latest data files have been installed correctly.", "mta-datafiles-missing" );
     }
 
     // Check for client file
@@ -321,6 +350,13 @@ int DoLaunchGame ( LPSTR lpCmdLine )
             return DisplayErrorMessageBox ( SString ( "Load failed. %s exists in the GTA directory. Please delete before continuing.", dllCheckList[i] ), "file-clash" );
         }    
     }
+
+    // Warning if d3d9.dll exists in the GTA install directory
+    if ( FileExists( PathJoin ( strGTAPath, "d3d9.dll" ) ) )
+    {
+        ShowD3dDllDialog ( g_hInstance, PathJoin ( strGTAPath, "d3d9.dll" ) );
+        HideD3dDllDialog ();
+    }    
 
     // Strip out flag from command line
     SString strCmdLine = lpCmdLine;

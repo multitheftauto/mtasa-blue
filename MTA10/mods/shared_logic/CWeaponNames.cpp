@@ -25,7 +25,7 @@ struct SWeaponSlot
 };
 
 SWeaponName WeaponNames [] =
-{ {"Melee"}, {"Brassknuckle"}, {"Golfclub"}, {"Nightstick"}, {"Knife"},
+{ {"Fist"}, {"Brassknuckle"}, {"Golfclub"}, {"Nightstick"}, {"Knife"},
 {"Bat"}, {"Shovel"}, {"Poolstick"}, {"Katana"}, {"Chainsaw"}, 
 {"Dildo"}, {"Dildo"}, {"Vibrator"}, {"Vibrator"}, {"Flower"},
 {"Cane"}, {"Grenade"}, {"Teargas"}, {"Molotov"}, {"Rocket"},

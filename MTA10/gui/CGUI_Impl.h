@@ -82,10 +82,9 @@ public:
     bool                            GetGUIInputEnabled          ( void );
     void                            SetGUIInputMode             ( eInputMode a_eMode );
     eInputMode                      GetGUIInputMode             ( void ); 
-    eInputMode                      GetInputModeFromString      ( const std::string& a_rstrMode ) const;
-    bool                            GetStringFromInputMode      ( eInputMode a_eMode, std::string& a_rstrResult ) const;
+    static CEGUI::String            GetUTFString                ( const char* szInput );
     static CEGUI::String            GetUTFString                ( std::string strInput );
-    static CEGUI::String            GetUTFString                ( std::wstring strInput );
+    static CEGUI::String            GetUTFString                ( CEGUI::String strInput );
 
     //
     CGUIMessageBox*                 CreateMessageBox            ( const char* szTitle, const char* szMessage, unsigned int uiFlags );
@@ -124,8 +123,9 @@ public:
     CGUITabPanel*                   CreateTabPanel              ( CGUITab* pParent );
     CGUITabPanel*                   CreateTabPanel              ( void );
 
-    CGUIScrollPane*                 CreateScrollPane            ( CGUIElement* pParent = NULL );
-    CGUIScrollPane*                 CreateScrollPane            ( CGUITab* pParent = NULL );
+    CGUIScrollPane*                 CreateScrollPane            ( CGUIElement* pParent );
+    CGUIScrollPane*                 CreateScrollPane            ( CGUITab* pParent );
+    CGUIScrollPane*                 CreateScrollPane            ( void );
 
     CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUIElement* pParent = NULL );
     CGUIScrollBar*                  CreateScrollBar             ( bool bHorizontal, CGUITab* pParent = NULL );

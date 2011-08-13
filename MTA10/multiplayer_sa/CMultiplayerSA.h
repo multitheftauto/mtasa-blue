@@ -8,6 +8,7 @@
 *               Christian Myhre Lundheim <>
 *               Jax <>
 *               Peter Beverloo <>
+*               Alberto Alonso <rydencillo@gmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -21,6 +22,7 @@
 
 #include "CPopulationSA.h"
 #include "multiplayersa_init.h"
+#include "CLimitsSA.h"
 
 #include "CRemoteDataSA.h"
 class CRemoteDataSA;
@@ -85,7 +87,7 @@ public:
     void                        ResetWater                  ();
     void                        SetCloudsEnabled            ( bool bDisabled );
     void                        RebuildMultiplayerPlayer    ( CPed * player );
-    bool                        AreInteriorSoundsEnabled    ();
+    bool                        GetInteriorSoundsEnabled    ();
     void                        SetInteriorSoundsEnabled    ( bool bEnabled );
     void                        SetWindVelocity             ( float fX, float fY, float fZ );
     void                        GetWindVelocity             ( float& fX, float& fY, float& fZ );
@@ -160,6 +162,10 @@ public:
     
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
+
+    CLimits*                    GetLimits () { return &m_limits; }
+private:
+    CLimitsSA                   m_limits;
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
     VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

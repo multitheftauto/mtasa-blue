@@ -127,7 +127,7 @@ public:
     virtual float           GetSuspensionUpperLimit         ( void ) const = 0;
     virtual float           GetSuspensionLowerLimit         ( void ) const = 0;
     virtual float           GetSuspensionFrontRearBias      ( void ) const = 0;
-    virtual float           GetSuspensionAntidiveMultiplier ( void ) const = 0;
+    virtual float           GetSuspensionAntiDiveMultiplier ( void ) const = 0;
 
     virtual float           GetCollisionDamageMultiplier    ( void ) const = 0;
 
@@ -172,7 +172,7 @@ public:
     virtual void            SetSuspensionUpperLimit         ( float fUpperLimit ) = 0;
     virtual void            SetSuspensionLowerLimit         ( float fLowerLimit ) = 0;
     virtual void            SetSuspensionFrontRearBias      ( float fBias ) = 0;
-    virtual void            SetSuspensionAntidiveMultiplier ( float fAntidive ) = 0;
+    virtual void            SetSuspensionAntiDiveMultiplier ( float fAntiDive ) = 0;
 
     virtual void            SetCollisionDamageMultiplier    ( float fMultiplier ) = 0;
 
@@ -189,9 +189,6 @@ public:
     // Call this every time you're done changing something. This will recalculate
     // all transmission/handling values according to the new values.
     virtual void            Recalculate                     ( void ) = 0;
-
-    // This will restore this handling data back to default values.
-    virtual void            Restore                         ( void ) = 0;
 };
 
 #endif

@@ -10,9 +10,6 @@
 *
 *****************************************************************************/
 
-typedef unsigned long TIMEUS;
-TIMEUS GetTimeUs ( void );
-
 //
 // CPerfStatResult
 //
@@ -167,4 +164,42 @@ public:
     // CPerfStatPacketUsage
 
     static CPerfStatPacketUsage*  GetSingleton      ( void );
+};
+
+
+//
+// CPerfStatBandwidthUsage
+//
+class CPerfStatBandwidthUsage : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatBandwidthUsage
+
+    static CPerfStatBandwidthUsage*  GetSingleton      ( void );
+};
+
+
+//
+// CPerfStatSqliteTiming
+//
+class CPerfStatSqliteTiming : public CPerfStatModule
+{
+public:
+    // CPerfStatModule
+    virtual const SString&      GetCategoryName     ( void ) = 0;
+    virtual void                DoPulse             ( void ) = 0;
+    virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+
+    // CPerfStatSqliteTiming
+    virtual void                OnSqliteOpen        ( CRegistry* pRegistry, const SString& strFileName ) = 0;
+    virtual void                OnSqliteClose       ( CRegistry* pRegistry ) = 0;
+    virtual void                UpdateSqliteTiming  ( CRegistry* pRegistry, const char* szQuery, TIMEUS timeUs ) = 0;
+    virtual void                SetCurrentResource  ( lua_State* luaVM ) = 0;
+
+    static CPerfStatSqliteTiming*  GetSingleton        ( void );
 };

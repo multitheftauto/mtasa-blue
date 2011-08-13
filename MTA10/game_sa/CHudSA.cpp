@@ -369,6 +369,21 @@ void CHudSA::DisableWantedLevel ( bool bDisabled )
     }
 }
 
+void CHudSA::DisableCrosshair ( bool bDisabled )
+{
+    static BYTE byteOriginal = 0;
+    if ( bDisabled && !byteOriginal )
+    {
+        byteOriginal = *(BYTE *)FUNC_DrawCrosshair;
+        MemPut < BYTE > ( FUNC_DrawCrosshair, 0xC3 );
+    }
+    else if ( !bDisabled && byteOriginal )
+    {
+        MemPut < BYTE > ( FUNC_DrawCrosshair, byteOriginal );
+        byteOriginal = 0;
+    }
+}
+
 void CHudSA::DisableAll ( bool bDisabled )
 {
     DisableAmmo ( bDisabled );
@@ -386,4 +401,5 @@ void CHudSA::DisableAll ( bool bDisabled )
     DisableClock ( bDisabled );
     DisableRadioName ( bDisabled );
     DisableWantedLevel ( bDisabled );
+    DisableCrosshair ( bDisabled );
 }

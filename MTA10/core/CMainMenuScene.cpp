@@ -798,9 +798,9 @@ void CMainMenuScene::Draw3DScene ( void )
 
                 float fZ = Clamp ( 0.f, sinf ( pMaskAnim[i].fC ), pMaskAnim[i].fF );
 
-                m_pGFX->Render2DSprite ( pMaskAnimTexture[pMaskAnim[i].ucIndex],
-                    &D3DXVECTOR2(pMaskAnim[i].fE,pMaskAnim[i].fE),
-                    &D3DXVECTOR2(MASK_PADDING_X + pMaskAnim[i].fA,MASK_PADDING_Y + pMaskAnim[i].fB),
+                D3DXVECTOR2 vec1(pMaskAnim[i].fE, pMaskAnim[i].fE);
+                D3DXVECTOR2 vec2(MASK_PADDING_X + pMaskAnim[i].fA, MASK_PADDING_Y + pMaskAnim[i].fB);
+                m_pGFX->Render2DSprite ( pMaskAnimTexture[pMaskAnim[i].ucIndex], &vec1, &vec2,
                     D3DXCOLOR ( 0, 0, 1, fZ ) );
 
                 // Almost faded out
@@ -825,7 +825,9 @@ void CMainMenuScene::Draw3DScene ( void )
         m_pDevice->Clear ( 0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0,0,0), 1, 0 );
         {
             // Render the mask texture
-            m_pGFX->Render2DSprite ( pMaskTexture, &D3DXVECTOR2(1,1), &D3DXVECTOR2(0,0), 0xFFFFFFFF );
+            D3DXVECTOR2 vec1(1, 1);
+            D3DXVECTOR2 vec2(0, 0);
+            m_pGFX->Render2DSprite ( pMaskTexture, &vec1, &vec2, 0xFFFFFFFF );
 
             // Check that the state is STATE_SCROLL
             if ( sState == STATE_SCROLL ) {
@@ -909,7 +911,9 @@ void CMainMenuScene::Draw3DScene ( void )
                     unsigned int uiClearWidth = (unsigned int)ceil((float)Size.cx / (float)usFontDX) * usFontDX;
 
                     // Render a black sprite to black out the squares
-                    m_pGFX->Render2DSprite ( NULL, &D3DXVECTOR2 ( (float)uiClearWidth, (float)usFontDY ), &D3DXVECTOR2 ( pCreditsStack[i].x, pCreditsStack[i].y ), D3DXCOLOR ( 0, 0, 0, 1.0f ) );
+                    D3DXVECTOR2 vec1((float)uiClearWidth, (float)usFontDY);
+                    D3DXVECTOR2 vec2(pCreditsStack[i].x, pCreditsStack[i].y);
+                    m_pGFX->Render2DSprite ( NULL, &vec1, &vec2, D3DXCOLOR ( 0, 0, 0, 1.0f ) );
 
                     // Render the text
                     m_pGFX->DrawText2D ( pCreditsStack[i].x, pCreditsStack[i].y, D3DXCOLOR ( 1, 0, 0, 1.0f ), szText, 1.0f );
@@ -1360,7 +1364,8 @@ void CMainMenuScene::Draw3DScene ( void )
 
                 D3DXVECTOR3 vecDirection;
                 D3DXVECTOR3 vecEyeStart = D3DXVECTOR3 ( fDisplaceX * 0.5f, 0, fDisplaceZ * 0.5f );
-                D3DXVec3Normalize ( &vecDirection, &D3DXVECTOR3 ( sinf ( fThetaPhased ) * 3.0f, 0, cosf ( fThetaPhased ) * 3.0f ) );
+                D3DXVECTOR3 vec(sinf ( fThetaPhased ) * 3.0f, 0, cosf ( fThetaPhased ) * 3.0f);
+                D3DXVec3Normalize ( &vecDirection, &vec );
 
                 // Adjust the bezier camera eye curve
                 vecBCreditEye[0] = vecEyeStart - D3DXVECTOR3 ( 0, 0.5f, 0 );
@@ -1710,7 +1715,10 @@ void CMainMenuScene::Draw3DScene ( void )
                 m_pDevice->SetVertexShader ( NULL );
                 m_pDevice->SetPixelShader ( pPSHBloom );
 
-                m_pGFX->Render2DSprite ( pTexBloomSrc, &D3DXVECTOR2((float)usTexBloomTgtWidth/(float)usTexBloomSrcWidth,(float)usTexBloomTgtHeight/(float)usTexBloomSrcHeight), &D3DXVECTOR2(0,0), 0xFFFFFFFF );
+                D3DXVECTOR2 vec1((float)usTexBloomTgtWidth / (float)usTexBloomSrcWidth,
+                                 (float)usTexBloomTgtHeight / (float)usTexBloomSrcHeight);
+                D3DXVECTOR2 vec2(0, 0);
+                m_pGFX->Render2DSprite ( pTexBloomSrc, &vec1, &vec2, 0xFFFFFFFF );
             }
         }
 
@@ -1742,9 +1750,16 @@ void CMainMenuScene::Draw3DScene ( void )
             }
 
             // Draw the bloom source and target planes (only if we've enabled post-processing)
-            m_pGFX->Render2DSprite ( pTexBloomSrc, &D3DXVECTOR2(1,1), &D3DXVECTOR2(0,0), 0xFFFFFFFF );
+            D3DXVECTOR2 vec1(1, 1);
+            D3DXVECTOR2 vec2(0, 0);
+            m_pGFX->Render2DSprite ( pTexBloomSrc, &vec1, &vec2, 0xFFFFFFFF );
             if ( bEnablePostProcessing )
-                m_pGFX->Render2DSprite ( pTexBloomTgt, &D3DXVECTOR2((float)usTexBloomSrcWidth/(float)usTexBloomTgtWidth,(float)usTexBloomSrcHeight/(float)usTexBloomTgtHeight), &D3DXVECTOR2(0,0), 0xFFFFFFFF );
+            {
+                D3DXVECTOR2 vec1((float)usTexBloomSrcWidth / (float)usTexBloomTgtWidth,
+                                 (float)usTexBloomSrcHeight / (float)usTexBloomTgtHeight);
+                D3DXVECTOR2 vec2(0, 0);
+                m_pGFX->Render2DSprite ( pTexBloomTgt, &vec1, &vec2, 0xFFFFFFFF );
+            }
 
             // Enable blending
             m_pDevice->SetRenderState ( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
@@ -1761,7 +1776,9 @@ void CMainMenuScene::Draw3DScene ( void )
                     dwColor = 0;
 
                 // Draw the sprite
-                m_pGFX->Render2DSprite ( NULL, &D3DXVECTOR2((float)usTexBloomSrcWidth,(float)usTexBloomSrcHeight), &D3DXVECTOR2(0,0), D3DCOLOR_ARGB ( dwSigmoidAlpha, dwColor, dwColor, dwColor ) );
+                D3DXVECTOR2 vec1((float)usTexBloomSrcWidth, (float)usTexBloomSrcHeight);
+                D3DXVECTOR2 vec2(0, 0);
+                m_pGFX->Render2DSprite ( NULL, &vec1, &vec2, D3DCOLOR_ARGB ( dwSigmoidAlpha, dwColor, dwColor, dwColor ) );
             }
 
             //CGraphics::GetSingletonPtr()->DrawTextCEGUI ( 200, 200, 300, 300, 0xFFFFFFFF, buf, 1.0f, DT_CENTER );
@@ -1856,7 +1873,9 @@ void CMainMenuScene::OnRestore ( IDirect3DDevice9 * pDevice, CVector2D vecScreen
 
 void CMainMenuScene::DrawRoll ( void )
 {
-    m_pGFX->Render2DSprite ( pTexRoll, &D3DXVECTOR2(fRollScaleX,fRollScaleY), &D3DXVECTOR2(iRollOffset,m_vecScreenSize.fY - fTheta), 0xFFFFFFFF );
+    D3DXVECTOR2 vec1(fRollScaleX, fRollScaleY);
+    D3DXVECTOR2 vec2(iRollOffset, m_vecScreenSize.fY - fTheta);
+    m_pGFX->Render2DSprite ( pTexRoll, &vec1, &vec2, 0xFFFFFFFF );
 }
 
 void CMainMenuScene::DrawCredit ( unsigned char ucIndex, short sStateRequired, D3DXVECTOR3 vecEyePt, float fDistanceThreshold, bool bIgnore )
@@ -1867,7 +1886,8 @@ void CMainMenuScene::DrawCredit ( unsigned char ucIndex, short sStateRequired, D
     float fMinAlpha = 0.1f;
     float fDistScale = 1.2f;
     float fRGB = 1.0f;
-    float fDistance = Clamp ( fMinAlpha, 1.0f - pow(D3DXVec3Length ( &(vecEyePt - vecCenter) ),1.2f) * fDistScale, 1.0f );
+    D3DXVECTOR3 vec(vecEyePt - vecCenter);
+    float fDistance = Clamp ( fMinAlpha, 1.0f - pow(D3DXVec3Length ( &vec ),1.2f) * fDistScale, 1.0f );
 
     if ( sState == sStateRequired || ucCredit == ucIndex ) {
         // If we're in focus mode, draw the splash

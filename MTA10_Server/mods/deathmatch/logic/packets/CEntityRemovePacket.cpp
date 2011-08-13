@@ -18,7 +18,7 @@ bool CEntityRemovePacket::Write ( NetBitStreamInterface& BitStream ) const
     vector < CElement* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end (); iter++ )
     {
-        BitStream.WriteCompressed ( (*iter)->GetID () );
+        BitStream.Write ( (*iter)->GetID () );
     }
 
     return m_List.size () > 0;

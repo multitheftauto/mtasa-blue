@@ -430,8 +430,8 @@ public:
     RwMatrix *                  GetLTM ( void );
     CEntity *                   GetTargetEntity ( void );
     void                        SetCameraClip ( bool bObjects, bool bVehicles );
-    BYTE                        GetCameraView ( void );
-    VOID                        SetCameraView ( BYTE dwCamMode );
+    BYTE                        GetCameraViewMode ( void );
+    VOID                        SetCameraViewMode ( BYTE dwCamMode );
 
 private:
     static unsigned long        FUNC_RwFrameGetLTM;

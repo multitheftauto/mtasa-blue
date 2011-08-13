@@ -32,14 +32,15 @@ public:
     bool                        Exists                          ( CLuaTimer* pLuaTimer );
     CLuaTimer*                  GetTimer                        ( unsigned int uiID );
 
-    CLuaTimer*                  AddTimer                        ( lua_State* luaVM );
+    CLuaTimer*                  AddTimer                        ( const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments );
+
     void                        RemoveTimer                     ( CLuaTimer* pLuaTimer );
     void                        RemoveAllTimers                 ( void );
     unsigned long               GetTimerCount                   ( void ) const              { return m_TimerList.size (); }
 
     void                        ResetTimer                      ( CLuaTimer* pLuaTimer );
 
-    void                        GetTimers                       ( unsigned long ulTime, CLuaMain* pLuaMain );
+    void                        GetTimers                       ( CTickCount llTime, CLuaMain* pLuaMain );
 
     void                        TakeOutTheTrash                 ( void );
 private:

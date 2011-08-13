@@ -107,6 +107,7 @@
 #include "luadefs/CLuaElementDefs.h"
 #include "luadefs/CLuaFileDefs.h"
 #include "luadefs/CLuaHTTPDefs.h"
+#include "luadefs/CLuaHandlingDefs.h"
 #include "luadefs/CLuaPickupDefs.h"
 #include "luadefs/CLuaResourceDefs.h"
 #include "luadefs/CLuaTextDefs.h"
@@ -117,6 +118,9 @@
 // Lua includes
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
+#include "CEasingCurve.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include "CScriptArgReader.h"
 #include "lua/CLuaManager.h"
 #include "lua/CLuaTimerManager.h"
 #include "lua/CLuaTimer.h"
@@ -127,7 +131,6 @@
 #include "lua/CLuaArguments.h"
 
 // Shared includes
-#include "CEasingCurve.h"
 #include "TInterpolation.h"
 #include "CPositionRotationAnimation.h"
 
@@ -175,6 +178,8 @@
 #include "CGame.h"
 #include "CGroups.h"
 #include "CHTTPD.h"
+#include "CHandlingEntry.h"
+#include "CHandlingManager.h"
 #include "CKeyBinds.h"
 #include "CLanBroadcast.h"
 #include "CLogger.h"
@@ -250,8 +255,8 @@
 #include "CStaticFunctionDefinitions.h"
 
 // Shared includes
-#include "CEasingCurve.h"
-#include "CPositionRotationAnimation.h"
+//#include "CEasingCurve.h"
+//#include "CPositionRotationAnimation.h"
 
 // Utility includes
 #include "utils/CHTTPClient.h"

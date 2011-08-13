@@ -108,7 +108,7 @@ void CResourceDownload::FileDownloadComplete ( CResourceDownloadFile * file )
 {
     if ( GetFilesRemainingToDownload() == 0 )
     {
-        CResource * resource = g_pGame->GetResourceManager()->Load ( m_strName.c_str () );
+        CResource * resource = g_pGame->GetResourceManager()->Load ( false, "todo", m_strName.c_str () );
         if ( resource )
         {
             if ( resource->GetIncludedResourcesCount() > 0 )

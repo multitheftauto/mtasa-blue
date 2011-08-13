@@ -65,7 +65,7 @@ void DumpHandlingData ( tHandlingDataSA* pData )
     fprintf ( pFile, "    m_OriginalHandlingData [%u].fSuspensionUpperLimit = %ff;\n", iCounter, pData->fSuspensionUpperLimit );
     fprintf ( pFile, "    m_OriginalHandlingData [%u].fSuspensionLowerLimit = %ff;\n", iCounter, pData->fSuspensionLowerLimit );
     fprintf ( pFile, "    m_OriginalHandlingData [%u].fSuspensionFrontRearBias = %ff;\n", iCounter, pData->fSuspensionFrontRearBias );
-    fprintf ( pFile, "    m_OriginalHandlingData [%u].fSuspensionAntidiveMultiplier = %ff;\n", iCounter, pData->fSuspensionAntidiveMultiplier );
+    fprintf ( pFile, "    m_OriginalHandlingData [%u].fSuspensionAntiDiveMultiplier = %ff;\n", iCounter, pData->fSuspensionAntiDiveMultiplier );
 
     fprintf ( pFile, "    m_OriginalHandlingData [%u].fCollisionDamageMultiplier = %ff;\n", iCounter, pData->fCollisionDamageMultiplier );
 
@@ -114,6 +114,40 @@ CHandlingManagerSA::CHandlingManagerSA ( void )
 
     // Uncomment this to dump
     //HookInstall ( Func_Calculate, (DWORD) Hook_Calculate, 11 );
+    m_HandlingNames["mass"] =                           HANDLING_MASS;                          // works (mass > 0)
+    m_HandlingNames["turnMass"] =                       HANDLING_TURNMASS;                      // works
+    m_HandlingNames["dragCoeff"] =                      HANDLING_DRAGCOEFF;                     // works
+    m_HandlingNames["centerOfMass"] =                   HANDLING_CENTEROFMASS;                  // works
+    m_HandlingNames["percentSubmerged"] =               HANDLING_PERCENTSUBMERGED;              // works
+    m_HandlingNames["tractionMultiplier"] =             HANDLING_TRACTIONMULTIPLIER;            // works
+    m_HandlingNames["driveType"] =                      HANDLING_DRIVETYPE;                     // works
+    m_HandlingNames["engineType"] =                     HANDLING_ENGINETYPE;                    // works
+    m_HandlingNames["numberOfGears"] =                  HANDLING_NUMOFGEARS;                    // works
+    m_HandlingNames["engineAcceleration"] =             HANDLING_ENGINEACCELERATION;            // works
+    m_HandlingNames["engineInertia"] =                  HANDLING_ENGINEINERTIA;                 // works
+    m_HandlingNames["maxVelocity"] =                    HANDLING_MAXVELOCITY;                   // works
+    m_HandlingNames["brakeDeceleration"] =              HANDLING_BRAKEDECELERATION;             // works
+    m_HandlingNames["brakeBias"] =                      HANDLING_BRAKEBIAS;                     // works
+    m_HandlingNames["ABS"] =                            HANDLING_ABS;                           // has no effect in vanilla gta either
+    m_HandlingNames["steeringLock"] =                   HANDLING_STEERINGLOCK;                  // works
+    m_HandlingNames["tractionLoss"] =                   HANDLING_TRACTIONLOSS;                  // works
+    m_HandlingNames["tractionBias"] =                   HANDLING_TRACTIONBIAS;                  // works
+    m_HandlingNames["suspensionForceLevel"] =           HANDLING_SUSPENSION_FORCELEVEL;         // works
+    m_HandlingNames["suspensionDamping"] =              HANDLING_SUSPENSION_DAMPING;            // works
+    m_HandlingNames["suspensionHighSpeedDamping"] =     HANDLING_SUSPENSION_HIGHSPEEDDAMPING;   // works
+    m_HandlingNames["suspensionUpperLimit"] =           HANDLING_SUSPENSION_UPPER_LIMIT;        // works
+    m_HandlingNames["suspensionLowerLimit"] =           HANDLING_SUSPENSION_LOWER_LIMIT;        // works
+    m_HandlingNames["suspensionFrontRearBias"] =        HANDLING_SUSPENSION_FRONTREARBIAS;      // works
+    m_HandlingNames["suspensionAntiDiveMultiplier"] =   HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER; // works
+    m_HandlingNames["collisionDamageMultiplier"] =      HANDLING_COLLISIONDAMAGEMULTIPLIER;     // works
+    m_HandlingNames["seatOffsetDistance"] =             HANDLING_SEATOFFSETDISTANCE;            // works
+    m_HandlingNames["monetary"] =                       HANDLING_MONETARY;                      // useless as it only influences SP stats (value of damaged property)
+    m_HandlingNames["handlingFlags"] =                  HANDLING_HANDLINGFLAGS;                 // works
+    m_HandlingNames["modelFlags"] =                     HANDLING_MODELFLAGS;                    // works
+    m_HandlingNames["headLight"] =                      HANDLING_HEADLIGHT;                     // doesn't work
+    m_HandlingNames["tailLight"] =                      HANDLING_TAILLIGHT;                     // doesn't seem to work*
+    m_HandlingNames["animGroup"] =                      HANDLING_ANIMGROUP;                     // works model based
+
 }
 
 
@@ -126,10 +160,23 @@ CHandlingManagerSA::~CHandlingManagerSA ( void )
     }
 }
 
+eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName ( std::string strName )
+{
+    std::map < std::string, eHandlingProperty >::iterator it;
+    it = m_HandlingNames.find ( strName );
+
+    if ( it != m_HandlingNames.end () )
+    {
+        return it->second;
+    }
+    return HANDLING_MAX;
+}
+
 CHandlingEntry* CHandlingManagerSA::CreateHandlingData ( void )
 {
     return new CHandlingEntrySA ();
 }
+
 
 const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData ( eVehicleTypes eModel )
 {
@@ -137,20 +184,10 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData ( eVehicleType
     if ( eModel >= 400 && eModel < VT_MAX )
     {
         // Return it
-        return m_pOriginalEntries [ GetHandlingID ( eModel ) ];
+        return m_pOriginalEntries [GetHandlingID(eModel)];
     }
 
     return NULL;
-}
-
-float CHandlingManagerSA::GetDragMultiplier ( void )
-{
-    return *(float*)(Var_fTurnMassMultiplier);
-}
-
-float CHandlingManagerSA::GetBasicDragCoeff ( void )
-{
-    return *(float*)(Var_fBasicDragCoeff);
 }
 
 // Return the handling manager id
@@ -407,7 +444,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [0].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [0].fSuspensionLowerLimit = -0.140000f;
     m_OriginalHandlingData [0].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [0].fSuspensionAntidiveMultiplier = 0.250000f;
+    m_OriginalHandlingData [0].fSuspensionAntiDiveMultiplier = 0.250000f;
     m_OriginalHandlingData [0].fCollisionDamageMultiplier = 0.230000f;
     m_OriginalHandlingData [0].uiModelFlags = 0x20;
     m_OriginalHandlingData [0].uiHandlingFlags = 0x500002;
@@ -443,7 +480,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [1].fSuspensionUpperLimit = 0.310000f;
     m_OriginalHandlingData [1].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [1].fSuspensionFrontRearBias = 0.570000f;
-    m_OriginalHandlingData [1].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [1].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [1].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [1].uiModelFlags = 0x1;
     m_OriginalHandlingData [1].uiHandlingFlags = 0x1;
@@ -479,7 +516,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [2].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [2].fSuspensionLowerLimit = -0.240000f;
     m_OriginalHandlingData [2].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [2].fSuspensionAntidiveMultiplier = 0.400000f;
+    m_OriginalHandlingData [2].fSuspensionAntiDiveMultiplier = 0.400000f;
     m_OriginalHandlingData [2].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [2].uiModelFlags = 0x2800;
     m_OriginalHandlingData [2].uiHandlingFlags = 0x10200000;
@@ -515,7 +552,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [3].fSuspensionUpperLimit = 0.400000f;
     m_OriginalHandlingData [3].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [3].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [3].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [3].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [3].fCollisionDamageMultiplier = 0.250000f;
     m_OriginalHandlingData [3].uiModelFlags = 0x6000;
     m_OriginalHandlingData [3].uiHandlingFlags = 0x200;
@@ -551,7 +588,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [4].fSuspensionUpperLimit = 0.370000f;
     m_OriginalHandlingData [4].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [4].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [4].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [4].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [4].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [4].uiModelFlags = 0x20;
     m_OriginalHandlingData [4].uiHandlingFlags = 0x0;
@@ -587,7 +624,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [5].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [5].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [5].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [5].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [5].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [5].fCollisionDamageMultiplier = 0.560000f;
     m_OriginalHandlingData [5].uiModelFlags = 0x0;
     m_OriginalHandlingData [5].uiHandlingFlags = 0x400000;
@@ -623,7 +660,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [6].fSuspensionUpperLimit = 0.200000f;
     m_OriginalHandlingData [6].fSuspensionLowerLimit = -0.300000f;
     m_OriginalHandlingData [6].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [6].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [6].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [6].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [6].uiModelFlags = 0xC008;
     m_OriginalHandlingData [6].uiHandlingFlags = 0x1340201;
@@ -659,7 +696,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [7].fSuspensionUpperLimit = 0.470000f;
     m_OriginalHandlingData [7].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [7].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [7].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [7].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [7].fCollisionDamageMultiplier = 0.260000f;
     m_OriginalHandlingData [7].uiModelFlags = 0x4098;
     m_OriginalHandlingData [7].uiHandlingFlags = 0x0;
@@ -695,7 +732,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [8].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [8].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [8].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [8].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [8].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [8].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [8].uiModelFlags = 0x4008;
     m_OriginalHandlingData [8].uiHandlingFlags = 0x200;
@@ -731,7 +768,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [9].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [9].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [9].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [9].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [9].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [9].fCollisionDamageMultiplier = 0.720000f;
     m_OriginalHandlingData [9].uiModelFlags = 0x282000;
     m_OriginalHandlingData [9].uiHandlingFlags = 0x10400001;
@@ -767,7 +804,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [10].fSuspensionUpperLimit = 0.310000f;
     m_OriginalHandlingData [10].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [10].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [10].fSuspensionAntidiveMultiplier = 0.200000f;
+    m_OriginalHandlingData [10].fSuspensionAntiDiveMultiplier = 0.200000f;
     m_OriginalHandlingData [10].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [10].uiModelFlags = 0x0;
     m_OriginalHandlingData [10].uiHandlingFlags = 0x0;
@@ -803,7 +840,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [11].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [11].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [11].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [11].fSuspensionAntidiveMultiplier = 0.400000f;
+    m_OriginalHandlingData [11].fSuspensionAntiDiveMultiplier = 0.400000f;
     m_OriginalHandlingData [11].fCollisionDamageMultiplier = 0.720000f;
     m_OriginalHandlingData [11].uiModelFlags = 0x40002004;
     m_OriginalHandlingData [11].uiHandlingFlags = 0xC04000;
@@ -839,7 +876,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [12].fSuspensionUpperLimit = 0.200000f;
     m_OriginalHandlingData [12].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [12].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [12].fSuspensionAntidiveMultiplier = 0.600000f;
+    m_OriginalHandlingData [12].fSuspensionAntiDiveMultiplier = 0.600000f;
     m_OriginalHandlingData [12].fCollisionDamageMultiplier = 0.410000f;
     m_OriginalHandlingData [12].uiModelFlags = 0x0;
     m_OriginalHandlingData [12].uiHandlingFlags = 0x2410008;
@@ -875,7 +912,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [13].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [13].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [13].fSuspensionFrontRearBias = 0.250000f;
-    m_OriginalHandlingData [13].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [13].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [13].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [13].uiModelFlags = 0x4001;
     m_OriginalHandlingData [13].uiHandlingFlags = 0x1;
@@ -911,7 +948,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [14].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [14].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [14].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [14].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [14].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [14].fCollisionDamageMultiplier = 0.530000f;
     m_OriginalHandlingData [14].uiModelFlags = 0x4088;
     m_OriginalHandlingData [14].uiHandlingFlags = 0x0;
@@ -947,7 +984,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [15].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [15].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [15].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [15].fSuspensionAntidiveMultiplier = 0.600000f;
+    m_OriginalHandlingData [15].fSuspensionAntiDiveMultiplier = 0.600000f;
     m_OriginalHandlingData [15].fCollisionDamageMultiplier = 0.540000f;
     m_OriginalHandlingData [15].uiModelFlags = 0xC0002004;
     m_OriginalHandlingData [15].uiHandlingFlags = 0x208000;
@@ -983,7 +1020,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [16].fSuspensionUpperLimit = 0.400000f;
     m_OriginalHandlingData [16].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [16].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [16].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [16].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [16].fCollisionDamageMultiplier = 0.330000f;
     m_OriginalHandlingData [16].uiModelFlags = 0x4001;
     m_OriginalHandlingData [16].uiHandlingFlags = 0x4;
@@ -1019,7 +1056,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [17].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [17].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [17].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [17].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [17].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [17].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [17].uiModelFlags = 0x20;
     m_OriginalHandlingData [17].uiHandlingFlags = 0x0;
@@ -1055,7 +1092,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [18].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [18].fSuspensionLowerLimit = -0.180000f;
     m_OriginalHandlingData [18].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [18].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [18].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [18].fCollisionDamageMultiplier = 0.540000f;
     m_OriginalHandlingData [18].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [18].uiHandlingFlags = 0x10000000;
@@ -1091,7 +1128,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [19].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [19].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [19].fSuspensionFrontRearBias = 0.540000f;
-    m_OriginalHandlingData [19].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [19].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [19].fCollisionDamageMultiplier = 0.510000f;
     m_OriginalHandlingData [19].uiModelFlags = 0x0;
     m_OriginalHandlingData [19].uiHandlingFlags = 0x200000;
@@ -1127,7 +1164,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [20].fSuspensionUpperLimit = 0.270000f;
     m_OriginalHandlingData [20].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [20].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [20].fSuspensionAntidiveMultiplier = 0.350000f;
+    m_OriginalHandlingData [20].fSuspensionAntiDiveMultiplier = 0.350000f;
     m_OriginalHandlingData [20].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [20].uiModelFlags = 0x0;
     m_OriginalHandlingData [20].uiHandlingFlags = 0x10400000;
@@ -1163,7 +1200,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [21].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [21].fSuspensionLowerLimit = -0.180000f;
     m_OriginalHandlingData [21].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [21].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [21].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [21].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [21].uiModelFlags = 0x40;
     m_OriginalHandlingData [21].uiHandlingFlags = 0x104004;
@@ -1199,7 +1236,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [22].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [22].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [22].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [22].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [22].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [22].fCollisionDamageMultiplier = 0.770000f;
     m_OriginalHandlingData [22].uiModelFlags = 0x88;
     m_OriginalHandlingData [22].uiHandlingFlags = 0x2;
@@ -1235,7 +1272,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [23].fSuspensionUpperLimit = 0.200000f;
     m_OriginalHandlingData [23].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [23].fSuspensionFrontRearBias = 0.450000f;
-    m_OriginalHandlingData [23].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [23].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [23].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [23].uiModelFlags = 0x201904;
     m_OriginalHandlingData [23].uiHandlingFlags = 0x308200;
@@ -1271,7 +1308,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [24].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [24].fSuspensionLowerLimit = -0.120000f;
     m_OriginalHandlingData [24].fSuspensionFrontRearBias = 0.380000f;
-    m_OriginalHandlingData [24].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [24].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [24].fCollisionDamageMultiplier = 0.240000f;
     m_OriginalHandlingData [24].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [24].uiHandlingFlags = 0x10200008;
@@ -1307,7 +1344,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [25].fSuspensionUpperLimit = 0.400000f;
     m_OriginalHandlingData [25].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [25].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [25].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [25].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [25].fCollisionDamageMultiplier = 0.160000f;
     m_OriginalHandlingData [25].uiModelFlags = 0x4011;
     m_OriginalHandlingData [25].uiHandlingFlags = 0x0;
@@ -1343,7 +1380,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [26].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [26].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [26].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [26].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [26].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [26].fCollisionDamageMultiplier = 0.350000f;
     m_OriginalHandlingData [26].uiModelFlags = 0x4001;
     m_OriginalHandlingData [26].uiHandlingFlags = 0x4;
@@ -1379,7 +1416,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [27].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [27].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [27].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [27].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [27].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [27].fCollisionDamageMultiplier = 0.490000f;
     m_OriginalHandlingData [27].uiModelFlags = 0x2004;
     m_OriginalHandlingData [27].uiHandlingFlags = 0x200000;
@@ -1415,7 +1452,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [28].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [28].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [28].fSuspensionFrontRearBias = 0.450000f;
-    m_OriginalHandlingData [28].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [28].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [28].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [28].uiModelFlags = 0x4002;
     m_OriginalHandlingData [28].uiHandlingFlags = 0x0;
@@ -1451,7 +1488,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [29].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [29].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [29].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [29].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [29].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [29].fCollisionDamageMultiplier = 0.090000f;
     m_OriginalHandlingData [29].uiModelFlags = 0x40008008;
     m_OriginalHandlingData [29].uiHandlingFlags = 0x308840;
@@ -1487,7 +1524,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [30].fSuspensionUpperLimit = 0.470000f;
     m_OriginalHandlingData [30].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [30].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [30].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [30].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [30].fCollisionDamageMultiplier = 0.260000f;
     m_OriginalHandlingData [30].uiModelFlags = 0x200809;
     m_OriginalHandlingData [30].uiHandlingFlags = 0x100000;
@@ -1523,7 +1560,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [31].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [31].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [31].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [31].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [31].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [31].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [31].uiModelFlags = 0x40006800;
     m_OriginalHandlingData [31].uiHandlingFlags = 0x8000;
@@ -1559,7 +1596,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [32].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [32].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [32].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [32].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [32].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [32].fCollisionDamageMultiplier = 0.250000f;
     m_OriginalHandlingData [32].uiModelFlags = 0x20002000;
     m_OriginalHandlingData [32].uiHandlingFlags = 0x0;
@@ -1595,7 +1632,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [33].fSuspensionUpperLimit = 0.310000f;
     m_OriginalHandlingData [33].fSuspensionLowerLimit = -0.180000f;
     m_OriginalHandlingData [33].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [33].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [33].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [33].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [33].uiModelFlags = 0x0;
     m_OriginalHandlingData [33].uiHandlingFlags = 0x0;
@@ -1631,7 +1668,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [34].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [34].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [34].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [34].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [34].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [34].fCollisionDamageMultiplier = 0.480000f;
     m_OriginalHandlingData [34].uiModelFlags = 0x2;
     m_OriginalHandlingData [34].uiHandlingFlags = 0x200000;
@@ -1667,7 +1704,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [35].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [35].fSuspensionLowerLimit = -0.300000f;
     m_OriginalHandlingData [35].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [35].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [35].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [35].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [35].uiModelFlags = 0x0;
     m_OriginalHandlingData [35].uiHandlingFlags = 0x0;
@@ -1703,7 +1740,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [36].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [36].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [36].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [36].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [36].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [36].fCollisionDamageMultiplier = 0.640000f;
     m_OriginalHandlingData [36].uiModelFlags = 0x2800;
     m_OriginalHandlingData [36].uiHandlingFlags = 0x4;
@@ -1739,7 +1776,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [37].fSuspensionUpperLimit = 0.430000f;
     m_OriginalHandlingData [37].fSuspensionLowerLimit = -0.110000f;
     m_OriginalHandlingData [37].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [37].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [37].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [37].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [37].uiModelFlags = 0x1;
     m_OriginalHandlingData [37].uiHandlingFlags = 0x0;
@@ -1775,7 +1812,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [38].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [38].fSuspensionLowerLimit = -0.080000f;
     m_OriginalHandlingData [38].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [38].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [38].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [38].fCollisionDamageMultiplier = 0.050000f;
     m_OriginalHandlingData [38].uiModelFlags = 0x440000;
     m_OriginalHandlingData [38].uiHandlingFlags = 0x0;
@@ -1811,7 +1848,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [39].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [39].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [39].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [39].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [39].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [39].fCollisionDamageMultiplier = 1.250000f;
     m_OriginalHandlingData [39].uiModelFlags = 0x40000020;
     m_OriginalHandlingData [39].uiHandlingFlags = 0x0;
@@ -1847,7 +1884,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [40].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [40].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [40].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [40].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [40].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [40].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [40].uiModelFlags = 0x4000;
     m_OriginalHandlingData [40].uiHandlingFlags = 0x440000;
@@ -1883,7 +1920,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [41].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [41].fSuspensionLowerLimit = -0.300000f;
     m_OriginalHandlingData [41].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [41].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [41].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [41].fCollisionDamageMultiplier = 0.350000f;
     m_OriginalHandlingData [41].uiModelFlags = 0x28;
     m_OriginalHandlingData [41].uiHandlingFlags = 0x1300045;
@@ -1919,7 +1956,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [42].fSuspensionUpperLimit = 0.270000f;
     m_OriginalHandlingData [42].fSuspensionLowerLimit = -0.190000f;
     m_OriginalHandlingData [42].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [42].fSuspensionAntidiveMultiplier = 0.550000f;
+    m_OriginalHandlingData [42].fSuspensionAntiDiveMultiplier = 0.550000f;
     m_OriginalHandlingData [42].fCollisionDamageMultiplier = 0.560000f;
     m_OriginalHandlingData [42].uiModelFlags = 0x0;
     m_OriginalHandlingData [42].uiHandlingFlags = 0x400000;
@@ -1955,7 +1992,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [43].fSuspensionUpperLimit = 0.000000f;
     m_OriginalHandlingData [43].fSuspensionLowerLimit = -1.000000f;
     m_OriginalHandlingData [43].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [43].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [43].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [43].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [43].uiModelFlags = 0x1;
     m_OriginalHandlingData [43].uiHandlingFlags = 0x400000;
@@ -1991,7 +2028,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [44].fSuspensionUpperLimit = 0.470000f;
     m_OriginalHandlingData [44].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [44].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [44].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [44].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [44].fCollisionDamageMultiplier = 1.000000f;
     m_OriginalHandlingData [44].uiModelFlags = 0x0;
     m_OriginalHandlingData [44].uiHandlingFlags = 0x0;
@@ -2027,7 +2064,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [45].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [45].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [45].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [45].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [45].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [45].fCollisionDamageMultiplier = 0.250000f;
     m_OriginalHandlingData [45].uiModelFlags = 0x20002000;
     m_OriginalHandlingData [45].uiHandlingFlags = 0x0;
@@ -2063,7 +2100,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [46].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [46].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [46].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [46].fSuspensionAntidiveMultiplier = 0.400000f;
+    m_OriginalHandlingData [46].fSuspensionAntiDiveMultiplier = 0.400000f;
     m_OriginalHandlingData [46].fCollisionDamageMultiplier = 0.720000f;
     m_OriginalHandlingData [46].uiModelFlags = 0x40002004;
     m_OriginalHandlingData [46].uiHandlingFlags = 0xC08401;
@@ -2099,7 +2136,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [47].fSuspensionUpperLimit = 0.470000f;
     m_OriginalHandlingData [47].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [47].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [47].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [47].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [47].fCollisionDamageMultiplier = 0.430000f;
     m_OriginalHandlingData [47].uiModelFlags = 0x801;
     m_OriginalHandlingData [47].uiHandlingFlags = 0x0;
@@ -2135,7 +2172,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [48].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [48].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [48].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [48].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [48].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [48].fCollisionDamageMultiplier = 0.450000f;
     m_OriginalHandlingData [48].uiModelFlags = 0x4088;
     m_OriginalHandlingData [48].uiHandlingFlags = 0x1;
@@ -2171,7 +2208,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [49].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [49].fSuspensionLowerLimit = -0.130000f;
     m_OriginalHandlingData [49].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [49].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [49].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [49].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [49].uiModelFlags = 0x1100;
     m_OriginalHandlingData [49].uiHandlingFlags = 0x8804;
@@ -2207,7 +2244,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [50].fSuspensionUpperLimit = 0.270000f;
     m_OriginalHandlingData [50].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [50].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [50].fSuspensionAntidiveMultiplier = 0.200000f;
+    m_OriginalHandlingData [50].fSuspensionAntiDiveMultiplier = 0.200000f;
     m_OriginalHandlingData [50].fCollisionDamageMultiplier = 0.480000f;
     m_OriginalHandlingData [50].uiModelFlags = 0x20;
     m_OriginalHandlingData [50].uiHandlingFlags = 0x0;
@@ -2243,7 +2280,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [51].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [51].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [51].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [51].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [51].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [51].fCollisionDamageMultiplier = 0.430000f;
     m_OriginalHandlingData [51].uiModelFlags = 0x1;
     m_OriginalHandlingData [51].uiHandlingFlags = 0x1;
@@ -2279,7 +2316,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [52].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [52].fSuspensionLowerLimit = -0.220000f;
     m_OriginalHandlingData [52].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [52].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [52].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [52].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [52].uiModelFlags = 0x0;
     m_OriginalHandlingData [52].uiHandlingFlags = 0x10800002;
@@ -2315,7 +2352,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [53].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [53].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [53].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [53].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [53].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [53].fCollisionDamageMultiplier = 0.450000f;
     m_OriginalHandlingData [53].uiModelFlags = 0x0;
     m_OriginalHandlingData [53].uiHandlingFlags = 0x10800000;
@@ -2351,7 +2388,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [54].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [54].fSuspensionLowerLimit = -0.350000f;
     m_OriginalHandlingData [54].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [54].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [54].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [54].fCollisionDamageMultiplier = 0.250000f;
     m_OriginalHandlingData [54].uiModelFlags = 0x8;
     m_OriginalHandlingData [54].uiHandlingFlags = 0x300000;
@@ -2387,7 +2424,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [55].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [55].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [55].fSuspensionFrontRearBias = 0.580000f;
-    m_OriginalHandlingData [55].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [55].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [55].fCollisionDamageMultiplier = 0.420000f;
     m_OriginalHandlingData [55].uiModelFlags = 0x40002000;
     m_OriginalHandlingData [55].uiHandlingFlags = 0x1;
@@ -2423,7 +2460,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [56].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [56].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [56].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [56].fSuspensionAntidiveMultiplier = 0.250000f;
+    m_OriginalHandlingData [56].fSuspensionAntiDiveMultiplier = 0.250000f;
     m_OriginalHandlingData [56].fCollisionDamageMultiplier = 0.520000f;
     m_OriginalHandlingData [56].uiModelFlags = 0x0;
     m_OriginalHandlingData [56].uiHandlingFlags = 0x10000006;
@@ -2459,7 +2496,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [57].fSuspensionUpperLimit = 0.310000f;
     m_OriginalHandlingData [57].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [57].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [57].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [57].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [57].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [57].uiModelFlags = 0x0;
     m_OriginalHandlingData [57].uiHandlingFlags = 0xC00000;
@@ -2495,7 +2532,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [58].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [58].fSuspensionLowerLimit = -0.180000f;
     m_OriginalHandlingData [58].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [58].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [58].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [58].fCollisionDamageMultiplier = 0.190000f;
     m_OriginalHandlingData [58].uiModelFlags = 0x40;
     m_OriginalHandlingData [58].uiHandlingFlags = 0x10000006;
@@ -2531,7 +2568,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [59].fSuspensionUpperLimit = 0.270000f;
     m_OriginalHandlingData [59].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [59].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [59].fSuspensionAntidiveMultiplier = 0.200000f;
+    m_OriginalHandlingData [59].fSuspensionAntiDiveMultiplier = 0.200000f;
     m_OriginalHandlingData [59].fCollisionDamageMultiplier = 0.480000f;
     m_OriginalHandlingData [59].uiModelFlags = 0x20;
     m_OriginalHandlingData [59].uiHandlingFlags = 0x1;
@@ -2567,7 +2604,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [60].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [60].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [60].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [60].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [60].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [60].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [60].uiModelFlags = 0x40000800;
     m_OriginalHandlingData [60].uiHandlingFlags = 0x0;
@@ -2603,7 +2640,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [61].fSuspensionUpperLimit = 0.400000f;
     m_OriginalHandlingData [61].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [61].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [61].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [61].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [61].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [61].uiModelFlags = 0x1;
     m_OriginalHandlingData [61].uiHandlingFlags = 0x400000;
@@ -2639,7 +2676,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [62].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [62].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [62].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [62].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [62].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [62].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [62].uiModelFlags = 0x4000C000;
     m_OriginalHandlingData [62].uiHandlingFlags = 0x400000;
@@ -2675,7 +2712,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [63].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [63].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [63].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [63].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [63].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [63].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [63].uiModelFlags = 0x3300;
     m_OriginalHandlingData [63].uiHandlingFlags = 0x4;
@@ -2711,7 +2748,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [64].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [64].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [64].fSuspensionFrontRearBias = 0.350000f;
-    m_OriginalHandlingData [64].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [64].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [64].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [64].uiModelFlags = 0x308;
     m_OriginalHandlingData [64].uiHandlingFlags = 0x340220;
@@ -2747,7 +2784,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [65].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [65].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [65].fSuspensionFrontRearBias = 0.450000f;
-    m_OriginalHandlingData [65].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [65].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [65].fCollisionDamageMultiplier = 0.350000f;
     m_OriginalHandlingData [65].uiModelFlags = 0x4020;
     m_OriginalHandlingData [65].uiHandlingFlags = 0x100004;
@@ -2783,7 +2820,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [66].fSuspensionUpperLimit = 0.340000f;
     m_OriginalHandlingData [66].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [66].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [66].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [66].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [66].fCollisionDamageMultiplier = 0.300000f;
     m_OriginalHandlingData [66].uiModelFlags = 0x4020;
     m_OriginalHandlingData [66].uiHandlingFlags = 0x500000;
@@ -2819,7 +2856,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [67].fSuspensionUpperLimit = 0.310000f;
     m_OriginalHandlingData [67].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [67].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [67].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [67].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [67].fCollisionDamageMultiplier = 0.850000f;
     m_OriginalHandlingData [67].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [67].uiHandlingFlags = 0x10000000;
@@ -2855,7 +2892,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [68].fSuspensionUpperLimit = 0.320000f;
     m_OriginalHandlingData [68].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [68].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [68].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [68].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [68].fCollisionDamageMultiplier = 0.540000f;
     m_OriginalHandlingData [68].uiModelFlags = 0x0;
     m_OriginalHandlingData [68].uiHandlingFlags = 0x10000001;
@@ -2891,7 +2928,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [69].fSuspensionUpperLimit = 0.290000f;
     m_OriginalHandlingData [69].fSuspensionLowerLimit = -0.160000f;
     m_OriginalHandlingData [69].fSuspensionFrontRearBias = 0.600000f;
-    m_OriginalHandlingData [69].fSuspensionAntidiveMultiplier = 0.400000f;
+    m_OriginalHandlingData [69].fSuspensionAntiDiveMultiplier = 0.400000f;
     m_OriginalHandlingData [69].fCollisionDamageMultiplier = 0.560000f;
     m_OriginalHandlingData [69].uiModelFlags = 0x40002004;
     m_OriginalHandlingData [69].uiHandlingFlags = 0xC00000;
@@ -2927,7 +2964,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [70].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [70].fSuspensionLowerLimit = -0.310000f;
     m_OriginalHandlingData [70].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [70].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [70].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [70].fCollisionDamageMultiplier = 0.350000f;
     m_OriginalHandlingData [70].uiModelFlags = 0x0;
     m_OriginalHandlingData [70].uiHandlingFlags = 0x318800;
@@ -2963,7 +3000,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [71].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [71].fSuspensionLowerLimit = -0.120000f;
     m_OriginalHandlingData [71].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [71].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [71].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [71].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [71].uiModelFlags = 0xC0000000;
     m_OriginalHandlingData [71].uiHandlingFlags = 0xC00000;
@@ -2999,7 +3036,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [72].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [72].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [72].fSuspensionFrontRearBias = 0.350000f;
-    m_OriginalHandlingData [72].fSuspensionAntidiveMultiplier = 0.600000f;
+    m_OriginalHandlingData [72].fSuspensionAntiDiveMultiplier = 0.600000f;
     m_OriginalHandlingData [72].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [72].uiModelFlags = 0x4009;
     m_OriginalHandlingData [72].uiHandlingFlags = 0x201;
@@ -3035,7 +3072,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [73].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [73].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [73].fSuspensionFrontRearBias = 0.450000f;
-    m_OriginalHandlingData [73].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [73].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [73].fCollisionDamageMultiplier = 0.530000f;
     m_OriginalHandlingData [73].uiModelFlags = 0x4088;
     m_OriginalHandlingData [73].uiHandlingFlags = 0x1;
@@ -3071,7 +3108,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [74].fSuspensionUpperLimit = 0.320000f;
     m_OriginalHandlingData [74].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [74].fSuspensionFrontRearBias = 0.350000f;
-    m_OriginalHandlingData [74].fSuspensionAntidiveMultiplier = 0.400000f;
+    m_OriginalHandlingData [74].fSuspensionAntiDiveMultiplier = 0.400000f;
     m_OriginalHandlingData [74].fCollisionDamageMultiplier = 0.300000f;
     m_OriginalHandlingData [74].uiModelFlags = 0x200840;
     m_OriginalHandlingData [74].uiHandlingFlags = 0x0;
@@ -3107,7 +3144,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [75].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [75].fSuspensionLowerLimit = -0.240000f;
     m_OriginalHandlingData [75].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [75].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [75].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [75].fCollisionDamageMultiplier = 0.300000f;
     m_OriginalHandlingData [75].uiModelFlags = 0x100;
     m_OriginalHandlingData [75].uiHandlingFlags = 0x10800200;
@@ -3143,7 +3180,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [76].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [76].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [76].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [76].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [76].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [76].fCollisionDamageMultiplier = 0.300000f;
     m_OriginalHandlingData [76].uiModelFlags = 0x0;
     m_OriginalHandlingData [76].uiHandlingFlags = 0x800200;
@@ -3179,7 +3216,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [77].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [77].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [77].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [77].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [77].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [77].fCollisionDamageMultiplier = 0.540000f;
     m_OriginalHandlingData [77].uiModelFlags = 0x40002004;
     m_OriginalHandlingData [77].uiHandlingFlags = 0x208000;
@@ -3215,7 +3252,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [78].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [78].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [78].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [78].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [78].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [78].fCollisionDamageMultiplier = 0.300000f;
     m_OriginalHandlingData [78].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [78].uiHandlingFlags = 0x10400000;
@@ -3251,7 +3288,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [79].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [79].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [79].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [79].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [79].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [79].fCollisionDamageMultiplier = 0.530000f;
     m_OriginalHandlingData [79].uiModelFlags = 0x88;
     m_OriginalHandlingData [79].uiHandlingFlags = 0x1;
@@ -3287,7 +3324,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [80].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [80].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [80].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [80].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [80].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [80].fCollisionDamageMultiplier = 0.250000f;
     m_OriginalHandlingData [80].uiModelFlags = 0x20206008;
     m_OriginalHandlingData [80].uiHandlingFlags = 0x1000001;
@@ -3323,7 +3360,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [81].fSuspensionUpperLimit = 0.200000f;
     m_OriginalHandlingData [81].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [81].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [81].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [81].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [81].fCollisionDamageMultiplier = 0.250000f;
     m_OriginalHandlingData [81].uiModelFlags = 0x20200008;
     m_OriginalHandlingData [81].uiHandlingFlags = 0x200;
@@ -3359,7 +3396,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [82].fSuspensionUpperLimit = 0.270000f;
     m_OriginalHandlingData [82].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [82].fSuspensionFrontRearBias = 0.580000f;
-    m_OriginalHandlingData [82].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [82].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [82].fCollisionDamageMultiplier = 0.560000f;
     m_OriginalHandlingData [82].uiModelFlags = 0x0;
     m_OriginalHandlingData [82].uiHandlingFlags = 0x400000;
@@ -3395,7 +3432,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [83].fSuspensionUpperLimit = 0.270000f;
     m_OriginalHandlingData [83].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [83].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [83].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [83].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [83].fCollisionDamageMultiplier = 0.560000f;
     m_OriginalHandlingData [83].uiModelFlags = 0x400000;
     m_OriginalHandlingData [83].uiHandlingFlags = 0x10400000;
@@ -3431,7 +3468,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [84].fSuspensionUpperLimit = 0.200000f;
     m_OriginalHandlingData [84].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [84].fSuspensionFrontRearBias = 0.540000f;
-    m_OriginalHandlingData [84].fSuspensionAntidiveMultiplier = 0.400000f;
+    m_OriginalHandlingData [84].fSuspensionAntiDiveMultiplier = 0.400000f;
     m_OriginalHandlingData [84].fCollisionDamageMultiplier = 0.520000f;
     m_OriginalHandlingData [84].uiModelFlags = 0x40400004;
     m_OriginalHandlingData [84].uiHandlingFlags = 0x4;
@@ -3467,7 +3504,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [85].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [85].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [85].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [85].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [85].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [85].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [85].uiModelFlags = 0x404008;
     m_OriginalHandlingData [85].uiHandlingFlags = 0x40200;
@@ -3503,7 +3540,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [86].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [86].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [86].fSuspensionFrontRearBias = 0.250000f;
-    m_OriginalHandlingData [86].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [86].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [86].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [86].uiModelFlags = 0x240001;
     m_OriginalHandlingData [86].uiHandlingFlags = 0x1148200;
@@ -3539,7 +3576,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [87].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [87].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [87].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [87].fSuspensionAntidiveMultiplier = 0.250000f;
+    m_OriginalHandlingData [87].fSuspensionAntiDiveMultiplier = 0.250000f;
     m_OriginalHandlingData [87].fCollisionDamageMultiplier = 0.520000f;
     m_OriginalHandlingData [87].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [87].uiHandlingFlags = 0x4;
@@ -3575,7 +3612,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [88].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [88].fSuspensionLowerLimit = -0.080000f;
     m_OriginalHandlingData [88].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [88].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [88].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [88].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [88].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [88].uiHandlingFlags = 0x2;
@@ -3611,7 +3648,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [89].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [89].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [89].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [89].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [89].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [89].fCollisionDamageMultiplier = 0.160000f;
     m_OriginalHandlingData [89].uiModelFlags = 0x4001;
     m_OriginalHandlingData [89].uiHandlingFlags = 0x0;
@@ -3647,7 +3684,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [90].fSuspensionUpperLimit = 0.320000f;
     m_OriginalHandlingData [90].fSuspensionLowerLimit = -0.140000f;
     m_OriginalHandlingData [90].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [90].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [90].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [90].fCollisionDamageMultiplier = 0.540000f;
     m_OriginalHandlingData [90].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [90].uiHandlingFlags = 0x0;
@@ -3683,7 +3720,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [91].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [91].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [91].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [91].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [91].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [91].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [91].uiModelFlags = 0x1300;
     m_OriginalHandlingData [91].uiHandlingFlags = 0x1040024;
@@ -3719,7 +3756,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [92].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [92].fSuspensionLowerLimit = -0.050000f;
     m_OriginalHandlingData [92].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [92].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [92].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [92].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [92].uiModelFlags = 0x201310;
     m_OriginalHandlingData [92].uiHandlingFlags = 0x1340005;
@@ -3755,7 +3792,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [93].fSuspensionUpperLimit = 0.470000f;
     m_OriginalHandlingData [93].fSuspensionLowerLimit = -0.110000f;
     m_OriginalHandlingData [93].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [93].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [93].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [93].fCollisionDamageMultiplier = 0.430000f;
     m_OriginalHandlingData [93].uiModelFlags = 0x12C008;
     m_OriginalHandlingData [93].uiHandlingFlags = 0x20;
@@ -3791,7 +3828,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [94].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [94].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [94].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [94].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [94].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [94].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [94].uiModelFlags = 0x40002800;
     m_OriginalHandlingData [94].uiHandlingFlags = 0x0;
@@ -3827,7 +3864,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [95].fSuspensionUpperLimit = 0.000000f;
     m_OriginalHandlingData [95].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [95].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [95].fSuspensionAntidiveMultiplier = 0.600000f;
+    m_OriginalHandlingData [95].fSuspensionAntiDiveMultiplier = 0.600000f;
     m_OriginalHandlingData [95].fCollisionDamageMultiplier = 0.410000f;
     m_OriginalHandlingData [95].uiModelFlags = 0x40002004;
     m_OriginalHandlingData [95].uiHandlingFlags = 0x2410000;
@@ -3863,7 +3900,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [96].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [96].fSuspensionLowerLimit = -0.140000f;
     m_OriginalHandlingData [96].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [96].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [96].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [96].fCollisionDamageMultiplier = 0.420000f;
     m_OriginalHandlingData [96].uiModelFlags = 0x40002000;
     m_OriginalHandlingData [96].uiHandlingFlags = 0x2010000;
@@ -3899,7 +3936,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [97].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [97].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [97].fSuspensionFrontRearBias = 0.440000f;
-    m_OriginalHandlingData [97].fSuspensionAntidiveMultiplier = 0.250000f;
+    m_OriginalHandlingData [97].fSuspensionAntiDiveMultiplier = 0.250000f;
     m_OriginalHandlingData [97].fCollisionDamageMultiplier = 0.520000f;
     m_OriginalHandlingData [97].uiModelFlags = 0x40202000;
     m_OriginalHandlingData [97].uiHandlingFlags = 0x12010000;
@@ -3935,7 +3972,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [98].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [98].fSuspensionLowerLimit = 0.000000f;
     m_OriginalHandlingData [98].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [98].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [98].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [98].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [98].uiModelFlags = 0x8;
     m_OriginalHandlingData [98].uiHandlingFlags = 0x200;
@@ -3971,7 +4008,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [99].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [99].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [99].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [99].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [99].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [99].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [99].uiModelFlags = 0x8;
     m_OriginalHandlingData [99].uiHandlingFlags = 0x200;
@@ -4007,7 +4044,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [100].fSuspensionUpperLimit = 0.320000f;
     m_OriginalHandlingData [100].fSuspensionLowerLimit = -0.160000f;
     m_OriginalHandlingData [100].fSuspensionFrontRearBias = 0.560000f;
-    m_OriginalHandlingData [100].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [100].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [100].fCollisionDamageMultiplier = 0.540000f;
     m_OriginalHandlingData [100].uiModelFlags = 0x0;
     m_OriginalHandlingData [100].uiHandlingFlags = 0x2;
@@ -4043,7 +4080,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [101].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [101].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [101].fSuspensionFrontRearBias = 0.450000f;
-    m_OriginalHandlingData [101].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [101].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [101].fCollisionDamageMultiplier = 0.540000f;
     m_OriginalHandlingData [101].uiModelFlags = 0xC0002004;
     m_OriginalHandlingData [101].uiHandlingFlags = 0x204000;
@@ -4079,7 +4116,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [102].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [102].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [102].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [102].fSuspensionAntidiveMultiplier = 0.250000f;
+    m_OriginalHandlingData [102].fSuspensionAntiDiveMultiplier = 0.250000f;
     m_OriginalHandlingData [102].fCollisionDamageMultiplier = 0.520000f;
     m_OriginalHandlingData [102].uiModelFlags = 0x40280000;
     m_OriginalHandlingData [102].uiHandlingFlags = 0x10008004;
@@ -4115,7 +4152,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [103].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [103].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [103].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [103].fSuspensionAntidiveMultiplier = 0.400000f;
+    m_OriginalHandlingData [103].fSuspensionAntiDiveMultiplier = 0.400000f;
     m_OriginalHandlingData [103].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [103].uiModelFlags = 0x200040;
     m_OriginalHandlingData [103].uiHandlingFlags = 0x104004;
@@ -4151,7 +4188,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [104].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [104].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [104].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [104].fSuspensionAntidiveMultiplier = 0.250000f;
+    m_OriginalHandlingData [104].fSuspensionAntiDiveMultiplier = 0.250000f;
     m_OriginalHandlingData [104].fCollisionDamageMultiplier = 0.230000f;
     m_OriginalHandlingData [104].uiModelFlags = 0x20;
     m_OriginalHandlingData [104].uiHandlingFlags = 0x700000;
@@ -4187,7 +4224,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [105].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [105].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [105].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [105].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [105].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [105].fCollisionDamageMultiplier = 0.450000f;
     m_OriginalHandlingData [105].uiModelFlags = 0x0;
     m_OriginalHandlingData [105].uiHandlingFlags = 0x800000;
@@ -4223,7 +4260,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [106].fSuspensionUpperLimit = 0.320000f;
     m_OriginalHandlingData [106].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [106].fSuspensionFrontRearBias = 0.540000f;
-    m_OriginalHandlingData [106].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [106].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [106].fCollisionDamageMultiplier = 0.540000f;
     m_OriginalHandlingData [106].uiModelFlags = 0x0;
     m_OriginalHandlingData [106].uiHandlingFlags = 0x2;
@@ -4259,7 +4296,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [107].fSuspensionUpperLimit = 0.320000f;
     m_OriginalHandlingData [107].fSuspensionLowerLimit = -0.140000f;
     m_OriginalHandlingData [107].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [107].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [107].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [107].fCollisionDamageMultiplier = 0.540000f;
     m_OriginalHandlingData [107].uiModelFlags = 0x0;
     m_OriginalHandlingData [107].uiHandlingFlags = 0x0;
@@ -4295,7 +4332,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [108].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [108].fSuspensionLowerLimit = -0.160000f;
     m_OriginalHandlingData [108].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [108].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [108].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [108].fCollisionDamageMultiplier = 0.520000f;
     m_OriginalHandlingData [108].uiModelFlags = 0x40000004;
     m_OriginalHandlingData [108].uiHandlingFlags = 0x4;
@@ -4331,7 +4368,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [109].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [109].fSuspensionLowerLimit = -0.120000f;
     m_OriginalHandlingData [109].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [109].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [109].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [109].fCollisionDamageMultiplier = 0.540000f;
     m_OriginalHandlingData [109].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [109].uiHandlingFlags = 0x1;
@@ -4367,7 +4404,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [110].fSuspensionUpperLimit = 0.270000f;
     m_OriginalHandlingData [110].fSuspensionLowerLimit = -0.080000f;
     m_OriginalHandlingData [110].fSuspensionFrontRearBias = 0.540000f;
-    m_OriginalHandlingData [110].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [110].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [110].fCollisionDamageMultiplier = 0.560000f;
     m_OriginalHandlingData [110].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [110].uiHandlingFlags = 0x400001;
@@ -4403,7 +4440,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [111].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [111].fSuspensionLowerLimit = -0.180000f;
     m_OriginalHandlingData [111].fSuspensionFrontRearBias = 0.250000f;
-    m_OriginalHandlingData [111].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [111].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [111].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [111].uiModelFlags = 0x1;
     m_OriginalHandlingData [111].uiHandlingFlags = 0x0;
@@ -4439,7 +4476,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [112].fSuspensionUpperLimit = 0.240000f;
     m_OriginalHandlingData [112].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [112].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [112].fSuspensionAntidiveMultiplier = 0.500000f;
+    m_OriginalHandlingData [112].fSuspensionAntiDiveMultiplier = 0.500000f;
     m_OriginalHandlingData [112].fCollisionDamageMultiplier = 0.300000f;
     m_OriginalHandlingData [112].uiModelFlags = 0x20200020;
     m_OriginalHandlingData [112].uiHandlingFlags = 0x504400;
@@ -4475,7 +4512,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [113].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [113].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [113].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [113].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [113].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [113].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [113].uiModelFlags = 0x40282804;
     m_OriginalHandlingData [113].uiHandlingFlags = 0x0;
@@ -4511,7 +4548,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [114].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [114].fSuspensionLowerLimit = -0.300000f;
     m_OriginalHandlingData [114].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [114].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [114].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [114].fCollisionDamageMultiplier = 0.350000f;
     m_OriginalHandlingData [114].uiModelFlags = 0x28;
     m_OriginalHandlingData [114].uiHandlingFlags = 0x1300045;
@@ -4547,7 +4584,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [115].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [115].fSuspensionLowerLimit = -0.300000f;
     m_OriginalHandlingData [115].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [115].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [115].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [115].fCollisionDamageMultiplier = 0.350000f;
     m_OriginalHandlingData [115].uiModelFlags = 0x28;
     m_OriginalHandlingData [115].uiHandlingFlags = 0x1300045;
@@ -4583,7 +4620,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [116].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [116].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [116].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [116].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [116].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [116].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [116].uiModelFlags = 0xC0002800;
     m_OriginalHandlingData [116].uiHandlingFlags = 0x4000001;
@@ -4619,7 +4656,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [117].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [117].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [117].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [117].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [117].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [117].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [117].uiModelFlags = 0xC0002804;
     m_OriginalHandlingData [117].uiHandlingFlags = 0x4000000;
@@ -4655,7 +4692,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [118].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [118].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [118].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [118].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [118].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [118].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [118].uiModelFlags = 0x2800;
     m_OriginalHandlingData [118].uiHandlingFlags = 0x4000002;
@@ -4691,7 +4728,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [119].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [119].fSuspensionLowerLimit = -0.160000f;
     m_OriginalHandlingData [119].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [119].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [119].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [119].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [119].uiModelFlags = 0x2800;
     m_OriginalHandlingData [119].uiHandlingFlags = 0x4000000;
@@ -4727,7 +4764,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [120].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [120].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [120].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [120].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [120].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [120].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [120].uiModelFlags = 0x40002804;
     m_OriginalHandlingData [120].uiHandlingFlags = 0x4000001;
@@ -4763,7 +4800,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [121].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [121].fSuspensionLowerLimit = -0.140000f;
     m_OriginalHandlingData [121].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [121].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [121].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [121].fCollisionDamageMultiplier = 0.050000f;
     m_OriginalHandlingData [121].uiModelFlags = 0x0;
     m_OriginalHandlingData [121].uiHandlingFlags = 0x40;
@@ -4799,7 +4836,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [122].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [122].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [122].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [122].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [122].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [122].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [122].uiModelFlags = 0x2804;
     m_OriginalHandlingData [122].uiHandlingFlags = 0x4000001;
@@ -4835,7 +4872,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [123].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [123].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [123].fSuspensionFrontRearBias = 0.450000f;
-    m_OriginalHandlingData [123].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [123].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [123].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [123].uiModelFlags = 0x0;
     m_OriginalHandlingData [123].uiHandlingFlags = 0x12010000;
@@ -4871,7 +4908,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [124].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [124].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [124].fSuspensionFrontRearBias = 0.300000f;
-    m_OriginalHandlingData [124].fSuspensionAntidiveMultiplier = 0.250000f;
+    m_OriginalHandlingData [124].fSuspensionAntiDiveMultiplier = 0.250000f;
     m_OriginalHandlingData [124].fCollisionDamageMultiplier = 0.520000f;
     m_OriginalHandlingData [124].uiModelFlags = 0x200000;
     m_OriginalHandlingData [124].uiHandlingFlags = 0x2010000;
@@ -4907,7 +4944,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [125].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [125].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [125].fSuspensionFrontRearBias = 0.350000f;
-    m_OriginalHandlingData [125].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [125].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [125].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [125].uiModelFlags = 0x40001B04;
     m_OriginalHandlingData [125].uiHandlingFlags = 0x308400;
@@ -4943,7 +4980,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [126].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [126].fSuspensionLowerLimit = 0.000000f;
     m_OriginalHandlingData [126].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [126].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [126].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [126].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [126].uiModelFlags = 0x8;
     m_OriginalHandlingData [126].uiHandlingFlags = 0x200;
@@ -4979,7 +5016,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [127].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [127].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [127].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [127].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [127].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [127].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [127].uiModelFlags = 0x8;
     m_OriginalHandlingData [127].uiHandlingFlags = 0x200;
@@ -5015,7 +5052,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [128].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [128].fSuspensionLowerLimit = -0.040000f;
     m_OriginalHandlingData [128].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [128].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [128].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [128].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [128].uiModelFlags = 0x40001B00;
     m_OriginalHandlingData [128].uiHandlingFlags = 0x308201;
@@ -5051,7 +5088,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [129].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [129].fSuspensionLowerLimit = -0.050000f;
     m_OriginalHandlingData [129].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [129].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [129].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [129].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [129].uiModelFlags = 0x40001B00;
     m_OriginalHandlingData [129].uiHandlingFlags = 0x1308001;
@@ -5087,7 +5124,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [130].fSuspensionUpperLimit = 0.400000f;
     m_OriginalHandlingData [130].fSuspensionLowerLimit = -0.400000f;
     m_OriginalHandlingData [130].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [130].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [130].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [130].fCollisionDamageMultiplier = 0.350000f;
     m_OriginalHandlingData [130].uiModelFlags = 0x6028;
     m_OriginalHandlingData [130].uiHandlingFlags = 0x1300005;
@@ -5123,7 +5160,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [131].fSuspensionUpperLimit = 0.340000f;
     m_OriginalHandlingData [131].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [131].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [131].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [131].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [131].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [131].uiModelFlags = 0x40005A00;
     m_OriginalHandlingData [131].uiHandlingFlags = 0x1308201;
@@ -5159,7 +5196,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [132].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [132].fSuspensionLowerLimit = -0.140000f;
     m_OriginalHandlingData [132].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [132].fSuspensionAntidiveMultiplier = 0.250000f;
+    m_OriginalHandlingData [132].fSuspensionAntiDiveMultiplier = 0.250000f;
     m_OriginalHandlingData [132].fCollisionDamageMultiplier = 0.520000f;
     m_OriginalHandlingData [132].uiModelFlags = 0x220000;
     m_OriginalHandlingData [132].uiHandlingFlags = 0x2012100;
@@ -5195,7 +5232,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [133].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [133].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [133].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [133].fSuspensionAntidiveMultiplier = 0.250000f;
+    m_OriginalHandlingData [133].fSuspensionAntiDiveMultiplier = 0.250000f;
     m_OriginalHandlingData [133].fCollisionDamageMultiplier = 0.520000f;
     m_OriginalHandlingData [133].uiModelFlags = 0x220000;
     m_OriginalHandlingData [133].uiHandlingFlags = 0x2010000;
@@ -5231,7 +5268,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [134].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [134].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [134].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [134].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [134].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [134].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [134].uiModelFlags = 0x4008;
     m_OriginalHandlingData [134].uiHandlingFlags = 0x200;
@@ -5267,7 +5304,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [135].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [135].fSuspensionLowerLimit = -0.210000f;
     m_OriginalHandlingData [135].fSuspensionFrontRearBias = 0.450000f;
-    m_OriginalHandlingData [135].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [135].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [135].fCollisionDamageMultiplier = 0.350000f;
     m_OriginalHandlingData [135].uiModelFlags = 0x20;
     m_OriginalHandlingData [135].uiHandlingFlags = 0x4404;
@@ -5303,7 +5340,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [136].fSuspensionUpperLimit = 0.270000f;
     m_OriginalHandlingData [136].fSuspensionLowerLimit = -0.220000f;
     m_OriginalHandlingData [136].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [136].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [136].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [136].fCollisionDamageMultiplier = 0.560000f;
     m_OriginalHandlingData [136].uiModelFlags = 0x0;
     m_OriginalHandlingData [136].uiHandlingFlags = 0x400000;
@@ -5339,7 +5376,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [137].fSuspensionUpperLimit = 0.350000f;
     m_OriginalHandlingData [137].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [137].fSuspensionFrontRearBias = 0.450000f;
-    m_OriginalHandlingData [137].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [137].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [137].fCollisionDamageMultiplier = 0.430000f;
     m_OriginalHandlingData [137].uiModelFlags = 0x4001;
     m_OriginalHandlingData [137].uiHandlingFlags = 0x2;
@@ -5375,7 +5412,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [138].fSuspensionUpperLimit = 0.340000f;
     m_OriginalHandlingData [138].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [138].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [138].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [138].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [138].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [138].uiModelFlags = 0x1A00;
     m_OriginalHandlingData [138].uiHandlingFlags = 0x308200;
@@ -5411,7 +5448,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [139].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [139].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [139].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [139].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [139].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [139].fCollisionDamageMultiplier = 0.250000f;
     m_OriginalHandlingData [139].uiModelFlags = 0x20002000;
     m_OriginalHandlingData [139].uiHandlingFlags = 0x0;
@@ -5447,7 +5484,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [140].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [140].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [140].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [140].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [140].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [140].fCollisionDamageMultiplier = 0.560000f;
     m_OriginalHandlingData [140].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [140].uiHandlingFlags = 0x400000;
@@ -5483,7 +5520,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [141].fSuspensionUpperLimit = 0.450000f;
     m_OriginalHandlingData [141].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [141].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [141].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [141].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [141].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [141].uiModelFlags = 0x8;
     m_OriginalHandlingData [141].uiHandlingFlags = 0x200;
@@ -5519,7 +5556,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [142].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [142].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [142].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [142].fSuspensionAntidiveMultiplier = 0.300000f;
+    m_OriginalHandlingData [142].fSuspensionAntiDiveMultiplier = 0.300000f;
     m_OriginalHandlingData [142].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [142].uiModelFlags = 0x40002804;
     m_OriginalHandlingData [142].uiHandlingFlags = 0x0;
@@ -5555,7 +5592,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [143].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [143].fSuspensionLowerLimit = -0.240000f;
     m_OriginalHandlingData [143].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [143].fSuspensionAntidiveMultiplier = 0.600000f;
+    m_OriginalHandlingData [143].fSuspensionAntiDiveMultiplier = 0.600000f;
     m_OriginalHandlingData [143].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [143].uiModelFlags = 0x40000009;
     m_OriginalHandlingData [143].uiHandlingFlags = 0x201;
@@ -5591,7 +5628,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [144].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [144].fSuspensionLowerLimit = -0.120000f;
     m_OriginalHandlingData [144].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [144].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [144].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [144].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [144].uiModelFlags = 0x2000;
     m_OriginalHandlingData [144].uiHandlingFlags = 0xC00000;
@@ -5627,7 +5664,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [145].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [145].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [145].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [145].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [145].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [145].fCollisionDamageMultiplier = 0.250000f;
     m_OriginalHandlingData [145].uiModelFlags = 0x20002000;
     m_OriginalHandlingData [145].uiHandlingFlags = 0x0;
@@ -5663,7 +5700,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [146].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [146].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [146].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [146].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [146].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [146].fCollisionDamageMultiplier = 0.050000f;
     m_OriginalHandlingData [146].uiModelFlags = 0x0;
     m_OriginalHandlingData [146].uiHandlingFlags = 0x1000000;
@@ -5699,7 +5736,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [147].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [147].fSuspensionLowerLimit = -0.120000f;
     m_OriginalHandlingData [147].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [147].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [147].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [147].fCollisionDamageMultiplier = 0.240000f;
     m_OriginalHandlingData [147].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [147].uiHandlingFlags = 0x10200008;
@@ -5735,7 +5772,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [148].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [148].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [148].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [148].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [148].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [148].fCollisionDamageMultiplier = 0.240000f;
     m_OriginalHandlingData [148].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [148].uiHandlingFlags = 0x10200008;
@@ -5771,7 +5808,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [149].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [149].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [149].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [149].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [149].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [149].fCollisionDamageMultiplier = 0.240000f;
     m_OriginalHandlingData [149].uiModelFlags = 0x40000000;
     m_OriginalHandlingData [149].uiHandlingFlags = 0x10200008;
@@ -5807,7 +5844,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [150].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [150].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [150].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [150].fSuspensionAntidiveMultiplier = 0.250000f;
+    m_OriginalHandlingData [150].fSuspensionAntiDiveMultiplier = 0.250000f;
     m_OriginalHandlingData [150].fCollisionDamageMultiplier = 0.230000f;
     m_OriginalHandlingData [150].uiModelFlags = 0x284020;
     m_OriginalHandlingData [150].uiHandlingFlags = 0x308800;
@@ -5843,7 +5880,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [151].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [151].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [151].fSuspensionFrontRearBias = 0.400000f;
-    m_OriginalHandlingData [151].fSuspensionAntidiveMultiplier = 0.400000f;
+    m_OriginalHandlingData [151].fSuspensionAntiDiveMultiplier = 0.400000f;
     m_OriginalHandlingData [151].fCollisionDamageMultiplier = 0.200000f;
     m_OriginalHandlingData [151].uiModelFlags = 0x40200040;
     m_OriginalHandlingData [151].uiHandlingFlags = 0x104004;
@@ -5879,7 +5916,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [152].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [152].fSuspensionLowerLimit = -0.180000f;
     m_OriginalHandlingData [152].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [152].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [152].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [152].fCollisionDamageMultiplier = 0.060000f;
     m_OriginalHandlingData [152].uiModelFlags = 0x880010;
     m_OriginalHandlingData [152].uiHandlingFlags = 0x1000000;
@@ -5915,7 +5952,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [153].fSuspensionUpperLimit = 0.300000f;
     m_OriginalHandlingData [153].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [153].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [153].fSuspensionAntidiveMultiplier = 0.400000f;
+    m_OriginalHandlingData [153].fSuspensionAntiDiveMultiplier = 0.400000f;
     m_OriginalHandlingData [153].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [153].uiModelFlags = 0x40002800;
     m_OriginalHandlingData [153].uiHandlingFlags = 0x200000;
@@ -5951,7 +5988,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [154].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [154].fSuspensionLowerLimit = -0.240000f;
     m_OriginalHandlingData [154].fSuspensionFrontRearBias = 0.590000f;
-    m_OriginalHandlingData [154].fSuspensionAntidiveMultiplier = 0.400000f;
+    m_OriginalHandlingData [154].fSuspensionAntiDiveMultiplier = 0.400000f;
     m_OriginalHandlingData [154].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [154].uiModelFlags = 0x2800;
     m_OriginalHandlingData [154].uiHandlingFlags = 0x200000;
@@ -5987,7 +6024,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [155].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [155].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [155].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [155].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [155].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [155].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [155].uiModelFlags = 0x3100;
     m_OriginalHandlingData [155].uiHandlingFlags = 0x4;
@@ -6023,7 +6060,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [156].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [156].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [156].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [156].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [156].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [156].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [156].uiModelFlags = 0x3100;
     m_OriginalHandlingData [156].uiHandlingFlags = 0x4;
@@ -6059,7 +6096,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [157].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [157].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [157].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [157].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [157].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [157].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [157].uiModelFlags = 0x3100;
     m_OriginalHandlingData [157].uiHandlingFlags = 0x4;
@@ -6095,7 +6132,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [158].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [158].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [158].fSuspensionFrontRearBias = 0.350000f;
-    m_OriginalHandlingData [158].fSuspensionAntidiveMultiplier = 0.600000f;
+    m_OriginalHandlingData [158].fSuspensionAntiDiveMultiplier = 0.600000f;
     m_OriginalHandlingData [158].fCollisionDamageMultiplier = 0.400000f;
     m_OriginalHandlingData [158].uiModelFlags = 0x4009;
     m_OriginalHandlingData [158].uiHandlingFlags = 0x201;
@@ -6131,7 +6168,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [159].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [159].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [159].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [159].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [159].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [159].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [159].uiModelFlags = 0x3100;
     m_OriginalHandlingData [159].uiHandlingFlags = 0x4;
@@ -6167,7 +6204,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [160].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [160].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [160].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [160].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [160].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [160].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [160].uiModelFlags = 0x3100;
     m_OriginalHandlingData [160].uiHandlingFlags = 0x4;
@@ -6203,7 +6240,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [161].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [161].fSuspensionLowerLimit = -0.130000f;
     m_OriginalHandlingData [161].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [161].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [161].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [161].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [161].uiModelFlags = 0x1100;
     m_OriginalHandlingData [161].uiHandlingFlags = 0x8804;
@@ -6239,7 +6276,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [162].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [162].fSuspensionLowerLimit = -0.160000f;
     m_OriginalHandlingData [162].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [162].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [162].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [162].fCollisionDamageMultiplier = 0.150000f;
     m_OriginalHandlingData [162].uiModelFlags = 0x1002000;
     m_OriginalHandlingData [162].uiHandlingFlags = 0x0;
@@ -6275,7 +6312,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [163].fSuspensionUpperLimit = 0.120000f;
     m_OriginalHandlingData [163].fSuspensionLowerLimit = -0.170000f;
     m_OriginalHandlingData [163].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [163].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [163].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [163].fCollisionDamageMultiplier = 0.110000f;
     m_OriginalHandlingData [163].uiModelFlags = 0x1000000;
     m_OriginalHandlingData [163].uiHandlingFlags = 0x0;
@@ -6311,7 +6348,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [164].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [164].fSuspensionLowerLimit = -0.160000f;
     m_OriginalHandlingData [164].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [164].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [164].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [164].fCollisionDamageMultiplier = 0.150000f;
     m_OriginalHandlingData [164].uiModelFlags = 0x1000000;
     m_OriginalHandlingData [164].uiHandlingFlags = 0x0;
@@ -6347,7 +6384,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [165].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [165].fSuspensionLowerLimit = -0.160000f;
     m_OriginalHandlingData [165].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [165].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [165].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [165].fCollisionDamageMultiplier = 0.110000f;
     m_OriginalHandlingData [165].uiModelFlags = 0x1000000;
     m_OriginalHandlingData [165].uiHandlingFlags = 0x0;
@@ -6383,7 +6420,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [166].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [166].fSuspensionLowerLimit = -0.160000f;
     m_OriginalHandlingData [166].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [166].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [166].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [166].fCollisionDamageMultiplier = 0.150000f;
     m_OriginalHandlingData [166].uiModelFlags = 0x1002000;
     m_OriginalHandlingData [166].uiHandlingFlags = 0x2;
@@ -6419,7 +6456,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [167].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [167].fSuspensionLowerLimit = -0.160000f;
     m_OriginalHandlingData [167].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [167].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [167].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [167].fCollisionDamageMultiplier = 0.150000f;
     m_OriginalHandlingData [167].uiModelFlags = 0x1002000;
     m_OriginalHandlingData [167].uiHandlingFlags = 0x0;
@@ -6455,7 +6492,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [168].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [168].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [168].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [168].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [168].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [168].fCollisionDamageMultiplier = 0.150000f;
     m_OriginalHandlingData [168].uiModelFlags = 0x1000000;
     m_OriginalHandlingData [168].uiHandlingFlags = 0x0;
@@ -6491,7 +6528,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [169].fSuspensionUpperLimit = 0.090000f;
     m_OriginalHandlingData [169].fSuspensionLowerLimit = -0.110000f;
     m_OriginalHandlingData [169].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [169].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [169].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [169].fCollisionDamageMultiplier = 0.240000f;
     m_OriginalHandlingData [169].uiModelFlags = 0x41002000;
     m_OriginalHandlingData [169].uiHandlingFlags = 0x0;
@@ -6527,7 +6564,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [170].fSuspensionUpperLimit = 0.150000f;
     m_OriginalHandlingData [170].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [170].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [170].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [170].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [170].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [170].uiModelFlags = 0x281300;
     m_OriginalHandlingData [170].uiHandlingFlags = 0x205;
@@ -6563,7 +6600,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [171].fSuspensionUpperLimit = 0.200000f;
     m_OriginalHandlingData [171].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [171].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [171].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [171].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [171].fCollisionDamageMultiplier = 0.150000f;
     m_OriginalHandlingData [171].uiModelFlags = 0x41000000;
     m_OriginalHandlingData [171].uiHandlingFlags = 0x0;
@@ -6599,7 +6636,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [172].fSuspensionUpperLimit = 0.200000f;
     m_OriginalHandlingData [172].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [172].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [172].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [172].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [172].fCollisionDamageMultiplier = 0.150000f;
     m_OriginalHandlingData [172].uiModelFlags = 0x41000000;
     m_OriginalHandlingData [172].uiHandlingFlags = 0x0;
@@ -6635,7 +6672,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [173].fSuspensionUpperLimit = 0.200000f;
     m_OriginalHandlingData [173].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [173].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [173].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [173].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [173].fCollisionDamageMultiplier = 0.150000f;
     m_OriginalHandlingData [173].uiModelFlags = 0x41000000;
     m_OriginalHandlingData [173].uiHandlingFlags = 0x2;
@@ -6671,7 +6708,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [174].fSuspensionUpperLimit = 0.090000f;
     m_OriginalHandlingData [174].fSuspensionLowerLimit = -0.110000f;
     m_OriginalHandlingData [174].fSuspensionFrontRearBias = 0.550000f;
-    m_OriginalHandlingData [174].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [174].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [174].fCollisionDamageMultiplier = 0.240000f;
     m_OriginalHandlingData [174].uiModelFlags = 0x1002000;
     m_OriginalHandlingData [174].uiHandlingFlags = 0x0;
@@ -6707,7 +6744,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [175].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [175].fSuspensionLowerLimit = 0.100000f;
     m_OriginalHandlingData [175].fSuspensionFrontRearBias = 0.000000f;
-    m_OriginalHandlingData [175].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [175].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [175].fCollisionDamageMultiplier = 0.330000f;
     m_OriginalHandlingData [175].uiModelFlags = 0x8000000;
     m_OriginalHandlingData [175].uiHandlingFlags = 0x0;
@@ -6743,7 +6780,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [176].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [176].fSuspensionLowerLimit = 0.500000f;
     m_OriginalHandlingData [176].fSuspensionFrontRearBias = 2.000000f;
-    m_OriginalHandlingData [176].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [176].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [176].fCollisionDamageMultiplier = 0.390000f;
     m_OriginalHandlingData [176].uiModelFlags = 0x8000400;
     m_OriginalHandlingData [176].uiHandlingFlags = 0x0;
@@ -6779,7 +6816,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [177].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [177].fSuspensionLowerLimit = 0.100000f;
     m_OriginalHandlingData [177].fSuspensionFrontRearBias = 0.000000f;
-    m_OriginalHandlingData [177].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [177].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [177].fCollisionDamageMultiplier = 0.380000f;
     m_OriginalHandlingData [177].uiModelFlags = 0x8000000;
     m_OriginalHandlingData [177].uiHandlingFlags = 0x0;
@@ -6815,7 +6852,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [178].fSuspensionUpperLimit = 15.000000f;
     m_OriginalHandlingData [178].fSuspensionLowerLimit = 0.100000f;
     m_OriginalHandlingData [178].fSuspensionFrontRearBias = 0.000000f;
-    m_OriginalHandlingData [178].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [178].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [178].fCollisionDamageMultiplier = 0.230000f;
     m_OriginalHandlingData [178].uiModelFlags = 0x8000000;
     m_OriginalHandlingData [178].uiHandlingFlags = 0x0;
@@ -6851,7 +6888,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [179].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [179].fSuspensionLowerLimit = 0.050000f;
     m_OriginalHandlingData [179].fSuspensionFrontRearBias = 0.000000f;
-    m_OriginalHandlingData [179].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [179].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [179].fCollisionDamageMultiplier = 0.330000f;
     m_OriginalHandlingData [179].uiModelFlags = 0x8000400;
     m_OriginalHandlingData [179].uiHandlingFlags = 0x0;
@@ -6887,7 +6924,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [180].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [180].fSuspensionLowerLimit = 0.100000f;
     m_OriginalHandlingData [180].fSuspensionFrontRearBias = 0.000000f;
-    m_OriginalHandlingData [180].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [180].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [180].fCollisionDamageMultiplier = 0.330000f;
     m_OriginalHandlingData [180].uiModelFlags = 0x8000400;
     m_OriginalHandlingData [180].uiHandlingFlags = 0x0;
@@ -6923,7 +6960,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [181].fSuspensionUpperLimit = 3.200000f;
     m_OriginalHandlingData [181].fSuspensionLowerLimit = 0.100000f;
     m_OriginalHandlingData [181].fSuspensionFrontRearBias = 2.500000f;
-    m_OriginalHandlingData [181].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [181].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [181].fCollisionDamageMultiplier = 0.180000f;
     m_OriginalHandlingData [181].uiModelFlags = 0x8000000;
     m_OriginalHandlingData [181].uiHandlingFlags = 0x0;
@@ -6959,7 +6996,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [182].fSuspensionUpperLimit = 3.500000f;
     m_OriginalHandlingData [182].fSuspensionLowerLimit = 0.100000f;
     m_OriginalHandlingData [182].fSuspensionFrontRearBias = 0.700000f;
-    m_OriginalHandlingData [182].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [182].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [182].fCollisionDamageMultiplier = 0.120000f;
     m_OriginalHandlingData [182].uiModelFlags = 0x8000000;
     m_OriginalHandlingData [182].uiHandlingFlags = 0x0;
@@ -6995,7 +7032,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [183].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [183].fSuspensionLowerLimit = 0.000000f;
     m_OriginalHandlingData [183].fSuspensionFrontRearBias = 1.000000f;
-    m_OriginalHandlingData [183].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [183].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [183].fCollisionDamageMultiplier = 0.380000f;
     m_OriginalHandlingData [183].uiModelFlags = 0x8000000;
     m_OriginalHandlingData [183].uiHandlingFlags = 0x0;
@@ -7031,7 +7068,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [184].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [184].fSuspensionLowerLimit = 0.300000f;
     m_OriginalHandlingData [184].fSuspensionFrontRearBias = 1.500000f;
-    m_OriginalHandlingData [184].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [184].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [184].fCollisionDamageMultiplier = 0.450000f;
     m_OriginalHandlingData [184].uiModelFlags = 0x8000400;
     m_OriginalHandlingData [184].uiHandlingFlags = 0x0;
@@ -7067,7 +7104,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [185].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [185].fSuspensionLowerLimit = 0.500000f;
     m_OriginalHandlingData [185].fSuspensionFrontRearBias = 2.000000f;
-    m_OriginalHandlingData [185].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [185].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [185].fCollisionDamageMultiplier = 0.390000f;
     m_OriginalHandlingData [185].uiModelFlags = 0x8000400;
     m_OriginalHandlingData [185].uiHandlingFlags = 0x0;
@@ -7103,7 +7140,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [186].fSuspensionUpperLimit = 0.100000f;
     m_OriginalHandlingData [186].fSuspensionLowerLimit = 0.000000f;
     m_OriginalHandlingData [186].fSuspensionFrontRearBias = 2.000000f;
-    m_OriginalHandlingData [186].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [186].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [186].fCollisionDamageMultiplier = 0.050000f;
     m_OriginalHandlingData [186].uiModelFlags = 0x4000400;
     m_OriginalHandlingData [186].uiHandlingFlags = 0x0;
@@ -7139,7 +7176,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [187].fSuspensionUpperLimit = 0.330000f;
     m_OriginalHandlingData [187].fSuspensionLowerLimit = -0.250000f;
     m_OriginalHandlingData [187].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [187].fSuspensionAntidiveMultiplier = 0.020000f;
+    m_OriginalHandlingData [187].fSuspensionAntiDiveMultiplier = 0.020000f;
     m_OriginalHandlingData [187].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [187].uiModelFlags = 0x301;
     m_OriginalHandlingData [187].uiHandlingFlags = 0x400040;
@@ -7175,7 +7212,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [188].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [188].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [188].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [188].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [188].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [188].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [188].uiModelFlags = 0x4008108;
     m_OriginalHandlingData [188].uiHandlingFlags = 0x400020;
@@ -7211,7 +7248,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [189].fSuspensionUpperLimit = 1.000000f;
     m_OriginalHandlingData [189].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [189].fSuspensionFrontRearBias = 0.350000f;
-    m_OriginalHandlingData [189].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [189].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [189].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [189].uiModelFlags = 0x24000008;
     m_OriginalHandlingData [189].uiHandlingFlags = 0x400000;
@@ -7247,7 +7284,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [190].fSuspensionUpperLimit = 0.550000f;
     m_OriginalHandlingData [190].fSuspensionLowerLimit = -0.050000f;
     m_OriginalHandlingData [190].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [190].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [190].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [190].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [190].uiModelFlags = 0x4008000;
     m_OriginalHandlingData [190].uiHandlingFlags = 0x400020;
@@ -7283,7 +7320,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [191].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [191].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [191].fSuspensionFrontRearBias = 0.900000f;
-    m_OriginalHandlingData [191].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [191].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [191].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [191].uiModelFlags = 0x4008100;
     m_OriginalHandlingData [191].uiHandlingFlags = 0x400020;
@@ -7319,7 +7356,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [192].fSuspensionUpperLimit = 1.000000f;
     m_OriginalHandlingData [192].fSuspensionLowerLimit = -0.000000f;
     m_OriginalHandlingData [192].fSuspensionFrontRearBias = 0.300000f;
-    m_OriginalHandlingData [192].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [192].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [192].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [192].uiModelFlags = 0x400C108;
     m_OriginalHandlingData [192].uiHandlingFlags = 0x400000;
@@ -7355,7 +7392,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [193].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [193].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [193].fSuspensionFrontRearBias = 0.800000f;
-    m_OriginalHandlingData [193].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [193].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [193].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [193].uiModelFlags = 0x4008100;
     m_OriginalHandlingData [193].uiHandlingFlags = 0x400000;
@@ -7391,7 +7428,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [194].fSuspensionUpperLimit = 0.400000f;
     m_OriginalHandlingData [194].fSuspensionLowerLimit = -0.300000f;
     m_OriginalHandlingData [194].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [194].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [194].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [194].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [194].uiModelFlags = 0x400C108;
     m_OriginalHandlingData [194].uiHandlingFlags = 0x400020;
@@ -7427,7 +7464,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [195].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [195].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [195].fSuspensionFrontRearBias = 0.300000f;
-    m_OriginalHandlingData [195].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [195].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [195].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [195].uiModelFlags = 0x2400C008;
     m_OriginalHandlingData [195].uiHandlingFlags = 0x400000;
@@ -7463,7 +7500,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [196].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [196].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [196].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [196].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [196].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [196].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [196].uiModelFlags = 0x24114108;
     m_OriginalHandlingData [196].uiHandlingFlags = 0x440000;
@@ -7499,7 +7536,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [197].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [197].fSuspensionLowerLimit = -0.050000f;
     m_OriginalHandlingData [197].fSuspensionFrontRearBias = 0.200000f;
-    m_OriginalHandlingData [197].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [197].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [197].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [197].uiModelFlags = 0x4000000;
     m_OriginalHandlingData [197].uiHandlingFlags = 0x400000;
@@ -7535,7 +7572,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [198].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [198].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [198].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [198].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [198].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [198].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [198].uiModelFlags = 0x2004000;
     m_OriginalHandlingData [198].uiHandlingFlags = 0x400000;
@@ -7571,7 +7608,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [199].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [199].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [199].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [199].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [199].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [199].fCollisionDamageMultiplier = 0.600000f;
     m_OriginalHandlingData [199].uiModelFlags = 0x2004000;
     m_OriginalHandlingData [199].uiHandlingFlags = 0x400000;
@@ -7607,7 +7644,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [200].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [200].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [200].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [200].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [200].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [200].fCollisionDamageMultiplier = 0.750000f;
     m_OriginalHandlingData [200].uiModelFlags = 0x2004000;
     m_OriginalHandlingData [200].uiHandlingFlags = 0x400000;
@@ -7643,7 +7680,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [201].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [201].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [201].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [201].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [201].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [201].fCollisionDamageMultiplier = 0.650000f;
     m_OriginalHandlingData [201].uiModelFlags = 0x2004000;
     m_OriginalHandlingData [201].uiHandlingFlags = 0x400000;
@@ -7679,7 +7716,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [202].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [202].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [202].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [202].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [202].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [202].fCollisionDamageMultiplier = 0.650000f;
     m_OriginalHandlingData [202].uiModelFlags = 0x2004000;
     m_OriginalHandlingData [202].uiHandlingFlags = 0x400000;
@@ -7715,7 +7752,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [203].fSuspensionUpperLimit = 0.200000f;
     m_OriginalHandlingData [203].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [203].fSuspensionFrontRearBias = 0.850000f;
-    m_OriginalHandlingData [203].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [203].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [203].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [203].uiModelFlags = 0x200C000;
     m_OriginalHandlingData [203].uiHandlingFlags = 0x400000;
@@ -7751,7 +7788,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [204].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [204].fSuspensionLowerLimit = -0.200000f;
     m_OriginalHandlingData [204].fSuspensionFrontRearBias = 0.900000f;
-    m_OriginalHandlingData [204].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [204].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [204].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [204].uiModelFlags = 0x2004000;
     m_OriginalHandlingData [204].uiHandlingFlags = 0x400000;
@@ -7787,7 +7824,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [205].fSuspensionUpperLimit = 0.500000f;
     m_OriginalHandlingData [205].fSuspensionLowerLimit = -0.100000f;
     m_OriginalHandlingData [205].fSuspensionFrontRearBias = 0.300000f;
-    m_OriginalHandlingData [205].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [205].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [205].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [205].uiModelFlags = 0x22004000;
     m_OriginalHandlingData [205].uiHandlingFlags = 0x400000;
@@ -7823,7 +7860,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [206].fSuspensionUpperLimit = 0.200000f;
     m_OriginalHandlingData [206].fSuspensionLowerLimit = -0.150000f;
     m_OriginalHandlingData [206].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [206].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [206].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [206].fCollisionDamageMultiplier = 0.500000f;
     m_OriginalHandlingData [206].uiModelFlags = 0x2004000;
     m_OriginalHandlingData [206].uiHandlingFlags = 0x400000;
@@ -7859,7 +7896,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [207].fSuspensionUpperLimit = 0.250000f;
     m_OriginalHandlingData [207].fSuspensionLowerLimit = -0.000000f;
     m_OriginalHandlingData [207].fSuspensionFrontRearBias = 0.800000f;
-    m_OriginalHandlingData [207].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [207].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [207].fCollisionDamageMultiplier = 0.080000f;
     m_OriginalHandlingData [207].uiModelFlags = 0x4000000;
     m_OriginalHandlingData [207].uiHandlingFlags = 0x20;
@@ -7895,7 +7932,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [208].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [208].fSuspensionLowerLimit = -0.080000f;
     m_OriginalHandlingData [208].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [208].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [208].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [208].fCollisionDamageMultiplier = 0.050000f;
     m_OriginalHandlingData [208].uiModelFlags = 0x2000000;
     m_OriginalHandlingData [208].uiHandlingFlags = 0x0;
@@ -7931,7 +7968,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings ( void )
     m_OriginalHandlingData [209].fSuspensionUpperLimit = 0.280000f;
     m_OriginalHandlingData [209].fSuspensionLowerLimit = -0.080000f;
     m_OriginalHandlingData [209].fSuspensionFrontRearBias = 0.500000f;
-    m_OriginalHandlingData [209].fSuspensionAntidiveMultiplier = 0.000000f;
+    m_OriginalHandlingData [209].fSuspensionAntiDiveMultiplier = 0.000000f;
     m_OriginalHandlingData [209].fCollisionDamageMultiplier = 0.100000f;
     m_OriginalHandlingData [209].uiModelFlags = 0x2000000;
     m_OriginalHandlingData [209].uiHandlingFlags = 0x0;

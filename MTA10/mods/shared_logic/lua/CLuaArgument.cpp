@@ -94,18 +94,6 @@ CLuaArgument::CLuaArgument ( lua_State* luaVM, int iArgument, std::map < const v
     // Read the argument out of the lua VM
     m_pTableData = NULL;
     Read ( luaVM, iArgument, pKnownTables );
-
-    // Store debug data for later retrieval
-    m_iLine = 0;
-    m_strFilename = "";
-    lua_Debug debugInfo;
-    if ( lua_getstack ( luaVM, 1, &debugInfo ) )
-    {
-        lua_getinfo ( luaVM, "nlS", &debugInfo );
-
-        m_strFilename = debugInfo.source;
-        m_iLine = debugInfo.currentline;
-    }
 }
 
 
@@ -384,7 +372,7 @@ void CLuaArgument::Read ( CClientEntity* pElement )
     if ( pElement )
     {   
         m_iType = LUA_TLIGHTUSERDATA;
-        m_pLightUserData = (void*) pElement->GetID ();
+        m_pLightUserData = (void*) reinterpret_cast<unsigned int *>(pElement->GetID ().Value());
     }
     else
         m_iType = LUA_TNIL;
@@ -396,7 +384,7 @@ void CLuaArgument::ReadElementID ( ElementID ID )
     m_strString = "";
     DeleteTableData ();
     m_iType = LUA_TLIGHTUSERDATA;
-    m_pLightUserData = (void*) ID;
+    m_pLightUserData = (void*) reinterpret_cast<unsigned int *>(ID.Value());
 }
 
 
@@ -446,7 +434,10 @@ void CLuaArgument::Push ( lua_State* luaVM, std::map < CLuaArguments*, int > * p
             {
                 if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
                 {
-                    lua_pushvalue ( luaVM, pKnownTables->find ( m_pTableData )->second );
+                    lua_getfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
+					lua_pushnumber ( luaVM, pKnownTables->find ( m_pTableData )->second );
+					lua_gettable ( luaVM, -2 );
+					lua_remove ( luaVM, -2 );
                 }
                 else
                 {
@@ -556,7 +547,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                     delete [] szValue;
                 }
                 else
-                    Read ( "" );
+                    Read ( std::string ( "" ) );
 
                 break;
             }
@@ -566,7 +557,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             {
                 // Read out the elemnt ID
                 ElementID ElementID;
-                if ( bitStream.ReadCompressed ( ElementID ) )
+                if ( bitStream.Read ( ElementID ) )
                 {
                     ReadElementID ( ElementID );
                 }
@@ -694,7 +685,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
                 {
                     type.data.ucType = LUA_TLIGHTUSERDATA;
                     bitStream.Write ( &type );
-                    bitStream.WriteCompressed ( static_cast < ElementID > ( pElement->GetID () ) );
+                    bitStream.Write ( pElement->GetID () );
                 }
                 else
                 {

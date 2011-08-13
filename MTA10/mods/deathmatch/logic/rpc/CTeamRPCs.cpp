@@ -62,7 +62,7 @@ void CTeamRPCs::SetTeamColor ( CClientEntity* pSource, NetBitStreamInterface& bi
 void CTeamRPCs::SetPlayerTeam ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     ElementID PlayerID;
-    if ( bitStream.ReadCompressed ( PlayerID ) )
+    if ( bitStream.Read ( PlayerID ) )
     {
         CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
         CClientTeam* pTeam = NULL;

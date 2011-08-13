@@ -147,12 +147,14 @@ CServerInfo::CServerInfo ( void )
     m_pButtonClose->SetPosition ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-(INFO_BUTTON_WIDTH*2)-(1.5f*INFO_WINDOW_HSPACING), DrawPosY-=INFO_BUTTON_HEIGHT ), false );
     m_pButtonClose->SetSize ( CVector2D ( INFO_BUTTON_WIDTH, INFO_BUTTON_HEIGHT ), false );
     m_pButtonClose->SetClickHandler ( GUI_CALLBACK ( &CServerInfo::OnCloseClicked, this ) );
+    m_pButtonClose->SetZOrderingEnabled ( false );
 
     // Join Game button
     m_pButtonJoinGame = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Join Game" ) );
     m_pButtonJoinGame->SetPosition ( CVector2D ( INFO_WINDOW_DEFAULTWIDTH-INFO_BUTTON_WIDTH-INFO_WINDOW_HSPACING, DrawPosY ), false );
     m_pButtonJoinGame->SetSize ( CVector2D ( INFO_BUTTON_WIDTH, INFO_BUTTON_HEIGHT ), false );
     m_pButtonJoinGame->SetClickHandler ( GUI_CALLBACK ( &CServerInfo::OnJoinGameClicked, this ) );
+    m_pButtonJoinGame->SetZOrderingEnabled ( false );
 
     // Password entry editbox
     m_pEnterPasswordEdit = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pWindow, "" ) );

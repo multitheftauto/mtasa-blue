@@ -110,6 +110,10 @@ public:
     void                UpdateCaptureAxis       ();
     void                UpdateJoypadTab         ();
 
+    void                UpdateAudioTab          ();
+
+    void                UpdateVideoTab          ( bool bIsVideoModeChanged = false );
+
     void                AddKeyBindSection       ( char * szSectionName );
     void                RemoveKeyBindSection    ( char * szSectionName );
     void                RemoveAllKeyBindSections ( void );
@@ -156,6 +160,10 @@ protected:
     CGUILabel*          m_pMapAlphaLabel;
     CGUIScrollBar*      m_pMapAlpha;
     CGUILabel*          m_pMapAlphaValueLabel;
+    CGUILabel*          m_pStreamingMemoryLabel;
+    CGUIScrollBar*      m_pStreamingMemory;
+    CGUILabel*          m_pStreamingMemoryValueLabel;
+    CGUIButton*         m_pVideoDefButton;
 
     CGUILabel*          m_pAsyncLabelInfo;
     CGUILabel*          m_pAsyncLabel;
@@ -168,9 +176,6 @@ protected:
     CGUILabel*          m_pSingleDownloadLabelInfo;
     CGUILabel*          m_pSingleDownloadLabel;
     CGUIComboBox*       m_pSingleDownloadCombo;
-    CGUILabel*          m_pCodePathLabelInfo;
-    CGUILabel*          m_pCodePathLabel;
-    CGUIComboBox*       m_pCodePathCombo;
     CGUILabel*          m_pUpdateBuildTypeLabelInfo;
     CGUILabel*          m_pUpdateBuildTypeLabel;
     CGUIComboBox*       m_pUpdateBuildTypeCombo;
@@ -196,6 +201,7 @@ protected:
     CGUICheckBox*       m_pCheckBoxUserAutoscan;
     CGUILabel*          m_pLabelUserTrackMode;
     CGUIComboBox*       m_pComboUsertrackMode;
+    CGUIButton*         m_pAudioDefButton;
 
     CGUIGridList*       m_pBindsList;
     CGUIButton*         m_pBindsDefButton;
@@ -246,8 +252,6 @@ protected:
     CGUILabel*          m_pChatBlueValue    [ ChatColorTypes::CHAT_COLOR_MAX ];
     CGUILabel*          m_pChatAlphaValue   [ ChatColorTypes::CHAT_COLOR_MAX ];
 
-    CGUIScrollPane*     m_pInterfacePaneScroller;
-
     CGUIScrollPane*     m_pPaneChatFont;
     CGUIRadioButton*    m_pRadioChatFont    [ ChatFonts::CHAT_FONT_MAX ];
 
@@ -263,8 +267,10 @@ protected:
 
     bool                OnJoypadTextChanged     ( CGUIElement* pElement );
     bool                OnAxisSelectClick       ( CGUIElement* pElement );
+    bool                OnAudioDefaultClick     ( CGUIElement* pElement );
     bool                OnJoypadDefaultClick    ( CGUIElement* pElement );
     bool                OnBindsDefaultClick     ( CGUIElement* pElement );
+    bool                OnVideoDefaultClick     ( CGUIElement* pElement );
     bool                OnBindsListClick        ( CGUIElement* pElement );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
@@ -272,6 +278,7 @@ protected:
     bool                OnRegisterButtonClick   ( CGUIElement* pElement );
     bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
     bool                OnBrightnessChanged     ( CGUIElement* pElement );
+    bool                OnStreamingMemoryChanged( CGUIElement* pElement );
     bool                OnMapAlphaChanged       ( CGUIElement* pElement );
     bool                OnRadioVolumeChanged    ( CGUIElement* pElement );
     bool                OnSFXVolumeChanged      ( CGUIElement* pElement );

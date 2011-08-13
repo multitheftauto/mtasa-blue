@@ -31,24 +31,37 @@ extern CGame* g_pGame;
 // This script is loaded into all VM's created.
 const char szPreloadedScript [] = ""\
 
-    // Code for allowing this syntax:  call.resource:exportedFunction (...)
-    // Aswell as the old:              call ( getResourceFromName ( "resource" ), ... )
+    // Code for allowing this syntax:   exports.resourceName:exportedFunctionName (...)
+    //                                  exports["resourceName"]:exportedFunctionName (...)
+    //                                  exports[resourcePointer]:exportedFunctionName (...)
+    // Aswell as the old:               call ( getResourceFromName ( "resourceName" ), "exportedFunctionName", ... )
     "local rescallMT = {}\n" \
     "function rescallMT:__index(k)\n" \
-    "        self[k] = function(res, ...) return call(self.res, k, ...) end\n" \
+    "        if type(k) ~= 'string' then k = tostring(k) end\n" \
+    "        self[k] = function(resExportTable, ...)\n" \
+    "                if type(self.res) == 'userdata' and getResourceRootElement(self.res) then\n" \
+    "                        return call(self.res, k, ...)\n" \
+    "                else\n" \
+    "                        return nil\n" \
+    "                end\n" \
+    "        end\n" \
     "        return self[k]\n" \
     "end\n" \
     "local exportsMT = {}\n" \
     "function exportsMT:__index(k)\n" \
+    "        if type(k) == 'userdata' and getResourceRootElement(k) then\n" \
+    "                return setmetatable({ res = k }, rescallMT)\n" \
+    "        elseif type(k) ~= 'string' then\n" \
+    "                k = tostring(k)\n" \
+    "        end\n" \
     "        local res = getResourceFromName(k)\n" \
-    "        if res then\n" \
-    "                self[k] = setmetatable({ res = res }, rescallMT)\n" \
-    "                return self[k]\n" \
+    "        if res and getResourceRootElement(res) then\n" \
+    "                return setmetatable({ res = res }, rescallMT)\n" \
     "        else\n" \
-    "                outputDebugString(\"exports: Call to non-existing resource (\" .. k .. \")\", 1)\n" \
+    "                outputDebugString('exports: Call to non-running server resource (' .. k .. ')', 1)\n" \
+    "                return setmetatable({}, rescallMT)\n" \
     "        end\n" \
     "end\n" \
-    "addEventHandler(\"onResourceStop\", root, function(res) exports[res] = nil end)\n" \
     "exports = setmetatable({}, exportsMT)\n";
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
@@ -232,13 +245,7 @@ bool CLuaMain::LoadScriptFromFile ( const char* szLUAScript )
         else
         {
             ResetInstructionCount ();
-#ifndef WIN32
-            std::setlocale(LC_ALL, "C");
-#endif
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
-#ifndef WIN32
-            std::setlocale(LC_ALL, "");
-#endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -302,13 +309,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpBuffer, unsigned int uiSize,
         else
         {
             ResetInstructionCount ();
-#ifndef WIN32
-            std::setlocale(LC_ALL, "C");
-#endif
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
-#ifndef WIN32
-            std::setlocale(LC_ALL, "");
-#endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -342,13 +343,7 @@ bool CLuaMain::LoadScript ( const char* szLUAScript )
         if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
-#ifndef WIN32
-            std::setlocale(LC_ALL, "C");
-#endif
             int iret = lua_pcall ( m_luaVM, 0, 0, 0 ) ;
-#ifndef WIN32
-            std::setlocale(LC_ALL, "");
-#endif
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 std::string strRes = ConformResourcePath ( lua_tostring( m_luaVM, -1 ) );
@@ -544,7 +539,7 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
 {
     // Find existing
     SString* pTag = MapFind ( m_FunctionTagMap, iLuaFunction );
-#ifndef MTA_DEBUG
+#ifndef CHECK_FUNCTION_TAG
     if ( !pTag )
 #endif
     {
@@ -577,7 +572,7 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
             strText = SString ( "@func_%d NULL", iLuaFunction );
         }
 
-    #ifdef MTA_DEBUG
+    #ifdef CHECK_FUNCTION_TAG
         if ( pTag )
         {
             // Check tag remains unchanged

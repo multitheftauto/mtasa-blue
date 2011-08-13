@@ -9,19 +9,18 @@
 *
 *****************************************************************************/
 
-#ifndef __CGAME_IHANDLINGMANAGER
-#define __CGAME_IHANDLINGMANAGER
+#ifndef __CGAME_CHandlingManager
+#define __CGAME_CHandlingManager
 
 #include "CHandlingEntry.h"
 
-class IHandlingManager
+class CHandlingManager
 {
 public:
     virtual CHandlingEntry*         CreateHandlingData      ( void ) = 0;
 
     virtual const CHandlingEntry*   GetOriginalHandlingData ( enum eVehicleTypes eModel ) = 0;
-    virtual float                   GetDragMultiplier       ( void ) = 0;
-    virtual float                   GetBasicDragCoeff       ( void ) = 0;
+    virtual eHandlingProperty       GetPropertyEnumFromName ( std::string strName ) = 0;
 };
 
 #endif

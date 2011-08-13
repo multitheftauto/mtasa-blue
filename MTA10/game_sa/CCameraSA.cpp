@@ -545,13 +545,13 @@ void _declspec(naked) HOOK_Camera_CollisionDetection ()
     }
 }
 
-BYTE CCameraSA::GetCameraView ( void )
+BYTE CCameraSA::GetCameraViewMode ( void )
 {
     // TODO: Add support for ped camera view, this will only work on vehicles for now.
     return *(BYTE *)VAR_VehicleCameraView;
 }
 
-VOID CCameraSA::SetCameraView ( BYTE dwCamMode )
+VOID CCameraSA::SetCameraViewMode ( BYTE dwCamMode )
 {
     MemPut < BYTE > ( VAR_VehicleCameraView, dwCamMode );
 }

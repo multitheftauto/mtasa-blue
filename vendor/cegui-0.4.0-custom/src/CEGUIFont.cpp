@@ -503,9 +503,7 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 		drawGlyphToBuffer((void*)glyph,dest_buff, size);
 
 		// define Image on Imageset for this glyph to save re-rendering glyph later
-        char* b    =  new char[];
-        sprintf(b,"%u",i);
-        imageName		= ("glyph_" + d_name + "_" + String(b));
+        imageName		= glyph_set[i];
 		rect.d_left		= (float)cur_x;
 		rect.d_top		= (float)cur_y;
 		rect.d_right	= (float)(cur_x + width - InterGlyphPadSpace);
@@ -513,8 +511,7 @@ void Font::createFontGlyphSet(const String& glyph_set, uint size, argb_t* buffer
 
 		offset.d_x		= (float)(glyph->metrics.horiBearingX >> 6);
 		offset.d_y		= -(float)(glyph->metrics.horiBearingY >> 6);
-
-		d_glyph_images->defineImage(imageName, rect, offset,glyph_set[i]);
+		d_glyph_images->defineImage(imageName, rect, offset, glyph_set[i], this);
 
 		cur_x += width;
 
@@ -1350,13 +1347,13 @@ String Font::OnGlyphDrawn ( unsigned long ulGlyph ) const
     unsigned int iLowerBound = 127;
     unsigned int iUpperBound = 65534;
 
-    std::map< unsigned long, unsigned long >::const_iterator itToErase;
+    std::map< unsigned long, unsigned long >::iterator itToErase;
     bool bErase = false;
 
     std::map< unsigned long, unsigned long >* m_pGlyphCache = const_cast< std::map< unsigned long, unsigned long >* >( &m_GlyphCache );
 
     // Let's check our cache to see if this glyph is already loaded
-    for ( std::map< unsigned long, unsigned long >::const_iterator it = m_pGlyphCache->begin(); it != m_pGlyphCache->end(); ++it )
+    for ( std::map< unsigned long, unsigned long >::iterator it = m_pGlyphCache->begin(); it != m_pGlyphCache->end(); ++it )
     {
         // If we're in range of another cache, we only update that cache
         if ( (unsigned int)abs((int)(it->first - ulGlyph)) <= iRange )

@@ -15,6 +15,7 @@
 
 class CClientColRectangle : public CClientColShape
 {
+    DECLARE_CLASS( CClientColRectangle, CClientColShape )
 public:
                             CClientColRectangle     ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, const CVector2D& vecSize );
 

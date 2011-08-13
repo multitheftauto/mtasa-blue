@@ -64,8 +64,8 @@ public:
     virtual float                   GetDXCharacterWidth ( char c, float fScale = 1.0f, ID3DXFont * pDXFont = NULL ) = 0;
     virtual float                   GetDXTextExtent     ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL ) = 0;
 
-    virtual bool                    LoadFont            ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont ) = 0;
-    virtual bool                    DestroyFont         ( std::string strFontPath ) = 0;
+    virtual bool                    LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont ) = 0;
+    virtual bool                    DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pD3DXFont ) = 0;
 
     virtual ID3DXFont *             GetFont             ( eFontType fontType = FONT_DEFAULT ) = 0;
     virtual eFontType               GetFontType         ( const char* szFontName ) = 0;
@@ -92,12 +92,12 @@ public:
                                                           unsigned long ulColor,
                                                           bool bPostGUI ) = 0;
 
-    virtual bool                    DrawTextureQueued   ( float fX, float fY,
+    virtual void                    DrawTextureQueued   ( float fX, float fY,
                                                           float fWidth, float fHeight,
                                                           float fU, float fV,
                                                           float fSizeU, float fSizeV, 
                                                           bool bRelativeUV,
-                                                          const std::string& strFilename,
+                                                          CMaterialItem* pMaterial,
                                                           float fRotation,
                                                           float fRotCenOffX,
                                                           float fRotCenOffY,
@@ -113,6 +113,10 @@ public:
                                                           unsigned long ulFormat,
                                                           ID3DXFont * pDXFont,
                                                           bool bPostGUI ) = 0;
+
+    virtual void                    EnableSetRenderTarget       ( bool bEnable ) = 0;
+    // Subsystems
+    virtual CRenderItemManagerInterface*   GetRenderItemManager  ( void ) = 0;
 };
 
 #endif

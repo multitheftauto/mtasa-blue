@@ -312,61 +312,21 @@ eInputMode CGUI_Impl::GetGUIInputMode( void )
     return m_eInputMode;
 }
 
-eInputMode CGUI_Impl::GetInputModeFromString ( const std::string& a_rstrMode ) const
+CEGUI::String CGUI_Impl::GetUTFString ( const char* szInput )
 {
-    const char* szMode = a_rstrMode.c_str();
-    if ( stricmp(szMode, "allow_binds") == 0 )
-    {
-        return INPUTMODE_ALLOW_BINDS;
-    }
-    else if ( stricmp(szMode, "no_binds") == 0 )
-    {
-        return INPUTMODE_NO_BINDS;
-    }
-    else if ( stricmp(szMode, "no_binds_when_editing") == 0 )
-    {
-        return INPUTMODE_NO_BINDS_ON_EDIT;
-    }
-    else
-    {
-        return INPUTMODE_INVALID;
-    }
-}
-
- 
-bool CGUI_Impl::GetStringFromInputMode ( eInputMode a_eMode, std::string& a_rstrResult ) const
-{
-    switch (a_eMode)
-    {
-    case INPUTMODE_ALLOW_BINDS:
-        {
-            a_rstrResult = "allow_binds";
-            return true;
-        }
-    case INPUTMODE_NO_BINDS:            
-        {
-            a_rstrResult = "no_binds";
-            return true;
-        }
-    case INPUTMODE_NO_BINDS_ON_EDIT:    
-        {
-            a_rstrResult = "no_binds_when_editing";
-            return true;
-        }
-    default:                           
-        return false;
-    }
+    CEGUI::String strUTF = (CEGUI::utf8*)szInput; //Convert into a CEGUI String
+    return GetUTFString ( strUTF );
 }
 
 CEGUI::String CGUI_Impl::GetUTFString ( const std::string strInput )
 {
-    std::wstring strUTF = MbUTF8ToUTF16(strInput); //Convert to a typical wide string
+    CEGUI::String strUTF = (CEGUI::utf8*)strInput.c_str(); //Convert into a CEGUI String
     return GetUTFString ( strUTF );
 }
 
-CEGUI::String CGUI_Impl::GetUTFString ( const std::wstring strLine )
+CEGUI::String CGUI_Impl::GetUTFString ( const CEGUI::String strInput )
 {
-    return CEGUI::String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(strLine)).c_str()); //Convert into a CEGUI String
+    return strInput.bidify();  // Bidify the string
 }
 
 void CGUI_Impl::ProcessCharacter ( unsigned long ulCharacter )
@@ -517,7 +477,7 @@ bool CGUI_Impl::LoadImageset ( const SString& strFilename )
 {
     try
     {
-        return GetImageSetManager()->createImageset ( strFilename ) != NULL;
+        return GetImageSetManager()->createImageset ( strFilename, "", true ) != NULL;
     }
 	catch (CEGUI::AlreadyExistsException exc)
     {
@@ -728,7 +688,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                 if ( strTemp.length () > 0 )
                 {
                     // Convert it to Unicode
-                    std::wstring strUTF = GetBidiString(MbUTF8ToUTF16(strTemp.c_str()));
+                    std::wstring strUTF = MbUTF8ToUTF16(strTemp.bidify().c_str());
 
                     // Open and empty the clipboard
                     OpenClipboard ( NULL );
@@ -783,12 +743,11 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                                 CloseClipboard();
                                 return true;
                             }
-                            strEditText = WndEdit->getText ();
+                            strEditText = WndEdit->getText ().bidify();
                             iSelectionStart = WndEdit->getSelectionStartIndex ();
                             iSelectionLength = WndEdit->getSelectionLength();
                             iMaxLength = WndEdit->getMaxTextLength();
                             iCaratIndex = WndEdit->getCaratIndex();
-                            strEditText = WndEdit->getText();
                         }
                         else
                         {
@@ -799,16 +758,15 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                                 CloseClipboard();
                                 return true;
                             }
-                            strEditText = WndEdit->getText ();
+                            strEditText = WndEdit->getText ().bidify();
                             iSelectionStart = WndEdit->getSelectionStartIndex ();
                             iSelectionLength = WndEdit->getSelectionLength();
                             iMaxLength = WndEdit->getMaxTextLength();
                             iCaratIndex = WndEdit->getCaratIndex();
-                            strEditText = WndEdit->getText();
                             bReplaceNewLines = false;
                         }
 
-                        std::wstring strClipboardText = GetBidiString(ClipboardBuffer);
+                        std::wstring strClipboardText = ClipboardBuffer;
                         size_t iNewlineIndex;
 
                         // Remove the newlines inserting spaces instead
@@ -885,13 +843,13 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                             if ( Wnd->getType ( ) == "CGUI/Editbox" )
                             {
                                 CEGUI::Editbox* WndEdit = reinterpret_cast < CEGUI::Editbox* > ( Wnd );  
-                                WndEdit->setText ( strEditText );
+                                WndEdit->setText ( strEditText, true );
                                 WndEdit->setCaratIndex ( iCaratIndex );
                             }
                             else
                             {
                                 CEGUI::MultiLineEditbox* WndEdit = reinterpret_cast < CEGUI::MultiLineEditbox* > ( Wnd );  
-                                WndEdit->setText ( strEditText );
+                                WndEdit->setText ( strEditText, true );
                                 WndEdit->setCaratIndex ( iCaratIndex );
                             }
                         }
@@ -1496,6 +1454,11 @@ CGUITabPanel* CGUI_Impl::CreateTabPanel ( CGUITab* pParent )
 CGUITabPanel* CGUI_Impl::CreateTabPanel ( void )
 {
     return _CreateTabPanel ( NULL );
+}
+
+CGUIScrollPane* CGUI_Impl::CreateScrollPane ( void )
+{
+    return _CreateScrollPane ( NULL );
 }
 
 CGUIScrollPane* CGUI_Impl::CreateScrollPane ( CGUIElement* pParent )

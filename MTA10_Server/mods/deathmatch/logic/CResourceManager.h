@@ -63,10 +63,9 @@ public:
                                 CResourceManager                ( void );
                                 ~CResourceManager               ( void );
 
-    CResource *                 Load                            ( const char * szResourceName );
+    CResource *                 Load                            ( bool bIsZipped, const char * szAbsPath, const char * szResourceName );
     void                        Unload                          ( CResource * resource );
     CResource *                 GetResource                     ( const char * szResourceName );
-    CResource *                 GetResource                     ( unsigned short usID );
     bool                        Exists                          ( CResource* pResource );
     void                        UnloadRemovedResources          ( void );
     void                        CheckResourceDependencies       ( void );
@@ -102,6 +101,11 @@ public:
 
     static bool                 ParseResourcePathInput          ( std::string strInput, CResource*& pResource, std::string* pstrPath, std::string* pstrMetaPath );
 
+    void                        NotifyResourceVMOpen            ( CResource* pResource, CLuaMain* pVM );
+    void                        NotifyResourceVMClose           ( CResource* pResource, CLuaMain* pVM );
+
+    void                        AddResourceToLists              ( CResource* pResource );
+    void                        RemoveResourceFromLists         ( CResource* pResource );
 
 private:
     char                        m_szResourceDirectory[260];
@@ -110,6 +114,11 @@ private:
     unsigned int                m_uiResourceFailedCount;
     bool                        m_bResourceListChanged;
     list<CResource *>           m_resourcesToStartAfterRefresh;
+
+    // Maps to speed things up
+    std::map < CResource*, lua_State* >     m_ResourceLuaStateMap;
+    std::map < lua_State*, CResource* >     m_LuaStateResourceMap;
+    std::map < SString, CResource* >        m_NameResourceMap;
 
     list<sResourceQueue>        m_resourceQueue;
 };

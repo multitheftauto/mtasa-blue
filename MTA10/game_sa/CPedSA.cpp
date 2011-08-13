@@ -384,7 +384,7 @@ CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
             // If the weapon is satchels, load the detonator too
             if ( weaponType == WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
             {
-                int iModel = pGame->GetWeaponInfo ( WEAPONTYPE_DETONATOR )->GetModel();
+                /*int iModel = pGame->GetWeaponInfo ( WEAPONTYPE_DETONATOR )->GetModel();
                 if ( iModel )
                 {
                     CModelInfo * pWeaponModel = pGame->GetModelInfo ( iModel );
@@ -392,7 +392,9 @@ CWeapon * CPedSA::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
                     {
                         pWeaponModel->Request ( true, true );
                     }
-                }
+                }*/
+                // Load the weapon and give it properly so getPedWeapon shows the weapon is there.
+                GiveWeapon( WEAPONTYPE_DETONATOR, 1 );
             }
         }
     }

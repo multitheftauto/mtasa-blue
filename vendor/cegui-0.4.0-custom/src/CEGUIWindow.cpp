@@ -907,7 +907,7 @@ void Window::setText(const String& text, bool bidify)
     }
     else
     {
-        String bidiText = String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(MbUTF8ToUTF16(text.c_str()))).c_str());  //Really ugly but CEGUI strings suck
+        String& bidiText = text.bidify();
         if ( bidiText == d_text )
             return;
         d_text = bidiText;

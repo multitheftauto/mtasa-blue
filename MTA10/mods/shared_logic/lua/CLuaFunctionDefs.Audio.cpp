@@ -133,8 +133,8 @@ int CLuaFunctionDefs::SetSoundPosition ( lua_State* luaVM )
         CClientSound* pSound = lua_tosound ( luaVM, 1 );
         if ( pSound )
         {
-            unsigned int uiPosition = ( unsigned int ) lua_tonumber ( luaVM, 2 );
-            if ( CStaticFunctionDefinitions::SetSoundPosition ( *pSound, uiPosition ) )
+            double dPosition = lua_tonumber ( luaVM, 2 );
+            if ( CStaticFunctionDefinitions::SetSoundPosition ( *pSound, dPosition ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -153,10 +153,10 @@ int CLuaFunctionDefs::GetSoundPosition ( lua_State* luaVM )
         CClientSound* pSound = lua_tosound ( luaVM, 1 );
         if ( pSound )
         {
-            unsigned int uiPosition = 0;
-            if ( CStaticFunctionDefinitions::GetSoundPosition ( *pSound, uiPosition ) )
+            double dPosition = 0;
+            if ( CStaticFunctionDefinitions::GetSoundPosition ( *pSound, dPosition ) )
             {
-                lua_pushnumber ( luaVM, uiPosition );
+                lua_pushnumber ( luaVM, dPosition );
                 return 1;
             }
         }
@@ -173,10 +173,10 @@ int CLuaFunctionDefs::GetSoundLength ( lua_State* luaVM )
         CClientSound* pSound = lua_tosound ( luaVM, 1 );
         if ( pSound )
         {
-            unsigned int uiLength = 0;
-            if ( CStaticFunctionDefinitions::GetSoundLength ( *pSound, uiLength ) )
+            double dLength = 0;
+            if ( CStaticFunctionDefinitions::GetSoundLength ( *pSound, dLength ) )
             {
-                lua_pushnumber ( luaVM, uiLength );
+                lua_pushnumber ( luaVM, dLength );
                 return 1;
             }
         }
@@ -398,7 +398,6 @@ int CLuaFunctionDefs::GetSoundMetaTags ( lua_State* luaVM )
         CClientSound* pSound = lua_tosound ( luaVM, 1 );
         if ( pSound )
         {
-            //pSound->ShowShoutcastMetaTags ();
             SString strMetaTags = "";
             if ( lua_istype ( luaVM, 2, LUA_TSTRING ) )
             {
@@ -633,4 +632,64 @@ int CLuaFunctionDefs::PreloadMissionAudio ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::SetAmbientSoundEnabled ( lua_State* luaVM )
+{
+    eAmbientSoundType eType; bool bEnabled;
 
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( eType, AMBIENT_SOUND_GENERAL );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetAmbientSoundEnabled ( eType, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setAmbientSoundEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::IsAmbientSoundEnabled ( lua_State* luaVM )
+{
+    eAmbientSoundType eType;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( eType );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bResultEnabled;
+        if ( CStaticFunctionDefinitions::IsAmbientSoundEnabled ( eType, bResultEnabled ) )
+        {
+            lua_pushboolean ( luaVM, bResultEnabled );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isAmbientSoundEnabled", *argStream.GetErrorMessage () ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::ResetAmbientSounds ( lua_State* luaVM )
+{
+    if ( CStaticFunctionDefinitions::ResetAmbientSounds () )
+    {
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "resetAmbientSounds" );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

@@ -91,10 +91,12 @@ void CCommunityRegistration::CreateWindows ( void )
     m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Register" ) );
     m_pButtonRegister->SetPosition ( CVector2D ( 100.0f, 270.0f ), false );
     m_pButtonRegister->SetSize ( CVector2D ( 90.0f, 20.0f ), false );
+    m_pButtonRegister->SetZOrderingEnabled ( false );
 
     m_pButtonCancel = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "Cancel" ) );
     m_pButtonCancel->SetPosition ( CVector2D ( 200.0f, 270.0f ), false );
     m_pButtonCancel->SetSize ( CVector2D ( 70.0f, 20.0f ), false );
+    m_pButtonRegister->SetZOrderingEnabled ( false );
 
     m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonRegisterClick, this ) );
     m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CCommunityRegistration::OnButtonCancelClick, this ) );

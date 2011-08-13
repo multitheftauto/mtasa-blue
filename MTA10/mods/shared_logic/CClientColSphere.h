@@ -15,6 +15,7 @@
 
 class CClientColSphere : public CClientColShape
 {
+    DECLARE_CLASS( CClientColSphere, CClientColShape )
 public:
                     CClientColSphere        ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius );
 

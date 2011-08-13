@@ -16,6 +16,9 @@
 
 #include <game/CHandlingEntry.h>
 #include "Common.h"
+#define FUNC_HandlingDataMgr_ConvertDataToGameUnits 0x6F5080
+// http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
+// http://www.gtamodding.com/index.php?title=Memory_Addresses_%28SA%29#Handling
 
 class CTransmissionSAInterface
 {
@@ -57,6 +60,7 @@ struct tHandlingDataSA
     float           fBrakeDeceleration;             // +148
     float           fBrakeBias;                     // +152
     bool            bABS;                           // +156
+    char            fUnknown[3];                    // +157
 
     float           fSteeringLock;                  // +160
     float           fTractionLoss;                  // +164
@@ -68,7 +72,7 @@ struct tHandlingDataSA
     float           fSuspensionUpperLimit;          // +184
     float           fSuspensionLowerLimit;          // +188
     float           fSuspensionFrontRearBias;       // +192
-    float           fSuspensionAntidiveMultiplier;  // +196
+    float           fSuspensionAntiDiveMultiplier;  // +196
 
     float           fCollisionDamageMultiplier;     // +200
 
@@ -80,7 +84,6 @@ struct tHandlingDataSA
     unsigned char   ucHeadLight     : 8;            // +220
     unsigned char   ucTailLight     : 8;            // +221
     unsigned char   ucAnimGroup     : 8;            // +222
-    unsigned char   ucUnused        : 8;            // +223
 };
 
 
@@ -90,23 +93,13 @@ public:
                     // Constructor for creatable dummy entries
                     CHandlingEntrySA                ( void );
 
-                    // Constructor for game linked entries
-                    CHandlingEntrySA                ( tHandlingDataSA* pDataSA, tHandlingDataSA* pOriginalUncalculatedData );
-
                     // Constructor for original entries
                     CHandlingEntrySA                ( tHandlingDataSA* pOriginal );
 
     virtual         ~CHandlingEntrySA               ( void );
 
-    bool            IsVehicleAdded                  ( CVehicle* pVeh );
-    // We add a vehicle to this entry
-    void            AddVehicle                      ( CVehicle* pVeh );
-
     // Use this to copy data from an another handling class to this
     void            Assign                          ( const CHandlingEntry* pData );
-
-    // Remove a vehicle from list
-    void            RemoveVehicle                   ( CVehicle* pVeh );
 
     // Get functions
     float           GetMass                         ( void ) const    { return m_Handling.fMass; };
@@ -139,7 +132,7 @@ public:
     float           GetSuspensionUpperLimit         ( void ) const    { return m_Handling.fSuspensionUpperLimit; };
     float           GetSuspensionLowerLimit         ( void ) const    { return m_Handling.fSuspensionLowerLimit; };
     float           GetSuspensionFrontRearBias      ( void ) const    { return m_Handling.fSuspensionFrontRearBias; };
-    float           GetSuspensionAntidiveMultiplier ( void ) const    { return m_Handling.fSuspensionAntidiveMultiplier; };
+    float           GetSuspensionAntiDiveMultiplier ( void ) const    { return m_Handling.fSuspensionAntiDiveMultiplier; };
 
     float           GetCollisionDamageMultiplier    ( void ) const    { return m_Handling.fCollisionDamageMultiplier; };
 
@@ -184,7 +177,7 @@ public:
     void            SetSuspensionUpperLimit         ( float fUpperLimit )           { m_Handling.fSuspensionUpperLimit = fUpperLimit; };
     void            SetSuspensionLowerLimit         ( float fLowerLimit )           { m_Handling.fSuspensionLowerLimit = fLowerLimit; };
     void            SetSuspensionFrontRearBias      ( float fBias )                 { m_Handling.fSuspensionFrontRearBias = fBias; };
-    void            SetSuspensionAntidiveMultiplier ( float fAntidive )             { m_Handling.fSuspensionAntidiveMultiplier = fAntidive; };
+    void            SetSuspensionAntiDiveMultiplier ( float fAntidive )             { m_Handling.fSuspensionAntiDiveMultiplier = fAntidive; };
 
     void            SetCollisionDamageMultiplier    ( float fMultiplier )           { m_Handling.fCollisionDamageMultiplier = fMultiplier; };
 
@@ -199,8 +192,6 @@ public:
 
     void            Recalculate                     ( void );
 
-    void            Restore                         ( void );
-
     tHandlingDataSA*    GetInterface                ( void )                        { return m_pHandlingSA; };
 
 private:
@@ -210,7 +201,6 @@ private:
     tHandlingDataSA         m_Handling;
 
     tHandlingDataSA*        m_pOriginalData;
-    std::list < CVehicleSA* > m_VehicleList;    // Single vehicles to apply data to
 };
 
 #endif

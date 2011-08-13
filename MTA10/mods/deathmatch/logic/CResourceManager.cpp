@@ -68,7 +68,7 @@ CResource* CResourceManager::GetResource ( const char* szResourceName )
     list < CResource* > ::const_iterator iter = m_resources.begin ();
     for ( ; iter != m_resources.end (); iter++ )
     {
-        if ( strcmp ( ( *iter )->GetName(), szResourceName ) == 0 )
+        if ( stricmp ( ( *iter )->GetName(), szResourceName ) == 0 )
             return ( *iter );
     }
     return NULL;
@@ -132,6 +132,14 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
 bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
+    eAccessType accessType = ACCESS_PUBLIC;
+
+    if ( strInput[0] == '@' )
+    {
+        accessType = ACCESS_PRIVATE;
+        strInput = strInput.substr ( 1 );
+    }
+
     if ( strInput[0] == ':' )
     {
         unsigned int iEnd = strInput.find_first_of("/");
@@ -144,7 +152,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
                 strMetaPath = strInput.substr(iEnd+1);
                 if ( IsValidFilePath ( strMetaPath.c_str() ) )
                 {
-                    strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strMetaPath;
+                    strPath = PathJoin ( pResource->GetResourceDirectoryPath ( accessType ), strMetaPath );
                     return true;
                 }
             }
@@ -152,7 +160,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
     }
     else if ( pResource && IsValidFilePath ( strInput.c_str() ) )
     {
-        strPath = pResource->GetResourceDirectoryPath() + std::string("/") + strInput;
+        strPath = PathJoin ( pResource->GetResourceDirectoryPath ( accessType ), strInput );
         strMetaPath = strInput;
         return true;
     }

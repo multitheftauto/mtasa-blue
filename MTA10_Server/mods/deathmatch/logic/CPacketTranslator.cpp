@@ -137,6 +137,10 @@ CPacket* CPacketTranslator::Translate ( NetServerPlayerID& Socket, ePacketID Pac
             pTemp = new CPlayerDiagnosticPacket;
             break;
 
+        case PACKET_ID_PLAYER_MODINFO:
+            pTemp = new CPlayerModInfoPacket;
+            break;
+
         default: break;
     }
 

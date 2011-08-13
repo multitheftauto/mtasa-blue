@@ -118,8 +118,6 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
         pCore->GetCommands ()->Add ( "showinterpolation",   "shows information about the interpolation",        COMMAND_ShowInterpolation );
         
         pCore->GetCommands ()->Add ( "watch",               "enables wpm watch mode",                           COMMAND_Watch );
-        pCore->GetCommands ()->Add ( "hash",                "enables wpm hash",                                 COMMAND_Hash );
-        pCore->GetCommands ()->Add ( "hasharray",           "enables wpm hash array",                           COMMAND_HashArray );
         pCore->GetCommands ()->Add ( "modules",             "enables wpm module",                               COMMAND_Modules );
 
         pCore->GetCommands ()->Add ( "debug",               "debug function 1",                                 COMMAND_Debug );
@@ -222,6 +220,15 @@ void CClient::PreFrameExecutionHandler ( void )
     if ( g_pClientGame )
     {
         g_pClientGame->DoPulsePreFrame ();
+    }
+}
+
+
+void CClient::PreHUDRenderExecutionHandler ( bool bDidUnminimize, bool bDidRecreateRenderTargets )
+{
+    if ( g_pClientGame )
+    {
+        g_pClientGame->DoPulsePreHUDRender ( bDidUnminimize, bDidRecreateRenderTargets );
     }
 }
 

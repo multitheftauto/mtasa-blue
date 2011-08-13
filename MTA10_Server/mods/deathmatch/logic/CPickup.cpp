@@ -21,6 +21,7 @@ CPickup::CPickup ( CElement* pParent, CXMLNode* pNode, CPickupManager* pPickupMa
     // Init
     m_pPickupManager = pPickupManager;
     m_pCollision = new CColSphere ( pColManager, NULL, m_vecPosition, 2.0f, NULL, true );
+    m_pCollision->SetEnabled( false );
     m_pCollision->SetCallback ( this );
     m_pCollision->SetAutoCallEvent ( false );
 
@@ -36,6 +37,7 @@ CPickup::CPickup ( CElement* pParent, CXMLNode* pNode, CPickupManager* pPickupMa
     m_fAmount = 0;
     m_ulRespawnIntervals = 30000;
     m_ulLastUsedTime = 0;
+    m_ulCreationTime = GetTime();
     m_usModel = CPickupManager::GetWeaponModel ( m_ucWeaponType );
     m_bVisible = true;
     m_bSpawned = true;

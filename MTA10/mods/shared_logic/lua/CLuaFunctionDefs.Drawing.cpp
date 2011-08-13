@@ -138,101 +138,48 @@ int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 {
-    // dxDrawText ( string text,int left,int top [,int right=left,int bottom=top,int color=0xffffffff,float scale=1,string font="default",string alignX="left",string alignY="top",bool clip=false,bool wordBreak=false] )
-    // Grab all argument types
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+//  bool dxDrawText ( string text, int left, int top [, int right=left, int bottom=top, int color=white, float scale=1, mixed font="default", 
+//      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI] )
+    SString strText; int iLeft; int iTop; int iRight; int iBottom; ulong ulColor; float fScaleX; float fScaleY; SString strFontName; CClientDxFont* pDxFontElement;
+    eDXHorizontalAlign alignX; eDXVerticalAlign alignY; bool bClip; bool bWordBreak; bool bPostGUI;
 
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TSTRING ) &&
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) && 
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strText );
+    argStream.ReadNumber ( iLeft );
+    argStream.ReadNumber ( iTop );
+    argStream.ReadNumber ( iRight, iLeft );
+    argStream.ReadNumber ( iBottom, iTop );
+    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadNumber ( fScaleX, 1 );
+    if ( argStream.NextIsNumber () )
+        argStream.ReadNumber ( fScaleY );
+    else
+        fScaleY = fScaleX;
+    MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
+    argStream.ReadEnumString ( alignX, DX_ALIGN_LEFT );
+    argStream.ReadEnumString ( alignY, DX_ALIGN_TOP );
+    argStream.ReadBool ( bClip, false );
+    argStream.ReadBool ( bWordBreak, false );
+    argStream.ReadBool ( bPostGUI, false );
+
+    if ( !argStream.HasErrors () )
     {
-        const char * szText = lua_tostring ( luaVM, 1 );
-        int iLeft = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-        int iTop = static_cast < int > ( lua_tonumber ( luaVM, 3 ) );
-        int iRight = iLeft;
-        int iBottom = iTop;        
-        unsigned long ulColor = 0xFFFFFFFF;
-        float fScale = 1.0f;
-        unsigned long ulFormat = 0;
-        bool bClip = false;
-        bool bPostGUI = false;
-        const char * szFontName = "";
-        CResource* pResource =  pLuaMain->GetResource();
+        // Get DX font
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement );
 
-        int iArgument4 = lua_type ( luaVM, 4 );
-        if ( ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) )
-        {
-            iRight = static_cast < int > ( lua_tonumber ( luaVM, 4 ) );
+        // Make format flag
+        ulong ulFormat = alignX | alignY;
+        //if ( ulFormat & DT_BOTTOM ) ulFormat |= DT_SINGLELINE;        MS says we should do this. Nobody tells me what to do.
+        if ( bWordBreak )           ulFormat |= DT_WORDBREAK;
+        if ( !bClip )               ulFormat |= DT_NOCLIP;
 
-            int iArgument5 = lua_type ( luaVM, 5 );
-            if ( ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
-            {
-                iBottom = static_cast < int > ( lua_tonumber ( luaVM, 5 ) );
+        CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI );
 
-                int iArgument6 = lua_type ( luaVM, 6 );
-                if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
-                {
-                    ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 6 ) );
-
-                    int iArgument7 = lua_type ( luaVM, 7 );
-                    if ( ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING ) )
-                    {
-                        fScale = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
-
-                        int iArgument8 = lua_type ( luaVM, 8 );
-                        if ( iArgument8 == LUA_TSTRING )
-                        {
-                            szFontName = lua_tostring ( luaVM, 8 );
-                            
-                            if ( lua_type ( luaVM, 9 ) == LUA_TSTRING )
-                            {
-                                const char * szTemp = lua_tostring ( luaVM, 9 );
-                                if ( !stricmp ( szTemp, "center" ) )
-                                    ulFormat |= DT_CENTER;
-                                else if ( !stricmp ( szTemp, "right" ) )
-                                    ulFormat |= DT_RIGHT;
-
-                                if ( lua_type ( luaVM, 10 ) == LUA_TSTRING )
-                                {
-                                    const char * szTemp = lua_tostring ( luaVM, 10 );
-                                    if ( !stricmp ( szTemp, "center" ) )
-                                        ulFormat |= DT_VCENTER;
-                                    else if ( !stricmp ( szTemp, "bottom" ) )
-                                        ulFormat |= ( DT_BOTTOM | DT_SINGLELINE );
-
-                                    if ( lua_type ( luaVM, 11 ) == LUA_TBOOLEAN )
-                                    {
-                                        bClip = ( lua_toboolean ( luaVM, 11 ) ) ? true:false;
-
-                                        if ( lua_type ( luaVM, 12 ) == LUA_TBOOLEAN )
-                                        {
-                                            if ( lua_toboolean ( luaVM, 12 ) )
-                                                ulFormat |= DT_WORDBREAK;
-                                            if ( lua_type ( luaVM, 13 ) == LUA_TBOOLEAN )
-                                            {
-                                                bPostGUI = ( lua_toboolean ( luaVM, 13 ) ) ? true:false;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if ( !bClip ) ulFormat |= DT_NOCLIP;
-
-        CStaticFunctionDefinitions::DrawText ( iLeft, iTop, iRight, iBottom, ulColor, szText, fScale, fScale, ulFormat, szFontName, bPostGUI, pResource );
-
-        // Success
         lua_pushboolean ( luaVM, true );
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawText" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawText", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -295,84 +242,36 @@ int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
 {
-    // dxDrawImage ( float x,float y,float width,float height,string filename,[float rotation,
-    //            float rotCenOffX, float rotCenOffY, int color=0xffffffff, bool postgui] )
+//  bool dxDrawImage ( float posX, float posY, float width, float height, string filepath [, float rotation = 0, float rotationCenterOffsetX = 0, 
+//      float rotationCenterOffsetY = 0, int color = white, bool postGUI = false ] )
+    float fPosX; float fPosY; float fWidth; float fHeight; CClientMaterial* pMaterialElement; float fRotation;
+        float fRotCenOffX; float fRotCenOffY; uint ulColor; bool bPostGUI;
 
-    // Grab all argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) && 
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) && 
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) && 
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-        (                              iArgument5 == LUA_TSTRING ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fPosX );
+    argStream.ReadNumber ( fPosY );
+    argStream.ReadNumber ( fWidth );
+    argStream.ReadNumber ( fHeight );
+    MixedReadMaterialString ( argStream, pMaterialElement );
+    argStream.ReadNumber ( fRotation, 0 );
+    argStream.ReadNumber ( fRotCenOffX, 0 );
+    argStream.ReadNumber ( fRotCenOffY, 0 );
+    argStream.ReadNumber ( ulColor, 0xffffffff );
+    argStream.ReadBool ( bPostGUI, false );
+
+    if ( !argStream.HasErrors () )
     {
-        float fX = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
-        float fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-        float fWidth = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-        float fHeight = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-        const char * szFile = lua_tostring ( luaVM, 5 );
-        float fRotation = 0;
-        float fRotCenOffX = 0;
-        float fRotCenOffY = 0;
-        unsigned long ulColor = 0xFFFFFFFF;
-
-        int iArgument6 = lua_type ( luaVM, 6 );
-        if ( ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) )
+        if ( pMaterialElement )
         {
-            fRotation = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
+            g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, 0, 0, 1, 1, true, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-
-        int iArgument7 = lua_type ( luaVM, 7 );
-        if ( ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING ) )
-        {
-            fRotCenOffX = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
-        }
-
-        int iArgument8 = lua_type ( luaVM, 8 );
-        if ( ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING ) )
-        {
-            fRotCenOffY = static_cast < float > ( lua_tonumber ( luaVM, 8 ) );
-        }
-
-        int iArgument9 = lua_type ( luaVM, 9 );
-        if ( ( iArgument9 == LUA_TNUMBER || iArgument9 == LUA_TSTRING ) )
-        {
-            ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 9 ) );
-        }
-
-        // Got a post gui specifier?
-        bool bPostGUI = false;
-        int iArgument10 = lua_type ( luaVM, 10 );
-        if ( iArgument10 == LUA_TBOOLEAN )
-        {
-            bPostGUI = ( lua_toboolean ( luaVM, 10 ) ) ? true:false;
-        }
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-
-        // Check for a valid (and sane) file path
-        if ( pResource && szFile )
-        {
-            // Get the correct directory
-            SString strPath;
-            if ( CResourceManager::ParseResourcePathInput( szFile, pResource, strPath ) &&
-                 g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, 0, 0, 1, 1, true, strPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
-            {
-                // Success
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-
-            m_pScriptDebugging->LogError ( luaVM, "dxDrawImage can't load %s", szFile );
-        }
+        else
+            m_pScriptDebugging->LogError ( luaVM, "dxDrawImage can't load file" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawImage" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawImage", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -382,97 +281,40 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
 {
-    // dxDrawImageSection ( float x,float y,float width,float height,float u, float v, float usize, float vsize, filename,[float rotation=0,
-    //            float rotCenOffX=0, float rotCenOffY=0, int color=0xffffffff, bool postgui=false] )
+//  bool dxDrawImageSection ( float posX, float posY, float width, float height, float u, float v, float usize, float vsize, string filepath, 
+//      [ float rotation = 0, float rotationCenterOffsetX = 0, float rotationCenterOffsetY = 0, int color = white, bool postGUI = false ] )
+    float fPosX; float fPosY; float fWidth; float fHeight; float fU; float fV; float fSizeU; float fSizeV; CClientMaterial* pMaterialElement;
+         float fRotation; float fRotCenOffX; float fRotCenOffY; uint ulColor; bool bPostGUI;
 
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fPosX );
+    argStream.ReadNumber ( fPosY );
+    argStream.ReadNumber ( fWidth );
+    argStream.ReadNumber ( fHeight );
+    argStream.ReadNumber ( fU );
+    argStream.ReadNumber ( fV );
+    argStream.ReadNumber ( fSizeU );
+    argStream.ReadNumber ( fSizeV );
+    MixedReadMaterialString ( argStream, pMaterialElement );
+    argStream.ReadNumber ( fRotation, 0 );
+    argStream.ReadNumber ( fRotCenOffX, 0 );
+    argStream.ReadNumber ( fRotCenOffY, 0 );
+    argStream.ReadNumber ( ulColor, 0xffffffff );
+    argStream.ReadBool ( bPostGUI, false );
 
-    // Grab all argument types
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    int iArgument7 = lua_type ( luaVM, 7 );
-    int iArgument8 = lua_type ( luaVM, 8 );
-    int iArgument9 = lua_type ( luaVM, 9 );
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) && 
-        ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) && 
-        ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) && 
-        ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-        ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) &&
-        ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING ) &&
-        ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING ) &&
-        ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING ) &&
-        (                              iArgument9 == LUA_TSTRING ) )
+    if ( !argStream.HasErrors () )
     {
-        float fX = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
-        float fY = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-        float fWidth = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
-        float fHeight = static_cast < float > ( lua_tonumber ( luaVM, 4 ) );
-        float fU = static_cast < float > ( lua_tonumber ( luaVM, 5 ) );
-        float fV = static_cast < float > ( lua_tonumber ( luaVM, 6 ) );
-        float fSizeU = static_cast < float > ( lua_tonumber ( luaVM, 7 ) );
-        float fSizeV = static_cast < float > ( lua_tonumber ( luaVM, 8 ) );
-        const char * szFile = lua_tostring ( luaVM, 9 );
-        float fRotation = 0;
-        float fRotCenOffX = 0;
-        float fRotCenOffY = 0;
-        unsigned long ulColor = 0xFFFFFFFF;
-
-        int iArgument10 = lua_type ( luaVM, 10 );
-        if ( ( iArgument10 == LUA_TNUMBER || iArgument10 == LUA_TSTRING ) )
+        if ( pMaterialElement )
         {
-            fRotation = static_cast < float > ( lua_tonumber ( luaVM, 10 ) );
+            g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, fU, fV, fSizeU, fSizeV, false, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-
-        int iArgument11 = lua_type ( luaVM, 11 );
-        if ( ( iArgument11 == LUA_TNUMBER || iArgument11 == LUA_TSTRING ) )
-        {
-            fRotCenOffX = static_cast < float > ( lua_tonumber ( luaVM, 11 ) );
-        }
-
-        int iArgument12 = lua_type ( luaVM, 12 );
-        if ( ( iArgument12 == LUA_TNUMBER || iArgument12 == LUA_TSTRING ) )
-        {
-            fRotCenOffY = static_cast < float > ( lua_tonumber ( luaVM, 12 ) );
-        }
-
-        int iArgument13 = lua_type ( luaVM, 13 );
-        if ( ( iArgument13 == LUA_TNUMBER || iArgument13 == LUA_TSTRING ) )
-        {
-            ulColor = static_cast < unsigned long > ( lua_tonumber ( luaVM, 13 ) );
-        }
-
-        // Got a post gui specifier?
-        bool bPostGUI = false;
-        int iArgument14 = lua_type ( luaVM, 14 );
-        if ( iArgument14 == LUA_TBOOLEAN )
-        {
-            bPostGUI = ( lua_toboolean ( luaVM, 14 ) ) ? true:false;
-        }
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-
-        // Check for a valid (and sane) file path
-        if ( pResource && szFile )
-        {
-            // Get the correct directory
-            SString strPath;
-            if ( CResourceManager::ParseResourcePathInput( szFile, pResource, strPath ) &&
-                 g_pCore->GetGraphics ()->DrawTextureQueued ( fX, fY, fWidth, fHeight, fU, fV, fSizeU, fSizeV, false, strPath, fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI ) )
-            {
-                // Success
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-
-            m_pScriptDebugging->LogError ( luaVM, "dxDrawImageSection can't load %s", szFile );
-        }
+        else
+            m_pScriptDebugging->LogError ( luaVM, "dxDrawImageSection can't load file" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "dxDrawImageSection" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxDrawImageSection", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -482,54 +324,36 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 {
-    // dxGetTextWidth ( string text, [float scale=1,string font="default"] )
+//  float dxGetTextWidth ( string text, [float scale=1, mixed font="default"] )
+    SString strText; float fScale; SString strFontName; CClientDxFont* pDxFontElement;
 
-    if ( lua_type ( luaVM, 1 ) == LUA_TSTRING )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strText );
+    argStream.ReadNumber ( fScale, 1 );
+    MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
+
+    if ( !argStream.HasErrors () )
     {
-        const char * szText = lua_tostring ( luaVM, 1 );
-        float fScale = 1.0f;
-        eFontType fontType = FONT_DEFAULT;
-        ID3DXFont * pFont = NULL;
-
-        int iArgument2 = lua_type ( luaVM, 2 );
-        if ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING )
-        {
-            fScale = static_cast < float > ( lua_tonumber ( luaVM, 2 ) );
-
-            if ( lua_type ( luaVM, 3 ) == LUA_TSTRING )
-            {
-                CResource* pResource =  m_pLuaManager->GetVirtualMachine(luaVM)->GetResource();
-                // sanitize the input
-                const char * szFontName = lua_tostring ( luaVM, 3 );
-                SString strPath, strMetaPath;
-                if ( CResourceManager::ParseResourcePathInput( szFontName, pResource, strPath, strMetaPath ) && FileExists(strPath) && 
-                     g_pClientGame->GetScriptFontLoader()->GetDXFont(&pFont,strPath,strMetaPath,pResource,fScale,fScale) )
-                {}
-                else
-                {
-                    fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFontName ) );
-                    pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
-                }
-            }
-        }
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement );
 
         // Retrieve the longest line's extent
-        std::stringstream ssText ( szText );
+        std::stringstream ssText ( strText );
         std::string sLineText;
         float fWidth = 0.0f, fLineExtent = 0.0f;
 
         while( std::getline ( ssText, sLineText ) )
         {
-            fLineExtent = g_pCore->GetGraphics ()->GetDXTextExtent ( sLineText.c_str ( ), fScale, pFont );
+            fLineExtent = g_pCore->GetGraphics ()->GetDXTextExtent ( sLineText.c_str ( ), fScale, pD3DXFont );
             if ( fLineExtent > fWidth )
                 fWidth = fLineExtent;
         }
+
         // Success
         lua_pushnumber ( luaVM, fWidth );
         return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "dxGetTextWidth" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetTextWidth", *argStream.GetErrorMessage () ) );
 
     // Failed
     lua_pushboolean ( luaVM, false );
@@ -539,111 +363,398 @@ int CLuaFunctionDefs::dxGetTextWidth ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxGetFontHeight ( lua_State* luaVM )
 {
-    // dxGetFontHeight ( [float scale=1,string font="default"] )
+//  int dxGetFontHeight ( [float scale=1, mixed font="default"] )
+    float fScale; SString strFontName; CClientDxFont* pDxFontElement;
 
-    float fScale = 1.0f;
-    eFontType fontType = FONT_DEFAULT;
-    ID3DXFont * pFont = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fScale, 1 );
+    MixedReadDxFontString ( argStream, strFontName, "default", pDxFontElement );
 
-    int iArgument1 = lua_type ( luaVM, 1 );
-    if ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING )
+    if ( !argStream.HasErrors () )
     {
-        fScale = static_cast < float > ( lua_tonumber ( luaVM, 1 ) );
+        ID3DXFont* pD3DXFont = CStaticFunctionDefinitions::ResolveD3DXFont ( strFontName, pDxFontElement );
 
-        if ( lua_type ( luaVM, 2 ) == LUA_TSTRING )
-        {
-            const char * szFontName = lua_tostring ( luaVM, 2 );
-            CResource* pResource =  m_pLuaManager->GetVirtualMachine(luaVM)->GetResource();
-            // sanitize the input
-            SString strPath, strMetaPath;
-            if ( CResourceManager::ParseResourcePathInput( szFontName, pResource, strPath, strMetaPath ) && FileExists(strPath) && 
-                 g_pClientGame->GetScriptFontLoader()->GetDXFont(&pFont,strPath,strMetaPath,pResource,fScale,fScale) )
-            {}
-            else
-            {
-                fontType = g_pCore->GetGraphics ()->GetFontType ( const_cast < char * > ( szFontName ) );
-                pFont = g_pCore->GetGraphics ()->GetFont ( fontType );
-            }
-        }
+        float fHeight = g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, pD3DXFont );
+        // Success
+        lua_pushnumber ( luaVM, fHeight );
+        return 1;
     }
-    float fHeight = g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, pFont );
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetFontHeight", *argStream.GetErrorMessage () ) );
 
-    // Success
-    lua_pushnumber ( luaVM, fHeight );
+    // Failed
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
-int CLuaFunctionDefs::LoadFont ( lua_State* luaVM )
+
+int CLuaFunctionDefs::dxCreateTexture ( lua_State* luaVM )
 {
-    bool bResult = false;
+//  element dxCreateTexture( string filepath )
+    SString strFilePath;
 
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strFilePath );
+
+    if ( !argStream.HasErrors () )
     {
-        if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            CResource* pResource =  pLuaMain->GetResource();
-            // sanitize the input
-            SString strFile = lua_tostring ( luaVM, 1 );
+            CResource* pParentResource = pLuaMain->GetResource ();
+            CResource* pFileResource = pParentResource;
             SString strPath, strMetaPath;
-            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath, strMetaPath ) )
+            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
             {
-                if ( FileExists(strPath) )
+                if ( FileExists ( strPath ) )
                 {
-                    bool bBold = false;
-                    unsigned int uiSize = 9;
-                    if ( lua_istype ( luaVM, 2, LUA_TBOOLEAN ) )
-                        bBold = lua_toboolean ( luaVM, 2 ) ? true : false;
-                    if ( lua_istype ( luaVM, 3, LUA_TNUMBER ) )
-                        uiSize = static_cast < uint > ( lua_tonumber ( luaVM, 3 ) );
-
-                    bResult = CStaticFunctionDefinitions::LoadFont ( strPath, bBold, uiSize, strMetaPath, pResource );
+                    CClientTexture* pTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateTexture ( strPath );
+                    if ( pTexture )
+                    {
+                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                        pTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                    }
+                    lua_pushelement ( luaVM, pTexture );
+                    return 1;
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateTexture", "file-path", 1 );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );               
+                m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateTexture", "file-path", 1 );
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateTexture", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
-    lua_pushboolean ( luaVM, bResult );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
-int CLuaFunctionDefs::UnloadFont ( lua_State* luaVM )
-{
-    bool bResult = false;
 
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
+int CLuaFunctionDefs::dxCreateShader ( lua_State* luaVM )
+{
+//  element dxCreateShader( string filepath [, bool debug] )
+    SString strFilePath; bool bDebug;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strFilePath );
+    argStream.ReadBool ( bDebug, false );
+
+    if ( !argStream.HasErrors () )
     {
-        if ( lua_istype ( luaVM, 1, LUA_TSTRING ) )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            CResource* pResource =  pLuaMain->GetResource();
-            // sanitize the input
-            SString strFile = lua_tostring ( luaVM, 1 );
+            CResource* pParentResource = pLuaMain->GetResource ();
+            CResource* pFileResource = pParentResource;
             SString strPath, strMetaPath;
-            if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath, strMetaPath ) )
+            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
             {
-                if ( FileExists(strPath) )
+                if ( FileExists ( strPath ) )
                 {
-                    bResult = CStaticFunctionDefinitions::UnloadFont ( strPath, strMetaPath, pResource );
+                    SString strRootPath = strPath.Left ( strPath.length () - strMetaPath.length () );
+                    SString strStatus;
+                    CClientShader* pShader = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateShader ( strPath, strRootPath, strStatus, bDebug );
+                    if ( pShader )
+                    {
+                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                        pShader->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                        lua_pushelement ( luaVM, pShader );
+                        lua_pushstring ( luaVM, strStatus );    // String containing name of technique being used.
+                        return 2;
+                    }
+                    else
+                    {
+                        // Replace any path in the error message with our own one
+                        SString strRootPathWithoutResource = strRootPath.Left ( strRootPath.TrimEnd ( "\\" ).length () - SStringX ( pFileResource->GetName () ).length () ) ;
+                        strStatus = strStatus.ReplaceI ( strRootPathWithoutResource, "" );
+                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Problem @ '%s' [%s]", "dxCreateShader", *strStatus ) );
+                    }
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );
+                    m_pScriptDebugging->LogCustom ( luaVM, SString ( "Missing file @ '%s' [%s]", "dxCreateShader", *ConformResourcePath ( strPath, true ) ) );
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );               
+                m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad file-path @ '%s' [%s]", "dxCreateShader", *strFilePath ) );
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "loadFont", "file-path", 1 );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateShader", *argStream.GetErrorMessage () ) );
 
     // error: bad arguments
-    lua_pushboolean ( luaVM, bResult );
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxCreateRenderTarget ( lua_State* luaVM )
+{
+//  element dxCreateRenderTarget( int sizeX, int sizeY [, int withAlphaChannel = false ] )
+    uint uiSizeX; uint uiSizeY; bool bWithAlphaChannel;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( uiSizeX );
+    argStream.ReadNumber ( uiSizeY );
+    argStream.ReadBool ( bWithAlphaChannel, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CResource* pParentResource = pLuaMain ? pLuaMain->GetResource () : NULL;
+        if ( pParentResource )
+        {
+            CClientRenderTarget* pRenderTarget = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateRenderTarget ( uiSizeX, uiSizeY, bWithAlphaChannel );
+            if ( pRenderTarget )
+            {
+                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                pRenderTarget->SetParent ( pParentResource->GetResourceDynamicEntity () );
+            }
+            lua_pushelement ( luaVM, pRenderTarget );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateRenderTarget", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxCreateScreenSource ( lua_State* luaVM )
+{
+//  element dxCreateScreenSource( int sizeX, int sizeY )
+    uint uiSizeX; uint uiSizeY;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( uiSizeX );
+    argStream.ReadNumber ( uiSizeY );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CResource* pParentResource = pLuaMain ? pLuaMain->GetResource () : NULL;
+        if ( pParentResource )
+        {
+            CClientScreenSource* pScreenSource = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateScreenSource ( uiSizeX, uiSizeY );
+            if ( pScreenSource )
+            {
+                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                pScreenSource->SetParent ( pParentResource->GetResourceDynamicEntity () );
+            }
+            lua_pushelement ( luaVM, pScreenSource );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateScreenSource", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxGetMaterialSize ( lua_State* luaVM )
+{
+//  int, int dxGetMaterialSize( element material )
+    CClientMaterial* pMaterial; SString strName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMaterial );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->m_uiSizeX );
+        lua_pushnumber ( luaVM, pMaterial->GetMaterialItem ()->m_uiSizeY );
+        return 2;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxGetMaterialSize", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
+{
+//  bool dxSetShaderValue( element shader, string name, mixed value )
+    CClientShader* pShader; SString strName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pShader );
+    argStream.ReadString ( strName );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Try each mixed type in turn
+        int iArgument = lua_type ( argStream.m_luaVM, argStream.m_iIndex );
+
+        if ( iArgument == LUA_TLIGHTUSERDATA )
+        {
+            // Texture
+            CClientTexture* pTexture;
+            if ( argStream.ReadUserData ( pTexture ) )
+            {
+                bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, pTexture->GetTextureItem () );
+                lua_pushboolean ( luaVM, bResult );
+                return 1;
+            }
+        }
+        else
+        if ( iArgument == LUA_TBOOLEAN )
+        {
+            // bool
+            bool bValue;
+            if ( argStream.ReadBool ( bValue ) )
+            {
+                bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, bValue );
+                lua_pushboolean ( luaVM, bResult );
+                return 1;
+            }
+        }
+        else
+        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
+        {
+            // float(s)
+            float fBuffer[16];
+            uint i;
+            for ( i = 0 ; i < NUMELMS(fBuffer); i++ )
+            {
+                fBuffer[i] = static_cast < float > ( lua_tonumber ( argStream.m_luaVM, argStream.m_iIndex++ ) );
+                iArgument = lua_type ( argStream.m_luaVM, argStream.m_iIndex );
+                if ( iArgument != LUA_TNUMBER && iArgument != LUA_TSTRING )
+                    break;
+            }
+            bool bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetShaderValue ( pShader->GetShaderItem (), strName, fBuffer, i + 1 );
+            lua_pushboolean ( luaVM, bResult );
+            return 1;
+        }
+        else
+        if ( iArgument == LUA_TTABLE )
+        {
+            // table (of floats)
+            float fBuffer[16];
+            for ( uint i = 0 ; i < NUMELMS(fBuffer); i++ )
+            {
+                // TODO
+            }
+        }
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetShaderValue", "Expected number, bool, table or texture at argument 3" ) );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetShaderValue", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxSetRenderTarget ( lua_State* luaVM )
+{
+//  bool setRenderTaget( element renderTarget [, bool clear = false ] )
+    CClientRenderTarget* pRenderTarget; bool bClear;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pRenderTarget, NULL );
+    argStream.ReadBool ( bClear, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bResult;
+        if ( pRenderTarget)
+            bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->SetRenderTarget ( pRenderTarget->GetRenderTargetItem (), bClear );
+        else
+            bResult = g_pCore->GetGraphics ()->GetRenderItemManager ()->RestoreDefaultRenderTarget ();
+
+        if ( bResult )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad usage @ '%s' [%s]", "dxSetRenderTarget", "dxSetRenderTarget can only be used inside certain events" ) );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxSetRenderTarget", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxUpdateScreenSource ( lua_State* luaVM )
+{
+//  bool dxUpdateScreenSource( element screenSource )
+    CClientScreenSource* pScreenSource;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pScreenSource );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pCore->GetGraphics ()->GetRenderItemManager ()->UpdateScreenSource ( pScreenSource->GetScreenSourceItem () );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxUpdateScreenSource", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::dxCreateFont ( lua_State* luaVM )
+{
+//  element dxCreateFont( string filepath [, int size=9, bool bold=false ] )
+    SString strFilePath; int iSize; bool bBold;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strFilePath );
+    argStream.ReadNumber ( iSize, 9 );
+    argStream.ReadBool ( bBold, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CResource* pParentResource = pLuaMain->GetResource ();
+            CResource* pFileResource = pParentResource;
+            SString strPath;
+            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath ) )
+            {
+                if ( FileExists ( strPath ) )
+                {
+                    CClientDxFont* pDxFont = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateDxFont ( strPath, iSize, bBold );
+                    if ( pDxFont )
+                    {
+                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                        pDxFont->SetParent ( pParentResource->GetResourceDynamicEntity () );
+                    }
+                    lua_pushelement ( luaVM, pDxFont );
+                    return 1;
+                }
+                else
+                    m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateFont", "file-path", 1 );
+            }
+            else
+                m_pScriptDebugging->LogBadPointer ( luaVM, "dxCreateFont", "file-path", 1 );
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "dxCreateFont", *argStream.GetErrorMessage () ) );
+
+    // error: bad arguments
+    lua_pushboolean ( luaVM, false );
     return 1;
 }

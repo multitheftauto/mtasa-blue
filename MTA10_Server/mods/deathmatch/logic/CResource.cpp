@@ -44,7 +44,7 @@ extern int errno;
 
 // (IJs) This class contains very nasty unchecked and unproper code. Please revise.
 
-CResource::CResource ( CResourceManager * resourceManager, const char * szResourceName, bool bLoad )
+CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const char * szAbsPath, const char * szResourceName )
 {
     m_bHandlingHTTPRequest = false;
     m_pDefaultElementGroup = NULL;
@@ -54,6 +54,7 @@ CResource::CResource ( CResourceManager * resourceManager, const char * szResour
     m_zipfile = NULL;
 
     // store the name
+    m_strAbsPath = szAbsPath;
     m_strResourceName = szResourceName ? szResourceName : "";
 
     // Initialize
@@ -68,7 +69,7 @@ CResource::CResource ( CResourceManager * resourceManager, const char * szResour
     m_pVM = NULL;
     m_timeLoaded = 0;
     m_timeStarted = 0;
-    m_bResourceIsZip = false;
+    m_bResourceIsZip = bIsZipped;
     m_bProtected = false;
     m_bStartedManually = false;
 
@@ -86,8 +87,7 @@ CResource::CResource ( CResourceManager * resourceManager, const char * szResour
 
     m_bDoneUpgradeWarnings = false;
 
-    if ( bLoad )
-        Load();
+    Load ();
 }
 
 bool CResource::Load ( void )
@@ -105,7 +105,6 @@ bool CResource::Load ( void )
         m_bLinked = false;
         m_pResourceElement = NULL;
         m_pResourceDynamicElementRoot = NULL;
-        m_bResourceIsZip = false;
         m_bProtected = false;
         m_bStartedManually = false;
 
@@ -132,24 +131,13 @@ bool CResource::Load ( void )
         this->RegisterEHS ( this, "call" );
 
         // Store the actual directory and zip paths for fast access
-        const char* szServerModPath = g_pServerInterface->GetServerModPath ();
+        m_strResourceDirectoryPath  = PathJoin ( m_strAbsPath, m_strResourceName, "/" );
+        m_strResourceCachePath      = PathJoin ( g_pServerInterface->GetServerModPath (), "resource-cache", "unzipped", m_strResourceName, "/" );
+        m_strResourceZip            = PathJoin ( m_strAbsPath, m_strResourceName + ".zip" );
 
-        char szBuffer[MAX_PATH];
-        snprintf ( szBuffer, MAX_PATH - 1, "%s/resources/%s/", szServerModPath, m_strResourceName.c_str () );
-        m_strResourceDirectoryPath = szBuffer;
-        snprintf ( szBuffer, MAX_PATH - 1, "%s/resource-cache/unzipped/%s/", szServerModPath, m_strResourceName.c_str () );
-        m_strResourceCachePath = szBuffer;
-        snprintf ( szBuffer, MAX_PATH - 1, "%s/resources/%s.zip", szServerModPath, m_strResourceName.c_str () );
-        m_strResourceZip = szBuffer;
-
-        // Check for our resource directory
-        if ( DoesDirectoryExist ( m_strResourceDirectoryPath.c_str () ) )
+        if ( m_bResourceIsZip )
         {
-            m_bResourceIsZip = false;
-        }
-        else
-        {
-            // OK, we didn't have a resource directory, it must be a zip file instead
+            // See if zip file is actually a zip file
             m_zipfile = unzOpen ( m_strResourceZip.c_str () );
             if ( !m_zipfile )
             {
@@ -157,16 +145,14 @@ bool CResource::Load ( void )
                 g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
                 // Show error
-                snprintf ( szBuffer, MAX_PATH - 1, "Couldn't find resource archive or directory (%s) for resource '%s'.\n", m_strResourceDirectoryPath.c_str (), m_strResourceName.c_str () );
-                m_strFailureReason = szBuffer;
-                CLogger::ErrorPrintf ( szBuffer );
+                m_strFailureReason = SString ( "Couldn't find resource archive or directory (%s) for resource '%s'.\n", m_strResourceDirectoryPath.c_str (), m_strResourceName.c_str () );
+                CLogger::ErrorPrintf ( m_strFailureReason );
                 return false;
             }
 
             // Close the zip file
             unzClose ( m_zipfile );
             m_zipfile = NULL;
-            m_bResourceIsZip = true;
 
             // See if the dir already exists
             bool bDirExists = DoesDirectoryExist ( m_strResourceCachePath.c_str () );
@@ -183,9 +169,8 @@ bool CResource::Load ( void )
                     g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
                     // Show error
-                    snprintf ( szBuffer, MAX_PATH - 1, "Couldn't create directory '%s' for resource '%s', check that the server has write access to the resources folder.\n", m_strResourceCachePath.c_str (), m_strResourceName.c_str () );
-                    m_strFailureReason = szBuffer;
-                    CLogger::ErrorPrintf ( szBuffer );
+                    m_strFailureReason = SString ( "Couldn't create directory '%s' for resource '%s', check that the server has write access to the resources folder.\n", m_strResourceCachePath.c_str (), m_strResourceName.c_str () );
+                    CLogger::ErrorPrintf ( m_strFailureReason );
                     return false;
                 }
             }
@@ -199,9 +184,8 @@ bool CResource::Load ( void )
             g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
 
             // Show error
-            snprintf ( szBuffer, MAX_PATH - 1, "Couldn't find meta.xml file for resource '%s'\n", m_strResourceName.c_str () );
-            m_strFailureReason = szBuffer;
-            CLogger::ErrorPrintf ( szBuffer );
+            m_strFailureReason = SString ( "Couldn't find meta.xml file for resource '%s'\n", m_strResourceName.c_str () );
+            CLogger::ErrorPrintf ( m_strFailureReason );
             return false;
         }
 
@@ -351,7 +335,7 @@ bool CResource::Load ( void )
 
                                 if ( !FileCopy ( strSrcFilePath.c_str (), strDstFilePath.c_str () ) )
                                 {
-                                    CLogger::LogPrintf ( "Could not copy Copy '%s' to '%s'\n", strSrcFilePath.c_str (), strDstFilePath.c_str () );
+                                    CLogger::LogPrintf ( "Could not copy '%s' to '%s'\n", strSrcFilePath.c_str (), strDstFilePath.c_str () );
                                 }
                             }
                         }
@@ -364,15 +348,7 @@ bool CResource::Load ( void )
             }
         }
 
-       // if  ( stricmp ( this->GetName(), "updtest" ) == 0 )
-      //      printf ( "0x%X\n", m_ulCRC );
         m_bLoaded = true;
-
-        /*CLuaArguments Arguments;
-        Arguments.PushResource ( this );
-        m_pRootElement->CallEvent ( "onResourceLoad", Arguments );*/
-        //currently called before the events are initialised @Kevuwk
-
         m_bDoneUpgradeWarnings = false;
    }
 
@@ -953,7 +929,10 @@ bool CResource::CreateVM ( void )
 {
     // Create the virtual machine
     if ( m_pVM == NULL )
+    {
         m_pVM = g_pGame->GetLuaManager ()->CreateVirtualMachine ( this );
+        m_resourceManager->NotifyResourceVMOpen ( this, m_pVM );
+    }
 
     if ( m_pVM )
     {
@@ -979,6 +958,7 @@ bool CResource::DestroyVM ( void )
     m_pRootElement->DeleteEvents ( m_pVM, true );
 
     // Delete the virtual machine
+    m_resourceManager->NotifyResourceVMClose ( this, m_pVM );
     g_pGame->GetLuaManager ()->RemoveVirtualMachine ( m_pVM );
     m_pVM = NULL;
     return true;
@@ -1255,6 +1235,10 @@ bool CResource::GetFilePath ( const char * szFilename, string& strPath )
 #endif
         return true;
     }
+
+    // Don't check zip file if resource was not identified as zipped
+    if ( !IsResourceZip () )
+        return false;
 
     if ( !m_zipfile )
         m_zipfile = unzOpen(m_strResourceZip.c_str ());
@@ -2120,6 +2104,9 @@ bool CResource::LinkToIncludedResources ( void )
         if ( !(*iterr)->CreateLink() )
         {
             m_bLinked = false;
+
+            if ( m_strFailureReason.empty () )
+                m_strFailureReason = SString ( "Failed to link to %s", (*iterr)->GetName ().c_str () );
 #ifdef RESOURCE_DEBUG_MESSAGES
             CLogger::LogPrintf ( "  Links to %s .. FAILED\n", (*iterr)->GetName().c_str () );
 #endif
@@ -2367,6 +2354,13 @@ void CResource::RemoveDependent ( CResource * resource )
 
 ResponseCode CResource::HandleRequest ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
+    if ( !g_pGame->IsServerFullyUp () )
+    {
+        SStringX strWait ( "The server is not ready. Please try again in a minute." );
+        ipoHttpResponse->SetBody ( strWait.c_str (), strWait.size () );
+        return HTTPRESPONSECODE_200_OK;
+    }
+
     // if the mutex is already locked (i.e. the resource is being deleted), we return from this asap
     // otherwise, we get the mutex and can handle the request
 

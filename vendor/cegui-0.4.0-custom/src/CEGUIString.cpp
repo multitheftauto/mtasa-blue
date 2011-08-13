@@ -25,6 +25,7 @@
 *************************************************************************/
 #include "StdInc.h"
 #include "CEGUIString.h"
+#include "CEGUIStringBidi.h"
 
 #include <iostream>
 
@@ -137,6 +138,13 @@ utf8* String::build_utf8_buff(void) const
     return d_encodedbuff;
 }
 
+//Get the bidirectional version of the string
+String String::bidify(void) const
+{
+    String tmp = *this;
+    doBidi(tmp.ptr(), length(), true, true);
+    return tmp;
+}
 
 
 //////////////////////////////////////////////////////////////////////////

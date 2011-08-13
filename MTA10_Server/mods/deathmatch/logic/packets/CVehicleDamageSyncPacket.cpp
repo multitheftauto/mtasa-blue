@@ -20,14 +20,14 @@ CVehicleDamageSyncPacket::CVehicleDamageSyncPacket ()
 
 bool CVehicleDamageSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
-     return ( BitStream.ReadCompressed ( m_Vehicle ) &&
+     return ( BitStream.Read ( m_Vehicle ) &&
               BitStream.Read ( &m_damage ) );
 }
 
 
 bool CVehicleDamageSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
-    BitStream.WriteCompressed ( m_Vehicle );
+    BitStream.Write ( m_Vehicle );
     BitStream.Write ( &m_damage );
 
     return true;

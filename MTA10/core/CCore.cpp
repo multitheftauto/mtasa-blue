@@ -21,6 +21,7 @@
 #include <Aclapi.h>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #include "SharedUtil.hpp"
+#include <clocale>
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -95,6 +96,10 @@ CCore::CCore ( void )
     #endif
     
     m_pConfigFile = NULL;
+
+    // Set our locale to the C locale, except for character handling which is the system's default
+    std::setlocale(LC_ALL,"C");
+    std::setlocale(LC_CTYPE,"");
 
     // NULL the path buffers
     memset ( m_szInstallRoot, 0, MAX_PATH );
@@ -200,6 +205,8 @@ CCore::CCore ( void )
     m_dLastTimeMs = 0;
     m_dPrevOverrun = 0;
     m_uiNewNickWaitFrames = 0;
+    m_iUnminimizeFrameCounter = 0;
+    m_bDidRecreateRenderTargets = false;
 }
 
 CCore::~CCore ( void )
@@ -644,9 +651,9 @@ bool CCore::IsConnected ( void )
 }
 
 
-bool CCore::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword )
+bool CCore::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave )
 {
-    return m_pConnectManager->Reconnect ( szHost, usPort, szPassword );
+    return m_pConnectManager->Reconnect ( szHost, usPort, szPassword, bSave );
 }
 
 
@@ -1109,6 +1116,9 @@ void CCore::DoPostFramePulse ( )
             {
                 m_bFirstFrame = false;
 
+                // Disable vsync while it's all dark
+                m_pGame->DisableVSync ();
+
                 // Parse the command line
                 // Does it begin with mtasa://?
                 if ( m_szCommandLineArgs && strnicmp ( m_szCommandLineArgs, "mtasa://", 8 ) == 0 )
@@ -1258,6 +1268,8 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "chatscrolldown",    "scrolls the chatbox downwards",    CCommandFuncs::ChatScrollDown );
     m_pCommands->Add ( "debugscrollup",     "scrolls the debug view upwards",   CCommandFuncs::DebugScrollUp );
     m_pCommands->Add ( "debugscrolldown",   "scrolls the debug view downwards", CCommandFuncs::DebugScrollDown );
+
+    m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
 
 #ifdef MTA_DEBUG
     //m_pCommands->Add ( "pools",               "read out the pool values",         CCommandFuncs::PoolRelocations );
@@ -1615,19 +1627,7 @@ void CCore::UpdateRecentlyPlayed()
         CServerList* pRecentList = pServerBrowser->GetRecentList ();
         pRecentList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
         pRecentList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET, true );
-
-        // Update our address history if need be
-        if (    pServerBrowser->m_bManualConnect 
-             && strHost == pServerBrowser->m_strManualHost  
-             && uiPort == pServerBrowser->m_usManualPort
-           )
-        {
-            CServerList* pHistoryList = pServerBrowser->GetHistoryList ();
-            pHistoryList->Remove ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET );
-            pHistoryList->AddUnique ( Address, uiPort + SERVER_LIST_QUERY_PORT_OFFSET ); 
-            pServerBrowser->CreateHistoryList();
-        }
-        
+       
         pServerBrowser->SaveRecentlyPlayedList();
         if ( !m_pConnectManager->m_strLastPassword.empty() )
             pServerBrowser->SetServerPassword ( strHost + ":" + SString("%u",uiPort), m_pConnectManager->m_strLastPassword );
@@ -1779,8 +1779,16 @@ void CCore::EnsureFrameRateLimitApplied ( void )
 //
 // Do FPS limiting
 //
+// This is called once a frame even if minimized
+//
 void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
 {
+    // Non frame rate limit stuff
+    if ( IsWindowMinimized () )
+        m_iUnminimizeFrameCounter = 4;     // Tell script we have unminimized after a short delay
+
+
+    // Frame rate limit stuff starts here
     m_bDoneFrameRateLimit = true;
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
@@ -1822,4 +1830,60 @@ void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
     m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f );
 
     m_dLastTimeMs = dTimeMs;
+}
+
+
+//
+// OnDeviceRestore
+//
+void CCore::OnDeviceRestore ( void )
+{
+    m_iUnminimizeFrameCounter = 4;     // Tell script we have restored after 4 frames to avoid double sends
+    m_bDidRecreateRenderTargets = true;
+}
+
+
+//
+// OnPreHUDRender
+//
+void CCore::OnPreHUDRender ( void )
+{
+    IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
+
+    // Create a state block.
+    IDirect3DStateBlock9 * pDeviceState = NULL;
+    pDevice->CreateStateBlock ( D3DSBT_ALL, &pDeviceState );
+    D3DXMATRIX matProjection;
+    pDevice->GetTransform ( D3DTS_PROJECTION, &matProjection );
+
+    // Make sure linear sampling is enabled
+    pDevice->SetSamplerState ( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+    pDevice->SetSamplerState ( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+    pDevice->SetSamplerState ( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+
+    // Make sure stencil is off to avoid problems with flame effects
+    pDevice->SetRenderState ( D3DRS_STENCILENABLE, FALSE );
+
+    // Maybe capture screen
+    CGraphics::GetSingleton ().GetRenderItemManager ()->UpdateBackBufferCopy ();
+
+    // Handle script stuffs
+    if ( m_iUnminimizeFrameCounter-- && !m_iUnminimizeFrameCounter )
+    {
+        m_pModManager->DoPulsePreHUDRender ( true, m_bDidRecreateRenderTargets );
+        m_bDidRecreateRenderTargets = false;
+    }
+    else
+        m_pModManager->DoPulsePreHUDRender ( false, false );
+
+    // Draw pre-GUI primitives
+    CGraphics::GetSingleton ().DrawPreGUIQueue ();
+
+    // Restore the render states
+    pDevice->SetTransform ( D3DTS_PROJECTION, &matProjection );
+    if ( pDeviceState )
+    {
+        pDeviceState->Apply ( );
+        pDeviceState->Release ( );
+    }
 }

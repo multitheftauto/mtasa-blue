@@ -65,7 +65,7 @@ ImagesetManager::~ImagesetManager(void)
 	Create an empty Imageset that has the given name and uses the
 	given Texture
 *************************************************************************/
-Imageset* ImagesetManager::createImageset(const String& name, Texture* texture)
+Imageset* ImagesetManager::createImageset(const String& name, Texture* texture, bool bDestroyTextureManagedExternally)
 {
 	Logger::getSingleton().logEvent((utf8*)"Attempting to create Imageset '" + name +"' with texture only.");
 
@@ -74,7 +74,7 @@ Imageset* ImagesetManager::createImageset(const String& name, Texture* texture)
 		throw	AlreadyExistsException("ImagesetManager::createImageset - An Imageset object named '" + name + "' already exists.");
 	}
 
-	Imageset* temp = new Imageset(name, texture);
+	Imageset* temp = new Imageset(name, texture, bDestroyTextureManagedExternally);
 	d_imagesets[name] = temp;
 
 	return temp;
@@ -84,11 +84,11 @@ Imageset* ImagesetManager::createImageset(const String& name, Texture* texture)
 /*************************************************************************
 	Create an Imageset object from the specified file
 *************************************************************************/
-Imageset* ImagesetManager::createImageset(const String& filename, const String& resourceGroup)
+Imageset* ImagesetManager::createImageset(const String& filename, const String& resourceGroup, bool bDestroyTextureManagedExternally)
 {
 	Logger::getSingleton().logEvent((utf8*)"Attempting to create an Imageset from the information specified in file '" + filename + "'.");
 
-	Imageset* temp = new Imageset(filename, resourceGroup);
+	Imageset* temp = new Imageset(filename, resourceGroup, bDestroyTextureManagedExternally);
 
 	String	name = temp->getName();
 
@@ -108,7 +108,7 @@ Imageset* ImagesetManager::createImageset(const String& filename, const String& 
 /*************************************************************************
     Create an Imageset object from the specified image file.
 *************************************************************************/
-Imageset* ImagesetManager::createImagesetFromImageFile(const String& name, const String& filename, const String& resourceGroup)
+Imageset* ImagesetManager::createImagesetFromImageFile(const String& name, const String& filename, const String& resourceGroup, bool bDestroyTextureManagedExternally)
 {
     Logger::getSingleton().logEvent((utf8*)"Attempting to create Imageset '" + name + "' using image file '" + filename + "'.");
 
@@ -117,7 +117,7 @@ Imageset* ImagesetManager::createImagesetFromImageFile(const String& name, const
         throw	AlreadyExistsException("ImagesetManager::createImageset - An Imageset object named '" + name + "' already exists.");
     }
 
-    Imageset* temp = new Imageset(name, filename, resourceGroup);
+    Imageset* temp = new Imageset(name, filename, resourceGroup, bDestroyTextureManagedExternally);
     d_imagesets[name] = temp;
 
     return temp;

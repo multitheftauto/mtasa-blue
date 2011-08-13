@@ -25,6 +25,12 @@ class CResourceManager;
 class CClientEntity;
 class CResource;
 
+enum eAccessType
+{
+    ACCESS_PUBLIC,
+    ACCESS_PRIVATE,
+};
+
 class CResourceManager
 {  
 

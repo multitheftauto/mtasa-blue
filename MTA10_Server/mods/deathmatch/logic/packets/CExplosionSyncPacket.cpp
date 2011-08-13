@@ -35,7 +35,7 @@ bool CExplosionSyncPacket::Read ( NetBitStreamInterface& BitStream )
         return false;
 
     m_OriginID = INVALID_ELEMENT_ID;
-    if ( bHasOrigin && !BitStream.ReadCompressed ( m_OriginID ) )
+    if ( bHasOrigin && !BitStream.Read ( m_OriginID ) )
         return false;
 
     SPositionSync position ( false );
@@ -61,7 +61,7 @@ bool CExplosionSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     {
         BitStream.WriteBit ( true );
         ElementID ID = m_pSourceElement->GetID ();
-        BitStream.WriteCompressed ( ID );
+        BitStream.Write ( ID );
 
         unsigned short usLatency = static_cast < CPlayer * > ( m_pSourceElement )->GetPing ();
         BitStream.WriteCompressed ( usLatency );
@@ -74,7 +74,7 @@ bool CExplosionSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_OriginID != INVALID_ELEMENT_ID )
     {
         BitStream.WriteBit ( true );
-        BitStream.WriteCompressed ( m_OriginID );
+        BitStream.Write ( m_OriginID );
     }
     else
         BitStream.WriteBit ( false );

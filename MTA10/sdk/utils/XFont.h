@@ -238,34 +238,43 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES * lpFontPropsX)
 				memcpy(szTemp, &lpMapAddress[index], ttRecord.uStringLength);
 				index += ttRecord.uStringLength;
 
-				if (szTemp[0] != 0)
+                // Sometimes neeeds a unitext to sortofansitext hack
+                std::string strTemp = szTemp;
+                if ( strTemp.length () == 0 && ttRecord.uStringLength > 2 )
+                {
+                    std::wstring strTempE = (const wchar_t*)(szTemp+1);
+                    strTemp = UTF16ToMbUTF8 ( strTempE );
+                }
+                const char* szTempAnsi = strTemp.c_str ();
+
+				if (szTempAnsi[0] != 0)
 				{
-					_ASSERTE(strlen(szTemp) < sizeof(lpFontProps->csName));
+					_ASSERTE(strlen(szTempAnsi) < sizeof(lpFontProps->csName));
 
 					switch (ttRecord.uNameID)
 					{
 						case 0:
 							if (lpFontProps->csCopyright[0] == 0)
-								strncpy(lpFontProps->csCopyright, szTemp,
+								strncpy(lpFontProps->csCopyright, szTempAnsi,
 									sizeof(lpFontProps->csCopyright)-1);
 							break;
 
 						case 1:
 							if (lpFontProps->csFamily[0] == 0)
-								strncpy(lpFontProps->csFamily, szTemp,
+								strncpy(lpFontProps->csFamily, szTempAnsi,
 									sizeof(lpFontProps->csFamily)-1);
 							bRetVal = TRUE;
 							break;
 
 						case 4:
 							if (lpFontProps->csName[0] == 0)
-								strncpy(lpFontProps->csName, szTemp,
+								strncpy(lpFontProps->csName, szTempAnsi,
 									sizeof(lpFontProps->csName)-1);
 							break;
 
 						case 7:
 							if (lpFontProps->csTrademark[0] == 0)
-								strncpy(lpFontProps->csTrademark, szTemp,
+								strncpy(lpFontProps->csTrademark, szTempAnsi,
 									sizeof(lpFontProps->csTrademark)-1);
 							break;
 

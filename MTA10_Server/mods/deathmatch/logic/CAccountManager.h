@@ -39,6 +39,7 @@ public:
     bool                        Save                        ( CXMLNode* pParent );
     bool                        Save                        ( CAccount* pParent, SString* pStrError = NULL );
     bool                        SaveSettings                ( void );
+    bool                        IntegrityCheck              ( void );
 
     CAccount*                   Get                         ( const char* szName, bool bRegistered = true );
     CAccount*                   Get                         ( const char* szName, const char* szIP );
@@ -50,8 +51,8 @@ public:
     inline bool                 IsAutoLoginEnabled          ( void )                    { return m_bAutoLogin; }
     inline void                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; }
 
-    CLuaArgument*               GetAccountData              ( CAccount* pAccount, char* szKey );
-    bool                        SetAccountData              ( CAccount* pAccount, char* szKey, SString strValue, int iType );
+    CLuaArgument*               GetAccountData              ( CAccount* pAccount, const char* szKey );
+    bool                        SetAccountData              ( CAccount* pAccount, const char* szKey, const SString& strValue, int iType );
     bool                        CopyAccountData             ( CAccount* pFromAccount, CAccount* pToAccount );
 
     bool                        ConvertXMLToSQL             ( const char* szFileName );

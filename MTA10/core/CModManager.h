@@ -41,6 +41,7 @@ public:
     void                Unload                  ( void );
 
     void                DoPulsePreFrame         ( void );
+    void                DoPulsePreHUDRender     ( bool bDidUnminimize, bool bDidRecreateRenderTargets );
     void                DoPulsePostFrame        ( void );
 
     CClientBase*        GetCurrentMod           ( void );

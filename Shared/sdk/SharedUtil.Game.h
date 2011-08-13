@@ -13,8 +13,23 @@
 namespace SharedUtil
 {
 
-    bool            GetTrafficLightStateFromStrings ( const char* szColorNS, const char* szColorEW,
-                                                      unsigned char& ucOutput );
+    namespace TrafficLight
+    {
+        enum EColor
+        {
+            GREEN,
+            YELLOW,
+            RED
+        };
+    
+        enum EState
+        {
+            AUTO,
+            DISABLED,
+        };
+    }
+
+    unsigned char   GetTrafficLightStateFromColors ( TrafficLight::EColor eColorNS, TrafficLight::EColor eColorEW );
 
     class CVehicleColor
     {

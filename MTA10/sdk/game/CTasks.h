@@ -45,7 +45,7 @@ public:
     virtual CTaskComplexEnterCarAsDriver        * CreateTaskComplexEnterCarAsDriver(CVehicle * pVehicle)=0;
     virtual CTaskComplexEnterCarAsPassenger     * CreateTaskComplexEnterCarAsPassenger(CVehicle * pVehicle, const int iTargetSeat=0, const bool bCarryOnAfterFallingOff=false )=0;
     virtual CTaskComplexEnterBoatAsDriver       * CreateTaskComplexEnterBoatAsDriver(CVehicle * pVehicle )=0;
-    virtual CTaskComplexLeaveCar                * CreateTaskComplexLeaveCar ( CVehicle* pVehicle, const int iTargetDoor=0, const int iDelayTime=0, const bool bSensibleLeaveCar=true, const bool bForceGetOut=false )=0;
+    virtual CTaskComplexLeaveCar                * CreateTaskComplexLeaveCar ( CVehicle* pVehicle, const int iTargetDoor=0xFF, const int iDelayTime=0, const bool bSensibleLeaveCar=true, const bool bForceGetOut=false )=0;
     virtual CTaskComplexUseMobilePhone          * CreateTaskComplexUseMobilePhone ( const int iDuration = -1 ) = 0;
 
     virtual CTaskSimpleDuck                     * CreateTaskSimpleDuck ( eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck=0, unsigned short nUseShotsWhizzingEvents=-1 )=0;

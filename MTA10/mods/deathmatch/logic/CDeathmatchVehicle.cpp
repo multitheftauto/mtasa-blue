@@ -14,7 +14,7 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
-CDeathmatchVehicle::CDeathmatchVehicle ( CClientManager* pManager, CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel ) : CClientVehicle ( pManager, ID, usVehicleModel )
+CDeathmatchVehicle::CDeathmatchVehicle ( CClientManager* pManager, CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel ) : ClassInit ( this ), CClientVehicle ( pManager, ID, usVehicleModel )
 {
     m_pUnoccupiedVehicleSync = pUnoccupiedVehicleSync;
     GetInitialDoorStates ( m_ucLastDoorStates );
@@ -111,7 +111,7 @@ bool CDeathmatchVehicle::SyncDamageModel ( void )
         if ( pBitStream )
         {
             // Write the vehicle id and the damage model data
-            pBitStream->WriteCompressed ( m_ID );
+            pBitStream->Write ( m_ID );
             pBitStream->Write ( &damage );
 
             // Send and delete it

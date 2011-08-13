@@ -75,7 +75,7 @@ void CVehicleRPCs::FixVehicle ( CClientEntity* pSource, NetBitStreamInterface& b
 
 void CVehicleRPCs::BlowVehicle ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    // Read out the vehicle id and whether to explode or not
+    // Read out the vehicle id
     unsigned char ucTimeContext;
     if ( bitStream.Read ( ucTimeContext ) )
     {

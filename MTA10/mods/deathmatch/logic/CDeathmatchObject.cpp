@@ -17,7 +17,7 @@ using std::list;
 
 extern CClientGame * g_pClientGame;
 
-CDeathmatchObject::CDeathmatchObject ( CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, CObjectSync* pObjectSync, ElementID ID, unsigned short usModel ) : CClientObject ( pManager, ID, usModel )
+CDeathmatchObject::CDeathmatchObject ( CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, CObjectSync* pObjectSync, ElementID ID, unsigned short usModel ) : ClassInit ( this ), CClientObject ( pManager, ID, usModel )
 {
     m_pMovingObjectsManager = pMovingObjectsManager;
     m_pObjectSync = pObjectSync;

@@ -17,7 +17,7 @@
 
 #include <StdInc.h>
 
-CClientRadarArea::CClientRadarArea ( class CClientManager* pManager, ElementID ID ) : CClientEntity ( ID )
+CClientRadarArea::CClientRadarArea ( class CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
 {
     // Init
     m_pManager = pManager;

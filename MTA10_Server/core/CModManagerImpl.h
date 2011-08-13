@@ -51,6 +51,8 @@ public:
 
     bool                IsFinished              ( void );
 
+    bool                PendingWorkToDo         ( void );
+
 private:
     CServerImpl*        m_pServer;
 

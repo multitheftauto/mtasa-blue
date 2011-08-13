@@ -48,9 +48,6 @@ void CMessageLoopHook::ApplyHook ( HWND hFocusWindow )
 
         // Subclass the window procedure.
         m_HookedWindowProc = SubclassWindow ( hFocusWindow, ProcessMessage );
-
-        // Enable Unicode (UTF-16) characters in WM_CHAR messages
-        SetWindowLongW ( hFocusWindow, GWL_WNDPROC, GetWindowLong ( hFocusWindow, GWL_WNDPROC ) );
     }
 }
 
@@ -178,6 +175,12 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                             return true;
                         }
                     }
+                    else
+                    if ( uMsg == WM_KEYDOWN && wParam == VK_ESCAPE && !g_pCore->IsConnected () )
+                    {
+                        // If Escape is pressed and we're not playing ingame, hide certain windows
+                        CLocalGUI::GetSingleton ().GetMainMenu ()->OnEscapePressedOffLine ();
+                    }
 
                     // If F8 is pressed, we show/hide the console
                     if ( ( uMsg == WM_KEYDOWN && wParam == VK_F8 ) || ( uMsg == WM_CHAR && wParam == '`' ) )
@@ -243,12 +246,12 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 m_LastScanCode = (BYTE)((lParam >> 16) & 0x000F);
                 GetKeyboardState( m_LastKeyboardState );
             }
-            // If it was a question mark character, we may have an unprocessed unicode character
-            if ( uMsg == WM_CHAR && wParam == 0x3F )
+
+            if ( uMsg == WM_CHAR )
             {
                 wchar_t* wcsUnicode = new wchar_t[1];
                 ToUnicodeEx ( m_LastVirtualKeyCode, m_LastScanCode, m_LastKeyboardState, wcsUnicode, 1, 0, GetKeyboardLayout(0) );
-                wParam = (WPARAM)wcsUnicode[0];
+                wParam = wcsUnicode[0] ? (WPARAM)wcsUnicode[0] : wParam;
                 delete wcsUnicode;
             }
 
@@ -317,13 +320,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
 
                 // Call GTA's window procedure.
-                return CallWindowProcW ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
+                return CallWindowProc ( pThis->m_HookedWindowProc, hwnd, uMsg, wParam, lParam );
             }
         }
     }
 
     // Tell windows to handle this message.
-    return DefWindowProcW ( hwnd, uMsg, wParam, lParam );
+    return DefWindowProc ( hwnd, uMsg, wParam, lParam );
 }
 
 

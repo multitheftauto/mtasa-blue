@@ -7,7 +7,6 @@
 *               and miscellaneous rendering functions
 *  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
 *               arc_
-*               Sebas Lamers <sebasdevelopment@gmx.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *  RenderWare is © Criterion Software
@@ -18,6 +17,29 @@
 #include "gamesa_renderware.h"
 
 extern CGameSA * pGame;
+
+//
+// STxdAction stores the current frame txd create and destroy events
+//
+struct STxdAction
+{
+    bool bAdd;
+    ushort usTxdId;
+};
+
+std::vector < STxdAction > ms_txdActionList;
+
+//
+// Hooks for creating txd create and destroy events
+//
+#define HOOKPOS_CTxdStore_SetupTxdParent       0x731D55
+DWORD RETURN_CTxdStore_SetupTxdParent =        0x731D5B;
+void HOOK_CTxdStore_SetupTxdParent ();
+
+#define HOOKPOS_CTxdStore_RemoveTxd       0x731E90
+DWORD RETURN_CTxdStore_RemoveTxd =        0x731E96;
+void HOOK_CTxdStore_RemoveTxd ();
+
 
 // RwFrameForAllObjects struct and callback used to replace dynamic vehicle parts
 struct SReplaceParts
@@ -167,6 +189,8 @@ static RpAtomic* LoadAtomicsCB (RpAtomic * atomic, SLoadAtomics * data)
 
 CRenderWareSA::CRenderWareSA ( eGameVersion version )
 {
+    m_pfnWatchCallback = NULL;
+
     // Version dependant addresses
     switch ( version )
     {
@@ -336,6 +360,9 @@ CRenderWareSA::CRenderWareSA ( eGameVersion version )
             break;
         }
     }
+
+    HookInstall ( HOOKPOS_CTxdStore_SetupTxdParent, (DWORD)HOOK_CTxdStore_SetupTxdParent, 6 );
+    HookInstall ( HOOKPOS_CTxdStore_RemoveTxd, (DWORD)HOOK_CTxdStore_RemoveTxd, 6 );
 }
 
 
@@ -452,73 +479,6 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures ( std::list < RwTexture* >& textu
     // Delete the reference we made in ModelInfoTXDAddTextures
     if ( bRemoveRef )
         CTxdStore_RemoveRef ( usTxdId );
-}
-
-struct SAnimHeader {
-    char    szVersion[4]; //ANPK or ANP3
-    int     iOffsetToEOF; //Offset to end of file
-    char    szBlockName[24]; //Block name to be used for the whole file
-    int     iNumberOfAnimations; //Number of animations inside the file
-};
-
-// Reads and parses an IFP file specified by a path (szIFP)
-CAnimBlock * CRenderWareSA::ReadIFP ( const char *szIFP )
-{
-
-    //Make sure we have a file path
-    if ( !szIFP )
-        return false;
-
-    // Read the file
-    FILE* pFile = fopen ( szIFP, "rb" );
-    //Make sure the file exists
-    if ( !pFile )
-        return NULL;
-
-    SAnimHeader SHeader;
-    //Read out the header information into SHeader
-    fread ( &SHeader, sizeof(SHeader), 1, pFile );
-    // Check the Header information ANP3 Is supported ANPK is not at the moment. 
-    if ( SHeader.szVersion[0] == 'A' && SHeader.szVersion[1] == 'N' && SHeader.szVersion[2] == 'P' && SHeader.szVersion[3] == '3' )
-    {
-        CAnimBlock * pAnim;
-        //Check it doesn't exist already
-        pAnim = pGame->GetAnimManager()->GetAnimationBlock( SHeader.szBlockName );
-        if ( pAnim )
-        {
-            //Return false before the loading
-            fclose ( pFile );
-            return NULL;
-        }
-    }
-    else
-    {
-        //Invalid file type close our file and return false
-        fclose ( pFile );
-        return NULL;
-    }
-
-    //close the file
-    fclose ( pFile );
-
-    // open the stream
-    RwStream * streamModel = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, szIFP );
-
-    // check for errors
-    if ( streamModel == NULL )
-        return NULL;
-
-    //Load the animation file from the stream
-    pGame->GetAnimManager()->LoadAnimFile( streamModel, true, "" );
-
-    //Register our animation block with SA
-    //int iBlockID = pGame->GetAnimManager()->RegisterAnimBlock( SHeader.szBlockName );
-
-    // close the stream
-    RwStreamClose ( streamModel, NULL );
-    CAnimBlock * pAnim = pGame->GetAnimManager()->GetAnimationBlock( SHeader.szBlockName );
-
-    return pAnim;
 }
 
 
@@ -866,4 +826,556 @@ bool CRenderWareSA::ListContainsNamedTexture ( std::list < RwTexture* >& list, c
             return true;
     }
     return false;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetTXDIDForModelID
+//
+// Get a TXD ID associated with the model ID
+//
+////////////////////////////////////////////////////////////////
+ushort CRenderWareSA::GetTXDIDForModelID ( ushort usModelID )
+{
+    if ( usModelID >= 20000 && usModelID < 25000 )
+    {
+        // Get global TXD ID instead
+        return usModelID - 20000;
+    }
+    else
+    {
+        // Get the CModelInfo's TXD ID
+
+        // Ensure valid
+        if ( usModelID >= 20000 || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID] )
+            return 0;
+
+        return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::InitWorldTextureWatch
+//
+// Setup texture watch callback
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::InitWorldTextureWatch ( PFN_WATCH_CALLBACK pfnWatchCallback )
+{
+    m_pfnWatchCallback = pfnWatchCallback;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::AddWorldTextureWatch
+//
+// Begin watching for changes to the d3d resource associated with this texture name 
+//
+// Returns false if shader/match already exists
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::AddWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char* szMatch, float fOrderPriority )
+{
+    SShadInfo* pNewShadInfo = CreateShadInfo ( pShaderData, szMatch, fOrderPriority );
+    if ( !pNewShadInfo )
+        return false;
+
+    // Step through texinfo list looking for all matches
+    for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; ++iter )
+    {
+        STexInfo* pTexInfo = &*iter;
+        if ( WildcardMatch ( pNewShadInfo->strMatch, pTexInfo->strTextureName ) )
+        {
+            // Check previous association
+            if ( SShadInfo* pPrevShadInfo = pTexInfo->pAssociatedShadInfo )
+            {
+				// Check priority
+                if ( pPrevShadInfo->fOrderPriority > pNewShadInfo->fOrderPriority )
+                    continue;
+
+                // Remove previous association
+                BreakAssociation ( pPrevShadInfo, pTexInfo );
+            }
+
+            // Add new association
+            MakeAssociation ( pNewShadInfo, pTexInfo );
+        }
+    }
+    return true;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::MakeAssociation
+//
+// Make the texture use the shader
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::MakeAssociation ( SShadInfo* pShadInfo, STexInfo* pTexInfo )
+{
+    assert ( !pTexInfo->pAssociatedShadInfo );
+    assert ( !MapContains ( pShadInfo->associatedTexInfoMap, pTexInfo ) );
+    pTexInfo->pAssociatedShadInfo = pShadInfo;
+    pShadInfo->associatedTexInfoMap.insert ( pTexInfo );
+
+    if ( m_pfnWatchCallback )
+        m_pfnWatchCallback ( pShadInfo->pShaderData, pTexInfo->pD3DData, NULL );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::BreakAssociation
+//
+// Stop the texture using the shader
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::BreakAssociation ( SShadInfo* pShadInfo, STexInfo* pTexInfo )
+{
+    assert ( pTexInfo->pAssociatedShadInfo == pShadInfo );
+    assert ( MapContains ( pShadInfo->associatedTexInfoMap, pTexInfo ) );
+    pTexInfo->pAssociatedShadInfo = NULL;
+    MapRemove ( pShadInfo->associatedTexInfoMap, pTexInfo );
+    if ( m_pfnWatchCallback )
+        m_pfnWatchCallback ( pShadInfo->pShaderData, NULL, pTexInfo->pD3DData );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::RemoveWorldTextureWatch
+//
+// End watching for changes to the d3d resource associated with this texture name
+//
+// When shadinfo removed:
+//      unassociate with matches, let each texture find a new latest match
+//
+// If szMatch is NULL, remove all usage of the shader
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::RemoveWorldTextureWatch ( CSHADERDUMMY* pShaderData, const char* szMatch )
+{
+    SString strMatch = SStringX ( szMatch ).ToLower ();
+    // Find shadInfo
+    for ( std::list < SShadInfo > ::iterator iter = m_ShadInfoList.begin () ; iter != m_ShadInfoList.end () ; )
+    {
+        SShadInfo* pShadInfo = &*iter;
+        if ( pShadInfo->pShaderData == pShaderData && ( !szMatch || pShadInfo->strMatch == strMatch ) )
+        {
+            std::vector < STexInfo* > reassociateList;
+
+            // Unassociate with all matches
+            while ( !pShadInfo->associatedTexInfoMap.empty () )
+            {
+                STexInfo* pTexInfo = *pShadInfo->associatedTexInfoMap.begin ();
+                BreakAssociation ( pShadInfo, pTexInfo );
+
+                // reassociateList for earlier shaders
+                reassociateList.push_back ( pTexInfo );
+            }
+
+            OnDestroyShadInfo ( pShadInfo );
+            iter = m_ShadInfoList.erase ( iter );
+
+            // Allow unassociated texinfos to find new associations
+            for ( uint i = 0 ; i < reassociateList.size () ; i++ )
+            {
+                STexInfo* pTexInfo = reassociateList [ i ];
+                FindNewAssociationForTexInfo ( pTexInfo );
+            }
+
+			// If a match string was supplied, there should be only one in the list, so we can stop here
+            if ( szMatch )
+                break;
+        }
+        else
+            ++iter;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::RemoveWorldTextureWatchByContext
+//
+// End watching for changes to the d3d resource associated with this context 
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::RemoveWorldTextureWatchByContext ( CSHADERDUMMY* pShaderData )
+{
+    RemoveWorldTextureWatch ( pShaderData, NULL );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::PulseWorldTextureWatch
+//
+// Update watched textures status
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::PulseWorldTextureWatch ( void )
+{
+    // Got through ms_txdActionList
+    for ( std::vector < STxdAction >::const_iterator iter = ms_txdActionList.begin () ; iter != ms_txdActionList.end () ; ++iter )
+    {
+        const STxdAction& action = *iter;
+        if ( action.bAdd )
+        {
+            //
+            // New txd has been loaded
+            //
+
+            // Get list of texture names and data to add
+
+            // Note: If txd has been unloaded since, textureList will be empty
+            std::vector < RwTexture* > textureList;
+            GetTxdTextures ( textureList, action.usTxdId );
+
+            for ( std::vector < RwTexture* > ::iterator iter = textureList.begin () ; iter != textureList.end () ; iter++ )
+            {
+                RwTexture* texture = *iter;
+                const char* szTextureName = texture->name;
+                CD3DDUMMY* pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+                AddActiveTexture ( action.usTxdId, szTextureName, pD3DData );
+            }
+        }
+        else
+        {
+            //
+            // Txd has been unloaded
+            //
+
+            RemoveTxdActiveTextures ( action.usTxdId );
+        }
+    }
+
+    ms_txdActionList.clear ();
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::AddActiveTexture
+//
+// Create a texinfo for the texture and find a best match shader for it
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::AddActiveTexture ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData )
+{
+    STexInfo* pTexInfo = CreateTexInfo ( usTxdId, strTextureName, pD3DData );
+    FindNewAssociationForTexInfo ( pTexInfo );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::CreateTexInfo
+//
+//
+//
+////////////////////////////////////////////////////////////////
+STexInfo* CRenderWareSA::CreateTexInfo ( ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData )
+{
+    // Create texinfo
+    m_TexInfoList.push_back ( STexInfo ( usTxdId, strTextureName, pD3DData ) );
+    STexInfo* pTexInfo = &m_TexInfoList.back ();
+
+    // Add to lookup maps
+    SString strUniqueKey ( "%d_%s", pTexInfo->usTxdId, *pTexInfo->strTextureName );
+    assert ( !MapContains ( m_UniqueTexInfoMap, strUniqueKey ) );
+    MapSet ( m_UniqueTexInfoMap, strUniqueKey, pTexInfo );
+
+	// This assert fails when using engine txd replace functions - TODO find out why
+    //assert ( !MapContains ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) );
+    MapSet ( m_D3DDataTexInfoMap, pTexInfo->pD3DData, pTexInfo );
+    return pTexInfo;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::OnDestroyTexInfo
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::OnDestroyTexInfo ( STexInfo* pTexInfo )
+{
+    // Remove from lookup maps
+    SString strUniqueKey ( "%d_%s", pTexInfo->usTxdId, *pTexInfo->strTextureName );
+    assert ( MapContains ( m_UniqueTexInfoMap, strUniqueKey ) );
+    MapRemove ( m_UniqueTexInfoMap, strUniqueKey );
+
+	// This assert fails when using engine txd replace functions - TODO find out why
+    //assert ( MapContains ( m_D3DDataTexInfoMap, pTexInfo->pD3DData ) );
+    MapRemove ( m_D3DDataTexInfoMap, pTexInfo->pD3DData );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::CreateShadInfo
+//
+//
+//
+////////////////////////////////////////////////////////////////
+SShadInfo* CRenderWareSA::CreateShadInfo (  CSHADERDUMMY* pShaderData, const SString& strMatch, float fOrderPriority )
+{
+    // Create shadinfo
+    m_ShadInfoList.push_back ( SShadInfo ( strMatch, pShaderData, fOrderPriority ) );
+    SShadInfo* pShadInfo = &m_ShadInfoList.back ();
+
+    // Check for uniqueness
+    SString strUniqueKey ( "%08x_%s", pShadInfo->pShaderData, *pShadInfo->strMatch );
+    if ( MapContains ( m_UniqueShadInfoMap, strUniqueKey ) )
+    {
+        // Remove again if not unique
+        m_ShadInfoList.pop_back ();
+        return NULL;
+    }
+
+    // Set unique map
+    MapSet ( m_UniqueShadInfoMap, strUniqueKey, pShadInfo );
+
+    // Add to order map
+    MapInsert ( m_orderMap, pShadInfo->fOrderPriority, pShadInfo );
+
+    return pShadInfo;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::OnDestroyShadInfo
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::OnDestroyShadInfo ( SShadInfo* pShadInfo )
+{
+    // Remove from lookup maps
+    SString strUniqueKey ( "%08x_%s", pShadInfo->pShaderData, *pShadInfo->strMatch );
+    assert ( MapContains ( m_UniqueShadInfoMap, strUniqueKey ) );
+    MapRemove ( m_UniqueShadInfoMap, strUniqueKey );
+
+    //  Remove from order map
+    MapRemovePair ( m_orderMap, pShadInfo->fOrderPriority, pShadInfo );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::FindNewAssociationForTexInfo
+//
+// Find best match for this texinfo
+// Called when a texture is loaded or a shader is removed from a texture
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::FindNewAssociationForTexInfo ( STexInfo* pTexInfo )
+{
+    // Stepping backwards will bias high priority, and if the priorty is the same, bias the latest additions
+    for ( std::multimap < float, SShadInfo* > ::reverse_iterator iter = m_orderMap.rbegin () ; iter != m_orderMap.rend () ; ++iter )
+    {
+        SShadInfo* pShadInfo = iter->second;
+        if ( WildcardMatch ( pShadInfo->strMatch, pTexInfo->strTextureName ) )
+        {
+            // Found one
+            MakeAssociation ( pShadInfo, pTexInfo );
+            break;
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::RemoveTxdActiveTextures
+//
+// Called when a TXD is being unloaded.
+// Delete texinfos which came from that TXD
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::RemoveTxdActiveTextures ( ushort usTxdId )
+{
+    // Find all TexInfo's for this txd
+    for ( std::list < STexInfo > ::iterator iter = m_TexInfoList.begin () ; iter != m_TexInfoList.end () ; )
+    {
+        STexInfo* pTexInfo = &*iter;
+        if ( pTexInfo->usTxdId == usTxdId )
+        {
+            // If texinfo has a shadinfo, unassociate
+            if ( SShadInfo* pShadInfo = pTexInfo->pAssociatedShadInfo )
+            {
+                BreakAssociation ( pShadInfo, pTexInfo );
+            }
+
+            OnDestroyTexInfo ( pTexInfo );
+            iter = m_TexInfoList.erase ( iter );
+        }
+        else
+            ++iter;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetModelTextureNames
+//
+// Get list of texture names associated with the model
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::GetModelTextureNames ( std::vector < SString >& outNameList, ushort usModelID )
+{
+    outNameList.empty ();
+
+    ushort usTxdId = GetTXDIDForModelID ( usModelID );
+
+    if ( usTxdId == 0 )
+        return;
+
+    std::vector < RwTexture* > textureList;
+    GetTxdTextures ( textureList, usTxdId );
+
+    for ( std::vector < RwTexture* > ::iterator iter = textureList.begin () ; iter != textureList.end () ; iter++ )
+    {
+        outNameList.push_back ( (*iter)->name );
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetTxdTextures
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::GetTxdTextures ( std::vector < RwTexture* >& outTextureList, ushort usTxdId )
+{
+    if ( usTxdId == 0 )
+        return;
+
+    // Get the TXD corresponding to this ID
+    SetTextureDict ( usTxdId );
+
+    RwTexDictionary* pTXD = CTxdStore_GetTxd ( usTxdId );
+
+    if ( pTXD )
+    {
+        RwTexDictionaryForAllTextures ( pTXD, StaticGetTextureCB, &outTextureList );
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::StaticGetTextureCB
+//
+// Callback used in GetTxdTextures
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::StaticGetTextureCB ( RwTexture* texture, std::vector < RwTexture* >* pTextureList )
+{
+    pTextureList->push_back ( texture );
+    return true;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetTextureName
+//
+//
+//
+////////////////////////////////////////////////////////////////
+const SString& CRenderWareSA::GetTextureName ( CD3DDUMMY* pD3DData )
+{
+    STexInfo** ppTexInfo = MapFind ( m_D3DDataTexInfoMap, pD3DData );
+    if ( ppTexInfo )
+        return (*ppTexInfo)->strTextureName;
+    static SString strDummy;
+    return strDummy;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+//
+//
+// Hooks
+//
+//
+//
+////////////////////////////////////////////////////////////////
+
+//
+// Txd created
+//
+
+void _cdecl OnAddTxd ( DWORD dwTxdId )
+{
+    STxdAction action;
+    action.bAdd = true;
+    action.usTxdId = (ushort)dwTxdId;
+    ms_txdActionList.push_back ( action );
+}
+
+// called from streaming on TXD create
+void _declspec(naked) HOOK_CTxdStore_SetupTxdParent ()
+{
+    _asm
+    {
+        // Hooked from 731D55  6 bytes
+
+        // eax - txd id
+        pushad
+        push eax
+        call OnAddTxd
+        add esp, 4
+        popad
+
+        // orig
+        mov     esi, ds:00C8800Ch 
+        jmp     RETURN_CTxdStore_SetupTxdParent  // 731D5B
+    }
+}
+
+
+//
+// Txd remove
+//
+
+void _cdecl OnRemoveTxd ( DWORD dwTxdId )
+{
+    STxdAction action;
+    action.bAdd = false;
+    action.usTxdId = (ushort)dwTxdId - 20000;
+    ms_txdActionList.push_back ( action );
+}
+
+// called from streaming on TXD destroy
+void _declspec(naked) HOOK_CTxdStore_RemoveTxd ()
+{
+    _asm
+    {
+        // Hooked from 731E90  6 bytes
+
+        // esi - txd id + 20000
+        pushad
+        push esi
+        call OnRemoveTxd
+        add esp, 4
+        popad
+
+        // orig
+        mov     ecx, ds:00C8800Ch
+        jmp     RETURN_CTxdStore_RemoveTxd      // 731E96
+    }
 }

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CClientColModel::CClientColModel ( CClientManager* pManager, ElementID ID ) : CClientEntity ( ID )
+CClientColModel::CClientColModel ( CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
 {
     // Init
     m_pManager = pManager;

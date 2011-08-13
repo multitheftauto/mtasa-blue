@@ -56,6 +56,9 @@ void            StopPseudoProgress                  ( void );
 SString         ShowCrashedDialog                   ( HINSTANCE hInstance, const SString& strMessage );
 void            HideCrashedDialog                   ( void );
 
+void            ShowD3dDllDialog                    ( HINSTANCE hInstance, const SString& strPath );
+void            HideD3dDllDialog                    ( void );
+
 void            UpdateMTAVersionApplicationSetting  ( void );
 bool            Is32bitProcess                      ( DWORD processID );
 

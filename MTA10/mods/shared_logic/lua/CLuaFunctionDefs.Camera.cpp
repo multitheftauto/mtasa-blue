@@ -19,10 +19,10 @@
 
 #include "StdInc.h"
 
-int CLuaFunctionDefs::GetCameraView ( lua_State* luaVM )
+int CLuaFunctionDefs::GetCameraViewMode ( lua_State* luaVM )
 {
     unsigned short ucMode;
-    if ( CStaticFunctionDefinitions::GetCameraView ( ucMode ) )
+    if ( CStaticFunctionDefinitions::GetCameraViewMode ( ucMode ) )
     {
         lua_pushnumber ( luaVM, ucMode );
         return 1;
@@ -267,11 +267,11 @@ int CLuaFunctionDefs::SetCameraClip ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::SetCameraView ( lua_State* luaVM )
+int CLuaFunctionDefs::SetCameraViewMode ( lua_State* luaVM )
 {
     if ( lua_type ( luaVM, 1 ) == LUA_TNUMBER )
     {
-        CStaticFunctionDefinitions::SetCameraView ( static_cast <unsigned short> ( lua_tonumber ( luaVM, 1 ) ) );
+        CStaticFunctionDefinitions::SetCameraViewMode ( static_cast <unsigned short> ( lua_tonumber ( luaVM, 1 ) ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;

@@ -48,7 +48,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
         {
             // Read out the player ID
             ElementID PlayerID;
-            if ( BitStream.ReadCompressed ( PlayerID ) )
+            if ( BitStream.Read ( PlayerID ) )
             {
                 // Grab the player
                 CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
@@ -89,7 +89,7 @@ bool CNetAPI::ProcessPacket ( unsigned char bytePacketID, NetBitStreamInterface&
         {
             // Read out the player ID
             ElementID PlayerID;
-            if ( BitStream.ReadCompressed ( PlayerID ) )
+            if ( BitStream.Read ( PlayerID ) )
             {
                 // Grab the player
                 CClientPlayer* pPlayer = m_pPlayerManager->Get ( PlayerID );
@@ -322,7 +322,8 @@ void CNetAPI::DoPulse ( void )
                 if ( !pVehicle || pPlayer->GetOccupiedVehicleSeat () == 0 )
                 {
                     // Disable our controls (swap with a blank controller state)
-                    g_pCore->GetGame ()->GetPad ()->SetCurrentControllerState ( &CControllerState () );
+                    CControllerState state;
+                    g_pCore->GetGame ()->GetPad ()->SetCurrentControllerState ( &state );
 
                     // Grab our vehicle
                     CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
@@ -751,7 +752,7 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
     if ( flags.data.bHasContact )
     {
         ElementID Temp;
-        BitStream.ReadCompressed ( Temp );
+        BitStream.Read ( Temp );
         pContactEntity = CElementIDs::GetElement ( Temp );
     }
         
@@ -945,7 +946,7 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
     // If the player is in contact with a object/vehicle, make that the origin    
     if ( bInContact )
     {
-        BitStream.WriteCompressed ( pContactEntity->GetID () );
+        BitStream.Write ( pContactEntity->GetID () );
 
         CVector vecOrigin;
         pContactEntity->GetPosition ( vecOrigin );
@@ -1027,7 +1028,7 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
     if ( DamagerID != RESERVED_ELEMENT_ID )
     {
         BitStream.WriteBit ( true );
-        BitStream.WriteCompressed ( DamagerID );
+        BitStream.Write ( DamagerID );
         
         SWeaponTypeSync weaponType;
         weaponType.data.ucWeaponType = g_pClientGame->GetDamageWeapon ();
@@ -1290,9 +1291,11 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     position.data.vecPosition = vecPosition;
     BitStream.Write ( &position );
 
-    // Grab the occupied vehicle seat. Send this only if we're driver.
+    // Grab the occupied vehicle seat. Send this only if we're driver
+    SOccupiedSeatSync seat;
     unsigned int uiSeat = pPlayerModel->GetOccupiedVehicleSeat ();
-    BitStream.Write ( ( unsigned char ) uiSeat );
+    seat.data.ucSeat = uiSeat;
+    BitStream.Write ( &seat );
     if ( uiSeat == 0 )
     {
         // Write the rotation in degrees
@@ -1328,7 +1331,7 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         while ( pTrailer )
         {
             BitStream.WriteBit ( true );
-            BitStream.WriteCompressed ( pTrailer->GetID () );
+            BitStream.Write ( pTrailer->GetID () );
 
             // Write the position and rotation
             CVector vecTrailerPosition, vecTrailerRotationDegrees;
@@ -1634,7 +1637,7 @@ void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
         CClientPlayer * pPlayer = pCamera->GetFocusedPlayer ();
         if ( !pPlayer ) pPlayer = g_pClientGame->GetLocalPlayer ();
 
-        BitStream.WriteCompressed ( pPlayer->GetID () );
+        BitStream.Write ( pPlayer->GetID () );
     }
 }
 

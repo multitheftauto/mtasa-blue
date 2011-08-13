@@ -163,7 +163,7 @@ bool CKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
         // Write the source player id
         ElementID PlayerID = pSourcePlayer->GetID ();
-        BitStream.WriteCompressed ( PlayerID );
+        BitStream.Write ( PlayerID );
 
         // Write the keysync data
         const CControllerState& ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();

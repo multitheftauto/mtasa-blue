@@ -47,6 +47,7 @@
 #define FUNC_DrawRadar              0x58A330
 #define FUNC_DrawRadioName          0x4E9E50
 #define FUNC_DrawWantedLevel        0x58D9A0
+#define FUNC_DrawCrosshair          0x58E020
 
 #define CODE_ShowMoney              0x58F47D
 
@@ -75,6 +76,7 @@ public:
     void                DisableClock ( bool bDisabled );
     void                DisableRadioName ( bool bDisabled );
     void                DisableWantedLevel ( bool bDisabled );
+    void                DisableCrosshair ( bool bDisabled );
     void                DisableAll ( bool bDisabled );
 };
 
