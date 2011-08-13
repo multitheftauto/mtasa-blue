@@ -1506,7 +1506,7 @@ int doBidi(BLOCKTYPE line, int count, bool applyShape, bool reorderCombining)
    {
      CHARTYPE temp;
      int it;
-     for(i=0; i<count; i++)
+     for(i=1; i<count; i++)     // Changed 0 to 1 to fix a crash - Don't know if there will be other consequences
        {
 	 if(GetType(GETCHAR(line, i)) == NSM && odd(levels[i]))
 	   {
