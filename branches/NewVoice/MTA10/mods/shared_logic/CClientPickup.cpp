@@ -16,7 +16,7 @@
 
 extern CClientGame* g_pClientGame;
 
-CClientPickup::CClientPickup ( CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition ) : CClientStreamElement ( pManager->GetPickupStreamer (), ID )
+CClientPickup::CClientPickup ( CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition ) : ClassInit ( this ), CClientStreamElement ( pManager->GetPickupStreamer (), ID )
 {
     // Initialize
     m_pManager = pManager;

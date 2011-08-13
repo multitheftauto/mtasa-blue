@@ -30,13 +30,13 @@ public:
                                     CZoneNames              ( void );
                                     ~CZoneNames             ( void );
 
-    void                            AddZone                 ( const char* szName, CVector& vecBottomLeft, CVector& vecTopRight );
-    SZone*                          GetZone                 ( CVector& vecPosition );
-    const char*                     GetZoneName             ( CVector& vecPosition );
+    void                            AddZone                 ( const char* szName, const CVector& vecBottomLeft, const CVector& vecTopRight );
+    SZone*                          GetZone                 ( const CVector& vecPosition );
+    const char*                     GetZoneName             ( const CVector& vecPosition );
 
-    void                            AddCity                 ( const char* szName, CVector& vecBottomLeft, CVector& vecTopRight );
-    SZone*                          GetCity                 ( CVector& vecPosition );
-    const char*                     GetCityName             ( CVector& vecPosition );
+    void                            AddCity                 ( const char* szName, const CVector& vecBottomLeft, const CVector& vecTopRight );
+    SZone*                          GetCity                 ( const CVector& vecPosition );
+    const char*                     GetCityName             ( const CVector& vecPosition );
 
     void                            LoadZones               ( void );
     void                            ClearZones              ( void );

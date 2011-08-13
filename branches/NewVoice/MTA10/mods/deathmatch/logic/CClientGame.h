@@ -34,7 +34,6 @@
 #include "CNetworkStats.h"
 #include "CSyncDebug.h"
 #include "CServer.h"
-#include "CTrainerMonitoringHistory.h"
 #include "CTransferBox.h"
 #include "rpc/CRPCFunctions.h"
 #include "CUnoccupiedVehicleSync.h"
@@ -49,7 +48,6 @@
 #include "CEvents.h"
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
-#include "CScriptFontLoader.h"
 #include "CElementDeleter.h"
 #include "CFoo.h"
 #include "../../shared_logic/CRegisteredCommands.h"
@@ -57,14 +55,6 @@
 #include "CVariableBuffer.h"
 #include "CLocalServer.h"
 #include "CVoiceRecorder.h"
-
-#ifdef MTA_DEBUG
-    struct AddressInfo 
-    {
-        unsigned long   ulOffset;
-        unsigned int    uiType;
-    };
-#endif
 
 class CClientGame
 {
@@ -193,6 +183,7 @@ public:
     inline bool                         IsLocalGame                     ( ) const { return m_bLocalPlay; }
 
     void                                DoPulsePreFrame                 ( void );
+    void                                DoPulsePreHUDRender             ( bool bDidUnminimize, bool bDidRecreateRenderTargets );
     void                                DoPulsePostFrame                ( void );
     void                                DoPulses                        ( void );
 
@@ -228,7 +219,6 @@ public:
     inline CResourceManager*            GetResourceManager              ( void )        { return m_pResourceManager; }
     inline CLuaManager*                 GetLuaManager                   ( void )        { return m_pLuaManager; }
     inline CScriptKeyBinds*             GetScriptKeyBinds               ( void )        { return m_pScriptKeyBinds; }
-    inline CScriptFontLoader*           GetScriptFontLoader             ( void )        { return m_pScriptFontLoader; }
     inline CScriptDebugging*            GetScriptDebugging              ( void )        { return m_pScriptDebugging; }
     inline CRegisteredCommands*         GetRegisteredCommands           ( void )        { return &m_RegisteredCommands; }
     inline CZoneNames*                  GetZoneNames                    ( void )        { return m_pZoneNames; };
@@ -323,6 +313,7 @@ public:
     void                                SetMinuteDuration               ( unsigned long ulDelay );
     inline long                         GetMoney                        ( void )                        { return m_lMoney; }
     void                                SetMoney                        ( long lMoney );
+    void                                SetWanted                       ( DWORD dwWanted );
 
     void                                ResetAmmoInClip                 ( void ) { memset(m_wasWeaponAmmoInClip,0,sizeof(m_wasWeaponAmmoInClip)); }
 
@@ -494,7 +485,6 @@ private:
     CTransferBox*                       m_pTransferBox;
     CResourceManager*                   m_pResourceManager;
     CScriptKeyBinds*                    m_pScriptKeyBinds;
-    CScriptFontLoader*                  m_pScriptFontLoader;
     CElementDeleter                     m_ElementDeleter;
     CZoneNames*                         m_pZoneNames;
     CPacketHandler*                     m_pPacketHandler;
@@ -569,6 +559,7 @@ private:
 
     float                               m_fGameSpeed;
     long                                m_lMoney;
+    DWORD                               m_dwWanted;
 
     bool                                m_Glitches[NUM_GLITCHES];
 
@@ -596,7 +587,7 @@ private:
 
     bool                                m_bBeingDeleted;        // To enable speedy disconnect
 
-    uint                                m_uiNotPulsedCounter;
+    bool                                m_bWasMinimized;
 
     // Cache for speeding up collision processing
 public:
@@ -621,18 +612,6 @@ private:
     CVector                             m_vecLastMimicRot;
     bool                                m_bDoPaintballs;
     bool                                m_bShowInterpolation;
-    #endif
-
-    // Trainer monitoring
-    #ifdef MTA_DEBUG
-        #define MTA_OFFSET_BASE     0
-        #define MTA_OFFSET_PLAYER   1
-        #define MTA_OFFSET_VEHICLE  2
-
-        CTrainerMonitoringHistory   m_RPMHistory;
-        CTrainerMonitoringHistory   m_WPMHistory;
-
-        AddressInfo *               GetAddressInfo ( unsigned long ulOffset, AddressInfo * pAddressInfo );
     #endif
 
     // Debug class. Empty in release.

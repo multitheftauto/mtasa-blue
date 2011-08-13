@@ -121,7 +121,7 @@ void CRPCFunctions::PlayerTarget ( NetBitStreamInterface & bitStream )
     if ( m_pSourcePlayer->IsJoined () )
     {
         ElementID TargetID;
-        bitStream.ReadCompressed ( TargetID );
+        bitStream.Read ( TargetID );
 
         CElement* pTarget = NULL;
         if ( TargetID != INVALID_ELEMENT_ID ) pTarget = CElementIDs::GetElement ( TargetID );
@@ -224,7 +224,7 @@ void CRPCFunctions::CursorEvent ( NetBitStreamInterface & bitStream )
          bitStream.ReadCompressed ( usY ) &&
          bitStream.Read ( &position ) &&
          bitStream.ReadBit ( bHasCollisionElement ) &&
-         ( !bHasCollisionElement || bitStream.ReadCompressed ( elementID ) ) )
+         ( !bHasCollisionElement || bitStream.Read ( elementID ) ) )
     {
         ucButton = button.data.ucButton;
         vecCursorPosition.fX = static_cast < float > ( usX );
@@ -295,7 +295,7 @@ void CRPCFunctions::CursorEvent ( NetBitStreamInterface & bitStream )
 void CRPCFunctions::RequestStealthKill ( NetBitStreamInterface & bitStream )
 {
     ElementID ID;
-    bitStream.ReadCompressed ( ID );
+    bitStream.Read ( ID );
     CElement * pElement = CElementIDs::GetElement ( ID );
     if ( pElement )
     {

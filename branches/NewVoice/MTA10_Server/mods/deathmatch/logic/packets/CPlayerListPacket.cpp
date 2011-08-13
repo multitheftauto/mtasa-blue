@@ -45,7 +45,7 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
 
         // Write the player ID
         ElementID PlayerID = pPlayer->GetID ();
-        BitStream.WriteCompressed ( PlayerID );
+        BitStream.Write ( PlayerID );
 
         // Time sync context
         BitStream.Write ( pPlayer->GetSyncTimeContext () );
@@ -107,7 +107,7 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( pTeam )
             {
                 BitStream.WriteBit ( true );
-                BitStream.WriteCompressed ( pTeam->GetID () );
+                BitStream.Write ( pTeam->GetID () );
             }
             else
                 BitStream.WriteBit ( false );
@@ -118,7 +118,7 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
                 CVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
                 // Vehicle ID and seat
-                BitStream.WriteCompressed ( pVehicle->GetID () );
+                BitStream.Write ( pVehicle->GetID () );
 
                 SOccupiedSeatSync seat;
                 seat.data.ucSeat = pPlayer->GetOccupiedVehicleSeat ();

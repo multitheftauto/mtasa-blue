@@ -17,6 +17,13 @@
 #include "ns_playerid.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
+struct SPacketStat
+{
+    int iCount;
+    int iTotalBytes;
+    TIMEUS totalTime;
+};
+
 class CNetServer
 {
 public:
@@ -35,8 +42,8 @@ public:
 
     virtual void                            RegisterPacketHandler           ( PPACKETHANDLER pfnPacketHandler, bool bIsPrimaryPacketHandler = true ) = 0;
 
-    virtual unsigned int                    GetBitsSent                     ( NetServerPlayerID& playerID ) = 0;
-    virtual unsigned int                    GetBitsReceived                 ( NetServerPlayerID& playerID ) = 0;
+    virtual bool                            GetNetworkStatistics            ( NetStatistics* pDest, NetServerPlayerID* pPlayerID = NULL ) = 0;
+    virtual const SPacketStat*              GetPacketStats                  ( void ) = 0;
 
     virtual int                             GetPing                         ( NetServerPlayerID& playerID ) = 0;
 
@@ -49,8 +56,6 @@ public:
     virtual void                            AddBan                          ( const char* szIP ) = 0;
     virtual void                            RemoveBan                       ( const char* szIP ) = 0;
     virtual bool                            IsBanned                        ( const char* szIP ) = 0;
-
-    virtual void                            GetNetworkUsageData             ( CNetServer::ENetworkUsageDirection, unsigned long ulBits[256], unsigned long ulCount[256] ) = 0;
 
     virtual void                            Kick                            ( NetServerPlayerID &PlayerID ) = 0;
 
@@ -69,6 +74,11 @@ public:
 
     virtual void                            ResetStub                       ( uint dwType, ... ) = 0;
     virtual void                            ResetStub                       ( uint dwType, va_list ) = 0;
+
+    virtual unsigned int                    GetPendingPacketCount           ( void ) = 0;
+
+    virtual bool                            InitServerId                    ( const char* szPath ) = 0;
+    virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled ) = 0;
 };
 
 #endif

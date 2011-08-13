@@ -403,7 +403,7 @@ void Editbox::eraseSelectedText(bool modify_text)
 		if (modify_text)
 		{
 			d_text_raw.erase(getSelectionStartIndex(), getSelectionLength());
-            d_text = String((CEGUI::utf8*)UTF16ToMbUTF8(GetBidiString(MbUTF8ToUTF16(d_text_raw.c_str()))).c_str());
+            d_text = d_text_raw.bidify();
 
 			// trigger notification that text has changed.
 			WindowEventArgs args(this);

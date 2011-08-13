@@ -34,6 +34,7 @@ class CClientRadarMarker;
 
 class CClientRadarMarker : public CClientEntity
 {
+    DECLARE_CLASS( CClientRadarMarker, CClientEntity )
     friend class CClientRadarMarkerManager;
 
 public:

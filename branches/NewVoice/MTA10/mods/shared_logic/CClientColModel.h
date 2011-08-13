@@ -15,8 +15,9 @@
 #include <list>
 #include "CClientEntity.h"
 
-class CClientColModel: public CClientEntity
+class CClientColModel : public CClientEntity
 {
+    DECLARE_CLASS( CClientColModel, CClientEntity )
 public:
                                     CClientColModel         ( class CClientManager* pManager, ElementID ID );
                                     ~CClientColModel        ( void );

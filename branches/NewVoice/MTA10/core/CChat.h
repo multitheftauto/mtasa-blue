@@ -82,7 +82,7 @@ public:
 
     CChatLineSection&           operator =              ( const CChatLineSection& other );
 
-    void                        Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );
+    void                        Draw                    ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );
     float                       GetWidth                ( void );
     inline const char*          GetText                 ( void )            { return m_strText.c_str (); }
     void                        SetText                 ( const char* szText )  { m_strText = szText; }
@@ -104,7 +104,7 @@ public:
     static bool                 IsColorCode             ( const char* szColorCode );
 
     virtual const char*         Format                  ( const char* szText, float fWidth, CColor& color, bool bColorCoded );
-    virtual void                Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );    
+    virtual void                Draw                    ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );    
     virtual float               GetWidth                ( void );
     bool                        IsActive                ( void )    { return m_bActive; }
     void                        SetActive               ( bool bActive )    { m_bActive = bActive; }
@@ -139,7 +139,7 @@ class CChat
 
 public:
     inline                      CChat                   ( void ) {};
-                                CChat                   ( CGUI* pManager, CVector2D & vecPosition );
+                                CChat                   ( CGUI* pManager, const CVector2D & vecPosition );
                                 ~CChat                  ( void );
 
     virtual void                Draw                    ( void );

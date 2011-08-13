@@ -117,6 +117,22 @@ SString SharedUtil::GetLocalTimeString ( bool bDate, bool bMilliseconds )
     return GetTimeString ( bDate, bMilliseconds, true );
 }
 
+namespace SharedUtil
+{
+    long long gCurrentTickCount64 = 0;
+}
+
+long long SharedUtil::GetModuleTickCount64 ( void )
+{
+    if ( !gCurrentTickCount64 )
+        UpdateModuleTickCount64 ();
+    return gCurrentTickCount64;
+}
+
+void SharedUtil::UpdateModuleTickCount64 ( void )
+{
+    gCurrentTickCount64 = GetTickCount64_ ();
+}
 
 
 //
@@ -184,3 +200,55 @@ unsigned long GetTickCount ( void )
 }
 #endif
 
+
+// Get time in microseconds
+#ifdef WIN32
+TIMEUS SharedUtil::GetTimeUs()
+{
+    static bool bInitialized = false;
+    static LARGE_INTEGER lFreq, lStart;
+    static LARGE_INTEGER lDivisor;
+    if ( !bInitialized )
+    {
+        bInitialized = true;
+        QueryPerformanceFrequency(&lFreq);
+        QueryPerformanceCounter(&lStart);
+        lDivisor.QuadPart = lFreq.QuadPart / 1000000;
+    }
+
+    LARGE_INTEGER lEnd;
+    QueryPerformanceCounter(&lEnd);
+	double duration = double(lEnd.QuadPart - lStart.QuadPart) / lFreq.QuadPart;
+    duration *= 1000000;
+    LONGLONG llDuration = static_cast < LONGLONG > ( duration );
+    return llDuration & 0xffffffff;
+}
+#else
+#include <sys/time.h>                // for gettimeofday()
+using namespace std;
+typedef long long LONGLONG;
+
+TIMEUS SharedUtil::GetTimeUs()
+{
+    static bool bInitialized = false;
+    static timeval t1;
+    if ( !bInitialized )
+    {
+        bInitialized = true;
+        // start timer
+        gettimeofday(&t1, NULL);
+    }
+
+    // stop timer
+    timeval t2;
+    gettimeofday(&t2, NULL);
+
+    // compute elapsed time in us
+    double elapsedTime;
+    elapsedTime =  (t2.tv_sec  - t1.tv_sec) * 1000000.0;    // sec to us
+    elapsedTime += (t2.tv_usec - t1.tv_usec);               // us to us
+
+    LONGLONG llDuration = static_cast < LONGLONG > ( elapsedTime );
+    return llDuration & 0xffffffff;
+}
+#endif

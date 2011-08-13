@@ -4778,6 +4778,15 @@ public:
 		return const_reverse_iterator(begin());
 	}
 
+	/*!
+	\brief
+		Get the bidirectional version of a string
+
+	\return
+		A modified variant of the string which has a shaping algorithm applied
+	*/
+    String bidify(void) const;
+
 private:
 	/*************************************************************************
 		Implementation Functions

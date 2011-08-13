@@ -12,6 +12,8 @@
 *****************************************************************************/
 
 
+#include <cmath>
+
 namespace SharedUtil
 {
     class CArgMap;
@@ -92,7 +94,8 @@ namespace SharedUtil
     #ifdef MTA_DEBUG
         void OutputDebugLine ( const char* szMessage );
     #else
-        #define OutputDebugLine(x) {}
+        inline void OutputDebugLineDummy ( void ) {}
+        #define OutputDebugLine(x) OutputDebugLineDummy ()
     #endif
 
     //
@@ -103,7 +106,7 @@ namespace SharedUtil
     //
     // Try to make a path relative to the 'resources/' directory
     //
-    SString ConformResourcePath ( const char* szRes );
+    SString ConformResourcePath ( const char* szRes, bool bConvertToUnixPathSep = false );
 
     SString GenerateNickname ( void );
 
@@ -116,8 +119,6 @@ namespace SharedUtil
     std::string  UTF16ToMbUTF8 (const std::wstring& ws);
 
     std::wstring  ANSIToUTF16 (const std::string& s);
-
-    std::wstring GetBidiString (const std::wstring ws);
 
     int  GetUTF8Confidence (unsigned char* input, int len);
 
@@ -169,7 +170,7 @@ namespace SharedUtil
     template < class T >
     int Round ( T value )
     {
-        return static_cast < int > ( floor ( value + 0.5f ) );
+        return static_cast < int > ( std::floor ( value + 0.5f ) );
     }
 
 
@@ -181,6 +182,9 @@ namespace SharedUtil
     //
     // std:: container helpers
     //
+
+    template < class TL, class T >
+    bool ListContains ( const TL& itemList, const T& item );
 
     // Add item if it does not aleady exist in itemList
     template < class TL, class T >
@@ -253,8 +257,8 @@ namespace SharedUtil
     //
 
     // Update or add a value for a key
-    template < class T, class V, class TR, class T2 >
-    void MapSet ( std::map < T, V, TR >& collection, const T2& key, const V& value )
+    template < class T, class V, class TR, class T2, class V2 >
+    void MapSet ( std::map < T, V, TR >& collection, const T2& key, const V2& value )
     {
         collection[ key ] = value;
     }
@@ -323,12 +327,55 @@ namespace SharedUtil
     }
 
     // Add a value for a key
-    template < class T, class V, class TR, class T2 >
-    void MapInsert ( std::multimap < T, V, TR >& collection, const T2& key, const V& value )
+    template < class T, class V, class TR, class T2, class V2 >
+    void MapInsert ( std::multimap < T, V, TR >& collection, const T2& key, const V2& value )
     {
         collection.insert ( std::pair < T2, V > ( key, value ) );
     }
 
+    // Remove first pair
+    template < class T, class V, class TR, class T2, class V2 >
+    void MapRemovePair ( std::multimap < T, V, TR >& collection, const T2& key, const V2& value )
+    {
+        typedef typename std::multimap < T, V, TR > ::iterator iter_t;
+        std::pair < iter_t, iter_t > itp = collection.equal_range ( key );
+        for ( iter_t it = itp.first ; it != itp.second ; ++it )
+            if ( it->second == value )
+            { 
+                collection.erase ( it );
+                break;
+            }
+    }
+
+
+    //
+    // std::set helpers
+    //
+
+    // Update or add an item
+    template < class T, class TR, class T2 >
+    void MapInsert ( std::set < T, TR >& collection, const T2& item )
+    {
+        collection.insert ( item );
+    }
+
+    // Returns true if the item is in the collection
+    template < class T, class TR, class T2 >
+    bool MapContains ( const std::set < T, TR >& collection, const T2& item )
+    {
+        return collection.find ( item ) != collection.end ();
+    }
+
+    // Remove item from collection
+    template < class T, class TR, class T2 >
+    bool MapRemove ( std::set < T, TR >& collection, const T2& item )
+    {
+        typename std::set < T, TR > ::iterator it = collection.find ( item );
+        if ( it == collection.end () )
+            return false;
+        collection.erase ( it );
+        return true;
+    }
 
 
 
@@ -447,7 +494,7 @@ namespace SharedUtil
     //
     // Note: IDs run from 1 to Capacity
     //
-    template < typename T, unsigned long INITIAL_MAX_STACK_SIZE, T INVALID_STACK_ID >
+    template < typename T, unsigned long INITIAL_MAX_STACK_SIZE >
     class CStack
     {
     public:
@@ -480,26 +527,26 @@ namespace SharedUtil
             m_ulCapacity = ulNewSize;
         }
 
-        T Pop ( void )
+        bool Pop ( T& dest )
         {
             // Got any items? Pop from the back
             if ( m_Queue.size () > 0 )
             {
                 T ID = m_Queue.back();
                 m_Queue.pop_back ();
-                return ID;
+                dest = ID;
+                return true;
             }
 
             // No IDs left
-            return INVALID_STACK_ID;
+            return false;
         }
 
         void Push ( T ID )
         {
             assert ( m_Queue.size () < m_ulCapacity );
-            assert ( ID != INVALID_STACK_ID );
             // Push to the front
-            return m_Queue.push_front ( ID );
+            m_Queue.push_front ( ID );
         }
 
     private:
@@ -1041,6 +1088,129 @@ namespace SharedUtil
     {
         return static_cast < T > ( ms_ucToupperTab [ static_cast < unsigned char > ( c ) ] );
     }
+
+
+    //
+    // enum reflection shenanigans
+    //
+    enum eDummy { };
+
+    struct CEnumInfo
+    {
+        struct SEnumItem
+        {
+            int iValue;
+            const char* szName;
+        };
+
+        CEnumInfo( const SString& strTypeName, const SEnumItem* pItemList, uint uiAmount, eDummy defaultValue, const SString& strDefaultName )
+        {
+            m_strTypeName = strTypeName;
+            m_strDefaultName = strDefaultName;
+            m_DefaultValue = defaultValue;
+            for ( uint i = 0 ; i < uiAmount ; i++ )
+            {
+                const SEnumItem& item = pItemList[i];
+                m_ValueMap[ item.szName ] = (eDummy)item.iValue;
+                m_NameMap[ (eDummy)item.iValue ] = item.szName;
+            }
+        }
+
+        const SString& FindName ( eDummy value ) const
+        {
+            if ( const SString* pName = MapFind ( m_NameMap, value ) )
+                return *pName;
+            return m_strDefaultName;
+        }
+
+        bool FindValue ( const SString& strName, eDummy& outResult ) const
+        {
+            if ( const eDummy* pValue = MapFind ( m_ValueMap, strName ) )
+            {
+                outResult = *pValue;
+                return true;
+            }
+            outResult = m_DefaultValue;
+            return false;
+        }
+
+        const SString& GetTypeName( void ) const
+        {
+            return m_strTypeName;
+        }
+
+        SString m_strTypeName;
+        SString m_strDefaultName;
+        eDummy m_DefaultValue;
+        std::map < SString, eDummy > m_ValueMap;
+        std::map < eDummy, SString > m_NameMap;
+    };
+
+
+    #define DECLARE_ENUM( T ) \
+        CEnumInfo*             GetEnumInfo     ( const T& ); \
+        inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
+        inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
+        inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
+
+    #define IMPLEMENT_ENUM_BEGIN(cls) \
+        CEnumInfo* GetEnumInfo( const cls& ) \
+        { \
+            static const CEnumInfo::SEnumItem items[] = {
+
+    #define IMPLEMENT_ENUM_END(name) \
+        IMPLEMENT_ENUM_END_DEFAULTS(name,0,"")
+
+    #define IMPLEMENT_ENUM_END_DEFAULTS(name,defvalue,defname) \
+                            }; \
+            static CEnumInfo info( name, items, NUMELMS(items),(eDummy)(defvalue),defname ); \
+            return &info; \
+        }
+
+    #define ADD_ENUM(value,name) {value, name},
+    #define ADD_ENUM1(value)     {value, #value},
+
+
+    //
+    // Fast wildcard matching
+    //
+    inline
+    bool WildcardMatch(const char *wild, const char *string) {
+      // Written by Jack Handy - jakkhandy@hotmail.com
+      assert ( wild && string );
+
+      const char *cp = NULL, *mp = NULL;
+
+      while ((*string) && (*wild != '*')) {
+        if ((*wild != *string) && (*wild != '?')) {
+          return 0;
+        }
+        wild++;
+        string++;
+      }
+
+      while (*string) {
+        if (*wild == '*') {
+          if (!*++wild) {
+            return 1;
+          }
+          mp = wild;
+          cp = string+1;
+        } else if ((*wild == *string) || (*wild == '?')) {
+          wild++;
+          string++;
+        } else {
+          wild = mp;
+          string = cp++;
+        }
+      }
+
+      while (*wild == '*') {
+        wild++;
+      }
+      return !*wild;
+    }
+
 };
 
 using namespace SharedUtil;

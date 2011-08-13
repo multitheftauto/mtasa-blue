@@ -24,6 +24,7 @@ class CClientCivilian;
 
 class CClientCivilian : public CClientEntity
 {
+    DECLARE_CLASS( CClientCivilian, CClientEntity )
     friend class CClientCivilianManager;
 
 public:

@@ -215,6 +215,7 @@ struct RwRaster
     unsigned char   format;
     unsigned char   *origPixels;
     int             origWidth, origHeight, origDepth;
+    void*           renderResource;
 };
 struct RwColorFloat
 {
@@ -390,7 +391,7 @@ union RwStreamTypeData
     struct {
         unsigned int      position;
         unsigned int      size;
-        void              *ptr;
+        void              *ptr_file;
     };
     struct {
         void              *file;
@@ -400,7 +401,7 @@ union RwStreamTypeData
         RwIOCallbackRead  callbackRead;
         RwIOCallbackWrite callbackWrite;
         RwIOCallbackOther callbackOther;
-        void              *ptr;
+        void              *ptr_callback;
     };
 };
 struct RwStream

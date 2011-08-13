@@ -24,7 +24,7 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
         return false;
 
     m_OriginID = INVALID_ELEMENT_ID;
-    if ( bHasOrigin && !BitStream.ReadCompressed ( m_OriginID ) )
+    if ( bHasOrigin && !BitStream.Read ( m_OriginID ) )
         return false;
 
     SPositionSync origin ( false );
@@ -64,7 +64,7 @@ bool CProjectileSyncPacket::Read ( NetBitStreamInterface& BitStream )
                 return false;
 
             m_TargetID = INVALID_ELEMENT_ID;
-            if ( bHasTarget && !BitStream.ReadCompressed ( m_TargetID ) )
+            if ( bHasTarget && !BitStream.Read ( m_TargetID ) )
                 return false;
 
             SVelocitySync velocity;
@@ -96,7 +96,7 @@ bool CProjectileSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_pSourceElement )
     {
         BitStream.WriteBit ( true );
-        BitStream.WriteCompressed ( m_pSourceElement->GetID () );
+        BitStream.Write ( m_pSourceElement->GetID () );
 
         unsigned short usLatency = static_cast < CPlayer * > ( m_pSourceElement )->GetPing ();
         BitStream.WriteCompressed ( usLatency );
@@ -108,7 +108,7 @@ bool CProjectileSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_OriginID != INVALID_ELEMENT_ID )
     {
         BitStream.WriteBit ( true );
-        BitStream.WriteCompressed ( m_OriginID );
+        BitStream.Write ( m_OriginID );
     }
     else
         BitStream.WriteBit ( false );
@@ -144,7 +144,7 @@ bool CProjectileSyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( m_TargetID != INVALID_ELEMENT_ID )
             {
                 BitStream.WriteBit ( true );
-                BitStream.WriteCompressed ( m_TargetID );
+                BitStream.Write ( m_TargetID );
             }
             else
                 BitStream.WriteBit ( false );

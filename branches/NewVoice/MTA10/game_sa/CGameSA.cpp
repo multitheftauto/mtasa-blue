@@ -150,6 +150,7 @@ CGameSA::CGameSA()
     // Change pool sizes here
     m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );  // Default is 500
     m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );  // Default is 350
+    m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );
 }
 
 CGameSA::~CGameSA ( void )
@@ -662,4 +663,12 @@ bool CGameSA::HasCreditScreenFadedOut ( void )
 void CGameSA::FlushPendingRestreamIPL ( void )
 {
     CModelInfoSA::StaticFlushPendingRestreamIPL ();
+}
+
+// Disable VSync by forcing what normally happends at the end of the loading screens
+// Note #1: This causes the D3D device to be reset after the next frame
+// Note #2: Some players do not need this to disable VSync. (Possibly because their video card driver settings override it somewhere)
+void CGameSA::DisableVSync ( void )
+{
+    MemPutFast < BYTE > ( 0xBAB318, 0 );
 }

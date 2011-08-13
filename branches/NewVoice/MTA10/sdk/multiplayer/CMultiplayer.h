@@ -15,8 +15,10 @@
 #include <CMatrix.h>
 #include <CVector.h>
 
+#include <game/CExplosion.h>
 #include <game/CStats.h>
 #include "CPopulationMP.h"
+#include "CLimits.h"
 
 #define DEFAULT_WAVES -1.0f
 
@@ -141,7 +143,7 @@ public:
     virtual void                        SetWaterColor               ( float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha ) = 0;
     virtual void                        ResetWater                  ( void ) = 0;
     virtual void                        SetCloudsEnabled            ( bool bDisabled ) = 0;
-    virtual bool                        AreInteriorSoundsEnabled    () = 0;
+    virtual bool                        GetInteriorSoundsEnabled    () = 0;
     virtual void                        SetInteriorSoundsEnabled    ( bool bEnabled ) = 0;
     virtual void                        SetWindVelocity             ( float fX, float fY, float fZ ) = 0;
     virtual void                        GetWindVelocity             ( float& fX, float& fY, float& fZ ) = 0;
@@ -217,6 +219,8 @@ public:
 
     virtual void                        AllowCreatedObjectsInVerticalLineTest ( bool bOn ) = 0;
     virtual void                        DeleteAndDisableGangTags    () = 0;
+
+    virtual CLimits*                    GetLimits                   () = 0;
 };
 
 #endif

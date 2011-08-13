@@ -70,6 +70,8 @@ CPerfStatManagerImpl::CPerfStatManagerImpl ( void )
     AddModule ( CPerfStatLuaMemory::GetSingleton () );
     AddModule ( CPerfStatLibMemory::GetSingleton () );
     AddModule ( CPerfStatPacketUsage::GetSingleton () );
+    AddModule ( CPerfStatSqliteTiming::GetSingleton () );
+    AddModule ( CPerfStatBandwidthUsage::GetSingleton () );
 }
 
 

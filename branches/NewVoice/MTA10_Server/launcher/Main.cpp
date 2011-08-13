@@ -57,9 +57,9 @@ int main ( int argc, char* argv [] )
         szLaunchFile = cpPos + 1;
     }
 
-    if ( argc == 2 )
+    if ( argc > 1 )
     {
-        if ( strcmp ( argv[1], "/?" ) == 0 || strcmp ( argv[1], "--help" ) == 0 )
+        if ( strcmp ( argv[1], "/?" ) == 0 || strcmp ( argv[1], "--help" ) == 0 || strcmp ( argv[1], "-h" ) == 0 )
         {
             printf ( "Usage: %s [OPTION]\n\n", szLaunchFile ? szLaunchFile : "mtaserver" );
             printf ( "  -s                   Run server in silent mode\n" );

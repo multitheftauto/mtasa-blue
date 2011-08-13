@@ -47,7 +47,10 @@ bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
     // No upgrades for trains
     if ( usModel == 537 ||
          usModel == 538 ||
-         usModel == 449 )
+         usModel == 449 ||
+         usModel == 569 ||
+         usModel == 570 ||
+         usModel == 590  )
     {
         return false;
     }

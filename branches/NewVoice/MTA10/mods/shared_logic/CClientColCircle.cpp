@@ -15,7 +15,7 @@
 
 using namespace std;
 
-CClientColCircle::CClientColCircle ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius ) : CClientColShape ( pManager, ID )
+CClientColCircle::CClientColCircle ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, float fRadius ) : ClassInit ( this ), CClientColShape ( pManager, ID )
 {
     m_vecPosition = vecPosition;
     m_fRadius = fRadius;

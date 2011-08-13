@@ -545,6 +545,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CHandlingEntry.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CHandlingManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CHTTPD.cpp"
 					>
 				</File>
@@ -621,6 +629,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CPerfStat.BandwidthUsage.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPerfStat.LibMemory.cpp"
 					>
 				</File>
@@ -634,6 +646,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CPerfStat.PacketUsage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CPerfStat.SqliteTiming.cpp"
 					>
 				</File>
 				<File
@@ -988,6 +1004,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerModInfoPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerPuresyncPacket.cpp"
 						>
 					</File>
@@ -1096,6 +1116,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\lua\CLuaFunctionParseHelpers.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\lua\CLuaFunctionRef.cpp"
 						>
 					</File>
@@ -1145,6 +1169,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaFileDefs.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaHandlingDefs.cpp"
 						>
 					</File>
 					<File
@@ -1610,6 +1638,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CHandlingEntry.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CHandlingManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CHTTPD.h"
 					>
 				</File>
@@ -2069,6 +2105,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerModInfoPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerPuresyncPacket.h"
 						>
 					</File>
@@ -2189,6 +2229,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\lua\CLuaFunctionParseHelpers.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\lua\CLuaFunctionRef.h"
 						>
 					</File>
@@ -2246,6 +2290,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaFileDefs.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaHandlingDefs.h"
 						>
 					</File>
 					<File

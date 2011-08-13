@@ -67,17 +67,7 @@ bool CDownloadableResource::DoesClientAndServerChecksumMatch ( void )
 
 CChecksum CDownloadableResource::GenerateClientChecksum ( void )
 {
-    WIN32_FIND_DATA fdInfo;
-    if ( INVALID_HANDLE_VALUE != FindFirstFile( m_szName, &fdInfo ) )
-    {
-        m_LastClientChecksum = CChecksum::GenerateChecksumFromFile ( m_szName );
-    }
-    else
-    {
-        // Reset the last client checksum, as the  does not exist
-        m_LastClientChecksum = CChecksum ();
-    }
-
+    m_LastClientChecksum = CChecksum::GenerateChecksumFromFile ( m_szName );
     return m_LastClientChecksum;
 }
 

@@ -224,16 +224,34 @@ DWORD RETURN_CrashFix_Misc13b =                             0x4D4764;
 #define HOOKPOS_CrashFix_Misc14                              0x4DD4B5
 DWORD RETURN_CrashFix_Misc14 =                               0x4DD4BB;
 
+#define HOOKPOS_FreezeFix_Misc15_US                         0x156CDAE
+#define HOOKPOS_FreezeFix_Misc15_EU                         0x156CDEE
+DWORD RETURN_FreezeFix_Misc15_US =                          0x156CDB4;
+DWORD RETURN_FreezeFix_Misc15_EU =                          0x156CDF4;
+DWORD RETURN_FreezeFix_Misc15_BOTH =                        0;
+
+#define HOOKPOS_CrashFix_Misc16                              0x5E5815
+DWORD RETURN_CrashFix_Misc16 =                               0x5E581B;
+
 #define HOOKPOS_VehColCB                                    0x04C838D
 DWORD RETURN_VehColCB =                                     0x04C83AA;
 
 #define HOOKPOS_VehCol                                      0x06D6603
 DWORD RETURN_VehCol =                                       0x06D660C;
 
+// Handling fix - driveType is per model
+#define HOOKPOS_CHandlingData_isNotRWD              0x6A048C
+DWORD RETURN_CHandlingData_isNotRWD =               0x6A0493;
+#define HOOKPOS_CHandlingData_isNotFWD              0x6A04BC
+DWORD RETURN_CHandlingData_isNotFWD =               0x6A04C3;
+// end of handling fix
 #define CALL_CAutomobile_ProcessEntityCollision             0x6AD053
 #define CALL_CBike_ProcessEntityCollision1                  0x6BDF82
 #define CALL_CBike_ProcessEntityCollision2                  0x6BE0D1
 #define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
+
+#define HOOKPOS_PreHUDRender                                      0x053EAD8
+DWORD RETURN_PreHUDRender =                                       0x053EADD;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -367,8 +385,13 @@ void HOOK_CrashFix_Misc11 ();
 void HOOK_CrashFix_Misc12 ();
 void HOOK_CrashFix_Misc13 ();
 void HOOK_CrashFix_Misc14 ();
+void HOOK_FreezeFix_Misc15 ();
+void HOOK_CrashFix_Misc16 ();
 void HOOK_VehColCB ();
 void HOOK_VehCol ();
+void HOOK_isVehDriveTypeNotRWD ();
+void HOOK_isVehDriveTypeNotFWD ();
+void HOOK_PreHUDRender();
 
 void HOOK_CTrafficLights_GetPrimaryLightState ();
 void HOOK_CTrafficLights_GetSecondaryLightState ();
@@ -503,9 +526,25 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CrashFix_Misc12, (DWORD)HOOK_CrashFix_Misc12, 5 );
     HookInstall(HOOKPOS_CrashFix_Misc13, (DWORD)HOOK_CrashFix_Misc13, 6 );
     HookInstall(HOOKPOS_CrashFix_Misc14, (DWORD)HOOK_CrashFix_Misc14, 6 );
+    if ( version == VERSION_US_10 )
+    {
+        HookInstall(HOOKPOS_FreezeFix_Misc15_US, (DWORD)HOOK_FreezeFix_Misc15, 6 );
+        RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_US;
+    }
+    if ( version == VERSION_EU_10 )
+    {
+        HookInstall(HOOKPOS_FreezeFix_Misc15_EU, (DWORD)HOOK_FreezeFix_Misc15, 6 );
+        RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_EU;
+    }
+    HookInstall(HOOKPOS_CrashFix_Misc16, (DWORD)HOOK_CrashFix_Misc16, 6 );
+
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
+    HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5 );
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7 );
+
+    HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7 );
+    HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7 );
 
     HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
@@ -519,7 +558,7 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
     HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
     HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
-    HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
+    //HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -1082,9 +1121,6 @@ void CMultiplayerSA::InitHooks()
     MemPut < WORD > ( 0x53A55F, 0x9090 );
     MemPut < BYTE > ( 0x73EC06, 0x85 );
 
-    // Increase the events pool size (Fixes #4577).
-    MemPut < DWORD > ( 0x551177, 9001 );
-
     // Do not fixate camera behind spectated player if local player is dead
     MemPut < BYTE > ( 0x52A2BB, 0 );
     MemPut < BYTE > ( 0x52A4F8, 0 );
@@ -1176,6 +1212,18 @@ void CMultiplayerSA::InitHooks()
     // Mute peds (would break setPedVoice).
     MemCpy ( (void *)0x5EFFE0, "\xC2\x18\x00\x90", 4 );
 #endif
+
+    // Clip camera also outside the world bounds.
+    MemSet ( (void *)0x41AD12, 0x90, 2 );
+    MemSet ( (void *)0x41ADA7, 0x90, 2 );
+    MemSet ( (void *)0x41ADF3, 0x90, 2 );
+
+    // Allow Player Garages to shut with players inside.
+    MemSet ( (void *)0x44C6FA, 0x90, 4 );
+
+    // Stop the loading of ambient traffic models and textures
+    // by skipping CStreaming::StreamVehiclesAndPeds() and CStreaming::StreamZoneModels()
+    MemPut < BYTE > ( 0x40E7DF, 0xEB );
 }
 
 
@@ -1364,7 +1412,7 @@ void CMultiplayerSA::DisableQuickReload ( bool bDisabled )
         MemPut < WORD > ( 0x60B4F6, 0x027C );
 }
 
-bool CMultiplayerSA::AreInteriorSoundsEnabled ( )
+bool CMultiplayerSA::GetInteriorSoundsEnabled ( )
 {
     return bInteriorSoundsEnabled;
 }
@@ -3613,6 +3661,49 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
     }
 }
 
+static CVehicleSAInterface* pHandlingDriveTypeVeh = NULL;
+unsigned char ucDriveType = '4';
+void GetVehicleDriveType()
+{
+    //Get the car drive type from the Vehicle interface
+    ucDriveType = static_cast<unsigned char> ( pHandlingDriveTypeVeh->m_pVehicle->GetHandlingData()->GetCarDriveType() );
+}
+
+void _declspec(naked) HOOK_isVehDriveTypeNotRWD ()
+{
+    // Get the Vehicle interface from esi
+    _asm
+    {
+         mov pHandlingDriveTypeVeh, esi
+    }
+
+    GetVehicleDriveType();
+
+    // push our drive type into bl :)
+    _asm
+    {
+        mov bl, ucDriveType
+        jmp RETURN_CHandlingData_isNotRWD
+    }
+}
+
+void _declspec(naked) HOOK_isVehDriveTypeNotFWD ()
+{
+    // Get the Vehicle SA interface from esi
+    _asm
+    {
+         mov pHandlingDriveTypeVeh, esi
+    }
+
+    GetVehicleDriveType();
+
+    // push our drive type into bl :)
+    _asm
+    {
+        mov bl, ucDriveType
+        jmp RETURN_CHandlingData_isNotFWD
+    }
+}
 
 unsigned char CMultiplayerSA::GetTrafficLightState ()
 {
@@ -4885,6 +4976,29 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList ()
     }
 }
 
+//
+// Test macros for CrashFixes
+//
+#ifdef MTA_DEBUG
+
+#define SIMULATE_ERROR_BEGIN( chance ) \
+{ \
+    _asm { pushad } \
+    if ( rand() % 100 < (chance) ) \
+    { \
+        _asm popad
+
+
+#define SIMULATE_ERROR_END \
+        _asm pushad \
+    } \
+    _asm popad \
+}
+
+#endif
+
+#define TEST_CRASH_FIXES 0
+
 
 void _declspec(naked) HOOK_CrashFix_Misc1 ()
 {
@@ -5139,6 +5253,78 @@ void _declspec(naked) HOOK_CrashFix_Misc14 ()
 }
 
 
+void _cdecl DoWait ( HANDLE hHandle )
+{
+    DWORD dwWait = 4000;
+    DWORD dwResult = WaitForSingleObject ( hHandle, dwWait );
+    if ( dwResult == WAIT_TIMEOUT )
+    {
+        AddReportLog ( 6211, SString ( "WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait ) );
+        // This thread lock bug in GTA will have to be fixed one day.
+        // Until then, a 5 second freeze should be long enough for the loading thread to have finished it's job.
+#if 0
+        _wassert ( _CRT_WIDE("\
+            Press IGNORE  ('I' Key) \n\
+            Press IGNORE  ('I' Key) \n\
+            Press IGNORE  ('I' Key) \n\
+            Press IGNORE  ('I' Key) \n\
+            ")
+         , _CRT_WIDE(__FILE__), __LINE__);
+#endif
+        dwResult = WaitForSingleObject ( hHandle, 1000 );
+    }
+}
+
+// hooked at 0156CDAE - 6 bytes
+void _declspec(naked) HOOK_FreezeFix_Misc15 ()
+{
+    _asm
+    {
+        pop eax
+        pop edx
+        pushad
+
+        push eax
+        call DoWait
+        add esp, 4
+
+        popad
+        jmp     RETURN_FreezeFix_Misc15_BOTH  // 156CDB4
+    }
+}
+
+
+// Handle RpAnimBlendClumpGetFirstAssociation returning NULL
+// hooked at 5E5815 6 bytes
+void _declspec(naked) HOOK_CrashFix_Misc16 ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     eax, 0
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        cmp     eax, 0
+        je      cont  // Skip much code if eax is zero ( RpAnimBlendClumpGetFirstAssociation returns NULL )
+
+        // continue standard path
+        movsx   ecx, word ptr [eax+2Ch]
+        xor     edi, edi
+        jmp     RETURN_CrashFix_Misc16  // 5E581B
+
+    cont:
+        add     esp, 96
+        retn
+    }
+}
+
+
+
 static SColor vehColors[4];
 
 void _cdecl SaveVehColors ( DWORD dwThis )
@@ -5296,5 +5482,28 @@ void _declspec(naked) HOOK_ProcessVehicleCollision ()
 
         pop eax
         ret
+    }
+}
+
+
+void OnPreHUDRender ( void );
+
+void _declspec(naked) HOOK_PreHUDRender ()
+{
+    _asm
+    {
+        pushad
+    }
+        //call PreHUDRender
+    OnPreHUDRender ();
+
+    _asm
+    {
+        popad
+
+        // Hooked from 0053EAD8  5 bytes
+        mov     eax, ds:0B6F0B8h
+
+        jmp     RETURN_PreHUDRender  // 0053EADD
     }
 }

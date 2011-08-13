@@ -88,6 +88,7 @@ class CClientProjectile;
 
 class CClientVehicle : public CClientStreamElement
 {
+    DECLARE_CLASS( CClientVehicle, CClientStreamElement )
     friend class CClientCamera;
     friend class CClientPed;
     friend class CClientVehicleManager;
@@ -140,12 +141,14 @@ public:
     float                       GetDoorOpenRatio        ( unsigned char ucDoor );
     void                        SetSwingingDoorsAllowed ( bool bAllowed );
     bool                        AreSwingingDoorsAllowed () const;
+    void                        AllowDoorRatioSetting   ( unsigned char ucDoor, bool bAllow );
     bool                        AreDoorsLocked          ( void );
     void                        SetDoorsLocked          ( bool bLocked );
 
 private:
     void                        SetDoorOpenRatioInterpolated    ( unsigned char ucDoor, float fRatio, unsigned long ulDelay );
     void                        ResetDoorInterpolation          ();
+    void                        CancelDoorInterpolation         ( unsigned char ucDoor );
     void                        ProcessDoorInterpolation        ();
 
 public:
@@ -380,17 +383,15 @@ public:
 
     void                        RemoveAllProjectiles    ( void );
 
-    static void                 SetPedOccupiedVehicle   ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat );
-    static void                 SetPedOccupyingVehicle  ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat );
+    static void                 SetPedOccupiedVehicle   ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor );
+    static void                 SetPedOccupyingVehicle  ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor );
     static void                 ValidatePedAndVehiclePair ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed, CClientVehicle* pVehicle );
     static void                 UnpairPedAndVehicle     ( CClientPed* pClientPed );
     
-#if WITH_VEHICLE_HANDLING
     void                        ApplyHandling           ( void );
     CHandlingEntry*             GetHandlingData         ( void );
     const CHandlingEntry*       GetOriginalHandlingData ( void )    { return m_pOriginalHandlingEntry; }
-#endif
 
 protected:
     void                        StreamIn                ( bool bInstantly );
@@ -442,6 +443,7 @@ protected:
     bool                        m_bLandingGearDown;
     bool                        m_bHasAdjustableProperty;
     unsigned short              m_usAdjustablePropertyValue;
+    bool                        m_bAllowDoorRatioSetting [ 6 ];
     float                       m_fDoorOpenRatio [ 6 ];
     struct
     {
@@ -490,10 +492,8 @@ protected:
     bool                        m_bIsOnGround;
     bool                        m_bHeliSearchLightVisible;
     float                       m_fHeliRotorSpeed;
-#if WITH_VEHICLE_HANDLING
     const CHandlingEntry*       m_pOriginalHandlingEntry;
     CHandlingEntry*             m_pHandlingEntry;
-#endif
 
     bool                        m_bIsDerailed;
     bool                        m_bIsDerailable;
@@ -540,6 +540,8 @@ protected:
 
     CVector                     m_vecGravity;
     SColor                      m_HeadLightColor;
+
+    bool                        m_bHasCustomHandling;
 
 public:
     CClientPlayer *             m_pLastSyncer;

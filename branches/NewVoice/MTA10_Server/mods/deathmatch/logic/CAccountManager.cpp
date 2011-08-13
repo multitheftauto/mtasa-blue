@@ -459,6 +459,12 @@ bool CAccountManager::SaveSettings ()
 }
 
 
+bool CAccountManager::IntegrityCheck ()
+{
+    return m_pSaveFile->IntegrityCheck ();
+}
+
+
 CAccount* CAccountManager::Get ( const char* szName, bool bRegistered )
 {
     if ( szName && szName [ 0 ] )
@@ -735,7 +741,7 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
 }
 
 
-CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, char* szKey )
+CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* szKey )
 {
     //Get the user ID
     int iUserID = pAccount->GetID();
@@ -762,14 +768,14 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, char* szKey )
         if ( iType == LUA_TNUMBER )
             return new CLuaArgument ( strtod ( (char *)result.Data[0][0].pVal, NULL ) );
         else
-            return new CLuaArgument ( (char *)result.Data[0][0].pVal );
+            return new CLuaArgument ( std::string ( (char *)result.Data[0][0].pVal ) );
     }
 
     //No results
     return new CLuaArgument ( false );
 }
 
-bool CAccountManager::SetAccountData( CAccount* pAccount, char* szKey, SString strValue, int iType )
+bool CAccountManager::SetAccountData( CAccount* pAccount, const char* szKey, const SString& strValue, int iType )
 {
     if ( iType != LUA_TSTRING && iType != LUA_TNUMBER && iType != LUA_TBOOLEAN && iType != LUA_TNIL )
         return false;

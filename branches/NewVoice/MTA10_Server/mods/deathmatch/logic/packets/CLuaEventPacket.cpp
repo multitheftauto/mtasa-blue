@@ -35,7 +35,7 @@ bool CLuaEventPacket::Read ( NetBitStreamInterface& BitStream )
     unsigned short usNameLength;
     if ( BitStream.ReadCompressed ( usNameLength ) )
     {
-        if ( usNameLength < (MAX_EVENT_NAME_LENGTH - 1) && BitStream.Read ( m_szName, usNameLength ) && BitStream.ReadCompressed ( m_ElementID ) )
+        if ( usNameLength < (MAX_EVENT_NAME_LENGTH - 1) && BitStream.Read ( m_szName, usNameLength ) && BitStream.Read ( m_ElementID ) )
         {
             m_szName [ usNameLength ] = 0;
             m_Arguments = CLuaArguments ( BitStream );
@@ -53,7 +53,7 @@ bool CLuaEventPacket::Write ( NetBitStreamInterface& BitStream ) const
     unsigned short usNameLength = static_cast < unsigned short > ( strlen ( m_szName ) );
     BitStream.WriteCompressed ( usNameLength );
     BitStream.Write ( const_cast < char* > ( m_szName ), usNameLength );
-    BitStream.WriteCompressed ( m_ElementID );
+    BitStream.Write ( m_ElementID );
     m_Arguments.WriteToBitStream ( BitStream );
 
     return true;

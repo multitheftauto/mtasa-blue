@@ -34,7 +34,7 @@ extern CClientGame* g_pClientGame;
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  1.8f
 
-CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
+CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigned short usModel ) : ClassInit ( this ), CClientStreamElement ( pManager->GetVehicleStreamer (), ID )
 {
     CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientVehicle" ), &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, &m_pLastSyncer, NULL );
 
@@ -49,11 +49,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_pVehicle = NULL;
     m_pUpgrades = new CVehicleUpgrades ( this );
     m_pClump = NULL;
-#if WITH_VEHICLE_HANDLING
     m_pOriginalHandlingEntry = g_pGame->GetHandlingManager ()->GetOriginalHandlingData ( static_cast < eVehicleTypes > ( usModel ) );
     m_pHandlingEntry = g_pGame->GetHandlingManager ()->CreateHandlingData ();
     m_pHandlingEntry->Assign ( m_pOriginalHandlingEntry );
-#endif
 
     SetTypeName ( "vehicle" );
 
@@ -86,6 +84,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_usAdjustablePropertyValue = 0;
     for ( unsigned int i = 0; i < 6; ++i )
     {
+        m_bAllowDoorRatioSetting [ i ] = true;
         m_fDoorOpenRatio [ i ] = 0.0f;
         m_doorInterp.fStart [ i ] = 0.0f;
         m_doorInterp.fTarget [ i ] = 0.0f;
@@ -136,6 +135,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
     m_bHeliSearchLightVisible = false;
     m_fHeliRotorSpeed = 0.0f;
+    m_bHasCustomHandling = false;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -220,9 +220,7 @@ CClientVehicle::~CClientVehicle ( void )
     Unlink ();
 
     delete m_pUpgrades;
-#if WITH_VEHICLE_HANDLING
     delete m_pHandlingEntry;
-#endif
     CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, &m_pLastSyncer, NULL );
 }
 
@@ -588,7 +586,7 @@ void CClientVehicle::SetDoorOpenRatioInterpolated ( unsigned char ucDoor, float 
     m_doorInterp.ulTargetTime [ ucDoor ] = ulTime + ulDelay;
 }
 
-void CClientVehicle::ResetDoorInterpolation ()
+void CClientVehicle::ResetDoorInterpolation ( )
 {
     for ( unsigned char i = 0; i < 6; ++i )
     {
@@ -597,6 +595,12 @@ void CClientVehicle::ResetDoorInterpolation ()
         m_doorInterp.ulTargetTime [ i ] = 0;
     }
 }
+
+void CClientVehicle::CancelDoorInterpolation ( unsigned char ucDoor )
+{
+    m_doorInterp.ulTargetTime [ ucDoor ] = 0;
+}
+
 
 void CClientVehicle::ProcessDoorInterpolation ()
 {
@@ -626,13 +630,14 @@ void CClientVehicle::ProcessDoorInterpolation ()
 
 void CClientVehicle::SetDoorOpenRatio ( unsigned char ucDoor, float fRatio, unsigned long ulDelay, bool bForced )
 {
-    bool bAllow = true;
     unsigned char ucSeat;
 
     if ( ucDoor <= 5 )
     {
+        bool bAllow = m_bAllowDoorRatioSetting [ ucDoor ];
+
         // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
-        if ( bForced == false )
+        if ( bAllow && bForced == false )
         {
             switch ( ucDoor )
             {
@@ -695,6 +700,12 @@ bool CClientVehicle::AreSwingingDoorsAllowed () const
         return m_pVehicle->AreSwingingDoorsAllowed ();
     }
     return m_bSwingingDoorsAllowed;
+}
+
+void CClientVehicle::AllowDoorRatioSetting ( unsigned char ucDoor, bool bAllow )
+{
+    m_bAllowDoorRatioSetting [ucDoor] = bAllow;
+    CancelDoorInterpolation ( ucDoor );
 }
 
 bool CClientVehicle::AreDoorsLocked ( void )
@@ -935,12 +946,10 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
         m_pModelInfo = g_pGame->GetModelInfo ( usModel );
         m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( usModel );
 
-#if WITH_VEHICLE_HANDLING
         // Reset handling to fit the vehicle
         m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData ( (eVehicleTypes)usModel );
         m_pHandlingEntry->Assign ( m_pOriginalHandlingEntry );
-        m_pHandlingEntry->Recalculate ();
-#endif
+        ApplyHandling ();
 
         // Create the vehicle if we're streamed in
         if ( IsStreamedIn () )
@@ -1086,8 +1095,8 @@ void CClientVehicle::CalcAndUpdateTyresCanBurstFlag ( void )
         bTyresCanBurst = true;
 
     // Script override
-//    if ( !m_bScriptCanBeDamaged )
-//        bTyresCanBurst = false;
+    if ( !m_bScriptCanBeDamaged )
+        bTyresCanBurst = false;
 
     if ( m_pVehicle )
     {
@@ -1964,7 +1973,8 @@ void CClientVehicle::StreamedInPulse ( void )
             {
                 // Force the position to the last remembered matrix (..and make sure gravity doesn't pull it down)
                 m_pVehicle->SetMatrix ( &m_matFrozen );
-                m_pVehicle->SetMoveSpeed ( &CVector ( 0.0f, 0.0f, 0.0f ) );
+                CVector vec(0.0f, 0.0f, 0.0f);
+                m_pVehicle->SetMoveSpeed ( &vec );
 
                 // Added by ChrML 27. Nov: Shouldn't cause any problems
                 m_pVehicle->SetUsesCollision ( false );
@@ -2054,6 +2064,17 @@ void CClientVehicle::StreamedInPulse ( void )
 
             // Update our streaming position
             UpdateStreamPosition ( vecPosition );
+        }
+
+        // Update doors
+        if ( CClientVehicleManager::HasDoors ( GetModel() ) )
+        {
+            for ( unsigned char i = 0; i < 6; ++i )
+            {
+                CDoor* pDoor = m_pVehicle->GetDoor ( i );
+                if ( pDoor )
+                    m_fDoorOpenRatio [ i ] = pDoor->GetAngleOpenRatio ();
+            }
         }
     }
 }
@@ -2213,10 +2234,6 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
         }
 
-        // Re-add all the upgrades
-        if ( m_pUpgrades )
-            m_pUpgrades->ReAddAll ();
-
         m_pVehicle->SetOverrideLights ( m_ucOverrideLights );
         m_pVehicle->SetRemap ( static_cast < unsigned int > ( m_ucPaintjob ) );
         m_pVehicle->SetBodyDirtLevel ( m_fDirtLevel );
@@ -2347,13 +2364,18 @@ void CClientVehicle::Create ( void )
             SetDoorOpenRatio ( i, m_fDoorOpenRatio [ i ], 0, true );
 
 
-#if WITH_VEHICLE_HANDLING
         // Re-apply handling entry
         if ( m_pHandlingEntry )
         {
             m_pVehicle->SetHandlingData ( m_pHandlingEntry );
+            
+            if ( m_bHasCustomHandling )
+                ApplyHandling ();
         }
-#endif
+        // Re-add all the upgrades - Has to be applied after handling *shrugs*
+        if ( m_pUpgrades )
+            m_pUpgrades->ReAddAll ();
+
         // Tell the streamer we've created this object
         NotifyCreate ();
     }
@@ -2385,9 +2407,7 @@ void CClientVehicle::Destroy ( void )
         m_bIsDerailed = IsDerailed ();
         m_fHeliRotorSpeed = GetHeliRotorSpeed ();
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible ();
-#if WITH_VEHICLE_HANDLING
         m_pHandlingEntry = m_pVehicle->GetHandlingData();
-#endif
         if ( m_eVehicleType == CLIENTVEHICLE_CAR ||
             m_eVehicleType == CLIENTVEHICLE_PLANE ||
             m_eVehicleType == CLIENTVEHICLE_QUADBIKE )
@@ -3120,7 +3140,9 @@ void CClientVehicle::UpdateTargetPosition ( void )
         CVector vecVelocity;
         GetMoveSpeed ( vecVelocity );
         float fThreshold = ( VEHICLE_INTERPOLATION_WARP_THRESHOLD + VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED * vecVelocity.Length () ) * g_pGame->GetGameSpeed ();
-        if ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () > fThreshold )
+
+        // There is a reason to have this condition this way: To prevent NaNs generating new NaNs after interpolating (Comparing with NaNs always results to false).
+        if ( ! ( ( vecCurrentPosition - m_interp.pos.vecTarget ).Length () <= fThreshold ) )
         {
             // Abort all interpolation
             m_interp.pos.ulFinishTime = 0;
@@ -3349,9 +3371,9 @@ std::string GetPlayerName ( CClientPed* pClientPed )
 // Make a ped become an occupied driver/passenger
 // Static function
 //
-void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat )
+void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor )
 {
-    INFO (( "SetPedOccupiedVehicle:%s in vehicle:0x%08x  seat:%d", GetPlayerName( pClientPed ).c_str (), pVehicle, uiSeat ));
+    INFO (( "SetPedOccupiedVehicle:%s in vehicle:0x%08x  seat:%d  door:%u", GetPlayerName( pClientPed ).c_str (), pVehicle, uiSeat, ucDoor ));
 
     if ( !pClientPed || !pVehicle )
         return;
@@ -3392,6 +3414,9 @@ void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehi
     pClientPed->m_pOccupiedVehicle = pVehicle;
     pClientPed->m_uiOccupiedVehicleSeat = uiSeat;
 
+    if ( ucDoor != 0xFF )
+        pVehicle->AllowDoorRatioSetting ( ucDoor, true );
+
     // Checks
     ValidatePedAndVehiclePair ( pClientPed, pVehicle );
 }
@@ -3401,9 +3426,9 @@ void CClientVehicle::SetPedOccupiedVehicle ( CClientPed* pClientPed, CClientVehi
 // Make a ped become an occupying driver/passenger
 // Static function
 //
-void CClientVehicle::SetPedOccupyingVehicle ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat )
+void CClientVehicle::SetPedOccupyingVehicle ( CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor )
 {
-    INFO (( "SetPedOccupyingVehicle:%s in vehicle:0x%08x  seat:%d", GetPlayerName( pClientPed ).c_str (), pVehicle, uiSeat ));
+    INFO (( "SetPedOccupyingVehicle:%s in vehicle:0x%08x  seat:%d  door:%u", GetPlayerName( pClientPed ).c_str (), pVehicle, uiSeat, ucDoor ));
 
     if ( !pClientPed || !pVehicle )
         return;
@@ -3444,6 +3469,9 @@ void CClientVehicle::SetPedOccupyingVehicle ( CClientPed* pClientPed, CClientVeh
     pClientPed->m_pOccupyingVehicle = pVehicle;
 //  if ( uiSeat >= 0 && uiSeat < 8 )
 //      pClientPed->m_uiOccupyingSeat = uiSeat;
+
+    if ( ucDoor != 0xFF )
+        pVehicle->AllowDoorRatioSetting ( ucDoor, false );
 
     // Checks
     ValidatePedAndVehiclePair ( pClientPed, pVehicle );
@@ -3540,6 +3568,11 @@ void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed, CClientVehicle
     if ( pClientPed->m_pOccupiedVehicle == pVehicle )
     {
         INFO (( "UnpairPedAndVehicle: pClientPed:%s from m_pOccupiedVehicle:0x%08x", GetPlayerName( pClientPed ).c_str (), pVehicle ));
+        if ( pClientPed->m_ucLeavingDoor != 0xFF )
+        {
+            pVehicle->AllowDoorRatioSetting ( pClientPed->m_ucLeavingDoor, true );
+            pClientPed->m_ucLeavingDoor = 0xFF;
+        }
         pClientPed->m_pOccupiedVehicle = NULL;
         pClientPed->m_uiOccupiedVehicleSeat = 0xFF;
     }
@@ -3592,19 +3625,20 @@ void CClientVehicle::UnpairPedAndVehicle( CClientPed* pClientPed )
     }
 }
 
-#if WITH_VEHICLE_HANDLING
 void CClientVehicle::ApplyHandling ( void )
 {
     if ( m_pVehicle )
         m_pVehicle->RecalculateHandling ();
+
+    m_bHasCustomHandling = true;
 }
 
 
-CHandlingEntry* CClientVehicle::GetHandlingData( void )
+CHandlingEntry* CClientVehicle::GetHandlingData ( void )
 {
     if ( m_pVehicle )
     {
-        return m_pVehicle->GetHandlingData();
+        return m_pVehicle->GetHandlingData ();
     }
     else if ( m_pHandlingEntry )
     {
@@ -3612,7 +3646,6 @@ CHandlingEntry* CClientVehicle::GetHandlingData( void )
     }
     return NULL;
 }
-#endif
 
 
 CSphere CClientVehicle::GetWorldBoundingSphere ( void )

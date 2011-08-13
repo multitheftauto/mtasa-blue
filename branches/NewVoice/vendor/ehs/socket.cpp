@@ -54,6 +54,7 @@ Zac Hansen ( xaxxon@slackworks.com )
 #define MSG_NOSIGNAL 0 // no support
 #endif // MSG_NOSIGNAL
 
+extern long long ms_HttpTotalBytesSent;
 
 Socket::Socket ( int inAcceptSocket,
 				 sockaddr_in * ipoInternetSocketAddress )
@@ -201,6 +202,7 @@ int Socket::Read ( void * ipBuffer, int ipBufferLength )
 
 int Socket::Send ( const void * ipMessage, size_t inLength, int inFlags )
 {
+    ms_HttpTotalBytesSent += inLength;
 
 	return send ( nAcceptSocket, 
 #ifdef _WIN32

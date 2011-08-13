@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-CClientColPolygon::CClientColPolygon ( CClientManager* pManager, ElementID ID, const CVector& vecPosition ) : CClientColShape ( pManager, ID )
+CClientColPolygon::CClientColPolygon ( CClientManager* pManager, ElementID ID, const CVector& vecPosition ) : ClassInit ( this ), CClientColShape ( pManager, ID )
 {
     m_pManager = pManager;
     m_vecPosition = vecPosition;

@@ -42,7 +42,7 @@ void CElementRPCs::SetElementParent ( CClientEntity* pSource, NetBitStreamInterf
 {
     // Read out the entity id and parent id
     ElementID ParentID;
-    if ( bitStream.ReadCompressed ( ParentID ) )
+    if ( bitStream.Read ( ParentID ) )
     {
         CClientEntity* pParent = CElementIDs::GetElement ( ParentID );
         if ( pParent )
@@ -66,40 +66,38 @@ void CElementRPCs::SetElementData ( CClientEntity* pSource, NetBitStreamInterfac
     unsigned short usNameLength;
     if ( bitStream.ReadCompressed ( usNameLength ) )
     {
-        char* szName = new char [ usNameLength + 1 ];
-        szName [ usNameLength ] = NULL;
-
-        CLuaArgument Argument;
-        if ( bitStream.Read ( szName, usNameLength ) && Argument.ReadFromBitStream ( bitStream ) )
+        // We should never receive an illegal name length from the server
+        if ( usNameLength > MAX_CUSTOMDATA_NAME_LENGTH )
         {
-            pSource->SetCustomData ( szName, Argument, NULL );
+            CLogger::ErrorPrintf ( "RPC SetElementData name length > MAX_CUSTOMDATA_NAME_LENGTH" );
+            return;
         }
-        delete [] szName;
+        SString strName;
+        CLuaArgument Argument;
+        if ( bitStream.ReadStringCharacters ( strName, usNameLength ) && Argument.ReadFromBitStream ( bitStream ) )
+        {
+            pSource->SetCustomData ( strName, Argument, NULL );
+        }
     }
 }
 
 
 void CElementRPCs::RemoveElementData ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    // Read out the entity id and name length
+    // Read out the name length
     unsigned short usNameLength;
     bool bRecursive;
     if ( bitStream.ReadCompressed ( usNameLength ) )
     {
-        // Allocate a buffer for the name
-        char* szName = new char [ usNameLength + 1 ];
-        szName [ usNameLength ] = NULL;
+        SString strName;
 
-        // Read it out plus whether it's recursive or not
-        if ( bitStream.Read ( szName, usNameLength ) &&
+        // Read out the name plus whether it's recursive or not
+        if ( bitStream.ReadStringCharacters ( strName, usNameLength ) &&
              bitStream.ReadBit ( bRecursive ) )
         {
             // Remove that name
-            pSource->DeleteCustomData ( szName, bRecursive );
+            pSource->DeleteCustomData ( strName, bRecursive );
         }
-
-        // Delete the name buffer
-        delete [] szName;
     }
 }
 
@@ -433,7 +431,7 @@ void CElementRPCs::SetElementModel ( CClientEntity* pSource, NetBitStreamInterfa
 void CElementRPCs::SetElementAttachedOffsets ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     SPositionSync position ( true );
-    SRotationDegreesSync rotation ( true );
+    SRotationRadiansSync rotation ( true );
     if ( position.Read ( bitStream ) && rotation.Read ( bitStream ) )
     {
         pSource->SetAttachedOffsets ( position.data.vecPosition, rotation.data.vecRotation );

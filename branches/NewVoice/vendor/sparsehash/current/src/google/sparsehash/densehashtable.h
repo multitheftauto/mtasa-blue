@@ -102,6 +102,7 @@
 
 #include <google/sparsehash/sparseconfig.h>
 #include <assert.h>
+#include <stddef.h>             // for ptrdiff_t
 #include <stdio.h>
 #include <stdlib.h>             // for abort()
 #include <algorithm>            // For swap(), eg

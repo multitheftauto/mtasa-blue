@@ -15,7 +15,7 @@
 
 using std::list;
 
-CClientColShape::CClientColShape ( CClientManager* pManager, ElementID ID ) : CClientEntity ( ID )
+CClientColShape::CClientColShape ( CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
 {
     CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientColShape" ), &m_pOwningMarker, &m_pOwningPickup, NULL );
 

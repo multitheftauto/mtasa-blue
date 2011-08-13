@@ -72,9 +72,11 @@ enum eClientEntityType
     CCLIENTCOL,
     CCLIENTTXD,
     CCLIENTSOUND,
-    CCLIENTHANDLING,
     CCLIENTWATER,
-    CCLIENTIFP,
+    CCLIENTDXFONT,
+    CCLIENTGUIFONT,
+    CCLIENTTEXTURE,
+    CCLIENTSHADER,
     CCLIENTUNKNOWN,
 };
 
@@ -88,8 +90,54 @@ class CLuaMain;
 class CMapEventManager;
 typedef CIntrusiveList < class CClientEntity > CChildListType;
 
+enum eCClientEntityClassTypes
+{
+    CLASS_CClientEntity,
+    CLASS_CClientCamera,
+    CLASS_CClientCivilian,
+    CLASS_CClientColModel,
+    CLASS_CClientDFF,
+    CLASS_CClientGUIElement,
+    CLASS_CClientStreamElement,
+    CLASS_CClientColShape,
+    CLASS_CClientMarker,
+    CLASS_CClientPathNode,
+    CLASS_CClientPickup,
+    CLASS_CClientRadarArea,
+    CLASS_CClientRadarMarker,
+    CLASS_CClientPed,
+    CLASS_CClientPlayer,
+    CLASS_CClientTeam,
+    CLASS_CClientSound,
+    CLASS_CClientVehicle,
+    CLASS_CClientDummy,
+    CLASS_CClientWater,
+    CLASS_CClientColCircle,
+    CLASS_CClientColCuboid,
+    CLASS_CClientColSphere,
+    CLASS_CClientColRectangle,
+    CLASS_CClientColPolygon,
+    CLASS_CClientColTube,
+    CLASS_CClientProjectile,
+    CLASS_CClientTXD,
+    CLASS_CScriptFile,
+    CLASS_CClientObject,
+    CLASS_CDeathmatchObject,
+    CLASS_CDeathmatchVehicle,
+    CLASS_CClientRenderElement,
+    CLASS_CClientDxFont,
+    CLASS_CClientGuiFont,
+    CLASS_CClientMaterial,
+    CLASS_CClientTexture,
+    CLASS_CClientShader,
+    CLASS_CClientRenderTarget,
+    CLASS_CClientScreenSource,
+};
+
+
 class CClientEntity
 {
+    DECLARE_BASE_CLASS( CClientEntity )
 public:
                                                 CClientEntity           ( ElementID ID );
     virtual                                     ~CClientEntity          ( void );

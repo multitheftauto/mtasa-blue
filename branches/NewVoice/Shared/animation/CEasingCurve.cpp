@@ -287,50 +287,17 @@ CEasingCurve::~CEasingCurve ()
     delete m_pImplementation;
 }
 
-static std::map<std::string, CEasingCurve::eType> s_mStringToType;
-static std::map<CEasingCurve::eType, std::string> s_mTypeToString;
-
-void declareStringVersionsOfEasingTypes ()
-{
-    s_mStringToType.clear();
-    s_mTypeToString.clear();
-#define DECLARE_EASING(x)   s_mStringToType[""#x""] = CEasingCurve::x; s_mTypeToString[CEasingCurve::x] = ""#x"";
-#include "EasingDeclarations.hpp"
-#undef DECLARE_EASING
-}
 
 CEasingCurve::eType CEasingCurve::GetEasingTypeFromString ( const std::string& a_rstrType )
 {
-    if ( s_mStringToType.empty() )
-    {
-        declareStringVersionsOfEasingTypes ();
-    }
-    std::map<std::string, CEasingCurve::eType>::const_iterator foundType = s_mStringToType.find( a_rstrType );
-    if ( foundType == s_mStringToType.end() )
-    {
-        return EASING_INVALID;
-    }
-    else
-    {
-        return foundType->second;
-    }
+    CEasingCurve::eType result;
+    StringToEnum ( a_rstrType, result );
+    return result;
 }
- 
+
 std::string CEasingCurve::GetStringFromEasingType ( CEasingCurve::eType a_eType )
 {
-    if (s_mTypeToString.empty())
-    {
-        declareStringVersionsOfEasingTypes ();
-    }
-    std::map<CEasingCurve::eType, std::string>::const_iterator foundType = s_mTypeToString.find( a_eType );
-    if ( foundType == s_mTypeToString.end() )
-    {
-        return "Invalid";
-    }
-    else
-    {
-        return foundType->second;
-    }
+    return EnumToString ( a_eType );
 }
 
 void CEasingCurve::SetType ( eType a_eType )

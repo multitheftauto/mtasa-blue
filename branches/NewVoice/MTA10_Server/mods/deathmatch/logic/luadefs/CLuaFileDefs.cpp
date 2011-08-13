@@ -65,6 +65,9 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
                                                         CAccessControlListRight::RIGHT_TYPE_GENERAL,
                                                         false ) )
                 {
+                    // Make sure the destination folder exist so we can create the file
+                    MakeSureDirExists ( strAbsPath.c_str () );
+
                     // Create the file to create
                     CScriptFile* pFile = new CScriptFile ( pResource, strSubPath.c_str (), DEFAULT_MAX_FILESIZE );
                     assert ( pFile );

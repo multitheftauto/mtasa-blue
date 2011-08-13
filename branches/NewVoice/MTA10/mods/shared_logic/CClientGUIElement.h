@@ -49,6 +49,7 @@ class CClientGUIElement;
 
 class CClientGUIElement : public CClientEntity
 {
+    DECLARE_CLASS( CClientGUIElement, CClientEntity )
     friend class CClientGUIManager;
 
 public:
@@ -75,6 +76,10 @@ public:
     // cgui element access
     inline CGUIElement*         GetCGUIElement              ( void )                        { return m_pCGUIElement; };
     inline void                 SetCGUIElement              ( CGUIElement *pCGUIElement )   { m_pCGUIElement = pCGUIElement; };
+
+    SString                     GetFont                     ( class CClientGuiFont** ppFontElement );
+    bool                        SetFont                     ( const SString& strFontName, CClientGuiFont* pFontElement );
+
 private:
     bool                        _CallbackEvent1             ( CGUIElement *pCGUIElement );
     bool                        _CallbackEvent2             ( CGUIElement *pCGUIElement );
@@ -85,6 +90,7 @@ private:
     const char*                 m_szCGUITypeName;
     CClientGUIManager*          m_pGUIManager;
     CGUIElement*                m_pCGUIElement;
+    CClientGuiFont*             m_pFontElement;
     CLuaMain*                   m_pLuaMain;
 };
 

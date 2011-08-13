@@ -19,7 +19,6 @@ CEvents::CEvents ( void )
 {
     m_bWasEventCancelled = false;
     m_bEventCancelled = false;
-    m_szLastError = NULL;
 }
 
 
@@ -126,11 +125,7 @@ void CEvents::PreEventPulse ( void )
     m_CancelledList.push_back ( m_bEventCancelled );
     m_bEventCancelled = false;
     m_bWasEventCancelled = false;
-    if ( m_szLastError )
-    {
-        delete [] m_szLastError;
-        m_szLastError = NULL;
-    }
+    m_strLastError = "";
 }
 
 
@@ -146,19 +141,10 @@ void CEvents::CancelEvent ( bool bCancelled )
     m_bEventCancelled = bCancelled;
 }
 
-void CEvents::CancelEvent ( bool bCancelled, char* szReason )
+void CEvents::CancelEvent ( bool bCancelled, const char* szReason )
 {
     m_bEventCancelled = bCancelled;
-    if ( m_szLastError )
-    {
-        delete [] m_szLastError;
-        m_szLastError = NULL;
-    }
-    if ( szReason )
-    {
-        m_szLastError = new char [ strlen ( szReason ) + 1 ];
-        strcpy ( m_szLastError, szReason );
-    }
+    m_strLastError = SStringX ( szReason );
 }
 
 bool CEvents::WasEventCancelled ( void )
@@ -168,6 +154,6 @@ bool CEvents::WasEventCancelled ( void )
 
 const char* CEvents::GetLastError ( void )
 {
-    return m_szLastError;
+    return m_strLastError;
 }
 

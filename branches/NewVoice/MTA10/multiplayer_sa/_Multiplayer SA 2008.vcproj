@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Client - Multiplayer SA"
 	ProjectGUID="{916D94E2-FB0B-4992-A52C-3698CCBB0A41}"
 	TargetFrameworkVersion="131072"
@@ -331,6 +331,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\CLimitsSA.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CMultiplayerSA.cpp"
 				>
 			</File>
@@ -398,6 +402,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\CLimitsSA.h"
+				>
+			</File>
 			<File
 				RelativePath="CMultiplayerSA.h"
 				>

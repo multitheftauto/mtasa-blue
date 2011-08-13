@@ -265,15 +265,15 @@ unsigned int GetRandom ( unsigned int uiLow, unsigned int uiHigh )
 }
 
 
-SString GetDataUnit ( unsigned int uiInput )
+SString GetDataUnit ( unsigned long long ullInput )
 {
     // Convert it to a float
-    float fInput = static_cast < float > ( uiInput );
+    float fInput = static_cast < float > ( ullInput );
 
     // Bytes per sec?
     if ( fInput < 1024 )
     {
-        return SString ( "%u B", uiInput );
+        return SString ( "%u B", (uint)ullInput );
     }
 
     // Kilobytes per sec?

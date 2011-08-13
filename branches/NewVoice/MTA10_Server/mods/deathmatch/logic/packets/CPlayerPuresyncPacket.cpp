@@ -61,7 +61,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         if ( flags.data.bHasContact )
         {
             ElementID Temp;
-            if ( !BitStream.ReadCompressed ( Temp ) )
+            if ( !BitStream.Read ( Temp ) )
                 return false;
             pContactElement = CElementIDs::GetElement ( Temp );
         }
@@ -216,7 +216,7 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         if ( BitStream.ReadBit () == true )
         {
             ElementID DamagerID;
-            if ( !BitStream.ReadCompressed ( DamagerID ) )
+            if ( !BitStream.Read ( DamagerID ) )
                 return false;
 
             SWeaponTypeSync weaponType;
@@ -308,7 +308,7 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             pSourcePlayer->GetContactPosition ( vecPosition );
         float fCameraRotation = pSourcePlayer->GetCameraRotation ();
 
-        BitStream.WriteCompressed ( PlayerID );
+        BitStream.Write ( PlayerID );
 
         // Write the time context
         BitStream.Write ( pSourcePlayer->GetSyncTimeContext () );
@@ -343,7 +343,7 @@ bool CPlayerPuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         BitStream.Write ( &flags );
 
         if ( pContactElement )
-            BitStream.WriteCompressed ( pContactElement->GetID () );
+            BitStream.Write ( pContactElement->GetID () );
 
         SPositionSync position ( false );
         position.data.vecPosition = vecPosition;

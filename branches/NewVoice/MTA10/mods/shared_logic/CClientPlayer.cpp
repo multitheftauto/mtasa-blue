@@ -17,7 +17,7 @@
 
 #include <StdInc.h>
 
-CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsLocalPlayer ) : CClientPed ( pManager, 0, ID, bIsLocalPlayer )
+CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsLocalPlayer ) : ClassInit ( this ), CClientPed ( pManager, 0, ID, bIsLocalPlayer )
 {
     // Initialize
     m_pManager = pManager;
@@ -112,6 +112,8 @@ CClientPlayer::~CClientPlayer ( void )
     // Remove the icon
     if ( m_pStatusIcon )
     {
+        m_pStatusIcon->SetVisible ( false );
+
         delete m_pStatusIcon;
         m_pStatusIcon = NULL;
     }
@@ -262,6 +264,11 @@ void CClientPlayer::Reset ( void )
     m_bNametagColorOverridden = false;
 
     SetAlpha ( 255 );
+
+    if ( m_pStatusIcon )
+    {
+        m_pStatusIcon->SetVisible ( false );
+    }
 }
 
 

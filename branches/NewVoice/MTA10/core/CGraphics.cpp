@@ -14,6 +14,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTileBatcher.h"
 
 using namespace std;
 
@@ -37,6 +38,11 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pOriginalTarget = NULL;
 
     m_bIsDrawing = false;
+    m_iDebugQueueRefs = 0;
+
+    m_pRenderItemManager = new CRenderItemManager ();
+    m_pTileBatcher = new CTileBatcher ();
+    m_bSetRenderTargetEnabled = false;
 }
 
 
@@ -45,8 +51,10 @@ CGraphics::~CGraphics ( void )
     if ( m_pLineInterface )
         m_pLineInterface->Release ();
 
-    DestroyFonts ();
-    ExpireCachedTextures ( true );
+    DestroyStandardDXFonts ();
+
+    SAFE_DELETE ( m_pRenderItemManager );
+    SAFE_DELETE ( m_pTileBatcher );
 }
 
 
@@ -93,15 +101,10 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
 
     // If no font was specified, use the default font
     if ( !pDXFont )
-    pDXFont = GetFont ();
+        pDXFont = GetFont ();
 
     // We're using a big font to keep it looking nice, so get the actual scale
-    if ( fScaleX > 1.1f || fScaleY > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScaleX /= 4.0f;
-        fScaleY /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScaleX, fScaleY );
 
     // Check for a valid font
     if ( pDXFont )
@@ -311,7 +314,8 @@ void CGraphics::Render3DSprite ( float fX, float fY, float fZ, float fScale, uns
     BeginSingleDrawing ();
 
     // Render it
-    m_pGUI->GetRenderingLibrary ()->Render3DSprite ( NULL, 1.0f, &D3DXVECTOR3 ( fX, fY, fZ ), &ViewMatrix, ulColor );
+    D3DXVECTOR3 vec(fX, fY, fZ);
+    m_pGUI->GetRenderingLibrary ()->Render3DSprite ( NULL, 1.0f, &vec, &ViewMatrix, ulColor );
 
     // End drawing
     EndSingleDrawing ();
@@ -335,11 +339,7 @@ float CGraphics::GetDXFontHeight ( float fScale, LPD3DXFONT pDXFont )
     if ( !pDXFont )
         pDXFont = GetFont ();
 
-    if ( fScale > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScale /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
 
     if ( pDXFont )
     {
@@ -356,11 +356,7 @@ float CGraphics::GetDXCharacterWidth ( char c, float fScale, LPD3DXFONT pDXFont 
     if ( !pDXFont )
         pDXFont = GetFont ();
 
-    if ( fScale > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScale /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
 
     if ( pDXFont )
     {
@@ -379,11 +375,7 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
     if ( !pDXFont )
         pDXFont = GetFont ();
 
-    if ( fScale > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScale /= 4.0f;
-    }
+    pDXFont = MaybeGetBigFont ( pDXFont, fScale, fScale );
 
     if ( pDXFont )
     {
@@ -526,18 +518,24 @@ void CGraphics::DrawRectQueued ( float fX, float fY,
 }
 
 
-bool CGraphics::DrawTextureQueued ( float fX, float fY,
+void CGraphics::DrawTextureQueued ( float fX, float fY,
                                  float fWidth, float fHeight,
                                  float fU, float fV,
                                  float fSizeU, float fSizeV,
                                  bool bRelativeUV,
-                                 const string& strFilename,
+                                 CMaterialItem* pMaterial,
                                  float fRotation,
                                  float fRotCenOffX,
                                  float fRotCenOffY,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
+    // If material is a shader, use its current instance
+    if ( CShaderItem* pShaderItem = DynamicCast < CShaderItem >( pMaterial ) )
+    {
+        pMaterial = pShaderItem->m_pShaderInstance;
+    }
+
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_TEXTURE;
@@ -550,18 +548,17 @@ bool CGraphics::DrawTextureQueued ( float fX, float fY,
     Item.Texture.fSizeU = fSizeU;
     Item.Texture.fSizeV = fSizeV;
     Item.Texture.bRelativeUV = bRelativeUV;
-    Item.Texture.info = CacheTexture( strFilename );
+    Item.Texture.pMaterial = pMaterial;
     Item.Texture.fRotation = fRotation;
     Item.Texture.fRotCenOffX = fRotCenOffX;
     Item.Texture.fRotCenOffY = fRotCenOffY;
     Item.Texture.ulColor = ulColor;
 
-    if ( !Item.Texture.info.d3dTexture )
-        return false;
+    // Keep material valid while in the queue
+    AddQueueRef ( pMaterial );
 
     // Add it to the queue
     AddQueueItem ( Item, bPostGUI );
-    return true;
 }
 
 
@@ -581,20 +578,17 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
     if ( !pDXFont ) pDXFont = GetFont ();
 
     // We're using a big font to keep it looking nice, so get the actual scale
-    if ( fScaleX > 1.1f || fScaleY > 1.1f )
-    {
-        pDXFont = GetBigFont ( pDXFont );
-        fScaleX /= 4.0f;
-        fScaleY /= 4.0f;
-    }
-
+    pDXFont = MaybeGetBigFont ( pDXFont, fScaleX, fScaleY );
 
     if ( pDXFont )
     {
-        iLeft = unsigned int ( ( float ) iLeft * ( 1.0f / fScaleX ) );
-        iTop = unsigned int ( ( float ) iTop * ( 1.0f / fScaleY ) );
-        iRight = unsigned int ( ( float ) iRight * ( 1.0f / fScaleX ) );
-        iBottom = unsigned int ( ( float ) iBottom * ( 1.0f / fScaleY ) );
+        if ( fScaleX != 1.0f || fScaleY != 1.0f )
+        {
+	        iLeft = unsigned int ( ( float ) iLeft * ( 1.0f / fScaleX ) );
+	        iTop = unsigned int ( ( float ) iTop * ( 1.0f / fScaleY ) );
+	        iRight = unsigned int ( ( float ) iRight * ( 1.0f / fScaleX ) );
+	        iBottom = unsigned int ( ( float ) iBottom * ( 1.0f / fScaleY ) );
+        }
 
         sDrawQueueItem Item;
         Item.eType = QUEUE_TEXT;
@@ -617,7 +611,7 @@ void CGraphics::DrawTextQueued ( int iLeft, int iTop,
     }
 }
 
-bool CGraphics::LoadFonts ( void )
+bool CGraphics::LoadStandardDXFonts ( void )
 {
     // Add our custom font resources
     if ( m_FontResourceNames.empty () )
@@ -682,44 +676,34 @@ bool CGraphics::LoadFonts ( void )
     return true;
 }
 
-bool CGraphics::LoadFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** pDXSmallFont, ID3DXFont** pDXBigFont )
+bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont )
 {
     int iLoaded = AddFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 );
 
     int iWeight = bBold ? FW_BOLD : FW_NORMAL;
-    ID3DXFont *pNewDXSmallFont = NULL;
-    ID3DXFont *pNewDXBigFont = NULL;
+    *ppD3DXFont = NULL;
 
     bool bSuccess = true;
     // Normal size
     if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight, 0, iWeight, 1,
         FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
-        &pNewDXSmallFont ) ) )
+        ppD3DXFont ) ) )
     {
         CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D font '%s'", strFontName.c_str() );
         bSuccess = false;
     }
 
-    // Big size (4x)
-    if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight*4, 0, iWeight, 1,
-        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
-        &pNewDXBigFont ) ) )
-    {
-        CLogger::GetSingleton ().ErrorPrintf( "Could not create Direct3D big font '%s'", strFontName.c_str() );
-        bSuccess = false;
-    }
-    *pDXSmallFont = pNewDXSmallFont;
-    *pDXBigFont = pNewDXBigFont;
-
-    return bSuccess && SUCCEEDED ( D3DXCreateSprite ( m_pDevice, &m_pDXSprite ) ) && ( iLoaded == 1 );
+    return bSuccess && ( iLoaded == 1 );
 }
 
-bool CGraphics::DestroyFont ( std::string strFontPath )
+bool CGraphics::DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont *pD3DXFont )
 {
-    return RemoveFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 ) ? true : false; 
+    bool bResult = RemoveFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 ) != 0;
+    SAFE_RELEASE( pD3DXFont );
+    return bResult;
 }
 
-bool CGraphics::DestroyFonts ( void )
+bool CGraphics::DestroyStandardDXFonts ( void )
 {
     // Remove our custom font resources (needs to be identical to LoadFonts)
     for ( uint i = 0 ; i < m_FontResourceNames.size () ; i++ )
@@ -727,6 +711,13 @@ bool CGraphics::DestroyFonts ( void )
         RemoveFontResourceEx ( CalcMTASAPath ( "MTA\\cgui\\" + m_FontResourceNames[i] ), FR_PRIVATE, 0 );
     }
 
+    for ( int i = 0; i < NUM_FONTS; i++ )
+    {
+        SAFE_RELEASE( m_pDXFonts[i] );
+        SAFE_RELEASE( m_pBigDXFonts[i] );
+    }
+
+    // Release 
     return true;
 }
 
@@ -797,7 +788,7 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
 {
     m_pDevice = pDevice;
 
-    LoadFonts ();
+    LoadStandardDXFonts ();
 
     // Get the original render target
     assert ( !m_pOriginalTarget );
@@ -806,6 +797,9 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     // Create drawing devices
     D3DXCreateLine ( pDevice, &m_pLineInterface );
     D3DXCreateTextureFromFileInMemory ( pDevice, g_szPixel, sizeof ( g_szPixel ), &m_pDXPixelTexture );
+
+    m_pTileBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
 }
 
 
@@ -825,6 +819,8 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
 
     if ( m_pLineInterface )
         m_pLineInterface->OnLostDevice ();
+
+    m_pRenderItemManager->OnLostDevice ();
 }
 
 
@@ -845,6 +841,8 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
 
     if ( m_pLineInterface )
         m_pLineInterface->OnResetDevice ();
+
+    m_pRenderItemManager->OnResetDevice ();
 }
 
 
@@ -858,15 +856,36 @@ void CGraphics::DrawPostGUIQueue ( void )
 {
     DrawQueue ( m_PostGUIQueue );
 
-    // Clean out unused textures here
-    ExpireCachedTextures ();
+    // Both queues should be empty now, and there should be no outstanding refs
+    assert ( m_PreGUIQueue.empty () && m_iDebugQueueRefs == 0 );
 }
 
-bool CGraphics::IsDrawQueueItemSprite ( const sDrawQueueItem& Item )
+
+void CGraphics::HandleDrawQueueModeChange ( uint curMode, uint newMode )
 {
-    return Item.eType == QUEUE_TEXT || Item.eType == QUEUE_RECT ||
-           Item.eType == QUEUE_CIRCLE || Item.eType == QUEUE_TEXTURE;
+    // Changing to...
+    if ( newMode == 'spri' )
+    {
+        // ...sprite mode
+        m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND );
+        m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP );
+        m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP );
+    }
+
+    // Changing from...
+    if ( curMode == 'spri' )
+    {
+        // ...sprite mode
+        m_pDXSprite->End ();
+    }
+    else
+    if ( curMode == 'tile' )
+    {
+        // ...tile mode
+        m_pTileBatcher->Flush ();
+    }
 }
+
 
 void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
 {
@@ -876,27 +895,31 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
         BeginSingleDrawing ();
 
         // Loop through it
-        bool bSpriteMode = false;
+        int curMode = 0;
         std::vector < sDrawQueueItem >::iterator iter = Queue.begin ();
         for ( ; iter != Queue.end (); iter++ )
         {
-            if ( IsDrawQueueItemSprite ( *iter ) != bSpriteMode )
+            const sDrawQueueItem& item = *iter;
+
+            // Determine new mode
+            uint newMode;
+            if ( item.eType == QUEUE_TEXTURE )                                 newMode = 'tile';
+            else if ( item.eType == QUEUE_LINE || item.eType == QUEUE_LINE3D )  newMode = 'misc';
+            else                                                                newMode = 'spri';
+
+            // Switching mode ?
+            if ( curMode != newMode )
             {
-                bSpriteMode = IsDrawQueueItemSprite ( *iter );
-                if ( bSpriteMode )
-                {
-                    m_pDXSprite->Begin ( D3DXSPRITE_ALPHABLEND );
-                    m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP );
-                    m_pDevice->SetSamplerState ( 0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP );
-                }
-                else
-                    m_pDXSprite->End ();
+                HandleDrawQueueModeChange ( curMode, newMode );
+                curMode = newMode;
             }
+
             // Draw the item
-            DrawQueueItem ( *iter );
+            DrawQueueItem ( item );
         }
-        if ( bSpriteMode )
-            m_pDXSprite->End ();
+
+        // Mode clean up
+        HandleDrawQueueModeChange ( curMode, 0 );
 
         EndSingleDrawing ();
 
@@ -908,19 +931,20 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
 
 void CGraphics::AddQueueItem ( const sDrawQueueItem& Item, bool bPostGUI )
 {
-    // Prevent queuing when minimized
-    if ( g_pCore->IsWindowMinimized () )
-    {
-        m_PostGUIQueue.clear ();
-        m_PreGUIQueue.clear ();
-        return;
-    }
-
     // Add it to the correct queue
     if ( bPostGUI && !CCore::GetSingleton ().IsMenuVisible() ) //Don't draw over the main menu.  Ever.
         m_PostGUIQueue.push_back ( Item );
     else
         m_PreGUIQueue.push_back ( Item );
+
+    // Prevent queuing when minimized
+    if ( g_pCore->IsWindowMinimized () )
+    {
+        ClearDrawQueue ( m_PreGUIQueue );
+        ClearDrawQueue ( m_PostGUIQueue );
+        assert ( m_iDebugQueueRefs == 0 );
+        return;
+    }
 }
 
 
@@ -986,25 +1010,23 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
         }
         case QUEUE_TEXTURE:
         {
-            RECT cutImagePos;
-            const float fSurfaceWidth  = Item.Texture.info.uiSurfaceWidth;
-            const float fSurfaceHeight = Item.Texture.info.uiSurfaceHeight;
-            const float fFileWidth     = Item.Texture.info.uiFileWidth;
-            const float fFileHeight    = Item.Texture.info.uiFileHeight;
-            cutImagePos.left    = ( Item.Texture.fU )                       * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
-            cutImagePos.top     = ( Item.Texture.fV )                       * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
-            cutImagePos.right   = ( Item.Texture.fU + Item.Texture.fSizeU ) * ( Item.Texture.bRelativeUV ? fSurfaceWidth  : fSurfaceWidth  / fFileWidth );
-            cutImagePos.bottom  = ( Item.Texture.fV + Item.Texture.fSizeV ) * ( Item.Texture.bRelativeUV ? fSurfaceHeight : fSurfaceHeight / fFileHeight );
-            const float fCutWidth  = cutImagePos.right - cutImagePos.left;
-            const float fCutHeight = cutImagePos.bottom - cutImagePos.top;
-            const D3DXVECTOR2 scaling         ( Item.Texture.fWidth / fCutWidth, Item.Texture.fHeight / fCutHeight );
-            const D3DXVECTOR2 rotationCenter  ( Item.Texture.fWidth * 0.5f + Item.Texture.fRotCenOffX, Item.Texture.fHeight * 0.5f + Item.Texture.fRotCenOffY );
-            const D3DXVECTOR2 position        ( Item.Texture.fX, Item.Texture.fY );
-            const float fRotationRad  = Item.Texture.fRotation * (6.2832f/360.f);
-            D3DXMATRIX matrix;
-            D3DXMatrixTransformation2D  ( &matrix, NULL, 0.0f, &scaling, &rotationCenter, fRotationRad, &position );
-            m_pDXSprite->SetTransform ( &matrix );
-            m_pDXSprite->Draw ( Item.Texture.info.d3dTexture, &cutImagePos, NULL, NULL, Item.Texture.ulColor );
+            const sDrawQueueTexture& t = Item.Texture;
+            float fU1 = t.fU;
+            float fV1 = t.fV;
+            float fU2 = ( t.fU + t.fSizeU );
+            float fV2 = ( t.fV + t.fSizeV );
+            if ( !t.bRelativeUV )
+            {
+                // If UV's are absolute pixels, then scale the range to 0.0f - 1.0f.
+                float fUScale = 1.0f / (float)t.pMaterial->m_uiSizeX;
+                float fVScale = 1.0f / (float)t.pMaterial->m_uiSizeY;
+                fU1 *= fUScale;
+                fV1 *= fVScale;
+                fU2 *= fUScale;
+                fV2 *= fVScale;
+            }
+            m_pTileBatcher->AddTile ( t.fX, t.fY, t.fX+t.fWidth, t.fY+t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY, t.ulColor );
+            RemoveQueueRef ( Item.Texture.pMaterial );
             break;
         }
         // Circle type?
@@ -1016,80 +1038,78 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
 }
 
 
-// Cache a texture for current and future use.
-SCachedTextureInfo& CGraphics::CacheTexture ( const string& strFilename )
+//
+// Maybe change to a higher resolution font
+//
+ID3DXFont* CGraphics::MaybeGetBigFont ( ID3DXFont* pDXFont, float& fScaleX, float& fScaleY )
 {
-    // Find exisiting
-    map < string, SCachedTextureInfo >::iterator iter = m_CachedTextureInfoMap.find ( strFilename );
-
-    if ( iter == m_CachedTextureInfoMap.end () )
+    if ( fScaleX > 1.1f || fScaleY > 1.1f )
     {
-        // Add if not found
-        m_CachedTextureInfoMap[strFilename] = SCachedTextureInfo();
-        iter = m_CachedTextureInfoMap.find ( strFilename );
-
-        SCachedTextureInfo& info = iter->second;
-        info.d3dTexture = LoadTexture( strFilename.c_str () );
-        info.uiFileWidth = 1;
-        info.uiFileHeight = 1;
-        info.uiSurfaceWidth = 1;
-        info.uiSurfaceHeight = 1;
-
-        if ( info.d3dTexture )
+        for ( int i = 0; i < NUM_FONTS; i++ )
         {
-            D3DXIMAGE_INFO imageInfo;
-            if ( SUCCEEDED ( D3DXGetImageInfoFromFile( strFilename.c_str (), &imageInfo ) ) )
+            if ( m_pDXFonts [ i ] == pDXFont )
             {
-                info.uiFileWidth = imageInfo.Width;
-                info.uiFileHeight = imageInfo.Height;
-            }
-            D3DSURFACE_DESC surfaceDesc;
-            if ( SUCCEEDED ( info.d3dTexture->GetLevelDesc( 0, &surfaceDesc ) ) )
-            {
-                info.uiSurfaceWidth = surfaceDesc.Width;
-                info.uiSurfaceHeight = surfaceDesc.Height;
+                // Adjust scale to compensate for higher res font
+                fScaleX *= 0.25f;
+                if ( &fScaleX != &fScaleY )     // Check fScaleY is not the same variable
+                    fScaleY *= 0.25f;
+                return m_pBigDXFonts [ i ];
             }
         }
-    }
-
-    SCachedTextureInfo& info = iter->second;
-    info.ulTimeLastUsed = GetTickCount32();
-
-    return info;
-}
-
-
-// Remove any cached texures that have not been used for a little while.
-void CGraphics::ExpireCachedTextures ( bool bExpireAll )
-{
-    // Expire unused cached textures
-    // 1 cached texture     = 15 seconds till expire
-    // 50 cached textures   = 8 seconds till expire
-    // 100 cached textures  = 1 second till expire
-    long ulNumTextures              = m_CachedTextureInfoMap.size ();
-    unsigned long ulMaxAgeSeconds   = Max < long > ( 1, 15 - (ulNumTextures * 15 / 100) );
-
-    map < string, SCachedTextureInfo > ::iterator iter = m_CachedTextureInfoMap.begin ();
-    while ( iter != m_CachedTextureInfoMap.end () )
-    {
-        SCachedTextureInfo& info    = iter->second;
-        unsigned long ulAge         = GetTickCount32() - info.ulTimeLastUsed;
-        if ( ulAge > ulMaxAgeSeconds * 1000 || bExpireAll )
-        {
-            SAFE_RELEASE ( info.d3dTexture );
-            iter = m_CachedTextureInfoMap.erase ( iter );
-        }
-        else
-            ++iter;
-    }
-}
-
-ID3DXFont* CGraphics::GetBigFont ( ID3DXFont* pDXFont )
-{
-    for ( int i = 0; i < NUM_FONTS; i++ )
-    {
-        if ( m_pDXFonts [ i ] == pDXFont )
-            return m_pBigDXFonts [ i ];
     }
     return pDXFont;
+}
+
+
+//
+// Clear queue, releasing render items where necessary
+//
+void CGraphics::ClearDrawQueue ( std::vector < sDrawQueueItem >& Queue )
+{
+    for ( std::vector < sDrawQueueItem >::const_iterator iter = Queue.begin () ; iter != Queue.end (); iter++ )
+    {
+        const sDrawQueueItem& item = *iter;
+        if ( item.eType == QUEUE_TEXTURE )
+            RemoveQueueRef ( item.Texture.pMaterial );
+    }
+    Queue.clear ();
+}
+
+
+//
+// Use ref counting to prevent render items from being deleted while in the queue
+//
+void CGraphics::AddQueueRef ( CRenderItem* pRenderItem )
+{
+    pRenderItem->AddRef ();
+    m_iDebugQueueRefs++;    // For debugging
+}
+
+void CGraphics::RemoveQueueRef ( CRenderItem* pRenderItem )
+{
+    pRenderItem->Release ();
+    m_iDebugQueueRefs--;    // For debugging
+}
+
+// Entering or leaving a section where the rendertarget can be changed from script
+void CGraphics::EnableSetRenderTarget ( bool bEnable )
+{
+    // Must be changing
+    assert ( m_bSetRenderTargetEnabled != bEnable );
+
+    if ( !bEnable )
+        m_pRenderItemManager->RestoreDefaultRenderTarget ();
+    else
+        m_pRenderItemManager->SaveDefaultRenderTarget ();
+
+    m_bSetRenderTargetEnabled = bEnable;
+}
+
+// Notification that the render target will be changing
+void CGraphics::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewViewportSizeY )
+{
+    // Flush dx draws
+    DrawPreGUIQueue ();
+    // Inform tile batcher
+    m_pTileBatcher->OnChangingRenderTarget ( uiNewViewportSizeX, uiNewViewportSizeY );
 }

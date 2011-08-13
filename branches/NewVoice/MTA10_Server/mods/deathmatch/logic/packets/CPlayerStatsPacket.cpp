@@ -29,7 +29,7 @@ bool CPlayerStatsPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_pSourceElement )
     {
         ElementID ID = m_pSourceElement->GetID ();
-        BitStream.WriteCompressed ( ID );
+        BitStream.Write ( ID );
 
         // Write the stats
         unsigned short usNumStats = static_cast < unsigned short  >( m_List.size () );

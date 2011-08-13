@@ -13,6 +13,8 @@
 #ifdef WIN32
     #include "shellapi.h"
     #include "shlobj.h"
+#else
+    #include <dirent.h>
 #endif
 
 //
@@ -53,11 +55,11 @@ bool SharedUtil::DirectoryExists ( const SString& strPath )
 }
 
 
-bool SharedUtil::FileLoad ( const SString& strFilename, SString& strBuffer )
+bool SharedUtil::FileLoad ( const SString& strFilename, SString& strBuffer, int iMaxSize )
 {
     strBuffer = "";
     std::vector < char > buffer;
-    if ( !FileLoad ( strFilename, buffer ) )
+    if ( !FileLoad ( strFilename, buffer, iMaxSize ) )
         return false;
     if ( buffer.size () )
     {
@@ -98,7 +100,7 @@ bool SharedUtil::FileRename ( const SString& strFilenameOld, const SString& strF
 //
 // Load binary data from a file into an array
 //
-bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& buffer )
+bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& buffer, int iMaxSize )
 {
     buffer.clear ();
     // Open
@@ -113,6 +115,7 @@ bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& bu
     int bytesRead = 0;
     if ( size > 0 && size < 1e9 )
     {
+        size = Min ( size, iMaxSize );
         // Allocate space
         buffer.assign ( size, 0 );
         // Read into buffer
@@ -433,9 +436,13 @@ SString SharedUtil::GetWindowsDirectory ( void )
 // Find all files or directories at a path
 //
 ///////////////////////////////////////////////////////////////
-std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bFiles, bool bDirectories )
+std::vector < SString > SharedUtil::FindFiles ( const SString& strInMatch, bool bFiles, bool bDirectories )
 {
     std::vector < SString > strResult;
+
+    SString strMatch = PathConform ( strInMatch );
+    if ( strMatch.Right ( 1 ) == PATH_SEPERATOR )
+        strMatch += "*";
 
     WIN32_FIND_DATA findData;
     HANDLE hFind = FindFirstFile ( strMatch, &findData );
@@ -452,7 +459,41 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
     }
     return strResult;
 }
+
+#else
+
+std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bFiles, bool bDirectories )
+{
+    std::vector < SString > strResult;
+
+    DIR *Dir;
+    struct dirent *DirEntry;
+
+    if ( ( Dir = opendir ( strMatch ) ) )
+    {
+        while ( ( DirEntry = readdir ( Dir ) ) != NULL )
+        {
+            // Skip dotted entries
+            if ( strcmp ( DirEntry->d_name, "." ) && strcmp ( DirEntry->d_name, ".." ) )
+            {
+                struct stat Info;
+                bool bIsDir = false;
+
+                SString strPath = PathJoin ( strMatch, DirEntry->d_name );
+
+                // Determine the file stats
+                if ( lstat ( strPath, &Info ) != -1 )
+                    bIsDir = S_ISDIR ( Info.st_mode );
+
+                if ( bIsDir ? bDirectories : bFiles )
+                    strResult.push_back ( DirEntry->d_name );
+            }
+        }
+    }
+    return strResult;
+}
 #endif
+
 
 void SharedUtil::ExtractFilename ( const SString& strPathFilename, SString* strPath, SString* strFilename )
 {
@@ -461,9 +502,42 @@ void SharedUtil::ExtractFilename ( const SString& strPathFilename, SString* strP
             *strFilename = strPathFilename;
 }
 
+
 bool SharedUtil::ExtractExtention ( const SString& strFilename, SString* strMain, SString* strExt )
 {
     return strFilename.Split ( ".", strMain, strExt, -1 );
+}
+
+
+SString SharedUtil::ExtractPath ( const SString& strPathFilename )
+{
+    SString strPath;
+    ExtractFilename ( strPathFilename, &strPath, NULL );
+    return strPath;
+}
+
+
+SString SharedUtil::ExtractFilename ( const SString& strPathFilename )
+{
+    SString strFilename;
+    ExtractFilename ( strPathFilename, NULL, &strFilename );
+    return strFilename;
+}
+
+
+SString SharedUtil::ExtractExtention ( const SString& strPathFilename )
+{
+    SString strExt;
+    ExtractExtention ( strPathFilename, NULL, &strExt );
+    return strExt;
+}
+
+
+SString SharedUtil::ExtractBeforeExtention ( const SString& strPathFilename )
+{
+    SString strMain;
+    ExtractExtention ( strPathFilename, &strMain, NULL );
+    return strMain;
 }
 
 

@@ -52,7 +52,8 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
     if ( m_Entities.size () > 0 )
     {
         // Write the number of entities
-        BitStream.WriteCompressed ( ( ElementID ) m_Entities.size () );
+        unsigned int NumElements = m_Entities.size ();
+        BitStream.WriteCompressed ( NumElements );
 
         // For each entity ...
         CVector vecTemp;
@@ -61,7 +62,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
         {
             // Entity id
             CElement* pElement = *iter;
-            BitStream.WriteCompressed ( pElement->GetID () );
+            BitStream.Write ( pElement->GetID () );
 
             // Entity type id
             unsigned char ucEntityTypeID = static_cast < unsigned char > ( pElement->GetType () );
@@ -72,7 +73,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             ElementID ParentID = INVALID_ELEMENT_ID;
             if ( pParent )
                 ParentID = pParent->GetID ();
-            BitStream.WriteCompressed ( ParentID );
+            BitStream.Write ( ParentID );
 
             // Entity interior
             BitStream.Write ( pElement->GetInterior () );
@@ -85,7 +86,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
             if ( pElementAttachedTo )
             {
                 BitStream.WriteBit ( true );
-                BitStream.WriteCompressed ( pElementAttachedTo->GetID () );
+                BitStream.Write ( pElementAttachedTo->GetID () );
 
                 // Attached position and rotation
                 SPositionSync attachedPosition ( false );
@@ -419,6 +420,52 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     else
                         BitStream.WriteBit ( false );
 
+                    // Write handling
+                    if ( g_pGame->GetHandlingManager()->HasModelHandlingChanged ( static_cast < eVehicleTypes > ( pVehicle->GetModel() ) )
+                        || pVehicle->HasHandlingChanged() )
+                    {
+                        BitStream.WriteBit ( true );
+                        SVehicleHandlingSync handling;
+                        CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+
+                        handling.data.fMass                         = pEntry->GetMass ();
+                        handling.data.fTurnMass                     = pEntry->GetTurnMass ();
+                        handling.data.fDragCoeff                    = pEntry->GetDragCoeff ();
+                        handling.data.vecCenterOfMass               = pEntry->GetCenterOfMass ();
+                        handling.data.ucPercentSubmerged            = pEntry->GetPercentSubmerged ();
+                        handling.data.fTractionMultiplier           = pEntry->GetTractionMultiplier ();
+                        handling.data.ucDriveType                   = pEntry->GetCarDriveType ();
+                        handling.data.ucEngineType                  = pEntry->GetCarEngineType ();
+                        handling.data.ucNumberOfGears               = pEntry->GetNumberOfGears ();
+                        handling.data.fEngineAcceleration           = pEntry->GetEngineAcceleration ();
+                        handling.data.fEngineInertia                = pEntry->GetEngineInertia ();
+                        handling.data.fMaxVelocity                  = pEntry->GetMaxVelocity ();
+                        handling.data.fBrakeDeceleration            = pEntry->GetBrakeDeceleration ();
+                        handling.data.fBrakeBias                    = pEntry->GetBrakeBias ();
+                        handling.data.bABS                          = pEntry->GetABS ();
+                        handling.data.fSteeringLock                 = pEntry->GetSteeringLock ();
+                        handling.data.fTractionLoss                 = pEntry->GetTractionLoss ();
+                        handling.data.fTractionBias                 = pEntry->GetTractionBias ();
+                        handling.data.fSuspensionForceLevel         = pEntry->GetSuspensionForceLevel ();
+                        handling.data.fSuspensionDamping            = pEntry->GetSuspensionDamping ();
+                        handling.data.fSuspensionHighSpdDamping     = pEntry->GetSuspensionHighSpeedDamping ();
+                        handling.data.fSuspensionUpperLimit         = pEntry->GetSuspensionUpperLimit ();
+                        handling.data.fSuspensionLowerLimit         = pEntry->GetSuspensionLowerLimit ();
+                        handling.data.fSuspensionFrontRearBias      = pEntry->GetSuspensionFrontRearBias ();
+                        handling.data.fSuspensionAntiDiveMultiplier = pEntry->GetSuspensionAntiDiveMultiplier ();
+                        handling.data.fCollisionDamageMultiplier    = pEntry->GetCollisionDamageMultiplier ();
+                        handling.data.uiModelFlags                  = pEntry->GetModelFlags ();
+                        handling.data.uiHandlingFlags               = pEntry->GetHandlingFlags ();
+                        handling.data.fSeatOffsetDistance           = pEntry->GetSeatOffsetDistance ();
+                        //handling.data.uiMonetary                    = pEntry->GetMonetary ();
+                        //handling.data.ucHeadLight                   = pEntry->GetHeadLight ();
+                        //handling.data.ucTailLight                   = pEntry->GetTailLight ();
+                        handling.data.ucAnimGroup                   = pEntry->GetAnimGroup ();
+                        BitStream.Write ( &handling );
+                    }
+                    else
+                        BitStream.WriteBit ( false );
+
                     break;
                 }                
 
@@ -601,7 +648,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     if ( pVehicle )
                     {
                         BitStream.WriteBit ( true );
-                        BitStream.WriteCompressed ( pVehicle->GetID () );
+                        BitStream.Write ( pVehicle->GetID () );
 
                         SOccupiedSeatSync seat;
                         seat.data.ucSeat = pPed->GetOccupiedVehicleSeat ();

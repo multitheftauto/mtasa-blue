@@ -28,6 +28,9 @@ class CPlayer;
 #include "CObject.h"
 #include "packets/CPacket.h"
 
+#define SLOW_SYNCRATE               1000
+#define DISTANCE_FOR_SLOW_SYNCRATE  320
+
 class CKeyBinds;
 class CPlayerCamera;
 
@@ -49,13 +52,6 @@ class CPlayer : public CPed, public CClient
 {
     friend class CElement;
     friend class CScriptDebugging;
-
-    struct sPlayerSyncData
-    {
-        CPlayer*        pPlayer;
-        unsigned long   ulLastSent;
-        unsigned long   ulSwitchingToSlowSyncRate;
-    };
 
 public:
                                                 CPlayer                     ( class CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket );
@@ -209,9 +205,7 @@ public:
     inline unsigned char                        GetBlurLevel                ( void )                        { return m_ucBlurLevel; }
     inline void                                 SetBlurLevel                ( unsigned char ucBlurLevel )   { m_ucBlurLevel = ucBlurLevel; }
 
-    bool                                        IsTimeToSendSyncFrom        ( CPlayer& Player, unsigned long ulTimeNow );
-    void                                        ClearSyncTime               ( CPlayer& Player );
-    void                                        ClearSyncTimes              ( void );    
+    bool                                        IsTimeForFarSync            ( void );
 
     // Sync stuff
     inline void                                 SetSyncingVelocity          ( bool bSyncing )               { m_bSyncingVelocity = bSyncing; }
@@ -228,6 +222,10 @@ public:
     // Checks
     void                                        SetWeaponCorrect            ( bool bWeaponCorrect );
     bool                                        GetWeaponCorrect            ( void );
+
+    void                                        UpdateOthersNearList        ( void );
+    void                                        AddNearPlayer               ( CPlayer* other )              { m_NearPlayerList [ other ] = 5; }
+    std::map < CPlayer*, int >&                 GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
 
     eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
     void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
@@ -324,14 +322,14 @@ private:
 
     unsigned char                               m_ucBlurLevel;
 
+    long long                                   m_llNextFarSyncTime;       
+
     // Voice
     eVoiceState                                 m_VoiceState;
     CElement*                                   m_pBroadcastElement;
     std::list < CElement* >                     m_lstBroadcastList;
     CElement*                                   m_pIgnoredElement;
     std::list < CElement* >                     m_lstIgnoredList;
-
-    std::list < sPlayerSyncData* >              m_SyncTimes;
 
     // Sync stuff
     bool                                        m_bSyncingVelocity;
@@ -342,6 +340,9 @@ private:
     std::map < std::string, std::string >       m_AnnounceValues;
 
     uint                                        m_uiWeaponIncorrectCount;
+
+    std::map < CPlayer*, int >                  m_NearPlayerList;
+    long long                                   m_llNearListUpdateTime;
 };
 
 #endif

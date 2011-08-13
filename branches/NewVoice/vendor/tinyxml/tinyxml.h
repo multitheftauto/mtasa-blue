@@ -1132,6 +1132,7 @@ public:
 	*/
 	virtual bool Accept( TiXmlVisitor* visitor ) const;
 
+    bool    m_bWasEmptyTag;                 // MTA - Remember style of empty original
 protected:
 
 	void CopyTo( TiXmlElement* target ) const;

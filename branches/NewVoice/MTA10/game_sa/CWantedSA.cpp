@@ -61,6 +61,12 @@ void CWantedSA::SetWantedLevel ( DWORD dwWantedLevel )
         call    dwFunc
     }
 }
+void CWantedSA::SetWantedLevelNoFlash ( DWORD dwWantedLevel )
+{
+    DWORD dwLastTimeChanged = internalInterface->m_LastTimeWantedLevelChanged;
+    SetWantedLevel( dwWantedLevel );
+    internalInterface->m_LastTimeWantedLevelChanged = dwLastTimeChanged;
+}
 
 void CWantedSA::SetWantedLevelNoDrop ( DWORD dwWantedLevel )
 {

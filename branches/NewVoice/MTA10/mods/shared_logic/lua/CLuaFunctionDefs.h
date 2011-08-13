@@ -189,6 +189,8 @@ public:
     // Ped funcs
     LUA_DECLARE ( CreatePed );
 
+    LUA_DECLARE ( DetonateSatchels );
+
     LUA_DECLARE ( GetPedVoice );
     LUA_DECLARE ( SetPedVoice );
     LUA_DECLARE ( GetPedTarget );
@@ -300,9 +302,8 @@ public:
     LUA_DECLARE ( IsVehicleBlown );
     LUA_DECLARE ( GetVehicleHeadLightColor );
     LUA_DECLARE ( GetVehicleCurrentGear );
-#if WITH_VEHICLE_HANDLING
     LUA_DECLARE ( GetVehicleHandling );
-#endif
+    LUA_DECLARE ( GetOriginalHandling )
     LUA_DECLARE ( GetVehicleDoorOpenRatio );
 
     // Vehicle set functions
@@ -349,9 +350,6 @@ public:
     LUA_DECLARE ( SetVehicleGravity );
     LUA_DECLARE ( SetVehicleHeadLightColor );
     LUA_DECLARE ( SetVehicleTurretPosition );
-#if WITH_VEHICLE_HANDLING
-    LUA_DECLARE ( SetVehicleHandling );
-#endif
     LUA_DECLARE ( SetVehicleDoorOpenRatio );
 
     // Object create funcs
@@ -378,6 +376,9 @@ public:
     LUA_DECLARE ( PlayMissionAudio );
     LUA_DECLARE ( PlaySoundFrontEnd );
     LUA_DECLARE ( PreloadMissionAudio );
+    LUA_DECLARE ( SetAmbientSoundEnabled );
+    LUA_DECLARE ( IsAmbientSoundEnabled );
+    LUA_DECLARE ( ResetAmbientSounds );
 
     // Blip funcs
     LUA_DECLARE ( CreateBlip );
@@ -435,7 +436,7 @@ public:
     LUA_DECLARE ( SetPickupType );
 
     // Cam get funcs
-    LUA_DECLARE ( GetCameraView );
+    LUA_DECLARE ( GetCameraViewMode );
     LUA_DECLARE ( GetCameraMatrix );
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
@@ -447,7 +448,7 @@ public:
     LUA_DECLARE ( SetCameraInterior );
     LUA_DECLARE ( FadeCamera );
     LUA_DECLARE ( SetCameraClip );
-    LUA_DECLARE ( SetCameraView );
+    LUA_DECLARE ( SetCameraViewMode );
     LUA_DECLARE ( SetCameraGoggleEffect );
 
     // Cursor funcs
@@ -474,8 +475,12 @@ public:
     LUA_DECLARE ( EngineReplaceVehiclePart );
     LUA_DECLARE ( EngineSetModelLODDistance );
     LUA_DECLARE ( EngineSetAsynchronousLoading );
-    LUA_DECLARE ( EngineLoadIFP );
-    LUA_DECLARE ( EngineUnloadIFP );
+    LUA_DECLARE ( EngineApplyShaderToWorldTexture );
+    LUA_DECLARE ( EngineRemoveShaderFromWorldTexture );
+    LUA_DECLARE ( EngineGetModelNameFromID );
+    LUA_DECLARE ( EngineGetModelIDFromName );
+    LUA_DECLARE ( EngineGetModelTextureNames );
+    LUA_DECLARE ( EngineGetVisibleTextureNames );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
@@ -486,8 +491,15 @@ public:
     LUA_DECLARE ( dxDrawImageSection );
     LUA_DECLARE ( dxGetTextWidth );
     LUA_DECLARE ( dxGetFontHeight );
-    LUA_DECLARE ( LoadFont );
-    LUA_DECLARE ( UnloadFont );
+    LUA_DECLARE ( dxCreateFont );
+    LUA_DECLARE ( dxCreateTexture );
+    LUA_DECLARE ( dxCreateShader );
+    LUA_DECLARE ( dxCreateRenderTarget );
+    LUA_DECLARE ( dxCreateScreenSource );
+    LUA_DECLARE ( dxGetMaterialSize );
+    LUA_DECLARE ( dxSetShaderValue );
+    LUA_DECLARE ( dxSetRenderTarget );
+    LUA_DECLARE ( dxUpdateScreenSource );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
@@ -532,6 +544,7 @@ public:
     LUA_DECLARE ( GUICreateCheckBox );
     LUA_DECLARE ( GUICreateRadioButton );
     LUA_DECLARE ( GUICreateStaticImage );
+    LUA_DECLARE ( GUICreateFont );
     LUA_DECLARE ( GUIStaticImageLoadImage );
     LUA_DECLARE ( GUIGetSelectedTab );
     LUA_DECLARE ( GUISetSelectedTab );
@@ -601,8 +614,6 @@ public:
     LUA_DECLARE ( GUIMemoSetCaratIndex );
     LUA_DECLARE ( GUIWindowSetMovable );
     LUA_DECLARE ( GUIWindowSetSizable );
-    LUA_DECLARE ( GUIWindowSetCloseButtonEnabled );
-    LUA_DECLARE ( GUIWindowSetTitleBarEnabled );
     LUA_DECLARE ( GUIWindowGetMovable );
     LUA_DECLARE ( GUIWindowGetSizable );
     LUA_DECLARE ( GUIWindowGetCloseButtonEnabled );
@@ -648,6 +659,7 @@ public:
     LUA_DECLARE ( GetTrafficLightState );
     LUA_DECLARE ( AreTrafficLightsLocked );
     LUA_DECLARE ( GetJetpackMaxHeight );
+    LUA_DECLARE ( GetAircraftMaxHeight );
 
     LUA_DECLARE ( SetTime );
     LUA_DECLARE ( GetSkyGradient );
@@ -678,7 +690,7 @@ public:
     LUA_DECLARE ( GetWindVelocity );
     LUA_DECLARE ( SetWindVelocity );
     LUA_DECLARE ( ResetWindVelocity );
-    LUA_DECLARE ( AreInteriorSoundsEnabled );
+    LUA_DECLARE ( GetInteriorSoundsEnabled );
     LUA_DECLARE ( SetInteriorSoundsEnabled );
     LUA_DECLARE ( GetRainLevel );
     LUA_DECLARE ( SetRainLevel );
@@ -695,6 +707,7 @@ public:
     LUA_DECLARE ( GetSunSize );
     LUA_DECLARE ( SetSunSize );
     LUA_DECLARE ( ResetSunSize );
+    LUA_DECLARE ( SetAircraftMaxHeight );
 
     // Input functions
     LUA_DECLARE ( BindKey );
@@ -783,6 +796,7 @@ public:
     // Utility
     LUA_DECLARE ( Md5 );
     LUA_DECLARE ( GetNetworkUsageData );
+    LUA_DECLARE ( GetNetworkStats );
     LUA_DECLARE ( GetPerformanceStats );
 
     LUA_DECLARE ( GetVersion );

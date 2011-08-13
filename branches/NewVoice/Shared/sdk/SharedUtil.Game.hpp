@@ -12,69 +12,44 @@
 
 namespace SharedUtil
 {
-    bool GetTrafficLightStateFromStrings ( const char* szColorNS, const char* szColorEW,
-                                           unsigned char& ucOutput )
+
+    unsigned char GetTrafficLightStateFromColors ( TrafficLight::EColor eColorNS, TrafficLight::EColor eColorEW )
     {
-        enum ETrafficColor
+        // Get the state number
+        unsigned char ucState = 0;
+        switch ( eColorEW )
         {
-            UNKNOWN,
-            GREEN,
-            YELLOW,
-            RED
-        };
-        ETrafficColor eColorNS = UNKNOWN;
-        ETrafficColor eColorEW = UNKNOWN;
-
-        // Transform the colors from strings to a numeric value.
-        if ( ! stricmp ( szColorNS, "green" ) ) eColorNS = GREEN;
-        else if ( ! stricmp ( szColorNS, "yellow" ) ) eColorNS = YELLOW;
-        else if ( ! stricmp ( szColorNS, "amber" ) ) eColorNS = YELLOW;
-        else if ( ! stricmp ( szColorNS, "red" ) ) eColorNS = RED;
-        if ( ! stricmp ( szColorEW, "green" ) ) eColorEW = GREEN;
-        else if ( ! stricmp ( szColorEW, "yellow" ) ) eColorEW = YELLOW;
-        else if ( ! stricmp ( szColorEW, "amber" ) ) eColorEW = YELLOW;
-        else if ( ! stricmp ( szColorEW, "red" ) ) eColorEW = RED;
-
-        if ( eColorNS != UNKNOWN && eColorEW != UNKNOWN )
-        {
-            // Get the state number
-            unsigned char ucState = 0;
-            switch ( eColorEW )
-            {
-                case RED:
-                    switch ( eColorNS ) {
-                        case GREEN: ucState = 0; break;
-                        case YELLOW: ucState = 1; break;
-                        case RED: ucState = 2; break;
-                        default: break;
-                    }
-                    break;
-                case YELLOW:
-                    switch ( eColorNS ) {
-                        case GREEN: ucState = 8; break;
-                        case YELLOW: ucState = 6; break;
-                        case RED: ucState = 4; break;
-                        default: break;
-                    }
-                    break;
-                case GREEN:
-                    switch ( eColorNS ) {
-                        case GREEN: ucState = 5; break;
-                        case YELLOW: ucState = 7; break;
-                        case RED: ucState = 3; break;
-                        default: break;
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            ucOutput = ucState;
-            return true;
+            case TrafficLight::RED:
+                switch ( eColorNS ) {
+                    case TrafficLight::GREEN: ucState = 0; break;
+                    case TrafficLight::YELLOW: ucState = 1; break;
+                    case TrafficLight::RED: ucState = 2; break;
+                    default: break;
+                }
+                break;
+            case TrafficLight::YELLOW:
+                switch ( eColorNS ) {
+                    case TrafficLight::GREEN: ucState = 8; break;
+                    case TrafficLight::YELLOW: ucState = 6; break;
+                    case TrafficLight::RED: ucState = 4; break;
+                    default: break;
+                }
+                break;
+            case TrafficLight::GREEN:
+                switch ( eColorNS ) {
+                    case TrafficLight::GREEN: ucState = 5; break;
+                    case TrafficLight::YELLOW: ucState = 7; break;
+                    case TrafficLight::RED: ucState = 3; break;
+                    default: break;
+                }
+                break;
+            default:
+                break;
         }
-        else
-            return false;
+
+        return ucState;
     }
+
 
     CVehicleColor::CVehicleColor ( void )
     {

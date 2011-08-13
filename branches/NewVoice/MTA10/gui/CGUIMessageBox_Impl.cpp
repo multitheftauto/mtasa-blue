@@ -56,6 +56,8 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
     m_pLabelCaption->SetSize ( CVector2D ( MESSAGEBOX_WIDTH - MESSAGEBOX_ICON_SIZE - MESSAGEBOX_SPACER * 3, MESSAGEBOX_HEIGHT - MESSAGEBOX_SPACER * 2 ) );
     m_pLabelCaption->SetHorizontalAlign ( CGUI_ALIGN_LEFT_WORDWRAP );
     m_pLabelCaption->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+    m_pLabelCaption->MoveToBack();
+    m_pLabelCaption->SetZOrderingEnabled( false );
 
     // Create buttons
     if ( uiFlags & MB_BUTTON_OK ) {
@@ -69,6 +71,7 @@ CGUIMessageBox_Impl::CGUIMessageBox_Impl ( CGUI_Impl* pGUI, const char* szTitle,
     if ( m_pButton ) {
         m_pButton->SetPosition ( CVector2D ( ( MESSAGEBOX_WIDTH - 84 ) / 2, MESSAGEBOX_HEIGHT * 0.76f ) );
         m_pButton->SetSize ( CVector2D ( 84.0f, 24.0f ) );
+        m_pButton->SetZOrderingEnabled ( false );
 
         SetClickHandler ( GUI_CALLBACK ( &CGUIMessageBox_Impl::OnResponseHandler, this ) );
     }

@@ -37,8 +37,8 @@ public:
                                         ~CStaticFunctionDefinitions         ( void );
 
     static bool                         AddEvent                            ( CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger );
-    static bool                         AddEventHandler                     ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
-    static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
+    static bool                         AddEventHandler                     ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated );
+    static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
     static bool                         TriggerEvent                        ( const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled );
     static bool                         TriggerServerEvent                  ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments );
     static bool                         CancelEvent                         ( bool bCancel );
@@ -112,12 +112,12 @@ public:
     static bool                         GetPlayerNametagColor               ( CClientPlayer & Player, unsigned char & ucR, unsigned char & ucG, unsigned char & ucB );
 
     // Player set funcs
-    static bool                         ShowPlayerHudComponent              ( unsigned char ucComponent, bool bShow );
+    static bool                         ShowPlayerHudComponent              ( eHudComponent component, bool bShow );
     static bool                         SetPlayerMoney                      ( long lMoney );
     static bool                         GivePlayerMoney                     ( long lMoney );
     static bool                         TakePlayerMoney                     ( long lMoney );
-    static bool                         SetPlayerNametagText                ( CClientEntity& Entity, char *  szText );
-    static bool                         SetPlayerNametagColor               ( CClientEntity& Entity, unsigned char ucR, unsigned char ucG, unsigned char ucB );
+    static bool                         SetPlayerNametagText                ( CClientEntity& Entity, const char* szText );
+    static bool                         SetPlayerNametagColor               ( CClientEntity& Entity, bool bRemoveOverride, unsigned char ucR, unsigned char ucG, unsigned char ucB );
     static bool                         SetPlayerNametagShowing             ( CClientEntity& Entity, bool bShowing );
 
     // Ped funcs
@@ -227,7 +227,7 @@ public:
 
     // Object set funcs
     static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );
-    static bool                         MoveObject                          ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, const char* a_szEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
+    static bool                         MoveObject                          ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
     static bool                         StopObject                          ( CClientEntity& Entity );
     static bool                         SetObjectScale                      ( CClientEntity& Entity, float fScale );
     static bool                         SetObjectStatic                     ( CClientEntity& Entity, bool bStatic );
@@ -251,6 +251,7 @@ public:
 
     // Explosion funcs
     static bool                         CreateExplosion                     ( CVector& vecPosition, unsigned char ucType, bool bMakeSound, float fCamShake, bool bDamaging );
+    static bool                         DetonateSatchels                    ( void );
 
     // Fire funcs
     static bool                         CreateFire                          ( CVector& vecPosition, float fSize );
@@ -259,6 +260,9 @@ public:
     static bool                         PlayMissionAudio                    ( const CVector& vecPosition, unsigned short usSound );
     static bool                         PlaySoundFrontEnd                   ( unsigned char ucSound );
     static bool                         PreloadMissionAudio                 ( unsigned short usSound, unsigned short usSlot );
+    static bool                         SetAmbientSoundEnabled              ( eAmbientSoundType eType, bool bMute );
+    static bool                         IsAmbientSoundEnabled               ( eAmbientSoundType eType, bool& bOutMute );
+    static bool                         ResetAmbientSounds                  ( void );
 
     // Blip funcs
     static CClientRadarMarker*          CreateBlip                          ( CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance );
@@ -284,7 +288,7 @@ public:
     static bool                         SetMarkerIcon                       ( CClientEntity& Entity, const char* szIcon );
 
     // Camera get funcs
-    static bool                         GetCameraView                       ( unsigned short& ucMode );
+    static bool                         GetCameraViewMode                       ( unsigned short& ucMode );
     static bool                         GetCameraMatrix                     ( CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV );
     static CClientEntity *              GetCameraTarget                     ( void );
     static bool                         GetCameraInterior                   ( unsigned char & ucInterior );
@@ -294,21 +298,22 @@ public:
     static bool                         SetCameraTarget                     ( CClientEntity * pEntity);
     static bool                         SetCameraInterior                   ( unsigned char ucInterior );
     static bool                         FadeCamera                          ( bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
-    static bool                         SetCameraView                       ( unsigned short ucMode );
+    static bool                         SetCameraViewMode                       ( unsigned short ucMode );
 
     // Cursor funcs
     static bool                         GetCursorPosition                   ( CVector2D& vecCursor, CVector& vecWorld );
     static bool                         IsCursorShowing                     ( bool& bShowing );
 
     // Drawing funcs
-    static void                         DrawText                            ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, const char* szFont, bool bPostGUI, CResource* pResource );
-    static bool                         LoadFont                            ( std::string strFullFilePath, bool bBold,  unsigned int uiSize, std::string strMetaPath, CResource* pResource );
-    static bool                         UnloadFont                          ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource );
+    static void                         DrawText                            ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI );
+    static CClientDxFont*               CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold, const SString& strMetaPath, CResource* pResource );
+    static CClientGuiFont*              CreateGuiFont                       ( const SString& strFullFilePath, uint uiSize, const SString& strMetaPath, CResource* pResource );
+    static ID3DXFont*                   ResolveD3DXFont                     ( const SString& strFontName, CClientDxFont* pDxFontElement );
 
     // GUI funcs
     static bool                         GUIGetInputEnabled                  ( void );
-    static bool                         GUIGetInputMode                     ( std::string& a_rstrResult );
-    static bool                         GUISetInputMode                     ( const std::string& a_rstrInputMode );
+    static eInputMode                   GUIGetInputMode                     ( void );
+    static void                         GUISetInputMode                     ( eInputMode inputMode );
 
     static CClientGUIElement*           GUICreateWindow                     ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative );
     static CClientGUIElement*           GUICreateLabel                      ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
@@ -336,8 +341,6 @@ public:
     static void                         GUISetEnabled                       ( CClientEntity& Element, bool bFlag );
     static void                         GUISetProperty                      ( CClientEntity& Element, const char* szProperty, const char* szValue );
     static void                         GUISetText                          ( CClientEntity& Element, const char* szText );
-    static bool                         GUISetFont                          ( CClientEntity& Element, const char* szFont );
-    static bool                         GUIUnloadFont                       ( std::string strFullFilePath, std::string strMetaPath, CResource* pResource );
     static void                         GUISetSize                          ( CClientEntity& Element, const CVector2D& vecSize, bool bRelative );
     static void                         GUISetPosition                      ( CClientEntity& Element, const CVector2D& vecPosition, bool bRelative );
     static void                         GUISetVisible                       ( CClientEntity& Element, bool bFlag );
@@ -387,8 +390,6 @@ public:
 
     static void                         GUIWindowSetMovable                 ( CClientEntity& Element, bool bFlag );
     static void                         GUIWindowSetSizable                 ( CClientEntity& Element, bool bFlag );
-    static void                         GUIWindowSetCloseButtonEnabled      ( CClientEntity& Element, bool bFlag );
-    static void                         GUIWindowSetTitleBarEnabled         ( CClientEntity& Element, bool bFlag );
 
     static void                         GUILabelSetColor                    ( CClientEntity& Element, int iR, int iG, int iB );
     static void                         GUILabelSetVerticalAlign            ( CClientEntity& Element, CGUIVerticalAlign eAlign );
@@ -405,8 +406,8 @@ public:
 
     // World functions
     static bool                         GetTime                             ( unsigned char &ucHour, unsigned char &ucMin );
-    static bool                         ProcessLineOfSight                  ( CVector& vecStart, CVector& vecEnd, bool& bCollision, CColPoint** pColPoint, CClientEntity** pColEntity, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false, bool bShootThroughStuff = false, CEntity* pIgnoredEntity = NULL );
-    static bool                         IsLineOfSightClear                  ( CVector& vecStart, CVector& vecEnd, bool& bIsClear, bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true, bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false, bool bIgnoreSomeObjectsForCamera = false, CEntity* pIgnoredEntity = NULL );
+    static bool                         ProcessLineOfSight                  ( const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint, CClientEntity** pColEntity, const SLineOfSightFlags& flags = SLineOfSightFlags(), CEntity* pIgnoredEntity = NULL, SLineOfSightBuildingResult* pBuildingResult = NULL );
+    static bool                         IsLineOfSightClear                  ( const CVector& vecStart, const CVector& vecEnd, bool& bIsClear, const SLineOfSightFlags& flags = SLineOfSightFlags(), CEntity* pIgnoredEntity = NULL );
     static bool                         TestLineAgainstWater                ( CVector& vecStart, CVector& vecEnd, CVector& vecCollision );
     static CClientWater*                CreateWater                         ( CResource& resource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow );
     static bool                         GetWaterLevel                       ( CVector& vecPosition, float& fLevel, bool bCheckWaves, CVector& vecUnknown );
@@ -458,6 +459,7 @@ public:
     static bool                         SetWindVelocity                     ( float fX, float fY, float fZ );
     static bool                         RestoreWindVelocity                 ( void );
     static bool                         GetWindVelocity                     ( float& fX, float& fY, float& fZ );
+    static bool                         SetAircraftMaxHeight                ( float fHeight );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );
@@ -518,9 +520,9 @@ public:
     static CClientSound*                PlaySound                           ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop );
     static CClientSound*                PlaySound3D                         ( CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop );
     static bool                         StopSound                           ( CClientSound& Sound );
-    static bool                         SetSoundPosition                    ( CClientSound& Sound, unsigned int uiPosition );
-    static bool                         GetSoundPosition                    ( CClientSound& Sound, unsigned int& uiPosition );
-    static bool                         GetSoundLength                      ( CClientSound& Sound, unsigned int& uiLength );
+    static bool                         SetSoundPosition                    ( CClientSound& Sound, double dPosition );
+    static bool                         GetSoundPosition                    ( CClientSound& Sound, double& dPosition );
+    static bool                         GetSoundLength                      ( CClientSound& Sound, double& dLength );
     static bool                         SetSoundPaused                      ( CClientSound& Sound, bool bPaused );
     static bool                         IsSoundPaused                       ( CClientSound& Sound, bool& bPaused );
     static bool                         SetSoundVolume                      ( CClientSound& Sound, float fVolume );
@@ -533,6 +535,20 @@ public:
     static bool                         GetSoundMaxDistance                 ( CClientSound& Sound, float& fDistance );
     static bool                         GetSoundMetaTags                    ( CClientSound& Sound, const SString& strFormat, SString& strMetaTags );
     static bool                         SetSoundEffectEnabled               ( CClientSound& Sound, const SString& strEffectName, bool bEnable );
+
+
+    // Handling funcs 
+    static eHandlingProperty    GetVehicleHandlingEnum              ( std::string strProperty );
+    static bool                 GetVehicleHandling                  ( CClientVehicle* pVehicle, eHandlingProperty eProperty, float& fValue );
+    static bool                 GetVehicleHandling                  ( CClientVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue );
+    static bool                 GetVehicleHandling                  ( CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue );
+    static bool                 GetVehicleHandling                  ( CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue );
+    static bool                 GetVehicleHandling                  ( CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue );
+    static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue );
+
 
     // Version funcs
     static unsigned long                GetVersion                          ( );

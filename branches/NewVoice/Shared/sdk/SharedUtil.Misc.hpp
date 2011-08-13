@@ -13,7 +13,6 @@
 *****************************************************************************/
 
 #include "UTF8.h"
-#include "minibidi.c"
 #include "CNickGen.h"
 #include "UTF8Detect.cpp"
 #ifdef WIN32
@@ -847,18 +846,6 @@ std::wstring SharedUtil::ANSIToUTF16 ( const std::string& input )
     return strOutput;
 }
 
-std::wstring SharedUtil::GetBidiString (const std::wstring input)
-{
-    int iCount = input.size();
-    wchar_t* wcsLineBidi = new wchar_t[iCount + 1];
-    memcpy ( wcsLineBidi, input.c_str(), ( iCount + 1 ) * sizeof ( wchar_t ) );
-    doBidi ( wcsLineBidi, iCount, 1, 1 );  //Process our UTF string through MiniBidi, for Bidirectionalism
-    std::wstring strLineBidi(wcsLineBidi);
-    delete wcsLineBidi;
-    return strLineBidi;
-}
-
-
 #ifdef MTA_DEBUG
 //
 // Output timestamped line into the debugger
@@ -899,7 +886,7 @@ bool SharedUtil::IsValidVersionString ( const SString& strVersion )
 //
 // Try to make a path relative to the 'resources/' directory
 //
-SString SharedUtil::ConformResourcePath ( const char* szRes )
+SString SharedUtil::ConformResourcePath ( const char* szRes, bool bConvertToUnixPathSep )
 {
     // Remove up to first '/resources/'
     // else
@@ -912,17 +899,25 @@ SString SharedUtil::ConformResourcePath ( const char* szRes )
 
     SString strDelimList[] = { "/resources/", "/resource-cache/unzipped/", "/deathmatch/" };
     SString strText = szRes ? szRes : "";
+    char cPathSep;
+
+    // Handle which path sep char
 #ifdef WIN32
-    char cPathSep = '\\';
-    for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
-        strDelimList[i] = strDelimList[i].Replace ( "/", "\\" );
-    strText = strText.Replace ( "/", "\\" );
-#else
-    char cPathSep = '/';
-    for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
-        strDelimList[i] = strDelimList[i].Replace ( "\\", "/" );
-    strText = strText.Replace ( "\\", "/" );
+    if ( !bConvertToUnixPathSep )
+    {
+        cPathSep = '\\';
+        for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+            strDelimList[i] = strDelimList[i].Replace ( "/", "\\" );
+        strText = strText.Replace ( "/", "\\" );
+    }
+    else
 #endif
+    {
+        cPathSep = '/';
+        for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
+            strDelimList[i] = strDelimList[i].Replace ( "\\", "/" );
+        strText = strText.Replace ( "\\", "/" );
+    }
 
     for ( unsigned int i = 0 ; i < NUMELMS ( strDelimList ) ; i++ )
     {

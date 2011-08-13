@@ -126,6 +126,7 @@ bool CMainConfig::Load ( const char* szFilename )
     if ( iResult == IS_SUCCESS )
     {
         m_uiMaxPlayers = iTemp;
+        m_uiSoftMaxPlayers = m_uiMaxPlayers;
     }
     else
     {
@@ -192,6 +193,10 @@ bool CMainConfig::Load ( const char* szFilename )
     // verifyclientsettings
     GetInteger ( m_pRootNode, "verifyclientsettings", m_iEnableClientChecks );
 
+    // hideac
+    int iHideAC = 0;
+    GetInteger ( m_pRootNode, "hideac", iHideAC );
+
     {
         SString strDisbaleAC;
         GetString ( m_pRootNode, "disableac", strDisbaleAC );
@@ -201,7 +206,7 @@ bool CMainConfig::Load ( const char* szFilename )
             if ( isdigit(***it) )
                 MapSet ( m_DisableACMap, *it, 1 );
 
-        g_pNetServer->ResetStub ( 'delu', *strDisbaleAC );
+        g_pNetServer->ResetStub ( 'delu', *strDisbaleAC, m_iEnableClientChecks, iHideAC );
     }
 
     {
@@ -305,6 +310,11 @@ bool CMainConfig::Load ( const char* szFilename )
         m_bVerifySerials = false;
     }
 
+    // Grab the server-id filename
+    SString strIdFile = "server-id.keys";
+    GetString ( m_pRootNode, "idfile", strIdFile, 1 );
+    m_strIdFile = g_pServerInterface->GetModManager ()->GetAbsolutePath ( strIdFile );
+
     // Grab the server logfiles
     std::string strBuffer;
     if ( GetString ( m_pRootNode, "logfile", strBuffer, 1 ) == IS_SUCCESS )
@@ -324,6 +334,10 @@ bool CMainConfig::Load ( const char* szFilename )
     }
 
     GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
+
+    // networkencryption - Encryption for Server <-> client communications
+    m_bNetworkEncryptionEnabled = true;
+    GetBoolean ( m_pRootNode, "networkencryption", m_bNetworkEncryptionEnabled );
 
     return true;
 }
@@ -510,7 +524,7 @@ bool CMainConfig::LoadExtended ( void )
     CLogger::SetMinLogLevel ( LOGLEVEL_LOW );
 
     // Register the commands
-    RegisterCommand ( "update", CConsoleCommands::Update, false );
+    RegisterCommand ( "update", CConsoleCommands::Update, false );          // Nearly working - Part of (unmaintained) resource download system
     RegisterCommand ( "start", CConsoleCommands::StartResource, false );
     RegisterCommand ( "stop", CConsoleCommands::StopResource, false );
     RegisterCommand ( "stopall", CConsoleCommands::StopAllResources, false );
@@ -524,9 +538,9 @@ bool CMainConfig::LoadExtended ( void )
 
     RegisterCommand ( "say", CConsoleCommands::Say, false );
     RegisterCommand ( "teamsay", CConsoleCommands::TeamSay, false );
-    RegisterCommand ( "asay", CConsoleCommands::ASay, false );
+    //RegisterCommand ( "asay", CConsoleCommands::ASay, false );    // Not working
     RegisterCommand ( "msg", CConsoleCommands::Msg, false );
-    RegisterCommand ( "amsg", CConsoleCommands::AMsg, false );
+    //RegisterCommand ( "amsg", CConsoleCommands::AMsg, false );    // Not working
     RegisterCommand ( "me", CConsoleCommands::Me, false );
     RegisterCommand ( "nick", CConsoleCommands::Nick, false );
 
@@ -546,7 +560,7 @@ bool CMainConfig::LoadExtended ( void )
 
     RegisterCommand ( "debugscript", CConsoleCommands::DebugScript, false );
 
-    RegisterCommand ( "sudo", CConsoleCommands::Sudo, false );
+    //RegisterCommand ( "sudo", CConsoleCommands::Sudo, false );    // Not working
 
     RegisterCommand ( "help", CConsoleCommands::Help, false );
 
@@ -577,10 +591,13 @@ bool CMainConfig::Save ( const char* szFilename )
 }
 
 
-bool CMainConfig::IsValidPassword ( const char* szPassword, unsigned int& uiUnsupportedIndex )
+bool CMainConfig::IsValidPassword ( const char* szPassword )
 {
+    if ( !szPassword )
+        return false;
+
     // Test all characters for visibilty
-    uiUnsupportedIndex = 0;
+    uint uiUnsupportedIndex = 0;
     const char* szPtr = szPassword;
     while ( *szPtr != 0 )
     {
@@ -598,20 +615,34 @@ bool CMainConfig::IsValidPassword ( const char* szPassword, unsigned int& uiUnsu
 }
 
 
-void CMainConfig::SetPassword ( const char* szPassword ) 
+bool CMainConfig::SetPassword ( const char* szPassword, bool bSave ) 
 {
-    m_strPassword = szPassword ? szPassword : "";
-    SetString ( m_pRootNode, "password", szPassword );
+    if ( IsValidPassword ( szPassword ) )
+    {
+        m_strPassword = szPassword;
+        if ( bSave )
+        {
+            SetString ( m_pRootNode, "password", szPassword );
+            Save ();
+        }
+    }
+    return true;
 }
 
 
-void CMainConfig::SetFPSLimit ( unsigned short usFPS )
+bool CMainConfig::SetFPSLimit ( unsigned short usFPS, bool bSave )
 {
     if ( usFPS == 0 || ( usFPS >= 25 && usFPS <= 100 ) )
     {
         m_usFPSLimit = usFPS;
-        SetInteger ( m_pRootNode, "fpslimit", usFPS );
+        if ( bSave )
+        {
+            SetInteger ( m_pRootNode, "fpslimit", usFPS );
+            Save ();
+        }
+        return true;
     }
+    return false;
 }
 
 
@@ -643,12 +674,17 @@ unsigned short CMainConfig::GetServerPort ( void )
     return m_usServerPort;
 }
 
-unsigned int CMainConfig::GetMaxPlayers ( void )
+unsigned int CMainConfig::GetHardMaxPlayers ( void )
 {
     unsigned int uiMaxPlayers;
     if ( m_pCommandLineParser && m_pCommandLineParser->GetMaxPlayers ( uiMaxPlayers ) )
         return uiMaxPlayers;
     return m_uiMaxPlayers;
+}
+
+unsigned int CMainConfig::GetMaxPlayers ( void )
+{
+    return SharedUtil::Min ( GetHardMaxPlayers(), m_uiSoftMaxPlayers );
 }
 
 unsigned short CMainConfig::GetHTTPPort ( void )
@@ -657,4 +693,123 @@ unsigned short CMainConfig::GetHTTPPort ( void )
     if ( m_pCommandLineParser && m_pCommandLineParser->GetHTTPPort ( usHTTPPort ) )
         return usHTTPPort;
     return m_usHTTPPort;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Fetch any single setting from the server config
+//
+//////////////////////////////////////////////////////////////////////
+bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
+{
+    //
+    // Fetch settings that may differ from the XML data
+    //
+    if ( strName == "minclientversion" )
+    {
+        strValue = m_strMinClientVersion;
+        return true;
+    }
+    else
+    if ( strName == "recommendedclientversion" )
+    {
+        strValue = m_strRecommendedClientVersion;
+        return true;
+    }
+    else
+    if ( strName == "password" )
+    {
+        strValue = GetPassword ();
+        return true;
+    }
+    else
+    if ( strName == "fpslimit" )
+    {
+        strValue = SString ( "%d", GetFPSLimit () );
+        return true;
+    }
+    else
+    if ( strName == "networkencryption" )
+    {
+        strValue = SString ( "%d", m_bNetworkEncryptionEnabled ? 1 : 0 );
+        return true;
+    }
+    else
+    {
+        //
+        // Everything else is read only, so can be fetched directly from the XML data
+        //
+        if ( GetString ( m_pRootNode, strName, strValue ) )
+            return true;
+    }
+
+    return false;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Put certain settings to the server config
+//
+//////////////////////////////////////////////////////////////////////
+bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, bool bSave )
+{
+    if ( strName == "minclientversion" )
+    {
+        if ( strValue == "" || IsValidVersionString ( strValue ) )
+        {
+            m_strMinClientVersion = strValue;
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "minclientversion", m_strMinClientVersion );
+                Save ();
+            }
+            return true;
+        }
+    }
+    else
+    if ( strName == "recommendedclientversion" )
+    {
+        if ( strValue == "" || IsValidVersionString ( strValue ) )
+        {
+            m_strRecommendedClientVersion = strValue;
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "recommendedclientversion", m_strRecommendedClientVersion );
+                Save ();
+            }
+            return true;
+        }
+    }
+    else
+    if ( strName == "password" )
+    {
+        return CStaticFunctionDefinitions::SetServerPassword ( strValue, bSave );
+    }
+    else
+    if ( strName == "fpslimit" )
+    {
+        return CStaticFunctionDefinitions::SetFPSLimit ( atoi ( strValue ), bSave );
+    }
+    else
+    if ( strName == "networkencryption" )
+    {
+        if ( strValue == "0" || strValue == "1"  )
+        {
+            m_bNetworkEncryptionEnabled = atoi ( strValue ) ? true : false;
+            if ( bSave )
+            {
+                SetBoolean ( m_pRootNode, "networkencryption", m_bNetworkEncryptionEnabled );
+                Save ();
+            }
+            g_pNetServer->SetEncryptionEnabled ( m_bNetworkEncryptionEnabled );
+            return true;
+        }
+    }
+
+    //
+    // Everything else is read only, so can't be set
+    //
+    return false;
 }

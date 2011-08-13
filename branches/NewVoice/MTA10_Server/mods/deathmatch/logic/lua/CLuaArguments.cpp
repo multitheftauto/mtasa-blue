@@ -153,15 +153,32 @@ void CLuaArguments::PushArguments ( lua_State* luaVM ) const
 
 void CLuaArguments::PushAsTable ( lua_State* luaVM, std::map < CLuaArguments*, int > * pKnownTables )
 {
+    // Ensure there is enough space on the Lua stack
+    LUA_CHECKSTACK ( luaVM, 4 );
+
     bool bKnownTablesCreated = false;
     if ( !pKnownTables )
     {
         pKnownTables = new std::map < CLuaArguments*, int > ();
         bKnownTablesCreated = true;
+
+		lua_newtable ( luaVM );
+		// using registry to make it fail safe, else we'd have to carry
+		// either lua top or current depth variable between calls
+		lua_setfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
     }
 
     lua_newtable ( luaVM );
-    pKnownTables->insert ( std::make_pair ( (CLuaArguments *)this, lua_gettop(luaVM) ) );
+
+	// push it onto the known tables
+	int size = pKnownTables->size();
+	lua_getfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
+	lua_pushnumber ( luaVM, ++size );
+	lua_pushvalue ( luaVM, -3 );
+	lua_settable ( luaVM, -3 );
+	lua_pop ( luaVM, 1 );
+    pKnownTables->insert ( std::make_pair ( (CLuaArguments *)this, size ) );
+
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
     for ( ; iter != m_Arguments.end () && (iter+1) != m_Arguments.end (); iter ++ )
     {
@@ -172,7 +189,12 @@ void CLuaArguments::PushAsTable ( lua_State* luaVM, std::map < CLuaArguments*, i
     }
 
     if ( bKnownTablesCreated )
+	{
+		// clear the cache
+		lua_pushnil ( luaVM );
+		lua_setfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
         delete pKnownTables;
+	}
 }
 
 
@@ -205,13 +227,7 @@ bool CLuaArguments::Call ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFuncti
     // Call the function with our arguments
     pLuaMain->ResetInstructionCount ();
 
-#ifndef WIN32
-    std::setlocale(LC_ALL, "C");
-#endif
     int iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
-#ifndef WIN32
-    std::setlocale(LC_ALL, "");
-#endif
     if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
     {
         SString strRes = ConformResourcePath ( lua_tostring( luaVM, -1 ) );
@@ -279,13 +295,7 @@ bool CLuaArguments::CallGlobal ( CLuaMain* pLuaMain, const char* szFunction, CLu
     pLuaMain->ResetInstructionCount ();
     int iret = 0;
     try {
-#ifndef WIN32
-        std::setlocale(LC_ALL, "C");
-#endif
         iret = lua_pcall ( luaVM, m_Arguments.size (), LUA_MULTRET, 0 );
-#ifndef WIN32
-        std::setlocale(LC_ALL, "");
-#endif
     }
     catch ( ... )
     {
@@ -362,7 +372,7 @@ vector < char * > * CLuaArguments::WriteToCharVector ( vector < char * > * value
                 CElement* pElement = (*iter)->GetElement ();
                 if ( VERIFY_ELEMENT(pElement) )
                 {
-                    snprintf ( szValue, 9, "E#%d", (int)pElement->GetID() );
+                    snprintf ( szValue, 9, "E#%d", (int)pElement->GetID().Value() );
                 }
                 else
                 {
@@ -792,7 +802,7 @@ bool CLuaArguments::ReadFromJSONObject ( json_object * object, std::vector < CLu
             bool bSuccess = true;
             json_object_object_foreach(object, key, val) 
             {
-                CLuaArgument* pArgument = new CLuaArgument ( key );
+                CLuaArgument* pArgument = new CLuaArgument ( std::string ( key ) );
                 m_Arguments.push_back ( pArgument ); // push the key first
                 pArgument = new CLuaArgument ( );
                 bSuccess = pArgument->ReadFromJSONObject ( val, pKnownTables ); // then the value

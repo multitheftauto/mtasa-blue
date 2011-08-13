@@ -76,6 +76,7 @@ public:
     bool                HasStarted                      ( void ) { return m_bStarted; };
 
     void                SetNewsHeadline                 ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew );
+    void                OnEscapePressedOffLine          ( void );
 
 private:
     sMenuItem*          CreateItem                      ( unsigned char menuType, const char* szFilePath, CVector2D vecRelPosition, CVector2D vecNativeSize );
@@ -101,11 +102,14 @@ private:
 
     // Images
     CGUIStaticImage*    m_pBackground;
+    CGUIStaticImage*    m_pLogo;
     CGUIStaticImage*    m_pLatestNews;
     CGUIStaticImage*    m_pFiller;
     CGUIStaticImage*    m_pFiller2;
     CGUIStaticImage*    m_pVersion;
     CGUIStaticImage*    m_pMenuArea;
+
+    CGUIScrollPane*     m_pCanvas;
 
     std::deque < sMenuItem* >    m_menuItems;
     std::set < sMenuItem* >      m_unhoveredItems;
@@ -134,8 +138,8 @@ private:
     int                 m_iYOff;
     int                 m_iMenuSizeX;
     int                 m_iMenuSizeY;
-    int                 m_iFirstItemTop;
-    int                 m_iSecondItemTop;
+    int                 m_iFirstItemCentre;
+    int                 m_iSecondItemCentre;
     //Define our bounding box for menu items
     int                 m_menuAX;
     int                 m_menuAY;

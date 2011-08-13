@@ -51,6 +51,8 @@ public:
     DECLARE_COMMAND_HANDLER ( ChatScrollDown );
     DECLARE_COMMAND_HANDLER ( DebugScrollUp );
     DECLARE_COMMAND_HANDLER ( DebugScrollDown );
+
+    DECLARE_COMMAND_HANDLER ( Test );
 };
 
 #endif

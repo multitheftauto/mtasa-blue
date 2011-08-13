@@ -24,20 +24,18 @@ void CNetworkStats::Reset ( void )
 {
     m_ulLastUpdateTime = CClientTime::GetTime ();
 
-    unsigned int uiPacketsSent = g_pNet->GetPacketsSent ();
-    unsigned int uiPacketsReceived = g_pNet->GetGoodPacketsReceived () + g_pNet->GetBadPacketsReceived ();
-    unsigned int uiBitsReceived = g_pNet->GetBitsReceived ();
-    unsigned int uiBitsSent = g_pNet->GetBitsSent ();
+    NetStatistics stats;
+    g_pNet->GetNetworkStatistics ( &stats );
 
-    m_uiPacketsSent = uiPacketsSent;
-    m_uiPacketsReceived = uiPacketsReceived;
-    m_uiBitsReceived = uiBitsReceived;
-    m_uiBitsSent = uiBitsSent;
+    m_fPacketSendRate = 0;
+    m_fPacketReceiveRate = 0;
+    m_fByteSendRate = 0;
+    m_fByteReceiveRate = 0;
 
-    m_uiLastPacketsSent = uiPacketsSent;
-    m_uiLastPacketsReceived = uiPacketsReceived;
-    m_uiLastBitsReceived = uiBitsReceived;
-    m_uiLastBitsSent = uiBitsSent;
+    m_uiLastPacketsSent = stats.packetsSent;
+    m_uiLastPacketsReceived = stats.packetsReceived;
+    m_ullLastBytesSent = stats.runningTotal[NS_ACTUAL_BYTES_SENT];
+    m_ullLastBytesReceived = stats.runningTotal[NS_ACTUAL_BYTES_RECEIVED];
 }
 
 void CNetworkStats::Draw ( void )
@@ -48,65 +46,73 @@ void CNetworkStats::Draw ( void )
         Update();
     }
 
+    NetStatistics stats;
+    g_pNet->GetNetworkStatistics ( &stats );
+
     // Draw the background
     float fResWidth = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportWidth () );
     float fResHeight = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportHeight () );
-    g_pGame->GetHud ()->Draw2DPolygon ( 0.75f * fResWidth, 0.30f * fResHeight,
-                                        1.0f * fResWidth, 0.30f * fResHeight,
-                                        0.75f * fResWidth, 0.63f * fResHeight,
-                                        1.0f * fResWidth, 0.63f * fResHeight,
+    g_pCore->GetGraphics ()->DrawRectangle ( 
+                                        0.75f * fResWidth, 0.30f * fResHeight,
+                                        0.25f * fResWidth, 0.33f * fResHeight,
                                         0x78000000 );
 
     // Grab the bytes sent/recv and datarate in the proper unit
-    SString strBytesSent = GetDataUnit ( g_pNet->GetBitsSent () / 8 );
-    SString strBytesRecv = GetDataUnit ( g_pNet->GetBitsReceived () / 8 );
-    SString strRecvRate  = GetDataUnit ( ( m_uiBitsReceived - m_uiLastBitsReceived ) / 8 );
-    SString strSendRate  = GetDataUnit ( ( m_uiBitsSent - m_uiLastBitsSent ) / 8 );
+    SString strBytesSent = GetDataUnit ( stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
+    SString strBytesRecv = GetDataUnit ( stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
+    SString strRecvRate  = GetDataUnit ( Round ( m_fByteReceiveRate ) );
+    SString strSendRate  = GetDataUnit ( Round ( m_fByteSendRate ) );
+
+    unsigned int uiNumMessagesInSendBuffer = 0;
+    for ( int i = 0; i < PACKET_PRIORITY_COUNT; ++i )
+        uiNumMessagesInSendBuffer += stats.messageInSendBuffer[i];
 
     // Populate a string to print
     SString strBuffer (
                 "Ping: %u ms\n"
                 "Messages in send buffer: %u\n"
-                "Messages sent: %u\n"
-                "Messages waiting ack: %u\n"
-                "Messages resent: %u\n"
-                "Acknowledges recv: %u\n"
-                "Acknowledges sent: %u\n"
-                "Acknowledges pending: %u\n"
+                "Messages in resend buffer: %u\n"
                 "Packets recv: %u\n"
                 "Packets sent: %u\n"
-                "Packet loss: %.2f%%\n"
+                "Overall packet loss: %.2f%%\n"
+                "Current packet loss: %.2f%%\n"
                 "Bytes recv: %s\n"
                 "Bytes sent: %s\n"
                 "Datarate: %s/s / %s/s\n"
                 "Packet rate: %u / %u\n"
                 "Compression ratio: %.3f%%\n"
-                "Decompression ratio: %.3f%%",
+                "Decompression ratio: %.3f%%\n"
+                "BPS limit by CC: %llu\n"
+                "BPS limit by OB: %llu\n"
+                "Encryption: %s\n",
 
                 g_pNet->GetPing (),
 
-                g_pNet->GetMessagesInSendBuffer (),
-                g_pNet->GetMessagesSent (),
-                g_pNet->GetMessagesWaitingAck (),
-                g_pNet->GetMessagesResent (),
+                uiNumMessagesInSendBuffer,
+                stats.messagesInResendBuffer,
 
-                g_pNet->GetAcknowledgesReceived (),
-                g_pNet->GetAcknowledgesSent (),
-                g_pNet->GetAcknowledgesPending (),
-
-                g_pNet->GetGoodPacketsReceived () + g_pNet->GetBadPacketsReceived (),
-                g_pNet->GetPacketsSent (),
-                g_pNet->GetPacketLoss (),
+                stats.packetsReceived,
+                stats.packetsSent,
+                
+                stats.packetlossTotal,
+                stats.packetlossLastSecond,
 
                 strBytesRecv.c_str (),
                 strBytesSent.c_str (),
                 strRecvRate.c_str (),
                 strSendRate.c_str (),
-                m_uiPacketsReceived - m_uiLastPacketsReceived,
-                m_uiPacketsSent - m_uiLastPacketsSent,
+                (unsigned int)floor(m_fPacketReceiveRate + 0.5f),
+                (unsigned int)floor(m_fPacketSendRate + 0.5f),
                 
-                g_pNet->GetCompressionRatio () * 100.0f,
-                g_pNet->GetDecompressionRatio () * 100.0f );
+                stats.compressionRatio * 100.0f,
+                stats.decompressionRatio * 100.0f,
+                
+                // Note: BPSLimitByCongestionControl is always 1
+                stats.isLimitedByCongestionControl ? stats.BPSLimitByCongestionControl : 0ULL,
+                stats.isLimitedByOutgoingBandwidthLimit ? stats.BPSLimitByOutgoingBandwidthLimit : 0ULL,
+
+                stats.encryptionStatus ? stats.encryptionStatus == 1 ? "On" : "Unknown" : "Off"
+                );
 
     // Print it
     m_pDisplayManager->DrawText2D ( strBuffer, CVector ( 0.76f, 0.31f, 0 ), 1.0f, 0xFFFFFFFF );
@@ -115,15 +121,19 @@ void CNetworkStats::Draw ( void )
 
 void CNetworkStats::Update ( void )
 {
+    NetStatistics stats;
+    g_pNet->GetNetworkStatistics ( &stats );
+
+    float delay = static_cast < float > ( CClientTime::GetTime () - m_ulLastUpdateTime );
     m_ulLastUpdateTime = CClientTime::GetTime ();
 
-    m_uiLastPacketsSent = m_uiPacketsSent;
-    m_uiLastPacketsReceived = m_uiPacketsReceived;
-    m_uiLastBitsReceived = m_uiBitsReceived;
-    m_uiLastBitsSent = m_uiBitsSent;
+    m_fPacketSendRate = ( stats.packetsSent - m_uiLastPacketsSent ) * 1000 / delay;
+    m_fPacketReceiveRate = ( stats.packetsReceived - m_uiLastPacketsReceived ) * 1000 / delay;
+    m_fByteSendRate = ( stats.runningTotal[NS_ACTUAL_BYTES_SENT] - m_ullLastBytesSent ) * 1000 / delay;
+    m_fByteReceiveRate = ( stats.runningTotal[NS_ACTUAL_BYTES_RECEIVED] - m_ullLastBytesReceived ) * 1000 / delay;
 
-    m_uiPacketsSent = g_pNet->GetPacketsSent ();
-    m_uiPacketsReceived = g_pNet->GetGoodPacketsReceived () + g_pNet->GetBadPacketsReceived ();
-    m_uiBitsReceived = g_pNet->GetBitsReceived ();
-    m_uiBitsSent = g_pNet->GetBitsSent ();
+    m_uiLastPacketsSent = stats.packetsSent;
+    m_uiLastPacketsReceived = stats.packetsReceived;
+    m_ullLastBytesSent = stats.runningTotal[NS_ACTUAL_BYTES_SENT];
+    m_ullLastBytesReceived = stats.runningTotal[NS_ACTUAL_BYTES_RECEIVED];
 }

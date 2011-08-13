@@ -412,6 +412,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     float fWaveHeight = g_pGame->GetWaterManager ()->GetGlobalWaveHeight ();
     float fWaterLevel = g_pGame->GetWaterManager ()->GetGlobalWaterLevel ();
     float fJetpackMaxHeight = g_pGame->GetJetpackMaxHeight ();
+    float fAircraftMaxHeight = g_pGame->GetAircraftMaxHeight ();
 
     // Get the sky gradient
     bool bHasSkyGradient = g_pGame->HasSkyGradient ();
@@ -444,7 +445,7 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
     g_pGame->GetWaterColor ( ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha );
 
     // Interior sounds
-    bool bInteriorSoundsEnabled = g_pGame->AreInteriorSoundsEnabled ( );
+    bool bInteriorSoundsEnabled = g_pGame->GetInteriorSoundsEnabled ( );
 
     // Rain level
     bool bOverrideRainLevel = g_pGame->HasRainLevel ( );
@@ -517,7 +518,8 @@ void CMapManager::OnPlayerJoin ( CPlayer& Player )
                                    bOverrideFarClipDistance,
                                    fFarClip,
                                    bOverrideFogDistance,
-                                   fFogDistance ) );
+                                   fFogDistance,
+                                   fAircraftMaxHeight ) );
 
     // Send him all the elements
     SendMapInformation ( Player );
@@ -554,10 +556,10 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
     }
 
     // If this guy was jacking someone, make sure its aborted
-    pVehicle = Player.GetEnteringVehicle ();
+    pVehicle = Player.GetJackingVehicle ();
     if ( pVehicle )
     {
-        if ( Player.GetVehicleAction () != CPlayer::VEHICLEACTION_NONE )
+        if ( Player.GetVehicleAction () == CPlayer::VEHICLEACTION_JACKING )
         {
             CPed * pOccupant = pVehicle->GetOccupant ( 0 );
             if ( pOccupant )
@@ -570,8 +572,8 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
                 m_pPlayerManager->BroadcastOnlyJoined ( Reply );
             }
         }
-        if ( pVehicle->GetEnteringPed () == &Player )
-            pVehicle->SetEnteringPed ( NULL );
+        if ( pVehicle->GetJackingPlayer () == &Player )
+            pVehicle->SetJackingPlayer ( NULL );
     }   
 
     // Update the player data
@@ -625,6 +627,7 @@ void CMapManager::DoPickupRespawning ( void )
 
     // Loop through each pickup looking for respawnable ones
     unsigned long ulLastUsedTime;
+    unsigned long ulCreationTime;
     CPickup* pPickup;
     list < CPickup* > ::const_iterator iterPickups = m_pPickupManager->IterBegin ();
     for ( ; iterPickups != m_pPickupManager->IterEnd (); iterPickups++ )
@@ -633,6 +636,18 @@ void CMapManager::DoPickupRespawning ( void )
 
         // Do we have to respawn this one and is it time to?
         ulLastUsedTime = pPickup->GetLastUsedTime ();
+        ulCreationTime = pPickup->GetCreationTime ();
+        
+
+        if ( pPickup->IsEnabled () == false )
+        {
+            // Allow time for the element to be at least sent client side before allowing collisions otherwise it's possible to get a collision before the pickup is created. DO NOT WANT! - Caz
+            if ( ulCurrentTime >= ( ulCreationTime + 100 ) )
+            {
+                pPickup->SetEnabled( true );
+            }
+        }
+
         if ( !pPickup->IsSpawned () && ulLastUsedTime != 0 && ulCurrentTime >= ( ulLastUsedTime + pPickup->GetRespawnIntervals () ) )
         {            
             // Set it as spawned

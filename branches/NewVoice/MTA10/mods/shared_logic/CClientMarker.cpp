@@ -22,7 +22,7 @@ extern CClientGame* g_pClientGame;
 
 unsigned int CClientMarker::m_uiStreamedInMarkers = 0;
 
-CClientMarker::CClientMarker ( CClientManager* pManager, ElementID ID, int iMarkerType ) : CClientStreamElement ( pManager->GetMarkerStreamer (), ID )
+CClientMarker::CClientMarker ( CClientManager* pManager, ElementID ID, int iMarkerType ) : ClassInit ( this ), CClientStreamElement ( pManager->GetMarkerStreamer (), ID )
 {
     // Init
     m_pManager = pManager;

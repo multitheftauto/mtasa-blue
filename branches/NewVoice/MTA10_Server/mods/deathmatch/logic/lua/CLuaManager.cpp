@@ -283,6 +283,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPlayerBlurLevel", CLuaFunctionDefinitions::SetPlayerBlurLevel );
     CLuaCFunctions::AddFunction ( "redirectPlayer", CLuaFunctionDefinitions::RedirectPlayer );
     CLuaCFunctions::AddFunction ( "setPlayerName", CLuaFunctionDefinitions::SetPlayerName );
+    CLuaCFunctions::AddFunction ( "detonateSatchels", CLuaFunctionDefinitions::DetonateSatchels );
 
     // Ped get functions
     CLuaCFunctions::AddFunction ( "getPedWeaponSlot", CLuaFunctionDefinitions::GetPedWeaponSlot );
@@ -577,6 +578,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Server standard funcs
     CLuaCFunctions::AddFunction ( "getMaxPlayers", CLuaFunctionDefinitions::GetMaxPlayers );
+    CLuaCFunctions::AddFunction ( "setMaxPlayers", CLuaFunctionDefinitions::SetMaxPlayers );
     CLuaCFunctions::AddFunction ( "outputChatBox", CLuaFunctionDefinitions::OutputChatBox );
     CLuaCFunctions::AddFunction ( "outputConsole", CLuaFunctionDefinitions::OutputConsole );
     CLuaCFunctions::AddFunction ( "outputDebugString", CLuaFunctionDefinitions::OutputDebugString );
@@ -585,7 +587,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getServerHttpPort", CLuaFunctionDefinitions::GetServerHttpPort );
     CLuaCFunctions::AddFunction ( "getServerPassword", CLuaFunctionDefinitions::GetServerPassword );
     CLuaCFunctions::AddFunction ( "setServerPassword", CLuaFunctionDefinitions::SetServerPassword );
-    
+    CLuaCFunctions::AddFunction ( "getServerConfigSetting", CLuaFunctionDefinitions::GetServerConfigSetting );
+    CLuaCFunctions::AddFunction ( "setServerConfigSetting", CLuaFunctionDefinitions::SetServerConfigSetting, true );
+
     CLuaCFunctions::AddFunction ( "shutdown", CLuaFunctionDefinitions::shutdown, true );
 
     // Utility vector math functions
@@ -627,6 +631,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCameraDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
+    CLuaHandlingDefs::LoadFunctions ();
     CLuaPickupDefs::LoadFunctions ();
     CLuaResourceDefs::LoadFunctions ();
     CLuaTextDefs::LoadFunctions ();
@@ -729,6 +734,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefinitions::Md5 );
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefinitions::GetVersion );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefinitions::GetNetworkUsageData );
+    CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefinitions::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getLoadedModules", CLuaFunctionDefinitions::GetModules );
     CLuaCFunctions::AddFunction ( "getModuleInfo", CLuaFunctionDefinitions::GetModuleInfo );
 }

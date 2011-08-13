@@ -267,7 +267,7 @@ void CInputRPCs::ForceReconnect ( NetBitStreamInterface& bitStream )
 
                 if ( szPassword )
                 {
-                    g_pCore->Reconnect ( szHost, usPort, szPassword );
+                    g_pCore->Reconnect ( szHost, usPort, szPassword, false );
                     delete [] szHost;
                     return;
                 }

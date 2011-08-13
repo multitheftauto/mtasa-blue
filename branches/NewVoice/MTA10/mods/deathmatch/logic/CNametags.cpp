@@ -152,7 +152,16 @@ void CNametags::DrawFromAim ( void )
             // Do the raycast
             CColPoint* pColPoint = NULL;
             CEntity* pEntity = NULL;
-            g_pGame->GetWorld ()->ProcessLineOfSight ( &vecStart, &vecTarget, &pColPoint, &pEntity, true, true, true, true, true, true, false, true );
+            SLineOfSightFlags flags;
+            flags.bCheckBuildings = true;
+            flags.bCheckVehicles = true;
+            flags.bCheckPeds = true;
+            flags.bCheckObjects = true;
+            flags.bCheckDummies = true;
+            flags.bSeeThroughStuff = true;
+            flags.bIgnoreSomeObjectsForCamera = false;
+            flags.bShootThroughStuff = true;
+            g_pGame->GetWorld ()->ProcessLineOfSight ( &vecStart, &vecTarget, &pColPoint, &pEntity, flags );
             if ( pColPoint ) pColPoint->Destroy (); 
 
             // Un-ignore the local player
@@ -277,7 +286,16 @@ void CNametags::DrawDefault ( void )
         // Do the raycast
         CColPoint* pColPoint = NULL;
         CEntity* pEntity = NULL;
-        g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pEntity, true, true, true, true, true, true, false, true );
+        SLineOfSightFlags flags;
+        flags.bCheckBuildings = true;
+        flags.bCheckVehicles = true;
+        flags.bCheckPeds = true;
+        flags.bCheckObjects = true;
+        flags.bCheckDummies = true;
+        flags.bSeeThroughStuff = true;
+        flags.bIgnoreSomeObjectsForCamera = false;
+        flags.bShootThroughStuff = true;
+        g_pGame->GetWorld ()->ProcessLineOfSight ( &vecOrigin, &vecTarget, &pColPoint, &pEntity, flags );
         if ( pColPoint ) pColPoint->Destroy ();
 
         // Un-ignore the local player
@@ -355,7 +373,12 @@ void CNametags::DrawDefault ( void )
                 ( pLocalVehicle && pLocalVehicle == pPlayerVehicle ) ||
                 ( fDistanceExp < DEFAULT_VIEW_RANGE_EXP && pPlayer->IsOnScreen () ) )
         {                
-            bCollision = g_pCore->GetGame ()->GetWorld ()->ProcessLineOfSight ( &CameraMatrix.vPos, &vecPlayerPosition, &pColPoint, &pGameEntity, true, true, false, true );
+            SLineOfSightFlags flags;
+            flags.bCheckBuildings = true;
+            flags.bCheckVehicles = true;
+            flags.bCheckPeds = false;
+            flags.bCheckObjects = true;
+            bCollision = g_pCore->GetGame ()->GetWorld ()->ProcessLineOfSight ( &CameraMatrix.vPos, &vecPlayerPosition, &pColPoint, &pGameEntity, flags );
             if ( !bCollision || ( pGameEntity && pPlayerVehicle && pGameEntity == pPlayerVehicle->GetGameEntity() ) )
             {
                 pPlayer->SetNametagDistance ( sqrt ( fDistanceExp ) );
@@ -413,8 +436,9 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
         return;
 
     // Grab the resolution width and height
-    static float fResWidth = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportWidth () );
-    static float fResHeight = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportHeight () );
+    CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
+    static float fResWidth = static_cast < float > ( pGraphics->GetViewportWidth () );
+    static float fResHeight = static_cast < float > ( pGraphics->GetViewportHeight () );
 
     // Get the position
     CVector vecPosition;
@@ -423,7 +447,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
     // Calculate where the player is on our screen
     CVector vecScreenPosition;
     vecPosition.fZ += 0.3f;
-    g_pCore->GetGraphics ()->CalcScreenCoors ( &vecPosition, &vecScreenPosition );
+    pGraphics->CalcScreenCoors ( &vecPosition, &vecScreenPosition );
 
     // Grab health and max health
     float fMaxHealth = pPlayer->GetMaxHealth ();
@@ -455,8 +479,10 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
         unsigned char ucR, ucG, ucB;
         pPlayer->GetNametagColor ( ucR, ucG, ucB );
         // Draw shadow first
-        g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-        g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+        int iScreenPosX = static_cast < int > ( vecScreenPosition.fX );
+        int iScreenPosY = static_cast < int > ( vecScreenPosition.fY );
+        pGraphics->DrawText ( iScreenPosX + 1, iScreenPosY+ 1, iScreenPosX + 1, iScreenPosY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+        pGraphics->DrawText ( iScreenPosX, iScreenPosY, iScreenPosX, iScreenPosY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
 
         // We need to draw health tags?
         if ( m_bDrawHealth )
@@ -477,8 +503,8 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
                 lGreen = static_cast < long > ( fHealth );
             }
 
-            long lRedBlack = static_cast < long > ( static_cast < float > ( lRed ) * 0.33f );
-            long lGreenBlack = static_cast < long > ( static_cast < float > ( lGreen ) * 0.33f );
+            long lRedBlack = static_cast < long > ( lRed * 0.33f );
+            long lGreenBlack = static_cast < long > ( lGreen * 0.33f );
 
             // TR - TL - BR - BL
             float fHeight = fResHeight * 0.011f;
@@ -488,11 +514,12 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             float fRemovedWidth = fWidth - (fHealth / 512.0f * fWidth);
             float fTopArmorOffset = fTopOffset + fHeight - 0.01f * fResWidth;
             float fMaxArmor = 100.0f;
-            float fArmorAlpha = ( fArmor / fMaxArmor ) * ( ( float ) ucAlpha / 255.0f ); // 0->1
+            float fArmorAlpha = ( fArmor / fMaxArmor ) * ( ucAlpha / 255.0f ); // 0->1
+
             unsigned char ucArmorAlpha = ( unsigned char ) ( 255.0f * fArmorAlpha );
 
-            #define ARMOR_BORDER_COLOR COLOR_ARGB(ucArmorAlpha,167,177,179)
-                
+            #define ARMOR_BORDER_COLOR COLOR_ABGR(ucArmorAlpha,167,177,179)
+
             // Base rectangle
             CVector vecTopLeftBase  ( vecScreenPosition.fX - fWidth * 0.5f, vecScreenPosition.fY + fTopOffset,           0 );
             CVector vecBotRightBase ( vecScreenPosition.fX + fWidth * 0.5f, vecScreenPosition.fY + fTopOffset + fHeight, 0 );
@@ -500,75 +527,61 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             // background
             CVector vecTopLeft  = vecTopLeftBase  + CVector ( -fSizeIncreaseBorder, -fSizeIncreaseBorder, 0 );
             CVector vecBotRight = vecBotRightBase + CVector ( +fSizeIncreaseBorder, +fSizeIncreaseBorder, 0 );
-            m_pHud->Draw2DPolygon ( 
+            pGraphics->DrawRectangle ( 
                             vecTopLeft.fX,  vecTopLeft.fY,
-                            vecBotRight.fX, vecTopLeft.fY,
-                            vecTopLeft.fX,  vecBotRight.fY,
-                            vecBotRight.fX, vecBotRight.fY,
-                            COLOR_ARGB ( ucAlpha, 0, 0, 0 ) );
+                            vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
+                            COLOR_ABGR ( ucAlpha, 0, 0, 0 ) );
 
             if ( fArmor > 0.0f )
             {
                 // Left side of armor indicator
                 vecTopLeft  = vecTopLeftBase  + CVector ( -fSizeIncreaseBorder, -fSizeIncreaseBorder, 0 );
                 vecBotRight = vecBotRightBase + CVector ( -fWidth,              +fSizeIncreaseBorder, 0 );
-                m_pHud->Draw2DPolygon ( 
+                pGraphics->DrawRectangle ( 
                                 vecTopLeft.fX,  vecTopLeft.fY,
-                                vecBotRight.fX, vecTopLeft.fY,
-                                vecTopLeft.fX,  vecBotRight.fY,
-                                vecBotRight.fX, vecBotRight.fY,
+                                vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
                                 ARMOR_BORDER_COLOR );
 
                 // Right side of armor indicator
                 vecTopLeft  = vecTopLeftBase  + CVector ( +fWidth,              -fSizeIncreaseBorder, 0 );
                 vecBotRight = vecBotRightBase + CVector ( +fSizeIncreaseBorder, +fSizeIncreaseBorder, 0 );
-                m_pHud->Draw2DPolygon ( 
+                pGraphics->DrawRectangle ( 
                                 vecTopLeft.fX,  vecTopLeft.fY,
-                                vecBotRight.fX, vecTopLeft.fY,
-                                vecTopLeft.fX,  vecBotRight.fY,
-                                vecBotRight.fX, vecBotRight.fY,
+                                vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
                                 ARMOR_BORDER_COLOR );
 
                 // Top armor indicator
                 vecTopLeft  = vecTopLeftBase  + CVector ( +0,                   -fSizeIncreaseBorder, 0 );
                 vecBotRight = vecBotRightBase + CVector ( +0,                   -fHeight, 0 );
-                m_pHud->Draw2DPolygon ( 
+                pGraphics->DrawRectangle ( 
                                 vecTopLeft.fX,  vecTopLeft.fY,
-                                vecBotRight.fX, vecTopLeft.fY,
-                                vecTopLeft.fX,  vecBotRight.fY,
-                                vecBotRight.fX, vecBotRight.fY,
+                                vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
                                 ARMOR_BORDER_COLOR );
 
                 // Bottom armor indicator
                 vecTopLeft  = vecTopLeftBase  + CVector ( +0,                   +fHeight, 0 );
                 vecBotRight = vecBotRightBase + CVector ( +0,                   +fSizeIncreaseBorder, 0 );
-                m_pHud->Draw2DPolygon ( 
+                pGraphics->DrawRectangle ( 
                                 vecTopLeft.fX,  vecTopLeft.fY,
-                                vecBotRight.fX, vecTopLeft.fY,
-                                vecTopLeft.fX,  vecBotRight.fY,
-                                vecBotRight.fX, vecBotRight.fY,
+                                vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
                                 ARMOR_BORDER_COLOR );
-            }
+           }
 
             // the colored bit
             vecTopLeft  = vecTopLeftBase  + CVector ( +0,                       +0, 0 );
             vecBotRight = vecBotRightBase + CVector ( -fRemovedWidth,           +0, 0 );
-            m_pHud->Draw2DPolygon ( 
+            pGraphics->DrawRectangle ( 
                             vecTopLeft.fX,  vecTopLeft.fY,
-                            vecBotRight.fX, vecTopLeft.fY,
-                            vecTopLeft.fX,  vecBotRight.fY,
-                            vecBotRight.fX, vecBotRight.fY,
-                            COLOR_ARGB ( ucAlpha, 0, static_cast < unsigned char > ( lGreen ), static_cast < unsigned char > ( lRed ) ) );
+                            vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
+                            COLOR_ABGR ( ucAlpha, 0, static_cast < unsigned char > ( lGreen ), static_cast < unsigned char > ( lRed ) ) );
 
             // the black bit
             vecTopLeft  = vecTopLeftBase  + CVector ( +fWidth - fRemovedWidth,  +0, 0 );
             vecBotRight = vecBotRightBase + CVector ( +0,                       +0, 0 );
-            m_pHud->Draw2DPolygon ( 
+            pGraphics->DrawRectangle ( 
                             vecTopLeft.fX,  vecTopLeft.fY,
-                            vecBotRight.fX, vecTopLeft.fY,
-                            vecTopLeft.fX,  vecBotRight.fY,
-                            vecBotRight.fX, vecBotRight.fY,
-                            COLOR_ARGB ( ucAlpha, 0, static_cast < unsigned char > ( lGreenBlack ), static_cast < unsigned char > ( lRedBlack ) ) );
+                            vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
+                            COLOR_ABGR ( ucAlpha, 0, static_cast < unsigned char > ( lGreenBlack ), static_cast < unsigned char > ( lRedBlack ) ) );
         }
     }
 }

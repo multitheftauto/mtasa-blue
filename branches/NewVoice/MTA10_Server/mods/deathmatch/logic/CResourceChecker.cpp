@@ -117,7 +117,7 @@ void CResourceChecker::CheckFileForIssues ( const string& strPath, const string&
     else
     if ( stricmp ( szExt, ".LUA" ) == 0 )
     {
-        CheckLuaFileForIssues( strPath, strFileName, bClientScript );
+        CheckLuaFileForIssues( strPath, strFileName, strResourceName, bClientScript );
     }
 }
 
@@ -214,7 +214,7 @@ void CResourceChecker::CheckRwFileForIssues ( const string& strPath, const strin
 //
 //
 ///////////////////////////////////////////////////////////////
-void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const string& strFileName, bool bClientScript )
+void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const string& strFileName, const string& strResourceName, bool bClientScript )
 {
     // Load the original file into a string
     string strFileContents;
@@ -275,7 +275,7 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
             {
                 fwrite ( strNewFileContents.c_str (), 1, strNewFileContents.length (), pFile );
                 fclose ( pFile );
-                CLogger::LogPrintf ( "Upgrading %s ...........done\n", strFileName.c_str () );
+                CLogger::LogPrintf ( "Upgrading %s:%s ...........done\n", strResourceName.c_str (), strFileName.c_str () );
 
                 m_upgradedFullPathList.push_back( strPath );
             }

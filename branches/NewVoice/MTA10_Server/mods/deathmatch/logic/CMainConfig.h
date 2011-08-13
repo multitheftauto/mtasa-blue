@@ -43,12 +43,14 @@ public:
     std::string                     GetServerIP                     ( void );
     unsigned short                  GetServerPort                   ( void );
     unsigned int                    GetMaxPlayers                   ( void );
+    unsigned int                    GetHardMaxPlayers               ( void );
+    void                            SetSoftMaxPlayers               ( unsigned int v ) { m_uiSoftMaxPlayers = v; }
     inline bool                     IsHTTPEnabled                   ( void )        { return m_bHTTPEnabled; };
 
-    bool                            IsValidPassword                 ( const char* szPassword, unsigned int& cUnsupportedIndex );
+    bool                            IsValidPassword                 ( const char* szPassword );
     inline bool                     HasPassword                     ( void )        { return !m_strPassword.empty (); };
     inline const std::string&       GetPassword                     ( void )        { return m_strPassword; };
-    void                            SetPassword                     ( const char* szPassword );
+    bool                            SetPassword                     ( const char* szPassword, bool bSave );
 
     bool                            GetVoiceEnabled                 ( void )        { return m_bVoiceEnabled; };
     unsigned int                    GetSampleRate                   ( void )        { return m_uiSampleRate; };
@@ -80,9 +82,14 @@ public:
     const SString&                  GetMinimumClientVersion         ( void )                    { return m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
+    const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
+    bool                            GetNetworkEncryptionEnabled     ( void )                    { return m_bNetworkEncryptionEnabled; }
 
     inline unsigned short           GetFPSLimit                     ( void )        { return m_usFPSLimit; };
-    void                            SetFPSLimit                     ( unsigned short usFPS );
+    bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
+
+    bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
+    bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
 
@@ -101,6 +108,7 @@ private:
     std::string                     m_strServerName;
     unsigned short                  m_usServerPort;
     unsigned int                    m_uiMaxPlayers;
+    unsigned int                    m_uiSoftMaxPlayers;
     bool                            m_bHTTPEnabled;
     std::string                     m_strPassword;
     bool                            m_bAseEnabled;
@@ -128,6 +136,8 @@ private:
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
     bool                            m_bAutoLogin;
+    SString                         m_strIdFile;
+    bool                            m_bNetworkEncryptionEnabled;
 };
 
 #endif

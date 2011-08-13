@@ -16,7 +16,7 @@
 std::map < unsigned short, std::list < RwTexture* > > CClientTXD::ms_ReplacedTXDTextures;
 std::map < unsigned short, std::list < RwTexture* > > CClientTXD::ms_AddedTXDTextures;
 
-CClientTXD::CClientTXD ( class CClientManager* pManager, ElementID ID ) : CClientEntity ( ID )
+CClientTXD::CClientTXD ( class CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
 {
     // Init
     m_pManager = pManager;

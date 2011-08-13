@@ -24,8 +24,6 @@ extern CGame* g_pGame;
 #define VERIFY_RESOURCE(resource) (g_pGame->GetResourceManager()->Exists(resource))
 #endif
 
-#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
-
 using namespace std;
 
 CLuaArgument::CLuaArgument ( void )
@@ -84,18 +82,6 @@ CLuaArgument::CLuaArgument ( lua_State* luaVM, int iArgument, std::map < const v
     // Read the argument out of the lua VM
     m_pTableData = NULL;
     Read ( luaVM, iArgument, pKnownTables );
-
-    // Store debug data for later retrieval
-    m_iLine = 0;
-    m_strFilename = "";
-    lua_Debug debugInfo;
-    if ( lua_getstack ( luaVM, 1, &debugInfo ) )
-    {
-        lua_getinfo ( luaVM, "nlS", &debugInfo );
-
-        m_strFilename = debugInfo.source;
-        m_iLine = debugInfo.currentline;
-    }
 }
 
 
@@ -371,7 +357,10 @@ void CLuaArgument::Push ( lua_State* luaVM, std::map < CLuaArguments*, int > * p
             {
                 if ( pKnownTables && pKnownTables->find ( m_pTableData ) != pKnownTables->end () )
                 {
-                    lua_pushvalue ( luaVM, pKnownTables->find ( m_pTableData )->second );
+					lua_getfield ( luaVM, LUA_REGISTRYINDEX, "cache" );
+					lua_pushnumber ( luaVM, pKnownTables->find ( m_pTableData )->second );
+					lua_gettable ( luaVM, -2 );
+					lua_remove ( luaVM, -2 );
                 }
                 else
                 {
@@ -403,6 +392,7 @@ void CLuaArgument::Read ( CLuaArguments * table )
     m_strString = "";
     DeleteTableData ();
     m_pTableData = new CLuaArguments ( *table );
+    m_bWeakTableRef = false;
     m_iType = LUA_TTABLE;
 }
 
@@ -430,7 +420,7 @@ void CLuaArgument::Read ( CElement* pElement )
     if ( pElement )
     {
         m_iType = LUA_TLIGHTUSERDATA;
-        m_pLightUserData = (void*) pElement->GetID ();
+        m_pLightUserData = (void*) reinterpret_cast<unsigned int *>(pElement->GetID ().Value());
     }
     else
         m_iType = LUA_TNIL;
@@ -573,7 +563,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
                     delete [] szValue;
                 }
                 else
-                    Read ( "" );
+                    Read ( std::string ( "" ) );
 
                 break;
             }
@@ -582,7 +572,7 @@ bool CLuaArgument::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::ve
             case LUA_TLIGHTUSERDATA:
             {
                 ElementID ElementID;
-                if ( bitStream.ReadCompressed ( ElementID ) )
+                if ( bitStream.Read ( ElementID ) )
                 {
                     CElement * element = CElementIDs::GetElement ( ElementID );
                     Read ( element );
@@ -710,7 +700,7 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, std::map
                 // Write its ID
                 type.data.ucType = LUA_TLIGHTUSERDATA;
                 bitStream.Write ( &type );
-                bitStream.WriteCompressed ( static_cast < ElementID > ( pElement->GetID () ) );
+                bitStream.Write ( pElement->GetID () );
             }
             else
             {
@@ -805,7 +795,7 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, std::map < CLua
             if ( pElement && bSerialize )
             {
                 char szElementID[10] = {0};
-                snprintf ( szElementID, 9, "^E^%d", (int)pElement->GetID() );
+                snprintf ( szElementID, 9, "^E^%d", (int)pElement->GetID().Value() );
                 return json_object_new_string ( szElementID );
             }
             else if ( VERIFY_RESOURCE(pResource) )
@@ -889,7 +879,7 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
             CResource* pResource = reinterpret_cast < CResource* > ( GetLightUserData() );
             if ( pElement )
             {
-                snprintf ( szBuffer, length, "#E#%d", (int)pElement->GetID() );
+                snprintf ( szBuffer, length, "#E#%d", (int)pElement->GetID().Value() );
                 return szBuffer;
             }
             else if ( VERIFY_RESOURCE(pResource) )
@@ -1010,7 +1000,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                     }
                 }
                 else
-                    Read(szString);
+                    Read(std::string ( szString ));
                 break;
                 }
             default:

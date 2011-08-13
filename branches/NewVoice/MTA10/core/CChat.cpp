@@ -19,7 +19,7 @@ extern CCore* g_pCore;
 
 CChat * g_pChat = NULL;
 
-CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
+CChat::CChat ( CGUI* pManager, const CVector2D & vecPosition )
 {    
     g_pChat = this;
     m_pManager = pManager;  
@@ -27,8 +27,7 @@ CChat::CChat ( CGUI* pManager, CVector2D & vecPosition )
     // Calculate relative position (assuming a 800x600 native resolution for our defined CCHAT_* values)
     CVector2D vecResolution = m_pManager->GetResolution ();
     m_vecScale = CVector2D ( vecResolution.fX / 800.0f, vecResolution.fY / 600.0f );
-    vecPosition = vecPosition * vecResolution;
-    m_vecBackgroundPosition = vecPosition;
+    m_vecBackgroundPosition = vecPosition * vecResolution;
 
     // Initialize variables
     m_iScrollState = 0;
@@ -864,7 +863,7 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
 }
 
 
-void CChatLine::Draw ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds )
+void CChatLine::Draw ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds )
 {
     float fCurrentX = vecPosition.fX;
     std::vector < CChatLineSection >::iterator iter = m_Sections.begin ();
@@ -965,7 +964,7 @@ CChatLineSection& CChatLineSection::operator = ( const CChatLineSection& other )
     return *this;
 }
 
-void CChatLineSection::Draw ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds )
+void CChatLineSection::Draw ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds )
 {
     if ( !m_strText.empty () && ucAlpha > 0 )
     {

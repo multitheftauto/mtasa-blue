@@ -71,7 +71,8 @@ public:
                                                       bool bOverrideFarClipDistance = false,
                                                       float fFarClip = 0,
                                                       bool bOverrideFogDistance = false,
-                                                      float fFogDistance = 0);
+                                                      float fFogDistance = 0,
+                                                      float fAircraftMaxHeight = 800 );
 
     inline ePacketID        GetPacketID             ( void ) const              { return PACKET_ID_MAP_INFO; };
     inline unsigned long    GetFlags                ( void ) const              { return PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -125,6 +126,7 @@ private:
     float                   m_fFarClip;
     bool                    m_bOverrideFogDistance;
     float                   m_fFogDistance;
+    float                   m_fAircraftMaxHeight;
 };
 
 #endif

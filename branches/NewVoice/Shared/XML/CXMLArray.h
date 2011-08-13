@@ -31,7 +31,7 @@ private:
     static void                 ExpandBy            ( unsigned long ulAmount );
     static void                 PushUniqueID        ( unsigned long ulID );
 
-    static CStack < unsigned long, 1, INVALID_XML_ID >  m_IDStack;
+    static CStack < unsigned long, 1 >  m_IDStack;
     static std::vector < CXMLCommon* >                  m_Elements;
     static unsigned long                                m_ulCapacity;
 };

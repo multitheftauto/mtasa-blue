@@ -1061,6 +1061,8 @@ inline void swap(sparsegroup<T,GROUP_SIZE> &x, sparsegroup<T,GROUP_SIZE> &y) {
 // ---------------------------------------------------------------------------
 
 
+#include <stddef.h> // for ptrdiff_t
+
 template <class T, u_int16_t GROUP_SIZE = DEFAULT_SPARSEGROUP_SIZE>
 class sparsetable {
  public:

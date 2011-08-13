@@ -31,17 +31,18 @@ static unsigned char g_ucMaxPassengers [] = { 3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1
 
 // List over all vehicles with their special attributes
 #define VEHICLE_HAS_TURRENT             0x001UL //1
-#define VEHICLE_HAS_SIRENES             0x002UL //2
+#define VEHICLE_HAS_SIRENS              0x002UL //2
 #define VEHICLE_HAS_LANDING_GEARS       0x004UL //4
 #define VEHICLE_HAS_ADJUSTABLE_PROPERTY 0x008UL //8
 #define VEHICLE_HAS_SMOKE_TRAIL         0x010UL //16
 #define VEHICLE_HAS_TAXI_LIGHTS         0x020UL //32
+#define VEHICLE_HAS_SEARCH_LIGHT        0x040UL //64
 
 unsigned long g_ulVehicleAttributes [] = {
   0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 32, 0, 0, 2, 0,    // 400-424
   0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,    // 425-449
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 450-474
-  0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 475-499
+  0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 64, 0, 0,    // 475-499
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 0, 0, 0, 0, 0, 4, 12, 0, 0, 2, 8, // 500-524
   8, 0, 0, 2, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,    // 525-549
   0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 550-574
@@ -177,7 +178,7 @@ bool CVehicleManager::Exists ( CVehicle* pVehicle )
 
 bool CVehicleManager::IsValidModel ( unsigned int ulVehicleModel )
 {
-    return ulVehicleModel >= 400 && ulVehicleModel <= 611;
+    return ulVehicleModel >= 400 && ulVehicleModel <= 611 && ulVehicleModel != 570;
 }
 
 eVehicleType CVehicleManager::GetVehicleType ( unsigned short usModel )
@@ -216,7 +217,7 @@ bool CVehicleManager::HasTurret ( unsigned int uiModel )
 bool CVehicleManager::HasSirens ( unsigned int uiModel )
 {
     return ( IsValidModel ( uiModel ) &&
-             ( g_ulVehicleAttributes[ uiModel - 400 ] & VEHICLE_HAS_SIRENES ) );
+             ( g_ulVehicleAttributes[ uiModel - 400 ] & VEHICLE_HAS_SIRENS ) );
 }
 
 bool CVehicleManager::HasTaxiLight ( unsigned int uiModel )

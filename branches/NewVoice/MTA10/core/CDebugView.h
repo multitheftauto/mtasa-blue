@@ -24,7 +24,7 @@
 class CDebugView : public CChat
 {
 public:
-                CDebugView              ( CGUI* pManager, CVector2D & vecPosition );
+                CDebugView              ( CGUI* pManager, const CVector2D & vecPosition );
 
     void        Draw                    ( void );
     void        Output                  ( char* szText, bool bColorCoded );

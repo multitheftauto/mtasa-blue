@@ -16,7 +16,7 @@
 #include <game/CHandlingManager.h>
 #include "CHandlingEntrySA.h"
 
-class CHandlingManagerSA: public IHandlingManager
+class CHandlingManagerSA: public CHandlingManager
 {
 public:
                                 CHandlingManagerSA              ( void );
@@ -25,9 +25,10 @@ public:
     CHandlingEntry*             CreateHandlingData              ( void );
 
     const CHandlingEntry*       GetOriginalHandlingData         ( eVehicleTypes eModel );
-    float                       GetDragMultiplier               ( void );
-    float                       GetBasicDragCoeff               ( void );
+
     eHandlingTypes              GetHandlingID                   ( eVehicleTypes eModel );
+
+    eHandlingProperty           GetPropertyEnumFromName         ( std::string strName );
 
 private:
     void                        InitializeDefaultHandlings      ( void );
@@ -38,8 +39,7 @@ private:
     static tHandlingDataSA      m_OriginalHandlingData [HT_MAX];
     static CHandlingEntrySA*    m_pOriginalEntries [HT_MAX];
 
-    // Additional entries are saved here
-    std::list < CHandlingEntrySA* > m_HandlingList;
+    std::map < std::string, eHandlingProperty > m_HandlingNames;
 };
 
 #endif

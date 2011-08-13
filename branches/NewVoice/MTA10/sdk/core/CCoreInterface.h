@@ -15,6 +15,7 @@
 #include "CConsoleInterface.h"
 #include "CCommandsInterface.h"
 #include "CCommunityInterface.h"
+#include "CRenderItemManagerInterface.h"
 #include "CGraphicsInterface.h"
 #include "CModManagerInterface.h"
 #include "CKeyBindsInterface.h"
@@ -89,7 +90,7 @@ public:
     virtual void                    SetOfflineMod                   ( bool bOffline ) = 0;
 
     virtual bool                    IsConnected                     ( void ) = 0;
-    virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword ) = 0;
+    virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true ) = 0;
 
     virtual const char *            GetInstallRoot                  ( void ) = 0;
     virtual const char *            GetModInstallRoot               ( const char * szModName )=0;
@@ -125,6 +126,8 @@ public:
     virtual void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1 ) = 0;
     virtual void                    ApplyFrameRateLimit             ( uint uiOverrideRate = -1 ) = 0;
     virtual void                    EnsureFrameRateLimitApplied     ( void ) = 0;
+
+    virtual void                    OnPreHUDRender                  ( void ) = 0;
 };
 
 #endif
