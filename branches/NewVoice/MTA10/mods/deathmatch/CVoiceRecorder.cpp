@@ -108,6 +108,18 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsig
     m_uiOutgoingReadIndex = 0;
     m_uiOutgoingWriteIndex = 0;
 
+    // Initialise the speex preprocessor
+    int iSamplingRate;
+    speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_SAMPLING_RATE, &iSamplingRate );
+    m_pSpeexPreprocState = speex_preprocess_state_init(m_iSpeexOutgoingFrameSampleCount, iSamplingRate);
+
+    // Set our preprocessor parameters
+    int iEnable = 1; int iDisable = 0;
+    speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_AGC, &iEnable );
+    speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_DENOISE, &iEnable );
+    speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_DEREVERB, &iEnable );
+    speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_VAD, &iDisable );
+
 }
 
 void CVoiceRecorder::DeInit( void )
@@ -124,6 +136,9 @@ void CVoiceRecorder::DeInit( void )
 
         speex_encoder_destroy(m_pSpeexEncoderState);
         m_pSpeexEncoderState = NULL;
+
+        speex_preprocess_state_destroy(m_pSpeexPreprocState);
+        m_pSpeexPreprocState = NULL;
 
         free(m_pOutgoingBuffer);
         m_pOutgoingBuffer = NULL;
@@ -250,6 +265,9 @@ void CVoiceRecorder::DoPulse( void )
                 }
                 else
                     pInputBuffer = m_pOutgoingBuffer + m_uiOutgoingReadIndex;
+
+                // Run through our preprocessor (noise/echo cancelation)
+                speex_preprocess_run(m_pSpeexPreprocState, (spx_int16_t*)pInputBuffer );
 
                 // Encode our audio stream with speex
                 speex_encode_int(m_pSpeexEncoderState, (spx_int16_t*)pInputBuffer, &speexBits);

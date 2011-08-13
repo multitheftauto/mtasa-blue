@@ -25,6 +25,7 @@
 //#define VOICE_DEBUG_LOCAL_PLAYBACK
 
 #include <speex/speex.h>
+#include <speex/speex_preprocess.h>
 #include <portaudio/portaudio.h>
 
 enum eVoiceState
@@ -79,6 +80,7 @@ private:
     PaStream*                           m_pAudioStream;
 
     void*                               m_pSpeexEncoderState;
+    SpeexPreprocessState*               m_pSpeexPreprocState;
 
     char*                               m_pOutgoingBuffer;
     int                                 m_iSpeexOutgoingFrameSampleCount;
