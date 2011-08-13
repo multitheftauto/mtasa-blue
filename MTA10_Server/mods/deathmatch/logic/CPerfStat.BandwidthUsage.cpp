@@ -232,9 +232,9 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
         {
             SString strType = (char*)result.Data[r][0].pVal;
             uint uiIndex = result.Data[r][1].nVal;
-            float GameRecv = result.Data[r][2].fVal;
-            float GameSent = result.Data[r][3].fVal;
-            float HttpSent = result.Data[r][4].fVal;
+            float GameRecv = Max ( 0.f, result.Data[r][2].fVal );
+            float GameSent = Max ( 0.f, result.Data[r][3].fVal );
+            float HttpSent = Max ( 0.f, result.Data[r][4].fVal );
 
             uint uiType = BWStatNameToIndex ( strType );
 
@@ -378,14 +378,14 @@ void CPerfStatBandwidthUsageImpl::RecordStats ( void )
     long long llTotalBytesSent, llTotalBytesReceived;
     g_pNetServer->GetStatsTotals ( llTotalBytesSent, llTotalBytesReceived );
 
-    long long llDeltaGameBytesSent = llTotalBytesSent - m_llPrevTotalBytesSent;
-    long long llDeltaGameBytesRecv = llTotalBytesReceived - m_llPrevTotalBytesReceived;
+    long long llDeltaGameBytesSent = Max ( 0LL, llTotalBytesSent - m_llPrevTotalBytesSent );
+    long long llDeltaGameBytesRecv = Max ( 0LL, llTotalBytesReceived - m_llPrevTotalBytesReceived );
 
     m_llPrevTotalBytesSent = llTotalBytesSent;
     m_llPrevTotalBytesReceived = llTotalBytesReceived;
 
     long long llHttpTotalBytesSent = EHS::StaticGetTotalBytesSent ();
-    long long llDeltaHttpBytesSent = llHttpTotalBytesSent - m_llPrevHttpTotalBytesSent;
+    long long llDeltaHttpBytesSent = Max ( 0LL, llHttpTotalBytesSent - m_llPrevHttpTotalBytesSent );
     m_llPrevHttpTotalBytesSent = llHttpTotalBytesSent;
 
     // Add to the history arrays
@@ -422,7 +422,7 @@ void CPerfStatBandwidthUsageImpl::AddSampleAtTime ( time_t tTime, long long llGa
 
             if ( nowIndex != type.nowIndex )
             {
-                if ( type.nowIndex != -1 )
+                if ( type.nowIndex != (uint)-1 )
                 {
                     type.itemList [ nowIndex ].llGameRecv = 0;
                     type.itemList [ nowIndex ].llGameSent = 0;
@@ -488,6 +488,7 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
     // Set option flags
     //
     bool bHelp = MapContains ( strOptionMap, "h" );
+    bool bTotalsOnly = MapContains ( strOptionMap, "t" );
 
     //
     // Process help
@@ -496,24 +497,39 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
     {
         pResult->AddColumn ( "Packet usage help" );
         pResult->AddRow ()[0] ="Option h - This help";
+        pResult->AddRow ()[0] ="Option t - Totals only";
         return;
     }
 
     // Add columns
-    pResult->AddColumn ( "Last 24 hours.Hour" );
-    pResult->AddColumn ( "Last 24 hours.Recv game" );
-    pResult->AddColumn ( "Last 24 hours.Sent game" );
-    pResult->AddColumn ( "Last 24 hours.Sent http" );
+    if ( !bTotalsOnly )
+    {
+        pResult->AddColumn ( "Last 24 hours.Hour" );
+        pResult->AddColumn ( "Last 24 hours.Recv game" );
+        pResult->AddColumn ( "Last 24 hours.Sent game" );
+        pResult->AddColumn ( "Last 24 hours.Sent http" );
 
-    pResult->AddColumn ( "Last 31 days.Day" );
-    pResult->AddColumn ( "Last 31 days.Recv game" );
-    pResult->AddColumn ( "Last 31 days.Sent game" );
-    pResult->AddColumn ( "Last 31 days.Sent http" );
+        pResult->AddColumn ( "Last 31 days.Day" );
+        pResult->AddColumn ( "Last 31 days.Recv game" );
+        pResult->AddColumn ( "Last 31 days.Sent game" );
+        pResult->AddColumn ( "Last 31 days.Sent http" );
 
-    pResult->AddColumn ( "Last 12 months.Month" );
-    pResult->AddColumn ( "Last 12 months.Recv game" );
-    pResult->AddColumn ( "Last 12 months.Sent game" );
-    pResult->AddColumn ( "Last 12 months.Sent http" );
+        pResult->AddColumn ( "Last 12 months.Month" );
+        pResult->AddColumn ( "Last 12 months.Recv game" );
+        pResult->AddColumn ( "Last 12 months.Sent game" );
+        pResult->AddColumn ( "Last 12 months.Sent http" );
+    }
+    else
+    {
+        pResult->AddColumn ( "Last 24 hours.Hour" );
+        pResult->AddColumn ( "Last 24 hours.Total" );
+
+        pResult->AddColumn ( "Last 31 days.Day" );
+        pResult->AddColumn ( "Last 31 days.Total" );
+
+        pResult->AddColumn ( "Last 12 months.Month" );
+        pResult->AddColumn ( "Last 12 months.Total" );
+    }
 
     uint showTypeList[] = {
                             BWSTAT_INDEX_HOURS,
@@ -555,9 +571,14 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
                 else
                     c++;
 
-                row[c++] = GetScaledBandwidthString ( item.llGameRecv );
-                row[c++] = GetScaledBandwidthString ( item.llGameSent );
-                row[c++] = GetScaledBandwidthString ( item.llHttpSent );
+                if ( !bTotalsOnly )
+                {
+                    row[c++] = GetScaledBandwidthString ( item.llGameRecv );
+                    row[c++] = GetScaledBandwidthString ( item.llGameSent );
+                    row[c++] = GetScaledBandwidthString ( item.llHttpSent );
+                }
+                else
+                    row[c++] = GetScaledBandwidthString ( item.llGameRecv + item.llGameSent + item.llHttpSent );
             }
             else
             {
