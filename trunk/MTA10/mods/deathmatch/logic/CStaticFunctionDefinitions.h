@@ -520,9 +520,9 @@ public:
     static CClientSound*                PlaySound                           ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop );
     static CClientSound*                PlaySound3D                         ( CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop );
     static bool                         StopSound                           ( CClientSound& Sound );
-    static bool                         SetSoundPosition                    ( CClientSound& Sound, unsigned int uiPosition );
-    static bool                         GetSoundPosition                    ( CClientSound& Sound, unsigned int& uiPosition );
-    static bool                         GetSoundLength                      ( CClientSound& Sound, unsigned int& uiLength );
+    static bool                         SetSoundPosition                    ( CClientSound& Sound, double dPosition );
+    static bool                         GetSoundPosition                    ( CClientSound& Sound, double& dPosition );
+    static bool                         GetSoundLength                      ( CClientSound& Sound, double& dLength );
     static bool                         SetSoundPaused                      ( CClientSound& Sound, bool bPaused );
     static bool                         IsSoundPaused                       ( CClientSound& Sound, bool& bPaused );
     static bool                         SetSoundVolume                      ( CClientSound& Sound, float fVolume );

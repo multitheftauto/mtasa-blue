@@ -133,8 +133,8 @@ int CLuaFunctionDefs::SetSoundPosition ( lua_State* luaVM )
         CClientSound* pSound = lua_tosound ( luaVM, 1 );
         if ( pSound )
         {
-            unsigned int uiPosition = ( unsigned int ) lua_tonumber ( luaVM, 2 );
-            if ( CStaticFunctionDefinitions::SetSoundPosition ( *pSound, uiPosition ) )
+            double dPosition = lua_tonumber ( luaVM, 2 );
+            if ( CStaticFunctionDefinitions::SetSoundPosition ( *pSound, dPosition ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -153,10 +153,10 @@ int CLuaFunctionDefs::GetSoundPosition ( lua_State* luaVM )
         CClientSound* pSound = lua_tosound ( luaVM, 1 );
         if ( pSound )
         {
-            unsigned int uiPosition = 0;
-            if ( CStaticFunctionDefinitions::GetSoundPosition ( *pSound, uiPosition ) )
+            double dPosition = 0;
+            if ( CStaticFunctionDefinitions::GetSoundPosition ( *pSound, dPosition ) )
             {
-                lua_pushnumber ( luaVM, uiPosition );
+                lua_pushnumber ( luaVM, dPosition );
                 return 1;
             }
         }
@@ -173,10 +173,10 @@ int CLuaFunctionDefs::GetSoundLength ( lua_State* luaVM )
         CClientSound* pSound = lua_tosound ( luaVM, 1 );
         if ( pSound )
         {
-            unsigned int uiLength = 0;
-            if ( CStaticFunctionDefinitions::GetSoundLength ( *pSound, uiLength ) )
+            double dLength = 0;
+            if ( CStaticFunctionDefinitions::GetSoundLength ( *pSound, dLength ) )
             {
-                lua_pushnumber ( luaVM, uiLength );
+                lua_pushnumber ( luaVM, dLength );
                 return 1;
             }
         }

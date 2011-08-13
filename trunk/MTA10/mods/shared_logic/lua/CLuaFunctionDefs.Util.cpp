@@ -660,11 +660,11 @@ int CLuaFunctionDefs::GetNetworkStats ( lua_State* luaVM )
         lua_createtable ( luaVM, 0, 11 );
 
         lua_pushstring ( luaVM, "bytesReceived" );
-        lua_pushnumber ( luaVM, stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
+        lua_pushnumber ( luaVM, static_cast < double > ( stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] ) );
         lua_settable   ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "bytesSent" );
-        lua_pushnumber ( luaVM, stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
+        lua_pushnumber ( luaVM, static_cast < double > ( stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] ) );
         lua_settable   ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "packetsReceived" );
@@ -692,11 +692,11 @@ int CLuaFunctionDefs::GetNetworkStats ( lua_State* luaVM )
         lua_settable   ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "isLimitedByCongestionControl" );
-        lua_pushnumber ( luaVM, stats.isLimitedByCongestionControl ? 1ULL : 0ULL );
+        lua_pushnumber ( luaVM, stats.isLimitedByCongestionControl ? 1 : 0 );
         lua_settable   ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "isLimitedByOutgoingBandwidthLimit" );
-        lua_pushnumber ( luaVM, stats.isLimitedByOutgoingBandwidthLimit ? 1ULL : 0ULL );
+        lua_pushnumber ( luaVM, stats.isLimitedByOutgoingBandwidthLimit ? 1 : 0 );
         lua_settable   ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "encryptionStatus" );

@@ -9587,7 +9587,7 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
     lua_settable ( luaVM, -3 );
 
     // strtok until we're out of tokens
-    while ( szToken = strtok ( NULL, strDelimiter ) )
+    while ( ( szToken = strtok ( NULL, strDelimiter ) ) )
     {
         // Add the token to the table
         lua_pushnumber ( luaVM, ++uiCount );
@@ -9604,7 +9604,7 @@ int CLuaFunctionDefinitions::Split ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
 {
-    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) || ( lua_type ( luaVM, 3 ) != LUA_TNUMBER ) && ( lua_type ( luaVM, 3 ) != LUA_TSTRING ) )
+    if ( ( lua_type ( luaVM, 1 ) != LUA_TSTRING ) || ( lua_type ( luaVM, 2 ) != LUA_TNUMBER ) || ( ( lua_type ( luaVM, 3 ) != LUA_TNUMBER ) && ( lua_type ( luaVM, 3 ) != LUA_TSTRING ) ) )
     {
         m_pScriptDebugging->LogBadType ( luaVM, "gettok" );
 
@@ -9624,7 +9624,6 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
 
     const char* szText = lua_tostring ( luaVM, 1 );
     int iToken = static_cast < int > ( lua_tonumber ( luaVM, 2 ) );
-    unsigned int uiCount = 0;
 
     if ( iToken > 0 && iToken < 1024 )
     {
@@ -9632,7 +9631,7 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
         char* strText = new char [ strlen ( szText ) + 1 ];
         strcpy ( strText, szText );
 
-        unsigned int uiCount = 1;
+        int iCount = 1;
         char* szToken = strtok ( strText, strDelimiter );
 
         // We're looking for the first part?
@@ -9641,10 +9640,10 @@ int CLuaFunctionDefinitions::GetTok ( lua_State* luaVM )
             // strtok count number of times
             do
             {
-                uiCount++;
+                iCount++;
                 szToken = strtok ( NULL, strDelimiter );
             }
-            while ( uiCount != iToken );
+            while ( iCount != iToken );
         }
 
         // Found it?
@@ -11691,11 +11690,11 @@ int CLuaFunctionDefinitions::GetNetworkStats ( lua_State* luaVM )
             lua_createtable ( luaVM, 0, 11 );
 
             lua_pushstring ( luaVM, "bytesReceived" );
-            lua_pushnumber ( luaVM, stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
+            lua_pushnumber ( luaVM, static_cast < double > ( stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] ) );
             lua_settable   ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "bytesSent" );
-            lua_pushnumber ( luaVM, stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
+            lua_pushnumber ( luaVM, static_cast < double > ( stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] ) );
             lua_settable   ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "packetsReceived" );
@@ -11723,11 +11722,11 @@ int CLuaFunctionDefinitions::GetNetworkStats ( lua_State* luaVM )
             lua_settable   ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "isLimitedByCongestionControl" );
-            lua_pushnumber ( luaVM, stats.isLimitedByCongestionControl ? 1ULL : 0ULL );
+            lua_pushnumber ( luaVM, stats.isLimitedByCongestionControl ? 1 : 0 );
             lua_settable   ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "isLimitedByOutgoingBandwidthLimit" );
-            lua_pushnumber ( luaVM, stats.isLimitedByOutgoingBandwidthLimit ? 1ULL : 0ULL );
+            lua_pushnumber ( luaVM, stats.isLimitedByOutgoingBandwidthLimit ? 1 : 0 );
             lua_settable   ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "encryptionStatus" );

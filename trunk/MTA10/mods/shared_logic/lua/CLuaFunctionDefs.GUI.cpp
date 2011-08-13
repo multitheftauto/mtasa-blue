@@ -2802,7 +2802,7 @@ int CLuaFunctionDefs::GUIComboBoxSetItemText ( lua_State* luaVM )
 int CLuaFunctionDefs::GUICreateFont ( lua_State* luaVM )
 {
 //  element guiCreateFont( string filepath [, int size=9 ] )
-    SString strFilePath; int iSize; bool bBold;
+    SString strFilePath; int iSize;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strFilePath );

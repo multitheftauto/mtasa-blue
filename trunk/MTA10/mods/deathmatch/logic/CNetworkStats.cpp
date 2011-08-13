@@ -34,8 +34,8 @@ void CNetworkStats::Reset ( void )
 
     m_uiLastPacketsSent = stats.packetsSent;
     m_uiLastPacketsReceived = stats.packetsReceived;
-    m_uiLastBytesSent = stats.runningTotal[NS_ACTUAL_BYTES_SENT];
-    m_uiLastBytesReceived = stats.runningTotal[NS_ACTUAL_BYTES_RECEIVED];
+    m_ullLastBytesSent = stats.runningTotal[NS_ACTUAL_BYTES_SENT];
+    m_ullLastBytesReceived = stats.runningTotal[NS_ACTUAL_BYTES_RECEIVED];
 }
 
 void CNetworkStats::Draw ( void )
@@ -60,8 +60,8 @@ void CNetworkStats::Draw ( void )
     // Grab the bytes sent/recv and datarate in the proper unit
     SString strBytesSent = GetDataUnit ( stats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
     SString strBytesRecv = GetDataUnit ( stats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
-    SString strRecvRate  = GetDataUnit ( floor(m_fByteReceiveRate + 0.5f) );
-    SString strSendRate  = GetDataUnit ( floor(m_fByteSendRate + 0.5f) );
+    SString strRecvRate  = GetDataUnit ( Round ( m_fByteReceiveRate ) );
+    SString strSendRate  = GetDataUnit ( Round ( m_fByteSendRate ) );
 
     unsigned int uiNumMessagesInSendBuffer = 0;
     for ( int i = 0; i < PACKET_PRIORITY_COUNT; ++i )
@@ -124,16 +124,16 @@ void CNetworkStats::Update ( void )
     NetStatistics stats;
     g_pNet->GetNetworkStatistics ( &stats );
 
-    float delay = CClientTime::GetTime () - m_ulLastUpdateTime;
+    float delay = static_cast < float > ( CClientTime::GetTime () - m_ulLastUpdateTime );
     m_ulLastUpdateTime = CClientTime::GetTime ();
 
     m_fPacketSendRate = ( stats.packetsSent - m_uiLastPacketsSent ) * 1000 / delay;
     m_fPacketReceiveRate = ( stats.packetsReceived - m_uiLastPacketsReceived ) * 1000 / delay;
-    m_fByteSendRate = ( stats.runningTotal[NS_ACTUAL_BYTES_SENT] - m_uiLastBytesSent ) * 1000 / delay;
-    m_fByteReceiveRate = ( stats.runningTotal[NS_ACTUAL_BYTES_RECEIVED] - m_uiLastBytesReceived ) * 1000 / delay;
+    m_fByteSendRate = ( stats.runningTotal[NS_ACTUAL_BYTES_SENT] - m_ullLastBytesSent ) * 1000 / delay;
+    m_fByteReceiveRate = ( stats.runningTotal[NS_ACTUAL_BYTES_RECEIVED] - m_ullLastBytesReceived ) * 1000 / delay;
 
     m_uiLastPacketsSent = stats.packetsSent;
     m_uiLastPacketsReceived = stats.packetsReceived;
-    m_uiLastBytesSent = stats.runningTotal[NS_ACTUAL_BYTES_SENT];
-    m_uiLastBytesReceived = stats.runningTotal[NS_ACTUAL_BYTES_RECEIVED];
+    m_ullLastBytesSent = stats.runningTotal[NS_ACTUAL_BYTES_SENT];
+    m_ullLastBytesReceived = stats.runningTotal[NS_ACTUAL_BYTES_RECEIVED];
 }

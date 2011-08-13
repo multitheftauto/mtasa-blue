@@ -626,7 +626,7 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
             uint i;
             for ( i = 0 ; i < NUMELMS(fBuffer); i++ )
             {
-                fBuffer[i] = lua_tonumber ( argStream.m_luaVM, argStream.m_iIndex++ );
+                fBuffer[i] = static_cast < float > ( lua_tonumber ( argStream.m_luaVM, argStream.m_iIndex++ ) );
                 iArgument = lua_type ( argStream.m_luaVM, argStream.m_iIndex );
                 if ( iArgument != LUA_TNUMBER && iArgument != LUA_TSTRING )
                     break;

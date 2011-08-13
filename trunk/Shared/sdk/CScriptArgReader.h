@@ -251,7 +251,7 @@ public:
     template < class T >
     bool ReadUserData ( T*& outValue, int defaultValue = -1 )
     {
-        return ReadUserData ( outValue, (T*)defaultValue, defaultValue == NULL, true );
+        return ReadUserData ( outValue, (T*)defaultValue, defaultValue == 0, true );
     }
 
 

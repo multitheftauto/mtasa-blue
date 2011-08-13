@@ -94,7 +94,8 @@ namespace SharedUtil
     #ifdef MTA_DEBUG
         void OutputDebugLine ( const char* szMessage );
     #else
-        #define OutputDebugLine(x) {}
+        inline void OutputDebugLineDummy ( void ) {}
+        #define OutputDebugLine(x) OutputDebugLineDummy ()
     #endif
 
     //
