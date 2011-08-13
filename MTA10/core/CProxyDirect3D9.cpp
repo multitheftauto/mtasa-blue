@@ -187,9 +187,9 @@ HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTY
 
     // Change the window title to MTA: San Andreas
     #ifdef MTA_DEBUG
-        SetWindowTextW ( hFocusWindow, L"MTA: San Andreas [DEBUG]" );
+        SetWindowText ( hFocusWindow, "MTA: San Andreas [DEBUG]" );
     #else
-        SetWindowTextW ( hFocusWindow, L"MTA: San Andreas" );
+        SetWindowText ( hFocusWindow, "MTA: San Andreas" );
     #endif
 
     // Enable the auto depth stencil parameter
