@@ -35,6 +35,7 @@ public:
     DECLARE_ELEMENT_RPC ( RemovePedFromVehicle );
     DECLARE_ELEMENT_RPC ( SetPedDoingGangDriveby );
     DECLARE_ELEMENT_RPC ( SetPedAnimation );
+    DECLARE_ELEMENT_RPC ( SetPedAnimationProgress );
     DECLARE_ELEMENT_RPC ( SetPedOnFire );
     DECLARE_ELEMENT_RPC ( SetPedHeadless );
     DECLARE_ELEMENT_RPC ( SetPedFrozen );

@@ -1901,6 +1901,25 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const 
 }
 
 
+bool CStaticFunctionDefinitions::SetPedAnimationProgress ( CClientEntity& Entity, const char * szAnimName, float fProgress )
+{    
+    RUN_CHILDREN SetPedAnimationProgress ( **iter, szAnimName, fProgress );
+
+    if ( IS_PED ( &Entity ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        CAnimBlendAssociation* pA = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( Ped.GetClump (), szAnimName );
+
+        if ( pA )
+        {
+            pA->SetCurrentProgress ( fProgress );
+        }
+    }
+
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::SetPedMoveAnim ( CClientEntity& Entity, unsigned int iMoveAnim )
 {    
     RUN_CHILDREN SetPedMoveAnim ( **iter, iMoveAnim );
