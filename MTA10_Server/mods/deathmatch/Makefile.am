@@ -177,6 +177,7 @@ LOGIC = \
 ./logic/luadefs/CLuaPickupDefs.cpp \
 ./logic/luadefs/CLuaResourceDefs.cpp \
 ./logic/luadefs/CLuaTextDefs.cpp \
+./logic/luadefs/CLuaVoiceDefs.cpp \
 ./logic/luadefs/CLuaWorldDefs.cpp \
 ./logic/luadefs/CLuaXMLDefs.cpp \
 ./logic/packets/CCameraSyncPacket.cpp \
@@ -233,7 +234,8 @@ LOGIC = \
 ./logic/packets/CVehiclePuresyncPacket.cpp \
 ./logic/packets/CVehicleSpawnPacket.cpp \
 ./logic/packets/CVehicleTrailerPacket.cpp \
-./logic/packets/CVoiceDataPacket.cpp
+./logic/packets/CVoiceDataPacket.cpp \
+./logic/packets/CVoiceEndPacket.cpp
 
 if PRECOMPILE_HEADERS
 BUILT_SOURCES = StdInc.h.gch
