@@ -550,12 +550,6 @@ public:
     static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue );
 
 
-#ifdef MTA_VOICE
-    // Voice funcs
-    static bool                         SetVoiceInputEnabled                ( bool bEnabled );
-    static bool                         SetVoiceMuteAllEnabled              ( bool bEnabled );
-#endif
-
     // Version funcs
     static unsigned long                GetVersion                          ( );
     static const char*                  GetVersionString                    ( );

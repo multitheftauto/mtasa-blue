@@ -54,10 +54,7 @@
 #include "../../shared_logic/CClientGUIElement.h"
 #include "CVariableBuffer.h"
 #include "CLocalServer.h"
-
-#ifdef MTA_VOICE
-    #include "CVoice.h"
-#endif
+#include "CVoiceRecorder.h"
 
 class CClientGame
 {
@@ -205,12 +202,11 @@ public:
     
     void                                StartPlayback                   ( void );
     void                                EnablePacketRecorder            ( const char* szFilename );
+    void                                InitVoice                       ( bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate );
 
     // Accessors
-#ifdef MTA_VOICE
-    inline CVoice*                      GetVoice                        ( void )        { return m_pVoice; };
-#endif
 
+    inline CVoiceRecorder*              GetVoiceRecorder                ( void )        { return m_pVoiceRecorder; };
     inline CClientManager*              GetManager                      ( void )        { return m_pManager; };
     inline CClientObjectManager*        GetObjectManager                ( void )        { return m_pObjectManager; };
     inline CClientPickupManager*        GetPickupManager                ( void )        { return m_pPickupManager; };
@@ -351,10 +347,6 @@ public:
     bool                                IsBeingDeleted                  ( void )                        { return m_bBeingDeleted; }
 
 private:
-    #ifdef MTA_VOICE
-    // Voice callbacks
-    static void                         SendVoiceData                   ( const unsigned char * pData, int len );
-    #endif
 
     // CGUI Callbacks
     bool                                OnKeyDown                       ( CGUIKeyEventArgs Args );
@@ -503,11 +495,7 @@ private:
     // Revised facilities
     CServer                             m_Server;
 
-#ifdef MTA_VOICE
-    CVoice*                             m_pVoice;
-    static CRITICAL_SECTION             m_crVoice;
-    static CVariableBuffer*             m_pVoiceBuffer;
-#endif
+    CVoiceRecorder*                     m_pVoiceRecorder;
 
     CClientPlayer*                      m_pLocalPlayer;
     ElementID                           m_LocalID;

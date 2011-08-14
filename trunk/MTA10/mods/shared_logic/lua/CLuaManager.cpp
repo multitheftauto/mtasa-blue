@@ -1010,12 +1010,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefs::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
 
-#ifdef MTA_VOICE
-    // Voice funcs
-    CLuaCFunctions::AddFunction ( "setVoiceInputEnabled", CLuaFunctionDefs::SetVoiceInputEnabled );
-    CLuaCFunctions::AddFunction ( "setMuteAllEnabled", CLuaFunctionDefs::SetVoiceMuteAllEnabled );
-#endif
-
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );
 

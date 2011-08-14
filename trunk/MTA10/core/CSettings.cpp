@@ -415,6 +415,20 @@ CSettings::CSettings ( void )
     m_pAudioMTAVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
     m_pAudioMTAVolume->SetProperty ( "StepSize", "0.01" );
 
+    m_pLabelVoiceVolume = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Voice volume:" ) );
+    m_pLabelVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pLabelVoiceVolume->GetPosition ( vecTemp, false );
+    m_pLabelVoiceVolume->AutoSize ( "Voice volume:" );
+
+    m_pLabelVoiceVolumeValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "0%") );
+    m_pLabelVoiceVolumeValue->SetPosition ( CVector2D ( vecTemp.fX + 250.0f, vecTemp.fY ) );
+    m_pLabelVoiceVolumeValue->AutoSize ( "100%" );
+
+    m_pAudioVoiceVolume = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabAudio ) );
+    m_pAudioVoiceVolume->SetPosition ( CVector2D ( vecTemp.fX + 80.0f, vecTemp.fY ) );
+    m_pAudioVoiceVolume->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pAudioVoiceVolume->SetProperty ( "StepSize", "0.01" );
+
     m_pAudioUsertrackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAudio, "Usertrack options" ) );
     m_pAudioUsertrackLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ), false );
     m_pAudioUsertrackLabel->GetPosition ( vecTemp, false );
@@ -892,6 +906,7 @@ CSettings::CSettings ( void )
     m_pAudioRadioVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnRadioVolumeChanged, this ) );
     m_pAudioSFXVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnSFXVolumeChanged, this ) );
     m_pAudioMTAVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMTAVolumeChanged, this ) );
+    m_pAudioVoiceVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnVoiceVolumeChanged, this ) );
     m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
     m_pMouseSensitivity->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnMouseSensitivityChanged, this ) );
@@ -1883,6 +1898,7 @@ bool CSettings::OnCancelButtonClick ( CGUIElement* pElement )
     gameSettings->SetRadioVolume ( m_ucOldRadioVolume );
     gameSettings->SetSFXVolume ( m_ucOldSFXVolume );
     CVARS_SET ( "mtavolume", m_fOldMTAVolume );
+    CVARS_SET ( "voicevolume", m_fOldVoiceVolume );
 
     return true;
 }
@@ -2018,8 +2034,11 @@ void CSettings::LoadData ( void )
     else if ( uiUsertrackMode == 2 ) m_pComboUsertrackMode->SetText ( "Sequential" );
     
     CVARS_GET ( "mtavolume", m_fOldMTAVolume );
+    CVARS_GET ( "voicevolume", m_fOldVoiceVolume );
     m_fOldMTAVolume = max( 0.0f, min( 1.0f, m_fOldMTAVolume ) );
+    m_fOldVoiceVolume = max( 0.0f, min( 1.0f, m_fOldVoiceVolume ) );
     m_pAudioMTAVolume->SetScrollPosition ( m_fOldMTAVolume );
+    m_pAudioVoiceVolume->SetScrollPosition ( m_fOldVoiceVolume );
 
     // Video
     int nextVideoMode;
@@ -2831,6 +2850,16 @@ bool CSettings::OnMTAVolumeChanged ( CGUIElement* pElement)
     
     CVARS_SET ( "mtavolume", m_pAudioMTAVolume->GetScrollPosition () );
 
+    return true;
+}
+
+bool CSettings::OnVoiceVolumeChanged ( CGUIElement* pElement)
+{
+    int iVolume = m_pAudioVoiceVolume->GetScrollPosition () * 100.0f;
+    m_pLabelVoiceVolumeValue->SetText ( SString ( "%i%%", iVolume ).c_str () );
+
+    CVARS_SET ( "voicevolume", m_pAudioVoiceVolume->GetScrollPosition () );
+    
     return true;
 }
 

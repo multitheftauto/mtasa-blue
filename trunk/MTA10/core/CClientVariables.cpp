@@ -219,6 +219,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "steer_with_mouse",           false );                        // steering with mouse controls
     DEFAULT ( "classic_controls",           false );                        // classic/standard controls
     DEFAULT ( "mtavolume",                  1.0f );                         // custom sound's volume
+    DEFAULT ( "voicevolume",                1.0f );                         // voice chat output volume
     DEFAULT ( "async_loading",              1 );                            // loading while crashing
     DEFAULT ( "mapalpha",                   155 );                          // map alpha
     DEFAULT ( "browser_speed",              2 );                            // Browser speed

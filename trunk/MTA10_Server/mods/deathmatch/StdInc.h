@@ -97,6 +97,7 @@
 #include "packets/CVehicleSpawnPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
 #include "packets/CVoiceDataPacket.h"
+#include "packets/CVoiceEndPacket.h"
 #include "packets/PacketIODeclarators.h"
 
 // Lua function definition includes
@@ -111,6 +112,7 @@
 #include "luadefs/CLuaResourceDefs.h"
 #include "luadefs/CLuaTextDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
+#include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaXMLDefs.h"
 
 // Lua includes

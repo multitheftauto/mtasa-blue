@@ -6256,51 +6256,6 @@ bool CStaticFunctionDefinitions::SetSoundEffectEnabled ( CClientSound& Sound, co
     return false;
 }
 
-#ifdef MTA_VOICE
-/**
- * Used by clients to set the enabled state of the voice system.  
- * Enabling the voice system starts recording of voice data from the
- * microphone.
- * 
- * @param bEnabled The enabled state of the mic.
- *
- * @return This method always returns true.
- */
-bool CStaticFunctionDefinitions::SetVoiceInputEnabled ( bool bEnabled )
-{
-    CVoice * pVoice = m_pClientGame->GetVoice();
-
-    // Voice module may not be loaded.
-    if ( NULL != pVoice )
-    {
-        pVoice->EnableInput ( bEnabled );
-    }
-
-    return true;
-}
-
-/**
- * Sets all players muted.
- * 
- * @param bEnabled The muted enable state.
- *
- * @return This function always returns true.
- */
-
-bool CStaticFunctionDefinitions::SetVoiceMuteAllEnabled ( bool bEnabled )
-{
-    CVoice * pVoice = m_pClientGame->GetVoice();
-
-    // Voice module may not be loaded.
-    if ( NULL != pVoice )
-    {
-        pVoice->SetMuted ( bEnabled );
-    }
-
-    return true;
-}
-#endif
-
 /** Version functions **/
 unsigned long CStaticFunctionDefinitions::GetVersion ()
 {

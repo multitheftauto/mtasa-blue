@@ -48,6 +48,10 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_bDontBroadcastLan = false;
     m_usFPSLimit = 36;
     m_bAutoLogin = false;
+    m_uiSampleRate = 1;
+    m_ucQuality = 4;
+    m_bVoiceEnabled = false;
+    m_uiBitrate = 0;
 }
 
 
@@ -260,6 +264,45 @@ bool CMainConfig::Load ( const char* szFilename )
              SetInteger ( m_pRootNode, "fpslimit", (int)m_usFPSLimit );
         }
     }
+
+    // Grab whether or not voice is enabled
+    iResult = GetInteger ( m_pRootNode, "voice", iTemp, 0, 1 );
+    if ( iResult == IS_SUCCESS )
+    {
+        m_bVoiceEnabled = iTemp ? true : false;
+    }
+
+    // Grab the Sample Rate for Voice
+    iResult = GetInteger ( m_pRootNode, "samplerate", iTemp, 0, 2 );
+    if ( iResult == IS_SUCCESS )
+    {
+        m_uiSampleRate = iTemp;
+    }
+    else
+    {
+        if ( iResult != DOESNT_EXIST )
+            CLogger::ErrorPrintf ( "Sample rate must be between 0 and 2, defaulting to %u\n", m_uiSampleRate );
+    }
+
+    // Grab the Quality for Voice
+    iResult = GetInteger ( m_pRootNode, "quality", iTemp, 0, 10 );
+    if ( iResult == IS_SUCCESS )
+    {
+        m_ucQuality = iTemp;
+    }
+    else
+    {
+        if ( iResult != DOESNT_EXIST )
+            CLogger::ErrorPrintf ( "Quality must be between 0 and 10, defaulting to %u\n", m_ucQuality );
+    }
+
+    // Grab the bitrate for Voice [optional]
+    iResult = GetInteger ( m_pRootNode, "bitrate", iTemp );
+    if ( iResult == IS_SUCCESS )
+    {
+        m_uiBitrate = iTemp;
+    }
+
 
     // Grab the serial verification
     /** ACHTUNG: Unsupported for release 1.0 (#4090)

@@ -42,6 +42,10 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_fAimDirection = 0.0f;
     m_ucDriveByDirection = 0;
     m_bAkimboArmUp = false;    
+
+    m_VoiceState = VOICESTATE_IDLE;
+    m_pBroadcastElement = g_pGame->GetMapManager()->GetRootElement();
+    m_pIgnoredElement = NULL;
     
     m_uiScriptDebugLevel = 0;
 
@@ -663,4 +667,63 @@ void CPlayer::UpdateOthersNearList ( void )
             }
         }
     }
+}
+
+void CPlayer::SetVoiceBroadcastTo( CElement* pElement )
+{
+    m_lstIgnoredList.clear();
+    m_pBroadcastElement = pElement;
+}
+
+void CPlayer::SetVoiceBroadcastTo( std::list < CElement* > lstElements )
+{
+    m_pBroadcastElement = NULL;
+    m_lstBroadcastList = lstElements;
+}
+
+void CPlayer::SetVoiceIgnoredElement( CElement* pElement )
+{
+    m_lstIgnoredList.clear();
+    m_pIgnoredElement = pElement;
+}
+
+void CPlayer::SetVoiceIgnoredList( std::list < CElement* > lstElements )
+{
+    m_pIgnoredElement = NULL;
+    m_lstIgnoredList = lstElements;
+}
+
+bool CPlayer::IsPlayerIgnoringElement( CElement* pElement )
+{
+    if ( IsUsingIgnoredList() )
+    {
+        list < CElement* > ::const_iterator iter = IterIgnoredListBegin();
+        for ( ; iter != IterIgnoredListEnd(); iter++ )
+        {
+            if ( *iter == pElement )
+                return true;
+        }
+        return false;
+    }
+    else if ( m_pIgnoredElement ) 
+    {
+        if ( IS_TEAM(m_pIgnoredElement) ) //if a team is  being ignored
+        {
+            CTeam* pTeam = static_cast < CTeam* > ( m_pIgnoredElement );
+            // If the broadcast-to player is in the ignored team
+            list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
+            for ( ; iter != pTeam->PlayersEnd (); iter++ )
+            {
+                if ( *iter == pElement )
+                    return true;
+            }
+            return false;
+        }
+        else
+        {
+            // See if the broadcast-to player is a descendent of the ignored element
+            return ( m_pIgnoredElement == pElement ) || ( m_pIgnoredElement->IsMyChild(pElement,true) );
+        }
+    }
+    return false;
 }
