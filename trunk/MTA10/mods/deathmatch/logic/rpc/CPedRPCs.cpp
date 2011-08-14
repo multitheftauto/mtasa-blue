@@ -33,6 +33,7 @@ void CPedRPCs::LoadFunctions ( void )
     AddHandler ( REMOVE_PED_FROM_VEHICLE, RemovePedFromVehicle, "RemovePedFromVehicle" );
     AddHandler ( SET_PED_DOING_GANG_DRIVEBY, SetPedDoingGangDriveby, "SetPedDoingGangDriveby" );
     AddHandler ( SET_PED_ANIMATION, SetPedAnimation, "SetPedAnimation" );
+    AddHandler ( SET_PED_ANIMATION_PROGRESS, SetPedAnimationProgress, "SetPedAnimationProgress" );
     AddHandler ( SET_PED_ON_FIRE, SetPedOnFire, "SetPedOnFire" );
     AddHandler ( SET_PED_HEADLESS, SetPedHeadless, "SetPedHeadless" );
     AddHandler ( SET_PED_FROZEN, SetPedFrozen, "SetPedFrozen" );
@@ -337,6 +338,42 @@ void CPedRPCs::SetPedAnimation ( CClientEntity* pSource, NetBitStreamInterface& 
                         if ( pBlock )
                         {
                             pPed->RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
+                        }
+                    }
+                }
+            }
+            else
+            {
+                pPed->KillAnimation ();
+            }
+        }
+    }
+}
+
+void CPedRPCs::SetPedAnimationProgress ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    // Read out the player and vehicle id
+    char szAnimName [ 64 ];
+    unsigned char ucAnimSize;
+    float fProgress;
+
+    if ( bitStream.Read ( ucAnimSize ) )
+    {
+        // Grab the ped
+        CClientPed * pPed = m_pPedManager->Get ( pSource->GetID (), true );
+        if ( pPed )
+        {
+            if ( ucAnimSize > 0 )
+            {
+                if ( bitStream.Read ( szAnimName, ucAnimSize ) )
+                {
+                    szAnimName [ ucAnimSize ] = 0;
+                    if ( bitStream.Read ( fProgress ) )
+                    {
+                        CAnimBlendAssociation* pA = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( pPed->GetClump (), szAnimName );
+                        if ( pA )
+                        {
+                            pA->SetCurrentProgress ( fProgress );
                         }
                     }
                 }

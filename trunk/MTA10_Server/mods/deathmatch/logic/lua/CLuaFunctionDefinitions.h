@@ -157,6 +157,7 @@ public:
     static int      RemovePedFromVehicle                ( lua_State* luaVM );
     static int      SetPedDoingGangDriveby              ( lua_State* luaVM );
     static int      SetPedAnimation                     ( lua_State* luaVM );
+    static int      SetPedAnimationProgress             ( lua_State* luaVM );
     static int      SetPedWeaponSlot                    ( lua_State* luaVM );
     static int      SetPedOnFire                        ( lua_State* luaVM );
     static int      SetPedHeadless                      ( lua_State* luaVM );

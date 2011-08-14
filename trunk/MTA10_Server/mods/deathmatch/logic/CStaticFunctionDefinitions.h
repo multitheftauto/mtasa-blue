@@ -192,6 +192,7 @@ public:
     static bool                 RemovePedFromVehicle                ( CElement* pElement );
     static bool                 SetPedDoingGangDriveby              ( CElement * pElement, bool bGangDriveby );
     static bool                 SetPedAnimation                     ( CElement * pElement, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame );
+    static bool                 SetPedAnimationProgress             ( CElement * pElement, const char * szAnimName, float fProgress );
     static bool                 SetPedOnFire                        ( CElement * pElement, bool bIsOnFire );
     static bool                 SetPedHeadless                      ( CElement * pElement, bool bIsHeadless );
     static bool                 SetPedFrozen                        ( CElement * pElement, bool bIsFrozen );

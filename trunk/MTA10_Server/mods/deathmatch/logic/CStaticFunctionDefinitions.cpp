@@ -3376,6 +3376,39 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const ch
 }
 
 
+bool CStaticFunctionDefinitions::SetPedAnimationProgress ( CElement * pElement, const char * szAnimName, float fProgress )
+{
+    assert ( pElement );
+    RUN_CHILDREN SetPedAnimationProgress ( *iter, szAnimName, fProgress );
+
+    if ( IS_PED ( pElement ) )
+    {
+        CPed * pPed = static_cast < CPed * > ( pElement );
+        if ( pPed->IsSpawned () )
+        {
+            CBitStream BitStream;
+            if ( szAnimName )
+            {
+                unsigned char ucAnimSize = ( unsigned char ) strlen ( szAnimName );
+
+                BitStream.pBitStream->Write ( ucAnimSize );
+                BitStream.pBitStream->Write ( szAnimName, ucAnimSize );
+                BitStream.pBitStream->Write ( fProgress );
+            }
+            else
+            {
+                // Inform them to kill the current animation instead
+                BitStream.pBitStream->Write ( ( unsigned char ) 0 );
+            }
+            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pPed, SET_PED_ANIMATION_PROGRESS, *BitStream.pBitStream ) );
+
+            return true;
+        }
+    }
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::SetPedOnFire ( CElement * pElement, bool bIsOnFire )
 {
     assert ( pElement );

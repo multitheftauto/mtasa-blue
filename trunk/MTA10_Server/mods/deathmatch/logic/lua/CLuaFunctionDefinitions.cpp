@@ -999,6 +999,37 @@ int CLuaFunctionDefinitions::SetPedAnimation ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::SetPedAnimationProgress ( lua_State* luaVM )
+{
+    // Check types
+    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+    {
+        // Grab the element
+        CElement * pElement = lua_toelement ( luaVM, 1 );
+        if ( pElement )
+        {
+            const char * szAnimName = NULL;
+            float fProgress = 0.0f;
+            if ( lua_type ( luaVM, 2 ) == LUA_TSTRING ) szAnimName = lua_tostring ( luaVM, 2 );
+            if ( lua_type ( luaVM, 3 ) == LUA_TNUMBER ) fProgress = static_cast < float > ( lua_tonumber ( luaVM, 3 ) );
+
+            if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( pElement, szAnimName, fProgress ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "setPedAnimationProgress", "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM, "setPedAnimationProgress" );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefinitions::SetPedWeaponSlot ( lua_State* luaVM )
 {
