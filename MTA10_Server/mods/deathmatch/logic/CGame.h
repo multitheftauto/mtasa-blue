@@ -60,10 +60,6 @@ class CGame;
 
 #include "lua/CLuaManager.h"
 
-#ifdef MTA_VOICE
-#include "../../../Voice/VoiceServerAPI.h"
-#endif
-
 // Forward declarations
 class ASE;
 class CAccessControlListManager;
@@ -345,10 +341,13 @@ private:
     void                        Packet_LuaEvent             ( class CLuaEventPacket& Packet );
     void                        Packet_CustomData           ( class CCustomDataPacket& Packet );
     void                        Packet_Voice_Data           ( class CVoiceDataPacket& Packet );
+    void                        Packet_Voice_End            ( class CVoiceEndPacket& Packet );
     void                        Packet_CameraSync           ( class CCameraSyncPacket& Packet );
     void                        Packet_PlayerTransgression  ( class CPlayerTransgressionPacket& Packet );
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
     void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
+
+    void                        VoiceBroadcastToPlayer      ( CElement* pElement, CPlayer* pSourcePlayer, CVoiceDataPacket& pPacket );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
@@ -400,10 +399,6 @@ private:
     CWaterManager*                  m_pWaterManager;
 
     CSerialManager                  m_SerialManager;
-
-#ifdef MTA_VOICE
-    CVoiceServer*               m_pVoiceServer;
-#endif
 
     char*                       m_szCurrentFileName;
 

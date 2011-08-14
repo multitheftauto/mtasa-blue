@@ -186,12 +186,15 @@ protected:
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
     CGUILabel*          m_pLabelMTAVolume;
+    CGUILabel*          m_pLabelVoiceVolume;
     CGUILabel*          m_pLabelRadioVolumeValue;
     CGUILabel*          m_pLabelSFXVolumeValue;
     CGUILabel*          m_pLabelMTAVolumeValue;
+    CGUILabel*          m_pLabelVoiceVolumeValue;
     CGUIScrollBar*      m_pAudioRadioVolume;
     CGUIScrollBar*      m_pAudioSFXVolume;
     CGUIScrollBar*      m_pAudioMTAVolume;
+    CGUIScrollBar*      m_pAudioVoiceVolume;
     CGUICheckBox*       m_pCheckBoxAudioEqualizer;
     CGUICheckBox*       m_pCheckBoxAudioAutotune;
     CGUILabel*          m_pAudioUsertrackLabel;
@@ -280,6 +283,7 @@ protected:
     bool                OnRadioVolumeChanged    ( CGUIElement* pElement );
     bool                OnSFXVolumeChanged      ( CGUIElement* pElement );
     bool                OnMTAVolumeChanged      ( CGUIElement* pElement );
+    bool                OnVoiceVolumeChanged    ( CGUIElement* pElement );
     bool                OnChatRedChanged        ( CGUIElement* pElement );
     bool                OnChatGreenChanged      ( CGUIElement* pElement );
     bool                OnChatBlueChanged       ( CGUIElement* pElement );
@@ -323,6 +327,7 @@ private:
     unsigned char       m_ucOldRadioVolume;
     unsigned char       m_ucOldSFXVolume;
     float               m_fOldMTAVolume;
+    float               m_fOldVoiceVolume;
 
     CGUIListItem*	    m_pSelectedBind;
 

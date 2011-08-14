@@ -1091,6 +1091,10 @@
 						RelativePath=".\logic\packets\CVoiceDataPacket.cpp"
 						>
 					</File>
+					<File
+						RelativePath=".\logic\packets\CVoiceEndPacket.cpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="lua"
@@ -1185,6 +1189,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaTextDefs.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaVoiceDefs.cpp"
 						>
 					</File>
 					<File
@@ -2189,6 +2197,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CVoiceEndPacket.h"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\PacketIODeclarators.h"
 						>
 					</File>
@@ -2298,6 +2310,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\luadefs\CLuaTextDefs.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\luadefs\CLuaVoiceDefs.h"
 						>
 					</File>
 					<File

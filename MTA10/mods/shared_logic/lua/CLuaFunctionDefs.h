@@ -799,12 +799,6 @@ public:
     LUA_DECLARE ( GetNetworkStats );
     LUA_DECLARE ( GetPerformanceStats );
 
-#ifdef MTA_VOICE
-    // Voice funcs
-    LUA_DECLARE ( SetVoiceInputEnabled );
-    LUA_DECLARE ( SetVoiceMuteAllEnabled );
-#endif
-
     LUA_DECLARE ( GetVersion );
 
     // UTF functions

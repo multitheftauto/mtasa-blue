@@ -36,12 +36,6 @@ using std::vector;
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
 
-// Used by the Voice system
-#ifdef MTA_VOICE
-CVariableBuffer * CClientGame::m_pVoiceBuffer;
-CRITICAL_SECTION CClientGame::m_crVoice;
-#endif
-
 bool g_bBoundsChecker = true;
 #define DEFAULT_GRAVITY            0.008f
 #define DEFAULT_GAME_SPEED         1.0f
@@ -131,22 +125,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_bWasMinimized = false;
 
-    #ifdef MTA_VOICE
-    m_pVoice = VoiceCreate();
-    // Initialize the voice module for this mod.
-    if ( m_pVoice )
-    {
-        g_pCore->GetConsole()->Printf("Loaded voice module [%s]",
-            m_pVoice->GetVersion());
-        m_pVoice->Initialize(512);
-        m_pVoice->RegisterSendHandler(SendVoiceData);
-        m_pVoice->SetMuted(false);
-        m_pVoice->Enable();
-    }
-    InitializeCriticalSection(&m_crVoice);
-    m_pVoiceBuffer = new CVariableBuffer( 65535 );
-    #endif
-
     // Grab the mod path
     m_strModRoot = g_pCore->GetModInstallRoot ( "deathmatch" );
 
@@ -235,6 +213,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_dwFrameTimeSlice = 0;
     m_dwLastFrameTick = 0;
     m_llLastTransgressionTime = 0;
+
+    // MTA Voice
+    m_pVoiceRecorder = new CVoiceRecorder();
 
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
@@ -358,17 +339,8 @@ CClientGame::~CClientGame ( void )
     m_pTransferBox->Hide();
     m_pBigPacketTransferBox->Hide();
 
-    #ifdef MTA_VOICE
-    if ( m_pVoice )
-    {
-        g_pCore->GetConsole()->Print("destroy..");
-        m_pVoice->Disable();
-        m_pVoice->Shutdown();
-        DeleteCriticalSection(&m_crVoice);
-        delete m_pVoiceBuffer;
-        VoiceDestroy();
-    }
-    #endif
+    delete m_pVoiceRecorder;
+    m_pVoiceRecorder = NULL;
 
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler ( NULL );
@@ -659,54 +631,14 @@ bool CClientGame::StartLocalGame ( const char* szConfig, const char* szPassword 
 
 void CClientGame::DoPulsePreFrame ( void )
 {   
-    #ifdef MTA_VOICE
-    /*
-     * Do not attempt to just 'EnterCriticalSection' here, because we _never_
-     * want to block on the critical section object in the rendering loop.
-     *
-     * If the critical section is in use, tough.  We'll process voice some other
-     * time...
-     */
-    if ( ( CClientGame::STATUS_JOINED == m_Status ) && ( 0 != TryEnterCriticalSection(&m_crVoice) ) )
+    if ( m_Status == CClientGame::STATUS_JOINED )
     {
-        if ( m_pVoiceBuffer->size() != 0 )
+        if ( m_pVoiceRecorder->IsEnabled() )
         {
-            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-            if ( pBitStream )
-            {
-                // TODO:  Write talking player(s).
-                // TODO:  Maybe copy the buffer?  I don't like casting this from const...
-                CClientPlayer* localPlayer = g_pClientGame->GetPlayerManager()->GetLocalPlayer();
-                if ( localPlayer != NULL )
-                {
-                    pBitStream->Write ( (unsigned short)m_pVoiceBuffer->size() );
-                    pBitStream->Write ( (char *)m_pVoiceBuffer->get(), m_pVoiceBuffer->size() );
-
-                    //g_pCore->GetConsole()->Printf("Sending vox packet of size: %u...", m_pVoiceBuffer->size());
-
-                    // Clear out the synchornized buffer.
-                    m_pVoiceBuffer->clear ( );
-
-                    // Send it and destroy the packet
-                    g_pNet->SendPacket ( PACKET_ID_VOICE_DATA, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE );
-                    g_pNet->DeallocateNetBitStream ( pBitStream );
-                }
-            }
+            m_pVoiceRecorder->DoPulse();
         }
-        LeaveCriticalSection(&m_crVoice);
     }
-    #endif
 }
-
-#ifdef MTA_VOICE
-void CClientGame::SendVoiceData ( const unsigned char * pData, int len )
-{
-    EnterCriticalSection(&m_crVoice);
-    m_pVoiceBuffer->add(pData, len);
-    LeaveCriticalSection(&m_crVoice);
-}
-#endif
-
 
 void CClientGame::DoPulsePreHUDRender ( bool bDidUnminimize, bool bDidRecreateRenderTargets )
 {
@@ -2591,6 +2523,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false );
     m_Events.AddEvent ( "onClientPlayerWasted", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerChoke", "", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerVoiceStart", "", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerVoiceStop", "", NULL, false );
     m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
 
     // Ped events
@@ -5104,4 +5038,12 @@ bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
     }
 
     return true;
+}
+
+void CClientGame::InitVoice( bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate )
+{
+    if ( m_pVoiceRecorder )
+    {
+        m_pVoiceRecorder -> Init ( bEnabled, uiServerSampleRate, ucQuality, uiBitrate );
+    }
 }

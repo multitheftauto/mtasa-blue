@@ -636,6 +636,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaResourceDefs::LoadFunctions ();
     CLuaTextDefs::LoadFunctions ();
     CLuaWorldDefs::LoadFunctions ();
+    CLuaVoiceDefs::LoadFunctions ();
     CLuaXMLDefs::LoadFunctions ();
 
     // All-Seeing Eye Functions
