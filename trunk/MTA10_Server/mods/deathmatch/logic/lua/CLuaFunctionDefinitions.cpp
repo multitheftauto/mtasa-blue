@@ -7061,85 +7061,44 @@ int CLuaFunctionDefinitions::StopObject ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::CreateRadarArea ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
-    int iArgument6 = lua_type ( luaVM, 6 );
-    int iArgument7 = lua_type ( luaVM, 7 );
-    int iArgument8 = lua_type ( luaVM, 8 );
+//  radararea createRadarArea ( float leftX, float bottomY, float sizeX, float sizeY, [ int r = 255, int g = 0, int b = 0, int a = 255, element visibleTo = getRootElement() ] )
+    CVector2D vecPosition; CVector2D vecSize; float dRed; float dGreen; float dBlue; float dAlpha; CElement* pVisibleTo;
 
-    if ( ( iArgument1 == LUA_TNUMBER || iArgument1 == LUA_TSTRING ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-         ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING || iArgument5 == LUA_TNONE ) &&
-         ( iArgument6 == LUA_TNUMBER || iArgument6 == LUA_TSTRING || iArgument6 == LUA_TNONE ) &&
-         ( iArgument7 == LUA_TNUMBER || iArgument7 == LUA_TSTRING || iArgument7 == LUA_TNONE ) &&
-         ( iArgument8 == LUA_TNUMBER || iArgument8 == LUA_TSTRING || iArgument8 == LUA_TNONE ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadNumber ( vecSize.fX );
+    argStream.ReadNumber ( vecSize.fY );
+    argStream.ReadNumber ( dRed, 255 );
+    argStream.ReadNumber ( dGreen, 0 );
+    argStream.ReadNumber ( dBlue, 0 );
+    argStream.ReadNumber ( dAlpha, 255 );
+    argStream.ReadUserData ( pVisibleTo, m_pRootElement );
+
+    if ( !argStream.HasErrors () )
     {
-        CVector2D vecPosition = CVector2D ( static_cast < float > ( lua_tonumber ( luaVM, 1 ) ), static_cast < float > ( lua_tonumber ( luaVM, 2 ) ) );
-        CVector2D vecSize = CVector2D ( static_cast < float > ( lua_tonumber ( luaVM, 3 ) ), static_cast < float > ( lua_tonumber ( luaVM, 4 ) ) );
-
-        double dRed = 255;
-        double dGreen = 0;
-        double dBlue = 0;
-        double dAlpha = 255;
-        if ( iArgument5 != LUA_TNONE ) dRed = lua_tonumber ( luaVM, 5 );
-        if ( iArgument6 != LUA_TNONE ) dGreen = lua_tonumber ( luaVM, 6 );
-        if ( iArgument7 != LUA_TNONE ) dBlue = lua_tonumber ( luaVM, 7 );
-        if ( iArgument8 != LUA_TNONE ) dAlpha = lua_tonumber ( luaVM, 8 );
-
-        if ( dRed >= 0 && dRed <= 255 &&
-             dGreen >= 0 && dGreen <= 255 &&
-             dBlue >= 0 && dBlue <= 255 &&
-             dAlpha >= 0 && dAlpha <= 255 )
+        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
+        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
+        if ( pResource )
         {
-            SColor color;
-            color.R = static_cast < unsigned char > ( dRed );
-            color.G = static_cast < unsigned char > ( dGreen );
-            color.B = static_cast < unsigned char > ( dBlue );
-            color.A = static_cast < unsigned char > ( dAlpha );
+            SColorRGBA color ( dRed, dGreen, dBlue, dAlpha );
 
-            // Read out optional visibleTo argument
-            CElement* pVisibleTo = m_pRootElement;
-            int iArgument9 = lua_type ( luaVM, 9 );
-            if ( iArgument9 == LUA_TLIGHTUSERDATA )
+            // Create it
+            CRadarArea* pRadarArea = CStaticFunctionDefinitions::CreateRadarArea ( pResource, vecPosition, vecSize, color, pVisibleTo );
+            if ( pRadarArea )
             {
-                pVisibleTo = lua_toelement ( luaVM, 9 );
-            }
-            else if ( iArgument9 == LUA_TBOOLEAN || iArgument9 == LUA_TNIL )
-            {
-                pVisibleTo = NULL;
-            }
-
-            CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
-            if ( pLuaMain )
-            {
-                CResource* pResource = pLuaMain->GetResource();
-                if ( pResource )
+                CElementGroup * pGroup = pResource->GetElementGroup();
+                if ( pGroup )
                 {
-                    // Create it
-                    CRadarArea* pRadarArea = CStaticFunctionDefinitions::CreateRadarArea ( pResource, vecPosition, vecSize, color, pVisibleTo );
-                    if ( pRadarArea )
-                    {
-                        CElementGroup * pGroup = pResource->GetElementGroup();
-                        if ( pGroup )
-                        {
-                            pGroup->Add ( pRadarArea );
-                        }
-                        lua_pushelement ( luaVM, pRadarArea );
-                        return 1;
-                    }
+                    pGroup->Add ( pRadarArea );
                 }
+                lua_pushelement ( luaVM, pRadarArea );
+                return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogWarning ( luaVM, "Bad color number sent to createRadarArea (0-255)" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "createRadarArea" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "createRadarArea", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7148,25 +7107,24 @@ int CLuaFunctionDefinitions::CreateRadarArea ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetRadarAreaSize ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+//  float, float getRadarAreaSize ( radararea theRadararea )
+    CRadarArea* pRadarArea;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pRadarArea );
+
+    if ( !argStream.HasErrors () )
     {
-        CRadarArea* pRadarArea = lua_toradararea ( luaVM, 1 );
-        if ( pRadarArea )
+        CVector2D vecSize;
+        if ( CStaticFunctionDefinitions::GetRadarAreaSize ( pRadarArea, vecSize ) )
         {
-            CVector2D vecSize;
-            if ( CStaticFunctionDefinitions::GetRadarAreaSize ( pRadarArea, vecSize ) )
-            {
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( vecSize.fX ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( vecSize.fY ) );
-                return 2;
-            }
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( vecSize.fX ) );
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( vecSize.fY ) );
+            return 2;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getRadarAreaSize", "radararea", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getRadarAreaSize" );
-
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getRadarAreaSize", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7175,26 +7133,26 @@ int CLuaFunctionDefinitions::GetRadarAreaSize ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetRadarAreaColor ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+//  int, int, int, int getRadarAreaColor ( radararea theRadararea )
+    CRadarArea* pRadarArea;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pRadarArea );
+
+    if ( !argStream.HasErrors () )
     {
-        CRadarArea* pRadarArea = lua_toradararea ( luaVM, 1 );
-        if ( pRadarArea )
+        SColor color;
+        if ( CStaticFunctionDefinitions::GetRadarAreaColor ( pRadarArea, color ) )
         {
-            SColor color;
-            if ( CStaticFunctionDefinitions::GetRadarAreaColor ( pRadarArea, color ) )
-            {
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.R ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.G ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.B ) );
-                lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.A ) );
-                return 4;
-            }
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.R ) );
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.G ) );
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.B ) );
+            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.A ) );
+            return 4;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "getRadarAreaColor", "radararea", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "getRadarAreaColor" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "getRadarAreaColor", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7203,19 +7161,19 @@ int CLuaFunctionDefinitions::GetRadarAreaColor ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::IsRadarAreaFlashing ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA )
+//  bool isRadarAreaFlashing ( radararea theRadararea )
+    CRadarArea* pRadarArea;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pRadarArea );
+
+    if ( !argStream.HasErrors () )
     {
-        CRadarArea* pRadarArea = lua_toradararea ( luaVM, 1 );
-        if ( pRadarArea )
-        {
-            lua_pushboolean ( luaVM, CStaticFunctionDefinitions::IsRadarAreaFlashing ( pRadarArea ) );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isRadarAreaFlashing", "radararea", 1 );
+        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::IsRadarAreaFlashing ( pRadarArea ) );
+        return 1;
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isRadarAreaFlashing" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isRadarAreaFlashing", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7224,29 +7182,25 @@ int CLuaFunctionDefinitions::IsRadarAreaFlashing ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::IsInsideRadarArea ( lua_State* luaVM )
 {
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TSTRING || iArgument2 == LUA_TNUMBER ) &&
-         ( iArgument3 == LUA_TSTRING || iArgument3 == LUA_TNUMBER ) )
+//  bool isInsideRadarArea ( radararea theArea, float posX, float posY )
+    CRadarArea* pRadarArea; CVector2D vecPosition;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pRadarArea );
+    argStream.ReadNumber ( vecPosition.fX );
+    argStream.ReadNumber ( vecPosition.fY );
+
+    if ( !argStream.HasErrors () )
     {
-        CRadarArea* pRadarArea = lua_toradararea ( luaVM, 1 );
-        if ( pRadarArea )
+        bool bInside = false;
+        if ( CStaticFunctionDefinitions::IsInsideRadarArea ( pRadarArea, vecPosition, bInside ) )
         {
-            CVector2D vecPosition ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ),
-                                    static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
-            bool bInside = false;
-            if ( CStaticFunctionDefinitions::IsInsideRadarArea ( pRadarArea, vecPosition, bInside ) )
-            {
-                lua_pushboolean ( luaVM, bInside );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bInside );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "isInsideRadarArea", "radararea", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "isInsideRadarArea" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "isInsideRadarArea", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7255,28 +7209,24 @@ int CLuaFunctionDefinitions::IsInsideRadarArea ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetRadarAreaSize ( lua_State* luaVM )
 {
-    int iArgument1 = lua_type ( luaVM, 1 );
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    if ( ( iArgument1 == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) )
+//  bool setRadarAreaSize ( radararea theRadararea, float x, float y )
+    CElement* pElement; CVector2D vecSize;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadNumber ( vecSize.fX );
+    argStream.ReadNumber ( vecSize.fY );
+
+    if ( !argStream.HasErrors () )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
+        if ( CStaticFunctionDefinitions::SetRadarAreaSize ( pElement, vecSize ) )
         {
-            CVector2D vecSize = CVector2D ( static_cast < float > ( lua_tonumber ( luaVM, 2 ) ), static_cast < float > ( lua_tonumber ( luaVM, 3 ) ) );
-            if ( CStaticFunctionDefinitions::SetRadarAreaSize ( pElement, vecSize ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setRadarAreaSize", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setRadarAreaSize" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setRadarAreaSize", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7285,50 +7235,27 @@ int CLuaFunctionDefinitions::SetRadarAreaSize ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetRadarAreaColor ( lua_State* luaVM )
 {
-    int iArgument2 = lua_type ( luaVM, 2 );
-    int iArgument3 = lua_type ( luaVM, 3 );
-    int iArgument4 = lua_type ( luaVM, 4 );
-    int iArgument5 = lua_type ( luaVM, 5 );
+//  bool setRadarAreaColor ( radararea theRadarArea, int r, int g, int b, int a )
+    CElement* pElement; float dRed; float dGreen; float dBlue; float dAlpha;
 
-    if ( ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA ) &&
-         ( iArgument2 == LUA_TNUMBER || iArgument2 == LUA_TSTRING ) &&
-         ( iArgument3 == LUA_TNUMBER || iArgument3 == LUA_TSTRING ) &&
-         ( iArgument4 == LUA_TNUMBER || iArgument4 == LUA_TSTRING ) &&
-         ( iArgument5 == LUA_TNUMBER || iArgument5 == LUA_TSTRING ) )
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadNumber ( dRed );
+    argStream.ReadNumber ( dGreen );
+    argStream.ReadNumber ( dBlue );
+    argStream.ReadNumber ( dAlpha, 255 );
+
+    if ( !argStream.HasErrors () )
     {
-        double dRed = lua_tonumber ( luaVM, 2 );
-        double dGreen = lua_tonumber ( luaVM, 3 );
-        double dBlue = lua_tonumber ( luaVM, 4 );
-        double dAlpha = lua_tonumber ( luaVM, 5 );
-
-        if ( dRed >= 0 && dRed <= 255 &&
-             dGreen >= 0 && dGreen <= 255 &&
-             dBlue >= 0 && dBlue <= 255 &&
-             dAlpha >= 0 && dAlpha <= 255 )
+        SColorRGBA color ( dRed, dGreen, dBlue, dAlpha );
+        if ( CStaticFunctionDefinitions::SetRadarAreaColor ( pElement, color ) )
         {
-            SColor color;
-            color.R = static_cast < unsigned char > ( dRed );
-            color.G = static_cast < unsigned char > ( dGreen );
-            color.B = static_cast < unsigned char > ( dBlue );
-            color.A = static_cast < unsigned char > ( dAlpha );
-
-            CElement* pElement = lua_toelement ( luaVM, 1 );
-            if ( pElement )
-            {
-                if ( CStaticFunctionDefinitions::SetRadarAreaColor ( pElement, color ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "setRadarAreaColor", "element", 1 );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogWarning ( luaVM, "Bad color values sent to setRadarAreaColor (0-255)" );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setRadarAreaColor" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setRadarAreaColor", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -7337,23 +7264,23 @@ int CLuaFunctionDefinitions::SetRadarAreaColor ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::SetRadarAreaFlashing ( lua_State* luaVM )
 {
-    if ( lua_type ( luaVM, 1 ) == LUA_TLIGHTUSERDATA &&
-         lua_type ( luaVM, 2 ) == LUA_TBOOLEAN )
+//  bool setRadarAreaFlashing ( radararea theRadarArea, bool flash )
+    CElement* pElement; bool bFlash;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadBool ( bFlash );
+
+    if ( !argStream.HasErrors () )
     {
-        CElement* pElement = lua_toelement ( luaVM, 1 );
-        if ( pElement )
+        if ( CStaticFunctionDefinitions::SetRadarAreaFlashing ( pElement, lua_toboolean ( luaVM, 2 ) ? true:false ) )
         {
-            if ( CStaticFunctionDefinitions::SetRadarAreaFlashing ( pElement, lua_toboolean ( luaVM, 2 ) ? true:false ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "setRadarAreaFlashing", "element", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM, "setRadarAreaFlashing" );
+        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Bad argument @ '%s' [%s]", "setRadarAreaFlashing", *argStream.GetErrorMessage () ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

@@ -427,6 +427,15 @@ namespace SharedUtil
         {
             A = ucA; R = ucR; G = ucG; B = ucB;
         }
+
+        template < class T, class U, class V, class W >
+        SColorARGB ( T a, U r, V g, W b )
+        {
+            A = Clamp < unsigned char > ( 0, static_cast < unsigned char > ( a ), 255 );
+            R = Clamp < unsigned char > ( 0, static_cast < unsigned char > ( r ), 255 );
+            G = Clamp < unsigned char > ( 0, static_cast < unsigned char > ( g ), 255 );
+            B = Clamp < unsigned char > ( 0, static_cast < unsigned char > ( b ), 255 );
+        }
     };
 
 
@@ -441,6 +450,15 @@ namespace SharedUtil
         SColorRGBA ( unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA )
         {
             A = ucA; R = ucR; G = ucG; B = ucB;
+        }
+
+        template < class T, class U, class V, class W >
+        SColorRGBA ( T r, U g, V b, W a )
+        {
+            A = Clamp < unsigned char > ( 0, static_cast < unsigned char > ( a ), 255 );
+            R = Clamp < unsigned char > ( 0, static_cast < unsigned char > ( r ), 255 );
+            G = Clamp < unsigned char > ( 0, static_cast < unsigned char > ( g ), 255 );
+            B = Clamp < unsigned char > ( 0, static_cast < unsigned char > ( b ), 255 );
         }
     };
 
