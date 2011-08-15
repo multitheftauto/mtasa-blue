@@ -253,9 +253,22 @@ void CPedRPCs::RemovePedFromVehicle ( CClientEntity* pSource, NetBitStreamInterf
             // Get the ped / player's occupied vehicle data before pulling it out
             CClientVehicle* pVehicle = pPed->GetOccupiedVehicle();
             unsigned int    uiSeat   = pPed->GetOccupiedVehicleSeat();
+            bool bCancellingWhileEntering = ( pPed->m_bIsLocalPlayer && pPed->IsEnteringVehicle() ); // Special case here that could cause network trouble.
 
-            if ( pVehicle )
-            {
+            // Occupied vehicle can be NULL here while entering (Walking up to a vehicle in preparation to getting in/opening the doors) - Caz
+            if ( pVehicle || bCancellingWhileEntering )
+            {                
+                if ( bCancellingWhileEntering )
+                {
+                    // Cancel vehicle entry
+                    pPed->GetTaskManager()->RemoveTask ( TASK_PRIORITY_PRIMARY );
+                    // pVehicle is *MORE than likely* NULL here because there is no occupied vehicle yet, only the occupying vehicle is right but check it anyway
+                    if ( pVehicle == NULL )
+                        pVehicle = pPed->GetOccupyingVehicle();
+                    
+                    if ( pVehicle == NULL ) // Every time I've tested this the occupying Vehicle has been correct, but if it doesn't exist let's not try and call an event on it!
+                        return;
+                }
                 pPed->SetSyncTimeContext ( ucTimeContext );
 
                 // Remove the player from his vehicle
