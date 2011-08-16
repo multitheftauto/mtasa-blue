@@ -2399,6 +2399,54 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath=".\acl.xml"
+				>
+			</File>
+			<File
+				RelativePath=".\banlist.xml"
+				>
+			</File>
+			<File
+				RelativePath=".\editor.conf"
+				>
+			</File>
+			<File
+				RelativePath=".\editor_acl.xml"
+				>
+			</File>
+			<File
+				RelativePath=".\local.conf"
+				>
+			</File>
+			<File
+				RelativePath=".\Makefile.am"
+				>
+			</File>
+			<File
+				RelativePath=".\mtaserver.conf"
+				>
+			</File>
+			<File
+				RelativePath=".\vehiclecolors.conf"
+				>
+			</File>
+			<Filter
+				Name="output"
+				>
+				<File
+					RelativePath="..\..\output\LICENSE"
+					>
+				</File>
+				<File
+					RelativePath="..\..\output\NOTICE"
+					>
+				</File>
+				<File
+					RelativePath="..\..\output\README"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>
