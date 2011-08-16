@@ -383,6 +383,7 @@ void CVehicle::SetModel ( unsigned short usModel )
     if ( usModel != m_usModel )
     {
         m_usModel = usModel;
+        m_eVehicleType = CVehicleManager::GetVehicleType ( m_usModel );
         RandomizeColor ();
         GetInitialDoorStates ( m_ucDoorStates );
 
