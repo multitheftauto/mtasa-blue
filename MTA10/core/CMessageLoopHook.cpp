@@ -212,7 +212,6 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                             if ( wParam == VK_TAB )
                             {
                                 CLocalGUI::GetSingleton ().GetConsole ()->SetNextAutoCompleteMatch ();
-                                return true; 
                             }
                             else
                             {
