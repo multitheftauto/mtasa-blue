@@ -924,7 +924,7 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, bool bLoadImmedi
             m_pUpgrades->RemoveAll ( false );
 
         // Are we swapping from a vortex or skimmer?
-        bool bResetWheelAndDoorStates = ( m_usModel == VT_VORTEX || m_usModel == VT_SKIMMER );
+        bool bResetWheelAndDoorStates = ( m_usModel == VT_VORTEX || m_usModel == VT_SKIMMER || ( m_eVehicleType == CLIENTVEHICLE_PLANE && m_eVehicleType != CClientVehicleManager::GetVehicleType ( usModel ) ) );
 
         // Set the new vehicle id and type
         m_usModel = usModel;
