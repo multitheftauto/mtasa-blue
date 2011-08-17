@@ -160,9 +160,9 @@ public:
     void                        SetInputText            ( const char* szText );
     const char*                 GetCommand              ( void )    { return m_strCommand.c_str (); }
     void                        SetCommand              ( const char* szCommand );
+    CVector2D                   CalcInputSize           ( void );
 
     static float                GetFontHeight           ( float fScale = 1.0f );
-    static float                GetCharacterWidth       ( int iChar, float fScale = 1.0f );
     static float                GetTextExtent           ( const char * szText, float fScale = 1.0f );
     static void                 DrawTextString          ( const char * szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY, const CRect2D& RenderBounds );
 
