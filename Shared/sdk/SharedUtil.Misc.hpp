@@ -547,6 +547,16 @@ SString SharedUtil::GetSystemErrorMessage ( uint uiError, bool bRemoveNewlines, 
     return strResult;
 }
 
+
+//
+// Return true if currently executing the main thread.
+// Main thread being defined as the thread the function is first called from.
+bool SharedUtil::IsMainThread ( void )
+{
+    static DWORD dwMainThread = GetCurrentThreadId ();
+    return GetCurrentThreadId () == dwMainThread;
+}
+
 #endif
 
 

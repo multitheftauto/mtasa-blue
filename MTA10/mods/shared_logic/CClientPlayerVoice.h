@@ -29,9 +29,14 @@
 class CClientPlayerVoice
 {
 public:
-                                        CClientPlayerVoice                      ( CClientPlayer* pPlayer, CVoiceRecorder* pVoiceRecorder  );
-                                        ~CClientPlayerVoice                     ( void );
+                                        CClientPlayerVoice          ( CClientPlayer* pPlayer, CVoiceRecorder* pVoiceRecorder  );
+                                        ~CClientPlayerVoice         ( void );
 
+    void                                DecodeAndBuffer             ( char* pBuffer, unsigned int bytesWritten );
+
+    void                                DoPulse                     ( void );
+
+private:  
     void                                Init                        ( void );
     void                                DeInit                      ( void );
 
@@ -39,22 +44,18 @@ public:
 
     bool                                IsActive                    ( void )                        { return m_bVoiceActive; }
 
-    void                                DecodeAndBuffer             ( char* pBuffer, unsigned int bytesWritten );
-
-    void                                DoPulse                     ( void );
+    void                                ServiceEventQueue           ( void );
 
     static int                          PAPlaybackCallback          ( const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData );
-    static void                         PAFinishCallback            ( void *userData );
+    //static void                         PAFinishCallback            ( void *userData );
     
     bool                                m_bVoiceActive;
     bool                                m_bWaitingToStop;
     unsigned long                       m_ulVoiceLastActive;
 
-protected:
     unsigned int                        m_uiBufferedOutputCount;
     bool                                m_bBufferOutput;
 
-private:  
     CClientPlayer*                      m_pPlayer;
     CVoiceRecorder*                     m_pVoiceRecorder;
     unsigned int                        m_SampleRate;
@@ -70,6 +71,9 @@ private:
 
     unsigned int                        m_uiBufferSizeBytes;
     float*                              m_pBufferedOutput;
+
+    float                               m_fVolume;
+    std::list < SString >               m_EventQueue;
+    CCriticalSection                    m_CS;
 };
 #endif
-

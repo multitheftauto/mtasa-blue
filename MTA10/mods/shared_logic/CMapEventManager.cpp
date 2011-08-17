@@ -227,6 +227,9 @@ CMapEvent* CMapEventManager::Get ( const char* szName )
 
 bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis )
 {
+    // Check for multi-threading slipups
+    assert ( IsMainThread () );
+
     // Call all the events with matching names
     bool bCalled = false;
     CMapEvent* pMapEvent;

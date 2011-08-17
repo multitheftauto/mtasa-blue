@@ -99,6 +99,11 @@ namespace SharedUtil
 
     SString         GetSystemErrorMessage           ( uint uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true );
 
+    //
+    // Return true if currently executing the main thread
+    // See implementation for details
+    bool            IsMainThread ( void );
+
 #endif
 
     SString         EscapeString                    ( const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#' );
