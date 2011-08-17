@@ -47,22 +47,8 @@ CServer::CServer ( void )
     m_hThread = INVALID_HANDLE_VALUE;
     m_iLastError = ERROR_NO_ERROR;
 
-    // Grab the path to the MTA installation folder
-    strncpy ( m_szServerRoot, g_pCore->GetInstallRoot (), MAX_PATH );
-    size_t sizeInstallRoot = strlen ( m_szServerRoot );
-
-    // Append / if neccessary
-    if ( m_szServerRoot [sizeInstallRoot - 1] != '/' ||
-         m_szServerRoot [sizeInstallRoot - 1] != '\\' )
-    {
-        m_szServerRoot [sizeInstallRoot] = '/';
-    }
-
-    // Append server/ to it
-    strncat ( m_szServerRoot, "server/", MAX_PATH );
-
-    // Append the server core dll name to it
-    m_strDLLFile.Format ( "%s%s", m_szServerRoot, SERVER_DLL_PATH );
+    m_strServerRoot = CalcMTASAPath ( "server" );
+    m_strDLLFile = PathJoin ( m_strServerRoot, SERVER_DLL_PATH );
 }
 
 
@@ -289,7 +275,7 @@ unsigned long CServer::Thread_Run ( void )
             strcpy ( szArgument1, "-D" );
 
             char szArgument2 [256];
-            strncpy ( szArgument2, m_szServerRoot, 256 );
+            strncpy ( szArgument2, m_strServerRoot, 256 );
             szArgument2 [ 255 ] = 0;
 
             char szArgument3 [16];

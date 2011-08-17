@@ -504,7 +504,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
         {
             // Hash the password if neccessary
             MD5 Password;
-            memset ( Password, 0, sizeof ( MD5 ) );
+            memset ( Password.data, 0, sizeof ( MD5 ) );
             if ( szPassword )
             {
                 // Is it long enough?
@@ -538,7 +538,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword )
             
             // Append user details
             pBitStream->Write ( const_cast < char* > ( m_szLocalNick ), MAX_PLAYER_NICK_LENGTH );
-            pBitStream->Write ( reinterpret_cast < char* > ( Password ), sizeof ( MD5 ) );
+            pBitStream->Write ( reinterpret_cast < char* > ( Password.data ), sizeof ( MD5 ) );
 
             // Append community information
             std::string strUser;
@@ -5024,7 +5024,7 @@ bool CClientGame::VerifySADataFiles ( int iEnableClientChecks )
     {
         MD5 md5;
         if ( !hasher.Calculate ( szVerifyData[i], md5 ) ||
-             memcmp ( md5, szVerifyData[i + 1], 0x10 ) )
+             memcmp ( md5.data, szVerifyData[i + 1], 0x10 ) )
         {
             iCheckStatus |= ( 1 << i );
         }

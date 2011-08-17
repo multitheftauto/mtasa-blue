@@ -106,6 +106,14 @@ void CInstallManager::InitSequencer ( void )
                 CR "update_end: "                                   ////// End of 'update game' //////
                 CR "            CALL SwitchBackFromTempExe "
                 CR " "        
+                CR "newlayout_check:"                               ////// Start of 'new layout check' //////
+                CR "            CALL ProcessLayoutChecks "
+                CR "            IF LastResult == ok GOTO newlayout_end: "
+                CR " "
+                CR "            CALL ChangeToAdmin "                // If changes failed, try as admin
+                CR "            IF LastResult == ok GOTO newlayout_check: "
+                CR "newlayout_end: "                                ////// End of 'new layout check' //////
+                CR " "        
                 CR "aero_check: "                                   ////// Start of 'Windows 7 aero desktop fix' //////
                 CR "            CALL ProcessAeroChecks "            // Make changes to comply with user setting
                 CR "            IF LastResult == ok GOTO aero_end: "
@@ -135,6 +143,7 @@ void CInstallManager::InitSequencer ( void )
     m_pSequencer->AddFunction ( "InstallFiles",            &CInstallManager::_InstallFiles );
     m_pSequencer->AddFunction ( "ChangeToAdmin",           &CInstallManager::_ChangeToAdmin );
     m_pSequencer->AddFunction ( "ShowCopyFailDialog",      &CInstallManager::_ShowCopyFailDialog );
+    m_pSequencer->AddFunction ( "ProcessLayoutChecks",     &CInstallManager::_ProcessLayoutChecks );
     m_pSequencer->AddFunction ( "ProcessAeroChecks",       &CInstallManager::_ProcessAeroChecks );
     m_pSequencer->AddFunction ( "ChangeFromAdmin",         &CInstallManager::_ChangeFromAdmin );
     m_pSequencer->AddFunction ( "InstallNewsItems",        &CInstallManager::_InstallNewsItems );
@@ -274,7 +283,7 @@ SString CInstallManager::_ChangeToAdmin ( void )
 {
     if ( !IsUserAdmin () )
     {
-        MessageBox( NULL, SString ( "MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease click 'Yes' in the next window.", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK );
+        MessageBox( NULL, SString ( "MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window.", *m_strAdminReason ), "Multi Theft Auto: San Andreas", MB_OK );
         SetIsBlockingUserProcess ();
         ReleaseSingleInstanceMutex ();
         if ( ShellExecuteBlocking ( "runas", GetLauncherPathFilename (), GetSequencerSnapshot () ) )
@@ -459,6 +468,108 @@ SString CInstallManager::_ShowCopyFailDialog ( void )
 }
 
 
+void ShowLayoutError ( const SString& strExtraInfo )
+{
+    MessageBox ( 0, SString ( "Multi Theft Auto has not been installed properly, please reinstall. %s", *strExtraInfo ), "Error", MB_OK );
+    TerminateProcess ( GetCurrentProcess (), 9 );
+}
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessLayoutChecks
+//
+// Make sure new reg/dir structure is ok
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessLayoutChecks ( void )
+{
+    //
+    // Validation
+    //
+
+    // Check data dir exists
+    {
+        if ( !DirectoryExists ( GetMTADataPath () ) )
+            ShowLayoutError ( "[Data directory not present]" );   // Can't find directory
+    }
+
+    // Check reg key exists
+    {
+        if ( GetRegistryValue ( "", "Last Install Location" ).empty () )
+            ShowLayoutError ( "[Registry key not present]" );   // Can't find reg key
+    }
+
+    // Check data dir writable
+    {
+        SString strTestFilePath = PathJoin ( GetMTADataPath (), "testdir", "testfile.txt" );
+
+        FileDelete ( strTestFilePath );
+        RemoveDirectory ( ExtractPath ( strTestFilePath ) );
+
+        SString strContent = "test";
+        if ( !FileSave ( strTestFilePath, strContent ) )
+            ShowLayoutError ( "[Data directory not writable]" );   // Can't save file
+
+        FileDelete ( strTestFilePath );
+        RemoveDirectory ( ExtractPath ( strTestFilePath ) );
+    }
+
+    // Check reg key writable
+    {
+        RemoveRegistryKey ( "testkeypath" );
+
+        SString strValue = GetTimeString( true, true );
+        SetRegistryValue ( "testkeypath", "testname", strValue );
+        SString strValueCheck = GetRegistryValue ( "testkeypath", "testname" );
+        if ( strValueCheck != strValue )
+            ShowLayoutError ( "[Registry key not writable]" );   // Can't write reg key
+
+        RemoveRegistryKey ( "testkeypath" );
+    }
+
+    // Check install dir writable
+    {
+        SString strTestFilePath = CalcMTASAPath ( PathJoin ( "mta", "writetest.txt" ) );
+
+        FileDelete ( strTestFilePath );
+
+        SString strContent = "test";
+        if ( !FileSave ( strTestFilePath, strContent ) )
+            ShowLayoutError ( "[Install directory not writable]" );   // Can't save file
+
+        FileDelete ( strTestFilePath );
+    }
+
+    //
+    // Migration
+    //
+
+    // If news/temp/upcache folder doesn't exist in new, but does in old place, move it
+    {
+        const char* folders[] = { "news", "temp", "upcache" };
+        for ( uint i = 0 ; i < NUMELMS( folders ) ; i++ )
+        {
+            SString strSrc = PathJoin ( GetSystemLocalAppDataPath (), "MTA San Andreas " + GetMajorVersionString (), folders[i] );
+            SString strDest = PathJoin ( GetMTADataPath (), folders[i] );
+            if ( !DirectoryExists ( strDest ) && DirectoryExists ( strSrc ) )
+                MoveFile ( strSrc, strDest );
+        }
+    }
+
+    // If aero option reg entry doesn't exist in new, but does in old place, move it
+    {
+        if ( GetApplicationSetting ( "aero-enabled" ).empty () )
+        {
+            SString strLegacyValue = GetVersionRegistryValueLegacy ( GetMajorVersionString (), PathJoin ( "Settings", "general" ), "aero-enabled" );
+            if ( !strLegacyValue.empty () )
+                SetApplicationSettingInt ( "aero-enabled", atoi ( strLegacyValue ) );
+        }
+    }
+
+    return "ok";
+}
+
+
 //////////////////////////////////////////////////////////
 //
 // CInstallManager::_ProcessAeroChecks
@@ -549,7 +660,7 @@ SString CInstallManager::_InstallNewsItems ( void )
         SString strSavedDir = GetCurrentWorkingDirectory ();
 
         // Calc and make target dir
-        SString strTargetDir = PathJoin ( GetMTALocalAppDataPath (), "news", strDate );
+        SString strTargetDir = PathJoin ( GetMTADataPath (), "news", strDate );
         MkDir ( strTargetDir );
 
         // Extract into target dir

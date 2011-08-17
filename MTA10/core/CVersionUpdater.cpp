@@ -11,7 +11,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <utils/CMD5Hasher.h>
 #include "CVersionUpdater.Util.hpp"
 #include "CNewsBrowser.h"
 
@@ -1240,27 +1239,26 @@ void CVersionUpdater::_CheckSidegradeRequirements ( void )
     // Is version allowed to be launched?
 
     // Find reg settings for other version
-    SString strRegPath ( "..\\%s", *m_strSidegradeVersion );
+    m_strSidegradePath = GetVersionRegistryValue ( m_strSidegradeVersion, "", "Last Run Path" );
+    SString strLaunchHash = GetVersionRegistryValue ( m_strSidegradeVersion, "", "Last Run Path Hash" );
+    SString strLaunchVersion = GetVersionRegistryValue ( m_strSidegradeVersion, "", "Last Run Path Version" );
 
-    m_strSidegradePath = GetRegistryValue ( strRegPath, "Last Run Path" );
-    SString strLaunchHash = GetRegistryValue ( strRegPath, "Last Run Path Hash" );
-    SString strLaunchVersion = GetRegistryValue ( strRegPath, "Last Run Path Version" );
-
-    // Validate strLaunchVersion
+    // Validate
     bool bVersionMatch = ( strLaunchVersion == m_strSidegradeVersion );
+    bool bLaunchPathValid = ( strLaunchHash == CMD5Hasher::CalculateHexString ( m_strSidegradePath ) );
 
-    // Validate strLaunchPath
-    bool bLaunchPathValid = false;
+    if ( !bVersionMatch || !bLaunchPathValid )
     {
-        MD5 md5;
-        CMD5Hasher Hasher;
-        if ( Hasher.Calculate ( m_strSidegradePath, md5 ) )
+        // Try again with datum from legacy registry settings
+        if ( m_strSidegradeVersion == "1.0" )
         {
-            char szHashResult[33];
-            Hasher.ConvertToHex ( md5, szHashResult );
+            m_strSidegradePath = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path" );
+            strLaunchHash = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path Hash" );
+            strLaunchVersion = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path Version" );
 
-            if ( strLaunchHash == szHashResult )
-                bLaunchPathValid = true;
+            // Re-validate
+            bVersionMatch = ( strLaunchVersion == m_strSidegradeVersion );
+            bLaunchPathValid = ( strLaunchHash == CMD5Hasher::CalculateHexString ( m_strSidegradePath ) );
         }
     }
 
@@ -2224,7 +2222,7 @@ void CVersionUpdater::_ProcessPatchFileDownload ( void )
     SString strPathFilename;
     {
         std::list < SString > saveLocationList;
-        saveLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache", m_JobInfo.strFilename ) );
+        saveLocationList.push_back ( PathJoin ( GetMTADataPath (), "upcache", m_JobInfo.strFilename ) );
         saveLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache", m_JobInfo.strFilename ) );
         saveLocationList.push_back ( GetMTATempPath () + m_JobInfo.strFilename );
         saveLocationList.push_back ( PathJoin ( "\\temp", m_JobInfo.strFilename ) );
@@ -2273,7 +2271,7 @@ void CVersionUpdater::_StartDownload ( void )
     {
         // See if file already exists in upcache
         std::list < SString > saveLocationList;
-        saveLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache", m_JobInfo.strFilename ) );
+        saveLocationList.push_back ( PathJoin ( GetMTADataPath (), "upcache", m_JobInfo.strFilename ) );
         saveLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache", m_JobInfo.strFilename ) );
         saveLocationList.push_back ( GetMTATempPath () + m_JobInfo.strFilename );
         saveLocationList.push_back ( PathJoin ( "\\temp", m_JobInfo.strFilename ) );

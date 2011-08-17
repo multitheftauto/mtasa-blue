@@ -186,11 +186,9 @@ bool CLocalServer::OnCancelButtonClick ( CGUIElement *pElement )
 bool CLocalServer::Load ( void )
 {
     // Get server module root
-    SString strServerPath = g_pCore->GetInstallRoot ();
-    strServerPath += "/server/mods/deathmatch";
+    SString strServerPath = CalcMTASAPath( PathJoin ( "server", "mods", "deathmatch" ) );
 
-    SString strConfigPath ( "%s/%s", strServerPath.c_str (), m_strConfig.c_str () );
-    m_pConfig = g_pCore->GetXML ()->CreateXML ( strConfigPath );
+    m_pConfig = g_pCore->GetXML ()->CreateXML ( PathJoin ( strServerPath, m_strConfig ) );
     if ( m_pConfig && m_pConfig->Parse() )
     {
         CXMLNode* pRoot = m_pConfig->GetRootNode();

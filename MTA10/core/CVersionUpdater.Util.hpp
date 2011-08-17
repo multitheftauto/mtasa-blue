@@ -357,7 +357,7 @@ namespace
             assert ( !m_pXMLFile );
 
             // Try to save
-            m_strTempFileName = MakeUniquePath ( PathJoin ( GetMTALocalAppDataPath (), "temp", "buffer.xml" ) );
+            m_strTempFileName = MakeUniquePath ( PathJoin ( GetMTADataPath (), "temp", "buffer.xml" ) );
             if ( !FileSave ( m_strTempFileName, &data[0], uiSize ) )
             {
                 AddReportLog ( 2501, SString ( "CXMLBuffer::SetFromBuffer: Could not save %s", m_strTempFileName.c_str () ) );

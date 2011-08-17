@@ -15,7 +15,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <CMD5Hasher.h>
 
 extern CGame* g_pGame;
 

@@ -56,7 +56,7 @@ void CNewsBrowser::InitNewsItemList ( void )
     m_NewsitemList.clear ();
 
     // Find all sub-directories in 'news' directory
-    SString strAllNewsDir = PathJoin ( GetMTALocalAppDataPath (), "news" );
+    SString strAllNewsDir = PathJoin ( GetMTADataPath (), "news" );
     std::vector < SString > directoryList = FindFiles ( strAllNewsDir + "\\*", false, true );
     std::sort ( directoryList.begin (), directoryList.end () );
 

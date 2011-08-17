@@ -12,7 +12,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include <utils/CMD5Hasher.h>
 
 extern CCore* g_pCore;
 

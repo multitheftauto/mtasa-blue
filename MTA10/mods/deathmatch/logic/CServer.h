@@ -36,9 +36,6 @@ public:
 
     bool                        Send                ( const char* szString );
 
-    inline const char*          GetServerRoot       ( void )                    { return m_szServerRoot; };
-    inline const char*          GetServerDLL        ( void )                    { return m_strDLLFile; };
-
     const std::string&          GetPassword         ( void )                    { return m_strPassword; };
     void                        SetPassword         ( const char* szPassword )  { m_strPassword = szPassword; };
 
@@ -50,7 +47,7 @@ private:
     HANDLE                      m_hThread;
     CDynamicLibrary* volatile   m_pLibrary;
     CCriticalSection            m_CriticalSection;
-    char                        m_szServerRoot [MAX_PATH];
+    SString                     m_strServerRoot;
     SString                     m_strDLLFile;
     SString                     m_strConfig;
 

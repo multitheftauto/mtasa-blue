@@ -37,7 +37,6 @@
 #include "CQuat.h"
 #include "SharedUtil.h"
 #include <bochs_internal/crc32.h>
-#include "CMD5Hasher.h"
 #include "CChecksum.h"
 
 // Packet includes
