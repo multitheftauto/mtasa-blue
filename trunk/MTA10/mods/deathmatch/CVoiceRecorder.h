@@ -52,13 +52,10 @@ enum eServerSampleRate
 class CVoiceRecorder
 {
 public:
-                                        CVoiceRecorder                  ( void );
-                                        ~CVoiceRecorder                 ( void );
+                                        CVoiceRecorder           	( void );
+                                        ~CVoiceRecorder          	( void );
 
     void                                Init                        ( bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate );
-    void                                DeInit                      ( void );
-
-    void                                SendFrame                   ( const void* inputBuffer );
 
     bool                                IsEnabled                   ( void )                        { return m_bEnabled; }
 
@@ -71,9 +68,12 @@ public:
 
     const SpeexMode*                    getSpeexModeFromSampleRate  ( void );
 
+private:  
+    void                                DeInit                      ( void );
+    void                                SendFrame                   ( const void* inputBuffer );
+
     static int                          PACallback                  ( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData );
 
-private:  
     bool                                m_bEnabled;
     eVoiceState                         m_VoiceState;
 
@@ -95,5 +95,8 @@ private:
 
     eSampleRate                         m_SampleRate;
     unsigned char                       m_ucQuality;
+
+    std::list < SString >               m_EventQueue;
+    CCriticalSection                    m_CS;
 };
 #endif

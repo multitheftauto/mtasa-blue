@@ -44,11 +44,14 @@ CVoiceRecorder::~CVoiceRecorder( void )
 // TODO: Replace this with BASS
 int CVoiceRecorder::PACallback( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData )
 {
+    // This assumes that PACallback will only be called when userData is a valid CVoiceRecorder pointer
     CVoiceRecorder* pVoiceRecorder = static_cast < CVoiceRecorder* > ( userData );
+    pVoiceRecorder->m_CS.Lock ();
 
     if ( pVoiceRecorder->IsEnabled() )
         pVoiceRecorder->SendFrame(inputBuffer);
 
+    pVoiceRecorder->m_CS.Unlock ();
     return 0;
 }
 
@@ -58,6 +61,8 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsig
 
     if ( !bEnabled ) // If we aren't enabled, don't bother continuing
         return;
+
+    m_CS.Lock ();
 
     // Convert the sample rate we received from the server (0-2) into an actual sample rate
     m_SampleRate = convertServerSampleRate( uiServerSampleRate );
@@ -129,6 +134,7 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsig
 
     g_pCore->GetConsole()->Printf( "Server Voice Chat Quality [%i];  Sample Rate: [%ikHz]; Bitrate [%ibps]", m_ucQuality, iSamplingRate, iBitRate );
 
+    m_CS.Unlock ();
 }
 
 void CVoiceRecorder::DeInit( void )
@@ -139,6 +145,12 @@ void CVoiceRecorder::DeInit( void )
 
         Pa_CloseStream( m_pAudioStream );
         Pa_Terminate();
+
+        // Assumes now that PACallback will not be called in this context
+        m_CS.Lock ();
+        m_CS.Unlock ();
+        // Assumes now that PACallback is not executing in this context
+
         m_pAudioStream = NULL;
 
         m_iSpeexOutgoingFrameSampleCount = 0;
@@ -199,6 +211,8 @@ void CVoiceRecorder::UpdatePTTState( unsigned int uiState )
     if ( !m_bEnabled )
         return;
 
+    m_CS.Lock ();
+
     if ( uiState == 1 )
     {
         if ( m_VoiceState == VOICESTATE_AWAITING_INPUT )
@@ -206,15 +220,16 @@ void CVoiceRecorder::UpdatePTTState( unsigned int uiState )
             // Call event on the local player for starting to talk
             if ( g_pClientGame->GetLocalPlayer () )
             {
+                m_CS.Unlock ();
                 CLuaArguments Arguments;
                 bool bEventTriggered = g_pClientGame->GetLocalPlayer ()->CallEvent ( "onClientPlayerVoiceStart", Arguments, true );
-            
+
                 if ( !bEventTriggered )
                 {
                     return;
                 }
-                else
-                    m_VoiceState = VOICESTATE_RECORDING;
+                m_CS.Lock ();
+                m_VoiceState = VOICESTATE_RECORDING;
             }
         }
     }
@@ -227,15 +242,20 @@ void CVoiceRecorder::UpdatePTTState( unsigned int uiState )
             // Call event on the local player for stopping to talk
             if ( g_pClientGame->GetLocalPlayer () )
             {
+                m_CS.Unlock ();
                 CLuaArguments Arguments;
                 g_pClientGame->GetLocalPlayer ()->CallEvent ( "onClientPlayerVoiceStop", Arguments, true );
+                m_CS.Lock ();
             }
         }
     }
+    m_CS.Unlock ();
 }
 
 void CVoiceRecorder::DoPulse( void )
 {
+    m_CS.Lock ();
+
     char *pInputBuffer;
     char bufTempOutput[2048];
     unsigned int uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
@@ -328,8 +348,10 @@ void CVoiceRecorder::DoPulse( void )
             }
         }
     }
+    m_CS.Unlock ();
 }
 
+// Called from other thread. Critical section is already locked.
 void CVoiceRecorder::SendFrame( const void* inputBuffer )
 {
     if ( m_VoiceState != VOICESTATE_AWAITING_INPUT && m_bEnabled && inputBuffer )

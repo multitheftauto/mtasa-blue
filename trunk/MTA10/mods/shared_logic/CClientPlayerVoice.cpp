@@ -42,6 +42,10 @@ CClientPlayerVoice::CClientPlayerVoice( CClientPlayer* pPlayer, CVoiceRecorder* 
     m_pBufferedOutput = NULL;
     m_uiBufferedOutputCount = 0;
 
+    // Get initial voice volume
+    m_fVolume = 1.0f;
+    g_pCore->GetCVars ()->Get ( "voicevolume", m_fVolume );
+
     Init ();
 }
 
@@ -53,8 +57,9 @@ CClientPlayerVoice::~CClientPlayerVoice( void )
 // TODO: Replace this with BASS
 int CClientPlayerVoice::PAPlaybackCallback( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData )
 {
-    CClientPlayer* pPlayer = static_cast < CClientPlayer* > ( userData );
-    CClientPlayerVoice* pVoice = pPlayer->GetVoice();
+    // This assumes that PAPlaybackCallback will only be called when userData is a valid CClientPlayerVoice pointer
+    CClientPlayerVoice* pVoice = static_cast < CClientPlayerVoice* > ( userData );
+    pVoice->m_CS.Lock ();
 
     pVoice->ReceiveFrame(outputBuffer);
 
@@ -65,21 +70,26 @@ int CClientPlayerVoice::PAPlaybackCallback( const void *inputBuffer, void *outpu
         // Have we exhausted our buffer? if so, the voice has stopped
         for ( unsigned i = 0; i < pVoice->m_uiBufferedOutputCount; i++ )
             if ( pOutBuffer[i] )  //Buffer is not empty
+            {
+                pVoice->m_CS.Unlock ();
                 return 0;
+            }
 
-        CLuaArguments Arguments;
-        pPlayer->CallEvent ( "onClientPlayerVoiceStop", Arguments, true );
+        pVoice->m_EventQueue.push_back ( "onClientPlayerVoiceStop" );
 
         pVoice->m_bVoiceActive = false;
         pVoice->m_bWaitingToStop = false;
         pVoice->m_ulVoiceLastActive = 0;
     }              
 
+    pVoice->m_CS.Unlock ();
     return 0;
 }
 
 void CClientPlayerVoice::Init( void )
 {
+    m_CS.Lock ();
+
     // Grab our sample rate and quality
     m_SampleRate = m_pVoiceRecorder->GetSampleRate();
     unsigned char ucQuality = m_pVoiceRecorder->GetSampleQuality();
@@ -117,7 +127,7 @@ void CClientPlayerVoice::Init( void )
             iFramesPerBuffer, 
             paNoFlag, 
             PAPlaybackCallback, 
-            m_pPlayer );
+            this );
 
     Pa_StartStream( m_pPlaybackStream );
 
@@ -129,12 +139,20 @@ void CClientPlayerVoice::Init( void )
     m_pIncomingBuffer = (char*) malloc(m_uiBufferSizeBytes * FRAME_INCOMING_BUFFER_COUNT);
     m_uiIncomingReadIndex=0;
     m_uiIncomingWriteIndex=0;
+
+    m_CS.Unlock ();
 }
 
 void CClientPlayerVoice::DeInit( void )
 {
     Pa_CloseStream( m_pPlaybackStream );
     Pa_Terminate();
+
+    // Assumes now that PAPlaybackCallback will not be called in this context
+    m_CS.Lock ();
+    m_CS.Unlock ();
+    // Assumes now that PAPlaybackCallback is not executing in this context
+
     m_pPlaybackStream = NULL;
 
     speex_decoder_destroy(m_pSpeexDecoderState);
@@ -161,6 +179,10 @@ void CClientPlayerVoice::DeInit( void )
 
 void CClientPlayerVoice::DoPulse( void )
 {
+    // Dispatch queued events
+    ServiceEventQueue ();
+
+    m_CS.Lock ();
     if ( m_ulVoiceLastActive )  // If voice hasnt been recieved for 500ms, assume we're done
     {
         unsigned long ulTimePassed = CClientTime::GetTime() - m_ulVoiceLastActive;
@@ -169,17 +191,20 @@ void CClientPlayerVoice::DoPulse( void )
             m_bWaitingToStop = true;
             m_ulVoiceLastActive = 0;
         }
+
+        // Update voice volume - TODO: don't do this quite so often
+        g_pCore->GetCVars ()->Get ( "voicevolume", m_fVolume );
     }
+
+    m_CS.Unlock ();
 }
 
+
+// Called from other thread. Critical section is already locked.
 void CClientPlayerVoice::ReceiveFrame( void* outputBuffer )
 {
     // Cast our output buffer to short
     short *pOutBuffer = (short*)outputBuffer;
-
-    float fVolume = 0.0f;
-    if ( !g_pCore->GetCVars ()->Get ( "voicevolume", fVolume ) )
-        fVolume = 1.0f;
 
     // Clamp floats to short
     for (unsigned int i = 0; i < m_uiBufferSizeBytes / VOICE_SAMPLE_SIZE; i++)
@@ -240,7 +265,7 @@ void CClientPlayerVoice::ReceiveFrame( void* outputBuffer )
             // Write clamped to buffered output
             m_pBufferedOutput[j] += pBufInput[ j % (uiTotalBufferSize/VOICE_SAMPLE_SIZE) ];
             // Adjust the volume
-            m_pBufferedOutput[j] = (short)((float)m_pBufferedOutput[j]*fVolume);
+            m_pBufferedOutput[j] = (short)((float)m_pBufferedOutput[j]*m_fVolume);
         }
 
         // Align our read index
@@ -254,12 +279,16 @@ void CClientPlayerVoice::ReceiveFrame( void* outputBuffer )
 
 void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten )
 {
+    m_CS.Lock ();
     CLuaArguments Arguments;
     if ( !m_bVoiceActive )
     {
+        m_CS.Unlock ();
+        ServiceEventQueue ();
         if ( !m_pPlayer->CallEvent ( "onClientPlayerVoiceStart", Arguments, true ) )
             return;
 
+        m_CS.Lock ();
         m_bVoiceActive = true;
     }
 
@@ -306,4 +335,24 @@ void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritte
         if (m_uiIncomingReadIndex == uiTotalBufferSize)
             m_uiIncomingReadIndex=0;
     }
+    m_CS.Unlock ();
+}
+
+
+void CClientPlayerVoice::ServiceEventQueue ( void )
+{
+    m_CS.Lock ();
+    while ( !m_EventQueue.empty () )
+    {
+        SString strEvent = m_EventQueue.front ();
+        m_EventQueue.pop_front ();
+
+        m_CS.Unlock ();
+
+        CLuaArguments Arguments;
+        m_pPlayer->CallEvent ( strEvent, Arguments, true );
+
+        m_CS.Lock ();
+    }
+    m_CS.Unlock ();
 }
