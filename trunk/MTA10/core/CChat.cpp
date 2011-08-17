@@ -768,14 +768,29 @@ bool CChatLine::IsColorCode ( const char* szColorCode )
 }
 
 
-const char* CChatLine::Format ( const char* szString, float fWidth, CColor& color, bool bColorCoded )
+//
+// Calculate the equivalent ansi string pointer of szPosition.
+//
+const char* CalcAnsiPtr ( const char* szStringAnsi, const wchar_t* szPosition )
 {
+    int iOrigSize = strlen ( szStringAnsi );
+    int iEndSize = UTF16ToMbUTF8 ( szPosition ).length();
+    int iOffset = iOrigSize - iEndSize;
+    return szStringAnsi + iOffset;
+}
+
+
+const char* CChatLine::Format ( const char* szStringAnsi, float fWidth, CColor& color, bool bColorCoded )
+{
+    std::wstring wString = MbUTF8ToUTF16 ( szStringAnsi );
+    const wchar_t* szString = wString.c_str ();
+
     float fPrevSectionsWidth = 0.0f;
     m_Sections.clear ();
 
-    const char* szSectionStart = szString;
-    const char* szSectionEnd = szString;
-    const char* szLastWrapPoint = szString;
+    const wchar_t* szSectionStart = szString;
+    const wchar_t* szSectionEnd = szString;
+    const wchar_t* szLastWrapPoint = szString;
     bool bLastSection = false;
     while ( !bLastSection )      // iterate over sections
     {
@@ -789,21 +804,21 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
         szSectionStart = szSectionEnd;
         szLastWrapPoint = szSectionStart;
         unsigned int uiSeekPos = 0;
-		SString strSectionStart = szSectionStart;
+        std::wstring strSectionStart = szSectionStart;
 
         while ( true )      // find end of this section
         {
-            float fSectionWidth = CChat::GetTextExtent ( strSectionStart.substr ( 0 , uiSeekPos ).c_str (), g_pChat->m_vecScale.fX );
+            float fSectionWidth = CChat::GetTextExtent ( UTF16ToMbUTF8 ( strSectionStart.substr ( 0 , uiSeekPos ) ).c_str (), g_pChat->m_vecScale.fX );
 
             if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || fPrevSectionsWidth + fSectionWidth > fWidth )
             {
                 bLastSection = true;
                 break;
             }
-            if ( bColorCoded && IsColorCode ( szSectionEnd ) )
+            if ( bColorCoded && IsColorCode ( UTF16ToMbUTF8 ( szSectionEnd ).c_str () ) )
             {
                 unsigned long ulColor = 0;
-                sscanf ( szSectionEnd + 1, "%06x", &ulColor );
+                sscanf ( UTF16ToMbUTF8 ( szSectionEnd ).c_str () + 1, "%06x", &ulColor );
                 color = ulColor;
                 fPrevSectionsWidth += fSectionWidth;
                 break;
@@ -815,7 +830,7 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
             szSectionEnd++;
             uiSeekPos++;
         }
-        section.m_strText.assign ( szSectionStart, szSectionEnd - szSectionStart );
+        section.m_strText = UTF16ToMbUTF8 ( strSectionStart.substr ( 0 , uiSeekPos ) );
     }
 
     if ( *szSectionEnd == '\0' )
@@ -824,7 +839,7 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
     }
     else if( *szSectionEnd == '\n' )
     {
-        return szSectionEnd + 1;
+        return CalcAnsiPtr ( szStringAnsi, szSectionEnd + 1 );
     }
     else
     {
@@ -836,7 +851,7 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
             {
                 // The line consists of one huge word. Leave the one section we created as it
                 // is (with the huge word cut off) and return szRemaining as the rest of the word
-                return szSectionEnd;
+                return CalcAnsiPtr ( szStringAnsi, szSectionEnd );
             }
             else
             {
@@ -847,9 +862,12 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
         else
         {
             // Wrapping point is in the middle of a section, truncate
-            (*(m_Sections.end () - 1)).m_strText.resize ( szLastWrapPoint - szSectionStart );
+            CChatLineSection& last = *( m_Sections.end () - 1 );
+            std::wstring wstrTemp = MbUTF8ToUTF16 ( last.m_strText );
+            wstrTemp.resize ( szLastWrapPoint - szSectionStart );
+            last.m_strText = UTF16ToMbUTF8 ( wstrTemp );
         }
-        return szLastWrapPoint;
+        return CalcAnsiPtr ( szStringAnsi, szLastWrapPoint );
     }
 }
 
