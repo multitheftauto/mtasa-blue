@@ -113,6 +113,7 @@ public:
 
     ~CServerListItem ( void )
     {
+        MapRemove ( ms_ValidServerListItemMap, this );
         CloseSocket ();
     }
 
@@ -141,6 +142,7 @@ public:
 
     void                Init            ( void )
     {
+        MapInsert ( ms_ValidServerListItemMap, this );
         // Initialize variables
         bScanned = false;
         bSkipped = false;
@@ -306,11 +308,18 @@ public:
         return m_iDataQuality;
     }
 
+    static bool StaticIsValid ( CServerListItem* pServer )
+    {
+        return MapContains ( ms_ValidServerListItemMap, pServer );
+    }
+
     int                 m_iTimeoutLength;
 protected:
     int                 m_Socket;
     CElapsedTime        m_ElapsedTime;
     int                 m_iDataQuality;
+
+    static std::set < CServerListItem* > ms_ValidServerListItemMap;
 };
 
 typedef std::list<CServerListItem*>::const_iterator CServerListIterator;

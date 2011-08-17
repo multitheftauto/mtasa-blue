@@ -1957,7 +1957,7 @@ CServerListItem* CServerBrowser::FindServerFromRow ( ServerBrowserType Type, int
 {
     CServerList * pList = GetServerList ( Type );
     CServerListItem * pSelectedServer = (CServerListItem *)m_pServerList [ Type ]->GetItemData ( iRow, DATA_PSERVER );
-    if ( pSelectedServer )
+    if ( CServerListItem::StaticIsValid ( pSelectedServer ) )
         return pSelectedServer;
     return NULL;
 }
@@ -2079,7 +2079,8 @@ void CServerBrowser::GetVisibleEndPointList ( std::vector < SAddressPort >& outE
     {
         if ( CServerListItem* pServer = (CServerListItem *)m_pServerList [ Type ]->GetItemData ( i, DATA_PSERVER ) )
         {
-            outEndpointList.push_back ( SAddressPort ( pServer->Address, pServer->usGamePort ) );
+            if ( CServerListItem::StaticIsValid ( pServer ) )
+                outEndpointList.push_back ( SAddressPort ( pServer->Address, pServer->usGamePort ) );
         }
     }
 }
