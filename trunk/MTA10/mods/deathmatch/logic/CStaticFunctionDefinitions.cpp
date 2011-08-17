@@ -4060,13 +4060,10 @@ bool CStaticFunctionDefinitions::GUIStaticImageLoadImage ( CClientEntity& Entity
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
-    // If there's a parent, make sure it's a GUI widget that can be a parent
-    // ChrML: This has broken a lot of scripts
-    //if ( pParent && !IS_CGUIELEMENT_VALID_PARENT ( pParent ) ) return NULL;
-
     CGUIElement *pElement = m_pGUI->CreateLabel ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
     pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
     pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetProperty ( "RiseOnClick", "False" );
 
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -4081,7 +4078,6 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton ( CLuaMain& LuaMa
     CGUIElement *pElement = m_pGUI->CreateButton ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
     pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
     pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
-    pElement->SetZOrderingEnabled( false );
    
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
