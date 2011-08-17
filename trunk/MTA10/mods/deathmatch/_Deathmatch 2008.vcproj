@@ -1288,34 +1288,6 @@
 			<Filter
 				Name="utils"
 				>
-				<File
-					RelativePath="..\..\sdk\utils\CMD5Hasher.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Nightly|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"
-						/>
-					</FileConfiguration>
-				</File>
 				<Filter
 					Name="portaudio"
 					>
@@ -2090,10 +2062,6 @@
 			<Filter
 				Name="utils"
 				>
-				<File
-					RelativePath="..\..\core\client\utils\CMD5Hasher.h"
-					>
-				</File>
 				<File
 					RelativePath="..\..\..\Shared\sdk\ieee754.h"
 					>

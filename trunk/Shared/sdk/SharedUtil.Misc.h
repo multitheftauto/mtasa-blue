@@ -19,9 +19,25 @@ namespace SharedUtil
     class CArgMap;
 #ifdef WIN32
 
-    SString GetVersionAppendString ( const SString& strUsingASEVersion = "" );
-    void SetRegistryValue ( const SString& strPath, const SString& strKey, const SString& strValue );
-    SString GetRegistryValue ( const SString& strPath, const SString& strKey );
+    SString GetMajorVersionString ( void );
+
+    // Get/set registry values for the current version
+    void SetRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue );
+    SString GetRegistryValue ( const SString& strPath, const SString& strName );
+    bool RemoveRegistryKey ( const SString& strPath );
+
+    // Get/set registry values for a particular version
+    void SetVersionRegistryValue ( const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue );
+    SString GetVersionRegistryValue ( const SString& strVersion, const SString& strPath, const SString& strName );
+
+    // Get/set registry values for all versions (Common)
+    void SetCommonRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue );
+    SString GetCommonRegistryValue ( const SString& strPath, const SString& strName );
+
+    // Get/set registry values for particular version using the old (HKCU) layout
+    void SetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue );
+    SString GetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName );
+
 
     bool ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
     bool ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
@@ -56,14 +72,16 @@ namespace SharedUtil
     void            SetReportLogContents            ( const SString& strText );
     SString         GetReportLogContents            ( void );
 
-    void            SetApplicationSetting           ( const SString& strPath, const SString& strKey, const SString& strValue );
-    void            SetApplicationSetting           ( const SString& strPathKey, const SString& strValue );
-    void            SetApplicationSettingInt        ( const SString& strPath, const SString& strKey, int iValue );
-    void            SetApplicationSettingInt        ( const SString& strPathKey, int iValue );
-    SString         GetApplicationSetting           ( const SString& strPath, const SString& strKey );
-    SString         GetApplicationSetting           ( const SString& strPathKey );
-    int             GetApplicationSettingInt        ( const SString& strPath, const SString& strKey );
-    int             GetApplicationSettingInt        ( const SString& strPathKey );
+    void            SetApplicationSetting           ( const SString& strPath, const SString& strName, const SString& strValue );
+    SString         GetApplicationSetting           ( const SString& strPath, const SString& strName );
+    bool            RemoveApplicationSettingKey     ( const SString& strPath );
+    void            SetApplicationSettingInt        ( const SString& strPath, const SString& strName, int iValue );
+    int             GetApplicationSettingInt        ( const SString& strPath, const SString& strName );
+
+    void            SetApplicationSetting           ( const SString& strName, const SString& strValue );
+    SString         GetApplicationSetting           ( const SString& strName );
+    void            SetApplicationSettingInt        ( const SString& strName, int iValue );
+    int             GetApplicationSettingInt        ( const SString& strName );
 
     void            WatchDogReset                   ( void );
     bool            WatchDogIsSectionOpen           ( const SString& str );

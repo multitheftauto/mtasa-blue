@@ -17,7 +17,6 @@
 
 #include "CPacket.h"
 #include "../../Config.h"
-#include "../CMD5Hasher.h"
 
 class CPlayerJoinDataPacket : public CPacket
 {

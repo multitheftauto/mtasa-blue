@@ -593,10 +593,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\logic\CMD5Hasher.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\logic\CObject.cpp"
 					>
 				</File>
@@ -1683,10 +1679,6 @@
 				</File>
 				<File
 					RelativePath=".\logic\CMarkerManager.h"
-					>
-				</File>
-				<File
-					RelativePath=".\logic\CMD5Hasher.h"
 					>
 				</File>
 				<File

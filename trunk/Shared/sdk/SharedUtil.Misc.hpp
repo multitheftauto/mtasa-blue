@@ -113,63 +113,101 @@ static bool DeleteRegistryKey ( HKEY hkRoot, const char* szSubKey )
 }
 
 
+
+
 //
-// GetVersionAppendString
+// GetMajorVersionString
 //
-SString SharedUtil::GetVersionAppendString ( const SString& strUsingASEVersion )
+SString SharedUtil::GetMajorVersionString ( void )
 {
-    SString strVersionAppend = SString ( " %s", strUsingASEVersion.empty () ? MTA_DM_ASE_VERSION : *strUsingASEVersion );
-
-    // Remove nightly appendage
-    strVersionAppend = strVersionAppend.TrimEnd ( "n" );
-
-    // 1.0 has no version number in the path
-    if ( strVersionAppend == " 1.0" )
-        strVersionAppend = "";
-
-    return strVersionAppend;
+    return SStringX ( MTA_DM_ASE_VERSION ).Left ( 3 );
 }
 
 
+// Old layout:
+//              HKCU Software\\Multi Theft Auto: San Andreas\\             - For 1.0
+//              HKCU Software\\Multi Theft Auto: San Andreas 1.1\\         - For 1.1
 //
-// MakeRegistryPath
-//
-// Turns "Settings"
-// into  "Software\\Multi Theft Auto: San Andreas 1.1\\Settings"
-// 
-static SString MakeRegistryPath ( const SString& strInPath )
+static SString MakeVersionRegistryPathLegacy ( const SString& strVersion, const SString& strPath )
 {
-    SString strPath = strInPath;
-    SString strUsingASEVersion = MTA_DM_ASE_VERSION;
+    SString strResult = "Software\\Multi Theft Auto: San Andreas";
+    if ( strVersion != "1.0" )
+        strResult += " " + strVersion;
 
-    // Use version from path instead?
-    if ( strPath.Left ( 3 ) == "..\\" )
-    {
-        strPath.Right ( strPath.length () - 3 ).Split ( "\\", &strUsingASEVersion, &strPath );
-    }
-
-    SString strResult = PathJoin ( "Software\\Multi Theft Auto: San Andreas" + GetVersionAppendString ( strUsingASEVersion ), strPath );
+    strResult = PathJoin ( strResult, strPath );
     strResult = strResult.TrimEnd ( "\\" );
     return strResult;
+}
+
+
+// Get/set registry values for a version using the old (HKCU) layout
+void SharedUtil::SetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue )
+{
+    WriteRegistryStringValue ( HKEY_CURRENT_USER, MakeVersionRegistryPathLegacy ( strVersion, strPath ), strName, strValue );
+}
+
+SString SharedUtil::GetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName )
+{
+    return ReadRegistryStringValue ( HKEY_CURRENT_USER, MakeVersionRegistryPathLegacy ( strVersion, strPath ), strName, NULL );
+}
+
+
+
+//
+// New layout:
+//              HKLM Software\\Multi Theft Auto: San Andreas All\\Common    - For all versions
+//              HKLM Software\\Multi Theft Auto: San Andreas All\\1.1       - For 1.1
+//              HKLM Software\\Multi Theft Auto: San Andreas All\\1.2       - For 1.2
+//
+static SString MakeVersionRegistryPath ( const SString& strVersion, const SString& strPath )
+{
+    SString strResult = PathJoin ( "Software\\Multi Theft Auto: San Andreas All", strVersion, strPath );
+    return strResult.TrimEnd ( "\\" );
 }
 
 //
 // Registry values
 // 
-void SharedUtil::SetRegistryValue ( const SString& strPath, const SString& strKey, const SString& strValue )
+// Get/set registry values for the current version
+void SharedUtil::SetRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue )
 {
-    WriteRegistryStringValue ( HKEY_CURRENT_USER, MakeRegistryPath ( strPath ), strKey, strValue );
+    WriteRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( GetMajorVersionString (), strPath ), strName, strValue );
 }
 
-SString SharedUtil::GetRegistryValue ( const SString& strPath, const SString& strKey )
+SString SharedUtil::GetRegistryValue ( const SString& strPath, const SString& strName )
 {
-    return ReadRegistryStringValue ( HKEY_CURRENT_USER, MakeRegistryPath ( strPath ), strKey, NULL );
+    return ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( GetMajorVersionString (), strPath ), strName, NULL );
 }
 
-bool DeleteRegistryValue ( const SString& strPathKey )
+bool SharedUtil::RemoveRegistryKey ( const SString& strPath )
 {
-    return DeleteRegistryKey ( HKEY_CURRENT_USER, strPathKey );
+    return DeleteRegistryKey ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( GetMajorVersionString (), strPath ) );
 }
+
+// Get/set registry values for a version
+void SharedUtil::SetVersionRegistryValue ( const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue )
+{
+    WriteRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( strVersion, strPath ), strName, strValue );
+}
+
+SString SharedUtil::GetVersionRegistryValue ( const SString& strVersion, const SString& strPath, const SString& strName )
+{
+    return ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( strVersion, strPath ), strName, NULL );
+}
+
+// Get/set registry values for all versions (common)
+void SharedUtil::SetCommonRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue )
+{
+    WriteRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( "Common", strPath ), strName, strValue );
+}
+
+SString SharedUtil::GetCommonRegistryValue ( const SString& strPath, const SString& strName )
+{
+    return ReadRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( "Common", strPath ), strName, NULL );
+}
+
+
+
 
 
 //
@@ -232,67 +270,59 @@ bool SharedUtil::GetOnRestartCommand ( SString& strOperation, SString& strFile, 
 //
 // Get/set string
 //
-void SharedUtil::SetApplicationSetting ( const SString& strPath, const SString& strKey, const SString& strValue )
+void SharedUtil::SetApplicationSetting ( const SString& strPath, const SString& strName, const SString& strValue )
 {
-    SetRegistryValue ( PathJoin ( "Settings", strPath ), strKey, strValue );
+    SetRegistryValue ( PathJoin ( "Settings", strPath ), strName, strValue );
 }
 
-SString SharedUtil::GetApplicationSetting ( const SString& strPath, const SString& strKey )
+SString SharedUtil::GetApplicationSetting ( const SString& strPath, const SString& strName )
 {
-    return GetRegistryValue ( PathJoin ( "Settings", strPath ), strKey );
+    return GetRegistryValue ( PathJoin ( "Settings", strPath ), strName );
 }
+
+// Delete a setting key
+bool SharedUtil::RemoveApplicationSettingKey ( const SString& strPath )
+{
+    return RemoveRegistryKey ( PathJoin ( "Settings", strPath ) );
+}
+
 
 //
 // Get/set int
 //
-void SharedUtil::SetApplicationSettingInt ( const SString& strPath, const SString& strKey, int iValue )
+void SharedUtil::SetApplicationSettingInt ( const SString& strPath, const SString& strName, int iValue )
 {
-    SetApplicationSetting ( strPath, strKey, SString ( "%d", iValue ) );
+    SetApplicationSetting ( strPath, strName, SString ( "%d", iValue ) );
 }
 
-int SharedUtil::GetApplicationSettingInt ( const SString& strPath, const SString& strKey )
+int SharedUtil::GetApplicationSettingInt ( const SString& strPath, const SString& strName )
 {
-    return atoi ( GetApplicationSetting ( strPath, strKey ) );
+    return atoi ( GetApplicationSetting ( strPath, strName ) );
 }
 
-//
-// Get/set string - Combined path and key i.e. "group.key"
-//
-SString SharedUtil::GetApplicationSetting ( const SString& strPathKey )
-{
-    SString strPath;
-    SString strKey = strPathKey.SplitRight ( ".", &strPath, -1 );
-    if ( !strPath.length () )
-        strPath = "general";
-    return GetApplicationSetting ( strPath, strKey );
-}
 
-void SharedUtil::SetApplicationSetting ( const SString& strPathKey, const SString& strValue )
-{
-    SString strPath;
-    SString strKey = strPathKey.SplitRight ( ".", &strPath, -1 );
-    if ( !strPath.length () )
-        strPath = "general";
-    SetApplicationSetting ( strPath, strKey, strValue );
-}
 
 //
-// Get/set int - Combined path and key i.e. "group.key"
+// Get/set string - Which uses 'general' key
 //
-void SharedUtil::SetApplicationSettingInt ( const SString& strPathKey, int iValue )
+void SharedUtil::SetApplicationSetting ( const SString& strName, const SString& strValue )
 {
-    SetApplicationSetting ( strPathKey, SString ( "%d", iValue ) );
+    SetApplicationSetting ( "general", strName, strValue );
 }
 
-int SharedUtil::GetApplicationSettingInt ( const SString& strPathKey )
+SString SharedUtil::GetApplicationSetting ( const SString& strName )
 {
-    return atoi ( GetApplicationSetting ( strPathKey ) );
+    return GetApplicationSetting ( "general", strName );
 }
 
-// Delete a setting key
-static bool DeleteApplicationSettingKey ( const SString& strPathKey )
+void SharedUtil::SetApplicationSettingInt ( const SString& strName, int iValue )
 {
-    return DeleteRegistryValue ( "Settings." + strPathKey );
+    SetApplicationSettingInt ( "general", strName, iValue );
+}
+
+int SharedUtil::GetApplicationSettingInt ( const SString& strName )
+{
+    return GetApplicationSettingInt ( "general", strName );
 }
 
 
@@ -303,7 +333,7 @@ static bool DeleteApplicationSettingKey ( const SString& strPathKey )
 
 void SharedUtil::WatchDogReset ( void )
 {
-    DeleteApplicationSettingKey ( "watchdog" );
+    RemoveApplicationSettingKey ( "watchdog" );
 }
 
 // Section
@@ -458,7 +488,7 @@ static SString GetReportLogHeaderText ( void )
 
 void SharedUtil::AddReportLog ( uint uiId, const SString& strText )
 {
-    SString strPathFilename = PathJoin ( GetMTALocalAppDataPath (), "report.log" );
+    SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
     MakeSureDirExists ( strPathFilename );
 
     SString strMessage ( "%u: %s %s - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), strText.c_str () );
@@ -470,14 +500,14 @@ void SharedUtil::AddReportLog ( uint uiId, const SString& strText )
 
 void SharedUtil::SetReportLogContents ( const SString& strText )
 {
-    SString strPathFilename = PathJoin ( GetMTALocalAppDataPath (), "report.log" );
+    SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
     MakeSureDirExists ( strPathFilename );
     FileSave ( strPathFilename, strText.length () ? &strText.at ( 0 ) : NULL, strText.length () );
 }
 
 SString SharedUtil::GetReportLogContents ( void )
 {
-    SString strReportFilename = PathJoin ( GetMTALocalAppDataPath (), "report.log" );
+    SString strReportFilename = PathJoin ( GetMTADataPath (), "report.log" );
     // Load file into a string
     std::vector < char > buffer;
     FileLoad ( strReportFilename, buffer );

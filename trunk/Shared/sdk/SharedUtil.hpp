@@ -20,3 +20,4 @@
 #include "SharedUtil.Time.hpp"
 #include "SharedUtil.Game.hpp"
 #include "SharedUtil.Math.hpp"
+#include "SharedUtil.Hash.hpp"

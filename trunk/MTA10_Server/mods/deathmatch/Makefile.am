@@ -79,7 +79,6 @@ LOGIC = \
 ./logic/CKeyBinds.cpp \
 ./logic/CLanBroadcast.cpp \
 ./logic/CLogger.cpp \
-./logic/CMD5Hasher.cpp \
 ./logic/CMainConfig.cpp \
 ./logic/CMapEvent.cpp \
 ./logic/CMapEventManager.cpp \

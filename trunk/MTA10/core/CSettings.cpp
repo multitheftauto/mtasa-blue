@@ -20,7 +20,6 @@
 #include "StdInc.h"
 #include <core/VideoCard.h>
 #include <game/CGame.h>
-#include <utils/CMD5Hasher.h>
 
 using namespace std;
 

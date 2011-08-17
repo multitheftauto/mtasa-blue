@@ -101,38 +101,6 @@ CCore::CCore ( void )
     std::setlocale(LC_ALL,"C");
     std::setlocale(LC_CTYPE,"");
 
-    // NULL the path buffers
-    memset ( m_szInstallRoot, 0, MAX_PATH );
-    memset ( m_szGTAInstallRoot, 0, MAX_PATH );
-
-    SString strInstallRoot = GetMTASABaseDir ();
-
-    SString strGTAInstallRoot = GetRegistryValue ( "..\\1.0", "GTA:SA Path" );
-    if ( strGTAInstallRoot.empty () )
-    {
-        MessageBox ( 0, "There is no GTA path specified in the registry, please reinstall.", "Error", MB_OK );
-        TerminateProcess ( GetCurrentProcess (), 9 );
-    }
-
-    STRNCPY ( m_szInstallRoot, strInstallRoot, sizeof ( m_szInstallRoot ) );
-    STRNCPY ( m_szGTAInstallRoot, strGTAInstallRoot, sizeof ( m_szGTAInstallRoot ) );
-
-    // Remove the trailing / from the installroot incase it has
-    size_t sizeInstallRoot = strlen ( m_szInstallRoot );
-    if ( m_szInstallRoot [ sizeInstallRoot - 1 ] == '/' ||
-         m_szInstallRoot [ sizeInstallRoot - 1 ] == '\\' )
-    {
-        m_szInstallRoot [ sizeInstallRoot - 1 ] = 0;
-    }
-
-    // Remove the trailing / from the installroot incase it has
-    size_t sizeGTAInstallRoot = strlen ( m_szGTAInstallRoot );
-    if ( m_szGTAInstallRoot [ sizeGTAInstallRoot - 1 ] == '/' ||
-         m_szGTAInstallRoot [ sizeGTAInstallRoot - 1 ] == '\\' )
-    {
-        m_szGTAInstallRoot [ sizeGTAInstallRoot - 1 ] = 0;
-    }
-
     // Parse the command line
     const char* pszNoValOptions[] =
     {
@@ -665,20 +633,8 @@ void CCore::SetOfflineMod ( bool bOffline )
 
 const char* CCore::GetModInstallRoot ( const char* szModName )
 {
-    m_strModInstallRoot = SString ( "%s\\mods\\%s", GetInstallRoot(), szModName );
+    m_strModInstallRoot = CalcMTASAPath ( PathJoin ( "mods", szModName ) );
     return m_strModInstallRoot;
-}
-
-
-const char* CCore::GetInstallRoot ( )
-{
-    return m_szInstallRoot;
-}
-
-
-const char* CCore::GetGTAInstallRoot ( void )
-{
-    return m_szGTAInstallRoot;
 }
 
 
@@ -917,7 +873,7 @@ void CCore::InitGUI ( IUnknown* pDevice )
     m_pGUI->SetWorkingDirectory ( CalcMTASAPath ( "MTA" ) );
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
-    std::string strScreenShotPath = GetInstallRoot () + std::string ( "\\screenshots" );
+    std::string strScreenShotPath = CalcMTASAPath ( "screenshots" );
     CVARS_SET ( "screenshot_path", strScreenShotPath );
     CScreenShot::SetPath ( strScreenShotPath.c_str() );
 }

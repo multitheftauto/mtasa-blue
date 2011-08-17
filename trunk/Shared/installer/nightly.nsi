@@ -50,8 +50,10 @@ Var RedistInstalled
 
 !ifdef CLIENT_SETUP
 	!define PRODUCT_NAME "MTA:SA 1.1"
+	!define PRODUCT_NAME_NO_VER "MTA:SA"
 !else
 	!define PRODUCT_NAME "MTA:SA Server 1.1"
+	!define PRODUCT_NAME_NO_VER "MTA:SA Server"
 !endif
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
@@ -78,6 +80,10 @@ Var RedistInstalled
 !define MUI_HEADERIMAGE_BITMAP "mta_install_header.bmp"
 
 ; Welcome page
+!define MUI_WELCOMEPAGE_TITLE_3LINES
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of $(^Name)\n\n It is recommended that you close all other applications before starting Setup. This will make it possible to update relevant system files without having to reboot your computer.\n\n[Admin access will be requested for Vista and up]\n\nClick Next to continue."
+!define MUI_PAGE_CUSTOMFUNCTION_PRE "WelcomePreProc"
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE "WelcomeLeaveProc"
 !insertmacro MUI_PAGE_WELCOME
 
 ; License page
@@ -107,6 +113,7 @@ Var RedistInstalled
 !insertmacro MUI_PAGE_INSTFILES
 
 ; Finish page
+!define MUI_FINISHPAGE_TITLE_3LINES
 ; Launch from installer with user privileges
 !define MUI_FINISHPAGE_RUN						""
 !define MUI_FINISHPAGE_RUN_FUNCTION				"LaunchLink"
@@ -119,19 +126,19 @@ Var RedistInstalled
 !insertmacro MUI_LANGUAGE							"English"
 LangString DESC_Section1 ${LANG_ENGLISH}			"The core components required to run Multi Theft Auto."
 LangString DESC_Section2 ${LANG_ENGLISH}			"The MTA:SA modification, allowing you to play online."
-LangString DESC_Section3 ${LANG_ENGLISH}			"The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
-LangString DESC_SectionGroupMods ${LANG_ENGLISH}	"Modifications for Multi Theft Auto. Without at least one of these, you cannot play Multi Theft Auto."
+;LangString DESC_Section3 ${LANG_ENGLISH}			"The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
+;LangString DESC_SectionGroupMods ${LANG_ENGLISH}	"Modifications for Multi Theft Auto. Without at least one of these, you cannot play Multi Theft Auto."
 LangString DESC_SectionGroupServer ${LANG_ENGLISH}  "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
 LangString DESC_Section4 ${LANG_ENGLISH}			"The Multi Theft Auto server. This is a required component."
 LangString DESC_Section5 ${LANG_ENGLISH}			"The MTA:SA modification for the server."
-LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
-LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
-LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
-LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
+;LangString DESC_Section6 ${LANG_ENGLISH}			"This is a set of required resources for your server."
+;LangString DESC_Section7 ${LANG_ENGLISH}			"This is an optional set of gamemodes and maps for your server."
+;LangString DESC_Section8 ${LANG_ENGLISH}			"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
+;LangString DESC_Section9 ${LANG_ENGLISH}			"This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
 LangString DESC_Section10 ${LANG_ENGLISH}			"Create a Start Menu group for installed applications"
 LangString DESC_Section11 ${LANG_ENGLISH}			"Create a Desktop Shortcut for the MTA:SA Client."
-LangString DESC_Blank ${LANG_ENGLISH}			""
-LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
+;LangString DESC_Blank ${LANG_ENGLISH}			""
+;LangString DESC_SectionGroupDev ${LANG_ENGLISH}		"Development code and tools that aid in the creation of mods for Multi Theft Auto"
 LangString DESC_SectionGroupClient ${LANG_ENGLISH}  "The client is the program you run to play on a Multi Theft Auto server"
 
 
@@ -150,7 +157,21 @@ Function .OnInstFailed
 FunctionEnd
 
 Function .onInit
-	Call DoRightsElevation
+	; #############################################
+	; Remove old shortcuts put in rand(user,admin) startmenu by previous installers (shortcuts now go in all users)
+	SetShellVarContext current
+	; Delete shortcuts
+	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\MTA San Andreas.lnk"
+	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas.lnk"
+	Delete "$DESKTOP\MTA San Andreas 1.1.lnk"
+
+	; Delete shortcuts
+	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\MTA Server.lnk"
+	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas Server.lnk"
+	RmDir /r "$SMPROGRAMS\\MTA San Andreas 1.1"
+	; #############################################
+
+	SetShellVarContext all
 
 	; Check if we must install the Microsoft Visual Studio 2008 SP1 redistributable
 	ClearErrors
@@ -162,52 +183,61 @@ DontInstallVC9Redist:
 	StrCpy $RedistInstalled "1"
 PostVC90Check:
 	
-	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" ; start of fix for #3743
-	${If} $Install_Dir == '' 
-		strcpy $INSTDIR "$PROGRAMFILES\MTA San Andreas 1.1"
-	${Else} 
-		strcpy $INSTDIR $Install_Dir
-	${EndIf} ; end of fix for #3743
+	; Try to find previously saved MTA:SA install path
+	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location"
+	${If} $Install_Dir == "" 
+		ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location"
+	${EndIf}
+	${If} $Install_Dir == "" 
+		strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas 1.1"
+	${EndIf}
+	strcpy $INSTDIR $Install_Dir
 
 	!ifdef CLIENT_SETUP
-		ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
-		StrCmp $2 "" trynext cont
-		trynext:
-		ReadRegStr $2 HKLM "SOFTWARE\Rockstar Games\GTA San Andreas\Installation" "ExePath"
-		cont:
-		StrCmp $2 "" trynext2 cont2
-		trynext2:
-		ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
-		cont2:
-		StrCmp $2 "" trynext3 cont3
-		trynext3:
-		ReadRegStr $2 HKCU "Software\Valve\Steam\Apps\12120" "Installed"
-		StrCpy $2 $2
-		StrCmp $2 "1" usesteam cont3
-		usesteam:
-		ReadRegStr $2 HKCU "Software\Valve\Steam" "SteamPath"
-		StrCpy $2 "$2\steamapps\common\grand theft auto san andreas"
-		cont3:
-		StrCmp $2 "" trynext4 cont4
-		trynext4:
-		ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "GTA:SA Path Backup"
-		cont4:
+		; Try to find previously saved GTA:SA install path
+		ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path"
+		${If} $2 == "" 
+			ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
+		${EndIf}
+		${If} $2 == "" 
+			ReadRegStr $2 HKLM "SOFTWARE\Rockstar Games\GTA San Andreas\Installation" "ExePath"
+		${EndIf}
+		${If} $2 == "" 
+			ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
+		${EndIf}
+		${If} $2 == "" 
+			ReadRegStr $3 HKCU "Software\Valve\Steam\Apps\12120" "Installed"
+			StrCpy $3 $3 1
+			${If} $3 == "1"
+				ReadRegStr $3 HKCU "Software\Valve\Steam" "SteamPath"
+				StrCpy $2 "$3\steamapps\common\grand theft auto san andreas"
+			${EndIf}
+		${EndIf}
+		${If} $2 == "" 
+			ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "GTA:SA Path Backup"
+		${EndIf}
+
+		; Remove exe name from path
 		!insertmacro ReplaceSubStr $2 "gta_sa.exe" ""
+		; Conform slash types
 		!insertmacro ReplaceSubStr $MODIFIED_STR "/" "\"
+		; Remove quotes
 		strcpy $3 '"'
 		!insertmacro ReplaceSubStr $MODIFIED_STR $3 ""
+		; Store result 
 		strcpy $GTA_DIR $MODIFIED_STR
 	!endif
 
 	InitPluginsDir
-	File /oname=$PLUGINSDIR\serialdialog.ini "serialdialog.ini"
+	;File /oname=$PLUGINSDIR\serialdialog.ini "serialdialog.ini"
 FunctionEnd
 
 Function .onInstSuccess
+	SetShellVarContext all
+
 	!ifdef CLIENT_SETUP
-		WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
-        WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "GTA:SA Path Backup" $GTA_DIR
-		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" $INSTDIR
+		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
+		WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location" $INSTDIR
 
 		; Add the protocol handler
 		WriteRegStr HKCR "mtasa" "" "URL:MTA San Andreas Protocol"
@@ -280,7 +310,7 @@ FunctionEnd
 	InstType "Server only"
 !endif
 
-Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+Name "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 !ifdef CLIENT_SETUP
 	OutFile "${INSTALL_OUTPUT}"
 !else
@@ -288,7 +318,7 @@ Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 !endif
 
 ;InstallDir "$PROGRAMfiles San Andreas"
-InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location"
+InstallDirRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location"
 ShowInstDetails show
 ShowUnInstDetails show
 
@@ -302,23 +332,32 @@ ShowUnInstDetails show
 			StrCmp "$RedistInstalled" "1" DontInstallRedist
 			Abort
 DontInstallRedist:
+			SetShellVarContext all
 
-			WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path" $GTA_DIR
-			WriteRegStr HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "GTA:SA Path Backup" $GTA_DIR
-			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1" "Last Install Location" $INSTDIR
+			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
+			WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1" "Last Install Location" $INSTDIR
+
+			# Create fixed path data directories
+			CreateDirectory "$APPDATA\MTA San Andreas All\Common"
+			CreateDirectory "$APPDATA\MTA San Andreas All\1.1"
 
 			SetOutPath "$INSTDIR\MTA"
 			SetOverwrite on
 
 			#############################################################
 			# Make the directory "$INSTDIR" read write accessible by all users
+			# Make the directory "$APPDATA\MTA San Andreas All" read write accessible by all users
 
             ${If} ${AtLeastWinVista}
                 DetailPrint "Updating permissions. This could take a few minutes..."
                 FastPerms::FullAccessPlox "$INSTDIR"
+                FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
             ${EndIf}
-
 			#############################################################
+
+			# Make some keys in HKLM read write accessible by all users
+			AccessControl::GrantOnRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "(BU)" "FullAccess"
+
 
             !ifndef LIGHTBUILD
                 SetOutPath "$INSTDIR\skins\Classic"
@@ -715,19 +754,19 @@ SectionEnd
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC01} $(DESC_Section1)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC02} $(DESC_Section2)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC03} $(DESC_Section3)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SECGMODS} $(DESC_SectionGroupMods)
+	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC03} $(DESC_Section3)
+	;!insertmacro MUI_DESCRIPTION_TEXT ${SECGMODS} $(DESC_SectionGroupMods)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC04} $(DESC_Section4)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC05} $(DESC_Section5)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $(DESC_Section6)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
+	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC06} $(DESC_Section6)
+	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC07} $(DESC_Section7)
+	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC08} $(DESC_Section8)
+	;!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} $(DESC_Section9)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} $(DESC_Section10)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SECBLANK} $(DESC_Blank)
+	;!insertmacro MUI_DESCRIPTION_TEXT ${SECBLANK} $(DESC_Blank)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGSERVER} $(DESC_SectionGroupServer)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
+	;!insertmacro MUI_DESCRIPTION_TEXT ${SECGDEV} $(DESC_SectionGroupDev)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SECGCLIENT} $(DESC_SectionGroupClient)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -768,6 +807,7 @@ FunctionEnd
  
 Function un.onInit
 	Call un.DoRightsElevation
+	SetShellVarContext all
 
 		MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
 		Abort
@@ -826,14 +866,19 @@ Section Uninstall
 		Delete "$INSTDIR\MTA\*.ax"
 		Delete "$INSTDIR\MTA\*.txt"
 
+		RmDir /r "$APPDATA\MTA San Andreas All\1.1"
+		; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
+
 		DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
 		DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
 		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas 1.1"
 		DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas 1.1"
+		DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\1.1"
+		; TODO if HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common is the only one left, delete it
 		
 		${GameExplorer_RemoveGame} ${GUID}
 		
-		; Delete shortcuts
+		; Delete client shortcuts
 		Delete "$SMPROGRAMS\\MTA San Andreas 1.1\MTA San Andreas.lnk"
 		Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas.lnk"
         Delete "$DESKTOP\MTA San Andreas 1.1.lnk"
@@ -844,7 +889,7 @@ Section Uninstall
 
 	RmDir "$INSTDIR" ; fix for #3898
 
-	; Delete shortcuts
+	; Delete server shortcuts
 	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\MTA Server.lnk"
 	Delete "$SMPROGRAMS\\MTA San Andreas 1.1\Uninstall MTA San Andreas Server.lnk"
 	RmDir /r "$SMPROGRAMS\\MTA San Andreas 1.1"
@@ -1090,8 +1135,15 @@ Var HWND_DIALOG
 Var RESIZE_X
 Var RESIZE_Y
 
+
+Function HideBackButton
+	GetDlgItem $ITEM_HWND $HWNDPARENT 3
+	ShowWindow $ITEM_HWND ${SW_HIDE}
+FunctionEnd
+
+
 ; Input:
-; 	$RESIZE_X $RESIZE_X		- Resize amount
+; 	$RESIZE_X $RESIZE_Y		- Resize amount
 Function ResizeComponentsDialogContents
 
  	FindWindow $HWND_DIALOG "#32770" "" $HWNDPARENT
@@ -1162,7 +1214,7 @@ Function ResizeSharedDialogContents
 	StrCpy $CY 0
 
 	StrCpy $ITEM_PARENT $HWNDPARENT
-	StrCpy $ITEM_ID 1	; Button - Back
+	StrCpy $ITEM_ID 1	; Button - Next
 	Call MoveDialogItem
 
 	StrCpy $ITEM_PARENT $HWNDPARENT
@@ -1170,7 +1222,7 @@ Function ResizeSharedDialogContents
 	Call MoveDialogItem
 
 	StrCpy $ITEM_PARENT $HWNDPARENT
-	StrCpy $ITEM_ID 3 ; Button - Next
+	StrCpy $ITEM_ID 3 ; Button - Back
 	Call MoveDialogItem
 	
 	;Move branding text down
@@ -1225,6 +1277,8 @@ Function ResizeSharedDialogContents
 FunctionEnd
 
 
+!define SWP_NOOWNERZORDER	    0x0200
+
 ; Input:
 ; 	$RESIZE_X $RESIZE_X		- Resize amount
 Function ResizeMainWindow
@@ -1247,7 +1301,7 @@ Function ResizeMainWindow
 	IntOp $3 $RECT_W + $RESIZE_X
 	IntOp $4 $RECT_H + $RESIZE_Y
 
-	System::Call "User32::SetWindowPos(i, i, i, i, i, i, i) b ($HWNDPARENT, 0, $1, $2, $3, $4, ${SWP_NOOWNERZORDER}|${SWP_NOSIZE})"
+	System::Call "User32::SetWindowPos(i, i, i, i, i, i, i) b ($HWNDPARENT, 0, $1, $2, $3, $4, ${SWP_NOOWNERZORDER})"
 
 	;Restore register values from the stack
 	Pop $4
@@ -1261,6 +1315,22 @@ FunctionEnd
 
 Var COMPONENTS_EXPAND_STATUS
 
+Function "WelcomePreProc"
+	!insertmacro UAC_IsInnerInstance
+	${If} ${UAC_IsInnerInstance} 
+		; If switched to admin, don't show welcome window again
+		Abort
+	${EndIf}
+FunctionEnd
+
+Function "WelcomeLeaveProc"
+	HideWindow
+	; Maybe switch to admin after welcome window
+	Call DoRightsElevation
+	ShowWindow $HWNDPARENT ${SW_SHOW}
+FunctionEnd
+
+
 Function "LicenseShowProc"
 	${If} $COMPONENTS_EXPAND_STATUS == 1
 		StrCpy $COMPONENTS_EXPAND_STATUS 0
@@ -1269,6 +1339,7 @@ Function "LicenseShowProc"
 		Call ResizeSharedDialogContents
 		Call ResizeMainWindow
 	${Endif}
+	Call HideBackButton
 FunctionEnd
 
 

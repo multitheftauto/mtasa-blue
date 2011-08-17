@@ -152,8 +152,6 @@ public:
     void                    RemoveMessageBox                ( bool bNextFrame = false );
     bool                    IsOfflineMod                    ( void ) { return m_bIsOfflineMod; }
     const char *            GetModInstallRoot               ( const char * szModName );
-    const char *            GetInstallRoot                  ( void );
-    const char *            GetGTAInstallRoot               ( void );
 
 
     // Subsystems
@@ -283,8 +281,6 @@ private:
     time_t                      m_tXfireUpdate;
 
     SString                     m_strModInstallRoot;
-    char                        m_szInstallRoot[MAX_PATH];
-    char                        m_szGTAInstallRoot[MAX_PATH];
 
     bool                        m_bQuitOnPulse;
     bool                        m_bDestroyMessageBox;

@@ -16,7 +16,6 @@
 #include <strsafe.h>
 #include <Tlhelp32.h>
 #define BUFSIZE 512
-#include "../sdk/utils/CMD5Hasher.cpp"  // :O
 
 static bool bCancelPressed = false;
 static bool bOkPressed = false;
@@ -514,6 +513,12 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
         SetRegistryValue ( "", "Last Run Path Hash", strHash );
         SetRegistryValue ( "", "Last Run Path Version", MTA_DM_ASE_VERSION );
 
+        // Also save for legacy 1.0 to see
+        SString strThisVersion = SStringX ( MTA_DM_ASE_VERSION ).TrimEnd ( "n" );
+        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path", szBuffer );
+        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Hash", strHash );
+        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Version", MTA_DM_ASE_VERSION );
+
         // Strip the module name out of the path.
         PathRemoveFileSpec ( szBuffer );
 
@@ -601,47 +606,61 @@ SString DoUserAssistedSearch ( void )
 ///////////////////////////////////////////////////////////////
 ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 {
-    // Note: "SOFTWARE\Multi Theft Auto: San Andreas" is the shared multi-version location for "GTA:SA Path"
+    // Registry places to look
+    std::vector < SString > pathList;
 
-    // Try "SOFTWARE\Multi Theft Auto: San Andreas" first   ( "..\\1.0" resolves to "SOFTWARE\Multi Theft Auto: San Andreas" )
-    SString strRegPath = GetRegistryValue ( "..\\1.0", "GTA:SA Path" );
+    // Try HKLM "SOFTWARE\\Multi Theft Auto: San Andreas All\\Common\\"
+    pathList.push_back ( GetCommonRegistryValue ( "", "GTA:SA Path" ) );
+    // Then HKCU "SOFTWARE\\Multi Theft Auto: San Andreas 1.0\\"
+    pathList.push_back ( GetVersionRegistryValueLegacy ( "1.0", "", "GTA:SA Path" ) );
+    // Then HKCU "SOFTWARE\\Multi Theft Auto: San Andreas 1.1\\"
+    pathList.push_back ( GetVersionRegistryValueLegacy ( "1.1", "", "GTA:SA Path Backup" ) );
 
-    // Update/restore from backup location
+
+    // Unicode character check on first one
+    if ( strlen( pathList[0].c_str () ) )
     {
-        SString strRegPathBackup = GetRegistryValue ( "", "GTA:SA Path Backup" );
-        if ( strRegPath.empty () )
-            strRegPath = strRegPathBackup;
-        else
-        if ( strRegPath != strRegPathBackup )
-            SetRegistryValue ( "", "GTA:SA Path Backup", strRegPath );
+        // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
+        if ( strchr ( pathList[0].c_str (), '?' ) > 0 )
+            return GAME_PATH_UNICODE_CHARS;
     }
 
-    // Manual skip if CTRL is held
-    if ( ( GetAsyncKeyState ( VK_CONTROL ) & 0x8000 ) == 0 )
-    {
-        if ( strlen( strRegPath.c_str () ) )
-        {
-            // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-            if ( strchr ( strRegPath.c_str (), '?' ) > 0 )
-                return GAME_PATH_UNICODE_CHARS;
 
-            SString strExePath ( "%s\\%s", strRegPath.c_str (), MTA_GTAEXE_NAME );
-            if ( FileExists( strExePath  ) )
-            {
-                strOutResult = strRegPath;
-                return GAME_PATH_OK;
-            }
-            strExePath = SString( "%s\\%s", strRegPath.c_str (), MTA_GTASTEAMEXE_NAME );
-            if ( FileExists( strExePath  ) )
-            {
-                return GAME_PATH_STEAM;
-            }
+    // Then step through looking for an existing file
+    bool bFoundSteamExe = false;
+    SString strRegPath;
+    for ( uint i = 0 ; i < pathList.size (); i++ )
+    {
+        if ( FileExists( PathJoin ( pathList[i], MTA_GTAEXE_NAME ) ) )
+        {
+            strRegPath = pathList[i];
+            break;
         }
+        if ( FileExists( PathJoin ( pathList[i], MTA_GTASTEAMEXE_NAME ) ) )
+        {
+            bFoundSteamExe = true;
+        }
+    }
+
+    // Found an exe?
+    if ( !strRegPath.empty () )
+    {
+        strOutResult = strRegPath;
+        // Update registry.
+        SetCommonRegistryValue ( "", "GTA:SA Path", strOutResult );
+        return GAME_PATH_OK;
+    }
+
+    // Found a steam exe?
+    if ( bFoundSteamExe )
+    {
+        return GAME_PATH_STEAM;
     }
 
     // Try to find?
     if ( !bFindIfMissing )
         return GAME_PATH_MISSING;
+
 
     // Ask user to browse for GTA
     BROWSEINFO bi = { 0 };
@@ -667,22 +686,26 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
     }
 
     // Check browse result
-    if ( !FileExists( PathJoin ( strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
+    if ( !FileExists( PathJoin ( strOutResult, MTA_GTAEXE_NAME ) ) )
     {
+        if ( FileExists( PathJoin ( strOutResult, MTA_GTASTEAMEXE_NAME ) ) )
+            return GAME_PATH_STEAM;
+
         // If browse didn't help, try another method
         strOutResult = DoUserAssistedSearch ();
 
-        if ( !FileExists( PathJoin ( strOutResult.c_str (), MTA_GTAEXE_NAME ) ) )
+        if ( !FileExists( PathJoin ( strOutResult, MTA_GTAEXE_NAME ) ) )
         {
+            if ( FileExists( PathJoin ( strOutResult, MTA_GTASTEAMEXE_NAME ) ) )
+                return GAME_PATH_STEAM;
+
             // If still not found, give up
             return GAME_PATH_MISSING;
         }
     }
 
     // File found. Update registry.
-    SetRegistryValue ( "..\\1.0", "GTA:SA Path", strOutResult );
-    SetRegistryValue ( "", "GTA:SA Path Backup", strOutResult );
-
+    SetCommonRegistryValue ( "", "GTA:SA Path", strOutResult );
     return GAME_PATH_OK;
 }
 
@@ -1679,7 +1702,7 @@ void CleanDownloadCache ( void )
 
     // Search possible cache locations
     std::list < SString > cacheLocationList;
-    cacheLocationList.push_back ( PathJoin ( GetMTALocalAppDataPath (), "upcache" ) );
+    cacheLocationList.push_back ( PathJoin ( GetMTADataPath (), "upcache" ) );
     cacheLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache" ) );
     cacheLocationList.push_back ( GetMTATempPath () );
 
