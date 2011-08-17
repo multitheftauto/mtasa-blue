@@ -127,6 +127,63 @@ IMPLEMENT_ENUM_BEGIN( eAmbientSoundType )
     ADD_ENUM ( AMBIENT_SOUND_GUNFIRE,           "gunfire" )
 IMPLEMENT_ENUM_END( "ambient-sound-type" )
 
+IMPLEMENT_ENUM_BEGIN( eCGUIType )
+    ADD_ENUM ( CGUI_BUTTON,         "gui-button" )
+    ADD_ENUM ( CGUI_CHECKBOX,       "gui-checkbox" )
+    ADD_ENUM ( CGUI_EDIT,           "gui-edit" )
+    ADD_ENUM ( CGUI_GRIDLIST,       "gui-gridlist" )
+    ADD_ENUM ( CGUI_LABEL,          "gui-label" )
+    ADD_ENUM ( CGUI_MEMO,           "gui-memo" )
+    ADD_ENUM ( CGUI_PROGRESSBAR,    "gui-progressbar" )
+    ADD_ENUM ( CGUI_RADIOBUTTON,    "gui-radiobutton" )
+    ADD_ENUM ( CGUI_STATICIMAGE,    "gui-staticimage" )
+    ADD_ENUM ( CGUI_TAB,            "gui-tab" )
+    ADD_ENUM ( CGUI_TABPANEL,       "gui-tabpanel" )
+    ADD_ENUM ( CGUI_WINDOW,         "gui-window" )
+    ADD_ENUM ( CGUI_SCROLLPANE,     "gui-scrollpane" )
+    ADD_ENUM ( CGUI_SCROLLBAR,      "gui-scrollbar" )
+    ADD_ENUM ( CGUI_COMBOBOX,       "gui-combobox" )
+IMPLEMENT_ENUM_END( "gui-type" )
+
+
+//
+// Get best guess at name of userdata type
+//
+SString GetUserDataClassName ( void* ptr, lua_State* luaVM )
+{
+    // Try element
+    if ( CClientEntity* pClientElement = UserDataCast < CClientEntity > ( (CClientEntity*)NULL, ptr, NULL ) )
+    {
+        // Try gui element
+        if ( CClientGUIElement* pGuiElement = DynamicCast < CClientGUIElement > ( pClientElement ) )
+        {
+            return EnumToString ( pGuiElement->GetCGUIElement ()->GetType () );
+        }
+        return pClientElement->GetTypeName ();
+    }
+
+    // Try xml node
+    if ( CXMLNode* pXMLNode = UserDataCast < CXMLNode > ( (CXMLNode*)NULL, ptr, NULL ) )
+    {
+        return GetClassTypeName ( pXMLNode );
+    }
+
+    // Try timer
+    if ( CLuaTimer* pLuaTimer = UserDataCast < CLuaTimer > ( (CLuaTimer*)NULL, ptr, luaVM ) )
+    {
+        return GetClassTypeName ( pLuaTimer );
+    }
+
+    // Try resource
+    if ( CResource* pResource = UserDataCast < CResource > ( (CResource*)NULL, ptr, NULL ) )
+    {
+        return GetClassTypeName ( pResource );
+    }
+
+    return "";
+}
+
+
 //
 // Reading mixed types
 //

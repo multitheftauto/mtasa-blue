@@ -77,3 +77,36 @@ IMPLEMENT_ENUM_BEGIN( eHudComponent )
     ADD_ENUM ( HUD_CROSSHAIR,       "crosshair" )
     ADD_ENUM ( HUD_ALL,             "all" )
 IMPLEMENT_ENUM_END( "hud-component" )
+
+
+//
+// Get best guess at name of userdata type
+//
+SString GetUserDataClassName ( void* ptr, lua_State* luaVM )
+{
+    // Try element
+    if ( CElement* pElement = UserDataCast < CElement > ( (CElement*)NULL, ptr, NULL ) )
+    {
+        return pElement->GetTypeName ();
+    }
+
+    // Try xml node
+    if ( CXMLNode* pXMLNode = UserDataCast < CXMLNode > ( (CXMLNode*)NULL, ptr, NULL ) )
+    {
+        return GetClassTypeName ( pXMLNode );
+    }
+
+    // Try timer
+    if ( CLuaTimer* pLuaTimer = UserDataCast < CLuaTimer > ( (CLuaTimer*)NULL, ptr, luaVM ) )
+    {
+        return GetClassTypeName ( pLuaTimer );
+    }
+
+    // Try resource
+    if ( CResource* pResource = UserDataCast < CResource > ( (CResource*)NULL, ptr, NULL ) )
+    {
+        return GetClassTypeName ( pResource );
+    }
+
+    return "";
+}
