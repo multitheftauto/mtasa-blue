@@ -21,6 +21,7 @@ DECLARE_ENUM( TrafficLight::EColor );
 DECLARE_ENUM( TrafficLight::EState );
 DECLARE_ENUM( CEasingCurve::eType );
 DECLARE_ENUM( eAmbientSoundType )
+DECLARE_ENUM( eCGUIType );
 
 enum eDXHorizontalAlign
 {
@@ -121,9 +122,23 @@ inline SString GetClassTypeName ( CGUIScrollPane* )  { return "gui-scrollpane"; 
 inline SString GetClassTypeName ( CGUIScrollBar* )   { return "gui-scrollbar"; }
 inline SString GetClassTypeName ( CGUIComboBox* )    { return "gui-combobox"; }
 
+inline SString GetClassTypeName ( CResource* )              { return "resource-data"; }
 inline SString GetClassTypeName ( CXMLNode* )               { return "xml-node"; }
 inline SString GetClassTypeName ( CLuaTimer* )              { return "lua-timer"; }
 inline SString GetClassTypeName ( CEntity* )                { return "entity"; }
+
+
+//
+// CResource from userdata
+//
+template < class T >
+CResource* UserDataCast ( CResource*, void* ptr, lua_State* )
+{
+    CResource* pResource = reinterpret_cast < CResource* > ( ptr );
+    if ( CLuaDefs::m_pResourceManager->Exists ( pResource ) )
+        return pResource;
+    return NULL;
+}
 
 
 //
@@ -211,6 +226,8 @@ CEntity* UserDataCast ( CEntity*, void* ptr, lua_State* )
     }
     return pEntity;
 }
+
+SString GetUserDataClassName ( void* ptr, lua_State* luaVM );
 
 
 //

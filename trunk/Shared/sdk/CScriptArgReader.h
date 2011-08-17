@@ -421,20 +421,26 @@ public:
             return "No error";
 
         int             iGotArgumentType    = lua_type ( m_luaVM, m_iErrorIndex );
-        const SString&  strGotArgumentType  = EnumToString ( (eLuaType)iGotArgumentType );
-        const char *    szGotArgumentValue  = lua_tostring ( m_luaVM, m_iErrorIndex );
+        SString         strGotArgumentType  = EnumToString ( (eLuaType)iGotArgumentType );
+        SString         strGotArgumentValue = lua_tostring ( m_luaVM, m_iErrorIndex );
 
         // Compose error message
         SString strMessage ( "Expected %s at argument %d", *m_strErrorExpectedType, m_iErrorIndex );
 
-        // Avoid things like 'Expected element, got userdata'
-        if ( iGotArgumentType != LUA_TLIGHTUSERDATA )
+        if ( iGotArgumentType == LUA_TLIGHTUSERDATA )
+        {
+	        // Get name of userdata type
+            strGotArgumentType = GetUserDataClassName ( lua_touserdata ( m_luaVM, m_iErrorIndex ), m_luaVM );
+            strGotArgumentValue = "";
+        }
+
+        if ( !strGotArgumentType.empty () )
         {
             strMessage += SString ( ", got %s", *strGotArgumentType );
 
             // Append value if available
-            if ( szGotArgumentValue && szGotArgumentValue[0] )
-                strMessage += SString ( " '%s'", szGotArgumentValue );
+            if ( !strGotArgumentValue.empty () )
+                strMessage += SString ( " '%s'", *strGotArgumentValue );
         }
 
         return strMessage;

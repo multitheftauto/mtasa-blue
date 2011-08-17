@@ -72,9 +72,24 @@ inline SString GetClassTypeName ( CDummy* )         { return "dummy"; }
 inline SString GetClassTypeName ( CScriptFile* )    { return "scriptfile"; }
 inline SString GetClassTypeName ( CWater* )         { return "water"; }
 
+inline SString GetClassTypeName ( CResource* )      { return "resource-data"; }
 inline SString GetClassTypeName ( CXMLNode* )       { return "xml-node"; }
 inline SString GetClassTypeName ( CLuaTimer* )      { return "lua-timer"; }
 inline SString GetClassTypeName ( CAccount* )       { return "account"; }
+
+
+
+//
+// CResource from userdata
+//
+template < class T >
+CResource* UserDataCast ( CResource*, void* ptr, lua_State* )
+{
+    CResource* pResource = reinterpret_cast < CResource* > ( ptr );
+    if ( g_pGame->GetResourceManager ()->Exists ( pResource ) )
+        return pResource;
+    return NULL;
+}
 
 
 //
@@ -142,3 +157,5 @@ bool CheckWrappedUserDataType ( CElement*& pElement, SString& strErrorExpectedTy
     strErrorExpectedType = GetClassTypeName ( (T*)0 );
     return false;
 }
+
+SString GetUserDataClassName ( void* ptr, lua_State* luaVM );
