@@ -474,6 +474,7 @@ void CMainMenu::Update ( void )
                 float fProgress = (m_pHoveredItem->image->GetAlpha()-CORE_MTA_NORMAL_ALPHA)/(CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
 			    // Let's work out what the target progress should be by working out the time passed
 			    fProgress = ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA) + fProgress;
+                MapRemove ( m_unhoveredItems, m_pHoveredItem );
                 SetItemHoverProgress ( m_pHoveredItem, fProgress, true );
             }
 

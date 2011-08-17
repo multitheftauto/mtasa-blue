@@ -400,7 +400,7 @@ void CChat::ClearInput ( void )
 {
     m_strInputText.clear ();
     m_InputLine.Clear ();
-    m_vecInputSize = CVector2D ( m_vecBackgroundSize.fX, ( GetFontHeight ( m_vecScale.fY ) * ( ( float ) m_InputLine.m_ExtraLines.size () + 1.25f ) ) );
+    m_vecInputSize = CalcInputSize ();
     if ( m_pInput )
         m_pInput->SetSize ( m_vecInputSize );
 }
@@ -580,10 +580,7 @@ void CChat::UpdateGUI ( void )
         m_vecBackgroundPosition.fX,
         m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY
     );
-    m_vecInputSize = CVector2D (
-        m_vecBackgroundSize.fX,
-        CChat::GetFontHeight ( m_vecScale.fY ) * 1.25f
-    );
+    m_vecInputSize = CalcInputSize ();
     if ( m_pInput )
     {
         m_pInput->SetPosition ( m_vecInputPosition );
@@ -624,6 +621,11 @@ void CChat::SetInputPrefix ( const char* szPrefix )
     m_InputLine.m_Prefix.SetText ( szPrefix );
 }
 
+CVector2D CChat::CalcInputSize ( void )
+{
+    return CVector2D ( m_vecBackgroundSize.fX, ( GetFontHeight ( m_vecScale.fY ) * ( ( float ) m_InputLine.m_ExtraLines.size () + 1.25f ) ) );
+}
+
 void CChat::SetInputText ( const char* szText )
 {
     m_InputLine.Clear ();
@@ -649,7 +651,7 @@ void CChat::SetInputText ( const char* szText )
     if ( szRemainingText )
         m_strInputText.resize ( szRemainingText - szText );
 
-    m_vecInputSize = CVector2D ( m_vecBackgroundSize.fX, ( CChat::GetFontHeight ( m_vecScale.fY ) * ( ( float ) m_InputLine.m_ExtraLines.size () + 1.25f ) ) );
+    m_vecInputSize = CalcInputSize ();
     if ( m_pInput )
         m_pInput->SetSize ( m_vecInputSize );
 }
@@ -685,19 +687,6 @@ float CChat::GetFontHeight ( float fScale )
         return g_pChat->m_pFont->GetFontHeight ( fScale );
     }
     return g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, g_pChat->m_pDXFont );
-}
-
-
-float CChat::GetCharacterWidth ( int iChar, float fScale )
-{
-    if ( !g_pChat )
-        return 0.0f;
-
-    if ( g_pChat->m_bUseCEGUI )
-    {
-        return g_pChat->m_pFont->GetCharacterWidth ( iChar, fScale );
-    }
-    return g_pCore->GetGraphics ()->GetDXCharacterWidth ( ( char ) iChar, fScale, g_pChat->m_pDXFont );
 }
 
 
@@ -781,7 +770,7 @@ bool CChatLine::IsColorCode ( const char* szColorCode )
 
 const char* CChatLine::Format ( const char* szString, float fWidth, CColor& color, bool bColorCoded )
 {
-    float fCurrentWidth = 0.0f;
+    float fPrevSectionsWidth = 0.0f;
     m_Sections.clear ();
 
     const char* szSectionStart = szString;
@@ -799,13 +788,14 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
 
         szSectionStart = szSectionEnd;
         szLastWrapPoint = szSectionStart;
-        unsigned int uiSeekPos = 1;
+        unsigned int uiSeekPos = 0;
+		SString strSectionStart = szSectionStart;
 
         while ( true )      // find end of this section
         {
-            unsigned int uiCharWidth = CChat::GetTextExtent ( std::string(szString).substr(0,uiSeekPos).c_str(), g_pChat->m_vecScale.fX );
+            float fSectionWidth = CChat::GetTextExtent ( strSectionStart.substr ( 0 , uiSeekPos ).c_str (), g_pChat->m_vecScale.fX );
 
-            if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || uiCharWidth > fWidth )
+            if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || fPrevSectionsWidth + fSectionWidth > fWidth )
             {
                 bLastSection = true;
                 break;
@@ -815,6 +805,7 @@ const char* CChatLine::Format ( const char* szString, float fWidth, CColor& colo
                 unsigned long ulColor = 0;
                 sscanf ( szSectionEnd + 1, "%06x", &ulColor );
                 color = ulColor;
+                fPrevSectionsWidth += fSectionWidth;
                 break;
             }
             if ( isspace ( (unsigned char)*szSectionEnd ) || ispunct ( (unsigned char)*szSectionEnd ) )
@@ -983,12 +974,8 @@ float CChatLineSection::GetWidth ()
 {
     if ( m_fCachedWidth < 0.0f || m_strText.size () != m_uiCachedLength )
     {
-        m_fCachedWidth = 0.0f;
-        for ( unsigned int i = 0; i < m_strText.size (); i++ )
-        {
-            m_fCachedWidth += CChat::GetCharacterWidth ( m_strText [ i ], g_pChat->m_vecScale.fX );            
-        }
+        m_fCachedWidth = CChat::GetTextExtent ( m_strText.c_str (), g_pChat->m_vecScale.fX ) / Max ( 0.01f, g_pChat->m_vecScale.fX );
         m_uiCachedLength = m_strText.size ();
     }
-    return m_fCachedWidth;
+    return m_fCachedWidth * g_pChat->m_vecScale.fX;
 }
