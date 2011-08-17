@@ -17,6 +17,7 @@
 using namespace std;
 
 extern CCore* g_pCore;
+std::set < CServerListItem* > CServerListItem::ms_ValidServerListItemMap;
 
 CServerList::CServerList ( void )
 {
