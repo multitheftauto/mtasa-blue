@@ -95,6 +95,7 @@ private:
     bool        m_bLoop;
 
     // Info
+    bool        m_bDoneCreate;
     double      m_dLength;
     SString     m_strStreamName;
     SString     m_strStreamTitle;
