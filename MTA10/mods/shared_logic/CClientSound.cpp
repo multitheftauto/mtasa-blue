@@ -105,10 +105,14 @@ bool CClientSound::Create ( void )
 
     // Initial state
     m_pAudio = new CBassAudio ( m_bStream, m_strPath, m_bLoop, m_b3D );
+    m_bDoneCreate = true;
 
     // Load file/start connect
     if ( !m_pAudio->BeginLoadingMedia () )
         return false;
+
+    // Get and save length
+    m_dLength = m_pAudio->GetLength ();
 
     // Transfer dynamic state
     m_pAudio->SetVolume ( m_fVolume );
@@ -164,7 +168,7 @@ void CClientSound::BeginSimulationOfPlayPosition ( void )
     if ( m_b3D && !m_bStream )
     {
         m_SimulatedPlayPosition.SetLooped ( m_bLoop );
-        m_SimulatedPlayPosition.SetLength ( GetLength () );
+        m_SimulatedPlayPosition.SetLength ( m_dLength );
         m_SimulatedPlayPosition.SetPaused ( m_bPaused );
         m_SimulatedPlayPosition.SetPlaybackSpeed( GetPlaybackSpeed () );
         m_SimulatedPlayPosition.SetPlayPositionNow ( GetPlayPosition () );
@@ -184,7 +188,7 @@ void CClientSound::EndSimulationOfPlayPositionAndApply ( void )
 {
     if ( m_SimulatedPlayPosition.IsValid () )
     {
-        m_SimulatedPlayPosition.SetLength ( GetLength () );
+        m_SimulatedPlayPosition.SetLength ( m_dLength );
         m_pAudio->SetPlayPosition ( m_SimulatedPlayPosition.GetPlayPositionNow () );
         m_SimulatedPlayPosition.SetValid ( false );
     }
@@ -281,18 +285,13 @@ double CClientSound::GetPlayPosition ( void )
 
 double CClientSound::GetLength ( void )
 {
-    if ( m_pAudio )
+    if ( !m_bDoneCreate && !m_bStream )
     {
-        // Use actual audio if active
-        m_dLength = m_pAudio->GetLength ();
-        // Update the saved state here as well
-        return m_dLength;
+        // If never loaded, do a create and destroy to get the length
+        Create ();
+        Destroy ();
     }
-    else
-    {
-        // Use saved state if not active
-        return m_dLength <= 0 ? DEFAULT_SOUND_LENGTH : m_dLength;
-    }
+    return m_dLength;
 }
 
 float CClientSound::GetVolume ( void )
