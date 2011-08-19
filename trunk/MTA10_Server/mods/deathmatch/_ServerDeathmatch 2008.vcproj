@@ -533,6 +533,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CElementRefManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CEvents.cpp"
 					>
 				</File>
@@ -1619,6 +1623,10 @@
 				</File>
 				<File
 					RelativePath=".\logic\CElementIDs.h"
+					>
+				</File>
+				<File
+					RelativePath=".\logic\CElementRefManager.h"
 					>
 				</File>
 				<File

@@ -105,6 +105,8 @@ public:
     void                                        GetChildren                 ( lua_State* pLua );
     bool                                        IsMyChild                   ( CElement* pElement, bool bRecursive );
     void                                        ClearChildren               ( void );
+    void                                        GetDescendants              ( std::vector < CElement* >& outResult );
+    void                                        GetDescendantsByType        ( std::vector < CElement* >& outResult, int type );
 
     inline CMapEventManager*                    GetEventManager             ( void )                        { return m_pEventManager; };
     inline CElement*                            GetParentEntity             ( void )                        { return m_pParent; };

@@ -4,7 +4,7 @@
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:
-*  PURPOSE:
+*  PURPOSE:     Help prevent invalid element pointers by removing refs when an element is deleted
 *  DEVELOPERS:
 *
 *****************************************************************************/

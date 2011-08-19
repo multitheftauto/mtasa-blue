@@ -141,6 +141,8 @@ CElement::~CElement ( void )
     // Ensure intrusive list nodes have been isolated
     assert ( m_FromRootNode.m_pOuterItem == this && !m_FromRootNode.m_pPrev && !m_FromRootNode.m_pNext );
     assert ( m_ChildrenNode.m_pOuterItem == this && !m_ChildrenNode.m_pPrev && !m_ChildrenNode.m_pNext );
+
+    CElementRefManager::OnElementDelete ( this );
 }
 
 
@@ -224,6 +226,29 @@ void CElement::FindAllChildrenByType ( const char* szType, lua_State* pLua )
     else
     {
         FindAllChildrenByTypeIndex ( uiTypeHash, pLua, uiIndex );
+    }
+}
+
+// TODO - Make this use GetEntitiesFromRoot
+void CElement::GetDescendants ( std::vector < CElement* >& outResult )
+{
+    for ( CChildListType::const_iterator iter = m_Children.begin () ; iter != m_Children.end () ; ++iter )
+    {
+        CElement* pChild = *iter;
+        outResult.push_back ( pChild );
+        pChild->GetDescendants ( outResult );
+    }
+}
+
+// TODO - Make this use GetEntitiesFromRoot
+void CElement::GetDescendantsByType ( std::vector < CElement* >& outResult, int type )
+{
+    for ( CChildListType::const_iterator iter = m_Children.begin () ; iter != m_Children.end () ; ++iter )
+    {
+        CElement* pChild = *iter;
+        if ( pChild->GetType () == type )
+            outResult.push_back ( pChild );
+        pChild->GetDescendantsByType ( outResult, type );
     }
 }
 

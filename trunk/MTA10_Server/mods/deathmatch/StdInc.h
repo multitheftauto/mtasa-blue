@@ -173,6 +173,7 @@
 #include "CElementDeleter.h"
 #include "CElementGroup.h"
 #include "CElementIDs.h"
+#include "CElementRefManager.h"
 #include "CEvents.h"
 #include "CGame.h"
 #include "CGroups.h"
