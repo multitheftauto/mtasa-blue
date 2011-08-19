@@ -161,19 +161,12 @@ list < CPlayer* > ::const_iterator CPlayerManager::IterGet ( ElementID PlayerID 
 }
 
 
-void CPlayerManager::Broadcast ( const CPacket& Packet, list < CPlayer * > & playersList )
-{
-    // Send the packet to each player in the supplied list
-    list < CPlayer* > ::iterator iter = playersList.begin ();
-    for ( ; iter != playersList.end (); iter++ )
-    {
-        (*iter)->Send ( Packet );
-    }
-}
-
 // TODO [28-Feb-2009] packetOrdering is currently always PACKET_ORDERING_GAME
 void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip )
 {
+    // Make a list of players to send this packet to
+    std::vector < CPlayer* > sendList;
+
     // Send the packet to each ingame player on the server except the skipped one
     list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
@@ -181,10 +174,108 @@ void CPlayerManager::BroadcastOnlyJoined ( const CPacket& Packet, CPlayer* pSkip
         CPlayer* pPlayer = *iter;
         if ( pPlayer != pSkip && pPlayer->IsJoined () )
         {
-            pPlayer->Send ( Packet );
+            sendList.push_back ( pPlayer );
         }
     }
+
+    CPlayerManager::Broadcast ( Packet, sendList );
 }
+
+
+
+// Send one packet to a list of players
+void CPlayerManager::Broadcast ( const CPacket& Packet, const std::set < CPlayer* >& sendList )
+{
+    Broadcast ( Packet, std::vector < CPlayer* > ( sendList.begin (), sendList.end () ) );
+}
+
+// Send one packet to a list of players
+void CPlayerManager::Broadcast ( const CPacket& Packet, const std::list < CPlayer* >& sendList )
+{
+    Broadcast ( Packet, std::vector < CPlayer* > ( sendList.begin (), sendList.end () ) );
+}
+
+// Send one packet to a list of players
+void CPlayerManager::Broadcast ( const CPacket& Packet, const std::vector < CPlayer* >& sendList )
+{
+    // Use the flags to determine how to send it
+    NetServerPacketReliability Reliability;
+    unsigned long ulFlags = Packet.GetFlags ();
+    if ( ulFlags & PACKET_RELIABLE )
+    {
+        if ( ulFlags & PACKET_SEQUENCED )
+        {
+            Reliability = PACKET_RELIABILITY_RELIABLE_ORDERED;
+        }
+        else
+        {
+            Reliability = PACKET_RELIABILITY_RELIABLE;
+        }
+    }
+    else
+    {
+        if ( ulFlags & PACKET_SEQUENCED )
+        {
+            Reliability = PACKET_RELIABILITY_UNRELIABLE_SEQUENCED;
+        }
+        else
+        {
+            Reliability = PACKET_RELIABILITY_UNRELIABLE;
+        }
+    }
+    NetServerPacketPriority packetPriority = PACKET_PRIORITY_MEDIUM;
+    if ( ulFlags & PACKET_HIGH_PRIORITY )
+    {
+        packetPriority = PACKET_PRIORITY_HIGH;
+    }
+    else if ( ulFlags & PACKET_LOW_PRIORITY )
+    {
+        packetPriority = PACKET_PRIORITY_LOW;
+    }
+
+    // Group players by bitstream version
+    std::multimap < ushort, CPlayer* > groupMap;
+    for ( std::vector < CPlayer* >::const_iterator iter = sendList.begin () ; iter != sendList.end () ; ++iter )
+    {
+        CPlayer* pPlayer = *iter;
+        MapInsert ( groupMap, pPlayer->GetBitStreamVersion (), pPlayer );
+    }
+
+    // For each bitstream version, make and send a packet
+    typedef std::multimap < ushort, CPlayer* > ::iterator mapIter;
+    mapIter m_it, s_it;
+    for ( m_it = groupMap.begin () ; m_it != groupMap.end () ; m_it = s_it )
+    {
+        ushort usBitStreamVersion = (*m_it).first;
+
+        // Allocate a bitstream
+        NetBitStreamInterface* pBitStream = g_pNetServer->AllocateNetServerBitStream ( usBitStreamVersion );
+
+        // Write the content
+        if ( Packet.Write ( *pBitStream ) )
+        {
+            // For each player, send the packet
+            pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
+            for ( s_it = keyRange.first ; s_it != keyRange.second ; ++s_it )
+            {
+                CPlayer* pPlayer = s_it->second;
+                dassert ( usBitStreamVersion == pPlayer->GetBitStreamVersion () );
+                g_pNetServer->SendPacket ( Packet.GetPacketID (), pPlayer->GetSocket (), pBitStream, FALSE, packetPriority, Reliability, PACKET_ORDERING_GAME );
+            }
+        }
+        else
+        {
+            // Skip
+            pair < mapIter , mapIter > keyRange = groupMap.equal_range ( usBitStreamVersion );
+            for ( s_it = keyRange.first ; s_it != keyRange.second ; ++s_it )
+            {}
+        }
+
+        // Destroy the bitstream
+        g_pNetServer->DeallocateNetServerBitStream ( pBitStream );
+    }
+}
+
 
 
 bool CPlayerManager::IsValidPlayerModel ( unsigned short usPlayerModel )

@@ -254,11 +254,7 @@ void CPerPlayerEntity::BroadcastOnlyVisible ( const CPacket& Packet )
     if ( m_bIsSynced )
     {
         // Send it to all players we're visible to
-        list < CPlayer* > ::const_iterator iter = m_Players.begin ();
-        for ( ; iter != m_Players.end (); iter++ )
-        {
-            (*iter)->Send ( Packet );
-        }
+        CPlayerManager::Broadcast ( Packet, m_Players );
     }
 }
 
