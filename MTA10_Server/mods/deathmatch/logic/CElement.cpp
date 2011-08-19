@@ -230,25 +230,31 @@ void CElement::FindAllChildrenByType ( const char* szType, lua_State* pLua )
 }
 
 // TODO - Make this use GetEntitiesFromRoot
-void CElement::GetDescendants ( std::vector < CElement* >& outResult )
+void CElement::GetDescendants ( std::vector < CElement* >& outResult, bool bIncludeThis )
 {
+    if ( bIncludeThis )
+        outResult.push_back ( this );
+
     for ( CChildListType::const_iterator iter = m_Children.begin () ; iter != m_Children.end () ; ++iter )
     {
         CElement* pChild = *iter;
         outResult.push_back ( pChild );
-        pChild->GetDescendants ( outResult );
+        pChild->GetDescendants ( outResult, false );
     }
 }
 
 // TODO - Make this use GetEntitiesFromRoot
-void CElement::GetDescendantsByType ( std::vector < CElement* >& outResult, int type )
+void CElement::GetDescendantsByType ( std::vector < CElement* >& outResult, bool bIncludeThis, int type )
 {
+    if ( bIncludeThis && GetType () == type )
+        outResult.push_back ( this );
+
     for ( CChildListType::const_iterator iter = m_Children.begin () ; iter != m_Children.end () ; ++iter )
     {
         CElement* pChild = *iter;
         if ( pChild->GetType () == type )
             outResult.push_back ( pChild );
-        pChild->GetDescendantsByType ( outResult, type );
+        pChild->GetDescendantsByType ( outResult, false, type );
     }
 }
 

@@ -20,7 +20,7 @@ void    SString_Tests                   ( void );
 void    SharedUtil_File_Tests           ( void );
 void    SharedUtil_ClassIdent_Tests     ( void );
 void 	SharedUtil_WildcardMatch_Tests  ( void );
-
+void    SharedUtil_Collection_Tests     ( void );
 
 ///////////////////////////////////////////////////////////////
 //
@@ -35,6 +35,7 @@ void SharedUtil_Tests ( void )
     SharedUtil_File_Tests ();
     SharedUtil_ClassIdent_Tests ();
     SharedUtil_WildcardMatch_Tests ();
+    SharedUtil_Collection_Tests ();
 }
 
 
@@ -512,6 +513,94 @@ void SharedUtil_WildcardMatch_Tests ( void )
             "A?*",          "BAA",                  false,
         TEST_END
     }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// SharedUtil_Collection_Tests
+//
+// Test behaviour of iterators and such
+//
+///////////////////////////////////////////////////////////////
+void SharedUtil_Collection_Tests ( void )
+{
+    // std::map
+    {
+        std::map < uint, SString > testMap;
+        MapSet ( testMap, 10, "10" );
+        MapSet ( testMap, 20, "20" );
+        MapSet ( testMap, 30, "30" );
+        MapSet ( testMap, 40, "40" );
+
+        std::map < uint, SString >::iterator iter = testMap.begin ();
+        assert ( iter->first == 10 );
+        iter++;
+        assert ( iter->first == 20 );
+        iter++;
+        testMap.erase ( iter++ );
+        assert ( iter->first == 40 );
+        iter++;
+        assert ( iter == testMap.end () );
+    }
+
+    // std::set
+    {
+        std::set < uint > testMap;
+        MapInsert ( testMap, 10 );
+        MapInsert ( testMap, 20 );
+        MapInsert ( testMap, 30 );
+        MapInsert ( testMap, 40 );
+
+        std::set < uint >::iterator iter = testMap.begin ();
+        assert ( *iter == 10 );
+        iter++;
+        assert ( *iter == 20 );
+        iter++;
+        testMap.erase ( iter++ );
+        assert ( *iter == 40 );
+        iter++;
+        assert ( iter == testMap.end () );
+    }
+
+    // std::list
+    {
+        std::list < uint > testList;
+        testList.push_back ( 10 );
+        testList.push_back ( 20 );
+        testList.push_back ( 30 );
+        testList.push_back ( 40 );
+
+        std::list < uint >::iterator iter = testList.begin ();
+        assert ( *iter == 10 );
+        iter++;
+        assert ( *iter == 20 );
+        iter++;
+        iter = testList.erase ( iter );
+        assert ( *iter == 40 );
+        iter++;
+        assert ( iter == testList.end () );
+    }
+
+    // std::vector
+    {
+        std::vector < uint > testList;
+        testList.push_back ( 10 );
+        testList.push_back ( 20 );
+        testList.push_back ( 30 );
+        testList.push_back ( 40 );
+
+        std::vector < uint >::iterator iter = testList.begin ();
+        assert ( *iter == 10 );
+        iter++;
+        assert ( *iter == 20 );
+        iter++;
+        iter = testList.erase ( iter );
+        assert ( *iter == 40 );
+        iter++;
+        assert ( iter == testList.end () );
+    }
+
 }
 
 #endif  // MTA_DEBUG

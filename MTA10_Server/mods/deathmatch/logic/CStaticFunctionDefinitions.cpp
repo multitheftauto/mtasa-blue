@@ -153,14 +153,18 @@ bool CStaticFunctionDefinitions::TriggerClientEvent ( CElement* pElement, const 
     assert ( pElement );
     assert ( szName );
     assert ( pCallWithElement );
-    RUN_CHILDREN TriggerClientEvent ( *iter, szName, pCallWithElement, Arguments );
 
-    if ( IS_PLAYER ( pElement ) )
-    {
-        CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
-        CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), Arguments );
-        pPlayer->Send ( Packet );
-    }
+    // Make packet
+    CLuaEventPacket Packet ( szName, pCallWithElement->GetID (), Arguments );
+
+    // Make send list
+    std::vector < CPlayer* > sendList;
+
+    // Get descendants (incl. pElement if a player)
+    pElement->GetDescendantsByType ( sendList, true, CElement::PLAYER );
+
+    // Send packet to players
+    CPlayerManager::Broadcast ( Packet, sendList );
 
     return true;
 }

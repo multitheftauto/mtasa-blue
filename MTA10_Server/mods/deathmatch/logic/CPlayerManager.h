@@ -49,8 +49,11 @@ public:
     inline std::list < CPlayer* > ::const_iterator  IterGet                     ( CPlayer* pPlayer );
     inline std::list < CPlayer* > ::const_iterator  IterGet                     ( ElementID PlayerID );
 
-    void                                        Broadcast                       ( const CPacket& Packet, std::list < CPlayer * > & playersList );
     void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL );
+
+    static void                                 Broadcast                       ( const CPacket& Packet, const std::set < CPlayer* >& sendList );
+    static void                                 Broadcast                       ( const CPacket& Packet, const std::list < CPlayer* >& sendList );
+    static void                                 Broadcast                       ( const CPacket& Packet, const std::vector < CPlayer* >& sendList );
 
     static bool                                 IsValidPlayerModel              ( unsigned short usPlayerModel );
 

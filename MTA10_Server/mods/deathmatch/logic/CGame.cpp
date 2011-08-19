@@ -1749,6 +1749,8 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 // Relay this (pure sync) packet to all the other players using distance rules
 void CGame::RelayPlayerPuresync ( CPacket& Packet )
 {
+    // Make a list of players to send this packet to
+    std::vector < CPlayer* > sendList;
 
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer->IsTimeForFarSync () )
@@ -1760,7 +1762,7 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
         {
             CPlayer* pSendPlayer = *iter;
             if ( pSendPlayer != pPlayer )
-                pSendPlayer->Send ( Packet );
+                sendList.push_back ( pSendPlayer );
         }
     }
     else
@@ -1782,11 +1784,14 @@ void CGame::RelayPlayerPuresync ( CPacket& Packet )
             }
             else
             {
-                pSendPlayer->Send ( Packet );
+                sendList.push_back ( pSendPlayer );
                 it++;
             }
         }
     }
+
+    // Relay packet
+    CPlayerManager::Broadcast ( Packet, sendList );
 }
 
 
@@ -1906,6 +1911,9 @@ void CGame::Packet_Keysync ( CKeysyncPacket& Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
+        // Make a list of players to send this packet to
+        std::vector < CPlayer* > sendList;
+
         // Grab the position of the source player
         const CVector& vecSourcePosition = pPlayer->GetPosition ();
 
@@ -1927,10 +1935,12 @@ void CGame::Packet_Keysync ( CKeysyncPacket& Packet )
                 if ( IsPointNearPoint3D ( vecSourcePosition, vecCameraPosition, MAX_KEYSYNC_DISTANCE ) )
                 {
                     // Send the packet to him
-                    pSendPlayer->Send ( Packet );
+                    sendList.push_back ( pSendPlayer );
                 }
             }
         }
+
+        CPlayerManager::Broadcast ( Packet, sendList );
     }
 }
 
@@ -2087,12 +2097,14 @@ void CGame::Packet_ExplosionSync ( CExplosionSyncPacket& Packet )
 
         if ( bBroadcast )
         {
+            // Make a list of players to send this packet to
+            std::vector < CPlayer* > sendList;
+
             // Loop through all the players
-            CPlayer* pSendPlayer;
             std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
             for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
             {
-                pSendPlayer = *iter;
+                CPlayer* pSendPlayer = *iter;
 
                 // We tell the reporter to create the explosion too
                 // Grab this player's camera position
@@ -2103,9 +2115,11 @@ void CGame::Packet_ExplosionSync ( CExplosionSyncPacket& Packet )
                 if ( IsPointNearPoint3D ( vecPosition, vecCameraPosition, MAX_EXPLOSION_SYNC_DISTANCE ) )
                 {
                     // Send the packet to him
-                    pSendPlayer->Send ( Packet );
+                    sendList.push_back ( pSendPlayer );
                 }
             }
+
+            CPlayerManager::Broadcast ( Packet, sendList );
         }
     }
 }
@@ -2125,12 +2139,14 @@ void CGame::Packet_ProjectileSync ( CProjectileSyncPacket& Packet )
                 vecPosition += pOriginSource->GetPosition ();
         }
 
+        // Make a list of players to send this packet to
+        std::vector < CPlayer* > sendList;
+
         // Loop through all the players
-        CPlayer* pSendPlayer;
         std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
         for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
         {
-            pSendPlayer = *iter;
+            CPlayer* pSendPlayer = *iter;
 
             // Not the player we got the packet from?
             if ( pSendPlayer != pPlayer )
@@ -2143,10 +2159,11 @@ void CGame::Packet_ProjectileSync ( CProjectileSyncPacket& Packet )
                 if ( IsPointNearPoint3D ( vecPosition, vecCameraPosition, MAX_PROJECTILE_SYNC_DISTANCE ) )
                 {
                     // Send the packet to him
-                    pSendPlayer->Send ( Packet );
+                    sendList.push_back ( pSendPlayer );
                 }
             }
         }
+        CPlayerManager::Broadcast ( Packet, sendList );
     }
 }
 
@@ -2996,7 +3013,7 @@ void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
                         {
                             // Add element decendants
                             std::vector < CPlayer* > descendantList;
-                            pBroadcastElement->GetDescendantsByType ( (std::vector < CElement* >&)descendantList, CElement::PLAYER );
+                            pBroadcastElement->GetDescendantsByType ( descendantList, false, CElement::PLAYER );
                             for ( std::vector < CPlayer* >::const_iterator iter = descendantList.begin() ; iter != descendantList.end() ; ++iter )
                             {
                                 playerSendMap.insert ( *iter );
@@ -3004,12 +3021,17 @@ void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
                         }
                     }
 
-                    // Send to all players in the send list except ourselves and ignored
-                    for ( std::set < CPlayer* >::iterator iter = playerSendMap.begin () ; iter != playerSendMap.end (); ++iter )
+                    // Filter out ourselves and ignored
+                    for ( std::set < CPlayer* >::iterator iter = playerSendMap.begin () ; iter != playerSendMap.end () ; )
                     {
-                        if ( *iter != pPlayer && !(*iter)->IsPlayerIgnoringElement(pPlayer) )
-                            (*iter)->Send ( VoicePacket );
+                        if ( *iter == pPlayer || (*iter)->IsPlayerIgnoringElement ( pPlayer ) )
+                            playerSendMap.erase ( iter++ );
+                        else
+                            ++iter;
                     }
+
+                    // Send to all players in the send list
+                    CPlayerManager::Broadcast ( VoicePacket, playerSendMap );
                 }
             }
         }

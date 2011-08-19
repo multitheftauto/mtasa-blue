@@ -53,9 +53,6 @@ public:
     inline unsigned long                GetSourceIP         ( void ) const                                      { return m_Source.GetBinaryAddress (); };
     inline unsigned short               GetSourcePort       ( void ) const                                      { return m_Source.GetPort (); };
 
-    virtual void                        Send                ( CPlayer* pPlayer ) const;
-private:
-    
 protected:
     CElement*                           m_pSourceElement;
     NetServerPlayerID                   m_Source;    
