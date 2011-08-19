@@ -2972,69 +2972,46 @@ void CGame::Packet_Voice_Data ( CVoiceDataPacket& Packet )
                     const unsigned char* pBuffer = Packet.GetData();
                     CVoiceDataPacket VoicePacket(pPlayer, pBuffer, usDataLength);
 
-                    // Send the packet to those who are on the players broadcast list
-                    if ( pPlayer->IsUsingBroadcastList() ) // We have a list instead of a single element to broadcast to
-                    {
-                        list < CElement* > ::const_iterator iter = pPlayer->IterBroadcastListBegin() ;
-                        for ( ; iter != pPlayer->IterBroadcastListEnd(); iter++ )
-                        {
-                            if ( IS_TEAM(*iter) )
-                            {
-                                CTeam* pTeam = static_cast < CTeam* > ( *iter );
-                                list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
-                                for ( ; iter != pTeam->PlayersEnd (); iter++ )
-                                {
-                                    if ( *iter != pPlayer && !(*iter)->IsPlayerIgnoringElement(pPlayer) ) // Don't send to ourselves, and only send if the target doesn't have this player on ignore
-                                        (*iter)->Send ( VoicePacket );
-                                }
-                            }
-                            else if ( IS_PLAYER(*iter) )
-                            {
-                                CPlayer* pTargetPlayer = static_cast < CPlayer* > ( *iter );
+                    // Make list of players to send the voice packet to
+                    std::set < CPlayer* > playerSendMap;
 
-                                if ( pTargetPlayer != pPlayer && !pTargetPlayer->IsPlayerIgnoringElement( pPlayer ) ) // only send if the target player isn't ignoring the sender
-                                {
-                                    pTargetPlayer->Send( VoicePacket );
-                                }
-                            }
-                        }
-                    }
-                    else
+                    list < CElement* > ::const_iterator iter = pPlayer->IterBroadcastListBegin() ;
+                    for ( ; iter != pPlayer->IterBroadcastListEnd(); iter++ )
                     {
-                        CElement* pBroadcastElement = pPlayer->GetBroadcastElement();
-
-                        if ( IS_TEAM(pBroadcastElement) )
+                        CElement* pBroadcastElement = *iter;
+                        if ( IS_TEAM( pBroadcastElement ) )
                         {
+                            // Add team members
                             CTeam* pTeam = static_cast < CTeam* > ( pBroadcastElement );
                             list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
                             for ( ; iter != pTeam->PlayersEnd (); iter++ )
+                                playerSendMap.insert ( *iter );
+                        }
+                        else if ( IS_PLAYER( pBroadcastElement ) )
+                        {
+                            // Add a player
+                            playerSendMap.insert ( static_cast < CPlayer* > ( pBroadcastElement ) );
+                        }
+                        else
+                        {
+                            // Add element decendants
+                            std::vector < CPlayer* > descendantList;
+                            pBroadcastElement->GetDescendantsByType ( (std::vector < CElement* >&)descendantList, CElement::PLAYER );
+                            for ( std::vector < CPlayer* >::const_iterator iter = descendantList.begin() ; iter != descendantList.end() ; ++iter )
                             {
-                                if ( *iter != pPlayer && !(*iter)->IsPlayerIgnoringElement(pPlayer) ) // Don't send to ourselves, and only send if the target doesn't have this player on ignore
-                                    (*iter)->Send ( VoicePacket );
+                                playerSendMap.insert ( *iter );
                             }
                         }
-                        else 
-                        {
-                            VoiceBroadcastToPlayer ( pBroadcastElement, pPlayer, VoicePacket );
-                        }
+                    }
+
+                    // Send to all players in the send list except ourselves and ignored
+                    for ( std::set < CPlayer* >::iterator iter = playerSendMap.begin () ; iter != playerSendMap.end (); ++iter )
+                    {
+                        if ( *iter != pPlayer && !(*iter)->IsPlayerIgnoringElement(pPlayer) )
+                            (*iter)->Send ( VoicePacket );
                     }
                 }
             }
-        }
-    }
-}
-
-void CGame::VoiceBroadcastToPlayer ( CElement* pElement, CPlayer* pSourcePlayer, CVoiceDataPacket& pPacket )
-{
-    RUN_CHILDREN VoiceBroadcastToPlayer ( *iter, pSourcePlayer, pPacket );
-
-    if ( IS_PLAYER(pElement) )
-    {
-        CPlayer* pTargetPlayer = static_cast < CPlayer* > ( pElement );
-
-        if ( pTargetPlayer != pSourcePlayer && !pTargetPlayer->IsPlayerIgnoringElement( pSourcePlayer ) ) // only send if the target player isn't ignoring the sender
-        {
-            pTargetPlayer->Send( pPacket );
         }
     }
 }

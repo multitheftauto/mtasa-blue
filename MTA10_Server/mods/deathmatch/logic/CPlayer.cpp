@@ -19,6 +19,10 @@ extern CGame * g_pGame;
 
 CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket ) : CPed ( NULL, NULL, NULL, 0 )
 {
+    CElementRefManager::AddElementRefs ( ELEMENT_REF_DEBUG ( this, "CPlayer" ), &m_pTeam, NULL );
+    CElementRefManager::AddElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstBroadcastList" ), &m_lstBroadcastList );
+    CElementRefManager::AddElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstIgnoredList" ), &m_lstIgnoredList );
+
     // Init
     m_pPlayerManager = pPlayerManager;
     m_pScriptDebugging = pScriptDebugging;
@@ -44,8 +48,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_bAkimboArmUp = false;    
 
     m_VoiceState = VOICESTATE_IDLE;
-    m_pBroadcastElement = g_pGame->GetMapManager()->GetRootElement();
-    m_pIgnoredElement = NULL;
+    m_lstBroadcastList.push_back ( g_pGame->GetMapManager()->GetRootElement() );
     
     m_uiScriptDebugLevel = 0;
 
@@ -145,6 +148,10 @@ CPlayer::~CPlayer ( void )
     // Unparent us (CElement's unparenting will crash because of the incomplete vtable at that point)
     m_bDoNotSendEntities = true;
     SetParentObject ( NULL );
+
+    CElementRefManager::RemoveElementRefs ( ELEMENT_REF_DEBUG ( this, "CPlayer" ), &m_pTeam, NULL );
+    CElementRefManager::RemoveElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstBroadcastList" ), &m_lstBroadcastList );
+    CElementRefManager::RemoveElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstIgnoredList" ), &m_lstIgnoredList );
 }
 
 
@@ -671,45 +678,36 @@ void CPlayer::UpdateOthersNearList ( void )
 
 void CPlayer::SetVoiceBroadcastTo( CElement* pElement )
 {
-    m_lstIgnoredList.clear();
-    m_pBroadcastElement = pElement;
+    m_lstBroadcastList.clear();
+    m_lstBroadcastList.push_back ( pElement );
 }
 
-void CPlayer::SetVoiceBroadcastTo( std::list < CElement* > lstElements )
+void CPlayer::SetVoiceBroadcastTo( const std::list < CElement* >& lstElements )
 {
-    m_pBroadcastElement = NULL;
     m_lstBroadcastList = lstElements;
 }
 
 void CPlayer::SetVoiceIgnoredElement( CElement* pElement )
 {
     m_lstIgnoredList.clear();
-    m_pIgnoredElement = pElement;
+    m_lstIgnoredList.push_back ( pElement );
 }
 
-void CPlayer::SetVoiceIgnoredList( std::list < CElement* > lstElements )
+void CPlayer::SetVoiceIgnoredList( const std::list < CElement* >& lstElements )
 {
-    m_pIgnoredElement = NULL;
     m_lstIgnoredList = lstElements;
 }
 
 bool CPlayer::IsPlayerIgnoringElement( CElement* pElement )
 {
-    if ( IsUsingIgnoredList() )
+    // For each ignored element
+    for ( list < CElement* > ::const_iterator iter = m_lstIgnoredList.begin () ; iter != m_lstIgnoredList.end () ; ++iter )
     {
-        list < CElement* > ::const_iterator iter = IterIgnoredListBegin();
-        for ( ; iter != IterIgnoredListEnd(); iter++ )
+        CElement* pIgnoredElement = *iter;
+        if ( IS_TEAM ( pIgnoredElement ) )
         {
-            if ( *iter == pElement )
-                return true;
-        }
-        return false;
-    }
-    else if ( m_pIgnoredElement ) 
-    {
-        if ( IS_TEAM(m_pIgnoredElement) ) //if a team is  being ignored
-        {
-            CTeam* pTeam = static_cast < CTeam* > ( m_pIgnoredElement );
+            // Check team
+            CTeam* pTeam = static_cast < CTeam* > ( pIgnoredElement );
             // If the broadcast-to player is in the ignored team
             list < CPlayer* > ::const_iterator iter = pTeam->PlayersBegin ();
             for ( ; iter != pTeam->PlayersEnd (); iter++ )
@@ -717,12 +715,18 @@ bool CPlayer::IsPlayerIgnoringElement( CElement* pElement )
                 if ( *iter == pElement )
                     return true;
             }
-            return false;
+        }
+        else if ( IS_PLAYER( pIgnoredElement ) )
+        {
+            // Check player
+            if ( pIgnoredElement == pElement )
+                return true;
         }
         else
         {
-            // See if the broadcast-to player is a descendent of the ignored element
-            return ( m_pIgnoredElement == pElement ) || ( m_pIgnoredElement->IsMyChild(pElement,true) );
+            // Check element decendants
+            if ( pIgnoredElement->IsMyChild ( pElement , true ) )
+                return true;
         }
     }
     return false;

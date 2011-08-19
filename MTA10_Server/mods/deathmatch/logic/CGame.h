@@ -347,8 +347,6 @@ private:
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
     void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
 
-    void                        VoiceBroadcastToPlayer      ( CElement* pElement, CPlayer* pSourcePlayer, CVoiceDataPacket& pPacket );
-
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
     // Technically, this could be put somewhere else.  It's a callback function

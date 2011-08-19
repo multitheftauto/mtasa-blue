@@ -230,21 +230,17 @@ public:
     eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
     void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
 
-    bool                                        IsUsingBroadcastList        ( void )                      { return !m_lstBroadcastList.empty(); }
-    inline std::list < CElement* > ::const_iterator IterBroadcastListBegin  ( void )                      { return m_lstBroadcastList.begin (); };
-    inline std::list < CElement* > ::const_iterator IterBroadcastListEnd    ( void )                      { return m_lstBroadcastList.end (); };
-    CElement*                                   GetBroadcastElement         ( void )                      { return m_pBroadcastElement; }
-    bool                                        IsVoiceMuted                ( void )                      { return m_pBroadcastElement == NULL && !IsUsingBroadcastList(); }
+    std::list < CElement* > ::const_iterator    IterBroadcastListBegin      ( void )                      { return m_lstBroadcastList.begin (); };
+    std::list < CElement* > ::const_iterator    IterBroadcastListEnd        ( void )                      { return m_lstBroadcastList.end (); };
+    bool                                        IsVoiceMuted                ( void )                      { return m_lstBroadcastList.empty (); }
     void                                        SetVoiceBroadcastTo         ( CElement* pElement );
-    void                                        SetVoiceBroadcastTo         ( std::list < CElement* > lstElements );
+    void                                        SetVoiceBroadcastTo         ( const std::list < CElement* >& lstElements );
 
     void                                        SetVoiceIgnoredElement      ( CElement* pElement );
-    void                                        SetVoiceIgnoredList         ( std::list < CElement* > lstElements );
-    inline std::list < CElement* > ::const_iterator IterIgnoredListBegin    ( void )                      { return m_lstIgnoredList.begin (); };
-    inline std::list < CElement* > ::const_iterator IterIgnoredListEnd      ( void )                      { return m_lstIgnoredList.end (); };
-    CElement*                                   GetIgnoredElement           ( void )                      { return m_pIgnoredElement; }
+    void                                        SetVoiceIgnoredList         ( const std::list < CElement* >& lstElements );
+    std::list < CElement* > ::const_iterator    IterIgnoredListBegin        ( void )                      { return m_lstIgnoredList.begin (); };
+    std::list < CElement* > ::const_iterator    IterIgnoredListEnd          ( void )                      { return m_lstIgnoredList.end (); };
     bool                                        IsPlayerIgnoringElement     ( CElement* pElement );
-    bool                                        IsUsingIgnoredList          ( void )                      { return !m_lstIgnoredList.empty(); }
 
 private:
     void                                        WriteCameraModePacket       ( void );
@@ -326,9 +322,7 @@ private:
 
     // Voice
     eVoiceState                                 m_VoiceState;
-    CElement*                                   m_pBroadcastElement;
     std::list < CElement* >                     m_lstBroadcastList;
-    CElement*                                   m_pIgnoredElement;
     std::list < CElement* >                     m_lstIgnoredList;
 
     // Sync stuff
