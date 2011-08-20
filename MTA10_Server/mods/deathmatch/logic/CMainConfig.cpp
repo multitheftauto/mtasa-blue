@@ -21,6 +21,8 @@
 
 extern CGame * g_pGame;
 
+CBandwidthSettings* g_pBandwidthSettings = new CBandwidthSettings ();
+
 using namespace std;
 
 CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConfig ( NULL )
@@ -52,6 +54,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_ucQuality = 4;
     m_bVoiceEnabled = false;
     m_uiBitrate = 0;
+    m_strBandwidthReductionMode = "medium";
 }
 
 
@@ -346,7 +349,33 @@ bool CMainConfig::Load ( const char* szFilename )
     m_bNetworkEncryptionEnabled = true;
     GetBoolean ( m_pRootNode, "networkencryption", m_bNetworkEncryptionEnabled );
 
+    // bandwidth_reduction
+    GetString ( m_pRootNode, "bandwidth_reduction", m_strBandwidthReductionMode );
+    ApplyBandwidthReductionMode ();
+
     return true;
+}
+
+
+//
+// Set those settings!
+//
+void CMainConfig::ApplyBandwidthReductionMode ( void )
+{
+    if ( m_strBandwidthReductionMode == "maximum"  )
+    {
+        g_pBandwidthSettings->SetMaximum ();
+    }
+    else
+    if ( m_strBandwidthReductionMode == "medium"  )
+    {
+        g_pBandwidthSettings->SetMedium ();
+    }
+    else
+    {
+        m_strBandwidthReductionMode = "none";
+        g_pBandwidthSettings->SetNone ();
+    }
 }
 
 
@@ -743,6 +772,12 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         return true;
     }
     else
+    if ( strName == "bandwidth_reduction" )
+    {
+        strValue = m_strBandwidthReductionMode;
+        return true;
+    }
+    else
     {
         //
         // Everything else is read only, so can be fetched directly from the XML data
@@ -802,7 +837,7 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
     else
     if ( strName == "networkencryption" )
     {
-        if ( strValue == "0" || strValue == "1"  )
+        if ( strValue == "0" || strValue == "1" )
         {
             m_bNetworkEncryptionEnabled = atoi ( strValue ) ? true : false;
             if ( bSave )
@@ -814,6 +849,22 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
             return true;
         }
     }
+    else
+    if ( strName == "bandwidth_reduction" )
+    {
+        if ( strValue == "none" || strValue == "medium"  || strValue == "maximum" )
+        {
+            m_strBandwidthReductionMode = strValue;
+            ApplyBandwidthReductionMode ();  
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "bandwidth_reduction", m_strBandwidthReductionMode );
+                Save ();
+            }
+            return true;
+        }
+    }
+
 
     //
     // Everything else is read only, so can't be set

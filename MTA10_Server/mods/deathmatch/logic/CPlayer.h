@@ -28,7 +28,6 @@ class CPlayer;
 #include "CObject.h"
 #include "packets/CPacket.h"
 
-#define SLOW_SYNCRATE               1000
 #define DISTANCE_FOR_SLOW_SYNCRATE  320
 
 class CKeyBinds;
@@ -250,6 +249,7 @@ public:
 
     void                                        SetCameraOrientation        ( const CVector& vecPosition, const CVector& vecFwd );
     bool                                        IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo );
+    int                                         GetSyncZone                 ( CPlayer* pOther );
     const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
     const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
 
@@ -352,6 +352,7 @@ private:
 
     CVector                                     m_vecCamPosition;
     CVector                                     m_vecCamFwd;
+    int                                         m_iLastZoneDebug;
 };
 
 #endif

@@ -15,7 +15,7 @@
 
 #include "StdInc.h"
 
-extern CGame * g_pGame;   
+extern CGame * g_pGame;
 
 CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket ) : CPed ( NULL, NULL, NULL, 0 )
 {
@@ -104,6 +104,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     // Add us to the manager
     pPlayerManager->AddToList ( this );
+    m_iLastZoneDebug = 0;
 }
 
 
@@ -560,8 +561,9 @@ bool CPlayer::IsTimeForFarSync ( void )
     long long llTime = GetTickCount64_ ();
     if ( llTime > m_llNextFarSyncTime )
     {
-        m_llNextFarSyncTime = llTime + SLOW_SYNCRATE;
-        m_llNextFarSyncTime += rand () % ( 1 + SLOW_SYNCRATE / 10 );   // Extra bit to help distribute the load
+        int iSlowSyncRate = g_pBandwidthSettings->ZoneUpdateIntervals [ ZONE3 ];
+        m_llNextFarSyncTime = llTime + iSlowSyncRate;
+        m_llNextFarSyncTime += rand () % ( 1 + iSlowSyncRate / 10 );   // Extra bit to help distribute the load
         return true;
     }
     return false;
@@ -669,7 +671,9 @@ void CPlayer::UpdateOthersNearList ( void )
                 if ( ( vecPlayerPosition - vecOtherPlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE ||
                      ( vecCameraPosition - vecOtherPlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE )
                 {
-                    pOtherPlayer->RefreshNearPlayer ( this );
+                    // Check dimension matches
+                    if ( m_usDimension == pOtherPlayer->GetDimension () )
+                        pOtherPlayer->RefreshNearPlayer ( this );
                 }
             }
         }
@@ -759,9 +763,115 @@ void CPlayer::RefreshNearPlayer ( CPlayer* pOther )
 
 
 //
-// TODO
+// Dynamically increase the interval between near sync updates depending on stuffs
 //
 bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo )
 {
+    int iZone = GetSyncZone ( pOther );
+
+    int iUpdateInterval = g_pBandwidthSettings->ZoneUpdateIntervals [ iZone ];
+
+#if MTA_DEBUG
+    if ( m_iLastZoneDebug != iZone )
+    {
+        // Calc direction from our camera to the other player
+        const CVector& vecOtherPosition = pOther->GetPosition ();
+        CVector vecDirToOther = pOther->GetPosition () - m_vecCamPosition;
+
+        // Get distance
+        float fDistSq = vecDirToOther.LengthSquared ();
+
+        // Get angle between camera direction and direction to other
+        vecDirToOther.Normalize ();
+        float fDot = m_vecCamFwd.DotProduct ( &vecDirToOther );
+
+        OutputDebugLine ( SString ( "Dist:%1.0f  Dot:%0.3f  %s SyncTo %s zone changing: %d -> %d [Interval:%d] CamPos:%1.0f,%1.0f,%1.0f  CamFwd:%1.2f,%1.2f,%1.2f "
+                ,sqrtf ( fDistSq )
+                ,fDot
+                ,pOther->GetNick ()
+                ,GetNick ()
+                ,m_iLastZoneDebug
+                ,iZone
+                ,iUpdateInterval
+                ,m_vecCamPosition.fX
+                ,m_vecCamPosition.fY
+                ,m_vecCamPosition.fZ
+                ,m_vecCamFwd.fX
+                ,m_vecCamFwd.fY
+                ,m_vecCamFwd.fZ
+            ) );
+
+        m_iLastZoneDebug = iZone;
+    }
+#endif
+
+    long long llTimeNow = GetModuleTickCount64 ();
+    long long llNextUpdateTime = nearInfo.llLastUpdateTime + iUpdateInterval;
+
+    if ( llNextUpdateTime > llTimeNow )
+        return false;
+
+    nearInfo.llLastUpdateTime = llTimeNow;
+
     return true;
 }
+
+
+//
+// Deduce what zone the other player is in
+//
+int CPlayer::GetSyncZone ( CPlayer* pOther )
+{
+    int iZone = 0;
+
+    // Calc direction from our camera to the other player
+    const CVector& vecOtherPosition = pOther->GetPosition ();
+    CVector vecDirToOther = vecOtherPosition - m_vecCamPosition;
+
+    // See if in distance zone 0
+    float fDistSq = vecDirToOther.LengthSquared ();
+    if ( fDistSq < g_pBandwidthSettings->fZone0RadiusSq )
+    {
+        iZone = 0;
+    }
+    else
+    {
+        // Get angle between camera direction and direction to other
+        vecDirToOther.Normalize ();
+        float fDot = m_vecCamFwd.DotProduct ( &vecDirToOther );
+        //  1=0 deg   0=90 deg  -1=180 deg
+        if ( fDot > g_pBandwidthSettings->fZone1Dot )
+        {
+            iZone = 0;
+        }
+        else
+        if ( fDot > g_pBandwidthSettings->fZone2Dot )
+        {
+            iZone = 1;
+        }
+        else
+            iZone = 2;
+    }
+
+
+    // See if zone could be lowered
+    if ( g_pBandwidthSettings->iMaxZoneIfOtherCanSee < iZone )
+    {
+        // Test if other can see us
+        const CVector& vecOtherCamPosition = pOther->GetCamPosition ();
+        const CVector& vecOtherCamFwd = pOther->GetCamFwd ();
+
+        // Calc direction from other camera to our player
+        CVector vecDirToHere = m_vecPosition - vecOtherCamPosition;
+
+        // Get angle between camera direction and direction to here
+        vecDirToHere.Normalize ();
+        float fDot = vecOtherCamFwd.DotProduct ( &vecDirToHere );
+        //  1=0 deg   0=90 deg  -1=180 deg
+        if ( fDot > 0.643 ) // 100 deg fov  [cos ( DEG2RAD( 100 ) * 0.5f )]
+            iZone = g_pBandwidthSettings->iMaxZoneIfOtherCanSee;
+    }
+
+    return iZone;
+}
+

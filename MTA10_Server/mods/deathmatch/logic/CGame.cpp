@@ -1749,6 +1749,8 @@ void CGame::Packet_PlayerTimeout ( CPlayerTimeoutPacket& Packet )
 // Relay this (pure sync) packet to all the other players using distance rules
 void CGame::RelayPlayerPuresync ( CPacket& Packet )
 {
+    UpdateModuleTickCount64 ();
+
     // Make a list of players to send this packet to
     std::vector < CPlayer* > sendList;
 

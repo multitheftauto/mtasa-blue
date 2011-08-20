@@ -93,6 +93,7 @@ public:
     bool                            SetSetting                      ( const SString& configSetting, const SString& strValue, bool bSave );
 
     void                            SetCommandLineParser            ( CCommandLineParser* pCommandLineParser );
+    void                            ApplyBandwidthReductionMode     ( void );
 
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
@@ -141,6 +142,7 @@ private:
     bool                            m_bAutoLogin;
     SString                         m_strIdFile;
     bool                            m_bNetworkEncryptionEnabled;
+    SString                         m_strBandwidthReductionMode;
 };
 
 #endif
