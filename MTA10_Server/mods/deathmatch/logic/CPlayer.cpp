@@ -669,7 +669,7 @@ void CPlayer::UpdateOthersNearList ( void )
                 if ( ( vecPlayerPosition - vecOtherPlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE ||
                      ( vecCameraPosition - vecOtherPlayerPos ).LengthSquared () < DISTANCE_FOR_SLOW_SYNCRATE * DISTANCE_FOR_SLOW_SYNCRATE )
                 {
-                    pOtherPlayer->AddNearPlayer ( this );
+                    pOtherPlayer->RefreshNearPlayer ( this );
                 }
             }
         }
