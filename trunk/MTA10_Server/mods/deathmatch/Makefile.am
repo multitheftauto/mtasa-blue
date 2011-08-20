@@ -70,6 +70,7 @@ LOGIC = \
 ./logic/CElementDeleter.cpp \
 ./logic/CElementGroup.cpp \
 ./logic/CElementIDs.cpp \
+./logic/CElementRefManager.cpp \
 ./logic/CEvents.cpp \
 ./logic/CGame.cpp \
 ./logic/CGroups.cpp \
