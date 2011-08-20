@@ -144,6 +144,7 @@
 #include "CAccountManager.h"
 #include "CBan.h"
 #include "CBanManager.h"
+#include "CBandwidthSettings.h"
 #include "CBlendedWeather.h"
 #include "CBlip.h"
 #include "CBlipManager.h"

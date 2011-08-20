@@ -1506,6 +1506,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CBandwidthSettings.h"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CBanManager.h"
 					>
 				</File>
