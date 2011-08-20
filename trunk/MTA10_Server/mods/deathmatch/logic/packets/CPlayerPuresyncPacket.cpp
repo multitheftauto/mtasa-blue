@@ -137,6 +137,11 @@ bool CPlayerPuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             return false;
         pSourcePlayer->SetCameraRotation ( fCameraRotation );
 
+        // Read the camera orientation
+        CVector vecCamPosition, vecCamFwd;
+        ReadCameraOrientation ( position.data.vecPosition, BitStream, vecCamPosition, vecCamFwd );
+        pSourcePlayer->SetCameraOrientation ( vecCamPosition, vecCamFwd );
+
         if ( flags.data.bHasAWeapon )
         {
             // Read client weapon data, but only apply it if the weapon matches with the server

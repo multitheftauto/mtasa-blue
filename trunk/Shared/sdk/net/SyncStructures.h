@@ -115,11 +115,12 @@ struct SIntegerSync : public ISyncStructure
 // Map a float range into bits          //
 //                                      //
 //////////////////////////////////////////
-template < unsigned int bits >
-struct SFloatAsBitsSync : public ISyncStructure
+struct SFloatAsBitsSyncBase : public ISyncStructure
 {
-    SFloatAsBitsSync ( float fMin, float fMax, bool bPreserveGreaterThanMin )
-        : m_fMin ( fMin )
+    SFloatAsBitsSyncBase ( uint uiBits, float fMin, float fMax, bool bPreserveGreaterThanMin )
+        : m_uiBits ( uiBits )
+        , ulValueMax ( ( 1 << uiBits ) - 1 )
+        , m_fMin ( fMin )
         , m_fMax ( fMax )
         , m_bPreserveGreaterThanMin ( bPreserveGreaterThanMin )
     {
@@ -128,7 +129,7 @@ struct SFloatAsBitsSync : public ISyncStructure
     bool Read ( NetBitStreamInterface& bitStream )
     {
         unsigned long ulValue = 0;
-        if ( bitStream.ReadBits ( &ulValue, bits ) )
+        if ( bitStream.ReadBits ( &ulValue, m_uiBits ) )
         {
             // Convert bits to position in range
             float fAlpha = ulValue / (float)ulValueMax;
@@ -151,7 +152,7 @@ struct SFloatAsBitsSync : public ISyncStructure
             if ( ulValue == 0 && fAlpha > 0.0f )
                 ulValue = 1;
 
-        bitStream.WriteBits ( &ulValue, bits );
+        bitStream.WriteBits ( &ulValue, m_uiBits );
     }
 
     struct
@@ -159,11 +160,23 @@ struct SFloatAsBitsSync : public ISyncStructure
         float fValue;
     } data;
 private:
+    const uint m_uiBits;
+    const ulong ulValueMax;
     const float m_fMin;
     const float m_fMax;
     const bool  m_bPreserveGreaterThanMin;
-    const static unsigned long ulValueMax = ( 1 << bits ) - 1;
 };
+
+// Template version
+template < unsigned int bits >
+struct SFloatAsBitsSync : public SFloatAsBitsSyncBase
+{
+    SFloatAsBitsSync ( float fMin, float fMax, bool bPreserveGreaterThanMin )
+        : SFloatAsBitsSyncBase ( bits, fMin, fMax, bPreserveGreaterThanMin )
+    {
+    }
+};
+
 
 
 // Declare specific health and armor sync structures

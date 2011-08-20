@@ -684,6 +684,76 @@ void WriteFullKeysync ( const CControllerState& ControllerState, NetBitStreamInt
     // Write it
     BitStream.Write ( &keys );
 }
+
+
+void ReadCameraOrientation ( const CVector& vecBasePosition, NetBitStreamInterface& BitStream, CVector& vecOutCamPosition, CVector& vecOutCamFwd )
+{
+    //
+    // Read rotations
+    //
+    const static float fPI = 3.14159265f;
+    SFloatAsBitsSync < 8 > rotation ( -fPI, fPI, false );
+
+    BitStream.Read ( &rotation );
+    float fCamRotZ = rotation.data.fValue;
+
+    BitStream.Read ( &rotation );
+    float fCamRotX = rotation.data.fValue;
+
+
+    // Remake direction
+    float fCosCamRotX = cos ( fCamRotX );
+    vecOutCamFwd.fX = fCosCamRotX * sin ( fCamRotZ );
+    vecOutCamFwd.fY = fCosCamRotX * cos ( fCamRotZ );
+    vecOutCamFwd.fZ = sin ( fCamRotX );
+
+    //
+    // Read offset
+    //
+
+    // Lookup table used when sending
+    struct {
+        uint uiNumBits;
+        float fRange;
+    } bitCountTable[4] = {
+                            { 3, 4.0f },        // 3 bits is +-4        12 bits total
+                            { 5, 16.0f },       // 5 bits is +-16       18 bits total
+                            { 9, 256.0f },      // 9 bits is +-256      30 bits total
+                            { 14, 8192.0f },    // 14 bits is +-8192    45 bits total
+                        };
+    // Read flag
+    bool bUseAbsolutePosition = false;
+    BitStream.ReadBit ( bUseAbsolutePosition );
+
+    // Read table look up index for num of bits
+    char idx = 0;
+    BitStream.ReadBits ( &idx, 2 );
+
+    const uint uiNumBits = bitCountTable[idx].uiNumBits;
+    const float fRange = bitCountTable[idx].fRange;
+
+
+    // Read each component
+    SFloatAsBitsSyncBase position ( uiNumBits, -fRange, fRange, false );
+
+    CVector vecUsePosition;
+    BitStream.Read ( &position );
+    vecUsePosition.fX = position.data.fValue;
+
+    BitStream.Read ( &position );
+    vecUsePosition.fY = position.data.fValue;
+
+    BitStream.Read ( &position );
+    vecUsePosition.fZ = position.data.fValue;
+
+    // Remake position
+    if ( bUseAbsolutePosition )
+        vecOutCamPosition = vecUsePosition;
+    else
+        vecOutCamPosition = vecBasePosition - vecUsePosition;
+}
+
+
 bool IsNametagValid ( const char* szNick )
 {
     // Grab the size of the nick. Check that it's not to long or short

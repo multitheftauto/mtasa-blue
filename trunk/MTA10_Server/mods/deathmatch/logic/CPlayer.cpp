@@ -731,3 +731,37 @@ bool CPlayer::IsPlayerIgnoringElement( CElement* pElement )
     }
     return false;
 }
+
+
+//
+// Save rough camera position and rotation for later
+//
+void CPlayer::SetCameraOrientation ( const CVector& vecPosition, const CVector& vecFwd )
+{
+    m_vecCamPosition = vecPosition;
+    m_vecCamFwd = vecFwd;
+}
+
+
+//
+// Ensure other player stays in the near list
+//
+void CPlayer::RefreshNearPlayer ( CPlayer* pOther )
+{
+    SNearInfo* pInfo = MapFind ( m_NearPlayerList, pOther );
+    if ( !pInfo )
+    {
+        MapSet ( m_NearPlayerList, pOther, SNearInfo () );
+        pInfo = MapFind ( m_NearPlayerList, pOther );
+    }
+    pInfo->iCount = 5;
+}
+
+
+//
+// TODO
+//
+bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo )
+{
+    return true;
+}

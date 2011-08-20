@@ -901,6 +901,98 @@ void CNetAPI::ReadPlayerPuresync ( CClientPlayer* pPlayer, NetBitStreamInterface
 }
 
 
+void WriteCameraOrientation ( const CVector& vecPositionBase, NetBitStreamInterface& BitStream )
+{
+    // Calc the camera position and rotation
+    CMatrix camMatrix;
+    g_pGame->GetCamera ()->GetMatrix ( &camMatrix );
+    const CVector& vecCamPosition = camMatrix.vPos;
+    const CVector& vecCamFwd = camMatrix.vFront;
+    float fCamRotZ = atan2 ( vecCamFwd.fX, vecCamFwd.fY );
+    float fCamRotX = atan2 ( vecCamFwd.fZ, DistanceBetweenPoints2D ( CVector (), vecCamFwd ) );
+
+
+    //
+    // Write rotations
+    //
+    const static float fPI = 3.14159265f;
+    SFloatAsBitsSync < 8 > rotation ( -fPI, fPI, false );
+
+    rotation.data.fValue = fCamRotZ;
+    BitStream.Write ( &rotation );
+
+    rotation.data.fValue = fCamRotX;
+    BitStream.Write ( &rotation );
+
+    //
+    // Write offset
+    //
+    // Calc the camera offset from the base position
+    CVector vecCamOffset = vecPositionBase - vecCamPosition;
+
+    // Calc biggest value
+    float fMaxRelValue = Max ( abs ( vecCamOffset.fX ), Max ( abs ( vecCamOffset.fY ), abs ( vecCamOffset.fZ ) ) );
+
+    // Calc biggest value if used absolute position
+    float fMaxAbsValue = Max ( abs ( vecCamPosition.fX ), Max ( abs ( vecCamPosition.fY ), abs ( vecCamPosition.fZ ) ) );
+
+    // Choose which one
+    bool bUseAbsolutePosition;
+    CVector vecUsePosition;
+    float fUseMaxValue;
+
+    if ( fMaxAbsValue < fMaxRelValue )
+    {
+        bUseAbsolutePosition = true;
+        vecUsePosition = vecCamPosition;
+        fUseMaxValue = fMaxAbsValue;
+    }
+    else
+    {
+        bUseAbsolutePosition = false;
+        vecUsePosition = vecCamOffset;
+        fUseMaxValue = fMaxRelValue;
+    }
+
+    // See how many bits we need ( using step size of 1.0f )
+    struct {
+        uint uiNumBits;
+        float fRange;
+    } bitCountTable[4] = {
+                            { 3, 4.0f },        // 3 bits is +-4        12 bits total
+                            { 5, 16.0f },       // 5 bits is +-16       18 bits total
+                            { 9, 256.0f },      // 9 bits is +-256      30 bits total
+                            { 14, 8192.0f },    // 14 bits is +-8192    45 bits total
+                        };
+    char idx;
+    for ( idx = 0 ; idx < 3 ; idx++ )
+    {
+        if ( bitCountTable[idx].fRange > fUseMaxValue )
+            break;  // We have enough bits now
+    }
+    const uint uiNumBits = bitCountTable[idx].uiNumBits;
+    const float fRange = bitCountTable[idx].fRange;
+
+    // Write flag
+    BitStream.WriteBit ( bUseAbsolutePosition );
+
+    // Write table look up for num of bits
+    BitStream.WriteBits ( &idx, 2 );
+
+    // Write each component
+    SFloatAsBitsSyncBase position ( uiNumBits, -fRange, fRange, false );
+
+    position.data.fValue = vecUsePosition.fX;
+    BitStream.Write ( &position );
+
+    position.data.fValue = vecUsePosition.fY;
+    BitStream.Write ( &position );
+
+    position.data.fValue = vecUsePosition.fZ;
+    BitStream.Write ( &position );
+}
+
+
 void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInterface& BitStream )
 {
     // Write our sync context.
@@ -983,6 +1075,9 @@ void CNetAPI::WritePlayerPuresync ( CClientPlayer* pPlayerModel, NetBitStreamInt
 
     // Write the camera rotation
     BitStream.Write ( g_pGame->GetCamera ()->GetCameraRotation () );
+
+    // Write the camera orientation
+    WriteCameraOrientation ( vecPosition, BitStream );
 
     if ( flags.data.bHasAWeapon )
     {
@@ -1290,6 +1385,9 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     SPositionSync position ( false );
     position.data.vecPosition = vecPosition;
     BitStream.Write ( &position );
+
+    // Write the camera orientation
+    WriteCameraOrientation ( vecPosition, BitStream );
 
     // Grab the occupied vehicle seat. Send this only if we're driver
     SOccupiedSeatSync seat;
