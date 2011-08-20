@@ -53,9 +53,9 @@ public:
     bool                            SetPassword                     ( const char* szPassword, bool bSave );
 
     bool                            IsVoiceEnabled                  ( void )        { return m_bVoiceEnabled; };
-    unsigned int                    GetSampleRate                   ( void )        { return m_uiSampleRate; };
-    unsigned int                    GetVoiceQuality                 ( void )        { return m_ucQuality; };
-    unsigned int                    GetVoiceBitrate                 ( void )        { return m_uiBitrate; };
+    unsigned int                    GetVoiceSampleRate              ( void )        { return m_uiVoiceSampleRate; };
+    unsigned int                    GetVoiceQuality                 ( void )        { return m_ucVoiceQuality; };
+    unsigned int                    GetVoiceBitrate                 ( void )        { return m_uiVoiceBitrate; };
 
     inline bool                     GetASEEnabled                   ( void )        { return m_bAseEnabled; };
     unsigned short                  GetHTTPPort                     ( void );
@@ -103,9 +103,9 @@ private:
     CXMLNode*                       m_pRootNode;
     CCommandLineParser*             m_pCommandLineParser;
 
-    unsigned int                    m_uiSampleRate;
-    unsigned char                   m_ucQuality;
-    unsigned int                    m_uiBitrate;
+    unsigned int                    m_uiVoiceSampleRate;
+    unsigned char                   m_ucVoiceQuality;
+    unsigned int                    m_uiVoiceBitrate;
 
     bool                            m_bVoiceEnabled;
     std::string                     m_strServerIP;

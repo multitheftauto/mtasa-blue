@@ -489,7 +489,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Prepare our voice string
     SString strVoice = "Disabled";
     if ( m_pMainConfig->IsVoiceEnabled() )
-        switch (m_pMainConfig->GetSampleRate())
+        switch (m_pMainConfig->GetVoiceSampleRate())
         {
             case 0:
                 strVoice = SString("Quality [%i];  Sample Rate: [8000kHz]",m_pMainConfig->GetVoiceQuality() ); break;
@@ -1069,7 +1069,7 @@ void CGame::JoinPlayer ( CPlayer& Player )
                                               m_pMainConfig->GetHTTPMaxConnectionsPerClient (),
                                               m_pMainConfig->GetEnableClientChecks (),
                                               m_pMainConfig->IsVoiceEnabled(),
-                                              m_pMainConfig->GetSampleRate(),
+                                              m_pMainConfig->GetVoiceSampleRate(),
                                               m_pMainConfig->GetVoiceQuality(),
                                               m_pMainConfig->GetVoiceBitrate() ) );
 }
