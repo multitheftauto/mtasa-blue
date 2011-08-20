@@ -51,6 +51,11 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 return false;
             pSourcePlayer->SetPosition ( position.data.vecPosition );
 
+            // Read the camera orientation
+            CVector vecCamPosition, vecCamFwd;
+            ReadCameraOrientation ( position.data.vecPosition, BitStream, vecCamPosition, vecCamFwd );
+            pSourcePlayer->SetCameraOrientation ( vecCamPosition, vecCamFwd );
+
             // Jax: don't allow any outdated packets through
             SOccupiedSeatSync seat;
             if ( !BitStream.Read ( &seat ) )

@@ -47,6 +47,12 @@ enum eVoiceState
     VOICESTATE_TRANSMITTING,
 };
 
+struct SNearInfo
+{
+    int iCount;
+    long long llLastUpdateTime;
+};
+
 
 class CPlayer : public CPed, public CClient
 {
@@ -224,8 +230,8 @@ public:
     bool                                        GetWeaponCorrect            ( void );
 
     void                                        UpdateOthersNearList        ( void );
-    void                                        AddNearPlayer               ( CPlayer* other )              { m_NearPlayerList [ other ] = 5; }
-    std::map < CPlayer*, int >&                 GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
+    void                                        RefreshNearPlayer           ( CPlayer* other );
+    std::map < CPlayer*, SNearInfo >&           GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
 
     eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
     void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
@@ -241,6 +247,12 @@ public:
     std::list < CElement* > ::const_iterator    IterIgnoredListBegin        ( void )                      { return m_lstIgnoredList.begin (); };
     std::list < CElement* > ::const_iterator    IterIgnoredListEnd          ( void )                      { return m_lstIgnoredList.end (); };
     bool                                        IsPlayerIgnoringElement     ( CElement* pElement );
+
+    void                                        SetCameraOrientation        ( const CVector& vecPosition, const CVector& vecFwd );
+    bool                                        IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo );
+    const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
+    const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
+
 
 private:
     void                                        WriteCameraModePacket       ( void );
@@ -335,8 +347,11 @@ private:
 
     uint                                        m_uiWeaponIncorrectCount;
 
-    std::map < CPlayer*, int >                  m_NearPlayerList;
+    std::map < CPlayer*, SNearInfo >            m_NearPlayerList;
     long long                                   m_llNearListUpdateTime;
+
+    CVector                                     m_vecCamPosition;
+    CVector                                     m_vecCamFwd;
 };
 
 #endif

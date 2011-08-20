@@ -168,6 +168,7 @@ bool ReadSmallKeysync ( CControllerState& ControllerState, const CControllerStat
 void WriteSmallKeysync ( const CControllerState& ControllerState, const CControllerState& LastControllerState, NetBitStreamInterface& BitStream );
 bool ReadFullKeysync ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
 void WriteFullKeysync ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
+void ReadCameraOrientation ( const CVector& vecBasePosition, NetBitStreamInterface& BitStream, CVector& vecOutCamPosition, CVector& vecOutCamFwd );
 
 
 // Validation funcs
