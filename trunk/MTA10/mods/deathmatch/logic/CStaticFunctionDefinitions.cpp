@@ -3905,7 +3905,7 @@ bool CStaticFunctionDefinitions::GetCameraViewMode ( unsigned short& ucMode )
 
 bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVector& vecWorld )
 {
-    if ( m_pClientGame->AreCursorEventsEnabled () )
+    if ( m_pClientGame->AreCursorEventsEnabled () || GUIGetInputEnabled () )
     {
         tagPOINT point;
         GetCursorPos ( &point );
