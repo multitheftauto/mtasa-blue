@@ -245,6 +245,8 @@ DWORD RETURN_CrashFix_Misc17b_US =                          0x7F1236;
 DWORD RETURN_CrashFix_Misc17b_EU =                          0x7F1276;
 DWORD RETURN_CrashFix_Misc17b_BOTH =                        0;
 
+#define HOOKPOS_CrashFix_Misc18                              0x4C7DAD
+DWORD RETURN_CrashFix_Misc18 =                               0x4C7DB4;
 
 #define HOOKPOS_VehColCB                                    0x04C838D
 DWORD RETURN_VehColCB =                                     0x04C83AA;
@@ -401,6 +403,7 @@ void HOOK_CrashFix_Misc14 ();
 void HOOK_FreezeFix_Misc15 ();
 void HOOK_CrashFix_Misc16 ();
 void HOOK_CrashFix_Misc17 ();
+void HOOK_CrashFix_Misc18 ();
 void HOOK_VehColCB ();
 void HOOK_VehCol ();
 void HOOK_isVehDriveTypeNotRWD ();
@@ -557,6 +560,7 @@ void CMultiplayerSA::InitHooks()
         RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_EU;
     }
     HookInstall(HOOKPOS_CrashFix_Misc16, (DWORD)HOOK_CrashFix_Misc16, 6 );
+    HookInstall(HOOKPOS_CrashFix_Misc18, (DWORD)HOOK_CrashFix_Misc18, 7 );
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29 );
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9 );
@@ -5362,6 +5366,41 @@ void _declspec(naked) HOOK_CrashFix_Misc17 ()
     }
 }
 
+
+// Handle GetWheelPosition having wrong data
+// hooked at 4C7DAD 7 bytes
+void _declspec(naked) HOOK_CrashFix_Misc18 ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     ebp, 0
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        cmp     ebp, 0
+        je      cont  // Skip much code if ebp is zero
+
+        // continue standard path
+        mov         edx,dword ptr [ebp+40h] 
+        mov         eax,dword ptr [esp+10h] 
+        jmp     RETURN_CrashFix_Misc18  // 4C7DB4
+
+    cont:
+        mov         edx,0 
+        mov         eax,dword ptr [esp+10h]
+        mov         dword ptr [eax],edx 
+        mov         dword ptr [eax+4],edx 
+        pop         esi  
+        mov         dword ptr [eax+8],edx 
+        pop         ebp  
+        ret         0Ch  
+    }
+}
 
 
 static SColor vehColors[4];
