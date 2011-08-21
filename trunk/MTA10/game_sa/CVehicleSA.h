@@ -158,6 +158,9 @@ class CVehicleSA;
 #define FUNC_CAutomobile__GetDoorAngleOpenRatio 0x6A2270
 #define FUNC_CTrain__GetDoorAngleOpenRatio      0x6F59C0
 
+#define HANDLING_NOS_Flag                       0x00080000
+#define	HANDLING_Hydraulics_Flag                0x00020000
+
 typedef struct
 {
     short sX;               // x coordinate times 8

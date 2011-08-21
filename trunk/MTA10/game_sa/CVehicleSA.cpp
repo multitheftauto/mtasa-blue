@@ -1679,7 +1679,51 @@ void CVehicleSA::RecalculateHandling ( void )
 
     // Put it in our interface
     CVehicleSAInterface* pInt = GetVehicleInterface ();
-    pInt->dwHandlingFlags = m_pHandlingData->GetInterface ()->uiHandlingFlags;
+    unsigned int uiHandlingFlags = m_pHandlingData->GetInterface ()->uiHandlingFlags;
+    // user error correction - NOS_INST = NOS Installed t/f
+    // if nos is installed we need the flag set
+    if ( pInt->m_upgrades[0] && pInt->m_upgrades[0] >= 1008 && pInt->m_upgrades[0] <= 1010 )
+    {
+        // Flag not enabled?
+        if ( uiHandlingFlags | HANDLING_NOS_Flag )
+        {
+            // Set zee flag
+            uiHandlingFlags |= HANDLING_NOS_Flag;
+            m_pHandlingData->SetHandlingFlags ( uiHandlingFlags );
+        }
+    }
+    else
+    {
+        // Flag Enabled?
+        if ( uiHandlingFlags & HANDLING_NOS_Flag )
+        {
+            // Unset the flag
+            uiHandlingFlags &= ~HANDLING_NOS_Flag;
+            m_pHandlingData->SetHandlingFlags ( uiHandlingFlags );
+        }
+    }
+    // Hydraulics Flag fixing
+    if ( pInt->m_upgrades[1] && pInt->m_upgrades[1] == 1087 )
+    {
+        // Flag not enabled?
+        if ( uiHandlingFlags | HANDLING_Hydraulics_Flag )
+        {
+            // Set zee flag
+            uiHandlingFlags |= HANDLING_Hydraulics_Flag;
+            m_pHandlingData->SetHandlingFlags ( uiHandlingFlags );
+        }
+    }
+    else
+    {
+        // Flag Enabled?
+        if ( uiHandlingFlags & HANDLING_Hydraulics_Flag )
+        {
+            // Unset the flag
+            uiHandlingFlags &= ~HANDLING_Hydraulics_Flag;
+            m_pHandlingData->SetHandlingFlags ( uiHandlingFlags );
+        }
+    }
+    pInt->dwHandlingFlags = uiHandlingFlags;
     pInt->fMass = m_pHandlingData->GetInterface ()->fMass;
     pInt->fTurnMass = m_pHandlingData->GetInterface ()->fTurnMass;// * pGame->GetHandlingManager()->GetTurnMassMultiplier();
     pInt->vecCenterOfMass = &m_pHandlingData->GetInterface()->vecCenterOfMass;
