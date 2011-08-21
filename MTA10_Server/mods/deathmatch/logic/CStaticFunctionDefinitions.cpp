@@ -4720,6 +4720,12 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
                 break;*/
             case HANDLING_HANDLINGFLAGS:
             {
+                // Disable NOS and Hydraulic installed properties.
+                if ( uiValue & 0x00080000 )
+                   uiValue &= ~0x00080000;
+                if ( uiValue & 0x00020000 )
+                   uiValue &= ~0x00020000;
+
                 pEntry->SetHandlingFlags ( uiValue );
                 return true;
             }
