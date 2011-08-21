@@ -229,8 +229,13 @@ public:
     bool                                        GetWeaponCorrect            ( void );
 
     void                                        UpdateOthersNearList        ( void );
-    void                                        RefreshNearPlayer           ( CPlayer* other );
+    void                                        RefreshNearPlayer           ( CPlayer* pOther );
     std::map < CPlayer*, SNearInfo >&           GetNearPlayerList           ( void )                        { return m_NearPlayerList; }
+    std::map < CPlayer*, SNearInfo >&           GetFarPlayerList            ( void )                        { return m_FarPlayerList; }
+    void                                        AddPlayerToDistLists        ( CPlayer* pOther );
+    void                                        RemovePlayerFromDistLists   ( CPlayer* pOther );
+    void                                        MovePlayerToNearList        ( CPlayer* pOther );
+    void                                        MovePlayerToFarList         ( CPlayer* pOther );
 
     eVoiceState                                 GetVoiceState               ( void )                      { return m_VoiceState; }
     void                                        SetVoiceState               ( eVoiceState State )         { m_VoiceState = State; }
@@ -348,6 +353,7 @@ private:
     uint                                        m_uiWeaponIncorrectCount;
 
     std::map < CPlayer*, SNearInfo >            m_NearPlayerList;
+    std::map < CPlayer*, SNearInfo >            m_FarPlayerList;
     long long                                   m_llNearListUpdateTime;
 
     CVector                                     m_vecCamPosition;

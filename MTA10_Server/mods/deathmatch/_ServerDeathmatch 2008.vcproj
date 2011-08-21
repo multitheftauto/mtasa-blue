@@ -629,6 +629,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\logic\CPerfStat.BandwidthReduction.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\logic\CPerfStat.BandwidthUsage.cpp"
 					>
 				</File>

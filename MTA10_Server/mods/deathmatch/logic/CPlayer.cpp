@@ -564,6 +564,12 @@ bool CPlayer::IsTimeForFarSync ( void )
         int iSlowSyncRate = g_pBandwidthSettings->ZoneUpdateIntervals [ ZONE3 ];
         m_llNextFarSyncTime = llTime + iSlowSyncRate;
         m_llNextFarSyncTime += rand () % ( 1 + iSlowSyncRate / 10 );   // Extra bit to help distribute the load
+
+        // Calc stats
+        int iNumPackets = m_FarPlayerList.size ();
+        int iNumSkipped = ( iNumPackets * iSlowSyncRate - iNumPackets * 1000 ) / 1000;
+        g_pStats->puresync.uiSentPacketsByZone [ ZONE3 ] += iNumPackets;
+        g_pStats->puresync.uiSkippedPacketsByZone [ ZONE3 ] += iNumSkipped;
         return true;
     }
     return false;
@@ -755,10 +761,42 @@ void CPlayer::RefreshNearPlayer ( CPlayer* pOther )
     SNearInfo* pInfo = MapFind ( m_NearPlayerList, pOther );
     if ( !pInfo )
     {
-        MapSet ( m_NearPlayerList, pOther, SNearInfo () );
+        // Move from far list
+        MovePlayerToNearList ( pOther );
         pInfo = MapFind ( m_NearPlayerList, pOther );
     }
     pInfo->iCount = 5;
+}
+
+
+void CPlayer::AddPlayerToDistLists ( CPlayer* pOther )
+{
+    dassert ( !MapContains ( m_NearPlayerList, pOther ) && !MapContains ( m_FarPlayerList, pOther ) );
+    SNearInfo info = { 0, 0 };
+    MapSet ( m_NearPlayerList, pOther, info );
+}
+
+void CPlayer::RemovePlayerFromDistLists ( CPlayer* pOther )
+{
+    dassert ( MapContains ( m_NearPlayerList, pOther ) || MapContains ( m_FarPlayerList, pOther ) );
+    MapRemove ( m_NearPlayerList, pOther );
+    MapRemove ( m_FarPlayerList, pOther );
+}
+
+void CPlayer::MovePlayerToNearList ( CPlayer* pOther )
+{
+    dassert ( !MapContains ( m_NearPlayerList, pOther ) && MapContains ( m_FarPlayerList, pOther ) );
+    SNearInfo* pInfo = MapFind ( m_FarPlayerList, pOther );
+    MapSet ( m_NearPlayerList, pOther, *pInfo );
+    MapRemove ( m_FarPlayerList, pOther );
+}
+
+void CPlayer::MovePlayerToFarList ( CPlayer* pOther )
+{
+    dassert ( MapContains ( m_NearPlayerList, pOther ) && !MapContains ( m_FarPlayerList, pOther ) );
+    SNearInfo* pInfo = MapFind ( m_NearPlayerList, pOther );
+    MapSet ( m_FarPlayerList, pOther, *pInfo );
+    MapRemove ( m_NearPlayerList, pOther );
 }
 
 
@@ -809,10 +847,15 @@ bool CPlayer::IsTimeToReceiveNearSyncFrom ( CPlayer* pOther, SNearInfo& nearInfo
     long long llNextUpdateTime = nearInfo.llLastUpdateTime + iUpdateInterval;
 
     if ( llNextUpdateTime > llTimeNow )
+    {
+        g_pStats->puresync.uiSkippedPacketsByZone[ iZone ]++;
         return false;
+    }
 
     nearInfo.llLastUpdateTime = llTimeNow;
 
+    STATS_COUNTER_INC( puresync.uiSentPacketsByZone[ iZone ] );
+    g_pStats->puresync.uiSentPacketsByZone[ iZone ]++;
     return true;
 }
 
@@ -874,4 +917,3 @@ int CPlayer::GetSyncZone ( CPlayer* pOther )
 
     return iZone;
 }
-
