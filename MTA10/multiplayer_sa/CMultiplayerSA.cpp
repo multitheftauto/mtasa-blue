@@ -233,6 +233,19 @@ DWORD RETURN_FreezeFix_Misc15_BOTH =                        0;
 #define HOOKPOS_CrashFix_Misc16                              0x5E5815
 DWORD RETURN_CrashFix_Misc16 =                               0x5E581B;
 
+#define HOOKPOS_CrashFix_Misc17                              0x5E5815
+DWORD RETURN_CrashFix_Misc17 =                               0x5E581B;
+
+#define HOOKPOS_CrashFix_Misc17_US                          0x7F120E
+#define HOOKPOS_CrashFix_Misc17_EU                          0x7F124E
+DWORD RETURN_CrashFix_Misc17a_US =                          0x7F1214;
+DWORD RETURN_CrashFix_Misc17a_EU =                          0x7F1254;
+DWORD RETURN_CrashFix_Misc17a_BOTH =                        0;
+DWORD RETURN_CrashFix_Misc17b_US =                          0x7F1236;
+DWORD RETURN_CrashFix_Misc17b_EU =                          0x7F1276;
+DWORD RETURN_CrashFix_Misc17b_BOTH =                        0;
+
+
 #define HOOKPOS_VehColCB                                    0x04C838D
 DWORD RETURN_VehColCB =                                     0x04C83AA;
 
@@ -387,6 +400,7 @@ void HOOK_CrashFix_Misc13 ();
 void HOOK_CrashFix_Misc14 ();
 void HOOK_FreezeFix_Misc15 ();
 void HOOK_CrashFix_Misc16 ();
+void HOOK_CrashFix_Misc17 ();
 void HOOK_VehColCB ();
 void HOOK_VehCol ();
 void HOOK_isVehDriveTypeNotRWD ();
@@ -529,12 +543,18 @@ void CMultiplayerSA::InitHooks()
     if ( version == VERSION_US_10 )
     {
         HookInstall(HOOKPOS_FreezeFix_Misc15_US, (DWORD)HOOK_FreezeFix_Misc15, 6 );
+        HookInstall(HOOKPOS_CrashFix_Misc17_US, (DWORD)HOOK_CrashFix_Misc17, 6 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_US;
+        RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_US;
+        RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_US;
     }
     if ( version == VERSION_EU_10 )
     {
         HookInstall(HOOKPOS_FreezeFix_Misc15_EU, (DWORD)HOOK_FreezeFix_Misc15, 6 );
+        HookInstall(HOOKPOS_CrashFix_Misc17_EU, (DWORD)HOOK_CrashFix_Misc17, 6 );
         RETURN_FreezeFix_Misc15_BOTH = RETURN_FreezeFix_Misc15_EU;
+        RETURN_CrashFix_Misc17a_BOTH = RETURN_CrashFix_Misc17a_EU;
+        RETURN_CrashFix_Misc17b_BOTH = RETURN_CrashFix_Misc17b_EU;
     }
     HookInstall(HOOKPOS_CrashFix_Misc16, (DWORD)HOOK_CrashFix_Misc16, 6 );
 
@@ -5320,6 +5340,25 @@ void _declspec(naked) HOOK_CrashFix_Misc16 ()
     cont:
         add     esp, 96
         retn
+    }
+}
+
+
+// Handle RwFrameSetStaticPluginsSize having NULL member at 0x90
+// hooked at 7F120E/7F124E 6 bytes
+void _declspec(naked) HOOK_CrashFix_Misc17 ()
+{
+    _asm
+    {
+        cmp     eax, 0
+        je      cont  // Skip much code if eax is zero
+
+        // continue standard path
+        mov     eax, [eax+90h]
+        jmp     RETURN_CrashFix_Misc17a_BOTH  // 7F1214/7F1254
+
+    cont:
+        jmp     RETURN_CrashFix_Misc17b_BOTH  // 7F1236/7F1276
     }
 }
 
