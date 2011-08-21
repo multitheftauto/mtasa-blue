@@ -377,8 +377,8 @@ void CPerfStatBandwidthUsageImpl::RecordStats ( void )
     NetStatistics liveStats;
     g_pNetServer->GetNetworkStatistics ( &liveStats );
 
-    long long llDeltaGameBytesSent = Max ( 0ULL, liveStats.runningTotal [ NS_ACTUAL_BYTES_SENT ] - m_PrevLiveStats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
-    long long llDeltaGameBytesRecv = Max ( 0ULL, liveStats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] - m_PrevLiveStats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
+    long long llDeltaGameBytesSent = Max < long long > ( 0LL, liveStats.runningTotal [ NS_ACTUAL_BYTES_SENT ] - m_PrevLiveStats.runningTotal [ NS_ACTUAL_BYTES_SENT ] );
+    long long llDeltaGameBytesRecv = Max < long long > ( 0LL, liveStats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] - m_PrevLiveStats.runningTotal [ NS_ACTUAL_BYTES_RECEIVED ] );
 
     m_PrevLiveStats = liveStats;
 
@@ -493,7 +493,7 @@ void CPerfStatBandwidthUsageImpl::GetStats ( CPerfStatResult* pResult, const std
     //
     if ( bHelp )
     {
-        pResult->AddColumn ( "Packet usage help" );
+        pResult->AddColumn ( "Bandwidth usage help" );
         pResult->AddRow ()[0] ="Option h - This help";
         pResult->AddRow ()[0] ="Option t - Totals only";
         return;

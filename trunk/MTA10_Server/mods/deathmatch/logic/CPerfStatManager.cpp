@@ -12,6 +12,7 @@
 
 #include "StdInc.h"
 
+SStatData* g_pStats = new SStatData ();
 
 ///////////////////////////////////////////////////////////////
 //
@@ -71,6 +72,7 @@ CPerfStatManagerImpl::CPerfStatManagerImpl ( void )
     AddModule ( CPerfStatLibMemory::GetSingleton () );
     AddModule ( CPerfStatPacketUsage::GetSingleton () );
     AddModule ( CPerfStatSqliteTiming::GetSingleton () );
+    AddModule ( CPerfStatBandwidthReduction::GetSingleton () );
     AddModule ( CPerfStatBandwidthUsage::GetSingleton () );
 }
 

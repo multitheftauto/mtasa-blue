@@ -60,7 +60,7 @@ public:
     void                                        ResetAll                        ( void );
 
 private:
-    inline void                                 AddToList                       ( CPlayer* pPlayer )                                { m_Players.push_back ( pPlayer ); };
+    void                                        AddToList                       ( CPlayer* pPlayer );
     void                                        RemoveFromList                  ( CPlayer* pPlayer );
 
     class CScriptDebugging*                     m_pScriptDebugging;

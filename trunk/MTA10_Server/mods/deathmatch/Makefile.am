@@ -94,6 +94,7 @@ LOGIC = \
 ./logic/CPed.cpp \
 ./logic/CPedManager.cpp \
 ./logic/CPedSync.cpp \
+./logic/CPerfStat.BandwidthReduction.cpp \
 ./logic/CPerfStat.BandwidthUsage.cpp \
 ./logic/CPerfStat.LibMemory.cpp \
 ./logic/CPerfStat.LuaMemory.cpp \

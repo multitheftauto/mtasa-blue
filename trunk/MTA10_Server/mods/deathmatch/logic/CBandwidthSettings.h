@@ -29,9 +29,9 @@ public:
 
     void SetNone ( void )
     {
-        fZone0Radius = 0;
-        fZone1Angle = 0;
-        fZone2Angle = 0;
+        fZone0Radius = 50;
+        fZone1Angle = 135;
+        fZone2Angle = 225;
         ZoneUpdateIntervals [ ZONE0 ] = 0;
         ZoneUpdateIntervals [ ZONE1 ] = 0;
         ZoneUpdateIntervals [ ZONE2 ] = 0;
