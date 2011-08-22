@@ -398,6 +398,12 @@ public:
         DWORD TexCoord1;
     };
 
+    struct SAdapterState
+    {
+        char Name[128];
+        int InstalledMemoryKB;
+    };
+
     struct SD3DDeviceState
     {
         SD3DDeviceState ()
@@ -418,7 +424,8 @@ public:
         D3DMATERIAL9                    Material;
         D3DCAPS9                        DeviceCaps;
         SD3DVertexDeclState             VertexDeclState;
-        
+        SAdapterState                   AdapterState;
+
         struct
         {
             IDirect3DVertexBuffer9*     StreamData;

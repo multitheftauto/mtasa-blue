@@ -20,9 +20,6 @@ using namespace std;
 
 # pragma comment(lib, "wbemuuid.lib")
 
-struct SQueryWMIResult : public std::vector < std::vector < SString > >
-{
-};
 
 /////////////////////////////////////////////////////////////////////
 //
@@ -31,7 +28,7 @@ struct SQueryWMIResult : public std::vector < std::vector < SString > >
 //
 //
 /////////////////////////////////////////////////////////////////////
-static bool QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys )
+bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys )
 {
     HRESULT hres;
 
@@ -231,7 +228,6 @@ static bool QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery, cons
 /////////////////////////////////////////////////////////////////////
 SString SharedUtil::GetWMIOSVersion ( void )
 {
-    //std::vector < std::vector < SString > > outResult;
     SQueryWMIResult result;
 
     QueryWMI ( result, "Win32_OperatingSystem", "Version" );
@@ -246,101 +242,67 @@ SString SharedUtil::GetWMIOSVersion ( void )
 
 /////////////////////////////////////////////////////////////////////
 //
-// GetWMIVideoAdapterName
-//
-//
-//
-/////////////////////////////////////////////////////////////////////
-SString SharedUtil::GetWMIVideoAdapterName ( void )
-{
-    // This won't change after the first call
-    static SString strResult;
-
-    if ( strResult.empty () )
-    {
-        SQueryWMIResult result;
-        QueryWMI ( result, "Win32_VideoController", "Name,Description,Caption" );
-
-        if ( !result.empty () )
-        {
-            // Use one of these
-            const SString& strName = result[0][0];
-            const SString& strDescription = result[0][1];
-            const SString& strCaption = result[0][2];
-
-            // Use description unless empty
-            if ( !strDescription.empty () )
-                strResult = strDescription;
-            else
-            // Or name
-            if ( !strName.empty () )
-                strResult = strName;
-            else
-            // Or caption
-            if ( !strCaption.empty () )
-                strResult = strCaption;
-        }
-    }
-
-    return strResult;
-}
-
-
-/////////////////////////////////////////////////////////////////////
-//
 // GetWMIVideoAdapterMemorySize
 //
 //
 //
 /////////////////////////////////////////////////////////////////////
-long long SharedUtil::GetWMIVideoAdapterMemorySize ( void )
+long long SharedUtil::GetWMIVideoAdapterMemorySize ( const SString& strDisplay )
 {
     // This won't change after the first call
     static long long llResult = 0;
 
     if ( llResult == 0 )
     {
-        SQueryWMIResult result;
-        QueryWMI ( result, "Win32_VideoController", "AdapterRAM" );
+        SString strDeviceId;
 
-        if ( !result.empty () )
-            llResult = _atoi64 ( result[0][0] );
+        // Find a device id for the display
+        for ( int i = 0 ; true ; i++ )
+        {
+            DISPLAY_DEVICE device;
+            device.cb = sizeof(device);
+
+            // Get next DISPLAY_DEVICE from the system
+            if( !EnumDisplayDevicesA ( NULL, i, &device, 0 ) )
+                break;
+
+            // Calc flags
+            bool bAttachedToDesktop = ( device.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP ) != 0;
+            bool bMirroringDriver   = ( device.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER ) != 0;
+            bool bPrimaryDevice     = ( device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE ) != 0;
+
+            // Only check attached, non mirror displays
+            if( bAttachedToDesktop && !bMirroringDriver )
+            {
+                if ( strDisplay.CompareI ( device.DeviceName ) )
+                {
+                    // Found a match
+                    strDeviceId = device.DeviceID;
+                    break;
+                }
+            }
+        }
+
+        // Get WMI info about all video controllers
+        SQueryWMIResult result;
+        QueryWMI ( result, "Win32_VideoController", "PNPDeviceID,AdapterRAM" );
+
+        // Check each controller for a device id match
+        for ( uint i = 0 ; i < result.size () ; i++ )
+        {
+            const SString& PNPDeviceID = result[i][0];
+            const SString& AdapterRAM = result[i][1];
+
+            if ( llResult == 0 )
+                llResult = _atoi64 ( AdapterRAM );
+
+            if ( llResult != 0 )
+                if ( PNPDeviceID.BeginsWithI ( strDeviceId ) )
+                    break;  // Found match
+        }
     }
 
     return llResult;
-}
-
-
-/////////////////////////////////////////////////////////////////////
-//
-// GetMinStreamingMemory
-//
-//
-//
-/////////////////////////////////////////////////////////////////////
-uint SharedUtil::GetMinStreamingMemory ( void )
-{
-    uint uiAmount = 50;
-
-#ifdef MTA_DEBUG
-    uiAmount = 1;
-#endif
-
-    return Min ( uiAmount, GetMaxStreamingMemory () );
-}
-
-
-/////////////////////////////////////////////////////////////////////
-//
-// GetMaxStreamingMemory
-//
-//
-//
-/////////////////////////////////////////////////////////////////////
-uint SharedUtil::GetMaxStreamingMemory ( void )
-{
-    int iMemoryMB = static_cast < int > ( GetWMIVideoAdapterMemorySize () / 1024LL / 1024 );
-    return Max ( 64, iMemoryMB );
 }
 
 #endif

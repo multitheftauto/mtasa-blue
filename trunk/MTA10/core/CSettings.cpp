@@ -589,8 +589,8 @@ CSettings::CSettings ( void )
     m_pStreamingMemoryLabel->GetPosition ( vecTemp, false );
     m_pStreamingMemoryLabel->AutoSize ( "Usable video memory:" );
 
-    unsigned int uiMinMemory = GetMinStreamingMemory ();
-    unsigned int uiMaxMemory = GetMaxStreamingMemory ();
+    unsigned int uiMinMemory = g_pCore->GetMinStreamingMemory ();
+    unsigned int uiMaxMemory = g_pCore->GetMaxStreamingMemory ();
 
     m_pStreamingMemory = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
     m_pStreamingMemory->SetPosition ( CVector2D ( vecTemp.fX + 130.0f, vecTemp.fY ) );
@@ -1112,8 +1112,8 @@ void CSettings::UpdateVideoTab ( bool bIsVideoModeChanged )
     // Streaming memory
     unsigned int uiStreamingMemory = 0;
     CVARS_GET ( "streaming_memory", uiStreamingMemory );
-    uiStreamingMemory = SharedUtil::Clamp ( GetMinStreamingMemory (), uiStreamingMemory, GetMaxStreamingMemory () );
-    float fPos = SharedUtil::Unlerp ( GetMinStreamingMemory (), uiStreamingMemory, GetMaxStreamingMemory () );
+    uiStreamingMemory = SharedUtil::Clamp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
+    float fPos = SharedUtil::Unlerp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
     m_pStreamingMemory->SetScrollPosition ( fPos );
     m_pStreamingMemoryValueLabel->SetText ( SString ( "%u MB", uiStreamingMemory ) );
 
@@ -1255,7 +1255,7 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false );
 
-    CVARS_SET ( "streaming_memory", GetMaxStreamingMemory () );
+    CVARS_SET ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
 
     CVARS_SET ( "mapalpha", 140.25f);
 
@@ -2197,8 +2197,8 @@ void CSettings::LoadData ( void )
     // Streaming memory
     unsigned int uiStreamingMemory;
     CVARS_GET ( "streaming_memory", uiStreamingMemory );
-    uiStreamingMemory = SharedUtil::Clamp ( GetMinStreamingMemory (), uiStreamingMemory, GetMaxStreamingMemory () );
-    float fPos = SharedUtil::Unlerp ( GetMinStreamingMemory (), uiStreamingMemory, GetMaxStreamingMemory () );
+    uiStreamingMemory = SharedUtil::Clamp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
+    float fPos = SharedUtil::Unlerp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
     m_pStreamingMemory->SetScrollPosition ( fPos );
     m_pStreamingMemoryValueLabel->SetText ( SString ( "%u MB", uiStreamingMemory ) );
 }
@@ -2408,8 +2408,8 @@ void CSettings::SaveData ( void )
 
     // Streaming memory
     float fPos = m_pStreamingMemory->GetScrollPosition ();
-    int min = GetMinStreamingMemory ();
-    int max = GetMaxStreamingMemory ();
+    int min = g_pCore->GetMinStreamingMemory ();
+    int max = g_pCore->GetMaxStreamingMemory ();
     unsigned int value = SharedUtil::Lerp ( min, fPos, max );
     CVARS_SET ( "streaming_memory", value );
 
@@ -2789,8 +2789,8 @@ bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
 bool CSettings::OnStreamingMemoryChanged ( CGUIElement* pElement )
 {
     float fPos = m_pStreamingMemory->GetScrollPosition ();
-    int min = GetMinStreamingMemory ();
-    int max = GetMaxStreamingMemory ();
+    int min = g_pCore->GetMinStreamingMemory ();
+    int max = g_pCore->GetMaxStreamingMemory ();
     int value = SharedUtil::Lerp ( min, fPos, max );
     m_pStreamingMemoryValueLabel->SetText ( SString("%i MB", value) );
 

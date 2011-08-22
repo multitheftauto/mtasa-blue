@@ -294,7 +294,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Give a default value for the streaming memory
     if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
-        g_pCore->GetCVars()->Set ( "streaming_memory", GetMaxStreamingMemory () );
+        g_pCore->GetCVars()->Set ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
 }
 
 
@@ -767,9 +767,9 @@ void CClientGame::DoPulsePostFrame ( void )
         // Adjust the streaming memory limit.
         unsigned int uiStreamingMemory;
         g_pCore->GetCVars()->Get ( "streaming_memory", uiStreamingMemory );
-        uiStreamingMemory = SharedUtil::Clamp ( GetMinStreamingMemory (),
+        uiStreamingMemory = SharedUtil::Clamp ( g_pCore->GetMinStreamingMemory (),
                                                 uiStreamingMemory,
-                                                GetMaxStreamingMemory () );
+                                                g_pCore->GetMaxStreamingMemory () );
         g_pCore->GetCVars()->Set ( "streaming_memory", uiStreamingMemory );
 
         int iStreamingMemoryBytes = static_cast<int>(uiStreamingMemory) * 1024 * 1024;

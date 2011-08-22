@@ -1843,3 +1843,28 @@ void CCore::OnPreHUDRender ( void )
         pDeviceState->Release ( );
     }
 }
+
+
+//
+// GetMinStreamingMemory
+//
+uint CCore::GetMinStreamingMemory ( void )
+{
+    uint uiAmount = 50;
+
+#ifdef MTA_DEBUG
+    uiAmount = 1;
+#endif
+
+    return Min ( uiAmount, GetMaxStreamingMemory () );
+}
+
+
+//
+// GetMaxStreamingMemory
+//
+uint CCore::GetMaxStreamingMemory ( void )
+{
+    uint iMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
+    return Max < uint > ( 64, iMemoryMB );
+}

@@ -126,6 +126,8 @@ public:
     virtual void                    EnsureFrameRateLimitApplied     ( void ) = 0;
 
     virtual void                    OnPreHUDRender                  ( void ) = 0;
+    virtual uint                    GetMinStreamingMemory           ( void ) = 0;
+    virtual uint                    GetMaxStreamingMemory           ( void ) = 0;
 };
 
 #endif
